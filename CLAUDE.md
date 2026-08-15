@@ -10,10 +10,15 @@ timing, proof burden and trusted-base size.
 - `PLAN.md` — plan, feasibility argument, pattern catalogue, benchmark-cell rules, open decisions.
 - `TOOLCHAIN.md` — running Verus (`./verus_run.py`), version pins, Verus conventions, what's missing on this box.
 - `pilot/README.md` — calibration kernel at all five rungs; the evidence behind the plan.
-- `harness/` — `asm.py` (the only objdump caller), `build.py`, `check.py` (the gate),
-  `measure.py`, `report.py`. Run `harness/check.py pNN` before believing anything.
-- `patterns/p01-array-sum/` — the template every later pattern clones; `spec.md`
-  there shows the kernel contract + driver-loop shape a pattern must define.
+- `harness/` — `asm.py` (the only objdump caller), `vparse.py` (Verus items and
+  clauses), `dloop.py` (driver loop → language-neutral tokens), `fixture.py`,
+  `build.py`, `check.py` (the gate), `measure.py`, `report.py`. Run
+  `harness/check.py pNN` before believing anything.
+- `patterns/p01-array-sum/` — the template every later pattern clones. `spec.md`
+  carries the kernel contract *and* the machine-readable pins the gate enforces
+  (obligation count, every `requires`/`ensures`, the driver loop, the `Ir`
+  floor, identity levels, Miri policy); `model.py` is the independent reference
+  implementation the gate drives. Both are mandatory per pattern.
 - `../LearnVeri/PITFALLS.md` — Verus gotchas; read before debugging.
 - `../LearnVeri/_VERUS_DOC_/` — Verus guide + full vstd source; grep before guessing.
 - `../LearnVeri/microbench/` — 20 CVE ports with security proofs; reusable kernels.

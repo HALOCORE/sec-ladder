@@ -55,7 +55,7 @@ gitignored).
 
 | file | shape | why |
 |---|---|---|
-| `small.bin` | 2 000 u64 = 16 kB, win 500, 200 000 iters | working set fits L1 |
+| `small.bin` | 2 000 u64 = 16 kB, win **501**, 200 000 iters | working set fits L1; 501 not 500 so `small` and `large` sit at different `win_len mod 4` (`inputs/gen.py`, `.memory/01-ladder.md` residue trap) |
 | `large.bin` | 1 500 000 u64 = 12 MB, win 4 096, 20 000 iters | past L2/L3, memory-bound |
 | `adversarial.bin` | `n_iters = 0` | the loop must never run |
 | `adversarial-empty.bin` | `payload_len = 0` | no header word at all |

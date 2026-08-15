@@ -43,12 +43,35 @@ void slb_load(const char *path, slb_input *out)
      * would trust the field and read uninitialised memory. */
     out->payload = NULL;
     if (out->payload_len > 0) {
+        long here, end;
         size_t want = (size_t)out->payload_len;
         if ((uint64_t)want != out->payload_len) { /* 32-bit size_t guard */
             fprintf(stderr, "slb: %s: payload_len %" PRIu64 " exceeds size_t\n", path,
                     out->payload_len);
             fclose(f);
             exit(SLB_EXIT_TRUNCATED);
+        }
+        /* Check the declared length against the bytes actually present BEFORE
+         * allocating. Rust's driver::load does not allocate on the declared
+         * length either (it read_to_end's and compares), so without this the two
+         * languages diverge on a huge payload_len: C would fail the malloc and
+         * exit SLB_EXIT_NOMEM (6) where Rust exits SLB_EXIT_TRUNCATED (5), and
+         * an adversarial input would look like a rung difference when it is a
+         * driver difference. (TASK_002_REVIEW, minors.) */
+        here = ftell(f);
+        if (here >= 0 && fseek(f, 0, SEEK_END) == 0) {
+            end = ftell(f);
+            if (fseek(f, here, SEEK_SET) != 0) {
+                fprintf(stderr, "slb: %s: cannot seek\n", path);
+                fclose(f);
+                exit(SLB_EXIT_TRUNCATED);
+            }
+            if (end >= 0 && (uint64_t)(end - here) < out->payload_len) {
+                fprintf(stderr, "slb: %s: payload_len %" PRIu64 " exceeds file size\n",
+                        path, out->payload_len);
+                fclose(f);
+                exit(SLB_EXIT_TRUNCATED);
+            }
         }
         out->payload = (unsigned char *)malloc(want);
         if (!out->payload) {

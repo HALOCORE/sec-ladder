@@ -95,9 +95,54 @@ The last row is the one to remember. **Weakening an `external_body` item's
 obligations.** A wrapper whose `requires` drifts turns the whole proof vacuous
 with no diagnostic at all. This is the same class of defect as the pilot's
 `external_body main`, and neither is detectable from "N verified, 0 errors".
-Grep every `external_body` signature by hand, and prefer wrappers with **no
-`ensures` at all** (a trusted item that asserts nothing cannot axiomatise a
-falsehood) wherever the proof can re-derive the fact at run time instead.
+Prefer wrappers with **no `ensures` at all** (a trusted item that asserts
+nothing cannot axiomatise a falsehood) wherever the proof can re-derive the fact
+at run time instead.
+
+### The mechanical defences (added at TASK_003)
+
+TASK_002 recorded "`check.py` cannot catch it; only reading the trusted
+signatures can". Half right: no *verification* result catches it, but a **pin**
+does. Every pattern's `spec.md` now carries, and `harness/check.py` diffs:
+
+1. **The obligation count**, per Verus source file. `external_body main` drops
+   p01's from 5 to 3. Pinning it turns "always report the obligation count after
+   a proof edit" from a discipline into a gate.
+2. **Every item's `external` attribute, `requires` and `ensures`, verbatim**, and
+   the item *set*. This is what catches the two mutations that move no count at
+   all: a tautological `ensures` (`r == r`) and a deleted `external_body`
+   `requires`. Demonstrated at TASK_003 — both gave `5 verified, 0 errors` and a
+   green gate before, and both now fail with the exact clause diff.
+3. **`verus <file> --verify-function <name> --verify-root`** answers "does this
+   function have a verified body?" *semantically*. It reports `0 verified` for an
+   `external_body` item and ≥1 for a real one, so the "rule 2" call-site check no
+   longer depends on recognising an attribute. Useful in its own right when
+   debugging: it tells you which item an obligation belongs to.
+
+Attribute detection itself is `harness/vparse.py` now, not a regex over
+`prefix.split("\n\n")[-1]` — that split let **one blank line** between
+`#[verifier::external_body]` and `fn main` hide the attribute completely, and
+`#[cfg_attr(all(), verifier::external_body)]` was invisible to it in any layout.
+vparse walks backwards over the real token stream and matches `external_body`
+anywhere inside an attribute. It also blanks comments and string literals first,
+because `// calls kernel(...)` used to satisfy the "there is a call site" check
+on its own.
+
+### Make the `ensures` load-bearing, or it is decoration
+
+Deleting p01's kernel `ensures` outright used to give the same `5 verified, 0
+errors` — nothing consumed it. The fix is one ghost line in the driver:
+
+```rust
+let r: u64 = kernel(vs, off, win_len);
+assert(r == sum_wrap(vs@, off as int, win_len as int));   // consumes the ensures
+```
+
+With it, deleting the `ensures` fails at `4 verified, 1 errors`. **Ghost code
+erases**, so R5's kernel stays byte-identical to R4's (re-checked at TASK_003:
+`md5_fn` `619b1d1b…` both, O3 isolated) — the byte-identity objection to doing
+this was really an objection to the gate's own textual driver diff, and that now
+exempts ghost statements. Do this in every pattern.
 
 ### Vacuity is the failure mode that silently ruins everything
 

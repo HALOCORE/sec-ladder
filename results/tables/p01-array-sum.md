@@ -1,6 +1,6 @@
 # p01-array-sum — results
 
-Generated 2026-08-15T12:30:02Z from `results/p01-array-sum.json` (git `3e6ad8f77eb1`, working tree dirty).
+Generated 2026-08-15T14:13:25Z from `results/p01-array-sum.json` (git `5cd4d340e644`, working tree dirty).
 
 ## Toolchain
 
@@ -30,91 +30,96 @@ Generated 2026-08-15T12:30:02Z from `results/p01-array-sum.json` (git `3e6ad8f77
 
 `Ir` is **callgrind per-function exclusive** for the kernel symbol. The whole-program total is deliberately absent: it moves with the size of the environment block and does not reproduce across shells (`.memory/03-measurement.md`). Static counts are given raw and padding-excluded; quote the padding-excluded one, and never quote either without the `Ir` beside it.
 
-An `Ir` marked `*` is `main`-exclusive, not kernel-exclusive: the kernel was inlined and has no symbol left. **Read those rows with care.** `main`-exclusive counts whatever else was inlined into `main`, and that is not the same set in every language: the Rust rungs inline the whole payload decoder, while the C rungs leave it in `common/driver.c`'s own symbols. On `large` that is ~12.4 M instructions the Rust `main` rows carry and the C ones do not (visible as the `isolated` `main`-exclusive figures in the JSON: ~12.36 M vs ~0.38 M). So a starred row is comparable **between Rust rungs only** — never Rust-vs-C, and never to an `isolated` row. Subtract the same cell's `isolated` `main` figure first if you need the inlined kernel's cost.
+`Ir(kernel)` and `Ir(main)` are separate columns and are never merged: a `main`-exclusive count is not a kernel measurement wearing a different hat, and pairing one with a static count taken from the *other* symbol is two halves of two different measurements. **`Ir(main)` counts whatever else was inlined into `main`, and that is not the same set in every language**: the Rust rungs inline the whole payload decoder, while the C rungs leave it in `common/driver.c`'s own symbols. On `large` that is ~12.4 M instructions the Rust `main` rows carry and the C ones do not (~12.36 M vs ~0.38 M in the `isolated` rows). So `Ir(main)` is comparable **between Rust rungs only** — never Rust-vs-C, and never to an `isolated` row.
 
-### O3 / isolated — symbol: `kernel`
+**Do not try to rescue it by subtraction.** A difference of two large numbers, each containing language-specific inlining, is not a measurement — `.memory/03-measurement.md` records the arithmetic that went wrong when TASK_002 tried. Use the `isolated` kernel-exclusive figure, which needs no correction.
 
-| rung | static raw | static pad-excl | sym bytes | Ir small | Ir large | md5_raw | md5_norel | loop | vec |
-|---|---:|---:|---:|---:|---:|---|---|---|---|
-| c-gcc | 33 | 31 | 105 | 254,400,000 | 205,180,000 | `d2209fca` | `35ff8090` | yes | xmm |
-| c-clang | 38 | 35 | 128 | 180,000,000 | 143,740,000 | `c9ad71e5` | `e8ce0110` | yes | xmm |
-| safe_naive | 59 | 47 | 192 | 182,400,000 | 144,320,000 | `6c85987d` | `09823d2b` | yes | xmm |
-| safe_tuned | 58 | 44 | 192 | 181,000,000 | 143,840,000 | `d1ee09f5` | `547f4822` | yes | xmm |
-| unsafe | 39 | 34 | 144 | 180,200,000 | 143,740,000 | `fb90a96c` | `f37ab80b` | yes | xmm |
-| verus | 39 | 34 | 144 | 180,200,000 | 143,740,000 | `fb90a96c` | `f37ab80b` | yes | xmm |
-| safe_naive_verus | 59 | 47 | 192 | 182,400,000 | 144,320,000 | `6c85987d` | `09823d2b` | yes | xmm |
+### O3 / isolated — static counts are for the `kernel` symbol
 
-### O0 / isolated — symbol: `kernel`
+| rung | `kernel` instrs (nm extent) | pad-excl | trailing pad (insns) | sym bytes | Ir(kernel) small | Ir(kernel) large | Ir(main) small | Ir(main) large | md5_fn | md5_raw | loop | vec |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|
+| c-gcc | 33 | 31 | 0 | 105 | 254,400,000 | 205,180,000 | 3,000,052 | 300,052 | `d2209fca` | `d2209fca` | yes | xmm |
+| c-clang | 37 | 35 | 1 | 125 | 180,000,000 | 143,740,000 | 3,800,048 | 380,048 | `cb7ad6f3` | `c9ad71e5` | yes | xmm |
+| safe_naive | 49 | 47 | 10 | 182 | 182,400,000 | 144,320,000 | 3,816,284 | 12,380,284 | `f8e1fe32` | `6c85987d` | yes | xmm |
+| safe_tuned | 46 | 44 | 12 | 180 | 181,000,000 | 143,840,000 | 3,816,284 | 12,380,284 | `af2d4c0a` | `d1ee09f5` | yes | xmm |
+| unsafe | 36 | 34 | 3 | 141 | 180,200,000 | 143,740,000 | 3,616,285 | 12,360,285 | `619b1d1b` | `fb90a96c` | yes | xmm |
+| verus | 36 | 34 | 3 | 141 | 180,200,000 | 143,740,000 | 3,616,286 | 12,360,286 | `619b1d1b` | `fb90a96c` | yes | xmm |
+| safe_naive_verus | 49 | 47 | 10 | 182 | 182,400,000 | 144,320,000 | 3,816,285 | 12,380,285 | `f8e1fe32` | `6c85987d` | yes | xmm |
 
-> `O0` rows exist to read the lowering. **No performance claim may rest on one** (`.memory/02-bench-rules.md`). Rust here is `opt-level=0 -C debug-assertions=off`, i.e. semantics-matched to C `-O0`; the `O0d` axis (overflow checks on) is a separate build.
-
-| rung | static raw | static pad-excl | sym bytes | Ir small | Ir large | md5_raw | md5_norel | loop | vec |
-|---|---:|---:|---:|---:|---:|---|---|---|---|
-| c-gcc | 24 | 24 | 92 | 1,205,400,000 | - | `f33177c4` | `8df8a232` | yes | - |
-| c-clang | 24 | 23 | 96 | 1,305,200,000 | - | `8025a602` | `305b7568` | yes | - |
-| safe_naive | 46 | 42 | 192 | 2,108,600,000 | - | `e68a5b96` | `f0a161f2` | yes | - |
-| safe_tuned | 83 | 69 | 288 | 2,116,800,000 | - | `18c96051` | `0593c9a9` | yes | - |
-| unsafe | 48 | 36 | 176 | 2,008,400,000 | - | `38891af3` | `0f0060ce` | yes | - |
-| verus | 48 | 36 | 176 | 2,008,400,000 | - | `6c5b3ca2` | `0f0060ce` | yes | - |
-| safe_naive_verus | 46 | 42 | 192 | 2,108,600,000 | - | `e68a5b96` | `f0a161f2` | yes | - |
-
-### O3 / whole — symbol: `main (kernel inlined)`
-
-| rung | static raw | static pad-excl | sym bytes | Ir small | Ir large | md5_raw | md5_norel | loop | vec |
-|---|---:|---:|---:|---:|---:|---|---|---|---|
-| c-gcc | 226 | 222 | 896 | 255,000,109 * | 205,260,109 * | `d29a72c7` | `3fe8c7d8` | yes | xmm |
-| c-clang | 213 | 209 | 838 | 183,000,127 * | 144,000,127 * | `133526c6` | `a7ac98bc` | yes | xmm |
-| safe_naive | 728 | 717 | 3,152 | 186,624,291 * | 162,800,291 * | `486961f0` | `1fd3c264` | yes | xmm |
-| safe_tuned | 712 | 701 | 3,072 | 183,816,286 * | 156,080,286 * | `1ed3505f` | `e01dbb50` | yes | xmm |
-| unsafe | 700 | 690 | 3,024 | 183,216,286 * | 155,980,286 * | `f84ba3a7` | `32b4f6c2` | yes | xmm |
-| verus | 697 | 686 | 3,056 | 183,016,285 * | 155,960,285 * | `86bbb0ac` | `6b0def94` | yes | xmm |
-| safe_naive_verus | 708 | 697 | 3,136 | 185,216,288 * | 156,660,288 * | `0b2951db` | `d6a9f18d` | yes | xmm |
-
-### O0 / whole — symbol: `main (kernel inlined)`
+### O0 / isolated — static counts are for the `kernel` symbol
 
 > `O0` rows exist to read the lowering. **No performance claim may rest on one** (`.memory/02-bench-rules.md`). Rust here is `opt-level=0 -C debug-assertions=off`, i.e. semantics-matched to C `-O0`; the `O0d` axis (overflow checks on) is a separate build.
 
-| rung | static raw | static pad-excl | sym bytes | Ir small | Ir large | md5_raw | md5_norel | loop | vec |
-|---|---:|---:|---:|---:|---:|---|---|---|---|
-| c-gcc | 85 | 85 | 347 | 1,205,400,000 | - | `907e1d80` | `328bcd20` | yes | - |
-| c-clang | 65 | 65 | 269 | 1,305,200,000 | - | `909271db` | `7adb28c7` | yes | - |
-| safe_naive | 129 | 125 | 640 | 2,108,600,000 | - | `e0f2cccc` | `022902d5` | yes | xmm |
-| safe_tuned | 129 | 125 | 640 | 2,116,800,000 | - | `c3a33e91` | `022902d5` | yes | xmm |
-| unsafe | 129 | 125 | 640 | 2,008,400,000 | - | `b6d4deb8` | `022902d5` | yes | xmm |
-| verus | 102 | 88 | 448 | 2,008,400,000 | - | `d74471d2` | `bad9b7e5` | yes | xmm |
-| safe_naive_verus | 102 | 88 | 448 | 2,108,600,000 | - | `91d0be77` | `bad9b7e5` | yes | xmm |
+| rung | `kernel` instrs (nm extent) | pad-excl | trailing pad (insns) | sym bytes | Ir(kernel) small | Ir(kernel) large | Ir(main) small | Ir(main) large | md5_fn | md5_raw | loop | vec |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|
+| c-gcc | 24 | 24 | 0 | 92 | 1,205,400,000 | - | 4,600,064 | - | `f33177c4` | `f33177c4` | yes | - |
+| c-clang | 23 | 23 | 1 | 86 | 1,305,200,000 | - | 4,000,055 | - | `de6279c5` | `8025a602` | yes | - |
+| safe_naive | 42 | 42 | 4 | 188 | 2,108,600,000 | - | 6,200,073 | - | `3ab6079d` | `e68a5b96` | yes | - |
+| safe_tuned | 69 | 69 | 14 | 274 | 2,116,800,000 | - | 6,200,073 | - | `05c1a4fe` | `18c96051` | yes | - |
+| unsafe | 36 | 36 | 12 | 164 | 2,008,400,000 | - | 6,200,073 | - | `1dffc20c` | `38891af3` | yes | - |
+| verus | 36 | 36 | 12 | 164 | 2,008,400,000 | - | 6,200,052 | - | `779a1133` | `6c5b3ca2` | yes | - |
+| safe_naive_verus | 42 | 42 | 4 | 188 | 2,108,600,000 | - | 6,200,052 | - | `3ab6079d` | `e68a5b96` | yes | - |
+
+### O3 / whole — static counts are for the `main` symbol; the kernel was inlined away, so it has no symbol and no static count of its own here
+
+| rung | `main` instrs (nm extent) | pad-excl | trailing pad (insns) | sym bytes | Ir(kernel) small | Ir(kernel) large | Ir(main) small | Ir(main) large | md5_fn | md5_raw | loop | vec |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|
+| c-gcc | 259 | 257 | 0 | 1,024 | - | - | 255,000,134 | 205,260,134 | `c87b764f` | `c87b764f` | yes | xmm |
+| c-clang | 253 | 249 | 0 | 1,010 | - | - | 183,000,166 | 144,000,166 | `164677c0` | `164677c0` | yes | xmm |
+| safe_naive | 727 | 717 | 1 | 3,151 | - | - | 186,624,291 | 162,800,291 | `e58bb012` | `486961f0` | yes | xmm |
+| safe_tuned | 711 | 701 | 1 | 3,071 | - | - | 183,816,286 | 156,080,286 | `aefc040c` | `1ed3505f` | yes | xmm |
+| unsafe | 699 | 690 | 1 | 3,023 | - | - | 183,216,286 | 155,980,286 | `3119981f` | `f84ba3a7` | yes | xmm |
+| verus | 696 | 686 | 1 | 3,055 | - | - | 183,016,285 | 155,960,285 | `85d6e419` | `86bbb0ac` | yes | xmm |
+| safe_naive_verus | 707 | 697 | 1 | 3,135 | - | - | 185,216,288 | 156,660,288 | `16f5d251` | `0b2951db` | yes | xmm |
+
+### O0 / whole — static counts are for the `main` symbol; the kernel symbol **survived** at this opt level, so nothing was inlined and the `Ir(kernel)` column is the real kernel cost
+
+> `O0` rows exist to read the lowering. **No performance claim may rest on one** (`.memory/02-bench-rules.md`). Rust here is `opt-level=0 -C debug-assertions=off`, i.e. semantics-matched to C `-O0`; the `O0d` axis (overflow checks on) is a separate build.
+
+| rung | `main` instrs (nm extent) | pad-excl | trailing pad (insns) | sym bytes | Ir(kernel) small | Ir(kernel) large | Ir(main) small | Ir(main) large | md5_fn | md5_raw | loop | vec |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|
+| c-gcc | 85 | 85 | 0 | 347 | 1,205,400,000 | - | 4,600,064 | - | `3a7ee833` | `3a7ee833` | yes | - |
+| c-clang | 65 | 65 | 0 | 269 | 1,305,200,000 | - | 3,800,055 | - | `ad425aa4` | `ad425aa4` | yes | - |
+| safe_naive | 125 | 125 | 4 | 636 | 2,108,600,000 | - | 6,200,073 | - | `f5131744` | `e0f2cccc` | yes | xmm |
+| safe_tuned | 125 | 125 | 4 | 636 | 2,116,800,000 | - | 6,200,073 | - | `64f574b6` | `c3a33e91` | yes | xmm |
+| unsafe | 125 | 125 | 4 | 636 | 2,008,400,000 | - | 6,200,073 | - | `98cb4fcb` | `b6d4deb8` | yes | xmm |
+| verus | 88 | 88 | 14 | 434 | 2,008,400,000 | - | 6,200,052 | - | `506b9992` | `d74471d2` | yes | xmm |
+| safe_naive_verus | 88 | 88 | 14 | 434 | 2,108,600,000 | - | 6,200,052 | - | `74a83eb0` | `91d0be77` | yes | xmm |
 
 ## Structural identity — does a proof cost anything?
 
-Compared in `isolated` builds, where the kernel is its own symbol. `md5_raw` is bit-exact machine code; `md5_norel` is the same bytes with pc-relative displacement fields zeroed, which is the honest oracle when two binaries link the kernel's callees at different addresses (that happens at `O0`, where the Rust kernel still calls `Iterator::next`).
+Compared in `isolated` builds, where the kernel is its own symbol, and on the **declared symbol extent** (`nm --print-size`), which is the function proper. `md5_raw` is objdump's grouping and also covers the alignment padding that follows the function, so two genuinely identical kernels at different alignments disagree on it and agree on `md5_fn` — the padding is reported separately rather than folded in. `md5_fn_norel` is the same bytes with pc-relative displacement fields zeroed, which is the honest (weaker) oracle when two binaries link the kernel's callees at different addresses — that happens at `O0`, where the Rust kernel still calls `Iterator::next`.
 
-| pair | opt | md5_raw equal | md5_norel equal | raw counts |
-|---|---|---|---|---|
-| unsafe vs verus | O0 | no | **yes** | 48/36 vs 48/36 |
-| unsafe vs verus | O3 | **yes** | **yes** | 39/34 vs 39/34 |
-| safe_naive vs safe_naive_verus | O0 | **yes** | **yes** | 46/42 vs 46/42 |
-| safe_naive vs safe_naive_verus | O3 | **yes** | **yes** | 59/47 vs 59/47 |
+| pair | opt | md5_fn equal | md5_fn_norel equal | md5_raw equal | counts (fn / pad-excl) | padding |
+|---|---|---|---|---|---|---|
+| unsafe vs verus | O0 | no | **yes** | no | 36/36 vs 36/36 | 12 B vs 12 B |
+| unsafe vs verus | O3 | **yes** | **yes** | **yes** | 36/34 vs 36/34 | 3 B vs 3 B |
+| safe_naive vs safe_naive_verus | O0 | **yes** | **yes** | **yes** | 42/42 vs 42/42 | 4 B vs 4 B |
+| safe_naive vs safe_naive_verus | O3 | **yes** | **yes** | **yes** | 49/47 vs 49/47 | 10 B vs 10 B |
 
 ## Wall clock (secondary)
 
 > taskset -c 3, interleaved round-robin, 30 reps, min and median; frequency scaling on, shared box. Frequency scaling is on and cannot be disabled without root; the box is shared and containerised. Wall clock is a sanity check on `Ir`, never the headline. Times include process start-up and reading the input file.
 
-| rung | mode | large.bin min (ms) | large.bin median (ms) | small.bin min (ms) | small.bin median (ms) |
-|---|---|---:|---:|---:|---:|
-| c-gcc | isolated | 36.85 | 41.07 | 26.27 | 28.86 |
-| c-gcc | whole | 37.61 | 41.48 | 26.00 | 29.74 |
-| c-clang | isolated | 37.31 | 41.37 | 16.12 | 19.33 |
-| c-clang | whole | 37.18 | 39.98 | 16.84 | 19.74 |
-| safe_naive | isolated | 37.96 | 42.63 | 17.34 | 21.37 |
-| safe_naive | whole | 37.95 | 41.10 | 17.15 | 20.23 |
-| safe_tuned | isolated | 37.86 | 40.84 | 17.19 | 19.70 |
-| safe_tuned | whole | 37.90 | 40.50 | 16.50 | 20.06 |
-| unsafe | isolated | 37.94 | 41.61 | 16.87 | 20.03 |
-| unsafe | whole | 37.76 | 41.57 | 16.32 | 20.18 |
-| verus | isolated | 37.71 | 40.99 | 17.57 | 20.06 |
-| verus | whole | 37.49 | 40.94 | 16.15 | 20.34 |
-| safe_naive_verus | isolated | 37.64 | 40.31 | 17.48 | 20.44 |
-| safe_naive_verus | whole | 37.71 | 40.18 | 16.42 | 18.28 |
+| rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
+|---|---|---:|---:|---:|---:|---:|---:|
+| c-gcc | isolated | 35.84 | 36.13 | 0.8% | 25.70 | 26.08 | 1.5% |
+| c-gcc | whole | 36.52 | 36.86 | 0.9% | 25.65 | 26.10 | 1.8% |
+| c-clang | isolated | 35.94 | 36.39 | 1.3% | 15.99 | 16.26 | 1.7% |
+| c-clang | whole | 35.99 | 36.35 | 1.0% | 16.65 | 16.89 | 1.4% |
+| safe_naive | isolated | 36.82 | 37.09 | 0.7% | 16.98 | 17.32 | 2.0% |
+| safe_naive | whole | 36.86 | 37.14 | 0.8% | 16.90 | 17.09 | 1.2% |
+| safe_tuned | isolated | 36.72 | 37.05 | 0.9% | 16.98 | 17.20 | 1.3% |
+| safe_tuned | whole | 36.70 | 36.99 | 0.8% | 16.13 | 16.35 | 1.3% |
+| unsafe | isolated | 36.62 | 37.07 | 1.2% | 16.20 | 16.94 | 4.6% |
+| unsafe | whole | 36.75 | 37.03 | 0.8% | 15.98 | 16.42 | 2.8% |
+| verus | isolated | 36.72 | 37.16 | 1.2% | 17.16 | 17.71 | 3.2% |
+| verus | whole | 36.56 | 36.91 | 1.0% | 16.03 | 16.42 | 2.5% |
+| safe_naive_verus | isolated | 36.57 | 36.93 | 1.0% | 17.32 | 17.59 | 1.6% |
+| safe_naive_verus | whole | 36.48 | 36.75 | 0.7% | 16.19 | 16.47 | 1.7% |
+
+Every wall-clock cell is within the 10% min-to-median spread threshold.
+
 
 ## Cells and metrics not measured
 

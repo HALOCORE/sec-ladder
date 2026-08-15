@@ -17,8 +17,33 @@ emits `mov eax, <answer>; ret`. Then you are timing `printf`.
    separate TU, no LTO. In `whole` mode inlining is allowed *on purpose* — that is
    the point of that mode — and rule 1 is what keeps it honest.
 4. **Verify, don't assume.** Every new pattern's build is checked by
-   `harness/check.py`, which greps the kernel's disassembly for a plausible loop
-   and fails the cell if the body collapsed to a constant. Report the check.
+   `harness/check.py`. It checks anti-collapse **twice**, because either check
+   alone is defeatable:
+   - *structurally* — the kernel's disassembly must have a backward branch, a
+     memory operand and a body above a floor. A collapsed kernel usually has
+     none of these, but a kernel that was hoisted or CSE'd still has all three;
+   - *dynamically* — **marginal executed instructions per kernel call**, against
+     a floor declared in the pattern's `spec.md`. Measured as a difference of
+     two callgrind runs of the same binary on the same input with only `n_iters`
+     changed (that field is at offset 0 of every input file, so the harness can
+     build the probe without the pattern's help). The difference cancels the
+     loader and environment terms that make an absolute whole-program `Ir`
+     unquotable, and it is **symbol-independent**, so it works in `whole` mode
+     where the kernel has no symbol and at `O0` where a rung's work lives in
+     `core::iter` symbols rather than in `kernel`.
+
+   Measured on p01, the floor across all 28 cells is 915 Ir/call (`c-clang O3
+   whole`); `spec.md` pins 400.
+
+5. **The barrier is pinned in `spec.md`, not inferred.** Removing the driver's
+   anti-collapse barrier is *not* reliably visible in either check above:
+   measured at TASK_003, replacing `off = acc % nwin` with `off = 0` in every
+   rung leaves p01's marginal `Ir` at ~902/call, because LLVM does not hoist a
+   whole inner loop out of an outer one. So the driver loop itself is pinned as
+   a canonical token sequence in the pattern's `spec.md`, and every rung — C
+   included — is normalised and diffed against **that**, not against each other.
+   Diffing the rungs against each other passes happily when the mutation is
+   applied to all of them.
 
 ## Input files
 
@@ -57,9 +82,40 @@ offset 16  u8[payload_len]    # pattern-defined payload
 - **Driver logic must be identical across R2–R5** and behaviourally identical to
   the C driver. Preferred: one shared `common/driver.rs` pulled in with
   `#[path = "..."] mod driver;`, marked `#[verifier::external]` in R5. If that
-  fights Verus, duplicate it — but then `harness/check.py` must diff the copies.
+  fights Verus, duplicate it — but then every copy is diffed **against the
+  canonical token sequence pinned in `spec.md`**, never against another copy.
+- The C copy is diffed the same way. `harness/dloop.py` normalises both
+  languages (types, casts, `wrapping_*` methods, grouping parentheses, Verus
+  clauses and ghost statements) to one token sequence; names that genuinely
+  differ get an explicit alias table in `spec.md`. **Required substrings are not
+  a diff**: p01's seven-substring check passed with a `__builtin_prefetch` and
+  an `__asm__ __volatile__` memory barrier added to the C driver loop, which is
+  precisely the cross-language asymmetry the anti-partial-evaluation rules
+  forbid.
+- **Ghost statements are exempt from the diff**, exactly as `invariant` and
+  `decreases` are. Ghost code erases, so an R5 driver that consumes its kernel's
+  `ensures` with an `assert` stays byte-identical to R4's — and R5's `ensures`
+  should be consumed, or it is decoration that only mutation testing defends.
 - Kernel signature is fixed per pattern in the pattern's `spec.md`, and all five
   rungs implement exactly that contract.
+
+## Miri policy
+
+**Miri is mandatory for any pattern where R4 and R5 are not byte-identical**, and
+only then. The reason is precise: the project's claim about R4 is that it is the
+same machine code as the rung whose obligations were discharged. When the two
+kernels are byte-identical, R4 inherits R5's proof exactly and a UB check adds
+nothing. When they are not, R4 is unverified unsafe code that 47 patterns will
+imitate, and nothing has checked it.
+
+`harness/check.py` step 8 wires this: it reads the identity level it measured for
+the R4/R5 pair at `O3`, and a pattern that is **not** `exact` while its `spec.md`
+says `miri.required = false` is a gate failure. p01 is `exact` and is therefore
+exempt, with the reason recorded in its own contract rather than in prose
+somebody has to remember. Note Miri is **not installed** for the pinned stable
+toolchain on this box (`rustup component add miri` is unavailable for
+`stable-x86_64-unknown-linux-gnu`), so the first pattern that needs it has to
+solve that first — the gate will say so rather than skip.
 
 ## Honesty rules
 
@@ -82,7 +138,12 @@ machine code was fine; the *label* was indefensible.
 
 1. **Every input a rung-5 cell is measured on must satisfy that cell's `requires`.**
    An R5 number produced outside the verified domain is R4's number wearing R5's
-   label. Record it as an R4 row, or not at all.
+   label. Record it as an R4 row, or not at all. **"Every input" includes the
+   `adversarial` ones.** The gate used to build its model set from the
+   non-adversarial inputs only; p01 hid that because its adversarial inputs make
+   zero kernel calls, but for most patterns the adversarial input is *by
+   construction* the one aimed at the precondition, so it is the single most
+   important input to evaluate this rule on.
 2. **A rung-5 cell needs at least one *verified* call site.** If the kernel is only
    reachable from `#[verifier::external_body] fn main`, no precondition is ever
    discharged and the proof is decorative — it verifies, and constrains nothing.
@@ -92,10 +153,35 @@ machine code was fine; the *label* was indefensible.
 3. **The `ensures` must hold on every measured run.** If the largest measured input
    falsifies a postcondition, the cell is invalid — not footnoted.
 4. **`harness/check.py` enforces 1–3 per cell.** It reads the kernel's
-   `requires`/`ensures` from `spec.md`, evaluates them against each input case's
-   generated parameters (`n`, value bounds, checksum range), and **fails the cell**
-   on violation. A pattern whose R5 precondition cannot cover `large` is a
+   `requires`/`ensures` from `spec.md`, drives the pattern's own `model.py` over
+   **every** input file, and evaluates the contract at every call the benchmark
+   actually makes. A pattern whose R5 precondition cannot cover `large` is a
    documented failure, not a silently narrowed table.
 
 Rule 2 is the one that matters: verifying a function proves nothing if nothing has
 to satisfy its preconditions.
+
+### How the gate enforces rule 2 — and why not with a regex
+
+Rewritten at TASK_003 after a reviewer put an `#[verifier::external_body] fn main`
+past the gate with **one blank line** (the attribute scan read
+`prefix.split("\n\n")[-1]`). Three independent mechanisms now, because each
+catches a different spelling of the same defect:
+
+- **The obligation count is pinned in `spec.md`.** `external_body main` drops
+  p01's count 5 → 3, and so does most tampering. A count that *moved* means code
+  stopped being verified, never that the proof got easier.
+- **Every item's `external` attribute, `requires` and `ensures` is pinned in
+  `spec.md` and diffed** (`harness/vparse.py`), as is the item *set*. This is the
+  only mechanical defence against the two mutations that leave "N verified, 0
+  errors" completely unchanged: a tautological `ensures`, and a `requires`
+  deleted from an `external_body` wrapper (`.memory/04-verus.md`).
+- **Verus is asked, not inspected.** `verus <file> --verify-function main
+  --verify-root` reports `0 verified` when `main` has no verified body, and ≥1
+  when it does. That is a semantic answer to a semantic question, and no
+  attribute spelling defeats it.
+
+Every pattern therefore ships two more files beside its sources:
+`model.py` (the independent reference implementation the gate drives — the model
+used to be hard-coded into `check.py`, which would have forced 47 forks) and the
+`slb-contract` block in `spec.md` carrying all of the pins above.

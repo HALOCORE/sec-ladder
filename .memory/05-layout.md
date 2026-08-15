@@ -16,14 +16,31 @@ sec-ladder/
     slb.py                  # input-file format read/write helper
   harness/
     build.py                # build one/all cells of a pattern
-    check.py                # correctness gate: checksums agree, no constant-folding
+    check.py                # correctness gate: checksums, anti-collapse, proof
+                            #   domain, driver pin, sanitizers, Miri policy
     asm.py                  # extract + normalise + diff kernel assembly
+    vparse.py               # Verus/Rust items, attributes, requires/ensures
+                            #   clauses. `python3 harness/vparse.py selftest`
+    dloop.py                # the driver loop -> a language-neutral token
+                            #   sequence, so C and Rust are diffed mechanically
+    fixture.py              # builds .temp/build/docrepro, the fixture
+                            #   `asm.py selftest` measures. Run it on a fresh
+                            #   checkout; check.py runs it for you
     measure.py              # instruction counts, callgrind, timing -> results JSON
     report.py               # results JSON -> markdown tables
   patterns/pNN-<slug>/
     README.md               # what the pattern is, the C bug, expected findings
     spec.md                 # the exact kernel contract all 5 rungs implement,
-                            #   incl. a ```slb-contract block check.py parses
+                            #   incl. a ```slb-contract block check.py parses.
+                            #   That block is a set of PINS: obligation count,
+                            #   every verus item's requires/ensures, the driver
+                            #   loop, the Ir floor, identity levels, Miri policy
+    model.py                # MANDATORY. The independent Python reference
+                            #   implementation of spec.md; check.py imports it
+                            #   and drives it over every input. See p01's for
+                            #   the required API -- the model used to be
+                            #   hard-coded in check.py, which would have forced
+                            #   47 forks of the gate
     inputs/gen.py           # deterministic input generation (.bin gitignored)
     c/kernel.c  c/kernel.h  # the kernel, its own TU
     c/main.c                # the C driver loop, a second TU so `isolated`
@@ -35,7 +52,11 @@ sec-ladder/
                             #   It exists to hold up finding 2 in 01-ladder.md.
     NOTES.md                # per-rung findings, proof sticking points, TCB tally
   results/
-    pNN-<slug>.json         # raw, committed
+    pNN-<slug>.json         # raw measurements, committed
+    gate/pNN-<slug>.json    # what check.py *found*, committed: identity levels,
+                            #   marginal Ir per call, obligation counts, TCB
+                            #   inventory, per-input requires/ensures coverage,
+                            #   adversarial behaviour, the verdict
     tables/                 # generated markdown, regenerable
 ```
 
@@ -52,10 +73,38 @@ sec-ladder/
 - **The driver loop is duplicated, on purpose, once per rung**, between
   `SLB-DRIVER-BEGIN` / `SLB-DRIVER-END` markers. It cannot be shared: R5's copy
   has to sit inside `verus!` so the kernel call site is verified
-  (`.memory/02-bench-rules.md` rule 2). `harness/check.py` step 6 diffs the Rust
-  copies (Verus `invariant`/`decreases` clauses stripped) and requires the C copy
-  to contain the same arithmetic. `common/driver.{c,rs}` holds only the parts
-  that *can* be shared: argv, file I/O, payload decoding, and printing.
+  (`.memory/02-bench-rules.md` rule 2). `harness/check.py` step 6 normalises
+  every copy — the C one included — with `harness/dloop.py` and diffs each
+  against the canonical token sequence pinned in `spec.md`. **Never
+  copy-against-copy**: that passes when the mutation is applied to all of them,
+  demonstrated at TASK_003 by deleting the anti-collapse barrier from all five
+  Rust rungs and watching the old gate print "5 Rust rungs share a
+  byte-identical driver loop". `common/driver.{c,rs}` holds only the parts that
+  *can* be shared: argv, file I/O, payload decoding, and printing.
+
+## Adding a pattern — what the gate needs from you
+
+`harness/check.py` is generic; everything pattern-specific lives in two files.
+In order:
+
+1. **`spec.md`** — prose contract, then the ```slb-contract``` block. Start by
+   copying p01's and changing every value. The block's fields:
+   `kernel`, `model`, `requires`, `ensures`, `verus.{call_site, kernel_item,
+   obligations, items}`, `driver.{statements, c_source, aliases, canonical}`,
+   `collapse.{probe_input, probe_iters, min_marginal_ir_per_call}`, `identity`,
+   `miri.{required, reason}`.
+2. **`model.py`** — a *second* implementation of `spec.md` in Python, from the
+   file bytes alone. Required API is documented at the top of p01's. It must not
+   share code with the rungs beyond `common/slb.py`.
+3. Generate the driver pin: `python3 harness/dloop.py <rung>.rs` prints the
+   canonical token sequence; paste it into `driver.canonical`. Run it on
+   `c/main.c` too and add `driver.aliases.c` entries until the two agree.
+4. Get the pins right by running the gate and reading what it says the values
+   are: obligation counts, identity levels and the `Ir` floor are all reported
+   before they are asserted.
+5. **Then mutate your own proof and check the gate fails.** A pattern whose
+   `spec.md` pins are copied from p01 without being re-derived is a pattern
+   whose gate certifies p01.
 
 ## What is committed
 

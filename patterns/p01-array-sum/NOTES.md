@@ -62,17 +62,33 @@ add    $0xfffffffffffffffc,%rdx
 jne    <back edge>
 ```
 
-`harness/check.py` step 3 re-derives this mechanically for all 28 cells: a
+`harness/check.py` step 3a re-derives this mechanically for all 28 cells: a
 backward branch inside the symbol, a memory operand, and a body above a floor.
+That is necessary and not sufficient — a kernel that was hoisted or CSE'd still
+has all three — so step 3b measures the **marginal executed instructions per
+kernel call**: whole-program `Ir` at 200 driver iterations minus `Ir` at 100,
+over the 100 extra calls. A difference of two runs of the same binary in the
+same shell, so every loader and environment term cancels, and it needs no
+symbol, which is why it works in `whole` mode and at `O0`. Across all 28 cells
+the range is **915 … 33 638 Ir/call**; `spec.md` pins a floor of 400. A
+collapsed loop reads ~0.
 
 ## 2. A Verus proof costs zero instructions — both halves
 
-`isolated`, raw machine-code bytes (`harness/asm.py`, `md5_raw`):
+`isolated`, raw machine-code bytes (`harness/asm.py`). **Quoted on the declared
+symbol extent (`nm --print-size`, `md5_fn`)**, which is the function proper;
+`md5_raw` is objdump's grouping and also covers the alignment padding that
+follows the function, so it is given beside it with the padding stated. Both
+conventions agree on every equality here (`.memory/03-measurement.md`).
 
-| pair | O3 `md5_raw` | O0 `md5_raw` | raw / padding-excluded |
-|---|---|---|---|
-| R4 `unsafe` vs R5 `verus` | **equal**, `fb90a96c…` | differs; `md5_raw_norel` **equal** `0f0060ce…` | 39 / 34 both |
-| R2 `safe_naive` vs R2v `safe_naive_verus` | **equal**, `6c85987d…` | **equal**, `e68a5b96…` | 59 / 47 both |
+| pair | O3 `md5_fn` | O3 `md5_raw` | O0 | counts `n_fn`/pad-excl (+padding) |
+|---|---|---|---|---|
+| R4 `unsafe` vs R5 `verus` | **equal**, `619b1d1b…` | **equal**, `fb90a96c…` | `md5_fn` differs (`1dffc20c…` vs `779a1133…`); `md5_fn_norel` **equal** `e5bc48f2…` | 36 / 34 both (+3 insn, 3 B padding) |
+| R2 `safe_naive` vs R2v `safe_naive_verus` | **equal**, `f8e1fe32…` | **equal**, `6c85987d…` | **equal**, `3ab6079d…` | 49 / 47 both (+10 insn, 10 B padding) |
+
+(TASK_002 published 39/34 and 59/47 as the "raw" counts; those are objdump's
+grouping, i.e. the function *plus* its trailing padding. The function itself is
+36 and 49 instructions. Neither the deltas nor the equalities move.)
 
 and the dynamic side agrees exactly: R5's kernel `Ir` equals R4's, and R2v's
 equals R2's, on both `small` and `large`, to the instruction.
@@ -233,52 +249,76 @@ Three deliberate choices behind that table:
 ### R2v (`safe_naive_verus.rs`) — TCB: 5 lines across 2 items
 
 `load_input` (4) and `emit` (1). No `get_unchecked`, no `unsafe` anywhere in the
-file. **A strictly smaller trusted base, and strictly worse code** (59/47 static
-vs R4's 39/34, +11…+29 `Ir` per call). That is finding 2 of
-`.memory/01-ladder.md` stated as a trade: the proof only pays when it licenses
-something.
+file. **A strictly smaller trusted base, and strictly worse code** (49 / 47
+static on the `nm` extent vs R4's 36 / 34, +11…+29 `Ir` per call). That is
+finding 2 of `.memory/01-ladder.md` stated as a trade: the proof only pays when
+it licenses something.
 
 ## 5. The proof covers the measured domain — and is not vacuous
 
 Rule 2 of `.memory/02-bench-rules.md` — the one the pilot failed — is satisfied
-structurally: `fn main` is *inside* `verus! { }`, is *not* `external_body`, and
-contains the call `kernel(vs, off, win_len)`. `harness/check.py` step 5 asserts
-all three by parsing `verus.rs`, so it cannot regress silently.
+structurally *and* semantically: `fn main` is inside `verus! { }`, is not
+`external_body`, and contains the call `kernel(vs, off, win_len)`; and
+`verus verus.rs --verify-function main --verify-root` reports **2 verified**,
+which is Verus itself confirming `main` has a verified body. (An `external_body`
+`main` reports **0 verified** — that is the pilot's defect detected semantically
+rather than by recognising an attribute, which is what a blank line defeated.)
 
-Rules 1 and 3 are enforced numerically: `check.py` simulates the driver in Python
-from the input file, then evaluates the contract in `spec.md` at **every call the
-benchmark actually makes** (220 000 of them across `small` and `large`) and
-re-derives the `ensures` on a sample with a second, independent summation.
+Rules 1 and 3 are enforced numerically: `check.py` drives this pattern's own
+`model.py` from the input file, then evaluates the contract in `spec.md` at
+**every call the benchmark actually makes** (220 000 of them across `small` and
+`large`) and re-derives the `ensures` on a sample with a second, independent
+summation. **Every input is evaluated, `adversarial-*` included** — p01's
+adversarial inputs all make zero kernel calls, so they are vacuously inside the
+domain, but the previous gate never looked, and for a pattern whose adversarial
+input is aimed at the precondition that is the one input that matters.
 
 But a green verification proves nothing by itself, so the proof was mutated and
-each mutant checked to fail:
+each mutant checked to fail. **Re-run at TASK_003**, because TASK_002 mis-quoted
+M5's evidence:
 
-| # | mutation | result |
-|---|---|---|
-| M5 | `nwin = n_vals − win_len + **2**` (so `off` can reach one past the last window) | **fails** — `precondition not satisfied … off + len <= v@.len() … at kernel(vs, off, win_len)` |
-| M1 | driver guard `win_len_w <= n_vals + 1` | **fails** — underflow in `n_vals − win_len` |
-| M2 | kernel's `requires` deleted | **fails** — loop invariant not established at entry |
-| M4 | `ensures` shifted by one element (`len + 1`) | **fails** — postcondition not satisfied |
-| M3 | **`requires` deleted from the trusted `get_unchecked`** | **VERIFIES, 5 verified 0 errors** |
+| # | mutation | verifier result | caught by the gate? |
+|---|---|---|---|
+| M5a | `nwin = n_vals − win_len + **2**`, loop invariant left alone | **fails** — `possible arithmetic underflow/overflow` at the `nwin` line **and** `invariant not satisfied before loop`. *Not* at the call. | driver pin |
+| M5b | the same, with the invariant repaired to `nwin == n_vals − win_len + 2` | **fails** — `precondition not satisfied … off + len <= v@.len()` at **`verus.rs:126:26`, the `kernel(vs, off, win_len)` call** | driver pin |
+| M1 | driver guard `win_len_w <= n_vals + 1` | **fails** — underflow in `n_vals − win_len` | driver pin |
+| M2 | kernel's `requires` deleted | **fails** — loop invariant not established at entry | contract pin |
+| M4 | `ensures` shifted by one element (`len + 1`) | **fails** — postcondition not satisfied | contract pin |
+| M6 | kernel's `ensures` **deleted entirely** | **fails** — `4 verified, 1 errors`, at the driver's ghost `assert` | contract pin |
+| M7 | kernel's `ensures` replaced by `r == r` | **`5 verified, 0 errors`** with the pre-TASK_003 driver; with the ghost assert it fails | contract pin |
+| M3 | **`requires` deleted from the trusted `get_unchecked`** | **VERIFIES, 5 verified 0 errors** — no diagnostic, ever | contract pin |
 
-M5 is the evidence that the call site is load-bearing: perturb the driver's
-arithmetic by one and Verus rejects it *at the call*, naming the precondition.
+**M5 is the evidence that the call site is load-bearing, and TASK_002 quoted the
+wrong half of it.** The published mutant fails *before* the call, at the loop
+invariant, so on its own it proves only that the invariant mentions `nwin`. The
+real evidence needs the invariant repaired too (M5b) — and then Verus rejects it
+*at the call*, naming the precondition. Substance was right, evidence was
+mis-quoted.
 
-One honest caveat: **the kernel's `ensures` is verified but not *consumed*.**
-`main` folds the return value into the checksum without asserting anything about
-it, so nothing downstream depends on `r == sum_wrap(...)`. Its non-triviality
-rests on mutation M4 (perturb it and verification fails), not on a call-site
-obligation the way the `requires` does. Consuming it would mean a ghost
-assertion inside the driver loop, which would break the loop's byte-identity
-with the other four rungs — a worse trade for a calibration pattern. Patterns
-that model an actual bug should make the `ensures` load-bearing.
+**The `ensures` is now consumed.** The driver carries one ghost line:
 
-M3 is the warning. Weakening an `external_body` item's `requires` never produces
-an error — it silently deletes the obligation from every caller and makes the
-memory-safety claim vacuous, with the same "N verified, 0 errors" on stdout.
-`check.py` cannot catch it (the mutant is a perfectly well-formed proof of a
-weaker statement); only reading the trusted signatures can. Written up in
-`.memory/04-verus.md`.
+```rust
+let r: u64 = kernel(vs, off, win_len);
+assert(r == sum_wrap(vs@, off as int, win_len as int));
+```
+
+Before it, deleting the postcondition entirely (M6) still gave `5 verified, 0
+errors` — the `ensures` was free decoration defended only by mutation testing.
+Ghost code erases, so R5's kernel is still byte-identical to R4's (`md5_fn`
+`619b1d1b…` both, `-O3 isolated`) and the driver loop still matches the pin:
+`harness/dloop.py` exempts ghost statements exactly as it exempts
+`invariant`/`decreases`. The byte-identity objection TASK_002 raised against
+doing this was really an objection to the gate's own textual rule.
+
+**M3 is the warning, and it is now caught — by a pin, not by the verifier.**
+Weakening an `external_body` item's `requires` never produces an error: it
+silently deletes the obligation from every caller and makes the memory-safety
+claim vacuous, with the same "N verified, 0 errors" on stdout. No verification
+result can catch that, because the mutant is a perfectly well-formed proof of a
+weaker statement. `spec.md` therefore pins every item's `external` attribute,
+`requires` and `ensures` verbatim, plus the item set and the obligation count,
+and `check.py` diffs them. Demonstrated at TASK_003: the old gate reported
+`check.py: PASS` on M3 and M7; the new one fails with the exact clause diff.
 
 ## 6. Proof sticking points
 
@@ -325,14 +365,35 @@ misattribute to a rung later.
 
 ## 8. Known gaps
 
-- **No Miri run on R4/R5.** `get_unchecked` correctness is argued from the
-  proof (R5) and by inspection (R4), and ASan/UBSan cover only the C side.
+- **No Miri run on R4/R5, and that is now a policy decision rather than an
+  omission.** `.memory/02-bench-rules.md` makes Miri mandatory exactly when R4
+  and R5 are *not* byte-identical, because that is when R4 stops inheriting R5's
+  discharged obligations. p01's are byte-identical at `-O3` (`md5_fn`
+  `619b1d1b…` both), so it is exempt, and `spec.md` records the exemption in
+  `miri.required` where `check.py` step 8 reads it. Note Miri is **not
+  installed** for the pinned stable toolchain on this box, so the first pattern
+  that needs it must solve that first; the gate will say so rather than skip.
 - **Whole-mode `Ir` is `main`-exclusive**, not kernel-exclusive — the kernel has
   no symbol left to attribute to. It includes the loader, so it is comparable
   across rungs within that mode and to nothing else.
 - **`panic=abort` and `O0d` (debug-assertions on) were built but not measured.**
   Both are supported axes in `harness/build.py`; neither is in the 24-cell
   matrix, and neither has numbers here.
-- The C driver loop is checked against the Rust one by required substrings, not
-  by a mechanical diff — a cross-language diff is not possible. The equivalence
-  argument is in `spec.md`.
+- ~~The C driver loop is checked by required substrings~~ — **fixed at
+  TASK_003.** A cross-language mechanical diff *is* possible: `harness/dloop.py`
+  normalises both languages (types, casts, `wrapping_*` methods, grouping
+  parens, Verus clauses, ghost statements) to one token sequence, and three
+  explicit aliases in `spec.md` (`n_body` ≡ `vals.len()`, `inp.n_iters` ≡
+  `n_iters`, `vals` ≡ `vals.as_slice()`) reconcile the names that genuinely
+  differ. All six driver loops — five Rust and the C one — normalise to the same
+  12-statement sequence, and every one of them is diffed against the sequence
+  pinned in `spec.md` rather than against each other. The substring check had
+  passed with a `__builtin_prefetch` and an `__asm__ __volatile__` memory
+  barrier added to the C loop.
+- **The anti-collapse barrier does not, on this pattern, actually prevent a
+  collapse.** Measured at TASK_003: replacing `off = acc % nwin` with `off = 0`
+  in every rung leaves the marginal cost at ~902–908 Ir per call (vs 915–919
+  with the barrier), because LLVM does not hoist a whole inner loop out of an
+  outer one. So on p01 the barrier is insurance, not load-bearing — and it is
+  the `spec.md` driver pin, not the `Ir` floor, that catches its removal. Do not
+  generalise: a pattern whose kernel is a single expression is a different case.

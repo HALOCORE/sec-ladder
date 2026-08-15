@@ -46,35 +46,52 @@ def main_table(doc, opt, mode, out):
     rows = cell_rows(doc, opt, mode)
     if not rows:
         return
-    sym = "kernel" if mode == "isolated" else "main (kernel inlined)"
-    out.append(f"\n### {opt} / {mode} — symbol: `{sym}`\n")
+    # The static counts in this table are for *one* symbol, named by
+    # `asm_symbol_needle`. `Ir` gets its own columns per symbol and is never
+    # merged into one: pairing a `main` static count with a `kernel` `Ir` (which
+    # is what the O0/whole section used to do) is not a row, it is two halves of
+    # two different measurements (TASK_002_REVIEW, M12).
+    sym = rows[0].get("asm_symbol_needle") or ("kernel" if mode == "isolated"
+                                               else "main")
+    kernel_alive = any((c.get("ir") or {}).get(i, {}).get("kernel_exclusive_ir")
+                       is not None for c in rows for i in ("small.bin", "large.bin"))
+    label = f"static counts are for the `{sym}` symbol"
+    if mode == "whole":
+        label += ("; the kernel symbol **survived** at this opt level, so nothing "
+                  "was inlined and the `Ir(kernel)` column is the real kernel cost"
+                  if kernel_alive else
+                  "; the kernel was inlined away, so it has no symbol and no "
+                  "static count of its own here")
+    out.append(f"\n### {opt} / {mode} — {label}\n")
     if opt == "O0":
         out.append("> `O0` rows exist to read the lowering. **No performance claim "
                    "may rest on one** (`.memory/02-bench-rules.md`). Rust here is "
                    "`opt-level=0 -C debug-assertions=off`, i.e. semantics-matched to "
                    "C `-O0`; the `O0d` axis (overflow checks on) is a separate build.\n")
-    out.append("| rung | static raw | static pad-excl | sym bytes | "
-               "Ir small | Ir large | md5_raw | md5_norel | loop | vec |")
-    out.append("|---|---:|---:|---:|---:|---:|---|---|---|---|")
+    out.append(f"| rung | `{sym}` instrs (nm extent) | pad-excl | trailing pad "
+               "(insns) | sym bytes | Ir(kernel) small | Ir(kernel) large | "
+               "Ir(main) small | Ir(main) large | md5_fn | md5_raw | loop | vec |")
+    out.append("|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|")
     for c in rows:
         s = c.get("static") or {}
         ir = c.get("ir") or {}
-        def irv(k):
-            v = ir.get(k) or {}
+
+        def irv(inp, which):
+            v = ir.get(inp) or {}
             if not v or "error" in v:
                 return "-"
-            # `kernel` when the symbol survived (isolated, and whole at O0 where
-            # nothing inlines); `main` when it did not (whole at O3). Never both
-            # added together, and never one silently standing in for the other.
-            if v.get("kernel_exclusive_ir") is not None:
-                return fmt(v["kernel_exclusive_ir"])
-            if v.get("main_exclusive_ir") is not None:
-                return fmt(v["main_exclusive_ir"]) + " *"
-            return "-"
+            n = v.get(which + "_exclusive_ir")
+            return "-" if n is None else fmt(n)
+        # md5_fn is the `nm --print-size` extent (the function); md5_raw is
+        # objdump's grouping, which also swallows the alignment padding that
+        # `pad` counts. Older JSONs have only md5_raw.
         out.append(
-            f"| {c['cell']} | {fmt(s.get('n_raw'))} | {fmt(s.get('n_nopad'))} | "
-            f"{fmt(s.get('n_bytes'))} | {irv('small.bin')} | {irv('large.bin')} | "
-            f"`{(s.get('md5_raw') or '')[:8]}` | `{(s.get('md5_raw_norel') or '')[:8]}` | "
+            f"| {c['cell']} | {fmt(s.get('n_fn', s.get('n_raw')))} | "
+            f"{fmt(s.get('n_fn_nopad', s.get('n_nopad')))} | "
+            f"{fmt(s.get('pad_insns'))} | {fmt(s.get('fn_bytes', s.get('n_bytes')))} | "
+            f"{irv('small.bin', 'kernel')} | {irv('large.bin', 'kernel')} | "
+            f"{irv('small.bin', 'main')} | {irv('large.bin', 'main')} | "
+            f"`{(s.get('md5_fn') or '-')[:8]}` | `{(s.get('md5_raw') or '')[:8]}` | "
             f"{'yes' if s.get('has_loop') else 'NO'} | "
             f"{','.join(s.get('vector_regs') or []) or '-'} |")
 
@@ -90,28 +107,64 @@ def wall_table(doc, out):
                f"check on `Ir`, never the headline. Times include process start-up "
                f"and reading the input file.\n")
     inputs = sorted({k for c in rows for k in c["wall"]})
-    out.append("| rung | mode | " + " | ".join(f"{i} min (ms) | {i} median (ms)"
-                                               for i in inputs) + " |")
-    out.append("|---|---|" + "---:|---:|" * len(inputs))
+    # `.memory/03-measurement.md` step 4: "Discard a run whose min-to-median
+    # spread exceeds 10% and say so." measure.py records the warning per cell;
+    # this table used to drop it silently (TASK_002_REVIEW, M10), so a table of
+    # mostly-discarded numbers read as a table of numbers.
+    discarded = []
+    out.append("| rung | mode | " + " | ".join(
+        f"{i} min (ms) | {i} median (ms) | {i} spread" for i in inputs) + " |")
+    out.append("|---|---|" + "---:|---:|---:|" * len(inputs))
     for c in rows:
         cells = []
         for i in inputs:
             w = c["wall"].get(i)
-            cells.append(f"{w['min_s'] * 1e3:.2f}" if w else "-")
-            cells.append(f"{w['median_s'] * 1e3:.2f}" if w else "-")
+            if not w:
+                cells += ["-", "-", "-"]
+                continue
+            sp = w.get("spread_pct")
+            bad = "warning" in w or (sp is not None and sp > 10)
+            if bad:
+                discarded.append((c["cell"], c["mode"], i, sp))
+            cells.append(f"{w['min_s'] * 1e3:.2f}")
+            cells.append(f"{w['median_s'] * 1e3:.2f}")
+            cells.append(("**" + f"{sp:.1f}%" + " ✗**") if bad
+                         else (f"{sp:.1f}%" if sp is not None else "-"))
         out.append(f"| {c['cell']} | {c['mode']} | " + " | ".join(cells) + " |")
+    total = sum(1 for c in rows for i in inputs if c["wall"].get(i))
+    out.append("")
+    if discarded:
+        out.append(f"**{len(discarded)} of {total} wall-clock cells exceed the 10% "
+                   f"min-to-median spread threshold and are DISCARDED** per "
+                   f"`.memory/03-measurement.md` step 4. They are printed above "
+                   f"marked ✗ rather than deleted, because a missing cell that "
+                   f"looks like an omission is worse than a documented failure "
+                   f"(`.memory/02-bench-rules.md`). **No claim in this report "
+                   f"rests on a marked row.**\n")
+        for cell, mode, inp, sp in discarded:
+            out.append(f"- `{cell} / {mode}` on `{inp}`: spread {sp:.1f}%")
+        out.append("")
+    else:
+        out.append("Every wall-clock cell is within the 10% min-to-median spread "
+                   "threshold.\n")
 
 
 def identity_table(doc, out):
     out.append("\n## Structural identity — does a proof cost anything?\n")
-    out.append("Compared in `isolated` builds, where the kernel is its own symbol. "
-               "`md5_raw` is bit-exact machine code; `md5_norel` is the same bytes "
-               "with pc-relative displacement fields zeroed, which is the honest "
-               "oracle when two binaries link the kernel's callees at different "
-               "addresses (that happens at `O0`, where the Rust kernel still calls "
-               "`Iterator::next`).\n")
-    out.append("| pair | opt | md5_raw equal | md5_norel equal | raw counts |")
-    out.append("|---|---|---|---|---|")
+    out.append("Compared in `isolated` builds, where the kernel is its own symbol, "
+               "and on the **declared symbol extent** (`nm --print-size`), which is "
+               "the function proper. `md5_raw` is objdump's grouping and also "
+               "covers the alignment padding that follows the function, so two "
+               "genuinely identical kernels at different alignments disagree on it "
+               "and agree on `md5_fn` — the padding is reported separately rather "
+               "than folded in. `md5_fn_norel` is the same bytes with pc-relative "
+               "displacement fields zeroed, which is the honest (weaker) oracle "
+               "when two binaries link the kernel's callees at different addresses "
+               "— that happens at `O0`, where the Rust kernel still calls "
+               "`Iterator::next`.\n")
+    out.append("| pair | opt | md5_fn equal | md5_fn_norel equal | md5_raw equal | "
+               "counts (fn / pad-excl) | padding |")
+    out.append("|---|---|---|---|---|---|---|")
     by = {(c.get("cell"), c.get("opt"), c.get("mode")): c for c in doc["cells"]}
     for a, b in (("unsafe", "verus"), ("safe_naive", "safe_naive_verus")):
         for opt in ("O0", "O3"):
@@ -119,11 +172,17 @@ def identity_table(doc, out):
             if not (ca and cb and ca.get("static") and cb.get("static")):
                 continue
             sa, sb = ca["static"], cb["static"]
-            out.append(
-                f"| {a} vs {b} | {opt} | "
-                f"{'**yes**' if sa['md5_raw'] == sb['md5_raw'] else 'no'} | "
-                f"{'**yes**' if sa['md5_raw_norel'] == sb['md5_raw_norel'] else 'no'} | "
-                f"{sa['n_raw']}/{sa['n_nopad']} vs {sb['n_raw']}/{sb['n_nopad']} |")
+
+            def eq(k):
+                if k not in sa or k not in sb:
+                    return "—"
+                return "**yes**" if sa[k] == sb[k] else "no"
+            cnt = (f"{sa.get('n_fn', sa['n_raw'])}/{sa.get('n_fn_nopad', sa['n_nopad'])}"
+                   f" vs {sb.get('n_fn', sb['n_raw'])}/"
+                   f"{sb.get('n_fn_nopad', sb['n_nopad'])}")
+            pad = (f"{sa.get('pad_bytes', '—')} B vs {sb.get('pad_bytes', '—')} B")
+            out.append(f"| {a} vs {b} | {opt} | {eq('md5_fn')} | "
+                       f"{eq('md5_fn_norel')} | {eq('md5_raw')} | {cnt} | {pad} |")
 
 
 def build(doc, name):
@@ -154,18 +213,23 @@ def build(doc, name):
                "(`.memory/03-measurement.md`). Static counts are given raw and "
                "padding-excluded; quote the padding-excluded one, and never quote "
                "either without the `Ir` beside it.")
-    out.append("\nAn `Ir` marked `*` is `main`-exclusive, not kernel-exclusive: the "
-               "kernel was inlined and has no symbol left. **Read those rows with "
-               "care.** `main`-exclusive counts whatever else was inlined into "
-               "`main`, and that is not the same set in every language: the Rust "
+    out.append("\n`Ir(kernel)` and `Ir(main)` are separate columns and are never "
+               "merged: a `main`-exclusive count is not a kernel measurement "
+               "wearing a different hat, and pairing one with a static count "
+               "taken from the *other* symbol is two halves of two different "
+               "measurements. **`Ir(main)` counts whatever else was inlined into "
+               "`main`, and that is not the same set in every language**: the Rust "
                "rungs inline the whole payload decoder, while the C rungs leave it "
                "in `common/driver.c`'s own symbols. On `large` that is ~12.4 M "
                "instructions the Rust `main` rows carry and the C ones do not "
-               "(visible as the `isolated` `main`-exclusive figures in the JSON: "
-               "~12.36 M vs ~0.38 M). So a starred row is comparable **between "
-               "Rust rungs only** — never Rust-vs-C, and never to an `isolated` "
-               "row. Subtract the same cell's `isolated` `main` figure first if "
-               "you need the inlined kernel's cost.")
+               "(~12.36 M vs ~0.38 M in the `isolated` rows). So `Ir(main)` is "
+               "comparable **between Rust rungs only** — never Rust-vs-C, and "
+               "never to an `isolated` row.")
+    out.append("\n**Do not try to rescue it by subtraction.** A difference of two "
+               "large numbers, each containing language-specific inlining, is not "
+               "a measurement — `.memory/03-measurement.md` records the arithmetic "
+               "that went wrong when TASK_002 tried. Use the `isolated` "
+               "kernel-exclusive figure, which needs no correction.")
     for mode in ("isolated", "whole"):
         for opt in ("O3", "O0"):
             main_table(doc, opt, mode, out)

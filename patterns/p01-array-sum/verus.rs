@@ -124,6 +124,14 @@ fn main() {
         {
             let off: usize = (acc % nwin) as usize;
             let r: u64 = kernel(vs, off, win_len);
+            // Ghost only: this is what *consumes* the kernel's `ensures`.
+            // Without it the postcondition is decoration -- deleting it
+            // entirely still gives "5 verified, 0 errors", so nothing but
+            // mutation testing defends it (TASK_002_REVIEW). Ghost code erases,
+            // so the driver loop stays byte-identical to R4's; `harness/dloop.py`
+            // exempts ghost statements from the driver diff exactly as it
+            // exempts `invariant`/`decreases`.
+            assert(r == sum_wrap(vs@, off as int, win_len as int));
             acc = acc.wrapping_mul(31).wrapping_add(r);
             it = it + 1;
         }

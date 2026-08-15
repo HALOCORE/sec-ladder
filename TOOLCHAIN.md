@@ -194,11 +194,22 @@ answers can normalise to the same md5. `harness/asm.py` owns the one pipeline an
 exposes the machine-code-byte digest that can.
 
 ```bash
-python3 harness/asm.py stat <bin> [--sym kernel]   # counts + all three digests
+python3 harness/asm.py stat <bin> [--sym kernel]   # counts + every digest
 python3 harness/asm.py show <bin> [--raw]          # normalised / objdump text
 python3 harness/asm.py diff <bin-a> <bin-b>        # verdict + readable diff
+python3 harness/fixture.py --check                 # build the pilot fixture,
+                                                   #   then re-derive its numbers
 python3 harness/asm.py selftest                    # re-derives the pilot numbers
+python3 harness/vparse.py selftest                 # attribute/clause parser
+python3 harness/vparse.py <file.rs>                # items, attrs, clauses
+python3 harness/dloop.py <file.rs|main.c> [alias-json]   # driver loop, canonical
 ```
+
+`fixture.py` is what makes `selftest` meaningful on a fresh checkout — it builds
+`.temp/build/docrepro/` from `pilot/` with the flags above. Verified at TASK_003:
+a clean rebuild reproduces all six kernels bit-exactly under **both** digest
+conventions (`md5_raw`, objdump grouping; `md5_fn`, the `nm --print-size`
+extent). `harness/check.py` builds it automatically and fails if it cannot.
 
 ## Verus conventions
 

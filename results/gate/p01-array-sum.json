@@ -1,0 +1,615 @@
+{
+  "pattern": "p01-array-sum",
+  "skipped_inputs": [
+    "small",
+    "large"
+  ],
+  "inputs_checked": [
+    "adversarial-empty.bin",
+    "adversarial-headonly.bin",
+    "adversarial-shortlen.bin",
+    "adversarial-win0.bin",
+    "adversarial-winbig.bin",
+    "adversarial.bin"
+  ],
+  "identity": [
+    {
+      "pair": "unsafe vs verus",
+      "opt": "O0",
+      "level": "norel",
+      "expected": "norel",
+      "md5_fn_a": "1dffc20c487ae61115c781e3e07f6fbe",
+      "md5_fn_b": "779a1133a213eaee1746d3b1b2cdd718",
+      "md5_raw_equal": false,
+      "counts_a": [
+        36,
+        36,
+        164
+      ],
+      "counts_b": [
+        36,
+        36,
+        164
+      ],
+      "pad_a": [
+        12,
+        12
+      ],
+      "pad_b": [
+        12,
+        12
+      ]
+    },
+    {
+      "pair": "unsafe vs verus",
+      "opt": "O3",
+      "level": "exact",
+      "expected": "exact",
+      "md5_fn_a": "619b1d1b656189b3315f3d3609cef3e3",
+      "md5_fn_b": "619b1d1b656189b3315f3d3609cef3e3",
+      "md5_raw_equal": true,
+      "counts_a": [
+        36,
+        34,
+        141
+      ],
+      "counts_b": [
+        36,
+        34,
+        141
+      ],
+      "pad_a": [
+        3,
+        3
+      ],
+      "pad_b": [
+        3,
+        3
+      ]
+    },
+    {
+      "pair": "safe_naive vs safe_naive_verus",
+      "opt": "O0",
+      "level": "exact",
+      "expected": "exact",
+      "md5_fn_a": "3ab6079d1bfba45f0fa0cfb60fb399f0",
+      "md5_fn_b": "3ab6079d1bfba45f0fa0cfb60fb399f0",
+      "md5_raw_equal": true,
+      "counts_a": [
+        42,
+        42,
+        188
+      ],
+      "counts_b": [
+        42,
+        42,
+        188
+      ],
+      "pad_a": [
+        4,
+        4
+      ],
+      "pad_b": [
+        4,
+        4
+      ]
+    },
+    {
+      "pair": "safe_naive vs safe_naive_verus",
+      "opt": "O3",
+      "level": "exact",
+      "expected": "exact",
+      "md5_fn_a": "f8e1fe32e8892731cd91639321747c0b",
+      "md5_fn_b": "f8e1fe32e8892731cd91639321747c0b",
+      "md5_raw_equal": true,
+      "counts_a": [
+        49,
+        47,
+        182
+      ],
+      "counts_b": [
+        49,
+        47,
+        182
+      ],
+      "pad_a": [
+        10,
+        10
+      ],
+      "pad_b": [
+        10,
+        10
+      ]
+    }
+  ],
+  "marginal_ir_per_call": {},
+  "verus": {
+    "safe_naive_verus.rs": {
+      "verified": 5,
+      "errors": 0,
+      "pinned": 5,
+      "tcb_items": [
+        {
+          "name": "load_input",
+          "attr": "verifier::external_body",
+          "body_lines": 4,
+          "line": 37
+        },
+        {
+          "name": "emit",
+          "attr": "verifier::external_body",
+          "body_lines": 1,
+          "line": 46
+        }
+      ]
+    },
+    "verus.rs": {
+      "verified": 5,
+      "errors": 0,
+      "pinned": 5,
+      "tcb_items": [
+        {
+          "name": "get_unchecked",
+          "attr": "verifier::external_body",
+          "body_lines": 1,
+          "line": 52
+        },
+        {
+          "name": "load_input",
+          "attr": "verifier::external_body",
+          "body_lines": 4,
+          "line": 68
+        },
+        {
+          "name": "emit",
+          "attr": "verifier::external_body",
+          "body_lines": 1,
+          "line": 77
+        }
+      ]
+    }
+  },
+  "verified_call_site": {
+    "main": 2,
+    "kernel": 2
+  },
+  "proof_domain": {
+    "adversarial-empty.bin": {
+      "calls": 0,
+      "requires_ok": true,
+      "ensures_checked": 0
+    },
+    "adversarial-headonly.bin": {
+      "calls": 0,
+      "requires_ok": true,
+      "ensures_checked": 0
+    },
+    "adversarial-shortlen.bin": {
+      "calls": 0,
+      "requires_ok": true,
+      "ensures_checked": 0
+    },
+    "adversarial-win0.bin": {
+      "calls": 0,
+      "requires_ok": true,
+      "ensures_checked": 0
+    },
+    "adversarial-winbig.bin": {
+      "calls": 0,
+      "requires_ok": true,
+      "ensures_checked": 0
+    },
+    "adversarial.bin": {
+      "calls": 0,
+      "requires_ok": true,
+      "ensures_checked": 0
+    }
+  },
+  "driver_loops": {
+    "c/main.c": {
+      "statements": 12,
+      "matches_pin": true
+    },
+    "safe_naive.rs": {
+      "statements": 12,
+      "matches_pin": true
+    },
+    "safe_naive_verus.rs": {
+      "statements": 12,
+      "matches_pin": true
+    },
+    "safe_tuned.rs": {
+      "statements": 12,
+      "matches_pin": true
+    },
+    "unsafe.rs": {
+      "statements": 12,
+      "matches_pin": true
+    },
+    "verus.rs": {
+      "statements": 12,
+      "matches_pin": true
+    }
+  },
+  "adversarial": {
+    "adversarial-empty.bin/c-gcc": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-empty.bin/c-clang": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-empty.bin/safe_naive": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-empty.bin/safe_tuned": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-empty.bin/unsafe": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-empty.bin/verus": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-empty.bin/safe_naive_verus": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-headonly.bin/c-gcc": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-headonly.bin/c-clang": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-headonly.bin/safe_naive": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-headonly.bin/safe_tuned": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-headonly.bin/unsafe": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-headonly.bin/verus": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-headonly.bin/safe_naive_verus": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-shortlen.bin/c-gcc": {
+      "exit": 5,
+      "stdout": "",
+      "stderr": "slb: /home/apt/repos_common/sec-ladder/patterns/p01-array-sum/inputs/adversarial-shortlen.bin: payload_len 4096 exceeds ",
+      "signal": null,
+      "model_exit": 5,
+      "model_stdout": ""
+    },
+    "adversarial-shortlen.bin/c-clang": {
+      "exit": 5,
+      "stdout": "",
+      "stderr": "slb: /home/apt/repos_common/sec-ladder/patterns/p01-array-sum/inputs/adversarial-shortlen.bin: payload_len 4096 exceeds ",
+      "signal": null,
+      "model_exit": 5,
+      "model_stdout": ""
+    },
+    "adversarial-shortlen.bin/safe_naive": {
+      "exit": 5,
+      "stdout": "",
+      "stderr": "slb: /home/apt/repos_common/sec-ladder/patterns/p01-array-sum/inputs/adversarial-shortlen.bin: payload_len 4096 exceeds ",
+      "signal": null,
+      "model_exit": 5,
+      "model_stdout": ""
+    },
+    "adversarial-shortlen.bin/safe_tuned": {
+      "exit": 5,
+      "stdout": "",
+      "stderr": "slb: /home/apt/repos_common/sec-ladder/patterns/p01-array-sum/inputs/adversarial-shortlen.bin: payload_len 4096 exceeds ",
+      "signal": null,
+      "model_exit": 5,
+      "model_stdout": ""
+    },
+    "adversarial-shortlen.bin/unsafe": {
+      "exit": 5,
+      "stdout": "",
+      "stderr": "slb: /home/apt/repos_common/sec-ladder/patterns/p01-array-sum/inputs/adversarial-shortlen.bin: payload_len 4096 exceeds ",
+      "signal": null,
+      "model_exit": 5,
+      "model_stdout": ""
+    },
+    "adversarial-shortlen.bin/verus": {
+      "exit": 5,
+      "stdout": "",
+      "stderr": "slb: /home/apt/repos_common/sec-ladder/patterns/p01-array-sum/inputs/adversarial-shortlen.bin: payload_len 4096 exceeds ",
+      "signal": null,
+      "model_exit": 5,
+      "model_stdout": ""
+    },
+    "adversarial-shortlen.bin/safe_naive_verus": {
+      "exit": 5,
+      "stdout": "",
+      "stderr": "slb: /home/apt/repos_common/sec-ladder/patterns/p01-array-sum/inputs/adversarial-shortlen.bin: payload_len 4096 exceeds ",
+      "signal": null,
+      "model_exit": 5,
+      "model_stdout": ""
+    },
+    "adversarial-win0.bin/c-gcc": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-win0.bin/c-clang": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-win0.bin/safe_naive": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-win0.bin/safe_tuned": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-win0.bin/unsafe": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-win0.bin/verus": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-win0.bin/safe_naive_verus": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-winbig.bin/c-gcc": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-winbig.bin/c-clang": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-winbig.bin/safe_naive": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-winbig.bin/safe_tuned": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-winbig.bin/unsafe": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-winbig.bin/verus": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-winbig.bin/safe_naive_verus": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial.bin/c-gcc": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial.bin/c-clang": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial.bin/safe_naive": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial.bin/safe_tuned": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial.bin/unsafe": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial.bin/verus": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial.bin/safe_naive_verus": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    }
+  },
+  "sanitizer": {
+    "adversarial-empty.bin": {
+      "exit": 0,
+      "expected_exit": 0
+    },
+    "adversarial-headonly.bin": {
+      "exit": 0,
+      "expected_exit": 0
+    },
+    "adversarial-shortlen.bin": {
+      "exit": 5,
+      "expected_exit": 5
+    },
+    "adversarial-win0.bin": {
+      "exit": 0,
+      "expected_exit": 0
+    },
+    "adversarial-winbig.bin": {
+      "exit": 0,
+      "expected_exit": 0
+    },
+    "adversarial.bin": {
+      "exit": 0,
+      "expected_exit": 0
+    }
+  },
+  "miri": {
+    "required": false,
+    "ran": false,
+    "byte_identical": true
+  },
+  "failures": [
+    {
+      "section": "coverage",
+      "message": "no non-adversarial input left to check a checksum against -- `--skip` removed them all, so this run certifies nothing"
+    },
+    {
+      "section": "collapse-ir",
+      "message": "--no-callgrind given: the dynamic anti-collapse assertion did not run, so this gate run does not certify that the loop survived"
+    }
+  ],
+  "notes": [],
+  "verdict": "FAIL"
+}

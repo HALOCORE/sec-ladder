@@ -39,13 +39,40 @@ intent; the implementation differs in two ways it had to:
   width-based, so `fadd` survives and `je 8f2` does not;
 - there is no `s/\b[0-9a-f]{4,}\b//g` at all.
 
-API: `asm.kernel(binary, needle) -> Kernel` with `.n_raw`, `.n_nopad`,
-`.n_bytes`, `.raw_bytes`, `.md5_raw`, `.md5_raw_norel`, `.md5_norm`,
-`.normalised`, `.has_loop`, `.backward_branches`, `.vector_regs`;
-`asm.diff(a, b) -> (same_raw, same_norel, text)`; `asm.text_size(binary)`;
+API: `asm.kernel(binary, needle) -> Kernel` with
+
+- objdump-grouping convention (function **+** inter-function padding):
+  `.n_raw`, `.n_nopad`, `.n_bytes`, `.raw_bytes`, `.md5_raw`, `.md5_raw_norel`;
+- `nm --print-size` convention (the function proper — **use this for identity**):
+  `.n_fn`, `.n_fn_nopad`, `.fn_bytes`, `.md5_fn`, `.md5_fn_norel`, `.has_extent`;
+- padding, reported separately and never folded in: `.pad_insns`, `.pad_bytes`;
+- shape: `.normalised`, `.md5_norm`, `.has_loop`, `.backward_branches`,
+  `.vector_regs`.
+
+Also `asm.nm_extents(binary) -> {sym: (addr, size)}`;
+`asm.diff(a, b) -> (same_fn, same_fn_norel, text)` (compared on the declared
+extent); `asm.identity_level(ka, kb) -> (level, evidence)` where level is one of
+`exact` / `norel` / `counts` / `differ`, ordered in `asm.IDENTITY_LEVELS`;
+`asm.text_size(binary)`.
+
 `asm.selftest()` re-derives every pilot number in this file and in
-`.memory/01-ladder.md` from `.temp/build/docrepro/`. `harness/check.py` runs the
+`.memory/01-ladder.md` from `.temp/build/docrepro/` — **both digest conventions
+are pinned**, so neither can drift into the other silently.
+**`harness/fixture.py` builds that fixture** (nothing in the repo did before
+TASK_003, so on a fresh checkout the selftest returned 77 and the gate
+downgraded it to a note — step 0 measured nothing). `harness/check.py` now
+builds the fixture if it is missing and *fails* if it cannot, then runs the
 selftest as its step 0, so a regression in the extractor fails the gate.
+
+Reproduced from a clean rebuild at TASK_003 — all six binaries, both
+conventions, bit-exact:
+
+| binary | n_raw / n_nopad | `md5_raw` | `md5_fn` (nm extent) | padding |
+|---|---|---|---|---|
+| `k_gcc` | 32 / 30 | `42779803…` | `42779803…` | 0 insn / 0 B |
+| `k_clang` | 33 / 31 | `92dc2bc6…` | `f5cc6e16…` | 1 insn / 3 B |
+| `k_rust`, `k_verus` | 57 / 46 | `935221a8…` | `e5310297…` | 9 insn / 9 B |
+| `k_unsafe`, `k_unsafe_verus` | 37 / 33 | `98e4a665…` | `a23e076c…` | 3 insn / 3 B |
 
 Padding-excluded = every `int3`/`nop`*/`xchg %ax,%ax` dropped, wherever it sits
 (not just the tail). `ud2` is deliberately **counted**: it is the tail of a real
@@ -198,8 +225,35 @@ work done. Pair it with `Ir` or say nothing.
   execute **143,740,000** kernel instructions: not "within 1", but exactly equal.
   That is the publishable form of this claim.
 
+### The one honest use of whole-program `Ir`: a slope
+
+Whole-program `Ir` is unquotable as a level (below). It is perfectly good as a
+**difference**, because every term that makes it unquotable — loader work, the
+size of the environment block, what stdout is connected to — is identical in two
+runs of the same binary in the same shell and cancels exactly.
+
+`harness/check.py` step 3b uses this as its anti-collapse assertion:
+
+```
+marginal Ir per call = (Ir at n_iters=200  -  Ir at n_iters=100) / 100
+```
+
+The probe files are the pattern's own `small.bin` with the `n_iters` field
+rewritten — that field is at offset 0 of *every* input file
+(`.memory/02-bench-rules.md`), so the harness builds them without the pattern's
+help. Two properties make this better than a per-symbol `Ir` floor:
+
+- **symbol-independent** — works in `whole` mode, where the kernel has been
+  inlined away, and at `O0`, where `safe_tuned`'s work lives in `core::iter`
+  symbols and its `kernel` symbol executes only 32 Ir/call;
+- **cheap** — 56 callgrind runs over p01's 28 cells took 10 s wall.
+
+Measured on p01 (all 28 cells): 915 … 33 638 Ir/call. `spec.md` pins a floor of
+400. A kernel that had been constant-folded, hoisted or CSE'd reads ~0.
+
 **Report per-function exclusive `Ir` for the kernel symbol. Never the
-whole-program `summary:` line.** Measured at TASK_001 on `pilot/k.c` (gcc, n=999):
+whole-program `summary:` line as a level.** Measured at TASK_001 on `pilot/k.c`
+(gcc, n=999):
 
 | variation | whole-program Ir | kernel Ir |
 |---|---|---|

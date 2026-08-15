@@ -35,9 +35,18 @@ enforces memory safety.
    wrong, TASK_002_REVIEW re-derived them first try). The counts and the
    equalities are unaffected either way. See `.memory/03-measurement.md`.
 
-   Reproduced independently on p01 (TASK_002), `-O3 isolated`:
-   R4 ≡ R5 `fb90a96c…` (39 raw / 34 padding-excluded) and
-   R2 ≡ R2v `6c85987d…` (59 / 47), both bit-exact.
+   Reproduced independently on p01 (TASK_002), `-O3 isolated`, and re-derived at
+   TASK_003 under **both** conventions:
+
+   | pair | `md5_raw` (objdump grouping) | `md5_fn` (`nm` extent) | counts |
+   |---|---|---|---|
+   | R4 ≡ R5 | `fb90a96c…` | `619b1d1b…` | 36 / 34 (+3 insn padding) |
+   | R2 ≡ R2v | `6c85987d…` | `f8e1fe32…` | 49 / 47 (+10 insn padding) |
+
+   TASK_002 published the counts as 39/34 and 59/47; those are objdump's
+   grouping, i.e. the function *plus* its trailing padding. Quote `md5_fn` for
+   identity — `harness/asm.py` now reads padding separately so a benign relink
+   at a different alignment cannot be mistaken for "the proof cost something".
 2. **A proof buys nothing on its own.** Proving R2 panic-free leaves every bounds
    check in place — rustc never learns what Z3 knew. The win only materialises
    when the proof *licenses unsafe code* (R5 = R4 codegen + discharged obligations).
@@ -108,7 +117,31 @@ the 5 rungs, with R1 built twice (gcc and clang).
 | Axis | Values |
 |---|---|
 | opt | `O0` (non-opt, for reading the lowering) and `O3` (for perf claims) |
-| inline mode | `isolated` (kernel in own TU, `#[inline(never)]` / `-fno-inline`, no LTO — this is what we read the assembly of) and `whole` (inlining + LTO on — this is what we time) |
+| inline mode | `isolated` and `whole` — **defined by effect, not by flags** (below) |
+
+### The inline modes are defined by *effect*
+
+Settled at TASK_002_REVIEW. The two modes are not "these flags" — they are two
+observable states of the build, and each language reaches them its own way:
+
+| mode | the effect that defines it | C | Rust (R2–R5) |
+|---|---|---|---|
+| `isolated` | the kernel survives as its own symbol and is reached through a real `call` | own TU, `__attribute__((noinline))`, no LTO | `#[inline(never)]` via `--cfg slb_isolated` |
+| `whole` | the kernel **may** inline into the driver loop | `-flto` across the three TUs | single crate, `codegen-units=1`, no `#[inline(never)]` |
+
+The flags differ because the languages start from different places, and matching
+the *flags* would not match the experiment: **C without `-flto` does not reach
+`whole` at all** — the kernel survives as its own symbol and the cell collapses
+into `isolated` (verified at TASK_002_REVIEW). Meanwhile `-C lto=fat` is
+impossible for R5, because Verus links a precompiled `vstd` rlib with no bitcode
+(`.memory/04-verus.md`), and a single-crate Rust binary at `codegen-units=1`
+already has the kernel and the driver in one module — which is exactly what
+`-flto` buys the three-TU C build.
+
+Matched on effect, the two columns are publishable side by side. Matched on
+flags, they would not be the same experiment. `harness/check.py` checks the
+effect directly: in `whole` it looks for the loop in `main`, and step 3b's
+marginal-`Ir` floor is symbol-independent precisely so it works in both modes.
 
 Flags:
 
