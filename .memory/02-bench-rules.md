@@ -128,6 +128,36 @@ solve that first — the gate will say so rather than skip.
 - If a rung is impossible for a pattern (e.g. R5 defeated by a proof obligation),
   record *where it got stuck*. That is a finding, not a gap.
 
+## The precondition must be structural. The attack must be data.
+
+Settled at TASK_003_REVIEW, which found the rule below collides head-on with any
+pattern that models a real bug: rule 1 says every measured input must satisfy R5's
+`requires`, but a pattern's adversarial input *is* the precondition violation. p01
+hid this because its adversarial inputs make zero kernel calls.
+
+The resolution is not to exempt adversarial inputs. It is to write the contract
+correctly:
+
+- **`requires` states only structural facts** — the slices exist, the offsets are
+  in range, the buffer capacities are what they are. These hold on *every* input
+  the benchmark runs, adversarial included.
+- **The attacker-controlled quantity is an argument, not an assumption.** A
+  length prefix read from the payload is data. The kernel must handle every value
+  it can take.
+- **The security property lives in the `ensures`** — "no byte outside `dst` is
+  written", "the return reflects only bytes inside the buffer", "the parse either
+  rejects or returns an in-bounds span".
+
+A kernel whose `requires` excludes the attack input has not solved the problem, it
+has assumed it away — and it will verify, and the gate will pass it, and the
+result will be worthless. This is the same failure as the pilot's `requires n <
+1000`: a precondition narrow enough to make the proof easy is a precondition that
+no caller can discharge.
+
+Corollary for the C rungs: R1 omits the check (that is the bug being modelled) and
+**R1h**, the hardened C cell, includes it. R1-vs-R1h isolates what the check costs
+inside one language, so "C is faster" and "C is unsafe" stop being confounded.
+
 ## Proof domain must cover the measured domain
 
 The pilot failed all four of these; TASK_001_REVIEW caught it. Its R5 kernel
