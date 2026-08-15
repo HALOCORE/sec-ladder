@@ -78,6 +78,15 @@ _PREFIXES = {"cs", "ds", "es", "fs", "gs", "ss", "data16", "rex.W", "rex"}
 # operand when that operand is a bare hex literal.
 _BRANCH_RE = re.compile(r"^(j[a-z]+|call|callq|loop|loope|loopne|loopz|loopnz|xbegin|bnd)$")
 
+# Bulk-memory routines: a call to one of these *is* the loop, it just lives in
+# libc (or in compiler-builtins for Rust). Matched against the symbol name
+# objdump prints in `<...>`, so `memcpy@plt`, `__memcpy_avx_unaligned_erms` and
+# `core::intrinsics::copy_nonoverlapping` all hit.
+_BULK_MEM_RE = re.compile(
+    r"(?:^|[^A-Za-z0-9_])(?:mem(?:cpy|move|set|cmp|chr)|bcopy|bzero|"
+    r"copy_nonoverlapping|copy_from_slice|clone_from_slice|"
+    r"__(?:aeabi_)?mem(?:cpy|move|set))(?:[^A-Za-z0-9_]|$)")
+
 _INSN_RE = re.compile(r"^\s*([0-9a-f]+):\t([0-9a-f ]+?)\s*(?:\t(.*))?$")
 _SYMHDR_RE = re.compile(r"^([0-9a-f]+)\s+<(.+)>:$")
 
@@ -272,6 +281,26 @@ class Kernel:
         return bool(self.backward_branches)
 
     @property
+    def bulk_calls(self):
+        """Calls to a known bulk-memory routine, as [(addr, symbol)].
+
+        A kernel whose whole body *is* a copy -- p02's `memcpy(dst, src+off+2,
+        len)` -- has no backward branch of its own at `-O3`: gcc emits 11
+        instructions and tails into `call memcpy@plt`. That is a perfectly
+        healthy kernel, and `check.py`'s structural anti-collapse check used to
+        fail it (TASK_003_REVIEW, before p02 existed). The loop is real, it just
+        lives in libc. Not a licence to skip the *dynamic* check, which is what
+        actually establishes the work happened."""
+        out = []
+        for i in self.insns:
+            if not re.match(r"^callq?$", i.mnemonic):
+                continue
+            m = re.search(r"<([^>]+)>", i.text)
+            if m and _BULK_MEM_RE.search(m.group(1)):
+                out.append((i.addr, m.group(1)))
+        return out
+
+    @property
     def vector_regs(self):
         found = set()
         for i in self.insns:
@@ -303,6 +332,7 @@ class Kernel:
             "md5_norm": self.md5_norm,
             "has_loop": self.has_loop,
             "n_backward_branches": len(self.backward_branches),
+            "bulk_calls": [n for _, n in self.bulk_calls],
             "vector_regs": self.vector_regs,
         }
 

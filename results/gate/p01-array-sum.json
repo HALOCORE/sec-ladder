@@ -11,14 +11,49 @@
     "large.bin",
     "small.bin"
   ],
+  "contract_sha256": "28410aae5423f4f6b80b5f89e4cdf51ff551c7fd950befef065a5ea280c4dadc",
+  "source_sha256": {
+    "common/driver.c": "55c3ff31a2a6a37ee2856537713976f75da4a143a27736a448e470aafb3c7c5f",
+    "common/driver.h": "ecbb79bf2511d0615f4afb5367938a681c387565c0d2832d59dda7f213c3fc73",
+    "common/driver.rs": "0e59d44c47a46302da9367dcb33033f48cb0a01f470d522e790dd0b0fdb78316",
+    "harness/asm.py": "974639a30180d567b93c5506fb82a8674ae397fea146dc893239c3655f5fc745",
+    "harness/build.py": "c6cdd32cb5ebdcf18fe2daa4dfc6964656315d949f80a3c5b0f01a1d5c79ccc2",
+    "harness/check.py": "fb36c45f43cb31d3a370b901aa7866572d0f26c267f0e026cc0ebbbd2a581093",
+    "harness/dloop.py": "f1ba9f364b9d2ff632faf74aa19f2185b66c267ad0c9fecc782203a42f5c351b",
+    "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+    "harness/measure.py": "8d24edd126da5260d617534a2db021f65e9a789525b69199c2c70702cb62e280",
+    "harness/report.py": "564585d9dc2627bf9773c3bcf1db143856902b7cad7774452e9fc288b9cecc5c",
+    "harness/vparse.py": "1e955e13aea819bd4845ee509d0e6a64420b2f686a62475b3f1c65970f64b7e8",
+    "patterns/p01-array-sum/NOTES.md": "5b57d10c6b27dc3b1d12d4be0dc92dfb1805be96c7c8d99dc9660738461f2760",
+    "patterns/p01-array-sum/README.md": "c0d5616db3227be899f2fbdd1eec18b2225e354235c046fdc6180a16edfe7015",
+    "patterns/p01-array-sum/c/kernel.c": "1b79c738a5ab4da534d62a931919ec2d16a6add4f3710b29a347e16b88c96fe7",
+    "patterns/p01-array-sum/c/kernel.h": "2eaee3e8be741b9ef00a9d6061e72f8ab6199143724b2438251c7032db01add4",
+    "patterns/p01-array-sum/c/main.c": "065a6d17209b6c5ddb03d33ea38b623265b73293d98415ac99d5f66f467d18ef",
+    "patterns/p01-array-sum/model.py": "f999fd77c1ba0ebaf54b7bd57c73c4ef63344a1c50a4824e3791b2a803769572",
+    "patterns/p01-array-sum/safe_naive.rs": "31718428bae78cc7c8d50ba5c520091e0596dca1b5216a6bb76f85bbd88abbfb",
+    "patterns/p01-array-sum/safe_naive_verus.rs": "535ed49cac2fe51c7a43bec9f0ab5a0fd34f831ea29a8032bd1c76074cef0b7a",
+    "patterns/p01-array-sum/safe_tuned.rs": "ff2d49dd5338f48a3051989565137f8f7ae685521e4fa78999874edff48e4c16",
+    "patterns/p01-array-sum/spec.md": "666a28ee3abd30ea8b89ac3f2f98e5799fced9dd64b14ec040af97d95ee99446",
+    "patterns/p01-array-sum/unsafe.rs": "026e4b6aa62113972c6881f0daa5e12da366c0eb0b9e7d5369cd0fc8c12db8e9",
+    "patterns/p01-array-sum/verus.rs": "2882fe8e72627cd44c3015ae1df5f8571577ccb0d93b53549a5ee4966e5ffde6"
+  },
+  "derived_contract": {
+    "requires": [
+      "off + len <= v_len"
+    ],
+    "ensures": [
+      "result == wrapping_sum(v, off, len)"
+    ],
+    "alpha_ir_per_work": 0.25
+  },
   "identity": [
     {
       "pair": "unsafe vs verus",
       "opt": "O0",
       "level": "norel",
       "expected": "norel",
-      "md5_fn_a": "1dffc20c487ae61115c781e3e07f6fbe",
-      "md5_fn_b": "779a1133a213eaee1746d3b1b2cdd718",
+      "md5_fn_a": "78b8c557c474a766ffebddfb445341d1",
+      "md5_fn_b": "a5bbe0c0f5efec40b33e8f9ff795e478",
       "md5_raw_equal": false,
       "counts_a": [
         36,
@@ -71,8 +106,8 @@
       "opt": "O0",
       "level": "exact",
       "expected": "exact",
-      "md5_fn_a": "3ab6079d1bfba45f0fa0cfb60fb399f0",
-      "md5_fn_b": "3ab6079d1bfba45f0fa0cfb60fb399f0",
+      "md5_fn_a": "bf555ac413188c88e5bf17e2b64f4f70",
+      "md5_fn_b": "bf555ac413188c88e5bf17e2b64f4f70",
       "md5_raw_equal": true,
       "counts_a": [
         42,
@@ -98,8 +133,8 @@
       "opt": "O3",
       "level": "exact",
       "expected": "exact",
-      "md5_fn_a": "f8e1fe32e8892731cd91639321747c0b",
-      "md5_fn_b": "f8e1fe32e8892731cd91639321747c0b",
+      "md5_fn_a": "12d307f2b9d1bef4f5e6c7a3ffde62cf",
+      "md5_fn_b": "12d307f2b9d1bef4f5e6c7a3ffde62cf",
       "md5_raw_equal": true,
       "counts_a": [
         49,
@@ -122,83 +157,139 @@
     }
   ],
   "marginal_ir_per_call": {
-    "c-clang/O0/isolated": 6546.0,
-    "c-clang/O0/whole": 6545.0,
-    "c-clang/O3/isolated": 919.0,
-    "c-clang/O3/whole": 915.0,
-    "c-gcc/O0/isolated": 6050.0,
-    "c-gcc/O0/whole": 6050.0,
-    "c-gcc/O3/isolated": 1287.0,
-    "c-gcc/O3/whole": 1275.0,
-    "safe_naive/O0/isolated": 26123.0,
-    "safe_naive/O0/whole": 26123.0,
-    "safe_naive/O3/isolated": 931.0,
-    "safe_naive/O3/whole": 933.0,
-    "safe_naive_verus/O0/isolated": 26123.0,
-    "safe_naive_verus/O0/whole": 26123.0,
-    "safe_naive_verus/O3/isolated": 931.0,
-    "safe_naive_verus/O3/whole": 926.0,
-    "safe_tuned/O0/isolated": 10629.0,
-    "safe_tuned/O0/whole": 10629.0,
-    "safe_tuned/O3/isolated": 924.0,
-    "safe_tuned/O3/whole": 919.0,
-    "unsafe/O0/isolated": 33638.0,
-    "unsafe/O0/whole": 33638.0,
-    "unsafe/O3/isolated": 919.0,
-    "unsafe/O3/whole": 916.0,
-    "verus/O0/isolated": 33638.0,
-    "verus/O0/whole": 33638.0,
-    "verus/O3/isolated": 919.0,
-    "verus/O3/whole": 915.0
+    "c-clang/O0/isolated/small.bin": 6545.72,
+    "c-clang/O0/isolated/large.bin": 53280.72,
+    "c-clang/O0/isolated/d_ir_d_work": 13.0,
+    "c-clang/O0/whole/small.bin": 6545.72,
+    "c-clang/O0/whole/large.bin": 53280.72,
+    "c-clang/O0/whole/d_ir_d_work": 13.0,
+    "c-clang/O3/isolated/small.bin": 913.72,
+    "c-clang/O3/isolated/large.bin": 7200.72,
+    "c-clang/O3/isolated/d_ir_d_work": 1.748817802503477,
+    "c-clang/O3/whole/small.bin": 907.72,
+    "c-clang/O3/whole/large.bin": 7194.72,
+    "c-clang/O3/whole/d_ir_d_work": 1.748817802503477,
+    "c-gcc/O0/isolated/small.bin": 6061.72,
+    "c-gcc/O0/isolated/large.bin": 49201.72,
+    "c-gcc/O0/isolated/d_ir_d_work": 12.0,
+    "c-gcc/O0/whole/small.bin": 6061.72,
+    "c-gcc/O0/whole/large.bin": 49201.72,
+    "c-gcc/O0/whole/d_ir_d_work": 12.0,
+    "c-gcc/O3/isolated/small.bin": 1286.72,
+    "c-gcc/O3/isolated/large.bin": 10273.72,
+    "c-gcc/O3/isolated/d_ir_d_work": 2.4998609179415854,
+    "c-gcc/O3/whole/small.bin": 1274.72,
+    "c-gcc/O3/whole/large.bin": 10262.72,
+    "c-gcc/O3/whole/d_ir_d_work": 2.5001390820584146,
+    "safe_naive/O0/isolated/small.bin": 26116.3,
+    "safe_naive/O0/isolated/large.bin": 213056.3,
+    "safe_naive/O0/isolated/d_ir_d_work": 52.0,
+    "safe_naive/O0/whole/small.bin": 26116.3,
+    "safe_naive/O0/whole/large.bin": 213056.3,
+    "safe_naive/O0/whole/d_ir_d_work": 52.0,
+    "safe_naive/O3/isolated/small.bin": 925.3,
+    "safe_naive/O3/isolated/large.bin": 7229.3,
+    "safe_naive/O3/isolated/d_ir_d_work": 1.7535465924895688,
+    "safe_naive/O3/whole/small.bin": 928.3,
+    "safe_naive/O3/whole/large.bin": 7232.3,
+    "safe_naive/O3/whole/d_ir_d_work": 1.7535465924895688,
+    "safe_naive_verus/O0/isolated/small.bin": 26116.3,
+    "safe_naive_verus/O0/isolated/large.bin": 213056.3,
+    "safe_naive_verus/O0/isolated/d_ir_d_work": 52.0,
+    "safe_naive_verus/O0/whole/small.bin": 26116.3,
+    "safe_naive_verus/O0/whole/large.bin": 213056.3,
+    "safe_naive_verus/O0/whole/d_ir_d_work": 52.0,
+    "safe_naive_verus/O3/isolated/small.bin": 925.3,
+    "safe_naive_verus/O3/isolated/large.bin": 7229.3,
+    "safe_naive_verus/O3/isolated/d_ir_d_work": 1.7535465924895688,
+    "safe_naive_verus/O3/whole/small.bin": 919.3,
+    "safe_naive_verus/O3/whole/large.bin": 7223.3,
+    "safe_naive_verus/O3/whole/d_ir_d_work": 1.7535465924895688,
+    "safe_tuned/O0/isolated/small.bin": 10622.3,
+    "safe_tuned/O0/isolated/large.bin": 86117.3,
+    "safe_tuned/O0/isolated/d_ir_d_work": 21.0,
+    "safe_tuned/O0/whole/small.bin": 10622.3,
+    "safe_tuned/O0/whole/large.bin": 86117.3,
+    "safe_tuned/O0/whole/d_ir_d_work": 21.0,
+    "safe_tuned/O3/isolated/small.bin": 918.3,
+    "safe_tuned/O3/isolated/large.bin": 7205.3,
+    "safe_tuned/O3/isolated/d_ir_d_work": 1.748817802503477,
+    "safe_tuned/O3/whole/small.bin": 912.3,
+    "safe_tuned/O3/whole/large.bin": 7197.3,
+    "safe_tuned/O3/whole/d_ir_d_work": 1.7482614742698193,
+    "unsafe/O0/isolated/small.bin": 33631.3,
+    "unsafe/O0/isolated/large.bin": 274496.3,
+    "unsafe/O0/isolated/d_ir_d_work": 67.0,
+    "unsafe/O0/whole/small.bin": 33631.3,
+    "unsafe/O0/whole/large.bin": 274496.3,
+    "unsafe/O0/whole/d_ir_d_work": 67.0,
+    "unsafe/O3/isolated/small.bin": 914.3,
+    "unsafe/O3/isolated/large.bin": 7200.3,
+    "unsafe/O3/isolated/d_ir_d_work": 1.748539638386648,
+    "unsafe/O3/whole/small.bin": 908.3,
+    "unsafe/O3/whole/large.bin": 7192.3,
+    "unsafe/O3/whole/d_ir_d_work": 1.7479833101529902,
+    "verus/O0/isolated/small.bin": 33631.3,
+    "verus/O0/isolated/large.bin": 274496.3,
+    "verus/O0/isolated/d_ir_d_work": 67.0,
+    "verus/O0/whole/small.bin": 33631.3,
+    "verus/O0/whole/large.bin": 274496.3,
+    "verus/O0/whole/d_ir_d_work": 67.0,
+    "verus/O3/isolated/small.bin": 913.3,
+    "verus/O3/isolated/large.bin": 7199.3,
+    "verus/O3/isolated/d_ir_d_work": 1.748539638386648,
+    "verus/O3/whole/small.bin": 908.3,
+    "verus/O3/whole/large.bin": 7192.3,
+    "verus/O3/whole/d_ir_d_work": 1.7479833101529902
   },
   "verus": {
     "safe_naive_verus.rs": {
-      "verified": 5,
+      "verified": 7,
       "errors": 0,
-      "pinned": 5,
+      "pinned": 7,
       "tcb_items": [
         {
           "name": "load_input",
           "attr": "verifier::external_body",
           "body_lines": 4,
-          "line": 37
+          "line": 44
         },
         {
           "name": "emit",
           "attr": "verifier::external_body",
           "body_lines": 1,
-          "line": 46
+          "line": 53
         }
       ]
     },
     "verus.rs": {
-      "verified": 5,
+      "verified": 7,
       "errors": 0,
-      "pinned": 5,
+      "pinned": 7,
       "tcb_items": [
         {
           "name": "get_unchecked",
           "attr": "verifier::external_body",
           "body_lines": 1,
-          "line": 52
+          "line": 57
         },
         {
           "name": "load_input",
           "attr": "verifier::external_body",
           "body_lines": 4,
-          "line": 68
+          "line": 73
         },
         {
           "name": "emit",
           "attr": "verifier::external_body",
           "body_lines": 1,
-          "line": 77
+          "line": 82
         }
       ]
     }
   },
   "verified_call_site": {
-    "main": 2,
+    "main": 4,
     "kernel": 2
   },
   "proof_domain": {
@@ -610,44 +701,72 @@
   "sanitizer": {
     "adversarial-empty.bin": {
       "exit": 0,
-      "expected_exit": 0
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": ""
     },
     "adversarial-headonly.bin": {
       "exit": 0,
-      "expected_exit": 0
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": ""
     },
     "adversarial-shortlen.bin": {
       "exit": 5,
-      "expected_exit": 5
+      "expected_exit": 5,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "slb: /home/apt/repos_common/sec-ladder/patterns/p01-array-sum/inputs/adversarial-shortlen.bin: payload_len 4096 exceeds file size"
     },
     "adversarial-win0.bin": {
       "exit": 0,
-      "expected_exit": 0
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": ""
     },
     "adversarial-winbig.bin": {
       "exit": 0,
-      "expected_exit": 0
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": ""
     },
     "adversarial.bin": {
       "exit": 0,
-      "expected_exit": 0
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": ""
     },
     "large.bin": {
       "exit": 0,
-      "expected_exit": 0
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": ""
     },
     "small.bin": {
       "exit": 0,
-      "expected_exit": 0
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": ""
     }
   },
   "miri": {
+    "pair": "unsafe vs verus",
+    "identity_o3": "exact",
+    "inherits_proof": true,
     "required": false,
-    "ran": false,
-    "byte_identical": true
+    "ran": false
   },
   "failures": [],
   "notes": [],
+  "loud": [],
+  "blocked": [],
   "verdict": "PASS",
   "complete_run": true,
   "invocation": "p01"

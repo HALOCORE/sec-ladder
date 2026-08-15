@@ -14,8 +14,9 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 |---|---|---|
 | T001 | clang 22.1.6 + valgrind 3.27.1 into `~/tools`; pilot re-measured | **done**, reviewed |
 | T002 | `harness/` + `common/` + p01 as the template | **done**, reviewed |
-| T003 | harden the gate against the six demonstrated bypasses | **done**, review in flight |
-| T004 | p02 buffer copy — first real bug, first adversarial table | draft spec |
+| T003 | harden the gate against the six demonstrated bypasses | **done**, reviewed |
+| T005 | derive the pins; unblock p02; the barrier swap | **done**, unreviewed |
+| T004 | p02 buffer copy — first real bug, first adversarial table | draft spec, **unblocked by T005** |
 
 Each task has been reviewed adversarially and each review found real defects. The
 cumulative lesson, worth reading before adding a pattern: **a green gate is
@@ -30,14 +31,26 @@ supersede any earlier task report they contradict.
 
 ## Open cross-cutting issues
 
-- **Miri is not installable** for the pinned toolchain, yet policy makes it
-  mandatory whenever R4 ≠ R5 — which is expected for any non-trivial proof. The
-  first interesting pattern will therefore fail the gate on a tool we do not have.
-  Needs a decision: relax the policy, source a Miri-capable toolchain alongside the
-  pin, or accept documented gaps.
-- **The barrier swap to multiply-shift is deferred.** It invalidates every
-  published checksum and `Ir` number, so it is a re-measurement task. Cheap now
-  that the driver is pinned in `spec.md`; gets more expensive with every pattern.
+- ~~**Miri is not installable**~~ — **closed at T005.** `nightly` +
+  `cargo miri setup` alongside the pinned toolchain; R4 has no vstd dependency,
+  and Miri checks source for UB rather than measuring codegen, so the toolchain
+  difference is not a confound. `TOOLCHAIN.md` has the arrangement. The gate now
+  runs it. Residual: a *big payload* is unchecked, because `n_iters` can be
+  clamped from the file header and the payload cannot — p01's `large.bin` times
+  out and is recorded as a blocked row.
+- ~~**The barrier swap to multiply-shift is deferred**~~ — **closed at T005.**
+  Swapped to `(acc * nwin) >> 64` in 128-bit arithmetic, p01 re-measured. Cost:
+  three lines of ghost proof in R5 (`lemma_u128_shr_is_div` plus two
+  `nonlinear_arith` steps) and the obligation count 5 → 7. R4's `-O3` driver loop
+  went 18 → 13 instructions, because the high half of `mul` lands in `%rdx`,
+  which is already the kernel's third argument register.
+- **A width change applied to every rung at once is invisible to the driver
+  diff.** `harness/dloop.py` must erase casts for the C/Rust reconciliation to
+  work at all. Not fixed; recorded in `.memory/02-bench-rules.md`.
+- **`results/gate/<pattern>.json` is the last complete run, pass or fail**, so a
+  red run replaces a green record. Mitigated at T005 by hashing the contract
+  block and every source into it, so a stale record is detectable. Whether the
+  directory should be tracked at all is still open.
 - **18 of 28 wall-clock cells exceed the 10% spread threshold** and are marked
   discarded. No claim rests on them. Fixing needs a quieter box.
 - **`perf_event_paranoid = 3`** — no hardware counters without root. This is the
@@ -47,7 +60,7 @@ supersede any earlier task report they contradict.
 
 | ID | Pattern | C bug class modelled | Verus difficulty | Status |
 |---|---|---|---|---|
-| p01 | array reduce / prefix scan | none (calibration) | trivial | planned |
+| p01 | array reduce / prefix scan | none (calibration) | trivial | **done** (T002/T003/T005), gate green, R5 == R4 byte-identical at O3 |
 | p02 | length-prefixed buffer copy (`memcpy` w/ attacker length) | spatial OOB write | easy | planned |
 | p03 | bounded queue / stack, array-backed | index underflow on empty pop | easy | planned |
 | p04 | ring buffer with wraparound | modular index, aliasing | moderate | planned |

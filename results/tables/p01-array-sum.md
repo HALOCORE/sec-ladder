@@ -1,6 +1,6 @@
 # p01-array-sum — results
 
-Generated 2026-08-15T14:13:25Z from `results/p01-array-sum.json` (git `5cd4d340e644`, working tree dirty).
+Generated 2026-08-15T16:01:11Z from `results/p01-array-sum.json` (git `19e3f6c9e001`, working tree dirty).
 
 ## Toolchain
 
@@ -38,13 +38,13 @@ Generated 2026-08-15T14:13:25Z from `results/p01-array-sum.json` (git `5cd4d340e
 
 | rung | `kernel` instrs (nm extent) | pad-excl | trailing pad (insns) | sym bytes | Ir(kernel) small | Ir(kernel) large | Ir(main) small | Ir(main) large | md5_fn | md5_raw | loop | vec |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|
-| c-gcc | 33 | 31 | 0 | 105 | 254,400,000 | 205,180,000 | 3,000,052 | 300,052 | `d2209fca` | `d2209fca` | yes | xmm |
-| c-clang | 37 | 35 | 1 | 125 | 180,000,000 | 143,740,000 | 3,800,048 | 380,048 | `cb7ad6f3` | `c9ad71e5` | yes | xmm |
-| safe_naive | 49 | 47 | 10 | 182 | 182,400,000 | 144,320,000 | 3,816,284 | 12,380,284 | `f8e1fe32` | `6c85987d` | yes | xmm |
-| safe_tuned | 46 | 44 | 12 | 180 | 181,000,000 | 143,840,000 | 3,816,284 | 12,380,284 | `af2d4c0a` | `d1ee09f5` | yes | xmm |
-| unsafe | 36 | 34 | 3 | 141 | 180,200,000 | 143,740,000 | 3,616,285 | 12,360,285 | `619b1d1b` | `fb90a96c` | yes | xmm |
-| verus | 36 | 34 | 3 | 141 | 180,200,000 | 143,740,000 | 3,616,286 | 12,360,286 | `619b1d1b` | `fb90a96c` | yes | xmm |
-| safe_naive_verus | 49 | 47 | 10 | 182 | 182,400,000 | 144,320,000 | 3,816,285 | 12,380,285 | `f8e1fe32` | `6c85987d` | yes | xmm |
+| c-gcc | 33 | 31 | 0 | 105 | 254,400,000 | 205,180,000 | 2,800,052 | 280,052 | `d2209fca` | `d2209fca` | yes | xmm |
+| c-clang | 37 | 35 | 1 | 125 | 180,000,000 | 143,740,000 | 2,600,052 | 260,052 | `cb7ad6f3` | `c9ad71e5` | yes | xmm |
+| safe_naive | 49 | 47 | 10 | 182 | 182,400,000 | 144,320,000 | 2,616,286 | 12,260,286 | `12d307f2` | `f1e7f951` | yes | xmm |
+| safe_tuned | 46 | 44 | 12 | 180 | 181,000,000 | 143,840,000 | 2,616,286 | 12,260,286 | `499ab455` | `9eb333b2` | yes | xmm |
+| unsafe | 36 | 34 | 3 | 141 | 180,200,000 | 143,740,000 | 2,616,286 | 12,260,286 | `619b1d1b` | `fb90a96c` | yes | xmm |
+| verus | 36 | 34 | 3 | 141 | 180,200,000 | 143,740,000 | 2,416,291 | 12,240,291 | `619b1d1b` | `fb90a96c` | yes | xmm |
+| safe_naive_verus | 49 | 47 | 10 | 182 | 182,400,000 | 144,320,000 | 2,616,287 | 12,260,287 | `12d307f2` | `f1e7f951` | yes | xmm |
 
 ### O0 / isolated — static counts are for the `kernel` symbol
 
@@ -52,25 +52,25 @@ Generated 2026-08-15T14:13:25Z from `results/p01-array-sum.json` (git `5cd4d340e
 
 | rung | `kernel` instrs (nm extent) | pad-excl | trailing pad (insns) | sym bytes | Ir(kernel) small | Ir(kernel) large | Ir(main) small | Ir(main) large | md5_fn | md5_raw | loop | vec |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|
-| c-gcc | 24 | 24 | 0 | 92 | 1,205,400,000 | - | 4,600,064 | - | `f33177c4` | `f33177c4` | yes | - |
-| c-clang | 23 | 23 | 1 | 86 | 1,305,200,000 | - | 4,000,055 | - | `de6279c5` | `8025a602` | yes | - |
-| safe_naive | 42 | 42 | 4 | 188 | 2,108,600,000 | - | 6,200,073 | - | `3ab6079d` | `e68a5b96` | yes | - |
-| safe_tuned | 69 | 69 | 14 | 274 | 2,116,800,000 | - | 6,200,073 | - | `05c1a4fe` | `18c96051` | yes | - |
-| unsafe | 36 | 36 | 12 | 164 | 2,008,400,000 | - | 6,200,073 | - | `1dffc20c` | `38891af3` | yes | - |
-| verus | 36 | 36 | 12 | 164 | 2,008,400,000 | - | 6,200,052 | - | `779a1133` | `6c5b3ca2` | yes | - |
-| safe_naive_verus | 42 | 42 | 4 | 188 | 2,108,600,000 | - | 6,200,052 | - | `3ab6079d` | `e68a5b96` | yes | - |
+| c-gcc | 24 | 24 | 0 | 92 | 1,205,400,000 | - | 6,800,066 | - | `f33177c4` | `f33177c4` | yes | - |
+| c-clang | 23 | 23 | 1 | 86 | 1,305,200,000 | - | 3,800,055 | - | `de6279c5` | `8025a602` | yes | - |
+| safe_naive | 42 | 42 | 4 | 188 | 2,108,600,000 | - | 4,800,073 | - | `bf555ac4` | `32dd86ab` | yes | - |
+| safe_tuned | 69 | 69 | 14 | 274 | 2,116,800,000 | - | 4,800,073 | - | `33f80521` | `7e1d442f` | yes | - |
+| unsafe | 36 | 36 | 12 | 164 | 2,008,400,000 | - | 4,800,073 | - | `78b8c557` | `5abf0ea1` | yes | - |
+| verus | 36 | 36 | 12 | 164 | 2,008,400,000 | - | 4,800,052 | - | `a5bbe0c0` | `7a961606` | yes | - |
+| safe_naive_verus | 42 | 42 | 4 | 188 | 2,108,600,000 | - | 4,800,052 | - | `bf555ac4` | `32dd86ab` | yes | - |
 
 ### O3 / whole — static counts are for the `main` symbol; the kernel was inlined away, so it has no symbol and no static count of its own here
 
 | rung | `main` instrs (nm extent) | pad-excl | trailing pad (insns) | sym bytes | Ir(kernel) small | Ir(kernel) large | Ir(main) small | Ir(main) large | md5_fn | md5_raw | loop | vec |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|
-| c-gcc | 259 | 257 | 0 | 1,024 | - | - | 255,000,134 | 205,260,134 | `c87b764f` | `c87b764f` | yes | xmm |
-| c-clang | 253 | 249 | 0 | 1,010 | - | - | 183,000,166 | 144,000,166 | `164677c0` | `164677c0` | yes | xmm |
-| safe_naive | 727 | 717 | 1 | 3,151 | - | - | 186,624,291 | 162,800,291 | `e58bb012` | `486961f0` | yes | xmm |
-| safe_tuned | 711 | 701 | 1 | 3,071 | - | - | 183,816,286 | 156,080,286 | `aefc040c` | `1ed3505f` | yes | xmm |
-| unsafe | 699 | 690 | 1 | 3,023 | - | - | 183,216,286 | 155,980,286 | `3119981f` | `f84ba3a7` | yes | xmm |
-| verus | 696 | 686 | 1 | 3,055 | - | - | 183,016,285 | 155,960,285 | `85d6e419` | `86bbb0ac` | yes | xmm |
-| safe_naive_verus | 707 | 697 | 1 | 3,135 | - | - | 185,216,288 | 156,660,288 | `16f5d251` | `0b2951db` | yes | xmm |
+| c-gcc | 256 | 255 | 1 | 1,014 | - | - | 254,800,133 | 205,240,133 | `7ef08e5f` | `0aff704c` | yes | xmm |
+| c-clang | 242 | 239 | 0 | 962 | - | - | 181,400,169 | 143,880,169 | `06d2a24e` | `06d2a24e` | yes | xmm |
+| safe_naive | 712 | 703 | 1 | 3,135 | - | - | 185,622,294 | 161,140,294 | `c64c96b6` | `43e25b00` | yes | xmm |
+| safe_tuned | 689 | 680 | 1 | 3,007 | - | - | 182,416,289 | 155,940,289 | `5625249a` | `c7c834d1` | yes | xmm |
+| unsafe | 687 | 677 | 1 | 3,007 | - | - | 181,616,289 | 155,840,289 | `40f1f18f` | `3cab7870` | yes | xmm |
+| verus | 684 | 674 | 1 | 2,991 | - | - | 181,616,288 | 155,840,288 | `893735f0` | `c3b956f7` | yes | xmm |
+| safe_naive_verus | 697 | 688 | 1 | 3,087 | - | - | 183,816,290 | 156,460,290 | `53ee383a` | `3658d4e1` | yes | xmm |
 
 ### O0 / whole — static counts are for the `main` symbol; the kernel symbol **survived** at this opt level, so nothing was inlined and the `Ir(kernel)` column is the real kernel cost
 
@@ -78,13 +78,13 @@ Generated 2026-08-15T14:13:25Z from `results/p01-array-sum.json` (git `5cd4d340e
 
 | rung | `main` instrs (nm extent) | pad-excl | trailing pad (insns) | sym bytes | Ir(kernel) small | Ir(kernel) large | Ir(main) small | Ir(main) large | md5_fn | md5_raw | loop | vec |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|
-| c-gcc | 85 | 85 | 0 | 347 | 1,205,400,000 | - | 4,600,064 | - | `3a7ee833` | `3a7ee833` | yes | - |
-| c-clang | 65 | 65 | 0 | 269 | 1,305,200,000 | - | 3,800,055 | - | `ad425aa4` | `ad425aa4` | yes | - |
-| safe_naive | 125 | 125 | 4 | 636 | 2,108,600,000 | - | 6,200,073 | - | `f5131744` | `e0f2cccc` | yes | xmm |
-| safe_tuned | 125 | 125 | 4 | 636 | 2,116,800,000 | - | 6,200,073 | - | `64f574b6` | `c3a33e91` | yes | xmm |
-| unsafe | 125 | 125 | 4 | 636 | 2,008,400,000 | - | 6,200,073 | - | `98cb4fcb` | `b6d4deb8` | yes | xmm |
-| verus | 88 | 88 | 14 | 434 | 2,008,400,000 | - | 6,200,052 | - | `506b9992` | `d74471d2` | yes | xmm |
-| safe_naive_verus | 88 | 88 | 14 | 434 | 2,108,600,000 | - | 6,200,052 | - | `74a83eb0` | `91d0be77` | yes | xmm |
+| c-gcc | 98 | 98 | 0 | 411 | 1,205,400,000 | - | 6,800,066 | - | `3374cc79` | `3374cc79` | yes | - |
+| c-clang | 65 | 65 | 0 | 270 | 1,305,200,000 | - | 3,800,055 | - | `77f37e64` | `77f37e64` | yes | - |
+| safe_naive | 113 | 113 | 2 | 574 | 2,108,600,000 | - | 4,800,073 | - | `0cc27eb0` | `1d0eea59` | yes | xmm |
+| safe_tuned | 113 | 113 | 2 | 574 | 2,116,800,000 | - | 4,800,073 | - | `9bef66b4` | `954b18e1` | yes | xmm |
+| unsafe | 113 | 113 | 2 | 574 | 2,008,400,000 | - | 4,800,073 | - | `14ea0864` | `87e8cfc5` | yes | xmm |
+| verus | 86 | 86 | 7 | 329 | 2,008,400,000 | - | 4,800,052 | - | `d78a5de2` | `6369b1eb` | yes | - |
+| safe_naive_verus | 86 | 86 | 7 | 329 | 2,108,600,000 | - | 4,800,052 | - | `73b40249` | `255954b4` | yes | - |
 
 ## Structural identity — does a proof cost anything?
 
@@ -103,20 +103,20 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 35.84 | 36.13 | 0.8% | 25.70 | 26.08 | 1.5% |
-| c-gcc | whole | 36.52 | 36.86 | 0.9% | 25.65 | 26.10 | 1.8% |
-| c-clang | isolated | 35.94 | 36.39 | 1.3% | 15.99 | 16.26 | 1.7% |
-| c-clang | whole | 35.99 | 36.35 | 1.0% | 16.65 | 16.89 | 1.4% |
-| safe_naive | isolated | 36.82 | 37.09 | 0.7% | 16.98 | 17.32 | 2.0% |
-| safe_naive | whole | 36.86 | 37.14 | 0.8% | 16.90 | 17.09 | 1.2% |
-| safe_tuned | isolated | 36.72 | 37.05 | 0.9% | 16.98 | 17.20 | 1.3% |
-| safe_tuned | whole | 36.70 | 36.99 | 0.8% | 16.13 | 16.35 | 1.3% |
-| unsafe | isolated | 36.62 | 37.07 | 1.2% | 16.20 | 16.94 | 4.6% |
-| unsafe | whole | 36.75 | 37.03 | 0.8% | 15.98 | 16.42 | 2.8% |
-| verus | isolated | 36.72 | 37.16 | 1.2% | 17.16 | 17.71 | 3.2% |
-| verus | whole | 36.56 | 36.91 | 1.0% | 16.03 | 16.42 | 2.5% |
-| safe_naive_verus | isolated | 36.57 | 36.93 | 1.0% | 17.32 | 17.59 | 1.6% |
-| safe_naive_verus | whole | 36.48 | 36.75 | 0.7% | 16.19 | 16.47 | 1.7% |
+| c-gcc | isolated | 37.51 | 38.10 | 1.6% | 24.51 | 24.77 | 1.1% |
+| c-gcc | whole | 38.29 | 38.68 | 1.0% | 24.60 | 24.85 | 1.0% |
+| c-clang | isolated | 37.77 | 38.11 | 0.9% | 15.08 | 15.31 | 1.5% |
+| c-clang | whole | 37.71 | 38.15 | 1.2% | 15.96 | 16.17 | 1.4% |
+| safe_naive | isolated | 38.51 | 38.92 | 1.1% | 16.11 | 16.26 | 0.9% |
+| safe_naive | whole | 38.58 | 38.98 | 1.0% | 15.92 | 16.22 | 1.8% |
+| safe_tuned | isolated | 38.46 | 38.83 | 1.0% | 15.97 | 16.16 | 1.2% |
+| safe_tuned | whole | 38.10 | 38.76 | 1.7% | 15.82 | 16.01 | 1.2% |
+| unsafe | isolated | 38.51 | 38.88 | 0.9% | 15.36 | 15.58 | 1.5% |
+| unsafe | whole | 38.44 | 38.83 | 1.0% | 16.05 | 16.38 | 2.0% |
+| verus | isolated | 38.31 | 38.72 | 1.1% | 15.40 | 15.61 | 1.4% |
+| verus | whole | 38.14 | 38.71 | 1.5% | 16.02 | 16.34 | 2.0% |
+| safe_naive_verus | isolated | 38.23 | 38.71 | 1.3% | 15.02 | 15.20 | 1.2% |
+| safe_naive_verus | whole | 38.26 | 38.70 | 1.2% | 16.06 | 16.33 | 1.7% |
 
 Every wall-clock cell is within the 10% min-to-median spread threshold.
 

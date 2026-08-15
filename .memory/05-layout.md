@@ -98,9 +98,17 @@ In order:
 1. **`spec.md`** — prose contract, then the ```slb-contract``` block. Start by
    copying p01's and changing every value. The block's fields:
    `kernel`, `model`, `requires`, `ensures`, `verus.{call_site, kernel_item,
-   obligations, items}`, `driver.{statements, c_source, aliases, canonical}`,
-   `collapse.{probe_input, probe_iters, min_marginal_ir_per_call}`, `identity`,
-   `miri.{required, reason}`.
+   translate, obligations, items, unsafe_justifications}`,
+   `driver.{statements, c_source, regions, aliases, canonical}`,
+   `collapse.{probe_inputs, probe_iters}`, `identity`,
+   `miri.{pair, sources, required, reason, blocked_reason}`.
+
+   `requires`/`ensures` are **derived** by the gate from `verus.rs`'s own clause
+   text through `verus.translate`; the copies in the block must equal the
+   derivation exactly, and the gate fails if they do not. The collapse floor is
+   derived from `model.py`'s `work_per_call` and is not settable here at all.
+   `collapse.probe_inputs` should name **two inputs with different
+   `work_per_call`**, or the marginal-rate assertion cannot run.
 2. **`model.py`** — a *second* implementation of `spec.md` in Python, from the
    file bytes alone. Required API is documented at the top of p01's. It must not
    share code with the rungs beyond `common/slb.py`.
@@ -108,8 +116,11 @@ In order:
    canonical token sequence; paste it into `driver.canonical`. Run it on
    `c/main.c` too and add `driver.aliases.c` entries until the two agree.
 4. Get the pins right by running the gate and reading what it says the values
-   are: obligation counts, identity levels and the `Ir` floor are all reported
-   before they are asserted.
+   are: obligation counts, identity levels, the derived `Ir` floor and the
+   translated contract are all reported before they are asserted. Do **not**
+   re-pin an obligation count without first finding out which item moved
+   (`verus_run.py <file> --verify-function <name> --verify-root`) — the count is
+   a skeleton checksum, not a semantic one.
 5. **Then mutate your own proof and check the gate fails.** A pattern whose
    `spec.md` pins are copied from p01 without being re-derived is a pattern
    whose gate certifies p01.

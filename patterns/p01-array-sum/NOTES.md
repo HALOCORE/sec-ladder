@@ -8,35 +8,75 @@ then `harness/report.py p01`.
 
 ## 1. The benchmark does not evaporate — shown, not asserted
 
-The anti-collapse mechanism is the serial dependency `off = acc % nwin`, where
-`acc` is the running checksum. It is the same arithmetic in C and in Rust, so
-neither language gets a stronger optimisation barrier than the other. No
-`black_box`, no `asm volatile`.
+The anti-collapse mechanism is the serial dependency
+`off = (acc * nwin) >> 64` in 128-bit arithmetic, where `acc` is the running
+checksum. It is the same arithmetic in C and in Rust, so neither language gets a
+stronger optimisation barrier than the other. No `black_box`, no `asm volatile`.
+
+It was `acc % nwin` until TASK_005. The `div` was ~0.1 % of `Ir` — invisible to
+the primary metric — but 20–40 cycles of latency on the very dependency chain
+that makes this a loop, and that is a **rung-independent additive constant**,
+which compresses every cross-rung wall-clock *ratio* toward 1. `mul` is 3
+cycles, and `off` is still uniform over `[0, nwin)` so the cache randomisation is
+unchanged. See `spec.md`, "The barrier is a multiply-shift, not a modulo".
 
 `main`, `-O3`, `isolated`, innermost loop containing `call kernel` — every rung
 has one, and it is a real loop:
 
 ```
-R1 gcc (15 instructions, 0x1210 → 0x1240)      R4 unsafe (18, 0x15150 → 0x15187)
+R1 gcc (14 instructions, 0x1250 → 0x127e)      R4 unsafe (13, 0x15100 → 0x15127)
    mov    %rbx,%rax        ; acc                  mov    %r14,%rax        ; acc
-   xor    %edx,%edx                               xor    %edx,%edx
-   mov    %r12,%rdi        ; v                    div    %rbp             ; acc % nwin
-   add    $0x1,%r14        ; it++                 mov    0x28(%rsp),%rdi  ; v
-   div    %rbp             ; acc % nwin           mov    %r15,%rsi        ; off
-   mov    %rdx,%rsi        ; off = remainder      mov    %rbx,%rcx        ; win_len
+   mov    %rbp,%rdi        ; v                    mul    %r12             ; acc*nwin -> rdx:rax
+   add    $0x1,%r14        ; it++                 mov    %rbp,%rdi        ; v.ptr
+   mul    %r12             ; acc*nwin -> rdx:rax  mov    %rbx,%rsi        ; v.len
+   mov    %rdx,%rsi        ; off = high half      mov    %r15,%rcx        ; win_len
    mov    %r13,%rdx        ; win_len              call   ...6unsafe6kernel
-   call   1660 <kernel>                           mov    %r14,%rcx
+   call   1730 <kernel>                           mov    %r14,%rcx
    mov    %rax,%rdx        ; r                    shl    $0x5,%rcx        ; acc*32
    mov    %rbx,%rax                               sub    %r14,%rcx        ;  - acc
    shl    $0x5,%rax        ; acc*32               mov    %rcx,%r14
    sub    %rbx,%rax        ;  - acc  = acc*31     add    %rax,%r14        ;  + r
    lea    (%rax,%rdx,1),%rbx ; + r                dec    %r13
-   cmp    0x10(%rsp),%r14                         je     ...
-   jb     1210 <main+0xb0>                        mov    %r14,%rax
-                                                  or     %rbp,%rax
-                                                  shr    $0x20,%rax
-                                                  jne    15150            ; back edge
+   cmp    0x10(%rsp),%r14                         jne    15100            ; back edge
+   jb     1250 <main+0xb0>
 ```
+
+`off` is the *high* half of the 128-bit product, so it arrives in `%rdx` — which
+is already the Rust kernel's third argument register. R4's loop therefore lost
+five instructions in the swap (18 → 13), not one; the modulo needed an `xor
+%edx,%edx` before the `div` and a `mov` to place the remainder.
+
+Measured effect of the swap, `O3 isolated`, `small.bin`, 200 000 kernel calls:
+
+| rung | Ir(kernel) before → after | Ir(main) before → after | per call | wall min (ms) |
+|---|---|---|---:|---|
+| c-gcc | 254,400,000 → **254,400,000** | 3,000,052 → 2,800,052 | −1.00 | 25.70 → 24.51 |
+| c-clang | 180,000,000 → **180,000,000** | 3,800,048 → 2,600,052 | −6.00 | 15.99 → 15.08 |
+| safe_naive | 182,400,000 → **182,400,000** | 3,816,284 → 2,616,286 | −6.00 | 16.98 → 16.11 |
+| safe_tuned | 181,000,000 → **181,000,000** | 3,816,284 → 2,616,286 | −6.00 | 16.98 → 15.97 |
+| unsafe | 180,200,000 → **180,200,000** | 3,616,285 → 2,616,286 | −5.00 | 16.20 → 15.36 |
+| verus | 180,200,000 → **180,200,000** | 3,616,286 → 2,416,291 | −6.00 | 17.16 → 15.40 |
+
+**Every kernel `Ir` is unchanged to the instruction.** The swap touched the
+driver and only the driver, which is exactly the property that makes it safe to
+do — the kernel column, which is where every perf claim in this pattern lives,
+did not move at all.
+
+Two honest caveats on the wall-clock column:
+
+- `small` gets 4–6 % faster; **`large` gets 4–5 % slower** (c-gcc isolated
+  35.84 → 37.51 ms). The kernel `Ir` is identical, so this is a memory-system
+  effect: `off` is now derived from the *high* bits of `acc` rather than the low
+  ones, so the offset *sequence* over the 12 MB array is different. Both
+  sequences are uniform over `[0, nwin)`; neither is more "correct". Do not read
+  it as a cost of the multiply.
+- The predicted de-compression of cross-rung ratios is **real but tiny here**:
+  `safe_naive / c-clang` on `small` moved 1.062 → 1.068. Wall clock on this
+  bench includes ~14 ms of process start-up and file reading against a ~2 ms
+  measured loop, and *that* additive constant dwarfs 20–40 cycles per call. The
+  argument for the swap stands on the `Ir` column and on the principle; the
+  wall-clock ratios were never going to move much until start-up is out of the
+  measurement.
 
 Read the chain: `acc` → `div` → `off` → `call kernel` → `acc`. Call *i+1* cannot
 start until call *i* has returned. There is nothing for LLVM to CSE and nothing
@@ -69,9 +109,19 @@ has all three — so step 3b measures the **marginal executed instructions per
 kernel call**: whole-program `Ir` at 200 driver iterations minus `Ir` at 100,
 over the 100 extra calls. A difference of two runs of the same binary in the
 same shell, so every loader and environment term cancels, and it needs no
-symbol, which is why it works in `whole` mode and at `O0`. Across all 28 cells
-the range is **915 … 33 638 Ir/call**; `spec.md` pins a floor of 400. A
-collapsed loop reads ~0.
+symbol, which is why it works in `whole` mode and at `O0`. A collapsed loop
+reads ~0.
+
+**The floor is derived, not declared** (TASK_005). `spec.md` used to pin an
+absolute 400 against a measured minimum of 915 — 0.80 Ir per element against
+1.83 achieved — and, worse, it was a number the pattern author could lower in
+the same commit that broke the loop. `model.py` now reports `work_per_call`
+(elements summed, from the input bytes alone) and `check.py` asserts
+`marginal_Ir >= ALPHA * work_per_call` with ALPHA a *harness* constant, plus
+`d(Ir)/d(work) >= ALPHA` across two probe shapes (`small.bin`, 501 elements;
+`large.bin`, 4096). Measured after the barrier swap: marginal Ir per call
+**908 … 274 496** over 56 cell/probe pairs, `d(Ir)/d(work)` **1.75 … 67.00**,
+against ALPHA = 0.25.
 
 ## 2. A Verus proof costs zero instructions — both halves
 
@@ -200,8 +250,10 @@ dec    %rdx
 jne    15260
 ```
 
-and the driver's `acc % nwin` is rematerialised — R2's `whole` `main` contains
-**four** `div` sites in the driver loop where R4 contains two. R3 shows neither
+and the driver's offset computation is rematerialised — measured at TASK_003,
+when the barrier was still `acc % nwin`, R2's `whole` `main` contained **four**
+`div` sites in the driver loop where R4 contained two. The barrier is a
+multiply-shift since TASK_005, so re-derive this before quoting it. R3 shows neither
 effect. Treat this as an observation, not a settled result: it is derived from a
 difference of two builds, and only `large` (`win_len` 4096, residue 0) shows it.
 It does reinforce the standing rule — **R3, not R2, is the honest number for what
@@ -259,7 +311,9 @@ it licenses something.
 Rule 2 of `.memory/02-bench-rules.md` — the one the pilot failed — is satisfied
 structurally *and* semantically: `fn main` is inside `verus! { }`, is not
 `external_body`, and contains the call `kernel(vs, off, win_len)`; and
-`verus verus.rs --verify-function main --verify-root` reports **2 verified**,
+`verus verus.rs --verify-function main --verify-root` reports **2 verified**
+(one query for the function, one for its loop body — see the note on the
+obligation count in `spec.md`),
 which is Verus itself confirming `main` has a verified body. (An `external_body`
 `main` reports **0 verified** — that is the pilot's defect detected semantically
 rather than by recognising an attribute, which is what a blank line defeated.)
@@ -286,7 +340,7 @@ M5's evidence:
 | M4 | `ensures` shifted by one element (`len + 1`) | **fails** — postcondition not satisfied | contract pin |
 | M6 | kernel's `ensures` **deleted entirely** | **fails** — `4 verified, 1 errors`, at the driver's ghost `assert` | contract pin |
 | M7 | kernel's `ensures` replaced by `r == r` | **`5 verified, 0 errors`** with the pre-TASK_003 driver; with the ghost assert it fails | contract pin |
-| M3 | **`requires` deleted from the trusted `get_unchecked`** | **VERIFIES, 5 verified 0 errors** — no diagnostic, ever | contract pin |
+| M3 | **`requires` deleted from the trusted `get_unchecked`** | **VERIFIES, 7 verified 0 errors** — no diagnostic, ever | structural rule (TASK_005) |
 
 **M5 is the evidence that the call site is load-bearing, and TASK_002 quoted the
 wrong half of it.** The published mutant fails *before* the call, at the loop
@@ -310,7 +364,19 @@ Ghost code erases, so R5's kernel is still byte-identical to R4's (`md5_fn`
 `invariant`/`decreases`. The byte-identity objection TASK_002 raised against
 doing this was really an objection to the gate's own textual rule.
 
-**M3 is the warning, and it is now caught — by a pin, not by the verifier.**
+**M3 is the warning, and the pin was not enough.** TASK_003_REVIEW showed that
+the pin moves with the code: deleting `requires i < v@.len()` from `get_unchecked`
+*and* the matching three characters from `spec.md` gave a full green gate,
+"3 TCB items, all contracts identical to spec.md", and an R5 whose trusted base
+axiomatises that reading any index of any slice is defined and yields `v@[i]`.
+No declared pin can defend against an attacker who writes the pins. TASK_005
+added a structural rule instead: **an `external_body` item whose body contains
+`unsafe` must carry a non-empty `requires`** — a trusted item that performs an
+unchecked operation and demands nothing of its callers is an axiom that the
+operation is always safe. The only escape is a per-item justification string in
+`spec.md` that the gate prints in the verdict on every single run.
+
+The pin is still there and still necessary, for the reason below.
 Weakening an `external_body` item's `requires` never produces an error: it
 silently deletes the obligation from every caller and makes the memory-safety
 claim vacuous, with the same "N verified, 0 errors" on stdout. No verification
@@ -391,9 +457,10 @@ misattribute to a rung later.
   passed with a `__builtin_prefetch` and an `__asm__ __volatile__` memory
   barrier added to the C loop.
 - **The anti-collapse barrier does not, on this pattern, actually prevent a
-  collapse.** Measured at TASK_003: replacing `off = acc % nwin` with `off = 0`
-  in every rung leaves the marginal cost at ~902–908 Ir per call (vs 915–919
-  with the barrier), because LLVM does not hoist a whole inner loop out of an
-  outer one. So on p01 the barrier is insurance, not load-bearing — and it is
+  collapse.** Measured at TASK_003, when the barrier was `acc % nwin`: replacing
+  it with `off = 0` in every rung left the marginal cost at ~902–908 Ir per call
+  (vs 915–919 with the barrier), because LLVM does not hoist a whole inner loop
+  out of an outer one. The multiply-shift barrier is cheaper still, so this gap
+  is now smaller, not larger. So on p01 the barrier is insurance, not load-bearing — and it is
   the `spec.md` driver pin, not the `Ir` floor, that catches its removal. Do not
   generalise: a pattern whose kernel is a single expression is a different case.

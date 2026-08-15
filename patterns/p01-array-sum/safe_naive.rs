@@ -35,7 +35,7 @@ fn main() {
         let nwin: u64 = (n_vals - win_len + 1) as u64;
         let mut it: u64 = 0;
         while it < n_iters {
-            let off: usize = (acc % nwin) as usize;
+            let off: usize = ((acc as u128 * nwin as u128) >> 64) as usize;
             let r: u64 = kernel(vs, off, win_len);
             acc = acc.wrapping_mul(31).wrapping_add(r);
             it = it + 1;

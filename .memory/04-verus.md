@@ -99,6 +99,28 @@ Prefer wrappers with **no `ensures` at all** (a trusted item that asserts
 nothing cannot axiomatise a falsehood) wherever the proof can re-derive the fact
 at run time instead.
 
+**And a pin is not enough for this one.** TASK_003_REVIEW deleted the `requires`
+from p01's `get_unchecked` *and* the matching three characters from `spec.md`,
+in one commit, and got a full green gate reporting "3 TCB items, all contracts
+identical to spec.md" — an R5 whose trusted base axiomatises that reading any
+index of any slice is defined and yields `v@[i]`. The pin is written by the same
+author as the code, so no declared pin defends against this. The rule since
+TASK_005 is **structural**:
+
+> An `#[verifier::external_body]` item whose body contains `unsafe` must carry a
+> non-empty `requires`.
+
+A trusted item that performs an unchecked operation and demands nothing of its
+callers *is* the axiom that the operation is always safe. `harness/check.py`
+fails on it outright; the only escape is a per-item justification string in
+`spec.md`'s `verus.unsafe_justifications`, which the gate then prints in the
+verdict on every single run, where a reviewer reads it.
+
+The corollary for writing R5: **give every trusted `unsafe` wrapper the
+precondition its callers must discharge, and keep the `ensures` as weak as the
+proof can live with.** `get_unchecked`'s pair — `requires i < v@.len()`,
+`ensures r == v@[i as int]` — is the shape to copy.
+
 ### The mechanical defences (added at TASK_003)
 
 TASK_002 recorded "`check.py` cannot catch it; only reading the trusted
@@ -107,7 +129,14 @@ does. Every pattern's `spec.md` now carries, and `harness/check.py` diffs:
 
 1. **The obligation count**, per Verus source file. `external_body main` drops
    p01's from 5 to 3. Pinning it turns "always report the obligation count after
-   a proof edit" from a discipline into a gate.
+   a proof edit" from a discipline into a gate — but **know what it measures**.
+   TASK_003_REVIEW derived it: *one Verus query per function, plus one per loop
+   body*. It is a checksum over the function/loop skeleton, so it is invariant
+   under precisely the semantic weakenings it was introduced to catch (a deleted
+   `requires`, a tautological `ensures`) and it moves on benign refactors that
+   add or remove a function or a loop. An unchanged count is evidence of
+   nothing. It also explains why `--verify-function main --verify-root` reports
+   2 for one function: the second query is the driver's loop body.
 2. **Every item's `external` attribute, `requires` and `ensures`, verbatim**, and
    the item *set*. This is what catches the two mutations that move no count at
    all: a tautological `ensures` (`r == r`) and a deleted `external_body`
@@ -118,6 +147,19 @@ does. Every pattern's `spec.md` now carries, and `harness/check.py` diffs:
    `external_body` item and ≥1 for a real one, so the "rule 2" call-site check no
    longer depends on recognising an attribute. Useful in its own right when
    debugging: it tells you which item an obligation belongs to.
+
+4. **The Python contract the gate evaluates is generated from the Verus clause
+   text**, through a declared `verus.translate` table in `spec.md` (TASK_005).
+   `contract["requires"]` and `verus.items[...]["requires"]` used to be two
+   independent transcriptions of one predicate with nothing checking they
+   corresponded, so the proof's precondition could be weakened while the gate
+   went on evaluating the strong one over every input and printing that it held.
+
+5. **`vparse.parse` returns a list and duplicate item names are a hard
+   failure.** The gate keyed items by name and kept the last, so a decoy
+   `fn kernel` inside a `#[cfg(any())] mod` could supply the pinned contract
+   while the real, weakened kernel was the one measured and the one compiled.
+   Pinned items must also be inside `verus! {}` and not `#[cfg]`-gated.
 
 Attribute detection itself is `harness/vparse.py` now, not a regex over
 `prefix.split("\n\n")[-1]` — that split let **one blank line** between

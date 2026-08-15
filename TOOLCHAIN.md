@@ -8,6 +8,7 @@ Install record for this box, and how to reproduce it. Installed 2026-08-15.
 |---|---|---|
 | Verus | `0.2026.08.09.92f466f` | `~/tools/verus` → `~/tools/verus-0.2026.08.09.92f466f` |
 | rustc/cargo | 1.97.1 (`stable`, and the pinned `1.97.1-x86_64-unknown-linux-gnu`) | `~/.cargo/bin` (rustup) |
+| **rustc nightly + Miri** | `1.99.0-nightly (d453bdd8f 2026-08-14)` / miri `0.1.0`. **Never used for a measured build** — see "Miri, and why it lives on a second toolchain" | `~/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu` |
 | z3 | bundled with Verus | `~/tools/verus/z3` |
 | gcc | 13.3.0 | `/usr/bin/gcc` |
 | **clang / LLVM** | **22.1.6** (matches rustc 1.97.1's LLVM exactly) | `~/tools/llvm` → `~/tools/llvm-22.1.6` |
@@ -145,6 +146,69 @@ A clean run prints `verification results:: N verified, 0 errors`.
 - `~/tools/llvm/bin/clang -O3 pilot/k.c -o k_clang && ./k_clang 10 20 30 40` → `100`
 - `valgrind --tool=callgrind` gives a repeat-identical `Ir` for all six pilot cells
 
+## Miri, and why it lives on a second toolchain
+
+Installed at TASK_005. `.memory/02-bench-rules.md` makes Miri **mandatory for any
+pattern whose R4 and R5 are not the same machine code**, and until TASK_005 that
+made the first such pattern un-greenable: `rustup component add miri` is not
+available for `stable-x86_64-unknown-linux-gnu` (nor for the pinned `1.97.1`),
+so the policy demanded a tool the box did not have.
+
+```bash
+rustup toolchain install nightly --component miri --profile minimal
+cargo +nightly miri setup          # builds the interpreter sysroot, ~20 s, cached
+```
+
+| | |
+|---|---|
+| toolchain | `nightly-x86_64-unknown-linux-gnu`, rustc `1.99.0-nightly (d453bdd8f 2026-08-14)` |
+| miri | `0.1.0 (d453bdd8f0 2026-08-14)` |
+| binary | `~/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/bin/miri` |
+| sysroot | `~/.cache/miri` (from `cargo +nightly miri setup --print-sysroot`) |
+
+**The toolchain difference is not a confound, and this is the whole argument for
+doing it this way.** Miri interprets *source* for undefined behaviour; it does
+not measure codegen, and no number in `results/` comes from it. The measured
+builds still use the pinned `1.97.1` + Verus's own toolchain, exactly as before.
+What Miri checks is R4 — plain unsafe Rust with **no vstd dependency** — so
+nightly can compile and interpret it without Verus being involved at all. The
+alternative on the table was weakening the Miri policy, which would have been
+trading a real check for a green light.
+
+`harness/check.py` runs it directly on the rung source, no Cargo project:
+
+```bash
+SR=$(cargo +nightly miri setup --print-sysroot)
+~/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/bin/miri \
+    --sysroot "$SR" --edition 2021 -Zmiri-disable-isolation \
+    patterns/p01-array-sum/unsafe.rs -- <input>.bin
+```
+
+`-Zmiri-disable-isolation` is required because every rung reads its input from a
+file named in `argv` (`.memory/02-bench-rules.md` rule 1). The gate rewrites
+`n_iters` to 4 first — Miri is ~1000× slower than native, and `small.bin`'s
+200 000 iterations would never finish; 4 iterations of the real driver on the
+real payload is enough to exercise every unsafe read at several distinct
+offsets. It then checks the printed checksum against `model.py`'s prediction, so
+a rung that is UB-free but *wrong* under interpretation still fails.
+
+Confirmed load-bearing, not decorative — R4 with the index shifted by 1600:
+
+```
+error: Undefined Behavior: `assume` called with `false`
+  --> unsafe.rs:19:42
+19 |    acc = acc.wrapping_add(unsafe { *v.get_unchecked(off + i + 1600) });
+   |                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ UB occurred here
+```
+
+Unmutated R4 on the same probe input prints `5680969448682675282`, which is what
+`model.py` predicts.
+
+**Limitation to keep in mind:** Miri checks the paths the probe inputs actually
+take. It is a UB *test*, not a proof, and it says nothing about the four inputs
+it was not run on. That is why the policy is "mandatory when R4 ≠ R5", not
+"sufficient".
+
 ## Missing / constrained on this box
 
 Relevant to benchmarking — see `PLAN.md` "Measurement methodology".
@@ -152,7 +216,8 @@ Relevant to benchmarking — see `PLAN.md` "Measurement methodology".
 - **`perf` not installed, and `perf_event_paranoid=3`** → no hardware counters
   even if installed (needs root to relax). This is the only remaining hard gap:
   no IPC, no branch-miss, no cache-miss data.
-- **`hyperfine`, `gdb`, `numactl`, `ninja` absent**; `taskset` is available for pinning.
+- **`hyperfine`, `gdb`, `numactl`, `ninja`, `rsync` absent**; `taskset` is
+  available for pinning.
 - CPU: 2× Xeon Gold 6230 (80 threads), `powersave` governor, shared box → wall
   clock is noisy; pin and use min-of-N.
 

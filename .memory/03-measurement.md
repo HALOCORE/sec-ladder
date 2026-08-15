@@ -248,8 +248,18 @@ help. Two properties make this better than a per-symbol `Ir` floor:
   symbols and its `kernel` symbol executes only 32 Ir/call;
 - **cheap** — 56 callgrind runs over p01's 28 cells took 10 s wall.
 
-Measured on p01 (all 28 cells): 915 … 33 638 Ir/call. `spec.md` pins a floor of
-400. A kernel that had been constant-folded, hoisted or CSE'd reads ~0.
+A kernel that had been constant-folded, hoisted or CSE'd reads ~0.
+
+**The floor is derived, not pinned** (TASK_005). `spec.md` used to declare an
+absolute `min_marginal_ir_per_call`, and p01's was 400 against a measured
+minimum of 915 — 0.80 Ir per element against 1.83 achieved. Worse, it was a
+number the pattern author could lower in the same commit that broke the loop.
+`model.py` now reports `work_per_call` and `harness/check.py` asserts
+`marginal_Ir >= ALPHA_IR_PER_WORK * work_per_call`, plus `d(Ir)/d(work) >= ALPHA`
+across two probe shapes; ALPHA is a harness constant (0.25 — one instruction per
+four 64-bit SIMD lanes, doubled for headroom). Measured on p01 after the TASK_005
+barrier swap: 908 … 274 496 Ir/call over 56 cell/probe pairs, `d(Ir)/d(work)`
+1.75 … 67.00.
 
 **Report per-function exclusive `Ir` for the kernel symbol. Never the
 whole-program `summary:` line as a level.** Measured at TASK_001 on `pilot/k.c`

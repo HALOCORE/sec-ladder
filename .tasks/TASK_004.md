@@ -5,8 +5,30 @@
 `.memory/05-layout.md` ("adding a pattern" checklist), `patterns/p01-array-sum/`
 as the worked template.
 
-**Status: draft — do not start until the manager marks it ready.** It may be
-amended by the outcome of `.tasks/TASK_003_REVIEW.md`.
+**Status: READY.** Unblocked by TASK_005, which fixed the two ways the gate
+false-failed this pattern before it existed.
+
+## What TASK_005 changed that you must use
+
+- **The precondition must be structural; the attack must be data.** Read the first
+  section of `.memory/02-bench-rules.md`. p02's length prefix is an *argument*, not
+  an assumption: `requires` states only that the slices and offsets are valid, and
+  the security property ("no byte outside `dst` is written") lives in the
+  `ensures`. A `requires` that excludes the attack input has assumed the problem
+  away, and the gate will now catch you doing it.
+- **`model.py` must implement `work_per_call(input)`** — abstract work units per
+  kernel call, derived from the file bytes alone. The anti-collapse floor is
+  derived from it; there is no declarable floor any more.
+- **`model.py` declares `sanitizer_expect` per input**, `"clean"` or `"fires"`. On
+  an input declared `"fires"`, sanitizer *silence is the failure* — if the input
+  meant to trigger the bug does not trigger it, the security result is unsupported.
+- **The contract is single-sourced.** `spec.md`'s Python contract is derived from
+  `verus.rs`'s own clause text through the `verus.translate` table and must match.
+  Do not hand-write two transcriptions of one predicate.
+- **An `external_body` item whose body contains `unsafe` must have a non-empty
+  `requires`**, or a printed justification. This is a hard failure, not a pin.
+- **Miri now runs on R4** (nightly, alongside the pinned toolchain). Expect it to
+  execute; a row it cannot finish is recorded blocked, not failed.
 
 ## Why this pattern
 

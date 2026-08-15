@@ -20,7 +20,14 @@ mod driver;
 
 verus! {
 
-broadcast use vstd::slice::group_slice_axioms;
+// `group_slice_axioms` gives `slice@.len() == spec_slice_len(slice)`, hence
+// `slice@.len() <= usize::MAX` -- without it `off + i` cannot be shown not to
+// overflow `usize`. `lemma_u128_shr_is_div` turns `x >> 64` into `x / 2^64`,
+// which is what the driver's multiply-shift barrier bound is about.
+broadcast use {
+    vstd::slice::group_slice_axioms,
+    vstd::bits::lemma_u128_shr_is_div,
+};
 
 /// Identical to verus.rs's spec.
 pub open spec fn sum_wrap(v: Seq<u64>, off: int, len: int) -> u64
@@ -88,7 +95,29 @@ fn main() {
                 nwin == n_vals - win_len + 1,
             decreases n_iters - it,
         {
-            let off: usize = (acc % nwin) as usize;
+            // Ghost only, and the reason the barrier could be swapped from a
+            // `%` to a multiply-shift at TASK_005: `off` must still be in
+            // range. `(acc * nwin) >> 64 < nwin` because `acc <= u64::MAX`
+            // implies `acc * nwin < nwin * 2^64`. Both steps are nonlinear, so
+            // Z3 needs them spelled out; `lemma_u128_shr_is_div` is what turns
+            // the shift into the division the arithmetic is about. Erases at
+            // compile time -- R4 and R5 stay byte-identical.
+            proof {
+                let p: int = (acc as int) * (nwin as int);
+                assert((acc as u128) * (nwin as u128)
+                       <= (u64::MAX as u128) * (u64::MAX as u128))
+                    by (nonlinear_arith)
+                    requires acc <= u64::MAX, nwin <= u64::MAX;
+                assert(vstd::arithmetic::power2::pow2(64)
+                       == 0x1_0000_0000_0000_0000nat) by {
+                    vstd::arithmetic::power2::lemma2_to64_rest();
+                }
+                assert(p < (nwin as int) * 0x1_0000_0000_0000_0000int)
+                    by (nonlinear_arith)
+                    requires p == (acc as int) * (nwin as int),
+                             acc <= u64::MAX, nwin >= 1;
+            }
+            let off: usize = ((acc as u128 * nwin as u128) >> 64) as usize;
             let r: u64 = kernel(vs, off, win_len);
             acc = acc.wrapping_mul(31).wrapping_add(r);
             it = it + 1;

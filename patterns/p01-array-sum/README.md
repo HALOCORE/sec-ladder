@@ -15,11 +15,14 @@ Three things it settles, none of which is about array summing:
 
 1. **The benchmark does not evaporate.** A pure kernel called `n_iters` times on
    the same data is exactly what LLVM CSEs away. Here the window offset is
-   derived from the running checksum — `off = acc % nwin` — so call *i+1*
-   depends on call *i*'s result. `harness/check.py` proves the loop survived by
-   disassembling every one of the 28 built cells and requiring a backward
-   branch, a memory operand and a body above a floor. No `black_box`, no
-   `asm volatile`, and therefore no C-vs-Rust asymmetry in the barrier.
+   derived from the running checksum — `off = (acc * nwin) >> 64` in 128-bit
+   arithmetic — so call *i+1* depends on call *i*'s result. `harness/check.py`
+   proves the loop survived by disassembling every one of the 28 built cells and
+   requiring a backward branch (or a call to a bulk-memory routine), a memory
+   operand and a body above a floor, *and* by measuring marginal executed
+   instructions per call against a floor derived from `model.py`'s
+   `work_per_call`. No `black_box`, no `asm volatile`, and therefore no
+   C-vs-Rust asymmetry in the barrier.
 
 2. **A Verus proof costs zero instructions, and buys nothing on its own.** R5's
    kernel is byte-identical to R4's, and the R2v control (`safe_naive_verus.rs`,

@@ -11,3 +11,9 @@ __pycache__/
 
 *.zip
 *.tar.gz
+
+# Diagnostic gate runs. `--skip`, `--no-build`, `--no-callgrind` and `--cells
+# measured` all certify strictly less than a full run, so check.py writes them
+# beside the full-run record rather than over it. Only the full-run record is
+# committed evidence.
+results/gate/*.partial.json

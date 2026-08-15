@@ -159,7 +159,7 @@ class Item:
     """One `fn` / `spec fn` / `proof fn`, with everything the gate asks about."""
 
     __slots__ = ("name", "kind", "start", "sig", "body", "attrs", "external",
-                 "clauses", "in_verus", "line")
+                 "clauses", "in_verus", "line", "cfg_gated", "mod_path")
 
     def __init__(self, **kw):
         for k in self.__slots__:
@@ -176,7 +176,9 @@ class Item:
 
     def __repr__(self):
         return (f"Item({self.name!r}, kind={self.kind!r}, external={self.external!r}, "
-                f"in_verus={self.in_verus}, clauses={ {k: v for k, v in self.clauses.items() if v} })")
+                f"in_verus={self.in_verus}, cfg_gated={self.cfg_gated!r}, "
+                f"mod_path={self.mod_path!r}, "
+                f"clauses={ {k: v for k, v in self.clauses.items() if v} })")
 
 
 def _clause_split(text):
@@ -223,12 +225,67 @@ def _parse_clauses(sig_code, sig_text):
     return out
 
 
+_CFG_RE = re.compile(r"#!?\[\s*cfg\s*\(")
+
+
+def _attrs_before(code, text, pos, attr_end):
+    """Every `#[...]` immediately preceding the item that starts at `pos`.
+
+    Walks backwards over the real token stream: whitespace and comments are
+    skipped (they are already blanked), and anything that is not the `]` of an
+    attribute -- a `}`, `;`, `{` -- stops the walk, so an attribute can never be
+    stolen from the previous item."""
+    out, p = [], pos
+    while True:
+        q = len(code[:p].rstrip())
+        if q == 0 or code[q - 1] != "]":
+            break
+        span = attr_end.get(q)
+        if span is None:
+            break
+        out.insert(0, text[span[0]:span[1]])
+        p = span[0]
+    return out, p
+
+
+def module_spans(text, code=None):
+    """[(name, body_start, body_end, cfg_gated)] for every `mod NAME { ... }`.
+
+    An item inside a `#[cfg(...)] mod` may not exist in the build at all, so it
+    must never be allowed to supply a pinned contract for the item that does
+    (TASK_003_REVIEW: a decoy `fn kernel` in a `#[cfg(any())] mod` fed the pin
+    while the real, weakened kernel was the one measured)."""
+    code = code if code is not None else blank_noncode(text)
+    attr_end = {e: (s, e) for s, e in attribute_spans(code)}
+    out = []
+    for m in re.finditer(r"\bmod\s+(" + _IDENT + r")\s*\{", code):
+        start = m.start()
+        # `pub mod`, `pub(crate) mod`, ... -- step back over modifiers
+        pre = code[:start].rstrip()
+        w = re.search(r"(" + _IDENT + r")$", pre)
+        if w and w.group(1) in _MODIFIERS:
+            start = w.start()
+        mattrs, _ = _attrs_before(code, text, start, attr_end)
+        open_at = m.end() - 1
+        end = _match_bracket(code, open_at)
+        out.append((m.group(1), open_at + 1, end - 1,
+                    any(_CFG_RE.match(a.replace(" ", "")) or
+                        re.match(r"#!?\[\s*cfg\s*\(", a) for a in mattrs)))
+    return out
+
+
 def parse(text):
-    """Every `fn`-like item in `text`, in source order."""
+    """Every `fn`-like item in `text`, in source order.
+
+    A **list**, not a dict. `check.py` used to key these by name and the last
+    one won, so a decoy item could supply the pinned contract for the real one
+    (TASK_003_REVIEW). Callers that want a mapping must decide what a duplicate
+    means; `duplicate_names()` is here for that."""
     code = blank_noncode(text)
     vs = verus_span(text, code)
     attrs = attribute_spans(code)
     attr_end = {e: (s, e) for s, e in attrs}
+    mods = module_spans(text, code)
     items = []
 
     for m in re.finditer(r"\bfn\s+(" + _IDENT + r")", code):
@@ -250,19 +307,7 @@ def parse(text):
             kind = "proof fn"
 
         # --- attributes: skip whitespace backwards, absorb every `#[...]` ----
-        my_attrs, p = [], pos
-        while True:
-            q = len(code[:p].rstrip())
-            if q == 0:
-                break
-            if code[q - 1] != "]":
-                break                      # `}`, `;`, `{` -> previous item
-            span = attr_end.get(q)
-            if span is None:
-                break
-            my_attrs.insert(0, text[span[0]:span[1]])
-            p = span[0]
-        item_start = p
+        my_attrs, item_start = _attrs_before(code, text, pos, attr_end)
 
         # --- signature / body ------------------------------------------------
         j, depth = m.end(), 0
@@ -294,18 +339,48 @@ def parse(text):
             if re.search(r"\bverifier::external\b", a):
                 ext = "verifier::external"
                 break
+        enclosing = [mm for mm in mods if mm[1] <= m.start() < mm[2]]
+        gated = None
+        if any(re.match(r"#!?\[\s*cfg\s*\(", a) for a in my_attrs):
+            gated = "own #[cfg(...)]"
+        else:
+            for mn, _, _, mcfg in enclosing:
+                if mcfg:
+                    gated = f"#[cfg(...)] mod {mn}"
+                    break
         items.append(Item(
             name=name, kind=kind, start=item_start, sig=sig_text, body=body,
             attrs=my_attrs, external=ext,
             clauses=_parse_clauses(sig_code, sig_text),
             in_verus=bool(vs) and vs[0] <= m.start() < vs[1],
             line=text.count("\n", 0, item_start) + 1,
+            cfg_gated=gated,
+            mod_path="::".join(mm[0] for mm in enclosing),
         ))
     return items
 
 
+def duplicate_names(items):
+    """{name: [Item, ...]} for every name defined more than once.
+
+    Two items with one name is not a style problem: whichever the gate keeps
+    supplies the pinned contract for whichever the compiler keeps, and there is
+    no reason those are the same one."""
+    seen = {}
+    for i in items:
+        seen.setdefault(i.name, []).append(i)
+    return {k: v for k, v in seen.items() if len(v) > 1}
+
+
 def by_name(text):
-    return {i.name: i for i in parse(text)}
+    """Name -> Item. **Raises** on a duplicate; use `parse()` if you want to
+    handle it yourself."""
+    items = parse(text)
+    dup = duplicate_names(items)
+    if dup:
+        raise ValueError("vparse: duplicate item name(s): " + ", ".join(
+            f"{k} at lines {[i.line for i in v]}" for k, v in sorted(dup.items())))
+    return {i.name: i for i in items}
 
 
 # --------------------------------------------------------------------------
@@ -360,6 +435,16 @@ fn f() { let r = kernel(v, 0, 1); }
         print(f"  {'ok  ' if ok else 'FAIL'} {label:52s} {got!r}"
               + ("" if ok else f"  (want {exp!r})"))
 
+    def raises(label, fn, exc=Exception):
+        nonlocal bad
+        try:
+            fn()
+        except exc as e:
+            print(f"  ok   {label:52s} raised {type(e).__name__}")
+            return
+        bad += 1
+        print(f"  FAIL {label:52s} did not raise {exc.__name__}")
+
     for n in "abcd":
         want(f"{n}: external_body seen", it[n].external, "verifier::external_body")
     want("kernel: not external", it["kernel"].external, None)
@@ -373,6 +458,45 @@ fn f() { let r = kernel(v, 0, 1); }
     want("f: real call site found", it["f"].calls("kernel"), True)
     want("verus! end found by brace match, not a comment",
          verus_span(src.replace(" // verus!", "")) is not None, True)
+
+    # --- TASK_003_REVIEW: items keyed by name, last wins -------------------
+    decoy = '''use vstd::prelude::*;
+verus! {
+#[cfg(any())]
+mod decoy {
+    // never compiled; supplied the pinned contract while the real kernel
+    // below was the one measured
+    pub fn kernel(v: &[u64], off: usize, len: usize) -> (r: u64)
+        requires off + len <= v@.len(),
+        ensures r == sum_wrap(v@, off as int, len as int),
+    { 0 }
+}
+
+pub fn kernel(v: &[u64], off: usize, len: usize) -> (r: u64)
+    requires true,
+{ 0 }
+
+#[cfg(feature = "x")]
+fn gated_leaf() { }
+} // verus!
+
+fn outside_verus() { }
+'''
+    ditems = parse(decoy)
+    want("parse() returns a list, both kernels present",
+         [i.name for i in ditems],
+         ["kernel", "kernel", "gated_leaf", "outside_verus"])
+    want("duplicate_names finds the decoy",
+         sorted(duplicate_names(ditems)), ["kernel"])
+    raises("by_name() refuses a duplicate", lambda: by_name(decoy), ValueError)
+    want("decoy kernel is cfg-gated by its enclosing mod",
+         ditems[0].cfg_gated, "#[cfg(...)] mod decoy")
+    want("decoy kernel records its mod path", ditems[0].mod_path, "decoy")
+    want("real kernel is not cfg-gated", ditems[1].cfg_gated, None)
+    want("an item's own #[cfg] is seen too",
+         ditems[2].cfg_gated, "own #[cfg(...)]")
+    want("item outside verus! is flagged", ditems[3].in_verus, False)
+
     print("vparse selftest:", "PASS" if bad == 0 else f"FAIL ({bad})")
     return 0 if bad == 0 else 1
 

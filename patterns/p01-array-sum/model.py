@@ -25,6 +25,24 @@ The API `harness/check.py` requires
     expected_exit    int    -- what a conforming driver exits with
     expected_stdout  str    -- exactly what it prints, newline included
     n_calls          int    -- kernel calls the driver makes on this input
+    work_per_call    int    -- abstract units of work one kernel call must do
+                       on this input, from the file bytes alone. p01: the
+                       window length, i.e. elements summed. This is what makes
+                       the anti-collapse floor **derived** rather than declared
+                       (TASK_005 A1): `check.py` asserts marginal Ir per call
+                       >= ALPHA * work_per_call with ALPHA a harness constant,
+                       and given two probe inputs of different shape it also
+                       asserts d(Ir)/d(work) >= ALPHA. Neither is settable from
+                       `spec.md`. Units are the pattern's own -- elements here,
+                       bytes copied for p02 -- and only the *ratio* has to be
+                       meaningful, so a pattern may not scale one input's units
+                       differently from another's.
+    sanitizer_expect str    -- "clean" or "fires". `.memory/02-bench-rules.md`
+                       says the adversarial row *records* whether the sanitizer
+                       fired; p02's adversarial input is defined as the one
+                       that trips ASan, so a hit there is the expected result,
+                       and silence is the failure. p01 models no memory-safety
+                       bug, so every input is "clean".
     iter_calls()     -> iterator of dict, one per kernel call. Each dict binds
                        the names the `requires`/`ensures` expressions in
                        spec.md use, and must contain "result". **Lazy** --
@@ -96,7 +114,7 @@ class Model:
                                                lambda a, b: (a + b) & MASK))
             self._prefix = prefix
             for _ in range(self.n_iters):
-                off = acc % nwin
+                off = (acc * nwin) >> 64
                 r = (prefix[off + win] - prefix[off]) & MASK
                 acc = (acc * 31 + r) & MASK
             self.n_calls = self.n_iters
@@ -112,7 +130,7 @@ class Model:
         win, nwin, prefix = int(self.win_len), self._nwin, self._prefix
         acc = 0
         for _ in range(self.n_iters):
-            off = acc % nwin
+            off = (acc * nwin) >> 64
             r = (prefix[off + win] - prefix[off]) & MASK
             yield {"off": off, "len": win, "v_len": self.v_len, "v": self.vals,
                    "result": r}
@@ -136,6 +154,26 @@ class Model:
     def helpers(self):
         return {"wrapping_sum": self.naive_sum}
 
+    # -- what the kernel must do, per call ---------------------------------
+    @property
+    def work_per_call(self):
+        """Elements the kernel sums per call, from the file alone.
+
+        `check.py` derives the anti-collapse floor from this, so it must be a
+        lower bound on the real work and must not be inflated: an overstated
+        `work_per_call` raises the floor on the *pattern's own* cells and is
+        caught the first time a legitimate rung trips it."""
+        return int(self.win_len) if self.entered else 0
+
+    # -- sanitizer expectation ---------------------------------------------
+    @property
+    def sanitizer_expect(self):
+        """p01 is the calibration pattern: no memory-safety bug, and its
+        adversarial inputs attack the *driver's* input validation rather than
+        the kernel (they make zero kernel calls). So ASan and UBSan must be
+        silent on every one of them. p02 is where this returns "fires"."""
+        return "clean"
+
     # -- what a conforming driver does -------------------------------------
     @property
     def expected_exit(self):
@@ -147,8 +185,8 @@ class Model:
 
     def describe(self):
         return (f"n_iters={self.n_iters} v_len={self.v_len} win={self.win_len} "
-                f"calls={self.n_calls} truncated={self.truncated} "
-                f"expected={self.checksum}")
+                f"calls={self.n_calls} work/call={self.work_per_call} "
+                f"truncated={self.truncated} expected={self.checksum}")
 
     def selfcheck(self):
         """Prefix-sum simulation vs literal addition, on a few calls."""

@@ -19,21 +19,45 @@ emits `mov eax, <answer>; ret`. Then you are timing `printf`.
 4. **Verify, don't assume.** Every new pattern's build is checked by
    `harness/check.py`. It checks anti-collapse **twice**, because either check
    alone is defeatable:
-   - *structurally* — the kernel's disassembly must have a backward branch, a
-     memory operand and a body above a floor. A collapsed kernel usually has
-     none of these, but a kernel that was hoisted or CSE'd still has all three;
+   - *structurally* — the kernel's disassembly must have a backward branch **or
+     a call to a known bulk-memory routine**, a memory operand, and a body above
+     a floor. A collapsed kernel usually has none of these, but a kernel that was
+     hoisted or CSE'd still has all three. The bulk-memory alternative was added
+     at TASK_005: a `memcpy`-shaped kernel has no backward branch of its own —
+     measured, gcc `-O3`, 16 instructions, `has_loop=False`, `call memcpy@plt` —
+     and the loop is real, it just lives in libc. Requiring a back edge
+     false-failed a perfectly healthy p02 kernel *before p02 existed*;
    - *dynamically* — **marginal executed instructions per kernel call**, against
-     a floor declared in the pattern's `spec.md`. Measured as a difference of
-     two callgrind runs of the same binary on the same input with only `n_iters`
-     changed (that field is at offset 0 of every input file, so the harness can
-     build the probe without the pattern's help). The difference cancels the
-     loader and environment terms that make an absolute whole-program `Ir`
-     unquotable, and it is **symbol-independent**, so it works in `whole` mode
-     where the kernel has no symbol and at `O0` where a rung's work lives in
-     `core::iter` symbols rather than in `kernel`.
+     a floor **derived** from the pattern's own `model.py`. Measured as a
+     difference of two callgrind runs of the same binary on the same input with
+     only `n_iters` changed (that field is at offset 0 of every input file, so
+     the harness can build the probe without the pattern's help). The difference
+     cancels the loader and environment terms that make an absolute
+     whole-program `Ir` unquotable, and it is **symbol-independent**, so it works
+     in `whole` mode where the kernel has no symbol and at `O0` where a rung's
+     work lives in `core::iter` symbols rather than in `kernel`.
 
-   Measured on p01, the floor across all 28 cells is 915 Ir/call (`c-clang O3
-   whole`); `spec.md` pins 400.
+   **The dynamic floor is not declared in `spec.md`.** It was, until TASK_005,
+   and TASK_003_REVIEW's central finding applies to it exactly: a pin that the
+   pattern author writes moves with the code it constrains, so weakening it costs
+   one extra edit in the same commit. (p01's was 400 against a measured minimum
+   of 915 — 0.80 Ir per element against 1.83 achieved — so it caught only
+   near-total collapse anyway.) Instead `model.py` exposes
+
+       work_per_call -> int   # abstract units of work one kernel call must do
+                              # on this input, from the file bytes alone
+
+   and the gate asserts `marginal_Ir >= ALPHA_IR_PER_WORK * work_per_call`, with
+   ALPHA a constant in `harness/check.py` — changing it is a harness diff that
+   moves all 47 patterns at once. Given **two probe inputs of different shape**
+   (`collapse.probe_inputs`) it additionally asserts the marginal rate
+   `d(Ir)/d(work) >= ALPHA`, which is the assertion an author cannot satisfy by
+   making the kernel do a fixed amount of work regardless of its input. A
+   declared `min_marginal_ir_per_call` may still appear and can only *tighten*
+   the derived floor.
+
+   Measured on p01 after the TASK_005 barrier swap: marginal Ir 908 … 274 496
+   across 56 cell/probe pairs, `d(Ir)/d(work)` 1.75 … 67.00, ALPHA = 0.25.
 
 5. **The barrier is pinned in `spec.md`, not inferred.** Removing the driver's
    anti-collapse barrier is *not* reliably visible in either check above:
@@ -75,6 +99,16 @@ offset 16  u8[payload_len]    # pattern-defined payload
   whether ASan/UBSan fired (C), whether it panicked (R2/R3), whether it silently
   corrupted (R4), and what the proof rules out (R5). This table is the security
   half of the result.
+- **The sanitizer is allowed to fire, and sometimes must.** `model.py` declares
+  `sanitizer_expect` per input, `"clean"` or `"fires"`. On a `"clean"` input any
+  ASan/UBSan diagnostic is a gate failure and the exit code must match the
+  model. On a `"fires"` input **silence is the failure**: if the input that is
+  supposed to trigger this pattern's bug does not, the security half of the
+  result is unsupported. The exit code is recorded rather than required there,
+  because ASan exits 1 by default, aborts (−6) under `abort_on_error`, and a
+  UBSan-only diagnostic may not change it at all. Before TASK_005 the gate
+  failed on *any* hit on *any* input, which meant the first pattern modelling a
+  real memory-safety bug could not be green.
 
 ## Kernel/driver split
 
@@ -87,13 +121,25 @@ offset 16  u8[payload_len]    # pattern-defined payload
 - The C copy is diffed the same way. `harness/dloop.py` normalises both
   languages (types, casts, `wrapping_*` methods, grouping parentheses, Verus
   clauses and ghost statements) to one token sequence; names that genuinely
-  differ get an explicit alias table in `spec.md`. **Required substrings are not
+  differ get an explicit alias table in `spec.md`. **That table renames and can
+  do nothing else**: both sides must be a dotted identifier path with an
+  optional `()`, so no alias can add, delete or restructure a statement. An
+  unconstrained destination — an *empty* one in particular — deletes the
+  statement it matches, which is enough to put the M9 prefetch/barrier payload
+  back into the measured C loop with two lines of `spec.md` (TASK_003_REVIEW).
+  The *set* of files that must carry an `SLB-DRIVER` region is pinned too
+  (`driver.regions`), and `harness/dloop.py` raises on a second marker pair:
+  otherwise a rung leaves the diff by deleting two comments, or a decoy region
+  in a block comment above the real loop is what gets diffed. **Required substrings are not
   a diff**: p01's seven-substring check passed with a `__builtin_prefetch` and
   an `__asm__ __volatile__` memory barrier added to the C driver loop, which is
   precisely the cross-language asymmetry the anti-partial-evaluation rules
   forbid.
-- **Ghost statements are exempt from the diff**, exactly as `invariant` and
-  `decreases` are. Ghost code erases, so an R5 driver that consumes its kernel's
+- **Ghost statements are exempt from the diff, in Rust only.** Exactly as
+  `invariant` and `decreases` are. `assert(...)` is a ghost statement in Verus
+  and erases; in C it is *live code* — `harness/build.py` never defines
+  `NDEBUG` — and stripping it there deleted a real branch from the measured loop
+  while the diff still passed (TASK_003_REVIEW). Ghost code erases, so an R5 driver that consumes its kernel's
   `ensures` with an `assert` stays byte-identical to R4's — and R5's `ensures`
   should be consumed, or it is decoration that only mutation testing defends.
 - Kernel signature is fixed per pattern in the pattern's `spec.md`, and all five
@@ -108,14 +154,35 @@ kernels are byte-identical, R4 inherits R5's proof exactly and a UB check adds
 nothing. When they are not, R4 is unverified unsafe code that 47 patterns will
 imitate, and nothing has checked it.
 
-`harness/check.py` step 8 wires this: it reads the identity level it measured for
-the R4/R5 pair at `O3`, and a pattern that is **not** `exact` while its `spec.md`
-says `miri.required = false` is a gate failure. p01 is `exact` and is therefore
-exempt, with the reason recorded in its own contract rather than in prose
-somebody has to remember. Note Miri is **not installed** for the pinned stable
-toolchain on this box (`rustup component add miri` is unavailable for
-`stable-x86_64-unknown-linux-gnu`), so the first pattern that needs it has to
-solve that first — the gate will say so rather than skip.
+`harness/check.py` step 8 wires this. Three details, all settled at TASK_005
+because between them they made the first pattern with a non-trivial proof
+un-greenable by any route:
+
+- **The threshold is `norel`, not `exact`.** `norel` means byte-identical once
+  pc-relative displacement *fields* are zeroed — the same machine code linked at
+  a different address. p01's own `spec.md` says exactly that about its `O0` row.
+  A `call rel32` to a callee that moved is not a semantic difference and must
+  not make Miri mandatory.
+- **Miri is installed and actually run.** On a `nightly` toolchain beside the
+  pinned one (`rustup toolchain install nightly --component miri`; see
+  `TOOLCHAIN.md`). This is sound because R4 is plain unsafe Rust with **no vstd
+  dependency**, and because Miri checks *source* for UB — it does not measure
+  codegen, and no number in `results/` comes from it, so the toolchain
+  difference is not a confound. The gate rewrites `n_iters` to 4 (Miri is
+  ~1000× slower than native), runs the R4 source on **every** input including
+  the adversarial ones, and checks the printed checksum against `model.py`.
+  Confirmed load-bearing: R4 with its index shifted by 1600 reports
+  `Undefined Behavior` and fails the stage.
+- **A missing tool blocks a row, it does not fail the pattern.** If Miri cannot
+  be run, the gate records a *documented failure for that row* with the
+  `miri.blocked_reason` `spec.md` pins, prints it in the verdict, and the
+  verdict becomes `PASS-WITH-BLOCKED-ROWS`. Failing a whole pattern on a tool
+  the box does not have is how gates get switched off.
+
+The pair to compare is `miri.pair` in `spec.md`, not a hard-coded
+`"unsafe vs verus"` string. Miri is a UB **test**, not a proof: it says nothing
+about paths the probe inputs do not take, which is why the policy is "mandatory
+when R4 ≠ R5" rather than "sufficient".
 
 ## Honesty rules
 
@@ -199,19 +266,99 @@ past the gate with **one blank line** (the attribute scan read
 catches a different spelling of the same defect:
 
 - **The obligation count is pinned in `spec.md`.** `external_body main` drops
-  p01's count 5 → 3, and so does most tampering. A count that *moved* means code
-  stopped being verified, never that the proof got easier.
+  p01's count 5 → 3, and so does most tampering. **Know what it measures, or it
+  will mislead you**: TASK_003_REVIEW derived it as *one Verus query per
+  function, plus one per loop body*, i.e. a checksum over the function/loop
+  skeleton. It is therefore invariant under exactly the semantic weakenings it
+  was introduced to catch — a deleted `requires`, a tautological `ensures` — and
+  it moves on benign refactors that add or remove a function or a loop. An
+  unchanged count is not evidence of anything. (It also answers the open
+  question of why `--verify-function main --verify-root` reports 2: the second
+  query is the driver's loop body.)
 - **Every item's `external` attribute, `requires` and `ensures` is pinned in
   `spec.md` and diffed** (`harness/vparse.py`), as is the item *set*. This is the
   only mechanical defence against the two mutations that leave "N verified, 0
   errors" completely unchanged: a tautological `ensures`, and a `requires`
-  deleted from an `external_body` wrapper (`.memory/04-verus.md`).
+  deleted from an `external_body` wrapper (`.memory/04-verus.md`). `vparse`
+  returns a **list**: two items with one name is a hard failure, because
+  whichever one the gate keeps supplies the pinned contract for whichever one
+  the compiler keeps, and nothing says those are the same one. A pinned item
+  must also be inside `verus! {}` and must not be `#[cfg]`-gated.
 - **Verus is asked, not inspected.** `verus <file> --verify-function main
   --verify-root` reports `0 verified` when `main` has no verified body, and ≥1
   when it does. That is a semantic answer to a semantic question, and no
   attribute spelling defeats it.
+- **A trusted `unsafe` item must demand something of its callers.** Structural,
+  not a pin: an `#[verifier::external_body]` item whose body contains `unsafe`
+  and whose `requires` is empty is an axiom that the unchecked operation is
+  always defined. `spec.md` may carry a per-item justification string instead,
+  and the gate prints it in the verdict on every run.
 
 Every pattern therefore ships two more files beside its sources:
 `model.py` (the independent reference implementation the gate drives — the model
 used to be hard-coded into `check.py`, which would have forced 47 forks) and the
 `slb-contract` block in `spec.md` carrying all of the pins above.
+
+### Which pins are legitimate — the rule, after TASK_003_REVIEW
+
+That review demonstrated, with a full green gate, that R5's trusted base can be
+made to axiomatise "reading any index of any slice is defined and yields
+`v@[i]`" by editing three lines of `verus.rs` and three of `spec.md` **in the
+same commit**. Every declared pin moves with the code it constrains, and the
+obligation count cannot backstop it (see above). The rule adopted at TASK_005:
+
+> **A declared pin is acceptable only for something a reviewer can check by
+> reading `spec.md` alone. Everything else is derived.**
+
+Legitimate declared pins: which input file to probe, which files carry a driver
+region, the canonical driver token sequence, the alias table, the identity level
+expected of a pair. All of those a reviewer can read and judge without opening
+the source.
+
+Derived instead: the anti-collapse floor (from `model.py`'s `work_per_call`
+times a harness constant); the Python `requires`/`ensures` the gate evaluates
+(generated from `verus.rs`'s own clause text through a declared, reviewed
+`verus.translate` table, so the two transcriptions of one predicate cannot
+drift apart); the structural rule on trusted `unsafe` items. `check.py`'s Miri
+cross-check — a declared value tested against a *measured* one — is the model to
+copy.
+
+The gate also **hashes the `slb-contract` block** into `results/gate/*.json`
+along with a sha256 of every source it read, so weakening a pin shows up in
+review as a change to the committed artefact rather than only as a source diff.
+
+### Open gaps in the driver diff, as of TASK_005
+
+- **Casts are erased, so a width change applied to *every* rung at once is
+  invisible.** `harness/dloop.py` must erase casts or `(size_t)(acc % nwin)` and
+  `(acc % nwin) as usize` never reconcile, and then there is no cross-language
+  diff at all. A change to one language shows up as a checksum divergence; a
+  change to all of them shows up as neither. Not fixed.
+- **Grouping is erased** for the same reason (`a * 31 + r` vs `a * (31 + r)`),
+  but the checksum stage catches that one instantly.
+- `results/gate/<pattern>.json` is the record of the last *complete* run, pass
+  or fail, so a failing run does replace a passing one. Since TASK_005 it
+  carries a sha256 of the contract block and of every source the gate read, so a
+  stale record is at least detectable by comparing hashes against the tree.
+
+### The reference model may not run the thing under test
+
+`model.py` is imported and driven inside an audit-hook sandbox that blocks
+`subprocess`, `os.exec*`, `ctypes` and sockets, and `check.py` refuses to load a
+model whose source so much as mentions them. A model whose `checksum` shells out
+to the built C binary passes step 2 by construction, and the log reports the
+checksum was "re-derived" (TASK_003_REVIEW). Step 2 is the gate's only
+load-bearing correctness check.
+
+Vacuity in the same stage is a failure, not evidence: an empty `requires` list
+used to print "holds on all 200000 kernel calls", and a model that returned no
+samples printed "re-derived on 0 sampled calls". Both now fail.
+
+### `--skip` cannot skip an adversarial input
+
+`check.py --skip <stem>` refuses any `adversarial*` stem outright — skipping
+them un-checks the proof-domain rules while the verdict still reads PASS, which
+is blocker B3 re-opened from the command line. Any other skip forces the verdict
+to `PARTIAL` (exit 2), a banner, and a separate `*.partial.json`, never the
+full-run record. `--no-build` additionally fails if any binary is older than the
+newest source file.

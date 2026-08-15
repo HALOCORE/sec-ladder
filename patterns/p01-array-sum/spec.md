@@ -52,8 +52,10 @@ That is the mechanical enforcement of `.memory/02-bench-rules.md` "Proof domain
 must cover the measured domain" rules 1 and 3.
 
 `off + len` cannot itself overflow `usize` in the measured domain because the
-driver derives `off` from `acc % nwin` with `nwin = v_len - len + 1`, so
-`off < nwin` and `off + len <= v_len`. R5 proves this at the call site.
+driver derives `off` from `(acc * nwin) >> 64` in 128-bit arithmetic with
+`nwin = v_len - len + 1`, so `off < nwin` and `off + len <= v_len`. R5 proves
+this at the call site — see "the barrier" below for why the bound needs three
+lines of nonlinear arithmetic where `acc % nwin` needed none.
 
 ## The machine-readable contract
 
@@ -67,7 +69,9 @@ a green gate are, separately, evidence of very little:
 | `verus.items[*].requires` / `.ensures` | replacing the kernel's postcondition with `ensures r == r` still gives *5 verified, 0 errors*. So does **deleting a `requires` from an `external_body` wrapper**, which silently deletes every caller's obligation and moves no count at all — the project's most dangerous known vacuity mode (`.memory/04-verus.md`). Only a textual diff against a pin catches it. |
 | the item set itself | a *new* `external_body` item can otherwise be added without the TCB tally noticing. |
 | `driver.canonical` | the driver loop was previously diffed rung-against-rung, so a mutation applied to *every* rung — deleting the anti-collapse barrier — passed; and the C copy was checked by required substrings, so adding a prefetch and a memory barrier passed (`.memory/02-bench-rules.md` forbids exactly that asymmetry). |
-| `collapse.min_marginal_ir_per_call` | a kernel that got constant-folded away still has a backward branch somewhere in the symbol. |
+| `collapse.probe_inputs` | a kernel that got constant-folded away still has a backward branch somewhere in the symbol. **The floor itself is no longer pinned here**: `check.py` derives it as `ALPHA_IR_PER_WORK * model.work_per_call` and, across the two probe shapes, asserts `d(Ir)/d(work) >= ALPHA`. ALPHA is a harness constant. The old declared floor of 400 was 0.80 Ir/element against 1.83 achieved, and whoever broke the loop could have lowered it in the same commit (TASK_003_REVIEW). |
+| `verus.translate` | `contract.requires` (Python) and `verus.items[*].requires` (Verus) used to be two independent transcriptions of one predicate with nothing checking they corresponded, so the proof's precondition could be weakened while the gate went on evaluating the strong one over every input. The Python side is now *generated* from the Verus clause text through this table. |
+| `driver.regions` | deleting the two `SLB-DRIVER` marker comments used to make a rung vanish from the driver diff silently — the gate only required that ≥2 regions were found anywhere. |
 | `identity` | recorded as a **result**, not a gate condition. A pattern whose proof legitimately costs an instruction is a finding; only a *drop below the pinned level* is a failure. |
 
 ```slb-contract
@@ -76,12 +80,19 @@ a green gate are, separately, evidence of very little:
   "model": "model.py",
   "requires": ["off + len <= v_len"],
   "ensures": ["result == wrapping_sum(v, off, len)"],
-  "note": "expressions are evaluated in Python against the bindings model.py yields per call (off/len/v_len/v/result) plus the helpers it supplies (wrapping_sum)",
+  "note": "requires/ensures above are DERIVED by check.py from verus.rs's own clause text through verus.translate, and the copy here must equal the derivation exactly. They are evaluated in Python against the bindings model.py yields per call (off/len/v_len/v/result) plus the helpers it supplies (wrapping_sum).",
 
   "verus": {
     "call_site": "main",
     "kernel_item": "kernel",
-    "obligations": {"verus.rs": 5, "safe_naive_verus.rs": 5},
+    "translate": {
+      "v@.len()": "v_len",
+      "sum_wrap": "wrapping_sum",
+      " as int": "",
+      "v@": "v",
+      "r": "result"
+    },
+    "obligations": {"verus.rs": 7, "safe_naive_verus.rs": 7},
     "items": {
       "verus.rs": {
         "sum_wrap":      {"external": null, "requires": [], "ensures": []},
@@ -114,6 +125,8 @@ a green gate are, separately, evidence of very little:
   "driver": {
     "statements": 12,
     "c_source": "c/main.c",
+    "regions": ["safe_naive.rs", "safe_naive_verus.rs", "safe_tuned.rs",
+                "unsafe.rs", "verus.rs", "c/main.c"],
     "aliases": {"c": {"n_body": "vals.len()",
                       "inp.n_iters": "n_iters",
                       "vals": "vals.as_slice()"}},
@@ -128,7 +141,7 @@ a green gate are, separately, evidence of very little:
       "it = 0 ;",
       "while it < n_iters",
       "{",
-      "off = acc % nwin ;",
+      "off = acc * nwin >> 64 ;",
       "r = kernel ( vs , off , win_len ) ;",
       "acc = acc * 31 + r ;",
       "it = it + 1 ;",
@@ -138,10 +151,9 @@ a green gate are, separately, evidence of very little:
   },
 
   "collapse": {
-    "probe_input": "small.bin",
+    "probe_inputs": ["small.bin", "large.bin"],
     "probe_iters": [100, 200],
-    "min_marginal_ir_per_call": 400,
-    "note": "marginal Ir = (Ir at 200 iterations - Ir at 100 iterations) / 100. A difference of two runs of the same binary in the same environment, so the loader/env terms that make whole-program Ir unquotable cancel exactly. Symbol-independent, so it works in `whole` mode and at O0 where the work lives in core::iter symbols. Measured floor across all 28 cells is 915 (c-clang O3 whole); 400 leaves >2x margin and is >100x above a collapsed loop."
+    "note": "marginal Ir = (Ir at 200 iterations - Ir at 100 iterations) / 100. A difference of two runs of the same binary in the same environment, so the loader/env terms that make whole-program Ir unquotable cancel exactly. Symbol-independent, so it works in `whole` mode and at O0 where the work lives in core::iter symbols. THE FLOOR IS NOT DECLARED HERE: check.py derives it as ALPHA_IR_PER_WORK * model.work_per_call, and the two probe inputs have different work per call (501 vs 4096 elements) so it can also assert d(Ir)/d(work) >= alpha. The old declared floor of 400 was 0.80 Ir/element against 1.83 achieved, and an author who broke the loop could lower it in the same commit."
   },
 
   "identity": [
@@ -152,8 +164,10 @@ a green gate are, separately, evidence of very little:
   ],
 
   "miri": {
+    "pair": ["unsafe", "verus"],
+    "sources": ["unsafe.rs"],
     "required": false,
-    "reason": "R4 and R5 are byte-identical at O3 (`identity` above pins `exact`), so R4 inherits R5's discharged obligations exactly. `.memory/02-bench-rules.md` makes Miri mandatory only when they are not."
+    "reason": "R4 and R5 are byte-identical at O3 (`identity` above pins `exact`), so R4 inherits R5's discharged obligations exactly. `.memory/02-bench-rules.md` makes Miri mandatory only when they are not. Set `required: true` to run it anyway; the nightly toolchain and sysroot are installed (TOOLCHAIN.md) and `check.py` interprets `sources` on every input at n_iters=4."
   }
 }
 ```
@@ -184,7 +198,7 @@ if win_len_w > 0 and win_len_w <= n_vals:
     nwin    := (n_vals - win_len + 1) as u64
     it      := 0
     while it < n_iters:
-        off := (acc % nwin) as usize
+        off := ((acc as u128 * nwin as u128) >> 64) as usize
         r   := kernel(vals, off, win_len)
         acc := acc *64 31 +64 r
         it  := it + 1
@@ -199,6 +213,27 @@ can neither CSE the calls nor hoist them out of the loop, and no `black_box` or
 `asm volatile` is needed — which matters, because those two are not equally
 strong barriers and using them would put a C-vs-Rust asymmetry in the driver
 (`.tasks/TASK_002.md`). The mechanism is the same arithmetic in both languages.
+
+### The barrier is a multiply-shift, not a modulo
+
+`off = (acc * nwin) >> 64` in 128-bit arithmetic — Lemire's map from a uniform
+`u64` onto `[0, nwin)`. It was `acc % nwin` until TASK_005.
+
+The swap is not a micro-optimisation, it is a measurement-validity fix. A 64-bit
+`div` is ~0.1 % of `Ir`, so the *primary* metric never noticed it — but it is
+20–40 cycles of latency sitting on the serial dependency chain that makes the
+loop a loop, and that is a **rung-independent additive constant**. An additive
+constant compresses every cross-rung wall-clock *ratio* toward 1, which is the
+direction that flatters this project's own headline. `mul` is 3 cycles and
+keeps the cache randomisation exactly (`off` is still uniform over `[0, nwin)`),
+so the ratios get more honest and nothing else changes. Both languages compile
+it to a single `mul` and a `mov` (gcc `-O3`: `mov %rdi,%rax; mul %rsi;
+mov %rdx,%rax`).
+
+It costs three lines of ghost proof in R5, where `%` cost none: `(acc * nwin)
+>> 64 < nwin` is nonlinear in both steps, so Z3 needs `acc * nwin` bounded
+explicitly and `vstd::bits::lemma_u128_shr_is_div` to turn the shift into the
+division the argument is about. That is why the obligation count moved 5 → 7.
 
 `harness/check.py` proves this held, per cell, by disassembling and requiring a
 backward branch and a plausible body size.
