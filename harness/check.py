@@ -900,14 +900,27 @@ def main():
         "notes": rep.notes,
         "verdict": "FAIL" if rep.failures else "PASS",
     }
+    # A diagnostic run must never overwrite the record of a full one. `--skip`
+    # and `--no-callgrind` both make the run certify strictly less, so they get
+    # their own file; only a complete run writes `<pattern>.json`. (Learned the
+    # hard way at TASK_003: a `--skip small --skip large --no-callgrind` run,
+    # used to *demonstrate* that those flags now fail the gate, clobbered the
+    # passing artefact with its own deliberate FAIL.)
+    partial = bool(a.skip) or a.no_callgrind or a.no_build or a.cells != "all"
+    doc["complete_run"] = not partial
+    doc["invocation"] = " ".join(sys.argv[1:])
     outdir = os.path.join(REPO, "results", "gate")
     os.makedirs(outdir, exist_ok=True)
-    outp = os.path.join(outdir, f"{os.path.basename(pdir)}.json")
+    suffix = ".partial.json" if partial else ".json"
+    outp = os.path.join(outdir, f"{os.path.basename(pdir)}{suffix}")
     with open(outp, "w") as fh:
         json.dump(doc, fh, indent=2, sort_keys=False, default=str)
 
     head("verdict")
     print(f"    results -> {os.path.relpath(outp, REPO)}")
+    if partial:
+        print("    PARTIAL RUN: this certifies less than a full one, so it was "
+              "written beside the full-run record, not over it.")
     for n in rep.notes:
         print(f"    note: {n}")
     if rep.failures:

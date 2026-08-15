@@ -53,10 +53,18 @@ sec-ladder/
     NOTES.md                # per-rung findings, proof sticking points, TCB tally
   results/
     pNN-<slug>.json         # raw measurements, committed
-    gate/pNN-<slug>.json    # what check.py *found*, committed: identity levels,
-                            #   marginal Ir per call, obligation counts, TCB
-                            #   inventory, per-input requires/ensures coverage,
-                            #   adversarial behaviour, the verdict
+    gate/pNN-<slug>.json    # what check.py *found* on a COMPLETE run, committed:
+                            #   identity levels, marginal Ir per call, obligation
+                            #   counts, TCB inventory, per-input requires/ensures
+                            #   coverage, adversarial behaviour, the verdict
+    gate/pNN-<slug>.partial.json   # the same, from a run that certified less
+                            #   (`--skip`, `--no-build`, `--no-callgrind`,
+                            #   `--cells measured`). A diagnostic run must never
+                            #   overwrite the record of a full one — at TASK_003
+                            #   a `--skip small --skip large --no-callgrind` run
+                            #   clobbered a passing artefact with its own
+                            #   deliberate FAIL. Both files carry
+                            #   `complete_run` and the exact `invocation`.
     tables/                 # generated markdown, regenerable
 ```
 

@@ -1,16 +1,15 @@
 {
   "pattern": "p01-array-sum",
-  "skipped_inputs": [
-    "small",
-    "large"
-  ],
+  "skipped_inputs": [],
   "inputs_checked": [
     "adversarial-empty.bin",
     "adversarial-headonly.bin",
     "adversarial-shortlen.bin",
     "adversarial-win0.bin",
     "adversarial-winbig.bin",
-    "adversarial.bin"
+    "adversarial.bin",
+    "large.bin",
+    "small.bin"
   ],
   "identity": [
     {
@@ -122,7 +121,36 @@
       ]
     }
   ],
-  "marginal_ir_per_call": {},
+  "marginal_ir_per_call": {
+    "c-clang/O0/isolated": 6546.0,
+    "c-clang/O0/whole": 6545.0,
+    "c-clang/O3/isolated": 919.0,
+    "c-clang/O3/whole": 915.0,
+    "c-gcc/O0/isolated": 6050.0,
+    "c-gcc/O0/whole": 6050.0,
+    "c-gcc/O3/isolated": 1287.0,
+    "c-gcc/O3/whole": 1275.0,
+    "safe_naive/O0/isolated": 26123.0,
+    "safe_naive/O0/whole": 26123.0,
+    "safe_naive/O3/isolated": 931.0,
+    "safe_naive/O3/whole": 933.0,
+    "safe_naive_verus/O0/isolated": 26123.0,
+    "safe_naive_verus/O0/whole": 26123.0,
+    "safe_naive_verus/O3/isolated": 931.0,
+    "safe_naive_verus/O3/whole": 926.0,
+    "safe_tuned/O0/isolated": 10629.0,
+    "safe_tuned/O0/whole": 10629.0,
+    "safe_tuned/O3/isolated": 924.0,
+    "safe_tuned/O3/whole": 919.0,
+    "unsafe/O0/isolated": 33638.0,
+    "unsafe/O0/whole": 33638.0,
+    "unsafe/O3/isolated": 919.0,
+    "unsafe/O3/whole": 916.0,
+    "verus/O0/isolated": 33638.0,
+    "verus/O0/whole": 33638.0,
+    "verus/O3/isolated": 919.0,
+    "verus/O3/whole": 915.0
+  },
   "verus": {
     "safe_naive_verus.rs": {
       "verified": 5,
@@ -203,6 +231,16 @@
       "calls": 0,
       "requires_ok": true,
       "ensures_checked": 0
+    },
+    "large.bin": {
+      "calls": 20000,
+      "requires_ok": true,
+      "ensures_checked": 128
+    },
+    "small.bin": {
+      "calls": 200000,
+      "requires_ok": true,
+      "ensures_checked": 128
     }
   },
   "driver_loops": {
@@ -593,6 +631,14 @@
     "adversarial.bin": {
       "exit": 0,
       "expected_exit": 0
+    },
+    "large.bin": {
+      "exit": 0,
+      "expected_exit": 0
+    },
+    "small.bin": {
+      "exit": 0,
+      "expected_exit": 0
     }
   },
   "miri": {
@@ -600,16 +646,9 @@
     "ran": false,
     "byte_identical": true
   },
-  "failures": [
-    {
-      "section": "coverage",
-      "message": "no non-adversarial input left to check a checksum against -- `--skip` removed them all, so this run certifies nothing"
-    },
-    {
-      "section": "collapse-ir",
-      "message": "--no-callgrind given: the dynamic anti-collapse assertion did not run, so this gate run does not certify that the loop survived"
-    }
-  ],
+  "failures": [],
   "notes": [],
-  "verdict": "FAIL"
+  "verdict": "PASS",
+  "complete_run": true,
+  "invocation": "p01"
 }
