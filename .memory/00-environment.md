@@ -8,7 +8,8 @@ this file (and say so in your report) if a fact goes stale.
 - 2× Intel Xeon Gold 6230 @ 2.10 GHz, 20 cores/socket, 2 threads/core = **80 logical CPUs**.
 - Governor `powersave`, frequency scaling active (observed ~24% of max at idle).
 - **Shared box, containerised** (`/dev/vg1/containers_apt`). Wall-clock timing is noisy.
-- ~134 GB free on `/`.
+- ~118 GB free on `/` (of 252 GB). The 12 GB LLVM install is the big consumer;
+  re-check with `df -h /` rather than trusting this line.
 - **No root.** Everything installs into `~/tools/` or `~/.cargo/`. No `sudo`.
 - Network works (GitHub, crates.io, static.rust-lang.org all reachable).
 
@@ -21,13 +22,23 @@ this file (and say so in your report) if a fact goes stale.
 | rustc/cargo | 1.97.1 — `stable` **and** `1.97.1-x86_64-unknown-linux-gnu` | `~/.cargo/bin` (rustup) |
 | z3 | bundled | `~/tools/verus/z3` |
 | gcc | 13.3.0 | `/usr/bin/gcc` |
+| **clang / LLVM** | **22.1.6** | `~/tools/llvm` (symlink → `llvm-22.1.6`); 12 GB on disk |
+| **valgrind + callgrind** | **3.27.1**, built from source | `~/tools/valgrind` (symlink → `valgrind-3.27.1`) |
 | binutils | objdump, readelf, nm | `/usr/bin` |
 | cmake | present | `/usr/bin/cmake` |
 | taskset | present (use for pinning) | `/usr/bin/taskset` |
 | python3 | present | `/usr/bin/python3` |
+| perl | 5.38.2 — `callgrind_annotate` needs it | `/usr/bin/perl` |
 
-Verus is deliberately **not on PATH**. Use `./verus_run.py`, which locates it and
-sets up the pinned rustc. See `TOOLCHAIN.md`.
+Verus, clang and valgrind are deliberately **not on PATH**. Use `./verus_run.py`
+for Verus and absolute paths for the others (`~/tools/llvm/bin/clang`,
+`~/tools/valgrind/bin/valgrind`, `~/tools/valgrind/bin/callgrind_annotate`).
+Reproduction commands: `TOOLCHAIN.md`.
+
+**clang 22.1.6 == rustc 1.97.1's LLVM 22.1.6** — identical major/minor/patch, so
+clang-vs-rustc is a genuine same-backend comparison and needs no version caveat
+today. Re-check with `rustc --version --verbose | grep LLVM` after any toolchain
+bump; if they diverge, every same-backend claim in `results/` must be re-labelled.
 
 ## Missing, and why it matters
 
@@ -35,9 +46,10 @@ sets up the pinned rustc. See `TOOLCHAIN.md`.
 |---|---|---|
 | `perf` | — | needs root to install |
 | `perf_event_paranoid=3` | **no hardware counters at all** (IPC, branch miss, cache miss) even if perf were installed | needs root to relax to ≤1 |
-| `valgrind` | no deterministic executed-instruction count | builds from source into `~/tools`, no root — TASK_001 |
-| `clang` | only C baseline is gcc, so C-vs-Rust confounds *safety cost* with *gcc-vs-LLVM codegen* | LLVM release tarball into `~/tools`, no root — TASK_001 |
 | `hyperfine`, `gdb`, `numactl`, `ninja` | minor; work around | — |
+
+`valgrind` and `clang` were the other two gaps. Both closed in TASK_001; they are
+in the installed table above. Hardware counters remain the only hard gap.
 
 ## Hard constraints (non-negotiable)
 

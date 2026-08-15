@@ -12,8 +12,13 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 
 | ID | Item | Status |
 |---|---|---|
-| T001 | clang + valgrind installed into `~/tools` | planned |
-| T002 | `harness/` (build, check, measure, asm) + p01 promoted from `pilot/` | planned |
+| T001 | clang 22.1.6 + valgrind 3.27.1 into `~/tools`; pilot re-measured | **done**, reviewed |
+| T002 | `harness/` (asm, build, check, measure, report) + p01 as the template | wip |
+
+T001's review produced two blockers (normalised-text digest cannot prove identity;
+the pilot's R5 had no verified call site) and four majors. All are folded into
+`.memory/01-ladder.md`, `.memory/02-bench-rules.md`, `.memory/03-measurement.md`,
+`.memory/04-verus.md` and `TASK_002.md`. Read those, not the pilot.
 
 ## Family A — buffers & bounds (spatial safety core)
 

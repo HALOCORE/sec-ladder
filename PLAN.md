@@ -27,16 +27,21 @@ Before planning further I built the ladder for one trivial kernel
 method in `TOOLCHAIN.md`. Kernel body at `-O3` / `opt-level=3`, `#[inline(never)]`,
 x86-64:
 
-| Cell | Instructions in kernel | Notes |
-|---|---|---|
-| C (gcc -O3) | **33** | vectorised, no checks |
-| safe Rust (`v[i]`) | **58** | bounds check + panic landing pad, still vectorised |
-| safe Rust *verified in Verus* | **58** | **identical, instruction for instruction, to plain rustc** |
-| unsafe Rust (`get_unchecked`) | **38** | check gone |
-| unsafe Rust **+ Verus proof** | **38** | **identical, instruction for instruction, to plain unsafe Rust** |
+| Cell | Static instrs (raw / padding-excl) | Executed `Ir` @ n=50 000 | Notes |
+|---|---|---|---|
+| C, gcc 13.3.0 `-O3` | 32 / 30 | **125,019** | SSE2, 2 elems/iter, no unroll |
+| C, clang 22.1.6 `-O3` | 33 / 31 | **87,518** | SSE2, 4 elems/iter, 2× unroll |
+| safe Rust (`v[i]`) | 57 / 46 | 87,542 | bounds check hoisted out of the loop; panic pad |
+| safe Rust *verified in Verus* | 57 / 46 | 87,542 | **byte-identical to plain rustc** |
+| safe Rust, tuned (iterator) | 61 / 49 | 87,526 | statically the largest cell in the ladder |
+| unsafe Rust (`get_unchecked`) | 37 / 33 | 87,520 | same 7-instruction loop body as clang |
+| unsafe Rust **+ Verus proof** | 37 / 33 | 87,520 | **byte-identical to plain unsafe Rust** |
 
-All five binaries produce the same answer. Two results fall out immediately, and
-they are the backbone of the whole study:
+All cells produce the same answer. Numbers independently re-derived at
+TASK_001_REVIEW; identity established on **raw machine-code bytes**, since the
+normalised-text digest can collide (`.memory/03-measurement.md`).
+
+Two results fall out immediately, and they are the backbone of the whole study:
 
 1. **A Verus proof costs exactly zero instructions.** Ghost code, `requires`,
    `ensures`, invariants and `decreases` are erased; the emitted code is
@@ -44,9 +49,18 @@ they are the backbone of the whole study:
    safe-Rust, verified-unsafe-Rust == unsafe-Rust.
 2. **A Verus proof also buys you nothing on its own.** Proving the safe version
    panic-free does *not* remove the bounds check — rustc never learns what the
-   SMT solver knew (58 instrs either way). The performance only arrives when the
+   SMT solver knew (57 instrs either way). The performance only arrives when the
    proof is used to *license unsafe code*: rung 5 = rung 4's assembly, with
    `i < v.len()` discharged at every access by the verifier instead of by the CPU.
+
+3. **On this kernel, safety is nearly free anyway — which is a warning about the
+   method, not a conclusion about Rust.** LLVM hoists the bounds check clean out of
+   the vectorised loop, so safe-vs-unsafe costs 7–22 executed instructions *per
+   call* regardless of `n`, and the tuned safe rung cuts that to ~6 while being
+   statically the *largest* cell in the ladder. Static instruction counts are not a
+   cost model. The patterns that matter are the ones where LLVM **cannot** hoist —
+   data-dependent indices, aliasing, pointer chasing — and that is where the
+   catalogue is aimed.
 
 So the interesting axis is not "does verification slow things down" (it doesn't)
 but **what you must move into the trusted base to get C's assembly, and how much
@@ -65,8 +79,21 @@ fn get_unchecked(v: &Vec<u64>, i: usize) -> (r: u64)
 metrics**, alongside cycles. That is the measurement the perf-vs-security
 literature is usually missing, and it is what makes this benchmark worth building.
 
-The 33-vs-38 C/Rust gap is *not* a language cost — it is gcc vs LLVM codegen
-(different vectorisation prologue). See "Threats to validity".
+The pilot's own TCB tally was wrong in the first write-up — three `external_body`
+items (`get_unchecked`, `out`, `main`), not one — and that under-count concealed a
+fatal defect: with `main` external, **no call site ever had to satisfy the kernel's
+precondition**, so the proof constrained nothing and the published run printed a
+value its own `ensures` forbids. The machine code was fine; the label was not. The
+rules that now prevent this are in `.memory/02-bench-rules.md` ("Proof domain must
+cover the measured domain"), and `harness/check.py` enforces them. p01 supersedes
+the pilot.
+
+The C-vs-Rust gap is *not* a language cost — it is **gcc vs LLVM**, and the first
+framing had the sign backwards. gcc emits *fewer* static instructions (32 vs 37)
+and executes **42.9% more** (125,019 vs 87,520). clang, which shares rustc's exact
+LLVM 22.1.6, emits the identical 7-instruction loop body as unsafe Rust; the whole
+residual static gap is +2 instructions from an induction-variable choice. Every
+C-vs-Rust claim needs a clang column. See "Threats to validity".
 
 ---
 
@@ -153,10 +180,11 @@ wall time (min/median) · binary size · exec LOC · proof+spec LOC · TCB lines
 
 ## Threats to validity (and what we do about them)
 
-1. **gcc vs LLVM is not a language comparison.** The pilot's 33-vs-38 gap is
-   backend, not safety. → Add **clang** as a second C baseline so at least one
-   comparison is same-backend. Installable without root from an LLVM release
-   tarball; report gcc and clang both.
+1. **gcc vs LLVM is not a language comparison.** ✅ **Resolved (TASK_001).** clang
+   22.1.6 — the exact LLVM rustc 1.97.1 uses — is installed. The pilot's apparent
+   C-beats-Rust gap was entirely backend, with the sign backwards: gcc emits fewer
+   instructions and runs 42.9% *slower*. A clang column is now mandatory on every
+   C-vs-Rust claim; gcc stays as the "what a distro ships" baseline.
 2. **"Non-opt" C and "non-opt" Rust are not the same experiment.** Debug Rust
    inserts *overflow checks*, a semantic difference, not just an unoptimised
    lowering. → Build non-opt cells both with and without `-C debug-assertions`,
@@ -174,48 +202,53 @@ wall time (min/median) · binary size · exec LOC · proof+spec LOC · TCB lines
    presented as one.
 6. **Noise.** Shared box, frequency scaling. → Pinning, min-of-N, and
    instruction counts as the primary metric.
+7. **Static instruction counts are not a cost model.** Twice now the static ranking
+   has inverted the dynamic one: gcc is smaller and slower than clang, and the
+   tuned safe Rust rung is the *largest* cell in the ladder while being within ~6
+   executed instructions of unsafe. → Never publish a static count without a
+   paired `Ir`, and always report both raw and padding-excluded counts.
+8. **"Identical machine code" needs the right oracle.** The normalised-text digest
+   erases every immediate and displacement — TASK_001_REVIEW built two kernels with
+   different *answers* and the same normalised md5. → Identity claims cite the raw
+   machine-code bytes; normalised text is for reading diffs only.
+9. **A verified cell can be measured outside its proof.** The pilot's R5 had no
+   verified call site and its published run falsified its own postcondition. →
+   `.memory/02-bench-rules.md` "Proof domain must cover the measured domain",
+   enforced by `harness/check.py`.
+10. **Reporting only the naive safe rung inflates safety's cost.** R2-vs-R4 on the
+   pilot overstates it ~3.7× versus R3-vs-R4. → No safety-cost claim ships without
+   the R3 column.
 
 ---
 
-## Repo layout (proposed)
+## Repo layout
 
-```
-sec-ladder/
-  PLAN.md  TOOLCHAIN.md  verus_run.py
-  pilot/                        # the calibration kernel, all 5 rungs
-  patterns/pNN-<name>/
-    README.md                   # the pattern, the C bug, expected findings
-    inputs/{small,large,adversarial}.bin
-    c/                          # kernel.c + driver.c + Makefile
-    rust-safe-naive/  rust-safe-tuned/  rust-unsafe/  rust-verus/
-    expected/checksums.txt
-  harness/
-    build_all.py                # every cell × both opt levels
-    check.py                    # all cells agree on every input
-    measure.py                  # instr counts, callgrind, timing → results/*.json
-    asm.py                      # extract + normalise + diff kernel assembly
-  results/                      # committed JSON + generated tables
-```
+Authoritative version: `.memory/05-layout.md`. Operational context for agents lives
+in `.memory/` (environment, ladder definition, bench rules, measurement protocol,
+Verus notes, layout, pattern catalogue); task specs and reviews in `.tasks/`.
 
 ## Phases
 
-- **P0 — toolchain + pilot** ✅ done (Verus 0.2026.08.09 installed, ladder validated).
-- **P1 — harness + pattern 2 end-to-end.** Build the `harness/` scripts against
-  the pilot, then do the buffer-copy pattern across all 10 cells with the
-  adversarial input. This is the template every later pattern is cloned from.
-- **P2 — patterns 3–5.** Widen; refine metrics; first results table.
-- **P3 — measurement hardening.** callgrind + clang (pending decisions below).
-- **P4 — patterns 6–8, then attempt 9–10** with a fixed proof budget; write up
-  what resisted verification.
+- **P0 — toolchain + pilot.** ✅ Done. Verus 0.2026.08.09, clang 22.1.6, valgrind
+  3.27.1 installed; ladder validated; pilot measured, reviewed, and its defects
+  turned into rules.
+- **P1 — harness + p01 (TASK_002).** `harness/{asm,build,check,measure,report}.py`
+  plus the first real pattern as the template all 47 clone from.
+- **P2 — Wave 1 patterns**: p02 buffer copy, p16 TLV walker, p17 HTTP Range parser.
+  First results table; first adversarial-behaviour table.
+- **P3 — Waves 2–5**, breadth across families A–D and G.
+- **P4 — Wave 6**, the pointer-heavy patterns where R5 is expected to fail; record
+  where the proofs get stuck.
+- **P5 — cross-pattern analysis and writeup.**
 
-## Decisions I need from you
+Full pattern list, difficulty and status: `.memory/06-catalogue.md`.
 
-1. **clang as a second C baseline?** Strongly recommended — without it we cannot
-   separate "safety cost" from "gcc vs LLVM". Extractable into `~/tools`, no root.
-2. **Build valgrind for callgrind?** Recommended — it is the only deterministic
-   dynamic metric available on this box. ~10 min build, no root.
-3. **Ask for `perf_event_paranoid ≤ 1`?** Optional; unlocks IPC/branch-miss data.
-4. **Pattern order** — I propose 2 → 3 → 5 → 4. Pattern 3 (the header parser) is
-   the one that best mirrors a real CVE and has a LearnVeri port to lift from.
-5. **Proof-effort budget per cell** — I suggest a hard cap (say 4 h equivalent);
-   past it we record the sticking point and move on.
+## Open decisions
+
+1. ~~clang as a second C baseline~~ — done, and it changed the headline result.
+2. ~~valgrind for callgrind~~ — done; `Ir` is now the primary dynamic metric.
+3. **Ask for `perf_event_paranoid ≤ 1`?** Still open, still needs root. Without it
+   there is no IPC, branch-miss or cache-miss data — which is the one thing that
+   could explain *why* gcc's shorter loop runs slower. Everything else is covered.
+4. **Proof-effort budget per cell** — proposed: a hard cap per R5 cell, past which
+   we record the sticking point and move on. Needs a number from you.

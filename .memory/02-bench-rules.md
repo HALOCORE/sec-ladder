@@ -71,3 +71,31 @@ offset 16  u8[payload_len]    # pattern-defined payload
   looks like an omission is worse than a documented failure.
 - If a rung is impossible for a pattern (e.g. R5 defeated by a proof obligation),
   record *where it got stuck*. That is a finding, not a gap.
+
+## Proof domain must cover the measured domain
+
+The pilot failed all four of these; TASK_001_REVIEW caught it. Its R5 kernel
+carries `requires n < 1000` and `ensures r < 1000*1000`, its only call site is
+inside `#[verifier::external_body] fn main`, and the published run at n = 50 000
+printed `24975000` — a value its own postcondition declares impossible. The
+machine code was fine; the *label* was indefensible.
+
+1. **Every input a rung-5 cell is measured on must satisfy that cell's `requires`.**
+   An R5 number produced outside the verified domain is R4's number wearing R5's
+   label. Record it as an R4 row, or not at all.
+2. **A rung-5 cell needs at least one *verified* call site.** If the kernel is only
+   reachable from `#[verifier::external_body] fn main`, no precondition is ever
+   discharged and the proof is decorative — it verifies, and constrains nothing.
+   The driver's call into the kernel must be inside `verus!` and must verify. Only
+   the argument-*reading* helper may be `external_body`, and its `ensures` must
+   supply exactly the facts the kernel's `requires` needs.
+3. **The `ensures` must hold on every measured run.** If the largest measured input
+   falsifies a postcondition, the cell is invalid — not footnoted.
+4. **`harness/check.py` enforces 1–3 per cell.** It reads the kernel's
+   `requires`/`ensures` from `spec.md`, evaluates them against each input case's
+   generated parameters (`n`, value bounds, checksum range), and **fails the cell**
+   on violation. A pattern whose R5 precondition cannot cover `large` is a
+   documented failure, not a silently narrowed table.
+
+Rule 2 is the one that matters: verifying a function proves nothing if nothing has
+to satisfy its preconditions.

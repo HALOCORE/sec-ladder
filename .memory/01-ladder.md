@@ -12,15 +12,56 @@ enforces memory safety.
 | **R4 unsafe** | `unsafe.rs` | `get_unchecked`, raw pointers, `from_raw_parts` — whatever it takes to reach C's codegen. Unsound-by-inspection is not allowed: it must be *correct*, just unverified. |
 | **R5 verus** | `verus.rs` | R4's exec code, plus Verus specs and proofs discharging every unsafe precondition. Ships the same machine code as R4. |
 
-## The two structural findings (established by `pilot/`, do not re-litigate)
+## The structural findings (established by `pilot/`, do not re-litigate)
 
 1. **A Verus proof costs zero instructions.** Ghost code, `requires`, `ensures`,
-   invariants, `decreases` all erase. R5's kernel assembly is byte-identical to
-   the equivalent plain-rustc build. Verified once at the pilot: 58 instrs safe
-   vs 58 verified-safe; 38 unsafe vs 38 verified-unsafe.
+   invariants, `decreases` all erase. Established at the pilot, corrected at
+   TASK_001, and independently re-derived at TASK_001_REVIEW **on the raw
+   machine-code bytes** — the only oracle that can establish this (normalised text
+   collides; see `.memory/03-measurement.md`):
+
+   | | static raw | static padding-excl | raw-byte md5 |
+   |---|---|---|---|
+   | R2 safe / R2 verified-safe | 57 / 57 | 46 / 46 | `e5310297…` both |
+   | R4 unsafe / R5 verified-unsafe | 37 / 37 | 33 / 33 | `a23e076c…` both |
+
+   Executed instructions (`Ir`) equal too. *(The pilot's published 58/38/33 are
+   each one too high — the old pipeline counted the symbol header line.)*
 2. **A proof buys nothing on its own.** Proving R2 panic-free leaves every bounds
    check in place — rustc never learns what Z3 knew. The win only materialises
    when the proof *licenses unsafe code* (R5 = R4 codegen + discharged obligations).
+
+3. **The static safe-vs-unsafe gap is mostly not a dynamic gap, and the tuned safe
+   rung nearly closes it.** (TASK_001, corrected at TASK_001_REVIEW.) On the pilot
+   kernel at `-O3`, LLVM hoists the bounds check clean out of the vectorised loop,
+   so the safety tax is **O(1) per call, not O(n)** — confirmed across
+   n = 999 … 100 000. The static delta is prologue, panic landing pad and padding.
+
+   Magnitudes, per call, versus unsafe R4:
+
+   | rung | static raw | static padding-excl | executed `Ir` delta |
+   |---|---|---|---|
+   | R2 safe-naive (`v[i]`) | +20 | +13 | **+7 … +22** |
+   | R3 safe-tuned (iterator) | +24 (largest of *all* rungs) | +16 | **+6 … +8** |
+
+   Three traps here, all of which bit the first write-up:
+
+   - **The delta is not a constant.** It varies with `n mod 4`: 22 / 7 / 9 / 11 for
+     residues 0 / 1 / 2 / 3. R2's vectoriser peels a 4-element scalar epilogue when
+     `n % 4 == 0`; R4 does not. The original "+22, independent of n" came from three
+     data points that were all ≡ 0 (mod 4). Quote a range, or state the residue.
+   - **Quote the padding-excluded static number**, or say which you are quoting.
+     `.memory/03-measurement.md` calls the raw count overstated; do not then
+     headline the raw gap.
+   - **R3 is the honest comparison for "what safe Rust costs."** Idiomatic
+     iterator code lands within ~6 instructions per call of unsafe while being
+     *statically the largest cell in the ladder* — a sharper refutation of
+     static-count-as-proxy than the gcc/clang one. Reporting R2 alone overstates
+     safe Rust's cost by ~3.7×. **Never publish a safety-cost claim without R3.**
+
+   Do **not** generalise any of this to patterns with data-dependent indices — the
+   interesting patterns are precisely the ones where LLVM cannot hoist, and that is
+   where the ladder earns its keep.
 
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how
@@ -28,7 +69,8 @@ much proof keeps that base sound, and which C patterns resist this treatment.*
 
 ## Build matrix
 
-Primary, per pattern: **5 rungs × 2 opt levels × 2 inline modes = 20 builds.**
+Primary, per pattern: **6 cells × 2 opt levels × 2 inline modes = 24 builds** —
+the 5 rungs, with R1 built twice (gcc and clang).
 
 | Axis | Values |
 |---|---|
@@ -37,7 +79,10 @@ Primary, per pattern: **5 rungs × 2 opt levels × 2 inline modes = 20 builds.**
 
 Flags:
 
-- **C**: `-std=c99 -Wall -Wextra` + `-O0` / `-O3`. Default gcc; clang as second baseline once available.
+- **C**: `-std=c99 -Wall -Wextra` + `-O0` / `-O3`. Build with **both** `/usr/bin/gcc`
+  (13.3.0) and `~/tools/llvm/bin/clang` (22.1.6) — clang is the same-backend
+  baseline and is mandatory for any C-vs-Rust claim; gcc is the "what a distro
+  ships" baseline.
 - **R2–R4**: `rustc -C opt-level=0 -C debug-assertions=on` / `-C opt-level=3 -C debug-assertions=off`.
 - **R5**: `./verus_run.py --compile verus.rs -o <out> -C opt-level=N ...` (same flags as R2–R4).
 - `-C codegen-units=1` everywhere for reproducible codegen.
@@ -50,6 +95,23 @@ Flags:
   semantic difference, not an unoptimised lowering. So also build R2–R5 at
   `opt-level=0 -C debug-assertions=off` as the semantics-matched `O0` column.
   Never make a perf claim from an `O0` row.
-- **gcc ≠ LLVM.** The pilot's C-33 vs unsafe-Rust-38 gap is a vectorisation
-  prologue difference, not a cost of Rust. Any C-vs-Rust number without a clang
-  column is confounded; label it as such until TASK_001 lands.
+- **gcc ≠ LLVM — confirmed, and it is large.** TASK_001 settled the pilot's
+  C-vs-unsafe-Rust gap: it is a *backend* artefact. Same `pilot/k.c`, same `-O3`:
+
+  | compiler | static raw | static padding-excl | kernel `Ir` @ n=50 000 | loop shape |
+  |---|---|---|---|---|
+  | gcc 13.3.0 | 32 | 30 | **125,019** | SSE2, 2 elems/iter, 5 instrs, no unroll |
+  | clang 22.1.6 | 33 | 31 | **87,518** | SSE2, 4 elems/iter, 7 instrs, 2× unroll |
+  | rustc 1.97.1 unsafe | 37 | 33 | **87,520** | *the same 7-instruction loop body* |
+
+  clang and rustc emit the identical loop body (modulo register allocation and
+  addressing-mode scale). The real clang→rustc static delta is **+2 instructions**
+  (`lea (,%rdx,8),%rax` + `and $-32,%rax`), not 4 — the other 2 are padding slots.
+  And the cause is **not** an `&Vec<u64>` ptr+len reload (LLVM promotes the `&Vec`
+  argument in both rungs): rustc's vector loop uses scale-1 *byte* addressing where
+  clang uses scale-8 index addressing, so it computes a byte-count bound. An
+  induction-variable choice, not an ABI cost. Worth exactly +2 executed
+  instructions per call, measured at n = 999 / 4001 / 12345 / 50000.
+
+  **Always report a clang column.** A gcc-only C baseline overstates C's dynamic
+  cost here by 43% — gcc emits *fewer* instructions and executes 42.9% *more*.

@@ -10,10 +10,28 @@ Install record for this box, and how to reproduce it. Installed 2026-08-15.
 | rustc/cargo | 1.97.1 (`stable`, and the pinned `1.97.1-x86_64-unknown-linux-gnu`) | `~/.cargo/bin` (rustup) |
 | z3 | bundled with Verus | `~/tools/verus/z3` |
 | gcc | 13.3.0 | `/usr/bin/gcc` |
+| **clang / LLVM** | **22.1.6** (matches rustc 1.97.1's LLVM exactly) | `~/tools/llvm` → `~/tools/llvm-22.1.6` |
+| **valgrind** | **3.27.1** (built from source) | `~/tools/valgrind` → `~/tools/valgrind-3.27.1` |
 | binutils | objdump / readelf / nm | `/usr/bin` |
 
-`~/.cargo/bin` is on PATH via `~/.bashrc`/`~/.profile`. Verus is **not** on PATH
-by design — `verus_run.py` locates it, so nothing depends on shell setup.
+`~/.cargo/bin` is on PATH via `~/.bashrc`/`~/.profile`. Verus, clang and valgrind
+are **not** on PATH by design — call them by absolute path
+(`~/tools/llvm/bin/clang`, `~/tools/valgrind/bin/valgrind`) so nothing depends on
+shell setup. `verus_run.py` locates Verus itself.
+
+### clang and rustc share a backend — exactly
+
+`rustc 1.97.1 --version --verbose` reports `LLVM version: 22.1.6`, and the
+installed clang is `clang version 22.1.6`. **Same major, minor and patch.** So a
+clang-vs-rustc comparison is genuinely same-backend and any remaining difference
+is language/ABI, not codegen vintage. If either side is ever bumped, re-check
+this and re-state the caveat — a multi-major gap would weaken every
+same-backend claim in `results/`.
+
+`~/tools/llvm-22.1.6` is **12 GB on disk** (the upstream `LLVM-*-Linux-X64`
+tarball is the full distribution — static libs, lldb, flang, all of it). LLVM no
+longer publishes the slim `clang+llvm-*-x86_64-linux-gnu-ubuntu-*` tarball that
+older instructions reference; `LLVM-<ver>-Linux-X64.tar.xz` is the replacement.
 
 ## Reproducing the Verus install
 
@@ -49,6 +67,57 @@ here. Avoid the `release/rolling/*` tags. Crate setup for `cargo verus`
 (that vstd pin, `[package.metadata.verus] verify = true`, an
 `unexpected_cfgs` allow-list, and an empty `[workspace]`) is in `PITFALLS.md`.
 
+## Reproducing the clang install
+
+No root, no package manager. Pick the release whose version equals rustc's
+`LLVM version:` field.
+
+```bash
+ver=22.1.6                                  # == rustc 1.97.1's LLVM version
+cd .temp/build
+curl -L -o "LLVM-$ver-Linux-X64.tar.xz" \
+  "https://github.com/llvm/llvm-project/releases/download/llvmorg-$ver/LLVM-$ver-Linux-X64.tar.xz"
+tar -xf "LLVM-$ver-Linux-X64.tar.xz" -C ~/tools
+mv ~/tools/"LLVM-$ver-Linux-X64" ~/tools/llvm-$ver
+ln -sfn llvm-$ver ~/tools/llvm
+~/tools/llvm/bin/clang --version
+```
+
+Download is ~1.9 GB, unpacks to ~12 GB, and `tar -xf` of the xz takes several
+minutes (single-threaded decompression). `sha256(LLVM-22.1.6-Linux-X64.tar.xz)`
+= `c5ac8ef89ca39d30cb32e9b83772f995dd891c685ebc188d593c943a64d5f8b5`.
+
+## Reproducing the valgrind install
+
+```bash
+ver=3.27.1
+cd .temp/build
+curl -L -O "https://sourceware.org/pub/valgrind/valgrind-$ver.tar.bz2"
+tar xf valgrind-$ver.tar.bz2 && cd valgrind-$ver
+./configure --prefix=$HOME/tools/valgrind-$ver
+make -j16 && make install
+ln -sfn valgrind-$ver ~/tools/valgrind
+~/tools/valgrind/bin/valgrind --version
+```
+
+Stock `./configure` is enough on this box (`supported CPU... ok (x86_64)`,
+`supported CPU/OS combination... ok (amd64-linux)`); no root, no extra deps, and
+`callgrind_annotate` only needs the system perl. ~211 MB installed, ~4 min build.
+`sha256(valgrind-3.27.1.tar.bz2)` =
+`5d589152eb8071c02feab8ce6ab719e431a1fbc3e2b1700f5432632a8b9264dc`.
+
+Usage — see `.memory/03-measurement.md` for the protocol, especially why the
+**per-function exclusive** `Ir` is the metric and the whole-program `summary:`
+line is not:
+
+```bash
+mkdir -p .temp/build/cg          # callgrind will NOT create the output dir
+~/tools/valgrind/bin/valgrind --tool=callgrind \
+    --callgrind-out-file=.temp/build/cg/x.out ./bin/x <args>
+~/tools/valgrind/bin/callgrind_annotate --threshold=100 .temp/build/cg/x.out \
+  | grep kernel
+```
+
 ## Running Verus
 
 Use `./verus_run.py` — it finds the Verus install, puts rustup on PATH so Verus
@@ -71,34 +140,50 @@ A clean run prints `verification results:: N verified, 0 errors`.
 - single-file verify, and `--compile` → runnable binary
 - `cargo verus build`: vstd (2044 obligations) + local lib verified, plain-Rust
   bin passed through, then compiled
-- ghost erasure produces byte-identical machine code to plain rustc (see `pilot/`)
+- ghost erasure produces byte-identical machine code to plain rustc (see `pilot/`);
+  re-confirmed at TASK_001 by md5 of the normalised kernel, not just by count
+- `~/tools/llvm/bin/clang -O3 pilot/k.c -o k_clang && ./k_clang 10 20 30 40` → `100`
+- `valgrind --tool=callgrind` gives a repeat-identical `Ir` for all six pilot cells
 
 ## Missing / constrained on this box
 
 Relevant to benchmarking — see `PLAN.md` "Measurement methodology".
 
 - **`perf` not installed, and `perf_event_paranoid=3`** → no hardware counters
-  even if installed (needs root to relax).
-- **`valgrind` not installed** → no callgrind instruction counts yet. Builds from
-  source without root.
-- **`clang` not installed** → the only C baseline is gcc, so C-vs-Rust
-  comparisons currently confound *safety cost* with *gcc-vs-LLVM codegen*.
-- **`hyperfine`, `gdb`, `numactl` absent**; `taskset` is available for pinning.
+  even if installed (needs root to relax). This is the only remaining hard gap:
+  no IPC, no branch-miss, no cache-miss data.
+- **`hyperfine`, `gdb`, `numactl`, `ninja` absent**; `taskset` is available for pinning.
 - CPU: 2× Xeon Gold 6230 (80 threads), `powersave` governor, shared box → wall
   clock is noisy; pin and use min-of-N.
 
 ## Pilot reproduction
 
+Binaries go to `.temp/build/pilot/bin/`; `pilot/` itself stays source-only.
+Ladder flags (`.memory/01-ladder.md`), run from the repo root:
+
 ```bash
-cd pilot
-../verus_run.py --compile k_verus.rs        -o /tmp_out/k_verus        -C opt-level=3
-../verus_run.py --compile k_unsafe_verus.rs -o /tmp_out/k_unsafe_verus -C opt-level=3
-rustc -C opt-level=3 k_rust.rs   -o k_rust
-rustc -C opt-level=3 k_unsafe.rs -o k_unsafe
-gcc   -O3            k.c         -o k_c
-# kernel body, addresses and symbol hashes normalised away:
-objdump -d --no-show-raw-insn <bin> | awk '/kernel>:/,/^$/' \
-  | sed -E 's/^\s+[0-9a-f]+:\s+//; s/0x[0-9a-f]+//g; s/<[^>]*>//g' | grep -v '^$'
+O=.temp/build/pilot/bin; mkdir -p $O
+gcc                -std=c99 -Wall -Wextra -O3 pilot/k.c -o $O/k_gcc
+~/tools/llvm/bin/clang -std=c99 -Wall -Wextra -O3 pilot/k.c -o $O/k_clang
+rustc -C opt-level=3 -C debug-assertions=off -C codegen-units=1 pilot/k_rust.rs   -o $O/k_rust
+rustc -C opt-level=3 -C debug-assertions=off -C codegen-units=1 pilot/k_unsafe.rs -o $O/k_unsafe
+./verus_run.py --compile pilot/k_verus.rs        -o $O/k_verus \
+    -C opt-level=3 -C debug-assertions=off -C codegen-units=1
+./verus_run.py --compile pilot/k_unsafe_verus.rs -o $O/k_unsafe_verus \
+    -C opt-level=3 -C debug-assertions=off -C codegen-units=1
+```
+
+Kernel body with addresses and symbol hashes normalised away — note this is
+**not** the snippet that produced the 33/58/38 numbers in `pilot/README.md` and
+`PLAN.md`; see `.memory/03-measurement.md` for what was wrong with that one
+(it counts the `<addr> <sym>:` header line as an instruction, so every published
+count is one too high, and it leaves bare-hex branch targets in so two builds
+never diff clean):
+
+```bash
+objdump -d --no-show-raw-insn <bin> | awk '/kernel[^ ]*>:$/,/^$/' | grep -v '>:$' \
+  | sed -E 's/^\s+[0-9a-f]+:\s+//; s/\s+#.*$//; s/<[^>]*>//g;
+            s/0x[0-9a-f]+//g; s/\b[0-9a-f]{4,}\b//g; s/\s+$//' | grep -v '^$'
 ```
 
 ## Verus conventions

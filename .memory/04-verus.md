@@ -46,6 +46,14 @@ justified. **TCB lines = every line inside:**
 Report as: `TCB: N lines across M items`. A rung-5 cell with a large TCB is not a
 win and must not be presented as one.
 
+**Count every `external_body` item, not just the interesting one.** The pilot was
+published as "TCB: one 3-line `get_unchecked` wrapper"; the true tally is **3 items**
+— `get_unchecked`, `out` (the `println!` wrapper) and `main`. Under-counting is how
+the pilot's fatal defect hid in plain sight: `main` being `external_body` is exactly
+why no precondition was ever discharged (`.memory/02-bench-rules.md`, rule 2). An
+`external_body` on a *driver* is far more dangerous than one on a leaf helper,
+because it deletes call-site obligations wholesale. List them individually.
+
 ### Vacuity is the failure mode that silently ruins everything
 
 A proof of a false or unreachable statement verifies happily. Guard against:
