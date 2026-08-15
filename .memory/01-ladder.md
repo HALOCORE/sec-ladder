@@ -22,11 +22,22 @@ enforces memory safety.
 
    | | static raw | static padding-excl | raw-byte md5 |
    |---|---|---|---|
-   | R2 safe / R2 verified-safe | 57 / 57 | 46 / 46 | `e5310297…` both |
-   | R4 unsafe / R5 verified-unsafe | 37 / 37 | 33 / 33 | `a23e076c…` both |
+   | R2 safe / R2 verified-safe | 57 / 57 | 46 / 46 | `935221a8…` both |
+   | R4 unsafe / R5 verified-unsafe | 37 / 37 | 33 / 33 | `98e4a665…` both |
 
    Executed instructions (`Ir`) equal too. *(The pilot's published 58/38/33 are
    each one too high — the old pipeline counted the symbol header line.)*
+
+   **Two digest conventions exist; always say which.** `935221a8…`/`98e4a665…`
+   are `harness/asm.py`'s `md5_raw`, which includes trailing alignment padding;
+   `e5310297…`/`a23e076c…` are the `nm --print-size` extent, i.e. the function
+   proper. Both are reproducible (TASK_002 claimed the latter was not — it was
+   wrong, TASK_002_REVIEW re-derived them first try). The counts and the
+   equalities are unaffected either way. See `.memory/03-measurement.md`.
+
+   Reproduced independently on p01 (TASK_002), `-O3 isolated`:
+   R4 ≡ R5 `fb90a96c…` (39 raw / 34 padding-excluded) and
+   R2 ≡ R2v `6c85987d…` (59 / 47), both bit-exact.
 2. **A proof buys nothing on its own.** Proving R2 panic-free leaves every bounds
    check in place — rustc never learns what Z3 knew. The win only materialises
    when the proof *licenses unsafe code* (R5 = R4 codegen + discharged obligations).
@@ -58,6 +69,28 @@ enforces memory safety.
      *statically the largest cell in the ladder* — a sharper refutation of
      static-count-as-proxy than the gcc/clang one. Reporting R2 alone overstates
      safe Rust's cost by ~3.7×. **Never publish a safety-cost claim without R3.**
+
+   Reproduced on p01 at TASK_002, with the residue effect measured properly this
+   time (16 window lengths, `inputs/gen.py --sweep`), `-O3 isolated`, per call:
+
+   | rung | res 0 | res 1 | res 2 | res 3 |
+   |---|---:|---:|---:|---:|
+   | R2 safe-naive | **+29** | +11 | +13 | +15 |
+   | R3 safe-tuned | +5 | +4 | +4 | +4 |
+   | R5 verus | 0 | 0 | 0 | 0 |
+   | R1 gcc | +368 … +384 (≈ +41%) | | | |
+
+   Constant in `win_len` within a residue class (+29 at 500, 504, 508 *and* 512),
+   so the tax is per call, not per element. **Give every pattern's `small` and
+   `large` inputs different residues mod 4** — p01's first draft used 500 and
+   4096, both ≡ 0, which is the single worst residue for R2 and would have
+   overstated it 2.4×. That is the third time this trap has been stepped in.
+
+   One new caveat: the +29 is the *out-of-line* figure. In `whole` mode on
+   `large`, R2's inlined kernel costs ≈ **+340** per call — its scalar epilogue
+   keeps a live per-element bounds check and the driver's `div` is
+   rematerialised. R3 and R5 show no such amplification. Derived from a
+   difference of two builds, so: an observation, not a settled result.
 
    Do **not** generalise any of this to patterns with data-dependent indices — the
    interesting patterns are precisely the ones where LLVM cannot hoist, and that is

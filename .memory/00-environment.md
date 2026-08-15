@@ -35,6 +35,16 @@ for Verus and absolute paths for the others (`~/tools/llvm/bin/clang`,
 `~/tools/valgrind/bin/valgrind`, `~/tools/valgrind/bin/callgrind_annotate`).
 Reproduction commands: `TOOLCHAIN.md`.
 
+**`rustc`/`cargo` are not on PATH either** in a non-interactive shell (rustup's
+`~/.cargo/env` is only sourced by login shells). Use `~/.cargo/bin/rustc`.
+`harness/build.py` does; `verus_run.py` prepends `~/.cargo/bin` for Verus's
+benefit. A bare `rustc` gives "command not found".
+
+**ASan/UBSan need `-static-libasan -static-libubsan`.** The container ships
+`LD_PRELOAD=/usr/libexec/coreutils/libstdbuf.so`, and the *shared* ASan runtime
+then refuses to start ("ASan runtime does not come first in initial library
+list"). Static linking sidesteps it; `harness/check.py` builds that way.
+
 **clang 22.1.6 == rustc 1.97.1's LLVM 22.1.6** — identical major/minor/patch, so
 clang-vs-rustc is a genuine same-backend comparison and needs no version caveat
 today. Re-check with `rustc --version --verbose | grep LLVM` after any toolchain

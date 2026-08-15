@@ -29,8 +29,27 @@ objdump -d --no-show-raw-insn <bin> | awk '/kernel[^ ]*>:$/,/^$/' | grep -v '>:$
 
 Strips addresses and symbol hashes so two builds diff cleanly. Rust symbols are
 mangled (`_RNvCs..._6kernel`, v0); match on the `kernel` substring, not an exact
-name. `harness/asm.py` will own this — **not yet written** as of TASK_001; until
-it exists, use exactly the pipeline above.
+name.
+
+**`harness/asm.py` now owns this (written at TASK_002). Do not run objdump
+anywhere else.** The shell pipeline above is kept only as documentation of
+intent; the implementation differs in two ways it had to:
+
+- the branch-target strip is **positional** (operand of a branch/call), not
+  width-based, so `fadd` survives and `je 8f2` does not;
+- there is no `s/\b[0-9a-f]{4,}\b//g` at all.
+
+API: `asm.kernel(binary, needle) -> Kernel` with `.n_raw`, `.n_nopad`,
+`.n_bytes`, `.raw_bytes`, `.md5_raw`, `.md5_raw_norel`, `.md5_norm`,
+`.normalised`, `.has_loop`, `.backward_branches`, `.vector_regs`;
+`asm.diff(a, b) -> (same_raw, same_norel, text)`; `asm.text_size(binary)`;
+`asm.selftest()` re-derives every pilot number in this file and in
+`.memory/01-ladder.md` from `.temp/build/docrepro/`. `harness/check.py` runs the
+selftest as its step 0, so a regression in the extractor fails the gate.
+
+Padding-excluded = every `int3`/`nop`*/`xchg %ax,%ax` dropped, wherever it sits
+(not just the tail). `ud2` is deliberately **counted**: it is the tail of a real
+panic path, not alignment.
 
 ### This normalisation is for READING diffs. It cannot prove identity.
 
@@ -56,7 +75,45 @@ raw insn bytes and only the address column stripped). `harness/asm.py` must expo
 both, and every "identical" claim must cite the raw-byte digest.
 
 Under the raw-byte oracle the pilot's finding does hold, independently reproduced:
-R2 ≡ R2v (`e5310297…`) and R4 ≡ R5 (`a23e076c…`) are byte-identical.
+R2 ≡ R2v and R4 ≡ R5 are byte-identical.
+
+**Two digest conventions exist and they mean different things. Say which you used.**
+
+| convention | extent | pilot digests |
+|---|---|---|
+| `nm --print-size` (the declared symbol size) | the function | `e5310297…` / `a23e076c…` |
+| `harness/asm.py` `md5_raw` (objdump's symbol grouping) | function **+ inter-function `int3` padding** (9 / 3 bytes on the pilot) | `935221a8…` / `98e4a665…` |
+
+TASK_002 recorded that the `nm` digests "came from an unrecorded convention and
+cannot be reproduced". **Both halves of that were false** — the convention is the
+one written two paragraphs above, and TASK_002_REVIEW reproduced both digests
+first try. The real issue is that `asm.py` reads *past* the declared symbol size,
+so `md5_raw` and `n_raw` are a digest and count of the function plus whatever
+alignment padding follows it. Consequence: two genuinely identical kernels at
+different alignments get different digests, and a gate that hard-fails on digest
+mismatch turns a benign relink into a false "the proof cost something" finding.
+Prefer the `nm`-extent digest for identity; keep the padded one only if the
+padding is reported separately.
+
+### The raw-byte oracle has one blind spot: link layout
+
+A `call rel32` encodes the distance to its callee, so two binaries containing the
+*same* kernel differ byte-for-byte if anything shifted the callee — and a
+one-character difference in a crate name (`6unsafe` vs `5verus`) does exactly
+that. This is invisible at `-O3`, where the kernels are leaf functions, and bites
+at `-O0`, where the Rust kernel still calls `Iterator::next`. Measured at
+TASK_002 on p01: `md5_raw` differs at O0 for R4-vs-R5, and the entire difference
+is three `call`/`jmp` displacements and one `%rip` displacement.
+
+`harness/asm.py` therefore also exposes **`md5_raw_norel`**: the same machine-code
+bytes with pc-relative *displacement fields only* zeroed. It recovers each field's
+value from objdump's own decoded target (`target - end_of_insn`) and locates it in
+the encoding, so nothing else is touched — every immediate, every non-pc-relative
+displacement, every opcode and register field still contributes. The constructed
+`0x1234`-vs-`0x5678` collision above is still caught.
+
+Rule: **quote `md5_raw` when it matches. When it does not, say so, and quote
+`md5_raw_norel` explicitly as the weaker claim it is.** Never silently substitute.
 
 ### Known hazards in the sed (fix when writing `harness/asm.py`)
 
@@ -112,6 +169,34 @@ work done. Pair it with `Ir` or say nothing.
 ~/tools/valgrind/bin/valgrind --tool=callgrind --callgrind-out-file=<out> ./bin <args>
 ~/tools/valgrind/bin/callgrind_annotate --threshold=100 <out> | grep kernel
 ```
+
+`harness/measure.py` owns this. Two things the one-liner gets wrong:
+
+- **`callgrind_annotate` splits one function across several `file:function`
+  rows.** Take the *sum* of every matching row, not the first. `measure.py`
+  matches on `(?:^|::)kernel(?:$|\W)` against the function half of `file:function`
+  so `k::kernel` and `???:kernel` both hit and `main::{closure#0}` does not.
+- In `whole` builds there is no kernel symbol — it was inlined on purpose — so
+  `measure.py` records `main`-exclusive `Ir` there and labels it. **`isolated` and
+  `whole` Ir are not comparable to each other**; `main` includes the loader.
+- **`main`-exclusive `Ir` is not comparable between C and Rust either.** It counts
+  whatever *else* was inlined into `main`, and that differs by language: the Rust
+  rungs inline the payload decoder into `main`, the C rungs leave it in
+  `common/driver.c`'s own symbols. Measured on p01 `large`: ~12.36 M instructions
+  the Rust `main` carries and the C `main` does not. Taken raw, that column
+  reports an 8.32% clang-over-rustc win **that does not exist**.
+
+  **Do not try to rescue it by subtraction.** TASK_002 subtracted each cell's own
+  `isolated` `main` figure and published "equal to within 1 instruction"; the
+  arithmetic was wrong (c-clang is **+78**, not −1, and `safe_tuned` flips sign
+  from −19,918 to **+80,001**). The residue also silently includes an 11-Ir C-ABI
+  shim the Rust rungs have and C does not. A difference of two large numbers, each
+  containing language-specific inlining, is not a measurement.
+
+  **Use the `isolated` kernel-exclusive figure instead — it needs no correction
+  and it makes the point cleanly.** On p01 `large`, c-clang and unsafe Rust both
+  execute **143,740,000** kernel instructions: not "within 1", but exactly equal.
+  That is the publishable form of this claim.
 
 **Report per-function exclusive `Ir` for the kernel symbol. Never the
 whole-program `summary:` line.** Measured at TASK_001 on `pilot/k.c` (gcc, n=999):

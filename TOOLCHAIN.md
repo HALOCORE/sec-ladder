@@ -186,6 +186,20 @@ objdump -d --no-show-raw-insn <bin> | awk '/kernel[^ ]*>:$/,/^$/' | grep -v '>:$
             s/0x[0-9a-f]+//g; s/\b[0-9a-f]{4,}\b//g; s/\s+$//' | grep -v '^$'
 ```
 
+**Superseded at TASK_002. Use `harness/asm.py`, not this.** The snippet above
+still has two defects of its own (`s/\b[0-9a-f]{4,}\b//g` eats the `fadd`
+mnemonic; branch targets under four hex digits survive), and — more importantly —
+its *output is text*, which cannot establish identity: two kernels with different
+answers can normalise to the same md5. `harness/asm.py` owns the one pipeline and
+exposes the machine-code-byte digest that can.
+
+```bash
+python3 harness/asm.py stat <bin> [--sym kernel]   # counts + all three digests
+python3 harness/asm.py show <bin> [--raw]          # normalised / objdump text
+python3 harness/asm.py diff <bin-a> <bin-b>        # verdict + readable diff
+python3 harness/asm.py selftest                    # re-derives the pilot numbers
+```
+
 ## Verus conventions
 
 - Files start with `use vstd::prelude::*;` and wrap verified code in `verus! { ... }`.

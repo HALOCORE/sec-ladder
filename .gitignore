@@ -2,5 +2,12 @@
 *.run.md
 .temp/
 
+# Benchmark inputs are regenerated deterministically by each pattern's
+# inputs/gen.py (.memory/02-bench-rules.md); gen.py is committed, blobs are not.
+patterns/*/inputs/*.bin
+
+__pycache__/
+*.pyc
+
 *.zip
 *.tar.gz

@@ -19,6 +19,29 @@ Clean run prints `verification results:: N verified, 0 errors`. **Always report
 the obligation count** after a proof edit — a count that drops unexpectedly means
 code stopped being verified, not that the proof got easier.
 
+## Flags and codegen (established at TASK_002 on p01)
+
+- **`verus_run.py` forwards unrecognised flags to rustc verbatim.** `--cfg
+  slb_isolated`, `-C opt-level=N`, `-C debug-assertions=off`, `-C
+  codegen-units=1` all work, so `#[cfg_attr(slb_isolated, inline(never))]`
+  inside `verus!` gives R5 the same isolated/whole axis as the other rungs.
+- **`-C lto=fat` is impossible for an R5 cell.** Verus links a precompiled
+  `vstd` rlib with no bitcode: `error: failed to get bitcode from object file
+  for LTO (Can't find section .llvmbc)`. So the `whole` inline mode must be
+  defined *without* rustc LTO, or R5 drops out of the matrix and the rungs stop
+  being comparable. `harness/build.py` defines `whole` for Rust as
+  "single crate, codegen-units=1, no `#[inline(never)]`", which is what `-flto`
+  buys the three-TU C build.
+- **R5's exec code must be *textually* identical to R4's, not merely
+  equivalent.** Writing R4 as `for i in 0..len` and R5 as `while i < len`
+  produced the same instructions in a different *order* (two independent
+  `add`/`sub` swapped) and broke byte identity while leaving the normalised
+  text identical. Verus supports `for i in 0..n` with `invariant` (no
+  `decreases` needed — it is inferred for a range), so use the same loop form.
+- At `-O0` a Rust kernel still calls `Iterator::next`, so R4-vs-R5 `md5_raw`
+  differs on link layout alone. See `.memory/03-measurement.md`,
+  "The raw-byte oracle has one blind spot".
+
 ## Conventions
 
 - File starts `use vstd::prelude::*;`, verified code inside `verus! { ... }`.
@@ -54,6 +77,28 @@ why no precondition was ever discharged (`.memory/02-bench-rules.md`, rule 2). A
 `external_body` on a *driver* is far more dangerous than one on a leaf helper,
 because it deletes call-site obligations wholesale. List them individually.
 
+### Test the proof by breaking it — a green run proves nothing on its own
+
+Verification succeeding is not evidence that the specification says anything. Run
+mutants and check that each one *fails*. TASK_002 did this on p01 (mutants kept
+in the report, not the tree):
+
+| mutation | expected | actual |
+|---|---|---|
+| driver's guard weakened so `off` can reach one past the last window | fail | **fail** — `precondition not satisfied ... off + len <= v@.len()` *at the `kernel(...)` call site* |
+| kernel's `requires` deleted | fail | **fail** — loop invariant not established |
+| kernel's `ensures` shifted by one element | fail | **fail** — postcondition not satisfied |
+| **`requires` deleted from the `external_body` `get_unchecked` wrapper** | fail | **VERIFIES CLEANLY** |
+
+The last row is the one to remember. **Weakening an `external_body` item's
+`requires` never causes a verification error — it silently deletes the callers'
+obligations.** A wrapper whose `requires` drifts turns the whole proof vacuous
+with no diagnostic at all. This is the same class of defect as the pilot's
+`external_body main`, and neither is detectable from "N verified, 0 errors".
+Grep every `external_body` signature by hand, and prefer wrappers with **no
+`ensures` at all** (a trusted item that asserts nothing cannot axiomatise a
+falsehood) wherever the proof can re-derive the fact at run time instead.
+
 ### Vacuity is the failure mode that silently ruins everything
 
 A proof of a false or unreachable statement verifies happily. Guard against:
@@ -85,6 +130,23 @@ The reviewer agent checks all of the above by grep + reading. See `.tasks/PROTOC
   witness `by (compute)` immediately before the `assert`.
 - **`checked_add`/`checked_sub`** return `Option` and never panic — often easier
   than proving raw `+` cannot overflow.
+- **Wrapping arithmetic has full specs**: `x.wrapping_add(y)` etc. are
+  `assume_specification`'d in `vstd::std_specs::num` and marked
+  `#[verifier::allow_in_spec]`, so the *same call* is usable inside a `spec fn`.
+  Writing a kernel with wrapping ops removes the overflow precondition entirely,
+  which is usually the right move: it leaves only the memory-safety obligation,
+  and it stops the `requires` from depending on facts about input *values* that
+  no honest loader can supply. Spec-level forms live in `vstd::wrapping`
+  (`u64_specs::wrapping_add`, ...).
+- **`v@.len() <= usize::MAX` for a slice is not free.** It comes from
+  `vstd::slice::axiom_spec_len`, whose trigger is `spec_slice_len(slice)` — a
+  term that never appears in normal code. Without it, `off + i` on in-bounds
+  indices still reports "possible arithmetic underflow/overflow". Fix:
+  `assert(v@.len() == vstd::slice::spec_slice_len(v));` once, before the loop.
+  Ghost-only, erases.
+- **Slices (`&[T]`) are well specified** — `View`, `spec_index`, `len`,
+  `slice_subrange`, `slice_index_get`, and exec `v[i]` all work. Prefer `&[u64]`
+  over the pilot's `&Vec<u64>`: it is idiomatic Rust and costs nothing.
 - **Panic-freedom ≠ correctness.** Clamping an index silences the bounds panic and
   leaves the logical bug. The security property needs a *functional* `ensures`.
 
