@@ -40,6 +40,19 @@ Reproduction commands: `TOOLCHAIN.md`.
 `harness/build.py` does; `verus_run.py` prepends `~/.cargo/bin` for Verus's
 benefit. A bare `rustc` gives "command not found".
 
+**This box's gcc default-enables `_FORTIFY_SOURCE` at level 3.** Ubuntu 24.04,
+gcc 13.3.0 (`Ubuntu 13.3.0-6ubuntu2~24.04.1`); confirm with
+`/usr/bin/gcc -O2 -dM -E - </dev/null | grep -i fortify` → `#define _FORTIFY_SOURCE 3`.
+`harness/build.py` passes no `-D_FORTIFY_SOURCE` either way, so **every gcc `-O`
+build in this repo is a fortified build** and clang's is not. Two consequences,
+both already bitten: a `memcpy` whose destination size gcc can see becomes
+`__memcpy_chk@plt` (so any symbol matching in `harness/asm.py` must recognise the
+`_chk` forms — fixed at TASK_006, 20 selftest cases), and a gcc `-O3 -flto` build
+of a deliberately-overflowing kernel *aborts* where the same source under clang
+is silent, which is a distro default and not a property of the program
+(p02 `NOTES.md` §1a). Level 3 uses `__builtin_dynamic_object_size`, so it fires
+on more shapes than level 2 would.
+
 **ASan/UBSan need `-static-libasan -static-libubsan`.** The container ships
 `LD_PRELOAD=/usr/libexec/coreutils/libstdbuf.so`, and the *shared* ASan runtime
 then refuses to start ("ASan runtime does not come first in initial library

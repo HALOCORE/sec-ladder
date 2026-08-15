@@ -14,10 +14,12 @@ was being asserted rather than tested.
                   before and after the call. They are `bytes`, so the Python
                   `ensures` compares them with `==` and the slicing underneath
                   is at C speed.
-    work_per_call bytes copied. Whether *bytes* is a legitimate unit for this
-                  kernel is the one number in the file a reviewer should argue
-                  with; the argument, with the measurement behind it, is on the
-                  property below.
+    work_per_call bytes copied -- and, since TASK_006, a declared
+                  `min_ir_per_work` beside it, because the harness's default
+                  rate is derived in 64-bit-lane terms and is unsound for a
+                  byte. The pair is the one thing in this file a reviewer should
+                  argue with; the argument and the measurements behind it are on
+                  the properties below.
     sanitizer     derived, not tabulated: an input is declared "fires" exactly
                   when the simulated run contains a call the rejection test
                   rejects, because that is precisely a call on which R1 (which
@@ -180,33 +182,67 @@ class Model:
     def work_per_call(self):
         """Bytes the kernel copies per call, from the file alone.
 
-        `check.py` derives the anti-collapse floor as ALPHA * work_per_call
-        with ALPHA = 0.25, and ALPHA's justification is written in 64-bit-lane
-        terms, so a byte-denominated unit is not obviously safe: one AVX2
-        instruction touches 32 bytes, and a fully vectorised copy-and-fold
-        would run at ~0.06 Ir per byte and fail a 0.25/byte floor while being
-        perfectly healthy. That was checked before this unit was chosen rather
-        than after. Measured, `-O3 isolated`, marginal Ir per byte copied:
-
-            c-gcc 3.80 / safe_naive 6.67 / safe_tuned 3.92 / unsafe 3.75  (small)
-            c-gcc 2.25 / safe_naive 2.74 / safe_tuned 2.50 / unsafe 2.49  (large)
-
-        i.e. 9x above the floor at worst. The reason is that the fold --
-        widening `u8` to `u64` and wrapping-adding -- does *not* vectorise in
-        rustc and only partly in gcc, so the kernel is ~2 instructions per byte
-        and not ~0.1. That is a fact about this kernel, not a licence: a pattern
-        whose kernel really is a bare `memcpy` would have to denominate in
-        64-bit words (and say so here) for ALPHA to mean the same thing it
-        means on p01.
-
         The minimum over records, so it is a lower bound on the real work and is
         not inflated: an overstated `work_per_call` raises the floor on the
         pattern's own cells and is caught the first time a legitimate rung trips
         it. A record the rejection test rejects contributes 0 -- the kernel
-        genuinely does no copying on it."""
+        genuinely does no copying on it.
+
+        Measured, `-O3 isolated`, marginal Ir per byte copied:
+
+            c-gcc 3.80 / safe_naive 6.67 / safe_tuned 3.92 / unsafe 3.75  (small)
+            c-gcc 2.25 / safe_naive 2.74 / safe_tuned 2.50 / unsafe 2.49  (large)
+
+        Those are all far above `min_ir_per_work` below, and the reason is that
+        the fold -- widening `u8` to `u64` and wrapping-adding -- does not
+        vectorise in rustc and only partly in gcc. **That is a fact about these
+        rungs, not about the algorithm**, which is exactly why the floor is
+        derived from `min_ir_per_work` and not from them."""
         if not self.entered:
             return 0
         return min(0 if ln < 0 else ln for _, ln, _ in self._rec)
+
+    # -- the cheapest legitimate cost of *this algorithm*, per unit ---------
+    # TASK_006 D, from TASK_004_REVIEW. The harness default (ALPHA = 0.25 Ir per
+    # unit) is derived in 64-bit-lane terms and is **unsound for a byte**: this
+    # box moves a byte with glibc `memcpy` in 0.104 instructions (re-measured at
+    # TASK_006: 4092 bytes cost 425.7 Ir, isolated by differencing a rung that
+    # copies-then-folds-8-bytes against the identical rung with the copy
+    # deleted, 483.7 vs 58.0). A kernel that is mostly a bulk copy therefore
+    # scores 0.118 Ir/byte and 0.25 would fail it at 0.47x the floor while it is
+    # the fastest correct implementation available. A floor that forbids the
+    # fastest correct implementation is not a floor.
+    #
+    # The number below is a lower bound on the *algorithm*: copy n bytes, then
+    # fold every one of them into a u64. The cheapest conceivable form of that
+    # on this box (Cascade Lake, AVX-512) fuses the two loops and needs, per
+    # 64-byte lane, at least
+    #
+    #     vmovdqu64  load        1
+    #     vmovdqu64  store       1
+    #     vpsadbw    widen+sum   1
+    #     vpaddq     accumulate  1
+    #                          ---
+    #                            4 instructions per 64 bytes = 0.0625 Ir/byte
+    #
+    # ignoring loop overhead, which only makes a real implementation dearer.
+    # Nothing correct can be below it: every byte must be read once, written
+    # once, and included in the sum. Achieved by the shipped rungs: 2.25 ... 6.67
+    # Ir/byte, i.e. 36x ... 107x clear.
+    #
+    # What this floor does NOT do, and no floor of this shape can: certify that
+    # the *copy* happened. p02 clears it on the fold alone. The copy is
+    # certified by `check.py` step 2 instead -- `checksum` here folds the bytes
+    # the copy is supposed to have moved, so a kernel that skips it prints a
+    # different number.
+    min_ir_per_work = 0.0625
+    min_ir_per_work_why = (
+        "work is BYTES COPIED. Cheapest correct implementation of "
+        "copy-then-fold-every-byte on this box: a fused AVX-512 loop needs at "
+        "least a 64-byte load, a 64-byte store, a vpsadbw and a vpaddq per "
+        "lane = 4 instructions / 64 bytes = 0.0625 Ir per byte. glibc memcpy "
+        "alone measures 0.104 Ir/byte here, so the harness default of 0.25 "
+        "would forbid a bulk-copy kernel outright.")
 
     # -- sanitizer expectation ---------------------------------------------
     @property

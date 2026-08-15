@@ -305,6 +305,22 @@ count, which is what `harness/measure.py` reports, does not contain it. On
 ~4% here, and it would be ~100% for a kernel that is *only* a `memcpy`. The same
 applies to a Rust rung whose work is in `core::iter` symbols at `-O0`.
 
+**The direct measurement of that `memcpy`, since several rules now depend on it**
+(TASK_004_REVIEW, re-derived at TASK_006). Difference of two rungs that are
+identical except that one deletes the copy, `-O3 isolated`, 4092 bytes:
+
+| rung | marginal Ir/call |
+|---|---:|
+| copy 4092 B, then fold 8 of them | 483.7 |
+| the same with the copy deleted | 58.0 |
+| **glibc `memcpy`, 4092 bytes** | **425.7 = 0.104 Ir per byte** |
+
+Two things rest on it: the anti-collapse floor's per-unit rate cannot exceed
+0.104 for a byte-denominated unit without forbidding the fastest correct
+implementation (`.memory/02-bench-rules.md`), and "the copy is 4% of p02's
+kernel" is a subtraction rather than an estimate. Note the second row is *not*
+zero — 58.0 Ir is the surviving prologue, rejection test and 8-byte fold.
+
 **So: kernel-exclusive `Ir` is the right level for a self-contained kernel, and
 the wrong one for a kernel that calls out.** The gate's `marginal_ir_per_call`
 (whole-program `Ir` at 2N calls minus at N, over N) has neither problem — it is a

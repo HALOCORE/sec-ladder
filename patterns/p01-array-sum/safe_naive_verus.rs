@@ -119,6 +119,16 @@ fn main() {
             }
             let off: usize = ((acc as u128 * nwin as u128) >> 64) as usize;
             let r: u64 = kernel(vs, off, win_len);
+            // Ghost only, and it is what *consumes* the kernel's `ensures`.
+            // `verus.rs` has carried this line since TASK_002_REVIEW; this cell
+            // did not, and `check.py` step 5c found it -- deleting the kernel's
+            // postcondition here left `7 verified, 0 errors`, i.e. the R2v
+            // control's proof was defending a postcondition nothing depended
+            // on. Ghost code erases, so the R2/R2v byte identity that makes
+            // this cell a control is unaffected, and `harness/dloop.py` exempts
+            // ghost statements from the driver diff (inside `verus! {}`, which
+            // this region is).
+            assert(r == sum_wrap(vs@, off as int, win_len as int));
             acc = acc.wrapping_mul(31).wrapping_add(r);
             it = it + 1;
         }

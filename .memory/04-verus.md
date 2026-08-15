@@ -213,17 +213,29 @@ Consequences, both measured:
 
 - **The `assert(false)` reachability probe does not detect this.** Add it anyway
   (it catches genuine vacuity), but do not expect it to catch this class.
-- **Neither of `copy_bytes`'s two `ensures` clauses is individually
-  load-bearing** — deleting *either* one leaves 9 verified / 0 errors, because
-  the tail clause implies the length clause. A spec can look like two obligations
-  and be one.
+- **One of `copy_bytes`'s two `ensures` clauses was redundant** — deleting the
+  *length* clause leaves 9 verified / 0 errors, because the tail clause implies
+  it. Deleting the *tail* clause gives 8 verified / **1 error**. Implication runs
+  one way, so only the weaker clause is free. (TASK_004_REVIEW reported both as
+  redundant and TASK_006 measured otherwise; the corrected version is here.) A
+  spec can look like two obligations and be one — but check which one.
 
-**The mechanical defence that does work — make clause deletion a gate stage.**
-For each `ensures` clause of each `external_body` item: delete it, re-run Verus,
-and **fail if the file still verifies with 0 errors**. That catches this mutant
-and correctly flags the redundant clause. Cost on p02: 4 Verus runs, ~20 s each.
-This is a *derived* check, not a declared pin, so it does not inherit the
-self-certification problem.
+**The mechanical defence — clause deletion, implemented as gate step 5c.** For
+each `ensures` clause of each `external_body` item (plus the pinned kernel item):
+delete it, re-run Verus, and **fail if the file still verifies with 0 errors**.
+Derived, not declared, so it does not inherit the self-certification problem.
+Mutants are built in a repo-layout mirror under `.temp/clausemut/`, never in
+`patterns/`. A relocated unmutated control and an `assert(false)` reachability
+probe run alongside.
+
+It found three real defects on first run — p02's redundant length clause, p02's
+third kernel clause, and p01's `safe_naive_verus.rs`, which had never had a
+consuming ghost `assert` at all.
+
+**It narrows this class; it does not close it.** Step 5c deletes *whole* clauses,
+so it catches redundant and decorative ones. The mutant above **rewrites** a
+clause and still verifies, so it survives. Do not describe 5c as closing the
+inconsistent-`ensures` hole.
 
 Meanwhile, for any `external_body` item with more than one `ensures` clause:
 prefer one strong clause to several overlapping ones, and state beside the item

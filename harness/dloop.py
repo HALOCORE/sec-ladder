@@ -21,10 +21,13 @@ What normalisation removes, and nothing else:
 
   * comments, and Verus-only clause blocks (`invariant`, `decreases`) --
     `harness/check.py` already exempted those
-  * ghost statements (`assert(...)`, `proof { }`, `ghost`/`tracked` bindings).
-    Ghost code erases, so an R5 driver that *consumes* its kernel's `ensures`
-    (the method change TASK_002_REVIEW asked for) stays byte-identical to R4's
-    and must stay diff-identical here too
+  * ghost statements (`assert(...)`, `proof { }`, `ghost`/`tracked` bindings),
+    **inside `verus! { ... }` and nowhere else**. Ghost code erases *in Verus*,
+    so an R5 driver that consumes its kernel's `ensures` (the method change
+    TASK_002_REVIEW asked for) stays byte-identical to R4's and must stay
+    diff-identical here too. Outside `verus!` every one of those tokens is live
+    code, and gating this on `lang == "rust"` -- which is what TASK_003 did --
+    reopened M9 in the other language (TASK_004_REVIEW; see `region_in_verus`)
   * type annotations, declaration types and casts, in both languages
   * `x.wrapping_mul(y)` / `wrapping_add` / `wrapping_sub` -> the C operator
   * parentheses that are not a call's -- `(acc % nwin) as usize` and
@@ -90,8 +93,12 @@ demonstrated against the gate so far has lived in this module):
     a region so deleting the markers no longer makes a rung vanish silently.
   * **Ghost-stripping applied to C.** `_GHOST_RE` was applied without branching
     on language, so `assert(...)` -- live code in C, since `build.py` never
-    defines `NDEBUG` -- was deleted from the C driver before the diff.
-    Normalisation of Verus clauses and ghost statements is now Rust-only.
+    defines `NDEBUG` -- was deleted from the C driver before the diff. The fix
+    made it Rust-only, which was **still wrong** and TASK_004_REVIEW showed why:
+    plain Rust is not Verus, `-C debug-assertions=off` does not remove
+    `assert!`, and `let ghost = <anything>;` is an ordinary binding whose
+    initialiser may be an `unsafe` block. Ghost stripping is now gated on
+    `vparse.verus_span` -- the region must literally be inside `verus! { }`.
   * **The alias table was an unconstrained rewriting program.** Destinations
     were unconstrained and an *empty* destination deleted statements outright,
     which revives the M9 prefetch/barrier payload with two lines of `spec.md`.
@@ -156,13 +163,12 @@ class RegionError(Exception):
     not an absence."""
 
 
-def region_text(txt, where="<text>"):
-    """The raw text between the markers, or None if the file has no region.
+def region_span(txt, where="<text>"):
+    """`(start, end)` offsets of the region body in `txt`, or None.
 
-    Raises `RegionError` if the file carries more than one BEGIN or more than
-    one END. The old leftmost non-greedy match silently picked the *first*
-    pair, so a decoy region in a block comment above the real loop was what got
-    diffed while the real loop was free to say anything."""
+    Same validation as `region_text`, which is written in terms of this: the
+    offsets are what decides whether the region is inside `verus! { ... }`, and
+    that decides whether ghost stripping applies (see `normalise`)."""
     nb, ne = txt.count(BEGIN_MARK), txt.count(END_MARK)
     if nb == 0 and ne == 0:
         return None
@@ -175,7 +181,55 @@ def region_text(txt, where="<text>"):
     m = _REGION_RE.search(txt)
     if not m:
         raise RegionError(f"{where}: {END_MARK} does not follow {BEGIN_MARK}")
-    return m.group(1)
+    return m.start(1), m.end(1)
+
+
+def region_text(txt, where="<text>"):
+    """The raw text between the markers, or None if the file has no region.
+
+    Raises `RegionError` if the file carries more than one BEGIN or more than
+    one END. The old leftmost non-greedy match silently picked the *first*
+    pair, so a decoy region in a block comment above the real loop was what got
+    diffed while the real loop was free to say anything."""
+    sp = region_span(txt, where)
+    return None if sp is None else txt[sp[0]:sp[1]]
+
+
+def region_in_verus(txt, where="<text>"):
+    """Is the driver region inside this file's `verus! { ... }` block?
+
+    **This, not `lang == "rust"`, is what licenses ghost stripping.** Ghost
+    statements erase *in Verus*; in plain Rust every one of the tokens
+    `_GHOST_RE` matches is live code. TASK_004_REVIEW put three payloads into
+    `safe_naive.rs`'s measured loop through the language-level gate -- each
+    normalised to the canonical sequence, kept `statements = 13`, printed the
+    right checksum, and cost 2.0 / 4.0 / 10.0 marginal Ir per call:
+
+        assert!(k < nrec as usize);                      # live in release Rust:
+                                                         # -C debug-assertions=off
+                                                         # removes debug_assert!
+                                                         # and nothing else
+        let ghost = black_box(src[k * stride]);          # `ghost` is just a name
+        let ghost = unsafe { _mm_prefetch(...) };        # M9's payload, in Rust
+
+    The `assert` exclusion was argued in TASK_003_REVIEW for C only and then
+    applied to both languages; `let ghost` is worse, because it admits an
+    arbitrary initialiser expression including an `unsafe` block."""
+    sp = region_span(txt, where)
+    if sp is None:
+        return False
+    vs = vparse.verus_span(txt)
+    if not vs or not (vs[0] <= sp[0] and sp[1] <= vs[1]):
+        return False
+    # ...and the enclosing item must not be `external`/`external_body`. Verus
+    # compiles such an item as plain Rust, so `let ghost = <expr>;` inside one is
+    # a live binding again -- the same payload, one attribute further in.
+    inner = [i for i in vparse.parse(txt)
+             if i.body_start is not None and i.body_end is not None
+             and i.body_start <= sp[0] and sp[1] <= i.body_end]
+    if not inner:
+        return False
+    return max(inner, key=lambda i: i.body_start).external is None
 
 
 def region(src_path):
@@ -451,19 +505,33 @@ def _apply_aliases(toks, aliases):
     return out
 
 
-def normalise(text, lang, aliases=None, call_args=None):
-    """Raw driver region -> canonical token string, one statement per line."""
+def normalise(text, lang, aliases=None, call_args=None, in_verus=False):
+    """Raw driver region -> canonical token string, one statement per line.
+
+    `in_verus` says the region sits inside a `verus! { ... }` block, and it is
+    the **only** thing that licenses ghost stripping. It defaults to False, so a
+    caller that does not know gets the strict reading and a `let ghost` shows up
+    as the statement it is; `normalise_file` derives it from the file. See
+    `region_in_verus` for the three payloads the old `lang == "rust"` gate let
+    through."""
     if lang not in ("rust", "c"):
         raise ValueError(f"dloop: unknown language {lang!r}")
+    if in_verus and lang != "rust":
+        raise ValueError(f"dloop: in_verus=True with lang={lang!r}; `verus!` is "
+                         f"Rust syntax and there is no Verus C")
     bad = validate_aliases(aliases) + validate_call_args(call_args)
     if bad:
         raise ValueError("; ".join(bad))
     text = vparse.blank_noncode(text)
-    # Ghost/clause stripping is **Rust-only**. `assert(...)` is a ghost
-    # statement in Verus and erases; in C it is live code -- `build.py` never
-    # defines `NDEBUG` -- so stripping it there deletes a real branch from the
-    # measured loop and the diff still passes.
-    if lang == "rust":
+    # Ghost/clause stripping applies **inside `verus! {}` only**, not to Rust
+    # generally. `assert(...)` is a ghost statement in Verus and erases; in C it
+    # is live code -- `build.py` never defines `NDEBUG` -- and in *plain Rust* it
+    # is live code too, because `-C debug-assertions=off` removes `debug_assert!`
+    # and nothing else. TASK_003_REVIEW's argument for excluding it was made
+    # about C and then applied to both languages; TASK_004_REVIEW walked an
+    # `assert!`, a `black_box` load and an `_mm_prefetch` into `safe_naive.rs`'s
+    # measured loop through the gap.
+    if in_verus:
         text = _strip_verus_clauses(text)
     toks = _tokens(text)
     toks = _apply_wrapping(toks)
@@ -495,8 +563,13 @@ def statement_count(canon):
 
 
 def normalise_file(path, lang, aliases=None, call_args=None):
-    r = region(path)
-    return None if r is None else normalise(r, lang, aliases, call_args)
+    txt = open(path).read()
+    where = os.path.basename(path)
+    sp = region_span(txt, where)
+    if sp is None:
+        return None
+    return normalise(txt[sp[0]:sp[1]], lang, aliases, call_args,
+                     in_verus=(lang == "rust" and region_in_verus(txt, where)))
 
 
 # --------------------------------------------------------------------------
@@ -543,25 +616,64 @@ def _selftest():
     want("exactly one pair -> the body",
          region_text(f"// {B}\nacc = 1;\n// {E}\n"), "acc = 1;")
 
-    # --- ghost stripping is Rust-only --------------------------------------
+    # --- ghost stripping happens inside `verus! {}` and nowhere else --------
     c_body = "assert(off < nwin);\nacc = acc * 31 + r;"
     rust_body = "assert(off < nwin);\nacc = acc.wrapping_mul(31).wrapping_add(r);"
     want("C `assert(...)` survives (it is live code there)",
          normalise(c_body, "c"), "assert ( off < nwin ) ;\nacc = acc * 31 + r ;")
-    want("Rust `assert(...)` is ghost and erases",
-         normalise(rust_body, "rust"), "acc = acc * 31 + r ;")
-    want("Rust `let ghost x = ...;` is a ghost binding and erases",
-         normalise("let ghost d0: Seq<u8> = dst@;\nacc = acc + r;", "rust"),
+    want("Verus `assert(...)` is ghost and erases",
+         normalise(rust_body, "rust", in_verus=True), "acc = acc * 31 + r ;")
+    want("Verus `let ghost x = ...;` is a ghost binding and erases",
+         normalise("let ghost d0: Seq<u8> = dst@;\nacc = acc + r;", "rust",
+                   in_verus=True),
          "acc = acc + r ;")
     want("C keeps a variable that merely starts with `let`-ish text",
          normalise("lettuce = 1;", "c"), "lettuce = 1 ;")
     want("a plain `let` binding is NOT ghost",
-         normalise("let r: u64 = kernel(v, off);", "rust"),
+         normalise("let r: u64 = kernel(v, off);", "rust", in_verus=True),
          "r = kernel ( v , off ) ;")
     want("Verus `invariant` block erases",
          normalise("while it < n\n    invariant\n        a <= b,\n{\nit = it + 1;\n}",
-                   "rust"),
+                   "rust", in_verus=True),
          "while it < n\n{\nit = it + 1 ;\n}")
+    raises("in_verus=True is refused for C",
+           lambda: normalise(c_body, "c", in_verus=True), ValueError)
+
+    # --- TASK_004_REVIEW: the three payloads the `lang == "rust"` gate passed
+    # Each one normalised to the canonical sequence, kept statements = 13 and
+    # printed the right checksum, while costing 2.0 / 4.0 / 10.0 marginal Ir per
+    # call in `safe_naive.rs`'s measured loop. `_GHOST_RE` is now gated on the
+    # region actually being inside `verus! { }`, so in a plain-Rust rung each is
+    # a statement the pin does not have.
+    for label, payload in (
+            ("assert! (live in release Rust: -C debug-assertions=off "
+             "removes debug_assert! only)", "assert!(k < nrec as usize);"),
+            ("let ghost = black_box(load)",
+             "let ghost = core::hint::black_box(src[k * stride]);"),
+            ("let ghost = unsafe { _mm_prefetch(..) }  (M9, in Rust)",
+             "let ghost = unsafe { core::arch::x86_64::_mm_prefetch("
+             "src.as_ptr().add(k) as *const i8, 3) };")):
+        loop = payload + "\nlet r: u64 = kernel(src, k * stride, dst);"
+        pin = normalise("let r: u64 = kernel(src, k * stride, dst);", "rust")
+        want(f"plain Rust keeps: {label[:38]}", normalise(loop, "rust") == pin,
+             False)
+        want(f"...and it still erases inside verus!: {label[:22]}",
+             normalise(loop, "rust", in_verus=True) == pin, True)
+
+    # --- region_in_verus decides it, and it is decided per file -------------
+    plain = (f"fn main() {{\n// {B}\nlet ghost = f(x);\n// {E}\n}}\n")
+    inside = ("verus! {\n" + plain + "}\n")
+    outside = (plain + "verus! {\nfn k() { }\n}\n")
+    ext = ("verus! {\n#[verifier::external_body]\n" + plain + "}\n")
+    want("region in a file with no verus! -> not verus",
+         region_in_verus(plain), False)
+    want("region inside verus! -> verus", region_in_verus(inside), True)
+    want("region *before* a verus! block -> not verus",
+         region_in_verus(outside), False)
+    want("region inside an `external_body` item -> not verus (it is plain Rust)",
+         region_in_verus(ext), False)
+    want("region_span agrees with region_text",
+         (lambda s: plain[s[0]:s[1]])(region_span(plain)), region_text(plain))
 
     # --- the alias table is a renamer, not a rewriter ----------------------
     want("legal alias table accepts",

@@ -50,6 +50,10 @@ What it enforces, in order:
        - the Python `requires`/`ensures` are GENERATED from `verus.rs`'s clause
          text through `spec.md`'s translation table, then evaluated on **every
          measured input**, adversarial included. Vacuous ones fail
+  5c every `ensures` clause of every `external_body` item is DELETED in turn and
+     Verus re-run: a file that still verifies with 0 errors is carrying a
+     trusted claim nothing depends on. Plus an `assert(false)` reachability
+     probe at the kernel call site, which catches genuine vacuity
   6  every rung's driver loop, C included, normalises to the token sequence
      pinned in `spec.md`; the *set* of files carrying a region is pinned too
   7  the C rung matches `model.py`'s per-input `sanitizer_expect`: "clean" means
@@ -66,6 +70,7 @@ contract block and of every source read. Exit code: 0 pass, 1 fail, 2 partial.
   harness/check.py p01 --no-build          # reuse .temp/build/pNN
   harness/check.py p01 --skip large        # fast edit/check loop; PARTIAL verdict
   harness/check.py p01 --no-callgrind      # skip step 3's dynamic half; FAILS
+  harness/check.py p01 --no-verus-mutants  # skip step 5c; FAILS
 """
 
 import argparse
@@ -115,6 +120,34 @@ VALGRIND = os.path.expanduser("~/tools/valgrind/bin/valgrind")
 # 8-lane machine. Measured across p01's 28 cells the *minimum* is 1.83 Ir per
 # element, so this leaves >7x margin while still sitting ~100x above a
 # collapsed loop (which scores ~0 by construction).
+#
+# **It is the DEFAULT rate, not the only one** (TASK_006 D, from
+# TASK_004_REVIEW). 0.25 is sound for a unit of work that is a 64-bit *element*
+# and unsound for one that is a *byte*: glibc `memcpy` moves a byte in 0.104
+# instructions (re-measured at TASK_006: a 4092-byte copy costs 425.7 Ir), so a
+# bulk-copy kernel scores 0.118 Ir/byte and this constant would fail it at 0.47x
+# the floor while it is perfectly healthy. A floor that forbids the fastest
+# correct implementation is not a floor, it is a bug that happens not to have
+# fired yet.
+#
+# So a pattern's `model.py` may expose
+#
+#     min_ir_per_work      -> float   # cheapest legitimate Ir per unit of work
+#     min_ir_per_work_why  -> str     # the argument for that number
+#
+# and the gate uses it in place of ALPHA. This is a claim about the *algorithm*
+# ("no correct implementation of this can be cheaper than X per unit"), not
+# about this kernel, which is what makes it a legitimate declared value under
+# the TASK_005 rule: a reviewer judges it by reading the argument, not by
+# reading the rung. Declaring a rate BELOW ALPHA additionally requires the
+# justification string, which the verdict then prints on every single run (the
+# `verus.unsafe_justifications` design), and requires two probe shapes so that
+# the un-gameable half of the stage -- `d(Ir)/d(work) >= rate` -- actually runs.
+#
+# Note what this stage does *not* do, on any setting: it bounds the kernel's
+# total cost, so it cannot certify that one *component* of the kernel happened.
+# p02 clears any rate on its fold alone. What certifies that p02's copy happened
+# is step 2 -- the reference model's checksum depends on every copied byte.
 ALPHA_IR_PER_WORK = 0.25
 
 MIRI_PROBE_ITERS = 4       # kernel calls Miri interprets per input
@@ -192,6 +225,15 @@ def sbg(obj, name):
     often `@property`, so reading one runs pattern code."""
     with model_sandbox():
         return getattr(obj, name)
+
+
+def sbg_opt(obj, name, default=None):
+    """Read an *optional* model attribute with the sandbox on.
+
+    `hasattr` outside the sandbox would evaluate a `@property` unsandboxed, so
+    existence and evaluation happen together and inside."""
+    with model_sandbox():
+        return getattr(obj, name, default)
 
 
 def sb_iter(it):
@@ -570,6 +612,7 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
     scratch = os.path.join(REPO, ".temp", "check", buildmod.pattern_id(pdir))
 
     shapes = []          # (name, {n: probe_path}, dcalls, work_per_call)
+    rates = {}           # nm -> (rate, why)
     for nm in names:
         src = os.path.join(indir, nm)
         if not os.path.exists(src):
@@ -580,6 +623,8 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
         mods = {n: sb(modmod.build, pr[n]) for n in (lo, hi)}
         dcalls = sbg(mods[hi], "n_calls") - sbg(mods[lo], "n_calls")
         work = sbg(mods[hi], "work_per_call")
+        rates[nm] = (sbg_opt(mods[hi], "min_ir_per_work"),
+                     sbg_opt(mods[hi], "min_ir_per_work_why", ""))
         if dcalls <= 0:
             rep.fail("collapse-ir", f"{nm}: probe iters {lo}->{hi} produce no "
                                     f"extra kernel calls -- pick another probe")
@@ -591,10 +636,60 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
                                     f"anything")
             return {}
         shapes.append((nm, pr, dcalls, work))
+    works = sorted({w for _, _, _, w in shapes})
+
+    # --- the rate: the harness default, or the algorithm's own lower bound ---
+    declared_rates = {r for r, _ in rates.values()}
+    if len(declared_rates) > 1:
+        rep.fail("collapse-ir",
+                 f"model.py reports different min_ir_per_work per probe input "
+                 f"({ {k: v[0] for k, v in rates.items()} }). The rate is the "
+                 f"cheapest legitimate cost of the *algorithm*; one that varies "
+                 f"with the input is a fact about the input.")
+        return {}
+    rate, why = next(iter(rates.values())) if rates else (None, "")
+    if rate is None:
+        rate, src_of_rate = ALPHA_IR_PER_WORK, "harness default"
+    else:
+        try:
+            rate = float(rate)
+        except (TypeError, ValueError):
+            rep.fail("collapse-ir", f"model.py's min_ir_per_work is {rate!r}, "
+                                    f"which is not a number")
+            return {}
+        if rate <= 0:
+            rep.fail("collapse-ir",
+                     "model.py declares min_ir_per_work <= 0, which is not a "
+                     "floor. A rate of zero certifies nothing at all.")
+            return {}
+        src_of_rate = "model.py"
+        if rate < ALPHA_IR_PER_WORK:
+            if not why:
+                rep.fail("collapse-ir",
+                         f"model.py declares min_ir_per_work={rate} below the "
+                         f"harness default {ALPHA_IR_PER_WORK} and gives no "
+                         f"`min_ir_per_work_why`. Below-default is allowed -- "
+                         f"0.25 is unsound for a byte-denominated unit -- but "
+                         f"only as an argued claim about the algorithm's "
+                         f"cheapest correct implementation, which the verdict "
+                         f"then prints on every run.")
+            else:
+                rep.shout("collapse-ir",
+                          f"the anti-collapse floor for this pattern is "
+                          f"{rate} Ir per unit of work, BELOW the harness "
+                          f"default {ALPHA_IR_PER_WORK}. model.py's argument: "
+                          f"{why}")
+            if len(works) < 2:
+                rep.fail("collapse-ir",
+                         f"min_ir_per_work={rate} is below the harness default "
+                         f"and only one probe *shape* is declared, so the one "
+                         f"assertion an author cannot satisfy with fixed work "
+                         f"-- d(Ir)/d(work) >= rate -- does not run. A loosened "
+                         f"absolute floor needs the marginal one.")
+    for nm, _, dcalls, work in shapes:
         print(f"    probe {nm:16s} n_iters {lo}/{hi} -> +{dcalls} kernel calls, "
               f"work_per_call={work}  => derived floor "
-              f"{ALPHA_IR_PER_WORK * work:.0f} Ir/call")
-    works = sorted({w for _, _, _, w in shapes})
+              f"{rate * work:.1f} Ir/call")
     if len(shapes) < 2 or len(works) < 2:
         rep.shout("collapse-ir",
                   f"only one probe *shape* ({names}, work={works}); the marginal "
@@ -602,10 +697,12 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
                   f"fixed amount of work regardless of its input passes the "
                   f"absolute floor. Add a second `collapse.probe_inputs` entry "
                   f"with a different work_per_call.")
-    print(f"    alpha = {ALPHA_IR_PER_WORK} Ir per unit of work (harness "
-          f"constant, NOT settable from spec.md); "
+    print(f"    rate  = {rate} Ir per unit of work, from {src_of_rate} "
+          f"(harness default {ALPHA_IR_PER_WORK}; NOT settable from spec.md); "
           + (f"spec.md's advisory floor {declared} can only tighten it"
              if declared else "spec.md declares no additional floor"))
+    if why:
+        print(f"    why   = {why}")
 
     out, ratios = {}, []
     for (c, o, m), path in sorted(built.items()):
@@ -626,12 +723,12 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
                 slope = (ir[hi] - ir[lo]) / dcalls
                 per_shape[nm] = (slope, work)
                 out[f"{c}/{o}/{m}/{nm}"] = slope
-                floor = max(ALPHA_IR_PER_WORK * work, declared)
+                floor = max(rate * work, declared)
                 if slope < floor:
                     rep.fail("collapse-ir",
                              f"{c} {o} {m} on {nm}: {slope:.0f} Ir per kernel "
-                             f"call is below the derived floor {floor:.0f} "
-                             f"({ALPHA_IR_PER_WORK} x work_per_call={work}) -- "
+                             f"call is below the derived floor {floor:.1f} "
+                             f"({rate} x work_per_call={work}) -- "
                              f"the loop is not doing the work the benchmark "
                              f"claims to measure (Ir {ir[lo]:,} -> {ir[hi]:,} "
                              f"over {dcalls} calls)")
@@ -642,20 +739,26 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
                 r = (b[0] - a[0]) / (b[1] - a[1])
                 ratios.append(r)
                 out[f"{c}/{o}/{m}/d_ir_d_work"] = r
-                if r < ALPHA_IR_PER_WORK:
+                if r < rate:
                     rep.fail("collapse-ir",
-                             f"{c} {o} {m}: d(Ir)/d(work) = {r:.3f} < alpha "
-                             f"{ALPHA_IR_PER_WORK}. Ir per call barely moves "
+                             f"{c} {o} {m}: d(Ir)/d(work) = {r:.3f} < rate "
+                             f"{rate}. Ir per call barely moves "
                              f"when the model says the work does "
                              f"({a[0]:.0f} Ir at work {a[1]} -> {b[0]:.0f} at "
                              f"{b[1]}), so the measured loop is not doing this "
                              f"pattern's work.")
-    if out and not any(f[0] == "collapse-ir" for f in rep.failures):
-        per = [v for k, v in out.items() if not k.endswith("d_ir_d_work")]
+    out["_rate"] = rate
+    if len(out) > 1 and not any(f[0] == "collapse-ir" for f in rep.failures):
+        per = [v for k, v in out.items()
+               if not k.endswith("d_ir_d_work") and k != "_rate"]
+        margins = [v / max(rate * w, declared)
+                   for (nm, _, _, w) in shapes
+                   for k, v in out.items() if k.endswith("/" + nm)]
         rep.ok(f"{len(per)} cell/probe pairs: marginal Ir per call "
-               f"{min(per):.0f}...{max(per):.0f}, all above the derived floor; "
+               f"{min(per):.0f}...{max(per):.0f}, all above the derived floor "
+               f"(tightest margin {min(margins):.1f}x); "
                + (f"d(Ir)/d(work) {min(ratios):.2f}...{max(ratios):.2f} "
-                  f"(alpha {ALPHA_IR_PER_WORK})" if ratios else
+                  f"(rate {rate})" if ratios else
                   "no second shape, so no marginal-rate assertion"))
     return out
 
@@ -1002,6 +1105,211 @@ def check_call_site(pdir, rep, contract):
     return out
 
 
+def _verus(path, *extra):
+    """(verified, errors, raw output). `(None, None, out)` if Verus said neither."""
+    r = subprocess.run([sys.executable, os.path.join(REPO, "verus_run.py"), path,
+                        *extra], capture_output=True, text=True, cwd=REPO,
+                       timeout=RUN_TIMEOUT)
+    res = (r.stdout + r.stderr).strip()
+    m = re.search(r"(\d+) verified, (\d+) errors", res)
+    if not m:
+        return None, None, res
+    return int(m.group(1)), int(m.group(2)), res
+
+
+def _mutant_path(pdir, src):
+    """Where to write a mutated copy of `pdir/src` so it still compiles.
+
+    A rung file carries `#[path = "../../common/driver.rs"]`, which rustc
+    resolves relative to the *file's own directory*. So the mutant cannot go in
+    a flat scratch dir: it goes into a mirror of the repo layout under
+    `.temp/clausemut/<pattern>/`, with `common` symlinked back. The pattern
+    directory itself is never written to -- a crashed gate run must not be able
+    to leave a mutated source in the tree."""
+    root = os.path.join(REPO, ".temp", "clausemut", buildmod.pattern_id(pdir))
+    d = os.path.join(root, os.path.relpath(pdir, REPO))
+    os.makedirs(d, exist_ok=True)
+    link = os.path.join(root, "common")
+    if not os.path.islink(link) and not os.path.exists(link):
+        os.symlink(os.path.join(REPO, "common"), link)
+    return os.path.join(d, src)
+
+
+def _insert_false_probe(txt, items, site, kname):
+    """`txt` with `assert(false);` inserted after the first call to `kname` in
+    `site`, or None if there is no such call.
+
+    A reachability probe: if `assert(false)` *verifies* there, the verification
+    context at the call site is contradictory and every caller is vacuous."""
+    it = items.get(site)
+    if it is None or it.body_start is None:
+        return None
+    code = vparse.blank_noncode(txt)
+    m = re.search(r"\b" + re.escape(kname) + r"\s*\(", code[it.body_start:])
+    if not m:
+        return None
+    i = it.body_start + m.end() - 1
+    depth = 0
+    while i < len(code):
+        if code[i] == "(":
+            depth += 1
+        elif code[i] == ")":
+            depth -= 1
+            if depth == 0:
+                break
+        i += 1
+    j = code.find(";", i)
+    if j < 0:
+        return None
+    return txt[:j + 1] + "\n            assert(false);" + txt[j + 1:]
+
+
+def check_clause_deletion(pdir, rep, contract, enabled=True):
+    """5c. Every trusted `ensures` clause must be load-bearing. DERIVED.
+
+    `.memory/04-verus.md`, after TASK_004_REVIEW: p02's `copy_bytes` carries two
+    `ensures` clauses and **neither is individually load-bearing** -- deleting
+    either leaves `9 verified, 0 errors`, because the tail clause implies the
+    length clause. Worse, the mutant that deletes half of the tail clause (M7)
+    is not vacuous but a silent *strengthening*: it injects `dst.len() == n`,
+    which is false of `copy_nonoverlapping`, consistent in context, and usable.
+    A false axiom that is usable is worse than one that collapses the context,
+    because nothing downstream looks wrong.
+
+    Nothing the verifier reports distinguishes any of that from a healthy run,
+    and the only defence was the declared `ensures` pin in `spec.md` -- which
+    TASK_003_REVIEW showed moves with the code it constrains. So this stage
+    *derives* the property instead:
+
+        for each `ensures` clause of each `external_body` item: delete it,
+        re-run Verus, and fail if the file still verifies with 0 errors.
+
+    A clause whose deletion changes nothing was either implied by its
+    neighbours (delete it, or merge them) or consumed by nobody (it is
+    decoration). Either way the tally in NOTES.md is overstating what the
+    trusted base actually says.
+
+    The `assert(false)` reachability probe runs beside it because it catches
+    *genuine* vacuity -- an unsatisfiable `requires`, a contradictory context.
+    It is **not** the detector for the clause class above: measured at
+    TASK_004_REVIEW, `assert(false)` after the call is still unprovable with the
+    M7 mutant in place.
+
+    Cost: one Verus run per clause plus two controls per file, ~20 s each."""
+    head("5c. clause deletion: is every trusted `ensures` clause load-bearing?")
+    vcfg = contract.get("verus") or {}
+    pinned_obl = vcfg.get("obligations") or {}
+    site = vcfg.get("call_site", "main")
+    kname = vcfg.get("kernel_item", "kernel")
+    also = list(vcfg.get("clause_deletion_extra_items") or [kname])
+    out = {}
+    if not enabled:
+        rep.fail("clause-mut", "--no-verus-mutants given: the clause-deletion "
+                               "stage did not run, so nothing checked that this "
+                               "pattern's trusted `ensures` clauses say anything")
+        return out
+    if not pinned_obl:
+        rep.fail("clause-mut", "spec.md pins no verus.obligations, so there is "
+                               "no file list to mutate")
+        return out
+    for src in sorted(pinned_obl):
+        path = os.path.join(pdir, src)
+        if not os.path.exists(path):
+            continue
+        txt = open(path).read()
+        try:
+            items = vparse.by_name(txt)
+        except ValueError as e:
+            rep.fail("clause-mut", f"{src}: {e}")
+            continue
+        mpath = _mutant_path(pdir, src)
+        rows = []
+
+        # --- control: the unmutated copy, at the scratch path ---------------
+        # Without this, a stage that silently fails to compile anything would
+        # report every clause as load-bearing and print a green line.
+        open(mpath, "w").write(txt)
+        base_v, base_e, base_out = _verus(mpath)
+        if base_v is None or base_e:
+            rep.fail("clause-mut",
+                     f"{src}: the UNMUTATED copy at {os.path.relpath(mpath, REPO)} "
+                     f"does not verify ({base_v} verified, {base_e} errors). "
+                     f"Every mutant would then 'fail' for the wrong reason and "
+                     f"this stage would certify nothing.\n      {base_out[-400:]}")
+            continue
+        print(f"    {src}: control (unmutated, relocated) -> {base_v} verified, "
+              f"0 errors")
+
+        # --- the assert(false) reachability probe ---------------------------
+        probe = _insert_false_probe(txt, items, site, kname)
+        if probe is None:
+            rep.note(f"{src}: no `{kname}(` call inside `{site}`, so the "
+                     f"assert(false) reachability probe did not run")
+        else:
+            open(mpath, "w").write(probe)
+            pv, pe, po = _verus(mpath)
+            rows.append(dict(item=site, kind="assert(false) probe", clause=None,
+                             verified=pv, errors=pe))
+            if pv is not None and pe == 0:
+                rep.fail("clause-mut",
+                         f"{src}: `assert(false)` immediately after the "
+                         f"`{kname}(...)` call in `{site}` VERIFIES ({pv} "
+                         f"verified, 0 errors). The verification context there "
+                         f"is contradictory, so every obligation the call site "
+                         f"discharges is vacuous and the proof constrains "
+                         f"nothing.")
+            else:
+                print(f"    {src}: assert(false) after `{kname}(...)` is "
+                      f"unprovable ({pv} verified, {pe} errors) -- the call "
+                      f"site's context is satisfiable")
+
+        # --- one mutant per `ensures` clause --------------------------------
+        targets = [i for i in items.values()
+                   if i.external == "verifier::external_body"]
+        extra = [items[n] for n in also if n in items and not items[n].external]
+        for it, why in ([(i, "trusted") for i in targets]
+                        + [(i, "verified") for i in extra]):
+            cl = it.clauses.get("ensures") or []
+            for idx, ctext in enumerate(cl):
+                open(mpath, "w").write(
+                    vparse.delete_clause(txt, it, "ensures", idx))
+                mv, me, mo = _verus(mpath)
+                rows.append(dict(item=it.name, kind=why, clause=ctext,
+                                 verified=mv, errors=me))
+                tag = f"{src} {it.name} ensures[{idx}]"
+                if mv is not None and me == 0:
+                    rep.fail("clause-mut",
+                             f"{tag} is NOT load-bearing: deleting "
+                             f"`{ctext}` still gives {mv} verified, 0 errors. "
+                             + ("A trusted item's `ensures` is an axiom; one "
+                                "that nothing depends on is an unchecked claim "
+                                "about real Rust semantics carried for free, "
+                                "and the TCB tally counts it as an obligation "
+                                "the reviewer must judge. Merge it into the "
+                                "clause that implies it, or delete it."
+                                if why == "trusted" else
+                                "Nothing consumes this postcondition, so it is "
+                                "decoration: replacing it with a tautology "
+                                "would verify too (`.memory/04-verus.md`). "
+                                "Consume it with a ghost `assert` at the call "
+                                "site."))
+                elif mv is None:
+                    rep.fail("clause-mut", f"{tag}: Verus produced no result "
+                                           f"for the mutant\n      {mo[-300:]}")
+                else:
+                    print(f"    {src}: {it.name} ensures[{idx}] load-bearing "
+                          f"({mv} verified, {me} errors) -- {ctext[:58]}")
+        open(mpath, "w").write(txt)      # leave the scratch copy unmutated
+        out[src] = {"control_verified": base_v, "mutants": rows}
+    n = sum(len(v["mutants"]) for v in out.values())
+    if out and not any(f[0] == "clause-mut" for f in rep.failures):
+        rep.ok(f"{n} Verus mutants across {len(out)} file(s): every trusted "
+               f"`ensures` clause is load-bearing, and `assert(false)` at the "
+               f"call site is unprovable. Derived, not declared -- this does not "
+               f"inherit the self-certification problem of a `spec.md` pin.")
+    return out
+
+
 def translate_clause(text, table):
     """One Verus clause -> one Python expression, through `table`.
 
@@ -1036,7 +1344,7 @@ def derive_contract(pdir, rep, contract):
     `spec.md` alone, without reference to the code it constrains.
 
     Returns (requires, ensures) as Python expression strings."""
-    head("5c0. the Python contract is derived from verus.rs, not transcribed")
+    head("5d0. the Python contract is derived from verus.rs, not transcribed")
     vcfg = contract.get("verus") or {}
     table = vcfg.get("translate")
     kname = vcfg.get("kernel_item", "kernel")
@@ -1105,7 +1413,7 @@ def check_proof_domain(rep, models, reqs, enss):
     `requires` list used to print "holds on all 200000 kernel calls", and a
     model that yielded no samples printed "re-derived on 0 sampled calls". Both
     read as the strongest line in the log and neither checked anything."""
-    head("5c. rules 1 and 3 on EVERY measured input, adversarial included")
+    head("5d. rules 1 and 3 on EVERY measured input, adversarial included")
     if not reqs:
         rep.fail("proof-vacuous",
                  "the kernel's `requires` is empty. Either the proof genuinely "
@@ -1488,6 +1796,8 @@ def main():
     ap.add_argument("--cells", default="all", choices=["all", "measured"])
     ap.add_argument("--no-callgrind", action="store_true",
                     help="skip step 3b; the run then FAILS, by design")
+    ap.add_argument("--no-verus-mutants", action="store_true",
+                    help="skip step 5c; the run then FAILS, by design")
     a = ap.parse_args()
 
     pdir = buildmod.pattern_dir(a.pattern)
@@ -1580,6 +1890,8 @@ def main():
     advtable = check_adversarial(built, rep, adv_models, indir, cells)
     verus_res = check_verus_contract(pdir, rep, contract)
     callsite = check_call_site(pdir, rep, contract)
+    clausemut = check_clause_deletion(pdir, rep, contract,
+                                      not a.no_verus_mutants)
     reqs, enss = derive_contract(pdir, rep, contract)
     domain = check_proof_domain(rep, all_models, reqs, enss)
     drivers = check_driver_identity(pdir, rep, contract)
@@ -1603,11 +1915,19 @@ def main():
         "source_sha256": {os.path.relpath(s, REPO): sha256_file(s)
                           for s in srcs if os.path.isfile(s)},
         "derived_contract": {"requires": reqs, "ensures": enss,
-                             "alpha_ir_per_work": ALPHA_IR_PER_WORK},
+                             # the harness default, and the rate actually used:
+                             # a pattern's model.py may declare its own
+                             # `min_ir_per_work` and p02 does (0.0625). Both are
+                             # recorded, because reading only the first would
+                             # misstate the floor this run enforced.
+                             "alpha_ir_per_work": ALPHA_IR_PER_WORK,
+                             "collapse_rate_ir_per_work":
+                                 slopes.pop("_rate", ALPHA_IR_PER_WORK)},
         "identity": identity,
         "marginal_ir_per_call": slopes,
         "verus": verus_res,
         "verified_call_site": callsite,
+        "clause_deletion": clausemut,
         "proof_domain": domain,
         "driver_loops": drivers,
         "adversarial": advtable,
@@ -1624,7 +1944,8 @@ def main():
     # hard way at TASK_003: a `--skip small --skip large --no-callgrind` run,
     # used to *demonstrate* that those flags now fail the gate, clobbered the
     # passing artefact with its own deliberate FAIL.)
-    partial = bool(a.skip) or a.no_callgrind or a.no_build or a.cells != "all"
+    partial = (bool(a.skip) or a.no_callgrind or a.no_build
+               or a.no_verus_mutants or a.cells != "all")
     if rep.failures:
         verdict = "FAIL"
     elif partial:
@@ -1650,7 +1971,8 @@ def main():
         print(f"\n{bar}\n#  PARTIAL RUN -- this certifies LESS than a full one "
               f"and its verdict\n#  is not a pass. Skipped inputs: "
               f"{a.skip or 'none'}; callgrind: "
-              f"{'OFF' if a.no_callgrind else 'on'}; build: "
+              f"{'OFF' if a.no_callgrind else 'on'}; verus mutants: "
+              f"{'OFF' if a.no_verus_mutants else 'on'}; build: "
               f"{'REUSED' if a.no_build else 'fresh'}; cells: {a.cells}.\n"
               f"#  Written beside the full-run record, never over it.\n{bar}")
     for s, m in rep.loud:

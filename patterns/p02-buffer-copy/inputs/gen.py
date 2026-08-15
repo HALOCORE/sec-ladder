@@ -19,15 +19,27 @@ file, and so does every length prefix the kernel reads.
 Two things about the sizes are deliberate and must survive any edit:
 
   * `small` and `large` copy **61** and **4092** bytes, which are different
-    residues mod 4 (1 and 0) *and* mod 8 (5 and 4). `.memory/01-ladder.md`: the
-    safe-vs-unsafe delta varies with the residue, and quoting one residue as if
-    it were the number has now been the mistake three times. The tail of a
-    vectorised copy is exactly where that shows up.
+    residues mod 4 (1 and 0), mod 8 (5 and 4) **and mod 16 (13 and 12)**.
+    `.memory/01-ladder.md`: the safe-vs-unsafe delta varies with the residue,
+    and quoting one residue as if it were the number has now been the mistake
+    three times. **Mod 16 is the modulus that actually mattered here**: R2's
+    epilogue on this codegen swings ~170 Ir across a mod-16 cycle -- measured,
+    `-O3 isolated`, copying *one more byte* (2048 -> 2049) made R2 166.7
+    instructions *cheaper* per call. `_check_residues()` below asserts the two
+    measured lengths differ mod 4, 8 and 16, so an edit that quietly puts them
+    in the same class fails loudly instead of producing a flattering number.
   * the strides (63 and 4094) are not powers of two, so consecutive records do
     not share a cache-set alignment and the record offsets the driver picks are
     not all 8-byte aligned. A length-prefixed record on the wire is not aligned;
     pretending otherwise would flatter every rung equally but measure something
     else.
+
+And one about the sweep: two points and a line is not a curve. `--sweep` emits
+**two complete mod-16 cycles** of record lengths, one at L1 scale and one at
+~2 KiB, because the residue effect is a property of the copy epilogue and its
+amplitude is not the same at both scales. `harness/check.py` and
+`harness/measure.py` both skip the `sweep-` prefix, so these are diagnostic
+inputs and never enter the matrix.
 """
 
 import argparse
@@ -65,6 +77,42 @@ def blob(rng, nrec, stride, rec_len, tail_len=None):
     return bytes(out)
 
 
+# The two measured record lengths, and the moduli they must not share. The
+# lengths are here rather than inline so `_check_residues` can see them.
+SMALL_LEN, LARGE_LEN = 61, 4092
+RESIDUE_MODULI = (4, 8, 16)
+
+# `--sweep`: (first_len, n_lens, cap, stride, nrec, n_iters). Each band is
+# **two** full cycles of `RESIDUE_MODULI[-1]` consecutive lengths plus the
+# endpoints, so the curve shows the whole sawtooth *and* establishes its period
+# instead of assuming it. One cycle is not enough: the first draft of this sweep
+# used 16 lengths per band and both bands happened to straddle a multiple of 64,
+# which cannot tell a period of 16 from a period of 64. Measured over 72
+# consecutive lengths, the period is 16 -- a ~167 Ir drop at `len == 1 (mod 16)`
+# and a ~7 Ir drop at `len == 0 (mod 8)`, on top of ~17 Ir per extra byte.
+SWEEP_CYCLES = 2
+SWEEP_BANDS = ((56, RESIDUE_MODULI[-1] * SWEEP_CYCLES + 2, 96, 98, 130, 200_000),
+               (2040, RESIDUE_MODULI[-1] * SWEEP_CYCLES + 2, 2080, 2082, 64, 20_000))
+
+
+def _check_residues():
+    """The two measured lengths must differ modulo every modulus that has ever
+    bitten this project. Returns a list of problems (empty when healthy).
+
+    p01's first draft used 500 and 4096, both == 0 (mod 4), which is the single
+    worst residue for R2 and overstated it 2.4x. p02's first draft used 61 and
+    4092, which differ mod 4 and mod 8 -- and *that* was still not enough,
+    because the modulus that governs this kernel's copy epilogue is 16."""
+    bad = []
+    for m in RESIDUE_MODULI:
+        if SMALL_LEN % m == LARGE_LEN % m:
+            bad.append(f"small={SMALL_LEN} and large={LARGE_LEN} are both "
+                       f"== {SMALL_LEN % m} (mod {m}); pick lengths in "
+                       f"different residue classes or the delta you publish is "
+                       f"one residue wearing the label of a constant")
+    return bad
+
+
 def write(name, n_iters, cap, stride, body, declared_len=None):
     payload = slb.pack_head2_bytes(cap, stride, body)
     path = os.path.join(HERE, name)
@@ -83,15 +131,20 @@ def main():
     rng = random.Random(SEED)
 
     print("p02 inputs ->", os.path.relpath(HERE, os.getcwd()))
+    for p in _check_residues():
+        print("gen.py: " + p, file=sys.stderr)
+        return 1
+    print(f"  residues ok: {SMALL_LEN} and {LARGE_LEN} differ mod "
+          + ", ".join(str(m) for m in RESIDUE_MODULI))
 
     # ---- the two measured inputs -----------------------------------------
     # small: 200 records x 63 B = 12 600 B of source + a 64 B destination, so
     # the whole working set is ~12.4 KiB and lives in L1 (32 KiB on this box).
-    write("small.bin", 200_000, 64, 63, blob(rng, 200, 63, 61))
+    write("small.bin", 200_000, 64, 63, blob(rng, 200, 63, SMALL_LEN))
     # large: 2048 records x 4094 B = 8.0 MiB of source, 8x this box's 1 MiB L2
     # and comfortably beyond it; the record the driver picks is uniform over the
     # whole blob, so every call is a cold 4 KiB read.
-    write("large.bin", 20_000, 4096, 4094, blob(rng, 2048, 4094, 4092))
+    write("large.bin", 20_000, 4096, 4094, blob(rng, 2048, 4094, LARGE_LEN))
 
     # ---- adversarial: the length prefix is the attack ---------------------
     # The four below are the point of the pattern. Every one of them REACHES
@@ -133,9 +186,17 @@ def main():
     if a.sweep:
         # Diagnostic only: one record length is a coincidence, not a number.
         # `harness/check.py` and `harness/measure.py` both skip `sweep-`.
+        #
+        # Two full mod-16 cycles. The first band is L1-resident and answers
+        # "what does the residue cost at the scale of `small`"; the second sits
+        # at ~2 KiB, which is where the swing was first noticed (2048 -> 2049
+        # made R2 cheaper). Sweeping only one band would have reproduced exactly
+        # the mistake this sweep exists to correct.
         print("  -- sweep (diagnostic, not part of the matrix)")
-        for ln in range(56, 72):
-            write(f"sweep-l{ln}.bin", 200_000, 72, 74, blob(rng, 175, 74, ln))
+        for first, n, cap, stride, nrec, iters in SWEEP_BANDS:
+            for ln in range(first, first + n):
+                write(f"sweep-l{ln}.bin", iters, cap, stride,
+                      blob(rng, nrec, stride, ln))
     return 0
 
 

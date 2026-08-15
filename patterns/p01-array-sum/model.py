@@ -59,6 +59,25 @@ The API `harness/check.py` requires
                        circular: p01 simulates with prefix sums and re-derives
                        with literal addition, and reports a disagreement here.
 
+Optional, and added at TASK_006 because the harness constant is unsound for a
+byte-denominated unit of work:
+
+    min_ir_per_work     float -- the cheapest legitimate instructions per unit
+                       of `work_per_call` for **this algorithm**, replacing the
+                       harness default ALPHA = 0.25. It is a claim about the
+                       algorithm, not about this kernel, which is why it may be
+                       declared at all: a reviewer judges it by reading the
+                       argument beside it, without opening a rung. Declaring a
+                       rate below the harness default also requires
+                       `min_ir_per_work_why`, which the verdict prints on every
+                       run, and two probe shapes so that `d(Ir)/d(work) >= rate`
+                       still runs. p01 declares neither: 0.25 Ir per 64-bit
+                       element summed is sound (measured minimum 1.83), and only
+                       a pattern whose unit is *smaller* than a 64-bit lane --
+                       p02's byte, where glibc `memcpy` achieves 0.104 -- needs
+                       to move it.
+    min_ir_per_work_why str  -- the argument for the number above.
+
 Nothing else is assumed. A pattern whose kernel takes different arguments binds
 different names; `spec.md`'s contract block and this file must agree, and the
 gate fails loudly (NameError) if they do not.

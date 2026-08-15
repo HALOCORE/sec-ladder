@@ -161,12 +161,21 @@ is a much stronger claim than any p01 could produce.
    writes, are +10 flat.* That is a codegen fragility finding, not a safety-cost
    finding — still worth publishing, but not as a safety tax.
 
+   Note also that "gcc's byte loop beats glibc `memcpy`" — briefly believed — is a
+   mislabelled comparison. gcc's byte loop is faster than **R4** (10106 vs 10201),
+   not than gcc's own `memcpy` build (9200). *Within* one compiler the byte loop is
+   dearer: gcc +906, clang +528. The conclusion survives and is stronger.
+
    **Two rules follow.** (1) Before attributing a cost to bounds checking,
    decompose: change one loop at a time and re-measure. A whole-kernel delta
-   attributes nothing. (2) Residues bite harder than recorded: R2's epilogue cost
-   here swings **±175 Ir on `len mod 16`** — copying *one more byte* (2048→2049)
-   made it 174 instructions *cheaper*. `gen.py` pins residues mod 4 and mod 8;
-   the modulus that mattered was 16. Sweep, do not sample.
+   attributes nothing. (2) Residues bite harder than recorded. Swept over 68
+   lengths at two scales (TASK_006), R2−R4 is a **sawtooth of constant amplitude
+   179 Ir, resetting at `len ≡ 1 (mod 16)`**, on a linear term of 0.21 Ir/byte —
+   so copying *one more byte* (2048→2049) made R2 174 instructions *cheaper*.
+   `gen.py` pinned residues mod 4 and mod 8; the modulus that mattered was 16, and
+   it now checks mod 16 before writing any input. Sweep, do not sample — and sweep
+   **two full cycles**: the first sweep design used 16 lengths per band and could
+   not distinguish period 16 from period 64.
 
    **R3 remains the honest number** — +10 per call, flat — the third pattern in a
    row where that is the finding.

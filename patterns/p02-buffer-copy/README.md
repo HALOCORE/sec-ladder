@@ -41,7 +41,7 @@ shape of the CVE and is what makes the comparison honest.
 |---|---|
 | **R1** `c-gcc` / `c-clang` | the code above. The bug. |
 | **R1h** `c-gcc-h` / `c-clang-h` | *new rung.* The same C plus the bounds check. |
-| **R2** `safe_naive.rs` | indexed copy loop, checked by the language |
+| **R2** `safe_naive.rs` | indexed copy loop, checked by the language. Its cost is a codegen accident, not a safety tax — read `NOTES.md` §0a first |
 | **R3** `safe_tuned.rs` | `copy_from_slice` on a checked subslice |
 | **R4** `unsafe.rs` | `copy_nonoverlapping`, check hoisted, unverified |
 | **R5** `verus.rs` | R4's exec code, with the check proved sufficient |
@@ -55,8 +55,9 @@ the bare check.
 ## Headline
 
 - The check costs **5 instructions per call out of ~230** (2%) in C, and Rust's
-  idiomatic safe rung (R3) lands within **+10 per call** of unsafe Rust. Safety
-  costs about the same in both languages; Rust makes it non-optional.
+  idiomatic safe rung (R3) lands within **+10 per call** of unsafe Rust —
+  measured at **68 record lengths across two scales**, +10 at every one of them.
+  Safety costs about the same in both languages; Rust makes it non-optional.
 - On a one-byte overflow, R1 is **silent in 7 of its 8 builds** — right answer
   shape, wrong number, exit 0. That is the row that matters. Delete the same
   check from safe Rust and you get exit 101 and `index out of bounds: the len is
@@ -64,6 +65,16 @@ the bare check.
 - R4 and R5 are **byte-identical** machine code (`md5_fn 0e5b5936…`) on a kernel
   with raw pointer arithmetic and a nine-obligation proof. The proof still costs
   zero instructions.
+- **A codegen-fragility finding, and a retraction.** R2, the mechanical port, is
+  +178 per call at 61 bytes. TASK_004 published that as an O(n) bounds-check tax
+  and it is **not one**: the bounds checks in R2's indexed fold cost zero, and
+  the entire delta is rustc failing to turn one spelling of a byte-copy loop into
+  a `memcpy`. Three other spellings — including the reslice a competent Rust
+  programmer writes — are +10 flat, and one operator in the *bounds check* flips
+  `bulk_calls []` → `['memcpy@GLIBC_2.14']`. C written the same way pays +906
+  (gcc) / +528 (clang), with no bounds checks at all. What is left is a real and
+  publishable result about **rustc's loop-idiom recognition being sensitive to
+  how a bound is spelled** — see `NOTES.md` §0a and §3a.
 
-Numbers, the full adversarial behaviour table, the TCB tally and the mutation
-results are in `NOTES.md`.
+Numbers, the residue curve, the full adversarial behaviour table, the TCB tally
+and the mutation results are in `NOTES.md`.

@@ -16,22 +16,22 @@
     "common/driver.c": "146366ecece22e987db2c4d1cd992cbbf03c06dce131a8db4da5d35c70337993",
     "common/driver.h": "50663623c44af447cd57a9a70f59fed70bfc844a890e5e7a8eb8a4d0f16d4151",
     "common/driver.rs": "ecafc9337834afbf85a1787528a220e51291e2705d9c9337b24a3a662a543029",
-    "harness/asm.py": "89596ab1873aec7480a32ca1d52dd549eef29124ca425d98a035878753a017a6",
+    "harness/asm.py": "e3b14d4e90f15e7ff28d862442c721120943bb70c9514437b77facc407b6675f",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "25c85a2cd9f4279e64ea333ff9f375ae01b5d6db742c9177fe83fd3cf8947c2d",
-    "harness/dloop.py": "3322e1e3a34abb33a87360ba2b0be0e4d0e470d543330547846553e96acd6e94",
+    "harness/check.py": "79f36a4f69cdf1b7b46c0a7038babec223e6ff4f2bd25d46f83c527c84302cc7",
+    "harness/dloop.py": "5be7e52c0fbbc07ddbdb3043b6fc08b4b895d41c071ccb74f5dcf0655c13d0fd",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "eadc0ed8afb59bedda89a92ee035c42676ab4020d0fb4612cd4d7c9e0f40807b",
     "harness/report.py": "78bc72b51e5734c02f69416893928b7279975f829fd98fc9c965ed217863728b",
-    "harness/vparse.py": "1e955e13aea819bd4845ee509d0e6a64420b2f686a62475b3f1c65970f64b7e8",
+    "harness/vparse.py": "c95b283684871eef444d91178465851fa8274d1362b12d7434c00aea2e643cc5",
     "patterns/p01-array-sum/NOTES.md": "5b57d10c6b27dc3b1d12d4be0dc92dfb1805be96c7c8d99dc9660738461f2760",
     "patterns/p01-array-sum/README.md": "c0d5616db3227be899f2fbdd1eec18b2225e354235c046fdc6180a16edfe7015",
     "patterns/p01-array-sum/c/kernel.c": "1b79c738a5ab4da534d62a931919ec2d16a6add4f3710b29a347e16b88c96fe7",
     "patterns/p01-array-sum/c/kernel.h": "2eaee3e8be741b9ef00a9d6061e72f8ab6199143724b2438251c7032db01add4",
     "patterns/p01-array-sum/c/main.c": "065a6d17209b6c5ddb03d33ea38b623265b73293d98415ac99d5f66f467d18ef",
-    "patterns/p01-array-sum/model.py": "f999fd77c1ba0ebaf54b7bd57c73c4ef63344a1c50a4824e3791b2a803769572",
+    "patterns/p01-array-sum/model.py": "cd2e58963a390b0ae40e88af505924f10eab7785dcee8205fa740c513eea182a",
     "patterns/p01-array-sum/safe_naive.rs": "31718428bae78cc7c8d50ba5c520091e0596dca1b5216a6bb76f85bbd88abbfb",
-    "patterns/p01-array-sum/safe_naive_verus.rs": "535ed49cac2fe51c7a43bec9f0ab5a0fd34f831ea29a8032bd1c76074cef0b7a",
+    "patterns/p01-array-sum/safe_naive_verus.rs": "6e84117379183aef6345c849ed2bea0777be2ec5422715bf9475c6c9b8a8bb87",
     "patterns/p01-array-sum/safe_tuned.rs": "ff2d49dd5338f48a3051989565137f8f7ae685521e4fa78999874edff48e4c16",
     "patterns/p01-array-sum/spec.md": "666a28ee3abd30ea8b89ac3f2f98e5799fced9dd64b14ec040af97d95ee99446",
     "patterns/p01-array-sum/unsafe.rs": "026e4b6aa62113972c6881f0daa5e12da366c0eb0b9e7d5369cd0fc8c12db8e9",
@@ -44,7 +44,8 @@
     "ensures": [
       "result == wrapping_sum(v, off, len)"
     ],
-    "alpha_ir_per_work": 0.25
+    "alpha_ir_per_work": 0.25,
+    "collapse_rate_ir_per_work": 0.25
   },
   "identity": [
     {
@@ -291,6 +292,53 @@
   "verified_call_site": {
     "main": 4,
     "kernel": 2
+  },
+  "clause_deletion": {
+    "safe_naive_verus.rs": {
+      "control_verified": 7,
+      "mutants": [
+        {
+          "item": "main",
+          "kind": "assert(false) probe",
+          "clause": null,
+          "verified": 6,
+          "errors": 1
+        },
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "r == sum_wrap(v@, off as int, len as int)",
+          "verified": 6,
+          "errors": 1
+        }
+      ]
+    },
+    "verus.rs": {
+      "control_verified": 7,
+      "mutants": [
+        {
+          "item": "main",
+          "kind": "assert(false) probe",
+          "clause": null,
+          "verified": 6,
+          "errors": 1
+        },
+        {
+          "item": "get_unchecked",
+          "kind": "trusted",
+          "clause": "r == v@[i as int]",
+          "verified": 6,
+          "errors": 1
+        },
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "r == sum_wrap(v@, off as int, len as int)",
+          "verified": 6,
+          "errors": 1
+        }
+      ]
+    }
   },
   "proof_domain": {
     "adversarial-empty.bin": {

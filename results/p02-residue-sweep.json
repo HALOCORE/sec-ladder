@@ -1,0 +1,1513 @@
+{
+ "pattern": "p02-buffer-copy",
+ "what": "marginal executed instructions per kernel call vs the copied record length, -O3 isolated, callgrind whole-program Ir at n_iters=200 minus at 100 over the 100 extra calls",
+ "why": "TASK_004 published R2's safe-vs-unsafe delta from two record lengths (61 and 4092) and called it an O(n) bounds-check tax. Both lengths sit near the top of a sawtooth of period 16 and amplitude 179 Ir. TASK_006 ran inputs/gen.py --sweep, which had never been run.",
+ "inputs": "patterns/p02-buffer-copy/inputs/sweep-l*.bin, from inputs/gen.py --sweep (two bands of 34 consecutive lengths = two full mod-16 cycles each, at L1 scale and at ~2 KiB)",
+ "findings": {
+  "period": 16,
+  "peak_to_trough_R2_minus_R4": 179,
+  "amplitude_is_constant_across_scale": true,
+  "linear_term_ir_per_byte": 0.21,
+  "reset_at": "len % 16 == 1 (R2 drops ~167 Ir; R4 rises ~7)",
+  "secondary_step_at": "len % 8 == 0 (~7 Ir)",
+  "R3_minus_R4": "+10 at every length, +8 when len % 8 == 0"
+ },
+ "rows": [
+  {
+   "len": 56,
+   "len_mod_16": 8,
+   "marginal_ir_per_call": {
+    "c-gcc": 207.0,
+    "c-clang": 193.0,
+    "c-gcc-h": 212.0,
+    "c-clang-h": 204.0,
+    "safe_naive": 319.0,
+    "safe_tuned": 210.0,
+    "unsafe": 202.0
+   },
+   "vs_unsafe": {
+    "c-gcc": 5.0,
+    "c-clang": -9.0,
+    "c-gcc-h": 10.0,
+    "c-clang-h": 2.0,
+    "safe_naive": 117.0,
+    "safe_tuned": 8.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 57,
+   "len_mod_16": 9,
+   "marginal_ir_per_call": {
+    "c-gcc": 212.0,
+    "c-clang": 201.0,
+    "c-gcc-h": 217.0,
+    "c-clang-h": 213.0,
+    "safe_naive": 339.0,
+    "safe_tuned": 219.0,
+    "unsafe": 209.0
+   },
+   "vs_unsafe": {
+    "c-gcc": 3.0,
+    "c-clang": -8.0,
+    "c-gcc-h": 8.0,
+    "c-clang-h": 4.0,
+    "safe_naive": 130.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 58,
+   "len_mod_16": 10,
+   "marginal_ir_per_call": {
+    "c-gcc": 217.0,
+    "c-clang": 206.0,
+    "c-gcc-h": 222.0,
+    "c-clang-h": 218.0,
+    "safe_naive": 356.0,
+    "safe_tuned": 224.0,
+    "unsafe": 214.0
+   },
+   "vs_unsafe": {
+    "c-gcc": 3.0,
+    "c-clang": -8.0,
+    "c-gcc-h": 8.0,
+    "c-clang-h": 4.0,
+    "safe_naive": 142.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 59,
+   "len_mod_16": 11,
+   "marginal_ir_per_call": {
+    "c-gcc": 222.72,
+    "c-clang": 211.72,
+    "c-gcc-h": 227.72,
+    "c-clang-h": 223.72,
+    "safe_naive": 373.3,
+    "safe_tuned": 229.3,
+    "unsafe": 219.3
+   },
+   "vs_unsafe": {
+    "c-gcc": 3.4,
+    "c-clang": -7.6,
+    "c-gcc-h": 8.4,
+    "c-clang-h": 4.4,
+    "safe_naive": 154.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 60,
+   "len_mod_16": 12,
+   "marginal_ir_per_call": {
+    "c-gcc": 227.72,
+    "c-clang": 216.72,
+    "c-gcc-h": 232.72,
+    "c-clang-h": 228.72,
+    "safe_naive": 390.3,
+    "safe_tuned": 234.3,
+    "unsafe": 224.3
+   },
+   "vs_unsafe": {
+    "c-gcc": 3.4,
+    "c-clang": -7.6,
+    "c-gcc-h": 8.4,
+    "c-clang-h": 4.4,
+    "safe_naive": 166.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 61,
+   "len_mod_16": 13,
+   "marginal_ir_per_call": {
+    "c-gcc": 232.0,
+    "c-clang": 221.0,
+    "c-gcc-h": 237.0,
+    "c-clang-h": 233.0,
+    "safe_naive": 407.0,
+    "safe_tuned": 239.0,
+    "unsafe": 229.0
+   },
+   "vs_unsafe": {
+    "c-gcc": 3.0,
+    "c-clang": -8.0,
+    "c-gcc-h": 8.0,
+    "c-clang-h": 4.0,
+    "safe_naive": 178.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 62,
+   "len_mod_16": 14,
+   "marginal_ir_per_call": {
+    "c-gcc": 236.28,
+    "c-clang": 225.28,
+    "c-gcc-h": 241.28,
+    "c-clang-h": 237.28,
+    "safe_naive": 423.7,
+    "safe_tuned": 243.7,
+    "unsafe": 233.7
+   },
+   "vs_unsafe": {
+    "c-gcc": 2.6,
+    "c-clang": -8.4,
+    "c-gcc-h": 7.6,
+    "c-clang-h": 3.6,
+    "safe_naive": 190.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 63,
+   "len_mod_16": 15,
+   "marginal_ir_per_call": {
+    "c-gcc": 238.72,
+    "c-clang": 231.72,
+    "c-gcc-h": 244.72,
+    "c-clang-h": 243.72,
+    "safe_naive": 441.3,
+    "safe_tuned": 249.3,
+    "unsafe": 239.3
+   },
+   "vs_unsafe": {
+    "c-gcc": -0.6,
+    "c-clang": -7.6,
+    "c-gcc-h": 5.4,
+    "c-clang-h": 4.4,
+    "safe_naive": 202.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 64,
+   "len_mod_16": 0,
+   "marginal_ir_per_call": {
+    "c-gcc": 201.72,
+    "c-clang": 212.72,
+    "c-gcc-h": 206.72,
+    "c-clang-h": 223.72,
+    "safe_naive": 434.3,
+    "safe_tuned": 229.3,
+    "unsafe": 221.3
+   },
+   "vs_unsafe": {
+    "c-gcc": -19.6,
+    "c-clang": -8.6,
+    "c-gcc-h": -14.6,
+    "c-clang-h": 2.4,
+    "safe_naive": 213.0,
+    "safe_tuned": 8.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 65,
+   "len_mod_16": 1,
+   "marginal_ir_per_call": {
+    "c-gcc": 215.28,
+    "c-clang": 229.28,
+    "c-gcc-h": 220.28,
+    "c-clang-h": 241.28,
+    "safe_naive": 266.7,
+    "safe_tuned": 247.7,
+    "unsafe": 237.7
+   },
+   "vs_unsafe": {
+    "c-gcc": -22.4,
+    "c-clang": -8.4,
+    "c-gcc-h": -17.4,
+    "c-clang-h": 3.6,
+    "safe_naive": 29.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 66,
+   "len_mod_16": 2,
+   "marginal_ir_per_call": {
+    "c-gcc": 221.0,
+    "c-clang": 235.0,
+    "c-gcc-h": 226.0,
+    "c-clang-h": 247.0,
+    "safe_naive": 284.0,
+    "safe_tuned": 253.0,
+    "unsafe": 243.0
+   },
+   "vs_unsafe": {
+    "c-gcc": -22.0,
+    "c-clang": -8.0,
+    "c-gcc-h": -17.0,
+    "c-clang-h": 4.0,
+    "safe_naive": 41.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 67,
+   "len_mod_16": 3,
+   "marginal_ir_per_call": {
+    "c-gcc": 226.0,
+    "c-clang": 240.0,
+    "c-gcc-h": 231.0,
+    "c-clang-h": 252.0,
+    "safe_naive": 301.0,
+    "safe_tuned": 258.0,
+    "unsafe": 248.0
+   },
+   "vs_unsafe": {
+    "c-gcc": -22.0,
+    "c-clang": -8.0,
+    "c-gcc-h": -17.0,
+    "c-clang-h": 4.0,
+    "safe_naive": 53.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 68,
+   "len_mod_16": 4,
+   "marginal_ir_per_call": {
+    "c-gcc": 231.0,
+    "c-clang": 245.0,
+    "c-gcc-h": 236.0,
+    "c-clang-h": 257.0,
+    "safe_naive": 318.0,
+    "safe_tuned": 263.0,
+    "unsafe": 253.0
+   },
+   "vs_unsafe": {
+    "c-gcc": -22.0,
+    "c-clang": -8.0,
+    "c-gcc-h": -17.0,
+    "c-clang-h": 4.0,
+    "safe_naive": 65.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 69,
+   "len_mod_16": 5,
+   "marginal_ir_per_call": {
+    "c-gcc": 236.72,
+    "c-clang": 250.72,
+    "c-gcc-h": 241.72,
+    "c-clang-h": 262.72,
+    "safe_naive": 335.3,
+    "safe_tuned": 268.3,
+    "unsafe": 258.3
+   },
+   "vs_unsafe": {
+    "c-gcc": -21.6,
+    "c-clang": -7.6,
+    "c-gcc-h": -16.6,
+    "c-clang-h": 4.4,
+    "safe_naive": 77.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 70,
+   "len_mod_16": 6,
+   "marginal_ir_per_call": {
+    "c-gcc": 241.0,
+    "c-clang": 255.0,
+    "c-gcc-h": 246.0,
+    "c-clang-h": 267.0,
+    "safe_naive": 352.0,
+    "safe_tuned": 273.0,
+    "unsafe": 263.0
+   },
+   "vs_unsafe": {
+    "c-gcc": -22.0,
+    "c-clang": -8.0,
+    "c-gcc-h": -17.0,
+    "c-clang-h": 4.0,
+    "safe_naive": 89.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 71,
+   "len_mod_16": 7,
+   "marginal_ir_per_call": {
+    "c-gcc": 245.28,
+    "c-clang": 259.28,
+    "c-gcc-h": 250.28,
+    "c-clang-h": 271.28,
+    "safe_naive": 368.7,
+    "safe_tuned": 277.7,
+    "unsafe": 267.7
+   },
+   "vs_unsafe": {
+    "c-gcc": -22.4,
+    "c-clang": -8.4,
+    "c-gcc-h": -17.4,
+    "c-clang-h": 3.6,
+    "safe_naive": 101.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 72,
+   "len_mod_16": 8,
+   "marginal_ir_per_call": {
+    "c-gcc": 250.28,
+    "c-clang": 240.28,
+    "c-gcc-h": 255.28,
+    "c-clang-h": 251.28,
+    "safe_naive": 361.7,
+    "safe_tuned": 257.7,
+    "unsafe": 249.7
+   },
+   "vs_unsafe": {
+    "c-gcc": 0.6,
+    "c-clang": -9.4,
+    "c-gcc-h": 5.6,
+    "c-clang-h": 1.6,
+    "safe_naive": 112.0,
+    "safe_tuned": 8.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 73,
+   "len_mod_16": 9,
+   "marginal_ir_per_call": {
+    "c-gcc": 255.28,
+    "c-clang": 248.28,
+    "c-gcc-h": 260.28,
+    "c-clang-h": 260.28,
+    "safe_naive": 381.7,
+    "safe_tuned": 266.7,
+    "unsafe": 256.7
+   },
+   "vs_unsafe": {
+    "c-gcc": -1.4,
+    "c-clang": -8.4,
+    "c-gcc-h": 3.6,
+    "c-clang-h": 3.6,
+    "safe_naive": 125.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 74,
+   "len_mod_16": 10,
+   "marginal_ir_per_call": {
+    "c-gcc": 261.72,
+    "c-clang": 254.72,
+    "c-gcc-h": 266.72,
+    "c-clang-h": 266.72,
+    "safe_naive": 399.3,
+    "safe_tuned": 272.3,
+    "unsafe": 262.3
+   },
+   "vs_unsafe": {
+    "c-gcc": -0.6,
+    "c-clang": -7.6,
+    "c-gcc-h": 4.4,
+    "c-clang-h": 4.4,
+    "safe_naive": 137.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 75,
+   "len_mod_16": 11,
+   "marginal_ir_per_call": {
+    "c-gcc": 265.28,
+    "c-clang": 258.28,
+    "c-gcc-h": 270.28,
+    "c-clang-h": 270.28,
+    "safe_naive": 415.7,
+    "safe_tuned": 276.7,
+    "unsafe": 266.7
+   },
+   "vs_unsafe": {
+    "c-gcc": -1.4,
+    "c-clang": -8.4,
+    "c-gcc-h": 3.6,
+    "c-clang-h": 3.6,
+    "safe_naive": 149.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 76,
+   "len_mod_16": 12,
+   "marginal_ir_per_call": {
+    "c-gcc": 271.72,
+    "c-clang": 264.72,
+    "c-gcc-h": 276.72,
+    "c-clang-h": 276.72,
+    "safe_naive": 433.3,
+    "safe_tuned": 282.3,
+    "unsafe": 272.3
+   },
+   "vs_unsafe": {
+    "c-gcc": -0.6,
+    "c-clang": -7.6,
+    "c-gcc-h": 4.4,
+    "c-clang-h": 4.4,
+    "safe_naive": 161.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 77,
+   "len_mod_16": 13,
+   "marginal_ir_per_call": {
+    "c-gcc": 276.72,
+    "c-clang": 269.72,
+    "c-gcc-h": 281.72,
+    "c-clang-h": 281.72,
+    "safe_naive": 450.3,
+    "safe_tuned": 287.3,
+    "unsafe": 277.3
+   },
+   "vs_unsafe": {
+    "c-gcc": -0.6,
+    "c-clang": -7.6,
+    "c-gcc-h": 4.4,
+    "c-clang-h": 4.4,
+    "safe_naive": 173.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 78,
+   "len_mod_16": 14,
+   "marginal_ir_per_call": {
+    "c-gcc": 280.28,
+    "c-clang": 273.28,
+    "c-gcc-h": 285.28,
+    "c-clang-h": 285.28,
+    "safe_naive": 466.7,
+    "safe_tuned": 291.7,
+    "unsafe": 281.7
+   },
+   "vs_unsafe": {
+    "c-gcc": -1.4,
+    "c-clang": -8.4,
+    "c-gcc-h": 3.6,
+    "c-clang-h": 3.6,
+    "safe_naive": 185.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 79,
+   "len_mod_16": 15,
+   "marginal_ir_per_call": {
+    "c-gcc": 281.28,
+    "c-clang": 278.28,
+    "c-gcc-h": 287.28,
+    "c-clang-h": 290.28,
+    "safe_naive": 483.7,
+    "safe_tuned": 296.7,
+    "unsafe": 286.7
+   },
+   "vs_unsafe": {
+    "c-gcc": -5.4,
+    "c-clang": -8.4,
+    "c-gcc-h": 0.6,
+    "c-clang-h": 3.6,
+    "safe_naive": 197.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 80,
+   "len_mod_16": 0,
+   "marginal_ir_per_call": {
+    "c-gcc": 245.0,
+    "c-clang": 260.0,
+    "c-gcc-h": 250.0,
+    "c-clang-h": 271.0,
+    "safe_naive": 477.0,
+    "safe_tuned": 277.0,
+    "unsafe": 269.0
+   },
+   "vs_unsafe": {
+    "c-gcc": -24.0,
+    "c-clang": -9.0,
+    "c-gcc-h": -19.0,
+    "c-clang-h": 2.0,
+    "safe_naive": 208.0,
+    "safe_tuned": 8.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 81,
+   "len_mod_16": 1,
+   "marginal_ir_per_call": {
+    "c-gcc": 249.28,
+    "c-clang": 267.28,
+    "c-gcc-h": 254.28,
+    "c-clang-h": 279.28,
+    "safe_naive": 309.7,
+    "safe_tuned": 285.7,
+    "unsafe": 275.7
+   },
+   "vs_unsafe": {
+    "c-gcc": -26.4,
+    "c-clang": -8.4,
+    "c-gcc-h": -21.4,
+    "c-clang-h": 3.6,
+    "safe_naive": 34.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 82,
+   "len_mod_16": 2,
+   "marginal_ir_per_call": {
+    "c-gcc": 255.0,
+    "c-clang": 273.0,
+    "c-gcc-h": 260.0,
+    "c-clang-h": 285.0,
+    "safe_naive": 327.0,
+    "safe_tuned": 291.0,
+    "unsafe": 281.0
+   },
+   "vs_unsafe": {
+    "c-gcc": -26.0,
+    "c-clang": -8.0,
+    "c-gcc-h": -21.0,
+    "c-clang-h": 4.0,
+    "safe_naive": 46.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 83,
+   "len_mod_16": 3,
+   "marginal_ir_per_call": {
+    "c-gcc": 260.72,
+    "c-clang": 278.72,
+    "c-gcc-h": 265.72,
+    "c-clang-h": 290.72,
+    "safe_naive": 344.3,
+    "safe_tuned": 296.3,
+    "unsafe": 286.3
+   },
+   "vs_unsafe": {
+    "c-gcc": -25.6,
+    "c-clang": -7.6,
+    "c-gcc-h": -20.6,
+    "c-clang-h": 4.4,
+    "safe_naive": 58.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 84,
+   "len_mod_16": 4,
+   "marginal_ir_per_call": {
+    "c-gcc": 265.0,
+    "c-clang": 283.0,
+    "c-gcc-h": 270.0,
+    "c-clang-h": 295.0,
+    "safe_naive": 361.0,
+    "safe_tuned": 301.0,
+    "unsafe": 291.0
+   },
+   "vs_unsafe": {
+    "c-gcc": -26.0,
+    "c-clang": -8.0,
+    "c-gcc-h": -21.0,
+    "c-clang-h": 4.0,
+    "safe_naive": 70.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 85,
+   "len_mod_16": 5,
+   "marginal_ir_per_call": {
+    "c-gcc": 270.72,
+    "c-clang": 288.72,
+    "c-gcc-h": 275.72,
+    "c-clang-h": 300.72,
+    "safe_naive": 378.11,
+    "safe_tuned": 306.11,
+    "unsafe": 296.11
+   },
+   "vs_unsafe": {
+    "c-gcc": -25.4,
+    "c-clang": -7.4,
+    "c-gcc-h": -20.4,
+    "c-clang-h": 4.6,
+    "safe_naive": 82.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 86,
+   "len_mod_16": 6,
+   "marginal_ir_per_call": {
+    "c-gcc": 275.0,
+    "c-clang": 293.0,
+    "c-gcc-h": 280.0,
+    "c-clang-h": 305.0,
+    "safe_naive": 395.0,
+    "safe_tuned": 311.0,
+    "unsafe": 301.0
+   },
+   "vs_unsafe": {
+    "c-gcc": -26.0,
+    "c-clang": -8.0,
+    "c-gcc-h": -21.0,
+    "c-clang-h": 4.0,
+    "safe_naive": 94.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 87,
+   "len_mod_16": 7,
+   "marginal_ir_per_call": {
+    "c-gcc": 280.72,
+    "c-clang": 298.72,
+    "c-gcc-h": 285.72,
+    "c-clang-h": 310.72,
+    "safe_naive": 412.3,
+    "safe_tuned": 316.3,
+    "unsafe": 306.3
+   },
+   "vs_unsafe": {
+    "c-gcc": -25.6,
+    "c-clang": -7.6,
+    "c-gcc-h": -20.6,
+    "c-clang-h": 4.4,
+    "safe_naive": 106.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 88,
+   "len_mod_16": 8,
+   "marginal_ir_per_call": {
+    "c-gcc": 285.0,
+    "c-clang": 279.0,
+    "c-gcc-h": 290.0,
+    "c-clang-h": 290.0,
+    "safe_naive": 405.0,
+    "safe_tuned": 296.0,
+    "unsafe": 288.0
+   },
+   "vs_unsafe": {
+    "c-gcc": -3.0,
+    "c-clang": -9.0,
+    "c-gcc-h": 2.0,
+    "c-clang-h": 2.0,
+    "safe_naive": 117.0,
+    "safe_tuned": 8.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 89,
+   "len_mod_16": 9,
+   "marginal_ir_per_call": {
+    "c-gcc": 290.72,
+    "c-clang": 287.72,
+    "c-gcc-h": 295.72,
+    "c-clang-h": 299.72,
+    "safe_naive": 425.3,
+    "safe_tuned": 305.3,
+    "unsafe": 295.3
+   },
+   "vs_unsafe": {
+    "c-gcc": -4.6,
+    "c-clang": -7.6,
+    "c-gcc-h": 0.4,
+    "c-clang-h": 4.4,
+    "safe_naive": 130.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2040,
+   "len_mod_16": 8,
+   "marginal_ir_per_call": {
+    "c-gcc": 4632.56,
+    "c-clang": 5114.56,
+    "c-gcc-h": 4637.56,
+    "c-clang-h": 5125.56,
+    "safe_naive": 5651.3,
+    "safe_tuned": 5131.08,
+    "unsafe": 5123.08
+   },
+   "vs_unsafe": {
+    "c-gcc": -490.5,
+    "c-clang": -8.5,
+    "c-gcc-h": -485.5,
+    "c-clang-h": 2.5,
+    "safe_naive": 528.2,
+    "safe_tuned": 8.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2041,
+   "len_mod_16": 9,
+   "marginal_ir_per_call": {
+    "c-gcc": 4637.52,
+    "c-clang": 5122.52,
+    "c-gcc-h": 4642.52,
+    "c-clang-h": 5134.52,
+    "safe_naive": 5671.3,
+    "safe_tuned": 5140.18,
+    "unsafe": 5130.18
+   },
+   "vs_unsafe": {
+    "c-gcc": -492.7,
+    "c-clang": -7.7,
+    "c-gcc-h": -487.7,
+    "c-clang-h": 4.3,
+    "safe_naive": 541.1,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2042,
+   "len_mod_16": 10,
+   "marginal_ir_per_call": {
+    "c-gcc": 4641.94,
+    "c-clang": 5126.94,
+    "c-gcc-h": 4646.94,
+    "c-clang-h": 5138.94,
+    "safe_naive": 5688.0,
+    "safe_tuned": 5144.8,
+    "unsafe": 5134.8
+   },
+   "vs_unsafe": {
+    "c-gcc": -492.9,
+    "c-clang": -7.9,
+    "c-gcc-h": -487.9,
+    "c-clang-h": 4.1,
+    "safe_naive": 553.2,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2043,
+   "len_mod_16": 11,
+   "marginal_ir_per_call": {
+    "c-gcc": 4646.86,
+    "c-clang": 5131.86,
+    "c-gcc-h": 4651.86,
+    "c-clang-h": 5143.86,
+    "safe_naive": 5705.0,
+    "safe_tuned": 5149.82,
+    "unsafe": 5139.82
+   },
+   "vs_unsafe": {
+    "c-gcc": -493.0,
+    "c-clang": -8.0,
+    "c-gcc-h": -488.0,
+    "c-clang-h": 4.0,
+    "safe_naive": 565.2,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2044,
+   "len_mod_16": 12,
+   "marginal_ir_per_call": {
+    "c-gcc": 4651.8,
+    "c-clang": 5136.8,
+    "c-gcc-h": 4656.8,
+    "c-clang-h": 5148.8,
+    "safe_naive": 5722.0,
+    "safe_tuned": 5154.9,
+    "unsafe": 5144.9
+   },
+   "vs_unsafe": {
+    "c-gcc": -493.1,
+    "c-clang": -8.1,
+    "c-gcc-h": -488.1,
+    "c-clang-h": 3.9,
+    "safe_naive": 577.1,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2045,
+   "len_mod_16": 13,
+   "marginal_ir_per_call": {
+    "c-gcc": 4656.74,
+    "c-clang": 5141.74,
+    "c-gcc-h": 4661.74,
+    "c-clang-h": 5153.74,
+    "safe_naive": 5739.0,
+    "safe_tuned": 5159.94,
+    "unsafe": 5149.94
+   },
+   "vs_unsafe": {
+    "c-gcc": -493.2,
+    "c-clang": -8.2,
+    "c-gcc-h": -488.2,
+    "c-clang-h": 3.8,
+    "safe_naive": 589.1,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2046,
+   "len_mod_16": 14,
+   "marginal_ir_per_call": {
+    "c-gcc": 4661.78,
+    "c-clang": 5146.78,
+    "c-gcc-h": 4666.78,
+    "c-clang-h": 5158.78,
+    "safe_naive": 5756.0,
+    "safe_tuned": 5164.82,
+    "unsafe": 5154.82
+   },
+   "vs_unsafe": {
+    "c-gcc": -493.0,
+    "c-clang": -8.0,
+    "c-gcc-h": -488.0,
+    "c-clang-h": 4.0,
+    "safe_naive": 601.2,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2047,
+   "len_mod_16": 15,
+   "marginal_ir_per_call": {
+    "c-gcc": 4662.1,
+    "c-clang": 5151.1,
+    "c-gcc-h": 4668.1,
+    "c-clang-h": 5163.1,
+    "safe_naive": 5772.7,
+    "safe_tuned": 5169.5,
+    "unsafe": 5159.5
+   },
+   "vs_unsafe": {
+    "c-gcc": -497.4,
+    "c-clang": -8.4,
+    "c-gcc-h": -491.4,
+    "c-clang-h": 3.6,
+    "safe_naive": 613.2,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2048,
+   "len_mod_16": 0,
+   "marginal_ir_per_call": {
+    "c-gcc": 4625.12,
+    "c-clang": 5132.12,
+    "c-gcc-h": 4630.12,
+    "c-clang-h": 5143.12,
+    "safe_naive": 5765.7,
+    "safe_tuned": 5149.48,
+    "unsafe": 5141.48
+   },
+   "vs_unsafe": {
+    "c-gcc": -516.4,
+    "c-clang": -9.4,
+    "c-gcc-h": -511.4,
+    "c-clang-h": 1.6,
+    "safe_naive": 624.2,
+    "safe_tuned": 8.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2049,
+   "len_mod_16": 1,
+   "marginal_ir_per_call": {
+    "c-gcc": 4630.9,
+    "c-clang": 5140.9,
+    "c-gcc-h": 4635.9,
+    "c-clang-h": 5152.9,
+    "safe_naive": 5599.0,
+    "safe_tuned": 5158.96,
+    "unsafe": 5148.96
+   },
+   "vs_unsafe": {
+    "c-gcc": -518.1,
+    "c-clang": -8.1,
+    "c-gcc-h": -513.1,
+    "c-clang-h": 3.9,
+    "safe_naive": 450.0,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2050,
+   "len_mod_16": 2,
+   "marginal_ir_per_call": {
+    "c-gcc": 4635.8,
+    "c-clang": 5145.8,
+    "c-gcc-h": 4640.8,
+    "c-clang-h": 5157.8,
+    "safe_naive": 5616.0,
+    "safe_tuned": 5163.92,
+    "unsafe": 5153.92
+   },
+   "vs_unsafe": {
+    "c-gcc": -518.1,
+    "c-clang": -8.1,
+    "c-gcc-h": -513.1,
+    "c-clang-h": 3.9,
+    "safe_naive": 462.1,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2051,
+   "len_mod_16": 3,
+   "marginal_ir_per_call": {
+    "c-gcc": 4640.14,
+    "c-clang": 5150.14,
+    "c-gcc-h": 4645.14,
+    "c-clang-h": 5162.14,
+    "safe_naive": 5632.7,
+    "safe_tuned": 5168.52,
+    "unsafe": 5158.52
+   },
+   "vs_unsafe": {
+    "c-gcc": -518.4,
+    "c-clang": -8.4,
+    "c-gcc-h": -513.4,
+    "c-clang-h": 3.6,
+    "safe_naive": 474.2,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2052,
+   "len_mod_16": 4,
+   "marginal_ir_per_call": {
+    "c-gcc": 4645.84,
+    "c-clang": 5155.84,
+    "c-gcc-h": 4650.84,
+    "c-clang-h": 5167.84,
+    "safe_naive": 5650.0,
+    "safe_tuned": 5173.9,
+    "unsafe": 5163.9
+   },
+   "vs_unsafe": {
+    "c-gcc": -518.1,
+    "c-clang": -8.1,
+    "c-gcc-h": -513.1,
+    "c-clang-h": 3.9,
+    "safe_naive": 486.1,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2053,
+   "len_mod_16": 5,
+   "marginal_ir_per_call": {
+    "c-gcc": 4650.1,
+    "c-clang": 5160.1,
+    "c-gcc-h": 4655.1,
+    "c-clang-h": 5172.1,
+    "safe_naive": 5666.7,
+    "safe_tuned": 5178.56,
+    "unsafe": 5168.56
+   },
+   "vs_unsafe": {
+    "c-gcc": -518.5,
+    "c-clang": -8.5,
+    "c-gcc-h": -513.5,
+    "c-clang-h": 3.5,
+    "safe_naive": 498.1,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2054,
+   "len_mod_16": 6,
+   "marginal_ir_per_call": {
+    "c-gcc": 4655.08,
+    "c-clang": 5165.08,
+    "c-gcc-h": 4660.08,
+    "c-clang-h": 5177.08,
+    "safe_naive": 5683.7,
+    "safe_tuned": 5183.6,
+    "unsafe": 5173.6
+   },
+   "vs_unsafe": {
+    "c-gcc": -518.5,
+    "c-clang": -8.5,
+    "c-gcc-h": -513.5,
+    "c-clang-h": 3.5,
+    "safe_naive": 510.1,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2055,
+   "len_mod_16": 7,
+   "marginal_ir_per_call": {
+    "c-gcc": 4660.92,
+    "c-clang": 5170.92,
+    "c-gcc-h": 4665.92,
+    "c-clang-h": 5182.92,
+    "safe_naive": 5701.0,
+    "safe_tuned": 5188.9,
+    "unsafe": 5178.9
+   },
+   "vs_unsafe": {
+    "c-gcc": -518.0,
+    "c-clang": -8.0,
+    "c-gcc-h": -513.0,
+    "c-clang-h": 4.0,
+    "safe_naive": 522.1,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2056,
+   "len_mod_16": 8,
+   "marginal_ir_per_call": {
+    "c-gcc": 4665.86,
+    "c-clang": 5151.86,
+    "c-gcc-h": 4670.86,
+    "c-clang-h": 5162.86,
+    "safe_naive": 5694.0,
+    "safe_tuned": 5168.86,
+    "unsafe": 5160.86
+   },
+   "vs_unsafe": {
+    "c-gcc": -495.0,
+    "c-clang": -9.0,
+    "c-gcc-h": -490.0,
+    "c-clang-h": 2.0,
+    "safe_naive": 533.1,
+    "safe_tuned": 8.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2057,
+   "len_mod_16": 9,
+   "marginal_ir_per_call": {
+    "c-gcc": 4670.9,
+    "c-clang": 5159.9,
+    "c-gcc-h": 4675.9,
+    "c-clang-h": 5171.9,
+    "safe_naive": 5714.0,
+    "safe_tuned": 5177.84,
+    "unsafe": 5167.84
+   },
+   "vs_unsafe": {
+    "c-gcc": -496.9,
+    "c-clang": -7.9,
+    "c-gcc-h": -491.9,
+    "c-clang-h": 4.1,
+    "safe_naive": 546.2,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2058,
+   "len_mod_16": 10,
+   "marginal_ir_per_call": {
+    "c-gcc": 4676.56,
+    "c-clang": 5165.56,
+    "c-gcc-h": 4681.56,
+    "c-clang-h": 5177.56,
+    "safe_naive": 5731.3,
+    "safe_tuned": 5183.24,
+    "unsafe": 5173.24
+   },
+   "vs_unsafe": {
+    "c-gcc": -496.7,
+    "c-clang": -7.7,
+    "c-gcc-h": -491.7,
+    "c-clang-h": 4.3,
+    "safe_naive": 558.1,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2059,
+   "len_mod_16": 11,
+   "marginal_ir_per_call": {
+    "c-gcc": 4682.96,
+    "c-clang": 5171.96,
+    "c-gcc-h": 4687.96,
+    "c-clang-h": 5183.96,
+    "safe_naive": 5748.54,
+    "safe_tuned": 5188.4,
+    "unsafe": 5178.4
+   },
+   "vs_unsafe": {
+    "c-gcc": -495.4,
+    "c-clang": -6.4,
+    "c-gcc-h": -490.4,
+    "c-clang-h": 5.6,
+    "safe_naive": 570.1,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2060,
+   "len_mod_16": 12,
+   "marginal_ir_per_call": {
+    "c-gcc": 4686.54,
+    "c-clang": 5175.54,
+    "c-gcc-h": 4691.54,
+    "c-clang-h": 5187.54,
+    "safe_naive": 5765.3,
+    "safe_tuned": 5193.06,
+    "unsafe": 5183.06
+   },
+   "vs_unsafe": {
+    "c-gcc": -496.5,
+    "c-clang": -7.5,
+    "c-gcc-h": -491.5,
+    "c-clang-h": 4.5,
+    "safe_naive": 582.2,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2061,
+   "len_mod_16": 13,
+   "marginal_ir_per_call": {
+    "c-gcc": 4690.9,
+    "c-clang": 5179.9,
+    "c-gcc-h": 4695.9,
+    "c-clang-h": 5191.9,
+    "safe_naive": 5782.0,
+    "safe_tuned": 5197.9,
+    "unsafe": 5187.9
+   },
+   "vs_unsafe": {
+    "c-gcc": -497.0,
+    "c-clang": -8.0,
+    "c-gcc-h": -492.0,
+    "c-clang-h": 4.0,
+    "safe_naive": 594.1,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2062,
+   "len_mod_16": 14,
+   "marginal_ir_per_call": {
+    "c-gcc": 4695.76,
+    "c-clang": 5184.76,
+    "c-gcc-h": 4700.76,
+    "c-clang-h": 5196.76,
+    "safe_naive": 5799.0,
+    "safe_tuned": 5202.86,
+    "unsafe": 5192.86
+   },
+   "vs_unsafe": {
+    "c-gcc": -497.1,
+    "c-clang": -8.1,
+    "c-gcc-h": -492.1,
+    "c-clang-h": 3.9,
+    "safe_naive": 606.1,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2063,
+   "len_mod_16": 15,
+   "marginal_ir_per_call": {
+    "c-gcc": 4696.84,
+    "c-clang": 5189.84,
+    "c-gcc-h": 4702.84,
+    "c-clang-h": 5201.84,
+    "safe_naive": 5816.0,
+    "safe_tuned": 5207.84,
+    "unsafe": 5197.84
+   },
+   "vs_unsafe": {
+    "c-gcc": -501.0,
+    "c-clang": -8.0,
+    "c-gcc-h": -495.0,
+    "c-clang-h": 4.0,
+    "safe_naive": 618.2,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2064,
+   "len_mod_16": 0,
+   "marginal_ir_per_call": {
+    "c-gcc": 4659.82,
+    "c-clang": 5170.82,
+    "c-gcc-h": 4664.82,
+    "c-clang-h": 5181.82,
+    "safe_naive": 5809.0,
+    "safe_tuned": 5187.9,
+    "unsafe": 5179.9
+   },
+   "vs_unsafe": {
+    "c-gcc": -520.1,
+    "c-clang": -9.1,
+    "c-gcc-h": -515.1,
+    "c-clang-h": 1.9,
+    "safe_naive": 629.1,
+    "safe_tuned": 8.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2065,
+   "len_mod_16": 1,
+   "marginal_ir_per_call": {
+    "c-gcc": 4677.58,
+    "c-clang": 5191.58,
+    "c-gcc-h": 4682.58,
+    "c-clang-h": 5203.58,
+    "safe_naive": 5642.3,
+    "safe_tuned": 5197.24,
+    "unsafe": 5187.24
+   },
+   "vs_unsafe": {
+    "c-gcc": -509.7,
+    "c-clang": 4.3,
+    "c-gcc-h": -504.7,
+    "c-clang-h": 16.3,
+    "safe_naive": 455.1,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2066,
+   "len_mod_16": 2,
+   "marginal_ir_per_call": {
+    "c-gcc": 4681.94,
+    "c-clang": 5195.94,
+    "c-gcc-h": 4686.94,
+    "c-clang-h": 5207.94,
+    "safe_naive": 5659.0,
+    "safe_tuned": 5201.86,
+    "unsafe": 5191.86
+   },
+   "vs_unsafe": {
+    "c-gcc": -509.9,
+    "c-clang": 4.1,
+    "c-gcc-h": -504.9,
+    "c-clang-h": 16.1,
+    "safe_naive": 467.1,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2067,
+   "len_mod_16": 3,
+   "marginal_ir_per_call": {
+    "c-gcc": 4687.56,
+    "c-clang": 5201.56,
+    "c-gcc-h": 4692.56,
+    "c-clang-h": 5213.56,
+    "safe_naive": 5676.3,
+    "safe_tuned": 5207.22,
+    "unsafe": 5197.22
+   },
+   "vs_unsafe": {
+    "c-gcc": -509.7,
+    "c-clang": 4.3,
+    "c-gcc-h": -504.7,
+    "c-clang-h": 16.3,
+    "safe_naive": 479.1,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2068,
+   "len_mod_16": 4,
+   "marginal_ir_per_call": {
+    "c-gcc": 4691.12,
+    "c-clang": 5205.12,
+    "c-gcc-h": 4696.12,
+    "c-clang-h": 5217.12,
+    "safe_naive": 5692.89,
+    "safe_tuned": 5211.81,
+    "unsafe": 5201.81
+   },
+   "vs_unsafe": {
+    "c-gcc": -510.7,
+    "c-clang": 3.3,
+    "c-gcc-h": -505.7,
+    "c-clang-h": 15.3,
+    "safe_naive": 491.1,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2069,
+   "len_mod_16": 5,
+   "marginal_ir_per_call": {
+    "c-gcc": 4696.12,
+    "c-clang": 5210.12,
+    "c-gcc-h": 4701.12,
+    "c-clang-h": 5222.12,
+    "safe_naive": 5709.7,
+    "safe_tuned": 5216.56,
+    "unsafe": 5206.56
+   },
+   "vs_unsafe": {
+    "c-gcc": -510.4,
+    "c-clang": 3.6,
+    "c-gcc-h": -505.4,
+    "c-clang-h": 15.6,
+    "safe_naive": 503.1,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2070,
+   "len_mod_16": 6,
+   "marginal_ir_per_call": {
+    "c-gcc": 4701.82,
+    "c-clang": 5215.82,
+    "c-gcc-h": 4706.82,
+    "c-clang-h": 5227.82,
+    "safe_naive": 5727.0,
+    "safe_tuned": 5221.84,
+    "unsafe": 5211.84
+   },
+   "vs_unsafe": {
+    "c-gcc": -510.0,
+    "c-clang": 4.0,
+    "c-gcc-h": -505.0,
+    "c-clang-h": 16.0,
+    "safe_naive": 515.2,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2071,
+   "len_mod_16": 7,
+   "marginal_ir_per_call": {
+    "c-gcc": 4706.12,
+    "c-clang": 5220.12,
+    "c-gcc-h": 4711.12,
+    "c-clang-h": 5232.12,
+    "safe_naive": 5743.7,
+    "safe_tuned": 5226.58,
+    "unsafe": 5216.58
+   },
+   "vs_unsafe": {
+    "c-gcc": -510.5,
+    "c-clang": 3.5,
+    "c-gcc-h": -505.5,
+    "c-clang-h": 15.5,
+    "safe_naive": 527.1,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2072,
+   "len_mod_16": 8,
+   "marginal_ir_per_call": {
+    "c-gcc": 4711.76,
+    "c-clang": 5201.76,
+    "c-gcc-h": 4716.76,
+    "c-clang-h": 5212.76,
+    "safe_naive": 5737.0,
+    "safe_tuned": 5206.9,
+    "unsafe": 5198.9
+   },
+   "vs_unsafe": {
+    "c-gcc": -487.1,
+    "c-clang": 2.9,
+    "c-gcc-h": -482.1,
+    "c-clang-h": 13.9,
+    "safe_naive": 538.1,
+    "safe_tuned": 8.0,
+    "unsafe": 0.0
+   }
+  },
+  {
+   "len": 2073,
+   "len_mod_16": 9,
+   "marginal_ir_per_call": {
+    "c-gcc": 4716.96,
+    "c-clang": 5209.96,
+    "c-gcc-h": 4721.96,
+    "c-clang-h": 5221.96,
+    "safe_naive": 5757.0,
+    "safe_tuned": 5215.82,
+    "unsafe": 5205.82
+   },
+   "vs_unsafe": {
+    "c-gcc": -488.9,
+    "c-clang": 4.1,
+    "c-gcc-h": -483.9,
+    "c-clang-h": 16.1,
+    "safe_naive": 551.2,
+    "safe_tuned": 10.0,
+    "unsafe": 0.0
+   }
+  }
+ ]
+}

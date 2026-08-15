@@ -46,6 +46,17 @@ Four things about that are load-bearing:
   and wave the attack through. The subtraction cannot underflow, because
   `src_off + 2 <= src_len` is the structural precondition (below). Every rung
   spells the test identically.
+
+  **This spelling has a measured codegen cost in R2, and it is a finding rather
+  than a reason to change it** (`NOTES.md` §3a). Subtraction-first leaves LLVM
+  unable to prove the copy loop's index in bounds, so rustc never rewrites
+  R2's byte loop into a `memcpy`: one operator flips `bulk_calls []` →
+  `['memcpy@GLIBC_2.14']` and 118 kernel instructions → 87, and that difference
+  is 100% of R2's published delta. The additive form is the one `spec.md`
+  forbids, so the honest reading is *the sound spelling of an overflow check
+  costs rustc an idiom recognition*, not *bounds checks are expensive*. R3, R4
+  and R5 write the same subtraction-first check and pay nothing, because their
+  copies are not index-by-index.
 - **The prefix is decoded with `+`, not `|`.** `b0 + 256*b1` and
   `b0 | (b1 << 8)` are the same function on bytes and LLVM emits the same
   instruction for both, but the additive form needs no bit-vector reasoning in
@@ -65,8 +76,16 @@ every measured input is inside the verified domain by construction.
 requires:  src_off + 2 <= src_len
 ensures:   result == copy_sum(src, src_off, dst_after_len)
            dst_after == copy_dst(dst_before, src, src_off)
-           dst_after_len == dst_len
 ```
+
+**Two clauses, not three.** There was a third, `dst_after_len == dst_len`, and
+`harness/check.py` step 5c deleted it and found the file still verified with 0
+errors: `copy_dst` returns a sequence of `dst_before`'s length on both branches,
+so the security clause already entails it. `copy_bytes`'s trusted contract lost
+its own copy of the same statement for the same reason. Saying an entailed fact
+a second time does not strengthen a contract; it inflates the TCB tally, gives a
+reviewer two claims to judge where there is one, and lets a later weakening of
+the strong clause hide behind the weak one.
 
 `requires` is the whole of it: **the two prefix bytes are inside the source
 buffer.** That is structural — it is about the shape of the buffers the driver
@@ -183,8 +202,7 @@ the two entries that are new here:
   "model": "model.py",
   "requires": ["src_off + 2 <= src_len"],
   "ensures": ["result == copy_sum(src, src_off, dst_after_len)",
-              "dst_after == copy_dst(dst_before, src, src_off)",
-              "dst_after_len == dst_len"],
+              "dst_after == copy_dst(dst_before, src, src_off)"],
   "note": "requires/ensures above are DERIVED by check.py from verus.rs's own clause text through verus.translate, and the copy here must equal the derivation exactly. They are evaluated in Python against the bindings model.py yields per call (src/src_off/src_len/dst_len/dst_after_len/dst_before/dst_after/result) plus the helpers it supplies (copy_dst, copy_sum). dst_before and dst_after are the WHOLE destination buffer as bytes: the security property is an equality on all of it, not on the copied prefix.",
 
   "verus": {
@@ -220,8 +238,7 @@ the two entries that are new here:
         "copy_bytes":   {"external": "verifier::external_body",
                          "requires": ["from + n <= src@.len()",
                                       "n <= old(dst)@.len()"],
-                         "ensures": ["final(dst)@.len() == old(dst)@.len()",
-                                     "final(dst)@ =~= src@.subrange(from as int, from + n as int) + old(dst)@.subrange( n as int, old(dst)@.len() as int, )"]},
+                         "ensures": ["final(dst)@ =~= src@.subrange(from as int, from + n as int) + old(dst)@.subrange( n as int, old(dst)@.len() as int, )"]},
         "load_input":   {"external": "verifier::external_body",
                          "requires": [], "ensures": []},
         "emit":         {"external": "verifier::external_body",
@@ -229,8 +246,7 @@ the two entries that are new here:
         "kernel":       {"external": null,
                          "requires": ["src_off + 2 <= src@.len()"],
                          "ensures": ["r == copy_sum(src@, src_off as int, final(dst)@.len() as int)",
-                                     "final(dst)@ =~= copy_dst(old(dst)@, src@, src_off as int)",
-                                     "final(dst)@.len() == old(dst)@.len()"]},
+                                     "final(dst)@ =~= copy_dst(old(dst)@, src@, src_off as int)"]},
         "main":         {"external": null, "requires": [], "ensures": []}
       }
     }
@@ -270,7 +286,7 @@ the two entries that are new here:
   "collapse": {
     "probe_inputs": ["small.bin", "large.bin"],
     "probe_iters": [100, 200],
-    "note": "work_per_call is BYTES COPIED (61 on small, 4092 on large), which model.py argues for explicitly rather than assuming: ALPHA's justification is written in 64-bit-lane terms, and a fully vectorised copy-and-fold would run below 0.25 Ir per byte while being perfectly healthy. Measured here: 2.25 to 6.67 Ir per byte across the cells, because widening u8 to u64 and wrapping-adding does not vectorise in rustc. A pattern whose kernel really is a bare memcpy would have to denominate in 64-bit words."
+    "note": "work_per_call is BYTES COPIED (61 on small, 4092 on large) and model.py declares min_ir_per_work = 0.0625 Ir per byte beside it, replacing the harness default of 0.25. The default is derived in 64-bit-lane terms and is unsound for a byte: glibc memcpy moves a byte in 0.104 instructions on this box (re-measured at TASK_006), so a bulk-copy kernel scores 0.118 and 0.25 would fail it at 0.47x while it is the fastest correct implementation there is. 0.0625 is the fused AVX-512 lower bound -- load, store, vpsadbw, vpaddq per 64-byte lane. The shipped rungs measure 2.25 to 6.67 Ir/byte, 36x to 107x clear, because the byte fold does not vectorise in rustc. Neither the rate nor the unit is settable from this file: both live in model.py, which the gate drives in a sandbox, and the gate prints the rate and its justification in every verdict."
   },
 
   "identity": [

@@ -156,9 +156,16 @@ def verus_span(text, code=None):
 # --------------------------------------------------------------------------
 
 class Item:
-    """One `fn` / `spec fn` / `proof fn`, with everything the gate asks about."""
+    """One `fn` / `spec fn` / `proof fn`, with everything the gate asks about.
 
-    __slots__ = ("name", "kind", "start", "sig", "body", "attrs", "external",
+    `sig_start` / `body_start` are absolute offsets into the *original* text, so
+    a caller can perform surgery on one clause without re-finding it. That is
+    what `clause_spans` and `delete_clause` are for: the clause-deletion gate
+    stage has to produce a mutant per clause, and a regex that re-locates the
+    clause would be a second, drifting parser."""
+
+    __slots__ = ("name", "kind", "start", "sig", "sig_code", "sig_start",
+                 "body", "body_start", "body_end", "attrs", "external",
                  "clauses", "in_verus", "line", "cfg_gated", "mod_path")
 
     def __init__(self, **kw):
@@ -350,7 +357,8 @@ def parse(text):
                     break
         items.append(Item(
             name=name, kind=kind, start=item_start, sig=sig_text, body=body,
-            attrs=my_attrs, external=ext,
+            sig_code=sig_code, sig_start=m.end(), body_start=body_open + 1,
+            body_end=body_end - 1, attrs=my_attrs, external=ext,
             clauses=_parse_clauses(sig_code, sig_text),
             in_verus=bool(vs) and vs[0] <= m.start() < vs[1],
             line=text.count("\n", 0, item_start) + 1,
@@ -358,6 +366,80 @@ def parse(text):
             mod_path="::".join(mm[0] for mm in enclosing),
         ))
     return items
+
+
+# --------------------------------------------------------------------------
+# clause surgery -- what the clause-deletion gate stage is built on
+# --------------------------------------------------------------------------
+
+def clause_spans(item):
+    """{kw: {'kw_span': (a, b), 'spans': [(a, b), ...]}} in absolute offsets.
+
+    `kw_span` covers the keyword itself; each entry of `spans` covers one clause
+    *without* its separating comma. Offsets index the original text the item was
+    parsed from, so `text[a:b]` is the clause verbatim."""
+    sig_code, base = item.sig_code or "", item.sig_start or 0
+    hits = []
+    for kw in CLAUSE_KEYWORDS:
+        for m in re.finditer(r"\b" + kw + r"\b", sig_code):
+            pre = sig_code[:m.start()]
+            if sum(pre.count(c) for c in "([{") == sum(pre.count(c) for c in ")]}"):
+                hits.append((m.start(), m.end(), kw))
+    hits.sort()
+    out = {}
+    for idx, (s, e, kw) in enumerate(hits):
+        end = hits[idx + 1][0] if idx + 1 < len(hits) else len(sig_code)
+        spans, depth, cur = [], 0, e
+        for i in range(e, end):
+            ch = sig_code[i]
+            if ch in "([{":
+                depth += 1
+            elif ch in ")]}":
+                depth -= 1
+            elif ch == "," and depth == 0:
+                if sig_code[cur:i].strip():
+                    spans.append((cur, i))
+                cur = i + 1
+        if sig_code[cur:end].strip():
+            spans.append((cur, end))
+        trimmed = []
+        for a, b in spans:
+            while a < b and sig_code[a] in " \t\r\n":
+                a += 1
+            while b > a and sig_code[b - 1] in " \t\r\n":
+                b -= 1
+            trimmed.append((base + a, base + b))
+        out[kw] = {"kw_span": (base + s, base + e), "spans": trimmed}
+    return out
+
+
+def delete_clause(text, item, kw, idx):
+    """`text` with clause `idx` of `item`'s `kw` list removed.
+
+    Removing the clause's separating comma too, and removing the keyword as well
+    when the clause was the only one -- a dangling `ensures` before `{` is a
+    parse error, and a parse error is not the same experiment as a missing
+    postcondition."""
+    info = clause_spans(item).get(kw)
+    if not info or idx >= len(info["spans"]):
+        raise ValueError(f"vparse: {item.name} has no {kw} clause {idx}")
+    spans = info["spans"]
+    a, b = spans[idx]
+    if len(spans) == 1:
+        a = info["kw_span"][0]
+    # swallow one separator: the comma after, else the comma before
+    j = b
+    while j < len(text) and text[j] in " \t\r\n":
+        j += 1
+    if j < len(text) and text[j] == ",":
+        b = j + 1
+    else:
+        i = a
+        while i > 0 and text[i - 1] in " \t\r\n":
+            i -= 1
+        if i > 0 and text[i - 1] == ",":
+            a = i - 1
+    return text[:a] + text[b:]
 
 
 def duplicate_names(items):
@@ -458,6 +540,52 @@ fn f() { let r = kernel(v, 0, 1); }
     want("f: real call site found", it["f"].calls("kernel"), True)
     want("verus! end found by brace match, not a comment",
          verus_span(src.replace(" // verus!", "")) is not None, True)
+
+    # --- clause surgery, for the clause-deletion gate stage ----------------
+    two = '''use vstd::prelude::*;
+verus! {
+#[verifier::external_body]
+fn copy_bytes(src: &[u8], from: usize, dst: &mut [u8], n: usize)
+    requires
+        from + n <= src@.len(),
+        n <= old(dst)@.len(),
+    ensures
+        final(dst)@.len() == old(dst)@.len(),
+        final(dst)@ =~= src@.subrange(from as int, from + n as int) + old(dst)@.subrange(
+            n as int,
+            old(dst)@.len() as int,
+        ),
+{ }
+} // verus!
+'''
+    cb = by_name(two)["copy_bytes"]
+    sp = clause_spans(cb)
+    want("clause_spans: both ensures clauses located",
+         [two[a:b] for a, b in sp["ensures"]["spans"]],
+         ["final(dst)@.len() == old(dst)@.len()",
+          "final(dst)@ =~= src@.subrange(from as int, from + n as int) + "
+          "old(dst)@.subrange(\n            n as int,\n            "
+          "old(dst)@.len() as int,\n        )"])
+    want("clause_spans: text agrees with the parsed clause list",
+         [norm_clause(two[a:b]) for a, b in sp["requires"]["spans"]],
+         cb.clauses["requires"])
+    d0 = delete_clause(two, cb, "ensures", 0)
+    want("delete_clause(0): the other clause survives, alone",
+         by_name(d0)["copy_bytes"].clauses["ensures"], [cb.clauses["ensures"][1]])
+    want("delete_clause(0): `requires` untouched",
+         by_name(d0)["copy_bytes"].clauses["requires"], cb.clauses["requires"])
+    d1 = delete_clause(two, cb, "ensures", 1)
+    want("delete_clause(1): the other clause survives, alone",
+         by_name(d1)["copy_bytes"].clauses["ensures"], [cb.clauses["ensures"][0]])
+    one = by_name(d0)["copy_bytes"]
+    d01 = delete_clause(d0, one, "ensures", 0)
+    want("deleting the only clause removes the `ensures` keyword too",
+         "ensures" in d01, False)
+    want("...and the item still parses", by_name(d01)["copy_bytes"].clauses["ensures"], [])
+    want("...and its `requires` is intact",
+         by_name(d01)["copy_bytes"].clauses["requires"], cb.clauses["requires"])
+    raises("deleting a clause that does not exist raises",
+           lambda: delete_clause(two, cb, "ensures", 2), ValueError)
 
     # --- TASK_003_REVIEW: items keyed by name, last wins -------------------
     decoy = '''use vstd::prelude::*;

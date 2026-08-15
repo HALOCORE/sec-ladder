@@ -69,11 +69,25 @@ emits `mov eax, <answer>; ret`. Then you are timing `printf`.
    shipped the floor is cleared by the **fold alone**, so the stage does not
    certify that the copy — the thing the pattern is about — happened at all.
 
-   Fix before the next bulk-memory pattern: either derive ALPHA per pattern from
-   `model.py` (a declared *cheapest legitimate* Ir per work unit, which is a
-   claim about the algorithm rather than about this kernel), or denominate
-   `work_per_call` in a unit whose cheapest correct implementation exceeds ALPHA.
-   As written the rule forbids exactly the kernel shape it should be protecting.
+   **Fixed at TASK_006.** ALPHA 0.25 remains the default; a `model.py` may declare
+   `min_ir_per_work` with a `min_ir_per_work_why`. Going below the default requires
+   the justification (printed on every run via `rep.shout`) **and** two probe shapes
+   so the `d(Ir)/d(work)` assertion still runs. p02 declares **0.0625** — the fused
+   AVX-512 lower bound: load + store + `vpsadbw` + `vpaddq` per 64-byte lane.
+
+   Note this necessarily *loosens* the absolute floor, and that is correct rather
+   than a concession: any sound rate for a byte-denominated unit must sit at or
+   below glibc's measured 0.104, so **0.25 was not tight, it was wrong**. Tightness
+   now comes from the rate assertion — measured margin 35.9×. Residual risk:
+   `min_ir_per_work` is still a number an author writes. It is legitimate under the
+   "declared pins must be checkable from `spec.md`/`model.py` prose alone" rule and
+   constrained three ways, but nothing mechanically checks that 0.0625 is right.
+
+   **A floor can never certify that a component ran.** p02 clears any rate on its
+   *fold* alone, so the stage does not show the copy happened. No rate bound on
+   total kernel `Ir` can attribute cost to a part. What actually certifies the copy
+   is step 2 — the model checksum folds the copied bytes. Do not ask the floor to
+   do a job it structurally cannot.
 
 ## Result consumption: keep the full-extent fold (settled by measurement)
 
@@ -175,13 +189,24 @@ offset 16  u8[payload_len]    # pattern-defined payload
   an `__asm__ __volatile__` memory barrier added to the C driver loop, which is
   precisely the cross-language asymmetry the anti-partial-evaluation rules
   forbid.
-- **Ghost statements are exempt from the diff, in Rust only.** Exactly as
-  `invariant` and `decreases` are. `assert(...)` is a ghost statement in Verus
-  and erases; in C it is *live code* — `harness/build.py` never defines
-  `NDEBUG` — and stripping it there deleted a real branch from the measured loop
-  while the diff still passed (TASK_003_REVIEW). Ghost code erases, so an R5 driver that consumes its kernel's
-  `ensures` with an `assert` stays byte-identical to R4's — and R5's `ensures`
-  should be consumed, or it is decoration that only mutation testing defends.
+- **Ghost statements are exempt from the diff only inside the `verus!` span** —
+  not "in Rust". Exactly as `invariant` and `decreases` are. Ghost code erases, so
+  an R5 driver that consumes its kernel's `ensures` with an `assert` stays
+  byte-identical to R4's — and R5's `ensures` should be consumed, or it is
+  decoration that only mutation testing defends.
+
+  Gating this on the *language* was wrong twice. In C, `assert(...)` is live code
+  (`harness/build.py` never defines `NDEBUG`) and stripping it deleted a real
+  branch from the measured loop while the diff still passed (TASK_003_REVIEW). In
+  plain Rust it reopened the same M9 payload (TASK_004): `assert!(...)`,
+  `let ghost = black_box(...)` and `let ghost = unsafe { _mm_prefetch(...) }` each
+  normalised to the canonical sequence, kept the statement count, printed the
+  right checksum, and cost 2–10 Ir/call. **`assert!` is live code in release
+  Rust** — `-C debug-assertions=off` removes only `debug_assert!` — and
+  `let ghost` admits an arbitrary expression including an `unsafe` block.
+  `dloop.normalise()` now takes `in_verus`, defaults it `False` (fail-closed),
+  refuses `in_verus=True` for C, and requires the region to sit inside
+  `verus! { }` *and* inside a non-`external` item.
 - Kernel signature is fixed per pattern in the pattern's `spec.md`, and all five
   rungs implement exactly that contract.
 

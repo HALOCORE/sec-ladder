@@ -2,13 +2,24 @@
 //!
 //! The mechanical port a working Rust programmer writes first: read the prefix
 //! with `src[i]`, reject a record that does not fit, then copy it a byte at a
-//! time with indexed writes. Zero `unsafe`. Every one of those accesses is a
-//! checked index, so this rung pays a bounds check per byte unless LLVM hoists
-//! it -- which is exactly what the measurement is asking about.
+//! time with indexed writes. Zero `unsafe`.
 //!
 //! The three-term rejection test is the *same* test R1h, R3, R4 and R5 write.
 //! Safe Rust does not make it unnecessary; it makes omitting it a panic instead
 //! of an out-of-bounds write. That difference is the pattern.
+//!
+//! **Do not read this rung's number as a bounds-check tax.** TASK_004 did, and
+//! TASK_004_REVIEW refuted it by changing one loop at a time (NOTES.md §3a):
+//! the indexed *fold* below costs exactly zero against R4, and the whole delta
+//! comes from the indexed *copy* not being turned into a `memcpy`. The reason
+//! is the rejection test one line above it: `src.len() - (src_off + 2)` is
+//! subtraction-first (spec.md:44-48 mandates that -- the additive form can wrap
+//! `usize` and wave the attack through), and LLVM cannot then prove the loop
+//! index in bounds, so loop-idiom recognition never fires. Writing the check
+//! additively flips `bulk_calls []` -> `['memcpy@GLIBC_2.14']` and 118
+//! instructions -> 87. This rung is kept exactly as it is because it is a *fair*
+//! naive port -- a real programmer does write this -- but its cost is a codegen
+//! accident and it must be reported beside the variants in NOTES.md §3a.
 
 #[path = "../../common/driver.rs"]
 mod driver;

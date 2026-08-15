@@ -144,12 +144,23 @@ fn get_unchecked(v: &[u8], i: usize) -> (r: u8)
 // has three documented preconditions and the `requires` below carries two of
 // them; the third -- that the regions do not overlap -- is discharged by Rust's
 // own aliasing rules rather than by the verifier, because `&[u8]` and
-// `&mut [u8]` cannot name the same allocation. The `ensures` says exactly what
-// the intrinsic does: `n` bytes land at `dst[0..n]`, the destination keeps its
-// length, and **every byte from `n` up is the byte that was already there**.
-// That last clause is what makes the postcondition of `kernel` a memory-safety
-// statement instead of a functional one, and it is the clause a reviewer should
-// attack first: if it were wrong, everything above it would be worthless.
+// `&mut [u8]` cannot name the same allocation.
+//
+// **One `ensures`, deliberately.** It says exactly what the intrinsic does: `n`
+// bytes land at `dst[0..n)` and **every byte from `n` up is the byte that was
+// already there**. It is the clause a reviewer should attack first: if it were
+// wrong, everything above it would be worthless.
+//
+// It used to be two, the second being `final(dst)@.len() == old(dst)@.len()`
+// ("`copy_nonoverlapping` does not reallocate"). That clause is *entailed* by
+// this one -- a subrange of length `n` concatenated with a subrange of length
+// `old(dst).len() - n` has length `old(dst).len()` -- so it was an axiom the
+// TCB tally counted, a reviewer had to judge, and nothing depended on. The gate
+// derives that now (`check.py` step 5c: delete each `ensures` clause of each
+// `external_body` item and fail if the file still verifies) and it fired here:
+// deleting the length clause left `9 verified, 0 errors`. Prefer one strong
+// clause to several overlapping ones -- an overlapping pair can also hide a
+// later weakening of the strong half behind the weak half.
 #[inline(always)]
 #[verifier::external_body]
 fn copy_bytes(src: &[u8], from: usize, dst: &mut [u8], n: usize)
@@ -157,7 +168,6 @@ fn copy_bytes(src: &[u8], from: usize, dst: &mut [u8], n: usize)
         from + n <= src@.len(),
         n <= old(dst)@.len(),
     ensures
-        final(dst)@.len() == old(dst)@.len(),
         final(dst)@ =~= src@.subrange(from as int, from + n as int) + old(dst)@.subrange(
             n as int,
             old(dst)@.len() as int,
@@ -193,6 +203,15 @@ fn emit(acc: u64) {
 
 // ---------------------------------------------------------------- kernel ----
 // Same exec code as unsafe.rs. Contract: ../spec.md.
+//
+// Two `ensures`, not three. The third used to be
+// `final(dst)@.len() == old(dst)@.len()`, and `copy_dst` returns a sequence of
+// `dst0`'s length on both branches, so the security clause already says it.
+// `check.py` step 5c derives that -- deleting it left `9 verified, 0 errors`,
+// i.e. nothing in the file, the driver's consuming asserts included, depended
+// on it. A postcondition nothing depends on is decoration
+// (`.memory/04-verus.md`), and here it was decoration that made the published
+// contract look like three obligations when it is two.
 #[cfg_attr(slb_isolated, inline(never))]
 pub fn kernel(src: &[u8], src_off: usize, dst: &mut [u8]) -> (r: u64)
     requires
@@ -200,7 +219,6 @@ pub fn kernel(src: &[u8], src_off: usize, dst: &mut [u8]) -> (r: u64)
     ensures
         r == copy_sum(src@, src_off as int, final(dst)@.len() as int),
         final(dst)@ =~= copy_dst(old(dst)@, src@, src_off as int),
-        final(dst)@.len() == old(dst)@.len(),
 {
     // Ghost only: mentioning `spec_slice_len` fires vstd's `axiom_spec_len`,
     // which is what tells the SMT solver a slice length fits in a `usize` --

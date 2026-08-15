@@ -80,8 +80,8 @@ _BRANCH_RE = re.compile(r"^(j[a-z]+|call|callq|loop|loope|loopne|loopz|loopnz|xb
 
 # Bulk-memory routines: a call to one of these *is* the loop, it just lives in
 # libc (or in compiler-builtins for Rust). Matched against the symbol name
-# objdump prints in `<...>`, so `memcpy@plt`, `__memcpy_avx_unaligned_erms` and
-# `core::intrinsics::copy_nonoverlapping` all hit.
+# objdump prints in `<...>`, so `memcpy@plt`, `__memcpy_avx_unaligned_erms`,
+# `__memcpy_chk@plt` and `core::intrinsics::copy_nonoverlapping` all hit.
 _BULK_NAMES = ("memcpy", "memmove", "memset", "memcmp", "memchr", "bcopy",
                "bzero", "copy_nonoverlapping", "copy_from_slice",
                "clone_from_slice", "__aeabi_memcpy", "__aeabi_memmove",
@@ -90,6 +90,32 @@ _BULK_MEM_RE = re.compile(
     r"(?:^|[^A-Za-z0-9_])(?:mem(?:cpy|move|set|cmp|chr)|bcopy|bzero|"
     r"copy_nonoverlapping|copy_from_slice|clone_from_slice|"
     r"__(?:aeabi_)?mem(?:cpy|move|set))(?:[^A-Za-z0-9_]|$)")
+
+# The regex above requires a NON-word character on both sides, and `_` is a word
+# character, so it misses every symbol glibc actually links: the docstring
+# claimed `__memcpy_avx_unaligned_erms` matched and it did not (noticed at
+# TASK_004, confirmed at TASK_004_REVIEW). Four of those misses are **live** on
+# this box, not hypothetical:
+#
+#   Ubuntu 24.04 / gcc 13.3.0 default-enables `_FORTIFY_SOURCE 3`, so a
+#   `memcpy` into a destination whose size gcc can see becomes a call to
+#   `__memcpy_chk@plt` -- verified at TASK_006 by compiling a 5-line C file with
+#   the harness's own flags (`-std=c99 -O3`, no `-D_FORTIFY_SOURCE`) and reading
+#   the disassembly. A kernel whose only loop is that call has `has_loop=False`
+#   and no bulk symbol, and step 3a fails it with "no backward branch and no
+#   bulk-memory call". That is a false-fail of a perfectly healthy kernel, i.e.
+#   exactly what the bulk-memory escape hatch was added to prevent.
+#
+# So the routine name is also matched as an underscore-delimited *component* of
+# the symbol. `__memcpy_avx_unaligned_erms`, `__memcpy_chk`, `__memmove_chk`,
+# `__memset_chk`, `__memcpy_sse2_unaligned_erms` all hit; `__stack_chk_fail`,
+# `__printf_chk` and `kernel` do not. It over-matches a user function called
+# `my_memcpy_helper`, which is the correct direction to err: this check only
+# decides whether the *structural* half accepts an out-of-line loop, and step 3b
+# then measures whether the work actually happened.
+_BULK_WORDS = frozenset(("memcpy", "memmove", "memset", "memcmp", "memchr",
+                         "bcopy", "bzero"))
+_SYM_SPLIT_RE = re.compile(r"[^A-Za-z0-9]+")
 
 # Rust v0 mangling packs each identifier between a decimal *length* prefix and
 # the next component, with word characters on both sides:
@@ -107,8 +133,53 @@ _V0_BULK_RES = [re.compile(r"(?<![0-9])" + str(len(n)) + re.escape(n))
 
 
 def is_bulk_symbol(sym):
-    """Is this symbol name a known bulk-memory routine? Handles v0 mangling."""
-    return bool(_BULK_MEM_RE.search(sym)) or any(r.search(sym) for r in _V0_BULK_RES)
+    """Is this symbol name a known bulk-memory routine?
+
+    Three spellings, because three toolchains write it three ways: plain
+    (`memcpy@plt`), Rust v0-mangled (`...5sliceSh15copy_from_slice...`), and
+    glibc/fortify (`__memcpy_avx_unaligned_erms`, `__memcpy_chk@plt`)."""
+    if _BULK_MEM_RE.search(sym) or any(r.search(sym) for r in _V0_BULK_RES):
+        return True
+    return any(p in _BULK_WORDS for p in _SYM_SPLIT_RE.split(sym))
+
+
+_BULK_SYM_CASES = (
+    # (symbol, expected) -- every one of these is a symbol that has actually
+    # been seen in this repo's builds or in glibc on this box.
+    ("memcpy@plt", True),
+    ("memcpy@GLIBC_2.14", True),
+    ("memmove", True),
+    ("__memcpy_avx_unaligned_erms", True),     # glibc IFUNC resolution
+    ("__memcpy_sse2_unaligned_erms", True),
+    ("__memmove_avx_unaligned", True),
+    ("__memcpy_chk", True),                    # _FORTIFY_SOURCE 3, gcc default
+    ("__memcpy_chk@plt", True),                # ...as objdump prints the call
+    ("__memmove_chk", True),
+    ("__memset_chk", True),
+    ("__aeabi_memcpy", True),
+    ("core::intrinsics::copy_nonoverlapping", True),
+    ("_RNvMNtCs4NRVxsYgnAr_4core5sliceSh15copy_from_sliceCs86OlWC8CPt8_10safe_tuned",
+     True),
+    ("kernel", False),
+    ("main", False),
+    ("__stack_chk_fail", False),               # `chk` alone is not a bulk copy
+    ("__printf_chk", False),
+    ("_ZN4core3fmt5write17h0123456789abcdefE", False),
+    ("memoize", False),                        # substring, not a component
+    ("9copy_from", False),                     # v0 length prefix must be exact
+)
+
+
+def selftest_bulk_symbols(verbose=True):
+    bad = 0
+    for sym, want in _BULK_SYM_CASES:
+        got = is_bulk_symbol(sym)
+        ok = got == want
+        bad += 0 if ok else 1
+        if verbose:
+            print(f"  {'ok  ' if ok else 'FAIL'} is_bulk_symbol({sym[:52]:52s}) "
+                  f"= {got}" + ("" if ok else f"  (want {want})"))
+    return bad
 
 _INSN_RE = re.compile(r"^\s*([0-9a-f]+):\t([0-9a-f ]+?)\s*(?:\t(.*))?$")
 _SYMHDR_RE = re.compile(r"^([0-9a-f]+)\s+<(.+)>:$")
@@ -664,12 +735,12 @@ def selftest(root=None):
     Build the fixture with `harness/fixture.py` (it compiles `pilot/` into
     `.temp/build/docrepro/`); before TASK_003 nothing in the repo did, so on a
     fresh checkout this returned 77 and the gate downgraded it to a note."""
+    bad = selftest_bulk_symbols()
     root = root or os.path.join(os.path.dirname(os.path.dirname(
         os.path.abspath(__file__))), ".temp", "build", "docrepro")
     if not os.path.isdir(root):
         print(f"selftest: fixture dir missing: {root}", file=sys.stderr)
         return 77
-    bad = 0
     for name, needle, want_raw, want_nopad, want_md5, want_md5fn in _SELFTEST:
         p = os.path.join(root, name)
         if not os.path.exists(p):

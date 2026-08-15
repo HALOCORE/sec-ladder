@@ -12,31 +12,31 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "68ce072e68acf854ec7498d93729a984e1f2b85da3a0493949f1fb535bca9888",
+  "contract_sha256": "63ae17029d1f50f52f9342be934399a99d317cac4af662fdf849f321b0296c30",
   "source_sha256": {
     "common/driver.c": "146366ecece22e987db2c4d1cd992cbbf03c06dce131a8db4da5d35c70337993",
     "common/driver.h": "50663623c44af447cd57a9a70f59fed70bfc844a890e5e7a8eb8a4d0f16d4151",
     "common/driver.rs": "ecafc9337834afbf85a1787528a220e51291e2705d9c9337b24a3a662a543029",
-    "harness/asm.py": "89596ab1873aec7480a32ca1d52dd549eef29124ca425d98a035878753a017a6",
+    "harness/asm.py": "e3b14d4e90f15e7ff28d862442c721120943bb70c9514437b77facc407b6675f",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "25c85a2cd9f4279e64ea333ff9f375ae01b5d6db742c9177fe83fd3cf8947c2d",
-    "harness/dloop.py": "3322e1e3a34abb33a87360ba2b0be0e4d0e470d543330547846553e96acd6e94",
+    "harness/check.py": "79f36a4f69cdf1b7b46c0a7038babec223e6ff4f2bd25d46f83c527c84302cc7",
+    "harness/dloop.py": "5be7e52c0fbbc07ddbdb3043b6fc08b4b895d41c071ccb74f5dcf0655c13d0fd",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "eadc0ed8afb59bedda89a92ee035c42676ab4020d0fb4612cd4d7c9e0f40807b",
     "harness/report.py": "78bc72b51e5734c02f69416893928b7279975f829fd98fc9c965ed217863728b",
-    "harness/vparse.py": "1e955e13aea819bd4845ee509d0e6a64420b2f686a62475b3f1c65970f64b7e8",
-    "patterns/p02-buffer-copy/NOTES.md": "ace2e09cdd13f3a8d0cd1ca5729d0661f55bfc7e088429f704e4a7e075d6204b",
-    "patterns/p02-buffer-copy/README.md": "c105451307c0583cd6aef8e9724a10beb4ae3b04c9ad8cc12642dad4f4d2458e",
+    "harness/vparse.py": "c95b283684871eef444d91178465851fa8274d1362b12d7434c00aea2e643cc5",
+    "patterns/p02-buffer-copy/NOTES.md": "69bf0d92e7092ab9f5415ed70c5811e77b4844a1313a6b8c58bb28ac5ca14259",
+    "patterns/p02-buffer-copy/README.md": "d37bc9a12ff7e00c11dde44f11babadd305fdeace5b68dc683b878f7cca78203",
     "patterns/p02-buffer-copy/c/kernel.c": "60a0e02c9394e0fba94d229b011d1b237cee71c7adc99e1ed326bca4700ee090",
     "patterns/p02-buffer-copy/c/kernel.h": "df4d7ff77c75b24e648005c3e160634f6c4cfd28750b3642969822c351b8f8f1",
     "patterns/p02-buffer-copy/c/kernel_hardened.c": "6bdb40962acc154134de0d551827cfdaeeb0db11e47b75ebae9c3a1af12d38da",
     "patterns/p02-buffer-copy/c/main.c": "457769c4cb05725ca9aa8ce5acaf6e0cf8a1b0ef494ab08b86d914a37a42bd47",
-    "patterns/p02-buffer-copy/model.py": "f7bebf42d3058da4161155e4b441a7e93d6671720d532d3d8a398d2271291cda",
-    "patterns/p02-buffer-copy/safe_naive.rs": "282b05aa588aa8507c04a8a3badeb89a86af6a7c675c8f7418d4b0c3fbc3ca5a",
+    "patterns/p02-buffer-copy/model.py": "45dba85095cdc6108813bcc528caceb43cb5584f16956dda5577754bd4c809d9",
+    "patterns/p02-buffer-copy/safe_naive.rs": "82d6331dc4d2b028b4ceb11dd82d9c62ea49593fb00f491b9b5a4d3e4321a360",
     "patterns/p02-buffer-copy/safe_tuned.rs": "23f1b0b7a7d45856ad430fe176062b4342044195f9393d2cd623b52c25850b4b",
-    "patterns/p02-buffer-copy/spec.md": "d30ed14493ee32877eafcc3000df6eb2ed1cb780b0888ddf7f7a0a730a879be2",
+    "patterns/p02-buffer-copy/spec.md": "48683d4680d8b545adc1488dd5ccb3586a7c1603bffaab1c8b668720027db7bc",
     "patterns/p02-buffer-copy/unsafe.rs": "d295410141f7ae1879305a0b57763f76e2f232a58688fd9efda59481b999c55c",
-    "patterns/p02-buffer-copy/verus.rs": "f4642ea221f373a216ea56e164977229b57929b4302333190909c0f87b92a97e"
+    "patterns/p02-buffer-copy/verus.rs": "e0d16418860a763eb2de3ed12bcfe2a11a9a181a7946c164b1f2e14fb3d489b7"
   },
   "derived_contract": {
     "requires": [
@@ -44,10 +44,10 @@
     ],
     "ensures": [
       "result == copy_sum(src, src_off, dst_after_len)",
-      "dst_after == copy_dst(dst_before, src, src_off)",
-      "dst_after_len == dst_len"
+      "dst_after == copy_dst(dst_before, src, src_off)"
     ],
-    "alpha_ir_per_work": 0.25
+    "alpha_ir_per_work": 0.25,
+    "collapse_rate_ir_per_work": 0.0625
   },
   "identity": [
     {
@@ -219,19 +219,19 @@
           "name": "copy_bytes",
           "attr": "verifier::external_body",
           "body_lines": 3,
-          "line": 153
+          "line": 164
         },
         {
           "name": "load_input",
           "attr": "verifier::external_body",
           "body_lines": 5,
-          "line": 177
+          "line": 187
         },
         {
           "name": "emit",
           "attr": "verifier::external_body",
           "body_lines": 1,
-          "line": 189
+          "line": 199
         }
       ]
     }
@@ -239,6 +239,48 @@
   "verified_call_site": {
     "main": 5,
     "kernel": 2
+  },
+  "clause_deletion": {
+    "verus.rs": {
+      "control_verified": 9,
+      "mutants": [
+        {
+          "item": "main",
+          "kind": "assert(false) probe",
+          "clause": null,
+          "verified": 8,
+          "errors": 1
+        },
+        {
+          "item": "get_unchecked",
+          "kind": "trusted",
+          "clause": "r == v@[i as int]",
+          "verified": 7,
+          "errors": 2
+        },
+        {
+          "item": "copy_bytes",
+          "kind": "trusted",
+          "clause": "final(dst)@ =~= src@.subrange(from as int, from + n as int) + old(dst)@.subrange( n as int, old(dst)@.len() as int, )",
+          "verified": 8,
+          "errors": 1
+        },
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "r == copy_sum(src@, src_off as int, final(dst)@.len() as int)",
+          "verified": 8,
+          "errors": 1
+        },
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "final(dst)@ =~= copy_dst(old(dst)@, src@, src_off as int)",
+          "verified": 8,
+          "errors": 1
+        }
+      ]
+    }
   },
   "proof_domain": {
     "adversarial-cap.bin": {
@@ -772,7 +814,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2191067==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x506000000060 at pc 0x55ff90f57f13 bp 0x7ffe1f9bbbe0 sp 0x7ffe1f9bb388 WRITE of size 65 at 0x506000000060 thread T0 #0 0x55ff90f57f12 in memcpy (/home/apt/repos_comm"
+      "diagnostic": "================================================================= ==2236441==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x506000000060 at pc 0x5648e203df13 bp 0x7ffe2dcb9910 sp 0x7ffe2dcb90b8 WRITE of size 65 at 0x506000000060 thread T0 #0 0x5648e203df12 in memcpy (/home/apt/repos_comm"
     },
     "adversarial-capbig.bin": {
       "exit": 7,
@@ -793,7 +835,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2191072==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000038 at pc 0x55921bf43036 bp 0x7ffc6384c000 sp 0x7ffc6384b7a8 READ of size 61 at 0x504000000038 thread T0 #0 0x55921bf43035 in memcpy (/home/apt/repos_commo"
+      "diagnostic": "================================================================= ==2236446==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000038 at pc 0x55da72d65036 bp 0x7ffe63ef4fb0 sp 0x7ffe63ef4758 READ of size 61 at 0x504000000038 thread T0 #0 0x55da72d65035 in memcpy (/home/apt/repos_commo"
     },
     "adversarial-stride1.bin": {
       "exit": 0,
@@ -807,7 +849,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2191075==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x527000006a38 at pc 0x5581ad8fa036 bp 0x7ffc3f2b5350 sp 0x7ffc3f2b4af8 READ of size 65535 at 0x527000006a38 thread T0 #0 0x5581ad8fa035 in memcpy (/home/apt/repos_co"
+      "diagnostic": "================================================================= ==2236449==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x527000006a38 at pc 0x55cc57a57036 bp 0x7ffe340c8760 sp 0x7ffe340c7f08 READ of size 65535 at 0x527000006a38 thread T0 #0 0x55cc57a57035 in memcpy (/home/apt/repos_co"
     },
     "large.bin": {
       "exit": 0,
@@ -922,7 +964,12 @@
     "adversarial-cap1.bin/c-gcc: opt/mode variants of this rung disagree (2 distinct behaviours)",
     "adversarial.bin/c-gcc: opt/mode variants of this rung disagree (2 distinct behaviours)"
   ],
-  "loud": [],
+  "loud": [
+    {
+      "section": "collapse-ir",
+      "message": "the anti-collapse floor for this pattern is 0.0625 Ir per unit of work, BELOW the harness default 0.25. model.py's argument: work is BYTES COPIED. Cheapest correct implementation of copy-then-fold-every-byte on this box: a fused AVX-512 loop needs at least a 64-byte load, a 64-byte store, a vpsadbw and a vpaddq per lane = 4 instructions / 64 bytes = 0.0625 Ir per byte. glibc memcpy alone measures 0.104 Ir/byte here, so the harness default of 0.25 would forbid a bulk-copy kernel outright."
+    }
+  ],
   "blocked": [],
   "verdict": "PASS",
   "complete_run": true,
