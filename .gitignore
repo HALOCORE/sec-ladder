@@ -1,0 +1,6 @@
+*.run/
+*.run.md
+.temp/
+
+*.zip
+*.tar.gz
