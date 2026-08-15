@@ -32,6 +32,17 @@
 #define SLB_EXIT_HEADER 4    /* file shorter than the 16-byte header */
 #define SLB_EXIT_TRUNCATED 5 /* payload_len declares more bytes than are present */
 #define SLB_EXIT_NOMEM 6     /* allocation failed */
+#define SLB_EXIT_CAP 7       /* declared destination capacity out of range */
+
+/* Upper bound on a payload-declared destination buffer size (64 MiB).
+ *
+ * A pattern whose payload names its own output-buffer capacity (p02) hands an
+ * attacker-controlled allocation size to the driver. Both languages must reject
+ * the same values in the same way, or an adversarial input reads as a rung
+ * difference when it is really "C's calloc returned NULL where Rust's allocator
+ * aborted". The limit is checked *before* allocating, in both drivers, and the
+ * check lives outside every measured loop. */
+#define SLB_MAX_CAP ((uint64_t)1 << 26)
 
 typedef struct {
     uint64_t n_iters;
@@ -53,6 +64,26 @@ void slb_load(const char *path, slb_input *out);
  * naturally-aligned u64 array the Rust rungs get from `Vec<u64>`, so no rung
  * enjoys an alignment or aliasing advantage the others lack. */
 uint64_t *slb_head_u64_body(const slb_input *in, uint64_t *head, size_t *n_body);
+
+/* Decode the payload as *two* little-endian u64 head words followed by a raw
+ * byte body: `*h0` and `*h1` get words 0 and 1, the return value is a freshly
+ * allocated copy of the remaining `*n_body` bytes. A payload shorter than 16
+ * bytes yields h0 = h1 = 0, n_body 0, NULL. Mirrors driver::head2_u64_bytes
+ * (Rust) and slb.head2_u64_bytes (Python).
+ *
+ * The copy is deliberate, for the same reason slb_head_u64_body copies: it
+ * gives the C rungs the same freshly-allocated body the Rust rungs get from a
+ * `Vec<u8>`, so no rung enjoys an alignment or locality advantage the others
+ * lack. */
+unsigned char *slb_head2_u64_bytes(const slb_input *in, uint64_t *h0, uint64_t *h1,
+                                   size_t *n_body);
+
+/* A zeroed destination buffer of `cap` bytes, or exit(SLB_EXIT_CAP) when `cap`
+ * is 0 or above SLB_MAX_CAP. Zeroed, not indeterminate: a kernel that reads the
+ * buffer must produce a value that depends on the *input file* and on nothing
+ * else, or the checksum stops being reproducible across rungs. Mirrors
+ * driver::zeroed (Rust). */
+unsigned char *slb_zeroed(uint64_t cap);
 
 /* Print the checksum as a decimal u64 and a newline. Nothing else on stdout. */
 void slb_emit(uint64_t acc);

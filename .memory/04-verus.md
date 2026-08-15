@@ -186,6 +186,62 @@ erases**, so R5's kernel stays byte-identical to R4's (re-checked at TASK_003:
 this was really an objection to the gate's own textual driver diff, and that now
 exempts ghost statements. Do this in every pattern.
 
+### An *inconsistent* `ensures` on a trusted item is a second vacuity mode
+
+Found at TASK_004 by a mutant that was expected to fail and did not. p02's
+`copy_bytes` wrapper carries two `ensures` clauses:
+
+```rust
+final(dst)@.len() == old(dst)@.len(),
+final(dst)@ =~= src@.subrange(from as int, from + n as int)
+               + old(dst)@.subrange(n as int, old(dst)@.len() as int),
+```
+
+Delete the `+ old(dst)@.subrange(...)` — i.e. stop saying the tail is
+unchanged — and the remaining clause additionally asserts `dst.len() == n`,
+which **contradicts** the clause above it whenever `n < dst.len()`. A trusted
+item with a contradictory postcondition makes every caller verify vacuously:
+`9 verified, 0 errors`, no diagnostic, and a memory-safety claim that means
+nothing.
+
+This is *not* the same as the known "weakened `requires`" mode and the
+structural rule from TASK_005 does not catch it — the `requires` is still there
+and still non-empty. The only mechanical defence is the declared `ensures` pin
+in `spec.md`, which TASK_003_REVIEW showed moves with the code it constrains. So
+for any `external_body` item with more than one `ensures` clause:
+
+- **write the clauses so they cannot be individually deleted into consistency**,
+  and prefer one strong clause to several overlapping ones;
+- state, in a comment beside the item, why each clause is true of the real
+  operation — that comment is the only thing between the proof and a false axiom;
+- when mutation-testing, include a mutant that makes a trusted postcondition
+  *inconsistent*, not only weaker. A mutant that verifies is a finding.
+
+### Consuming a postcondition about `&mut` state
+
+`.memory/04-verus.md` already says the `ensures` must be consumed or it is
+decoration. For a `&mut` postcondition the consuming assert needs the *pre*
+state, and the only way to hold it is a ghost binding:
+
+```rust
+let ghost d0: Seq<u8> = dst@;
+let r: u64 = kernel(src, k * stride, dst);
+assert(dst@ =~= copy_dst(d0, src@, (k * stride) as int));   // consumes it
+```
+
+Both lines erase, so R4/R5 byte identity survives (measured on p02: `md5_fn`
+`0e5b5936…` both, `-O3 isolated`). `harness/dloop.py` had to learn that
+`let ghost` / `let tracked` are ghost statements before this was possible —
+before that the snapshot showed up in the driver diff as a real statement, so
+the only way to keep the driver pin was not to consume the postcondition.
+Without the assert, replacing p02's security clause with a tautology verified
+cleanly.
+
+**Also: this Verus rejects a bare `dst@` in a postcondition** —
+*"to dereference a mutable reference parameter in a postcondition, disambiguate
+by wrapping it in either `old` or `final`"*. The spelling that works is
+`final(dst)@`, no `*`.
+
 ### Vacuity is the failure mode that silently ruins everything
 
 A proof of a false or unreachable statement verifies happily. Guard against:
@@ -234,6 +290,23 @@ The reviewer agent checks all of the above by grep + reading. See `.tasks/PROTOC
 - **Slices (`&[T]`) are well specified** — `View`, `spec_index`, `len`,
   `slice_subrange`, `slice_index_get`, and exec `v[i]` all work. Prefer `&[u64]`
   over the pilot's `&Vec<u64>`: it is idiomatic Rust and costs nothing.
+- **`&mut [T]` works too** (established at TASK_004 on p02): `old(dst)@` /
+  `final(dst)@`, `Vec::as_mut_slice` is `assume_specification`'d with a
+  prophecy, and `dst[i] = v` has an `IndexSetTrustedSpec`. There is **no** vstd
+  spec for `copy_from_slice`, so a rung that wants the bulk copy verified needs
+  its own trusted wrapper around `ptr::copy_nonoverlapping` — which is the right
+  answer anyway, because that wrapper *is* the pattern's trusted base and its
+  contract is what a reviewer should attack.
+- **Dividing a length by a stride needs lemmas.** `n / s >= 1` from `s <= n`
+  needs `vstd::arithmetic::div_mod::lemma_div_non_zero`; `(n / s) * s <= n`
+  needs `lemma_fundamental_div_mod`; `k * s <= (nrec - 1) * s` from `k < nrec`
+  needs `lemma_mul_inequality` (broadcast) and one `by (nonlinear_arith)` to
+  join them. Three ghost lines, all erasing.
+- **Decode a little-endian prefix with `+`, not `|`.** `b0 + 256*b1` and
+  `b0 | (b1 << 8)` are the same function on bytes and compile to the same
+  instruction, but only the first is linear arithmetic; the second drags in
+  `by (bit_vector)`. Choosing the spelling that is cheaper to prove is fine.
+  Choosing a weaker *specification* is not.
 - **Panic-freedom ≠ correctness.** Clamping an index silences the bounds panic and
   leaves the logical bug. The security property needs a *functional* `ensures`.
 

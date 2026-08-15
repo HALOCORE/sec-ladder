@@ -289,6 +289,38 @@ the same n, almost entirely Rust std startup plus `str::parse::<u64>` vs
 `strtoul`. That is a driver artefact, not a kernel property — another reason the
 summary line must never appear in a results table.
 
+### …but kernel-exclusive `Ir` silently drops work that leaves the symbol
+
+Found at TASK_004 on p02, whose kernel is a `memcpy` plus a fold. `memcpy` is in
+libc, so callgrind attributes it to libc — and the `kernel` symbol's *exclusive*
+count, which is what `harness/measure.py` reports, does not contain it. On
+`large` (4092 bytes per call, `-O3 isolated`):
+
+| | c-gcc | c-clang | unsafe |
+|---|---:|---:|---:|
+| marginal Ir per call (whole program, difference of two runs) | 9195.7 | 10192.7 | 10200.8 |
+| `kernel` symbol, exclusive | 8765 | 9764 | 9772 |
+| missing: driver loop + the `memcpy` | ~431 | ~429 | ~429 |
+
+~4% here, and it would be ~100% for a kernel that is *only* a `memcpy`. The same
+applies to a Rust rung whose work is in `core::iter` symbols at `-O0`.
+
+**So: kernel-exclusive `Ir` is the right level for a self-contained kernel, and
+the wrong one for a kernel that calls out.** The gate's `marginal_ir_per_call`
+(whole-program `Ir` at 2N calls minus at N, over N) has neither problem — it is a
+difference of two runs of the same binary in the same shell, so every loader and
+environment term cancels, and it is symbol-independent so nothing can leave it.
+Quote the marginal column for any pattern whose kernel contains a bulk-memory
+call, and say which column you are quoting either way.
+
+And from the same pattern, the standing caveat about `Ir` as a proxy for time,
+now with a counterexample: **gcc executed 10% fewer instructions than clang on
+identical source and took 23% longer** (8765 vs 9764 Ir/call; 30.8 vs 25.0 ms
+wall, min of 15, pinned). `Ir` and wall clock disagreed in *direction*. This box
+cannot measure IPC to explain it (no `perf`, `perf_event_paranoid=3`, no root),
+so it stands as an observation — and as the reason a wall-clock column must
+accompany any cross-compiler claim.
+
 ## Timing protocol
 
 1. Pin to a single core with `taskset -c N`. Use the same core for a whole

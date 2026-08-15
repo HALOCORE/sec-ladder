@@ -60,6 +60,27 @@ CG_PLAN = [("O0", "isolated", "small.bin"),
 SKIP_INPUT_PREFIX = "sweep-"
 
 
+def load_model(pdir):
+    """The pattern's own `model.py`, or None. Used only to describe the inputs.
+
+    `harness/check.py` imports the same file under an audit-hook sandbox
+    because there it is a *correctness oracle*; here it only produces a log
+    line, so a plain import is enough -- but nothing in this file may come to
+    depend on it."""
+    path = os.path.join(pdir, "model.py")
+    if not os.path.exists(path):
+        return None
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        f"slb_measure_model_{buildmod.pattern_id(pdir)}", path)
+    mod = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(mod)
+    except Exception:                                      # noqa: BLE001
+        return None
+    return mod if hasattr(mod, "build") else None
+
+
 # --------------------------------------------------------------------------
 
 def sh(cmd, timeout=600):
@@ -186,7 +207,10 @@ def main():
     pdir = buildmod.pattern_dir(a.pattern)
     pid = buildmod.pattern_id(pdir)
     slug = os.path.basename(pdir)
-    cells = buildmod.ALL_CELLS if a.cells == "all" else buildmod.MEASURED_CELLS
+    # Per-pattern: the R1h cells exist only where c/kernel_hardened.c does and
+    # the R2v control only where safe_naive_verus.rs does.
+    cells = (buildmod.all_cells(pdir) if a.cells == "all"
+             else buildmod.measured_cells(pdir))
     indir = os.path.join(pdir, "inputs")
     scratch = os.path.join(REPO, ".temp", "cg", pid)
 
@@ -208,14 +232,26 @@ def main():
         "cells": [],
     }
 
+    # The per-input row used to decode the payload with `slb.head_u64_body`,
+    # i.e. it assumed p01's "one head word then u64s" layout and reported
+    # `win_len`/`v_len` for every pattern. p02's payload is two head words and a
+    # byte blob, so those two columns were nonsense there. What is actually
+    # generic is the file *format* (n_iters / payload_len / present / truncated)
+    # plus whatever the pattern's own `model.py` says about itself.
+    modmod = load_model(pdir)
     for f in sorted(os.listdir(indir)):
         if not f.endswith(".bin") or f.startswith(SKIP_INPUT_PREFIX):
             continue
-        sf = slb.read(os.path.join(indir, f))
-        head, body = slb.head_u64_body(sf.payload[: sf.declared_len])
-        doc["inputs"][f] = {"n_iters": sf.n_iters, "declared_len": sf.declared_len,
-                            "present": len(sf.payload), "truncated": sf.truncated,
-                            "win_len": head, "v_len": len(body)}
+        path = os.path.join(indir, f)
+        sf = slb.read(path)
+        rec = {"n_iters": sf.n_iters, "declared_len": sf.declared_len,
+               "present": len(sf.payload), "truncated": sf.truncated}
+        if modmod is not None:
+            try:
+                rec["model"] = modmod.build(path).describe()
+            except Exception as e:                        # noqa: BLE001
+                rec["model"] = f"<model.py failed: {e}>"
+        doc["inputs"][f] = rec
 
     rows = []
     for c in cells:

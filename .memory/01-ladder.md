@@ -12,6 +12,33 @@ enforces memory safety.
 | **R4 unsafe** | `unsafe.rs` | `get_unchecked`, raw pointers, `from_raw_parts` — whatever it takes to reach C's codegen. Unsound-by-inspection is not allowed: it must be *correct*, just unverified. |
 | **R5 verus** | `verus.rs` | R4's exec code, plus Verus specs and proofs discharging every unsafe precondition. Ships the same machine code as R4. |
 
+### R1h — the hardened C cell (optional, added at TASK_004)
+
+| Rung | Dir/file stem | Definition |
+|---|---|---|
+| **R1h C-hardened** | `c/kernel_hardened.c` | R1's kernel plus the bounds check a careful C programmer writes. Same signature, same calling convention, same driver — the *only* difference is the check. |
+
+**Ship it for every pattern that models a bug.** With only R1, "C is faster" and
+"C is unsafe" are the same sentence, because C is faster precisely in that it
+skipped the check. R1h separates them:
+
+- R1 vs R1h = what the check costs, **inside one language**
+- R1h vs R4 = what Rust's unsafe rung costs against *safe* C
+- R1h vs R2/R3 = what Rust's additional machinery costs beyond the bare check
+
+`harness/build.py` creates the `c-gcc-h` / `c-clang-h` cells for any pattern that
+ships `c/kernel_hardened.c` and for no other — presence of the file is the
+switch, there is nothing to declare. A pattern with R1h builds 32 cells, not 24.
+Use `buildmod.measured_cells(pdir)` / `all_cells(pdir)`, never the module-level
+`MEASURED_CELLS` / `ALL_CELLS`, which exist only for argparse.
+
+Measured on p02 (`-O3`, marginal Ir per call, both `small` and `large`): the
+check costs **+5 instructions with gcc and +12 with clang, per call, independent
+of the size of the copy** — 2.2% and 5.4% of the call on the L1-resident input,
+0.05% and 0.12% on the memory-bound one. So the headline p02 supports is *safety
+costs about the same in both languages, and Rust makes it non-optional*, which
+is a much stronger claim than any p01 could produce.
+
 ## The structural findings (established by `pilot/`, do not re-litigate)
 
 1. **A Verus proof costs zero instructions.** Ghost code, `requires`, `ensures`,
@@ -104,6 +131,31 @@ enforces memory safety.
    Do **not** generalise any of this to patterns with data-dependent indices — the
    interesting patterns are precisely the ones where LLVM cannot hoist, and that is
    where the ladder earns its keep.
+
+   **p02 is the first pattern where that reservation paid out, and it changed the
+   *shape* of R2's tax, not its size.** On a length-prefixed copy (`-O3
+   isolated`, marginal Ir per call):
+
+   | rung | 61 B copied | 4092 B copied | vs R4 |
+   |---|---:|---:|---|
+   | R2 safe-naive | 407.0 | 11226.0 | **+178 / +1025 — O(n), ≈ +0.25 per byte** |
+   | R3 safe-tuned | 239.0 | 10210.8 | **+10 / +10 — O(1)** |
+   | R5 verus | 227.0 | 10198.8 | −2 / −2 |
+
+   R2's indexed copy loop (`dst[i] = src[off+2+i]`) keeps a live bounds check per
+   element and, at `-O3 isolated`, is not turned into a `memcpy` at all (the bulk
+   call appears only in `whole` mode). p01 measured the same rung at +11…+29 *per
+   call*. So the residue-mod-4 trap is not the only way to misquote R2: on a
+   pattern where LLVM cannot hoist, R2's overhead is not a per-call constant at
+   all, and quoting p01's +29 as "what safe Rust costs" would understate p02 by
+   35x. **R3 remains the honest number** — +10 per call, flat — which is the
+   third pattern in a row where that is the finding.
+
+   Also from p02, against p01's gcc-vs-clang result: **gcc executed ~10% fewer
+   instructions than clang here and took 23% longer** (8765 vs 9764 Ir per call;
+   30.8 vs 25.0 ms). Neither compiler is reliably ahead, and instruction count
+   and wall clock disagreed in *direction* on the same source. Report both
+   columns; do not let `Ir` stand in for time without saying so.
 
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how

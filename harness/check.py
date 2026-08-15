@@ -1193,6 +1193,20 @@ def check_driver_identity(pdir, rep, contract):
     for lang, table in sorted(aliases.items()):
         for p in dloop.validate_aliases(table, f"spec.md driver.aliases.{lang}"):
             rep.fail("driver", p)
+    # `driver.call_args` -- which argument positions of a named call are the
+    # canonical ones, per language. Needed as soon as a pattern's C kernel takes
+    # the slice lengths Rust carries inside `&[T]` (p02:
+    # `kernel(src, src_len, src_off, dst, dst_cap)` vs `kernel(src, src_off,
+    # dst)`), which no alias can express. Printed in the log every run, because
+    # it is a pin a reviewer has to read against the C source.
+    call_args = cfg.get("call_args") or {}
+    for lang, table in sorted(call_args.items()):
+        for p in dloop.validate_call_args(table, f"spec.md driver.call_args.{lang}"):
+            rep.fail("driver", p)
+        for fn, keep in sorted(table.items()):
+            print(f"    call_args[{lang}] {fn}(): canonical arguments are at "
+                  f"positions {keep}; every other argument of that call must be "
+                  f"a bare name and is dropped before the diff")
     # The *set* of files that must carry a region is pinned. Without it,
     # deleting the two marker comments makes a rung vanish from the diff
     # silently -- the old code only required that >= 2 regions were found
@@ -1217,7 +1231,8 @@ def check_driver_identity(pdir, rep, contract):
                                    f"in the tree")
             continue
         try:
-            r = dloop.normalise_file(path, lang, aliases.get(lang))
+            r = dloop.normalise_file(path, lang, aliases.get(lang),
+                                     call_args.get(lang))
         except dloop.RegionError as e:
             rep.fail("driver", str(e))
             seen_files.append(f)
@@ -1476,7 +1491,13 @@ def main():
     a = ap.parse_args()
 
     pdir = buildmod.pattern_dir(a.pattern)
-    cells = (buildmod.ALL_CELLS if a.cells == "all" else buildmod.MEASURED_CELLS)
+    # Per-pattern, not module-level: the R1h cells exist only for a pattern
+    # that ships `c/kernel_hardened.c` and the R2v control only for one that
+    # ships `safe_naive_verus.rs` (`.memory/05-layout.md` calls it OPTIONAL,
+    # but the module-level ALL_CELLS treated it as mandatory and failed four
+    # builds on any pattern without one).
+    cells = (buildmod.all_cells(pdir) if a.cells == "all"
+             else buildmod.measured_cells(pdir))
     opts, modes = buildmod.OPTS, buildmod.MODES
 
     # `--skip` used to re-open blocker B3 from the command line: skipping the

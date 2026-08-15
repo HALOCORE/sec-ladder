@@ -8,6 +8,16 @@ modes = 24 builds.
   opt     O0     O3
   mode    isolated  whole
 
+Plus, **only for a pattern that ships `c/kernel_hardened.c`**, the R1h cells
+`c-gcc-h` and `c-clang-h`: the same driver and the same signature linked against
+the C kernel that *does* carry the bounds check (32 builds for such a pattern).
+Without R1h, "C is faster" and "C is unsafe" are confounded, because C is faster
+precisely in that it skipped the check; R1-vs-R1h separates them inside one
+language (`.memory/02-bench-rules.md`, "The precondition must be structural").
+A pattern that models no bug ships no hardened kernel and gets the plain 24 --
+the cell list is per-pattern, so use `measured_cells(pdir)` / `all_cells(pdir)`
+rather than the module-level lists, which exist only for argparse.
+
 Plus three opt-in axes that are *not* in the default 24 and must be reported
 separately if used:
 
@@ -45,8 +55,15 @@ RUSTC = os.environ.get("SLB_RUSTC", os.path.expanduser("~/.cargo/bin/rustc"))
 VERUS_RUN = os.path.join(REPO, "verus_run.py")
 
 MEASURED_CELLS = ["c-gcc", "c-clang", "safe_naive", "safe_tuned", "unsafe", "verus"]
+# R1h. Present only for a pattern that ships `c/kernel_hardened.c`; see the
+# module docstring. `-h` cells link `main.c` against the hardened kernel TU
+# instead of `kernel.c` and are otherwise byte-for-byte the same build.
+HARDENED_CELLS = ["c-gcc-h", "c-clang-h"]
+HARDENED_KERNEL = os.path.join("c", "kernel_hardened.c")
 CONTROL_CELLS = ["safe_naive_verus"]
-ALL_CELLS = MEASURED_CELLS + CONTROL_CELLS
+# For argparse only -- every cell name that exists anywhere. What a *pattern*
+# builds is measured_cells(pdir) / all_cells(pdir).
+ALL_CELLS = MEASURED_CELLS + HARDENED_CELLS + CONTROL_CELLS
 OPTS = ["O0", "O3"]
 ALL_OPTS = ["O0", "O0d", "O3"]
 MODES = ["isolated", "whole"]
@@ -74,6 +91,28 @@ def pattern_dir(pat):
 
 def pattern_id(pdir):
     return os.path.basename(pdir).split("-")[0]
+
+
+def has_hardened(pdir):
+    """Does this pattern ship an R1h kernel? Presence of the file is the whole
+    switch -- there is nothing to declare and nothing to forget to declare."""
+    return os.path.exists(os.path.join(pdir, HARDENED_KERNEL))
+
+
+def measured_cells(pdir):
+    return MEASURED_CELLS + (HARDENED_CELLS if has_hardened(pdir) else [])
+
+
+def all_cells(pdir):
+    """Measured cells plus whichever control cells this pattern actually ships.
+
+    `.memory/05-layout.md` calls `safe_naive_verus.rs` OPTIONAL, but
+    `ALL_CELLS` was unconditional, so `check.py --cells all` on a pattern
+    without one failed four builds and the gate with it. Presence of the source
+    is the switch, exactly as for the hardened C kernel -- there is nothing to
+    declare and nothing to forget to declare."""
+    return measured_cells(pdir) + [c for c in CONTROL_CELLS
+                                   if os.path.exists(os.path.join(pdir, RUST_SRC[c]))]
 
 
 def out_path(pdir, cell, opt, mode, panic):
@@ -120,9 +159,9 @@ def rust_flags(opt, mode, panic):
     return f
 
 
-def build_c(pdir, cc, opt, mode, panic, out, dry):
+def build_c(pdir, cc, opt, mode, panic, out, dry, kernel_src="kernel.c"):
     srcs = [os.path.join(COMMON, "driver.c"),
-            os.path.join(pdir, "c", "kernel.c"),
+            os.path.join(pdir, "c", kernel_src),
             os.path.join(pdir, "c", "main.c")]
     cmd = [cc] + c_flags(opt, mode, panic) + \
         ["-I", COMMON, "-I", os.path.join(pdir, "c")] + srcs + ["-o", out]
@@ -160,10 +199,13 @@ def run(cmd, dry):
 def build_cell(pdir, cell, opt, mode, panic="unwind", dry=False, quiet=False):
     """Build one cell. Returns (ok, out_path, log)."""
     out = out_path(pdir, cell, opt, mode, panic)
-    if cell == "c-gcc":
-        rc, log, el = build_c(pdir, GCC, opt, mode, panic, out, dry)
-    elif cell == "c-clang":
-        rc, log, el = build_c(pdir, CLANG, opt, mode, panic, out, dry)
+    if cell in ("c-gcc", "c-clang", "c-gcc-h", "c-clang-h"):
+        cc = GCC if cell.startswith("c-gcc") else CLANG
+        ksrc = "kernel_hardened.c" if cell.endswith("-h") else "kernel.c"
+        if ksrc == "kernel_hardened.c" and not has_hardened(pdir):
+            raise SystemExit(f"build.py: cell {cell!r} needs "
+                             f"{HARDENED_KERNEL} and this pattern has none")
+        rc, log, el = build_c(pdir, cc, opt, mode, panic, out, dry, ksrc)
     elif cell in ("verus", "safe_naive_verus"):
         rc, log, el = build_verus(pdir, cell, opt, mode, panic, out, dry)
     elif cell in RUST_SRC:
@@ -200,13 +242,17 @@ def main():
     ap.add_argument("--panic", default="unwind", choices=["unwind", "abort"])
     ap.add_argument("--all", action="store_true",
                     help="include the R2v control cell")
+    ap.add_argument("--no-hardened", action="store_true",
+                    help="skip the R1h cells even when the pattern has them")
     ap.add_argument("--list", action="store_true", help="print the matrix and exit")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
 
     check_toolchain()
     pdir = pattern_dir(a.pattern)
-    cells = a.cell or (ALL_CELLS if a.all else MEASURED_CELLS)
+    cells = a.cell or (all_cells(pdir) if a.all else measured_cells(pdir))
+    if a.no_hardened:
+        cells = [c for c in cells if c not in HARDENED_CELLS]
     opts = a.opt or OPTS
     modes = a.mode or MODES
 

@@ -43,6 +43,12 @@ sec-ladder/
                             #   47 forks of the gate
     inputs/gen.py           # deterministic input generation (.bin gitignored)
     c/kernel.c  c/kernel.h  # the kernel, its own TU
+    c/kernel_hardened.c     # OPTIONAL R1h: the same C kernel WITH the bounds
+                            #   check. Ship it for every pattern that models a
+                            #   bug -- without it "C is faster" and "C is
+                            #   unsafe" are the same sentence. Its presence is
+                            #   what creates the `c-gcc-h` / `c-clang-h` cells;
+                            #   nothing is declared. See .memory/01-ladder.md
     c/main.c                # the C driver loop, a second TU so `isolated`
                             #   builds put a real call between them
     safe_naive.rs  safe_tuned.rs  unsafe.rs  verus.rs
@@ -96,12 +102,21 @@ sec-ladder/
 In order:
 
 1. **`spec.md`** — prose contract, then the ```slb-contract``` block. Start by
-   copying p01's and changing every value. The block's fields:
+   copying p01's (no bug, `&[u64]` in and a `u64` out) or **p02's** (a real bug,
+   a `&mut [u8]` output buffer, an R1h cell) and changing every value. The
+   block's fields:
    `kernel`, `model`, `requires`, `ensures`, `verus.{call_site, kernel_item,
    translate, obligations, items, unsafe_justifications}`,
-   `driver.{statements, c_source, regions, aliases, canonical}`,
+   `driver.{statements, c_source, regions, aliases, call_args, canonical}`,
    `collapse.{probe_inputs, probe_iters}`, `identity`,
    `miri.{pair, sources, required, reason, blocked_reason}`.
+
+   `driver.call_args` (added at TASK_004) declares which argument *positions* of
+   a named call are the canonical ones, per language: `{"c": {"kernel": [0, 2,
+   3]}}`. Needed as soon as the C kernel takes the slice lengths Rust carries
+   inside `&[T]`, which no alias can reconcile — an alias's two sides are both a
+   dotted identifier path, so it renames and does nothing else. `dloop` refuses
+   to drop anything that is not a single bare identifier.
 
    `requires`/`ensures` are **derived** by the gate from `verus.rs`'s own clause
    text through `verus.translate`; the copies in the block must equal the
@@ -112,6 +127,24 @@ In order:
 2. **`model.py`** — a *second* implementation of `spec.md` in Python, from the
    file bytes alone. Required API is documented at the top of p01's. It must not
    share code with the rungs beyond `common/slb.py`.
+
+   Two lessons from p02's, the first non-p01-shaped one. **The bindings are
+   yours to choose** — p01 binds `v/off/len/v_len/result`, p02 binds
+   `src/src_off/src_len/dst_len/dst_after_len/dst_before/dst_after/result`,
+   because a kernel that *writes* needs the buffer before and after to state its
+   security property. And **argue for the unit of `work_per_call` in the
+   docstring rather than assuming it**: ALPHA is justified in 64-bit-lane terms,
+   so "bytes" is only safe if the kernel really does ≥0.25 instructions per
+   byte. p02 measured 2.2–6.7 and kept bytes; a bare-`memcpy` kernel would have
+   to denominate in 64-bit words and say so.
+
+   If a payload shape is new, add its decoder to `common/` in all three
+   languages (`slb_head2_u64_bytes` / `driver::head2_u64_bytes` /
+   `slb.head2_u64_bytes` is p02's) — never to the pattern. Anything the driver
+   allocates from an attacker-controlled size must be range-checked identically
+   in C and Rust before allocating (`SLB_MAX_CAP`, exit 7), or the two languages
+   diverge on `calloc`-returns-NULL vs allocator-aborts and it reads as a rung
+   difference.
 3. Generate the driver pin: `python3 harness/dloop.py <rung>.rs` prints the
    canonical token sequence; paste it into `driver.canonical`. Run it on
    `c/main.c` too and add `driver.aliases.c` entries until the two agree.
@@ -123,7 +156,9 @@ In order:
    a skeleton checksum, not a semantic one.
 5. **Then mutate your own proof and check the gate fails.** A pattern whose
    `spec.md` pins are copied from p01 without being re-derived is a pattern
-   whose gate certifies p01.
+   whose gate certifies p01. Include at least one mutant that makes a *trusted*
+   postcondition **inconsistent** rather than merely weaker — p02's M7 verified
+   cleanly and only the `spec.md` pin caught it (`.memory/04-verus.md`).
 
 ## What is committed
 

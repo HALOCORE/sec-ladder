@@ -26,6 +26,13 @@ pub const EXIT_USAGE: i32 = 2;
 pub const EXIT_OPEN: i32 = 3;
 pub const EXIT_HEADER: i32 = 4;
 pub const EXIT_TRUNCATED: i32 = 5;
+pub const EXIT_CAP: i32 = 7;
+
+/// Upper bound on a payload-declared destination buffer size (64 MiB). See
+/// `SLB_MAX_CAP` in common/driver.h: both languages must reject the same
+/// capacities the same way, or an adversarial input reads as a rung difference
+/// when it is really an allocator difference.
+pub const MAX_CAP: u64 = 1 << 26;
 
 pub struct Input {
     pub n_iters: u64,
@@ -113,6 +120,29 @@ pub fn head_u64_body(input: &Input) -> (u64, Vec<u64>) {
     let head = w[0];
     w.remove(0);
     (head, w)
+}
+
+/// Split the payload into (head word 0, head word 1, remaining bytes). Mirrors
+/// `slb_head2_u64_bytes` in common/driver.c. A payload shorter than 16 bytes
+/// yields (0, 0, vec![]).
+pub fn head2_u64_bytes(input: &Input) -> (u64, u64, Vec<u8>) {
+    if input.payload.len() < 16 {
+        return (0, 0, Vec::new());
+    }
+    (le64(&input.payload[0..8]), le64(&input.payload[8..16]),
+     input.payload[16..].to_vec())
+}
+
+/// A zeroed destination buffer of `cap` bytes, or exit(EXIT_CAP) when `cap` is
+/// 0 or above `MAX_CAP`. Mirrors `slb_zeroed` in common/driver.c -- including
+/// the range check, which is what stops a huge declared capacity from being a
+/// `calloc` failure in C and an allocator abort in Rust.
+pub fn zeroed(cap: u64) -> Vec<u8> {
+    if cap == 0 || cap > MAX_CAP {
+        die(EXIT_CAP,
+            &format!("slb: destination capacity {} out of range (1..{})", cap, MAX_CAP));
+    }
+    vec![0u8; cap as usize]
 }
 
 /// Print the checksum as a decimal u64 and a newline. Nothing else on stdout.

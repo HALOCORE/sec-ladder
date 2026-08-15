@@ -53,6 +53,31 @@ Names that genuinely differ between the languages (C computed `n_body` where
 Rust calls `vals.len()`) are reconciled by an explicit, reviewable alias table
 in `spec.md`, not by loosening the comparison.
 
+**Arities that genuinely differ** get a second, equally constrained table.
+`&[u8]` is a pointer *and* a length, so a C kernel that takes the same
+information takes more arguments: p02's is
+`kernel(src, src_len, src_off, dst, dst_cap)` against Rust's
+`kernel(src, src_off, dst)`. An alias cannot express that -- both sides of an
+alias are a dotted identifier path, so it can rename and nothing else -- and no
+amount of renaming turns five arguments into three. `driver.call_args` declares,
+per language, which argument positions of a named call are the canonical ones
+(`{"c": {"kernel": [0, 2, 3]}}`). Three things keep it from being a hole:
+
+  * it only ever drops arguments of a call to a **named** function, so it cannot
+    delete or restructure a statement the way an unconstrained alias could;
+  * every dropped argument must be a **single token** -- a bare identifier. A
+    dropped `foo(bar)` or `x + 1` is refused, so nothing can hide in the gap;
+  * dropping the *wrong* positions does not silently pass: the surviving
+    arguments still have to match the pinned sequence token for token, and the
+    declared positions are right there in `spec.md` for a reviewer to read
+    against the C source.
+
+The alternative was to give the C kernel a `{ptr, len}` struct so the arities
+matched, which is a real C idiom (`struct iovec`) but is also exactly the
+"Rust-in-C-syntax written to lose" the reviewer checklist warns about. The
+asymmetry is a fact about the two languages; the pin makes it visible instead of
+making it go away.
+
 TASK_003_REVIEW found three ways through this file, all fixed here and all
 covered by `_selftest()` (which nothing in the repo had before -- every bypass
 demonstrated against the gate so far has lived in this module):
@@ -103,8 +128,17 @@ C_TYPES = {
 _NOT_CALLS = {"if", "while", "for", "return", "match", "switch", "sizeof",
               "else", "do", "and", "or", "not"}
 # Statements that erase at compile time and must not count as driver logic.
-_GHOST_RE = re.compile(r"^(assert|assert_by|assume|proof|ghost|tracked|reveal|"
-                       r"reveal_with_fuel|broadcast)\b")
+# `let ghost x = ...;` / `let tracked x = ...;` are ghost *bindings*: Verus
+# erases them exactly as it erases `assert`, and a rung that snapshots state
+# before a call in order to consume the callee's `ensures` needs one. Without
+# this the snapshot showed up in the token stream as a real statement and the
+# driver pin rejected it, so the only way to consume a postcondition about
+# `&mut` state was not to. Rust-only, like every other rule in
+# `_strip_verus_clauses`: `let` is not C, and outside `verus!` it is not Rust
+# either.
+_GHOST_RE = re.compile(r"^(let\s+(ghost|tracked)\b|assert|assert_by|assume|"
+                       r"proof|ghost|tracked|reveal|reveal_with_fuel|"
+                       r"broadcast)\b")
 
 WRAPPING = {"wrapping_mul": "*", "wrapping_add": "+", "wrapping_sub": "-",
             "wrapping_div": "/", "wrapping_rem": "%"}
@@ -177,6 +211,93 @@ def validate_aliases(aliases, where="spec.md"):
                     f"dotted identifier path with an optional `()` -- aliases "
                     f"rename, they do not rewrite")
     return problems
+
+
+# --- the call-shape table -------------------------------------------------
+
+def validate_call_args(spec, where="spec.md"):
+    """[] when the table is legal, else a list of problems."""
+    problems = []
+    for fn, keep in (spec or {}).items():
+        if not isinstance(fn, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", fn):
+            problems.append(f"{where}: call_args key {fn!r} is not a function name")
+            continue
+        if (not isinstance(keep, list) or not keep
+                or not all(isinstance(i, int) for i in keep)):
+            problems.append(f"{where}: call_args[{fn!r}] = {keep!r} must be a "
+                            f"non-empty list of argument positions")
+            continue
+        if keep != sorted(set(keep)) or keep[0] < 0:
+            problems.append(f"{where}: call_args[{fn!r}] = {keep!r} must be "
+                            f"strictly increasing and non-negative -- it "
+                            f"selects positions, it does not reorder them")
+    return problems
+
+
+def _split_args(toks, i):
+    """`toks[i]` is a `(`. Returns (args, index_of_matching_paren)."""
+    depth, args, cur, j = 0, [], [], i
+    while j < len(toks):
+        t = toks[j]
+        if t == "(":
+            depth += 1
+            if depth == 1:
+                j += 1
+                continue
+        elif t == ")":
+            depth -= 1
+            if depth == 0:
+                args.append(cur)
+                return args, j
+        elif t == "," and depth == 1:
+            args.append(cur)
+            cur = []
+            j += 1
+            continue
+        cur.append(t)
+        j += 1
+    raise ValueError("unbalanced parentheses in the driver region")
+
+
+def _apply_call_args(toks, spec):
+    """Keep only the declared argument positions of a call to a named function.
+
+    Raises ValueError when the declaration does not fit what is actually
+    written -- a pin that has drifted from the source must fail loudly, not
+    normalise to something that happens to match."""
+    if not spec:
+        return toks
+    out, i = [], 0
+    while i < len(toks):
+        t = toks[i]
+        if t in spec and i + 1 < len(toks) and toks[i + 1] == "(":
+            args, close = _split_args(toks, i + 1)
+            keep = spec[t]
+            if keep[-1] >= len(args):
+                raise ValueError(
+                    f"call_args[{t!r}] keeps position {keep[-1]} but the call "
+                    f"has {len(args)} argument(s)")
+            for pos, a in enumerate(args):
+                if pos in keep:
+                    continue
+                if len(a) != 1 or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", a[0]):
+                    raise ValueError(
+                        f"call_args[{t!r}] drops argument {pos} = "
+                        f"{' '.join(a)!r}, which is not a single identifier. "
+                        f"Only a bare name may be dropped, so that nothing can "
+                        f"hide in the arguments the diff stops looking at.")
+            out.append(t)
+            out.append("(")
+            for n, pos in enumerate(keep):
+                if n:
+                    out.append(",")
+                out.extend(args[pos])
+            out.append(")")
+            i = close + 1
+            continue
+        out.append(t)
+        i += 1
+    return out
 
 
 def _strip_verus_clauses(body):
@@ -330,11 +451,11 @@ def _apply_aliases(toks, aliases):
     return out
 
 
-def normalise(text, lang, aliases=None):
+def normalise(text, lang, aliases=None, call_args=None):
     """Raw driver region -> canonical token string, one statement per line."""
     if lang not in ("rust", "c"):
         raise ValueError(f"dloop: unknown language {lang!r}")
-    bad = validate_aliases(aliases)
+    bad = validate_aliases(aliases) + validate_call_args(call_args)
     if bad:
         raise ValueError("; ".join(bad))
     text = vparse.blank_noncode(text)
@@ -349,6 +470,7 @@ def normalise(text, lang, aliases=None):
     toks = _strip_rust_types(toks) if lang == "rust" else _strip_c_types(toks)
     toks = _strip_group_parens(toks)
     toks = _apply_aliases(toks, aliases)
+    toks = _apply_call_args(toks, call_args)
     # one statement per line, so a diff points at a statement
     lines, cur = [], []
     for t in toks:
@@ -372,9 +494,9 @@ def statement_count(canon):
     return sum(1 for l in canon.splitlines() if l.endswith(";") or l == "{")
 
 
-def normalise_file(path, lang, aliases=None):
+def normalise_file(path, lang, aliases=None, call_args=None):
     r = region(path)
-    return None if r is None else normalise(r, lang, aliases)
+    return None if r is None else normalise(r, lang, aliases, call_args)
 
 
 # --------------------------------------------------------------------------
@@ -428,6 +550,14 @@ def _selftest():
          normalise(c_body, "c"), "assert ( off < nwin ) ;\nacc = acc * 31 + r ;")
     want("Rust `assert(...)` is ghost and erases",
          normalise(rust_body, "rust"), "acc = acc * 31 + r ;")
+    want("Rust `let ghost x = ...;` is a ghost binding and erases",
+         normalise("let ghost d0: Seq<u8> = dst@;\nacc = acc + r;", "rust"),
+         "acc = acc + r ;")
+    want("C keeps a variable that merely starts with `let`-ish text",
+         normalise("lettuce = 1;", "c"), "lettuce = 1 ;")
+    want("a plain `let` binding is NOT ghost",
+         normalise("let r: u64 = kernel(v, off);", "rust"),
+         "r = kernel ( v , off ) ;")
     want("Verus `invariant` block erases",
          normalise("while it < n\n    invariant\n        a <= b,\n{\nit = it + 1;\n}",
                    "rust"),
@@ -459,6 +589,38 @@ def _selftest():
     want("statement_count counts `;` and block openers",
          statement_count(normalise("while a < b {\nc = 1;\nd = 2;\n}", "c")), 3)
 
+    # --- the call-shape table (p02: C spells slice lengths as arguments) ----
+    c_call = "uint64_t r = kernel(src, n_src, k * stride, dst, dst_cap);"
+    rs_call = "let r: u64 = kernel(src, k * stride, dst);"
+    want("C's extra length arguments drop out at the declared positions",
+         normalise(c_call, "c", None, {"kernel": [0, 2, 3]}),
+         normalise(rs_call, "rust"))
+    want("a call the table says nothing about is untouched",
+         normalise(c_call, "c", None, {"other": [0]}), normalise(c_call, "c"))
+    want("legal call_args table accepts",
+         validate_call_args({"kernel": [0, 2, 3]}), [])
+    want("out-of-order positions rejected (it selects, it does not reorder)",
+         len(validate_call_args({"kernel": [2, 0]})), 1)
+    want("empty position list rejected", len(validate_call_args({"kernel": []})), 1)
+    raises("dropping a non-identifier argument raises",
+           lambda: normalise("r = kernel(src, prefetch(src), off);", "c", None,
+                             {"kernel": [0, 2]}), ValueError)
+    raises("dropping an *expression* argument raises",
+           lambda: normalise("r = kernel(src, n + 1, off);", "c", None,
+                             {"kernel": [0, 2]}), ValueError)
+    raises("a position past the end of the call raises",
+           lambda: normalise("r = kernel(src, off);", "c", None,
+                             {"kernel": [0, 2, 3]}), ValueError)
+    # Keeping the wrong positions cannot silently match: either the dropped
+    # argument is not a bare name (raises), or the survivors differ from the
+    # pin. Both are shown, because "it happens to line up" is the only way a
+    # positional table could be a hole.
+    raises("keeping the wrong positions raises when a real argument is dropped",
+           lambda: normalise(c_call, "c", None, {"kernel": [0, 1, 3]}), ValueError)
+    want("keeping the wrong bare names does not match the pin",
+         normalise("r = kernel(a, b, c);", "c", None, {"kernel": [0, 1]})
+         == normalise("r = kernel(a, c);", "rust"), False)
+
     print("dloop selftest:", "PASS" if bad == 0 else f"FAIL ({bad})")
     return 0 if bad == 0 else 1
 
@@ -467,10 +629,13 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "selftest":
         sys.exit(_selftest())
     lang = "c" if sys.argv[1].endswith((".c", ".h")) else "rust"
-    al = None
+    al, ca = None, None
     if len(sys.argv) > 2:
         import json
         al = json.loads(sys.argv[2])
-    out = normalise_file(sys.argv[1], lang, al)
+    if len(sys.argv) > 3:
+        import json
+        ca = json.loads(sys.argv[3])
+    out = normalise_file(sys.argv[1], lang, al, ca)
     print(out)
     print(f"--- {statement_count(out)} statements", file=sys.stderr)

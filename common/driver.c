@@ -114,4 +114,46 @@ uint64_t *slb_head_u64_body(const slb_input *in, uint64_t *head, size_t *n_body)
     return body;
 }
 
+unsigned char *slb_head2_u64_bytes(const slb_input *in, uint64_t *h0, uint64_t *h1,
+                                   size_t *n_body)
+{
+    size_t len = (size_t)in->payload_len;
+    unsigned char *body;
+
+    if (in->payload_len < 16) {
+        *h0 = 0;
+        *h1 = 0;
+        *n_body = 0;
+        return NULL;
+    }
+    *h0 = slb_le64(in->payload);
+    *h1 = slb_le64(in->payload + 8);
+    *n_body = len - 16;
+    if (*n_body == 0)
+        return NULL;
+    body = (unsigned char *)malloc(*n_body);
+    if (!body) {
+        fprintf(stderr, "slb: out of memory for %zu body bytes\n", *n_body);
+        exit(SLB_EXIT_NOMEM);
+    }
+    memcpy(body, in->payload + 16, *n_body);
+    return body;
+}
+
+unsigned char *slb_zeroed(uint64_t cap)
+{
+    unsigned char *p;
+    if (cap == 0 || cap > SLB_MAX_CAP) {
+        fprintf(stderr, "slb: destination capacity %" PRIu64 " out of range (1..%" PRIu64 ")\n",
+                cap, (uint64_t)SLB_MAX_CAP);
+        exit(SLB_EXIT_CAP);
+    }
+    p = (unsigned char *)calloc((size_t)cap, 1);
+    if (!p) {
+        fprintf(stderr, "slb: out of memory for %" PRIu64 " destination bytes\n", cap);
+        exit(SLB_EXIT_NOMEM);
+    }
+    return p;
+}
+
 void slb_emit(uint64_t acc) { printf("%" PRIu64 "\n", acc); }

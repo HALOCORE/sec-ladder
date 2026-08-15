@@ -95,3 +95,29 @@ def head_u64_body(payload):
 def pack_head_body(head, body):
     """Inverse of head_u64_body: build a payload from a head word and a list."""
     return struct.pack("<%dQ" % (1 + len(body)), head, *body)
+
+
+# Mirrors SLB_MAX_CAP / SLB_EXIT_CAP in common/driver.h and MAX_CAP / EXIT_CAP
+# in common/driver.rs. A pattern whose payload declares its own output-buffer
+# size hands the driver an attacker-controlled allocation; both drivers reject
+# the same range the same way, before allocating, outside every measured loop.
+MAX_CAP = 1 << 26
+EXIT_CAP = 7
+
+
+def head2_u64_bytes(payload):
+    """Split a payload into (head word 0, head word 1, remaining raw bytes).
+
+    Mirrors `slb_head2_u64_bytes` (C) and `driver::head2_u64_bytes` (Rust).
+    Patterns whose payload is "two header words, then a byte blob" use this
+    shape; p02 is the first. A payload shorter than 16 bytes yields (0, 0, b"").
+    """
+    if len(payload) < 16:
+        return 0, 0, b""
+    h0, h1 = struct.unpack("<QQ", payload[:16])
+    return h0, h1, payload[16:]
+
+
+def pack_head2_bytes(h0, h1, body):
+    """Inverse of head2_u64_bytes."""
+    return struct.pack("<QQ", h0, h1) + bytes(body)

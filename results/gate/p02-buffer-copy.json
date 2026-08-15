@@ -1,0 +1,930 @@
+{
+  "pattern": "p02-buffer-copy",
+  "skipped_inputs": [],
+  "inputs_checked": [
+    "adversarial-cap.bin",
+    "adversarial-cap1.bin",
+    "adversarial-capbig.bin",
+    "adversarial-shortlen.bin",
+    "adversarial-srcend.bin",
+    "adversarial-stride1.bin",
+    "adversarial.bin",
+    "large.bin",
+    "small.bin"
+  ],
+  "contract_sha256": "68ce072e68acf854ec7498d93729a984e1f2b85da3a0493949f1fb535bca9888",
+  "source_sha256": {
+    "common/driver.c": "146366ecece22e987db2c4d1cd992cbbf03c06dce131a8db4da5d35c70337993",
+    "common/driver.h": "50663623c44af447cd57a9a70f59fed70bfc844a890e5e7a8eb8a4d0f16d4151",
+    "common/driver.rs": "ecafc9337834afbf85a1787528a220e51291e2705d9c9337b24a3a662a543029",
+    "harness/asm.py": "89596ab1873aec7480a32ca1d52dd549eef29124ca425d98a035878753a017a6",
+    "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+    "harness/check.py": "25c85a2cd9f4279e64ea333ff9f375ae01b5d6db742c9177fe83fd3cf8947c2d",
+    "harness/dloop.py": "3322e1e3a34abb33a87360ba2b0be0e4d0e470d543330547846553e96acd6e94",
+    "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+    "harness/measure.py": "eadc0ed8afb59bedda89a92ee035c42676ab4020d0fb4612cd4d7c9e0f40807b",
+    "harness/report.py": "78bc72b51e5734c02f69416893928b7279975f829fd98fc9c965ed217863728b",
+    "harness/vparse.py": "1e955e13aea819bd4845ee509d0e6a64420b2f686a62475b3f1c65970f64b7e8",
+    "patterns/p02-buffer-copy/NOTES.md": "ace2e09cdd13f3a8d0cd1ca5729d0661f55bfc7e088429f704e4a7e075d6204b",
+    "patterns/p02-buffer-copy/README.md": "c105451307c0583cd6aef8e9724a10beb4ae3b04c9ad8cc12642dad4f4d2458e",
+    "patterns/p02-buffer-copy/c/kernel.c": "60a0e02c9394e0fba94d229b011d1b237cee71c7adc99e1ed326bca4700ee090",
+    "patterns/p02-buffer-copy/c/kernel.h": "df4d7ff77c75b24e648005c3e160634f6c4cfd28750b3642969822c351b8f8f1",
+    "patterns/p02-buffer-copy/c/kernel_hardened.c": "6bdb40962acc154134de0d551827cfdaeeb0db11e47b75ebae9c3a1af12d38da",
+    "patterns/p02-buffer-copy/c/main.c": "457769c4cb05725ca9aa8ce5acaf6e0cf8a1b0ef494ab08b86d914a37a42bd47",
+    "patterns/p02-buffer-copy/model.py": "f7bebf42d3058da4161155e4b441a7e93d6671720d532d3d8a398d2271291cda",
+    "patterns/p02-buffer-copy/safe_naive.rs": "282b05aa588aa8507c04a8a3badeb89a86af6a7c675c8f7418d4b0c3fbc3ca5a",
+    "patterns/p02-buffer-copy/safe_tuned.rs": "23f1b0b7a7d45856ad430fe176062b4342044195f9393d2cd623b52c25850b4b",
+    "patterns/p02-buffer-copy/spec.md": "d30ed14493ee32877eafcc3000df6eb2ed1cb780b0888ddf7f7a0a730a879be2",
+    "patterns/p02-buffer-copy/unsafe.rs": "d295410141f7ae1879305a0b57763f76e2f232a58688fd9efda59481b999c55c",
+    "patterns/p02-buffer-copy/verus.rs": "f4642ea221f373a216ea56e164977229b57929b4302333190909c0f87b92a97e"
+  },
+  "derived_contract": {
+    "requires": [
+      "src_off + 2 <= src_len"
+    ],
+    "ensures": [
+      "result == copy_sum(src, src_off, dst_after_len)",
+      "dst_after == copy_dst(dst_before, src, src_off)",
+      "dst_after_len == dst_len"
+    ],
+    "alpha_ir_per_work": 0.25
+  },
+  "identity": [
+    {
+      "pair": "unsafe vs verus",
+      "opt": "O0",
+      "level": "norel",
+      "expected": "norel",
+      "md5_fn_a": "5c0d4e0be96b8503f1b1a5da019ca929",
+      "md5_fn_b": "b0e44091898016273ef36cf937328988",
+      "md5_raw_equal": false,
+      "counts_a": [
+        72,
+        72,
+        328
+      ],
+      "counts_b": [
+        72,
+        72,
+        328
+      ],
+      "pad_a": [
+        8,
+        8
+      ],
+      "pad_b": [
+        8,
+        8
+      ]
+    },
+    {
+      "pair": "unsafe vs verus",
+      "opt": "O3",
+      "level": "exact",
+      "expected": "exact",
+      "md5_fn_a": "0e5b59364bb674247824dd027e846807",
+      "md5_fn_b": "0e5b59364bb674247824dd027e846807",
+      "md5_raw_equal": true,
+      "counts_a": [
+        72,
+        70,
+        228
+      ],
+      "counts_b": [
+        72,
+        70,
+        228
+      ],
+      "pad_a": [
+        12,
+        12
+      ],
+      "pad_b": [
+        12,
+        12
+      ]
+    }
+  ],
+  "marginal_ir_per_call": {
+    "c-clang/O0/isolated/small.bin": 799.0,
+    "c-clang/O0/isolated/large.bin": 49571.74,
+    "c-clang/O0/isolated/d_ir_d_work": 12.099414537335647,
+    "c-clang/O0/whole/small.bin": 799.0,
+    "c-clang/O0/whole/large.bin": 49571.74,
+    "c-clang/O0/whole/d_ir_d_work": 12.099414537335647,
+    "c-clang/O3/isolated/small.bin": 221.0,
+    "c-clang/O3/isolated/large.bin": 10192.74,
+    "c-clang/O3/isolated/d_ir_d_work": 2.473763334160258,
+    "c-clang/O3/whole/small.bin": 206.0,
+    "c-clang/O3/whole/large.bin": 10177.74,
+    "c-clang/O3/whole/d_ir_d_work": 2.473763334160258,
+    "c-clang-h/O0/isolated/small.bin": 811.0,
+    "c-clang-h/O0/isolated/large.bin": 49583.74,
+    "c-clang-h/O0/isolated/d_ir_d_work": 12.099414537335647,
+    "c-clang-h/O0/whole/small.bin": 811.0,
+    "c-clang-h/O0/whole/large.bin": 49583.74,
+    "c-clang-h/O0/whole/d_ir_d_work": 12.099414537335647,
+    "c-clang-h/O3/isolated/small.bin": 233.0,
+    "c-clang-h/O3/isolated/large.bin": 10204.74,
+    "c-clang-h/O3/isolated/d_ir_d_work": 2.473763334160258,
+    "c-clang-h/O3/whole/small.bin": 221.0,
+    "c-clang-h/O3/whole/large.bin": 10192.74,
+    "c-clang-h/O3/whole/d_ir_d_work": 2.473763334160258,
+    "c-gcc/O0/isolated/small.bin": 703.0,
+    "c-gcc/O0/isolated/large.bin": 41413.74,
+    "c-gcc/O0/isolated/d_ir_d_work": 10.099414537335647,
+    "c-gcc/O0/whole/small.bin": 703.0,
+    "c-gcc/O0/whole/large.bin": 41413.74,
+    "c-gcc/O0/whole/d_ir_d_work": 10.099414537335647,
+    "c-gcc/O3/isolated/small.bin": 232.0,
+    "c-gcc/O3/isolated/large.bin": 9195.74,
+    "c-gcc/O3/isolated/d_ir_d_work": 2.2237013148102207,
+    "c-gcc/O3/whole/small.bin": 228.0,
+    "c-gcc/O3/whole/large.bin": 9191.74,
+    "c-gcc/O3/whole/d_ir_d_work": 2.2237013148102207,
+    "c-gcc-h/O0/isolated/small.bin": 711.0,
+    "c-gcc-h/O0/isolated/large.bin": 41421.74,
+    "c-gcc-h/O0/isolated/d_ir_d_work": 10.099414537335647,
+    "c-gcc-h/O0/whole/small.bin": 711.0,
+    "c-gcc-h/O0/whole/large.bin": 41421.74,
+    "c-gcc-h/O0/whole/d_ir_d_work": 10.099414537335647,
+    "c-gcc-h/O3/isolated/small.bin": 237.0,
+    "c-gcc-h/O3/isolated/large.bin": 9200.74,
+    "c-gcc-h/O3/isolated/d_ir_d_work": 2.2237013148102207,
+    "c-gcc-h/O3/whole/small.bin": 241.0,
+    "c-gcc-h/O3/whole/large.bin": 9204.74,
+    "c-gcc-h/O3/whole/d_ir_d_work": 2.2237013148102207,
+    "safe_naive/O0/isolated/small.bin": 6838.0,
+    "safe_naive/O0/isolated/large.bin": 450248.0,
+    "safe_naive/O0/isolated/d_ir_d_work": 110.0,
+    "safe_naive/O0/whole/small.bin": 6838.0,
+    "safe_naive/O0/whole/large.bin": 450248.0,
+    "safe_naive/O0/whole/d_ir_d_work": 110.0,
+    "safe_naive/O3/isolated/small.bin": 407.0,
+    "safe_naive/O3/isolated/large.bin": 11226.0,
+    "safe_naive/O3/isolated/d_ir_d_work": 2.6839493922103697,
+    "safe_naive/O3/whole/small.bin": 273.0,
+    "safe_naive/O3/whole/large.bin": 10720.0,
+    "safe_naive/O3/whole/d_ir_d_work": 2.5916645993549987,
+    "safe_tuned/O0/isolated/small.bin": 1553.0,
+    "safe_tuned/O0/isolated/large.bin": 90635.84,
+    "safe_tuned/O0/isolated/d_ir_d_work": 22.099439345075663,
+    "safe_tuned/O0/whole/small.bin": 1553.0,
+    "safe_tuned/O0/whole/large.bin": 90635.84,
+    "safe_tuned/O0/whole/d_ir_d_work": 22.099439345075663,
+    "safe_tuned/O3/isolated/small.bin": 239.0,
+    "safe_tuned/O3/isolated/large.bin": 10210.84,
+    "safe_tuned/O3/isolated/d_ir_d_work": 2.4737881419002727,
+    "safe_tuned/O3/whole/small.bin": 227.0,
+    "safe_tuned/O3/whole/large.bin": 10198.84,
+    "safe_tuned/O3/whole/d_ir_d_work": 2.4737881419002727,
+    "unsafe/O0/isolated/small.bin": 4110.0,
+    "unsafe/O0/isolated/large.bin": 266525.84,
+    "unsafe/O0/isolated/d_ir_d_work": 65.09943934507567,
+    "unsafe/O0/whole/small.bin": 4110.0,
+    "unsafe/O0/whole/large.bin": 266525.84,
+    "unsafe/O0/whole/d_ir_d_work": 65.09943934507567,
+    "unsafe/O3/isolated/small.bin": 229.0,
+    "unsafe/O3/isolated/large.bin": 10200.84,
+    "unsafe/O3/isolated/d_ir_d_work": 2.4737881419002727,
+    "unsafe/O3/whole/small.bin": 216.0,
+    "unsafe/O3/whole/large.bin": 10187.84,
+    "unsafe/O3/whole/d_ir_d_work": 2.4737881419002727,
+    "verus/O0/isolated/small.bin": 4110.0,
+    "verus/O0/isolated/large.bin": 266525.84,
+    "verus/O0/isolated/d_ir_d_work": 65.09943934507567,
+    "verus/O0/whole/small.bin": 4110.0,
+    "verus/O0/whole/large.bin": 266525.84,
+    "verus/O0/whole/d_ir_d_work": 65.09943934507567,
+    "verus/O3/isolated/small.bin": 227.0,
+    "verus/O3/isolated/large.bin": 10198.84,
+    "verus/O3/isolated/d_ir_d_work": 2.4737881419002727,
+    "verus/O3/whole/small.bin": 216.0,
+    "verus/O3/whole/large.bin": 10187.84,
+    "verus/O3/whole/d_ir_d_work": 2.4737881419002727
+  },
+  "verus": {
+    "verus.rs": {
+      "verified": 9,
+      "errors": 0,
+      "pinned": 9,
+      "tcb_items": [
+        {
+          "name": "get_unchecked",
+          "attr": "verifier::external_body",
+          "body_lines": 1,
+          "line": 132
+        },
+        {
+          "name": "copy_bytes",
+          "attr": "verifier::external_body",
+          "body_lines": 3,
+          "line": 153
+        },
+        {
+          "name": "load_input",
+          "attr": "verifier::external_body",
+          "body_lines": 5,
+          "line": 177
+        },
+        {
+          "name": "emit",
+          "attr": "verifier::external_body",
+          "body_lines": 1,
+          "line": 189
+        }
+      ]
+    }
+  },
+  "verified_call_site": {
+    "main": 5,
+    "kernel": 2
+  },
+  "proof_domain": {
+    "adversarial-cap.bin": {
+      "calls": 8,
+      "requires_ok": true,
+      "ensures_checked": 8
+    },
+    "adversarial-cap1.bin": {
+      "calls": 8,
+      "requires_ok": true,
+      "ensures_checked": 8
+    },
+    "adversarial-capbig.bin": {
+      "calls": 0,
+      "requires_ok": true,
+      "ensures_checked": 0
+    },
+    "adversarial-shortlen.bin": {
+      "calls": 0,
+      "requires_ok": true,
+      "ensures_checked": 0
+    },
+    "adversarial-srcend.bin": {
+      "calls": 8,
+      "requires_ok": true,
+      "ensures_checked": 8
+    },
+    "adversarial-stride1.bin": {
+      "calls": 0,
+      "requires_ok": true,
+      "ensures_checked": 0
+    },
+    "adversarial.bin": {
+      "calls": 8,
+      "requires_ok": true,
+      "ensures_checked": 8
+    },
+    "large.bin": {
+      "calls": 20000,
+      "requires_ok": true,
+      "ensures_checked": 128
+    },
+    "small.bin": {
+      "calls": 200000,
+      "requires_ok": true,
+      "ensures_checked": 128
+    }
+  },
+  "driver_loops": {
+    "c/main.c": {
+      "statements": 13,
+      "matches_pin": true
+    },
+    "safe_naive.rs": {
+      "statements": 13,
+      "matches_pin": true
+    },
+    "safe_tuned.rs": {
+      "statements": 13,
+      "matches_pin": true
+    },
+    "unsafe.rs": {
+      "statements": 13,
+      "matches_pin": true
+    },
+    "verus.rs": {
+      "statements": 13,
+      "matches_pin": true
+    }
+  },
+  "adversarial": {
+    "adversarial-cap.bin/c-gcc": {
+      "exit": 0,
+      "stdout": "244239563421568",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "244239563421568"
+    },
+    "adversarial-cap.bin/c-clang": {
+      "exit": 0,
+      "stdout": "244239563421568",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "244239563421568"
+    },
+    "adversarial-cap.bin/safe_naive": {
+      "exit": 0,
+      "stdout": "244239563421568",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "244239563421568"
+    },
+    "adversarial-cap.bin/safe_tuned": {
+      "exit": 0,
+      "stdout": "244239563421568",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "244239563421568"
+    },
+    "adversarial-cap.bin/unsafe": {
+      "exit": 0,
+      "stdout": "244239563421568",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "244239563421568"
+    },
+    "adversarial-cap.bin/verus": {
+      "exit": 0,
+      "stdout": "244239563421568",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "244239563421568"
+    },
+    "adversarial-cap.bin/c-gcc-h": {
+      "exit": 0,
+      "stdout": "244239563421568",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "244239563421568"
+    },
+    "adversarial-cap.bin/c-clang-h": {
+      "exit": 0,
+      "stdout": "244239563421568",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "244239563421568"
+    },
+    "adversarial-cap1.bin/c-gcc": {
+      "exit": 0,
+      "stdout": "198979479034752",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-cap1.bin/c-clang": {
+      "exit": 0,
+      "stdout": "198979479034752",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-cap1.bin/safe_naive": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-cap1.bin/safe_tuned": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-cap1.bin/unsafe": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-cap1.bin/verus": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-cap1.bin/c-gcc-h": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-cap1.bin/c-clang-h": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-capbig.bin/c-gcc": {
+      "exit": 7,
+      "stdout": "",
+      "stderr": "slb: destination capacity 1099511627776 out of range (1..67108864)",
+      "signal": null,
+      "model_exit": 7,
+      "model_stdout": ""
+    },
+    "adversarial-capbig.bin/c-clang": {
+      "exit": 7,
+      "stdout": "",
+      "stderr": "slb: destination capacity 1099511627776 out of range (1..67108864)",
+      "signal": null,
+      "model_exit": 7,
+      "model_stdout": ""
+    },
+    "adversarial-capbig.bin/safe_naive": {
+      "exit": 7,
+      "stdout": "",
+      "stderr": "slb: destination capacity 1099511627776 out of range (1..67108864)",
+      "signal": null,
+      "model_exit": 7,
+      "model_stdout": ""
+    },
+    "adversarial-capbig.bin/safe_tuned": {
+      "exit": 7,
+      "stdout": "",
+      "stderr": "slb: destination capacity 1099511627776 out of range (1..67108864)",
+      "signal": null,
+      "model_exit": 7,
+      "model_stdout": ""
+    },
+    "adversarial-capbig.bin/unsafe": {
+      "exit": 7,
+      "stdout": "",
+      "stderr": "slb: destination capacity 1099511627776 out of range (1..67108864)",
+      "signal": null,
+      "model_exit": 7,
+      "model_stdout": ""
+    },
+    "adversarial-capbig.bin/verus": {
+      "exit": 7,
+      "stdout": "",
+      "stderr": "slb: destination capacity 1099511627776 out of range (1..67108864)",
+      "signal": null,
+      "model_exit": 7,
+      "model_stdout": ""
+    },
+    "adversarial-capbig.bin/c-gcc-h": {
+      "exit": 7,
+      "stdout": "",
+      "stderr": "slb: destination capacity 1099511627776 out of range (1..67108864)",
+      "signal": null,
+      "model_exit": 7,
+      "model_stdout": ""
+    },
+    "adversarial-capbig.bin/c-clang-h": {
+      "exit": 7,
+      "stdout": "",
+      "stderr": "slb: destination capacity 1099511627776 out of range (1..67108864)",
+      "signal": null,
+      "model_exit": 7,
+      "model_stdout": ""
+    },
+    "adversarial-shortlen.bin/c-gcc": {
+      "exit": 5,
+      "stdout": "",
+      "stderr": "slb: /home/apt/repos_common/sec-ladder/patterns/p02-buffer-copy/inputs/adversarial-shortlen.bin: payload_len 4616 exceed",
+      "signal": null,
+      "model_exit": 5,
+      "model_stdout": ""
+    },
+    "adversarial-shortlen.bin/c-clang": {
+      "exit": 5,
+      "stdout": "",
+      "stderr": "slb: /home/apt/repos_common/sec-ladder/patterns/p02-buffer-copy/inputs/adversarial-shortlen.bin: payload_len 4616 exceed",
+      "signal": null,
+      "model_exit": 5,
+      "model_stdout": ""
+    },
+    "adversarial-shortlen.bin/safe_naive": {
+      "exit": 5,
+      "stdout": "",
+      "stderr": "slb: /home/apt/repos_common/sec-ladder/patterns/p02-buffer-copy/inputs/adversarial-shortlen.bin: payload_len 4616 exceed",
+      "signal": null,
+      "model_exit": 5,
+      "model_stdout": ""
+    },
+    "adversarial-shortlen.bin/safe_tuned": {
+      "exit": 5,
+      "stdout": "",
+      "stderr": "slb: /home/apt/repos_common/sec-ladder/patterns/p02-buffer-copy/inputs/adversarial-shortlen.bin: payload_len 4616 exceed",
+      "signal": null,
+      "model_exit": 5,
+      "model_stdout": ""
+    },
+    "adversarial-shortlen.bin/unsafe": {
+      "exit": 5,
+      "stdout": "",
+      "stderr": "slb: /home/apt/repos_common/sec-ladder/patterns/p02-buffer-copy/inputs/adversarial-shortlen.bin: payload_len 4616 exceed",
+      "signal": null,
+      "model_exit": 5,
+      "model_stdout": ""
+    },
+    "adversarial-shortlen.bin/verus": {
+      "exit": 5,
+      "stdout": "",
+      "stderr": "slb: /home/apt/repos_common/sec-ladder/patterns/p02-buffer-copy/inputs/adversarial-shortlen.bin: payload_len 4616 exceed",
+      "signal": null,
+      "model_exit": 5,
+      "model_stdout": ""
+    },
+    "adversarial-shortlen.bin/c-gcc-h": {
+      "exit": 5,
+      "stdout": "",
+      "stderr": "slb: /home/apt/repos_common/sec-ladder/patterns/p02-buffer-copy/inputs/adversarial-shortlen.bin: payload_len 4616 exceed",
+      "signal": null,
+      "model_exit": 5,
+      "model_stdout": ""
+    },
+    "adversarial-shortlen.bin/c-clang-h": {
+      "exit": 5,
+      "stdout": "",
+      "stderr": "slb: /home/apt/repos_common/sec-ladder/patterns/p02-buffer-copy/inputs/adversarial-shortlen.bin: payload_len 4616 exceed",
+      "signal": null,
+      "model_exit": 5,
+      "model_stdout": ""
+    },
+    "adversarial-srcend.bin/c-gcc": {
+      "exit": 0,
+      "stdout": "144602631418632",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-srcend.bin/c-clang": {
+      "exit": 0,
+      "stdout": "144602631418632",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-srcend.bin/safe_naive": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-srcend.bin/safe_tuned": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-srcend.bin/unsafe": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-srcend.bin/verus": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-srcend.bin/c-gcc-h": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-srcend.bin/c-clang-h": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-stride1.bin/c-gcc": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-stride1.bin/c-clang": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-stride1.bin/safe_naive": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-stride1.bin/safe_tuned": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-stride1.bin/unsafe": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-stride1.bin/verus": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-stride1.bin/c-gcc-h": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-stride1.bin/c-clang-h": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial.bin/c-gcc": {
+      "exit": -6,
+      "stdout": "",
+      "stderr": "malloc(): invalid size (unsorted)",
+      "signal": 6,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial.bin/c-clang": {
+      "exit": -6,
+      "stdout": "",
+      "stderr": "malloc(): invalid size (unsorted)",
+      "signal": 6,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial.bin/safe_naive": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial.bin/safe_tuned": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial.bin/unsafe": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial.bin/verus": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial.bin/c-gcc-h": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial.bin/c-clang-h": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    }
+  },
+  "sanitizer": {
+    "adversarial-cap.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": ""
+    },
+    "adversarial-cap1.bin": {
+      "exit": 1,
+      "expected_exit": 0,
+      "expect": "fires",
+      "fired": true,
+      "diagnostic": "================================================================= ==2191067==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x506000000060 at pc 0x55ff90f57f13 bp 0x7ffe1f9bbbe0 sp 0x7ffe1f9bb388 WRITE of size 65 at 0x506000000060 thread T0 #0 0x55ff90f57f12 in memcpy (/home/apt/repos_comm"
+    },
+    "adversarial-capbig.bin": {
+      "exit": 7,
+      "expected_exit": 7,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "slb: destination capacity 1099511627776 out of range (1..67108864)"
+    },
+    "adversarial-shortlen.bin": {
+      "exit": 5,
+      "expected_exit": 5,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "slb: /home/apt/repos_common/sec-ladder/patterns/p02-buffer-copy/inputs/adversarial-shortlen.bin: payload_len 4616 exceeds file size"
+    },
+    "adversarial-srcend.bin": {
+      "exit": 1,
+      "expected_exit": 0,
+      "expect": "fires",
+      "fired": true,
+      "diagnostic": "================================================================= ==2191072==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000038 at pc 0x55921bf43036 bp 0x7ffc6384c000 sp 0x7ffc6384b7a8 READ of size 61 at 0x504000000038 thread T0 #0 0x55921bf43035 in memcpy (/home/apt/repos_commo"
+    },
+    "adversarial-stride1.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": ""
+    },
+    "adversarial.bin": {
+      "exit": 1,
+      "expected_exit": 0,
+      "expect": "fires",
+      "fired": true,
+      "diagnostic": "================================================================= ==2191075==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x527000006a38 at pc 0x5581ad8fa036 bp 0x7ffc3f2b5350 sp 0x7ffc3f2b4af8 READ of size 65535 at 0x527000006a38 thread T0 #0 0x5581ad8fa035 in memcpy (/home/apt/repos_co"
+    },
+    "large.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": ""
+    },
+    "small.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": ""
+    }
+  },
+  "miri": {
+    "pair": "unsafe vs verus",
+    "identity_o3": "exact",
+    "inherits_proof": true,
+    "required": true,
+    "ran": true,
+    "available": true,
+    "sysroot": "/home/apt/.cache/miri",
+    "probe_iters": 4,
+    "runs": [
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-cap.bin",
+        "exit": 0,
+        "ub": false,
+        "stdout": "264465344",
+        "model_stdout": "264465344",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-cap1.bin",
+        "exit": 0,
+        "ub": false,
+        "stdout": "0",
+        "model_stdout": "0",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-capbig.bin",
+        "exit": 7,
+        "ub": false,
+        "stdout": "",
+        "model_stdout": "",
+        "stderr": "slb: destination capacity 1099511627776 out of range (1..67108864)"
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-shortlen.bin",
+        "exit": 5,
+        "ub": false,
+        "stdout": "",
+        "model_stdout": "",
+        "stderr": "slb: /home/apt/repos_common/sec-ladder/.temp/check/p02/miri/miri.adversarial-shortlen.bin: payload_len 4616 exceeds file size"
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-srcend.bin",
+        "exit": 0,
+        "ub": false,
+        "stdout": "0",
+        "model_stdout": "0",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-stride1.bin",
+        "exit": 0,
+        "ub": false,
+        "stdout": "0",
+        "model_stdout": "0",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial.bin",
+        "exit": 0,
+        "ub": false,
+        "stdout": "0",
+        "model_stdout": "0",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "large.bin",
+        "exit": 0,
+        "ub": false,
+        "stdout": "16186812096",
+        "model_stdout": "16186812096",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "small.bin",
+        "exit": 0,
+        "ub": false,
+        "stdout": "237406208",
+        "model_stdout": "237406208",
+        "stderr": ""
+      }
+    ]
+  },
+  "failures": [],
+  "notes": [
+    "adversarial-cap1.bin/c-gcc: opt/mode variants of this rung disagree (2 distinct behaviours)",
+    "adversarial.bin/c-gcc: opt/mode variants of this rung disagree (2 distinct behaviours)"
+  ],
+  "loud": [],
+  "blocked": [],
+  "verdict": "PASS",
+  "complete_run": true,
+  "invocation": "p02"
+}

@@ -82,10 +82,33 @@ _BRANCH_RE = re.compile(r"^(j[a-z]+|call|callq|loop|loope|loopne|loopz|loopnz|xb
 # libc (or in compiler-builtins for Rust). Matched against the symbol name
 # objdump prints in `<...>`, so `memcpy@plt`, `__memcpy_avx_unaligned_erms` and
 # `core::intrinsics::copy_nonoverlapping` all hit.
+_BULK_NAMES = ("memcpy", "memmove", "memset", "memcmp", "memchr", "bcopy",
+               "bzero", "copy_nonoverlapping", "copy_from_slice",
+               "clone_from_slice", "__aeabi_memcpy", "__aeabi_memmove",
+               "__aeabi_memset", "__memcpy", "__memmove", "__memset")
 _BULK_MEM_RE = re.compile(
     r"(?:^|[^A-Za-z0-9_])(?:mem(?:cpy|move|set|cmp|chr)|bcopy|bzero|"
     r"copy_nonoverlapping|copy_from_slice|clone_from_slice|"
     r"__(?:aeabi_)?mem(?:cpy|move|set))(?:[^A-Za-z0-9_]|$)")
+
+# Rust v0 mangling packs each identifier between a decimal *length* prefix and
+# the next component, with word characters on both sides:
+#
+#   _RNvMNtCs4NRVxsYgnAr_4core5sliceSh15copy_from_sliceCs86OlWC8CPt8_10safe_tuned
+#                                     ^^ ^^^^^^^^^^^^^^^
+#
+# so the boundary-anchored regex above cannot see `copy_from_slice` there. It
+# false-failed p02's `safe_tuned` at O0, where the copy and the fold are still
+# out-of-line calls and the kernel symbol therefore has no loop of its own.
+# Matching is kept tight by requiring the length prefix to be *exactly* the
+# routine's length, so `15copy_from_slice` hits and `9copy_from` does not.
+_V0_BULK_RES = [re.compile(r"(?<![0-9])" + str(len(n)) + re.escape(n))
+                for n in _BULK_NAMES]
+
+
+def is_bulk_symbol(sym):
+    """Is this symbol name a known bulk-memory routine? Handles v0 mangling."""
+    return bool(_BULK_MEM_RE.search(sym)) or any(r.search(sym) for r in _V0_BULK_RES)
 
 _INSN_RE = re.compile(r"^\s*([0-9a-f]+):\t([0-9a-f ]+?)\s*(?:\t(.*))?$")
 _SYMHDR_RE = re.compile(r"^([0-9a-f]+)\s+<(.+)>:$")
@@ -296,7 +319,7 @@ class Kernel:
             if not re.match(r"^callq?$", i.mnemonic):
                 continue
             m = re.search(r"<([^>]+)>", i.text)
-            if m and _BULK_MEM_RE.search(m.group(1)):
+            if m and is_bulk_symbol(m.group(1)):
                 out.append((i.addr, m.group(1)))
         return out
 

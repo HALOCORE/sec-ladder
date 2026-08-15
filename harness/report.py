@@ -199,12 +199,15 @@ def build(doc, name):
                f"`{doc['host']['governor']}`")
     out.append("")
     out.append("## Inputs\n")
-    out.append("| file | n_iters | declared payload | present | win_len | v_len | truncated |")
-    out.append("|---|---:|---:|---:|---:|---:|---|")
+    # The last column is the pattern's own `model.py` describing the input.
+    # It used to be `win_len`/`v_len`, i.e. p01's payload layout hard-coded into
+    # the report of every pattern.
+    out.append("| file | n_iters | declared payload | present | truncated | model |")
+    out.append("|---|---:|---:|---:|---|---|")
     for k, v in doc["inputs"].items():
         out.append(f"| {k} | {fmt(v['n_iters'])} | {fmt(v['declared_len'])} | "
-                   f"{fmt(v['present'])} | {fmt(v['win_len'])} | {fmt(v['v_len'])} | "
-                   f"{v['truncated']} |")
+                   f"{fmt(v['present'])} | {v['truncated']} | "
+                   f"{v.get('model', '')} |")
 
     out.append("\n## Static + executed instructions\n")
     out.append("`Ir` is **callgrind per-function exclusive** for the kernel symbol. "

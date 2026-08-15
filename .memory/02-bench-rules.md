@@ -224,6 +224,40 @@ no caller can discharge.
 Corollary for the C rungs: R1 omits the check (that is the bug being modelled) and
 **R1h**, the hardened C cell, includes it. R1-vs-R1h isolates what the check costs
 inside one language, so "C is faster" and "C is unsafe" stop being confounded.
+Built at TASK_004 on p02 and now a standard optional cell — see
+`.memory/01-ladder.md`. Measured there: the check is +5 (gcc) / +12 (clang)
+instructions per call, flat in the size of the copy.
+
+### Worked example: what this looks like in practice (p02)
+
+The whole contract, for a kernel that copies a length-prefixed record into a
+fixed buffer:
+
+```
+requires  src_off + 2 <= src_len                       <- structural, holds on every input
+ensures   result   == copy_sum(src, src_off, dst_len)  <- the value
+          dst_after == copy_dst(dst_before, src, src_off)   <- THE SECURITY PROPERTY
+          dst_after_len == dst_len
+```
+
+Two things to copy from it:
+
+- The `requires` says only "the two prefix bytes are inside the source". The
+  attacker's `u16` length is an *argument*; the kernel is total in all 65 536
+  values it can take, and the gate evaluates the precondition at every call on
+  every input, adversarial included.
+- The security clause is an equality on the **whole** destination sequence, not
+  a property of the copied prefix. `copy_dst` is "the record, followed by the
+  bytes that were already there" — so one clause says both "the copy is correct"
+  and "nothing outside `dst[0..len)` moved", and on a record that does not fit
+  it is the identity, i.e. *nothing at all was written*. Stating it over the
+  prefix only would have proved the easy half.
+
+And one thing to avoid: p02's spec functions are named in the `ensures` and
+mirrored as Python helpers in `model.py`, because the gate evaluates the derived
+contract with `eval` and a `forall|j: int| ...` does not translate. Push
+quantifiers into a spec function and give `model.py` an independent
+implementation of it.
 
 ## Proof domain must cover the measured domain
 
