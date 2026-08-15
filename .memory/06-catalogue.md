@@ -13,12 +13,35 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 | ID | Item | Status |
 |---|---|---|
 | T001 | clang 22.1.6 + valgrind 3.27.1 into `~/tools`; pilot re-measured | **done**, reviewed |
-| T002 | `harness/` (asm, build, check, measure, report) + p01 as the template | wip |
+| T002 | `harness/` + `common/` + p01 as the template | **done**, reviewed |
+| T003 | harden the gate against the six demonstrated bypasses | **done**, review in flight |
+| T004 | p02 buffer copy — first real bug, first adversarial table | draft spec |
 
-T001's review produced two blockers (normalised-text digest cannot prove identity;
-the pilot's R5 had no verified call site) and four majors. All are folded into
-`.memory/01-ladder.md`, `.memory/02-bench-rules.md`, `.memory/03-measurement.md`,
-`.memory/04-verus.md` and `TASK_002.md`. Read those, not the pilot.
+Each task has been reviewed adversarially and each review found real defects. The
+cumulative lesson, worth reading before adding a pattern: **a green gate is
+evidence about the gate, not about the work.** T001's review found the identity
+oracle could not detect difference (a collision was constructed) and that the
+pilot's proof had no verified call site. T002's review got six defects past a
+28/28 PASS, including the pilot's exact fatal defect. T003 fixed those and its own
+engineer then found a seventh defect in its own delivery after reporting.
+
+Findings are folded into `.memory/01`–`05`; those files supersede the pilot and
+supersede any earlier task report they contradict.
+
+## Open cross-cutting issues
+
+- **Miri is not installable** for the pinned toolchain, yet policy makes it
+  mandatory whenever R4 ≠ R5 — which is expected for any non-trivial proof. The
+  first interesting pattern will therefore fail the gate on a tool we do not have.
+  Needs a decision: relax the policy, source a Miri-capable toolchain alongside the
+  pin, or accept documented gaps.
+- **The barrier swap to multiply-shift is deferred.** It invalidates every
+  published checksum and `Ir` number, so it is a re-measurement task. Cheap now
+  that the driver is pinned in `spec.md`; gets more expensive with every pattern.
+- **18 of 28 wall-clock cells exceed the 10% spread threshold** and are marked
+  discarded. No claim rests on them. Fixing needs a quieter box.
+- **`perf_event_paranoid = 3`** — no hardware counters without root. This is the
+  only way to explain *why* gcc's shorter loop runs 43% slower.
 
 ## Family A — buffers & bounds (spatial safety core)
 
