@@ -197,25 +197,38 @@ final(dst)@ =~= src@.subrange(from as int, from + n as int)
                + old(dst)@.subrange(n as int, old(dst)@.len() as int),
 ```
 
-Delete the `+ old(dst)@.subrange(...)` — i.e. stop saying the tail is
-unchanged — and the remaining clause additionally asserts `dst.len() == n`,
-which **contradicts** the clause above it whenever `n < dst.len()`. A trusted
-item with a contradictory postcondition makes every caller verify vacuously:
-`9 verified, 0 errors`, no diagnostic, and a memory-safety claim that means
-nothing.
+Delete the `+ old(dst)@.subrange(...)` — i.e. stop saying the tail is unchanged —
+and the remaining clause additionally asserts `dst.len() == n`. The file still
+gives `9 verified, 0 errors`, with no diagnostic.
 
-This is *not* the same as the known "weakened `requires`" mode and the
-structural rule from TASK_005 does not catch it — the `requires` is still there
-and still non-empty. The only mechanical defence is the declared `ensures` pin
-in `spec.md`, which TASK_003_REVIEW showed moves with the code it constrains. So
-for any `external_body` item with more than one `ensures` clause:
+**It is not vacuity, and the first write-up of this said it was.** Measured at
+TASK_004_REVIEW: with the mutant in place `assert(false)` after the call is
+*still* unprovable, so callers are not vacuous. What actually happens is a
+**silent strengthening** — the trusted item injects an extra false fact
+(`dst.len() == n`) that is consistent in context and happens to make the security
+postcondition provable. A false axiom that is *usable* is worse than one that
+collapses the context, because nothing downstream looks wrong.
 
-- **write the clauses so they cannot be individually deleted into consistency**,
-  and prefer one strong clause to several overlapping ones;
-- state, in a comment beside the item, why each clause is true of the real
-  operation — that comment is the only thing between the proof and a false axiom;
-- when mutation-testing, include a mutant that makes a trusted postcondition
-  *inconsistent*, not only weaker. A mutant that verifies is a finding.
+Consequences, both measured:
+
+- **The `assert(false)` reachability probe does not detect this.** Add it anyway
+  (it catches genuine vacuity), but do not expect it to catch this class.
+- **Neither of `copy_bytes`'s two `ensures` clauses is individually
+  load-bearing** — deleting *either* one leaves 9 verified / 0 errors, because
+  the tail clause implies the length clause. A spec can look like two obligations
+  and be one.
+
+**The mechanical defence that does work — make clause deletion a gate stage.**
+For each `ensures` clause of each `external_body` item: delete it, re-run Verus,
+and **fail if the file still verifies with 0 errors**. That catches this mutant
+and correctly flags the redundant clause. Cost on p02: 4 Verus runs, ~20 s each.
+This is a *derived* check, not a declared pin, so it does not inherit the
+self-certification problem.
+
+Meanwhile, for any `external_body` item with more than one `ensures` clause:
+prefer one strong clause to several overlapping ones, and state beside the item
+why each clause is true of the real operation — that comment is the only thing
+between the proof and a false axiom.
 
 ### Consuming a postcondition about `&mut` state
 

@@ -132,24 +132,44 @@ is a much stronger claim than any p01 could produce.
    interesting patterns are precisely the ones where LLVM cannot hoist, and that is
    where the ladder earns its keep.
 
-   **p02 is the first pattern where that reservation paid out, and it changed the
-   *shape* of R2's tax, not its size.** On a length-prefixed copy (`-O3
-   isolated`, marginal Ir per call):
+   **p02 first appeared to be that case and was not.** The claim published at
+   TASK_004 — "R2 pays an O(n) bounds-check tax on a data-dependent copy,
+   +178 at 61 B and +1025 at 4092 B" — was **refuted at TASK_004_REVIEW**. Keep
+   the refutation, not the claim; it is the most instructive result so far.
 
-   | rung | 61 B copied | 4092 B copied | vs R4 |
+   | rung | 61 B | 4092 B | vs R4 |
    |---|---:|---:|---|
-   | R2 safe-naive | 407.0 | 11226.0 | **+178 / +1025 — O(n), ≈ +0.25 per byte** |
-   | R3 safe-tuned | 239.0 | 10210.8 | **+10 / +10 — O(1)** |
-   | R5 verus | 227.0 | 10198.8 | −2 / −2 |
+   | R2 safe-naive, as first written | 407.0 | 11226.0 | +178 / +1025 |
+   | …`copy_from_slice`, indexed fold kept | 239.0 | 10210.8 | **+10 / +10** |
+   | …indexed copy kept, one `&src[a..b]` reslice added | 239.0 | 10210.8 | **+10 / +10** |
+   | …identical but the check written *additively* | 237.0 | 10208.8 | **+8 / +8** |
+   | R3 safe-tuned | 239.0 | 10210.8 | +10 / +10 |
 
-   R2's indexed copy loop (`dst[i] = src[off+2+i]`) keeps a live bounds check per
-   element and, at `-O3 isolated`, is not turned into a `memcpy` at all (the bulk
-   call appears only in `whole` mode). p01 measured the same rung at +11…+29 *per
-   call*. So the residue-mod-4 trap is not the only way to misquote R2: on a
-   pattern where LLVM cannot hoist, R2's overhead is not a per-call constant at
-   all, and quoting p01's +29 as "what safe Rust costs" would understate p02 by
-   35x. **R3 remains the honest number** — +10 per call, flat — which is the
-   third pattern in a row where that is the finding.
+   The decomposition that kills it: changing **only the fold** moves nothing;
+   changing **only the copy** removes 100% of the tax. R2's and R4's fold loops
+   are the *same* 19-instruction unrolled body — the indexed fold's bounds checks
+   cost **zero**. The real cause is that `len > src.len() - (src_off + 2)`
+   (subtraction-first) leaves LLVM unable to prove the index bound, so
+   loop-idiom recognition never forms a `memcpy`; one operator change flips
+   `bulk_calls []` → `['memcpy@GLIBC_2.14']`, 118 insns → 87. So the comparison
+   was **inline SSE2 copy vs `call memcpy`** — two different algorithms — and C
+   written the same way pays the same (clang +532; gcc's byte loop is 94 Ir
+   *faster* than glibc's memcpy).
+
+   The honest claim: *rustc failed to idiom-recognise one spelling of a byte-copy
+   loop; three other spellings, including the reslice a competent Rust programmer
+   writes, are +10 flat.* That is a codegen fragility finding, not a safety-cost
+   finding — still worth publishing, but not as a safety tax.
+
+   **Two rules follow.** (1) Before attributing a cost to bounds checking,
+   decompose: change one loop at a time and re-measure. A whole-kernel delta
+   attributes nothing. (2) Residues bite harder than recorded: R2's epilogue cost
+   here swings **±175 Ir on `len mod 16`** — copying *one more byte* (2048→2049)
+   made it 174 instructions *cheaper*. `gen.py` pins residues mod 4 and mod 8;
+   the modulus that mattered was 16. Sweep, do not sample.
+
+   **R3 remains the honest number** — +10 per call, flat — the third pattern in a
+   row where that is the finding.
 
    Also from p02, against p01's gcc-vs-clang result: **gcc executed ~10% fewer
    instructions than clang here and took 23% longer** (8765 vs 9764 Ir per call;

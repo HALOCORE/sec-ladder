@@ -59,6 +59,46 @@ emits `mov eax, <answer>; ret`. Then you are timing `printf`.
    Measured on p01 after the TASK_005 barrier swap: marginal Ir 908 … 274 496
    across 56 cell/probe pairs, `d(Ir)/d(work)` 1.75 … 67.00, ALPHA = 0.25.
 
+   **ALPHA = 0.25 Ir per byte is too high, and it forbids the kernel shape we
+   want next.** Measured at TASK_004_REVIEW: glibc `memcpy` itself achieves
+   **0.104 Ir/byte**, so ALPHA is 2.4× above what the fastest correct
+   implementation of a bulk copy can do. A kernel dominated by a bulk copy
+   *cannot* satisfy the floor — bare copy + 8-byte fold measures 0.118 Ir/byte
+   (0.47× the floor, fails), and the word-wise fold that `p02/NOTES.md` §0
+   recommends for future patterns sits at only 1.37× margin. Also, for p02 as
+   shipped the floor is cleared by the **fold alone**, so the stage does not
+   certify that the copy — the thing the pattern is about — happened at all.
+
+   Fix before the next bulk-memory pattern: either derive ALPHA per pattern from
+   `model.py` (a declared *cheapest legitimate* Ir per work unit, which is a
+   claim about the algorithm rather than about this kernel), or denominate
+   `work_per_call` in a unit whose cheapest correct implementation exceeds ALPHA.
+   As written the rule forbids exactly the kernel shape it should be protecting.
+
+## Result consumption: keep the full-extent fold (settled by measurement)
+
+p02's result fold is ~96% of kernel cost and the copy ~4%, which looks like the
+benchmark measuring its own scaffolding. TASK_004_REVIEW measured the
+alternatives and the conclusion is **keep the full fold** — but the reasoning
+that was originally written down for it is wrong, so do not propagate that.
+
+- A word-wise fold cuts the kernel 10 200 → 1 399 Ir/call and lifts the copy's
+  share 4.2% → ~31%. It cannot go further: **any fold that reads every copied
+  byte costs at least what `memcpy` cost to write them**, so the copy caps near
+  50%. An `xor` fold measures identically. A cheaper fold is not the lever.
+- **The feared side effect does not exist.** The worry was that a narrow fold
+  would leave most of the copy dead and let LLVM elide it in `whole` mode.
+  Measured with only 8 of 4092 bytes consumed: 484.1 isolated / 472.1 whole, and
+  the `memcpy` call is still present in `main` in both. Deleting the copy drops
+  it to 58.0 / 0.0. LLVM does not narrow it, because `dst` is a caller-visible
+  `&mut [u8]`.
+- So the binding constraint on kernel design is **the harness floor above, not
+  the optimiser**. Fix the floor rather than redesigning the fold.
+
+When a pattern's scaffolding dominates its kernel, say so at the top of `NOTES.md`
+and quote the **marginal** column — never present a whole-kernel delta as the cost
+of the thing the pattern is named after.
+
 5. **The barrier is pinned in `spec.md`, not inferred.** Removing the driver's
    anti-collapse barrier is *not* reliably visible in either check above:
    measured at TASK_003, replacing `off = acc % nwin` with `off = 0` in every
