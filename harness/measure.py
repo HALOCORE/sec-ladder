@@ -106,10 +106,28 @@ def toolchain():
 
 
 def git_state():
+    """Provenance of the run, with a structural caveat (TASK_008_REVIEW minor 3).
+
+    `commit` is HEAD **at the time of measurement**, which is necessarily the
+    commit *before* the one this JSON is committed in. So a freshly re-run,
+    entirely up-to-date results file always reads `commit: <HEAD~1>, dirty:
+    true`, and "the recorded commit is behind the tree" is therefore not
+    evidence of staleness by itself. There is no fix -- a file cannot name the
+    commit that will contain it -- so do not chase it. What *is* evidence:
+    `results/gate/<pattern>.json`'s `source_sha256` map, which `harness/check.py`
+    writes per source file and a reviewer can compare against the tree.
+
+    `dirty_files` counts every modified path in the working tree, not just the
+    ones this measurement depended on, so it is a smoke signal and nothing
+    more."""
     commit = sh(["git", "-C", REPO, "rev-parse", "HEAD"])
     dirty = sh(["git", "-C", REPO, "status", "--porcelain"])
     return {"commit": commit, "dirty": bool(dirty.strip()),
-            "dirty_files": len(dirty.splitlines())}
+            "dirty_files": len(dirty.splitlines()),
+            "note": "commit is HEAD when measured, i.e. the parent of the "
+                    "commit this file lands in; a fresh run always names "
+                    "HEAD~1 and reads dirty. Use results/gate/*.json's "
+                    "source_sha256 to detect real staleness."}
 
 
 def host():

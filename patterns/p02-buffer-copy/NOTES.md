@@ -593,6 +593,62 @@ weak half.
 from TASK_005 (a trusted `unsafe` item must carry a non-empty `requires`) is
 satisfied by both items without a justification string, and the gate prints so.
 
+### The verified twins — what makes those `requires` more than *non-trivial*
+
+Added at TASK_009, and the reason is that everything above judges **triviality**
+and **mention**, not **strength**. Measured at TASK_008_REVIEW, both of these
+passed the whole gate — PASS, `complete_run true`, zero failures:
+
+| weakening | why every earlier check is blind to it |
+|---|---|
+| `get_unchecked`: `i < v@.len()` → **`i <= v@.len()`** | not a tautology; both parameters appear; deletion does not apply to trusted items |
+| `copy_bytes`: `from + n <= src@.len()` → **`… + 1`** | the same, on the copy |
+
+The first axiomatises that reading one byte past the end of a slice is defined
+and equals `v@[i]`; the second, that `copy_nonoverlapping` may read one byte past
+the end of `src`. Both are CWE-125.
+
+So `verus.rs` carries a twin beside each trusted `unsafe` item — the **same
+signature and the same contract**, which `check.py` step 5c-twin lifts from the
+trusted item and compares character for character, with a *checked*
+implementation instead of `unsafe`:
+
+| trusted item | twin | body |
+|---|---|---|
+| `get_unchecked` | `slb_twin_get_unchecked` | `v[i]` — 1 line |
+| `copy_bytes` | `slb_twin_copy_bytes` | an indexed copy loop — 16 lines |
+
+A precondition too weak to license the unchecked operation is too weak to
+license the checked one, and Verus can see the checked one. Measured:
+
+| mutant (verus.rs **and** the spec.md pins, one commit) | `--cfg slb_twin` |
+|---|---|
+| shipped | 12 verified, 0 errors |
+| `i <= v@.len()`, twin edited to match | 11 / 1 — `precondition not met: index in bounds` at `v[i]` |
+| `from + n <= src@.len() + 1`, ditto | 10 / 2 — the same, at `src[from + j]` |
+| weakened, twin made *defensive* (`if i < v.len() {v[i]} else {0}`) | 11 / 1 — `postcondition not satisfied` |
+| weakened trusted item, twin left alone | Verus: **12 / 0 — passes**; caught by the signature comparison instead |
+
+The fourth row is why the twin also has to satisfy the trusted `ensures`: an
+author cannot rescue a weakened `requires` by making the twin total. The fifth
+is why the contract is *lifted* rather than declared twice.
+
+**The copy twin is the interesting one, and it is where this mechanism could
+have been worse than useless.** There is no vstd spec for `copy_from_slice`
+(`.memory/04-verus.md`), so the checked equivalent of a bulk copy cannot be
+another bulk copy — it has to be the indexed loop. Had that loop failed *for
+want of a spec* rather than for want of a precondition, every failure the stage
+reported would have been uninterpretable. It verifies, so the failures above are
+about the precondition; the gate prints Verus's own diagnostic and says which
+reading each error text supports.
+
+Neither twin is in the TCB tally: Verus verifies both. Both are
+`#[cfg(slb_twin)]`, a cfg no build sets, so **they cost zero instructions
+structurally rather than by hope** — the pinned obligation count stays 9 (the
+twin run reports 12), no `slb_twin` symbol appears in the built R5 binary, and
+R4≡R5 is byte-identical as before (`md5_fn 0e5b59364bb6` at `-O3 isolated`,
+both).
+
 ---
 
 ## 6. Mutation testing — the proof was broken on purpose

@@ -64,11 +64,18 @@ supersede any earlier task report they contradict.
 - **`work_per_call` is unbounded.** Shrinking p02's 16× still passes the floor
   (margin 576.7×, shout only). See `.memory/02-bench-rules.md` for why bounding
   it mechanically is harder than it looks.
-- **Nothing pins the `SLB-DRIVER` region to the *measured* code path.** A region
-  placed in a dead decoy `fn` whose body matches the canonical tokens, while the
-  real measured loop goes unpinned, looks reachable. Raised at TASK_008_REVIEW
-  from reading, **not demonstrated** — the reviewer ran out of budget. Pre-existing,
-  and the highest-value unexplored attack on the driver diff. Test it.
+- **Nothing pins the `SLB-DRIVER` region to the *measured* code path — and this
+  is the sixth demonstrated bypass of the driver diff.** Raised at
+  TASK_008_REVIEW from reading; **built and confirmed at TASK_009.** Move
+  `safe_naive.rs`'s markers into a dead `fn slb_decoy` whose body is the
+  canonical loop, leave the real loop in `main` unmarked, and put
+  `_mm_prefetch` in it: **full gate PASS, `complete_run: true`, 0 failures**,
+  with stage 6 reporting *"5 driver loops … all normalise to the pinned
+  13-statement token sequence"* — one of them from a function that never runs.
+  The payload is live (`prefetcht0` in both O3 and O0 disassembly, 0 in the
+  control; marginal Ir/call O0 6838 → 6852). **Not fixed** — TASK_009 scoped it
+  as an investigation. A fix has to tie the region to the code the benchmark
+  actually executes, not merely to a file. Next task owns it.
 - **`measure.py` cannot record the commit it will be committed in**, so a fresh
   results JSON always names HEAD~1 with `dirty_files` set. Structural; say so in
   the schema rather than chasing it.

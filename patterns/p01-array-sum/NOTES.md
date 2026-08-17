@@ -326,6 +326,31 @@ Three deliberate choices behind that table:
   `u64::wrapping_add` / `wrapping_mul`. These are vstd's TCB, not this project's,
   but they are not zero and are named here rather than assumed away.
 
+### The verified twin — what makes `i < v@.len()` more than *non-trivial*
+
+Added at TASK_009. Everything the gate checked about `get_unchecked`'s
+precondition before it judged **triviality** (is the clause a tautology?) and
+**mention** (does it constrain every parameter the body uses?). Neither is
+*strength*: `i <= v@.len()` is not a tautology, mentions both parameters, and
+passed the entire gate — an R5 whose trusted base axiomatises that reading one
+byte past the end of a slice is defined (TASK_008_REVIEW).
+
+`verus.rs` therefore carries `slb_twin_get_unchecked`: the *same signature and
+contract*, lifted from `get_unchecked` by the gate and compared character for
+character, with `{ v[i] }` in place of `unsafe { *v.get_unchecked(i) }`. A
+precondition too weak to license the unchecked read is too weak to license the
+checked one, and Verus can see the checked one — the weakened pair fails with
+`precondition not met: index in bounds for this access`.
+
+The twin is `#[cfg(slb_twin)]`, a cfg no build sets, so rustc strips it before
+codegen: **zero instructions, structurally**. The pinned obligation count is
+unmoved at 7; `check.py` re-runs Verus with `--cfg slb_twin` and gets 8. R4≡R5
+is byte-identical as before (`md5_fn 619b1d1b6561` at `-O3 isolated`, both).
+
+It is **not** in the TCB tally above, because Verus verifies it. What it adds to
+the *declared* surface is one body of checked code a reviewer judges by reading
+it — the `model.py` move, applied to the trusted base instead of the kernel.
+
 ### R2v (`safe_naive_verus.rs`) — TCB: 5 lines across 2 items
 
 `load_input` (4) and `emit` (1). No `get_unchecked`, no `unsafe` anywhere in the

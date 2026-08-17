@@ -140,6 +140,31 @@ fn get_unchecked(v: &[u8], i: usize) -> (r: u8)
     unsafe { *v.get_unchecked(i) }
 }
 
+// THE VERIFIED TWIN of trusted item 1 (`harness/check.py` step 5c-twin).
+//
+// Same signature and same contract, character for character -- the gate lifts
+// both from `get_unchecked` above and refuses a twin whose signature differs --
+// but implemented in *checked* code. A `requires` too weak to license
+// `*v.get_unchecked(i)` is too weak to license `v[i]`, and Verus can see the
+// second one. Weaken the pair to `i <= v@.len()` and this fails with
+// `precondition not met: index in bounds for this access`; that off-by-one
+// passed the entire gate before this stage existed (TASK_008_REVIEW), because
+// 5a only asks whether the clause mentions every parameter and 5c-req only
+// whether it is a tautology, and `i <= v@.len()` is neither trivial nor silent.
+//
+// `#[cfg(slb_twin)]` is a cfg no build ever sets, so rustc strips this before
+// codegen: the twin costs zero instructions structurally, and the pinned
+// obligation count stays 9 (the `--cfg slb_twin` run reports 12).
+#[cfg(slb_twin)]
+fn slb_twin_get_unchecked(v: &[u8], i: usize) -> (r: u8)
+    requires
+        i < v@.len(),
+    ensures
+        r == v@[i as int],
+{
+    v[i]
+}
+
 // TRUSTED ITEM 2 of 4, and the one this pattern is about. `copy_nonoverlapping`
 // has three documented preconditions and the `requires` below carries two of
 // them; the third -- that the regions do not overlap -- is discharged by Rust's
@@ -175,6 +200,55 @@ fn copy_bytes(src: &[u8], from: usize, dst: &mut [u8], n: usize)
 {
     unsafe {
         core::ptr::copy_nonoverlapping(src.as_ptr().add(from), dst.as_mut_ptr(), n);
+    }
+}
+
+// THE VERIFIED TWIN of trusted item 2 (`harness/check.py` step 5c-twin).
+//
+// The interesting one: there is **no vstd spec for `copy_from_slice`**
+// (`.memory/04-verus.md`), so the checked equivalent of a bulk copy cannot be
+// another bulk copy -- it has to be the indexed loop below. That is the twin
+// mechanism's known wrinkle, and it is worth being explicit that this loop
+// verifying is what rules out the false-failure reading: if the twin failed for
+// want of a spec rather than for want of a precondition, the stage would be
+// worse than useless. It verifies (12 verified, 0 errors with `--cfg
+// slb_twin`), so the failures it reports are about the precondition.
+//
+// Weaken `from + n <= src@.len()` to `from + n <= src@.len() + 1` -- the copy's
+// form of the same off-by-one, which passed the whole gate at TASK_008_REVIEW --
+// and this fails at `src[from + j]` with `precondition not met: index in bounds
+// for this access`, because reading `src[src@.len()]` is exactly what the
+// weakened clause would license `copy_nonoverlapping` to do.
+//
+// The `assert` and the `src@.len() <= usize::MAX` invariant are the ambient
+// fact `vstd::slice::axiom_spec_len` supplies, fired the same way the kernel
+// fires it; they are ghost and this whole item is cfg'd out of every build.
+#[cfg(slb_twin)]
+fn slb_twin_copy_bytes(src: &[u8], from: usize, dst: &mut [u8], n: usize)
+    requires
+        from + n <= src@.len(),
+        n <= old(dst)@.len(),
+    ensures
+        final(dst)@ =~= src@.subrange(from as int, from + n as int) + old(dst)@.subrange(
+            n as int,
+            old(dst)@.len() as int,
+        ),
+{
+    assert(src@.len() == vstd::slice::spec_slice_len(src));
+    let mut j: usize = 0;
+    while j < n
+        invariant
+            j <= n,
+            n <= dst@.len(),
+            from + n <= src@.len(),
+            src@.len() <= usize::MAX,
+            dst@.len() == old(dst)@.len(),
+            forall|q: int| 0 <= q < j ==> dst@[q] == src@[from + q],
+            forall|q: int| j <= q < dst@.len() ==> dst@[q] == old(dst)@[q],
+        decreases n - j,
+    {
+        dst[j] = src[from + j];
+        j = j + 1;
     }
 }
 

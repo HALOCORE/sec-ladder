@@ -317,10 +317,57 @@ quoting 5c as a defence.**
 
    The three checks judge *triviality* and *mention*. Neither is *strength*, and
    strength is the whole property. **Do not describe 5c-req's guarantee as
-   "strong enough" — it is "not `true`".** Any pattern whose security argument
-   rests on a trusted accessor's `requires` needs a mechanism that checks the
-   declared precondition really licenses the operation; the shape to aim for is
-   the Miri cross-check's, a declared value tested against a measured one.
+   "strong enough" — it is "not `true`".**
+
+   **The mechanism that does judge strength: the verified twin (TASK_009).**
+   Beside each trusted `unsafe` item sits `#[cfg(slb_twin)] fn slb_twin_<name>`
+   with the *same* contract, implemented in checked code — `get_unchecked`'s twin
+   is `{ v[i] }`, `copy_bytes`'s is an indexed copy loop. Gate stage `5c-twin`
+   re-runs Verus with `--cfg slb_twin` and requires 0 errors. A `requires` too
+   weak to license the real operation is too weak to license the checked one, so
+   `i <= v@.len()` fails with *"precondition not met: index in bounds"*. The
+   `#[cfg]` keeps it out of every measured build, so it costs no instructions.
+
+   The contract is **lifted from the trusted item and compared**, not declared,
+   so weakening the item while leaving the twin alone is a signature mismatch —
+   note that Verus *alone* passes that mutant at 12 verified / 0 errors, so the
+   comparison is doing real work. Eight mutants fail for eight distinct reasons,
+   including two beyond the original design: a twin missing its `#[cfg]` (it
+   would compile into the measured binaries) and a twin whose body calls
+   `get_unchecked` (it re-uses the axiom it exists to check).
+
+   The `copy_from_slice`-has-no-vstd-spec wrinkle resolves cleanly: the copy twin
+   is an indexed loop and it **verifies**, so a failure there is weakness, not a
+   missing spec — and the gate prints the Verus diagnostic so the two can be told
+   apart.
+
+   Shipped obligation counts: p02 9 → 12, p01 7 → 8, with the pins unmoved.
+
+   **The load-bearing part is not the twin verifying — it is the twin *failing*
+   when the trusted precondition is deleted**, re-checked on every run
+   (`slb_twin_get_unchecked` / `slb_twin_copy_bytes` → 11 verified, 1 error).
+   A twin that verifies proves nothing on its own; a twin that still verifies
+   with the precondition deleted **never used it**, and certifies nothing about
+   strength. Two independent toothless-twin attacks were built and **both are
+   caught by that one check**:
+
+   - a trusted item with a `requires` and **no `ensures`** — the shape this file
+     actively *recommends* — twinned by an **empty body**. Verus: clean.
+   - a twin whose body is `loop { }` under
+     `#[verifier::exec_allows_no_decreases_clause]`, so it never returns and
+     satisfies **any** postcondition vacuously. Verus: 13 verified, 0 errors.
+     (Without that attribute Verus itself rejects it: *"loop must have a
+     decreases clause"* — and then helpfully names the attribute that disables
+     the check.)
+
+   Both give `FAIL [twin] … still verifies with the precondition DELETED`. That
+   generalises the way an enumeration of bad twin shapes would not: it tests the
+   twin's *dependence* on the precondition rather than guessing at how a body
+   might dodge it. Note the interaction with the "prefer wrappers with no
+   `ensures`" advice above — a trusted item with no `ensures` cannot have a twin
+   with teeth, because there is nothing to force the body to do the work. **Those
+   two pieces of guidance are in tension; the twin wins where a pattern's
+   security rests on the item.**
 2. **`&&` defeats whole-clause deletion — still open.** TASK_008 made 5c delete
    *conjuncts* (`vparse.top_level_ops` / `conjunct_spans` / `delete_conjunct`),
    and a clause carrying a top-level `==>`, `||` or `<==>` is **refused rather
@@ -341,6 +388,14 @@ quoting 5c as a defence.**
    the refusal branch is untested by the tree — strip redundant outer brackets
    before deciding a clause is atomic, and treat "atomic" as a claim to be
    justified rather than a default.
+
+   **Fixed at TASK_009**, which also found the splitter was *unsound* in a second
+   way nobody had specified: splitting a `forall` body at its inner `&&` produced
+   a fragment with the bound variable free, so the mutant failed to **compile**,
+   and a compile failure was being read as *"the conjunct is load-bearing"*. A
+   check that fails open on malformed input, in the direction of reporting health.
+   A top-level quantifier binder is now refused (and therefore shouted), and the
+   `vparse` selftest covers all three shapes at gate step 0.
 3. ~~**`clause_deletion_extra_items` can silently un-check the kernel.**~~
    **Closed at TASK_008** — an unknown item name is a hard failure.
 

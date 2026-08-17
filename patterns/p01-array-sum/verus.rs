@@ -65,6 +65,31 @@ fn get_unchecked(v: &[u64], i: usize) -> (r: u64)
     unsafe { *v.get_unchecked(i) }
 }
 
+// THE VERIFIED TWIN of trusted item 1 (`harness/check.py` step 5c-twin).
+//
+// Same signature and same contract, character for character -- the gate lifts
+// both from `get_unchecked` above and refuses a twin whose signature differs --
+// but implemented in *checked* code. A `requires` too weak to license
+// `*v.get_unchecked(i)` is too weak to license `v[i]`, and Verus can see the
+// second one: weaken the pair to `i <= v@.len()` and this item fails with
+// `precondition not met: index in bounds for this access`, which is the only
+// mechanism in the project that judges the *strength* of a trusted
+// precondition rather than its triviality (5a and 5c-req both pass
+// `i <= v@.len()` happily -- TASK_008_REVIEW).
+//
+// `#[cfg(slb_twin)]` is a cfg no build ever sets, so rustc strips this before
+// codegen and it costs zero instructions structurally rather than by hope. The
+// gate re-runs Verus with `--cfg slb_twin` to check it.
+#[cfg(slb_twin)]
+fn slb_twin_get_unchecked(v: &[u64], i: usize) -> (r: u64)
+    requires
+        i < v@.len(),
+    ensures
+        r == v@[i as int],
+{
+    v[i]
+}
+
 // TRUSTED ITEM 2 of 3. Argument parsing, file I/O and little-endian decoding,
 // delegated to common/driver.rs so that all five rungs read the file the same
 // way. It states **no** `ensures` at all, deliberately: an `ensures` here would

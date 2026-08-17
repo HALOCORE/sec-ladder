@@ -129,6 +129,37 @@ def _match_bracket(code, i):
     raise ValueError(f"vparse: unbalanced {code[i]!r} at offset {i}")
 
 
+def _match_angle(code, i):
+    """Index just past the `<` opened at `code[i]`.
+
+    Angle brackets are not brackets -- `->`, `=>` and comparison operators all
+    contain one of the characters -- so this skips the two arrows explicitly and
+    recurses through any real bracket it meets (`<F: Fn(u8) -> u8>`). Raises
+    rather than guessing: a generic list this cannot read must fail the caller
+    loudly, because the caller is synthesising code from it."""
+    if code[i] != "<":
+        raise ValueError(f"vparse: no '<' at offset {i}")
+    depth, j = 0, i
+    while j < len(code):
+        if code.startswith("->", j) or code.startswith("=>", j):
+            j += 2
+            continue
+        c = code[j]
+        if c in "([{":
+            j = _match_bracket(code, j)
+            continue
+        if c in ")]}":
+            raise ValueError(f"vparse: unbalanced '<' at offset {i}")
+        if c == "<":
+            depth += 1
+        elif c == ">":
+            depth -= 1
+            if depth == 0:
+                return j + 1
+        j += 1
+    raise ValueError(f"vparse: unbalanced '<' at offset {i}")
+
+
 def attribute_spans(code):
     """[(start, end)] of every `#[...]` / `#![...]` in the blanked code."""
     spans = []
@@ -166,7 +197,8 @@ class Item:
 
     __slots__ = ("name", "kind", "start", "sig", "sig_code", "sig_start",
                  "body", "body_start", "body_end", "attrs", "external",
-                 "clauses", "in_verus", "line", "cfg_gated", "mod_path")
+                 "clauses", "in_verus", "line", "cfg_gated", "mod_path",
+                 "impl_span", "impl_head")
 
     def __init__(self, **kw):
         for k in self.__slots__:
@@ -281,6 +313,58 @@ def module_spans(text, code=None):
     return out
 
 
+def impl_spans(text, code=None):
+    """[(head, body_start, body_end)] for every `impl ... { ... }` block.
+
+    Needed by the `requires`-tautology probe: a trusted accessor with a `&self`
+    receiver cannot be copied into a free function -- *"`self` parameter is only
+    allowed in associated functions"* -- so the probe is synthesised **inside
+    the same `impl`**, where `self`, the impl's generics and its `Self` type are
+    all in scope. Without this a pattern whose trusted item is method-shaped
+    hard-fails the gate and cannot be greened at all (TASK_008_REVIEW, major C).
+
+    `impl` is only recognised at item position (preceded by nothing, `{`, `}` or
+    `;`), so a `-> impl Iterator<...>` return type is not mistaken for a block.
+    An `impl` this cannot read is simply not reported, and the probe then
+    refuses with a named reason rather than emitting code that will not
+    compile."""
+    code = code if code is not None else blank_noncode(text)
+    out = []
+    for m in re.finditer(r"\bimpl\b", code):
+        pre = code[:m.start()].rstrip()
+        if pre and pre[-1] not in "{};":
+            continue                       # `-> impl Trait`, `dyn impl`, ...
+        j, body = m.end(), None
+        try:
+            while j < len(code):
+                if code.startswith("->", j) or code.startswith("=>", j):
+                    j += 2
+                    continue
+                c = code[j]
+                if c == "<":
+                    j = _match_angle(code, j)
+                    continue
+                if c in "([":
+                    j = _match_bracket(code, j)
+                    continue
+                if c == "{":
+                    body = j
+                    break
+                if c == ";":
+                    break                  # `impl` used in a way we don't model
+                j += 1
+        except ValueError:
+            continue
+        if body is None:
+            continue
+        try:
+            end = _match_bracket(code, body)
+        except ValueError:
+            continue
+        out.append((text[m.start():body].strip(), body + 1, end - 1))
+    return out
+
+
 def parse(text):
     """Every `fn`-like item in `text`, in source order.
 
@@ -293,6 +377,7 @@ def parse(text):
     attrs = attribute_spans(code)
     attr_end = {e: (s, e) for s, e in attrs}
     mods = module_spans(text, code)
+    impls = impl_spans(text, code)
     items = []
 
     for m in re.finditer(r"\bfn\s+(" + _IDENT + r")", code):
@@ -347,6 +432,8 @@ def parse(text):
                 ext = "verifier::external"
                 break
         enclosing = [mm for mm in mods if mm[1] <= m.start() < mm[2]]
+        in_impl = [ii for ii in impls if ii[1] <= m.start() < ii[2]]
+        inner_impl = max(in_impl, key=lambda ii: ii[1]) if in_impl else None
         gated = None
         if any(re.match(r"#!?\[\s*cfg\s*\(", a) for a in my_attrs):
             gated = "own #[cfg(...)]"
@@ -364,6 +451,8 @@ def parse(text):
             line=text.count("\n", 0, item_start) + 1,
             cfg_gated=gated,
             mod_path="::".join(mm[0] for mm in enclosing),
+            impl_span=None if inner_impl is None else (inner_impl[1], inner_impl[2]),
+            impl_head=None if inner_impl is None else inner_impl[0],
         ))
     return items
 
@@ -427,19 +516,76 @@ def delete_clause(text, item, kw, idx):
     a, b = spans[idx]
     if len(spans) == 1:
         a = info["kw_span"][0]
-    # swallow one separator: the comma after, else the comma before
+    # Swallow one separator: the comma after, else the comma before. Scanned on
+    # the comment-blanked copy, because `clause_spans` trims through comments
+    # too -- see `delete_conjunct` for the failure this caused.
+    code = blank_noncode(text)
     j = b
-    while j < len(text) and text[j] in " \t\r\n":
+    while j < len(code) and code[j] in " \t\r\n":
         j += 1
-    if j < len(text) and text[j] == ",":
+    if j < len(code) and code[j] == ",":
         b = j + 1
     else:
         i = a
-        while i > 0 and text[i - 1] in " \t\r\n":
+        while i > 0 and code[i - 1] in " \t\r\n":
             i -= 1
-        if i > 0 and text[i - 1] == ",":
+        if i > 0 and code[i - 1] == ",":
             a = i - 1
     return text[:a] + text[b:]
+
+
+def _first_clause_offset(sig_code):
+    """Offset of the first Verus clause keyword at bracket depth 0, or the end."""
+    best = len(sig_code)
+    for kw in CLAUSE_KEYWORDS:
+        for m in re.finditer(r"\b" + kw + r"\b", sig_code):
+            pre = sig_code[:m.start()]
+            if sum(pre.count(c) for c in "([{") == sum(pre.count(c) for c in ")]}"):
+                best = min(best, m.start())
+                break
+    return best
+
+
+def _param_span(item):
+    """(open, close) offsets of the parameter list inside `item.sig_code`."""
+    sc = item.sig_code or ""
+    i = 0
+    while i < len(sc) and sc[i].isspace():
+        i += 1
+    if i < len(sc) and sc[i] == "<":
+        i = _match_angle(sc, i)
+    while i < len(sc) and sc[i].isspace():
+        i += 1
+    if i >= len(sc) or sc[i] != "(":
+        raise ValueError(f"vparse: {item.name} has no parameter list")
+    return i, _match_bracket(sc, i)
+
+
+def sig_prefix(item):
+    """(generics, params, where_clause) of the item, as verbatim source text.
+
+    Everything the tautology probe must reproduce so that the parameter list it
+    copies actually type-checks. `params_text` used to be the whole of it, and
+    TASK_008_REVIEW measured the four shapes that then hard-fail the probe --
+    `<T: Copy>` and a `where` clause give *E0425 cannot find type `T`*, `<'a>`
+    gives *E0261 undeclared lifetime*, and a `&self` receiver gives *`self`
+    parameter is only allowed in associated functions*. Fail-closed, and
+    therefore correct, but the consequence was that a pattern with a generic or
+    method-shaped trusted accessor could not be greened at all.
+
+    Any piece that is empty comes back as `""`."""
+    sc, st = item.sig_code or "", item.sig or ""
+    i, j = _param_span(item)
+    k = 0
+    while k < len(sc) and sc[k].isspace():
+        k += 1
+    gen = st[k:_match_angle(sc, k)] if k < len(sc) and sc[k] == "<" else ""
+    end = _first_clause_offset(sc)
+    if end < j:                      # a clause keyword inside the parameters?
+        end = len(sc)
+    m = re.search(r"\bwhere\b", sc[j:end])
+    where = st[j:end][m.start():].strip() if m else ""
+    return gen, st[i:j], where
 
 
 def params_text(item):
@@ -448,26 +594,21 @@ def params_text(item):
     What the `requires`-tautology probe needs: a synthesised
     `proof fn <name><params> ensures <clause>, { }` has to bind exactly the
     names the clause mentions, and copying the source's own text is the only
-    way to be sure it does."""
-    sc = item.sig_code or ""
-    i = sc.find("(")
-    if i < 0:
-        raise ValueError(f"vparse: {item.name} has no parameter list")
-    return (item.sig or "")[i:_match_bracket(sc, i)]
+    way to be sure it does. See `sig_prefix` for the generics and `where` that
+    have to travel with it."""
+    return sig_prefix(item)[1]
 
 
-def param_names(item):
-    """[name] of the item's parameters, in order.
+def params(item):
+    """[(name, type_text)] of the item's parameters, in order.
 
-    Raises on anything that is not `[mut ]name: type` or a `self` receiver --
-    a caller that reasons about *which* parameters a contract constrains must
-    not be allowed to silently skip one it could not parse."""
-    sc = item.sig_code or ""
-    i = sc.find("(")
-    if i < 0:
-        raise ValueError(f"vparse: {item.name} has no parameter list")
-    j = _match_bracket(sc, i)
-    inner_code, inner_text = sc[i + 1:j - 1], (item.sig or "")[i + 1:j - 1]
+    A `self` receiver comes back as `("self", "<the receiver text>")`. Raises on
+    anything that is not `[mut ]name: type` -- a caller that reasons about
+    *which* parameters a contract constrains must not be allowed to silently
+    skip one it could not parse."""
+    sc, st = item.sig_code or "", item.sig or ""
+    i, j = _param_span(item)
+    inner_code, inner_text = sc[i + 1:j - 1], st[i + 1:j - 1]
     out, depth, start = [], 0, 0
     pieces = []
     for k, ch in enumerate(inner_code):
@@ -483,8 +624,9 @@ def param_names(item):
         code, text = inner_code[a:b], inner_text[a:b]
         if not code.strip():
             continue
-        if re.fullmatch(r"\s*&?\s*(mut\s+)?self\s*", code):
-            out.append("self")
+        if re.fullmatch(r"\s*&?\s*('[A-Za-z_][A-Za-z0-9_]*\s+)?(mut\s+)?self\s*",
+                        code):
+            out.append(("self", text.strip()))
             continue
         depth, cut = 0, None
         for k, ch in enumerate(code):
@@ -503,8 +645,13 @@ def param_names(item):
         if not re.fullmatch(_IDENT, nm):
             raise ValueError(f"vparse: {item.name}: parameter pattern "
                              f"{nm!r} is not a plain identifier")
-        out.append(nm)
+        out.append((nm, text[cut + 1:].strip()))
     return out
+
+
+def param_names(item):
+    """[name] of the item's parameters, in order; `self` for a receiver."""
+    return [n for n, _ in params(item)]
 
 
 # --- conjuncts: one deletable unit is not always one clause ----------------
@@ -527,13 +674,42 @@ def param_names(item):
 #
 # `item.clauses` is untouched and stays comma-split: it is what `spec.md` pins,
 # and the pin is a verbatim text diff that must not move under this.
+#
+# **And "atomic" is a claim, not a default** (TASK_008_REVIEW, blocker A).
+# `top_level_ops` reports operators at bracket depth 0 only, and "no operators
+# found" used to mean *atomic, `refused=None`* -- so `( A && B )` was neither
+# split nor refused. No shout, no failure, full green gate, and the redundant
+# trusted axiom is back for two characters. The `==>` path was loud all along;
+# the parenthesised case escaped both branches. Two changes close it:
+#
+#   * redundant outer brackets are stripped before the top-level scan, so
+#     `( A && B )` splits exactly as `A && B` does;
+#   * a clause with no top-level operator but *some* logical operator inside
+#     brackets, or a top-level quantifier binder whose body runs to the end of
+#     the clause, is **refused** (and therefore shouted) rather than being
+#     called atomic. Only a clause containing no logical operator anywhere is
+#     atomic without an argument.
+#
+# The quantifier case is a soundness fix in its own right: `forall|j| A && B`
+# parses as `forall|j| (A && B)`, so splitting at that `&&` produced a fragment
+# with `j` unbound -- a mutant that fails to compile, which the stage would read
+# as "load-bearing" if the probe did not hard-fail first.
 _LOGIC_OPS = ("<==>", "<==", "==>", "&&&", "|||", "||", "&&")
 
+# `forall|j: int| ...` / `exists|...| ...` / `choose|...| ...`: the binder's
+# body extends to the end of the clause, so nothing inside it is a deletable
+# conjunct of the clause.
+_QUANT_RE = re.compile(r"\b(forall|exists|choose)\s*\|")
 
-def top_level_ops(text):
-    """[(offset, op)] for each logical operator of `_LOGIC_OPS` at bracket
-    depth 0 in `text`. Longest match wins at each position, so `&&&` is never
-    read as `&&` and `<==>` is never read as `<==`."""
+
+def top_level_ops(text, depth0=True):
+    """[(offset, op)] for each logical operator of `_LOGIC_OPS` in `text`.
+
+    `depth0` (the default) reports only operators at bracket depth 0; with
+    `depth0=False` every occurrence is reported, which is how a caller asks
+    "is there a connective hiding inside brackets?". Longest match wins at each
+    position, so `&&&` is never read as `&&` and `<==>` is never read as
+    `<==`."""
     out, depth, i = [], 0, 0
     while i < len(text):
         ch = text[i]
@@ -541,7 +717,7 @@ def top_level_ops(text):
             depth += 1
         elif ch in ")]}":
             depth -= 1
-        if depth == 0:
+        if depth == 0 or not depth0:
             for op in _LOGIC_OPS:
                 if text.startswith(op, i):
                     out.append((i, op))
@@ -554,14 +730,38 @@ def top_level_ops(text):
     return out
 
 
+def strip_outer_brackets(text):
+    """(start, end) of `text` with every redundant enclosing `( ... )` removed.
+
+    Redundant means: the whole of `text` is one bracketed group. `"( a && b )"`
+    -> the span of `" a && b "`. Returns `(0, len(text))` when there is nothing
+    to strip. `text` must be comment/string-blanked."""
+    a, b = 0, len(text)
+    while True:
+        while a < b and text[a] in " \t\r\n":
+            a += 1
+        while b > a and text[b - 1] in " \t\r\n":
+            b -= 1
+        if b - a < 2 or text[a] != "(":
+            return a, b
+        try:
+            if _match_bracket(text[a:b], 0) != b - a:
+                return a, b
+        except ValueError:
+            return a, b
+        a, b = a + 1, b - 1
+
+
 def conjunct_spans(item, kw):
     """Per comma-clause of `item`'s `kw` list: the deletable conjuncts inside it.
 
     Returns a list parallel to `item.clauses[kw]`, each entry
     `{"spans": [(a, b), ...], "op": "&&"|"&&&"|None, "refused": None|str}` in
-    absolute offsets into the text the item was parsed from. `refused` names the
-    top-level connective that made splitting unsound; the caller must surface it
-    rather than silently treating the clause as atomic."""
+    absolute offsets into the text the item was parsed from. `refused` says why
+    the clause could not be split into conjuncts; the caller must surface it
+    rather than silently treating the clause as atomic. **`refused is None` is a
+    positive claim** -- "this clause contains no logical connective at all, so
+    it has exactly one conjunct" -- not a fallback."""
     info = clause_spans(item).get(kw)
     if not info:
         return []
@@ -570,11 +770,20 @@ def conjunct_spans(item, kw):
     for a, b in info["spans"]:
         # the comment/string-blanked copy: a `&&` inside a comment is not a
         # connective, and the two copies are the same length so offsets agree
-        body = (item.sig_code or "")[a - base:b - base]
+        whole = (item.sig_code or "")[a - base:b - base]
+        # `( A && B )` must split exactly as `A && B` does (TASK_008_REVIEW A)
+        sa, sb = strip_outer_brackets(whole)
+        body = whole[sa:sb]
+        a_in = a + sa
         ops = top_level_ops(body)
         kinds = {op for _, op in ops}
-        if not kinds:
-            out.append({"spans": [(a, b)], "op": None, "refused": None})
+        quant = _QUANT_RE.search(body)
+        if quant and (not ops or quant.start() < min(o for o, _ in ops)):
+            # `forall|j| A && B` is `forall|j| (A && B)`: nothing after the
+            # binder is a conjunct of the clause.
+            out.append({"spans": [(a, b)], "op": None,
+                        "refused": f"a top-level `{quant.group(1)}` binder, "
+                                   f"whose body runs to the end of the clause"})
             continue
         if kinds == {"&&"} or kinds == {"&&&"}:
             op = kinds.pop()
@@ -590,11 +799,21 @@ def conjunct_spans(item, kw):
                 while e > s and body[e - 1] in " \t\r\n":
                     e -= 1
                 if e > s:
-                    trimmed.append((a + s, a + e))
+                    trimmed.append((a_in + s, a_in + e))
             out.append({"spans": trimmed, "op": op, "refused": None})
             continue
-        out.append({"spans": [(a, b)], "op": None,
-                    "refused": "top-level " + ", ".join(sorted(kinds))})
+        if kinds:
+            out.append({"spans": [(a, b)], "op": None,
+                        "refused": "top-level " + ", ".join(sorted(kinds))})
+            continue
+        buried = {op for _, op in top_level_ops(body, depth0=False)}
+        if buried:
+            out.append({"spans": [(a, b)], "op": None,
+                        "refused": "no top-level connective but "
+                                   + ", ".join(sorted(buried))
+                                   + " inside brackets"})
+            continue
+        out.append({"spans": [(a, b)], "op": None, "refused": None})
     return out
 
 
@@ -604,7 +823,16 @@ def delete_conjunct(text, item, kw, ci, ji):
     Removes the adjacent connective with it. A clause with a single conjunct
     falls back to `delete_clause`, which also drops the keyword when the clause
     was the only one -- a dangling `ensures` before `{` is a parse error, and a
-    parse error is not the same experiment as a missing postcondition."""
+    parse error is not the same experiment as a missing postcondition.
+
+    **The scan for the connective runs on the comment-blanked copy**
+    (TASK_008_REVIEW, minor 1). `conjunct_spans` trims a span's trailing
+    whitespace on the blanked text, so it trims *through* a comment;
+    `ensures a == b /* && c */ && d == e` therefore ends conjunct 0 at `b`,
+    and a raw-text scan for the operator then stops at the `/`, leaves the
+    `&&` in place, and produces `ensures /* && c */ && d == e`. That is a parse
+    error, which the gate reports as *"Verus produced no result for the
+    mutant"* -- blaming Verus for a splitter bug."""
     cj = conjunct_spans(item, kw)
     if ci >= len(cj):
         raise ValueError(f"vparse: {item.name} has no {kw} clause {ci}")
@@ -613,18 +841,19 @@ def delete_conjunct(text, item, kw, ci, ji):
         raise ValueError(f"vparse: {item.name} {kw}[{ci}] has no conjunct {ji}")
     if len(spans) == 1:
         return delete_clause(text, item, kw, ci)
+    code = blank_noncode(text)
     a, b = spans[ji]
     if ji + 1 < len(spans):                       # swallow the operator after
         j = b
-        while j < len(text) and text[j] in " \t\r\n":
+        while j < len(code) and code[j] in " \t\r\n":
             j += 1
-        if text.startswith(op, j):
+        if code.startswith(op, j):
             b = j + len(op)
     else:                                         # ...else the one before
         i = a
-        while i > 0 and text[i - 1] in " \t\r\n":
+        while i > 0 and code[i - 1] in " \t\r\n":
             i -= 1
-        if text[max(0, i - len(op)):i] == op:
+        if code[max(0, i - len(op)):i] == op:
             a = i - len(op)
     return text[:a] + text[b:]
 
@@ -820,6 +1049,115 @@ fn f(dst: &mut [u8], n: usize) -> (r: u64)
          top_level_ops("a &&& b"), [(2, "&&&")])
     want("top_level_ops ignores operators inside brackets",
          top_level_ops("f(a && b) && c"), [(10, "&&")])
+
+    # --- TASK_008_REVIEW A: one pair of brackets must not buy silence --------
+    paren = '''use vstd::prelude::*;
+verus! {
+#[verifier::external_body]
+fn g(dst: &mut [u8], n: usize, v: &[u8], j: usize) -> (r: u64)
+    requires
+        ( n <= old(dst)@.len() && n >= 0 ),
+    ensures
+        (( r == 1 && n == 2 )),
+        (r == 1 ==> n > 0),
+        f(n && j),
+        forall|q: int| 0 <= q < n && v@[q] == 0u8,
+        r == 1,
+{ 0 }
+} // verus!
+'''
+    pg = by_name(paren)["g"]
+    want("strip_outer_brackets removes one redundant pair",
+         strip_outer_brackets("( a && b )"), (2, 8))
+    want("...and does not remove a non-enclosing one",
+         strip_outer_brackets("(a) && (b)"), (0, 10))
+    cjp = conjunct_spans(pg, "requires")
+    want("a fully-parenthesised `( A && B )` SPLITS (was: silently atomic)",
+         [paren[a:b] for a, b in cjp[0]["spans"]],
+         ["n <= old(dst)@.len()", "n >= 0"])
+    want("...and is not refused", cjp[0]["refused"], None)
+    want("deleting conjunct 1 of it leaves the brackets balanced",
+         by_name(delete_conjunct(paren, pg, "requires", 0, 1))["g"]
+         .clauses["requires"], ["( n <= old(dst)@.len() )"])
+    ejp = conjunct_spans(pg, "ensures")
+    want("`(( A && B ))` -- two pairs -- splits too",
+         [paren[a:b] for a, b in ejp[0]["spans"]], ["r == 1", "n == 2"])
+    want("`(A ==> B)` is refused, not called atomic",
+         ejp[1]["refused"], "top-level ==>")
+    want("a connective buried in a call argument is refused",
+         ejp[2]["refused"], "no top-level connective but && inside brackets")
+    want("a top-level quantifier binder is refused (its body is not a conjunct)",
+         ejp[3]["refused"],
+         "a top-level `forall` binder, whose body runs to the end of the clause")
+    want("...and a clause with no connective anywhere is atomic, positively",
+         (ejp[4]["refused"], [paren[a:b] for a, b in ejp[4]["spans"]]),
+         (None, ["r == 1"]))
+
+    # --- TASK_008_REVIEW minor 1: a comment between two conjuncts -----------
+    cmt = '''use vstd::prelude::*;
+verus! {
+#[verifier::external_body]
+fn h(n: usize) -> (r: u64)
+    ensures
+        r == 1 /* && r == 9 */ && n == 2,
+{ 0 }
+} // verus!
+'''
+    ch = by_name(cmt)["h"]
+    want("a `&&` inside a comment is not a connective",
+         [cmt[a:b] for a, b in conjunct_spans(ch, "ensures")[0]["spans"]],
+         ["r == 1", "n == 2"])
+    d = delete_conjunct(cmt, ch, "ensures", 0, 0)
+    want("deleting conjunct 0 swallows the operator ACROSS the comment",
+         by_name(d)["h"].clauses["ensures"], ["n == 2"])
+    want("...and deleting conjunct 1 leaves a parseable clause (comment kept)",
+         [c.replace("/* && r == 9 */", "").strip()
+          for c in by_name(delete_conjunct(cmt, ch, "ensures", 0, 1))["h"]
+          .clauses["ensures"]], ["r == 1"])
+
+    # --- TASK_008_REVIEW C: what the tautology probe has to copy ------------
+    shapes = '''use vstd::prelude::*;
+verus! {
+pub struct Buf { pub b: Vec<u8> }
+
+impl Buf {
+    #[verifier::external_body]
+    pub fn at(&self, i: usize) -> (r: u8)
+        requires i < self.b@.len(),
+    { 0 }
+}
+
+#[verifier::external_body]
+fn gen<T: Copy>(v: &[T], i: usize) -> (r: T) requires i < v@.len(), { v[i] }
+
+#[verifier::external_body]
+fn wh<T>(v: &[T], i: usize) -> (r: T) where T: Copy
+    requires i < v@.len(),
+{ v[i] }
+
+#[verifier::external_body]
+fn lt<'a>(v: &'a [u8], i: usize) -> (r: u8) requires i < v@.len(), { 0 }
+} // verus!
+'''
+    si = by_name(shapes)
+    want("sig_prefix carries the generic list",
+         sig_prefix(si["gen"])[0], "<T: Copy>")
+    want("sig_prefix carries the `where` clause",
+         sig_prefix(si["wh"])[2], "where T: Copy")
+    want("...and its generics, and stops the params at the right bracket",
+         (sig_prefix(si["wh"])[0], sig_prefix(si["wh"])[1]),
+         ("<T>", "(v: &[T], i: usize)"))
+    want("sig_prefix carries a lifetime parameter",
+         sig_prefix(si["lt"])[0], "<'a>")
+    want("a `self` receiver is reported with its text",
+         params(si["at"]), [("self", "&self"), ("i", "usize")])
+    want("...and the item knows which `impl` encloses it",
+         si["at"].impl_head, "impl Buf")
+    want("a free fn has no impl", si["gen"].impl_head, None)
+    want("param types come back beside the names",
+         params(si["gen"]), [("v", "&[T]"), ("i", "usize")])
+    want("_match_angle survives a nested generic",
+         _match_angle("<Vec<u8>, T>x", 0), 12)
 
     # --- parameter names, for the trusted-`unsafe` coverage rule ------------
     want("param_names on a &mut signature",

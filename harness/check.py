@@ -186,6 +186,41 @@ ALPHA_IR_PER_WORK = 0.25
 # algorithm; it is saying the work does not happen, and no `why` string can fix
 # that. Changing this is a harness diff that moves all 47 patterns at once.
 MIN_DECLARABLE_IR_PER_WORK = 0.015625
+#
+# ...but read that derivation again: "four instructions per 256 **bytes**". It
+# is a statement about a byte-denominated unit, and it fired *before* any
+# justification was consulted, unlike the below-default path which accepts a
+# `min_ir_per_work_why`. TASK_008_REVIEW found the pattern it forbids:
+# `.memory/06-catalogue.md` plans **p09, bit vector / bitset** -- AVX-512
+# `vpopcntq` does 512 bits in ~3 instructions = **0.0059 Ir per bit**, below
+# 1/64, with no route out. An honest bit-denominated `model.py` could not be
+# greened at all.
+#
+# The bound is therefore expressed per **bit** of whatever unit `model.py`
+# denominates in, which is the only unit-awareness that is physical rather than
+# conventional:
+#
+#     MIN_DECLARABLE_IR_PER_BIT * work_unit_bits
+#
+# `model.py` declares `work_unit_bits` (default 8 -- a byte, so no existing
+# pattern moves and p02's bound is still exactly 0.015625) and `work_unit` (a
+# name, printed). p09 declares 1 and gets 0.001953, which `vpopcntq`'s 0.0059
+# clears 3x. This is unit-*awareness*, not a hatch: nothing has to be argued.
+MIN_DECLARABLE_IR_PER_BIT = MIN_DECLARABLE_IR_PER_WORK / 8
+#
+# Unit-awareness does not cover everything, and the residue is worth naming. A
+# *skipping* walker -- a TLV parser denominated in buffer bytes -- touches one
+# byte in `stride`, so its honest Ir-per-byte is unbounded below and no physical
+# argument fixes it, because the rate is then a fact about the input rather than
+# about the algorithm. The right answer there is to re-denominate the unit in
+# the thing the kernel actually touches (records, not bytes), and the failure
+# message says so. For the case where an author is sure otherwise there is a
+# justification hatch -- `min_ir_per_work_bound_why`, shouted on every run like
+# its sibling -- but it is capped: it may lower the unit-aware bound by at most
+# 64x, the same "a vector four times wider than anything that exists, three
+# times over" argument. Without a cap the hatch is `> 0` again and
+# TASK_006_REVIEW's `1e-9` walks back in behind a free-text string.
+MIN_BOUND_HATCH_FACTOR = 64.0
 
 # Above this ratio of measured Ir to the derived floor, the floor is loose
 # enough that it certifies nothing but total collapse, and the verdict says so.
@@ -660,6 +695,7 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
 
     shapes = []          # (name, {n: probe_path}, dcalls, work_per_call)
     rates = {}           # nm -> (rate, why)
+    units = {}           # nm -> (unit name, bits per unit, bound hatch why)
     for nm in names:
         src = os.path.join(indir, nm)
         if not os.path.exists(src):
@@ -672,6 +708,9 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
         work = sbg(mods[hi], "work_per_call")
         rates[nm] = (sbg_opt(mods[hi], "min_ir_per_work"),
                      sbg_opt(mods[hi], "min_ir_per_work_why", ""))
+        units[nm] = (sbg_opt(mods[hi], "work_unit", "byte"),
+                     sbg_opt(mods[hi], "work_unit_bits", 8),
+                     sbg_opt(mods[hi], "min_ir_per_work_bound_why", ""))
         if dcalls <= 0:
             rep.fail("collapse-ir", f"{nm}: probe iters {lo}->{hi} produce no "
                                     f"extra kernel calls -- pick another probe")
@@ -694,6 +733,32 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
                  f"cheapest legitimate cost of the *algorithm*; one that varies "
                  f"with the input is a fact about the input.")
         return {}
+    # --- the unit, and therefore the bound under the declarable rate ---------
+    declared_units = {u for u in units.values()}
+    if len(declared_units) > 1:
+        rep.fail("collapse-ir",
+                 f"model.py reports different work units per probe input "
+                 f"({units}). The unit of work is a property of the pattern, "
+                 f"not of the input.")
+        return {}
+    unit_name, unit_bits, bound_why = (next(iter(declared_units))
+                                       if declared_units else ("byte", 8, ""))
+    try:
+        unit_bits = int(unit_bits)
+    except (TypeError, ValueError):
+        unit_bits = 0
+    if unit_bits < 1:
+        rep.fail("collapse-ir",
+                 f"model.py declares work_unit_bits={unit_bits!r}; it is how "
+                 f"many bits one unit of work is (a byte is 8) and it sets the "
+                 f"absolute bound under min_ir_per_work. It must be an integer "
+                 f">= 1.")
+        return {}
+    bound = MIN_DECLARABLE_IR_PER_BIT * unit_bits
+    hatched = False
+    if bound_why:
+        bound, hatched = bound / MIN_BOUND_HATCH_FACTOR, True
+
     rate, why = next(iter(rates.values())) if rates else (None, "")
     if rate is None:
         rate, src_of_rate = ALPHA_IR_PER_WORK, "harness default"
@@ -704,11 +769,16 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
             rep.fail("collapse-ir", f"model.py's min_ir_per_work is {rate!r}, "
                                     f"which is not a number")
             return {}
-        if rate < MIN_DECLARABLE_IR_PER_WORK:
+        if rate < bound:
             rep.fail("collapse-ir",
-                     f"model.py declares min_ir_per_work={rate}, below the "
-                     f"harness's absolute bound {MIN_DECLARABLE_IR_PER_WORK}. "
-                     f"Until TASK_008 the only bound was `> 0`, and "
+                     f"model.py declares min_ir_per_work={rate} Ir per "
+                     f"{unit_name}, below the harness's absolute bound {bound} "
+                     f"({MIN_DECLARABLE_IR_PER_BIT} Ir/bit x work_unit_bits="
+                     f"{unit_bits}"
+                     + (f", already lowered {MIN_BOUND_HATCH_FACTOR:.0f}x by "
+                        f"model.py's min_ir_per_work_bound_why" if hatched
+                        else "")
+                     + f"). Until TASK_008 the only bound was `> 0`, and "
                      f"TASK_006_REVIEW put 1e-9 with why=\"see NOTES.md\" past "
                      f"the whole gate -- 'derived floor 0.0 Ir/call', 'tightest "
                      f"margin 2246270772.2x', nothing inspects `why`. The bound "
@@ -716,10 +786,15 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
                      f"is p02's 0.0625 Ir/byte (load+store+vpsadbw+vpaddq per "
                      f"64-byte AVX-512 lane), and {MIN_DECLARABLE_IR_PER_WORK} "
                      f"is the same four instructions across a vector four times "
-                     f"wider than anything that exists. Below it, this is not a "
-                     f"claim about an algorithm; it is a claim that the work "
-                     f"does not happen, and no justification string repairs "
-                     f"that.")
+                     f"wider than anything that exists -- per bit, "
+                     f"{MIN_DECLARABLE_IR_PER_BIT}. If your kernel really is "
+                     f"cheaper than that per unit, the unit is one it does not "
+                     f"touch once per unit (a skipping walker denominated in "
+                     f"buffer bytes is the shape), and the fix is to "
+                     f"**re-denominate work_per_call in the thing the kernel "
+                     f"touches** -- records, not bytes. Lowering the floor "
+                     + ("further " if hatched else "")
+                     + f"instead just stops it saying anything.")
             return {}
         src_of_rate = "model.py"
         if rate < ALPHA_IR_PER_WORK:
@@ -739,9 +814,18 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
                          f"assertion an author cannot satisfy with fixed work "
                          f"-- d(Ir)/d(work) >= rate -- does not run. A loosened "
                          f"absolute floor needs the marginal one.")
+    if hatched:
+        rep.shout("collapse-ir",
+                  f"model.py invoked `min_ir_per_work_bound_why` to lower the "
+                  f"harness's ABSOLUTE bound from "
+                  f"{MIN_DECLARABLE_IR_PER_BIT * unit_bits} to {bound} Ir per "
+                  f"{unit_name} -- the hatch under the bound, not the bound "
+                  f"under the default. Capped at {MIN_BOUND_HATCH_FACTOR:.0f}x, "
+                  f"because an uncapped hatch is `> 0` again. model.py's "
+                  f"argument: {bound_why}")
     for nm, _, dcalls, work in shapes:
         print(f"    probe {nm:16s} n_iters {lo}/{hi} -> +{dcalls} kernel calls, "
-              f"work_per_call={work}  => derived floor "
+              f"work_per_call={work} {unit_name}(s)  => derived floor "
               f"{rate * work:.1f} Ir/call")
     if len(shapes) < 2 or len(works) < 2:
         rep.shout("collapse-ir",
@@ -750,7 +834,12 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
                   f"fixed amount of work regardless of its input passes the "
                   f"absolute floor. Add a second `collapse.probe_inputs` entry "
                   f"with a different work_per_call.")
-    print(f"    rate  = {rate} Ir per unit of work, from {src_of_rate} "
+    print(f"    unit  = 1 {unit_name} = {unit_bits} bit(s); absolute bound "
+          f"{bound} Ir per {unit_name} "
+          f"({MIN_DECLARABLE_IR_PER_BIT} Ir/bit x {unit_bits}"
+          + (f", hatched /{MIN_BOUND_HATCH_FACTOR:.0f}" if hatched else "")
+          + ")")
+    print(f"    rate  = {rate} Ir per {unit_name}, from {src_of_rate} "
           f"(harness default {ALPHA_IR_PER_WORK}; NOT settable from spec.md); "
           + (f"spec.md's advisory floor {declared} can only tighten it"
              if declared else "spec.md declares no additional floor"))
@@ -801,6 +890,8 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
                              f"{b[1]}), so the measured loop is not doing this "
                              f"pattern's work.")
     out["_rate"] = rate
+    out["_bound"] = bound
+    out["_work_unit"] = unit_name
     # --- the achieved margin, printed beside the declared floor --------------
     #
     # TASK_006_REVIEW D: the verdict printed "tightest margin 2246270772.2x" for
@@ -814,15 +905,15 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
                for k, v in out.items() if k.endswith("/" + nm)]
     tight = min(margins) if margins else None
     per = [v for k, v in out.items()
-           if not k.endswith("d_ir_d_work") and k != "_rate"]
+           if not k.endswith("d_ir_d_work") and not k.startswith("_")]
     if tight is not None:
         out["_tightest_margin"] = tight
         if rate < ALPHA_IR_PER_WORK and why:
             rep.shout("collapse-ir",
                       f"this pattern's anti-collapse floor is {rate} Ir per "
-                      f"unit of work, BELOW the harness default "
-                      f"{ALPHA_IR_PER_WORK} (bound {MIN_DECLARABLE_IR_PER_WORK}"
-                      f"). Declared floor {rate * min(works):.1f}...{rate * max(works):.1f} "
+                      f"{unit_name}, BELOW the harness default "
+                      f"{ALPHA_IR_PER_WORK} (absolute bound {bound})"
+                      f". Declared floor {rate * min(works):.1f}...{rate * max(works):.1f} "
                       f"Ir/call; tightest measured margin over it {tight:.1f}x, "
                       f"i.e. this stage tolerates a "
                       f"{100 * (1 - 1 / tight):.1f}% loss of work before it "
@@ -835,11 +926,11 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
                       f"{100 * (1 - 1 / tight):.2f}% of its work and still pass "
                       f"this stage. Read it as a smoke test, not as evidence "
                       f"that the work happened.")
-    if len(out) > 1 and not any(f[0] == "collapse-ir" for f in rep.failures):
+    if per and not any(f[0] == "collapse-ir" for f in rep.failures):
         rep.ok(f"{len(per)} cell/probe pairs: marginal Ir per call "
                f"{min(per):.0f}...{max(per):.0f}, all above the derived floor "
                f"(tightest margin {tight:.1f}x over a declared "
-               f"{rate} Ir/work); "
+               f"{rate} Ir/{unit_name}); "
                + (f"d(Ir)/d(work) {min(ratios):.2f}...{max(ratios):.2f} "
                   f"(rate {rate})" if ratios else
                   "no second shape, so no marginal-rate assertion"))
@@ -1135,10 +1226,19 @@ def check_verus_contract(pdir, rep, contract):
             if not it.in_verus:
                 diffs.append("outside `verus! {}` -- Verus never sees it, so "
                              "its pinned contract constrains nothing")
-            if it.cfg_gated:
+            # A verified twin (stage 5c-twin) is *required* to be cfg'd out of
+            # every build -- that is what makes it cost zero instructions
+            # structurally. 5c-twin checks the exact cfg spelling and that the
+            # twin's signature is the trusted item's, so the item it stands
+            # beside is not left unpinned.
+            if it.cfg_gated and not name.startswith(TWIN_PREFIX):
                 diffs.append(f"gated by {it.cfg_gated} -- it may not be in the "
                              f"build at all, while the item that is goes "
                              f"unpinned")
+            elif it.cfg_gated and it.cfg_gated != "own #[cfg(...)]":
+                diffs.append(f"is a verified twin but is gated by "
+                             f"{it.cfg_gated} rather than by its own "
+                             f"#[cfg({TWIN_CFG})]")
             if (it.external or None) != (w.get("external") or None):
                 diffs.append(f"external: {it.external!r} != {w.get('external')!r}")
             for kw in ("requires", "ensures"):
@@ -1236,15 +1336,18 @@ def check_call_site(pdir, rep, contract):
                                     f"(comments and string literals do not count)")
 
     for name in (site, kname):
-        r = subprocess.run([sys.executable, os.path.join(REPO, "verus_run.py"), src,
-                            "--verify-function", name, "--verify-root"],
-                           capture_output=True, text=True, cwd=REPO,
-                           timeout=RUN_TIMEOUT)
-        res = (r.stdout + r.stderr).strip()
-        m = re.search(r"(\d+) verified, (\d+) errors", res)
-        n = int(m.group(1)) if m else 0
+        mp = (items.get(name).mod_path or "") if items.get(name) else ""
+        nv, ne, res, resolved = _verify_function(src, name, mp)
+        n = nv or 0
         out[name] = n
-        if not m or int(m.group(2)) or n < 1:
+        if not resolved:
+            rep.fail("proof-rule2",
+                     f"Verus could not RESOLVE `{name}` for "
+                     f"`--verify-function` (module {mp!r}) -- that is 'the gate "
+                     f"could not ask the question', not 'the item has no "
+                     f"verified body' (TASK_008_REVIEW major E).\n"
+                     f"      {(res or '')[-300:]}")
+        elif nv is None or ne or n < 1:
             rep.fail("proof-rule2",
                      f"`verus --verify-function {name}` reports {n} verified: "
                      f"Verus has no verified body for `{name}`. If it is "
@@ -1267,6 +1370,32 @@ def _verus(path, *extra):
     if not m:
         return None, None, res
     return int(m.group(1)), int(m.group(2)), res
+
+
+_UNRESOLVED_RE = re.compile(
+    r"could not find function .*specified by --verify-function")
+
+
+def _verify_function(path, name, mod_path=""):
+    """(verified, errors, output, resolved) for one item, asked of Verus.
+
+    Two answers that used to be one (TASK_008_REVIEW, major E). `--verify-root`
+    restricts the query to the crate root, so a function inside a `mod` is not
+    *unverified* -- it is **unnameable**: Verus replies *"could not find
+    function drive specified by --verify-function; available functions are: -
+    main"*, `_verus` returns `(None, None)`, and the caller reported "the item
+    enclosing the region has no verified body", which is false. The file
+    verifies 2/0.
+
+    `--verify-only-module <mod> --verify-function <name>` is the query that does
+    resolve it (measured: `1 verified, 0 errors`), so a mod-nested item is now
+    asked properly instead of being misdiagnosed. `resolved` is False only when
+    Verus says it cannot find the name at all, which is a different failure and
+    must be reported as one -- an `impl` method resolves fine either way."""
+    extra = (["--verify-only-module", mod_path, "--verify-function", name]
+             if mod_path else ["--verify-function", name, "--verify-root"])
+    nv, ne, out = _verus(path, *extra)
+    return nv, ne, out, not (nv is None and _UNRESOLVED_RE.search(out or ""))
 
 
 def _mutant_path(pdir, src):
@@ -1542,21 +1671,124 @@ def check_clause_deletion(pdir, rep, contract, enabled=True):
     return out
 
 
-def _taut_probe(txt, item, a, b, tag):
-    """`txt` with a `proof fn` appended inside `verus! {}` whose only obligation
-    is the clause at `txt[a:b]`, under no hypotheses but the parameter types.
+_SLICE_TY_RE = re.compile(r"^&\s*(?P<mut>mut\s+)?\[")
+
+# Tactics the tautology probe tries, in order, before it will say "this clause
+# constrains a caller". The bare probe's oracle is "Z3 proved it", so a
+# tautology that needs a decision procedure reads as meaningful without them:
+# TASK_008_REVIEW measured `off <= (off | 1)` and `(off & 0xff) <= 255` as
+# "not a tautology" against the bare probe, and both are `true` for every
+# `usize`. One extra Verus run per tactic, and only for a conjunct the previous
+# tactic failed on, so the shipped tree pays for all of them and a tautological
+# one pays for one.
+_TAUT_TACTICS = (None, "nonlinear_arith", "bit_vector")
+
+
+def _ambient_facts(item):
+    """The facts a real call site has and a bare `proof fn` does not.
+
+    TASK_008_REVIEW, major D: the probe reported this project's own documented
+    tautology `v@.len() <= usize::MAX` as "not a tautology", because it comes
+    from `vstd::slice::axiom_spec_len` whose trigger is `spec_slice_len(slice)`
+    -- a term that appears nowhere in normal code. p02's kernel fires it with
+    one ghost `assert`; the probe had no such line, so a clause the *caller* can
+    discharge and the bare probe cannot was the exploitable residual.
+
+    So the probe now opens with the same two moves: bring the slice axioms in by
+    `broadcast use`, and mention `spec_slice_len` once per slice parameter to
+    fire the trigger. `broadcast use` of a group the file already broadcasts is
+    not an error (measured), and a parameter that is not a slice gets nothing --
+    `spec_slice_len` on a `&Vec<T>` would not type-check."""
+    out = ["broadcast use vstd::slice::group_slice_axioms;"]
+    for nm, ty in vparse.params(item):
+        if nm == "self":
+            continue
+        m = _SLICE_TY_RE.match(re.sub(r"\s+", " ", ty).strip())
+        if not m:
+            continue
+        # a `&mut [T]` parameter is only nameable as `old(x)` in this position
+        ref = f"old({nm})" if m.group("mut") else nm
+        out.append(f"assert({ref}@.len() == vstd::slice::spec_slice_len({ref}));")
+    return out
+
+
+def _taut_probe(txt, item, a, b, tag, tactic=None):
+    """(`txt` with a synthesised `proof fn` whose only obligation is the clause
+    at `txt[a:b]`, None), or (None, why it could not be synthesised).
 
     If that verifies, the clause is a **tautology**: it is `true` for every
     value its parameters can take, so demanding it of a caller demands nothing.
     `n >= 0` on a `usize` and `0 <= i` on a `usize` are both of this shape, and
     both walked past the gate at TASK_006_REVIEW while the structural rule
-    printed them approvingly."""
+    printed them approvingly.
+
+    Three things travel with the parameter list, all measured as hard failures
+    without them at TASK_008_REVIEW (major C) -- fail-closed, but the
+    consequence was that *a pattern with a generic or method-shaped trusted
+    accessor could not be greened at all*:
+
+      * the **generic list** (`<T: Copy>` -> E0425 cannot find type `T`);
+      * the **`where` clause** (same error);
+      * **lifetimes** (`<'a>` -> E0261 undeclared lifetime `'a`).
+
+    A `self` receiver is the fourth, and it cannot be fixed by copying more of
+    the signature -- *"`self` parameter is only allowed in associated
+    functions"*. The probe is synthesised **inside the item's own `impl`
+    block** instead, where `self`, `Self` and the impl's generics are all in
+    scope. An item with a `self` receiver and no `impl` the parser could find is
+    refused *by name*, not by an opaque compile error."""
     vs = vparse.verus_span(txt)
     if vs is None:
-        return None
-    fn = (f"\nproof fn slb_taut_probe_{tag}{vparse.params_text(item)}\n"
-          f"    ensures\n        {txt[a:b]},\n{{\n}}\n")
-    return txt[:vs[1]] + fn + txt[vs[1]:]
+        return None, "the file has no `verus! {}` span to put the probe in"
+    try:
+        gen, prm, whr = vparse.sig_prefix(item)
+        pars = vparse.params(item)
+    except ValueError as e:
+        return None, str(e)
+    at = vs[1]
+    if item.impl_span is not None:
+        at = item.impl_span[1]
+    elif any(n == "self" for n, _ in pars):
+        return None, (f"`{item.name}` takes a `self` receiver but vparse found "
+                      f"no enclosing `impl` block, so there is nowhere to "
+                      f"synthesise an associated function")
+    body = _ambient_facts(item)
+    if tactic:
+        body.append(f"assert({txt[a:b]}) by ({tactic});")
+    fn = (f"\nproof fn slb_taut_probe_{tag}{gen}{prm}{' ' + whr if whr else ''}\n"
+          f"    ensures\n        {txt[a:b]},\n{{\n"
+          + "".join(f"    {l}\n" for l in body) + "}\n")
+    return txt[:at] + fn + txt[at:], None
+
+
+def _run_taut_battery(txt, item, a, b, tag, mpath, base_v):
+    """(verdict, verified, errors, output, tactic) for one `requires` conjunct.
+
+    Verdicts: `tautology` (some tactic proved it under no hypotheses),
+    `not a tautology`, `unsynthesisable` (the probe could not be built -- the
+    reason is in `output`), `nocompile` (Verus produced no result at all),
+    `perturbed` (the probe moved something other than the one obligation it
+    added, so the conjunct was not judged). Everything but the second is a
+    failure for the caller; none of them is a silent skip."""
+    pv = pe = None
+    po, used = "", None
+    for tac in _TAUT_TACTICS:
+        probe, whynot = _taut_probe(txt, item, a, b, tag, tac)
+        if probe is None:
+            return "unsynthesisable", None, None, whynot, tac
+        open(mpath, "w").write(probe)
+        pv, pe, po = _verus(mpath)
+        used = tac
+        if tac is None:
+            if pv is None:
+                return "nocompile", pv, pe, po, tac
+            if pe == 0:
+                return "tautology", pv, pe, po, tac
+            if pe != 1 or pv != base_v:
+                return "perturbed", pv, pe, po, tac
+        elif pv is not None and pe == 0:
+            return "tautology", pv, pe, po, tac
+    return "not a tautology", pv, pe, po, used
 
 
 def check_requires_strength(pdir, rep, contract, enabled=True):
@@ -1659,27 +1891,34 @@ def check_requires_strength(pdir, rep, contract, enabled=True):
                     tag = (f"{src} {it.name} requires[{idx}]"
                            + (f".conjunct[{jdx}]" if len(cj["spans"]) > 1 else ""))
                     # --- 2. tautology probe (every item) --------------------
-                    probe = _taut_probe(txt, it, a, b, f"{it.name}_{idx}_{jdx}")
-                    if probe is None:
-                        rep.fail("req-mut", f"{tag}: no `verus! {{}}` span to "
-                                            f"put the tautology probe in")
-                        continue
-                    open(mpath, "w").write(probe)
-                    pv, pe, po = _verus(mpath)
+                    # Bare Z3 first, then a decision procedure per tactic. Each
+                    # is only reached because the previous one failed, so a
+                    # genuine tautology usually costs one run and only a clause
+                    # that survives all of them costs three.
+                    verdict, pv, pe, po, used = _run_taut_battery(
+                        txt, it, a, b, f"{it.name}_{idx}_{jdx}", mpath, base_v)
                     rows.append(dict(item=it.name, kind=why, clause=ctext,
-                                     test="tautology", verified=pv, errors=pe))
-                    if pv is None:
+                                     test="tautology", tactic=used,
+                                     verified=pv, errors=pe, verdict=verdict))
+                    if verdict == "unsynthesisable":
+                        rep.fail("req-mut",
+                                 f"{tag}: the tautology probe could not be "
+                                 f"synthesised, so this conjunct was not judged "
+                                 f"at all -- {po}. Fix the probe rather than "
+                                 f"skipping the clause.")
+                    elif verdict == "nocompile":
                         rep.fail("req-mut",
                                  f"{tag}: the tautology probe did not compile, "
                                  f"so this conjunct was not judged at all. Fix "
                                  f"the probe rather than skipping the "
                                  f"clause.\n      {(po or '')[-300:]}")
-                    elif pe == 0:
+                    elif verdict == "tautology":
                         rep.fail("req-mut",
                                  f"{tag} is a TAUTOLOGY: `{ctext}` is provable "
                                  f"from the parameter types alone ({pv} "
-                                 f"verified, 0 errors -- control {base_v}), so "
-                                 f"it demands nothing of any caller. "
+                                 f"verified, 0 errors -- control {base_v}"
+                                 + (f", via `by ({used})`" if used else "")
+                                 + f"), so it demands nothing of any caller. "
                                  + ("A trusted `unsafe` item whose precondition "
                                     "is `true` is the axiom that the unchecked "
                                     "operation is always defined -- `n >= 0` on "
@@ -1688,7 +1927,7 @@ def check_requires_strength(pdir, rep, contract, enabled=True):
                                     if why == "trusted" else
                                     "A verified item's precondition that holds "
                                     "always constrains no call site."))
-                    elif pe != 1 or pv != base_v:
+                    elif verdict == "perturbed":
                         rep.fail("req-mut",
                                  f"{tag}: the tautology probe gave {pv} "
                                  f"verified, {pe} errors against a control of "
@@ -1701,8 +1940,10 @@ def check_requires_strength(pdir, rep, contract, enabled=True):
                         print(f"    {src}: {it.name} requires[{idx}]"
                               + (f".conjunct[{jdx}]" if len(cj["spans"]) > 1
                                  else "")
-                              + f" is not a tautology ({pv} verified, {pe} "
-                                f"errors) -- {ctext[:52]}")
+                              + f" is not a tautology (bare Z3, "
+                              + ", ".join(f"`by ({t})`" for t in _TAUT_TACTICS
+                                          if t)
+                              + f") -- {ctext[:52]}")
                     # --- 1. deletion, for verified items only ---------------
                     if why != "verified":
                         continue
@@ -1733,12 +1974,304 @@ def check_requires_strength(pdir, rep, contract, enabled=True):
     n = sum(len(v["mutants"]) for v in out.values())
     if out and not any(f[0] == "req-mut" for f in rep.failures):
         rep.ok(f"{n} Verus mutants across {len(out)} file(s): no `requires` "
-               f"conjunct is a tautology, and every *verified* item's "
+               f"conjunct is a tautology under bare Z3 or "
+               + " or ".join(f"`by ({t})`" for t in _TAUT_TACTICS if t)
+               + f", and every *verified* item's "
                f"precondition fails the file when deleted. Note what is NOT "
-               f"claimed: deleting a trusted item's precondition can never fail "
-               f"a file (measured -- it only removes obligations from callers), "
-               f"so a *missing* one is caught by the parameter-coverage rule in "
-               f"5a, not here.")
+               f"claimed: (a) deleting a trusted item's precondition can never "
+               f"fail a file (measured -- it only removes obligations from "
+               f"callers), so a *missing* one is caught by the "
+               f"parameter-coverage rule in 5a, not here; (b) this stage judges "
+               f"TRIVIALITY, not STRENGTH -- `i <= v@.len()` is not a tautology "
+               f"and is still one byte past the end. Strength is stage 5c-twin.")
+    return out
+
+
+# ==========================================================================
+# 5c-twin. the verified twin: is the trusted `requires` STRONG ENOUGH?
+# ==========================================================================
+
+TWIN_PREFIX = "slb_twin_"
+TWIN_CFG = "slb_twin"
+# Anything that would let a twin pass without Verus actually checking the
+# operation. `unsafe` and `external_body` would make the twin a second copy of
+# the axiom; `assume`/`admit` would let the author write the precondition they
+# wish they had; calling the trusted item itself is the degenerate cheat.
+_TWIN_BANNED = ("unsafe", "assume", "admit", "assume_specification",
+                "external_body", "external")
+
+
+def check_trusted_twins(pdir, rep, contract, enabled=True):
+    """Does the trusted `requires` actually **license the operation**?
+
+    TASK_008_REVIEW's blocker: `get_unchecked`'s `requires i < v@.len()`
+    weakened to **`i <= v@.len()`**, with the `spec.md` pin moved in the same
+    commit, passes the entire gate -- PASS, complete_run True, 0 failures. 5a
+    prints it approvingly (*"demands `['i <= v@.len()']` of every caller,
+    constraining every parameter its body uses"*); 5c-req's tautology probe
+    cannot see it, because it is not a tautology; parameter coverage cannot see
+    it, because both parameters appear; deletion is not applied to trusted items
+    and cannot be (TASK_008 measured that deleting a trusted precondition only
+    *removes* obligations, so nothing ever fails). R5's trusted base then
+    axiomatises that **reading one byte past the end of a slice is defined and
+    equals `v@[i]`** -- CWE-125, the bug class the next pattern exists to model.
+    The same shape on the copy is `from + n <= src@.len() + 1`.
+
+    Those three checks judge *triviality* and *mention*. Neither is *strength*,
+    and strength is the whole property.
+
+    **The mechanism: a verified twin.** Beside every trusted `unsafe` item,
+    `verus.rs` carries `slb_twin_<name>` -- the *same signature and the same
+    contract, character for character*, implemented in checked code instead of
+    `unsafe`. `get_unchecked`'s twin is `{ v[i] }`; `copy_bytes`'s is an indexed
+    copy loop (there is no vstd spec for `copy_from_slice`, so a bulk-copy twin
+    is not available -- `.memory/04-verus.md`). The gate asserts the twin
+    verifies against that contract.
+
+    Why this is an oracle for strength: a precondition too weak to license the
+    unchecked operation is too weak to license the checked one, and the checked
+    one is the one Verus can see. Measured on p02:
+
+        shipped (`i < v@.len()`, `from + n <= src@.len()`)  12 verified, 0 errors
+        `i <= v@.len()`, twin edited to match                11 verified, 1 errors
+              error: precondition not met: index in bounds for this access -> v[i]
+        `from + n <= src@.len() + 1`, ditto                  10 verified, 2 errors
+              error: precondition not met: index in bounds -> src[from + j]
+        weakened + a *defensive* twin `if i < v.len() {v[i]} else {0}`
+                                                             11 verified, 1 errors
+              error: postcondition not satisfied -> r == v@[i as int]
+
+    The last row is the reason this is not just another pin: the twin has to
+    satisfy the trusted item's `ensures` as well, so an author cannot rescue a
+    weakened `requires` by making the twin defensive. It is the `model.py` move
+    -- an independent implementation -- applied to the trusted base.
+
+    Four structural rules keep it honest, each closing a way to write a twin
+    that passes without checking anything:
+
+      * **the twin's signature must be identical to the trusted item's**,
+        modulo whitespace. Otherwise the attacker weakens the trusted item and
+        leaves the twin alone -- measured: that variant gives 12 verified, 0
+        errors, so Verus alone does *not* catch it;
+      * **the twin must be `#[cfg(slb_twin)]`**, which is a cfg no build ever
+        sets. rustc strips it before codegen, so the mechanism costs zero
+        instructions *structurally* rather than by hope, and the pinned
+        obligation count does not move (p02 stays at 9; the twin run reports
+        12);
+      * **the twin body may not contain** `unsafe`, `assume`, `admit`,
+        `assume_specification` or `external`, and may not call any
+        `external_body` item in the file. Each of those would let the twin
+        inherit the axiom it is supposed to be an independent check on;
+      * **a trusted `unsafe` item with no twin is a failure**, with the usual
+        expensive escape hatch: `verus.twin_justifications`, shouted every run.
+
+    What this does NOT establish: that the twin is the right stand-in for the
+    unchecked operation. That is the declared half, and it is declared *as code
+    Verus checks* rather than as a number the author asserts -- which is why it
+    is legitimate under `.memory/02-bench-rules.md`'s "a declared pin is
+    acceptable only for something a reviewer can check by reading `spec.md`
+    alone": `get_unchecked` <-> `v[i]` is exactly that judgement, and the
+    contract half is lifted from the source, so the two cannot drift.
+
+    Nor does a twin *failure* prove weakness on its own: it can also mean the
+    checked equivalent needs a spec vstd does not ship. The two are told apart
+    by Verus's own diagnostic, which the stage prints in full -- `precondition
+    not met`/`postcondition not satisfied` is weakness, `no method named` /
+    `cannot find function` is a missing spec."""
+    head("5c-twin. verified twin: does the trusted `requires` license the "
+         "operation?")
+    vcfg = contract.get("verus") or {}
+    pinned_obl = vcfg.get("obligations") or {}
+    justif = vcfg.get("twin_justifications") or {}
+    out = {}
+    if not enabled:
+        rep.fail("twin", "--no-verus-mutants given: the verified-twin stage did "
+                         "not run, so nothing checked that this pattern's "
+                         "trusted preconditions are strong enough to license "
+                         "the operations they stand for")
+        return out
+    if not pinned_obl:
+        rep.fail("twin", "spec.md pins no verus.obligations, so there is no "
+                         "file list to check twins in")
+        return out
+    for src in sorted(pinned_obl):
+        path = os.path.join(pdir, src)
+        if not os.path.exists(path):
+            continue
+        txt = open(path).read()
+        try:
+            items = vparse.by_name(txt)
+        except ValueError as e:
+            rep.fail("twin", f"{src}: {e}")
+            continue
+        trusted = [i for i in items.values()
+                   if i.external == "verifier::external_body"
+                   and _UNSAFE_RE.search(i.body or "")]
+        ext_names = {i.name for i in items.values() if i.external}
+        if not trusted:
+            print(f"    {src}: no trusted `unsafe` item, so no twin is required")
+            continue
+        rows, ok_here = [], True
+        for t in trusted:
+            twin = items.get(TWIN_PREFIX + t.name)
+            why = (justif.get(src) or {}).get(t.name)
+            if twin is None:
+                ok_here = False
+                if why:
+                    rep.shout("twin",
+                              f"{src}:{t.line} trusted `unsafe` item "
+                              f"`{t.name}` has NO verified twin "
+                              f"`{TWIN_PREFIX}{t.name}`. spec.md justifies it: "
+                              f"{why}")
+                else:
+                    rep.fail("twin",
+                             f"{src}:{t.line} trusted `unsafe` item `{t.name}` "
+                             f"has no verified twin. Nothing then checks that "
+                             f"its `requires` {_clauses(t, 'requires')} is "
+                             f"strong enough to license the unchecked "
+                             f"operation its body performs -- only that the "
+                             f"clause is non-trivial and mentions every "
+                             f"parameter, which `i <= v@.len()` also is and "
+                             f"does. Add `#[cfg({TWIN_CFG})] fn "
+                             f"{TWIN_PREFIX}{t.name}` with the same signature "
+                             f"and a checked body, or declare "
+                             f"verus.twin_justifications[{src!r}][{t.name!r}] "
+                             f"in spec.md -- which the gate then shouts every "
+                             f"run.")
+                continue
+            probs = []
+            if twin.external:
+                probs.append(f"it is {twin.external}, so Verus never checks its "
+                             f"body and it re-states the axiom instead of "
+                             f"testing it")
+            if not twin.in_verus:
+                probs.append("it is outside `verus! {}`")
+            if not any(re.fullmatch(r"#!?\[\s*cfg\s*\(\s*" + TWIN_CFG +
+                                    r"\s*\)\s*\]", a.strip()) for a in twin.attrs):
+                probs.append(f"it is not `#[cfg({TWIN_CFG})]`, so it would be "
+                             f"compiled into the measured binaries -- the twin "
+                             f"must cost zero instructions structurally, not by "
+                             f"hope")
+            gs, ts = vparse.norm_clause(twin.sig), vparse.norm_clause(t.sig)
+            if gs != ts:
+                probs.append(f"its signature is not the trusted item's:\n"
+                             f"        twin:    {gs}\n"
+                             f"        trusted: {ts}\n"
+                             f"      A twin with its own contract is a second "
+                             f"declaration, not a check: weakening the trusted "
+                             f"`requires` and leaving the twin alone verifies "
+                             f"cleanly (measured, 12 verified / 0 errors)")
+            bcode = vparse.blank_noncode(twin.body or "")
+            for w in _TWIN_BANNED:
+                if re.search(r"\b" + w + r"\b", bcode):
+                    probs.append(f"its body contains `{w}`, which would let it "
+                                 f"inherit the very axiom it exists to check")
+            called = sorted(n for n in ext_names
+                            if re.search(r"\b" + re.escape(n) + r"\s*\(", bcode))
+            if called:
+                probs.append(f"its body calls the trusted item(s) {called}, so "
+                             f"it re-uses the axiom instead of re-deriving it")
+            if probs:
+                ok_here = False
+                rep.fail("twin", f"{src}:{twin.line} `{twin.name}` is not a "
+                                 f"usable twin for `{t.name}`: "
+                         + "; ".join(probs))
+            rows.append(dict(trusted=t.name, twin=twin.name,
+                             signature_identical=gs == ts,
+                             requires=_clauses(t, "requires"),
+                             ensures=_clauses(t, "ensures"),
+                             body_lines=twin.body_lines))
+        if not ok_here:
+            out[src] = {"twins": rows, "verified": None, "errors": None}
+            continue
+        base_v, base_e, _ = _verus(path)
+        tv, te, to = _verus(path, "--cfg", TWIN_CFG)
+        out[src] = {"twins": rows, "verified": tv, "errors": te,
+                    "without_twins": base_v}
+        if tv is None or te:
+            rep.fail("twin",
+                     f"{src}: with `--cfg {TWIN_CFG}` Verus reports {tv} "
+                     f"verified, {te} errors ({base_v} verified without the "
+                     f"twins). At least one trusted precondition is not strong "
+                     f"enough to license the checked equivalent of the "
+                     f"operation its body performs -- or the checked "
+                     f"equivalent needs a spec vstd does not ship, which the "
+                     f"diagnostic below distinguishes (`precondition not met` / "
+                     f"`postcondition not satisfied` is weakness; `cannot find` "
+                     f"/ `no method named` is a missing spec).\n"
+                     f"      {(to or '')[-900:]}")
+        elif base_v is not None and tv <= base_v:
+            rep.fail("twin",
+                     f"{src}: `--cfg {TWIN_CFG}` reports {tv} verified, which "
+                     f"is not more than the {base_v} verified without it, so "
+                     f"the twins were not compiled at all and this stage "
+                     f"checked nothing.")
+        else:
+            for r in rows:
+                print(f"    {src}: `{r['twin']}` verifies against "
+                      f"`{r['trusted']}`'s own contract "
+                      f"(requires={r['requires']}) in {r['body_lines']} lines "
+                      f"of checked code")
+            print(f"    {src}: {tv} verified, 0 errors with `--cfg {TWIN_CFG}` "
+                  f"({base_v} without it -- the twins are cfg'd out of every "
+                  f"build, so they cost zero instructions)")
+            # --- the twin must NEED the precondition ------------------------
+            #
+            # The oracle above has teeth only in proportion to what the contract
+            # says. A trusted item with a `requires` and **no `ensures`** -- which
+            # `.memory/04-verus.md` recommends, because a trusted item that asserts
+            # nothing cannot axiomatise a falsehood -- can be twinned by an *empty
+            # body*, and an empty body verifies under any precondition whatever.
+            # So: delete the twin's `requires` and re-run. If it still verifies,
+            # the checked implementation never used the precondition and the twin
+            # certifies nothing about it.
+            #
+            # This is the deletion oracle that does not exist for the trusted item
+            # (deleting a trusted precondition only removes obligations from
+            # callers, so nothing fails -- TASK_008). It exists here precisely
+            # because the twin is *verified* code.
+            for t in trusted:
+                twin = items.get(TWIN_PREFIX + t.name)
+                if twin is None or not _clauses(twin, "requires"):
+                    continue
+                mt, cur = txt, twin
+                for _ in range(len(_clauses(twin, "requires"))):
+                    mt = vparse.delete_clause(mt, cur, "requires", 0)
+                    nxt = vparse.by_name(mt).get(twin.name)
+                    if nxt is None or not _clauses(nxt, "requires"):
+                        break
+                    cur = nxt
+                mpath = _mutant_path(pdir, src)
+                open(mpath, "w").write(mt)
+                dv, de, do = _verus(mpath, "--cfg", TWIN_CFG)
+                open(mpath, "w").write(txt)
+                for r in rows:
+                    if r["twin"] == twin.name:
+                        r["vacuity_probe"] = {"verified": dv, "errors": de}
+                if dv is not None and de == 0:
+                    rep.fail("twin",
+                             f"{src}:{twin.line} `{twin.name}` still verifies with "
+                             f"`{t.name}`'s precondition {_clauses(t, 'requires')} "
+                             f"DELETED ({dv} verified, 0 errors). The checked "
+                             f"implementation never used it, so this twin "
+                             f"certifies nothing about the precondition's "
+                             f"strength -- an empty twin body for a trusted item "
+                             f"with no `ensures` is the shape. Give the twin a "
+                             f"body that actually performs the operation, and the "
+                             f"trusted item an `ensures` strong enough to force "
+                             f"it.")
+                else:
+                    print(f"    {src}: `{twin.name}` fails when `{t.name}`'s "
+                          f"`requires` is deleted ({dv} verified, {de} errors) -- "
+                          f"the checked implementation genuinely needs it")
+    if out and not any(f[0] == "twin" for f in rep.failures):
+        n = sum(len(v["twins"]) for v in out.values())
+        rep.ok(f"{n} verified twin(s): every trusted `unsafe` item's "
+               f"`requires` is strong enough to license a *checked* "
+               f"implementation of the same contract. This is the only stage "
+               f"that judges STRENGTH rather than triviality -- 5a and 5c-req "
+               f"both pass `i <= v@.len()`. The twins are "
+               f"`#[cfg({TWIN_CFG})]`, so no build compiles them.")
     return out
 
 
@@ -1941,22 +2474,50 @@ def _verus_verified_files(pdir, rep, contract, verus_res):
 
       * the file is in `spec.md`'s `verus.obligations`, so stage 5a ran
         `verus_run.py` on it and got `N verified, 0 errors` back;
-      * **and** `verus --verify-function <the item enclosing the region>
-        --verify-root` reports a verified body for that item, so the answer is
-        about the code being normalised rather than about the file in general.
+      * **and** `verus --verify-function <the item enclosing the region>`
+        reports a verified body for that item, so the answer is about the code
+        being normalised rather than about the file in general.
 
     The second query is what makes this different in kind from the pin: an item
     Verus never compiled cannot report a verified body, whatever its file
-    spells its macros. Returns the set of file names that earned the harbour."""
+    spells its macros. Returns the set of file names that earned the harbour.
+
+    Three refusals, deliberately distinguished (TASK_008_REVIEW, major E):
+    **duplicate name** (the query cannot be trusted to name the right item),
+    **unresolvable name** (Verus cannot find it -- the file may verify
+    perfectly; a mod-nested driver used to land here and be reported as having
+    no verified body, which was false), and **no verified body** (Verus found
+    it and it has none). `_verify_function` asks a mod-nested item with
+    `--verify-only-module`, so the second case is now rare rather than
+    routine."""
     vcfg = contract.get("verus") or {}
     pinned_obl = vcfg.get("obligations") or {}
     ok = set()
     for src in sorted(pinned_obl):
-        r = verus_res.get(src) or {}
-        if r.get("errors") or not r.get("verified"):
-            continue
         path = os.path.join(pdir, src)
         if not os.path.exists(path):
+            continue
+        # The duplicate-name failure is the only thing standing between this
+        # certificate and the wrong item -- Verus itself does NOT object to two
+        # items sharing a name (`S::drive` and `inner::drive` ->
+        # `--verify-function drive` silently reports `1 verified`, measured at
+        # TASK_008_REVIEW). It is checked FIRST and named explicitly, so the
+        # refusal is attributed to the duplicate rather than to the generic
+        # "no verified body" text below.
+        try:
+            dup = vparse.duplicate_names(vparse.parse(open(path).read()))
+        except ValueError as e:
+            rep.fail("driver", f"{src}: {e}")
+            continue
+        if dup:
+            rep.fail("driver",
+                     f"{src}: `{sorted(dup)}` defined more than once, so "
+                     f"`--verify-function` cannot be trusted to name the item "
+                     f"enclosing the driver region -- Verus does not object to "
+                     f"two items with one name. No harbour certificate issued.")
+            continue
+        r = verus_res.get(src) or {}
+        if r.get("errors") or not r.get("verified"):
             continue
         txt = open(path).read()
         try:
@@ -1978,18 +2539,34 @@ def _verus_verified_files(pdir, rep, contract, verus_res):
                  and i.body_start <= sp[0] and sp[1] <= i.body_end]
         if not inner:
             continue
-        name = max(inner, key=lambda i: i.body_start).name
-        nv, ne, out = _verus(path, "--verify-function", name, "--verify-root")
+        it = max(inner, key=lambda i: i.body_start)
+        name = it.name
+        nv, ne, out, resolved = _verify_function(path, name, it.mod_path or "")
+        q = (f"--verify-only-module {it.mod_path} --verify-function {name}"
+             if it.mod_path else f"--verify-function {name} --verify-root")
         if nv and not ne:
             ok.add(src)
             print(f"    {src}: `fn {name}` encloses the driver region and Verus "
                   f"reports {nv} verified for it -- ghost stripping licensed")
+        elif not resolved:
+            rep.fail("driver",
+                     f"{src}: the driver region is inside `fn {name}`"
+                     + (f" (module `{it.mod_path}`)" if it.mod_path else "")
+                     + f", and Verus could not RESOLVE that name: `verus {q}` "
+                       f"says the function does not exist. This is not the same "
+                       f"answer as 'the item has no verified body' -- the file "
+                       f"may verify perfectly well -- so no certificate is "
+                       f"issued and the reason is that the gate could not ask "
+                       f"the question. Move the region into an item "
+                       f"`--verify-function` can name, or teach "
+                       f"`_verify_function` the query that "
+                       f"reaches it.\n      {(out or '')[-300:]}")
         else:
             rep.fail("driver",
                      f"{src}: the driver region is inside `fn {name}`, which "
-                     f"claims a `verus!` span, but "
-                     f"`verus --verify-function {name} --verify-root` reports "
-                     f"{nv} verified / {ne} errors. Ghost statements are "
+                     f"claims a `verus!` span, but `verus {q}` reports "
+                     f"{nv} verified / {ne} errors -- Verus resolved the item "
+                     f"and has no verified body for it. Ghost statements are "
                      f"stripped from the driver diff only for code Verus "
                      f"actually verified.\n      {(out or '')[-300:]}")
     return ok
@@ -2312,7 +2889,8 @@ def main():
     ap.add_argument("--no-callgrind", action="store_true",
                     help="skip step 3b; the run then FAILS, by design")
     ap.add_argument("--no-verus-mutants", action="store_true",
-                    help="skip step 5c; the run then FAILS, by design")
+                    help="skip steps 5c, 5c-req and 5c-twin; the run then "
+                         "FAILS, by design")
     a = ap.parse_args()
 
     pdir = buildmod.pattern_dir(a.pattern)
@@ -2409,6 +2987,7 @@ def main():
                                       not a.no_verus_mutants)
     reqmut = check_requires_strength(pdir, rep, contract,
                                      not a.no_verus_mutants)
+    twins = check_trusted_twins(pdir, rep, contract, not a.no_verus_mutants)
     reqs, enss = derive_contract(pdir, rep, contract)
     domain = check_proof_domain(rep, all_models, reqs, enss)
     verus_ok = _verus_verified_files(pdir, rep, contract, verus_res)
@@ -2445,8 +3024,11 @@ def main():
                              # ratio of the tightest measured cell to the
                              # declared floor. 35.9x and 2.2e9x used to print
                              # identically (TASK_006_REVIEW D).
+                             "collapse_work_unit":
+                                 slopes.pop("_work_unit", "byte"),
                              "collapse_floor_min_declarable":
-                                 MIN_DECLARABLE_IR_PER_WORK,
+                                 slopes.pop("_bound",
+                                            MIN_DECLARABLE_IR_PER_WORK),
                              "collapse_tightest_margin":
                                  slopes.pop("_tightest_margin", None)},
         "identity": identity,
@@ -2455,6 +3037,7 @@ def main():
         "verified_call_site": callsite,
         "clause_deletion": clausemut,
         "requires_strength": reqmut,
+        "verified_twins": twins,
         "proof_domain": domain,
         "driver_loops": drivers,
         "adversarial": advtable,
@@ -2518,7 +3101,122 @@ def main():
     return 2 if partial else 0
 
 
+_PROBE_CASES = [
+    # (label, item source, item name, expected verdict)
+    #
+    # --- the baseline: the rig itself works ------------------------------
+    ("plain / meaningful", """
+#[verifier::external_body]
+fn f(v: &[u8], i: usize) requires i < v@.len(), { unsafe { let _ = v[i]; } }
+""", "f", "not a tautology"),
+    ("plain / trivial", """
+#[verifier::external_body]
+fn f(v: &[u8], i: usize) requires 0 <= i, { unsafe { let _ = v[i]; } }
+""", "f", "tautology"),
+    # --- TASK_008_REVIEW major C: four shapes that HARD-FAILED the probe --
+    ("generic <T: Copy>", """
+#[verifier::external_body]
+fn f<T: Copy>(v: &[T], i: usize) -> (r: T) requires i < v@.len(), { unsafe { *v.get_unchecked(i) } }
+""", "f", "not a tautology"),
+    ("where clause", """
+#[verifier::external_body]
+fn f<T>(v: &[T], i: usize) -> (r: T) where T: Copy
+    requires i < v@.len(),
+{ unsafe { *v.get_unchecked(i) } }
+""", "f", "not a tautology"),
+    ("lifetime <'a>", """
+#[verifier::external_body]
+fn f<'a>(v: &'a [u8], i: usize) -> (r: u8) requires i < v@.len(), { unsafe { *v.get_unchecked(i) } }
+""", "f", "not a tautology"),
+    ("&self receiver in an impl", """
+pub struct Buf { pub b: Vec<u8> }
+impl Buf {
+    #[verifier::external_body]
+    pub fn f(&self, i: usize) -> (r: u8)
+        requires i < self.b@.len(),
+    { unsafe { *self.b.get_unchecked(i) } }
+}
+""", "f", "not a tautology"),
+    ("&self receiver, trivial clause -- still judged", """
+pub struct Buf { pub b: Vec<u8> }
+impl Buf {
+    #[verifier::external_body]
+    pub fn f(&self, i: usize) -> (r: u8)
+        requires 0 <= i,
+    { unsafe { *self.b.get_unchecked(i) } }
+}
+""", "f", "tautology"),
+    # --- TASK_008_REVIEW major D: "Z3 could not prove it" was read as -----
+    #     "it constrains a caller"
+    ("slice len <= usize::MAX (needs the axiom a call site fires)", """
+#[verifier::external_body]
+fn f(v: &[u8], i: usize) requires v@.len() <= usize::MAX, { unsafe { let _ = v[i]; } }
+""", "f", "tautology"),
+    ("&mut slice len <= usize::MAX", """
+#[verifier::external_body]
+fn f(dst: &mut [u8], n: usize) requires old(dst)@.len() <= usize::MAX, { unsafe { let _ = dst[n]; } }
+""", "f", "tautology"),
+    ("bit-or bound (needs by (bit_vector))", """
+#[verifier::external_body]
+fn f(v: &[u8], off: usize) requires off <= (off | 1), { unsafe { let _ = v[off]; } }
+""", "f", "tautology"),
+    ("bit-and bound (needs by (bit_vector))", """
+#[verifier::external_body]
+fn f(v: &[u8], off: usize) requires (off & 0xff) <= 255, { unsafe { let _ = v[off]; } }
+""", "f", "tautology"),
+    ("nonlinear identity", """
+#[verifier::external_body]
+fn f(v: &[u8], n: usize) requires n as int * n as int >= 0, { unsafe { let _ = v[n]; } }
+""", "f", "tautology"),
+    # --- the residual this does NOT close: too weak, but not trivial ------
+    ("off-by-one -- NOT a tautology, and 5c-twin is what catches it", """
+#[verifier::external_body]
+fn f(v: &[u8], i: usize) requires i <= v@.len(), { unsafe { let _ = v[i]; } }
+""", "f", "not a tautology"),
+]
+
+
+def _probe_selftest():
+    """End-to-end fixtures for the `requires`-tautology probe, one Verus run per
+    tactic per case. Not part of the gate (it costs ~30 Verus runs); run it
+    after touching `_taut_probe`, `_ambient_facts` or `vparse.sig_prefix`:
+
+        harness/check.py selftest-probe
+    """
+    scratch = os.path.join(REPO, ".temp", "check", "probe-selftest")
+    os.makedirs(scratch, exist_ok=True)
+    mpath = os.path.join(scratch, "probe.rs")
+    head("tautology-probe selftest")
+    bad = 0
+    for label, src, iname, expect in _PROBE_CASES:
+        txt = "use vstd::prelude::*;\n\nverus! {\n" + src + "\nfn main() {}\n} // verus!\n"
+        base = os.path.join(scratch, "base.rs")
+        open(base, "w").write(txt)
+        base_v, base_e, base_out = _verus(base)
+        if base_v is None or base_e:
+            bad += 1
+            print(f"  FAIL {label:56s} the fixture itself does not verify "
+                  f"({base_v}/{base_e})\n       {(base_out or '')[-300:]}")
+            continue
+        it = [i for i in vparse.parse(txt) if i.name == iname][0]
+        cj = vparse.conjunct_spans(it, "requires")
+        a, b = cj[0]["spans"][0]
+        got, pv, pe, po, tac = _run_taut_battery(txt, it, a, b, "sel", mpath,
+                                                 base_v)
+        ok = got == expect
+        bad += 0 if ok else 1
+        print(f"  {'ok  ' if ok else 'FAIL'} {label:56s} {got}"
+              + (f" via `by ({tac})`" if got == "tautology" and tac else "")
+              + ("" if ok else f"  (want {expect})"))
+        if not ok and po:
+            print(f"       {po[-400:]}")
+    print("tautology-probe selftest:", "PASS" if bad == 0 else f"FAIL ({bad})")
+    return 0 if bad == 0 else 1
+
+
 if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "selftest-probe":
+        sys.exit(_probe_selftest())
     try:
         sys.exit(main())
     except ModelSandboxError as e:
