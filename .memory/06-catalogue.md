@@ -24,6 +24,7 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 | T007 | p16 TLV walker — the first data-dependent loop bound | **done**, gate PASS first run, **reviewed** (headline overclaimed, corrected) |
 | T011 | p17 HTTP suffix-range (CVE-2017-7529) — the limit of memory safety | **done**, gate PASS first run, **reviewed** (leak claim refuted; real artefact found one token away) |
 | T012 | ship p17's slice-relative guard — the artefact T011 claimed | **done**, reproduced independently; gate PASS, no measured number moved |
+| T013 | p05 2-D index flattening — the first **vectorisable** kernel | spec written, wip |
 
 **T010's review closed the gate-hardening arc.** It was deliberately shaped as
 the opposite of the previous six — not a bypass hunt but "will this gate *accept*
@@ -144,7 +145,7 @@ supersede any earlier task report they contradict.
 | p02 | length-prefixed buffer copy (`memcpy` w/ attacker length) | spatial OOB write | easy | planned |
 | p03 | bounded queue / stack, array-backed | index underflow on empty pop | easy | planned |
 | p04 | ring buffer with wraparound | modular index, aliasing | moderate | planned |
-| p05 | 2-D index flattening / matmul (`i*n+j`) | overflow in index arithmetic | moderate | planned |
+| p05 | 2-D index flattening / matmul (`i*n+j`) | dimensions trusted vs buffer; overflow in the check | moderate | **wip** (T013) — taken out of order: the first kernel with an *associative* inner loop, so the first that can vectorise |
 | p06 | in-place reverse / rotate / swap | aliasing, permutation invariant | moderate | planned |
 | p07 | binary search | midpoint overflow (`(lo+hi)/2`) | moderate | planned |
 | p08 | memmove with overlapping regions | overlap UB | moderate | planned |
@@ -233,6 +234,26 @@ the *optimiser*. Worth doing precisely because it inverts the usual story.
 
 Depth-first, template-first. Do not start a wave until the previous one's patterns
 are green in `harness/check.py`.
+
+**Wave 1 is complete and green** (p01, p02, p16, p17). Wave 2 is open.
+
+**Order within a wave is now chosen by which axis is untested, not by number.**
+p05 was taken first because every fold measured so far — p16's and p17's alike —
+is a *serial Horner chain*, so the safe-vs-unsafe gap has only ever been measured
+on a scalar loop on both sides. p16 quantified a bounds check blocking a 4×
+unroll (2.25 of 4.25 Ir/byte); nothing has yet measured one blocking
+**vectorisation**, which is a far wider lane. That is the largest untested claim
+in the programme. Pick the next pattern the same way: **what would change a
+conclusion?**
+
+High-value out-of-order candidates noted for later:
+- **p08** (overlapping `memmove`) — safe Rust *cannot express* the bug; the
+  borrow checker rejects it at compile time. A structural Rust win to set against
+  p17's structural Rust loss. Awkward for the ladder (R2/R3 must use
+  `copy_within`, a different algorithm) — design carefully.
+- **p47** (constant-time compare) — the adversary is the *optimiser*, a third
+  security axis after spatial safety and functional correctness. Likely defeats
+  R5 in an interesting way: Verus cannot state a timing property at all.
 
 - **Wave 1** (template + core): p01, p02, p16, p17 — establishes the pattern
   template, the adversarial-input protocol, and one real-CVE mirror.
