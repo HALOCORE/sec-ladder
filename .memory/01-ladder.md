@@ -195,11 +195,22 @@ is a much stronger claim than any p01 could produce.
    and wall clock disagreed in *direction* on the same source. Report both
    columns; do not let `Ir` stand in for time without saying so.
 
-4. **p16 is the case p01 said not to generalise to, and it delivers the project's
-   first real O(n) safety cost — with the cause one level down from the check.**
-   (TASK_007.) A TLV walker: trip count from attacker data, each record's position
-   depending on every previous length field, nothing hoistable, nothing
-   idiom-recognisable. `-O3 isolated`, marginal `Ir`/call:
+4. **p16 is the case p01 said not to generalise to. One *spelling* of safe Rust
+   pays an O(n) cost there; idiomatic safe Rust still does not.** (TASK_007,
+   corrected at TASK_007_REVIEW — the first write-up of this said "first real O(n)
+   safety cost" and that **overclaimed**.) A TLV walker: trip count from attacker
+   data, each record's position depending on every previous length field, nothing
+   hoistable, nothing idiom-recognisable.
+
+   **The number that settles it: R3's marginal rate is 5.7500 Ir per folded byte,
+   which is R4's exactly.** Idiomatic safe Rust costs **zero per byte** here. Its
+   whole cost is O(1) per call (+27 / +77), which *shrinks* as a fraction of the
+   call with size — 0.90% on `small`, 0.32% on `large`. Only the naive indexed
+   spelling is O(n). This file already said, at finding 3: *"Never publish a
+   safety-cost claim without R3."* The rule was violated by its own author on the
+   next pattern. **Lead with R3 or do not lead.**
+
+   `-O3 isolated`, marginal `Ir`/call:
 
    | rung | small (508 B win) | large (4090 B win) | vs R4 |
    |---|---:|---:|---|
@@ -209,46 +220,88 @@ is a much stronger claim than any p01 could produce.
    | R3 safe-tuned | 3037 | 23875 | +27 / +77 |
    | R4 unsafe / R5 verus | 3010 / 3010 | 23798 / 23798 | 0 |
 
-   **This is a per-byte cost, not per call** — R2 is 10.00 Ir per folded byte,
-   R3/R4 are 5.75, measured over 68 consecutive value lengths in two bands 18×
-   apart. R2−R4 = **exactly 4.25 Ir/byte in both bands**. p01's and p02's "+10
-   flat" does *not* survive contact with a data-dependent walk.
+   **R2's cost is per byte, not per call** — 10.00 Ir per folded byte against
+   R3/R4's 5.75, over 68 consecutive value lengths in two bands 18× apart, exactly
+   4.25 apart in both. The sweep is *exactly* linear (least-squares residual
+   **0.00** over 34 points per band) and `R2 = 10·folded + 21·nrec + 11`
+   reproduces both shipped totals to the instruction. Measured, not fitted.
 
-   **But decompose before calling it a bounds-check tax — the same trap as p02.**
-   Eight variants, all printing the same checksum: changing **only the fold**
-   removes 98.0% / 99.3% of the gap; changing **only the walk** removes 1.5% /
-   0.5%. Unsafe-walk+safe-fold and safe-walk+unsafe-fold sum to 2091 against the
-   whole gap's 2085 — no interaction term. So the cost is entirely in the inner
-   byte fold, and from the disassembly: R2's fold is a rolled 10-instruction body
-   (10.00 Ir/byte); R4's is 4×-unrolled, 23 insns per 4 bytes (5.75). Of the 4.25,
-   **2.00 is the check itself and 2.25 is the unrolling the check's extra loop
-   exit prevents.** Corroborated independently by counting `shl $0x5` sites: 3 in
-   exactly the rolled variants, 7 in exactly the unrolled ones.
+   **Decompose before calling it a bounds-check tax — the same trap as p02.**
+   Changing **only the fold** removes 98.0% / 99.3% of the gap; changing **only
+   the walk** removes 1.5% / 0.5%; the two sum to 2091 against the whole gap's
+   2085, so there is no interaction term. The cost is entirely in the inner byte
+   fold: R2's is a rolled 10-instruction body, R4's is 4×-unrolled at 23 insns per
+   4 bytes.
 
-   **The honest headline: more than half the cost of the bounds check is not the
-   check, it is the optimisation the check forecloses.** That is the same shape as
-   p02's retraction (a lost `memcpy` idiom) arriving at a *real* cost rather than
-   a spurious one — and it is the project's most transferable result, because it
-   says a safety tax must be attributed to a mechanism, never to a comparison.
+   **The attribution was then confirmed by construction at TASK_007_REVIEW**,
+   which is why it is safe to state. `-C llvm-args=-unroll-count=1` rolls R4's
+   fold and is a **bit-for-bit no-op on R2** (so it is not silently changing both
+   sides). Rolled R4 and rolled R2 then differ by exactly `cmp %rax,%rsi ; je
+   <panic>`:
+
+   | fold | band A | band B |
+   |---|---:|---:|
+   | R2, rolled + checked | 10.0000 | 10.0000 |
+   | R4 shipped, 4×unrolled + unchecked | 5.7500 | 5.7500 |
+   | **R4, rolled + unchecked** | **8.0000** | **8.0000** |
+   | **gap R2 − R4-rolled = the check alone** | **2.0000** | **2.0000** |
+
+   So 4.2500 = 2.0000 + 2.2500 with **zero residual**. The 8.00 rolled-unchecked
+   constant has four independent sightings, the best of which is free: **R4's own
+   remainder loop in the shipped binary** is 8 insns/byte — R2's body minus
+   exactly `cmp`+`je`. (The `shl $0x5` site count offered in `NOTES.md` is *not*
+   independent corroboration — both counts follow from the same unroll factor.)
+
+   **The split is exact but path-dependent, and the counterfactual is not what it
+   looks like.** Forcing LLVM to unroll the *checked* loop
+   (`-unroll-runtime-multi-exit -unroll-count=4`) gives **9.50**, not 7.75: four
+   copies need four exit tests, `mov,or,cmp,je` = 15 insns = 3.75/byte. So
+   unrolling R2 would recover **0.50, not 2.25**. `NOTES.md`'s "would have
+   amortised" is a false counterfactual. The right word is the stronger one:
+   **the check does not merely cost 2.00, it forecloses an optimisation worth
+   2.25 that it could not have amortised anyway.**
+
+   **The transferable lesson: a safety tax must be attributed to a mechanism,
+   never to a comparison** — and the mechanism here is only half the check. Same
+   shape as p02's retraction (a lost `memcpy` idiom), arriving this time at a real
+   cost rather than a spurious one.
 
    **Three further things p16 establishes:**
-   - **`Ir` and wall clock disagree in *magnitude*, not just direction: +70% `Ir`
-     → 0% time.** All 16 O3 cells land in 12.69–12.85 ms / 73.56–74.23 ms. The
-     fold is a serial Horner chain, latency-bound at ~3 cycles/byte, so the extra
-     instructions issue in slack. **This is a property of this kernel, not of
-     bounds checks** — a kernel with independent inner iterations would convert
-     the same 4.25 Ir/byte into time. Stated as an inference from the dependence
-     chain plus cycle arithmetic; IPC could not be measured (no counters).
-   - **Nothing vectorises in any rung** (`vector_regs: []` in all 32 cells), so
-     the gap is measured on a scalar loop on both sides — no vectorisation
-     confound, unlike p01.
-   - **R3 survives, and is now the *fourth* pattern in a row.** +27 / +77 per
-     call, fitting `7 + 7·nrec` (`7 + 5·nrec` when vlen ≡ 0 mod 4), which predicts
-     both shipped numbers without being fitted to them. **The residue modulus that
+   - **`Ir` and wall clock disagree in *magnitude*, not just direction: +72% `Ir`
+     → +0.27% time.** Spreads are 0.96–2.31%, well inside the 10% discard
+     threshold, so unlike p02's timing this is a *usable* null. The fold is a
+     serial Horner chain, latency-bound: **differencing `n_iters` gives
+     3.027–3.055 cycles/byte for every rung** on `large`, 3.03–3.08 on `small`.
+     Because L1-resident `small` gives the same rate as L3-resident `large`, the
+     obvious alternative — memory-bandwidth-bound, which would equally hide a
+     +70% `Ir` gap — is **ruled out**, not merely unconsidered.
+     **This is a property of this kernel, not of bounds checks**: a kernel with
+     independent inner iterations would turn the same 4.25 Ir/byte into time.
+     *(The first write-up's cycle arithmetic was wrong — it implied 3.30 GHz while
+     CPU 5 turbos to 3.85 GHz, and 13% / 21% of the quoted wall times is fixed
+     overhead outside the kernel. Two errors that cancelled. **Always difference
+     `n_iters`; never divide a total wall time by a byte count.**)*
+   - **Vectorisation is not a confound, but "nothing vectorises in any rung" is
+     false** — it is **23 of 32 cells**; the 9 with `['xmm']` are all `whole`-mode
+     `main`, i.e. the driver, not the fold. The *fold* is scalar in every rung, so
+     the gap is measured on a scalar loop on both sides. Quote the 23/32.
+   - **R3 survives, and is now the *fourth* pattern in a row** — see the opening
+     of this finding. `7 + 7·nrec` (`7 + 5·nrec` when vlen ≡ 0 mod 4) is a
+     **zero-degrees-of-freedom interpolation**, and only `large` is genuinely
+     out-of-sample; do not call it a prediction. **The residue modulus that
      matters here is 4** — the unroll factor — amplitude 1.5%. p01's was 4, p02's
      was 16; do not assume.
+   - **gcc's 36% deficit is a flag default, not a codegen limit.** `c-gcc` is 4062
+     against clang's 2993 on `small` — but with `-funroll-loops` gcc reaches
+     **2823 and beats clang**. Not a fortify/ssp artefact. Before reporting any
+     gcc-vs-clang gap, establish whether it is a default or a capability.
 
-   Security half: R1 does not merely over-read, it **walks unboundedly**. Once `p`
+   Security half, and it was **directly demonstrated** at TASK_007_REVIEW rather
+   than inferred: `end - p` wraps to `0xfffffffffffff03d` and the walk ran
+   **200 MiB / 6459 records past the window without terminating** — only the
+   reviewer's own cap stopped it. Equivalence was fuzzed too: 210 random
+   adversarial chains × 12 binaries against `model.py`, **0 mismatches**.
+   R1 does not merely over-read, it **walks unboundedly**. Once `p`
    passes `end`, `end - p` underflows `size_t` and the loop condition stays true
    forever, so R1 parses memory until it faults — SIGSEGV in both gcc and clang
    plain builds, ASan `heap-buffer-overflow` READ 0 bytes past a 3072-byte region.

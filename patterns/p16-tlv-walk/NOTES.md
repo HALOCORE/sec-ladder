@@ -4,15 +4,30 @@
 > this project published one from a whole-kernel delta it had to retract it. §3
 > is the decomposition; §2 is the number; §0 is what the number is *of*.
 
-**The one-line result, and it is not what the first three patterns said.**
-p16's safe-naive rung pays a genuine **O(n) instruction tax — +4.2 Ir per folded
-byte, +69% / +72% over unsafe** — the first true O(n) safety cost this project
-has measured. The decomposition (§3) puts all of it in the *value fold* and none
-of it in the walk, and shows that **more than half of it is not the bounds check
-but the 4× unroll the check prevents**. And it costs **nothing in wall clock**,
-because the fold is latency-bound on a serial Horner chain: all 16 `-O3` cells
-land inside 1.5% of each other on both inputs. Both halves of that are the
-result; quoting either alone would be a misrepresentation.
+**The one-line result.** *(Corrected at TASK_007_REVIEW — the original wording,
+"the first true O(n) safety cost this project has measured", **overclaimed**, and
+broke this project's own standing rule that no safety-cost claim ships without
+R3. What follows is the corrected statement.)*
+
+**One *spelling* of safe Rust pays an O(n) tax here. Idiomatic safe Rust does
+not.** R3's marginal rate is **5.7500 Ir per folded byte — R4's exactly**: zero
+per byte. R3's entire cost is O(1) per call (+27 / +77), *shrinking* as a
+fraction of the call as the data grows (0.90% on `small`, 0.32% on `large`).
+
+What is O(n) is the **naive indexed spelling**, R2: +4.25 Ir per folded byte,
++69% / +72% over unsafe. The decomposition (§3) puts all of it in the *value
+fold* and none in the walk, and — confirmed by construction with a
+rolled-vs-rolled control (§3.4) — **only 2.00 of the 4.25 is the bounds check;
+2.25 is a 4× unroll the check forecloses.**
+
+It costs **nothing in wall clock**: +72% `Ir` → **+0.27%** time, spreads
+0.96–2.31%, because the fold is latency-bound on a serial Horner chain at ~3.03
+cycles/byte. That rate is identical on L1-resident `small` and L3-resident
+`large`, which rules out the memory-bandwidth explanation.
+
+All four claims are the result; quoting any one alone would misrepresent it —
+and the first of them is the one that matters, because it is the one that says
+the first three patterns' conclusion still stands.
 
 ## 0. What p16 is for, and what its numbers are of
 
@@ -170,9 +185,18 @@ The mechanism is not mysterious and it is worth stating because it bounds the
 claim: the fold is `acc = acc*31 + b`, a **serial dependence chain**. Each byte's
 result is the next byte's input, so the loop is latency-bound at roughly 3
 cycles per byte (`shl`+`sub` for ×31, then `add`) and the extra bounds-check
-instructions issue into slots that were idle anyway. 4070 bytes × 3 cycles ×
-20 000 calls ≈ 244 M cycles ≈ 74 ms at this box's observed turbo, which is the
-measured number.
+instructions issue into slots that were idle anyway.
+
+*(Corrected at TASK_007_REVIEW. The arithmetic originally written here —
+4070 bytes × 3 cycles × 20 000 calls ≈ 244 M cycles ≈ 74 ms — reconciled only
+because two errors cancelled: it implies a 3.30 GHz clock, but CPU 5 turbos to a
+measured **3.85 GHz**, and 13% / 21% of the quoted 74 ms / 12.7 ms is fixed
+overhead outside the kernel (measured at `n_iters = 0`: 9.4 ms / 2.7 ms). The
+correct method is to **difference `n_iters`**, never to divide a total wall time
+by a byte count. Doing so gives **3.027–3.055 cycles/byte for every rung** on
+`large` and 3.03–3.08 on `small` — which confirms the Horner story more tightly
+than the original arithmetic did, and, because the L1-resident and L3-resident
+inputs agree, rules out a memory-bandwidth explanation.)*
 
 So the honest headline is **two sentences, not one**: *safe-naive Rust pays a
 real O(n) instruction tax on a walk LLVM cannot hoist — and on this kernel it
@@ -277,7 +301,17 @@ decimal places. Splitting it:
 | component | Ir/byte | share |
 |---|---:|---:|
 | the bounds check itself (`cmp`, `je`) | 2.00 | 47% |
-| loop overhead the 4× unroll would have amortised | 2.25 | 53% |
+| the 4× unroll the check forecloses | 2.25 | 53% |
+
+*(Both rows confirmed by construction at TASK_007_REVIEW — see §3.4. The second
+row originally read "loop overhead the 4× unroll **would have amortised**", and
+that counterfactual is **false**: forcing LLVM to unroll the *checked* loop
+(`-unroll-runtime-multi-exit -unroll-count=4`) gives **9.50**, not 7.75, because
+four copies need four exit tests — `mov,or,cmp,je`, 15 insns, 3.75/byte. So
+unrolling R2 would recover **0.50, not 2.25**. The arithmetic 4.25 = 2.00 + 2.25
+is exact, but the two terms are not independently recoverable. "Forecloses" is
+the correct and stronger word: the check costs 2.00 **and** denies an
+optimisation worth 2.25 that it could never have amortised.)*
 
 The check makes the fold a **multiple-exit loop** — it leaves either on the trip
 count or through the panic edge — and LLVM does not unroll it. That is
@@ -286,6 +320,32 @@ corroborated by a count that is independent of the timing: the number of
 variants that are expensive ({1, 5, 6}: walk + rolled fold + epilogue) and **7**
 for exactly the variants that are cheap ({2, 3, 4, 7, 8}: walk + 4 unrolled
 copies + remainder + epilogue). Eight variants, no exceptions.
+
+*(TASK_007_REVIEW's correction: this is **not independent corroboration of the
+2.00/2.25 split**, because the site count and the instructions-per-byte are both
+consequences of the same unroll factor — it is one observation stated twice. It
+does independently confirm **which variants are unrolled**, which is all it
+should be cited for. The split's real confirmation is §3.4.)*
+
+### §3.4 — the rolled-vs-rolled control (TASK_007_REVIEW)
+
+The split above was originally inferred from reading two disassemblies. It was
+then **confirmed by construction**. `-C llvm-args=-unroll-count=1` rolls R4's
+fold, and is a **bit-for-bit no-op on R2** — so it is not quietly changing both
+sides of the comparison. Rolled R4 and rolled R2 then differ by exactly
+`cmp %rax,%rsi ; je <panic>`:
+
+| fold | band A | band B |
+|---|---:|---:|
+| R2, rolled + checked | 10.0000 | 10.0000 |
+| R4 shipped, 4×unrolled + unchecked | 5.7500 | 5.7500 |
+| **R4, rolled + unchecked** | **8.0000** | **8.0000** |
+| **R2 − R4-rolled = the check, alone** | **2.0000** | **2.0000** |
+
+4.2500 = 2.0000 + 2.2500, zero residual. The 8.00 rolled-unchecked constant has
+four independent sightings, and the cheapest is already in the shipped binary:
+**R4's own remainder loop** runs at 8 insns/byte — R2's body minus exactly
+`cmp`+`je`. gcc's `-O3` fold body and R4's mod-4 sawtooth are the other two.
 
 Variant 3 is the sharpest form of the point: it is still an *indexed* fold
 (`rest[3 + j]`), and it costs +6. Indexing is not what is expensive — an index
@@ -296,9 +356,12 @@ optimisation) with a different optimisation lost, which is why the two must not
 be reported as one result.
 
 **Does the fold vectorise in any rung? No — in none of them, and that bounds
-the comparison.** `vector_regs` is `[]` for every one of the 32 cells in
+the comparison.** `vector_regs` is `[]` for **23 of the 32 cells** in
 `results/p16-tlv-walk.json`, and no `%xmm`/`%ymm`/`%zmm` register appears in any
-kernel. `acc = acc*31 + b` is a serial reduction, so there is nothing to
+**kernel**. *(Corrected at TASK_007_REVIEW: the original sentence said all 32,
+which is false. The 9 exceptions are `['xmm']` and are all `whole`-mode `main` —
+the driver, not the fold. The claim this section rests on is about the fold and
+is unaffected; quote 23/32.)* `acc = acc*31 + b` is a serial reduction, so there is nothing to
 vectorise; the best any rung achieves is a 4× *unroll*, which shortens the loop
 overhead but not the dependence chain. The safe-vs-unsafe gap here is therefore
 measured on a scalar loop on both sides — it is not "safe Rust lost the
