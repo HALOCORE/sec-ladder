@@ -382,7 +382,18 @@ it moved p17's swept rates from a true **10.0000 / 5.7500** to a reported
 `sw228→sw232`: **10.0000 / 5.7500 / 5.7500 / 5.7500** for R2 / R3 / R4 / R5, plus
 **14.0000** for the `i128` variant and **10.0000** for the all-unsigned one. A
 non-zero-residue pair drifts visibly (`sw200→sw204` gives 10.1775 / 5.9275), so
-**quote a rate only from a zero-residue lag pair**, and say which pair. Small, but it is the difference between "reproduces p16's
+**quote a rate only from a zero-residue lag pair**, and say which pair.
+
+Done properly this is *exact*, not approximate: p05's zero-residue pairs give
+**1.375000** (= 11/8, an 11-instruction body over 8 elements) and **1.062500**
+(= 17/16) — six decimals, both bands, and the fractions fall straight out of the
+disassembly. A per-element rate that does not land on a simple ratio of
+instructions to lane width is a sign the pair was not residue-matched.
+
+Also measured at TASK_013: **`measure.py` run twice on different cores reproduced
+all 42 `kernel_exclusive_ir` figures identically**, while three wall-clock cells
+changed discard status. Exactly the split this file predicts — deterministic
+columns are portable across runs, the timing column is not. Small, but it is the difference between "reproduces p16's
 constant" and "reproduces it *exactly*", and a four-decimal claim cannot afford
 it. **Difference two inputs whose checksums have the same digit count** — a
 residue-matched lag pair does this for free — or subtract the term explicitly.

@@ -28,6 +28,11 @@ this file (and say so in your report) if a fact goes stale.
   or report ns and stop. Quoting a cross-session clock is the same class of error
   as writing up a finding from a report without re-measuring, one level down.
 
+  **Interleaving is necessary but not sufficient.** At TASK_013 the probe was run
+  interleaved with the wall reps, on one pinned core, inside one session — and
+  still read **3236 / 3732 / 3816 MHz** (min / med / max). So even done correctly,
+  a cycles figure carries **±15%**. Quote the band or do not quote cycles.
+
   Consequence worth knowing: **`ns` is a measurement on this box and `cycles` is
   an inference.** Prefer ns for anything published.
 - **Shared box, containerised** (`/dev/vg1/containers_apt`). Wall-clock timing is noisy.

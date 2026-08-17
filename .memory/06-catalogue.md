@@ -24,7 +24,7 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 | T007 | p16 TLV walker — the first data-dependent loop bound | **done**, gate PASS first run, **reviewed** (headline overclaimed, corrected) |
 | T011 | p17 HTTP suffix-range (CVE-2017-7529) — the limit of memory safety | **done**, gate PASS first run, **reviewed** (leak claim refuted; real artefact found one token away) |
 | T012 | ship p17's slice-relative guard — the artefact T011 claimed | **done**, reproduced independently; gate PASS, no measured number moved |
-| T013 | p05 2-D index flattening — the first **vectorisable** kernel | spec written, wip |
+| T013 | p05 2-D index flattening — the first **vectorisable** kernel | **done**, gate PASS first run, review owed; **hypothesis inverted** |
 
 **T010's review closed the gate-hardening arc.** It was deliberately shaped as
 the opposite of the previous six — not a bypass hunt but "will this gate *accept*
@@ -113,6 +113,17 @@ supersede any earlier task report they contradict.
   region's enclosing function must have non-zero exclusive `Ir` and be the
   kernel's only caller, read from the callgrind profiles stage 3b already writes
   (dynamic). See `.memory/02-bench-rules.md`.
+- **p17's `spec.md` `obligations_note` is arithmetically wrong** (found at
+  TASK_013). It says `main` = body + driver loop + one per `by`-block, which
+  predicts 6 for its four `by`-blocks; the measured value is 5, and p05's
+  character-identical driver also measures 5. The note already says the
+  rule-of-thumb gives 7 and is not the derivation, so it is internally
+  inconsistent. Fix is one JSON string, **but it is inside the hashed contract
+  block**, so it needs a `check.py p17` re-run to refresh the gate record. Folded
+  into the next engineer task's Part 0; not urgent, nothing rests on it.
+- **p05's `inputs/` holds 144 sweep `.bin`, ~189 MB.** Gitignored and regenerable
+  by `gen.py --sweep`; left in place because `rm` outside `.temp/` stalls on
+  review. Delete by hand if the box gets tight (`df -h /`).
 - **`measure.py` cannot record the commit it will be committed in**, so a fresh
   results JSON always names HEAD~1 with `dirty_files` set. Structural; say so in
   the schema rather than chasing it.
@@ -145,7 +156,7 @@ supersede any earlier task report they contradict.
 | p02 | length-prefixed buffer copy (`memcpy` w/ attacker length) | spatial OOB write | easy | planned |
 | p03 | bounded queue / stack, array-backed | index underflow on empty pop | easy | planned |
 | p04 | ring buffer with wraparound | modular index, aliasing | moderate | planned |
-| p05 | 2-D index flattening / matmul (`i*n+j`) | dimensions trusted vs buffer; overflow in the check | moderate | **wip** (T013) — taken out of order: the first kernel with an *associative* inner loop, so the first that can vectorise |
+| p05 | 2-D index flattening / matmul (`i*n+j`) | dimensions trusted vs buffer; overflow in the check | moderate | **done** (T013), gate PASS first run, R5 == R4 `exact` at O3; **on a vectorised loop the check costs 0.0000 Ir/element** |
 | p06 | in-place reverse / rotate / swap | aliasing, permutation invariant | moderate | planned |
 | p07 | binary search | midpoint overflow (`(lo+hi)/2`) | moderate | planned |
 | p08 | memmove with overlapping regions | overlap UB | moderate | planned |

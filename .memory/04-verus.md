@@ -491,9 +491,11 @@ quoting 5c as a defence.**
    accessor strength addresses it. The twin's value accrues from the first pattern
    that needs a **multi-clause trusted accessor**, which is a property of the
    *intrinsic being wrapped* — raw-pointer families p27+ — not of the pattern
-   number. Three patterns in, the mechanism has never been exercised on the case
-   it was built for. That is a fact to state when reporting it, not a reason to
-   remove it (see the adjudication above).
+   number. **Four patterns in (p01, p02, p16, p17, p05 — all single-clause), the
+   mechanism has never been exercised on the case it was built for.** That is a
+   fact to state when reporting it, not a reason to remove it (see the
+   adjudication above) — but it is now a standing item: if p27+ arrives and the
+   accessor is *still* single-clause, reopen the keep/delete question.
 
    **`MAX_TWIN_JUSTIFICATIONS` was deleted at TASK_007**, on the same review's
    recommendation: it was the manager's round number, it is redundant (the
@@ -638,6 +640,13 @@ The reviewer agent checks all of the above by grep + reading. See `.tasks/PROTOC
     not a proof failure, it is a missing library fact.
   - **A loop invariant cuts the pre-loop context.** Facts established before the
     loop are not visible inside it unless restated in the invariant.
+- **A *product* index (`i*ncol + j`) — the p05 shape (TASK_013).** Needs
+  `lemma_mul_inequality` plus one `by (nonlinear_arith)`. The non-obvious part:
+  **the nonlinear conjunct cannot live in the outer loop's invariant**, because it
+  is false at `i == nrow`. Re-derive it at the top of the loop *body* and restate
+  it in the inner invariant. Verus will prove `nrow*ncol <= 0xffff_ffff` from
+  `nrow, ncol <= 65535` even with `usize` modelled as possibly 32-bit, so the
+  bound itself is not the work — placing it is.
 - **A parser loop with `break` proves cleanly** — established on p16 (TASK_007),
   where R5 verified **first try in ~2 s** and the one-session budget went unused.
   Two ingredients: `invariant_except_break` for the facts that hold on every

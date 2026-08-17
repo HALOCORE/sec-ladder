@@ -34,6 +34,14 @@ Known residuals we are deliberately **not** closing, all measured:
   1.72×/1.75×, because several sub-requests read the same body — so the same
   convention made the floor **loose** (margin 40.3×, ~97.5% work loss tolerated).
   When a kernel can read the same byte twice, say which way the estimate errs.
+  p05 errs *strict* again (by the 4 header bytes). Three patterns, three
+  directions — **state the direction, never assume it.**
+- **The `ALPHA = 0.25` floor constant needs a fresh argument for a vectorising
+  kernel.** It is justified in 64-bit-lane terms; a vectorised byte fold achieves
+  **1.375 / 1.0625 Ir per element** at SSE2 and an AVX-512 `vpsadbw` form would
+  reach ~0.0625, which is below the constant. Nothing on this box builds with
+  `-march`, so it is not live — but a pattern that adds one must re-argue ALPHA
+  rather than inherit it.
 - `twin_justifications` is capped at 1 by a round number, not by an argument.
 - A trusted `requires` that is non-trivial, mentions every parameter and is still
   too weak by one is caught only by the verified twin; a trusted `ensures` that is

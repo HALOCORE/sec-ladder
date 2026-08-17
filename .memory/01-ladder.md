@@ -436,6 +436,66 @@ is a much stronger claim than any p01 could produce.
    **ns is a measurement here; cycles is an inference.** See
    `.memory/00-environment.md`.
 
+6. **p05 — on a vectorised loop the bounds check is *free*, and vectorisation is
+   exactly what makes it free.** (TASK_013.) The hypothesis this pattern was
+   commissioned to test — that a bounds check would *block* vectorisation and cost
+   a multiple — is **inverted by the measurement**, which is the better outcome.
+
+   2-D index flattening, `a[i*ncol + j]`, associative inner sum so the loop *can*
+   vectorise, Horner once per row so the result still depends on row order.
+
+   - **Per-element rate, zero-residue lag pairs, both bands, six decimals:
+     `1.375000` for c-clang, safe-naive, safe-tuned and unsafe alike** (= 11/8,
+     an 11-instruction body over 8 elements); c-gcc `1.062500` (= 17/16). **The
+     bounds check costs 0.0000 Ir per element.**
+   - **Turn vectorisation off and it costs 4.2500 Ir/element exactly**, both
+     bands — **the third independent reproduction of that constant, and the first
+     on a non-Horner fold.** So 4.25 is rustc's per-element checked-scalar-fold
+     cost, and *vectorising is what removes it*.
+   - Kernel-only vector usage: **19 of 32 cells, all 16 at `-O3`.** LLVM emits an
+     11-instruction body per 8 elements with **identical mnemonics in c-clang,
+     safe_naive, safe_tuned, unsafe and verus**. (The 3 `O0 whole` hits are an
+     aggregate stack move, not the fold — check what a `vector_regs` hit *is*.)
+
+   **What survives is a per-row cost with a residue trap at a vector width**, and
+   it is the most predictive model this project has built:
+
+   > `R2 − R4 = 35 + nrow · f(ncol mod 8)`,  `f = [84, 32, 35, 38, 41, 44, 47, 50]`
+   > `R3 − R4 =  9 + nrow · 6`
+
+   128 of 128 swept points reproduced exactly; 16 parameters fitted from 16
+   points, **112 out of sample**, and a held-out band (`nrow=41`, 16 points) gives
+   **max error 0.0000**. Second model here tested by prediction rather than
+   re-measurement, after p02's sawtooth.
+
+   ⚠ **`f` is an arithmetic run of step 3 for residues 1–7 — and residue 0 is an
+   outlier, 84 against the 29 the run extrapolates to.** So `ncol ≡ 0 (mod 8)`
+   costs ~55 extra instructions per row, and **every power-of-two `ncol` lands
+   there**: 8, 16, 32, 64, 256, 1024. This is p01's trap again at a wider width
+   (there, `n % 4 == 0` was the worst residue at +29 against +11). **The
+   dimensions a benchmark author reaches for first are the worst case.** Periods
+   are back-end specific — LLVM 8, gcc 16 — so sweep two full cycles of the
+   *widest* period you might hit, and never sample powers of two alone.
+
+   - **`Ir` converts to time here: +34.4% `Ir` → +30.5% wall** (safe-naive vs
+     unsafe, `large`, `n_iters`-differenced, worst raw spread 2.3%). R3 +1.3%,
+     verus −0.7%, c-clang ≡ unsafe. **This confirms a prediction p16's own
+     `NOTES.md` made** — that a kernel with independent inner iterations would
+     convert the same instruction gap into time, where p16's latency-bound Horner
+     chain did not (+72% `Ir` → +0.27%). A prediction made on one pattern and
+     confirmed on another.
+   - **R3 is free for the sixth pattern in a row.** R1h costs +7 (gcc) / +2
+     (clang), flat.
+
+   **One design fact worth carrying, and it changed the kernel:** with a `u64` row
+   accumulator **no LLVM rung vectorises at this project's flags** (`-O3`, no
+   `-march`, so SSE2) — *"the cost-model indicates that vectorization is not
+   beneficial"* — while gcc does. Narrowing the row accumulator to `u32` makes
+   every back end vectorise. `-mavx2` also fixes it but is a `build.py` change and
+   was not made. **Accumulator width decides whether a loop vectorises at all at
+   SSE2**, which is a codegen-fragility finding in the same family as p02's lost
+   `memcpy` idiom.
+
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how
 much proof keeps that base sound, and which C patterns resist this treatment.*

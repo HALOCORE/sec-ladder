@@ -21,9 +21,21 @@ rolled-vs-rolled control (§3.4) — **only 2.00 of the 4.25 is the bounds check
 2.25 is a 4× unroll the check forecloses.**
 
 It costs **nothing in wall clock**: +72% `Ir` → **+0.27%** time, spreads
-0.96–2.31%, because the fold is latency-bound on a serial Horner chain at ~3.03
-cycles/byte. That rate is identical on L1-resident `small` and L3-resident
-`large`, which rules out the memory-bandwidth explanation.
+0.96–2.31%, because the fold is latency-bound on a serial Horner chain. The
+per-byte *time* is identical on L1-resident `small` and L3-resident `large`,
+which rules out the memory-bandwidth explanation.
+
+⚠ **The "~3.03 cycles/byte" this section used to quote is an inference, not a
+measurement, and it is now qualified (TASK_012; landed here at TASK_013).** It
+converts a wall time measured at TASK_007 with a clock measured at
+TASK_007_REVIEW — *different sessions* — and this box's clock is set by other
+tenants: the same dependent-chain probe read 3.80–3.89 GHz in one session and
+2.55–2.86 GHz in another (`.memory/00-environment.md`). At all-core turbo the
+same ns figure is ~2.2 cycles/byte. **The ns figures and the null result above
+stand** — they are ratios and levels taken inside one session — and so does the
+Horner-chain mechanism, which has a hard 3-cycle serial latency floor
+independent of the clock. Only the cycles/byte conversion is withdrawn as a
+measurement. See §2.
 
 All four claims are the result; quoting any one alone would misrepresent it —
 and the first of them is the one that matters, because it is the one that says
@@ -189,14 +201,37 @@ instructions issue into slots that were idle anyway.
 
 *(Corrected at TASK_007_REVIEW. The arithmetic originally written here —
 4070 bytes × 3 cycles × 20 000 calls ≈ 244 M cycles ≈ 74 ms — reconciled only
-because two errors cancelled: it implies a 3.30 GHz clock, but CPU 5 turbos to a
-measured **3.85 GHz**, and 13% / 21% of the quoted 74 ms / 12.7 ms is fixed
+because two errors cancelled: it implies a 3.30 GHz clock, but CPU 5 measured
+**3.85 GHz** in that session — a figure now known not to hold across sessions,
+see the ⚠ below — and 13% / 21% of the quoted 74 ms / 12.7 ms is fixed
 overhead outside the kernel (measured at `n_iters = 0`: 9.4 ms / 2.7 ms). The
 correct method is to **difference `n_iters`**, never to divide a total wall time
-by a byte count. Doing so gives **3.027–3.055 cycles/byte for every rung** on
-`large` and 3.03–3.08 on `small` — which confirms the Horner story more tightly
-than the original arithmetic did, and, because the L1-resident and L3-resident
-inputs agree, rules out a memory-bandwidth explanation.)*
+by a byte count.)*
+
+**What differencing `n_iters` actually measures is a *time* per byte, and that
+is the figure this pattern may quote.** It is the same on the L1-resident and
+the L3-resident input, which is what rules out a memory-bandwidth explanation —
+that argument needs only the equality, not a clock.
+
+⚠ **The conversion of that time into "3.027–3.055 cycles/byte on `large`, and
+3.03–3.08 on `small`" is withdrawn as a measurement (TASK_012; landed here at
+TASK_013).** It multiplies a wall time measured at TASK_007 by a clock measured
+at TASK_007_REVIEW, and those are *different sessions* on a shared, containerised
+box whose clock is set by other tenants: the identical dependent-chain probe, on
+the identical cores, read **3.80–3.89 GHz** in one session and **2.55–2.86 GHz**
+in another (`.memory/00-environment.md`). The same ns figure is therefore ~3.0 or
+~2.2 cycles/byte depending on when you ask, and **`ns` is a measurement on this
+box while `cycles` is an inference**. `.memory/00-environment.md`'s rule: never
+quote cycles from a clock measured in a different session — measure the clock
+*interleaved* with the wall-clock reps, or report ns and stop.
+
+What survives independently of any clock: the Horner step `(acc<<5) - acc + b`
+has a **hard 3-cycle serial latency floor**, so *if* the chain is the limiter
+then the clock during the TASK_007 run must have been ≥ ~3.8 GHz. That is a
+consistency argument — it is why 3.03 looked so clean — and not an independent
+confirmation. **Do not publish a cycles/byte figure for p16 without re-measuring
+the clock interleaved with the reps.** The null result (+72% `Ir` → +0.27% time)
+and the ns figures are unaffected: both are taken inside one session.
 
 So the honest headline is **two sentences, not one**: *safe-naive Rust pays a
 real O(n) instruction tax on a walk LLVM cannot hoist — and on this kernel it
