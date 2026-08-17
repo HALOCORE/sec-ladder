@@ -130,6 +130,16 @@ emits `mov eax, <answer>; ret`. Then you are timing `printf`.
    `model.py` is forbidden with no route out. Same shape for any *skipping*
    walker denominated in buffer bytes. Fix the bound before p09, not during it.
 
+   **Fixed at TASK_009, and the fix composes into a third knob.** The bound is now
+   `MIN_DECLARABLE_IR_PER_BIT (0.001953125) × model.work_unit_bits`, with a hatch
+   (`min_ir_per_work_bound_why`) capped at 64×. p09's bit-denominated shape passes;
+   `1e-9` still fails even hatched. But `work_unit_bits` is checked only for
+   `>= 1`, so `work_unit_bits = 1` plus the hatch yields an absolute bound of
+   **3.05e-5 — 512× below the pre-TASK_009 bound of 0.015625** — from two numbers
+   in the same author-written `model.py` that already supplies `min_ir_per_work`
+   and `work_per_call`. Nothing checks that `work_per_call` is denominated in the
+   unit `work_unit_bits` names. Three composing knobs, one author, one commit.
+
    **A floor can never certify that a component ran.** p02 clears any rate on its
    *fold* alone, so the stage does not show the copy happened. No rate bound on
    total kernel `Ir` can attribute cost to a part. What actually certifies the copy
@@ -305,7 +315,22 @@ offset 16  u8[payload_len]    # pattern-defined payload
 only then. The reason is precise: the project's claim about R4 is that it is the
 same machine code as the rung whose obligations were discharged. When the two
 kernels are byte-identical, R4 inherits R5's proof exactly and a UB check adds
-nothing. When they are not, R4 is unverified unsafe code that 47 patterns will
+nothing.
+
+**This policy needs revisiting, and TASK_009_REVIEW is why.** "R4 inherits R5's
+proof" is only as good as R5's proof, and R5's trusted `ensures` need not be
+**complete** with respect to the operations its trusted body performs. Measured:
+`unsafe { let _peek = *v.get_unchecked(i + 1); *v.get_unchecked(i) }` passes the
+whole gate with the contract, the twin and the pins unchanged — nothing licenses
+the `i + 1` read, and no Verus stage can see it, because the twin only has to
+satisfy the `ensures` and the `ensures` never mentions it. **Miri is the only
+backstop for that class, and this policy makes it optional exactly when
+byte-identity holds** — i.e. exactly in the case the project reports as its
+headline result. So the argument "identical machine code, therefore no UB check
+needed" is sound about *codegen* and unsound about *the trusted base*. Since Miri
+over all inputs costs about a minute, the cheap resolution is to run it whenever a
+pattern has any trusted `unsafe` item at all, and keep the identity rule only as
+the reason it may never be skipped when R4 ≠ R5. When they are not, R4 is unverified unsafe code that 47 patterns will
 imitate, and nothing has checked it.
 
 `harness/check.py` step 8 wires this. Three details, all settled at TASK_005
@@ -517,6 +542,34 @@ review as a change to the committed artefact rather than only as a source diff.
 
 ### Open gaps in the driver diff, as of TASK_005
 
+- **`driver.regions` pins a *file*, never the code that executes — and this is
+  the sixth demonstrated bypass, in both languages.** Move a rung's
+  `SLB-DRIVER` markers into a dead decoy function whose body is the canonical
+  loop, leave the real loop unmarked, and put a payload in it: **full gate PASS**,
+  with stage 6 reporting all five loops match the pin. Demonstrated on
+  `safe_naive.rs` (TASK_009, `_mm_prefetch`, marginal Ir O0 6838 → 6852) **and on
+  `c/main.c`** (TASK_009_REVIEW, `__builtin_prefetch`, all 32 C cells moved
+  +1…+6/call while all four Rust rungs stayed put — a pure cross-language
+  asymmetry, exactly what the anti-partial-evaluation rules forbid).
+  `check_driver_identity` is language-neutral about *where* the region sits, so
+  **this is one mechanism to fix, not two.**
+
+  Two derived fixes, both buildable with machinery that already exists:
+  1. **Structural, and it catches both demonstrations**: the pinned kernel item
+     may be called **exactly once** in each rung source, and that call must be
+     inside the region. A decoy whose body is the canonical loop necessarily
+     contains a second kernel call; a real measured loop cannot avoid containing
+     one.
+  2. **Dynamic**: the gate already runs callgrind twice per cell for the
+     marginal-`Ir` probe, and callgrind records caller→callee edges. Assert that
+     the callers of the kernel symbol in the `isolated` build are exactly the
+     region's enclosing function, and that that function has non-zero `Ir`. A dead
+     decoy has zero — that is an operational definition of "executed", measured
+     rather than declared, in the same spirit as the Miri cross-check.
+
+  For Rust alone, `_verus_verified_files` already resolves the region's enclosing
+  item, so requiring it to equal `driver.call_site` closes that half — but it says
+  nothing about C, which is why (1) or (2) is the actual fix.
 - **Casts are erased, so a width change applied to *every* rung at once is
   invisible.** `harness/dloop.py` must erase casts or `(size_t)(acc % nwin)` and
   `(acc % nwin) as usize` never reconcile, and then there is no cross-language

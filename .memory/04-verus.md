@@ -363,11 +363,67 @@ quoting 5c as a defence.**
    Both give `FAIL [twin] … still verifies with the precondition DELETED`. That
    generalises the way an enumeration of bad twin shapes would not: it tests the
    twin's *dependence* on the precondition rather than guessing at how a body
-   might dodge it. Note the interaction with the "prefer wrappers with no
-   `ensures`" advice above — a trusted item with no `ensures` cannot have a twin
-   with teeth, because there is nothing to force the body to do the work. **Those
-   two pieces of guidance are in tension; the twin wins where a pattern's
-   security rests on the item.**
+   might dodge it.
+
+   **But the deletion probe is not the mechanism's perimeter.** TASK_009_REVIEW
+   found three bypasses that never reach it and one blind spot that survives it.
+   Do not describe the twin as closing the strength class.
+
+   - **Scope is decided by a regex on a function body.** `_UNSAFE_RE` is
+     `\bunsafe\b` searched against `item.body`, and `vparse` parses **`fn` items
+     only**. Move the `unsafe` into a `macro_rules!` and the item is invisible to
+     *both* 5a's structural rule and 5c-twin's trusted list: `requires` deleted,
+     twin deleted, **full gate PASS** with *"no trusted `unsafe` item, so no twin
+     is required"*. That is TASK_003_REVIEW's blocker fully re-opened. `unsafe` in
+     a `common/driver.rs` helper is the same hole without a macro, because the
+     gate never parses that file. **Key the trusted-item rules on
+     `external_body` + a non-empty `ensures`, not on `unsafe`** — that is the
+     shape that can axiomatise a falsehood, per this file's own argument.
+   - **The twin is verified in a different configuration than the shipped proof.**
+     `--cfg slb_twin` changes the meaning of the whole file, and the
+     "only a twin may be `#[cfg]`-gated" check is enforced over `fn` items, so a
+     cfg'd `const`/`use`/`type`/`static` is invisible. With
+     `#[cfg(slb_twin)] const SLACK: usize = 0;` / `#[cfg(not(...))] … = 1;` and a
+     `requires in_bounds(v, i)` shared character-for-character by item and twin,
+     the twin is checked against `i < v@.len() + 0` while R5 ships
+     `i < v@.len() + 1`. Measured: `get_unchecked(v, v.len())` **verifies in the
+     shipped config**. Fix: the token `slb_twin` may appear in a pinned Verus file
+     only inside a twin's own `#[cfg(slb_twin)]`, and pin the twin-config
+     obligation count too.
+   - **`verus.twin_justifications` is uncapped free text**, and with every twin
+     justified away the gate still prints `0 verified twin(s): every trusted
+     `unsafe` item's `requires` is strong enough…` — a sentence that asserts the
+     property at *n = 0*, while both known too-weak forms ship.
+
+   **The blind spot that survives every check: a trusted `ensures` need not be
+   complete with respect to the operations its body performs.** The twin only has
+   to satisfy the `ensures`, so
+   `unsafe { let _peek = *v.get_unchecked(i + 1); *v.get_unchecked(i) }` passes
+   with the contract, the twin and the pins all unchanged — nothing licenses the
+   `i + 1` read, and the twin cannot see it because the `ensures` never mentions
+   it. Nothing mechanical checks this. **The only backstop is Miri on R4, which
+   `.memory/02-bench-rules.md` makes mandatory only when R4 ≠ R5 — i.e. optional
+   exactly when this project's headline byte-identity result holds.** Revisit that
+   policy; and see the per-item argument requirement below.
+
+   Also, from the code rather than a mutant: the deletion probe deletes **all** of
+   a twin's `requires` clauses and requires one failure, so a twin needing only 1
+   of N clauses still reports that the implementation "genuinely needs it". Make
+   it per-conjunct before a multi-clause accessor arrives.
+
+   Note the interaction with the "prefer wrappers with no `ensures`" advice above —
+   a trusted item with no `ensures` cannot have a twin with teeth, because there
+   is nothing to force the body to do the work. **That tension is worse than it
+   first looked: the sharpest fix for the `_UNSAFE_RE` bypass is to key the
+   trusted-item rules on a non-empty `ensures`, which pulls the same way.** Where
+   a pattern's security rests on a trusted item, give it an `ensures` and a twin.
+
+   **What a human must still read, after every fix** — put this per item in the
+   pattern's `NOTES.md`: (a) is the twin's body the right checked stand-in for the
+   unchecked operation (`v[i]` for `*v.get_unchecked(i)`)? — declared, and the
+   gate cannot judge it; (b) is the trusted `ensures` **complete** with respect to
+   every unchecked operation the body performs? — the blind spot above; (c) does
+   the clause mean the same thing in the shipped configuration as in the twin's?
 2. **`&&` defeats whole-clause deletion — still open.** TASK_008 made 5c delete
    *conjuncts* (`vparse.top_level_ops` / `conjunct_spans` / `delete_conjunct`),
    and a clause carrying a top-level `==>`, `||` or `<==>` is **refused rather
