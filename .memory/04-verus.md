@@ -144,6 +144,15 @@ does. Every pattern's `spec.md` now carries, and `harness/check.py` diffs:
    add or remove a function or a loop. An unchanged count is evidence of
    nothing. It also explains why `--verify-function main --verify-root` reports
    2 for one function: the second query is the driver's loop body.
+
+   **The rule of thumb is incomplete — corrected at TASK_007.** "One query per
+   function plus one per loop body" predicts **7** for p16; the true count is
+   **10**. It does not account for `by (nonlinear_arith)` / `by { .. }`
+   sub-proofs, each of which is its own query, and p16's driver has four. **Do not
+   derive a pin from the formula — measure each term** with
+   `--verify-function <name> --verify-root` and write the decomposition into
+   `spec.md` beside the pin, as p16 does. A pin a reviewer cannot re-derive from
+   `spec.md` alone is a declared pin, which `.memory/02-bench-rules.md` forbids.
 2. **Every item's `external` attribute, `requires` and `ensures`, verbatim**, and
    the item *set*. This is what catches the two mutations that move no count at
    all: a tautological `ensures` (`r == r`) and a deleted `external_body`
@@ -592,6 +601,21 @@ The reviewer agent checks all of the above by grep + reading. See `.tasks/PROTOC
 
 ## Proof techniques that keep coming up
 
+- **A parser loop with `break` proves cleanly** — established on p16 (TASK_007),
+  where R5 verified **first try in ~2 s** and the one-session budget went unused.
+  Two ingredients: `invariant_except_break` for the facts that hold on every
+  normal iteration, plus a loop `ensures` for what must hold on *both* exits.
+  The invariant shape that does the work is **"the walk from here is the whole
+  walk"** — relate the accumulator so far, plus the spec function applied to the
+  *remaining* input, to the spec function applied to the whole. Two ghost
+  accumulator snapshots carry it across the break. That shape should transfer to
+  every parser in Family C.
+- **`decreases` catches a real bug with no test run.** p16's `p += vlen` variant —
+  a common spelling of the walker — fails at `decreases not satisfied at end of
+  loop`, because `vlen == 0` makes no progress. Built as plain Rust it **hangs**
+  on a zero-length-record input the shipped kernel handles. That is the cheapest
+  honest demonstration on this project of something a proof gives that a test
+  suite does not: no input had to be guessed.
 - **Representation invariant**: `spec fn well_formed(&self) -> bool` tying
   `self.buf@.len()` to the logical sizes; thread it through every method's
   `requires`/`ensures` and the constructor's `ensures`. One invariant usually

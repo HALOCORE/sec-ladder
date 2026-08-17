@@ -21,7 +21,7 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 | T008 | close the two bypasses T006_REVIEW demonstrated; harden 5c and the floor | **done**, reviewed |
 | T009 | judge the *strength* of a trusted `requires` (the verified twin); close the paren-`&&` hole | **done**, reviewed |
 | T010 | fix the twin's perimeter (3 bypasses); tie the driver region to code that runs | **done**, reviewed |
-| T007 | p16 TLV walker — the first data-dependent loop bound | spec written, **unblocked**, wip |
+| T007 | p16 TLV walker — the first data-dependent loop bound | **done**, gate PASS first run, review owed |
 
 **T010's review closed the gate-hardening arc.** It was deliberately shaped as
 the opposite of the previous six — not a bypass hunt but "will this gate *accept*
@@ -168,7 +168,7 @@ supersede any earlier task report they contradict.
 
 | ID | Pattern | C bug class modelled | Verus difficulty | Status |
 |---|---|---|---|---|
-| p16 | TLV / length-prefixed record walker | length field vs remaining buffer | easy–moderate | planned |
+| p16 | TLV / length-prefixed record walker | length field vs remaining buffer | easy–moderate | **done** (T007), gate PASS first run, R5 == R4 `exact` at O3; **first measured O(n) safety cost** |
 | p17 | HTTP `Range:` style header parser | int overflow → OOB (cf. CVE-2017-7529) | moderate | planned |
 | p18 | varint / LEB128 decoder | unbounded shift, truncation | easy–moderate | planned |
 | p19 | protocol state machine (byte-at-a-time) | state confusion | moderate | planned |

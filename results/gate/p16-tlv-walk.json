@@ -1,0 +1,683 @@
+{
+  "pattern": "p16-tlv-walk",
+  "skipped_inputs": [],
+  "inputs_checked": [
+    "adversarial-overrun.bin",
+    "adversarial-stride2.bin",
+    "adversarial-trunc.bin",
+    "large.bin",
+    "small.bin"
+  ],
+  "contract_sha256": "c6021ea1d69ae2cf81f3fcce40d7dafe5280a7e3f26adfcf03f878fbfa2c7f99",
+  "source_sha256": {
+    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+    "harness/asm.py": "e3b14d4e90f15e7ff28d862442c721120943bb70c9514437b77facc407b6675f",
+    "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+    "harness/check.py": "2c09e0667263364e427a20de3bd76482dfeb1df23cb62c99fbba65844e491c57",
+    "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+    "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+    "harness/measure.py": "a810bf5973787f78fc9805b2407a6bb04bbee68c968374a2e9b8622c4c5d3af4",
+    "harness/report.py": "537f51262f58391a6e4da1999807e3b84a9e487e9727e168dc6527578442580a",
+    "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
+    "patterns/p16-tlv-walk/NOTES.md": "555a3f51693c85a0a5353741ff68a7ef67230c152d2670231c1f3e07184c9bae",
+    "patterns/p16-tlv-walk/README.md": "33af344db846bf9f7c835b6ef588e4d32c84260df7e1d96c1da489d6523db251",
+    "patterns/p16-tlv-walk/c/kernel.c": "a59fbef6d3427711a78b7806569978223367c6cba81bfcf1881e1ac83977aba0",
+    "patterns/p16-tlv-walk/c/kernel.h": "2cc7285986c387baed556449abb63ad25cc3409e27a081300a1ca5e2c84641aa",
+    "patterns/p16-tlv-walk/c/kernel_hardened.c": "a8a078fda62dae779146c3c32dd2dc53766b13e866222a2c9665e67efa39e470",
+    "patterns/p16-tlv-walk/c/main.c": "7bb5a45a3f0103b60a2dd27b8e45eb52ce0015fa31c813b1135d77fc444be6aa",
+    "patterns/p16-tlv-walk/model.py": "8b35eae6926af6654d6816d9a1733808234217fda9cdb8a8ee1d873d1877a6e9",
+    "patterns/p16-tlv-walk/safe_naive.rs": "3f58f658310c5615d0899d01e0907a68b5689673b79d856b6372dbf8cd149054",
+    "patterns/p16-tlv-walk/safe_tuned.rs": "6044ce0394896c3605e02178e84aa38b05d9c3bc4d31444cb52ab8674889d2fd",
+    "patterns/p16-tlv-walk/spec.md": "f3f2eb8ac3807db168d9e79dfec4b13edec7c94745d1de4c33cb0ff318c19ba9",
+    "patterns/p16-tlv-walk/unsafe.rs": "ae04d5ee891f29376555b3ef60f99348bb3bfa080eb897f4520dd8bbbbf6f2a4",
+    "patterns/p16-tlv-walk/verus.rs": "58c6d06cd6f86430578f5e3120644324162e5822db489ace7cdbba191e79332e"
+  },
+  "derived_contract": {
+    "requires": [
+      "off + len <= buf_len"
+    ],
+    "ensures": [
+      "result == tlv_fold(buf, off, len)"
+    ],
+    "alpha_ir_per_work": 0.25,
+    "collapse_rate_ir_per_work": 0.25,
+    "collapse_work_unit": "byte",
+    "collapse_floor_min_declarable": 0.015625,
+    "collapse_tightest_margin": 23.237867970660147
+  },
+  "identity": [
+    {
+      "pair": "unsafe vs verus",
+      "opt": "O0",
+      "level": "norel",
+      "expected": "norel",
+      "md5_fn_a": "3dfd3fac6b292e3958527fcbbb652fc4",
+      "md5_fn_b": "7c1d83ebfc737e4772e44ffb82153811",
+      "md5_raw_equal": false,
+      "counts_a": [
+        85,
+        85,
+        398
+      ],
+      "counts_b": [
+        85,
+        85,
+        398
+      ],
+      "pad_a": [
+        2,
+        2
+      ],
+      "pad_b": [
+        2,
+        2
+      ]
+    },
+    {
+      "pair": "unsafe vs verus",
+      "opt": "O3",
+      "level": "exact",
+      "expected": "exact",
+      "md5_fn_a": "852405e0fa438a9df19c778fb3eff314",
+      "md5_fn_b": "852405e0fa438a9df19c778fb3eff314",
+      "md5_raw_equal": true,
+      "counts_a": [
+        92,
+        88,
+        324
+      ],
+      "counts_b": [
+        92,
+        88,
+        324
+      ],
+      "pad_a": [
+        12,
+        12
+      ],
+      "pad_b": [
+        12,
+        12
+      ]
+    }
+  ],
+  "marginal_ir_per_call": {
+    "c-clang/O0/isolated/small.bin": 7606.72,
+    "c-clang/O0/isolated/large.bin": 61252.72,
+    "c-clang/O0/isolated/d_ir_d_work": 14.976549413735343,
+    "c-clang/O0/whole/small.bin": 7606.72,
+    "c-clang/O0/whole/large.bin": 61252.72,
+    "c-clang/O0/whole/d_ir_d_work": 14.976549413735343,
+    "c-clang/O3/isolated/small.bin": 3007.72,
+    "c-clang/O3/isolated/large.bin": 23775.72,
+    "c-clang/O3/isolated/d_ir_d_work": 5.797878280290341,
+    "c-clang/O3/whole/small.bin": 2992.72,
+    "c-clang/O3/whole/large.bin": 23760.72,
+    "c-clang/O3/whole/d_ir_d_work": 5.797878280290341,
+    "c-clang-h/O0/isolated/small.bin": 7634.72,
+    "c-clang-h/O0/isolated/large.bin": 61322.72,
+    "c-clang-h/O0/isolated/d_ir_d_work": 14.988274706867672,
+    "c-clang-h/O0/whole/small.bin": 7635.72,
+    "c-clang-h/O0/whole/large.bin": 61323.72,
+    "c-clang-h/O0/whole/d_ir_d_work": 14.988274706867672,
+    "c-clang-h/O3/isolated/small.bin": 3031.72,
+    "c-clang-h/O3/isolated/large.bin": 23829.72,
+    "c-clang-h/O3/isolated/d_ir_d_work": 5.806253489670575,
+    "c-clang-h/O3/whole/small.bin": 3012.72,
+    "c-clang-h/O3/whole/large.bin": 23810.72,
+    "c-clang-h/O3/whole/d_ir_d_work": 5.806253489670575,
+    "c-gcc/O0/isolated/small.bin": 9657.72,
+    "c-gcc/O0/isolated/large.bin": 77625.72,
+    "c-gcc/O0/isolated/d_ir_d_work": 18.974874371859297,
+    "c-gcc/O0/whole/small.bin": 9657.72,
+    "c-gcc/O0/whole/large.bin": 77625.72,
+    "c-gcc/O0/whole/d_ir_d_work": 18.974874371859297,
+    "c-gcc/O3/isolated/small.bin": 4077.72,
+    "c-gcc/O3/isolated/large.bin": 32709.72,
+    "c-gcc/O3/isolated/d_ir_d_work": 7.993299832495812,
+    "c-gcc/O3/whole/small.bin": 4064.72,
+    "c-gcc/O3/whole/large.bin": 32696.72,
+    "c-gcc/O3/whole/d_ir_d_work": 7.993299832495812,
+    "c-gcc-h/O0/isolated/small.bin": 9678.72,
+    "c-gcc-h/O0/isolated/large.bin": 77676.72,
+    "c-gcc-h/O0/isolated/d_ir_d_work": 18.98324958123953,
+    "c-gcc-h/O0/whole/small.bin": 9678.72,
+    "c-gcc-h/O0/whole/large.bin": 77676.72,
+    "c-gcc-h/O0/whole/d_ir_d_work": 18.98324958123953,
+    "c-gcc-h/O3/isolated/small.bin": 4094.72,
+    "c-gcc-h/O3/isolated/large.bin": 32750.72,
+    "c-gcc-h/O3/isolated/d_ir_d_work": 8.0,
+    "c-gcc-h/O3/whole/small.bin": 4080.72,
+    "c-gcc-h/O3/whole/large.bin": 32736.72,
+    "c-gcc-h/O3/whole/d_ir_d_work": 8.0,
+    "safe_naive/O0/isolated/small.bin": 27169.3,
+    "safe_naive/O0/isolated/large.bin": 220141.3,
+    "safe_naive/O0/isolated/d_ir_d_work": 53.87269681742043,
+    "safe_naive/O0/whole/small.bin": 27169.3,
+    "safe_naive/O0/whole/large.bin": 220141.3,
+    "safe_naive/O0/whole/d_ir_d_work": 53.87269681742043,
+    "safe_naive/O3/isolated/small.bin": 5109.3,
+    "safe_naive/O3/isolated/large.bin": 40935.3,
+    "safe_naive/O3/isolated/d_ir_d_work": 10.001675041876046,
+    "safe_naive/O3/whole/small.bin": 5630.3,
+    "safe_naive/O3/whole/large.bin": 45068.3,
+    "safe_naive/O3/whole/d_ir_d_work": 11.010050251256281,
+    "safe_tuned/O0/isolated/small.bin": 12033.3,
+    "safe_tuned/O0/isolated/large.bin": 94881.3,
+    "safe_tuned/O0/isolated/d_ir_d_work": 23.12897822445561,
+    "safe_tuned/O0/whole/small.bin": 12033.3,
+    "safe_tuned/O0/whole/large.bin": 94881.3,
+    "safe_tuned/O0/whole/d_ir_d_work": 23.12897822445561,
+    "safe_tuned/O3/isolated/small.bin": 3051.3,
+    "safe_tuned/O3/isolated/large.bin": 23889.3,
+    "safe_tuned/O3/isolated/d_ir_d_work": 5.817420435510888,
+    "safe_tuned/O3/whole/small.bin": 3032.3,
+    "safe_tuned/O3/whole/large.bin": 23886.3,
+    "safe_tuned/O3/whole/d_ir_d_work": 5.821887213847013,
+    "unsafe/O0/isolated/small.bin": 18297.3,
+    "unsafe/O0/isolated/large.bin": 147201.3,
+    "unsafe/O0/isolated/d_ir_d_work": 35.98659966499162,
+    "unsafe/O0/whole/small.bin": 18297.3,
+    "unsafe/O0/whole/large.bin": 147201.3,
+    "unsafe/O0/whole/d_ir_d_work": 35.98659966499162,
+    "unsafe/O3/isolated/small.bin": 3024.3,
+    "unsafe/O3/isolated/large.bin": 23812.3,
+    "unsafe/O3/isolated/d_ir_d_work": 5.803461753210497,
+    "unsafe/O3/whole/small.bin": 3009.3,
+    "unsafe/O3/whole/large.bin": 23797.3,
+    "unsafe/O3/whole/d_ir_d_work": 5.803461753210497,
+    "verus/O0/isolated/small.bin": 18297.3,
+    "verus/O0/isolated/large.bin": 147201.3,
+    "verus/O0/isolated/d_ir_d_work": 35.98659966499162,
+    "verus/O0/whole/small.bin": 18297.3,
+    "verus/O0/whole/large.bin": 147201.3,
+    "verus/O0/whole/d_ir_d_work": 35.98659966499162,
+    "verus/O3/isolated/small.bin": 3023.3,
+    "verus/O3/isolated/large.bin": 23811.3,
+    "verus/O3/isolated/d_ir_d_work": 5.803461753210497,
+    "verus/O3/whole/small.bin": 3009.3,
+    "verus/O3/whole/large.bin": 23797.3,
+    "verus/O3/whole/d_ir_d_work": 5.803461753210497
+  },
+  "verus": {
+    "verus.rs": {
+      "verified": 10,
+      "errors": 0,
+      "pinned": 10,
+      "tcb_items": [
+        {
+          "name": "get_unchecked",
+          "attr": "verifier::external_body",
+          "body_lines": 1,
+          "line": 140
+        },
+        {
+          "name": "load_input",
+          "attr": "verifier::external_body",
+          "body_lines": 4,
+          "line": 192
+        },
+        {
+          "name": "emit",
+          "attr": "verifier::external_body",
+          "body_lines": 1,
+          "line": 204
+        }
+      ]
+    }
+  },
+  "verified_call_site": {
+    "main": 5,
+    "kernel": 3
+  },
+  "clause_deletion": {
+    "verus.rs": {
+      "control_verified": 10,
+      "mutants": [
+        {
+          "item": "main",
+          "kind": "assert(false) probe",
+          "clause": null,
+          "verified": 9,
+          "errors": 1
+        },
+        {
+          "item": "get_unchecked",
+          "kind": "trusted",
+          "clause": "r == v@[i as int]",
+          "verified": 8,
+          "errors": 2
+        },
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "r == tlv_fold(buf@, off as int, len as int)",
+          "verified": 9,
+          "errors": 1
+        }
+      ]
+    }
+  },
+  "requires_strength": {
+    "verus.rs": {
+      "control_verified": 10,
+      "mutants": [
+        {
+          "item": "get_unchecked",
+          "kind": "trusted",
+          "clause": "i < v@.len()",
+          "test": "tautology",
+          "tactic": "bit_vector",
+          "verified": null,
+          "errors": null,
+          "verdict": "not a tautology"
+        },
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "off + len <= buf@.len()",
+          "test": "tautology",
+          "tactic": "bit_vector",
+          "verified": null,
+          "errors": null,
+          "verdict": "not a tautology"
+        },
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "off + len <= buf@.len()",
+          "test": "deletion",
+          "verified": 9,
+          "errors": 1
+        }
+      ]
+    }
+  },
+  "verified_twins": {
+    "verus.rs": {
+      "twins": [
+        {
+          "trusted": "get_unchecked",
+          "twin": "slb_twin_get_unchecked",
+          "signature_identical": true,
+          "requires": [
+            "i < v@.len()"
+          ],
+          "ensures": [
+            "r == v@[i as int]"
+          ],
+          "body_lines": 1,
+          "vacuity_probe": {
+            "per_conjunct": [
+              {
+                "conjunct": "i < v@.len()",
+                "verified": 10,
+                "errors": 1
+              }
+            ],
+            "load_bearing": 1,
+            "conjuncts": 1
+          }
+        }
+      ],
+      "verified": 11,
+      "errors": 0,
+      "without_twins": 10
+    }
+  },
+  "proof_domain": {
+    "adversarial-overrun.bin": {
+      "calls": 8,
+      "requires_ok": true,
+      "ensures_checked": 8
+    },
+    "adversarial-stride2.bin": {
+      "calls": 0,
+      "requires_ok": true,
+      "ensures_checked": 0
+    },
+    "adversarial-trunc.bin": {
+      "calls": 8,
+      "requires_ok": true,
+      "ensures_checked": 8
+    },
+    "large.bin": {
+      "calls": 20000,
+      "requires_ok": true,
+      "ensures_checked": 128
+    },
+    "small.bin": {
+      "calls": 25000,
+      "requires_ok": true,
+      "ensures_checked": 128
+    }
+  },
+  "driver_loops": {
+    "c/main.c": {
+      "statements": 12,
+      "matches_pin": true
+    },
+    "safe_naive.rs": {
+      "statements": 12,
+      "matches_pin": true
+    },
+    "safe_tuned.rs": {
+      "statements": 12,
+      "matches_pin": true
+    },
+    "unsafe.rs": {
+      "statements": 12,
+      "matches_pin": true
+    },
+    "verus.rs": {
+      "statements": 12,
+      "matches_pin": true
+    }
+  },
+  "adversarial": {
+    "adversarial-overrun.bin/c-gcc": {
+      "exit": -11,
+      "stdout": "",
+      "stderr": "",
+      "signal": 11,
+      "model_exit": 0,
+      "model_stdout": "8267139675305953920"
+    },
+    "adversarial-overrun.bin/c-clang": {
+      "exit": -11,
+      "stdout": "",
+      "stderr": "",
+      "signal": 11,
+      "model_exit": 0,
+      "model_stdout": "8267139675305953920"
+    },
+    "adversarial-overrun.bin/safe_naive": {
+      "exit": 0,
+      "stdout": "8267139675305953920",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "8267139675305953920"
+    },
+    "adversarial-overrun.bin/safe_tuned": {
+      "exit": 0,
+      "stdout": "8267139675305953920",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "8267139675305953920"
+    },
+    "adversarial-overrun.bin/unsafe": {
+      "exit": 0,
+      "stdout": "8267139675305953920",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "8267139675305953920"
+    },
+    "adversarial-overrun.bin/verus": {
+      "exit": 0,
+      "stdout": "8267139675305953920",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "8267139675305953920"
+    },
+    "adversarial-overrun.bin/c-gcc-h": {
+      "exit": 0,
+      "stdout": "8267139675305953920",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "8267139675305953920"
+    },
+    "adversarial-overrun.bin/c-clang-h": {
+      "exit": 0,
+      "stdout": "8267139675305953920",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "8267139675305953920"
+    },
+    "adversarial-stride2.bin/c-gcc": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-stride2.bin/c-clang": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-stride2.bin/safe_naive": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-stride2.bin/safe_tuned": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-stride2.bin/unsafe": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-stride2.bin/verus": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-stride2.bin/c-gcc-h": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-stride2.bin/c-clang-h": {
+      "exit": 0,
+      "stdout": "0",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "0"
+    },
+    "adversarial-trunc.bin/c-gcc": {
+      "exit": 0,
+      "stdout": "3988538283260473009",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "3988538283260473009"
+    },
+    "adversarial-trunc.bin/c-clang": {
+      "exit": 0,
+      "stdout": "3988538283260473009",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "3988538283260473009"
+    },
+    "adversarial-trunc.bin/safe_naive": {
+      "exit": 0,
+      "stdout": "3988538283260473009",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "3988538283260473009"
+    },
+    "adversarial-trunc.bin/safe_tuned": {
+      "exit": 0,
+      "stdout": "3988538283260473009",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "3988538283260473009"
+    },
+    "adversarial-trunc.bin/unsafe": {
+      "exit": 0,
+      "stdout": "3988538283260473009",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "3988538283260473009"
+    },
+    "adversarial-trunc.bin/verus": {
+      "exit": 0,
+      "stdout": "3988538283260473009",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "3988538283260473009"
+    },
+    "adversarial-trunc.bin/c-gcc-h": {
+      "exit": 0,
+      "stdout": "3988538283260473009",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "3988538283260473009"
+    },
+    "adversarial-trunc.bin/c-clang-h": {
+      "exit": 0,
+      "stdout": "3988538283260473009",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "3988538283260473009"
+    }
+  },
+  "sanitizer": {
+    "adversarial-overrun.bin": {
+      "exit": 1,
+      "expected_exit": 0,
+      "expect": "fires",
+      "fired": true,
+      "diagnostic": "================================================================= ==3162231==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51f000001a80 at pc 0x55736a040717 bp 0x7ffd0e569df0 sp 0x7ffd0e569de0 READ of size 1 at 0x51f000001a80 thread T0 #0 0x55736a040716 in kernel /home/apt/repos_common/"
+    },
+    "adversarial-stride2.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": ""
+    },
+    "adversarial-trunc.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": ""
+    },
+    "large.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": ""
+    },
+    "small.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": ""
+    }
+  },
+  "miri": {
+    "pair": "unsafe vs verus",
+    "identity_o3": "exact",
+    "inherits_proof": true,
+    "trusted_items": {
+      "verus.rs": [
+        "get_unchecked"
+      ]
+    },
+    "required_because": [
+      "this pattern has 1 trusted item(s) {'verus.rs': ['get_unchecked']} whose `ensures` need not be COMPLETE with respect to the unchecked operations their bodies perform (TASK_009_REVIEW x4)",
+      "spec.md sets miri.required"
+    ],
+    "required": true,
+    "ran": true,
+    "available": true,
+    "sysroot": "/home/apt/.cache/miri",
+    "probe_iters": 4,
+    "runs": [
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-overrun.bin",
+        "exit": 0,
+        "ub": false,
+        "stdout": "11362453224674129216",
+        "model_stdout": "11362453224674129216",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-stride2.bin",
+        "exit": 0,
+        "ub": false,
+        "stdout": "0",
+        "model_stdout": "0",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-trunc.bin",
+        "exit": 0,
+        "ub": false,
+        "stdout": "5018301368121126796",
+        "model_stdout": "5018301368121126796",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "large.bin",
+        "exit": 0,
+        "ub": false,
+        "stdout": "7384174217059939314",
+        "model_stdout": "7384174217059939314",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "small.bin",
+        "exit": 0,
+        "ub": false,
+        "stdout": "14520258090713499404",
+        "model_stdout": "14520258090713499404",
+        "stderr": ""
+      }
+    ]
+  },
+  "failures": [],
+  "notes": [],
+  "loud": [],
+  "blocked": [],
+  "verdict": "PASS",
+  "complete_run": true,
+  "invocation": "p16"
+}

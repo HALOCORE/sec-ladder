@@ -177,9 +177,11 @@ mentions. Budget for them up front; each has cost an engineer a surprise.
      `#[cfg(slb_twin)]` attribute — anywhere else in the pinned file or anything
      it includes is a hard failure. A `#[cfg]`-varying `const` used in a
      `requires` was the bypass this closes.
-   - `verus.twin_justifications` is the escape hatch and is capped at
-     `MAX_TWIN_JUSTIFICATIONS = 1` per pattern, shouted every run. If a pattern
-     needs two, that is a finding to report, not a number to raise.
+   - `verus.twin_justifications` is the escape hatch, uncapped and shouted every
+     run. (`MAX_TWIN_JUSTIFICATIONS = 1` existed briefly and was **deleted at
+     TASK_007** — a manager-invented round number, redundant against the separate
+     "every twin justified away" rule, and the only knob in the twin regime that
+     could hard-fail an honest pattern with no route out.)
 7. **Every trusted item needs a written human argument in `NOTES.md`**, marked
    `SLB-TRUSTED-ARGUMENT <src> <name>`, ≥200 chars, containing the literal labels
    `(a)`, `(b)`, `(c)`: (a) is the twin body the right checked stand-in;

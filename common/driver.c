@@ -140,6 +140,29 @@ unsigned char *slb_head2_u64_bytes(const slb_input *in, uint64_t *h0, uint64_t *
     return body;
 }
 
+unsigned char *slb_head1_u64_bytes(const slb_input *in, uint64_t *h0, size_t *n_body)
+{
+    size_t len = (size_t)in->payload_len;
+    unsigned char *body;
+
+    if (in->payload_len < 8) {
+        *h0 = 0;
+        *n_body = 0;
+        return NULL;
+    }
+    *h0 = slb_le64(in->payload);
+    *n_body = len - 8;
+    if (*n_body == 0)
+        return NULL;
+    body = (unsigned char *)malloc(*n_body);
+    if (!body) {
+        fprintf(stderr, "slb: out of memory for %zu body bytes\n", *n_body);
+        exit(SLB_EXIT_NOMEM);
+    }
+    memcpy(body, in->payload + 8, *n_body);
+    return body;
+}
+
 unsigned char *slb_zeroed(uint64_t cap)
 {
     unsigned char *p;

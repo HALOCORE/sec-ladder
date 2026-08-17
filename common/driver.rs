@@ -133,6 +133,23 @@ pub fn head2_u64_bytes(input: &Input) -> (u64, u64, Vec<u8>) {
      input.payload[16..].to_vec())
 }
 
+/// Split the payload into (head word 0, remaining bytes). Mirrors
+/// `slb_head1_u64_bytes` in common/driver.c and `slb.head1_u64_bytes` in
+/// common/slb.py. A payload shorter than 8 bytes yields (0, vec![]).
+///
+/// p16 is the first pattern with this shape: one head word (`stride`) and then
+/// the record chain. The body is a bulk `to_vec()` rather than an
+/// element-by-element decode, deliberately: `.memory/02-bench-rules.md` records
+/// that `head_u64_body`'s per-element loop is exactly why p01's `large.bin`
+/// cannot be checked under Miri inside 180 s while p02's larger one finishes in
+/// 1.5 s.
+pub fn head1_u64_bytes(input: &Input) -> (u64, Vec<u8>) {
+    if input.payload.len() < 8 {
+        return (0, Vec::new());
+    }
+    (le64(&input.payload[0..8]), input.payload[8..].to_vec())
+}
+
 /// A zeroed destination buffer of `cap` bytes, or exit(EXIT_CAP) when `cap` is
 /// 0 or above `MAX_CAP`. Mirrors `slb_zeroed` in common/driver.c -- including
 /// the range check, which is what stops a huge declared capacity from being a

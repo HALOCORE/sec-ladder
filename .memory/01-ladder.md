@@ -195,6 +195,68 @@ is a much stronger claim than any p01 could produce.
    and wall clock disagreed in *direction* on the same source. Report both
    columns; do not let `Ir` stand in for time without saying so.
 
+4. **p16 is the case p01 said not to generalise to, and it delivers the project's
+   first real O(n) safety cost — with the cause one level down from the check.**
+   (TASK_007.) A TLV walker: trip count from attacker data, each record's position
+   depending on every previous length field, nothing hoistable, nothing
+   idiom-recognisable. `-O3 isolated`, marginal `Ir`/call:
+
+   | rung | small (508 B win) | large (4090 B win) | vs R4 |
+   |---|---:|---:|---|
+   | c-clang / c-clang-h | 2993 / 3017 | 23761 / 23815 | check = +24 / +54 |
+   | c-gcc / c-gcc-h | 4062 / 4079 | 32694 / 32735 | check = +17 / +41 |
+   | **R2 safe-naive** | **5095** | **40921** | **+2085 (+69%) / +17123 (+72%)** |
+   | R3 safe-tuned | 3037 | 23875 | +27 / +77 |
+   | R4 unsafe / R5 verus | 3010 / 3010 | 23798 / 23798 | 0 |
+
+   **This is a per-byte cost, not per call** — R2 is 10.00 Ir per folded byte,
+   R3/R4 are 5.75, measured over 68 consecutive value lengths in two bands 18×
+   apart. R2−R4 = **exactly 4.25 Ir/byte in both bands**. p01's and p02's "+10
+   flat" does *not* survive contact with a data-dependent walk.
+
+   **But decompose before calling it a bounds-check tax — the same trap as p02.**
+   Eight variants, all printing the same checksum: changing **only the fold**
+   removes 98.0% / 99.3% of the gap; changing **only the walk** removes 1.5% /
+   0.5%. Unsafe-walk+safe-fold and safe-walk+unsafe-fold sum to 2091 against the
+   whole gap's 2085 — no interaction term. So the cost is entirely in the inner
+   byte fold, and from the disassembly: R2's fold is a rolled 10-instruction body
+   (10.00 Ir/byte); R4's is 4×-unrolled, 23 insns per 4 bytes (5.75). Of the 4.25,
+   **2.00 is the check itself and 2.25 is the unrolling the check's extra loop
+   exit prevents.** Corroborated independently by counting `shl $0x5` sites: 3 in
+   exactly the rolled variants, 7 in exactly the unrolled ones.
+
+   **The honest headline: more than half the cost of the bounds check is not the
+   check, it is the optimisation the check forecloses.** That is the same shape as
+   p02's retraction (a lost `memcpy` idiom) arriving at a *real* cost rather than
+   a spurious one — and it is the project's most transferable result, because it
+   says a safety tax must be attributed to a mechanism, never to a comparison.
+
+   **Three further things p16 establishes:**
+   - **`Ir` and wall clock disagree in *magnitude*, not just direction: +70% `Ir`
+     → 0% time.** All 16 O3 cells land in 12.69–12.85 ms / 73.56–74.23 ms. The
+     fold is a serial Horner chain, latency-bound at ~3 cycles/byte, so the extra
+     instructions issue in slack. **This is a property of this kernel, not of
+     bounds checks** — a kernel with independent inner iterations would convert
+     the same 4.25 Ir/byte into time. Stated as an inference from the dependence
+     chain plus cycle arithmetic; IPC could not be measured (no counters).
+   - **Nothing vectorises in any rung** (`vector_regs: []` in all 32 cells), so
+     the gap is measured on a scalar loop on both sides — no vectorisation
+     confound, unlike p01.
+   - **R3 survives, and is now the *fourth* pattern in a row.** +27 / +77 per
+     call, fitting `7 + 7·nrec` (`7 + 5·nrec` when vlen ≡ 0 mod 4), which predicts
+     both shipped numbers without being fitted to them. **The residue modulus that
+     matters here is 4** — the unroll factor — amplitude 1.5%. p01's was 4, p02's
+     was 16; do not assume.
+
+   Security half: R1 does not merely over-read, it **walks unboundedly**. Once `p`
+   passes `end`, `end - p` underflows `size_t` and the loop condition stays true
+   forever, so R1 parses memory until it faults — SIGSEGV in both gcc and clang
+   plain builds, ASan `heap-buffer-overflow` READ 0 bytes past a 3072-byte region.
+   R1h and all four Rust rungs print the model's answer. Delete-the-check controls:
+   C → SIGSEGV, unsafe Rust → SIGSEGV, safe Rust → **exit 101, index out of
+   bounds**, Verus → will not compile. A missing check in a chained parser
+   compounds; carry this to p17+.
+
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how
 much proof keeps that base sound, and which C patterns resist this treatment.*

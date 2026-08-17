@@ -121,3 +121,21 @@ def head2_u64_bytes(payload):
 def pack_head2_bytes(h0, h1, body):
     """Inverse of head2_u64_bytes."""
     return struct.pack("<QQ", h0, h1) + bytes(body)
+
+
+def head1_u64_bytes(payload):
+    """Split a payload into (head word 0, remaining raw bytes).
+
+    Mirrors `slb_head1_u64_bytes` (C) and `driver::head1_u64_bytes` (Rust).
+    Patterns whose payload is "one header word, then a byte blob" use this
+    shape; p16 is the first. A payload shorter than 8 bytes yields (0, b"").
+    """
+    if len(payload) < 8:
+        return 0, b""
+    (h0,) = struct.unpack("<Q", payload[:8])
+    return h0, payload[8:]
+
+
+def pack_head1_bytes(h0, body):
+    """Inverse of head1_u64_bytes."""
+    return struct.pack("<Q", h0) + bytes(body)

@@ -1123,12 +1123,24 @@ _UNSAFE_RE = re.compile(r"\bunsafe\b")
 TWIN_PREFIX = "slb_twin_"
 TWIN_CFG = "slb_twin"
 
-# How many trusted items a pattern may justify away with
-# `verus.twin_justifications` before the hatch has become an off switch. See
-# `check_trusted_twins`; TASK_009_REVIEW's x3 used two of them (p02 has exactly
-# two trusted items) and got a full green gate with both known off-by-one
-# weakenings shipped.
-MAX_TWIN_JUSTIFICATIONS = 1
+# `MAX_TWIN_JUSTIFICATIONS = 1` used to live here and was DELETED at TASK_007,
+# on TASK_010_REVIEW's recommendation. Three reasons, in order of weight:
+#
+#   1. It was a round number, not an argument -- the same shape as
+#      `MIN_DECLARABLE_IR_PER_WORK`, which forbade p09's honest bit-denominated
+#      `model.py` outright (`.memory/02-bench-rules.md`).
+#   2. It was redundant. The case it was introduced for (TASK_009_REVIEW's x3:
+#      justify away BOTH of p02's trusted items, ship both known off-by-one
+#      weakenings, get a green gate) is already a hard failure under the
+#      separate `n_twins == 0` rule below -- "every trusted item in this pattern
+#      is excused ... so stage 5c-twin checked the strength of NOTHING".
+#      Re-measured at TASK_007 with the cap gone: x3 still FAILS.
+#   3. It was the only knob in the twin regime that could hard-fail an *honest*
+#      pattern with no route out. A pattern with two genuinely untwinnable
+#      trusted items had no legal configuration.
+#
+# The hatch itself stays: uncapped, `rep.block`ed per item, and shouted every
+# run, so a reviewer reads every use of it.
 
 
 def _is_trusted(item):
@@ -2820,25 +2832,15 @@ def check_trusted_twins(pdir, rep, contract, enabled=True):
     #         strong enough ...
     #     check.py: PASS   failures 0   loud 3
     #
-    # -- a green sentence asserting the property at **n = 0**. Three changes:
-    # the hatch is capped, justifying away *every* trusted item is a hard
-    # failure (the hatch has then become an off switch for the whole stage), and
-    # the OK line below states its `n`, refuses to fire at `n == 0`, and refuses
-    # to fire at all if anything was justified away.
+    # -- a green sentence asserting the property at **n = 0**. Two changes
+    # survive: justifying away *every* trusted item is a hard failure (the hatch
+    # has then become an off switch for the whole stage), and the OK line below
+    # states its `n`, refuses to fire at `n == 0`, and refuses to fire at all if
+    # anything was justified away. The third -- a numeric cap on how many items
+    # may be justified away -- was deleted at TASK_007 as redundant with the
+    # first; see the comment where `MAX_TWIN_JUSTIFICATIONS` used to be defined.
     n_twins = sum(len(v["twins"]) for v in out.values())
     if justified:
-        if len(justified) > MAX_TWIN_JUSTIFICATIONS:
-            rep.fail("twin",
-                     f"{len(justified)} trusted item(s) {sorted(justified)} are "
-                     f"excused from having a verified twin by "
-                     f"verus.twin_justifications; the cap is "
-                     f"{MAX_TWIN_JUSTIFICATIONS} per pattern. This is a harness "
-                     f"constant, not a spec.md value: TASK_009_REVIEW used two "
-                     f"of them (p02 has exactly two trusted items) to ship BOTH "
-                     f"known off-by-one weakenings -- `i <= v@.len()` and "
-                     f"`from + n <= src@.len() + 1` -- with both twins deleted "
-                     f"and a full green gate. An untwinnable trusted item is a "
-                     f"finding to write up, not a routine hatch.")
         if n_twins == 0:
             rep.fail("twin",
                      f"every trusted item in this pattern "
@@ -3415,6 +3417,7 @@ def _check_region_runs(pdir, rep, contract, files, built, cg_files, probe):
             continue
         want[f] = fn
     checked, ran = 0, set()
+    n_kernel_syms, n_caller_edges = 0, 0
     for (c, o, m), binp in sorted(built.items()):
         if m != "isolated" or not binp:
             continue
@@ -3456,6 +3459,40 @@ def _check_region_runs(pdir, rep, contract, files, built, cg_files, probe):
                      f"loop, the real loop left unmarked with a "
                      f"`__builtin_prefetch` in it, full gate PASS and all 32 C "
                      f"cells +1..+6 Ir/call while the Rust rungs stood still.")
+        elif not kids or not callers_of_k:
+            # TASK_010_REVIEW / TASK_007 Part 0.1. Without this arm `kids == []`
+            # makes `callers_of_k` and `bad` empty too, the cell is counted as
+            # CHECKED, and the OK line below announces that `fn` "is the only
+            # caller of the `kernel` symbol" -- over a set with no members. That
+            # is the fifth instance of the rule TASK_010 itself promoted (a
+            # count-bearing `rep.ok` must state its `n` and must never fire at
+            # `n == 0`), and it silences precisely the limb added to catch a live
+            # decoy. Reproduced in `.temp/review010/cgvac.py` by renaming the
+            # symbol to `kernel.constprop.0` -- the shape of a gcc IPA clone --
+            # which gave `failures=0 shouts=0` and an identical green line.
+            #
+            # `callers_of_k == []` with `kids` non-empty is the same vacuity one
+            # step later (the symbol is in the profile but callgrind recorded no
+            # edge into it), so both are refused here rather than one.
+            rep.fail("driver",
+                     f"{c} {o} {m} on {nm}: "
+                     + (f"no callgrind symbol fullmatches the pinned kernel item "
+                        f"`{kname}`"
+                        if not kids else
+                        f"the `{kname}` symbol is in the profile but callgrind "
+                        f"recorded no caller edge into it")
+                     + f" in an **isolated** build, where "
+                       f"`#[inline(never)]`/`SLB_NOINLINE` is supposed to keep "
+                       f"the kernel as its own called symbol. The 'only caller' "
+                       f"assertion would therefore have been made over an empty "
+                       f"set and passed vacuously (n=0). Causes to check, in "
+                       f"order: the compiler cloned or renamed it (gcc "
+                       f"`{kname}.constprop.0`/`.isra.0`, LLVM `.llvm.<hash>`), "
+                       f"`verus.kernel_item` names something the binary does not "
+                       f"contain, or the kernel was inlined away despite the "
+                       f"isolated flags. Symbols in this profile whose name "
+                       f"contains `{kname}`: "
+                       f"{sorted({s for s in names.values() if kname in s})[:8]}")
         elif bad:
             rep.fail("driver",
                      f"{c} {o} {m} on {nm}: the kernel symbol is called from "
@@ -3465,13 +3502,18 @@ def _check_region_runs(pdir, rep, contract, files, built, cg_files, probe):
                      f"what ran.")
         else:
             checked += 1
+            n_kernel_syms += len(kids)
+            n_caller_edges += len(callers_of_k)
             ran.add(f"{src}:{fn}")
     if checked:
         print(f"    dynamic: in {checked} isolated cell(s) on {nm} "
               f"(n_iters={n}), the function enclosing the region "
               f"({sorted(ran)}) has non-zero exclusive Ir and is the only "
               f"caller of the `{kname}` symbol -- 'executed' measured from "
-              f"callgrind's own caller->callee edges, not declared")
+              f"callgrind's own caller->callee edges, not declared. "
+              f"n={n_kernel_syms} matching kernel symbol(s) over those cells "
+              f"and {n_caller_edges} caller edge(s) into them; a cell where "
+              f"either is 0 now FAILS rather than passing this line vacuously")
     elif built:
         rep.shout("driver",
                   "stage 6's dynamic half checked no cell: no isolated-mode "

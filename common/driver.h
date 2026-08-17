@@ -78,6 +78,21 @@ uint64_t *slb_head_u64_body(const slb_input *in, uint64_t *head, size_t *n_body)
 unsigned char *slb_head2_u64_bytes(const slb_input *in, uint64_t *h0, uint64_t *h1,
                                    size_t *n_body);
 
+/* Decode the payload as *one* little-endian u64 head word followed by a raw byte
+ * body: `*h0` gets word 0, the return value is a freshly allocated copy of the
+ * remaining `*n_body` bytes. A payload shorter than 8 bytes yields h0 = 0,
+ * n_body 0, NULL. Mirrors driver::head1_u64_bytes (Rust) and
+ * slb.head1_u64_bytes (Python). p16 is the first pattern with this shape: one
+ * head word (`stride`) and then the record chain.
+ *
+ * The copy is deliberate, for the same reason slb_head2_u64_bytes copies. Note
+ * also that it is a *bulk* memcpy rather than an element-by-element decode:
+ * `.memory/02-bench-rules.md` records that `slb_head_u64_body`'s per-element
+ * loop is why p01's `large.bin` cannot be checked under Miri inside 180 s, while
+ * p02's larger `large.bin` finishes in 1.5 s. The payload decoder a pattern
+ * picks in common/ decides whether its rows are Miri-checkable. */
+unsigned char *slb_head1_u64_bytes(const slb_input *in, uint64_t *h0, size_t *n_body);
+
 /* A zeroed destination buffer of `cap` bytes, or exit(SLB_EXIT_CAP) when `cap`
  * is 0 or above SLB_MAX_CAP. Zeroed, not indeterminate: a kernel that reads the
  * buffer must produce a value that depends on the *input file* and on nothing
