@@ -21,6 +21,7 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 | T008 | close the two bypasses T006_REVIEW demonstrated; harden 5c and the floor | **done**, reviewed |
 | T009 | judge the *strength* of a trusted `requires` (the verified twin); close the paren-`&&` hole | **done**, reviewed |
 | T010 | fix the twin's perimeter (3 bypasses); tie the driver region to code that runs | **done**, review owed |
+| T007 | p16 TLV walker — the first data-dependent loop bound | spec written, **blocked on T010's review** |
 
 **Priority shift, decided by the user after T010.** Six of ten tasks went to
 gate hardening and 2 of 47 patterns exist. The gate's threat model is now
@@ -28,7 +29,6 @@ explicitly *honest mistake, not malicious author* (`.memory/02-bench-rules.md`,
 top section, with the residuals we are deliberately leaving open). New gate work
 must pass "could this happen by accident?" first. **Produce patterns; review each
 pattern once, not each fix to each check.**
-| T007 | p16 TLV walker — the first data-dependent loop bound | spec written, **blocked on T010's review** |
 
 p01 is now `PASS-WITH-BLOCKED-ROWS` rather than `PASS`: TASK_010 made Miri
 mandatory whenever a pattern has any trusted item, and Miri does not finish p01's
@@ -88,9 +88,13 @@ supersede any earlier task report they contradict.
   with stage 6 reporting *"5 driver loops … all normalise to the pinned
   13-statement token sequence"* — one of them from a function that never runs.
   The payload is live (`prefetcht0` in both O3 and O0 disassembly, 0 in the
-  control; marginal Ir/call O0 6838 → 6852). **Not fixed** — TASK_009 scoped it
-  as an investigation. A fix has to tie the region to the code the benchmark
-  actually executes, not merely to a file. Next task owns it.
+  control; marginal Ir/call O0 6838 → 6852). Confirmed at TASK_009_REVIEW to work
+  against the **C** rung too, so it was one mechanism, not two.
+  **Closed at TASK_010, both ways**: the kernel must be called exactly once per
+  rung source and that call must be inside the region (structural), *and* the
+  region's enclosing function must have non-zero exclusive `Ir` and be the
+  kernel's only caller, read from the callgrind profiles stage 3b already writes
+  (dynamic). See `.memory/02-bench-rules.md`.
 - **`measure.py` cannot record the commit it will be committed in**, so a fresh
   results JSON always names HEAD~1 with `dirty_files` set. Structural; say so in
   the schema rather than chasing it.
