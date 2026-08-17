@@ -310,6 +310,62 @@ is a much stronger claim than any p01 could produce.
    bounds**, Verus → will not compile. A missing check in a chained parser
    compounds; carry this to p17+.
 
+5. **p17 — the limit. A program can be provably memory-safe and still leak, and
+   we now have one.** (TASK_011.) A suffix-range parser mirroring CVE-2017-7529.
+   `start = content_len - s` in **signed** arithmetic, guarded only by
+   `start < end`. The served range is `[len - s, len)` — the last `s` bytes — so
+   one attacker `u16` selects the harm:
+
+   | `s` | the unchecked read | ASan on R1 | safe Rust |
+   |---|---|---|---|
+   | `≤ content_len` | correct | — | correct |
+   | `content_len < s ≤ len` | the window's own metadata, **in bounds** | **clean, exit 0** | **leaks identically** |
+   | `> len` | before the allocation | `6 bytes before 64-byte region` | panics, exit 101 |
+
+   The two adversarial inputs are **the same 64 bytes with one suffix field 64 vs
+   70**. Both C rungs exit 0 with a plausible answer on both.
+
+   **Control 1 — safe Rust with the sign conjunct deleted.** On the leak input it
+   prints `1395842226496950656`, **bit-identical to C's leaked value, no panic**;
+   on the OOB input it panics. So bounds checking kills exactly one of the two
+   harms, and the one it cannot see is the Heartbleed-shaped one.
+
+   **Control 2 — and this is the sharpest artefact this project has produced.**
+   The first attempt (delete the sign check from R5) fails *both* obligations,
+   because a proof quantifies over all inputs and the mutant admits both harms —
+   **the manager predicted otherwise and was wrong; the separation needs a program
+   change, not an input.** The engineer then built the right mutant: guard the
+   **absolute** index rather than the sign, `start >= -(body_start as i64)`, which
+   is exactly what a bounds check buys you. Result: **`9 verified, 1 errors`, the
+   single error being the *functional* invariant. Every `get_unchecked`
+   precondition discharges.** Run as plain safe Rust it prints the leaked value on
+   one input and the correct answer on the other.
+
+   That is a program that is **provably memory-safe and still leaks**, and it puts
+   a measurement under finding 2: memory safety and correctness are different
+   properties, and the proof obligation that catches this bug is the functional
+   `ensures`, not the access obligation.
+
+   **Perf — R3 is free for the fifth pattern in a row** (+32 Ir/call flat, 0 per
+   byte; +0.61% / +0.08%). And **R2−R4 = 4.2500 Ir per folded byte, reproducing
+   p16's swept constant to four decimals on a completely different kernel** — so
+   4.25 is a property of *rustc's checked indexed byte fold*, not of p16. Two
+   further reproductions: gcc's default-vs-`-funroll-loops` deficit (2nd pattern —
+   `-funroll-loops` takes gcc past clang again), and gcc's default rolled fold at
+   **exactly 8.0000 Ir/byte**, the rolled-unchecked constant p16's review derived.
+   Decomposition again puts 98.5% / 99.8% of R2's gap in the inner byte fold.
+
+   **Two manager predictions killed by measurement**, both worth keeping:
+   `i128` index arithmetic costs +4.0000 Ir/byte, but **signedness itself costs
+   4 Ir per *call*, flat — 0.17% of the gap.** "The cost of the check is the
+   conversion, not the comparison" is **false**.
+
+   Wall clock: every rung folds a byte in **0.784–0.791 ns**, 0.9% spread across a
+   73% `Ir` gap. No cycles/byte is claimed — CPU 3's `scaling_cur_freq` was seen
+   ramping 800→902 MHz against a 3.9 GHz max, so the clock during the window is
+   not measurable that way. At 3.9 GHz those figures are 3.06–3.08 cycles/byte,
+   which **independently corroborates p16's 3.027–3.055** on a different kernel.
+
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how
 much proof keeps that base sound, and which C patterns resist this treatment.*

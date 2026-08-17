@@ -28,7 +28,12 @@ costs nothing to retain. **What changes is the rule for new work:**
 Known residuals we are deliberately **not** closing, all measured:
 
 - `work_per_call` is unbounded; shrinking it 16× passes with a shout. Nothing
-  checks it is denominated in the unit `work_unit_bits` names.
+  checks it is denominated in the unit `work_unit_bits` names. **And it can err
+  in either direction**: p16's `work_per_call = stride` *over*-estimated the bytes
+  folded (headers skipped), so the floor was strict; p17's *under*-estimates by
+  1.72×/1.75×, because several sub-requests read the same body — so the same
+  convention made the floor **loose** (margin 40.3×, ~97.5% work loss tolerated).
+  When a kernel can read the same byte twice, say which way the estimate errs.
 - `twin_justifications` is capped at 1 by a round number, not by an argument.
 - A trusted `requires` that is non-trivial, mentions every parameter and is still
   too weak by one is caught only by the verified twin; a trusted `ensures` that is

@@ -374,23 +374,35 @@ call:
 
 | | with `memcpy` | with the byte loop | cost of the byte loop |
 |---|---:|---:|---:|
-| gcc | 9200.3 | 10106.3 | **+906.0** |
-| clang | 10204.3 | 10732.3 | **+528.0** |
+| gcc | **9200.74** | 10106.3 | **+905.6** |
+| clang | **10204.74** | 10732.3 | **+527.6** |
 
 Both are in the same range as R2's +1025, in a language with no bounds checks at
 all. (TASK_004_REVIEW reported this as "gcc's byte loop is 94 Ir *faster* than
 glibc's memcpy", which is a comparison against **R4**, not against gcc's own
-`memcpy` build: 10106.3 vs R4's 10200.8. Within one compiler the byte loop is
+`memcpy` build: 10106.3 vs R4's 10200.84. Within one compiler the byte loop is
 dearer, by the table above. Corrected at TASK_006.)
 
-(The two `with memcpy` figures above, 9200.3 and 10204.3, were measured on
-hand-built variant binaries and do **not** reproduce against the gate's own R1h
-cells, which come out at 9200.74 and 10204.74 — `results/gate/*.json`,
-`c-gcc-h`/`c-clang-h` `/O3/isolated/large.bin`. 0.44 Ir per call is 44
-instructions over the 100-call probe, so it is a difference between two builds
-and not noise; the *deltas* the table is about are unaffected. Not chased at
-TASK_008 — recorded so the next reader does not treat the two as the same
-measurement.)
+**Provenance of that row, fixed at TASK_011 and only half fixed.** The
+`with memcpy` column now quotes the **gate's own shipped `c-gcc-h` / `c-clang-h`
+cells** — `results/gate/p02-buffer-copy.json`,
+`marginal_ir_per_call/{c-gcc-h,c-clang-h}/O3/isolated/large.bin` = 9200.74 and
+10204.74 — which is a number anybody can re-derive by running
+`harness/check.py p02`. The figures previously printed here, 9200.3 and 10204.3,
+came from hand-built variant binaries that are not in the tree and did not
+reproduce; 0.44 Ir per call is 44 instructions over the 100-call probe, so it
+was a difference between two builds, not noise.
+
+The `with the byte loop` column is **still** a hand-built variant
+(`c/kernel_hardened.c` with the `memcpy` replaced by the byte loop) and was
+**not** re-measured at TASK_011, so the two columns still come from two build
+recipes and the deltas are quoted to ±0.5 Ir. Two things a later task should
+know: `harness/measure.py` **cannot** supply this row at all — its `Ir` column is
+callgrind *per-function exclusive for the `kernel` symbol*, which excludes the
+libc `memcpy` this row exists to price — so the only reproducible source for it
+is the gate's marginal column or a purpose-built probe. And nothing here is
+load-bearing for §3a's conclusion, which is a ~900 / ~530 instruction gap
+against R2's +1025.
 
 ### 3b. The residue curve — `gen.py --sweep`, finally run
 
@@ -460,31 +472,50 @@ sawtooth of any consequence.
 `results/p02-buffer-copy.json`, `-O3 isolated`. `Ir` here is callgrind
 **per-function exclusive for the `kernel` symbol**, so it is the *fold plus the
 prologue and the check* and **excludes the `memcpy`**, which lives in libc; the
-marginal column above includes it. Wall clock is min of 15, `taskset`-pinned,
-frequency scaling on.
+marginal column above includes it. Wall clock is **min of 30**, `taskset -c 3`,
+interleaved round-robin, frequency scaling on.
+
+**Re-measured at TASK_011** (`python3 harness/measure.py p02`, one run, after
+p16's `common/head1_u64_bytes` landed and `common/` stopped moving). What moved
+and what did not is itself the useful part:
+
+- **the static columns did not move at all** — `n_fn`/`n_fn_nopad` are identical
+  in all 32 cells, and so is every Rust `md5_fn`, including R4 ≡ R5's
+  `0e5b59364bb6…` in §4;
+- **the `Ir` columns did not move by one instruction** in any cell;
+- **only wall clock moved**, by −0.24 … +0.25 ms, i.e. inside its own spread;
+- `binary_text_bytes` moved in **10 of 32 cells and all 10 are C**
+  (`c-gcc` 2385 → 2545, `c-clang` 1792 → 1936, …), because `common/driver.c`
+  grew `slb_head1_u64_bytes` for p16 and the C driver is a linked-in TU. **No
+  Rust cell moved**: rustc drops the unused `driver::head1_u64_bytes` before
+  codegen. That field is not quoted in this file, which is why nothing below
+  changes because of it.
 
 | rung | cell | static `n_fn`/nopad | `Ir`/call small | `Ir`/call large | wall small | wall large |
 |---|---|---:|---:|---:|---:|---:|
-| R1 | c-gcc | 153 / 150 | 202 | 8765 | 7.56 ms | 30.82 ms |
-| R1h | c-gcc-h | 153 / 151 | 207 | 8770 | 7.61 ms | 30.85 ms |
-| R1 | c-clang | 66 / 64 | 193 | 9764 | 6.09 ms | 25.02 ms |
-| R1h | c-clang-h | 75 / 73 | 205 | 9776 | 6.15 ms | 25.10 ms |
-| R2 | safe_naive | 122 / 118 | 392 | 11211 | 7.72 ms | 25.70 ms |
-| R3 | safe_tuned | 95 / 93 | 212 | 9783 | 6.48 ms | 25.22 ms |
-| R4 | unsafe | 72 / 70 | 201 | 9772 | 6.67 ms | 25.34 ms |
-| R5 | verus | 72 / 70 | **201** | **9772** | 6.54 ms | 25.35 ms |
+| R1 | c-gcc | 153 / 150 | 202 | 8765 | 7.56 ms | 30.97 ms |
+| R1h | c-gcc-h | 153 / 151 | 207 | 8770 | 7.56 ms | 30.90 ms |
+| R1 | c-clang | 66 / 64 | 193 | 9764 | 5.97 ms | 25.19 ms |
+| R1h | c-clang-h | 75 / 73 | 205 | 9776 | 6.06 ms | 25.18 ms |
+| R2 | safe_naive | 122 / 118 | 392 | 11211 | 7.59 ms | 25.85 ms |
+| R3 | safe_tuned | 95 / 93 | 212 | 9783 | 6.42 ms | 25.47 ms |
+| R4 | unsafe | 72 / 70 | 201 | 9772 | 6.43 ms | 25.40 ms |
+| R5 | verus | 72 / 70 | **201** | **9772** | 6.51 ms | 25.53 ms |
 
 R5's `Ir` equals R4's to the instruction on both inputs (40,200,000 and
-195,440,000 totals) — the dynamic half of §4.
+195,440,000 totals) — the dynamic half of §4. Both totals are unchanged from the
+TASK_005 run.
 
 The wall-clock column contains the one thing `Ir` cannot say: **gcc executes 10%
 *fewer* instructions than clang on `large` and takes 23% *longer*.** Same source,
-same input, gcc's kernel is 8765 Ir against clang's 9764 and 30.8 ms against
-25.0 ms. That is an IPC difference and this box cannot measure IPC (`perf`
+same input, gcc's kernel is 8765 Ir against clang's 9764 and 30.97 ms against
+25.19 ms. That is an IPC difference and this box cannot measure IPC (`perf`
 absent, `perf_event_paranoid=3`, no root — TOOLCHAIN.md), so it is recorded as an
 observation and not explained. It is also a standing warning about this
 project's primary metric: instruction count is not time, and here they disagree
-in *direction*.
+in *direction*. The ratio is 1.229 on the re-measurement against 1.232 on the
+original, so the claim is stable across two independent timing runs (2026-08-15
+and 2026-08-17) with one `common/` change between them.
 
 One asymmetry a reviewer should know about and that is **not** corrected: the C
 kernel's `const uint8_t *src` and `uint8_t *dst` may alias as far as the

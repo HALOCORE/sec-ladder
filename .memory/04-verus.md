@@ -470,7 +470,16 @@ quoting 5c as a defence.**
      project — both known forms were reviewer-built. And the twin is **idle on
      p16**, whose accessor is the same single-clause `i < v@.len()` p01 and p02
      ship. A green 5c-twin on p16 is not evidence that anything hard was checked.
-     Its value accrues from p17 on.
+
+   **"Its value accrues from p17 on" was wrong — corrected at TASK_011.** p17's
+   accessor is *also* single-clause, and for a structural reason worth knowing:
+   p17's interesting harm is **not a memory error at all**, so no amount of
+   accessor strength addresses it. The twin's value accrues from the first pattern
+   that needs a **multi-clause trusted accessor**, which is a property of the
+   *intrinsic being wrapped* — raw-pointer families p27+ — not of the pattern
+   number. Three patterns in, the mechanism has never been exercised on the case
+   it was built for. That is a fact to state when reporting it, not a reason to
+   remove it (see the adjudication above).
 
    **`MAX_TWIN_JUSTIFICATIONS` was deleted at TASK_007**, on the same review's
    recommendation: it was the manager's round number, it is redundant (the
@@ -601,6 +610,20 @@ The reviewer agent checks all of the above by grep + reading. See `.tasks/PROTOC
 
 ## Proof techniques that keep coming up
 
+- **Four traps a parser proof hits, all measured on p17 (TASK_011).** Full
+  write-ups in `../LearnVeri/PITFALLS.md`.
+  - **`continue` is not expressible in a Verus `for` loop** — *"for-loops do not
+    yet support continue"*. `while` + `continue` verifies but needs the increment
+    placed above the guard. Usually the better fix is to restructure into a
+    guarded `if`, which p17 did: `if start < end && start >= 0 { … }`. That also
+    made the R1↔R1h difference a single conjunct, which is what the ladder wants.
+  - **vstd has no axiom that a slice is at most `isize::MAX` bytes**, and Verus
+    models `usize` as possibly 32-bit. A kernel doing signed index arithmetic
+    therefore needs an explicit `requires buf@.len() <= 0x7fff_ffff_ffff_ffff`,
+    discharged by a matching conjunct in the driver's guard. Budget for it — it is
+    not a proof failure, it is a missing library fact.
+  - **A loop invariant cuts the pre-loop context.** Facts established before the
+    loop are not visible inside it unless restated in the invariant.
 - **A parser loop with `break` proves cleanly** — established on p16 (TASK_007),
   where R5 verified **first try in ~2 s** and the one-session budget went unused.
   Two ingredients: `invariant_except_break` for the facts that hold on every

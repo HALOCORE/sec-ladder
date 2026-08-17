@@ -1,6 +1,6 @@
 # p02-buffer-copy — results
 
-Generated 2026-08-15T16:58:24Z from `results/p02-buffer-copy.json` (git `273849cbdc3d`, working tree dirty).
+Generated 2026-08-17T18:00:05Z from `results/p02-buffer-copy.json` (git `712ca8501b8b`).
 
 ## Toolchain
 
@@ -17,15 +17,15 @@ Generated 2026-08-15T16:58:24Z from `results/p02-buffer-copy.json` (git `273849c
 
 | file | n_iters | declared payload | present | truncated | model |
 |---|---:|---:|---:|---|---|
-| adversarial-cap.bin | 8 | 12,556 | 12,556 | False | n_iters=8 cap=64 stride=66 n_src=12540 nrec=190 calls=8 work/call=64w san=clean truncated=False cap_bad=False expected=244239563421568 |
-| adversarial-cap1.bin | 8 | 12,612 | 12,612 | False | n_iters=8 cap=64 stride=67 n_src=12596 nrec=188 calls=8 work/call=0w san=fires truncated=False cap_bad=False expected=0 |
-| adversarial-capbig.bin | 8 | 520 | 520 | False | n_iters=8 cap=1099511627776 stride=63 n_src=504 nrec=0 calls=0 work/call=0w san=clean truncated=False cap_bad=True expected=None |
-| adversarial-shortlen.bin | 8 | 4,616 | 520 | True | n_iters=8 cap=64 stride=63 n_src=504 nrec=0 calls=0 work/call=0w san=clean truncated=True cap_bad=False expected=None |
-| adversarial-srcend.bin | 8 | 56 | 56 | False | n_iters=8 cap=64 stride=40 n_src=40 nrec=1 calls=8 work/call=0w san=fires truncated=False cap_bad=False expected=0 |
-| adversarial-stride1.bin | 8 | 80 | 80 | False | n_iters=8 cap=64 stride=1 n_src=64 nrec=0 calls=0 work/call=0w san=clean truncated=False cap_bad=False expected=0 |
-| adversarial.bin | 8 | 12,616 | 12,616 | False | n_iters=8 cap=64 stride=63 n_src=12600 nrec=200 calls=8 work/call=0w san=fires truncated=False cap_bad=False expected=0 |
-| large.bin | 20,000 | 8,384,528 | 8,384,528 | False | n_iters=20000 cap=4096 stride=4094 n_src=8384512 nrec=2048 calls=20000 work/call=4092w san=clean truncated=False cap_bad=False expected=4856715052625337940 |
-| small.bin | 200,000 | 12,616 | 12,616 | False | n_iters=200000 cap=64 stride=63 n_src=12600 nrec=200 calls=200000 work/call=61w san=clean truncated=False cap_bad=False expected=15997819096698035934 |
+| adversarial-cap.bin | 8 | 12,556 | 12,556 | False | n_iters=8 cap=64 stride=66 n_src=12540 nrec=190 calls=8 work/call=64B san=clean truncated=False cap_bad=False expected=244239563421568 |
+| adversarial-cap1.bin | 8 | 12,612 | 12,612 | False | n_iters=8 cap=64 stride=67 n_src=12596 nrec=188 calls=8 work/call=0B san=fires truncated=False cap_bad=False expected=0 |
+| adversarial-capbig.bin | 8 | 520 | 520 | False | n_iters=8 cap=1099511627776 stride=63 n_src=504 nrec=0 calls=0 work/call=0B san=clean truncated=False cap_bad=True expected=None |
+| adversarial-shortlen.bin | 8 | 4,616 | 520 | True | n_iters=8 cap=64 stride=63 n_src=504 nrec=0 calls=0 work/call=0B san=clean truncated=True cap_bad=False expected=None |
+| adversarial-srcend.bin | 8 | 56 | 56 | False | n_iters=8 cap=64 stride=40 n_src=40 nrec=1 calls=8 work/call=0B san=fires truncated=False cap_bad=False expected=0 |
+| adversarial-stride1.bin | 8 | 80 | 80 | False | n_iters=8 cap=64 stride=1 n_src=64 nrec=0 calls=0 work/call=0B san=clean truncated=False cap_bad=False expected=0 |
+| adversarial.bin | 8 | 12,616 | 12,616 | False | n_iters=8 cap=64 stride=63 n_src=12600 nrec=200 calls=8 work/call=0B san=fires truncated=False cap_bad=False expected=0 |
+| large.bin | 20,000 | 8,384,528 | 8,384,528 | False | n_iters=20000 cap=4096 stride=4094 n_src=8384512 nrec=2048 calls=20000 work/call=4092B san=clean truncated=False cap_bad=False expected=4856715052625337940 |
+| small.bin | 200,000 | 12,616 | 12,616 | False | n_iters=200000 cap=64 stride=63 n_src=12600 nrec=200 calls=200000 work/call=61B san=clean truncated=False cap_bad=False expected=15997819096698035934 |
 
 ## Static + executed instructions
 
@@ -39,14 +39,14 @@ Generated 2026-08-15T16:58:24Z from `results/p02-buffer-copy.json` (git `273849c
 
 | rung | `kernel` instrs (nm extent) | pad-excl | trailing pad (insns) | sym bytes | Ir(kernel) small | Ir(kernel) large | Ir(main) small | Ir(main) large | md5_fn | md5_raw | loop | vec |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|
-| c-gcc | 153 | 150 | 0 | 593 | 40,400,000 | 175,300,000 | 3,200,064 | 320,064 | `694ccb6f` | `694ccb6f` | yes | xmm |
-| c-clang | 66 | 64 | 2 | 213 | 38,600,000 | 195,280,000 | 3,200,069 | 320,069 | `1f6d48cb` | `80d3af53` | yes | - |
+| c-gcc | 153 | 150 | 0 | 593 | 40,400,000 | 175,300,000 | 3,200,064 | 320,064 | `41231363` | `41231363` | yes | xmm |
+| c-clang | 66 | 64 | 2 | 213 | 38,600,000 | 195,280,000 | 3,200,069 | 320,069 | `14046564` | `75e65627` | yes | - |
 | safe_naive | 122 | 118 | 2 | 430 | 78,400,000 | 224,220,000 | 3,000,293 | 300,293 | `3bc4ef75` | `577a2a21` | yes | xmm |
 | safe_tuned | 95 | 93 | 3 | 333 | 42,400,000 | 195,660,000 | 3,000,293 | 300,293 | `e207ec6c` | `40438eda` | yes | - |
 | unsafe | 72 | 70 | 12 | 228 | 40,200,000 | 195,440,000 | 3,200,295 | 320,295 | `0e5b5936` | `03836d16` | yes | - |
 | verus | 72 | 70 | 12 | 228 | 40,200,000 | 195,440,000 | 2,800,291 | 280,291 | `0e5b5936` | `03836d16` | yes | - |
-| c-gcc-h | 153 | 151 | 0 | 610 | 41,400,000 | 175,400,000 | 3,200,064 | 320,064 | `29ab725d` | `29ab725d` | yes | xmm |
-| c-clang-h | 75 | 73 | 2 | 244 | 41,000,000 | 195,520,000 | 3,200,069 | 320,069 | `6385306f` | `9a4c6f02` | yes | - |
+| c-gcc-h | 153 | 151 | 0 | 610 | 41,400,000 | 175,400,000 | 3,200,064 | 320,064 | `2034ed0c` | `2034ed0c` | yes | xmm |
+| c-clang-h | 75 | 73 | 2 | 244 | 41,000,000 | 195,520,000 | 3,200,069 | 320,069 | `ca37a0e5` | `8bf12e31` | yes | - |
 
 ### O0 / isolated — static counts are for the `kernel` symbol
 
@@ -54,14 +54,14 @@ Generated 2026-08-15T16:58:24Z from `results/p02-buffer-copy.json` (git `273849c
 
 | rung | `kernel` instrs (nm extent) | pad-excl | trailing pad (insns) | sym bytes | Ir(kernel) small | Ir(kernel) large | Ir(main) small | Ir(main) large | md5_fn | md5_raw | loop | vec |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|
-| c-gcc | 48 | 48 | 0 | 176 | 130,200,000 | - | 7,600,077 | - | `bc136206` | `bc136206` | yes | - |
-| c-clang | 41 | 41 | 1 | 159 | 153,000,000 | - | 4,400,067 | - | `b12484c7` | `7e7d41d5` | yes | - |
+| c-gcc | 48 | 48 | 0 | 176 | 130,200,000 | - | 7,600,077 | - | `f85e9034` | `f85e9034` | yes | - |
+| c-clang | 41 | 41 | 1 | 159 | 153,000,000 | - | 4,400,067 | - | `e5333d17` | `7fc6e63e` | yes | - |
 | safe_naive | 127 | 127 | 11 | 629 | 598,600,000 | - | 5,400,093 | - | `afe5bb09` | `befd4fec` | yes | - |
 | safe_tuned | 102 | 102 | 3 | 461 | 291,200,000 | - | 5,400,093 | - | `3789e442` | `159c1182` | NO | - |
 | unsafe | 72 | 72 | 8 | 328 | 243,400,000 | - | 5,400,093 | - | `5c0d4e0b` | `65039c37` | yes | - |
 | verus | 72 | 72 | 8 | 328 | 243,400,000 | - | 5,400,072 | - | `b0e44091` | `a9315683` | yes | - |
-| c-gcc-h | 58 | 58 | 0 | 211 | 131,800,000 | - | 7,600,077 | - | `3a0a5049` | `3a0a5049` | yes | - |
-| c-clang-h | 55 | 55 | 2 | 211 | 155,400,000 | - | 4,400,067 | - | `2ce3a840` | `df642369` | yes | - |
+| c-gcc-h | 58 | 58 | 0 | 211 | 131,800,000 | - | 7,600,077 | - | `2f28d8ef` | `2f28d8ef` | yes | - |
+| c-clang-h | 55 | 55 | 2 | 211 | 155,400,000 | - | 4,400,067 | - | `8013b441` | `03a914e8` | yes | - |
 
 ### O3 / whole — static counts are for the `main` symbol; the kernel was inlined away, so it has no symbol and no static count of its own here
 
@@ -82,13 +82,13 @@ Generated 2026-08-15T16:58:24Z from `results/p02-buffer-copy.json` (git `273849c
 
 | rung | `main` instrs (nm extent) | pad-excl | trailing pad (insns) | sym bytes | Ir(kernel) small | Ir(kernel) large | Ir(main) small | Ir(main) large | md5_fn | md5_raw | loop | vec |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|
-| c-gcc | 113 | 113 | 0 | 520 | 130,200,000 | - | 7,600,077 | - | `48402f94` | `48402f94` | yes | - |
+| c-gcc | 113 | 113 | 0 | 520 | 130,200,000 | - | 7,600,077 | - | `d5eca909` | `d5eca909` | yes | - |
 | c-clang | 78 | 78 | 0 | 345 | 153,000,000 | - | 4,400,066 | - | `8a0fa704` | `8a0fa704` | yes | - |
 | safe_naive | 149 | 149 | 2 | 766 | 598,600,000 | - | 5,400,093 | - | `cac1218c` | `9cedf5b8` | yes | xmm |
 | safe_tuned | 149 | 149 | 2 | 766 | 291,200,000 | - | 5,400,093 | - | `d3396e1c` | `5b91340a` | yes | xmm |
 | unsafe | 149 | 149 | 2 | 766 | 243,400,000 | - | 5,400,093 | - | `af955bce` | `625545fe` | yes | xmm |
 | verus | 112 | 112 | 12 | 580 | 243,400,000 | - | 5,400,072 | - | `8869f0e9` | `2bcc6a63` | yes | xmm |
-| c-gcc-h | 113 | 113 | 0 | 520 | 131,800,000 | - | 7,600,077 | - | `2f53f824` | `2f53f824` | yes | - |
+| c-gcc-h | 113 | 113 | 0 | 520 | 131,800,000 | - | 7,600,077 | - | `ef7d1484` | `ef7d1484` | yes | - |
 | c-clang-h | 78 | 78 | 0 | 345 | 155,400,000 | - | 4,400,066 | - | `6bf51041` | `6bf51041` | yes | - |
 
 ## Structural identity — does a proof cost anything?
@@ -102,26 +102,26 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 ## Wall clock (secondary)
 
-> taskset -c 3, interleaved round-robin, 15 reps, min and median; frequency scaling on, shared box. Frequency scaling is on and cannot be disabled without root; the box is shared and containerised. Wall clock is a sanity check on `Ir`, never the headline. Times include process start-up and reading the input file.
+> taskset -c 3, interleaved round-robin, 30 reps, min and median; frequency scaling on, shared box. Frequency scaling is on and cannot be disabled without root; the box is shared and containerised. Wall clock is a sanity check on `Ir`, never the headline. Times include process start-up and reading the input file.
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 30.82 | 31.09 | 0.9% | 7.56 | 7.79 | 3.1% |
-| c-gcc | whole | 30.89 | 31.09 | 0.6% | 7.53 | 7.70 | 2.3% |
-| c-clang | isolated | 25.02 | 25.28 | 1.1% | 6.09 | 6.33 | 3.8% |
-| c-clang | whole | 25.12 | 25.28 | 0.7% | 5.98 | 6.14 | 2.8% |
-| safe_naive | isolated | 25.70 | 25.96 | 1.0% | 7.72 | 7.99 | 3.5% |
-| safe_naive | whole | 25.47 | 25.74 | 1.1% | 6.34 | 6.74 | 6.4% |
-| safe_tuned | isolated | 25.22 | 25.42 | 0.8% | 6.48 | 6.61 | 2.0% |
-| safe_tuned | whole | 25.25 | 25.52 | 1.1% | 6.42 | 6.76 | 5.2% |
-| unsafe | isolated | 25.34 | 25.56 | 0.9% | 6.67 | 6.97 | 4.5% |
-| unsafe | whole | 25.29 | 25.44 | 0.6% | 6.58 | 6.86 | 4.3% |
-| verus | isolated | 25.35 | 25.49 | 0.5% | 6.54 | 6.84 | 4.7% |
-| verus | whole | 25.27 | 25.40 | 0.5% | 6.80 | 7.08 | 4.2% |
-| c-gcc-h | isolated | 30.85 | 31.05 | 0.6% | 7.61 | 7.93 | 4.3% |
-| c-gcc-h | whole | 30.73 | 31.05 | 1.0% | 7.55 | 7.67 | 1.6% |
-| c-clang-h | isolated | 25.10 | 25.31 | 0.8% | 6.15 | 6.32 | 2.8% |
-| c-clang-h | whole | 25.12 | 25.35 | 0.9% | 6.05 | 6.29 | 4.0% |
+| c-gcc | isolated | 30.97 | 31.30 | 1.1% | 7.56 | 8.06 | 6.6% |
+| c-gcc | whole | 31.00 | 31.33 | 1.1% | 7.50 | 7.96 | 6.1% |
+| c-clang | isolated | 25.19 | 25.46 | 1.1% | 5.97 | 6.24 | 4.6% |
+| c-clang | whole | 25.27 | 25.49 | 0.9% | 5.99 | 6.20 | 3.6% |
+| safe_naive | isolated | 25.85 | 26.15 | 1.1% | 7.59 | 7.93 | 4.4% |
+| safe_naive | whole | 25.56 | 25.96 | 1.6% | 6.43 | 6.63 | 3.2% |
+| safe_tuned | isolated | 25.47 | 25.71 | 0.9% | 6.42 | 6.65 | 3.6% |
+| safe_tuned | whole | 25.45 | 25.75 | 1.2% | 6.42 | 6.70 | 4.4% |
+| unsafe | isolated | 25.40 | 25.77 | 1.4% | 6.43 | 6.78 | 5.5% |
+| unsafe | whole | 25.33 | 25.68 | 1.4% | 6.50 | 6.88 | 5.8% |
+| verus | isolated | 25.53 | 25.71 | 0.7% | 6.51 | 6.87 | 5.4% |
+| verus | whole | 25.41 | 25.66 | 1.0% | 6.57 | 6.89 | 4.8% |
+| c-gcc-h | isolated | 30.90 | 31.34 | 1.4% | 7.56 | 7.82 | 3.4% |
+| c-gcc-h | whole | 31.05 | 31.45 | 1.3% | 7.59 | 7.77 | 2.3% |
+| c-clang-h | isolated | 25.18 | 25.49 | 1.2% | 6.06 | 6.32 | 4.2% |
+| c-clang-h | whole | 25.22 | 25.55 | 1.3% | 6.04 | 6.34 | 5.1% |
 
 Every wall-clock cell is within the 10% min-to-median spread threshold.
 

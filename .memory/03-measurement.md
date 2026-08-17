@@ -382,3 +382,13 @@ had moved in 5 C cells (`common/driver.c` grew when p02 added
 i.e. link layout only. So "the kernels are byte-identical, therefore the numbers
 stand" is right about the kernel columns and wrong about the whole-binary ones.
 Say which columns a staleness argument covers.
+
+**Reproduced exactly on p02 at TASK_011**, when `common/driver.c` grew again for
+p16's `head1_u64_bytes`: `binary_text_bytes` moved in **10 of 32 cells and all 10
+are C**. Static counts, kernel `Ir` and every Rust `md5_fn` were unchanged. The
+asymmetry is the useful part and it is not noise: **rustc drops the unused
+`driver::head1_u64_bytes` before codegen, while gcc and clang link the whole
+translation unit.** So a shared-`common/` addition is invisible to the Rust rungs
+and visible to every C one — which means a C-vs-Rust *whole-binary* size
+comparison silently charges C for code no pattern calls. Never compare
+`binary_text_bytes` across languages without saying this.

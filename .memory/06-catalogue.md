@@ -22,6 +22,7 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 | T009 | judge the *strength* of a trusted `requires` (the verified twin); close the paren-`&&` hole | **done**, reviewed |
 | T010 | fix the twin's perimeter (3 bypasses); tie the driver region to code that runs | **done**, reviewed |
 | T007 | p16 TLV walker — the first data-dependent loop bound | **done**, gate PASS first run, **reviewed** (headline overclaimed, corrected) |
+| T011 | p17 HTTP suffix-range (CVE-2017-7529) — the limit of memory safety | **done**, gate PASS first run, review owed |
 
 **T010's review closed the gate-hardening arc.** It was deliberately shaped as
 the opposite of the previous six — not a bypass hunt but "will this gate *accept*
@@ -36,7 +37,10 @@ on the ground that Miri never opens `verus.rs` and so is not a partial backstop
 for a too-weak trusted `requires` but *none*.
 
 **Priority shift, decided by the user after T010.** Six of ten tasks went to
-gate hardening and 2 of 47 patterns exist. The gate's threat model is now
+gate hardening and 2 of 47 patterns existed. **It worked**: the two tasks since
+produced p16 and p17, each green on a complete run first try, each reviewed or
+awaiting one review — and p17 delivered the programme's first *negative* result
+about memory safety. 4 of 47 now exist. The gate's threat model is now
 explicitly *honest mistake, not malicious author* (`.memory/02-bench-rules.md`,
 top section, with the residuals we are deliberately leaving open). New gate work
 must pass "could this happen by accident?" first. **Produce patterns; review each
@@ -110,22 +114,14 @@ supersede any earlier task report they contradict.
 - **`measure.py` cannot record the commit it will be committed in**, so a fresh
   results JSON always names HEAD~1 with `dirty_files` set. Structural; say so in
   the schema rather than chasing it.
-- **`measure.py p02` has not been re-run since TASK_005** (its JSON records a
-  commit five back, `dirty_files: 13`). TASK_008 left it deliberately: re-running
-  moves numbers quoted in three `NOTES.md` tables. TASK_008_REVIEW judged the
-  ordering: it must be re-run before p16 is **published**, not before p16 is
-  built, and the cheapest safe order is to re-run it *once*, with p16's
-  `common/head1_u64_bytes` addition already in place, then re-quote the three
-  tables from that one JSON — otherwise p16 moves `common/` again and the same
-  re-run is owed twice. Exposure is `binary_text_bytes` and the wall-clock
-  column only; `md5_fn` and `n_fn` are re-derived every gate run, and the kernel
-  columns are safe by the p01 argument, which is now tested rather than asserted.
-  Related, and the reason to do it:
-  `p02/NOTES.md` §3c's "with `memcpy`" row does not reproduce — 9200.3 / 10204.3
-  published against 9200.74 / 10204.74 measured on the gate's own `c-gcc-h` /
-  `c-clang-h` cells. 0.44 Ir/call is 44 instructions over a 100-call probe, so
-  it is a build difference, not noise. The deltas that table is about are
-  unaffected.
+- ~~**`measure.py p02` has not been re-run since TASK_005**~~ — **closed at
+  TASK_011**, in the order TASK_008_REVIEW prescribed: once, with p16's
+  `common/head1_u64_bytes` already in place. `binary_text_bytes` moved in 10 of
+  32 cells, all C (see `.memory/03-measurement.md` for why the asymmetry is
+  structural, not noise); kernel columns and every Rust `md5_fn` unchanged. The
+  §3a "with `memcpy`" row was re-quoted from the new run. Residual: the "with the
+  byte loop" column is a hand-built variant `measure.py` structurally cannot
+  supply, because its `Ir` is kernel-exclusive and excludes libc `memcpy`.
 - **`perf_event_paranoid = 3`** — no hardware counters without root. This is the
   only way to explain *why* gcc's shorter loop runs 43% slower. **Owed by the
   user**; nothing works around it.
@@ -169,7 +165,7 @@ supersede any earlier task report they contradict.
 | ID | Pattern | C bug class modelled | Verus difficulty | Status |
 |---|---|---|---|---|
 | p16 | TLV / length-prefixed record walker | length field vs remaining buffer | easy–moderate | **done** (T007), reviewed; gate PASS first run, R5 == R4 `exact` at O3; **first O(n) cost of a *spelling* — R3 is still 0/byte** |
-| p17 | HTTP `Range:` style header parser | int overflow → OOB (cf. CVE-2017-7529) | moderate | planned |
+| p17 | HTTP `Range:` style header parser | int overflow → OOB (cf. CVE-2017-7529) | moderate | **done** (T011), gate PASS first run, R5 == R4 `exact` at O3; **provably memory-safe program that still leaks** |
 | p18 | varint / LEB128 decoder | unbounded shift, truncation | easy–moderate | planned |
 | p19 | protocol state machine (byte-at-a-time) | state confusion | moderate | planned |
 | p20 | length/offset pair validation (heartbeat-style) | trusted length field (cf. CVE-2014-0160) | moderate | planned |

@@ -1,10 +1,11 @@
 {
   "pattern": "p02-buffer-copy",
-  "generated_utc": "2026-08-15T16:58:24Z",
+  "generated_utc": "2026-08-17T18:00:05Z",
   "git": {
-    "commit": "273849cbdc3d91ac55fc27ab8a0b6dbd4e132d39",
-    "dirty": true,
-    "dirty_files": 13
+    "commit": "712ca8501b8b6292c3d8a99dcfdb8fcc286b052f",
+    "dirty": false,
+    "dirty_files": 0,
+    "note": "commit is HEAD when measured, i.e. the parent of the commit this file lands in; a fresh run always names HEAD~1 and reads dirty. Use results/gate/*.json's source_sha256 to detect real staleness."
   },
   "toolchain": {
     "gcc": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
@@ -24,7 +25,7 @@
   "protocol": {
     "static": "harness/asm.py; raw and padding-excluded both reported",
     "ir": "callgrind per-function exclusive Ir, kernel symbol only; whole-program summary deliberately not recorded",
-    "wall": "taskset -c 3, interleaved round-robin, 15 reps, min and median; frequency scaling on, shared box"
+    "wall": "taskset -c 3, interleaved round-robin, 30 reps, min and median; frequency scaling on, shared box"
   },
   "inputs": {
     "adversarial-cap.bin": {
@@ -32,63 +33,63 @@
       "declared_len": 12556,
       "present": 12556,
       "truncated": false,
-      "model": "n_iters=8 cap=64 stride=66 n_src=12540 nrec=190 calls=8 work/call=64w san=clean truncated=False cap_bad=False expected=244239563421568"
+      "model": "n_iters=8 cap=64 stride=66 n_src=12540 nrec=190 calls=8 work/call=64B san=clean truncated=False cap_bad=False expected=244239563421568"
     },
     "adversarial-cap1.bin": {
       "n_iters": 8,
       "declared_len": 12612,
       "present": 12612,
       "truncated": false,
-      "model": "n_iters=8 cap=64 stride=67 n_src=12596 nrec=188 calls=8 work/call=0w san=fires truncated=False cap_bad=False expected=0"
+      "model": "n_iters=8 cap=64 stride=67 n_src=12596 nrec=188 calls=8 work/call=0B san=fires truncated=False cap_bad=False expected=0"
     },
     "adversarial-capbig.bin": {
       "n_iters": 8,
       "declared_len": 520,
       "present": 520,
       "truncated": false,
-      "model": "n_iters=8 cap=1099511627776 stride=63 n_src=504 nrec=0 calls=0 work/call=0w san=clean truncated=False cap_bad=True expected=None"
+      "model": "n_iters=8 cap=1099511627776 stride=63 n_src=504 nrec=0 calls=0 work/call=0B san=clean truncated=False cap_bad=True expected=None"
     },
     "adversarial-shortlen.bin": {
       "n_iters": 8,
       "declared_len": 4616,
       "present": 520,
       "truncated": true,
-      "model": "n_iters=8 cap=64 stride=63 n_src=504 nrec=0 calls=0 work/call=0w san=clean truncated=True cap_bad=False expected=None"
+      "model": "n_iters=8 cap=64 stride=63 n_src=504 nrec=0 calls=0 work/call=0B san=clean truncated=True cap_bad=False expected=None"
     },
     "adversarial-srcend.bin": {
       "n_iters": 8,
       "declared_len": 56,
       "present": 56,
       "truncated": false,
-      "model": "n_iters=8 cap=64 stride=40 n_src=40 nrec=1 calls=8 work/call=0w san=fires truncated=False cap_bad=False expected=0"
+      "model": "n_iters=8 cap=64 stride=40 n_src=40 nrec=1 calls=8 work/call=0B san=fires truncated=False cap_bad=False expected=0"
     },
     "adversarial-stride1.bin": {
       "n_iters": 8,
       "declared_len": 80,
       "present": 80,
       "truncated": false,
-      "model": "n_iters=8 cap=64 stride=1 n_src=64 nrec=0 calls=0 work/call=0w san=clean truncated=False cap_bad=False expected=0"
+      "model": "n_iters=8 cap=64 stride=1 n_src=64 nrec=0 calls=0 work/call=0B san=clean truncated=False cap_bad=False expected=0"
     },
     "adversarial.bin": {
       "n_iters": 8,
       "declared_len": 12616,
       "present": 12616,
       "truncated": false,
-      "model": "n_iters=8 cap=64 stride=63 n_src=12600 nrec=200 calls=8 work/call=0w san=fires truncated=False cap_bad=False expected=0"
+      "model": "n_iters=8 cap=64 stride=63 n_src=12600 nrec=200 calls=8 work/call=0B san=fires truncated=False cap_bad=False expected=0"
     },
     "large.bin": {
       "n_iters": 20000,
       "declared_len": 8384528,
       "present": 8384528,
       "truncated": false,
-      "model": "n_iters=20000 cap=4096 stride=4094 n_src=8384512 nrec=2048 calls=20000 work/call=4092w san=clean truncated=False cap_bad=False expected=4856715052625337940"
+      "model": "n_iters=20000 cap=4096 stride=4094 n_src=8384512 nrec=2048 calls=20000 work/call=4092B san=clean truncated=False cap_bad=False expected=4856715052625337940"
     },
     "small.bin": {
       "n_iters": 200000,
       "declared_len": 12616,
       "present": 12616,
       "truncated": false,
-      "model": "n_iters=200000 cap=64 stride=63 n_src=12600 nrec=200 calls=200000 work/call=61w san=clean truncated=False cap_bad=False expected=15997819096698035934"
+      "model": "n_iters=200000 cap=64 stride=63 n_src=12600 nrec=200 calls=200000 work/call=61B san=clean truncated=False cap_bad=False expected=15997819096698035934"
     }
   },
   "cells": [
@@ -98,7 +99,7 @@
       "mode": "isolated",
       "binary": ".temp/build/p02/c-gcc-O0-isolated",
       "asm_symbol_needle": "kernel",
-      "binary_text_bytes": 2841,
+      "binary_text_bytes": 3093,
       "status": "ok",
       "static": {
         "binary": "/home/apt/repos_common/sec-ladder/.temp/build/p02/c-gcc-O0-isolated",
@@ -106,13 +107,13 @@
         "n_raw": 48,
         "n_nopad": 48,
         "n_bytes": 176,
-        "md5_raw": "bc136206343c65855512b91c9439ae31",
+        "md5_raw": "f85e9034f7f0e816a2b2f3b5214c6875",
         "md5_raw_norel": "49a4e7330520b3af70145373bb85936b",
         "has_extent": true,
         "n_fn": 48,
         "n_fn_nopad": 48,
         "fn_bytes": 176,
-        "md5_fn": "bc136206343c65855512b91c9439ae31",
+        "md5_fn": "f85e9034f7f0e816a2b2f3b5214c6875",
         "md5_fn_norel": "49a4e7330520b3af70145373bb85936b",
         "pad_insns": 0,
         "pad_bytes": 0,
@@ -148,7 +149,7 @@
       "mode": "whole",
       "binary": ".temp/build/p02/c-gcc-O0-whole",
       "asm_symbol_needle": "main",
-      "binary_text_bytes": 2877,
+      "binary_text_bytes": 3132,
       "status": "ok",
       "static": {
         "binary": "/home/apt/repos_common/sec-ladder/.temp/build/p02/c-gcc-O0-whole",
@@ -156,13 +157,13 @@
         "n_raw": 113,
         "n_nopad": 113,
         "n_bytes": 520,
-        "md5_raw": "48402f9426979202c720838d87a34eb2",
+        "md5_raw": "d5eca9096f05ef7f3fde611ec7373931",
         "md5_raw_norel": "1bc68bd66590dece287fc01b2be5944d",
         "has_extent": true,
         "n_fn": 113,
         "n_fn_nopad": 113,
         "fn_bytes": 520,
-        "md5_fn": "48402f9426979202c720838d87a34eb2",
+        "md5_fn": "d5eca9096f05ef7f3fde611ec7373931",
         "md5_fn_norel": "1bc68bd66590dece287fc01b2be5944d",
         "pad_insns": 0,
         "pad_bytes": 0,
@@ -196,7 +197,7 @@
       "mode": "isolated",
       "binary": ".temp/build/p02/c-gcc-O3-isolated",
       "asm_symbol_needle": "kernel",
-      "binary_text_bytes": 2385,
+      "binary_text_bytes": 2545,
       "status": "ok",
       "static": {
         "binary": "/home/apt/repos_common/sec-ladder/.temp/build/p02/c-gcc-O3-isolated",
@@ -204,13 +205,13 @@
         "n_raw": 153,
         "n_nopad": 150,
         "n_bytes": 593,
-        "md5_raw": "694ccb6f4205ef2eac983b87c17159cb",
+        "md5_raw": "41231363e0eeaff78e67c1f7132c2f09",
         "md5_raw_norel": "7d8880ed2143870013bc7a88c2da9339",
         "has_extent": true,
         "n_fn": 153,
         "n_fn_nopad": 150,
         "fn_bytes": 593,
-        "md5_fn": "694ccb6f4205ef2eac983b87c17159cb",
+        "md5_fn": "41231363e0eeaff78e67c1f7132c2f09",
         "md5_fn_norel": "7d8880ed2143870013bc7a88c2da9339",
         "pad_insns": 0,
         "pad_bytes": 0,
@@ -253,16 +254,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.0075564151629805565,
-          "median_s": 0.0077919429168105125,
-          "reps": 15,
-          "spread_pct": 3.116924477413895
+          "min_s": 0.0075607094913721085,
+          "median_s": 0.00805805204436183,
+          "reps": 30,
+          "spread_pct": 6.577987866843223
         },
         "large.bin": {
-          "min_s": 0.030818020924925804,
-          "median_s": 0.031092331744730473,
-          "reps": 15,
-          "spread_pct": 0.8900987525217888
+          "min_s": 0.0309735219925642,
+          "median_s": 0.031303970608860254,
+          "reps": 30,
+          "spread_pct": 1.0668745271376745
         }
       }
     },
@@ -294,7 +295,10 @@
         "md5_norm": "8be5be3bed4986beed53035879147544",
         "has_loop": true,
         "n_backward_branches": 9,
-        "bulk_calls": [],
+        "bulk_calls": [
+          "__memcpy_chk@plt",
+          "__memcpy_chk@plt"
+        ],
         "vector_regs": [
           "xmm"
         ]
@@ -323,16 +327,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.007526902481913567,
-          "median_s": 0.0076981354504823685,
-          "reps": 15,
-          "spread_pct": 2.27494602169031
+          "min_s": 0.0075042154639959335,
+          "median_s": 0.00796452583745122,
+          "reps": 30,
+          "spread_pct": 6.134023945125032
         },
         "large.bin": {
-          "min_s": 0.030888673849403858,
-          "median_s": 0.031087514013051987,
-          "reps": 15,
-          "spread_pct": 0.6437316299740271
+          "min_s": 0.030998041853308678,
+          "median_s": 0.03132895706221461,
+          "reps": 30,
+          "spread_pct": 1.0675358478187678
         }
       }
     },
@@ -342,7 +346,7 @@
       "mode": "isolated",
       "binary": ".temp/build/p02/c-clang-O0-isolated",
       "asm_symbol_needle": "kernel",
-      "binary_text_bytes": 2539,
+      "binary_text_bytes": 2795,
       "status": "ok",
       "static": {
         "binary": "/home/apt/repos_common/sec-ladder/.temp/build/p02/c-clang-O0-isolated",
@@ -350,13 +354,13 @@
         "n_raw": 42,
         "n_nopad": 41,
         "n_bytes": 160,
-        "md5_raw": "7e7d41d54de0af3a07a5f4774cc7459f",
+        "md5_raw": "7fc6e63edbfaee652c1f9d650bad45f5",
         "md5_raw_norel": "4e2349aa99b78b7d640fb5feddaf230f",
         "has_extent": true,
         "n_fn": 41,
         "n_fn_nopad": 41,
         "fn_bytes": 159,
-        "md5_fn": "b12484c7a77931f7ca8b158651669e9b",
+        "md5_fn": "e5333d17b2e04b0b7c373ff90871c746",
         "md5_fn_norel": "c23288a5bda78a17a44310ed56255633",
         "pad_insns": 1,
         "pad_bytes": 1,
@@ -440,7 +444,7 @@
       "mode": "isolated",
       "binary": ".temp/build/p02/c-clang-O3-isolated",
       "asm_symbol_needle": "kernel",
-      "binary_text_bytes": 1792,
+      "binary_text_bytes": 1936,
       "status": "ok",
       "static": {
         "binary": "/home/apt/repos_common/sec-ladder/.temp/build/p02/c-clang-O3-isolated",
@@ -448,13 +452,13 @@
         "n_raw": 68,
         "n_nopad": 64,
         "n_bytes": 224,
-        "md5_raw": "80d3af53946ecc77876e12300774e919",
+        "md5_raw": "75e656272a5fa863c639fb728900273e",
         "md5_raw_norel": "2bceabb3198bcdd851d3cd97a561c89d",
         "has_extent": true,
         "n_fn": 66,
         "n_fn_nopad": 64,
         "fn_bytes": 213,
-        "md5_fn": "1f6d48cb8376657f7c9a430b9478265f",
+        "md5_fn": "1404656416221a328654fbb1efa32af4",
         "md5_fn_norel": "8f351d0b70cdca9829b2a7913d8cc758",
         "pad_insns": 2,
         "pad_bytes": 11,
@@ -495,16 +499,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.006093529053032398,
-          "median_s": 0.0063260868191719055,
-          "reps": 15,
-          "spread_pct": 3.8164709500117455
+          "min_s": 0.005966439843177795,
+          "median_s": 0.006240551825612783,
+          "reps": 30,
+          "spread_pct": 4.594230221702743
         },
         "large.bin": {
-          "min_s": 0.02501575741916895,
-          "median_s": 0.025279419496655464,
-          "reps": 15,
-          "spread_pct": 1.0539839872466839
+          "min_s": 0.0251859650015831,
+          "median_s": 0.02545570768415928,
+          "reps": 30,
+          "spread_pct": 1.0710039601787125
         }
       }
     },
@@ -568,16 +572,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.005979862995445728,
-          "median_s": 0.006144863553345203,
-          "reps": 15,
-          "spread_pct": 2.7592698699809635
+          "min_s": 0.0059861550107598305,
+          "median_s": 0.006199808791279793,
+          "reps": 30,
+          "spread_pct": 3.5691321079378957
         },
         "large.bin": {
-          "min_s": 0.025115312077105045,
-          "median_s": 0.025280059315264225,
-          "reps": 15,
-          "spread_pct": 0.6559633328600452
+          "min_s": 0.025265236385166645,
+          "median_s": 0.025490059982985258,
+          "reps": 30,
+          "spread_pct": 0.8898535299301936
         }
       }
     },
@@ -744,16 +748,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.007721683010458946,
-          "median_s": 0.007989906705915928,
-          "reps": 15,
-          "spread_pct": 3.4736429233584856
+          "min_s": 0.007591024041175842,
+          "median_s": 0.007926016114652157,
+          "reps": 30,
+          "spread_pct": 4.413002404671934
         },
         "large.bin": {
-          "min_s": 0.025695365853607655,
-          "median_s": 0.025963200256228447,
-          "reps": 15,
-          "spread_pct": 1.0423451611730532
+          "min_s": 0.025851240381598473,
+          "median_s": 0.026145948097109795,
+          "reps": 30,
+          "spread_pct": 1.1400138297468387
         }
       }
     },
@@ -818,16 +822,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.006336351856589317,
-          "median_s": 0.006742032244801521,
-          "reps": 15,
-          "spread_pct": 6.402428359314164
+          "min_s": 0.006427244283258915,
+          "median_s": 0.006633071228861809,
+          "reps": 30,
+          "spread_pct": 3.2024136088776434
         },
         "large.bin": {
-          "min_s": 0.025472660548985004,
-          "median_s": 0.025740401819348335,
-          "reps": 15,
-          "spread_pct": 1.0510926797318758
+          "min_s": 0.02556151431053877,
+          "median_s": 0.02596030943095684,
+          "reps": 30,
+          "spread_pct": 1.560138869603873
         }
       }
     },
@@ -1000,16 +1004,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.00647507980465889,
-          "median_s": 0.006605582311749458,
-          "reps": 15,
-          "spread_pct": 2.0154578943825614
+          "min_s": 0.006419938988983631,
+          "median_s": 0.0066499263048172,
+          "reps": 30,
+          "spread_pct": 3.5823909888897383
         },
         "large.bin": {
-          "min_s": 0.025217403657734394,
-          "median_s": 0.025420060381293297,
-          "reps": 15,
-          "spread_pct": 0.8036383376713969
+          "min_s": 0.025468221865594387,
+          "median_s": 0.025706501677632332,
+          "reps": 30,
+          "spread_pct": 0.9355965771597212
         }
       }
     },
@@ -1075,16 +1079,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.0064181555062532425,
-          "median_s": 0.006755027920007706,
-          "reps": 15,
-          "spread_pct": 5.248741845320617
+          "min_s": 0.0064219944179058075,
+          "median_s": 0.006703787017613649,
+          "reps": 30,
+          "spread_pct": 4.3879296892901
         },
         "large.bin": {
-          "min_s": 0.025245745666325092,
-          "median_s": 0.025519125163555145,
-          "reps": 15,
-          "spread_pct": 1.0828735298348093
+          "min_s": 0.025451678782701492,
+          "median_s": 0.02575471391901374,
+          "reps": 30,
+          "spread_pct": 1.1906292661457263
         }
       }
     },
@@ -1253,16 +1257,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.006671388633549213,
-          "median_s": 0.006969294510781765,
-          "reps": 15,
-          "spread_pct": 4.4654253199167036
+          "min_s": 0.006430909037590027,
+          "median_s": 0.006783019285649061,
+          "reps": 30,
+          "spread_pct": 5.475279560026045
         },
         "large.bin": {
-          "min_s": 0.025337151251733303,
-          "median_s": 0.025561136193573475,
-          "reps": 15,
-          "spread_pct": 0.8840178582619824
+          "min_s": 0.02539850678294897,
+          "median_s": 0.025765605736523867,
+          "reps": 30,
+          "spread_pct": 1.4453564404870605
         }
       }
     },
@@ -1328,16 +1332,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.0065770139917731285,
-          "median_s": 0.006857285276055336,
-          "reps": 15,
-          "spread_pct": 4.261375825454916
+          "min_s": 0.006497174501419067,
+          "median_s": 0.006876562722027302,
+          "reps": 30,
+          "spread_pct": 5.8392801443977085
         },
         "large.bin": {
-          "min_s": 0.025286429561674595,
-          "median_s": 0.02543687727302313,
-          "reps": 15,
-          "spread_pct": 0.5949741183569858
+          "min_s": 0.025330149568617344,
+          "median_s": 0.02568437857553363,
+          "reps": 30,
+          "spread_pct": 1.3984481455851911
         }
       }
     },
@@ -1506,16 +1510,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.006538464687764645,
-          "median_s": 0.006842509843409061,
-          "reps": 15,
-          "spread_pct": 4.65010014068552
+          "min_s": 0.006511379964649677,
+          "median_s": 0.006865466944873333,
+          "reps": 30,
+          "spread_pct": 5.437971400010384
         },
         "large.bin": {
-          "min_s": 0.025350894778966904,
-          "median_s": 0.025489436462521553,
-          "reps": 15,
-          "spread_pct": 0.5464962273031657
+          "min_s": 0.02552640251815319,
+          "median_s": 0.02570812962949276,
+          "reps": 30,
+          "spread_pct": 0.7119182235347625
         }
       }
     },
@@ -1581,16 +1585,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.006796455010771751,
-          "median_s": 0.007084658369421959,
-          "reps": 15,
-          "spread_pct": 4.240495349317135
+          "min_s": 0.0065744249150156975,
+          "median_s": 0.006890369579195976,
+          "reps": 30,
+          "spread_pct": 4.805662369931019
         },
         "large.bin": {
-          "min_s": 0.025271563790738583,
-          "median_s": 0.025396275334060192,
-          "reps": 15,
-          "spread_pct": 0.4934856598281158
+          "min_s": 0.02541041001677513,
+          "median_s": 0.025660801213234663,
+          "reps": 30,
+          "spread_pct": 0.9853882573883366
         }
       }
     },
@@ -1600,7 +1604,7 @@
       "mode": "isolated",
       "binary": ".temp/build/p02/c-gcc-h-O0-isolated",
       "asm_symbol_needle": "kernel",
-      "binary_text_bytes": 2876,
+      "binary_text_bytes": 3128,
       "status": "ok",
       "static": {
         "binary": "/home/apt/repos_common/sec-ladder/.temp/build/p02/c-gcc-h-O0-isolated",
@@ -1608,13 +1612,13 @@
         "n_raw": 58,
         "n_nopad": 58,
         "n_bytes": 211,
-        "md5_raw": "3a0a504928a44789d2b7d7b6c24fb08e",
+        "md5_raw": "2f28d8efa869d81ded55aaadfd767b49",
         "md5_raw_norel": "88790b59f3172444255bff57e72d82eb",
         "has_extent": true,
         "n_fn": 58,
         "n_fn_nopad": 58,
         "fn_bytes": 211,
-        "md5_fn": "3a0a504928a44789d2b7d7b6c24fb08e",
+        "md5_fn": "2f28d8efa869d81ded55aaadfd767b49",
         "md5_fn_norel": "88790b59f3172444255bff57e72d82eb",
         "pad_insns": 0,
         "pad_bytes": 0,
@@ -1650,7 +1654,7 @@
       "mode": "whole",
       "binary": ".temp/build/p02/c-gcc-h-O0-whole",
       "asm_symbol_needle": "main",
-      "binary_text_bytes": 2912,
+      "binary_text_bytes": 3167,
       "status": "ok",
       "static": {
         "binary": "/home/apt/repos_common/sec-ladder/.temp/build/p02/c-gcc-h-O0-whole",
@@ -1658,13 +1662,13 @@
         "n_raw": 113,
         "n_nopad": 113,
         "n_bytes": 520,
-        "md5_raw": "2f53f824f6261699c29cb94275aee6f4",
+        "md5_raw": "ef7d1484c8003da84709e8344f96550d",
         "md5_raw_norel": "1bc68bd66590dece287fc01b2be5944d",
         "has_extent": true,
         "n_fn": 113,
         "n_fn_nopad": 113,
         "fn_bytes": 520,
-        "md5_fn": "2f53f824f6261699c29cb94275aee6f4",
+        "md5_fn": "ef7d1484c8003da84709e8344f96550d",
         "md5_fn_norel": "1bc68bd66590dece287fc01b2be5944d",
         "pad_insns": 0,
         "pad_bytes": 0,
@@ -1698,7 +1702,7 @@
       "mode": "isolated",
       "binary": ".temp/build/p02/c-gcc-h-O3-isolated",
       "asm_symbol_needle": "kernel",
-      "binary_text_bytes": 2402,
+      "binary_text_bytes": 2562,
       "status": "ok",
       "static": {
         "binary": "/home/apt/repos_common/sec-ladder/.temp/build/p02/c-gcc-h-O3-isolated",
@@ -1706,13 +1710,13 @@
         "n_raw": 153,
         "n_nopad": 151,
         "n_bytes": 610,
-        "md5_raw": "29ab725d97b3ce380fe74bda7447cfae",
+        "md5_raw": "2034ed0cb8dca8e8ce496e1a6a10277b",
         "md5_raw_norel": "bb04aa1561444ca888019867c469b0fc",
         "has_extent": true,
         "n_fn": 153,
         "n_fn_nopad": 151,
         "fn_bytes": 610,
-        "md5_fn": "29ab725d97b3ce380fe74bda7447cfae",
+        "md5_fn": "2034ed0cb8dca8e8ce496e1a6a10277b",
         "md5_fn_norel": "bb04aa1561444ca888019867c469b0fc",
         "pad_insns": 0,
         "pad_bytes": 0,
@@ -1755,16 +1759,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.007606279104948044,
-          "median_s": 0.007932052947580814,
-          "reps": 15,
-          "spread_pct": 4.282959356840427
+          "min_s": 0.007560180500149727,
+          "median_s": 0.007816251832991838,
+          "reps": 30,
+          "spread_pct": 3.3871060728912514
         },
         "large.bin": {
-          "min_s": 0.030848372727632523,
-          "median_s": 0.031045999377965927,
-          "reps": 15,
-          "spread_pct": 0.6406388177369884
+          "min_s": 0.03090381994843483,
+          "median_s": 0.03134252782911062,
+          "reps": 30,
+          "spread_pct": 1.4195911101210377
         }
       }
     },
@@ -1796,7 +1800,10 @@
         "md5_norm": "e9f9c25f1847ecf60f031cb531150674",
         "has_loop": true,
         "n_backward_branches": 9,
-        "bulk_calls": [],
+        "bulk_calls": [
+          "__memcpy_chk@plt",
+          "__memcpy_chk@plt"
+        ],
         "vector_regs": [
           "xmm"
         ]
@@ -1825,16 +1832,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.007552549242973328,
-          "median_s": 0.007673757150769234,
-          "reps": 15,
-          "spread_pct": 1.604860874077377
+          "min_s": 0.007592402398586273,
+          "median_s": 0.007767013274133205,
+          "reps": 30,
+          "spread_pct": 2.2998106051313254
         },
         "large.bin": {
-          "min_s": 0.03072999883443117,
-          "median_s": 0.03104593139141798,
-          "reps": 15,
-          "spread_pct": 1.0280916660264392
+          "min_s": 0.031045354902744293,
+          "median_s": 0.03144563315436244,
+          "reps": 30,
+          "spread_pct": 1.2893337920345815
         }
       }
     },
@@ -1844,7 +1851,7 @@
       "mode": "isolated",
       "binary": ".temp/build/p02/c-clang-h-O0-isolated",
       "asm_symbol_needle": "kernel",
-      "binary_text_bytes": 2603,
+      "binary_text_bytes": 2859,
       "status": "ok",
       "static": {
         "binary": "/home/apt/repos_common/sec-ladder/.temp/build/p02/c-clang-h-O0-isolated",
@@ -1852,13 +1859,13 @@
         "n_raw": 57,
         "n_nopad": 55,
         "n_bytes": 224,
-        "md5_raw": "df64236928e3818f7d2017a7d0c68d18",
+        "md5_raw": "03a914e853f5c3bd654ca9a807f4cc6a",
         "md5_raw_norel": "c4d855f4a651550d317bcc0c3ff2e793",
         "has_extent": true,
         "n_fn": 55,
         "n_fn_nopad": 55,
         "fn_bytes": 211,
-        "md5_fn": "2ce3a840620643bd9de69472b1af1744",
+        "md5_fn": "8013b4412eac4b18a73ebe5dcade4dad",
         "md5_fn_norel": "e1602a828fdcdd89bb45f58a6c14d9b4",
         "pad_insns": 2,
         "pad_bytes": 13,
@@ -1942,7 +1949,7 @@
       "mode": "isolated",
       "binary": ".temp/build/p02/c-clang-h-O3-isolated",
       "asm_symbol_needle": "kernel",
-      "binary_text_bytes": 1824,
+      "binary_text_bytes": 1968,
       "status": "ok",
       "static": {
         "binary": "/home/apt/repos_common/sec-ladder/.temp/build/p02/c-clang-h-O3-isolated",
@@ -1950,13 +1957,13 @@
         "n_raw": 77,
         "n_nopad": 73,
         "n_bytes": 256,
-        "md5_raw": "9a4c6f02419b34568774268e6f528683",
+        "md5_raw": "8bf12e3152d658c95424386a1bcf0968",
         "md5_raw_norel": "998df68fd49c8ed6b25277e11e49d6c5",
         "has_extent": true,
         "n_fn": 75,
         "n_fn_nopad": 73,
         "fn_bytes": 244,
-        "md5_fn": "6385306f0987b30f2989dfef98d75444",
+        "md5_fn": "ca37a0e5d942d0f1c37d69e63ab6818b",
         "md5_fn_norel": "58be15a425db187bd80c8148ebaee22f",
         "pad_insns": 2,
         "pad_bytes": 12,
@@ -1997,16 +2004,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.006148758344352245,
-          "median_s": 0.006318168714642525,
-          "reps": 15,
-          "spread_pct": 2.755196428330707
+          "min_s": 0.006063038483262062,
+          "median_s": 0.006318969186395407,
+          "reps": 30,
+          "spread_pct": 4.22116243926012
         },
         "large.bin": {
-          "min_s": 0.02510371245443821,
-          "median_s": 0.025306150317192078,
-          "reps": 15,
-          "spread_pct": 0.8064060768752078
+          "min_s": 0.025179140269756317,
+          "median_s": 0.025488002691417933,
+          "reps": 30,
+          "spread_pct": 1.2266599190942293
         }
       }
     },
@@ -2070,16 +2077,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.006049918010830879,
-          "median_s": 0.006292619742453098,
-          "reps": 15,
-          "spread_pct": 4.011653235427683
+          "min_s": 0.006035587750375271,
+          "median_s": 0.006342058070003986,
+          "reps": 30,
+          "spread_pct": 5.077721214634984
         },
         "large.bin": {
-          "min_s": 0.025119123980402946,
-          "median_s": 0.025353251956403255,
-          "reps": 15,
-          "spread_pct": 0.932070625484262
+          "min_s": 0.025219254195690155,
+          "median_s": 0.0255521428771317,
+          "reps": 30,
+          "spread_pct": 1.319978294593797
         }
       }
     }

@@ -15,8 +15,9 @@ Rust, unsafe Rust + Verus proof — plus a sixth **R1h** hardened-C cell, across
 optimisation levels and two inline modes, and compared on assembly, executed
 instructions, timing, proof burden and trusted-base size.
 
-47 patterns are catalogued in `.memory/06-catalogue.md`. **Three exist: p01
-(calibration), p02 (first real bug), p16 (first data-dependent bound).**
+47 patterns are catalogued in `.memory/06-catalogue.md`. **Four exist: p01
+(calibration), p02 (first real bug), p16 (first data-dependent bound), p17 (the
+limit of memory safety).**
 
 ## The findings so far — this is the actual output
 
@@ -65,6 +66,22 @@ instructions, timing, proof burden and trusted-base size.
    memory bandwidth is ruled out rather than merely unconsidered.
    **Fourth pattern in a row where R3 is the honest number.**
 
+10. **p17 — the limit, and the most important artefact here.** A suffix-range
+   parser (CVE-2017-7529). One missing `start >= 0`; the served range is the last
+   `s` bytes, so one attacker `u16` picks the harm. For `content_len < s <= len`
+   the bad read is **inside the allocation** — ASan clean, exit 0, and **safe Rust
+   with the check deleted prints C's leaked value bit-for-bit**. Only for `s > len`
+   does it leave the allocation and Rust panic. Then the artefact: guard the
+   *absolute* index instead of the sign — exactly what a bounds check buys — and
+   Verus gives **9 verified, 1 error, the single error being the *functional*
+   invariant; every access obligation discharges.** **A provably memory-safe
+   program that still leaks.** Memory safety and correctness are different
+   properties and this is the measurement.
+11. **4.25 Ir/folded byte is a property of rustc, not of a pattern.** p17
+   reproduced p16's swept R2−R4 constant to four decimals on a different kernel,
+   and gcc's rolled fold hit 8.0000 exactly, the same rolled-unchecked constant.
+   **R3 is free for the fifth pattern in a row.**
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds
@@ -81,7 +98,15 @@ instructions, timing, proof burden and trusted-base size.
   *spelling*, not to safety. This file's own rule — *never publish a safety-cost
   claim without R3* — was broken by the person who wrote it, one pattern later.
 - **"gcc is 36% behind clang on p16"** — a flag default, not a codegen limit.
-  With `-funroll-loops` gcc reaches 2823 and **beats** clang's 2993.
+  With `-funroll-loops` gcc reaches 2823 and **beats** clang's 2993. Reproduced on
+  p17: 7065 → 4813, past clang again.
+- **"The cost of the check is the conversion, not the comparison"** (manager's
+  prediction for p17). False: `i128` index arithmetic costs +4.0000 Ir/byte, but
+  **signedness itself is 4 Ir per call, flat — 0.17% of the gap.**
+- **"The twin's value accrues from p17 on"** — p17's accessor is single-clause
+  too, and for a structural reason: its interesting harm is not a memory error.
+  The twin's value starts at the first *multi-clause trusted accessor*, a property
+  of the wrapped intrinsic (p27+), not of the pattern number.
 
 ## Working method
 
