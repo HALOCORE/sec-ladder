@@ -20,8 +20,20 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 | T006 | retract p02's perf claim; close the reopened bypass; fix the floor | **done**, reviewed |
 | T008 | close the two bypasses T006_REVIEW demonstrated; harden 5c and the floor | **done**, reviewed |
 | T009 | judge the *strength* of a trusted `requires` (the verified twin); close the paren-`&&` hole | **done**, reviewed |
-| T010 | fix the twin's perimeter (3 bypasses); tie the driver region to code that runs | **done**, review owed |
-| T007 | p16 TLV walker — the first data-dependent loop bound | spec written, **blocked on T010's review** |
+| T010 | fix the twin's perimeter (3 bypasses); tie the driver region to code that runs | **done**, reviewed |
+| T007 | p16 TLV walker — the first data-dependent loop bound | spec written, **unblocked**, wip |
+
+**T010's review closed the gate-hardening arc.** It was deliberately shaped as
+the opposite of the previous six — not a bypass hunt but "will this gate *accept*
+the next pattern?" — and answered **PASS on all four** of the checks p16 would be
+first to exercise, overturning three of the manager's premises with measurements.
+Two findings are folded into T007 Part 0: a `rep.ok` that fires over an empty set
+when the kernel symbol does not fullmatch (a gcc IPA clone silences the
+decoy-catching limb), and `MAX_TWIN_JUSTIFICATIONS`, deleted as a redundant
+manager-invented round number that could hard-fail an honest pattern. It also
+adjudicated the verified twin — the manager's own design — as **worth keeping**,
+on the ground that Miri never opens `verus.rs` and so is not a partial backstop
+for a too-weak trusted `requires` but *none*.
 
 **Priority shift, decided by the user after T010.** Six of ten tasks went to
 gate hardening and 2 of 47 patterns exist. The gate's threat model is now

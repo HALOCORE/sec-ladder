@@ -3,10 +3,26 @@
 **Role:** research engineer
 **Read first:** `.tasks/PROTOCOL.md`, then `.memory/01-ladder.md`,
 `.memory/02-bench-rules.md`, `.memory/04-verus.md`, `.memory/05-layout.md`
-("Adding a pattern — what the gate needs from you"), then
-`patterns/p02-buffer-copy/` in full — **p02 is the template you clone**, not p01.
-p02 has the bug, the R1h cell, the `&mut`/`&[u8]` handling and the adversarial
-protocol; p01 has none of them.
+("Adding a pattern — what the gate needs from you", **including the new "five
+demands steps 1–5 predate"** — those are hard failures and clone-from-p02 does
+not supply all of them), then `patterns/p02-buffer-copy/` in full — **p02 is the
+template you clone**, not p01. p02 has the bug, the R1h cell, the `&mut`/`&[u8]`
+handling and the adversarial protocol; p01 has none of them.
+
+**Status: UNBLOCKED.** TASK_009 and TASK_010 landed and TASK_010_REVIEW cleared
+them. That review also checked this spec against the hardened gate and answered
+**PASS on all four** of the checks p16 would be the first to exercise — you do not
+need to re-derive any of it:
+
+| Check | Verdict for p16 |
+|---|---|
+| kernel called exactly once, inside the region | **PASS.** R1h reuses the same `c/main.c`, so it carries no region; `match`/nested-block/`#[cfg]` call sites all count as 1. |
+| non-zero exclusive `Ir` + kernel's only caller | **PASS.** The stage reads only `collapse.probe_inputs[0]` and skips non-`isolated` modes, so adversarial inputs and `-O3` inlining never reach it. |
+| verified twin, per-conjunct deletion | **PASS.** Your accessor is single-clause. The per-conjunct probe was verified by construction. |
+| mandatory Miri, 180 s | **PASS**, subject to the blob-size rule below. |
+
+Read `.tasks/TASK_010_REVIEW_REPORT.md` only if you hit one of these; it is 420
+lines and you should not need it.
 
 ## Why this pattern, and what it is for
 
@@ -196,7 +212,18 @@ Five, all from `inputs/gen.py`, deterministic from a fixed seed:
 probabilistically and an overrun from a middle window stays inside the
 allocation — silent wrong answer, no ASan, and a gate that passes by luck. With
 `nwin == 1`, `k` is always 0, the window is also the last, and the overshoot
-leaves the allocation deterministically. Keep `n_iters` small there.
+leaves the allocation deterministically.
+
+**Keep the blob small there — a few KiB — and note that `n_iters` is not the
+knob.** `check.py:3819` rewrites `n_iters` to 4 for every Miri run, discarding
+whatever you declare, so this row's Miri cost is `4 × n_blob` folded bytes.
+Measured throughput on this box is **~16 900 B/s**, so a blob above ~700 KiB
+blocks the row and p16 is born `PASS-WITH-BLOCKED-ROWS`. The same bound applies
+to `small` and `large` through their **stride**, not their blob size — which is
+why p02's 8.38 MB `large.bin` finishes Miri in 1.5 s and p01's does not finish at
+all. (p01 blocks for an unrelated reason worth knowing: `common/driver.rs`'s
+`head_u64_body` decodes element-by-element under the interpreter. Your
+`head1_u64_bytes` must be a bulk `to_vec()`, like `head2_u64_bytes`.)
 
 Give `small` and `large` **different window sizes mod 16 and mod 4**
 (`.memory/01-ladder.md`: residues have bitten three times, and p02's real
@@ -258,13 +285,32 @@ being measured on a scalar loop in both — worth knowing before interpreting it
    trivial. Paste both results.
 6. `NOTES.md` carries the TCB tally, counted per `.memory/04-verus.md` (**every**
    `external_body` item, individually).
+7. **The three artefacts p02 did not have when it was built** — none are supplied
+   by cloning p02, all three are hard failures, and an engineer should not meet
+   them for the first time at hour three:
+   - `#[cfg(slb_twin)] fn slb_twin_get_unchecked` beside the accessor, same
+     signature and same contract character-for-character;
+   - `verus.twin_obligations` in the `slb-contract` block, **with the arithmetic
+     written out beside it** as p02 does ("9 shipped + 3: …"). Without that note
+     it is a declared pin a reviewer cannot check from `spec.md` alone, which
+     `.memory/02-bench-rules.md` forbids;
+   - an `SLB-TRUSTED-ARGUMENT verus.rs get_unchecked` block in `NOTES.md` with
+     the literal labels `(a)`, `(b)`, `(c)`, ≥200 chars. (b) — is the `ensures`
+     complete with respect to every unchecked operation the body performs — is
+     the one no oracle covers, so write it as if it were the deliverable.
+8. **Say plainly in `NOTES.md` that the twin is idle on this pattern.** p16's
+   accessor is the same single-clause `i < v@.len()` p01 and p02 ship, so a green
+   5c-twin on p16 is **not** evidence that anything hard was checked — its value
+   accrues from p17 on, where a multi-clause accessor can be missing a conjunct.
+   Requirement 1 of "Harness adaptations" below still stands: show it *failing*
+   on `i <= v@.len()` for this pattern's own accessor.
 
 ## If the proof stalls
 
-There is no proof-effort budget set yet — the user owes that decision. Until
-then: if R5 is not converging after a serious attempt, **stop and report where
-it stuck**, with the exact Verus error and the obligation it could not
-discharge. `.memory/02-bench-rules.md` is explicit that a documented R5 failure
+**The budget is one engineer session for the R5 cell** (set by the manager at
+TASK_008, pending a user override). If R5 is not converging by the end of it,
+**stop and report where it stuck**, with the exact Verus error and the obligation
+it could not discharge. `.memory/02-bench-rules.md` is explicit that a documented R5 failure
 is a finding, not a gap, and p16 is supposed to be one of the *easy* ones — a
 stall here is important information about the harder families and I want it
 early rather than late.
@@ -278,16 +324,51 @@ not edit `pilot/`, and do not edit `patterns/p01-array-sum/` or
 `~/tools/valgrind/bin/valgrind`, rustc is `~/.cargo/bin/rustc` — none are on
 PATH. Long builds get `timeout <N>`.
 
-**If a prescription in this file is wrong, say so with the measurement.** Five
-engineers have now contradicted my instructions and all five were right. That is
-the most valuable thing an engineer on this project does.
+**If a prescription in this file is wrong, say so with the measurement.** Eight
+agents have now contradicted my written instructions and all eight were right —
+the last one overturned three premises in a single review, with measurements.
+That is the most valuable thing an engineer on this project does.
+
+## Part 0 — two gate fixes to land first (small, then leave the gate alone)
+
+Both come from TASK_010_REVIEW and both pass the "could this happen by accident?"
+test in `.memory/02-bench-rules.md`. Do these **first**, since you will be
+running the gate all task; then do not touch `harness/` again except where p16
+forces it.
+
+1. **`check.py:3442-3474` asserts "the only caller" over an empty set.** If no
+   callgrind symbol fullmatches the kernel name, `kids` is empty, so
+   `callers_of_k` and `bad` are both empty, the cell is counted as **checked**,
+   and the stage prints *"… has non-zero exclusive `Ir` and is the only caller of
+   the `kernel` symbol"*. Reproduced by the reviewer in
+   `.temp/review010/cgvac.py` by renaming the symbol to `kernel.constprop.0` —
+   the shape of a gcc IPA clone — giving `failures=0 shouts=0` and an identical
+   green line. That silences precisely the limb added to catch a live decoy, and
+   it is the **fifth** instance of the rule TASK_010 itself promoted: *a
+   count-bearing `rep.ok` must state its `n` and must never fire at `n == 0`*.
+   Fix it, and re-run the reviewer's rig to show it now fails.
+2. **Delete `MAX_TWIN_JUSTIFICATIONS` and its check** (`check.py:1131`,
+   `:2830`). It was my round number. It is redundant — the separate "every twin
+   justified away" rule already fails the case it was meant to catch, which the
+   reviewer confirmed by re-running mirror `x3` — and it is the only knob in the
+   twin regime that can hard-fail an honest pattern with **no route out**. The
+   hatch stays, uncapped and shouted every run. Confirm `x3` still fails after
+   the deletion; if it does not, keep the cap and tell me I was wrong to drop it.
+
+Nothing else in `harness/` is in scope. If p16 needs a harness change beyond
+`head1_u64_bytes`, report it rather than growing the gate — it is 4209 lines
+against two patterns and that ratio is the reason this task exists.
 
 ## Harness adaptations
 
-**Prerequisite: TASK_008 landed; TASK_009 must land too.** TASK_008 closed the
-fake-`verus!` ghost harbour and added `requires` mutation testing. TASK_008_REVIEW
-then found that neither reaches the property p16 depends on, and answered the
-"is the template ready for p16" question with **no**:
+**Prerequisite: satisfied.** TASK_008, TASK_009 and TASK_010 have all landed and
+been reviewed. The history below is kept because it explains *why* the accessor's
+`requires` is the whole security argument for this pattern — not because anything
+here is still blocking.
+
+TASK_008 closed the fake-`verus!` ghost harbour and added `requires` mutation
+testing. TASK_008_REVIEW then found that neither reaches the property p16 depends
+on, and answered the "is the template ready for p16" question with **no**:
 
 > p16's security argument is `get_unchecked`'s `requires i < v@.len()` and
 > nothing else. Changing it to `i <= v@.len()` — the off-by-one OOB read p16
@@ -297,9 +378,9 @@ then found that neither reaches the property p16 depends on, and answered the
 > trusted items and cannot be.
 
 So the gate would certify a p16 whose trusted base axiomatises the exact bug
-class p16 is about. **TASK_009 Part B is the fix** — a mechanism that judges the
-*strength* of a trusted precondition rather than its triviality. Do not start p16
-before it lands.
+class p16 is about. **TASK_009's verified twin is the fix** — a mechanism that
+judges the *strength* of a trusted precondition rather than its triviality. It
+landed, was attacked at TASK_009_REVIEW and TASK_010_REVIEW, and survives.
 
 Three further requirements the reviewer set for this pattern specifically:
 

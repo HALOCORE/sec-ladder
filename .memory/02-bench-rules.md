@@ -36,6 +36,14 @@ Known residuals we are deliberately **not** closing, all measured:
   identity plus Miri. Both remain human readings.
 - A width change applied to every rung at once is invisible to the driver diff.
 - `include!()` of a file outside the module graph escapes the `unsafe` scan.
+- `unsafe` anywhere in `common/` is a hard failure with **no hatch**, unlike
+  every other structural rule here. Correct today (no rung needs it) and it will
+  have to be revisited for the pointer-backed families, p27+.
+- The verified twin has never been exercised against a **generic or method-shaped**
+  trusted accessor; `vparse.params_text` is documented to hard-fail there and
+  nobody has re-measured since TASK_008_REVIEW. p16 is safe (a free `fn` taking
+  `&[u8]`); **p17 and beyond may not be** — check it when a pattern first needs
+  one, rather than discovering it mid-proof.
 
 A reviewer should still report an adversarial hole it happens to find — it belongs
 in this list. It should not become the next task.
@@ -429,10 +437,32 @@ un-greenable by any route:
   verdict becomes `PASS-WITH-BLOCKED-ROWS`. Failing a whole pattern on a tool
   the box does not have is how gates get switched off.
 
+**Sizing inputs so Miri does not block the row — measured at TASK_010_REVIEW.**
+Miri's cost is driven by the **payload the kernel folds**, not by the file size,
+and `n_iters` is *not* the knob: `check.py:3819` rewrites it to
+`MIRI_PROBE_ITERS = 4` for every Miri run, discarding whatever the pattern
+declared. Measured fold throughput on this box: **5.91e-5 s per folded byte
+(~16 900 B/s)**, so the 180 s budget is ≈ **3.05 M folded bytes**, i.e. a stride
+of **≤ ~760 KiB per call** at 4 iterations. Size `inputs/gen.py` against that
+*before* building.
+
+Why p01 blocks and p02 does not, which is not a size story: p02's 8.38 MB
+`large.bin` finishes in **1.5 s**. p01 blocks because `common/driver.rs`'s
+`head_u64_body` decodes the payload **element by element** (1.5 M `le64` +
+`push`) under the interpreter, while `head2_u64_bytes` / `head1_u64_bytes` are a
+single `to_vec()`. **The payload decoder you pick in `common/` decides whether
+your rows are Miri-checkable** — prefer a bulk `to_vec` shape.
+
 The pair to compare is `miri.pair` in `spec.md`, not a hard-coded
 `"unsafe vs verus"` string. Miri is a UB **test**, not a proof: it says nothing
 about paths the probe inputs do not take, which is why the policy is "mandatory
 when R4 ≠ R5" rather than "sufficient".
+
+**Miri is no backstop at all for a too-weak trusted `requires`** — not a partial
+one. `miri.sources` names **R4's** `unsafe.rs`; a weakened `requires` lives in
+R5's `verus.rs`, which Miri never opens. And a weak precondition does not itself
+execute UB, it only fails to forbid it. Established decisively at
+TASK_010_REVIEW, and it is the argument for keeping the verified twin.
 
 ## A count-bearing `rep.ok` must state its `n`, and must never fire at `n == 0`
 
@@ -699,6 +729,11 @@ review as a change to the committed artefact rather than only as a source diff.
   or fail, so a failing run does replace a passing one. Since TASK_005 it
   carries a sha256 of the contract block and of every source the gate read, so a
   stale record is at least detectable by comparing hashes against the tree.
+  **But the record itself is not byte-reproducible** (TASK_010_REVIEW): a clean
+  re-run on an unchanged tree differs by ~3 lines, because the `diagnostic`
+  fields carry ASan PIDs and ASLR-dependent addresses. So `git diff` on a gate
+  record cannot be read as "something changed" — compare the hashes and the
+  verdict, not the file.
 
 ### The reference model may not run the thing under test
 

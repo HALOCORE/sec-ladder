@@ -433,6 +433,41 @@ quoting 5c as a defence.**
    the clause mean the same thing in the shipped configuration as in the twin's?
 
    **All three bypasses closed at TASK_010, and (a)–(c) are now mandatory text.**
+   The per-conjunct fix above landed too, and was verified *by construction* at
+   TASK_010_REVIEW rather than by reading: a redundant second conjunct on both
+   item and twin is now reported as still-verifying with that single conjunct
+   deleted, while p02's two real `copy_bytes` conjuncts each give 11 verified / 1
+   error.
+
+   **Is the twin worth its weight? Adjudicated at TASK_010_REVIEW — keep it.**
+   The manager designed the mechanism and wrote this entry, so an independent
+   agent was asked, and told to treat "delete it" as a welcome answer. It said
+   keep, on a structural argument rather than a preference:
+
+   - **Nothing else covers this class.** Miri never opens `verus.rs`, and a weak
+     precondition does not execute UB, it only fails to forbid it. So for a
+     too-weak trusted `requires` the twin is not the best backstop, it is the
+     **only** one. `.memory/02-bench-rules.md` now records this.
+   - **What it uniquely catches is a *missing conjunct*** in a multi-clause
+     trusted `requires` — the archetypal honest mistake when wrapping an
+     intrinsic that has three documented preconditions and the author encodes
+     two. p02's own comment admits it carries two of three. Deletion of a trusted
+     precondition cannot fail Verus, parameter coverage passes, and the tautology
+     probe passes; only the twin moves.
+   - **Cost is not the objection.** 5c-twin is five Verus runs on p02 at ~1.7 s
+     each, ~8.5 s of a ~4-minute gate. Maintenance surface is the real cost.
+   - **Honest caveat, and it must be stated when reporting p16:** there is **no
+     recorded accidental instance** of a too-weak trusted `requires` on this
+     project — both known forms were reviewer-built. And the twin is **idle on
+     p16**, whose accessor is the same single-clause `i < v@.len()` p01 and p02
+     ship. A green 5c-twin on p16 is not evidence that anything hard was checked.
+     Its value accrues from p17 on.
+
+   **`MAX_TWIN_JUSTIFICATIONS` was deleted at TASK_007**, on the same review's
+   recommendation: it was the manager's round number, it is redundant (the
+   separate "every twin justified away" rule already fails that case), and it was
+   the one knob in the twin regime that could hard-fail an honest pattern with no
+   route out. The escape hatch remains, uncapped but shouted every run.
 
    - **The regime is keyed on `external_body` + (non-empty `ensures` **or**
      `unsafe` in body)**, not on `unsafe` alone. Additionally every `unsafe` token
