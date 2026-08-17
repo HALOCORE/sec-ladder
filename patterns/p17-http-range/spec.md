@@ -101,6 +101,19 @@ safety. Safe Rust eliminates the third row and does **nothing** about the
 second. The only thing that fixes the second row is `start >= 0`, which is
 identical in C and in Rust and costs the same in both.
 
+**Be precise about *what* the middle row discloses, because it depends on the
+input and the two cases are not equally interesting.** On a **one-window** input
+(`adversarial-leak.bin`, `nwin == 1`, `off == 0`) the excess over what the caller
+is entitled to is a suffix of `[0, body_start)` — the `nsuf` word and the suffix
+table, i.e. **the attacker's own request header, byte for byte**. That is a
+memory-safe *wrong answer*, not an information disclosure, and it is structural:
+with `off == 0` the read `[len - s, len)` can never reach anything but this
+window. On a **multi-window** input the same arithmetic reaches into the
+*previous window*, which is another caller's data and a real disclosure — but
+only for a guard that permits a negative *window*-relative index, which
+`start >= 0` does not and `start >= -((off + body_start) as i64)` does. That is
+`adversarial-crosswin-{lo,hi}.bin` and `NOTES.md` §1c.
+
 Correspondingly, on the Verus side, a proof that every access is in bounds
 discharges the third row and **not** the second, because the second row *is* in
 bounds. Only the functional `ensures` catches it. p17 is therefore the pattern
@@ -272,7 +285,7 @@ returned. Nothing to CSE, nothing to hoist, no `black_box` and no `asm volatile`
 the other. `k = (acc * nwin) >> 64` is Lemire's map onto `[0, nwin)`; see p01's
 `spec.md` for why it is a multiply-shift and not a modulo.
 
-### Why both adversarial inputs are exactly one window
+### Why `adversarial-leak` and `adversarial-oob` are exactly one window
 
 `k` is pseudo-random over `[0, nwin)`, so with several windows a malformed one
 would be hit only probabilistically. On p17 that matters far more than it did on
@@ -282,6 +295,55 @@ silent wrong answer with no ASan and a gate that passed by luck. With
 `nwin == 1`, `k` is always 0, `off` is always 0, and `abs < 0` is an absolute
 negative index deterministically. `model.py`'s `sanitizer_expect` is written
 against `off + len - s < 0` rather than `start < 0` for the same reason.
+
+### Why `adversarial-crosswin` is two windows, and why it is exempt
+
+`adversarial-crosswin-lo.bin` and `adversarial-crosswin-hi.bin` break that rule
+deliberately, and the paragraph above is precisely the reason they are generated
+as a **pair**.
+
+The one-window rule exists because a *positional* claim — "this call reads before
+the allocation" — is a coin flip once `k` can select a window. **This input makes
+no positional claim.** It is a **differential**: two files identical in every byte
+except window 0's secret, so the claim is *"change the victim's bytes and the
+output changes, with no panic and no sanitizer report"*, and that claim is true
+however `k` lands. If `k` never selects the attacker's window the two outputs
+agree and nothing is asserted; if it selects it once, the disclosure is visible in
+the checksum. Determinism is not needed — only the *difference* is read, and the
+difference is zero unless a byte of window 0's secret reached the result.
+
+The layout, with `stride = 64` and `n_blob = 128`:
+
+| | `nsuf` | suffixes | `body_start` | `content_len` | what it serves |
+|---|---:|---|---:|---:|---|
+| window 0, `off = 0` — **the victim** | 1 | `(32)` | 4 | 60 | `buf[32..64)` only. `buf[4..32)` is the **secret** and no rung that keeps `start >= 0` ever reads it |
+| window 1, `off = 64` — **the attacker** | 3 | `(10, 56, 122)` | 8 | 56 | `s = 122` ⇒ `start = −66`, `abs = off + len − s = 6` |
+
+Two design constraints are load-bearing and must survive any edit.
+
+- **Window 0 has to serve something.** A window that serves no range returns 0,
+  `acc` stays 0, and `k = (acc * nwin) >> 64` is then 0 for ever — the driver's
+  multiply-shift has an **absorbing state at `acc == 0`** and window 1 would never
+  be visited at all. Serving 32 bytes makes window 0's result a full-width
+  pseudo-random `u64` on the first call.
+- **`s = 122` keeps `abs = 6 ≥ 0`.** Every read on this input, in *every* rung
+  including R1, is inside the blob, so `model.py` derives `sanitizer_expect =
+  "clean"` and ASan must stay silent. This input is about disclosure, not about
+  memory safety; `adversarial-oob.bin` is the memory-safety input and this one
+  must not accidentally become a second copy of it.
+
+The guards, and what each does with the third request — this is the whole
+experiment and rows 2 and 3 are one token apart:
+
+| guard | third request | discloses window 0? |
+|---|---|---|
+| none (R1, `c/kernel.c`) | served | **yes** |
+| `start >= -(body_start as i64)` — window-relative (`NOTES.md` §7 M4) | rejected, `−66 < −8` | no |
+| `start >= -((off + body_start) as i64)` — **slice**-relative, i.e. all a bounds check or `get_unchecked`'s `requires i < v@.len()` actually demands | served, `−66 ≥ −72` | **yes** |
+| `start >= 0` — R1h, R2, R3, R4, R5 | rejected | no |
+
+Measured outputs for all four, and the Verus verdicts that go with them, are in
+`NOTES.md` §1c.
 
 ### The C/Rust arity gap, and `driver.call_args`
 

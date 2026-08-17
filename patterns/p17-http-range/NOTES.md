@@ -1,32 +1,62 @@
 # p17 — findings, adversarial behaviour, TCB tally, sticking points
 
 > **Read §0 first.** p17's headline is **not** a performance claim. It is a
-> *negative* result about memory safety, and §1a and §7 are the two measurements
+> *negative* result about memory safety, and §1a, §1c and §7 are the measurements
 > that earn it. §2 and §3 are the cost columns and they are the smaller half.
 
 **The one-line result.** **Safe Rust does not fix this bug. Neither does a proof
 of memory safety.** One missing `start >= 0` produces two harms; safe Rust and
 the trusted accessor's `requires` each eliminate exactly one of them, and the
-one they do not eliminate is the information leak the CVE is famous for.
-Measured, not argued:
+one they do not eliminate is a **legal read of the wrong bytes**. Making the
+index provably in bounds — which is precisely what safe Rust forces on you and
+precisely what `get_unchecked`'s `requires i < v@.len()` demands — discharges
+every memory-safety obligation in the file and leaves the wrong read in place.
+
+**Which wrong bytes you get depends on the guard, and that is the measurement.**
+Four programs, one token apart, all built from `verus.rs` by substituting the
+guard and nothing else. "Verus (MS-only)" is the same file with the functional
+specification stripped, which is `.memory/04-verus.md` item 2b's probe: it asks
+whether the *memory-safety* half discharges on its own.
+
+| guard | Verus | Verus (MS-only) | memory safety | reads a **neighbouring window**? |
+|---|---|---|---|---|
+| none — `if (start < end)`, R1 / `verus_nocheck` | 9 verified, 1 errors, **two** error blocks | **9 verified, 1 errors** — `0 <= base` | **no** | yes on `crosswin`, and on `oob` it reads *before* the blob |
+| `start >= -(body_start as i64)` — **window**-relative, §7 M4 | 9 verified, 1 errors, functional only | **10 verified, 0 errors** | yes | **no** — it serves the attacker its *own* request header |
+| `start >= -((off + body_start) as i64)` — **slice**-relative | 9 verified, 1 errors, functional only | **10 verified, 0 errors** | yes | **YES** — §1c, measured |
+| `start >= 0` — shipped R1h/R2/R3/R4/R5 | **10 verified, 0 errors** | 10 verified, 0 errors | yes | no, and correct |
+
+**Rows 2 and 3 are the whole point.** Identical Verus verdicts in both columns,
+one token apart, opposite security outcomes. Row 2 is what p17 shipped as its
+demonstration and it discloses nothing — its excess bytes are the attacker's own
+`nsuf` word and suffix table. Row 3 is the artefact the headline needs: a program
+with **no `unsafe` outside the one trusted accessor, every obligation
+discharged, no panic and no sanitizer report**, whose output is a function of a
+*different* caller's bytes. Row 1 is the positive control that makes the MS-only
+column mean something: strip the functional spec from the *unguarded* mutant and
+Verus still reports an error, and it is `0 <= base`.
+
+Why row 3 and not row 2 is what a bounds check licenses: p17's driver hands the
+kernel `bytes.as_slice()`, **the whole blob**, so the index a bounds check —
+and `get_unchecked`'s `requires` — actually constrains is the *slice*-relative
+one. The window-relative guard of row 2 is **strictly stronger** than memory
+safety, and §1b used to call it "exactly what a bounds check buys you", which was
+wrong in the direction that flattered the pattern.
+
+The three earlier rows of the old headline, for the record:
 
 | | on `adversarial-oob.bin` (`s > len`) | on `adversarial-leak.bin` (`content_len < s <= len`) |
 |---|---|---|
 | C (R1, shipped) | wrong answer, exit 0; **ASan: 6 bytes *before* a 64-byte region** | wrong answer, exit 0; **ASan silent** |
-| safe Rust, check deleted | **panics**, exit 101 | **prints C's leaked value**, exit 0, no diagnostic |
+| safe Rust, check deleted | **panics**, exit 101 | **prints C's wrong value**, exit 0, no diagnostic |
 | Verus, check deleted | memory-safety obligation fails | — (see §7: Verus quantifies over inputs, not over files) |
-| **Verus, bounds-safe by construction** (`start >= -body_start`) | verifies | **only the functional `ensures` fails** — 9 verified, 1 error |
-
-The last row is the pattern. Making the index provably in bounds — which is
-precisely what safe Rust forces on you, and precisely what the accessor's
-`requires` demands — leaves the leak intact and discharges every memory-safety
-obligation in the file. Only `result == range_fold(..)` rejects it.
 
 Cost, for completeness and because the project's other patterns are about cost:
 **R3 safe-tuned is +32 instructions per call, flat — 0.61% / 0.08%** — the fifth
 pattern in a row where idiomatic safe Rust is free. R2's naive spelling pays
-**4.2500 Ir per folded byte**, which is p16's swept constant *to four decimal
-places* on a completely different kernel, and §3 shows it is the byte fold and
+**4.2500 Ir per folded byte**, which is p16's swept constant **exactly**, on a
+completely different kernel — as are the two rates it is the difference of,
+10.0000 and 5.7500, once the driver's per-input `println!` term is removed
+(§3b) — and §3 shows it is the byte fold and
 **not** the signed arithmetic: the entire signed↔unsigned round trip costs
 **4 instructions per call, flat**.
 
@@ -68,11 +98,22 @@ so, and it did not on any row here.
 |---|---|---|---|---|
 | `adversarial-leak.bin` | **one window**, `n_blob == stride == 64`, `nsuf=3`, suffixes `10, 56, 64`. The third asks for 64 bytes of a 56-byte body: `start = −8`, `abs = 0` | exit 0, **`1395842226496950656`** — a wrong answer, no crash, no diagnostic | exit 0, `13350769809739249920` | **clean, exit 0.** No ASan report, no UBSan report |
 | `adversarial-oob.bin` | the same 64 bytes with **one `u16` changed**: suffixes `10, 56, 70`. `start = −14`, `abs = −6` | exit 0, **`7837465949650580608`** — also a wrong answer, also no crash | exit 0, `13350769809739249920` — *identical to the leak row* | **fires**: `heap-buffer-overflow`, `READ of size 1`, ***"6 bytes before 64-byte region"***, allocated in `slb_head1_u64_bytes`, at `c/kernel.c:81`, exit 1 |
+| `adversarial-crosswin-lo.bin` | **two** windows, `n_blob = 128`, `stride = 64`. Window 0 is the victim (`nsuf=1`, suffix `32`, secret `buf[4..32)` filled `0x00`); window 1 is the attacker (`nsuf=3`, suffixes `10, 56, 122`), and `s = 122` gives `start = −66`, `abs = 6` — **six bytes into the victim's window** | exit 0, **`16140351554550698128`** | exit 0, `15118011540968580209` | **clean, exit 0.** No ASan report, no UBSan report |
+| `adversarial-crosswin-hi.bin` | the same 128 bytes with **only the victim's secret changed** to `0xff` | exit 0, **`16701685314320143948`** — *different from the `-lo` row*, so window 0's bytes reached the output | exit 0, `15118011540968580209` — *identical to the `-lo` row* | **clean, exit 0** |
 | `adversarial-nsuf.bin` | `nsuf = 100` declared in a 34-byte window, so `2 + 2*nsuf > len` | exit 0, `0` | the same, everywhere | clean, exit 0 |
 | `adversarial-stride1.bin` | `stride_w == 1`, below the driver guard; zero kernel calls | exit 0, `0` | the same, everywhere | clean, exit 0 |
 | `small.bin`, `large.bin` | well-formed | exit 0, agree with `model.py` | the same | clean, exit 0 |
 
-Four things in that table are worth reading twice.
+**The crosswin pair is a differential and the two R1 cells are the result.** One
+byte-for-byte identical pair of files except the victim's 28 secret bytes; R1's
+checksum moves and every checked rung's does not. That is *disclosure of another
+window's data*, with ASan silent and no panic — and it is what `inputs/gen.py`
+already predicted in prose ("a backward read from a middle window stays inside
+the allocation, which is a silent wrong answer with no ASan") and treated as a
+hazard to be avoided. It is in fact the genuine leak; §1c builds the memory-safe
+Rust and Verus programs that do the same thing.
+
+Five things in that table are worth reading twice.
 
 **The two adversarial files differ in one `u16`, and every rung that keeps the
 check prints the same checksum on both.** The first two suffix requests are
@@ -115,32 +156,184 @@ deleted and **nothing else changed**, built `-O3 -C debug-assertions=off
 | `large.bin` | `10613012665269285418` | `10613012665269285418` |
 
 **The first row is the project's first measured limit of memory safety.** Safe
-Rust, with no `unsafe` anywhere, reproduces C's leaked value bit for bit, exits
+Rust, with no `unsafe` anywhere, reproduces C's wrong value bit for bit, exits
 0, and says nothing. The bounds check is present and *passes*, because index 0 is
-a perfectly good index into a 64-byte slice. The second row is the usual win, and
+a perfectly good index into a 64-byte slice. (What those extra bytes *are* is
+§1b: on this one-window input they are the attacker's own header. Add a second
+window and the same omission reads the neighbour — §1c.) The second row is the
+usual win, and
 the mechanism is visible in the panic message: `(base + j) as usize` on
 `base = −6` is `18446744073709551610`, which is what a bounds check is for.
 
 Both rows are the same one-conjunct omission. One language feature catches one of
 them.
 
-### 1b. And the version that *is* bounds-safe still leaks
+### 1b. And the version that *is* bounds-safe still serves the wrong bytes
 
 The obvious "fix" for someone reasoning about memory rather than about the
 protocol is to guard the **absolute index** instead of the logical start —
 `start >= -(body_start as i64)`, i.e. "clamp the read to the front of the
-buffer". That is exactly what a bounds check buys you, and it is what safe Rust
-forces you towards. `.temp/p17/mut/patterns/p17-http-range/safe_naive_absguard.rs`:
+window". `.temp/p17/mut/patterns/p17-http-range/safe_naive_absguard.rs`:
 
 | input | result |
 |---|---|
-| `adversarial-leak.bin` | exit 0, **`1395842226496950656`** — C's leaked value again |
+| `adversarial-leak.bin` | exit 0, **`1395842226496950656`** — C's wrong value again |
 | `adversarial-oob.bin` | exit 0, `13350769809739249920` — **correct** |
+| `adversarial-crosswin-{lo,hi}.bin` | exit 0, `15118011540968580209` on **both** — no cross-window disclosure |
 | `small.bin` / `large.bin` | correct |
 
 Memory-safe on every input, correct on the OOB input, and it still serves the
 suffix table to the attacker. §7's M4 is the same mutation in Verus, and it
 verifies every memory-safety obligation in the file.
+
+**This paragraph used to say that guarding the window-relative index is "exactly
+what a bounds check buys you". That was wrong, and wrong in the direction that
+flattered the pattern** (TASK_011_REVIEW, blocker 1b). It is *strictly stronger*
+than a bounds check. The driver hands the kernel `bytes.as_slice()` — the whole
+blob, `safe_naive.rs:71`, `verus.rs:367` — so what a bounds check, and what
+`get_unchecked`'s `requires i < v@.len()`, actually demand is that the
+**slice**-relative index be in range, not the window-relative one. Guard exactly
+that and the program still verifies and does something worse. §1c.
+
+Two consequences of the same correction, both of which cost this pattern its
+first headline:
+
+- what §1b and §7 M4 disclose on a **one-window** input is `[0, body_start)` of
+  the attacker's *own* window — its `nsuf` word and its own suffix table, eight
+  bytes it wrote itself. "Leak" was the wrong word for it; **memory-safe and
+  functionally wrong** is the right one, and §5's second table already said so
+  one paragraph below the claim it contradicted;
+- the maximum disclosure in that regime is `2 + 2*nsuf` attacker-written bytes
+  and no input can change that, because the caller is entitled to every body byte
+  (it can ask `s = content_len`) so the excess over entitlement is always a
+  suffix of the header. It is structural, not an accident of the chosen input.
+
+### 1c. The artefact: memory-safe, verified, and it reads a *neighbouring window*
+
+**This is the claim `.memory/01-ladder.md` finding 5 needs and the one p17
+originally shipped without.** One token, on the shipped `verus.rs`:
+
+```rust
+-        if start < end && start >= 0 {
++        if start < end && start >= -((off + body_start) as i64) {
+```
+
+`adversarial-crosswin-lo.bin` / `-hi.bin` are the pair that reads it out: two
+64-byte windows, identical in every byte except window 0's 28 secret bytes
+(`0x00` vs `0xff`), and window 1's third suffix `s = 122` puts the read at
+absolute index 6 — inside the victim. `spec.md` has the layout and the reason
+this input is exempt from the one-window rule.
+
+Every binary below was built from the shipped sources, `-O3
+-C debug-assertions=off --cfg slb_isolated`, Verus through `./verus_run.py`:
+
+| binary | `crosswin-lo` | `crosswin-hi` | reads window 0? |
+|---|---|---|---|
+| `c-gcc` (R1) | `16140351554550698128` | `16701685314320143948` | **yes** |
+| `safe_naive` (R2, shipped) | `15118011540968580209` | same | no |
+| `safe_naive_absguard` (window-relative) | `15118011540968580209` | same | no |
+| **`safe_naive_sliceguard`** (slice-relative, **zero `unsafe`**) | `16140351554550698128` | `16701685314320143948` | **yes** |
+| `verus` (R5 shipped, 10 verified / 0 errors) | `15118011540968580209` | same | no |
+| `verus_msonly` (shipped guard, spec stripped, 10/0) | `15118011540968580209` | same | no |
+| `verus_absguard_msonly` (window-relative, 10/0) | `15118011540968580209` | same | no |
+| **`verus_sliceguard_msonly`** (slice-relative, **10 verified, 0 errors**) | `16140351554550698128` | `16701685314320143948` | **yes** |
+
+All exit 0. No panic, no sanitizer report (`gcc -O1
+-fsanitize=address,undefined -static-libasan -static-libubsan` on R1 prints
+**nothing** on either file and exits 0 on both, while printing the two different
+checksums). Three rows of that table are the argument:
+
+1. **`verus_sliceguard_msonly` is a program every one of whose obligations Verus
+   discharges — `10 verified, 0 errors` — and whose output is a function of bytes
+   another caller owns.** That is a provably memory-safe program that leaks. Be
+   exact about the two edits it carries and why each is there: the **guard** is
+   the one token, and it is what makes it read the neighbour; the **functional
+   specification is stripped**, and that is not a second bug but the *probe* —
+   it is how you ask Verus whether the memory-safety half stands on its own, and
+   `verus_msonly` (row 6, same strip, shipped guard, no disclosure) and
+   `nocheck_msonly` (still fails, on `0 <= base`) are its two controls. With the
+   functional specification left in, the same one-token file is `9 verified,
+   1 errors` and the single error is the functional invariant — i.e. Verus's
+   objection to it is that it computes the wrong number, never that it reads the
+   wrong memory.
+2. **`verus_msonly` is the control that says the *guard* did it, not the spec
+   stripping.** Same deletion of the functional specification, shipped guard, no
+   disclosure.
+3. **`safe_naive_sliceguard` is the control that says the *trusted accessor* did
+   not do it.** Zero `unsafe`, plain safe Rust, indexing `buf[...]` with a bounds
+   check on every access — same disclosure. Rust's bounds check permits it for
+   exactly the reason Verus's `requires` does: the index it constrains is the
+   slice's, and the slice is the whole blob.
+
+Verus verdicts, my own runs, on mutants generated from `verus.rs` by exact-string
+substitution (`--multiple-errors 20` changes nothing anywhere):
+
+| mutant | shipped spec | functional spec stripped |
+|---|---|---|
+| `verus.rs` | **10 verified, 0 errors** | 10 verified, 0 errors |
+| window-relative (`§7` M4) | 9 verified, 1 errors — `range_walk` invariant :311 | **10 verified, 0 errors** |
+| **slice-relative** | 9 verified, 1 errors — `range_walk` invariant :311 | **10 verified, 0 errors** |
+| guard deleted (`§7` M3) | 9 verified, 1 errors, **two** blocks: :311 **and** `0 <= base` :342, plus `note: while loop: not all errors may have been reported` | 9 verified, 1 errors — **`0 <= base`**, i.e. a memory-safety obligation |
+
+The last row is the positive control `.memory/04-verus.md` item 2b asks for: with
+the functional specification stripped, the probe can still see a memory-safety
+failure, so `10 verified, 0 errors` on the slice-relative mutant is a real
+positive and not an artefact of having deleted the specs.
+
+#### Reproducing it — and why the control is not a file in this directory
+
+`verus_leak.rs` is **not** shipped in `patterns/p17-http-range/`, and that is a
+harness constraint rather than a choice:
+
+- `.memory/05-layout.md`: *"Rung file stems are fixed … Do not invent variants;
+  add an axis to `harness/build.py` instead."* `harness/build.py`'s
+  `CONTROL_CELLS` / `RUST_SRC` / `ALL_CELLS` are closed lists used as argparse
+  `choices`, so a new control cell is a harness change;
+- `harness/check.py:1446` requires every `.rs` in the pattern directory that
+  opens a `verus!` block to be pinned in `spec.md`'s `verus.obligations`, and
+  `harness/check.py:1549` fails the gate for any pinned file Verus reports errors
+  on. The mutant as such is `9 verified, 1 errors`, so pinning it turns the gate
+  **red**;
+- the only 0-error form with the guard swapped and nothing else touched is the
+  spec-stripped one, whose kernel `ensures` is `r == r` — which stage 5c
+  (clause deletion) fails by design, because that is exactly §7's M2.
+
+So it lives where §1a's and §7's other mutants live: generated into `.temp/`.
+The generation is an exact-string substitution with a hit-count assertion, so it
+cannot silently drift from `verus.rs`:
+
+```sh
+mkdir -p .temp/p17b/mirror/common .temp/p17b/mirror/patterns/p17-http-range
+cp common/driver.rs .temp/p17b/mirror/common/
+python3 - <<'PY'
+src = "patterns/p17-http-range/verus.rs"
+out = ".temp/p17b/mirror/patterns/p17-http-range/verus_leak.rs"
+t = open(src).read()
+old = "if start < end && start >= 0 {"
+new = "if start < end && start >= -((off + body_start) as i64) {"
+assert t.count(old) == 1
+open(out, "w").write(t.replace(old, new))
+PY
+./verus_run.py .temp/p17b/mirror/patterns/p17-http-range/verus_leak.rs
+#   -> 9 verified, 1 errors   (only the range_walk invariant, verus_leak.rs:311)
+```
+
+`.temp/p17b/mkvariants.py` does that plus the spec-stripped and safe-Rust
+variants; `.temp/p17b/demo.sh` builds them and prints the table above.
+
+**If the disclosure claim is ever to be gate-certified rather than reproduced by
+hand, the way to do it is not to relax any of the three rules above.** It is to
+ship the mutant with its *specification* moved to match its guard — replace
+`start >= 0` with `start >= -(off + body_start)` in `range_walk` as well as in
+the exec code — which verifies `10 verified, 0 errors` **with** a load-bearing
+functional postcondition, and to pin it in `spec.md` as a second obligations
+entry with its own twin, its own `SLB-TRUSTED-ARGUMENT` block and its own
+`driver.regions` entry. That is a different and arguably sharper artefact — *a
+program proved to meet its specification, whose specification is the bug* — and
+it costs a full second Verus file in stages 5a/5c/5c-req/5c-twin on every gate
+run. It was not done here because TASK_012 is scoped to one control, one input
+and one table, and because it is a design decision rather than an engineering
+one.
 
 ## 2. Performance
 
@@ -166,9 +359,9 @@ differ mod 4, 8 and 16 — `inputs/gen.py` asserts it before writing a byte.
 Read per unit of the thing each rung is doing — and the units are *measured*,
 not fitted, from a 34-point sweep (§3b) rather than from these two points:
 
-- **R3 costs zero per byte.** Its marginal rate is **5.7491 Ir per folded byte**
-  and R4's is **5.7491** — equal to four decimal places over 34 consecutive
-  served lengths (§3b). Its whole cost is O(1) in the bytes: **+32 per call** on
+- **R3 costs zero per byte.** Its marginal rate is **5.7500 Ir per folded byte**
+  and R4's is **5.7500** — equal, exactly, over 34 consecutive served lengths
+  (§3b). Its whole cost is O(1) in the bytes: **+32 per call** on
   the shipped inputs, which serve three ranges, and **+16 (served length ≡ 0 mod
   4) or +18** on the sweep's one-range windows. Those two points interpolate to
   roughly *9–10 per call plus 7–8 per range request* — an interpolation from two
@@ -177,9 +370,10 @@ not fitted, from a 34-point sweep (§3b) rather than from these two points:
   is the **fifth pattern in a row** where idiomatic safe Rust is free
   (`.memory/01-ladder.md` findings 3 and 9).
 - **R2 is O(bytes served):** **10.0000** Ir per folded byte against R3/R4's
-  5.7491, i.e. **+4.2500 per byte**. `.memory/01-ladder.md` records p16's swept
-  value as exactly 4.2500 on a completely different kernel; p17 reproduces it to
-  four decimal places. That is a strong sign the constant is a property of
+  **5.7500**, i.e. **+4.2500 per byte**. `.memory/01-ladder.md` records p16's
+  swept value as exactly 4.2500 on a completely different kernel, and p16's own
+  10.00 / 5.75 pair; p17 reproduces **all three exactly**, not to four decimals
+  with an offset (§3b). That is a strong sign the constant is a property of
   *rustc's checked indexed byte fold*, not of either pattern.
 - **R5 is free**, as on every pattern: byte-identical to R4 at `-O3`
   (`md5_fn 45064db24a5b` both, `md5_raw` equal, padding 9/9 B), `norel` at `O0`
@@ -270,14 +464,40 @@ gap.** The mechanism is p16's and is not mysterious: the fold is
 and the extra bounds-check instructions issue into slots that were idle anyway.
 
 *Frequency caveat, and it is why no cycles/byte figure is quoted as a
-measurement.* This box's governor is `powersave` and `scaling_cur_freq` on CPU 3
-was observed ramping 800 MHz → 902 MHz across a single 77 ms run, against a
-`cpuinfo_max_freq` of 3.9 GHz, so the effective clock during the measured window
-cannot be pinned down here. At 3.9 GHz the figures above are **≤ 3.09
-cycles/byte**, i.e. an upper bound; p16 measured 3.027–3.055 cycles/byte for the
-same Horner shape on a different kernel by the same differencing method, which is
-consistent, but p17 does not independently establish the cycle figure and does
-not claim it.
+measurement.* **The reason first given here was wrong** — it read
+`scaling_cur_freq` "ramping 800 MHz → 902 MHz" as evidence about the clock, and
+that file is unusable on this box: it reports **800 MHz while a pinned core is
+demonstrably retiring ~2.8 G dependent `addq`s per second**, measured twice
+(TASK_011_REVIEW: `800000` for a six-second sample; TASK_012: five consecutive
+samples, all `800000`±20, taken while the probe below was running on that core).
+`.memory/00-environment.md` carries the durable form: never derive a clock from
+that file; time a 1-cycle-latency dependent chain instead.
+
+**The conclusion survives the correction, for a better reason.** The dependent-add
+probe, same source and same pinning, does not give the same answer in different
+sessions:
+
+| session | CPU 3 | CPU 5 |
+|---|---|---|
+| TASK_011_REVIEW | 3801–3888 MHz | 3771–3874 MHz |
+| TASK_012 | 2764–2861 MHz | 2551–2719 MHz |
+
+That spread is not noise, it is the part number: a Xeon Gold 6230 is 2.1 GHz
+base, **3.9 GHz single-core turbo and ~2.8 GHz all-core**, and this is a *shared,
+containerised* box, so the clock during any measurement is set by what other
+tenants are doing. 0.784–0.791 ns per folded byte is therefore **2.2 cycles/byte
+at the all-core clock and 3.1 at the one-core clock** — an interval a third of
+its own width, not a figure. p17 does not claim a cycles/byte measurement, and a
+quotation of 3.02–3.05 (p16's interval) would be a *new* overclaim of exactly the
+species this file has just had to correct: a number lifted from a clock that was
+measured in a different session from the wall time it divides.
+
+**What would earn it** is measuring the clock in the same session as, or
+interleaved with, the wall-clock reps — the probe is `.temp/review011/clock.c`
+and it costs 300 ms. That was not done here, and until it is the wall table
+above should be read as it is written: as *ratios between rungs*, which the
+30-interleaved-rep / min protocol makes robust to a clock that moves, and not as
+absolute times.
 
 So the honest headline for the cost half is **two sentences**: *safe-naive Rust
 pays a real 4.25 Ir per byte on an indexed byte fold LLVM cannot hoist — and on
@@ -416,13 +636,36 @@ points. R3 and R4 are not, and their residual is the same 8.97/7.48 sawtooth,
 because both use LLVM's 4×-unrolled fold with a scalar epilogue. Differencing at
 **lag 4** (same length mod 4) removes it and gives the true rates:
 
-| rung | Ir per folded byte (lag-4, mean of 30) |
-|---|---:|
-| R2 safe_naive | **9.9991** |
-| R3 safe_tuned | **5.7491** |
-| R4 unsafe | **5.7491** |
-| v4 i128 | 13.9991 |
-| v5 unsigned | 9.9991 |
+| rung | Ir per folded byte (lag-4, **zero-residue pair** sw228 → sw232) | (lag-4, mean of 30 — **contaminated**, see below) |
+|---|---:|---:|
+| R2 safe_naive | **10.0000** | 9.9991 |
+| R3 safe_tuned | **5.7500** | 5.7491 |
+| R4 unsafe | **5.7500** | 5.7491 |
+| R5 verus | **5.7500** | — |
+| v4 i128 | **14.0000** | 13.9991 |
+| v5 unsigned | **10.0000** | 9.9991 |
+
+**The right-hand column was published first and it is 0.0009 low for a reason
+that has nothing to do with the kernel** (TASK_011_REVIEW, minor 3; re-measured
+independently at TASK_012 with `.temp/p17b/lag4.py` — four rungs × three lag-4
+pairs, plus v4 and v5 at the zero-residue pair, all fresh callgrind runs, so
+**every cell in the left-hand column is measured and none is derived from the
+differences**). Marginal `Ir` per call carries a **fractional** part that depends
+on the *input*, identical across every Rust binary, and it is the cost of
+`println!`-formatting a final `acc` with a different number of decimal digits.
+It cancels in a same-input difference and biases a cross-input *rate*:
+
+| lag-4 pair | fractional residue | R2 | R3 | R4 | R5 |
+|---|---|---:|---:|---:|---:|
+| sw200 → sw204 | 0.70 / 0.41 | 10.1775 | 5.9275 | 5.9275 | 5.9275 |
+| sw201 → sw205 | 0.30 / 0.11 | 9.9525 | 5.7025 | 5.7025 | 5.7025 |
+| **sw228 → sw232** | **0.00 / 0.00** | **10.0000** | **5.7500** | **5.7500** | **5.7500** |
+
+So the honest statement is *stronger* than the published one: at the pair where
+the driver term is exactly zero on both sides, p17 reproduces **p16's constants
+exactly** — 10.00 for the checked indexed fold, 5.75 for the unchecked one, and
+4.2500 for the difference — rather than to four decimals with an offset. Quote
+differences, or the zero-residue pair; never a mean of contaminated rates.
 
 and the differences, which are exact because both sides see the same residue:
 
@@ -534,11 +777,21 @@ any accessor that rejects it, because the access it makes is legal — that is w
 bounds property, *says which bytes* the result is a fold of.
 
 **Demonstrated, not asserted, in §7 M4:** replace `start >= 0` with
-`start >= -(body_start as i64)` — guard the absolute index instead of the logical
-start, which is exactly what a bounds check gives you — and Verus reports
-**9 verified, 1 error**, the one error being the functional loop invariant.
-Every `get_unchecked` precondition discharges. Every memory-safety obligation in
-the file is met, and the program serves the attacker its own metadata.
+`start >= -(body_start as i64)` — guard the window-relative index instead of the
+logical start — and Verus reports **9 verified, 1 error**, the one error being
+the functional loop invariant. Every `get_unchecked` precondition discharges.
+Every memory-safety obligation in the file is met, and the program serves the
+attacker its own metadata. Strip the functional specification from that mutant
+and it is `10 verified, 0 errors`: the memory-safety half discharges on its own.
+
+**And the version that is memory-safe by exactly the standard a bounds check
+sets — no more — reads *another caller's* bytes.** `start >= -(off + body_start)`
+is what `requires i < v@.len()` actually demands of a kernel handed the whole
+blob; it also verifies `10 verified, 0 errors` with the functional specification
+stripped, and on `adversarial-crosswin-{lo,hi}.bin` its output moves with the
+victim window's secret. §1c has the numbers. So the row of the table below is not
+"the functional `ensures` is the only thing that rejects the harm" as a nicety:
+it is the only thing standing between this program and a cross-tenant read.
 
 So p16 and p17 bracket the question this project has been asserting since
 finding 2:
@@ -552,14 +805,19 @@ finding 2:
 Three consequences worth stating plainly.
 
 1. **"Verified memory-safe" is a strictly weaker statement than "verified
-   correct", and p17 puts a program between them.** Not a hypothetical program: a
-   one-conjunct edit of the shipped one, which verifies every safety obligation
-   and leaks. The distinction has been in `.memory/` since finding 2 with no
-   measurement behind it; this is the measurement.
+   correct", and p17 puts a program between them.** Not a hypothetical program:
+   a one-token edit of the shipped one, which discharges every safety obligation
+   (`10 verified, 0 errors` with the functional spec stripped) and whose checksum
+   is a function of a neighbouring window's bytes (§1c). The distinction has been
+   in `.memory/` since finding 2 with no measurement behind it; this is the
+   measurement.
 2. **The same gap exists in the language, not just in the verifier.** §1a: safe
-   Rust with the same conjunct deleted prints C's leaked value on the leak input
-   and panics on the OOB input. Rust's bounds check and Verus's accessor
-   precondition are the *same* property, and they draw the *same* line.
+   Rust with the same conjunct deleted prints C's wrong value on the leak input
+   and panics on the OOB input; §1c: safe Rust with the *slice*-relative guard,
+   zero `unsafe`, a bounds check on every access, discloses the neighbour. Rust's
+   bounds check and Verus's accessor precondition are the *same* property, and
+   they draw the *same* line — and that line is the **slice**, which on this
+   pattern is the whole blob.
 3. **What is machine-judged and what is a human reading.** Of p17's trusted
    clauses:
 
@@ -567,7 +825,7 @@ Three consequences worth stating plainly.
    |---|---|---|
    | `get_unchecked` `requires i < v@.len()` | 5a (mentions every parameter its body uses), 5c-req (not a tautology), 5c-twin (strong enough to license `v[i]`) | 5c-twin is the only one that judges *strength*. And on p17 even a perfect judgement of it certifies only the *third* row of §5's first table. |
    | `get_unchecked` `ensures r == v@[i as int]` | 5c (deleting it must break the file — measured, 7 verified / 3 errors), identity, Miri | **Completeness** of this `ensures` w.r.t. the body's operations is judged by **no oracle at all** — §6 (b). |
-   | `kernel` `ensures r == range_fold(..)` | 5c (deleting it must break the file — measured, 9 verified / 1 error), and `model.py` re-deriving it on 280 sampled calls across all 6 inputs | **This is the clause the pattern's security rests on**, which is new: on p01, p02 and p16 the kernel `ensures` was the value and the accessor's `requires` was the security. |
+   | `kernel` `ensures r == range_fold(..)` | 5c (deleting it must break the file — measured, 9 verified / 1 error), and `model.py` re-deriving it on the gate's sampled calls across every input | **This is the clause the pattern's security rests on**, which is new: on p01, p02 and p16 the kernel `ensures` was the value and the accessor's `requires` was the security. |
 
 ## 6. Trusted items — the arguments no oracle can make
 
@@ -596,13 +854,29 @@ and both are tests rather than proofs (`.memory/02-bench-rules.md`, measured at
 TASK_010): stage 3c identity catches the case where the extra read is added to
 `verus.rs` alone, because R5's machine code then differs from R4's and the pin
 here is `exact`; and step 8 Miri catches the case where the same read is added to
-`unsafe.rs` too, but **only on inputs that actually reach the boundary**. Note a
-p17-specific weakness in that second backstop: R4 keeps the `start >= 0`
-conjunct, so R4's own reads never come within a byte of either end of the blob on
-any shipped input — the boundary is reached by *R1*, which Miri never opens — so
-Miri's coverage here is thinner than it was on p16, where the shipped
-`adversarial-overrun` window ended three bytes from the end of the blob. Read the
-body, every time.
+`unsafe.rs` too, but **only on inputs that actually reach the boundary**. On p17
+they do. Measured (`.temp/p17b/readspan.py` — every window the driver selects,
+every byte the *checked* kernel folds plus the header bytes it reads):
+
+| input | `n_blob` | min read idx | max read idx | last valid |
+|---|---:|---:|---:|---:|
+| `small` | 16192 | **0** | **16191** | 16191 |
+| `large` | 8390650 | **0** | **8390649** | 8390649 |
+| `adversarial-leak` | 64 | **0** | **63** | 63 |
+| `adversarial-oob` | 64 | **0** | **63** | 63 |
+| `adversarial-crosswin-lo`/`-hi` | 128 | **0** | **127** | 127 |
+
+R4's own reads touch *both* ends of the blob exactly on **every input that serves
+a range at all** (`adversarial-nsuf` reads indices 0–1 and rejects;
+`adversarial-stride1` makes no call — both by design), so p17's boundary coverage
+is **better** than p16's, whose shipped window ended three bytes short — the
+opposite of what this paragraph claimed before
+TASK_012 (TASK_011_REVIEW, minor 2). One real caveat remains and it is about the
+clamp, not about the inputs: `check.py` rewrites `n_iters` to 4 for Miri, and at
+four iterations `large.bin` reaches index 0 but only 6 319 591 of 8 390 649, so
+the *far* boundary on `large` is covered by the gate's own runs and not by Miri's.
+Every other input covers both ends at four iterations too. Read the body, every
+time.
 
 **And there is a p17-specific limit on what this item can be asked to do, which
 is the whole pattern.** `i < v@.len()` is a *memory-safety* precondition and p17
@@ -677,12 +951,14 @@ one hides.
 item is identical under `--cfg slb_twin`, and the token scan enforces that
 nothing in this file varies with that cfg except the twin itself.
 
-## 7. Mutation testing — I broke my own proof, twice on purpose and twice to measure
+## 7. Mutation testing — I broke my own proof, twice on purpose and three times to measure
 
 `.memory/05-layout.md` step 5: *a pattern whose `spec.md` pins are copied without
 being re-derived is a pattern whose gate certifies the pattern it was copied
-from.* Four mutants, built as full repo-layout mirrors under `.temp/p17/mut/`
-and never in `patterns/`.
+from.* Five mutants, built as full repo-layout mirrors under `.temp/p17/mut/`
+(M1–M4) and `.temp/p17b/mirror/` (M3–M5, regenerated at TASK_012 from the
+shipped `verus.rs` by an exact-string substitution that asserts its own hit
+count), and never in `patterns/` — §1c has the reason that is not a choice.
 
 ### M1 — the trusted accessor's `requires` weakened by one character
 
@@ -752,9 +1028,10 @@ impossible — which is M4.
 
 ### M4 — the mutation the prediction was actually about: bounds-safe and still wrong
 
-`start >= 0` → **`start >= -(body_start as i64)`**. Guard the *absolute* index
-instead of the logical start — "clamp the read to the front of the buffer",
-which is what a bounds check buys you and what safe Rust pushes you towards.
+`start >= 0` → **`start >= -(body_start as i64)`**. Guard the *window*-relative
+index instead of the logical start — "clamp the read to the front of the
+window". **This is *stronger* than a bounds check, not equal to one**; the
+version that is exactly as strong as a bounds check is M5 below, and it is worse.
 `.temp/p17/mut/patterns/p17-http-range/verus_absguard.rs`:
 
 ```
@@ -770,11 +1047,45 @@ verification results:: 9 verified, 1 errors
 `get_unchecked` precondition is proved. The trusted accessor is satisfied at
 every one of the four call sites. And the program serves the attacker the
 window's own suffix table — §1b runs the same mutation as plain safe Rust and it
-prints C's leaked value.
+prints C's wrong value.
 
 *That* is the measurement TASK_011 asked for, arrived at by a different route
 than the one it prescribed: **a proof of memory safety is not a proof of the
 security property, and here is a program that has the first and not the second.**
+
+What M4 does **not** establish, and was published as if it did, is *disclosure*:
+what this mutant reads beyond its entitlement is `[0, body_start)` of the
+attacker's own window. See §1b.
+
+### M5 — exactly as strong as a bounds check, and it reads the neighbour
+
+`start >= 0` → **`start >= -((off + body_start) as i64)`**. The driver hands the
+kernel the whole blob, so this — *the slice-relative index is in range* — is
+precisely and only what `get_unchecked`'s `requires i < v@.len()`, and what safe
+Rust's bounds check, demand.
+
+```
+error: invariant not satisfied at end of loop body
+   --> .../verus_sliceguard.rs:311:13
+    |
+311 | /             range_walk(buf@, off as int, len as int, i as int, acc, nserved) == range_walk(
+    | |_____________^
+verification results:: 9 verified, 1 errors
+```
+
+Identical to M4's verdict — one error, the functional one, `--multiple-errors 20`
+unchanged — and with the functional specification stripped, **`10 verified, 0
+errors`**, as M4 also gives. The two mutants are indistinguishable to Verus and
+differ by one token; on `adversarial-crosswin-{lo,hi}.bin` M4 prints the same
+checksum on both files and M5 prints two different ones. §1c is the table, the
+positive control (`nocheck` with the spec stripped still fails, on `0 <= base`)
+and the reproduction command.
+
+**M5 is the mutant that earns the sentence M4 was published under.** It is a
+program whose every Verus obligation about memory discharges, which contains no
+`unsafe` outside the one trusted accessor — the safe-Rust twin of it contains
+none at all — and whose output is a function of bytes belonging to a different
+caller's window.
 
 ## 8. Is the verified twin still idle? Yes.
 

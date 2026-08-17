@@ -210,6 +210,27 @@ mentions. Budget for them up front; each has cost an engineer a surprise.
    make in `model.py`'s docstring (step 2) — nothing checks that
    `work_per_call` is denominated in the unit `work_unit_bits` names.
 
+11. **A Verus control that does not verify cleanly cannot live in a pattern dir
+   at all** — measured at TASK_012, and it is a consequence of two existing rules
+   meeting. `check.py:1446` requires *every* `.rs` in the pattern dir containing a
+   `verus!` block to be pinned in `verus.obligations`, and `:1549` fails the gate
+   for any pinned file reporting `n_err > 0`. `build.py`'s `--cell` list is closed
+   `choices`, so the file cannot be built either. So a **deliberately broken**
+   proof — the most valuable kind of control, the one that shows what an obligation
+   is load-bearing *for* — has nowhere to live.
+
+   Ship it as a `.temp/` artefact with (a) a **committed generator** that derives
+   it from the shipped `verus.rs` by exact-string substitution and asserts its own
+   hit count, so it cannot drift, and (b) a `NOTES.md` section carrying the diff,
+   the commands and the measured output. p17 §1c is the model.
+
+   The alternative — move the *specification* to match the mutant so it verifies
+   `10 verified, 0 errors` with a load-bearing postcondition, giving "a program
+   proved to meet its specification, whose specification is the bug" — is a
+   genuinely better artefact, but it costs a second pinned Verus file with its own
+   twin, `SLB-TRUSTED-ARGUMENT` block and `driver.regions` entry, on every gate
+   run. Recorded as an open option, not taken.
+
 Stage list, so a failure name maps to a function: `selftests`, `build`,
 `checksums`, `no_collapse`, `marginal_ir`, `identity`, `adversarial`,
 `verus_contract`, `call_site`, `clause_deletion`, `requires_strength`,

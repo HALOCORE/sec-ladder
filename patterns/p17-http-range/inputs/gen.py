@@ -28,7 +28,10 @@ regimes the read lands in:
     s > len                   BEFORE the allocation -- the OOB, which ASan sees
                               and safe Rust panics on
 
-Six inputs, and the two adversarial ones in the middle are the pattern.
+Eight inputs; the adversarial ones in the middle are the pattern. `leak`/`oob`
+are the one-`u16` pair that chooses between the two harms, and
+`crosswin-lo`/`crosswin-hi` are the two-window pair that shows what the in-bounds
+harm reads when there *is* a neighbour to read.
 
 Four things about the sizes are deliberate and must survive any edit.
 
@@ -56,6 +59,10 @@ Four things about the sizes are deliberate and must survive any edit.
     allocation, which is a silent wrong answer with no ASan and a gate that
     passes by luck. With `nwin == 1`, `k` is always 0 and `off` is always 0, so
     a negative `abs` is a negative *absolute* index, deterministically.
+    `adversarial-crosswin-{lo,hi}` is the **deliberate exception** and the
+    paragraph above is exactly why it is built as a *pair*: see
+    `crosswin()` below and `../spec.md`, "Why `adversarial-crosswin` is two
+    windows and a pair".
   * **`adversarial-leak` and `adversarial-oob` differ in exactly one `u16`.**
     Same 64-byte window, same first two suffixes, same body bytes; the third
     suffix is 64 in one file and 70 in the other. That is the whole experiment:
@@ -198,6 +205,67 @@ ADV_BODY = ADV_LEN - (2 + 2 * ADV_NSUF)      # 56 == content_len
 ADV_LEAK_SUFFIXES = (10, 56, 64)
 ADV_OOB_SUFFIXES = (10, 56, 70)
 
+# ---- adversarial-crosswin: the read that reaches into ANOTHER window --------
+#
+# Two 64-byte windows in one blob. Everything above about `nwin == 1` still
+# holds for `leak`/`oob`; this input breaks that rule ON PURPOSE, and the way it
+# stays a *demonstration* rather than a coin flip is that it is generated as a
+# PAIR that differs in nothing but the victim's secret bytes. The claim is
+# differential -- "change the victim's bytes and the output changes, with no
+# panic and no sanitizer report" -- and that claim is independent of which
+# window `k` happens to select on any given iteration.
+#
+#   window 0, off = 0    THE VICTIM
+#       nsuf = 1, suffix (32) -> body_start = 4, content_len = 60
+#       serves buf[32..64) and nothing else, so bytes buf[4..32) -- the SECRET
+#       -- are read by NO rung that keeps `start >= 0`, and by no rung at all
+#       that guards the WINDOW-relative index either.
+#
+#       It has to serve *something*. A window that serves nothing returns 0,
+#       `acc` never leaves 0, and `k = (acc * nwin) >> 64` is then pinned at 0
+#       for ever: the driver's multiply-shift has an absorbing state at
+#       `acc == 0` and window 1 would never be visited. 32 bytes is enough for
+#       window 0's result to be a full-width pseudo-random u64 on the first
+#       call.
+#
+#   window 1, off = 64   THE ATTACKER
+#       nsuf = 3, suffixes (10, 56, 122) -> body_start = 8, content_len = 56
+#       s = 122 gives start = 56 - 122 = -66 and an ABSOLUTE index of
+#       off + len - s = 128 - 122 = 6, i.e. six bytes into the *victim's*
+#       window. The read is [6, 128): in bounds of the blob, so ASan is silent
+#       and safe Rust does not panic, and it covers 26 of the 28 secret bytes.
+#
+# What each guard does with that third request:
+#
+#   none        (R1, c/kernel.c)                   serves it   -> DISCLOSES
+#   start >= -(body_start)        (window-relative, NOTES 7 M4)  rejects (-66 < -8)
+#   start >= -((off + body_start))(slice-relative)  serves it   -> DISCLOSES
+#   start >= 0                    (R1h, R2..R5)     rejects
+#
+# and the middle two are the point: same Verus verdict, opposite outcome.
+CW_LEN = 64
+CW_PUB = 32                                   # window 0's public tail
+CW_VICTIM_SUFFIXES = (32,)
+CW_ATTACK_SUFFIXES = (10, 56, 122)
+CW_SECRETS = (("lo", 0x00), ("hi", 0xFF))     # the only difference in the pair
+
+
+def crosswin(secret_byte):
+    """The two-window blob, parameterised by the victim's secret fill byte.
+
+    Deterministic and rng-free: the pair must differ in the secret bytes and in
+    NOTHING else, and drawing either window from the shared rng would make the
+    two files differ in whatever the rng happened to be doing."""
+    v = bytearray()
+    v += head(len(CW_VICTIM_SUFFIXES), CW_VICTIM_SUFFIXES)          # 4 bytes
+    v += bytes([secret_byte]) * (CW_LEN - 4 - CW_PUB)               # SECRET
+    v += bytes((0x11 * (i % 15)) % 251 for i in range(CW_PUB))      # public
+    assert len(v) == CW_LEN, len(v)
+    v += head(len(CW_ATTACK_SUFFIXES), CW_ATTACK_SUFFIXES)          # 8 bytes
+    v += bytes(0x40 + (i % 64) for i in range(CW_LEN - 8))
+    assert len(v) == 2 * CW_LEN, len(v)
+    return bytes(v)
+
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
@@ -256,6 +324,22 @@ def main():
     #     return 0 on every call and print 0. It is the control for (1) and (2):
     #     the same "the header lied" shape with the suffix *values* innocent.
     write("adversarial-nsuf.bin", 8, 34, tiled(rng, 16, 100, (7, 9), 28))
+
+    # (3b) THE CROSS-WINDOW READ. Two windows, generated as a pair whose only
+    #      difference is window 0's secret fill byte. Every rung that keeps
+    #      `start >= 0` -- and every rung that guards the WINDOW-relative index
+    #      -- prints the same checksum on both files; a rung that guards the
+    #      SLICE-relative index, which is all a bounds check or a
+    #      `get_unchecked` precondition actually demands, prints two different
+    #      ones. Both files are in bounds throughout, so ASan must stay silent
+    #      on both, exactly as on `adversarial-leak`.
+    for tag, byte in CW_SECRETS:
+        blob = crosswin(byte)
+        assert len(blob) == 2 * CW_LEN
+        write(f"adversarial-crosswin-{tag}.bin", 8, CW_LEN, blob)
+    a, b = (crosswin(x) for _, x in CW_SECRETS)
+    assert a[:4] == b[:4] and a[CW_LEN - CW_PUB:] == b[CW_LEN - CW_PUB:], \
+        "the crosswin pair must differ ONLY in window 0's secret bytes"
 
     # (4) stride 1: a window that cannot even hold `nsuf`. The driver guard
     #     `stride_w >= 2` skips the loop entirely rather than entering and

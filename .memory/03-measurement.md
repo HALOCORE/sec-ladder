@@ -378,7 +378,11 @@ the final checksum, and the number of *digits* differs per input, so the
 whole-program `Ir` difference between two inputs includes a few instructions of
 formatting that have nothing to do with the kernel. Measured at TASK_011_REVIEW:
 it moved p17's swept rates from a true **10.0000 / 5.7500** to a reported
-9.9991 / 5.7491. Small, but it is the difference between "reproduces p16's
+9.9991 / 5.7491. Re-measured independently at TASK_012 on the zero-residue pair
+`sw228→sw232`: **10.0000 / 5.7500 / 5.7500 / 5.7500** for R2 / R3 / R4 / R5, plus
+**14.0000** for the `i128` variant and **10.0000** for the all-unsigned one. A
+non-zero-residue pair drifts visibly (`sw200→sw204` gives 10.1775 / 5.9275), so
+**quote a rate only from a zero-residue lag pair**, and say which pair. Small, but it is the difference between "reproduces p16's
 constant" and "reproduces it *exactly*", and a four-decimal claim cannot afford
 it. **Difference two inputs whose checksums have the same digit count** — a
 residue-matched lag pair does this for free — or subtract the term explicitly.

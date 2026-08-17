@@ -2,6 +2,8 @@
   "pattern": "p17-http-range",
   "skipped_inputs": [],
   "inputs_checked": [
+    "adversarial-crosswin-hi.bin",
+    "adversarial-crosswin-lo.bin",
     "adversarial-leak.bin",
     "adversarial-nsuf.bin",
     "adversarial-oob.bin",
@@ -22,8 +24,8 @@
     "harness/measure.py": "a810bf5973787f78fc9805b2407a6bb04bbee68c968374a2e9b8622c4c5d3af4",
     "harness/report.py": "537f51262f58391a6e4da1999807e3b84a9e487e9727e168dc6527578442580a",
     "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
-    "patterns/p17-http-range/NOTES.md": "49780506b8dab83b68faee727a7e83aa01aa18c6116b31f5bd12a57016c049fd",
-    "patterns/p17-http-range/README.md": "649461ceb2ea3882b8cbf799865b4be1175bcc1a934e78b1f30bc8e2c25d77c1",
+    "patterns/p17-http-range/NOTES.md": "2c9ae2c23aa5a0bf4312efee2b497d277845c24aa93c27766a829fcd1f9f1a25",
+    "patterns/p17-http-range/README.md": "b17e898b60e8f20ad812f95ad76af578c64aba3bf50463497449ac4af19130e3",
     "patterns/p17-http-range/c/kernel.c": "7c4e302d420db1ef666a7218a884c611120811324629dc9cdc7884c0e0ad7db6",
     "patterns/p17-http-range/c/kernel.h": "09bfe23afa37872032784e8d0afe473713fbac12cd8a6c28e5f8ffe6b8c85f05",
     "patterns/p17-http-range/c/kernel_hardened.c": "603c7e13ba191725a6a15fbbd347b0c97319176d5a9607e1064c594ff41993b8",
@@ -31,7 +33,7 @@
     "patterns/p17-http-range/model.py": "d3e26cfeb6a076b423b474a40d77bbab47e50d0abf133e457ef046ed12b5813c",
     "patterns/p17-http-range/safe_naive.rs": "43fadb4c64f6f60e219ba8ce16bf27daa1085f6239d873a16bca7a7b5e20340b",
     "patterns/p17-http-range/safe_tuned.rs": "4afff314daf7d1fdadfeb1fe661a13a07808da9dce560bece1798518fbbf0414",
-    "patterns/p17-http-range/spec.md": "c988f370f4e686f190025cd1344f65d6f26bbcc17923bba6867e796922fd0fc0",
+    "patterns/p17-http-range/spec.md": "e0bd1e09e19643168c25f9e1682529550be88020cc2e63ad4bfc69a27b556ad9",
     "patterns/p17-http-range/unsafe.rs": "a119e3782f413cfdaa2e71fcf5fe572ed820d5db6daade7e06ea13cc2a415960",
     "patterns/p17-http-range/verus.rs": "5a09e9d58df3639b5802a955e66fafd01e4b2b49cbff80ee0d82d4fa9ca6cc12"
   },
@@ -348,6 +350,16 @@
     }
   },
   "proof_domain": {
+    "adversarial-crosswin-hi.bin": {
+      "calls": 8,
+      "requires_ok": true,
+      "ensures_checked": 8
+    },
+    "adversarial-crosswin-lo.bin": {
+      "calls": 8,
+      "requires_ok": true,
+      "ensures_checked": 8
+    },
     "adversarial-leak.bin": {
       "calls": 8,
       "requires_ok": true,
@@ -402,6 +414,134 @@
     }
   },
   "adversarial": {
+    "adversarial-crosswin-hi.bin/c-gcc": {
+      "exit": 0,
+      "stdout": "16701685314320143948",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "15118011540968580209"
+    },
+    "adversarial-crosswin-hi.bin/c-clang": {
+      "exit": 0,
+      "stdout": "16701685314320143948",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "15118011540968580209"
+    },
+    "adversarial-crosswin-hi.bin/safe_naive": {
+      "exit": 0,
+      "stdout": "15118011540968580209",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "15118011540968580209"
+    },
+    "adversarial-crosswin-hi.bin/safe_tuned": {
+      "exit": 0,
+      "stdout": "15118011540968580209",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "15118011540968580209"
+    },
+    "adversarial-crosswin-hi.bin/unsafe": {
+      "exit": 0,
+      "stdout": "15118011540968580209",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "15118011540968580209"
+    },
+    "adversarial-crosswin-hi.bin/verus": {
+      "exit": 0,
+      "stdout": "15118011540968580209",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "15118011540968580209"
+    },
+    "adversarial-crosswin-hi.bin/c-gcc-h": {
+      "exit": 0,
+      "stdout": "15118011540968580209",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "15118011540968580209"
+    },
+    "adversarial-crosswin-hi.bin/c-clang-h": {
+      "exit": 0,
+      "stdout": "15118011540968580209",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "15118011540968580209"
+    },
+    "adversarial-crosswin-lo.bin/c-gcc": {
+      "exit": 0,
+      "stdout": "16140351554550698128",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "15118011540968580209"
+    },
+    "adversarial-crosswin-lo.bin/c-clang": {
+      "exit": 0,
+      "stdout": "16140351554550698128",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "15118011540968580209"
+    },
+    "adversarial-crosswin-lo.bin/safe_naive": {
+      "exit": 0,
+      "stdout": "15118011540968580209",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "15118011540968580209"
+    },
+    "adversarial-crosswin-lo.bin/safe_tuned": {
+      "exit": 0,
+      "stdout": "15118011540968580209",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "15118011540968580209"
+    },
+    "adversarial-crosswin-lo.bin/unsafe": {
+      "exit": 0,
+      "stdout": "15118011540968580209",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "15118011540968580209"
+    },
+    "adversarial-crosswin-lo.bin/verus": {
+      "exit": 0,
+      "stdout": "15118011540968580209",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "15118011540968580209"
+    },
+    "adversarial-crosswin-lo.bin/c-gcc-h": {
+      "exit": 0,
+      "stdout": "15118011540968580209",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "15118011540968580209"
+    },
+    "adversarial-crosswin-lo.bin/c-clang-h": {
+      "exit": 0,
+      "stdout": "15118011540968580209",
+      "stderr": "",
+      "signal": null,
+      "model_exit": 0,
+      "model_stdout": "15118011540968580209"
+    },
     "adversarial-leak.bin/c-gcc": {
       "exit": 0,
       "stdout": "1395842226496950656",
@@ -660,6 +800,20 @@
     }
   },
   "sanitizer": {
+    "adversarial-crosswin-hi.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": ""
+    },
+    "adversarial-crosswin-lo.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": ""
+    },
     "adversarial-leak.bin": {
       "exit": 0,
       "expected_exit": 0,
@@ -679,7 +833,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==3358421==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x50600000001a at pc 0x5578bef9e921 bp 0x7ffdc1b7fcc0 sp 0x7ffdc1b7fcb0 READ of size 1 at 0x50600000001a thread T0 #0 0x5578bef9e920 in kernel /home/apt/repos_common/"
+      "diagnostic": "================================================================= ==3536299==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x50600000001a at pc 0x563d8d3d6921 bp 0x7fffbc707ec0 sp 0x7fffbc707eb0 READ of size 1 at 0x50600000001a thread T0 #0 0x563d8d3d6920 in kernel /home/apt/repos_common/"
     },
     "adversarial-stride1.bin": {
       "exit": 0,
@@ -722,6 +876,24 @@
     "sysroot": "/home/apt/.cache/miri",
     "probe_iters": 4,
     "runs": [
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-crosswin-hi.bin",
+        "exit": 0,
+        "ub": false,
+        "stdout": "7898796251734015761",
+        "model_stdout": "7898796251734015761",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-crosswin-lo.bin",
+        "exit": 0,
+        "ub": false,
+        "stdout": "7898796251734015761",
+        "model_stdout": "7898796251734015761",
+        "stderr": ""
+      },
       {
         "source": "unsafe.rs",
         "input": "adversarial-leak.bin",

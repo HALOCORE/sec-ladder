@@ -164,9 +164,14 @@ does. Every pattern's `spec.md` now carries, and `harness/check.py` diffs:
    ambiguity is fatal. Two probes, both used at TASK_011_REVIEW:
    **`--multiple-errors 20`** to force the rest out, and **strip the functional
    spec and re-run** — if the memory-safety obligations then give `N verified,
-   0 errors`, nothing was hidden behind the functional failure. Keep a positive
-   control beside it (a mutant known to break memory safety) so you know the
-   probe can actually see a second error.
+   0 errors`, nothing was hidden behind the functional failure.
+
+   **The positive control is not optional, and its strongest form was measured at
+   TASK_012.** Strip the functional spec from a mutant that *does* break memory
+   safety and confirm it **still fails**: p17's `nocheck_msonly` gives
+   `9 verified, 1 errors`, the single error being `0 <= base`, a memory-safety
+   obligation. Without that control, a `10 verified, 0 errors` after stripping
+   proves nothing — it is equally consistent with the probe being blind.
 3. **`verus <file> --verify-function <name> --verify-root`** answers "does this
    function have a verified body?" *semantically*. It reports `0 verified` for an
    `external_body` item and ≥1 for a real one, so the "rule 2" call-site check no

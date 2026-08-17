@@ -31,15 +31,25 @@ is decided by a single attacker-controlled `u16`. The identity
 
 **The middle row is the point.** That read is in bounds, so bounds checking
 cannot see it — not C's, not Rust's, and not a proof that every access is in
-bounds. It is Heartbleed's shape: a legal read of the wrong bytes. Safe Rust
-eliminates the third row and does **nothing** about the second; the only thing
-that fixes the second row is the explicit `start >= 0` check, which is identical
-in C and in Rust and costs the same in both.
+bounds. It is a **legal read of the wrong bytes**. Safe Rust eliminates the third
+row and does **nothing** about the second; the only thing that fixes the second
+row is the explicit `start >= 0` check, which is identical in C and in Rust and
+costs the same in both.
 
-**Both halves are demonstrated rather than asserted**, with two controls built
-under `.temp/` and never shipped as rungs — safe Rust with the conjunct deleted,
-and Verus with the conjunct deleted. `NOTES.md` §1a and §7 have the stdout and
-the Verus diagnostics.
+**Which wrong bytes, though, depends on the input, and only one of the two cases
+is an information disclosure.** On the single-window inputs the extra bytes are
+the attacker's *own* `nsuf` word and suffix table — memory-safe and functionally
+wrong, not a leak. Give the blob a second window (`adversarial-crosswin-{lo,hi}`)
+and the same arithmetic reaches into the *previous* window, which is another
+caller's data: that is Heartbleed's shape, and it needs a guard on the
+*slice*-relative index — which is all a bounds check, or `get_unchecked`'s
+`requires i < v@.len()`, ever demanded. `NOTES.md` §1b and §1c.
+
+**Every half is demonstrated rather than asserted**, with controls built under
+`.temp/` and never shipped as rungs — safe Rust with the conjunct deleted, safe
+Rust and Verus with the conjunct replaced by each of the two bounds-safe guards,
+and Verus with the conjunct deleted. `NOTES.md` §1a, §1c and §7 have the stdout,
+the Verus diagnostics and the reproduction commands.
 
 There is a matching result on the proof side, and it is the reason p17 is worth
 more than another perf row. A proof that every access is in bounds discharges

@@ -269,9 +269,24 @@ is a much stronger claim than any p01 could produce.
    **Three further things p16 establishes:**
    - **`Ir` and wall clock disagree in *magnitude*, not just direction: +72% `Ir`
      → +0.27% time.** Spreads are 0.96–2.31%, well inside the 10% discard
-     threshold, so unlike p02's timing this is a *usable* null. The fold is a
-     serial Horner chain, latency-bound: **differencing `n_iters` gives
-     3.027–3.055 cycles/byte for every rung** on `large`, 3.03–3.08 on `small`.
+     threshold, so unlike p02's timing this is a *usable* null. **The null itself
+     is safe** — it is a ratio taken inside one session — and so is the ns figure.
+     The fold is a serial Horner chain, latency-bound: differencing `n_iters`
+     gives **3.027–3.055 cycles/byte** for every rung on `large`, 3.03–3.08 on
+     `small`.
+
+     ⚠ **That cycles/byte figure is an inference, not a measurement, and it is
+     now qualified (TASK_012).** It converts a wall time measured in TASK_007
+     with a clock measured in TASK_007_REVIEW — *different sessions* — and this
+     box's clock is set by other tenants: the same probe read 3.80–3.89 GHz in one
+     session and 2.55–2.86 GHz in another (`.memory/00-environment.md`). At
+     all-core turbo the same ns figure is ~2.2 cycles/byte.
+     What survives independently: the Horner chain `(acc<<5) - acc + b` has a
+     **hard 3-cycle serial latency floor**, so *if* the chain is the limiter the
+     clock during measurement must have been ≥ ~3.8 GHz. Consistent, and it is
+     why 3.03 looked so clean — but it is a consistency argument, not an
+     independent confirmation. **Do not publish cycles/byte for p16 without an
+     interleaved clock measurement.**
      Because L1-resident `small` gives the same rate as L3-resident `large`, the
      obvious alternative — memory-bandwidth-bound, which would equally hide a
      +70% `Ir` gap — is **ruled out**, not merely unconsidered.
@@ -370,6 +385,29 @@ is a much stronger claim than any p01 could produce.
    guard being one token weaker is the whole point**, and it is why "what a bounds
    check buys you" must be written *slice*-relative, not window-relative.
 
+   **Independently reproduced at TASK_012 on shipped-format inputs**, with a
+   committed input pair `adversarial-crosswin-{lo,hi}` differing in exactly 28
+   bytes of window 0's secret and nowhere else. Every checked rung prints
+   `15118011540968580209` on both; C, and the two slice-guarded variants, print
+   two *different* values that track the secret. ASan+UBSan clean, exit 0, on
+   both files.
+
+   **And the sharpest part was not in the original claim: `safe_naive_sliceguard`
+   does it too — plain safe Rust, zero `unsafe`, no proof.** So this is not a
+   statement about a trusted accessor or about Verus at all. **It is a statement
+   about what a bounds check *is*:** the language's bound is the slice it was
+   given, and if the caller hands you the whole blob, "in bounds" spans every
+   other client's data in it. Rust enforces that bound perfectly and the leak
+   goes straight through it.
+
+   Two design lessons from building the input, both non-obvious and both now in
+   p17's `spec.md`: **window 0 must serve something**, because a window returning
+   0 pins `acc` at 0 and `k = (acc*nwin) >> 64` is then 0 for ever — **the
+   driver's Lemire index has an absorbing state**, and the first design never
+   visited the attacker window; and the malicious suffix must keep `abs >= 0`, so
+   that every rung including R1 stays in bounds and ASan must stay *silent* —
+   which is what makes it a disclosure demonstration rather than a crash.
+
    **Perf — R3 is free for the fifth pattern in a row** (+32 Ir/call flat, 0 per
    byte; +0.61% / +0.08%). And **R2−R4 = 4.2500 Ir per folded byte, reproducing
    p16's swept constant on a completely different kernel** — *exactly*, in fact:
@@ -389,12 +427,14 @@ is a much stronger claim than any p01 could produce.
    conversion, not the comparison" is **false**.
 
    Wall clock: every rung folds a byte in **0.784–0.791 ns**, 0.9% spread across a
-   73% `Ir` gap. The delivery declined to quote cycles/byte because
-   `scaling_cur_freq` showed 800→902 MHz against a 3.9 GHz max — **but that file
-   is unreliable on this box** (`.memory/00-environment.md`): it reported 800 MHz
-   for six seconds while the core was measured running at 3.80–3.89 GHz. So the
-   caution was an *under*claim. p16's 3.85 GHz and 3.027–3.055 cycles/byte stand,
-   and p17 may quote **3.02–3.05** — two kernels agreeing on the Horner rate.
+   73% `Ir` gap. **p17 quotes no cycles/byte, and that is correct** — a manager
+   instruction to quote 3.02–3.05 was overturned at TASK_012 with the measurement
+   that killed it. `scaling_cur_freq` is unusable (it reads 800 MHz under load),
+   *and* the dependent-chain probe is not reproducible across sessions on this
+   shared box: 3.80–3.89 GHz in one, 2.55–2.86 GHz in another, same code, same
+   cores. The same ns figure is 2.2 or 3.1 cycles/byte depending on when you ask.
+   **ns is a measurement here; cycles is an inference.** See
+   `.memory/00-environment.md`.
 
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how

@@ -7,14 +7,29 @@ this file (and say so in your report) if a fact goes stale.
 
 - 2× Intel Xeon Gold 6230 @ 2.10 GHz, 20 cores/socket, 2 threads/core = **80 logical CPUs**.
 - Governor `powersave`, frequency scaling active (observed ~24% of max at idle).
-- **`scaling_cur_freq` is unusable on this box — do not derive cycles from it.**
-  Measured at TASK_011_REVIEW: it reported **800 MHz for six seconds while the
-  core was actually running at 3.80–3.89 GHz**. p17's delivery declined to quote
-  a cycles/byte figure on the strength of that file and thereby *under*claimed.
-  If you need a clock, **measure it** — time a known-length dependent chain (a
-  1-cycle-per-iteration loop) and divide. That method gave 3.85 GHz on CPU 5 at
-  TASK_007_REVIEW and 3.80–3.89 GHz on CPU 3 at TASK_011_REVIEW, i.e. it is
-  stable and reproducible across cores while the sysfs file is not.
+- **`scaling_cur_freq` is unusable on this box.** Re-confirmed twice: it reports
+  **800 MHz under load** while the pinned core is retiring ~2.8 G dependent
+  `addq`s per second. Never derive cycles from it.
+- **And the replacement is not stable either — this box's clock is set by other
+  tenants.** The dependent-chain probe (time a 1-cycle-per-iteration loop,
+  divide) is the right *method*, but it does not give a reusable constant:
+
+  | session | CPU 3 | CPU 5 |
+  |---|---|---|
+  | TASK_011_REVIEW | 3801–3888 MHz | 3771–3874 MHz |
+  | TASK_012 (same `clock.c`, same pinning) | **2764–2861 MHz** | **2551–2719 MHz** |
+
+  That is the Xeon Gold 6230's one-core turbo (3.9 GHz) against its all-core
+  turbo (~2.8 GHz) on a shared, containerised host. The same 0.784–0.791 ns/byte
+  is therefore **2.2 or 3.1 cycles/byte depending on when you ask**.
+
+  **Rule: never quote cycles from a clock measured in a different session.**
+  Measure it *interleaved* with the wall-clock reps — the probe costs ~300 ms —
+  or report ns and stop. Quoting a cross-session clock is the same class of error
+  as writing up a finding from a report without re-measuring, one level down.
+
+  Consequence worth knowing: **`ns` is a measurement on this box and `cycles` is
+  an inference.** Prefer ns for anything published.
 - **Shared box, containerised** (`/dev/vg1/containers_apt`). Wall-clock timing is noisy.
 - ~118 GB free on `/` (of 252 GB). The 12 GB LLVM install is the big consumer;
   re-check with `df -h /` rather than trusting this line.
