@@ -283,8 +283,10 @@ Four findings:
 1. **R3 costs +10 instructions per call and the number does not move with the
    size of the copy.** `copy_from_slice` on a checked subslice plus an iterator
    fold is within 0.1% of raw pointers on `large`. Measured across **68 record
-   lengths at two scales** (§3b) it is +10 at every one of them, dropping to +8
-   when `len ≡ 0 (mod 8)`. This is p01's "the safety tax is O(1) per call"
+   lengths at two scales** (§3b) it takes exactly two values: **+8 where
+   `len ≡ 0 (mod 8)` and +10 everywhere else** — 26/26 lag-8 pairs agree exactly
+   in both bands, and re-measured outside them at TASK_008 (+8.0 at 512, 520,
+   528, 1000; +10.0 at 513, 521, 1001). This is p01's "the safety tax is O(1) per call"
    reproduced on a pattern with a *data-dependent* copy length — which
    `.memory/01-ladder.md` explicitly warned not to assume — and it is the third
    pattern in a row where R3 is the honest number.
@@ -306,18 +308,29 @@ Four findings:
 
 One loop changed at a time, everything else byte-for-byte R2, `-O3 isolated`,
 marginal Ir per call, every variant checksum-identical to `model.py` on both
-inputs. (Reproduced at TASK_006 from the review's variants; the numbers below are
-the TASK_006 run.)
+inputs.
 
 | # | variant | 61 B | 4092 B | vs R4 | kernel `n_fn` nopad | bulk call |
 |---|---|---:|---:|---|---:|---|
-| — | **R2 as shipped** | 407.0 | 11225.9 | +178 / +1025 | 118 | **none** |
-| n2 | indexed copy kept, **iterator fold** | 407.0 | 11225.9 | +178 / +1025 | — | none |
-| n1 | **`copy_from_slice`**, indexed fold kept | 239.0 | 10210.9 | **+10 / +10** | 93 | `memcpy@GLIBC_2.14` |
-| n3 | indexed copy kept, **one `&src[a..b]` reslice** added | 239.0 | 10210.9 | **+10 / +10** | 93 | `memcpy@GLIBC_2.14` |
-| n4 | R2 verbatim, the check written **additively** | 237.0 | 10208.9 | **+8 / +8** | 87 | `memcpy@GLIBC_2.14` |
-| — | R3 `safe_tuned` | 239.0 | 10210.9 | +10 / +10 | 93 | `memcpy@GLIBC_2.14` |
-| — | R4 `unsafe` | 229.0 | 10200.9 | 0 | 70 | `memcpy@GLIBC_2.14` |
+| — | **R2 as shipped** | 407.0 | 11226.0 | +178 / +1025 | 118 | **none** |
+| n2 | indexed copy kept, **iterator fold** | 407.0 | 11226.0 | +178 / +1025 | — | none |
+| n1 | **`copy_from_slice`**, indexed fold kept | 239.0 | 10210.8 | **+10 / +10** | 93 | `memcpy@GLIBC_2.14` |
+| n3 | indexed copy kept, **one `&src[a..b]` reslice** added | 239.0 | 10210.8 | **+10 / +10** | 93 | `memcpy@GLIBC_2.14` |
+| n4 | R2 verbatim, the check written **additively** | 237.0 | 10208.8 | **+8 / +8** | 87 | `memcpy@GLIBC_2.14` |
+| — | R3 `safe_tuned` | 239.0 | 10210.8 | +10 / +10 | 93 | `memcpy@GLIBC_2.14` |
+| — | R4 `unsafe` | 229.0 | 10200.8 | 0 | 70 | `memcpy@GLIBC_2.14` |
+
+**The `4092 B` column used to read 11225.9 / 10210.9 / 10208.9 / 10200.9 here
+while §3's table, `.memory/01-ladder.md` and two independent re-runs all read
+…6.0 / …0.8 / …8.8 / …0.8 — one measurement, two tables, different numbers**
+(TASK_006_REVIEW). Corrected at TASK_008 from a fresh run of both: the shipped
+rungs come out of `results/gate/p02-buffer-copy.json`
+(`safe_naive` 11226.0, `safe_tuned` 10210.84, `unsafe` 10200.84) and the four
+variants out of `.temp/review006/variants/` re-measured with the same
+two-callgrind-runs difference (n1 10210.8, n2 11226.0, n3 10210.8, n4 10208.8,
+r2 11226.0 — all checksum `4856715052625337940`). The `.9` column was a
+transcription, and nothing in the gate diffs one table in `NOTES.md` against
+another.
 
 Read the first two rows together: **changing only the fold moves nothing.**
 Read rows n1 and n3: **changing only the copy removes 100% of it.**
@@ -367,16 +380,47 @@ call:
 Both are in the same range as R2's +1025, in a language with no bounds checks at
 all. (TASK_004_REVIEW reported this as "gcc's byte loop is 94 Ir *faster* than
 glibc's memcpy", which is a comparison against **R4**, not against gcc's own
-`memcpy` build: 10106.3 vs R4's 10200.9. Within one compiler the byte loop is
+`memcpy` build: 10106.3 vs R4's 10200.8. Within one compiler the byte loop is
 dearer, by the table above. Corrected at TASK_006.)
+
+(The two `with memcpy` figures above, 9200.3 and 10204.3, were measured on
+hand-built variant binaries and do **not** reproduce against the gate's own R1h
+cells, which come out at 9200.74 and 10204.74 — `results/gate/*.json`,
+`c-gcc-h`/`c-clang-h` `/O3/isolated/large.bin`. 0.44 Ir per call is 44
+instructions over the 100-call probe, so it is a difference between two builds
+and not noise; the *deltas* the table is about are unaffected. Not chased at
+TASK_008 — recorded so the next reader does not treat the two as the same
+measurement.)
 
 ### 3b. The residue curve — `gen.py --sweep`, finally run
 
 `inputs/gen.py --sweep` existed since TASK_004 and had never been run. It now
-emits **two complete mod-16 cycles at each of two scales** (68 inputs), because
-one cycle cannot tell a period of 16 from a period of 64 — the first draft of
-this sweep used 16 lengths per band and both bands happened to straddle a
-multiple of 64. Measured over 72 consecutive lengths, the period is **16**.
+emits **two complete mod-16 cycles plus the endpoints at each of two scales** —
+`SWEEP_BANDS` is `(56, 34)` and `(2040, 34)`, i.e. lengths 56…89 and 2040…2073,
+**68 inputs in two runs of 34** — because one cycle cannot tell a period of 16
+from a period of 64, and the first draft of this sweep used 16 lengths per band
+with both bands straddling a multiple of 64.
+
+**What 34 consecutive lengths per band establishes, and what it does not.**
+Earlier drafts of this section and of `gen.py` said "measured over 72
+consecutive lengths"; 72 is not a number in this data and never was. What the 34
+give is the lag-16 comparison, twice, at each scale. Checked directly against
+`results/p02-residue-sweep.json` (TASK_008):
+
+- **R3 − R4 is exactly 16-periodic and in fact 8-periodic**: 26/26 lag-8 pairs
+  and 18/18 lag-16 pairs agree exactly, in *both* bands. So a period of 32 or 64
+  is excluded outright — a signal of period 32 cannot agree with itself at
+  lag 16 for 18 consecutive lengths.
+- **R2 − R4 is 16-periodic only in *shape*.** The raw delta disagrees at every
+  one of the 18 lag-16 pairs in both bands, by ±5.0 (band 1) / +4.9…+5.1
+  (band 2) — a drift of ~5 Ir per 16 bytes riding under the sawtooth, i.e.
+  ~0.31 Ir/byte locally against the 0.21 Ir/byte long-range slope taken between
+  the two bands' cycle means. "The period is 16" is a claim about the sawtooth,
+  not about the delta, and the row below quotes the sawtooth.
+- **34 cannot rule out a period longer than 34.** A signal with period 1024
+  that happens to look 16-periodic across 34 samples is not excluded by this
+  data; what makes that implausible is the second band, 32× larger in copy size,
+  showing the same 16-cycle and the same 179 Ir amplitude.
 
 R2 − R4, `-O3 isolated`, marginal Ir per call, one full cycle at each scale:
 
@@ -589,15 +633,31 @@ Two consequences, both measured:
   unsatisfiable `requires`, a contradictory context — but it is not the detector
   here.
 - **Clause deletion is now a gate stage** (`harness/check.py` step 5c,
-  TASK_006): for each `ensures` clause of each `external_body` item, delete it,
-  re-run Verus, fail if the file still verifies with 0 errors. It is *derived*,
-  not declared, so unlike the `spec.md` clause pin it does not move with the
-  code it constrains. Cost on p02: 5 Verus runs plus 2 controls, ~20 s each.
-  Run on p02 as TASK_004 shipped it, it failed **two** clauses (§5).
+  TASK_006): for each `ensures` **conjunct** of each `external_body` item,
+  delete it, re-run Verus, fail if the file still verifies with 0 errors. It is
+  *derived*, not declared, so unlike the `spec.md` clause pin it does not move
+  with the code it constrains. Cost on p02: 5 Verus runs plus 2 controls, 1.7 s
+  each. Run on p02 as TASK_004 shipped it, it failed **two** clauses (§5).
+
+  *Conjunct, not clause, since TASK_008.* `vparse._clause_split` split on
+  top-level commas only, so `ensures a, b` was two deletable units and
+  `ensures a && b` was one — re-joining a redundant conjunct with `&&` made the
+  stage delete both halves together, the file failed, and the stage certified
+  the clause load-bearing. One character. Demonstrated by re-joining
+  `final(dst)@.len() == old(dst)@.len()` onto the surviving clause here:
+  `ensures[0] load-bearing (8 verified, 1 errors)` and a green gate before,
+  `ensures[0].conjunct[1] is NOT load-bearing ... 9 verified, 0 errors` after.
+  Clauses whose top level also carries `==>`, `||` or `<==>` are **not** split
+  (a conjunct lifted out of an implication is not a deletable unit) and the
+  refusal is shouted into the verdict.
+
+- **`requires` gets a different oracle entirely** (step 5c-req, TASK_008).
+  Step 5c never touched `requires`, and that is the dangerous half — see §6a
+  below.
 
 **Be precise about what step 5c does and does not close.** It deletes whole
-clauses, so it catches a clause that is *redundant* (implied by its neighbours,
-which is what `copy_bytes`'s length clause was) and a clause that is
+conjuncts, so it catches one that is *redundant* (implied by its neighbours,
+which is what `copy_bytes`'s length clause was) and one that is
 *decorative* (nothing consumes it, which is what `kernel`'s third clause was and
 what p01's R2v control turned out to be). It does **not** catch a clause that has
 been *rewritten*: apply M7 to p02's single surviving clause today and the file
@@ -652,6 +712,72 @@ to the pinned 13-statement sequence — but `harness/dloop.py` had to learn that
 state cannot be consumed without a pre-state snapshot, and a pre-state snapshot
 is a `let ghost`.** `.memory/04-verus.md`'s "do this in every pattern" was not
 achievable for such a postcondition before this change.
+
+---
+
+### 6a. The `requires` half, and why it is not the mirror of the `ensures` half
+
+TASK_006_REVIEW found that step 5c iterated `ensures` and nothing else, and that
+the `requires` hole is the one this pattern is about. Three mutants, all with
+the matching `spec.md` pin moved in the same edit, all giving **9 verified, 0
+errors** and the obligation count unmoved at 9:
+
+| mutant | what it leaves the trusted base saying |
+|---|---|
+| delete `from + n <= src@.len()` from `copy_bytes` | `copy_nonoverlapping` may read from anywhere past `src` |
+| `get_unchecked`: `i < v@.len()` → `0 <= i` | reading any index of any slice is defined and yields `v@[i]` |
+| `copy_bytes`: both `requires` → `n >= 0` | an arbitrary `copy_nonoverlapping` is defined — the exact CWE-787 |
+
+The third gave a **full gate PASS**, and the structural "a trusted `unsafe` item
+must demand something of its callers" rule printed the tautology approvingly:
+*"trusted `unsafe` item `copy_bytes` demands `['n >= 0']` of every caller"*.
+
+**The obvious fix does not exist.** TASK_008 was specified as "delete the
+`requires`, re-run, fail if the file still verifies". Measured, on this file:
+
+| | verified / errors |
+|---|---|
+| control | 9 / 0 |
+| delete `copy_bytes.requires[0]` | **9 / 0** |
+| `get_unchecked` → `0 <= i` | **9 / 0** |
+| `copy_bytes` → `n >= 0` | **9 / 0** |
+| delete `kernel.requires[0]` (a *verified* item) | **8 / 1** |
+
+Deleting a precondition from an `external_body` item removes an obligation from
+its *call sites*, so verification gets strictly easier and nothing can ever
+fail. Implementing the prescription literally would have reported every trusted
+precondition in the project as "not load-bearing", on every run. The last row is
+why the deletion test survives for **verified** items: there the deleted
+assumption was one the item's own body was using.
+
+So step 5c-req runs three checks instead, and the third is the only one that
+catches all three mutants:
+
+1. **deletion**, verified items only — `kernel requires[0] is load-bearing when
+   deleted (8 verified, 1 errors)`;
+2. **tautology probe**, every item: a synthesised
+   `proof fn p(<the item's parameters verbatim>) ensures <the conjunct>, { }`
+   appended inside `verus! { }`. If it verifies, the conjunct is `true` under
+   the parameter types alone. All four of this file's `requires` conjuncts fail
+   the probe, as they should; `0 <= i` and `n >= 0` verify (10 verified, 0
+   errors against a control of 9) and are caught;
+3. **parameter coverage** (step 5a): every parameter the trusted body uses must
+   appear in the `requires`. `copy_bytes` uses `src`, `from`, `dst`, `n` and
+   constrains all four; delete the first precondition and `['src', 'from']` go
+   unconstrained, which is the axiom that the copy is defined for every value of
+   them. Deliberately **not** `requires ∪ ensures`: `get_unchecked`'s
+   `ensures r == v@[i as int]` mentions `v`, so the union reading would pass
+   `requires 0 <= i`.
+
+Known limit of (3): a pure *value* parameter (one written, never used as an
+address or a length) legitimately needs no precondition, and would have to be
+declared in `spec.md`'s `verus.unsafe_justifications`, which the verdict then
+shouts on every run. Neither trusted item here has one.
+
+What none of this closes: a `requires` that is non-trivial, mentions every
+parameter, and is still **too weak for the operation** — say `from + n <= src@.len() + 1`.
+That is a claim about `copy_nonoverlapping`'s real contract, and the only things
+between it and the proof are the comment beside the item and a reviewer.
 
 ---
 
@@ -776,6 +902,33 @@ back again in the other language. All three now fail; the five real rungs and
 `c/main.c` still normalise to the pin (`verus.rs` is the only file whose region
 is inside `verus! {}`, and it is the only one where ghost statements erase).
 
+**And it reopened again, because `verus!` is a token.** TASK_006_REVIEW put the
+same M9 payload back into `safe_naive.rs`'s measured loop with three lines:
+
+```rust
+macro_rules! verus { ($($t:tt)*) => { $($t)* } }
+verus!( fn main() { ... SLB-DRIVER-BEGIN ... } );
+```
+
+`vparse.verus_span` accepts `verus!\s*[{(\[]`; the guard in step 5a that says "a
+file with a `verus!` block must be in `verus.obligations`" matched
+`verus!\s*\{`; the round bracket is the entire bypass. Result: 407.0 → 412.0
+Ir/call on `small`, `prefetch` in the disassembly, checksums unchanged, a full
+green gate and a `contract sha256` **identical** to the shipped pattern.
+
+Closed at TASK_008, and **not with a fourth regex** — the tree already contained
+the third and the paren form walked round it. `dloop.normalise_file` now takes a
+`verus_verified` certificate and raises `GhostHarbourError` without it, and
+`check.py` supplies that certificate only from *Verus's own verdict*: the file
+is in `verus.obligations` and verified with 0 errors in step 5a, **and**
+`verus --verify-function <the item enclosing the region> --verify-root` reports
+a verified body for it. An item Verus never compiled cannot report one, whatever
+its file spells its macros. Fails closed: a region that claims the harbour
+without the certificate is a hard failure, not a quiet downgrade. All three
+bracket forms were rebuilt at TASK_008 with the payload in place — each would
+have matched the pinned 13-statement sequence under the old code, and each now
+fails step 6 (`.temp/p008/logs/a{1,2,3}*.log`).
+
 ### Two harness warts found and *not* fixed
 
 - `check_proof_domain` prints the failing call's bindings minus the key `"v"`,
@@ -826,6 +979,43 @@ so the un-gameable assertion `d(Ir)/d(work) >= rate` still runs.
 
 Measured after the change: 64 cell/probe pairs, marginal Ir 206 … 450 248,
 tightest margin **35.9×**, `d(Ir)/d(work)` 2.22 … 110.0.
+
+### 9a. …and the knobs, bounded at TASK_008
+
+TASK_006_REVIEW measured how weak the residual risk was: **the only bound on
+`min_ir_per_work` was `> 0`.** `min_ir_per_work = 1e-9` with
+`min_ir_per_work_why = "see NOTES.md"` passed the whole gate, printing "derived
+floor 0.0 Ir/call" and "tightest margin 2246270772.2×" in exactly the words it
+prints "35.9×". Nothing inspects `why` — it is free text. `work_per_call` is a
+second unbounded knob in the same sandboxed file, and the floor is the
+*product*.
+
+Three changes, in decreasing order of how much they actually buy:
+
+- **An absolute bound, `MIN_DECLARABLE_IR_PER_WORK = 0.015625`.** Physical, not
+  conventional: the tightest rate anyone has argued for here is p02's 0.0625 —
+  four instructions per 64-byte AVX-512 lane — and 1/64 is the same four
+  instructions across a vector four times wider than anything that exists.
+  Below that, a pattern is not making a claim about an algorithm; it is saying
+  the work does not happen. `1e-9` now fails outright with that argument in the
+  message.
+- **The achieved margin is printed beside the declared floor, in the verdict**,
+  with what it implies spelled out: p02 reads "declared floor 3.8…255.8 Ir/call;
+  tightest measured margin over it 35.9×, i.e. this stage tolerates a 97.2% loss
+  of work before it objects." A margin above 100× additionally shouts that the
+  floor "rules out total collapse and essentially nothing else".
+- **The stage now says what it certifies in its own log**, so a reader of a
+  green run cannot over-read the line.
+
+**What this does *not* fix, measured.** Shrinking `work_per_call` by 16× in
+`model.py` (`return max(1, min(...) // 16)`) still **passes** — margin 576.7×,
+two loud lines in the verdict, no failure. Bounding the product mechanically
+would need the harness to know each pattern's unit of work, which is exactly
+what `model.py` exists to supply. The defence against that knob is visibility
+plus step 2, not rejection: the margin shout is `rep.shout` rather than
+`rep.fail` because a legitimately fast rung on a conservative unit of work has a
+large margin honestly (p01's margins run 7×–268×), and failing on it would turn
+the floor into a *cap* on how good a rung is allowed to be.
 
 **What this stage does not do, on any setting.** It bounds the kernel's *total*
 cost, so it cannot certify that one component of the kernel happened — p02

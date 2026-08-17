@@ -251,19 +251,57 @@ quoting 5c as a defence.**
    about, and it leaves R5 axiomatising that an arbitrary
    `copy_nonoverlapping` is defined.
 
-   **A `requires` test must be the mirror image of an `ensures` test.** Deleting
-   a postcondition should make the *file* fail; deleting a precondition makes
-   verification strictly *easier*, so the check is "delete it and confirm some
-   call site now fails". Weakening-not-deleting needs the same treatment.
-2. **`&&` defeats whole-clause deletion.** `vparse._clause_split` splits on
-   top-level commas, so `ensures a, b` is two deletable clauses and
-   `ensures a && b` is one. Re-joining a redundant conjunct with `&&` makes 5c
-   delete both halves together, the file fails, and the stage reports the clause
-   load-bearing. Cost to an author: one character. Split at top-level `&&` too.
-   (Not what p02's fix did — that was a genuine deletion, checked.)
-3. **`clause_deletion_extra_items` can silently un-check the kernel.** Unknown
-   item names are dropped from the list with no failure, so declaring a
-   misspelled name exempts the kernel's `ensures` from 5c entirely.
+   **There is no mirror-image deletion oracle for a trusted item, and TASK_008
+   measured it.** The obvious fix — "delete the `requires`, confirm some call
+   site now fails" — does not work, because deleting a precondition from an
+   `external_body` item only *removes* obligations from its callers. Nothing
+   anywhere fails:
+
+   | mutant on p02 `verus.rs` | result |
+   |---|---|
+   | control | 9 verified, 0 errors |
+   | delete `copy_bytes` `requires[0]` | **9 verified, 0 errors** |
+   | `get_unchecked`: `i < v@.len()` → `0 <= i` | **9 verified, 0 errors** |
+   | `copy_bytes`: both `requires` → `n >= 0` | **9 verified, 0 errors** |
+   | delete the **kernel's** `requires[0]` (a *verified* item) | 8 verified, 1 errors |
+
+   Deletion is a valid test only on the last row's kind. Had it been applied to
+   trusted items it would have reported every trusted precondition in the
+   project as not-load-bearing. **Three checks replace it (TASK_008):**
+
+   - **A tautology probe** — synthesise `proof fn <params verbatim> ensures
+     <conjunct>, { }` inside `verus! {}` and run it. If it verifies, the
+     conjunct is a tautology and constrains no caller. Catches `0 <= i` and
+     `n >= 0`. `old(dst)` and `&mut [u8]` both work in such a probe. A probe
+     that fails to *compile* is a hard failure ("this conjunct was not judged"),
+     never a silent skip.
+   - **Deletion, for verified items only** — where the mirror test really works.
+   - **Parameter coverage** — every parameter a trusted `unsafe` body *uses*
+     must appear in its `requires`. This is the only one of the three that
+     catches a **missing** precondition, which has no verification signature at
+     all. Escape hatch is the existing `verus.unsafe_justifications`, shouted
+     every run.
+
+   Known false-positive shape for the third: a pure *value* parameter (written,
+   never used as an address or a length) legitimately needs no precondition.
+   Nothing in the tree exercises it yet.
+
+   **Still open, and only a reviewer closes it:** a `requires` that is
+   non-trivial, mentions every parameter, and is nonetheless too weak —
+   `from + n <= src@.len() + 1`. That is a claim about `copy_nonoverlapping`'s
+   real contract, and no mechanical check judges it.
+2. ~~**`&&` defeats whole-clause deletion.**~~ **Closed at TASK_008.** 5c now
+   deletes *conjuncts*: `vparse.top_level_ops` / `conjunct_spans` /
+   `delete_conjunct`. A clause carrying a top-level `==>`, `||` or `<==>` is
+   **refused rather than guessed at**, and the refusal is shouted — a conjunct
+   split out of an implication's antecedent is not a deletable unit. `item.clauses`
+   stays comma-split so no `spec.md` pin moved. The reviewer's `&&`-merged
+   mutant now reports `ensures[0].conjunct[1] is NOT load-bearing`.
+3. ~~**`clause_deletion_extra_items` can silently un-check the kernel.**~~
+   **Closed at TASK_008** — an unknown item name is a hard failure.
+
+A Verus run on p02's `verus.rs` measures **1.7 s**, not the ~20 s an earlier
+docstring claimed, so mutation stages are far cheaper than they were budgeted at.
 
 Meanwhile, for any `external_body` item with more than one `ensures` clause:
 prefer one strong clause to several overlapping ones, and state beside the item

@@ -163,6 +163,32 @@ class RegionError(Exception):
     not an absence."""
 
 
+class GhostHarbourError(Exception):
+    """The region's syntax claims to sit inside `verus! { }`, but the caller
+    could not certify that **Verus compiled this file**.
+
+    TASK_006_REVIEW put the M9 prefetch payload back into `safe_naive.rs`'s
+    measured loop with
+
+        macro_rules! verus { ($($t:tt)*) => { $($t)* } }
+        verus!( fn main() { ... SLB-DRIVER-BEGIN ... } );
+
+    -- three lines and a round bracket. `verus_span` accepted it (it matches
+    `verus!\\s*[{(\\[]`), so `region_in_verus` said True, ghost stripping ran,
+    `let ghost = unsafe { _mm_prefetch(..) };` vanished before the diff, and the
+    gate passed with a `contract sha256` identical to the shipped pattern at
+    +5.0 Ir/call.
+
+    The bypass is **not** a regex bug and must not be fixed with a fourth
+    regex: the brace form was already guarded by one and the paren form walked
+    round it. The question is semantic -- *did Verus compile this file?* -- and
+    the gate already has the answer, because it runs Verus on every file in
+    `spec.md`'s `verus.obligations` and gets an obligation count back. So
+    `normalise_file` demands that answer from its caller (`verus_verified=`) and
+    **fails closed**: a region that claims the harbour without it is this
+    exception, not a quiet downgrade to non-ghost normalisation."""
+
+
 def region_span(txt, where="<text>"):
     """`(start, end)` offsets of the region body in `txt`, or None.
 
@@ -196,10 +222,15 @@ def region_text(txt, where="<text>"):
 
 
 def region_in_verus(txt, where="<text>"):
-    """Is the driver region inside this file's `verus! { ... }` block?
+    """Does the driver region's **syntax** claim to be inside `verus! { ... }`?
 
-    **This, not `lang == "rust"`, is what licenses ghost stripping.** Ghost
-    statements erase *in Verus*; in plain Rust every one of the tokens
+    This is a *claim*, not a licence. Read `GhostHarbourError`: any file can
+    write `macro_rules! verus` and this function will say True, because it is
+    looking at the token stream and the token stream is the attacker's. What
+    licenses ghost stripping is this claim **plus** Verus's own verdict on the
+    file, which only `normalise_file`'s caller can supply.
+
+    Ghost statements erase *in Verus*; in plain Rust every one of the tokens
     `_GHOST_RE` matches is live code. TASK_004_REVIEW put three payloads into
     `safe_naive.rs`'s measured loop through the language-level gate -- each
     normalised to the canonical sequence, kept `statements = 13`, printed the
@@ -562,14 +593,41 @@ def statement_count(canon):
     return sum(1 for l in canon.splitlines() if l.endswith(";") or l == "{")
 
 
-def normalise_file(path, lang, aliases=None, call_args=None):
+def normalise_file(path, lang, aliases=None, call_args=None,
+                   verus_verified=False):
+    """Normalise the driver region of `path`.
+
+    `verus_verified` is the caller's certificate that **Verus itself compiled
+    and verified this file** -- in `check.py` it comes from stage 5a, which runs
+    `verus_run.py` on every file in `spec.md`'s `verus.obligations` and reads
+    the obligation count back, plus a `--verify-function --verify-root` query on
+    the item that encloses the region. It is the only thing that licenses ghost
+    stripping.
+
+    Fails closed. A file whose region *claims* the `verus!` harbour without that
+    certificate raises `GhostHarbourError` rather than being renormalised
+    without ghost stripping: a rung that is not compiled by Verus has no
+    business spelling `verus!` around its measured loop at all, and downgrading
+    silently would leave the payload's author a second guess to make."""
     txt = open(path).read()
     where = os.path.basename(path)
     sp = region_span(txt, where)
     if sp is None:
         return None
+    claims = (lang == "rust" and region_in_verus(txt, where))
+    if claims and not verus_verified:
+        raise GhostHarbourError(
+            f"{where}: the driver region sits inside something spelled "
+            f"`verus!`, but Verus never verified this file -- it is not in "
+            f"spec.md's `verus.obligations`, or the item enclosing the region "
+            f"has no verified body. Ghost stripping is licensed by Verus's own "
+            f"verdict, not by the token `verus!`: `macro_rules! verus "
+            f"{{ ($($t:tt)*) => {{ $($t)* }} }}` plus `verus!( ... )` is three "
+            f"lines, and it is how TASK_006_REVIEW put `let ghost = unsafe "
+            f"{{ _mm_prefetch(..) }};` back into a measured loop at +5.0 "
+            f"Ir/call with a fully green gate.")
     return normalise(txt[sp[0]:sp[1]], lang, aliases, call_args,
-                     in_verus=(lang == "rust" and region_in_verus(txt, where)))
+                     in_verus=claims)
 
 
 # --------------------------------------------------------------------------
@@ -674,6 +732,34 @@ def _selftest():
          region_in_verus(ext), False)
     want("region_span agrees with region_text",
          (lambda s: plain[s[0]:s[1]])(region_span(plain)), region_text(plain))
+
+    # --- TASK_006_REVIEW: `verus!` is a token, not a certificate -------------
+    # A rung can define its own `verus!` and enter the ghost-strip harbour in
+    # any of the three bracket forms `vparse.verus_span` accepts. The brace form
+    # already had a guard in `check.py` and the paren form walked round it, so
+    # the fix is not a fourth regex: `normalise_file` refuses to strip anything
+    # unless the caller certifies that **Verus verified this file**.
+    fake = "macro_rules! verus { ($($t:tt)*) => { $($t)* } }\n"
+    scratch = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        ".temp", "dloop-selftest")
+    os.makedirs(scratch, exist_ok=True)
+    for label, o, c, tail in (("brace", "{", "}", ""),
+                              ("paren", "(", ")", ";"),
+                              ("bracket", "[", "]", ";")):
+        src = (fake + f"verus!{o}\n" + plain + f"{c}{tail}\n")
+        want(f"fake `verus!{o}...{c}` still *claims* the harbour",
+             region_in_verus(src), True)
+        p = os.path.join(scratch, f"fake_{label}.rs")
+        open(p, "w").write(src)
+        raises(f"...but normalise_file fails closed on it ({label})",
+               lambda p=p: normalise_file(p, "rust"), GhostHarbourError)
+        want(f"...and with the Verus certificate it strips ({label})",
+             normalise_file(p, "rust", verus_verified=True), "")
+    real = os.path.join(scratch, "no_verus.rs")
+    open(real, "w").write(plain)
+    want("a plain-Rust region needs no certificate and keeps its statement",
+         normalise_file(real, "rust"), "ghost = f ( x ) ;")
 
     # --- the alias table is a renamer, not a rewriter ----------------------
     want("legal alias table accepts",

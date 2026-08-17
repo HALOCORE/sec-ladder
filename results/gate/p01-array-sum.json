@@ -18,13 +18,13 @@
     "common/driver.rs": "ecafc9337834afbf85a1787528a220e51291e2705d9c9337b24a3a662a543029",
     "harness/asm.py": "e3b14d4e90f15e7ff28d862442c721120943bb70c9514437b77facc407b6675f",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "79f36a4f69cdf1b7b46c0a7038babec223e6ff4f2bd25d46f83c527c84302cc7",
-    "harness/dloop.py": "5be7e52c0fbbc07ddbdb3043b6fc08b4b895d41c071ccb74f5dcf0655c13d0fd",
+    "harness/check.py": "2776fd4fbe845ead28647e6c326dd85e1b3686b9c23306edd05e7b10d514f150",
+    "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "eadc0ed8afb59bedda89a92ee035c42676ab4020d0fb4612cd4d7c9e0f40807b",
-    "harness/report.py": "78bc72b51e5734c02f69416893928b7279975f829fd98fc9c965ed217863728b",
-    "harness/vparse.py": "c95b283684871eef444d91178465851fa8274d1362b12d7434c00aea2e643cc5",
-    "patterns/p01-array-sum/NOTES.md": "5b57d10c6b27dc3b1d12d4be0dc92dfb1805be96c7c8d99dc9660738461f2760",
+    "harness/report.py": "537f51262f58391a6e4da1999807e3b84a9e487e9727e168dc6527578442580a",
+    "harness/vparse.py": "705b351b08be97d6bb6ad1fa9a241de57f03b216e388326a3f067ff02366420f",
+    "patterns/p01-array-sum/NOTES.md": "7f2383a689e14cbcc1eea2a73b7a53fcda304160d031e312ff3a88f22e617283",
     "patterns/p01-array-sum/README.md": "c0d5616db3227be899f2fbdd1eec18b2225e354235c046fdc6180a16edfe7015",
     "patterns/p01-array-sum/c/kernel.c": "1b79c738a5ab4da534d62a931919ec2d16a6add4f3710b29a347e16b88c96fe7",
     "patterns/p01-array-sum/c/kernel.h": "2eaee3e8be741b9ef00a9d6061e72f8ab6199143724b2438251c7032db01add4",
@@ -45,7 +45,9 @@
       "result == wrapping_sum(v, off, len)"
     ],
     "alpha_ir_per_work": 0.25,
-    "collapse_rate_ir_per_work": 0.25
+    "collapse_rate_ir_per_work": 0.25,
+    "collapse_floor_min_declarable": 0.015625,
+    "collapse_tightest_margin": 7.02373046875
   },
   "identity": [
     {
@@ -334,6 +336,58 @@
           "item": "kernel",
           "kind": "verified",
           "clause": "r == sum_wrap(v@, off as int, len as int)",
+          "verified": 6,
+          "errors": 1
+        }
+      ]
+    }
+  },
+  "requires_strength": {
+    "safe_naive_verus.rs": {
+      "control_verified": 7,
+      "mutants": [
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "off + len <= v@.len()",
+          "test": "tautology",
+          "verified": 7,
+          "errors": 1
+        },
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "off + len <= v@.len()",
+          "test": "deletion",
+          "verified": 6,
+          "errors": 1
+        }
+      ]
+    },
+    "verus.rs": {
+      "control_verified": 7,
+      "mutants": [
+        {
+          "item": "get_unchecked",
+          "kind": "trusted",
+          "clause": "i < v@.len()",
+          "test": "tautology",
+          "verified": 7,
+          "errors": 1
+        },
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "off + len <= v@.len()",
+          "test": "tautology",
+          "verified": 7,
+          "errors": 1
+        },
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "off + len <= v@.len()",
+          "test": "deletion",
           "verified": 6,
           "errors": 1
         }

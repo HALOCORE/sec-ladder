@@ -97,6 +97,22 @@ emits `mov eax, <answer>; ret`. Then you are timing `printf`.
    step 2 — the model checksum. That was already the rule two paragraphs down;
    the measurement above is how much it matters.
 
+   **Partly closed at TASK_008.** `MIN_DECLARABLE_IR_PER_WORK = 0.015625` is a
+   hard floor under what any `model.py` may declare (`1e-9` now fails outright),
+   the achieved margin is printed beside the declared floor with what it implies,
+   and a margin above `LOOSE_FLOOR_MARGIN = 100` shouts. The stage is renamed
+   **"NOT-COLLAPSED smoke test"** and its own log now says step 2 is what
+   certifies the work happened, so a green line cannot be over-read. p02 prints:
+   *"tightest measured margin over it 35.9×, i.e. this stage tolerates a 97.2%
+   loss of work before it objects."*
+
+   **`work_per_call` is still unbounded — only made loud.** Shrinking p02's 16×
+   still **passes** (margin 576.7×, two shouts, no failure). Bounding it
+   mechanically would need the harness to know each pattern's unit of work,
+   which is precisely what `model.py` exists to supply, and failing on a large
+   margin would turn the floor into a *cap on how good a rung may be* — p01's
+   honest margins run 7×–268×. So this knob is a known, documented residual.
+
    **A floor can never certify that a component ran.** p02 clears any rate on its
    *fold* alone, so the stage does not show the copy happened. No rate bound on
    total kernel `Ir` can attribute cost to a part. What actually certifies the copy
@@ -235,6 +251,20 @@ offset 16  u8[payload_len]    # pattern-defined payload
   regex over the source. Payloads inside a *genuine* `verus!` span are safe:
   Verus itself rejects all three (`assert!` → *"panic is not supported"*,
   `let ghost = <expr>` → parse error), so the harbour is sound when it is real.
+
+  **Closed at TASK_008, semantically and fail-closed.**
+  `dloop.normalise_file(..., verus_verified=)` raises `GhostHarbourError` when a
+  region *claims* a `verus!` span without the caller's certificate, and
+  `check.py::_verus_verified_files` issues that certificate only from Verus's own
+  verdict: the file is in `verus.obligations` **and** stage 5a got `N verified,
+  0 errors`, **and** `--verify-function <the item enclosing the region>
+  --verify-root` reports a verified body for that item. `region_in_verus` is now
+  documented as a *claim*, not a licence. All three bracket forms fail, and so
+  does a fourth variant that also declares the rung in `verus.obligations` to
+  dodge the pin guard — Verus refuses the file, so no certificate is issued.
+  The gate now names the harbour in its log: *"ghost statements excluded in
+  ['verus.rs'] — the only file(s) Verus itself verified this run"*. The regexes
+  were reconciled too, but that is hygiene, not the fix.
 - Kernel signature is fixed per pattern in the pattern's `spec.md`, and all five
   rungs implement exactly that contract.
 

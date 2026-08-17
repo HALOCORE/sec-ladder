@@ -1,6 +1,6 @@
 # p01-array-sum — results
 
-Generated 2026-08-15T16:01:11Z from `results/p01-array-sum.json` (git `19e3f6c9e001`, working tree dirty).
+Generated 2026-08-17T09:52:07Z from `results/p01-array-sum.json` (git `5bbb5ac39f5e`, working tree dirty).
 
 ## Toolchain
 
@@ -15,16 +15,16 @@ Generated 2026-08-15T16:01:11Z from `results/p01-array-sum.json` (git `19e3f6c9e
 
 ## Inputs
 
-| file | n_iters | declared payload | present | win_len | v_len | truncated |
-|---|---:|---:|---:|---:|---:|---|
-| adversarial-empty.bin | 1,000 | 0 | 0 | 0 | 0 | False |
-| adversarial-headonly.bin | 1,000 | 8 | 8 | 8 | 0 | False |
-| adversarial-shortlen.bin | 1,000 | 4,096 | 40 | 4 | 4 | True |
-| adversarial-win0.bin | 1,000 | 520 | 520 | 0 | 64 | False |
-| adversarial-winbig.bin | 1,000 | 520 | 520 | 1,099,511,627,776 | 64 | False |
-| adversarial.bin | 0 | 520 | 520 | 8 | 64 | False |
-| large.bin | 20,000 | 12,000,008 | 12,000,008 | 4,096 | 1,500,000 | False |
-| small.bin | 200,000 | 16,008 | 16,008 | 501 | 2,000 | False |
+| file | n_iters | declared payload | present | truncated | model |
+|---|---:|---:|---:|---|---|
+| adversarial-empty.bin | 1,000 | 0 | 0 | False | n_iters=1000 v_len=0 win=0 calls=0 work/call=0 truncated=False expected=0 |
+| adversarial-headonly.bin | 1,000 | 8 | 8 | False | n_iters=1000 v_len=0 win=8 calls=0 work/call=0 truncated=False expected=0 |
+| adversarial-shortlen.bin | 1,000 | 4,096 | 40 | True | n_iters=1000 v_len=4 win=4 calls=0 work/call=0 truncated=True expected=None |
+| adversarial-win0.bin | 1,000 | 520 | 520 | False | n_iters=1000 v_len=64 win=0 calls=0 work/call=0 truncated=False expected=0 |
+| adversarial-winbig.bin | 1,000 | 520 | 520 | False | n_iters=1000 v_len=64 win=1099511627776 calls=0 work/call=0 truncated=False expected=0 |
+| adversarial.bin | 0 | 520 | 520 | False | n_iters=0 v_len=64 win=8 calls=0 work/call=8 truncated=False expected=0 |
+| large.bin | 20,000 | 12,000,008 | 12,000,008 | False | n_iters=20000 v_len=1500000 win=4096 calls=20000 work/call=4096 truncated=False expected=8088771909753396726 |
+| small.bin | 200,000 | 16,008 | 16,008 | False | n_iters=200000 v_len=2000 win=501 calls=200000 work/call=501 truncated=False expected=17245669606222259694 |
 
 ## Static + executed instructions
 
@@ -78,7 +78,7 @@ Generated 2026-08-15T16:01:11Z from `results/p01-array-sum.json` (git `19e3f6c9e
 
 | rung | `main` instrs (nm extent) | pad-excl | trailing pad (insns) | sym bytes | Ir(kernel) small | Ir(kernel) large | Ir(main) small | Ir(main) large | md5_fn | md5_raw | loop | vec |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|
-| c-gcc | 98 | 98 | 0 | 411 | 1,205,400,000 | - | 6,800,066 | - | `3374cc79` | `3374cc79` | yes | - |
+| c-gcc | 98 | 98 | 0 | 411 | 1,205,400,000 | - | 6,800,066 | - | `2fe6ada7` | `2fe6ada7` | yes | - |
 | c-clang | 65 | 65 | 0 | 270 | 1,305,200,000 | - | 3,800,055 | - | `77f37e64` | `77f37e64` | yes | - |
 | safe_naive | 113 | 113 | 2 | 574 | 2,108,600,000 | - | 4,800,073 | - | `0cc27eb0` | `1d0eea59` | yes | xmm |
 | safe_tuned | 113 | 113 | 2 | 574 | 2,116,800,000 | - | 4,800,073 | - | `9bef66b4` | `954b18e1` | yes | xmm |
@@ -103,20 +103,20 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 37.51 | 38.10 | 1.6% | 24.51 | 24.77 | 1.1% |
-| c-gcc | whole | 38.29 | 38.68 | 1.0% | 24.60 | 24.85 | 1.0% |
-| c-clang | isolated | 37.77 | 38.11 | 0.9% | 15.08 | 15.31 | 1.5% |
-| c-clang | whole | 37.71 | 38.15 | 1.2% | 15.96 | 16.17 | 1.4% |
-| safe_naive | isolated | 38.51 | 38.92 | 1.1% | 16.11 | 16.26 | 0.9% |
-| safe_naive | whole | 38.58 | 38.98 | 1.0% | 15.92 | 16.22 | 1.8% |
-| safe_tuned | isolated | 38.46 | 38.83 | 1.0% | 15.97 | 16.16 | 1.2% |
-| safe_tuned | whole | 38.10 | 38.76 | 1.7% | 15.82 | 16.01 | 1.2% |
-| unsafe | isolated | 38.51 | 38.88 | 0.9% | 15.36 | 15.58 | 1.5% |
-| unsafe | whole | 38.44 | 38.83 | 1.0% | 16.05 | 16.38 | 2.0% |
-| verus | isolated | 38.31 | 38.72 | 1.1% | 15.40 | 15.61 | 1.4% |
-| verus | whole | 38.14 | 38.71 | 1.5% | 16.02 | 16.34 | 2.0% |
-| safe_naive_verus | isolated | 38.23 | 38.71 | 1.3% | 15.02 | 15.20 | 1.2% |
-| safe_naive_verus | whole | 38.26 | 38.70 | 1.2% | 16.06 | 16.33 | 1.7% |
+| c-gcc | isolated | 35.96 | 36.20 | 0.7% | 24.12 | 24.32 | 0.8% |
+| c-gcc | whole | 36.53 | 36.83 | 0.8% | 24.22 | 24.50 | 1.1% |
+| c-clang | isolated | 36.09 | 36.30 | 0.6% | 15.51 | 15.66 | 0.9% |
+| c-clang | whole | 36.02 | 36.33 | 0.9% | 15.71 | 15.96 | 1.6% |
+| safe_naive | isolated | 36.86 | 37.02 | 0.4% | 15.80 | 15.93 | 0.8% |
+| safe_naive | whole | 36.83 | 37.06 | 0.6% | 15.75 | 15.99 | 1.5% |
+| safe_tuned | isolated | 36.68 | 37.03 | 0.9% | 15.70 | 15.91 | 1.4% |
+| safe_tuned | whole | 36.69 | 36.96 | 0.8% | 15.56 | 15.74 | 1.1% |
+| unsafe | isolated | 36.66 | 36.98 | 0.9% | 14.99 | 15.26 | 1.8% |
+| unsafe | whole | 36.62 | 36.91 | 0.8% | 15.81 | 16.04 | 1.5% |
+| verus | isolated | 36.72 | 36.98 | 0.7% | 15.08 | 15.35 | 1.8% |
+| verus | whole | 36.55 | 36.77 | 0.6% | 15.78 | 16.01 | 1.4% |
+| safe_naive_verus | isolated | 36.69 | 36.87 | 0.5% | 14.71 | 14.92 | 1.4% |
+| safe_naive_verus | whole | 36.54 | 36.83 | 0.8% | 15.77 | 16.02 | 1.6% |
 
 Every wall-clock cell is within the 10% min-to-median spread threshold.
 

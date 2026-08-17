@@ -1,10 +1,10 @@
 {
   "pattern": "p01-array-sum",
-  "generated_utc": "2026-08-15T16:01:11Z",
+  "generated_utc": "2026-08-17T09:52:07Z",
   "git": {
-    "commit": "19e3f6c9e001af78dc0cf78d70e5a2763fdfb338",
+    "commit": "5bbb5ac39f5e6b8c9cee4f7851b39a836afd4513",
     "dirty": true,
-    "dirty_files": 15
+    "dirty_files": 19
   },
   "toolchain": {
     "gcc": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
@@ -32,64 +32,56 @@
       "declared_len": 0,
       "present": 0,
       "truncated": false,
-      "win_len": 0,
-      "v_len": 0
+      "model": "n_iters=1000 v_len=0 win=0 calls=0 work/call=0 truncated=False expected=0"
     },
     "adversarial-headonly.bin": {
       "n_iters": 1000,
       "declared_len": 8,
       "present": 8,
       "truncated": false,
-      "win_len": 8,
-      "v_len": 0
+      "model": "n_iters=1000 v_len=0 win=8 calls=0 work/call=0 truncated=False expected=0"
     },
     "adversarial-shortlen.bin": {
       "n_iters": 1000,
       "declared_len": 4096,
       "present": 40,
       "truncated": true,
-      "win_len": 4,
-      "v_len": 4
+      "model": "n_iters=1000 v_len=4 win=4 calls=0 work/call=0 truncated=True expected=None"
     },
     "adversarial-win0.bin": {
       "n_iters": 1000,
       "declared_len": 520,
       "present": 520,
       "truncated": false,
-      "win_len": 0,
-      "v_len": 64
+      "model": "n_iters=1000 v_len=64 win=0 calls=0 work/call=0 truncated=False expected=0"
     },
     "adversarial-winbig.bin": {
       "n_iters": 1000,
       "declared_len": 520,
       "present": 520,
       "truncated": false,
-      "win_len": 1099511627776,
-      "v_len": 64
+      "model": "n_iters=1000 v_len=64 win=1099511627776 calls=0 work/call=0 truncated=False expected=0"
     },
     "adversarial.bin": {
       "n_iters": 0,
       "declared_len": 520,
       "present": 520,
       "truncated": false,
-      "win_len": 8,
-      "v_len": 64
+      "model": "n_iters=0 v_len=64 win=8 calls=0 work/call=8 truncated=False expected=0"
     },
     "large.bin": {
       "n_iters": 20000,
       "declared_len": 12000008,
       "present": 12000008,
       "truncated": false,
-      "win_len": 4096,
-      "v_len": 1500000
+      "model": "n_iters=20000 v_len=1500000 win=4096 calls=20000 work/call=4096 truncated=False expected=8088771909753396726"
     },
     "small.bin": {
       "n_iters": 200000,
       "declared_len": 16008,
       "present": 16008,
       "truncated": false,
-      "win_len": 501,
-      "v_len": 2000
+      "model": "n_iters=200000 v_len=2000 win=501 calls=200000 work/call=501 truncated=False expected=17245669606222259694"
     }
   },
   "cells": [
@@ -99,7 +91,7 @@
       "mode": "isolated",
       "binary": ".temp/build/p01/c-gcc-O0-isolated",
       "asm_symbol_needle": "kernel",
-      "binary_text_bytes": 2197,
+      "binary_text_bytes": 2648,
       "status": "ok",
       "static": {
         "binary": "/home/apt/repos_common/sec-ladder/.temp/build/p01/c-gcc-O0-isolated",
@@ -147,7 +139,7 @@
       "mode": "whole",
       "binary": ".temp/build/p01/c-gcc-O0-whole",
       "asm_symbol_needle": "main",
-      "binary_text_bytes": 2224,
+      "binary_text_bytes": 2684,
       "status": "ok",
       "static": {
         "binary": "/home/apt/repos_common/sec-ladder/.temp/build/p01/c-gcc-O0-whole",
@@ -155,13 +147,13 @@
         "n_raw": 98,
         "n_nopad": 98,
         "n_bytes": 411,
-        "md5_raw": "3374cc79d5ac4d8ae73b12ac79aafd8b",
+        "md5_raw": "2fe6ada73f9070e6a69b3b6624ef253c",
         "md5_raw_norel": "8db04fb9d6d07a31122be75c742d24ce",
         "has_extent": true,
         "n_fn": 98,
         "n_fn_nopad": 98,
         "fn_bytes": 411,
-        "md5_fn": "3374cc79d5ac4d8ae73b12ac79aafd8b",
+        "md5_fn": "2fe6ada73f9070e6a69b3b6624ef253c",
         "md5_fn_norel": "8db04fb9d6d07a31122be75c742d24ce",
         "pad_insns": 0,
         "pad_bytes": 0,
@@ -195,7 +187,7 @@
       "mode": "isolated",
       "binary": ".temp/build/p01/c-gcc-O3-isolated",
       "asm_symbol_needle": "kernel",
-      "binary_text_bytes": 1529,
+      "binary_text_bytes": 1833,
       "status": "ok",
       "static": {
         "binary": "/home/apt/repos_common/sec-ladder/.temp/build/p01/c-gcc-O3-isolated",
@@ -250,16 +242,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.02450572419911623,
-          "median_s": 0.024774011224508286,
+          "min_s": 0.024118930101394653,
+          "median_s": 0.024316619150340557,
           "reps": 30,
-          "spread_pct": 1.0947932948732484
+          "spread_pct": 0.8196426960683161
         },
         "large.bin": {
-          "min_s": 0.03751166816800833,
-          "median_s": 0.03809968801215291,
+          "min_s": 0.035964188165962696,
+          "median_s": 0.03620461095124483,
           "reps": 30,
-          "spread_pct": 1.5675651680190354
+          "spread_pct": 0.668506082141113
         }
       }
     },
@@ -322,16 +314,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.024597814306616783,
-          "median_s": 0.024848037865012884,
+          "min_s": 0.02422419935464859,
+          "median_s": 0.024501703679561615,
           "reps": 30,
-          "spread_pct": 1.0172593193729051
+          "spread_pct": 1.145566550416339
         },
         "large.bin": {
-          "min_s": 0.03829197306185961,
-          "median_s": 0.03868200443685055,
+          "min_s": 0.036528085358440876,
+          "median_s": 0.0368283037096262,
           "reps": 30,
-          "spread_pct": 1.0185721544326154
+          "spread_pct": 0.8218836225314164
         }
       }
     },
@@ -341,7 +333,7 @@
       "mode": "isolated",
       "binary": ".temp/build/p01/c-clang-O0-isolated",
       "asm_symbol_needle": "kernel",
-      "binary_text_bytes": 1931,
+      "binary_text_bytes": 2379,
       "status": "ok",
       "static": {
         "binary": "/home/apt/repos_common/sec-ladder/.temp/build/p01/c-clang-O0-isolated",
@@ -437,7 +429,7 @@
       "mode": "isolated",
       "binary": ".temp/build/p01/c-clang-O3-isolated",
       "asm_symbol_needle": "kernel",
-      "binary_text_bytes": 1318,
+      "binary_text_bytes": 1606,
       "status": "ok",
       "static": {
         "binary": "/home/apt/repos_common/sec-ladder/.temp/build/p01/c-clang-O3-isolated",
@@ -492,16 +484,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.01507794950157404,
-          "median_s": 0.015309198293834925,
+          "min_s": 0.01551449578255415,
+          "median_s": 0.015655301976948977,
           "reps": 30,
-          "spread_pct": 1.533688597622272
+          "spread_pct": 0.9075782827126205
         },
         "large.bin": {
-          "min_s": 0.037767043337225914,
-          "median_s": 0.038111727219074965,
+          "min_s": 0.03608566150069237,
+          "median_s": 0.03629610827192664,
           "reps": 30,
-          "spread_pct": 0.9126578397237289
+          "spread_pct": 0.583186679923371
         }
       }
     },
@@ -564,16 +556,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.015959233976900578,
-          "median_s": 0.016174711287021637,
+          "min_s": 0.01570755150169134,
+          "median_s": 0.01596244005486369,
           "reps": 30,
-          "spread_pct": 1.3501732629081173
+          "spread_pct": 1.622713464570874
         },
         "large.bin": {
-          "min_s": 0.037711664102971554,
-          "median_s": 0.038147564977407455,
+          "min_s": 0.036015027202665806,
+          "median_s": 0.0363308135420084,
           "reps": 30,
-          "spread_pct": 1.1558781210123106
+          "spread_pct": 0.8768182724549487
         }
       }
     },
@@ -740,16 +732,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.016111194156110287,
-          "median_s": 0.016261420212686062,
+          "min_s": 0.015796960331499577,
+          "median_s": 0.01592737529426813,
           "reps": 30,
-          "spread_pct": 0.9324327862984684
+          "spread_pct": 0.8255699832866177
         },
         "large.bin": {
-          "min_s": 0.0385054973885417,
-          "median_s": 0.0389224998652935,
+          "min_s": 0.03686289768666029,
+          "median_s": 0.03702229307964444,
           "reps": 30,
-          "spread_pct": 1.0829686798848992
+          "spread_pct": 0.43240060599422936
         }
       }
     },
@@ -814,16 +806,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.01592243369668722,
-          "median_s": 0.01621639495715499,
+          "min_s": 0.015747204422950745,
+          "median_s": 0.015987470746040344,
           "reps": 30,
-          "spread_pct": 1.8462080990101941
+          "spread_pct": 1.5257712838186297
         },
         "large.bin": {
-          "min_s": 0.03858471754938364,
-          "median_s": 0.038977839052677155,
+          "min_s": 0.03683363366872072,
+          "median_s": 0.037056108471006155,
           "reps": 30,
-          "spread_pct": 1.0188528730069557
+          "spread_pct": 0.6039990631561267
         }
       }
     },
@@ -994,16 +986,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.015965253114700317,
-          "median_s": 0.016160432249307632,
+          "min_s": 0.01569514162838459,
+          "median_s": 0.015912335831671953,
           "reps": 30,
-          "spread_pct": 1.222524523758412
+          "spread_pct": 1.383830795732154
         },
         "large.bin": {
-          "min_s": 0.038461918011307716,
-          "median_s": 0.03883088007569313,
+          "min_s": 0.03668438643217087,
+          "median_s": 0.03702595829963684,
           "reps": 30,
-          "spread_pct": 0.959291900827567
+          "spread_pct": 0.9311096645913283
         }
       }
     },
@@ -1068,16 +1060,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.015820857137441635,
-          "median_s": 0.016009662300348282,
+          "min_s": 0.015562769025564194,
+          "median_s": 0.015735510736703873,
           "reps": 30,
-          "spread_pct": 1.1933940194670016
+          "spread_pct": 1.1099677111182764
         },
         "large.bin": {
-          "min_s": 0.03809950966387987,
-          "median_s": 0.03876265697181225,
+          "min_s": 0.03668542392551899,
+          "median_s": 0.036963350139558315,
           "reps": 30,
-          "spread_pct": 1.7405665159020975
+          "spread_pct": 0.7575930282381053
         }
       }
     },
@@ -1244,16 +1236,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.015357602387666702,
-          "median_s": 0.015581462066620588,
+          "min_s": 0.01498792041093111,
+          "median_s": 0.015255866572260857,
           "reps": 30,
-          "spread_pct": 1.4576473156621246
+          "spread_pct": 1.7877474258158297
         },
         "large.bin": {
-          "min_s": 0.03851206600666046,
-          "median_s": 0.038875591941177845,
+          "min_s": 0.03666356299072504,
+          "median_s": 0.036984475795179605,
           "reps": 30,
-          "spread_pct": 0.9439273770836227
+          "spread_pct": 0.8752908290330318
         }
       }
     },
@@ -1318,16 +1310,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.016053137369453907,
-          "median_s": 0.016382182016968727,
+          "min_s": 0.01580691710114479,
+          "median_s": 0.016041682567447424,
           "reps": 30,
-          "spread_pct": 2.0497217456129793
+          "spread_pct": 1.4852071710152182
         },
         "large.bin": {
-          "min_s": 0.038436222821474075,
-          "median_s": 0.03882563440129161,
+          "min_s": 0.03662408236414194,
+          "median_s": 0.03691380890086293,
           "reps": 30,
-          "spread_pct": 1.0131369610022443
+          "spread_pct": 0.791082036787515
         }
       }
     },
@@ -1492,16 +1484,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.01539743971079588,
-          "median_s": 0.015614645555615425,
+          "min_s": 0.015077819116413593,
+          "median_s": 0.015346023719757795,
           "reps": 30,
-          "spread_pct": 1.410662089926888
+          "spread_pct": 1.7788023670627315
         },
         "large.bin": {
-          "min_s": 0.03831200301647186,
-          "median_s": 0.038719477597624063,
+          "min_s": 0.036720361560583115,
+          "median_s": 0.03697911091148853,
           "reps": 30,
-          "spread_pct": 1.0635689837908269
+          "spread_pct": 0.7046481567958436
         }
       }
     },
@@ -1566,16 +1558,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.01602161582559347,
-          "median_s": 0.016342513263225555,
+          "min_s": 0.015782221220433712,
+          "median_s": 0.01601020758971572,
           "reps": 30,
-          "spread_pct": 2.0029030849651974
+          "spread_pct": 1.4445771992273588
         },
         "large.bin": {
-          "min_s": 0.03814398404210806,
-          "median_s": 0.03871191805228591,
+          "min_s": 0.036549163050949574,
+          "median_s": 0.036771895829588175,
           "reps": 30,
-          "spread_pct": 1.4889215807947453
+          "spread_pct": 0.6094059618495548
         }
       }
     },
@@ -1740,16 +1732,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.015023949556052685,
-          "median_s": 0.015201231464743614,
+          "min_s": 0.014711706899106503,
+          "median_s": 0.014916341751813889,
           "reps": 30,
-          "spread_pct": 1.179995366927387
+          "spread_pct": 1.390966079672334
         },
         "large.bin": {
-          "min_s": 0.038234164007008076,
-          "median_s": 0.03871395951136947,
+          "min_s": 0.03669053874909878,
+          "median_s": 0.03686548350378871,
           "reps": 30,
-          "spread_pct": 1.254886871002195
+          "spread_pct": 0.47681162679637407
         }
       }
     },
@@ -1814,16 +1806,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.01605985499918461,
-          "median_s": 0.01632817927747965,
+          "min_s": 0.015773036517202854,
+          "median_s": 0.016021748073399067,
           "reps": 30,
-          "spread_pct": 1.670776469081841
+          "spread_pct": 1.576814685776931
         },
         "large.bin": {
-          "min_s": 0.03825845289975405,
-          "median_s": 0.03870086604729295,
+          "min_s": 0.03654369432479143,
+          "median_s": 0.0368336895480752,
           "reps": 30,
-          "spread_pct": 1.1563801304201313
+          "spread_pct": 0.7935574895804485
         }
       }
     }

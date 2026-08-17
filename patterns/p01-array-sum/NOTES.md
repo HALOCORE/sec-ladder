@@ -131,10 +131,38 @@ symbol extent (`nm --print-size`, `md5_fn`)**, which is the function proper;
 follows the function, so it is given beside it with the padding stated. Both
 conventions agree on every equality here (`.memory/03-measurement.md`).
 
-| pair | O3 `md5_fn` | O3 `md5_raw` | O0 | counts `n_fn`/pad-excl (+padding) |
+| pair | O3 `md5_fn` | O3 `md5_raw` | O0 `md5_fn` | counts `n_fn`/pad-excl (+padding) |
 |---|---|---|---|---|
-| R4 `unsafe` vs R5 `verus` | **equal**, `619b1d1b…` | **equal**, `fb90a96c…` | `md5_fn` differs (`1dffc20c…` vs `779a1133…`); `md5_fn_norel` **equal** `e5bc48f2…` | 36 / 34 both (+3 insn, 3 B padding) |
-| R2 `safe_naive` vs R2v `safe_naive_verus` | **equal**, `f8e1fe32…` | **equal**, `6c85987d…` | **equal**, `3ab6079d…` | 49 / 47 both (+10 insn, 10 B padding) |
+| R4 `unsafe` vs R5 `verus` | **equal**, `619b1d1b6561…` | **equal**, `fb90a96cd00f…` | differs (`78b8c557c474…` vs `a5bbe0c0f5ef…`); `md5_fn_norel` **equal** `e5bc48f259a2…` | 36 / 34 both (+3 insn, 3 B padding) |
+| R2 `safe_naive` vs R2v `safe_naive_verus` | **equal**, `12d307f2b9d1…` | **equal**, `f1e7f9511d86…` | **equal**, `bf555ac41318…` | 49 / 47 both (+10 insn, 10 B padding) |
+
+Every digest is a **prefix of the md5 over the raw machine-code bytes of the
+`kernel` symbol**; `md5_fn`/`md5_fn_norel` are taken on the `nm --print-size`
+extent (the function proper — the identity convention), `md5_raw` on objdump's
+symbol grouping (function **plus** the alignment padding that follows it), and
+`*_norel` is the same bytes with pc-relative *displacement fields only* zeroed
+(`.memory/03-measurement.md`). The counts column is O3.
+
+**Five of these were stale until TASK_008** (found by TASK_006_REVIEW,
+re-derived here from a fresh `check.py p01` build rather than copied): both R2
+O3 digests, the R2 O0 digest, and both sides of the R4/R5 O0 pair. The barrier
+swap at TASK_005 changed the kernels; **every *equality* in the table survived
+it**, which is why nothing caught the drift — a stale digest beside a correct
+"equal" is exactly the shape a reader cannot detect. `harness/asm.py`'s selftest
+pins the *pilot's* digests, not this pattern's, so nothing mechanical checks
+this table. Re-derive it after any change to a rung or to the driver, with:
+
+```bash
+python3 - <<'EOF'
+import sys; sys.path.insert(0, "harness"); import asm
+for a, b in (("unsafe", "verus"), ("safe_naive", "safe_naive_verus")):
+    for o in ("O3", "O0"):
+        for n in (a, b):
+            k = asm.kernel(f".temp/build/p01/{n}-{o}-isolated", "kernel")
+            print(o, n, k.md5_fn[:12], k.md5_fn_norel[:12], k.md5_raw[:12],
+                  k.n_fn, k.n_fn_nopad, k.pad_insns)
+EOF
+```
 
 (TASK_002 published 39/34 and 59/47 as the "raw" counts; those are objdump's
 grouping, i.e. the function *plus* its trailing padding. The function itself is

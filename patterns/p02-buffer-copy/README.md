@@ -56,8 +56,14 @@ the bare check.
 
 - The check costs **5 instructions per call out of ~230** (2%) in C, and Rust's
   idiomatic safe rung (R3) lands within **+10 per call** of unsafe Rust —
-  measured at **68 record lengths across two scales**, +10 at every one of them.
-  Safety costs about the same in both languages; Rust makes it non-optional.
+  measured at **68 record lengths across two scales**: **+8 where
+  `len ≡ 0 (mod 8)` and +10 everywhere else**, at every one of the 68, with no
+  other value anywhere in the sweep. Safety costs about the same in both
+  languages; Rust makes it non-optional.
+  (This line said "+10 at every one of them" until TASK_008, contradicting
+  `NOTES.md` §3 finding 1 and the §3b table in the same commit. 8 is the value
+  at 5 of the 34 lengths in each sweep band, and re-measured outside the bands
+  at TASK_008: +8.0 at 512, 520, 528 and 1000; +10.0 at 513, 521 and 1001.)
 - On a one-byte overflow, R1 is **silent in 7 of its 8 builds** — right answer
   shape, wrong number, exit 0. That is the row that matters. Delete the same
   check from safe Rust and you get exit 101 and `index out of bounds: the len is

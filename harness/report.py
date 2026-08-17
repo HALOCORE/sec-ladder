@@ -26,8 +26,33 @@ TABLES = os.path.join(RESULTS, "tables")
 
 
 def load(pid):
-    hits = [f for f in os.listdir(RESULTS)
-            if f.startswith(pid + "-") and f.endswith(".json")]
+    """The measure.py record for `pid`.
+
+    `results/` also holds side records -- p02 ships `p02-residue-sweep.json`
+    beside `p02-buffer-copy.json` -- and matching on the `pNN-` prefix alone
+    made `report.py p02` a hard error from the day the sweep was committed,
+    which is why `results/tables/p02-buffer-copy.md` was never regenerated
+    (found at TASK_008). A measure.py record is the one with a `cells` list, so
+    that is the discriminator; the exact stem still works if it is ever
+    ambiguous even so."""
+    hits = sorted(f for f in os.listdir(RESULTS)
+                  if (f == pid + ".json" or f.startswith(pid + "-"))
+                  and f.endswith(".json"))
+    if len(hits) > 1:
+        keep = []
+        for f in hits:
+            try:
+                if isinstance(json.load(open(os.path.join(RESULTS, f)))
+                              .get("cells"), list):
+                    keep.append(f)
+            except (ValueError, OSError):
+                continue
+        if len(keep) == 1:
+            hits = keep
+        else:
+            raise SystemExit(
+                f"report.py: {pid} matches {hits} in results/, of which "
+                f"{keep} carry a `cells` list. Name the stem exactly.")
     if len(hits) != 1:
         raise SystemExit(f"report.py: {pid} matches {hits} in results/")
     return json.load(open(os.path.join(RESULTS, hits[0]))), hits[0]

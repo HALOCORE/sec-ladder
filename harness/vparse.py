@@ -442,6 +442,193 @@ def delete_clause(text, item, kw, idx):
     return text[:a] + text[b:]
 
 
+def params_text(item):
+    """The item's parameter list, brackets included, verbatim.
+
+    What the `requires`-tautology probe needs: a synthesised
+    `proof fn <name><params> ensures <clause>, { }` has to bind exactly the
+    names the clause mentions, and copying the source's own text is the only
+    way to be sure it does."""
+    sc = item.sig_code or ""
+    i = sc.find("(")
+    if i < 0:
+        raise ValueError(f"vparse: {item.name} has no parameter list")
+    return (item.sig or "")[i:_match_bracket(sc, i)]
+
+
+def param_names(item):
+    """[name] of the item's parameters, in order.
+
+    Raises on anything that is not `[mut ]name: type` or a `self` receiver --
+    a caller that reasons about *which* parameters a contract constrains must
+    not be allowed to silently skip one it could not parse."""
+    sc = item.sig_code or ""
+    i = sc.find("(")
+    if i < 0:
+        raise ValueError(f"vparse: {item.name} has no parameter list")
+    j = _match_bracket(sc, i)
+    inner_code, inner_text = sc[i + 1:j - 1], (item.sig or "")[i + 1:j - 1]
+    out, depth, start = [], 0, 0
+    pieces = []
+    for k, ch in enumerate(inner_code):
+        if ch in "([{<":
+            depth += 1
+        elif ch in ")]}>":
+            depth -= 1
+        elif ch == "," and depth == 0:
+            pieces.append((start, k))
+            start = k + 1
+    pieces.append((start, len(inner_code)))
+    for a, b in pieces:
+        code, text = inner_code[a:b], inner_text[a:b]
+        if not code.strip():
+            continue
+        if re.fullmatch(r"\s*&?\s*(mut\s+)?self\s*", code):
+            out.append("self")
+            continue
+        depth, cut = 0, None
+        for k, ch in enumerate(code):
+            if ch in "([{<":
+                depth += 1
+            elif ch in ")]}>":
+                depth -= 1
+            elif ch == ":" and depth == 0:
+                cut = k
+                break
+        if cut is None:
+            raise ValueError(f"vparse: {item.name}: parameter {text.strip()!r} "
+                             f"has no `: type`")
+        nm = text[:cut].strip()
+        nm = re.sub(r"^(mut|ref)\s+", "", nm).strip()
+        if not re.fullmatch(_IDENT, nm):
+            raise ValueError(f"vparse: {item.name}: parameter pattern "
+                             f"{nm!r} is not a plain identifier")
+        out.append(nm)
+    return out
+
+
+# --- conjuncts: one deletable unit is not always one clause ----------------
+#
+# TASK_006_REVIEW, major C. `_clause_split` splits on top-level commas, so
+# `ensures a, b` is two deletable clauses and `ensures a && b` is one. Re-joining
+# a redundant conjunct with `&&` therefore makes the clause-deletion stage delete
+# **both** halves at once; the file fails to verify, and the stage reports the
+# clause load-bearing and prints a green line. Cost to an author: one character.
+# Demonstrated on p02: ` && final(dst)@.len() == old(dst)@.len()` re-joined onto
+# `copy_bytes`'s surviving `ensures` gives `ensures[0] load-bearing (8 verified,
+# 1 errors)` and a green gate, while deleting only that conjunct reproduces the
+# shipped file at 9 verified, 0 errors.
+#
+# So the deletion stage works on *conjuncts*, not clauses. Splitting is only
+# sound where `&&` is the top-level connective: `a ==> b && c` parses as
+# `a ==> (b && c)`, and a conjunct lifted out of an implication's antecedent or
+# consequent is not a deletable unit. Any other top-level logical operator
+# therefore **refuses** the split and says so, rather than guessing.
+#
+# `item.clauses` is untouched and stays comma-split: it is what `spec.md` pins,
+# and the pin is a verbatim text diff that must not move under this.
+_LOGIC_OPS = ("<==>", "<==", "==>", "&&&", "|||", "||", "&&")
+
+
+def top_level_ops(text):
+    """[(offset, op)] for each logical operator of `_LOGIC_OPS` at bracket
+    depth 0 in `text`. Longest match wins at each position, so `&&&` is never
+    read as `&&` and `<==>` is never read as `<==`."""
+    out, depth, i = [], 0, 0
+    while i < len(text):
+        ch = text[i]
+        if ch in "([{":
+            depth += 1
+        elif ch in ")]}":
+            depth -= 1
+        if depth == 0:
+            for op in _LOGIC_OPS:
+                if text.startswith(op, i):
+                    out.append((i, op))
+                    i += len(op)
+                    break
+            else:
+                i += 1
+            continue
+        i += 1
+    return out
+
+
+def conjunct_spans(item, kw):
+    """Per comma-clause of `item`'s `kw` list: the deletable conjuncts inside it.
+
+    Returns a list parallel to `item.clauses[kw]`, each entry
+    `{"spans": [(a, b), ...], "op": "&&"|"&&&"|None, "refused": None|str}` in
+    absolute offsets into the text the item was parsed from. `refused` names the
+    top-level connective that made splitting unsound; the caller must surface it
+    rather than silently treating the clause as atomic."""
+    info = clause_spans(item).get(kw)
+    if not info:
+        return []
+    out = []
+    base = item.sig_start or 0
+    for a, b in info["spans"]:
+        # the comment/string-blanked copy: a `&&` inside a comment is not a
+        # connective, and the two copies are the same length so offsets agree
+        body = (item.sig_code or "")[a - base:b - base]
+        ops = top_level_ops(body)
+        kinds = {op for _, op in ops}
+        if not kinds:
+            out.append({"spans": [(a, b)], "op": None, "refused": None})
+            continue
+        if kinds == {"&&"} or kinds == {"&&&"}:
+            op = kinds.pop()
+            cuts, prev, spans = [o for o, _ in ops], 0, []
+            for c in cuts:
+                spans.append((prev, c))
+                prev = c + len(op)
+            spans.append((prev, len(body)))
+            trimmed = []
+            for s, e in spans:
+                while s < e and body[s] in " \t\r\n":
+                    s += 1
+                while e > s and body[e - 1] in " \t\r\n":
+                    e -= 1
+                if e > s:
+                    trimmed.append((a + s, a + e))
+            out.append({"spans": trimmed, "op": op, "refused": None})
+            continue
+        out.append({"spans": [(a, b)], "op": None,
+                    "refused": "top-level " + ", ".join(sorted(kinds))})
+    return out
+
+
+def delete_conjunct(text, item, kw, ci, ji):
+    """`text` with conjunct `ji` of clause `ci` of `item`'s `kw` list removed.
+
+    Removes the adjacent connective with it. A clause with a single conjunct
+    falls back to `delete_clause`, which also drops the keyword when the clause
+    was the only one -- a dangling `ensures` before `{` is a parse error, and a
+    parse error is not the same experiment as a missing postcondition."""
+    cj = conjunct_spans(item, kw)
+    if ci >= len(cj):
+        raise ValueError(f"vparse: {item.name} has no {kw} clause {ci}")
+    spans, op = cj[ci]["spans"], cj[ci]["op"]
+    if ji >= len(spans):
+        raise ValueError(f"vparse: {item.name} {kw}[{ci}] has no conjunct {ji}")
+    if len(spans) == 1:
+        return delete_clause(text, item, kw, ci)
+    a, b = spans[ji]
+    if ji + 1 < len(spans):                       # swallow the operator after
+        j = b
+        while j < len(text) and text[j] in " \t\r\n":
+            j += 1
+        if text.startswith(op, j):
+            b = j + len(op)
+    else:                                         # ...else the one before
+        i = a
+        while i > 0 and text[i - 1] in " \t\r\n":
+            i -= 1
+        if text[max(0, i - len(op)):i] == op:
+            a = i - len(op)
+    return text[:a] + text[b:]
+
+
 def duplicate_names(items):
     """{name: [Item, ...]} for every name defined more than once.
 
@@ -586,6 +773,66 @@ fn copy_bytes(src: &[u8], from: usize, dst: &mut [u8], n: usize)
          by_name(d01)["copy_bytes"].clauses["requires"], cb.clauses["requires"])
     raises("deleting a clause that does not exist raises",
            lambda: delete_clause(two, cb, "ensures", 2), ValueError)
+
+    # --- TASK_006_REVIEW C: `&&` must not hide a conjunct from deletion -----
+    merged = '''use vstd::prelude::*;
+verus! {
+#[verifier::external_body]
+fn f(dst: &mut [u8], n: usize) -> (r: u64)
+    requires
+        n <= old(dst)@.len() && n >= 0,
+    ensures
+        final(dst)@.len() == old(dst)@.len(),
+        r == 1 ==> n > 0 && n < 9,
+        &&& r == 2
+        &&& n == 3,
+{ 0 }
+} // verus!
+'''
+    mf = by_name(merged)["f"]
+    want("a merged `a && b` is still ONE clause for the pin",
+         mf.clauses["requires"], ["n <= old(dst)@.len() && n >= 0"])
+    cj = conjunct_spans(mf, "requires")
+    want("...but TWO conjuncts for the deletion stage",
+         [merged[a:b] for a, b in cj[0]["spans"]],
+         ["n <= old(dst)@.len()", "n >= 0"])
+    want("deleting conjunct 1 leaves the other, still a clause",
+         by_name(delete_conjunct(merged, mf, "requires", 0, 1))["f"]
+         .clauses["requires"], ["n <= old(dst)@.len()"])
+    want("deleting conjunct 0 leaves the other",
+         by_name(delete_conjunct(merged, mf, "requires", 0, 0))["f"]
+         .clauses["requires"], ["n >= 0"])
+    ej = conjunct_spans(mf, "ensures")
+    want("a clause with no top-level connective is one conjunct",
+         [merged[a:b] for a, b in ej[0]["spans"]],
+         ["final(dst)@.len() == old(dst)@.len()"])
+    want("`==>` refuses the split rather than guessing at precedence",
+         ej[1]["refused"], "top-level &&, ==>")
+    want("...and the refused clause stays a single deletable unit",
+         [merged[a:b] for a, b in ej[1]["spans"]], ["r == 1 ==> n > 0 && n < 9"])
+    want("`&&&` (n-ary, lowest precedence) splits too",
+         [merged[a:b] for a, b in ej[2]["spans"]], ["r == 2", "n == 3"])
+    want("deleting the only conjunct falls back to deleting the clause",
+         "final" in delete_conjunct(merged, mf, "ensures", 0, 0), False)
+    raises("a conjunct index past the end raises",
+           lambda: delete_conjunct(merged, mf, "requires", 0, 2), ValueError)
+    want("top_level_ops does not read `&&&` as `&&`",
+         top_level_ops("a &&& b"), [(2, "&&&")])
+    want("top_level_ops ignores operators inside brackets",
+         top_level_ops("f(a && b) && c"), [(10, "&&")])
+
+    # --- parameter names, for the trusted-`unsafe` coverage rule ------------
+    want("param_names on a &mut signature",
+         param_names(cb), ["src", "from", "dst", "n"])
+    want("params_text copies the source verbatim",
+         params_text(cb),
+         "(src: &[u8], from: usize, dst: &mut [u8], n: usize)")
+    want("param_names strips `mut` and keeps generics whole",
+         param_names(by_name("verus! {\nfn g(mut a: Vec<u64>, b: &[u8]) { }\n}")["g"]),
+         ["a", "b"])
+    raises("a parameter with no type raises rather than being skipped",
+           lambda: param_names(by_name("verus! {\nfn h(a) { }\n}")["h"]),
+           ValueError)
 
     # --- TASK_003_REVIEW: items keyed by name, last wins -------------------
     decoy = '''use vstd::prelude::*;

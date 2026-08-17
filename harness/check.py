@@ -31,7 +31,12 @@ What it enforces, in order:
      call, a memory operand, a body above a floor) *and* dynamically -- marginal
      executed instructions per kernel call, measured as a difference of two
      callgrind runs, above a floor DERIVED from `model.py`'s `work_per_call`
-     times a harness constant, plus `d(Ir)/d(work)` across two probe shapes
+     times a harness constant, plus `d(Ir)/d(work)` across two probe shapes.
+     **This is a smoke test for total collapse and nothing finer** -- it bounds
+     the kernel's total cost, so it cannot attribute cost to a component and
+     p02 clears its own floor 35.9x over. What certifies that the work happened
+     is step 2. The verdict now prints the achieved margin beside the declared
+     floor so a 35.9x and a 2.2-billion-x margin cannot read the same
   3c structural identity R4-vs-R5 is measured and **recorded as a result**. Only
      a drop below the level `spec.md` pins fails the gate: a proof that
      legitimately costs an instruction is a finding, not a harness error
@@ -50,10 +55,18 @@ What it enforces, in order:
        - the Python `requires`/`ensures` are GENERATED from `verus.rs`'s clause
          text through `spec.md`'s translation table, then evaluated on **every
          measured input**, adversarial included. Vacuous ones fail
-  5c every `ensures` clause of every `external_body` item is DELETED in turn and
-     Verus re-run: a file that still verifies with 0 errors is carrying a
-     trusted claim nothing depends on. Plus an `assert(false)` reachability
-     probe at the kernel call site, which catches genuine vacuity
+  5c every `ensures` CONJUNCT of every `external_body` item is DELETED in turn
+     and Verus re-run: a file that still verifies with 0 errors is carrying a
+     trusted claim nothing depends on. Conjunct, not clause -- re-joining a
+     redundant clause with `&&` used to defeat the stage. Plus an
+     `assert(false)` reachability probe at the kernel call site, which catches
+     genuine vacuity
+  5c-req the mirror for `requires`, which is a different oracle: deleting a
+     precondition from a *trusted* item can never fail a file (it only removes
+     obligations from callers -- measured), so each conjunct instead gets a
+     synthesised `proof fn` with the item's parameters and that conjunct as its
+     only `ensures`. If that verifies, the conjunct is `true` and demands
+     nothing. Deletion is still run for *verified* items, where it does bite
   6  every rung's driver loop, C included, normalises to the token sequence
      pinned in `spec.md`; the *set* of files carrying a region is pinned too
   7  the C rung matches `model.py`'s per-input `sanitizer_expect`: "clean" means
@@ -149,6 +162,39 @@ VALGRIND = os.path.expanduser("~/tools/valgrind/bin/valgrind")
 # p02 clears any rate on its fold alone. What certifies that p02's copy happened
 # is step 2 -- the reference model's checksum depends on every copied byte.
 ALPHA_IR_PER_WORK = 0.25
+
+# ...and there is a hard floor under what `min_ir_per_work` may declare, because
+# until TASK_008 the only bound was `> 0`. TASK_006_REVIEW put
+# `min_ir_per_work = 1e-9` with `min_ir_per_work_why = "see NOTES.md"` past the
+# whole gate; it printed "derived floor 0.0 Ir/call" and "tightest margin
+# 2246270772.2x" and nothing objected, because nothing inspects `why` -- it is
+# free text. `work_per_call` is a second unbounded knob in the same sandboxed
+# file, and the floor is their *product*, so either one alone can zero it.
+#
+# The bound is physical, not conventional. The tightest legitimate rate anyone
+# has argued for in this project is p02's 0.0625 Ir per byte: on this box's
+# AVX-512 units a fused copy-and-fold is load + store + `vpsadbw` + `vpaddq` per
+# 64-byte lane, i.e. 4 instructions per 64 bytes. (Measured reality is looser
+# still: glibc `memcpy` moves a byte in 0.104 Ir.) A vector unit four times
+# wider than anything that exists would put the same four instructions across
+# 256 bytes and land at 1/64. So:
+#
+#     no algorithm can be cheaper than 0.015625 instructions per unit of work,
+#     for any unit of work small enough to be worth denominating in.
+#
+# A pattern that wants to declare less than that is not making a claim about an
+# algorithm; it is saying the work does not happen, and no `why` string can fix
+# that. Changing this is a harness diff that moves all 47 patterns at once.
+MIN_DECLARABLE_IR_PER_WORK = 0.015625
+
+# Above this ratio of measured Ir to the derived floor, the floor is loose
+# enough that it certifies nothing but total collapse, and the verdict says so.
+# It is a `shout`, not a `fail`: a legitimately fast kernel on a conservative
+# unit of work has a large margin honestly (p01 runs 7x-268x), and failing on it
+# would make the floor a cap on how good a rung is allowed to be. What it must
+# not do is read the same as a tight one -- 35.9x and 2246270772.2x printed
+# identically before TASK_008.
+LOOSE_FLOOR_MARGIN = 100.0
 
 MIRI_PROBE_ITERS = 4       # kernel calls Miri interprets per input
 # Per-input wall limit. `n_iters` can be clamped from the file header, but the
@@ -588,7 +634,8 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
 
     A declared floor may still appear in `spec.md`, but it can only *tighten*
     the derived one; lowering it to zero changes nothing."""
-    head("3b. anti-collapse, dynamic: marginal Ir per kernel call")
+    head("3b. NOT-COLLAPSED smoke test: marginal Ir per kernel call vs a "
+         "derived floor")
     cfg = contract.get("collapse")
     if not cfg:
         rep.fail("collapse-ir", "spec.md declares no `collapse` section -- "
@@ -657,10 +704,22 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
             rep.fail("collapse-ir", f"model.py's min_ir_per_work is {rate!r}, "
                                     f"which is not a number")
             return {}
-        if rate <= 0:
+        if rate < MIN_DECLARABLE_IR_PER_WORK:
             rep.fail("collapse-ir",
-                     "model.py declares min_ir_per_work <= 0, which is not a "
-                     "floor. A rate of zero certifies nothing at all.")
+                     f"model.py declares min_ir_per_work={rate}, below the "
+                     f"harness's absolute bound {MIN_DECLARABLE_IR_PER_WORK}. "
+                     f"Until TASK_008 the only bound was `> 0`, and "
+                     f"TASK_006_REVIEW put 1e-9 with why=\"see NOTES.md\" past "
+                     f"the whole gate -- 'derived floor 0.0 Ir/call', 'tightest "
+                     f"margin 2246270772.2x', nothing inspects `why`. The bound "
+                     f"is physical: the tightest rate argued for in this project "
+                     f"is p02's 0.0625 Ir/byte (load+store+vpsadbw+vpaddq per "
+                     f"64-byte AVX-512 lane), and {MIN_DECLARABLE_IR_PER_WORK} "
+                     f"is the same four instructions across a vector four times "
+                     f"wider than anything that exists. Below it, this is not a "
+                     f"claim about an algorithm; it is a claim that the work "
+                     f"does not happen, and no justification string repairs "
+                     f"that.")
             return {}
         src_of_rate = "model.py"
         if rate < ALPHA_IR_PER_WORK:
@@ -673,12 +732,6 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
                          f"only as an argued claim about the algorithm's "
                          f"cheapest correct implementation, which the verdict "
                          f"then prints on every run.")
-            else:
-                rep.shout("collapse-ir",
-                          f"the anti-collapse floor for this pattern is "
-                          f"{rate} Ir per unit of work, BELOW the harness "
-                          f"default {ALPHA_IR_PER_WORK}. model.py's argument: "
-                          f"{why}")
             if len(works) < 2:
                 rep.fail("collapse-ir",
                          f"min_ir_per_work={rate} is below the harness default "
@@ -748,18 +801,55 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
                              f"{b[1]}), so the measured loop is not doing this "
                              f"pattern's work.")
     out["_rate"] = rate
+    # --- the achieved margin, printed beside the declared floor --------------
+    #
+    # TASK_006_REVIEW D: the verdict printed "tightest margin 2246270772.2x" for
+    # a floor of 1e-9 in exactly the same words it printed "35.9x" for p02 as
+    # shipped, and nothing distinguished them. The margin is the ratio of what
+    # was *measured* to what was *declared*, so it bounds both knobs at once --
+    # shrink `min_ir_per_work` or shrink `work_per_call` and it explodes either
+    # way.
+    margins = [v / max(rate * w, declared)
+               for (nm, _, _, w) in shapes
+               for k, v in out.items() if k.endswith("/" + nm)]
+    tight = min(margins) if margins else None
+    per = [v for k, v in out.items()
+           if not k.endswith("d_ir_d_work") and k != "_rate"]
+    if tight is not None:
+        out["_tightest_margin"] = tight
+        if rate < ALPHA_IR_PER_WORK and why:
+            rep.shout("collapse-ir",
+                      f"this pattern's anti-collapse floor is {rate} Ir per "
+                      f"unit of work, BELOW the harness default "
+                      f"{ALPHA_IR_PER_WORK} (bound {MIN_DECLARABLE_IR_PER_WORK}"
+                      f"). Declared floor {rate * min(works):.1f}...{rate * max(works):.1f} "
+                      f"Ir/call; tightest measured margin over it {tight:.1f}x, "
+                      f"i.e. this stage tolerates a "
+                      f"{100 * (1 - 1 / tight):.1f}% loss of work before it "
+                      f"objects. model.py's argument for the rate: {why}")
+        if tight > LOOSE_FLOOR_MARGIN:
+            rep.shout("collapse-ir",
+                      f"the derived floor is {tight:.0f}x below the tightest "
+                      f"cell actually measured, so it rules out total collapse "
+                      f"and essentially nothing else -- a cell could lose "
+                      f"{100 * (1 - 1 / tight):.2f}% of its work and still pass "
+                      f"this stage. Read it as a smoke test, not as evidence "
+                      f"that the work happened.")
     if len(out) > 1 and not any(f[0] == "collapse-ir" for f in rep.failures):
-        per = [v for k, v in out.items()
-               if not k.endswith("d_ir_d_work") and k != "_rate"]
-        margins = [v / max(rate * w, declared)
-                   for (nm, _, _, w) in shapes
-                   for k, v in out.items() if k.endswith("/" + nm)]
         rep.ok(f"{len(per)} cell/probe pairs: marginal Ir per call "
                f"{min(per):.0f}...{max(per):.0f}, all above the derived floor "
-               f"(tightest margin {min(margins):.1f}x); "
+               f"(tightest margin {tight:.1f}x over a declared "
+               f"{rate} Ir/work); "
                + (f"d(Ir)/d(work) {min(ratios):.2f}...{max(ratios):.2f} "
                   f"(rate {rate})" if ratios else
                   "no second shape, so no marginal-rate assertion"))
+        print("    what this stage certifies: that no cell COLLAPSED. It "
+              "bounds the kernel's\n    total cost from below, so it cannot "
+              "attribute cost to a component and cannot\n    tell a kernel "
+              "doing 3% of its work from one doing all of it (p02 clears "
+              "its\n    floor on the fold alone). What certifies that the work "
+              "happened is step 2 --\n    the reference model's checksum "
+              "(`.memory/02-bench-rules.md`).")
     return out
 
 
@@ -882,14 +972,70 @@ def _check_trusted_unsafe(rep, src, tcb, justifications):
 
     The escape hatch is deliberately expensive to use: `spec.md` may carry a
     per-item justification string, and the gate then prints it in the verdict
-    every single run, where a reviewer reads it."""
+    every single run, where a reviewer reads it.
+
+    **TASK_006_REVIEW re-opened this on the item p02 exists to be about.** A
+    *non-empty* `requires` satisfies the rule above and says nothing:
+    `copy_bytes` weakened to `requires n >= 0` -- which is `true` for a `usize`
+    -- gave 9 verified, 0 errors, did not move the obligation count, and this
+    very function printed it approvingly ("trusted `unsafe` item `copy_bytes`
+    demands `['n >= 0']` of every caller"). Deleting `from + n <= src@.len()`
+    outright did the same. **No verify/fail oracle can catch either** -- measured
+    at TASK_008: deleting a precondition from a trusted item makes every call
+    site strictly easier, so nothing ever fails (control 9/0, M1 9/0, M2 9/0,
+    M3 9/0; the same deletion applied to the *verified* `kernel` gives 8/1).
+
+    So there is a second structural rule, and it is the one that catches all
+    three: **every parameter the trusted body uses must be constrained by the
+    `requires`.** A trusted item that performs an unchecked operation on `src`
+    and `from` while demanding nothing about either is the axiom that the
+    operation is defined for all values of them. Not `ensures` -- `get_unchecked`
+    weakened to `requires 0 <= i` keeps `ensures r == v@[i as int]`, so a
+    requires-or-ensures reading would pass it.
+
+    Known false positive, and the reason the justification hatch covers this
+    rule too: a pure *value* parameter (`fn write(dst, i, v)` -- `v` is written,
+    never used as an address) genuinely needs no precondition. Say so in
+    `spec.md` and the verdict shouts it on every run."""
     for i in tcb:
         if not _UNSAFE_RE.search(i.body or ""):
             continue
         reqs = _clauses(i, "requires")
         if reqs:
+            try:
+                pars = vparse.param_names(i)
+            except ValueError as e:
+                rep.fail("tcb-unsafe", f"{src}:{i.line} `{i.name}`: {e}")
+                continue
+            body_ids = set(re.findall(r"[A-Za-z_][A-Za-z0-9_]*", i.body or ""))
+            req_ids = set(re.findall(r"[A-Za-z_][A-Za-z0-9_]*", " ".join(reqs)))
+            used = [p for p in pars if p in body_ids]
+            bare = [p for p in used if p not in req_ids]
+            if bare and not justifications.get(i.name):
+                rep.fail("tcb-unsafe",
+                         f"{src}:{i.line} trusted `unsafe` item `{i.name}` "
+                         f"demands {reqs} of its callers, which constrains "
+                         f"nothing about {bare} -- parameter(s) its own trusted "
+                         f"body uses. That is the axiom that the unchecked "
+                         f"operation is defined for every value of {bare}, "
+                         f"which is exactly how `requires n >= 0` on a `usize` "
+                         f"passed the gate at TASK_006_REVIEW. No verification "
+                         f"result can catch it: deleting a precondition from a "
+                         f"trusted item makes every call site strictly easier, "
+                         f"so the file still reports 0 errors. If the parameter "
+                         f"is a pure value that needs no precondition, declare "
+                         f"verus.unsafe_justifications[{src!r}][{i.name!r}] in "
+                         f"spec.md and the verdict will shout it every run.")
+                continue
+            if bare:
+                rep.shout("tcb-unsafe",
+                          f"{src}:{i.line} `{i.name}`'s `requires` constrains "
+                          f"nothing about {bare}, which its trusted body uses. "
+                          f"spec.md justifies it: {justifications[i.name]}")
+                continue
             rep.ok(f"{src}: trusted `unsafe` item `{i.name}` demands "
-                   f"{reqs} of every caller")
+                   f"{reqs} of every caller, constraining every parameter its "
+                   f"body uses ({used})")
             continue
         why = justifications.get(i.name)
         if not why:
@@ -933,9 +1079,15 @@ def check_verus_contract(pdir, rep, contract):
     # The pinned file list is author-chosen, so dropping an entry un-checks a
     # whole source. Every file in the pattern that opens a `verus!` block must
     # be in it.
+    #
+    # This used to be `re.search(r"\bverus!\s*\{")` while `vparse.verus_span`
+    # accepted `verus!\s*[{(\[]`, and the one-character gap between the two was
+    # TASK_006_REVIEW's blocker A. It is written in terms of `verus_span` now so
+    # the two cannot disagree -- but note that is *hygiene, not the fix*: a
+    # third regex is what was defeated. The fix is `_verus_verified_files`,
+    # which asks Verus.
     for f in sorted(os.listdir(pdir)):
-        if f.endswith(".rs") and re.search(r"\bverus!\s*\{",
-                                           vparse.blank_noncode(open(os.path.join(pdir, f)).read())):
+        if f.endswith(".rs") and vparse.verus_span(open(os.path.join(pdir, f)).read()):
             if f not in pinned_obl:
                 rep.fail("proof-pin", f"{f} contains a `verus!` block but is not "
                                       f"in spec.md's verus.obligations -- an "
@@ -1125,9 +1277,16 @@ def _mutant_path(pdir, src):
     a flat scratch dir: it goes into a mirror of the repo layout under
     `.temp/clausemut/<pattern>/`, with `common` symlinked back. The pattern
     directory itself is never written to -- a crashed gate run must not be able
-    to leave a mutated source in the tree."""
+    to leave a mutated source in the tree.
+
+    The mirror is `<root>/patterns/<dirname>/`, **not** `os.path.relpath(pdir,
+    REPO)`: the latter assumed every pattern sits exactly two levels below the
+    repo root, so running the gate on a mutated copy under `.temp/` (which is
+    how every bypass in this project has been demonstrated) put the mutant at a
+    depth where `../../common` resolved to nothing and the stage failed with
+    "the UNMUTATED copy does not verify" instead of doing its job."""
     root = os.path.join(REPO, ".temp", "clausemut", buildmod.pattern_id(pdir))
-    d = os.path.join(root, os.path.relpath(pdir, REPO))
+    d = os.path.join(root, "patterns", os.path.basename(pdir))
     os.makedirs(d, exist_ok=True)
     link = os.path.join(root, "common")
     if not os.path.islink(link) and not os.path.exists(link):
@@ -1164,6 +1323,51 @@ def _insert_false_probe(txt, items, site, kname):
     return txt[:j + 1] + "\n            assert(false);" + txt[j + 1:]
 
 
+def _mutation_targets(items, also, src, rep, resolved):
+    """(trusted, verified) items that the mutation stages must cover in `src`.
+
+    `trusted` is every `#[verifier::external_body]` item -- derived, so nothing
+    can be dropped from it. `verified` is `spec.md`'s
+    `verus.clause_deletion_extra_items`, which defaults to `[kernel_item]`.
+
+    That list used to be filtered with `if n in items`, so a **misspelled name
+    was silently dropped** and declaring `"kernal"` exempted the real kernel's
+    `ensures` from the whole stage while the log still printed a green line
+    (TASK_006_REVIEW, minor 1). Names are resolved across all pinned files and
+    anything never resolved is a hard failure -- see `_unresolved`."""
+    trusted = [i for i in items.values()
+               if i.external == "verifier::external_body"]
+    verified = []
+    for n in also:
+        it = items.get(n)
+        if it is None:
+            continue
+        resolved.add(n)
+        if it.external == "verifier::external_body":
+            continue          # already in `trusted`
+        if it.external:
+            rep.fail("clause-mut",
+                     f"{src}: `{n}` is declared in "
+                     f"verus.clause_deletion_extra_items but is {it.external}, "
+                     f"so Verus never verifies it and mutating its clauses "
+                     f"tests nothing")
+            continue
+        verified.append(it)
+    return trusted, verified
+
+
+def _unresolved(also, resolved, rep, section):
+    missing = sorted(set(also) - resolved)
+    if missing:
+        rep.fail(section,
+                 f"verus.clause_deletion_extra_items names {missing}, which "
+                 f"exist in none of the pinned Verus files. The list used to be "
+                 f"filtered with `if n in items`, so one typo exempted the "
+                 f"kernel from mutation testing and the stage still printed a "
+                 f"green line (TASK_006_REVIEW minor 1). An unknown name is a "
+                 f"hard failure.")
+
+
 def check_clause_deletion(pdir, rep, contract, enabled=True):
     """5c. Every trusted `ensures` clause must be load-bearing. DERIVED.
 
@@ -1181,13 +1385,23 @@ def check_clause_deletion(pdir, rep, contract, enabled=True):
     TASK_003_REVIEW showed moves with the code it constrains. So this stage
     *derives* the property instead:
 
-        for each `ensures` clause of each `external_body` item: delete it,
-        re-run Verus, and fail if the file still verifies with 0 errors.
+        for each `ensures` **conjunct** of each `external_body` item: delete
+        it, re-run Verus, and fail if the file still verifies with 0 errors.
 
     A clause whose deletion changes nothing was either implied by its
     neighbours (delete it, or merge them) or consumed by nobody (it is
     decoration). Either way the tally in NOTES.md is overstating what the
     trusted base actually says.
+
+    **Conjunct, not clause** (TASK_006_REVIEW C). `vparse._clause_split` splits
+    on top-level commas, so `ensures a, b` was two deletable units and
+    `ensures a && b` was one: re-joining a redundant conjunct with `&&` made
+    this stage delete both halves at once, the file failed, and the stage
+    certified the clause load-bearing. One character, and the check is satisfied
+    by reformatting. `vparse.conjunct_spans` splits at top-level `&&` / `&&&`
+    and **refuses** any clause whose top level also carries `==>`, `||` or
+    `<==>`, because a conjunct lifted out of an implication is not a deletable
+    unit. Every refusal is shouted into the verdict rather than passed over.
 
     The `assert(false)` reachability probe runs beside it because it catches
     *genuine* vacuity -- an unsatisfiable `requires`, a contradictory context.
@@ -1195,13 +1409,18 @@ def check_clause_deletion(pdir, rep, contract, enabled=True):
     TASK_004_REVIEW, `assert(false)` after the call is still unprovable with the
     M7 mutant in place.
 
-    Cost: one Verus run per clause plus two controls per file, ~20 s each."""
-    head("5c. clause deletion: is every trusted `ensures` clause load-bearing?")
+    `requires` is **not** tested here; it needs a different oracle entirely and
+    gets its own stage (`check_requires_strength`).
+
+    Cost: one Verus run per conjunct plus two controls per file (1.7 s each on
+    p02's verus.rs, measured at TASK_008)."""
+    head("5c. clause deletion: is every trusted `ensures` conjunct load-bearing?")
     vcfg = contract.get("verus") or {}
     pinned_obl = vcfg.get("obligations") or {}
     site = vcfg.get("call_site", "main")
     kname = vcfg.get("kernel_item", "kernel")
     also = list(vcfg.get("clause_deletion_extra_items") or [kname])
+    resolved = set()
     out = {}
     if not enabled:
         rep.fail("clause-mut", "--no-verus-mutants given: the clause-deletion "
@@ -1263,50 +1482,263 @@ def check_clause_deletion(pdir, rep, contract, enabled=True):
                       f"unprovable ({pv} verified, {pe} errors) -- the call "
                       f"site's context is satisfiable")
 
-        # --- one mutant per `ensures` clause --------------------------------
-        targets = [i for i in items.values()
-                   if i.external == "verifier::external_body"]
-        extra = [items[n] for n in also if n in items and not items[n].external]
+        # --- one mutant per `ensures` conjunct ------------------------------
+        targets, extra = _mutation_targets(items, also, src, rep, resolved)
         for it, why in ([(i, "trusted") for i in targets]
                         + [(i, "verified") for i in extra]):
-            cl = it.clauses.get("ensures") or []
-            for idx, ctext in enumerate(cl):
-                open(mpath, "w").write(
-                    vparse.delete_clause(txt, it, "ensures", idx))
-                mv, me, mo = _verus(mpath)
-                rows.append(dict(item=it.name, kind=why, clause=ctext,
-                                 verified=mv, errors=me))
-                tag = f"{src} {it.name} ensures[{idx}]"
-                if mv is not None and me == 0:
-                    rep.fail("clause-mut",
-                             f"{tag} is NOT load-bearing: deleting "
-                             f"`{ctext}` still gives {mv} verified, 0 errors. "
-                             + ("A trusted item's `ensures` is an axiom; one "
-                                "that nothing depends on is an unchecked claim "
-                                "about real Rust semantics carried for free, "
-                                "and the TCB tally counts it as an obligation "
-                                "the reviewer must judge. Merge it into the "
-                                "clause that implies it, or delete it."
-                                if why == "trusted" else
-                                "Nothing consumes this postcondition, so it is "
-                                "decoration: replacing it with a tautology "
-                                "would verify too (`.memory/04-verus.md`). "
-                                "Consume it with a ghost `assert` at the call "
-                                "site."))
-                elif mv is None:
-                    rep.fail("clause-mut", f"{tag}: Verus produced no result "
-                                           f"for the mutant\n      {mo[-300:]}")
-                else:
-                    print(f"    {src}: {it.name} ensures[{idx}] load-bearing "
-                          f"({mv} verified, {me} errors) -- {ctext[:58]}")
+            for idx, cj in enumerate(vparse.conjunct_spans(it, "ensures")):
+                if cj["refused"]:
+                    rep.shout("clause-mut",
+                              f"{src} {it.name} ensures[{idx}] carries "
+                              f"{cj['refused']}, so this stage refused to split "
+                              f"it into conjuncts and deleted it whole. A "
+                              f"redundant conjunct inside it would be "
+                              f"undetectable here: "
+                              f"{txt[cj['spans'][0][0]:cj['spans'][0][1]][:70]}")
+                for jdx, (a, b) in enumerate(cj["spans"]):
+                    ctext = vparse.norm_clause(txt[a:b])
+                    open(mpath, "w").write(
+                        vparse.delete_conjunct(txt, it, "ensures", idx, jdx))
+                    mv, me, mo = _verus(mpath)
+                    rows.append(dict(item=it.name, kind=why, clause=ctext,
+                                     verified=mv, errors=me))
+                    tag = (f"{src} {it.name} ensures[{idx}]"
+                           + (f".conjunct[{jdx}]" if len(cj["spans"]) > 1 else ""))
+                    if mv is not None and me == 0:
+                        rep.fail("clause-mut",
+                                 f"{tag} is NOT load-bearing: deleting "
+                                 f"`{ctext}` still gives {mv} verified, 0 errors. "
+                                 + ("A trusted item's `ensures` is an axiom; one "
+                                    "that nothing depends on is an unchecked claim "
+                                    "about real Rust semantics carried for free, "
+                                    "and the TCB tally counts it as an obligation "
+                                    "the reviewer must judge. Merge it into the "
+                                    "clause that implies it, or delete it."
+                                    if why == "trusted" else
+                                    "Nothing consumes this postcondition, so it is "
+                                    "decoration: replacing it with a tautology "
+                                    "would verify too (`.memory/04-verus.md`). "
+                                    "Consume it with a ghost `assert` at the call "
+                                    "site."))
+                    elif mv is None:
+                        rep.fail("clause-mut", f"{tag}: Verus produced no result "
+                                               f"for the mutant\n      {mo[-300:]}")
+                    else:
+                        print(f"    {src}: {it.name} ensures[{idx}]"
+                              + (f".conjunct[{jdx}]" if len(cj["spans"]) > 1
+                                 else "")
+                              + f" load-bearing ({mv} verified, {me} errors)"
+                                f" -- {ctext[:58]}")
         open(mpath, "w").write(txt)      # leave the scratch copy unmutated
         out[src] = {"control_verified": base_v, "mutants": rows}
+    if out:
+        _unresolved(also, resolved, rep, "clause-mut")
     n = sum(len(v["mutants"]) for v in out.values())
     if out and not any(f[0] == "clause-mut" for f in rep.failures):
         rep.ok(f"{n} Verus mutants across {len(out)} file(s): every trusted "
-               f"`ensures` clause is load-bearing, and `assert(false)` at the "
+               f"`ensures` conjunct is load-bearing, and `assert(false)` at the "
                f"call site is unprovable. Derived, not declared -- this does not "
                f"inherit the self-certification problem of a `spec.md` pin.")
+    return out
+
+
+def _taut_probe(txt, item, a, b, tag):
+    """`txt` with a `proof fn` appended inside `verus! {}` whose only obligation
+    is the clause at `txt[a:b]`, under no hypotheses but the parameter types.
+
+    If that verifies, the clause is a **tautology**: it is `true` for every
+    value its parameters can take, so demanding it of a caller demands nothing.
+    `n >= 0` on a `usize` and `0 <= i` on a `usize` are both of this shape, and
+    both walked past the gate at TASK_006_REVIEW while the structural rule
+    printed them approvingly."""
+    vs = vparse.verus_span(txt)
+    if vs is None:
+        return None
+    fn = (f"\nproof fn slb_taut_probe_{tag}{vparse.params_text(item)}\n"
+          f"    ensures\n        {txt[a:b]},\n{{\n}}\n")
+    return txt[:vs[1]] + fn + txt[vs[1]:]
+
+
+def check_requires_strength(pdir, rep, contract, enabled=True):
+    """5c-req. Does every `requires` conjunct demand anything of a caller?
+
+    TASK_006_REVIEW's blocker B: stage 5c iterated `it.clauses.get("ensures")`
+    and nothing else, and the `requires` hole is the dangerous one. All three of
+    these gave **9 verified, 0 errors** on p02, with the obligation count
+    unmoved at 9 and the full gate green:
+
+      * delete `from + n <= src@.len()` from the trusted `copy_bytes`;
+      * weaken `get_unchecked`'s `i < v@.len()` to `0 <= i`;
+      * replace both of `copy_bytes`'s preconditions with `n >= 0`.
+
+    **The task specified the mirror of the `ensures` test -- delete the clause,
+    re-run, fail if the file still verifies -- and that oracle does not exist
+    for a trusted item.** Measured at TASK_008 on p02's `verus.rs`:
+
+        control                                9 verified, 0 errors
+        delete copy_bytes.requires[0]  (M1)    9 verified, 0 errors
+        get_unchecked requires -> 0 <= i (M2)  9 verified, 0 errors
+        copy_bytes requires -> n >= 0  (M3)    9 verified, 0 errors
+        delete kernel.requires[0]              8 verified, 1 errors
+
+    Deleting a precondition from an `external_body` item removes an obligation
+    from its call sites, which makes verification *strictly easier*; nothing can
+    fail. Implementing the prescription as written would report every trusted
+    precondition in the project as "not load-bearing" on every run. The last row
+    is why the deletion test is still run -- for a **verified** item the deleted
+    precondition is an assumption its own body was using, so the file does fail,
+    and that is a real mirror image.
+
+    So this stage runs three checks, and the third is the one that catches all
+    three mutants:
+
+      1. **deletion**, for the `requires` of *verified* items only: delete the
+         conjunct, and fail if the file still verifies;
+      2. **tautology probe**, for every item: a synthesised `proof fn` with the
+         item's parameters and the conjunct as its sole `ensures`. If that
+         verifies under no hypotheses, the conjunct is `true` and demands
+         nothing. Catches M2 and M3;
+      3. **parameter coverage** for trusted `unsafe` items, in stage 5a
+         (`_check_trusted_unsafe`) because that is where its sibling rule lives.
+         Catches M1, M2 and M3.
+
+    Nothing here is declared, so none of it inherits the self-certification
+    problem of a `spec.md` pin."""
+    head("5c-req. precondition strength: does every `requires` conjunct "
+         "demand anything?")
+    vcfg = contract.get("verus") or {}
+    pinned_obl = vcfg.get("obligations") or {}
+    kname = vcfg.get("kernel_item", "kernel")
+    also = list(vcfg.get("clause_deletion_extra_items") or [kname])
+    resolved = set()
+    out = {}
+    if not enabled:
+        rep.fail("req-mut", "--no-verus-mutants given: the precondition-strength "
+                            "stage did not run, so nothing checked that this "
+                            "pattern's trusted `requires` clauses demand "
+                            "anything")
+        return out
+    if not pinned_obl:
+        rep.fail("req-mut", "spec.md pins no verus.obligations, so there is no "
+                            "file list to mutate")
+        return out
+    for src in sorted(pinned_obl):
+        path = os.path.join(pdir, src)
+        if not os.path.exists(path):
+            continue
+        txt = open(path).read()
+        try:
+            items = vparse.by_name(txt)
+        except ValueError as e:
+            rep.fail("req-mut", f"{src}: {e}")
+            continue
+        mpath = _mutant_path(pdir, src)
+        open(mpath, "w").write(txt)
+        base_v, base_e, base_out = _verus(mpath)
+        if base_v is None or base_e:
+            rep.fail("req-mut",
+                     f"{src}: the UNMUTATED copy at "
+                     f"{os.path.relpath(mpath, REPO)} does not verify "
+                     f"({base_v} verified, {base_e} errors), so every mutant "
+                     f"below would 'fail' for the wrong reason\n"
+                     f"      {base_out[-400:]}")
+            continue
+        rows = []
+        targets, extra = _mutation_targets(items, also, src, rep, resolved)
+        for it, why in ([(i, "trusted") for i in targets]
+                        + [(i, "verified") for i in extra]):
+            for idx, cj in enumerate(vparse.conjunct_spans(it, "requires")):
+                if cj["refused"]:
+                    rep.shout("req-mut",
+                              f"{src} {it.name} requires[{idx}] carries "
+                              f"{cj['refused']}, so it was not split into "
+                              f"conjuncts: a vacuous conjunct inside it is "
+                              f"invisible to this stage.")
+                for jdx, (a, b) in enumerate(cj["spans"]):
+                    ctext = vparse.norm_clause(txt[a:b])
+                    tag = (f"{src} {it.name} requires[{idx}]"
+                           + (f".conjunct[{jdx}]" if len(cj["spans"]) > 1 else ""))
+                    # --- 2. tautology probe (every item) --------------------
+                    probe = _taut_probe(txt, it, a, b, f"{it.name}_{idx}_{jdx}")
+                    if probe is None:
+                        rep.fail("req-mut", f"{tag}: no `verus! {{}}` span to "
+                                            f"put the tautology probe in")
+                        continue
+                    open(mpath, "w").write(probe)
+                    pv, pe, po = _verus(mpath)
+                    rows.append(dict(item=it.name, kind=why, clause=ctext,
+                                     test="tautology", verified=pv, errors=pe))
+                    if pv is None:
+                        rep.fail("req-mut",
+                                 f"{tag}: the tautology probe did not compile, "
+                                 f"so this conjunct was not judged at all. Fix "
+                                 f"the probe rather than skipping the "
+                                 f"clause.\n      {(po or '')[-300:]}")
+                    elif pe == 0:
+                        rep.fail("req-mut",
+                                 f"{tag} is a TAUTOLOGY: `{ctext}` is provable "
+                                 f"from the parameter types alone ({pv} "
+                                 f"verified, 0 errors -- control {base_v}), so "
+                                 f"it demands nothing of any caller. "
+                                 + ("A trusted `unsafe` item whose precondition "
+                                    "is `true` is the axiom that the unchecked "
+                                    "operation is always defined -- `n >= 0` on "
+                                    "a `usize` is exactly this, and it passed "
+                                    "the whole gate at TASK_006_REVIEW."
+                                    if why == "trusted" else
+                                    "A verified item's precondition that holds "
+                                    "always constrains no call site."))
+                    elif pe != 1 or pv != base_v:
+                        rep.fail("req-mut",
+                                 f"{tag}: the tautology probe gave {pv} "
+                                 f"verified, {pe} errors against a control of "
+                                 f"{base_v}/0. Exactly one new obligation was "
+                                 f"added, so anything but {base_v}/1 means the "
+                                 f"probe broke something else and this "
+                                 f"conjunct was not judged.\n"
+                                 f"      {(po or '')[-300:]}")
+                    else:
+                        print(f"    {src}: {it.name} requires[{idx}]"
+                              + (f".conjunct[{jdx}]" if len(cj["spans"]) > 1
+                                 else "")
+                              + f" is not a tautology ({pv} verified, {pe} "
+                                f"errors) -- {ctext[:52]}")
+                    # --- 1. deletion, for verified items only ---------------
+                    if why != "verified":
+                        continue
+                    open(mpath, "w").write(
+                        vparse.delete_conjunct(txt, it, "requires", idx, jdx))
+                    mv, me, mo = _verus(mpath)
+                    rows.append(dict(item=it.name, kind=why, clause=ctext,
+                                     test="deletion", verified=mv, errors=me))
+                    if mv is not None and me == 0:
+                        rep.fail("req-mut",
+                                 f"{tag} is NOT load-bearing: deleting it from "
+                                 f"a *verified* item still gives {mv} verified, "
+                                 f"0 errors, so its own body never used the "
+                                 f"assumption and no call site had to discharge "
+                                 f"it. It is decoration.")
+                    elif mv is None:
+                        rep.fail("req-mut", f"{tag}: Verus produced no result "
+                                            f"for the deletion mutant\n"
+                                            f"      {(mo or '')[-300:]}")
+                    else:
+                        print(f"    {src}: {it.name} requires[{idx}] is "
+                              f"load-bearing when deleted ({mv} verified, {me} "
+                              f"errors)")
+        open(mpath, "w").write(txt)
+        out[src] = {"control_verified": base_v, "mutants": rows}
+    if out:
+        _unresolved(also, resolved, rep, "req-mut")
+    n = sum(len(v["mutants"]) for v in out.values())
+    if out and not any(f[0] == "req-mut" for f in rep.failures):
+        rep.ok(f"{n} Verus mutants across {len(out)} file(s): no `requires` "
+               f"conjunct is a tautology, and every *verified* item's "
+               f"precondition fails the file when deleted. Note what is NOT "
+               f"claimed: deleting a trusted item's precondition can never fail "
+               f"a file (measured -- it only removes obligations from callers), "
+               f"so a *missing* one is caught by the parameter-coverage rule in "
+               f"5a, not here.")
     return out
 
 
@@ -1487,7 +1919,83 @@ def check_proof_domain(rep, models, reqs, enss):
 # 6. the driver loop
 # ==========================================================================
 
-def check_driver_identity(pdir, rep, contract):
+def _verus_verified_files(pdir, rep, contract, verus_res):
+    """Which `.rs` files did **Verus** compile and verify, this run?
+
+    TASK_006_REVIEW's blocker A. `harness/dloop.py` strips ghost statements
+    inside a `verus!` span, which is sound only if the span is Verus's. A rung
+    that writes
+
+        macro_rules! verus { ($($t:tt)*) => { $($t)* } }
+        verus!( fn main() { ... SLB-DRIVER-BEGIN ... } );
+
+    got the harbour for free: `vparse.verus_span` accepts
+    `verus!\\s*[{(\\[]` and the guard in stage 5a matched `verus!\\s*\\{` only,
+    so the round bracket was the whole bypass -- +5.0 Ir/call of `_mm_prefetch`
+    in `safe_naive.rs`'s measured loop, unchanged checksums, and a `contract
+    sha256` identical to the shipped pattern.
+
+    The answer is not a fourth regex over the source (the tree already contains
+    the third, and it did not generalise). It is Verus's own verdict, which this
+    gate already has:
+
+      * the file is in `spec.md`'s `verus.obligations`, so stage 5a ran
+        `verus_run.py` on it and got `N verified, 0 errors` back;
+      * **and** `verus --verify-function <the item enclosing the region>
+        --verify-root` reports a verified body for that item, so the answer is
+        about the code being normalised rather than about the file in general.
+
+    The second query is what makes this different in kind from the pin: an item
+    Verus never compiled cannot report a verified body, whatever its file
+    spells its macros. Returns the set of file names that earned the harbour."""
+    vcfg = contract.get("verus") or {}
+    pinned_obl = vcfg.get("obligations") or {}
+    ok = set()
+    for src in sorted(pinned_obl):
+        r = verus_res.get(src) or {}
+        if r.get("errors") or not r.get("verified"):
+            continue
+        path = os.path.join(pdir, src)
+        if not os.path.exists(path):
+            continue
+        txt = open(path).read()
+        try:
+            sp = dloop.region_span(txt, src)
+        except dloop.RegionError:
+            continue
+        if sp is None or not dloop.region_in_verus(txt, src):
+            continue
+        # Which item encloses the region? Ask Verus whether *that* item has a
+        # verified body -- `--verify-function` reports 0 for anything Verus did
+        # not compile as verified code.
+        try:
+            items = vparse.parse(txt)
+        except ValueError as e:
+            rep.fail("driver", f"{src}: {e}")
+            continue
+        inner = [i for i in items
+                 if i.body_start is not None and i.body_end is not None
+                 and i.body_start <= sp[0] and sp[1] <= i.body_end]
+        if not inner:
+            continue
+        name = max(inner, key=lambda i: i.body_start).name
+        nv, ne, out = _verus(path, "--verify-function", name, "--verify-root")
+        if nv and not ne:
+            ok.add(src)
+            print(f"    {src}: `fn {name}` encloses the driver region and Verus "
+                  f"reports {nv} verified for it -- ghost stripping licensed")
+        else:
+            rep.fail("driver",
+                     f"{src}: the driver region is inside `fn {name}`, which "
+                     f"claims a `verus!` span, but "
+                     f"`verus --verify-function {name} --verify-root` reports "
+                     f"{nv} verified / {ne} errors. Ghost statements are "
+                     f"stripped from the driver diff only for code Verus "
+                     f"actually verified.\n      {(out or '')[-300:]}")
+    return ok
+
+
+def check_driver_identity(pdir, rep, contract, verus_ok=frozenset()):
     head("6. every driver loop matches the token sequence pinned in spec.md")
     cfg = contract.get("driver") or {}
     canon = cfg.get("canonical")
@@ -1540,7 +2048,12 @@ def check_driver_identity(pdir, rep, contract):
             continue
         try:
             r = dloop.normalise_file(path, lang, aliases.get(lang),
-                                     call_args.get(lang))
+                                     call_args.get(lang),
+                                     verus_verified=(f in verus_ok))
+        except dloop.GhostHarbourError as e:
+            rep.fail("driver", str(e))
+            seen_files.append(f)
+            continue
         except dloop.RegionError as e:
             rep.fail("driver", str(e))
             seen_files.append(f)
@@ -1576,7 +2089,9 @@ def check_driver_identity(pdir, rep, contract):
     if not any(f[0] == "driver" for f in rep.failures):
         rep.ok(f"{len(found)} driver loops ({sorted(found)}) all normalise to "
                f"the pinned {want_stmts}-statement token sequence; Verus "
-               f"clauses and ghost statements excluded (Rust only)")
+               f"clauses and ghost statements excluded in "
+               f"{sorted(verus_ok) or 'no file'} -- the only file(s) Verus "
+               f"itself verified this run, which is what licenses the strip")
     return out
 
 
@@ -1892,9 +2407,12 @@ def main():
     callsite = check_call_site(pdir, rep, contract)
     clausemut = check_clause_deletion(pdir, rep, contract,
                                       not a.no_verus_mutants)
+    reqmut = check_requires_strength(pdir, rep, contract,
+                                     not a.no_verus_mutants)
     reqs, enss = derive_contract(pdir, rep, contract)
     domain = check_proof_domain(rep, all_models, reqs, enss)
-    drivers = check_driver_identity(pdir, rep, contract)
+    verus_ok = _verus_verified_files(pdir, rep, contract, verus_res)
+    drivers = check_driver_identity(pdir, rep, contract, verus_ok)
     san = check_sanitizers(pdir, rep, indir, all_models)
     miri = check_miri(pdir, rep, contract, identity, modmod, indir,
                       sorted(all_models))
@@ -1922,12 +2440,21 @@ def main():
                              # misstate the floor this run enforced.
                              "alpha_ir_per_work": ALPHA_IR_PER_WORK,
                              "collapse_rate_ir_per_work":
-                                 slopes.pop("_rate", ALPHA_IR_PER_WORK)},
+                                 slopes.pop("_rate", ALPHA_IR_PER_WORK),
+                             # what the floor was actually worth this run: the
+                             # ratio of the tightest measured cell to the
+                             # declared floor. 35.9x and 2.2e9x used to print
+                             # identically (TASK_006_REVIEW D).
+                             "collapse_floor_min_declarable":
+                                 MIN_DECLARABLE_IR_PER_WORK,
+                             "collapse_tightest_margin":
+                                 slopes.pop("_tightest_margin", None)},
         "identity": identity,
         "marginal_ir_per_call": slopes,
         "verus": verus_res,
         "verified_call_site": callsite,
         "clause_deletion": clausemut,
+        "requires_strength": reqmut,
         "proof_domain": domain,
         "driver_loops": drivers,
         "adversarial": advtable,

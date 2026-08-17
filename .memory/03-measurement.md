@@ -365,3 +365,20 @@ One JSON per pattern in `results/pNN-<name>.json`, schema owned by
 `harness/measure.py`. Generated tables go in `results/tables/`. Raw is committed;
 tables are regenerable. Every JSON records the toolchain versions and the git
 commit it was produced from.
+
+**A side record in `results/` can make a table un-regenerable.** `report.py p02`
+was a hard error from the moment `p02-residue-sweep.json` was committed — the
+prefix matched two files — so `results/tables/p02-buffer-copy.md` could not be
+regenerated at all, silently, for two tasks. Fixed at TASK_008 by discriminating
+on the presence of a `cells` list. Any new side record in `results/` needs the
+same thought.
+
+**Re-run `measure.py` when the tree moves, and check what actually went stale.**
+p01's JSON was four commits behind with `dirty_files: 15`. On re-running:
+**all 42 `kernel_exclusive_ir` figures were identical** — including c-clang,
+unsafe and verus at exactly 143,740,000 on `large` — but `binary_text_bytes`
+had moved in 5 C cells (`common/driver.c` grew when p02 added
+`head2_u64_bytes`), and one `md5_raw` had moved with `md5_raw_norel` unchanged,
+i.e. link layout only. So "the kernels are byte-identical, therefore the numbers
+stand" is right about the kernel columns and wrong about the whole-binary ones.
+Say which columns a staleness argument covers.

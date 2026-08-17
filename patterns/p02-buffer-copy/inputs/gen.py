@@ -87,9 +87,20 @@ RESIDUE_MODULI = (4, 8, 16)
 # endpoints, so the curve shows the whole sawtooth *and* establishes its period
 # instead of assuming it. One cycle is not enough: the first draft of this sweep
 # used 16 lengths per band and both bands happened to straddle a multiple of 64,
-# which cannot tell a period of 16 from a period of 64. Measured over 72
-# consecutive lengths, the period is 16 -- a ~167 Ir drop at `len == 1 (mod 16)`
-# and a ~7 Ir drop at `len == 0 (mod 8)`, on top of ~17 Ir per extra byte.
+# which cannot tell a period of 16 from a period of 64.
+#
+# So each band is **34 consecutive lengths** -- 56..89 and 2040..2073, 68 inputs
+# in total. (This comment said "measured over 72 consecutive lengths" until
+# TASK_008; 72 is not a number in the data. The two bands are 34 each and they
+# are not adjacent.) What 34 buys is the lag-16 comparison repeated 18 times per
+# band: R3 - R4 agrees with itself at lag 8 and lag 16 in 26/26 and 18/18 pairs
+# in both bands, which excludes a period of 32 or 64 outright, while R2 - R4
+# agrees at lag 16 only after the 0.21 Ir/byte linear term is subtracted (the
+# raw lag-16 difference is a constant ~5.0 Ir = 16 x 0.21). It cannot exclude a
+# period longer than 34; the second band, 32x larger, is what makes one
+# implausible. The shape: a ~167 Ir drop at `len == 1 (mod 16)` and a ~7 Ir drop
+# at `len == 0 (mod 8)`, on top of ~17 Ir per extra byte within a cycle.
+# NOTES.md 3b has the table and the check.
 SWEEP_CYCLES = 2
 SWEEP_BANDS = ((56, RESIDUE_MODULI[-1] * SWEEP_CYCLES + 2, 96, 98, 130, 200_000),
                (2040, RESIDUE_MODULI[-1] * SWEEP_CYCLES + 2, 2080, 2082, 64, 20_000))
