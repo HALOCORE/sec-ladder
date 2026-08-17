@@ -3,6 +3,43 @@
 These rules exist to stop the compiler from evaluating the benchmark away, and to
 keep the five rungs comparable. A cell that breaks one of them is invalid data.
 
+## The gate's threat model — settled, do not re-litigate
+
+**The threat is an honest mistake, not a malicious pattern author.** Nobody is
+attacking this benchmark; the pattern author, the engineer and the reviewer are
+all us. Decided after TASK_010, on the user's call, when six consecutive tasks had
+gone to gate hardening and 2 of 47 patterns existed.
+
+The gate demonstrably earns its keep against *accident*. Real accidental defects
+it caught, none of them constructed: the retracted O(n) bounds-check claim; a
+verified-safe control cell that had never had a consuming ghost assert; five stale
+identity digests; `binary_text_bytes` stale in five cells; a results table that had
+been silently un-regenerable for two tasks; and the residue trap, stepped in three
+separate times.
+
+But the last rounds defended against a *deliberate* author — `unsafe` hidden in a
+`macro_rules!`, a `#[cfg]`'d constant making a proof mean two different things.
+Those are real holes and the fixes are built and kept, because built machinery
+costs nothing to retain. **What changes is the rule for new work:**
+
+> Before hardening the gate again, ask: **could this defect happen by accident?**
+> If not, record it as a known residual, name it here, and move on to a pattern.
+
+Known residuals we are deliberately **not** closing, all measured:
+
+- `work_per_call` is unbounded; shrinking it 16× passes with a shout. Nothing
+  checks it is denominated in the unit `work_unit_bits` names.
+- `twin_justifications` is capped at 1 by a round number, not by an argument.
+- A trusted `requires` that is non-trivial, mentions every parameter and is still
+  too weak by one is caught only by the verified twin; a trusted `ensures` that is
+  *incomplete* with respect to its body's operations is caught only partially, by
+  identity plus Miri. Both remain human readings.
+- A width change applied to every rung at once is invisible to the driver diff.
+- `include!()` of a file outside the module graph escapes the `unsafe` scan.
+
+A reviewer should still report an adversarial hole it happens to find — it belongs
+in this list. It should not become the next task.
+
 ## Anti-partial-evaluation
 
 The failure mode: the compiler proves the whole program has a constant result and

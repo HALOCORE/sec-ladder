@@ -20,7 +20,14 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 | T006 | retract p02's perf claim; close the reopened bypass; fix the floor | **done**, reviewed |
 | T008 | close the two bypasses T006_REVIEW demonstrated; harden 5c and the floor | **done**, reviewed |
 | T009 | judge the *strength* of a trusted `requires` (the verified twin); close the paren-`&&` hole | **done**, reviewed |
-| T010 | fix the twin's perimeter (3 bypasses); tie the driver region to code that runs | **done**, unreviewed |
+| T010 | fix the twin's perimeter (3 bypasses); tie the driver region to code that runs | **done**, review owed |
+
+**Priority shift, decided by the user after T010.** Six of ten tasks went to
+gate hardening and 2 of 47 patterns exist. The gate's threat model is now
+explicitly *honest mistake, not malicious author* (`.memory/02-bench-rules.md`,
+top section, with the residuals we are deliberately leaving open). New gate work
+must pass "could this happen by accident?" first. **Produce patterns; review each
+pattern once, not each fix to each check.**
 | T007 | p16 TLV walker — the first data-dependent loop bound | spec written, **blocked on T010's review** |
 
 p01 is now `PASS-WITH-BLOCKED-ROWS` rather than `PASS`: TASK_010 made Miri

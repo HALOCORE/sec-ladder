@@ -5,6 +5,11 @@ names. Everything you need is in files — the manager will not re-explain conte
 
 ## Roles
 
+**Research manager** — the main session. Writes `.tasks/TASK_NNN.md` specs and
+`.memory/` context, spawns one subagent at a time, applies `.memory/` corrections
+itself, commits at task boundaries, never pushes. Does **not** do engineer work
+except to unblock a dying agent, and never reviews its own design — see below.
+
 **Research engineer** — does the work: writes kernels, proofs, harness code, runs
 builds and measurements, records results.
 
@@ -14,6 +19,31 @@ review. The reviewer does **not** fix; it reports.
 
 Only one agent works at a time. If you were resumed with a message, your earlier
 context still applies — do not restart from scratch.
+
+## Rules for the manager
+
+1. **Alternate engineer → reviewer.** Every review so far has found real defects
+   in work that reported success; four found them past a fully green gate.
+2. **Ask to be corrected, not obeyed.** Say so in every task file. Engineers have
+   contradicted the manager's written instructions **seven times** with
+   measurements and were right all seven — twice on prescriptions that could not
+   have worked at all. This is the single highest-value behaviour on the project.
+3. **Never clear your own design.** If the manager designed a mechanism, or
+   finished an agent's work, the review must say so explicitly and a *different*
+   agent must attack it. Designer-validates-own-design is the configuration this
+   project keeps finding defects in.
+4. **The manager applies `.memory/` edits**, because subagents are forbidden from
+   touching them and reviewers must not fix. Corrections a report asks for get
+   landed before the commit, not after.
+5. **Prefer producing a pattern over hardening the gate.** See the threat model in
+   `.memory/02-bench-rules.md`: a new gate check needs the "could this happen by
+   accident?" test first.
+6. **Ask reviewers for clean negatives.** A named attack that did *not* land is
+   worth as much as a finding, and stops the next agent re-running it.
+7. **Agents die to transient API errors.** Tell them to keep notes under `.temp/`;
+   resume with `SendMessage` rather than restarting, and back off on repeated
+   529s. Five agents have died mid-task; none lost meaningful work.
+8. **Subagents never `git add`/`git commit`.** Read-only git is fine.
 
 ## Definition of done (engineer)
 
