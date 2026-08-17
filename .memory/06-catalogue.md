@@ -16,7 +16,10 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 | T002 | `harness/` + `common/` + p01 as the template | **done**, reviewed |
 | T003 | harden the gate against the six demonstrated bypasses | **done**, reviewed |
 | T005 | derive the pins; unblock p02; the barrier swap | **done**, unreviewed |
-| T004 | p02 buffer copy — first real bug, first adversarial table | draft spec, **unblocked by T005** |
+| T004 | p02 buffer copy — first real bug, first adversarial table | **done**, reviewed (perf headline refuted) |
+| T006 | retract p02's perf claim; close the reopened bypass; fix the floor | **done**, reviewed |
+| T008 | close the two bypasses T006_REVIEW demonstrated; harden 5c and the floor | spec written, **blocks T007** |
+| T007 | p16 TLV walker — the first data-dependent loop bound | spec written, **blocked on T008** |
 
 Each task has been reviewed adversarially and each review found real defects. The
 cumulative lesson, worth reading before adding a pattern: **a green gate is
@@ -54,7 +57,17 @@ supersede any earlier task report they contradict.
 - **18 of 28 wall-clock cells exceed the 10% spread threshold** and are marked
   discarded. No claim rests on them. Fixing needs a quieter box.
 - **`perf_event_paranoid = 3`** — no hardware counters without root. This is the
-  only way to explain *why* gcc's shorter loop runs 43% slower.
+  only way to explain *why* gcc's shorter loop runs 43% slower. **Owed by the
+  user**; nothing works around it.
+- **Proof-effort budget per R5 cell — set by the manager at TASK_008, pending a
+  user override.** The budget is **one engineer session per R5 cell**. If the
+  proof has not converged by the end of it, the engineer stops and reports the
+  exact Verus error, the obligation it could not discharge, and what it tried.
+  That report *is* the deliverable for that row — `.memory/02-bench-rules.md`
+  already says a documented R5 failure is a finding, not a gap. Rationale: the
+  alternative is an open-ended stall on p28/p30, which the catalogue already
+  expects to defeat R5, and a stuck proof is most informative *early*. Raise the
+  budget for a specific pattern when the sticking point looks like the finding.
 
 ## Family A — buffers & bounds (spatial safety core)
 

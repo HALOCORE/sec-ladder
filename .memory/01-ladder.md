@@ -68,7 +68,16 @@ is a much stronger claim than any p01 could produce.
    | pair | `md5_raw` (objdump grouping) | `md5_fn` (`nm` extent) | counts |
    |---|---|---|---|
    | R4 ≡ R5 | `fb90a96c…` | `619b1d1b…` | 36 / 34 (+3 insn padding) |
-   | R2 ≡ R2v | `6c85987d…` | `f8e1fe32…` | 49 / 47 (+10 insn padding) |
+   | R2 ≡ R2v | `f1e7f951…` | `12d307f2…` | 49 / 47 (+10 insn padding) |
+
+   The R2≡R2v digests were `6c85987d…`/`f8e1fe32…` and went stale at the TASK_005
+   barrier swap; re-measured at TASK_006_REVIEW. The R4≡R5 pair is unchanged and
+   current. **Every *equality* held throughout** — only the absolute digests
+   moved — but `.memory/03-measurement.md` requires an identity claim to cite a
+   reproducible raw-byte digest, and for three tasks these two were not. p01's
+   `NOTES.md` carried the same stale pair plus three more (the `O0` rows).
+   The instruction counts in this table have **not** been re-verified since the
+   swap; treat them as unconfirmed until something re-measures them.
 
    TASK_002 published the counts as 39/34 and 59/47; those are objdump's
    grouping, i.e. the function *plus* its trailing padding. Quote `md5_fn` for

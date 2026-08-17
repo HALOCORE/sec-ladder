@@ -83,6 +83,20 @@ emits `mov eax, <answer>; ret`. Then you are timing `printf`.
    "declared pins must be checkable from `spec.md`/`model.py` prose alone" rule and
    constrained three ways, but nothing mechanically checks that 0.0625 is right.
 
+   **TASK_006_REVIEW measured how weak that residual risk is: the only lower
+   bound is `> 0`.** `min_ir_per_work = 1e-9` with `why = "see NOTES.md"` passes
+   the whole gate, printing "derived floor 0.0 Ir/call" and "tightest margin
+   2246270772.2×". Nothing inspects `why` — it is free text. `work_per_call` is
+   a second unbounded knob in the same file, and both move in the same commit as
+   the code they constrain, so TASK_003_REVIEW's self-certification argument
+   applies verbatim. Even as shipped the margin is 35.9×, i.e. p02 could lose
+   97% of its work and still clear the floor.
+
+   **So do not describe this stage as an anti-collapse gate.** It rules out
+   total collapse and nothing finer. What certifies that the work happened is
+   step 2 — the model checksum. That was already the rule two paragraphs down;
+   the measurement above is how much it matters.
+
    **A floor can never certify that a component ran.** p02 clears any rate on its
    *fold* alone, so the stage does not show the copy happened. No rate bound on
    total kernel `Ir` can attribute cost to a part. What actually certifies the copy
@@ -207,6 +221,20 @@ offset 16  u8[payload_len]    # pattern-defined payload
   `dloop.normalise()` now takes `in_verus`, defaults it `False` (fail-closed),
   refuses `in_verus=True` for C, and requires the region to sit inside
   `verus! { }` *and* inside a non-`external` item.
+
+  **And `verus!` must be *Verus's* macro, not one the rung defines.** TASK_006_REVIEW
+  put the M9 prefetch payload back into `safe_naive.rs`'s measured loop with a
+  three-line `macro_rules! verus { ($($t:tt)*) => { $($t)* } }` and `verus!( ... )`
+  — round brackets. `vparse.py` accepted `verus!\s*[{(\[]`, `check.py`'s
+  "a file with a `verus!` block must appear in `verus.obligations`" guard matched
+  only `verus!\s*\{`, and the one-character gap between the two regexes was the
+  whole bypass: full green gate, `contract sha256` **identical** to the shipped
+  pattern, +5 Ir/call, `prefetch` in the disassembly. A rung that is not compiled
+  by Verus must never reach the ghost-stripping path — the correct test is
+  "was this file verified by Verus", which is a fact the gate already has, not a
+  regex over the source. Payloads inside a *genuine* `verus!` span are safe:
+  Verus itself rejects all three (`assert!` → *"panic is not supported"*,
+  `let ghost = <expr>` → parse error), so the harbour is sound when it is real.
 - Kernel signature is fixed per pattern in the pattern's `spec.md`, and all five
   rungs implement exactly that contract.
 

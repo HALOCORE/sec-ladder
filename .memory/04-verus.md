@@ -237,6 +237,34 @@ so it catches redundant and decorative ones. The mutant above **rewrites** a
 clause and still verifies, so it survives. Do not describe 5c as closing the
 inconsistent-`ensures` hole.
 
+**Three further limits, all measured at TASK_006_REVIEW. Know them before
+quoting 5c as a defence.**
+
+1. **5c tests `ensures` only, and the `requires` hole is the dangerous one.**
+   It iterates `it.clauses.get("ensures")` and nothing else. Deleting
+   `from + n <= src@.len()` from p02's trusted `copy_bytes`, or weakening
+   `get_unchecked`'s `i < v@.len()` to `0 <= i`, each gives **9 verified, 0
+   errors** — the obligation count does not move, and the structural
+   "a trusted `unsafe` item must demand something" rule is satisfied by the
+   tautology `n >= 0`, which the gate then *prints approvingly*. Full green.
+   That is TASK_003_REVIEW's finding re-opened on the one item p02 exists to be
+   about, and it leaves R5 axiomatising that an arbitrary
+   `copy_nonoverlapping` is defined.
+
+   **A `requires` test must be the mirror image of an `ensures` test.** Deleting
+   a postcondition should make the *file* fail; deleting a precondition makes
+   verification strictly *easier*, so the check is "delete it and confirm some
+   call site now fails". Weakening-not-deleting needs the same treatment.
+2. **`&&` defeats whole-clause deletion.** `vparse._clause_split` splits on
+   top-level commas, so `ensures a, b` is two deletable clauses and
+   `ensures a && b` is one. Re-joining a redundant conjunct with `&&` makes 5c
+   delete both halves together, the file fails, and the stage reports the clause
+   load-bearing. Cost to an author: one character. Split at top-level `&&` too.
+   (Not what p02's fix did — that was a genuine deletion, checked.)
+3. **`clause_deletion_extra_items` can silently un-check the kernel.** Unknown
+   item names are dropped from the list with no failure, so declaring a
+   misspelled name exempts the kernel's `ensures` from 5c entirely.
+
 Meanwhile, for any `external_body` item with more than one `ensures` clause:
 prefer one strong clause to several overlapping ones, and state beside the item
 why each clause is true of the real operation — that comment is the only thing
