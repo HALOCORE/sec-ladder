@@ -160,6 +160,59 @@ In order:
    postcondition **inconsistent** rather than merely weaker — p02's M7 verified
    cleanly and only the `spec.md` pin caught it (`.memory/04-verus.md`).
 
+### The five demands steps 1–5 predate
+
+Steps 1–5 were written at TASK_004. TASK_008/009/010 added checks that a pattern
+author must satisfy **before** the gate will go green, and that nothing above
+mentions. Budget for them up front; each has cost an engineer a surprise.
+
+6. **Every trusted item needs a verified twin.** "Trusted" is keyed on
+   `#[verifier::external_body]` + (a non-empty `ensures` **or** `unsafe`) — not on
+   `unsafe` alone. For each such item write `fn slb_twin_<name>` with the **same
+   signature and the same contract text**, body being the *checked* stand-in
+   (`v[i]` for `*v.get_unchecked(i)`), gated `#[cfg(slb_twin)]`. Pin both counts:
+   `verus.obligations.<src>` (shipped) and `verus.twin_obligations.<src>`
+   (`--cfg slb_twin`). p02: 9 and 12, for two trusted items.
+   - The token `slb_twin` may appear **only** inside a twin's own
+     `#[cfg(slb_twin)]` attribute — anywhere else in the pinned file or anything
+     it includes is a hard failure. A `#[cfg]`-varying `const` used in a
+     `requires` was the bypass this closes.
+   - `verus.twin_justifications` is the escape hatch and is capped at
+     `MAX_TWIN_JUSTIFICATIONS = 1` per pattern, shouted every run. If a pattern
+     needs two, that is a finding to report, not a number to raise.
+7. **Every trusted item needs a written human argument in `NOTES.md`**, marked
+   `SLB-TRUSTED-ARGUMENT <src> <name>`, ≥200 chars, containing the literal labels
+   `(a)`, `(b)`, `(c)`: (a) is the twin body the right checked stand-in;
+   (b) is the `ensures` **complete** with respect to every unchecked operation the
+   body performs; (c) does each clause mean the same in both configurations.
+   The gate checks the marker, the labels and the length, prints the text in full,
+   and cannot judge it. (b) is the one no oracle covers — a body that also reads
+   `i + 1` passes the contract pin, the twin and the `--cfg` run unchanged.
+8. **Miri is mandatory whenever the pattern has any trusted item**, not only when
+   R4 ≠ R5 — the old rule made it optional exactly when byte-identity holds, which
+   is the project's headline. `MIRI_PROBE_ITERS = 4`, `MIRI_TIMEOUT = 180`.
+   `n_iters` can be clamped from the file header; **the payload cannot**, so a big
+   input times out and becomes a documented blocked row (p01's `large.bin`).
+   **Size the inputs with this in mind** — it is an `inputs/gen.py` decision, and
+   cheaper to make before the build than after.
+9. **The driver region must be code that runs.** Two rules, both added because a
+   dead decoy region passed a full gate in *both* languages:
+   - Structural: the pinned kernel item is called **exactly once** per rung
+     source, and that call is inside the `SLB-DRIVER` region.
+   - Dynamic: the region's enclosing function must have non-zero exclusive `Ir`
+     and be the kernel's **only** caller, read from the callgrind profiles stage
+     3b already writes.
+10. **The `Ir` floor's composition is clamped.** It derives from `model.py`'s
+   `work_per_call` × `work_unit_bits`, with an absolute clamp; the gate prints the
+   effective absolute floor. `work_per_call`'s *unit* is still your argument to
+   make in `model.py`'s docstring (step 2) — nothing checks that
+   `work_per_call` is denominated in the unit `work_unit_bits` names.
+
+Stage list, so a failure name maps to a function: `selftests`, `build`,
+`checksums`, `no_collapse`, `marginal_ir`, `identity`, `adversarial`,
+`verus_contract`, `call_site`, `clause_deletion`, `requires_strength`,
+`trusted_twins`, `proof_domain`, `driver_identity`, `sanitizers`, `miri`.
+
 ## What is committed
 
 Committed: sources, `spec.md`, `README.md`, `NOTES.md`, `inputs/gen.py`,
