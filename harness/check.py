@@ -47,9 +47,15 @@ What it enforces, in order:
        - every item's `external` attribute, `requires` and `ensures` match
          `spec.md` exactly, and the item set matches too; no duplicate item
          names, and no pinned item outside `verus!` or behind a `#[cfg]`
-       - an `external_body` item whose body contains `unsafe` must carry a
+       - a **trusted** item -- `external_body` plus either a non-empty
+         `ensures` or `unsafe` in its body (`_is_trusted`) -- must carry a
          non-empty `requires`, or a justification `spec.md` states and the
-         verdict prints
+         verdict prints. Keyed on `external_body` + `ensures` since TASK_010,
+         because one `macro_rules!` holding the `unsafe` deleted the whole
+         regime while the pins moved in the same commit
+       - every `unsafe` token in a pinned Verus source sits inside a trusted
+         item's body, and the `common/` files the rungs `#[path]`-include carry
+         none at all -- otherwise the unchecked operation is outside every rule
        - Verus itself confirms the call site verifies (`--verify-function`),
          rather than a regex confirming it looks like it might
        - the Python `requires`/`ensures` are GENERATED from `verus.rs`'s clause
@@ -67,14 +73,30 @@ What it enforces, in order:
      synthesised `proof fn` with the item's parameters and that conjunct as its
      only `ensures`. If that verifies, the conjunct is `true` and demands
      nothing. Deletion is still run for *verified* items, where it does bite
+  5c-twin every trusted item has a `#[cfg(slb_twin)]` verified twin with the
+     same contract, lifted and compared; the twin verifies, its obligation count
+     in the twin configuration is pinned too, and it FAILS when any single
+     conjunct of the trusted `requires` is deleted. The token `slb_twin` may
+     appear nowhere but on a twin's own `#[cfg]`, so the two configurations
+     cannot disagree about anything else. `NOTES.md` must carry a per-item
+     argument for the three things no stage here can judge, and the verdict
+     prints it. The justification hatch is capped and may not cover every
+     trusted item
   6  every rung's driver loop, C included, normalises to the token sequence
-     pinned in `spec.md`; the *set* of files carrying a region is pinned too
+     pinned in `spec.md`; the *set* of files carrying a region is pinned too;
+     the pinned kernel item is called **exactly once** per region-carrying
+     source and that call is inside the region; and callgrind's own
+     caller->callee edges say the region's enclosing function executed
+     (non-zero exclusive `Ir`) and is the only caller of the kernel symbol in
+     every `isolated` cell -- a region pinned in a dead decoy function passed
+     everything else, in both languages
   7  the C rung matches `model.py`'s per-input `sanitizer_expect`: "clean" means
      no ASan/UBSan diagnostic and the predicted exit, "fires" means a diagnostic
      is REQUIRED (p02's adversarial input is defined as the one that trips ASan)
-  8  the Miri policy: mandatory wherever R4 and R5 are not the same machine code
-     (`norel` or better), run for real on a nightly toolchain; a row Miri cannot
-     be run on is a documented blocked row, not a pattern failure
+  8  the Miri policy: mandatory wherever the pattern has a trusted item at all,
+     and never waivable when R4 and R5 are not the same machine code (`norel` or
+     better); run for real on a nightly toolchain. A row Miri cannot be run on is
+     a documented blocked row, not a pattern failure
 
 Results are written to `results/gate/<pattern>.json`, with a sha256 of the
 contract block and of every source read. Exit code: 0 pass, 1 fail, 2 partial.
@@ -221,6 +243,30 @@ MIN_DECLARABLE_IR_PER_BIT = MIN_DECLARABLE_IR_PER_WORK / 8
 # times over" argument. Without a cap the hatch is `> 0` again and
 # TASK_006_REVIEW's `1e-9` walks back in behind a free-text string.
 MIN_BOUND_HATCH_FACTOR = 64.0
+#
+# ...and the two knobs above COMPOSE, which TASK_009_REVIEW measured as Part F.
+# `work_unit_bits` is checked only for `>= 1`, so `work_unit_bits = 1` plus the
+# hatch yields an absolute bound of **3.05e-5 -- 512x below the pre-TASK_009
+# bound of 0.015625** -- out of two numbers in the same author-written `model.py`
+# that already supplies `min_ir_per_work` and `work_per_call`. Three composing
+# knobs, one author, one commit; and nothing checks that `work_per_call` is
+# denominated in the unit `work_unit_bits` names, so the third knob can absorb
+# any factor the other two cannot.
+#
+# So the *product* is bounded, not just each factor. The unit-aware bound and
+# the hatch may each apply in full, but their composition may not take the
+# absolute floor below one hatch-factor under the byte-denominated bound:
+#
+#     bound = max(MIN_DECLARABLE_IR_PER_BIT * work_unit_bits [/ hatch],
+#                 MIN_DECLARABLE_IR_PER_WORK / MIN_BOUND_HATCH_FACTOR)
+#
+# p09's bit-denominated unit still clears it unhatched (0.001953 > 0.000244) and
+# so does a hatched byte unit (0.000244), which are the two cases either
+# mechanism was introduced for. What is now impossible is stacking them, and the
+# effective absolute floor is printed on every run so a reviewer sees which
+# number the run actually enforced.
+MIN_DECLARABLE_IR_PER_WORK_ABS = (MIN_DECLARABLE_IR_PER_WORK
+                                  / MIN_BOUND_HATCH_FACTOR)
 
 # Above this ratio of measured Ir to the derived floor, the floor is loose
 # enough that it certifies nothing but total collapse, and the verdict says so.
@@ -754,10 +800,12 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
                  f"absolute bound under min_ir_per_work. It must be an integer "
                  f">= 1.")
         return {}
-    bound = MIN_DECLARABLE_IR_PER_BIT * unit_bits
-    hatched = False
+    unit_bound = MIN_DECLARABLE_IR_PER_BIT * unit_bits
+    bound, hatched, clamped = unit_bound, False, False
     if bound_why:
-        bound, hatched = bound / MIN_BOUND_HATCH_FACTOR, True
+        bound, hatched = unit_bound / MIN_BOUND_HATCH_FACTOR, True
+    if bound < MIN_DECLARABLE_IR_PER_WORK_ABS:
+        bound, clamped = MIN_DECLARABLE_IR_PER_WORK_ABS, True
 
     rate, why = next(iter(rates.values())) if rates else (None, "")
     if rate is None:
@@ -778,6 +826,15 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
                      + (f", already lowered {MIN_BOUND_HATCH_FACTOR:.0f}x by "
                         f"model.py's min_ir_per_work_bound_why" if hatched
                         else "")
+                     + (f", then CLAMPED back up to "
+                        f"{MIN_DECLARABLE_IR_PER_WORK_ABS} because the two knobs "
+                        f"compose: work_unit_bits={unit_bits} and the hatch "
+                        f"together would give {unit_bound / MIN_BOUND_HATCH_FACTOR}, "
+                        f"{MIN_DECLARABLE_IR_PER_WORK / (unit_bound / MIN_BOUND_HATCH_FACTOR):.0f}x "
+                        f"under the byte-denominated "
+                        f"{MIN_DECLARABLE_IR_PER_WORK}, out of two numbers in the "
+                        f"same author-written model.py that also supplies "
+                        f"min_ir_per_work and work_per_call" if clamped else "")
                      + f"). Until TASK_008 the only bound was `> 0`, and "
                      f"TASK_006_REVIEW put 1e-9 with why=\"see NOTES.md\" past "
                      f"the whole gate -- 'derived floor 0.0 Ir/call', 'tightest "
@@ -817,12 +874,22 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
     if hatched:
         rep.shout("collapse-ir",
                   f"model.py invoked `min_ir_per_work_bound_why` to lower the "
-                  f"harness's ABSOLUTE bound from "
-                  f"{MIN_DECLARABLE_IR_PER_BIT * unit_bits} to {bound} Ir per "
+                  f"harness's ABSOLUTE bound from {unit_bound} to {bound} Ir per "
                   f"{unit_name} -- the hatch under the bound, not the bound "
                   f"under the default. Capped at {MIN_BOUND_HATCH_FACTOR:.0f}x, "
-                  f"because an uncapped hatch is `> 0` again. model.py's "
-                  f"argument: {bound_why}")
+                  f"because an uncapped hatch is `> 0` again"
+                  + (f", and CLAMPED at {MIN_DECLARABLE_IR_PER_WORK_ABS} because "
+                     f"work_unit_bits={unit_bits} had already lowered it "
+                     f"{8 / unit_bits:.0f}x: the two knobs compose, and "
+                     f"work_unit_bits=1 plus a full hatch used to give 3.05e-5, "
+                     f"512x under the byte bound" if clamped else "")
+                  + f". model.py's argument: {bound_why}")
+    elif clamped:
+        rep.shout("collapse-ir",
+                  f"model.py declares work_unit_bits={unit_bits}, which would "
+                  f"put the absolute bound at {unit_bound} Ir per {unit_name}; "
+                  f"clamped up to the composition bound "
+                  f"{MIN_DECLARABLE_IR_PER_WORK_ABS}.")
     for nm, _, dcalls, work in shapes:
         print(f"    probe {nm:16s} n_iters {lo}/{hi} -> +{dcalls} kernel calls, "
               f"work_per_call={work} {unit_name}(s)  => derived floor "
@@ -834,11 +901,15 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
                   f"fixed amount of work regardless of its input passes the "
                   f"absolute floor. Add a second `collapse.probe_inputs` entry "
                   f"with a different work_per_call.")
-    print(f"    unit  = 1 {unit_name} = {unit_bits} bit(s); absolute bound "
-          f"{bound} Ir per {unit_name} "
-          f"({MIN_DECLARABLE_IR_PER_BIT} Ir/bit x {unit_bits}"
-          + (f", hatched /{MIN_BOUND_HATCH_FACTOR:.0f}" if hatched else "")
-          + ")")
+    print(f"    unit  = 1 {unit_name} = {unit_bits} bit(s); EFFECTIVE ABSOLUTE "
+          f"FLOOR under min_ir_per_work = {bound} Ir per {unit_name} "
+          f"(= {MIN_DECLARABLE_IR_PER_BIT} Ir/bit x work_unit_bits={unit_bits}"
+          + (f" / hatch {MIN_BOUND_HATCH_FACTOR:.0f}" if hatched else "")
+          + (f", CLAMPED UP to the composition bound "
+             f"{MIN_DECLARABLE_IR_PER_WORK_ABS}" if clamped else "")
+          + f"); byte-denominated reference {MIN_DECLARABLE_IR_PER_WORK}, so "
+          f"this run's floor sits "
+          f"{MIN_DECLARABLE_IR_PER_WORK / bound:.0f}x below it")
     print(f"    rate  = {rate} Ir per {unit_name}, from {src_of_rate} "
           f"(harness default {ALPHA_IR_PER_WORK}; NOT settable from spec.md); "
           + (f"spec.md's advisory floor {declared} can only tighten it"
@@ -847,6 +918,7 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
         print(f"    why   = {why}")
 
     out, ratios = {}, []
+    cg_files = {}
     for (c, o, m), path in sorted(built.items()):
         if not path:
             continue
@@ -854,9 +926,9 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
         for nm, pr, dcalls, work in shapes:
             ir = {}
             for n in (lo, hi):
-                ir[n] = _callgrind_total(
-                    path, pr[n],
-                    os.path.join(scratch, f"cg.{c}-{o}-{m}.{nm}.{n}.out"))
+                cgp = os.path.join(scratch, f"cg.{c}-{o}-{m}.{nm}.{n}.out")
+                cg_files[(c, o, m, nm, n)] = cgp
+                ir[n] = _callgrind_total(path, pr[n], cgp)
                 if ir[n] is None:
                     rep.fail("collapse-ir",
                              f"{c} {o} {m} on {nm}: callgrind produced no total")
@@ -892,6 +964,11 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
     out["_rate"] = rate
     out["_bound"] = bound
     out["_work_unit"] = unit_name
+    # Stage 6's dynamic half reuses these profiles rather than running callgrind
+    # again -- `_check_region_runs`. Popped in `main()` before the record is
+    # written; a path is not a measurement.
+    out["_cg_files"] = cg_files
+    out["_cg_probe"] = (names[0], hi)
     # --- the achieved margin, printed beside the declared floor --------------
     #
     # TASK_006_REVIEW D: the verdict printed "tightest margin 2246270772.2x" for
@@ -1043,6 +1120,174 @@ def _clauses(item, kw):
 
 _UNSAFE_RE = re.compile(r"\bunsafe\b")
 
+TWIN_PREFIX = "slb_twin_"
+TWIN_CFG = "slb_twin"
+
+# How many trusted items a pattern may justify away with
+# `verus.twin_justifications` before the hatch has become an off switch. See
+# `check_trusted_twins`; TASK_009_REVIEW's x3 used two of them (p02 has exactly
+# two trusted items) and got a full green gate with both known off-by-one
+# weakenings shipped.
+MAX_TWIN_JUSTIFICATIONS = 1
+
+
+def _is_trusted(item):
+    """Is this item part of the trusted base the twin/`requires` rules govern?
+
+    **Not** "its body contains `unsafe`", which is what TASK_005 through
+    TASK_009 used and what TASK_009_REVIEW's blocker x1 defeated with three
+    lines:
+
+        macro_rules! slb_raw_get { ($v:expr,$i:expr) =>
+            { unsafe { *$v.get_unchecked($i) } } }        // outside verus! {}
+        fn get_unchecked(...) ensures r == v@[i as int] { slb_raw_get!(v, i) }
+
+    `vparse` parses `fn` items only, so the `macro_rules!` is invisible, and
+    `_UNSAFE_RE` searched `item.body`, which now contains no `unsafe` token at
+    all. Both the 5a rule ("a trusted `unsafe` item must demand something") and
+    5c-twin's trusted list went empty: `requires` deleted, twin deleted, pins
+    moved in the same commit, **full gate PASS** printing *"no trusted `unsafe`
+    item, so no twin is required"*. That is TASK_003_REVIEW's blocker fully
+    re-opened -- R5's trusted base axiomatising that reading any index of any
+    slice is defined and equals `v@[i]`. `unsafe` in a `common/driver.rs` helper
+    is the same hole without a macro, because the gate never parsed that file.
+
+    The predicate is therefore keyed on the shape that can **axiomatise a
+    falsehood**, which is the property the rules are actually about
+    (`.memory/04-verus.md`: "a trusted item that asserts nothing cannot
+    axiomatise a falsehood"):
+
+        `#[verifier::external_body]`  AND  a non-empty `ensures`
+
+    -- plus the old `unsafe`-in-body limb, kept as a *disjunct* rather than
+    replaced, because a trusted body that performs an unchecked operation is UB
+    in the shipped binary whether or not it asserts anything about the result.
+    Neither limb can be dodged by moving code: hiding the `unsafe` leaves the
+    `ensures` (x1), and dropping the `ensures` leaves nothing for the axiom to
+    say. `load_input` and `emit` have neither, so they stay out, which is the
+    intended behaviour -- they are trusted I/O with no postcondition.
+
+    Note the consequence, which `.memory/04-verus.md` records as a tension and
+    this decides: "prefer trusted wrappers with no `ensures`" and "a trusted
+    item needs an `ensures` to be checkable" now pull the same way. Where a
+    pattern's security rests on a trusted item, give it an `ensures` and a
+    twin; a trusted item with neither `ensures` nor `unsafe` is outside the
+    regime *and outside the security argument*, and `_scan_unsafe_sites` below
+    is what stops the second half of that from being a lie."""
+    if item.external != "verifier::external_body":
+        return False
+    return bool(_clauses(item, "ensures")) or bool(_UNSAFE_RE.search(item.body or ""))
+
+
+def _path_includes(pdir, srcs):
+    """Every file the given sources pull into their crate with
+    `#[path = "..."] mod ...`. Those files are part of the token stream the
+    compiler and Verus see, and no pattern-local check ever parsed them:
+    `common/driver.rs` is `#[verifier::external]` for R5, so an `unsafe` helper
+    or a `#[cfg(slb_twin)]` item in it is invisible to every rule keyed on the
+    pattern's own sources."""
+    out = []
+    for src in srcs:
+        path = os.path.join(pdir, src)
+        if not os.path.exists(path):
+            continue
+        # The RAW text, not `blank_noncode`: the path is a string literal, which
+        # blanking erases. A commented-out `#[path]` therefore gets scanned too,
+        # which is the safe direction.
+        txt = open(path).read()
+        cand = re.findall(r"#\[\s*path\s*=\s*\"([^\"]+)\"\s*\]", txt)
+        # ...and a plain `mod foo;`, which resolves to a sibling file rather than
+        # to a declared path. No pattern uses that today; leaving it out would
+        # mean an `unsafe` helper or a `#[cfg(slb_twin)]` item in `foo.rs` was
+        # outside both scans, which is the whole shape of the bug this exists to
+        # close.
+        for m in re.finditer(r"\bmod\s+([A-Za-z_][A-Za-z0-9_]*)\s*;",
+                             vparse.blank_noncode(txt)):
+            cand += [m.group(1) + ".rs", os.path.join(m.group(1), "mod.rs")]
+        for inc in cand:
+            p = os.path.normpath(os.path.join(pdir, inc))
+            if p not in out and os.path.exists(p):
+                out.append(p)
+    return out
+
+
+def _scan_unsafe_sites(rep, pdir, contract):
+    """Every `unsafe` token in the proof's source, not one `fn` body at a time.
+
+    `_is_trusted` above fixes *which items* the rules govern. This fixes the
+    other half of x1: the gate must know about `unsafe` that is not inside any
+    parsed item at all -- a `macro_rules!`, a `const`/`static` initialiser, an
+    `unsafe impl`, a nested closure outside a `fn`, or a helper in the shared
+    `common/driver.rs`, which no pattern-local parse ever reads. Each of those
+    performs an unchecked operation that no `requires` demands and no twin
+    checks.
+
+    Rule: in a pinned Verus source, every `unsafe` token must sit inside the
+    body of an item this gate treats as trusted (`_is_trusted`), so that the
+    5a `requires` rule and the 5c-twin rule reach it. Anywhere else is a hard
+    failure naming the line. The same scan runs over the `common/` files the
+    pattern pulls in with `#[path = "../../common/..."]`, where `unsafe` is a
+    hole with no macro required."""
+    vcfg = contract.get("verus") or {}
+    pinned_obl = vcfg.get("obligations") or {}
+    n_ok = 0
+    for src in sorted(pinned_obl):
+        path = os.path.join(pdir, src)
+        if not os.path.exists(path):
+            continue
+        txt = open(path).read()
+        code = vparse.blank_noncode(txt)
+        try:
+            items = vparse.parse(txt)
+        except ValueError as e:
+            rep.fail("tcb-unsafe", f"{src}: {e}")
+            continue
+        spans = [(i.body_start, i.body_end, i.name) for i in items
+                 if _is_trusted(i) and i.body_start is not None]
+        for m in _UNSAFE_RE.finditer(code):
+            # `unsafe fn` / `unsafe impl` modifiers and `unsafe` blocks alike:
+            # the question is only whether the token is inside a trusted body.
+            host = [nm for a, b, nm in spans if a <= m.start() < b]
+            if host:
+                n_ok += 1
+                continue
+            rep.fail("tcb-unsafe",
+                     f"{src}:{txt.count(chr(10), 0, m.start()) + 1} an `unsafe` "
+                     f"token sits outside every trusted item's body, so no "
+                     f"`requires` rule and no verified twin governs it. This is "
+                     f"TASK_009_REVIEW's blocker x1: a `macro_rules!` holding "
+                     f"`unsafe {{ *$v.get_unchecked($i) }}` is invisible to "
+                     f"`vparse` (which parses `fn` items only), so the trusted "
+                     f"item's body contained no `unsafe` token, 5a said nothing "
+                     f"and 5c-twin reported \"no trusted `unsafe` item, so no "
+                     f"twin is required\" -- with the `requires` and the twin "
+                     f"both deleted and the pins moved in the same commit. Put "
+                     f"the unchecked operation inside an "
+                     f"`#[verifier::external_body]` item with a `requires`, an "
+                     f"`ensures` and a `#[cfg({TWIN_CFG})]` twin.")
+    # ...and the shared driver, which is `#[verifier::external]` for R5 and so
+    # is never parsed by any pattern-local check. An `unsafe` helper there is
+    # x1 without needing a macro: the trusted item's body just calls it.
+    seen_common = _path_includes(
+        pdir, sorted(pinned_obl) + sorted(f for f in os.listdir(pdir)
+                                          if f.endswith(".rs")))
+    for p in seen_common:
+        code = vparse.blank_noncode(open(p).read())
+        rel = os.path.relpath(p, REPO)
+        for m in _UNSAFE_RE.finditer(code):
+            rep.fail("tcb-unsafe",
+                     f"{rel}:{code.count(chr(10), 0, m.start()) + 1} `unsafe` in "
+                     f"a shared driver file the rungs `#[path]`-include. The "
+                     f"gate never parses this file, so nothing requires a "
+                     f"precondition of it and no twin checks it -- a trusted "
+                     f"item whose body is `driver::raw_get(v, i)` has the whole "
+                     f"of x1's effect with no macro. Keep unchecked operations "
+                     f"in the pattern's own `#[verifier::external_body]` items.")
+    if seen_common:
+        print(f"    scanned for `unsafe` outside a trusted body: "
+              f"{sorted(pinned_obl)} + {[os.path.relpath(p, REPO) for p in seen_common]}"
+              f" ({n_ok} token(s) inside a trusted body)")
+
 
 def _check_trusted_unsafe(rep, src, tcb, justifications):
     """TASK_005 A3, and the whole reason TASK_005 exists.
@@ -1087,9 +1332,15 @@ def _check_trusted_unsafe(rep, src, tcb, justifications):
     Known false positive, and the reason the justification hatch covers this
     rule too: a pure *value* parameter (`fn write(dst, i, v)` -- `v` is written,
     never used as an address) genuinely needs no precondition. Say so in
-    `spec.md` and the verdict shouts it on every run."""
+    `spec.md` and the verdict shouts it on every run.
+
+    **TASK_010 A: the scope is `_is_trusted`, not `unsafe`-in-the-body.** One
+    `macro_rules!` deleted this whole regime at TASK_009_REVIEW (blocker x1) --
+    read `_is_trusted` for why the predicate is now `external_body` plus either
+    a non-empty `ensures` or `unsafe` in the body, and `_scan_unsafe_sites` for
+    the `unsafe` this function can no longer be the only reader of."""
     for i in tcb:
-        if not _UNSAFE_RE.search(i.body or ""):
+        if not _is_trusted(i):
             continue
         reqs = _clauses(i, "requires")
         if reqs:
@@ -1104,7 +1355,7 @@ def _check_trusted_unsafe(rep, src, tcb, justifications):
             bare = [p for p in used if p not in req_ids]
             if bare and not justifications.get(i.name):
                 rep.fail("tcb-unsafe",
-                         f"{src}:{i.line} trusted `unsafe` item `{i.name}` "
+                         f"{src}:{i.line} trusted item `{i.name}` "
                          f"demands {reqs} of its callers, which constrains "
                          f"nothing about {bare} -- parameter(s) its own trusted "
                          f"body uses. That is the axiom that the unchecked "
@@ -1124,19 +1375,21 @@ def _check_trusted_unsafe(rep, src, tcb, justifications):
                           f"nothing about {bare}, which its trusted body uses. "
                           f"spec.md justifies it: {justifications[i.name]}")
                 continue
-            rep.ok(f"{src}: trusted `unsafe` item `{i.name}` demands "
+            rep.ok(f"{src}: trusted item `{i.name}` demands "
                    f"{reqs} of every caller, constraining every parameter its "
                    f"body uses ({used})")
             continue
         why = justifications.get(i.name)
         if not why:
             rep.fail("tcb-unsafe",
-                     f"{src}:{i.line} `{i.name}` is {i.external}, its body "
-                     f"contains `unsafe`, and it has **no `requires`**. It is "
+                     f"{src}:{i.line} `{i.name}` is {i.external}"
+                     + (", its body contains `unsafe`"
+                        if _UNSAFE_RE.search(i.body or "") else "")
+                     + (f", it asserts {_clauses(i, 'ensures')} about its result"
+                        if _clauses(i, "ensures") else "")
+                     + f", and it has **no `requires`**. It is "
                      f"therefore an axiom that the unchecked operation is "
                      f"always defined"
-                     + (f", and it asserts {_clauses(i, 'ensures')} about the "
-                        f"result" if _clauses(i, "ensures") else "")
                      + f". Give it the precondition its callers must discharge, "
                        f"or declare "
                        f"verus.unsafe_justifications[{src!r}][{i.name!r}] in "
@@ -1144,7 +1397,7 @@ def _check_trusted_unsafe(rep, src, tcb, justifications):
                        f"verdict.")
         else:
             rep.shout("tcb-unsafe",
-                      f"{src}:{i.line} `{i.name}` is a trusted `unsafe` item "
+                      f"{src}:{i.line} `{i.name}` is a trusted item "
                       f"with NO precondition. spec.md justifies it: {why}")
 
 
@@ -1177,6 +1430,7 @@ def check_verus_contract(pdir, rep, contract):
     # the two cannot disagree -- but note that is *hygiene, not the fix*: a
     # third regex is what was defeated. The fix is `_verus_verified_files`,
     # which asks Verus.
+    _scan_unsafe_sites(rep, pdir, contract)
     for f in sorted(os.listdir(pdir)):
         if f.endswith(".rs") and vparse.verus_span(open(os.path.join(pdir, f)).read()):
             if f not in pinned_obl:
@@ -1258,6 +1512,9 @@ def check_verus_contract(pdir, rep, contract):
                   f"({i.body_lines} body lines, line {i.line}, "
                   f"requires={_clauses(i, 'requires') or '[]'})")
         _check_trusted_unsafe(rep, src, tcb, justif.get(src) or {})
+        print(f"    {src}: items the trusted-item rules govern (`_is_trusted`: "
+              f"external_body + an `ensures`, or `unsafe` in the body): "
+              f"{sorted(i.name for i in item_list if _is_trusted(i))}")
         for kw in ("assume(", "assume_specification", "admit("):
             n = len(re.findall(re.escape(kw), vparse.blank_noncode(txt)))
             if n:
@@ -1662,9 +1919,26 @@ def check_clause_deletion(pdir, rep, contract, enabled=True):
         out[src] = {"control_verified": base_v, "mutants": rows}
     if out:
         _unresolved(also, resolved, rep, "clause-mut")
-    n = sum(len(v["mutants"]) for v in out.values())
-    if out and not any(f[0] == "clause-mut" for f in rep.failures):
-        rep.ok(f"{n} Verus mutants across {len(out)} file(s): every trusted "
+    # `n` counts CLAUSE mutants, not rows: the `assert(false)` probe is a row
+    # too, so `len(rows)` is >= 1 whenever the stage ran at all and a green line
+    # keyed on it would assert "every trusted `ensures` conjunct is
+    # load-bearing" over zero conjuncts. TASK_009_REVIEW's x3 was exactly this
+    # shape one stage over -- `0 verified twin(s): every trusted `unsafe` item's
+    # `requires` is strong enough ...` -- so every count-bearing `rep.ok` in
+    # this file now states its `n` and refuses to fire at zero (TASK_010 C).
+    n = sum(1 for v in out.values() for r in v["mutants"] if r["clause"])
+    probes = sum(1 for v in out.values() for r in v["mutants"] if not r["clause"])
+    if out and not n:
+        rep.fail("clause-mut",
+                 f"this stage deleted 0 `ensures` conjuncts across "
+                 f"{sorted(out)} ({probes} reachability probe(s) only), so it "
+                 f"certified nothing about any trusted postcondition. Either no "
+                 f"trusted item states an `ensures` -- in which case say so in "
+                 f"spec.md and check `verus.items` -- or the conjunct splitter "
+                 f"found nothing to delete.")
+    elif out and not any(f[0] == "clause-mut" for f in rep.failures):
+        rep.ok(f"{n} `ensures` conjunct(s) deleted across {len(out)} file(s) "
+               f"(n={n} > 0), plus {probes} reachability probe(s): every trusted "
                f"`ensures` conjunct is load-bearing, and `assert(false)` at the "
                f"call site is unprovable. Derived, not declared -- this does not "
                f"inherit the self-certification problem of a `spec.md` pin.")
@@ -1971,9 +2245,22 @@ def check_requires_strength(pdir, rep, contract, enabled=True):
         out[src] = {"control_verified": base_v, "mutants": rows}
     if out:
         _unresolved(also, resolved, rep, "req-mut")
-    n = sum(len(v["mutants"]) for v in out.values())
-    if out and not any(f[0] == "req-mut" for f in rep.failures):
-        rep.ok(f"{n} Verus mutants across {len(out)} file(s): no `requires` "
+    # Count what was actually judged, and refuse the green line at zero
+    # (TASK_010 C -- a count-bearing `rep.ok` must state its `n`).
+    n = sum(1 for v in out.values() for r in v["mutants"]
+            if r["test"] == "tautology")
+    dels = sum(1 for v in out.values() for r in v["mutants"]
+               if r["test"] == "deletion")
+    if out and not n:
+        rep.fail("req-mut",
+                 f"this stage judged 0 `requires` conjuncts across "
+                 f"{sorted(out)}, so nothing was tested for triviality. A "
+                 f"pattern whose trusted items and kernel all have empty "
+                 f"preconditions has no obligations for a caller to discharge, "
+                 f"which is the pilot's defect, not a clean run.")
+    elif out and not any(f[0] == "req-mut" for f in rep.failures):
+        rep.ok(f"{n} `requires` conjunct(s) probed (n={n} > 0) and {dels} "
+               f"deleted, across {len(out)} file(s): no `requires` "
                f"conjunct is a tautology under bare Z3 or "
                + " or ".join(f"`by ({t})`" for t in _TAUT_TACTICS if t)
                + f", and every *verified* item's "
@@ -1991,14 +2278,186 @@ def check_requires_strength(pdir, rep, contract, enabled=True):
 # 5c-twin. the verified twin: is the trusted `requires` STRONG ENOUGH?
 # ==========================================================================
 
-TWIN_PREFIX = "slb_twin_"
-TWIN_CFG = "slb_twin"
 # Anything that would let a twin pass without Verus actually checking the
 # operation. `unsafe` and `external_body` would make the twin a second copy of
 # the axiom; `assume`/`admit` would let the author write the precondition they
 # wish they had; calling the trusted item itself is the degenerate cheat.
 _TWIN_BANNED = ("unsafe", "assume", "admit", "assume_specification",
                 "external_body", "external")
+
+_TWIN_CFG_TOKEN_RE = re.compile(r"\b" + TWIN_CFG + r"\b")
+_TWIN_CFG_ATTR_RE = re.compile(r"#!?\[\s*cfg\s*\(\s*" + TWIN_CFG + r"\s*\)\s*\]")
+
+
+def _check_twin_cfg_hygiene(rep, src, txt, items, extra=()):
+    """The twin must be verified in the **shipped** configuration.
+
+    TASK_009_REVIEW's blocker x2. `check.py` verifies the twins with
+    `_verus(path, "--cfg", TWIN_CFG)`, and that cfg changes the meaning of the
+    *whole file*, not just the twin items. The "only a verified twin may be
+    `#[cfg]`-gated" rule in 5a is enforced over `vparse` items -- i.e. `fn`s --
+    so a cfg'd `const`, `use`, `type`, `static` or `mod` is invisible to it.
+    Measured mirror:
+
+        #[cfg(slb_twin)]      pub const SLACK: usize = 0;
+        #[cfg(not(slb_twin))] pub const SLACK: usize = 1;
+        pub open spec fn in_bounds(v: &[u8], i: usize) -> bool
+            { i < v@.len() + SLACK }
+
+    used as the `requires` of **both** `get_unchecked` and its twin, so
+    `norm_clause(sig)` compares equal character for character. The twin was then
+    checked against `i < v@.len() + 0` while R5 ships `i < v@.len() + 1`;
+    `get_unchecked(v, v.len())` verifies in the shipped config (11 verified, 0
+    errors) and fails only under `--cfg slb_twin`. Gate: PASS, 0 failures, 0
+    shouts.
+
+    The rule: **the token `slb_twin` may appear in a pinned Verus source only
+    inside a twin item's own `#[cfg(slb_twin)]` attribute.** Anything else is a
+    hard failure.
+
+    Why this is a complete check and not a heuristic: Rust's conditional
+    compilation is driven by `cfg`/`cfg_attr` predicates, and a predicate that
+    depends on `slb_twin` must **name** it in the crate's token stream -- there
+    is no indirection (no aliasing of cfg names, no computed predicates). So if
+    the token occurs nowhere but on the twins' own attributes, the two
+    compilations agree on every item except the twins, which is exactly the
+    property x2 broke. The token stream includes what `#[path]`-included files
+    contribute, so those are scanned too (`extra`); `slb_twin_<name>` itself
+    does not match, because `_` is a word character.
+
+    It is checked *before* any Verus run in this stage, so a file that fails it
+    never gets a twin certificate at all."""
+    code = vparse.blank_noncode(txt)
+    twin_names = {i.name for i in items.values()
+                  if i.name.startswith(TWIN_PREFIX)}
+    allowed = []
+    for i in items.values():
+        if i.name not in twin_names or i.start is None or i.sig_start is None:
+            continue
+        for a, b in vparse.attribute_spans(code):
+            if i.start <= a and b <= i.sig_start and _TWIN_CFG_ATTR_RE.fullmatch(
+                    code[a:b].strip()):
+                allowed.append((a, b))
+    bad = [m.start() for m in _TWIN_CFG_TOKEN_RE.finditer(code)
+           if not any(a <= m.start() < b for a, b in allowed)]
+    for off in bad:
+        rep.fail("twin",
+                 f"{src}:{txt.count(chr(10), 0, off) + 1} the token "
+                 f"`{TWIN_CFG}` appears outside any twin item's own "
+                 f"`#[cfg({TWIN_CFG})]` attribute: "
+                 f"`{vparse.norm_clause(txt[max(0, off - 40):off + 40])}`. "
+                 f"5c-twin verifies this file with `--cfg {TWIN_CFG}`, which "
+                 f"changes the meaning of the WHOLE file, so any other use of "
+                 f"the token lets the twin be checked against a contract R5 "
+                 f"does not ship. TASK_009_REVIEW measured it: "
+                 f"`#[cfg({TWIN_CFG})] const SLACK: usize = 0;` with "
+                 f"`#[cfg(not({TWIN_CFG}))] ... = 1;` inside a spec fn shared as "
+                 f"the `requires` of both the trusted item and its twin gives a "
+                 f"character-identical signature comparison, a clean twin run, "
+                 f"and a shipped `requires` of `i < v@.len() + 1` -- reading one "
+                 f"past the end, verified. The `#[cfg]` on a `const` is "
+                 f"invisible to the item-set pin because `vparse` parses `fn` "
+                 f"items only.")
+    for path in extra:
+        ecode = vparse.blank_noncode(open(path).read())
+        for m in _TWIN_CFG_TOKEN_RE.finditer(ecode):
+            rep.fail("twin",
+                     f"{os.path.relpath(path, REPO)}:"
+                     f"{ecode.count(chr(10), 0, m.start()) + 1} the token "
+                     f"`{TWIN_CFG}` appears in a file `{src}` `#[path]`-includes. "
+                     f"It is part of the same crate, so it changes what "
+                     f"`--cfg {TWIN_CFG}` compiles -- the twin would be verified "
+                     f"against a configuration no build ships.")
+    if not bad and allowed:
+        print(f"    {src}: the token `{TWIN_CFG}` occurs nowhere but on the "
+              f"{len(allowed)} twin `#[cfg({TWIN_CFG})]` attribute(s), so the "
+              f"shipped configuration and the `--cfg {TWIN_CFG}` one differ in "
+              f"nothing but the twin items themselves")
+
+
+_ARG_MARK = "SLB-TRUSTED" "-ARGUMENT"
+_ARG_RE = re.compile(r"^.*" + _ARG_MARK + r"\s+(\S+)\s+(\S+)\s*$", re.M)
+_ARG_MIN_CHARS = 200
+
+
+def _check_trusted_arguments(rep, pdir, trusted_by_src):
+    """The part no mechanism can judge, required to exist and printed.
+
+    TASK_009_REVIEW's deepest finding (x4): **a trusted `ensures` need not be
+    complete with respect to the operations its body performs.** Replace
+    `get_unchecked`'s body with
+
+        unsafe { let _peek = *v.get_unchecked(i + 1); *v.get_unchecked(i) }
+
+    and the contract, the twin and the pins are all still exactly right: nothing
+    licenses the `i + 1` read, and no Verus stage can see it, because the twin
+    only has to satisfy the `ensures` and the `ensures` never mentions it.
+
+    Three of the four questions that decide whether a trusted item is sound are
+    outside every oracle this gate has:
+
+      (a) is the twin's body the right *checked stand-in* for the unchecked
+          operation (`v[i]` for `*v.get_unchecked(i)`)?
+      (b) is the `ensures` **complete** with respect to every unchecked
+          operation the body performs?
+      (c) does each clause mean the same thing in the shipped configuration as
+          in the twin's?
+
+    So the gate requires the argument to *exist*, per item, in the pattern's
+    `NOTES.md`, and prints it in full on every run where a reviewer reads it --
+    the same design as `verus.unsafe_justifications`, applied to the question
+    that has no mechanical answer. It checks the marker, the three labels and a
+    minimum length; it cannot check the reasoning, and says so. Judging it is
+    the human's job and this is the paragraph they are meant to read."""
+    path = os.path.join(pdir, "NOTES.md")
+    txt = open(path).read() if os.path.exists(path) else ""
+    blocks, hits = {}, list(_ARG_RE.finditer(txt))
+    for i, m in enumerate(hits):
+        # The block ends at the next marker, the next markdown heading, or the
+        # next horizontal rule -- whichever comes first. Without the last two,
+        # the final marker in the file swallows the rest of NOTES.md and the
+        # gate log prints 31 kB of unrelated prose, which is the opposite of
+        # making one paragraph impossible to skip.
+        ends = [hits[i + 1].start()] if i + 1 < len(hits) else []
+        for pat in (r"^#{1,6} ", r"^---\s*$"):
+            nxt = re.search(pat, txt[m.end():], re.M)
+            if nxt:
+                ends.append(m.end() + nxt.start())
+        blocks[(m.group(1), m.group(2))] = txt[m.end():min(ends or [len(txt)])].strip()
+    for src, names in sorted(trusted_by_src.items()):
+        for name in sorted(names):
+            body = blocks.get((src, name))
+            if body is None:
+                rep.fail("twin",
+                         f"NOTES.md carries no `{_ARG_MARK} {src} {name}` "
+                         f"section. Every trusted item needs a written, per-item "
+                         f"argument for the three things no stage of this gate "
+                         f"can judge: (a) is the twin's body the right checked "
+                         f"stand-in for the unchecked operation; (b) is the "
+                         f"`ensures` COMPLETE with respect to every unchecked "
+                         f"operation the body performs; (c) does each clause "
+                         f"mean the same thing in the shipped configuration as "
+                         f"in the twin's. (b) is TASK_009_REVIEW's x4: a body "
+                         f"that also reads `i + 1` passes the contract pin, the "
+                         f"twin and the `--cfg {TWIN_CFG}` run unchanged. The "
+                         f"gate requires the text and prints it; only a human "
+                         f"can judge it.")
+                continue
+            missing = [l for l in ("(a)", "(b)", "(c)") if l not in body]
+            if missing or len(body) < _ARG_MIN_CHARS:
+                rep.fail("twin",
+                         f"NOTES.md's `{_ARG_MARK} {src} {name}` section is "
+                         f"{len(body)} chars and is missing {missing or 'nothing'} "
+                         f"-- all three of (a) the twin as a checked stand-in, "
+                         f"(b) the `ensures`'s COMPLETENESS with respect to every "
+                         f"unchecked operation in the body, and (c) the clause "
+                         f"meaning the same in both configurations must be "
+                         f"argued, in at least {_ARG_MIN_CHARS} characters.")
+                continue
+            print(f"    HUMAN MUST JUDGE -- {src} `{name}`, from NOTES.md "
+                  f"({len(body)} chars):")
+            for line in body.splitlines():
+                print(f"      | {line}")
 
 
 def check_trusted_twins(pdir, rep, contract, enabled=True):
@@ -2094,6 +2553,8 @@ def check_trusted_twins(pdir, rep, contract, enabled=True):
         rep.fail("twin", "spec.md pins no verus.obligations, so there is no "
                          "file list to check twins in")
         return out
+    pinned_twin_obl = vcfg.get("twin_obligations") or {}
+    justified, n_trusted, trusted_by_src = [], 0, {}
     for src in sorted(pinned_obl):
         path = os.path.join(pdir, src)
         if not os.path.exists(path):
@@ -2104,13 +2565,18 @@ def check_trusted_twins(pdir, rep, contract, enabled=True):
         except ValueError as e:
             rep.fail("twin", f"{src}: {e}")
             continue
-        trusted = [i for i in items.values()
-                   if i.external == "verifier::external_body"
-                   and _UNSAFE_RE.search(i.body or "")]
+        _check_twin_cfg_hygiene(rep, src, txt, items,
+                                _path_includes(pdir, [src]))
+        trusted = [i for i in items.values() if _is_trusted(i)]
         ext_names = {i.name for i in items.values() if i.external}
         if not trusted:
-            print(f"    {src}: no trusted `unsafe` item, so no twin is required")
+            print(f"    {src}: no trusted item with an `ensures` or an `unsafe` "
+                  f"body (`_is_trusted`), so no twin is required. "
+                  f"external_body items: "
+                  f"{sorted(i.name for i in items.values() if i.external)}")
             continue
+        n_trusted += len(trusted)
+        trusted_by_src[src] = [t.name for t in trusted]
         rows, ok_here = [], True
         for t in trusted:
             twin = items.get(TWIN_PREFIX + t.name)
@@ -2118,14 +2584,31 @@ def check_trusted_twins(pdir, rep, contract, enabled=True):
             if twin is None:
                 ok_here = False
                 if why:
+                    justified.append(f"{src}:{t.name}")
+                    # A shout is not enough on its own: TASK_009_REVIEW's x3
+                    # shipped BOTH known off-by-one weakenings with both twins
+                    # deleted and two `"see NOTES.md"` justifications, and the
+                    # gate printed `PASS  failures 0  loud 3`. `rep.block`
+                    # additionally forces the verdict to
+                    # PASS-WITH-BLOCKED-ROWS, which is what an unchecked
+                    # trusted precondition actually is: a row nothing verified.
+                    rep.block("twin", f"{src} `{t.name}` (strength unchecked)",
+                              f"trusted item `{t.name}` has NO verified twin "
+                              f"`{TWIN_PREFIX}{t.name}`, so its `requires` "
+                              f"{_clauses(t, 'requires')} was never tested for "
+                              f"STRENGTH -- only for triviality (5c-req) and "
+                              f"parameter mention (5a), both of which "
+                              f"`i <= v@.len()` passes. spec.md justifies it: "
+                              f"{why}")
                     rep.shout("twin",
-                              f"{src}:{t.line} trusted `unsafe` item "
+                              f"{src}:{t.line} trusted item "
                               f"`{t.name}` has NO verified twin "
                               f"`{TWIN_PREFIX}{t.name}`. spec.md justifies it: "
                               f"{why}")
                 else:
                     rep.fail("twin",
-                             f"{src}:{t.line} trusted `unsafe` item `{t.name}` "
+                             f"{src}:{t.line} trusted item `{t.name}` "
+                             f"({t.external}, ensures={_clauses(t, 'ensures')}) "
                              f"has no verified twin. Nothing then checks that "
                              f"its `requires` {_clauses(t, 'requires')} is "
                              f"strong enough to license the unchecked "
@@ -2206,6 +2689,33 @@ def check_trusted_twins(pdir, rep, contract, enabled=True):
                      f"is not more than the {base_v} verified without it, so "
                      f"the twins were not compiled at all and this stage "
                      f"checked nothing.")
+        elif src not in pinned_twin_obl:
+            # `tv > base_v` only says *something* extra was compiled. The twin
+            # configuration is a second configuration of the same file and it
+            # gets the same treatment as the shipped one: a pinned obligation
+            # count, so that a twin quietly losing its loop body, or an extra
+            # item appearing only under `--cfg slb_twin`, moves a number a
+            # reviewer can read in `spec.md` (TASK_009_REVIEW blocker x2, second
+            # half).
+            rep.fail("twin",
+                     f"{src}: spec.md pins verus.obligations={pinned_obl[src]} "
+                     f"for the shipped configuration but no "
+                     f"verus.twin_obligations for the `--cfg {TWIN_CFG}` one, "
+                     f"which is where the twins are actually checked. This run "
+                     f"measured {tv} verified / 0 errors with the cfg and "
+                     f"{base_v} without; pin `\"twin_obligations\": {{{src!r}: "
+                     f"{tv}}}` in the slb-contract block. Without it the only "
+                     f"assertion about the twin configuration is `{tv} > "
+                     f"{base_v}`.")
+        elif tv != pinned_twin_obl[src]:
+            rep.fail("twin",
+                     f"{src}: `--cfg {TWIN_CFG}` reports {tv} verified, spec.md "
+                     f"pins verus.twin_obligations={pinned_twin_obl[src]} "
+                     f"({base_v} verified without the cfg, pinned "
+                     f"{pinned_obl[src]}). One Verus query per function plus one "
+                     f"per loop body: a twin that lost its loop, or an item that "
+                     f"exists only in the twin configuration, moves this and "
+                     f"nothing else does.")
         else:
             for r in rows:
                 print(f"    {src}: `{r['twin']}` verifies against "
@@ -2213,8 +2723,10 @@ def check_trusted_twins(pdir, rep, contract, enabled=True):
                       f"(requires={r['requires']}) in {r['body_lines']} lines "
                       f"of checked code")
             print(f"    {src}: {tv} verified, 0 errors with `--cfg {TWIN_CFG}` "
-                  f"({base_v} without it -- the twins are cfg'd out of every "
-                  f"build, so they cost zero instructions)")
+                  f"-- matches the pinned verus.twin_obligations "
+                  f"({base_v} without it, pinned {pinned_obl[src]}; the twins "
+                  f"are cfg'd out of every build, so they cost zero "
+                  f"instructions)")
             # --- the twin must NEED the precondition ------------------------
             #
             # The oracle above has teeth only in proportion to what the contract
@@ -2230,48 +2742,132 @@ def check_trusted_twins(pdir, rep, contract, enabled=True):
             # (deleting a trusted precondition only removes obligations from
             # callers, so nothing fails -- TASK_008). It exists here precisely
             # because the twin is *verified* code.
+            #
+            # **Per conjunct, not all-at-once** (TASK_009_REVIEW, from the code
+            # rather than a mutant). The first version deleted *every* `requires`
+            # clause of the twin and demanded one failure, so a twin that needs 1
+            # of N clauses still reported that the implementation "genuinely
+            # needs it" -- and the other N-1 clauses of the trusted item were
+            # then unchecked for strength. p02 does not exhibit it (both of
+            # `copy_bytes`'s clauses are load-bearing, measured below); a
+            # multi-clause accessor would. The conjunct split is `vparse`'s, so
+            # a clause carrying a top-level `==>`/`||`/quantifier is refused and
+            # shouted rather than guessed at, exactly as in 5c.
             for t in trusted:
                 twin = items.get(TWIN_PREFIX + t.name)
                 if twin is None or not _clauses(twin, "requires"):
                     continue
-                mt, cur = txt, twin
-                for _ in range(len(_clauses(twin, "requires"))):
-                    mt = vparse.delete_clause(mt, cur, "requires", 0)
-                    nxt = vparse.by_name(mt).get(twin.name)
-                    if nxt is None or not _clauses(nxt, "requires"):
-                        break
-                    cur = nxt
-                mpath = _mutant_path(pdir, src)
-                open(mpath, "w").write(mt)
-                dv, de, do = _verus(mpath, "--cfg", TWIN_CFG)
-                open(mpath, "w").write(txt)
+                try:
+                    cspans = vparse.conjunct_spans(twin, "requires")
+                except ValueError as e:
+                    rep.fail("twin", f"{src}: `{twin.name}` requires: {e}")
+                    continue
+                probes, needed = [], 0
+                for ci, cs in enumerate(cspans):
+                    if cs.get("refused"):
+                        rep.shout("twin",
+                                  f"{src}:{twin.line} `{twin.name}`'s "
+                                  f"`requires[{ci}]` could not be split into "
+                                  f"conjuncts ({cs['refused']}), so it is "
+                                  f"deleted whole. A clause that is really "
+                                  f"several obligations joined by an implication "
+                                  f"is checked only as a unit.")
+                    for ji in range(len(cs["spans"])):
+                        mt = vparse.delete_conjunct(txt, twin, "requires", ci, ji)
+                        mpath = _mutant_path(pdir, src)
+                        open(mpath, "w").write(mt)
+                        dv, de, do = _verus(mpath, "--cfg", TWIN_CFG)
+                        open(mpath, "w").write(txt)
+                        frag = vparse.norm_clause(
+                            txt[cs["spans"][ji][0]:cs["spans"][ji][1]])
+                        probes.append(dict(conjunct=frag, verified=dv, errors=de))
+                        if dv is not None and de == 0:
+                            rep.fail("twin",
+                                     f"{src}:{twin.line} `{twin.name}` still "
+                                     f"verifies with the single conjunct "
+                                     f"`{frag}` DELETED from its `requires` "
+                                     f"({dv} verified, 0 errors). The checked "
+                                     f"implementation never used that conjunct, "
+                                     f"so nothing tests whether `{t.name}`'s "
+                                     f"matching clause is strong enough -- and "
+                                     f"the all-at-once version of this probe "
+                                     f"reported the whole `requires` "
+                                     f"'genuinely needed' as long as ONE "
+                                     f"conjunct was load-bearing. Give the twin "
+                                     f"a body that performs the operation that "
+                                     f"conjunct licenses, or drop the conjunct "
+                                     f"from both.")
+                        else:
+                            needed += 1
+                            print(f"    {src}: `{twin.name}` fails when the "
+                                  f"conjunct `{frag}` alone is deleted from "
+                                  f"`{t.name}`'s `requires` ({dv} verified, "
+                                  f"{de} errors) -- the checked implementation "
+                                  f"genuinely needs it")
                 for r in rows:
                     if r["twin"] == twin.name:
-                        r["vacuity_probe"] = {"verified": dv, "errors": de}
-                if dv is not None and de == 0:
-                    rep.fail("twin",
-                             f"{src}:{twin.line} `{twin.name}` still verifies with "
-                             f"`{t.name}`'s precondition {_clauses(t, 'requires')} "
-                             f"DELETED ({dv} verified, 0 errors). The checked "
-                             f"implementation never used it, so this twin "
-                             f"certifies nothing about the precondition's "
-                             f"strength -- an empty twin body for a trusted item "
-                             f"with no `ensures` is the shape. Give the twin a "
-                             f"body that actually performs the operation, and the "
-                             f"trusted item an `ensures` strong enough to force "
-                             f"it.")
-                else:
-                    print(f"    {src}: `{twin.name}` fails when `{t.name}`'s "
-                          f"`requires` is deleted ({dv} verified, {de} errors) -- "
-                          f"the checked implementation genuinely needs it")
-    if out and not any(f[0] == "twin" for f in rep.failures):
-        n = sum(len(v["twins"]) for v in out.values())
-        rep.ok(f"{n} verified twin(s): every trusted `unsafe` item's "
+                        r["vacuity_probe"] = {"per_conjunct": probes,
+                                              "load_bearing": needed,
+                                              "conjuncts": len(probes)}
+    _check_trusted_arguments(rep, pdir, trusted_by_src)
+    # --- the justification hatch is capped, and the OK line may not lie ------
+    #
+    # TASK_009_REVIEW x3: `verus.twin_justifications` was uncapped free text
+    # nobody reads, and with BOTH twins deleted, BOTH known too-weak forms
+    # shipped and two entries reading `"see NOTES.md"`, the gate printed
+    #
+    #     ok  0 verified twin(s): every trusted `unsafe` item's `requires` is
+    #         strong enough ...
+    #     check.py: PASS   failures 0   loud 3
+    #
+    # -- a green sentence asserting the property at **n = 0**. Three changes:
+    # the hatch is capped, justifying away *every* trusted item is a hard
+    # failure (the hatch has then become an off switch for the whole stage), and
+    # the OK line below states its `n`, refuses to fire at `n == 0`, and refuses
+    # to fire at all if anything was justified away.
+    n_twins = sum(len(v["twins"]) for v in out.values())
+    if justified:
+        if len(justified) > MAX_TWIN_JUSTIFICATIONS:
+            rep.fail("twin",
+                     f"{len(justified)} trusted item(s) {sorted(justified)} are "
+                     f"excused from having a verified twin by "
+                     f"verus.twin_justifications; the cap is "
+                     f"{MAX_TWIN_JUSTIFICATIONS} per pattern. This is a harness "
+                     f"constant, not a spec.md value: TASK_009_REVIEW used two "
+                     f"of them (p02 has exactly two trusted items) to ship BOTH "
+                     f"known off-by-one weakenings -- `i <= v@.len()` and "
+                     f"`from + n <= src@.len() + 1` -- with both twins deleted "
+                     f"and a full green gate. An untwinnable trusted item is a "
+                     f"finding to write up, not a routine hatch.")
+        if n_twins == 0:
+            rep.fail("twin",
+                     f"every trusted item in this pattern "
+                     f"({sorted(justified)}) is excused by "
+                     f"verus.twin_justifications, so stage 5c-twin checked the "
+                     f"strength of NOTHING. A hatch that can be applied to the "
+                     f"whole of its own stage is an off switch, and the stage "
+                     f"used to print `0 verified twin(s): every trusted "
+                     f"`unsafe` item's `requires` is strong enough ...` in that "
+                     f"configuration.")
+    if out and n_twins and not justified and not any(
+            f[0] == "twin" for f in rep.failures):
+        rep.ok(f"{n_twins} verified twin(s) for {n_trusted} trusted item(s), "
+               f"n={n_twins} > 0 and none justified away: every trusted item's "
                f"`requires` is strong enough to license a *checked* "
                f"implementation of the same contract. This is the only stage "
                f"that judges STRENGTH rather than triviality -- 5a and 5c-req "
                f"both pass `i <= v@.len()`. The twins are "
-               f"`#[cfg({TWIN_CFG})]`, so no build compiles them.")
+               f"`#[cfg({TWIN_CFG})]`, so no build compiles them. What it does "
+               f"NOT judge: whether the trusted `ensures` is COMPLETE with "
+               f"respect to every unchecked operation the trusted body performs "
+               f"-- a body that also reads `i + 1` passes every stage here, and "
+               f"the backstops are stage 3c identity and step 8 Miri.")
+    elif out and not any(f[0] == "twin" for f in rep.failures):
+        rep.shout("twin",
+                  f"stage 5c-twin ran but certified {n_twins} twin(s) for "
+                  f"{n_trusted} trusted item(s), with {len(justified)} justified "
+                  f"away ({sorted(justified)}). No strength claim is being made "
+                  f"about the justified ones.")
     return out
 
 
@@ -2445,6 +3041,26 @@ def check_proof_domain(rep, models, reqs, enss):
                    f"{len(sample)} sampled calls")
         stats[name] = dict(calls=n, requires_ok=bad_req is None,
                            ensures_checked=len(sample))
+    # The same "green at n = 0" class one level up (TASK_010 C). Every input
+    # being degenerate prints a `--` line per input and neither a failure nor an
+    # `ok`, so the stage disappears from the verdict rather than objecting -- and
+    # p01's adversarial inputs really are 0-call, so the shape is not
+    # hypothetical, it is just not universal today.
+    tot = sum(v["calls"] for v in stats.values())
+    chk = sum(v["ensures_checked"] for v in stats.values())
+    if stats and not tot:
+        rep.fail("proof-vacuous",
+                 f"all {len(stats)} measured input(s) make ZERO kernel calls, so "
+                 f"rules 1 and 3 were evaluated on nothing at all. Every line "
+                 f"this stage printed reads 'vacuously inside the domain'.")
+    elif stats and not chk:
+        rep.fail("proof-vacuous",
+                 f"{tot} kernel call(s) across {len(stats)} input(s), but the "
+                 f"`ensures` was re-derived on 0 of them.")
+    elif stats:
+        print(f"    totals: {tot} kernel call(s) across {len(stats)} input(s), "
+              f"`requires` evaluated on all of them, `ensures` re-derived "
+              f"independently on {chk}")
     return stats
 
 
@@ -2572,7 +3188,300 @@ def _verus_verified_files(pdir, rep, contract, verus_res):
     return ok
 
 
-def check_driver_identity(pdir, rep, contract, verus_ok=frozenset()):
+_TOK_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*|\S")
+
+# Identifier-shaped tokens that may legitimately sit immediately before a call.
+# Anything *else* identifier-shaped before `kernel(` is a return type or `fn`,
+# i.e. a definition or a prototype, not a call.
+_CALL_KEYWORDS = {"return", "in", "else", "as", "await", "yield", "and", "or",
+                  "not", "sizeof"}
+
+
+def _kernel_calls(code, kname):
+    """Offsets of every *call* to `kname` in comment-blanked `code`.
+
+    Language-neutral by design: it has to work on `c/main.c` and on four Rust
+    rungs, and the thing being counted is the same in both. A definition
+    (`fn kernel(`, `uint64_t kernel(`) or a prototype has an identifier-shaped
+    token immediately before the name; a call has `=`, `(`, `,`, `;`, an
+    operator, or one of `_CALL_KEYWORDS`."""
+    out = []
+    for m in re.finditer(r"\b" + re.escape(kname) + r"\s*\(", code):
+        toks = _TOK_RE.findall(code[:m.start()])
+        prev = toks[-1] if toks else ""
+        if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", prev) and prev not in _CALL_KEYWORDS:
+            continue                        # `fn kernel(` / `uint64_t kernel(`
+        out.append(m.start())
+    return out
+
+
+def _check_region_executes(pdir, rep, contract, files):
+    """The pinned region must be **the code the benchmark runs**.
+
+    `.memory/02-bench-rules.md`, "Open gaps in the driver diff": `driver.regions`
+    pins a *file*, never the code that executes, and that is the sixth
+    demonstrated bypass -- in **both** languages, one mechanism rather than two.
+    Move a rung's `SLB-DRIVER` markers into a dead decoy function whose body is
+    the canonical loop verbatim, leave the real loop unmarked, and put a payload
+    in it:
+
+      * `safe_naive.rs` + `_mm_prefetch` (TASK_009): full gate PASS, stage 6
+        reporting all five loops match the pin, marginal Ir O0 6838 -> 6852;
+      * `c/main.c` + `__builtin_prefetch` (TASK_009_REVIEW): full gate PASS,
+        `prefetch` in three C cells' disassembly, **all 32 C cells moved
+        +1...+6 Ir/call while all four Rust rungs stayed put** -- a pure
+        cross-language asymmetry, which is exactly what the
+        anti-partial-evaluation rules forbid.
+
+    The structural fix, and it catches both demonstrations: **the pinned kernel
+    item may be called exactly once in each region-carrying source, and that
+    call must be inside the region.** A decoy whose body is the canonical loop
+    necessarily contains a second kernel call, and a real measured loop cannot
+    avoid containing one -- the kernel *is* the pattern, so a driver that does
+    not call it in the region is not the driver.
+
+    It is a check on the source rather than on the binary, so it is not an
+    operational definition of "executed" by itself; `_check_region_runs` is the
+    dynamic half, and it is the one that measures. This half is what makes the
+    dynamic half's question well posed, by fixing which function the region
+    belongs to."""
+    kname = (contract.get("verus") or {}).get("kernel_item", "kernel")
+    for f in sorted(files):
+        path = os.path.join(pdir, f)
+        if not os.path.exists(path):
+            continue
+        txt = open(path).read()
+        code = vparse.blank_noncode(txt)
+        try:
+            sp = dloop.region_span(txt, f)
+        except dloop.RegionError:
+            continue                        # already failed in the caller
+        if sp is None:
+            continue
+        calls = _kernel_calls(code, kname)
+        inside = [o for o in calls if sp[0] <= o < sp[1]]
+        lines = [txt.count("\n", 0, o) + 1 for o in calls]
+        if len(calls) != 1 or not inside:
+            rep.fail("driver",
+                     f"{f}: {len(calls)} call(s) to the pinned kernel item "
+                     f"`{kname}()` at line(s) {lines}, {len(inside)} of them "
+                     f"inside the SLB-DRIVER region (lines "
+                     f"{txt.count(chr(10), 0, sp[0]) + 1}-"
+                     f"{txt.count(chr(10), 0, sp[1]) + 1}). Exactly one call is "
+                     f"required, and it must be the one in the region. "
+                     f"`driver.regions` pins a FILE, never the code that runs, "
+                     f"and moving the markers into a dead decoy function whose "
+                     f"body is the canonical loop -- while the real, unmarked "
+                     f"loop carries a `__builtin_prefetch` -- passed the whole "
+                     f"gate twice, on `safe_naive.rs` and on `c/main.c`. A decoy "
+                     f"whose body is the canonical loop necessarily contains a "
+                     f"second call to `{kname}`; a real measured loop cannot "
+                     f"avoid containing one.")
+        else:
+            print(f"    {f}: the one call to `{kname}()` in this file is at "
+                  f"line {lines[0]}, inside the pinned region "
+                  f"({txt.count(chr(10), 0, sp[0]) + 1}-"
+                  f"{txt.count(chr(10), 0, sp[1]) + 1})")
+
+
+def _cg_parse(path):
+    """`(names, callers, excl)` from one callgrind output file.
+
+    `names[id] -> symbol`, `callers[id] -> {caller id}` from the `cfn=` edges
+    callgrind records inside each `fn=` context, `excl[id] -> exclusive Ir`.
+    Callgrind names a function once and refers to it by id afterwards, so the
+    name table has to be built as the file is read."""
+    names, callers, excl, cur = {}, {}, {}, None
+    for line in open(path):
+        line = line.rstrip("\n")
+        m = re.match(r"^fn=\((\d+)\)\s*(.*)$", line)
+        if m:
+            if m.group(2).strip():
+                names[m.group(1)] = m.group(2).strip()
+            cur = m.group(1)
+            continue
+        m = re.match(r"^cfn=\((\d+)\)\s*(.*)$", line)
+        if m:
+            if m.group(2).strip():
+                names[m.group(1)] = m.group(2).strip()
+            callers.setdefault(m.group(1), set()).add(cur)
+            continue
+        if cur and line[:1].isdigit():
+            p = line.split()
+            if len(p) >= 2:
+                try:
+                    excl[cur] = excl.get(cur, 0) + int(p[1])
+                except ValueError:
+                    pass
+    return names, callers, excl
+
+
+def _enclosing_fn(txt, off, lang):
+    """Name of the function whose body contains offset `off`.
+
+    Rust goes through `vparse` (which knows about `verus!`, `impl` blocks and
+    `mod`s). C walks the brace structure backwards to the outermost unmatched
+    `{` and reads the identifier before the parameter list -- enough for a
+    top-level function definition, which is the only shape a driver region can
+    sit in."""
+    if lang != "c":
+        inner = [i for i in vparse.parse(txt)
+                 if i.body_start is not None and i.body_end is not None
+                 and i.body_start <= off < i.body_end]
+        return max(inner, key=lambda i: i.body_start).name if inner else None
+    code = vparse.blank_noncode(txt)
+    opens, depth, i = [], 0, off
+    while i > 0:
+        i -= 1
+        if code[i] == "}":
+            depth += 1
+        elif code[i] == "{":
+            if depth:
+                depth -= 1
+            else:
+                opens.append(i)
+    if not opens:
+        return None
+    j = opens[-1] - 1
+    while j >= 0 and code[j] in " \t\r\n":
+        j -= 1
+    if j < 0 or code[j] != ")":
+        return None
+    d = 0
+    while j >= 0:
+        if code[j] == ")":
+            d += 1
+        elif code[j] == "(":
+            d -= 1
+            if d == 0:
+                break
+        j -= 1
+    k = j - 1
+    while k >= 0 and code[k] in " \t\r\n":
+        k -= 1
+    m = re.search(r"([A-Za-z_][A-Za-z0-9_]*)$", code[:k + 1])
+    return m.group(1) if m else None
+
+
+def _cg_name_matches(sym, want):
+    """Does callgrind's symbol `sym` name the source-level function `want`?
+
+    Rust mangles to `<crate>::main`; C emits `main`. The suffix form is
+    deliberately narrow -- `::main` only, never a bare substring, so `slb_decoy`
+    cannot be matched by `xslb_decoy`."""
+    return sym == want or sym.endswith("::" + want)
+
+
+def _check_region_runs(pdir, rep, contract, files, built, cg_files, probe):
+    """The dynamic half of Part E: is the region's function **executed**, and is
+    it the only thing that calls the kernel?
+
+    `_check_region_executes` above is structural, and structural checks are read
+    off the attacker's own text. This one is measured. `.memory/02-bench-rules.md`
+    asked for exactly this: *"assert that the callers of the kernel symbol in the
+    `isolated` build are exactly the region's enclosing function, and that that
+    function has non-zero `Ir`. A dead decoy has zero -- that is an operational
+    definition of 'executed', measured rather than declared, in the same spirit
+    as the Miri cross-check."*
+
+    It costs no extra runs: stage 3b already ran callgrind twice per cell for
+    the marginal-`Ir` probe, and callgrind records caller->callee edges, so this
+    re-reads profiles that are already on disk.
+
+    `isolated` cells only. In `whole` mode the kernel is inlined on purpose, so
+    there is no symbol and no edge to check -- which is also why the structural
+    half is not redundant."""
+    cmain = (contract.get("driver") or {}).get("c_source",
+                                              os.path.join("c", "main.c"))
+    kname = (contract.get("verus") or {}).get("kernel_item", "kernel")
+    nm, n = probe
+    want = {}
+    for f in sorted(files):
+        path = os.path.join(pdir, f)
+        lang = "c" if f.endswith((".c", ".h")) else "rust"
+        txt = open(path).read()
+        try:
+            sp = dloop.region_span(txt, f)
+        except dloop.RegionError:
+            continue
+        if sp is None:
+            continue
+        fn = _enclosing_fn(txt, sp[0], lang)
+        if fn is None:
+            rep.fail("driver",
+                     f"{f}: could not resolve the function enclosing the "
+                     f"SLB-DRIVER region, so the gate cannot ask whether the "
+                     f"region's code is the code that runs.")
+            continue
+        want[f] = fn
+    checked, ran = 0, set()
+    for (c, o, m), binp in sorted(built.items()):
+        if m != "isolated" or not binp:
+            continue
+        src = buildmod.RUST_SRC.get(c, cmain)
+        fn = want.get(src)
+        if fn is None:
+            continue
+        cgp = cg_files.get((c, o, m, nm, n))
+        if not cgp or not os.path.exists(cgp):
+            rep.fail("driver",
+                     f"{c} {o} {m}: no callgrind profile at {cgp} -- stage 6's "
+                     f"dynamic half cannot run, so nothing measured whether the "
+                     f"pinned region is the code that executes.")
+            continue
+        names, callers, excl = _cg_parse(cgp)
+        host = [i for i, s in names.items() if _cg_name_matches(s, fn)]
+        ir = sum(excl.get(i, 0) for i in host)
+        # The kernel *function*, not everything whose mangled name contains it.
+        # `measure.py`'s row matcher is `(?:^|::)kernel(?:$|\W)`, which also
+        # matches `safe_tuned::kernel::{closure#0}` -- and at O0 that closure is
+        # called from `Iterator::fold` and from `kernel` itself, so a caller-set
+        # assertion written with that regex false-fails on a perfectly healthy
+        # cell (measured on p02 safe_tuned O0 isolated). An anchored match is
+        # what "the kernel symbol" means here.
+        kids = [i for i, s in names.items()
+                if re.fullmatch(r"(?:.*::)?" + re.escape(kname), s)]
+        callers_of_k = sorted({names.get(x, x) for k in kids
+                               for x in callers.get(k, ())})
+        bad = [s for s in callers_of_k if not _cg_name_matches(s, fn)]
+        if not host or ir == 0:
+            rep.fail("driver",
+                     f"{c} {o} {m} on {nm}: `{src}`'s SLB-DRIVER region sits in "
+                     f"`{fn}`, which executed **{ir} instructions** in this run "
+                     f"({'no such symbol in the profile' if not host else 'zero exclusive Ir'}). "
+                     f"The pinned region is therefore not the code the benchmark "
+                     f"runs. This is the decoy-region bypass measured rather "
+                     f"than argued: markers moved into a dead "
+                     f"`static void slb_decoy(void)` whose body is the canonical "
+                     f"loop, the real loop left unmarked with a "
+                     f"`__builtin_prefetch` in it, full gate PASS and all 32 C "
+                     f"cells +1..+6 Ir/call while the Rust rungs stood still.")
+        elif bad:
+            rep.fail("driver",
+                     f"{c} {o} {m} on {nm}: the kernel symbol is called from "
+                     f"{callers_of_k}, but `{src}`'s SLB-DRIVER region is inside "
+                     f"`{fn}`. The diffed loop is not the loop that calls the "
+                     f"kernel, so what stage 6 compared against the pin is not "
+                     f"what ran.")
+        else:
+            checked += 1
+            ran.add(f"{src}:{fn}")
+    if checked:
+        print(f"    dynamic: in {checked} isolated cell(s) on {nm} "
+              f"(n_iters={n}), the function enclosing the region "
+              f"({sorted(ran)}) has non-zero exclusive Ir and is the only "
+              f"caller of the `{kname}` symbol -- 'executed' measured from "
+              f"callgrind's own caller->callee edges, not declared")
+    elif built:
+        rep.shout("driver",
+                  "stage 6's dynamic half checked no cell: no isolated-mode "
+                  "callgrind profile matched a region-carrying source, so "
+                  "nothing measured that the pinned region is the code that "
+                  "runs.")
+
+
+def check_driver_identity(pdir, rep, contract, verus_ok=frozenset(),
+                          built=None, cg_files=None, cg_probe=None):
     head("6. every driver loop matches the token sequence pinned in spec.md")
     cfg = contract.get("driver") or {}
     canon = cfg.get("canonical")
@@ -2650,6 +3559,16 @@ def check_driver_identity(pdir, rep, contract, verus_ok=frozenset()):
     if len(found) < 2:
         rep.fail("driver", "fewer than two driver regions found")
         return {}
+    _check_region_executes(pdir, rep, contract, found)
+    if cg_files and cg_probe:
+        _check_region_runs(pdir, rep, contract, found, built or {}, cg_files,
+                           cg_probe)
+    else:
+        rep.shout("driver",
+                  "no callgrind profiles were available, so stage 6's DYNAMIC "
+                  "half did not run: nothing measured that the region's "
+                  "enclosing function executed and is the kernel's only caller. "
+                  "Only the structural one-call-inside-the-region rule ran.")
     want_stmts = cfg.get("statements")
     out = {}
     for name, body in sorted(found.items()):
@@ -2759,10 +3678,47 @@ def _miri_sysroot():
     return r.stdout.strip() if r.returncode == 0 and r.stdout.strip() else None
 
 
+def _trusted_items(pdir, contract):
+    """{pinned Verus source: [trusted item names]} -- `_is_trusted` applied to
+    every file `verus.obligations` names. Used by the Miri policy, which is now
+    keyed on "does this pattern have a trusted base at all" rather than on
+    whether R4 and R5 happen to be byte-identical."""
+    out = {}
+    for src in sorted((contract.get("verus") or {}).get("obligations") or {}):
+        path = os.path.join(pdir, src)
+        if not os.path.exists(path):
+            continue
+        try:
+            items = vparse.parse(open(path).read())
+        except ValueError:
+            continue
+        got = sorted(i.name for i in items if _is_trusted(i))
+        if got:
+            out[src] = got
+    return out
+
+
 def check_miri(pdir, rep, contract, identity, modmod, indir, names):
-    """`.memory/02-bench-rules.md`: Miri is mandatory for any pattern whose R4
-    and R5 are **not** byte-identical, because that is exactly when R4 stops
-    inheriting R5's discharged obligations.
+    """`.memory/02-bench-rules.md`: Miri is mandatory for any pattern that has a
+    trusted `unsafe` item at all, and *may never be skipped* when R4 and R5 are
+    not byte-identical.
+
+    **The second clause used to be the whole policy, and TASK_009_REVIEW showed
+    why that was wrong.** "R4 and R5 are the same machine code, so R4 inherits
+    R5's proof" is sound about codegen and unsound about the trusted base: R5's
+    proof is only as good as its trusted `ensures`, and a trusted `ensures` need
+    not be **complete** with respect to the operations its body performs.
+    Measured (mirror x4):
+
+        unsafe { let _peek = *v.get_unchecked(i + 1); *v.get_unchecked(i) }
+
+    with the contract, the twin and the pins all unchanged -- nothing licenses
+    the `i + 1` read and no Verus stage can see it. Miri is the only backstop for
+    that class, and the old policy made it optional **exactly when byte-identity
+    holds**, i.e. exactly in the case this project reports as its headline
+    result. Miri over all inputs costs about a minute, so the resolution is to
+    run it whenever there is a trusted item, and keep the identity rule as the
+    reason it can never be waived when R4 != R5.
 
     Three things changed at TASK_005, because between them they meant that the
     first pattern with a non-trivial proof could not be green by any route
@@ -2796,23 +3752,48 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names):
     level = o3[0]["level"]
     idx = asm.IDENTITY_LEVELS.index(level)
     inherits = idx >= asm.IDENTITY_LEVELS.index("norel")
-    out = {"pair": pair, "identity_o3": level, "inherits_proof": inherits}
+    trusted = _trusted_items(pdir, contract)
+    n_trusted = sum(len(v) for v in trusted.values())
+    out = {"pair": pair, "identity_o3": level, "inherits_proof": inherits,
+           "trusted_items": trusted}
 
-    if inherits and not cfg.get("required"):
+    # DERIVED, and it overrides the declared flag in one direction only: the
+    # flag can add Miri, never remove it.
+    why_required = []
+    if n_trusted:
+        why_required.append(
+            f"this pattern has {n_trusted} trusted item(s) {trusted} whose "
+            f"`ensures` need not be COMPLETE with respect to the unchecked "
+            f"operations their bodies perform (TASK_009_REVIEW x4)")
+    if not inherits:
+        why_required.append(
+            f"R4 and R5 differ at O3 (identity {level!r}), so R4 does not "
+            f"inherit R5's discharged obligations at all")
+    if cfg.get("required"):
+        why_required.append("spec.md sets miri.required")
+    out["required_because"] = why_required
+
+    if not why_required:
         rep.ok(f"R4/R5 ({pair}) are the same machine code at O3 (identity "
-               f"{level!r} >= 'norel'), so R4 inherits R5's proof -- Miri not "
-               f"required. spec.md: {cfg.get('reason', '(no reason given)')}")
+               f"{level!r} >= 'norel') and this pattern has NO trusted item, so "
+               f"there is no trusted `ensures` whose incompleteness Miri would "
+               f"have to backstop -- Miri not required. spec.md: "
+               f"{cfg.get('reason', '(no reason given)')}")
         out.update(required=False, ran=False)
         return out
-    if not inherits and not cfg.get("required"):
-        rep.fail("miri", f"R4 and R5 differ at O3 (identity {level!r}), so R4 is "
-                         f"unverified unsafe code that does not inherit R5's "
-                         f"proof. `.memory/02-bench-rules.md` makes Miri "
-                         f"mandatory here; spec.md sets miri.required=false.")
-        out.update(required=True, ran=False)
-        return out
+    if n_trusted and cfg.get("required") is False:
+        rep.fail("miri",
+                 f"spec.md sets miri.required=false, but this pattern has "
+                 f"{n_trusted} trusted item(s) {trusted}, which makes Miri "
+                 f"mandatory whatever the R4/R5 identity level is "
+                 f"(`.memory/02-bench-rules.md`, revised at TASK_010): a trusted "
+                 f"`ensures` need not cover every unchecked operation its body "
+                 f"performs, byte-identity propagates that rather than excusing "
+                 f"it, and Miri is the only backstop. The gate runs Miri anyway; "
+                 f"fix the pin so it does not claim otherwise.")
 
     out["required"] = True
+    print(f"    Miri is REQUIRED because: " + "; ".join(why_required))
     srcs = cfg.get("sources") or [buildmod.RUST_SRC.get(a, f"{a}.rs")]
     blocked = cfg.get("blocked_reason")
     sysroot = _miri_sysroot() if os.path.exists(MIRI_BIN) else None
@@ -2991,7 +3972,9 @@ def main():
     reqs, enss = derive_contract(pdir, rep, contract)
     domain = check_proof_domain(rep, all_models, reqs, enss)
     verus_ok = _verus_verified_files(pdir, rep, contract, verus_res)
-    drivers = check_driver_identity(pdir, rep, contract, verus_ok)
+    drivers = check_driver_identity(pdir, rep, contract, verus_ok, built,
+                                    slopes.pop("_cg_files", None),
+                                    slopes.pop("_cg_probe", None))
     san = check_sanitizers(pdir, rep, indir, all_models)
     miri = check_miri(pdir, rep, contract, identity, modmod, indir,
                       sorted(all_models))

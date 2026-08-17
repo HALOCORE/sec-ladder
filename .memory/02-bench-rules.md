@@ -140,6 +140,15 @@ emits `mov eax, <answer>; ret`. Then you are timing `printf`.
    and `work_per_call`. Nothing checks that `work_per_call` is denominated in the
    unit `work_unit_bits` names. Three composing knobs, one author, one commit.
 
+   **Clamped at TASK_010**: `MIN_DECLARABLE_IR_PER_WORK_ABS = 0.015625/64 =
+   0.000244140625` bounds the **composition**, so the reachable absolute floor is
+   64× under the byte bound rather than 512×, and the effective absolute floor is
+   printed every run. p09's bit-denominated shape still passes; the previously
+   legal `work_unit_bits = 1` + hatch combination now fails. The third knob —
+   nothing checks that `work_per_call` is denominated in the unit
+   `work_unit_bits` names — is bounded only by its product with the other two.
+   Documented residual, unchanged.
+
    **A floor can never certify that a component ran.** p02 clears any rate on its
    *fold* alone, so the stage does not show the copy happened. No rate bound on
    total kernel `Ir` can attribute cost to a part. What actually certifies the copy
@@ -327,10 +336,35 @@ satisfy the `ensures` and the `ensures` never mentions it. **Miri is the only
 backstop for that class, and this policy makes it optional exactly when
 byte-identity holds** — i.e. exactly in the case the project reports as its
 headline result. So the argument "identical machine code, therefore no UB check
-needed" is sound about *codegen* and unsound about *the trusted base*. Since Miri
-over all inputs costs about a minute, the cheap resolution is to run it whenever a
-pattern has any trusted `unsafe` item at all, and keep the identity rule only as
-the reason it may never be skipped when R4 ≠ R5. When they are not, R4 is unverified unsafe code that 47 patterns will
+needed" is sound about *codegen* and unsound about *the trusted base*.
+
+**Changed at TASK_010: Miri is now derived, not declared.** It is required
+whenever the pattern has any trusted item at all, `check.py` reads that from
+`verus.rs` rather than from `spec.md`, and `miri.required: false` beside a trusted
+item is a hard failure. The identity rule survives only as the reason it can never
+be skipped when R4 ≠ R5. Cost of the change: p01 is now
+`PASS-WITH-BLOCKED-ROWS` — Miri does not finish `large.bin` inside 180 s, so 8 of
+9 inputs are checked and the ninth is a documented blocked row.
+
+**And the measured answer to "does Miri catch the incomplete-`ensures` case" is
+no — something else does.** Two distinct sub-cases, both measured at TASK_010:
+
+- **R5-only drift** (the extra `i + 1` read added to `verus.rs` alone): Miri
+  reports *no UB on all 9 inputs*, because `miri.sources` names **R4's** source
+  and the mutation is in R5's trusted body. What catches it is **stage 3c
+  identity** — `unsafe vs verus at O3: identity dropped to 'differ'`,
+  `md5_fn 0e5b59364bb6 vs 1118d7679708`. So the byte-identity result is itself
+  load-bearing as a *check*, not merely a finding.
+- **The identical-code case** (the same extra read in `unsafe.rs` *and*
+  `verus.rs`, which identity cannot see): **Miri does catch it**, on 1 of 9 p02
+  inputs — `adversarial-cap.bin`, *"Undefined Behavior: `assume` called with
+  `false`"*. Only that one, because it is the input where `len == dst.len()`.
+
+So the class has a backstop, but a **two-part and partial** one: identity for
+R5-only drift, Miri for the identical-code case, and Miri only on inputs that
+actually reach the boundary. Neither is a proof that a trusted `ensures` is
+complete. That remains a human reading — see the `SLB-TRUSTED-ARGUMENT`
+requirement in `.memory/04-verus.md`. When they are not, R4 is unverified unsafe code that 47 patterns will
 imitate, and nothing has checked it.
 
 `harness/check.py` step 8 wires this. Three details, all settled at TASK_005
@@ -362,6 +396,30 @@ The pair to compare is `miri.pair` in `spec.md`, not a hard-coded
 `"unsafe vs verus"` string. Miri is a UB **test**, not a proof: it says nothing
 about paths the probe inputs do not take, which is why the policy is "mandatory
 when R4 ≠ R5" rather than "sufficient".
+
+## A count-bearing `rep.ok` must state its `n`, and must never fire at `n == 0`
+
+Promoted to a rule at TASK_010, after the shape was found **four** times and only
+one instance had been caught by review. The pattern: a stage prints
+*"every X is Y"* over an empty collection and the run goes green. Instances:
+
+- `0 verified twin(s): every trusted `unsafe` item's `requires` is strong
+  enough…` with both twins justified away and both known too-weak forms shipped
+  (found by TASK_009_REVIEW);
+- 5c's OK line counted rows *including* the `assert(false)` probe, so it could
+  assert "every trusted `ensures` conjunct is load-bearing" over zero conjuncts;
+- 5c-req, the same;
+- 5d printed only `--` lines and **neither** an `ok` nor a `fail` when every input
+  made zero kernel calls.
+
+Two earlier instances of the same family are already recorded above: an empty
+`requires` list printing "holds on all 200000 kernel calls", and a model that
+returned no samples printing "re-derived on 0 sampled calls".
+
+So: every success line that quantifies over a collection prints the size of that
+collection, and a size of zero is a **failure**, not a pass. A vacuous truth in a
+gate log reads exactly like a discharged obligation, and that is the single most
+repeated defect in this project's history.
 
 ## Honesty rules
 
@@ -570,6 +628,29 @@ review as a change to the committed artefact rather than only as a source diff.
   For Rust alone, `_verus_verified_files` already resolves the region's enclosing
   item, so requiring it to equal `driver.call_site` closes that half — but it says
   nothing about C, which is why (1) or (2) is the actual fix.
+
+  **Closed at TASK_010, with both fixes built.** The decoy mirrors now fail twice
+  over, structurally and dynamically:
+
+  ```
+  [driver] c/main.c: 2 call(s) to the pinned kernel item `kernel()` at line(s)
+    [41, 74], 1 of them inside the SLB-DRIVER region (lines 31-45).
+  [driver] c-gcc O3 isolated on small.bin: `c/main.c`'s SLB-DRIVER region sits in
+    `slb_decoy`, which executed **0 instructions** in this run
+  ```
+
+  The dynamic half reuses the callgrind profiles stage 3b already writes, so it
+  costs nothing extra, and it is the project's second *measured* answer to a
+  question that had been declared (the first being the Miri cross-check). The
+  shipped patterns report `the one call to kernel() … inside the pinned region`
+  and `in 16 / 14 isolated cell(s) … non-zero exclusive Ir and is the only caller
+  of the kernel symbol`.
+
+  Two soft edges, recorded rather than fixed: `--cells measured` skips sources
+  with no built cell, so the dynamic count drops without a failure (that run is
+  already `PARTIAL`); and `_enclosing_fn` for C is a brace walk rather than a
+  parser — correct for a top-level definition, which is the only shape a region
+  can sit in today, and it fails closed on anything else.
 - **Casts are erased, so a width change applied to *every* rung at once is
   invisible.** `harness/dloop.py` must erase casts or `(size_t)(acc % nwin)` and
   `(acc % nwin) as usize` never reconcile, and then there is no cross-language

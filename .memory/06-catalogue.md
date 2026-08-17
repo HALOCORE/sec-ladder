@@ -19,8 +19,16 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 | T004 | p02 buffer copy — first real bug, first adversarial table | **done**, reviewed (perf headline refuted) |
 | T006 | retract p02's perf claim; close the reopened bypass; fix the floor | **done**, reviewed |
 | T008 | close the two bypasses T006_REVIEW demonstrated; harden 5c and the floor | **done**, reviewed |
-| T009 | judge the *strength* of a trusted `requires`; close the paren-`&&` hole | spec written, **blocks T007** |
-| T007 | p16 TLV walker — the first data-dependent loop bound | spec written, **blocked on T009** |
+| T009 | judge the *strength* of a trusted `requires` (the verified twin); close the paren-`&&` hole | **done**, reviewed |
+| T010 | fix the twin's perimeter (3 bypasses); tie the driver region to code that runs | **done**, unreviewed |
+| T007 | p16 TLV walker — the first data-dependent loop bound | spec written, **blocked on T010's review** |
+
+p01 is now `PASS-WITH-BLOCKED-ROWS` rather than `PASS`: TASK_010 made Miri
+mandatory whenever a pattern has any trusted item, and Miri does not finish p01's
+`large.bin` within 180 s. 8 of 9 inputs are checked; the ninth is a documented
+blocked row. That is the policy working as intended, not a regression — but it
+means the headline verdict string changed, so do not read an old `PASS` as
+equivalent.
 
 Each task has been reviewed adversarially and each review found real defects. The
 cumulative lesson, worth reading before adding a pattern: **a green gate is

@@ -351,6 +351,50 @@ It is **not** in the TCB tally above, because Verus verifies it. What it adds to
 the *declared* surface is one body of checked code a reviewer judges by reading
 it — the `model.py` move, applied to the trusted base instead of the kernel.
 
+### The per-item argument only a human can make
+
+Required by `harness/check.py` step 5c-twin since TASK_010, which fails the gate
+if this section is missing and **prints it in full on every run**. Three of the
+four questions that decide whether a trusted item is sound are outside every
+oracle the gate has, and TASK_009_REVIEW demonstrated the worst of them: a body
+of `unsafe { let _peek = *v.get_unchecked(i + 1); *v.get_unchecked(i) }` leaves
+the contract, the twin, the pins and every Verus stage unchanged and green, while
+nothing licenses the `i + 1` read.
+
+SLB-TRUSTED-ARGUMENT verus.rs get_unchecked
+
+(a) **Is the twin's body the right checked stand-in?** Yes. The unchecked
+operation is `*v.get_unchecked(i)` on `&[u64]`; the twin is `v[i]` — the same
+operation on the same slice at the same index, with the bound Verus can check.
+The standard library documents `get_unchecked(i)` as `index(i)` minus the bounds
+check, so the pair is an exact checked/unchecked correspondence rather than an
+analogy. A *defensive* twin would not do: it satisfies a weakened `requires` and
+then fails the `ensures`, which is the point of lifting the whole contract rather
+than the precondition alone.
+
+(b) **Is the `ensures` complete with respect to every unchecked operation the
+body performs?** Yes as the body stands: one expression, one unchecked read, at
+index `i` of slice `v`, and `ensures r == v@[i as int]` names exactly that index
+of exactly that slice, so no twin can satisfy it without doing the same read.
+That completeness is a property of the body being one line and **nothing
+mechanical enforces it** — a second unchecked read the `ensures` never mentions
+is invisible to 5a, 5c, 5c-req and 5c-twin. The two measured backstops (TASK_010,
+on p02's identical wrapper) are both tests, not proofs: stage 3c identity fails
+when only R5 gains the read, because R4 and R5 stop being the same machine code;
+and when R4 gains it too, step 8 Miri finds the UB — but only on the input that
+actually indexes the last element, 1 of 9 there. Alignment and provenance need no
+clause here: the slice comes from a `Vec<u64>`, so it is aligned and wholly
+initialised by construction, and `i < v@.len()` is the entire obligation.
+
+(c) **Does the clause mean the same in both configurations?** Yes. `i < v@.len()`
+contains no pattern-defined name, only the parameters and vstd's `@`/`len()`, so
+there is nothing a `#[cfg]` could redefine. Since TASK_010 the gate additionally
+forbids the token `slb_twin` anywhere in this file except the twin's own
+`#[cfg(slb_twin)]` attribute, and pins the twin-configuration obligation count
+(`verus.twin_obligations`: 8, against 7 shipped) — because a `#[cfg]`-selected
+`const` inside a shared `spec fn` was measured passing the whole gate while
+shipping `i < v@.len() + 1`.
+
 ### R2v (`safe_naive_verus.rs`) — TCB: 5 lines across 2 items
 
 `load_input` (4) and `emit` (1). No `get_unchecked`, no `unsafe` anywhere in the

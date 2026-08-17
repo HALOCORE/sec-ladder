@@ -645,9 +645,94 @@ reading each error text supports.
 Neither twin is in the TCB tally: Verus verifies both. Both are
 `#[cfg(slb_twin)]`, a cfg no build sets, so **they cost zero instructions
 structurally rather than by hope** — the pinned obligation count stays 9 (the
-twin run reports 12), no `slb_twin` symbol appears in the built R5 binary, and
+twin run reports 12, and that count is pinned too as `verus.twin_obligations`
+since TASK_010), no `slb_twin` symbol appears in the built R5 binary, and
 R4≡R5 is byte-identical as before (`md5_fn 0e5b59364bb6` at `-O3 isolated`,
 both).
+
+### 5a. The per-item argument only a human can make
+
+Required by `harness/check.py` step 5c-twin since TASK_010, which fails the gate
+if a section below is missing and **prints each one in full on every run**. It
+exists because three of the four questions that decide whether a trusted item is
+sound are outside every oracle the gate has, and TASK_009_REVIEW demonstrated the
+worst of them (x4): replace `get_unchecked`'s body with
+`unsafe { let _peek = *v.get_unchecked(i + 1); *v.get_unchecked(i) }` and the
+contract, the twin, the pins, the obligation counts and all five Verus stages are
+unchanged and green — nothing licenses the `i + 1` read.
+
+SLB-TRUSTED-ARGUMENT verus.rs get_unchecked
+
+(a) **Is the twin's body the right checked stand-in?** Yes. The unchecked
+operation is `*v.get_unchecked(i)`; the twin's body is `v[i]`. The standard
+library documents `get_unchecked(i)` as `index(i)` with the bounds check removed,
+so `v[i]` is the same operation on the same slice at the same index, and Verus
+checks the bound `v[i]` needs against the same `requires`. It is not a different
+operation on a copy, not a different slice, and not defensive (a defensive twin
+`if i < v.len() { v[i] } else { 0 }` fails the `ensures` — measured, 11 verified
+/ 1 error).
+
+(b) **Is the `ensures` complete with respect to every unchecked operation the
+body performs?** Yes *as the body stands*: the body is one expression performing
+exactly one unchecked read, at index `i` of slice `v`, and
+`ensures r == v@[i as int]` names that index and that slice, so the twin cannot
+satisfy the postcondition without performing the same read. It is complete only
+because the body is one line, and **nothing mechanical enforces that**: adding a
+second unchecked read the `ensures` does not mention is invisible to 5a, 5c,
+5c-req and 5c-twin alike. Two backstops were measured at TASK_010 and both are
+tests rather than proofs: stage 3c identity fails, because R5's exec code changes
+and R4≢R5 (x4 → `md5_fn 1118d7679708` against R4's `0e5b59364bb6`, pinned
+`exact`); and if the same extra read is put in R4 too, so that identity survives,
+step 8 Miri reports `Undefined Behavior: 'assume' called with 'false'` at the
+`dst` fold — but on only **1 of the 9 inputs** (`adversarial-cap.bin`, the one
+where `len == dst.len()`). Read the body, every time.
+
+(c) **Does the clause mean the same in both configurations?** Yes. `i < v@.len()`
+mentions only `i`, `v`, and vstd's `@`/`len()`; there is no pattern-defined name
+in it that a `#[cfg]` could redefine. Since TASK_010 the gate also forbids the
+token `slb_twin` anywhere in the file except the twins' own `#[cfg(slb_twin)]`
+attributes, so no item — `const`, `use`, `type` or `fn` — can differ between the
+shipped compilation and the twin's. That rule exists because
+`#[cfg(slb_twin)] const SLACK: usize = 0;` / `#[cfg(not(slb_twin))] … = 1;`
+behind a shared `spec fn in_bounds` passed the whole gate while shipping
+`i < v@.len() + 1`.
+
+SLB-TRUSTED-ARGUMENT verus.rs copy_bytes
+
+(a) **Is the twin's body the right checked stand-in?** Yes, and it is the one
+place where the answer needed thought. There is no vstd spec for
+`copy_from_slice`, so the checked equivalent of a bulk copy cannot be another
+bulk copy; the twin is the indexed loop `dst[j] = src[from + j]` for
+`j in 0..n`, with checked indexing on both sides. That is the byte-by-byte
+definition of `copy_nonoverlapping` over the same two extents, so the loop's
+reads and writes are the intrinsic's reads and writes, index by index. It
+verifies, which is what rules out the "the twin failed for want of a spec"
+reading of any failure it reports.
+
+(b) **Is the `ensures` complete with respect to every unchecked operation the
+body performs?** For the memory extents, yes; for one obligation, deliberately
+no, and it is argued in prose instead. The body performs one unchecked call,
+`copy_nonoverlapping(src.as_ptr().add(from), dst.as_mut_ptr(), n)`, which carries
+four obligations. Read extent `src[from .. from+n)`: covered — the `ensures`
+names `src@.subrange(from, from + n)`, and `requires from + n <= src@.len()` is
+what makes `as_ptr().add(from)` and the read stay inside the allocation. Write
+extent `dst[0 .. n)`: covered exactly, because the `ensures` is an equality on
+the **whole** final `dst` sequence, so it says both "these `n` bytes" and "no
+byte from `n` up moved"; `requires n <= old(dst)@.len()` bounds it.
+**Non-overlap: not covered, and it cannot be** — it is a property of the two
+arguments' provenance rather than of any value, and it is discharged by Rust's
+aliasing rules, since `&[u8]` and `&mut [u8]` cannot name the same allocation.
+That is why the wrapper takes two references and not two raw pointers, and it is
+the single obligation in this file that rests on prose. Alignment: trivial here,
+because `u8` has alignment 1; a `T` with a larger alignment would need a clause
+and this argument would have to change.
+
+(c) **Does each clause mean the same in both configurations?**
+`from + n <= src@.len()` and `n <= old(dst)@.len()` mention only parameters and
+vstd names, and the file contains no `slb_twin` token outside the twins' own
+attributes (enforced), so the two compilations differ in nothing but the twin
+items. The pinned `verus.twin_obligations` (12) is the second half of that check:
+it moves if an item exists only under the cfg.
 
 ---
 

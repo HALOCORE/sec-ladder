@@ -93,6 +93,8 @@ a green gate are, separately, evidence of very little:
       "r": "result"
     },
     "obligations": {"verus.rs": 7, "safe_naive_verus.rs": 7},
+    "twin_obligations": {"verus.rs": 8},
+    "twin_obligations_note": "The obligation count in the OTHER configuration -- `verus.rs --cfg slb_twin`, which is where step 5c-twin checks the twin. 7 shipped + 1 for slb_twin_get_unchecked. `safe_naive_verus.rs` has no trusted item with an `ensures` and no `unsafe`, so it needs no twin and gets no twin run.",
     "items": {
       "verus.rs": {
         "sum_wrap":      {"external": null, "requires": [], "ensures": []},
@@ -169,8 +171,9 @@ a green gate are, separately, evidence of very little:
   "miri": {
     "pair": ["unsafe", "verus"],
     "sources": ["unsafe.rs"],
-    "required": false,
-    "reason": "R4 and R5 are byte-identical at O3 (`identity` above pins `exact`), so R4 inherits R5's discharged obligations exactly. `.memory/02-bench-rules.md` makes Miri mandatory only when they are not. Set `required: true` to run it anyway; the nightly toolchain and sysroot are installed (TOOLCHAIN.md) and `check.py` interprets `sources` on every input at n_iters=4."
+    "required": true,
+    "reason": "R4 and R5 ARE byte-identical at O3 (`identity` above pins `exact`), and that used to make Miri optional here. It no longer does: `.memory/02-bench-rules.md`, revised at TASK_010, makes Miri mandatory for any pattern with a trusted `unsafe` item, and `check.py` derives that from `verus.rs` rather than from this flag. The reason byte-identity is not an excuse: R4 inherits R5's proof, and R5's proof is only as good as its trusted `ensures`, which need not be COMPLETE with respect to the operations the trusted body performs -- a `get_unchecked` wrapper that also reads `i + 1` passes every Verus stage with its contract, twin and pins unchanged (TASK_009_REVIEW x4). Miri is the only backstop for that class when R4 carries the same read, and byte-identity propagates it rather than excusing it.",
+    "blocked_reason": "miri is installed on the nightly toolchain beside the pinned one (TOOLCHAIN.md). p01's `large.bin` is 1.5 M u64s that the driver decodes one at a time, so that row may exceed check.py's MIRI_TIMEOUT under interpretation; a timeout is recorded as a BLOCKED row for that input, never as a pattern failure, and the verdict then reads PASS-WITH-BLOCKED-ROWS. The size of an input file must not decide whether the gate is green."
   }
 }
 ```

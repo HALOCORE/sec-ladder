@@ -220,6 +220,8 @@ the two entries that are new here:
       "r": "result"
     },
     "obligations": {"verus.rs": 9},
+    "twin_obligations": {"verus.rs": 12},
+    "twin_obligations_note": "The obligation count in the OTHER configuration -- `verus.rs --cfg slb_twin`, which is where step 5c-twin checks the twins. 9 shipped + 3: slb_twin_get_unchecked (1 query) and slb_twin_copy_bytes (1 for the fn + 1 for its loop body). Pinned for the same reason the shipped count is: `tv > base_v` only says something extra compiled, and a twin that quietly lost its loop body, or an item that exists only under the cfg, moves this number and nothing else.",
     "items": {
       "verus.rs": {
         "rec_len":      {"external": null, "requires": [], "ensures": []},
@@ -305,7 +307,7 @@ the two entries that are new here:
     "pair": ["unsafe", "verus"],
     "sources": ["unsafe.rs"],
     "required": true,
-    "reason": "R4 and R5 ARE byte-identical at O3, so `.memory/02-bench-rules.md` does not make Miri mandatory. It is required here anyway: R4 is the project's first rung-4 carrying raw pointer arithmetic (`src.as_ptr().add(src_off + 2)`, `dst.as_mut_ptr()`, `copy_nonoverlapping`), where p01's was a single `get_unchecked`, and the adversarial inputs drive it down the rejection path that the proof is about. A UB test over all nine inputs costs about a minute.",
+    "reason": "R4 and R5 ARE byte-identical at O3. That used to make Miri optional; since TASK_010 `.memory/02-bench-rules.md` makes it mandatory for any pattern with a trusted `unsafe` item, which check.py DERIVES from verus.rs rather than reading from this flag -- because R4 inherits R5's proof and R5's proof is only as good as its trusted `ensures`, which need not be complete with respect to the operations the trusted body performs (TASK_009_REVIEW x4). It was required here anyway even under the old policy: R4 is the project's first rung-4 carrying raw pointer arithmetic (`src.as_ptr().add(src_off + 2)`, `dst.as_mut_ptr()`, `copy_nonoverlapping`), where p01's was a single `get_unchecked`, and the adversarial inputs drive it down the rejection path that the proof is about. A UB test over all nine inputs costs about a minute.",
     "blocked_reason": "miri is installed on the nightly toolchain beside the pinned one (TOOLCHAIN.md). If it is missing, this row is blocked rather than failed -- but note the pattern is NOT exempt from the policy on identity grounds alone in spirit: R4 here is materially more unsafe than p01's."
   }
 }

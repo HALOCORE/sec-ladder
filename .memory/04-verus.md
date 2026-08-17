@@ -99,6 +99,13 @@ Prefer wrappers with **no `ensures` at all** (a trusted item that asserts
 nothing cannot axiomatise a falsehood) wherever the proof can re-derive the fact
 at run time instead.
 
+**Superseded at TASK_010 for any item a security argument rests on — see the
+verified-twin section below.** A trusted item with no `ensures` cannot have a twin
+with teeth, because there is nothing to force the twin's body to do the work, and
+the sharpest fix for the macro bypass keys the whole regime on a non-empty
+`ensures`. The advice above still holds for trusted items that contain no `unsafe`
+and carry no weight (`load_input`, `emit`).
+
 **And a pin is not enough for this one.** TASK_003_REVIEW deleted the `requires`
 from p01's `get_unchecked` *and* the matching three characters from `spec.md`,
 in one commit, and got a full green gate reporting "3 TCB items, all contracts
@@ -424,6 +431,49 @@ quoting 5c as a defence.**
    gate cannot judge it; (b) is the trusted `ensures` **complete** with respect to
    every unchecked operation the body performs? — the blind spot above; (c) does
    the clause mean the same thing in the shipped configuration as in the twin's?
+
+   **All three bypasses closed at TASK_010, and (a)–(c) are now mandatory text.**
+
+   - **The regime is keyed on `external_body` + (non-empty `ensures` **or**
+     `unsafe` in body)**, not on `unsafe` alone. Additionally every `unsafe` token
+     in a pinned Verus source must lie inside a trusted item's body, and `unsafe`
+     in any `#[path]`- or `mod`-included `common/` file is a hard failure — the
+     macro bypass *and* the no-macro variant (`unsafe` moved into
+     `common/driver.rs`) both fail now. Watch the trap the engineer hit building
+     this: `blank_noncode` erases the `#[path = "..."]` string literal, so an
+     include scan must read **raw** text or it silently scans nothing.
+   - **`slb_twin` may appear only inside a twin item's own `#[cfg(slb_twin)]`**,
+     in the pinned file *and every file it includes*, checked before any Verus
+     call; and `verus.twin_obligations` is pinned (p02 12, p01 8) rather than
+     merely requiring the count to rise. The engineer's soundness argument for why
+     a token scan is *complete* rather than heuristic, which is worth keeping:
+     Rust conditional compilation is driven by `cfg`/`cfg_attr` predicates that
+     must **name** the flag in the token stream — there is no cfg aliasing and no
+     computed predicate — so if the token occurs nowhere else, the two
+     compilations differ in nothing but the twins. Residual: an `include!()` of a
+     file outside the module graph would not be found.
+   - **`twin_justifications` is capped at 1**, justifying away *every* trusted
+     item is a separate hard failure, each justified item `rep.block`s the run,
+     and the OK line states its `n` and refuses to fire at zero. Note the
+     engineer's own objection, which stands: "1" is a round number, and a hatch
+     with a hard cap and no route out is the exact shape that made
+     `MIN_DECLARABLE_IR_PER_WORK` forbid p09. If a pattern legitimately has two
+     untwinnable trusted items, the cap becomes "fewer than all".
+   - **The deletion probe is per-conjunct**, demonstrated on a synthetic third
+     conjunct: `from <= src@.len()` deleted alone still verifies (12/0) and now
+     fails the stage, while each of p02's two real conjuncts gives 11/1.
+   - **(a)–(c) are required text.** Each trusted item needs an
+     `SLB-TRUSTED-ARGUMENT <src> <item>` block in `NOTES.md` carrying all three
+     labels, ≥200 chars, printed in full on every run. The gate can require that
+     the argument exists; only a human can judge it.
+
+   **The tension is now resolved, in the opposite direction to the old advice.**
+   Because the regime is keyed on `ensures`-or-`unsafe`, a trusted `unsafe` item
+   with no `ensures` is still inside it — and its only possible twin is an empty
+   body, which the deletion probe catches. So **a trusted `unsafe` item must in
+   practice carry an `ensures`**, and "prefer wrappers with no `ensures`" is
+   **wrong** for any item a security argument rests on. It remains right for
+   `load_input`/`emit`, which contain no `unsafe` and stay outside the regime.
 2. **`&&` defeats whole-clause deletion — still open.** TASK_008 made 5c delete
    *conjuncts* (`vparse.top_level_ops` / `conjunct_spans` / `delete_conjunct`),
    and a clause carrying a top-level `==>`, `||` or `<==>` is **refused rather
