@@ -18,8 +18,9 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 | T005 | derive the pins; unblock p02; the barrier swap | **done**, unreviewed |
 | T004 | p02 buffer copy — first real bug, first adversarial table | **done**, reviewed (perf headline refuted) |
 | T006 | retract p02's perf claim; close the reopened bypass; fix the floor | **done**, reviewed |
-| T008 | close the two bypasses T006_REVIEW demonstrated; harden 5c and the floor | **done**, unreviewed |
-| T007 | p16 TLV walker — the first data-dependent loop bound | spec written, **unblocked by T008** |
+| T008 | close the two bypasses T006_REVIEW demonstrated; harden 5c and the floor | **done**, reviewed |
+| T009 | judge the *strength* of a trusted `requires`; close the paren-`&&` hole | spec written, **blocks T007** |
+| T007 | p16 TLV walker — the first data-dependent loop bound | spec written, **blocked on T009** |
 
 Each task has been reviewed adversarially and each review found real defects. The
 cumulative lesson, worth reading before adding a pattern: **a green gate is
@@ -63,9 +64,25 @@ supersede any earlier task report they contradict.
 - **`work_per_call` is unbounded.** Shrinking p02's 16× still passes the floor
   (margin 576.7×, shout only). See `.memory/02-bench-rules.md` for why bounding
   it mechanically is harder than it looks.
+- **Nothing pins the `SLB-DRIVER` region to the *measured* code path.** A region
+  placed in a dead decoy `fn` whose body matches the canonical tokens, while the
+  real measured loop goes unpinned, looks reachable. Raised at TASK_008_REVIEW
+  from reading, **not demonstrated** — the reviewer ran out of budget. Pre-existing,
+  and the highest-value unexplored attack on the driver diff. Test it.
+- **`measure.py` cannot record the commit it will be committed in**, so a fresh
+  results JSON always names HEAD~1 with `dirty_files` set. Structural; say so in
+  the schema rather than chasing it.
 - **`measure.py p02` has not been re-run since TASK_005** (its JSON records a
-  commit four back). TASK_008 left it deliberately: re-running moves numbers
-  quoted in three `NOTES.md` tables. Related, and the reason to do it:
+  commit five back, `dirty_files: 13`). TASK_008 left it deliberately: re-running
+  moves numbers quoted in three `NOTES.md` tables. TASK_008_REVIEW judged the
+  ordering: it must be re-run before p16 is **published**, not before p16 is
+  built, and the cheapest safe order is to re-run it *once*, with p16's
+  `common/head1_u64_bytes` addition already in place, then re-quote the three
+  tables from that one JSON — otherwise p16 moves `common/` again and the same
+  re-run is owed twice. Exposure is `binary_text_bytes` and the wall-clock
+  column only; `md5_fn` and `n_fn` are re-derived every gate run, and the kernel
+  columns are safe by the p01 argument, which is now tested rather than asserted.
+  Related, and the reason to do it:
   `p02/NOTES.md` §3c's "with `memcpy`" row does not reproduce — 9200.3 / 10204.3
   published against 9200.74 / 10204.74 measured on the gate's own `c-gcc-h` /
   `c-clang-h` cells. 0.44 Ir/call is 44 instructions over a 100-call probe, so

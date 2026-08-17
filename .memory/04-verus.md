@@ -275,6 +275,21 @@ quoting 5c as a defence.**
      `n >= 0`. `old(dst)` and `&mut [u8]` both work in such a probe. A probe
      that fails to *compile* is a hard failure ("this conjunct was not judged"),
      never a silent skip.
+
+     **Two limits, both measured at TASK_008_REVIEW.** (i) `vparse.params_text`
+     copies the parameter list and nothing else, so the probe **hard-fails** on
+     a generic (`<T: Copy>`, `where` clause), a `self` receiver, a lifetime
+     parameter, or a trigger-less quantifier — fail-closed and therefore correct,
+     but the consequence is that *a pattern with a generic or method-shaped
+     trusted accessor cannot be greened at all*. (ii) The oracle is "Z3 proved
+     it", so a tautology that needs a trigger or a lemma reads as meaningful.
+     `v@.len() <= usize::MAX` — this file's own documented "not free" tautology —
+     passes as "not a tautology". Partial mitigation, measured: a tautology the
+     probe cannot discharge usually cannot be discharged at the *call site*
+     either, so the exploitable subset is clauses the caller can prove and the
+     bare probe cannot. `v@.len() <= usize::MAX` is exactly one of those, because
+     the kernel's `assert(src@.len() == spec_slice_len(src))` fires the axiom and
+     the probe has no such line.
    - **Deletion, for verified items only** — where the mirror test really works.
    - **Parameter coverage** — every parameter a trusted `unsafe` body *uses*
      must appear in its `requires`. This is the only one of the three that
@@ -286,17 +301,46 @@ quoting 5c as a defence.**
    never used as an address or a length) legitimately needs no precondition.
    Nothing in the tree exercises it yet.
 
-   **Still open, and only a reviewer closes it:** a `requires` that is
-   non-trivial, mentions every parameter, and is nonetheless too weak —
-   `from + n <= src@.len() + 1`. That is a claim about `copy_nonoverlapping`'s
-   real contract, and no mechanical check judges it.
-2. ~~**`&&` defeats whole-clause deletion.**~~ **Closed at TASK_008.** 5c now
-   deletes *conjuncts*: `vparse.top_level_ops` / `conjunct_spans` /
-   `delete_conjunct`. A clause carrying a top-level `==>`, `||` or `<==>` is
-   **refused rather than guessed at**, and the refusal is shouted — a conjunct
-   split out of an implication's antecedent is not a deletable unit. `item.clauses`
-   stays comma-split so no `spec.md` pin moved. The reviewer's `&&`-merged
-   mutant now reports `ensures[0].conjunct[1] is NOT load-bearing`.
+   **Still open, and the most dangerous hole in the project.** A `requires` that
+   is non-trivial, mentions every parameter, and is nonetheless **too weak by
+   one**. Two measured forms, both with a full-gate PASS at TASK_008_REVIEW:
+
+   - `get_unchecked`: `i < v@.len()` → **`i <= v@.len()`**. One character. 5a
+     prints it approvingly (*"demands `['i <= v@.len()']` of every caller,
+     constraining every parameter its body uses"*), the tautology probe cannot
+     see it (it is not a tautology), parameter coverage cannot see it (both
+     parameters appear), and deletion is not applied to trusted items by
+     construction. R5's trusted base then axiomatises that **reading one byte
+     past the end of a slice is defined and equals `v@[i]`** — which is CWE-125,
+     the bug class p16 exists to model.
+   - `copy_bytes`: `from + n <= src@.len() + 1`, the same shape on a copy.
+
+   The three checks judge *triviality* and *mention*. Neither is *strength*, and
+   strength is the whole property. **Do not describe 5c-req's guarantee as
+   "strong enough" — it is "not `true`".** Any pattern whose security argument
+   rests on a trusted accessor's `requires` needs a mechanism that checks the
+   declared precondition really licenses the operation; the shape to aim for is
+   the Miri cross-check's, a declared value tested against a measured one.
+2. **`&&` defeats whole-clause deletion — still open.** TASK_008 made 5c delete
+   *conjuncts* (`vparse.top_level_ops` / `conjunct_spans` / `delete_conjunct`),
+   and a clause carrying a top-level `==>`, `||` or `<==>` is **refused rather
+   than guessed at**, with the refusal shouted. `item.clauses` stays comma-split
+   so no `spec.md` pin moved. The reviewer's original `&&`-merged mutant is now
+   caught (`ensures[0].conjunct[1] is NOT load-bearing`).
+
+   **But one pair of parentheses reopens it, silently.** `top_level_ops` reports
+   operators at bracket depth 0 only, and "no operators found" is treated as
+   *atomic with `refused=None`*. So `( A && B )` is neither split nor refused —
+   no shout, no failure, full gate PASS, and the redundant trusted axiom is back
+   (measured at TASK_008_REVIEW: deleting only the conjunct gives 9 verified /
+   0 errors, i.e. it was never load-bearing). Cost to an author: two characters.
+
+   The contrast is the defect. The `==>` path *is* loud; the design assumes
+   "anything unsplittable gets shouted about", and the parenthesised case escapes
+   both branches. Note p02 as shipped exercises neither path (`SHOUTS: 0`), so
+   the refusal branch is untested by the tree — strip redundant outer brackets
+   before deciding a clause is atomic, and treat "atomic" as a claim to be
+   justified rather than a default.
 3. ~~**`clause_deletion_extra_items` can silently un-check the kernel.**~~
    **Closed at TASK_008** — an unknown item name is a hard failure.
 

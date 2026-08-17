@@ -284,12 +284,37 @@ the most valuable thing an engineer on this project does.
 
 ## Harness adaptations
 
-**Prerequisite: TASK_008 must land first.** It closes two gate bypasses
-(a rung can fake a `verus!` block and enter the ghost-strip path; stage 5c never
-tests `requires`, so a trusted `unsafe` wrapper can demand `n >= 0` and pass the
-whole gate). Cloning the template before those are fixed clones both holes into
-p16 — and p16's *entire* security argument is the accessor's `requires`, so
-blocker 2 lands on it harder than it lands on p02.
+**Prerequisite: TASK_008 landed; TASK_009 must land too.** TASK_008 closed the
+fake-`verus!` ghost harbour and added `requires` mutation testing. TASK_008_REVIEW
+then found that neither reaches the property p16 depends on, and answered the
+"is the template ready for p16" question with **no**:
+
+> p16's security argument is `get_unchecked`'s `requires i < v@.len()` and
+> nothing else. Changing it to `i <= v@.len()` — the off-by-one OOB read p16
+> exists to model — **passes the entire gate**, with stage 5a printing it
+> approvingly. The tautology probe cannot see it (not a tautology); parameter
+> coverage cannot see it (both parameters appear); deletion is not applied to
+> trusted items and cannot be.
+
+So the gate would certify a p16 whose trusted base axiomatises the exact bug
+class p16 is about. **TASK_009 Part B is the fix** — a mechanism that judges the
+*strength* of a trusted precondition rather than its triviality. Do not start p16
+before it lands.
+
+Three further requirements the reviewer set for this pattern specifically:
+
+1. **The accessor's `requires` must be checked, not declared.** Whatever
+   mechanism TASK_009 lands, `NOTES.md` must show it failing on
+   `i <= v@.len()` for *this* pattern's accessor, not only for p02's.
+2. **Do not give p16 a generic or method-shaped trusted accessor.** The
+   tautology probe hard-fails on generics, `self` receivers and lifetime
+   parameters (TASK_009 Part C fixes it; until then a plain free function is the
+   only shape that can be greened). A monomorphic `fn get_unchecked(v: &[u8], i:
+   usize) -> u8` is what this pattern needs anyway.
+3. **State the residual honestly in `NOTES.md`.** 5c-req's guarantee is
+   "this precondition is not `true`", not "this precondition is strong enough".
+   Say which of p16's trusted clauses are machine-judged and which rest on a
+   human having read them.
 
 TASK_006_REVIEW was asked what in the template will not survive a parser kernel
 and named four hard stops, with file:line. **The design above was chosen to

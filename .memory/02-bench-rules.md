@@ -97,7 +97,8 @@ emits `mov eax, <answer>; ret`. Then you are timing `printf`.
    step 2 — the model checksum. That was already the rule two paragraphs down;
    the measurement above is how much it matters.
 
-   **Partly closed at TASK_008.** `MIN_DECLARABLE_IR_PER_WORK = 0.015625` is a
+   **Partly closed at TASK_008, and the new bound has its own problem.**
+   `MIN_DECLARABLE_IR_PER_WORK = 0.015625` is a
    hard floor under what any `model.py` may declare (`1e-9` now fails outright),
    the achieved margin is printed beside the declared floor with what it implies,
    and a margin above `LOOSE_FLOOR_MARGIN = 100` shouts. The stage is renamed
@@ -112,6 +113,22 @@ emits `mov eax, <answer>; ret`. Then you are timing `printf`.
    which is precisely what `model.py` exists to supply, and failing on a large
    margin would turn the floor into a *cap on how good a rung may be* — p01's
    honest margins run 7×–268×. So this knob is a known, documented residual.
+   Reproduced at TASK_008_REVIEW, with two details worth keeping: the
+   `d(Ir)/d(work)` rate assertion gets **easier** when work shrinks, so it is no
+   defence at all; and the second shout is discoverable only by *being there*
+   (shipped p02 prints one, the mutant prints two), because its text reads as a
+   statement about the floor being loose rather than about `work_per_call` having
+   been edited. Honestly documented residual — do not upgrade the claim.
+
+   **`MIN_DECLARABLE_IR_PER_WORK` has no justification hatch, and its derivation
+   presumes a unit the kernel touches once per unit.** The below-default path
+   accepts a `min_ir_per_work_why`; this bound fires before any justification is
+   consulted. The derivation is "4 instructions per 256 bytes", which is a
+   statement about *bytes*. `.memory/06-catalogue.md` plans **p09, bit
+   vector/bitset** — AVX-512 `vpopcntq` does 512 bits in ~3 instructions =
+   **0.0059 Ir per bit**, below the bound, so an honest bit-denominated
+   `model.py` is forbidden with no route out. Same shape for any *skipping*
+   walker denominated in buffer bytes. Fix the bound before p09, not during it.
 
    **A floor can never certify that a component ran.** p02 clears any rate on its
    *fold* alone, so the stage does not show the copy happened. No rate bound on
@@ -265,6 +282,20 @@ offset 16  u8[payload_len]    # pattern-defined payload
   The gate now names the harbour in its log: *"ghost statements excluded in
   ['verus.rs'] — the only file(s) Verus itself verified this run"*. The regexes
   were reconciled too, but that is hygiene, not the fix.
+
+  Independently re-attacked at TASK_008_REVIEW along four routes (paren, bracket,
+  brace, and a variant that also declares the rung in `verus.obligations` to dodge
+  the pin guard) — **all four fail**, as does an `external_body main`. One rough
+  edge: the certificate is denied for a driver region inside a `mod`, because
+  `--verify-function <name> --verify-root` cannot resolve a mod-nested function
+  (*"could not find function"*), and the resulting message says *"the item
+  enclosing the region has no verified body"*, which is false. Fail-closed but
+  misattributed; it will bite the first pattern that puts its driver in a
+  submodule. An `impl` method resolves fine. Also worth knowing: Verus itself
+  does **not** object to two items sharing a name (`S::drive` and `inner::drive`
+  → `--verify-function drive` silently reports `1 verified`), so `vparse`'s
+  text-level duplicate-name failure is the only thing standing between the
+  certificate and the wrong item.
 - Kernel signature is fixed per pattern in the pattern's `spec.md`, and all five
   rungs implement exactly that contract.
 
