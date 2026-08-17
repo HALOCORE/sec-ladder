@@ -436,65 +436,81 @@ is a much stronger claim than any p01 could produce.
    **ns is a measurement here; cycles is an inference.** See
    `.memory/00-environment.md`.
 
-6. **p05 — on a vectorised loop the bounds check is *free*, and vectorisation is
-   exactly what makes it free.** (TASK_013.) The hypothesis this pattern was
-   commissioned to test — that a bounds check would *block* vectorisation and cost
-   a multiple — is **inverted by the measurement**, which is the better outcome.
+6. **p05 — the safety cost does not vanish on a vectorised loop, it moves from
+   per-element to per-row; and its cause is a nonlinear implication the optimiser
+   cannot prove but the verifier can.** (TASK_013, substantially corrected at
+   TASK_013_REVIEW — the first write-up said "the check costs 0.0000 Ir/element"
+   and "the wider the lane the cheaper safety gets"; **the first is true only of
+   the steady state and the second is refuted by measurement.**)
 
-   2-D index flattening, `a[i*ncol + j]`, associative inner sum so the loop *can*
-   vectorise, Horner once per row so the result still depends on row order.
+   2-D index flattening, `a[i*ncol + j]`, associative inner sum so the loop can
+   vectorise, Horner once per row.
 
-   - **Per-element rate, zero-residue lag pairs, both bands, six decimals:
-     `1.375000` for c-clang, safe-naive, safe-tuned and unsafe alike** (= 11/8,
-     an 11-instruction body over 8 elements); c-gcc `1.062500` (= 17/16). **The
-     bounds check costs 0.0000 Ir per element.**
-   - **Turn vectorisation off and it costs 4.2500 Ir/element exactly**, both
-     bands — **the third independent reproduction of that constant, and the first
-     on a non-Horner fold.** So 4.25 is rustc's per-element checked-scalar-fold
-     cost, and *vectorising is what removes it*.
-   - Kernel-only vector usage: **19 of 32 cells, all 16 at `-O3`.** LLVM emits an
-     11-instruction body per 8 elements with **identical mnemonics in c-clang,
-     safe_naive, safe_tuned, unsafe and verus**. (The 3 `O0 whole` hits are an
-     aggregate stack move, not the fold — check what a `vector_regs` hit *is*.)
+   **What is exactly true.** In the vectorised steady state the per-element rate
+   is **1.375000** (= 11/8, an 11-instruction body over 8 elements) for c-clang,
+   safe-naive, safe-tuned and unsafe **alike**, six decimals, both bands; c-gcc
+   `1.062500` (= 17/16). Five rungs emit identical mnemonics. Per *element*,
+   inside the vector body, the check really is free.
 
-   **What survives is a per-row cost with a residue trap at a vector width**, and
-   it is the most predictive model this project has built:
+   **Where the check actually went — the mechanism, supplied at review.** It is
+   hoisted into a **22-instruction per-row trip-count computation** (a
+   `cmova`/`cmovb` min-max chain computing `N = min(ncol, len − rowbase)`), and it
+   **survives in the scalar epilogue** at 8 Ir/element against R4's 5. So the cost
+   is `O(nrow)`, not zero. **"Per element" is a marginal derivative, not an
+   average** — the average gap on shipped inputs is ~34%.
 
-   > `R2 − R4 = 35 + nrow · f(ncol mod 8)`,  `f = [84, 32, 35, 38, 41, 44, 47, 50]`
-   > `R3 − R4 =  9 + nrow · 6`
+   **`f(0) = 84` is explained**, and it is the sharpest small result here:
+   `mov $0x8,%r11d ; cmove %r11,%r8` — **a remainder of zero is forced to a full
+   vector width**, because R2's loop is multi-exit and must keep a scalar
+   epilogue. `84 = 29 + 64 − 11 + 2`. Every power-of-two `ncol` pays a full extra
+   vector iteration it does not need.
 
-   128 of 128 swept points reproduced exactly; 16 parameters fitted from 16
-   points, **112 out of sample**, and a held-out band (`nrow=41`, 16 points) gives
-   **max error 0.0000**. Second model here tested by prediction rather than
-   re-measurement, after p02's sawtooth.
+   **The model has zero fitted parameters.** Derived at review from the listings
+   alone: `R4 = 37 + nrow·(27+11q+5r)`, `R3 = 46 + nrow·(33+11q+5r)`,
+   `R2 = 72 + nrow·(56+11V+8e)`, reproducing every measured point to the
+   instruction. The published `35 + nrow·f(ncol mod 8)` form is the same thing with
+   the structure hidden; `f` absorbs nothing. **Domain: `ncol > 8`** — the model is
+   false below that (34755 measured against 41699 predicted at 496×8).
 
-   ⚠ **`f` is an arithmetic run of step 3 for residues 1–7 — and residue 0 is an
-   outlier, 84 against the 29 the run extrapolates to.** So `ncol ≡ 0 (mod 8)`
-   costs ~55 extra instructions per row, and **every power-of-two `ncol` lands
-   there**: 8, 16, 32, 64, 256, 1024. This is p01's trap again at a wider width
-   (there, `n % 4 == 0` was the worst residue at +29 against +11). **The
-   dimensions a benchmark author reaches for first are the worst case.** Periods
-   are back-end specific — LLVM 8, gcc 16 — so sweep two full cycles of the
-   *widest* period you might hit, and never sample powers of two alone.
+   **Four corrections that matter, all measured:**
+   - **Wider lanes make safety *worse*, not better.** At AVX2 the gap at
+     `ncol ≡ 0 (mod 32)` is **14601 Ir/call against SSE2's 4487**, ratio 1.42× →
+     **4.58×**, and safe Rust is **absolutely slower** (18674 vs 15177). The peel
+     is VF elements long, so it grows with the lane.
+   - **The hypothesis is not inverted in general — it holds at `ncol = 8`.** R2's
+     vector guard is `N >= 9` where R4's is `ncol >= 8`, so there the check **does**
+     block vectorisation, and costs **2.94×**. p05 has both regimes in one kernel.
+   - **R3 is *not* free here.** +16.7% at 496×8, +4.7% at shipped `large` — an
+     `O(nrow)` cost. **The "R3 free" streak ends at five patterns, not six.**
+   - **4.2500 is not "the check".** The `-unroll-count=1` no-op control *does*
+     exist here (bit-for-bit identical R2, `md5_fn 76d7c2380278`), and gives
+     rolled+checked 7.0000, rolled+unchecked 5.0000, novec-unrolled 2.7500 →
+     **4.25 = 2.00 check + 2.25 unroll**, the *identical split* TASK_007_REVIEW
+     derived on p16. So the third reproduction is of the constant **and its
+     decomposition**, which is stronger than the constant alone.
 
-   - **`Ir` converts to time here: +34.4% `Ir` → +30.5% wall** (safe-naive vs
-     unsafe, `large`, `n_iters`-differenced, worst raw spread 2.3%). R3 +1.3%,
-     verus −0.7%, c-clang ≡ unsafe. **This confirms a prediction p16's own
-     `NOTES.md` made** — that a kernel with independent inner iterations would
-     convert the same instruction gap into time, where p16's latency-bound Horner
-     chain did not (+72% `Ir` → +0.27%). A prediction made on one pattern and
-     confirmed on another.
-   - **R3 is free for the sixth pattern in a row.** R1h costs +7 (gcc) / +2
-     (clang), flat.
+   **The deepest result, and the first time this project connects the proof to the
+   performance causally.** The kernel *already* checks `nrow*ncol <= avail`, so
+   R2's panic is **dead on every execution**. LLVM cannot eliminate it because
+   `nrow*ncol <= avail ⟹ i*ncol + j < avail` is **nonlinear** — and that is
+   *exactly* the obligation R5 discharges, with `lemma_mul_inequality` and one
+   `by (nonlinear_arith)`. **The `29 + 3r` Ir per row is the price of the
+   optimiser failing the lemma the proof proves.**
 
-   **One design fact worth carrying, and it changed the kernel:** with a `u64` row
-   accumulator **no LLVM rung vectorises at this project's flags** (`-O3`, no
-   `-march`, so SSE2) — *"the cost-model indicates that vectorization is not
-   beneficial"* — while gcc does. Narrowing the row accumulator to `u32` makes
-   every back end vectorise. `-mavx2` also fixes it but is a `build.py` change and
-   was not made. **Accumulator width decides whether a loop vectorises at all at
-   SSE2**, which is a codegen-fragility finding in the same family as p02's lost
-   `memcpy` idiom.
+   That sharpens finding 2. "A proof buys nothing on its own" is still true of
+   *this* toolchain — but here we can say precisely what it would buy if rustc
+   could consume it, and name the fact it would need. Safety's cost on this
+   pattern is not the check; it is the compiler's incompleteness at nonlinear
+   arithmetic.
+
+   **Two things that stand unchanged:** `Ir` converts to time on this kernel
+   (+34.4% `Ir` → **+32.9%** wall — the review's own remeasurement; the delivered
+   +30.5% was over-precise), confirming a prediction p16's `NOTES.md` made that a
+   kernel with independent inner iterations would convert where its latency-bound
+   Horner chain did not (+72% → +0.27%). And the `u32` row accumulator deviation is
+   **sound, and better justified than the delivery argued**: `ncol <= 65535` × `u8`
+   caps a row sum at 16 711 425 < 2³², so `u32` and `u64` are equal on *every
+   representable input*, confirmed by identical checksums.
 
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how

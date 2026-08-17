@@ -86,11 +86,26 @@ limit of memory safety).**
    `start >= -(body_start as i64)` guard is strictly *stronger* than a bounds
    check, which is what made its leak vacuous. The distinction is one token and
    it is the whole finding: write "what a bounds check buys" **slice**-relative.
-11. **4.25 Ir/folded byte is a property of rustc, not of a pattern.** p17
-   reproduced p16's swept R2−R4 constant **exactly** (10.0000 / 5.7500 once the
-   driver's `println!` digit-count term is differenced out), and gcc's rolled fold
-   hit 8.0000, the same rolled-unchecked constant. **R3 is free for the fifth
-   pattern in a row.**
+11. **4.25 Ir/element is a property of rustc, not of a pattern — and so is its
+   2.00 + 2.25 split.** p17 reproduced p16's swept constant exactly (10.0000 /
+   5.7500 once the driver's `println!` digit-count term is differenced out); p05
+   reproduced it a third time on a non-Horner fold, *and* reproduced the
+   decomposition — 2.00 check + 2.25 foreclosed unroll — from its own no-op
+   control. **R3 is free for five patterns and then stops**: on p05 it carries an
+   `O(nrow)` cost, +4.7% at `large`, +16.7% at `ncol = 8`.
+12. **p05 — safety on a vectorised loop, and the first causal link from proof to
+   performance.** Per element inside the vector body the check is free (1.375000,
+   five rungs identical). But it is hoisted into a 22-instruction per-row
+   trip-count computation and survives in the scalar epilogue, so the cost is
+   `O(nrow)`, not zero — and **wider lanes make it worse**: at AVX2 the gap is
+   4.58× against SSE2's 1.42×, with safe Rust absolutely slower. `ncol ≡ 0 mod 8`
+   pays a *full extra vector iteration*, so every power-of-two dimension is the
+   worst case.
+   The cause: the kernel already checks `nrow*ncol <= avail`, so R2's panic is
+   dead on every run — but LLVM cannot eliminate it, because
+   `nrow*ncol <= avail ⟹ i*ncol+j < avail` is **nonlinear**, which is exactly the
+   obligation R5 discharges with `lemma_mul_inequality`. **The safety cost is the
+   price of the optimiser failing the lemma the proof proves.**
 
 ## Retracted — do not reinstate
 
@@ -121,7 +136,13 @@ limit of memory safety).**
   bytes are the attacker's own request table. Corrected to a *slice*-relative
   guard, which does disclose a neighbour window. See finding 10.
 - **"`scaling_cur_freq` shows the clock"** — it reported 800 MHz for six seconds
-  while the core ran at 3.80–3.89 GHz. Measure the clock with a dependent chain.
+  while the core ran at 3.80–3.89 GHz. Measure the clock with a dependent chain,
+  interleaved — and even then it spans ±15% within one session.
+- **"On a vectorised loop the bounds check costs 0.0000 Ir/element"** and **"the
+  wider the lane, the cheaper safety gets"** (p05, manager). The first is true
+  only of the vector steady state — the check is hoisted into a per-row
+  trip-count computation and survives in the scalar epilogue, an `O(nrow)` cost.
+  The second is **refuted**: at AVX2 the gap is 4.58× against SSE2's 1.42×.
 
 ## Working method
 
@@ -129,8 +150,14 @@ See `.tasks/PROTOCOL.md` for the full rules. The short version: manager writes
 specs and `.memory/`, one subagent at a time alternating engineer → reviewer,
 manager lands `.memory/` corrections and commits.
 
+**Do not write a finding into `.memory/` before its review lands** —
+`.tasks/PROTOCOL.md` rule 9. Four consecutive reviews caught the manager
+overclaiming, every time from the same cause. Engineer writes `NOTES.md`, manager
+commits it, reviewer attacks it, *then* `.memory/`.
+
 **Ask to be corrected, not obeyed.** Agents have contradicted the manager's
-written instructions **nine times** with measurements and were right all nine.
+written instructions **thirteen times** with measurements and were right all
+thirteen.
 Two were prescriptions that could not have worked at all; one overturned three
 premises in a single review; the latest caught the manager overclaiming a
 headline. Say so in every task file.

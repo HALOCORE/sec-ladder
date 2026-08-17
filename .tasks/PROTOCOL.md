@@ -44,6 +44,32 @@ context still applies — do not restart from scratch.
    resume with `SendMessage` rather than restarting, and back off on repeated
    529s. Five agents have died mid-task; none lost meaningful work.
 8. **Subagents never `git add`/`git commit`.** Read-only git is fine.
+9. **Do not write a finding into `.memory/` before its review lands.** This is a
+   measured process defect, not advice: **four consecutive reviews (p16, p17
+   ×2, p05) found the manager's `.memory/` write-up overclaiming**, every time
+   from the same cause — the manager wrote the finding from the engineer's report
+   without re-measuring, and the engineer's own `NOTES.md` sometimes contained the
+   correction one paragraph below the headline the manager copied.
+
+   The ordering that fixes it, at no cost:
+
+   - the **engineer** writes measured claims into the pattern's `NOTES.md` — they
+     ran the experiment, and the gate certifies the tree;
+   - the **manager** commits that as-is, *without* adding a `.memory/` finding;
+   - the **reviewer** attacks the claim;
+   - **only then** does the manager write `.memory/`, from the reviewed text.
+
+   `.memory/` is the layer that outlives every task and is described as
+   authoritative. A number that has not survived a review does not belong in it.
+   If a finding must be recorded before review, mark it **PROVISIONAL — not yet
+   reviewed** in the text itself.
+10. **Ask the review for the mechanism, not just the number.** p05's review was
+   asked "if five rungs emit identical mnemonics, where did the bounds check go?"
+   and came back with the hoisted trip-count computation, the surviving scalar
+   epilogue, the `cmove` that forces a zero remainder to a full vector width, and
+   a zero-parameter derivation of a model the delivery had fitted. "It vanished"
+   is not a mechanism, and a finding without one is the finding a reader
+   disbelieves.
 
 ## Definition of done (engineer)
 

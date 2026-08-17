@@ -24,7 +24,7 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 | T007 | p16 TLV walker — the first data-dependent loop bound | **done**, gate PASS first run, **reviewed** (headline overclaimed, corrected) |
 | T011 | p17 HTTP suffix-range (CVE-2017-7529) — the limit of memory safety | **done**, gate PASS first run, **reviewed** (leak claim refuted; real artefact found one token away) |
 | T012 | ship p17's slice-relative guard — the artefact T011 claimed | **done**, reproduced independently; gate PASS, no measured number moved |
-| T013 | p05 2-D index flattening — the first **vectorisable** kernel | **done**, gate PASS first run, review owed; **hypothesis inverted** |
+| T013 | p05 2-D index flattening — the first **vectorisable** kernel | **done**, gate PASS first run, **reviewed**; every number reproduced, four framing claims corrected |
 
 **T010's review closed the gate-hardening arc.** It was deliberately shaped as
 the opposite of the previous six — not a bypass hunt but "will this gate *accept*
@@ -156,7 +156,7 @@ supersede any earlier task report they contradict.
 | p02 | length-prefixed buffer copy (`memcpy` w/ attacker length) | spatial OOB write | easy | planned |
 | p03 | bounded queue / stack, array-backed | index underflow on empty pop | easy | planned |
 | p04 | ring buffer with wraparound | modular index, aliasing | moderate | planned |
-| p05 | 2-D index flattening / matmul (`i*n+j`) | dimensions trusted vs buffer; overflow in the check | moderate | **done** (T013), gate PASS first run, R5 == R4 `exact` at O3; **on a vectorised loop the check costs 0.0000 Ir/element** |
+| p05 | 2-D index flattening / matmul (`i*n+j`) | dimensions trusted vs buffer; overflow in the check | moderate | **done** (T013), gate PASS first run, R5 == R4 `exact` at O3; safety moves from per-element to **per-row**, and gets *worse* with wider lanes |
 | p06 | in-place reverse / rotate / swap | aliasing, permutation invariant | moderate | planned |
 | p07 | binary search | midpoint overflow (`(lo+hi)/2`) | moderate | planned |
 | p08 | memmove with overlapping regions | overlap UB | moderate | planned |
