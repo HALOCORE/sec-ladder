@@ -22,7 +22,8 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 | T009 | judge the *strength* of a trusted `requires` (the verified twin); close the paren-`&&` hole | **done**, reviewed |
 | T010 | fix the twin's perimeter (3 bypasses); tie the driver region to code that runs | **done**, reviewed |
 | T007 | p16 TLV walker — the first data-dependent loop bound | **done**, gate PASS first run, **reviewed** (headline overclaimed, corrected) |
-| T011 | p17 HTTP suffix-range (CVE-2017-7529) — the limit of memory safety | **done**, gate PASS first run, review owed |
+| T011 | p17 HTTP suffix-range (CVE-2017-7529) — the limit of memory safety | **done**, gate PASS first run, **reviewed** (leak claim refuted; real artefact found one token away) |
+| T012 | ship p17's slice-relative guard — the artefact T011 claimed | wip |
 
 **T010's review closed the gate-hardening arc.** It was deliberately shaped as
 the opposite of the previous six — not a bypass hunt but "will this gate *accept*
@@ -165,7 +166,7 @@ supersede any earlier task report they contradict.
 | ID | Pattern | C bug class modelled | Verus difficulty | Status |
 |---|---|---|---|---|
 | p16 | TLV / length-prefixed record walker | length field vs remaining buffer | easy–moderate | **done** (T007), reviewed; gate PASS first run, R5 == R4 `exact` at O3; **first O(n) cost of a *spelling* — R3 is still 0/byte** |
-| p17 | HTTP `Range:` style header parser | int overflow → OOB (cf. CVE-2017-7529) | moderate | **done** (T011), gate PASS first run, R5 == R4 `exact` at O3; **provably memory-safe program that still leaks** |
+| p17 | HTTP `Range:` style header parser | int overflow → OOB (cf. CVE-2017-7529) | moderate | **done** (T011), reviewed; gate PASS first run, R5 == R4 `exact` at O3; **memory-safe but functionally wrong** — the *leaking* variant lands at T012 |
 | p18 | varint / LEB128 decoder | unbounded shift, truncation | easy–moderate | planned |
 | p19 | protocol state machine (byte-at-a-time) | state confusion | moderate | planned |
 | p20 | length/offset pair validation (heartbeat-style) | trusted length field (cf. CVE-2014-0160) | moderate | planned |

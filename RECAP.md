@@ -70,17 +70,27 @@ limit of memory safety).**
    parser (CVE-2017-7529). One missing `start >= 0`; the served range is the last
    `s` bytes, so one attacker `u16` picks the harm. For `content_len < s <= len`
    the bad read is **inside the allocation** — ASan clean, exit 0, and **safe Rust
-   with the check deleted prints C's leaked value bit-for-bit**. Only for `s > len`
-   does it leave the allocation and Rust panic. Then the artefact: guard the
-   *absolute* index instead of the sign — exactly what a bounds check buys — and
-   Verus gives **9 verified, 1 error, the single error being the *functional*
-   invariant; every access obligation discharges.** **A provably memory-safe
-   program that still leaks.** Memory safety and correctness are different
-   properties and this is the measurement.
+   with the check deleted prints C's value bit-for-bit**. Only for `s > len` does
+   it leave the allocation and Rust panic.
+   Then the artefact. Guard the **slice**-relative index —
+   `start >= -((off + body_start) as i64)`, which is exactly what a bounds check
+   buys, no more — and Verus gives **9 verified, 1 error, the single error being
+   the *functional* invariant; every access obligation discharges** (10/0 with the
+   functional spec stripped). It reads a **neighbouring window's** bytes: output
+   tracks the victim's secret, no panic, no `unsafe`. **A provably memory-safe
+   program that leaks.** Memory safety and correctness are different properties
+   and this is the measurement.
+   **Two corrections are baked in above, both from TASK_011_REVIEW** — the
+   shipped `adversarial-leak` row discloses only the *attacker's own* request
+   table, so it shows memory-safe-but-wrong, not disclosure; and the delivered
+   `start >= -(body_start as i64)` guard is strictly *stronger* than a bounds
+   check, which is what made its leak vacuous. The distinction is one token and
+   it is the whole finding: write "what a bounds check buys" **slice**-relative.
 11. **4.25 Ir/folded byte is a property of rustc, not of a pattern.** p17
-   reproduced p16's swept R2−R4 constant to four decimals on a different kernel,
-   and gcc's rolled fold hit 8.0000 exactly, the same rolled-unchecked constant.
-   **R3 is free for the fifth pattern in a row.**
+   reproduced p16's swept R2−R4 constant **exactly** (10.0000 / 5.7500 once the
+   driver's `println!` digit-count term is differenced out), and gcc's rolled fold
+   hit 8.0000, the same rolled-unchecked constant. **R3 is free for the fifth
+   pattern in a row.**
 
 ## Retracted — do not reinstate
 
@@ -107,6 +117,11 @@ limit of memory safety).**
   too, and for a structural reason: its interesting harm is not a memory error.
   The twin's value starts at the first *multi-clause trusted accessor*, a property
   of the wrapped intrinsic (p27+), not of the pattern number.
+- **"p17's leak is an information disclosure"** — as shipped it is not; the excess
+  bytes are the attacker's own request table. Corrected to a *slice*-relative
+  guard, which does disclose a neighbour window. See finding 10.
+- **"`scaling_cur_freq` shows the clock"** — it reported 800 MHz for six seconds
+  while the core ran at 3.80–3.89 GHz. Measure the clock with a dependent chain.
 
 ## Working method
 

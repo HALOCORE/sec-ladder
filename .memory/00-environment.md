@@ -7,6 +7,14 @@ this file (and say so in your report) if a fact goes stale.
 
 - 2× Intel Xeon Gold 6230 @ 2.10 GHz, 20 cores/socket, 2 threads/core = **80 logical CPUs**.
 - Governor `powersave`, frequency scaling active (observed ~24% of max at idle).
+- **`scaling_cur_freq` is unusable on this box — do not derive cycles from it.**
+  Measured at TASK_011_REVIEW: it reported **800 MHz for six seconds while the
+  core was actually running at 3.80–3.89 GHz**. p17's delivery declined to quote
+  a cycles/byte figure on the strength of that file and thereby *under*claimed.
+  If you need a clock, **measure it** — time a known-length dependent chain (a
+  1-cycle-per-iteration loop) and divide. That method gave 3.85 GHz on CPU 5 at
+  TASK_007_REVIEW and 3.80–3.89 GHz on CPU 3 at TASK_011_REVIEW, i.e. it is
+  stable and reproducible across cores while the sysfs file is not.
 - **Shared box, containerised** (`/dev/vg1/containers_apt`). Wall-clock timing is noisy.
 - ~118 GB free on `/` (of 252 GB). The 12 GB LLVM install is the big consumer;
   re-check with `df -h /` rather than trusting this line.

@@ -319,36 +319,64 @@ is a much stronger claim than any p01 could produce.
    | `s` | the unchecked read | ASan on R1 | safe Rust |
    |---|---|---|---|
    | `≤ content_len` | correct | — | correct |
-   | `content_len < s ≤ len` | the window's own metadata, **in bounds** | **clean, exit 0** | **leaks identically** |
+   | `content_len < s ≤ len` | the window's own header, **in bounds** | **clean, exit 0** | **reads it identically** |
    | `> len` | before the allocation | `6 bytes before 64-byte region` | panics, exit 101 |
 
    The two adversarial inputs are **the same 64 bytes with one suffix field 64 vs
    70**. Both C rungs exit 0 with a plausible answer on both.
 
    **Control 1 — safe Rust with the sign conjunct deleted.** On the leak input it
-   prints `1395842226496950656`, **bit-identical to C's leaked value, no panic**;
-   on the OOB input it panics. So bounds checking kills exactly one of the two
-   harms, and the one it cannot see is the Heartbleed-shaped one.
+   prints `1395842226496950656`, **bit-identical to C's value, no panic** (the
+   reviewer confirmed identity is structural: an identical 130-byte index
+   sequence, derived independently, not a coincidence); on the OOB input it
+   panics. So bounds checking kills exactly one of the two harms.
 
-   **Control 2 — and this is the sharpest artefact this project has produced.**
-   The first attempt (delete the sign check from R5) fails *both* obligations,
-   because a proof quantifies over all inputs and the mutant admits both harms —
-   **the manager predicted otherwise and was wrong; the separation needs a program
-   change, not an input.** The engineer then built the right mutant: guard the
-   **absolute** index rather than the sign, `start >= -(body_start as i64)`, which
-   is exactly what a bounds check buys you. Result: **`9 verified, 1 errors`, the
-   single error being the *functional* invariant. Every `get_unchecked`
-   precondition discharges.** Run as plain safe Rust it prints the leaked value on
-   one input and the correct answer on the other.
+   **The shipped `adversarial-leak` row is *not* an information disclosure, and
+   the first write-up of this finding said it was.** Corrected at
+   TASK_011_REVIEW. R1 folds 130 bytes over window indices `[0,63]` where the
+   checked rungs fold 66 over `[8,63]`; the excess is exactly indices `{0..7}` —
+   `nsuf` plus the three suffix `u16`s, i.e. **the attacker's own request table**
+   (`inputs/gen.py` literally labels it `ATTACKER DATA`). Structural, not an
+   artefact of this input: the regime reads `[len-s, len)` with
+   `len-s ∈ [0, body_start)`, so the excess is *always* a suffix of the
+   attacker-written header, bounded by `2 + 2*nsuf` bytes. p17 as shipped
+   demonstrates **provably memory-safe and functionally wrong** — real, and worth
+   publishing — but not disclosure. p17's own `NOTES.md` said the true thing one
+   paragraph below the headline that contradicted it.
 
-   That is a program that is **provably memory-safe and still leaks**, and it puts
-   a measurement under finding 2: memory safety and correctness are different
-   properties, and the proof obligation that catches this bug is the functional
-   `ensures`, not the access obligation.
+   **Control 2 — the artefact, and it is one token away from what shipped.**
+   The manager's first design (delete the sign check from R5) fails *both*
+   obligations, because a proof quantifies over all inputs and that mutant admits
+   both harms — **the separation needs a program change, not an input.** The
+   engineer then built `start >= -(body_start as i64)`, which verifies with only
+   the functional obligation failing. But that guard is **strictly stronger than
+   what a bounds check buys**, and calling it "exactly what a bounds check buys"
+   was the error that made the leak vacuous. The driver hands the kernel the
+   **whole blob**, so bounds checking permits any *slice*-relative index ≥ 0:
+
+   > `start >= -((off + body_start) as i64)`
+
+   That verifies identically — **`9 verified, 1 errors`, functional only; `10
+   verified, 0 errors` once the functional spec is stripped** — and it **does**
+   disclose. On a two-window probe the output tracks the *victim window's* secret
+   (`14940305438379539953` vs `10930790086150322769`), with no panic and no
+   `unsafe`.
+
+   **That is the real artefact: a program with no `unsafe`, whose memory-safety
+   obligations all discharge, that reads another window's bytes.** It is
+   Heartbleed's shape — a lawful read of a neighbour's buffer inside one
+   allocation — and it puts a measurement under finding 2: the obligation that
+   catches it is the functional `ensures`, never the access obligation. **The
+   guard being one token weaker is the whole point**, and it is why "what a bounds
+   check buys you" must be written *slice*-relative, not window-relative.
 
    **Perf — R3 is free for the fifth pattern in a row** (+32 Ir/call flat, 0 per
    byte; +0.61% / +0.08%). And **R2−R4 = 4.2500 Ir per folded byte, reproducing
-   p16's swept constant to four decimals on a completely different kernel** — so
+   p16's swept constant on a completely different kernel** — *exactly*, in fact:
+   the delivered 9.9991 / 5.7491 were contaminated by the driver's final
+   `println!` (its digit count varies per input); the zero-residue lag-4 pair
+   gives **10.0000 / 5.7500 exactly**. The constants reproduce *better* than
+   claimed — so
    4.25 is a property of *rustc's checked indexed byte fold*, not of p16. Two
    further reproductions: gcc's default-vs-`-funroll-loops` deficit (2nd pattern —
    `-funroll-loops` takes gcc past clang again), and gcc's default rolled fold at
@@ -361,10 +389,12 @@ is a much stronger claim than any p01 could produce.
    conversion, not the comparison" is **false**.
 
    Wall clock: every rung folds a byte in **0.784–0.791 ns**, 0.9% spread across a
-   73% `Ir` gap. No cycles/byte is claimed — CPU 3's `scaling_cur_freq` was seen
-   ramping 800→902 MHz against a 3.9 GHz max, so the clock during the window is
-   not measurable that way. At 3.9 GHz those figures are 3.06–3.08 cycles/byte,
-   which **independently corroborates p16's 3.027–3.055** on a different kernel.
+   73% `Ir` gap. The delivery declined to quote cycles/byte because
+   `scaling_cur_freq` showed 800→902 MHz against a 3.9 GHz max — **but that file
+   is unreliable on this box** (`.memory/00-environment.md`): it reported 800 MHz
+   for six seconds while the core was measured running at 3.80–3.89 GHz. So the
+   caution was an *under*claim. p16's 3.85 GHz and 3.027–3.055 cycles/byte stand,
+   and p17 may quote **3.02–3.05** — two kernels agreeing on the Horner rate.
 
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how

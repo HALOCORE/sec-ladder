@@ -373,6 +373,16 @@ regenerated at all, silently, for two tasks. Fixed at TASK_008 by discriminating
 on the presence of a `cells` list. Any new side record in `results/` needs the
 same thought.
 
+**A marginal-`Ir` figure carries a per-input `println!` term.** The driver prints
+the final checksum, and the number of *digits* differs per input, so the
+whole-program `Ir` difference between two inputs includes a few instructions of
+formatting that have nothing to do with the kernel. Measured at TASK_011_REVIEW:
+it moved p17's swept rates from a true **10.0000 / 5.7500** to a reported
+9.9991 / 5.7491. Small, but it is the difference between "reproduces p16's
+constant" and "reproduces it *exactly*", and a four-decimal claim cannot afford
+it. **Difference two inputs whose checksums have the same digit count** — a
+residue-matched lag pair does this for free — or subtract the term explicitly.
+
 **Re-run `measure.py` when the tree moves, and check what actually went stale.**
 p01's JSON was four commits behind with `dirty_files: 15`. On re-running:
 **all 42 `kernel_exclusive_ir` figures were identical** — including c-clang,

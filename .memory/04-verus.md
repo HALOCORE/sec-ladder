@@ -158,6 +158,15 @@ does. Every pattern's `spec.md` now carries, and `harness/check.py` diffs:
    all: a tautological `ensures` (`r == r`) and a deleted `external_body`
    `requires`. Demonstrated at TASK_003 — both gave `5 verified, 0 errors` and a
    green gate before, and both now fail with the exact clause diff.
+2b. **"Is this error hiding another one?"** Verus reports the first failure per
+   query, so a mutant that reports one error may be concealing others — and if a
+   claim rests on *which* obligation failed (p17's whole result does), that
+   ambiguity is fatal. Two probes, both used at TASK_011_REVIEW:
+   **`--multiple-errors 20`** to force the rest out, and **strip the functional
+   spec and re-run** — if the memory-safety obligations then give `N verified,
+   0 errors`, nothing was hidden behind the functional failure. Keep a positive
+   control beside it (a mutant known to break memory safety) so you know the
+   probe can actually see a second error.
 3. **`verus <file> --verify-function <name> --verify-root`** answers "does this
    function have a verified body?" *semantically*. It reports `0 verified` for an
    `external_body` item and ≥1 for a real one, so the "rule 2" call-site check no
