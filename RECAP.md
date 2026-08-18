@@ -380,16 +380,13 @@ clean" from "sanitiser cannot see". Both are in `.memory/06-catalogue.md`.
 
 ## State
 
-- `harness/` — `check.py` (17 stages: stage `0b` is the declared-idiom key,
-  added at TASK_016; plus clause deletion, `requires` strength, the verified
-  twin, and region-actually-runs), `asm.py`, `dloop.py`, `vparse.py`,
-  `build.py`, `measure.py`, `report.py`, `fixture.py`. **4396 lines against six
-  patterns** — that ratio is why gate work needs the "could this happen by
-  accident?" test. It was unchanged across the whole of p08; TASK_016 added the
-  first 145 lines since the hardening arc closed, and that check passed the
-  accident test with the strongest answer any check here has had — the mistake
-  it prevents had already happened twice, to two different agents, in
-  consecutive tasks.
+- `harness/` — `check.py` (17 stages: `0b` is the declared-idiom key and its
+  reporting-only spelling audit, added at TASK_016/020; plus clause deletion,
+  `requires` strength, the verified twin, and region-actually-runs), `asm.py`,
+  `dloop.py`, `vparse.py`, `build.py`, `measure.py`, `report.py`, `fixture.py`.
+  **4790 lines against six patterns.** It was frozen through p08; TASK_016–020
+  added ~540 lines, all of it the idiom mechanism, each increment passing the
+  "could this happen by accident?" test with a measured count of accidents.
 - **Gate: all six re-run at TASK_016 and green** — p02, p16, p17, p05, p08
   `PASS` — each green on
   its first full run. **p01 is `PASS-WITH-BLOCKED-ROWS`**: Miri is mandatory for
