@@ -121,6 +121,21 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    proves"~~ is **retracted as written**: what those instructions price is two
    *spellings*, not safety. See finding 13.
 
+   **REINSTATED at TASK_021_REVIEW, restricted to the row-scaled term**, in
+   exactly these words: *"On p05, the `O(nrow)` part of the in-contract safety
+   tax is the price of the optimiser failing the lemma the proof proves."* The
+   in-contract respelling removes exactly one instruction per row — the `add`
+   that makes the row base buffer-absolute — and the five that survive are the
+   reslice's bounds check, whose deletion needs `(i+1)·ncol <= nrow·ncol`, the
+   nonlinear fact `lemma_mul_inequality` discharges. Not true of the constants,
+   not a statement about safety in general.
+   **But p05 has no floor**, only successively lower best-found values: TASK_021
+   claimed a two-sided floor at `5·nrow + 6` from six flat R4 spellings, and the
+   review refuted it — all eight had decoded the header the shipped way, and
+   respelling *that* gives **13 in-contract R4 spellings, 11 distinct bodies,
+   every one cheaper**. Corrected floor `5·nrow + 11` (106/336); published high
+   by 14%/16%. Two "floors" on this pattern have now been broken; expect a third.
+
 13. **p08, and the retraction it forced — safe Rust beat unsafe Rust on p05.**
    p08's own result is structural: overlapping `memcpy` is UB that safe Rust
    **cannot express** (borrow checker, compile time, no runtime check and so

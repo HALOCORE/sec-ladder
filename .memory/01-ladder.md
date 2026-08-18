@@ -780,19 +780,38 @@ is a much stronger claim than any p01 could produce.
    kernel, written this way" to "safety costs this" — that is the step
    finding 14 shows is not available.
 
-   **PROVISIONAL — TASK_021 measured a two-sided floor and may rehabilitate the
-   retracted sentence. Do not quote either way until the review lands.** What was
-   measured: p05's `6·nrow + 9` is an upper bound (in-contract minimum
-   `5·nrow + 6`, swept over 179 points on a *new* `nrow` axis — the published
-   form was itself a three-point fit until band D shipped); the **R4 side has
-   zero in-contract spread** across six spellings and four distinct `md5_fn`
-   bodies, which is what p16 and p17 could not establish; and the single
-   instruction the floor removes is `add %rsi,%rax`, while the five that survive
-   need `(i+1)·ncol <= nrow·ncol` — **the nonlinear obligation R5 discharges with
-   `lemma_mul_inequality`**. If that holds up, the in-contract floor and the
-   proof obligation are the same fact, and the sentence returns *bounded,
-   two-sided and in-contract*, which is a much narrower and much better claim
-   than the one retracted. See `patterns/p05-index-flatten/NOTES.md` §14.
+   **The sentence is REINSTATED, restricted to the row-scaled term** (TASK_021,
+   adjudicated at TASK_021_REVIEW). Exactly these words and no wider:
+
+   > **"On p05, the `O(nrow)` part of the in-contract safety tax is the price of
+   > the optimiser failing the lemma the proof proves."**
+
+   True of *this kernel*, *this declaration* and *this toolchain*, and of the
+   **row-scaled term only**: the in-contract respelling removes exactly one
+   instruction per row — `add %rsi,%rax`, the `add` that makes the row base
+   buffer-absolute — and the five that survive are the reslice's bounds check,
+   whose deletion needs `(i+1)·ncol <= nrow·ncol`, the nonlinear fact R5
+   discharges with `lemma_mul_inequality`. **Not** true of the constants, which
+   move in *both* rungs and by different amounts, and **not** a statement about
+   safety in general.
+
+   **And p05 has no floor — only a succession of best-found values, two of which
+   have already been broken.** TASK_021 reported a "two-sided floor" of
+   `5·nrow + 6` on the ground that six in-contract R4 spellings gave one
+   instruction count. **Refuted**: all eight of its R4 spellings decoded the
+   header the shipped way, so the flatness was an artefact of respelling *one
+   rung*. The review found **13 in-contract R4 spellings, 11 distinct `md5_fn`
+   bodies, every one cheaper than shipped R4** (cheapest: two unaligned
+   `*const u16` header reads). Corrected figures: floor **`5·nrow + 11`** =
+   **106 / 336**, so the published `6·nrow + 9` is high by `nrow − 2`, i.e.
+   **14% / 16%** — not the 18%/17% first reported. Do **not** write "two-sided"
+   or "zero R4 spread" anywhere.
+
+   **The number is also reading-dependent**, which the earlier write-up stated
+   unconditionally: under p05's `required[1]` read as p16's is, the floor is
+   `5·nrow + 11` (106/336); under the strict reading it is
+   `min(6·nrow + 11, 5·nrow + 17)` (112/342). The *qualitative* claim survives
+   both. See `patterns/p05-index-flatten/NOTES.md` §14.
 
    **Two things that stand unchanged:** `Ir` converts to time on this kernel
    (+34.4% `Ir` → **+32.9%** wall — the review's own remeasurement; the delivered
