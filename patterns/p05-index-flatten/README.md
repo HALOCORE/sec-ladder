@@ -173,8 +173,12 @@ upper bounds and bounds nothing in either direction. What is quotable is the
 published 123 / 399 *inside* it, and 80% / 71% of the published figure living in
 spelling the declaration does not pin. (This used to add "against p16's
 44% / 55%", i.e. that p05's declaration is the loosest of the set. That compared
-a *pair* interval against p16's **R3-side-only** span; p16's own pair interval,
-measured at TASK_023, is 111% / 109%. The comparison is withdrawn.) At `nrow = 1`
+a *pair* interval against p16's **R3-side-only** span. TASK_023's replacement —
+"p16's own pair interval is 111% / 109%" — is refuted in turn: measured, p16's
+is **−239…+236 / −2449…+2244**, 1759% / 6095%, negative at the bottom on all 24
+blobs. **Both forms are withdrawn and neither is re-pointed**, because a
+2-lever p16 search and a 46-spelling p05 search are not each other's peers.)
+At `nrow = 1`
 the bottom of that interval is **exactly 0**, measured: there is an admissible
 pair on which safe and unsafe cost the same instruction count.
 

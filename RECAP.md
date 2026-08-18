@@ -65,7 +65,22 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    data-dependent bound, nothing hoistable, no bulk idiom to lose: the case p01
    said not to generalise to. **R3 idiomatic safe Rust is 5.7500 Ir/folded byte —
    R4's rate exactly, zero per byte**, its whole cost O(1) per call and shrinking
-   with size. Only the *naive indexed spelling* is O(n): +4.25 Ir/byte, +69/+72%.
+   with size. ⚠ **Both figures are SPELLING-CONDITIONAL and must be quoted with
+   the fold that produced them** (TASK_023_REVIEW, TASK_024). p16's declaration
+   leaves the value fold free *by name*, and the per-byte rate is a property of
+   that fold: 5.7500 for the shipped one LLVM unrolls 4×, **6.50000 and 6.62500**
+   for `chunks_exact(4)` and `(8)` — both *dearer* — and 5.18750 / 5.09375 /
+   5.04688 for `(16)` / `(32)` / `(64)`. The **null itself is exact at matched
+   spelling**: safe and unsafe slopes are equal to five decimal places at all six
+   folds measured, in three residue-matched bands, because the reslice and the
+   `get_unchecked` both sit *outside* the fold loop and the chunk body is the
+   same instruction sequence on both sides. Across *unmatched* folds an
+   admissible safe rung reads −0.5625 Ir/byte against the shipped unsafe one —
+   that is a codegen difference and not a safety cost, and at matched spelling
+   the unsafe rung is cheaper by `2 + 5·nrec` on every point. "O(1) per call" is
+   separately corrected to `7 + 5·nrec` / `7 + 7·nrec` (TASK_015_REVIEW). See
+   `patterns/p16-tlv-walk/NOTES.md` §10a.2.
+   Only the *naive indexed spelling* is O(n): +4.25 Ir/byte, +69/+72%.
    Of that 4.25, a rolled-vs-rolled control (`-unroll-count=1`, a bit-for-bit
    no-op on R2) shows **exactly 2.00 is the check and 2.25 is the 4× unroll it
    forecloses**, zero residual. And it costs **+0.27% wall clock** — the fold is
@@ -190,7 +205,8 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    retraction of it is itself retracted.
    **And that contract-relative number bounds `inf(in-contract R3) − R4ship`
    and nothing else** — a bound only because R4 is held fixed by fiat, and the
-   search for what it bounds has now failed three times. TASK_021 reported a *two-sided*
+   search for what it bounds has now failed three times
+   (`patterns/p05-index-flatten/NOTES.md` §14). TASK_021 reported a *two-sided*
    floor, `5·nrow + 6`, on the ground that six in-contract unsafe spellings gave
    one instruction count. They had all decoded the header the shipped way, so it
    measured the header. TASK_021_REVIEW respelled that and got `5·nrow + 11`
@@ -199,68 +215,20 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    4–10 independent machine-code bodies, and two of the three were broken
    anyway** — so "reached by many spellings" is not evidence of a floor, and
    nothing here should ever again be published as one. See finding 12.
-
-13. **p08, and the retraction it forced — safe Rust beat unsafe Rust on p05.**
-   p08's own result is structural: overlapping `memcpy` is UB that safe Rust
-   **cannot express** (borrow checker, compile time, no runtime check and so
-   nothing to measure), `unsafe` re-opens it via `copy_nonoverlapping`, and
-   **R5 does not close it** — substituting `copy_nonoverlapping` into the trusted
-   body verifies 11/0 and 15/0 under the twin, invisible to Verus, the twin and
-   the contract pins; only Miri and the O3 identity pin catch it. On this libc
-   the UB **executes and is unobservable**: glibc 2.39 `memcpy` *is* `memmove`,
-   so R1 ≡ R1h at **0.00 Ir/call** — a *libc* property, never to be quoted as
-   "memmove is free". ASan sees the overlap, but **`_FORTIFY_SOURCE` blinds it**
-   under clang as well as gcc, because the check lives in the `memcpy`
-   interceptor and not in `__memcpy_chk`.
-   Then the blocker, which is about **p05**: `data.chunks_exact(ncol)` — one
-   idiomatic safe expression, zero `unsafe`, no proof — is **`nrow − 7`
-   instructions per call cheaper than the unsafe rung**, exactly, on every input,
-   with identical output on all 150 committed p05 inputs. p05's shipped R3
-   reslices by hand and pays `6·nrow + 9`. **Three patterns have now priced a
-   spelling as safety's cost** (p02, p16, p05).
-
-14. **Every rung is a spelling, the gap does not converge, and "safe beats
-   unsafe" was never available as a language fact.** (TASK_015 +
-   TASK_015_REVIEW. The programme's central methodological result, and the one
-   that shapes the writeup.)
-   The audit found **all three shipped R3s beaten**, each beater also cheaper
-   than **its own R4**. The control that answered it — apply the same
-   consumed-slice idiom to the *unsafe* rung — put unsafe back on top at
-   **+11.00 Ir/call flat**. Then the review ran **one more round on each side**:
-   replace the unsafe loop counter with the canonical C test `while rp < end`
-   and it becomes **`nrow + 9`** — swept exactly over all 144 blobs, zero
-   residual, with a second unrelated unsafe spelling landing on the identical
-   figure. **`O(1)` became `O(nrow)` and the sign of the conclusion flipped on
-   the first thing a reader would try. The gap does not converge.**
-   And it never could, for a reason available without measuring: **R4 is defined
-   by *permission*, not obligation**, so every safe program is an admissible R4
-   and `inf(R4) <= inf(R3)` **by construction**. What is *not* available a priori
-   is whether that infimum gap is zero or positive — which is exactly the
-   quantity that moved from 11 to `nrow + 9` when someone looked.
-   **Both spellings that drove this were out of contract.** p05's `spec.md`
-   forbids `chunks_exact` and the running row pointer by name — either deletes
-   the `i*ncol + j` multiply, which *is* the pattern — and **two consecutive
-   tasks measured them and reported them as p05's numbers**, the manager's own
-   retraction among them. The declaration was right both times and failed only
-   by being **invisible**: it is prose, and the hashed block starts 240 lines
-   later. So p05's `6·nrow + 9` **stands as a contract-relative number**, and the
-   retraction of it is itself retracted.
-   **TASK_021 measured that contract-relative number to be an UPPER BOUND, and
-   the reading has since been narrowed twice** (`patterns/p05-index-flatten/NOTES.md`
-   §14): seven textually independent
-   in-contract respellings reach `5·nrow + 6` with **zero residual over 179
-   sweep points**. TASK_021's companion claim — that the *unsafe* side "does not
+   TASK_021's companion claim — that the *unsafe* side "does not
    move at all" (six spellings, four distinct machine-code bodies, zero
-   difference) — is **refuted**: all six decoded the header the shipped way, and
-   respelling it moves R4 by 7 flat (TASK_022). The only thing `6·nrow + 9`
-   bounds is `inf(in-contract R3) − R4ship`, i.e. R4 held fixed by fiat. Its
+   difference) — is **refuted** the same way: all six decoded the header the
+   shipped way, and respelling it moves R4 by 7 flat (TASK_022). Its
    functional form, its sign
    and its `O(nrow)` conclusion all survive under that stated pairing, but the
    "21%/18% of the tax lives in unpinned spelling" figure is the **R3 side
    alone**; over free pairs the interval is 80%/71% of the published tax. (That
    was then called "the loosest of the set"; the comparison put a *pair*
-   interval next to p16's **R3-only** span, and p16's own pair interval —
-   TASK_023 — is 111%/109%, wider. Withdrawn.) The `nrow` axis it is swept on
+   interval next to p16's **R3-only** span. TASK_023's replacement — "p16's
+   own pair interval is 111%/109%, wider" — is refuted in turn: measured, p16's
+   is −239…+236 / −2449…+2244, i.e. 1759%/6095%, negative at the bottom on all
+   24 blobs. **Both are withdrawn and neither is re-pointed** — a 2-lever p16
+   search is not the peer of a 46-spelling p05 one.) The `nrow` axis it is swept on
    ships too: `inputs/gen.py` band D, 33 blobs, and `source_sha256` covers
    `gen.py` from TASK_021 so the law is re-derivable from a hashed file.
    **The policy, decided and implemented (TASK_016–018).** "Compare idiom-matched
@@ -285,17 +253,24 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    nothing else — a bound only because R4 is held fixed BY FIAT rather than
    minimised. It is NOT an upper bound on the in-contract safety tax**, which is
    what this line said until TASK_023. p16's `+27/+77` has a measured
-   in-contract minimum of
-   `+19/+45` against the shipped R4; p17's `+32` has an in-contract respelling measuring **−19** against
+   in-contract minimum of **−199 / −2365** against the shipped R4 — ~~`+19/+45`~~,
+   refuted at TASK_023_REVIEW because the search that produced it pulled two
+   per-record levers on a declaration that also licenses **unrolling**, the only
+   lever that acts per byte; p17's `+32` has an in-contract respelling measuring
+   **−19** against
    the shipped R4, byte-identical to the row an earlier task had excluded. Both
    patterns ship an R3 measurably off the floor of their own contract, so "the
    shipped R3 is the cheapest admissible spelling" is **false, not
    unestablished**. **And the unsafe rung is a spelling too**: p05's R4 moves 7
-   flat (TASK_022) and p16's moves `4·nrec` (TASK_023), so on both the shipped
-   pair's difference is *exceeded* by an admissible pair — by `5·nrec` on p16,
-   47 against 27 at `small` and 127 against 77 at `large`. Report the
+   flat (TASK_022), and on p16 the *safe* side moves further than the unsafe one
+   — ~~p16's R4 moves `4·nrec` via `r4_hdr`~~, which **cannot be a p16 rung at
+   all** (vstd cannot verify `read_unaligned` and the `identity` pin needs
+   R5 ≡ R4, so it would need a fourth trusted item), where the R3-side levers
+   cost zero TCB and are larger. Report the
    in-contract **pair interval** beside every headline, with the shipped pair
-   located inside it, and the fixed-R4 bound if one number is wanted.
+   located inside it, and the fixed-R4 bound if one number is wanted — and
+   **never a per-byte difference across unmatched fold spellings** (TASK_024,
+   under review).
 
 ## Retracted — do not reinstate
 
@@ -422,13 +397,29 @@ headline. Say so in every task file.
 - **A tool that reports nothing may be a tool that cannot see.** ASan is silent
   on p08's overlap not because there is none but because fortify rewrote the call
   to `__memcpy_chk`. A gate row records `clean` for both reasons identically.
-- **Two files, two numbering schemes.** RECAP's findings are numbered 1–13,
+- **Two files, two numbering schemes.** RECAP's findings are numbered 1–14,
   `.memory/01-ladder.md`'s are 1–7. Name the pattern, never the number.
+  (This file also *shipped findings 13 and 14 twice*, with divergent text, from
+  an insert-where-a-replace-was-meant. One copy asserted p05's `5·nrow + 6`
+  floor as a narrowing result while the other recorded its refutation. Deduped
+  and merged 2026-08-18. When you edit a finding, `grep` its opening words first.)
+- **A per-byte rate is a property of a *spelling*, not of a rung.** p16 publishes
+  rates from 5.04688 to 6.62500 for the same kernel, all in contract, and the
+  family is not monotone in the chunk width — at `K ≤ 8` `try_into` makes LLVM
+  fold byte loads into a word load and the rate goes *up*. Differencing two rates
+  across unmatched folds manufactured a **sign error in p16's headline** that
+  survived a task. Name the fold beside every rate; difference rates only between
+  rungs that fold the same way. Whether this is a finding or a reason the project
+  cannot publish per-byte rates at all is **open and under review** (TASK_024).
 
 ## Priority — read this before planning
 
-**Fifteen tasks in, 6 of 47 patterns exist** — six tasks went to gate hardening
-before the user called it; every task since has produced or reviewed a pattern. The gate's threat model is **honest mistake, not
+**Twenty-four tasks in, 6 of 47 patterns exist.** Six tasks went to gate
+hardening before the user called it; **TASK_015–024 — ten consecutive tasks —
+went to the *spelling* problem** and produced no new pattern. That arc has paid
+(the named-spelling standard, four refuted floors, p16's sign error) but the
+ratio is now the thing to watch: **the next pattern is overdue.** The gate's
+threat model is **honest mistake, not
 malicious author** (`.memory/02-bench-rules.md`, top section, with the list of
 residuals we are deliberately leaving open). New gate work must pass "could this
 happen by accident?" first.
@@ -457,13 +448,43 @@ set before more results are added to it:
    `R4ship − r4_hdr = 4·nrec` Ir/call (the two length bytes as one unaligned
    `u16`, the same lever that moved p05's R4), zero residual over 24 blobs, and
    the admissible pair `(r3_hdrarray, r4_hdr)` **exceeds** the published
-   `+27/+77` by `5·nrec`. p16's in-contract pair interval is `nrec + 13` …
-   `7 + 10·nrec` / `3·nrec + 13` … `7 + 12·nrec`, 111%/109% of the published tax
-   wide, with the shipped pair inside it. The three R4 controls ship in
+   `+27/+77` by `5·nrec`. ⚠ **The pair interval TASK_023 published from that —
+   `nrec + 13` … `7 + 10·nrec` / `3·nrec + 13` … `7 + 12·nrec`, "111%/109%
+   wide" — is REFUTED** (TASK_023_REVIEW): it was a 2-lever search on a
+   declaration that also licenses **unrolling**, which is the only lever of the
+   three that acts *per byte*. Measured, the interval is **−239…+236 (1759%) /
+   −2449…+2244 (6095%)** and its **bottom is negative on all 24 blobs**; the
+   in-contract minimum against the shipped R4 is **−199 / −2365**, not
+   `+19 / +45`. `r4_hdr` also **cannot be a p16 rung** — vstd cannot verify
+   `read_unaligned` and the `identity` pin needs R5 ≡ R4, so it would need a
+   fourth trusted item — while the R3-side levers cost zero TCB. **What survives
+   and is now the statement to quote: fold both rungs the same way and the
+   per-byte rates are equal to five decimal places at all six spellings
+   measured, and the unsafe rung is cheaper per *record* on every point.** The
+   three R4 controls ship in
    `patterns/p16-tlv-walk/controls/gen_controls.py`; the write-up is that
-   pattern's `NOTES.md` §10a.1. **p17, p02, p01 and p08 remain unverified on the
-   R4 side** — their published figures are one-sided bounds, not upper bounds on
-   a tax.
+   pattern's `NOTES.md` §10a.1 and §10a.2. **p17, p02, p01 and p08 remain
+   unverified on the R4 side** — their published figures are one-sided bounds,
+   not upper bounds on a tax, and p17's `−19.00` is the same shape of claim that
+   the unroll lever manufactured on p16.
+
+   **TASK_024 landed the corrections and then contradicted the paragraph above,
+   and its work is UNREVIEWED — that review is the next task.** All seven prose
+   items are in the tree and p16/p05/p02 gates are green; §10a.2 is the write-up.
+   Its three counter-measurements, all with disassembly: `5 + 3/K` is **not a
+   law** (`chunks_exact(4)` = 6.50000 and `(8)` = 6.62500, both *dearer* than the
+   shipped 5.75, so the family is not even monotone in `K` — the free parameter is
+   the whole **fold spelling**, not the unroll factor); **"zero per byte" is not
+   sign-wrong but spelling-conditional**, exactly 0.00000 safe-minus-unsafe at all
+   six folds in three residue-matched bands, so **−0.5625 is a cross-spelling
+   codegen difference and not a safety cost**; and TASK_023_REVIEW's
+   `51·nrec − 5` / `48·nrec − 5` is **domained wrong** — fixed-`vlen` slices (124,
+   126), not residue classes, predicting 475 at `large` against a measured 2365.
+   Two things the reviewer should be pointed at: whether "accept K-dependence" is
+   a finding or a surrender (the manager's own stated least-certain call), and the
+   **reproduction gap** — §10a.2's twelve probes exist only in gitignored
+   `.temp/p24/*.py`, where `controls/*.py` is inside `source_sha256` precisely so
+   that cannot happen.
 2. **p01 and p08 still owe an in-contract spelling spread** — and after p05,
    what they owe is an *interval*, not a minimum. Do not let either publish a
    "floor"; four have been published across the project and four were refuted.
@@ -516,9 +537,24 @@ clean" from "sanitiser cannot see". Both are in `.memory/06-catalogue.md`.
 - **p05's `inputs/` holds ~189 MB of gitignored sweep blobs**, regenerable with
   `gen.py --sweep`. Left in place because `rm` outside `.temp/` stalls on review;
   delete by hand if the box gets tight (`df -h /`).
-- **p08's `inputs/` and `.temp/review014/` hold gitignored blobs too**; p08's dir
-  is ~33 MB, of which only the generators are tracked.
-- Commits run through the TASK_014_REVIEW landing. Tree clean.
+- **p08's `inputs/` holds gitignored blobs too** — ~33 MB, of which only the
+  generators are tracked.
+- **`.temp/` was swept 2026-08-18: 12 GB → 574 MB**, and the rule that produced
+  it is now `.memory/00-environment.md` constraint 6 (**keep the generator,
+  delete the artefact**) and `CLAUDE.md`'s Don't-1. What was deleted: 10,567
+  files — 6.4 GB of compiled cell binaries, 4.9 GB of generated `.bin` blobs,
+  0.2 GB of `.o`/`.pyc` — inventoried by path and size in
+  `.temp/CLEANUP-MANIFEST-2026-08-18.txt`. What was kept: every text artefact,
+  36 MB, which is what the evidence always was. Verified afterwards by
+  `harness/fixture.py --check`, which rebuilt the pilot fixture from source and
+  reproduced all six `md5_fn`/`md5_raw` pins and both identity levels — `PASS`,
+  so the sweep cost nothing. The rule generalises: an agent deletes **its own**
+  task's binaries when its gates are green and reports anything older to the
+  manager.
+- **The tree is NOT clean.** Commits run through the TASK_024 landing
+  (`.temp/p24` engineer, died to an API 529 after finishing its work and before
+  reporting; the manager reconstructed and committed it). **TASK_024 is
+  unreviewed** — see queue item 1.
 
 ## Decisions
 

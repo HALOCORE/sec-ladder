@@ -1745,14 +1745,23 @@ and none of them moved the coefficient.
    is that it had only respelled one rung: on the R3 side alone the span is
    `nrow + 7` (26 / 72, 21% / 18%), which is the figure this item replaces.
    ⚠ **"…and that makes p05's declaration the LOOSEST of the set" was written
-   here and is now FALSE, by the same correction applied to another pattern.**
-   It compared p05's *pair* interval against p16's **R3-side-only** span of
-   44% / 55% — the same one-rung mistake one paragraph up. TASK_023 respelled
-   p16's R4 (`R4ship − r4_hdr = 4·nrec`, zero residual on 24 blobs) and p16's
-   pair interval is **111% / 109%** of its published tax, *wider* than p05's
-   80% / 71%. p05's declaration is the loosest of those measured **on the R3
-   side**; on pairs it is not, and only two patterns have a pair interval at
-   all.
+   here and is FALSE.** It compared p05's *pair* interval against p16's
+   **R3-side-only** span of 44% / 55% — the same one-rung mistake one paragraph
+   up.
+
+   ⚠ **The replacement was withdrawn too, at TASK_024, and NOT re-pointed.**
+   TASK_023 substituted *"p16's pair interval is 111% / 109%, wider than p05's
+   80% / 71%"*. Both halves fail. p16's number is refuted — TASK_023_REVIEW
+   measured p16's pair interval at **−239…+236 (1759%) / −2449…+2244 (6095%)**,
+   with its bottom **negative on all 24 blobs**, because p16's declaration also
+   licenses **unrolling** and that lever is per byte where the two TASK_023
+   pulled are per record (`patterns/p16-tlv-walk/NOTES.md` §10a.2). And even
+   with the right number the comparison would be invalid: it puts a **2-lever**
+   p16 search beside p05's **46-spelling** one, which is the same "one interval
+   is not the other's peer" error, one level down, as the claim it replaced.
+   **Two intervals are comparable when the searches behind them are, and no two
+   searches on this project are.** No "which declaration is loosest" claim is
+   asserted anywhere; do not re-derive one from these numbers.
 4. **There is no measured minimum, and "best found" is not honest enough for
    this pattern.** Three values have been published here as the minimum and all
    three were overturned by the next search — `5·nrow + 6` (8 R4 spellings),

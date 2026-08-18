@@ -393,6 +393,44 @@ places and points at nothing. **Name the pattern, never the number.**
    shipped unsafe on all 24 points.** In contract, safe Rust is **−0.5625 Ir per
    byte**, not zero. **p16 is the second pattern after p17 where an admissible
    safe rung beats its own R4.**
+
+   ⚠ **CONTESTED — PROVISIONAL, NOT YET REVIEWED (TASK_024, landed 2026-08-18).**
+   The engineer sent to land the three paragraphs above measured against them and
+   came back with three corrections. They are written up in
+   `patterns/p16-tlv-walk/NOTES.md` §10a.2 with the disassembly, and they are
+   **not yet reviewed**, so this block records the disagreement rather than
+   picking a side. Do not quote either version as settled; quote §10a.2 and say
+   it is under review. The three:
+   - **`5 + 3/K` is not a law.** It is a three-point fit falsified by two more
+     points of its own family: `chunks_exact(4)` measures **6.50000** and
+     `chunks_exact(8)` **6.62500**, where the law says 5.75 and 5.375, and both
+     are **dearer** than the shipped rung — the family is not monotone in `K`.
+     Mechanism, from the disassembly: at `K ≤ 8` `try_into::<[u8;K]>()` lets LLVM
+     fold the byte loads into one word load plus extraction (7 insns for 4
+     bytes); at `K ≥ 16` it emits `K` direct `movzbl` and the body is `5K + 3`.
+     **The free parameter is the whole fold spelling, not `K`.**
+   - **"Zero per byte" is not sign-wrong; it is spelling-conditional.** Fold both
+     rungs the same way and the safe−unsafe slope is **0.00000** at all six
+     spellings measured, in three residue-matched bands — because the reslice and
+     the `get_unchecked` both sit *outside* the fold loop, so the chunk body is
+     the same instruction sequence (identical mnemonics at `K` 16/32/64) on both
+     sides. **−0.5625 is the difference between two *different* folds**, one of
+     which happens to sit on the safe side: a codegen difference, and attributing
+     it to safety breaks this file's own "attribute to a mechanism, never to a
+     comparison" rule. At matched spelling the **unsafe** rung is cheaper by
+     `2 + 5·nrec` on every point, as `inf(R4) ≤ inf(R3)` requires.
+   - **`51·nrec − 5` / `48·nrec − 5` is domained wrong.** The two measurements
+     are right and the *labels* are not: both are **fixed-`vlen` slices** (124 and
+     126), not residue classes — at `vlen` 56 and 88, both `≡ 0 (mod 4)` with
+     `nrec` 4, the difference is 31 and 115, not 199 — and extrapolated to `large`
+     the law predicts 475 against a measured **2365**. It must scale with `vlen`
+     because the effect is per byte. Same trap this file already records twice.
+
+   ⚠ **Reproduction gap, also unreviewed**: §10a.2's twelve probes exist only in
+   `.temp/p24/*.py`, which is gitignored scratch. `controls/*.py` is inside
+   `source_sha256` precisely so a control's reproduction path ships; p16's does
+   not yet contain them. Landing them re-runs the p16 gate.
+
    The shipped-pair figures below (+27/+77, "O(1) per call") describe the shipped
    pair and nothing wider.
    **Corrected at TASK_015_REVIEW: "O(1) per call" is residue-dependent.** The

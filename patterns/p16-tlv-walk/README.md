@@ -48,6 +48,33 @@ genuine O(n) tax and the safe-*tuned* rung does not.
 | the C bounds check (R1h − R1) | +17…+54 | ~4–6 Ir per record |
 | **wall clock, every rung** | **0** | latency-bound; all 16 `-O3` cells within 1.3% |
 
+**Read that table as the SHIPPED PAIR and nothing wider.** p16's declaration
+leaves the value fold's spelling free, by name — *"deliberately NOT restricted:
+… and unrolling"* — and the per-byte rate is a property of that spelling. The
+shipped rungs are 4×-unrolled by LLVM and run at **5.7500 Ir per folded byte**;
+an admissible safe rung using `chunks_exact(32)` runs at **5.09375**, and one
+using `chunks_exact(4)` at **6.50000**, *dearer* than shipped. So:
+
+- **against the shipped R4, the cheapest in-contract safe rung is `−199` at
+  `small` / `−2365` at `large`** — cheaper, on all 24 blobs. The published
+  `+19 / +45` "in-contract minimum" is refuted (`NOTES.md` §10a.2). p16 is the
+  second pattern after p17 where an admissible **safe** rung beats its own
+  shipped **unsafe** one;
+- **but at matched spelling the unsafe rung is cheaper on all nine blobs
+  measured**, by `2 + 5·nrec` (22 / 52), so this is a fact about the shipped
+  cell, not about the languages. `inf(R4) ≤ inf(R3)` holds by construction, and
+  it is measured here;
+- **and per byte the two are equal to five decimal places at every spelling
+  measured** — six folds, difference exactly `0.00000`, because the reslice and
+  the `get_unchecked` both sit *outside* the fold loop and the chunk body is the
+  same instruction sequence on both sides. The per-byte safety tax on p16 is
+  **zero**; what is not zero, and not a safety cost, is the difference between
+  two *different* folds.
+
+"Safe Rust costs zero per byte here" therefore stands **as a matched-spelling
+statement** and only as one. Quote a per-byte rate with the fold that produced
+it; difference two rates only between rungs that fold the same way.
+
 `NOTES.md` §3 is the decomposition that earns the right to say that, and it
 matters: the delta lives **entirely in the value fold** (changing only the fold
 removes 98–99% of it; changing only the walk removes 1.5%), and **more than half
