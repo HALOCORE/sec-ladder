@@ -1157,14 +1157,45 @@ Two consequences follow with them: at `nrec` 10 the in-contract span is
 `10 − (−32)` = **42** against `R3 − R4 = 77`, cheapest admissible **+45**; at
 `nrec` 4, **12** against 27, cheapest **+19**.
 
-⚠ **The 68 committed sweep blobs could NOT have tested this axis, and that is a
-shipped gap, not a solved one.** `inputs/gen.py`'s `SWEEP_BANDS` put both bands
-at `nrec` 2 and 4, so the committed sweep varies the *residue* and holds `nrec`
-almost fixed — the law above rests entirely on 22 inputs that live in
-`.temp/review018/in16/` and are not in the tree. Anybody re-deriving it must
-regenerate them. **p16 owes sweep inputs that move `nrec`**; until it ships
-them, the `nrec` laws are reproducible only by rebuilding the reviewer's
-generator run.
+**The `nrec` axis now ships, and the laws were re-derived from it (TASK_020).**
+As delivered this block carried a ⚠: the 68 committed sweep blobs could not have
+tested this axis at all, because `inputs/gen.py`'s two `SWEEP_BANDS` sit at
+`nrec` 4 and 2, so the committed sweep moved the *residue* and held `nrec`
+almost fixed. The law rested entirely on 22 inputs under `.temp/review018/in16/`
+that were not in the tree — the tree stated a law it could not reproduce, which
+is the shape of defect `nrec + 3` (§10 point 3) already cost this pattern once.
+
+TASK_020 added a **third band** to `inputs/gen.py`: `sweep-n{nrec}v{vlen}.bin`
+over `nrec ∈ {1…9, 12, 16}` × `vlen ∈ {124, 126}` — 22 blobs, nine *consecutive*
+`nrec` values plus two distant ones for lever arm, and **both** residue classes,
+because `R3ship − R4ship` is the one law of the four that is residue-dependent
+and a single class would silently turn it back into a fit. Appending the band
+leaves all 68 earlier `sweep-v*.bin` **byte-identical** (the RNG is drawn
+sequentially and the new band is drawn last; verified by md5 over all 73 files
+before and after). The blobs are gitignored like every other input; the
+generator is what is committed.
+
+Re-measured on those blobs, `-O3 isolated`, `n_iters` 100→200, one session
+(`.temp/p20/p16nrec.log`) — **zero residual on all 22 points, on all four
+laws**:
+
+| difference | law | residual over the 22 committed-generator points |
+|---|---|---|
+| `R3ship − R4ship` | `7 + 5·nrec` (`vlen ≡ 0 mod 4`) / `7 + 7·nrec` | **0** |
+| `R3ship − r3_endslice` | `2·nrec − 2` | **0** |
+| `R3ship − r3_window` | `4·nrec − 8` | **0** |
+| `r3_hdrarray − R3ship` | `nrec` | **0** |
+
+The first row is the clean one: both binaries come from the same build. The
+other three use the TASK_018 variant binaries under `.temp/p18/`, built in an
+earlier session — §10b says a marginal is exact only within a build, so those
+three rows carried a cross-build risk and it did not materialise; every
+difference is the same exact integer the reviewer measured.
+
+⚠ Residual gap, smaller than the one it replaces: the *variants* are still
+uncommitted, so rows 2–4 remain reproducible only by rebuilding
+`.temp/p18/v16/`. What now ships is the **input axis**, which is what made row 1
+— the law over the two cells p16 actually publishes — underivable from the tree.
 
 **What this establishes.**
 

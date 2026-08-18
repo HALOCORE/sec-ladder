@@ -377,6 +377,29 @@ is a real hazard and this box cannot demonstrate its cost. Also:
 `split_at_checked` consumes the slice with **no `div` and is 4 Ir cheaper
 still**, so the defect belongs to one spelling, not to the consuming idiom.
 
+**The two terms, settled at TASK_020.**
+
+1. **Environment length, within one build: ≈ 0.10 Ir/call.** Three independent
+   probes agree (21 pad lengths at TASK_020: min 7292.12, max 7292.22, and
+   identical to TASK_019 at all six shared pads). It is **scatter, not trend** —
+   pads 4…64 are byte-identical and the steps do not order with length.
+2. **The build itself moves the level.** Same source, two build paths,
+   **byte-identical kernel** (`md5_fn e207ec6c…`, `kernel` self-cost 9783.00 in
+   both) → p02 `large` marginal 10210.82 vs 10210.84. The whole delta is inside
+   libc's AVX `memmove`: 64 bytes of path length change the heap alignment.
+
+Union over five probes: **7292.10 … 7292.30, i.e. 0.20** on p08 `small`.
+
+**Two retractions, both landed by tasks that were correcting each other.**
+TASK_017 said ≤0.08. TASK_019 then read TASK_018_REVIEW as saying *both*
+endpoints of `7292.14 … 7292.30` were unreproduced, concluded "~0.1", and put it
+in p01's **hashed** `collapse.note`. Both endpoints were in fact reproduced —
+they are TASK_017_REVIEW's five measured points, committed at
+`patterns/p08-overlap-move/NOTES.md:192`. **`check.py`'s original "about 0.2" was
+right the whole time.** The lesson is the file's own: a marginal `Ir`/call is
+exact only **within one build and one session**, and a number re-derived from a
+prior task's prose rather than from a measurement inherits its errors.
+
 Rule: **a spelling whose win is one instruction wide cannot be quoted on `Ir`
 alone, and this box cannot supply the wall-clock column to rescue it** — say the
 win is instruction-count-only and stop. A constant chunk size is a different
@@ -452,10 +475,8 @@ It threatens **no published p08 number** — `R1h − R1 = 0.00` measured exactl
 
 Consequence for gate hygiene: **"every `marginal_ir_per_call` cell unchanged" is
 a valid *within-session* invariant (96/96 across three p08 runs) and NOT a valid
-cross-session one** — 12 of p08's 64 cells move, with an observed spread of
-**0.18 Ir/call** (TASK_017 reported ≤0.08; TASK_017_REVIEW measured wider). The
-drift is **not periodic and not monotone** in the pad length: pads 4–36 are
-byte-identical and the step falls at 40. Do not read
+cross-session one**. **There are TWO non-cancelling terms, and separating them
+took four tasks and two wrong numbers** — see the box below. Do not read
 such a drift as a code change, and do not quote p08's marginals to more
 precision than that.
 

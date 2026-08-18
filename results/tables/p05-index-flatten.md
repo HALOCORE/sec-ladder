@@ -40,6 +40,13 @@ Every delta below is a difference between rungs that are meant to be spellings o
 > The gate checks that this declaration is **present** and hashes it into `contract_sha256`. It never checks that a rung honours it — that check would have to be textual and would fail open, and the threat model is honest mistake, not malicious author. TASK_016_REVIEW forked p05 with a **forbidden** R3 and got a complete green run with an unchanged `contract_sha256`. So this section is a claim about intent that a reader must check against the rung sources, not a verified property of the numbers below.
 
 
+### Spelling audit (stage `0b`, reporting only)
+
+Measured by the gate, not by this file — from `results/gate/p05-index-flatten.json`, contract `55aa62ca0024`.
+
+This declaration backticks **no spelling at all**, so the named-spelling standard's own trigger never fires on this pattern and there is nothing to audit. Its rungs are matched by the entries' English alone.
+
+
 ## Static + executed instructions
 
 `Ir` is **callgrind per-function exclusive** for the kernel symbol. The whole-program total is deliberately absent: it moves with the size of the environment block and does not reproduce across shells (`.memory/03-measurement.md`). Static counts are given raw and padding-excluded; quote the padding-excluded one, and never quote either without the `Ir` beside it.

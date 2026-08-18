@@ -237,9 +237,12 @@ Method: marginal Ir per kernel call = whole-program Ir at `n_iters=200` minus at
 two runs of the same binary, so the one-shot loader terms cancel and it is
 symbol-independent. `.temp/p05/sweep_ir.py`. **"every loader and environment
 term cancels" is false** and this line used to say it (TASK_019, from
-TASK_018_REVIEW M3): the environment block is worth ~0.1 Ir/call on p08
-(measured over six environment lengths at TASK_019), and heap alignment ~0.02
-on p02, with the kernel's own self-cost identical in both cases. Every
+TASK_018_REVIEW M3): the environment block is worth ~0.1 Ir/call on p08 *within
+one build* (six environment lengths at TASK_019, 21 at TASK_020, both
+7292.12 … 7292.22), and heap alignment ~0.02 on p02, with the kernel's own
+self-cost identical in both cases. Across *builds* the level itself moves —
+p08's cross-session union is 7292.10 … 7292.30 = 0.20 (TASK_020) — so the
+figure to carry is ~0.1 within a build and ~0.2 across sessions. Every
 delta below is a within-session difference, which is where the method is
 exact; see `patterns/p01-array-sum/spec.md`'s `collapse.note`.
 

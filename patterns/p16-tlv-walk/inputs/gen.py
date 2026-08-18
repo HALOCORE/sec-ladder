@@ -136,6 +136,39 @@ SWEEP_CYCLES = 2
 SWEEP_BANDS = ((56, RESIDUE_MODULI[-1] * SWEEP_CYCLES + 2, 4, 32, 25_000),
                (2040, RESIDUE_MODULI[-1] * SWEEP_CYCLES + 2, 2, 16, 5_000))
 
+# The THIRD band, and it sweeps a different axis: `nrec`, the number of records
+# per window, with the value length held fixed. Added at TASK_020.
+#
+# Both bands above sit at `nrec` 4 and 2, so between them the committed
+# generator moves the *residue* and holds `nrec` essentially fixed. NOTES.md
+# 10a's load-bearing statement is the opposite shape -- four laws linear in
+# `nrec` (`2*nrec - 2`, `4*nrec - 8`, `nrec`, and `7 + 5*nrec` / `7 + 7*nrec`),
+# promoted from a three-point fit to a swept law at TASK_018_REVIEW over inputs
+# that were never committed. So the tree could state the law and not reproduce
+# it, which is the shape of defect `nrec + 3` already cost this pattern once.
+#
+# Two decisions worth defending:
+#
+#   * **the `nrec` values are not consecutive** -- 1..9, then 12 and 16. Every
+#     law here is claimed to be affine in `nrec`, and 1..9 is nine consecutive
+#     points, which is what tests that; 12 and 16 are the lever arm that
+#     separates an affine law from a low-order polynomial fitted to a short run.
+#     The `+3` failure was a three-point fit, and nine consecutive points plus
+#     two distant ones is a different object.
+#   * **both residue classes ship**, 22 blobs rather than 11, because the fourth
+#     law is the only one that is residue-dependent (`7 + 5*nrec` at
+#     `vlen == 0 mod 4` against `7 + 7*nrec` otherwise). One class reproduces
+#     three of the four laws and silently turns the fourth into a fit. 124 and
+#     126 are the two classes NOTES.md 10a used, and 124 is `small`'s own value
+#     length, so one column of the band is directly comparable with the matrix.
+#
+# This band is appended AFTER the two above and the RNG is drawn sequentially,
+# so every `sweep-v*.bin` the earlier bands emit is byte-identical to before.
+SWEEP_NRECS = (1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 16)
+SWEEP_NREC_VLENS = (124, 126)      # 0 and 2 mod 4 -- NOTES.md 10a's two classes
+SWEEP_NREC_WINS = 16
+SWEEP_NREC_ITERS = 5_000
+
 
 def write(name, n_iters, stride, body, declared_len=None):
     payload = slb.pack_head1_bytes(stride, body)
@@ -218,6 +251,14 @@ def main():
             for vl in range(first, first + n):
                 write(f"sweep-v{vl}.bin", iters, recs * (3 + vl),
                       tiled(rng, nwin, recs, vl))
+        # The `nrec` axis (TASK_020). Same `write`, same `tiled`, same tiling
+        # rule -- records fill each window exactly, so `work_per_call = stride`
+        # keeps erring strict here as it does everywhere else in this file.
+        print("  -- sweep over nrec (NOTES.md 10a's axis)")
+        for vl in SWEEP_NREC_VLENS:
+            for nr in SWEEP_NRECS:
+                write(f"sweep-n{nr}v{vl}.bin", SWEEP_NREC_ITERS,
+                      nr * (3 + vl), tiled(rng, SWEEP_NREC_WINS, nr, vl))
     return 0
 
 

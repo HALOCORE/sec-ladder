@@ -93,6 +93,34 @@ invariant matching a `forbidden` entry is the pin having **no notion of what cod
 runs**. Three of four repairs are about how the declaration is *read*, and
 provenance cannot license them. Worse, provenance is **unfalsifiable**.
 
+**The audit is reproducible from the tree since TASK_020** — `check.idiom_audit`,
+stage `0b`, reporting-only and never-failing, its count in all six gate records
+and rendered by `report.py` with a **STALE** banner when `spec.md` no longer
+hashes to the record. But it splits into a decidable half and an undecidable one,
+and the file must not imply otherwise:
+
+- **`forbidden` is decidable and reports a verdict: 0 hits on all six.** That is
+  the reproducible core of "0 of 82". Raw substring matching gives **5** — two
+  hardened-C files quoting their own forbidden spelling in the comment explaining
+  why they avoid it, p16's *ghost* loop invariant, and two p17 comment/format
+  strings — so the 0 is a property of the **matching rule** (blank comments and
+  string literals, blank Verus ghost clauses, delete whitespace), not of the
+  text.
+- **`required` is NOT decidable, and the manager's prescription to audit it
+  universally was refuted by measurement.** Applying every entry to every rung of
+  its declared languages gives **41 misses over 158 obligations — all 41
+  non-defects** (18 backticked prose like a filename or the word "why", 17 spans
+  quoted *in order to be absent*, 6 scoped by the entry's English). Worse, it
+  inverts: **9 of the 117 "matches" match for the wrong reason** — p02's `|`
+  matching the `||` of a guard, p08's `&` matching `&mut` — so the naive rule
+  contradicts the declaration it audits. `required` therefore reports
+  **presence in two buckets with no verdict**, which is the smallest thing that
+  works.
+- **`pins_nothing` is the useful signal**: an entry that matches *no* rung of a
+  language it declares is a bug in the **ruler**. It ran 16 → 11 across
+  TASK_019's repair, and the five that vanished are exactly the ellipsis and
+  p02's single-string entry.
+
 Use **direction**, which is a number: *an edit that **shrinks** the admissible
 class and **lowers or does not raise** the pattern's own published figure is not
 self-certification.* Both landed edits pass it measurably — p16's exclusion makes

@@ -114,11 +114,20 @@ one-shot loader terms cancel, and it needs no symbol, which is why it works in
 **"every loader and environment term cancels" is what this paragraph used to
 say, and it is false** (corrected at TASK_019, from TASK_018_REVIEW M3). Two
 terms survive the difference: the *environment block*, worth about **0.1**
-Ir/call on p08 — one binary, one input, only the environment's length varying,
-six lengths each: 7292.12 … 7292.22 on `small` and 29037.52 … 29037.62 on
-`large` (TASK_019), with TASK_018_REVIEW's five `small` points extending the
-union to 7292.10 … 7292.22 — and *heap alignment*, which is not the environment
-at all
+Ir/call on p08 *within one build* — one binary, one input, only the
+environment's length varying: 7292.12 … 7292.22 on `small` over six lengths
+(TASK_019) and over 21 lengths 0…900 (TASK_020), 29037.52 … 29037.62 on `large`
+(TASK_019), with TASK_018_REVIEW's five `small` points extending the union to
+7292.10 … 7292.22 — and *the build itself*, which is not the environment at all
+and is the larger half: a **different** build of the same p08 source measured
+7292.14 … 7292.30 (TASK_017_REVIEW, `patterns/p08-overlap-move/NOTES.md` 2b), an
+interval that does not overlap the current build's maximum, so the union over
+all five probes is 7292.10 … 7292.30 = **0.20**. ⚠ TASK_019 wrote here and in
+`spec.md`'s hashed note that neither endpoint of check.py's `7292.14 … 7292.30`
+had been reproduced; that is **wrong and retracted at TASK_020** — both are
+TASK_017_REVIEW's measured points, and TASK_018_REVIEW m3 flagged only the lower
+one while calling the "about 0.2" headline right. The build-shift mechanism is
+*heap alignment*
 — p02's shipped R3 built at two different paths measures 10210.82 and 10210.84
 on `large` with a byte-identical kernel, and per-function callgrind puts the
 whole 0.02 inside glibc's AVX memmove while the kernel's own self-cost is

@@ -21,6 +21,7 @@ Everything here is regenerable; the JSON is the record. Three rules from
 """
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -172,6 +173,104 @@ def idiom_section(doc, out):
                "unchanged `contract_sha256`. So this section is a claim about intent "
                "that a reader must check against the rung sources, not a verified "
                "property of the numbers below.\n")
+    audit_section(doc, out)
+
+
+def read_gate_audit(pattern):
+    """The stage-0b spelling audit out of `results/gate/<pattern>.json`.
+
+    Deliberately NOT recomputed here, unlike `read_idiom` above, and the two
+    rules are opposite for a reason. The *declaration* must be shown as it
+    stands today, because it is a claim about intent. The *audit* is a
+    measurement, and a measurement a report recomputes for itself is a report
+    that can disagree with the artefact it claims to describe -- so this reads
+    the committed gate record and prints its `contract_sha256` beside the
+    numbers.
+
+    Returns `(audit, stale)`. `stale` is True when the gate record's
+    `contract_sha256` no longer matches the block in `spec.md`, i.e. the
+    declaration moved since the last gate run and the audit below describes the
+    old one. Returns `(None, False)` when there is no record or no audit in it
+    -- a record written before TASK_020 has neither, and that is not an error."""
+    path = os.path.join(RESULTS, "gate", f"{pattern}.json")
+    try:
+        rec = json.load(open(path))
+    except (OSError, ValueError):
+        return None, False
+    au = rec.get("idiom_audit")
+    if not isinstance(au, dict):
+        return None, False
+    spec = os.path.join(REPO, "patterns", pattern, "spec.md")
+    try:
+        m = re.search(r"```slb-contract\s*\n(.*?)```", open(spec).read(), re.S)
+    except OSError:
+        return au, False
+    stale = bool(m) and (hashlib.sha256(m.group(1).encode()).hexdigest()
+                         != rec.get("contract_sha256"))
+    return dict(au, _sha=rec.get("contract_sha256")), stale
+
+
+def audit_section(doc, out):
+    """The stage-0b spelling audit, out of the gate record (TASK_020).
+
+    Reporting only — it cannot fail the gate, and this section must not read as
+    though it had. It is here because the declaration above is otherwise
+    unfalsifiable from `results/` alone: TASK_019 measured 20 raw / 15
+    comment-stripped / 9 normalised violations of these six declarations and
+    repaired them to 0, and that audit lived in a scratch file nobody committed.
+
+    `forbidden` is the only half with a verdict, because its scope is universal
+    by the key's own meaning. The `required` numbers are presence, not
+    compliance: which rungs an entry applies to lives in its English, and
+    asserting otherwise was measured to give 41 misses of which 41 were
+    non-defects (`check.idiom_audit`)."""
+    au, stale = read_gate_audit(doc["pattern"])
+    if not isinstance(au, dict):
+        return
+    out.append("\n### Spelling audit (stage `0b`, reporting only)\n")
+    out.append(f"Measured by the gate, not by this file — from "
+               f"`results/gate/{doc['pattern']}.json`, contract "
+               f"`{str(au.get('_sha'))[:12]}`.\n")
+    if stale:
+        out.append("> ⚠ **STALE.** The `slb-contract` block in `spec.md` no "
+                   "longer hashes to the gate record's `contract_sha256`, so "
+                   "the declaration above and the audit below are describing "
+                   "**different** declarations. Re-run `harness/check.py` for "
+                   "this pattern before reading these numbers.\n")
+    if not au.get("spellings"):
+        out.append("This declaration backticks **no spelling at all**, so the "
+                   "named-spelling standard's own trigger never fires on this "
+                   "pattern and there is nothing to audit. Its rungs are "
+                   "matched by the entries' English alone.\n")
+        return
+    out.append(f"`{au['spellings']}` backticked spelling(s) over "
+               f"`{au['rungs']}` rung(s) → **{au['pairs']}** (spelling, rung) "
+               f"pair(s), **{au['present']}** present — not the product, "
+               f"because a per-language entry is read against its own "
+               f"language's rungs only. Matching is "
+               f"`check.spelling_matches`: comments, string literals and Verus "
+               f"ghost clauses blanked, then all whitespace deleted.\n")
+    out.append(f"- **FORBIDDEN — {au['forbidden_hits']} hit(s)** of "
+               f"{au['forbidden_spellings']} spelling(s). *Decidable*: no rung "
+               f"may spell a forbidden token, in any language the entry names, "
+               f"so this number needs no reading of the entry's English. It is "
+               f"the only number here that a non-zero makes wrong.")
+    for h in au.get("hits") or []:
+        out.append(f"  - `{h['spelling']}` — **{h['rung']}** ({h['lang']})")
+    out.append(f"- **required — {au['required_pins_nothing']} spelling(s) pin "
+               f"nothing**, {au['required_absent']} scoped-absent pair(s). "
+               f"*Not decidable*, and **a non-zero here is normal**: a "
+               f"`required` entry may quote a span in order to say it is "
+               f"absent, may quote a file name or a digest, and may scope "
+               f"itself to some rungs in prose (\"R1 omits only …\"). Read each "
+               f"line against the entry above it.")
+    for p in au.get("pins_nothing") or []:
+        out.append(f"  - pins nothing — `{p['spelling']}` "
+                   f"({p['entry']}, {p['lang']}, 0 of {p['of_rungs']} rungs)")
+    for x in au.get("absent") or []:
+        out.append(f"  - absent — `{x['spelling']}` "
+                   f"({x['entry']}, {x['lang']}, **{x['rung']}**)")
+    out.append("")
 
 
 def main_table(doc, opt, mode, out):

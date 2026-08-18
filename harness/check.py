@@ -31,7 +31,13 @@ What it enforces, in order:
      a forbidden respelling passes this gate (proved by experiment,
      TASK_016_REVIEW B1). An entry may be a plain string or an object keyed by
      language (TASK_019); `spelling_matches` below DEFINES what matching one
-     means, and is selftested at stage 0 rather than run against any rung
+     means. TASK_020 adds a REPORTING-ONLY audit here -- where every backticked
+     spelling is and is not, across every rung of the languages it declares,
+     printed and written to `results/gate/*.json`. It never fails and never
+     enters the verdict; it exists so TASK_019's "0 of 82" is reproducible from
+     the committed tree instead of from a scratch file. `forbidden` carries a
+     verdict (its scope is universal by the key's own meaning); the `required`
+     numbers are presence, not compliance -- see `idiom_audit`
   1  every cell of the matrix builds (and under `--no-build`, that no binary
      predates the newest source)
   2  every cell prints the checksum the pattern's own `model.py` predicts. The
@@ -547,6 +553,10 @@ def check_selftests(rep):
         if got != want:
             rep.fail("spelling-selftest",
                      f"spelling_matches: {label}: got {got}, want {want}")
+    for label, got, want in _AUDIT_CASES:
+        if got != want:
+            rep.fail("audit-selftest",
+                     f"idiom_audit: {label}: got {got}, want {want}")
 
 
 # ==========================================================================
@@ -792,13 +802,157 @@ def idiom_lines(contract, keys=("required", "forbidden"), why=True):
     return out
 
 
-def check_idiom(rep, contract):
+#: A backticked span inside an entry, which is what the standard's own trigger
+#: names: "where a `required` entry quotes an expression **in backticks** it
+#: pins THAT SPELLING".
+_TICK = re.compile(r"`([^`]+)`")
+
+
+def rung_sources(pdir):
+    """`[(relpath, language)]` for every rung source this pattern ships.
+
+    Derived from `build.py`'s cell tables, not from a list here, so a pattern
+    that ships no `c/kernel_hardened.c` or no `safe_naive_verus.rs` reports on
+    what it has -- the same "presence of the file is the whole switch" rule
+    `build.all_cells` follows."""
+    out = [(os.path.join("c", "kernel.c"), "c")]
+    if buildmod.has_hardened(pdir):
+        out.append((buildmod.HARDENED_KERNEL, "c"))
+    for cell in buildmod.MEASURED_CELLS + buildmod.CONTROL_CELLS:
+        rel = buildmod.RUST_SRC.get(cell)
+        if rel and os.path.exists(os.path.join(pdir, rel)):
+            out.append((rel, "rust"))
+    return [(r, l) for r, l in out if os.path.exists(os.path.join(pdir, r))]
+
+
+def idiom_audit(contract, rungs):
+    """REPORTING ONLY. Where each declared spelling is, and is not, in the tree.
+
+    `rungs` is `[(relpath, language, source_text)]`. Never fails, never blocks,
+    never touches the verdict -- it is an observation printed into the record so
+    that a reviewer can read it, and so that `results/gate/*.json` carries a
+    number whose movement a diff shows.
+
+    **Why this exists.** TASK_019 audited all six declarations against every
+    rung and found **20 raw / 15 comment-stripped / 9 normalised violations of
+    78 obligations**, then repaired them to 0 of 82. That audit lived in a
+    hand-transcribed table in a gitignored scratch file, so "0 of 82" was a
+    claim nothing in the tree reproduced -- the self-certifying-pin trap, one
+    level up. "Could this happen by accident?" is answered by the twenty.
+
+    **Why `forbidden` gets a verdict and `required` does not.** This is the one
+    asymmetry that makes the line readable, and it is measured rather than
+    chosen. `forbidden`'s scope is universal by the key's own meaning: no rung
+    may spell it, in any language it declares, so `forbidden_hits` is decidable
+    with no English involved -- and it has teeth, because on the shipped tree
+    raw substring matching gives **5** hits and `spelling_matches` gives **0**;
+    the five are two hardened-C comments quoting the spelling they refuse,
+    p16's verus.rs GHOST loop invariant, and p17's `Range:` inside a comment and
+    a format string. That 0 is the reproducible core of TASK_019's number.
+
+    `required` has no such scope. Which rungs an entry applies to lives in its
+    English -- "R1 has no fit check at all", "R1 omits only `&& start >= 0`" --
+    and TASK_020 measured what happens if you ignore that and assert every
+    backticked span in every rung of the declared languages: **41 misses out of
+    158 obligations, and all 41 are non-defects** (the tree was at 0 violations
+    when it was measured). Worse than noise, 17 of the 41 are ANTI-signal: a
+    `required` entry may quote a span in order to say it is ABSENT --
+    p08's "written `%` and not `&`", p17's "not two `continue`s", p02's "with
+    `+`, not `|`" -- and for those the verdict inverts. The naive line prints
+    `&` as a MISS on p08's two C rungs, which are the rungs that are right, and
+    counts it MATCHED on the four Rust rungs where every hit is a reference
+    sigil; **9 of its 117 "matched" are matched for the exactly wrong reason**
+    (p02's `|` in `c/kernel_hardened.c` and all four Rust rungs -- it is in the
+    `||` of the guard -- plus p08's `&` in four). So `required` is reported as
+    PRESENCE, in two shapes, and the reader judges against the entry beside it:
+
+      * `pins_nothing` -- present in **no** rung of a language it declares.
+        This is the class that carries real defects, and it catches both ruler
+        bugs TASK_019 found: run against the pre-repair declarations at
+        `9e2f9f6`, p17's ellipsis `if start < end && start >= 0 { ... }` pins
+        nothing in either language, and p02's single-string `required[0]` pins
+        nothing on Rust in three of its spellings -- exactly the per-language
+        defect the repair fixed. The count moved **16 -> 11** across it.
+      * `absent` -- present in some rungs of that language and not others, i.e.
+        the entry is scoped and the reader should check the scope.
+
+    The 11 residual `pins_nothing` on the shipped tree are all expected, and
+    they split 6/5: **six** are prose references that happen to be backticked
+    (`c/kernel.c`, `adversarial-overrun.bin` twice, `md5_fn e207ec6c8697...`,
+    and the word `why` twice) and **five** are spans quoted in order to be
+    absent (`src_len`, `dst_cap`, `&`, `continue` twice). **A non-zero here is
+    normal**; what is worth reading is a change."""
+    langs = sorted({l for _, l, _ in rungs})
+    text = {(r, l): s for r, l, s in rungs}
+    n_sp = n_pair = n_present = n_forb_sp = 0
+    pins_nothing, absent, hits = [], [], []
+    for key in ("required", "forbidden"):
+        for i, e in enumerate(contract.get("idiom", {}).get(key) or []):
+            per = ({l: e for l in langs} if isinstance(e, str)
+                   else {l: v for l, v in e.items() if l in langs})
+            for lang in sorted(per):
+                for tok in _TICK.findall(per[lang]):
+                    here = [r for r, l in sorted(text) if l == lang]
+                    on = [r for r in here
+                          if spelling_matches(tok, text[(r, lang)])]
+                    off = [r for r in here if r not in on]
+                    n_sp += 1
+                    n_pair += len(here)
+                    n_present += len(on)
+                    row = {"entry": f"{key}[{i}]", "lang": lang,
+                           "spelling": tok}
+                    if key == "forbidden":
+                        n_forb_sp += 1
+                        for r in on:
+                            hits.append(dict(row, rung=r))
+                    elif not on:
+                        pins_nothing.append(dict(row, of_rungs=len(here)))
+                    else:
+                        for r in off:
+                            absent.append(dict(row, rung=r))
+    return {"spellings": n_sp, "rungs": len(rungs), "pairs": n_pair,
+            "present": n_present,
+            "forbidden_spellings": n_forb_sp, "forbidden_hits": len(hits),
+            "hits": hits,
+            "required_pins_nothing": len(pins_nothing),
+            "pins_nothing": pins_nothing,
+            "required_absent": len(absent), "absent": absent}
+
+
+def idiom_audit_lines(au):
+    """The audit as text for the verdict. Data, not a diagnostic: no `FAIL`, no
+    `!!`, and every list is printed in full so a miss travels with its reason."""
+    # NOT `spellings x rungs`: a per-language entry is read against its own
+    # language's rungs only, so the product is not the pair count.
+    out = [f"    audit  {au['spellings']} backticked spelling(s) over "
+           f"{au['rungs']} rung(s) -> {au['pairs']} (spelling, rung) pair(s), "
+           f"{au['present']} present  [reporting only -- never fails]",
+           f"    audit  forbidden: {au['forbidden_spellings']} spelling(s), "
+           f"{au['forbidden_hits']} hit(s)  "
+           f"(decidable: no rung may spell a forbidden token)",
+           f"    audit  required : {au['required_pins_nothing']} pin nothing, "
+           f"{au['required_absent']} scoped-absent pair(s)  "
+           f"(NOT decidable -- an entry's rung scope is its English; a "
+           f"non-zero here is normal, read it against the entry)"]
+    for h in au["hits"]:
+        out.append(f"    audit    FORBIDDEN HIT {h['entry']:<13}{h['lang']:<5}"
+                   f"{h['rung']:<22}`{h['spelling']}`")
+    for p in au["pins_nothing"]:
+        out.append(f"    audit    pins nothing  {p['entry']:<13}{p['lang']:<5}"
+                   f"0 of {p['of_rungs']} rung(s){'':<9}`{p['spelling']}`")
+    for x in au["absent"]:
+        out.append(f"    audit    absent        {x['entry']:<13}{x['lang']:<5}"
+                   f"{x['rung']:<22}`{x['spelling']}`")
+    return out
+
+
+def check_idiom(rep, pdir, contract):
     head("0b. the pattern declares the idiom its rungs implement")
     probs = idiom_problems(contract)
     for p in probs:
         rep.fail("idiom", p)
     if probs:
-        return
+        return None
     idi = contract["idiom"]
     nreq, nforb = len(idi["required"]), len(idi.get("forbidden") or [])
     nlang = sum(1 for k in ("required", "forbidden")
@@ -812,6 +966,25 @@ def check_idiom(rep, contract):
                            "rungs are matched only by the `required` list and "
                            "its safety number is a spelling's number unless "
                            f"`why` argues otherwise: {idi['why']}")
+    # The reporting line (TASK_020). Never fails, never blocks, never shouts --
+    # `rep.ok` and plain prints, because this is data. `idiom_audit`'s docstring
+    # says why `forbidden` carries a verdict and `required` does not.
+    rungs = [(r, l, open(os.path.join(pdir, r)).read())
+             for r, l in rung_sources(pdir)]
+    au = idiom_audit(contract, rungs)
+    if au["spellings"] == 0:
+        rep.ok("idiom spelling audit: this declaration backticks NO spelling, "
+               "so the named-spelling standard's own trigger never fires here "
+               "and there is nothing for the audit to report. Its rungs are "
+               "matched by the entries' English alone (TASK_019, TASK_020).")
+    else:
+        rep.ok("idiom spelling audit follows -- REPORTING ONLY. It cannot fail "
+               "the gate and does not enter the verdict; it exists so that "
+               "TASK_019's '0 of 82' is reproducible from the committed tree "
+               "rather than from a scratch file.")
+        for ln in idiom_audit_lines(au):
+            print(ln)
+    return au
 
 
 _IDIOM_CASES = [
@@ -903,6 +1076,56 @@ _MATCH_CASES = [
      spelling_matches("end - p >= 3",
                       "while end - p >= 3\n    invariant end - p >= 0,\n"
                       "{\n    p = p + 1;\n}\n"), True),
+]
+
+#: `idiom_audit` selftests (TASK_020). Synthetic two-rung patterns, one per
+#: shape the shipped declarations actually contain, so the reporting line's
+#: three buckets are pinned in code and inside `source_sha256`.
+_AUD_RUNGS = [("c/kernel.c", "c", "if (len > cap - 2) return 0;\n"),
+              ("c/kernel_hardened.c", "c",
+               "/* not `2 + len > cap` */\nif (len > cap - 2) return 0;\n"),
+              ("safe_tuned.rs", "rust", "if len > cap - 2 { return 0; }\n"),
+              ("verus.rs", "rust",
+               "while i < n\n    invariant 2 + len > cap,\n{\n    i = i + 1;\n}\n"
+               "if len > cap - 2 { return 0; }\n")]
+
+
+def _aud(req, forb=()):
+    return idiom_audit({"idiom": {"required": list(req),
+                                  "forbidden": list(forb), "why": "w"}},
+                       _AUD_RUNGS)
+
+
+_AUDIT_CASES = [
+    # No backticks anywhere -> the standard's trigger never fires. This is p01
+    # and p05 as shipped, and the line must say so rather than print "0 of 0".
+    ("an entry with no backticks pins nothing and reports nothing",
+     _aud(["the fit check is subtraction-first"])["spellings"], 0),
+    # A plain-string entry is read once per language, against that language's
+    # rungs only: 2 spellings, 2 C pairs + 2 Rust pairs.
+    ("a spelling every rung has is present everywhere and prints no row",
+     [_aud(["`len > cap - 2`"])[k]
+      for k in ("spellings", "pairs", "present", "required_pins_nothing",
+                "required_absent")], [2, 4, 4, 0, 0]),
+    # p17's ellipsis: `if start < end && start >= 0 { ... }` matched no rung in
+    # any language, and this is the bucket that would have printed it.
+    ("a spelling no rung has PINS NOTHING, once per language",
+     [_aud(["`if (len > cap) { ... }`"])[k]
+      for k in ("required_pins_nothing", "required_absent")], [2, 0]),
+    # p02/p16/p17's shape: the entry's English scopes it to some rungs.
+    ("a spelling only one rung has is scoped-absent, not pins-nothing",
+     [_aud([{"c": "`return 0;`", "rust": "`while i < n`"}])[k]
+      for k in ("required_pins_nothing", "required_absent")], [0, 1]),
+    # forbidden is decidable: universal by the key's own meaning.
+    ("a forbidden spelling nobody uses is 0 hits",
+     _aud(["`len > cap - 2`"], ["`2 + len > cap`"])["forbidden_hits"], 0),
+    # ...and it is 0 only because of the matching rule. Both of the two rungs
+    # that contain the token contain it as a comment / as a ghost invariant --
+    # p02+p16's hardened C and p16's verus.rs, exactly.
+    ("a forbidden spelling in exec code IS a hit",
+     _aud(["`len > cap - 2`"], ["`len > cap - 2`"])["forbidden_hits"], 4),
+    ("a per-language entry pins only its own language's rungs",
+     _aud([{"c": "`return 0;`"}])["pairs"], 2),
 ]
 
 
@@ -1075,14 +1298,33 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
 
     **The loader and environment terms cancel to about 0.2 Ir/call, not
     exactly** -- corrected at TASK_018 from TASK_017's own p08 measurement
-    (`patterns/p08-overlap-move/NOTES.md` 2b, `.memory/03-measurement.md`).
-    Changing only the length of the environment block moves p08's
-    `unsafe/O3/whole/small.bin` marginal over **7292.14 … 7292.30**, a spread of
-    **0.18**, non-periodic and non-monotone in the pad length, with 100% of the
-    drift inside one glibc `memmove` whose alignment-dependent tail changes by
-    ~0.04 Ir/iteration. It is a real between-session term, it is bounded and
-    small, and it threatens no published number (p08's tightest, `R1h - R1 =
-    0.00`, measured exactly 0.00 in 12 configurations). Two consequences: quote
+    (`patterns/p08-overlap-move/NOTES.md` 2b, `.memory/03-measurement.md`), and
+    requoted at TASK_020, where the interval this paragraph used to give
+    (`7292.14 … 7292.30`) was believed to have no reproduced endpoint. **It has
+    two, and the 0.2 headline is right** -- but for a reason the interval alone
+    does not say, so state the reason:
+
+      * **within one build**, changing only the length of the environment block
+        moves p08's `unsafe/O3/whole/small.bin` marginal by about **0.10**, and
+        three probes agree: 21 pad lengths 0…900 at TASK_020 give
+        7292.12 … 7292.22, six lengths at TASK_019 give 7292.12 … 7292.22, five
+        at TASK_018_REVIEW give 7292.10 … 7292.22. Non-periodic and non-monotone
+        in the pad length -- it is SCATTER, not a trend.
+      * **across builds the level itself moves**, and that is the larger half.
+        TASK_017 and TASK_017_REVIEW probed a *different* build of the same
+        source and got 7292.14 … 7292.30 (five points, recorded at
+        `patterns/p08-overlap-move/NOTES.md` 2b) -- an interval that does not
+        even overlap the current build's maximum. This is the p02 mechanism
+        (NOTES 10b): two binaries of different size land their buffers at
+        different alignments, so glibc's `memmove` takes a different path while
+        the kernel's own self-cost is identical.
+
+    Union over all five probes: **7292.10 … 7292.30**, spread **0.20**, of which
+    ~0.10 is the environment and the rest is the build. 100% of the drift is
+    inside one glibc `memmove` whose alignment-dependent tail changes by ~0.04
+    Ir/iteration. It is a real between-session term, it is bounded and small,
+    and it threatens no published number (p08's tightest, `R1h - R1 = 0.00`,
+    measured exactly 0.00 in 12 configurations). Two consequences: quote
     marginals **to the instruction, never to the hundredth**, across sessions;
     and if p08's 12 cells move by a few hundredths between gate runs, that is
     this effect and not a code change.
@@ -4349,7 +4591,7 @@ def main():
 
     rep = Report()
     check_selftests(rep)
-    check_idiom(rep, contract)
+    audit = check_idiom(rep, pdir, contract)
 
     if a.no_build:
         built = {}
@@ -4428,6 +4670,13 @@ def main():
         # the rungs were supposed to be spellings *of*. It is inside the hashed
         # block, so this is a convenience copy, not a second pin.
         "idiom": contract.get("idiom"),
+        # TASK_020: where each declared spelling is and is not, measured against
+        # the shipped rungs. REPORTING ONLY -- it never fails and never enters
+        # the verdict. It is here so the audit is reproducible from the
+        # committed tree and so a diff shows when the count moves;
+        # `idiom_audit`'s docstring says why `forbidden_hits` is a verdict and
+        # the `required` numbers are not.
+        "idiom_audit": audit,
         "source_sha256": {os.path.relpath(s, REPO): sha256_file(s)
                           for s in srcs if os.path.isfile(s)},
         "derived_contract": {"requires": reqs, "ensures": enss,

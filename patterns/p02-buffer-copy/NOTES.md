@@ -1424,8 +1424,13 @@ Two rules follow, and the second is the one that costs sessions:
   difference, which is the only way this file and the gate ever use it;
 - `patterns/p01-array-sum/spec.md`'s `collapse.note` used to say the
   loader/environment terms *"cancel exactly"*. They do not. p08's environment
-  block moves a marginal by ~**0.1** — 7292.12 … 7292.22 on `small` and
-  29037.52 … 29037.62 on `large`, six environment lengths each, re-measured at
-  TASK_019 — and heap alignment moves p02's by 0.02 here, a **different**
+  block moves a marginal by ~**0.1** *within one build* — 7292.12 … 7292.22 on
+  `small` and 29037.52 … 29037.62 on `large`, six environment lengths each,
+  re-measured at TASK_019, and 7292.12 … 7292.22 again over 21 lengths at
+  TASK_020 — and heap alignment moves p02's by 0.02 here, a **different**
   mechanism and one that is not the environment at all. Corrected in that
-  hashed note at TASK_019.
+  hashed note at TASK_019. **The alignment term is the larger of the two on p08
+  as well**, which TASK_019 missed: a different build of the same p08 source
+  measured 7292.14 … 7292.30 (TASK_017_REVIEW), so the cross-session union is
+  7292.10 … 7292.30 = 0.20 and check.py's "about 0.2" was right all along
+  (TASK_020; TASK_019's "neither endpoint reproduced" is retracted).
