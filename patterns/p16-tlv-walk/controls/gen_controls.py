@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Generate p16's three in-contract R3 respellings into `.temp/p16/controls/`.
+"""Generate p16's in-contract respellings into `.temp/p16/controls/` — three of
+R3 (TASK_021) and three of R4 (TASK_023).
 
     python3 patterns/p16-tlv-walk/controls/gen_controls.py
 
@@ -52,8 +53,23 @@ the shipped `#[path = "../../common/driver.rs"]`, which from `.temp/p08/controls
 resolves to `.temp/common/driver.rs` — a *copy* of `common/` that happens to
 exist on this box and is gitignored, so on a fresh clone those controls do not
 compile. This script rewrites the path to `../../../common/driver.rs`, which
-resolves to the real, hashed `common/driver.rs`. Reported rather than fixed for
-p08 (TASK_021).
+resolves to the real, hashed `common/driver.rs`. Reported rather than fixed at
+TASK_021; **TASK_022 landed the same fix in p08's generator**, so both now
+rewrite the path and this is no longer a difference between them.
+
+**The R4 controls (TASK_023), and why they exist.** §10a searched the *safe*
+side only and said so, and `spec.md`'s `idiom.why` published `R3ship − R4ship`
+as "an UPPER BOUND on the in-contract safety tax" in all six patterns. The R4
+side moves too: `R4ship − r4_hdr = 4·nrec` Ir/call, zero residual over 24 blobs,
+so the admissible pair `(r3_hdrarray, r4_hdr)` **exceeds** the published tax by
+`5·nrec` and the sentence is false for p16 as well as for p05. These three are
+derived from `unsafe.rs` by the same asserted single-hit substitution as the R3
+ones, so the law cannot outlive the rung it is a respelling of. They are
+**controls, not cells**: nothing here is built by `harness/build.py`, none is a
+p16 rung, and no number in `results/` comes from any of them. `r4_hdr` in
+particular would need its own Verus obligation before it could ever be an R5,
+which is one reason it is not proposed as a replacement rung. See `../NOTES.md`
+§10a.1.
 """
 
 import os
@@ -142,6 +158,73 @@ CONTROLS = {
           "        };\n")]),
 }
 
+#: TASK_023's R4 respellings, derived from `unsafe.rs`. Same rule as above: both
+#: named comparisons stay literal, `p`/`end` stay the cursor-and-end pair,
+#: `p = p + 3 + vlen` is untouched, the tag is still folded before the fit test
+#: and `nrec` is still folded. Only the header read and the indexing base move,
+#: which `spec.md`'s `why` says is deliberately not restricted.
+R4_BANNER = ("//! p16 CONTROL -- an IN-CONTRACT alternate spelling of R4.\n"
+             "//! NOT a p16 cell. Generated from `unsafe.rs` by\n"
+             "//! `patterns/p16-tlv-walk/controls/gen_controls.py`; every\n"
+             "//! substitution is asserted to hit exactly once, so this file\n"
+             "//! cannot drift from the rung it respells. See ../NOTES.md 10a.1.\n"
+             "//!\n")
+
+_WINDOW = [
+    ("    let mut p: usize = off;\n    let end: usize = off + len;\n",
+     "    let w: &[u8] = unsafe { buf.get_unchecked(off..off + len) };\n"
+     "    let mut p: usize = 0;\n    let end: usize = len;\n"),
+    ("unsafe { *buf.get_unchecked(p) }", "unsafe { *w.get_unchecked(p) }"),
+    ("unsafe { *buf.get_unchecked(p + 1) }", "unsafe { *w.get_unchecked(p + 1) }"),
+    ("unsafe { *buf.get_unchecked(p + 2) }", "unsafe { *w.get_unchecked(p + 2) }"),
+    ("unsafe { *buf.get_unchecked(p + 3 + j) }",
+     "unsafe { *w.get_unchecked(p + 3 + j) }"),
+]
+
+def _hdr(base):
+    return [("        let vlen: usize = unsafe { *%s.get_unchecked(p + 1) } as usize\n"
+             "            + 256 * (unsafe { *%s.get_unchecked(p + 2) } as usize);\n"
+             % (base, base),
+             "        let vlen: usize = u16::from_le(unsafe {\n"
+             "            (%s.as_ptr().add(p + 1) as *const u16).read_unaligned()\n"
+             "        }) as usize;\n" % base)]
+
+R4_CONTROLS = {
+    "r4_hdr.rs": (
+        "//! `r4_hdr` -- the ONE lever that moves p16's unsafe rung: the two\n"
+        "//! value-length bytes read as a single unaligned `u16` instead of two\n"
+        "//! `get_unchecked` byte loads. `u16::from_le` keeps the decode\n"
+        "//! endian-explicit; on x86-64 it is a no-op, and equivalence is\n"
+        "//! checked on every committed input rather than argued.\n"
+        "//! SAFETY: `end - p >= 3` plus `end <= buf.len()` give `p + 2 <\n"
+        "//! buf.len()`, which is exactly what the 2-byte read needs -- the\n"
+        "//! same obligation the two byte loads already had, not a new one.\n"
+        "//! Measured: `R4ship - this = 4*nrec`, zero residual over 24 blobs.\n"
+        "//! It is the same lever that moved p05's R4 by -3/-5/-7, and it is\n"
+        "//! what makes `R3ship - R4ship` NOT an upper bound on p16's\n"
+        "//! in-contract safety tax: `r3_hdrarray - r4_hdr` exceeds the\n"
+        "//! published pair by `5*nrec`.\n",
+        [PATH_FIX] + _hdr("buf")),
+
+    "r4_window.rs": (
+        "//! `r4_window` -- the exact edit that makes `r3_window` `4*nrec - 8`\n"
+        "//! CHEAPER than shipped R3, applied to the unsafe rung instead: the\n"
+        "//! window is resliced once before the loop and `p` is\n"
+        "//! window-relative, `end = len`. Measured: **2 Ir/call DEARER**,\n"
+        "//! flat, on all 24 blobs. It is here because a matched-pair edit\n"
+        "//! that helps the safe rung and hurts the unsafe one is the cleanest\n"
+        "//! demonstration that `same idiom` has no fixed point\n"
+        "//! (`.memory/01-ladder.md` finding 6), and because a control that\n"
+        "//! goes the wrong way is what shows `r4_hdr` is not an artefact.\n",
+        [PATH_FIX] + _WINDOW),
+
+    "r4_window_hdr.rs": (
+        "//! `r4_window_hdr` -- both of the above. Measured `4*nrec - 2`, i.e.\n"
+        "//! exactly `r4_hdr` plus `r4_window`, so the two edits do not\n"
+        "//! interact. Kept for that: it is the additivity check.\n",
+        [PATH_FIX] + _WINDOW + _hdr("w")),
+}
+
 RUSTC = os.path.expanduser("~/.cargo/bin/rustc")
 #: `harness/build.py::rust_flags("O3", "isolated")`, verbatim. Quoted here so
 #: the controls are built exactly the way the cells they are compared against
@@ -150,13 +233,14 @@ FLAGS = ["--edition", "2021", "-C", "codegen-units=1", "-C", "opt-level=3",
          "-C", "debug-assertions=off", "--cfg", "slb_isolated"]
 
 
-def sub(src_name, out_name, header, pairs):
+def sub(src_name, out_name, header, pairs, banner=None):
     s = open(os.path.join(PDIR, src_name)).read()
     for old, new in pairs:
         n = s.count(old)
         assert n == 1, f"{out_name}: {n} hits (want 1) for {old!r}"
         s = s.replace(old, new)
-    open(os.path.join(OUT, out_name), "w").write(BANNER + header + "\n" + s)
+    open(os.path.join(OUT, out_name), "w").write((banner or BANNER) + header
+                                                 + "\n" + s)
     print(f"  {out_name:18s} <- {src_name} ({len(pairs)} substitution(s))")
 
 
@@ -166,10 +250,12 @@ def main():
     print("p16 controls ->", os.path.relpath(OUT, os.getcwd()))
     for name, (header, pairs) in sorted(CONTROLS.items()):
         sub("safe_tuned.rs", name, header, pairs)
+    for name, (header, pairs) in sorted(R4_CONTROLS.items()):
+        sub("unsafe.rs", name, header, pairs, R4_BANNER)
 
     if build:
         print("\nbuilding (harness/build.py's exact -O3 isolated flags):")
-        for name in sorted(CONTROLS):
+        for name in sorted(CONTROLS) + sorted(R4_CONTROLS):
             src = os.path.join(OUT, name)
             out = os.path.join(OUT, name[:-3])
             r = subprocess.run([RUSTC] + FLAGS + [src, "-o", out],
@@ -188,17 +274,24 @@ build them:
       {' '.join(FLAGS)} \\
       .temp/p16/controls/r3_endslice.rs -o .temp/p16/controls/r3_endslice
 
-check equivalence (all three must print the shipped R3 binary's checksum and
-exit code on every committed input, sweep blobs included):
+check equivalence (all six must print the shipped rungs' checksum and exit code
+on every committed input, sweep blobs included -- R3 and R4 agree on all of
+them, so one reference binary settles both sets):
   python3 patterns/p16-tlv-walk/inputs/gen.py --sweep
   for f in patterns/p16-tlv-walk/inputs/*.bin; do ... done
 
-re-derive NOTES.md 10a's laws (marginal Ir/call, n_iters 100 -> 200, the same
-probe harness/check.py step 3b uses):
-  R3ship - r3_endslice = 2*nrec - 2
-  R3ship - r3_window   = 4*nrec - 8
-  r3_hdrarray - R3ship = nrec
-on the 22 `sweep-n{{nrec}}v{{vlen}}.bin` blobs inputs/gen.py's third band emits.
+re-derive NOTES.md 10a / 10a.1's laws (marginal Ir/call, n_iters 100 -> 200, the
+same probe harness/check.py step 3b uses):
+  R3ship - r3_endslice   = 2*nrec - 2
+  R3ship - r3_window     = 4*nrec - 8
+  r3_hdrarray - R3ship   = nrec
+  R4ship - r4_hdr        = 4*nrec           (TASK_023)
+  R4ship - r4_window     = -2, i.e. DEARER  (TASK_023)
+  R4ship - r4_window_hdr = 4*nrec - 2       (TASK_023)
+on the 22 `sweep-n{{nrec}}v{{vlen}}.bin` blobs inputs/gen.py's third band emits,
+plus `small` (nrec 4) and `large` (nrec 10). Build the six controls and the two
+shipped rungs in ONE session before differencing them: a marginal is exact only
+within a build (NOTES.md 10b).
 """)
     return 0
 

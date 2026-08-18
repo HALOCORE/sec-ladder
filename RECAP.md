@@ -188,8 +188,9 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    by being **invisible**: it is prose, and the hashed block starts 240 lines
    later. So p05's `6·nrow + 9` **stands as a contract-relative number**, and the
    retraction of it is itself retracted.
-   **And that contract-relative number is an UPPER BOUND** — but the search for
-   what it bounds has now failed three times. TASK_021 reported a *two-sided*
+   **And that contract-relative number bounds `inf(in-contract R3) − R4ship`
+   and nothing else** — a bound only because R4 is held fixed by fiat, and the
+   search for what it bounds has now failed three times. TASK_021 reported a *two-sided*
    floor, `5·nrow + 6`, on the ground that six in-contract unsafe spellings gave
    one instruction count. They had all decoded the header the shipped way, so it
    measured the header. TASK_021_REVIEW respelled that and got `5·nrow + 11`
@@ -244,15 +245,22 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    by being **invisible**: it is prose, and the hashed block starts 240 lines
    later. So p05's `6·nrow + 9` **stands as a contract-relative number**, and the
    retraction of it is itself retracted.
-   **And TASK_021 measured that contract-relative number to be an UPPER BOUND**
-   (`patterns/p05-index-flatten/NOTES.md` §14): seven textually independent
+   **TASK_021 measured that contract-relative number to be an UPPER BOUND, and
+   the reading has since been narrowed twice** (`patterns/p05-index-flatten/NOTES.md`
+   §14): seven textually independent
    in-contract respellings reach `5·nrow + 6` with **zero residual over 179
-   sweep points**, and the *unsafe* side — searched in contract for the first
-   time on any pattern — does not move at all (six spellings, four distinct
-   machine-code bodies, zero difference). p05 therefore joins p16, p17 and p02
-   in having published an upper bound; unlike them its functional form, its sign
-   and its `O(nrow)` conclusion all survive, and only 21%/18% of the tax lives
-   in unpinned spelling against p16's 44%/55%. The `nrow` axis it is swept on
+   sweep points**. TASK_021's companion claim — that the *unsafe* side "does not
+   move at all" (six spellings, four distinct machine-code bodies, zero
+   difference) — is **refuted**: all six decoded the header the shipped way, and
+   respelling it moves R4 by 7 flat (TASK_022). The only thing `6·nrow + 9`
+   bounds is `inf(in-contract R3) − R4ship`, i.e. R4 held fixed by fiat. Its
+   functional form, its sign
+   and its `O(nrow)` conclusion all survive under that stated pairing, but the
+   "21%/18% of the tax lives in unpinned spelling" figure is the **R3 side
+   alone**; over free pairs the interval is 80%/71% of the published tax. (That
+   was then called "the loosest of the set"; the comparison put a *pair*
+   interval next to p16's **R3-only** span, and p16's own pair interval —
+   TASK_023 — is 111%/109%, wider. Withdrawn.) The `nrow` axis it is swept on
    ships too: `inputs/gen.py` band D, 33 blobs, and `source_sha256` covers
    `gen.py` from TASK_021 so the law is re-derivable from a hashed file.
    **The policy, decided and implemented (TASK_016–018).** "Compare idiom-matched
@@ -273,13 +281,21 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    below on both sides.
 
    **The conclusion that follows, and it governs every number this project
-   publishes: `R3ship − R4ship` is an UPPER BOUND on the in-contract safety tax,
-   never the tax.** p16's `+27/+77` has a measured in-contract minimum of
-   `+19/+45`; p17's `+32` has an in-contract respelling measuring **−19** against
+   publishes: `R3ship − R4ship` bounds `inf(in-contract R3) − R4ship` and
+   nothing else — a bound only because R4 is held fixed BY FIAT rather than
+   minimised. It is NOT an upper bound on the in-contract safety tax**, which is
+   what this line said until TASK_023. p16's `+27/+77` has a measured
+   in-contract minimum of
+   `+19/+45` against the shipped R4; p17's `+32` has an in-contract respelling measuring **−19** against
    the shipped R4, byte-identical to the row an earlier task had excluded. Both
    patterns ship an R3 measurably off the floor of their own contract, so "the
    shipped R3 is the cheapest admissible spelling" is **false, not
-   unestablished**. Report the in-contract spread beside every headline.
+   unestablished**. **And the unsafe rung is a spelling too**: p05's R4 moves 7
+   flat (TASK_022) and p16's moves `4·nrec` (TASK_023), so on both the shipped
+   pair's difference is *exceeded* by an admissible pair — by `5·nrec` on p16,
+   47 against 27 at `small` and 127 against 77 at `large`. Report the
+   in-contract **pair interval** beside every headline, with the shipped pair
+   located inside it, and the fixed-R4 bound if one number is wanted.
 
 ## Retracted — do not reinstate
 
@@ -433,13 +449,21 @@ it once, land the corrections, repeat** — and per `PROTOCOL.md` rule 9, write
 instance of the same mistake, and the correction is owed across the whole result
 set before more results are added to it:
 
-1. **TASK_023 — the `idiom.why` sentence is false in all six patterns.** It says
-   `R3ship − R4ship` is an upper bound on the in-contract safety tax; it is one
-   **only while one rung is held fixed**, and p05 has an admissible pair whose
-   tax is exactly 0.00. The text is byte-identical across six declarations and
-   **hashed into `contract_sha256`**, so this is one cross-pattern edit and six
-   gate runs. Ride along: p16's `controls/gen_controls.py` docstring still says
-   p08's `#[path]` defect is unfixed, which TASK_022 fixed.
+1. ~~**TASK_023 — the `idiom.why` sentence is false in all six patterns.**~~
+   **Done.** The sentence is replaced byte-identically in all six `idiom.why`
+   blocks; both ride-alongs done. The probe TASK_023 asked for — *is the
+   sentence false for the other patterns or merely unverified?* — came back
+   **false, not unverified**: p16's unsafe rung moves in contract by
+   `R4ship − r4_hdr = 4·nrec` Ir/call (the two length bytes as one unaligned
+   `u16`, the same lever that moved p05's R4), zero residual over 24 blobs, and
+   the admissible pair `(r3_hdrarray, r4_hdr)` **exceeds** the published
+   `+27/+77` by `5·nrec`. p16's in-contract pair interval is `nrec + 13` …
+   `7 + 10·nrec` / `3·nrec + 13` … `7 + 12·nrec`, 111%/109% of the published tax
+   wide, with the shipped pair inside it. The three R4 controls ship in
+   `patterns/p16-tlv-walk/controls/gen_controls.py`; the write-up is that
+   pattern's `NOTES.md` §10a.1. **p17, p02, p01 and p08 remain unverified on the
+   R4 side** — their published figures are one-sided bounds, not upper bounds on
+   a tax.
 2. **p01 and p08 still owe an in-contract spelling spread** — and after p05,
    what they owe is an *interval*, not a minimum. Do not let either publish a
    "floor"; four have been published across the project and four were refuted.

@@ -171,7 +171,10 @@ upper bounds and bounds nothing in either direction. What is quotable is the
 **interval**: over the in-contract pairs searched the tax runs `2·nrow − 2` …
 `6·nrow + 20` — **36 … 134 at `small`, 128 … 410 at `large`** — with the
 published 123 / 399 *inside* it, and 80% / 71% of the published figure living in
-spelling the declaration does not pin (against p16's 44% / 55%). At `nrow = 1`
+spelling the declaration does not pin. (This used to add "against p16's
+44% / 55%", i.e. that p05's declaration is the loosest of the set. That compared
+a *pair* interval against p16's **R3-side-only** span; p16's own pair interval,
+measured at TASK_023, is 111% / 109%. The comparison is withdrawn.) At `nrow = 1`
 the bottom of that interval is **exactly 0**, measured: there is an admissible
 pair on which safe and unsafe cost the same instruction count.
 

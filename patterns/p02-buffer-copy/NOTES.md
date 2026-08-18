@@ -34,13 +34,18 @@ idiom-recognise one spelling of a byte-copy loop.** Three other spellings —
 including the reslice a competent Rust programmer writes — are +10 per call,
 flat. That is a codegen-fragility finding, not a safety-cost finding.
 
-⚠ **And `+10` is an UPPER BOUND on p02's in-contract safety tax, not the tax —
-read §10a with this section** (TASK_019, from TASK_018_REVIEW M1). An admissible
+⚠ **And `+10` bounds `inf(in-contract R3) − R4ship` and nothing else — read §10a
+with this section** (TASK_019, from TASK_018_REVIEW M1). An admissible
 R3 that respells only what the declaration leaves free — the `u16` header read —
 measures **4 `Ir`/call cheaper than the shipped R3** (3 at `len ≡ 0 mod 8`), so
-the measured in-contract minimum against the shipped R4 is **+6 / +5**. The R4
-side has not been searched in contract, so even that is a bound and not a safety
-number (`.memory/01-ladder.md` finding 14).
+the measured in-contract minimum against the shipped R4 is **+6 / +5**. **The R4
+side has not been searched in contract**, and that matters more than it used to:
+on p05 (TASK_022) and on p16 (TASK_023, §10a.1 there) the unsafe rung moved too,
+by 7 flat and by `4·nrec` respectively, and once it does, the shipped pair's
+difference is **not** an upper bound on the in-contract safety tax at all — an
+admissible pair exceeds it. p02's R4 side is **unverified, not verified fixed**;
+do not write "upper bound on p02's in-contract safety tax"
+(`.memory/01-ladder.md` finding 14).
 
 The **security** result of this pattern (§1) was reviewed and stands unchanged.
 
@@ -1287,8 +1292,8 @@ which is the whole of TASK_017_REVIEW.
 **And the result does not depend on the answer.** `r3_forloop` changes nothing
 but the fold — a thing no `required` entry mentions at all — and is already
 **2 (1) `Ir`/call below the shipped R3**. So the in-contract minimum is at most
-`+8 / +7` even if `r3_hdrslice` were ruled out, and `+10` is an upper bound
-either way.
+`+8 / +7` even if `r3_hdrslice` were ruled out, and `+10` bounds
+`inf(in-contract R3) − R4ship` from above either way.
 
 **Static**, `-O3 isolated`:
 
@@ -1356,12 +1361,18 @@ Summarised against the shipped R3:
 
 **What this establishes.**
 
-1. **`R3ship − R4ship = +10 / +8` is an UPPER BOUND on p02's in-contract safety
-   tax, not the tax.** The measured in-contract minimum is **+6** (`small`,
+1. **`R3ship − R4ship = +10 / +8` is an upper bound on
+   `inf(in-contract R3) − R4ship`, and on nothing else.** The measured
+   in-contract minimum against the shipped R4 is **+6** (`small`,
    `large`, `sweep-l65`, `sweep-l2049`) and **+5** (`sweep-l56`,
    `sweep-l2040`) — `r3_hdrslice`. p02 is the third pattern where this holds,
    after p16 (`+27/+77` → `+19/+45`) and p17 (`+32` → `−19`); the shape of the
    result is now uniform enough to expect rather than to discover.
+   ⚠ **It is a bound only because R4 is held fixed by fiat**, and it is *not* an
+   upper bound on "p02's in-contract safety tax": that would need the R4 side to
+   have been searched, and it has not been. Where it has been searched the
+   unsafe rung moved — p05 by 7 flat, p16 by `4·nrec` — and the shipped pair's
+   difference stopped bounding anything (TASK_022, TASK_023).
 2. **TASK_018_REVIEW M1's failure scenario would have published a number that is
    not even the floor.** The forbidden additive guard is −3 against shipped R3,
    flat; `r3_hdrslice`, which is **in** contract, is −4 at 14 of 16 swept

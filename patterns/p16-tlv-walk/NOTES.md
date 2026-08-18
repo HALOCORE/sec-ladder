@@ -28,12 +28,17 @@ one residue class where the slope is invisible. **Sweep, do not sample**, and
 when a headline and a decomposition disagree, the decomposition is the one that
 was measured.
 
-⚠ **And `+27 / +77` is an upper bound on the in-contract safety tax, not the
-tax (TASK_018, §10a).** Three alternate R3 spellings that keep **both** of
+⚠ **And `+27 / +77` bounds nothing except against the shipped R4 (TASK_018 and
+TASK_023, §10a).** Three alternate R3 spellings that keep **both** of
 `spec.md`'s named comparisons literally, and change only the header read and the
 value fold — the two things the declaration says it does *not* restrict — span
 **42 `Ir`/call at `large` against the published 77**, the cheapest sitting at
-`+45`. Pinning the comparison tokens narrows the admissible class; it does not
+`+45`. **TASK_023 then searched the R4 side and it moves too**, by the same
+lever: `R4ship − r4_hdr = 4·nrec`, zero residual over 24 blobs. So the
+admissible **pair** `(r3_hdrarray, r4_hdr)` **exceeds** the published tax by
+`5·nrec` — 47 against 27 at `small`, 127 against 77 at `large` — and `+27 / +77`
+is not an upper bound on p16's in-contract safety tax either. Pinning the
+comparison tokens narrows the admissible class; it does not
 pick a point in it, and the claim that it "makes `R3 − R4` a difference in
 safety rather than in representation" is withdrawn.
 
@@ -185,15 +190,18 @@ Read per unit of the thing each rung is doing:
   does `nrec`. So `.memory/01-ladder.md`'s R3 finding **survives** the
   data-dependent loop, correctly re-denominated.
 
-  ⚠ **`+27 / +77` is an UPPER BOUND on p16's in-contract safety tax, not the
-  tax. Read §10a with this bullet — it is 900 lines below and it is the one that
+  ⚠ **`+27 / +77` is the shipped pair's difference and is an upper bound on
+  nothing but `inf(in-contract R3) − R4ship`. Read §10a with this bullet — it is
+  900 lines below and it is the one that
   was measured.** "The shipped R3 is the cheapest admissible spelling" is
   **FALSE**, not unestablished: TASK_018 measured three admissible respellings
   keeping *both* named comparisons literally, two of them cheaper than the
   shipped R3 (`R3ship − r3_endslice = 2·nrec − 2`, `R3ship − r3_window =
   4·nrec − 8`, `r3_hdrarray − R3ship = nrec`), and TASK_018_REVIEW swept the
   `nrec` axis to confirm them. The measured in-contract minimum against the
-  shipped R4 is **+19 (`small`) / +45 (`large`)**. Everything in the two
+  shipped R4 is **+19 (`small`) / +45 (`large`)** — and that one-sided figure is
+  all that survives TASK_023, which measured the **R4** side moving by `4·nrec`
+  and an admissible pair exceeding `+27 / +77` by `5·nrec` (§10a). Everything in the two
   paragraphs below is about *out-of-contract* spellings and was written before
   §10a existed; it is kept because the reasoning is still the record of what
   TASK_017 excluded, but it must not be read as "nobody has measured an
@@ -1221,11 +1229,12 @@ $ ... marginal Ir/call, n_iters 100 -> 200, -O3 isolated       (.temp/p21/p16law
 
 So §10a is now reproducible end to end from the committed tree: the generator,
 the input band and — since TASK_021 — both of them inside `source_sha256`.
-One difference from p08's generator, and it is a fix p08 still needs: p08's
-controls keep the shipped `#[path = "../../common/driver.rs"]`, which from
+One difference from p08's generator, and it *was* a fix p08 needed until
+TASK_022 landed it there too: p08's controls used to keep the shipped
+`#[path = "../../common/driver.rs"]`, which from
 `.temp/p08/controls/` resolves to `.temp/common/driver.rs`, a **gitignored
-copy** of `common/` that happens to exist on this box; p16's generator rewrites
-the path to the real, hashed `common/driver.rs`.
+copy** of `common/` that happens to exist on this box; both generators now
+rewrite the path to the real, hashed `common/driver.rs`.
 
 **What this establishes.**
 
@@ -1238,11 +1247,13 @@ the path to the real, hashed `common/driver.rs`.
 2. **The in-contract spread is 42 `Ir`/call at `large` (−32 … +10) against a
    published `R3 − R4` of 77, and 12 at `small` against 27** — 55% and 44% of
    the published safety tax lives in spelling the declaration does not pin.
-3. Therefore **`R3ship − R4ship = +27 / +77` is an upper bound on p16's
-   in-contract safety tax, not the tax.** The measured in-contract minimum is
-   **+19 / +45** (`r3_window`) or **+21 / +59** (`r3_endslice`) against the
-   shipped R4 — and since the *R4* side has not been searched in contract
-   either, even those are bounds and not safety numbers
+3. Therefore **`R3ship − R4ship = +27 / +77` is not the tax.** The measured
+   in-contract minimum is **+19 / +45** (`r3_window`) or **+21 / +59**
+   (`r3_endslice`) against the shipped R4 — and that pairing, R4 held fixed by
+   fiat, is the **only** thing `+27 / +77` bounds. **The *R4* side has now been
+   searched (TASK_023, §10a.1) and it moves by `4·nrec`**, so `+27 / +77` is not
+   an upper bound on p16's in-contract safety tax: the admissible pair
+   `(r3_hdrarray, r4_hdr)` exceeds it by `5·nrec`
    (`.memory/01-ladder.md` finding 14).
 4. **`spec.md` ground (ii) is withdrawn.** Pinning `end - p >= 3` and
    `vlen > end - (p + 3)` does **not** make `R3 − R4` "a difference in safety
@@ -1259,3 +1270,97 @@ the path to the real, hashed `common/driver.rs`.
 whole-program `Ir` difference. Binaries built with `harness/build.py`'s exact
 `-O3 isolated` rustc flags (`--edition 2021 -C codegen-units=1 -C opt-level=3
 -C debug-assertions=off --cfg slb_isolated`). **No pattern source was edited.**
+
+## 10a.1. The **R4** side, and item 3 above is refuted (TASK_023)
+
+§10a searched the safe side and left the unsafe side alone, and said so — item
+3's own words were *"since the R4 side has not been searched in contract
+either"*. TASK_023 searched it, on the question *"is `R3ship − R4ship` an upper
+bound on the in-contract safety tax a p05 fact, or a ladder fact?"* **It is a
+ladder fact, and p16 is the second pattern to measure it.**
+
+Three respellings of `unsafe.rs`, derived by exact-string substitution asserted
+to hit exactly once (`controls/gen_controls.py`, the same discipline as the R3
+controls), each keeping **both** named comparisons literally, keeping `p`/`end`
+as the cursor-and-end pair, keeping `p = p + 3 + vlen`, folding the tag before
+the fit test and folding `nrec`. They change only what this declaration's `why`
+says is *"deliberately NOT restricted: the R2/R3/R4 spelling of the value fold
+and of the header read"* — which is the identical licence `r3_hdrarray` and
+`r3_window` run on.
+
+| variant | what changed | `md5_fn` | `n_fn` | `R4ship − this` |
+|---|---|---|---:|---|
+| `r4_hdr` | the two value-length bytes read as **one unaligned `u16`** (`(buf.as_ptr().add(p + 1) as *const u16).read_unaligned()`, `u16::from_le`) instead of two `get_unchecked` byte loads | `4b800e6d0d47` | 88 | **`4·nrec`** |
+| `r4_window` | window resliced once (`buf.get_unchecked(off..off + len)`), `p` window-relative, `end = len` — the exact edit that makes `r3_window` `4·nrec − 8` cheaper | `f99559928bb6` | 94 | **−2** (*dearer*) |
+| `r4_window_hdr` | both | `cd404bbbfec3` | 90 | `4·nrec − 2` |
+
+**Zero residual on all 24 points** — `nrec ∈ {1…9, 12, 16}` × `vlen ∈ {124, 126}`
+(both residue classes), plus `small` (`nrec` 4) and `large` (`nrec` 10).
+Equivalence: **95 committed inputs × 3 variants = 285 comparisons, 0
+mismatches** on stdout and exit status against the shipped R4 binary.
+
+**One build, so the interval is a difference of numbers from one session.** §10b
+says a marginal is exact only within a build, and §10a's own note flags that its
+rows 2–4 carried a cross-build risk. This section re-measured shipped R3, the
+three committed R3 controls *and* shipped R4 alongside the new variants, and
+every digest reproduces §10a's table byte for byte: `07b07f1a8055` (R3 ship,
+117), `34a618f837f2` (117), `c7f697a8d9ec` (119), `999fb67758ff` (118),
+`852405e0fa43` (R4 ship, 92). All four §10a laws re-derive with **zero
+residual on the same 24 points**, including the residue-dependent
+`R3ship − R4ship = 7 + 5·nrec` (`vlen ≡ 0 mod 4`) / `7 + 7·nrec`.
+
+**What it refutes.** `R3ship − R4ship` is not an upper bound on the in-contract
+safety tax, because both rungs are spellings and the admissible **pairs** form
+an interval:
+
+| endpoint | pairing (`nrec ≥ 3`) | law (`vlen ≡ 0 mod 4` / else) | `small` / `large` |
+|---|---|---|---|
+| bottom | cheapest R3 `r3_window` vs dearest R4 `r4_window` | `nrec + 13` / `3·nrec + 13` | 17 / 43 |
+| — | **shipped pair, published** | `7 + 5·nrec` / `7 + 7·nrec` | **27 / 77** |
+| top | dearest R3 `r3_hdrarray` vs cheapest R4 `r4_hdr` | `7 + 10·nrec` / `7 + 12·nrec` | 47 / 127 |
+
+Zero residual on both endpoint laws over the 20 points with `nrec ≥ 3`. The
+domain is not decoration: at `nrec ∈ {1, 2}` the *ordering* flips, because
+`4·nrec − 8` is negative there and `r3_window` is then the **dearest** R3 rather
+than the cheapest; the endpoints become 10…20 / 12…22 at `nrec` 1 and 13…27 /
+17…31 at `nrec` 2. **The published pair sits inside the interval on all 24
+points**, and the pair `(r3_hdrarray, r4_hdr)` exceeds it by exactly `5·nrec`
+(`nrec` from the safe side + `4·nrec` from the unsafe side) with **zero residual
+on all 24** — that pair is the interval's top only for `nrec ≥ 3`, but it
+exceeds the published figure everywhere. The interval is **111% / 109% of the
+published tax** wide at `small` / `large`, rising to 159% at `nrec` 16.
+
+**Three things this does *not* touch, stated so nobody re-runs them.**
+
+- **The per-byte null survives.** `4·nrec` is per *record*: it is the same
+  integer at `vlen` 124, 126 and at `small`'s and `large`'s quite different
+  value lengths. So `.memory/01-ladder.md` finding 4's *"R3's marginal rate is
+  5.7500 Ir per folded byte, which is R4's exactly"* is untouched, and so is
+  R2's 10.00.
+- **The one-sided bound survives**, and it is the only thing that does: hold R4
+  at the shipped cell and `+27 / +77` bounds `inf(in-contract R3) − R4ship`
+  above, with `+19 / +45` tighter.
+- **This is not a minimum.** `r4_hdr` is the *first* lever tried on p16's R4 and
+  it moved `4·nrec`; p05 published three successive R4-side "minima" and the
+  next search overturned each (`.memory/01-ladder.md` finding 6). Nothing here
+  is offered as `min(R4)`, and `min(R3 found) − min(R4 found)` is not a bound in
+  either direction.
+
+**The difference from p05 is the shape, and it is the sharper half.** p05's R4
+side moved by a **constant** (7 flat); p16's moves by a **coefficient**
+(`4·nrec`). So on p16 the pairing convention does not merely shift the intercept
+of the published law — it changes the `nrec` coefficient from 1 to 10 (`vlen ≡ 0
+mod 4`) or 3 to 12, i.e. across the whole interval. p05's §14h.6 found the same
+thing on its own axis (coefficient 2…6 over free pairings). **The `O(nrec)`
+*shape* of p16's headline survives; its coefficient is a property of the pairing
+convention, not of the pattern.**
+
+**Method.** `.temp/p23/probe.py` (R4 side, generation + build + token grep +
+digests + equivalence + marginals) and `.temp/p23/probe2.py` (R3 side, same
+build), logs `.temp/p23/probe{,2}.log`, data `.temp/p23/v16/probe{,2}.json`.
+Marginal `Ir`/call by `harness/check.py`'s own probe — whole-program `Ir` at
+`n_iters` 200 minus at 100, over 100 — re-implemented independently and agreeing
+to the instruction with §10a on all five shared baselines. `harness/build.py`'s
+exact `-O3 isolated` rustc flags. **No pattern source was edited**; the three R4
+variants ship in `controls/gen_controls.py` so this section is reproducible from
+the tree.

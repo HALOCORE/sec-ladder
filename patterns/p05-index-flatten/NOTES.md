@@ -1333,10 +1333,14 @@ one. What it publishes instead:
    — §14h.3). The published `6·nrow + 9` sits **inside** that interval, not
    above it, so "upper bound on the in-contract safety tax" — which is how
    TASK_021 and TASK_021_REVIEW both phrased it, and how `spec.md`'s
-   `idiom.why` still phrases it for all six patterns — is **false** as stated
-   for p05, at least under a free pairing. (`spec.md` is not edited here: that
-   paragraph is byte-identical across the six declarations by design, so
-   correcting it is a cross-pattern decision, not p05's.) The
+   `idiom.why` phrased it for all six patterns — is **false** as stated
+   for p05, at least under a free pairing. **`spec.md` was corrected at
+   TASK_023**, byte-identically in all six declarations, and the same task
+   answered the question this item left open — *is p05 special?* — with **no**:
+   p16's unsafe rung moves in contract by `4·nrec` Ir/call and an admissible
+   p16 pair exceeds its published tax by `5·nrec`
+   (`patterns/p16-tlv-walk/NOTES.md` §10a.1). p17, p02, p01 and p08 are still
+   unsearched on the R4 side. The
    bottom of the interval is **exactly 0 at `nrow = 1`** (measured, not
    extrapolated: `sweep-r1c30`, `r3_ds_h1` and `r4_dataslice` both at 152.30),
    so "safety costs something here" is not true of every admissible pair either.
@@ -1350,8 +1354,10 @@ one. What it publishes instead:
 For comparison: p16's published `+27/+77` was high by 30%/42%, p17's `+32` had
 the **wrong sign**, and p02's `+10` was high by 40%/50%. On the *R3 side alone*
 p05's declaration is the tightest of the four — §14a says why, in instructions —
-but once both rungs are respelled it is the **loosest** (§14h.3), and the
-difference between those two sentences is the whole lesson of this section.
+but once both rungs are respelled that comparison does not hold up either
+(§14h.3's ⚠: p16's pair interval, measured at TASK_023, is wider still). The
+difference between the one-rung and the two-rung reading is the whole lesson of
+this section.
 
 ### 14a. The machine audit cannot settle p05, and that is a measurement
 
@@ -1734,11 +1740,19 @@ and none of them moved the coefficient.
    in-contract pairings.
 
    The interval is `4·nrow + 22` wide — **98 Ir at `small` and 282 at `large`,
-   80% and 71% of the published tax**, against p16's 44% / 55%. So once *both*
-   rungs are respelled p05's declaration is the **loosest** of the set, not the
-   tightest. This file said the opposite until TASK_022, and the reason it did
+   80% and 71% of the published tax**. This file said the opposite until
+   TASK_022, and the reason it did
    is that it had only respelled one rung: on the R3 side alone the span is
    `nrow + 7` (26 / 72, 21% / 18%), which is the figure this item replaces.
+   ⚠ **"…and that makes p05's declaration the LOOSEST of the set" was written
+   here and is now FALSE, by the same correction applied to another pattern.**
+   It compared p05's *pair* interval against p16's **R3-side-only** span of
+   44% / 55% — the same one-rung mistake one paragraph up. TASK_023 respelled
+   p16's R4 (`R4ship − r4_hdr = 4·nrec`, zero residual on 24 blobs) and p16's
+   pair interval is **111% / 109%** of its published tax, *wider* than p05's
+   80% / 71%. p05's declaration is the loosest of those measured **on the R3
+   side**; on pairs it is not, and only two patterns have a pair interval at
+   all.
 4. **There is no measured minimum, and "best found" is not honest enough for
    this pattern.** Three values have been published here as the minimum and all
    three were overturned by the next search — `5·nrow + 6` (8 R4 spellings),

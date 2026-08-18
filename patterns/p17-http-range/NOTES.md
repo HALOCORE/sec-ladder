@@ -58,11 +58,16 @@ per call plus 7–8 per *range request*; §3b's 34-point sweep holds the request
 count at 1 and so establishes the per-byte rate and nothing about the constant.
 On that reading R3 is still the fifth
 pattern in a row where idiomatic safe Rust is free **per byte**.
-⚠ **And `+32` is an upper bound, not the safety tax (TASK_018, §10a).** An
+⚠ **And `+32` bounds `inf(in-contract R3) − R4ship` and nothing else
+(TASK_018, §10a).** An
 alternate R3 that is *inside* p17's declared idiom — same `i64` `start`/`end`,
 same literal conjunctive guard, only the suffix-table walk and the byte fold
 respelled — measures **51 `Ir`/call cheaper on both bands**, i.e. **−19 against
-the shipped R4**. Do not quote `+32` as what safety costs on this kernel.
+the shipped R4**. Do not quote `+32` as what safety costs on this kernel — and do
+not quote it as an upper bound on p17's in-contract safety tax either: that
+would need the **R4** side searched, and it has not been. Where it has been
+searched the unsafe rung moved too (p05 by 7 flat at TASK_022, p16 by `4·nrec`
+at TASK_023) and the shipped pair's difference stopped bounding anything.
 
 ⚠ **This paragraph said "+32 instructions per call, flat" until TASK_016, and
 "flat" there was read as flat per call, which the two shipped points cannot
@@ -1404,8 +1409,11 @@ digests are of the function's bytes, not of its symbol, which is exactly what
    (`nsuf` 1…8, `.temp/review015/in17/`, zero residual) **is** the in-contract
    law, transferred without re-measuring. A request with 20 ranges pays ≈ 340
    `Ir`/call for the shipped spelling that an admissible one does not.
-2. **p17's published `R3 − R4 = +32` is an upper bound on the in-contract safety
-   tax, not the tax.** The measured in-contract minimum is **−19.00** against the
+2. **p17's published `R3 − R4 = +32` is an upper bound on
+   `inf(in-contract R3) − R4ship`, and on nothing else.** It is a bound only
+   because R4 is held fixed by fiat; it is **not** an upper bound on p17's
+   in-contract safety tax, which would need the R4 side searched (p05 and p16
+   have been, and both moved). The measured in-contract minimum is **−19.00** against the
    shipped R4, on both bands. Per `.memory/01-ladder.md` finding 14 that is
    **not** "safe Rust beats unsafe Rust" — R4 is a spelling too and its
    in-contract space has not been searched — it is "the shipped pair is not on
