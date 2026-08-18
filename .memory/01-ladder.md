@@ -780,6 +780,20 @@ is a much stronger claim than any p01 could produce.
    kernel, written this way" to "safety costs this" — that is the step
    finding 14 shows is not available.
 
+   **PROVISIONAL — TASK_021 measured a two-sided floor and may rehabilitate the
+   retracted sentence. Do not quote either way until the review lands.** What was
+   measured: p05's `6·nrow + 9` is an upper bound (in-contract minimum
+   `5·nrow + 6`, swept over 179 points on a *new* `nrow` axis — the published
+   form was itself a three-point fit until band D shipped); the **R4 side has
+   zero in-contract spread** across six spellings and four distinct `md5_fn`
+   bodies, which is what p16 and p17 could not establish; and the single
+   instruction the floor removes is `add %rsi,%rax`, while the five that survive
+   need `(i+1)·ncol <= nrow·ncol` — **the nonlinear obligation R5 discharges with
+   `lemma_mul_inequality`**. If that holds up, the in-contract floor and the
+   proof obligation are the same fact, and the sentence returns *bounded,
+   two-sided and in-contract*, which is a much narrower and much better claim
+   than the one retracted. See `patterns/p05-index-flatten/NOTES.md` §14.
+
    **Two things that stand unchanged:** `Ir` converts to time on this kernel
    (+34.4% `Ir` → **+32.9%** wall — the review's own remeasurement; the delivered
    +30.5% was over-precise), confirming a prediction p16's `NOTES.md` made that a

@@ -27,12 +27,21 @@ costs nothing to retain. **What changes is the rule for new work:**
 
 Known residuals we are deliberately **not** closing, all measured:
 
-- **`source_sha256` omits `patterns/*/inputs/gen.py` and `common/slb.py`** —
-  third sighting, and **no longer hygiene**. p16 §10a's swept `nrec` laws are
-  reproducible *only* through `gen.py`, so an edit to the generator that changed
-  what the sweep produces would move **nothing** in any gate artefact. One-line
-  glob fix; costs a gate round on all six. This one should be closed, unlike the
-  rest of this list.
+- ~~`source_sha256` omits `patterns/*/inputs/gen.py` and `common/slb.py`~~ —
+  **CLOSED at TASK_021**, with a demonstrated record move (a comment-only
+  `gen.py` edit now changes `source_sha256`; before the fix it changed nothing).
+  The glob also gained `patterns/*/controls/*.py` and **`verus_run.py`**, a
+  fourth uncovered file nobody had named: it is R5's compiler driver *and* the
+  process every proof stage asks for a verdict, so it decides both what R5's
+  machine code is and what "verified" meant in that run — and it sits at the repo
+  root, which `harness/*.py` never covered.
+- **A control generator can emit sources that compile against a gitignored
+  copy of `common/`.** p08's `controls/gen_controls.py` leaves the shipped
+  `#[path = "../../common/driver.rs"]` in its output, which from
+  `.temp/p08/controls/` resolves to `.temp/common/driver.rs`. Byte-identical
+  today, so it works **by luck**; on a fresh clone p08's controls do not compile.
+  Same "stale or absent reproduction path" family as the entry above. p16's new
+  generator rewrites the path to the real, hashed file; p08's is not fixed.
 
 - `work_per_call` is unbounded; shrinking it 16× passes with a shout. Nothing
   checks it is denominated in the unit `work_unit_bits` names. **And it can err
