@@ -11,7 +11,7 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "4c6a8642355e9ea6c13c1dde602bd4b5c6ce05b95a530b9c4250fbfd7de3be67",
+  "contract_sha256": "443fc3db042c62166b36f5925468ba72048765a19075efbb49da5ffe61795142",
   "idiom": {
     "required": [
       "wrapping, not checked, addition in every rung -- the kernel is total on VALUES and R5's only obligation is off + len <= v.len()",
@@ -21,7 +21,7 @@
     "forbidden": [
       "a dead v_len parameter on the C kernel"
     ],
-    "why": "wrapping addition is what keeps the proof obligation exactly the memory-safety property, with no value bound smuggled in that the input generator would then have to be trusted to respect -- the pilot did the opposite and its own measured inputs violated it. The C/Rust arity asymmetry is the finding and not a rigging: the length is the thing C does not have and therefore cannot check, so handing C a dead v_len to make the signatures match would be Rust-in-C-syntax and would delete the comparison. Both are written out in the prose above; TASK_016 moved them into the hashed block. Note how weak this declaration deliberately is: p01 is the CALIBRATION pattern, it models no bug, and its inner fold is an associative sum with no bulk-memory idiom to lose, so beyond the three required entries no spelling of the fold is excluded and p01's numbers are a spelling's numbers. TASK_016 did not measure a spelling spread for p01; one is owed before any p01 number is quoted as what safe Rust costs."
+    "why": "wrapping addition is what keeps the proof obligation exactly the memory-safety property, with no value bound smuggled in that the input generator would then have to be trusted to respect -- the pilot did the opposite and its own measured inputs violated it. The C/Rust arity asymmetry is the finding and not a rigging: the length is the thing C does not have and therefore cannot check, so handing C a dead v_len to make the signatures match would be Rust-in-C-syntax and would delete the comparison. Both are also written out in the prose above ('Kernel signature' and 'Semantics'); TASK_016 RESTATED them here rather than moving them, so p01 states its idiom twice and THIS block is the authoritative copy (TASK_016_REVIEW m2). Whoever edits one edits the other. Note how weak this declaration deliberately is: p01 is the CALIBRATION pattern, it models no bug, and its inner fold is an associative sum with no bulk-memory idiom to lose, so beyond the three required entries no spelling of the fold is excluded and p01's numbers are a spelling's numbers. TASK_016 did not measure a spelling spread for p01; one is owed before any p01 number is quoted as what safe Rust costs."
   },
   "source_sha256": {
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
@@ -29,11 +29,11 @@
     "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
     "harness/asm.py": "e3b14d4e90f15e7ff28d862442c721120943bb70c9514437b77facc407b6675f",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "e7c6bca47361b30daf7a0aef68c0e8dd765f9600fe7d2077966cf3f46cfa4205",
+    "harness/check.py": "87fc00213197af167c781a3d83c72b81835e4e3f2212294086c7cba162d452bb",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "a810bf5973787f78fc9805b2407a6bb04bbee68c968374a2e9b8622c4c5d3af4",
-    "harness/report.py": "537f51262f58391a6e4da1999807e3b84a9e487e9727e168dc6527578442580a",
+    "harness/report.py": "1b32855d5820d0357626e041e486da68d0206ce0df0bd898560ff7affe6b035a",
     "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
     "patterns/p01-array-sum/NOTES.md": "c56280a0664c0049d879e9a6cba88e59b18e3bfa157d051984db6f13fe4752e5",
     "patterns/p01-array-sum/README.md": "c0d5616db3227be899f2fbdd1eec18b2225e354235c046fdc6180a16edfe7015",
@@ -44,7 +44,7 @@
     "patterns/p01-array-sum/safe_naive.rs": "31718428bae78cc7c8d50ba5c520091e0596dca1b5216a6bb76f85bbd88abbfb",
     "patterns/p01-array-sum/safe_naive_verus.rs": "6e84117379183aef6345c849ed2bea0777be2ec5422715bf9475c6c9b8a8bb87",
     "patterns/p01-array-sum/safe_tuned.rs": "ff2d49dd5338f48a3051989565137f8f7ae685521e4fa78999874edff48e4c16",
-    "patterns/p01-array-sum/spec.md": "3f9670585fe21d60a34ec61bb7950efc7c70ba3801cefbdff794b6a349fc93b1",
+    "patterns/p01-array-sum/spec.md": "aecea507425fde553a3ccdad0aa20866e61bc9f5f323efc795d8e53f1d1d86bd",
     "patterns/p01-array-sum/unsafe.rs": "026e4b6aa62113972c6881f0daa5e12da366c0eb0b9e7d5369cd0fc8c12db8e9",
     "patterns/p01-array-sum/verus.rs": "2b2b8d1c63fecfacb9f3487e2db205a4ba415808ed1b99fba2be6918108afe70"
   },

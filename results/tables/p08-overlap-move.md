@@ -24,6 +24,26 @@ Generated 2026-08-18T03:14:40Z from `results/p08-overlap-move.json` (git `4ab7a5
 | large.bin | 8,000 | 33,529,864 | 33,529,864 | False | n_iters=8000 stride=4093 n_blob=33529856 nwin=8192 calls=8000 work/call=4093B san=clean truncated=False expected=16961355432730674521 |
 | small.bin | 25,000 | 16,072 | 16,072 | False | n_iters=25000 stride=502 n_blob=16064 nwin=32 calls=25000 work/call=502B san=clean truncated=False expected=5963384295905503290 |
 
+## Declared idiom — what these numbers are numbers *of*
+
+Every delta below is a difference between rungs that are meant to be spellings of one kernel. The pattern's hashed `slb-contract` block declares which spellings that means; **a rung that deviates is a different benchmark and its numbers are not comparable to these.**
+
+- **required** — R1 spells the move memcpy and R1h memmove -- that one token is the whole difference between them
+- **required** — R2 shifts element-by-element in a backward loop, R3 uses copy_within, R4/R5 use core::ptr::copy; R2 and R3 differ in the body of move_right and in nothing else
+- **required** — the bounds guard `m < 2 || d == 0 || d + nrep > m` is checked ONCE, outside the round loop, in every rung including R1
+- **required** — dr = d + r, not a fixed d
+- **required** — nrep = 1 + (nrep_w % 4), a mask and not a check, written `%` and not `&`
+- **required** — scr is a fixed SCR = 4096 byte array LOCAL to the kernel in all six rungs, zero-initialised in all six, and m = min(avail, SCR)
+- **FORBIDDEN** — a per-round bounds check -- do not push the guard into the loop
+- **FORBIDDEN** — `nrep_w & 3`
+- **FORBIDDEN** — a driver-owned &mut scratch argument
+- **FORBIDDEN** — writing anything into the space the move opens
+
+> **Why**: p08's result is that one token (memcpy vs memmove) is the whole bug and that safe Rust cannot express it, so a rung that spells the move differently is not a rung of p08. A fixed d makes every round after the first a no-op, the checksum stops depending on nrep, and LLVM is free to delete the rounds. `&` is the same instruction as `%` on unsigned values but drags `by (bit_vector)` into R5 -- a cheaper proof of an identical specification, which `.memory/04-verus.md` blesses. The scratch must be kernel-local because `driver.call_args` refuses to drop anything that is not a single bare identifier, so C's `scr` and Rust's `&mut scr` cannot be reconciled by the driver diff; making them so would be a harness/ change, and the zero-init keeps the memset a uniform per-call constant that cancels in every rung-to-rung comparison. Writing header bytes into the opened space is a second bounded loop that adds nothing to the aliasing axis. RESTATED in this hashed block at TASK_016 from the prose sections 'Load-bearing, do not improve' and 'The scratch buffer' above -- restated, not moved: the prose is still there, says the same thing, and THIS block is the authoritative copy of it (TASK_016_REVIEW m2). Whoever edits one edits the other. TASK_016 did not measure a spelling spread for p08 and none is claimed here.
+
+> The gate checks that this declaration is **present** and hashes it into `contract_sha256`. It never checks that a rung honours it — that check would have to be textual and would fail open, and the threat model is honest mistake, not malicious author. TASK_016_REVIEW forked p05 with a **forbidden** R3 and got a complete green run with an unchanged `contract_sha256`. So this section is a claim about intent that a reader must check against the rung sources, not a verified property of the numbers below.
+
+
 ## Static + executed instructions
 
 `Ir` is **callgrind per-function exclusive** for the kernel symbol. The whole-program total is deliberately absent: it moves with the size of the environment block and does not reproduce across shells (`.memory/03-measurement.md`). Static counts are given raw and padding-excluded; quote the padding-excluded one, and never quote either without the `Ir` beside it.

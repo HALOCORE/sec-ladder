@@ -398,20 +398,57 @@ measured the per-rung offsets from the committed gate record and refuted it:
 | c-gcc, c-gcc-h | **+15.72** | R2 / R3 / R4 | +14.30 |
 | c-clang, c-clang-h | **+14.72** | R5 verus | **+13.30** |
 
-so the deltas that cross a *convention boundary* move:
+and **five of p16's eight rows** have deltas that move — written consistently as
+`row − R4`, small/large:
 
-- **`R5 − R4`: 0 → −1.00.** R4 and R5 are byte-identical binaries (`md5_raw`
-  equal), so their kernel-exclusive counts cannot differ — the −1.00 is the
-  driver's, and it is a fact about the whole-program measurement, not about the
-  proof. **Finding 1 rests on the raw-byte identity oracle, not on this number**;
-  quote the `md5` when saying a proof costs zero.
-- **`R4 − c-clang`: −17/−37 → +16.58/+36.58** — the sign flips.
-- **`R4 − c-gcc`: +1052/+8896 → −1053.42/−8897.42** — the sign flips.
+| delta | kernel-exclusive | whole-program marginal | moves by |
+|---|---:|---:|---:|
+| `c-gcc − R4` | +1052 / +8896 | +1053.42 / +8897.42 | +1.42 |
+| `c-gcc-h − R4` | +1069 / +8937 | +1070.42 / +8938.42 | +1.42 |
+| `c-clang − R4` | −17 / −37 | −16.58 / −36.58 | +0.42 |
+| `c-clang-h − R4` | +7 / +17 | +7.42 / +17.42 | +0.42 |
+| `R5 − R4` | 0 / 0 | −1.00 / −1.00 | −1.00 |
+
+**No sign flips**, and this file previously said there were two — a correction
+made at TASK_016_REVIEW, landed by the manager, and refuted at TASK_017. The
+"flip" came from labelling a value `R4 − c-clang` while quoting `c-clang − R4`:
+**switching sign convention mid-sentence, in the section whose own rule is "say
+which convention".** The canonical table is `patterns/p16-tlv-walk/NOTES.md` §10.
+
+`R5 − R4` going 0 → −1.00 is worth its own line: R4 and R5 are byte-identical
+binaries (`md5_raw` equal), so their kernel-exclusive counts *cannot* differ.
+The −1.00 is the driver's. **Finding 1 rests on the raw-byte identity oracle,
+not on this number** — quote the `md5` when saying a proof costs zero.
 
 Same shape as the two static-count conventions (`n_fn` vs `n_raw`), which
 TASK_014_REVIEW's own write-up mixed. Rule, in both cases and now with teeth:
 **say which convention a number is in, every time — a cross-rung delta is only
 meaningful inside one convention.**
+
+### `marginal_ir_per_call` does not always cancel the environment block
+
+This file already says whole-program totals move with the environment block
+(argv, envp, the `PAD`-style padding a different shell hands you). What TASK_017
+measured is that **differencing two runs does not always cancel it**:
+
+```
+p08  padlen=  0   marginal/iter = 7292.26
+p08  padlen=200   marginal/iter = 7292.24
+p08  padlen=400   marginal/iter = 7292.14
+p16  padlen=0/200/400            = 3009.30 / 3009.30 / 3009.30   (control: invariant)
+```
+
+Byte-identical binary, byte-identical probe inputs, only the env block's length
+changed. It is **p08-specific and mechanistic**: p08's per-iteration work runs
+through glibc `memcpy`/`memmove`, whose path length depends on buffer alignment,
+and the env block shifts the stack. p16, which calls no bulk routine, is exactly
+invariant.
+
+Consequence for gate hygiene: **"every `marginal_ir_per_call` cell unchanged" is
+a valid *within-session* invariant (96/96 across three p08 runs) and NOT a valid
+cross-session one** — 12 of p08's 64 cells move by ≤0.08 Ir/call. Do not read
+such a drift as a code change, and do not quote p08's marginals to more
+precision than that.
 
 ## Timing protocol
 

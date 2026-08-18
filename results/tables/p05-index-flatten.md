@@ -24,6 +24,22 @@ Generated 2026-08-17T20:26:54Z from `results/p05-index-flatten.json` (git `9d5c8
 | large.bin | 12,000 | 8,394,443 | 8,394,443 | False | n_iters=12000 stride=3969 n_blob=8394435 nwin=2115 calls=12000 work/call=3969B san=clean truncated=False expected=9972956928725141114 |
 | small.bin | 25,000 | 15,944 | 15,944 | False | n_iters=25000 stride=498 n_blob=15936 nwin=32 calls=25000 work/call=498B san=clean truncated=False expected=1506433241298462329 |
 
+## Declared idiom — what these numbers are numbers *of*
+
+Every delta below is a difference between rungs that are meant to be spellings of one kernel. The pattern's hashed `slb-contract` block declares which spellings that means; **a rung that deviates is a different benchmark and its numbers are not comparable to these.**
+
+- **required** — i*ncol + j written out in every rung, not strength-reduced
+- **required** — R3 may reslice [base .. base+ncol] with base = off + 4 + i*ncol -- that moves the CHECK and keeps the MULTIPLY, and it is the most a rung may do
+- **required** — the fit check is nrow * ncol > avail in 64-bit; row is a u32 accumulator and acc a u64
+- **required** — nrow * ncol is folded into the result, so a rung that walks a different number of elements cannot produce the same checksum even if the bytes happened to fold the same way
+- **FORBIDDEN** — chunks_exact
+- **FORBIDDEN** — a running row pointer
+
+> **Why**: either deletes the flattened index, which IS the pattern; a rung that does it is a different benchmark and its numbers are not comparable (this file's second sentence). RESTATED in this hashed block at TASK_016 from the prose section 'Load-bearing, do not improve' above, where contract_sha256 could not see it -- restated, not moved: the prose is still there and THIS block is the authoritative copy of it (TASK_016_REVIEW m2), and the copies had already drifted, the 'nrow * ncol is folded into the result' entry having been dropped on the day the block landed and restored at TASK_017 (m1). The declaration itself was made at TASK_013 BEFORE any of these spellings were measured, it was right both times it was tested, and two consecutive tasks measured a forbidden spelling anyway and published the result as p05's number (TASK_014_REVIEW B1 measured chunks_exact, TASK_015 measured the running row pointer; neither cited this file). NOTES.md 13 tabulates 11 measured spellings of this kernel with the contract-conformant cell marked -- none of the other ten is a p05 number. The gate checks that this key is present and hashes it; it does NOT check that a rung honours it.
+
+> The gate checks that this declaration is **present** and hashes it into `contract_sha256`. It never checks that a rung honours it — that check would have to be textual and would fail open, and the threat model is honest mistake, not malicious author. TASK_016_REVIEW forked p05 with a **forbidden** R3 and got a complete green run with an unchanged `contract_sha256`. So this section is a claim about intent that a reader must check against the rung sources, not a verified property of the numbers below.
+
+
 ## Static + executed instructions
 
 `Ir` is **callgrind per-function exclusive** for the kernel symbol. The whole-program total is deliberately absent: it moves with the size of the environment block and does not reproduce across shells (`.memory/03-measurement.md`). Static counts are given raw and padding-excluded; quote the padding-excluded one, and never quote either without the `Ir` beside it.

@@ -175,6 +175,36 @@ Read per unit of the thing each rung is doing:
   "+10 per call, flat": those kernels did one unit of work per call, this one
   does `nrec`. So `.memory/01-ladder.md`'s R3 finding **survives** the
   data-dependent loop, correctly re-denominated.
+
+  **The shipped R3 is not known to be the cheapest admissible spelling — and
+  after TASK_017 it is the only admissible spelling anybody has measured.**
+  Two cheaper R3 spellings exist and were measured at TASK_015
+  (`.temp/p05r3/v16/tuned_split.rs`, `…/tuned_splitat.rs`): **49 (`small`) /
+  109 (`large`) Ir/call below the shipped R3**, i.e. `10·nrec + 9` in both
+  residue classes (§10, **whole-program marginal** convention on both sides —
+  the variants were never measured kernel-exclusive, and §10 now records that
+  the driver offset is *not* uniform, so do not assume this delta carries into
+  §2's convention unchanged). Both consume the slice — one
+  window reslice, then `split_first_chunk::<3>()`/`split_at_checked` or plain
+  `split_at` — and therefore contain **neither** of the two comparisons
+  `spec.md`'s `idiom.required[0]` names. TASK_017 disambiguated that entry as
+  naming **tokens**, so both are **out of contract**: they are not admissible
+  p16 R3s and their numbers are not p16's. The matching consuming *R4*
+  (`…/unsafe_consume.rs`, 29/49 below the shipped R4) is out of contract for the
+  same reason, which is the point — the reading excludes a *representation*, on
+  both sides of the pair, not one rung's competitor.
+
+  What that leaves is honest and weaker than it sounds: **nobody has searched
+  p16's in-contract spelling space.** "The shipped R3 is the cheapest admissible
+  spelling" is **unestablished**, not established; `+27 / +77` is the cost of
+  *this* cursor-walk R3 against the cursor-walk R4 it ships beside, and the
+  value fold, the header read and the unrolling are unpinned. Nothing is
+  swapped: the cheaper rungs are out of contract, and even if they were not,
+  `R3′ − R4 = −22 / −32` means swapping R3 alone would publish "safe beats
+  unsafe" from an unmatched pair (TASK_014/TASK_015's defect, re-committed as a
+  shipped cell), while `inf(R4) ≤ inf(R3)` by construction
+  (`.memory/01-ladder.md` finding 14) means no swap terminates. Adjudicated at
+  TASK_016_REVIEW Part 5: **state the limitation, swap neither cell.**
 - **R5 is free**, as on every pattern: byte-identical to R4 at `-O3`
   (`md5_fn 852405e0fa43` both, `md5_raw` equal, padding 12/12 B), `norel` at
   `O0` where the crate names differ in length.
@@ -878,10 +908,41 @@ TASK_016 for every pattern that has spellings.
 **Read the convention line before comparing with §2.** These are **whole-program
 marginal** `Ir`/call — (`Ir` at `n_iters` 200 − at 100) ÷ 100, `harness/check.py`
 step 3b's probe — where §2's table is **callgrind's kernel-exclusive `Ir` ÷
-calls**. The two differ by the driver's own per-iteration work, measured here as
-a uniform **+14.30 on every rung** (R2 5095.0 → 5109.30, R3 3037.0 → 3051.30,
-R4 3010.0 → 3024.30), so every *difference* is identical under both conventions
-and no absolute here contradicts §2. **The three shipped rows are the gate's own
+calls**. The two differ by the driver's own per-iteration work, which is
+**+14.30 on the three rungs in this table** (R2 5095.0 → 5109.30, R3 3037.0 →
+3051.30, R4 3010.0 → 3024.30), so every difference *here* is identical under
+both conventions and no absolute here contradicts §2.
+
+**That offset is NOT uniform across the pattern, and the earlier claim that "no
+published delta moves" was false** (TASK_016_REVIEW M1; re-measured at TASK_017
+from `results/gate/p16-tlv-walk.json` against §2). The driver's per-iteration
+work outside the kernel symbol is compiled by a different compiler per rung:
+**c-gcc/c-gcc-h +15.72, c-clang/c-clang-h +14.72, R2/R3/R4 +14.30, R5 +13.30**,
+on both inputs. Every delta that crosses a *compiler* boundary therefore moves.
+Writing every difference consistently as **row − R4** (small / large):
+
+| delta | §2, kernel-exclusive | marginal | moves by |
+|---|---:|---:|---:|
+| `c-gcc − R4` | +1052 / +8896 | +1053.42 / +8897.42 | +1.42 |
+| `c-gcc-h − R4` | +1069 / +8937 | +1070.42 / +8938.42 | +1.42 |
+| `c-clang − R4` | −17 / −37 | −16.58 / −36.58 | +0.42 |
+| `c-clang-h − R4` | +7 / +17 | +7.42 / +17.42 | +0.42 |
+| `R5 − R4` | **0 / 0** | **−1.00 / −1.00** | −1.00 |
+| `R3 − R4`, `R2 − R4`, `R1h − R1` in one compiler | — | — | **0** |
+
+**No sign flips.** TASK_016_REVIEW M1 and `.memory/03-measurement.md` report
+these two C rows as "the sign flips"; re-measured at TASK_017 they do not — that
+reading comes from labelling the values `R4 − c-clang` / `R4 − c-gcc` while
+quoting `c-clang − R4` / `c-gcc − R4`, i.e. from switching sign convention
+mid-sentence. The magnitudes move by 0.42 and 1.42 and the signs stand. What is
+true, and is M1's real content, is that the offset is **not** uniform and five of
+§2's eight rows' deltas move; the earlier "+14.30 on every rung, no published
+delta moves" was false. **The R4 ≡ R5 finding does not rest on that −1.00**: it
+rests on `md5_fn` byte-identity (§2), which is a property of the kernel and not
+of the driver. Rule: say which convention a number is in — and which direction
+the subtraction goes — every time (`.memory/03-measurement.md`).
+
+**The three shipped rows are the gate's own
 numbers**: `results/gate/p16-tlv-walk.json`'s `marginal_ir_per_call` reads
 5109.3 / 3051.3 / 3024.3 on `small` and 40935.3 / 23889.3 / 23812.3 on `large`,
 which is where the +14.30 is checkable rather than asserted. p05 and p17 quote the marginal convention
@@ -900,10 +961,24 @@ before differencing across files.
 | 5 | R4 | `get_unchecked` on an index `p` | **`unsafe.rs` (SHIPPED CELL)** | **3024.30** | **23812.30** | **0** |
 | 6 | R4 | consumed cursor, `get_unchecked` | `v16-unsafe_consume.rs` | 2995.30 | 23763.30 | −29 / −49 |
 
-**Every row here satisfies p16's declared idiom, and that is deliberate** — see
-point 2 below and `spec.md`'s `idiom.why`. The marking here is therefore
-*shipped* versus *not shipped*, which is a weaker distinction than p05's, where
-8 of 11 spellings are excluded by name.
+**Rows 3, 4 and 6 do NOT satisfy p16's declared idiom** — corrected at TASK_017.
+Until then this section said all six rows were admissible, because `spec.md`'s
+`idiom` block contradicted itself: `required[0]` names two comparisons "in every
+rung" and the same block's `why` asserted that a spelling containing neither was
+admissible (TASK_016_REVIEW M2). `required[0]` now says explicitly that it names
+**tokens**; rows 3, 4 and 6 keep a consumed slice and a running remainder and
+contain neither `end - p >= 3` nor `vlen > end - (p + 3)`, so they are different
+benchmarks. The argument for that reading, and what it costs, is in
+`spec.md`'s `idiom.why`; the short version is that the two tokens *are* the
+cursor-and-end traversal, and pinning them is what makes `R3 − R4` a difference
+in safety rather than in representation. Note that the exclusion is
+**symmetric** — row 6 is an *unsafe* rung and goes out with rows 3 and 4.
+
+So the marking here is now *shipped and admissible* (rows 1, 2, 5) versus *out of
+contract* (rows 3, 4, 6), and the honest consequence is uncomfortable: **p16 has
+no admissible alternate spelling measured at all**, where `.memory/05-layout.md`
+finding 13 asks for at least two per rung. The spread below is a spread of
+kernels p16 does not ship *and* may not ship.
 
 Rows 3 and 4 are **indistinguishable in `Ir` on every input where both were
 measured** — both shipped inputs and four sweep blobs (`sw56`, `sw60`,
@@ -935,17 +1010,22 @@ Three things follow.
 1. **The safe side is again the spelling-sensitive one**, and by a margin that
    swamps the pair: rows 1–4 span 2107 `Ir` on `small` (69%), rows 5–6 span 29
    (1.0%).
-2. **p16's published R3 cost is a spelling's cost, and this pattern's `idiom`
-   block says so in as many words.** Unlike p05, p16 declares *no* restriction on
-   how the walk is spelled — only that the comparisons stay subtraction-first,
-   the tag is folded before the fit test, and `nrec` is folded — so rows 3, 4 and
-   6 are **admissible** p16 rungs that nobody has landed. `.memory/01-ladder.md`'s
-   corollary ("quote the cheapest spelling you can find") therefore bites here in
-   a way it does not on p05, and the honest statement is: *R3 costs `7 + 7·nrec`
-   as written; a consuming R3 costs `10·nrec + 9` less; and against the matching
-   consuming R4 the residual is 7 flat at one residue and `7 + nrec` at the other
-   three.* Landing a cheaper R3 as a cell is a **cell swap and a different task**;
-   it is not done here, and TASK_016 changed no cell source.
+2. **p16's published R3 cost is still a spelling's cost — but the spelling it is
+   a cost *of* is now pinned, and the cheaper rows are out of contract**
+   (TASK_017; the pre-TASK_017 text of this point called rows 3, 4 and 6
+   "admissible", which the block no longer supports). `required[0]` pins the two
+   comparisons as tokens, i.e. the cursor-and-end traversal, in every rung; what
+   it still does **not** pin is the value fold, the header read or unrolling, so
+   `+27 / +77` remains *this* R3's number rather than safe Rust's. The honest
+   statement is: *R3 costs `7 + 7·nrec` as written; a consuming R3 costs
+   `10·nrec + 9` less but is not a p16 rung; against the matching consuming R4 —
+   also not a p16 rung — the residual is 7 flat at one residue and `7 + nrec` at
+   the others.* `.memory/01-ladder.md`'s "quote the cheapest spelling you can
+   find" therefore does **not** bite on rows 3/4/6, and instead leaves a
+   different debt: **no admissible alternate R3 has ever been measured for p16**,
+   so "cheapest admissible" is unestablished. Measuring one is a task; landing
+   one is a cell swap and a different task again. TASK_016 and TASK_017 changed
+   no cell source.
 3. **`nrec + 3` was never p16's law.** TASK_015's audit fitted three points, two
    of which sat at `vlen ≡ 0 (mod 4)` where the slope is invisible, and the third
    used a record count its own table contradicts. Swept, the same quantity is

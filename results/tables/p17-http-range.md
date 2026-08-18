@@ -24,6 +24,23 @@ Generated 2026-08-17T18:33:08Z from `results/p17-http-range.json` (git `712ca850
 | large.bin | 12,000 | 8,390,658 | 8,390,658 | False | n_iters=12000 stride=4093 n_blob=8390650 nwin=2050 calls=12000 work/call=4093B san=clean truncated=False expected=10613012665269285418 |
 | small.bin | 25,000 | 16,200 | 16,200 | False | n_iters=25000 stride=506 n_blob=16192 nwin=32 calls=25000 work/call=506B san=clean truncated=False expected=18416420189787787870 |
 
+## Declared idiom — what these numbers are numbers *of*
+
+Every delta below is a difference between rungs that are meant to be spellings of one kernel. The pattern's hashed `slb-contract` block declares which spellings that means; **a rung that deviates is a different benchmark and its numbers are not comparable to these.**
+
+- **required** — start and end are int64_t / i64 in every rung, and the spec functions are written over int, not nat
+- **required** — the guard is the one conjunctive `if start < end && start >= 0 { ... }`, not two `continue`s
+- **required** — R1 omits only `&& start >= 0` -- it keeps `len < 2` and `2 + 2*nsuf > len`
+- **required** — nserved is folded into the result
+- **FORBIDDEN** — unsigned start/end
+- **FORBIDDEN** — `Range:` text parsing -- the fields are bytes, not ASCII
+- **FORBIDDEN** — a window-relative sign guard where a slice-relative one is meant, and vice versa
+
+> **Why**: making start unsigned deletes the CVE: `start < 0` becomes unrepresentable and the leak row of the semantics table could not exist. ASCII parsing adds a second new variable (string parsing is p11-p15). The `continue` spelling is not expressible in Verus ('for-loops do not yet support continue') and the while workaround hoists the increment above the guard in all six rungs. The last forbidden entry is the one that already cost this pattern a retraction: `start >= -(body_start as i64)` and `start >= -((off + body_start) as i64)` differ by one token, both verify, and only the second is what a bounds check buys -- see NOTES.md 1c. RESTATED in this hashed block at TASK_016 from the prose section 'Load-bearing, do not improve' above -- restated, not moved: the prose is still there, says the same thing, and THIS block is the authoritative copy of it (TASK_016_REVIEW m2). Whoever edits one edits the other. Note what is NOT restricted: the R2/R3/R4 spelling of the byte fold and of the suffix-table walk. NOTES.md 10 tabulates three measured spellings; the cheapest safe one is 17 Ir per suffix below the shipped R3, so p17's published R3 number is a spelling's number under this declaration, and it is a matched pair only against the R4 it ships beside.
+
+> The gate checks that this declaration is **present** and hashes it into `contract_sha256`. It never checks that a rung honours it — that check would have to be textual and would fail open, and the threat model is honest mistake, not malicious author. TASK_016_REVIEW forked p05 with a **forbidden** R3 and got a complete green run with an unchanged `contract_sha256`. So this section is a claim about intent that a reader must check against the rung sources, not a verified property of the numbers below.
+
+
 ## Static + executed instructions
 
 `Ir` is **callgrind per-function exclusive** for the kernel symbol. The whole-program total is deliberately absent: it moves with the size of the environment block and does not reproduce across shells (`.memory/03-measurement.md`). Static counts are given raw and padding-excluded; quote the padding-excluded one, and never quote either without the `Ir` beside it.

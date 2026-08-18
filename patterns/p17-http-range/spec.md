@@ -124,6 +124,11 @@ both Verus diagnostics from the same one-conjunct mutation.
 
 ### Load-bearing, do not "improve"
 
+**The authoritative copy of this list is the `idiom` key in the `slb-contract`
+block below**, which is hashed into `contract_sha256`. What follows is the same
+statement in prose, with the arguments; if the two ever disagree, the block wins
+and the prose is the bug. Edit both or neither (TASK_016_REVIEW m2).
+
 - **`start` and `end` are `int64_t` / `i64`.** That is the CVE. Making them
   unsigned "to be safe" deletes the pattern: `start < 0` would be
   unrepresentable and the second row of the table above could not exist.
@@ -390,7 +395,7 @@ exactly what `.memory/02-bench-rules.md` forbids.
       "`Range:` text parsing -- the fields are bytes, not ASCII",
       "a window-relative sign guard where a slice-relative one is meant, and vice versa"
     ],
-    "why": "making start unsigned deletes the CVE: `start < 0` becomes unrepresentable and the leak row of the semantics table could not exist. ASCII parsing adds a second new variable (string parsing is p11-p15). The `continue` spelling is not expressible in Verus ('for-loops do not yet support continue') and the while workaround hoists the increment above the guard in all six rungs. The last forbidden entry is the one that already cost this pattern a retraction: `start >= -(body_start as i64)` and `start >= -((off + body_start) as i64)` differ by one token, both verify, and only the second is what a bounds check buys -- see NOTES.md 1c. Moved into the hashed block at TASK_016 from the prose section 'Load-bearing, do not improve' above. Note what is NOT restricted: the R2/R3/R4 spelling of the byte fold and of the suffix-table walk. NOTES.md 10 tabulates three measured spellings; the cheapest safe one is 17 Ir per suffix below the shipped R3, so p17's published R3 number is a spelling's number under this declaration, and it is a matched pair only against the R4 it ships beside."
+    "why": "making start unsigned deletes the CVE: `start < 0` becomes unrepresentable and the leak row of the semantics table could not exist. ASCII parsing adds a second new variable (string parsing is p11-p15). The `continue` spelling is not expressible in Verus ('for-loops do not yet support continue') and the while workaround hoists the increment above the guard in all six rungs. The last forbidden entry is the one that already cost this pattern a retraction: `start >= -(body_start as i64)` and `start >= -((off + body_start) as i64)` differ by one token, both verify, and only the second is what a bounds check buys -- see NOTES.md 1c. RESTATED in this hashed block at TASK_016 from the prose section 'Load-bearing, do not improve' above -- restated, not moved: the prose is still there, says the same thing, and THIS block is the authoritative copy of it (TASK_016_REVIEW m2). Whoever edits one edits the other. Note what is NOT restricted: the R2/R3/R4 spelling of the byte fold and of the suffix-table walk. NOTES.md 10 tabulates three measured spellings; the cheapest safe one is 17 Ir per suffix below the shipped R3, so p17's published R3 number is a spelling's number under this declaration, and it is a matched pair only against the R4 it ships beside."
   },
 
   "verus": {

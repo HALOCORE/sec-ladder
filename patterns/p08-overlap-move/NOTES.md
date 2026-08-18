@@ -163,6 +163,35 @@ because the callee is the same function. The task predicted "flat and small
 (finding 3's family)"; the measurement is stronger than the prediction, and for
 a reason that is a property of glibc rather than of the ladder.
 
+**One caveat on the figures in this table, measured at TASK_017: p08's marginal
+`Ir` does not reproduce to the hundredth across *sessions*, and p08 is the only
+pattern where that is true.** Re-running all six gates at TASK_017 — no cell
+source changed, all 28 `md5_fn` identical — moved **12 of p08's 64
+`marginal_ir_per_call` cells** (and the 11 `d_ir_d_work` slopes derived from
+them) by **0.02–0.08 Ir/call**, while the other five patterns reproduced
+**541/541** of their recorded values exactly. Two runs *inside one shell* agree
+on **64/64**, so this is not run-to-run noise.
+
+The cause is the environment block, and it is measured rather than inferred.
+With the byte-identical `unsafe-O3-whole` binary and byte-identical 100/200
+iteration probe inputs, padding the environment with 0 / 200 / 400 bytes gives
+whole-program totals 1 099 559 / 1 099 525 / 1 099 513 at `n_iters = 100` and
+marginals of **7292.26 / 7292.24 / 7292.14** per iteration. The identical
+experiment on p16 gives **3009.30 / 3009.30 / 3009.30** — invariant to the
+hundredth. So the sensitivity is p08's own: its per-iteration work runs through
+glibc `memcpy`/`memmove`, whose path length depends on buffer alignment, and the
+environment block shifts the stack under it. `.memory/03-measurement.md` already
+says whole-program totals move with the environment block; what is new is that
+**differencing two of them does not cancel it here**, because the per-iteration
+cost itself changes with alignment.
+
+Magnitude: ≤0.08 on figures of 4 800–206 000, i.e. ≤2×10⁻⁵ relative. No claim in
+this file rests on a digit that moves — `R1h − R1 = 0.00` is a difference of two
+cells measured in the *same* run, and every §3 attribution is likewise a
+within-run difference. But **quote p08's marginals to the instruction, not to
+the hundredth**, and do not treat "every `marginal_ir_per_call` cell unchanged"
+as an invariant for p08 across sessions.
+
 Wall clock agrees, within a noise floor that is itself measured (§4):
 `large`, min of 31 pinned interleaved reps — c-gcc 3670.08 ns vs c-gcc-h
 3539.37 ns, c-clang 3527.73 vs c-clang-h 3492.81. **Both differences have the

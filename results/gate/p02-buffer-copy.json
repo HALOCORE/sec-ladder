@@ -12,19 +12,19 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "9f4365369d1e845b6a272d210900defe9cf7d7165c8fe1e2c6373fa007b8210e",
+  "contract_sha256": "121da143cc51b42e858b93f73f28b5a8e412645dc7117adf812e56893ae21502",
   "idiom": {
     "required": [
-      "the fit check is subtraction-first -- `len > src_len - (src_off + 2)` -- spelled identically in every rung",
+      "the fit check is subtraction-first -- `len > src_len - (src_off + 2)` -- spelled identically in every rung that HAS one. R1 (`c/kernel.c`) has no fit check at all: it casts `src_len` and `dst_cap` to `(void)` and that omission IS the bug this pattern models. R1h is R1 plus the three-term check `len > dst_cap || len > src_len - (src_off + 2)` and nothing else",
       "the u16 prefix is decoded with `+`, not `|`",
       "the result is folded over dst AFTER the copy, not over src",
-      "the kernel is total in len: all 65536 values a u16 prefix can express are handled",
+      "the kernel is total in len: all 65536 values a u16 prefix can express are handled -- in every rung EXCEPT R1, which is defined only for the values that happen to fit and overruns `dst` for the rest. R1's partiality is the CWE-787 the pattern exists to exhibit (ASan fires on `adversarial-overrun.bin`, NOTES.md 1); do not 'fix' it",
       "R2 copies index-by-index; R3 reslices both sides once and copies with copy_from_slice"
     ],
     "forbidden": [
       "the additive check `src_off + 2 + len > src_len`"
     ],
-    "why": "the additive form can overflow size_t and wave the attack through, so it is the spelling this pattern exists to reject. The `+` decode and the `|` decode are the same function and lower to the same instruction; `+` is chosen because it needs no bit-vector reasoning in R5, which is a cheaper PROOF and not a weaker specification. Folding dst after the copy is what stops the copy being dead code. The last required entry is the one that already cost this pattern a retraction and must not be quietly 'fixed': R2's index-by-index copy is why rustc never forms a memcpy there, one operator flips `bulk_calls []` to `['memcpy@GLIBC_2.14']` and 118 kernel instructions to 87, and that difference was 100% of R2's retracted delta (NOTES.md 3a). Swapping a bulk copy into R2, or an indexed copy into R3, deletes p02's only decomposition and its finding with it. Moved into the hashed block at TASK_016 from the 'Four things about that are load-bearing' prose above. TASK_016 did not measure a spelling spread for p02 and none is claimed here."
+    "why": "the additive form can overflow size_t and wave the attack through, so it is the spelling this pattern exists to reject. The `+` decode and the `|` decode are the same function and lower to the same instruction; `+` is chosen because it needs no bit-vector reasoning in R5, which is a cheaper PROOF and not a weaker specification. Folding dst after the copy is what stops the copy being dead code. The last required entry is the one that already cost this pattern a retraction and must not be quietly 'fixed': R2's index-by-index copy is why rustc never forms a memcpy there, one operator flips `bulk_calls []` to `['memcpy@GLIBC_2.14']` and 118 kernel instructions to 87, and that difference was 100% of R2's retracted delta (NOTES.md 3a). Swapping a bulk copy into R2, or an indexed copy into R3, deletes p02's only decomposition and its finding with it. RESTATED in this hashed block at TASK_016 from the 'Four things about that are load-bearing' prose above -- restated, not moved: the prose is still there, says the same thing, and THIS block is the authoritative copy of it (TASK_016_REVIEW m2). Whoever edits one edits the other. TASK_016 did not measure a spelling spread for p02 and none is claimed here."
   },
   "source_sha256": {
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
@@ -32,11 +32,11 @@
     "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
     "harness/asm.py": "e3b14d4e90f15e7ff28d862442c721120943bb70c9514437b77facc407b6675f",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "e7c6bca47361b30daf7a0aef68c0e8dd765f9600fe7d2077966cf3f46cfa4205",
+    "harness/check.py": "87fc00213197af167c781a3d83c72b81835e4e3f2212294086c7cba162d452bb",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "a810bf5973787f78fc9805b2407a6bb04bbee68c968374a2e9b8622c4c5d3af4",
-    "harness/report.py": "537f51262f58391a6e4da1999807e3b84a9e487e9727e168dc6527578442580a",
+    "harness/report.py": "1b32855d5820d0357626e041e486da68d0206ce0df0bd898560ff7affe6b035a",
     "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
     "patterns/p02-buffer-copy/NOTES.md": "70580c7089bbeade704a63d0df2c7e4575603858129c3825a00a83f33b9c2bc9",
     "patterns/p02-buffer-copy/README.md": "0e16eefe3cfa37df83df7581b1eae7dbec1f5f128bb80bf32acf45e8c3225b82",
@@ -47,7 +47,7 @@
     "patterns/p02-buffer-copy/model.py": "45dba85095cdc6108813bcc528caceb43cb5584f16956dda5577754bd4c809d9",
     "patterns/p02-buffer-copy/safe_naive.rs": "82d6331dc4d2b028b4ceb11dd82d9c62ea49593fb00f491b9b5a4d3e4321a360",
     "patterns/p02-buffer-copy/safe_tuned.rs": "23f1b0b7a7d45856ad430fe176062b4342044195f9393d2cd623b52c25850b4b",
-    "patterns/p02-buffer-copy/spec.md": "d0cbc98ced73cc150ed3df202d93f8f3a0548225f2c22e441ccb5265405d47ed",
+    "patterns/p02-buffer-copy/spec.md": "5d902124f89af982ea78a15df97d7cb73de8771d4bba28354777bfc46a9a3e2e",
     "patterns/p02-buffer-copy/unsafe.rs": "d295410141f7ae1879305a0b57763f76e2f232a58688fd9efda59481b999c55c",
     "patterns/p02-buffer-copy/verus.rs": "a2f76991dcea4faccd78b8254e1f69c2874f644970ff90f7575ab151464c5696"
   },
@@ -946,7 +946,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==3703942==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x506000000060 at pc 0x55a6f7be9f13 bp 0x7ffd81bfa230 sp 0x7ffd81bf99d8 WRITE of size 65 at 0x506000000060 thread T0 #0 0x55a6f7be9f12 in __interceptor_memcpy (/home/"
+      "diagnostic": "================================================================= ==3753288==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x506000000060 at pc 0x5570d7129f13 bp 0x7ffc499b9690 sp 0x7ffc499b8e38 WRITE of size 65 at 0x506000000060 thread T0 #0 0x5570d7129f12 in __interceptor_memcpy (/home/"
     },
     "adversarial-capbig.bin": {
       "exit": 7,
@@ -967,7 +967,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==3703947==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000038 at pc 0x55f6e73d1036 bp 0x7ffd21ad5a00 sp 0x7ffd21ad51a8 READ of size 61 at 0x504000000038 thread T0 #0 0x55f6e73d1035 in __interceptor_memcpy (/home/a"
+      "diagnostic": "================================================================= ==3753293==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000038 at pc 0x55fb4213f036 bp 0x7fffeeef10a0 sp 0x7fffeeef0848 READ of size 61 at 0x504000000038 thread T0 #0 0x55fb4213f035 in __interceptor_memcpy (/home/a"
     },
     "adversarial-stride1.bin": {
       "exit": 0,
@@ -981,7 +981,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==3703951==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x527000006a38 at pc 0x5605a287e036 bp 0x7ffcac240400 sp 0x7ffcac23fba8 READ of size 65535 at 0x527000006a38 thread T0 #0 0x5605a287e035 in __interceptor_memcpy (/hom"
+      "diagnostic": "================================================================= ==3753296==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x527000006a38 at pc 0x56272607a036 bp 0x7ffc455eb480 sp 0x7ffc455eac28 READ of size 65535 at 0x527000006a38 thread T0 #0 0x56272607a035 in __interceptor_memcpy (/hom"
     },
     "large.bin": {
       "exit": 0,

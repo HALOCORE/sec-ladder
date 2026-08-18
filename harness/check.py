@@ -24,8 +24,12 @@ What it enforces, in order:
      conventions), and the three structural parsers pass their own selftests
   0b the pattern DECLARES the idiom its rungs implement, inside the hashed
      contract block. Presence only -- the gate never checks that a rung honours
-     it (that check would fail open); the point is that the declaration is
-     hashed, so changing a rung's idiom must move `contract_sha256`
+     it (that check would fail open). What the key buys is that the declaration
+     is required, printed in the verdict and hashed, so *weakening or editing
+     the declaration* moves `contract_sha256`. It does NOT detect a rung that
+     violates the declaration: rung sources are covered by `source_sha256`, and
+     a forbidden respelling passes this gate (proved by experiment,
+     TASK_016_REVIEW B1)
   1  every cell of the matrix builds (and under `--no-build`, that no binary
      predates the newest source)
   2  every cell prints the checksum the pattern's own `model.py` predicts. The
@@ -561,9 +565,31 @@ def idiom_problems(contract):
     What this does NOT do is check that a rung honours its idiom. Grepping
     `safe_tuned.rs` for `chunks_exact` fails open -- a strength-reduced row
     pointer has no token to grep for -- and the threat model is honest mistake,
-    not malicious author (`.memory/02-bench-rules.md`). The whole value is that
-    the declaration is inside the hashed block: changing a rung's idiom must
-    now move `contract_sha256`, which is a signal review already reads.
+    not malicious author (`.memory/02-bench-rules.md`).
+
+    TASK_016 claimed here that "changing a rung's idiom must now move
+    `contract_sha256`". **That is false and TASK_016_REVIEW B1 proved it by
+    experiment**: a p05 fork whose `safe_tuned.rs` was swapped for the
+    *forbidden* `chunks_exact` spelling produced a complete green run -- `PASS`,
+    `complete_run: true`, `failures: []` -- with `contract_sha256`
+    byte-identical to the shipped pattern's, certifying `R3 - R4 = -12/-58` as
+    p05 while printing the declaration that forbids it three lines above the
+    PASS. `read_contract()` hashes `spec.md`'s fenced block and nothing else.
+
+    What the key actually buys, which is narrower and still worth having:
+
+      * the declaration is REQUIRED, so a pattern cannot ship without stating
+        what its rungs are spellings *of*;
+      * it is VISIBLE -- printed in the verdict and in the failure summary, and
+        copied into every committed `results/gate/*.json`;
+      * it is HASHED, so *weakening or editing the declaration* -- the move that
+        licenses a swap -- shows up as a one-line `contract_sha256` change in a
+        committed artefact, which is a signal review already reads.
+
+    Rung sources are covered by `source_sha256`, not by this key. Nothing here
+    prevents a forbidden respelling and nothing can without semantic checking,
+    which the threat model forbids. Say that, and do not restore the stronger
+    sentence.
 
     `forbidden` MAY be empty. A pattern with no meaningful spelling restriction
     must be able to say so and pass -- `MAX_TWIN_JUSTIFICATIONS` was deleted at
@@ -599,20 +625,27 @@ def idiom_problems(contract):
     return probs
 
 
-def idiom_lines(contract):
+def idiom_lines(contract, keys=("required", "forbidden"), why=True):
     """The declaration itself, for the verdict: a reviewer reading a run sees
-    what was declared without opening `spec.md`."""
+    what was declared without opening `spec.md`.
+
+    `keys`/`why` narrow it: the failure summary reprints the `forbidden` list
+    alone, because a failing run is the output somebody copies out of a
+    terminal and the declaration has to travel with it (TASK_017 Part 2)."""
     idi = contract.get("idiom") or {}
     out = []
     for k, tag in (("required", "REQUIRED "), ("forbidden", "FORBIDDEN")):
+        if k not in keys:
+            continue
         for s in idi.get(k) or []:
             out += textwrap.wrap(s, 92, initial_indent=f"    idiom {tag} ",
                                  subsequent_indent=" " * 20)
         if not (idi.get(k) or []):
             out.append(f"    idiom {tag} (none declared)")
-    out += textwrap.wrap(idi.get("why") or "", 92,
-                         initial_indent="    idiom WHY       ",
-                         subsequent_indent=" " * 20)
+    if why:
+        out += textwrap.wrap(idi.get("why") or "", 92,
+                             initial_indent="    idiom WHY       ",
+                             subsequent_indent=" " * 20)
     return out
 
 
@@ -4265,6 +4298,13 @@ def main():
         print(f"    {len(rep.failures)} FAILURE(S):")
         for s, m in rep.failures:
             print(f"      [{s}] {m}")
+        # And the forbidden list again, beside the failures. A failing run is
+        # the output that gets pasted into a report; the verdict header above it
+        # is often scrolled past. The gate cannot tell whether a rung honours
+        # the declaration -- printing it where the reader is looking is the
+        # whole of what stage 0b can do about that (TASK_017 Part 2).
+        for ln in idiom_lines(contract, keys=("forbidden",), why=False):
+            print(ln)
         print("\ncheck.py: FAIL")
         return 1
     print(f"\ncheck.py: {verdict}")

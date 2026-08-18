@@ -68,6 +68,14 @@ loop" case, now with a 2-D index on top.
 
 ### Load-bearing, do not "improve"
 
+**The authoritative copy of this list is the `idiom` key in the `slb-contract`
+block below**, which is hashed into `contract_sha256`. What follows is the same
+statement in prose, with the arguments; if the two ever disagree, the block wins
+and the prose is the bug. Edit both or neither — TASK_016 *duplicated* this
+section into the block rather than moving it, and one bullet was already missing
+from the copy on the day it landed (TASK_016_REVIEW m1/m2; restored at
+TASK_017).
+
 - **`i*ncol + j` stays as written, in every rung.** Do not strength-reduce it to
   a running pointer and do not use `chunks_exact` — either deletes the pattern.
   R3 reslices `[base .. base+ncol]` with `base = off + 4 + i*ncol`, which moves
@@ -318,10 +326,11 @@ exactly what `.memory/02-bench-rules.md` forbids.
     "required": [
       "i*ncol + j written out in every rung, not strength-reduced",
       "R3 may reslice [base .. base+ncol] with base = off + 4 + i*ncol -- that moves the CHECK and keeps the MULTIPLY, and it is the most a rung may do",
-      "the fit check is nrow * ncol > avail in 64-bit; row is a u32 accumulator and acc a u64"
+      "the fit check is nrow * ncol > avail in 64-bit; row is a u32 accumulator and acc a u64",
+      "nrow * ncol is folded into the result, so a rung that walks a different number of elements cannot produce the same checksum even if the bytes happened to fold the same way"
     ],
     "forbidden": ["chunks_exact", "a running row pointer"],
-    "why": "either deletes the flattened index, which IS the pattern; a rung that does it is a different benchmark and its numbers are not comparable (this file's second sentence). Moved into the hashed block at TASK_016 from the prose section 'Load-bearing, do not improve' above, where contract_sha256 could not see it: it was declared at TASK_013 BEFORE any of these spellings were measured, it was right both times it was tested, and two consecutive tasks measured a forbidden spelling anyway and published the result as p05's number (TASK_014_REVIEW B1 measured chunks_exact, TASK_015 measured the running row pointer; neither cited this file). NOTES.md 13 tabulates 11 measured spellings of this kernel with the contract-conformant cell marked -- none of the other ten is a p05 number. The gate checks that this key is present and hashes it; it does NOT check that a rung honours it."
+    "why": "either deletes the flattened index, which IS the pattern; a rung that does it is a different benchmark and its numbers are not comparable (this file's second sentence). RESTATED in this hashed block at TASK_016 from the prose section 'Load-bearing, do not improve' above, where contract_sha256 could not see it -- restated, not moved: the prose is still there and THIS block is the authoritative copy of it (TASK_016_REVIEW m2), and the copies had already drifted, the 'nrow * ncol is folded into the result' entry having been dropped on the day the block landed and restored at TASK_017 (m1). The declaration itself was made at TASK_013 BEFORE any of these spellings were measured, it was right both times it was tested, and two consecutive tasks measured a forbidden spelling anyway and published the result as p05's number (TASK_014_REVIEW B1 measured chunks_exact, TASK_015 measured the running row pointer; neither cited this file). NOTES.md 13 tabulates 11 measured spellings of this kernel with the contract-conformant cell marked -- none of the other ten is a p05 number. The gate checks that this key is present and hashes it; it does NOT check that a rung honours it."
   },
 
   "verus": {

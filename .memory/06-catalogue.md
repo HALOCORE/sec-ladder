@@ -116,8 +116,10 @@ supersede any earlier task report they contradict.
   separately **wrong**: `contract_sha256` has already moved 3× on p01 and 4× on
   p02, so "unchanged since TASK_013" was recency, not an invariant.
 
-  **Residual, adjudicated at TASK_016_REVIEW: state the limitation, swap
-  neither cell.** p17's cheaper spelling is genuinely admissible under its
+  **CLOSED at TASK_017: the limitation is stated in p16's and p17's `NOTES.md`,
+  neither cell was swapped, and p16's `required[0]` was disambiguated as naming
+  tokens — which puts its cheaper spelling OUT of contract and leaves p16 with
+  zero measured admissible alternates.** The adjudication that got there: p17's cheaper spelling is genuinely admissible under its
   declaration — but it also beats **its own R4** by 19.00, so swapping R3 alone
   would re-commit TASK_014/015's unmatched-pair defect *as a shipped cell*, and
   `inf(R4) <= inf(R3)` means no swap ever terminates. p16's case is **not even

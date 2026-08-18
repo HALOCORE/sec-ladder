@@ -89,6 +89,12 @@ all six rungs, and **R1 and R1h differ by exactly one token**: `memcpy` vs
 
 ### Load-bearing, do not "improve"
 
+**The authoritative copy of this list — and of "The scratch buffer" below — is
+the `idiom` key in the `slb-contract` block**, which is hashed into
+`contract_sha256`. What follows is the same statement in prose, with the
+arguments; if the two ever disagree, the block wins and the prose is the bug.
+Edit both or neither (TASK_016_REVIEW m2).
+
 - **`dr = d + r`, not a fixed `d`.** With a fixed `d` and `d >= m/2` the rounds
   after the first are *no-ops* — the checksum would stop depending on `nrep`, a
   rung that skipped rounds 2..n would still pass, and LLVM would be free to
@@ -313,7 +319,7 @@ check from `spec.md` alone is exactly what `.memory/02-bench-rules.md` forbids.
       "a driver-owned &mut scratch argument",
       "writing anything into the space the move opens"
     ],
-    "why": "p08's result is that one token (memcpy vs memmove) is the whole bug and that safe Rust cannot express it, so a rung that spells the move differently is not a rung of p08. A fixed d makes every round after the first a no-op, the checksum stops depending on nrep, and LLVM is free to delete the rounds. `&` is the same instruction as `%` on unsigned values but drags `by (bit_vector)` into R5 -- a cheaper proof of an identical specification, which `.memory/04-verus.md` blesses. The scratch must be kernel-local because `driver.call_args` refuses to drop anything that is not a single bare identifier, so C's `scr` and Rust's `&mut scr` cannot be reconciled by the driver diff; making them so would be a harness/ change, and the zero-init keeps the memset a uniform per-call constant that cancels in every rung-to-rung comparison. Writing header bytes into the opened space is a second bounded loop that adds nothing to the aliasing axis. Moved into the hashed block at TASK_016 from the prose sections 'Load-bearing, do not improve' and 'The scratch buffer' above. TASK_016 did not measure a spelling spread for p08 and none is claimed here."
+    "why": "p08's result is that one token (memcpy vs memmove) is the whole bug and that safe Rust cannot express it, so a rung that spells the move differently is not a rung of p08. A fixed d makes every round after the first a no-op, the checksum stops depending on nrep, and LLVM is free to delete the rounds. `&` is the same instruction as `%` on unsigned values but drags `by (bit_vector)` into R5 -- a cheaper proof of an identical specification, which `.memory/04-verus.md` blesses. The scratch must be kernel-local because `driver.call_args` refuses to drop anything that is not a single bare identifier, so C's `scr` and Rust's `&mut scr` cannot be reconciled by the driver diff; making them so would be a harness/ change, and the zero-init keeps the memset a uniform per-call constant that cancels in every rung-to-rung comparison. Writing header bytes into the opened space is a second bounded loop that adds nothing to the aliasing axis. RESTATED in this hashed block at TASK_016 from the prose sections 'Load-bearing, do not improve' and 'The scratch buffer' above -- restated, not moved: the prose is still there, says the same thing, and THIS block is the authoritative copy of it (TASK_016_REVIEW m2). Whoever edits one edits the other. TASK_016 did not measure a spelling spread for p08 and none is claimed here."
   },
 
   "verus": {

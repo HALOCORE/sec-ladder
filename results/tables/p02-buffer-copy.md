@@ -27,6 +27,22 @@ Generated 2026-08-17T18:00:05Z from `results/p02-buffer-copy.json` (git `712ca85
 | large.bin | 20,000 | 8,384,528 | 8,384,528 | False | n_iters=20000 cap=4096 stride=4094 n_src=8384512 nrec=2048 calls=20000 work/call=4092B san=clean truncated=False cap_bad=False expected=4856715052625337940 |
 | small.bin | 200,000 | 12,616 | 12,616 | False | n_iters=200000 cap=64 stride=63 n_src=12600 nrec=200 calls=200000 work/call=61B san=clean truncated=False cap_bad=False expected=15997819096698035934 |
 
+## Declared idiom — what these numbers are numbers *of*
+
+Every delta below is a difference between rungs that are meant to be spellings of one kernel. The pattern's hashed `slb-contract` block declares which spellings that means; **a rung that deviates is a different benchmark and its numbers are not comparable to these.**
+
+- **required** — the fit check is subtraction-first -- `len > src_len - (src_off + 2)` -- spelled identically in every rung that HAS one. R1 (`c/kernel.c`) has no fit check at all: it casts `src_len` and `dst_cap` to `(void)` and that omission IS the bug this pattern models. R1h is R1 plus the three-term check `len > dst_cap || len > src_len - (src_off + 2)` and nothing else
+- **required** — the u16 prefix is decoded with `+`, not `|`
+- **required** — the result is folded over dst AFTER the copy, not over src
+- **required** — the kernel is total in len: all 65536 values a u16 prefix can express are handled -- in every rung EXCEPT R1, which is defined only for the values that happen to fit and overruns `dst` for the rest. R1's partiality is the CWE-787 the pattern exists to exhibit (ASan fires on `adversarial-overrun.bin`, NOTES.md 1); do not 'fix' it
+- **required** — R2 copies index-by-index; R3 reslices both sides once and copies with copy_from_slice
+- **FORBIDDEN** — the additive check `src_off + 2 + len > src_len`
+
+> **Why**: the additive form can overflow size_t and wave the attack through, so it is the spelling this pattern exists to reject. The `+` decode and the `|` decode are the same function and lower to the same instruction; `+` is chosen because it needs no bit-vector reasoning in R5, which is a cheaper PROOF and not a weaker specification. Folding dst after the copy is what stops the copy being dead code. The last required entry is the one that already cost this pattern a retraction and must not be quietly 'fixed': R2's index-by-index copy is why rustc never forms a memcpy there, one operator flips `bulk_calls []` to `['memcpy@GLIBC_2.14']` and 118 kernel instructions to 87, and that difference was 100% of R2's retracted delta (NOTES.md 3a). Swapping a bulk copy into R2, or an indexed copy into R3, deletes p02's only decomposition and its finding with it. RESTATED in this hashed block at TASK_016 from the 'Four things about that are load-bearing' prose above -- restated, not moved: the prose is still there, says the same thing, and THIS block is the authoritative copy of it (TASK_016_REVIEW m2). Whoever edits one edits the other. TASK_016 did not measure a spelling spread for p02 and none is claimed here.
+
+> The gate checks that this declaration is **present** and hashes it into `contract_sha256`. It never checks that a rung honours it — that check would have to be textual and would fail open, and the threat model is honest mistake, not malicious author. TASK_016_REVIEW forked p05 with a **forbidden** R3 and got a complete green run with an unchanged `contract_sha256`. So this section is a claim about intent that a reader must check against the rung sources, not a verified property of the numbers below.
+
+
 ## Static + executed instructions
 
 `Ir` is **callgrind per-function exclusive** for the kernel symbol. The whole-program total is deliberately absent: it moves with the size of the environment block and does not reproduce across shells (`.memory/03-measurement.md`). Static counts are given raw and padding-excluded; quote the padding-excluded one, and never quote either without the `Ir` beside it.

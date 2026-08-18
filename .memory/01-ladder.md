@@ -258,13 +258,23 @@ is a much stronger claim than any p01 could produce.
    **Corrected at TASK_015_REVIEW: "O(1) per call" is residue-dependent.** The
    +27/+77 pair decomposes as `7 + 5·nrec` at `vlen ≡ 0 (mod 4)` and `7 + 7·nrec`
    otherwise, so it is `O(nrec)` — the two published points happen to sit at
-   nrec 4 and 10. A cheaper R3 spelling exists (`split_at` / `split_first_chunk`,
+   nrec 4 and 10. A cheaper spelling exists (`split_at` / `split_first_chunk`,
    indistinguishable from each other) at `R3ship − R3′ = 10·nrec + 9`, and
    idiom-matched against an equivalent R4 the residual is **7 flat at
    `vlen ≡ 0 (mod 4)` and `7 + nrec` in the other three classes**, swept over 68
-   blobs. None of this is landed as a p16 cell and none of it may be quoted as
-   p16's R3 — p16 has no declared-idiom block yet, which is exactly the gap
-   finding 14 is about. This file already said, at finding 3: *"Never publish a
+   blobs.
+   **But it is OUT OF CONTRACT, decided at TASK_017.** p16's `idiom.required[0]`
+   was disambiguated as naming **tokens** — `end - p >= 3` and
+   `vlen > end - (p+3)` must appear literally — and `split_first_chunk` contains
+   neither. The reading was chosen on four measurement-independent grounds (house
+   convention across p05/p02/p17; those tokens *being* the cursor-and-end
+   traversal; and the exclusion falling **symmetrically**, taking the consuming
+   *R4* control out with the R3s), explicitly **not** on which answer made the
+   cheaper spelling inadmissible. State the residual risk with the number every
+   time: **the chosen reading makes p16's shipped figure look better**, and it
+   leaves p16 with **zero measured admissible alternate spellings**, so "the
+   shipped R3 is the cheapest admissible one" is **unestablished, not
+   established**. p16 owes a spelling-spread measurement inside its own contract. This file already said, at finding 3: *"Never publish a
    safety-cost claim without R3."* The rule was violated by its own author on the
    next pattern. **Lead with R3 or do not lead.**
 

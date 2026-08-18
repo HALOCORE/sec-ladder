@@ -38,6 +38,13 @@ measured inputs violated. See `.memory/02-bench-rules.md`.)
 C's `uint64_t` addition already wraps by definition, so R1 needs no special
 spelling; the Rust rungs use `u64::wrapping_add`.
 
+**The authoritative statement of p01's idiom** — this section's wrapping-addition
+rule and the "Kernel signature" section's C/Rust arity asymmetry — **is the
+`idiom` key in the `slb-contract` block below**, which is hashed into
+`contract_sha256`. The prose here is the same statement with the arguments; if
+the two ever disagree, the block wins and the prose is the bug. Edit both or
+neither (TASK_016_REVIEW m2).
+
 ## Contract
 
 ```
@@ -89,7 +96,7 @@ a green gate are, separately, evidence of very little:
       "R2 indexes v[i] element by element; R3 reslices the window once and folds it with an iterator"
     ],
     "forbidden": ["a dead v_len parameter on the C kernel"],
-    "why": "wrapping addition is what keeps the proof obligation exactly the memory-safety property, with no value bound smuggled in that the input generator would then have to be trusted to respect -- the pilot did the opposite and its own measured inputs violated it. The C/Rust arity asymmetry is the finding and not a rigging: the length is the thing C does not have and therefore cannot check, so handing C a dead v_len to make the signatures match would be Rust-in-C-syntax and would delete the comparison. Both are written out in the prose above; TASK_016 moved them into the hashed block. Note how weak this declaration deliberately is: p01 is the CALIBRATION pattern, it models no bug, and its inner fold is an associative sum with no bulk-memory idiom to lose, so beyond the three required entries no spelling of the fold is excluded and p01's numbers are a spelling's numbers. TASK_016 did not measure a spelling spread for p01; one is owed before any p01 number is quoted as what safe Rust costs."
+    "why": "wrapping addition is what keeps the proof obligation exactly the memory-safety property, with no value bound smuggled in that the input generator would then have to be trusted to respect -- the pilot did the opposite and its own measured inputs violated it. The C/Rust arity asymmetry is the finding and not a rigging: the length is the thing C does not have and therefore cannot check, so handing C a dead v_len to make the signatures match would be Rust-in-C-syntax and would delete the comparison. Both are also written out in the prose above ('Kernel signature' and 'Semantics'); TASK_016 RESTATED them here rather than moving them, so p01 states its idiom twice and THIS block is the authoritative copy (TASK_016_REVIEW m2). Whoever edits one edits the other. Note how weak this declaration deliberately is: p01 is the CALIBRATION pattern, it models no bug, and its inner fold is an associative sum with no bulk-memory idiom to lose, so beyond the three required entries no spelling of the fold is excluded and p01's numbers are a spelling's numbers. TASK_016 did not measure a spelling spread for p01; one is owed before any p01 number is quoted as what safe Rust costs."
   },
 
   "verus": {

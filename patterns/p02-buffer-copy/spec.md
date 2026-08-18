@@ -34,18 +34,26 @@ else:                                                     # reject, untouched
     return 0
 ```
 
-Four things about that are load-bearing:
+Four things about that are load-bearing.
+
+**The authoritative copy of this list is the `idiom` key in the `slb-contract`
+block below**, which is hashed into `contract_sha256`. What follows is the same
+statement in prose, with the arguments; if the two ever disagree, the block wins
+and the prose is the bug. Edit both or neither (TASK_016_REVIEW m2).
 
 - **The kernel is total in `len`.** Every one of the 65 536 values a `u16`
   prefix can express is handled. `.memory/02-bench-rules.md`: the attacker
   quantity is an *argument*, not an assumption. A contract that assumed
   `len <= dst_cap` would verify, would pass the gate, and would have assumed the
-  vulnerability away.
+  vulnerability away. **R1 is the exception and it is the point**: `c/kernel.c`
+  is total in nothing — it is defined only for the `len` values that happen to
+  fit — and that is the CWE-787 being modelled, not a rung to repair.
 - **The check is written subtraction-first.** `len > src_len - (src_off + 2)`,
   not `src_off + 2 + len > src_len`: the additive form can overflow `size_t`
   and wave the attack through. The subtraction cannot underflow, because
   `src_off + 2 <= src_len` is the structural precondition (below). Every rung
-  spells the test identically.
+  that *has* the test spells it identically — R1 has no test at all, which is
+  the bug; R1h is R1 plus those three lines.
 
   **This spelling has a measured codegen cost in R2, and it is a finding rather
   than a reason to change it** (`NOTES.md` §3a). Subtraction-first leaves LLVM
@@ -207,14 +215,14 @@ the two entries that are new here:
 
   "idiom": {
     "required": [
-      "the fit check is subtraction-first -- `len > src_len - (src_off + 2)` -- spelled identically in every rung",
+      "the fit check is subtraction-first -- `len > src_len - (src_off + 2)` -- spelled identically in every rung that HAS one. R1 (`c/kernel.c`) has no fit check at all: it casts `src_len` and `dst_cap` to `(void)` and that omission IS the bug this pattern models. R1h is R1 plus the three-term check `len > dst_cap || len > src_len - (src_off + 2)` and nothing else",
       "the u16 prefix is decoded with `+`, not `|`",
       "the result is folded over dst AFTER the copy, not over src",
-      "the kernel is total in len: all 65536 values a u16 prefix can express are handled",
+      "the kernel is total in len: all 65536 values a u16 prefix can express are handled -- in every rung EXCEPT R1, which is defined only for the values that happen to fit and overruns `dst` for the rest. R1's partiality is the CWE-787 the pattern exists to exhibit (ASan fires on `adversarial-overrun.bin`, NOTES.md 1); do not 'fix' it",
       "R2 copies index-by-index; R3 reslices both sides once and copies with copy_from_slice"
     ],
     "forbidden": ["the additive check `src_off + 2 + len > src_len`"],
-    "why": "the additive form can overflow size_t and wave the attack through, so it is the spelling this pattern exists to reject. The `+` decode and the `|` decode are the same function and lower to the same instruction; `+` is chosen because it needs no bit-vector reasoning in R5, which is a cheaper PROOF and not a weaker specification. Folding dst after the copy is what stops the copy being dead code. The last required entry is the one that already cost this pattern a retraction and must not be quietly 'fixed': R2's index-by-index copy is why rustc never forms a memcpy there, one operator flips `bulk_calls []` to `['memcpy@GLIBC_2.14']` and 118 kernel instructions to 87, and that difference was 100% of R2's retracted delta (NOTES.md 3a). Swapping a bulk copy into R2, or an indexed copy into R3, deletes p02's only decomposition and its finding with it. Moved into the hashed block at TASK_016 from the 'Four things about that are load-bearing' prose above. TASK_016 did not measure a spelling spread for p02 and none is claimed here."
+    "why": "the additive form can overflow size_t and wave the attack through, so it is the spelling this pattern exists to reject. The `+` decode and the `|` decode are the same function and lower to the same instruction; `+` is chosen because it needs no bit-vector reasoning in R5, which is a cheaper PROOF and not a weaker specification. Folding dst after the copy is what stops the copy being dead code. The last required entry is the one that already cost this pattern a retraction and must not be quietly 'fixed': R2's index-by-index copy is why rustc never forms a memcpy there, one operator flips `bulk_calls []` to `['memcpy@GLIBC_2.14']` and 118 kernel instructions to 87, and that difference was 100% of R2's retracted delta (NOTES.md 3a). Swapping a bulk copy into R2, or an indexed copy into R3, deletes p02's only decomposition and its finding with it. RESTATED in this hashed block at TASK_016 from the 'Four things about that are load-bearing' prose above -- restated, not moved: the prose is still there, says the same thing, and THIS block is the authoritative copy of it (TASK_016_REVIEW m2). Whoever edits one edits the other. TASK_016 did not measure a spelling spread for p02 and none is claimed here."
   },
 
   "verus": {

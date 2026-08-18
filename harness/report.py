@@ -10,6 +10,10 @@ Everything here is regenerable; the JSON is the record. Three rules from
   * identity is reported from `md5_raw`, with `md5_raw_norel` shown alongside so
     a link-layout-only difference is visible as such
   * `O0` rows are printed but flagged: no perf claim may rest on one
+  * the pattern's **declared idiom** is printed above the numbers, because this
+    file is the artefact a writeup reads from and it carried no trace of what a
+    pattern forbids until TASK_017 -- p05's number was quoted twice by agents
+    who never opened its `spec.md`
 
   harness/report.py p01
   harness/report.py p01 --stdout
@@ -18,6 +22,7 @@ Everything here is regenerable; the JSON is the record. Three rules from
 import argparse
 import json
 import os
+import re
 import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -65,6 +70,73 @@ def fmt(n):
 def cell_rows(doc, opt, mode):
     return [c for c in doc["cells"]
             if c.get("opt") == opt and c.get("mode") == mode]
+
+
+def read_idiom(pattern):
+    """The pattern's declared idiom, out of `patterns/<pattern>/spec.md`.
+
+    Read from `spec.md`, not from `results/gate/<pattern>.json`, although the
+    gate record carries a copy: the copy is as old as the last gate run, and a
+    table generated today must show what the pattern declares today. Same block
+    and same regex as `check.py: read_contract()`, which hashes it into
+    `contract_sha256`.
+
+    Returns None (and the section then says so loudly) if the file, the block or
+    its JSON is missing -- `report.py` regenerates a description of a
+    measurement and must not become a second gate."""
+    path = os.path.join(REPO, "patterns", pattern, "spec.md")
+    try:
+        txt = open(path).read()
+    except OSError:
+        return None
+    m = re.search(r"```slb-contract\s*\n(.*?)```", txt, re.S)
+    if not m:
+        return None
+    try:
+        idi = json.loads(m.group(1)).get("idiom")
+    except ValueError:
+        return None
+    return idi if isinstance(idi, dict) else None
+
+
+def idiom_section(doc, out):
+    """What the numbers below are numbers *of*.
+
+    TASK_017 Part 2, from TASK_016_REVIEW B1. The failure this addresses is not
+    a rung that lies -- the gate cannot catch that and does not claim to -- it
+    is a reader who quotes `results/tables/p05-index-flatten.md` without ever
+    opening `patterns/p05-index-flatten/spec.md`, which happened in two
+    consecutive tasks and cost a published headline."""
+    out.append("\n## Declared idiom — what these numbers are numbers *of*\n")
+    idi = read_idiom(doc["pattern"])
+    if not idi:
+        out.append(f"**No `idiom` object could be read from "
+                   f"`patterns/{doc['pattern']}/spec.md`.** Every pattern is "
+                   f"required to declare one (gate stage `0b`), so this table "
+                   f"is describing a pattern that would not pass the gate — "
+                   f"treat every number below as unattributed.\n")
+        return
+    out.append("Every delta below is a difference between rungs that are meant to be "
+               "spellings of one kernel. The pattern's hashed `slb-contract` block "
+               "declares which spellings that means; **a rung that deviates is a "
+               "different benchmark and its numbers are not comparable to these.**\n")
+    for s in idi.get("required") or []:
+        out.append(f"- **required** — {s}")
+    for s in idi.get("forbidden") or []:
+        out.append(f"- **FORBIDDEN** — {s}")
+    if not (idi.get("forbidden") or []):
+        out.append("- **FORBIDDEN** — *nothing is excluded by name.* The rungs are "
+                   "matched only by the `required` list above, so these numbers are "
+                   "a spelling's numbers unless the rationale below argues otherwise.")
+    out.append(f"\n> **Why**: {idi.get('why') or '(none given)'}\n")
+    out.append("> The gate checks that this declaration is **present** and hashes it "
+               "into `contract_sha256`. It never checks that a rung honours it — that "
+               "check would have to be textual and would fail open, and the threat "
+               "model is honest mistake, not malicious author. TASK_016_REVIEW forked "
+               "p05 with a **forbidden** R3 and got a complete green run with an "
+               "unchanged `contract_sha256`. So this section is a claim about intent "
+               "that a reader must check against the rung sources, not a verified "
+               "property of the numbers below.\n")
 
 
 def main_table(doc, opt, mode, out):
@@ -233,6 +305,8 @@ def build(doc, name):
         out.append(f"| {k} | {fmt(v['n_iters'])} | {fmt(v['declared_len'])} | "
                    f"{fmt(v['present'])} | {v['truncated']} | "
                    f"{v.get('model', '')} |")
+
+    idiom_section(doc, out)
 
     out.append("\n## Static + executed instructions\n")
     out.append("`Ir` is **callgrind per-function exclusive** for the kernel symbol. "

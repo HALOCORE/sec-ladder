@@ -229,8 +229,22 @@ mentions. Budget for them up front; each has cost an engineer a surprise.
    `forbidden` — spellings that would delete the pattern, **allowed to be empty**
    but shouted when it is; `why` — non-empty prose. Unknown keys are rejected, so
    a mistyped `forbid` cannot be silently empty. The gate checks **nothing
-   semantic** — it requires the key, prints it in the verdict, and hashes it, so
-   changing a rung's idiom must move `contract_sha256`.
+   semantic** — it requires the key, prints it in the verdict and in
+   `results/tables/*.md` (via `report.py`, TASK_017), and hashes it.
+
+   **Be exact about what the hash buys, because the first version of this entry
+   was not.** *Editing or weakening the declaration* moves `contract_sha256`.
+   **Changing a rung does not** — `read_contract()` hashes `spec.md`'s fenced
+   block and nothing else; rung sources are covered by `source_sha256`. Nothing
+   here prevents a forbidden respelling and nothing can without semantic
+   checking, which the threat model forbids. TASK_016_REVIEW proved it by
+   forking p05 with the forbidden spelling and gate-passing at an identical
+   `contract_sha256`.
+
+   What earns the mechanism its lines is **not** the hash: it is that the
+   declaration is *structured*, so it can be printed next to every published
+   number, and that consolidating six declarations into one diffable object made
+   three latent specification defects visible at its first review.
 
    This exists because the declaration used to be prose. p05's `spec.md` forbade
    `chunks_exact` **by name** and two consecutive tasks measured it anyway and

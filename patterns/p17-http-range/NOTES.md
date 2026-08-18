@@ -389,6 +389,36 @@ not fitted, from a 34-point sweep (§3b) rather than from these two points:
   *shrinks* as a fraction of the call: 0.61% on `small`, 0.08% on `large`. That
   is the **fifth pattern in a row** where idiomatic safe Rust is free
   (`.memory/01-ladder.md` findings 3 and 9).
+
+  **The shipped R3 is not the cheapest admissible spelling, and it is
+  deliberately not swapped.** `.temp/p05r3/v17/tuned_suffix.rs` (§10 row 3 —
+  `chunks_exact(2)` over the suffix table, the served range taken as the suffix
+  `body[start..]`) satisfies **all four** of p17's `required` entries: `i64`
+  endpoints, the one conjunctive `if start < end && start >= 0`, `nserved`
+  folded, no `Range:` text parsing. Checked entry by entry at TASK_016_REVIEW —
+  unlike p16's, p17's "not restricted" note stands. It measures **5189.70 /
+  41260.70**, i.e. **51.00 below the shipped R3 on both inputs** (`17·nsuf`
+  exactly over eight generated `nsuf` points, §10), so `+32` is the cost of
+  *this* R3's spelling and is **not** what safety costs on this kernel.
+
+  Three reasons it is not swapped in, adjudicated at TASK_016_REVIEW Part 5 and
+  not a preference:
+
+  1. **the cheaper R3 beats its own R4 too** — `R3′ − R4 = −19.00` on both
+     shipped inputs. Swapping R3 alone would publish "safe Rust beats unsafe
+     Rust" from an **unmatched pair**, which is exactly the TASK_014/TASK_015
+     defect, this time committed as a shipped cell;
+  2. **an honest swap has to move R4 as well**, and the matched pair does not
+     hold still: TASK_015_REVIEW's `nsuf` sweep has `R3′ − R4` running +1 … −73
+     across `nsuf` 1…8, so the swap produces a *different* number, not a stable
+     one;
+  3. **no swap terminates.** R4 is defined by *permission*, so
+     `inf(R4) ≤ inf(R3)` by construction (`.memory/01-ladder.md` finding 14) and
+     chasing the cheapest admissible R3 chases a quantity with no fixed point.
+
+  What p17 publishes is therefore a **matched pair by declaration, not an
+  optimum** — and that sentence, not the `+32`, is what a reader should carry
+  away from this row.
 - **R2 is O(bytes served):** **10.0000** Ir per folded byte against R3/R4's
   **5.7500**, i.e. **+4.2500 per byte**. `.memory/01-ladder.md` records p16's
   swept value as exactly 4.2500 on a completely different kernel, and p16's own
