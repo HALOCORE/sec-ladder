@@ -344,29 +344,31 @@ it once, land the corrections, repeat** — and per `PROTOCOL.md` rule 9, write
 instance of the same mistake, and the correction is owed across the whole result
 set before more results are added to it:
 
-1. **Review TASK_018** — it landed all six gates green and *overturned three of
-   the manager's prescriptions with measurements*, including the reason the
-   manager gave for the pin. That makes it exactly the shape rule 3 exists for.
-   Attack: the cross-language clause (does it re-admit anything it should not?);
-   the three p16 respellings and two p17 ones, whose `nrec` coefficient is a
-   **3-point fit** and is flagged as such; and whether "decidability" survives as
-   the justification once attributability is gone.
-2. **Four patterns owe an in-contract spelling spread** — p01, p02, p05, p08.
-   `.memory/05-layout.md` demand 13 now requires one per pattern and only p16 and
-   p17 have theirs. Until p05 has one, its `6·nrow + 9` is an upper bound with no
-   measured floor, exactly like p16's `+27/+77` was.
-3. **A shipped p17 sweep.** p17 has **no sweep inputs at all**, which is how its
+1. **Close the `source_sha256` generator gap (TASK_021's first line).** Third
+   sighting and now load-bearing: `patterns/*/inputs/gen.py` and `common/slb.py`
+   are outside the hash, and p16 §10a's swept laws are reproducible *only*
+   through `gen.py`. A generator edit that changed the sweep would move nothing
+   in any gate artefact. One line; costs one gate round.
+2. **p05 still has no in-contract spelling spread** — dropped from TASK_020 for
+   time. Three patterns have one (p02, p16, p17) and all three found their
+   published figure was an upper bound. p05's `6·nrow + 9` is quoted in
+   `.memory/01-ladder.md` finding 6 as though it were the number; until it has a
+   floor it is not. p01 and p08 owe one too.
+3. **p16 §10a's variant binaries are gitignored.** The *input* axis now ships,
+   but three of its four laws rest on `.temp/p18/` builds. Ship the variants
+   behind a committed generator, the way p08's `controls/` does.
+4. **A shipped p17 sweep.** p17 has **no sweep inputs at all**, which is how its
    "+32 Ir/call flat" got published from two bands that both happen to have
    `nsuf = 3`. `.memory`'s own residue rule applied and was not followed. The
    review's `nsuf` 1–8 inputs are generated under `.temp/` and are not shipped.
-4. **p07 binary search** — `O(log n)`, almost pure per-call overhead with no
+5. **p07 binary search** — `O(log n)`, almost pure per-call overhead with no
    inner loop to amortise over, so any R3 cost shows up as a large *fraction*
    rather than a flat constant. Midpoint overflow `(lo+hi)/2` is p17's shape
    again: an arithmetic bug giving a wrong-but-in-bounds index.
-5. **p47 constant-time compare** — a third security axis, where the adversary is
+6. **p47 constant-time compare** — a third security axis, where the adversary is
    the **optimiser** and Verus cannot state the property at all. Expect it to
    defeat R5 in an interesting way; a documented R5 failure is a finding here.
-6. **p27+ raw pointers.** No longer "the only place the twin can earn its keep"
+7. **p27+ raw pointers.** No longer "the only place the twin can earn its keep"
    — p08 did that (mutant M2, the weakened `requires`, caught by the twin and by
    nothing else). p27 is now just the next hard proof.
 

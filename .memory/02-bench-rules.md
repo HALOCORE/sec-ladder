@@ -27,6 +27,13 @@ costs nothing to retain. **What changes is the rule for new work:**
 
 Known residuals we are deliberately **not** closing, all measured:
 
+- **`source_sha256` omits `patterns/*/inputs/gen.py` and `common/slb.py`** —
+  third sighting, and **no longer hygiene**. p16 §10a's swept `nrec` laws are
+  reproducible *only* through `gen.py`, so an edit to the generator that changed
+  what the sweep produces would move **nothing** in any gate artefact. One-line
+  glob fix; costs a gate round on all six. This one should be closed, unlike the
+  rest of this list.
+
 - `work_per_call` is unbounded; shrinking it 16× passes with a shout. Nothing
   checks it is denominated in the unit `work_unit_bits` names. **And it can err
   in either direction**: p16's `work_per_call = stride` *over*-estimated the bytes
