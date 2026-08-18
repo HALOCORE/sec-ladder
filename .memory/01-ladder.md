@@ -10,6 +10,7 @@ enforces memory safety.
 | **R2 safe-naive** | `safe_naive.rs` | The mechanical port a working Rust programmer writes first: `for i in 0..n { ... v[i] ... }`, indexing, `Vec`, no cleverness. Must contain **zero** `unsafe`. |
 | **R3 safe-tuned** | `safe_tuned.rs` | Same semantics, rewritten to help LLVM elide checks: iterators, `chunks_exact`, `zip`, slice reslicing, `split_at`, hoisted length assertions. Still **zero** `unsafe`. **Subject to the pattern's declared idiom** — see below. |
 | **R4 unsafe** | `unsafe.rs` | `get_unchecked`, raw pointers, `from_raw_parts` — whatever it takes to reach C's codegen. Unsound-by-inspection is not allowed: it must be *correct*, just unverified. **Subject to the pattern's declared idiom** — see below. |
+| **R5 verus** | `verus.rs` | R4's exec code, plus Verus specs and proofs discharging every unsafe precondition. Ships the same machine code as R4. |
 
 **The spelling list above is permissive, and a pattern's `spec.md` overrides it.**
 This was a live contradiction until TASK_015_REVIEW: this table names
@@ -25,7 +26,32 @@ nobody noticed for six patterns**: every safe program is an admissible R4, so
 `inf(R4) <= inf(R3)` **by construction**. "Safe Rust beats unsafe Rust" can
 therefore never be a language fact under these definitions — see finding 6's
 amendment and `.memory/06-catalogue.md`.
-| **R5 verus** | `verus.rs` | R4's exec code, plus Verus specs and proofs discharging every unsafe precondition. Ships the same machine code as R4. |
+
+**The named-spelling standard (TASK_018), and what it does and does not buy.**
+Every pattern's `slb-contract` block carries an `idiom` object naming the tokens
+each rung must spell literally. It is a **policy adopted after measuring**, not a
+reading of what any earlier text meant, and all six carry a byte-identical
+statement of it. One clause is load-bearing and was found by measurement: **a
+rung spells the same operands the way its language forces, and nothing else
+varies** — without it, a literal reading puts *eight shipped cells* out of
+contract, because e.g. p02's `src_len` does not exist in the Rust signature at
+all.
+
+- It does **not** buy attributability. On p17 the excluded spelling and an
+  admissible one compile to the **same 478 bytes**, so the exclusion moves no
+  number; on p16, 42 of 77 Ir/call at `large` sit inside the unpinned part of the
+  spelling.
+- It buys **decidability**. The semantic alternative cannot settle a variant that
+  satisfies "every comparison is subtraction-first" *vacuously* by having no
+  comparison, nor one whose `rest.len() >= 3` is neither. A contract a grep can
+  settle beats one only an argument can settle.
+- "Pin nothing and report the spread" fails differently: with no pin the spread
+  has no boundary, and `inf(R4) <= inf(R3)` makes it unbounded below on both
+  sides. The pin is what makes the spread finite and searchable.
+
+**So: a pinned idiom makes the admissible class DECIDABLE, not SINGULAR — and
+therefore `R3ship − R4ship` is an UPPER BOUND on the in-contract safety tax,
+never the tax.** Report the in-contract spread beside every headline.
 
 ### R1h — the hardened C cell (optional, added at TASK_004)
 
@@ -137,8 +163,11 @@ is a much stronger claim than any p01 could produce.
      caught at review), p05 (`chunks_exact` beats the *unsafe* rung, caught at
      TASK_014_REVIEW). The failure mode is always the same — one plausible R3 is
      written, measured, and reported as what safe Rust costs.
-     **Before any safety-cost headline, write at least two independent R3
-     spellings and quote the cheaper.** The iterator/slice-consuming forms
+     **Before any safety-cost headline, write at least two independent
+     *in-contract* R3 spellings and quote the cheaper.** "In contract" is the
+     whole of TASK_018: a spelling that violates the pattern's declared idiom
+     measures a different kernel, and one that respects it may still be much
+     cheaper than the shipped cell. The iterator/slice-consuming forms
      (`chunks_exact`, `split_at`, `iter().zip()`) are the ones that keep winning,
      because they hand the optimiser a length it does not have to re-derive.
    - **…and that rule is still not enough — but the fix is not "match the
@@ -276,12 +305,27 @@ is a much stronger claim than any p01 could produce.
    pair `7 + 5·nrec` / `7 + 7·nrec` (+27/+77); excluded matched consuming pair
    `7` flat / `7 + nrec` (+7/+17). What it protects is the shipped cells'
    *standing* and §3's swept law, not a flattering number.
-   Two things are still owed from that review: the reading is a **policy adopted
-   after measuring**, not a disambiguation of what the text always meant, and
-   must be labelled so; and it leaves p16 with **zero measured admissible
-   alternate spellings**, so "the shipped R3 is the cheapest admissible one" is
-   **unestablished, not established**. p16 owes a spelling-spread measurement
-   inside its own contract. This file already said, at finding 3: *"Never publish a
+   **Both readings were superseded at TASK_018**, which adopted the named-spelling
+   standard uniformly across all six patterns, **labelled as a policy adopted
+   after measuring** rather than as a disambiguation of what the text meant.
+   Ground (ii) of the four — that pinning the tokens holds the representation
+   fixed and so makes `R3 − R4` a safety rather than a representation difference
+   — **is withdrawn by measurement** and has been withdrawn from the spec block:
+   42 of p16's 77 Ir/call at `large` sit inside the part of the spelling the pin
+   does not fix.
+
+   **And "cheapest admissible is unestablished" is now FALSE, not unestablished.**
+   TASK_018 measured **three** admissible p16 respellings, all keeping both named
+   comparisons literally, all byte-identical in output on 73/73 inputs; **two are
+   cheaper than the shipped R3**. `R3ship − r3_endslice = 2·nrec − 2` and
+   `R3ship − r3_window = 4·nrec − 8`, zero residual across four residue classes
+   (the `nrec` coefficient is a **3-point fit** — do not quote it as a law; that
+   is exactly what produced the retracted `nrec + 3`).
+
+   **So `+27 / +77` is an UPPER BOUND on p16's in-contract safety tax, not the
+   tax.** The measured in-contract minimum is **+19 (small) / +45 (large)**, and
+   the R4 side has not been searched in contract at all, so even that is an
+   R3-side bound. This file already said, at finding 3: *"Never publish a
    safety-cost claim without R3."* The rule was violated by its own author on the
    next pattern. **Lead with R3 or do not lead.**
 
@@ -484,8 +528,16 @@ is a much stronger claim than any p01 could produce.
    which is what makes it a disclosure demonstration rather than a crash.
 
    **Perf — R3 is free for the fifth pattern in a row** (+32 Ir/call, 0 per
-   byte; +0.61% / +0.08%). **"Flat" is wrong and was corrected at
-   TASK_015_REVIEW: it is flat *per byte*, not per call.** Both shipped bands
+   byte; +0.61% / +0.08%). **Two corrections, and the second is the larger.**
+   "Flat" is wrong (TASK_015_REVIEW): it is flat *per byte*, not per call.
+   And **`+32` is an UPPER BOUND, not p17's R3 cost** (TASK_018): an in-contract
+   respelling — keeping `let start: i64`, `let end: i64` and the literal
+   `if start < end && start >= 0` — measures **−19.00 flat against the shipped
+   R4** on both bands, and is **byte-identical** (`md5_fn 532201c70eeb…`, 135
+   instructions) to the very row TASK_017 had declared out of contract. So p17's
+   "R3 is free" survives *per byte* and does **not** survive as `+32`; and the
+   R4 side has not been searched in contract, so −19 is an R3-side bound and
+   emphatically **not** "safe beats unsafe" (finding 14). Both shipped bands
    happen to have `nsuf = 3`; swept over generated inputs at `nsuf` 1–8,
    `R3ship − R4` runs 18…63 and `R3ship − R3′` is exactly `17·nsuf`. p17 ships
    **no sweep inputs at all**, which is how a two-point constant got published as

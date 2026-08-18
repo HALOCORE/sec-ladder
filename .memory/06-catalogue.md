@@ -112,7 +112,7 @@ supersede any earlier task report they contradict.
   the verdict. The rung sources are covered by `source_sha256`, not by this key.
   Nothing here prevents a forbidden respelling and nothing can without semantic
   checking, which the threat model forbids. **Say that, rather than the false
-  mechanism sentence.** **Fixed at TASK_017**, which is the change that
+  mechanism sentence** — which this file itself carried until TASK_018. **Fixed at TASK_017**, which is the change that
   addresses the failure actually observed: `report.py` now prints the
   declaration — required, FORBIDDEN, why — **above every table** in
   `results/tables/*.md`, read from `spec.md` rather than the gate record, and
@@ -124,10 +124,17 @@ supersede any earlier task report they contradict.
   separately **wrong**: `contract_sha256` has already moved 3× on p01 and 4× on
   p02, so "unchanged since TASK_013" was recency, not an invariant.
 
-  **CLOSED at TASK_017: the limitation is stated in p16's and p17's `NOTES.md`,
-  neither cell was swapped, and p16's `required[0]` was disambiguated as naming
-  tokens — which puts its cheaper spelling OUT of contract and leaves p16 with
-  zero measured admissible alternates.** The adjudication that got there: p17's cheaper spelling is genuinely admissible under its
+  **CLOSED at TASK_018, and not as TASK_017 left it.** TASK_017 read p16's
+  `required[0]` as naming tokens and applied that standard to p16 while refusing
+  it for p17 *in the same commit* — the blocker TASK_017_REVIEW found. TASK_018
+  adopted the named-spelling standard **uniformly across all six**, labelled as a
+  policy adopted after measuring, restored the disclosure TASK_017 had deleted,
+  and then measured the consequence: p16 has **three** admissible respellings
+  (two cheaper) and p17 **two** (both cheaper), so "the shipped R3 is the
+  cheapest admissible spelling" is **FALSE, not unestablished**, in both. Neither
+  cell was swapped; both `NOTES.md` now carry an in-contract spelling spread and
+  state their published R3 figures as **upper bounds**. The adjudication that got
+  there: p17's cheaper spelling is genuinely admissible under its
   declaration — but it also beats **its own R4** by 19.00, so swapping R3 alone
   would re-commit TASK_014/015's unmatched-pair defect *as a shipped cell*, and
   `inf(R4) <= inf(R3)` means no swap ever terminates. p16's case is **not even
