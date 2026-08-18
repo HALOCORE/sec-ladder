@@ -27,6 +27,12 @@ timing, proof burden and trusted-base size.
 
 1. **No `/tmp` scratch files** — use `.temp/` (gitignored), a subdir per category. `rm`
    is auto-permitted only under `.temp/`; elsewhere it stalls on human review.
+   **Keep the generator, delete the artefact**: binaries, `.o`, `.pyc` and `.bin`
+   blobs under `.temp/` are re-derivable (`harness/build.py`, `inputs/gen.py`) and
+   get deleted once your gates are green; the `NOTES.md`, `.py` probe, `.rs`/`.c`
+   source, `.json` and `.log` are the evidence and stay. If a blob has no script
+   that rebuilds it, write one before finishing. Full rule and rationale:
+   `.memory/00-environment.md` constraint 6.
 2. **No blind process killing** — never `pkill`/`killall`/substring match. Confirm the
    full command line of an exact PID, then kill that PID. Prefer `timeout <N> <cmd>`.
 3. **No GitHub-specific infrastructure** — no `.github/`, no CI config, no badges.

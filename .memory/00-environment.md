@@ -36,8 +36,13 @@ this file (and say so in your report) if a fact goes stale.
   Consequence worth knowing: **`ns` is a measurement on this box and `cycles` is
   an inference.** Prefer ns for anything published.
 - **Shared box, containerised** (`/dev/vg1/containers_apt`). Wall-clock timing is noisy.
-- ~118 GB free on `/` (of 252 GB). The 12 GB LLVM install is the big consumer;
-  re-check with `df -h /` rather than trusting this line.
+- ~111 GB free on `/` (of 252 GB) after the 2026-08-18 sweep below. The 12 GB LLVM
+  install is the big fixed consumer; re-check with `df -h /` rather than trusting
+  this line.
+- **`.temp/` is the other big consumer and it grows without bound.** It reached
+  **12 GB across 24 tasks** — 6.4 GB of compiled cell binaries, 4.9 GB of
+  generated input blobs, 0.2 GB of `.o`/`.pyc` — against **36 MB of the text that
+  was actually the evidence**. Swept 2026-08-18 to 574 MB; see constraint 6.
 - **No root.** Everything installs into `~/tools/` or `~/.cargo/`. No `sudo`.
 - Network works (GitHub, crates.io, static.rust-lang.org all reachable).
 
@@ -144,3 +149,32 @@ in the installed table above. Hardware counters remain the only hard gap.
 4. **Subagents never run `git commit`/`git add`** or any history-mutating git command.
    Read-only git is fine. The manager commits at task boundaries.
 5. **No root, no system package installs.** `~/tools/` only.
+6. **Keep the generator, delete the artefact.** Anything under `.temp/` that a
+   committed script re-derives — compiled binaries, `.o`, `.pyc`, callgrind
+   scratch, and the `.bin` input blobs that `inputs/gen.py` produces
+   deterministically — is **not evidence and must not be hoarded**. The evidence
+   is the text: your `NOTES.md`, the `.py` generator or probe that built the
+   variant, the `.rs`/`.c` source you measured, the `.json` results and the
+   `.log` of the run that produced them. Two rules follow:
+
+   - **A binary you cannot regenerate from a file in the tree is a defect, not
+     an asset.** If a probe's inputs came from an ad-hoc shell command, write the
+     command into a `.py` beside the blob *before* you finish the task. This is
+     the same standard `source_sha256` already enforces for patterns.
+   - **Delete your task's binaries and blobs when the task's gates are green.**
+     `harness/build.py` rebuilds `.temp/build/` on demand, `check.py` recreates
+     `.temp/check/` and `.temp/clausemut/`, `fixture.py` rebuilds
+     `.temp/build/docrepro/`, and every pattern's blobs come back from
+     `inputs/gen.py` — all with `exist_ok=True`, so an absent directory costs
+     time and nothing else. Do **not** delete another task's directory; report it
+     and let the manager sweep.
+
+   The 2026-08-18 sweep is recorded in `.temp/CLEANUP-MANIFEST-2026-08-18.txt`
+   (path, size and mime of all 10,567 deleted files). The classification rule it
+   used is mechanical and worth reusing: `file --mime-type` every file under
+   `.temp/`, delete the non-`text/*` ones, keep everything else.
+
+   **Not covered by this, deliberately**: `patterns/*/inputs/*.bin` (p05 ~189 MB,
+   p08 ~33 MB) are gitignored and equally regenerable, but they live outside
+   `.temp/` where `rm` stalls on human review. They are the manager's call, not
+   an agent's.
