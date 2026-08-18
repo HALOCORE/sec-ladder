@@ -234,8 +234,14 @@ question becomes what the hoisting costs. §2.
 
 Method: marginal Ir per kernel call = whole-program Ir at `n_iters=200` minus at
 `n_iters=100`, over 100 — `harness/check.py` step 3b's method, a difference of
-two runs of the same binary in the same shell, so every loader and environment
-term cancels and it is symbol-independent. `.temp/p05/sweep_ir.py`.
+two runs of the same binary, so the one-shot loader terms cancel and it is
+symbol-independent. `.temp/p05/sweep_ir.py`. **"every loader and environment
+term cancels" is false** and this line used to say it (TASK_019, from
+TASK_018_REVIEW M3): the environment block is worth ~0.1 Ir/call on p08
+(measured over six environment lengths at TASK_019), and heap alignment ~0.02
+on p02, with the kernel's own self-cost identical in both cases. Every
+delta below is a within-session difference, which is where the method is
+exact; see `patterns/p01-array-sum/spec.md`'s `collapse.note`.
 
 **Swept, not sampled, and over two full cycles of the widest modulus in play**
 (`.memory/01-ladder.md`: "sweep two full cycles: the first sweep design used 16

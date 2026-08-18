@@ -185,9 +185,21 @@ Read per unit of the thing each rung is doing:
   does `nrec`. So `.memory/01-ladder.md`'s R3 finding **survives** the
   data-dependent loop, correctly re-denominated.
 
-  **The shipped R3 is not known to be the cheapest admissible spelling — and
-  after TASK_017 it is the only admissible spelling anybody has measured.**
-  Two cheaper R3 spellings exist and were measured at TASK_015
+  ⚠ **`+27 / +77` is an UPPER BOUND on p16's in-contract safety tax, not the
+  tax. Read §10a with this bullet — it is 900 lines below and it is the one that
+  was measured.** "The shipped R3 is the cheapest admissible spelling" is
+  **FALSE**, not unestablished: TASK_018 measured three admissible respellings
+  keeping *both* named comparisons literally, two of them cheaper than the
+  shipped R3 (`R3ship − r3_endslice = 2·nrec − 2`, `R3ship − r3_window =
+  4·nrec − 8`, `r3_hdrarray − R3ship = nrec`), and TASK_018_REVIEW swept the
+  `nrec` axis to confirm them. The measured in-contract minimum against the
+  shipped R4 is **+19 (`small`) / +45 (`large`)**. Everything in the two
+  paragraphs below is about *out-of-contract* spellings and was written before
+  §10a existed; it is kept because the reasoning is still the record of what
+  TASK_017 excluded, but it must not be read as "nobody has measured an
+  admissible alternate".
+
+  Two cheaper *out-of-contract* R3 spellings exist and were measured at TASK_015
   (`.temp/p05r3/v16/tuned_split.rs`, `…/tuned_splitat.rs`): **49 (`small`) /
   109 (`large`) Ir/call below the shipped R3**, i.e. `10·nrec + 9` in both
   residue classes (§10, **whole-program marginal** convention on both sides —
@@ -203,11 +215,16 @@ Read per unit of the thing each rung is doing:
   same reason, which is the point — the reading excludes a *representation*, on
   both sides of the pair, not one rung's competitor.
 
-  What that leaves is honest and weaker than it sounds: **nobody has searched
-  p16's in-contract spelling space.** "The shipped R3 is the cheapest admissible
-  spelling" is **unestablished**, not established; `+27 / +77` is the cost of
-  *this* cursor-walk R3 against the cursor-walk R4 it ships beside, and the
-  value fold, the header read and the unrolling are unpinned. Nothing is
+  What that left, *as of TASK_017*, was honest and weaker than it sounded:
+  nobody had yet searched p16's in-contract spelling space, so `+27 / +77` was
+  the cost of *this* cursor-walk R3 against the cursor-walk R4 it ships beside,
+  with the value fold, the header read and the unrolling unpinned. **TASK_018
+  searched it (§10a) and the sentence that stood here — "the shipped R3 is the
+  cheapest admissible spelling is unestablished" — is now FALSE, not
+  unestablished:** three admissible respellings, two cheaper, laws swept at
+  TASK_018_REVIEW. What survives from this paragraph is only that the unpinned
+  part of the spelling is where the movement is: 42 of the 77 Ir/call at `large`
+  sit inside it. Nothing is
   swapped: the cheaper rungs are out of contract, and even if they were not,
   `R3′ − R4 = −22 / −32` means swapping R3 alone would publish "safe beats
   unsafe" from an unmatched pair (TASK_014/TASK_015's defect, re-committed as a
@@ -1117,12 +1134,37 @@ same convention as §10's table, so these are directly comparable with it:
 | `R3ship − r3_window` | `4·nrec − 8` | **0** on all 12 points |
 | `r3_hdrarray − R3ship` | `nrec` | **0** on the 6 points measured |
 
-⚠ **The residue axis is a sweep; the `nrec` axis is a three-point fit**
-(`nrec ∈ {2, 4, 10}`). §3b's own rule — *sweep, do not sample* — is satisfied for
-the residue and is **not** satisfied for `nrec`, and `nrec + 3` (§10 point 3) is
-what a three-point `nrec` fit did to this pattern last time. Do not quote the
-`nrec` forms as laws. What is measured directly, and needs no fit, is the
-**sign and size at the two shipped inputs**.
+**The `nrec` forms are LAWS, not fits — swept at TASK_018_REVIEW.** As delivered
+this block carried a ⚠ saying the residue axis was swept and the `nrec` axis was
+a three-point fit (`nrec ∈ {2, 4, 10}`), that §3b's own rule — *sweep, do not
+sample* — was therefore not satisfied for `nrec`, and that `nrec + 3` (§10
+point 3) is what a three-point `nrec` fit did to this pattern last time. The
+review ran the sweep the caveat asked for: **11 `nrec` values (1, 2, 3, 4, 5, 6,
+7, 8, 9, 12, 16) × 2 residue classes (`vlen` 124 ≡ 0 and 126 ≡ 2 mod 4), 22
+generated inputs, all five binaries on each = 110 marginals, all six rungs
+printing identical checksums on every input, and ZERO residual** on all four
+forms:
+
+| difference | law | residual over the 22 points |
+|---|---|---|
+| `R3ship − r3_endslice` | `2·nrec − 2` | **0** |
+| `R3ship − r3_window` | `4·nrec − 8` | **0** |
+| `r3_hdrarray − R3ship` | `nrec` | **0** |
+| `R3ship − R4ship` | `7 + 5·nrec` (`vlen ≡ 0 mod 4`) / `7 + 7·nrec` | **0** |
+
+So this is **not** a repeat of `nrec + 3`, and the `nrec` forms may be quoted.
+Two consequences follow with them: at `nrec` 10 the in-contract span is
+`10 − (−32)` = **42** against `R3 − R4 = 77`, cheapest admissible **+45**; at
+`nrec` 4, **12** against 27, cheapest **+19**.
+
+⚠ **The 68 committed sweep blobs could NOT have tested this axis, and that is a
+shipped gap, not a solved one.** `inputs/gen.py`'s `SWEEP_BANDS` put both bands
+at `nrec` 2 and 4, so the committed sweep varies the *residue* and holds `nrec`
+almost fixed — the law above rests entirely on 22 inputs that live in
+`.temp/review018/in16/` and are not in the tree. Anybody re-deriving it must
+regenerate them. **p16 owes sweep inputs that move `nrec`**; until it ships
+them, the `nrec` laws are reproducible only by rebuilding the reviewer's
+generator run.
 
 **What this establishes.**
 

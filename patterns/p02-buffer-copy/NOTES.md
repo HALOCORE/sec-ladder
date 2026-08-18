@@ -34,6 +34,14 @@ idiom-recognise one spelling of a byte-copy loop.** Three other spellings —
 including the reslice a competent Rust programmer writes — are +10 per call,
 flat. That is a codegen-fragility finding, not a safety-cost finding.
 
+⚠ **And `+10` is an UPPER BOUND on p02's in-contract safety tax, not the tax —
+read §10a with this section** (TASK_019, from TASK_018_REVIEW M1). An admissible
+R3 that respells only what the declaration leaves free — the `u16` header read —
+measures **4 `Ir`/call cheaper than the shipped R3** (3 at `len ≡ 0 mod 8`), so
+the measured in-contract minimum against the shipped R4 is **+6 / +5**. The R4
+side has not been searched in contract, so even that is a bound and not a safety
+number (`.memory/01-ladder.md` finding 14).
+
 The **security** result of this pattern (§1) was reviewed and stands unchanged.
 
 ### 0b. The copy is a small minority of the kernel's work
@@ -1226,3 +1234,198 @@ model's work.
   that column understates every C rung by ~430 instructions per call on `large`.
   Use the marginal column (this file, and `marginal_ir_per_call` in the gate
   JSON) for anything cross-rung.
+
+## 10a. The **in-contract** spelling spread (TASK_019)
+
+§0a's headline — *"three other spellings … are +10 per call, flat"* — is a
+statement about **R2**'s copy, not about how cheap an admissible **R3** can be.
+Nobody had asked the second question for p02 until now, and TASK_018_REVIEW M1
+made it urgent: p02's `forbidden` additive guard *builds in Rust* and measures
+3.00 `Ir`/call cheaper than the shipped R3, so an agent who greps for the
+forbidden text, finds it in no Rust rung, and publishes `+7` as p02's floor has
+a story that hangs together. **It is still wrong, and it is wrong in the
+direction nobody guessed: the cheapest spelling measured here is admissible, and
+it beats the forbidden one.**
+
+Variants under `.temp/p19/v02/`, **none a p02 cell**, each built with
+`harness/build.py`'s exact `-O3 isolated` rustc flags
+(`--edition 2021 -C codegen-units=1 -C opt-level=3 -C debug-assertions=off
+--cfg slb_isolated`). The three **in-contract** ones each keep the fit check
+spelled exactly as `idiom.required[0]`'s Rust entry names it, decode the `u16`
+prefix with `+`, fold `dst` after the copy, are total in `len`, reslice both
+sides of the copy once and copy with `copy_from_slice` — i.e. the **only** thing
+respelled is what the declaration leaves free. The last two are controls and are
+out of contract by construction; they are here because the question TASK_018
+could not answer is what the pin costs, and a bound needs both sides.
+
+| variant | what changed | in contract? |
+|---|---|---|
+| `r3_splitat.rs` | the destination reslice is `dst.split_at_mut(len)` instead of `&mut dst[..len]` | **yes** |
+| `r3_forloop.rs` | the fold over `d` is a `for &x in d.iter()` loop instead of `iter().fold` | **yes** |
+| `r3_hdrslice.rs` | the `u16` prefix is read out of a 2-byte reslice `&src[src_off..src_off + 2]`, still with `+` and not `\|` | **yes** |
+| `r3_srclen.rs` | TASK_018_REVIEW's probe: two added bindings so the guard reads `len > dst_cap || len > src_len - (src_off + 2)` | **no** — that is the entry's **C** spelling, and this is a Rust rung |
+| `r3_additive.rs` | the guard made additive: `src_off + 2 + len > src.len()` | **no** — `forbidden[0]` |
+
+**Equivalence:** all seven binaries (five variants, shipped R3, shipped R4) print
+byte-identical stdout and exit status to shipped R3 on **77/77** committed
+inputs. Zero divergences.
+
+**The objection to `r3_hdrslice`, and the answer — because a reviewer will raise
+it and the number depends on it.** `required[4]` reads *"R2 copies
+index-by-index; R3 reslices both sides once and copies with `copy_from_slice`"*,
+and `r3_hdrslice` adds a **third** reslice, a 2-byte one for the header. Is it
+out? No, and the entry decides it rather than an argument: the clause is about
+the **copy** — *reslices both sides once **and copies with**
+`copy_from_slice`* — and `r3_hdrslice`'s copy is the shipped one, unchanged
+(`&mut dst[..len]`, `&src[src_off + 2..src_off + 2 + len]`). The header read is
+not a side of the copy, and no entry names how the `u16` prefix is *read*:
+`required[1]` names only that it is *decoded* with `+` and not `\|`, which
+`r3_hdrslice` keeps verbatim. If a future task wants the header read pinned,
+that is a declaration edit made **before** measuring, not a reading made after —
+which is the whole of TASK_017_REVIEW.
+
+**And the result does not depend on the answer.** `r3_forloop` changes nothing
+but the fold — a thing no `required` entry mentions at all — and is already
+**2 (1) `Ir`/call below the shipped R3**. So the in-contract minimum is at most
+`+8 / +7` even if `r3_hdrslice` were ruled out, and `+10` is an upper bound
+either way.
+
+**Static**, `-O3 isolated`:
+
+| cell | `n_fn` | `fn_bytes` | `md5_fn` |
+|---|---:|---:|---|
+| R4 `unsafe.rs` | 72 | 228 | `0e5b59364bb67424…` |
+| **R3 shipped** | **95** | **333** | **`e207ec6c8697d244…`** |
+| `r3_splitat` | 95 | 333 | `e207ec6c8697d244…` |
+| `r3_srclen` | 95 | 333 | `e207ec6c8697d244…` |
+| `r3_forloop` | 92 | 314 | `5b703ff1cf786c32…` |
+| `r3_hdrslice` | **83** | 286 | `47f480c0277b144b…` |
+| `r3_additive` | 87 | 311 | `f8288927117cf60c…` |
+
+`r3_splitat` and `r3_srclen` are **byte-identical** to the shipped kernel —
+rustc erases both distinctions — which reproduces TASK_018_REVIEW's
+`e207ec6c8697…` independently and is the third pattern where the pin draws a
+line the compiler does not.
+
+**Whole-program marginal `Ir`/call**, `-O3 isolated`, `n_iters` 100→200, every
+row measured **in one session against references rebuilt in the same
+directory** (see §10b — that qualifier is load-bearing, not decoration):
+
+| input | `len` | R4 ship | **R3 ship** | `r3_splitat` | `r3_forloop` | `r3_hdrslice` | `r3_additive` ⛔ |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `small` | 61 | 229.00 | **239.00** | 239.00 | 237.00 | **235.00** | 236.00 |
+| `large` | 4092 | 10200.84 | **10210.84** | 10210.84 | 10208.84 | **10206.84** | 10207.84 |
+| `sweep-l56` | 56 | 202.00 | 210.00 | 210.00 | 209.00 | **207.00** | 207.00 |
+| `sweep-l65` | 65 | 237.70 | 247.70 | 247.70 | 245.70 | **243.70** | 244.70 |
+| `sweep-l2040` | 2040 | 5123.08 | 5131.08 | 5131.08 | 5130.08 | **5128.08** | 5128.08 |
+| `sweep-l2049` | 2049 | 5148.96 | 5158.96 | 5158.96 | 5156.96 | **5154.96** | 5155.96 |
+
+Every difference is an exact integer. **Swept, not sampled** — the rule this
+project has broken three times (`nrec + 3`, p02's own mod-16 sawtooth, p17's
+two-point `+32`). Sixteen *consecutive* record lengths, 56…71, are **two full
+cycles of the widest modulus in play** (`R3 − R4` is 8-periodic here, §3b), all
+measured in one session against references rebuilt in the same directory
+(`.temp/p19/sweep02.py`, `.temp/p19/sweep02.log`). **Zero residual on all 16:**
+
+| difference | `len ≡ 0 (mod 8)` (56, 64) | otherwise (14 lengths) |
+|---|---:|---:|
+| `R3ship − R4ship` | **8** | **10** |
+| `r3_splitat − R3ship` | 0 | 0 |
+| `r3_forloop − R3ship` | **−1** | **−2** |
+| `r3_hdrslice − R3ship` | **−3** | **−4** |
+| `r3_additive − R3ship` ⛔ | −3 | −3 (**flat**) |
+
+The first row is §3b's own swept `R3 − R4` split, reproduced here on 16
+consecutive lengths by a separate probe — the cheap check that these variants
+are measuring p02's kernel and not something else. The last row is the sharpest
+one: the forbidden spelling's advantage is **flat at −3**, while the admissible
+`r3_hdrslice`'s is **−4 at 14 of the 16 lengths**, so
+
+> at 14 of 16 record lengths the cheapest **admissible** R3 is strictly cheaper
+> than the cheapest **forbidden** one, and at the other 2 they tie.
+
+Summarised against the shipped R3:
+
+| variant | `len ≢ 0 (mod 8)` | `len ≡ 0 (mod 8)` |
+|---|---:|---:|
+| `r3_splitat` | 0 | 0 |
+| `r3_forloop` | **−2** | **−1** |
+| `r3_hdrslice` | **−4** | **−3** |
+| `r3_additive` ⛔ | −3 | −3 |
+
+
+**What this establishes.**
+
+1. **`R3ship − R4ship = +10 / +8` is an UPPER BOUND on p02's in-contract safety
+   tax, not the tax.** The measured in-contract minimum is **+6** (`small`,
+   `large`, `sweep-l65`, `sweep-l2049`) and **+5** (`sweep-l56`,
+   `sweep-l2040`) — `r3_hdrslice`. p02 is the third pattern where this holds,
+   after p16 (`+27/+77` → `+19/+45`) and p17 (`+32` → `−19`); the shape of the
+   result is now uniform enough to expect rather than to discover.
+2. **TASK_018_REVIEW M1's failure scenario would have published a number that is
+   not even the floor.** The forbidden additive guard is −3 against shipped R3,
+   flat; `r3_hdrslice`, which is **in** contract, is −4 at 14 of 16 swept
+   lengths and −3 (tied) at the other 2. So the exclusion of the additive
+   spelling **costs p02's published floor nothing at all** — the cheapest
+   admissible R3 is at least as cheap as the cheapest forbidden one at every
+   length measured, and strictly cheaper at 14 of 16. That is a much better
+   answer to "is the pin self-serving?" than an argument, and it is the
+   opposite of p16's, where the exclusion made the published tax 4.5× larger.
+3. **The pin now decides p02, where TASK_018_REVIEW measured that it decided
+   nothing.** Before TASK_019 neither `required[0]` nor `forbidden[0]` matched
+   any Rust rung — the shipped R3 and the forbidden variant were *equally*
+   unmatched, so the grep separated nothing. With the entries per-language, the
+   shipped R3 matches `required[0]`'s Rust spelling, `r3_additive` matches
+   `forbidden[0]`'s Rust spelling, and `r3_srclen` matches neither. Three
+   verdicts where there were none.
+4. **`r3_srclen` is out of contract while being byte-identical to the shipped
+   cell**, which is the standard behaving as declared ("out of contract even
+   when it compiles to the same bytes") and is worth stating plainly, because it
+   is the sharpest cost of the token reading: p02 excludes a cell whose
+   machine code it ships.
+5. **The R4 side has not been searched in contract**, so `+6 / +5` is an R3-side
+   bound and **not** p02's safety number (`.memory/01-ladder.md` finding 14).
+
+**Method.** Variants and binaries under `.temp/p19/v02/`, measured by
+`.temp/p19/measure02.py`, which calls `.temp/p05r3/mir.py` —
+`harness/check.py`'s own `_probe_input` plus a whole-program `Ir` difference.
+**No pattern source was edited.**
+
+## 10b. The marginal is exact within a build, not across builds
+
+Discovered while measuring §10a and recorded because it is a measurement rule,
+not a p02 fact. The shipped `safe_tuned.rs`, compiled from the **same source**
+with the **same flags** into two different directories, gives two different
+marginals on `large`:
+
+| build | `kernel` `md5_fn` | `n_fn` | marginal `Ir`/call, `large` |
+|---|---|---:|---:|
+| `.temp/build/p02/safe_tuned-O3-isolated` | `e207ec6c8697d244…` | 95 | 10210.**82** |
+| `.temp/p19/v02/bin-r3_shipped-O3-isolated` | `e207ec6c8697d244…` | 95 | 10210.**84** |
+
+Same on `small` (239.00 both). Per-function callgrind self-costs at `large`
+locate the whole 0.02:
+
+```
+kernel                      9783.00 /call   in BOTH builds
+libc (4322) = 0x188a80       412.82  vs  412.84 /call
+main                          15.00 /call   in both
+```
+
+`0x188a80` in `/usr/lib/x86_64-linux-gnu/libc.so.6` is the AVX `memmove`
+(`cmp $0x20,%rdx` then `vmovdqu`). The two binaries differ in size by 64 bytes,
+so the driver's `Vec` lands at a different alignment and glibc's copy takes a
+marginally different path. **The kernel's own executed instruction count is
+identical.**
+
+Two rules follow, and the second is the one that costs sessions:
+
+- a marginal `Ir`/call is exact as a **within-session, within-build**
+  difference, which is the only way this file and the gate ever use it;
+- `patterns/p01-array-sum/spec.md`'s `collapse.note` used to say the
+  loader/environment terms *"cancel exactly"*. They do not. p08's environment
+  block moves a marginal by ~**0.1** — 7292.12 … 7292.22 on `small` and
+  29037.52 … 29037.62 on `large`, six environment lengths each, re-measured at
+  TASK_019 — and heap alignment moves p02's by 0.02 here, a **different**
+  mechanism and one that is not the environment at all. Corrected in that
+  hashed note at TASK_019.

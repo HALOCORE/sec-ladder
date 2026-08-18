@@ -29,7 +29,9 @@ What it enforces, in order:
      the declaration* moves `contract_sha256`. It does NOT detect a rung that
      violates the declaration: rung sources are covered by `source_sha256`, and
      a forbidden respelling passes this gate (proved by experiment,
-     TASK_016_REVIEW B1)
+     TASK_016_REVIEW B1). An entry may be a plain string or an object keyed by
+     language (TASK_019); `spelling_matches` below DEFINES what matching one
+     means, and is selftested at stage 0 rather than run against any rung
   1  every cell of the matrix builds (and under `--no-build`, that no binary
      predates the newest source)
   2  every cell prints the checksum the pattern's own `model.py` predicts. The
@@ -541,6 +543,10 @@ def check_selftests(rep):
         if got != want:
             rep.fail("idiom-selftest",
                      f"idiom_problems: {label}: got {got}, want {want}")
+    for label, got, want in _MATCH_CASES:
+        if got != want:
+            rep.fail("spelling-selftest",
+                     f"spelling_matches: {label}: got {got}, want {want}")
 
 
 # ==========================================================================
@@ -548,6 +554,110 @@ def check_selftests(rep):
 # ==========================================================================
 
 IDIOM_KEYS = ("required", "forbidden", "why")
+
+#: languages an `idiom` entry may be keyed by. A `required`/`forbidden` entry is
+#: either a plain string (applies to every rung) or an object with these keys
+#: (each rung is read against its own language's spelling). TASK_019.
+IDIOM_LANGS = ("c", "rust")
+
+_GHOST_KW = re.compile(r"\b(requires|ensures|recommends|decreases|invariant"
+                       r"|opens_invariants|no_unwind|returns|when)\b")
+
+
+def _blank_ghost(code):
+    """Blank Verus ghost clauses, preserving offsets and line numbers.
+
+    A clause keyword at bracket depth 0 opens a region that runs to the `{` or
+    `;` that ends it -- which covers a function's `requires`/`ensures` list and
+    a loop's `invariant`/`decreases` header alike. `vparse.clause_spans` does
+    not: it reads an item's *signature* only, and the spelling that forced this
+    to exist is a **loop** invariant (below)."""
+    out, i, n, depth = list(code), 0, len(code), 0
+    while i < n:
+        c = code[i]
+        if c in "([":
+            depth += 1
+        elif c in ")]":
+            depth -= 1
+        elif depth == 0:
+            m = _GHOST_KW.match(code, i)
+            if m:
+                j, d2 = m.end(), 0
+                while j < n:
+                    ch = code[j]
+                    if ch in "([":
+                        d2 += 1
+                    elif ch in ")]":
+                        d2 -= 1
+                    elif d2 == 0 and ch in "{;":
+                        break
+                    j += 1
+                for k in range(i, j):
+                    if out[k] != "\n":
+                        out[k] = " "
+                i = j
+                continue
+        i += 1
+    return "".join(out)
+
+
+def exec_code(src):
+    """`src` with comments, string/char literals and Verus ghost clauses blanked.
+
+    Offset- and line-preserving, so a hit's line number is still the source's."""
+    return _blank_ghost(vparse.blank_noncode(src))
+
+
+def spelling_matches(spelling, src):
+    """Does `src` spell `spelling`? The named-spelling standard's matching rule.
+
+    This is a DEFINITION, not a gate check. Nothing in this file calls it
+    against a rung source: stage 0b is presence-only and the threat model is
+    honest mistake, not malicious author (`.memory/02-bench-rules.md`). It lives
+    here, selftested at stage 0 and therefore inside `source_sha256`, because
+    the standard's word "literal" was undefined for three tasks and **twenty
+    shipped obligations turned on the gap** (TASK_018_REVIEW B1, TASK_019). A
+    convention that lives only in prose drifts; one that is code and hashed
+    cannot.
+
+    Three parts, each forced by a shipped cell rather than chosen:
+
+      * **whitespace is deleted from both sides.** `patterns/p17-http-range/spec.md`
+        declares `2 + 2*nsuf > len`; all six p17 rungs write `2 + 2 * nsuf > len`.
+        Six cells were out of their own contract on two space characters.
+      * **comments and string literals are blanked**
+        (`vparse.blank_noncode`). `patterns/p02-buffer-copy/c/kernel_hardened.c:10`
+        and `patterns/p16-tlv-walk/c/kernel_hardened.c` each quote their own
+        pattern's `forbidden` spelling in the comment that explains why they do
+        not use it; and `patterns/p17-http-range/c/kernel.c` matches
+        `2 + 2*nsuf > len` on raw text only because a comment spells it that way
+        while the code writes the spaced form -- a match for the wrong reason.
+      * **Verus ghost clauses are blanked.** They erase before codegen and their
+        arithmetic is over unbounded `int`, so they cannot carry the overflow an
+        additive spelling is forbidden for. Without this,
+        `patterns/p16-tlv-walk/verus.rs`'s loop invariant `p + 3 + vlen <= end`
+        makes p16's own R5 violate p16's `forbidden[0]` -- on the one pattern
+        TASK_018_REVIEW called decidable.
+
+    What it does NOT decide, and no code can: the POLARITY of a quoted span
+    (p02's `|`, p08's `&`, p17's `continue` are quoted in order to be absent)
+    and the SET OF RUNGS an entry scopes to. Both live in the entry's English."""
+    return _WS.sub("", spelling) in _WS.sub("", exec_code(src))
+
+
+_WS = re.compile(r"\s+")
+
+
+def idiom_entry_text(entry, lang=None):
+    """One entry's text: the string itself, or the per-language spelling.
+
+    With `lang=None` an object entry renders as `c: ... | rust: ...` so the
+    verdict prints every spelling a reviewer would have to check."""
+    if isinstance(entry, str):
+        return entry
+    if lang is not None:
+        return entry.get(lang, "")
+    return " | ".join(f"{k}: {entry[k]}" for k in sorted(entry))
 
 
 def idiom_problems(contract):
@@ -597,7 +707,19 @@ def idiom_problems(contract):
     route out -- so an empty `forbidden` is shouted, not failed. `required` may
     not be empty: with nothing required there is no matched pair, and a
     matched-pair delta is the only thing that can carry a safety number
-    (`.memory/06-catalogue.md`)."""
+    (`.memory/06-catalogue.md`).
+
+    TASK_019 admits a second entry shape: an object keyed by language
+    (`IDIOM_LANGS`) instead of a string, matched per rung against its own
+    language's spelling. One string cannot name a check whose operands are
+    `src_len` in C and `src.len()` in Rust -- the C signature carries a length
+    parameter the Rust signature does not -- and the prose clause that used to
+    paper over that was measured not to fire (TASK_018_REVIEW B1). The keys are
+    closed and every declared key must be non-empty, because the accident this
+    shape invites is a typo'd language key that silently pins nothing: the same
+    accident `forbid`-for-`forbidden` invites, and the reason that case is in
+    `_IDIOM_CASES`. Still presence only -- no stage matches an entry against a
+    rung."""
     idi = contract.get("idiom")
     if not isinstance(idi, dict):
         return ["spec.md's slb-contract block has no `idiom` object. Every "
@@ -611,10 +733,30 @@ def idiom_problems(contract):
                      f"{list(IDIOM_KEYS)} -- a mistyped key is silently empty")
     for k in ("required", "forbidden"):
         v = idi.get(k, [])
-        if not isinstance(v, list) or any(not isinstance(s, str) or not s.strip()
-                                          for s in v):
-            probs.append(f"idiom.{k} must be a list of non-empty strings, "
-                         f"got {v!r}")
+        if not isinstance(v, list):
+            probs.append(f"idiom.{k} must be a list, got {v!r}")
+            continue
+        for e in v:
+            if isinstance(e, str):
+                if not e.strip():
+                    probs.append(f"idiom.{k} has an empty entry -- that is a "
+                                 f"typo, not a declaration")
+            elif isinstance(e, dict):
+                bad = sorted(set(e) - set(IDIOM_LANGS))
+                if bad:
+                    probs.append(
+                        f"idiom.{k} entry has unknown language key(s) {bad}; "
+                        f"expected a subset of {list(IDIOM_LANGS)} -- a "
+                        f"mistyped language key pins nothing for that language")
+                if not e:
+                    probs.append(f"idiom.{k} has an empty per-language entry")
+                if any(not isinstance(s, str) or not s.strip()
+                       for s in e.values()):
+                    probs.append(f"idiom.{k} per-language entry {sorted(e)} has "
+                                 f"an empty spelling")
+            else:
+                probs.append(f"idiom.{k} entries must be a non-empty string or "
+                             f"an object keyed by {list(IDIOM_LANGS)}, got {e!r}")
     if not idi.get("required"):
         probs.append("idiom.required is empty -- name what every rung must "
                      "implement, in the pattern's own terms")
@@ -637,8 +779,9 @@ def idiom_lines(contract, keys=("required", "forbidden"), why=True):
     for k, tag in (("required", "REQUIRED "), ("forbidden", "FORBIDDEN")):
         if k not in keys:
             continue
-        for s in idi.get(k) or []:
-            out += textwrap.wrap(s, 92, initial_indent=f"    idiom {tag} ",
+        for e in idi.get(k) or []:
+            out += textwrap.wrap(idiom_entry_text(e), 92,
+                                 initial_indent=f"    idiom {tag} ",
                                  subsequent_indent=" " * 20)
         if not (idi.get(k) or []):
             out.append(f"    idiom {tag} (none declared)")
@@ -658,9 +801,12 @@ def check_idiom(rep, contract):
         return
     idi = contract["idiom"]
     nreq, nforb = len(idi["required"]), len(idi.get("forbidden") or [])
+    nlang = sum(1 for k in ("required", "forbidden")
+                for e in idi.get(k) or [] if isinstance(e, dict))
     rep.ok(f"idiom declared: {nreq} required, {nforb} forbidden spelling(s), "
-           f"hashed into contract sha256. Presence only -- no stage here checks "
-           f"that a rung honours it. Text in the verdict.")
+           f"{nlang} of them per-language, hashed into contract sha256. "
+           f"Presence only -- no stage here checks that a rung honours it. "
+           f"Text in the verdict.")
     if nforb == 0:
         rep.shout("idiom", "this pattern forbids no spelling by name, so its "
                            "rungs are matched only by the `required` list and "
@@ -696,6 +842,67 @@ _IDIOM_CASES = [
     ("an empty entry in a list is a typo, not a declaration",
      len(idiom_problems({"idiom": {"required": ["x", ""], "forbidden": [],
                                    "why": "z"}})), 1),
+    # TASK_019: a per-language entry is legal, and a mistyped language key is
+    # the same accident as `forbid`-for-`forbidden` -- silently pins nothing.
+    ("a per-language entry is legal",
+     idiom_problems({"idiom": {"required": [{"c": "len > src_len - 2",
+                                             "rust": "len > src.len() - 2"}],
+                               "forbidden": [], "why": "y"}}), []),
+    ("one language key is legal (an entry may pin one side only)",
+     idiom_problems({"idiom": {"required": [{"c": "memcpy"}],
+                               "forbidden": [], "why": "y"}}), []),
+    ("`rst` is not `rust`",
+     len(idiom_problems({"idiom": {"required": [{"rst": "x"}],
+                                   "forbidden": [], "why": "y"}})), 1),
+    ("an empty per-language spelling is a typo",
+     len(idiom_problems({"idiom": {"required": [{"c": "x", "rust": "  "}],
+                                   "forbidden": [], "why": "y"}})), 1),
+    ("a list of lists is not a declaration",
+     len(idiom_problems({"idiom": {"required": [["x"]], "forbidden": [],
+                                   "why": "y"}})), 1),
+]
+
+#: `spelling_matches` selftests. Each case is a shipped situation, named -- see
+#: the docstring for which cell forced which part (TASK_019).
+_MATCH_CASES = [
+    ("whitespace is not a spelling",
+     spelling_matches("2 + 2*nsuf > len", "    if 2 + 2 * nsuf > len {\n"), True),
+    ("a different spelling is still a different spelling",
+     spelling_matches("end - p >= 3", "    while p + 3 <= end {\n"), False),
+    ("a C comment quoting the forbidden spelling is not the code using it",
+     spelling_matches("src_off + 2 + len > src_len",
+                      "/* written subtraction-first rather than\n"
+                      " * `src_off + 2 + len > src_len` because ... */\n"
+                      "if (len > src_len - (src_off + 2)) return 0;\n"), False),
+    ("...and the subtraction-first spelling in the same file does match",
+     spelling_matches("len > src_len - (src_off + 2)",
+                      "/* rather than `src_off + 2 + len > src_len` */\n"
+                      "if (len > src_len - (src_off + 2)) return 0;\n"), True),
+    ("a Rust line comment is not code either",
+     spelling_matches("start >= 0",
+                      "// R1h has `&& start >= 0` here; this rung does not.\n"
+                      "if start < end {\n"), False),
+    ("a string literal is not code",
+     spelling_matches("Range:", 'println!("Range: {}", n);\n'), False),
+    ("a loop invariant is ghost, so a forbidden spelling there is not a use",
+     spelling_matches("p + 3 + vlen <= end",
+                      "while j < vlen\n    invariant\n        j <= vlen,\n"
+                      "        p + 3 + vlen <= end,\n    decreases vlen - j,\n"
+                      "{\n    j = j + 1;\n}\n"), False),
+    ("...and the exec comparison in the same loop still matches",
+     spelling_matches("vlen > end - (p + 3)",
+                      "while end - p >= 3\n    invariant end <= buf@.len(),\n"
+                      "    decreases end - p,\n{\n"
+                      "    if vlen > end - (p + 3) { break; }\n}\n"), True),
+    ("a function's requires/ensures is ghost too",
+     spelling_matches("off + len <= v.len()",
+                      "fn kernel(v: &[u64]) -> u64\n"
+                      "    requires off + len <= v.len(),\n"
+                      "{\n    0\n}\n"), False),
+    ("the exec loop condition before an invariant survives",
+     spelling_matches("end - p >= 3",
+                      "while end - p >= 3\n    invariant end - p >= 0,\n"
+                      "{\n    p = p + 1;\n}\n"), True),
 ]
 
 

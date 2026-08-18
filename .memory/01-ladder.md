@@ -35,18 +35,35 @@ statement of it. One clause is load-bearing and was found by measurement: **a
 rung spells the same operands the way its language forces, and nothing else
 varies**.
 
-**That clause does not work, and the "eight shipped cells" figure attached to it
-is retracted** (TASK_018_REVIEW). The real count is **10 literal misses, or 4
-once whitespace is normalised** — six of the ten are nothing but spacing
-(`2 + 2*nsuf` declared, `2 + 2 * nsuf` written, in all six p17 rungs). And the
-clause's antecedent — *"the language cannot express it"* — is **false for the
-four that remain**: Rust *can* spell p02's `src_len`, and a p02 R3 variant that
-does is **byte-identical to the shipped cell** (`md5_fn e207ec6c8697…`, same
-marginal). So the clause never fires for the cells it was written to rescue.
+**That clause was deleted at TASK_019, and the "eight shipped cells" figure
+attached to it is retracted twice over.** TASK_018_REVIEW made it "10 literal, 4
+whitespace-normalised"; TASK_019 audited the *whole* declaration against every
+rung it scopes to and measured **20 raw / 15 comment-stripped / 9 fully
+normalised violations out of 78 obligations** — then repaired the declarations to
+**0 of 82**, measured, not asserted.
 
-The tree therefore holds two incompatible sentences — the standard says no
-shipped cell is out of contract; the standard applied says four are — and
-resolving it is a design act, not a measurement.
+Two violation classes nobody had counted, and both are about the **ruler**, not
+the code:
+
+- **p17's `required[1]` backticked an ellipsis** — `if start < end && start >= 0
+  { ... }`. No rung in any language can contain that. 5 obligations.
+- **p16's `verus.rs:275` contains p16's own `forbidden[0]` literally**, as a
+  *ghost loop invariant*. The grep that is supposed to settle admission **fires
+  on a shipped cell of the pattern the previous review had called decidable** —
+  because the pin has no notion of which code *runs*.
+
+**Comment-stripping is load-bearing, and was unstated until TASK_019 defined the
+matching rule** (`check.spelling_matches`: blank comments and string literals,
+blank Verus ghost clauses, then delete all whitespace). Two hardened-C files
+quote their own `forbidden` spelling *inside the comment explaining why they do
+not use it*, and p17's C rung matched `2 + 2*nsuf > len` on raw text **only
+because a comment spells it that way** while the code writes the spaced form — a
+match for the wrong reason.
+
+The resolution: `required`/`forbidden` entries may be **per-language objects**,
+so a check whose operands are `src_len` in C and `src.len()` in Rust can be named
+honestly. It **narrows** rather than loosening — 78 → 82 obligations, and on p02
+the pin decided 0 of 3 variants before and 3 of 3 after.
 
 - It does **not** buy attributability. On p17 the excluded spelling and an
   admissible one compile to the **same 478 bytes**, so the exclusion moves no
@@ -65,6 +82,23 @@ resolving it is a design act, not a measurement.
 **So: a pinned idiom makes the admissible class DECIDABLE, not SINGULAR — and
 therefore `R3ship − R4ship` is an UPPER BOUND on the in-contract safety tax,
 never the tax.** Report the in-contract spread beside every headline.
+
+**How to tell a legitimate declaration edit from self-certification — the
+direction test (TASK_019).** The obvious guard is *provenance*: "this edit was
+forced by shipped code that predates the standard, not by a number anyone
+wants." **That guard does not survive**, and the engineer who was asked to attack
+it took it apart: only one of TASK_019's four repair mechanisms is about code at
+all. An ellipsis in a `required` entry is a **typo in the ruler**; a ghost
+invariant matching a `forbidden` entry is the pin having **no notion of what code
+runs**. Three of four repairs are about how the declaration is *read*, and
+provenance cannot license them. Worse, provenance is **unfalsifiable**.
+
+Use **direction**, which is a number: *an edit that **shrinks** the admissible
+class and **lowers or does not raise** the pattern's own published figure is not
+self-certification.* Both landed edits pass it measurably — p16's exclusion makes
+its published tax **4.5× larger**, and p02's repair **lowers** its headline from
+`+10` to an in-contract minimum of `+6 / +5`. An edit that widens the class while
+improving the pattern's number is the one to refuse.
 
 ### R1h — the hardened C cell (optional, added at TASK_004)
 

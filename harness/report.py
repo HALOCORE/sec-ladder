@@ -100,6 +100,25 @@ def read_idiom(pattern):
     return idi if isinstance(idi, dict) else None
 
 
+def _entry_lines(tag, entry):
+    """One `required`/`forbidden` entry as markdown bullets.
+
+    An entry is a plain string, or — TASK_019 — an object keyed by language,
+    because one string cannot name a check whose operands are `src_len` in C and
+    `src.len()` in Rust. Every language's spelling is printed, indented under the
+    entry: a reader of `results/` sees the whole declaration or none of it, and
+    silently printing one language's spelling for all six rungs is the failure
+    this section exists to prevent."""
+    if isinstance(entry, str):
+        return [f"- **{tag}** — {entry}"]
+    if not isinstance(entry, dict):
+        return [f"- **{tag}** — *(unreadable entry: {entry!r})*"]
+    lines = [f"- **{tag}** — *per language:*"]
+    for lang in sorted(entry):
+        lines.append(f"  - `{lang}` — {entry[lang]}")
+    return lines
+
+
 def idiom_section(doc, out):
     """What the numbers below are numbers *of*.
 
@@ -136,10 +155,10 @@ def idiom_section(doc, out):
                "spellings of one kernel. The pattern's hashed `slb-contract` block "
                "declares which spellings that means; **a rung that deviates is a "
                "different benchmark and its numbers are not comparable to these.**\n")
-    for s in idi.get("required") or []:
-        out.append(f"- **required** — {s}")
-    for s in idi.get("forbidden") or []:
-        out.append(f"- **FORBIDDEN** — {s}")
+    for e in idi.get("required") or []:
+        out += _entry_lines("required", e)
+    for e in idi.get("forbidden") or []:
+        out += _entry_lines("FORBIDDEN", e)
     if not (idi.get("forbidden") or []):
         out.append("- **FORBIDDEN** — *nothing is excluded by name.* The rungs are "
                    "matched only by the `required` list above, so these numbers are "
