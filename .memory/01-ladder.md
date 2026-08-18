@@ -409,9 +409,18 @@ is a much stronger claim than any p01 could produce.
    residual**. The 68 committed blobs could not have tested it: both bands sit at
    `nrec` 2 and 4.)
 
-   **So `+27 / +77` is an UPPER BOUND on p16's in-contract safety tax, not the
-   tax.** The measured in-contract minimum is **+19 (small) / +45 (large)**, and
-   the R4 side has not been searched in contract at all, so even that is an
+   **`+27 / +77` is a bound on `inf(in-contract R3) − R4ship` — and on nothing
+   else. MEASURED FALSE as a bound on p16's in-contract safety tax**
+   (TASK_023). p16's unsafe rung moves in contract too, by the same lever that
+   moved p05's — respelling the header read as one unaligned `u16` — and unlike
+   p05's constant it moves by a **coefficient**: `R4ship − r4_hdr = 4·nrec`,
+   zero residual over 24 blobs. So the pairing convention does not shift p16's
+   intercept, it changes the `nrec` coefficient from 1 to 10 (`vlen ≡ 0 mod 4`)
+   or 3 to 12, and the in-contract **pair interval is 111% / 109% of the shipped
+   pair** — *wider* than p05's 80% / 71%. An admissible pair exceeds the
+   published tax by `5·nrec`.
+   The R3-side figure below is therefore one-sided, and that is all it is: the
+   measured in-contract R3 minimum is **+19 (small) / +45 (large)**, and
    R3-side bound. This file already said, at finding 3: *"Never publish a
    safety-cost claim without R3."* The rule was violated by its own author on the
    next pattern. **Lead with R3 or do not lead.**
@@ -617,7 +626,11 @@ is a much stronger claim than any p01 could produce.
    **Perf — R3 is free for the fifth pattern in a row** (+32 Ir/call, 0 per
    byte; +0.61% / +0.08%). **Two corrections, and the second is the larger.**
    "Flat" is wrong (TASK_015_REVIEW): it is flat *per byte*, not per call.
-   And **`+32` is an UPPER BOUND, not p17's R3 cost** (TASK_018): an in-contract
+   And **`+32` is a ONE-SIDED bound — R3-side only, with R4 held at the shipped
+   cell — not p17's R3 cost and not a bound on its safety tax.** p17's unsafe
+   side has never been searched in contract; after TASK_023 it is *unverified*,
+   not verified-fixed, and the same header-respelling lever moved both p05's and
+   p16's. (TASK_018): an in-contract
    respelling — keeping `let start: i64`, `let end: i64` and the literal
    `if start < end && start >= 0` — measures **−19.00 flat against the shipped
    R4** on both bands, and is **byte-identical** (`md5_fn 532201c70eeb…`, 135

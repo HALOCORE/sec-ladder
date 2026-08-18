@@ -133,7 +133,10 @@ supersede any earlier task report they contradict.
   (two cheaper) and p17 **two** (both cheaper), so "the shipped R3 is the
   cheapest admissible spelling" is **FALSE, not unestablished**, in both. Neither
   cell was swapped; both `NOTES.md` now carry an in-contract spelling spread and
-  state their published R3 figures as **upper bounds**. The adjudication that got
+  state their published R3 figures as **one-sided bounds** — R3-side only, R4 held
+  at the shipped cell. TASK_023 measured that "upper bound on the safety tax" is
+  **false** for p16 as well as p05; p17, p02, p01 and p08 are *unverified* on the
+  R4 side, not verified fixed. The adjudication that got
   there: p17's cheaper spelling is genuinely admissible under its
   declaration — but it also beats **its own R4** by 19.00, so swapping R3 alone
   would re-commit TASK_014/015's unmatched-pair defect *as a shipped cell*, and
