@@ -33,18 +33,31 @@ each rung must spell literally. It is a **policy adopted after measuring**, not 
 reading of what any earlier text meant, and all six carry a byte-identical
 statement of it. One clause is load-bearing and was found by measurement: **a
 rung spells the same operands the way its language forces, and nothing else
-varies** — without it, a literal reading puts *eight shipped cells* out of
-contract, because e.g. p02's `src_len` does not exist in the Rust signature at
-all.
+varies**.
+
+**That clause does not work, and the "eight shipped cells" figure attached to it
+is retracted** (TASK_018_REVIEW). The real count is **10 literal misses, or 4
+once whitespace is normalised** — six of the ten are nothing but spacing
+(`2 + 2*nsuf` declared, `2 + 2 * nsuf` written, in all six p17 rungs). And the
+clause's antecedent — *"the language cannot express it"* — is **false for the
+four that remain**: Rust *can* spell p02's `src_len`, and a p02 R3 variant that
+does is **byte-identical to the shipped cell** (`md5_fn e207ec6c8697…`, same
+marginal). So the clause never fires for the cells it was written to rescue.
+
+The tree therefore holds two incompatible sentences — the standard says no
+shipped cell is out of contract; the standard applied says four are — and
+resolving it is a design act, not a measurement.
 
 - It does **not** buy attributability. On p17 the excluded spelling and an
   admissible one compile to the **same 478 bytes**, so the exclusion moves no
-  number; on p16, 42 of 77 Ir/call at `large` sit inside the unpinned part of the
-  spelling.
-- It buys **decidability**. The semantic alternative cannot settle a variant that
-  satisfies "every comparison is subtraction-first" *vacuously* by having no
-  comparison, nor one whose `rest.len() >= 3` is neither. A contract a grep can
-  settle beats one only an argument can settle.
+  number; on p16 the in-contract class **spans 42** of the 77 Ir/call at `large`,
+  of which **32 is removable** by an admissible respelling.
+- It was argued to buy **decidability** — the semantic alternative cannot settle
+  a variant that satisfies "every comparison is subtraction-first" *vacuously* by
+  having no comparison. **That is refuted on p02**, where the grep the standard
+  says settles admission excludes four *shipped* cells, so the pin is not
+  decidable-and-correct simultaneously. What survives as the justification is the
+  narrow one in `check.py`: the declaration is **required, visible and hashed**.
 - "Pin nothing and report the spread" fails differently: with no pin the spread
   has no boundary, and `inf(R4) <= inf(R3)` makes it unbounded below on both
   sides. The pin is what makes the spread finite and searchable.
@@ -319,8 +332,10 @@ is a much stronger claim than any p01 could produce.
    comparisons literally, all byte-identical in output on 73/73 inputs; **two are
    cheaper than the shipped R3**. `R3ship − r3_endslice = 2·nrec − 2` and
    `R3ship − r3_window = 4·nrec − 8`, zero residual across four residue classes
-   (the `nrec` coefficient is a **3-point fit** — do not quote it as a law; that
-   is exactly what produced the retracted `nrec + 3`).
+   (the `nrec` coefficient was a 3-point fit; **TASK_018_REVIEW promoted it to a
+   swept law** — 11 `nrec` values × 2 residue classes, 110 marginals, **zero
+   residual**. The 68 committed blobs could not have tested it: both bands sit at
+   `nrec` 2 and 4.)
 
    **So `+27 / +77` is an UPPER BOUND on p16's in-contract safety tax, not the
    tax.** The measured in-contract minimum is **+19 (small) / +45 (large)**, and
