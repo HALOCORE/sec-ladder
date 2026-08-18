@@ -8,20 +8,33 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "c6021ea1d69ae2cf81f3fcce40d7dafe5280a7e3f26adfcf03f878fbfa2c7f99",
+  "contract_sha256": "afd4c4939c46b414a39247934cd02182cd799695ccdfaf623787d9e3df276697",
+  "idiom": {
+    "required": [
+      "every comparison is subtraction-first: `end - p >= 3` and `vlen > end - (p + 3)`, in every rung",
+      "the tag byte is folded, and folded BEFORE the fit test",
+      "nrec is folded into the result",
+      "R1 omits only the second check -- it keeps `end - p >= 3`"
+    ],
+    "forbidden": [
+      "the additive spellings `p + 3 <= end` and `p + 3 + vlen <= end`",
+      "tag dispatch or skipped records"
+    ],
+    "why": "the additive comparisons can overflow size_t on an attacker-chosen vlen and wave the attack through, which is the whole check p16 is about; an unread tag is deleted by LLVM and the walk stops looking like a TLV walk; a `if tag != 0 { skip }` branch adds an unpredictable data-dependent branch, which is a second new variable and belongs to p19/p35 (this box cannot measure branch misses). Moved into the hashed block at TASK_016 from the prose section 'Five things are load-bearing' above. Note what is deliberately NOT restricted: the R2/R3/R4 spelling of the walk and of the value fold, beyond the comparisons above. A consuming spelling (`split_first_chunk::<3>()` plus `split_at`) is admissible under this declaration and measures 10*nrec + 9 CHEAPER than the shipped R3 -- NOTES.md 10 tabulates five spellings. So p16's published R3 number is a spelling's number, matched only against the R4 it ships beside; if a later task wants it to be more than that, the honest move is to declare the walk's spelling here BEFORE measuring, the way p05 did at TASK_013."
+  },
   "source_sha256": {
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
     "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
     "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
     "harness/asm.py": "e3b14d4e90f15e7ff28d862442c721120943bb70c9514437b77facc407b6675f",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "2c09e0667263364e427a20de3bd76482dfeb1df23cb62c99fbba65844e491c57",
+    "harness/check.py": "e7c6bca47361b30daf7a0aef68c0e8dd765f9600fe7d2077966cf3f46cfa4205",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "a810bf5973787f78fc9805b2407a6bb04bbee68c968374a2e9b8622c4c5d3af4",
     "harness/report.py": "537f51262f58391a6e4da1999807e3b84a9e487e9727e168dc6527578442580a",
     "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
-    "patterns/p16-tlv-walk/NOTES.md": "555a3f51693c85a0a5353741ff68a7ef67230c152d2670231c1f3e07184c9bae",
+    "patterns/p16-tlv-walk/NOTES.md": "3e022a58ede9b707ee84e1ef7d3968d45f7967f889876e9488ad25ccac40b792",
     "patterns/p16-tlv-walk/README.md": "33af344db846bf9f7c835b6ef588e4d32c84260df7e1d96c1da489d6523db251",
     "patterns/p16-tlv-walk/c/kernel.c": "a59fbef6d3427711a78b7806569978223367c6cba81bfcf1881e1ac83977aba0",
     "patterns/p16-tlv-walk/c/kernel.h": "2cc7285986c387baed556449abb63ad25cc3409e27a081300a1ca5e2c84641aa",
@@ -30,7 +43,7 @@
     "patterns/p16-tlv-walk/model.py": "8b35eae6926af6654d6816d9a1733808234217fda9cdb8a8ee1d873d1877a6e9",
     "patterns/p16-tlv-walk/safe_naive.rs": "3f58f658310c5615d0899d01e0907a68b5689673b79d856b6372dbf8cd149054",
     "patterns/p16-tlv-walk/safe_tuned.rs": "6044ce0394896c3605e02178e84aa38b05d9c3bc4d31444cb52ab8674889d2fd",
-    "patterns/p16-tlv-walk/spec.md": "f3f2eb8ac3807db168d9e79dfec4b13edec7c94745d1de4c33cb0ff318c19ba9",
+    "patterns/p16-tlv-walk/spec.md": "9eae1c192b4c518ec958ab39300480afdb23bba2bae7c2ec207c93c938e97ad0",
     "patterns/p16-tlv-walk/unsafe.rs": "ae04d5ee891f29376555b3ef60f99348bb3bfa080eb897f4520dd8bbbbf6f2a4",
     "patterns/p16-tlv-walk/verus.rs": "58c6d06cd6f86430578f5e3120644324162e5822db489ace7cdbba191e79332e"
   },
@@ -576,7 +589,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==3162231==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51f000001a80 at pc 0x55736a040717 bp 0x7ffd0e569df0 sp 0x7ffd0e569de0 READ of size 1 at 0x51f000001a80 thread T0 #0 0x55736a040716 in kernel /home/apt/repos_common/"
+      "diagnostic": "================================================================= ==3734430==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51f000001a80 at pc 0x56050c264717 bp 0x7fff8116fbe0 sp 0x7fff8116fbd0 READ of size 1 at 0x51f000001a80 thread T0 #0 0x56050c264716 in kernel /home/apt/repos_common/"
     },
     "adversarial-stride2.bin": {
       "exit": 0,

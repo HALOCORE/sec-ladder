@@ -378,6 +378,21 @@ exactly what `.memory/02-bench-rules.md` forbids.
   "ensures": ["result == range_fold(buf, off, len)"],
   "note": "requires/ensures above are DERIVED by check.py from verus.rs's own clause text through verus.translate, and the copy here must equal the derivation exactly. They are evaluated in Python against the bindings model.py yields per call (buf/off/len/buf_len/result) plus the helper it supplies (range_fold). NOTE WHAT THE ensures IS, AND THAT IT IS THE OPPOSITE OF p16's: on p16 the ensures was the value and the security property was the trusted accessor's requires, because the harm was a read outside the buffer. p17 has TWO harms. The one that leaves the allocation is still excluded by `i < v@.len()`. The one that stays INSIDE it -- content_len < s <= len, a read of the window's own suffix table -- is memory-safe, so no accessor precondition can exclude it and `result == range_fold(buf, off, len)` is the only thing that does. See the prose above and NOTES.md 5.",
 
+  "idiom": {
+    "required": [
+      "start and end are int64_t / i64 in every rung, and the spec functions are written over int, not nat",
+      "the guard is the one conjunctive `if start < end && start >= 0 { ... }`, not two `continue`s",
+      "R1 omits only `&& start >= 0` -- it keeps `len < 2` and `2 + 2*nsuf > len`",
+      "nserved is folded into the result"
+    ],
+    "forbidden": [
+      "unsigned start/end",
+      "`Range:` text parsing -- the fields are bytes, not ASCII",
+      "a window-relative sign guard where a slice-relative one is meant, and vice versa"
+    ],
+    "why": "making start unsigned deletes the CVE: `start < 0` becomes unrepresentable and the leak row of the semantics table could not exist. ASCII parsing adds a second new variable (string parsing is p11-p15). The `continue` spelling is not expressible in Verus ('for-loops do not yet support continue') and the while workaround hoists the increment above the guard in all six rungs. The last forbidden entry is the one that already cost this pattern a retraction: `start >= -(body_start as i64)` and `start >= -((off + body_start) as i64)` differ by one token, both verify, and only the second is what a bounds check buys -- see NOTES.md 1c. Moved into the hashed block at TASK_016 from the prose section 'Load-bearing, do not improve' above. Note what is NOT restricted: the R2/R3/R4 spelling of the byte fold and of the suffix-table walk. NOTES.md 10 tabulates three measured spellings; the cheapest safe one is 17 Ir per suffix below the shipped R3, so p17's published R3 number is a spelling's number under this declaration, and it is a matched pair only against the R4 it ships beside."
+  },
+
   "verus": {
     "call_site": "main",
     "kernel_item": "kernel",

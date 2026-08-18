@@ -314,6 +314,16 @@ exactly what `.memory/02-bench-rules.md` forbids.
   "ensures": ["result == grid_fold(buf, off, len)"],
   "note": "requires/ensures above are DERIVED by check.py from verus.rs's own clause text through verus.translate, and the copy here must equal the derivation exactly. They are evaluated in Python against the bindings model.py yields per call (buf/off/len/buf_len/result) plus the helper it supplies (grid_fold). p05 is p16's shape and NOT p17's: the harm is an ordinary read past the end of the buffer, so the trusted accessor's discharged `i < v@.len()` is the security property and the `ensures` is what keeps the proof non-vacuous and pins WHICH bytes the answer is a fold of. There is no memory-safe harm here for the ensures to be the only guard against -- p05 has no 'inside the buffer but outside the window' band, because avail IS the window's tail. See the prose above.",
 
+  "idiom": {
+    "required": [
+      "i*ncol + j written out in every rung, not strength-reduced",
+      "R3 may reslice [base .. base+ncol] with base = off + 4 + i*ncol -- that moves the CHECK and keeps the MULTIPLY, and it is the most a rung may do",
+      "the fit check is nrow * ncol > avail in 64-bit; row is a u32 accumulator and acc a u64"
+    ],
+    "forbidden": ["chunks_exact", "a running row pointer"],
+    "why": "either deletes the flattened index, which IS the pattern; a rung that does it is a different benchmark and its numbers are not comparable (this file's second sentence). Moved into the hashed block at TASK_016 from the prose section 'Load-bearing, do not improve' above, where contract_sha256 could not see it: it was declared at TASK_013 BEFORE any of these spellings were measured, it was right both times it was tested, and two consecutive tasks measured a forbidden spelling anyway and published the result as p05's number (TASK_014_REVIEW B1 measured chunks_exact, TASK_015 measured the running row pointer; neither cited this file). NOTES.md 13 tabulates 11 measured spellings of this kernel with the contract-conformant cell marked -- none of the other ten is a p05 number. The gate checks that this key is present and hashes it; it does NOT check that a rung honours it."
+  },
+
   "verus": {
     "call_site": "main",
     "kernel_item": "kernel",
@@ -384,7 +394,7 @@ exactly what `.memory/02-bench-rules.md` forbids.
   "collapse": {
     "probe_inputs": ["small.bin", "large.bin"],
     "probe_iters": [100, 200],
-    "note": "work_per_call is the WINDOW in bytes -- the stride, 498 on small and 3969 on large -- and the two differ precisely so that check.py's d(Ir)/d(work) assertion has two probe shapes and can run at all. The matrix tiles the window exactly on both (19x26 = 494 = 498-4 and 65x61 = 3965 = 3969-4), so the unit is a STRICT OVER-estimate of the bytes folded, by exactly the four header bytes, and the derived floor errs strict -- p16's direction, not p17's. model.py declares NO min_ir_per_work, so the harness default of 0.25 Ir per byte applies unchanged. THAT ARGUMENT IS DIFFERENT FROM p16's AND p17's AND HAS TO BE: they could say the fold is a serial Horner chain with no vector form, and p05's inner loop is the first in this project that actually vectorises. It is still sound at the flags this project builds with (-O3, no -march, i.e. SSE2): measured, rustc and clang take 8 bytes per vector iteration in 12 and 11 instructions (1.50 / 1.38 Ir/byte) and gcc 16 bytes in 17 (1.06), i.e. 4.2x above the floor at worst before the per-row Horner step and the scalar epilogue are counted. An AVX-512 vpsadbw form would reach 0.0625 and would need a declaration, but harness/build.py passes no -march so no rung can get there. Measured margins are in NOTES.md 4."
+    "note": "work_per_call is the WINDOW in bytes -- the stride, 498 on small and 3969 on large -- and the two differ precisely so that check.py's d(Ir)/d(work) assertion has two probe shapes and can run at all. The matrix tiles the window exactly on both (19x26 = 494 = 498-4 and 65x61 = 3965 = 3969-4), so the unit is a STRICT OVER-estimate of the bytes folded, by exactly the four header bytes, and the derived floor errs strict -- p16's direction, not p17's. model.py declares NO min_ir_per_work, so the harness default of 0.25 Ir per byte applies unchanged. THAT ARGUMENT IS DIFFERENT FROM p16's AND p17's AND HAS TO BE: they could say the fold is a serial Horner chain with no vector form, and p05's inner loop is the first in this project that actually vectorises. It is still sound at the flags this project builds with (-O3, no -march, i.e. SSE2): measured, rustc and clang take 8 bytes per vector iteration in 12 and 11 instructions (1.50 / 1.38 Ir/byte) and gcc 16 bytes in 17 (1.06), i.e. 4.2x above the floor at worst before the per-row Horner step and the scalar epilogue are counted. An AVX-512 vpsadbw form would reach 0.0625 and would need a declaration, but harness/build.py passes no -march so no rung can get there. Measured margins are in NOTES.md 9."
   },
 
   "identity": [

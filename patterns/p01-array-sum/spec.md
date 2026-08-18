@@ -82,6 +82,16 @@ a green gate are, separately, evidence of very little:
   "ensures": ["result == wrapping_sum(v, off, len)"],
   "note": "requires/ensures above are DERIVED by check.py from verus.rs's own clause text through verus.translate, and the copy here must equal the derivation exactly. They are evaluated in Python against the bindings model.py yields per call (off/len/v_len/v/result) plus the helpers it supplies (wrapping_sum).",
 
+  "idiom": {
+    "required": [
+      "wrapping, not checked, addition in every rung -- the kernel is total on VALUES and R5's only obligation is off + len <= v.len()",
+      "the C kernel takes (v, off, len) and has no length to check; the Rust kernels take &[u64], i.e. a pointer AND a length",
+      "R2 indexes v[i] element by element; R3 reslices the window once and folds it with an iterator"
+    ],
+    "forbidden": ["a dead v_len parameter on the C kernel"],
+    "why": "wrapping addition is what keeps the proof obligation exactly the memory-safety property, with no value bound smuggled in that the input generator would then have to be trusted to respect -- the pilot did the opposite and its own measured inputs violated it. The C/Rust arity asymmetry is the finding and not a rigging: the length is the thing C does not have and therefore cannot check, so handing C a dead v_len to make the signatures match would be Rust-in-C-syntax and would delete the comparison. Both are written out in the prose above; TASK_016 moved them into the hashed block. Note how weak this declaration deliberately is: p01 is the CALIBRATION pattern, it models no bug, and its inner fold is an associative sum with no bulk-memory idiom to lose, so beyond the three required entries no spelling of the fold is excluded and p01's numbers are a spelling's numbers. TASK_016 did not measure a spelling spread for p01; one is owed before any p01 number is quoted as what safe Rust costs."
+  },
+
   "verus": {
     "call_site": "main",
     "kernel_item": "kernel",

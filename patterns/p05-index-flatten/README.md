@@ -114,15 +114,28 @@ each row by hand. `data.chunks_exact(ncol)` — zero `unsafe`, no proof — is
 in both residue classes, with identical output on all 150 committed inputs.
 **There was no break in the streak.**
 
-**But read `NOTES.md` §12c before quoting that as "safe beats unsafe".** R4's
+~~**But read `NOTES.md` §12c before quoting that as "safe beats unsafe".** R4's
 spelling is not optimal either. Rewrite R4 with the same consumed-slice idiom —
 one row pointer advanced by `ncol` instead of a flat `i*ncol` index — and unsafe
 goes back on top, at **+11.00 Ir per call, flat in `nrow`** (19, 41 and 65 all
 give exactly +11). That is p05's honest safety number: *idiom-matched, safety
 costs eleven instructions per call on a vectorised 2-D fold, `O(1)` and not
-`O(nrow)`.* And `chunks_exact`'s advantage is `Ir`-only on `small` — it emits a
-hardware `div` per call that callgrind prices at one instruction, and the
-interleaved wall clock shows +0.47% where `Ir` shows −0.87%.
+`O(nrow)`.*~~
+
+**Both halves above are retracted, and the retraction of the retraction is the
+result.** `spec.md`'s `idiom` block — declared at TASK_013, moved into the
+hashed contract at TASK_016 — forbids `chunks_exact` **and** the running row
+pointer by name, because either deletes the `i*ncol + j` the pattern is about.
+So both spellings that overturned "R3 is not free", and both spellings in the
+"+11" pair, are numbers for a different kernel; TASK_014_REVIEW and TASK_015
+measured them without citing `spec.md`. And +11 does not survive on its own
+terms either: one more unsafe round (`while rp < end`) makes it **`nrow + 9`**,
+`O(nrow)`. **p05's number is `R3 − R4 = 6·nrow + 9` under its declared idiom**
+(+16.7% at 496×8, +4.7% at `large`), and `NOTES.md` §13 publishes all eleven
+measured spellings as a result about *method*. `chunks_exact`'s advantage is
+also `Ir`-only on `small` — it emits a hardware `div` per call that callgrind
+prices at one instruction — though the wall-clock evidence for that
+(+0.47% / 8.61% spread) did **not** reproduce and must not be quoted.
 
 R4 and R5 are **byte-identical at `-O3`** (`md5_fn 4a28657ae7e4`) — the first
 time this project's byte-identity result covers a vectorised kernel, a scalar

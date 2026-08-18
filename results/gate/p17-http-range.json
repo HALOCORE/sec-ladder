@@ -11,20 +11,34 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "f507c355815fc57c1dba24b7bf5236a7c34ba1b5d80e1feb6041a3b20cf6d155",
+  "contract_sha256": "34a0f52c39404f259e6a63c35abfeea3c8a1fd863653f31a90e90437a58ffadb",
+  "idiom": {
+    "required": [
+      "start and end are int64_t / i64 in every rung, and the spec functions are written over int, not nat",
+      "the guard is the one conjunctive `if start < end && start >= 0 { ... }`, not two `continue`s",
+      "R1 omits only `&& start >= 0` -- it keeps `len < 2` and `2 + 2*nsuf > len`",
+      "nserved is folded into the result"
+    ],
+    "forbidden": [
+      "unsigned start/end",
+      "`Range:` text parsing -- the fields are bytes, not ASCII",
+      "a window-relative sign guard where a slice-relative one is meant, and vice versa"
+    ],
+    "why": "making start unsigned deletes the CVE: `start < 0` becomes unrepresentable and the leak row of the semantics table could not exist. ASCII parsing adds a second new variable (string parsing is p11-p15). The `continue` spelling is not expressible in Verus ('for-loops do not yet support continue') and the while workaround hoists the increment above the guard in all six rungs. The last forbidden entry is the one that already cost this pattern a retraction: `start >= -(body_start as i64)` and `start >= -((off + body_start) as i64)` differ by one token, both verify, and only the second is what a bounds check buys -- see NOTES.md 1c. Moved into the hashed block at TASK_016 from the prose section 'Load-bearing, do not improve' above. Note what is NOT restricted: the R2/R3/R4 spelling of the byte fold and of the suffix-table walk. NOTES.md 10 tabulates three measured spellings; the cheapest safe one is 17 Ir per suffix below the shipped R3, so p17's published R3 number is a spelling's number under this declaration, and it is a matched pair only against the R4 it ships beside."
+  },
   "source_sha256": {
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
     "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
     "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
     "harness/asm.py": "e3b14d4e90f15e7ff28d862442c721120943bb70c9514437b77facc407b6675f",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "2c09e0667263364e427a20de3bd76482dfeb1df23cb62c99fbba65844e491c57",
+    "harness/check.py": "e7c6bca47361b30daf7a0aef68c0e8dd765f9600fe7d2077966cf3f46cfa4205",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "a810bf5973787f78fc9805b2407a6bb04bbee68c968374a2e9b8622c4c5d3af4",
     "harness/report.py": "537f51262f58391a6e4da1999807e3b84a9e487e9727e168dc6527578442580a",
     "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
-    "patterns/p17-http-range/NOTES.md": "2c9ae2c23aa5a0bf4312efee2b497d277845c24aa93c27766a829fcd1f9f1a25",
+    "patterns/p17-http-range/NOTES.md": "7fc668a6d92df07633b8cfff564f7a13b2cd491203754fec3cc9283718269ce9",
     "patterns/p17-http-range/README.md": "b17e898b60e8f20ad812f95ad76af578c64aba3bf50463497449ac4af19130e3",
     "patterns/p17-http-range/c/kernel.c": "7c4e302d420db1ef666a7218a884c611120811324629dc9cdc7884c0e0ad7db6",
     "patterns/p17-http-range/c/kernel.h": "09bfe23afa37872032784e8d0afe473713fbac12cd8a6c28e5f8ffe6b8c85f05",
@@ -33,7 +47,7 @@
     "patterns/p17-http-range/model.py": "d3e26cfeb6a076b423b474a40d77bbab47e50d0abf133e457ef046ed12b5813c",
     "patterns/p17-http-range/safe_naive.rs": "43fadb4c64f6f60e219ba8ce16bf27daa1085f6239d873a16bca7a7b5e20340b",
     "patterns/p17-http-range/safe_tuned.rs": "4afff314daf7d1fdadfeb1fe661a13a07808da9dce560bece1798518fbbf0414",
-    "patterns/p17-http-range/spec.md": "ec9b91ffaefd72bd51367a98f7351e91db9388006022ee8ed91dbb8dc48660f4",
+    "patterns/p17-http-range/spec.md": "447d9ea97186506233474788c41cb15eb83ab55f3efd9bfd7286eed977b883b4",
     "patterns/p17-http-range/unsafe.rs": "a119e3782f413cfdaa2e71fcf5fe572ed820d5db6daade7e06ea13cc2a415960",
     "patterns/p17-http-range/verus.rs": "5a09e9d58df3639b5802a955e66fafd01e4b2b49cbff80ee0d82d4fa9ca6cc12"
   },
@@ -833,7 +847,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==3612255==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x50600000001a at pc 0x555e66e05921 bp 0x7ffcf8d3fce0 sp 0x7ffcf8d3fcd0 READ of size 1 at 0x50600000001a thread T0 #0 0x555e66e05920 in kernel /home/apt/repos_common/"
+      "diagnostic": "================================================================= ==3736925==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x50600000001a at pc 0x560729400921 bp 0x7fff96640290 sp 0x7fff96640280 READ of size 1 at 0x50600000001a thread T0 #0 0x560729400920 in kernel /home/apt/repos_common/"
     },
     "adversarial-stride1.bin": {
       "exit": 0,

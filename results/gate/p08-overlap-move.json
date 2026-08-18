@@ -9,14 +9,31 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "29d348a15a7520071854deed04df300872197cf25c6623dc9de9c30a5bd32a18",
+  "contract_sha256": "7bc041f3c1048cfcb3017c8e1b4667035b00cb1ad4192d5f52841d74ba24de64",
+  "idiom": {
+    "required": [
+      "R1 spells the move memcpy and R1h memmove -- that one token is the whole difference between them",
+      "R2 shifts element-by-element in a backward loop, R3 uses copy_within, R4/R5 use core::ptr::copy; R2 and R3 differ in the body of move_right and in nothing else",
+      "the bounds guard `m < 2 || d == 0 || d + nrep > m` is checked ONCE, outside the round loop, in every rung including R1",
+      "dr = d + r, not a fixed d",
+      "nrep = 1 + (nrep_w % 4), a mask and not a check, written `%` and not `&`",
+      "scr is a fixed SCR = 4096 byte array LOCAL to the kernel in all six rungs, zero-initialised in all six, and m = min(avail, SCR)"
+    ],
+    "forbidden": [
+      "a per-round bounds check -- do not push the guard into the loop",
+      "`nrep_w & 3`",
+      "a driver-owned &mut scratch argument",
+      "writing anything into the space the move opens"
+    ],
+    "why": "p08's result is that one token (memcpy vs memmove) is the whole bug and that safe Rust cannot express it, so a rung that spells the move differently is not a rung of p08. A fixed d makes every round after the first a no-op, the checksum stops depending on nrep, and LLVM is free to delete the rounds. `&` is the same instruction as `%` on unsigned values but drags `by (bit_vector)` into R5 -- a cheaper proof of an identical specification, which `.memory/04-verus.md` blesses. The scratch must be kernel-local because `driver.call_args` refuses to drop anything that is not a single bare identifier, so C's `scr` and Rust's `&mut scr` cannot be reconciled by the driver diff; making them so would be a harness/ change, and the zero-init keeps the memset a uniform per-call constant that cancels in every rung-to-rung comparison. Writing header bytes into the opened space is a second bounded loop that adds nothing to the aliasing axis. Moved into the hashed block at TASK_016 from the prose sections 'Load-bearing, do not improve' and 'The scratch buffer' above. TASK_016 did not measure a spelling spread for p08 and none is claimed here."
+  },
   "source_sha256": {
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
     "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
     "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
     "harness/asm.py": "e3b14d4e90f15e7ff28d862442c721120943bb70c9514437b77facc407b6675f",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "2c09e0667263364e427a20de3bd76482dfeb1df23cb62c99fbba65844e491c57",
+    "harness/check.py": "e7c6bca47361b30daf7a0aef68c0e8dd765f9600fe7d2077966cf3f46cfa4205",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "a810bf5973787f78fc9805b2407a6bb04bbee68c968374a2e9b8622c4c5d3af4",
@@ -31,7 +48,7 @@
     "patterns/p08-overlap-move/model.py": "6933ee18a8d53566ae4cfac1448253984b4ea83f4901c5b902e76ea1fe415d10",
     "patterns/p08-overlap-move/safe_naive.rs": "90ff21af76511fdaaa7ec7cd66e8976ed8932d58ae0655d6636290dfda6bfc26",
     "patterns/p08-overlap-move/safe_tuned.rs": "c885cd2eb1ce0b06e8919a8a443cbd2d1311cb389ace7355fde0c1ac99a5fc4b",
-    "patterns/p08-overlap-move/spec.md": "7165d081673b8005b266d827885f93c95d35926d1012e0d1b3dda31581dc9a80",
+    "patterns/p08-overlap-move/spec.md": "177285765897ea52a10f083da903f6c8159d16d5ec59cf454f5ff14e5fb23389",
     "patterns/p08-overlap-move/unsafe.rs": "34adfa6b368e37515b8517d7937788117e7424f1d97d7412410734dc606cea72",
     "patterns/p08-overlap-move/verus.rs": "6082fa92403d892af554d603ebca0aa328c1aec039899b6b223e661cdc89849f"
   },

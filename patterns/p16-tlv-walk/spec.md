@@ -264,6 +264,20 @@ exactly what `.memory/02-bench-rules.md` forbids.
   "ensures": ["result == tlv_fold(buf, off, len)"],
   "note": "requires/ensures above are DERIVED by check.py from verus.rs's own clause text through verus.translate, and the copy here must equal the derivation exactly. They are evaluated in Python against the bindings model.py yields per call (buf/off/len/buf_len/result) plus the helper it supplies (tlv_fold). NOTE WHAT THE ensures IS NOT: it is the value, not the security property. p16's kernel writes nothing, so 'no byte outside the window was read' cannot be a postcondition -- a kernel could read out of bounds and discard the byte. The memory-safety claim rests entirely on get_unchecked's discharged `requires i < v@.len()`. See the prose above.",
 
+  "idiom": {
+    "required": [
+      "every comparison is subtraction-first: `end - p >= 3` and `vlen > end - (p + 3)`, in every rung",
+      "the tag byte is folded, and folded BEFORE the fit test",
+      "nrec is folded into the result",
+      "R1 omits only the second check -- it keeps `end - p >= 3`"
+    ],
+    "forbidden": [
+      "the additive spellings `p + 3 <= end` and `p + 3 + vlen <= end`",
+      "tag dispatch or skipped records"
+    ],
+    "why": "the additive comparisons can overflow size_t on an attacker-chosen vlen and wave the attack through, which is the whole check p16 is about; an unread tag is deleted by LLVM and the walk stops looking like a TLV walk; a `if tag != 0 { skip }` branch adds an unpredictable data-dependent branch, which is a second new variable and belongs to p19/p35 (this box cannot measure branch misses). Moved into the hashed block at TASK_016 from the prose section 'Five things are load-bearing' above. Note what is deliberately NOT restricted: the R2/R3/R4 spelling of the walk and of the value fold, beyond the comparisons above. A consuming spelling (`split_first_chunk::<3>()` plus `split_at`) is admissible under this declaration and measures 10*nrec + 9 CHEAPER than the shipped R3 -- NOTES.md 10 tabulates five spellings. So p16's published R3 number is a spelling's number, matched only against the R4 it ships beside; if a later task wants it to be more than that, the honest move is to declare the walk's spelling here BEFORE measuring, the way p05 did at TASK_013."
+  },
+
   "verus": {
     "call_site": "main",
     "kernel_item": "kernel",

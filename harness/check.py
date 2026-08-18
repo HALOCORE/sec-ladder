@@ -22,6 +22,10 @@ What it enforces, in order:
 
   0  the extractor still reproduces the pilot numbers in `.memory/` (both digest
      conventions), and the three structural parsers pass their own selftests
+  0b the pattern DECLARES the idiom its rungs implement, inside the hashed
+     contract block. Presence only -- the gate never checks that a rung honours
+     it (that check would fail open); the point is that the declaration is
+     hashed, so changing a rung's idiom must move `contract_sha256`
   1  every cell of the matrix builds (and under `--no-build`, that no binary
      predates the newest source)
   2  every cell prints the checksum the pattern's own `model.py` predicts. The
@@ -120,6 +124,7 @@ import re
 import struct
 import subprocess
 import sys
+import textwrap
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(REPO, "common"))
@@ -528,6 +533,137 @@ def check_selftests(rep):
     if dloop._selftest() != 0:
         rep.fail("dloop-selftest", "harness/dloop.py fails its own bypass "
                                    "cases -- driver normalisation is unsound")
+    for label, got, want in _IDIOM_CASES:
+        if got != want:
+            rep.fail("idiom-selftest",
+                     f"idiom_problems: {label}: got {got}, want {want}")
+
+
+# ==========================================================================
+# 0b. the pattern declares the idiom its rungs implement
+# ==========================================================================
+
+IDIOM_KEYS = ("required", "forbidden", "why")
+
+
+def idiom_problems(contract):
+    """Structural check on the `idiom` key. Presence, never semantics.
+
+    TASK_016, from TASK_015_REVIEW B2. `patterns/p05-index-flatten/spec.md`
+    forbids `chunks_exact` and a strength-reduced row pointer **by name**, and
+    says a rung that deviates "is a different benchmark and its numbers are not
+    comparable" -- but it says it in prose at line 69 while the hashed block
+    starts at line 309, so `contract_sha256` was blind to it. Two consecutive
+    tasks then measured a forbidden spelling and published the result as p05's
+    number. This is the only check in the gate whose "could this happen by
+    accident?" answer is *it already did, twice, to two different agents*.
+
+    What this does NOT do is check that a rung honours its idiom. Grepping
+    `safe_tuned.rs` for `chunks_exact` fails open -- a strength-reduced row
+    pointer has no token to grep for -- and the threat model is honest mistake,
+    not malicious author (`.memory/02-bench-rules.md`). The whole value is that
+    the declaration is inside the hashed block: changing a rung's idiom must
+    now move `contract_sha256`, which is a signal review already reads.
+
+    `forbidden` MAY be empty. A pattern with no meaningful spelling restriction
+    must be able to say so and pass -- `MAX_TWIN_JUSTIFICATIONS` was deleted at
+    TASK_007 precisely because it could hard-fail an honest pattern with no
+    route out -- so an empty `forbidden` is shouted, not failed. `required` may
+    not be empty: with nothing required there is no matched pair, and a
+    matched-pair delta is the only thing that can carry a safety number
+    (`.memory/06-catalogue.md`)."""
+    idi = contract.get("idiom")
+    if not isinstance(idi, dict):
+        return ["spec.md's slb-contract block has no `idiom` object. Every "
+                "pattern declares the idiom its rungs implement, inside the "
+                "hashed block -- see patterns/p05-index-flatten/spec.md -- as "
+                '{"required": [...], "forbidden": [...], "why": "..."}']
+    probs = []
+    unknown = sorted(set(idi) - set(IDIOM_KEYS))
+    if unknown:
+        probs.append(f"idiom has unknown key(s) {unknown}; expected exactly "
+                     f"{list(IDIOM_KEYS)} -- a mistyped key is silently empty")
+    for k in ("required", "forbidden"):
+        v = idi.get(k, [])
+        if not isinstance(v, list) or any(not isinstance(s, str) or not s.strip()
+                                          for s in v):
+            probs.append(f"idiom.{k} must be a list of non-empty strings, "
+                         f"got {v!r}")
+    if not idi.get("required"):
+        probs.append("idiom.required is empty -- name what every rung must "
+                     "implement, in the pattern's own terms")
+    if not isinstance(idi.get("why"), str) or not idi["why"].strip():
+        probs.append("idiom.why is empty -- state what a deviating rung would "
+                     "delete, and, when `forbidden` is empty, why nothing is "
+                     "excluded")
+    return probs
+
+
+def idiom_lines(contract):
+    """The declaration itself, for the verdict: a reviewer reading a run sees
+    what was declared without opening `spec.md`."""
+    idi = contract.get("idiom") or {}
+    out = []
+    for k, tag in (("required", "REQUIRED "), ("forbidden", "FORBIDDEN")):
+        for s in idi.get(k) or []:
+            out += textwrap.wrap(s, 92, initial_indent=f"    idiom {tag} ",
+                                 subsequent_indent=" " * 20)
+        if not (idi.get(k) or []):
+            out.append(f"    idiom {tag} (none declared)")
+    out += textwrap.wrap(idi.get("why") or "", 92,
+                         initial_indent="    idiom WHY       ",
+                         subsequent_indent=" " * 20)
+    return out
+
+
+def check_idiom(rep, contract):
+    head("0b. the pattern declares the idiom its rungs implement")
+    probs = idiom_problems(contract)
+    for p in probs:
+        rep.fail("idiom", p)
+    if probs:
+        return
+    idi = contract["idiom"]
+    nreq, nforb = len(idi["required"]), len(idi.get("forbidden") or [])
+    rep.ok(f"idiom declared: {nreq} required, {nforb} forbidden spelling(s), "
+           f"hashed into contract sha256. Presence only -- no stage here checks "
+           f"that a rung honours it. Text in the verdict.")
+    if nforb == 0:
+        rep.shout("idiom", "this pattern forbids no spelling by name, so its "
+                           "rungs are matched only by the `required` list and "
+                           "its safety number is a spelling's number unless "
+                           f"`why` argues otherwise: {idi['why']}")
+
+
+_IDIOM_CASES = [
+    ("no idiom key at all", bool(idiom_problems({})), True),
+    ("required + forbidden + why",
+     idiom_problems({"idiom": {"required": ["i*ncol + j written out"],
+                               "forbidden": ["chunks_exact"],
+                               "why": "it deletes the flattened index"}}), []),
+    # The p01/p08 shape: nothing excluded, and that must PASS -- see the
+    # docstring on why a hard failure with no route out is the wrong shape.
+    ("empty forbidden is legal",
+     idiom_problems({"idiom": {"required": ["wrapping addition"],
+                               "forbidden": [], "why": "no spelling of an "
+                               "associative fold deletes this pattern"}}), []),
+    ("empty required is not",
+     len(idiom_problems({"idiom": {"required": [], "forbidden": ["x"],
+                                   "why": "y"}})), 1),
+    ("empty why is not",
+     len(idiom_problems({"idiom": {"required": ["x"], "forbidden": [],
+                                   "why": "   "}})), 1),
+    # A mistyped key is silently empty, which is the accident this check exists
+    # to make loud in the first place.
+    ("`forbid` is not `forbidden`",
+     len(idiom_problems({"idiom": {"required": ["x"], "forbid": ["y"],
+                                   "why": "z"}})), 1),
+    ("a bare string is not a declaration",
+     bool(idiom_problems({"idiom": "do not use chunks_exact"})), True),
+    ("an empty entry in a list is a typo, not a declaration",
+     len(idiom_problems({"idiom": {"required": ["x", ""], "forbidden": [],
+                                   "why": "z"}})), 1),
+]
 
 
 # ==========================================================================
@@ -3960,6 +4096,7 @@ def main():
 
     rep = Report()
     check_selftests(rep)
+    check_idiom(rep, contract)
 
     if a.no_build:
         built = {}
@@ -4034,6 +4171,10 @@ def main():
         # TASK_005 A4: weakening a pin now shows up in review as a change to the
         # committed gate artefact, not only as a source diff.
         "contract_sha256": contract_sha,
+        # TASK_016: the declared idiom, recorded so the gate artefact says what
+        # the rungs were supposed to be spellings *of*. It is inside the hashed
+        # block, so this is a convenience copy, not a second pin.
+        "idiom": contract.get("idiom"),
         "source_sha256": {os.path.relpath(s, REPO): sha256_file(s)
                           for s in srcs if os.path.isfile(s)},
         "derived_contract": {"requires": reqs, "ensures": enss,
@@ -4101,6 +4242,10 @@ def main():
 
     head("verdict")
     print(f"    results -> {os.path.relpath(outp, REPO)}")
+    # The declared idiom, in full: every number below is a matched-pair delta
+    # under it, and a rung that deviates is a different benchmark (TASK_016).
+    for ln in idiom_lines(contract):
+        print(ln)
     bar = "#" * 70
     if partial:
         print(f"\n{bar}\n#  PARTIAL RUN -- this certifies LESS than a full one "

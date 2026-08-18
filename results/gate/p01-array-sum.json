@@ -11,14 +11,25 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "877cf8e3c2212f8765861d4be2250bde59d443b63d1c6374b2da1d5473bdf44b",
+  "contract_sha256": "4c6a8642355e9ea6c13c1dde602bd4b5c6ce05b95a530b9c4250fbfd7de3be67",
+  "idiom": {
+    "required": [
+      "wrapping, not checked, addition in every rung -- the kernel is total on VALUES and R5's only obligation is off + len <= v.len()",
+      "the C kernel takes (v, off, len) and has no length to check; the Rust kernels take &[u64], i.e. a pointer AND a length",
+      "R2 indexes v[i] element by element; R3 reslices the window once and folds it with an iterator"
+    ],
+    "forbidden": [
+      "a dead v_len parameter on the C kernel"
+    ],
+    "why": "wrapping addition is what keeps the proof obligation exactly the memory-safety property, with no value bound smuggled in that the input generator would then have to be trusted to respect -- the pilot did the opposite and its own measured inputs violated it. The C/Rust arity asymmetry is the finding and not a rigging: the length is the thing C does not have and therefore cannot check, so handing C a dead v_len to make the signatures match would be Rust-in-C-syntax and would delete the comparison. Both are written out in the prose above; TASK_016 moved them into the hashed block. Note how weak this declaration deliberately is: p01 is the CALIBRATION pattern, it models no bug, and its inner fold is an associative sum with no bulk-memory idiom to lose, so beyond the three required entries no spelling of the fold is excluded and p01's numbers are a spelling's numbers. TASK_016 did not measure a spelling spread for p01; one is owed before any p01 number is quoted as what safe Rust costs."
+  },
   "source_sha256": {
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
     "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
     "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
     "harness/asm.py": "e3b14d4e90f15e7ff28d862442c721120943bb70c9514437b77facc407b6675f",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "2c09e0667263364e427a20de3bd76482dfeb1df23cb62c99fbba65844e491c57",
+    "harness/check.py": "e7c6bca47361b30daf7a0aef68c0e8dd765f9600fe7d2077966cf3f46cfa4205",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "a810bf5973787f78fc9805b2407a6bb04bbee68c968374a2e9b8622c4c5d3af4",
@@ -33,7 +44,7 @@
     "patterns/p01-array-sum/safe_naive.rs": "31718428bae78cc7c8d50ba5c520091e0596dca1b5216a6bb76f85bbd88abbfb",
     "patterns/p01-array-sum/safe_naive_verus.rs": "6e84117379183aef6345c849ed2bea0777be2ec5422715bf9475c6c9b8a8bb87",
     "patterns/p01-array-sum/safe_tuned.rs": "ff2d49dd5338f48a3051989565137f8f7ae685521e4fa78999874edff48e4c16",
-    "patterns/p01-array-sum/spec.md": "827a861edd8ba7a01db66928800e4dd2839dfbef67f1f317493a16e63ea3775d",
+    "patterns/p01-array-sum/spec.md": "3f9670585fe21d60a34ec61bb7950efc7c70ba3801cefbdff794b6a349fc93b1",
     "patterns/p01-array-sum/unsafe.rs": "026e4b6aa62113972c6881f0daa5e12da366c0eb0b9e7d5369cd0fc8c12db8e9",
     "patterns/p01-array-sum/verus.rs": "2b2b8d1c63fecfacb9f3487e2db205a4ba415808ed1b99fba2be6918108afe70"
   },

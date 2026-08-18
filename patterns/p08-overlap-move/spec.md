@@ -298,6 +298,24 @@ check from `spec.md` alone is exactly what `.memory/02-bench-rules.md` forbids.
   "ensures": ["result == shift_fold(buf, off, len)"],
   "note": "requires/ensures above are DERIVED by check.py from verus.rs's own clause text through verus.translate, and the copy here must equal the derivation exactly. They are evaluated in Python against the bindings model.py yields per call (buf/off/len/buf_len/result) plus the helper it supplies (shift_fold). p08 is NEITHER p16's shape NOR p17's: the harm is not an out-of-bounds access -- the guard `d + nrep > m` is present in EVERY rung, R1 included, and nothing leaves any allocation -- and it is not a memory-safe read of the wrong bytes either. It is UB with no spatial component: an overlapping memcpy, whose harm is silent corruption inside a buffer the program owns. The trusted item's THREE ensures conjuncts are the security property here, because they are what says the move did not touch the two regions outside [dr, m). See the prose above.",
 
+  "idiom": {
+    "required": [
+      "R1 spells the move memcpy and R1h memmove -- that one token is the whole difference between them",
+      "R2 shifts element-by-element in a backward loop, R3 uses copy_within, R4/R5 use core::ptr::copy; R2 and R3 differ in the body of move_right and in nothing else",
+      "the bounds guard `m < 2 || d == 0 || d + nrep > m` is checked ONCE, outside the round loop, in every rung including R1",
+      "dr = d + r, not a fixed d",
+      "nrep = 1 + (nrep_w % 4), a mask and not a check, written `%` and not `&`",
+      "scr is a fixed SCR = 4096 byte array LOCAL to the kernel in all six rungs, zero-initialised in all six, and m = min(avail, SCR)"
+    ],
+    "forbidden": [
+      "a per-round bounds check -- do not push the guard into the loop",
+      "`nrep_w & 3`",
+      "a driver-owned &mut scratch argument",
+      "writing anything into the space the move opens"
+    ],
+    "why": "p08's result is that one token (memcpy vs memmove) is the whole bug and that safe Rust cannot express it, so a rung that spells the move differently is not a rung of p08. A fixed d makes every round after the first a no-op, the checksum stops depending on nrep, and LLVM is free to delete the rounds. `&` is the same instruction as `%` on unsigned values but drags `by (bit_vector)` into R5 -- a cheaper proof of an identical specification, which `.memory/04-verus.md` blesses. The scratch must be kernel-local because `driver.call_args` refuses to drop anything that is not a single bare identifier, so C's `scr` and Rust's `&mut scr` cannot be reconciled by the driver diff; making them so would be a harness/ change, and the zero-init keeps the memset a uniform per-call constant that cancels in every rung-to-rung comparison. Writing header bytes into the opened space is a second bounded loop that adds nothing to the aliasing axis. Moved into the hashed block at TASK_016 from the prose sections 'Load-bearing, do not improve' and 'The scratch buffer' above. TASK_016 did not measure a spelling spread for p08 and none is claimed here."
+  },
+
   "verus": {
     "call_site": "main",
     "kernel_item": "kernel",
@@ -380,7 +398,7 @@ check from `spec.md` alone is exactly what `.memory/02-bench-rules.md` forbids.
   "collapse": {
     "probe_inputs": ["small.bin", "large.bin"],
     "probe_iters": [100, 200],
-    "note": "work_per_call is the WINDOW in bytes -- the stride, 502 on small and 4093 on large -- and the two differ precisely so that check.py's d(Ir)/d(work) assertion has two probe shapes and can run at all. **The unit errs LOOSE here, which is p17's direction and NOT p16's or p05's, and by more than either.** The kernel touches its scratch four times over: 4096 bytes of memset, m of copy in, 4*(m-d)-6 of moves and m of fold = 6074 bytes on small against a window of 502 (12.1x) and 20444 against 4093 on large (5.0x). model.py's work_per_call docstring has the table. model.py declares NO min_ir_per_work, so the harness default of 0.25 Ir per byte applies unchanged, and on p08 that argument is p16's and p17's rather than p05's: **the fold is a serial Horner chain**, acc = acc*31 + b, with a hard 3-cycle loop-carried dependence and no vector form -- measured at -O3 as a 4x-unrolled 23-instruction body over 4 bytes = 5.75 Ir/byte in every Rust rung (5.755 measured end to end, NOTES.md 3b), 23x the floor. The memmove calls themselves are BELOW the floor (glibc moves a byte in ~0.104 Ir), which is exactly why the floor is denominated in the window and not in bytes moved, and why NOTES.md quotes ns beside Ir for the move. Measured margins are in NOTES.md 7."
+    "note": "work_per_call is the WINDOW in bytes -- the stride, 502 on small and 4093 on large -- and the two differ precisely so that check.py's d(Ir)/d(work) assertion has two probe shapes and can run at all. **The unit errs LOOSE here, which is p17's direction and NOT p16's or p05's, and by more than either.** The kernel touches its scratch four times over: 4096 bytes of memset, m of copy in, 4*(m-d)-6 of moves and m of fold = 6074 bytes on small against a window of 502 (12.1x) and 20444 against 4093 on large (5.0x). model.py's work_per_call docstring has the table. model.py declares NO min_ir_per_work, so the harness default of 0.25 Ir per byte applies unchanged, and on p08 that argument is p16's and p17's rather than p05's: **the fold is a serial Horner chain**, acc = acc*31 + b, with a hard 3-cycle loop-carried dependence and no vector form -- measured at -O3 as a 4x-unrolled 23-instruction body over 4 bytes = 5.75 Ir/byte in every Rust rung (5.755 measured end to end, NOTES.md 3b), 23x the floor. The memmove calls themselves are BELOW the floor (glibc moves a byte in ~0.104 Ir), which is exactly why the floor is denominated in the window and not in bytes moved, and why NOTES.md quotes ns beside Ir for the move. Measured margins are in NOTES.md 9."
   },
 
   "identity": [

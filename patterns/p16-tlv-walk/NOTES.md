@@ -11,8 +11,22 @@ R3. What follows is the corrected statement.)*
 
 **One *spelling* of safe Rust pays an O(n) tax here. Idiomatic safe Rust does
 not.** R3's marginal rate is **5.7500 Ir per folded byte — R4's exactly**: zero
-per byte. R3's entire cost is O(1) per call (+27 / +77), *shrinking* as a
-fraction of the call as the data grows (0.90% on `small`, 0.32% on `large`).
+per byte. R3's whole cost is **`7 + 5·nrec` when the value length is ≡ 0 (mod 4)
+and `7 + 7·nrec` otherwise** — the two shipped points, +27 and +77, are `nrec` 4
+and 10 — so it is **O(records) and not O(1) per call**, while still being 0 per
+*byte*, and it shrinks as a fraction of the call as the records grow (0.90% on
+`small`, 0.32% on `large`).
+
+⚠ **"O(1) per call" is what this paragraph said until TASK_016, and it was
+wrong.** §2 and §3b below have carried `7 + 7·nrec` since TASK_007 — the
+headline contradicted its own decomposition four sections down, which is this
+project's most repeated defect (`.memory/01-ladder.md` finding 5 has the same
+shape on p17). TASK_015_REVIEW M1 is what caught it, by running the 68 sweep
+blobs p16 already ships against both rungs; the same review also refuted a
+`nrec + 3` figure that had been fitted to three points, all of which sat at the
+one residue class where the slope is invisible. **Sweep, do not sample**, and
+when a headline and a decomposition disagree, the decomposition is the one that
+was measured.
 
 What is O(n) is the **naive indexed spelling**, R2: +4.25 Ir per folded byte,
 +69% / +72% over unsafe. The decomposition (§3) puts all of it in the *value
@@ -852,3 +866,88 @@ vstd::slice::spec_slice_len(buf));` once at the top of the kernel is what makes
 
 Total Verus wall time for the shipped file: ~2 s.
 
+
+## 10. The spelling spread — five spellings, and which two are p16
+
+**Not the headline.** A result about *method*. p16's number is the matched pair
+under the idiom `spec.md` declares — **R3 `safe_tuned.rs` − R4 `unsafe.rs` =
+`7 + 5·nrec` (`vlen ≡ 0 mod 4`) / `7 + 7·nrec`** — and the other rows below are
+measurements of kernels p16 does not ship. Required for every pattern by
+TASK_016 for every pattern that has spellings.
+
+**Read the convention line before comparing with §2.** These are **whole-program
+marginal** `Ir`/call — (`Ir` at `n_iters` 200 − at 100) ÷ 100, `harness/check.py`
+step 3b's probe — where §2's table is **callgrind's kernel-exclusive `Ir` ÷
+calls**. The two differ by the driver's own per-iteration work, measured here as
+a uniform **+14.30 on every rung** (R2 5095.0 → 5109.30, R3 3037.0 → 3051.30,
+R4 3010.0 → 3024.30), so every *difference* is identical under both conventions
+and no absolute here contradicts §2. **The three shipped rows are the gate's own
+numbers**: `results/gate/p16-tlv-walk.json`'s `marginal_ir_per_call` reads
+5109.3 / 3051.3 / 3024.3 on `small` and 40935.3 / 23889.3 / 23812.3 on `large`,
+which is where the +14.30 is checkable rather than asserted. p05 and p17 quote the marginal convention
+in their own §2; p16 is the pattern that does not, and that is worth knowing
+before differencing across files.
+
+`small` = 4 records × 127-byte values (`vlen ≡ 0 mod 4`); `large` = 10 × 409
+(`vlen ≡ 2`). Sources under `.temp/p05r3/v16/`; **none is a p16 cell.**
+
+| # | rung | spelling | file | small | large | − R4 shipped |
+|---|---|---|---|---:|---:|---|
+| 1 | R2 | indexed `buf[p+3+j]` | **`safe_naive.rs` (SHIPPED CELL)** | 5109.30 | 40935.30 | +2085 / +17123 — the O(n) row, 4.25 Ir per folded byte (§3b) |
+| 2 | R3 | reslice header + iterator fold | **`safe_tuned.rs` (SHIPPED CELL)** | **3051.30** | **23889.30** | **+27 / +77** |
+| 3 | R3 | `split_first_chunk::<3>()` + `split_at` | `v16-tuned_split.rs` | 3002.30 | 23780.30 | −22 / −32 |
+| 4 | R3 | `split_at` only | `v16-tuned_splitat.rs` | 3002.30 | 23780.30 | −22 / −32 |
+| 5 | R4 | `get_unchecked` on an index `p` | **`unsafe.rs` (SHIPPED CELL)** | **3024.30** | **23812.30** | **0** |
+| 6 | R4 | consumed cursor, `get_unchecked` | `v16-unsafe_consume.rs` | 2995.30 | 23763.30 | −29 / −49 |
+
+**Every row here satisfies p16's declared idiom, and that is deliberate** — see
+point 2 below and `spec.md`'s `idiom.why`. The marking here is therefore
+*shipped* versus *not shipped*, which is a weaker distinction than p05's, where
+8 of 11 spellings are excluded by name.
+
+Rows 3 and 4 are **indistinguishable in `Ir` on every input where both were
+measured** — both shipped inputs and four sweep blobs (`sw56`, `sw60`,
+`sw2040`, `sw2044`), six points, equal to the hundredth — while being textually
+unrelated: what does the work is consuming a cursor, not the method that
+consumes it. (The 68-blob sweep below measures row 3 and not row 4.)
+
+**The laws, swept over all 68 committed sweep blobs** (two `nrec` bands × 34
+consecutive value lengths, i.e. ≥2 full cycles of the mod-4 residue), each an
+*exact* constant per (residue, band) with **zero residual**
+(`.temp/review015/sweep-p16.json`, re-derived at TASK_016):
+
+| difference | `vlen ≡ 0 (mod 4)` | otherwise |
+|---|---|---|
+| R3ship − R4ship (**the pair p16 publishes**) | `7 + 5·nrec` | `7 + 7·nrec` |
+| R3ship − R3′ | `10·nrec + 9` | `10·nrec + 9` |
+| R4ship − R4′ | `5·nrec + 9` | `4·nrec + 9` |
+| R3′ − R4′ (matched, both consuming) | `7` **flat** | `7 + nrec` |
+| R3′ − R4ship | `−(5·nrec + 2)` | `−(3·nrec + 2)` |
+
+The sweep bands have `nrec` 2 and 4. **The two shipped inputs are out-of-sample
+at `nrec` 4 and 10 and every law predicts them to the instruction** — including
+`nrec = 10`, which is 2.5× outside the swept range: R3ship − R4ship 77 (`7+7·10`),
+R3ship − R3′ 109 (`10·10+9`), R4ship − R4′ 49 (`4·10+9`), R3′ − R4′ 17 (`7+10`).
+That is what makes them laws rather than fits.
+
+Three things follow.
+
+1. **The safe side is again the spelling-sensitive one**, and by a margin that
+   swamps the pair: rows 1–4 span 2107 `Ir` on `small` (69%), rows 5–6 span 29
+   (1.0%).
+2. **p16's published R3 cost is a spelling's cost, and this pattern's `idiom`
+   block says so in as many words.** Unlike p05, p16 declares *no* restriction on
+   how the walk is spelled — only that the comparisons stay subtraction-first,
+   the tag is folded before the fit test, and `nrec` is folded — so rows 3, 4 and
+   6 are **admissible** p16 rungs that nobody has landed. `.memory/01-ladder.md`'s
+   corollary ("quote the cheapest spelling you can find") therefore bites here in
+   a way it does not on p05, and the honest statement is: *R3 costs `7 + 7·nrec`
+   as written; a consuming R3 costs `10·nrec + 9` less; and against the matching
+   consuming R4 the residual is 7 flat at one residue and `7 + nrec` at the other
+   three.* Landing a cheaper R3 as a cell is a **cell swap and a different task**;
+   it is not done here, and TASK_016 changed no cell source.
+3. **`nrec + 3` was never p16's law.** TASK_015's audit fitted three points, two
+   of which sat at `vlen ≡ 0 (mod 4)` where the slope is invisible, and the third
+   used a record count its own table contradicts. Swept, the same quantity is
+   `7` / `7 + nrec`. **Sweep, do not sample** — the rule this file's §3b already
+   states, violated one section later by the same project.

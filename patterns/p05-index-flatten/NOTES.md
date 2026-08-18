@@ -1044,14 +1044,26 @@ R4 verbatim except that it advances one row pointer by `ncol` — exactly what
 | `large` 65×61 | 8435.70 | 8377.70 | **8366.70** | **+11.00** |
 | `sweep-r41c32` | 2880.41 | 2846.41 | **2835.41** | **+11.00** |
 
-**Unsafe goes back on top the moment both rungs are written the same way, and the
-residual safety tax is +11.00 Ir per call, flat in `nrow`** — nrow 19, 41 and 65
-all give exactly +11, i.e. `O(1)` per call, not `O(nrow)`. That is p05's honest
-safety number: *when the safe and unsafe rungs use the same addressing idiom,
-safety costs eleven instructions per call on a vectorised 2-D fold*, and it is
-the up-front reslice `&buf[off+4 .. off+4+nrow*ncol]` plus the `chunks_exact`
-length setup. "Safe Rust is faster than unsafe Rust" is an artefact of comparing
-a good safe spelling with a mediocre unsafe one.
+~~**Unsafe goes back on top the moment both rungs are written the same way, and
+the residual safety tax is +11.00 Ir per call, flat in `nrow`** — nrow 19, 41 and
+65 all give exactly +11, i.e. `O(1)` per call, not `O(nrow)`. That is p05's
+honest safety number: *when the safe and unsafe rungs use the same addressing
+idiom, safety costs eleven instructions per call on a vectorised 2-D fold*.~~
+
+**Retracted at TASK_015_REVIEW (B1), twice over, and the table above is not what
+is wrong with it.** The **+11.00 reproduces exactly** — swept over all 144
+committed blobs, every `ncol` residue, min = max = mean — and so does every
+other figure in this section. What does not survive is the conclusion. (a) One
+more unsafe round, replacing the `i < nrow` counter with the canonical C test
+`while rp < end`, removes one instruction per row and the gap reopens as
+**`nrow + 9`**, `O(nrow)` again; a second, textually unrelated unsafe spelling
+lands on the identical number. (b) Both rungs in the +11 pair are **excluded by
+this pattern's own contract** — `spec.md`'s `idiom` key forbids `chunks_exact`
+and the running row pointer by name, and has since TASK_013 — so +11 is a real
+number for a kernel that is not p05. §13 is the full spread with the
+contract-conformant cells marked; the sentence that replaces this one is
+*"idiom-matched safety has no fixed point, and p05's contract-relative cost is
+`6·nrow + 9`"*.
 
 **And `chunks_exact`'s `Ir` win does not convert to time — there is a `div`.**
 `ChunksExact::new` computes `len − len % chunk_size`, and with a runtime `ncol`
@@ -1101,6 +1113,97 @@ reason is measured rather than editorial:
    `.memory/01-ladder.md` finding 4 imposes. `chunks_exact` changes the header
    handling, the row addressing and the trip count at once.
 
-What the file therefore claims is the honest form: **§2's R3 column is the cost
+What the file therefore claims is the honest form: ~~**§2's R3 column is the cost
 of one spelling, this section has three more, and the idiom-matched safe-vs-unsafe
-number is +11 Ir per call, flat.**
+number is +11 Ir per call, flat.**~~ — corrected at TASK_015_REVIEW and TASK_016:
+**§2's R3 column is the cost of one spelling, §13 has ten more, and the only
+number p05 may headline is the matched pair under the `idiom` block
+`spec.md` has declared since TASK_013 — `R3 − R4 = 6·nrow + 9`.** There is no
+idiom-matched number outside that declaration, because "same idiom" has no fixed
+point: see §13.
+
+## 13. The spelling spread — eleven spellings of one kernel, and which two are p05
+
+**Not the headline.** This section is a result *about method*, published because
+the spread is wider than the thing the pattern measures. The number p05
+publishes is the matched pair under the idiom `spec.md` declares —
+**R3 `safe_tuned.rs` − R4 `unsafe.rs` = `6·nrow + 9`** — and every other row
+below is a measurement of a *different* kernel, kept here so nobody re-derives
+one and reports it as p05's.
+
+Mandatory for every pattern that has spellings, from TASK_016 on. Method:
+marginal `Ir` per kernel call = (whole-program `Ir` at `n_iters` 200 − at 100)
+÷ 100, `-O3 isolated` — §2's method, and the same probe `harness/check.py`
+step 3b uses. **The three shipped rows below are the gate's own numbers** —
+`results/gate/p05-index-flatten.json`'s `marginal_ir_per_call` reads 2081.0 /
+1504.0 / 1381.0 on `small` and 11330.7 / 8834.7 / 8435.7 on `large`, so this
+table can be checked against a committed artefact without rebuilding anything.
+The variant sources are under `.temp/p05r3/v05/` and `.temp/review015/v05/`;
+**none of them is a p05 cell and none may be landed as one.**
+
+`small` = 19×26, `large` = 65×61.
+
+| # | rung | spelling | file | small | large | − R4 shipped |
+|---|---|---|---|---:|---:|---|
+| 1 | R2 | indexed `buf[off+4+i*ncol+j]` | **`safe_naive.rs` (shipped, IN CONTRACT)** | 2081.00 | 11330.70 | `+35 + nrow·(29+3r)` |
+| 2 | R3 | hand-reslice `buf[base..base+ncol]` | **`safe_tuned.rs` (shipped, IN CONTRACT)** | **1504.00** | **8834.70** | **`+6·nrow + 9`** |
+| 3 | R3 | index cursor into `data` | `t4_idx.rs` | 1446.00 | 8638.70 | +65 / +203 |
+| 4 | R3 | `split_at(ncol)` on a consumed cursor | `tuned_splitat.rs` | 1407.00 | 8507.70 | `+nrow + 7` |
+| 5 | R3 | `ChunksExact::fold` | `t3_fold.rs` | 1388.00 | 8442.70 | +7 / +7 |
+| 6 | R3 | `chunks_exact(ncol)` for-loop | `tuned_chunks.rs` | 1369.00 | 8377.70 | `−(nrow − 7)` |
+| 7 | R3 | `split_at_checked` while-let | `t2_splitchk.rs` | **1365.00** | **8373.70** | `−(nrow − 3)` |
+| 8 | R4 | `get_unchecked` flat index | **`unsafe.rs` (shipped, IN CONTRACT)** | **1381.00** | **8435.70** | **0** |
+| 9 | R4 | row pointer + `i < nrow` counter | `unsafe_consume.rs` | 1358.00 | 8366.70 | `−(nrow + 4)` |
+| 10 | R4 | row pointer, `while rp < end` | `u2_end.rs` | **1337.00** | **8299.70** | `−(2·nrow + 6)` |
+| 11 | R4 | `from_raw_parts` per row | `u2_rawslice.rs` | **1337.00** | **8299.70** | `−(2·nrow + 6)` |
+
+Rows 2 and 8 are the pair. Rows 1, 2 and 8 are the only three that satisfy
+`spec.md`'s `idiom`: every other row either consumes the slice (3–7) or carries a
+strength-reduced running row pointer (9–11), and both are forbidden **by name**
+because they delete the `i*ncol + j` multiply that *is* the pattern.
+
+**The spread, and why it is the finding.**
+
+| | range | width |
+|---|---|---|
+| safe spellings (rows 1–7) | 1365.00 … 2081.00 | **716 Ir = 52% of the cheapest** |
+| unsafe spellings (rows 8–11) | 1337.00 … 1381.00 | **44 Ir = 3.3% of the cheapest** |
+| the contract-conformant pair (2 − 8) | +123 on `small`, +399 on `large` | `6·nrow + 9` |
+| the best out-of-contract pair (7 − 10) | +28 on `small`, +74 on `large` | `nrow + 9` |
+
+Three things follow, and only the first two are about p05.
+
+1. **The safe side is 16× more spelling-sensitive than the unsafe side.** That
+   asymmetry is itself publishable and it is not what anyone predicted: the
+   received story is that unsafe code is where the tuning lives.
+2. **"Same idiom" has no fixed point, so a spread cannot be repaired into a
+   number.** Rows 6 and 9 were idiom-matched under TASK_015's own criterion
+   ("consume the slice / carry a row base"); row 10 satisfies that criterion too
+   and is `nrow + 2` cheaper; row 11 is the *safe* program of row 6 with only its
+   checked slice constructions replaced — the most matched unsafe rung it is
+   possible to write — and lands on row 10's number to the instruction. The class
+   picked out by "same idiom" has members differing by `O(nrow)`.
+3. **And a published spread cannot carry a safety claim at all**, which is why
+   this section is method and not result: R4 is defined by *permission* rather
+   than obligation (`.memory/01-ladder.md`), so every safe program is an
+   admissible R4, `inf(R4) ≤ inf(R3)` **by construction**, and the two intervals
+   above always overlap with the unsafe one extending lower. That is a theorem,
+   not a measurement. Only a matched-pair delta under a *declared* idiom carries
+   a safety number — hence the `idiom` key.
+
+**Provenance.** Rows 1, 2, 4, 6, 8, 9 are TASK_015's (`.temp/p05r3/v05/`);
+rows 3, 5, 7, 10 and 11 are TASK_015_REVIEW's (`.temp/review015/v05/`). Rows 7,
+10, 11 and the
+`−(nrow − 3)` / `−(2·nrow + 6)` laws are TASK_015_REVIEW's, swept over **all 144
+committed sweep blobs** with zero residual. Rows 3 and 5 were quoted on `small`
+only until TASK_016, which measured their `large` column here (`.temp/p16idiom/`)
+— so their `− R4` entries are **two-point interpolations, not swept laws**, and
+row 3's apparent `3·nrow + 8` in particular has not been checked against a single
+other point. Two points cannot distinguish a slope from a residue; this project
+has stepped in that trap three times. The controls re-measured in the same
+session reproduce exactly (R3 shipped 1504.00 / 8834.70, R4 shipped 1381.00 /
+8435.70).
+
+Equivalence: all eleven print the shipped R4 binary's checksum and exit code on
+**all 150 committed inputs** — this is a spelling spread, not an algorithm
+spread. `.temp/review015/equiv.py`.

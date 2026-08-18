@@ -205,6 +205,18 @@ the two entries that are new here:
               "dst_after == copy_dst(dst_before, src, src_off)"],
   "note": "requires/ensures above are DERIVED by check.py from verus.rs's own clause text through verus.translate, and the copy here must equal the derivation exactly. They are evaluated in Python against the bindings model.py yields per call (src/src_off/src_len/dst_len/dst_after_len/dst_before/dst_after/result) plus the helpers it supplies (copy_dst, copy_sum). dst_before and dst_after are the WHOLE destination buffer as bytes: the security property is an equality on all of it, not on the copied prefix.",
 
+  "idiom": {
+    "required": [
+      "the fit check is subtraction-first -- `len > src_len - (src_off + 2)` -- spelled identically in every rung",
+      "the u16 prefix is decoded with `+`, not `|`",
+      "the result is folded over dst AFTER the copy, not over src",
+      "the kernel is total in len: all 65536 values a u16 prefix can express are handled",
+      "R2 copies index-by-index; R3 reslices both sides once and copies with copy_from_slice"
+    ],
+    "forbidden": ["the additive check `src_off + 2 + len > src_len`"],
+    "why": "the additive form can overflow size_t and wave the attack through, so it is the spelling this pattern exists to reject. The `+` decode and the `|` decode are the same function and lower to the same instruction; `+` is chosen because it needs no bit-vector reasoning in R5, which is a cheaper PROOF and not a weaker specification. Folding dst after the copy is what stops the copy being dead code. The last required entry is the one that already cost this pattern a retraction and must not be quietly 'fixed': R2's index-by-index copy is why rustc never forms a memcpy there, one operator flips `bulk_calls []` to `['memcpy@GLIBC_2.14']` and 118 kernel instructions to 87, and that difference was 100% of R2's retracted delta (NOTES.md 3a). Swapping a bulk copy into R2, or an indexed copy into R3, deletes p02's only decomposition and its finding with it. Moved into the hashed block at TASK_016 from the 'Four things about that are load-bearing' prose above. TASK_016 did not measure a spelling spread for p02 and none is claimed here."
+  },
+
   "verus": {
     "call_site": "main",
     "kernel_item": "kernel",
