@@ -26,6 +26,9 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 | T012 | ship p17's slice-relative guard — the artefact T011 claimed | **done**, reproduced independently; gate PASS, no measured number moved |
 | T013 | p05 2-D index flattening — the first **vectorisable** kernel | **done**, gate PASS first run, **reviewed**; every number reproduced, four framing claims corrected |
 | T014 | p08 overlapping move — the bug safe Rust cannot express | **done**, gate PASS first run, **reviewed**; six manager prescriptions refuted, and the review's blocker landed on **p05**, not p08 |
+| T015 | the R3 audit across p05/p16/p17 | **done**, **reviewed**; the manager's specced cell swap was **declined and the decline was right**; produced finding 14 |
+| T016 | the declared-idiom key, hashed and required | **done**, all six green, **reviewed**; its advertised mechanism was disproved by experiment |
+| T017 | say what the key actually does; three declaration defects | **done**, all six green, **unreviewed** — the p16 `required[0]` reading is a judgement and needs one |
 
 **T010's review closed the gate-hardening arc.** It was deliberately shaped as
 the opposite of the previous six — not a bypass hunt but "will this gate *accept*
@@ -109,8 +112,13 @@ supersede any earlier task report they contradict.
   the verdict. The rung sources are covered by `source_sha256`, not by this key.
   Nothing here prevents a forbidden respelling and nothing can without semantic
   checking, which the threat model forbids. **Say that, rather than the false
-  mechanism sentence.** `report.py` prints no `idiom` at all, so
-  `results/tables/*.md` carries none.
+  mechanism sentence.** **Fixed at TASK_017**, which is the change that
+  addresses the failure actually observed: `report.py` now prints the
+  declaration — required, FORBIDDEN, why — **above every table** in
+  `results/tables/*.md`, read from `spec.md` rather than the gate record, and
+  `check.py` reprints the `forbidden` list beside any failures. The observed
+  failure was a reader quoting a number without opening `spec.md`; this is the
+  only mechanism that touches it.
 
   The manager's objection to putting the key in the contract block was
   separately **wrong**: `contract_sha256` has already moved 3× on p01 and 4× on

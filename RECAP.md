@@ -326,29 +326,25 @@ it once, land the corrections, repeat** — and per `PROTOCOL.md` rule 9, write
 instance of the same mistake, and the correction is owed across the whole result
 set before more results are added to it:
 
-1. **TASK_017 — repair what the idiom key claims, and three declaration
-   defects.** The key is built and green, but TASK_016_REVIEW **proved by
-   experiment** that its advertised mechanism is false: it forked p05, swapped
-   in the *forbidden* `chunks_exact` rung, and got `PASS` with
-   `contract_sha256` **byte-identical**. `read_contract()` hashes `spec.md`'s
-   block, not the rungs. Four repairs, all needing one gate re-run each:
-   - the false sentence, in `harness/check.py:564-566` and `TASK_016.md` — say
-     what the key *does* buy (weakening the declaration moves the hash; the
-     declaration is printed) and stop claiming what it does not;
-   - **p16's hashed block contradicts itself** (`spec.md:269` vs `:278`), so its
-     `required[0]` must be disambiguated before any p16 R3 decision;
-   - **p02's `required[0]` and `[3]` are false of its own R1** — p16 and p17
-     carve R1 out of their declarations and p02, retrofitted the same day, does
-     not;
-   - p05's retrofit dropped the "`nrow * ncol` is folded into the result"
-     bullet that p16 and p17 both kept.
-   Consider also printing `forbidden` in the failure summary and in
-   `report.py`'s tables — it prints no `idiom` at all today.
-2. **State the limitation on p16 and p17's R3, swap neither cell** — adjudicated
-   at TASK_016_REVIEW. p17's cheaper spelling also beats its own R4, so swapping
-   R3 alone re-commits the unmatched-pair defect as a shipped cell, and
-   `inf(R4) <= inf(R3)` means no swap terminates. p16's premise is broken until
-   item 1 lands.
+1. **Review TASK_017** — it is landed and all six gates are green, but its
+   central act is a **judgement, not a measurement**, and the engineer said so:
+   p16's `idiom.required[0]` was disambiguated as naming **tokens**, which puts
+   p16's cheaper spelling out of contract. Both readings are true of the shipped
+   tree, so no experiment decides it. **The direction of the risk is that the
+   chosen reading makes p16's own number look better** — the engineer flagged
+   this itself and neutralised it by recording that p16 now has *zero* measured
+   admissible alternates, so "cheapest admissible" is unestablished rather than
+   established. A different agent should attack the reading and the four grounds
+   given for it (house convention; the tokens *being* the traversal; the
+   exclusion falling symmetrically on the consuming R4 control; and `inf(R4) <=
+   inf(R3)` leaving the semantic reading with no fixed point).
+   Also worth a second pair of eyes: `report.py` now prints each pattern's
+   declaration above its table — the one mechanism that addresses the failure we
+   actually observed twice.
+2. **p16 owes a spelling-spread measurement inside its own contract.**
+   `.memory/05-layout.md` demand 13 asks for two alternates per rung; after
+   TASK_017's reading, p16 has none that are admissible. Cheap, and it closes
+   the gap the reading opened.
 3. **A shipped p17 sweep.** p17 has **no sweep inputs at all**, which is how its
    "+32 Ir/call flat" got published from two bands that both happen to have
    `nsuf = 3`. `.memory`'s own residue rule applied and was not followed. The
