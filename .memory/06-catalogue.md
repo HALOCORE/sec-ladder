@@ -25,6 +25,7 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 | T011 | p17 HTTP suffix-range (CVE-2017-7529) — the limit of memory safety | **done**, gate PASS first run, **reviewed** (leak claim refuted; real artefact found one token away) |
 | T012 | ship p17's slice-relative guard — the artefact T011 claimed | **done**, reproduced independently; gate PASS, no measured number moved |
 | T013 | p05 2-D index flattening — the first **vectorisable** kernel | **done**, gate PASS first run, **reviewed**; every number reproduced, four framing claims corrected |
+| T014 | p08 overlapping move — the bug safe Rust cannot express | **wip** |
 
 **T010's review closed the gate-hardening arc.** It was deliberately shaped as
 the opposite of the previous six — not a bypass hunt but "will this gate *accept*
@@ -262,6 +263,12 @@ High-value out-of-order candidates noted for later:
   borrow checker rejects it at compile time. A structural Rust win to set against
   p17's structural Rust loss. Awkward for the ladder (R2/R3 must use
   `copy_within`, a different algorithm) — design carefully.
+  **Taken at T014.** Two claims in this entry's original wording are under test
+  rather than established, and are flagged here so nobody inherits them as fact:
+  *"overlap UB is not caught by ASan"* — **probably wrong**, this box's
+  `libclang_rt.asan.a` carries the `-param-overlap` interceptor string — and
+  *"the different algorithm is a flaw to design around"* — it is the finding,
+  and TASK_014 requires the spec to say so rather than pretend the rungs match.
 - **p47** (constant-time compare) — the adversary is the *optimiser*, a third
   security axis after spatial safety and functional correctness. Likely defeats
   R5 in an interesting way: Verus cannot state a timing property at all.
