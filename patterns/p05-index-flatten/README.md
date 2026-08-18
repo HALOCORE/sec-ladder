@@ -51,8 +51,10 @@ register in all 16 `-O3` cells.
 
 ## The result
 
-*(Corrected at TASK_013_REVIEW — see `NOTES.md` §12. Every number here
-reproduced exactly; two framing claims did not survive.)*
+*(Corrected at TASK_013_REVIEW and again at TASK_014_REVIEW / TASK_015 — see
+`NOTES.md` §12. Every number here reproduced exactly, twice; four framing claims
+did not survive. **The one that matters: the safety-cost half below prices two
+particular `safe_tuned.rs`/`safe_naive.rs` spellings, not safe Rust.**)*
 
 **Inside the vector body the bounds check is free.** c-clang, safe-naive,
 safe-tuned, unsafe and verus all fold an element in **1.375000** Ir (= 11
@@ -72,12 +74,15 @@ p16's and p17's constant, on a third kernel and the first whose fold is not a
 Horner chain. p05's own no-op control splits it further: **2.00 check + 2.25
 foreclosed unroll**, the same split derived on p16.
 
-**Why the check survives at all is the deepest result here.** The kernel already
+**Why the check survives *in these two spellings*.** The kernel already
 checks `nrow*ncol <= avail`, so the panic is dead on every execution — but LLVM
 cannot eliminate it, because `nrow*ncol <= avail ⟹ i*ncol + j < avail` is
 **nonlinear**, which is exactly the obligation R5 discharges with
-`lemma_mul_inequality`. **The cost of safety here is the price of the optimiser
-failing the lemma the proof proves.**
+`lemma_mul_inequality`. ~~**The cost of safety here is the price of the optimiser
+failing the lemma the proof proves.**~~ **Retracted at TASK_014_REVIEW.** It is
+the price of the indexed and hand-resliced spellings; `data.chunks_exact(ncol)`
+pays none of it and needs no lemma. The sentence is true of the **obligation**
+and false as a statement about safety.
 
 What survives vectorisation is a cost **per row**, not per element:
 
@@ -99,9 +104,25 @@ need** — the residue trap of `.memory/01-ladder.md` finding 3, at a vector wid
 and said the null was a property of its latency-bound chain. p05 measures
 **+34.4% `Ir` → +32.9% time** on `large` (the review's remeasurement; the
 delivered +30.5% was over-precise), because independent vector lanes leave no
-idle issue slots for the check to fill. **R3 is not free here**: +4.7% `Ir` at
-`large` but **+16.7% at `ncol = 8`** — an `O(nrow)` cost, and the end of the
-"R3 is free" streak at five patterns.
+idle issue slots for the check to fill.
+
+~~**R3 is not free here**: +4.7% `Ir` at `large` but +16.7% at `ncol = 8` — an
+`O(nrow)` cost, and the end of the "R3 is free" streak at five patterns.~~
+**Retracted.** That is `safe_tuned.rs`'s number, and `safe_tuned.rs` reslices
+each row by hand. `data.chunks_exact(ncol)` — zero `unsafe`, no proof — is
+**`−(nrow − 7)` Ir per call, i.e. cheaper than the unsafe rung**, on every input
+in both residue classes, with identical output on all 150 committed inputs.
+**There was no break in the streak.**
+
+**But read `NOTES.md` §12c before quoting that as "safe beats unsafe".** R4's
+spelling is not optimal either. Rewrite R4 with the same consumed-slice idiom —
+one row pointer advanced by `ncol` instead of a flat `i*ncol` index — and unsafe
+goes back on top, at **+11.00 Ir per call, flat in `nrow`** (19, 41 and 65 all
+give exactly +11). That is p05's honest safety number: *idiom-matched, safety
+costs eleven instructions per call on a vectorised 2-D fold, `O(1)` and not
+`O(nrow)`.* And `chunks_exact`'s advantage is `Ir`-only on `small` — it emits a
+hardware `div` per call that callgrind prices at one instruction, and the
+interleaved wall clock shows +0.47% where `Ir` shows −0.87%.
 
 R4 and R5 are **byte-identical at `-O3`** (`md5_fn 4a28657ae7e4`) — the first
 time this project's byte-identity result covers a vectorised kernel, a scalar

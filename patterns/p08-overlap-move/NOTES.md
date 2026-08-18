@@ -430,8 +430,16 @@ Two consequences, and both are general:
   only `Ir` would have said so.
 - **`rep`-string instructions make callgrind `Ir` and wall clock disagree in
   *direction*, not just in magnitude.** On `small`, `Ir` says c-gcc (4865.72) is
-  **33% cheaper** than c-clang (7293.60); wall clock says c-gcc (452.75 ns) is
-  **2.9% dearer** than c-clang (440.01 ns). The entire inversion is `rep stos` +
+  **33% cheaper** than c-clang (7293.60); wall clock says c-gcc is **dearer**.
+  **Quote the direction, not this delivery's magnitude.** The delivered figure
+  was "2.9% dearer (452.75 vs 440.01 ns)"; TASK_014_REVIEW re-measured it
+  independently (21 reps, `taskset -c 3`, differenced `n_iters` 25 000 → 75 000)
+  at **448.16 vs 442.44 ns = +1.29%**, against a same-session noise floor of
+  **+0.37%** taken from R4 vs R5 (442.76 vs 444.40), which are byte-identical
+  kernels and so should read 0. So the direction reproduces and is 3.5× the
+  floor; the 2.9% was 2.2× over-precise. A magnitude on this box needs its floor
+  printed beside it (`.memory/00-environment.md`: the clock is set by other
+  tenants). The entire inversion is `rep stos` +
   `rep movsq` in the gcc kernel being counted at one instruction per iteration.
   `.memory/03-measurement.md` already records one direction-disagreement (p02,
   gcc −10% Ir / +23% time); **this is a second, with a named mechanism, and it is
@@ -703,11 +711,23 @@ Three things did cost time, all mechanical rather than mathematical:
   tree.** `.memory/04-verus.md` predicted a different family — "a pure *value*
   parameter legitimately needs no precondition; nothing in the tree exercises it
   yet" — and this is a second: *a parameter whose type already fixes everything
-  there is to say about it*. The fix is to take a slice, which makes
-  `m <= old(v)@.len()` a real constraint, and it is a fix rather than a
-  workaround because the slice contract is the more general one. But the rule as
-  written rejects the more natural signature, and a future pattern with a
-  fixed-size trusted buffer will hit it again.
+  there is to say about it*. The way past it is to take a slice, which makes
+  `m <= old(v)@.len()` a real constraint.
+
+  **That is a workaround, not a fix, and the first draft of this bullet had it
+  backwards** (corrected at TASK_014_REVIEW, measured). It said the widening was
+  "a fix rather than a workaround because the slice contract is the more general
+  one". The generality is exactly what loses a fact: the array type *carries the
+  length*, the slice type does not, so the widened contract is the **weaker** of
+  the two — a real-`&mut [u8]` caller cannot prove `v@.len()` survived the call
+  (`assertion failed`, `1 verified, 1 errors`) where the array signature gives it
+  free (`3 verified, 0 errors`). See §8 (b). p08 gets away with it only because
+  its single call site passes `&mut scr` with `scr: [u8; SCR]` and Verus's
+  unsizing coercion supplies the length from outside the contract. So: the rule
+  as written rejects the more natural *and stronger* signature, the repair costs
+  a fact, and a future pattern with a fixed-size trusted buffer will hit it
+  again. Stage 5a's rejection is a genuine false positive and is recorded in
+  `.memory/04-verus.md`.
 - **Three `ensures` conjuncts, not four, and the gate decided it.** The
   commissioning sketch asked for four, including `v@.len() == old(v)@.len()`.
   With it present, step 5c reports *"`move_right` ensures[0] is NOT
@@ -949,13 +969,34 @@ substantive half on every run: with a conjunct deleted from the trusted
 rather than merely coexisting with it.
 
 **(b) Is the `ensures` complete with respect to every unchecked operation the
-body performs?** Yes, and unlike every earlier pattern on this project that claim
-is not carried by the body being one line — it is carried by the three conjuncts
-**partitioning the buffer**. The body performs one unchecked operation, a
-`memmove` of `m - dr` bytes from `[0, m-dr)` to `[dr, m)`. The postcondition
-names `[dr, m)`, `[0, dr)` and `[m, old(v)@.len())`, which together are every
-index of the slice, so there is no index whose final value the contract leaves
-unconstrained. That is the property the blind spot TASK_009_REVIEW demonstrated
+body performs?** **Relative to this pattern's one call site, yes. As a contract
+on a general `&mut [u8]`, no — and the first draft of this paragraph claimed
+otherwise. Corrected at TASK_014_REVIEW, measured.** The body performs one
+unchecked operation, a `memmove` of `m - dr` bytes from `[0, m-dr)` to `[dr, m)`.
+The postcondition names `[dr, m)`, `[0, dr)` and `[m, old(v)@.len())` — three
+regions that partition **`old(v)@.len()`**, the length the slice had *before* the
+call. Nothing in the contract pins `final(v)@.len()`. A caller holding a genuine
+`&mut [u8]` therefore cannot prove the length survived: with
+
+```
+let n = v@.len();  move_right(v, dr, m);  assert(v@.len() == n);
+```
+
+Verus reports `assertion failed` (`1 verified, 1 errors`), where the **array**
+signature `&mut [u8; SCR]` this pattern abandoned gives it free from the type
+(`3 verified, 0 errors`). p08's kernel verifies only because its single call site
+passes `&mut scr` with `scr: [u8; SCR]`, so Verus's unsizing coercion carries the
+length in from outside the contract. **The trusted item's contract is complete
+only relative to one caller** — say so before cloning it.
+
+Two things this does *not* mean. It is not a soundness hole in p08: Rust gives a
+`&mut [u8]` callee no way to change the slice's length, so the missing fourth
+conjunct is unfalsifiable and gate 5c is right to delete it as not load-bearing
+(no wrong body exists that three clauses admit and four would catch — see §6b).
+And it does not make the trusted body's *writes* unconstrained: within
+`old(v)@.len()` the three regions still cover every index, so a stray write must
+land in one of them and contradict a conjunct. That is the property the blind
+spot TASK_009_REVIEW demonstrated
 (`let _peek = *v.get_unchecked(i + 1)`) exploits: an `ensures` that mentions
 *some* of what the body touches licenses the rest by omission. Here omission is
 impossible by construction — add a stray write anywhere in the body and it must

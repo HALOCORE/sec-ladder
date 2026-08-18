@@ -28,7 +28,21 @@ p08 is that case, and it has the full arc:
 | C | yes — `memcpy` | — |
 | **safe Rust** | **no.** `&[u8]` and `&mut [u8]` into one buffer at once is `E0502` | **zero: the program does not compile** |
 | unsafe Rust | yes again — `ptr::copy_nonoverlapping` | its whole contract is the non-overlap |
-| Verus | the bug is not even *expressible* in the spec logic | — |
+| Verus | **yes — and the verifier does not see it.** The *caller's* obligation is discharged; the trusted body is trusted | the proof moves the bug into the TCB, it does not remove it |
+
+**That last row was wrong until TASK_014_REVIEW measured it**, and the correction
+matters more than the row: it used to read *"the bug is not even expressible in
+the spec logic"*. Substitute `core::ptr::copy` → `core::ptr::copy_nonoverlapping`
+in `verus.rs`'s trusted body and nothing else, and Verus reports
+**`11 verified, 0 errors`** shipped and **`15 verified, 0 errors`** under
+`--cfg slb_twin`. The mutant is invisible to the verifier, to the verified twin,
+to `spec.md`'s contract pin (the contract text does not change) and to gate
+stages 5c/5c-req. What catches it is the `O3` identity pin against R4 — the call
+target differs — and Miri, which reports *"`copy_nonoverlapping` called on
+overlapping ranges"*. `NOTES.md` §8 (SLB-TRUSTED-ARGUMENT (b)) has always said
+this; the table contradicted it. **A proof of a `requires` is not a proof that
+the trusted body honours it**, and there is no non-overlap `requires` to state
+because `ptr::copy` legitimately permits overlap.
 
 Three further things make it worth doing, and they are all measurements rather
 than arguments:

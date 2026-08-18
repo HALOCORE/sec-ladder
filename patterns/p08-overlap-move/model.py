@@ -254,7 +254,7 @@ class Model:
         So the derived floor of `0.25 * stride` = 125.5 / 1023.3 Ir per call is
         **12x / 5x looser than a byte-denominated estimate of the real traffic
         would make it**, before the fold's ~6.25 Ir per byte is counted at all.
-        NOTES.md 7 reports the measured margin. This is the residual
+        NOTES.md 9 reports the measured margin. This is the residual
         `.memory/02-bench-rules.md` documents and declines to close: the floor
         is a smoke test for total collapse, and what certifies that the work
         happened is step 2, the model checksum -- which here folds every byte of

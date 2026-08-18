@@ -36,7 +36,10 @@
 //! the call site whatever the contract says, so stating it would be an axiom
 //! about real Rust semantics carried for free -- exactly what
 //! `.memory/04-verus.md` says a trusted `ensures` must not be. The commissioning
-//! sketch asked for four clauses; three is the measured number. NOTES.md 4.
+//! sketch asked for four clauses; three is the measured number. NOTES.md 6a.
+//! Read NOTES.md 8 (b) beside it: three clauses partition `old(v)@.len()`, not
+//! `final(v)@.len()`, so the contract is complete *relative to this pattern's
+//! one call site* and not as a contract on a general `&mut [u8]`.
 //!
 //! **The parameter is `&mut [u8]` and not `&mut [u8; SCR]`, and that was forced
 //! by the gate rather than chosen.** With the array type, vstd's
@@ -45,8 +48,10 @@
 //! `check.py` stage 5a's parameter-coverage rule (*every parameter a trusted
 //! body uses must appear in its `requires`*) fails outright:
 //! *"demands ... which constrains nothing about ['v']"*. The slice type makes
-//! `m <= old(v)@.len()` a real constraint and restores the four-clause `ensures`
-//! at the same time. NOTES.md 4 records this as the first false positive of that
+//! `m <= old(v)@.len()` a real constraint. **It is a workaround, not a fix: the
+//! array type carries the length and the slice type does not, so the widened
+//! contract is the weaker one** (TASK_014_REVIEW, measured -- NOTES.md 6a and
+//! 8 (b)). NOTES.md 6a records this as the first false positive of that
 //! rule found in the tree; `.memory/04-verus.md` predicted a different one (a
 //! pure value parameter) and said nothing exercised it yet.
 //!
@@ -73,7 +78,7 @@
 //! benchmark runs, `adversarial-*` included, and the gate checks it call by
 //! call. `d` and `nrep_w`, all 2^32 pairs, are arguments of the problem.
 //!
-//! TCB tally: NOTES.md 4. Four `external_body` items, all listed there
+//! TCB tally: NOTES.md 8. Four `external_body` items, all listed there
 //! individually, because an under-counted TCB is how the pilot's fatal defect
 //! hid in plain sight (`.memory/04-verus.md`).
 

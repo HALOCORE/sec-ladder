@@ -9,8 +9,11 @@
 **The one-line result.** *(Restated at TASK_013_REVIEW. Every number below
 reproduced exactly, including on shapes never measured — but the original
 one-liner, "the wider the lane, the cheaper safety gets", is **refuted**, and
-"0.0000 Ir per element" is true only of the vector steady state. What follows is
-the corrected statement; §12 carries the review's own measurements.)*
+"0.0000 Ir per element" is true only of the vector steady state. Restated
+**again** at TASK_014_REVIEW and TASK_015: the safety-cost half of this section
+is retracted, because it prices two *spellings* and not the language. What
+follows is the corrected statement; **§12** carries both reviews' own
+measurements and the R3 audit.)*
 
 **The bounds check does not vanish on a vectorised loop — it moves from
 per-element to per-row.** Inside the vector body it really is free: c-clang,
@@ -29,12 +32,20 @@ long, so it grows with the lane.
 vector guard is `N >= 9` where R4's is `ncol >= 8`, so there the check **does**
 block vectorisation, costing **2.94×**. p05 contains both regimes in one kernel.
 
-**Why the check cannot be eliminated, which is the deepest result here.** The
+**Why the check cannot be eliminated *in these two spellings*.** The
 kernel *already* checks `nrow*ncol <= avail`, so R2's panic is **dead on every
 execution**. LLVM cannot remove it because `nrow*ncol <= avail ⟹ i*ncol + j <
 avail` is **nonlinear** — and that is precisely the obligation R5 discharges,
-with `lemma_mul_inequality` and one `by (nonlinear_arith)`. **The per-row cost is
-the price of the optimiser failing the lemma the proof proves.**
+with `lemma_mul_inequality` and one `by (nonlinear_arith)`. Linearising that
+guard in an isolated compilation deletes the entire per-row apparatus
+(TASK_014_REVIEW: 5 `cmov` → 0, 166 → 125 instructions, an unchecked epilogue),
+so nonlinearity is the blocker **for this kernel written this way**.
+
+~~**The per-row cost is the price of the optimiser failing the lemma the proof
+proves.**~~ **Retracted at TASK_014_REVIEW.** It is the price of the *indexed*
+and the *hand-resliced* spellings. `data.chunks_exact(ncol)` — zero `unsafe`, no
+proof, no lemma — pays none of it, and the sentence is true of the **obligation**
+and false as a statement about safety. That is the distinction it elided. §12.
 
 Four numbers, and none of them means anything alone. **R3 first**, per
 `.memory/01-ladder.md`'s standing rule — *lead with R3 or do not lead*, a rule
@@ -58,9 +69,19 @@ derived on p16, so the third reproduction is of the constant *and* its
 decomposition.
 
 ⚠ **`+30.5%` in the last row is over-precise** — the review's independent
-remeasurement gives **+32.9%**. And **R3 is not free on this pattern**: +4.7% at
-shipped `large` but **+16.7% at `ncol = 8`**, an `O(nrow)` cost. The "R3 is free"
-streak ends at five patterns, not six.
+remeasurement gives **+32.9%**.
+
+⚠ **The R3 column above is the cost of *this file's* R3, not of safe Rust, and
+the difference is the whole finding.** ~~"R3 is not free on this pattern: +4.7%
+at shipped `large` but +16.7% at `ncol = 8`, an O(nrow) cost. The 'R3 is free'
+streak ends at five patterns, not six."~~ **Retracted at TASK_014_REVIEW.**
+`safe_tuned.rs` reslices each row *by hand*; one idiomatic safe expression,
+`data.chunks_exact(ncol)`, pays **`−(nrow − 7)` Ir per call against R4** —
+cheaper than the unsafe rung — on every input in both residue classes, with
+identical stdout and exit against R4 on all 150 committed inputs. Zero `unsafe`,
+no proof, no lemma. **There was no break in the streak.** §12 has the audit, the
+third spelling (`split_at`, `+(nrow + 7)`), and the control that says the
+remaining ordering is an *idiom* difference and not a safety cost.
 
 ⚠ **The model below holds for `ncol > 8` only** (34755 measured against 41699
 predicted at 496×8), and it has **zero fitted parameters** when derived from the
@@ -911,15 +932,175 @@ shipped `verus.rs` was restored afterwards and re-verified by md5
   disabling it moves all of them; the comparison is still controlled (same
   source, same flag, verified same checksum, verified `vector_regs=[]`) but it is
   not a one-sided perturbation and should not be described as one.
-- **`f(0) = 84` is measured, not explained.** Why LLVM peels a full 8-element
-  checked epilogue for R2 when `ncol ≡ 0 (mod 8)` — where R4 has none — is
-  visible in the disassembly as a `cmov`-heavy per-row preamble, but no
-  attribution finer than "the vectoriser's trip-count split differs" was
-  established.
-- **No hardware counters.** The +30.5% time against +34.4% `Ir` is consistent
+- ~~**`f(0) = 84` is measured, not explained.**~~ **Superseded — it was explained
+  at TASK_013_REVIEW**, by `mov $0x8,%r11d ; cmove %r11,%r8` forcing a remainder
+  of zero to a full vector width. §12a.
+- **No hardware counters.** The +32.9% time against +34.4% `Ir` is consistent
   with an issue-limited loop, but IPC, branch misses and cache misses are
   unmeasurable on this box (`perf` absent, `perf_event_paranoid=3`, no root) and
   are not estimated.
 - **`work_per_call` is still an author-written knob**, over-stating by exactly
   the 4 header bytes here; the floor's 8.5× margin means the stage tolerates an
   88% loss of work. §9, and `.memory/02-bench-rules.md`'s standing residual.
+
+---
+
+## 12. The two reviews, and the R3 audit — what this pattern's numbers actually price
+
+This section exists because the headline above was corrected twice, both times
+by measurement, and both times the correction was about **which spelling** was
+measured rather than about the measuring. §1–§11 are unchanged and every number
+in them still reproduces; what changes is what they are evidence *for*.
+
+### 12a. TASK_013_REVIEW — the mechanism, and the model with no fitted parameters
+
+- **Where the check went.** Hoisted into a **22-instruction per-row trip-count
+  computation** (a `cmova`/`cmovb` min-max chain computing
+  `N = min(ncol, len − rowbase)`) and **surviving in the scalar epilogue** at
+  8 Ir/element against R4's 5. "Per element" in §2 is a marginal derivative, not
+  an average; the average gap on shipped inputs is ~34%.
+- **`f(0) = 84` is explained** — §11's "measured, not explained" is superseded:
+  `mov $0x8,%r11d ; cmove %r11,%r8` forces a **remainder of zero to a full vector
+  width**, because R2's loop is multi-exit and must keep a scalar epilogue.
+  `84 = 29 + 64 − 11 + 2`. Every power-of-two `ncol` pays a vector iteration it
+  does not need.
+- **Zero fitted parameters**, derived from the listings:
+  `R4 = 37 + nrow·(27+11q+5r)`, `R3 = 46 + nrow·(33+11q+5r)`,
+  `R2 = 72 + nrow·(56+11V+8e)`, reproducing every measured point to the
+  instruction. Domain `ncol > 8`.
+- **Wall clock: +34.4% Ir → +32.9% time**, not the delivered +30.5%.
+
+### 12b. TASK_014_REVIEW — `chunks_exact` beats the *unsafe* rung, and the retraction
+
+`safe_tuned.rs`'s inner loop replaced by `data.chunks_exact(ncol)`, one
+substitution, nothing else touched. `-O3 isolated`, marginal Ir per call
+(callgrind, `n_iters` 100 → 200):
+
+| input (nrow×ncol) | R2 | R3 shipped | **R4 unsafe** | **chunks_exact** | chunks − R4 |
+|---|---:|---:|---:|---:|---:|
+| `small` 19×26 | 2081.00 | 1504.00 | **1381.00** | **1369.00** | **−12.00** |
+| `large` 65×61 | 11330.70 | 8834.70 | **8435.70** | **8377.70** | **−58.00** |
+| `sweep-r19c24` (≡0 mod 8) | 2784.30 | 1276.30 | 1153.30 | 1141.30 | −12.00 |
+| `sweep-r19c25` | 1929.30 | 1409.30 | 1286.30 | 1274.30 | −12.00 |
+| `sweep-r41c32` | 6359.41 | 3135.41 | 2880.41 | 2846.41 | −34.00 |
+| `sweep-r65c64` | 12891.00 | 7795.00 | 7396.00 | 7338.00 | −58.00 |
+| `sweep-r65c65` | 9966.30 | 8250.30 | 7851.30 | 7793.30 | −58.00 |
+
+`chunks − R4 = −(nrow − 7)` exactly, both residue classes; `R3 − R4 = 6·nrow + 9`.
+Identical stdout and exit against R4 on **all 150 committed inputs**.
+**Every one of these figures was re-measured independently at TASK_015 and
+reproduced to the hundredth.**
+
+Mechanism, from the listing: `chunks_exact` hands each row a slice whose length
+**is** `ncol` by construction, so R4's *two* row-base registers (`%r11` for the
+vector body at `+8`, `%rdx` for the scalar epilogue, both advanced by `ncol`
+every row — `add %r9,%r11 ; add %r9,%rdx`) collapse to **one** pointer
+(`add %r11,%rdi`). That single `add` per row *is* the `−1·nrow` slope. Against
+**R2** the change is larger: R2's five `cmov`s go to zero, the `cmp $0x9` vector
+guard and the residue `cmove` disappear, and the epilogue becomes R4's unchecked
+5-instruction body. Static, `nm --print-size` extent / objdump grouping:
+R2 168/171, R3 shipped 111/125, chunks 105/109, R4 87/97 — `cmov` count
+**5 / 0 / 0 / 0**, i.e. the five are R2's alone.
+
+**What is retracted.** "R3 is not free here" and "the `29 + 3r` per row is the
+price of the optimiser failing the lemma the proof proves". What **survives**
+unchanged: the `1.375000` steady state; the `29 + 3r` model *as a model of R2 and
+of the shipped spelling*; the AVX2 result; the `f(0) = 84` mechanism; and the
+nonlinearity claim **as a statement about the obligation**, which the review
+confirmed with a linearisation counterfactual (`probe2.rs`: 5 `cmov` → 0,
+166 → 125 instructions, unchecked epilogue). Two caveats on that counterfactual,
+both measured: it does **not** survive the shipped binary build — LLVM's
+induction-variable simplification re-derives `i*ncol` and the linearised R2
+measures **2366 Ir/call against R2's 2081**, *worse* — and `chunks_exact` makes
+the question moot, since a spelling with no lemma at all beats R4.
+
+### 12c. TASK_015 — the audit: a third spelling, and the control that reframes it
+
+`.memory/01-ladder.md`'s corollary rule is *write at least two independent R3
+spellings and quote the cheaper*. Three were written. Marginal Ir/call,
+`-O3 isolated`, same method:
+
+| spelling | vs R4, as a function of `nrow` | small | large |
+|---|---|---:|---:|
+| R2 indexed `buf[off+4+i*ncol+j]` | `+35 + nrow·(29+3r)` | +700 | +2895 |
+| R3 shipped, hand-resliced `buf[base..base+ncol]` | `+6·nrow + 9` | +123 | +399 |
+| `split_at(ncol)` on a consumed cursor | `+nrow + 7` | +26 | +72 |
+| **`chunks_exact(ncol)`** | **`−nrow + 7`** | **−12** | **−58** |
+
+So consuming the slice by hand recovers `5·nrow + 2` of the shipped spelling's
+`6·nrow + 9`, and `chunks_exact` takes the last row-scaled instruction as well.
+The spread **across four safe spellings of one kernel is larger than the spread
+between safe and unsafe**, which is the transferable point.
+
+**The control that must ship with "safe Rust beat unsafe Rust", because it
+reframes it.** R4's spelling is not optimal either: it indexes `buf` flat, which
+is what forces the two row bases. `.temp/p05r3/v05/unsafe_consume.rs` is shipped
+R4 verbatim except that it advances one row pointer by `ncol` — exactly what
+`chunks_exact` gives the safe rung for free. Same checksum on all 150 inputs.
+
+| input | R4 shipped | R3 `chunks_exact` | **R4′ same idiom** | R3 − R4′ |
+|---|---:|---:|---:|---:|
+| `small` 19×26 | 1381.00 | 1369.00 | **1358.00** | **+11.00** |
+| `large` 65×61 | 8435.70 | 8377.70 | **8366.70** | **+11.00** |
+| `sweep-r41c32` | 2880.41 | 2846.41 | **2835.41** | **+11.00** |
+
+**Unsafe goes back on top the moment both rungs are written the same way, and the
+residual safety tax is +11.00 Ir per call, flat in `nrow`** — nrow 19, 41 and 65
+all give exactly +11, i.e. `O(1)` per call, not `O(nrow)`. That is p05's honest
+safety number: *when the safe and unsafe rungs use the same addressing idiom,
+safety costs eleven instructions per call on a vectorised 2-D fold*, and it is
+the up-front reslice `&buf[off+4 .. off+4+nrow*ncol]` plus the `chunks_exact`
+length setup. "Safe Rust is faster than unsafe Rust" is an artefact of comparing
+a good safe spelling with a mediocre unsafe one.
+
+**And `chunks_exact`'s `Ir` win does not convert to time — there is a `div`.**
+`ChunksExact::new` computes `len − len % chunk_size`, and with a runtime `ncol`
+that is a real `div %r11d`, once per kernel call, in the prologue:
+
+```
+mov %r8d,%eax ; xor %edx,%edx ; div %r11d ; mov %r8,%rax ; sub %rdx,%rax
+```
+
+**Callgrind counts a `div` as 1 Ir; the hardware does not.** Interleaved wall
+clock (`taskset -c 3`, 31 reps, differenced `n_iters` 25 000 → 75 000 on `small`,
+12 000 → 36 000 on `large`, min ns/call):
+
+| cell | small | vs R4 | large | vs R4 |
+|---|---:|---:|---:|---:|
+| R4 shipped | 84.80 | +0.00% | 546.82 | +0.00% |
+| R3 shipped | 92.56 | +9.16% | 543.79 | −0.55% |
+| R3 `chunks_exact` | 85.20 | **+0.47%** | 539.89 | −1.27% |
+| R4′ consuming | 83.97 | −0.97% | 551.07 | +0.78% |
+| R2 safe-naive | 136.89 | +61.43% | 723.33 | +32.28% |
+
+On `small`, `Ir` says `chunks_exact` is **−0.87%** against R4 and ns says
+**+0.47%**; its min-to-median spread is **8.61%**, the worst of the five and the
+only one near the 10% discard threshold, which is what a variable-latency `div`
+looks like. `large` (8.4 MB payload, memory-bound) resolves nothing: every Rust
+rung but R2 is inside ±1.3% at 1–2% spreads. **So the `−(nrow − 7)` is a real
+instruction-count result and must not be quoted as a time result.** R3 shipped's
+`+9.16%` on `small` against `+8.91%` in `Ir` *does* convert, and R2's `+61.43%`
+against `+50.7%` converts and then some — the direction-of-conversion claim in §4
+is unaffected.
+
+### 12d. Why the shipped R3 is still the shipped R3
+
+`safe_tuned.rs` was **not** replaced with `chunks_exact` at TASK_015, and the
+reason is measured rather than editorial:
+
+1. The audit found the *same* defect in p16's and p17's R3 (both beaten, both by
+   spellings that also beat their own R4). Swapping p05 alone would make one
+   pattern "best-found" and two "first plausible" inside one result set.
+2. The R4′ control above says the ordering a swap would publish — safe beats
+   unsafe — is an idiom mismatch, not a language fact. Landing it as a cell would
+   install a headline that a ten-line control refutes.
+3. `chunks_exact`'s advantage is `Ir`-only on `small` (the `div`).
+4. `safe_tuned.rs` is load-bearing as this pattern's **decomposition control**:
+   it differs from R2 in the inner loop and in nothing else, so `R2 − R3` *is*
+   the per-element check cost by construction (§3), which is the rule
+   `.memory/01-ladder.md` finding 4 imposes. `chunks_exact` changes the header
+   handling, the row addressing and the trip count at once.
+
+What the file therefore claims is the honest form: **§2's R3 column is the cost
+of one spelling, this section has three more, and the idiom-matched safe-vs-unsafe
+number is +11 Ir per call, flat.**
