@@ -23,7 +23,7 @@ vectorised kernel), p08 (the first structural Rust win).
 ## The findings so far — this is the actual output
 
 **Numbering warning, because it has already cost an agent time.** The list below
-is **RECAP's own digest** and is numbered 1–13. `.memory/01-ladder.md` has a
+is **RECAP's own digest** and is numbered 1–14. `.memory/01-ladder.md` has a
 *different* list, numbered 1–7, one entry per pattern, and **that one is
 authoritative**. "Finding 12" means different things in the two files. When
 writing a task file, name the pattern (*"p05's causal claim"*), never the number.
@@ -140,27 +140,39 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    reslices by hand and pays `6·nrow + 9`. **Three patterns have now priced a
    spelling as safety's cost** (p02, p16, p05).
 
-14. **Every rung is a spelling — and this is now the programme's central
-   methodological result.** (TASK_015. **PROVISIONAL — not yet reviewed.**) The
-   audit ran the "is there a cheaper idiomatic spelling?" test across p05, p16
-   and p17: **all three shipped R3s are beaten**, and each beater is also
-   cheaper than **its own R4**. Then the control nobody had thought to run —
-   apply the same consumed-slice idiom to the *unsafe* rung — and **unsafe goes
-   back on top**: p05 **+11.00 Ir/call, flat** (nrow 19/41/65 all exactly +11,
-   so `O(1)` not `O(nrow)`), p16 `nrec + 3`. **"Safe Rust beat unsafe Rust" was
-   an idiom mismatch, not a language fact.**
-   On p05 the spread across four safe spellings — `35 + nrow·(29+3r)`,
-   `6·nrow + 9`, `nrow + 7`, `−nrow + 7` — is **larger than the safe-vs-unsafe
-   gap itself**. So "write two spellings and quote the cheaper" is not enough
-   either; the rule that follows is **compare idiom-matched rungs, or publish
-   the spread rather than a cell.** A single number per rung measures the author
-   unless every rung was written the same way — and the project's reporting
-   format does not yet reflect that.
-   The p05 R3 swap was specced and **declined on this evidence**, which is the
-   right call: it would have installed a headline that ten lines of control
-   refute. Also measured: `chunks_exact` with a runtime chunk size emits a
-   hardware `div` that callgrind prices at **1 Ir**, so its win is
-   instruction-count-only — interleaved ns says +0.47% where `Ir` says −0.87%.
+14. **Every rung is a spelling, the gap does not converge, and "safe beats
+   unsafe" was never available as a language fact.** (TASK_015 +
+   TASK_015_REVIEW. The programme's central methodological result, and the one
+   that shapes the writeup.)
+   The audit found **all three shipped R3s beaten**, each beater also cheaper
+   than **its own R4**. The control that answered it — apply the same
+   consumed-slice idiom to the *unsafe* rung — put unsafe back on top at
+   **+11.00 Ir/call flat**. Then the review ran **one more round on each side**:
+   replace the unsafe loop counter with the canonical C test `while rp < end`
+   and it becomes **`nrow + 9`** — swept exactly over all 144 blobs, zero
+   residual, with a second unrelated unsafe spelling landing on the identical
+   figure. **`O(1)` became `O(nrow)` and the sign of the conclusion flipped on
+   the first thing a reader would try. The gap does not converge.**
+   And it never could, for a reason available without measuring: **R4 is defined
+   by *permission*, not obligation**, so every safe program is an admissible R4
+   and `inf(R4) <= inf(R3)` **by construction**. What is *not* available a priori
+   is whether that infimum gap is zero or positive — which is exactly the
+   quantity that moved from 11 to `nrow + 9` when someone looked.
+   **Both spellings that drove this were out of contract.** p05's `spec.md`
+   forbids `chunks_exact` and the running row pointer by name — either deletes
+   the `i*ncol + j` multiply, which *is* the pattern — and **two consecutive
+   tasks measured them and reported them as p05's numbers**, the manager's own
+   retraction among them. The declaration was right both times and failed only
+   by being **invisible**: it is prose, and the hashed block starts 240 lines
+   later. So p05's `6·nrow + 9` **stands as a contract-relative number**, and the
+   retraction of it is itself retracted.
+   **The policy that follows** (recommended, not yet implemented): "compare
+   idiom-matched rungs" **does not work** — "same idiom" has no fixed point, its
+   members differing by `O(nrow)` — and a published spread **cannot carry a
+   safety number at all**, per the theorem above. What survives is a
+   **matched-pair delta under an idiom declared before measuring**, moved into
+   the hashed contract block so the gate can see it, plus a spelling-spread
+   section published as method and never as headline.
 
 ## Retracted — do not reinstate
 
@@ -198,11 +210,23 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
   only of the vector steady state — the check is hoisted into a per-row
   trip-count computation and survives in the scalar epilogue, an `O(nrow)` cost.
   The second is **refuted**: at AVX2 the gap is 4.58× against SSE2's 1.42×.
-- **"R3 is not free on p05; the R3-free streak ends at five patterns"** and
-  **"the `29 + 3r` Ir per row is the price of the optimiser failing the lemma the
-  proof proves"** — the strongest claim this project had made, retracted at
-  TASK_014_REVIEW. Both describe p05's *shipped* R3, which reslices by hand.
-  `chunks_exact` beats **R4**. There was no break in the streak.
+- **"`chunks_exact` refutes p05's R3 cost"** (TASK_014_REVIEW's blocker, which
+  the manager landed as a retraction). **The retraction is itself retracted**:
+  `chunks_exact` is forbidden by p05's own `spec.md`, so it measures a different
+  kernel. p05's `6·nrow + 9` stands **as a contract-relative number**. What does
+  not stand is reading it as "what safe Rust costs" — finding 14.
+- **"Safe Rust beat unsafe Rust"**, and its repair **"p05's idiom-matched safety
+  number is +11.00 Ir/call, flat, `O(1)`"**. One more unsafe round makes it
+  `nrow + 9`. Both spellings were out of contract, and `inf(R4) <= inf(R3)`
+  holds by construction anyway.
+- **"Compare idiom-matched rungs"** (manager, one turn after inventing it).
+  "Same idiom" has no fixed point; its members differ by `O(nrow)`.
+- **"p17's R3 costs +32 Ir/call, flat"** — flat *per byte*, not per call. Both
+  published bands happen to have `nsuf = 3`; swept, `R3ship − R4` runs 18…63.
+  p17 ships no sweep inputs, which is how a two-point constant became a law.
+- **"p16's R3 cost is O(1) per call"** — `7 + 5·nrec` at `vlen ≡ 0 (mod 4)`,
+  `7 + 7·nrec` otherwise. `O(nrec)`, and the two published points were nrec 4
+  and 10.
 - **"Overlap UB is not caught by ASan"** (manager, in the catalogue since it was
   written). It is caught — `memcpy-param-overlap`, exact to the byte — unless
   the call site is fortified to `__memcpy_chk`, which blinds ASan under clang as
@@ -260,11 +284,18 @@ headline. Say so in every task file.
 - **A finding needs a mechanism, not just a number.** "It vanished" was p05's
   first answer; the real one was a hoisted trip-count computation and a surviving
   scalar epilogue, and it changed the conclusion.
-- **You are measuring a spelling until you have written two.** Three retractions
-  (p02, p16, p05) are the same mistake: one plausible R3 written, measured, and
-  published as what *safe Rust* costs. On p05 the second spelling beat the
-  **unsafe** rung. A safety-cost claim is a claim about the language, so it is
-  only as good as the best spelling anyone can find.
+- **You are measuring a spelling until you have written two — and then you are
+  still measuring a spelling.** Three retractions (p02, p16, p05) came from one
+  plausible R3 published as what *safe Rust* costs. Writing a second spelling
+  does not fix it: on p05 the spread across eleven exceeds the safe-vs-unsafe
+  gap, and the unsafe rung has spellings too. Only a matched pair under a
+  **declared, pre-registered** idiom carries a safety number (finding 14).
+- **Read the pattern's `spec.md` before believing a cross-pattern rule.** Two
+  consecutive tasks measured spellings p05's `spec.md` forbids **by name**, in a
+  section titled "Load-bearing, do not improve", and neither cited it — because
+  `.memory/01-ladder.md`'s R3 definition listed the forbidden spelling as a
+  technique. A general file and a pattern file disagreed and the general one
+  won twice.
 - **A tool that reports nothing may be a tool that cannot see.** ASan is silent
   on p08's overlap not because there is none but because fortify rewrote the call
   to `__memcpy_chk`. A gate row records `clean` for both reasons identically.
@@ -295,24 +326,36 @@ it once, land the corrections, repeat** — and per `PROTOCOL.md` rule 9, write
 instance of the same mistake, and the correction is owed across the whole result
 set before more results are added to it:
 
-1. **Decide the reporting policy — the question finding 14 opened, and the
-   biggest open item in the programme.** The audit is *done* (TASK_015): all
-   three shipped R3s are beaten, each beater beats its own R4, and an
-   idiom-matched R4′ puts unsafe back on top at +11 flat. What is owed is **one
-   policy, decided once and applied uniformly** — idiom-matched rung pairs, a
-   published spread per rung, or a declared canonical idiom per pattern — not
-   three more one-off swaps. This blocks the writeup and shapes every remaining
-   pattern, so settle it before adding results to a format that may change.
-   **It needs a review first**: the R4′ control now carries the conclusion and
-   is its author's own design (`PROTOCOL.md` rule 3).
-2. **p07 binary search** — `O(log n)`, almost pure per-call overhead with no
+1. **Implement the declared-idiom policy (TASK_016) — decided, reviewed, and
+   now just work.** Finding 14 settled *what* to do; nothing has been built. Two
+   pieces: a required `"idiom"` key inside every pattern's hashed `slb-contract`
+   block (`required` / `forbidden` / `why`), and a **spelling-spread** section in
+   every `NOTES.md`, published as method and never as headline. The gate checks
+   the key is present and non-empty and hashes it — it must **not** try to check
+   the idiom semantically ("could this happen by accident?" says no).
+   Retrofit across six patterns: p05 and p17 have the prose already and need it
+   moved; p01, p02, p08, p16 need a paragraph each. **No cell source changes, so
+   no measured column can move**, but `contract_sha256` moves in all six and all
+   six gates re-run — about 12–15 minutes of machine time.
+   This is a `harness/check.py` change, so it needs the "could this happen by
+   accident?" test in writing before it lands, and its own review after.
+   **Two corrections ride along** (both need the gate re-run anyway):
+   `patterns/p08-overlap-move/spec.md:383` says "NOTES.md 7" and means §9 —
+   inside the hashed block, confirmed the only mis-targeted cross-reference in
+   `patterns/` out of 65 checked; and p16's and p17's `NOTES.md` carry R3
+   constants the review showed are residue- and `nsuf`-scaled.
+2. **A shipped p17 sweep.** p17 has **no sweep inputs at all**, which is how its
+   "+32 Ir/call flat" got published from two bands that both happen to have
+   `nsuf = 3`. `.memory`'s own residue rule applied and was not followed. The
+   review's `nsuf` 1–8 inputs are generated under `.temp/` and are not shipped.
+3. **p07 binary search** — `O(log n)`, almost pure per-call overhead with no
    inner loop to amortise over, so any R3 cost shows up as a large *fraction*
    rather than a flat constant. Midpoint overflow `(lo+hi)/2` is p17's shape
    again: an arithmetic bug giving a wrong-but-in-bounds index.
-3. **p47 constant-time compare** — a third security axis, where the adversary is
+4. **p47 constant-time compare** — a third security axis, where the adversary is
    the **optimiser** and Verus cannot state the property at all. Expect it to
    defeat R5 in an interesting way; a documented R5 failure is a finding here.
-4. **p27+ raw pointers.** No longer "the only place the twin can earn its keep"
+5. **p27+ raw pointers.** No longer "the only place the twin can earn its keep"
    — p08 did that (mutant M2, the weakened `requires`, caught by the twin and by
    nothing else). p27 is now just the next hard proof.
 

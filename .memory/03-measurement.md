@@ -362,18 +362,25 @@ moved rather than bytes folded.
 
 ### Callgrind prices a hardware `div` at 1 `Ir`
 
-**PROVISIONAL — not yet reviewed (TASK_015).** Third named mechanism for
-`Ir`/ns disagreement, after `rep`-strings above and p16's latency-bound Horner
-chain. `chunks_exact(n)` with a **runtime** chunk size computes
-`len − len % chunk_size`, which lowers to a hardware `div` in the prologue —
-one instruction to callgrind, tens of variable cycles to the machine. Measured
-on p05: `Ir` says the `chunks_exact` spelling is −0.87% against R4 on `small`
-and interleaved ns says **+0.47%**, at an 8.61% min-to-median spread, the worst
-of five cells and the only one near the 10% discard threshold.
+Third named mechanism for `Ir`/ns disagreement, after `rep`-strings above and
+p16's latency-bound Horner chain. `chunks_exact(n)` with a **runtime** chunk
+size computes `len − len % chunk_size`, which lowers to a hardware `div` in the
+prologue — one instruction to callgrind, tens of variable cycles to the machine.
+Confirmed in the listing (`div %r11d`) at TASK_015 and again at review.
 
-Rule: **a spelling whose win is one instruction wide needs a wall-clock column
-before it is quoted**, and a constant chunk size is a different measurement from
-a runtime one.
+**The rule is sound; the ns evidence originally offered for it is not.**
+TASK_015 reported +0.47% ns against −0.87% `Ir` on p05 `small`. Two independent
+31-rep interleaved sessions at review **disagree on cell ordering** and on which
+cell has the worst spread (one run's worst was a cell with no `div` at all), and
+between-run drift of ~4% exceeds every inter-cell `Ir` difference. So the `div`
+is a real hazard and this box cannot demonstrate its cost. Also:
+`split_at_checked` consumes the slice with **no `div` and is 4 Ir cheaper
+still**, so the defect belongs to one spelling, not to the consuming idiom.
+
+Rule: **a spelling whose win is one instruction wide cannot be quoted on `Ir`
+alone, and this box cannot supply the wall-clock column to rescue it** — say the
+win is instruction-count-only and stop. A constant chunk size is a different
+measurement from a runtime one.
 
 ## Timing protocol
 

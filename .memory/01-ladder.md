@@ -8,8 +8,23 @@ enforces memory safety.
 |---|---|---|
 | **R1 C** | `c/` | Idiomatic C99. No bounds checks. Written the way a competent systems programmer writes it — *including* the bug class the pattern is about, if the pattern models one. |
 | **R2 safe-naive** | `safe_naive.rs` | The mechanical port a working Rust programmer writes first: `for i in 0..n { ... v[i] ... }`, indexing, `Vec`, no cleverness. Must contain **zero** `unsafe`. |
-| **R3 safe-tuned** | `safe_tuned.rs` | Same semantics, rewritten to help LLVM elide checks: iterators, `chunks_exact`, `zip`, slice reslicing, `split_at`, hoisted length assertions. Still **zero** `unsafe`. |
-| **R4 unsafe** | `unsafe.rs` | `get_unchecked`, raw pointers, `from_raw_parts` — whatever it takes to reach C's codegen. Unsound-by-inspection is not allowed: it must be *correct*, just unverified. |
+| **R3 safe-tuned** | `safe_tuned.rs` | Same semantics, rewritten to help LLVM elide checks: iterators, `chunks_exact`, `zip`, slice reslicing, `split_at`, hoisted length assertions. Still **zero** `unsafe`. **Subject to the pattern's declared idiom** — see below. |
+| **R4 unsafe** | `unsafe.rs` | `get_unchecked`, raw pointers, `from_raw_parts` — whatever it takes to reach C's codegen. Unsound-by-inspection is not allowed: it must be *correct*, just unverified. **Subject to the pattern's declared idiom** — see below. |
+
+**The spelling list above is permissive, and a pattern's `spec.md` overrides it.**
+This was a live contradiction until TASK_015_REVIEW: this table names
+`chunks_exact` as an R3 technique, while p05's `spec.md` names it as
+*pattern-deleting* and says a rung that uses it "is a different benchmark and
+its numbers are not comparable". **Two consecutive tasks quoted this table as
+licence, measured a forbidden spelling, and reported the result as p05's number**
+— the manager's own retraction of p05's headline among them. Read the pattern's
+`spec.md` before treating any technique here as available.
+
+**R4 is defined by *permission*, not obligation, and that has a consequence
+nobody noticed for six patterns**: every safe program is an admissible R4, so
+`inf(R4) <= inf(R3)` **by construction**. "Safe Rust beats unsafe Rust" can
+therefore never be a language fact under these definitions — see finding 6's
+amendment and `.memory/06-catalogue.md`.
 | **R5 verus** | `verus.rs` | R4's exec code, plus Verus specs and proofs discharging every unsafe precondition. Ships the same machine code as R4. |
 
 ### R1h — the hardened C cell (optional, added at TASK_004)
@@ -126,20 +141,27 @@ is a much stronger claim than any p01 could produce.
      spellings and quote the cheaper.** The iterator/slice-consuming forms
      (`chunks_exact`, `split_at`, `iter().zip()`) are the ones that keep winning,
      because they hand the optimiser a length it does not have to re-derive.
-   - **…and that rule is still not enough. PROVISIONAL — not yet reviewed
-     (TASK_015).** The audit measured **four** safe spellings of p05's kernel —
-     `+35 + nrow·(29+3r)`, `+6·nrow + 9`, `+nrow + 7`, `−nrow + 7` — and **the
-     spread across them is larger than the safe-versus-unsafe gap itself.**
-     Quoting "the cheaper of two" still publishes a number that the third
-     spelling moves. Worse, **R4 is a spelling too**, and the audit's R4′ control
-     put unsafe back on top on both p05 and p16.
+   - **…and that rule is still not enough — but the fix is not "match the
+     idioms" either.** The audit measured four safe spellings of p05's kernel and
+     the review took it to eleven; the spread across them **exceeds the
+     safe-versus-unsafe gap**. Quoting "the cheaper of two" publishes a number
+     the third spelling moves, and **R4 is a spelling too**.
 
-     So the rule that actually follows is: **compare idiom-matched rungs, or
-     publish the spread rather than a cell.** A single number per rung is only
-     meaningful when every rung was written the same way; otherwise the ladder is
-     measuring the author, not the language. This is the most important
-     methodological result the project has, and it is not yet reflected in the
-     reporting format — see `.memory/06-catalogue.md`.
+     "Compare idiom-matched rungs" was the obvious repair and **it does not
+     work**: "same idiom" has **no fixed point**. R3′ and R4′ were idiom-matched
+     under the audit's own criterion; R4″ satisfies that criterion too and is
+     `nrow + 2` cheaper; R4‴ — the *safe* program with only its checked slice
+     constructions replaced, the most matched unsafe rung it is possible to
+     write — lands on R4″'s number. "Same idiom" picks out an equivalence class
+     whose members differ by `O(nrow)`, so no gate check can decide between them.
+
+     **The rule that survives: a safety number is only meaningful as a
+     matched-pair delta under an idiom the pattern *declared before measuring*.**
+     A published spread cannot carry a safety claim at all — see finding 14 for
+     why that is a theorem rather than a preference. The declaration is p05's
+     `spec.md:69-73` mechanism, which was right both times it was tested and
+     failed only by being **invisible** to the gate. Fix: move it into the hashed
+     contract block (`.memory/06-catalogue.md`).
 
    Reproduced on p01 at TASK_002, with the residue effect measured properly this
    time (16 window lengths, `inputs/gen.py --sweep`), `-O3 isolated`, per call:
@@ -232,7 +254,17 @@ is a much stronger claim than any p01 could produce.
    which is R4's exactly.** Idiomatic safe Rust costs **zero per byte** here. Its
    whole cost is O(1) per call (+27 / +77), which *shrinks* as a fraction of the
    call with size — 0.90% on `small`, 0.32% on `large`. Only the naive indexed
-   spelling is O(n). This file already said, at finding 3: *"Never publish a
+   spelling is O(n).
+   **Corrected at TASK_015_REVIEW: "O(1) per call" is residue-dependent.** The
+   +27/+77 pair decomposes as `7 + 5·nrec` at `vlen ≡ 0 (mod 4)` and `7 + 7·nrec`
+   otherwise, so it is `O(nrec)` — the two published points happen to sit at
+   nrec 4 and 10. A cheaper R3 spelling exists (`split_at` / `split_first_chunk`,
+   indistinguishable from each other) at `R3ship − R3′ = 10·nrec + 9`, and
+   idiom-matched against an equivalent R4 the residual is **7 flat at
+   `vlen ≡ 0 (mod 4)` and `7 + nrec` in the other three classes**, swept over 68
+   blobs. None of this is landed as a p16 cell and none of it may be quoted as
+   p16's R3 — p16 has no declared-idiom block yet, which is exactly the gap
+   finding 14 is about. This file already said, at finding 3: *"Never publish a
    safety-cost claim without R3."* The rule was violated by its own author on the
    next pattern. **Lead with R3 or do not lead.**
 
@@ -434,8 +466,14 @@ is a much stronger claim than any p01 could produce.
    that every rung including R1 stays in bounds and ASan must stay *silent* —
    which is what makes it a disclosure demonstration rather than a crash.
 
-   **Perf — R3 is free for the fifth pattern in a row** (+32 Ir/call flat, 0 per
-   byte; +0.61% / +0.08%). And **R2−R4 = 4.2500 Ir per folded byte, reproducing
+   **Perf — R3 is free for the fifth pattern in a row** (+32 Ir/call, 0 per
+   byte; +0.61% / +0.08%). **"Flat" is wrong and was corrected at
+   TASK_015_REVIEW: it is flat *per byte*, not per call.** Both shipped bands
+   happen to have `nsuf = 3`; swept over generated inputs at `nsuf` 1–8,
+   `R3ship − R4` runs 18…63 and `R3ship − R3′` is exactly `17·nsuf`. p17 ships
+   **no sweep inputs at all**, which is how a two-point constant got published as
+   a law — `.memory`'s own residue rule ("sweep two full cycles, never sample two
+   points") applied and was not followed. A shipped p17 sweep is owed. And **R2−R4 = 4.2500 Ir per folded byte, reproducing
    p16's swept constant on a completely different kernel** — *exactly*, in fact:
    the delivered 9.9991 / 5.7491 were contaminated by the driver's final
    `println!` (its digit count varies per input); the zero-residue lag-4 pair
@@ -507,43 +545,48 @@ is a much stronger claim than any p01 could produce.
    - **The hypothesis is not inverted in general — it holds at `ncol = 8`.** R2's
      vector guard is `N >= 9` where R4's is `ncol >= 8`, so there the check **does**
      block vectorisation, and costs **2.94×**. p05 has both regimes in one kernel.
-   - ~~**R3 is *not* free here.** +16.7% at 496×8, +4.7% at shipped `large` — an
-     `O(nrow)` cost. The "R3 free" streak ends at five patterns, not six.~~
-     **RETRACTED at TASK_014_REVIEW, and this is the blocker of that review.**
-     What was measured is p05's *shipped* R3, which reslices by hand. One
-     idiomatic safe expression — `data.chunks_exact(ncol)`, a spelling this
-     file's own R3 definition **names** — is `nrow − 7` instructions per call
-     **cheaper than R4**, exactly, on every input in both residue classes
-     (−12 at nrow 19, −34 at 41, −58 at 65), with identical stdout and exit
-     against R4 on all **150** committed p05 inputs, and +1.78% wall against
-     R4's +2.22% for shipped R3 and +31.2% for R2. Zero `unsafe`, no proof.
-     The mechanism: `chunks_exact` hands each row a slice whose length **is**
-     `ncol` by construction, so the vector/scalar split is computed once per
-     *call* rather than once per row (no `cmov` at all, against R2's five), the
-     epilogue is R4's unchecked 5-instruction body, and both `f(0) = 84`
-     mechanisms — the `cmp $9` guard and the `cmove` forcing a zero remainder to
-     a full vector width — disappear.
+   - **R3 is *not* free here — and this bullet survived a retraction and a
+     re-instatement, so read the whole of it.** Within p05's **declared
+     contract**, shipped R3 pays `6·nrow + 9` Ir/call against shipped R4:
+     +16.7% at 496×8, +4.7% at shipped `large`, an `O(nrow)` cost. **That number
+     stands.**
+     What does **not** stand is reading it as *what safe Rust costs*.
+     TASK_014_REVIEW retracted the bullet on the ground that
+     `data.chunks_exact(ncol)` — a spelling this file's own R3 row named — beats
+     **R4** by `nrow − 7` on every one of 150 inputs. TASK_015_REVIEW then found
+     that **`chunks_exact` is forbidden by `patterns/p05-index-flatten/spec.md`
+     itself** (it deletes the `i*ncol + j` multiply, which *is* the pattern), as
+     is the running row pointer used by the R4′ control that answered it. So
+     both of the spellings that overturned this bullet are **out of contract**,
+     the retraction was wrong, and the number is reinstated — *as a
+     contract-relative number*.
+     Keep all three facts together or the bullet misleads again: the cost is
+     real at the declared idiom; the declared idiom is a real restriction; and
+     outside it the gap moves by more than the gap.
 
-     **…and then the next task refuted the framing of *that*, so read the
-     amendment before quoting any of it. PROVISIONAL — not yet reviewed
-     (TASK_015).** "Safe Rust beat unsafe Rust" is an **idiom mismatch, not a
-     language fact.** R4 is a spelling too: rewrite the *unsafe* rung with the
-     same consumed-slice idiom (a row pointer advanced by `ncol`, ten lines) and
-     unsafe is back on top. p05's honest idiom-matched safety number is
-     **+11.00 Ir/call, flat — nrow 19, 41 and 65 all exactly +11, so `O(1)` and
-     not `O(nrow)`.** p16's is `nrec + 3`. The shipped R4 maintains **two** row
-     bases (one for the vector body, one for the scalar epilogue) and
-     `chunks_exact` collapses them to one pointer; that single `add` per row
-     **is** the `−1·nrow` slope, and it is R4's to fix.
+     **Two numbers produced while chasing this are themselves refuted; do not
+     quote either.** TASK_015's out-of-contract R4′ control gave *"+11.00
+     Ir/call, flat in `nrow`, `O(1)` not `O(nrow)`"* as p05's idiom-matched
+     safety number. One more unsafe round — replacing the loop counter with the
+     canonical C test `while rp < end` — makes it **`nrow + 9`**, swept exactly
+     over all 144 committed blobs with zero residual, and a second, textually
+     unrelated unsafe spelling lands on the identical figure. **The `O(1)`
+     conclusion flips on the first thing a reader tries.** Likewise p16's
+     `nrec + 3` was a three-point fit; swept over 68 blobs it is **7 flat at
+     `vlen ≡ 0 (mod 4)` and `7 + nrec` in the other three residue classes** —
+     the audit's three points all sat at residue 0.
 
-     **And the `−(nrow − 7)` is `Ir`-only.** `chunks_exact` with a runtime chunk
-     size emits a hardware `div` per call (`len − len % chunk_size`), which
-     callgrind prices at **1 instruction**. Interleaved wall clock on `small`
-     says **+0.47%** where `Ir` says −0.87%, at an 8.61% min-to-median spread —
-     the worst of the five cells and the only one near the discard threshold.
-     Quote it as an instruction-count result or not at all.
+     **The `chunks_exact` `div` is real; its timing consequence is not.**
+     `chunks_exact` with a runtime chunk size emits a hardware `div` per call
+     (`len − len % chunk_size`), which callgrind prices at **1 instruction** —
+     keep that as a rule (`.memory/03-measurement.md`). But the ns evidence for
+     it does not reproduce: two 31-rep interleaved sessions disagree on cell
+     ordering and on which cell has the worst spread, and between-run drift
+     (~4%) exceeds every inter-cell `Ir` difference. And `split_at_checked`
+     consumes the slice with **no `div` and is 4 Ir cheaper still**, so the
+     `div` is one spelling's defect, not the idiom's.
 
-     Two smaller corrections to the review's own write-up: its static counts mix
+     Two smaller corrections to TASK_014_REVIEW's write-up: its static counts mix
      conventions (105 is `n_fn`; 171 and 97 are `n_raw` — matched, 105/168/87 or
      109/171/97), and **shipped R3 also has zero `cmov`** — the five are R2's
      alone.
@@ -580,10 +623,16 @@ is a much stronger claim than any p01 could produce.
    whole question is moot for the headline, because a spelling with no lemma at
    all beats R4.
 
-   ~~"The `29 + 3r` Ir per row is the price of the optimiser failing the lemma
-   the proof proves."~~ **Retracted.** It is the price of two spellings; a third
-   pays nothing. The sentence remains true of the *obligation* and false as a
-   statement about safety, which is the distinction it elided.
+   **"The `29 + 3r` Ir per row is the price of the optimiser failing the lemma
+   the proof proves"** — retracted at TASK_014_REVIEW, **partially reinstated at
+   TASK_015_REVIEW**, and the final status is: *true of this kernel at its
+   declared idiom, and not a statement about safety in general.* The cost is
+   real (`6·nrow + 9` for shipped R3, more for R2), the nonlinear implication
+   really is what blocks elimination (linearisation deletes the whole per-row
+   apparatus), and the counterexample that overturned it used a spelling
+   `spec.md` forbids. What the sentence may never do is generalise from "this
+   kernel, written this way" to "safety costs this" — that is the step
+   finding 14 shows is not available.
 
    **Two things that stand unchanged:** `Ir` converts to time on this kernel
    (+34.4% `Ir` → **+32.9%** wall — the review's own remeasurement; the delivered

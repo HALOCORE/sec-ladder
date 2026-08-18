@@ -69,34 +69,45 @@ supersede any earlier task report they contradict.
 
 ## Open cross-cutting issues
 
-- **THE OPEN QUESTION: every rung is a spelling, so what does the ladder
-  report?** **PROVISIONAL — not yet reviewed (TASK_015).** The audit ran across
-  p05, p16 and p17 and found **all three shipped R3s beaten**, each beater also
-  cheaper than **its own R4** (`R3ship − R3′` = `6·nrow + 9` on p05,
-  `10·nrec + 9` on p16, `51` flat on p17). Then the R4′ control: apply the same
-  consumed-slice idiom to the *unsafe* rung and **unsafe goes back on top** —
-  p05 **+11.00 Ir/call flat**, p16 `nrec + 3`.
+- **THE DECIDED QUESTION: every rung is a spelling — the ladder reports a
+  matched-pair delta under a *declared* idiom, and nothing else can.**
+  (TASK_015 + TASK_015_REVIEW.) The audit found all three shipped R3s beaten,
+  each beater also cheaper than its own R4; the R4′ control then put unsafe back
+  on top. **Both halves used spellings p05's `spec.md:69-73` explicitly
+  forbids**, and neither task cited it — the pin is prose at line 69 while the
+  hashed block starts at 309, so `contract_sha256` is blind to it. `spec.md` was
+  right both times it was tested and failed only by being **invisible**.
 
-  So the safe-vs-unsafe gap this project reports is **idiom-bound**, and on p05
-  the spread across four safe spellings **exceeds** it. A single number per rung
-  is only meaningful when every rung was written the same way.
+  Two results settle the reporting question:
+  1. **"Same idiom" has no fixed point.** R3′/R4′ were matched under the audit's
+     own criterion; R4″ satisfies it too and is `nrow + 2` cheaper; R4‴ — the
+     safe program with only its checked slice constructions replaced — lands on
+     R4″. The class members differ by `O(nrow)`, so no gate check can pick one.
+  2. **A published spread cannot carry a safety number at all.** R4 is defined by
+     *permission*, so every safe program is an admissible R4 and
+     `inf(R4) <= inf(R3)` **by construction**. Publishing two intervals tells a
+     reader a theorem, not a measurement.
 
-  **The p05 R3 swap was specced and declined**, with the R4′ control as the
-  reason: landing it would have headlined "safe Rust beats unsafe Rust", which
-  ten lines refute. Not a cost decision — a gate run is 1.5–2.5 min. Three
-  further reasons on the record: swapping p05 alone leaves one pattern
-  "best-found" and two "first plausible" in one result set; `chunks_exact`'s win
-  is `Ir`-only (the `div`); and p05's `safe_tuned.rs` is load-bearing as the
-  decomposition control, differing from R2 in the inner loop **and nothing
-  else**, which is what makes `R2 − R3` the per-element check cost *by
-  construction*.
+  **Adopted policy (recommended by TASK_015_REVIEW, not yet implemented):**
+  a declared canonical idiom per pattern, with two amendments that answer the
+  self-certification objection — **move the declaration into the hashed
+  `slb-contract` block** as a required `"idiom": {"required": [...],
+  "forbidden": [...], "why": "..."}` key, so changing a rung's idiom must move
+  `contract_sha256`; and require a **spelling-spread section** in every
+  `NOTES.md`, published as a result about method and never as the headline.
+  The gate checks presence and hashes it; it does not try to check semantically
+  ("could this happen by accident?" says no).
 
-  **What is owed is a policy decided once and applied uniformly**, not three
-  more swaps. Candidates: idiom-matched rung pairs; publishing a spread per
-  rung; or a declared canonical idiom per pattern. Variants are in
-  `.temp/p05r3/`; none is gate-ready (`O0`/`whole` cells and Miri were not
-  built, and p16's `R3′ − R4` is fitted over 6 points across 2 residue classes
-  rather than swept).
+  Retrofit: p05 and p17 already have the prose and need it moved; p01, p02, p08,
+  p16 need a paragraph each. **No cell source changes, so no measured column can
+  move** — but `contract_sha256` moves in all six, so all six gates re-run
+  (~12–15 min of machine time).
+
+  **The p05 R3 swap was specced and declined, and review confirmed the decision
+  for a stronger reason than the four given: the replacement was out of
+  contract.** p05's shipped `safe_tuned.rs` *is* the contract-conformant R3 and
+  stays. Variants are in `.temp/p05r3/` and `.temp/review015/`; none is
+  gate-ready.
 - **`harness/check.py` stage 7 is structurally blind to `_chk`-rewritten
   `mem*`/`str*` misuse**, because it builds gcc-only at this box's fortify-3
   default and ASan's checks live in the interceptors, not in `__memcpy_chk`.
