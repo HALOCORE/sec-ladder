@@ -129,12 +129,19 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    reslice's bounds check, whose deletion needs `(i+1)·ncol <= nrow·ncol`, the
    nonlinear fact `lemma_mul_inequality` discharges. Not true of the constants,
    not a statement about safety in general.
-   **But p05 has no floor**, only successively lower best-found values: TASK_021
-   claimed a two-sided floor at `5·nrow + 6` from six flat R4 spellings, and the
-   review refuted it — all eight had decoded the header the shipped way, and
-   respelling *that* gives **13 in-contract R4 spellings, 11 distinct bodies,
-   every one cheaper**. Corrected floor `5·nrow + 11` (106/336); published high
-   by 14%/16%. Two "floors" on this pattern have now been broken; expect a third.
+   **But p05 has no minimum, and neither does any pattern.** Three were
+   published and all three refuted, each by the first lever the next agent
+   pulled: `5·nrow + 6` → `5·nrow + 11` (respell the header) → `5·nrow + 13`
+   (delete a redundant zero-check). Each had been reached by several independent
+   machine-code bodies, so **"reached by many spellings" is not evidence of a
+   floor**. And the quantity is unsound, not just unlucky: **`min(R3) − min(R4)`
+   is the difference of two upper bounds and bounds nothing in either
+   direction** — measured, the same edit is −2 on R4 and +1 on R3, and
+   `5·nrow + 13` *exceeds* the published `6·nrow + 9` for `nrow < 4`.
+   Publish the in-contract **pair interval** (`36…134 / 128…410`, with the
+   published 123/399 inside it) and, if one number is wanted, the fixed-R4
+   bound. **An admissible pair has a tax of exactly 0.00**, so p05 does not
+   support "safety costs something here" over free pairings.
 
 13. **p08, and the retraction it forced — safe Rust beat unsafe Rust on p05.**
    p08's own result is structural: overlapping `memcpy` is UB that safe Rust
@@ -370,31 +377,28 @@ it once, land the corrections, repeat** — and per `PROTOCOL.md` rule 9, write
 instance of the same mistake, and the correction is owed across the whole result
 set before more results are added to it:
 
-1. **Close the `source_sha256` generator gap (TASK_021's first line).** Third
-   sighting and now load-bearing: `patterns/*/inputs/gen.py` and `common/slb.py`
-   are outside the hash, and p16 §10a's swept laws are reproducible *only*
-   through `gen.py`. A generator edit that changed the sweep would move nothing
-   in any gate artefact. One line; costs one gate round.
-2. **p05 still has no in-contract spelling spread** — dropped from TASK_020 for
-   time. Three patterns have one (p02, p16, p17) and all three found their
-   published figure was an upper bound. p05's `6·nrow + 9` is quoted in
-   `.memory/01-ladder.md` finding 6 as though it were the number; until it has a
-   floor it is not. p01 and p08 owe one too.
-3. **p16 §10a's variant binaries are gitignored.** The *input* axis now ships,
-   but three of its four laws rest on `.temp/p18/` builds. Ship the variants
-   behind a committed generator, the way p08's `controls/` does.
-4. **A shipped p17 sweep.** p17 has **no sweep inputs at all**, which is how its
+1. **TASK_023 — the `idiom.why` sentence is false in all six patterns.** It says
+   `R3ship − R4ship` is an upper bound on the in-contract safety tax; it is one
+   **only while one rung is held fixed**, and p05 has an admissible pair whose
+   tax is exactly 0.00. The text is byte-identical across six declarations and
+   **hashed into `contract_sha256`**, so this is one cross-pattern edit and six
+   gate runs. Ride along: p16's `controls/gen_controls.py` docstring still says
+   p08's `#[path]` defect is unfixed, which TASK_022 fixed.
+2. **p01 and p08 still owe an in-contract spelling spread** — and after p05,
+   what they owe is an *interval*, not a minimum. Do not let either publish a
+   "floor"; four have been published across the project and four were refuted.
+3. **A shipped p17 sweep.** p17 has **no sweep inputs at all**, which is how its
    "+32 Ir/call flat" got published from two bands that both happen to have
    `nsuf = 3`. `.memory`'s own residue rule applied and was not followed. The
    review's `nsuf` 1–8 inputs are generated under `.temp/` and are not shipped.
-5. **p07 binary search** — `O(log n)`, almost pure per-call overhead with no
+4. **p07 binary search** — `O(log n)`, almost pure per-call overhead with no
    inner loop to amortise over, so any R3 cost shows up as a large *fraction*
    rather than a flat constant. Midpoint overflow `(lo+hi)/2` is p17's shape
    again: an arithmetic bug giving a wrong-but-in-bounds index.
-6. **p47 constant-time compare** — a third security axis, where the adversary is
+5. **p47 constant-time compare** — a third security axis, where the adversary is
    the **optimiser** and Verus cannot state the property at all. Expect it to
    defeat R5 in an interesting way; a documented R5 failure is a finding here.
-7. **p27+ raw pointers.** No longer "the only place the twin can earn its keep"
+6. **p27+ raw pointers.** No longer "the only place the twin can earn its keep"
    — p08 did that (mutant M2, the weakened `requires`, caught by the twin and by
    nothing else). p27 is now just the next hard proof.
 
