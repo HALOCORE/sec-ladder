@@ -88,7 +88,24 @@ supersede any earlier task report they contradict.
      `inf(R4) <= inf(R3)` **by construction**. Publishing two intervals tells a
      reader a theorem, not a measurement.
 
-  **Adopted policy (recommended by TASK_015_REVIEW, not yet implemented):**
+  **IMPLEMENTED at TASK_016.** The `idiom` key is required and hashed
+  (`check.py` stage `0b`, +145 lines, 8 selftests, nothing semantic); all six
+  patterns declare; all six gates green with `contract_sha256` moved in all six
+  and the invariant confirmed — **28/28 `md5_fn` and 564/564
+  `marginal_ir_per_call` cells unchanged**. Spelling-spread sections shipped for
+  p05 (§13), p16 (§10), p17 (§10). The manager's objection to putting the key in
+  the contract block was **wrong**: `contract_sha256` has already moved 3× on p01
+  and 4× on p02, so "unchanged since TASK_013" was recency, not an invariant.
+
+  **Residual, and it is an owed decision, not a defect:** p16 and p17 declare no
+  restriction on the fold/walk spelling, so their published R3 numbers are
+  spellings' numbers **by declaration** — and a cheaper *admissible* R3 exists
+  for both (p16's `split_first_chunk::<3>()` is `10·nrec + 9` cheaper than
+  shipped). Either swap those cells or state in each `NOTES.md` that the shipped
+  R3 is not the cheapest admissible one. Not done at TASK_016; no cell source
+  changed.
+
+  **Superseded design notes (kept because the argument matters):**
   a declared canonical idiom per pattern, with two amendments that answer the
   self-certification objection — **move the declaration into the hashed
   `slb-contract` block** as a required `"idiom": {"required": [...],

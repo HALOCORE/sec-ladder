@@ -224,6 +224,26 @@ mentions. Budget for them up front; each has cost an engineer a surprise.
    hit count, so it cannot drift, and (b) a `NOTES.md` section carrying the diff,
    the commands and the measured output. p17 §1c is the model.
 
+12. **The `slb-contract` block requires an `idiom` object** (TASK_016, gate stage
+   `0b`): `required` — a non-empty list of what every rung must spell out;
+   `forbidden` — spellings that would delete the pattern, **allowed to be empty**
+   but shouted when it is; `why` — non-empty prose. Unknown keys are rejected, so
+   a mistyped `forbid` cannot be silently empty. The gate checks **nothing
+   semantic** — it requires the key, prints it in the verdict, and hashes it, so
+   changing a rung's idiom must move `contract_sha256`.
+
+   This exists because the declaration used to be prose. p05's `spec.md` forbade
+   `chunks_exact` **by name** and two consecutive tasks measured it anyway and
+   published the result as p05's number — the pin was at line 69 and the hashed
+   block started at line 309. See `.memory/01-ladder.md` finding 14.
+
+13. **A spelling-spread section in `NOTES.md` is mandatory for any pattern with
+   more than one measured spelling.** At least two alternates per rung; the
+   shipped, contract-conformant cell marked; deltas given as laws where swept and
+   **flagged as interpolations where not**; and an explicit *"not the headline"*
+   line. The spread is a result **about method** — the number stays the
+   matched pair. p05 §13 (11 spellings), p16 §10 and p17 §10 are the models.
+
    The alternative — move the *specification* to match the mutant so it verifies
    `10 verified, 0 errors` with a load-bearing postcondition, giving "a program
    proved to meet its specification, whose specification is the bug" — is a

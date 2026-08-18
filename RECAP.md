@@ -326,36 +326,30 @@ it once, land the corrections, repeat** — and per `PROTOCOL.md` rule 9, write
 instance of the same mistake, and the correction is owed across the whole result
 set before more results are added to it:
 
-1. **Implement the declared-idiom policy (TASK_016) — decided, reviewed, and
-   now just work.** Finding 14 settled *what* to do; nothing has been built. Two
-   pieces: a required `"idiom"` key inside every pattern's hashed `slb-contract`
-   block (`required` / `forbidden` / `why`), and a **spelling-spread** section in
-   every `NOTES.md`, published as method and never as headline. The gate checks
-   the key is present and non-empty and hashes it — it must **not** try to check
-   the idiom semantically ("could this happen by accident?" says no).
-   Retrofit across six patterns: p05 and p17 have the prose already and need it
-   moved; p01, p02, p08, p16 need a paragraph each. **No cell source changes, so
-   no measured column can move**, but `contract_sha256` moves in all six and all
-   six gates re-run — about 12–15 minutes of machine time.
-   This is a `harness/check.py` change, so it needs the "could this happen by
-   accident?" test in writing before it lands, and its own review after.
-   **Two corrections ride along** (both need the gate re-run anyway):
-   `patterns/p08-overlap-move/spec.md:383` says "NOTES.md 7" and means §9 —
-   inside the hashed block, confirmed the only mis-targeted cross-reference in
-   `patterns/` out of 65 checked; and p16's and p17's `NOTES.md` carry R3
-   constants the review showed are residue- and `nsuf`-scaled.
-2. **A shipped p17 sweep.** p17 has **no sweep inputs at all**, which is how its
+1. **Review TASK_016** — the declared-idiom key is *built and green* (see State),
+   but it is a `harness/` change implementing the manager's own design, so
+   `PROTOCOL.md` rule 3 requires a different agent to attack it before it counts
+   as settled. Ask specifically whether the six declarations are honest
+   descriptions of what the rungs do, or post-hoc rationalisations of what they
+   happen to be — that is the failure mode a self-declared idiom has.
+2. **The cheaper-admissible-R3 decision, owed on p16 and p17.** Both declare no
+   restriction on the fold/walk spelling, so their published R3 numbers are
+   spellings' numbers **by declaration**, and a cheaper admissible R3 exists for
+   both (p16's `split_first_chunk::<3>()` is `10·nrec + 9` cheaper). Either swap
+   the cells or say in each `NOTES.md` that the shipped R3 is not the cheapest
+   admissible one. Do not invent a restriction to exclude it retroactively.
+3. **A shipped p17 sweep.** p17 has **no sweep inputs at all**, which is how its
    "+32 Ir/call flat" got published from two bands that both happen to have
    `nsuf = 3`. `.memory`'s own residue rule applied and was not followed. The
    review's `nsuf` 1–8 inputs are generated under `.temp/` and are not shipped.
-3. **p07 binary search** — `O(log n)`, almost pure per-call overhead with no
+4. **p07 binary search** — `O(log n)`, almost pure per-call overhead with no
    inner loop to amortise over, so any R3 cost shows up as a large *fraction*
    rather than a flat constant. Midpoint overflow `(lo+hi)/2` is p17's shape
    again: an arithmetic bug giving a wrong-but-in-bounds index.
-4. **p47 constant-time compare** — a third security axis, where the adversary is
+5. **p47 constant-time compare** — a third security axis, where the adversary is
    the **optimiser** and Verus cannot state the property at all. Expect it to
    defeat R5 in an interesting way; a documented R5 failure is a finding here.
-5. **p27+ raw pointers.** No longer "the only place the twin can earn its keep"
+6. **p27+ raw pointers.** No longer "the only place the twin can earn its keep"
    — p08 did that (mutant M2, the weakened `requires`, caught by the twin and by
    nothing else). p27 is now just the next hard proof.
 
@@ -367,13 +361,18 @@ clean" from "sanitiser cannot see". Both are in `.memory/06-catalogue.md`.
 
 ## State
 
-- `harness/` — `check.py` (16 stages incl. clause deletion, `requires` strength,
-  the verified twin, and region-actually-runs), `asm.py`, `dloop.py`, `vparse.py`,
-  `build.py`, `measure.py`, `report.py`, `fixture.py`. **4251 lines against six
+- `harness/` — `check.py` (17 stages: stage `0b` is the declared-idiom key,
+  added at TASK_016; plus clause deletion, `requires` strength, the verified
+  twin, and region-actually-runs), `asm.py`, `dloop.py`, `vparse.py`,
+  `build.py`, `measure.py`, `report.py`, `fixture.py`. **4396 lines against six
   patterns** — that ratio is why gate work needs the "could this happen by
-  accident?" test. **Unchanged across the whole of p08**, which is the intended
-  rate now the gate is frozen.
-- **Gate: p02, p16, p17, p05, p08 all `PASS` on complete runs** — each green on
+  accident?" test. It was unchanged across the whole of p08; TASK_016 added the
+  first 145 lines since the hardening arc closed, and that check passed the
+  accident test with the strongest answer any check here has had — the mistake
+  it prevents had already happened twice, to two different agents, in
+  consecutive tasks.
+- **Gate: all six re-run at TASK_016 and green** — p02, p16, p17, p05, p08
+  `PASS` — each green on
   its first full run. **p01 is `PASS-WITH-BLOCKED-ROWS`**: Miri is mandatory for
   any pattern with a trusted item and cannot finish p01's `large.bin` in 180 s,
   so 8 of 9 inputs are checked and the ninth is documented. Policy working, not a

@@ -382,6 +382,21 @@ alone, and this box cannot supply the wall-clock column to rescue it** — say t
 win is instruction-count-only and stop. A constant chunk size is a different
 measurement from a runtime one.
 
+### Two `Ir` conventions are in shipped patterns — always say which
+
+**PROVISIONAL — not yet reviewed (TASK_016).** p16's `NOTES.md` §2 quotes
+**callgrind kernel-exclusive `Ir` ÷ calls**; p05's and p17's quote
+**whole-program marginal** `Ir` (the `n_iters` difference `check.py` stage 3b
+uses). On p16 the offset is a uniform **+14.30** across all three rungs
+(R2 5095.0→5109.30, R3 3037.0→3051.30, R4 3010.0→3024.30), so every *difference*
+is unaffected and no published delta moves — but the absolutes are not
+comparable across patterns, and **nothing in the tree said so** until TASK_016
+measured it while reconciling an audit that had quoted both.
+
+Same shape as the two static-count conventions (`n_fn` vs `n_raw`), which
+TASK_014_REVIEW's own write-up mixed. Rule, identical in both cases: **say which
+convention a number is in, every time.**
+
 ## Timing protocol
 
 1. Pin to a single core with `taskset -c N`. Use the same core for a whole
