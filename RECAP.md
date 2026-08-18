@@ -15,9 +15,10 @@ Rust, unsafe Rust + Verus proof — plus a sixth **R1h** hardened-C cell, across
 optimisation levels and two inline modes, and compared on assembly, executed
 instructions, timing, proof burden and trusted-base size.
 
-47 patterns are catalogued in `.memory/06-catalogue.md`. **Four exist: p01
-(calibration), p02 (first real bug), p16 (first data-dependent bound), p17 (the
-limit of memory safety).**
+47 patterns are catalogued in `.memory/06-catalogue.md`. **Five exist, all green
+and all reviewed:** p01 (calibration), p02 (first real bug), p16 (first
+data-dependent bound), p17 (the limit of memory safety), p05 (the first
+vectorised kernel).
 
 ## The findings so far — this is the actual output
 
@@ -180,11 +181,20 @@ headline. Say so in every task file.
   what killed the O(n) claim.
 - **Say which columns a staleness argument covers.** "The kernels are identical so
   the numbers stand" was right about kernel columns, wrong about whole-binary ones.
+- **Residues bite at whatever width the codegen chose, and the round numbers are
+  the worst case.** p01 mod 4, p02 mod 16, p16 mod 4, p05 mod 8 with **residue 0
+  the outlier** — so every power-of-two dimension pays a full extra vector
+  iteration. The size a benchmark author reaches for first is the trap.
+- **`ns` is a measurement on this box; `cycles` is an inference.** The clock is
+  set by other tenants and spans ±15% even measured interleaved in one session.
+- **A finding needs a mechanism, not just a number.** "It vanished" was p05's
+  first answer; the real one was a hoisted trip-count computation and a surviving
+  scalar epilogue, and it changed the conclusion.
 
 ## Priority — read this before planning
 
-**Twelve tasks in, 3 of 47 patterns exist** — six tasks went to gate hardening
-before the user called it. The gate's threat model is **honest mistake, not
+**Fourteen tasks in, 5 of 47 patterns exist** — six tasks went to gate hardening
+before the user called it; every task since has produced or reviewed a pattern. The gate's threat model is **honest mistake, not
 malicious author** (`.memory/02-bench-rules.md`, top section, with the list of
 residuals we are deliberately leaving open). New gate work must pass "could this
 happen by accident?" first.
@@ -196,44 +206,66 @@ overclaim — which is the *right* place for review effort.
 
 ## Immediate queue
 
-The gate-hardening arc is **closed**. T010's review confirmed the gate accepts
-new patterns; T007 built one and it passed on the first complete run. The mode
-now is: build a pattern, review it once, land the corrections, repeat.
+The gate-hardening arc is **closed**. Four pattern tasks since have each gone
+green on the first complete run. The working mode is: **build a pattern, review
+it once, land the corrections, repeat** — and per `PROTOCOL.md` rule 9, write
+`.memory/` only *after* the review.
 
-1. **p17** (HTTP `Range`, mirrors CVE-2017-7529; LearnVeri port at
-   `../LearnVeri/microbench/CVE-2017-7529` to lift from). Needs harness work
-   before it can start: a struct result cannot pass through a C out-parameter
-   (`dloop._apply_call_args`), and `build.py` hard-codes three C TUs. **Also the
-   first pattern where the verified twin stops being idle** — p16's accessor was
-   single-clause, so its green twin check proved nothing; a multi-clause accessor
-   is where the mechanism earns its keep, and `.memory/02-bench-rules.md` records
-   that the twin has never been tested against a generic/method-shaped one.
-2. **Re-run `measure.py p02` once**, now that p16's `common/head1_u64_bytes` is
-   in place — the ordering condition in `.memory/06-catalogue.md` is satisfied.
-3. Then Wave 2 (p03–p10, bounds breadth). Open cross-cutting issues are listed at
-   the top of `.memory/06-catalogue.md`.
+**Order within a wave is chosen by "what would change a conclusion?", not by
+number** (`.memory/06-catalogue.md`, Sequencing). On that test the next pattern
+is **p08, overlapping `memmove`**, and the reasoning should survive compaction:
 
-Carry-overs from p16 worth landing opportunistically: its `inputs/gen.py
---sweep` blobs were never added to the pattern dir (the sweep evidence lives in
-`.temp/`), and eight minor findings from TASK_007_REVIEW are listed in
-`.tasks/TASK_007_REVIEW_REPORT.md` §F3–F10.
+1. **p08 is the only class where safe Rust's advantage is *compile-time* and is
+   *not* a bounds check** — the borrow checker rejects the aliasing outright. The
+   programme currently has p17 saying "Rust does not help here" and **nothing**
+   saying "Rust wins structurally, beyond bounds checking". That asymmetry will
+   read as bias in a writeup.
+   Known design problem, flagged in the catalogue: R2/R3 must use `copy_within`,
+   i.e. **a different algorithm** — which is not a flaw to hide but *is* the
+   finding, and the spec must say so rather than pretending the rungs match.
+   Overlap UB is also not caught by ASan, so it tests the gate's tooling too.
+2. **p07 binary search** — the natural test of what p05 just broke. p05 ended the
+   "R3 is free" streak with an `O(nrow)` cost; p07 is `O(log n)`, almost pure
+   per-call overhead with no inner loop to amortise over, so any R3 cost shows up
+   as a large *fraction*. Midpoint overflow `(lo+hi)/2` is also p17's shape again
+   — an arithmetic bug giving a wrong-but-in-bounds index.
+3. **p47 constant-time compare** — a third security axis, where the adversary is
+   the **optimiser** and Verus cannot state the property at all. Expect it to
+   defeat R5 in an interesting way; a documented R5 failure is a finding here.
+4. **p27+ raw pointers** — the only place the verified twin can finally earn its
+   keep (five patterns in, every trusted accessor has been single-clause, so the
+   mechanism has never been exercised on the case it was built for). If p27's
+   accessor is *also* single-clause, `PROTOCOL.md` says reopen the keep/delete
+   question.
+
+**One small carry-over**, cheap, fold into the next task's Part 0:
+p17's `spec.md` `obligations_note` is arithmetically wrong (its stated derivation
+predicts 6 for `main`; the measured value is 5, and p05's character-identical
+driver also measures 5). One JSON string, but it lives **inside the hashed
+contract block**, so it needs a `check.py p17` re-run to refresh the gate record.
 
 ## State
 
 - `harness/` — `check.py` (16 stages incl. clause deletion, `requires` strength,
   the verified twin, and region-actually-runs), `asm.py`, `dloop.py`, `vparse.py`,
-  `build.py`, `measure.py`, `report.py`, `fixture.py`. **4200 lines against three
-  patterns** — that ratio is why gate work now needs the "could this happen by
-  accident?" test.
-- p16 gate `PASS`, complete, first run. p02 `PASS`; **p01 `PASS-WITH-BLOCKED-ROWS`** — Miri is now mandatory for any
-  pattern with a trusted item and cannot finish p01's `large.bin` in 180 s. 8 of 9
-  inputs checked, ninth documented. Policy working, not a regression.
-- `results/p02-buffer-copy.json` is stale. Its precondition is now **met** —
-  p16's `common/head1_u64_bytes` has landed — so the single re-run is owed; see
-  `.memory/06-catalogue.md` for why the ordering mattered.
+  `build.py`, `measure.py`, `report.py`, `fixture.py`. **4251 lines against five
+  patterns** — that ratio is why gate work needs the "could this happen by
+  accident?" test. It has grown 42 lines in four pattern tasks, which is the
+  intended rate.
+- **Gate: p02, p16, p17, p05 all `PASS` on complete runs** — each green on its
+  first full run. **p01 is `PASS-WITH-BLOCKED-ROWS`**: Miri is mandatory for any
+  pattern with a trusted item and cannot finish p01's `large.bin` in 180 s, so 8
+  of 9 inputs are checked and the ninth is documented. Policy working, not a
+  regression — do not read an old `PASS` as equivalent.
+- `results/p02-buffer-copy.json` was re-measured at TASK_011; **that debt is
+  closed.** `binary_text_bytes` moved in 10 of 32 cells, all C, for a structural
+  reason worth knowing (`.memory/03-measurement.md`).
 - Toolchain: Verus `0.2026.08.09.92f466f`, rustc 1.97.1, clang/LLVM 22.1.6,
   valgrind 3.27.1, nightly+Miri, all in `~/tools`, no root. `TOOLCHAIN.md`.
-- Commits run through `c623b22`+. Tree clean.
+- **p05's `inputs/` holds ~189 MB of gitignored sweep blobs**, regenerable with
+  `gen.py --sweep`. Left in place because `rm` outside `.temp/` stalls on review;
+  delete by hand if the box gets tight (`df -h /`).
+- Commits run through `dea112c`. Tree clean.
 
 ## Decisions
 

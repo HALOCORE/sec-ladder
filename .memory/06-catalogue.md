@@ -42,7 +42,7 @@ for a too-weak trusted `requires` but *none*.
 gate hardening and 2 of 47 patterns existed. **It worked**: the two tasks since
 produced p16 and p17, each green on a complete run first try, each reviewed or
 awaiting one review — and p17 delivered the programme's first *negative* result
-about memory safety. 4 of 47 now exist. The gate's threat model is now
+about memory safety, and p05 the first causal link from proof to performance. 5 of 47 now exist. The gate's threat model is now
 explicitly *honest mistake, not malicious author* (`.memory/02-bench-rules.md`,
 top section, with the residuals we are deliberately leaving open). New gate work
 must pass "could this happen by accident?" first. **Produce patterns; review each

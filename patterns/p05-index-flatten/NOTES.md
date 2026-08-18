@@ -6,12 +6,35 @@
 > measurement that forced a one-token change to the design; §2 is the answer;
 > §3 is the decomposition that makes the answer attributable.
 
-**The one-line result.** *On a loop LLVM vectorises, the per-element cost of
-safe Rust's bounds check is **exactly 0.0000 Ir**, for the naive indexed
-spelling as well as the tuned one — and the identical loop with vectorisation
-switched off pays **exactly 4.2500 Ir per element**, reproducing p16's and p17's
-constant on a third kernel.* So the answer to the commissioning question is the
-opposite of the hypothesis: **the wider the lane, the cheaper safety gets.**
+**The one-line result.** *(Restated at TASK_013_REVIEW. Every number below
+reproduced exactly, including on shapes never measured — but the original
+one-liner, "the wider the lane, the cheaper safety gets", is **refuted**, and
+"0.0000 Ir per element" is true only of the vector steady state. What follows is
+the corrected statement; §12 carries the review's own measurements.)*
+
+**The bounds check does not vanish on a vectorised loop — it moves from
+per-element to per-row.** Inside the vector body it really is free: c-clang,
+safe-naive, safe-tuned, unsafe and verus all fold an element in **1.375000 Ir**,
+identical mnemonics, six decimals, two bands. But the check is **hoisted into a
+22-instruction per-row trip-count computation** and **survives in the scalar
+epilogue** at 8 Ir/element against R4's 5. The cost is `O(nrow)`, and on shipped
+inputs the average gap is ~34%.
+
+**Wider lanes make it worse, not better.** At AVX2 the gap at `ncol ≡ 0 (mod 32)`
+is **14601 Ir/call against SSE2's 4487** — ratio 1.42× → **4.58×** — and safe
+Rust is *absolutely slower* (18674 vs 15177). The scalar peel is one vector width
+long, so it grows with the lane.
+
+**And the commissioning hypothesis was right in one regime.** At `ncol = 8`, R2's
+vector guard is `N >= 9` where R4's is `ncol >= 8`, so there the check **does**
+block vectorisation, costing **2.94×**. p05 contains both regimes in one kernel.
+
+**Why the check cannot be eliminated, which is the deepest result here.** The
+kernel *already* checks `nrow*ncol <= avail`, so R2's panic is **dead on every
+execution**. LLVM cannot remove it because `nrow*ncol <= avail ⟹ i*ncol + j <
+avail` is **nonlinear** — and that is precisely the obligation R5 discharges,
+with `lemma_mul_inequality` and one `by (nonlinear_arith)`. **The per-row cost is
+the price of the optimiser failing the lemma the proof proves.**
 
 Four numbers, and none of them means anything alone. **R3 first**, per
 `.memory/01-ladder.md`'s standing rule — *lead with R3 or do not lead*, a rule
@@ -26,8 +49,26 @@ this project's own author has broken twice:
 | shipped `large`, Ir/call | **+4.7%** | +34.4% | — |
 | shipped `large`, wall clock | **+1.3%** | +30.5% | — |
 
-Read across the first two rows: **vectorisation is what makes the check free**,
-and the 4.25 Ir/element that p16 and p17 measured is still there underneath it.
+Read across the first two rows: vectorisation removes the check's *per-element*
+cost, and the 4.25 Ir/element that p16 and p17 measured is still there underneath
+it. **That 4.25 is not "the check" either**: p05's own `-unroll-count=1` control
+is a bit-for-bit no-op on R2 (`md5_fn 76d7c2380278`) and splits it
+**2.00 check + 2.25 foreclosed unroll** — the identical split TASK_007_REVIEW
+derived on p16, so the third reproduction is of the constant *and* its
+decomposition.
+
+⚠ **`+30.5%` in the last row is over-precise** — the review's independent
+remeasurement gives **+32.9%**. And **R3 is not free on this pattern**: +4.7% at
+shipped `large` but **+16.7% at `ncol = 8`**, an `O(nrow)` cost. The "R3 is free"
+streak ends at five patterns, not six.
+
+⚠ **The model below holds for `ncol > 8` only** (34755 measured against 41699
+predicted at 496×8), and it has **zero fitted parameters** when derived from the
+listings rather than fitted: `R4 = 37 + nrow·(27+11q+5r)`,
+`R3 = 46 + nrow·(33+11q+5r)`, `R2 = 72 + nrow·(56+11V+8e)`. `f` absorbs nothing.
+`f(0) = 84` is explained: `mov $0x8,%r11d ; cmove %r11,%r8` forces a remainder of
+**zero** to a full vector width, because R2's loop is multi-exit and must keep an
+epilogue — so every power-of-two `ncol` pays an extra vector iteration.
 Read down the third row: what survives vectorisation is a cost **per row**, not
 per element — a shape no earlier pattern in this project has produced, and one
 that makes the answer depend on `ncol mod 8`.

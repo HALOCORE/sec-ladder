@@ -51,17 +51,33 @@ register in all 16 `-O3` cells.
 
 ## The result
 
-**On the vectorised loop the bounds check costs exactly 0.0000 instructions per
-element — for the naive indexed spelling as well as the tuned one.** All of
-c-clang, safe-naive, safe-tuned, unsafe and verus fold an element in
-**1.375000** Ir (= 11 instructions / 8 elements, the SSE2 vector body); gcc, at a
-16-element body, in **1.062500**. Measured on zero-residue lag pairs, exact to
-six decimals, on two independent bands.
+*(Corrected at TASK_013_REVIEW — see `NOTES.md` §12. Every number here
+reproduced exactly; two framing claims did not survive.)*
+
+**Inside the vector body the bounds check is free.** c-clang, safe-naive,
+safe-tuned, unsafe and verus all fold an element in **1.375000** Ir (= 11
+instructions / 8 elements, the SSE2 vector body), with identical mnemonics; gcc,
+at a 16-element body, in **1.062500**. Zero-residue lag pairs, exact to six
+decimals, two independent bands.
+
+**But the check does not disappear — it moves.** It is hoisted into a
+22-instruction per-row trip-count computation and survives in the scalar
+epilogue at 8 Ir/element against R4's 5. The cost is `O(nrow)`; the average gap
+on shipped inputs is ~34%. **And wider lanes make it worse**: at AVX2 the gap is
+**4.58×** against SSE2's 1.42×, with safe Rust absolutely slower, because the
+scalar peel is one vector width long.
 
 **Switch the vectoriser off and the same rungs pay 4.2500 Ir per element** —
-p16's and p17's constant, reproduced on a third kernel and the first one whose
-fold is not a Horner chain. So the mechanism is named by construction:
-*vectorisation is what makes the check free.*
+p16's and p17's constant, on a third kernel and the first whose fold is not a
+Horner chain. p05's own no-op control splits it further: **2.00 check + 2.25
+foreclosed unroll**, the same split derived on p16.
+
+**Why the check survives at all is the deepest result here.** The kernel already
+checks `nrow*ncol <= avail`, so the panic is dead on every execution — but LLVM
+cannot eliminate it, because `nrow*ncol <= avail ⟹ i*ncol + j < avail` is
+**nonlinear**, which is exactly the obligation R5 discharges with
+`lemma_mul_inequality`. **The cost of safety here is the price of the optimiser
+failing the lemma the proof proves.**
 
 What survives vectorisation is a cost **per row**, not per element:
 
@@ -71,16 +87,21 @@ R3 - R4  =   9  +  nrow * 6
 ```
 
 fitted on two `nrow` bands (128 points, zero residual) and **predicting a third,
-held-out band to 0.0000 Ir over 16 points**. Note `f(0) = 84` against
-`f(1) = 32`: LLVM peels a checked 8-element epilogue for R2 exactly where R4 has
-none, so the answer depends on `ncol mod 8` by a factor of 2.6 — the residue
-trap of `.memory/01-ladder.md` finding 3, at a vector width this time.
+held-out band to 0.0000 Ir over 16 points** — and derivable from the listings
+with **zero fitted parameters**, so `f` absorbs nothing. Domain: `ncol > 8`.
+`f(0) = 84` against `f(1) = 32` is explained by
+`mov $0x8,%r11d ; cmove %r11,%r8`: a remainder of **zero is forced to a full
+vector width**, because R2's loop is multi-exit and must keep a scalar epilogue.
+**Every power-of-two `ncol` therefore pays an extra vector iteration it does not
+need** — the residue trap of `.memory/01-ladder.md` finding 3, at a vector width.
 
 **And here the instructions become time.** p16 measured +72% `Ir` → +0.27% time
 and said the null was a property of its latency-bound chain. p05 measures
-**+34.4% `Ir` → +30.5% time** on `large`, because independent vector lanes leave
-no idle issue slots for the check to fill. R3 stays free: +4.7% `Ir`, +1.3%
-time, for the sixth pattern running.
+**+34.4% `Ir` → +32.9% time** on `large` (the review's remeasurement; the
+delivered +30.5% was over-precise), because independent vector lanes leave no
+idle issue slots for the check to fill. **R3 is not free here**: +4.7% `Ir` at
+`large` but **+16.7% at `ncol = 8`** — an `O(nrow)` cost, and the end of the
+"R3 is free" streak at five patterns.
 
 R4 and R5 are **byte-identical at `-O3`** (`md5_fn 4a28657ae7e4`) — the first
 time this project's byte-identity result covers a vectorised kernel, a scalar
