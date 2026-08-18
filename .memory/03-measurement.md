@@ -384,18 +384,34 @@ measurement from a runtime one.
 
 ### Two `Ir` conventions are in shipped patterns — always say which
 
-**PROVISIONAL — not yet reviewed (TASK_016).** p16's `NOTES.md` §2 quotes
-**callgrind kernel-exclusive `Ir` ÷ calls**; p05's and p17's quote
-**whole-program marginal** `Ir` (the `n_iters` difference `check.py` stage 3b
-uses). On p16 the offset is a uniform **+14.30** across all three rungs
-(R2 5095.0→5109.30, R3 3037.0→3051.30, R4 3010.0→3024.30), so every *difference*
-is unaffected and no published delta moves — but the absolutes are not
-comparable across patterns, and **nothing in the tree said so** until TASK_016
-measured it while reconciling an audit that had quoted both.
+p16's `NOTES.md` §2 quotes **callgrind kernel-exclusive `Ir` ÷ calls**; p05's and
+p17's quote **whole-program marginal** `Ir` (the `n_iters` difference `check.py`
+stage 3b uses). Nothing in the tree said so until TASK_016 measured it while
+reconciling an audit that had quoted both.
+
+**The offset is NOT uniform, and three published p16 deltas do move.** TASK_016
+reported "+14.30 on every rung, so no difference is affected"; TASK_016_REVIEW
+measured the per-rung offsets from the committed gate record and refuted it:
+
+| rung | offset | rung | offset |
+|---|---:|---|---:|
+| c-gcc, c-gcc-h | **+15.72** | R2 / R3 / R4 | +14.30 |
+| c-clang, c-clang-h | **+14.72** | R5 verus | **+13.30** |
+
+so the deltas that cross a *convention boundary* move:
+
+- **`R5 − R4`: 0 → −1.00.** R4 and R5 are byte-identical binaries (`md5_raw`
+  equal), so their kernel-exclusive counts cannot differ — the −1.00 is the
+  driver's, and it is a fact about the whole-program measurement, not about the
+  proof. **Finding 1 rests on the raw-byte identity oracle, not on this number**;
+  quote the `md5` when saying a proof costs zero.
+- **`R4 − c-clang`: −17/−37 → +16.58/+36.58** — the sign flips.
+- **`R4 − c-gcc`: +1052/+8896 → −1053.42/−8897.42** — the sign flips.
 
 Same shape as the two static-count conventions (`n_fn` vs `n_raw`), which
-TASK_014_REVIEW's own write-up mixed. Rule, identical in both cases: **say which
-convention a number is in, every time.**
+TASK_014_REVIEW's own write-up mixed. Rule, in both cases and now with teeth:
+**say which convention a number is in, every time — a cross-rung delta is only
+meaningful inside one convention.**
 
 ## Timing protocol
 

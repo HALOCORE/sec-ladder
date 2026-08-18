@@ -326,18 +326,29 @@ it once, land the corrections, repeat** — and per `PROTOCOL.md` rule 9, write
 instance of the same mistake, and the correction is owed across the whole result
 set before more results are added to it:
 
-1. **Review TASK_016** — the declared-idiom key is *built and green* (see State),
-   but it is a `harness/` change implementing the manager's own design, so
-   `PROTOCOL.md` rule 3 requires a different agent to attack it before it counts
-   as settled. Ask specifically whether the six declarations are honest
-   descriptions of what the rungs do, or post-hoc rationalisations of what they
-   happen to be — that is the failure mode a self-declared idiom has.
-2. **The cheaper-admissible-R3 decision, owed on p16 and p17.** Both declare no
-   restriction on the fold/walk spelling, so their published R3 numbers are
-   spellings' numbers **by declaration**, and a cheaper admissible R3 exists for
-   both (p16's `split_first_chunk::<3>()` is `10·nrec + 9` cheaper). Either swap
-   the cells or say in each `NOTES.md` that the shipped R3 is not the cheapest
-   admissible one. Do not invent a restriction to exclude it retroactively.
+1. **TASK_017 — repair what the idiom key claims, and three declaration
+   defects.** The key is built and green, but TASK_016_REVIEW **proved by
+   experiment** that its advertised mechanism is false: it forked p05, swapped
+   in the *forbidden* `chunks_exact` rung, and got `PASS` with
+   `contract_sha256` **byte-identical**. `read_contract()` hashes `spec.md`'s
+   block, not the rungs. Four repairs, all needing one gate re-run each:
+   - the false sentence, in `harness/check.py:564-566` and `TASK_016.md` — say
+     what the key *does* buy (weakening the declaration moves the hash; the
+     declaration is printed) and stop claiming what it does not;
+   - **p16's hashed block contradicts itself** (`spec.md:269` vs `:278`), so its
+     `required[0]` must be disambiguated before any p16 R3 decision;
+   - **p02's `required[0]` and `[3]` are false of its own R1** — p16 and p17
+     carve R1 out of their declarations and p02, retrofitted the same day, does
+     not;
+   - p05's retrofit dropped the "`nrow * ncol` is folded into the result"
+     bullet that p16 and p17 both kept.
+   Consider also printing `forbidden` in the failure summary and in
+   `report.py`'s tables — it prints no `idiom` at all today.
+2. **State the limitation on p16 and p17's R3, swap neither cell** — adjudicated
+   at TASK_016_REVIEW. p17's cheaper spelling also beats its own R4, so swapping
+   R3 alone re-commits the unmatched-pair defect as a shipped cell, and
+   `inf(R4) <= inf(R3)` means no swap terminates. p16's premise is broken until
+   item 1 lands.
 3. **A shipped p17 sweep.** p17 has **no sweep inputs at all**, which is how its
    "+32 Ir/call flat" got published from two bands that both happen to have
    `nsuf = 3`. `.memory`'s own residue rule applied and was not followed. The

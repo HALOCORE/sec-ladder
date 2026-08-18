@@ -88,22 +88,49 @@ supersede any earlier task report they contradict.
      `inf(R4) <= inf(R3)` **by construction**. Publishing two intervals tells a
      reader a theorem, not a measurement.
 
-  **IMPLEMENTED at TASK_016.** The `idiom` key is required and hashed
-  (`check.py` stage `0b`, +145 lines, 8 selftests, nothing semantic); all six
-  patterns declare; all six gates green with `contract_sha256` moved in all six
-  and the invariant confirmed — **28/28 `md5_fn` and 564/564
-  `marginal_ir_per_call` cells unchanged**. Spelling-spread sections shipped for
-  p05 (§13), p16 (§10), p17 (§10). The manager's objection to putting the key in
-  the contract block was **wrong**: `contract_sha256` has already moved 3× on p01
-  and 4× on p02, so "unchanged since TASK_013" was recency, not an invariant.
+  **IMPLEMENTED at TASK_016 — and its advertised mechanism is FALSE, proved by
+  experiment at TASK_016_REVIEW.** The key is required and hashed (`check.py`
+  stage `0b`, +145 lines, 8 selftests, nothing semantic); all six patterns
+  declare; all six gates green, `contract_sha256` moved in all six, invariant
+  confirmed (**28/28 `md5_fn`, 564/564 `marginal_ir_per_call` cells unchanged**).
+  Spelling-spread sections shipped for p05 (§13), p16 (§10), p17 (§10).
 
-  **Residual, and it is an owed decision, not a defect:** p16 and p17 declare no
-  restriction on the fold/walk spelling, so their published R3 numbers are
-  spellings' numbers **by declaration** — and a cheaper *admissible* R3 exists
-  for both (p16's `split_first_chunk::<3>()` is `10·nrec + 9` cheaper than
-  shipped). Either swap those cells or state in each `NOTES.md` that the shipped
-  R3 is not the cheapest admissible one. Not done at TASK_016; no cell source
-  changed.
+  **What it does not do.** `check.py`, `TASK_016.md` and this file all claimed
+  *"changing a rung's idiom must move `contract_sha256`"*. It must not:
+  `read_contract()` hashes `spec.md`'s fenced block and nothing else. The review
+  forked p05, swapped `safe_tuned.rs` for the **forbidden** `chunks_exact`
+  variant, and got **`PASS`, `complete_run: true`, `failures: []`, with
+  `contract_sha256` byte-identical to the shipped one** — the gate certifying
+  `R3 − R4 = −12/−58`, the retracted "safe beats unsafe", as green p05. The
+  declaration was printed three lines above the PASS and changed nothing.
+
+  **What it actually buys**, which is narrower and still worth having:
+  *weakening the declaration* moves the hash, and the declaration is visible in
+  the verdict. The rung sources are covered by `source_sha256`, not by this key.
+  Nothing here prevents a forbidden respelling and nothing can without semantic
+  checking, which the threat model forbids. **Say that, rather than the false
+  mechanism sentence.** `report.py` prints no `idiom` at all, so
+  `results/tables/*.md` carries none.
+
+  The manager's objection to putting the key in the contract block was
+  separately **wrong**: `contract_sha256` has already moved 3× on p01 and 4× on
+  p02, so "unchanged since TASK_013" was recency, not an invariant.
+
+  **Residual, adjudicated at TASK_016_REVIEW: state the limitation, swap
+  neither cell.** p17's cheaper spelling is genuinely admissible under its
+  declaration — but it also beats **its own R4** by 19.00, so swapping R3 alone
+  would re-commit TASK_014/015's unmatched-pair defect *as a shipped cell*, and
+  `inf(R4) <= inf(R3)` means no swap ever terminates. p16's case is **not even
+  well-posed**: its hashed block contradicts itself, requiring `end - p >= 3`
+  and `vlen > end - (p+3)` "in every rung" at `spec.md:269` while asserting at
+  `:278` that `split_first_chunk::<3>()` — which contains **neither**
+  comparison — is admissible. Disambiguate `required[0]` before deciding
+  anything downstream of it.
+
+  Declining to add a p16 restriction that would have excluded the cheaper
+  spelling retroactively was **right**, and the reason generalises: **a
+  `forbidden` entry chosen after seeing which spelling is cheaper is
+  self-certification in its purest form.**
 
   **Superseded design notes (kept because the argument matters):**
   a declared canonical idiom per pattern, with two amendments that answer the
