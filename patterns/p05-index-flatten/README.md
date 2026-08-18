@@ -84,6 +84,22 @@ the price of the indexed and hand-resliced spellings; `data.chunks_exact(ncol)`
 pays none of it and needs no lemma. The sentence is true of the **obligation**
 and false as a statement about safety.
 
+**REINSTATED at TASK_021_REVIEW, restricted to the row-scaled term — these
+words and no wider** (identical in `NOTES.md` §1 and `.memory/01-ladder.md`
+finding 6):
+
+> **"On p05, the `O(nrow)` part of the in-contract safety tax is the price of
+> the optimiser failing the lemma the proof proves."**
+
+True of *this kernel*, *this declaration* and *this toolchain*, and of the
+**row-scaled term only**: the in-contract respelling removes exactly one
+instruction per row — `add %rsi,%rax`, the `add` that makes the row base
+buffer-absolute — and the five that survive are the reslice's bounds check,
+whose deletion needs `(i+1)·ncol <= nrow·ncol`, the nonlinear fact R5 discharges
+with `lemma_mul_inequality`. It is **not** true of the constants, which move in
+*both* rungs and by *different* amounts, and it is **not** a statement about
+safety in general.
+
 What survives vectorisation is a cost **per row**, not per element:
 
 ```
@@ -134,21 +150,42 @@ terms either: one more unsafe round (`while rp < end`) makes it **`nrow + 9`**,
 (+16.7% at 496×8, +4.7% at `large`), and `NOTES.md` §13 publishes all eleven
 measured spellings as a result about *method*.
 
-**And that number is an UPPER BOUND, measured at TASK_021** (`NOTES.md` §14).
-Inside the declaration the shipped R3 is beaten under *both* readings of
-`required[1]`: seven textually independent in-contract respellings reach
-**`5·nrow + 6`** with zero residual over 179 sweep points (14 values of `nrow`,
-all eight `ncol` residues mod 8), so the published figure is high by `nrow + 3`
-— 18% at `small`, 17% at `large`. Two things make p05's case different from
-p16's and p17's. The **qualitative** claim survives: same functional form, same
-sign, still `O(nrow)`, and only 21%/18% of the published tax lives in unpinned
-spelling against p16's 44%/55%. And the floor is **two-sided** — six in-contract
-*unsafe* spellings, four distinct machine-code bodies, **zero** difference in
-executed instructions at all 179 points — where p16's and p17's floors are
-R3-side bounds with an unsearched R4. The one instruction per row that the
-respelling removes is the `add` that makes the row base buffer-absolute; the
-five that survive are the reslice's bounds check, and the fact that would delete
-them is the nonlinear one R5 discharges with `lemma_mul_inequality`.
+**And that number is the *shipped pair's*, not a bound on the in-contract tax**
+(`NOTES.md` §14, measured at TASK_021 and corrected twice since). Inside the
+declaration the shipped R3 is beaten under *both* readings of `required[1]`:
+seven textually independent in-contract respellings reach **`5·nrow + 6`
+against the shipped R4** with zero residual over 179 sweep points (14 values of
+`nrow`, all eight `ncol` residues mod 8), so the published figure overstates
+*that* pairing by `nrow + 3`. That is the claim that has held; three others have
+not.
+
+**p05 has no measured in-contract minimum, and this file will not quote one.**
+Three have been published as one and all three were overturned by the next
+search — `5·nrow + 6` (TASK_021, 8 unsafe spellings searched), `5·nrow + 11`
+(TASK_021_REVIEW, 28), `5·nrow + 13` (TASK_022, 46) — every time by respelling
+one more thing in the *unsafe* rung's prologue, every time on the first lever
+the next agent pulled, and every time the refuted value had been reached by
+several independent machine-code bodies, which is the evidence that kept being
+mistaken for a floor. `min(R3 found) − min(R4 found)` is the difference of two
+upper bounds and bounds nothing in either direction. What is quotable is the
+**interval**: over the in-contract pairs searched the tax runs `2·nrow − 2` …
+`6·nrow + 20` — **36 … 134 at `small`, 128 … 410 at `large`** — with the
+published 123 / 399 *inside* it, and 80% / 71% of the published figure living in
+spelling the declaration does not pin (against p16's 44% / 55%). At `nrow = 1`
+the bottom of that interval is **exactly 0**, measured: there is an admissible
+pair on which safe and unsafe cost the same instruction count.
+
+**The shape survives all three revisions under one stated pairing**, and that
+is the durable part: cheapest R3 found against cheapest R4 found, p16's reading
+of `required[1]`, gives `5·nrow + b` with only `b` moving (6 → 11 → 13) — same
+functional form, same sign, still `O(nrow)`, coefficient still 5. Over *free*
+in-contract pairings the coefficient ranges from 2 to 6, so it is a property of
+the pairing convention and not of the pattern. The one instruction per row
+that the respelling removes is the `add` that makes the row base buffer-absolute;
+the five that survive are the reslice's bounds check, and the fact that would
+delete them is the nonlinear one R5 discharges with `lemma_mul_inequality`. No
+in-contract spelling searched removes those five; an *out-of-contract* linear
+row index removes 2 of them.
 
 `chunks_exact`'s advantage is
 also `Ir`-only on `small` — it emits a hardware `div` per call that callgrind

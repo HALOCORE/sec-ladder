@@ -80,8 +80,18 @@ the pin decided 0 of 3 variants before and 3 of 3 after.
   sides. The pin is what makes the spread finite and searchable.
 
 **So: a pinned idiom makes the admissible class DECIDABLE, not SINGULAR — and
-therefore `R3ship − R4ship` is an UPPER BOUND on the in-contract safety tax,
-never the tax.** Report the in-contract spread beside every headline.
+therefore `R3ship − R4ship` is an upper bound on the in-contract safety tax
+ONLY WHILE ONE RUNG IS HELD FIXED.** That qualification is not decoration: with
+*both* rungs free to be respelled, p05 has an admissible pair whose tax is
+**exactly 0**, so the unqualified sentence is **false**. It is currently written
+unqualified in all six patterns' `idiom.why`, hashed into `contract_sha256`
+(TASK_022 flagged it and correctly did not touch it; it is a cross-pattern
+decision).
+
+**And do not replace it with `min(R3) − min(R4)`** — that is the difference of
+two upper bounds and bounds nothing in either direction. Report the in-contract
+**pair interval** beside every headline, plus the fixed-R4 bound if a single
+number is wanted.
 
 **How to tell a legitimate declaration edit from self-certification — the
 direction test (TASK_019).** The obvious guard is *provenance*: "this edit was
@@ -795,23 +805,36 @@ is a much stronger claim than any p01 could produce.
    move in *both* rungs and by different amounts, and **not** a statement about
    safety in general.
 
-   **And p05 has no floor — only a succession of best-found values, two of which
-   have already been broken.** TASK_021 reported a "two-sided floor" of
-   `5·nrow + 6` on the ground that six in-contract R4 spellings gave one
-   instruction count. **Refuted**: all eight of its R4 spellings decoded the
-   header the shipped way, so the flatness was an artefact of respelling *one
-   rung*. The review found **13 in-contract R4 spellings, 11 distinct `md5_fn`
-   bodies, every one cheaper than shipped R4** (cheapest: two unaligned
-   `*const u16` header reads). Corrected figures: floor **`5·nrow + 11`** =
-   **106 / 336**, so the published `6·nrow + 9` is high by `nrow − 2`, i.e.
-   **14% / 16%** — not the 18%/17% first reported. Do **not** write "two-sided"
-   or "zero R4 spread" anywhere.
+   **p05 has no minimum, and this project should stop publishing one.** Three
+   have now been published and all three refuted, each by the first lever the
+   next agent pulled: `5·nrow + 6` (TASK_021) → `5·nrow + 11` (TASK_021_REVIEW,
+   which respelled the header) → `5·nrow + 13` (TASK_022, which deleted a
+   semantically redundant `nrow == 0 || ncol == 0` early return, worth 7 Ir/call
+   flat against shipped R4). Each was reached by **several independent `md5_fn`
+   bodies**, so — and this is the transferable lesson — **"reached by many
+   spellings" is not evidence of a floor.**
 
-   **The number is also reading-dependent**, which the earlier write-up stated
-   unconditionally: under p05's `required[1]` read as p16's is, the floor is
-   `5·nrow + 11` (106/336); under the strict reading it is
-   `min(6·nrow + 11, 5·nrow + 17)` (112/342). The *qualitative* claim survives
-   both. See `patterns/p05-index-flatten/NOTES.md` §14.
+   Worse, the quantity itself is unsound: **`min(R3 found) − min(R4 found)` is
+   the difference of two upper bounds and bounds nothing in either direction.**
+   Two measured consequences on p05:
+   - the same edit is **−2 on R4 and +1 on R3**, so the constant does not cancel;
+   - `5·nrow + 13` **exceeds** the published `6·nrow + 9` for `nrow < 4`, so a
+     "minimum" can sit above the published number on 3 of 14 `nrow` values.
+
+   **What to publish instead.** The in-contract *pair interval*,
+   `2·nrow − 2 … 6·nrow + 20` = **36…134 / 128…410**, with the published
+   123 / 399 inside it — and, separately, the one real bound: **hold R4 at the
+   shipped cell**, and `6·nrow + 9` bounds `inf(R3) − R4ship` from above, with
+   `5·nrow + 6` tighter.
+
+   **And an admissible pair exists whose tax is exactly 0** (`nrow = 1`,
+   `ncol ≢ 0 mod 8`; `sweep-r1c30` measures **0.00**). So p05 does not support
+   "safety costs something here" over free pairings at all.
+
+   **The number is also reading-dependent**, which an earlier write-up stated
+   unconditionally: p05's `required[1]` read as p16's is gives one figure, the
+   strict reading another. The *qualitative* claim survives both. See
+   `patterns/p05-index-flatten/NOTES.md` §14.
 
    **Two things that stand unchanged:** `Ir` converts to time on this kernel
    (+34.4% `Ir` → **+32.9%** wall — the review's own remeasurement; the delivered

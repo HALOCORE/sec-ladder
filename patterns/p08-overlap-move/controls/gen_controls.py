@@ -39,6 +39,18 @@ The three, and what each is for:
 
 Nothing here is built by `harness/build.py` and nothing here is measured. The
 commands to run each are printed at the end.
+
+**The `#[path]` rewrite, fixed at TASK_022.** The two derived controls used to
+keep the shipped `#[path = "../../common/driver.rs"]`. The generated file sits
+*three* levels under the repo root (`.temp/p08/controls/`) where the shipped
+source sits two (`patterns/p08-overlap-move/`), so that path resolved to
+`.temp/common/driver.rs` — a gitignored copy of `common/` that happens to exist
+on this box and is byte-identical to the real one today. The controls therefore
+compiled **by luck**, and on a fresh clone they would not compile at all
+(TASK_021_REVIEW clean negative 9). `PATH_FIX` below rewrites it to
+`../../../common/driver.rs`, the real file that `source_sha256` hashes, and it
+is asserted like every other substitution so it cannot silently stop matching.
+p16's generator has done this since it landed; this is the same fix.
 """
 
 import os
@@ -49,19 +61,27 @@ PDIR = os.path.dirname(HERE)
 REPO = os.path.dirname(os.path.dirname(PDIR))
 OUT = os.path.join(REPO, ".temp", "p08", "controls")
 
+#: shipped -> generated. The generated file sits three levels under the repo
+#: root, the shipped one two, so the relative `#[path]` needs one more `..`.
+#: Applied to every *derived* control; asserted like any other substitution.
+PATH_FIX = ('#[path = "../../common/driver.rs"]',
+            '#[path = "../../../common/driver.rs"]')
+
 
 def sub(src_name, out_name, pairs, header=None):
     """Copy `src_name` from the pattern dir to OUT with exact-string
-    substitutions, asserting each pattern occurs exactly once."""
+    substitutions, asserting each pattern occurs exactly once. `PATH_FIX` is
+    applied to every derived control and asserted the same way."""
     s = open(os.path.join(PDIR, src_name)).read()
-    for old, new in pairs:
+    for old, new in [PATH_FIX] + list(pairs):
         n = s.count(old)
         assert n == 1, f"{out_name}: {n} hits (want 1) for {old!r}"
         s = s.replace(old, new)
     if header:
         s = header + s
     open(os.path.join(OUT, out_name), "w").write(s)
-    print(f"  {out_name:20s} <- {src_name} ({len(pairs)} substitution(s))")
+    print(f"  {out_name:20s} <- {src_name} "
+          f"({len(pairs)} substitution(s) + the #[path] rewrite)")
 
 
 # ---------------------------------------------------------------------------

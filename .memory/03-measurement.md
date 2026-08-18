@@ -480,6 +480,20 @@ took four tasks and two wrong numbers** — see the box below. Do not read
 such a drift as a code change, and do not quote p08's marginals to more
 precision than that.
 
+### Gate records carry per-run noise — subtract it before claiming a leaf moved
+
+Measured at TASK_022 on unchanged trees, two consecutive runs:
+
+- **p05: 4 leaves.** The `adversarial-dims` heap-OOB stdout for c-gcc and
+  c-clang (genuinely nondeterministic — it reads past the allocation), plus two
+  ASan PID/ASLR diagnostic strings.
+- **p08: 8 leaves.** `marginal_ir_per_call` on the `O0`/`whole` rows, all ±0.02.
+
+**TASK_021_REVIEW's clean negative 6 attributed exactly those 8 p08 leaves to an
+edit.** They move on an unrelated edit too, so they are run noise, not an effect.
+Any "N leaves moved" demonstration must subtract these first — the technique is
+otherwise sound and is how the `source_sha256` gap was proved closed.
+
 ## Timing protocol
 
 1. Pin to a single core with `taskset -c N`. Use the same core for a whole
