@@ -138,9 +138,29 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    instructions per call cheaper than the unsafe rung**, exactly, on every input,
    with identical output on all 150 committed p05 inputs. p05's shipped R3
    reslices by hand and pays `6·nrow + 9`. **Three patterns have now priced a
-   spelling as safety's cost** (p02, p16, p05), so the rule gained a corollary:
-   never publish a safety-cost claim without the *best* R3 — write two
-   independent spellings and quote the cheaper.
+   spelling as safety's cost** (p02, p16, p05).
+
+14. **Every rung is a spelling — and this is now the programme's central
+   methodological result.** (TASK_015. **PROVISIONAL — not yet reviewed.**) The
+   audit ran the "is there a cheaper idiomatic spelling?" test across p05, p16
+   and p17: **all three shipped R3s are beaten**, and each beater is also
+   cheaper than **its own R4**. Then the control nobody had thought to run —
+   apply the same consumed-slice idiom to the *unsafe* rung — and **unsafe goes
+   back on top**: p05 **+11.00 Ir/call, flat** (nrow 19/41/65 all exactly +11,
+   so `O(1)` not `O(nrow)`), p16 `nrec + 3`. **"Safe Rust beat unsafe Rust" was
+   an idiom mismatch, not a language fact.**
+   On p05 the spread across four safe spellings — `35 + nrow·(29+3r)`,
+   `6·nrow + 9`, `nrow + 7`, `−nrow + 7` — is **larger than the safe-vs-unsafe
+   gap itself**. So "write two spellings and quote the cheaper" is not enough
+   either; the rule that follows is **compare idiom-matched rungs, or publish
+   the spread rather than a cell.** A single number per rung measures the author
+   unless every rung was written the same way — and the project's reporting
+   format does not yet reflect that.
+   The p05 R3 swap was specced and **declined on this evidence**, which is the
+   right call: it would have installed a headline that ten lines of control
+   refute. Also measured: `chunks_exact` with a runtime chunk size emits a
+   hardware `div` that callgrind prices at **1 Ir**, so its win is
+   instruction-count-only — interleaved ns says +0.47% where `Ir` says −0.87%.
 
 ## Retracted — do not reinstate
 
@@ -275,14 +295,16 @@ it once, land the corrections, repeat** — and per `PROTOCOL.md` rule 9, write
 instance of the same mistake, and the correction is owed across the whole result
 set before more results are added to it:
 
-1. **The R3 audit (TASK_015).** Land `chunks_exact` as p05's R3 — the review's
-   variant is in `.temp/review014/p05lin/` and is **not gate-ready** (needs
-   static identity, the `O0`/`whole` cells, `spec.md` pins, a re-measure) — and
-   then run the same "is there a cheaper idiomatic spelling?" audit against
-   **p16 and p17**, whose R3 numbers are load-bearing in findings 9 and 11 and
-   have never had a second spelling written. This is the cheapest way to stop
-   the fourth retraction. **Do not let it turn into a rewrite of every pattern**:
-   two spellings per pattern, quote the cheaper, move on.
+1. **Decide the reporting policy — the question finding 14 opened, and the
+   biggest open item in the programme.** The audit is *done* (TASK_015): all
+   three shipped R3s are beaten, each beater beats its own R4, and an
+   idiom-matched R4′ puts unsafe back on top at +11 flat. What is owed is **one
+   policy, decided once and applied uniformly** — idiom-matched rung pairs, a
+   published spread per rung, or a declared canonical idiom per pattern — not
+   three more one-off swaps. This blocks the writeup and shapes every remaining
+   pattern, so settle it before adding results to a format that may change.
+   **It needs a review first**: the R4′ control now carries the conclusion and
+   is its author's own design (`PROTOCOL.md` rule 3).
 2. **p07 binary search** — `O(log n)`, almost pure per-call overhead with no
    inner loop to amortise over, so any R3 cost shows up as a large *fraction*
    rather than a flat constant. Midpoint overflow `(lo+hi)/2` is p17's shape

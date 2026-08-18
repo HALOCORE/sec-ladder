@@ -126,6 +126,20 @@ is a much stronger claim than any p01 could produce.
      spellings and quote the cheaper.** The iterator/slice-consuming forms
      (`chunks_exact`, `split_at`, `iter().zip()`) are the ones that keep winning,
      because they hand the optimiser a length it does not have to re-derive.
+   - **…and that rule is still not enough. PROVISIONAL — not yet reviewed
+     (TASK_015).** The audit measured **four** safe spellings of p05's kernel —
+     `+35 + nrow·(29+3r)`, `+6·nrow + 9`, `+nrow + 7`, `−nrow + 7` — and **the
+     spread across them is larger than the safe-versus-unsafe gap itself.**
+     Quoting "the cheaper of two" still publishes a number that the third
+     spelling moves. Worse, **R4 is a spelling too**, and the audit's R4′ control
+     put unsafe back on top on both p05 and p16.
+
+     So the rule that actually follows is: **compare idiom-matched rungs, or
+     publish the spread rather than a cell.** A single number per rung is only
+     meaningful when every rung was written the same way; otherwise the ladder is
+     measuring the author, not the language. This is the most important
+     methodological result the project has, and it is not yet reflected in the
+     reporting format — see `.memory/06-catalogue.md`.
 
    Reproduced on p01 at TASK_002, with the residue effect measured properly this
    time (16 window lengths, `inputs/gen.py --sweep`), `-O3 isolated`, per call:
@@ -508,7 +522,31 @@ is a much stronger claim than any p01 could produce.
      *call* rather than once per row (no `cmov` at all, against R2's five), the
      epilogue is R4's unchecked 5-instruction body, and both `f(0) = 84`
      mechanisms — the `cmp $9` guard and the `cmove` forcing a zero remainder to
-     a full vector width — disappear. **Safe Rust beat unsafe Rust here.**
+     a full vector width — disappear.
+
+     **…and then the next task refuted the framing of *that*, so read the
+     amendment before quoting any of it. PROVISIONAL — not yet reviewed
+     (TASK_015).** "Safe Rust beat unsafe Rust" is an **idiom mismatch, not a
+     language fact.** R4 is a spelling too: rewrite the *unsafe* rung with the
+     same consumed-slice idiom (a row pointer advanced by `ncol`, ten lines) and
+     unsafe is back on top. p05's honest idiom-matched safety number is
+     **+11.00 Ir/call, flat — nrow 19, 41 and 65 all exactly +11, so `O(1)` and
+     not `O(nrow)`.** p16's is `nrec + 3`. The shipped R4 maintains **two** row
+     bases (one for the vector body, one for the scalar epilogue) and
+     `chunks_exact` collapses them to one pointer; that single `add` per row
+     **is** the `−1·nrow` slope, and it is R4's to fix.
+
+     **And the `−(nrow − 7)` is `Ir`-only.** `chunks_exact` with a runtime chunk
+     size emits a hardware `div` per call (`len − len % chunk_size`), which
+     callgrind prices at **1 instruction**. Interleaved wall clock on `small`
+     says **+0.47%** where `Ir` says −0.87%, at an 8.61% min-to-median spread —
+     the worst of the five cells and the only one near the discard threshold.
+     Quote it as an instruction-count result or not at all.
+
+     Two smaller corrections to the review's own write-up: its static counts mix
+     conventions (105 is `n_fn`; 171 and 97 are `n_raw` — matched, 105/168/87 or
+     109/171/97), and **shipped R3 also has zero `cmov`** — the five are R2's
+     alone.
    - **4.2500 is not "the check".** The `-unroll-count=1` no-op control *does*
      exist here (bit-for-bit identical R2, `md5_fn 76d7c2380278`), and gives
      rolled+checked 7.0000, rolled+unchecked 5.0000, novec-unrolled 2.7500 →

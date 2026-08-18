@@ -360,6 +360,21 @@ contain a `rep` instruction**, so no previously published `Ir` comparison is
 contaminated. Re-check this before denominating any future pattern in bytes
 moved rather than bytes folded.
 
+### Callgrind prices a hardware `div` at 1 `Ir`
+
+**PROVISIONAL — not yet reviewed (TASK_015).** Third named mechanism for
+`Ir`/ns disagreement, after `rep`-strings above and p16's latency-bound Horner
+chain. `chunks_exact(n)` with a **runtime** chunk size computes
+`len − len % chunk_size`, which lowers to a hardware `div` in the prologue —
+one instruction to callgrind, tens of variable cycles to the machine. Measured
+on p05: `Ir` says the `chunks_exact` spelling is −0.87% against R4 on `small`
+and interleaved ns says **+0.47%**, at an 8.61% min-to-median spread, the worst
+of five cells and the only one near the 10% discard threshold.
+
+Rule: **a spelling whose win is one instruction wide needs a wall-clock column
+before it is quoted**, and a constant chunk size is a different measurement from
+a runtime one.
+
 ## Timing protocol
 
 1. Pin to a single core with `taskset -c N`. Use the same core for a whole

@@ -69,16 +69,34 @@ supersede any earlier task report they contradict.
 
 ## Open cross-cutting issues
 
-- **p05's R3 is not the best R3, and the same audit is owed on p16 and p17.**
-  TASK_014_REVIEW's blocker: `data.chunks_exact(ncol)` is `nrow − 7`
-  instructions per call **cheaper than the unsafe rung**, on every p05 input,
-  with identical output on all 150 committed inputs. p05's shipped
-  `safe_tuned.rs` reslices by hand and pays `6·nrow + 9`. The variant lives in
-  `.temp/review014/p05lin/` and is **not gate-ready** — it needs static
-  identity, the `O0`/`whole` cells, and `spec.md` pins. Three patterns have now
-  priced a *spelling* as safety's cost, so the audit is not optional: see
-  `.memory/01-ladder.md`'s corollary rule (write two independent R3 spellings,
-  quote the cheaper).
+- **THE OPEN QUESTION: every rung is a spelling, so what does the ladder
+  report?** **PROVISIONAL — not yet reviewed (TASK_015).** The audit ran across
+  p05, p16 and p17 and found **all three shipped R3s beaten**, each beater also
+  cheaper than **its own R4** (`R3ship − R3′` = `6·nrow + 9` on p05,
+  `10·nrec + 9` on p16, `51` flat on p17). Then the R4′ control: apply the same
+  consumed-slice idiom to the *unsafe* rung and **unsafe goes back on top** —
+  p05 **+11.00 Ir/call flat**, p16 `nrec + 3`.
+
+  So the safe-vs-unsafe gap this project reports is **idiom-bound**, and on p05
+  the spread across four safe spellings **exceeds** it. A single number per rung
+  is only meaningful when every rung was written the same way.
+
+  **The p05 R3 swap was specced and declined**, with the R4′ control as the
+  reason: landing it would have headlined "safe Rust beats unsafe Rust", which
+  ten lines refute. Not a cost decision — a gate run is 1.5–2.5 min. Three
+  further reasons on the record: swapping p05 alone leaves one pattern
+  "best-found" and two "first plausible" in one result set; `chunks_exact`'s win
+  is `Ir`-only (the `div`); and p05's `safe_tuned.rs` is load-bearing as the
+  decomposition control, differing from R2 in the inner loop **and nothing
+  else**, which is what makes `R2 − R3` the per-element check cost *by
+  construction*.
+
+  **What is owed is a policy decided once and applied uniformly**, not three
+  more swaps. Candidates: idiom-matched rung pairs; publishing a spread per
+  rung; or a declared canonical idiom per pattern. Variants are in
+  `.temp/p05r3/`; none is gate-ready (`O0`/`whole` cells and Miri were not
+  built, and p16's `R3′ − R4` is fitted over 6 points across 2 residue classes
+  rather than swept).
 - **`harness/check.py` stage 7 is structurally blind to `_chk`-rewritten
   `mem*`/`str*` misuse**, because it builds gcc-only at this box's fortify-3
   default and ASan's checks live in the interceptors, not in `__memcpy_chk`.
