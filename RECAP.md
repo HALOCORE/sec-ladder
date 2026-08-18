@@ -188,6 +188,62 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    by being **invisible**: it is prose, and the hashed block starts 240 lines
    later. So p05's `6·nrow + 9` **stands as a contract-relative number**, and the
    retraction of it is itself retracted.
+   **And that contract-relative number is an UPPER BOUND** — but the search for
+   what it bounds has now failed three times. TASK_021 reported a *two-sided*
+   floor, `5·nrow + 6`, on the ground that six in-contract unsafe spellings gave
+   one instruction count. They had all decoded the header the shipped way, so it
+   measured the header. TASK_021_REVIEW respelled that and got `5·nrow + 11`
+   from 13 unsafe spellings; TASK_022 deleted a semantically redundant
+   zero-guard and got `5·nrow + 13` from 46. **Each value had been reached by
+   4–10 independent machine-code bodies, and two of the three were broken
+   anyway** — so "reached by many spellings" is not evidence of a floor, and
+   nothing here should ever again be published as one. See finding 12.
+
+13. **p08, and the retraction it forced — safe Rust beat unsafe Rust on p05.**
+   p08's own result is structural: overlapping `memcpy` is UB that safe Rust
+   **cannot express** (borrow checker, compile time, no runtime check and so
+   nothing to measure), `unsafe` re-opens it via `copy_nonoverlapping`, and
+   **R5 does not close it** — substituting `copy_nonoverlapping` into the trusted
+   body verifies 11/0 and 15/0 under the twin, invisible to Verus, the twin and
+   the contract pins; only Miri and the O3 identity pin catch it. On this libc
+   the UB **executes and is unobservable**: glibc 2.39 `memcpy` *is* `memmove`,
+   so R1 ≡ R1h at **0.00 Ir/call** — a *libc* property, never to be quoted as
+   "memmove is free". ASan sees the overlap, but **`_FORTIFY_SOURCE` blinds it**
+   under clang as well as gcc, because the check lives in the `memcpy`
+   interceptor and not in `__memcpy_chk`.
+   Then the blocker, which is about **p05**: `data.chunks_exact(ncol)` — one
+   idiomatic safe expression, zero `unsafe`, no proof — is **`nrow − 7`
+   instructions per call cheaper than the unsafe rung**, exactly, on every input,
+   with identical output on all 150 committed p05 inputs. p05's shipped R3
+   reslices by hand and pays `6·nrow + 9`. **Three patterns have now priced a
+   spelling as safety's cost** (p02, p16, p05).
+
+14. **Every rung is a spelling, the gap does not converge, and "safe beats
+   unsafe" was never available as a language fact.** (TASK_015 +
+   TASK_015_REVIEW. The programme's central methodological result, and the one
+   that shapes the writeup.)
+   The audit found **all three shipped R3s beaten**, each beater also cheaper
+   than **its own R4**. The control that answered it — apply the same
+   consumed-slice idiom to the *unsafe* rung — put unsafe back on top at
+   **+11.00 Ir/call flat**. Then the review ran **one more round on each side**:
+   replace the unsafe loop counter with the canonical C test `while rp < end`
+   and it becomes **`nrow + 9`** — swept exactly over all 144 blobs, zero
+   residual, with a second unrelated unsafe spelling landing on the identical
+   figure. **`O(1)` became `O(nrow)` and the sign of the conclusion flipped on
+   the first thing a reader would try. The gap does not converge.**
+   And it never could, for a reason available without measuring: **R4 is defined
+   by *permission*, not obligation**, so every safe program is an admissible R4
+   and `inf(R4) <= inf(R3)` **by construction**. What is *not* available a priori
+   is whether that infimum gap is zero or positive — which is exactly the
+   quantity that moved from 11 to `nrow + 9` when someone looked.
+   **Both spellings that drove this were out of contract.** p05's `spec.md`
+   forbids `chunks_exact` and the running row pointer by name — either deletes
+   the `i*ncol + j` multiply, which *is* the pattern — and **two consecutive
+   tasks measured them and reported them as p05's numbers**, the manager's own
+   retraction among them. The declaration was right both times and failed only
+   by being **invisible**: it is prose, and the hashed block starts 240 lines
+   later. So p05's `6·nrow + 9` **stands as a contract-relative number**, and the
+   retraction of it is itself retracted.
    **And TASK_021 measured that contract-relative number to be an UPPER BOUND**
    (`patterns/p05-index-flatten/NOTES.md` §14): seven textually independent
    in-contract respellings reach `5·nrow + 6` with **zero residual over 179
