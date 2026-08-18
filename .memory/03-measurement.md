@@ -487,7 +487,12 @@ Measured at TASK_022 on unchanged trees, two consecutive runs:
 - **p05: 4 leaves.** The `adversarial-dims` heap-OOB stdout for c-gcc and
   c-clang (genuinely nondeterministic — it reads past the allocation), plus two
   ASan PID/ASLR diagnostic strings.
-- **p08: 8 leaves.** `marginal_ir_per_call` on the `O0`/`whole` rows, all ±0.02.
+- **p08: 23 leaves** — `marginal_ir_per_call`, across **all four** opt/mode
+  combinations (not just `O0`/`whole`), to **±0.08**. TASK_022 recorded 8 and
+  `O0`/`whole` only; TASK_023_REVIEW reproduced the **identical 23 keys on an
+  unchanged tree**, which is what makes them noise rather than an effect.
+- **p02: 3, p16: 1, p17: 1** — previously unrecorded.
+- **Total churn on an unchanged tree: 32 leaves.**
 
 **TASK_021_REVIEW's clean negative 6 attributed exactly those 8 p08 leaves to an
 edit.** They move on an unrelated edit too, so they are run noise, not an effect.

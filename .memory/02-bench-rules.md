@@ -35,8 +35,10 @@ Known residuals we are deliberately **not** closing, all measured:
   process every proof stage asks for a verdict, so it decides both what R5's
   machine code is and what "verified" meant in that run — and it sits at the repo
   root, which `harness/*.py` never covered.
-- **A control generator can emit sources that compile against a gitignored
-  copy of `common/`.** p08's `controls/gen_controls.py` leaves the shipped
+- ~~A control generator can emit sources that compile against a gitignored copy
+  of `common/`~~ — **CLOSED at TASK_022** for p08 (`PATH_FIX`, proven on a
+  simulated fresh clone) and at TASK_023 for p16. Kept because the shape
+  recurs: p08's `controls/gen_controls.py` leaves the shipped
   `#[path = "../../common/driver.rs"]` in its output, which from
   `.temp/p08/controls/` resolves to `.temp/common/driver.rs`. Byte-identical
   today, so it works **by luck**; on a fresh clone p08's controls do not compile.

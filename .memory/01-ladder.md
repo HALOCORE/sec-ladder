@@ -83,10 +83,20 @@ the pin decided 0 of 3 variants before and 3 of 3 after.
 therefore `R3ship − R4ship` is an upper bound on the in-contract safety tax
 ONLY WHILE ONE RUNG IS HELD FIXED.** That qualification is not decoration: with
 *both* rungs free to be respelled, p05 has an admissible pair whose tax is
-**exactly 0**, so the unqualified sentence is **false**. It is currently written
-unqualified in all six patterns' `idiom.why`, hashed into `contract_sha256`
-(TASK_022 flagged it and correctly did not touch it; it is a cross-pattern
-decision).
+**exactly 0**, so the unqualified sentence is **false**. **Replaced in all six
+`idiom.why` at TASK_023** with the one-sided form; the sentence survived
+*outside* the hashed blocks in eleven further places, found by grepping.
+
+**The unpinned unroll factor is not a p16 problem.** `5 + 3/K` follows from a
+declaration that licenses unrolling and an inner byte loop, so **any pattern with
+an inner byte loop is exposed** — p17 and p02 both publish one-sided R3 bounds
+today and are the obvious next targets. Note also what makes the safe-side lever
+different in kind: `r4_hdr`'s unaligned `u16` read **cannot be a p16 rung at all**
+(vstd does not support `read_unaligned`, and the `identity` pin needs R5 ≡ R4),
+so it would need a **fourth trusted item** in a pattern whose whole claim rests on
+one trusted `requires`. The R3-side variants cost **zero TCB** and are the larger
+effect. "The same category of edit on the safe side" was the argument for
+`r4_hdr`; it is measurably not the same category.
 
 **And do not replace it with `min(R3) − min(R4)`** — that is the difference of
 two upper bounds and bounds nothing in either direction. Report the in-contract
@@ -364,11 +374,21 @@ is a much stronger claim than any p01 could produce.
    data, each record's position depending on every previous length field, nothing
    hoistable, nothing idiom-recognisable.
 
-   **The number that settles it: R3's marginal rate is 5.7500 Ir per folded byte,
-   which is R4's exactly.** Idiomatic safe Rust costs **zero per byte** here. Its
-   whole cost is O(1) per call (+27 / +77), which *shrinks* as a fraction of the
-   call with size — 0.90% on `small`, 0.32% on `large`. Only the naive indexed
-   spelling is O(n).
+   **The number that settled it — 5.7500 Ir per folded byte for both R3 and R4,
+   "safe Rust costs zero per byte" — is SIGN-WRONG IN CONTRACT** (TASK_023_REVIEW).
+   Both rates are a function of an **unpinned** quantity: p16's own declaration
+   licenses *unrolling*, LLVM unrolls the shipped fold 4×, and the rate is
+   **`5 + 3/K`** — 5.7500 at K=4, 5.1875 at K=16, 5.09375 at K=32. Zero fitted
+   parameters, confirmed in the disassembly.
+   So an in-contract safe rung — shipped `safe_tuned.rs`, **one substitution,
+   zero `unsafe`, both named tokens literal, 95/95 equivalent** — gives
+   `R4ship − sv_c32 = 51·nrec − 5` (`vlen ≡ 0 mod 4`) / `48·nrec − 5`, zero
+   residual on 22 blobs: **+199 at `small`, +2365 at `large`, safe beating
+   shipped unsafe on all 24 points.** In contract, safe Rust is **−0.5625 Ir per
+   byte**, not zero. **p16 is the second pattern after p17 where an admissible
+   safe rung beats its own R4.**
+   The shipped-pair figures below (+27/+77, "O(1) per call") describe the shipped
+   pair and nothing wider.
    **Corrected at TASK_015_REVIEW: "O(1) per call" is residue-dependent.** The
    +27/+77 pair decomposes as `7 + 5·nrec` at `vlen ≡ 0 (mod 4)` and `7 + 7·nrec`
    otherwise, so it is `O(nrec)` — the two published points happen to sit at
@@ -416,11 +436,15 @@ is a much stronger claim than any p01 could produce.
    p05's constant it moves by a **coefficient**: `R4ship − r4_hdr = 4·nrec`,
    zero residual over 24 blobs. So the pairing convention does not shift p16's
    intercept, it changes the `nrec` coefficient from 1 to 10 (`vlen ≡ 0 mod 4`)
-   or 3 to 12, and the in-contract **pair interval is 111% / 109% of the shipped
-   pair** — *wider* than p05's 80% / 71%. An admissible pair exceeds the
-   published tax by `5·nrec`.
-   The R3-side figure below is therefore one-sided, and that is all it is: the
-   measured in-contract R3 minimum is **+19 (small) / +45 (large)**, and
+   or 3 to 12. **The pair interval published at TASK_023 — 17…47 / 43…127,
+   "111%/109% wide" — is refuted** (TASK_023_REVIEW): measured, it is
+   **−239…+236 (1759%) / −2449…+2244 (6095%)**, and **its bottom is negative on
+   all 24 points**. Do not re-point the "which declaration is loosest"
+   comparison either; that compared a 2-lever search against p05's 46-spelling
+   one, which is the same error one level down. Withdraw it.
+   The R3-side figure below is one-sided, and **its number is refuted too**: the
+   in-contract R3 minimum against shipped R4 is **−199 / −2365**, not
+   `+19 / +45` (TASK_023_REVIEW). The bound survives; the value does not. And
    R3-side bound. This file already said, at finding 3: *"Never publish a
    safety-cost claim without R3."* The rule was violated by its own author on the
    next pattern. **Lead with R3 or do not lead.**
