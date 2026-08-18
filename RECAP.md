@@ -166,13 +166,31 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    by being **invisible**: it is prose, and the hashed block starts 240 lines
    later. So p05's `6·nrow + 9` **stands as a contract-relative number**, and the
    retraction of it is itself retracted.
-   **The policy that follows** (recommended, not yet implemented): "compare
-   idiom-matched rungs" **does not work** — "same idiom" has no fixed point, its
-   members differing by `O(nrow)` — and a published spread **cannot carry a
-   safety number at all**, per the theorem above. What survives is a
-   **matched-pair delta under an idiom declared before measuring**, moved into
-   the hashed contract block so the gate can see it, plus a spelling-spread
-   section published as method and never as headline.
+   **The policy, decided and implemented (TASK_016–018).** "Compare idiom-matched
+   rungs" **does not work** — "same idiom" has no fixed point, its members
+   differing by `O(nrow)` — and a published spread **cannot carry a safety number
+   at all**, per the theorem above. What ships is a **named-spelling standard**:
+   every pattern's hashed contract block carries an `idiom` object naming the
+   tokens each rung must spell literally, uniform across all six, **labelled as a
+   policy adopted after measuring**, with one measured clause — a rung spells the
+   same operands the way its language forces — without which eight shipped cells
+   fall out of contract.
+
+   **What the pin buys is decidability, not attributability, and that was
+   measured.** On p17 the excluded and an admissible spelling compile to the
+   **same 478 bytes**; on p16, 42 of 77 Ir/call sit inside the unpinned part.
+   What it does buy is a contract a `grep` can settle instead of one only an
+   argument can settle — and a *boundary*, without which the spread is unbounded
+   below on both sides.
+
+   **The conclusion that follows, and it governs every number this project
+   publishes: `R3ship − R4ship` is an UPPER BOUND on the in-contract safety tax,
+   never the tax.** p16's `+27/+77` has a measured in-contract minimum of
+   `+19/+45`; p17's `+32` has an in-contract respelling measuring **−19** against
+   the shipped R4, byte-identical to the row an earlier task had excluded. Both
+   patterns ship an R3 measurably off the floor of their own contract, so "the
+   shipped R3 is the cheapest admissible spelling" is **false, not
+   unestablished**. Report the in-contract spread beside every headline.
 
 ## Retracted — do not reinstate
 
@@ -326,25 +344,17 @@ it once, land the corrections, repeat** — and per `PROTOCOL.md` rule 9, write
 instance of the same mistake, and the correction is owed across the whole result
 set before more results are added to it:
 
-1. **Review TASK_017** — it is landed and all six gates are green, but its
-   central act is a **judgement, not a measurement**, and the engineer said so:
-   p16's `idiom.required[0]` was disambiguated as naming **tokens**, which puts
-   p16's cheaper spelling out of contract. Both readings are true of the shipped
-   tree, so no experiment decides it. **The direction of the risk is that the
-   chosen reading makes p16's own number look better** — the engineer flagged
-   this itself and neutralised it by recording that p16 now has *zero* measured
-   admissible alternates, so "cheapest admissible" is unestablished rather than
-   established. A different agent should attack the reading and the four grounds
-   given for it (house convention; the tokens *being* the traversal; the
-   exclusion falling symmetrically on the consuming R4 control; and `inf(R4) <=
-   inf(R3)` leaving the semantic reading with no fixed point).
-   Also worth a second pair of eyes: `report.py` now prints each pattern's
-   declaration above its table — the one mechanism that addresses the failure we
-   actually observed twice.
-2. **p16 owes a spelling-spread measurement inside its own contract.**
-   `.memory/05-layout.md` demand 13 asks for two alternates per rung; after
-   TASK_017's reading, p16 has none that are admissible. Cheap, and it closes
-   the gap the reading opened.
+1. **Review TASK_018** — it landed all six gates green and *overturned three of
+   the manager's prescriptions with measurements*, including the reason the
+   manager gave for the pin. That makes it exactly the shape rule 3 exists for.
+   Attack: the cross-language clause (does it re-admit anything it should not?);
+   the three p16 respellings and two p17 ones, whose `nrec` coefficient is a
+   **3-point fit** and is flagged as such; and whether "decidability" survives as
+   the justification once attributability is gone.
+2. **Four patterns owe an in-contract spelling spread** — p01, p02, p05, p08.
+   `.memory/05-layout.md` demand 13 now requires one per pattern and only p16 and
+   p17 have theirs. Until p05 has one, its `6·nrow + 9` is an upper bound with no
+   measured floor, exactly like p16's `+27/+77` was.
 3. **A shipped p17 sweep.** p17 has **no sweep inputs at all**, which is how its
    "+32 Ir/call flat" got published from two bands that both happen to have
    `nsuf = 3`. `.memory`'s own residue rule applied and was not followed. The
