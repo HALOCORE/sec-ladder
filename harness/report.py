@@ -270,6 +270,21 @@ def audit_section(doc, out):
     for x in au.get("absent") or []:
         out.append(f"  - absent — `{x['spelling']}` "
                    f"({x['entry']}, {x['lang']}, **{x['rung']}**)")
+    # TASK_021. Kept out of the two buckets above on purpose: "no rung of a
+    # language this pattern HAS spells this" is a defect in the ruler, "there is
+    # no rung to ask" is a fact about the pattern's shape. Zero on all six
+    # shipped patterns, which is why it must be printed rather than assumed.
+    out.append(f"- **no rung — {au.get('no_rung_entries', 0)} per-language "
+               f"entry/entries** name a language this pattern ships no rung "
+               f"for; rungs here are "
+               f"{', '.join(f'`{l}`' for l in au.get('languages') or []) or 'none'}. "
+               f"Such a key used to be dropped silently, so the declaration read "
+               f"as constraining rungs that do not exist.")
+    for n in au.get("no_rung") or []:
+        out.append(f"  - no `{n['lang']}` rung — {n['entry']} pins "
+                   + (", ".join(f"`{s}`" for s in n["spellings"])
+                      or "no backticked spelling")
+                   + " there")
     out.append("")
 
 

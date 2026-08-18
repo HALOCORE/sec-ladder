@@ -237,6 +237,37 @@ SWEEP_BANDS = ((19, 24, RESIDUE_MODULI[-1] * SWEEP_CYCLES, 32, 25_000),
                (65, 56, RESIDUE_MODULI[-1] * SWEEP_CYCLES, 512, 8_000),
                (41, 24, RESIDUE_MODULI[-2], 32, 20_000))
 
+# ---- band D: the `nrow` AXIS, added at TASK_021 -----------------------------
+#
+# **Bands A-C sweep `ncol` and sample `nrow`.** Between them they give `nrow` in
+# {19, 41, 65} and nothing else, so every law of the form `a + b*nrow` that this
+# pattern publishes -- `R3ship - R4ship = 6*nrow + 9` is the headline one -- rests
+# on **three points**. That is one degree of freedom against a two-parameter
+# model, and it is exactly the shape that has already cost this project two
+# retractions: p16's `nrec + 3` and p05's own `+11.00 flat` were both fits over
+# three or fewer values of the axis they were quoted in, and both flipped on the
+# next point measured (`.memory/01-ladder.md` finding 6; NOTES.md 12c). Band C's
+# own comment says two points cannot be wrong -- three can only be wrong in one
+# direction.
+#
+# Band D moves `nrow` over **nine consecutive values plus two distant ones** at
+# **three `ncol` residue classes**, which is p16's TASK_020 band shape. `ncol` is
+# held to {30, 32, 33} = {6, 0, 1} mod 8, so the class LLVM peels a full extra
+# vector iteration for (`ncol = 0 mod 8`, NOTES.md 2a) is in the band rather than
+# assumed away; `nrow` is small on purpose, because the quantity under test is
+# the *slope* and small `nrow` keeps the sweep cheap enough to run every
+# variant on every blob.
+#
+# It is appended **after** bands A-C and the RNG is drawn sequentially, so every
+# one of the 150 files that existed before this band is byte-identical after it
+# (verified by md5 over all 150, TASK_021). The blobs are gitignored; this
+# generator is what is committed -- and since TASK_021 `harness/check.py` hashes
+# it into `source_sha256`, so a law measured on these blobs is no longer
+# re-derivable from a file the gate record cannot see.
+SWEEP_NROWS = (1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 16)
+SWEEP_NROW_NCOLS = (30, 32, 33)
+SWEEP_NROW_BAND = (32, 20_000)          # nwin, n_iters
+
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
@@ -307,6 +338,14 @@ def main():
             for nc in range(first, first + n):
                 write(f"sweep-r{nrow}c{nc}.bin", iters, HDR + nrow * nc,
                       tiled(rng, nwin, nrow, nc, nrow * nc))
+        # Band D, LAST so bands A-C stay byte-identical (see SWEEP_NROWS).
+        # Same name shape, so one parser reads every sweep blob; no `nrow` here
+        # collides with 19, 41 or 65.
+        nwin, iters = SWEEP_NROW_BAND
+        for nr in SWEEP_NROWS:
+            for nc in SWEEP_NROW_NCOLS:
+                write(f"sweep-r{nr}c{nc}.bin", iters, HDR + nr * nc,
+                      tiled(rng, nwin, nr, nc, nr * nc))
     return 0
 
 

@@ -132,7 +132,25 @@ measured them without citing `spec.md`. And +11 does not survive on its own
 terms either: one more unsafe round (`while rp < end`) makes it **`nrow + 9`**,
 `O(nrow)`. **p05's number is `R3 − R4 = 6·nrow + 9` under its declared idiom**
 (+16.7% at 496×8, +4.7% at `large`), and `NOTES.md` §13 publishes all eleven
-measured spellings as a result about *method*. `chunks_exact`'s advantage is
+measured spellings as a result about *method*.
+
+**And that number is an UPPER BOUND, measured at TASK_021** (`NOTES.md` §14).
+Inside the declaration the shipped R3 is beaten under *both* readings of
+`required[1]`: seven textually independent in-contract respellings reach
+**`5·nrow + 6`** with zero residual over 179 sweep points (14 values of `nrow`,
+all eight `ncol` residues mod 8), so the published figure is high by `nrow + 3`
+— 18% at `small`, 17% at `large`. Two things make p05's case different from
+p16's and p17's. The **qualitative** claim survives: same functional form, same
+sign, still `O(nrow)`, and only 21%/18% of the published tax lives in unpinned
+spelling against p16's 44%/55%. And the floor is **two-sided** — six in-contract
+*unsafe* spellings, four distinct machine-code bodies, **zero** difference in
+executed instructions at all 179 points — where p16's and p17's floors are
+R3-side bounds with an unsearched R4. The one instruction per row that the
+respelling removes is the `add` that makes the row base buffer-absolute; the
+five that survive are the reslice's bounds check, and the fact that would delete
+them is the nonlinear one R5 discharges with `lemma_mul_inequality`.
+
+`chunks_exact`'s advantage is
 also `Ir`-only on `small` — it emits a hardware `div` per call that callgrind
 prices at one instruction — though the wall-clock evidence for that
 (+0.47% / 8.61% spread) did **not** reproduce and must not be quoted.
@@ -147,7 +165,7 @@ epilogue and a nonlinear proof.
 |---|---|
 | `spec.md` | the contract every rung implements, and the `slb-contract` pin block |
 | `model.py` | the independent Python reference the gate drives |
-| `inputs/gen.py` | deterministic input generation, `--sweep` for the `ncol` sweep |
+| `inputs/gen.py` | deterministic input generation; `--sweep` gives the `ncol` sweep (bands A–C) **and the `nrow` sweep (band D, TASK_021)** |
 | `c/kernel.c` | R1 — no size check. The bug. |
 | `c/kernel_hardened.c` | R1h — the same, plus the one line |
 | `c/main.c` | the C driver |

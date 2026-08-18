@@ -1192,10 +1192,40 @@ earlier session — §10b says a marginal is exact only within a build, so those
 three rows carried a cross-build risk and it did not materialise; every
 difference is the same exact integer the reviewer measured.
 
-⚠ Residual gap, smaller than the one it replaces: the *variants* are still
+~~⚠ Residual gap, smaller than the one it replaces: the *variants* are still
 uncommitted, so rows 2–4 remain reproducible only by rebuilding
-`.temp/p18/v16/`. What now ships is the **input axis**, which is what made row 1
-— the law over the two cells p16 actually publishes — underivable from the tree.
+`.temp/p18/v16/`.~~ **Closed at TASK_021.** What TASK_020 shipped was the
+**input axis**; what ships now is the **variants**, behind
+`patterns/p16-tlv-walk/controls/gen_controls.py` — p08's committed-generator
+shape (`.memory/05-layout.md` demand 11: a source that is not a pinned, cleanly
+verifying cell cannot live in the pattern dir). Each control is `safe_tuned.rs`
+with two or four **exact-string substitutions, each asserted to hit exactly
+once**, so a control cannot drift from the rung it respells: edit
+`safe_tuned.rs` and either the control moves with it or the generator fails
+loudly. That is the property the `.temp/p18/v16/` copies did not have.
+
+It reproduces TASK_018's binaries **byte for byte** — `md5_fn` `34a618f8`
+(`r3_endslice`, 117 insns), `c7f697a8` (`r3_window`, 119), `999fb677`
+(`r3_hdrarray`, 118), against shipped `07b07f1a` (117) and R4 `852405e0` (92),
+which is the digest table five paragraphs below — and all four laws re-derive
+from it with **zero residual on all 22 committed `sweep-n*` blobs**:
+
+```
+$ python3 patterns/p16-tlv-walk/controls/gen_controls.py --build
+$ ... marginal Ir/call, n_iters 100 -> 200, -O3 isolated       (.temp/p21/p16laws.json)
+  R3ship - R4ship = 7 + 5*nrec / 7 + 7*nrec     22 points, NONZERO residual on 0
+  R3ship - r3_endslice = 2*nrec - 2             22 points, NONZERO residual on 0
+  R3ship - r3_window   = 4*nrec - 8             22 points, NONZERO residual on 0
+  r3_hdrarray - R3ship = nrec                   22 points, NONZERO residual on 0
+```
+
+So §10a is now reproducible end to end from the committed tree: the generator,
+the input band and — since TASK_021 — both of them inside `source_sha256`.
+One difference from p08's generator, and it is a fix p08 still needs: p08's
+controls keep the shipped `#[path = "../../common/driver.rs"]`, which from
+`.temp/p08/controls/` resolves to `.temp/common/driver.rs`, a **gitignored
+copy** of `common/` that happens to exist on this box; p16's generator rewrites
+the path to the real, hashed `common/driver.rs`.
 
 **What this establishes.**
 

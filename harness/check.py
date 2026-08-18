@@ -881,15 +881,41 @@ def idiom_audit(contract, rungs):
     (`c/kernel.c`, `adversarial-overrun.bin` twice, `md5_fn e207ec6c8697...`,
     and the word `why` twice) and **five** are spans quoted in order to be
     absent (`src_len`, `dst_cap`, `&`, `continue` twice). **A non-zero here is
-    normal**; what is worth reading is a change."""
+    normal**; what is worth reading is a change.
+
+    **`no_rung` -- a fourth bucket, closed at TASK_021.** A per-language entry
+    may name a language this pattern ships no rung for. Before TASK_021 that
+    key was dropped by the `if l in langs` filter with no trace: the entry
+    would print as pinning whatever its *other* key pins, and the declaration
+    would read as constraining six rungs while constraining three. It is
+    **unreachable on the shipped tree** -- all six patterns ship both languages,
+    so `langs == ['c', 'rust']` everywhere and this bucket is 0 in all six
+    records -- and that is exactly the argument for closing it now: it is
+    invisible until the first Rust-only (or C-only) pattern, and on that day it
+    is silent rather than loud. It reports rather than fails, because a
+    declaration written against a rung the pattern deliberately does not ship
+    (a pattern whose C rung is the *point* and whose Rust side is future work)
+    is an honest state, and the threat model is honest mistake
+    (`.memory/02-bench-rules.md`: a new hard failure with no route out is how
+    gates get switched off). It is deliberately **not** folded into
+    `pins_nothing`: that bucket means "no rung of a language this pattern HAS
+    spells this", which is a defect in the ruler; this one means "there is no
+    rung to ask", which is a fact about the pattern's shape."""
     langs = sorted({l for _, l, _ in rungs})
     text = {(r, l): s for r, l, s in rungs}
     n_sp = n_pair = n_present = n_forb_sp = 0
-    pins_nothing, absent, hits = [], [], []
+    pins_nothing, absent, hits, no_rung = [], [], [], []
     for key in ("required", "forbidden"):
         for i, e in enumerate(contract.get("idiom", {}).get(key) or []):
             per = ({l: e for l in langs} if isinstance(e, str)
                    else {l: v for l, v in e.items() if l in langs})
+            if isinstance(e, dict):
+                # The dropped keys, named instead of discarded (TASK_021).
+                for lang in sorted(set(e) - set(langs)):
+                    if lang not in IDIOM_LANGS:
+                        continue        # a typo; `idiom_problems` already failed
+                    no_rung.append({"entry": f"{key}[{i}]", "lang": lang,
+                                    "spellings": _TICK.findall(e[lang])})
             for lang in sorted(per):
                 for tok in _TICK.findall(per[lang]):
                     here = [r for r, l in sorted(text) if l == lang]
@@ -911,12 +937,13 @@ def idiom_audit(contract, rungs):
                         for r in off:
                             absent.append(dict(row, rung=r))
     return {"spellings": n_sp, "rungs": len(rungs), "pairs": n_pair,
-            "present": n_present,
+            "present": n_present, "languages": langs,
             "forbidden_spellings": n_forb_sp, "forbidden_hits": len(hits),
             "hits": hits,
             "required_pins_nothing": len(pins_nothing),
             "pins_nothing": pins_nothing,
-            "required_absent": len(absent), "absent": absent}
+            "required_absent": len(absent), "absent": absent,
+            "no_rung_entries": len(no_rung), "no_rung": no_rung}
 
 
 def idiom_audit_lines(au):
@@ -933,7 +960,15 @@ def idiom_audit_lines(au):
            f"    audit  required : {au['required_pins_nothing']} pin nothing, "
            f"{au['required_absent']} scoped-absent pair(s)  "
            f"(NOT decidable -- an entry's rung scope is its English; a "
-           f"non-zero here is normal, read it against the entry)"]
+           f"non-zero here is normal, read it against the entry)",
+           f"    audit  languages: rungs in {au.get('languages', [])}; "
+           f"{au.get('no_rung_entries', 0)} per-language entry/entries name a "
+           f"language this pattern ships NO rung for "
+           f"(TASK_021: reported, not dropped)"]
+    for n in au.get("no_rung") or []:
+        out.append(f"    audit    NO RUNG       {n['entry']:<13}{n['lang']:<5}"
+                   f"pattern ships no {n['lang']} rung  "
+                   f"{n['spellings'] or 'no backticked spelling'}")
     for h in au["hits"]:
         out.append(f"    audit    FORBIDDEN HIT {h['entry']:<13}{h['lang']:<5}"
                    f"{h['rung']:<22}`{h['spelling']}`")
@@ -1090,10 +1125,15 @@ _AUD_RUNGS = [("c/kernel.c", "c", "if (len > cap - 2) return 0;\n"),
                "if len > cap - 2 { return 0; }\n")]
 
 
-def _aud(req, forb=()):
+#: The same pattern with its Rust rungs removed -- the shape no shipped pattern
+#: has and every future one might (TASK_021's `no_rung` bucket).
+_AUD_RUNGS_C = [r for r in _AUD_RUNGS if r[1] == "c"]
+
+
+def _aud(req, forb=(), rungs=None):
     return idiom_audit({"idiom": {"required": list(req),
                                   "forbidden": list(forb), "why": "w"}},
-                       _AUD_RUNGS)
+                       _AUD_RUNGS if rungs is None else rungs)
 
 
 _AUDIT_CASES = [
@@ -1126,6 +1166,33 @@ _AUDIT_CASES = [
      _aud(["`len > cap - 2`"], ["`len > cap - 2`"])["forbidden_hits"], 4),
     ("a per-language entry pins only its own language's rungs",
      _aud([{"c": "`return 0;`"}])["pairs"], 2),
+    # TASK_021, the residual TASK_020 reported and did not close. On a pattern
+    # that ships no Rust rung the `rust` key used to vanish: 1 spelling, 2
+    # pairs, and NOTHING said the other half of the entry had been discarded.
+    ("a per-language key naming an unshipped language is REPORTED, not dropped",
+     [_aud([{"c": "`return 0;`", "rust": "`while i < n`"}],
+           rungs=_AUD_RUNGS_C)[k]
+      for k in ("spellings", "pairs", "no_rung_entries",
+                "required_pins_nothing", "required_absent")], [1, 2, 1, 0, 0]),
+    ("...and the dropped key's spellings travel with the report",
+     _aud([{"c": "`return 0;`", "rust": "`while i < n`"}],
+          rungs=_AUD_RUNGS_C)["no_rung"],
+     [{"entry": "required[0]", "lang": "rust", "spellings": ["while i < n"]}]),
+    # A dropped key with no backticks pins nothing either way, but the entry
+    # still says something about a language that is not there -- report it.
+    ("a dropped key with no backticked spelling is still reported",
+     _aud([{"c": "`return 0;`", "rust": "no cleverness"}],
+          rungs=_AUD_RUNGS_C)["no_rung_entries"], 1),
+    ("forbidden entries get the same treatment",
+     _aud(["`len > cap - 2`"], [{"rust": "`chunks_exact`"}],
+          rungs=_AUD_RUNGS_C)["no_rung_entries"], 1),
+    # ...and on a pattern that DOES ship both languages nothing is dropped, so
+    # all six shipped records must print 0 here.
+    ("both languages shipped -> nothing is dropped",
+     _aud([{"c": "`return 0;`", "rust": "`while i < n`"}])["no_rung_entries"],
+     0),
+    ("a plain-string entry can never hit this bucket",
+     _aud(["`len > cap - 2`"], rungs=_AUD_RUNGS_C)["no_rung_entries"], 0),
 ]
 
 
@@ -4653,12 +4720,44 @@ def main():
     miri = check_miri(pdir, rep, contract, identity, modmod, indir,
                       sorted(all_models))
 
+    # What `source_sha256` covers, and why each line is here. The rule is: a
+    # file whose contents a committed claim depends on must be hashed, or a
+    # stale record is undetectable -- which is the whole reason the key exists
+    # (`.memory/02-bench-rules.md`, "a stale record is at least detectable by
+    # comparing hashes against the tree").
+    #
+    # The last four lines were added at TASK_021, on the third sighting of the
+    # gap. It stopped being hygiene at TASK_020:
+    #
+    #   * `inputs/gen.py` -- the inputs are gitignored and the GENERATOR is what
+    #     is committed, so it is the only reproduction path for anything measured
+    #     on a sweep blob. `patterns/p16-tlv-walk/NOTES.md` 10a states four
+    #     swept `nrec` laws that are re-derivable ONLY by running this file; an
+    #     edit changing what the sweep produces moved nothing in any gate
+    #     artefact, because `check.inputs_of` also drops `sweep-*` from
+    #     `inputs_checked`. Both halves of the record were blind to it at once.
+    #   * `common/*.py` -- `slb.py`, imported by all six `model.py`s to decode
+    #     the payload. Step 2 (the model checksum) is the gate's only
+    #     load-bearing correctness check and this file sits inside it.
+    #   * `controls/*.py` -- committed control generators
+    #     (`patterns/p08-overlap-move/controls/gen_controls.py`); same argument
+    #     as `inputs/gen.py`, for cells that are not p05-style rungs.
+    #   * `verus_run.py` -- THE THIRD FILE, and it is named here rather than
+    #     left implicit because it was not in the reported gap. It is R5's
+    #     compiler driver (`build.py:VERUS_RUN`, `fixture.py`) *and* the process
+    #     stages 5/5a-5d ask for Verus's verdict, so it decides both what R5's
+    #     machine code is and what "verified" meant in this run. It is at the
+    #     repo root, so `harness/*.py` never covered it.
     srcs = sorted(glob.glob(os.path.join(pdir, "*.rs"))
                   + glob.glob(os.path.join(pdir, "c", "*"))
                   + glob.glob(os.path.join(pdir, "*.md"))
                   + glob.glob(os.path.join(pdir, "model.py"))
                   + glob.glob(os.path.join(REPO, "common", "driver.*"))
-                  + glob.glob(os.path.join(REPO, "harness", "*.py")))
+                  + glob.glob(os.path.join(REPO, "harness", "*.py"))
+                  + glob.glob(os.path.join(pdir, "inputs", "gen.py"))
+                  + glob.glob(os.path.join(pdir, "controls", "*.py"))
+                  + glob.glob(os.path.join(REPO, "common", "*.py"))
+                  + glob.glob(os.path.join(REPO, "verus_run.py")))
     doc = {
         "pattern": os.path.basename(pdir),
         "skipped_inputs": a.skip,

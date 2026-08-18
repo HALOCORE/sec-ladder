@@ -166,6 +166,17 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    by being **invisible**: it is prose, and the hashed block starts 240 lines
    later. So p05's `6·nrow + 9` **stands as a contract-relative number**, and the
    retraction of it is itself retracted.
+   **And TASK_021 measured that contract-relative number to be an UPPER BOUND**
+   (`patterns/p05-index-flatten/NOTES.md` §14): seven textually independent
+   in-contract respellings reach `5·nrow + 6` with **zero residual over 179
+   sweep points**, and the *unsafe* side — searched in contract for the first
+   time on any pattern — does not move at all (six spellings, four distinct
+   machine-code bodies, zero difference). p05 therefore joins p16, p17 and p02
+   in having published an upper bound; unlike them its functional form, its sign
+   and its `O(nrow)` conclusion all survive, and only 21%/18% of the tax lives
+   in unpinned spelling against p16's 44%/55%. The `nrow` axis it is swept on
+   ships too: `inputs/gen.py` band D, 33 blobs, and `source_sha256` covers
+   `gen.py` from TASK_021 so the law is re-derivable from a hashed file.
    **The policy, decided and implemented (TASK_016–018).** "Compare idiom-matched
    rungs" **does not work** — "same idiom" has no fixed point, its members
    differing by `O(nrow)` — and a published spread **cannot carry a safety number

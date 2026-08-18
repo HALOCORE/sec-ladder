@@ -288,6 +288,16 @@ R3−R4 is **123.00 at every one of the 64 band-A points and 399.00 at every one
 of the 64 band-B points** — flat in `ncol`, flat in the residue, and exactly
 `9 + 6·nrow`.
 
+⚠ **Two qualifications on that line, both added at TASK_021 and both measured.**
+(i) The `nrow` coefficient rested on the three values bands A–C supply
+(19, 41, 65); band D now sweeps `nrow ∈ {1…9, 12, 16}` at three `ncol` residue
+classes and the form is reproduced with **zero residual on all 179 points**, so
+it is a law and no longer a three-point fit. (ii) `9 + 6·nrow` is the shipped
+pair's difference and therefore an **UPPER BOUND** on p05's in-contract safety
+tax: the measured in-contract minimum is **`5·nrow + 6`** (§14), and the R4
+side of the pair — six in-contract spellings, 179 points each — does not move
+at all.
+
 Three things follow and they are the finding:
 
 1. **The per-element cost of the check is exactly zero, for R2 as well as R3.**
@@ -1131,6 +1141,14 @@ number p05 may headline is the matched pair under the `idiom` block
 idiom-matched number outside that declaration, because "same idiom" has no fixed
 point: see §13.
 
+**Amended at TASK_021: that pair is an UPPER BOUND, not the tax.** The
+declaration makes the admissible class *decidable*, not *singular*
+(`.memory/01-ladder.md`), and inside it the shipped R3 is beaten under both
+readings of `required[1]` — the measured in-contract minimum is `5·nrow + 6`,
+by seven independent spellings. The R4 side, searched for the first time here,
+does **not** move: six in-contract unsafe spellings, four distinct machine-code
+bodies, zero difference over 179 points. §14.
+
 ## 13. The spelling spread — eleven spellings of one kernel, and which two are p05
 
 **Not the headline.** This section is a result *about method*, published because
@@ -1139,6 +1157,10 @@ publishes is the matched pair under the idiom `spec.md` declares —
 **R3 `safe_tuned.rs` − R4 `unsafe.rs` = `6·nrow + 9`** — and every other row
 below is a measurement of a *different* kernel, kept here so nobody re-derives
 one and reports it as p05's.
+
+**And that published pair is an upper bound — §14 is the in-contract spread.**
+This section's rows are out of contract; §14's are in it, and its minimum
+(`5·nrow + 6`) is the number a safety claim about p05 has to be made against.
 
 Mandatory for every pattern that has spellings, from TASK_016 on. Method:
 marginal `Ir` per kernel call = (whole-program `Ir` at `n_iters` 200 − at 100)
@@ -1216,3 +1238,266 @@ session reproduce exactly (R3 shipped 1504.00 / 8834.70, R4 shipped 1381.00 /
 Equivalence: all eleven print the shipped R4 binary's checksum and exit code on
 **all 150 committed inputs** — this is a spelling spread, not an algorithm
 spread. `.temp/review015/equiv.py`.
+
+**Row 3 is out of contract for the wrong reason, corrected at TASK_021.** The
+table above files `t4_idx.rs` under "consumes the slice". It does not consume
+anything: it reslices `data[b..b + ncol]` exactly as the shipped R3 does, and
+what puts it out is the line below that — `b += ncol`, a running row *index*,
+which is `forbidden[1]`'s strength reduction with a `usize` in place of a
+pointer. The **verdict** is unchanged (row 3 is out), only the reason. It
+matters because it is the one row whose exclusion a reader could otherwise not
+reproduce from the source, and because §14 measures what an in-contract
+data-relative base actually costs — it is `nrow` *cheaper* than shipped R3, not
+`3·nrow + 8` cheaper, so row 3's saving is the strength reduction and not the
+reslice.
+
+## 14. The **in-contract** spelling spread (TASK_021)
+
+§13 is eleven spellings of this kernel and it answers *"how wide is the spread?"*.
+It cannot answer **"is the shipped R3 the cheapest *admissible* one?"**, because
+nine of its eleven rows are out of contract and the two that are in it are the
+shipped pair. This section answers that question, on both sides of the pair.
+
+**The answer is no — and the margin is the smallest of the four patterns that
+have been asked.** `6·nrow + 9` is an **upper bound** on p05's in-contract
+safety tax. The measured in-contract minimum is **`5·nrow + 6`**, i.e. the
+published figure is high by `nrow + 3` — 18% at `small`, 17% at `large`. For
+comparison: p16's published `+27/+77` was high by 30%/42%, p17's `+32` had the
+**wrong sign**, and p02's `+10` was high by 40%/50%. p05 is the pattern whose
+declaration pinned the number tightest, and §14a says why, in instructions.
+
+### 14a. The machine audit cannot settle p05, and that is a measurement
+
+TASK_021's task file says to run `check.idiom_audit` — the stage-`0b` audit — on
+each variant before measuring it. **Run against p05 it reports `spellings = 0`**:
+
+```
+$ python3 .temp/p21/audit.py
+p05 idiom.forbidden: ['chunks_exact', 'a running row pointer']
+BACKTICKED SPELLINGS IN p05's DECLARATION: 0
+check.idiom_audit on p05 with a variant substituted: spellings=0 pairs=0
+    forbidden_hits=0 pins_nothing=0 no_rung=0
+  => the machine audit decides NOTHING on p05.
+```
+
+p05's four `required` entries and two `forbidden` entries carry **no backticks
+at all**, so the named-spelling standard's own trigger — *"where a `required`
+entry quotes an expression in backticks it pins THAT SPELLING"* — never fires
+here. `spec.md`'s `idiom.why` already says so (*"`required` in p01 and p05
+contains no backticks at all, so those two patterns pin no token"*), and
+`.memory/01-ladder.md` records it; what is new is that the audit built to
+reproduce the standard now confirms it with a count rather than a reading.
+
+So p05's admission test is **prose plus one grep**, and it was applied that way:
+
+| entry | how it was decided |
+|---|---|
+| `forbidden[0]` `chunks_exact` | `check.spelling_matches("chunks_exact", src)` — **decidable**, 0 hits on all 29 R3 variants and all 8 R4 variants |
+| `forbidden[1]` "a running row pointer" | **not greppable in general.** What is: a variable advanced by `ncol` across outer iterations (`x += ncol`, `x = x + ncol`, `p.add(ncol)`). Zero hits on all 37, and it is the grep that would have caught §13's rows 9–11 and `t4_idx.rs` |
+| `required[0]` the multiply is written out | `i*ncol` present in whitespace-deleted exec source — true of all 37 |
+| `required[1]` the licensed reslice | **human.** The two readings are separated below rather than resolved |
+| `required[2]` fit check, `u32`/`u64` widths | greppable, true of all 37 |
+| `required[3]` `nrow*ncol` folded in | greppable, true of all 37 |
+
+### 14b. The variants, and the two readings of `required[1]`
+
+Sources under `.temp/p21/v05/`, generated by `.temp/p21/mkvar.py`,
+`mkvar2.py` and `mkvar3.py`; **none is a p05 cell and none may be landed as one.** Every one is
+shipped R3 (or shipped R4) with *one* thing respelled and the driver copied
+verbatim, so no variant can differ in the measured loop.
+
+`required[1]` reads *"R3 may reslice `[base .. base+ncol]` with
+`base = off + 4 + i*ncol` — that moves the CHECK and keeps the MULTIPLY, and it
+is the most a rung may do."* Two readings, and the result does not depend on
+which is taken:
+
+- **strict** — `base` must be spelled `off + 4 + i * ncol`, so only the header
+  read, the slice the reslice indexes, and the fold's surface may move;
+- **p16's reading** — the reslice may index a *hoisted sub-slice*, so `base` may
+  be window-data-relative (`i * ncol` into `&buf[off+4 .. off+4+nrow*ncol]`).
+  This is `r3_endslice`/`r3_window`'s move on p16 (`patterns/p16-tlv-walk/NOTES.md`
+  §10a) and `.memory/01-ladder.md`'s R3 definition licenses the hoisted length
+  assertion it amounts to. The bytes read are identical; only the origin the
+  index is expressed against moves.
+
+**Under both readings the shipped R3 is beaten.** Strictly, by `r3_hdrarray`,
+which respells nothing but the header read and is **3 cheaper, flat in `nrow`**,
+and — for `nrow > 3` — by `r3_get_h1` at `nrow − 3` (the same reslice written
+`buf.get(base..base + ncol)`; at `nrow ≤ 3` that one is *dearer*, and the law is
+signed and exact at every point including `nrow = 1`). Under p16's reading, by
+`r3_ds_h1` at `nrow + 3`. So the strict-reading floor is `6·nrow + 6` at
+`nrow ≤ 6` and `5·nrow + 12` above it, and the p16-reading floor is
+`5·nrow + 6` everywhere; **the shipped figure is not the minimum under either.**
+
+### 14c. Provenance: the baselines are the shipped cells
+
+`r3_ship.rs` and `r4_ship.rs` are the shipped kernels rebuilt in this session
+with `harness/build.py`'s exact `-O3 isolated` rustc flags
+(`--edition 2021 -C codegen-units=1 -C opt-level=3 -C debug-assertions=off
+--cfg slb_isolated`). They are **byte-identical** to the shipped cells —
+`md5_fn 9de0ae49d75a` (`safe_tuned.rs`) and `4a28657ae7e4` (`unsafe.rs`) — and
+reproduce `results/gate/p05-index-flatten.json`'s committed marginals to the
+instruction: 1504.00 / 8834.70 and 1381.00 / 8435.70. So §14 is one build and
+directly comparable with the gate record, which is the cross-build risk §10b of
+`patterns/p16-tlv-walk/NOTES.md` had to carry and this section does not.
+
+**Equivalence:** all **37** binaries print the shipped R4 binary's checksum and
+exit code on **all 183 committed inputs** — 0 mismatches over 6771 runs
+(`.temp/p21/equiv.py`). A spelling spread, not an algorithm spread.
+
+### 14d. The `nrow` axis had three points. It now ships with fourteen
+
+**Bands A–C sweep `ncol` and *sample* `nrow`.** They give `nrow ∈ {19, 41, 65}`
+and nothing else, so **every `a + b·nrow` law this pattern has ever published —
+`6·nrow + 9` included — rested on three points**, one degree of freedom against
+a two-parameter model. That is the shape that has already cost this project two
+retractions (p16's `nrec + 3`; p05's own `+11.00 flat`), and `inputs/gen.py`'s
+own band-C comment concedes it: two points cannot be wrong, three can only be
+wrong in one direction.
+
+TASK_021 added **band D** to `patterns/p05-index-flatten/inputs/gen.py`:
+`nrow ∈ {1…9, 12, 16}` × `ncol ∈ {30, 32, 33}` = **33 blobs**, nine
+*consecutive* `nrow` values plus two distant ones for lever arm, at three `ncol`
+residue classes mod 8 — `{6, 0, 1}` — so the class LLVM peels a full extra
+vector iteration for (`ncol ≡ 0`, §2a) is *in* the band rather than assumed
+away. Appended last, and the RNG is drawn sequentially, so **all 150 files that
+existed before are byte-identical after** (md5 over all 150: 0 changed).
+
+The sweep is therefore **179 inputs — 14 values of `nrow`, 96 of `ncol` spanning
+24…119, all eight residue classes mod 8** — and since TASK_021 `gen.py` is
+inside `source_sha256`, a law measured on these blobs is re-derivable from a file
+the gate record can see.
+
+### 14e. The laws — zero residual on every one of 179 points
+
+`-O3 isolated`, marginal `Ir`/call = (whole-program `Ir` at `n_iters` 200 − at
+100)/100, `harness/check.py` step 3b's own probe (`.temp/p21/mir.py`), one
+session. Checked by `.temp/p21/laws.py`; **residual is exactly 0 at every point
+of every row**, not "small".
+
+| spelling | what changed from shipped R3 | `− R4ship` | reading |
+|---|---|---|---|
+| `r3_ds_h1` ✦ | data region resliced once to `nrow*ncol`, `base = i*ncol`; header via `try_into()` | **`5·nrow + 6`** | p16's |
+| `r3_ds_while` ✦ | ditto, `while` outer loop | **`5·nrow + 6`** | p16's |
+| `r3_ds_h2` / `_cells` / `_i1` / `_two` / `_copied` ✦ | ditto, five more surfaces | **`5·nrow + 6`** | p16's |
+| `r3_ds_h0` | data region resliced once; shipped header | `5·nrow + 9` | p16's |
+| `r3_dsget_h1` | ditto + `data.get(..)` instead of the indexing reslice | `5·nrow + 10` | p16's |
+| `r3_get_h1` | shipped base, `buf.get(base..base+ncol)`, array header | `5·nrow + 12` | **strict** |
+| `r3_hdrarray` | shipped everything, header via `try_into()` | `6·nrow + 6` | **strict** |
+| **`safe_tuned.rs` (shipped)** | — | **`6·nrow + 9`** | **strict** |
+| `r3_ends_h1` | `&buf[..off+4+nrow*ncol]` hoisted, base absolute, array header | `6·nrow + 10` | **strict** |
+| `r3_window` | whole window resliced, `base = 4 + i*ncol` | `6·nrow + 12` | p16's |
+| `r3_ends_h0` | as `r3_ends_h1`, shipped header | `6·nrow + 13` | **strict** |
+
+✦ = seven textually independent spellings, **each swept over all 179 points and
+each with zero residual against `5·nrow + 6`**. Three of them (`r3_ds_h1`,
+`r3_ds_h2`, `r3_ds_copied`) turn out to be the *same binary* — `md5_fn
+e1d625cc9b0e`, 113 instructions — and four are not (`d233f48a00ff`,
+`9e59f98affaa`, `83d5f8bb96a5`, `cf5784a53206`), so the floor is reached by
+**four distinct machine-code bodies** and is not one spelling's luck.
+
+Two spellings that are **not** near the floor and are worth recording so nobody
+re-derives them, both measured on the two shipped inputs only and **not** swept:
+`buf[base..][..ncol]` with an absolute base costs **+38 / +130** against shipped
+R3 (1542.00 / 8964.70 — two range checks, not one; the same two-step spelling
+*over the hoisted data slice*, `r3_ds_two`, is at the floor), and
+`buf[base..].iter().take(ncol)` de-vectorises the fold entirely (2010.00 /
+10536.70, worse than shipped R2 on `small`).
+
+### 14f. The R4 side has **zero** in-contract spread — six spellings, 179 points
+
+This is the part p16 and p17 could not do, and it is why p05's floor is a
+two-sided figure rather than an R3-side bound (`.memory/01-ladder.md`
+finding 14).
+
+| unsafe spelling | `md5_fn` | `n_fn` | `− R4ship`, 179 points |
+|---|---|---:|---|
+| `unsafe.rs` (shipped), `get_unchecked(off + 4 + i*ncol + j)` | `4a28657ae7e4` | 87 | — |
+| `r4_base`, per-row `base` hoisted | `4a28657ae7e4` | 87 | **0** |
+| `r4_for`, `for` loops instead of `while` | `acf0bc406f51` | 87 | **0** |
+| `r4_getrange`, `get_unchecked(base..base+ncol)` + iterator fold | `e905e528d7c6` | 87 | **0** |
+| `r4_rowslice`, `from_raw_parts` per row | `e905e528d7c6` | 87 | **0** |
+| `r4_dsrow`, hoisted data slice + unchecked row reslice | `e905e528d7c6` | 87 | **0** |
+| `r4_dataptr`, fixed data pointer, `*dp.add(i*ncol + j)` | `3aa26d8839bc` | 87 | **0** |
+| `r4_dataslice`, `from_raw_parts` over the data region, flat index | `5f9513c56b92` | 98 | `+8` at `ncol ≡ 0 (mod 8)`, `+3·nrow + 8` otherwise |
+
+**Four distinct machine-code bodies, one instruction count, one executed count
+at every point.** The one variant that moves, `r4_dataslice`, is *dearer* — and
+its numbers (1446.00 / 8638.70) are exactly §13 row 3's `t4_idx.rs`, which is
+how a *safe* out-of-contract spelling and an *unsafe* in-contract one land on
+the same figure. So the shipped R4 is the cheapest in-contract unsafe spelling
+found, and unlike §13's rows 9–11 nothing in contract goes below it.
+
+### 14g. The mechanism, counted in the disassembly
+
+`.memory/01-ladder.md` finding 6 asks for the mechanism, not the number. Every
+term above is a per-row instruction and can be pointed at
+(`.temp/p21/asm-r3_ship.txt`, `asm-r3_ds_h1.txt`, `asm-r4_ship.txt`).
+
+The outer-loop latch plus row setup, i.e. everything executed once per row
+outside the vector body:
+
+| rung | insns/row | the block |
+|---|---:|---|
+| **R4 shipped** | **12** | `mov;shl;sub` + `mov;add` (Horner) · `inc` · `add %r9,%r11` + `add %r9,%rdx` (two row pointers LLVM strength-reduced for itself) · `cmp;je` (trip) · `cmp $0x8;jae` (vector guard) |
+| **R3 shipped** | **18** | the same 12, **plus** `mov;imul` (re-derive `i*ncol`) · `add %rsi` (add `off + 4`) · `lea (%rax,%r11,1)` (form `base+ncol`) · `cmp %r8;ja` (against `buf.len()`) |
+| **R3 `r3_ds_h1`** | **17** | the same, **minus** the `add %rsi` |
+
+So the published `6·nrow` is exactly those six instructions, and the in-contract
+minimum removes **exactly one of them**: the `add` that turns a window-relative
+row base into a buffer-absolute one. Hoisting the reslice to
+`&buf[off+4 .. off+4+nrow*ncol]` makes the base already window-relative, and the
+`add` disappears. The `+3` is the header: shipped decodes `nrow`/`ncol` with
+`movzwl` + two `movzbl` + `shl` + `or`; the array form issues one 4-byte load
+and derives the vector guard as `cmp $0x80000,%r9d` — testing `ncol >= 8`
+against the *packed* header word without extracting `ncol` at all.
+
+**The surviving five are the bounds check and nothing else**, and they cannot
+be removed by any spelling: `mov;imul` re-derives `i*ncol` — which LLVM has
+*already* strength-reduced into `%r8`/`%rsi` two instructions earlier, and
+re-derives anyway because the check needs the value and not the pointer — then
+`lea` forms `base + ncol`, then `cmp;ja`. The fact needed to delete them is
+`(i+1)·ncol <= nrow·ncol` for `i < nrow`, which is **nonlinear**, which is the
+obligation R5 discharges with `lemma_mul_inequality` and `by (nonlinear_arith)`
+(§5), and which §12b's `probe2.rs` already showed LLVM cannot do. **The
+in-contract floor and the proof obligation are the same fact**, and that is a
+sharper statement of finding 6 than "the optimiser fails the lemma the proof
+proves" — it now has a floor under it, measured over 14 values of `nrow`.
+
+### 14h. What this establishes
+
+1. **"The shipped R3 is the cheapest admissible spelling" is FALSE for p05
+   too** — under *both* readings of `required[1]`, so the reading does not have
+   to be settled to reach it. Fourth pattern out of four.
+2. **`R3ship − R4ship = 6·nrow + 9` is an UPPER BOUND on p05's in-contract
+   safety tax, not the tax.** The measured minimum is **`5·nrow + 6`**:
+   **101 at `small` against a published 123, 331 at `large` against 399**.
+   `.memory/01-ladder.md` finding 6 quotes the published figure as p05's safety
+   cost; it is high by `nrow + 3`.
+3. **…but the qualitative claim survives, which is new.** p17's floor flipped
+   the *sign* and p16's cut the tax by up to 42%; p05's changes the constant and
+   one coefficient and leaves the functional form, the sign and the `O(nrow)`
+   conclusion intact. The in-contract span is `nrow + 7` (26 at `small`, 72 at
+   `large`) against a published tax of 123 / 399 — **21% / 18% of the published
+   figure lives in spelling the declaration does not pin, against p16's 44% /
+   55%.** p05's declaration is the tightest of the two that have been measured
+   this way, and §14g says why: it pins the multiply, and the multiply is where
+   the cost is.
+4. **The floor is two-sided**, unlike p16's and p17's. Six in-contract unsafe
+   spellings, four distinct machine-code bodies, **zero** difference in executed
+   instructions at all 179 points; the only in-contract R4 that moves is dearer.
+   So `5·nrow + 6` is not an R3-side bound with an unsearched R4 side — within
+   the spellings searched it is the whole in-contract interval's lower end.
+   It remains true that `inf(R4) <= inf(R3)` by construction (finding 14), so
+   this is *best found*, never *infimum*.
+5. **p05's published `6·nrow + 9` is independently re-derived here on a 14-point
+   `nrow` axis**, zero residual, where the number it certifies had been a
+   three-point fit. That is worth as much as the correction: the headline was
+   under-supported and is now correct.
+
+**Method.** `.temp/p21/mkvar.py`, `mkvar2.py`, `mkvar3.py` (sources), `.temp/p21/mir.py`
+(the marginal probe, `harness/check.py::_probe_input` plus a whole-program `Ir`
+difference), `.temp/p21/equiv.py` (183 inputs × 37 binaries), `.temp/p21/laws.py`
+(residuals), `.temp/p21/audit.py` (the idiom audit). **No pattern source was
+edited**; the only committed file this section changed is `inputs/gen.py`, which
+gained band D.
