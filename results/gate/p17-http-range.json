@@ -11,7 +11,7 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "e6e9841f854ae3dd0119b2b9ddf1a206f5d73c1c1d791e3ffb9ddd27a4e2ed86",
+  "contract_sha256": "f507c355815fc57c1dba24b7bf5236a7c34ba1b5d80e1feb6041a3b20cf6d155",
   "source_sha256": {
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
     "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
@@ -33,7 +33,7 @@
     "patterns/p17-http-range/model.py": "d3e26cfeb6a076b423b474a40d77bbab47e50d0abf133e457ef046ed12b5813c",
     "patterns/p17-http-range/safe_naive.rs": "43fadb4c64f6f60e219ba8ce16bf27daa1085f6239d873a16bca7a7b5e20340b",
     "patterns/p17-http-range/safe_tuned.rs": "4afff314daf7d1fdadfeb1fe661a13a07808da9dce560bece1798518fbbf0414",
-    "patterns/p17-http-range/spec.md": "e0bd1e09e19643168c25f9e1682529550be88020cc2e63ad4bfc69a27b556ad9",
+    "patterns/p17-http-range/spec.md": "ec9b91ffaefd72bd51367a98f7351e91db9388006022ee8ed91dbb8dc48660f4",
     "patterns/p17-http-range/unsafe.rs": "a119e3782f413cfdaa2e71fcf5fe572ed820d5db6daade7e06ea13cc2a415960",
     "patterns/p17-http-range/verus.rs": "5a09e9d58df3639b5802a955e66fafd01e4b2b49cbff80ee0d82d4fa9ca6cc12"
   },
@@ -833,7 +833,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==3536299==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x50600000001a at pc 0x563d8d3d6921 bp 0x7fffbc707ec0 sp 0x7fffbc707eb0 READ of size 1 at 0x50600000001a thread T0 #0 0x563d8d3d6920 in kernel /home/apt/repos_common/"
+      "diagnostic": "================================================================= ==3612255==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x50600000001a at pc 0x555e66e05921 bp 0x7ffcf8d3fce0 sp 0x7ffcf8d3fcd0 READ of size 1 at 0x50600000001a thread T0 #0 0x555e66e05920 in kernel /home/apt/repos_common/"
     },
     "adversarial-stride1.bin": {
       "exit": 0,
