@@ -81,6 +81,38 @@ is silent, which is a distro default and not a property of the program
 (p02 `NOTES.md` §1a). Level 3 uses `__builtin_dynamic_object_size`, so it fires
 on more shapes than level 2 would.
 
+**`_FORTIFY_SOURCE` blinds ASan to `mem*` misuse, under clang as well as gcc.**
+Measured at TASK_014 and reproduced at TASK_014_REVIEW. ASan's overlap and
+bounds checks for `memcpy` live in its **`memcpy` interceptor**; at fortify
+level 3 a call whose destination has a computable
+`__builtin_dynamic_object_size` is rewritten to **`__memcpy_chk`**, which ASan
+does **not** intercept. Isolated to that one flag, same source:
+
+| build | call emitted | overlapping `memcpy` |
+|---|---|---|
+| gcc, box default (fortify 3) | `__memcpy_chk@plt` | **silent, exit 0** |
+| gcc `-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0` | `__interceptor_memcpy` | fires, exit 1 |
+| clang, default (no fortify) | `__asan_memcpy` | fires, exit 1 |
+| clang `-D_FORTIFY_SOURCE=3` | `__memcpy_chk@plt` | **silent, exit 0** |
+
+**The discriminator is `_chk`, not the compiler.** Consequence for the gate:
+`harness/check.py` stage 7 builds gcc-only at this box's defaults, so it is
+structurally blind to any `mem*`/`str*` misuse gcc rewrites to a `_chk` form.
+p02 was checked and is **not** affected — its ASan kernel calls
+`__interceptor_memcpy` and fires on three inputs.
+
+**glibc 2.39 x86-64 `memcpy` *is* `memmove`.** One function, one address, with a
+`dst-src < n → backward copy` branch; `__memcpy_chk` and `__memmove_chk` alias
+the same way. So overlapping-`memcpy` UB cannot be made to misbehave on this
+box, at any size, under any `GLIBC_TUNABLES` hwcaps setting (320 runs, TASK_014).
+
+**valgrind memcheck is unusable on this box; callgrind is fine.** Dynamic
+binaries: refuses to start (`must-be-redirected ... memcmp in
+ld-linux-x86-64.so.2`, wants `libc6-dbg`, which needs root). Static binaries:
+start, but `--trace-redir=yes` shows three vDSO redirections and **zero**
+`mem*`/`str*` ones, so the interceptors that would report an overlap are not
+installed. Do not plan a detection story around memcheck.
+
 **ASan/UBSan need `-static-libasan -static-libubsan`.** The container ships
 `LD_PRELOAD=/usr/libexec/coreutils/libstdbuf.so`, and the *shared* ASan runtime
 then refuses to start ("ASan runtime does not come first in initial library

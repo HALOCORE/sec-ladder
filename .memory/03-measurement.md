@@ -337,6 +337,29 @@ cannot measure IPC to explain it (no `perf`, `perf_event_paranoid=3`, no root),
 so it stands as an observation — and as the reason a wall-clock column must
 accompany any cross-compiler claim.
 
+### Callgrind counts a `rep`-string instruction **once per repetition**
+
+Established at TASK_014, verified independently at TASK_014_REVIEW with a
+minimal probe rather than by inference: `rep stosb` over 4096 bytes = **4110.00
+Ir** (1.0034 Ir/byte) against `rep stosq`'s 527.00 and an empty call's 5.00. So
+one x86 instruction can contribute thousands of `Ir`.
+
+Consequence, measured on p08: gcc inlines `rep stos %rax` (0.126 Ir/byte) where
+glibc's `memset` uses `rep stosb` (1.006), and `Ir` therefore says c-gcc is
+**33% cheaper** than c-clang while wall clock says it is **dearer** — *`Ir` and
+ns disagreeing in direction, with a named mechanism*. This is finding 5/6's
+family with a cause attached, and it is a property of the **counter**, not of
+the code.
+
+**Blast radius checked and empty.** glibc picks the byte-wise `rep` paths only
+above a size threshold — `memcpy`/`memmove` stay on the vector path at 0.104
+Ir/byte up to somewhere between 8 KiB and 16 KiB, `memset` flips at 3 KiB — and
+p02's copies (61 B = 26 Ir, 4092 B = 425 Ir) are well inside the vector regime.
+p01, p05, p16 and p17 call no bulk routine at all. **Only p08's gcc kernels
+contain a `rep` instruction**, so no previously published `Ir` comparison is
+contaminated. Re-check this before denominating any future pattern in bytes
+moved rather than bytes folded.
+
 ## Timing protocol
 
 1. Pin to a single core with `taskset -c N`. Use the same core for a whole

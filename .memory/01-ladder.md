@@ -114,6 +114,18 @@ is a much stronger claim than any p01 could produce.
      *statically the largest cell in the ladder* — a sharper refutation of
      static-count-as-proxy than the gcc/clang one. Reporting R2 alone overstates
      safe Rust's cost by ~3.7×. **Never publish a safety-cost claim without R3.**
+   - **…and the corollary, which cost us three retractions: without the *best*
+     R3.** A safety-cost claim is a claim about the *language*, so it is only as
+     good as the best spelling anyone can find — and this project has now
+     published a spelling's cost as safety's cost **three times**: p02 (a lost
+     `memcpy` idiom, retracted), p16 ("only the naive indexed spelling is O(n)",
+     caught at review), p05 (`chunks_exact` beats the *unsafe* rung, caught at
+     TASK_014_REVIEW). The failure mode is always the same — one plausible R3 is
+     written, measured, and reported as what safe Rust costs.
+     **Before any safety-cost headline, write at least two independent R3
+     spellings and quote the cheaper.** The iterator/slice-consuming forms
+     (`chunks_exact`, `split_at`, `iter().zip()`) are the ones that keep winning,
+     because they hand the optimiser a length it does not have to re-derive.
 
    Reproduced on p01 at TASK_002, with the residue effect measured properly this
    time (16 window lengths, `inputs/gen.py --sweep`), `-O3 isolated`, per call:
@@ -436,10 +448,11 @@ is a much stronger claim than any p01 could produce.
    **ns is a measurement here; cycles is an inference.** See
    `.memory/00-environment.md`.
 
-6. **p05 — the safety cost does not vanish on a vectorised loop, it moves from
-   per-element to per-row; and its cause is a nonlinear implication the optimiser
-   cannot prove but the verifier can.** (TASK_013, substantially corrected at
-   TASK_013_REVIEW — the first write-up said "the check costs 0.0000 Ir/element"
+6. **p05 — on a vectorised loop the cost is `O(nrow)` for two *spellings* of safe
+   Rust and *negative* for a third. Safe Rust is not slower here; two ways of
+   writing it are.** (TASK_013, corrected at TASK_013_REVIEW, and its headline
+   **refuted at TASK_014_REVIEW** — see the "R3 is not free" bullet below, which
+   was wrong. The first write-up also said "the check costs 0.0000 Ir/element"
    and "the wider the lane the cheaper safety gets"; **the first is true only of
    the steady state and the second is refuted by measurement.**)
 
@@ -480,8 +493,22 @@ is a much stronger claim than any p01 could produce.
    - **The hypothesis is not inverted in general — it holds at `ncol = 8`.** R2's
      vector guard is `N >= 9` where R4's is `ncol >= 8`, so there the check **does**
      block vectorisation, and costs **2.94×**. p05 has both regimes in one kernel.
-   - **R3 is *not* free here.** +16.7% at 496×8, +4.7% at shipped `large` — an
-     `O(nrow)` cost. **The "R3 free" streak ends at five patterns, not six.**
+   - ~~**R3 is *not* free here.** +16.7% at 496×8, +4.7% at shipped `large` — an
+     `O(nrow)` cost. The "R3 free" streak ends at five patterns, not six.~~
+     **RETRACTED at TASK_014_REVIEW, and this is the blocker of that review.**
+     What was measured is p05's *shipped* R3, which reslices by hand. One
+     idiomatic safe expression — `data.chunks_exact(ncol)`, a spelling this
+     file's own R3 definition **names** — is `nrow − 7` instructions per call
+     **cheaper than R4**, exactly, on every input in both residue classes
+     (−12 at nrow 19, −34 at 41, −58 at 65), with identical stdout and exit
+     against R4 on all **150** committed p05 inputs, and +1.78% wall against
+     R4's +2.22% for shipped R3 and +31.2% for R2. Zero `unsafe`, no proof.
+     The mechanism: `chunks_exact` hands each row a slice whose length **is**
+     `ncol` by construction, so the vector/scalar split is computed once per
+     *call* rather than once per row (no `cmov` at all, against R2's five), the
+     epilogue is R4's unchecked 5-instruction body, and both `f(0) = 84`
+     mechanisms — the `cmp $9` guard and the `cmove` forcing a zero remainder to
+     a full vector width — disappear. **Safe Rust beat unsafe Rust here.**
    - **4.2500 is not "the check".** The `-unroll-count=1` no-op control *does*
      exist here (bit-for-bit identical R2, `md5_fn 76d7c2380278`), and gives
      rolled+checked 7.0000, rolled+unchecked 5.0000, novec-unrolled 2.7500 →
@@ -489,19 +516,36 @@ is a much stronger claim than any p01 could produce.
      derived on p16. So the third reproduction is of the constant **and its
      decomposition**, which is stronger than the constant alone.
 
-   **The deepest result, and the first time this project connects the proof to the
-   performance causally.** The kernel *already* checks `nrow*ncol <= avail`, so
-   R2's panic is **dead on every execution**. LLVM cannot eliminate it because
-   `nrow*ncol <= avail ⟹ i*ncol + j < avail` is **nonlinear** — and that is
-   *exactly* the obligation R5 discharges, with `lemma_mul_inequality` and one
-   `by (nonlinear_arith)`. **The `29 + 3r` Ir per row is the price of the
-   optimiser failing the lemma the proof proves.**
+   **Why the check cannot be eliminated — and what that is worth.** R2's panic is
+   dead on every execution, and LLVM keeps it: `nrow*ncol <= avail ⟹ i*ncol + j <
+   avail` is **nonlinear**, which is exactly the obligation R5 discharges with
+   `lemma_mul_inequality` and one `by (nonlinear_arith)`. Linearising that guard
+   in an isolated compilation deletes the entire per-row apparatus — 5 `cmov` → 0,
+   166 → 125 instructions, the `cmp $9` and residue `cmove` gone, an unchecked
+   epilogue (TASK_014_REVIEW, `probe2.rs`, which also reproduces the shipped
+   mechanism independently). So nonlinearity is the blocker **for this kernel**.
 
-   That sharpens finding 2. "A proof buys nothing on its own" is still true of
-   *this* toolchain — but here we can say precisely what it would buy if rustc
-   could consume it, and name the fact it would need. Safety's cost on this
-   pattern is not the check; it is the compiler's incompleteness at nonlinear
-   arithmetic.
+   It is **not necessary in general**: p08 keeps a provably-dead `copy_within`
+   range check whose implication is purely *linear*, at 26.00 Ir/call, because
+   the fact it needs is **relational** across the loop induction variable rather
+   than nonlinear — LLVM's value-range machinery is per-value. Restating the
+   relation inside p08's loop deletes the check outright (3 panic refs → 0).
+
+   **And the cost is not intrinsic to safe Rust** — see the retracted bullet
+   above. What the `29 + 3r` per row prices is the *indexed and the
+   manually-resliced spellings*, not the missing lemma.
+
+   Two further caveats, both measured at TASK_014_REVIEW. The linearisation
+   counterfactual does **not** survive the shipped binary build: as a real p05
+   cell, LLVM's induction-variable simplification re-derives `i*ncol` and the
+   linearised R2 measures **2366 Ir/call against R2's 2081** — *worse*. And the
+   whole question is moot for the headline, because a spelling with no lemma at
+   all beats R4.
+
+   ~~"The `29 + 3r` Ir per row is the price of the optimiser failing the lemma
+   the proof proves."~~ **Retracted.** It is the price of two spellings; a third
+   pays nothing. The sentence remains true of the *obligation* and false as a
+   statement about safety, which is the distinction it elided.
 
    **Two things that stand unchanged:** `Ir` converts to time on this kernel
    (+34.4% `Ir` → **+32.9%** wall — the review's own remeasurement; the delivered
@@ -511,6 +555,51 @@ is a much stronger claim than any p01 could produce.
    **sound, and better justified than the delivery argued**: `ncol <= 65535` × `u8`
    caps a row sum at 16 711 425 < 2³², so `u32` and `u64` are equal on *every
    representable input*, confirmed by identical checksums.
+
+7. **p08 — the first structural Rust win, and a bug that executes without
+   consequence.** (TASK_014, reviewed at TASK_014_REVIEW.) A fixed buffer shifted
+   right to make room; R1 spells the move `memcpy`, R1h `memmove`, and **that one
+   token is the whole difference**. Every rung carries the same bounds guard, so
+   this is the project's first result that is not about a bounds check.
+
+   **`memcpy` *is* `memmove` on this libc.** glibc 2.39 x86-64: one function, one
+   address, with a `dst-src < n → backward copy` branch — and the `_chk` forms
+   alias too (`__memcpy_chk == __memmove_chk`), which matters because gcc's
+   fortified cells call those. So the UB **executes and is unobservable**: 320
+   runs across every size regime with zero divergence, all 32 builds print the
+   model's answer, exit 0, no diagnostic. **R1 ≡ R1h at 0.00 Ir/call** — the same
+   machine code with one different call target. That is a **libc** property, not
+   a language or compiler one, and must never be quoted as "memmove is free".
+
+   **What sees it.** ASan's `memcpy-param-overlap` fires, exact to the byte
+   (`d=2045` fires, `d=2046` silent) — **but not when the call site is
+   fortified**, because the check lives in the `memcpy` interceptor and ASan does
+   not intercept `__memcpy_chk`. The discriminator is `_chk`, **not gcc**: clang
+   at `-D_FORTIFY_SOURCE=3` is blind too. Miri catches the Rust mutant
+   (`copy_nonoverlapping called on overlapping ranges`), the first time the
+   gate's Miri stage has been aimed at aliasing UB rather than spatial. valgrind
+   memcheck is unavailable on this box entirely.
+
+   **The structural claim, stated precisely.** Safe Rust cannot express the bug —
+   the borrow checker rejects it at compile time, and rustc even suggests
+   `split_at_mut`. There is **no runtime check** and therefore no cost to
+   measure. `unsafe` re-opens it exactly via `copy_nonoverlapping`. **What R5
+   does *not* do is rule it out**: substituting `copy_nonoverlapping` into the
+   trusted body verifies `11/0` shipped and `15/0` under the twin, invisible to
+   Verus, to the twin, to the contract pin and to stages 5c/5c-req. Only the O3
+   identity pin against R4 and Miri catch it. A proof of a `requires` is not a
+   proof that the trusted body honours it.
+
+   **The honest counterweight, which must ship with the claim**: safe Rust
+   prevents the *UB*, not the *wrongness*. The forward-loop control compiles,
+   does not panic, and silently replicates the buffer.
+
+   **R3 == R4 flat at 26 Ir/call** (a dead, purely linear range check LLVM keeps),
+   so R3 is free again — but this is the **sixth** pattern only if p05's shipped
+   R3 is counted as the failure, and after TASK_014_REVIEW's blocker the honest
+   count is that **no pattern has yet shown safe Rust paying an unavoidable
+   per-element price.** Do not write "p08 restores the streak"; there was no
+   break.
 
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how

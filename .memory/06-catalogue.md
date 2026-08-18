@@ -25,7 +25,7 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 | T011 | p17 HTTP suffix-range (CVE-2017-7529) — the limit of memory safety | **done**, gate PASS first run, **reviewed** (leak claim refuted; real artefact found one token away) |
 | T012 | ship p17's slice-relative guard — the artefact T011 claimed | **done**, reproduced independently; gate PASS, no measured number moved |
 | T013 | p05 2-D index flattening — the first **vectorisable** kernel | **done**, gate PASS first run, **reviewed**; every number reproduced, four framing claims corrected |
-| T014 | p08 overlapping move — the bug safe Rust cannot express | **wip** |
+| T014 | p08 overlapping move — the bug safe Rust cannot express | **done**, gate PASS first run, **reviewed**; six manager prescriptions refuted, and the review's blocker landed on **p05**, not p08 |
 
 **T010's review closed the gate-hardening arc.** It was deliberately shaped as
 the opposite of the previous six — not a bypass hunt but "will this gate *accept*
@@ -68,6 +68,31 @@ Findings are folded into `.memory/01`–`05`; those files supersede the pilot an
 supersede any earlier task report they contradict.
 
 ## Open cross-cutting issues
+
+- **p05's R3 is not the best R3, and the same audit is owed on p16 and p17.**
+  TASK_014_REVIEW's blocker: `data.chunks_exact(ncol)` is `nrow − 7`
+  instructions per call **cheaper than the unsafe rung**, on every p05 input,
+  with identical output on all 150 committed inputs. p05's shipped
+  `safe_tuned.rs` reslices by hand and pays `6·nrow + 9`. The variant lives in
+  `.temp/review014/p05lin/` and is **not gate-ready** — it needs static
+  identity, the `O0`/`whole` cells, and `spec.md` pins. Three patterns have now
+  priced a *spelling* as safety's cost, so the audit is not optional: see
+  `.memory/01-ladder.md`'s corollary rule (write two independent R3 spellings,
+  quote the cheaper).
+- **`harness/check.py` stage 7 is structurally blind to `_chk`-rewritten
+  `mem*`/`str*` misuse**, because it builds gcc-only at this box's fortify-3
+  default and ASan's checks live in the interceptors, not in `__memcpy_chk`.
+  Identified at T014, confirmed and *strengthened* at review (clang with
+  `-D_FORTIFY_SOURCE=3` is blind too, so the discriminator is `_chk`, not the
+  compiler). Fix is `-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0` and/or a clang
+  column. **p02 was checked and is not affected.** Not fixed; general, not
+  p08-specific.
+- **A gate row can record "sanitiser clean" for two opposite reasons** and the
+  record cannot tell them apart. `results/gate/p08-overlap-move.json` shows
+  `adversarial-overlap expect=clean fired=False exit=0` with empty
+  `notes`/`blocked` — identical in shape to p17's genuinely-clean row, though
+  p08's means "the tool cannot see this". `check.py:566` admits only
+  `clean`/`fires`. The reason survives only in `model.py`'s docstring.
 
 - ~~**Miri is not installable**~~ — **closed at T005.** `nightly` +
   `cargo miri setup` alongside the pinned toolchain; R4 has no vstd dependency,
@@ -160,7 +185,7 @@ supersede any earlier task report they contradict.
 | p05 | 2-D index flattening / matmul (`i*n+j`) | dimensions trusted vs buffer; overflow in the check | moderate | **done** (T013), gate PASS first run, R5 == R4 `exact` at O3; safety moves from per-element to **per-row**, and gets *worse* with wider lanes |
 | p06 | in-place reverse / rotate / swap | aliasing, permutation invariant | moderate | planned |
 | p07 | binary search | midpoint overflow (`(lo+hi)/2`) | moderate | planned |
-| p08 | memmove with overlapping regions | overlap UB | moderate | planned |
+| p08 | memmove with overlapping regions | overlap UB | moderate | **done** (T014), reviewed; gate PASS first run, R4 == R5 `exact` at **both** O0 and O3; the UB **executes and is unobservable** (glibc `memcpy` *is* `memmove`), so p08 is a tooling-and-expressiveness result, not a performance one |
 | p09 | bit vector / bitset ops (set, test, popcount) | word-index vs bit-index confusion | easy–moderate | planned |
 | p10 | sliding-window / stencil over array | off-by-one at boundaries | moderate | planned |
 
@@ -263,12 +288,12 @@ High-value out-of-order candidates noted for later:
   borrow checker rejects it at compile time. A structural Rust win to set against
   p17's structural Rust loss. Awkward for the ladder (R2/R3 must use
   `copy_within`, a different algorithm) — design carefully.
-  **Taken at T014.** Two claims in this entry's original wording are under test
-  rather than established, and are flagged here so nobody inherits them as fact:
-  *"overlap UB is not caught by ASan"* — **probably wrong**, this box's
-  `libclang_rt.asan.a` carries the `-param-overlap` interceptor string — and
-  *"the different algorithm is a flaw to design around"* — it is the finding,
-  and TASK_014 requires the spec to say so rather than pretend the rungs match.
+  **Done at T014.** Both claims in this entry's original wording were **wrong**
+  and are corrected here so nobody inherits them: *"overlap UB is not caught by
+  ASan"* — it **is**, by the `memcpy-param-overlap` interceptor, unless the call
+  site was fortified to `__memcpy_chk`, which blinds ASan under **clang as well
+  as gcc** (`.memory/00-environment.md`); and *"the different algorithm is a flaw
+  to design around"* — it is the finding.
 - **p47** (constant-time compare) — the adversary is the *optimiser*, a third
   security axis after spatial safety and functional correctness. Likely defeats
   R5 in an interesting way: Verus cannot state a timing property at all.

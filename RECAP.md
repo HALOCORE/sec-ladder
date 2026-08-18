@@ -15,12 +15,18 @@ Rust, unsafe Rust + Verus proof — plus a sixth **R1h** hardened-C cell, across
 optimisation levels and two inline modes, and compared on assembly, executed
 instructions, timing, proof burden and trusted-base size.
 
-47 patterns are catalogued in `.memory/06-catalogue.md`. **Five exist, all green
+47 patterns are catalogued in `.memory/06-catalogue.md`. **Six exist, all green
 and all reviewed:** p01 (calibration), p02 (first real bug), p16 (first
 data-dependent bound), p17 (the limit of memory safety), p05 (the first
-vectorised kernel).
+vectorised kernel), p08 (the first structural Rust win).
 
 ## The findings so far — this is the actual output
+
+**Numbering warning, because it has already cost an agent time.** The list below
+is **RECAP's own digest** and is numbered 1–13. `.memory/01-ladder.md` has a
+*different* list, numbered 1–7, one entry per pattern, and **that one is
+authoritative**. "Finding 12" means different things in the two files. When
+writing a task file, name the pattern (*"p05's causal claim"*), never the number.
 
 1. **A Verus proof costs exactly zero instructions.** The proven binary is
    byte-identical to the unproven one; ghost code fully erases. Verified on raw
@@ -92,8 +98,9 @@ vectorised kernel).
    5.7500 once the driver's `println!` digit-count term is differenced out); p05
    reproduced it a third time on a non-Horner fold, *and* reproduced the
    decomposition — 2.00 check + 2.25 foreclosed unroll — from its own no-op
-   control. **R3 is free for five patterns and then stops**: on p05 it carries an
-   `O(nrow)` cost, +4.7% at `large`, +16.7% at `ncol = 8`.
+   control. ~~R3 is free for five patterns and then stops.~~ **The second
+   sentence is retracted** — see finding 13. **No pattern has yet shown safe
+   Rust paying an unavoidable per-element price.**
 12. **p05 — safety on a vectorised loop, and the first causal link from proof to
    performance.** Per element inside the vector body the check is free (1.375000,
    five rungs identical). But it is hoisted into a 22-instruction per-row
@@ -105,8 +112,35 @@ vectorised kernel).
    The cause: the kernel already checks `nrow*ncol <= avail`, so R2's panic is
    dead on every run — but LLVM cannot eliminate it, because
    `nrow*ncol <= avail ⟹ i*ncol+j < avail` is **nonlinear**, which is exactly the
-   obligation R5 discharges with `lemma_mul_inequality`. **The safety cost is the
-   price of the optimiser failing the lemma the proof proves.**
+   obligation R5 discharges with `lemma_mul_inequality`. Linearising the guard in
+   an isolated compilation deletes the whole per-row apparatus, so nonlinearity
+   **is** the blocker for this kernel — confirmed at TASK_014_REVIEW against the
+   manager's suspicion that p08 refuted it. But it is **not a general law** (p08
+   keeps a dead *linear* check for a *relational* reason), and
+   ~~"the safety cost is the price of the optimiser failing the lemma the proof
+   proves"~~ is **retracted as written**: what those instructions price is two
+   *spellings*, not safety. See finding 13.
+
+13. **p08, and the retraction it forced — safe Rust beat unsafe Rust on p05.**
+   p08's own result is structural: overlapping `memcpy` is UB that safe Rust
+   **cannot express** (borrow checker, compile time, no runtime check and so
+   nothing to measure), `unsafe` re-opens it via `copy_nonoverlapping`, and
+   **R5 does not close it** — substituting `copy_nonoverlapping` into the trusted
+   body verifies 11/0 and 15/0 under the twin, invisible to Verus, the twin and
+   the contract pins; only Miri and the O3 identity pin catch it. On this libc
+   the UB **executes and is unobservable**: glibc 2.39 `memcpy` *is* `memmove`,
+   so R1 ≡ R1h at **0.00 Ir/call** — a *libc* property, never to be quoted as
+   "memmove is free". ASan sees the overlap, but **`_FORTIFY_SOURCE` blinds it**
+   under clang as well as gcc, because the check lives in the `memcpy`
+   interceptor and not in `__memcpy_chk`.
+   Then the blocker, which is about **p05**: `data.chunks_exact(ncol)` — one
+   idiomatic safe expression, zero `unsafe`, no proof — is **`nrow − 7`
+   instructions per call cheaper than the unsafe rung**, exactly, on every input,
+   with identical output on all 150 committed p05 inputs. p05's shipped R3
+   reslices by hand and pays `6·nrow + 9`. **Three patterns have now priced a
+   spelling as safety's cost** (p02, p16, p05), so the rule gained a corollary:
+   never publish a safety-cost claim without the *best* R3 — write two
+   independent spellings and quote the cheaper.
 
 ## Retracted — do not reinstate
 
@@ -144,6 +178,22 @@ vectorised kernel).
   only of the vector steady state — the check is hoisted into a per-row
   trip-count computation and survives in the scalar epilogue, an `O(nrow)` cost.
   The second is **refuted**: at AVX2 the gap is 4.58× against SSE2's 1.42×.
+- **"R3 is not free on p05; the R3-free streak ends at five patterns"** and
+  **"the `29 + 3r` Ir per row is the price of the optimiser failing the lemma the
+  proof proves"** — the strongest claim this project had made, retracted at
+  TASK_014_REVIEW. Both describe p05's *shipped* R3, which reslices by hand.
+  `chunks_exact` beats **R4**. There was no break in the streak.
+- **"Overlap UB is not caught by ASan"** (manager, in the catalogue since it was
+  written). It is caught — `memcpy-param-overlap`, exact to the byte — unless
+  the call site is fortified to `__memcpy_chk`, which blinds ASan under clang as
+  well as gcc.
+- **"The bug is not expressible at R5"** (p08's own README). It is, and it
+  verifies clean: a proof of a `requires` is not a proof that the trusted body
+  honours it.
+- **"p08 undermines p05's nonlinearity claim"** (manager, TASK_014_REVIEW Part 3).
+  Refuted with disassembly: p08's retained check is blocked by a *relational*
+  deduction, not a nonlinear one, and p05's linearisation counterfactual goes the
+  manager's way. p05's cost claim fell for an unrelated reason.
 
 ## Working method
 
@@ -190,10 +240,20 @@ headline. Say so in every task file.
 - **A finding needs a mechanism, not just a number.** "It vanished" was p05's
   first answer; the real one was a hoisted trip-count computation and a surviving
   scalar epilogue, and it changed the conclusion.
+- **You are measuring a spelling until you have written two.** Three retractions
+  (p02, p16, p05) are the same mistake: one plausible R3 written, measured, and
+  published as what *safe Rust* costs. On p05 the second spelling beat the
+  **unsafe** rung. A safety-cost claim is a claim about the language, so it is
+  only as good as the best spelling anyone can find.
+- **A tool that reports nothing may be a tool that cannot see.** ASan is silent
+  on p08's overlap not because there is none but because fortify rewrote the call
+  to `__memcpy_chk`. A gate row records `clean` for both reasons identically.
+- **Two files, two numbering schemes.** RECAP's findings are numbered 1–13,
+  `.memory/01-ladder.md`'s are 1–7. Name the pattern, never the number.
 
 ## Priority — read this before planning
 
-**Fourteen tasks in, 5 of 47 patterns exist** — six tasks went to gate hardening
+**Fifteen tasks in, 6 of 47 patterns exist** — six tasks went to gate hardening
 before the user called it; every task since has produced or reviewed a pattern. The gate's threat model is **honest mistake, not
 malicious author** (`.memory/02-bench-rules.md`, top section, with the list of
 residuals we are deliberately leaving open). New gate work must pass "could this
@@ -206,56 +266,52 @@ overclaim — which is the *right* place for review effort.
 
 ## Immediate queue
 
-The gate-hardening arc is **closed**. Four pattern tasks since have each gone
+The gate-hardening arc is **closed**. Five pattern tasks since have each gone
 green on the first complete run. The working mode is: **build a pattern, review
 it once, land the corrections, repeat** — and per `PROTOCOL.md` rule 9, write
 `.memory/` only *after* the review.
 
-**Order within a wave is chosen by "what would change a conclusion?", not by
-number** (`.memory/06-catalogue.md`, Sequencing). On that test the next pattern
-is **p08, overlapping `memmove`**, and the reasoning should survive compaction:
+**The next task is not a new pattern.** TASK_014_REVIEW's blocker is the third
+instance of the same mistake, and the correction is owed across the whole result
+set before more results are added to it:
 
-1. **p08 is the only class where safe Rust's advantage is *compile-time* and is
-   *not* a bounds check** — the borrow checker rejects the aliasing outright. The
-   programme currently has p17 saying "Rust does not help here" and **nothing**
-   saying "Rust wins structurally, beyond bounds checking". That asymmetry will
-   read as bias in a writeup.
-   Known design problem, flagged in the catalogue: R2/R3 must use `copy_within`,
-   i.e. **a different algorithm** — which is not a flaw to hide but *is* the
-   finding, and the spec must say so rather than pretending the rungs match.
-   Overlap UB is also not caught by ASan, so it tests the gate's tooling too.
-2. **p07 binary search** — the natural test of what p05 just broke. p05 ended the
-   "R3 is free" streak with an `O(nrow)` cost; p07 is `O(log n)`, almost pure
-   per-call overhead with no inner loop to amortise over, so any R3 cost shows up
-   as a large *fraction*. Midpoint overflow `(lo+hi)/2` is also p17's shape again
-   — an arithmetic bug giving a wrong-but-in-bounds index.
+1. **The R3 audit (TASK_015).** Land `chunks_exact` as p05's R3 — the review's
+   variant is in `.temp/review014/p05lin/` and is **not gate-ready** (needs
+   static identity, the `O0`/`whole` cells, `spec.md` pins, a re-measure) — and
+   then run the same "is there a cheaper idiomatic spelling?" audit against
+   **p16 and p17**, whose R3 numbers are load-bearing in findings 9 and 11 and
+   have never had a second spelling written. This is the cheapest way to stop
+   the fourth retraction. **Do not let it turn into a rewrite of every pattern**:
+   two spellings per pattern, quote the cheaper, move on.
+2. **p07 binary search** — `O(log n)`, almost pure per-call overhead with no
+   inner loop to amortise over, so any R3 cost shows up as a large *fraction*
+   rather than a flat constant. Midpoint overflow `(lo+hi)/2` is p17's shape
+   again: an arithmetic bug giving a wrong-but-in-bounds index.
 3. **p47 constant-time compare** — a third security axis, where the adversary is
    the **optimiser** and Verus cannot state the property at all. Expect it to
    defeat R5 in an interesting way; a documented R5 failure is a finding here.
-4. **p27+ raw pointers** — the only place the verified twin can finally earn its
-   keep (five patterns in, every trusted accessor has been single-clause, so the
-   mechanism has never been exercised on the case it was built for). If p27's
-   accessor is *also* single-clause, `PROTOCOL.md` says reopen the keep/delete
-   question.
+4. **p27+ raw pointers.** No longer "the only place the twin can earn its keep"
+   — p08 did that (mutant M2, the weakened `requires`, caught by the twin and by
+   nothing else). p27 is now just the next hard proof.
 
-**One small carry-over**, cheap, fold into the next task's Part 0:
-p17's `spec.md` `obligations_note` is arithmetically wrong (its stated derivation
-predicts 6 for `main`; the measured value is 5, and p05's character-identical
-driver also measures 5). One JSON string, but it lives **inside the hashed
-contract block**, so it needs a `check.py p17` re-run to refresh the gate record.
+**Two harness items, both identified and deliberately not fixed**, because the
+"could this happen by accident?" test applies and neither blocks a pattern:
+stage 7 builds gcc-only at this box's fortify-3 default and is therefore blind
+to `_chk`-rewritten `mem*` misuse; and a gate row cannot distinguish "sanitiser
+clean" from "sanitiser cannot see". Both are in `.memory/06-catalogue.md`.
 
 ## State
 
 - `harness/` — `check.py` (16 stages incl. clause deletion, `requires` strength,
   the verified twin, and region-actually-runs), `asm.py`, `dloop.py`, `vparse.py`,
-  `build.py`, `measure.py`, `report.py`, `fixture.py`. **4251 lines against five
+  `build.py`, `measure.py`, `report.py`, `fixture.py`. **4251 lines against six
   patterns** — that ratio is why gate work needs the "could this happen by
-  accident?" test. It has grown 42 lines in four pattern tasks, which is the
-  intended rate.
-- **Gate: p02, p16, p17, p05 all `PASS` on complete runs** — each green on its
-  first full run. **p01 is `PASS-WITH-BLOCKED-ROWS`**: Miri is mandatory for any
-  pattern with a trusted item and cannot finish p01's `large.bin` in 180 s, so 8
-  of 9 inputs are checked and the ninth is documented. Policy working, not a
+  accident?" test. **Unchanged across the whole of p08**, which is the intended
+  rate now the gate is frozen.
+- **Gate: p02, p16, p17, p05, p08 all `PASS` on complete runs** — each green on
+  its first full run. **p01 is `PASS-WITH-BLOCKED-ROWS`**: Miri is mandatory for
+  any pattern with a trusted item and cannot finish p01's `large.bin` in 180 s,
+  so 8 of 9 inputs are checked and the ninth is documented. Policy working, not a
   regression — do not read an old `PASS` as equivalent.
 - `results/p02-buffer-copy.json` was re-measured at TASK_011; **that debt is
   closed.** `binary_text_bytes` moved in 10 of 32 cells, all C, for a structural
@@ -265,7 +321,9 @@ contract block**, so it needs a `check.py p17` re-run to refresh the gate record
 - **p05's `inputs/` holds ~189 MB of gitignored sweep blobs**, regenerable with
   `gen.py --sweep`. Left in place because `rm` outside `.temp/` stalls on review;
   delete by hand if the box gets tight (`df -h /`).
-- Commits run through `dea112c`. Tree clean.
+- **p08's `inputs/` and `.temp/review014/` hold gitignored blobs too**; p08's dir
+  is ~33 MB, of which only the generators are tracked.
+- Commits run through the TASK_014_REVIEW landing. Tree clean.
 
 ## Decisions
 

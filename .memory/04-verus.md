@@ -69,6 +69,25 @@ justified. **TCB lines = every line inside:**
 Report as: `TCB: N lines across M items`. A rung-5 cell with a large TCB is not a
 win and must not be presented as one.
 
+**A proof of a `requires` is not a proof that the trusted body honours it, and
+p08 measures exactly how invisible the gap is.** Substituting
+`core::ptr::copy` → `core::ptr::copy_nonoverlapping` inside p08's trusted
+`move_right` — a body whose whole safety contract *is* the non-overlap, and
+which then commits the pattern's own UB — verifies **`11 verified, 0 errors`
+shipped and `15 verified, 0 errors` under `--cfg slb_twin`**. Invisible to
+Verus, to the **verified twin**, to the `spec.md` contract pin (textually
+unchanged), and to gate stages 5c and 5c-req. What catches it is the `O3`
+identity pin against R4 (the call target differs) and **Miri**. So never write
+that R5 "rules the bug out" or that the bug is "not expressible at R5" — the
+correct claim is that the *caller's* obligation is discharged, and the trusted
+body is trusted. This is why Miri is mandatory for any pattern with a trusted
+item, and it is the sharpest justification that rule has.
+
+**An `external_body` item need not contain `unsafe`.** p08's `copy_in` wraps a
+perfectly safe `copy_from_slice`; it is trusted because vstd has no spec for it,
+not because it is dangerous. The TCB tally must count it anyway — "trusted"
+means "unchecked by the verifier", not "unsafe".
+
 **Count every `external_body` item, not just the interesting one.** The pilot was
 published as "TCB: one 3-line `get_unchecked` wrapper"; the true tally is **3 items**
 — `get_unchecked`, `out` (the `println!` wrapper) and `main`. Under-counting is how
@@ -153,6 +172,12 @@ does. Every pattern's `spec.md` now carries, and `harness/check.py` diffs:
    `--verify-function <name> --verify-root` and write the decomposition into
    `spec.md` beside the pin, as p16 does. A pin a reviewer cannot re-derive from
    `spec.md` alone is a declared pin, which `.memory/02-bench-rules.md` forbids.
+
+   **A `const` inside `verus!` is its own query** — found at TASK_014, measured
+   two ways and confirmed at review (`SCR` → `1 verified`). p08's 11 is
+   `SCR 1 + kernel 3 + main 5 + …`, so a pattern that introduces a capacity
+   constant will see the count move for a reason that has nothing to do with the
+   proof. Add it to the terms you measure rather than being surprised by it.
 2. **Every item's `external` attribute, `requires` and `ensures`, verbatim**, and
    the item *set*. This is what catches the two mutations that move no count at
    all: a tautological `ensures` (`r == r`) and a deleted `external_body`
@@ -395,9 +420,40 @@ quoting 5c as a defence.**
    twin's *dependence* on the precondition rather than guessing at how a body
    might dodge it.
 
+   **The twin earned its keep at p08 — the first demonstration in six patterns,
+   and it is now the mechanism's whole case.** Every trusted item before p08 was
+   a single-clause `get_unchecked`, so the twin had never been exercised on the
+   case it was designed for. p08's `move_right` is the first genuinely
+   multi-clause contract, and mutant M2 — weakening `0 < dr <= m` to `<= m + 1`
+   in the item **and** its twin — gives **`11 verified, 0 errors` shipped** and
+   **`14 verified, 1 errors` under `--cfg slb_twin`** (*invariant not satisfied
+   before loop*). Reproduced independently at review, against an `11`/`15`
+   control. **Nothing else in the gate catches it**: the count pins move, but
+   only because the twin is what moves them. Keep the twin.
+
+   Note precisely what it does *not* catch, so a writeup does not overreach:
+   dropping an `ensures` conjunct (M4/M5) fails ordinary Verus anyway, and the
+   `copy_nonoverlapping` substitution above passes the twin cleanly. **The
+   twin's unique catch is a weakened `requires`, and only that.**
+
    **But the deletion probe is not the mechanism's perimeter.** TASK_009_REVIEW
    found three bypasses that never reach it and one blind spot that survives it.
    Do not describe the twin as closing the strength class.
+
+   - **Stage 5a's parameter-coverage rule has a second false-positive family,
+     found in the tree at TASK_014**: a parameter whose *type* already fixes
+     everything sayable about it. `move_right(v: &mut [u8; SCR], ...)` is
+     rejected — *"demands … which constrains nothing about `['v']`"* — because
+     the rule asks syntactically whether the `requires` mentions `v`, and with a
+     fixed-size array there is nothing left to say: the real safety fact,
+     `m <= SCR`, *is* stated and *is* about `v`'s length, just not syntactically.
+     Worked around by widening to `&mut [u8]`, **and the widening cost the
+     contract the length fact** — with a real slice a caller cannot prove
+     `v@.len()` survives the call (`assertion failed`, 1 verified 1 errors),
+     where the array signature gives it free (`3 verified, 0 errors`). So the
+     three-clause `ensures` does **not** partition the buffer, and the more
+     general contract is here the *weaker* one. Do not repeat p08's `NOTES.md`
+     claim that the widening was "a fix rather than a workaround".
 
    - **Scope is decided by a regex on a function body.** `_UNSAFE_RE` is
      `\bunsafe\b` searched against `item.body`, and `vparse` parses **`fn` items
