@@ -9,7 +9,7 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "9b05ff508e45f0eb8b3302f288f44b4e9562f9ff463d784bd4e0a4f147b6bfae",
+  "contract_sha256": "88440446e6e68cd63878ab3a3b3cbfdfbf34ab6a72060fb0c37e6a9b85846d75",
   "idiom": {
     "required": [
       "R1 spells the move memcpy and R1h memmove -- that one token is the whole difference between them",
@@ -25,7 +25,7 @@
       "a driver-owned &mut scratch argument",
       "writing anything into the space the move opens"
     ],
-    "why": "p08's result is that one token (memcpy vs memmove) is the whole bug and that safe Rust cannot express it, so a rung that spells the move differently is not a rung of p08. A fixed d makes every round after the first a no-op, the checksum stops depending on nrep, and LLVM is free to delete the rounds. `&` is the same instruction as `%` on unsigned values but drags `by (bit_vector)` into R5 -- a cheaper proof of an identical specification, which `.memory/04-verus.md` blesses. The scratch must be kernel-local because `driver.call_args` refuses to drop anything that is not a single bare identifier, so C's `scr` and Rust's `&mut scr` cannot be reconciled by the driver diff; making them so would be a harness/ change, and the zero-init keeps the memset a uniform per-call constant that cancels in every rung-to-rung comparison. Writing header bytes into the opened space is a second bounded loop that adds nothing to the aliasing axis. RESTATED in this hashed block at TASK_016 from the prose sections 'Load-bearing, do not improve' and 'The scratch buffer' above -- restated, not moved: the prose is still there, says the same thing, and THIS block is the authoritative copy of it (TASK_016_REVIEW m2). Whoever edits one edits the other. TASK_016 did not measure a spelling spread for p08 and none is claimed here."
+    "why": "p08's result is that one token (memcpy vs memmove) is the whole bug and that safe Rust cannot express it, so a rung that spells the move differently is not a rung of p08. A fixed d makes every round after the first a no-op, the checksum stops depending on nrep, and LLVM is free to delete the rounds. `&` is the same instruction as `%` on unsigned values but drags `by (bit_vector)` into R5 -- a cheaper proof of an identical specification, which `.memory/04-verus.md` blesses. The scratch must be kernel-local because `driver.call_args` refuses to drop anything that is not a single bare identifier, so C's `scr` and Rust's `&mut scr` cannot be reconciled by the driver diff; making them so would be a harness/ change, and the zero-init keeps the memset a uniform per-call constant that cancels in every rung-to-rung comparison. Writing header bytes into the opened space is a second bounded loop that adds nothing to the aliasing axis. RESTATED in this hashed block at TASK_016 from the prose sections 'Load-bearing, do not improve' and 'The scratch buffer' above -- restated, not moved: the prose is still there, says the same thing, and THIS block is the authoritative copy of it (TASK_016_REVIEW m2). Whoever edits one edits the other. TASK_016 did not measure a spelling spread for p08 and none is claimed here. NAMED-SPELLING STANDARD -- POLICY ADOPTED AT TASK_018, AFTER the alternate spellings had been measured. It is NOT a disambiguation of what these entries always meant, and presenting it as one would be the self-certification this mechanism exists to prevent (TASK_017_REVIEW). The rule, and this paragraph is byte-identical in all six patterns' `why` -- diff them: where a `required` entry quotes an expression in backticks it pins THAT SPELLING, not merely the property the expression has, so a rung that establishes the same fact by a different expression is out of contract even when it is semantically identical and even when it compiles to the same bytes. Where a rung's LANGUAGE cannot express the quoted spelling, that rung spells the same operands the way its language forces and nothing else varies. That clause was MEASURED, not granted: without it a literal reading puts EIGHT SHIPPED CELLS out of their own contract -- p02's four Rust rungs (`len > src.len() - (src_off + 2)`, where the entry says `src_len` and the Rust signature has no `src_len` to say) and p08's four Rust rungs (`let dr: usize = d + r;`, where the entry says `dr = d + r`) -- and no cell source may change. A difference the language does NOT force is not covered by that clause: Rust can write `let end: i64 = content_len;`, and four shipped p17 rungs do. An entry that names a rung pins that rung only, and an entry may carve a rung out (p05's second entry, p16's fourth, p17's third). WHY IT WAS ADOPTED: TASK_017 applied this reading to p16 and refused it for p17 in the same commit, writing into p17's NOTES.md that a spelling with no `end` binding anywhere in its code satisfied entries naming `start < end` (TASK_017_REVIEW B1). One rule across all six is the repair. TOKENS rather than SEMANTICS, for a reason that is checkable rather than rhetorical: only the token reading partitions cleanly. `.temp/p05r3/v16/tuned_split.rs` satisfies p16's `every comparison is subtraction-first` VACUOUSLY -- it contains no comparison at all -- and `tuned_splitat.rs`'s `rest.len() >= 3` is neither subtraction-first nor additive, so the semantic reading does not decide either of them (TASK_017_REVIEW m5). A contract a grep can settle beats a contract only an argument can settle. WHAT THE STANDARD DOES NOT BUY, measured at TASK_018 and put here rather than in a footnote: a pinned idiom makes the admissible class DECIDABLE, not SINGULAR. Respelling only what the declaration leaves free moves p16's R3 by `4*nrec - 8` Ir/call and p17's by 51 Ir/call flat, so `R3ship - R4ship` is an UPPER BOUND on the in-contract safety tax and never the tax itself. Every pattern owes an in-contract spelling spread beside its headline; p16 and p17 have one from TASK_018 (their NOTES.md 10a), p01, p02, p05 and p08 do not."
   },
   "source_sha256": {
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
@@ -33,13 +33,13 @@
     "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
     "harness/asm.py": "e3b14d4e90f15e7ff28d862442c721120943bb70c9514437b77facc407b6675f",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "87fc00213197af167c781a3d83c72b81835e4e3f2212294086c7cba162d452bb",
+    "harness/check.py": "93f00205eb87d21a4317dcbd599f5cb88111212a116bb0d0fe080818a132f4f4",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "a810bf5973787f78fc9805b2407a6bb04bbee68c968374a2e9b8622c4c5d3af4",
-    "harness/report.py": "1b32855d5820d0357626e041e486da68d0206ce0df0bd898560ff7affe6b035a",
+    "harness/report.py": "268c40491c96a755d2733e47dfa9357be6c0d535cc100b9cc3c2450cec6b5c83",
     "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
-    "patterns/p08-overlap-move/NOTES.md": "6736312ee2db2ef3889b4b722ef5d40ad9194eecf98400652cba2ced1f6dcc24",
+    "patterns/p08-overlap-move/NOTES.md": "8058ac5d8ed6ee954620a7911697e9b32a9451eb8e91f27465748351e2dfe25a",
     "patterns/p08-overlap-move/README.md": "e7a9da96f6904c2d9d6b259087f901511360a53e60915db3250e901db2f32414",
     "patterns/p08-overlap-move/c/kernel.c": "a1240809985bda7164c99d60aed2ca1efee4b1f8fc36afa0754fd0cbef202a8c",
     "patterns/p08-overlap-move/c/kernel.h": "0849b814a8299dd729a16fdb195cb604cd6c795abc8d410ed80b0ecfd39f8302",
@@ -48,7 +48,7 @@
     "patterns/p08-overlap-move/model.py": "6933ee18a8d53566ae4cfac1448253984b4ea83f4901c5b902e76ea1fe415d10",
     "patterns/p08-overlap-move/safe_naive.rs": "90ff21af76511fdaaa7ec7cd66e8976ed8932d58ae0655d6636290dfda6bfc26",
     "patterns/p08-overlap-move/safe_tuned.rs": "c885cd2eb1ce0b06e8919a8a443cbd2d1311cb389ace7355fde0c1ac99a5fc4b",
-    "patterns/p08-overlap-move/spec.md": "cf232df7a8c5023c80b439e8db7787e246d97b72b0cfb4576c55afc5c5500463",
+    "patterns/p08-overlap-move/spec.md": "26e45e32a42bed2c38a19102e670131654664371bef1e5a6356f0454c678643c",
     "patterns/p08-overlap-move/unsafe.rs": "34adfa6b368e37515b8517d7937788117e7424f1d97d7412410734dc606cea72",
     "patterns/p08-overlap-move/verus.rs": "6082fa92403d892af554d603ebca0aa328c1aec039899b6b223e661cdc89849f"
   },

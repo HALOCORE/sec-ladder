@@ -864,8 +864,21 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
     cannot see it. Executed instructions per kernel call can. Measured as a
     slope -- Ir at N calls minus Ir at N/2 calls, over the difference in calls --
     which is symbol-independent (so it works in `whole` mode, and at O0 where a
-    rung's work lives in `core::iter` symbols rather than in `kernel`) and
-    cancels the loader and environment terms exactly.
+    rung's work lives in `core::iter` symbols rather than in `kernel`).
+
+    **The loader and environment terms cancel to about 0.2 Ir/call, not
+    exactly** -- corrected at TASK_018 from TASK_017's own p08 measurement
+    (`patterns/p08-overlap-move/NOTES.md` 2b, `.memory/03-measurement.md`).
+    Changing only the length of the environment block moves p08's
+    `unsafe/O3/whole/small.bin` marginal over **7292.14 … 7292.30**, a spread of
+    **0.18**, non-periodic and non-monotone in the pad length, with 100% of the
+    drift inside one glibc `memmove` whose alignment-dependent tail changes by
+    ~0.04 Ir/iteration. It is a real between-session term, it is bounded and
+    small, and it threatens no published number (p08's tightest, `R1h - R1 =
+    0.00`, measured exactly 0.00 in 12 configurations). Two consequences: quote
+    marginals **to the instruction, never to the hundredth**, across sessions;
+    and if p08's 12 cells move by a few hundredths between gate runs, that is
+    this effect and not a code change.
 
     **The floor is derived, not declared** (TASK_005 A1). `spec.md` used to pin
     an absolute `min_marginal_ir_per_call`, which is a number the pattern author

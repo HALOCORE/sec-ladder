@@ -28,6 +28,15 @@ one residue class where the slope is invisible. **Sweep, do not sample**, and
 when a headline and a decomposition disagree, the decomposition is the one that
 was measured.
 
+⚠ **And `+27 / +77` is an upper bound on the in-contract safety tax, not the
+tax (TASK_018, §10a).** Three alternate R3 spellings that keep **both** of
+`spec.md`'s named comparisons literally, and change only the header read and the
+value fold — the two things the declaration says it does *not* restrict — span
+**42 `Ir`/call at `large` against the published 77**, the cheapest sitting at
+`+45`. Pinning the comparison tokens narrows the admissible class; it does not
+pick a point in it, and the claim that it "makes `R3 − R4` a difference in
+safety rather than in representation" is withdrawn.
+
 What is O(n) is the **naive indexed spelling**, R2: +4.25 Ir per folded byte,
 +69% / +72% over unsafe. The decomposition (§3) puts all of it in the *value
 fold* and none in the walk, and — confirmed by construction with a
@@ -961,24 +970,45 @@ before differencing across files.
 | 5 | R4 | `get_unchecked` on an index `p` | **`unsafe.rs` (SHIPPED CELL)** | **3024.30** | **23812.30** | **0** |
 | 6 | R4 | consumed cursor, `get_unchecked` | `v16-unsafe_consume.rs` | 2995.30 | 23763.30 | −29 / −49 |
 
-**Rows 3, 4 and 6 do NOT satisfy p16's declared idiom** — corrected at TASK_017.
-Until then this section said all six rows were admissible, because `spec.md`'s
-`idiom` block contradicted itself: `required[0]` names two comparisons "in every
-rung" and the same block's `why` asserted that a spelling containing neither was
-admissible (TASK_016_REVIEW M2). `required[0]` now says explicitly that it names
-**tokens**; rows 3, 4 and 6 keep a consumed slice and a running remainder and
-contain neither `end - p >= 3` nor `vlen > end - (p + 3)`, so they are different
-benchmarks. The argument for that reading, and what it costs, is in
-`spec.md`'s `idiom.why`; the short version is that the two tokens *are* the
-cursor-and-end traversal, and pinning them is what makes `R3 − R4` a difference
-in safety rather than in representation. Note that the exclusion is
-**symmetric** — row 6 is an *unsafe* rung and goes out with rows 3 and 4.
+**Rows 3, 4 and 6 do NOT satisfy p16's declared idiom.** Rows 3, 4 and 6 keep a
+consumed slice and a running remainder and contain neither `end - p >= 3` nor
+`vlen > end - (p + 3)`, so under the **named-spelling standard** they are
+different benchmarks.
 
-So the marking here is now *shipped and admissible* (rows 1, 2, 5) versus *out of
-contract* (rows 3, 4, 6), and the honest consequence is uncomfortable: **p16 has
-no admissible alternate spelling measured at all**, where `.memory/05-layout.md`
-finding 13 asks for at least two per rung. The spread below is a spread of
-kernels p16 does not ship *and* may not ship.
+**Say when that became true, because it was not always true.** Until TASK_017
+this section said all six rows were admissible, and it said so because the
+pre-TASK_017 `idiom` block said so in as many words: *"A consuming spelling
+(`split_first_chunk::<3>()` plus `split_at`) **is admissible under this
+declaration**"* (`git show fd91ae7:patterns/p16-tlv-walk/spec.md`). TASK_017
+read `required[0]` as naming tokens and deleted that sentence.
+**TASK_018 adopted the named-spelling standard as a *policy*, for all six
+patterns, after the alternate spellings had been measured** — it is not a
+disambiguation of what `required[0]` always meant, and `spec.md`'s `idiom.why`
+now carries both the deleted sentences and the date they stopped applying. Rows
+3 and 4 were admissible when TASK_015 measured them (`ad661ed`) and stopped
+being admissible at `89f6598`, four tasks later. Nobody may read `+27 / +77` as
+a pre-registered matched pair.
+
+**And the argument TASK_017 gave for the pin does not survive measurement.** Its
+short version was that the two tokens *are* the cursor-and-end traversal, so
+pinning them "is what makes `R3 − R4` a difference in safety rather than in
+representation". §10a measures that and it is **false**: three respellings that
+keep both named comparisons literally, and change only the header read and the
+value fold, span 42 `Ir`/call at `large` against a published `R3 − R4` of 77.
+The pin makes the admissible class *decidable*; it does not make it *singular*.
+
+The exclusion is **symmetric in existence** — row 6 is an *unsafe* rung and goes
+out with rows 3 and 4 — and **asymmetric in effect**, which is the number this
+paragraph used to omit (TASK_017_REVIEW M4): the published pair is `+27 / +77`
+and the excluded matched consuming pair is `+7 / +17`, so the reading makes
+p16's published safety tax **3.9× / 4.5× larger**, removing 49 / 109 `Ir`/call
+of headroom from the **safe** side against 29 / 49 from the unsafe side. Quote
+those numbers, not the word "symmetric".
+
+So the marking here is *shipped and admissible* (rows 1, 2, 5) versus *out of
+contract* (rows 3, 4, 6). Between TASK_017 and TASK_018 that left p16 with **no
+admissible alternate spelling measured at all**, which was the honest and
+uncomfortable statement of the time; §10a closes it with three.
 
 Rows 3 and 4 are **indistinguishable in `Ir` on every input where both were
 measured** — both shipped inputs and four sweep blobs (`sw56`, `sw60`,
@@ -1010,10 +1040,8 @@ Three things follow.
 1. **The safe side is again the spelling-sensitive one**, and by a margin that
    swamps the pair: rows 1–4 span 2107 `Ir` on `small` (69%), rows 5–6 span 29
    (1.0%).
-2. **p16's published R3 cost is still a spelling's cost — but the spelling it is
-   a cost *of* is now pinned, and the cheaper rows are out of contract**
-   (TASK_017; the pre-TASK_017 text of this point called rows 3, 4 and 6
-   "admissible", which the block no longer supports). `required[0]` pins the two
+2. **p16's published R3 cost is still a spelling's cost, and pinning the
+   comparisons did not stop it being one.** `required[0]` pins the two
    comparisons as tokens, i.e. the cursor-and-end traversal, in every rung; what
    it still does **not** pin is the value fold, the header read or unrolling, so
    `+27 / +77` remains *this* R3's number rather than safe Rust's. The honest
@@ -1021,13 +1049,110 @@ Three things follow.
    `10·nrec + 9` less but is not a p16 rung; against the matching consuming R4 —
    also not a p16 rung — the residual is 7 flat at one residue and `7 + nrec` at
    the others.* `.memory/01-ladder.md`'s "quote the cheapest spelling you can
-   find" therefore does **not** bite on rows 3/4/6, and instead leaves a
-   different debt: **no admissible alternate R3 has ever been measured for p16**,
-   so "cheapest admissible" is unestablished. Measuring one is a task; landing
-   one is a cell swap and a different task again. TASK_016 and TASK_017 changed
-   no cell source.
+   find" does **not** bite on rows 3/4/6 — but §10a shows it bites anyway, from
+   inside the contract: **the shipped R3 is measurably not the cheapest
+   admissible one.** Between TASK_017 and TASK_018 the statement here was "no
+   admissible alternate R3 has ever been measured, so 'cheapest admissible' is
+   unestablished"; after §10a it is **false**, not unestablished. Landing a
+   cheaper admissible R3 is a cell swap and a different task; TASK_016, TASK_017
+   and TASK_018 changed no cell source.
 3. **`nrec + 3` was never p16's law.** TASK_015's audit fitted three points, two
    of which sat at `vlen ≡ 0 (mod 4)` where the slope is invisible, and the third
    used a record count its own table contradicts. Swept, the same quantity is
    `7` / `7 + nrec`. **Sweep, do not sample** — the rule this file's §3b already
    states, violated one section later by the same project.
+
+## 10a. The **in-contract** spelling spread (TASK_018)
+
+§10's rows 3, 4 and 6 are out of contract under the named-spelling standard, so
+they cannot answer "is the shipped R3 the cheapest admissible one?". This
+section answers it. **The answer is no.**
+
+Three alternate R3 spellings, all under `.temp/p18/v16/`, **none a p16 cell**.
+Each keeps **both named comparisons literally** — `while end - p >= 3` and
+`if vlen > end - (p + 3)` — keeps `p`/`end` as the cursor-and-end pair, keeps
+`p = p + 3 + vlen`, folds the tag before the fit test, folds `nrec`, and
+contains zero `unsafe`. The **only** thing respelled is what `spec.md`'s
+`idiom.why` says is deliberately *not* restricted: which slice the header read
+and the value fold index into.
+
+| variant | what changed | in contract? |
+|---|---|---|
+| `r3_endslice.rs` | one added line: the two reslices come out of `&buf[..end]` instead of out of `buf`. `p` still absolute, `end` still `off + len`. | **yes**, on the tokens *and* on `idiom.why` ground (ii)'s gloss ("`p` indexing the whole blob") |
+| `r3_window.rs` | window resliced once before the loop; `p` window-relative, `end = len` | yes on the tokens; ground (ii)'s gloss arguably excludes it — reported separately for that reason |
+| `r3_hdrarray.rs` | header read as `[u8; 3]` via `try_into()` instead of a runtime-length reslice | **yes** |
+
+**Equivalence:** all three print byte-identical stdout and exit status to
+shipped R3 on **73/73** committed inputs (and shipped R3 matches shipped R4 on
+all 73). One semantic note, because it is the first thing to attack:
+`r3_endslice`'s `&buf[..end]` moves a bound check *earlier* than shipped R3's
+first `&buf[p..p+3]`. Under the kernel's `requires off + len <= buf_len` — which
+is structural and holds on every input this benchmark runs — the two are the
+same function; on a call that violated the `requires` they would panic at
+different points. That is what "hoisted length assertion" in the R3 rung
+definition (`.memory/01-ladder.md`) licenses, and it is why this is an R3 move
+and not a semantics change.
+
+**Whole-program marginal `Ir`/call**, `-O3 isolated`, `n_iters` 100→200 — the
+same convention as §10's table, so these are directly comparable with it:
+
+| input | `nrec` | `vlen%4` | R4 ship | **R3 ship** | `r3_endslice` | `r3_window` | `r3_hdrarray` |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `sweep-v2040` | 2 | 0 | 23561.70 | 23578.70 | 23576.70 | 23578.70 | 23580.70 |
+| `sweep-v2041` | 2 | 1 | 23586.00 | 23607.00 | 23605.00 | 23607.00 | — |
+| `sweep-v2042` | 2 | 2 | 23602.30 | 23623.30 | 23621.30 | 23623.30 | — |
+| `sweep-v2043` | 2 | 3 | 23618.00 | 23639.00 | 23637.00 | 23639.00 | — |
+| `sweep-v2044` | 2 | 0 | 23608.00 | 23625.00 | 23623.00 | 23625.00 | 23627.00 |
+| `small` | 4 | 0 | 3024.30 | **3051.30** | 3045.30 | 3043.30 | 3055.30 |
+| `sweep-v56` | 4 | 0 | 1459.70 | 1486.70 | 1480.70 | 1478.70 | 1490.70 |
+| `sweep-v57` | 4 | 1 | 1508.00 | 1543.00 | 1537.00 | 1535.00 | — |
+| `sweep-v58` | 4 | 2 | 1540.00 | 1575.00 | 1569.00 | 1567.00 | — |
+| `sweep-v59` | 4 | 3 | 1572.30 | 1607.30 | 1601.30 | 1599.30 | — |
+| `sweep-v60` | 4 | 0 | 1552.00 | 1579.00 | 1573.00 | 1571.00 | 1583.00 |
+| `large` | 10 | 2 | 23812.30 | **23889.30** | 23871.30 | 23857.30 | 23899.30 |
+
+| difference | value | residual |
+|---|---|---|
+| `R3ship − r3_endslice` | `2·nrec − 2` | **0** on all 12 points, all four residue classes |
+| `R3ship − r3_window` | `4·nrec − 8` | **0** on all 12 points |
+| `r3_hdrarray − R3ship` | `nrec` | **0** on the 6 points measured |
+
+⚠ **The residue axis is a sweep; the `nrec` axis is a three-point fit**
+(`nrec ∈ {2, 4, 10}`). §3b's own rule — *sweep, do not sample* — is satisfied for
+the residue and is **not** satisfied for `nrec`, and `nrec + 3` (§10 point 3) is
+what a three-point `nrec` fit did to this pattern last time. Do not quote the
+`nrec` forms as laws. What is measured directly, and needs no fit, is the
+**sign and size at the two shipped inputs**.
+
+**What this establishes.**
+
+1. **"The shipped R3 is the cheapest admissible spelling" is FALSE**, not
+   unestablished. `r3_endslice` is admissible on the strictest available reading
+   and is **6 `Ir`/call cheaper on `small`, 18 on `large`**. This is also what
+   discharges `.memory/05-layout.md` finding 13's "at least two alternates per
+   rung" for p16's R3, which §10's rows 3 and 4 stopped discharging the moment
+   they went out of contract.
+2. **The in-contract spread is 42 `Ir`/call at `large` (−32 … +10) against a
+   published `R3 − R4` of 77, and 12 at `small` against 27** — 55% and 44% of
+   the published safety tax lives in spelling the declaration does not pin.
+3. Therefore **`R3ship − R4ship = +27 / +77` is an upper bound on p16's
+   in-contract safety tax, not the tax.** The measured in-contract minimum is
+   **+19 / +45** (`r3_window`) or **+21 / +59** (`r3_endslice`) against the
+   shipped R4 — and since the *R4* side has not been searched in contract
+   either, even those are bounds and not safety numbers
+   (`.memory/01-ladder.md` finding 14).
+4. **`spec.md` ground (ii) is withdrawn.** Pinning `end - p >= 3` and
+   `vlen > end - (p + 3)` does **not** make `R3 − R4` "a difference in safety
+   rather than a difference in representation". It narrows the class of
+   representations; it does not collapse it to one.
+5. Unlike p17 (`patterns/p17-http-range/NOTES.md` §10), **no identity collapse
+   here**: `md5_fn` is `07b07f1a…` (shipped, 117 insns), `34a618f8…`
+   (`r3_endslice`, 117), `c7f697a8…` (`r3_window`, 119), `999fb677…`
+   (`r3_hdrarray`, 118), `852405e0…` (R4, 92). On p16 the pin excludes genuinely
+   different codegen. It still does not pick a point.
+
+**Method.** `.temp/p18/measure.py` and `.temp/p18/measure2.py`, both calling
+`.temp/p05r3/mir.py`, which is `harness/check.py`'s own `_probe_input` plus a
+whole-program `Ir` difference. Binaries built with `harness/build.py`'s exact
+`-O3 isolated` rustc flags (`--edition 2021 -C codegen-units=1 -C opt-level=3
+-C debug-assertions=off --cfg slb_isolated`). **No pattern source was edited.**

@@ -11,7 +11,7 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "443fc3db042c62166b36f5925468ba72048765a19075efbb49da5ffe61795142",
+  "contract_sha256": "0d922b43f76fcb80e922f4fe13daaf589366d04c6afd3a41c19030d7302e6485",
   "idiom": {
     "required": [
       "wrapping, not checked, addition in every rung -- the kernel is total on VALUES and R5's only obligation is off + len <= v.len()",
@@ -21,7 +21,7 @@
     "forbidden": [
       "a dead v_len parameter on the C kernel"
     ],
-    "why": "wrapping addition is what keeps the proof obligation exactly the memory-safety property, with no value bound smuggled in that the input generator would then have to be trusted to respect -- the pilot did the opposite and its own measured inputs violated it. The C/Rust arity asymmetry is the finding and not a rigging: the length is the thing C does not have and therefore cannot check, so handing C a dead v_len to make the signatures match would be Rust-in-C-syntax and would delete the comparison. Both are also written out in the prose above ('Kernel signature' and 'Semantics'); TASK_016 RESTATED them here rather than moving them, so p01 states its idiom twice and THIS block is the authoritative copy (TASK_016_REVIEW m2). Whoever edits one edits the other. Note how weak this declaration deliberately is: p01 is the CALIBRATION pattern, it models no bug, and its inner fold is an associative sum with no bulk-memory idiom to lose, so beyond the three required entries no spelling of the fold is excluded and p01's numbers are a spelling's numbers. TASK_016 did not measure a spelling spread for p01; one is owed before any p01 number is quoted as what safe Rust costs."
+    "why": "wrapping addition is what keeps the proof obligation exactly the memory-safety property, with no value bound smuggled in that the input generator would then have to be trusted to respect -- the pilot did the opposite and its own measured inputs violated it. The C/Rust arity asymmetry is the finding and not a rigging: the length is the thing C does not have and therefore cannot check, so handing C a dead v_len to make the signatures match would be Rust-in-C-syntax and would delete the comparison. Both are also written out in the prose above ('Kernel signature' and 'Semantics'); TASK_016 RESTATED them here rather than moving them, so p01 states its idiom twice and THIS block is the authoritative copy (TASK_016_REVIEW m2). Whoever edits one edits the other. Note how weak this declaration deliberately is: p01 is the CALIBRATION pattern, it models no bug, and its inner fold is an associative sum with no bulk-memory idiom to lose, so beyond the three required entries no spelling of the fold is excluded and p01's numbers are a spelling's numbers. TASK_016 did not measure a spelling spread for p01; one is owed before any p01 number is quoted as what safe Rust costs. NAMED-SPELLING STANDARD -- POLICY ADOPTED AT TASK_018, AFTER the alternate spellings had been measured. It is NOT a disambiguation of what these entries always meant, and presenting it as one would be the self-certification this mechanism exists to prevent (TASK_017_REVIEW). The rule, and this paragraph is byte-identical in all six patterns' `why` -- diff them: where a `required` entry quotes an expression in backticks it pins THAT SPELLING, not merely the property the expression has, so a rung that establishes the same fact by a different expression is out of contract even when it is semantically identical and even when it compiles to the same bytes. Where a rung's LANGUAGE cannot express the quoted spelling, that rung spells the same operands the way its language forces and nothing else varies. That clause was MEASURED, not granted: without it a literal reading puts EIGHT SHIPPED CELLS out of their own contract -- p02's four Rust rungs (`len > src.len() - (src_off + 2)`, where the entry says `src_len` and the Rust signature has no `src_len` to say) and p08's four Rust rungs (`let dr: usize = d + r;`, where the entry says `dr = d + r`) -- and no cell source may change. A difference the language does NOT force is not covered by that clause: Rust can write `let end: i64 = content_len;`, and four shipped p17 rungs do. An entry that names a rung pins that rung only, and an entry may carve a rung out (p05's second entry, p16's fourth, p17's third). WHY IT WAS ADOPTED: TASK_017 applied this reading to p16 and refused it for p17 in the same commit, writing into p17's NOTES.md that a spelling with no `end` binding anywhere in its code satisfied entries naming `start < end` (TASK_017_REVIEW B1). One rule across all six is the repair. TOKENS rather than SEMANTICS, for a reason that is checkable rather than rhetorical: only the token reading partitions cleanly. `.temp/p05r3/v16/tuned_split.rs` satisfies p16's `every comparison is subtraction-first` VACUOUSLY -- it contains no comparison at all -- and `tuned_splitat.rs`'s `rest.len() >= 3` is neither subtraction-first nor additive, so the semantic reading does not decide either of them (TASK_017_REVIEW m5). A contract a grep can settle beats a contract only an argument can settle. WHAT THE STANDARD DOES NOT BUY, measured at TASK_018 and put here rather than in a footnote: a pinned idiom makes the admissible class DECIDABLE, not SINGULAR. Respelling only what the declaration leaves free moves p16's R3 by `4*nrec - 8` Ir/call and p17's by 51 Ir/call flat, so `R3ship - R4ship` is an UPPER BOUND on the in-contract safety tax and never the tax itself. Every pattern owes an in-contract spelling spread beside its headline; p16 and p17 have one from TASK_018 (their NOTES.md 10a), p01, p02, p05 and p08 do not."
   },
   "source_sha256": {
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
@@ -29,11 +29,11 @@
     "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
     "harness/asm.py": "e3b14d4e90f15e7ff28d862442c721120943bb70c9514437b77facc407b6675f",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "87fc00213197af167c781a3d83c72b81835e4e3f2212294086c7cba162d452bb",
+    "harness/check.py": "93f00205eb87d21a4317dcbd599f5cb88111212a116bb0d0fe080818a132f4f4",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "a810bf5973787f78fc9805b2407a6bb04bbee68c968374a2e9b8622c4c5d3af4",
-    "harness/report.py": "1b32855d5820d0357626e041e486da68d0206ce0df0bd898560ff7affe6b035a",
+    "harness/report.py": "268c40491c96a755d2733e47dfa9357be6c0d535cc100b9cc3c2450cec6b5c83",
     "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
     "patterns/p01-array-sum/NOTES.md": "c56280a0664c0049d879e9a6cba88e59b18e3bfa157d051984db6f13fe4752e5",
     "patterns/p01-array-sum/README.md": "c0d5616db3227be899f2fbdd1eec18b2225e354235c046fdc6180a16edfe7015",
@@ -44,7 +44,7 @@
     "patterns/p01-array-sum/safe_naive.rs": "31718428bae78cc7c8d50ba5c520091e0596dca1b5216a6bb76f85bbd88abbfb",
     "patterns/p01-array-sum/safe_naive_verus.rs": "6e84117379183aef6345c849ed2bea0777be2ec5422715bf9475c6c9b8a8bb87",
     "patterns/p01-array-sum/safe_tuned.rs": "ff2d49dd5338f48a3051989565137f8f7ae685521e4fa78999874edff48e4c16",
-    "patterns/p01-array-sum/spec.md": "aecea507425fde553a3ccdad0aa20866e61bc9f5f323efc795d8e53f1d1d86bd",
+    "patterns/p01-array-sum/spec.md": "10550d462ec77422a2eea31fddcb9d82df8184cc5ec086fda1ea34365ea20e1f",
     "patterns/p01-array-sum/unsafe.rs": "026e4b6aa62113972c6881f0daa5e12da366c0eb0b9e7d5369cd0fc8c12db8e9",
     "patterns/p01-array-sum/verus.rs": "2b2b8d1c63fecfacb9f3487e2db205a4ba415808ed1b99fba2be6918108afe70"
   },

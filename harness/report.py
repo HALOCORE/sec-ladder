@@ -12,8 +12,9 @@ Everything here is regenerable; the JSON is the record. Three rules from
   * `O0` rows are printed but flagged: no perf claim may rest on one
   * the pattern's **declared idiom** is printed above the numbers, because this
     file is the artefact a writeup reads from and it carried no trace of what a
-    pattern forbids until TASK_017 -- p05's number was quoted twice by agents
-    who never opened its `spec.md`
+    pattern forbids until TASK_017. It is worth having on its own merits; it is
+    **not** the fix for the observed failure, and TASK_017 said it was. See
+    `idiom_section` for what actually happened.
 
   harness/report.py p01
   harness/report.py p01 --stdout
@@ -102,11 +103,26 @@ def read_idiom(pattern):
 def idiom_section(doc, out):
     """What the numbers below are numbers *of*.
 
-    TASK_017 Part 2, from TASK_016_REVIEW B1. The failure this addresses is not
-    a rung that lies -- the gate cannot catch that and does not claim to -- it
-    is a reader who quotes `results/tables/p05-index-flatten.md` without ever
-    opening `patterns/p05-index-flatten/spec.md`, which happened in two
-    consecutive tasks and cost a published headline."""
+    TASK_017 Part 2, from TASK_016_REVIEW B1.
+
+    **What this does not do, corrected at TASK_018 (TASK_017_REVIEW M2.)**
+    TASK_017 wrote here that the observed failure "is a reader who quotes
+    `results/tables/p05-index-flatten.md` without ever opening
+    `patterns/p05-index-flatten/spec.md`, which happened in two consecutive
+    tasks and cost a published headline". That is false as a description of what
+    happened: `.temp/review014/NOTES.md` and `.temp/p05r3/NOTES.md` have **zero**
+    occurrences of `results/tables` between them -- neither task read a generated
+    table. What they read is in `.memory/01-ladder.md:15-22`: both quoted
+    **`.memory/01-ladder.md`'s own permissive R3 rung list**, which names
+    `chunks_exact` as an R3 technique, as licence for a spelling p05's `spec.md`
+    forbids.
+
+    So the failure this section addresses is a *possible* one, not the observed
+    one, and the mechanism that would have caught the observed one is a
+    declaration on `.memory/01-ladder.md`'s rung table -- which this file cannot
+    print. Keep the section: a declaration above every table is worth having,
+    and it is the only copy of the idiom a reader of `results/` will ever see.
+    Do not budget against it as the repair for the two-task failure."""
     out.append("\n## Declared idiom — what these numbers are numbers *of*\n")
     idi = read_idiom(doc["pattern"])
     if not idi:

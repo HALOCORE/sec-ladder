@@ -58,6 +58,11 @@ per call plus 7–8 per *range request*; §3b's 34-point sweep holds the request
 count at 1 and so establishes the per-byte rate and nothing about the constant.
 On that reading R3 is still the fifth
 pattern in a row where idiomatic safe Rust is free **per byte**.
+⚠ **And `+32` is an upper bound, not the safety tax (TASK_018, §10a).** An
+alternate R3 that is *inside* p17's declared idiom — same `i64` `start`/`end`,
+same literal conjunctive guard, only the suffix-table walk and the byte fold
+respelled — measures **51 `Ir`/call cheaper on both bands**, i.e. **−19 against
+the shipped R4**. Do not quote `+32` as what safety costs on this kernel.
 
 ⚠ **This paragraph said "+32 instructions per call, flat" until TASK_016, and
 "flat" there was read as flat per call, which the two shipped points cannot
@@ -391,15 +396,28 @@ not fitted, from a 34-point sweep (§3b) rather than from these two points:
   (`.memory/01-ladder.md` findings 3 and 9).
 
   **The shipped R3 is not the cheapest admissible spelling, and it is
-  deliberately not swapped.** `.temp/p05r3/v17/tuned_suffix.rs` (§10 row 3 —
-  `chunks_exact(2)` over the suffix table, the served range taken as the suffix
-  `body[start..]`) satisfies **all four** of p17's `required` entries: `i64`
-  endpoints, the one conjunctive `if start < end && start >= 0`, `nserved`
-  folded, no `Range:` text parsing. Checked entry by entry at TASK_016_REVIEW —
-  unlike p16's, p17's "not restricted" note stands. It measures **5189.70 /
-  41260.70**, i.e. **51.00 below the shipped R3 on both inputs** (`17·nsuf`
-  exactly over eight generated `nsuf` points, §10), so `+32` is the cost of
-  *this* R3's spelling and is **not** what safety costs on this kernel.
+  deliberately not swapped.** ⚠ **Corrected at TASK_018.** This paragraph used
+  to say that `.temp/p05r3/v17/tuned_suffix.rs` (§10 row 3) *"satisfies **all
+  four** of p17's `required` entries: `i64` endpoints, the one conjunctive `if
+  start < end && start >= 0`, `nserved` folded, no `Range:` text parsing"*.
+  **That was false of the file** (TASK_017_REVIEW B1): `tuned_suffix.rs` has no
+  `end` binding anywhere in its code — the only two occurrences of the word are
+  in doc comments — and writes `start < content_len`. Under the
+  **named-spelling standard** (`spec.md`'s `idiom.why`; policy adopted at
+  TASK_018 for all six patterns, after measuring) row 3 is **out of contract on
+  two entries**, `required[0]` and `required[1]`.
+
+  **The correction changes the attribution and not the number.**
+  `.temp/p18/v17/r3_incontract.rs` keeps `let start: i64`, `let end: i64`, the
+  literal `if start < end && start >= 0` and `n = end - start`, and respells
+  only the suffix-table walk and the byte fold — the two things `spec.md` says
+  are *not* restricted. It is **in contract**, and it compiles to
+  **byte-identical machine code** to `tuned_suffix.rs`: `md5_fn
+  532201c70eeb5fea…`, `md5_raw 12fd8faca909d0e0…`, `n_fn 135`, both `-O3
+  isolated`. It measures **5189.70 / 41260.70**, i.e. **51.00 below the shipped
+  R3 on both inputs** (`17·nsuf` exactly over eight generated `nsuf` points,
+  §10), so `+32` is the cost of *this* R3's spelling and is **not** what safety
+  costs on this kernel. See §10a.
 
   Three reasons it is not swapped in, adjudicated at TASK_016_REVIEW Part 5 and
   not a preference:
@@ -1252,6 +1270,10 @@ Total Verus wall time for the shipped file: ~4 s.
 
 ## 10. The spelling spread — three spellings, and the one thing p17 can say
 
+> **Read §10a with this section.** Row 3 below is **out of contract** under the
+> named-spelling standard (corrected at TASK_018); §10a is the in-contract
+> spread, and it reaches row 3's number with row 3's exact machine code.
+
 **Not the headline.** A result about *method*, required for every pattern by
 TASK_016 for every pattern that has spellings. p17's number is the matched pair under
 the idiom `spec.md` declares — **R3 `safe_tuned.rs` − R4 `unsafe.rs` = +32
@@ -1272,14 +1294,23 @@ weakness of this section and it is stated up front.
 | 3 | R3 | `chunks_exact(2)` over the table; body resliced once, served range as the **suffix** `body[start..]` | `v17-tuned_suffix.rs` | 5189.70 | 41260.70 | −19 / −19 |
 | 4 | R4 | `get_unchecked`, flat indices | **`unsafe.rs` (SHIPPED CELL)** | **5208.70** | **41279.70** | **0** |
 
-All four rows satisfy p17's declared idiom — it constrains the *signedness*, the
-*guard* and what R1 omits, not how the fold or the table walk is spelled — so
-the marking is *shipped* versus *not shipped*. Row 3 keeps `start` and `end`
+⚠ **This paragraph was wrong and is corrected at TASK_018.** It used to read:
+*"All four rows satisfy p17's declared idiom … Row 3 keeps `start` and `end`
 `i64`, keeps the one conjunctive guard, and folds the same bytes; it is an
-admissible p17 R3 that nobody has landed.
+admissible p17 R3 that nobody has landed."* **Row 3 has no `end` binding
+anywhere in its code** (`.temp/p05r3/v17/tuned_suffix.rs`; the only two
+occurrences of the word are in doc comments) and it writes `start <
+content_len` where `required[1]` names `start < end`. Under the
+**named-spelling standard** — `spec.md`'s `idiom.why`, a **policy adopted at
+TASK_018 for all six patterns, after the alternate spellings had been
+measured** — row 3 is **out of contract on `required[0]` and `required[1]`**.
+The claim it satisfied all four was written into this file by TASK_017, in the
+same commit that ruled the analogous p16 spelling out (TASK_017_REVIEW B1). The
+marking is therefore *shipped* (rows 1, 2, 4) versus *out of contract* (row 3),
+and §10a supplies the in-contract alternates row 3 cannot be.
 
-Row 3 is the whole spread: p17 has **one** alternate spelling measured, against
-p05's ten and p16's four. It changes two things at once — a constant-size
+Row 3 is the whole *measured* spread of TASK_015/TASK_016: p17 had **one**
+alternate spelling measured, against p05's ten and p16's four. It changes two things at once — a constant-size
 `chunks_exact(2)`, which is a mask and not the runtime `div` that made p05's
 `chunks_exact` a special case, and a one-endpoint suffix reslice so `s` is never
 re-derived as `end - start`. It is identical on every input.
@@ -1314,8 +1345,80 @@ Two caveats that bound this, both load-bearing:
   points*. **A shipped `nsuf` sweep is owed and is its own task** — TASK_016
   changed no cell source and no input.
 
-And the same structural point as p05 and p16: the cheapest safe spelling (row 3)
-is **below the unsafe rung** on both shipped inputs, and p17's `idiom` block does
-not restrict the fold or table-walk spelling, so row 3 is an *admissible* p17 R3
-that nobody has landed. The pair in rows 2 and 4 is what p17 publishes; it is a
-matched pair by declaration, not by optimality.
+And the same structural point as p05 and p16, restated correctly at TASK_018:
+the cheapest safe spelling measured is **below the unsafe rung** on both shipped
+inputs, and although row 3 as written is out of contract, **an in-contract
+spelling reaches the identical machine code and the identical number** (§10a).
+The pair in rows 2 and 4 is what p17 publishes; it is a matched pair by
+declaration, not by optimality — and §10a shows the declaration does not narrow
+it to one.
+
+## 10a. The **in-contract** spelling spread (TASK_018)
+
+§10 row 3 is out of contract under the named-spelling standard, so it cannot
+answer "is the shipped R3 the cheapest admissible one?". This section answers
+it. **The answer is no — and the exclusion of row 3 costs nothing, because the
+compiler erases the distinction the standard draws.**
+
+Two alternate R3 spellings, under `.temp/p18/v17/`, **neither a p17 cell**. Both
+keep `let start: i64`, `let end: i64`, the literal
+`if start < end && start >= 0`, `n = end - start`, `nserved` folded, no `Range:`
+parsing, zero `unsafe`. Only the suffix-table walk and the byte fold — the two
+things `spec.md`'s `idiom.why` says are deliberately *not* restricted — are
+respelled. Both print byte-identical stdout and exit status to shipped R3 on
+**8/8** committed inputs.
+
+Marginal `Ir`/call, `-O3 isolated`, §10's convention and probe:
+
+| variant | what changed | small | large | − R4 ship | − R3 ship |
+|---|---|---:|---:|---:|---:|
+| `r3_tabonly.rs` | table walk only: `chunks_exact(2)` for `tab[2*i..2*i+2]` | 5234.70 | 41305.70 | +26 / +26 | −6 / −6 |
+| `r3_incontract.rs` | table walk **and** the served range as a suffix reslice of `body` | **5189.70** | **41260.70** | **−19 / −19** | **−51 / −51** |
+| *(shipped R3)* | — | 5240.70 | 41311.70 | +32 / +32 | 0 |
+
+**The identity, which is the finding.** `r3_incontract.rs` and the *excluded*
+`.temp/p05r3/v17/tuned_suffix.rs` compile to the **same machine code**:
+
+```
+.temp/p18/bin17-r3_incontract-O3-isolated  n_fn=135  md5_fn=532201c70eeb5fea622c8199d94edd99  md5_raw=12fd8faca909d0e087c517a0f1142d25
+.temp/p05r3/bin/v17-tuned_suffix-O3-isolated  n_fn=135  md5_fn=532201c70eeb5fea622c8199d94edd99  md5_raw=12fd8faca909d0e087c517a0f1142d25
+```
+
+The two sources differ in *exactly* the tokens `required[0]` and `required[1]`
+name — `let end: i64 = content_len;` + `start < end` + `n = end - start` against
+`start < content_len` + an open-ended suffix reslice — and rustc emits the same
+478 bytes for both. `harness/asm.py` is the oracle
+(`.memory/03-measurement.md`: identity claims cite raw bytes). The *symbol
+names* differ (`…13r3_incontract6kernel` vs `…12tuned_suffix6kernel`) — these
+digests are of the function's bytes, not of its symbol, which is exactly what
+`md5_fn`/`md5_raw` are for.
+
+**What this establishes.**
+
+1. **"The shipped R3 is the cheapest admissible one" is FALSE for p17**, not
+   unestablished: an admissible spelling is **51.00 `Ir`/call cheaper on both
+   bands**. And this is a **swept law, not a two-point constant** — which is
+   worth spelling out because §10's own caveat is that both shipped inputs sit
+   at `nsuf = 3`. Because `r3_incontract` and `tuned_suffix.rs` are *the same
+   machine code*, §10's eight-point measurement `R3ship − R3′ = 17·nsuf`
+   (`nsuf` 1…8, `.temp/review015/in17/`, zero residual) **is** the in-contract
+   law, transferred without re-measuring. A request with 20 ranges pays ≈ 340
+   `Ir`/call for the shipped spelling that an admissible one does not.
+2. **p17's published `R3 − R4 = +32` is an upper bound on the in-contract safety
+   tax, not the tax.** The measured in-contract minimum is **−19.00** against the
+   shipped R4, on both bands. Per `.memory/01-ladder.md` finding 14 that is
+   **not** "safe Rust beats unsafe Rust" — R4 is a spelling too and its
+   in-contract space has not been searched — it is "the shipped pair is not on
+   the floor of its own contract".
+3. **On p17 the token pin has zero effect on any measured quantity.** It
+   excludes a source-level difference the compiler erases. Whatever a
+   declaration that pins tokens buys, on this pattern it is not attributability
+   of `R3 − R4`: the number the pin was used to exclude is reachable inside the
+   pin.
+4. All of §10's caveats still stand: both shipped inputs have `nsuf = 3`, p17
+   ships **no sweep**, and a shipped `nsuf` sweep is still owed.
+
+**Method.** `.temp/p18/measure2.py` → `.temp/p05r3/mir.py` (= `check.py`'s
+`_probe_input` plus a whole-program `Ir` difference). Binaries built with
+`harness/build.py`'s exact `-O3 isolated` rustc flags. **No pattern source was
+edited.**

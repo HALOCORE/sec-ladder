@@ -185,7 +185,14 @@ says whole-program totals move with the environment block; what is new is that
 **differencing two of them does not cancel it here**, because the per-iteration
 cost itself changes with alignment.
 
-Magnitude: ≤0.08 on figures of 4 800–206 000, i.e. ≤2×10⁻⁵ relative. No claim in
+Magnitude: **spread 0.18** on figures of 4 800–206 000, i.e. ~1×10⁻⁵ relative.
+⚠ The "≤0.08" this paragraph used to quote was the movement observed *between
+two gate runs*, not the size of the effect (TASK_017_REVIEW m3): on
+`unsafe/O3/whole/small.bin` the committed record is 7292.12 and the review
+measured **7292.14 / 7292.18 / 7292.24 / 7292.26 / 7292.30** across
+environments — 2.25× the stated bound, and the effect is **non-periodic and
+non-monotone** in the pad length (pads 4…36 give one whole-program total, pads
+40…64 a second). The operative advice below is unaffected. No claim in
 this file rests on a digit that moves — `R1h − R1 = 0.00` is a difference of two
 cells measured in the *same* run, and every §3 attribution is likewise a
 within-run difference. But **quote p08's marginals to the instruction, not to
