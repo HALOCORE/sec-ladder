@@ -444,9 +444,18 @@ through glibc `memcpy`/`memmove`, whose path length depends on buffer alignment,
 and the env block shifts the stack. p16, which calls no bulk routine, is exactly
 invariant.
 
+**Demonstrated at symbol granularity, not inferred** (TASK_017_REVIEW): at
+PAD 36→40, `unsafe::main` and the `memset` are bit-identical, and **100% of the
+drift is inside the `memmove`** at `libc+0x188a80` (196.96 → 197.00 Ir/iter).
+It threatens **no published p08 number** — `R1h − R1 = 0.00` measured exactly
+0.00 across 12 argv/env configurations.
+
 Consequence for gate hygiene: **"every `marginal_ir_per_call` cell unchanged" is
 a valid *within-session* invariant (96/96 across three p08 runs) and NOT a valid
-cross-session one** — 12 of p08's 64 cells move by ≤0.08 Ir/call. Do not read
+cross-session one** — 12 of p08's 64 cells move, with an observed spread of
+**0.18 Ir/call** (TASK_017 reported ≤0.08; TASK_017_REVIEW measured wider). The
+drift is **not periodic and not monotone** in the pad length: pads 4–36 are
+byte-identical and the step falls at 40. Do not read
 such a drift as a code change, and do not quote p08's marginals to more
 precision than that.
 

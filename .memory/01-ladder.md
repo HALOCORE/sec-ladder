@@ -270,11 +270,18 @@ is a much stronger claim than any p01 could produce.
    convention across p05/p02/p17; those tokens *being* the cursor-and-end
    traversal; and the exclusion falling **symmetrically**, taking the consuming
    *R4* control out with the R3s), explicitly **not** on which answer made the
-   cheaper spelling inadmissible. State the residual risk with the number every
-   time: **the chosen reading makes p16's shipped figure look better**, and it
-   leaves p16 with **zero measured admissible alternate spellings**, so "the
-   shipped R3 is the cheapest admissible one" is **unestablished, not
-   established**. p16 owes a spelling-spread measurement inside its own contract. This file already said, at finding 3: *"Never publish a
+   cheaper spelling inadmissible.
+   **The suspicion that the reading was self-serving was measured and refuted at
+   TASK_017_REVIEW: it makes p16's published safety tax 4.5× LARGER.** Shipped
+   pair `7 + 5·nrec` / `7 + 7·nrec` (+27/+77); excluded matched consuming pair
+   `7` flat / `7 + nrec` (+7/+17). What it protects is the shipped cells'
+   *standing* and §3's swept law, not a flattering number.
+   Two things are still owed from that review: the reading is a **policy adopted
+   after measuring**, not a disambiguation of what the text always meant, and
+   must be labelled so; and it leaves p16 with **zero measured admissible
+   alternate spellings**, so "the shipped R3 is the cheapest admissible one" is
+   **unestablished, not established**. p16 owes a spelling-spread measurement
+   inside its own contract. This file already said, at finding 3: *"Never publish a
    safety-cost claim without R3."* The rule was violated by its own author on the
    next pattern. **Lead with R3 or do not lead.**
 
