@@ -177,6 +177,12 @@ is a much stronger claim than any p01 could produce.
 
 ## The structural findings (established by `pilot/`, do not re-litigate)
 
+**Numbering warning — 26 stale citations exist.** The findings in *this* file are
+numbered **1–7, one per pattern**. `RECAP.md` carries a *different* list, its own
+digest, numbered **1–14**. "`.memory/01-ladder.md` finding 14" appears in 26
+places and points at nothing. **Name the pattern, never the number.**
+
+
 1. **A Verus proof costs zero instructions.** Ghost code, `requires`, `ensures`,
    invariants, `decreases` all erase. Established at the pilot, corrected at
    TASK_001, and independently re-derived at TASK_001_REVIEW **on the raw
