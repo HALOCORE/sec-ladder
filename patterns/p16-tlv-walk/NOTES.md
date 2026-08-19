@@ -32,8 +32,11 @@ was measured.
 TASK_023, §10a).** Three alternate R3 spellings that keep **both** of
 `spec.md`'s named comparisons literally, and change only the header read and the
 value fold — the two things the declaration says it does *not* restrict — span
-**42 `Ir`/call at `large` against the published 77**, the cheapest sitting at
-`+45`. **TASK_023 then searched the R4 side and it moves too**, by the same
+**42 `Ir`/call at `large` against the published 77**, the cheapest **of those
+three** sitting at `+45` (a *later* search on the same declaration reached
+`−2545`; see §10a.2, and read `+45` as scoped to TASK_018's three respellings
+and never as a floor). **TASK_023 then searched the R4 side and it moves too**,
+by the same
 lever: `R4ship − r4_hdr = 4·nrec`, zero residual over 24 blobs. So the
 admissible **pair** `(r3_hdrarray, r4_hdr)` **exceeds** the published tax by
 `5·nrec` — 47 against 27 at `small`, 127 against 77 at `large` — and `+27 / +77`
@@ -199,19 +202,26 @@ Read per unit of the thing each rung is doing:
   shipped R3 (`R3ship − r3_endslice = 2·nrec − 2`, `R3ship − r3_window =
   4·nrec − 8`, `r3_hdrarray − R3ship = nrec`), and TASK_018_REVIEW swept the
   `nrec` axis to confirm them. ~~The measured in-contract minimum against the
-  shipped R4 is **+19 (`small`) / +45 (`large`)**~~ — **that value is refuted
-  (TASK_023_REVIEW): the measured in-contract minimum against the shipped R4 is
-  −199 (`small`) / −2365 (`large`)**, reached by a safe rung one substitution
-  from the shipped one, and it is **negative on all 24 blobs**. The one-sided
-  *form* is all that survives TASK_023, which measured the **R4** side moving by
+  shipped R4 is **+19 (`small`) / +45 (`large`)**~~ — **that value is refuted,
+  and so is the value that replaced it. The CHEAPEST FOUND in contract against
+  the shipped R4 is −199 (`small`, `chunks_exact(16)`/`(32)`) / −2545 (`large`,
+  `chunks_exact(64)`)**, reached by safe rungs one substitution from the shipped
+  one, and it is **negative on all 24 blobs**. ~~`−199 / −2365`~~ was published
+  as the minimum and was overturned by the next search (TASK_025_REVIEW major
+  3), which is the **fifth** time that has happened on p16 or p05: **write
+  "cheapest found", never "minimum"**, and name the spelling, because the
+  cheapest spelling is not even the same on the two blobs. The one-sided *form*
+  is all that survives TASK_023, which measured the **R4** side moving by
   `4·nrec` and an admissible pair exceeding `+27 / +77` by `5·nrec` (§10a); the
-  lever that makes the minimum negative is **unrolling**, licensed by the same
-  declaration and larger than both — §10a.2, which also measures that the
-  unsafe rung goes lower still at matched spelling. Everything in the two
-  paragraphs below is about *out-of-contract* spellings and was written before
-  §10a existed; it is kept because the reasoning is still the record of what
-  TASK_017 excluded, but it must not be read as "nobody has measured an
-  admissible alternate".
+  lever that makes the figure negative is the **fold spelling**, licensed by the
+  same declaration and larger than both — §10a.2. Note what §10a.2 does **not**
+  show: the six unsafe-side chunked probes are **not admissible R4 rungs** (the
+  `identity` pin chains R4 to what vstd can verify, and vstd verifies none of
+  them), so whether an admissible *unsafe* rung goes lower still is **open**.
+  Everything in the two paragraphs below is about *out-of-contract* spellings
+  and was written before §10a existed; it is kept because the reasoning is still
+  the record of what TASK_017 excluded, but it must not be read as "nobody has
+  measured an admissible alternate".
 
   Two cheaper *out-of-contract* R3 spellings exist and were measured at TASK_015
   (`.temp/p05r3/v16/tuned_split.rs`, `…/tuned_splitat.rs`): **49 (`small`) /
@@ -242,9 +252,15 @@ Read per unit of the thing each rung is doing:
   swapped: the cheaper rungs are out of contract, and even if they were not,
   `R3′ − R4 = −22 / −32` means swapping R3 alone would publish "safe beats
   unsafe" from an unmatched pair (TASK_014/TASK_015's defect, re-committed as a
-  shipped cell), while `inf(R4) ≤ inf(R3)` by construction
-  (`.memory/01-ladder.md` finding 14) means no swap terminates. Adjudicated at
-  TASK_016_REVIEW Part 5: **state the limitation, swap neither cell.**
+  shipped cell), while ~~`inf(R4) ≤ inf(R3)` by construction~~ meant no swap
+  terminates. **That second reason is REFUTED** (TASK_025_REVIEW blocker 1): the
+  `identity` pin makes an R4 a program that must have a verifying byte-identical
+  R5, so the R4 class is bounded by what vstd can express and the R3 class is
+  not — the two are incomparable, and on p16 the safe side reaches folds the
+  unsafe side cannot. See §10a.2 and `.memory/01-ladder.md`'s R4-by-permission
+  paragraph, which the same measurement corrected project-wide. The **verdict**
+  is unchanged, on the first reason alone. Adjudicated at TASK_016_REVIEW
+  Part 5: **state the limitation, swap neither cell.**
 - **R5 is free**, as on every pattern: byte-identical to R4 at `-O3`
   (`md5_fn 852405e0fa43` both, `md5_raw` equal, padding 12/12 B), `norel` at
   `O0` where the crate names differ in length.
@@ -1168,8 +1184,12 @@ forms:
 
 So this is **not** a repeat of `nrec + 3`, and the `nrec` forms may be quoted.
 Two consequences follow with them: at `nrec` 10 the in-contract span is
-`10 − (−32)` = **42** against `R3 − R4 = 77`, cheapest admissible **+45**; at
-`nrec` 4, **12** against 27, cheapest **+19**.
+`10 − (−32)` = **42** against `R3 − R4 = 77`, cheapest **of these three** at
+**+45**; at `nrec` 4, **12** against 27, cheapest of these three at **+19**.
+⚠ Those two figures are the cheapest of *this table's* three respellings, not
+of the contract: §10a.2's chunked folds are admissible under the same
+declaration and reach `−199` / `−2545`. This paragraph said "cheapest
+admissible" until TASK_027 and that word was doing work it had not earned.
 
 **The `nrec` axis now ships, and the laws were re-derived from it (TASK_020).**
 As delivered this block carried a ⚠: the 68 committed sweep blobs could not have
@@ -1255,15 +1275,23 @@ rewrite the path to the real, hashed `common/driver.rs`.
    the published safety tax lives in spelling the declaration does not pin.
 3. Therefore **`R3ship − R4ship = +27 / +77` is not the tax.** ~~The measured
    in-contract minimum is **+19 / +45** (`r3_window`) or **+21 / +59**
-   (`r3_endslice`) against the shipped R4~~ — **both values are refuted
-   (TASK_023_REVIEW, §10a.2): the measured in-contract minimum against the
-   shipped R4 is −199 / −2365, negative on all 24 blobs, via a chunked safe
-   fold.** The pairing — R4 held fixed by fiat — is still the **only** thing
-   `+27 / +77` bounds. **The *R4* side has now been searched (TASK_023, §10a.1)
-   and it moves by `4·nrec`**, so `+27 / +77` is not an upper bound on p16's
-   in-contract safety tax: the admissible pair `(r3_hdrarray, r4_hdr)` exceeds
-   it by `5·nrec` (`.memory/01-ladder.md`, the R4-by-permission paragraph — R4
-   is defined by permission, so `inf(R4) ≤ inf(R3)` by construction).
+   (`r3_endslice`) against the shipped R4~~ — **refuted, and so is the value
+   that replaced them. The CHEAPEST FOUND in contract against the shipped R4 is
+   −199 (`small`) / −2545 (`large`), negative on all 24 blobs, via chunked safe
+   folds** (TASK_023_REVIEW, TASK_024, TASK_025_REVIEW major 3; §10a.2). It is
+   *cheapest found* and not a minimum: four successive values of this number
+   have now been overturned by the next search. The pairing — R4 held fixed by
+   fiat — is still the **only** thing `+27 / +77` bounds. **The *R4* side has
+   now been searched (TASK_023, §10a.1) and it moves by `4·nrec`**, so
+   `+27 / +77` is not an upper bound on p16's in-contract safety tax: the
+   admissible pair `(r3_hdrarray, r4_hdr)` exceeds it by `5·nrec`. ⚠ The
+   sentence that used to close this item — *"R4 is defined by permission, so
+   `inf(R4) ≤ inf(R3)` by construction"* — is **withdrawn**: p16's `identity`
+   pin makes an R4 a program that must have a verifying byte-identical R5, so
+   the R4 class is bounded by what vstd can express and the R3 class is not
+   (TASK_025_REVIEW blocker 1; `.memory/01-ladder.md`'s R4-by-permission
+   paragraph now carries the correction project-wide). The R4 side moving is a
+   *measurement*, and it stands on its own.
 4. **`spec.md` ground (ii) is withdrawn.** Pinning `end - p >= 3` and
    `vlen > end - (p + 3)` does **not** make `R3 − R4` "a difference in safety
    rather than a difference in representation". It narrows the class of
@@ -1369,6 +1397,17 @@ chunked folds of §10a.2 — are safe Rust and cost zero TCB.** So "the same
 category of edit on the safe side", which is how the R4 search was justified, is
 measurably **not** the same category: the safe-side levers are free and larger.
 
+> **This audit covered the R3 side only, and the omission cost the next task its
+> headline.** §10a.2 then measured six `u_c*` folds and never asked the same
+> question of them; TASK_025_REVIEW did, and **every one of the six is
+> disqualified by the argument in this very paragraph** — `chunks_exact`,
+> `ChunksExact`, `by_ref`, `TryFromSliceError` and `get_unchecked` are each
+> unsupported by vstd at the pin, so `u_c32` needs **five** new trusted items
+> where `r4_hdr` needs one. **The rule this generalises to, now in `spec.md`'s
+> hashed `why`: under an `identity: unsafe ≡ verus, exact` pin, an R4-side
+> variant must be expressible in what vstd can verify, or it is not a rung.**
+> Audit the TCB of an unsafe-side variant *before* differencing it, not after.
+
 **Three things this does *not* touch** — ~~*stated so nobody re-runs them*~~.
 **That sentence was an instruction not to re-run the experiment, and the
 experiment it discouraged is the one that broke the first bullet two tasks
@@ -1382,21 +1421,27 @@ shape of defect this file has now shipped twice.**
   lever, which is **per byte**. In contract the safe rung reaches **5.09375
   Ir/folded byte** against the shipped unsafe rung's **5.7500**. What survives,
   and is now the statement to quote, is **the matched-spelling null: fold both
-  rungs the same way and the per-byte rates are equal to five decimal places at
-  every spelling measured** (§10a.2). R2's 10.00 is untouched.
+  rungs the same way and the per-byte difference is a single integer per call at
+  every length, slope 0.0000000, swept over 130 consecutive `vlen`** (§10a.2).
+  R2's 10.00 is untouched.
 - **The one-sided bound survives; its value does not.** Hold R4 at the shipped
   cell and `R3ship − R4ship` bounds `inf(in-contract R3) − R4ship` above — that
-  much is still true, and trivially so. But the measured in-contract minimum
-  against the shipped R4 is **−199 (`small`) / −2365 (`large`)**, not the
-  ~~`+19 / +45`~~ this bullet defended: negative on all 24 blobs, via a safe
-  rung that is in contract by the gate's own matcher and 95/95 equivalent.
+  much is still true, and trivially so. But the **cheapest found** in contract
+  against the shipped R4 is **−199 (`small`, `chunks_exact(16)`/`(32)`) /
+  −2545 (`large`, `chunks_exact(64)`)**, not the ~~`+19 / +45`~~ this bullet
+  defended and not the ~~`−199 / −2365`~~ that replaced it: negative on all 24
+  blobs, via safe rungs that are in contract by the gate's own matcher and 95/95
+  equivalent. **Cheapest found, never minimum** — and the cheapest spelling is
+  not even the same on the two blobs (§10a.2).
 - **This is not a minimum.** `r4_hdr` is the *first* lever tried on p16's R4 and
   it moved `4·nrec`; p05 published three successive R4-side "minima" and the
   next search overturned each (`.memory/01-ladder.md` finding 6). Nothing here
   is offered as `min(R4)`, and `min(R3 found) − min(R4 found)` is not a bound in
-  either direction. **Confirmed the hard way**: the very next search found a
+  either direction. **Confirmed the hard way, twice**: the next search found a
   lever ~60× larger on both sides — `4·nrec` is 40 Ir/call at `large` against
-  the chunked fold's 2365 (safe side) and 2417 (unsafe side).
+  the chunked fold's 2365 — and the search *after that* moved the safe side
+  again, to 2545 at `chunks_exact(64)`. Five published p16/p05 "minima" have now
+  been overturned by the next search.
 
 **The difference from p05 is the shape, and it is the sharper half.** p05's R4
 side moved by a **constant** (7 flat); p16's moves by a **coefficient**
@@ -1417,7 +1462,7 @@ exact `-O3 isolated` rustc flags. **No pattern source was edited**; the three R4
 variants ship in `controls/gen_controls.py` so this section is reproducible from
 the tree.
 
-## 10a.2. The unroll lever, and what a per-byte rate is actually a property of (TASK_023_REVIEW, TASK_024)
+## 10a.2. The fold lever, and what a per-byte rate is actually a property of (TASK_023_REVIEW, TASK_024, corrected at TASK_025_REVIEW / TASK_027)
 
 §10a.1's search pulled two levers. The declaration names a third — its last
 sentence has said *"Still deliberately NOT restricted: … and **unrolling**"*
@@ -1426,7 +1471,53 @@ and that third lever is the only one of the three that acts **per byte**. It is
 therefore an order of magnitude larger than either of the others, and it is what
 refutes §10a.1's interval, §10's `+19 / +45`, and the per-byte null.
 
+> **TASK_025_REVIEW attacked this section and found one blocker and four majors;
+> TASK_027 landed the corrections and re-measured them from the committed tree.**
+> What changed, in one place, so a reader of an older copy can diff: the six
+> `u_c*` probes are **not admissible R4 rungs** and never were, so the
+> "at matched spelling the unsafe rung is cheaper" statement had no rung behind
+> it and is withdrawn; `−0.5625` was arithmetic and is **`−0.65625`**;
+> `−199 / −2365` was not the cheapest and the word "minimum" is gone everywhere;
+> "`chunks_exact(4)` is dearer" was an artefact of `try_into` and is refuted by
+> its own control; and every stated reason for not pinning the fold was
+> withdrawn while the conclusion stood. What got *stronger*: the null is now
+> swept over 130 consecutive lengths instead of sampled at three pairs, and the
+> mnemonic identity holds at `K` 4 and 8 too.
+>
+> **The whole section is now reproducible from the tree.** The eighteen probes
+> ship as `controls/gen_controls.py`'s third dict, the rates come off
+> `controls/foldcmp.py`, and the lengths come from `inputs/gen.py`'s fourth
+> band. Every number below was re-derived from those three files at TASK_027,
+> in one build session, in the foreground.
+
 ### The measured rates
+
+> ⚠ **Read the next table as DISASSEMBLY, not as measurement.** Every
+> five-decimal rate in it is `chunk-body instructions / K`, counted off the
+> objdump by `controls/foldcmp.py`, and it is exact *as that*. **None of them is
+> a five-decimal measured slope**, and TASK_025_REVIEW minor 6 is where that
+> stopped being pedantry. A marginal is `(Ir @ 200 − Ir @ 100)/100`, so the
+> driver's one `println` does **not** cancel — what survives is the digit-count
+> difference between the two checksums, ~22.63 Ir/digit, i.e. **0.2263 Ir per
+> call per digit** — and a rate read from a residue-matched pair
+> `(vlen, vlen + K)` divides that by only `nrec·K` folded bytes. So the measured
+> error is `0.2263 · Δ(Δdigits) / (nrec·K)` Ir/byte, and it is **larger for
+> smaller `K`**. Measured over `inputs/gen.py`'s fourth band, at every offset:
+>
+> | fold | matched step | measured rate, min … max (mean) | exact `body/K` |
+> |---|---:|---|---:|
+> | shipped | 8 B | 5.64750 … 5.82500 (5.74951) | **5.75000** |
+> | `chunks_exact(32)` | 64 B | 5.08266 … 5.10313 (5.09345) | **5.09375** |
+> | `chunks_exact(64)` | 128 B | 5.04219 … 5.05156 (5.04689) | **5.04688** |
+>
+> Subtract the predicted digit term and the max residual falls to 0.0266 /
+> 0.0045 / 0.0017 Ir/byte respectively (`.temp/p27/digits.py`), so the term is
+> the mechanism and not a hypothesis. **The sharpest form of this: p16's own
+> published headline rate, the shipped fold's 5.7500, is the *least*
+> reproducible number in the table — ±0.09 Ir/byte as a measured slope —
+> because a pair matched at its own `K = 4` is only 8 folded bytes apart.** Only
+> the disassembly makes any of these exact. Any table of p16 rates must say
+> which of the two kinds of number it is.
 
 | fold spelling | `K` | Ir per folded byte | chunk-body insns | source |
 |---|---:|---:|---|---|
@@ -1434,27 +1525,33 @@ refutes §10a.1's interval, §10's `+19 / +45`, and the per-byte null.
 | `chunks_exact(4)` + `try_into::<[u8;4]>()` | 4 | **6.50000** | 26 / 4 | TASK_024 |
 | **shipped R3 and shipped R4** (rolled in source, LLVM unrolls 4×) | 4 | **5.75000** | 23 / 4 | §3, both |
 | manual 16× unroll, subtraction-first guard | 16 | 5.37500 | — | TASK_023_REVIEW |
+| `chunks_exact(4)` and `(8)` **without `try_into`** | 4, 8 | **5.37500** | 43 / 8 | TASK_025_REVIEW |
 | manual 32× unroll (2 induction vars, so `5 + 6/K`) | 32 | 5.18750 | — | TASK_023_REVIEW |
 | `chunks_exact(16)` | 16 | **5.18750** | 83 / 16 | both |
+| `chunks_exact(16)` without `try_into` | 16 | **5.18750** | 83 / 16 | TASK_025_REVIEW |
 | `chunks_exact(32)` | 32 | **5.09375** | 163 / 32 | both |
 | `chunks_exact(64)` | 64 | **5.04688** | 323 / 64 | TASK_024 |
 
-Slopes are binary-differenced marginals over blobs matched in residue. Three
-bands, and the residue matching is what makes the epilogue cancel:
+Reproduce the whole table with
 
-- **band A** `sweep-v56 → sweep-v88`, `nrec` 4, both `≡ 24 (mod 32)`;
-- **band B** `sweep-v2040 → sweep-v2072`, `nrec` 2, both `≡ 24 (mod 32)`;
-- **the mod-64 triple** `vlen` 2040 / 2168 / 2296, `nrec` 2, all `≡ 56 (mod 64)`
-  — needed because the committed sweep bands span 34 consecutive lengths and so
-  contain **no** pair differing by a multiple of 64. Generated by
-  `.temp/p24/gen_k64.py` from `inputs/gen.py`'s own `tiled()`; scratch, not
-  committed, because the shipped bands settle every `K ≤ 32`.
+```
+python3 patterns/p16-tlv-walk/controls/gen_controls.py --build
+python3 patterns/p16-tlv-walk/controls/foldcmp.py
+```
 
-Bands B and the triple's first step give the exact values above. **Band A reads
-`+0.00469` high on every row alike** — `s_ship` 5.75469, `s_c4` 6.50469, `s_c8`
-6.62969, `s_c16` 5.19219, `s_c32` 5.09844 — which is the digit-count term in the
-driver's `println`, not a codegen difference: it is the *same* offset on all ten
-binaries, so it cancels in every safe-minus-unsafe difference below.
+which prints the body length, the `movzbl` count and `body/K` for each `K` on
+both sides. **The earlier band construction is superseded and is recorded only
+because its weakness is the finding.** TASK_024 read these rates off three
+binary-differenced pairs — `sweep-v56 → sweep-v88`, `sweep-v2040 →
+sweep-v2072`, and a scratch mod-64 triple — and called them "three
+residue-matched bands". TASK_025_REVIEW measured that all three sit at the
+*same* residue offset (56, 88, 2040, 2072, 2168 and 2296 are every one `≡ 24
+(mod 32)`), so they are three pairs at one point rather than three bands, and
+the `+0.00469` that band A read high on every row alike is the `println` term
+above. The mod-64 triple was scratch and uncommitted, which is why K = 64 was
+not re-derivable from the tree at all; `inputs/gen.py`'s **fourth band** now
+ships 130 consecutive lengths at `nrec` 2 and settles every `K ≤ 64` at every
+offset.
 
 ### `5 + 3/K` is NOT a law — it is a three-point fit, and two new points falsify it
 
@@ -1488,46 +1585,98 @@ chunk body is 26 insns per 4 bytes = 6.50 exactly. At `K = 8` it is 53 per 8 =
 6.625. At `K ≥ 16` LLVM abandons the trick and emits `K` direct `movzbl`, so the
 body is `5K + 3` and the rate is `5 + 3/K` **for that spelling only**.
 
+**And that attribution is now controlled rather than asserted — TASK_025_REVIEW
+built the probe this section should have built.** Every variant TASK_024 measured
+contains `try_into`, so nothing in it separated `try_into` from `chunks_exact`.
+The control is the same `chunks_exact(K)` fold with the `try_into` step deleted
+(`{s,u}_n{4,8,16}` in `controls/gen_controls.py`):
+
+| probe | chunk body | `movzbl` | rate | spelling |
+|---|---:|---:|---:|---|
+| `s_c4` | 26 | 3 | 6.50000 | with `try_into` |
+| `s_n4` | 43 | 8 | **5.37500** | **no `try_into`** (43 insns / 8 bytes) |
+| `s_c8` | 53 | 6 | 6.62500 | with `try_into` |
+| `s_n8` | 43 | 8 | **5.37500** | no `try_into` |
+| `s_c16` | 83 | 16 | 5.18750 | with `try_into` |
+| `s_n16` | 83 | 16 | 5.18750 | no `try_into` — **identical** |
+
+The mechanism is **confirmed**: remove `try_into` and the `K ≤ 8` penalty
+disappears, LLVM re-unrolls to an 8-byte body at `K` 4 and 8 alike, and at
+`K = 16` the two spellings are the same 83 instructions. What the control also
+does is **refute the argument this section built on the penalty** — see "Why the
+fold is NOT pinned" below. Measured, not inferred: `u_ship − s_n4` is
+**+167** at `small` and **+1509** at `large`, i.e. chunking at `K = 4` is 1509
+Ir/call *cheaper* than the shipped R4 once the `try_into` spelling is dropped.
+
 > **So the per-byte rate is a property of the FOLD SPELLING, not of `K` and not
 > of the rung.** "Unroll factor" is the wrong name for the free parameter; the
 > free parameter is the whole fold, and `K` only orders it inside one family and
 > only above 16.
 
-### The matched-spelling null: the per-byte safety tax is EXACTLY ZERO, at six spellings
+### The matched-spelling null: the per-byte safety tax is EXACTLY ZERO, SWEPT
 
-Twelve probes, built in one session: `s_*` from `safe_tuned.rs` and `u_*` from
-`unsafe.rs`, **one exact-string substitution each** (the value fold), the *same*
-chunked fold text on both sides — the unsafe side differing only in taking the
-value slice with `get_unchecked` instead of `&buf[p + 3..p + 3 + vlen]`. All
-twelve are **in contract by the gate's own matcher** (`spelling_matches`:
-req1 = req2 = True, forb1 = forb2 = False, the same verdict as both shipped
-rungs) and **95/95 equivalent** in stdout and exit status against the shipped R4
-binary — 12 × 95 = 1140 comparisons, 0 mismatches — and the six unsafe ones are
-Miri-clean on `small`, `large` and all three `adversarial-*` inputs.
+**This is the one result of this whole arc that got stronger under review, and
+it is the only per-byte number p16 should publish.**
 
-| fold | safe slope | unsafe slope | **difference** |
-|---|---:|---:|---:|
-| shipped (LLVM 4×) | 5.75000 | 5.75000 | **0.00000** |
-| `chunks_exact(4)` | 6.50000 | 6.50000 | **0.00000** |
-| `chunks_exact(8)` | 6.62500 | 6.62500 | **0.00000** |
-| `chunks_exact(16)` | 5.18750 | 5.18750 | **0.00000** |
-| `chunks_exact(32)` | 5.09375 | 5.09375 | **0.00000** |
-| `chunks_exact(64)` | 5.04688 | 5.04688 | **0.00000** |
+Eighteen probes, built in one session from `controls/gen_controls.py`: `s_*`
+from `safe_tuned.rs` and `u_*` from `unsafe.rs`, **one exact-string substitution
+each** (the value fold), the *same* fold text on both sides — the unsafe side
+differing only in taking the value slice with `get_unchecked` instead of
+`&buf[p + 3..p + 3 + vlen]`. All are **in contract**: `check.spelling_matches`
+gives req1 = req2 = True, forb1 = forb2 = False, the same verdict as both
+shipped rungs, and TASK_025_REVIEW checked the other two `required` entries by
+hand as well (the tag is folded *before* the fit test, `nrec` is folded) — 12/12
+on the probes that existed then. They are **equivalent in stdout and exit status
+on every committed input**: TASK_024 measured 12 × 95 = 1140 comparisons with 0
+mismatches, and TASK_027 re-ran it over the whole control set and the fourth
+band — **23 controls × 225 inputs = 5175 comparisons, 0 mismatches**
+(`.temp/p27/equiv.py`; 23 × 95 = 2185 of them on the inputs that predate the new
+band). The unsafe ones are Miri-clean on `small`, `large` and all three
+`adversarial-*` inputs.
+
+**Swept, not sampled.** TASK_024 claimed this null from three pairs at one
+residue offset. TASK_025_REVIEW swept 127 consecutive `vlen` and TASK_027
+re-swept the **130 consecutive lengths `inputs/gen.py`'s fourth band now
+commits** (`sweep-k120 … sweep-k249`, `nrec` 2). At every one of the 130 points
+the safe-minus-unsafe difference is a **single integer per call**:
+
+| fold | safe − unsafe, per call | distinct values over 130 lengths | slope of the difference |
+|---|---:|---|---:|
+| shipped (LLVM 4×) | 17 (`vlen ≡ 0 mod 4`) / 21 | 2, split by residue only | **0.0000000** within each class |
+| `chunks_exact(4)` | 10 | 1 | **0.0000000** |
+| `chunks_exact(8)` | 11 | 1 | **0.0000000** |
+| `chunks_exact(16)` | 12 | 1 | **0.0000000** |
+| `chunks_exact(32)` | 12 | 1 | **0.0000000** |
+| `chunks_exact(64)` | 12 | 1 | **0.0000000** |
+
+Max residual 0.00. The shipped pair's 17/21 is `7 + 5·nrec` / `7 + 7·nrec` at
+`nrec` 2, i.e. §3b's published law, and it is the only row where the residue
+class survives — matching the fold deletes the residue dependence, because it
+was the shipped R3's iterator epilogue against the shipped R4's scalar
+remainder and never a safety effect.
 
 **And the mechanism, not just the number:** the chunk-loop body is the *same
 machine code* on both sides. Its instruction count is identical at every `K`
-(26, 53, 83, 163, 323) and its **mnemonic sequence is identical** at `K` 16, 32
-and 64 — 83, 163 and 323 instructions in the same order, differing only in
-register allocation. That is not a coincidence to be re-measured per pattern: **the value
-fold carries no bounds check on either side at any `K`**, because the reslice
-(R3) and the `get_unchecked` (R4) both sit *outside* it. A rung's safety
-mechanism cannot enter a loop it is hoisted out of, so the per-byte rate cannot
-differ between rungs that fold the same way. It differs only when they fold
+(26, 53, 83, 163, 323) and its **mnemonic sequence is identical at `K` 4, 8, 16,
+32 and 64** — `controls/foldcmp.py` prints `True` on all five. (TASK_024 hedged
+this to 16/32/64 and so **under-claimed**; the scratch script it cited compared
+full instruction *text*, registers included, which is not the claim, and found
+no body at all at `K` 4 and 8. That script is not cited any more; `foldcmp.py`
+is the repair and it prints the verdict it is quoted for.) The one row where
+identity is *not* exact is the **shipped** pair: 23 instructions on each side,
+the same multiset, a different order — the load is scheduled before the `×31`
+chain on the safe side and after it on the unsafe side.
+
+That is not a coincidence to be re-measured per pattern: **the value fold
+carries no bounds check on either side at any `K`**, because the reslice (R3)
+and the `get_unchecked` (R4) both sit *outside* it. A rung's safety mechanism
+cannot enter a loop it is hoisted out of, so the per-byte rate cannot differ
+between rungs that fold the same way. It differs only when they fold
 *differently*.
 
 The rung difference is per **record** at every spelling, flat in `vlen` —
-17 / 10 / 11 / 12 / 12 / 12 Ir/call at `nrec` 2, the same integers at `vlen`
-2040, 2168 and 2296:
+17 / 10 / 11 / 12 / 12 / 12 Ir/call at `nrec` 2 over all 130 lengths of the
+fourth band, and the same integers at the `nrec` axis's own blobs:
 
 | pair | law | `small` / `large` |
 |---|---|---|
@@ -1535,11 +1684,6 @@ The rung difference is per **record** at every spelling, flat in `vlen` —
 | `chunks_exact(4)` matched | `2 + 4·nrec`, both residue classes | 18 / 42 |
 | `chunks_exact(8)` matched | `3 + 4·nrec` | 19 / 43 |
 | `chunks_exact(16/32/64)` matched | `2 + 5·nrec` | 22 / 52 |
-
-Matching the fold also **deletes the residue dependence** of the published law:
-`7 + 5·nrec` / `7 + 7·nrec` collapses to one class. The residue term was never a
-safety effect either — it was the shipped R3's iterator epilogue against the
-shipped R4's scalar remainder.
 
 ### What this does to "safe Rust beats unsafe Rust here"
 
@@ -1551,12 +1695,44 @@ R4ship − sv_c32  =  +199 (small)  /  +2365 (large)
                  =  48·nrec − 5   AT vlen 126   (n1 43, n4 187, n9 427, n16 763)
 ```
 
-zero residual over the 22 committed `sweep-n*` blobs, `sv_c32` being shipped
-`safe_tuned.rs` with **one substitution, zero `unsafe` tokens, both named
-comparisons literal** (`spelling_matches` req1 = req2 = True, forb1 = forb2 =
-False, identical to the shipped rungs), byte-identical stdout **and** exit status
-to shipped R3 on **95/95** committed inputs. That is real, and it is why the
-one-sided bound's value is now **−199 / −2365**.
+zero residual over the 22 committed `sweep-n*` blobs, `sv_c32` (`s_c32` in
+`controls/gen_controls.py`) being shipped `safe_tuned.rs` with **one
+substitution, zero `unsafe` tokens, both named comparisons literal**
+(`spelling_matches` req1 = req2 = True, forb1 = forb2 = False, identical to the
+shipped rungs), byte-identical stdout **and** exit status to shipped R3 on
+**95/95** committed inputs. That is real.
+
+> ⚠ **It is not the cheapest found, it never was a minimum, and the word
+> "minimum" does not belong anywhere near it.** TASK_025_REVIEW major 3
+> differenced `chunks_exact(64)` — which was already in the rate table three
+> rows above, at a *cheaper* per-byte rate — and got **`+127` at `small` /
+> `+2545` at `large`**. That is the **fifth** published p16/p05 "minimum"
+> overturned by the next search, and §10a.1's own third bullet said it would be.
+> **Write "cheapest found", with the spelling named, and never "minimum".**
+>
+> And the cheapest found is **per input**, which no site had said. Re-measured at
+> TASK_027 in one build session, marginal Ir/call, from the committed generator:
+>
+> | | `small` (`vlen` 124, `nrec` 4) | `large` (`vlen` 406, `nrec` 10) |
+> |---|---:|---:|
+> | `u_ship` (shipped R4) | 3024.30 | 23812.30 |
+> | `s_ship` (shipped R3) | 3051.30 | 23889.30 |
+> | `s_c16` | 2825.30 | 21717.30 |
+> | `s_c32` | 2825.30 | 21447.30 |
+> | `s_c64` | **2897.30** | 21267.30 |
+> | `s_n4` (no `try_into`) | 2857.30 | 22303.30 |
+>
+> so `u_ship − s_c64` is `+127 / +2545` but **`s_c64` is 72 Ir/call DEARER than
+> `s_c32` at `small`**, where the cheapest found is `s_c16`/`s_c32` at `−199`.
+> **No single spelling is cheapest on both blobs.** The mechanism is the scalar
+> `.remainder()` tail: a larger `K` leaves a longer tail, and `small`'s
+> `vlen` 124 is `1 × 64 + 60` against `3 × 32 + 28`. So "the cheapest-found
+> in-contract R3 is `−127 / −2545`" is one *rung's* pair and not a cheapest-found
+> pair; quoting it as the latter understates `small` by 72 Ir/call. **The honest
+> form: cheapest found is `−199` at `small` (`chunks_exact(16)` or `(32)`) and
+> `−2545` at `large` (`chunks_exact(64)`), and the winner changes with the
+> input** — which is one more reason a spelling-dependent number is not a
+> property of the kernel.
 
 > ⚠ **Do not label those two laws by residue class, and do not extrapolate them
 > to `large`.** TASK_023_REVIEW wrote them as `51·nrec − 5` (`vlen ≡ 0 mod 4`) /
@@ -1571,84 +1747,175 @@ one-sided bound's value is now **−199 / −2365**.
 > already records twice — a coefficient fitted at one `vlen` reported as a law
 > in `nrec`.
 
-**It is not, however, a safe-beats-unsafe result, and TASK_024 measured why.**
-The same fold on the unsafe side is cheaper still, on every point:
+TASK_024 answered this with "the same fold on the unsafe side is cheaper still"
+— `R4ship − u_c32 = +221 / +2417`, so `u_c32 − s_c32 = −(2 + 5·nrec)` — and
+concluded that *"the admissible unsafe class dips below the admissible safe
+class at matched spelling, exactly as `inf(R4) ≤ inf(R3)` predicts by
+construction"*.
 
-```
-R4ship − u_c32   =  +221 (small) / +2417 (large)
-u_c32  − s_c32   =  −(2 + 5·nrec)  =  −22 / −52
-                   zero residual on all NINE blobs measured, both residue classes
-                   (small, large, v56, v88, v2040, v2072, and the mod-64 triple)
-```
+> 🚫 **That sentence is WITHDRAWN, and what replaces it is stronger. `u_c32` is
+> not a p16 R4 rung, and neither is any of the six `u_c*` probes**
+> (TASK_025_REVIEW blocker 1, with four Verus logs). The comparison was never
+> between two rungs, so it could not have shown anything about two classes.
+>
+> The disqualification is **this section's own argument from §10a.1**, applied to
+> the side §10a.1 never audited. `spec.md` pins `identity: unsafe ≡ verus, O3
+> exact`, so **an R4 is not merely a program that may use `unsafe` — it is a
+> program that must have a byte-identical R5 twin that Verus verifies.** Built
+> that twin (`verus.rs` with its exec fold replaced by `u_c32`'s, verbatim) and
+> Verus at the pinned vstd rejects it:
+>
+> ```
+> error: The verifier does not yet support the following Rust feature: ref patterns
+> error: `core::slice::impl&%0::chunks_exact` is not supported
+> error: `core::slice::iter::ChunksExact` is not supported
+> error: `core::slice::iter::impl&%90%default%by_ref` is not supported
+> error: `core::array::TryFromSliceError` is not supported
+> error: `core::slice::impl&%0::get_unchecked` is not supported
+> ```
+>
+> Shipping `u_c32` needs **five** new trusted items — a range accessor, two
+> `assume_specification`, two `external_type_specification` — on the pattern
+> whose entire memory-safety claim is *one* trusted `requires` (§5; TCB 6 lines
+> across 3 items). `r4_hdr` was disqualified in §10a.1 for needing **one**. The
+> *safe* rung with the identical fold needs **none**, and §10a.1's TCB audit
+> covered only the R3 side, which is how the `u_*` side got shipped as a
+> comparison without anyone costing it.
 
-`u_c32` is Miri-clean on `small`, `large` and all three `adversarial-*` inputs,
-agrees with the shipped R4 on 95/95, and is in contract by the same matcher. So
-the admissible unsafe class dips **below** the admissible safe class at matched
-spelling, exactly as `inf(R4) ≤ inf(R3)` predicts by construction
-(`.memory/01-ladder.md`, the R4-by-permission paragraph). The correct statements
-are:
+So the correct statements are:
 
 1. **Against the shipped R4, an admissible safe rung is cheaper on all 24
-   blobs** (TASK_023_REVIEW's count; TASK_024 re-measured 10 of them) — p16 is
-   the second pattern where that is true, after p17's `−19.00`. Both are
+   blobs** (TASK_023_REVIEW's count; TASK_024 re-measured 10 of them, TASK_027
+   re-measured `small` and `large` from the committed generator) — p16 is the
+   second pattern where that is true, after p17's `−19.00`. Both are
    comparisons against a *shipped* cell, not between admissible classes, and
-   p17's own `spec.md` already says so of its own number.
-2. **At matched spelling the unsafe rung is cheaper on all nine blobs
-   measured**, by `2 + 5·nrec` — the same shape as the published `7 + 5·nrec`,
-   and with the residue dependence gone.
-3. **Per byte, the two are equal at all six spellings measured**, to five
-   decimal places, in three bands.
+   p17's own `spec.md` already says so of its own number. Cheapest found is
+   `−199` at `small` and `−2545` at `large`, per the box above.
+2. **The safe class reaches fold spellings the unsafe class cannot** — and that
+   is the *mechanism* behind statement 1, not a caveat on it. Every `chunks_exact`
+   fold measured here is free on the safe side and costs five trusted items on
+   the unsafe side, because the `identity` pin chains R4 to what vstd can
+   verify while R3 is chained to nothing. **So `inf(R4) ≤ inf(R3)` "by
+   construction" is FALSE for p16**: the R4 class is *more* constrained than the
+   R3 class, not less, and the inclusion runs the opposite way from the one this
+   file and `.memory/01-ladder.md` had published. That claim is now corrected
+   project-wide in the R4-by-permission paragraph, and p16 is the measured
+   instance.
+3. **Whether `inf(admissible R4) > inf(admissible R3)` on p16 is OPEN**, and it
+   should be written as open rather than resolved in either direction. Nobody has
+   tried the one thing that would settle it: a **hand-unrolled 32× fold with
+   explicit indices**, which is Verus-expressible in principle, is licensed by
+   the declaration's own "unrolling" clause, and sits at 5.18750 in the rate
+   table above. Until someone builds it *and* verifies its R5 twin, p16 has an
+   admissible safe rung below its shipped unsafe one and no measured admissible
+   unsafe rung below that.
+4. **Per byte, the two are equal at every matched spelling**, swept — the table
+   two subsections above. This is the only per-byte number to quote.
 
-Statement 1 without statement 2 is the sentence a reader will quote and the
-sentence the measurement does not support.
+Statement 1 without statements 2 and 3 is the sentence a reader will quote and
+the sentence the measurement does not support.
 
-### The `−0.5625 Ir/byte` figure, and what it is a measurement of
+### The `−0.65625 Ir/byte` figure, and what it is a measurement of
 
-`5.09375 − 5.7500 = −0.5625` is the in-contract safe rung's rate minus the
-*shipped* unsafe rung's rate. It is the difference between **two different fold
-spellings**, one of which happens to sit on the safe side. It is a codegen
-difference, and calling it a safety cost breaks two rules this project wrote
-after paying for them: finding 3's *"before attributing a cost to bounds
-checking, decompose — change one loop at a time and re-measure"*, and this
-pattern's own *"a safety tax must be attributed to a mechanism, never to a
-comparison"* (§3). Decomposed, the mechanism is 3 loop-control instructions
-amortised over 32 bytes instead of 4, on both rungs alike. **Quote it as the
-cross-spelling figure it is, never as p16's per-byte safety tax, which is
-0.00000.**
+`5.09375 − 5.7500 = −0.65625` is the in-contract safe rung's rate minus the
+*shipped* unsafe rung's rate.
 
-### Why the unroll factor is NOT pinned
+> ⚠ **This file published that subtraction as `−0.5625` and it is arithmetic**
+> (TASK_025_REVIEW major 2). `−0.5625` is the **K = 16** figure,
+> `5.1875 − 5.75`, which is what TASK_023_REVIEW actually measured before
+> TASK_024 re-aimed the sentence at the K = 32 rung and left the number behind.
+> It reached four files as a headline. Confirmed independently from the
+> disassembly-exact rates and from the marginals: `u_ship − s_c32` is 31 at
+> `sweep-v56` and 115 at `sweep-v88`, and `(115 − 31)/(4 · 32) = 0.65625`.
+
+It is the difference between **two different fold spellings**, one of which
+happens to sit on the safe side. It is a codegen difference, and calling it a
+safety cost breaks two rules this project wrote after paying for them: finding
+3's *"before attributing a cost to bounds checking, decompose — change one loop
+at a time and re-measure"*, and this pattern's own *"a safety tax must be
+attributed to a mechanism, never to a comparison"* (§3). Decomposed, the
+mechanism is 3 loop-control instructions amortised over 32 bytes instead of 4,
+on both rungs alike. **Quote it as the cross-spelling figure it is, never as
+p16's per-byte safety tax, which is 0.00000** — and note that as a *measured*
+quantity it is worth about ±0.09 Ir/byte anyway, since the shipped fold's own
+rate is the least reproducible slope in the table.
+
+### Why the fold is NOT pinned — the conclusion stands and every earlier reason for it is withdrawn
 
 The tempting repair is a `forbidden` entry excluding chunked or manually
-unrolled folds, which would put `sv_c32` out of contract and restore `+27 / +77`
-and `+19 / +45`. **It is refused, on the rule this project already has.** The
-direction test (`.memory/01-ladder.md`) says a declaration edit escapes the
-charge of self-certification only if it **shrinks** the admissible class *and*
-**does not raise** the pattern's own published figure. Excluding the chunked
-fold shrinks the class **and** raises the published one-sided figure from −199
-back to +19. It fails the test outright, and it is precisely the retroactive
-exclusion the test exists to forbid.
+unrolled folds, which would put `s_c32` out of contract and restore `+27 / +77`
+and `+19 / +45`. **It is still refused. The three reasons TASK_024 gave for
+refusing it are all withdrawn** (TASK_025_REVIEW major 5 and major 4), and the
+honest replacement is one reason, which is decisive on its own:
 
-The disassembly says the same thing independently: there is no unroll-free
-baseline to be different *from*. **The shipped rungs are already 4×-unrolled —
-by LLVM, from rolled source.** A manually chunked fold is not a different
-kernel; it is the same serial Horner chain over the same bytes in the same
-order, with the same one `movzbl` per byte, differing only in how many loop-exit
-tests LLVM has to keep. `chunks_exact(4)` proves the point from the other side:
-it is *dearer* than the shipped spelling, so the free parameter is not a dial
-that only ever flatters the safe rung.
+> **Pinning would not have worked.** The declaration licenses **manual
+> unrolling by name** — *"Still deliberately NOT restricted: … and
+> unrolling"* — and a manual 32× unroll measures **5.18750**, still below the
+> shipped 5.75. An exclusion aimed at `chunks_exact` therefore does not restore
+> `+19 / +45`; it moves the cheapest admissible safe spelling from one licensed
+> family to another and changes the number by less than the gap it was meant to
+> close. A pin that does not decide the thing it was written to decide is not a
+> pin.
 
-**What is pinned instead is the reporting rule, which costs the class nothing:**
+What is withdrawn, and why it matters that it is written down rather than
+quietly dropped:
 
-> **A per-byte rate is quoted with its fold spelling named. A DIFFERENCE of
-> per-byte rates is quoted only between rungs that fold the same way.**
+- ~~*"the direction test forbids it"*~~ — the load-bearing sentence, and it
+  argued from a rule that decides nothing. `.memory/01-ladder.md` states the
+  direction test as a **sufficient condition for innocence** ("an edit that
+  shrinks the class and lowers or does not raise the published figure is not
+  self-certification") and then offers as a **passing** example p16's own
+  TASK_017 exclusion, which made this pattern's published tax **4.5× larger** —
+  i.e. an exclusion that *raised* the figure. TASK_024 read the same test as
+  *forbidding* an exclusion **because** it raises the figure. The stated clause
+  and its own cited precedent point in opposite directions. **Do not cite the
+  direction test here again**: `.memory/01-ladder.md` now carries it flagged as
+  broken with a repair that is explicitly PROVISIONAL and has not been attacked
+  by anyone, and citing an unreviewed rule as licence is the exact move that
+  produced this paragraph.
+- ~~*"`chunks_exact(4)` is dearer, so the free parameter is not a dial that only
+  ever flatters the safe rung"*~~ — **an artefact of `try_into`**, refuted by
+  the control two subsections above. Drop `try_into` and `chunks_exact(4)`
+  measures 5.37500 and is **1509 Ir/call cheaper** than the shipped R4 at
+  `large`. The one spelling that happened to go the other way was carrying the
+  whole argument.
 
-That rule is not a declaration edit, it does not exclude a single spelling, and
-under it every number in this section is publishable: the rate is `5 + 3/K` for
-`chunks_exact` at `K ≥ 16`, 5.7500 for the shipped spelling, 6.50 and 6.625 for
-the two small chunk sizes — and the safety tax is **0.00000 per byte at every
-spelling**, and per call `7 + 5·nrec` / `7 + 7·nrec` for the shipped fold,
-`2 + 4·nrec` for `chunks_exact(4)`, `3 + 4·nrec` for `chunks_exact(8)` and
-`2 + 5·nrec` for `chunks_exact(16)`, `(32)` and `(64)` alike.
+What survives untouched is the *disassembly* observation, which was never a
+reason to refuse a pin but is a reason the pin would be strange: there is no
+unroll-free baseline to be different *from*. **The shipped rungs are already
+4×-unrolled — by LLVM, from rolled source.** A manually chunked fold is not a
+different kernel; it is the same serial Horner chain over the same bytes in the
+same order, with the same one `movzbl` per byte, differing only in how many
+loop-exit tests LLVM has to keep.
+
+**What is pinned instead is the reporting rule, which costs the class nothing.**
+TASK_024 adopted it in this form:
+
+> ~~**A per-byte rate is quoted with its fold spelling named. A DIFFERENCE of
+> per-byte rates is quoted only between rungs that fold the same way.**~~
+
+**That version is too weak, and the evidence is that it was in force in this
+very section while the section's own headline broke it.** `−0.5625` is a
+cross-spelling difference of rates; naming the spellings did not stop it
+reaching four files as p16's number, because a named cross-spelling difference
+still *reads* as a per-byte tax. The stronger rule, from TASK_025_REVIEW:
+
+> **Never publish a bare per-byte rate, or a cross-spelling difference of two
+> rates, as a pattern's number. Publish only matched-spelling differences.** A
+> bare rate is not a property of the kernel: in contract, one exact-string
+> substitution apart, p16's ranges 5.04688 … 6.62500 (a 31% spread) with a
+> seventh spelling at 5.37500 — and it is not even measurable past ±0.01, or
+> ±0.09 at the shipped fold's own `K`. A *difference* of two such numbers is
+> worse still.
+
+Under that rule the publishable content of this section is: the per-byte safety
+tax is **0.00000 at every matched spelling, swept over 130 lengths**; per call
+it is `7 + 5·nrec` / `7 + 7·nrec` for the shipped fold, `2 + 4·nrec` for
+`chunks_exact(4)`, `3 + 4·nrec` for `chunks_exact(8)` and `2 + 5·nrec` for
+`chunks_exact(16)`, `(32)` and `(64)` alike. The individual rates stay in the
+table above as *disassembly* quantities with their spellings named, which is
+what they are; `−0.65625` is retained only as the record of a withdrawn
+headline.
 
 ### The comparison that is withdrawn, not re-pointed
 
@@ -1660,16 +1927,43 @@ error, one level down, as the *"p05's declaration is the loosest of the set"*
 claim it was written to replace. Two intervals are comparable when the searches
 behind them are, and no two searches on this project are.
 
-### Method
+### Method, and the reproduction path (repaired at TASK_027)
 
-Scripts `.temp/p24/{gen_matched,equiv,measure,measure_k64,gen_k64,dis,foldbody,miri}.py`,
-data `.temp/p24/marginal.json` and `.temp/p24/marginal_k64.json`; the
-TASK_023_REVIEW half is `.temp/review023/{gen_r4_attack,measure}.py` with
-`marginal_all.json`, `vlensweep.json`, `r3unroll.json`. Marginal `Ir`/call by
+**From the committed tree, in three commands:**
+
+```
+python3 patterns/p16-tlv-walk/inputs/gen.py --sweep     # + the fourth band
+python3 patterns/p16-tlv-walk/controls/gen_controls.py --build
+python3 patterns/p16-tlv-walk/controls/foldcmp.py       # the rates, off objdump
+```
+
+`controls/gen_controls.py`'s third dict is the eighteen probes — `{s,u}_ship`,
+`{s,u}_c{4,8,16,32,64}`, `{s,u}_n{4,8,16}` — each one asserted-single-hit
+substitution of the value fold into a shipped rung, so a probe cannot outlive
+the rung it respells. `inputs/gen.py`'s fourth band is `sweep-k{120…249}`, 130
+consecutive value lengths at `nrec` 2, appended **last** so all 95 pre-existing
+blobs stay byte-identical (checked: 0 of 95 changed). Marginal `Ir`/call by
 `harness/check.py` step 3b's own probe (whole-program `Ir` at `n_iters` 200
 minus at 100, over 100), `harness/build.py`'s exact `-O3 isolated` rustc flags,
-one build session per table. Digests via `harness/asm.py`, the only `objdump`
-caller. Admission decided by `harness/check.py::spelling_matches`, the gate's
-own matcher. **No pattern source was edited and no probe is committed** — every
-probe is one asserted-single-hit substitution away from a shipped rung, so the
-generators reproduce them from the hashed tree.
+one build session per table. Digests and instruction bodies via `harness/asm.py`,
+the only `objdump` caller. Admission decided by
+`harness/check.py::spelling_matches`, the gate's own matcher. **No pattern
+source was edited and no probe is committed** as a `.rs` file — the generator is.
+
+**What this replaces, and it is not tidying.** Every number in this section used
+to live in gitignored `.temp/p24/*.py`, so the pattern stated laws the tree could
+not re-derive — the same defect `inputs/gen.py`'s third band and
+`controls/gen_controls.py`'s first two dicts were each added to close. Worse,
+one cited artefact printed the *opposite* of the claim: `.temp/p24/foldbody.py`,
+named above for "the fold body is the same machine code on both sides",
+re-runs as committed printing `identical=False` at every `K` and finding no body
+at all at `K` 4 and 8, because it compares full instruction text and does not
+select the innermost loop (TASK_025_REVIEW minor 7). It is not cited any more.
+`controls/foldcmp.py` is the working version and it prints the verdict it is
+quoted for. Equivalence of everything the generator emits is re-checked the same
+way (`.temp/p27/equiv.py`: 23 controls x 225 committed inputs, 0 mismatches
+against the shipped R4's stdout and exit status). Scratch for the earlier passes survives at `.temp/p24/` (TASK_024),
+`.temp/r25/` (TASK_025_REVIEW: the four Verus logs, the sweep, the `println`
+control, the `try_into` control) and `.temp/p27/` (TASK_027: the re-measurement,
+`marg.json`, `fit.py`, `digits.py`); the TASK_023_REVIEW half is
+`.temp/review023/{gen_r4_attack,measure}.py`.

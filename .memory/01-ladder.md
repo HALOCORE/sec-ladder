@@ -581,11 +581,19 @@ places and points at nothing. **Name the pattern, never the number.**
    comparison either; that compared a 2-lever search against p05's 46-spelling
    one, which is the same error one level down. Withdraw it.
    The R3-side figure below is one-sided, and **its number is refuted too**: the
-   cheapest in-contract R3 found against shipped R4 is **−127 / −2545**
-   (`chunks_exact(64)`, TASK_025_REVIEW) — not `+19 / +45` (TASK_023_REVIEW) and
-   not the `−199 / −2365` that replaced it (TASK_024). **The bound survives, the
-   value does not, and it has now moved three times — write "cheapest found",
-   never "minimum".** And
+   cheapest in-contract R3 found against shipped R4 is **−199 at `small`
+   (`chunks_exact(16)`/`(32)`) and −2545 at `large` (`chunks_exact(64)`)** — not
+   `+19 / +45` (TASK_023_REVIEW), not `−199 / −2365` (TASK_024), and not the
+   `−127 / −2545` the manager wrote at TASK_025_REVIEW, which paired one rung at
+   both inputs.
+   ⚠ **NO SINGLE SPELLING IS CHEAPEST ON BOTH BLOBS** (TASK_027, measured):
+   `chunks_exact(64)` is **72 Ir/call dearer than `(32)` at `small`** and 180
+   cheaper at `large`. Mechanism: a larger `K` leaves a longer scalar
+   `.remainder()` tail, and `small`'s `vlen` 124 is `1×64 + 60` against
+   `3×32 + 28`. **So a cheapest-found figure must name its INPUT as well as its
+   spelling** — one more reason the quantity is not a minimum in any useful
+   sense. The bound survives, the value does not, and it has now moved four
+   times. Write "cheapest found", never "minimum". And
    R3-side bound. This file already said, at finding 3: *"Never publish a
    safety-cost claim without R3."* The rule was violated by its own author on the
    next pattern. **Lead with R3 or do not lead.**

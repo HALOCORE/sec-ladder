@@ -278,6 +278,26 @@ Committed: sources, `spec.md`, `README.md`, `NOTES.md`, `inputs/gen.py`,
 Gitignored: `.temp/`, `inputs/*.bin`, build outputs, `results/tables/` is
 regenerable but **is** committed for reviewability.
 
+## Adding a sweep band costs a gate re-run, not a re-measure
+
+**Measured at TASK_027, and nothing written down said so** — two earlier tasks
+avoided shipping a sweep partly for fear of the cost, which is how p17's
+"+32 Ir/call flat" got published from two bands that both had `nsuf = 3`.
+
+Append the new band **last** in `inputs/gen.py` (TASK_020's argument: the
+pre-existing blobs stay byte-identical — verified on p16, 95 of 95 matched, 0
+changed lines). Then:
+
+- `check.inputs_of` drops `sweep-*` from `inputs_checked`, and
+  `measure.SKIP_INPUT_PREFIX = "sweep-"` drops them from the measurement matrix;
+- so **no matrix input, no `inputs_checked` entry and no number in
+  `results/pNN.json` depends on any sweep blob**;
+- the only thing that moves is `source_sha256[inputs/gen.py]`.
+
+**Cost: one `check.py pNN` run.** There is no reason for a pattern not to ship
+the sweep its laws are derived from, and `gen.py` being inside `source_sha256` is
+what makes those laws re-derivable from a hashed file.
+
 ## Editing rules
 
 - `pilot/` is frozen evidence for `PLAN.md`. Do not edit it; p01 is its successor.

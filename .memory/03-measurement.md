@@ -448,6 +448,36 @@ TASK_014_REVIEW's own write-up mixed. Rule, in both cases and now with teeth:
 **say which convention a number is in, every time — a cross-rung delta is only
 meaningful inside one convention.**
 
+### A per-byte rate from a marginal pair is good to ±0.09, not to five decimals
+
+**Measured on p16 at TASK_027, and it lands on this project's most-quoted
+number.** The driver's `println!` costs **0.2263 Ir per call per decimal digit**
+of the checksum it prints. In a residue-matched marginal pair that residual is
+divided by only `nrec·K` folded bytes, so a rate read off two runs carries
+
+```
+error  =  0.2263 · Δ(Δdigits) / (nrec · K)
+```
+
+Over a 130-length sweep that is, as a *measured slope*:
+
+| fold | measured range | exact (`body/K`) |
+|---|---|---|
+| shipped, `K = 4` | **5.64750 … 5.82500** | 5.75000 |
+| `chunks_exact(32)` | 5.08266 … 5.10313 | 5.09375 |
+| `chunks_exact(64)` | 5.04219 … 5.05156 | 5.04688 |
+
+**So p16's shipped 5.7500 — published since its §3 — is the least reproducible
+rate in its own table, ±0.09 Ir/byte**, precisely because the shipped fold has the
+smallest `K`. Subtracting the predicted digit term drops the residual to 0.0266 /
+0.0045 / 0.0017, which confirms the term is the whole error.
+
+**The rule: a five-decimal per-byte rate must come from the disassembly
+(`body_len / K`), never from a two-point or few-point marginal.** A *difference*
+of two rates at matched spelling is exempt and is exact — both rungs print the
+same checksum, so the term cancels identically — which is why p16's 0.0000000
+null survives at five decimals while the rates it is a null between do not.
+
 ### `marginal_ir_per_call` does not always cancel the environment block
 
 This file already says whole-program totals move with the environment block

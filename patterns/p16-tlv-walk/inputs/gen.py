@@ -169,6 +169,48 @@ SWEEP_NREC_VLENS = (124, 126)      # 0 and 2 mod 4 -- NOTES.md 10a's two classes
 SWEEP_NREC_WINS = 16
 SWEEP_NREC_ITERS = 5_000
 
+# The FOURTH band, `sweep-k*`, added at TASK_027. It sweeps the same axis as the
+# first two -- the value length, `nrec` held at 2 -- and exists for one reason
+# the first two cannot serve: NOTES.md 10a.2 measures the value fold respelled as
+# `chunks_exact(K)` up to **K = 64**, and a per-byte rate at chunk width `K` is
+# only readable from a pair of blobs whose value lengths differ by a MULTIPLE OF
+# K, or the two ends of the difference carry different `.remainder()` tails and
+# the epilogue does not cancel. Bands A and B span 34 consecutive lengths each,
+# so between them the committed tree contains no pair differing by 32 either --
+# 10a.2's K = 32 and K = 64 rows were measured on scratch blobs that were never
+# committed, which is the same "the tree states a law it cannot re-derive"
+# defect the third band was added to close, on its fourth sighting.
+#
+# Three decisions, and each is forced rather than chosen:
+#
+#   * **CONSECUTIVE, not a mod-64 triple.** `.temp/p24/gen_k64.py` reached K = 64
+#     with three blobs at `vlen` 2040 / 2168 / 2296, all == 56 (mod 64). That is
+#     three points at ONE residue offset, and TASK_025_REVIEW measured what that
+#     costs: the three "residue-matched bands" 10a.2 published are three pairs
+#     all sitting at 24 (mod 32), and a legitimately matched pair at a different
+#     offset moves the rate by ±0.01 Ir/byte (the driver's `println` digit-count
+#     term, which does not cancel within one binary). A consecutive band gives
+#     every offset, so the null is swept rather than sampled -- and the review's
+#     own 128-blob consecutive sweep needed no mod-64 triple at all.
+#   * **the width follows this file's own rule**, `2 cycles + 2` of the largest
+#     modulus measured, which for the fold band is K = 64 rather than 16: two
+#     cycles because one cannot tell a period of 64 from a period of 128, and the
+#     +2 for the endpoints. 130 lengths.
+#   * **appended LAST, after the `nrec` band**, and the RNG is drawn sequentially,
+#     so every blob the first three bands emit stays BYTE-IDENTICAL. Measured at
+#     TASK_027, not asserted: sha256 of all 95 pre-existing blobs before and
+#     after, 0 differences. That is why this costs a gate RE-RUN (the record's
+#     `source_sha256` for this file moves) and not a re-measure -- `check.py` and
+#     `measure.py` both drop the `sweep-` prefix, so no matrix input, no
+#     `inputs_checked` entry and no number in `results/p16-tlv-walk.json` depends
+#     on any of it.
+SWEEP_FOLD_K = 64                  # the largest chunk width NOTES.md 10a.2 measures
+SWEEP_FOLD_FIRST = 120
+SWEEP_FOLD_N = SWEEP_FOLD_K * SWEEP_CYCLES + 2
+SWEEP_FOLD_RECS = 2
+SWEEP_FOLD_WINS = 16
+SWEEP_FOLD_ITERS = 5_000
+
 
 def write(name, n_iters, stride, body, declared_len=None):
     payload = slb.pack_head1_bytes(stride, body)
@@ -259,6 +301,15 @@ def main():
             for nr in SWEEP_NRECS:
                 write(f"sweep-n{nr}v{vl}.bin", SWEEP_NREC_ITERS,
                       nr * (3 + vl), tiled(rng, SWEEP_NREC_WINS, nr, vl))
+        # The FOLD band (TASK_027). Appended last for the reason above: drawing
+        # the RNG sequentially keeps every blob the three bands above emit
+        # byte-identical, so adding it costs a gate re-run and nothing more.
+        print(f"  -- sweep over vlen for the fold width (NOTES.md 10a.2's axis, "
+              f"{SWEEP_FOLD_N} consecutive lengths at nrec {SWEEP_FOLD_RECS})")
+        for vl in range(SWEEP_FOLD_FIRST, SWEEP_FOLD_FIRST + SWEEP_FOLD_N):
+            write(f"sweep-k{vl}.bin", SWEEP_FOLD_ITERS,
+                  SWEEP_FOLD_RECS * (3 + vl),
+                  tiled(rng, SWEEP_FOLD_WINS, SWEEP_FOLD_RECS, vl))
     return 0
 
 

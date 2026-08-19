@@ -52,28 +52,42 @@ genuine O(n) tax and the safe-*tuned* rung does not.
 leaves the value fold's spelling free, by name — *"deliberately NOT restricted:
 … and unrolling"* — and the per-byte rate is a property of that spelling. The
 shipped rungs are 4×-unrolled by LLVM and run at **5.7500 Ir per folded byte**;
-an admissible safe rung using `chunks_exact(32)` runs at **5.09375**, and one
-using `chunks_exact(4)` at **6.50000**, *dearer* than shipped. So:
+an admissible safe rung using `chunks_exact(32)` runs at **5.09375** and one
+using `chunks_exact(64)` at **5.04688**. So:
 
-- **against the shipped R4, the cheapest in-contract safe rung is `−199` at
-  `small` / `−2365` at `large`** — cheaper, on all 24 blobs. The published
-  `+19 / +45` "in-contract minimum" is refuted (`NOTES.md` §10a.2). p16 is the
-  second pattern after p17 where an admissible **safe** rung beats its own
-  shipped **unsafe** one;
-- **but at matched spelling the unsafe rung is cheaper on all nine blobs
-  measured**, by `2 + 5·nrec` (22 / 52), so this is a fact about the shipped
-  cell, not about the languages. `inf(R4) ≤ inf(R3)` holds by construction, and
-  it is measured here;
-- **and per byte the two are equal to five decimal places at every spelling
-  measured** — six folds, difference exactly `0.00000`, because the reslice and
-  the `get_unchecked` both sit *outside* the fold loop and the chunk body is the
-  same instruction sequence on both sides. The per-byte safety tax on p16 is
-  **zero**; what is not zero, and not a safety cost, is the difference between
-  two *different* folds.
+- **per byte, safe and unsafe are equal at every matched spelling — the
+  difference is a single integer per call at every length, slope `0.0000000`,
+  swept over 130 consecutive value lengths.** That is p16's per-byte safety tax
+  and it is **0.00000**. The mechanism is why it cannot be otherwise: the
+  reslice (R3) and the `get_unchecked` (R4) both sit *outside* the fold loop, so
+  the chunk body is mnemonic-identical on the two sides at `K` = 4, 8, 16, 32
+  and 64;
+- **against the shipped R4, an in-contract safe rung is cheaper on all 24
+  blobs** — **cheapest found** `−199` at `small` (`chunks_exact(16)`/`(32)`) and
+  `−2545` at `large` (`chunks_exact(64)`), with no single spelling cheapest on
+  both. The published `+19 / +45` and `−199 / −2365` "in-contract minima" are
+  both refuted (`NOTES.md` §10a.2); **the word is "cheapest found", never
+  "minimum"**, because five successive p16/p05 minima have been overturned by
+  the next search. p16 is the second pattern after p17 where an admissible
+  **safe** rung beats its own shipped **unsafe** one;
+- **and it is not disposed of by "unsafe could do that too".** The six matched
+  *unsafe*-side chunked probes are **not admissible p16 R4s**: `spec.md` pins
+  `identity: unsafe ≡ verus, O3 exact`, so an R4 must have a byte-identical R5
+  that Verus verifies, and vstd at the pin supports none of `chunks_exact`,
+  `ChunksExact`, `by_ref`, `TryFromSliceError`, `get_unchecked` — five new
+  trusted items, on a pattern whose whole memory-safety claim is one trusted
+  `requires`. The safe rung with the identical fold needs none. **So the safe
+  class reaches spellings the unsafe class cannot**, and whether
+  `inf(admissible R4) > inf(admissible R3)` here is **open** — nobody has built
+  the hand-unrolled 32× fold with explicit indices that would settle it.
 
 "Safe Rust costs zero per byte here" therefore stands **as a matched-spelling
-statement** and only as one. Quote a per-byte rate with the fold that produced
-it; difference two rates only between rungs that fold the same way.
+statement** and only as one. **Never publish a bare per-byte rate or a
+cross-spelling difference of two rates as p16's number** — in contract, one
+substitution apart, the rate ranges 5.04688 … 6.62500, and the five-decimal
+figures are exact as *disassembly* quantities (`body/K`), not as measured slopes:
+measured, they carry ±0.01 Ir/byte from the driver's `println` digit-count term,
+and ±0.09 at the shipped fold's own `K`. Publish matched-spelling differences.
 
 `NOTES.md` §3 is the decomposition that earns the right to say that, and it
 matters: the delta lives **entirely in the value fold** (changing only the fold
@@ -121,4 +135,13 @@ python3 patterns/p16-tlv-walk/inputs/gen.py     # regenerate the .bin (gitignore
 harness/check.py p16                            # the gate
 harness/build.py p16                            # the 32 builds
 harness/measure.py p16                          # results/p16-tlv-walk.json
+```
+
+The in-contract respellings every spread figure above rests on are not cells and
+are not committed as `.rs`; their generator is:
+
+```bash
+python3 patterns/p16-tlv-walk/inputs/gen.py --sweep        # + the 4 sweep bands
+python3 patterns/p16-tlv-walk/controls/gen_controls.py --build
+python3 patterns/p16-tlv-walk/controls/foldcmp.py          # the rates, off objdump
 ```

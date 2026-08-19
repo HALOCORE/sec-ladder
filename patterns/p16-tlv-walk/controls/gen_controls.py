@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Generate p16's in-contract respellings into `.temp/p16/controls/` — three of
-R3 (TASK_021) and three of R4 (TASK_023).
+R3 (TASK_021), three of R4 (TASK_023) and eighteen matched fold
+variants (TASK_027, from TASK_024 and TASK_025_REVIEW).
 
     python3 patterns/p16-tlv-walk/controls/gen_controls.py
 
@@ -70,6 +71,39 @@ p16 rung, and no number in `results/` comes from any of them. `r4_hdr` in
 particular would need its own Verus obligation before it could ever be an R5,
 which is one reason it is not proposed as a replacement rung. See `../NOTES.md`
 §10a.1.
+
+**The fold variants (TASK_027), and why they had to move here.** §10a.2's whole
+argument — the matched-spelling per-byte null, the rate spread, the `try_into`
+mechanism, and the cheapest-found in-contract R3 — was measured on probes that
+lived only in gitignored `.temp/p24/*.py`, so the pattern stated laws the tree
+could not re-derive. That is the same defect `inputs/gen.py`'s third band and
+this file's first two dicts were each written to close, on its third sighting.
+`FOLD_CONTROLS` is the third: eighteen variants, each one asserted-single-hit
+substitution of the **value fold** into a shipped rung, safe side from
+`safe_tuned.rs` and unsafe side from `unsafe.rs` with the value slice taken by
+`get_unchecked` so the rung stays R4-shaped.
+
+  * `{s,u}_ship` — the two shipped rungs with the driver path fixed and nothing
+    else, so the baseline is built in the same session as the variants.
+  * `{s,u}_c{4,8,16,32,64}` — `chunks_exact(K)` + `try_into::<[u8; K]>()`.
+  * `{s,u}_n{4,8,16}` — the same fold with the `try_into` step **removed**. This
+    is the control TASK_025_REVIEW built and §10a.2 never did: it is what
+    separates `try_into` from `chunks_exact`, and it refutes the
+    "`chunks_exact(4)` is dearer, so the free parameter is not a dial that
+    flatters the safe rung" argument — without `try_into`, K = 4 measures
+    5.37500 Ir/byte and is 1509 Ir/call *cheaper* than the shipped R4 at
+    `large`.
+
+**None of the sixteen is a candidate rung, and the unsafe eight cannot be one at
+all.** That is not a stylistic preference: this pattern's `identity` pin is
+`unsafe ≡ verus, O3 exact`, so an R4 must have a byte-identical R5 that Verus
+verifies, and at the pinned vstd `chunks_exact`, `ChunksExact`, `by_ref`,
+`TryFromSliceError` and `get_unchecked` are each unsupported — shipping `u_c32`
+would need **five** new trusted items where `r4_hdr` was disqualified for needing
+one (TASK_025_REVIEW blocker 1, four Verus logs). The *safe* variants with the
+identical fold need none. So the safe-side and unsafe-side levers are not the
+same category of edit, and the general form of that is now in `../spec.md`'s
+`why`.
 """
 
 import os
@@ -225,6 +259,125 @@ R4_CONTROLS = {
         [PATH_FIX] + _WINDOW + _hdr("w")),
 }
 
+#: TASK_027's fold variants. Same rule as the two dicts above: ONE exact-string
+#: substitution, asserted to hit exactly once, so a variant cannot outlive the
+#: rung it respells. The substituted text is the **value fold** and nothing else,
+#: which `../spec.md`'s `why` says is deliberately not restricted ("the R2/R3/R4
+#: spelling of the value fold and of the header read ... and unrolling"). Both
+#: named comparisons, the `p`/`end` cursor pair, `p = p + 3 + vlen`, the tag fold
+#: before the fit test and the `nrec` fold are all untouched, on both sides.
+FOLD_BANNER = ("//! p16 CONTROL -- a matched FOLD respelling. NOT a p16 cell,\n"
+               "//! and the `u_*` ones CANNOT be p16 cells (see below).\n"
+               "//! Generated from `safe_tuned.rs` / `unsafe.rs` by\n"
+               "//! `patterns/p16-tlv-walk/controls/gen_controls.py`; the one\n"
+               "//! substitution is asserted to hit exactly once, so this file\n"
+               "//! cannot drift from the rung it respells. See ../NOTES.md\n"
+               "//! 10a.2.\n"
+               "//!\n")
+
+#: shipped R3's value fold, verbatim.
+S_FOLD_OLD = ("        acc = buf[p + 3..p + 3 + vlen]\n"
+              "            .iter()\n"
+              "            .fold(acc, |a, &x| a.wrapping_mul(31).wrapping_add(x as u64));\n")
+
+#: shipped R4's value fold, verbatim.
+U_FOLD_OLD = ("        let mut j: usize = 0;\n"
+              "        while j < vlen {\n"
+              "            acc = acc\n"
+              "                .wrapping_mul(31)\n"
+              "                .wrapping_add(unsafe { *buf.get_unchecked(p + 3 + j) } as u64);\n"
+              "            j = j + 1;\n"
+              "        }\n")
+
+#: The only difference between the two sides of a matched pair: how the value
+#: slice is obtained. Everything after this line is the same fold text.
+S_SLICE = "&buf[p + 3..p + 3 + vlen]"
+U_SLICE = "unsafe { buf.get_unchecked(p + 3..p + 3 + vlen) }"
+
+
+def chunks(k, slice_expr):
+    """`chunks_exact(k)` + `try_into::<[u8; k]>()`, the §10a.2 fold."""
+    return ("        let s: &[u8] = %s;\n" % slice_expr
+            + "        let mut ch = s.chunks_exact(%d);\n" % k
+            + "        for c in ch.by_ref() {\n"
+              "            let a: [u8; %d] = match c.try_into() { Ok(v) => v, Err(_) => break };\n" % k
+            + "            for &x in a.iter() {\n"
+              "                acc = acc.wrapping_mul(31).wrapping_add(x as u64);\n"
+              "            }\n"
+              "        }\n"
+              "        acc = ch.remainder().iter()\n"
+              "            .fold(acc, |a, &x| a.wrapping_mul(31).wrapping_add(x as u64));\n")
+
+
+def chunks_noarray(k, slice_expr):
+    """`chunks()` MINUS the `try_into` step -- the mechanism control."""
+    return ("        let s: &[u8] = %s;\n" % slice_expr
+            + "        let mut ch = s.chunks_exact(%d);\n" % k
+            + "        for c in ch.by_ref() {\n"
+              "            for &x in c.iter() {\n"
+              "                acc = acc.wrapping_mul(31).wrapping_add(x as u64);\n"
+              "            }\n"
+              "        }\n"
+              "        acc = ch.remainder().iter()\n"
+              "            .fold(acc, |a, &x| a.wrapping_mul(31).wrapping_add(x as u64));\n")
+
+
+_FOLD_WHY = {
+    "s": ("//! SAFE side, from `safe_tuned.rs`: zero `unsafe` tokens, the value\n"
+          "//! slice still taken by `&buf[p + 3..p + 3 + vlen]`. Costs ZERO TCB.\n"),
+    "u": ("//! UNSAFE side, from `unsafe.rs`, and it CANNOT BE A p16 RUNG. The\n"
+          "//! `identity` pin is `unsafe == verus, O3 exact`, so an R4 needs a\n"
+          "//! byte-identical R5 that Verus verifies; at the pinned vstd\n"
+          "//! `chunks_exact`, `ChunksExact`, `by_ref`, `TryFromSliceError` and\n"
+          "//! `get_unchecked` are each unsupported, so shipping this would need\n"
+          "//! FIVE new trusted items (TASK_025_REVIEW blocker 1) on a pattern\n"
+          "//! whose whole memory-safety claim is ONE trusted `requires`.\n"
+          "//! It is a control for the per-byte null and nothing else.\n"),
+}
+
+#: The two shipped rungs, PATH_FIX and nothing else. They are here because a
+#: marginal is exact only within one build (../NOTES.md §10b), so the baseline
+#: every fold law is differenced against has to come out of the same session as
+#: the variants. `s_ship`/`u_ship` are byte-identical in behaviour to the cells
+#: `harness/build.py` builds; they are copies, not respellings.
+FOLD_CONTROLS = {
+    "s_ship.rs": ("//! `s_ship` -- shipped `safe_tuned.rs`, driver path fixed and\n"
+                  "//! NOTHING else. The same-session baseline for every law\n"
+                  "//! below; 5.75000 Ir/folded byte, chunk body 23 insns / 4.\n"
+                  + _FOLD_WHY["s"], [PATH_FIX], "safe_tuned.rs"),
+    "u_ship.rs": ("//! `u_ship` -- shipped `unsafe.rs`, driver path fixed and\n"
+                  "//! NOTHING else. 5.75000 Ir/folded byte, chunk body 23 insns\n"
+                  "//! / 4 -- the same multiset as `s_ship` in a different order\n"
+                  "//! (the load is scheduled before the x31 chain on the safe\n"
+                  "//! side, after it on the unsafe side).\n",
+                  [PATH_FIX], "unsafe.rs"),
+}
+for _k in (4, 8, 16, 32, 64):
+    for _side, _base, _old, _sl in (("s", "safe_tuned.rs", S_FOLD_OLD, S_SLICE),
+                                    ("u", "unsafe.rs", U_FOLD_OLD, U_SLICE)):
+        FOLD_CONTROLS["%s_c%d.rs" % (_side, _k)] = (
+            "//! `%s_c%d` -- `chunks_exact(%d)` + `try_into::<[u8; %d]>()`.\n"
+            "//! Measured per folded byte: 6.50000 (K=4), 6.62500 (8), 5.18750\n"
+            "//! (16), 5.09375 (32), 5.04688 (64) -- a DISASSEMBLY quantity\n"
+            "//! (chunk-body insns / K), not a five-decimal measured slope.\n"
+            "//! Safe and unsafe are EQUAL at every K: the chunk body is\n"
+            "//! mnemonic-identical on the two sides, because the reslice and\n"
+            "//! the `get_unchecked` both sit OUTSIDE the fold loop.\n"
+            % (_side, _k, _k, _k) + _FOLD_WHY[_side],
+            [PATH_FIX, (_old, chunks(_k, _sl))], _base)
+for _k in (4, 8, 16):
+    for _side, _base, _old, _sl in (("s", "safe_tuned.rs", S_FOLD_OLD, S_SLICE),
+                                    ("u", "unsafe.rs", U_FOLD_OLD, U_SLICE)):
+        FOLD_CONTROLS["%s_n%d.rs" % (_side, _k)] = (
+            "//! `%s_n%d` -- `chunks_exact(%d)` with the `try_into` step REMOVED.\n"
+            "//! The mechanism control (TASK_025_REVIEW major 4): 43 insns / 8\n"
+            "//! bytes = 5.37500 at K=4 AND K=8 (LLVM unrolls two 4-chunks), and\n"
+            "//! 83/16 = 5.18750 at K=16, byte-identical to the `try_into`\n"
+            "//! version there. So `chunks_exact(4)` is dearer than the shipped\n"
+            "//! fold only WITH `try_into`.\n"
+            % (_side, _k, _k) + _FOLD_WHY[_side],
+            [PATH_FIX, (_old, chunks_noarray(_k, _sl))], _base)
+
 RUSTC = os.path.expanduser("~/.cargo/bin/rustc")
 #: `harness/build.py::rust_flags("O3", "isolated")`, verbatim. Quoted here so
 #: the controls are built exactly the way the cells they are compared against
@@ -252,10 +405,12 @@ def main():
         sub("safe_tuned.rs", name, header, pairs)
     for name, (header, pairs) in sorted(R4_CONTROLS.items()):
         sub("unsafe.rs", name, header, pairs, R4_BANNER)
+    for name, (header, pairs, base) in sorted(FOLD_CONTROLS.items()):
+        sub(base, name, header, pairs, FOLD_BANNER)
 
     if build:
         print("\nbuilding (harness/build.py's exact -O3 isolated flags):")
-        for name in sorted(CONTROLS) + sorted(R4_CONTROLS):
+        for name in sorted(CONTROLS) + sorted(R4_CONTROLS) + sorted(FOLD_CONTROLS):
             src = os.path.join(OUT, name)
             out = os.path.join(OUT, name[:-3])
             r = subprocess.run([RUSTC] + FLAGS + [src, "-o", out],
@@ -292,6 +447,27 @@ on the 22 `sweep-n{{nrec}}v{{vlen}}.bin` blobs inputs/gen.py's third band emits,
 plus `small` (nrec 4) and `large` (nrec 10). Build the six controls and the two
 shipped rungs in ONE session before differencing them: a marginal is exact only
 within a build (NOTES.md 10b).
+
+re-derive NOTES.md 10a.2's fold results (TASK_027; s_ship/u_ship above are the
+same-session baseline, so no build.py binary is needed):
+  the per-byte NULL -- difference each s_cK against u_cK on any two blobs of the
+    same nrec whose vlen differs by a multiple of K; the difference is a single
+    INTEGER per call at every length, so the slope of the difference is 0.
+    inputs/gen.py's FOURTH band (`sweep-k*`, 130 consecutive vlen at nrec 2) is
+    what makes that a sweep and what settles K = 64: the first three bands span
+    34 consecutive lengths and contain no pair differing by 32 or 64. Measured
+    over all 130: a single integer, 12, for every chunked K, slope 0.0000000.
+  the RATES -- `python3 patterns/p16-tlv-walk/controls/foldcmp.py`, which reads
+    them off the disassembly (chunk-body insns / K) rather than off a slope.
+    Do NOT read a five-decimal rate off a marginal difference: the residual
+    `println` digit term is 0.2263 Ir/call/digit and a matched pair divides it
+    by only `nrec*K` bytes, so the shipped fold's own 5.75000 is worth +-0.09
+    Ir/byte measured and 5.04688 at K=64 is worth +-0.005.
+  the try_into MECHANISM -- s_n4 / s_n8 are 43 insns / 8 bytes = 5.37500 where
+    s_c4 / s_c8 are 26/4 and 53/8; s_n16 and s_c16 are both 83/16.
+  cheapest found vs the SHIPPED R4 -- u_ship - s_c32 = 199 (small) / 2365
+    (large); u_ship - s_c64 = 127 / 2545; u_ship - s_n4 = 167 / 1509. Cheapest
+    found is per input and no spelling wins on both -- see NOTES.md 10a.2.
 """)
     return 0
 

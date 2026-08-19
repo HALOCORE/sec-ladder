@@ -273,10 +273,15 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    nothing else — a bound only because R4 is held fixed BY FIAT rather than
    minimised. It is NOT an upper bound on the in-contract safety tax**, which is
    what this line said until TASK_023. p16's `+27/+77` has a cheapest-found
-   in-contract R3 of **−127 / −2545** against the shipped R4 — the value having
-   moved three times (~~`+19/+45`~~ TASK_023, ~~`−199/−2365`~~ TASK_024, now
-   `chunks_exact(64)` at TASK_025_REVIEW), which is why **the word is "cheapest
-   found" and never "minimum"**; p17's `+32` has an in-contract respelling measuring
+   in-contract R3 of **−199 at `small` and −2545 at `large`** against the shipped
+   R4 — the value having moved four times (~~`+19/+45`~~ TASK_023,
+   ~~`−199/−2365`~~ TASK_024, ~~`−127/−2545`~~ the manager at TASK_025_REVIEW,
+   who paired one rung at both inputs), and **no single spelling is cheapest on
+   both blobs**: `chunks_exact(64)` is 72 Ir/call *dearer* than `(32)` at `small`
+   and 180 cheaper at `large`, because a larger `K` leaves a longer scalar
+   remainder tail. **A cheapest-found figure must name its input as well as its
+   spelling**, which is why the word is "cheapest found" and never
+   "minimum"; p17's `+32` has an in-contract respelling measuring
    **−19** against
    the shipped R4, byte-identical to the row an earlier task had excluded. Both
    patterns ship an R3 measurably off the floor of their own contract, so "the
