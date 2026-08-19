@@ -22,9 +22,13 @@ Not measurable on this box and not faked: IPC, branch misses, cache misses
   harness/measure.py p01
   harness/measure.py p01 --reps 30 --cpu 3
   harness/measure.py p01 --no-callgrind        # static + wall only
+  harness/measure.py --check-stale             # do any committed records
+  harness/measure.py p01 --check-stale         # disagree with the tree?
 """
 
 import argparse
+import glob
+import hashlib
 import json
 import os
 import re
@@ -114,8 +118,10 @@ def git_state():
     true`, and "the recorded commit is behind the tree" is therefore not
     evidence of staleness by itself. There is no fix -- a file cannot name the
     commit that will contain it -- so do not chase it. What *is* evidence:
-    `results/gate/<pattern>.json`'s `source_sha256` map, which `harness/check.py`
-    writes per source file and a reviewer can compare against the tree.
+    this record's own `source_sha256`/`input_sha256` maps (TASK_035), compared
+    against the tree by `harness/measure.py --check-stale`. Before TASK_035 the
+    only such map was `results/gate/<pattern>.json`'s, which covers what the
+    *gate* read and is not the same list.
 
     `dirty_files` counts every modified path in the working tree, not just the
     ones this measurement depended on, so it is a smoke signal and nothing
@@ -126,8 +132,9 @@ def git_state():
             "dirty_files": len(dirty.splitlines()),
             "note": "commit is HEAD when measured, i.e. the parent of the "
                     "commit this file lands in; a fresh run always names "
-                    "HEAD~1 and reads dirty. Use results/gate/*.json's "
-                    "source_sha256 to detect real staleness."}
+                    "HEAD~1 and reads dirty. For real staleness run "
+                    "`harness/measure.py --check-stale`, which compares this "
+                    "record's source_sha256/input_sha256 against the tree."}
 
 
 def host():
@@ -139,6 +146,207 @@ def host():
                   for l in open("/proc/cpuinfo") if l.startswith("model name")), "?")
     return {"cpu_model": model, "governor": gov,
             "note": "frequency scaling active, shared container -- wall clock is noisy"}
+
+
+# ---- provenance: what this record depends on -----------------------------
+#
+# TASK_035. `results/gate/*.json` has carried `source_sha256` since TASK_005;
+# `results/*.json` -- where every published `Ir`, `ns`, digest and static count
+# lives -- carried nothing, so a measurement record could disagree with the tree
+# indefinitely with nothing to say so. It did, for ~7 tasks:
+# `results/p01-array-sum.json`'s `c-gcc/O0/whole` recorded `md5_fn 2fe6ada73f90`
+# where a rebuild deterministically gives `4104f39118e8` (`md5_fn_norel` equal,
+# so: `common/driver.c` grew 23 lines at `c623b22` and moved the call
+# displacements).
+#
+# The list below is deliberately NOT `check.py`'s. That one globs `harness/*.py`
+# wholesale, which is right for a gate record -- the gate really does read every
+# one of those files -- and wrong here: a `report.py` edit would invalidate every
+# measurement record in the repo without a single measured number moving, and a
+# detector that cries wolf is a detector people switch off. The rule for this
+# list is narrower: **a file belongs iff editing it can change a number this
+# record prints.**
+#
+#   * `<pattern>/*.rs`, `<pattern>/c/*` -- the rung sources, including
+#     `c/kernel_hardened.c` (R1h) and `safe_naive_verus.rs` (R2v) where they
+#     exist; `build.py` selects cells by file presence, so the glob is the cell
+#     list.
+#   * `common/driver.*` -- `driver.c`/`driver.h` are compiled into every C cell
+#     and `driver.rs` is `#[path]`-included by every Rust one. This is the file
+#     that actually drifted, and it is shared, so an edit for pattern X restates
+#     every whole-binary column of patterns A..W.
+#   * `<pattern>/model.py`, `common/slb.py` -- the `inputs` block is `slb.read`
+#     plus `model.build(path).describe()`. Unlike `check.py`, `measure.py` uses
+#     the model for a description and never as an oracle -- but the description
+#     is IN the record, so it is a dependency.
+#   * `harness/build.py` -- owns the compiler paths and every flag
+#     (`-O0/-O3`, `-DSLB_ISOLATED`, `-flto`, `--cfg slb_isolated`,
+#     `codegen-units=1`). It decides what the machine code is.
+#   * `harness/asm.py` -- owns every static column and both digest conventions.
+#     A change to the normalisation or to the `nm`-extent walk restates
+#     `n_fn`/`md5_fn`/`binary_text_bytes` with no rebuild at all.
+#   * `harness/measure.py` -- this file: `CG_PLAN` (which cells get an `Ir`
+#     column), `_sum_rows`' symbol matcher, `SKIP_INPUT_PREFIX`, and the wall
+#     protocol.
+#   * `verus_run.py` -- R5's and R2v's compiler driver (`build.py:VERUS_RUN`).
+#     It decides what the `verus` cells' machine code is, and `toolchain.verus`
+#     is its `--info` output.
+#
+# Deliberately EXCLUDED, each for a reason a later reader can check:
+#
+#   * `harness/report.py` -- renders `results/tables/*.md` FROM this record. It
+#     cannot change a number in it. This is the false positive the list exists to
+#     avoid.
+#   * `harness/check.py`, `vparse.py`, `dloop.py`, `fixture.py` -- the gate and
+#     its analysers. They certify the tree; they do not build or measure it, and
+#     nothing they compute appears here.
+#   * `<pattern>/*.md` -- `spec.md`'s pins bind the *gate*; `measure.py` reads no
+#     pin from any of them. Hashing them would invalidate every record on a
+#     `NOTES.md` prose edit, which is the `report.py` false positive again.
+#   * `<pattern>/controls/*.py` -- control generators. Control cells are not in
+#     `build.all_cells()` and are never measured here.
+#   * `common/layout/*.py` -- the code-layout probe. It is a separate experiment
+#     with its own outputs; `measure.py` neither imports nor runs it.
+#
+# `inputs/gen.py` is in `source_sha256`, but the blobs get their OWN block --
+# see `input_sha256` below for why, and `--check-stale` for what the difference
+# buys.
+
+
+def sha256_file(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def measurement_sources(pdir):
+    """Committed files whose contents can change a number in this record."""
+    return sorted(glob.glob(os.path.join(pdir, "*.rs"))
+                  + glob.glob(os.path.join(pdir, "c", "*"))
+                  + glob.glob(os.path.join(pdir, "model.py"))
+                  + glob.glob(os.path.join(pdir, "inputs", "gen.py"))
+                  + glob.glob(os.path.join(REPO, "common", "driver.*"))
+                  + glob.glob(os.path.join(REPO, "common", "slb.py"))
+                  + glob.glob(os.path.join(REPO, "harness", "build.py"))
+                  + glob.glob(os.path.join(REPO, "harness", "asm.py"))
+                  + glob.glob(os.path.join(REPO, "harness", "measure.py"))
+                  + glob.glob(os.path.join(REPO, "verus_run.py")))
+
+
+def matrix_inputs(indir):
+    """The blobs a measurement actually opens -- the same filter the `inputs`
+    loop below uses, so the two cannot drift apart.
+
+    These are gitignored (`.memory/05-layout.md`), so `gen.py` is what is
+    committed and the generator is hashed above. The blobs are hashed *as well*,
+    separately, because the two answer different questions and collapsing them
+    into one boolean is what makes the generator look like a bad thing to hash:
+
+      * a `gen.py` edit that moves a matrix blob -- the record is stale, and only
+        the blob hash proves it (the generator hash cannot tell "the inputs
+        changed" from "a comment changed");
+      * appending a sweep band, which `.memory/05-layout.md` measured as costing
+        one gate re-run and no re-measure -- the generator moves, every matrix
+        blob is byte-identical, and `--check-stale` says so instead of demanding
+        a re-measure that would change nothing.
+
+    Blobs missing from a fresh clone are reported as such, not as staleness:
+    running `gen.py` is the documented way to get them back."""
+    return sorted(os.path.join(indir, f) for f in os.listdir(indir)
+                  if f.endswith(".bin") and not f.startswith(SKIP_INPUT_PREFIX))
+
+
+def provenance(pdir, indir):
+    return ({os.path.relpath(s, REPO): sha256_file(s)
+             for s in measurement_sources(pdir) if os.path.isfile(s)},
+            {os.path.relpath(b, REPO): sha256_file(b)
+             for b in matrix_inputs(indir)})
+
+
+# ---- the checker ---------------------------------------------------------
+
+def _compare(rec, key):
+    """(stale, missing) for one hash block of one record."""
+    stale, missing = [], []
+    for rel, want in sorted((rec.get(key) or {}).items()):
+        path = os.path.join(REPO, rel)
+        if not os.path.exists(path):
+            missing.append(rel)
+        elif sha256_file(path) != want:
+            stale.append(rel)
+    return stale, missing
+
+
+def check_stale(pattern=None):
+    """Compare every committed record's hash blocks against the working tree.
+
+    Covers both record families, because they have the same failure mode and
+    `.memory/02-bench-rules.md`'s hand-run one-liner only ever covered one:
+
+      results/gate/*.json  -- `source_sha256`, written by `check.py`
+      results/*.json       -- `source_sha256` + `input_sha256`, written here
+
+    Verdicts. STALE is the only one that sets the exit code, so this can be run
+    before trusting any committed number without it failing on a fresh clone:
+
+      STALE          a hashed source, or a matrix input blob, differs from the
+                     tree -- the record does not describe this tree
+      GEN-ONLY       `inputs/gen.py` moved and every matrix blob it produces is
+                     byte-identical: a sweep band, not a re-measure
+      NO BASELINE    the record predates its hash block; nothing to compare
+      MISSING        hashed file absent (gitignored blobs on a fresh clone --
+                     run `inputs/gen.py`)
+      FRESH          every hash matches
+    """
+    files = sorted(glob.glob(os.path.join(RESULTS, "p*.json"))
+                   + glob.glob(os.path.join(RESULTS, "gate", "p*.json")))
+    bad = seen = 0
+    for f in files:
+        rel = os.path.relpath(f, REPO)
+        if pattern and not os.path.basename(f).startswith(pattern):
+            continue
+        # A `--skip`/`--no-callgrind` gate run certifies strictly less and gets
+        # its own file (`check.py`); it is not the record of record.
+        if f.endswith(".partial.json"):
+            print(f"SKIP        {rel:42s} partial run")
+            continue
+        rec = json.load(open(f))
+        # `results/p02-residue-sweep.json` is a side record, not a matrix
+        # measurement; `report.py` discriminates on the `cells` list and so does
+        # this (`.memory/03-measurement.md`, "a side record can make a table
+        # un-regenerable").
+        gate = os.path.basename(os.path.dirname(f)) == "gate"
+        if not gate and "cells" not in rec:
+            print(f"SKIP        {rel:42s} side record (no `cells` list)")
+            continue
+        seen += 1
+        if "source_sha256" not in rec:
+            print(f"NO BASELINE {rel:42s} (record predates `source_sha256`; "
+                  f"it will carry one after the next run)")
+            continue
+        stale, missing = _compare(rec, "source_sha256")
+        bstale, bmissing = _compare(rec, "input_sha256")
+        gen_only = (not bstale and not bmissing and "input_sha256" in rec
+                    and all(s.endswith("inputs/gen.py") for s in stale) and stale)
+        if gen_only:
+            print(f"GEN-ONLY    {rel:42s} {stale[0]} moved; "
+                  f"{len(rec['input_sha256'])} matrix blob(s) byte-identical "
+                  f"-- no re-measure needed")
+        elif stale or bstale:
+            bad += 1
+            for s in stale + bstale:
+                print(f"STALE       {rel:42s} {s}")
+        else:
+            print(f"FRESH       {rel:42s} "
+                  f"{len(rec['source_sha256'])} source(s)"
+                  + (f" + {len(rec['input_sha256'])} input(s)"
+                     if "input_sha256" in rec else ""))
+        for m in missing + bmissing:
+            print(f"MISSING     {rel:42s} {m}")
+    print(f"\n{seen} record(s) examined, {bad} STALE")
+    return 1 if bad else 0
 
 
 # --------------------------------------------------------------------------
@@ -214,13 +422,21 @@ def wall(binaries, arg, cpu, reps):
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("pattern")
+    ap.add_argument("pattern", nargs="?")
+    ap.add_argument("--check-stale", action="store_true",
+                    help="compare every committed results record against the "
+                         "tree and exit; measures nothing")
     ap.add_argument("--reps", type=int, default=30)
     ap.add_argument("--cpu", type=int, default=3, help="taskset core for timing")
     ap.add_argument("--no-callgrind", action="store_true")
     ap.add_argument("--no-wall", action="store_true")
     ap.add_argument("--cells", default="all", choices=["all", "measured"])
     a = ap.parse_args()
+
+    if a.check_stale:
+        return check_stale(a.pattern)
+    if not a.pattern:
+        ap.error("a pattern is required unless --check-stale is given")
 
     pdir = buildmod.pattern_dir(a.pattern)
     pid = buildmod.pattern_id(pdir)
@@ -231,11 +447,18 @@ def main():
              else buildmod.measured_cells(pdir))
     indir = os.path.join(pdir, "inputs")
     scratch = os.path.join(REPO, ".temp", "cg", pid)
+    src_sha, inp_sha = provenance(pdir, indir)
 
     doc = {
         "pattern": slug,
         "generated_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "git": git_state(),
+        # TASK_035: what this record depends on, so staleness is detectable --
+        # `harness/measure.py --check-stale`. See `measurement_sources` for why
+        # each line is in the list and `matrix_inputs` for why the blobs are a
+        # separate block.
+        "source_sha256": src_sha,
+        "input_sha256": inp_sha,
         "toolchain": toolchain(),
         "host": host(),
         "timing_cpu": a.cpu,

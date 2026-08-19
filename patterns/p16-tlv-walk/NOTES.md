@@ -303,6 +303,29 @@ All 16 `-O3` cells fall in 12.69…12.85 ms and 73.56…74.23 ms — a 1.3% and 
 spread against a measured run-to-run spread of 1.2–1.3%. **R2 executes 70% more
 instructions than R4 and is, if anything, marginally faster.**
 
+**Re-measured at TASK_035**, when `results/*.json` was given a `source_sha256`
+(`harness/measure.py --check-stale`). **Nothing deterministic in this pattern
+moved: 0 leaves outside the wall column** — every static count, every digest,
+every checksum and all 48 `Ir` figures are bit-identical, so the table above and
+§2's Ir column are unchanged. The `ns` column did move, and the reason is the
+box rather than the tree — an independent re-timing of the *same* binaries
+(`.temp/p35/wallprobe.py`, shipped `measure.wall()`) reproduces the wider
+spread:
+
+| `-O3`, `small` | TASK_007 session | TASK_035 record | independent re-time |
+|---|---|---|---|
+| min band across 16 cells | **12.69…12.85 ms (1.3%)** | **12.28…13.28 ms (8.2%)** | 12.19…13.04 ms (7.0%) |
+| within-cell min-to-median | 0.96…2.31% | 3.64…12.04% | 2.10…7.88% |
+| `large` min band | 73.56…74.23 ms (0.9%) | 72.86…75.38 ms (3.5%) | — |
+
+Four `small` cells now exceed the 10% min-to-median threshold and
+`results/tables/p16-tlv-walk.md` marks them DISCARDED
+(`.memory/03-measurement.md` step 4). **In the new session the within-cell
+spread exceeds the between-cell band, so it cannot resolve "all 16 cells within
+1.3%" either way — it does not refute it.** The 1.3% reading above is the quiet
+session's and is what this section quotes; a claim about the gap needs a quiet
+session, and the *deterministic* half of the null (+72% `Ir`) is untouched.
+
 The mechanism is not mysterious and it is worth stating because it bounds the
 claim: the fold is `acc = acc*31 + b`, a **serial dependence chain**. Each byte's
 result is the next byte's input, so the loop is latency-bound at roughly 3

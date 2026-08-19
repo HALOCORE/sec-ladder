@@ -496,28 +496,96 @@ Note what does *not* work: the table prints no call column, and `bulk_calls` in
 the gate record names only *recognised bulk* routines — p11's
 `<CStr>::from_bytes_until_nul` never appears there.
 
-### `results/*.json` has NO staleness detector, and two records drifted
+### Staleness: `harness/measure.py --check-stale`, and why a COMMIT test is not the test
 
-**`results/gate/*.json` carries `source_sha256`; `results/*.json` does not**
-(found at TASK_034, in passing). So a *measurement* record — which is where every
-published `Ir` and `ns` lives — can disagree with the tree indefinitely and
-nothing says so. It did: `results/p01-array-sum.json`'s `c-gcc/O0/whole` records
-`md5_fn 2fe6ada73f90` where a rebuild deterministically gives `4104f39118e8`.
-`n_fn` (98) and `fn_bytes` (411) are unchanged, so it is `call`/`jmp`
-displacements only — `common/driver.c` gained 23 lines after that record was
-written.
+**TASK_034 found that `results/*.json` had no staleness detector; TASK_035 built
+one and showed the manager's way of sizing the damage was wrong three times.**
 
-**Scope, measured by comparing each record's `git_state.commit` against the last
-commit that touched `common/driver.c` (`c623b22`):**
+**The mechanism now exists.** `measure.py` writes **`source_sha256`** (18 files
+per pattern: the rung sources, `c/*`, `model.py`, `inputs/gen.py`,
+`common/driver.*`, `common/slb.py`, `harness/{build,asm,measure}.py`,
+`verus_run.py`) **and `input_sha256`** (the matrix blobs the run actually opened).
+The rule in its comment block is *"a file belongs iff editing it can change a
+number this record prints"*, and the exclusions each carry a checkable reason —
+`report.py` renders *from* the record; `check.py`/`vparse.py`/`dloop.py`/
+`fixture.py` certify rather than build or measure; `controls/*.py` are not in
+`build.all_cells()`.
 
-| measured AFTER the driver change (OK) | measured BEFORE (at risk) |
-|---|---|
-| p02, p05, p07, p08, p11, p17 | **p01, p16** |
+```
+harness/measure.py --check-stale        # exit 1 on STALE; covers BOTH record families
+  STALE | GEN-ONLY | NO BASELINE | MISSING | FRESH | SKIP
+```
 
-Two of eight. Until it is fixed, **`md5_fn` and any whole-binary column in
-`results/*.json` are valid only at the commit the record names** — say so beside
-any number quoted from p01's or p16's measurement record. Kernel-*difference*
-columns are far safer, because a driver change cancels between rungs.
+`GEN-ONLY` is the verdict that keeps two true facts from colliding: `gen.py`
+moved but every matrix blob it produces is byte-identical, so
+`.memory/05-layout.md`'s *"a sweep band costs one gate re-run, not a re-measure"*
+stays literally true while "the inputs changed under this record" is still caught
+— and caught better than a generator hash alone, which cannot tell a comment edit
+from a data change.
+
+⚠ **A commit test is NOT the test. Hashes are.** The manager sized the damage by
+comparing each record's `git_state.commit` against the last commit touching
+`common/driver.c`. That method was wrong in both directions:
+
+- **p16 was never at risk.** Its rungs call `driver::head1_u64_bytes`, which that
+  commit *added* — a p16 binary **cannot be built** against the older driver. Its
+  record was taken from a dirty tree that already had it (`dirty: true`). Measured:
+  **0 deterministic leaves moved**, 96 wall leaves and nothing else.
+- **p11 WAS at risk, and the commit test could not see it** — the file that moved
+  was `harness/asm.py` (`_BULK_STR_WORDS`), landed *after* p11's record. So
+  `results/p11-nul-scan.json` records the C rungs calling **no bulk routine**,
+  where p11's own headline is that glibc `strlen` is a 12.0× library factor.
+- **p01 was at risk and did drift**, as reported: `md5_fn 2fe6ada7…` →
+  `4104f391…` with `md5_fn_norel` equal and `n_fn`/`fn_bytes` unchanged, i.e.
+  displacements only, plus 5 `binary_text_bytes` on C cells (none published
+  anywhere).
+
+**And the damage was small where it mattered: `Ir` is bit-identical on both
+re-measured patterns.** p16's null re-derives exactly — R3−R4 = **27 / 77**
+(`7+5·nrec` / `7+7·nrec`), R5−R4 = **0.00**. **Proved rather than argued**: p01
+built against both drivers gives the *same* kernel `Ir`, the *same* whole-program
+`Ir`, and identical rung-to-rung differences on both columns for all five rungs.
+gcc/clang link the unused TU (+160 / +144 B of `.text`); rustc drops it before
+codegen — the asymmetry this file already records, reproduced.
+
+**Status: 0 STALE. But "0 stale everywhere" would overstate it** — p01 and p16 are
+`FRESH`, the other six are **`NO BASELINE`** (their records predate the key) and
+each clears on its next run. The deterministic half was closed by rebuild instead:
+252 cells, 5544 static leaves, **6 moved**, all of them p11's `bulk_calls`.
+
+**Do not make this a `check.py` stage.** Only `measure.py` can refresh a
+measurement record, and `measure.py` is inside the gate's own hash — a gate stage
+would hard-fail every pattern until each is re-measured, coupling gate greenness
+to a full matrix re-measure. Run it before quoting a number.
+
+⚠ **`check.py`'s own `harness/*.py` glob is over-broad, and the cost is now
+measured.** `check.py` imports `asm`, `build`, `vparse`, `dloop`, `fixture` — **not
+`measure`, not `report`** — yet hashes all of `harness/*.py`. TASK_035's
+`measure.py` edit therefore cost **eight full gate re-runs, 13 minutes**, for a
+file the gate never executes; p01's gate diff was one line. Narrowing it to the
+five imported modules plus `check.py` is a judgement call (belt-and-braces cannot
+under-cover, and the tax is per edit event) — but it is the same false positive
+this project warns about one level up.
+
+### This box's `ns` noise floor is a SESSION property, not a constant
+
+**Measured at TASK_035, and it is why a wall-clock row can stop being quotable
+without anything in the tree changing.** The *same* p16 binaries, three days
+apart:
+
+| | between-cell band, `small`, 16 `-O3` cells | within-cell min→median |
+|---|---|---|
+| original session | **12.69…12.85 ms (1.3%)** | 0.96…2.31% |
+| TASK_035 session | **12.28…13.28 ms (8.2%)** | 3.64…12.04% |
+
+Four cells tripped the 10% discard rule and
+`results/tables/p16-tlv-walk.md` now carries a **DISCARD banner**. It is the box,
+not the tree: an independent re-time of the same binaries with the shipped
+`measure.wall()` read 12.19…13.04 ms (7.0%). **So a quiet-session figure cannot be
+refuted by a noisy session — only left unresolved**, which is the state
+`p16/README.md`'s "all 16 `-O3` cells within 1.3%" is now in.
+
+### Interleave by CELL, never by block — it alone flipped a sign
 
 ### Interleave by CELL, never by block — it alone flipped a sign
 

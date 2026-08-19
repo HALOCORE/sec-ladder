@@ -131,7 +131,7 @@
     "harness/check.py": "e7b9b11950677854fa76f14196963c85bad5afef4353bfc243c9984638bc66e9",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
-    "harness/measure.py": "a810bf5973787f78fc9805b2407a6bb04bbee68c968374a2e9b8622c4c5d3af4",
+    "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
     "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
     "patterns/p02-buffer-copy/NOTES.md": "478facabaf199681260a3810f4bc502f53af0f1defab2838b3c060769b6b583b",
@@ -1044,7 +1044,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==645424==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x506000000060 at pc 0x55cb2a544f13 bp 0x7fff46ccd8d0 sp 0x7fff46ccd078 WRITE of size 65 at 0x506000000060 thread T0 #0 0x55cb2a544f12 in __interceptor_memcpy (/home/a"
+      "diagnostic": "================================================================= ==776076==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x506000000060 at pc 0x558329b46f13 bp 0x7ffc61371700 sp 0x7ffc61370ea8 WRITE of size 65 at 0x506000000060 thread T0 #0 0x558329b46f12 in __interceptor_memcpy (/home/a"
     },
     "adversarial-capbig.bin": {
       "exit": 7,
@@ -1065,7 +1065,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==645429==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000038 at pc 0x55f1b1205036 bp 0x7fff7aafb570 sp 0x7fff7aafad18 READ of size 61 at 0x504000000038 thread T0 #0 0x55f1b1205035 in __interceptor_memcpy (/home/ap"
+      "diagnostic": "================================================================= ==776081==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000038 at pc 0x564fdcca1036 bp 0x7ffd0cef4e50 sp 0x7ffd0cef45f8 READ of size 61 at 0x504000000038 thread T0 #0 0x564fdcca1035 in __interceptor_memcpy (/home/ap"
     },
     "adversarial-stride1.bin": {
       "exit": 0,
@@ -1079,7 +1079,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==645432==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x527000006a38 at pc 0x561a32635036 bp 0x7ffeded68e00 sp 0x7ffeded685a8 READ of size 65535 at 0x527000006a38 thread T0 #0 0x561a32635035 in __interceptor_memcpy (/home"
+      "diagnostic": "================================================================= ==776084==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x527000006a38 at pc 0x5562dab78036 bp 0x7ffecf365d30 sp 0x7ffecf3654d8 READ of size 65535 at 0x527000006a38 thread T0 #0 0x5562dab78035 in __interceptor_memcpy (/home"
     },
     "large.bin": {
       "exit": 0,

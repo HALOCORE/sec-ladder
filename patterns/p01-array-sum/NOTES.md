@@ -320,6 +320,20 @@ wall-clock table gives `-O3 isolated` `small.bin` minima of 15.80 ms (R2),
 rungs are bimodal, and the two safe rungs' fast residue is the opposite of R4's,
 so the comparison changes sign with where the linker put the function.
 
+**Both numbers moved at TASK_035** and the withdrawal is why that costs nothing.
+Re-measuring p01 to give `results/p01-array-sum.json` a `source_sha256`
+(`harness/measure.py --check-stale`) redrew the same three minima as **15.56 ms
+(R2), 15.35 (R3) and 14.72 (R4)** — i.e. **R2 +5.71% and R3 +4.30%**, against the
+15.80 / 15.70 / 14.99 and +5.40% / +4.72% above. Same shipped layout, same
+binaries in every deterministic column (**every `Ir`, every static count and
+every digest in this pattern is bit-identical after the re-measure**, R4≡R5 still
+`619b1d1b6561…` and R2≡R2v still `12d307f2b9d1…`); a single-layout `ns` reading
+of a bimodal cell simply is not reproducible to 0.3 points, which is this
+section's claim and not a new one. **The column stays withdrawn.** The earlier
+pair is still quoted in `README.md` and in `.memory/03-measurement.md`'s layout
+table as *the published single-layout reading*; restating those is the manager's
+call (TASK_035 report), not a silent edit here.
+
 **The mechanism is the 32-byte instruction-fetch / DSB window grid**, computed
 statically from the listing with no fitted parameter (`.memory/03-measurement.md`,
 "Code layout: the 32-byte fetch grid"). p01 is the cleanest example on the

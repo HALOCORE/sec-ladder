@@ -1,6 +1,6 @@
 # p01-array-sum — results
 
-Generated 2026-08-17T09:52:07Z from `results/p01-array-sum.json` (git `5bbb5ac39f5e`, working tree dirty).
+Generated 2026-08-19T17:06:10Z from `results/p01-array-sum.json` (git `79950f694cff`, working tree dirty).
 
 ## Toolchain
 
@@ -103,7 +103,7 @@ This declaration backticks **no spelling at all**, so the named-spelling standar
 
 | rung | `main` instrs (nm extent) | pad-excl | trailing pad (insns) | sym bytes | Ir(kernel) small | Ir(kernel) large | Ir(main) small | Ir(main) large | md5_fn | md5_raw | loop | vec |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|
-| c-gcc | 98 | 98 | 0 | 411 | 1,205,400,000 | - | 6,800,066 | - | `2fe6ada7` | `2fe6ada7` | yes | - |
+| c-gcc | 98 | 98 | 0 | 411 | 1,205,400,000 | - | 6,800,066 | - | `4104f391` | `4104f391` | yes | - |
 | c-clang | 65 | 65 | 0 | 270 | 1,305,200,000 | - | 3,800,055 | - | `77f37e64` | `77f37e64` | yes | - |
 | safe_naive | 113 | 113 | 2 | 574 | 2,108,600,000 | - | 4,800,073 | - | `0cc27eb0` | `1d0eea59` | yes | xmm |
 | safe_tuned | 113 | 113 | 2 | 574 | 2,116,800,000 | - | 4,800,073 | - | `9bef66b4` | `954b18e1` | yes | xmm |
@@ -128,20 +128,20 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 35.96 | 36.20 | 0.7% | 24.12 | 24.32 | 0.8% |
-| c-gcc | whole | 36.53 | 36.83 | 0.8% | 24.22 | 24.50 | 1.1% |
-| c-clang | isolated | 36.09 | 36.30 | 0.6% | 15.51 | 15.66 | 0.9% |
-| c-clang | whole | 36.02 | 36.33 | 0.9% | 15.71 | 15.96 | 1.6% |
-| safe_naive | isolated | 36.86 | 37.02 | 0.4% | 15.80 | 15.93 | 0.8% |
-| safe_naive | whole | 36.83 | 37.06 | 0.6% | 15.75 | 15.99 | 1.5% |
-| safe_tuned | isolated | 36.68 | 37.03 | 0.9% | 15.70 | 15.91 | 1.4% |
-| safe_tuned | whole | 36.69 | 36.96 | 0.8% | 15.56 | 15.74 | 1.1% |
-| unsafe | isolated | 36.66 | 36.98 | 0.9% | 14.99 | 15.26 | 1.8% |
-| unsafe | whole | 36.62 | 36.91 | 0.8% | 15.81 | 16.04 | 1.5% |
-| verus | isolated | 36.72 | 36.98 | 0.7% | 15.08 | 15.35 | 1.8% |
-| verus | whole | 36.55 | 36.77 | 0.6% | 15.78 | 16.01 | 1.4% |
-| safe_naive_verus | isolated | 36.69 | 36.87 | 0.5% | 14.71 | 14.92 | 1.4% |
-| safe_naive_verus | whole | 36.54 | 36.83 | 0.8% | 15.77 | 16.02 | 1.6% |
+| c-gcc | isolated | 33.55 | 35.29 | 5.2% | 24.27 | 25.74 | 6.1% |
+| c-gcc | whole | 34.15 | 35.73 | 4.6% | 24.59 | 25.82 | 5.0% |
+| c-clang | isolated | 32.86 | 34.94 | 6.3% | 15.02 | 15.55 | 3.5% |
+| c-clang | whole | 34.02 | 34.83 | 2.4% | 15.78 | 16.61 | 5.3% |
+| safe_naive | isolated | 35.12 | 35.97 | 2.4% | 15.56 | 16.60 | 6.7% |
+| safe_naive | whole | 35.26 | 35.95 | 2.0% | 15.94 | 16.35 | 2.5% |
+| safe_tuned | isolated | 35.21 | 35.95 | 2.1% | 15.35 | 16.47 | 7.3% |
+| safe_tuned | whole | 34.09 | 35.89 | 5.3% | 15.38 | 16.34 | 6.3% |
+| unsafe | isolated | 34.73 | 36.11 | 4.0% | 14.72 | 15.85 | 7.7% |
+| unsafe | whole | 34.40 | 36.18 | 5.2% | 15.66 | 16.68 | 6.5% |
+| verus | isolated | 35.07 | 36.21 | 3.2% | 15.08 | 15.97 | 5.9% |
+| verus | whole | 34.37 | 35.68 | 3.8% | 15.65 | 16.67 | 6.5% |
+| safe_naive_verus | isolated | 34.37 | 35.88 | 4.4% | 14.54 | 15.73 | 8.2% |
+| safe_naive_verus | whole | 34.37 | 35.77 | 4.1% | 15.70 | 16.86 | 7.3% |
 
 Every wall-clock cell is within the 10% min-to-median spread threshold.
 
