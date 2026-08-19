@@ -433,6 +433,10 @@ headline. Say so in every task file.
   to `__memcpy_chk`. A gate row records `clean` for both reasons identically.
 - **Two files, two numbering schemes.** RECAP's findings are numbered 1–14,
   `.memory/01-ladder.md`'s are 1–7. Name the pattern, never the number.
+  **And one task file is misnumbered**: `.tasks/TASK_025_REVIEW.md` reviews
+  **TASK_024**, not TASK_025 (there is no TASK_025). Every other
+  `TASK_NNN_REVIEW` reviews `TASK_NNN`; `TASK_027_REVIEW` restores the
+  convention. Cite reviews by what they *found*, not by their number.
   (This file also *shipped findings 13 and 14 twice*, with divergent text, from
   an insert-where-a-replace-was-meant. One copy asserted p05's `5·nrow + 6`
   floor as a narrowing result while the other recorded its refutation. Deduped
