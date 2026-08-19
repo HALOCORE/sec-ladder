@@ -628,9 +628,22 @@ it once, land the corrections, repeat** — and per `PROTOCOL.md` rule 9, write
 (TASK_029). Finding 8 in `.memory/01-ladder.md` is written.** The headline
 survived six workloads; the manager's framing of it did not (see finding 15).
 
-**THE LAYOUT FINDING IS REVIEWED AND IT GENERALISES — see finding 16. Two
-patterns' published wall-clock rows are withdrawn, and landing that in the
-pattern files and `results/` is the next task (`TASK_031`).**
+**The layout arc is closed: finding 16 is measured, reviewed, refined and landed
+in all seven patterns' files (TASK_026 → 029 → 030_REVIEW → 031).**
+
+**THE NEXT TASK IS `TASK_032` — ship the layout harness, then STOP doing
+methodology.** The finding lives entirely in `.temp/`, and `controls/*.py` is
+inside `source_sha256` precisely so that cannot happen. It is one task and it is
+genuinely load-bearing: without it, every future pattern's wall-clock column is
+unbracketed and finding 16 is not re-derivable. **After that, patterns.**
+
+⚠ **Read the ratio before planning anything else. TASK_015–031 is seventeen
+consecutive tasks of methodology and correction against two patterns produced
+(p07, and p05/p16's repairs).** Both arcs were worth it — the named-spelling
+standard, the R4-is-chained-to-the-prover result, and finding 16 are three of the
+project's strongest results, and none of them was on anyone's plan. But 7 of 47
+patterns exist. **The queue after TASK_032 is patterns, and a methodology task
+should now have to argue for itself against a pattern.**
 
 **Items 1–2a below are the closed spelling arc, kept for the history.** That arc
 ran TASK_015–028, thirteen tasks; it is finished and its rules are distilled in
