@@ -557,9 +557,17 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
 
    `q >> 7` is `q/128 ≤ q/64`, so under the guard it is **always a legal word
    index**: `19 verified, 0 errors` with the functional spec stripped, `20/0` once
-   the spec moves to match. **Zero instructions** (6691.70 vs 6692.30), identical
-   `n_fn`, and the guarded body identical **but for one immediate**. All five
-   builds print the same wrong answer. ⚠ **This is the example to quote, not
+   the spec moves to match. **Zero instructions** (6691.70 vs 6692.30), and
+   **the whole 368-byte R4 kernel differs in ONE BYTE** (offset 156, `06` → `07`;
+   TASK_039). All five builds print the same wrong answer **on `small`, p09's
+   headline blob** — not only on thin windows; ASan+UBSan are silent on *every*
+   input and Miri is `exit=0 UB=no`.
+   ⚠ **And it is a CLASS of ≥ 9, not an instance**: the obligation reduces to
+   `C·(nwords−1) + 8 ≤ 8·nwords`, so every shift digit above 6 and every scale
+   below 8 qualifies. Second member measured — `4 * (q >> 6)`, again one differing
+   byte (the SIB scale), and its `_msonly` verifies **18/0 with no ghost line at
+   all** where `q >> 7` needs one. `q >> 7` is the headline only because it is the
+   one member in `q >> 5`'s own character position. ⚠ **This is the example to quote, not
    `q & 31`**, which is a *two*-character edit costing +32% on R4 — p09 shipped
    calling both "one-character bugs" and that is wrong on both counts.
    **The probe is not blind**: `_msonly` survived `assert(false)` in three places
@@ -594,8 +602,13 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    inside every published wall-clock number, and on p09 it is **55% of `small`
    and 73% of `large`**. Subtract `t(n_iters = 1)` before quoting any ratio. **A
    whole mechanism died on this**: p09's "the extra instructions retire cheaper
-   than average" (ILP) came from a 2–4× `Ir`-vs-`ns` gap, and corrected, **R3's
-   `ns` penalty EXCEEDS its `Ir` penalty.** See `.memory/03-measurement.md`.
+   than average" (ILP) came from a 2–4× `Ir`-vs-`ns` gap, and corrected **the
+   largest surviving factor is 1.5×**. ⚠ Name the blob (TASK_039): R3's `ns`
+   penalty exceeds its `Ir` penalty **on `small` only**; on `large` it stays
+   below (+179…+183% against +199.4%). The correction's own error bar is **±9
+   points** — `R5 − R4`, which must be 0, reads −0.9…+8.7% across four runs — so
+   quote a corrected ratio only where the effect clears it, as p09's do by 11–25×.
+   See `.memory/03-measurement.md`.
    **(b) A `forbidden` entry without backticks is audited ZERO times**, while the
    verdict line two above still counts it (`check.py:929` keys on `_TICK`). p09
    shipped 5 forbidden entries and 0 audited spellings — its "forbidden: 0 hits"
