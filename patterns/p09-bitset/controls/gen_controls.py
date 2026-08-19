@@ -34,11 +34,25 @@ the lemma. p09 asks the same question about a bound derived through `>>`:
     m_clamp_far   ...`>= 0x1000000`, true but useless     -- negative control
     m_clamp_u     the same dead clamp on R4, to check it is a no-op there
 
-**2. THE TWO BUGS (`x_*`) -- one character each, at every rung.**
+**2. THE THREE BUGS (`x_*`) -- and the headline pair is `x_shift5` / `x_shift7`,
+which differ from the shipped rung by ONE CHARACTER IN THE SAME POSITION.**
 
-    x_mask31      `q & 63` -> `q & 31`. In range, wrong answer, invisible.
-    x_shift5      `q >> 6` -> `q >> 5`. The task file called this the arithmetic
-                  bug; it is measured to be a SECOND SPATIAL bug (NOTES.md 6).
+    x_shift7      `q >> 6` -> `q >> 7`. q/128 <= q/64, so under `q < nbits` it
+                  is ALWAYS a legal word index: wrong answer, in bounds, ZERO
+                  instruction cost, invisible to every rung, to ASan/UBSan, to
+                  Miri and to a memory-safety-only proof. THE HEADLINE.
+    x_shift5      `q >> 6` -> `q >> 5`. q/32 >= q/64, so it overshoots: a SECOND
+                  SPATIAL bug, caught by memory safety alone (NOTES.md 6).
+    x_mask31      `q & 63` -> `q & 31`. In range, wrong answer, invisible to
+                  memory safety -- but a TWO-character edit costing +32% on R4.
+    x_mask3       `q & 63` -> `q & 3`, the ONE-character mask edit, for the same
+                  reason: the cost story has to be told at matched edit distance.
+    x_scale4      `8 * (q >> 6)` -> `4 * (q >> 6)`, a MISALIGNED word read, and
+                  the second measured member of the invisible class: the
+                  obligation is `C*(nwords-1) + 8 <= 8*nwords`, so every scale
+                  BELOW 8 is in bounds exactly as every shift digit ABOVE 6 is.
+                  It is here so that `q >> 7` is published as the sharpest
+                  member of a family and not as a curiosity (TASK_039).
 
 **3. R3-SIDE SPAN (`r3_*`) -- in-contract respellings, for the cheapest-found
 figure `.memory/01-ladder.md` requires beside any headline.**
@@ -48,13 +62,16 @@ figure `.memory/01-ladder.md` requires beside any headline.**
     r3_wordchunks ...and walk the popcount pass with `chunks_exact(8)`
     r3_qchunks    walk the QUERY array with `chunks_exact(4)`
 
-**5. THE VERUS MUTANTS (`m_shift5*`, `m_mask31*`, `m_control_msonly`).** These
-are the seven rows of NOTES.md 6a and they are why this file exists at all: a
-`verus.rs` that does not verify cleanly cannot live in the pattern dir. `_msonly`
-strips the functional `ensures`, both loop invariants that carry it and the
-driver's consuming assert, leaving only the memory-safety obligations -- which is
-`.memory/04-verus.md`'s mandatory positive control, and `m_control_msonly` is the
-row that shows the stripped probe is not blind.
+**5. THE VERUS MUTANTS (`m_shift7*`, `m_shift5*`, `m_mask31*`,
+`m_control_msonly`).** These are the twelve rows of NOTES.md 6a and they are why
+this file exists at all: a `verus.rs` that does not verify cleanly cannot live in
+the pattern dir. `_msonly` strips the functional `ensures`, both loop invariants
+that carry it and the driver's consuming assert, leaving only the memory-safety
+obligations -- which is `.memory/04-verus.md`'s mandatory positive control, and
+`m_control_msonly` is the row that shows the stripped probe is not blind.
+`m_shift7*` is the headline: an index bug that stays inside the bitset, so the
+memory-safety-only configuration discharges it at `19 verified, 0 errors` and the
+whole-specification one at `20 verified, 0 errors` once the spec moves to match.
 
 **4. THE C-SIDE BOUNDS CHECK (`c_*`).** p03's "it is not Rust-specific" result
 needs a C rung that HAS a bounds check, because R1h has none -- its only check is
@@ -206,6 +223,32 @@ def controls():
     out["x_shift5_t"] = sub(t, SHIFT_RS, SHIFT_RS.replace("q >> 6", "q >> 5"))
     out["x_shift5_n"] = sub(n, SHIFT_RS_ABS, SHIFT_RS_ABS.replace("q >> 6", "q >> 5"))
     out["x_shift5_u"] = sub(u, SHIFT_RS_U, SHIFT_RS_U.replace("q >> 6", "q >> 5"))
+    # THE HEADLINE PAIR. `q >> 7` is the SAME character position as `q >> 5` and
+    # the opposite direction: q/128 <= q/64, so under `q < nbits` the index is
+    # always legal (q/128 <= q/64 < ceil(nbits/64) == nwords). Nothing in the
+    # ladder sees it -- not the bounds check, not ASan/UBSan, not Miri, not the
+    # memory-safety proof -- and it costs zero instructions.
+    out["x_shift7_t"] = sub(t, SHIFT_RS, SHIFT_RS.replace("q >> 6", "q >> 7"))
+    out["x_shift7_n"] = sub(n, SHIFT_RS_ABS, SHIFT_RS_ABS.replace("q >> 6", "q >> 7"))
+    out["x_shift7_u"] = sub(u, SHIFT_RS_U, SHIFT_RS_U.replace("q >> 6", "q >> 7"))
+    # `q & 31` is a TWO-character substitution ("63" -> "31"); `q & 3` is the
+    # one-character one, so the mask bug's R4 cost can be quoted at the same edit
+    # distance as the index bug's. Both are in range and both are invisible.
+    out["x_mask3_u"] = sub(u, MASK_RS, MASK_RS.replace("q & 63", "q & 3"))
+    # The SECOND member of the invisible class, found by looking one step past
+    # `q >> 7` (TASK_039). The access needs `ws + C*(q>>6) + 8 <= buf.len()`,
+    # which the invariants reduce to `C*(nwords-1) + 8 <= 8*nwords`: true for
+    # every C <= 7 and false for C = 9. So a misaligned read at HALF the stride
+    # is in bounds on every input, wrong on every input, and one byte of machine
+    # code away from the shipped rung -- the SIB scale field.
+    out["x_scale4_t"] = sub(t, SHIFT_RS, SHIFT_RS.replace("8 * (q >> 6)",
+                                                          "4 * (q >> 6)"))
+    out["x_scale4_n"] = sub(n, SHIFT_RS_ABS,
+                            SHIFT_RS_ABS.replace("8 * (q >> 6)",
+                                                 "4 * (q >> 6)"))
+    out["x_scale4_u"] = sub(u, SHIFT_RS_U,
+                            SHIFT_RS_U.replace("8 * (q >> 6)",
+                                               "4 * (q >> 6)"))
 
     # ---- 3. the R3-side span ---------------------------------------------
     out["r3_wordslice"] = sub(
@@ -303,6 +346,65 @@ def controls():
         out["m_shift5"],
         "pub open spec fn word_of(q: u64) -> int {\n    q as int / 64\n}",
         "pub open spec fn word_of(q: u64) -> int {\n    q as int / 32\n}")
+    # ---- 5b. `q >> 7`, the UNDERSHOOTING index ---------------------------
+    # The same four rows as the mask bug, on an INDEX. `m_shift7_bare` shows what
+    # the one ghost line buys: without it the proof cannot even see that the
+    # smaller shift is bounded by the larger, so it fails for a proof-weakness
+    # reason (the same shape as the bare `q & 31`, NOTES.md 6a's caveat). With it
+    # the only remaining error is the FUNCTIONAL one, and stripping the
+    # functional spec leaves 19/0 -- the index bug memory safety cannot see.
+    P7 = VPROOF.replace(
+        "            }",
+        "                assert((q >> 7) <= (q >> 6)) by (bit_vector);\n            }")
+    out["m_shift7_bare"] = sub(v, VSHIFT, VSHIFT.replace("q >> 6", "q >> 7"))
+    s7 = sub(out["m_shift7_bare"], VPROOF, P7)
+    out["m_shift7"] = s7
+    out["m_shift7_msonly"] = msonly(s7)
+    # ...and the author's misunderstanding reaching the specification, which is
+    # `m_mask31_spec`'s row for the index. `word_of` alone is not enough: the
+    # bridge lemma still asserts `(q >> 6) == word_of(q)`, which is then FALSE,
+    # so it fails for a proof-engineering reason rather than a semantic one
+    # (17 verified, 2 errors). Move the lemma too and it is 20 verified, 0 errors.
+    out["m_shift7_spec"] = sub(
+        s7, "pub open spec fn word_of(q: u64) -> int {\n    q as int / 64\n}",
+        "pub open spec fn word_of(q: u64) -> int {\n    q as int / 128\n}")
+    out["m_shift7_spec2"] = sub(
+        out["m_shift7_spec"],
+        """pub proof fn lemma_guard_bounds_word(q: u64, nbits: u64)
+    requires
+        q < nbits,
+    ensures
+        (q >> 6) == word_of(q),
+        (q >> 6) < nwords_of(nbits),
+{
+    lemma_shr6_is_div64(q);
+}""",
+        """pub proof fn lemma_guard_bounds_word(q: u64, nbits: u64)
+    requires
+        q < nbits,
+    ensures
+        (q >> 7) == word_of(q),
+        (q >> 7) < nwords_of(nbits),
+{
+    lemma_shr6_is_div64(q);
+    assert(vstd::arithmetic::power2::pow2(7) == 128) by {
+        vstd::arithmetic::power2::lemma2_to64();
+    }
+    assert((q >> 7) <= (q >> 6)) by (bit_vector);
+}""")
+
+    # ...and the scale edit on the proof side. NOTE THE ASYMMETRY, measured:
+    # this one needs NO ghost line at all. `m_scale4` fails only the functional
+    # invariant (17/1) and `m_scale4_msonly` is `18 verified, 0 errors` off the
+    # shipped proof text -- where `q >> 7` needed `assert((q >> 7) <= (q >> 6))
+    # by (bit_vector)` before the memory-safety side would close. The reason is
+    # that `4*(q>>6) + 8 <= 8*nwords` is LINEAR in facts the loop invariant
+    # already carries, while `q >> 7 < nwords` is a bit-vector fact about a
+    # shift the invariant never mentions.
+    out["m_scale4"] = sub(v, VSHIFT, VSHIFT.replace("8 * (q >> 6)",
+                                                    "4 * (q >> 6)"))
+    out["m_scale4_msonly"] = msonly(out["m_scale4"])
+
     m31 = sub(v, VMASK, VMASK.replace("q & 63", "q & 31"))
     # `q & 31` also fails a SECOND, non-substantive obligation -- the shift-amount
     # bound on `1u64 << (q & 31)` -- because the supporting lemma names 63 and
@@ -347,6 +449,11 @@ def controls():
            "            uint64_t w = load_u64(buf, ws + (size_t)(8 * (q >> 6)));",
         "if (q < nbits) {\n"
         "            uint64_t w = load_u64(buf, ws + (size_t)(8 * (q >> 5)));")
+    out["x_shift7.c"] = sub(
+        c, "if (q < nbits) {\n"
+           "            uint64_t w = load_u64(buf, ws + (size_t)(8 * (q >> 6)));",
+        "if (q < nbits) {\n"
+        "            uint64_t w = load_u64(buf, ws + (size_t)(8 * (q >> 7)));")
     out["c_check_clamp.c"] = sub(out["c_check_clamp.c"], "    (void)buf_len;",
                                  "    /* buf_len is used below */")
     out["c_check.c"] = sub(out["c_check.c"], "    (void)buf_len;",

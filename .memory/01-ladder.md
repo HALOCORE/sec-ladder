@@ -1401,10 +1401,19 @@ places and points at nothing. **Name the pattern, never the number.**
    legal word index** — and Verus proves it universally with one ghost line:
    `m_shift7_msonly` **19 verified, 0 errors**, `m_shift7_spec2` **20 / 0** once
    the spec moves to match. It costs **zero instructions** (6691.70 vs 6692.30),
-   `n_fn` is **identical at 102**, and the guarded body is the same 26
-   instructions **but for one immediate** (`shr $0x7` for `shr $0x6`). All five
-   builds print the same wrong answer; ASan+UBSan at the gate's own flags are
-   silent on every input.
+   `n_fn` is **identical at 102**, and — measured at TASK_039 — **the whole
+   368-byte R4 kernel differs in ONE BYTE** (offset 156, `06` → `07`); the
+   103-instruction disassembly differs only in `shr $0x6` → `shr $0x7`. All five
+   builds print the same wrong answer on **`small`, p09's headline blob**, not
+   only on thin windows; ASan+UBSan at the gate's own flags are silent on **every**
+   input including `thin.bin`, and Miri is `exit=0 UB=no`.
+   ⚠ **And it is a class, not an instance — ≥ 9 members.** The obligation reduces
+   to `C·(nwords−1) + 8 ≤ 8·nwords`, so **every shift digit above 6 and every
+   scale below 8 is in bounds**. Second member measured: `4 * (q >> 6)` — again
+   one differing byte (the SIB scale), wrong in all three rungs on every blob,
+   Miri clean, and `m_scale4_msonly` verifies **18/0 with no ghost line at all**,
+   where `q >> 7` needs one `by (bit_vector)`. `q >> 7` ships as the headline only
+   because it is the one member in `q >> 5`'s own character position.
    ⚠ **This is the example to quote, not `q & 31`** — which is a *two*-character
    substitution costing **+32% on R4**. p09 shipped calling both "one-character
    bugs"; that is wrong on both counts.

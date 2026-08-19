@@ -767,7 +767,12 @@ review as a change to the committed artefact rather than only as a source diff.
   and **0 audited spellings** — its "forbidden: 0 hits" was kept by auditing
   nothing. **Backtick every `forbidden` and `required` entry you want enforced**,
   and read `audit  forbidden: N spelling(s)` — not the declaration line — as the
-  count that matters.
+  count that matters. **p09 was backticked at TASK_039 and the audit now reports
+  `10 spelling(s), 0 hit(s)` — the 0 is earned.** Note the two numbers legitimately
+  differ: the *verdict* line counts **entries** (5) and the *audit* line counts
+  **spelling × language** (10). And the `_blank_ghost` exposure is real but did not
+  fire: p09's spec fns spell `q as int / 64`, and the doc comments that do contain
+  `q / 64` are blanked as comments.
 
   ⚠ **"Detectable" was detectable BY HAND until TASK_035; now it is one
   command**, and it covers the measurement records too, which never had a hash

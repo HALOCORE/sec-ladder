@@ -18,8 +18,11 @@ own **negative control**: the popcount pass reads the same array, with the same
 byte-at-a-time decoder, into the same fold, through an index linear in its own
 loop counter.
 
-And it carries **two one-character bugs**. Only one of them is a memory error,
-and — §6 — **it is not the one the task file predicted**.
+And it carries **two one-character index bugs in the same character position**.
+`q >> 5` is caught by memory safety alone; `q >> 7` is caught by nothing at all,
+at zero instruction cost, on machine code one byte away from the shipped rung.
+That pair is p09's headline and §6 is the measurement. (The task file predicted a
+different pair; the correction is measured.)
 
 ---
 
@@ -282,24 +285,40 @@ word) and loses badly on the derived one (56 vs 34). Since `small` and `large`
 are 100% guarded, the query and guarded terms add, and 26+56 = 82 loses to
 31+34 = 65.
 
-On the listing (`.temp/p09/loops.py`), the difference on the guarded path is that
-**R3's reslice lets LLVM hoist the eight byte-address computations above the
-eight bounds checks**, which needs eight simultaneously-live registers; R3's
-query loop body is 82 instructions and contains a stack reload
-(`mov 0x8(%rsp),%r9`), where R2 recomputes each address from one base
-(`movzbl -0x2(%r13,%r12,1)`) inside a 65-instruction body. A full
-register-allocation attribution was not done; what is measured is the +22.00 per
-guarded query and the spill in the listing.
+**The mechanism is a LOST LOAD IDIOM, and it fails in exactly one of the eight
+loops measured.** LLVM merges the eight byte loads of a little-endian `u64` into
+ONE `mov`. The complete 2×2 (`.temp/p09/loops.py`, re-read at TASK_039):
 
-**And in both safe rungs the surviving per-byte check on the derived index costs
-more than the check.** LLVM merges the eight byte loads of a little-endian `u64`
-into ONE `mov` — it does so in R4's query loop (`mov (%rdi,%r15,1),%r15`), in
-R4's popcount pass, and **in R3's popcount pass** (`mov -0x7(%rbx,%rdi,1),%r13`).
-It does **not** do so on the shift-derived access in either safe rung, where the
-22-instruction `movzbl`/`shl`/`or` chain survives. So the cost of the surviving
-check is 8 compares **plus** a lost load idiom — p02's mechanism
-(`.memory/01-ladder.md`: "rustc failed to idiom-recognise one spelling") arriving
-on a *safety* axis rather than a spelling axis.
+| | linear index (popcount pass) | shift-derived index (query loop) |
+|---|---|---|
+| absolute (R2) | merged `mov -0x7(%rax,%rcx,1),%rdi` | **merged** `mov (%rdi,%rax,1),%rax` |
+| reslice (R3) | merged `mov -0x7(%rbx,%rdi,1),%r13` | **NOT merged** — 22-insn `movzbl/shl/or` chain |
+| unchecked (R4) | merged `mov -0x7(%rdi,%rdx,1),%r14` | merged `mov (%rdi,%r15,1),%r15` |
+
+**One cell of six, and that single failure is the whole inversion:**
+
+```
++21  lost 8-byte load merge   (22 insns of movzbl/shl/or against 1 mov)
+ +1  spill reload             `mov 0x8(%rsp),%r9`
+ -5  cheaper query-array checks the reslice buys (R2's inner body 31, R3's 26)
+-------------------------------------------------------------------------
++17 net  ==  R3's 82-instruction guarded body against R2's 65
+         ==  (/query -5) + (/guarded +22)
+```
+
+⚠ **The earlier reading — "LLVM does not merge on the shift-derived access in
+*either* safe rung" — is measured FALSE for R2** (TASK_038_REVIEW M1). R2 keeps
+the merge on the *same* access, so the reslice is what loses it, and the
+register-pressure story (eight live byte addresses hoisted above eight checks) is
+the *consequence* of the lost merge rather than an independent cause.
+
+**So the hazard is conditional and the condition is checkable**: `reslice` **+**
+a data-derived index **+** a multi-byte decode at it. p09 is the first pattern
+here with all three at once, which is why "is this a p09 fact or a general
+reslice hazard?" has an answer rather than a caveat. It is p02's mechanism
+(`.memory/01-ladder.md`: "rustc failed to idiom-recognise one spelling")
+arriving on a *safety* axis rather than a spelling axis — and it is the same
+mechanism as `q & 31`'s R4 cost (§6b) and half of `m_clampb`'s win (§8).
 
 ### 4d. R1 vs R1h — what the range check costs inside one language
 
@@ -341,31 +360,56 @@ rule; the blocked runs trip it and show the classic monotone ramp
 (`unsafe` 5.37 → 6.31 ms across the block), which is TASK_031's artefact
 reproduced on a ninth pattern.
 
-`harness/measure.py p09 --reps 30 --cpu 3`, `-O3 isolated`, min of 30:
+`harness/measure.py p09 --reps 30 --cpu 3`, `-O3 isolated`, min of 30. ⚠ **Every
+figure in this table is a LEVEL and INCLUDES THE PER-PROCESS CONSTANT** — argv,
+the file read, the payload decode, process setup. `measure.py` times whole
+process invocations (`.memory/03-measurement.md`), and on p09 that constant is
+**55% of the `small` figure and 73% of `large`**. Do not difference this column:
 
-| rung | `small` min | vs R4 | `large` min | vs R4 |
-|---|---:|---:|---:|---:|
-| unsafe | 5.36 ms | — | 9.41 ms | — |
-| verus | 5.40 ms | +0.75% | 9.31 ms | −1.06% |
-| safe_naive | 8.47 ms | +58.0% | 11.90 ms | +26.5% |
-| safe_tuned | 10.67 ms | +99.1% | 14.13 ms | +50.2% |
-| c-clang | 4.66 ms | −13.1% | 8.70 ms | −7.5% |
-| c-clang-h | 4.86 ms | −9.3% | 8.81 ms | −6.4% |
-| c-gcc-h | 9.65 ms | +80.0% | 12.77 ms | +35.7% |
+| rung | `small` min (LEVEL) | `large` min (LEVEL) |
+|---|---:|---:|
+| unsafe | 5.36 ms | 9.41 ms |
+| verus | 5.40 ms | 9.31 ms |
+| safe_naive | 8.47 ms | 11.90 ms |
+| safe_tuned | 10.67 ms | 14.13 ms |
+| c-clang | 4.66 ms | 8.70 ms |
+| c-clang-h | 4.86 ms | 8.81 ms |
+| c-gcc-h | 9.65 ms | 12.77 ms |
 
-**The column is resolvable**: the effects (26–99%) are an order of magnitude
-above the floor (≤7.8%), and R5-vs-R4 (+0.75% / −1.06%) sits inside it, which is
-what byte-identical kernels must do. 2 of 32 cells tripped the 10% rule and are
-marked ✗ in `results/tables/p09-bitset.md`; **both are `whole` mode on `small`
-and no claim here rests on them.**
+**The ratio to quote is the kernel-only one**, `t(N) − t(1)`: the same blob run
+with `n_iters` rewritten to 1, which is the marginal construction this file
+already uses for `Ir`. `.temp/r38/wall.py` is the probe; four independent runs
+exist (TASK_038_REVIEW's, and three at TASK_039):
 
-⚠ **`Ir` and wall clock agree in direction and disagree in magnitude by 2–4×.**
-R3-vs-R4 is +205.6% on `Ir` and +99.1% on ns at `small`; +199.4% and +50.2% at
-`large`. The extra instructions are predictable compare-and-branch with high ILP,
-so they retire far cheaper than the average instruction. **Quote both columns.**
-No cycles figure is quoted: `.memory/00-environment.md` records that this box's
-clock is set by other tenants and that ns is a measurement while cycles is an
-inference.
+| pair | `Ir` | ns as a LEVEL ratio | **ns kernel-only** |
+|---|---:|---:|---:|
+| R3 − R4 `small` | +205.6% | +99.1% | **+205.4 … +219.7%** |
+| R3 − R4 `large` | +199.4% | +50.2% | **+179.2 … +183.1%** |
+| R2 − R4 `small` | +148.5% | +58.0% | **+110.8 … +125.6%** |
+| R2 − R4 `large` | +148.5% | +26.5% | **+97.3 … +100.0%** |
+
+⚠ **The ILP reading this section used to carry is REFUTED.** It said the extra
+instructions "retire far cheaper than the average instruction" because `Ir` and
+ns disagreed by 2–4×. Corrected, the largest surviving factor is **1.5×** (R2 on
+`large`), and on `small` **R3's ns penalty equals or exceeds its `Ir` penalty** —
+205.4/215.4/219.7% against 205.6%, i.e. no discount at all. On `large` R3 keeps a
+1.1× discount (179–183% against 199.4%), so **the sentence has to name the blob**,
+which is `.memory/01-ladder.md`'s own rule for any cheapest-found figure.
+
+⚠ **The correction subtracts two noisy minima, so it is noisier than the level
+column.** `R5 − R4` must be 0 — the kernels are byte-identical (§3b) — and the
+four runs read **−0.9%, +2.6%, +2.7%, +8.7%**. That is the corrected column's own
+error bar, it is a *session* property like every other ns figure here
+(`.memory/03-measurement.md`), and the R2/R3 effects above clear it by **11–25×**
+rather than by the order of magnitude the level column appeared to give. Do not
+quote a corrected ratio whose effect is not far above ±9 points.
+
+The identical-copy floor above (1.70–7.83% alternating) is what makes the *level*
+column readable at all; 2 of 32 cells tripped the 10% rule and are marked ✗ in
+`results/tables/p09-bitset.md`; **both are `whole` mode on `small` and no claim
+here rests on them.** No cycles figure is quoted:
+`.memory/00-environment.md` records that this box's clock is set by other tenants
+and that ns is a measurement while cycles is an inference.
 
 ---
 
@@ -430,14 +474,23 @@ codegen side is not.** That is p05's and p03's sentence on a third operator, and
 
 ### 5b. TCB tally — 4 trusted items, ONE of them `unsafe`
 
-`TCB: 12 lines across 4 items.`
+`TCB: 7 lines across 4 items`, which is the gate's own count —
+`results/gate/p09-bitset.json`, `verus.verus.rs.tcb_items`, `body_lines`:
 
 | item | `unsafe`? | lines | why trusted | twin |
 |---|---|---:|---|---|
-| `buf_get_unchecked` | **yes** | 3 | vstd ships no spec for `<[T]>::get_unchecked` | `slb_twin_buf_get_unchecked` |
-| `popcount64` | **no** | 3 | vstd ships no spec for `u64::count_ones` | `slb_twin_popcount64` |
+| `buf_get_unchecked` | **yes** | 1 | vstd ships no spec for `<[T]>::get_unchecked` | `slb_twin_buf_get_unchecked` |
+| `popcount64` | **no** | 1 | vstd ships no spec for `u64::count_ones` | `slb_twin_popcount64` |
 | `load_input` | no | 4 | file I/O and argv | — (no `ensures`, no `unsafe`) |
-| `emit` | no | 2 | `println!` | — |
+| `emit` | no | 1 | `println!` | — |
+
+⚠ **This read `12 lines across 4 items` until TASK_039 and that was wrong**
+(TASK_038_REVIEW M3): the per-item column counted signature and brace lines and
+matched no item but `load_input`. **Every other pattern's declared figure equals
+its gate total exactly** — p01 6, p02 10, p03 10, p05 6, p07 6, p08 10, p11 6,
+p16 6, p17 6 — so the rule is "quote `tcb_items`", and corrected, **p09 has the
+second-smallest trusted base in the project**, not one of the largest. The
+interesting fact was never the size: it is which *kind* of item is in it.
 
 **p09 is the first pattern in this project whose trusted item models a CPU
 INSTRUCTION rather than a memory operation.** p08's `copy_in` is the precedent
@@ -539,19 +592,40 @@ loop rather than restate it with one indexed read.
 
 ---
 
-## 6. THE TWO BUGS — and the task file's premise about `q >> 5` is measured FALSE
+## 6. ONE CHARACTER, ONE POSITION — `q >> 5` is caught by everything and `q >> 7` by nothing
 
-`.tasks/TASK_038.md` predicted "every rung catches the first, no rung catches the
-second, and the `ensures` catches the second only because `model.py` disagrees",
-with `q >> 5` and `q & 31` as two spellings of one arithmetic bug. **They are not
-the same bug and only one of them is arithmetic.**
+**This is p09's headline and it is a pair, not a list.** Both edits change the
+digit of the shift in `words[q >> 6]`, in the same character position, by one:
 
-`q >> 5` is `q / 32`, which is **larger** than `q / 64`, so under the guard
-`q < nbits` it names word indices up to roughly `2·nwords` — off the end of the
-bitset. It is a **second spatial bug**. `q & 31` is the genuine arithmetic one:
-the index is untouched, the wrong *bit* is tested, and the answer is wrong.
+```
+words[q >> 6]   shipped
+words[q >> 5]   q/32 >= q/64, so it OVERSHOOTS: a second SPATIAL bug, caught by
+                the bounds check, by ASan, by Miri and by the proof
+words[q >> 7]   q/128 <= q/64, so under `q < nbits` it is ALWAYS a legal word
+                index: caught by NOTHING, at zero instruction cost
+```
 
-### 6a. What R5 says — seven mutants, all from `controls/gen_controls.py`
+`q >> 7` is legal because `q < nbits ⟹ q/128 ≤ q/64 < ⌈nbits/64⌉ = nwords`, and
+the shipped R4 and the bugged R4 are **368 bytes of machine code with one
+differing byte** (`.temp/p39/NOTES.md` 4a: offset 156, `06` → `07`; the
+disassembly differs in exactly one instruction, `shr $0x6,%r15d` →
+`shr $0x7,%r15d`, and in nothing else). All three Rust rungs and both C rungs
+print the same wrong answer.
+
+⚠ **This pattern used to publish "two one-character bugs", meaning `q >> 5` and
+`q & 31`, and that was wrong on both counts** (TASK_038_REVIEW B1). `q >> 5` is
+not arithmetic — it is spatial. `q & 31` is not one character — it is a *two*-
+character substitution (`63` → `31`) and it costs **+32% on R4**. The
+one-character mask edit is `q & 3`, and it costs **more** (§6b). The pair above
+is the honest headline; the mask bug is a different result and §6b prices it.
+
+⚠ **`.tasks/TASK_038.md`'s premise was the reverse of the measurement**: it
+predicted `q >> 5` and `q & 31` as two spellings of *one arithmetic bug*. They
+are two different bugs, only one of them is arithmetic, and the arithmetic index
+bug the task file was reaching for exists — it is `q >> 7`, which nobody had
+tried.
+
+### 6a. What R5 says — fifteen rows, all from `controls/gen_controls.py`
 
 | variant | exec | functional spec | Verus |
 |---|---|---|---|
@@ -560,95 +634,175 @@ the index is untouched, the wrong *bit* is tested, and the answer is wrong.
 | `m_shift5` | `q >> 5` | as shipped | 17 verified, **1 errors** — *possible arithmetic underflow/overflow* on the index |
 | **`m_shift5_msonly`** | `q >> 5` | **stripped** | 17 verified, **1 errors** — ***precondition not satisfied***. **Memory safety alone catches it.** |
 | `m_shift5_spec` | `q >> 5` | `word_of = /32` | 16 verified, **2 errors** — moving the spec does not help |
+| `m_shift7_bare` | `q >> 7` | as shipped | 17 verified, **1 errors** — precondition **and** the invariant: proof weakness, cf. bare `q & 31` |
+| `m_shift7` | `q >> 7` | as shipped | 18 verified, **1 errors** — *invariant not satisfied*, **functional only** |
+| **`m_shift7_msonly`** | `q >> 7` | **stripped** | **19 verified, 0 errors** — **INVISIBLE to memory safety** |
+| `m_shift7_spec` | `q >> 7` | `word_of = /128` | 17 verified, **2 errors** — the bridge lemma is now false; move it too → |
+| **`m_shift7_spec2`** | `q >> 7` | `word_of = /128` + lemma | **20 verified, 0 errors** — **INVISIBLE entirely** |
 | `m_mask31_fixshift` | `q & 31` | as shipped | 18 verified, **1 errors** — *invariant not satisfied*, **functional only** |
 | **`m_mask31_msonly`** | `q & 31` | **stripped** | **19 verified, 0 errors** — **invisible to memory safety** |
 | **`m_mask31_spec`** | `q & 31` | `bit_of = %32` | **20 verified, 0 errors** — **invisible entirely** |
+| `m_scale4` | `4 * (q >> 6)` | as shipped | 17 verified, **1 errors** — *invariant not satisfied*, **functional only** |
+| **`m_scale4_msonly`** | `4 * (q >> 6)` | **stripped** | **18 verified, 0 errors** — invisible, and **with no ghost line at all** |
 
 `.memory/04-verus.md` requires the positive control and it is row 2: stripping
-the functional spec does not blind the probe. All seven rows are regenerated by
-the committed `controls/gen_controls.py` (which asserts its own substitution hit
+the functional spec does not blind the probe. All rows are regenerated by the
+committed `controls/gen_controls.py` (which asserts its own substitution hit
 counts off the shipped `verus.rs`) and re-verified from that generator: the
-counts above are the second, reproduced run, not the exploratory one. The two
-that carry the result, in full:
+counts above are the second, reproduced run, not the exploratory one.
+
+⚠ **THE PROBE IS NOT BLIND, and that was attacked four ways** (TASK_038_REVIEW).
+`assert(false)` in the kernel body, in the query loop and in the popcount loop
+all fail (`17/1`, `18/1`, *assertion failed*), and deleting the guard
+`if q < nbits` from the stripped configuration fails with *precondition not
+satisfied* on both `m_control_msonly` and `m_mask31_msonly`. So a memory-safety-
+only proof that **still catches R1's own spatial bug on the same file**
+discharges `q >> 7` and `q & 31` at `19 verified, 0 errors`.
+
+The two that carry the result, in full:
 
 ```
+$ ./verus_run.py .temp/p09/controls/m_shift7_msonly.rs --multiple-errors 20
+verification results:: 19 verified, 0 errors
+
 $ ./verus_run.py .temp/p09/controls/m_shift5_msonly.rs --multiple-errors 20
-error: precondition not satisfied        <- the ACCESSOR's, with no functional spec
+error: precondition not satisfied        <- load_u64's, with no functional spec
 error: possible arithmetic underflow/overflow
 verification results:: 17 verified, 1 errors
-
-$ ./verus_run.py .temp/p09/controls/m_mask31_fixshift.rs --multiple-errors 20
-error: invariant not satisfied at end of loop body    <- and nothing else
-verification results:: 18 verified, 1 errors
 ```
 
-⚠ **Honest caveat.** `q & 31` without help also fails a *second*,
-non-substantive obligation — `possible bit shift underflow/overflow` on
-`1u64 << (q & 31)` — because the supporting lemma names the constant 63 and
-nothing then proves `(q & 31) < 64`. `m_mask31_fixshift` supplies
+⚠ **The obligation that fires is `load_u64`'s — a VERIFIED item's precondition,
+not the trusted accessor's.** This file said "the ACCESSOR's" until TASK_039 and
+that was a mis-attribution (TASK_038_REVIEW B2). The error points at
+`verus.rs:427`, `p + 8 <= buf@.len()`, which belongs to `load_u64`; deleting
+`buf_get_unchecked`'s `requires` changes **nothing** (shipped 18/0 → 18/0,
+`m_mask31_msonly` 19/0 → 19/0, `m_shift5_msonly` 17/1 → 17/1). The trusted
+clause is **shadowed, not dead**: delete the *decoders'* preconditions and keep
+the accessor's, and the failure moves inside `load_u32`/`load_u64`.
+
+**p09 is the only pattern here whose decoder wrappers carry their own `requires`
+(0 in all nine others), so this is the first time the memory-safety obligation
+sits OUTSIDE the TCB boundary** — in verified code, discharged by the verifier,
+rather than at the trusted edge. That is a better result than the one this file
+originally claimed.
+
+⚠ **Two honest caveats about the "bare" rows.** `q & 31` without help also fails
+a *second*, non-substantive obligation — `possible bit shift underflow/overflow`
+on `1u64 << (q & 31)` — because the supporting lemma names the constant 63 and
+nothing then proves `(q & 31) < 64`; `m_mask31_fixshift` supplies
 `assert((q & 31) < 64) by (bit_vector)` so the single remaining error is the
-substantive one. **Quote the `fixshift` row, never the bare one.**
+substantive one. `q >> 7` has the same shape: `m_shift7_bare` fails the
+precondition *as well*, because nothing relates `q >> 7` to `q >> 6`, and one
+line — `assert((q >> 7) <= (q >> 6)) by (bit_vector)`, a pure bit-vector fact,
+no new trusted item and no assumption — is what makes the row substantive.
+**Quote the `fixshift` and `m_shift7` rows, never the bare ones.** The scale
+edit needs no line at all, which is the asymmetry §6b closes with.
 
 **So the answer to "which rungs catch which bug, and with what":**
 
-- **The mask bug `q & 31`** is caught by **nothing** except a functional
-  specification written independently of the code — and if the author's
-  misunderstanding reaches the specification (`bit_of = q % 32`), R5 verifies
-  cleanly. `20 verified, 0 errors` is a program proved to meet its
+- **The index bug `q >> 7`** is caught by **nothing**: not by rustc's bounds
+  check, not by ASan or UBSan, not by Miri, not by the memory-safety proof, and
+  not by moving the specification. Only a functional `ensures` written
+  independently of the code sees it, and `m_shift7_spec2` shows that too fails
+  once the author's misunderstanding reaches the spec. **This is the pattern's
+  lead.**
+- **The mask bug `q & 31`** is the same story on a different operator, and it
+  ends the same way: `20 verified, 0 errors` is a program proved to meet its
   specification, whose specification is the bug. **That is the manager's
-  designed result and it stands.**
-- **The shift bug `q >> 5`** is caught by R5 through the **accessor's
+  designed result and it stands** — at a *two*-character edit distance.
+- **The shift bug `q >> 5`** is caught by R5 through **`load_u64`'s
   precondition**, with the functional `ensures` deleted, and moving the
   specification to match it does not help — because the spatial obligation does
-  not come from the `ensures` at all. **That is a better result than the one
-  designed for, and it is the pattern's lead.**
+  not come from the `ensures` at all.
 
 ### 6b. What everything else says — cost, sanitisers and where the bounds check is
 
-`.temp/p09/ctlmeasure.py`, marginal Ir/call, `-O3 isolated`, and equivalence
-against `model.py` on all five shipped inputs (`=` matches):
+`.temp/p09/ctlmeasure.py` and `.temp/r38/marg.py`, marginal Ir/call,
+`-O3 isolated`, and equivalence against `model.py` on all five shipped inputs
+(`=` matches). Every figure below was re-measured at TASK_039:
 
 | control | `n_fn` | `small` | `large` | equiv (small/large/oob/edge/count) |
 |---|---:|---:|---:|---|
 | `safe_naive` | 293 | 16628.30 | 60928.30 | `=====` |
+| **`x_shift7_n`** | **293** | **16627.70** | — | `XXXX=` |
 | `x_shift5_n` | 293 | 16628.00 | 60928.00 | `XXXX=` |
 | `x_mask31_n` | 312 | 20455.30 | 74210.70 | `XXXX=` |
 | `safe_tuned` | 291 | 20448.30 | 73404.30 | `=====` |
+| **`x_shift7_t`** | **291** | **20447.70** | — | `XXXX=` |
 | `x_shift5_t` | 291 | 20448.00 | 73404.00 | `XXXX=` |
 | `x_mask31_t` | 291 | 20448.30 | 73403.70 | `XXXX=` |
 | `unsafe` | 102 | 6692.30 | 24519.30 | `=====` |
+| **`x_shift7_u`** | **102** | **6691.70** | **24519.00** | `XXXX=` |
 | `x_shift5_u` | 102 | 6692.00 | 24519.00 | `XXXX=` |
-| **`x_mask31_u`** | **113** | **8845.30** | **31990.70** | `XXXX=` |
+| `x_scale4_u` | 102 | 6692.00 | — | `XXXX=` |
+| `x_mask31_u` | 113 | 8845.30 | 31990.70 | `XXXX=` |
+| **`x_mask3_u`** | **120** | **10518.00** | **37801.30** | `XXXX=` |
 
-⚠ **"The same machine code shape at a different constant" is FALSE, measured.**
-`q & 63` is free — the hardware masks `bt`'s shift amount mod 64 — so the wrong
-constant needs a real `and`: **`x_mask31_u` costs R4 +2153.00 Ir/call on `small`
-(+32.2%) and +9.00 per guarded query** (fit: `/guarded` 20.00 against 11.00).
+**`q >> 7` costs ZERO instructions on every rung**, and `n_fn` is identical on
+all three. The sub-unit difference (−0.60 on every rung; −0.30 for `x_scale4_u`)
+is inside the driver's own `println!` term, which §3 measures at **−1.00** between two
+*byte-identical* kernels — so they cannot be kernel work, and on R4 the whole
+368-byte kernel is in fact **one byte different**. `q >> 5` is free the same way
+(0.00 on every rung).
+
+⚠ **THE COST OF THE MASK BUG IS A LOST LOAD MERGE, NOT A MASK — there is no
+`and` anywhere in `x_mask31_u`'s guarded body** (TASK_038_REVIEW M2; this file
+previously said "the wrong constant needs a real `and`" and that is measured
+false — the only `and`s in the kernel are the SWAR popcount's). What `q & 31`
+does is let LLVM prove the tested bit is in the **low 32 bits**, so it **narrows
+the load**: the merged 8-byte `mov (%rdi,%r15,1),%r15` splits into
+`mov ..,%r12d` + `movzwl 0x4` + `movzbl 0x6` + `movzbl 0x7` (**4+2+1+1**) and the
+test becomes a 32-bit `bt %r14d,%r12d`. Guarded body 35 against 26, i.e.
+**+9.00 per guarded query** (fit: `/guarded` 20.00 against 11.00) and
+**+2153.00 Ir/call on `small`, +32.2%**.
+
+**That is the same mechanism as §4c's**, which unifies p09's two cost stories:
+every instruction p09 pays for a bug or for a reslice is the eight-byte
+load-merge idiom being lost, and the amount is set by how narrow the surviving
+consumer is.
+
+**The one-character mask edit confirms it and is DEARER.** `q & 3` (a single
+deletion, matching `q >> 7`'s edit distance) narrows the tested operand to one
+*byte*, so the load splits **six** ways (1+1+2+2+1+1) and this time a real
+`and $0x3,%r14d` does appear — because only a 32-bit `bt` masks its operand for
+free. Guarded body 42 against 26: **+16.00 per guarded query, +3825.70 on
+`small` (+57.2%) and +13282.00 on `large`.** So matching the edit distance does
+not make the mask bug free; it makes it worse, and `q >> 7` remains the only
+free one.
+
 The mask bug is free on the *safe* rungs (`x_mask31_t` is +0.00 on `small`)
-because they already spend 45 instructions per guarded query that the extra
-`and` hides inside. **The arithmetic bug's cost is not zero and it is not the
-same on every rung.**
-
-`q >> 5` **is** free: 0.00 on every rung, and `n_fn` unchanged on R3 and R4.
+because they never had the merge to lose — §4c: R3's query loop is already
+decoding byte by byte.
 
 **Sanitisers, gcc `-O1 -g -fsanitize=address,undefined -static-libasan
--static-libubsan`, the gate's own flags, on `small.bin`:**
+-static-libubsan`, the gate's own flags:**
 
-| build | exit | stdout | diagnostic |
-|---|---|---|---|
-| shipped `kernel_hardened.c` | 0 | `12759648911969524195` (= model) | none |
-| `x_mask31.c` | 0 | `16409156155243397307` | **none** |
-| `x_shift5.c` | 0 | `1713513234165324099` | **none** |
+| build | input | exit | stdout | diagnostic |
+|---|---|---|---|---|
+| shipped `kernel_hardened.c` | `small` | 0 | `12759648911969524195` (= model) | none |
+| `x_mask31.c` | `small` | 0 | `16409156155243397307` | **none** |
+| `x_shift5.c` | `small` | 0 | `1713513234165324099` | **none** |
+| `x_shift5.c` | `thin` | 1 | — | **`heap-buffer-overflow`** |
+| **`x_shift7.c`** | `small` | 0 | `3393155352413092229` | **none** |
+| **`x_shift7.c`** | `large` | 0 | `14870482563458464910` | **none** |
+| **`x_shift7.c`** | `oob` / `edge` / `count` | 0 | wrong / wrong / `0` | **none** |
+| **`x_shift7.c`** | `thin` | 0 | `13683142426360191424` | **none** |
 
-**Both bugs are silent under ASan+UBSan on the shipped inputs, and both are
-wrong.** For the mask bug that is the whole point. For the shift bug it is
-because the overshoot lands **inside the same allocation**: the query array
-follows the word array, so `words[q >> 5]` reads query bytes. That is p17's
-finding — *the language's bound is the slice it was given* — reproduced on a
-pattern where the wrong index is produced by arithmetic rather than by a signed
-subtraction.
+**All three bugs are silent under ASan+UBSan on the shipped inputs, and all
+three are wrong.** For the mask bug and for `q >> 7` that is the whole point.
+For `q >> 5` it is because the overshoot lands **inside the same allocation**:
+the query array follows the word array, so `words[q >> 5]` reads query bytes.
+That is p17's finding — *the language's bound is the slice it was given* —
+reproduced on a pattern where the wrong index is produced by arithmetic rather
+than by a signed subtraction. **`q >> 7` has no such input at all**, which is the
+difference between the two rows: it is silent on `thin.bin` too, and on every
+blob, because it never leaves the bitset.
 
-**And here is the input that shows R5 was right to reject it.**
+Miri on `x_shift7_u` (the gate's own protocol, `n_iters` rewritten to 4):
+`exit=0`, **no UB**, wrong answer, on `small`, `adversarial-edge` and
+`adversarial-oob`.
+
+**And here is the input that shows R5 was right to reject `q >> 5`.**
 `.temp/p09/thin.py` builds `thin.bin`: `nbits = 1024` (16 words, 128 B) with only
 `nq = 4` queries (16 B), so the overshoot leaves the 152-byte blob.
 
@@ -658,12 +812,49 @@ subtraction.
 | `x_shift5_u` (unsafe) | `6437231379592215552` — **wrong, silent, exit 0**, 112 B past the blob |
 | `x_shift5_t`, `x_shift5_n` (safe) | **panic: index out of bounds** |
 | `x_shift5.c` under ASan | **`heap-buffer-overflow` READ of size 1**, exit 1 |
+| **`x_shift7_{u,t,n}` and `x_shift7.c`** | **`13683142426360191424` — wrong, silent, exit 0, and IN BOUNDS** |
 
 So: **the bounds check and the sanitiser catch `q >> 5` on an input nobody would
 think to write, and never on the five shipped ones; the proof catches it on
 every input, because its obligation is universally quantified.** `thin.bin` is a
 `.temp/` probe with a committed generator rather than a matrix input, because no
-*shipped* rung behaves differently on it.
+*shipped* rung behaves differently on it. **And there is no `thin.bin` for
+`q >> 7`** — no input exists on which any of these mechanisms fires, because the
+index never leaves the bitset.
+
+### 6c. ONE STEP FURTHER — the invisible class is not a singleton
+
+`q >> 7` was found by looking one step past `q >> 5`; TASK_039 looked one step
+past `q >> 7`. **The access is `load_u64(buf, ws + (C * (q >> S)) as usize)`, its
+obligation is `ws + C·(q >> S) + 8 ≤ buf@.len()`, and the loop invariants
+(`q >> S ≤ q >> 6 < nwords`, `qs == ws + 8·nwords`, `off + len ≤ buf@.len()`)
+reduce it to `C·(nwords − 1) + 8 ≤ 8·nwords`**, so:
+
+| lever | in bounds (invisible) | out of bounds (spatial) |
+|---|---|---|
+| shift digit `S` | **7, 8, 9** — every digit *above* 6 undershoots | **5, 4, …** — every digit below |
+| scale `C` | **0 … 7** — every factor *below* 8 | **9** (needs `nwords ≤ 1`) |
+
+That is **at least nine one-character index edits that no memory-safety
+mechanism can see**, in one expression. The scale lever was measured as the
+second instance (`x_scale4_*`, `m_scale4*`):
+
+- `8 * (q >> 6)` → `4 * (q >> 6)` is a **misaligned word read**, wrong on
+  `small`, `large`, both adversarial blobs and `thin.bin`, in **all three Rust
+  rungs**, exit 0, no panic; Miri `exit=0`, no UB;
+- **6692.00 against 6692.30**, `n_fn` 102 = 102, and again **one differing byte**
+  in 368 (offset 160, the SIB scale field: `lea (%r9,%r15,8)` → `lea (%r9,%r15,4)`);
+- `m_scale4_msonly` is **18 verified, 0 errors** — invisible **with no ghost line
+  at all**, where `q >> 7` needed `assert((q >> 7) <= (q >> 6)) by (bit_vector)`.
+  The reason is that `4·(q>>6) + 8 ≤ 8·nwords` is *linear* in facts the loop
+  invariant already carries, while `q >> 7 < nwords` is a bit-vector fact about a
+  shift the invariant never mentions.
+
+**`q >> 7` is still the one to quote**, because it is the only member of the
+class that sits in `q >> 5`'s own character position — which is what makes the
+pair a controlled comparison rather than an anecdote. The rest are here so that
+the headline reads as *"the smallest member of a family memory safety cannot
+see"* and not as a curiosity.
 
 ---
 
@@ -734,6 +925,14 @@ p09 asks the same question about a bound derived through `>>`.
    56.00 to **14.00** and the kernel from 291 to 218 instructions — **49% of the
    marginal on `small`, 47% on `large`.**
 
+⚠ **HALF OF THAT WIN IS A RESTORED LOAD IDIOM, NOT A DELETED CHECK.** The
+guarded body goes 82 → 40, and by §4c's decomposition that is **−20 deleted
+checks, −21 the eight-byte load merge coming back, −1 the spill it was causing**.
+Once the clamp establishes the address is in range, LLVM re-merges the eight byte
+loads into one `mov` — the idiom the reslice had cost it. So "seeding deletes 49%
+of the kernel" is true and "seeding deletes the bounds checks" is only half of
+why (TASK_038_REVIEW M1).
+
 **So p09 localises the seeding boundary that p03 could only demonstrate.** The
 inference LLVM will not make is not `q < nbits ⟹ q >> 6 < nwords` (giving it
 that for free changes nothing); it is the *composition*
@@ -745,10 +944,24 @@ proof states it at the index.
 Two qualifications, both measured:
 
 - ⚠ **`m_clampb_lo`, one byte short of what the access needs, behaves like
-  `m_clampb`** (same three slopes, +3 instructions statically, −1.00 Ir). p03's
-  `sp > 65` separated cleanly; p09's does not, and the 3-instruction static
-  difference is unexplained. Do not quote a one-instruction win here
-  (`.memory/03-measurement.md`).
+  `m_clampb`** (same three slopes, +3 instructions statically, −1.00 Ir) —
+  **and the mechanism is now known** (TASK_038_REVIEW m1, re-read off my own
+  build at TASK_039). LLVM does **not** delete the 8th byte's check; it **fuses
+  it into the clamp**, by splitting the comparison three ways:
+
+  ```
+  m_clampb      lea 0x10(,%r10,8),%r9 ; cmp %rbx,%r9 ; ja <return 0>   then the merged load
+  m_clampb_lo   lea 0xf(,%rbp,8),%r8  ; cmp %rcx,%r8 ; ja <return 0> ; jb <loop top>
+                                                       `==` falls through to the panic block
+  ```
+
+  Both query-loop bodies are **40 instructions**, so there are **zero extra hot
+  instructions**; the +3 static is the extra landing block, and the −1.00 Ir is
+  one `mov` in `m_clampb`'s *prologue* that register allocation does not emit in
+  `m_clampb_lo`. **So p03's "one past the invariant" control DOES separate on
+  p09** — by 3 static and 0 dynamic — because the extra obligation rides a branch
+  that was already there. Still do not quote a one-instruction win
+  (`.memory/03-measurement.md`); quote the mechanism.
 - ⚠ **Seeding only works after the reslice.** On R2, `m_clampb_n` moves
   `/guarded` 34.00 → 37.00 — it does **not** delete anything. Mechanism: R2
   indexes `buf` absolutely and nothing in R2 ever establishes
@@ -893,26 +1106,41 @@ Fourth measured instance after p16, p05, p11 and p03.
 
 ## 11. What p09 adds to the ladder
 
-1. **The first pattern whose safety check is not a bounds check**, and the answer
+1. **ONE CHARACTER, IN ONE POSITION, IS THE DIFFERENCE BETWEEN A BUG EVERYTHING
+   CATCHES AND A BUG NOTHING CATCHES.** `words[q >> 5]` is caught by rustc's
+   bounds check, by ASan, by Miri and by `load_u64`'s precondition;
+   `words[q >> 7]` is caught by **none** of them, on any input, at **zero
+   instruction cost**, on an R4 kernel that differs from the shipped one in
+   **one byte of 368**. It is one of at least nine such edits in that expression
+   (§6c). The mask bug `q & 31` tells the same story on a different operator but
+   at **two** characters and **+32% on R4**.
+2. **The first pattern whose safety check is not a bounds check**, and the answer
    is that it matters: on a **linear** index the safety tax is `0.00000` per word
    and `−3.00000` per query; on the **shift-derived** index it is `+45.00000` per
    guarded query as shipped and `+4.00000` at best. Same rung, same call, same
    buffer, same decoder — three checks, three answers.
-2. **p03's seeding result does not transplant, and p09 says where the boundary
+3. **The memory-safety obligation sits OUTSIDE the TCB boundary here, for the
+   first time in this project.** What fires on `q >> 5` is `load_u64`'s
+   `p + 8 <= buf@.len()` — a *verified* item's precondition. p09 is the only
+   pattern whose decoder wrappers carry their own `requires`, and the trusted
+   accessor's clause is **shadowed, not dead**. TCB is **7 lines across 4
+   items**, the second-smallest here.
+4. **p03's seeding result does not transplant, and p09 says where the boundary
    is.** Handing LLVM the fact at the *word index* — exactly what the proof
    proves — changes nothing in Rust or in C; handing it at the *byte offset*
    deletes 49% of the kernel. The failed inference is the composition, not the
-   shift.
-3. **Two one-character bugs whose obligations are different.** `q & 31` is caught
-   only by a functional specification written independently of the code, and not
-   even by that if the misunderstanding reaches the spec (`20 verified, 0
-   errors`). `q >> 5` is caught by the accessor's **precondition** with the
-   functional spec deleted — and by nothing else on any shipped input, in any
-   rung, under any sanitiser, at zero instruction cost.
-4. **The intrinsic comparison is a null and the library difference is not.**
+   shift. **And half of that win is a restored load idiom, not a deleted check.**
+5. **A conditional, checkable reslice hazard, and it is the whole of the first
+   R3 > R2 inversion in this project.** `reslice` + a data-derived index + a
+   multi-byte decode at it ⇒ LLVM loses the eight-byte load-merge idiom, in
+   exactly one of eight loops. `+21` lost merge, `+1` spill, `−5` cheaper query
+   checks = `+17` net. The same mechanism prices `q & 31` (+9/guarded, the load
+   narrows to 4+2+1+1) and `q & 3` (+16/guarded, six ways) — **one mechanism,
+   every cost story in this pattern.**
+6. **The intrinsic comparison is a null and the library difference is not.**
    `__builtin_popcountll` (clang) and `u64::count_ones()` (rustc) lower to the
    same 23-instruction SWAR body; gcc calls `__popcountdi2` and pays +29.00 per
    word. No rung emits `popcnt` at this box's default `-march`.
-5. **The first trusted item in this project that models a CPU instruction**
+7. **The first trusted item in this project that models a CPU instruction**
    rather than a memory operation, and the first twin that has to *implement* a
    contract with a loop rather than restate it with one indexed read.

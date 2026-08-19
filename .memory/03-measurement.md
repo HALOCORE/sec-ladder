@@ -630,17 +630,22 @@ every number.** On p09 that constant is **55% of the `small` figure and 73% of
 
 **A whole mechanism died on this.** p09 published "the extra instructions retire
 far cheaper than the average instruction" (ILP) from a 2–4× `Ir`-vs-`ns` gap.
-Corrected, **R3's `ns` penalty EXCEEDS its `Ir` penalty** — the ILP reading is
-refuted for R3 and survives for R2 only at 1.2–1.5×.
+Corrected, **the largest surviving factor across four runs is 1.5×, not 2–4×** —
+so the ILP reading dies either way. ⚠ **But name the blob** (TASK_039): R3's `ns`
+penalty exceeds its `Ir` penalty **on `small` only** (+215…+220% against `Ir`'s
++205.6%, a dead heat to +7%); on `large` it stays *below* at +179…+183% against
++199.4%.
 
 **Rules:**
 
 1. **Never quote a wall-clock ratio off the raw column.** Quote the level if you
    must, and label it *"includes the per-process constant"*.
 2. The correction subtracts two noisy minima, so it is **noisier than the raw
-   column** — on p09 `R5 − R4` reads +2.7% / +4.1% where it must be 0. Only quote
-   a corrected ratio when the effect is far above that; p09's R2/R3 effects are
-   25–80×.
+   column**, and the residual is a **session property**: `R5 − R4` — which must be
+   0, the kernels being byte-identical — read **−0.9%, +2.6%, +2.7%, +8.7%** over
+   four runs (TASK_039). **Quote ±9 points as the error bar**, and only quote a
+   corrected ratio when the effect clears it by a wide margin: p09's R2/R3 rows
+   clear it by **11–25×**, not the 25–80× first written.
 3. This is orthogonal to the layout modes below. Do **both**.
 
 ### This box's `ns` noise floor is a SESSION property, not a constant
