@@ -1,5 +1,54 @@
 # TASK_026 — p07 binary search: the first kernel where the clock is set by branches, not instructions
 
+> **ADDENDUM, written at dispatch.** This file was drafted before TASK_025_REVIEW,
+> TASK_027_REVIEW and TASK_028 landed, and it is **numbered out of order** — it
+> was queued as 026 and dispatched after 028. Everything below stands; §0 is what
+> those three tasks changed, and where §0 and the body disagree, **§0 wins.**
+>
+> ## §0 — what changed while this file sat in the queue
+>
+> 1. **Never publish a bare per-byte (or per-element) rate, and never a difference
+>    of rates across unmatched spellings. Publish only matched-spelling
+>    differences.** A bare rate is not a property of the kernel — p16's ranges
+>    5.04688…6.62500 in contract, one exact-string substitution apart. This
+>    supersedes §2 item 4's weaker "name the spelling beside the rate", which
+>    demonstrably did not catch its own author's headline.
+> 2. **A five-decimal rate must come from the DISASSEMBLY (`body_len / K`), never
+>    from a marginal.** The driver's `println!` costs 0.2263 Ir/call/digit and a
+>    matched pair divides it by only the folded bytes, so a measured slope carries
+>    `0.2263·Δ(Δdigits)/(bytes)` — **±0.09 Ir/byte on p16's shipped fold**. A
+>    matched-spelling *difference* is exempt and exact, because both rungs print
+>    the same checksum. Applies directly to §3 item 1's "Ir per search".
+> 3. **RUN `./verus_run.py` ON AN R5 TWIN BEFORE DIFFERENCING ANY UNSAFE-SIDE
+>    VARIANT.** p07 pins `identity` like every other pattern, and **a rung covered
+>    by an `identity` pin is chained to the prover**: an R4 candidate that vstd
+>    cannot express at the pinned version is not a rung, and its number means
+>    nothing. This check would have caught five published figures across two
+>    patterns over four tasks; it costs about eleven minutes. **Read the error
+>    text, not the exit code** — `is not supported` disqualifies (it forces a new
+>    *trusted* item); *"postcondition not satisfied"* disqualifies nothing.
+> 4. **No pair interval.** §2 item 3 says "an interval, not a minimum" — correct
+>    about the minimum, wrong about the interval. Both pair intervals this project
+>    published were built from R4s that are not rungs. What p07 ships is the
+>    **fixed-R4 bound** (`R3ship − R4ship`, R4 held by fiat) and an **R3-side
+>    span**. If you search the R4 side and find it does not move, say so as
+>    **"degenerate"** — the pair interval collapses onto the R3-side span — which
+>    is falsifiable, where "unavailable" is not.
+> 5. **Name the sweep band `sweep-*` and nothing else.** That prefix is the whole
+>    mechanism (`check.py:459-460`, `measure.py:60`), and a band named otherwise
+>    enters the measurement matrix. Appended last, a `sweep-*` band costs **a gate
+>    re-run only, not a re-measure** — so §2 item 2 is cheap, and there is no
+>    excuse for the p17 failure it exists to prevent. **Verify `gen.py` is
+>    deterministic by regenerating twice and diffing**; the gate hashes `gen.py`
+>    and never the blobs, so that determinism is the entire basis of the claim.
+> 6. **`.memory/01-ladder.md`'s direction test is flagged BROKEN** with a
+>    PROVISIONAL repair. Do not cite it for anything.
+> 7. **Housekeeping now mandatory** (`.memory/00-environment.md` constraint 6):
+>    delete your binaries and generated blobs once the gate is green, keep scripts
+>    and notes. **Run measurements in the FOREGROUND** — background `nohup` jobs on
+>    this box are reported "completed" while still running, which corrupted a data
+>    point two tasks ago. Per-PID scratch paths.
+
 **Role:** research engineer
 **Read first:** `.tasks/PROTOCOL.md`, `.memory/01-ladder.md` (findings 3–5 **and**
 the named-spelling-standard block including the direction test),
@@ -9,8 +58,8 @@ in full** — p05 is the template you clone (it is the most recent full build an
 carries the idiom block in its mature form). Where this spec is silent, **do what
 p05 did.**
 
-Do not start until TASK_025_REVIEW has landed and the manager has told you so;
-its findings may change §6 below.
+TASK_025_REVIEW, TASK_027_REVIEW and TASK_028 have all landed. **Start now**, and
+read §0 above first.
 
 ## Why this pattern, and why now
 
