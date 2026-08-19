@@ -610,6 +610,39 @@ a data-dependent path length, and is that dependence shared by every rung?**
 p03 is also the second pattern whose whole-program marginal does not cancel the
 environment, and the first where the mechanism is a **stack** buffer's alignment.
 
+### `measure.py`'s `ns` column is a whole-process LEVEL, never a difference
+
+⚠ **Project-wide, measured at TASK_038_REVIEW, and it changes every published
+wall-clock ratio.** `measure.py` times whole process invocations, so **the
+per-process constant — argv, file I/O, payload decode, process setup — is inside
+every number.** On p09 that constant is **55% of the `small` figure and 73% of
+`large`**; on `large`, 7.15 ms of R4's 9.75 ms is just the 8.2 MB payload read.
+
+**Subtract it.** Run the same blob with `n_iters` rewritten to **1** and difference
+— the marginal construction this file already endorses for `Ir`:
+
+| pair | `Ir` | `ns` as published | `ns` kernel-only |
+|---|---|---|---|
+| p09 R3−R4 `small` | +205.6% | +99.1% | **+215.4%** |
+| p09 R3−R4 `large` | +199.4% | +50.2% | **+183.1%** |
+| p09 R2−R4 `small` | +148.5% | +58.0% | **+125.6%** |
+| p09 R2−R4 `large` | +148.5% | +26.5% | **+100.0%** |
+
+**A whole mechanism died on this.** p09 published "the extra instructions retire
+far cheaper than the average instruction" (ILP) from a 2–4× `Ir`-vs-`ns` gap.
+Corrected, **R3's `ns` penalty EXCEEDS its `Ir` penalty** — the ILP reading is
+refuted for R3 and survives for R2 only at 1.2–1.5×.
+
+**Rules:**
+
+1. **Never quote a wall-clock ratio off the raw column.** Quote the level if you
+   must, and label it *"includes the per-process constant"*.
+2. The correction subtracts two noisy minima, so it is **noisier than the raw
+   column** — on p09 `R5 − R4` reads +2.7% / +4.1% where it must be 0. Only quote
+   a corrected ratio when the effect is far above that; p09's R2/R3 effects are
+   25–80×.
+3. This is orthogonal to the layout modes below. Do **both**.
+
 ### This box's `ns` noise floor is a SESSION property, not a constant
 
 **Measured at TASK_035, and it is why a wall-clock row can stop being quotable

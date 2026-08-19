@@ -760,6 +760,15 @@ review as a change to the committed artefact rather than only as a source diff.
   or fail, so a failing run does replace a passing one. Since TASK_005 it
   carries a sha256 of the contract block and of every source the gate read, so a
   stale record is at least detectable by comparing hashes against the tree.
+  ⚠ **A `forbidden` entry without BACKTICKS is audited zero times, and the
+  verdict line still counts it** (TASK_038_REVIEW). `check.py:929`'s audit keys on
+  `_TICK.findall`, so a bare-string entry is invisible to it while the line two
+  above still reports *"N forbidden spelling(s)"*. p09 shipped 5 forbidden entries
+  and **0 audited spellings** — its "forbidden: 0 hits" was kept by auditing
+  nothing. **Backtick every `forbidden` and `required` entry you want enforced**,
+  and read `audit  forbidden: N spelling(s)` — not the declaration line — as the
+  count that matters.
+
   ⚠ **"Detectable" was detectable BY HAND until TASK_035; now it is one
   command**, and it covers the measurement records too, which never had a hash
   block at all:

@@ -15,9 +15,8 @@ Rust, unsafe Rust + Verus proof — plus a sixth **R1h** hardened-C cell, across
 optimisation levels and two inline modes, and compared on assembly, executed
 instructions, timing, proof burden and trusted-base size.
 
-47 patterns are catalogued in `.memory/06-catalogue.md`. **Ten exist and all are
-green. Nine are reviewed** (p09 is built, green and **UNREVIEWED** — rule 9, its
-findings are in `patterns/p09-bitset/NOTES.md` and not in `.memory/` yet)**:** p01 (calibration), p02 (first real bug), p16 (first
+47 patterns are catalogued in `.memory/06-catalogue.md`. **Ten exist, all green,
+all reviewed:** p01 (calibration), p02 (first real bug), p16 (first
 data-dependent bound), p17 (the limit of memory safety), p05 (the first
 vectorised kernel), p08 (the first structural Rust win). **p07 (binary search) is
 built, green and UNREVIEWED** — per `PROTOCOL.md` rule 9 its findings are in
@@ -40,7 +39,7 @@ claim.
 ## The findings so far — this is the actual output
 
 **Numbering warning, because it has already cost an agent time.** The list below
-is **RECAP's own digest** and is numbered 1–19. `.memory/01-ladder.md` has a
+is **RECAP's own digest** and is numbered 1–20. `.memory/01-ladder.md` has a
 *different* list, numbered 1–7, one entry per pattern, and **that one is
 authoritative**. "Finding 12" means different things in the two files. When
 writing a task file, name the pattern (*"p05's causal claim"*), never the number.
@@ -544,50 +543,63 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    run**, no lemma. And the gate caught a **tautological conjunct on a trusted
    item** via 5c-twin's per-conjunct probe — its first fire on shipped code.
 
-19. **p09 — a one-character bug that a memory-safety proof cannot see, beside one
-   it catches without being asked.** ⚠ **UNREVIEWED (TASK_038).** First kernel
-   whose guard is **not a bounds check** (`q < nbits` guarding `words[q >> 6]`),
-   first where **R3 is dearer than R2**, first trusted item modelling a **CPU
-   instruction**.
+19. **p09 — one character, in one position, separates a bug everything catches
+   from a bug nothing catches.** (TASK_038, reviewed at TASK_038_REVIEW:
+   invisibility **confirmed against four vacuity attacks**; one blocker and five
+   majors against the prose, two of them project-wide.)
 
-   **The separation, seven Verus mutants with a positive control:**
+   ```
+   words[q >> 6]   shipped
+   words[q >> 5]   caught by memory safety ALONE, on every input
+   words[q >> 7]   caught by NOTHING — no bounds check, no ASan/UBSan,
+                   no Miri, no memory-safety proof
+   ```
 
-   | variant | functional spec | Verus |
-   |---|---|---|
-   | control | shipped | 18 / 0 |
-   | `m_control_msonly` | **stripped** | 18 / 0 ← the probe is not blind |
-   | `m_shift5_msonly` | **stripped** | **precondition not satisfied** |
-   | `m_mask31_msonly` | **stripped** | **19 / 0** |
-   | `m_mask31_spec` | moved to match | **20 / 0** |
+   `q >> 7` is `q/128 ≤ q/64`, so under the guard it is **always a legal word
+   index**: `19 verified, 0 errors` with the functional spec stripped, `20/0` once
+   the spec moves to match. **Zero instructions** (6691.70 vs 6692.30), identical
+   `n_fn`, and the guarded body identical **but for one immediate**. All five
+   builds print the same wrong answer. ⚠ **This is the example to quote, not
+   `q & 31`**, which is a *two*-character edit costing +32% on R4 — p09 shipped
+   calling both "one-character bugs" and that is wrong on both counts.
+   **The probe is not blind**: `_msonly` survived `assert(false)` in three places
+   and guard deletion, so a proof that still catches R1's spatial bug discharges
+   these clean.
 
-   So `q & 31` is **invisible to memory safety, and invisible entirely once the
-   spec moves with it** — while `q >> 5` (which is `q/32 ≥ q/64`, a *second
-   spatial* bug) is caught by the precondition even then. p17 showed a
-   memory-safe program can be wrong; **p09 puts the invisible bug one character
-   from a visible one in the same kernel.**
+   **The obligation that fires is a VERIFIED item's**, `load_u64`'s — not the
+   trusted accessor's, whose `requires` is *shadowed*. p09 is the only pattern
+   with decoder wrappers, so this is the first time the memory-safety obligation
+   sits **outside the TCB boundary**. TCB is **7 lines / 4 items**, the
+   second-smallest here.
 
-   **The three checks decompose** (90 blobs, pooled rank 4/4, every band alone
-   2/4): the popcount pass's linear index `+19` and **0.00000 cheapest
-   in-contract**; the query array's linear index `+11` and **−3.00000**; the
-   bitset word's **shift-derived** index **`+45.00`** and **+4.00000**.
+   ⚠ **The reslice hazard, and it is the whole of p09's R3 > R2 inversion** (the
+   first in this project). LLVM loses the 8-byte load-merge idiom on exactly one
+   of eight loops: **reslice + a data-derived index + a multi-byte decode at it**.
+   R2 keeps the merge on the *same* access. `+21` lost merge, `+1` spill, `−5`
+   cheaper checks = `+17`. **Half of the p03-style seeding win here is the
+   restored load idiom, not deleted checks**, and `q & 31`'s cost is the same
+   mechanism — which unifies p09's two cost stories. **p03's seeding control does
+   not transplant**: the failed inference is the composition through the
+   **multiply**, not the shift.
 
-   ⚠ **p03's seeding control does NOT transplant, and that localises the
-   mechanism.** A dead clamp on the *word index* — p03's exact shape — is **+461
-   dearer** and deletes nothing, in C as well as Rust. The same clamp on the
-   **byte offset** deletes **49% of the kernel**. And a clamp that says nothing is
-   byte-identical to shipped R3, reproducing p03's `sp > 1000`. **The inference
-   LLVM fails is the composition through the MULTIPLY, not the shift.**
+   The three-check decomposition has **zero free parameters** — every coefficient
+   is a loop-body instruction count off the listing, and out of sample it predicts
+   `large` to within **1.13 Ir of 73404**. `q >> 6` ≡ `q / 64` on all three
+   compilers, so that `forbidden` entry moves no number.
 
-   **`q >> 6` and `q / 64` are identical to every compiler here** — three
-   compilers, `usize`/`u32`, checked and unchecked, same emitted text; the linker
-   folded two probes together. The `forbidden` entry **moves no number** and is
-   kept only because it makes "the shift implements the division" a real Verus
-   obligation. (The first probe was thrown out: rustc const-propagated *into*
-   `#[inline(never)]` callees when built as a binary rather than a `lib` object.)
-   Intrinsics under p11's rule: **no rung emits `popcnt`** (no `-march`); clang's
-   builtin and rustc's `count_ones()` lower to the *same* 23-instruction SWAR — a
-   null — while **gcc calls `__popcountdi2` at +29.00/word**, invisible to the
-   kernel-exclusive column.
+20. **Two measurement defects found in passing, both project-wide.**
+   (TASK_038_REVIEW.)
+   **(a) `measure.py`'s `ns` column is a whole-process LEVEL, never a
+   difference** — the per-process constant (argv, file I/O, payload decode) is
+   inside every published wall-clock number, and on p09 it is **55% of `small`
+   and 73% of `large`**. Subtract `t(n_iters = 1)` before quoting any ratio. **A
+   whole mechanism died on this**: p09's "the extra instructions retire cheaper
+   than average" (ILP) came from a 2–4× `Ir`-vs-`ns` gap, and corrected, **R3's
+   `ns` penalty EXCEEDS its `Ir` penalty.** See `.memory/03-measurement.md`.
+   **(b) A `forbidden` entry without backticks is audited ZERO times**, while the
+   verdict line two above still counts it (`check.py:929` keys on `_TICK`). p09
+   shipped 5 forbidden entries and 0 audited spellings — its "forbidden: 0 hits"
+   was kept **by auditing nothing**. Backtick every entry you want enforced.
 
 ## Retracted — do not reinstate
 
@@ -723,7 +735,7 @@ headline. Say so in every task file.
 - **A tool that reports nothing may be a tool that cannot see.** ASan is silent
   on p08's overlap not because there is none but because fortify rewrote the call
   to `__memcpy_chk`. A gate row records `clean` for both reasons identically.
-- **Two files, two numbering schemes.** RECAP's findings are numbered 1–19,
+- **Two files, two numbering schemes.** RECAP's findings are numbered 1–20,
   `.memory/01-ladder.md`'s are 1–7. Name the pattern, never the number.
   **And one task file is misnumbered**: `.tasks/TASK_025_REVIEW.md` reviews
   **TASK_024**, not TASK_025 (there is no TASK_025). Every other

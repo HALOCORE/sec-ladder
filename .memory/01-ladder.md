@@ -1384,6 +1384,71 @@ places and points at nothing. **Name the pattern, never the number.**
    5c-twin's per-conjunct deletion probe — the first time that TASK_010 refinement
    has fired on shipped code rather than a constructed mutant.
 
+11. **p09 — one character, in one position, is the difference between a bug
+   everything catches and a bug nothing catches.** (TASK_038, reviewed at
+   TASK_038_REVIEW: invisibility claim **confirmed against four vacuity attacks**;
+   one blocker and five majors against the prose, two of them project-wide.)
+
+   ```
+   words[q >> 6]   shipped
+   words[q >> 5]   caught by memory safety ALONE, on every input:
+                   rustc's bounds check, ASan, Miri, and the proof's precondition
+   words[q >> 7]   caught by NOTHING:
+                   no bounds check, no ASan/UBSan, no Miri, no memory-safety proof
+   ```
+
+   `q >> 7` is `q/128 ≤ q/64`, so under the guard `q < nbits` it is **always a
+   legal word index** — and Verus proves it universally with one ghost line:
+   `m_shift7_msonly` **19 verified, 0 errors**, `m_shift7_spec2` **20 / 0** once
+   the spec moves to match. It costs **zero instructions** (6691.70 vs 6692.30),
+   `n_fn` is **identical at 102**, and the guarded body is the same 26
+   instructions **but for one immediate** (`shr $0x7` for `shr $0x6`). All five
+   builds print the same wrong answer; ASan+UBSan at the gate's own flags are
+   silent on every input.
+   ⚠ **This is the example to quote, not `q & 31`** — which is a *two*-character
+   substitution costing **+32% on R4**. p09 shipped calling both "one-character
+   bugs"; that is wrong on both counts.
+
+   **The probe is not blind**, which is what makes it a result: `_msonly` survived
+   four vacuity attacks — `assert(false)` in three separate places (17/1, 18/1),
+   and deleting the guard (`precondition not satisfied`) — so a memory-safety-only
+   proof that still catches R1's spatial bug on the same file discharges `q & 31`
+   and `q >> 7` clean.
+
+   **And the obligation that fires is a VERIFIED item's, not the trusted
+   accessor's.** It is `load_u64`'s `p + 8 <= buf@.len()`; deleting
+   `buf_get_unchecked`'s `requires` changes nothing (18/0 → 18/0, 19/0 → 19/0,
+   17/1 → 17/1), and the trusted clause is **shadowed, not dead** (delete the
+   decoders' and it fires inside them). p09 is the **only pattern with decoder
+   wrappers carrying their own `requires`** — so this is the first time the
+   memory-safety obligation sits **outside the TCB boundary**, which is a better
+   result than the one it shipped. **TCB is 7 lines / 4 items** (the gate's own
+   count), the second-smallest here — not the 12 its `NOTES.md` declared.
+
+   **The three checks decompose with ZERO free parameters** — every coefficient is
+   a loop-body instruction count off the listing, and out of sample the fit
+   predicts `large` (3.5×–4.6× outside every band) to within **1.13 Ir of 73404**,
+   with `R3 − R4` predicted **48885.00** against measured **48885.00**.
+
+   ⚠ **The reslice hazard, conditional and checkable, and it is the whole of p09's
+   R3 > R2 inversion** (the first in this project). LLVM loses the 8-byte
+   load-merge idiom on exactly **one of eight loops**: `reslice` **+** a
+   data-derived index **+** a multi-byte decode at it. R2 keeps the merge on the
+   *same* shift-derived access. Decomposed: `+21` lost merge, `+1` spill, `−5`
+   cheaper query checks the reslice buys = `+17` net. **Half of p03's
+   seeding-style win here is the restored load idiom, not deleted checks**, and
+   `q & 31`'s R4 cost is the *same* mechanism (it narrows the load to 32 bits and
+   splits the merged `mov` into 4+2+1+1) — which unifies p09's two cost stories.
+
+   **p03's seeding control does not transplant**: a dead clamp on the *word index*
+   is **+461 dearer** and deletes nothing, in C as well as Rust; the same clamp on
+   the **byte offset** deletes 49% of the kernel; one that says nothing is
+   byte-identical to shipped R3. **The inference LLVM fails is the composition
+   through the multiply, not the shift.**
+   `q >> 6` and `q / 64` are **identical to rustc, clang and gcc** — the
+   `forbidden` entry moves no number and is kept only because it makes "the shift
+   implements the division" a real Verus obligation.
+
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how
 much proof keeps that base sound, and which C patterns resist this treatment.*
