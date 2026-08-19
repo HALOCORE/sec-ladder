@@ -711,11 +711,16 @@ measured against the last commit that touched `common/driver.c`: **six patterns
 were measured after it and are fine; p01 and p16 were measured before it and are
 at risk.** `TASK_035` closes it.
 
-After the review, **patterns**, in the order I would take them: **p03** (bounded
-queue/stack — index underflow on empty pop, and the first pattern whose state
-persists *across calls*), **p09** (bitset — word-index vs bit-index confusion, and
-the first kernel whose safety check is not a bounds check at all), **p12**
-(`strcat` into a fixed buffer — but fix defect 2 first).
+**Both next tasks are already written, so the pattern cannot be deferred again:**
+`TASK_035` (the staleness fix — small, bounded) and then **`TASK_036` — p03,
+bounded stack**, the first kernel whose *control flow is attacker-chosen*: the
+window carries an opcode stream and the bug is a stack underflow (`sp − 1` at 0).
+It is also the first pattern whose safety check is not on a slice — the guard is
+an *emptiness* test — so do not assume it yields another per-byte constant.
+
+After p03: **p09** (bitset — word-index vs bit-index confusion), **p12** (`strcat`
+into a fixed buffer, now that `asm.py` knows the `str*` family), **p04** (ring
+buffer — modular index + aliasing).
 
 ⚠ **Read the ratio before planning anything else. TASK_015–031 is seventeen
 consecutive tasks of methodology and correction against two patterns produced
