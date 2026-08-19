@@ -1,0 +1,602 @@
+{
+ "safe_naive|1": {
+  "addr": 261120,
+  "bit4": 0,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 16.323295421898365,
+  "pass1": 16.359216533601284,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_naive|10": {
+  "addr": 315456,
+  "bit4": 0,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 16.04029629379511,
+  "pass1": 16.057034954428673,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_naive|11": {
+  "addr": 152272,
+  "bit4": 1,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 15.007391571998596,
+  "pass1": 14.989709481596947,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "safe_naive|12": {
+  "addr": 115712,
+  "bit4": 0,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 16.31013210862875,
+  "pass1": 16.30548946559429,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_naive|13": {
+  "addr": 152512,
+  "bit4": 0,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 16.31132699549198,
+  "pass1": 16.312209889292717,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_naive|14": {
+  "addr": 268608,
+  "bit4": 0,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 16.39809925109148,
+  "pass1": 16.257313080132008,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_naive|15": {
+  "addr": 135408,
+  "bit4": 1,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 15.278395265340805,
+  "pass1": 15.25771338492632,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "safe_naive|16": {
+  "addr": 177056,
+  "bit4": 0,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 15.756234526634216,
+  "pass1": 15.73075819760561,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_naive|17": {
+  "addr": 104656,
+  "bit4": 1,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 15.244743786752224,
+  "pass1": 15.352519229054451,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "safe_naive|18": {
+  "addr": 294432,
+  "bit4": 0,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 15.699369832873344,
+  "pass1": 15.793340280652046,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_naive|19": {
+  "addr": 89104,
+  "bit4": 1,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 15.290174633264542,
+  "pass1": 15.250870026648045,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "safe_naive|2": {
+  "addr": 166336,
+  "bit4": 0,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 16.380823217332363,
+  "pass1": 16.346891410648823,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_naive|20": {
+  "addr": 237200,
+  "bit4": 1,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 15.049133449792862,
+  "pass1": 14.931360259652138,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "safe_naive|3": {
+  "addr": 170224,
+  "bit4": 1,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 15.285586938261986,
+  "pass1": 15.19027166068554,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "safe_naive|4": {
+  "addr": 172368,
+  "bit4": 1,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 15.318240039050579,
+  "pass1": 15.281795524060726,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "safe_naive|5": {
+  "addr": 162176,
+  "bit4": 0,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 16.047470271587372,
+  "pass1": 16.11048635095358,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_naive|6": {
+  "addr": 132080,
+  "bit4": 1,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 14.732790179550648,
+  "pass1": 14.700048603117466,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "safe_naive|7": {
+  "addr": 98032,
+  "bit4": 1,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 15.093107707798481,
+  "pass1": 15.115783549845219,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "safe_naive|8": {
+  "addr": 237232,
+  "bit4": 1,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 15.33468347042799,
+  "pass1": 15.284420922398567,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "safe_naive|9": {
+  "addr": 232064,
+  "bit4": 0,
+  "md5_fn_norel": "a77302fc10f9",
+  "pass0": 16.131260432302952,
+  "pass1": 16.054149717092514,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_tuned|1": {
+  "addr": 205152,
+  "bit4": 0,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 15.743068419396877,
+  "pass1": 15.751605853438377,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_tuned|10": {
+  "addr": 256352,
+  "bit4": 0,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 15.778428874909878,
+  "pass1": 15.80237690359354,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_tuned|11": {
+  "addr": 217728,
+  "bit4": 0,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 16.265783458948135,
+  "pass1": 16.31838921457529,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_tuned|12": {
+  "addr": 188080,
+  "bit4": 1,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 14.875032007694244,
+  "pass1": 14.895448461174965,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "safe_tuned|13": {
+  "addr": 305520,
+  "bit4": 1,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 14.963803812861443,
+  "pass1": 14.974634163081646,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "safe_tuned|14": {
+  "addr": 200272,
+  "bit4": 1,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 15.054317191243172,
+  "pass1": 15.1317548006773,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "safe_tuned|15": {
+  "addr": 214176,
+  "bit4": 0,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 15.813665464520454,
+  "pass1": 15.778479166328907,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_tuned|16": {
+  "addr": 147136,
+  "bit4": 0,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 16.28865208476782,
+  "pass1": 16.2984412163496,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_tuned|17": {
+  "addr": 328160,
+  "bit4": 0,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 15.796525403857231,
+  "pass1": 15.78062679618597,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_tuned|18": {
+  "addr": 169120,
+  "bit4": 0,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 15.690360218286514,
+  "pass1": 15.734902583062649,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_tuned|19": {
+  "addr": 141568,
+  "bit4": 0,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 16.33400935679674,
+  "pass1": 16.157202422618866,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_tuned|2": {
+  "addr": 284160,
+  "bit4": 0,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 16.202934086322784,
+  "pass1": 16.308396123349667,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_tuned|20": {
+  "addr": 133296,
+  "bit4": 1,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 14.865984208881855,
+  "pass1": 14.966058544814587,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "safe_tuned|3": {
+  "addr": 143824,
+  "bit4": 1,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 14.992762356996536,
+  "pass1": 15.06123784929514,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "safe_tuned|4": {
+  "addr": 106896,
+  "bit4": 1,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 15.190498903393745,
+  "pass1": 15.18554799258709,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "safe_tuned|5": {
+  "addr": 175712,
+  "bit4": 0,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 15.75356163084507,
+  "pass1": 15.802618116140366,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_tuned|6": {
+  "addr": 193344,
+  "bit4": 0,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 16.195370815694332,
+  "pass1": 16.148262657225132,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_tuned|7": {
+  "addr": 279072,
+  "bit4": 0,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 15.771511010825634,
+  "pass1": 15.707510523498058,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "safe_tuned|8": {
+  "addr": 267376,
+  "bit4": 1,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 14.955012127757072,
+  "pass1": 14.984987676143646,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "safe_tuned|9": {
+  "addr": 331568,
+  "bit4": 1,
+  "md5_fn_norel": "331da58119a6",
+  "pass0": 14.941208995878696,
+  "pass1": 15.019841492176056,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "unsafe|1": {
+  "addr": 285520,
+  "bit4": 1,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 16.088834032416344,
+  "pass1": 15.80958254635334,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "unsafe|10": {
+  "addr": 227184,
+  "bit4": 1,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 15.74181579053402,
+  "pass1": 15.617790631949902,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "unsafe|11": {
+  "addr": 298720,
+  "bit4": 0,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 15.102794393897057,
+  "pass1": 15.160351991653442,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "unsafe|12": {
+  "addr": 230080,
+  "bit4": 0,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 15.225435607135296,
+  "pass1": 15.17010573297739,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "unsafe|13": {
+  "addr": 124960,
+  "bit4": 0,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 15.132129192352295,
+  "pass1": 15.099645592272282,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "unsafe|14": {
+  "addr": 325568,
+  "bit4": 0,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 15.112561173737049,
+  "pass1": 15.111295506358147,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "unsafe|15": {
+  "addr": 281584,
+  "bit4": 1,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 15.680905431509018,
+  "pass1": 15.615740790963173,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "unsafe|16": {
+  "addr": 197280,
+  "bit4": 0,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 15.056782402098179,
+  "pass1": 15.106095001101494,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "unsafe|17": {
+  "addr": 249856,
+  "bit4": 0,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 15.183474868535995,
+  "pass1": 15.182138420641422,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "unsafe|18": {
+  "addr": 323328,
+  "bit4": 0,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 15.056016854941845,
+  "pass1": 15.159264206886292,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "unsafe|19": {
+  "addr": 222160,
+  "bit4": 1,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 15.712589025497437,
+  "pass1": 15.941302292048931,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "unsafe|2": {
+  "addr": 148416,
+  "bit4": 0,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 15.079833567142487,
+  "pass1": 15.145533718168736,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "unsafe|20": {
+  "addr": 212880,
+  "bit4": 1,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 15.792478807270527,
+  "pass1": 15.796985477209091,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "unsafe|3": {
+  "addr": 191696,
+  "bit4": 1,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 16.083525493741035,
+  "pass1": 16.30164124071598,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "unsafe|4": {
+  "addr": 87680,
+  "bit4": 0,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 15.237179584801197,
+  "pass1": 15.133775770664215,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "unsafe|5": {
+  "addr": 197296,
+  "bit4": 1,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 15.738829039037228,
+  "pass1": 15.852433629333973,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ },
+ "unsafe|6": {
+  "addr": 158400,
+  "bit4": 0,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 15.158602967858315,
+  "pass1": 15.19864797592163,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "unsafe|7": {
+  "addr": 342688,
+  "bit4": 0,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 15.11924248188734,
+  "pass1": 15.152525156736374,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "unsafe|8": {
+  "addr": 155904,
+  "bit4": 0,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 15.137573704123497,
+  "pass1": 15.046738088130951,
+  "predicted": "fast",
+  "rule": "win32@0",
+  "score": 1
+ },
+ "unsafe|9": {
+  "addr": 321904,
+  "bit4": 1,
+  "md5_fn_norel": "6fdd2d270593",
+  "pass0": 15.753248706459999,
+  "pass1": 15.712440945208073,
+  "predicted": "slow",
+  "rule": "win32@0",
+  "score": 2
+ }
+}

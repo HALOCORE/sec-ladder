@@ -1750,7 +1750,7 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
 # ==========================================================================
 
 def check_identity(digests, rep, contract):
-    head("3c. structural identity R4-vs-R5 (recorded as a result)")
+    head("3c. structural identity R4-vs-R5 (recorded as a result AND enforced)")
     pins = contract.get("identity") or []
     if not pins:
         rep.note("spec.md pins no identity expectations")
@@ -4768,6 +4768,16 @@ def main():
     #   * `controls/*.py` -- committed control generators
     #     (`patterns/p08-overlap-move/controls/gen_controls.py`); same argument
     #     as `inputs/gen.py`, for cells that are not p05-style rungs.
+    #   * `common/layout/*.py` -- TASK_032. The code-layout control
+    #     (`common/layout/README.md`): the population builder, the
+    #     interleaved-schedule rule, the identical-copy noise floor, the
+    #     32-byte loop-geometry fit and the pre-registration harness. The gate
+    #     never imports it, but every withdrawn wall-clock row and RECAP
+    #     finding 16 rest on what it measures, and it is the ONLY reproduction
+    #     path for them -- the populations themselves live in gitignored
+    #     `.temp/`. Same argument as `inputs/gen.py`: the generator is what is
+    #     committed. `common/*.py` is non-recursive and does not reach it, so
+    #     it needs its own line.
     #   * `verus_run.py` -- THE THIRD FILE, and it is named here rather than
     #     left implicit because it was not in the reported gap. It is R5's
     #     compiler driver (`build.py:VERUS_RUN`, `fixture.py`) *and* the process
@@ -4783,6 +4793,7 @@ def main():
                   + glob.glob(os.path.join(pdir, "inputs", "gen.py"))
                   + glob.glob(os.path.join(pdir, "controls", "*.py"))
                   + glob.glob(os.path.join(REPO, "common", "*.py"))
+                  + glob.glob(os.path.join(REPO, "common", "layout", "*.py"))
                   + glob.glob(os.path.join(REPO, "verus_run.py")))
     doc = {
         "pattern": os.path.basename(pdir),

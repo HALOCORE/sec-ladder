@@ -86,10 +86,18 @@
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
     "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
     "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+    "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+    "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+    "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+    "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+    "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+    "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+    "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+    "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "e3b14d4e90f15e7ff28d862442c721120943bb70c9514437b77facc407b6675f",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "29dda0abeb945a962f19ef95e11375ffcf0e2cd54c3fdde94bb0eab3ddedb8bb",
+    "harness/check.py": "e7b9b11950677854fa76f14196963c85bad5afef4353bfc243c9984638bc66e9",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "a810bf5973787f78fc9805b2407a6bb04bbee68c968374a2e9b8622c4c5d3af4",
@@ -791,7 +799,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==397158==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x508000004128 at pc 0x55e6de54d9af bp 0x7ffed36d2110 sp 0x7ffed36d2100 READ of size 1 at 0x508000004128 thread T0 #0 0x55e6de54d9ae in kernel /home/apt/repos_common/s"
+      "diagnostic": "================================================================= ==457529==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x508000004128 at pc 0x557ef52f29af bp 0x7ffee28103b0 sp 0x7ffee28103a0 READ of size 1 at 0x508000004128 thread T0 #0 0x557ef52f29ae in kernel /home/apt/repos_common/s"
     },
     "adversarial-stride7.bin": {
       "exit": 0,
@@ -812,7 +820,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==397163==ERROR: AddressSanitizer: SEGV on unknown address 0x508100000128 (pc 0x55741923096b bp 0x508000000125 sp 0x7ffe5125ff20 T0) ==397163==The signal is caused by a READ memory access. #0 0x5574192309"
+      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==457534==ERROR: AddressSanitizer: SEGV on unknown address 0x508100000128 (pc 0x56393dadb96b bp 0x508000000125 sp 0x7ffd0214aaf0 T0) ==457534==The signal is caused by a READ memory access. #0 0x56393dadb9"
     },
     "adversarial-zero.bin": {
       "exit": 0,

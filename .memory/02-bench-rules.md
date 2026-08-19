@@ -760,6 +760,29 @@ review as a change to the committed artefact rather than only as a source diff.
   or fail, so a failing run does replace a passing one. Since TASK_005 it
   carries a sha256 of the contract block and of every source the gate read, so a
   stale record is at least detectable by comparing hashes against the tree.
+  ⚠ **"Detectable" means detectable BY HAND. Nothing does it automatically**
+  (measured at TASK_032): `check.py` *writes* `source_sha256` and never compares
+  it to anything, so editing a hashed file **fails no gate** — it silently leaves
+  seven records disagreeing with the tree until someone re-runs them. The one-line
+  check, worth running before trusting any committed gate record:
+
+  ```bash
+  python3 - <<'EOF'
+  import json,glob,hashlib,os
+  for f in glob.glob('results/gate/p*.json'):
+      if 'partial' in f: continue
+      for rel,h in json.load(open(f))['source_sha256'].items():
+          if not os.path.exists(rel): print('MISSING', rel, f); continue
+          if hashlib.sha256(open(rel,'rb').read()).hexdigest() != h:
+              print('STALE', rel, 'in', f)
+  EOF
+  ```
+
+  Two consequences worth knowing before choosing where a tool lives: the
+  re-run tax is **per edit event, not per file** (shipping 8 files costs what
+  shipping 4 costs, and batching N edits into one sweep costs one sweep), and a
+  tool the gate never *imports* cannot invalidate anything **inside** a record —
+  only a claim in a pattern's `NOTES.md`, which `glob(pdir/*.md)` already hashes.
   **But the record itself is not byte-reproducible** (TASK_010_REVIEW): a clean
   re-run on an unchanged tree differs by ~3 lines, because the `diagnostic`
   fields carry ASan PIDs and ASLR-dependent addresses. So `git diff` on a gate

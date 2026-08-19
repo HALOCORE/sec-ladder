@@ -482,13 +482,37 @@ Two rules follow:
    |---|---|---|
    | p01 | 0.82…3.17% | 10.42 / 10.15 / 7.74% |
    | p07 | 0.83…2.24% | 31.76 / 17.12 / 8.08% |
-   | **p05** | **5.09…45.04%** | 14.09 / 8.30 / 9.34% |
+   | **p05** | **4.19…14.83%** | 14.09 / 8.30 / 9.34% |
 
    p05's band is *inside its own noise floor*, which is why its `small` row is
-   withdrawn and p01's and p07's are withdrawn for a real reason. p01's and p07's
-   modes are additionally **protocol-insensitive** — p07 R2−R4 reads
-   +27.46/+27.67/+27.67/+27.77% alternating *and* blocked — which is how they were
-   separated from this artefact.
+   withdrawn and p01's and p07's are withdrawn for a real reason.
+   (⚠ An earlier version of this row said 5.09…45.04% — that was the max over
+   blocked *and* alternating blocks together, i.e. it included the artefact. The
+   alternating figure is the honest one and the conclusion is unchanged.)
+
+3. **Run the protocol control on every pattern before trusting any of its layout
+   verdicts.** Done for all seven at TASK_032, ~8 minutes; **p05 is the only
+   protocol-sensitive pattern**, and its row was already withdrawn — so the bug
+   reached no surviving published verdict:
+
+   | pattern | alternating | blocked | identical-copy floor | sensitive? |
+   |---|---|---|---|---|
+   | p02 R2 | +17.35 / +16.69% | +17.12 / +16.43% | 1.0–3.4% | no |
+   | **p05 R2** | **+30.31 / +30.07%** | **+7.56 / +7.93%** | 4.2–21.0% | **YES** |
+   | p08 R2 | +104.72 / +105.44% | +104.64 / +104.82% | 0.58–1.30% | no |
+   | p16 R2 | −0.15 / −0.25% | −0.13 / −0.20% | 0.61–1.50% | no |
+   | p17 R2 | −0.18 / +0.05% | −0.03 / +0.04% | 0.55–1.00% | no |
+
+   p16's and p17's "gap < 1% either way" are therefore **clean negatives under
+   both protocols**, which had not been established before. p01 and p07 are
+   protocol-insensitive too (p07 R2−R4 reads +27.46…+27.77% blocked *and*
+   alternating), which is how their modes were separated from the artefact.
+
+**The tool ships: `common/layout/`.** `order.py` is this control, `layout_gen.py`
+the population builder (its `round_robin()` is the scheduler, and `order.py` and
+`predict_then_time.py` **import** it so the probe tests the shipped code rather
+than a copy), `loopfit.py` the mechanism, `predict_then_time.py` the
+pre-registration harness. `common/layout/README.md` has the recipes.
 
 ### Code layout: the 32-byte fetch grid, and why two patterns' `ns` columns are withdrawn
 
@@ -689,11 +713,12 @@ Measured at TASK_022 on unchanged trees, two consecutive runs:
   combinations (not just `O0`/`whole`), to **±0.08**. TASK_022 recorded 8 and
   `O0`/`whole` only; TASK_023_REVIEW reproduced the **identical 23 keys on an
   unchanged tree**, which is what makes them noise rather than an effect.
-  ⚠ **The count is a floor, not a constant: TASK_028 measured 75.** Same
-  magnitude (`10452.64 → 10452.72`, ±0.08), same key, three times as many leaves —
-  so **quote the magnitude and the key, and re-measure the count**. The three
-  recorded values are 8 → 23 → 75 and every one of them was written down as if it
-  were the number.
+  ⚠ **The count is not a constant and not even monotone.** Recorded values across
+  four runs: **8 → 23 → 75 → 0** (TASK_022 / TASK_023_REVIEW / TASK_028 /
+  TASK_032). Same magnitude every time (`10452.64 → 10452.72`, ±0.08), same key.
+  It is **intermittent, not a growing per-run cost**, and each of the first three
+  was written down as if it were *the* number. **Quote the magnitude and the key;
+  budget "0…75"; re-measure the count.**
 - **p02: 3, p16: 1, p17: 1** — previously unrecorded.
 - **Total churn on an unchanged tree: 32 leaves at TASK_022/023, ~114 at
   TASK_028** (the p08 growth plus 5 ASan PID strings and p05's 2 nondeterministic

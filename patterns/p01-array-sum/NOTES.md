@@ -326,11 +326,19 @@ statically from the listing with no fitted parameter (`.memory/03-measurement.md
 project because the loop is small enough to see whole:
 
 ```
-unsafe     loop0 [kernel+0x40, +0x5e)  30 B   win32 [1,2]   x1.0501 / x1.0583  PERFECT
-safe_tuned loop0 [kernel+0x50, +0x6e)  30 B   win32 [1,2]   x1.0803 / x1.0823  PERFECT
-safe_naive loop1 [kernel+0x90, +0xa1)  17 B   win32 [1,2]   x1.0450 / x1.0508  PERFECT
+unsafe     loop0 [kernel+0x40, +0x5e)  30 B   win32 [1,2]   x1.0459 / x1.0471  PERFECT
+safe_tuned loop0 [kernel+0x50, +0x6e)  30 B   win32 [1,2]   x1.0831 / x1.0798  PERFECT
+safe_naive loop0 [kernel+0x50, +0x6e)  30 B   win32 [1,2]   x1.0494 / x1.0463  PERFECT
+safe_naive loop1 [kernel+0x90, +0xa1)  17 B   win32 [1,2]   x1.0494 / x1.0463  PERFECT
                                               jcc32 [0,1]   (same partition)
 ```
+
+(TASK_032's re-measurement; TASK_031 read ×1.0501/×1.0583, ×1.0803/×1.0823 and
+×1.0450/×1.0508 for the first three rows. R2's two loops are listed because both
+separate perfectly — their `win32` flips together, so the 17-byte tail is not
+evidence *against* the 30-byte SSE loop being the site, and picking one of them
+by a "tightest loop" heuristic is the error `common/layout/loopfit.py` exists to
+stop.)
 
 R4's SSE loop is **30 bytes long**: at `kernel%32 == 0` it lands entirely inside
 one 32-byte fetch window, and at `kernel%32 == 16` it straddles two — the
@@ -339,12 +347,14 @@ one 32-byte fetch window, and at `kernel%32 == 16` it straddles two — the
 because every kernel is 16-byte aligned; a toolchain that aligned functions to
 32 bytes would erase the proxy and keep the effect.
 
-Mode-matched over the 30 layouts, `small`:
+Mode-matched over the 30 layouts, `small` — **re-measured at TASK_032 with the
+round-robin ordering bug fixed** (`common/layout/layout_gen.py`, two independent
+passes):
 
 | | `%32 == 0` | `%32 == 16` | |
 |---|---:|---:|---|
-| R2 vs R4 | **+5.24%** | **−4.10%** | **SIGN FLIPS** |
-| R3 vs R4 | **+7.01%** | **−5.67%** | **SIGN FLIPS** |
+| R2 vs R4 | **+5.80 / +5.14%** | **−3.61 / −4.04%** | **SIGN FLIPS** |
+| R3 vs R4 | **+7.10 / +6.92%** | **−5.45 / −5.44%** | **SIGN FLIPS** |
 
 **Confirmed out of sample and pre-registered**, which is the evidence to trust:
 20 *fresh* symbol orderings the hypothesis had never seen, predictions written
@@ -368,24 +378,52 @@ each shipped rung (distinct inodes, one layout), timed in the same harness at
 11 of those 12 rung-blocks under 1.4% — against a 30-layout band of **10.42% /
 10.15% / 7.74%** (R2/R3/R4). The R2-vs-R4 ratio over those identical copies is
 **+4.80 / +4.69 / +4.79 / +4.55%** across two passes and both round-robin
-orderings (`.temp/p31/order.py`, `order_p01.log`). So the published +5.40% is a
-*faithful* measurement of one layout, not a noisy one — which is exactly why it
-is misleading.
+orderings (the probe now ships as `common/layout/order.py`; TASK_031 ran it as
+`.temp/p31/order.py`, `order_p01.log`). So the published +5.40% is a *faithful*
+measurement of one layout, not a noisy one — which is exactly why it is
+misleading.
 
-⚠ **The two mode-matched percentages above are the weakest numbers in this
-section**, and they are quoted only because they are what the population gives.
-`.temp/r30/layout_gen.py` times its 93 binaries **blocked by rung** rather than
-alternating, and on p01 `small` that costs the `order` build slots 3.79% for R2
-and *gains* them 3.62% for R4 (`.temp/r30/lever_bias.log`) — a differential of
-~7 points between rungs, applied to modes that are 50%/93% order-builds
-respectively. Up to ~3.5 of the 9.3-point mode difference could be that. The
-*within-rung* ratios and the out-of-sample test above are unaffected (their
-labels are uncorrelated with the build slot: mean slot 9.0 vs 10.0 out of 19),
-and they are what the withdrawal rests on.
+**The build-slot caveat this section carried at TASK_031 is RESOLVED, and the
+answer is that it changed nothing.** TASK_031 flagged that the mode-matched
+percentages were the weakest numbers here: the pre-ship builder timed its
+93 binaries **blocked by rung** rather than alternating, and the mode groups
+have unbalanced lever composition (R2's `%32 == 0` group was 8 `align` + 8
+`order`, its `%32 == 16` group 1 + 13), so the mode label was partly a
+build-slot label. TASK_032 fixed the ordering
+(`common/layout/layout_gen.py:round_robin`) and re-ran the whole population.
+Three ways, all agreeing:
+
+* **Mode-matched, fixed builder**: `+5.80 / −3.61%` and `+7.10 / −5.45%` against
+  TASK_031's `+5.24 / −4.10%` and `+7.01 / −5.67%`. Every number moves by ≤0.6
+  points; no sign moves. Pass 2 independently: `+5.14 / −4.04%`, `+6.92 / −5.44%`.
+* **Inside one lever**, so composition cannot contribute at all: `order`-only
+  builds give R2 `+5.14 / −3.61%` (n = 8/6, 13/15) and R3 `+7.22 / −5.55%`;
+  `align`-only gives `+6.12 / −5.92%` and `+6.80 / −4.31%`.
+* **The per-layout time is a property of the binary**, not of when it ran:
+  cross-pass Spearman ρ = **+0.944 / +0.902 / +0.883** (R2/R3/R4) on `small`.
+  On `large`, where there is no mode, ρ = +0.29 / −0.13 / −0.02 — noise, exactly
+  as it should read.
+
+Fresh out-of-sample confirmation with the fixed timer, 20 orderings the
+hypothesis had never seen, prediction SHA-256'd before any timing
+(`5c5c2a8cbfa81d1e199e1374dbcfaa65ba5c37290cdaea8117189b9b155eb4a9`, committed
+as `common/layout/data/predictions_p01oos.json` — the file's own sha256 *is*
+that hash): a **single** directional rule, `win32` on loop 0, more fetch windows
+predicts slower, no per-rung tuning — **perfect separation on all three rungs,
+both passes**, ×1.0628/×1.0633 (R2), ×1.0565/×1.0533 (R3), ×1.0411/×1.0432 (R4).
+That is strictly stronger than TASK_031's pre-registration, which used the
+`bit4` proxy with its direction fitted per rung.
+
+The population and the pre-registration are committed under
+`common/layout/data/`; `python3 common/layout/survives.py --dir
+common/layout/data p01` reproduces the table above with no measurement.
 
 **What is NOT withdrawn.** `large.bin` — every rung-to-rung gap there is under
-1% in both modes and pooled (R2 +0.05%, R3 −0.13%), i.e. p01's memory-bound
-input says "no difference", and it still says that at 30 layouts. The `Ir`
+1% in both modes and pooled (TASK_032, fixed builder: R2 pooled **+0.12%**,
+modes **+0.17 / +0.08%**; R3 pooled **+0.02%**, modes **+0.07 / +0.06%**;
+published minima give +0.54% and +0.06%), i.e. p01's memory-bound input says
+"no difference", and it still says that at 30 layouts. No `(loop, property)`
+pair separates `large` at all, and the cross-pass ρ there is ≈ 0. The `Ir`
 columns, which are exact and are where every p01 claim lives (§3). R4 ≡ R5
 (byte-identical machine code cannot differ in wall clock for a reason of its
 own).

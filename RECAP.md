@@ -395,8 +395,14 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    against +61.93% over the population, 11 points that layout does **not**
    explain; and *the C and R5 rungs of all seven patterns remain unbracketed.*
    **p01's and p05's `small` wall-clock rows are withdrawn**, for different
-   reasons. p01's sign flips (+5.24% / −4.10%). ⚠ **p05's published reason was
-   itself wrong** — the "shipped binary is the slowest layout of 31" ranking was a
+   reasons. **p01's sign flips: +5.80% / −3.61% (R2) and +7.10% / −5.45% (R3)** —
+   re-measured at TASK_032 with the fixed timer, every number within 0.6 points of
+   the blocked-timer values and no sign moved, plus a **fresh out-of-sample
+   pre-registration using one directional rule (`win32@0`) with no per-rung
+   tuning**, which held with perfect separation on all three rungs across two
+   passes. The committed `common/layout/data/predictions_p01oos.json`'s own
+   sha256 *is* the hash printed before timing — `sha256sum` it. ⚠ **p05's
+   published reason was itself wrong** — the "shipped binary is the slowest layout of 31" ranking was a
    **blocked-round-robin artefact**, reproduced at TASK_031 with *zero* layout
    variation on byte-identical copies. p05's real defect: its `small` noise floor
    on byte-identical binaries is **5–45%**, wider than any gap read off it. Under
@@ -416,7 +422,14 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    its own, and manufactured every reading that was attributed to p05's layout.
    p01's and p07's modes survived only because they are **protocol-insensitive**
    (p07 reads +27.4…+27.8% blocked *and* alternating), which is how they were told
-   apart from the artefact.
+   apart from the artefact. **All seven patterns now carry the protocol control
+   and p05 is the only sensitive one** — so the bug reached no surviving published
+   verdict, and p16's and p17's "gap < 1% either way" are clean negatives under
+   both protocols, which had not been established before.
+   **The tool ships**: `common/layout/` (hashed into all seven `source_sha256`),
+   with the population data for p01 committed under `common/layout/data/` so the
+   published table reproduces with **zero measurement** —
+   `python3 common/layout/survives.py --dir common/layout/data p01`.
 
 ## Retracted — do not reinstate
 
@@ -631,11 +644,18 @@ survived six workloads; the manager's framing of it did not (see finding 15).
 **The layout arc is closed: finding 16 is measured, reviewed, refined and landed
 in all seven patterns' files (TASK_026 → 029 → 030_REVIEW → 031).**
 
-**THE NEXT TASK IS `TASK_032` — ship the layout harness, then STOP doing
-methodology.** The finding lives entirely in `.temp/`, and `controls/*.py` is
-inside `source_sha256` precisely so that cannot happen. It is one task and it is
-genuinely load-bearing: without it, every future pattern's wall-clock column is
-unbracketed and finding 16 is not re-derivable. **After that, patterns.**
+**TASK_032 shipped the layout harness and the methodology arc is CLOSED.**
+`common/layout/` is committed and hashed; p01's mode survived the fixed timer;
+all seven patterns carry the protocol control.
+
+**THE NEXT TASK IS A PATTERN, and the one after that is a pattern.** Nothing in
+the queue below outranks that. Candidates, in the order I would take them: **p03**
+(bounded queue/stack — index underflow on empty pop; the cheapest realistic bug
+left and a different *shape* from every existing pattern, since the state persists
+across calls), **p09** (bitset — word-index vs bit-index confusion, and the first
+kernel where the safety check is not a bounds check at all), **p11**
+(`strlen`/`strcpy` — the first NUL-termination pattern, and Family B is entirely
+empty).
 
 ⚠ **Read the ratio before planning anything else. TASK_015–031 is seventeen
 consecutive tasks of methodology and correction against two patterns produced

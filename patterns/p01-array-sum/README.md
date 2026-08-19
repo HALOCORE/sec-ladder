@@ -59,10 +59,18 @@ has a sign** (`NOTES.md` §3b). Built at 30 code layouts, all three Rust rungs a
 bimodal on a 30-byte SSE loop that fits inside one 32-byte instruction-fetch
 window at one address residue and straddles two at the other, and the two safe
 rungs' fast residue is the *opposite* of `unsafe`'s: mode-matched, R2-vs-R4 is
-**+5.24%** or **−4.10%** and R3-vs-R4 is **+7.01%** or **−5.67%**, depending only
+**+5.80%** or **−3.61%** and R3-vs-R4 is **+7.10%** or **−5.45%**, depending only
 on where the linker put the function. Confirmed out of sample on 20 fresh
 layouts with the predictions hashed before timing. p01's `large` column is
 unaffected (every gap under 1%), and so is every `Ir` number in this pattern.
+
+Those four percentages were re-measured at TASK_032 after a round-robin
+**ordering** bug was fixed in the population builder; the caveat this section
+and `NOTES.md` §3b carried at TASK_031 is resolved and changed nothing — every
+number moved by ≤0.6 points and no sign moved, the split holds inside a single
+build lever, and a single pre-registered rule (`win32`, more fetch windows =
+slower) separates all three rungs perfectly out of sample. The tool, the
+population and the pre-registration are committed under `common/layout/`.
 
 ## Inputs
 
