@@ -15,10 +15,8 @@ Rust, unsafe Rust + Verus proof — plus a sixth **R1h** hardened-C cell, across
 optimisation levels and two inline modes, and compared on assembly, executed
 instructions, timing, proof burden and trusted-base size.
 
-47 patterns are catalogued in `.memory/06-catalogue.md`. **Nine exist and all are
-green. Eight are reviewed** (p03 is built, green and **UNREVIEWED** — rule 9, its
-findings are in `patterns/p03-bounded-stack/NOTES.md` and deliberately not in
-`.memory/` yet)**:** p01 (calibration), p02 (first real bug), p16 (first
+47 patterns are catalogued in `.memory/06-catalogue.md`. **Nine exist, all green,
+all reviewed:** p01 (calibration), p02 (first real bug), p16 (first
 data-dependent bound), p17 (the limit of memory safety), p05 (the first
 vectorised kernel), p08 (the first structural Rust win). **p07 (binary search) is
 built, green and UNREVIEWED** — per `PROTOCOL.md` rule 9 its findings are in
@@ -476,51 +474,62 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    and that is more interesting than the claim it replaces. Neither route is free;
    see `.memory/04-verus.md`.
 
-18. **p03 — the same check, deleted on push and kept on pop, in one function
-   with one constant; and a zero-parameter control that takes the gap to exactly
-   zero.** ⚠ **UNREVIEWED (TASK_036).** First kernel whose **control flow is
-   attacker-chosen** (the opcode stream is in the file), first whose safety law is
-   per *executed operation*, first bounded by Rust's **borrow checker** as well as
-   by vstd.
+18. **p03 — the safety tax IS the price of the optimiser failing the invariant
+   the proof proves; it is NOT a fact about Rust; and it retires "nobody has built
+   an admissible R4 that moves".** (TASK_036, reviewed at TASK_036_REVIEW: causal
+   claim **confirmed** with three negative controls, two blockers and two majors
+   against the prose.) First kernel whose **control flow is attacker-chosen**,
+   first whose safety law is per *executed operation*.
 
-   **The laws — max residual 0.0000 over 89 blobs, three bands:**
+   **The control that does it.** `m_clamp` = R3 plus a **dead**
+   `if sp > STACK_CAP { return 0; }` — R5's own invariant handed to LLVM. Safe
+   17 → 13 Ir per executed pop, unsafe 14 → 13, **gap exactly zero on both sides**,
+   zero fitted parameters. **It is the invariant and not range propagation**:
+   `sp > 1000` is byte-identical to shipped R3 (nothing), `sp > 65` leaves the
+   check standing *and* is dearer, and a non-dead early return saying nothing
+   about `sp` is dearer with the check standing.
+   **This generalises finding 12's reinstated p05 sentence from a NONLINEAR fact
+   to a linear one** — nonlinearity was p05's whole stated excuse. ⚠ **With two
+   qualifications that change what it says, both measured:** it is **not
+   Rust-specific** (clang keeps a manual C bounds check at exactly 4.00000
+   Ir/executed pop, gcc keeps it too, and *both* delete 100% of it given the
+   identical clamp, byte-identically — two middle-ends, and gcc shares none with
+   rustc); and **LLVM does eventually derive the fact** (the clamp is gone from
+   the output and the `sp > 64` path is treated as unreachable), so it is analysis
+   **seeding**, not inability to prove the lemma.
 
-   | quantity | law |
-   |---|---|
-   | `R1h − R1`, the emptiness check in C | **`2.00000 · xpop`** — exact, **gcc and clang identical** |
-   | `R3 − R4`, safe Rust's surviving check | **`3.00000 · xpop + 5`** |
-   | `R3 − R4` on push / dropped push / empty pop | **0.00000 / 0.00000 / 0.00000** |
+   **The laws**, max residual 0.0000 over 89 blobs: `R1h − R1 = 2.00000 · xpop`
+   exact and **identical on gcc and clang**; `R3ship − R4ship = 3.00000 · xpop + 5`;
+   and **0.00000 on push, dropped push and empty pop** — the same check deleted on
+   one side of one function and kept on the other. ⚠ **The `3.00000` is the
+   shipped spelling's rate, not the class's**: in contract the class reaches
+   **1.00000** and **−1.00000**, so p03's R3-side span is **−113 … +5110** /
+   **+212 … +17237**, and the cheapest spelling **differs between the two blobs**.
+   The lever is `assert!(sp <= STACK_CAP)` — one line, zero `unsafe`, zero TCB,
+   byte-identical to `m_clamp`, and admissible: the gate's own matcher takes it and
+   `.memory/01-ladder.md`'s R3 definition names *"hoisted length assertions"*.
+   ⚠ **"The guard must be in the same basic block" is REFUTED** — hoisting it into
+   the loop head is byte-identical to shipped R3. The real discriminator is that
+   the **push** guard supplies the *upper* bound the access needs, locally, while
+   the **pop** guard supplies only the lower bound and the upper must come from
+   the loop-carried invariant.
 
-   **So the same check is eliminated on the push side and survives on the pop
-   side, in one function with one compile-time bound of 64.** The discriminator is
-   whether the guard sits in the *same basic block* as the index (`if sp <
-   STACK_CAP`) or a loop invariant away from it, across the attacker-chosen
-   branch.
+   **And the standing question in finding 14 is ANSWERED.** `m_clamp_unsafe` — R4
+   plus the same dead clamp — verifies **9/0 with zero new trusted items**, holds
+   the `identity` pin byte-for-byte, and measures **−118 / +497** against
+   `R4ship`. **The project's first admissible R4 that moves**, so p03 has its
+   first non-degenerate pair interval. Paired with the asymmetry: `assert!` on the
+   unsafe side is `error: panic is not supported`, so **the safe class reaches a
+   spelling the unsafe class cannot** — third instance of the R4-by-permission
+   result, first where the safe lever is one line.
 
-   ⚠ **And the control is the finding.** `m_clamp` = R3 plus a **dead**
-   `if sp > STACK_CAP { return 0; }` — R5's invariant handed to LLVM. Safe goes
-   17 → 13 per pop, unsafe 14 → 13, and **the gap goes to exactly zero on both
-   sides**, zero fitted parameters. That is p05's reinstated *"the price of the
-   optimiser failing the lemma the proof proves"* — **on a LINEAR fact**, where
-   p05's stated excuse was nonlinearity (finding 12). Masking (`stack[sp & 63]`)
-   removes only 1.00000 of the 3.
-
-   **The bug is not a wild address**: `sp−1` at 0 wraps to `stack−1`, eight bytes
-   below the array and **inside the kernel's own frame**. It does not fault; it
-   returns a wrong answer, and **R1's answer is not reproducible across runs** —
-   bit-stable only under `addr-no-randomize`, so the checksum leaks something
-   ASLR-derived. A *pointer*-disclosure shape, distinct from p17's data
-   disclosure. UBSan beats ASan here because the array has a static type. A
-   sustained underflow faults at exactly the 8 MiB `ulimit -s`.
-
-   **The branch lever is cleaner than p07's compiler flag**: same op count, same
-   POP count, same value stream, only the *order* differs — `Ir` identical to the
-   instruction, `Bc` identical to the branch, `D1mr` 0.00, and **`Bcm` moves 116×
-   to 0.5002/op, exactly the coin-flip value.**
-   **The gate earned its keep on a trusted item**: two defects in the first draft,
-   including a tautological conjunct caught by 5c-twin's per-conjunct deletion
-   probe — **the first time that TASK_010 refinement has fired on shipped code
-   rather than a constructed mutant.**
+   **The bug** is not a wild address: `sp−1` at 0 wraps to `stack−1`, inside the
+   kernel's own frame. It does not fault; it returns a wrong answer, and **R1's
+   checksum is not reproducible across runs** — a *pointer*-disclosure shape,
+   distinct from p17's data disclosure. UBSan beats ASan (static array type); a
+   sustained underflow faults at exactly the 8 MiB `ulimit -s`. **Verus 9/0 first
+   run**, no lemma. And the gate caught a **tautological conjunct on a trusted
+   item** via 5c-twin's per-conjunct probe — its first fire on shipped code.
 
 ## Retracted — do not reinstate
 
