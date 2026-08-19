@@ -72,19 +72,35 @@ POPs that actually pop.
 | quantity | value | what it is |
 |---|---|---|
 | `R1h − R1` | **2.00000 Ir per executed POP** | what the *emptiness check* costs, inside C, **identical in gcc and clang** |
-| `R3 − R4` | **3.00000 Ir per executed POP**, 0 on every other operation | what safe Rust's surviving *bounds check* costs |
+| `R3ship − R4ship` | **3.00000 Ir per executed POP**, 0 on every other operation | what the **shipped** safe rung's surviving *bounds check* costs |
+| in-contract R3 class | **+3.00000 … −1.00000 per executed POP** | the same rung respelled: one `assert!(sp <= STACK_CAP)` and *where* you put it |
 | `R2 − R3` | **20.00000 Ir per operation** | the opcode-stream bounds checks one reslice removes |
-| push-side check | **0.00000** | LLVM deletes it: the guard is in the same basic block as the index |
+| push-side check | **0.00000** | LLVM deletes it: the push guard supplies the *upper* bound the write needs, locally |
 
 **One array, one compile-time bound, one function, two answers** — and the
-discriminator is whether the guard sits in the same basic block as the index or
-a loop invariant away from it. The pop's needs `sp <= STACK_CAP` carried across
-the attacker-chosen `if op == 0` branch; **Z3 takes that in one invariant clause
-with no lemma, LLVM does not take it at all**, and a dead `if sp > STACK_CAP`
-handed to the optimiser drops the safe rung from 17 to 13 Ir per pop and the
-unsafe one from 14 to 13 — the gap goes to **exactly zero**. That is p05's
-sentence *"the price of the optimiser failing the lemma the proof proves"* on a
-fact that is **linear**, which p05's could not claim.
+discriminator is **which bound each guard supplies**. The push guard gives
+`sp < STACK_CAP`, which is the upper bound the write needs and is available
+where the write is; the pop guard gives only `sp > 0`, and the upper bound the
+read needs has to come from the loop-carried invariant. **Z3 takes that in one
+invariant clause with no lemma; LLVM will not derive it unseeded**, and a dead
+`if sp > STACK_CAP` handed to the optimiser drops the safe rung from 17 to 13 Ir
+per pop and the unsafe one from 14 to 13 — the gap goes to **exactly zero**.
+That is p05's sentence *"the price of the optimiser failing the lemma the proof
+proves"* on a fact that is **linear**, which p05's could not claim.
+
+Two things that must travel with it, both measured (`NOTES.md` §4b, §10a):
+
+* **it is not a fact about Rust.** Give the C rung the same manual bounds check
+  and clang keeps it at **4.00000 Ir per executed pop exactly** and gcc keeps it
+  too; hand either the identical clamp and **both delete 100% of it**,
+  byte-identically. Two independent middle-ends, and gcc shares none with rustc.
+  And LLVM *does* derive the fact once seeded — the clamp is gone from its
+  output — so this is analysis **seeding**, not an inability to prove the lemma.
+* **the safe rung is cheaper than the unsafe one, in contract, on both inputs.**
+  `assert!(sp <= STACK_CAP)` on the loop's back edge is safe Rust, adds no
+  `unsafe` and no trusted line, is in contract by the gate's own matcher, and
+  measures **−113 Ir/call on `small` and −202 on `large`** against the shipped
+  unsafe rung. The published `3.00000` is the *shipped spelling's* rate.
 
 ## Rungs
 

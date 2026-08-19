@@ -182,8 +182,13 @@ R4 plus a *dead* `if sp > STACK_CAP { return 0; }` — has a twin that verifies
 **`9 verified, 0 errors`** with **zero new trusted items**, holds the `identity`
 pin byte-for-byte (`md5_fn 40d374bfb669`, `md5_raw` equal), is in contract by the
 gate's own matcher, and measures **−118 on `small` / +497 on `large`** against
-`R4ship`. So p03 has a **non-degenerate pair interval**, the first on this
-project, and "nobody has, on any pattern" is retired.
+`R4ship`. The **back-edge** variant (`m_clamp_unsafe_tail`, also `9/0`, identity
+byte-for-byte) measures **−118 / −207**, so the R4 endpoint has *measured width*:
+**2884…3002** on `small`, **8177…8881** on `large`. So p03 has a **non-degenerate
+pair interval**, the first on this project, and "nobody has, on any pattern" is
+retired. ⚠ Note what it is **not**: the two class minima are 5 apart on both
+blobs, and that is the per-call constant, **not a tax** — `min(R3) − min(R4)`
+differences two upper bounds and bounds nothing (finding 12).
 **And the asymmetry is measured on the same pattern**: the *safe* side's cheapest
 lever is `assert!(sp <= STACK_CAP)`, and on the unsafe side that is
 `error: panic is not supported` — so the safe class reaches a spelling the unsafe

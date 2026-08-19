@@ -97,13 +97,13 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
     "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
-    "patterns/p03-bounded-stack/NOTES.md": "95846dd310d2d62dcd4768f5853cb5a37bdeca94f31512020a70eae0e12192a4",
-    "patterns/p03-bounded-stack/README.md": "71cafe92ef36cd91da0c8b7f5bdb49e329f873ad09f6be6ed25491b68443b3ae",
+    "patterns/p03-bounded-stack/NOTES.md": "5959aa391032a0a999bf5270610bb7c7832b962f3326f6a8c886bbddf68a1b6f",
+    "patterns/p03-bounded-stack/README.md": "3cc82de5b8db1b527cb3b0f37238646fd4111b38d602f385eab829436cbe91fa",
     "patterns/p03-bounded-stack/c/kernel.c": "9f1558cfbe298a11dc7edd231e2ee8d1efcf339e9f2332dc3e2cc0ef3782bf37",
     "patterns/p03-bounded-stack/c/kernel.h": "11a5cfc8f821fb56cbf3384ab99c24465c4d0d861cd6c770607cb84318d097bc",
     "patterns/p03-bounded-stack/c/kernel_hardened.c": "5cba2e2c70b3946c57d0c0fcbf2037ff8a066006126bf6f082287e5754e80486",
     "patterns/p03-bounded-stack/c/main.c": "09a0b93a61d861465ade53467faab2a342fe3159a57805c8142b102ae0ae9bc7",
-    "patterns/p03-bounded-stack/controls/gen_controls.py": "343d85ebdac99d80e271a887298bcdeb2e33d511771af6b0192837eeb71f4c4c",
+    "patterns/p03-bounded-stack/controls/gen_controls.py": "efe7ba5590770ad8e1eab9665dc5c8a6011502ce003d277eb6df7d3c58ed1b13",
     "patterns/p03-bounded-stack/inputs/gen.py": "aeb1ef44a77d7fe967a810cf030d870278d4ed48f4301db3cd99ee12477359ee",
     "patterns/p03-bounded-stack/model.py": "8813c186c3902aa239ee94f5e83b1aec35d501055e8364353d5ddf6dca017835",
     "patterns/p03-bounded-stack/safe_naive.rs": "8d7f24002a402e3f8113f275fb58ed5931f2fc2ab1d27cf4f87b27fe2d05bb70",
@@ -555,7 +555,7 @@
   "adversarial": {
     "adversarial-allpop.bin/c-gcc": {
       "exit": 0,
-      "stdout": "17765868390721395840",
+      "stdout": "9620844446615770752",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
@@ -563,7 +563,7 @@
     },
     "adversarial-allpop.bin/c-clang": {
       "exit": 0,
-      "stdout": "8243408478144632576",
+      "stdout": "7874681405998970112",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
@@ -747,7 +747,7 @@
     },
     "adversarial-underflow.bin/c-gcc": {
       "exit": 0,
-      "stdout": "475843829579282560",
+      "stdout": "8916605432913543296",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
@@ -755,7 +755,7 @@
     },
     "adversarial-underflow.bin/c-clang": {
       "exit": 0,
-      "stdout": "459667517624373504",
+      "stdout": "6802454464588414464",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
@@ -816,7 +816,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==866695==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f7"
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==905623==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f2"
     },
     "adversarial-count.bin": {
       "exit": 0,
@@ -837,7 +837,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==866700==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f0"
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==905628==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f4"
     },
     "large.bin": {
       "exit": 0,

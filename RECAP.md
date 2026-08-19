@@ -502,14 +502,22 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    exact and **identical on gcc and clang**; `R3ship − R4ship = 3.00000 · xpop + 5`;
    and **0.00000 on push, dropped push and empty pop** — the same check deleted on
    one side of one function and kept on the other. ⚠ **The `3.00000` is the
-   shipped spelling's rate, not the class's**: in contract the class reaches
-   **1.00000** and **−1.00000**, so p03's R3-side span is **−113 … +5110** /
-   **+212 … +17237**, and the cheapest spelling **differs between the two blobs**.
-   The lever is `assert!(sp <= STACK_CAP)` — one line, zero `unsafe`, zero TCB,
-   byte-identical to `m_clamp`, and admissible: the gate's own matcher takes it and
-   `.memory/01-ladder.md`'s R3 definition names *"hoisted length assertions"*.
+   shipped spelling's rate, not the class's**: in contract the class runs from
+   **+3.00000 to −1.00000** per executed pop, so p03's R3-side span is
+   **−113 … +5110** / **−202 … +17237**. The lever is `assert!(sp <= STACK_CAP)`
+   — one line, zero `unsafe`, zero TCB, admissible (the gate's own matcher takes
+   it and `.memory/01-ladder.md`'s R3 definition names *"hoisted length
+   assertions"*) — **and WHERE it goes is worth 2 Ir twice** (TASK_037): on the
+   loop's **back edge** it is `−1.00000·xpop` with no dropped-push cost and is
+   cheapest on **both** blobs; at the loop **head** it is byte-identical to
+   `m_clamp` but costs `+2.00000·dpush`, because LLVM then materialises the
+   now-known `sp == STACK_CAP` on that edge; in the **pop arm** it survives as a
+   runtime `cmp $0x41`. Two published cheapest-founds refuted on this one
+   pattern, the second after a review had confirmed the first.
    ⚠ **"The guard must be in the same basic block" is REFUTED** — hoisting it into
-   the loop head is byte-identical to shipped R3. The real discriminator is that
+   the loop head is byte-identical to shipped R3 (that control is itself out of
+   contract, so it refutes the *mechanism* and is not a spelling of the class).
+   The real discriminator is that
    the **push** guard supplies the *upper* bound the access needs, locally, while
    the **pop** guard supplies only the lower bound and the upper must come from
    the loop-carried invariant.
@@ -517,8 +525,12 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    **And the standing question in finding 14 is ANSWERED.** `m_clamp_unsafe` — R4
    plus the same dead clamp — verifies **9/0 with zero new trusted items**, holds
    the `identity` pin byte-for-byte, and measures **−118 / +497** against
-   `R4ship`. **The project's first admissible R4 that moves**, so p03 has its
-   first non-degenerate pair interval. Paired with the asymmetry: `assert!` on the
+   `R4ship`; on the back edge (`m_clamp_unsafe_tail`, also **9/0**, identity
+   byte-for-byte) it measures **−118 / −207**. **The project's first admissible
+   R4s that move**, so p03 has its first non-degenerate pair interval — the R4
+   endpoint now has measured width, 2884…3002 on `small` and 8177…8881 on
+   `large`. (The two class minima are 5 apart on both blobs; that is the per-call
+   constant and **not** a tax — `min(R3) − min(R4)` differences two upper bounds.) Paired with the asymmetry: `assert!` on the
    unsafe side is `error: panic is not supported`, so **the safe class reaches a
    spelling the unsafe class cannot** — third instance of the R4-by-permission
    result, first where the safe lever is one line.

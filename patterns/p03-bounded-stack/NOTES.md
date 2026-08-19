@@ -159,9 +159,13 @@ whole-program marginal is not.
 | **R5 verus** | 66/64 | **3002** | 50 | 13 | 3065.00 | **8384** | 50 | 13 | 8447.30 |
 
 `small` is 237 operations with 118 executed pops (50% POP, stack half full);
-`large` is 830 with 207 (25% POP, **stack runs full** — 559 of its 623 pushes
-are dropped by the guard). Both facts are in the table's arithmetic through §4's
-law, and `inputs/gen.py` explains why a density below 50% must saturate.
+`large` is 830 with 207 (25% POP, **stack runs full** — **352** of its 623
+pushes are dropped by the guard). Both facts are in the table's arithmetic
+through §4's law, and `inputs/gen.py` explains why a density below 50% must
+saturate. (Counts per call, replayed from `model.py`'s own driver loop by
+`.temp/p37/counts_sl.py`: `small` = 237 ops / 119 xpush / **0** dpush / 118 xpop
+/ 0 epop, `large` = 830 / 271 / 352 / 207 / 0. An earlier draft put `large`'s
+dropped pushes at 559, which is `dpush + xpop`.)
 
 Against R4, kernel-exclusive:
 
@@ -228,8 +232,15 @@ total                =   ~60 Ir per call, independent of `nops`
 
 **~60 Ir/call, about 2.0% of R4's `small` cell and 0.7% of its `large` one.** It
 amortises along `nops` and is *not* part of any number in §4, because §4 is
-kernel-exclusive and rung-to-rung between rungs that all pay it. It **is** part
-of the C-vs-Rust rows in §3 and they say so.
+kernel-exclusive and rung-to-rung between rungs that all pay it.
+
+⚠ **Nor is it part of the C-vs-Rust rows in §3, and an earlier draft said it
+was** (TASK_036_REVIEW). Those rows are **kernel-exclusive** too, and the
+`memset` runs in libc, outside the kernel symbol — so the 43–50 Ir/call that
+only the Rust rungs pay is **excluded** from them. The size of the difference:
+`c-clang` reads **−12.29%** against R4 kernel-exclusive and **−13.47%**
+whole-program. The `[0u64; 64]` fill is priced here, in this subsection, and
+nowhere else; a reader wanting the C-vs-Rust gap *with* it has to add it back.
 
 ## 4. The swept laws — five exact integer cost models, zero residual
 
@@ -263,13 +274,33 @@ kernel-exclusive Ir per call, -O3 isolated       MAX RESIDUAL 0.0000, 89 blobs
   c-gcc-h    (R1h) = 19·xpush +  7·dpush + 13·xpop +  7·epop + 41
   safe_naive (R2)  = 31·xpush + 27·dpush + 37·xpop + 28·epop + 57
   safe_tuned (R3)  = 11·xpush +  7·dpush + 17·xpop +  8·epop + 46
-  unsafe/verus     = 11·xpush +  7·dpush + 14·xpop +  8·epop + 41
+  unsafe     (R4)  = 11·xpush +  7·dpush + 14·xpop +  8·epop + 41
 
                                                  MAX RESIDUAL 0.0000, 77 blobs
                                                  (the 77 with epop == 0; see below)
   c-clang    (R1)  = 11·xpush +  7·dpush + 11·xpop + 26
   c-gcc      (R1)  = 19·xpush +  7·dpush + 11·xpop + 41
 ```
+
+⚠ **The `R4` row is R4's, and the sweep never measured R5.** It used to be
+labelled `unsafe/verus`: `.temp/p03/kir-band-*.json` has no `verus` row, so the
+row is `unsafe`'s 89 blobs and nothing else. R5 is *entitled* to the same law
+at `-O3` — §8 pins R4 and R5 to the same machine-code bytes (`md5_raw` equal,
+`md5_fn 52432361a348`), and finding 1 says a proof costs zero instructions —
+but that is an inference from the identity pin, not a sweep, and the label
+should not have said otherwise.
+
+⚠ **And the design's support is thin where two of the five terms live**
+(TASK_036_REVIEW §6, exact rational rank). The pooled design is rank **5/5**,
+but **every pair of bands is rank-deficient** — `A 3/5, B 3/5, C 3/5; A+B 4/5,
+A+C 4/5, B+C 4/5` — so no two bands identify these terms and the three-band
+pooling is load-bearing rather than decorative. Worse for two coefficients:
+`epop > 0` on only **12 of 89** blobs and `dpush > 0` on only **9 of 89**. The
+`epop` and `dpush` rates are therefore carried by a handful of points and by
+the zero residual, not by a well-spread design, and that is worth saying beside
+a law that reports `max residual 0.0000`. (The `small` and `large` cells do not
+depend on `epop` at all — both have `epop = 0` — and `large` is where `dpush`
+matters: 352 per call.)
 
 **The two R1 cells are fitted on bands A and B only, and that is a result and
 not a convenience.** On band C an R1 cell's *own* execution counts stop being
@@ -285,20 +316,35 @@ running the same program.
 | quantity | law | what it is |
 |---|---|---|
 | `R1h − R1` | **`2.00000 · xpop`**, exactly, **gcc and clang alike**, constant 0 | what the **emptiness check** costs, inside one language |
-| `R3 − R4` | **`3.00000 · xpop + 5`** | what safe Rust's surviving **bounds check** costs |
+| `R3ship − R4ship` | **`3.00000 · xpop + 5`** | what the **shipped** safe rung's surviving bounds check costs — a spelling's number, not the class's (§10a) |
 | `R2 − R3` | **`20.00000 · (xpush + dpush + xpop + epop) + 11`** | the **opcode-stream** bounds checks, which one reslice removes |
 | `R2 − R4` | `20.00000 · nops + 3.00000 · xpop + 16` | the sum |
 
 and the one that is not a number:
 
-| `R3 − R4` on `xpush`, `dpush`, `epop` | **0.00000, 0.00000, 0.00000** | the **push-side** bounds check is deleted outright |
+| `R3ship − R4ship` on `xpush`, `dpush`, `epop` | **0.00000, 0.00000, 0.00000** | the **push-side** bounds check is deleted outright |
 
 **One array, one compile-time bound of 64, one function, two answers.** The
-push's `stack[sp]` sits inside `if sp < STACK_CAP` in the same basic block and
-LLVM deletes its check; the pop's `stack[sp]` needs `sp <= STACK_CAP` carried
-across the attacker-chosen `if op == 0` branch and the loop back edge, and LLVM
-does not carry it. Both safe rungs' push path is **instruction-identical** to
-R4's: 11 for a push that pushes, 7 for one the guard drops, in R3 and in R4.
+push's `stack[sp]` sits inside `if sp < STACK_CAP` and LLVM deletes its check;
+the pop's `stack[sp]` needs `sp <= STACK_CAP` carried across the
+attacker-chosen `if op == 0` branch and the loop back edge, and LLVM does not
+carry it. Both safe rungs' push path is **instruction-identical** to R4's: 11
+for a push that pushes, 7 for one the guard drops, in R3 and in R4.
+
+⚠ **The discriminator is NOT "the same basic block", and that wording is
+refuted** (TASK_036_REVIEW §5). `x_pushhoist` computes `let can_push = sp <
+STACK_CAP;` in the loop head and branches on it in the push arm — guard and
+write in *different* basic blocks — and it is **byte-identical to shipped R3**
+(`md5_fn a5a47dba3129`, `n_fn 82`, 3361 / 9010): LLVM normalises the hoist away
+and still deletes the push check. (It is also out of contract by the gate's own
+ruler — it misses `required[0]`'s `if sp < STACK_CAP {` — so it refutes the
+*mechanism sentence* and is not a spelling of the class; the two facts are
+independent.) **What actually separates the two guards is which BOUND each
+supplies**: the push guard establishes `sp < STACK_CAP`, which is the upper
+bound the write needs, right there and from local information; the pop guard
+establishes only `sp > 0`, a *lower* bound, and the upper bound the read needs
+has to come from the loop-carried invariant, which is the thing LLVM will not
+derive unseeded (§4b).
 
 Two smaller things fall out of the same table:
 
@@ -344,8 +390,22 @@ band-A points, so the design is not degenerate), zero residual:
 unsafe rung 14 → 13, so the safe-versus-unsafe gap goes to EXACTLY ZERO per
 pop** and the whole of `R3 − R4` collapses to the same +5 per-call constant it
 already had. The dead test costs 2.00000 per *dropped* push, which is why
-`m_clamp` is cheaper than R4 on `small` (−113 Ir/call, few dropped pushes) and
-dearer on `large` (+502, 559 dropped pushes per call).
+`m_clamp` is cheaper than R4 on `small` (−113 Ir/call, **zero** dropped pushes)
+and dearer on `large` (+502, **352** dropped pushes per call — `.temp/p37/counts_sl.py`
+replays `model.py`'s own driver loop: `large` is 830 ops per call, 271 executed
+pushes, 352 dropped, 207 executed pops, 0 empty pops. An earlier draft said 559,
+which is `dpush + xpop`, the count of operations that are *not* executed pushes.)
+
+⚠ **Where the 2.00000 per dropped push comes from, off the listing** — because
+§10a turns on it. In `m_clamp`'s kernel the push guard is respelled
+`cmp $0x40,%r15 ; jne <push> ; mov $0x40,%r15d ; jmp <tail>`: knowing
+`sp <= STACK_CAP`, LLVM reads the failed guard as `sp == STACK_CAP` and
+**materialises the constant** on that edge, which is two instructions more than
+the `cmp $0x40,%r15 ; jae <tail>` that R3 and R4 emit. It is not the dead test
+executing — the dead test is gone. **Moving the same fact to the loop's back
+edge avoids it entirely** (§10a): the header phi is then bounded from below by
+the entry value and from above by an asserted back edge, no fixed point is
+needed, and the dropped-push edge never learns the equality.
 
 So the sentence survives on a linear fact, and p03 states it in the form the
 control licenses:
@@ -355,10 +415,50 @@ control licenses:
 > dead runtime test and watching the gap go to zero, on both sides of the
 > comparison, with no fitted parameter.**
 
-`m_clamp` is `idiom`-legal in letter (it adds no forbidden spelling) but it is a
-**control and not a rung**: it is dead code inserted to move a number, which is
-the shape `.memory/01-ladder.md`'s direction test exists to catch, and it is
-reported here rather than shipped for that reason.
+⚠ **Two qualifications, both measured, and the sentence is wrong without them.**
+
+**(1) It is not a fact about safe Rust — it is a fact about optimisers, and two
+independent middle-ends fail the same lemma the same way** (TASK_036_REVIEW §4).
+Give the *C* rung the bounds check a careful C programmer writes on the pop read
+(`if (sp >= STACK_CAP) __builtin_trap();` after the decrement, the C analogue of
+safe Rust's `if idx >= len { panic }`), ± the identical clamp. Kernel-exclusive
+Ir/call, `-O3 isolated`, `.temp/r36/c/k_*.c`:
+
+```
+  c-clang-h (shipped R1h)      small=2869  large= 8162   n_fn 51   no check written
+  k_bchk-clang    (+check)     small=3341  large= 8990   n_fn 56   check SURVIVES (cmp $0x3f, ud2)
+  k_bchk_clamp-clang           small=2869  large= 8866   n_fn 53   md5_fn e5fd25a089b2…
+  k_clamp-clang   (no check)   small=2869  large= 8866   n_fn 53   md5_fn e5fd25a089b2…  <- IDENTICAL
+  c-gcc-h   (shipped R1h)      small=3836  large=10345   n_fn 76   no check written
+  k_bchk-gcc      (+check)     small=4546  large=12997   n_fn 80   check SURVIVES (2x cmp $0x3f)
+  k_bchk_clamp-gcc             small=3838  large=10347   n_fn 78   md5_fn d88f71dc501a…
+  k_clamp-gcc     (no check)   small=3838  large=10347   n_fn 78   md5_fn d88f71dc501a…  <- IDENTICAL
+```
+
+clang keeps the manual C check at **4.00000 Ir per executed pop, exactly**
+(+472 / +828 over 118 / 207 pops); gcc keeps it too. Hand either compiler the
+identical clamp and **both delete 100% of it**, with the clamped-with-check
+binary **byte-identical** to the clamped-without-check one. **gcc shares no
+middle-end with rustc**, so this is not an LLVM quirk and not a Rust result:
+write it as *"any compiler asked to prove this"*, never as *"safe Rust"*.
+
+**(2) LLVM does eventually DERIVE the fact; what it cannot do is find it
+unseeded.** In `m_clamp`'s output the clamp is **gone**, and its `return 0`
+semantics is not preserved on the `sp > 64` path — the only `cmp $0x40` left is
+the push guard, respelled as an *equality* (see above), which is only sound if
+`sp <= 64` is known. So LLVM did derive `sp <= STACK_CAP`; it needed the fact
+handed to it once before it would. **That makes this analysis seeding / phase
+ordering, not an inability to prove the lemma — a different failure from p05's**,
+where the fact itself is nonlinear.
+
+`m_clamp` is `idiom`-legal by the gate's own ruler (0 forbidden hits, 0 required
+misses) but it is reported here as a **control and not a rung**: it is dead code
+inserted to move a number, which is the shape `.memory/01-ladder.md`'s direction
+test exists to catch. ⚠ Note what that exclusion does and does not buy: `m_clamp`
+is **byte-identical** to `r3_assert_head`, an in-contract spelling (`md5_fn
+7ad05dbef1b7`, both), so **excluding it removes no machine code from the
+admissible class** — the same shape `.memory/01-ladder.md` records for p17,
+where the excluded spelling and an admissible one compile to the same 478 bytes.
 
 ### 4c. Two more levers, priced
 
@@ -376,6 +476,15 @@ into an in-range one, which is the opposite of what this pattern models) and the
 measurement says the exclusion is not protecting a number — it would move the
 published figure from 3.00000 to 2.00000, i.e. *down*, in the direction that
 flatters the thesis. **Forbidding it is against interest.**
+
+**And, stronger, the exclusion protects nothing at all** (TASK_037). The
+in-contract R3 class reaches **13.00000 per executed pop** (`r3_assert_tail`,
+§10a), which is *below* `m_mask`'s 16.00000 and below R4's own 14.00000 — so a
+spelling that violates no entry of the declaration is **cheaper than the
+forbidden one**, and the mask is not the cheap thing p03 is refusing to write.
+`r3_assert_idx` makes the point exactly: `assert!(sp < STACK_CAP)` stated after
+the decrement lands on `m_mask`'s **exact numbers**, 3243 / 8803, in contract
+and from a *different* machine code (`md5_fn c7f4d2b8162f` against `a7ea8592ed93`).
 
 ### 4d. The branch lever — and it is cleaner than a compiler flag
 
@@ -905,67 +1014,164 @@ wire format — any window may declare zero operations — and it is what makes 
 `.memory/01-ladder.md` finding 3 requires **at least two independent in-contract
 R3 spellings with the cheaper quoted**. All numbers are kernel-exclusive Ir/call
 (§3b says why), built by `controls/gen_controls.py` and measured by
-`.temp/p03/run_controls.py`. **Every control prints `model.py`'s answer on all
-six matrix inputs**, checked by the same script.
+`.temp/p03/run_controls.py` (the TASK_036_REVIEW and TASK_037 rows by
+`.temp/r36/probe.py` and `.temp/p37/probe.py`, which use the same two-point
+marginal). **Every control prints `model.py`'s answer on all six matrix
+inputs**, checked by the same script — including every row added below.
 
-### 10a. The R3 side — three spellings reach ONE machine code, and a fourth is dearer
+### 10a. The R3 side — the shipped spelling is NOT the cheap end, and the class goes NEGATIVE
+
+⚠ **This subsection was wrong at the bottom through TASK_036 and again at
+TASK_036_REVIEW.** The first draft published `safe_tuned` as "cheapest found,
+both blobs"; the review found `assert!(sp <= STACK_CAP)` at the loop head, which
+is in contract by the gate's own ruler and 472 Ir/call cheaper on `small`; and
+TASK_037, told to look for a cheaper one before writing the number down, found
+that the **same assertion on the loop's back edge** is cheaper again — by 704
+Ir/call on `large`. **Two refutations on one pattern, one of them of a figure
+that had already survived a review**, so read the table as a search log and not
+as a floor.
 
 | spelling | small | small − R4 | large | large − R4 | `md5_fn` | in contract? |
 |---|---:|---:|---:|---:|---|---|
-| `safe_tuned` (**shipped**) — window reslice, `w[4 + 5*k]` | 3361 | **+359** | 9010 | **+626** | `a5a47dba3129` | yes — **cheapest found, both blobs** |
+| `r3_assert_tail` — `assert!(sp <= STACK_CAP)` on the **back edge** | 2889 | **−113** | **8182** | **−202** | `cd9855c16fe4` | yes — **cheapest found, both blobs** |
+| `r3_assert_head` — the same assertion at the loop **head** | 2889 | **−113** | 8886 | +502 | `7ad05dbef1b7` | yes |
+| `r3_assert_pop` — the same assertion inside the **pop arm** | 3125 | +123 | 8596 | +212 | `26e8bbe931c3` ⚠ | yes |
+| `r3_assert_idx` — `assert!(sp < STACK_CAP)` **after the decrement** | 3243 | +241 | 8803 | +419 | `c7f4d2b8162f` | yes |
+| `safe_tuned` (**shipped**) — window reslice, `w[4 + 5*k]` | 3361 | +359 | 9010 | +626 | `a5a47dba3129` | yes |
 | `r3_forloop` — `for k in 0..nops` | 3361 | +359 | 9010 | +626 | `a5a47dba3129` | yes |
-| `r3_slicestack` — the stack reached as `&mut stack_arr[..]` | 3361 | +359 | 9010 | +626 | `a5a47dba3129` | yes |
-| `r3_chunks` — `w[4..4+5*nops].chunks_exact(5)` | 3595 | +593 | 9837 | +1453 | `22c952351220` | yes — **dearest found** |
+| `r3_slicestack` — the stack reached as `&mut stack_arr[..]` | 3361 | +359 | 9010 | +626 | `a5a47dba3129` | yes, by the entry's English (see below) |
+| `r3_chunks` — `w[4..4+5*nops].chunks_exact(5)` | 3595 | +593 | 9837 | +1453 | `22c952351220` | yes — **dearest found** apart from R2 |
 | `safe_naive` (R2, shipped) | 8112 | +5110 | 25621 | +17237 | `f73287f3ba30` | yes |
 | `m_mask` — `stack[sp & (STACK_CAP - 1)]` | 3243 | +241 | 8803 | +419 | `a7ea8592ed93` | **no** — forbidden |
-| `m_clamp` — R3 + a dead `if sp > STACK_CAP` | 2889 | **−113** | 8886 | +502 | `7ad05dbef1b7` | **no** — dead code inserted to move a number |
+| `m_clamp` — R3 + a dead `if sp > STACK_CAP` | 2889 | −113 | 8886 | +502 | `7ad05dbef1b7` | **no** — dead code inserted to move a number |
 | `m_branchless` — the dispatch as a select | 6561 | +3559 | 22183 | +13799 | `9515fe351865` | **no** — `required[4]` |
 
 * **fixed-R4 bound** (`R3ship − R4ship`, R4 held by fiat — the only sound
   quantity per `.memory/01-ladder.md`): **+359 on `small`, +626 on `large`**,
-  and as a law `3.00000·xpop + 5`.
+  and as a law `3.00000·xpop + 5`. It survives as an **upper** bound on
+  `inf(in-contract R3) − R4ship`, and what it bounds is now **negative on both
+  blobs**.
+* ⚠ **`3.00000` per executed pop is the SHIPPED SPELLING's rate, not the
+  class's.** Swept exactly, 19 blobs, `max residual 0.000000`
+  (`.temp/p37/sweepfit.py`), against R4's `11 xpush + 7 dpush + 14 xpop + 41`:
+
+  ```
+    safe_tuned      11·xpush + 7·dpush + 17·xpop + 46      +3.00000 per pop
+    r3_assert_idx   11       + 7       + 16      + 46      +2.00000
+    r3_assert_pop   11       + 7       + 15      + 46      +1.00000
+    r3_assert_head  11       + 9       + 13      + 46      −1.00000  (+2 per dropped push)
+    r3_assert_tail  11       + 7       + 13      + 46      −1.00000  (and nothing per dropped push)
+  ```
+
+  The in-contract class runs from **+3.00000 down to −1.00000 per executed pop**
+  on one line of source, and `r3_assert_tail` **dominates every other spelling
+  found, on every regressor**.
 * **R3-side span**, cheapest-found to dearest-found in contract:
-  **+359 … +5110 on `small`** and **+626 … +17237 on `large`**. The dearest end
+  **−113 … +5110 on `small`** and **−202 … +17237 on `large`**. The dearest end
   is `safe_naive`, which is a *shipped rung* — p03's R2 and R3 differ by one
   reslice and are both in contract, so the span is genuinely the rung ladder and
-  not a search artefact. Excluding R2, the span is **+359 … +593 / +626 …
-  +1453**, width 234 / 827.
-* Write **"cheapest found"**, never "minimum". Six p05/p16/p07/p11 minima have
-  been published on this project and every one was refuted by the next agent's
-  first lever.
+  not a search artefact. Excluding R2, the span is **−113 … +593 / −202 …
+  +1453**, width 706 / 1655.
+* Write **"cheapest found"**, never "minimum" — and this subsection is the
+  project's cleanest demonstration of why. Six p05/p16/p07/p11 minima had been
+  published and every one was refuted by the next agent's first lever; p03's own
+  has now been refuted **twice**, the second time after a review had confirmed it.
 * ⚠ **Three in-contract spellings land on the same number because they land on
   the same MACHINE CODE** — `md5_fn a5a47dba3129`, identical, `n_fn 82`. That is
   worth stating precisely because `.memory/01-ladder.md` warns that *"reached by
   many spellings is not evidence of a floor"*: here it is not even three points,
   it is **one point written three ways**, and it is evidence of nothing at all
-  about a floor.
-* **Unlike p16 and p11, the cheapest spelling is the same on both blobs.** p16's
-  `chunks_exact(64)` is cheapest on one input and dearest on the other and p11's
-  `take_while` flips too; p03's ranking is stable because its per-call cost is
-  linear in counts the input fixes, with no chunk remainder and no library
-  threshold to cross.
+  about a floor. Two more pairs collide the same way: `r3_assert_head` is
+  byte-identical to `m_clamp`, and `r3_assert_idx` reaches `m_mask`'s exact
+  *numbers* from a different machine code.
+* **The cheapest spelling IS the same on both blobs — but the ranking below it
+  is not.** `r3_assert_tail` wins or ties both (it ties `r3_assert_head` on
+  `small` only because `small` has **zero** dropped pushes, so the head
+  placement's +2·dpush costs nothing there). Between the other two, `head` beats
+  `pop` on `small` by 236 and `pop` beats `head` on `large` by 290 — the
+  same input-dependent reordering p16's `chunks_exact(64)` and p11's
+  `take_while` show, one level down. **A cheapest-found figure must name its
+  input even when the winner does not change.**
+* **Placement is the whole story, and it is worth 2 Ir twice**, read off the
+  listing (`harness/asm.py show --raw`):
+  * **back edge** (`r3_assert_tail`): every edge into the header phi is bounded
+    without a fixed point — the entry value is `0` and the back edge is
+    asserted — so LLVM deletes the pop's bounds check *and* the assertion, and
+    the pop becomes `add -0x8(%rsp,%r15,8),%rsi ; dec %r15` with the address
+    arithmetic folded into the addressing mode. The push guard keeps its
+    `cmp $0x40,%r15 ; jae` spelling, exactly as in R3 and R4.
+  * **head** (`r3_assert_head`, and `m_clamp`): same 13 per pop, but LLVM now
+    knows `sp == STACK_CAP` on the dropped-push edge and materialises it —
+    `cmp $0x40,%r15 ; jne ; mov $0x40,%r15d ; jmp` — which is the +2.00000 per
+    dropped push, and 704 Ir/call on `large`.
+  * **pop arm** (`r3_assert_pop`): the assertion does not dominate the back
+    edge, the loop-carried range is never established, and the assertion
+    **survives** as `cmp $0x41,%r15 ; jae <panic>` — 2 Ir on every POP
+    *operation*. It still deletes the pop's own bounds check. (The 19-blob
+    design has `epop = 0` throughout, so the fit attributes those 2 to `xpop`;
+    on band C they would split. `small` and `large` both have `epop = 0`.)
+  * **after the decrement** (`r3_assert_idx`): the assertion and the check are
+    now the same comparison on the same value, LLVM keeps one of them, and the
+    saving is 1.00000.
+* ⚠ **`r3_assert_pop`'s `md5_fn` is the one digest in this table that moves with
+  the SOURCE FILE'S NAME**, and it is worth a line because it is a small trap.
+  It is the only row whose assertion survives into the binary, so its kernel
+  carries a pc-relative reference to a panic `Location` — and the `Location`
+  holds the *source path*, so building the identical bytes from a differently
+  named scratch file shifts `.rodata` and with it the displacement:
+  `md5_fn 26e8bbe931c3` from `.temp/p03/controls/r3_assert_pop.rs`,
+  `18e28795e5fc` from a copy under another name, **same `n_fn 82`, same
+  `md5_fn_norel e33533f83a4d`, same `md5_raw_norel aa78cd90afec`, same Ir**.
+  Quote `*_norel` for this row, per `harness/asm.py`'s own rule. The other three
+  assertion rows are byte-identical across both builds, which is independent
+  corroboration that their assertions really are **gone**.
 * The **out-of-contract** exclusions cut in both directions and one of them cuts
   against interest: `m_mask` is **cheaper** than the shipped R3 and forbidding it
   raises p03's published tax from 2.00000 to 3.00000 per pop, while
   `m_branchless` is **far dearer** and forbidding it lowers nothing. On p05 and
   p16 the excluded spellings were uniformly cheaper, which made the declaration
-  look like it might be protecting a number; here it is not.
+  look like it might be protecting a number; here it is not — and §4c gives the
+  stronger form: the in-contract class reaches **13** per pop against `m_mask`'s
+  16, so the exclusion is not even keeping the cheapest spelling out.
+* ⚠ **One row's admission rests on the entry's English rather than on the
+  ruler.** `r3_slicestack` renames the array (`let mut stack_arr: [u64;
+  STACK_CAP] = [0; STACK_CAP];`) and therefore **misses** `required[2]`'s
+  literal span under `check.spelling_matches`, while honouring what the entry
+  says — "a fixed-size LOCAL array, never a growable one". That is exactly the
+  case `.memory/01-ladder.md` records as *"`required` is NOT decidable — an
+  entry's rung scope and polarity live in its English"*, and it is disclosed
+  rather than counted silently. It sets no endpoint: it is byte-identical to the
+  shipped R3. Every other `r3_*` above is **0 forbidden hits, 0 required misses**
+  against the gate's own matcher (`.temp/p37/contract.py`, which calls
+  `harness/check.py::spelling_matches`).
 
-### 10b. The R4 side — degenerate, FIFTH pattern running
+### 10b. The R4 side — the project's FIRST admissible R4 that MOVES
 
 TASK_026 §0 item 3 and `.memory/01-ladder.md`: **a rung covered by an `identity`
 pin is chained to the prover**, so an R4 candidate is not a rung until its R5
-twin verifies. All three candidates have a twin in `controls/gen_controls.py`
-and all three have been run **before any of their numbers was differenced**.
+twin verifies. Every candidate has a twin in `controls/gen_controls.py` and
+every twin was run **before any of its numbers was differenced**.
 
 | spelling | small − R4 | large − R4 | Verus verdict |
 |---|---:|---:|---|
-| `r4_forloop` — `for k in 0..nops` | **0.00** | **0.00** | **`9 verified, 0 errors`** — admissible, and it does not move |
-| `r4_ptr` — `as_ptr()` / `add()` | 0.00 | 0.00 | **DISQUALIFIED** |
-| `r4_slicestack` — the stack as `&mut [u64]` | 0.00 | 0.00 | **DISQUALIFIED, and for a reason no earlier pattern hit** |
+| `r4_forloop` — `for k in 0..nops` | **0.00** | **0.00** | **`9 verified, 0 errors`** — admissible, does not move |
+| `r4_slicestack` — the stack as `&mut [u64]` | **0.00** | **0.00** | **`9 verified, 0 errors`** — admissible, does not move |
+| `m_clamp_unsafe` — R4 + a dead `if sp > STACK_CAP` at the **head** | **−118** | **+497** | **`9 verified, 0 errors`** — admissible, **and it MOVES** |
+| `m_clamp_unsafe_tail` — the same test on the **back edge** | **−118** | **−207** | **`9 verified, 0 errors`** — admissible, moves further |
+| `r4_ptr` — `as_ptr()` / `add()` | 0.00 | 0.00 | **DISQUALIFIED** — `does not yet support` |
+| `r4_assert` — `assert!(sp <= STACK_CAP)` | — | — | **DISQUALIFIED** — `panic is not supported`; the safe class's own lever, unavailable here |
 
 ```
 $ ./verus_run.py .temp/p03/controls/r4_forloop_twin.rs
+verification results:: 9 verified, 0 errors
+
+$ ./verus_run.py .temp/p03/controls/r4_slicestack_twin.rs
+verification results:: 9 verified, 0 errors
+
+$ ./verus_run.py .temp/p03/controls/m_clamp_unsafe_twin.rs
+verification results:: 9 verified, 0 errors
+
+$ ./verus_run.py .temp/p03/controls/m_clamp_unsafe_tail_twin.rs
 verification results:: 9 verified, 0 errors
 
 $ ./verus_run.py .temp/p03/controls/r4_ptr_twin.rs
@@ -973,42 +1179,79 @@ error: The verifier does not yet support the following Rust feature: dereferenci
 a raw pointer. Currently, Verus only supports raw pointers through the permissioned
 raw_ptr interface
 
-$ ./verus_run.py .temp/p03/controls/r4_slicestack_twin.rs      # accessors unchanged
-error[E0308]: mismatched types                                 # x2 -- it does not even TYPECHECK
+$ ./verus_run.py .temp/p03/controls/r4_assert_twin.rs
+error: panic is not supported (if you used Rust's `assert!` macro, you may have
+       meant to use Verus's `assert` function)
+```
 
-$ ./verus_run.py .temp/p03/controls/r4_slicestack_twin.rs      # accessors respelled over &[u64]
-error[E0502]: cannot borrow `(Verus spec stack_arr)` as immutable because it is also
-              borrowed as mutable
+⚠ **So p03's pair interval is NOT degenerate, and this is the first pattern on
+which it is not** (p05, p16, p07, p11 were all degenerate, and
+`.memory/01-ladder.md` carried *"nobody has, on any pattern"* as a standing
+statement). `m_clamp_unsafe` and `m_clamp_unsafe_tail` are R4 plus one
+provably-dead `if sp > STACK_CAP { return 0; }`; both
+
+* verify **`9 verified, 0 errors`** with **zero new trusted items** — the
+  accessors, their `requires`, their `ensures` and the TCB tally are untouched,
+  because `sp <= STACK_CAP` is already an invariant clause and the dead test
+  needs no ghost support at all;
+* hold the `identity` pin **byte-for-byte**: the `rustc` build and the
+  `verus --compile` build of the tail variant agree on `md5_raw
+  331b95aebf7743b42bb2114a8e733534` and `md5_fn c079bb40d06d832c964ebcffec35334c`,
+  `n_fn 66` — the same instruction count as shipped R4;
+* are in contract by the gate's own matcher (0 forbidden hits, 0 required
+  misses), and out of it only by the **judgement** §4b states — dead code
+  inserted to move a number. That judgement is why they are named `m_*`;
+* and they **move**: −118 / +497 at the head, −118 / **−207** on the back edge,
+  the same ±2·dpush placement effect §10a measures on the safe side.
+
+**The measured asymmetry, on the same pattern.** `assert!` is the safe class's
+cheapest lever (§10a) and Verus answers `panic is not supported` — which
+`.memory/01-ladder.md`'s qualification 2 makes a disqualification at the pinned
+vstd — so **the safe class reaches a spelling the unsafe class cannot**. That is
+the third measured instance of R4-by-permission on this project and the first
+where the safe-side lever is a one-line assertion. The unsafe side reaches the
+same *per-operation rates* by a different route — the dead clamp gives
+`11 xpush + 7 dpush + 13 xpop` on both sides, and the two differ only in the
+per-call constant (46 against 41, the window-reslice check) — so what is
+asymmetric here is the **permission**, not the reachable cost.
+
+⚠ **What the two class minima are, and what they do NOT license.** Cheapest
+in-contract R3 is 2889 / 8182 and cheapest admissible R4 is 2884 / 8177 — a
+difference of **exactly 5 on both blobs**, i.e. the per-call constant, with
+`0.00000` per executed pop. **Do not publish that as p03's safety tax.**
+`.memory/01-ladder.md` is explicit: `min(R3) − min(R4)` is the difference of two
+*upper* bounds and bounds nothing in either direction. The sound number remains
+the fixed-R4 bound (§10a), and what the +5 says is only that the two searches
+have so far converged on the same code up to the window-reslice check.
+
+⚠ **`r4_slicestack` is NOT borrow-checker-blocked, and the earlier claim that it
+was is WITHDRAWN** (TASK_036_REVIEW §3a). This file used to read the errors
+below as a fact about Rust — *"the unsafe class is bounded by Rust's borrow
+checker"* — and they were **two defects in `controls/gen_controls.py`**:
+
+```
+error[E0502]: cannot borrow `(Verus spec stack_arr)` as immutable because it is
+              also borrowed as mutable                      # x2
 error[E0596]: cannot borrow `stack` as mutable, as it is not declared as mutable
 ```
 
-**So the pair interval is DEGENERATE — the only R4 shown admissible besides the
-shipped cell measures exactly `R4ship` (byte-identically: `md5_fn
-52432361a348`, `n_fn 66`, `asm.identity_level` `exact`), so the R4 endpoint has
-zero measured width and the interval collapses onto the R3-side span.** That is
-the fifth pattern running (p05, p16, p07, p11, p03) and it is stated as
-degeneracy rather than unavailability, because it stops being degenerate the day
-somebody builds an admissible R4 that moves.
-
-⚠ **What is new here is a second, independent reason the R4 class is narrow, and
-it is not vstd's fault.** `r4_slicestack` is disqualified twice over: with the
-shipped accessors it does not typecheck, because they take `&[u64; 64]`; with
-the accessors respelled over `&[u64]` it does not *borrow-check*, because the
-same `&mut [u64]` cannot be reborrowed immutably for the read while it is held
-mutably for the write. So on p03 the unsafe class is bounded by **Rust's borrow
-checker and by the shape of the trusted base**, not only by what vstd can
-express — and respelling the trusted base to widen it is *itself* a change to
-the TCB, which is the cost `.memory/01-ladder.md` disqualified p16's `r4_hdr`
-for. **The claim p03 is entitled to is "no admissible R4 has been SHOWN to
-move", not "none can".**
+The `E0502`s came from a ghost invariant clause and a ghost `assert` **the
+control itself added**, both reading `stack_arr` while it is mutably borrowed
+and neither needed by the candidate; the `E0596` came from a generated
+`let stack:` with no `mut`. With the ghost assert split across the borrow, the
+unsizing coercion `&mut stack_arr` in place of `&mut stack_arr[..]`, and
+`&mut *stack` / `&*stack` reborrows at the two call sites — **the same 1 + 3
+TCB lines and the same `requires`, only the parameter types moving** — it
+verifies `9 verified, 0 errors`, and its exec side is byte-identical to shipped
+R4 (`md5_fn 52432361a348`, 3002 / 8384). The generator is repaired, so the
+verdict above is re-derivable from the tree.
 
 ⚠ **And note how much smaller the excluded gap is here than on p11.** p11's
-inadmissible `r4_cstr` was worth 17 526 Ir/call, 35% of the kernel. p03's three
-candidates are worth **0.00** — every one of them compiles to R4's own code or
-to a permutation of it. So p03 is a clean negative for the R4-by-permission
-result rather than an instance of it: **on this pattern the unsafe class really
-does look singular, and it is the first pattern where searching it turned up
-nothing at all.**
+inadmissible `r4_cstr` was worth 17 526 Ir/call, 35% of the kernel. p03's two
+*disqualified* candidates are worth **0.00** — each compiles to R4's own code or
+to a permutation of it. What p03 adds is not a large excluded gap but a
+**non-zero admissible one**: the R4 endpoint has measured width for the first
+time on this project, 2884 … 3002 on `small` and 8177 … 8881 on `large`.
 
 ### 10c. The out-of-contract spellings, and what each buys
 
@@ -1016,10 +1259,18 @@ nothing at all.**
 |---|---|---:|---:|
 | `m_mask` | 1.00000 of the 3.00000 per-pop check | +241 | +419 |
 | `m_clamp` | 4.00000 per pop, costs 2.00000 per dropped push | −113 | +502 |
+| `m_clamp_unsafe` | 1.00000 per pop off **R4**, same 2.00000 per dropped push | −118 | +497 |
+| `m_clamp_unsafe_tail` | 1.00000 per pop off **R4**, and nothing per dropped push | −118 | −207 |
 | `m_uninit` | the `[0u64; 64]` fill and its `memset` | −17 (+ the memset) | −17 (+ the memset) |
 | `m_branchless` | the two-way branch | +3559 | +13799 |
 
-## 11. Wall clock — the noise floor first, and one column is UNRESOLVED
+Only the first and the last are out of contract by `idiom.forbidden`;
+`m_uninit` is (`MaybeUninit`) too. The three `m_clamp*` are out by the
+**judgement** of §4b and not by the ruler, and §10b treats the unsafe pair as
+admissible R4 candidates for exactly that reason — a ruler the gate can run
+admits them, so the twin has to be run before their numbers are quoted.
+
+## 11. Wall clock — the noise floor first, one null, and one direction reversal
 
 `.memory/03-measurement.md`: run `common/layout/order.py` **before** believing
 any `ns` number, and `layout_gen.py` if a mode shows. Both were run.
@@ -1147,10 +1398,22 @@ is therefore:
 > and exact; the time gap is real and has a range, not a value; and the
 > direction is opposite.**
 
-⚠ **The caveat that must travel with it**: the effect is 1.5–3× the
-identical-copy floor and this box is in its noisy regime (§11b). The direction
-reproduces across two passes and two modes; the *magnitude* should be read as
-"7 to 15 percent", never as a point.
+⚠ **The caveat that must travel with it — and it is about the MAGNITUDE, not
+the sign.** The effect is 1.5–3× the identical-copy floor and this box is in its
+noisy regime (§11b), so the *magnitude* should be read as "7 to 15 percent",
+never as a point.
+
+**The DIRECTION is resolved, and an earlier draft hedged it too hard**
+(TASK_036_REVIEW's noise-floor rerun). There are now **seven independent
+correct-protocol readings across two sessions**, all negative and spread 0.4
+points: §11a's three (`round_robin` and `alternating`, −10.63…−11.04%) plus four
+more the next day (`alt` and `gen` orders, two passes: −10.70, −10.72, −10.77,
+−10.86%), against an identical-copy floor of **3.4–6.5%** in the same runs. The
+only readings that do not show it are the **blocked** schedule, which §11a
+already identifies as the protocol bug — it inflates two floors to 10–13% and
+pulls `R3 − R4` to −3.7…−4.4%, still negative. "A sign that flips between modes
+is not a sign" (`.memory/03-measurement.md`) applies to `large`, where it does
+flip (§11c reading 2); on `small` nothing flips.
 
 ### 11d. What is NOT here
 
@@ -1184,19 +1447,28 @@ input and not the other, and the attacker picks which.** `R3 − R4` is
 * the maximiser is 50% density, which is also the only density at which every
   operation executes. **The worst case for safe Rust is the well-formed input.**
 
+⚠ **That is the SHIPPED PAIR's answer.** For the in-contract class the question
+does not arise in the same form: `r3_assert_tail` is `−1.00000·xpop + 5` against
+`R4ship` (§10a), so the *in-contract* cost does not amortise — it is negative on
+both blobs and gets more negative as pops get more frequent. The amortisation
+result above is about `R3ship` and should always be quoted with the rung named.
+
 ### 12b. Is the obligation the same one the optimiser fails?
 
 Yes, and both halves are measured rather than argued: §6c shows the invariant is
 what `stack_get_unchecked`'s precondition needs, and §4b shows that handing LLVM
 the same invariant as dead code takes the gap to zero. p05 could claim the first
-half and had to argue the second; p03 has both, on a **linear** fact.
+half and had to argue the second; p03 has both, on a **linear** fact — and on a
+fact **two independent middle-ends** fail identically (§4b qualification 1), so
+the answer is about optimisers and not about a language.
 
 ### 12c. What the second buffer costs the trusted base
 
 p01, p02, p05, p07, p11, p16 and p17 each ship **one** trusted `unsafe`
 accessor. p03 ships **three**, because the kernel has two buffers and writes one
-of them, and §5b tallies 8 TCB lines across 5 `external_body` items against
-p11's 6 across 3. **That is a real cost of the pattern and not of the
+of them, and §5b tallies **10** TCB lines across 5 `external_body` items
+(`1 + 1 + 3 + 4 + 1`, and the gate's record says 10 too) against p11's 6 across
+3. **That is a real cost of the pattern and not of the
 implementation** — any kernel with a second mutable buffer pays it — and it is
 the first data point this project has on how the TCB scales with the number of
 buffers rather than with the number of rungs.
@@ -1217,7 +1489,13 @@ so the ordering is a consequence of the task and not a choice.
 `.memory/01-ladder.md`'s direction test is what a reviewer should apply, and §10a
 records the two exclusions that move p03's published figure: `m_mask` would
 lower it from 3.00000 to 2.00000 per pop and is forbidden (**against interest**),
-`m_branchless` would raise it and is forbidden (no interest either way).
+`m_branchless` would raise it and is forbidden (no interest either way). Since
+TASK_037 there is a third thing to say and it is the strongest of the three:
+**the declaration is not what holds p03's figure up at all.** An in-contract
+spelling reaches −1.00000 per pop (§10a), below both forbidden alternatives, so
+no exclusion here is protecting a number — what keeps the published 3.00000 in
+place is the *choice of shipped spelling*, which is a separate decision and is
+the one this file now states explicitly.
 
 ### 13a. The shared paragraph is byte-identical
 

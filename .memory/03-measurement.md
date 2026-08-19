@@ -78,6 +78,26 @@ Padding-excluded = every `int3`/`nop`*/`xchg %ax,%ax` dropped, wherever it sits
 (not just the tail). `ud2` is deliberately **counted**: it is the tail of a real
 panic path, not alignment.
 
+### `md5_fn` moves with the SOURCE FILE'S NAME when a panic survives
+
+**Measured at TASK_037.** A kernel that retains a `panic!`/`assert!` landing pad
+holds a pc-relative reference to a `core::panic::Location` carrying **the source
+file's path**. So the *same* control built from two directories gives two
+`md5_fn` values — p03's `r3_assert_pop`: `26e8bbe931c3` from
+`.temp/p03/controls/`, `18e28795e5fc` from a copy — at identical `n_fn` (82),
+identical `Ir`, and **identical `md5_fn_norel` (`e33533f83a4d`)**.
+
+Three consequences:
+
+- **Quote `md5_fn_norel` when comparing kernels built from different paths.**
+  `md5_fn` is only comparable within one build location.
+- **It is a free signal.** A control whose `md5_fn` is *stable* across paths has
+  no surviving panic — which is exactly the "was the check deleted?" question. On
+  p03 three of four assert-controls were byte-stable and the fourth was not, which
+  independently confirmed which assertions LLVM removed.
+- It does **not** affect the gate: `check.py` builds every cell into one tree, so
+  the identity pin compares like with like.
+
 ### This normalisation is for READING diffs. It cannot prove identity.
 
 **Never use the normalised text (or its md5) as the oracle for "R5 ≡ R4".** The sed
