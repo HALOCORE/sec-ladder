@@ -862,12 +862,15 @@ record's commit against `common/driver.c`'s last change; **p16 was never at risk
 which that test could not see**. A commit test is not the test; hashes are
 (`.memory/03-measurement.md`).
 
-**Both p03 tasks are landed. THE NEXT TASK IS A PATTERN.** Nine of 47 exist and
-the last three tasks were all p03. Candidates in the order I would take them:
-**p09** (bitset — word-index vs bit-index confusion, and the first kernel whose
-safety check is not a bounds check at all), **p12** (`strcat` into a fixed buffer,
-now that `asm.py` knows the `str*` family), **p04** (ring buffer — modular index
-plus aliasing).
+**p03 and p09 are landed and reviewed. THE NEXT TASK IS `TASK_040` — p12,
+`strcat` into a fixed buffer.** It is the classic stack smash, the single
+most-cited memory-safety bug in C, and this project does not have it: **every bug
+here so far is a READ** except p02's bulk `memcpy`. It is also the first pattern
+where the safe rung **cannot express the bug at all** (p08's shape, on length
+rather than aliasing).
+After it: **p04** (ring buffer — modular index plus aliasing), **p13**
+(`strncpy` truncation — silent, and the check is *inside* libc), **p06**
+(in-place reverse — a permutation invariant, which is a new *proof* shape).
 
 ⚠ **Read the ratio before planning anything else. TASK_015–031 is seventeen
 consecutive tasks of methodology and correction against two patterns produced
