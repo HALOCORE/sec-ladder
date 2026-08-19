@@ -195,8 +195,9 @@ Three separate qualifications, in decreasing order of how much they cost:
 and +3.5% on the memory-bound one — an 8x difference in the conversion factor"*,
 and TASK_026_REVIEW showed the sentence rested on a rung `§11c` had never built
 at more than one alignment. Built at 30 layouts (§11e) `safe_naive`'s wall clock
-is **bimodal**: 17.708 ms or 13.931 ms on `small`, selected by **bit 4 of the
-kernel's entry address**, against R4's 14.007 / 14.062 in the same two modes. So
+is **bimodal**: 17.708 ms or 13.931 ms on `small`, selected by **where its
+73-byte inner loop sits on the 32-byte instruction-fetch grid** — 3 windows or 4
+— against R4's 14.007 / 14.062 in the same two modes. So
 **R2-vs-R4 is +26.42% in one mode and −0.93% in the other**: the *sign* is a
 property of where the linker put the function, and +28.0% is one of two answers.
 Do not quote either number, and do not quote the `8x` ratio, which is a ratio of
@@ -1242,8 +1243,10 @@ So any "byte-identical machine code at a different address" check on a rung that
 can panic must use `md5_fn_norel`; `md5_fn` will fail it for the right reason and
 the wrong conclusion.
 
-**The band is not a band. It is two modes, selected by bit 4 of the kernel's
-entry address.** Grouping the 30 layouts by `kernel_addr % 32` on `small.bin`:
+**The band is not a band. It is two modes, and the property that selects them is
+the loop's position on the 32-byte instruction-fetch grid.** Grouping the 30
+layouts by `kernel_addr % 32` on `small.bin` — which is a *proxy* for that
+property, see the box below — gives:
 
 | rung | `%32 == 0` | `%32 == 16` | mode gap |
 |---|---:|---:|---:|
@@ -1254,12 +1257,62 @@ entry address.** Grouping the 30 layouts by `kernel_addr % 32` on `small.bin`:
 For R2 the separation is **perfect**: the fastest slow-mode layout is 16.993 ms
 and the slowest fast-mode one is 14.766 ms, so the largest-gap clustering of the
 30 timings and the bit-4 partition are **the same partition**, 30 of 30. It is
-not noise and it is not a gradient — it is one bit, and which residue is fast
-depends on the rung's own loop geometry rather than on a universal rule.
+not noise and it is not a gradient — and which residue is fast depends on the
+rung's own loop geometry rather than on a universal rule.
 
-**No counter this box can produce resolves it.** The minimal pair is
+⚠ **"Bit 4 of the kernel's entry address" is a PROXY, and this section used to
+publish it as the law** (corrected at TASK_030_REVIEW, landed TASK_031). Every
+kernel here is 16-byte aligned, so any 32-byte-granular property of the code can
+only take two values and *looks* like one address bit. It is not the entry
+address that matters — p01's mode is set by a loop at `+0x40`, and p07's by one
+at `+0x148` — and a toolchain that aligned functions to 32 bytes would erase the
+proxy while leaving the effect untouched. Partition by the geometry computed
+from the listing, never by an address bit.
+
+**The mechanism is the 32-byte instruction-fetch / DSB window grid**, in two
+forms, both computed from the recorded addresses with **zero fitted parameters**
+(`.temp/r30/loopfit.py`; `.memory/03-measurement.md`, "Code layout: the 32-byte
+fetch grid"):
+
+- **`win32`** — the loop body occupies one more 32-byte fetch window in one
+  layout than in the other;
+- **`jcc32`** — a branch in the loop crosses or ends on a 32-byte boundary, so
+  its chunk is not cached in the DSB. This box is **Cascade Lake, family 6 model
+  85 stepping 7, microcode `0x5000024`** — the mitigated microcode for the Jump
+  Conditional Code erratum, **Intel SKX102**.
+
+On p07, enumerating **every** loop in the kernel rather than guessing one:
+
+```
+safe_naive loop3 [kernel+0x148,+0x191)  73 B  win32[3,4]  small x0.7863 / x0.7825 / x0.7865  PERFECT (3 passes)
+                                                          large x0.9700 / x0.9686 / x0.9707  PERFECT
+safe_naive loop2 [kernel+0x140,+0x186)  70 B  jcc32[0,1]  small x1.2718 / x1.2780 / x1.2714  PERFECT
+safe_tuned loop2 [kernel+0xa0, +0xd4)   52 B  win32[2,3]  small x1.0605 … x1.0657
+```
+
+**§11e's own geometric negative used the wrong loop and the wrong property, and
+the geometry points the right way once both are fixed.** The retracted sentence
+read: *"`.temp/p29/fetchwin.py` counts the loop geometry off both listings and
+R2's innermost search loop (70 bytes, 23 instructions) spans 3 32-byte fetch
+windows and 2 64-byte lines in both modes … the one geometric difference there
+points the wrong way."* Two errors:
+
+- the 70-byte loop `[+0x140,+0x186)` does span 3 windows in both modes — but its
+  fused `cmp;je` crosses a 32-byte boundary in **exactly one** mode, which is the
+  `jcc32` form and which that count never looked at;
+- there is a **second back-edge**, `[+0x148,+0x191)`, 73 bytes, and it *does* go
+  **3 → 4 windows**. That is the loop the mode is on.
+
+**Record why the wrong loop was picked, because it will happen again**: a
+"tightest backward branch" heuristic (`.temp/r30/jcc.py`) finds the smallest
+back-edge, and on any vectorised kernel that is the **scalar tail**, not the hot
+body — on p01 it picks the 12-byte scalar tail instead of the 30-byte SSE loop.
+`.temp/r30/loopfit.py` exists because of this and enumerates all of them.
+
+**No counter this box can produce ranks it.** The minimal pair is
 `-align-all-functions=1` vs `=2`, which moves R2's kernel by exactly 16 bytes and
-changes nothing else. Every counter callgrind has, on that pair:
+changes nothing else (`md5_fn_norel` equal, `n_fn` 172 both). Per-call marginals
+on that pair:
 
 ```
 event      align1(%32=0)  align2(%32=16)      delta
@@ -1272,18 +1325,38 @@ Bcm              273.93         273.92        -0.01
 Bi / Bim               0              0         0.00
 ```
 
-**A 27% wall-clock mode, and instructions, data reads, every cache level and the
-simulated branch predictor are all identical.** Nor is it a straightforward
-instruction-fetch story: `.temp/p29/fetchwin.py` counts the loop geometry off
-both listings and R2's innermost search loop (70 bytes, 23 instructions) spans
-**3 32-byte fetch windows and 2 64-byte lines in both modes**, while the outer
-`hi = mid` re-entry path spans *more* windows in the **fast** build (4 vs 3) —
-i.e. the one geometric difference there is points the wrong way. What is left is
-the front end (decode / uop cache) and the address-indexed predictor structures,
-neither of which a simulator models and neither of which
-`perf_event_paranoid = 3` will report. **This is the sharpest form of §11d's
-surviving caveat**: the *only* instrument on this box that sees the effect at all
-is the wall clock.
+⚠ **Those zeros are per-call marginals rounded to two decimals, and this
+section previously over-read them as "the simulators are blind to code layout".**
+They are not blind; they are blind to the *front end*. Whole-program absolute
+totals on the same pair (`.temp/r30/modesim2.py`):
+
+```
+Ir 99054451 both (+0.0000%)   Dr, Dw, Bc, Bi, Bim  all +0.0000%
+I1mr 1875 -> 1881 (+6)   ILmr 1830 -> 1835 (+5)   D1mr 2608 -> 2603 (-5)
+D1mw 1184 -> 1182 (-2)   DLmr 1808 -> 1807 (-1)   DLmw 1101 -> 1102 (+1)
+Bcm  2184897 -> 2184900 (+3)
+```
+
+Callgrind's cache model is address-indexed and its branch predictor
+address-hashed, so both register the move — by **≤ 6 events in 10⁸**, across a
+27% wall-clock mode. **A 27% mode, and the executed instruction stream, the data
+reads and every simulated cache and predictor counter are the same to six
+events.** Use the simulators to attribute a cache or branch mechanism; never to
+detect or rank a layout effect. That is still the sharpest form of §11d's
+surviving caveat — the *only* instrument on this box that sees the effect is the
+wall clock — but the reason is the missing front-end model, not blindness to
+addresses.
+
+**Out of sample, pre-registered.** Predictions written and SHA-256'd
+(`5fd5ebdce09bef14113dab07abc42d8e1e18696b2503b4a27c9e100b12fdc678`) **before
+any timing**, on 20 fresh symbol orderings the hypothesis had never seen:
+`safe_naive`'s `jcc32` rule **held with perfect separation on both passes**
+(×1.2932 / ×1.2896); `safe_tuned`'s overlapped by one pair (×1.0767 / ×1.0784).
+Building with `-C llvm-args=-x86-branches-within-32B-boundaries` collapses R3's
+band from **17.12% to 4.00%** and makes it **18.6% faster overall** (median
+15.75 → 12.82 ms), R2's from 31.76% to 13.82% — evidence, not proof, because the
+flag also forces 32-byte function alignment (so bit 4 is pinned by construction)
+and it does not touch the `win32` form.
 
 **Consequence 1 — R2's `ns` sign is a property of the linker, and that is why §3
 withdraws it.** Mode-matched against R4:
@@ -1314,18 +1387,73 @@ disjoint-bands test at seven layouts and fails it at thirty, with no
 disagreement between the two measurements.** It is the same rung, the same
 binaries, the same machine — only the number of layouts sampled changed. So
 "bands must be disjoint before a sign is asserted" retracts a true claim as soon
-as somebody is more thorough. Two statistics do *not* move that way, because both
-are proportions rather than extremes:
+as somebody is more thorough. One statistic does *not* move that way:
 
-* **mode-matching** — group by the address bit and compare inside a mode. Keeps
-  R3's sign on both inputs (`small` +11.12% / +17.37%, `large` +0.85% / +2.52%)
-  and correctly refuses R2's on `small`.
-* **dominance** — "slower at k of N layouts". R3 is slower than the *worst* R4
-  layout at **30 of 30** on `small` and **29 of 30** on `large`; R2 at 19 of 30
-  and 23 of 30.
+* **mode-matching** — group by the 32-byte geometry (`win32` / `jcc32`; the
+  address bit is the proxy for it) and compare inside a mode. Keeps R3's sign on
+  both inputs (`small` +11.12% / +17.37%, `large` +0.85% / +2.52%) and correctly
+  refuses R2's on `small`. Subsampled 400 times per size, its medians are **flat
+  in `N`** with spread ~1/√N — it converges.
+
+⚠ **A second statistic this section proposed — "dominance", *slower than the
+worst layout of the other rung at k of N* — is RETRACTED** (TASK_030_REVIEW
+major 3, landed TASK_031). It was offered here as a proportion rather than an
+extreme, and it is not: it is defined against `max(B)`, an **extremum of B**, so
+it inherits the exact defect of the range it was introduced to replace.
+Subsampled, it **drifts** — p01's R2 goes 28.7% at `N = 4` to 13.3% at `N = 30`,
+sd **±26 points** at `N = 4`; p07's R3 on `large` 94.8% → 90.0%. The replacement
+that does converge is **pairwise `P(A > B)`** over all `N²` layout pairs, a
+genuine proportion, flat at every `N` (58.1 → 58.4, 97.4 → 97.3, 73.9 → 74.7
+across `N` = 4…30). The dominance figures already published in this file
+(R3 slower than the worst R4 layout at 30 of 30 on `small`, 29 of 30 on `large`;
+R2 at 19 and 23 of 30) are **measurements at `N = 30` and are true as such** —
+they are simply not a statistic to state a rule on.
 
 Publish the range as a *worst case* if you like; do not publish it as *the*
 interval, and do not let a rule stated on it decide what may be claimed.
 
 Numbers reproduce `.temp/r26/layout_r2.py` closely: 28.91% here against 28.47%
 there, `safe_naive` 13.977…18.017 against 14.038…18.034.
+
+### 11f. The R4 rung has an 8% layout band that nothing here explains — OPEN
+
+**TASK_030_REVIEW minor 8, measured further at TASK_031. This is an open
+problem, recorded because it is larger than several published gaps.**
+
+§11e's table records `unsafe` as *"14.007 / 14.062 ms, 0.4%, no mode"*. That is
+the **bit-4 mode gap**, not the band. The band is:
+
+```
+unsafe, small.bin, 30 layouts:  13.453..14.540 ms  spread  8.08%   (pass 0, cpu 3)
+                                13.443..14.530     spread  8.09%   (pass 1, cpu 3)
+                                13.422..14.452     spread  7.68%   (pass 2, cpu 5)
+cross-pass reproducibility:     spearman rho +0.922 / +0.960 / +0.931
+```
+
+**It is reproducible, it is not explained, and it is not noise.** What has been
+ruled out:
+
+- **any address bit** — the best is `bit5` at ×0.9809, and it *overlaps*; no bit
+  gives a perfect split, unlike R2's ×0.7863;
+- **`jcc32`** — it flips on R4 (`%32=0` → 0 hits, `%32=16` → 1 hit) and buys
+  **+0.5%**. On this rung a JCC hit is necessary but nowhere near sufficient;
+- **measurement noise.** TASK_031 timed **31 byte-identical copies** of the
+  shipped `unsafe` binary (distinct inodes, one layout) in the same harness, two
+  passes × two round-robin orders: the spread is **1.10 / 1.14 / 1.24 / 1.54%**
+  (all three rungs together, 0.83 … 2.24% — `.temp/p31/order.py`,
+  `order_p07.log`). The 8% band is ~5–6× that floor, and
+  the per-layout ranking reproduces across passes at ρ ≈ +0.93 while identical
+  copies do not rank at all.
+- **the round-robin's order**, which is a real artefact elsewhere (it is what
+  p05's `NOTES.md` §4b is about): p07's R2-vs-R4 and R3-vs-R4 medians on
+  identical copies are +27.46 / +27.67 / +27.67 / +27.77% and +12.42 / +12.65 /
+  +12.42 / +12.60% — **identical under alternating and blocked ordering**, so
+  p07's timing is protocol-insensitive and this band is not a harness artefact.
+
+So R4 spans 8% across layouts with no mode, no bit, no geometric predictor and a
+1.5% noise floor. Two consequences worth stating plainly: **(a)** it is larger
+than R3's published `large` gap (+1.6%) and than most C-vs-Rust `ns` differences
+in this table, so it is a live threat to any *un*bracketed `ns` claim on this
+pattern; and **(b)** it is why R2's mode is quoted mode-matched rather than
+against R4's minimum — R4's own minimum is a draw from an 8%-wide distribution
+that nobody can predict.

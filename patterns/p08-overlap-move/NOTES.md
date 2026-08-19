@@ -436,6 +436,56 @@ issued while the loads and stores are the real work. That is the p16 direction
 (+34.4% Ir → +32.9% time). **Three patterns, three conversion ratios — `Ir` is
 not a time model and this is the third demonstration.**
 
+### 4b. Bracketed at 30 code layouts — p08's `ns` gap SURVIVES
+
+**TASK_030_REVIEW / TASK_031.** Code layout withdrew two other patterns' `ns`
+rows (p01 `small`, p07 R2 — `.memory/03-measurement.md`, "Code layout: the
+32-byte fetch grid"). p08's is the largest `ns` gap on the project and it is
+**not** one of them; a reader who sees only the withdrawals will conclude the
+whole column is unsound, and that is not what was measured.
+
+Every Rust rung rebuilt at **30 layouts** (9 `-align-all-functions` + 21
+`--symbol-ordering-file` permutations), two passes, `md5_fn_norel` / `n_fn` /
+stdout invariant throughout. Whole-process minima, so these are the
+`results/tables/` cells rather than §4's differenced per-call numbers:
+
+```
+                    published   pooled    mode0    mode16   verdict
+small  R2 vs R4     +105.16% +104.77% +104.43% +110.05%   survives, 30/30
+small  R3 vs R4       -0.20%   +0.03%   +0.05%   +0.02%   no gap either way
+large  R2 vs R4      +50.91%  +61.93%  +61.79%  +64.72%   sign survives, 30/30
+large  R3 vs R4       +0.63%   +0.08%   +0.12%   +0.08%   no gap either way
+```
+
+p08 is the **only** one of the four surviving patterns with a detectable layout
+mode at all, and it is on R2: `bit4` splits `small` perfectly at **×1.0274**,
+from `win32 [3,4]` on the 81-byte loop at `kernel+0x2d0` — one extra 32-byte
+fetch window, 2.7%. Against a +105% gap it changes nothing, which is the useful
+form of the result: *the mode is real, it is measurable, and it is two orders of
+magnitude below the effect it would have to overturn.* The rest of the
+population is narrow — the entire 30-layout spread is 3.66 / 1.03 / 1.09% on
+`small` and 2.98 / 1.86 / 1.83% on `large` (R2/R3/R4).
+
+The R3 rows are the same statement §4 makes from R4 ≡ R5 (+1.1% between
+byte-identical binaries), re-derived from 60 binaries instead of 2: **R3-vs-R4 is
+under 0.1% in both modes on both inputs, and R3 is slower than the worst R4
+layout at 0–1 of 30.** R3 is free here, at 30 layouts.
+
+⚠ **The sign survives; the two-decimal magnitude does not, and `large` is the
+clearest case on the project.** +50.91% published against +61.93% over the
+population — **11 points** — with the whole layout population only 3% wide, so
+layout does not explain it. The two runs differ in session and pinned core
+(published `taskset -c 5`, population `-c 3`). Quote p08's `large` R2 gap as
+"+50 … +62%", or quote §4's per-call +130.0% with §4's own protocol attached;
+do not quote either to two decimals.
+
+⚠ **The C cells have no layout bracket.** Both levers are rustc / rust-lld side,
+so `c-gcc`, `c-clang` and the `-h` twins were built at one layout only. §4's
+`rep`-string finding — `Ir` and wall clock disagreeing in *direction* between
+c-gcc and c-clang — rests on an unbracketed `ns` pair, and §4a already says to
+quote its direction rather than its magnitude. That is the same caveat, arrived
+at from the other side.
+
 ### 4a. The memset's share — the manager asked for this one specifically
 
 The task says: *"Report the memset's share of per-call `Ir` — if it is over ~20%

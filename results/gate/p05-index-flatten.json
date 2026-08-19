@@ -55,8 +55,8 @@
     "harness/measure.py": "a810bf5973787f78fc9805b2407a6bb04bbee68c968374a2e9b8622c4c5d3af4",
     "harness/report.py": "09488cb5b72a3244b69c5759b0cba53a44ebecbda98b26c9c206183567c13d8a",
     "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
-    "patterns/p05-index-flatten/NOTES.md": "5b756f84c5e1523dfcc76afa4c034f325a3f5d54418f63afcf291234c84fe7f3",
-    "patterns/p05-index-flatten/README.md": "0721ee1437790c56da13186227b239770632744eeaf39594b8cec8dc93d02531",
+    "patterns/p05-index-flatten/NOTES.md": "0e8418fd775df3fd92b578381fca7ee9fa6812831168526c0fbe7f7ed467f8fa",
+    "patterns/p05-index-flatten/README.md": "1d63da6e199fa8b5a981fbbb6fd9c13dbde52530f69632b44e5cea69a05c49c7",
     "patterns/p05-index-flatten/c/kernel.c": "484308a6fa4dd4f61aa00ccb58b25bbe8cd4cb182de0bbefa9308e4fed5296ae",
     "patterns/p05-index-flatten/c/kernel.h": "910c7479b88896eea27be86c34958ab9a6474c97844ea01b34865a1f23098c72",
     "patterns/p05-index-flatten/c/kernel_hardened.c": "960540172dda6666a97a93eb2cc116bebce7d29b9cdcd17e1dc042c5443fdf99",
@@ -420,7 +420,7 @@
   "adversarial": {
     "adversarial-dims.bin/c-gcc": {
       "exit": 0,
-      "stdout": "493948044803721728",
+      "stdout": "5731781549223733760",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
@@ -428,7 +428,7 @@
     },
     "adversarial-dims.bin/c-clang": {
       "exit": 0,
-      "stdout": "8465025109673249280",
+      "stdout": "999948276704206080",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
@@ -681,14 +681,14 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==46019==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d4 at pc 0x562eaa6507a1 bp 0x7ffee3ef22b0 sp 0x7ffee3ef22a0 READ of size 1 at 0x5070000000d4 thread T0 #0 0x562eaa6507a0 in kernel /home/apt/repos_common/se"
+      "diagnostic": "================================================================= ==404707==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d4 at pc 0x558b377687a1 bp 0x7ffd55cf85e0 sp 0x7ffd55cf85d0 READ of size 1 at 0x5070000000d4 thread T0 #0 0x558b377687a0 in kernel /home/apt/repos_common/s"
     },
     "adversarial-ovf.bin": {
       "exit": 1,
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==46020==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d8 at pc 0x561d2f4557a1 bp 0x7fff76b4ede0 sp 0x7fff76b4edd0 READ of size 1 at 0x5070000000d8 thread T0 #0 0x561d2f4557a0 in kernel /home/apt/repos_common/se"
+      "diagnostic": "================================================================= ==404708==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d8 at pc 0x5574106607a1 bp 0x7ffd9a97bce0 sp 0x7ffd9a97bcd0 READ of size 1 at 0x5070000000d8 thread T0 #0 0x5574106607a0 in kernel /home/apt/repos_common/s"
     },
     "adversarial-stride3.bin": {
       "exit": 0,

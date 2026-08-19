@@ -51,6 +51,19 @@ Three things it settles, none of which is about array summing:
 Never report R2 as "the cost of safe Rust" without R3 beside it — on the pilot
 that overstated the cost by ~3.7x (`.memory/01-ladder.md`).
 
+## The `small` wall-clock column is withdrawn
+
+`results/tables/p01-array-sum.md` publishes `-O3 isolated` `small.bin` minima
+that work out to **R2 +5.40%** and **R3 +4.72%** over `unsafe`. **Neither number
+has a sign** (`NOTES.md` §3b). Built at 30 code layouts, all three Rust rungs are
+bimodal on a 30-byte SSE loop that fits inside one 32-byte instruction-fetch
+window at one address residue and straddles two at the other, and the two safe
+rungs' fast residue is the *opposite* of `unsafe`'s: mode-matched, R2-vs-R4 is
+**+5.24%** or **−4.10%** and R3-vs-R4 is **+7.01%** or **−5.67%**, depending only
+on where the linker put the function. Confirmed out of sample on 20 fresh
+layouts with the predictions hashed before timing. p01's `large` column is
+unaffected (every gap under 1%), and so is every `Ir` number in this pattern.
+
 ## Inputs
 
 `python3 inputs/gen.py` (deterministic, seed `0x5EC1ADDE`; the `.bin` files are

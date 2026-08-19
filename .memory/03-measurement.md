@@ -448,6 +448,48 @@ TASK_014_REVIEW's own write-up mixed. Rule, in both cases and now with teeth:
 **say which convention a number is in, every time — a cross-rung delta is only
 meaningful inside one convention.**
 
+### Interleave by CELL, never by block — it alone flipped a sign
+
+**Measured at TASK_031, on 31 byte-identical copies of one binary.** A timing
+probe that iterates a dict filled cell-by-cell gives each cell a *contiguous
+block* of every rep instead of alternating. `harness/measure.py:wall()` and
+`.memory/03-measurement.md`'s timing protocol both alternate; a hand-rolled probe
+easily does not, and the docstring will still say "interleaved".
+
+Same 31 identical copies, same machine, one layout, only the loop order changed:
+
+```
+ALTERNATING   R2 vs R4  +28.08%      R3 vs R4   +1.21%
+BLOCKED       R2 vs R4   +6.00%      R3 vs R4   -4.16%      <- sign flips
+BLOCKED, slot-0 only     +17.31%                -11.70%
+```
+
+**Every reading TASK_030_REVIEW attributed to p05's shipped layout is reproduced
+here with no layout variation at all**: the "shipped R2 is rank 30/30, shipped R3
+rank 0/30" ranking, the `−9.91/−11.57%` R3 figure, and the `+7.17%` "population"
+value. So was the `--symbol-ordering-file` "lever bias".
+
+Two rules follow:
+
+1. **Alternate by cell.** Build a flat interleaved list; do not iterate a
+   per-cell container. This costs nothing and it is the difference between a sign
+   and its opposite on an unstable cell.
+2. **Measure the noise floor with byte-identical copies before believing any
+   layout or spelling effect.** Build the *same* source N times, time them as a
+   population, and compare the spread to the effect:
+
+   | pattern (`small`) | identical-copy floor | 30-layout band |
+   |---|---|---|
+   | p01 | 0.82…3.17% | 10.42 / 10.15 / 7.74% |
+   | p07 | 0.83…2.24% | 31.76 / 17.12 / 8.08% |
+   | **p05** | **5.09…45.04%** | 14.09 / 8.30 / 9.34% |
+
+   p05's band is *inside its own noise floor*, which is why its `small` row is
+   withdrawn and p01's and p07's are withdrawn for a real reason. p01's and p07's
+   modes are additionally **protocol-insensitive** — p07 R2−R4 reads
+   +27.46/+27.67/+27.67/+27.77% alternating *and* blocked — which is how they were
+   separated from this artefact.
+
 ### Code layout: the 32-byte fetch grid, and why two patterns' `ns` columns are withdrawn
 
 **TASK_026 → TASK_029 → TASK_030_REVIEW.** The final reading is TASK_030_REVIEW's,
@@ -538,10 +580,13 @@ they are extrema and neither converges:**
   Cheap; enough to *detect* a mode.
 - **`-C link-arg=-Wl,--symbol-ordering-file=<f>`** (rust-lld) — moves it
   arbitrarily far, at unchanged `n_fn` and unchanged instruction stream.
-  ⚠ **It permutes all 582 text symbols**, so it moves the driver, libstd and
-  startup too, and the `order` sub-population differs systematically from the
-  `align` one by +5–10% *independent* of the kernel's address. Use both levers to
-  detect; never quote a pooled band across the mixture as "the layout band".
+  ⚠ It permutes all 582 text symbols, so it moves the driver, libstd and startup
+  too. **The measured evidence that this biases results is WITHDRAWN** — the
+  +5–10% `order`-vs-`align` gap was the blocked-ordering artefact below, and
+  TASK_031 reproduced it on byte-identical copies (blocked +3.90/+5.30%,
+  alternating −0.98…+0.36%). The lever may still be impure; nothing measured shows
+  it. Use both levers to detect a mode, and do not quote a pooled band across the
+  mixture as "the layout band" — that caution stands on its own.
 - Two levers that do **not** work: a padding object via `-C link-arg` (rustc
   appends it after the crate's `.text` and passes `--gc-sections`), and
   `-align-all-nofallthru-blocks` (nops *inside* the kernel — not byte-identical).
@@ -560,14 +605,16 @@ control.
 #### Two published rows are withdrawn
 
 - **p01's `small` R2/R3 `ns` cells** — sign flips with the mode.
-- **p05's `small` R2/R3 `ns` cells** — a *different* defect and worse: p05 has no
-  mode, but its **shipped** binary is the slowest R2 layout of 31 and its shipped
-  R3 is the fastest, so the published +36.01% is measured worst-against-best; over
-  the population it is +7.17%. p05's `small` cell also drifts 10–20 points between
-  sessions on byte-identical binaries (round-robin width ruled out; frequency, SMT
-  sibling or thermal remain, and none is diagnosable without root).
-
-### A per-byte rate from a marginal pair is good to ±0.09, not to five decimals
+- **p05's `small` R2/R3 `ns` cells** — a *different* defect, and the reason
+  published at TASK_030_REVIEW was itself wrong. ~~"The shipped binary is the
+  slowest R2 layout of 31 and the shipped R3 the fastest, so +36.01% is
+  worst-against-best where the population says +7.17%."~~ **That ranking is a
+  measurement artefact, reproduced at TASK_031 with ZERO layout variation** — see
+  the interleaving rule below. The real reason is simpler and worse: **p05's
+  `small` cell's noise floor on byte-identical binaries is 5–45%, wider than any
+  gap anyone has read off it.** Under the project's own alternating protocol,
+  R2−R4 is ≈+30% across 17 measurements and R3−R4 is +1.2…+6.9%, always positive.
+  The cell is not quotable; p05's `large` row is.
 
 ### A per-byte rate from a marginal pair is good to ±0.09, not to five decimals
 

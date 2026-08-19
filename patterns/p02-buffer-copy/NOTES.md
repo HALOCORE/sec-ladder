@@ -551,6 +551,50 @@ against R3's 1553, because `get_unchecked` and `copy_nonoverlapping` are real
 function calls until they are inlined. Unsafe code is not faster before the
 optimiser runs.
 
+### And these wall-clock cells were bracketed at 30 code layouts — they SURVIVE
+
+**TASK_030_REVIEW / TASK_031.** Two patterns had a wall-clock row withdrawn over
+code layout (p01's `small` and p07's R2; see `.memory/03-measurement.md`, "Code
+layout: the 32-byte fetch grid"). p02 is **not** one of them, and saying so is
+the point of this subsection — a reader who sees two withdrawals and no
+survivors concludes the whole `ns` column is unsound.
+
+Every Rust rung was rebuilt at **30 layouts** (9 `-align-all-functions` values +
+21 `--symbol-ordering-file` permutations), two passes, with `md5_fn_norel`,
+`n_fn` and stdout invariant at every one:
+
+```
+                    published   pooled    mode0    mode16   verdict
+small  R2 vs R4       +18.04%  +16.75%  +16.68%  +17.03%   survives, 30/30
+small  R3 vs R4        -0.17%   -1.06%   -1.10%   -0.95%   no gap either way
+large  R2 vs R4        +1.78%   +1.95%   +2.00%   +1.90%   survives, 30/30
+large  R3 vs R4        +0.27%   -0.05%   -0.06%   +0.02%   no gap either way
+```
+
+**The stronger statement is the band, not the mode-match.** p02's *entire*
+30-layout population is 1.80% / 2.60% / 3.04% wide on `small` (R2/R3/R4) and
+0.77 … 1.04% on `large`. No address bit separates it — best ratio ×1.0021,
+never a perfect split — and this is *not* because the geometry sat still:
+
+```
+safe_naive loop0 [kernel+0x80, +0x93)  19 B  win32[1,2]  jcc32[0,1]
+           small x1.0021 / x0.9995     large x0.9984 / x1.0014
+```
+
+The loop crosses from one 32-byte fetch window to two exactly as p01's and p07's
+do, and the time does not move. p02's copy is bound on the `memcpy` and on
+memory, not on the front end; the 32-byte grid is universal, being
+front-end-bound is not.
+
+⚠ **Two things that are still single-layout.** (i) The **magnitude** is good to
+about a point, not to two decimals: +18.04% published against +16.75% over the
+population. (ii) **The C cells are unbracketed.** The layout levers are rustc /
+rust-lld side, so `c-gcc`, `c-clang` and their `-h` twins were built at one
+layout only — including the headline *"gcc executes 10% fewer instructions than
+clang on `large` and takes 23% longer"* above. Its `Ir` half is exact; its `ns`
+half has no band of its own, and the same caveat is on record for every C `ns`
+cell in the project.
+
 ---
 
 ## 4. R4 ≡ R5: byte-identical, on a real proof

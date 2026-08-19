@@ -496,6 +496,9 @@ set at `n_iters = 25 000` has a 13.8% min-to-median spread, over
 `.memory/03-measurement.md`'s 10% threshold. It is printed in
 `.temp/p05/wall2-analysis.txt` rather than deleted, and no claim above rests on
 it. The `Ir` column for `small` is unaffected — callgrind is deterministic.
+**§4b reaches the same verdict from a second direction and makes it much
+stronger**: on byte-identical binaries p05's `small` cell has a wider band than
+the effect anyone wanted to read off it.
 
 ### 4a. Cycles — quotable this time, because the clock was measured interleaved
 
@@ -518,6 +521,100 @@ Note the probe's own spread — 3236 to 3816 MHz **within one session, on one
 pinned core, 31 windows apart** — which is a fresh, first-hand demonstration of
 why `.memory/00-environment.md`'s rule exists. Even interleaved, cycles is an
 inference with a ±15% band on it, and ns is the measurement.
+
+### 4b. The `small` wall-clock row is WITHDRAWN — and the reason is not code layout
+
+**TASK_030_REVIEW raised this; TASK_031 measured it and the diagnosis changed.**
+`results/tables/p05-index-flatten.md`'s `-O3 isolated` `small.bin` minima are
+7.24 ms (R2), 5.54 (R3) and 5.32 (R4), i.e. **R2 +36.01%** and **R3 +4.12%** over
+`unsafe`. Do not quote either to a decimal. Nothing below touches `large`, which
+is where §4's numbers come from.
+
+**First, what it is NOT: p05 has no code-layout mode.** Built at 30 layouts per
+rung, no address bit separates p05's timings — best ratios ×1.0031 (R2), ×0.9817
+(R3), ×1.0146 (R4), never a perfect split — even though the 32-byte geometry
+*does* flip exactly as it does on p01 and p07:
+
+```
+unsafe  loop0 [kernel+0x70,+0x124) 180 B  win32[6,7]  jcc32[1,2]
+        small x0.9856  x0.9857    large x1.0016  x0.9996
+```
+
+One extra 32-byte fetch window, no time. p05's fold is throughput-bound on
+independent vector lanes, not front-end-bound, so the grid costs it nothing
+(`.memory/03-measurement.md`).
+
+**Second, what TASK_030_REVIEW thought it was, and why that is wrong.** It read
+off one 31-binary round-robin that the *shipped* build is the slowest R2 layout
+of 31 and the fastest R3 of 31, giving R3-vs-R4 = **−9.91% / −11.57%** against a
+published +4.12%, and concluded the published gap was a worst-against-best layout
+pairing. **TASK_031 reproduced that entire pattern with no layout variation at
+all** — 31 **byte-identical copies** of each shipped rung, distinct inodes, one
+layout, timed in the same harness, varying only the *order* of the round-robin
+(`.temp/p31/order.py`, `order_p05.log`, `order_p05_pos.log`):
+
+| order | R2 vs R4 (medians) | R3 vs R4 (medians) | R3 vs R4 (slot 0) | slot-0 rank R2 / R3 |
+|---|---:|---:|---:|---|
+| **alternating** (4 blocks) | +28.08 / +30.85 / +30.32 / +30.56% | +1.21 / +4.64 / +4.22 / +4.43% | +0.63 … +6.64% | mid-field |
+| **blocked** (4 blocks) | +6.00 / +5.29 / +18.00 / +18.37% | −4.16 / −1.49 / −0.99 / −0.26% | **−11.70 / −10.77 / −3.68 / −3.92%** | R2 slowest, R3 fastest |
+
+Against the population run it is meant to explain: shipped R2 rank 30/30, shipped
+R3 rank 0/30, R3-vs-R4 −9.91% / −11.57%, "population" R2-vs-R4 +7.17% / +6.96%.
+**Every one of those readings is reproduced by identical copies of one binary.**
+
+The mechanism is in the harness, not the machine. `.temp/r30/layout_gen.py` times
+with `for k, b in bins.items()` over a dict filled **rung by rung**, so each rung
+occupies a contiguous third of every rep and the shipped build is slot 0 of its
+own rung's block — while `harness/measure.py`'s `wall()`, `.temp/r30/repeat.py`
+and `.temp/r30/interleave.py` all *alternate* the rungs, which is what
+`.memory/03-measurement.md` asks for ("spreading thermal/neighbour drift across
+all cells beats concentrating it in one"). `interleave.py` ruled out the
+round-robin's **width** (+33.75 / +31.24 / +29.25 / +30.26% at widths 1/5/15/30);
+it did not vary the **order**, and the order is what moves it. Same effect,
+smaller, on the "lever bias" that was read as a property of
+`--symbol-ordering-file`: on identical copies, slots 10–30 (where the `order`
+builds sit) come out **+3.90% / +5.30%** slower than slots 1–9 (the `align`
+builds) under blocked order and **−0.98 … +0.36%** under alternating, against
+`.temp/r30/lever_bias.log`'s +5.05 / +5.27 / +9.85% for this exact rung
+(`.temp/p31/posbias.py`).
+
+**Third, the reason the row really is withdrawn, and it is simpler.** p05's
+`small` cell is not measurable to this precision on this box. Over four
+(pass × order) blocks, the 31 byte-identical copies of a rung span **5.09% …
+45.04%**, above 10% in **17 of 24** rung-blocks. Measured the same way, in the
+same session, on the same core:
+
+| pattern, `small` | 31 identical copies | 30 layouts | band / noise |
+|---|---|---|---|
+| p01 | **0.82 … 3.17%** | 10.42 / 10.15 / 7.74% | ~5–9× |
+| p07 | **0.83 … 2.24%** | 31.76 / 17.12 / 8.08% | ~4–20× |
+| **p05** | **5.09 … 45.04%** | 14.09 / 8.30 / 9.34% | **< 1×** |
+
+**p05's 30-layout "band" is smaller than its own noise floor on byte-identical
+binaries.** There is nothing to attribute to layout because there is nothing
+above the noise to attribute.
+
+**What survives, and it is not nothing.** A *median over many binaries* averages
+that noise out, and under the project's own alternating protocol the R2 gap is
+stable: **+28.08 / +30.85 / +30.32 / +30.56%** (TASK_031, identical copies),
+**+28.68 … +32.49%** over 8 independent blocks (`.temp/r30/repeat_p05.log`),
+**+29.25 … +33.75%** at four round-robin widths (`interleave_p05.log`). So **R2
+really is about +30% slower than R4 on `small`, and the published +36.01% is ~6
+points high** — a single-binary min-of-31 read out of a distribution that is 20%
+wide. R3-vs-R4 is **+1.21 … +6.88%** over seventeen alternating measurements
+(the published cell, 8 `repeat.py` blocks, 4 `interleave.py` widths, 4
+`order.py` medians), **every one positive**; it is a few percent and it is not
+4.12%.
+
+**Two traps for whoever revisits this.**
+
+- The `small` *`Ir`* column is untouched — callgrind is deterministic and p05's
+  instruction laws are exact (§3, §3a).
+- A layout population compares **whole-process** minima, but §4's headline
+  (+30.5% on `large`) is a **per-call** number with start-up and file reading
+  differenced out. They are different statistics on different inputs; the
+  population's `large` R2 figure (+15.2%) is not a correction of +30.5% and must
+  not be quoted as one.
 
 ---
 

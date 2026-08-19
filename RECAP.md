@@ -386,12 +386,21 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    on 20 pre-registered layouts** whose predictions were SHA-256'd before timing.
    **It does not hit everything.** Real on **p07 and p01**, marginal on p08,
    **absent on p02, p05, p16, p17** — the geometry flips on all seven, but only a
-   front-end-bound loop pays for it. So p02's +18.04% and p08's +105.16% survive
-   intact; **p01's and p05's `small` wall-clock rows are withdrawn** — p01's
-   because the sign flips (+5.24% / −4.10%), p05's for a different and worse
-   reason: it has no mode, but its *shipped* binary is the slowest R2 layout of 31
-   and its shipped R3 the fastest, so the published +36.01% is worst-against-best
-   where the population says +7.17%.
+   front-end-bound loop pays for it.
+   **The honest summary is three-part** (TASK_031, which refined it): *the signs
+   survive on four patterns* — p02's +18.04% and p08's +105.16% come through
+   mode-matching, and their entire 30-layout populations are 0.84–3.66% wide, so
+   nothing in them could move a gap that size; *no magnitude survives to two
+   decimals anywhere it was checked* — p08's `large` R2 is +50.91% published
+   against +61.93% over the population, 11 points that layout does **not**
+   explain; and *the C and R5 rungs of all seven patterns remain unbracketed.*
+   **p01's and p05's `small` wall-clock rows are withdrawn**, for different
+   reasons. p01's sign flips (+5.24% / −4.10%). ⚠ **p05's published reason was
+   itself wrong** — the "shipped binary is the slowest layout of 31" ranking was a
+   **blocked-round-robin artefact**, reproduced at TASK_031 with *zero* layout
+   variation on byte-identical copies. p05's real defect: its `small` noise floor
+   on byte-identical binaries is **5–45%**, wider than any gap read off it. Under
+   the project's own alternating protocol its numbers are stable and positive.
    **What to publish**: mode-matched comparison, and pairwise `P(A > B)` over all
    layout pairs. Both converge. ~~Worst-vs-best range~~ and ~~dominance~~ are
    **both retracted** — both are extrema, neither converges, and the second was
@@ -400,6 +409,14 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    no part of the front end, so across a 27% mode they move by **≤6 events in
    10⁸**. Use them to attribute a mechanism, never to detect or rank a layout
    effect.
+   **The methodological result, which outlives the finding: interleave by CELL,
+   never by block, and measure the noise floor with byte-identical copies before
+   believing any effect.** A probe that gives each cell a contiguous block of every
+   rep — rather than alternating, as `harness/measure.py` does — flipped a sign on
+   its own, and manufactured every reading that was attributed to p05's layout.
+   p01's and p07's modes survived only because they are **protocol-insensitive**
+   (p07 reads +27.4…+27.8% blocked *and* alternating), which is how they were told
+   apart from the artefact.
 
 ## Retracted — do not reinstate
 

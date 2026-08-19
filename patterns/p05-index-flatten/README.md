@@ -122,6 +122,15 @@ and said the null was a property of its latency-bound chain. p05 measures
 delivered +30.5% was over-precise), because independent vector lanes leave no
 idle issue slots for the check to fill.
 
+⚠ **That is the `large` number, and only `large` is quotable.** p05's `small`
+wall-clock row is **withdrawn** (`NOTES.md` §4b): 31 byte-identical copies of one
+shipped binary span 5 … 45% there, so the cell is wider than any gap read off it,
+and the published +36.01% (R2) and +4.12% (R3) are single-binary draws from that
+distribution. The effect is not layout — p05 has no layout mode, and its 32-byte
+loop geometry flips with no change in time. Over many binaries under the
+project's alternating round-robin the R2 gap is a stable **≈ +30%** and R3's is
+**a few percent, always positive**; neither is a decimal.
+
 ~~**R3 is not free here**: +4.7% `Ir` at `large` but +16.7% at `ncol = 8` — an
 `O(nrow)` cost, and the end of the "R3 is free" streak at five patterns.~~
 **Retracted.** That is `safe_tuned.rs`'s number, and `safe_tuned.rs` reslices

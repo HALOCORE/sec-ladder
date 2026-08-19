@@ -352,6 +352,56 @@ already records that `Ir` and wall clock disagreed in *direction* on p02; here
 they disagree in *magnitude*, and reporting either column alone would mislead in
 opposite directions.
 
+### The null was bracketed at 30 code layouts, and it SURVIVES
+
+**TASK_030_REVIEW / TASK_031.** Code layout can move wall clock by up to 27% at
+an unchanged executed instruction stream, and it withdrew two patterns' `ns`
+rows (p01 `small`, p07 R2 — `.memory/03-measurement.md`, "Code layout: the
+32-byte fetch grid"). **p16 was the pattern nominated as the most likely second
+case, and it has no mode at all.** That matters more here than on any other
+pattern, because p16's headline *is* a null: a null measured at one layout could
+be luck, and this one is not.
+
+Every Rust rung rebuilt at 30 layouts (9 `-align-all-functions` + 21
+`--symbol-ordering-file` permutations), `md5_fn_norel` / `n_fn` / stdout
+invariant at every one:
+
+```
+                    published   pooled    mode0    mode16
+small  R2 vs R4        -0.41%   -0.03%   +0.08%   -0.13%
+small  R3 vs R4        -0.07%   -0.09%   -0.11%   -0.07%
+large  R2 vs R4        -0.22%   +0.11%   +0.18%   +0.10%
+large  R3 vs R4        +0.22%   -0.00%   +0.04%   -0.01%
+```
+
+Under 0.25% everywhere, in both modes, on both inputs. No address bit separates
+p16's timings — best ratio ×0.9977, never a perfect split — and the **entire**
+30-layout population is 1.05 / 0.85 / 1.26% wide on `small` and 1.30 / 1.10 /
+1.47% on `large`, i.e. the layout band is the same size as the run-to-run spread
+this section already quotes (1.2–1.3%).
+
+**And the negative has a mechanism, which is the part that generalises.** The
+32-byte geometry *does* flip on p16 exactly as it does on the two patterns that
+lost a row:
+
+```
+safe_naive loop1 [kernel+0x80, +0x9f)   31 B  win32[1,2]  small x0.9977  large x0.9996
+safe_tuned loop2 [kernel+0x130,+0x14a)  26 B  win32[1,2]  small x0.9998  large x1.0000
+unsafe     loop0 [kernel+0x20, +0x12f) 271 B  jcc32[1,3]  small x0.9998  large x1.0004
+```
+
+One extra 32-byte fetch window, and one extra branch crossing a 32-byte
+boundary, on loops that cost nothing extra. **The geometry flip is universal;
+being front-end-bound is not** — and p16's whole finding above is that this
+kernel is latency-bound with idle issue slots, which is precisely a kernel that
+cannot pay for an extra fetch window either. The layout negative and the
+instruction-tax null have the same cause.
+
+⚠ The C cells are **unbracketed**: both levers are rustc / rust-lld side, so
+`c-gcc` and `c-clang` were built at one layout only. Nothing in this section's
+null rests on them (it is an R2-vs-R4 statement), but the `ns` column's C rows
+have no band of their own.
+
 ### `whole` mode: R2 is the only rung that gets worse when inlined
 
 Comparing like with like — `isolated` (kernel + main exclusive `Ir`) against

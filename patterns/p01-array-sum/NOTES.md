@@ -311,6 +311,85 @@ difference of two builds, and only `large` (`win_len` 4096, residue 0) shows it.
 It does reinforce the standing rule — **R3, not R2, is the honest number for what
 safe Rust costs.**
 
+## 3b. Wall clock: p01's `small` `ns` column is WITHDRAWN — it has no sign
+
+**TASK_030_REVIEW, landed at TASK_031.** `results/tables/p01-array-sum.md`'s
+wall-clock table gives `-O3 isolated` `small.bin` minima of 15.80 ms (R2),
+15.70 (R3) and 14.99 (R4) — i.e. **R2 +5.40% and R3 +4.72% over `unsafe`**.
+**Do not quote either number.** Built at 30 code layouts per rung, *all three*
+rungs are bimodal, and the two safe rungs' fast residue is the opposite of R4's,
+so the comparison changes sign with where the linker put the function.
+
+**The mechanism is the 32-byte instruction-fetch / DSB window grid**, computed
+statically from the listing with no fitted parameter (`.memory/03-measurement.md`,
+"Code layout: the 32-byte fetch grid"). p01 is the cleanest example on the
+project because the loop is small enough to see whole:
+
+```
+unsafe     loop0 [kernel+0x40, +0x5e)  30 B   win32 [1,2]   x1.0501 / x1.0583  PERFECT
+safe_tuned loop0 [kernel+0x50, +0x6e)  30 B   win32 [1,2]   x1.0803 / x1.0823  PERFECT
+safe_naive loop1 [kernel+0x90, +0xa1)  17 B   win32 [1,2]   x1.0450 / x1.0508  PERFECT
+                                              jcc32 [0,1]   (same partition)
+```
+
+R4's SSE loop is **30 bytes long**: at `kernel%32 == 0` it lands entirely inside
+one 32-byte fetch window, and at `kernel%32 == 16` it straddles two — the
+`movdqu` at `+0x4b` spans bytes 27..1 of the boundary. That is the whole mode.
+"Bit 4 of the entry address" is only a *proxy* for it and works here solely
+because every kernel is 16-byte aligned; a toolchain that aligned functions to
+32 bytes would erase the proxy and keep the effect.
+
+Mode-matched over the 30 layouts, `small`:
+
+| | `%32 == 0` | `%32 == 16` | |
+|---|---:|---:|---|
+| R2 vs R4 | **+5.24%** | **−4.10%** | **SIGN FLIPS** |
+| R3 vs R4 | **+7.01%** | **−5.67%** | **SIGN FLIPS** |
+
+**Confirmed out of sample and pre-registered**, which is the evidence to trust:
+20 *fresh* symbol orderings the hypothesis had never seen, predictions written
+and SHA-256'd (`1462aa5f37aaa2f3d4c2bfde9a9ef4c6befb89ebcc7d7370ed9a3973d89f812b`)
+**before a single timing**, two passes — all three rungs separated **perfectly**,
+`safe_naive` ×1.0605/×1.0661, `safe_tuned` ×1.0546/×1.0587, `unsafe`
+×1.0410/×1.0502. The pre-registered rules were *not the same rule*:
+`safe_tuned` is slow at `%32 == 0` and `unsafe` is slow at `%32 == 16`. Two
+rungs of one pattern whose modes run in opposite directions cannot have a stable
+gap, and that is the withdrawal in one sentence.
+
+**The concrete failure scenario, because this is not a hypothetical.** A reader
+takes "safe-naive costs 5.4% of wall clock on the L1-resident input" from the
+table, rebuilds `p01/safe_naive.rs` with any different link order — a new
+dependency, a reordered `mod`, a different `rustc` patch release — and measures
+R2 **4% faster** than `unsafe`. Same source, same flags, same machine.
+
+**It is layout, not noise — control, TASK_031.** 31 **byte-identical copies** of
+each shipped rung (distinct inodes, one layout), timed in the same harness at
+31 reps, span **0.82 … 3.17%** over four (pass × round-robin order) blocks —
+11 of those 12 rung-blocks under 1.4% — against a 30-layout band of **10.42% /
+10.15% / 7.74%** (R2/R3/R4). The R2-vs-R4 ratio over those identical copies is
+**+4.80 / +4.69 / +4.79 / +4.55%** across two passes and both round-robin
+orderings (`.temp/p31/order.py`, `order_p01.log`). So the published +5.40% is a
+*faithful* measurement of one layout, not a noisy one — which is exactly why it
+is misleading.
+
+⚠ **The two mode-matched percentages above are the weakest numbers in this
+section**, and they are quoted only because they are what the population gives.
+`.temp/r30/layout_gen.py` times its 93 binaries **blocked by rung** rather than
+alternating, and on p01 `small` that costs the `order` build slots 3.79% for R2
+and *gains* them 3.62% for R4 (`.temp/r30/lever_bias.log`) — a differential of
+~7 points between rungs, applied to modes that are 50%/93% order-builds
+respectively. Up to ~3.5 of the 9.3-point mode difference could be that. The
+*within-rung* ratios and the out-of-sample test above are unaffected (their
+labels are uncorrelated with the build slot: mean slot 9.0 vs 10.0 out of 19),
+and they are what the withdrawal rests on.
+
+**What is NOT withdrawn.** `large.bin` — every rung-to-rung gap there is under
+1% in both modes and pooled (R2 +0.05%, R3 −0.13%), i.e. p01's memory-bound
+input says "no difference", and it still says that at 30 layouts. The `Ir`
+columns, which are exact and are where every p01 claim lives (§3). R4 ≡ R5
+(byte-identical machine code cannot differ in wall clock for a reason of its
+own).
+
 ## 4. TCB tally
 
 Counted per `.memory/04-verus.md`: every line inside `#[verifier::external_body]`

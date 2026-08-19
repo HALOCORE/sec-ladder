@@ -583,6 +583,47 @@ this kernel it buys back nothing, because the kernel was never throughput-bound.
 *direction* on p02 and in *magnitude* on p16; p17 is the third instance and the
 cleanest, because the per-call time is differenced rather than divided.
 
+**And the null was bracketed at 30 code layouts, where it SURVIVES**
+(TASK_030_REVIEW / TASK_031). Code layout moves wall clock by up to 27% at an
+unchanged instruction stream and it withdrew two patterns' `ns` rows (p01
+`small`, p07 R2 — `.memory/03-measurement.md`, "Code layout: the 32-byte fetch
+grid"). p17 has **no mode**: rebuilt at 30 layouts per rung with `md5_fn_norel`,
+`n_fn` and stdout invariant at every one, the rung-to-rung gaps are
+
+```
+                    published   pooled    mode0    mode16
+small  R2 vs R4        -0.22%   -0.09%   -0.12%   -0.18%
+small  R3 vs R4        -0.50%   -0.15%   -0.13%   -0.27%
+large  R2 vs R4        -0.15%   +0.03%   -0.02%   +0.05%
+large  R3 vs R4        +0.20%   -0.04%   -0.06%   +0.13%
+```
+
+— under 0.5% everywhere, in both modes, on both inputs; no address bit separates
+the population (best ratio ×0.9989, never a perfect split); and the *whole*
+30-layout band is 0.84 … 1.40% on `small` and 1.05 … 1.37% on `large`, i.e. the
+same size as the 1.1% / 1.8% eight-cell spread quoted above. A null measured at
+one layout could be luck; this one is measured at thirty.
+
+The negative comes with the mechanism, not just the number. p17's loops **do**
+change 32-byte geometry with layout, on four of them at once, and nothing moves:
+
+```
+safe_naive loop2 [kernel+0xb0, +0xcf)   31 B  win32[1,2]   small x0.9992  large x0.9987
+safe_tuned loop3 [kernel+0x1b0,+0x1ca)  26 B  win32[1,2]   small x0.9999  large x0.9975
+safe_tuned loop2 [kernel+0x130,+0x180)  80 B  jcc32[0,1]   small x0.9999  large x0.9975
+unsafe     loop0 [kernel+0x60, +0x17f) 287 B  win32[9,10]  small x1.0015  large x1.0006
+```
+
+**The geometry flip is universal; being front-end-bound is not**, and 2b has
+already established that this kernel is latency-bound on a serial Horner chain
+with idle issue slots — which is exactly a kernel that cannot pay for an extra
+fetch window. p17's layout negative and its instruction-tax null have one cause.
+
+⚠ The C cells are **unbracketed**: both levers are rustc / rust-lld side, so
+`c-gcc`, `c-clang` and the `-h` twins were built at one layout only. The
+conclusion above is an R2/R3-vs-R4 statement and does not rest on them, but the
+`ns` column's four C rows have no band of their own.
+
 ### 2c. Static counts, and why they are not a proxy
 
 `-O3 isolated`, `nm --print-size` extent, `n_fn` / padding-excluded:

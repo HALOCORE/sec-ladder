@@ -117,13 +117,20 @@ under six query distributions.
 **R2's two `ns` cells are withdrawn** (`NOTES.md` §3, §11e). They were published
 as "+28.0% on `small`, +3.5% on `large` — an 8x difference in the conversion
 factor". Built at 30 code layouts, `safe_naive`'s wall clock is **bimodal**:
-17.708 ms or 13.931 ms on `small`, selected by **bit 4 of the kernel's entry
-address**, so R2-vs-R4 is **+26.42% in one mode and −0.93% in the other** — on
-machine code identical but for call displacements (`md5_fn_norel` equal) at an
-identical executed instruction count (12346.57 Ir/call at every layout). Every
-counter this box can produce — `Ir`, `Dr`, `D1mr`, `DLmr`, simulated `Bcm` — is
-equal across that boundary. **R3's `ns` cells survive**: slower than R4 at 30 of
-30 layouts on `small`.
+17.708 ms or 13.931 ms on `small`, selected by whether its **73-byte inner loop
+occupies 3 or 4 32-byte instruction-fetch windows**, so R2-vs-R4 is **+26.42% in
+one mode and −0.93% in the other** — on machine code identical but for call
+displacements (`md5_fn_norel` equal) at an identical executed instruction count
+(12346.57 Ir/call at every layout). Every counter this box can produce — `Ir`,
+`Dr`, `D1mr`, `DLmr`, simulated `Bcm` — is equal across that boundary to **≤6
+events in 10⁸**, because callgrind models no part of the front end. The
+partition was confirmed **out of sample on 20 fresh layouts with the predictions
+hashed before timing**. ("Bit 4 of the kernel's entry address" is a *proxy* for
+the window count and only works because every kernel here is 16-byte aligned;
+`NOTES.md` §11e.) **R3's `ns` cells survive** mode-matching: +11.12% / +17.37%
+on `small`, +0.85% / +2.52% on `large`. ⚠ And R4 itself has an **8% layout band
+with no mode and no explanation** (§11f), which is larger than several gaps in
+the table above.
 
 **R3's tax is 46.6% of the kernel at n = 16 385 and still rising**, toward an
 asymptote of `6 / (12 + f_lo)` ∈ **[46.15%, 50.00%]** — 47.99% on the shipped

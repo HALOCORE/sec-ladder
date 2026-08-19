@@ -74,7 +74,7 @@
     "harness/measure.py": "a810bf5973787f78fc9805b2407a6bb04bbee68c968374a2e9b8622c4c5d3af4",
     "harness/report.py": "09488cb5b72a3244b69c5759b0cba53a44ebecbda98b26c9c206183567c13d8a",
     "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
-    "patterns/p16-tlv-walk/NOTES.md": "a645a7584c5754c10a9390a00aebcfe6caf312e4581e9e94c16ab47c97d31c2b",
+    "patterns/p16-tlv-walk/NOTES.md": "c71851147c9bf316966da2bbfd9f63e191dc2c98a20c556999ad50cb6e532fdd",
     "patterns/p16-tlv-walk/README.md": "f15228277fb40556da91f02dfa7bd453eada8276cf34d529db519b65a2911bd6",
     "patterns/p16-tlv-walk/c/kernel.c": "a59fbef6d3427711a78b7806569978223367c6cba81bfcf1881e1ac83977aba0",
     "patterns/p16-tlv-walk/c/kernel.h": "2cc7285986c387baed556449abb63ad25cc3409e27a081300a1ca5e2c84641aa",
@@ -633,7 +633,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==56583==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51f000001a80 at pc 0x55b6bf18e717 bp 0x7fffec58f6c0 sp 0x7fffec58f6b0 READ of size 1 at 0x51f000001a80 thread T0 #0 0x55b6bf18e716 in kernel /home/apt/repos_common/se"
+      "diagnostic": "================================================================= ==399475==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51f000001a80 at pc 0x560224aed717 bp 0x7fff055acd40 sp 0x7fff055acd30 READ of size 1 at 0x51f000001a80 thread T0 #0 0x560224aed716 in kernel /home/apt/repos_common/s"
     },
     "adversarial-stride2.bin": {
       "exit": 0,
