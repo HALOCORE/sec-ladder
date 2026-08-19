@@ -702,14 +702,21 @@ fixing them: **p08, not p11, is the sharpest instance** of the kernel-exclusive
 column's distortion — 10 inverted rung pairs, with `c-gcc` reading 58% *dearer*
 than `c-clang` where the marginal says 33% *cheaper*.
 
-⚠ **ONE NEW DEFECT, found in passing, and it is about published numbers:
-`results/*.json` has no `source_sha256`.** The *gate* records have one and are all
-fresh (0 stale across 8); the *measurement* records — where every published `Ir`
-and `ns` lives — have none, so they can disagree with the tree indefinitely with
-nothing to say so. **`results/p01-array-sum.json` did**, for ~7 tasks. Scope,
-measured against the last commit that touched `common/driver.c`: **six patterns
-were measured after it and are fine; p01 and p16 were measured before it and are
-at risk.** `TASK_035` closes it.
+**The staleness gap is closed (TASK_035).** `measure.py` now writes
+`source_sha256` + `input_sha256` and ships `--check-stale` over **both** record
+families; 0 STALE across 16 records. ⚠ But two things must be said precisely:
+**p01 and p16 are `FRESH`; the other six are `NO BASELINE`** (their records
+predate the key and clear on their next run), so "0 stale everywhere" overstates
+it — the deterministic half was closed by rebuild instead (252 cells, 5544 static
+leaves, **6 moved, all p11's `bulk_calls`**). And **`results/p11-nul-scan.json` is
+stale on that column**: it records the C rungs calling no bulk routine, where
+p11's own headline is that glibc `strlen` is a 12.0× library factor. Small, but it
+understates the pattern's own finding.
+⚠ **My method for sizing it was wrong in both directions** — I compared each
+record's commit against `common/driver.c`'s last change; **p16 was never at risk**
+(it cannot compile against the older driver) and **p11 was, via `harness/asm.py`,
+which that test could not see**. A commit test is not the test; hashes are
+(`.memory/03-measurement.md`).
 
 **Both next tasks are already written, so the pattern cannot be deferred again:**
 `TASK_035` (the staleness fix — small, bounded) and then **`TASK_036` — p03,

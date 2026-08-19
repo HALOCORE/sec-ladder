@@ -709,6 +709,14 @@ p16    small safe_naive     -0.41%   -0.03%   +0.08%   -0.13%   gap <1% either w
 p17    small safe_naive     -0.22%   -0.09%   -0.12%   -0.18%   gap <1% either way
 ```
 
+⚠ **The `published` column is each pattern's record AS OF TASK_030_REVIEW, and
+p01's has since moved.** Its TASK_035 re-measure reads **+5.71% / +4.30%** against
+the +5.40% / +4.72% above — same sign, same class, **column still withdrawn**.
+That a single-layout reading of a bimodal cell is not reproducible to 0.3 points
+is this table's own point, so no verdict moves; only the label is stale.
+**Re-derive that column from `results/*.json` rather than quoting it from here**,
+and run `harness/measure.py --check-stale` first.
+
 **Confirmed out of sample, pre-registered**: predictions written and SHA-256'd
 *before* any timing, on 20 fresh symbol orderings — p01 all three rungs held with
 perfect separation on both passes; p07 `safe_naive` held.
