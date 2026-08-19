@@ -15,8 +15,10 @@ Rust, unsafe Rust + Verus proof — plus a sixth **R1h** hardened-C cell, across
 optimisation levels and two inline modes, and compared on assembly, executed
 instructions, timing, proof burden and trusted-base size.
 
-47 patterns are catalogued in `.memory/06-catalogue.md`. **Seven exist and all are
-green. Six are reviewed:** p01 (calibration), p02 (first real bug), p16 (first
+47 patterns are catalogued in `.memory/06-catalogue.md`. **Eight exist and all are
+green. Seven are reviewed** (p11 is built, green and **UNREVIEWED** — rule 9, its
+findings are in `patterns/p11-nul-scan/NOTES.md` and deliberately not in
+`.memory/` yet)**:** p01 (calibration), p02 (first real bug), p16 (first
 data-dependent bound), p17 (the limit of memory safety), p05 (the first
 vectorised kernel), p08 (the first structural Rust win). **p07 (binary search) is
 built, green and UNREVIEWED** — per `PROTOCOL.md` rule 9 its findings are in
@@ -39,7 +41,7 @@ claim.
 ## The findings so far — this is the actual output
 
 **Numbering warning, because it has already cost an agent time.** The list below
-is **RECAP's own digest** and is numbered 1–16. `.memory/01-ladder.md` has a
+is **RECAP's own digest** and is numbered 1–17. `.memory/01-ladder.md` has a
 *different* list, numbered 1–7, one entry per pattern, and **that one is
 authoritative**. "Finding 12" means different things in the two files. When
 writing a task file, name the pattern (*"p05's causal claim"*), never the number.
@@ -431,6 +433,39 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    published table reproduces with **zero measurement** —
    `python3 common/layout/survives.py --dir common/layout/data p01`.
 
+17. **p11 — the safe class reaches a library the unsafe class cannot, and it is
+   worth 35% of the kernel.** ⚠ **UNREVIEWED (TASK_033).** Family B's first
+   pattern, and the first kernel whose **loop bound is not known before the loop**
+   — a NUL scan runs until it finds a sentinel that may not be there.
+   **The decomposition, which is the pattern's point** (all rates `body_len / K`
+   off the listing, `vector_regs` empty on 8 of 8 kernels):
+
+   | scan spelling | lowers to | Ir/byte |
+   |---|---|---:|
+   | C `strlen` | glibc IFUNC → **AVX2** | **0.078125** |
+   | `CStr::from_bytes_until_nul` (R3) | `core::slice::memchr`, SWAR 2×u64 | **0.937500** |
+   | `iter().position()` | scalar byte loop | 5.00000 |
+   | R4 `get_unchecked` | scalar byte loop | 6.00000 |
+   | R2 indexed | + `lea;cmp;jae` | 9.00000 |
+
+   **12.0× is IFUNC+AVX2 vs baseline SWAR; 5.3× is which Rust spelling; 3.00000
+   Ir/byte is the bounds check** — a library difference, a spelling difference and
+   a safety cost, separated, where the naive report would have been one ratio.
+   **The swept law**, zero residual over 61 points, all four residues:
+   `R2 − R4 = 7.25000` Ir per string byte `= 4.25000` (fold) `+ 3.00000` (scan).
+   **4.25 = 2.00 check + 2.25 unroll is p16's and p17's constant, reproduced a
+   third time with the split included.** ⚠ **3.00000 is new and is the finding to
+   attack**: the *same* check costs one instruction more because the scan's
+   induction variable is window-relative where the fold's was hoisted to
+   blob-absolute. **A bounds check costs 2 or 3 Ir/byte depending on what the loop
+   already holds.**
+   **And it is the largest instance of finding 14's R4-chained-to-the-prover
+   result**: `r4_cstr` would be **−17 526 Ir/call (−35%)** on `large` and is
+   rejected with **four** `is not supported` errors. The safe class reaches
+   `core::slice::memchr` at **zero TCB**; the unsafe class cannot reach it at all.
+   R3−R4 changes sign at string length 17–18, at `memchr`'s 16-byte threshold, and
+   `small`/`large` are specified on opposite sides of it.
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds
@@ -565,7 +600,7 @@ headline. Say so in every task file.
 - **A tool that reports nothing may be a tool that cannot see.** ASan is silent
   on p08's overlap not because there is none but because fortify rewrote the call
   to `__memcpy_chk`. A gate row records `clean` for both reasons identically.
-- **Two files, two numbering schemes.** RECAP's findings are numbered 1–16,
+- **Two files, two numbering schemes.** RECAP's findings are numbered 1–17,
   `.memory/01-ladder.md`'s are 1–7. Name the pattern, never the number.
   **And one task file is misnumbered**: `.tasks/TASK_025_REVIEW.md` reviews
   **TASK_024**, not TASK_025 (there is no TASK_025). Every other
@@ -648,14 +683,30 @@ in all seven patterns' files (TASK_026 → 029 → 030_REVIEW → 031).**
 `common/layout/` is committed and hashed; p01's mode survived the fixed timer;
 all seven patterns carry the protocol control.
 
-**THE NEXT TASK IS A PATTERN, and the one after that is a pattern.** Nothing in
-the queue below outranks that. Candidates, in the order I would take them: **p03**
-(bounded queue/stack — index underflow on empty pop; the cheapest realistic bug
-left and a different *shape* from every existing pattern, since the state persists
-across calls), **p09** (bitset — word-index vs bit-index confusion, and the first
-kernel where the safety check is not a bounds check at all), **p11**
-(`strlen`/`strcpy` — the first NUL-termination pattern, and Family B is entirely
-empty).
+**p11 is built and green (TASK_033); `TASK_033_REVIEW` is next, then patterns.**
+
+⚠ **Two harness defects are queued and one of them is a live trap.**
+
+1. **The kernel-exclusive `Ir` column is WRONG for any pattern whose rungs call
+   different library routines**, and `results/tables/*.md` publishes it. On p11 it
+   is off by **9830 Ir/call, 43% of a cell**, because `strlen`, `memchr` and
+   `CStr::from_bytes_until_nul` all live outside the `kernel` symbol — read off
+   that column p11's R3 looks **30% cheaper** than R4, where the marginal (and the
+   clock) say **21% dearer**. p11's `NOTES.md` §3 is the correction and every
+   published p11 number is the marginal. **Anyone reading a p11 table without
+   §3 beside it gets the sign backwards.**
+2. **`harness/asm.py::is_bulk_symbol` knows `mem*` and not `str*`.** Harmless on
+   p11 (its kernels keep a fold loop, so stage 3a's back-edge alternative fires),
+   but a kernel that is *only* a `strlen` would have neither a back edge nor a
+   recognised bulk call and stage 3a would **fail a healthy cell** — the exact
+   false-failure the bulk alternative exists to prevent. One line; it moves all 47
+   patterns, so it is the manager's. **It will bite p12–p15.**
+
+After the review, **patterns**, in the order I would take them: **p03** (bounded
+queue/stack — index underflow on empty pop, and the first pattern whose state
+persists *across calls*), **p09** (bitset — word-index vs bit-index confusion, and
+the first kernel whose safety check is not a bounds check at all), **p12**
+(`strcat` into a fixed buffer — but fix defect 2 first).
 
 ⚠ **Read the ratio before planning anything else. TASK_015–031 is seventeen
 consecutive tasks of methodology and correction against two patterns produced

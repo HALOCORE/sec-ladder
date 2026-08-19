@@ -313,7 +313,7 @@ review lands; the argument and the arithmetic are `p07/NOTES.md` §0.
 
 | ID | Pattern | C bug class modelled | Verus difficulty | Status |
 |---|---|---|---|---|
-| p11 | `strlen`/`strcpy` over NUL-terminated buffer | missing terminator → OOB read | moderate | planned |
+| p11 | NUL-terminated string scan (`strlen`-shaped) | missing terminator → OOB read; **the loop simply does not stop** | moderate | **done** (T033), gate `PASS` first complete run, R5 12/0, R4 == R5 `exact`. **UNREVIEWED** — findings are in its `NOTES.md` and not yet in `.memory/`. Family B's first pattern; first kernel whose loop bound is not known before the loop, and first where C's rung calls a SIMD libc routine |
 | p12 | `strcat` into fixed stack buffer | classic stack overflow | moderate | planned |
 | p13 | `strncpy`/`snprintf` truncation semantics | silent truncation, missing NUL | moderate | planned |
 | p14 | tokenizer (`strtok`-style, in-place mutation) | in-place mutation + aliasing | hard | planned |
