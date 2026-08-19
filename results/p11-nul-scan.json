@@ -61,7 +61,7 @@
       "declared_len": 48,
       "present": 48,
       "truncated": false,
-      "model": "n_iters=8 stride=40 n_blob=40 nwin=1 calls=8 work/call=40B san=clean truncated=False expected=6311443662811229568"
+      "model": "n_iters=8 stride=40 n_blob=40 nwin=1 calls=8 work/call=40B san=clean truncated=False expected=17859238140672197760"
     },
     "large.bin": {
       "n_iters": 1500,

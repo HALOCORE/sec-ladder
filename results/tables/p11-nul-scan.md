@@ -21,7 +21,7 @@ Generated 2026-08-19T15:01:06Z from `results/p11-nul-scan.json` (git `36b64ea403
 | adversarial-empty.bin | 8 | 20 | 20 | False | n_iters=8 stride=12 n_blob=12 nwin=1 calls=8 work/call=12B san=clean truncated=False expected=227437609984 |
 | adversarial-nonul.bin | 8 | 74 | 74 | False | n_iters=8 stride=66 n_blob=66 nwin=1 calls=8 work/call=66B san=fires truncated=False expected=18024987679707349248 |
 | adversarial-stride3.bin | 8 | 38 | 38 | False | n_iters=8 stride=3 n_blob=30 nwin=0 calls=0 work/call=0B san=clean truncated=False expected=0 |
-| adversarial-zerotail.bin | 8 | 48 | 48 | False | n_iters=8 stride=40 n_blob=40 nwin=1 calls=8 work/call=40B san=clean truncated=False expected=6311443662811229568 |
+| adversarial-zerotail.bin | 8 | 48 | 48 | False | n_iters=8 stride=40 n_blob=40 nwin=1 calls=8 work/call=40B san=clean truncated=False expected=17859238140672197760 |
 | large.bin | 1,500 | 8,290,008 | 8,290,008 | False | n_iters=1500 stride=4145 n_blob=8290000 nwin=2000 calls=1500 work/call=4145B san=clean truncated=False expected=1712828251200407713 |
 | small.bin | 6,000 | 14,312 | 14,312 | False | n_iters=6000 stride=1192 n_blob=14304 nwin=12 calls=6000 work/call=1192B san=clean truncated=False expected=11230946376629265678 |
 
@@ -97,7 +97,11 @@ Measured by the gate, not by this file — from `results/gate/p11-nul-scan.json`
 
 `Ir(kernel)` and `Ir(main)` are separate columns and are never merged: a `main`-exclusive count is not a kernel measurement wearing a different hat, and pairing one with a static count taken from the *other* symbol is two halves of two different measurements. **`Ir(main)` counts whatever else was inlined into `main`, and that is not the same set in every language**: the Rust rungs inline the whole payload decoder, while the C rungs leave it in `common/driver.c`'s own symbols. On `large` that is ~12.4 M instructions the Rust `main` rows carry and the C ones do not (~12.36 M vs ~0.38 M in the `isolated` rows). So `Ir(main)` is comparable **between Rust rungs only** — never Rust-vs-C, and never to an `isolated` row.
 
-**Do not try to rescue it by subtraction.** A difference of two large numbers, each containing language-specific inlining, is not a measurement — `.memory/03-measurement.md` records the arithmetic that went wrong when TASK_002 tried. Use the `isolated` kernel-exclusive figure, which needs no correction.
+**Do not try to rescue it by subtraction.** A difference of two large numbers, each containing language-specific inlining, is not a measurement — `.memory/03-measurement.md` records the arithmetic that went wrong when TASK_002 tried.
+
+**And the `isolated` kernel-exclusive figure is not a correction-free alternative — it is right only when every rung does its own work inside its own symbol.** This column counts instructions *inside the kernel symbol*, so whatever a rung calls out to — a libc routine, a standard-library function, an out-of-line helper — lands in no column of this table at all. Measured over the eight shipped patterns at `O3 / isolated / small`: on five of them the column ranks the rungs exactly as the whole-program marginal does (worst ratio disagreement 0.0052), on `p02-buffer-copy` it distorts a ratio by 0.19 without reordering anything, and on **`p08-overlap-move` and `p11-nul-scan` it reverses real rung comparisons** — p08's `c-gcc` reads 58% *dearer* than `c-clang` here and 33% *cheaper* on the marginal; p11's `safe_tuned` reads 30% *cheaper* than `unsafe` here and 21% *dearer* on the marginal and the wall clock.
+
+**The check needs no disassembly.** Every rung runs the same input the same number of times, so rung-to-rung *ratios* of this column are directly comparable with the same ratios of `marginal_ir_per_call` in `results/gate/<pattern>.json`, which is a whole-program slope and therefore symbol-independent. Agreement means the kernel-exclusive figure is the whole cell; disagreement means it is not, and then only the marginal is comparable across rungs. **Where a pattern's rungs do call out, its `NOTES.md` is where the convention its published numbers are in is stated** — `p11-nul-scan` §3 and `p08-overlap-move` §2b are the worked examples. Read that before differencing two rows of this table.
 
 ### O3 / isolated — static counts are for the `kernel` symbol
 

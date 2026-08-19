@@ -95,13 +95,13 @@
     "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
     "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
-    "harness/asm.py": "e3b14d4e90f15e7ff28d862442c721120943bb70c9514437b77facc407b6675f",
+    "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
     "harness/check.py": "e7b9b11950677854fa76f14196963c85bad5afef4353bfc243c9984638bc66e9",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "a810bf5973787f78fc9805b2407a6bb04bbee68c968374a2e9b8622c4c5d3af4",
-    "harness/report.py": "09488cb5b72a3244b69c5759b0cba53a44ebecbda98b26c9c206183567c13d8a",
+    "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
     "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
     "patterns/p07-binary-search/NOTES.md": "d50783ef3e0e6f70d620d26609b1893c4a37f417f851d7d121b2a863ff106d06",
     "patterns/p07-binary-search/README.md": "3843aa876d1992bbe34833152e9c281f2857c0c83bf62e9dd96200cb43095de3",
@@ -799,7 +799,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==457529==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x508000004128 at pc 0x557ef52f29af bp 0x7ffee28103b0 sp 0x7ffee28103a0 READ of size 1 at 0x508000004128 thread T0 #0 0x557ef52f29ae in kernel /home/apt/repos_common/s"
+      "diagnostic": "================================================================= ==655363==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x508000004128 at pc 0x555b25f829af bp 0x7ffdd6237710 sp 0x7ffdd6237700 READ of size 1 at 0x508000004128 thread T0 #0 0x555b25f829ae in kernel /home/apt/repos_common/s"
     },
     "adversarial-stride7.bin": {
       "exit": 0,
@@ -820,7 +820,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==457534==ERROR: AddressSanitizer: SEGV on unknown address 0x508100000128 (pc 0x56393dadb96b bp 0x508000000125 sp 0x7ffd0214aaf0 T0) ==457534==The signal is caused by a READ memory access. #0 0x56393dadb9"
+      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==655369==ERROR: AddressSanitizer: SEGV on unknown address 0x508100000128 (pc 0x55eb9c4dc96b bp 0x508000000125 sp 0x7ffe6d897210 T0) ==655369==The signal is caused by a READ memory access. #0 0x55eb9c4dc9"
     },
     "adversarial-zero.bin": {
       "exit": 0,

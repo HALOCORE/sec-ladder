@@ -471,11 +471,53 @@ Ir/byte**, glibc `memchr` **0.1023** — 31% dearer, because `memchr` must also 
 its count.
 
 ⚠ **And the kernel-exclusive `Ir` column cannot see any of it.** A routine called
-*out* of the kernel symbol is not in that column: on p11 it is off by **9830
-Ir/call, 43% of a cell**, and it **inverts the R3-vs-R4 sign** (R3 looks 30%
-cheaper where the whole-program marginal and the clock both say 21% dearer). Use
-the marginal for any pattern whose rungs call different routines, and say which
-convention every number is in.
+*out* of the kernel symbol is not in that column. Measured across all eight
+patterns (TASK_034, ratio-disagreement between the kernel-exclusive column and
+`marginal_ir_per_call`, and the count of rung pairs whose **order inverts**):
+
+| pattern | worst disagreement | inverted rung pairs |
+|---|---:|---:|
+| **p08** | **2.2315** | **10** |
+| p11 | 0.7839 | 3 |
+| p02 | 0.1895 | 0 |
+| p01 / p05 / p07 / p16 / p17 | ≤0.0052 | 0 |
+
+**p08 is the sharpest instance, not p11** — on that column `c-gcc` reads **58%
+dearer** than `c-clang` where the marginal says **33% cheaper**, i.e. a C-vs-C
+comparison reversed. p11 distorts by 43% of a cell and inverts three pairs; p02
+distorts and inverts nothing.
+
+**The author-checkable test, which needs no disassembly** (and is now the
+generated boilerplate in `results/tables/*.md`): every rung runs the same input
+the same number of times, so **rung-to-rung ratios of the kernel-exclusive column
+must agree with the same ratios of `marginal_ir_per_call`**, which is
+symbol-independent. Where they disagree, the marginal is the one to publish.
+Note what does *not* work: the table prints no call column, and `bulk_calls` in
+the gate record names only *recognised bulk* routines — p11's
+`<CStr>::from_bytes_until_nul` never appears there.
+
+### `results/*.json` has NO staleness detector, and two records drifted
+
+**`results/gate/*.json` carries `source_sha256`; `results/*.json` does not**
+(found at TASK_034, in passing). So a *measurement* record — which is where every
+published `Ir` and `ns` lives — can disagree with the tree indefinitely and
+nothing says so. It did: `results/p01-array-sum.json`'s `c-gcc/O0/whole` records
+`md5_fn 2fe6ada73f90` where a rebuild deterministically gives `4104f39118e8`.
+`n_fn` (98) and `fn_bytes` (411) are unchanged, so it is `call`/`jmp`
+displacements only — `common/driver.c` gained 23 lines after that record was
+written.
+
+**Scope, measured by comparing each record's `git_state.commit` against the last
+commit that touched `common/driver.c` (`c623b22`):**
+
+| measured AFTER the driver change (OK) | measured BEFORE (at risk) |
+|---|---|
+| p02, p05, p07, p08, p11, p17 | **p01, p16** |
+
+Two of eight. Until it is fixed, **`md5_fn` and any whole-binary column in
+`results/*.json` are valid only at the commit the record names** — say so beside
+any number quoted from p01's or p16's measurement record. Kernel-*difference*
+columns are far safer, because a driver change cancels between rungs.
 
 ### Interleave by CELL, never by block — it alone flipped a sign
 

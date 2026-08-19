@@ -165,28 +165,28 @@
     "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
     "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
-    "harness/asm.py": "e3b14d4e90f15e7ff28d862442c721120943bb70c9514437b77facc407b6675f",
+    "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
     "harness/check.py": "e7b9b11950677854fa76f14196963c85bad5afef4353bfc243c9984638bc66e9",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "a810bf5973787f78fc9805b2407a6bb04bbee68c968374a2e9b8622c4c5d3af4",
-    "harness/report.py": "09488cb5b72a3244b69c5759b0cba53a44ebecbda98b26c9c206183567c13d8a",
+    "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
     "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
-    "patterns/p11-nul-scan/NOTES.md": "56150000ade5368a9f7609e40096ab0e022a41cfd9e38ad7f9cdd9dad2ac9eb7",
-    "patterns/p11-nul-scan/README.md": "8464719701c14c87eaadf9ad49fc8e6a99ed60fa550d21cf3e70bbe903b0c109",
+    "patterns/p11-nul-scan/NOTES.md": "21152a9b5f25fdf3459696e32ac0b16a9cfbabaca1413ab7eb26fa28600c1430",
+    "patterns/p11-nul-scan/README.md": "1ee4371f8cac420d963d490645f39321b8193ae16e309334d01ab6191bcd9d44",
     "patterns/p11-nul-scan/c/kernel.c": "e4f3f2d0c3dfc871e83d28ec822e4bda7c98aaa1566c018d5c79bb7e0f971f96",
     "patterns/p11-nul-scan/c/kernel.h": "aa44dd53403a286c7fbd6dea582d1c48771b6d022469804be0c80d801edc9d89",
     "patterns/p11-nul-scan/c/kernel_hardened.c": "f0bda03b36f3e8334a35c14ce6863435a10faf80eac73b8df629e3aa213b09f5",
     "patterns/p11-nul-scan/c/main.c": "0896021efbca0fc3b5b40415c2ddb4da9a6db098fa640efd60b3a271854777cb",
     "patterns/p11-nul-scan/controls/gen_controls.py": "49a24d4ac3bb9c268947a8bee7683f7a2122194a3206faf75b539fb7670ccf30",
-    "patterns/p11-nul-scan/inputs/gen.py": "599121cc5baf6094815fb9c58560830d651f9d74cbcf8a81acc48aa14d03c5e3",
+    "patterns/p11-nul-scan/inputs/gen.py": "35b668a4fb9029de63b44cfe51f7395aa97b41c96693a062bfcd35c8b673cddf",
     "patterns/p11-nul-scan/model.py": "238bce2309f0f728732f4000599caccde16857450a5a525206f0726fe823e758",
     "patterns/p11-nul-scan/safe_naive.rs": "3c053c7d80c10b40fee9029b14d6b352ebb1c7f01ad5d8045b7b7e122503e630",
     "patterns/p11-nul-scan/safe_tuned.rs": "251657e52838beceab27ba38a049c51bfe189a2fabc00d6f347024b86f1d79ce",
-    "patterns/p11-nul-scan/spec.md": "f385da6e7472ef1bffe59e154ffec1b10695a5c4136e7b8112e605397ed7599e",
-    "patterns/p11-nul-scan/unsafe.rs": "6fdf99379522d7cc8dace20ec207827b27742901f3907c5b1030de3982397710",
-    "patterns/p11-nul-scan/verus.rs": "493457d2b285ed2434a69f2c9673f3e1404cc4c58474222ffdb620deaa096f46",
+    "patterns/p11-nul-scan/spec.md": "271219fbd88814eadfa27d294d20c0cdf4b062e52cc6aa4b0902ffe064db100f",
+    "patterns/p11-nul-scan/unsafe.rs": "c6d2e114b65c01e6668e0a7120d4f78b186ba952e70f1db60427f369739829a6",
+    "patterns/p11-nul-scan/verus.rs": "291f34bd92c9140b7f30044a23aebc524bd123669ecd4040a66236d4d2b8b950",
     "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
   },
   "derived_contract": {
@@ -366,19 +366,19 @@
           "name": "get_unchecked",
           "attr": "verifier::external_body",
           "body_lines": 1,
-          "line": 203
+          "line": 216
         },
         {
           "name": "load_input",
           "attr": "verifier::external_body",
           "body_lines": 4,
-          "line": 253
+          "line": 266
         },
         {
           "name": "emit",
           "attr": "verifier::external_body",
           "body_lines": 1,
-          "line": 265
+          "line": 278
         }
       ]
     }
@@ -800,67 +800,67 @@
     },
     "adversarial-zerotail.bin/c-gcc": {
       "exit": 0,
-      "stdout": "6311443662811229568",
+      "stdout": "17859238140672197760",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
-      "model_stdout": "6311443662811229568"
+      "model_stdout": "17859238140672197760"
     },
     "adversarial-zerotail.bin/c-clang": {
       "exit": 0,
-      "stdout": "6311443662811229568",
+      "stdout": "17859238140672197760",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
-      "model_stdout": "6311443662811229568"
+      "model_stdout": "17859238140672197760"
     },
     "adversarial-zerotail.bin/safe_naive": {
       "exit": 0,
-      "stdout": "6311443662811229568",
+      "stdout": "17859238140672197760",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
-      "model_stdout": "6311443662811229568"
+      "model_stdout": "17859238140672197760"
     },
     "adversarial-zerotail.bin/safe_tuned": {
       "exit": 0,
-      "stdout": "6311443662811229568",
+      "stdout": "17859238140672197760",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
-      "model_stdout": "6311443662811229568"
+      "model_stdout": "17859238140672197760"
     },
     "adversarial-zerotail.bin/unsafe": {
       "exit": 0,
-      "stdout": "6311443662811229568",
+      "stdout": "17859238140672197760",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
-      "model_stdout": "6311443662811229568"
+      "model_stdout": "17859238140672197760"
     },
     "adversarial-zerotail.bin/verus": {
       "exit": 0,
-      "stdout": "6311443662811229568",
+      "stdout": "17859238140672197760",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
-      "model_stdout": "6311443662811229568"
+      "model_stdout": "17859238140672197760"
     },
     "adversarial-zerotail.bin/c-gcc-h": {
       "exit": 0,
-      "stdout": "6311443662811229568",
+      "stdout": "17859238140672197760",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
-      "model_stdout": "6311443662811229568"
+      "model_stdout": "17859238140672197760"
     },
     "adversarial-zerotail.bin/c-clang-h": {
       "exit": 0,
-      "stdout": "6311443662811229568",
+      "stdout": "17859238140672197760",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
-      "model_stdout": "6311443662811229568"
+      "model_stdout": "17859238140672197760"
     }
   },
   "sanitizer": {
@@ -869,7 +869,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==563949==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000078 at pc 0x559eb7e71472 bp 0x7ffdfbeeb8d0 sp 0x7ffdfbeeb078 READ of size 21 at 0x504000000078 thread T0 #0 0x559eb7e71471 in __interceptor_strlen.part.0 (/"
+      "diagnostic": "================================================================= ==666903==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000078 at pc 0x55e185522472 bp 0x7ffc6e0e88a0 sp 0x7ffc6e0e8048 READ of size 21 at 0x504000000078 thread T0 #0 0x55e185522471 in __interceptor_strlen.part.0 (/"
     },
     "adversarial-empty.bin": {
       "exit": 0,
@@ -883,7 +883,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==563952==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d2 at pc 0x55a351832472 bp 0x7fff4b9a17c0 sp 0x7fff4b9a0f68 READ of size 13 at 0x5070000000d2 thread T0 #0 0x55a351832471 in __interceptor_strlen.part.0 (/"
+      "diagnostic": "================================================================= ==666906==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d2 at pc 0x55930c005472 bp 0x7fffef1e2160 sp 0x7fffef1e1908 READ of size 13 at 0x5070000000d2 thread T0 #0 0x55930c005471 in __interceptor_strlen.part.0 (/"
     },
     "adversarial-stride3.bin": {
       "exit": 0,
@@ -974,8 +974,8 @@
         "input": "adversarial-zerotail.bin",
         "exit": 0,
         "ub": false,
-        "stdout": "13639865634293098176",
-        "model_stdout": "13639865634293098176",
+        "stdout": "17350591509089579584",
+        "model_stdout": "17350591509089579584",
         "stderr": ""
       },
       {

@@ -126,13 +126,13 @@
     "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
     "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
-    "harness/asm.py": "e3b14d4e90f15e7ff28d862442c721120943bb70c9514437b77facc407b6675f",
+    "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
     "harness/check.py": "e7b9b11950677854fa76f14196963c85bad5afef4353bfc243c9984638bc66e9",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "a810bf5973787f78fc9805b2407a6bb04bbee68c968374a2e9b8622c4c5d3af4",
-    "harness/report.py": "09488cb5b72a3244b69c5759b0cba53a44ebecbda98b26c9c206183567c13d8a",
+    "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
     "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
     "patterns/p02-buffer-copy/NOTES.md": "478facabaf199681260a3810f4bc502f53af0f1defab2838b3c060769b6b583b",
     "patterns/p02-buffer-copy/README.md": "0e16eefe3cfa37df83df7581b1eae7dbec1f5f128bb80bf32acf45e8c3225b82",
@@ -1044,7 +1044,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==452774==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x506000000060 at pc 0x559fcd4f6f13 bp 0x7ffd47726820 sp 0x7ffd47725fc8 WRITE of size 65 at 0x506000000060 thread T0 #0 0x559fcd4f6f12 in __interceptor_memcpy (/home/a"
+      "diagnostic": "================================================================= ==645424==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x506000000060 at pc 0x55cb2a544f13 bp 0x7fff46ccd8d0 sp 0x7fff46ccd078 WRITE of size 65 at 0x506000000060 thread T0 #0 0x55cb2a544f12 in __interceptor_memcpy (/home/a"
     },
     "adversarial-capbig.bin": {
       "exit": 7,
@@ -1065,7 +1065,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==452779==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000038 at pc 0x5593c4770036 bp 0x7ffc4c5de550 sp 0x7ffc4c5ddcf8 READ of size 61 at 0x504000000038 thread T0 #0 0x5593c4770035 in __interceptor_memcpy (/home/ap"
+      "diagnostic": "================================================================= ==645429==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000038 at pc 0x55f1b1205036 bp 0x7fff7aafb570 sp 0x7fff7aafad18 READ of size 61 at 0x504000000038 thread T0 #0 0x55f1b1205035 in __interceptor_memcpy (/home/ap"
     },
     "adversarial-stride1.bin": {
       "exit": 0,
@@ -1079,7 +1079,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==452782==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x527000006a38 at pc 0x5622dc34b036 bp 0x7ffc6cdb7790 sp 0x7ffc6cdb6f38 READ of size 65535 at 0x527000006a38 thread T0 #0 0x5622dc34b035 in __interceptor_memcpy (/home"
+      "diagnostic": "================================================================= ==645432==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x527000006a38 at pc 0x561a32635036 bp 0x7ffeded68e00 sp 0x7ffeded685a8 READ of size 65535 at 0x527000006a38 thread T0 #0 0x561a32635035 in __interceptor_memcpy (/home"
     },
     "large.bin": {
       "exit": 0,

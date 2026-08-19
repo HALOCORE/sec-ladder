@@ -30,12 +30,25 @@
 //!     if q >= len { break; }
 //!
 //! *before* the step makes `q < len` and the overflow goes away at zero cost in
-//! preconditions, in driver statements and (measured: NOTES.md 3) in
-//! instructions. And the added line is not a prover concession -- it is the
-//! sentence "a string whose terminator is missing is the last string in the
-//! window", which is precisely the case R1 cannot represent. **The spelling that
-//! makes the proof go through is the one that names the bug**, which is p07's
-//! finding about half-open bounds arriving on a completely different kernel.
+//! preconditions and in driver statements. And the added line is not a prover
+//! concession -- it is the sentence "a string whose terminator is missing is the
+//! last string in the window", which is precisely the case R1 cannot represent.
+//! **The spelling that makes the proof go through is the one that names the
+//! bug**, which is p07's finding about half-open bounds arriving on a completely
+//! different kernel.
+//!
+//! **What it is NOT is free in instructions, and this comment claimed a
+//! measurement for that until TASK_034** ("zero cost in preconditions, in driver
+//! statements and (measured: NOTES.md 3) in instructions" -- NOTES.md 3 measures
+//! no such thing). Deleting the guard: kernel 123 -> 114 instructions, marginal
+//! 50174 -> 45909 on `large`, i.e. **1.00000 Ir per scanned byte + 3 per string
+//! + 1 per call, 8.5% of R4**, because the `sete %bpl` in the scan exists only to
+//! carry the exit reason to the post-loop `test; je`. **That is the trade and it
+//! is the more interesting result**: p17 discharges the same obligation with a
+//! precondition at zero instructions, p11 with a program change at zero
+//! preconditions, and neither route is free (`.memory/04-verus.md`). The guard
+//! stays -- it is in `idiom.required` for all six rungs, so no rung comparison
+//! moves, and NOTES.md 5a carries the law.
 //!
 //!     requires  off + len <= buf@.len()
 //!

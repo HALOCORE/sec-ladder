@@ -695,22 +695,21 @@ all seven patterns carry the protocol control.
 
 **p11 is built and green (TASK_033); `TASK_033_REVIEW` is next, then patterns.**
 
-⚠ **Two harness defects are queued and one of them is a live trap.**
+**Both harness defects are FIXED (TASK_034)** — `report.py`'s boilerplate no
+longer tells readers to use a column that inverts signs, and `asm.py::is_bulk_symbol`
+now knows the `str*` family (27 new selftest cases, 47 total). Measured while
+fixing them: **p08, not p11, is the sharpest instance** of the kernel-exclusive
+column's distortion — 10 inverted rung pairs, with `c-gcc` reading 58% *dearer*
+than `c-clang` where the marginal says 33% *cheaper*.
 
-1. **The kernel-exclusive `Ir` column is WRONG for any pattern whose rungs call
-   different library routines**, and `results/tables/*.md` publishes it. On p11 it
-   is off by **9830 Ir/call, 43% of a cell**, because `strlen`, `memchr` and
-   `CStr::from_bytes_until_nul` all live outside the `kernel` symbol — read off
-   that column p11's R3 looks **30% cheaper** than R4, where the marginal (and the
-   clock) say **21% dearer**. p11's `NOTES.md` §3 is the correction and every
-   published p11 number is the marginal. **Anyone reading a p11 table without
-   §3 beside it gets the sign backwards.**
-2. **`harness/asm.py::is_bulk_symbol` knows `mem*` and not `str*`.** Harmless on
-   p11 (its kernels keep a fold loop, so stage 3a's back-edge alternative fires),
-   but a kernel that is *only* a `strlen` would have neither a back edge nor a
-   recognised bulk call and stage 3a would **fail a healthy cell** — the exact
-   false-failure the bulk alternative exists to prevent. One line; it moves all 47
-   patterns, so it is the manager's. **It will bite p12–p15.**
+⚠ **ONE NEW DEFECT, found in passing, and it is about published numbers:
+`results/*.json` has no `source_sha256`.** The *gate* records have one and are all
+fresh (0 stale across 8); the *measurement* records — where every published `Ir`
+and `ns` lives — have none, so they can disagree with the tree indefinitely with
+nothing to say so. **`results/p01-array-sum.json` did**, for ~7 tasks. Scope,
+measured against the last commit that touched `common/driver.c`: **six patterns
+were measured after it and are fine; p01 and p16 were measured before it and are
+at risk.** `TASK_035` closes it.
 
 After the review, **patterns**, in the order I would take them: **p03** (bounded
 queue/stack — index underflow on empty pop, and the first pattern whose state

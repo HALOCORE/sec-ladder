@@ -59,7 +59,7 @@ written, and the sixth has no terminator. ASan reports
 ```
 ERROR: AddressSanitizer: heap-buffer-overflow ... READ of size 13
     #0 __interceptor_strlen
-    #1 kernel patterns/p11-nul-scan/c/kernel.c:65
+    #1 kernel patterns/p11-nul-scan/c/kernel.c:68
 0x... is located 0 bytes after 66-byte region
 ```
 
@@ -75,8 +75,11 @@ ERROR: AddressSanitizer: heap-buffer-overflow ... READ of size 13
    term rather than quoting a ratio — the distinction this project retracted a
    "C beats Rust" headline over once already.
 3. **The declared count bounds nothing**, and `adversarial-zerotail.bin` proves
-   it: the same 4096-string lie as `adversarial-count.bin` with a NUL tail
-   instead of a non-zero one, and every rung including R1 stays in bounds.
+   it: the same 4096-string lie as `adversarial-count.bin` — the same window
+   byte for byte, since TASK_034 — with a NUL tail instead of a non-zero one,
+   and every rung including R1 stays in bounds. The two blobs differ in 20 bytes
+   and nothing else, which is what makes the row a controlled comparison
+   (`NOTES.md` §7).
 
 ## Rungs
 

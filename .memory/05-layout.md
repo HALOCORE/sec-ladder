@@ -311,6 +311,21 @@ harness rather than argued:
   95 pre-existing blobs unchanged) — it is one command and it is the whole basis
   of the claim.
 
+## An input generator's RNG is a shared sequential stream — and it can re-converge
+
+**Measured at TASK_034.** `inputs/gen.py` draws every blob from one advancing
+RNG, so removing or adding a draw shifts every *later* blob. That much is
+obvious. What is not: **`random.shuffle`'s rejection sampling makes word
+consumption data-dependent, so the streams can re-CONVERGE** — after p11's
+one-line generator fix only **three** blobs moved (`zerotail` as intended,
+`stride3` which makes 0 kernel calls, and `sweep-len01k24` whose band-A lengths
+are constant so no law could move), and the Mersenne Twister state was **equal**
+from that point on (index 343 vs 339 immediately before, identical after).
+
+**So: diff the blob set before and after any generator edit and say which moved.
+Never assume "only the ones I edited", and never assume "everything after".**
+Both guesses were available here and both were wrong.
+
 ## Editing rules
 
 - `pilot/` is frozen evidence for `PLAN.md`. Do not edit it; p01 is its successor.

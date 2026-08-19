@@ -119,7 +119,9 @@ missing from the copy on the day it landed.
   `len`, which **cannot be proved overflow-free** at the pinned vstd (no axiom
   that a slice is at most `isize::MAX` bytes; `usize` modelled as possibly
   32-bit). p17 bought its way out of the analogous obligation with a second
-  `requires` and a third driver conjunct; this line costs neither. NOTES.md 5.
+  `requires` and a third driver conjunct; this line costs neither — but it is
+  **not** free either, at 1.00000 Ir per scanned byte (NOTES.md 5a). Both routes
+  are priced, and both are non-zero. NOTES.md 5.
 - **The little-endian header decode is written out** — `b0 + 256*b1 + 65536*b2 +
   16777216*b3` — in every rung, and `from_le_bytes` is `forbidden`. Two reasons,
   and the second decides it: it would delete the decode every rung shares, and
@@ -180,10 +182,14 @@ of the window are *arguments* of the problem; the kernel is total in all of them
 **It is ONE clause, and p17's second one is deliberately absent.** p17 needed
 `buf_len <= 9223372036854775807` because it cast to `i64`; p11 needs the same
 fact for a different reason — the cursor step `p = q + 1` with `q` possibly
-`len` — and gets it for free from the `if q >= len: break` line above instead of
-paying for it with a precondition and a driver conjunct. Reported in NOTES.md 5,
+`len` — and gets it from the `if q >= len: break` line above instead of paying
+for it with a precondition and a driver conjunct. Reported in NOTES.md 5,
 because "the spelling that makes the proof go through is the one that names the
-bug" is p07's finding arriving on a completely different kernel.
+bug" is p07's finding arriving on a completely different kernel. **It is not
+free, and the trade is the result**: that line costs **1.00000 Ir per scanned
+byte, 8.5% of R4** (NOTES.md 5a, measured by deleting it), where p17's second
+`requires` costs zero instructions. Every rung here carries the line — it is in
+`idiom.required` for all six — so no rung comparison in this pattern moves.
 
 ### What the `ensures` is, and what it is not — p11 is p16's case, not p17's
 

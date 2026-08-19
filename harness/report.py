@@ -479,8 +479,42 @@ def build(doc, name):
     out.append("\n**Do not try to rescue it by subtraction.** A difference of two "
                "large numbers, each containing language-specific inlining, is not "
                "a measurement — `.memory/03-measurement.md` records the arithmetic "
-               "that went wrong when TASK_002 tried. Use the `isolated` "
-               "kernel-exclusive figure, which needs no correction.")
+               "that went wrong when TASK_002 tried.")
+    # TASK_034 item 9. This paragraph used to end "Use the `isolated`
+    # kernel-exclusive figure, which needs no correction." -- boilerplate
+    # printed into all eight tables, and false in three of them. It told the
+    # reader of `results/tables/p11-nul-scan.md` to use the one column that
+    # gets p11's headline comparison backwards. The replacement states the
+    # CONDITION and, because "do the rungs call the same routines?" is not a
+    # question a reader of this table can answer, gives a check that needs no
+    # disassembly: ratios of this column against ratios of the gate's
+    # whole-program marginal (measured at TASK_034, `.temp/p34/colcheck.py`).
+    out.append("\n**And the `isolated` kernel-exclusive figure is not a "
+               "correction-free alternative — it is right only when every rung "
+               "does its own work inside its own symbol.** This column counts "
+               "instructions *inside the kernel symbol*, so whatever a rung calls "
+               "out to — a libc routine, a standard-library function, an "
+               "out-of-line helper — lands in no column of this table at all. "
+               "Measured over the eight shipped patterns at `O3 / isolated / "
+               "small`: on five of them the column ranks the rungs exactly as the "
+               "whole-program marginal does (worst ratio disagreement 0.0052), on "
+               "`p02-buffer-copy` it distorts a ratio by 0.19 without reordering "
+               "anything, and on **`p08-overlap-move` and `p11-nul-scan` it "
+               "reverses real rung comparisons** — p08's `c-gcc` reads 58% "
+               "*dearer* than `c-clang` here and 33% *cheaper* on the marginal; "
+               "p11's `safe_tuned` reads 30% *cheaper* than `unsafe` here and 21% "
+               "*dearer* on the marginal and the wall clock.")
+    out.append("\n**The check needs no disassembly.** Every rung runs the same "
+               "input the same number of times, so rung-to-rung *ratios* of this "
+               "column are directly comparable with the same ratios of "
+               "`marginal_ir_per_call` in `results/gate/<pattern>.json`, which is "
+               "a whole-program slope and therefore symbol-independent. Agreement "
+               "means the kernel-exclusive figure is the whole cell; disagreement "
+               "means it is not, and then only the marginal is comparable across "
+               "rungs. **Where a pattern's rungs do call out, its `NOTES.md` is "
+               "where the convention its published numbers are in is stated** — "
+               "`p11-nul-scan` §3 and `p08-overlap-move` §2b are the worked "
+               "examples. Read that before differencing two rows of this table.")
     for mode in ("isolated", "whole"):
         for opt in ("O3", "O0"):
             main_table(doc, opt, mode, out)

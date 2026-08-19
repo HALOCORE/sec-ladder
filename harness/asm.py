@@ -117,6 +117,52 @@ _BULK_WORDS = frozenset(("memcpy", "memmove", "memset", "memcmp", "memchr",
                          "bcopy", "bzero"))
 _SYM_SPLIT_RE = re.compile(r"[^A-Za-z0-9]+")
 
+# The `str*` family, added at TASK_034 on p11's report (`patterns/p11-nul-scan/
+# NOTES.md` 8a) after `is_bulk_symbol` was measured to answer `False` for
+# `strlen`, `strlen@plt`, `__strlen_avx2`, `strnlen` and `__strlen_chk` while
+# answering `True` for `memchr@plt`. Same argument as the `mem*` family and the
+# same escape hatch: a call to one of these *is* the loop, it just lives in
+# libc. p11's own kernels are unaffected -- they keep a fold loop, so step 3a's
+# back-edge branch fires -- but **a kernel whose only work is a `strlen` has
+# neither a back edge nor a recognised bulk call**, and step 3a would fail a
+# perfectly healthy cell, which is the exact false-failure the bulk alternative
+# was added to prevent, one function family short. That is p12-p15 shaped, not
+# hypothetical: any NUL-terminated-string pattern whose C rung is one library
+# call lands on it.
+#
+# Scope, and why it stops where it does. These are the string routines whose
+# body is a scan or a copy over an unbounded-until-sentinel run of bytes, i.e.
+# the ones that can BE the kernel's loop:
+#
+#   search   strlen strnlen strchr strrchr strchrnul strstr strcasestr
+#            strspn strcspn strpbrk strsep strtok
+#   copy     strcpy strncpy stpcpy stpncpy strcat strncat strdup strndup
+#   compare  strcmp strncmp strcasecmp strncasecmp
+#
+# `strtol`/`strtoul`/`strtod`/`strerror`/`strsignal` are deliberately absent:
+# they are conversions and table lookups, not a loop over a caller's buffer, so
+# a kernel that is only one of those really has done no bulk work and step 3a
+# should say so. The boundary is exact rather than approximate, because matching
+# is on whole `[^A-Za-z0-9]`-delimited components: `strtoul` is one component
+# and is in no list, so it cannot be dragged in by a prefix of a listed name.
+#
+# The three spellings the `mem*` family needed all appear here too and all are
+# covered by the SAME two mechanisms, so nothing new is required:
+#   plain / PLT      `strlen`, `strlen@plt`, `strlen@GLIBC_2.2.5`
+#   glibc IFUNC      `__strlen_avx2`, `__strncpy_evex`, `__strcmp_sse2`
+#   fortify          `__strcpy_chk@plt`, `__strncat_chk`, `__strlen_chk`
+# -- because `_SYM_SPLIT_RE` splits on `_` and `@` alike, so the routine name is
+# an underscore-delimited component in every one of them. The Rust v0 route
+# (`_BULK_NAMES` -> `_V0_BULK_RES`) gets them too, for a `12core3str6strlen`
+# shaped symbol; rustc does not call these today, and the cost of listing them
+# is one regex each.
+_BULK_STR_WORDS = frozenset((
+    "strlen", "strnlen", "strchr", "strrchr", "strchrnul", "strstr",
+    "strcasestr", "strspn", "strcspn", "strpbrk", "strsep", "strtok",
+    "strcpy", "strncpy", "stpcpy", "stpncpy", "strcat", "strncat",
+    "strdup", "strndup", "strcmp", "strncmp", "strcasecmp", "strncasecmp"))
+_BULK_WORDS = _BULK_WORDS | _BULK_STR_WORDS
+
 # Rust v0 mangling packs each identifier between a decimal *length* prefix and
 # the next component, with word characters on both sides:
 #
@@ -129,15 +175,19 @@ _SYM_SPLIT_RE = re.compile(r"[^A-Za-z0-9]+")
 # Matching is kept tight by requiring the length prefix to be *exactly* the
 # routine's length, so `15copy_from_slice` hits and `9copy_from` does not.
 _V0_BULK_RES = [re.compile(r"(?<![0-9])" + str(len(n)) + re.escape(n))
-                for n in _BULK_NAMES]
+                for n in tuple(_BULK_NAMES) + tuple(sorted(_BULK_STR_WORDS))]
 
 
 def is_bulk_symbol(sym):
-    """Is this symbol name a known bulk-memory routine?
+    """Is this symbol name a known bulk-memory or bulk-string routine?
 
     Three spellings, because three toolchains write it three ways: plain
     (`memcpy@plt`), Rust v0-mangled (`...5sliceSh15copy_from_slice...`), and
-    glibc/fortify (`__memcpy_avx_unaligned_erms`, `__memcpy_chk@plt`)."""
+    glibc/fortify (`__memcpy_avx_unaligned_erms`, `__memcpy_chk@plt`). The
+    `str*` family answers the same question -- *is this call the kernel's
+    loop?* -- and needs only two of the three matchers, because no `str*`
+    routine name contains an underscore; see `_BULK_STR_WORDS` for why the
+    `str*` conversions (`strtoul`, `strerror`) are excluded."""
     if _BULK_MEM_RE.search(sym) or any(r.search(sym) for r in _V0_BULK_RES):
         return True
     return any(p in _BULK_WORDS for p in _SYM_SPLIT_RE.split(sym))
@@ -167,6 +217,39 @@ _BULK_SYM_CASES = (
     ("_ZN4core3fmt5write17h0123456789abcdefE", False),
     ("memoize", False),                        # substring, not a component
     ("9copy_from", False),                     # v0 length prefix must be exact
+    # --- the `str*` family (TASK_034, p11's NOTES.md 8a) -------------------
+    # Every True case below returned False before this task, `memchr@plt`
+    # notwithstanding, and each of the first five is a symbol p11's own C rungs
+    # or this box's glibc actually emit.
+    ("strlen", True),
+    ("strlen@plt", True),                      # p11 c-gcc / c-clang, objdump
+    ("strlen@GLIBC_2.2.5", True),
+    ("__strlen_avx2", True),                   # glibc IFUNC on this box
+    ("__strlen_sse2", True),
+    ("strnlen", True),                         # the bounded scan a hardened C
+    ("strnlen@plt", True),                     #   rung reaches for
+    ("__strlen_chk", True),                    # fortify spelling
+    ("__strcpy_chk@plt", True),                # ...as objdump prints the call
+    ("__strncat_chk", True),
+    ("strchr@plt", True),
+    ("strchrnul", True),
+    ("strcmp@plt", True),
+    ("__strcmp_avx2", True),
+    ("strncpy@plt", True),
+    ("stpcpy", True),
+    ("strstr", True),
+    ("strtok@plt", True),
+    ("_RNvNtCsaBcDeFgHiJk_4core3str6strlenCs1234567890_6kernel", True),
+    # ...and the conversions, which are NOT a loop over the caller's buffer, so
+    # a kernel whose only call is one of these has done no bulk work:
+    ("strtoul@plt", False),
+    ("strtol", False),
+    ("strtod@plt", False),
+    ("strerror", False),
+    ("strsignal@plt", False),
+    ("stride", False),                         # not a routine at all
+    ("__strtol_internal", False),
+    ("9strlen", False),                        # v0 prefix must be exact (6)
 )
 
 

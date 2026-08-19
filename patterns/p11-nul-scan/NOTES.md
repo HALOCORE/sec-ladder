@@ -82,7 +82,8 @@ disassembly quantity. The spelling is named beside every one.
 
 | scan spelling | rung | what it lowers to | Ir per scanned byte |
 |---|---|---|---|
-| `strlen` | R1, and R1h's `memchr` | glibc IFUNC → AVX2; main loop `vmovdqa/vpminub×3/vpcmpeqb/vpmovmskb/sub/test/je` = **10 insns / 128 B** at `libc+0x18b880` | **0.078125** |
+| `strlen` | **R1** | glibc IFUNC → AVX2; main loop `vmovdqa/vpminub×3/vpcmpeqb/vpmovmskb/sub/test/je` = **10 insns / 128 B** at `libc+0x18b880` | **0.078125** |
+| `memchr` | **R1h** | glibc IFUNC → AVX2 as well, at `libc+0x188080`, **but it must also test its count** | **0.1023** (measured; not `strlen`'s rate) |
 | `CStr::from_bytes_until_nul` | **R3** | `core::slice::memchr`, SWAR on 2 × `u64`, **15 insns / 16 B**, no `xmm`/`ymm` | **0.937500** (spans ≥ 16 B) |
 | `iter().position(\|&b\| b == 0)` | `r3_position` | scalar byte loop `cmpb;je;inc;cmp;jne` | **5.00000** |
 | `iter().take_while(..).count()` | `r3_takewhile` | the same loop | **5.00000** |
@@ -91,10 +92,19 @@ disassembly quantity. The spelling is named beside every one.
 | `while (buf[off+q] != 0) q++` under **gcc** | `k_byteloop` | scalar byte loop `add;cmpb;jne` | **3.00000** |
 | the same under **clang** | `k_byteloop` | *rewritten to `call strlen@plt`* | **0.078125** |
 
-Independent check of the top row, and it is a *measurement* rather than a second
-reading of the same listing: 64 × `strlen` over a 65 536-byte string under
+Independent check of the top two rows, and it is a *measurement* rather than a
+second reading of the same listing: 64 × `strlen` over a 65 536-byte string under
 callgrind is **330 616 Ir over 4 194 304 bytes = 0.0788 Ir/byte**, against
-0.078125 predicted.
+0.078125 predicted. The same probe on `memchr` (`.temp/r33/mcprobe.c`, re-run at
+TASK_034) gives **429 184 Ir over the same 4 194 304 bytes = 0.1023**, i.e. **31%
+dearer than `strlen` and not the same row**, which is what item (3) of this
+section already says in prose — `memchr` tests a count as well as a sentinel.
+Until TASK_034 the table put R1h's `memchr` on `strlen`'s 0.078125
+(TASK_033_REVIEW minor 4); both are AVX2 out of the same IFUNC mechanism, so the
+qualitative claim was right and the rate was not. **Nothing in the decomposition
+below rests on the `memchr` rate** — the 12.0× is `strlen` against
+`core::slice::memchr`, and §3's per-string R1-vs-R1h figures are marginals, not
+rates.
 
 **The decomposition, which does not say what the bare ratio says.**
 `0.078125` against `5.00000` is 64×, and the safety term is the *smallest* of the
@@ -155,6 +165,21 @@ clock says (+23.35%). `results/tables/p11-nul-scan.md` reports the
 kernel-exclusive column because that is what `harness/measure.py` records for
 every pattern; **this section is the correction, and every number below is the
 whole-program marginal.**
+
+Until TASK_034 the shipped table also *told the reader to use that column* —
+`harness/report.py`'s boilerplate ended "Use the `isolated` kernel-exclusive
+figure, which needs no correction", i.e. the table instructed the reader to get
+p11's headline comparison backwards (TASK_033_REVIEW minor 3). It now states the
+condition and gives a check that needs no disassembly, because *"do the rungs
+call the same routines?"* is not a question the table can answer: **every rung
+runs the same input the same number of times, so rung-to-rung RATIOS of the
+kernel-exclusive column are comparable with the same ratios of
+`marginal_ir_per_call` in `results/gate/<pattern>.json`, which is a whole-program
+slope**. Measured over all eight patterns at `O3 / isolated / small`
+(`.temp/p34/colcheck.py`): five agree to a worst ratio disagreement of 0.0052,
+p02 distorts by 0.19 without reordering anything, and **p08 (10 inverted rung
+pairs, worst 2.23) and p11 (3, worst 0.78) reverse real comparisons** — p08's is
+the larger instance, and it inverts C-vs-Rust rather than R3-vs-R4.
 
 `-O3 isolated`, `panic=unwind`. Wall clock is `taskset -c 3`, interleaved
 round-robin, min of 31 reps; frequency scaling is on and cannot be disabled
@@ -286,19 +311,38 @@ have different mean string lengths, and it is the mechanism behind §3's result 
 
 ### 4c. C against R4, with both slopes falling out of the listing
 
-| pair | 5 ≤ L ≤ 15 | per byte | 20 ≤ L ≤ 64 | per byte |
-|---|---|---:|---|---:|
-| c-clang − R4 | `−144.02·L + 75`, maxres **0.42** | **−6.00000** | `−136.5·L − 60` | −5.69 |
-| c-gcc − R4 | `−90.03·L − 60 … −170`, maxres **0.42** | **−3.75000** | `−82.5·L − 200` | −3.44 |
+⚠ **These two are FITS, and this file's opening rule says a five-decimal rate
+here comes off a listing.** They are quoted at five decimals below because they
+*agree* with a listing count to 0.04%, not because a listing produced them —
+TASK_033_REVIEW minor 7, and the presentation is what was wrong rather than the
+number. Recomputed at TASK_034 from the stored band-A marginals
+(`.temp/p34/fit4c.py`, `.temp/p11/sweep_A.json`), **per residue class**, which is
+the only honest way to fit a difference whose classes are staggered by 54 Ir:
 
-**−6.00000 is exactly R4's scan rate.** Below 32 bytes glibc's AVX2 `strlen`
-costs ≈0 per byte — one `vpcmpeqb` covers the whole string — so the entire
-difference is R4's byte loop, with nothing left over. And
-**−3.75000 = −6.00000 + 2.25000**, the 2.25 being gcc's *rolled* fold against
-clang's 4×-unrolled one: **the gcc-vs-clang gap on this kernel is the unroll
-factor and nothing else.** `.memory/01-ladder.md` asks that a gcc-vs-clang gap be
+| pair | 5 ≤ L ≤ 15, per class | per byte, per class | 20 ≤ L ≤ 64 | per byte |
+|---|---|---:|---|---:|
+| c-clang − R4 | slope −143.895 … −144.053, intercept +74 … +75 | **−5.99563 … −6.00219** | `−136.7·L − 59` | −5.68 … −5.71 |
+| c-gcc − R4 | slope −89.895 … −90.053, intercept **+39 … −170** | **−3.74563 … −3.75219** | `−82.8·L − 202` | −3.43 … −3.46 |
+
+(The intercept range on the `c-gcc` row used to read "−60 … −170"; the `r = 0`
+class is **+39**, and dropping it made the stagger look one-sided.)
+
+**So: R4's scan rate is 6.00000 Ir/byte off the listing (§2), and the C-vs-R4
+fit corroborates it to 0.04% rather than measuring it.** Below 32 bytes glibc's
+AVX2 `strlen` costs ≈0 per byte — one `vpcmpeqb` covers the whole string — so
+the difference is R4's byte loop with essentially nothing left over. **And
+3.75 = 6.00 − 2.25**, the 2.25 being gcc's *rolled* fold against clang's
+4×-unrolled one: **the gcc-vs-clang gap on this kernel is the unroll factor and
+nothing else.** `.memory/01-ladder.md` asks that a gcc-vs-clang gap be
 established as a default or a capability before it is reported; here it is a
 default, and the same one p16 and p17 found.
+
+⚠ **"Nothing left over" needs one qualification, from §5a.** 1.00000 of R4's
+6.00000 Ir/byte scan is the `if q >= len { break; }` guard — bookkeeping the C
+rungs do **not** pay per byte, because `strlen`/`memchr` return the length
+already. So the fit's agreement is *arithmetic* agreement: the C rungs pay ≈0
+per byte for the scan, R4 pays 5.00 for the scan proper plus 1.00 for the guard
+every rung in this pattern is required to carry.
 
 ## 5. The proof
 
@@ -338,11 +382,15 @@ underflow/overflow`. Two were mine (the invariants had dropped
 
 ```
 error: possible arithmetic underflow/overflow
-   --> patterns/p11-nul-scan/verus.rs:370:13
+   --> patterns/p11-nul-scan/verus.rs:370:13        <-- the PRE-FIX file
     |
 370 |         p = q + 1;
     |             ^^^^^
 ```
+
+(That paste is of a file that no longer exists — the one without the guard — so
+its line number is not re-derivable from the tree and is left as it was recorded.
+The shipped `verus.rs` writes the same statement at line 396.)
 
 The scan may legitimately stop at `q == len` — that is what a window with no
 terminator left does — so `q + 1` is `len + 1`. vstd has **no axiom that a slice
@@ -361,12 +409,63 @@ if q >= len {
 ```
 
 *before* the cursor step makes `q < len`, and the obligation disappears — at zero
-extra preconditions, zero driver statements, and zero instructions (§4: R4 and
-R5 are byte-identical and the line costs one compare per string, already in the
-table). **And the inserted line is not a prover concession**: it is the sentence
-*"a string whose terminator is missing is the last string in the window"*, which
-is precisely the case R1 cannot represent. It is in `idiom.required` for that
-reason.
+extra preconditions and zero driver statements. **And the inserted line is not a
+prover concession**: it is the sentence *"a string whose terminator is missing is
+the last string in the window"*, which is precisely the case R1 cannot represent.
+It is in `idiom.required` for that reason.
+
+**It is not free in instructions, and this file said it was until TASK_034.**
+The sentence above used to end "…zero driver statements, *and zero
+instructions*", and the header comments of `unsafe.rs` and `verus.rs` said the
+same (at `unsafe.rs:38` and `verus.rs:32-34` as those files were shipped before
+this task); `c/main.c`'s was the only one that was right, because it claims zero
+cost in driver statements and preconditions only. TASK_033_REVIEW deleted the three
+lines (`.temp/r33/u_noqguard.rs`) and measured the difference; the static counts
+and the two marginals were re-measured from a fresh build at TASK_034
+(`.temp/p34/guardcost.py`, interleaved by cell) and the four-length law is that
+review's. Checksums are unchanged on every input:
+
+```
+static   kernel 123 -> 114 insns (nopad 117 -> 109), md5_fn 9145e57079d2 -> 54f39868dbf4
+scan     6 insns (cmpb sete je inc cmp jne)  ->  5 (cmpb je inc cmp jne)
+marginal small  19084.00 -> 17481.00   (+1603.00 = +8.4% of R4)
+marginal large  50174.00 -> 45909.00   (+4265.00 = +8.5% of R4)
+   L    u_baseline   u_noqguard  guard cost  scanned B  per byte
+   8       3329.00      3040.00      289.00        216    1.3380
+  16       5585.00      5104.00      481.00        408    1.1789
+  24       7841.00      7168.00      673.00        600    1.1217
+  64      19121.00     17488.00     1633.00       1560    1.0468
+```
+
+**`guard = 24·L + 97` at `k = 24`, zero residual over four string lengths =
+1.00000 Ir per scanned byte + 3 per string + 1 per call.** Cross-check on
+`large`: `4100 + 41` scanned bytes `+ 3·41 + 1 = 4265`, measured **4265**.
+
+**Mechanism**: with the guard the scan loop has to carry its *exit reason* out
+in a register — the `sete %bpl` of §2's R4 row exists only so the post-loop
+`test %bpl,%bpl; je` can implement `if q >= len`. Delete the guard and the loop
+falls through and the `sete` disappears.
+
+**So publish the trade, not the retraction, because the corrected result is the
+better one.** p17 and p11 buy the *same* fact — that the cursor step cannot
+overflow — and they buy it in different currencies:
+
+| route | preconditions | driver | instructions |
+|---|---|---|---|
+| p17 — a second `requires` | **+1 clause** | +1 conjunct | **0** |
+| p11 — a guard in the program | 0 | 0 | **+1.00000 Ir/scanned byte, 8.5%** |
+
+Neither is free, and the table is now in `.memory/04-verus.md`. Where the cost
+lands matters too: **the C rungs do not pay it per byte**, because their scan is
+a libcall that already returns the length, so of R4's 6.00000 Ir/byte scan
+**1.00000 is shared-idiom bookkeeping that `strlen`/`memchr` get for free** —
+which qualifies §4c, and §4c says so.
+
+⚠ **The line stays.** It is in `idiom.required` for all six rungs, every cell
+pays it, and it does **not** contaminate §4a's 3.00000: without the guard the
+two scan loops are 8 (R2) and 5 (R4) instructions and the difference is
+`lea; cmp; jae` either way (TASK_033_REVIEW's clean negative, on
+`.temp/r33/r2_noqguard.rs`). The defect was the word "free", not the line.
 
 This is p07's finding — *the spelling that makes the proof go through is the one
 that names the bug* — arriving on a completely different kernel and a completely
@@ -379,7 +478,7 @@ p11's is an `usize` overflow in a cursor step).
 $ grep -c 'assume('              patterns/p11-nul-scan/verus.rs   -> 0
 $ grep -c 'assume_specification' patterns/p11-nul-scan/verus.rs   -> 0
 $ grep -c 'verifier::external\]' patterns/p11-nul-scan/verus.rs   -> 0
-$ grep -n  'verifier::external_body' ...                          -> 202, 251, 263
+$ grep -n  'verifier::external_body' ...                          -> 217, 266, 278
 ```
 
 **TCB: 6 lines across 3 items.**
@@ -414,8 +513,23 @@ check), and the only backstop for it is Miri on `unsafe.rs`, which this pattern
 runs on all seven inputs (§8).
 
 (c) *Does each clause mean the same in both configurations?* Yes, and it is
-checkable rather than asserted: the token `slb_twin` occurs in this file exactly
-once, inside the twin's own `#[cfg(slb_twin)]` attribute, so the two
+checkable rather than asserted — **but count the token the way the gate counts
+it, which this paragraph did not until TASK_034.** Three counts, all measured on
+the shipped file and all different:
+
+```
+$ grep -c -o 'slb_twin'      patterns/p11-nul-scan/verus.rs   -> 3   (246, 248, 249)
+$ grep -c -o -E '\bslb_twin\b' ...                            -> 2   (246, 248)
+```
+
+Line 246 is a **comment** explaining the attribute, 248 is the attribute, and
+249 is the twin's own name `slb_twin_get_unchecked`, which is a different
+identifier because `_` is a word character. What `harness/check.py` scans is
+`vparse.blank_noncode(...)`, i.e. the token stream with comments and string
+literals blanked, and there the count is **1 — the attribute, and nothing else**,
+which is what the gate prints (`the token slb_twin occurs nowhere but on the 1
+twin #[cfg(slb_twin)] attribute(s)`). A comment cannot change codegen, so the
+argument is unaffected and is in fact tighter than "once" was: the two
 compilations differ in nothing but the twin's existence. `i`, `v` and `v@.len()`
 denote the same values in both, there is no `#[cfg]`-varying `const`, `type` or
 `use` anywhere in `verus.rs`, and the file includes nothing but
@@ -457,6 +571,20 @@ live in the pattern directory, so each mutant is generated into `.temp/` from th
 (`controls/gen_controls.py`), and this section carries the commands and the
 output.
 
+⚠ **The line numbers below are `verus.rs`'s, plus the mutant's own offset, so an
+edit to the file's header comment moves them and the paste goes stale in a way
+no gate stage can see.** TASK_033_REVIEW found all three stale by +2; they were
+re-derived at TASK_034 *after* the §5a correction had moved them again, by
+regenerating and re-running rather than by arithmetic:
+
+```
+$ python3 patterns/p11-nul-scan/controls/gen_controls.py
+$ ./verus_run.py .temp/p11/controls/m1_weak_requires.rs [--cfg slb_twin]
+```
+
+The verdicts and the counts are what the section is about; treat a drifted line
+number as a stale citation and re-run the two commands above.
+
 ### 6a. `m1_weak_requires` — one character, and only the TWIN sees it
 
 `i < v@.len()` → `i <= v@.len()` in the trusted item **and** its twin, so the
@@ -468,9 +596,9 @@ verification results:: 12 verified, 0 errors                 <-- SHIPPED CONFIG 
 
 $ ./verus_run.py .temp/p11/controls/m1_weak_requires.rs --cfg slb_twin
 error: precondition not met: index in bounds for this access
-   --> .temp/p11/controls/m1_weak_requires.rs:252:5
+   --> .temp/p11/controls/m1_weak_requires.rs:267:5
     |
-252 |     v[i]
+267 |     v[i]
     |     ^^^^
 verification results:: 12 verified, 1 errors
 ```
@@ -492,14 +620,14 @@ The `q >= len` arm is deleted from `scan_end`, which turns the spec function int
 ```
 $ ./verus_run.py .temp/p11/controls/m2_unbounded_scan.rs
 error: could not prove termination
-   --> .temp/p11/controls/m2_unbounded_scan.rs:127:9
+   --> .temp/p11/controls/m2_unbounded_scan.rs:140:9
     |
-127 |         scan_end(buf, off, len, q + 1)
+140 |         scan_end(buf, off, len, q + 1)
     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 error: loop invariant not satisfied
-   --> .temp/p11/controls/m2_unbounded_scan.rs:333:15
+   --> .temp/p11/controls/m2_unbounded_scan.rs:348:15
 ...
-347 |                 q as int == scan_end(buf@, off as int, len as int, p as int),
+362 |                 q as int == scan_end(buf@, off as int, len as int, p as int),
     |                 ------------------------------------------------------------ failed this invariant
 verification results:: 10 verified, 2 errors
 ```
@@ -522,12 +650,12 @@ $ ./verus_run.py .temp/p11/controls/m3_exec_offbyone.rs
 error: possible arithmetic underflow/overflow          (`len + 1`)
 error: invariant not satisfied at end of loop body     (`p <= q <= len`)
 error: precondition not satisfied
-   --> .temp/p11/controls/m3_exec_offbyone.rs:346:16
+   --> .temp/p11/controls/m3_exec_offbyone.rs:361:16
     |
-214 |         i < v@.len(),
+229 |         i < v@.len(),
     |         ------------ failed precondition
 ...
-346 |             if get_unchecked(buf, off + q) == 0 {
+361 |             if get_unchecked(buf, off + q) == 0 {
     |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 verification results:: 11 verified, 1 errors
 ```
@@ -543,9 +671,9 @@ claim is load-bearing rather than decorative.
 
 | input | model's answer | c-gcc / c-clang (R1) | R1h ×2, R2, R3, R4, R5 | ASan on R1 |
 |---|---|---|---|---|
-| `adversarial-nonul` | 18024987679707349248 | **1078694406687294464** | = | **heap-buffer-overflow, READ of size 13, 0 bytes after a 66-byte region, `__interceptor_strlen` ← `kernel:65`** |
-| `adversarial-count` | 11408910424468685312 | **7133615092521126400** | = | **heap-buffer-overflow, READ of size 21, 0 bytes after a 40-byte region** |
-| `adversarial-zerotail` | 6311443662811229568 | = | = | clean, exit 0 |
+| `adversarial-nonul` | 18024987679707349248 | **1078694406687294464** | = | **heap-buffer-overflow, READ of size 13, 0 bytes after a 66-byte region, `__interceptor_strlen` ← `c/kernel.c:68`** |
+| `adversarial-count` | 11408910424468685312 | **7133615092521126400** | = | **heap-buffer-overflow, READ of size 21, 0 bytes after a 40-byte region, same frame** |
+| `adversarial-zerotail` | 17859238140672197760 | = | = | clean, exit 0 |
 | `adversarial-empty` | 227437609984 | = | = | clean, exit 0 |
 | `adversarial-stride3` | 0 (zero kernel calls) | = | = | clean, exit 0 |
 
@@ -562,6 +690,40 @@ returns the model's answer. So the loop is bounded by the *sentinel* and by the
 remark. TASK_033 predicted `adversarial-count` as "the scan walks past the
 window"; that is right, but only because its tail is unterminated — the count
 lie on its own does nothing, which is what `zerotail` was added to show.
+
+⚠ **That sentence was FALSE about the shipped tree until TASK_034, and `cmp`
+found it in ten seconds** (TASK_033_REVIEW major 2). `inputs/gen.py` drew the
+three strings **twice**, once per blob, from the same sequentially advancing
+RNG, so the two windows shared their string *lengths* (4/6/3) and terminator
+positions but **not their bytes**: 33 differing bytes, not 20. The generator now
+draws them once and reuses them (`shared = strings(rng, COUNT_LENS)`), which is
+the fix the reviewer asked for — weakening the sentence instead would have
+thrown away the only controlled row in the table. Re-measured on the regenerated
+blobs with `.temp/p34/paircmp.py`:
+
+```
+count    64 B          n differing bytes: 20
+zerotail 64 B          indices: [44 … 63]        (all 20 in the tail)
+a payload: 00100000 8d6df4cd 00 1357338d5973 00 2b49f9 00 <20 non-zero>
+b payload: 00100000 8d6df4cd 00 1357338d5973 00 2b49f9 00 <20 NUL>
+```
+
+The conclusion never depended on it — string content cannot change whether
+`strlen` runs off the end — but "a controlled comparison rather than a remark"
+did. **Regenerating moved exactly three blobs**: `adversarial-zerotail.bin` (the
+point), `adversarial-stride3.bin` (random filler, **zero** kernel calls, answer
+still 0) and `sweep-len01k24.bin`, both of the last two only because the RNG
+stream shifted; `adversarial-count.bin` is byte-identical to the one every
+earlier number was measured on. Nothing downstream of `sweep-len01k24.bin`
+moved, and the reason is worth writing down because it looks like a bug and is
+not: `random.shuffle` uses rejection sampling, so its *word* consumption is
+data-dependent, and the two streams — 4 words apart after the deleted draw —
+re-converge inside that file's shuffles (MT index 343 vs 339 before it, and the
+**entire state** equal after it). Band A's lengths are constant within a file, so
+`sweep-len01k24`'s trip counts, and therefore §4a's laws, cannot move either;
+only its bytes and its checksum do. `zerotail`'s model answer is now
+**17859238140672197760** (was 6311443662811229568) and both of R1's wrong
+answers are unchanged.
 
 **2. R1 overruns AT MOST ONCE PER CALL, unlike p16.** R1 keeps
 `if (p >= len) break`, so the *cursor* is bounded even though the *scan* is not:
@@ -643,16 +805,16 @@ before it objects, which is why it is a *not-collapsed smoke test* and not an
 anti-collapse gate. What certifies that the work happened is step 2, the model
 checksum.
 
-### 8a. A harness observation, reported and NOT fixed
+### 8a. A harness observation, reported at TASK_033 and FIXED at TASK_034
 
-`harness/asm.py::is_bulk_symbol` recognises the `mem*` family and **not the
+`harness/asm.py::is_bulk_symbol` recognised the `mem*` family and **not the
 `str*` family**:
 
 ```
 $ python3 -c "import sys;sys.path.insert(0,'harness');import asm
 > for s in ['strlen','strlen@plt','__strlen_avx2','memchr@plt','strnlen','__strlen_chk']:
 >     print(s, asm.is_bulk_symbol(s))"
-strlen         False
+strlen         False        <-- before TASK_034; all five str* rows are now True
 strlen@plt     False
 __strlen_avx2  False
 memchr@plt     True
@@ -663,14 +825,24 @@ __strlen_chk   False
 Stage 3a's structural anti-collapse check accepts *"a backward branch **or** a
 call to a known bulk-memory routine"*, and that alternative exists because a
 `memcpy`-shaped kernel has no back edge of its own (TASK_005). p11's C kernels
-are unaffected — they keep the fold loop, so they have a real back edge, and
-`c-gcc-h`/`c-clang-h` show `memchr@plt` in the gate's own table — but **a kernel
-whose only work is a `strlen` would have neither, and stage 3a would fail a
-perfectly healthy cell**, which is the exact false-failure the bulk-memory
-alternative was added to prevent, one function family short. It is one entry in
-a list and it changes 47 patterns at once, so it is reported here rather than
-edited (TASK_033's constraint, and `.memory/02-bench-rules.md`'s "could this
-happen by accident?" test says yes, at p12–p15).
+were unaffected — they keep the fold loop, so they have a real back edge, and
+`c-gcc-h`/`c-clang-h` showed `memchr@plt` in the gate's own table — but **a
+kernel whose only work is a `strlen` would have neither, and stage 3a would fail
+a perfectly healthy cell**, which is the exact false-failure the bulk-memory
+alternative was added to prevent, one function family short.
+
+TASK_033 reported it rather than editing it (that task's constraint).
+**TASK_034 landed it**: `_BULK_STR_WORDS` covers the search, copy and compare
+routines whose body is a loop over the caller's buffer — `strlen`, `strnlen`,
+`strchr`, `strstr`, `strcpy`, `strcmp` and the rest, in all three spellings
+(`strlen@plt`, glibc's `__strlen_avx2`, fortify's `__strcpy_chk@plt`) — while
+the *conversions* stay out, because a kernel whose only call is `strtoul` really
+has done no bulk work: `strtoul`, `strtol`, `strtod`, `strerror`, `strsignal`
+and `__strtol_internal` all still answer `False`. 27 selftest cases were added
+beside the `mem*` family's 20, run at gate stage 0 and therefore inside
+`source_sha256`. **Visible effect on this pattern**: `c-gcc` and `c-clang` now
+report `bulk=['strlen@plt']` in the gate's own table where they reported nothing,
+which is what §12a describes.
 
 ## 9. Dead code that is kept on purpose
 
@@ -776,18 +948,34 @@ merely equal in `Ir`, it is **byte-identical to the shipped R4** —
 `p <= i` and the `decreases` for a range `for`, so the twin needed only those two
 ghost deletions and LLVM emits the same machine code either way.
 
-⚠ **And the spelling that would settle the question has not been built.**
-`.memory/01-ladder.md` records the same gap on p05 (an unbuilt zero-guard
-deletion) and p16 (an unbuilt hand-unrolled 32× fold), so the claim p11 is
-entitled to is *no admissible R4 has been **shown** to move*, not *none can*. The
-untried candidate here is specific and worth naming: a **hand-written SWAR scan
+**The spelling that would settle the question HAS now been built, and it is
+inadmissible by measurement rather than by expectation** (TASK_033_REVIEW; the
+twin re-run at TASK_034). The candidate is specific: a **hand-written SWAR scan
 in unsafe Rust**, reading the window eight bytes at a time and applying
 `core::slice::memchr`'s own `(x − 0x01…01) & ~x & 0x80…80` test. It needs a `u64`
-load out of a `&[u8]`, which at the pinned vstd means `from_le_bytes`
-(`is not supported`), `read_unaligned` (`is not supported`, measured on p05 and
-p16) or the `vstd::raw_ptr` `PointsTo` model — so it is *likely* inadmissible for
-the same reason `r4_cstr` is, and **likely is not measured**. Nobody has compiled
-it, here or on p05 or p16.
+load out of a `&[u8]`, and at the pinned vstd every route to one is closed:
+
+```
+$ ./verus_run.py .temp/r33/r4_swar_twin.rs
+error: `core::num::impl&%9::from_le_bytes` is not supported (note: you may be
+able to add a Verus specification to this function with `assume_specification`)
+error: aborting due to 1 previous error
+```
+
+`read_unaligned` is `is not supported` too (measured on p05 and p16), and the
+`vstd::raw_ptr` `PointsTo` model is a new trusted item by construction. So the
+paragraph that used to end "*likely* inadmissible … and **likely is not
+measured**" is retired: all three routes are closed **by measurement**, and
+`from_le_bytes` is *separately* forbidden by p11's own `idiom.forbidden[1]`, so
+the spelling is doubly out of the admissible class.
+
+⚠ What survives is the weaker, still-true version of the caveat: an *exec* SWAR
+R4 has still not been compiled and priced, so nobody knows how much it would
+have moved — pricing it would describe a cell that cannot ship. And
+`.memory/01-ladder.md`'s other two instances of the gap stand: p05's unbuilt
+zero-guard deletion and p16's unbuilt hand-unrolled 32× fold. The claim p11 is
+entitled to remains *no admissible R4 has been **shown** to move*, not *none
+can*.
 
 ⚠ **What is new here is the SIZE of what the pin excludes.** On p05 and p16 the
 inadmissible R4 spellings moved the number by a header read — `4·nrec`, `7 flat`.
@@ -843,12 +1031,28 @@ safe_naive / safe_tuned: no (loop, property) pair moves the time by >1%
 large:   no rung has a mode
 ```
 
-⚠ **The mechanism is identified but not attributed to one loop.** Four
-`(loop, property)` pairs separate the population perfectly and identically —
-loop1 `win32[1,2]`, loop2 `win32[3,4]`, loop3 `win32[1,2]`, loop4 `jcc32[0,1]` —
-because the kernel is a single function moved as a unit, so every loop's 32-byte
-geometry flips together. The population identifies the **mode**; it does not
-identify **which loop**, and this write-up will not pretend otherwise.
+⚠ **The mechanism is identified but not attributed to one loop, and the count of
+pairs that fail to attribute it is SEVEN rather than the four this file used to
+say** (TASK_033_REVIEW minor 6; re-run at TASK_034, `.temp/p34/analyze-p11.log`).
+`analyze.py` separates the population perfectly and identically on
+
+```
+unsafe   loop0 [+0x40,+0x189) 329B  jcc32[1,4]   x0.9399 / x0.9447   *PERFECT*
+unsafe   loop1 [+0x50,+0x63)   19B  win32[1,2]   x0.9399 / x0.9447   *PERFECT*
+unsafe   loop1 [+0x50,+0x63)   19B  jcc32[0,1]   x0.9399 / x0.9447   *PERFECT*
+unsafe   loop2 [+0xd0,+0x124)  84B  win32[3,4]   x0.9399 / x0.9447   *PERFECT*
+unsafe   loop2 [+0xd0,+0x124)  84B  jcc32[0,1]   x0.9399 / x0.9447   *PERFECT*
+unsafe   loop3 [+0x140,+0x15a) 26B  win32[1,2]   x1.0640 / x1.0585   *PERFECT*
+unsafe   loop4 [+0x15a,+0x192) 56B  jcc32[0,1]   x1.0640 / x1.0585   *PERFECT*
+```
+
+— in **two opposite orientations** (`×0.9399` and `×1.0640`, and
+`1 / 1.0640 = 0.9398`: it is the same partition read from either side), because
+the kernel is a single function moved as a unit, so every loop's 32-byte geometry
+flips together. **The conclusion is strengthened, not weakened**: the population
+identifies the **mode** and cannot identify **which loop**, and seven
+indistinguishable candidates say that more sharply than four. This write-up will
+not pretend otherwise.
 
 What the population *does* say is that the mode is on `small` and not on `large`,
 and that fits the kernel: `small`'s mean string length is 6.92, so the
@@ -907,12 +1111,13 @@ So every rung's *own* code is scalar, and the AVX2 in this pattern is entirely
 inside glibc:
 
 - **R1 and R1h call out.** `c-gcc-h`/`c-clang-h` show `bulk=['memchr@plt']` in
-  the gate's own table; `c-gcc`/`c-clang` show `bulk=[]` **only because
-  `harness/asm.py::is_bulk_symbol` does not know the `str*` family** (§8a) — the
-  relocation is there (`R_X86_64_PLT32 strlen`, §1) and the IFUNC resolves to the
-  AVX2 implementation at `libc+0x18b7c0`, confirmed by disassembling libc
-  (`vpcmpeqb %ymm`, `vpminub`, `vpmovmskb`) and by the 0.0788 Ir/byte
-  measurement.
+  the gate's own table, and since TASK_034 `c-gcc`/`c-clang` show
+  `bulk=['strlen@plt']` there too — they showed `bulk=[]` **only because
+  `harness/asm.py::is_bulk_symbol` did not know the `str*` family** (§8a), never
+  because the call was absent: the relocation is there (`R_X86_64_PLT32 strlen`,
+  §1) and the IFUNC resolves to the AVX2 implementation at `libc+0x18b7c0`,
+  confirmed by disassembling libc (`vpcmpeqb %ymm`, `vpminub`, `vpmovmskb`) and
+  by the 0.0788 Ir/byte measurement.
 - **R3 calls out too, to `core::slice::memchr`, which uses no vector register at
   all** — it is SWAR on two `u64`s (`movabs $0x8080808080808080`, `sub`, `or`,
   `and`), 15 instructions per 16 bytes.

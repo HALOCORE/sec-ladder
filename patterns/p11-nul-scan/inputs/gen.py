@@ -249,7 +249,10 @@ COUNT_TAIL = 20
 
 # ---- adversarial-zerotail: the same lie, a NUL tail -------------------------
 #
-# Identical header (nstr = 4096) and identical first three strings; the 20-byte
+# Identical header (nstr = 4096) and identical first three strings -- the same
+# bytes, not merely the same lengths, because `main()` draws them ONCE and
+# reuses them (TASK_034; before that the two blobs differed in 33 bytes and
+# this comment was wrong). The 20-byte
 # tail is NUL rather than filler. Every rung including R1 stays inside the
 # window: each tail byte is an empty string, the cursor advances one byte at a
 # time, and the walk ends on `p >= len` after 23 strings -- 4073 short of the
@@ -336,15 +339,29 @@ def main():
     write("adversarial-nonul.bin", ADV_ITERS, HDR + len(body),
           window(len(NONUL_LENS) + 1, body))
 
+    # (2) and (3) are a CONTROLLED PAIR and share one draw of the strings.
+    #
+    # Until TASK_034 each called `strings(rng, ...)` on the same sequentially
+    # advancing RNG, so the two blobs got three strings of the same LENGTHS and
+    # different BYTES: `cmp` reported 33 differing bytes where this file and
+    # ../NOTES.md 7 both said "20 tail bytes and nothing else"
+    # (TASK_033_REVIEW major 2). The conclusion survived -- string content
+    # cannot change whether `strlen` runs off the end -- but the sentence that
+    # upgrades the row from a remark to a controlled comparison was false about
+    # the shipped tree. One draw, reused, makes it true: the two windows are
+    # byte-identical up to the tail, and the tail is the only thing that moves.
+    shared = strings(rng, COUNT_LENS)
+
     # (2) the count lies and the tail is unterminated: R1 walks into filler
     #     that was never a string and off the end of the blob.
-    body = strings(rng, COUNT_LENS) + rng.randbytes(COUNT_TAIL).translate(NONZERO)
+    body = shared + rng.randbytes(COUNT_TAIL).translate(NONZERO)
     write("adversarial-count.bin", ADV_ITERS, HDR + len(body),
           window(COUNT_NSTR, body))
 
     # (3) the SAME count lie with a NUL tail: harmless in every rung. The
     #     control that shows the declared count is not a bound.
-    body = strings(rng, ZEROTAIL_LENS) + bytes(ZEROTAIL_TAIL)
+    assert ZEROTAIL_LENS == COUNT_LENS, "the pair must share its strings"
+    body = shared + bytes(ZEROTAIL_TAIL)
     write("adversarial-zerotail.bin", ADV_ITERS, HDR + len(body),
           window(ZEROTAIL_NSTR, body))
 

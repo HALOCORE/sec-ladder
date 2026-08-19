@@ -34,11 +34,22 @@
 //! most `isize::MAX` bytes** (`.memory/04-verus.md`), so it is not derivable:
 //! p17 bought its way out of the analogous obligation with a second `requires`
 //! and a third driver conjunct. p11 does not, because the guard above the cursor
-//! step makes `q < len` -- at zero preconditions, zero driver statements and
-//! zero instructions beyond the one compare. And that guard is not a prover
-//! concession: it is the sentence *"a string whose terminator is missing is the
-//! last string in the window"*, i.e. the case R1 cannot represent, which is why
-//! it is in `idiom.required` rather than being conventional. NOTES.md 5a.
+//! step makes `q < len` -- at zero preconditions and zero driver statements. And
+//! that guard is not a prover concession: it is the sentence *"a string whose
+//! terminator is missing is the last string in the window"*, i.e. the case R1
+//! cannot represent, which is why it is in `idiom.required` rather than being
+//! conventional. NOTES.md 5a.
+//!
+//! **It is not free in instructions, and this comment said "zero instructions
+//! beyond the one compare" until TASK_034.** Deleting the three lines gives a
+//! kernel of 114 instructions instead of 123 and a whole-program marginal of
+//! 45909 instead of 50174 on `large`: **1.00000 Ir per scanned byte + 3 per
+//! string + 1 per call, 8.5% of R4**, because with the guard the scan must carry
+//! its exit reason out in a register (`sete %bpl`) for the post-loop `test; je`.
+//! So the two ways of discharging this obligation price differently and neither
+//! is free -- p17 pays a precondition and no instructions, p11 pays instructions
+//! and no precondition. The line stays: every rung has it, so no rung comparison
+//! moves. NOTES.md 5a has the law and `.memory/04-verus.md` the trade.
 
 #[path = "../../common/driver.rs"]
 mod driver;
