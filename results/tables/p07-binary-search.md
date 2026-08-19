@@ -43,7 +43,7 @@ Every delta below is a difference between rungs that are meant to be spellings o
   - `rust` — and the ordering test that halves the range: `if v < key` in all four Rust rungs.
 - **required** — *per language:*
   - `c` — the length check is `if (4 * n + 4 * nq > avail)` in 64-bit size_t. Present in five of the six rungs; c/kernel.c omits exactly this line and nothing else, which IS the bug, so the one scoped-absent audit pair this declaration reports is on that rung and is correct.
-  - `rust` — the length check is `if 4 * (n as u64) + 4 * (nq as u64) > avail as u64` -- widened to u64 because n and nq are u32 fields and 4*n + 4*nq needs 36 bits. All four Rust rungs.
+  - `rust` — the length check is `if 4 * (n as u64) + 4 * (nq as u64) > avail as u64` -- widened to u64 because n and nq are u32 fields and 4*n + 4*nq needs 35 bits. All four Rust rungs.
 - **required** — *per language:*
   - `c` — the probe index keeps the multiply and the base: `size_t ep = off + 8 + 4 * mid;` in both C rungs.
   - `rust` — the probe index keeps the multiply and the base: `let ep: usize = off + 8 + 4 * mid;` in all four Rust rungs. R3 may reslice [ep .. ep + 4] -- that moves the CHECK and keeps the INDEX, and it is the most a rung may do.
@@ -68,7 +68,7 @@ Every delta below is a difference between rungs that are meant to be spellings o
 
 ### Spelling audit (stage `0b`, reporting only)
 
-Measured by the gate, not by this file — from `results/gate/p07-binary-search.json`, contract `164995db0bac`.
+Measured by the gate, not by this file — from `results/gate/p07-binary-search.json`, contract `3621a53ee5fd`.
 
 `34` backticked spelling(s) over `6` rung(s) → **102** (spelling, rung) pair(s), **71** present — not the product, because a per-language entry is read against its own language's rungs only. Matching is `check.spelling_matches`: comments, string literals and Verus ghost clauses blanked, then all whitespace deleted.
 

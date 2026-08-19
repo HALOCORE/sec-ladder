@@ -10,7 +10,7 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "164995db0bacef11ded39be40b760de1b81740a9942e0ac4b0b824036ec9c9ce",
+  "contract_sha256": "3621a53ee5fdb0cd3361ea59d949f8e824780c7ed70a5f209f6c94a8472a1357",
   "idiom": {
     "required": [
       "the midpoint is `lo + (hi - lo) / 2` in all six rungs and in the Verus spec function bsearch. The overflow-safe form; pinning it is what makes forbidden[0] settleable by grep instead of by argument.",
@@ -30,7 +30,7 @@
       },
       {
         "c": "the length check is `if (4 * n + 4 * nq > avail)` in 64-bit size_t. Present in five of the six rungs; c/kernel.c omits exactly this line and nothing else, which IS the bug, so the one scoped-absent audit pair this declaration reports is on that rung and is correct.",
-        "rust": "the length check is `if 4 * (n as u64) + 4 * (nq as u64) > avail as u64` -- widened to u64 because n and nq are u32 fields and 4*n + 4*nq needs 36 bits. All four Rust rungs."
+        "rust": "the length check is `if 4 * (n as u64) + 4 * (nq as u64) > avail as u64` -- widened to u64 because n and nq are u32 fields and 4*n + 4*nq needs 35 bits. All four Rust rungs."
       },
       {
         "c": "the probe index keeps the multiply and the base: `size_t ep = off + 8 + 4 * mid;` in both C rungs.",
@@ -95,20 +95,20 @@
     "harness/measure.py": "a810bf5973787f78fc9805b2407a6bb04bbee68c968374a2e9b8622c4c5d3af4",
     "harness/report.py": "09488cb5b72a3244b69c5759b0cba53a44ebecbda98b26c9c206183567c13d8a",
     "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
-    "patterns/p07-binary-search/NOTES.md": "c1730cbc8fc6b03673fe4856a80c8dab502636a175d7fdca15292dcec33b4921",
-    "patterns/p07-binary-search/README.md": "549a292e120f9ddbf159b36a7ddf20b8b254228a08d419a548a4ffa1b2a66176",
+    "patterns/p07-binary-search/NOTES.md": "8e63fa32cb0170a9871b00d05cd86b2c1f7a660f468b2272b763f3eb21f80e90",
+    "patterns/p07-binary-search/README.md": "1473f9d5cb358f48b84809b620c211a835fc5fefb1ede742daebbf26ee0eb6d2",
     "patterns/p07-binary-search/c/kernel.c": "0442f65e78a943d43bbb4025cacb8ac3cdb59cd93358d2b70f1b90e458acabdf",
     "patterns/p07-binary-search/c/kernel.h": "c9fbc3a97360785b5c5bf0f39902de7790a27b77970190e1487c17a8798ea69c",
-    "patterns/p07-binary-search/c/kernel_hardened.c": "c411fb4a90a1013b5879a2595e2966fe6a3748a27adb6bdf3207df8bc61925b4",
+    "patterns/p07-binary-search/c/kernel_hardened.c": "482afd02c19226166bee91842d1b6e7fc7c620f088f242f661f7333e797dcd68",
     "patterns/p07-binary-search/c/main.c": "c91f1b099a6fc782b7ed3964224f203766e0e3a4b2f19e8be3ef608cc1d9719a",
-    "patterns/p07-binary-search/controls/gen_controls.py": "f1fb153cd46d4256b7ea18242edbc2f571f3ff53f6592e7421f519320b8bd85c",
-    "patterns/p07-binary-search/inputs/gen.py": "46aa6ffdd144e1e3873be0854dac63a1c2d658f0cc24b6f27bcd1a27cad3cf11",
-    "patterns/p07-binary-search/model.py": "1889e0bf7cb274ea349d185608b11edb0d4529ba70cd67b75fe26d098d285d6c",
+    "patterns/p07-binary-search/controls/gen_controls.py": "41180da02e95efe72e805b2089d2376db98cb4306bddfe935a0a1972b6e8db87",
+    "patterns/p07-binary-search/inputs/gen.py": "392a9ccb36517b9012deb0085ea39f05aed01da5d522caa6ddb2250193c6c2d1",
+    "patterns/p07-binary-search/model.py": "006c0d9b4b103e0669520cf633c1ea2b1c4c4d6b52d82099c5a96763403e5df1",
     "patterns/p07-binary-search/safe_naive.rs": "8f4f830a71715a8b60d6ba9c43895716c8d82481fe839def4d75b3bedc663b03",
     "patterns/p07-binary-search/safe_tuned.rs": "8fb449181022196a22ff1e7123ce382618eb679a9cb5b002af2c7400c109ba97",
-    "patterns/p07-binary-search/spec.md": "9e8bc757465745a737b5cfafc041b94f93d945ebdf52ed1cf42122e06b17b099",
+    "patterns/p07-binary-search/spec.md": "de442dd065869e83939e086b602f843487b6cf38474635a7652406f512681006",
     "patterns/p07-binary-search/unsafe.rs": "75afd26ac939c386629272fe9792472c7f065f05b9f1540415cc6ff69718de44",
-    "patterns/p07-binary-search/verus.rs": "d437ccd5c3d28db1ad1c8c819345adbb8a9c1042d71ccb1e3b7e9d4d8d206259",
+    "patterns/p07-binary-search/verus.rs": "65a717b1262a501741ca7aa51578ab72d842650a41c763d3f01dafc604690f9c",
     "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
   },
   "derived_contract": {
@@ -791,7 +791,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==109398==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x508000004128 at pc 0x5644ef9b39af bp 0x7ffd2a3ba950 sp 0x7ffd2a3ba940 READ of size 1 at 0x508000004128 thread T0 #0 0x5644ef9b39ae in kernel /home/apt/repos_common/s"
+      "diagnostic": "================================================================= ==147838==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x508000004128 at pc 0x55a90878a9af bp 0x7ffcbd2ff3f0 sp 0x7ffcbd2ff3e0 READ of size 1 at 0x508000004128 thread T0 #0 0x55a90878a9ae in kernel /home/apt/repos_common/s"
     },
     "adversarial-stride7.bin": {
       "exit": 0,
@@ -812,7 +812,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==109403==ERROR: AddressSanitizer: SEGV on unknown address 0x508100000128 (pc 0x55805dc6496b bp 0x508000000125 sp 0x7ffcab44cac0 T0) ==109403==The signal is caused by a READ memory access. #0 0x55805dc649"
+      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==147843==ERROR: AddressSanitizer: SEGV on unknown address 0x508100000128 (pc 0x559ac603c96b bp 0x508000000125 sp 0x7ffce58fc7a0 T0) ==147843==The signal is caused by a READ memory access. #0 0x559ac603c9"
     },
     "adversarial-zero.bin": {
       "exit": 0,

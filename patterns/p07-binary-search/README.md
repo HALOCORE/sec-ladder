@@ -10,9 +10,10 @@ reason it exists rather than the pattern count.**
    p08, p16 and p17 all do `for each byte: acc = f(acc, b)`, so a per-call
    safety constant divided by `n` bytes goes to zero — which is *why* "safety is
    cheap" keeps coming out. Binary search does `ceil(log2(n+1))` probes over a
-   `4n`-byte array: on `large.bin`, 6428 bytes read out of a 1 048 916-byte
-   window. **The per-probe bounds check is a fixed fraction of the kernel and
-   cannot be amortised by making the input bigger.** Measured: `NOTES.md` §3c.
+   `4n`-byte array: on `large.bin`, 6624 bytes read out of a 1 048 916-byte
+   window (0.63%). **R3's per-probe bounds check is a fixed fraction of the
+   kernel and cannot be amortised by making the input bigger.** Measured:
+   `NOTES.md` §3c.
 2. **It is the canonical unpredictable-branch kernel**, so it tests
    `.memory/01-ladder.md`'s "static instruction counts are not a cost model" and
    "`Ir` and wall clock can disagree in direction" on a kernel *designed* to
@@ -76,7 +77,7 @@ field, so `lo + hi <= 2*(2^32 - 2) = 8 589 934 588` — 2.1e9 times short of
 `2^64`. The midpoint sum cannot wrap for any input this wire format can express;
 RAM is not the binding constraint, the field width is. The cheapest index type
 that *could* wrap is `int`, and it needs 4 GiB of u32 elements. The overflow
-that **is** reachable is in the other multiplication: `4*n + 4*nq` needs 36 bits
+that **is** reachable is in the other multiplication: `4*n + 4*nq` needs 35 bits
 and a 32-bit check waves `adversarial-width` straight through
 (`NOTES.md` §6, and note that unlike p05 the *unsigned* 32-bit spelling breaks
 too).
@@ -97,32 +98,54 @@ in the inclusive spelling and completely dead in the shipped one.
 
 | | `Ir` vs R4, small | ns vs R4, small | `Ir` vs R4, large | ns vs R4, large |
 |---|---:|---:|---:|---:|
-| R2 safe-naive | +87.8% | +28.0% | +87.7% | +3.5% |
+| R2 safe-naive | +87.8% | *withdrawn* | +87.7% | *withdrawn* |
 | R3 safe-tuned | +45.9% | +13.0% | +47.0% | +1.6% |
 | R5 verus | 0.0% | −0.0% | 0.0% | +0.3% |
 
-**The headline is the asymmetry between those columns.** The *same* +87.8%
-instruction gap is worth 28.0% of wall clock on the L1-resident input and 3.5%
-on the memory-bound one — the conversion factor is a property of the input, not
-of the rung. And the swept laws are exact integers with **zero residual over 113
-sweep blobs**:
+**The `Ir` columns are the result, and the swept laws behind them are exact
+integers with zero residual over 113 sweep blobs**:
 
 ```
 R2 - R4 = 36 + 11.0000*nq + 11.0000*probes     (the four per-byte index checks)
 R3 - R4 =  9 +  4.0000*nq +  6.0000*probes     (one two-sided slice range check)
 ```
 
-both derived independently from the disassembly with zero fitted parameters
-(`NOTES.md` §3a). **R3's tax is 46.6% of the kernel at n = 16 385 and still
-rising, toward the 48.0% the two per-probe constants fix** — the first pattern
-in this project where the safety cost does not amortise away.
+both derived from the disassembly with the per-probe coefficients counted rather
+than fitted (`NOTES.md` §3a), and re-verified out of sample on 30 fresh blobs
+under six query distributions.
+
+**R2's two `ns` cells are withdrawn** (`NOTES.md` §3, §11e). They were published
+as "+28.0% on `small`, +3.5% on `large` — an 8x difference in the conversion
+factor". Built at 30 code layouts, `safe_naive`'s wall clock is **bimodal**:
+17.708 ms or 13.931 ms on `small`, selected by **bit 4 of the kernel's entry
+address**, so R2-vs-R4 is **+26.42% in one mode and −0.93% in the other** — on
+machine code identical but for call displacements (`md5_fn_norel` equal) at an
+identical executed instruction count (12346.57 Ir/call at every layout). Every
+counter this box can produce — `Ir`, `Dr`, `D1mr`, `DLmr`, simulated `Bcm` — is
+equal across that boundary. **R3's `ns` cells survive**: slower than R4 at 30 of
+30 layouts on `small`.
+
+**R3's tax is 46.6% of the kernel at n = 16 385 and still rising**, toward an
+asymptote of `6 / (12 + f_lo)` ∈ **[46.15%, 50.00%]** — 47.99% on the shipped
+50/50-hit workload, and workload-dependent because `f_lo`, the fraction of probes
+taking the `lo = mid + 1` arm, is data. **p07 is the first pattern where R3's tax
+has no axis along which it amortises**: p16's and p17's is a per-*call* constant
+(0.00000 Ir/byte swept — the reslice sits outside the fold loop) and p05's is
+`O(nrow)`, which vanishes along `ncol`; p07's vanishes along nothing, because
+there is no inner loop to hoist it out of. It is **not** "the first
+counterexample to safety is cheap" — `.memory/01-ladder.md` finding 4 already
+carries p16's swept **R2** tax of 4.25 Ir per folded byte, whose fraction also
+rises.
 
 **The branch result** (`NOTES.md` §11): every source-level branchless spelling
 is converted back to a branch by LLVM's `X86CmovConverterPass` and measures
 *exactly* the shipped rung. The control that works is the pass itself —
 `-C llvm-args=-x86-cmov-converter=false` on the unchanged source — which emits
 2 `cmov`, executes **+10% instructions** and runs **9–18% faster**, with the
-bands separated from a seven-alignment layout control.
+bands separated from a seven-alignment layout control. `callgrind --branch-sim`
+then measures what the control was built to infer: **0.586 simulated mispredicts
+per probe branchy against 0.129 branchless**, with `D1mr` identical, and a
+symbol-by-symbol diff showing 559 symbols of which exactly one differs.
 
 **R5 is free and verified first try**: `10 verified, 0 errors`, R4 ≡ R5
 byte-identical at `-O3` (`md5_fn 4f8c443684e1`), and p07's kernel needs **zero**
@@ -144,7 +167,8 @@ safe_naive.rs          R2  -- four bounds checks per probe
 safe_tuned.rs          R3  -- one, via a 4-byte reslice
 unsafe.rs              R4  -- none
 verus.rs               R5  -- R4's exec code + 10 discharged obligations
-controls/gen_controls.py   the 12 derived controls (branchless, R3/R4
-                           respellings, and the three C bug variants)
+controls/gen_controls.py   the 15 derived controls (branchless, R3/R4
+                           respellings, both R4 candidates' Verus twins, and
+                           the three C bug variants)
 NOTES.md               everything that was measured
 ```

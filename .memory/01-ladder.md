@@ -1223,11 +1223,20 @@ places and points at nothing. **Name the pattern, never the number.**
    supported"*, so it is not a rung. Fixed-R4 bound `+3017.14 / +10019.42`;
    in-contract R3-side span `2554.45…3017.14 / 8412.35…10019.42`.
 
-   ⚠ **Do not quote p07's R2 `ns` numbers or the "8× conversion factor".**
-   `safe_naive`'s layout band is **28.47%** — the widest single-rung band measured
-   on this project — so neither the +28.0% nor the +3.5% has an established sign.
-   R3's counterweight (+13.0% small / +1.6% large) *does* survive bracketing:
-   bands disjoint on both inputs in two independent runs.
+   ⚠ **Do not quote p07's R2 `ns` numbers or the "8× conversion factor" — they
+   have NO SIGN, and the reason is sharper than a wide band** (TASK_029, 30
+   layouts). Code layout selects between **two discrete modes on bit 4 of the
+   kernel's entry address**, and R2's comparison flips across them: **+26.42% at
+   `kernel%32 == 0`, −0.93% at `%32 == 16`**, perfect separation 30/30. No number
+   of reps recovers a sign from that. The mode is invisible to every counter this
+   box has — a minimal pair 16 bytes apart has identical `Ir`, identical simulated
+   cache counters and `Bcm` 273.93 vs 273.92.
+   **R3's counterweight survives, but by dominance and mode-matching, not by
+   disjoint bands**: R3 is slower than the *worst* R4 layout at 30/30 on `small`
+   and 29/30 on `large` (R2: 19/30, 23/30). The disjoint-interval reading is
+   retracted — the worst-vs-best range is not a converging statistic and widened
+   from 28.91% to 30.78% purely by sampling more
+   (`.memory/03-measurement.md`).
 
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how

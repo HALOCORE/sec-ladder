@@ -382,7 +382,7 @@ exactly what `.memory/02-bench-rules.md` forbids.
       },
       {
         "c": "the length check is `if (4 * n + 4 * nq > avail)` in 64-bit size_t. Present in five of the six rungs; c/kernel.c omits exactly this line and nothing else, which IS the bug, so the one scoped-absent audit pair this declaration reports is on that rung and is correct.",
-        "rust": "the length check is `if 4 * (n as u64) + 4 * (nq as u64) > avail as u64` -- widened to u64 because n and nq are u32 fields and 4*n + 4*nq needs 36 bits. All four Rust rungs."
+        "rust": "the length check is `if 4 * (n as u64) + 4 * (nq as u64) > avail as u64` -- widened to u64 because n and nq are u32 fields and 4*n + 4*nq needs 35 bits. All four Rust rungs."
       },
       {
         "c": "the probe index keeps the multiply and the base: `size_t ep = off + 8 + 4 * mid;` in both C rungs.",

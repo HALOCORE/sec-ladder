@@ -62,6 +62,14 @@ contract. `r4_ptr` uses `as_ptr()`/`add()`/`read()` and exists to be *rejected*:
 `NOTES.md` §10b runs its twin through Verus and quotes the error text, because
 `is not supported` is what disqualifies and `postcondition not satisfied` is not.
 
+**Both R4 candidates have a twin here, and until TASK_029 only one did.**
+`r4_ptr_twin` exists to be rejected; `r4_for_twin` exists to be accepted
+(`10 verified, 0 errors`). TASK_026_REVIEW measured that `NOTES.md` §10b's
+"Both candidates were" put through Verus was false — `r4_for`'s verdict was an
+inspection standing beside somebody else's run. The rule that makes a twin
+mandatory does not distinguish the candidate you expect to pass from the one you
+expect to fail, so the generator must not either.
+
 **The C variants for §6, which are the pattern's two other bugs.**
 
   * `k_incl.c` — the textbook INCLUSIVE binary search: `hi = n - 1`,
@@ -75,7 +83,7 @@ contract. `r4_ptr` uses `as_ptr()`/`add()`/`read()` and exists to be *rejected*:
     `adversarial-zero.bin`.
   * `k_u32.c` — the length check written in **unsigned 32-bit**:
     `if ((uint32_t)(4 * n + 4 * nq) > (uint32_t)avail)`. p07's `n`/`nq` are u32
-    fields, so `4*n + 4*nq` needs 36 bits and this wraps. Contrast p05, whose
+    fields, so `4*n + 4*nq` needs 35 bits and this wraps. Contrast p05, whose
     u16 dimensions keep `nrow*ncol` inside `uint32_t` so that only its *signed*
     spelling breaks.
   * `k_i32.c` — the same check in **signed 32-bit**, which is p05's bug shape,
@@ -256,6 +264,51 @@ def main():
         "the error. `is not supported` disqualifies an R4 candidate because it\n"
         "forces a NEW TRUSTED ITEM; `postcondition not satisfied` would not."))
 
+    # ...and the twin for the OTHER R4 candidate. Added at TASK_029 because
+    # TASK_026_REVIEW measured that NOTES.md 10b's "Both candidates were" put
+    # through Verus was FALSE: only `r4_ptr` had a twin here, so `r4_for`'s
+    # "admissible" verdict was an inspection standing beside somebody else's
+    # Verus run. It is a rung claim, so it needs a run of its own. A `for` over a
+    # range needs two Verus-only edits beyond `r4_for`'s exec substitution --
+    # Verus derives `q <= nq` and the `decreases` itself -- and that is the whole
+    # difference. Measured: `10 verified, 0 errors`, the same count as shipped.
+    FOR_OLD_1 = """    let mut acc: u64 = 0;
+    let mut q: usize = 0;
+    // "The queries from here, with what we have accumulated, are all the
+    // queries." Same shape as p16's walk invariant and p05's row invariant.
+    while q < nq
+        invariant
+            q <= nq,
+"""
+    FOR_NEW_1 = """    let mut acc: u64 = 0;
+    // TASK_029: the query loop as a `for`, i.e. `r4_for`'s spelling. Verus
+    // derives `q <= nq` and the `decreases` for a range `for`, so both go.
+    for q in 0..nq
+        invariant
+"""
+    FOR_OLD_2 = """                == query_walk(buf@, off as int, n as int, nq as int, 0, 0),
+        decreases nq - q,
+    {
+"""
+    FOR_NEW_2 = """                == query_walk(buf@, off as int, n as int, nq as int, 0, 0),
+    {
+"""
+    FOR_OLD_3 = """        acc = acc.wrapping_mul(31).wrapping_add(found.wrapping_add(1));
+        q = q + 1;
+    }
+"""
+    FOR_NEW_3 = """        acc = acc.wrapping_mul(31).wrapping_add(found.wrapping_add(1));
+    }
+"""
+    made.append(rust(
+        "r4_for_twin", "verus.rs",
+        [(FOR_OLD_1, FOR_NEW_1, 1), (FOR_OLD_2, FOR_NEW_2, 1),
+         (FOR_OLD_3, FOR_NEW_3, 1)],
+        "THE R5 TWIN OF r4_for, and unlike r4_ptr_twin it exists to be ACCEPTED.\n"
+        "`./verus_run.py .temp/p07/controls/r4_for_twin.rs` -> 10 verified, 0\n"
+        "errors, so the `for` spelling is an admissible R4 and its +58.00/+92.00\n"
+        "Ir/call may be differenced. NOTES.md 10b."))
+
     # ---------------------------------------------------------- C variants --
     INCL_BRANCHY = """        size_t lo = 0;
         size_t hi = n;
@@ -293,7 +346,7 @@ def main():
         "k_u32", "kernel_hardened.c",
         [("    if (4 * n + 4 * nq > avail)",
           "    if ((uint32_t)(4 * n + 4 * nq) > (uint32_t)avail)", 1)],
-        "The length check in UNSIGNED 32-bit. 4*n + 4*nq needs 36 bits because\n"
+        "The length check in UNSIGNED 32-bit. 4*n + 4*nq needs 35 bits because\n"
         "n and nq are u32 fields, so this wraps -- and p05's does NOT, because\n"
         "its dimensions are u16. Run it on adversarial-width.bin."))
     made.append(c(

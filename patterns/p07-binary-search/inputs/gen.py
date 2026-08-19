@@ -329,7 +329,7 @@ COUNT_ELEMS, COUNT_QUERIES, COUNT_N, COUNT_NQ = 16, 4, 4096, 4
 #
 # **And the width that breaks here is `unsigned`, not just `int` -- p07 and p05
 # sit on opposite sides of that boundary.** `n` and `nq` are u32 fields, so
-# `4*n + 4*nq` reaches 34 359 738 360 and needs 36 bits; at n = 2^30 the 32-bit
+# `4*n + 4*nq` reaches 34 359 738 360 and needs 35 bits; at n = 2^30 the 32-bit
 # product is exactly 2^32 = 0 (mod 2^32) and the test `4 > 80` is false. p05's
 # `nrow*ncol` comes from u16 fields, tops out at 4 294 836 225, and therefore
 # still FITS `uint32_t` -- only p05's *signed* spelling breaks. ../NOTES.md 6

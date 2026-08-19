@@ -448,31 +448,102 @@ TASK_014_REVIEW's own write-up mixed. Rule, in both cases and now with teeth:
 **say which convention a number is in, every time — a cross-rung delta is only
 meaningful inside one convention.**
 
-### Code layout is worth up to 28% of wall clock at BYTE-IDENTICAL machine code
+### Code layout selects between DISCRETE MODES worth ~27% of wall clock, at an unchanged executed instruction stream
 
-**Measured on p07 at TASK_026 and extended at TASK_026_REVIEW.** Build the same
-source at seven alignments (`-C llvm-args=-align-all-functions=N`) and confirm the
-kernel's `md5_fn` is identical at every one, then time all seven. The spread is
-the **layout band**, and no `ns` ranking is readable inside it:
+**Measured on p07: TASK_026 (7 alignments), TASK_026_REVIEW (extended to R2),
+TASK_029 (30 layouts, and the reading below is TASK_029's, which overturned the
+first two).** This is the widest confound this project has, it is invisible to
+every counter available here, and it governs every `ns` number in `results/`.
 
-| rung | `small.bin` band | spread |
-|---|---|---:|
-| `unsafe` | 13.450…14.139 ms | **5.12%** |
-| `safe_tuned` | 15.378…16.999 ms | **10.54%** |
-| **`safe_naive`** | 14.038…18.034 ms | **28.47%** |
+**It is not a "band". It is two modes, selected by one address bit.** On p07's
+`safe_naive` / `small.bin`, over 30 layouts:
 
-28.47% is the widest single-rung band this project has measured, and it is on the
-rung a headline was resting on. Across *different* binaries at identical `Ir` the
-figure reaches **32%**.
+```
+kernel entry %32 == 0   ->  17.708 ms   (n=18)
+kernel entry %32 == 16  ->  13.931 ms   (n=12)
+```
 
-**The rule: an `ns` claim on an L1-resident kernel must be published as an
-interval, computed from both rungs' bands, and the bands must be disjoint before
-a sign is asserted.** On p07 that killed the R2 comparison (`[−0.72%, +34.08%]`,
-overlapping — no sign) and passed the R3 one (`[+8.77%, +26.39%]`, disjoint).
-A best-vs-best point estimate is not a substitute: p07's R2 point estimate was
-+4.37% inside a band that spans zero. Memory-bound inputs are far safer —
-`large.bin`'s bands are 0.61%…4.00% — which is itself the warning, because the
-*cheap* input to measure is the one where layout dominates.
+Perfect separation — slowest fast layout 14.766 < fastest slow layout 16.993 —
+and the largest-gap clustering and the bit-4 partition are the **same partition,
+30/30**. A "spread" statistic averages across a bimodal population and reports
+neither mode.
+
+**The sign of a rung-to-rung comparison flips with that bit:**
+
+```
+kernel%32 = 0    unsafe 14.007 ms   safe_naive 17.708 (+26.42%)   safe_tuned 15.563 (+11.12%)
+kernel%32 = 16   unsafe 14.062 ms   safe_naive 13.931 ( -0.93%)   safe_tuned 16.505 (+17.37%)
+```
+
+So p07's R2 `ns` comparison is not "uncertain because the band is wide" — **it has
+no sign at all**, and no number of reps recovers one. That is a stronger
+withdrawal than a wide interval, and it is the correct reason to withdraw.
+
+**No counter on this box resolves it.** Minimal pair, `-align-all-functions=1` vs
+`=2` (kernel 16 bytes apart, `md5_fn_norel bf70816958ed` both):
+
+```
+Ir 12346.57 vs 12346.57  (Δ0.00) | Dr 530.71 both | Dw 6.01 both
+I1mr/D1mr/D1mw/ILmr/DLmr/DLmw  0.00 both
+Bc 3482.85 both | Bcm 273.93 vs 273.92 | Bi/Bim 0 both
+```
+
+A 27% wall-clock mode with an identical instruction stream, identical simulated
+cache behaviour and identical simulated branch behaviour. Callgrind's simulators
+(see `.memory/00-environment.md`) are **blind to it** — which is the limit of the
+capability that file recommends. Mechanism narrowed, not identified: not I-cache
+geometry (p07's R2 inner loop spans the same 3 32-byte windows and 2 64-byte
+lines in *both* modes, and the one geometric difference points the wrong way);
+front-end or an address-indexed predictor is what is left, and neither is
+observable here.
+
+#### The two levers, and how to build a layout population
+
+- **`-C llvm-args=-align-all-functions=N`** — moves the kernel inside `0x300`.
+  Cheap, and enough to *detect* a mode.
+- **`-C link-arg=-Wl,--symbol-ordering-file=<f>`** (rust-lld) — moves it
+  arbitrarily far (p07: `0x15600` → `0x518f0`) at unchanged `n_fn` and unchanged
+  executed instruction stream. **This is the strong lever**; use it for anything
+  that has to be conclusive.
+- Two levers that do **not** work, so nobody re-runs them: a padding object via
+  `-C link-arg` does not shift the kernel (rustc appends it after the crate's
+  `.text` and passes `--gc-sections`; retained with `"axR"` it lands *after*
+  `kernel`); and `-align-all-nofallthru-blocks=K` is **not** byte-identical — it
+  inserts nops *inside* the kernel (p07 `n_fn` 66 → 67/71/73).
+
+#### Verify invariance with `md5_fn_norel`, NOT `md5_fn`
+
+⚠ **An earlier version of this section said `md5_fn`, and that is wrong for any
+rung whose kernel can `call` a panic path** — the `call rel32` displacement moves
+with layout, so p07's R2 and R3 produce **28 distinct `md5_fn` over 30 layouts at
+constant `n_fn`**. `md5_fn_norel` is invariant (`bf70816958ed`). Following the old
+recipe, you would conclude the code changed and abandon the control.
+
+#### The statistic to publish — and the one that does NOT converge
+
+⚠ **The worst-vs-best RANGE is not a converging statistic.** Adding samples
+widens it, and it changed a verdict on the same binaries, same machine:
+
+| | 7 alignments | 30 layouts |
+|---|---|---|
+| `safe_naive` band, `small` | 28.91% | **30.78%** |
+| R2 vs R4, `small` | [−1.84%, +33.65%] overlap | [−4.67%, +33.80%] overlap |
+| **R3 vs R4, `large`** | **[+0.72%, +3.12%] DISJOINT** | **[−0.14%, +4.42%] OVERLAP** |
+
+So *"publish an interval and require disjoint bands"* — the rule this section
+carried for one task — **is not stable**, and it retracted a clean negative from
+p07's own review purely by sampling more.
+
+**Use these two instead. Both converged on p07:**
+
+1. **Mode-matched comparison** — partition by the address bit, compare within a
+   mode, report per mode. A sign that flips between modes is not a sign.
+2. **Dominance** — the fraction of layout pairs in which rung A beats the
+   *worst* layout of rung B. p07 R3 vs R4: **30/30** on `small`, **29/30** on
+   `large` (R2: 19/30, 23/30 — which is what "no sign" looks like).
+
+Memory-bound inputs are far safer (`large.bin` bands 0.61%…4.00%), which is itself
+the warning: the *cheap* input to measure is the one where layout dominates.
 
 ### A per-byte rate from a marginal pair is good to ±0.09, not to five decimals
 

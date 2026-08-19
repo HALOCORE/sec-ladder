@@ -176,7 +176,7 @@ pub open spec fn query_walk(
 /// window too short to hold the header, a zero count, and -- **the one R1 omits,
 /// and the only one it omits** -- a declared array bigger than the bytes that
 /// arrived. That third test is written over `int` here, which is unbounded, and
-/// in `u64` in the exec rungs; `4*n + 4*nq` needs 36 bits, so the 32-bit
+/// in `u64` in the exec rungs; `4*n + 4*nq` needs 35 bits, so the 32-bit
 /// spelling of it is the pattern's second bug (c/kernel_hardened.c).
 pub open spec fn search_fold(buf: Seq<u8>, off: int, len: int) -> u64 {
     if len < 8 {

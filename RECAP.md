@@ -577,15 +577,19 @@ green on the first complete run. The working mode is: **build a pattern, review
 it once, land the corrections, repeat** — and per `PROTOCOL.md` rule 9, write
 `.memory/` only *after* the review.
 
-**THE NEXT TASK IS `TASK_026_REVIEW` — p07 is built, green and unreviewed**, and
-per rule 9 nothing of it is in `.memory/` yet. It reports the **first
-counterexample to "safety is cheap" in seven patterns**, so it is the highest-value
-thing in the project to attack. Its engineer named the target itself: it shipped a
-defective input generator (every miss drawn as `element + 1`, so no key ever fell
-below `elements[0]`, which made its own inclusive-`hi` control print the *correct*
-checksum), caught it with its own control, and says the workload — not the kernel
-— is what a reviewer should go after. Attack the workload, the layout band, the
-`Ir`→`ns` inference, and the exact-integer laws.
+**p07 is built, reviewed (TASK_026_REVIEW) and its corrections are landed
+(TASK_029). Finding 8 in `.memory/01-ladder.md` is written.** The headline
+survived six workloads; the manager's framing of it did not (see finding 15).
+
+**THE NEXT TASK IS `TASK_030_REVIEW` — the layout-mode finding, because it is
+cross-cutting.** TASK_029 measured that code layout selects between **two discrete
+modes on bit 4 of the kernel's entry address**, worth ~27% of wall clock at an
+**unchanged executed instruction stream and identical simulated cache and branch
+counters**. It is unreviewed, it retracted a clean negative from p07's own review
+by sampling more, and it destabilised a `.memory/` rule one task after that rule
+was written. **Every `ns` number in `results/` was measured at one layout**, so if
+the mode generalises past p07 the project's wall-clock column needs re-reading —
+that is the question.
 
 **Items 1–2a below are the closed spelling arc, kept for the history.** That arc
 ran TASK_015–028, thirteen tasks; it is finished and its rules are distilled in

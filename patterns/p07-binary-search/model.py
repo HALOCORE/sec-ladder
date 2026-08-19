@@ -283,11 +283,12 @@ class Model:
         in bytes, and that is the whole point of the pattern.** Every earlier
         kernel folds every byte of its window, so `work_per_call = stride` is
         both honest and roughly proportional to the work. Binary search reads
-        `4 * ceil(log2 n)` bytes out of a `4*n`-byte array: on `large.bin` that
-        is 1782 probes = 7128 bytes touched out of a 1 048 840-byte window. A
-        byte-denominated unit would put the derived floor at
-        `0.25 * 1048840 = 262210` Ir/call against a kernel that legitimately
-        executes ~40 000, and the gate would fail a perfectly healthy pattern --
+        `4 * ceil(log2 n)` bytes out of a `4*n`-byte array: on `large.bin`
+        (`n = 262 135`, `nq = 92`) that is `92 * 18 = 1656` probes = 6624 bytes
+        touched out of a 1 048 916-byte window, 0.63%. A byte-denominated unit
+        would put the derived floor at `0.25 * 1048916 = 262 229` Ir/call
+        against a kernel that legitimately executes ~21 400 (kernel-exclusive
+        `Ir`), and the gate would fail a perfectly healthy pattern --
         the same shape as `MIN_DECLARABLE_IR_PER_WORK` forbidding p09's
         bit-denominated model (`.memory/02-bench-rules.md`). The unit has to be
         the thing the kernel actually does once per unit of input it actually

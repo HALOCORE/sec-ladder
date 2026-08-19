@@ -55,7 +55,12 @@ Three things follow, and the third is the useful one:
    large, i.e. a key near the top, and the threshold is `2*(n-1) >= LIMIT`.
 3. **The overflow that IS reachable in a binary search over this format is in
    the OTHER multiplication.** The length check `4*n + 4*nq` reaches
-   `4*(2^32-1)*2 = 34 359 738 360` and needs 36 bits. In unsigned 32-bit it
+   `4*(2^32-1)*2 = 34 359 738 360` and needs **35** bits
+   (`2^34 = 17 179 869 184 < 34 359 738 360 < 34 359 738 368 = 2^35`; the
+   "36 bits" this file, `README.md`, `verus.rs`, `c/kernel_hardened.c`,
+   `inputs/gen.py`, `controls/gen_controls.py` and the hashed `idiom.why` in
+   `spec.md` all carried until TASK_029 was off by one and changed no
+   conclusion). In unsigned 32-bit it
    wraps: at `n = 2^30, nq = 1` the left-hand side is `4`, the test passes on
    any window over 12 bytes, and the first probe is 2 GiB out.
    `adversarial-width.bin` is that input, at a window of **88 bytes**, and §6
@@ -136,16 +141,18 @@ Two things, and they are the deliverable rather than the pattern count.
 p08, p16 and p17 are all `for each byte: acc = f(acc, b)`, so a per-call safety
 constant divided by `n` bytes goes to zero — which is *why* "safety is cheap"
 keeps coming out. Binary search does `ceil(log2(n+1))` probes per query over a
-`4n`-byte array. On `large.bin` that is **6428 bytes probed out of a 1 048 916
-byte window**, 0.61%. §3 measures what happens to R3's cost as `n` grows: it
-does **not** go to zero.
+`4n`-byte array. On `large.bin` (`n = 262 135`, `nq = 92`, so `92 * 18 = 1656`
+probes) that is **6624 bytes probed out of a 1 048 916 byte window**, 0.63%.
+§3 measures what happens to R3's cost as `n` grows: it does **not** go to zero.
 
 **(b) It is the canonical unpredictable-branch kernel**, so it tests
 `.memory/01-ladder.md`'s "static `Ir` is not a cost model" and "`Ir` and ns can
 disagree in direction" on a kernel *designed* to make them disagree. This box
-has `perf_event_paranoid = 3` and no branch-miss counter, so the branchless
-control in §11 is **mandatory rather than optional** — and §11 confirms `cmov`
-in the disassembly, and controls for code layout before drawing any inference.
+has `perf_event_paranoid = 3` and no branch-miss *hardware* counter, so the
+branchless control in §11 is **mandatory rather than optional** — and §11
+confirms `cmov` in the disassembly, and controls for code layout before drawing
+any inference. It also has `callgrind --branch-sim`/`--cache-sim`, which p07
+did not use and §11d now does.
 
 ---
 
@@ -173,23 +180,62 @@ Against R4, in percent:
 
 | rung | `Ir` small | ns small | `Ir` large | ns large |
 |---|---:|---:|---:|---:|
-| c-gcc | +77.4% | +51.9% | +78.6% | +16.9% |
-| c-clang | −8.5% | +6.9% | −8.3% | −1.1% |
-| R2 | **+87.8%** | **+28.0%** | **+87.7%** | **+3.5%** |
+| c-gcc | +77.4% | +51.9% ⚠ | +78.6% | +16.9% ⚠ |
+| c-clang | −8.5% | +6.9% ⚠ | −8.3% | −1.1% ⚠ |
+| R2 | **+87.8%** | ~~+28.0%~~ **withdrawn** | **+87.7%** | ~~+3.5%~~ **withdrawn** |
 | R3 | **+45.9%** | **+13.0%** | **+47.0%** | **+1.6%** |
-| R5 | 0.0% | −0.0% | 0.0% | +0.3% |
+| R5 | 0.0% | −0.0% ⚠ | 0.0% | +0.3% ⚠ |
 
-**Read the R2 row twice. The same +87.8% instruction gap converts to +28.0% of
-wall clock on the L1-resident input and +3.5% on the memory-bound one** — an 8x
-difference in the conversion factor, from the *input*, with the program held
-fixed. That is `.memory/01-ladder.md`'s "static counts are not a cost model" in
-its sharpest form to date: here the *dynamic* count is not a cost model either.
+**The `Ir` columns are the result. Every `ns` cell in that table is one build at
+one code layout, and §11c/§11e measure that that is not enough to carry a sign.**
+Three separate qualifications, in decreasing order of how much they cost:
+
+**(1) R2's two `ns` cells are WITHDRAWN.** They were published as *"the same
++87.8% instruction gap converts to +28.0% of wall clock on the L1-resident input
+and +3.5% on the memory-bound one — an 8x difference in the conversion factor"*,
+and TASK_026_REVIEW showed the sentence rested on a rung `§11c` had never built
+at more than one alignment. Built at 30 layouts (§11e) `safe_naive`'s wall clock
+is **bimodal**: 17.708 ms or 13.931 ms on `small`, selected by **bit 4 of the
+kernel's entry address**, against R4's 14.007 / 14.062 in the same two modes. So
+**R2-vs-R4 is +26.42% in one mode and −0.93% in the other**: the *sign* is a
+property of where the linker put the function, and +28.0% is one of two answers.
+Do not quote either number, and do not quote the `8x` ratio, which is a ratio of
+two withdrawn ones. What the withdrawal does **not** touch is the `Ir` half:
++87.8% / +87.7% are exact and swept (§3b).
+
+**(2) R3's two `ns` cells survive, and they are the ones to quote.** +13.0% and
++1.6% hold under mode-matching (+11.12% / +17.37% on `small`, +0.85% / +2.52% on
+`large`) and `safe_tuned` is slower than `unsafe` at **30 of 30** layouts on
+`small`. §3c's counterweight rests on these and is unaffected.
+
+**(3) The six `ns` cells marked ⚠ — both C rungs and R5 — have no layout bracket
+at all**, and the lever that produced one for the Rust rungs cannot produce one
+for C:
+`-align-all-functions` is an LLVM knob, so it reaches `c-clang` but not
+`c-gcc`, and a `c-gcc`-vs-`rustc` comparison needs both endpoints bracketed by
+the *same* lever or it is not a bracket. **`c-gcc +51.9%` is therefore an
+unbracketed single-layout number exactly as R2's was**, and it is the largest
+`ns` claim in the table. The symbol-ordering lever of §11e is linker-side and
+would reach every rung including gcc's; nobody has run it on the C cells. Until
+somebody does, read the C `ns` column as "not ranked".
+
+**And one more, which is about `Ir` and not about layout: R5's `0.0%` is
+kernel-exclusive, and whole-program it is `−1.00` Ir/call on both inputs.** R4
+and R5 are byte-identical binaries in the kernel (`md5_raw` equal, §9), so their
+kernel-exclusive counts *cannot* differ and the 0.0% here is the strongest form
+of the claim. The −1.00 is outside the kernel, in the driver. This matters
+because §3b's laws are **whole-program marginals** and this table is
+**kernel-exclusive**: a reader who differences across the two conventions can
+derive a contradiction that is not there (`.memory/03-measurement.md`: say which
+convention a number is in, every time).
 
 `c-clang` executes 8.5% **fewer** instructions than R4 on `small` and takes
 6.9% **longer** — `Ir` and ns disagreeing in direction inside one input, on the
 same LLVM backend. §11 has the layout control that says how much of that is
 real; the honest version is "the two are within the layout band and the ns
-column cannot rank them". **The instruction half is real and unexplained**:
+column cannot rank them", and per (3) above the `c-gcc`/`c-clang` half of it has
+no measured band of its own at all. **The instruction half is real and
+unexplained**:
 swept, `c-clang − R4` is `−1.0050` Ir per probe, i.e. clang's probe body is one
 instruction shorter than rustc's on semantically identical code with the same
 backend version (`.memory/00-environment.md`: clang 22.1.6 == rustc 1.97.1's
@@ -197,28 +243,77 @@ LLVM). p01 found a +2 instruction rustc-over-clang delta from an
 induction-variable choice; this is the same family with the sign flipped, and I
 did not chase it to the register allocator.
 
-### 3a. The mechanism, derived from the listings with zero fitted parameters
+### 3a. The mechanism, derived from the listings with zero fitted per-probe parameters
 
-Every rung's search loop is one basic-block chain; the numbers below are counted
-off `harness/asm.py`'s normalised listing, not fitted.
+Every rung's search loop is one basic-block chain; the per-probe numbers below
+are counted off `harness/asm.py`'s normalised listing, not fitted.
 
-**R4 (`unsafe`), the branchy shipped loop** — two paths, because the `hi = mid`
-arm re-enters above the loop test:
+**R4 (`unsafe`), the branchy shipped loop — THREE paths, not two.** LLVM rotates
+the loop and duplicates the `lo < hi` test, so the `while` has **two** exit
+sites and the `break` is a third. Addresses are from the `-O3 isolated` build,
+instructions grouped by role with the group's first address on the left:
 
 ```
-   mov %r11,%r10          <- hi = mid arm re-enters here
-   cmp %r10,%rbx ; jae    <- lo < hi
-   mov %r10,%r11 ; sub %rbx,%r11 ; shr $1,%r11 ; add %rbx,%r11    <- mid
-   lea (%rdx,%r11,4),%r14                                          <- ep
-   mov (%rdi,%r14,1),%ebp   <<< the WHOLE u32 decode, ONE instruction
-   cmp %r9d,%ebp ; je       <- v == key, break
-   jae                      <- v < key ?
-   inc %r11 ; mov %r11,%rbx ; cmp %r10,%rbx ; jb                   <- lo = mid+1
+   15698  mov %r10,%r11 ; sub %rbx,%r11 ; shr $1,%r11 ; add %rbx,%r11  <- mid   (4)
+   156a4  lea (%rdx,%r11,4),%r14                                       <- ep    (1)
+   156a8  mov (%rdi,%r14,1),%ebp   <<< the WHOLE u32 decode, ONE instruction    (1)
+   156ac  cmp %r9d,%ebp ; je 15660   <- v == key: BREAK, and that is EXIT 1     (2)
+   ---- shared prefix ends: 8 instructions, every probe pays them ----
+   156b1  jae 15690                  <- v > key ?                              (1)
+   156b3  inc %r11 ; mov %r11,%rbx   <- lo = mid + 1                           (2)
+   156b9  cmp %r10,%rbx ; jb 15698   <- lo < hi; not taken = EXIT 2            (2)
+   15690  mov %r11,%r10              <- hi = mid                              (1)
+   15693  cmp %r10,%rbx ; jae 156be  <- lo < hi; taken     = EXIT 3            (2)
 ```
 
-`lo` path = 13 instructions, `hi` path = 12. At the 50/50 branch split the
-workload produces that is **12.5 Ir/probe**, and the swept fit in §3b measures
-**12.5035**.
+so the three arms are **8 + 1 + 2 + 2 (loop test) = 13** for `lo = mid + 1`,
+**8 + 1 + 1 + 2 = 12** for `hi = mid`, and **8** for the `break`. The
+per-*query* constant is **16** — `1567b`'s 6-instruction head, the
+8-instruction accumulate at `15663`, and the 2-instruction not-found tail at
+`156be` — and a query that breaks does not execute the tail but does execute the
+`inc %r11` at `15660`, so a break probe is charged `8 + 1 − 2 = ` **7**.
+
+**What this file used to say, and why it was wrong** (TASK_026_REVIEW major 3).
+It said *"`lo` path = 13, `hi` path = 12; at the 50/50 branch split the workload
+produces that is 12.5 Ir/probe, and the swept fit in §3b measures 12.5035"*.
+Three errors in one sentence: the workload's 50/50 is the **hit/miss** ratio and
+not the branch split (measured over the sweep: `lo` **0.4591**, `hi` **0.4764**,
+`break` **0.0645**); the loop has **three** exits; and 12.5035 is not a per-probe
+constant at all but an **OLS slope** over blobs whose break fraction falls
+0.19 → 0.037, so it is partly absorbing the changing path mix. Neither
+hand-derivation at the real split reproduces it — two-path gives 12.4591,
+three-path 12.1367. **A right-looking number can be a wrong derivation, and the
+agreement to four decimals is what stopped anybody checking.**
+
+**The replacement, pinned rather than fitted** (`.temp/r26/sweep_pathfit.py`, on
+the same 113 sweep blobs and the same cached callgrind numbers, with an
+independent per-arm probe counter that reproduces §3b's probe total on every
+blob):
+
+```
+Ir/call = a + b*nq + 13*P_lo + 12*P_hi + 7*P_break        (2 free, not 3)
+
+  unsafe       lo/hi/eq=13/12/7   a= 42.852  b= 16.0026   max|res| = 0.4127
+  safe_tuned   lo/hi/eq=19/18/13  a= 51.852  b= 20.0026   max|res| = 0.4127
+  safe_naive   lo/hi/eq=24/23/18  a= 78.852  b= 27.0026   max|res| = 0.4127
+```
+
+against §3b's three-free-parameter `a + b*nq + c*probes`, whose max residual is
+**10.566** on all three. **A 25x better fit with one fewer free parameter and
+the per-probe cost no longer fitted at all**, and `b` lands on 16.0026 against a
+listing count of exactly 16.
+
+**And it confirms the published differences instead of disturbing them**, which
+is the point: the deltas come out `9 + 4*nq` with `+6` on **all three** arms for
+R3, and `36 + 11*nq` with `+11` on **all three** arms for R2. The safety tax is
+*path-independent* where the level is not — which is exactly why §3b's
+matched-spelling differences have zero residual while its levels do not.
+
+The residual floor of **0.4127** is identical for all three rungs and identical
+to §11b's branchless row, i.e. it is a per-call term this model does not carry
+and that cancels in every difference; the driver's `println!` digit term
+(`.memory/03-measurement.md`: 0.2263 Ir per call per decimal digit) is the right
+size for it, but I did not isolate it here.
 
 **LLVM merges the written-out little-endian decode into a single 32-bit `mov`**
 — in R1-clang, R2, R3, R4 and R5 alike. So `idiom.required`'s "written out with
@@ -290,6 +385,15 @@ blobs (`.temp/p07/fit3.py`):
 | unsafe | 39.40 | 13.2240 | 12.5035 | 10.57 |
 | unsafe (branchless, §11) | 42.85 | 12.5027 | **14.0000** | **0.41** |
 
+**The residual column is the tell, and it was in this table before anybody read
+it.** The branchless row's 0.41 and the branchy rows' 10.57 differ by 25x on the
+same blobs, the same driver and the same probe counts. That is not measurement
+noise — the branchless loop has **one** path, so `c*probes` is exact for it,
+while the branchy ones have three and `c` is absorbing a path mix that moves
+across the sweep. §3a's three-path model drops the branchy rows to the same
+0.4127 floor, so this table's `c` column is a *slope*, not a per-probe cost, and
+only the difference table below should be quoted.
+
 and the **matched-spelling differences**, which are the publishable quantity
 (TASK_026 §0 item 1: never a bare rate, only a matched difference — every
 per-call term the two rungs share, the driver's `println!` digit term included,
@@ -316,10 +420,31 @@ and 94.1 – 95.0% on `large`**, using the exact probe counts 462.69 and 1607.07
 per call. So `nq` per window does what TASK_026 designed it to do — the driver's
 own overhead is not what is being measured.
 
-### 3c. Does R3's cost amortise? **No — and this is the first pattern where it does not.**
+### 3c. Does R3's cost amortise? **No — and p07 is the first pattern where R3's tax has no axis along which it does.**
 
-Every prior pattern's answer was "yes, to zero, per byte". p07's, stated as a
-function of `n` over band A (nq = 58 throughout):
+**Scope the claim to R3, and do not write "the first counterexample to safety is
+cheap".** That sentence stood here until TASK_029 and it is refuted by
+`.memory/01-ladder.md` itself: finding 4 carries p16's swept **R2** tax of
+**4.25 Ir per folded byte**, whose fraction also rises — toward `4.25/5.75` =
+73.9% — mechanism-attributed (2.00 check + 2.25 foreclosed unroll), confirmed by
+construction with `-unroll-count=1` and reproduced on p17's different kernel;
+finding 6 carries p05's `O(nrow)` **R3** tax, of which that file says in its own
+words *"the cost is `O(nrow)`, **not** zero"*. p16's R2 story is structurally
+identical to the one below, one rung down and measured first.
+
+**What is a first, stated precisely: p07 is the first pattern where R3's tax has
+no axis along which it amortises.**
+
+| pattern | R3 − R4 | the axis it amortises along |
+|---|---|---|
+| p16 / p17 | a per-**call** constant, **0.00000 Ir/byte** swept | any — the reslice sits *outside* the fold loop |
+| p05 | `6*nrow + 9`, i.e. `O(nrow)` | `ncol`: it vanishes as rows get wider |
+| **p07** | **6.0000 Ir per probe**, `probes = nq·⌈log2 n⌉` | **none** — there is no inner loop to hoist it out of, so the fraction rises in **both** `n` and `nq` |
+
+That, and not "safety is expensive here", is the finding — and it says the six
+earlier answers were a property of the **loop shape** those kernels shared.
+
+p07's, stated as a function of `n` over band A (nq = 58 throughout):
 
 | n | probes/call | R3 − R4 | per probe | (R3 − R4)/R4 |
 |---:|---:|---:|---:|---:|
@@ -333,24 +458,63 @@ function of `n` over band A (nq = 58 throughout):
 - **per probe** it converges to the constant 6 (from above; the excess at small
   `n` is the per-query term `4*nq` spread over fewer probes);
 - **as a fraction of the kernel** it is **46.63% at n = 16 385 and still rising
-  monotonically**, toward the asymptote the two per-probe constants fix:
-  `6.0000 / 12.5035 = 47.99%`. It does not tend to zero and it never will,
-  because both rungs' per-probe costs are constants and the per-call and
-  per-query terms — the only things that could dilute the ratio — are `O(1)`
-  and `O(nq)` while the probe count is `O(nq · log n)`.
+  monotonically**. It does not tend to zero and it never will, because both
+  rungs' per-probe costs are constants and the per-call and per-query terms —
+  the only things that could dilute the ratio — are `O(1)` and `O(nq)` while the
+  probe count is `O(nq · log n)`.
+
+**The asymptote is a property of the kernel AND the query distribution, so quote
+it with the workload.** §3a's three-path form makes R4's per-probe cost
+`12 + f_lo` where `f_lo` is the fraction of probes taking the `lo = mid + 1`
+arm, so the asymptote is `6 / (12 + f_lo)` — and `f_lo` is *data*. Measured
+marginals per probe on two degenerate workloads: **12.0017** on all-below-min
+keys (pure `hi = mid` arm, `f_lo = 0`) and **13.0026** on all-above-max keys
+(pure `lo` arm, `f_lo = 1`), so
+
+```
+asymptote  =  6 / (12 + f_lo)  in  [46.15%, 50.00%]
+                                    47.99% on the shipped 50/50-hit workload
+```
+
+Until TASK_029 this file quoted `6.0000 / 12.5035 = 47.99%` as if the kernel
+fixed it; 12.5035 was §3b's OLS slope on the shipped workload (§3a), so 47.99%
+was a property of `inputs/gen.py` quoted as a property of binary search.
+
+**Confirmed across six deliberately different workloads** (TASK_026_REVIEW,
+`.temp/r26/altwork.py`, 30 blobs × 6 distributions, same element arrays, nq = 58):
+
+| workload | probes/call at n=16 385 | R4 `Ir`/probe ¹ | (R3−R4)/R4 |
+|---|---:|---:|---:|
+| shipped (50% hit) | 781.52 | 13.5396 | 46.59% |
+| all-miss | 812.08 | 13.6893 | 46.00% |
+| all-hit | 754.34 | 13.3639 | 47.29% |
+| all-below-min | 870.00 | 13.1164 | 47.86% |
+| all-above-max | 812.00 | 14.1962 | 44.36% |
+| clustered | 782.75 | 13.2975 | 47.44% |
+
+¹ whole kernel divided by probes, so it carries the per-call and per-query terms
+too — it is not the per-probe *marginal*, which is the `12 + f_lo` above. That is
+why `allbelow`'s 13.1164 sits above its own marginal of 12.0017.
+
+**Monotone rising in `n` in all six.** No workload flattens it and none reverses
+it; what the workload moves is *where inside [46.15%, 50.00%]* it is heading.
+And the exact-integer laws of §3b were re-verified **out of sample** on those 30
+fresh blobs with an independent probe counter, to the integer, 30/30.
 
 So: **on p07 the safe rung's tax is a fixed fraction of the kernel, and making
 the input bigger makes it slightly worse.** Every earlier pattern in this
-project could amortise the check away by folding more bytes; a search cannot,
-because there are no more bytes to fold — there are only more levels, and each
-level pays again. That is the finding p07 was built for, and it is the first
-honest counterexample to "safety is cheap" this project has produced.
+project could amortise the *R3* check away by folding more bytes; a search
+cannot, because there are no more bytes to fold — there are only more levels,
+and each level pays again.
 
 **The counterweight, and it must ship with the claim: in wall clock the same
-tax is +13.0% on `small` and +1.6% on `large`** (§3, and §11 shows both survive
-the layout control). A 46% instruction tax that is worth 1.6% of time on the
-input where the kernel actually spends its time is not the same statement as a
-46% *cost*, and neither number may be quoted without the other.
+tax is +13.0% on `small` and +1.6% on `large`** (§3). Those are the two `ns`
+cells that survive bracketing — §11e shows `safe_tuned` slower than `unsafe` at
+30 of 30 code layouts on `small`, and mode-matched at +11.12% / +17.37% — while
+R2's, on the same table, do not (§3 (1)). A 46% instruction tax that is worth
+1.6% of time on the input where the kernel actually spends its time is not the
+same statement as a 46% *cost*, and neither number may be quoted without the
+other.
 
 ---
 
@@ -380,8 +544,19 @@ the actual is 0.72–0.97 of it (0.886 on `small`, 0.971 on `large`). p16's and
 p05's err strict too; p17's errs loose.
 
 Gate stage 3b, as run: derived floor 130.5 Ir/call on `small` and 414.0 on
-`large`; **64 cell/probe pairs, marginal Ir 5 993 … 215 957, tightest margin
-45.9x, `d(Ir)/d(work)` 11.97 … 132.14.** No shout.
+`large`; **64 cell/probe pairs, marginal Ir 6 021 … 216 053, tightest margin
+46.1x, `d(Ir)/d(work)` 11.96 … 131.97.** No shout.
+
+⚠ **Those figures were wrong here until TASK_029, and the way they were wrong is
+worth one sentence** (TASK_026_REVIEW minor 5). Until then this paragraph quoted
+`5 993 … 215 957 / 45.9x / 11.97 … 132.14`, which came from `gate1.log` and
+`gate2.log` — both run at 07:07 and 07:10, *before* `inputs/` was regenerated at
+07:30 for the §1 workload fix. `gate3`–`gate6` and the review's independent run
+all give the values above. §1 already records that the miss-drawing defect made a
+section's claim false; what it did **not** record is that the fix silently
+invalidated every number measured off the old blobs, and one of them survived the
+sweep into §4. **When an input generator changes, re-derive every measured number
+in the file, not just the ones the change was about.**
 
 ---
 
@@ -737,19 +912,38 @@ All numbers are the whole-program marginal Ir/call.
 
 TASK_026 §0 item 3 and `.memory/01-ladder.md`: **a rung covered by an `identity`
 pin is chained to the prover**, so an R4 candidate must be put through Verus
-before its number means anything. Both candidates were.
+before its number means anything. Both candidates now have a twin in
+`controls/gen_controls.py` and both have been run.
 
 | spelling | small − R4 | large − R4 | Verus verdict |
 |---|---:|---:|---|
-| `r4_for` — query loop as `for q in 0..nq` | +58.00 | +92.00 | admissible (no new feature); **dearer** |
+| `r4_for` — query loop as `for q in 0..nq` | +58.00 | +92.00 | **`10 verified, 0 errors`** — admissible, and **dearer** |
 | `r4_ptr` — `as_ptr()` / `add()` / `*p` | −460.69 | −1605.07 | **DISQUALIFIED** |
 
 ```
-$ ./verus_run.py .temp/p07/twin/r4_ptr_twin.rs
+$ ./verus_run.py .temp/p07/controls/r4_for_twin.rs
+verification results:: 10 verified, 0 errors
+
+$ ./verus_run.py .temp/p07/controls/r4_ptr_twin.rs
 error: The verifier does not yet support the following Rust feature:
 dereferencing a raw pointer. Currently, Verus only supports raw pointers
 through the permissioned raw_ptr interface
 ```
+
+⚠ **This paragraph said "Both candidates were" before TASK_029 and it was
+false** (TASK_026_REVIEW minor 4). `gen_controls.py` generated `r4_ptr_twin`
+only, so `r4_for`'s "admissible (no new feature)" was an *inspection* standing
+beside somebody else's Verus run, in the one place on the R4 side where an
+inspection is exactly what the rule forbids. The reviewer built the missing twin
+and it verifies — the verdict was right and the claim of having checked it was
+not — and `r4_for_twin` is now generated here so the next reader does not have
+to take it on trust. The same review also found that this block cited
+`.temp/p07/twin/r4_ptr_twin.rs`, a path that never existed; the generator writes
+to `.temp/p07/controls/`. **A wrong path and an unrun check look identical from
+outside, which is the argument for the generator over the prose.** Also worth
+recording: the `for` spelling costs **no obligations** either — 10, the same as
+the shipped `while` — because Verus derives `q <= nq` and the `decreases` for a
+range `for`, so the two Verus-only edits the twin needs are deletions.
 
 That is the `is not supported` class, which is what forces a **new trusted
 item** and therefore disqualifies (`postcondition not satisfied` would not).
@@ -810,10 +1004,20 @@ language key would have failed stage 0b outright.
 
 ## 11. The branch control — mandatory here, and it lands
 
-This box has `perf_event_paranoid = 3` and no branch-miss counter, so any claim
-about branch misprediction has to be **inferred by construction**. TASK_026 asks
-for a branchless variant with `cmov` confirmed in the disassembly rather than
-assumed. Confirming it turned out to be the finding.
+This box has `perf_event_paranoid = 3` and no branch-miss **hardware** counter,
+so TASK_026 asked for the claim to be **inferred by construction**: a branchless
+variant with `cmov` confirmed in the disassembly rather than assumed. Confirming
+it turned out to be the finding.
+
+⚠ **"No counter" was over-read, and it cost this section a whole control.**
+`valgrind --tool=callgrind --branch-sim=yes` reports simulated `Bc`/`Bcm` and
+runs here; §11d now uses it, and it answers directly what §11a–§11c were built
+to establish by construction. The `cmov` control keeps its value — it is a
+*causal* lever where the simulator is an *observation*, and §11a's result that
+LLVM converts every source-level branchless spelling back to a branch is not
+something a counter could have found — but it was not the only instrument
+available, and the section was written as if it were
+(`.memory/00-environment.md`).
 
 ### 11a. Every source-level branchless spelling is converted back to a branch
 
@@ -855,9 +1059,11 @@ predictable `je` for the early exit:
 **14 instructions counted off the listing; the swept fit measures 14.0000
 Ir/probe with max residual 0.41 over 113 blobs** — a zero-parameter derivation
 matching a measurement to four decimals, and the branchless loop is
-path-independent where the branchy one is not (12.5035 = the 13/12 two-path
-average). This is a same-source, one-pass control, the shape
-`.memory/01-ladder.md` praises for p16's `-unroll-count=1`.
+path-independent where the branchy one is not — which is why 14.0000 is a real
+per-probe constant and the branchy 12.5035 is not (§3a: the branchy loop's three
+arms cost 13 / 12 / 7 and 12.5035 is an OLS slope over a moving path mix). This
+is a same-source, one-pass control, the shape `.memory/01-ladder.md` praises for
+p16's `-unroll-count=1`.
 
 ### 11c. The layout control, run first, because ns is not trustworthy here
 
@@ -881,6 +1087,24 @@ safe_tuned brless  12.830 .. 14.968 ms (16.66%)     20.270 .. 20.816 ms (2.69%)
 `small` and 0.6% on `large`.** That is a first-class caveat and it is why the ns
 column of §3 must not be read below ~6%.
 
+⚠ **This control was run on `unsafe` and `safe_tuned` only, and the rung it did
+not cover is the one §3's bolded headline rested on.** `safe_naive` was never
+built at more than one alignment here. TASK_026_REVIEW built it at seven
+(`.temp/r26/layout_r2.py`, identical marginal `Ir/call` 12346.57 at every one)
+and got a **28.47%** band on `small.bin` — **the widest single-rung band this
+project has measured**, and of the same order as the 21% and 32% figures this
+section opens with, which are across *different programs* rather than one
+program at seven addresses:
+
+```
+-- small.bin, 31 reps interleaved, taskset -c 3
+   >> safe_naive: layout band 14.038..18.034 ms  spread 28.47%
+   >> safe_tuned: layout band 15.378..16.999 ms  spread 10.54%
+   >> unsafe:     layout band 13.450..14.139 ms  spread  5.12%
+```
+
+§11e is what that band turns out to be made of, and it is not a band.
+
 ### 11d. The inference, and exactly what it rests on
 
 **On all four (rung × input) combinations the branchy and branchless bands do
@@ -899,22 +1123,209 @@ toggled**: the branchless build executes ~10% more instructions and finishes
 worth **−18.1% / −10.0%** of p07's wall clock at a cost of **+1.4965 Ir/probe**
 (14.0000 − 12.5035).
 
-**This is an inference, not a measurement, and here is exactly what it rests
-on.** (i) That the wall-clock difference is *branch misprediction* and not
-something else is not measured — this box has no counter, and nothing here rules
-out, say, a front-end effect from the shorter loop body. What is measured is
-that removing the data-dependent branch, and nothing else, is worth that much
-time. (ii) `-x86-cmov-converter=false` is a whole-program flag; the driver is
-inside it too. The kernel disassembly shows exactly two `cmov` appearing and two
-conditional jumps disappearing, and the driver loop has no data-dependent branch
-for the pass to touch, so the change is localised — but that is a reading of the
-listing, not an isolation experiment. (iii) The effect is bracketed by the
-layout control above rather than compared against a single build.
+**This section said "this is an inference, not a measurement" and named two
+caveats. Both are now closed, and by a flag that was available the whole
+time.** `.memory/00-environment.md`'s "no hardware counters" was read across this
+project for 28 tasks as *branch misprediction is unmeasurable here*, which is why
+the `cmov` control above was built to infer by construction what one flag
+reports directly:
+
+```
+valgrind --tool=callgrind --branch-sim=yes   ->  Bc, Bcm, Bi, Bim
+valgrind --tool=callgrind --cache-sim=yes    ->  D1mr, DLmr, I1mr, ...
+```
+
+Both run on this box (valgrind 3.27.1). Measured on the branchy/branchless pair
+(`.temp/r26/branchsim.py`), marginal per call:
+
+| build | input | `Ir` | `Bc` | `Bcm` | `Bcm/Bc` | `Bcm`/probe |
+|---|---|---:|---:|---:|---:|---:|
+| unsafe branchy | small | 6582.98 | 1392.09 | 271.16 | 0.1948 | **0.5861** |
+| unsafe branchless | small | 7245.77 | 958.40 | 59.45 | 0.0620 | 0.1285 |
+| unsafe branchy | large | 21356.70 | 4825.21 | 853.98 | 0.1770 | **0.5314** |
+| unsafe branchless | large | 23691.98 | 3264.14 | 93.07 | 0.0285 | 0.0579 |
+
+**+10.07% `Ir` buys −78.1% simulated mispredicts on `small` and −89.1% on
+`large`**, and **0.586 mispredicts per probe is what a coin-flip branch should
+give** — which is the sanity check that the simulator is modelling the right
+thing rather than the claim itself.
+
+**Caveat (i), the front end and locality, is narrowed rather than argued.**
+`--cache-sim=yes` (`.temp/r26/cachesim.py`) says the lever is
+**locality-neutral**: `D1mr` is **1076.82 on `large` for both builds** and `DLmr`
+is equal too. Only the branch counters move. What is still *not* excluded is a
+decode/uop-throughput effect from the shorter body — simulation cannot see the
+front end — so the data-cache explanation is dead and the front-end one is not.
+
+**Caveat (ii), the whole-program flag, is now an isolation experiment.** A
+symbol-by-symbol instruction-stream diff of the two whole binaries finds **559
+symbols and exactly one different**: `kernel`, 70 → 68 raw instructions. The
+driver, libstd and the startup path are bit-identical, so the flag changed the
+kernel and nothing else — measured, not read off a listing.
+
+**Say what the simulator is, every time you quote it.** Callgrind's predictor is
+a generic two-level scheme, **not this CPU's**; `Bcm` is *simulated* and must
+never be converted to cycles without saying so. It is strong evidence about
+**direction and ratio**, weak about **magnitude**
+(`.memory/00-environment.md`). Both simulators also slow callgrind down
+substantially, so they are for a named question on a few cells, not for a matrix.
+
+**And a lever that needs no flag and no simulator at all: the workload.** Same
+binary, same alignment, same element arrays — only the query distribution
+changes (`.temp/r26/worklever.py`, n = 16 385):
+
+| workload | probes/call | `Ir`/call | `D1mr` | `Bcm` | ns/call | ns/probe |
+|---|---:|---:|---:|---:|---:|---:|
+| shipped | 781.52 | 10581.50 | 300.52 | 422.78 | 2817.3 | 3.6049 |
+| clustered | 782.75 | 10408.58 | 1.60 | 273.35 | 1653.2 | 2.1121 |
+| all-below-min | 870.00 | 11411.30 | 0.13 | 59.02 | 795.9 | 0.9148 |
+
+**`allbelow` executes +7.84% more instructions and takes 71.75% less time than
+the shipped workload on a byte-identical program** — a sharper `Ir`-vs-ns
+direction reversal than the compiler flag produced, and available on any
+data-dependent kernel. `cluster` separates locality from branches: with `D1mr`
+at ~0 for both, the extra 214.3 mispredicts/call cost 857.3 ns/call ≈ **4.0 ns ≈
+14 cycles per simulated mispredict**, the textbook penalty. That last figure is
+an *attribution*, not an isolation — the predictable workload also gains
+cross-probe speculation.
+
+Caveat (iii) stands unchanged: the effect is bracketed by the layout control
+above rather than compared against a single build.
 
 **What this says about `.memory/01-ladder.md` findings 5 and 6.** They were
 established on p01/p02 (gcc fewer instructions, more time) and p08 (`rep`
 strings). p07 adds a case where the mechanism is *the branch itself*, the
 control is same-source, and the disagreement is 10 percentage points wide in one
-direction and 18 in the other. It also adds the sharper corollary: **the
-conversion factor from `Ir` to ns is a property of the INPUT** — R2's identical
-+87.8% instruction gap is worth 28.0% of time on `small` and 3.5% on `large`.
+direction and 18 in the other. The sharper corollary this section used to draw —
+*"the conversion factor from `Ir` to ns is a property of the INPUT: R2's
+identical +87.8% instruction gap is worth 28.0% of time on `small` and 3.5% on
+`large`"* — **is withdrawn with the numbers it rests on** (§3 (1)). The corollary
+survives on better evidence: the workload table above makes the same point on a
+**byte-identical** program, where R2-vs-R4 changed the program.
+
+### 11e. What the layout band is MADE OF: one address bit, and no counter sees it
+
+TASK_029. §11c brackets an `ns` claim by taking the *range* over seven
+alignments. Two things were never checked about that: whether the range is a
+converging statistic, and what the spread is made of. Both are now measured
+(`.temp/p29/layout_wide.py`, `layout_shape.py`, `modesim.py`).
+
+**A second layout lever, and it is much stronger than alignment.** rust-lld
+takes `--symbol-ordering-file`, so the same source can be built with the binary's
+582 text symbols in a pseudo-random order:
+
+```
+rustc ... -C link-arg=-Wl,--symbol-ordering-file=<permutation of the 582 symbols>
+```
+
+Nine alignments (`-align-all-functions=0..8`) plus 21 random orderings is 30
+layouts per rung; they put `unsafe`'s `kernel` at 28 distinct addresses spanning
+`0x15600 … 0x518f0`, where alignment alone moves it inside `0x300`. `n_fn` and
+the executed instruction stream are unchanged. **Control, and it must be run
+before anything else**: the marginal `Ir/call` is *exactly* invariant over all 30
+layouts of each rung — 12346.57 (R2) / 9600.12 (R3) / 6582.98 (R4), one value
+each, not a range.
+
+⚠ **A correction to the recipe while we are here.** `md5_fn` is invariant across
+layouts for `unsafe` **only**. R2's and R3's kernels contain a `call` to the
+panic path, so their `md5_fn` moves with the call displacement — 28 distinct
+digests over the 30 layouts — while `n_fn` (172, 99) does not. `md5_fn_norel`,
+which zeroes the pc-relative displacement fields, *is* invariant; measured on the
+minimal pair used below:
+
+```
+safe_naive -align-all-functions=1   n_fn=172  md5_fn 13f8c1575bec  md5_fn_norel bf70816958ed
+safe_naive -align-all-functions=2   n_fn=172  md5_fn f7463bbc1d17  md5_fn_norel bf70816958ed
+```
+
+So any "byte-identical machine code at a different address" check on a rung that
+can panic must use `md5_fn_norel`; `md5_fn` will fail it for the right reason and
+the wrong conclusion.
+
+**The band is not a band. It is two modes, selected by bit 4 of the kernel's
+entry address.** Grouping the 30 layouts by `kernel_addr % 32` on `small.bin`:
+
+| rung | `%32 == 0` | `%32 == 16` | mode gap |
+|---|---:|---:|---:|
+| `safe_naive` (R2) | **17.708 ms** (n=18) | **13.931 ms** (n=12) | **27.1%** |
+| `safe_tuned` (R3) | 15.563 ms (n=15) | 16.505 ms (n=15) | 6.1%, opposite sign |
+| `unsafe` (R4) | 14.007 ms (n=15) | 14.062 ms (n=15) | 0.4% |
+
+For R2 the separation is **perfect**: the fastest slow-mode layout is 16.993 ms
+and the slowest fast-mode one is 14.766 ms, so the largest-gap clustering of the
+30 timings and the bit-4 partition are **the same partition**, 30 of 30. It is
+not noise and it is not a gradient — it is one bit, and which residue is fast
+depends on the rung's own loop geometry rather than on a universal rule.
+
+**No counter this box can produce resolves it.** The minimal pair is
+`-align-all-functions=1` vs `=2`, which moves R2's kernel by exactly 16 bytes and
+changes nothing else. Every counter callgrind has, on that pair:
+
+```
+event      align1(%32=0)  align2(%32=16)      delta
+Ir             12346.57       12346.57         0.00
+Dr               530.71         530.71         0.00
+Dw                 6.01           6.01         0.00
+I1mr / D1mr / D1mw / ILmr / DLmr / DLmw   all 0.00 both     0.00
+Bc              3482.85        3482.85         0.00
+Bcm              273.93         273.92        -0.01
+Bi / Bim               0              0         0.00
+```
+
+**A 27% wall-clock mode, and instructions, data reads, every cache level and the
+simulated branch predictor are all identical.** Nor is it a straightforward
+instruction-fetch story: `.temp/p29/fetchwin.py` counts the loop geometry off
+both listings and R2's innermost search loop (70 bytes, 23 instructions) spans
+**3 32-byte fetch windows and 2 64-byte lines in both modes**, while the outer
+`hi = mid` re-entry path spans *more* windows in the **fast** build (4 vs 3) —
+i.e. the one geometric difference there is points the wrong way. What is left is
+the front end (decode / uop cache) and the address-indexed predictor structures,
+neither of which a simulator models and neither of which
+`perf_event_paranoid = 3` will report. **This is the sharpest form of §11d's
+surviving caveat**: the *only* instrument on this box that sees the effect at all
+is the wall clock.
+
+**Consequence 1 — R2's `ns` sign is a property of the linker, and that is why §3
+withdraws it.** Mode-matched against R4:
+
+| | `%32 == 0` | `%32 == 16` | |
+|---|---:|---:|---|
+| R2 vs R4, `small` | **+26.42%** | **−0.93%** | **SIGN FLIPS** |
+| R3 vs R4, `small` | +11.12% | +17.37% | same sign |
+| R2 vs R4, `large` | +3.34% | +0.47% | same sign |
+| R3 vs R4, `large` | +0.85% | +2.52% | same sign |
+
+R2 is faster than the *worst* R4 layout at 11 of its 30 layouts on `small`; R3 at
+**0 of 30**. So R3's counterweight is not merely "bands disjoint" — it is
+dominance, at every layout measured, in both modes.
+
+**Consequence 2, and it is a methodological one: the worst-vs-best RANGE is not a
+converging statistic, so a rule phrased on it is a rule about sample size.**
+Adding layout samples can only widen a range, never narrow it:
+
+| | 7 alignments (§11c's lever) | 30 layouts |
+|---|---|---|
+| `safe_naive` band, `small` | 28.91% | **30.78%** |
+| R2 vs R4 interval, `small` | [−1.84%, +33.65%] OVERLAP | [−4.67%, +33.80%] OVERLAP |
+| **R3 vs R4 interval, `large`** | **[+0.72%, +3.12%] DISJOINT** | **[−0.14%, +4.42%] OVERLAP** |
+
+The last row is the one to notice: **the R3 `large` comparison passes the
+disjoint-bands test at seven layouts and fails it at thirty, with no
+disagreement between the two measurements.** It is the same rung, the same
+binaries, the same machine — only the number of layouts sampled changed. So
+"bands must be disjoint before a sign is asserted" retracts a true claim as soon
+as somebody is more thorough. Two statistics do *not* move that way, because both
+are proportions rather than extremes:
+
+* **mode-matching** — group by the address bit and compare inside a mode. Keeps
+  R3's sign on both inputs (`small` +11.12% / +17.37%, `large` +0.85% / +2.52%)
+  and correctly refuses R2's on `small`.
+* **dominance** — "slower at k of N layouts". R3 is slower than the *worst* R4
+  layout at **30 of 30** on `small` and **29 of 30** on `large`; R2 at 19 of 30
+  and 23 of 30.
+
+Publish the range as a *worst case* if you like; do not publish it as *the*
+interval, and do not let a rule stated on it decide what may be claimed.
+
+Numbers reproduce `.temp/r26/layout_r2.py` closely: 28.91% here against 28.47%
+there, `safe_naive` 13.977…18.017 against 14.038…18.034.

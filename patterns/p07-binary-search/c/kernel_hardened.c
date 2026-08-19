@@ -12,7 +12,8 @@
  *
  *     4 * 4294967295 + 4 * 4294967295 = 34 359 738 360
  *
- * which needs 36 bits. In `size_t` (64-bit here) the line below is exact. Write
+ * which needs 35 bits (2^34 < 34 359 738 360 < 2^35). In `size_t` (64-bit here)
+ * the line below is exact. Write
  * the same line with 32-bit unsigned dimensions and it becomes
  *
  *     if (4u * (uint32_t)n + 4u * (uint32_t)nq > (uint32_t)avail) return 0;

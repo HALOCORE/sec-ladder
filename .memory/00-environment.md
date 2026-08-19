@@ -178,6 +178,23 @@ thing.
 3. **Both slow callgrind down substantially.** Use them for a named question on
    a few cells, not across a matrix.
 
+**⚠ And the limit, measured at TASK_029: the simulators are blind to code
+layout.** A minimal pair 16 bytes apart on p07 differs by **27% of wall clock**
+with `Ir`, every cache counter and every branch counter *identical*
+(`Bcm` 273.93 vs 273.92). So `--branch-sim` and `--cache-sim` explain a
+*mechanism* when one is in reach and say nothing at all about the largest
+wall-clock confound this box has — see `.memory/03-measurement.md`. Use them to
+attribute, never to rank.
+
+**The layout lever itself, since it belongs here too:**
+`-C link-arg=-Wl,--symbol-ordering-file=<f>` (rust-lld) moves a kernel arbitrarily
+far — p07's went `0x15600` → `0x518f0` — at unchanged `n_fn` and unchanged
+executed instruction stream, which is far stronger than
+`-C llvm-args=-align-all-functions=N` (confined to `0x300`). Two levers that do
+**not** work: a padding object via `-C link-arg` (rustc appends it after the
+crate's `.text` and passes `--gc-sections`), and `-align-all-nofallthru-blocks`
+(inserts nops *inside* the kernel, so it is not byte-identical).
+
 **And a lever that needs no simulator at all: the workload.** Same binary, same
 alignment, same element arrays, only the query distribution changed — p07's
 `allbelow` executes **+7.84% more instructions and takes 71.75% less time** than
