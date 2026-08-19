@@ -298,6 +298,19 @@ changed lines). Then:
 the sweep its laws are derived from, and `gen.py` being inside `source_sha256` is
 what makes those laws re-derivable from a hashed file.
 
+Two conditions the rule depends on, both verified at TASK_027_REVIEW against the
+harness rather than argued:
+
+- **The `sweep-` prefix IS the mechanism**, hardcoded in two module-level
+  literals (`check.py:459-460`, `measure.py:60`) with no pattern-specific input
+  and no `spec.md` key that selects inputs. **A band named anything else enters
+  the measurement matrix and costs a full re-measure.** Name it `sweep-*`.
+- **The gate hashes `gen.py` and never the blobs**, so a sweep-derived law's
+  reproducibility rests entirely on `gen.py` being *deterministic*. Verify that
+  by regenerating twice and diffing, as p16 did (two runs byte-identical, and the
+  95 pre-existing blobs unchanged) — it is one command and it is the whole basis
+  of the claim.
+
 ## Editing rules
 
 - `pilot/` is frozen evidence for `PLAN.md`. Do not edit it; p01 is its successor.
