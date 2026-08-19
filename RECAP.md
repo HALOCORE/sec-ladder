@@ -158,10 +158,15 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    is the difference of two upper bounds and bounds nothing in either
    direction** — measured, the same edit is −2 on R4 and +1 on R3, and
    `5·nrow + 13` *exceeds* the published `6·nrow + 9` for `nrow < 4`.
-   Publish the in-contract **pair interval** (`36…134 / 128…410`, with the
-   published 123/399 inside it) and, if one number is wanted, the fixed-R4
-   bound. **An admissible pair has a tax of exactly 0.00**, so p05 does not
-   support "safety costs something here" over free pairings.
+   ~~Publish the in-contract **pair interval** (`36…134 / 128…410`, with the
+   published 123/399 inside it)~~ and, if one number is wanted, the fixed-R4
+   bound. ~~**An admissible pair has a tax of exactly 0.00**, so p05 does not
+   support "safety costs something here" over free pairings.~~
+   **Both struck at TASK_028** — the interval's endpoints and the `0.00`
+   pairing are `r4_dataslice` and `c4_hu16_nz`, neither of which is a rung.
+   Publish the **fixed-R4 bound** and the **R3-side span** (`5·nrow + 6` …
+   `6·nrow + 13` = 101…127 / 331…403); see item 1 of "Priority" below, and note
+   that this paragraph is the site that survived the first correction sweep.
 
 13. **p08, and the retraction it forced — safe Rust beat unsafe Rust on p05.**
    p08's own result is structural: overlapping `memcpy` is UB that safe Rust

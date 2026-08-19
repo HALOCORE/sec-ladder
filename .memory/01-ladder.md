@@ -135,11 +135,16 @@ the pin decided 0 of 3 variants before and 3 of 3 after.
 
 **So: a pinned idiom makes the admissible class DECIDABLE, not SINGULAR — and
 therefore `R3ship − R4ship` is an upper bound on the in-contract safety tax
-ONLY WHILE ONE RUNG IS HELD FIXED.** That qualification is not decoration: with
-*both* rungs free to be respelled, p05 has an admissible pair whose tax is
-**exactly 0**, so the unqualified sentence is **false**. **Replaced in all six
-`idiom.why` at TASK_023** with the one-sided form; the sentence survived
-*outside* the hashed blocks in eleven further places, found by grepping.
+ONLY WHILE ONE RUNG IS HELD FIXED.** **Replaced in all six `idiom.why` at
+TASK_023** with the one-sided form; the sentence survived *outside* the hashed
+blocks in eleven further places, found by grepping.
+⚠ **The reason originally given here was itself refuted** (TASK_027_REVIEW). It
+was: *"with both rungs free to be respelled, p05 has an admissible pair whose tax
+is exactly 0."* **That pair's R4 is `r4_dataslice`, which is not a rung** —
+`from_raw_parts` is `is not supported` at the pinned vstd. See the p05 entry
+below. **The qualification survives and is if anything stronger**: it holds
+because nobody has yet built an admissible R4 that moves *at all*, not because a
+free pairing reaches zero.
 
 **The unpinned unroll factor is not a p16 problem.** `5 + 3/K` follows from a
 declaration that licenses unrolling and an inner byte loop, so **any pattern with
@@ -153,9 +158,25 @@ effect. "The same category of edit on the safe side" was the argument for
 `r4_hdr`; it is measurably not the same category.
 
 **And do not replace it with `min(R3) − min(R4)`** — that is the difference of
-two upper bounds and bounds nothing in either direction. Report the in-contract
-**pair interval** beside every headline, plus the fixed-R4 bound if a single
-number is wanted.
+two upper bounds and bounds nothing in either direction.
+
+⚠ **The instruction that used to follow — "report the in-contract PAIR INTERVAL
+beside every headline" — is REVERSED (TASK_028).** There are **three distinct
+quantities** and the project has confused them repeatedly, so name them:
+
+| quantity | p05 | what it is |
+|---|---|---|
+| **fixed-R4 bound** | `6·nrow + 9` = 123 / 399 | **one number.** `R3ship − R4ship`, bounding `inf(in-contract R3) − R4ship`. The only sound one. |
+| **R3-side span** | `5·nrow + 6 … 6·nrow + 13` = 101…127 / 331…403 | the in-contract R3 search, R4 held by fiat. Width `nrow + 7` = 26 / 72. |
+| **pair interval** | *the same numbers* | both rungs free — and it **collapses onto the R3-side span**, because every admissible R4 measures exactly `R4ship`. |
+
+So **do not publish a pair interval — not because it is unavailable, but because
+it is DEGENERATE**: it duplicates the R3-side span, and its R4 endpoint has zero
+measured width. (An earlier manager note said it "is identical to the fixed-R4
+bound"; that is **wrong** — the fixed-R4 bound is a single number and sits
+*inside* the span.) State the degeneracy rather than the absence: it is
+falsifiable in one sentence, and **it stops being degenerate the day somebody
+builds an admissible R4 that moves.** Nobody has, on any pattern.
 
 **How to tell a legitimate declaration edit from self-certification — the
 direction test (TASK_019).** The obvious guard is *provenance*: "this edit was
@@ -597,12 +618,18 @@ places and points at nothing. **Name the pattern, never the number.**
 
    **`+27 / +77` is a bound on `inf(in-contract R3) − R4ship` — and on nothing
    else. MEASURED FALSE as a bound on p16's in-contract safety tax**
-   (TASK_023). p16's unsafe rung moves in contract too, by the same lever that
-   moved p05's — respelling the header read as one unaligned `u16` — and unlike
-   p05's constant it moves by a **coefficient**: `R4ship − r4_hdr = 4·nrec`,
-   zero residual over 24 blobs. So the pairing convention does not shift p16's
-   intercept, it changes the `nrec` coefficient from 1 to 10 (`vlen ≡ 0 mod 4`)
-   or 3 to 12. **The pair interval published at TASK_023 — 17…47 / 43…127,
+   (TASK_023). ⚠ **The reason TASK_023 gave is REFUTED and so is p05's half of
+   it** (TASK_027_REVIEW). It was: *"p16's unsafe rung moves in contract too, by
+   the same lever that moved p05's — respelling the header read as one unaligned
+   `u16` — and unlike p05's constant it moves by a coefficient,
+   `R4ship − r4_hdr = 4·nrec`."* The measurement is right and **the rung is
+   not**: `r4_hdr` needs `read_unaligned` and `c4_hu16_nz` needs
+   `read_unaligned`/`as_ptr`/`add`, all `is not supported` at the pinned vstd, and
+   every alternative route (`from_raw_parts`, `TryFromSliceError`,
+   `from_le_bytes`) is unsupported too. **Neither pattern's R4 side has moved by a
+   single admissible instruction.** The `+27 / +77` bound is still one-sided —
+   that part stands, on the R3 side alone.
+   **The pair interval published at TASK_023 — 17…47 / 43…127,
    "111%/109% wide" — is refuted** (TASK_023_REVIEW): measured, it is
    **−239…+236 (1759%) / −2449…+2244 (6095%)**, and **its bottom is negative on
    all 24 points**. Do not re-point the "which declaration is loosest"
@@ -1054,6 +1081,12 @@ places and points at nothing. **Name the pattern, never the number.**
    defect as p16's `u_c32`, on a figure that is load-bearing in this file, in
    `RECAP.md`, and inside the hashed `why` of **all six patterns**. The cheapest
    *measured and admissible* p05 R4 is **the shipped cell, at 0**.
+   ⚠ **Say "the only R4 SHOWN admissible", not "seven admissible spellings"**
+   (TASK_028). Six further round-1 variants measure 0 against the shipped R4 but
+   **were never put through Verus**, and at least two of them (`r4_rowslice`,
+   `r4_dataptr`) use the very `from_raw_parts`/`add` the logs reject. It moves no
+   endpoint — they all measure 0 — but the claim we are entitled to is one
+   verified cell, not seven.
    Substituting the admissible class into p05's own published laws gives
    `5·nrow + 6 … 6·nrow + 13` = **101…127 / 331…403**, width `nrow + 7` = 26 / 72
    — which is *exactly* the R3-side-only span of 21% / 18% that the pair interval

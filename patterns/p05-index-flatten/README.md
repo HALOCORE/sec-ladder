@@ -167,27 +167,61 @@ one more thing in the *unsafe* rung's prologue, every time on the first lever
 the next agent pulled, and every time the refuted value had been reached by
 several independent machine-code bodies, which is the evidence that kept being
 mistaken for a floor. `min(R3 found) − min(R4 found)` is the difference of two
-upper bounds and bounds nothing in either direction. What is quotable is the
-**interval**: over the in-contract pairs searched the tax runs `2·nrow − 2` …
-`6·nrow + 20` — **36 … 134 at `small`, 128 … 410 at `large`** — with the
-published 123 / 399 *inside* it, and 80% / 71% of the published figure living in
-spelling the declaration does not pin. (This used to add "against p16's
-44% / 55%", i.e. that p05's declaration is the loosest of the set. That compared
-a *pair* interval against p16's **R3-side-only** span. TASK_023's replacement —
-"p16's own pair interval is 111% / 109%" — is refuted in turn: measured, p16's
-is **−239…+236 / −2449…+2244**, 1759% / 6095%, negative at the bottom on all 24
-blobs. **Both forms are withdrawn and neither is re-pointed**, because a
-2-lever p16 search and a 46-spelling p05 search are not each other's peers.)
-At `nrow = 1`
-the bottom of that interval is **exactly 0**, measured: there is an admissible
-pair on which safe and unsafe cost the same instruction count.
+upper bounds and bounds nothing in either direction.
+
+**And at TASK_028 the R4 side of all three of those revisions turned out not to
+be made of rungs.** p05 pins `identity: unsafe ≡ verus, O3 exact`, so an R4 must
+have a byte-identical R5 twin that Verus verifies; every unsafe spelling that
+moved off the shipped cell respells the header read or uses `from_raw_parts`,
+and at the pinned vstd `read_unaligned`, `as_ptr`, `add`, `from_raw_parts`,
+`TryFromSliceError` and `from_le_bytes` are all `is not supported` — the cheapest
+of them, `c4_hu16_nz`, verifies only with **one new trusted item**, which is the
+cost that disqualified the same lever on p16. **p05's R4 side has never moved by
+a single admissible instruction, and TASK_021's original "the R4 side has zero
+in-contract spread" was right for a reason nobody had found: not that six agents
+spelled the header the same way, but that the pin leaves them nothing else to
+spell it with.**
+
+So what is quotable is **two quantities, and a pair interval is not one of
+them**:
+
+- the **fixed-R4 bound** — hold the unsafe rung at the shipped cell by fiat, and
+  `R3ship − R4ship = 6·nrow + 9` bounds `inf(in-contract R3) − R4ship` above,
+  with `5·nrow + 6` tighter;
+- the **R3-side span**, cheapest-found to dearest-found in contract against that
+  fixed R4: `5·nrow + 6` … `6·nrow + 13`, **101 … 127 at `small`, 331 … 403 at
+  `large`**, width `nrow + 7` = 26 / 72, i.e. **21% / 18%** of the published
+  figure, which sits inside it.
+
+~~What is quotable is the **interval**: over the in-contract pairs searched the
+tax runs `2·nrow − 2` … `6·nrow + 20` — 36 … 134 / 128 … 410 — 80% / 71% of the
+published figure, and at `nrow = 1` its bottom is **exactly 0**, so there is an
+admissible pair on which safe and unsafe cost the same.~~ **Withdrawn at
+TASK_028**: the bottom endpoint is `r4_dataslice` and the top is `c4_hu16_nz`,
+and neither is a rung, so the free pairing does not exist. Substituting the
+admissible class returns exactly the R3-side span above — the figure this
+interval was introduced to *replace*. A pair interval over the admissible class
+is not unavailable, it is **degenerate**: every p05 R4 that could enter it sits
+at the shipped cell, so its R4 endpoint has zero measured width. It becomes a
+result the day somebody builds an admissible R4 that moves — the unbuilt
+zero-guard deletion in `NOTES.md` §14f. (This paragraph used to add "against
+p16's 44% / 55%", i.e. that p05's declaration is the loosest of the set. That
+compared a *pair* interval against p16's **R3-side-only** span. TASK_023's
+replacement — "p16's own pair interval is 111% / 109%" — was refuted in turn,
+and at TASK_028 p16's interval is withdrawn on the same ground as p05's. **All
+three forms are withdrawn and none is re-pointed**, because a 2-lever p16 search
+and a 46-spelling p05 search are not each other's peers, and because neither
+pattern has a pair interval left.)
 
 **The shape survives all three revisions under one stated pairing**, and that
 is the durable part: cheapest R3 found against cheapest R4 found, p16's reading
 of `required[1]`, gives `5·nrow + b` with only `b` moving (6 → 11 → 13) — same
 functional form, same sign, still `O(nrow)`, coefficient still 5. Over *free*
-in-contract pairings the coefficient ranges from 2 to 6, so it is a property of
-the pairing convention and not of the pattern. The one instruction per row
+in-contract pairings the coefficient ranged from 2 to 6, which is why this used
+to be stated as a property of the pairing convention rather than of the pattern;
+**at TASK_028 both spellings that produced the 2 and the 6 are inadmissible**, so
+over the admissible class the pairing collapses to `b = 6` and the coefficient
+does not depend on convention after all. The one instruction per row
 that the respelling removes is the `add` that makes the row base buffer-absolute;
 the five that survive are the reslice's bounds check, and the fact that would
 delete them is the nonlinear one R5 discharges with `lemma_mul_inequality`. No

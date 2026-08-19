@@ -65,9 +65,13 @@ same literal conjunctive guard, only the suffix-table walk and the byte fold
 respelled — measures **51 `Ir`/call cheaper on both bands**, i.e. **−19 against
 the shipped R4**. Do not quote `+32` as what safety costs on this kernel — and do
 not quote it as an upper bound on p17's in-contract safety tax either: that
-would need the **R4** side searched, and it has not been. Where it has been
+would need the **R4** side searched, and it has not been. ~~Where it has been
 searched the unsafe rung moved too (p05 by 7 flat at TASK_022, p16 by `4·nrec`
-at TASK_023) and the shipped pair's difference stopped bounding anything.
+at TASK_023) and the shipped pair's difference stopped bounding anything.~~
+**Withdrawn at TASK_028**: both of those levers are respellings of a header read
+that vstd cannot verify at the pin, so neither is a rung, and **no pattern's R4
+side has moved by an admissible instruction**. p17's `−19` is an **R3-side**
+figure and is untouched by any of it (TASK_027_REVIEW Q2, clean negative).
 
 ⚠ **This paragraph said "+32 instructions per call, flat" until TASK_016, and
 "flat" there was read as flat per call, which the two shipped points cannot
@@ -1413,11 +1417,19 @@ digests are of the function's bytes, not of its symbol, which is exactly what
    `inf(in-contract R3) − R4ship`, and on nothing else.** It is a bound only
    because R4 is held fixed by fiat; it is **not** an upper bound on p17's
    in-contract safety tax, which would need the R4 side searched (p05 and p16
-   have been, and both moved). The measured in-contract minimum is **−19.00** against the
-   shipped R4, on both bands. Per `.memory/01-ladder.md` finding 14 that is
+   have been, ~~and both moved~~ — **and at TASK_028 neither moved
+   admissibly**: every spelling that moved on either pattern needs a vstd
+   feature that is `is not supported` at the pin, so it is not a rung. Searching
+   p17's R4 side means running `./verus_run.py` on each candidate's twin first).
+   The measured in-contract minimum is **−19.00** against the
+   shipped R4, on both bands, and it is an **R3-side** figure — TASK_027_REVIEW
+   Q2 checked it specifically and it is a clean negative. Per
+   `.memory/01-ladder.md` finding 14 that is
    **not** "safe Rust beats unsafe Rust" — R4 is a spelling too and its
    in-contract space has not been searched — it is "the shipped pair is not on
-   the floor of its own contract".
+   the floor of its own contract". (Finding 14's *other* half, `inf(R4) ≤
+   inf(R3)` by construction, is refuted; the half cited here is the surviving
+   one.)
 3. **On p17 the token pin has zero effect on any measured quantity.** It
    excludes a source-level difference the compiler erases. Whatever a
    declaration that pins tokens buys, on this pattern it is not attributability

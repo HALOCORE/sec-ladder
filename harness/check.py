@@ -53,9 +53,18 @@ What it enforces, in order:
      p02 clears its own floor 35.9x over. What certifies that the work happened
      is step 2. The verdict now prints the achieved margin beside the declared
      floor so a 35.9x and a 2.2-billion-x margin cannot read the same
-  3c structural identity R4-vs-R5 is measured and **recorded as a result**. Only
-     a drop below the level `spec.md` pins fails the gate: a proof that
-     legitimately costs an instruction is a finding, not a harness error
+  3c structural identity R4-vs-R5 is measured, recorded as a result, **and
+     enforced**. A level at or above the one `spec.md` pins is a result; a drop
+     below it calls `rep.fail` and the run's verdict is FAIL. So a proof that
+     legitimately costs an instruction is a finding only while the pin allows
+     it -- against an `exact` pin it is a gate failure, not a harness error.
+     **This entry read "recorded as a RESULT, not a gate condition" until
+     TASK_028, and that was false** (`check_identity` -> `rep.fail("identity",
+     ...)`, and `if rep.failures: verdict = "FAIL"`). It mattered beyond
+     tidiness: it was the one sentence in the tree arguing that an `identity`
+     pin constrains a shipped pair of files rather than the class of programs
+     that could occupy the rung, which is the step that disqualifies an
+     unverifiable R4 candidate (`.memory/01-ladder.md`, TASK_027_REVIEW Q1)
   4  `adversarial-*` behaviour is recorded per rung and compared to the model's
      expected exit/stdout
   5  the "Proof domain must cover the measured domain" rules:
@@ -1720,7 +1729,24 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
 
 
 # ==========================================================================
-# 3c. structural identity -- a RESULT, not a gate condition
+# 3c. structural identity -- a RESULT *and* a gate condition
+#
+# This header said "a RESULT, not a gate condition" until TASK_028. That was
+# FALSE: `check_identity` below calls `rep.fail("identity", ...)` whenever the
+# measured level is weaker than the one `spec.md` pins, and `rep.failures`
+# makes the run's verdict "FAIL". What is a result and not a gate condition is
+# the *level itself* -- the gate records `exact`/`multiset`/`norel` for every
+# pair whether or not a pin exists, and a level STRONGER than the pin is
+# reported, never failed.
+#
+# The distinction is load-bearing, not cosmetic. Because the pin is enforced,
+# an `identity: unsafe == verus, O3 exact` entry does not merely assert
+# something about the two files that ship: it constrains what may occupy the
+# R4 role at all, since a candidate R4 with no byte-identical R5 twin that
+# Verus verifies could not pass this stage. That is the step by which
+# `.memory/01-ladder.md` disqualifies unverifiable R4 candidates from the
+# admissible class (TASK_027_REVIEW Q1), and the old comment was the strongest
+# textual argument against it anywhere in the tree.
 # ==========================================================================
 
 def check_identity(digests, rep, contract):

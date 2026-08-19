@@ -521,8 +521,15 @@ Measured at TASK_022 on unchanged trees, two consecutive runs:
   combinations (not just `O0`/`whole`), to **±0.08**. TASK_022 recorded 8 and
   `O0`/`whole` only; TASK_023_REVIEW reproduced the **identical 23 keys on an
   unchanged tree**, which is what makes them noise rather than an effect.
+  ⚠ **The count is a floor, not a constant: TASK_028 measured 75.** Same
+  magnitude (`10452.64 → 10452.72`, ±0.08), same key, three times as many leaves —
+  so **quote the magnitude and the key, and re-measure the count**. The three
+  recorded values are 8 → 23 → 75 and every one of them was written down as if it
+  were the number.
 - **p02: 3, p16: 1, p17: 1** — previously unrecorded.
-- **Total churn on an unchanged tree: 32 leaves.**
+- **Total churn on an unchanged tree: 32 leaves at TASK_022/023, ~114 at
+  TASK_028** (the p08 growth plus 5 ASan PID strings and p05's 2 nondeterministic
+  `adversarial-dims` stdouts). Budget by *class*, never by count.
 
 **TASK_021_REVIEW's clean negative 6 attributed exactly those 8 p08 leaves to an
 edit.** They move on an unrelated edit too, so they are run noise, not an effect.

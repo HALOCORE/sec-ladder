@@ -39,13 +39,18 @@ with this section** (TASK_019, from TASK_018_REVIEW M1). An admissible
 R3 that respells only what the declaration leaves free — the `u16` header read —
 measures **4 `Ir`/call cheaper than the shipped R3** (3 at `len ≡ 0 mod 8`), so
 the measured in-contract minimum against the shipped R4 is **+6 / +5**. **The R4
-side has not been searched in contract**, and that matters more than it used to:
-on p05 (TASK_022) and on p16 (TASK_023, §10a.1 there) the unsafe rung moved too,
-by 7 flat and by `4·nrec` respectively, and once it does, the shipped pair's
-difference is **not** an upper bound on the in-contract safety tax at all — an
-admissible pair exceeds it. p02's R4 side is **unverified, not verified fixed**;
-do not write "upper bound on p02's in-contract safety tax"
-(`.memory/01-ladder.md` finding 14).
+side has not been searched in contract**, and **what searching it costs changed
+at TASK_028**. p05 (TASK_022) and p16 (TASK_023) both reported the unsafe rung
+moving — by 7 flat and by `4·nrec` — and both figures are **withdrawn**: every
+spelling that moved needs `read_unaligned` / `from_raw_parts` / `chunks_exact`,
+each `is not supported` at the pinned vstd, and p02 pins
+`identity: unsafe ≡ verus, O3 exact` like the other five, so an R4 candidate
+without a verifying byte-identical R5 twin is not a p02 rung either.
+**Searching p02's R4 side is therefore a Verus question before it is a
+measurement question**: run `./verus_run.py` on the twin *before* differencing
+anything. p02's R4 side is still **unverified, not verified fixed**, so do not
+write "upper bound on p02's in-contract safety tax" — but the reason is now that
+nobody has looked, not that a lever is known to exist.
 
 The **security** result of this pattern (§1) was reviewed and stands unchanged.
 
@@ -1370,9 +1375,14 @@ Summarised against the shipped R3:
    result is now uniform enough to expect rather than to discover.
    ⚠ **It is a bound only because R4 is held fixed by fiat**, and it is *not* an
    upper bound on "p02's in-contract safety tax": that would need the R4 side to
-   have been searched, and it has not been. Where it has been searched the
+   have been searched, and it has not been. ~~Where it has been searched the
    unsafe rung moved — p05 by 7 flat, p16 by `4·nrec` — and the shipped pair's
-   difference stopped bounding anything (TASK_022, TASK_023).
+   difference stopped bounding anything (TASK_022, TASK_023).~~ **Withdrawn at
+   TASK_028**: on both patterns every R4 spelling that moved is inadmissible
+   under the `identity` pin, so neither R4 side has moved by an admissible
+   instruction and the fixed-R4 bound never stopped bounding anything. p02 owes
+   an R4-side search; it does not owe a pair interval, and it must not publish
+   one.
 2. **TASK_018_REVIEW M1's failure scenario would have published a number that is
    not even the floor.** The forbidden additive guard is −3 against shipped R3,
    flat; `r3_hdrslice`, which is **in** contract, is −4 at 14 of 16 swept

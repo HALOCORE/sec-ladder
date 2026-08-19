@@ -35,12 +35,20 @@ value fold — the two things the declaration says it does *not* restrict — sp
 **42 `Ir`/call at `large` against the published 77**, the cheapest **of those
 three** sitting at `+45` (a *later* search on the same declaration reached
 `−2545`; see §10a.2, and read `+45` as scoped to TASK_018's three respellings
-and never as a floor). **TASK_023 then searched the R4 side and it moves too**,
+and never as a floor). ~~**TASK_023 then searched the R4 side and it moves too**,
 by the same
 lever: `R4ship − r4_hdr = 4·nrec`, zero residual over 24 blobs. So the
 admissible **pair** `(r3_hdrarray, r4_hdr)` **exceeds** the published tax by
 `5·nrec` — 47 against 27 at `small`, 127 against 77 at `large` — and `+27 / +77`
-is not an upper bound on p16's in-contract safety tax either. Pinning the
+is not an upper bound on p16's in-contract safety tax either.~~
+**WITHDRAWN AT TASK_028.** TASK_023 did search the R4 side and `R4ship − r4_hdr
+= 4·nrec` is a correct measurement over 24 blobs, but **`r4_hdr` is not a p16
+rung** — `read_unaligned` is `is not supported` at the pinned vstd and the
+`identity` pin needs a verifying byte-identical R5, so shipping it costs a new
+trusted item (§10a.1's own table already says so). `(r3_hdrarray, r4_hdr)` is
+therefore not a pair of rungs, **p16's R4 side has never moved by a single
+admissible instruction**, and `+27 / +77` *is* an upper bound on
+`inf(in-contract R3) − R4ship` — the only quantity it ever bounded. Pinning the
 comparison tokens narrows the admissible class; it does not
 pick a point in it, and the claim that it "makes `R3 − R4` a difference in
 safety rather than in representation" is withdrawn.
@@ -212,7 +220,9 @@ Read per unit of the thing each rung is doing:
   "cheapest found", never "minimum"**, and name the spelling, because the
   cheapest spelling is not even the same on the two blobs. The one-sided *form*
   is all that survives TASK_023, which measured the **R4** side moving by
-  `4·nrec` and an admissible pair exceeding `+27 / +77` by `5·nrec` (§10a); the
+  `4·nrec` and an "admissible" pair exceeding `+27 / +77` by `5·nrec` (§10a)
+  — **and at TASK_028 that pair is not admissible either**, because `r4_hdr` is
+  not a rung, so the one-sided form survives *intact* rather than as a remnant; the
   lever that makes the figure negative is the **fold spelling**, licensed by the
   same declaration and larger than both — §10a.2. Note what §10a.2 does **not**
   show: the six unsafe-side chunked probes are **not admissible R4 rungs** (the
@@ -1281,17 +1291,23 @@ rewrite the path to the real, hashed `common/driver.rs`.
    folds** (TASK_023_REVIEW, TASK_024, TASK_025_REVIEW major 3; §10a.2). It is
    *cheapest found* and not a minimum: four successive values of this number
    have now been overturned by the next search. The pairing — R4 held fixed by
-   fiat — is still the **only** thing `+27 / +77` bounds. **The *R4* side has
+   fiat — is still the **only** thing `+27 / +77` bounds. ~~**The *R4* side has
    now been searched (TASK_023, §10a.1) and it moves by `4·nrec`**, so
    `+27 / +77` is not an upper bound on p16's in-contract safety tax: the
-   admissible pair `(r3_hdrarray, r4_hdr)` exceeds it by `5·nrec`. ⚠ The
+   admissible pair `(r3_hdrarray, r4_hdr)` exceeds it by `5·nrec`.~~
+   **WITHDRAWN AT TASK_028**: `r4_hdr` is not a rung, so nothing admissible
+   exceeds `+27 / +77` and the fixed-R4 reading is not a fallback but the whole
+   story. ⚠ The
    sentence that used to close this item — *"R4 is defined by permission, so
    `inf(R4) ≤ inf(R3)` by construction"* — is **withdrawn**: p16's `identity`
    pin makes an R4 a program that must have a verifying byte-identical R5, so
    the R4 class is bounded by what vstd can express and the R3 class is not
    (TASK_025_REVIEW blocker 1; `.memory/01-ladder.md`'s R4-by-permission
-   paragraph now carries the correction project-wide). The R4 side moving is a
-   *measurement*, and it stands on its own.
+   paragraph now carries the correction project-wide). ~~The R4 side moving is a
+   *measurement*, and it stands on its own.~~ **It does not** (TASK_028): the
+   measurement stands, but it is a measurement of a **control**, and the same
+   `identity` argument that withdrew `inf(R4) ≤ inf(R3)` two sentences up
+   disqualifies `r4_hdr` as well. One argument, both consequences.
 4. **`spec.md` ground (ii) is withdrawn.** Pinning `end - p >= 3` and
    `vlen > end - (p + 3)` does **not** make `R3 − R4` "a difference in safety
    rather than a difference in representation". It narrows the class of
@@ -1346,9 +1362,14 @@ every digest reproduces §10a's table byte for byte: `07b07f1a8055` (R3 ship,
 residual on the same 24 points**, including the residue-dependent
 `R3ship − R4ship = 7 + 5·nrec` (`vlen ≡ 0 mod 4`) / `7 + 7·nrec`.
 
-**What it refutes.** `R3ship − R4ship` is not an upper bound on the in-contract
-safety tax, because both rungs are spellings and the admissible **pairs** form
-an interval.
+**What it refutes.** ~~`R3ship − R4ship` is not an upper bound on the
+in-contract safety tax, because both rungs are spellings and the admissible
+**pairs** form an interval.~~ **WITHDRAWN AT TASK_028.** Both rungs are
+spellings, but only one of them is *free*: the `identity` pin chains R4 to what
+vstd can verify, and every R4 spelling in this section that moves fails it.
+`R3ship − R4ship` bounds `inf(in-contract R3) − R4ship` and always did; what
+this section really refutes is the narrower and still-important claim that
+**the shipped R3 is the cheapest admissible spelling**, which is false.
 
 > ⚠ **The interval printed below is REFUTED — every number in it, and the sign
 > of its bottom endpoint. TASK_023_REVIEW.** It was computed from a **two-lever**
@@ -1361,6 +1382,19 @@ an interval.
 > reproduce exactly and because the "what it refutes" argument is still the
 > right argument; the *width* is not p16's uncertainty band and must not be
 > quoted as one. §10a.2 has the replacement and the mechanism.
+>
+> ⚠ **AND AT TASK_028 THERE IS NO REPLACEMENT EITHER — p16 PUBLISHES NO PAIR
+> INTERVAL.** Both the 2-lever interval below and the −239…+236 / −2449…+2244
+> one that replaced it take their R4 endpoints from `r4_hdr` and the unsafe-side
+> `chunks_exact` folds, and **neither family is a p16 rung**: `read_unaligned`
+> is unsupported (one new trusted item) and `chunks_exact`/`ChunksExact`/
+> `by_ref`/`TryFromSliceError`/`get_unchecked` are unsupported (five). With no
+> admissible R4 that moves, a pair interval over the admissible class is
+> **degenerate** — its R4 endpoint has zero measured width, so it is the
+> R3-side span under a second name. What p16 publishes is the **fixed-R4
+> bound** and the **R3-side span**, and nothing that differences two searched
+> sides. It stops being degenerate the day somebody builds the hand-unrolled
+> 32× fold (§10a.2), which nobody has.
 
 | endpoint | pairing (`nrec ≥ 3`) | law (`vlen ≡ 0 mod 4` / else) | `small` / `large` |
 |---|---|---|---|
@@ -1376,7 +1410,9 @@ than the cheapest; the endpoints become 10…20 / 12…22 at `nrec` 1 and 13…2
 points**, and the pair `(r3_hdrarray, r4_hdr)` exceeds it by exactly `5·nrec`
 (`nrec` from the safe side + `4·nrec` from the unsafe side) with **zero residual
 on all 24** — that pair is the interval's top only for `nrec ≥ 3`, but it
-exceeds the published figure everywhere. ~~The interval is **111% / 109% of the
+exceeds the published figure everywhere. **`(r3_hdrarray, r4_hdr)` is not a
+pair of rungs** (TASK_028): `r3_hdrarray` is, `r4_hdr` is not, so the `5·nrec`
+excess is a fact about a safe rung differenced against a control. ~~The interval is **111% / 109% of the
 published tax** wide at `small` / `large`, rising to 159% at `nrec` 16.~~
 **Withdrawn: the measured widths are 1759% / 6095%** (TASK_023_REVIEW), and the
 comparison of that width against p05's was withdrawn outright rather than
@@ -1443,14 +1479,24 @@ shape of defect this file has now shipped twice.**
   again, to 2545 at `chunks_exact(64)`. Five published p16/p05 "minima" have now
   been overturned by the next search.
 
-**The difference from p05 is the shape, and it is the sharper half.** p05's R4
+~~**The difference from p05 is the shape, and it is the sharper half.** p05's R4
 side moved by a **constant** (7 flat); p16's moves by a **coefficient**
 (`4·nrec`). So on p16 the pairing convention does not merely shift the intercept
 of the published law — it changes the `nrec` coefficient from 1 to 10 (`vlen ≡ 0
 mod 4`) or 3 to 12, i.e. across the whole interval. p05's §14h.6 found the same
 thing on its own axis (coefficient 2…6 over free pairings). **The `O(nrec)`
 *shape* of p16's headline survives; its coefficient is a property of the pairing
-convention, not of the pattern.**
+convention, not of the pattern.**~~
+
+**WITHDRAWN AT TASK_028 — the two patterns are the same shape after all, and it
+is `0`.** Neither R4 side moves admissibly: p05's constant is `c4_hu16_nz` and
+p16's coefficient is `r4_hdr`, and both need a vstd feature that is
+`is not supported` at the pin. Over the *admissible* class the pairing convention
+has nothing to choose between on either pattern, so it shifts neither intercept
+nor coefficient, and the `O(nrec)` shape of p16's headline is a property of the
+pattern rather than of the convention. The comparison this paragraph drew — one
+pattern's constant against the other's coefficient — was a comparison of two
+controls.
 
 **Method.** `.temp/p23/probe.py` (R4 side, generation + build + token grep +
 digests + equivalence + marginals) and `.temp/p23/probe2.py` (R3 side, same
@@ -1524,15 +1570,16 @@ refutes §10a.1's interval, §10's `+19 / +45`, and the per-byte null.
 | `chunks_exact(8)` + `try_into::<[u8;8]>()` | 8 | **6.62500** | 53 / 8 | TASK_024 |
 | `chunks_exact(4)` + `try_into::<[u8;4]>()` | 4 | **6.50000** | 26 / 4 | TASK_024 |
 | **shipped R3 and shipped R4** (rolled in source, LLVM unrolls 4×) | 4 | **5.75000** | 23 / 4 | §3, both |
-| manual 16× unroll, subtraction-first guard | 16 | 5.37500 | — | TASK_023_REVIEW |
+| manual 16× unroll, subtraction-first guard **†** | 16 | 5.37500 | — | TASK_023_REVIEW |
 | `chunks_exact(4)` and `(8)` **without `try_into`** | 4, 8 | **5.37500** | 43 / 8 | TASK_025_REVIEW |
-| manual 32× unroll (2 induction vars, so `5 + 6/K`) | 32 | 5.18750 | — | TASK_023_REVIEW |
+| manual 32× unroll (2 induction vars, so `5 + 6/K`) **†** | 32 | 5.18750 | — | TASK_023_REVIEW |
 | `chunks_exact(16)` | 16 | **5.18750** | 83 / 16 | both |
 | `chunks_exact(16)` without `try_into` | 16 | **5.18750** | 83 / 16 | TASK_025_REVIEW |
 | `chunks_exact(32)` | 32 | **5.09375** | 163 / 32 | both |
 | `chunks_exact(64)` | 64 | **5.04688** | 323 / 64 | TASK_024 |
 
-Reproduce the whole table with
+Reproduce **8 of the 10 rows** — every row with a `chunk-body insns` figure —
+with
 
 ```
 python3 patterns/p16-tlv-walk/controls/gen_controls.py --build
@@ -1540,7 +1587,19 @@ python3 patterns/p16-tlv-walk/controls/foldcmp.py
 ```
 
 which prints the body length, the `movzbl` count and `body/K` for each `K` on
-both sides. **The earlier band construction is superseded and is recorded only
+both sides.
+
+**† The two manual-unroll rows are NOT reproducible from the committed tree**
+(TASK_027_REVIEW minor; corrected here at TASK_028, which said "reproduce the
+whole table" and did not). Their `chunk-body insns` cell is `—` because no
+committed variant emits them: `gen_controls.py`'s 18 variants are the
+`chunks_exact` family and the header/walk respellings, and nobody has committed
+a hand-unrolled fold. The two rates are TASK_023_REVIEW's arithmetic on
+`5 + 3/K` and `5 + 6/K`, kept because they are the reason the fold spelling is
+not pinned — an exclusion aimed at `chunks_exact` moves the cheapest admissible
+safe spelling into the manual-unroll family rather than restoring `+19`. Until
+somebody builds one, read those two rows as predictions, not measurements. That
+build is queue item 2a. **The earlier band construction is superseded and is recorded only
 because its weakness is the finding.** TASK_024 read these rates off three
 binary-differenced pairs — `sweep-v56 → sweep-v88`, `sweep-v2040 →
 sweep-v2072`, and a scratch mod-64 triple — and called them "three
@@ -1926,6 +1985,11 @@ p05's **46-spelling** one — the same "one interval is not the other's peer"
 error, one level down, as the *"p05's declaration is the loosest of the set"*
 claim it was written to replace. Two intervals are comparable when the searches
 behind them are, and no two searches on this project are.
+
+**And at TASK_028 there are no intervals left to compare.** p05's is withdrawn
+(both endpoints inadmissible R4s) and so is p16's, for the same reason. Two
+published, two withdrawn, neither replaced. Do not re-derive a "which
+declaration is loosest" claim from any number in either file.
 
 ### Method, and the reproduction path (repaired at TASK_027)
 

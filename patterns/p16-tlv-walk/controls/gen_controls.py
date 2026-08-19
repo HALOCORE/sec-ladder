@@ -94,8 +94,14 @@ substitution of the **value fold** into a shipped rung, safe side from
     5.37500 Ir/byte and is 1509 Ir/call *cheaper* than the shipped R4 at
     `large`.
 
-**None of the sixteen is a candidate rung, and the unsafe eight cannot be one at
-all.** That is not a stylistic preference: this pattern's `identity` pin is
+**Eighteen files, sixteen respellings**: `s_ship` and `u_ship` are copies of the
+shipped rungs and therefore *are* rungs, so wherever this file counts admissible
+candidates the figure is sixteen and wherever it counts generated files the
+figure is eighteen. (TASK_027_REVIEW read the two counts as a contradiction —
+they are not, but nothing said so, and TASK_028 wrote it down.)
+
+**None of the sixteen respellings is a candidate rung, and the unsafe eight
+cannot be one at all.** That is not a stylistic preference: this pattern's `identity` pin is
 `unsafe ≡ verus, O3 exact`, so an R4 must have a byte-identical R5 that Verus
 verifies, and at the pinned vstd `chunks_exact`, `ChunksExact`, `by_ref`,
 `TryFromSliceError` and `get_unchecked` are each unsupported — shipping `u_c32`
