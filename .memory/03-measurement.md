@@ -567,6 +567,29 @@ five imported modules plus `check.py` is a judgement call (belt-and-braces canno
 under-cover, and the tax is per edit event) — but it is the same false positive
 this project warns about one level up.
 
+### `results/*.json` is kernel-exclusive for EVERY pattern — there is no p03-vs-p11 rule conflict
+
+**Checked at TASK_036_REVIEW.** `results/p03-bounded-stack.json`,
+`results/p11-nul-scan.json` and `results/p16-tlv-walk.json` all carry the
+*identical* protocol string — *"callgrind per-function exclusive Ir, kernel symbol
+only; whole-program summary deliberately not recorded"* — because it is
+`harness/measure.py`'s hardcoded protocol for every pattern. p11's and p03's
+`NOTES.md` prose about **which column to quote** is a compatible refinement of
+that, not a contradiction:
+
+- **p11**: the *rungs call different library routines*, so the kernel-exclusive
+  column omits different amounts per rung and the **whole-program marginal** is
+  what its rung comparisons must use.
+- **p03**: its `[0u64; 64]` lowers to a `memset` whose path length depends on the
+  array's alignment — which moves with **the probe file's path length** (±7
+  Ir/call on byte-identical kernels) — so the **kernel-exclusive** column is the
+  stable one.
+
+**The discriminator is not "does the kernel call out". It is: does the callee have
+a data-dependent path length, and is that dependence shared by every rung?**
+p03 is also the second pattern whose whole-program marginal does not cancel the
+environment, and the first where the mechanism is a **stack** buffer's alignment.
+
 ### This box's `ns` noise floor is a SESSION property, not a constant
 
 **Measured at TASK_035, and it is why a wall-clock row can stop being quotable

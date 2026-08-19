@@ -176,7 +176,19 @@ measured width. (An earlier manager note said it "is identical to the fixed-R4
 bound"; that is **wrong** — the fixed-R4 bound is a single number and sits
 *inside* the span.) State the degeneracy rather than the absence: it is
 falsifiable in one sentence, and **it stops being degenerate the day somebody
-builds an admissible R4 that moves.** Nobody has, on any pattern.
+builds an admissible R4 that moves.**
+⚠ **ANSWERED AT p03 (TASK_036_REVIEW). Somebody built one.** `m_clamp_unsafe` —
+R4 plus a *dead* `if sp > STACK_CAP { return 0; }` — has a twin that verifies
+**`9 verified, 0 errors`** with **zero new trusted items**, holds the `identity`
+pin byte-for-byte (`md5_fn 40d374bfb669`, `md5_raw` equal), is in contract by the
+gate's own matcher, and measures **−118 on `small` / +497 on `large`** against
+`R4ship`. So p03 has a **non-degenerate pair interval**, the first on this
+project, and "nobody has, on any pattern" is retired.
+**And the asymmetry is measured on the same pattern**: the *safe* side's cheapest
+lever is `assert!(sp <= STACK_CAP)`, and on the unsafe side that is
+`error: panic is not supported` — so the safe class reaches a spelling the unsafe
+class cannot. Third measured instance of the R4-by-permission result, and the
+first where the safe-side lever is a **one-line assertion**.
 
 **How to tell a legitimate declaration edit from self-certification — the
 direction test (TASK_019).** The obvious guard is *provenance*: "this edit was
@@ -1292,6 +1304,80 @@ places and points at nothing. **Name the pattern, never the number.**
    is separately forbidden by p11's `idiom.forbidden[1]`. R3−R4 changes sign at
    string length 17–18, at `core::slice::memchr`'s 16-byte threshold, and
    `small`/`large` are specified on opposite sides of it.
+
+10. **p03 — the safety tax IS the price of the optimiser failing the invariant
+   the proof proves, on a LINEAR fact; and it is not a fact about Rust.**
+   (TASK_036, reviewed at TASK_036_REVIEW: the causal claim **confirmed** with
+   three negative controls, two blockers and two majors against the prose.)
+
+   **The control.** `m_clamp` = R3 plus a *dead* `if sp > STACK_CAP { return 0; }`
+   — R5's own invariant handed to LLVM. Safe goes **17 → 13** Ir per executed pop,
+   unsafe **14 → 13**, and **the gap goes to exactly zero on both sides**, zero
+   fitted parameters, max residual 0.000000 over 19 blobs. **Three negative
+   controls say it is the INVARIANT and not range propagation in general:**
+   `sp > 1000` is **byte-identical to shipped R3** (nothing); `sp > 65`, one past
+   the invariant, leaves the check standing *and* is dearer; a non-dead early
+   return that says nothing about `sp` is dearer with the check standing.
+
+   **This generalises p05's reinstated causal sentence (finding 6) from a
+   NONLINEAR fact to a linear one** — nonlinearity was p05's whole stated excuse
+   for why LLVM could not do it. **But two qualifications are mandatory and both
+   were measured:**
+
+   1. ⚠ **It is NOT Rust-specific.** Give the C rung a manual bounds check on the
+      pop read and **clang keeps it at 4.00000 Ir per executed pop, exactly**;
+      gcc keeps it too. Hand either the identical clamp and **both delete 100% of
+      it**, with the clamped-with-check binary **byte-identical** to the
+      clamped-without-check one. **Two independent middle-ends fail the same
+      lemma the same way**, and gcc shares none with rustc. Write it as *"any
+      compiler asked to prove this"*, never as *"safe Rust"*.
+   2. ⚠ **LLVM does eventually DERIVE the fact.** In `m_clamp`'s output the clamp
+      is *gone* and its `return 0` semantics is not preserved on the `sp > 64`
+      path — LLVM concluded that path unreachable, i.e. it did derive
+      `sp ≤ STACK_CAP`. What it cannot do is find the fact **unseeded**. So this
+      is analysis **seeding / phase ordering**, not an inability to prove the
+      lemma — a different failure from p05's, where the fact itself is nonlinear.
+
+   **The laws** (max residual 0.0000, 89 blobs, three bands; the pooled design is
+   rank 5/5 and **every pair of bands is rank-deficient**, so only the pooled fit
+   identifies the terms):
+
+   | quantity | law |
+   |---|---|
+   | `R1h − R1`, the emptiness check in C | `2.00000 · xpop`, exact, gcc and clang identical |
+   | `R3ship − R4ship` | `3.00000 · xpop + 5` |
+   | on push / dropped push / empty pop | 0.00000 / 0.00000 / 0.00000 |
+
+   ⚠ **`3.00000` is the SHIPPED SPELLING's rate, not the class's.** In contract
+   the class reaches **1.00000** (`assert!` in the pop arm) and **−1.00000**
+   (`assert!(sp <= STACK_CAP)` at the loop head, which is *byte-identical* to
+   `m_clamp`). p03's in-contract R3-side span is **−113 … +5110** on `small` and
+   **+212 … +17237** on `large`, and **the cheapest spelling differs between the
+   two blobs** — one more instance of "a cheapest-found figure must name its
+   input".
+
+   ⚠ **The "same basic block" mechanism is REFUTED.** Hoisting the push guard into
+   the loop head (`let can_push = sp < STACK_CAP;`) is **byte-identical to shipped
+   R3** — LLVM normalises the hoist away and still deletes the check. **The real
+   discriminator: the push guard supplies the UPPER bound the access needs,
+   locally; the pop guard supplies only the LOWER bound, and the upper must come
+   from the loop-carried invariant.** Confirmed by two in-contract controls
+   (`if sp > 0 && sp <= STACK_CAP`, and the assert in the pop arm) which both go
+   to 13–15 with the check deleted.
+
+   **The bug**: `sp−1` at 0 wraps to `stack−1`, eight bytes below the array and
+   **inside the kernel's own frame** — it does not fault, it returns a wrong
+   answer, and **R1's checksum is not reproducible across runs** (bit-stable only
+   under `addr-no-randomize`). A **pointer**-disclosure shape, distinct from p17's
+   data disclosure. UBSan beats ASan here because the array has a static type. A
+   sustained underflow faults at exactly the 8 MiB `ulimit -s`.
+
+   **Verus 9/0 on the first run**, Z3 taking `sp <= STACK_CAP` across the
+   attacker-chosen branch in one invariant clause — no lemma, no
+   `nonlinear_arith`. TCB 10 lines / 5 items. And **the gate earned its keep on a
+   trusted item**: a tautological `v@.len() == 64` on a `&[u64; 64]`, caught by
+   5c-twin's per-conjunct deletion probe — the first time that TASK_010 refinement
+   has fired on shipped code rather than a constructed mutant.
 
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how
