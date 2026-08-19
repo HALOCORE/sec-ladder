@@ -63,7 +63,22 @@ context still applies — do not restart from scratch.
    authoritative. A number that has not survived a review does not belong in it.
    If a finding must be recorded before review, mark it **PROVISIONAL — not yet
    reviewed** in the text itself.
-10. **Ask the review for the mechanism, not just the number.** p05's review was
+10. **Write the report file BEFORE citing it.** A subagent's report exists only in
+    its return message; if the manager lands the corrections and moves on, the
+    `.tasks/TASK_NNN_REVIEW_REPORT.md` everything now points at was never created.
+    This happened at TASK_027_REVIEW — three dangling citations, two of them in
+    `.memory/`, the layer this project calls authoritative — and it was found by
+    the next engineer, not by the manager. The check is one command and costs
+    nothing:
+
+    ```bash
+    grep -rho '\.tasks/TASK_[A-Za-z0-9_]*\.md' .memory/ .tasks/ RECAP.md \
+      | sort -u | while read p; do [ -e "$p" ] || echo "MISSING: $p"; done
+    ```
+
+    Run it before every commit that cites a report. (`TASK_NNN.md` in this file is
+    a placeholder and will always show up; ignore that one.)
+11. **Ask the review for the mechanism, not just the number.** p05's review was
    asked "if five rungs emit identical mnemonics, where did the bounds check go?"
    and came back with the hoisted trip-count computation, the surviving scalar
    epilogue, the `cmove` that forces a zero remainder to a full vector width, and
