@@ -15,9 +15,9 @@ Rust, unsafe Rust + Verus proof — plus a sixth **R1h** hardened-C cell, across
 optimisation levels and two inline modes, and compared on assembly, executed
 instructions, timing, proof burden and trusted-base size.
 
-47 patterns are catalogued in `.memory/06-catalogue.md`. **Eight exist and all are
-green. Seven are reviewed** (p11 is built, green and **UNREVIEWED** — rule 9, its
-findings are in `patterns/p11-nul-scan/NOTES.md` and deliberately not in
+47 patterns are catalogued in `.memory/06-catalogue.md`. **Nine exist and all are
+green. Eight are reviewed** (p03 is built, green and **UNREVIEWED** — rule 9, its
+findings are in `patterns/p03-bounded-stack/NOTES.md` and deliberately not in
 `.memory/` yet)**:** p01 (calibration), p02 (first real bug), p16 (first
 data-dependent bound), p17 (the limit of memory safety), p05 (the first
 vectorised kernel), p08 (the first structural Rust win). **p07 (binary search) is
@@ -41,7 +41,7 @@ claim.
 ## The findings so far — this is the actual output
 
 **Numbering warning, because it has already cost an agent time.** The list below
-is **RECAP's own digest** and is numbered 1–17. `.memory/01-ladder.md` has a
+is **RECAP's own digest** and is numbered 1–18. `.memory/01-ladder.md` has a
 *different* list, numbered 1–7, one entry per pattern, and **that one is
 authoritative**. "Finding 12" means different things in the two files. When
 writing a task file, name the pattern (*"p05's causal claim"*), never the number.
@@ -476,6 +476,52 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    and that is more interesting than the claim it replaces. Neither route is free;
    see `.memory/04-verus.md`.
 
+18. **p03 — the same check, deleted on push and kept on pop, in one function
+   with one constant; and a zero-parameter control that takes the gap to exactly
+   zero.** ⚠ **UNREVIEWED (TASK_036).** First kernel whose **control flow is
+   attacker-chosen** (the opcode stream is in the file), first whose safety law is
+   per *executed operation*, first bounded by Rust's **borrow checker** as well as
+   by vstd.
+
+   **The laws — max residual 0.0000 over 89 blobs, three bands:**
+
+   | quantity | law |
+   |---|---|
+   | `R1h − R1`, the emptiness check in C | **`2.00000 · xpop`** — exact, **gcc and clang identical** |
+   | `R3 − R4`, safe Rust's surviving check | **`3.00000 · xpop + 5`** |
+   | `R3 − R4` on push / dropped push / empty pop | **0.00000 / 0.00000 / 0.00000** |
+
+   **So the same check is eliminated on the push side and survives on the pop
+   side, in one function with one compile-time bound of 64.** The discriminator is
+   whether the guard sits in the *same basic block* as the index (`if sp <
+   STACK_CAP`) or a loop invariant away from it, across the attacker-chosen
+   branch.
+
+   ⚠ **And the control is the finding.** `m_clamp` = R3 plus a **dead**
+   `if sp > STACK_CAP { return 0; }` — R5's invariant handed to LLVM. Safe goes
+   17 → 13 per pop, unsafe 14 → 13, and **the gap goes to exactly zero on both
+   sides**, zero fitted parameters. That is p05's reinstated *"the price of the
+   optimiser failing the lemma the proof proves"* — **on a LINEAR fact**, where
+   p05's stated excuse was nonlinearity (finding 12). Masking (`stack[sp & 63]`)
+   removes only 1.00000 of the 3.
+
+   **The bug is not a wild address**: `sp−1` at 0 wraps to `stack−1`, eight bytes
+   below the array and **inside the kernel's own frame**. It does not fault; it
+   returns a wrong answer, and **R1's answer is not reproducible across runs** —
+   bit-stable only under `addr-no-randomize`, so the checksum leaks something
+   ASLR-derived. A *pointer*-disclosure shape, distinct from p17's data
+   disclosure. UBSan beats ASan here because the array has a static type. A
+   sustained underflow faults at exactly the 8 MiB `ulimit -s`.
+
+   **The branch lever is cleaner than p07's compiler flag**: same op count, same
+   POP count, same value stream, only the *order* differs — `Ir` identical to the
+   instruction, `Bc` identical to the branch, `D1mr` 0.00, and **`Bcm` moves 116×
+   to 0.5002/op, exactly the coin-flip value.**
+   **The gate earned its keep on a trusted item**: two defects in the first draft,
+   including a tautological conjunct caught by 5c-twin's per-conjunct deletion
+   probe — **the first time that TASK_010 refinement has fired on shipped code
+   rather than a constructed mutant.**
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds
@@ -610,7 +656,7 @@ headline. Say so in every task file.
 - **A tool that reports nothing may be a tool that cannot see.** ASan is silent
   on p08's overlap not because there is none but because fortify rewrote the call
   to `__memcpy_chk`. A gate row records `clean` for both reasons identically.
-- **Two files, two numbering schemes.** RECAP's findings are numbered 1–17,
+- **Two files, two numbering schemes.** RECAP's findings are numbered 1–18,
   `.memory/01-ladder.md`'s are 1–7. Name the pattern, never the number.
   **And one task file is misnumbered**: `.tasks/TASK_025_REVIEW.md` reviews
   **TASK_024**, not TASK_025 (there is no TASK_025). Every other

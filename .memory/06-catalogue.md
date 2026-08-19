@@ -284,7 +284,7 @@ supersede any earlier task report they contradict.
 |---|---|---|---|---|
 | p01 | array reduce / prefix scan | none (calibration) | trivial | **done** (T002/T003/T005), gate green, R5 == R4 byte-identical at O3 |
 | p02 | length-prefixed buffer copy (`memcpy` w/ attacker length) | spatial OOB write | easy | **done** (T004), reviewed (perf headline refuted at T006), re-measured T011; gate `PASS`, R5 == R4 `exact` at O3 / `norel` at O0; **the project's strongest security result** — idiomatic C prints a plausible answer and exits 0 in 7 of 8 builds on a one-byte overflow, the 8th aborting only on this box's `_FORTIFY_SOURCE 3` default |
-| p03 | bounded queue / stack, array-backed | index underflow on empty pop | easy | planned |
+| p03 | bounded stack over an attacker-chosen opcode stream | index underflow on empty pop — `sp−1` at 0 wraps to `stack−1`, **inside the kernel's own frame** | easy | **done** (T036), gate `PASS` first complete run, R5 **9/0 first run**, R4 == R5 `exact`. **UNREVIEWED**. First kernel whose *control flow* is attacker-chosen; first whose safety law is per *executed* operation; first bounded by Rust's **borrow checker** as well as vstd |
 | p04 | ring buffer with wraparound | modular index, aliasing | moderate | planned |
 | p05 | 2-D index flattening / matmul (`i*n+j`) | dimensions trusted vs buffer; overflow in the check | moderate | **done** (T013), gate PASS first run, R5 == R4 `exact` at O3; safety moves from per-element to **per-row**, and gets *worse* with wider lanes |
 | p06 | in-place reverse / rotate / swap | aliasing, permutation invariant | moderate | planned |
