@@ -1167,10 +1167,73 @@ places and points at nothing. **Name the pattern, never the number.**
    count is that **no pattern has yet shown safe Rust paying an unavoidable
    per-element price.** Do not write "p08 restores the streak"; there was no
    break.
+   ⚠ **That last sentence was true when written and is now ANSWERED — see finding
+   8 (p07).** Safe Rust pays `6.0000` Ir per probe on a kernel with no inner loop,
+   and the fraction rises in both `n` and `nq`. The six patterns before it shared
+   a loop shape, and that is what they were measuring.
+
+8. **p07 — the first pattern where R3's tax has NO axis along which it
+   amortises, and the answer to "no pattern has yet shown safe Rust paying an
+   unavoidable per-element price" directly above.** (TASK_026, reviewed at
+   TASK_026_REVIEW; headline confirmed, the manager's framing of it refuted.)
+
+   Binary search: `Θ(log n)` probes, **no inner loop to amortise a per-call
+   constant over**. Matched-spelling laws, exact integers, verified **out of
+   sample** on 30 fresh blobs with an independent probe-count implementation
+   (30/30 exact), and re-derived from the listings rather than fitted:
+
+   ```
+   R3 − R4 =  9 +  4·nq +  6·probes      (one two-sided slice range check)
+   R2 − R4 = 36 + 11·nq + 11·probes      (four one-sided index checks)
+   probes  = nq·⌈log2 n⌉  (data-dependent; use the EXACT count replayed from the
+                           file — ⌈log2 n⌉ leaves 600–1250 residuals)
+   ```
+
+   **R3's share of kernel `Ir` rises in both `n` and `nq`**: 42.53% → 46.63% over
+   `n` = 7 … 16 385, asymptote `6/(12 + f_lo)` ∈ **[46.15%, 50.00%]** — 47.99% on
+   the shipped 50/50 workload. **The asymptote is a property of the kernel AND the
+   query distribution**, which is why it must be quoted with the workload.
+   **Confirmed across six deliberately different workloads** (all-hit, all-miss,
+   all-below, all-above, clustered, shipped), monotone rising in every one.
+
+   **Why this is a first, stated precisely.** p16/p17's R3 tax is a per-**call**
+   constant — 0.00000 Ir/byte swept, because the reslice sits *outside* the fold
+   loop. p05's is `O(nrow)`, which vanishes along `ncol`. **p07's vanishes along
+   nothing**, because there is no inner loop for it to be hoisted out of. That —
+   not "safety is expensive here" — is the finding, and it says the six earlier
+   answers were a property of the **loop shape** those kernels shared.
+
+   ⚠ **It is NOT "the first counterexample to safety is cheap".** The manager
+   wrote that and it is refuted by *this file*: finding 4 carries p16's swept
+   **R2** tax of 4.25 Ir/folded byte, whose fraction also rises (toward
+   `4.25/5.75` = 73.9%), reproduced on p17; finding 6 carries p05's `O(nrow)`
+   **R3** tax. **The R3 scoping is the entire claim.**
+
+   **Two structural results beside it.** The proof is 10/0 first try, and
+   `kernel` costs **3** obligations where p05's costs 5 — every multiply is by the
+   literal 4, so p07 has *zero* nonlinear arithmetic. And the half-open spelling
+   (`hi = n`, `while lo < hi`, `hi = mid`) **removes** the `usize` underflow
+   obligation rather than discharging it: **the spelling that makes the proof
+   trivial is the one that makes the bug impossible**, at zero cost in
+   instructions, obligations or TCB. The inclusive-`hi` spelling ships as a
+   control and SIGSEGVs on p07's own `small.bin` — the underflow fires on
+   *well-formed* input, any key below `elements[0]`.
+   p07's R4 side is **degenerate, third pattern running**: `r4_ptr` measures
+   −460/−1605 and its twin dies on *"dereferencing a raw pointer is not
+   supported"*, so it is not a rung. Fixed-R4 bound `+3017.14 / +10019.42`;
+   in-contract R3-side span `2554.45…3017.14 / 8412.35…10019.42`.
+
+   ⚠ **Do not quote p07's R2 `ns` numbers or the "8× conversion factor".**
+   `safe_naive`'s layout band is **28.47%** — the widest single-rung band measured
+   on this project — so neither the +28.0% nor the +3.5% has an established sign.
+   R3's counterweight (+13.0% small / +1.6% large) *does* survive bracketing:
+   bands disjoint on both inputs in two independent runs.
 
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how
 much proof keeps that base sound, and which C patterns resist this treatment.*
+**And after p07, one more: which loop shapes let a safety check amortise — because
+that, not safety, is what the first six patterns were measuring.**
 
 ## Build matrix
 

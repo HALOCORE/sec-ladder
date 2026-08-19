@@ -23,12 +23,18 @@ built, green and UNREVIEWED** — per `PROTOCOL.md` rule 9 its findings are in
 `patterns/p07-binary-search/NOTES.md` and deliberately **not** in `.memory/` yet.
 Read them as provisional; the review is the next task.
 
-⚠ **If p07 survives review it changes the headline of this document.** It is the
-first kernel here that is not a linear fold — `Θ(log n)` probes, no inner loop to
-amortise a per-call constant over — and measured over `n` = 7 … 16 385 **R3's
-cost as a fraction of kernel `Ir` rises monotonically, 42.53% → 46.63%, toward
-48.0%**. Six patterns said safety is cheap; this one says that was a property of
-the *loop shape* those six shared. See finding 15.
+**p07 changes the headline of this document, in a narrower way than it was first
+written.** It is the first kernel here that is not a linear fold — `Θ(log n)`
+probes, no inner loop to amortise a per-call constant over — and it is **the first
+pattern where R3's tax has no axis along which it amortises at all**: `6.0000` Ir
+per probe with `probes = nq·⌈log2 n⌉`, so the fraction rises in *both* `n` and
+`nq`. Survives six deliberately different query distributions, monotone in every
+one. See finding 15.
+⚠ It is **not** "the first counterexample to safety is cheap" — that sentence was
+the manager's and it was refuted at TASK_026_REVIEW against this project's own
+`.memory/`, which already records p16/p17's **R2** tax of 4.25 Ir/folded byte
+(rising, toward 73.9%) and p05's `O(nrow)` **R3** tax. The R3 scoping is the whole
+claim.
 
 ## The findings so far — this is the actual output
 
@@ -323,41 +329,47 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    not exist. And **never a per-byte difference across unmatched fold
    spellings**.
 
-15. **p07 — safety stops being cheap when there is no inner loop, and `Ir` and
-   `ns` disagree in *direction* with a named mechanism.** ⚠ **UNREVIEWED
-   (TASK_026); everything here is provisional and lives in
-   `patterns/p07-binary-search/NOTES.md`.**
-   Binary search: `Θ(log n)` probes, nothing to amortise a per-call constant
-   over. **R3's share of kernel `Ir` rises monotonically with `n` — 42.53% →
-   46.63% over `n` = 7 … 16 385, converging to `6.0000/12.5035` = 48.0%.** Six
-   patterns said safety is cheap; on the evidence so far that was a property of
-   the **loop shape** all six shared, not of safety.
-   The laws are **exact integers, zero fitted parameters, residual 0.00 over 113
-   swept blobs**, and both are re-derived from the listings rather than fitted:
-   `R2 − R4 = 36 + 11·nq + 11·probes` (four one-sided index checks) and
-   `R3 − R4 = 9 + 4·nq + 6·probes` (one two-sided slice range check). The x-axis
-   is the **exact probe count replayed from the file**; `⌈log2 n⌉` leaves
-   600–1250 residuals.
-   **The `Ir`/`ns` result, which needed two controls to be sayable.** Every
-   *source-level* branchless spelling is converted back to a branch by LLVM's
-   `X86CmovConverterPass` and measures the shipped rung exactly — the lever is
-   the pass, not the source. Disabling it on **unchanged** source gives
-   **+10.07% `Ir` → −18.13% `ns`** (`small`) and **+10.94% → −9.98%** (`large`),
-   bands non-overlapping. And the same +87.8% R2 gap is worth **28.0%** of wall
-   clock on the L1-resident input and **3.5%** on the memory-bound one: **the
-   `Ir`→`ns` conversion factor is a property of the *input*, program held
-   fixed.**
-   **Layout had to be controlled first, and it is the widest confound this
-   project has measured**: two binaries with *identical* `Ir` differ **32%** in
-   `ns`, and the *same machine code at seven different addresses* spans **6%** on
-   `small`. No `ns` ranking on an L1-resident kernel is readable below that band.
-   Two more: p07's R4 side is **degenerate, third pattern running** (`r4_ptr`
-   measures −460/−1605 and its twin dies on *"dereferencing a raw pointer is not
-   supported"*, so it is not a rung — the §0 rule fired on its first outing); and
-   the catalogue's stated bug for p07 was **wrong**, midpoint overflow being
-   unreachable by 2.1e9 because the `u32` header field binds long before RAM
-   does, while the reachable overflow is in the *length check* (`4·n + 4·nq`
-   needs 36 bits, fooled at an 88-byte window).
+15. **p07 — the first pattern where R3's tax has NO axis along which it
+   amortises.** (TASK_026, reviewed at TASK_026_REVIEW: headline **confirmed**,
+   two majors and five minors against the surrounding prose.)
+   Binary search: `Θ(log n)` probes, no inner loop. **R3 costs `6.0000` Ir per
+   probe with `probes = nq·⌈log2 n⌉`, so its share of kernel `Ir` rises in both
+   `n` and `nq`** — 42.53% → 46.63% over `n` = 7 … 16 385. The asymptote is
+   `6/(12 + f_lo)` ∈ **[46.15%, 50.00%]**, 47.99% on the shipped 50/50 workload:
+   fixed by the kernel *and* the query distribution, not by the kernel alone.
+   **Confirmed across six deliberately different workloads** — all-hit, all-miss,
+   all-below, all-above, clustered, shipped — monotone rising in every one, so it
+   is not an artefact of the query mix. The laws are exact integers verified
+   **out of sample** on 30 fresh blobs with an independent probe-count
+   implementation: `R3 − R4 = 9 + 4·nq + 6·probes`,
+   `R2 − R4 = 36 + 11·nq + 11·probes`, 30/30 exact.
+   ⚠ **What this is NOT: "the first counterexample to safety is cheap".** That was
+   the manager's sentence and `.memory/01-ladder.md` already refuted it — p16/p17
+   carry a swept **R2** tax of 4.25 Ir/folded byte whose fraction also rises
+   (toward 73.9%), and p05 an `O(nrow)` **R3** tax. What is new is the *R3*
+   scoping and the *no axis* part: p16/p17's R3 tax is a per-**call** constant
+   (0.00000 Ir/byte, the reslice sits outside the fold loop) and p05's is
+   `O(nrow)`, which vanishes along `ncol`. p07's vanishes along nothing.
+   **The `Ir`-vs-`ns` half is real and was tightened, not broken.** Disabling
+   LLVM's `X86CmovConverterPass` on unchanged source gives +10.07% `Ir` → −18.13%
+   `ns`, and the review closed both of the delivery's own caveats: a
+   symbol-by-symbol diff of the two whole binaries found **559 symbols, exactly
+   one different**, and `--cache-sim` showed the lever locality-neutral (`D1mr`
+   1076.82 on both). **Branch misprediction is measurable on this box after all**
+   — `callgrind --branch-sim=yes` — see `.memory/00-environment.md`.
+   Sharper still, with no compiler flag: changing only the *workload* makes the
+   same binary execute **+7.84% more instructions in 71.75% less time**.
+   ⚠ **Do not quote p07's R2 `ns` numbers.** `safe_naive`'s layout band is
+   **28.47%** — the widest single-rung band this project has measured — so the
+   "+28.0% small / +3.5% large, an 8× conversion factor" claim has **no
+   established sign** and is withdrawn pending a bracketed re-measurement. R3's
+   counterweight (+13.0% / +1.6%) *does* survive: bands disjoint on both inputs,
+   in two independent runs.
+   Two more, both confirmed: p07's R4 side is **degenerate, third pattern
+   running** (`r4_ptr` measures −460/−1605 and its twin dies on *"dereferencing a
+   raw pointer is not supported"*); and the catalogue's stated bug was **wrong** —
+   midpoint overflow is unreachable by 2.1e9 because the `u32` header field binds
+   long before RAM, while the reachable overflow is in the length check.
 
 ## Retracted — do not reinstate
 

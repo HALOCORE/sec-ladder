@@ -448,6 +448,32 @@ TASK_014_REVIEW's own write-up mixed. Rule, in both cases and now with teeth:
 **say which convention a number is in, every time — a cross-rung delta is only
 meaningful inside one convention.**
 
+### Code layout is worth up to 28% of wall clock at BYTE-IDENTICAL machine code
+
+**Measured on p07 at TASK_026 and extended at TASK_026_REVIEW.** Build the same
+source at seven alignments (`-C llvm-args=-align-all-functions=N`) and confirm the
+kernel's `md5_fn` is identical at every one, then time all seven. The spread is
+the **layout band**, and no `ns` ranking is readable inside it:
+
+| rung | `small.bin` band | spread |
+|---|---|---:|
+| `unsafe` | 13.450…14.139 ms | **5.12%** |
+| `safe_tuned` | 15.378…16.999 ms | **10.54%** |
+| **`safe_naive`** | 14.038…18.034 ms | **28.47%** |
+
+28.47% is the widest single-rung band this project has measured, and it is on the
+rung a headline was resting on. Across *different* binaries at identical `Ir` the
+figure reaches **32%**.
+
+**The rule: an `ns` claim on an L1-resident kernel must be published as an
+interval, computed from both rungs' bands, and the bands must be disjoint before
+a sign is asserted.** On p07 that killed the R2 comparison (`[−0.72%, +34.08%]`,
+overlapping — no sign) and passed the R3 one (`[+8.77%, +26.39%]`, disjoint).
+A best-vs-best point estimate is not a substitute: p07's R2 point estimate was
++4.37% inside a band that spans zero. Memory-bound inputs are far safer —
+`large.bin`'s bands are 0.61%…4.00% — which is itself the warning, because the
+*cheap* input to measure is the one where layout dominates.
+
 ### A per-byte rate from a marginal pair is good to ±0.09, not to five decimals
 
 **Measured on p16 at TASK_027, and it lands on this project's most-quoted

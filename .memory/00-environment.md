@@ -133,11 +133,56 @@ bump; if they diverge, every same-backend claim in `results/` must be re-labelle
 | Missing | Consequence | Fix |
 |---|---|---|
 | `perf` | — | needs root to install |
-| `perf_event_paranoid=3` | **no hardware counters at all** (IPC, branch miss, cache miss) even if perf were installed | needs root to relax to ≤1 |
+| `perf_event_paranoid=3` | **no hardware counters at all** (IPC, branch miss, cache miss) even if perf were installed — but see the simulator note below, which is what the project should have been using for 28 tasks | needs root to relax to ≤1 |
 | `hyperfine`, `gdb`, `numactl`, `ninja` | minor; work around | — |
 
 `valgrind` and `clang` were the other two gaps. Both closed in TASK_001; they are
 in the installed table above. Hardware counters remain the only hard gap.
+
+## Branch and cache behaviour ARE measurable here — by simulation (TASK_026_REVIEW)
+
+**This was missed for 28 tasks and it cost real work.** The table above says "no
+hardware counters", and that was read across the project as *branch misprediction
+is unmeasurable on this box*, so p07 built a whole `cmov`-pass control to infer by
+construction what one flag reports directly. Callgrind 3.27.1 has both simulators
+and both run here:
+
+```
+valgrind --tool=callgrind --branch-sim=yes  ->  Bc, Bcm, Bi, Bim
+valgrind --tool=callgrind --cache-sim=yes   ->  D1mr, DLmr, I1mr, ...
+```
+
+Measured on p07 (`.temp/r26/branchsim.py`, `cachesim.py`), per call:
+
+| build | input | `Ir` | `Bc` | `Bcm` | `Bcm/Bc` |
+|---|---|---:|---:|---:|---:|
+| unsafe branchy | small | 6582.98 | 1392.09 | 271.16 | 0.1948 |
+| unsafe branchless | small | 7245.77 | 958.40 | 59.45 | 0.0620 |
+| unsafe branchy | large | 21356.70 | 4825.21 | 853.98 | 0.1770 |
+| unsafe branchless | large | 23691.98 | 3264.14 | 93.07 | 0.0285 |
+
+0.586 mispredicts per probe on a binary search is exactly what a coin-flip branch
+should give, which is the sanity check that the simulator is modelling the right
+thing.
+
+**Three rules, because a simulator is not a counter:**
+
+1. **It is a MODEL, not this CPU.** Callgrind's predictor is a generic
+   two-level scheme, not Cascade Lake's. Report `Bcm` as *simulated* and never
+   convert it to cycles without saying so. It is strong evidence about
+   *direction* and *ratio*, weak about magnitude.
+2. **`--cache-sim` is how you rule out the locality confound**, which is
+   otherwise entangled with every branch story: on p07 the `cmov` lever moved
+   `Bcm` by −78% while `D1mr` was **identical** (1076.82 both builds), which is
+   what makes the branch attribution stick.
+3. **Both slow callgrind down substantially.** Use them for a named question on
+   a few cells, not across a matrix.
+
+**And a lever that needs no simulator at all: the workload.** Same binary, same
+alignment, same element arrays, only the query distribution changed — p07's
+`allbelow` executes **+7.84% more instructions and takes 71.75% less time** than
+its shipped workload. That is a sharper `Ir`-vs-`ns` direction reversal than any
+compiler flag produced, and it is available on any data-dependent kernel.
 
 ## Hard constraints (non-negotiable)
 
