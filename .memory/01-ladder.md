@@ -1243,6 +1243,56 @@ places and points at nothing. **Name the pattern, never the number.**
    reproducible across passes and CPUs, separated by no bit and unmoved by
    `jcc32`. It is larger than several published gaps and nothing accounts for it.
 
+9. **p11 — a library difference, a spelling difference and a safety cost,
+   separated; and a bounds check costs 2 or 3 Ir/byte depending on what the loop
+   already holds.** (TASK_033, reviewed at TASK_033_REVIEW — headline confirmed
+   by independent re-measurement, two majors and six minors against the prose,
+   **no blockers**.) Family B's first pattern, and the first kernel whose **loop
+   bound is not known before the loop**.
+
+   **The three-way decomposition, which is the pattern's point.** All rates
+   `body_len / K` off the listing; `vector_regs` empty on 8 of 8 kernels:
+
+   | scan spelling | lowers to | Ir/byte |
+   |---|---|---:|
+   | C `strlen` | glibc IFUNC → **AVX2** | **0.078125** (measured 0.0788) |
+   | C `memchr` (R1h) | AVX2, **but must also test its count** | **0.1023** |
+   | `CStr::from_bytes_until_nul` (R3) | `core::slice::memchr`, SWAR 2×`u64` | **0.937500** |
+   | `iter().position()` | scalar byte loop | 5.00000 |
+   | R4 `get_unchecked` | scalar byte loop | 6.00000 |
+   | R2 indexed | + `lea;cmp;jae` | 9.00000 |
+
+   **12.0× is the library. 5.3× is which Rust spelling. 3.00000 Ir/byte is the
+   bounds check.** Only the third is a safety number, and it is at matched
+   spelling — the two loop bodies differ by exactly `lea; cmp; jae`.
+
+   ⚠ **THE NEW CONSTANT, and it generalises past p11: a bounds check costs
+   `2.00000` Ir/byte when the loop's induction variable already holds the address
+   being checked, and `3.00000` when it does not — and which one you get is
+   decided by the loop's OTHER exit test.** p11's fold has `add %rdx,%rax` hoisted
+   outside the loop (bound test = `cmp; jae` = 2); its scan keeps `%rbx`
+   window-relative *because its own exit test is `q < len`*, so the check must
+   `lea` first = 3. One kernel, one compiler, matched spelling, and confirmed by a
+   one-loop-at-a-time control: scan `(4730−1850)/(24·40) = 3.00000`, fold
+   `(6190−2110)/(24·40) = 4.25000`, both exact, residual a constant −39/call.
+
+   **`4.25000 = 2.00 + 2.25` is now reproduced on a THIRD kernel with the split
+   intact** (p16, p17, p11), and on p11 by an isolating control rather than a
+   whole-kernel delta. Swept law: `R2 − R4 = 7.25000` Ir per string byte
+   `= 4.25000` (fold) `+ 3.00000` (scan), zero residual over 61 points, all four
+   residues.
+
+   **The largest instance of the R4-by-permission result** (see the paragraph at
+   the top of this file): `r4_cstr` would be **−17 526 Ir/call, −35% of the kernel
+   on `large`**, and its twin is rejected with **four** `is not supported`
+   (`CStr`, `FromBytesUntilNulError`, `from_bytes_until_nul`, `to_bytes`). **The
+   safe class reaches `core::slice::memchr` at zero TCB; the unsafe class cannot
+   reach it at all.** The hand-written SWAR alternative is now *measured*
+   inadmissible too — `from_le_bytes` `is not supported` on p11's own twin, and it
+   is separately forbidden by p11's `idiom.forbidden[1]`. R3−R4 changes sign at
+   string length 17–18, at `core::slice::memchr`'s 16-byte threshold, and
+   `small`/`large` are specified on opposite sides of it.
+
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how
 much proof keeps that base sound, and which C patterns resist this treatment.*

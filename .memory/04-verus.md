@@ -5,6 +5,52 @@ Read `../LearnVeri/PITFALLS.md` before debugging anything. Grep
 instead of guessing; `../LearnVeri/microbench/` has 20 worked CVE proofs to lift
 technique from.
 
+## A proof-enabling program change is not automatically free
+
+**Measured at TASK_033 / TASK_033_REVIEW, and it is a trade rather than a win.**
+
+p11's scan can stop at `q == len`, so `p = q + 1` cannot be proved overflow-free
+(vstd has no `isize::MAX` slice-length axiom and `usize` may be 32-bit). **p17
+paid for the same fact with a second `requires` clause plus a driver conjunct.**
+p11 instead writes one line *before* the step:
+
+```rust
+if q >= len { break; }
+```
+
+That removes the obligation at **zero preconditions and zero driver statements**,
+and the line is semantically the right statement — *"a string with no terminator
+is the last string in the window"*, which is precisely the case R1 cannot
+represent.
+
+⚠ **But it is not free in instructions, and p11 shipped saying it was.** Deleting
+it (checksums unchanged on every input):
+
+```
+kernel 123 -> 114 insns; scan body 6 -> 5
+marginal small  19084.00 -> 17481.00   (+8.4% of R4)
+marginal large  50174.00 -> 45909.00   (+8.5% of R4)
+guard = 24*L + 97 at k=24  =  1.00000 Ir per scanned byte + 3 per string + 1 per call
+                              (zero residual, four string lengths)
+```
+
+**Mechanism**: with the guard the scan loop must carry its *exit reason* out in a
+register — the `sete %bpl` exists only so the post-loop `test; je` can implement
+`if q >= len`. Without it the loop falls through and the `sete` disappears.
+
+**So the two ways of discharging an overflow obligation price differently, and
+neither is free:**
+
+| route | preconditions | driver | instructions |
+|---|---|---|---|
+| p17 — a second `requires` | **+1 clause** | +1 conjunct | **0** |
+| p11 — a guard in the program | 0 | 0 | **+1.00000 Ir/scanned byte, 8.5%** |
+
+**Quote the trade, never "it was free."** And note where the cost lands: the C
+rungs do not pay it per byte, because their scan is a libcall that already returns
+the length — so of p11's R4 6.00000 Ir/byte scan, **1.00000 is bookkeeping that
+`strlen`/`memchr` get for free.**
+
 ## Running
 
 ```bash

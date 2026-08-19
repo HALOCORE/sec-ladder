@@ -434,7 +434,9 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    `python3 common/layout/survives.py --dir common/layout/data p01`.
 
 17. **p11 — the safe class reaches a library the unsafe class cannot, and it is
-   worth 35% of the kernel.** ⚠ **UNREVIEWED (TASK_033).** Family B's first
+   worth 35% of the kernel.** (TASK_033, **reviewed** at TASK_033_REVIEW:
+   headline confirmed by independent re-measurement, two majors and six minors
+   against the prose, **no blockers**.) Family B's first
    pattern, and the first kernel whose **loop bound is not known before the loop**
    — a NUL scan runs until it finds a sentinel that may not be there.
    **The decomposition, which is the pattern's point** (all rates `body_len / K`
@@ -465,6 +467,14 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    `core::slice::memchr` at **zero TCB**; the unsafe class cannot reach it at all.
    R3−R4 changes sign at string length 17–18, at `memchr`'s 16-byte threshold, and
    `small`/`large` are specified on opposite sides of it.
+   ⚠ **And the correction that makes it a better result** (TASK_033_REVIEW major
+   1): p11 discharges an overflow obligation with one line in the *program*
+   (`if q >= len { break; }`) where p17 had to buy a second `requires` — and p11
+   shipped calling that **free**. It is not: it costs **1.00000 Ir per scanned
+   byte, 8.5% of R4**, because the guard forces the scan's exit reason into a
+   register. **The real trade is 8.5% of the kernel instead of a precondition**,
+   and that is more interesting than the claim it replaces. Neither route is free;
+   see `.memory/04-verus.md`.
 
 ## Retracted — do not reinstate
 

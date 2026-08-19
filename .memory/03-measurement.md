@@ -448,6 +448,35 @@ TASK_014_REVIEW's own write-up mixed. Rule, in both cases and now with teeth:
 **say which convention a number is in, every time — a cross-rung delta is only
 meaningful inside one convention.**
 
+### Separate the safety cost from the LIBRARY cost by naming the routine
+
+**p11 is the worked example (TASK_033, reviewed).** Its rungs call *different*
+library routines, so a rung-to-rung ratio silently mixes three unrelated things.
+Decomposed:
+
+| factor | what it compares | size |
+|---|---|---:|
+| **library** | glibc `strlen` (IFUNC → AVX2) vs `core::slice::memchr` (SWAR, no xmm/ymm) | **12.0×** |
+| **spelling** | `CStr::from_bytes_until_nul` vs `iter().position()`, both safe Rust | **5.3×** |
+| **safety** | checked vs unchecked **at matched spelling** | **3.00000 Ir/byte** |
+
+Only the third is a safety number. Reported as a single ratio, p11's R1-vs-R3 gap
+would have read as a 60× "cost of safe Rust" and none of it would have been safety.
+
+**The rule: whenever two rungs call different library routines, name the routine
+beside every rate and difference rates only within a routine.** This is the
+library-level analogue of the matched-spelling rule and it has the same failure
+mode. Two calibration figures on this box, both AVX2: glibc `strlen` **0.0788
+Ir/byte**, glibc `memchr` **0.1023** — 31% dearer, because `memchr` must also test
+its count.
+
+⚠ **And the kernel-exclusive `Ir` column cannot see any of it.** A routine called
+*out* of the kernel symbol is not in that column: on p11 it is off by **9830
+Ir/call, 43% of a cell**, and it **inverts the R3-vs-R4 sign** (R3 looks 30%
+cheaper where the whole-program marginal and the clock both say 21% dearer). Use
+the marginal for any pattern whose rungs call different routines, and say which
+convention every number is in.
+
 ### Interleave by CELL, never by block — it alone flipped a sign
 
 **Measured at TASK_031, on 31 byte-identical copies of one binary.** A timing
