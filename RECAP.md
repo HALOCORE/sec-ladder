@@ -756,6 +756,12 @@ survived six workloads; the manager's framing of it did not (see finding 15).
 **The layout arc is closed: finding 16 is measured, reviewed, refined and landed
 in all seven patterns' files (TASK_026 → 029 → 030_REVIEW → 031).**
 
+⚠ **p03's span rests on ONE unreviewed measurement.** TASK_037's `a_tail` finding
+is swept (`maxres 0.000000`, 19 blobs) and its admissibility comes from the gate's
+own decidable matcher, which is why I landed it without a further review — but it
+refuted a number a review had just confirmed, and **the `+5` per-call constant has
+never been searched at all.** The next task that touches p03 should verify both.
+
 **TASK_032 shipped the layout harness and the methodology arc is CLOSED.**
 `common/layout/` is committed and hashed; p01's mode survived the fixed timer;
 all seven patterns carry the protocol control.
@@ -785,16 +791,12 @@ record's commit against `common/driver.c`'s last change; **p16 was never at risk
 which that test could not see**. A commit test is not the test; hashes are
 (`.memory/03-measurement.md`).
 
-**Both next tasks are already written, so the pattern cannot be deferred again:**
-`TASK_035` (the staleness fix — small, bounded) and then **`TASK_036` — p03,
-bounded stack**, the first kernel whose *control flow is attacker-chosen*: the
-window carries an opcode stream and the bug is a stack underflow (`sp − 1` at 0).
-It is also the first pattern whose safety check is not on a slice — the guard is
-an *emptiness* test — so do not assume it yields another per-byte constant.
-
-After p03: **p09** (bitset — word-index vs bit-index confusion), **p12** (`strcat`
-into a fixed buffer, now that `asm.py` knows the `str*` family), **p04** (ring
-buffer — modular index + aliasing).
+**Both p03 tasks are landed. THE NEXT TASK IS A PATTERN.** Nine of 47 exist and
+the last three tasks were all p03. Candidates in the order I would take them:
+**p09** (bitset — word-index vs bit-index confusion, and the first kernel whose
+safety check is not a bounds check at all), **p12** (`strcat` into a fixed buffer,
+now that `asm.py` knows the `str*` family), **p04** (ring buffer — modular index
+plus aliasing).
 
 ⚠ **Read the ratio before planning anything else. TASK_015–031 is seventeen
 consecutive tasks of methodology and correction against two patterns produced
