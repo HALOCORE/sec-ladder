@@ -15,8 +15,9 @@ Rust, unsafe Rust + Verus proof — plus a sixth **R1h** hardened-C cell, across
 optimisation levels and two inline modes, and compared on assembly, executed
 instructions, timing, proof burden and trusted-base size.
 
-47 patterns are catalogued in `.memory/06-catalogue.md`. **Nine exist, all green,
-all reviewed:** p01 (calibration), p02 (first real bug), p16 (first
+47 patterns are catalogued in `.memory/06-catalogue.md`. **Ten exist and all are
+green. Nine are reviewed** (p09 is built, green and **UNREVIEWED** — rule 9, its
+findings are in `patterns/p09-bitset/NOTES.md` and not in `.memory/` yet)**:** p01 (calibration), p02 (first real bug), p16 (first
 data-dependent bound), p17 (the limit of memory safety), p05 (the first
 vectorised kernel), p08 (the first structural Rust win). **p07 (binary search) is
 built, green and UNREVIEWED** — per `PROTOCOL.md` rule 9 its findings are in
@@ -39,7 +40,7 @@ claim.
 ## The findings so far — this is the actual output
 
 **Numbering warning, because it has already cost an agent time.** The list below
-is **RECAP's own digest** and is numbered 1–18. `.memory/01-ladder.md` has a
+is **RECAP's own digest** and is numbered 1–19. `.memory/01-ladder.md` has a
 *different* list, numbered 1–7, one entry per pattern, and **that one is
 authoritative**. "Finding 12" means different things in the two files. When
 writing a task file, name the pattern (*"p05's causal claim"*), never the number.
@@ -543,6 +544,51 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    run**, no lemma. And the gate caught a **tautological conjunct on a trusted
    item** via 5c-twin's per-conjunct probe — its first fire on shipped code.
 
+19. **p09 — a one-character bug that a memory-safety proof cannot see, beside one
+   it catches without being asked.** ⚠ **UNREVIEWED (TASK_038).** First kernel
+   whose guard is **not a bounds check** (`q < nbits` guarding `words[q >> 6]`),
+   first where **R3 is dearer than R2**, first trusted item modelling a **CPU
+   instruction**.
+
+   **The separation, seven Verus mutants with a positive control:**
+
+   | variant | functional spec | Verus |
+   |---|---|---|
+   | control | shipped | 18 / 0 |
+   | `m_control_msonly` | **stripped** | 18 / 0 ← the probe is not blind |
+   | `m_shift5_msonly` | **stripped** | **precondition not satisfied** |
+   | `m_mask31_msonly` | **stripped** | **19 / 0** |
+   | `m_mask31_spec` | moved to match | **20 / 0** |
+
+   So `q & 31` is **invisible to memory safety, and invisible entirely once the
+   spec moves with it** — while `q >> 5` (which is `q/32 ≥ q/64`, a *second
+   spatial* bug) is caught by the precondition even then. p17 showed a
+   memory-safe program can be wrong; **p09 puts the invisible bug one character
+   from a visible one in the same kernel.**
+
+   **The three checks decompose** (90 blobs, pooled rank 4/4, every band alone
+   2/4): the popcount pass's linear index `+19` and **0.00000 cheapest
+   in-contract**; the query array's linear index `+11` and **−3.00000**; the
+   bitset word's **shift-derived** index **`+45.00`** and **+4.00000**.
+
+   ⚠ **p03's seeding control does NOT transplant, and that localises the
+   mechanism.** A dead clamp on the *word index* — p03's exact shape — is **+461
+   dearer** and deletes nothing, in C as well as Rust. The same clamp on the
+   **byte offset** deletes **49% of the kernel**. And a clamp that says nothing is
+   byte-identical to shipped R3, reproducing p03's `sp > 1000`. **The inference
+   LLVM fails is the composition through the MULTIPLY, not the shift.**
+
+   **`q >> 6` and `q / 64` are identical to every compiler here** — three
+   compilers, `usize`/`u32`, checked and unchecked, same emitted text; the linker
+   folded two probes together. The `forbidden` entry **moves no number** and is
+   kept only because it makes "the shift implements the division" a real Verus
+   obligation. (The first probe was thrown out: rustc const-propagated *into*
+   `#[inline(never)]` callees when built as a binary rather than a `lib` object.)
+   Intrinsics under p11's rule: **no rung emits `popcnt`** (no `-march`); clang's
+   builtin and rustc's `count_ones()` lower to the *same* 23-instruction SWAR — a
+   null — while **gcc calls `__popcountdi2` at +29.00/word**, invisible to the
+   kernel-exclusive column.
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds
@@ -677,7 +723,7 @@ headline. Say so in every task file.
 - **A tool that reports nothing may be a tool that cannot see.** ASan is silent
   on p08's overlap not because there is none but because fortify rewrote the call
   to `__memcpy_chk`. A gate row records `clean` for both reasons identically.
-- **Two files, two numbering schemes.** RECAP's findings are numbered 1–18,
+- **Two files, two numbering schemes.** RECAP's findings are numbered 1–19,
   `.memory/01-ladder.md`'s are 1–7. Name the pattern, never the number.
   **And one task file is misnumbered**: `.tasks/TASK_025_REVIEW.md` reviews
   **TASK_024**, not TASK_025 (there is no TASK_025). Every other
