@@ -87,9 +87,17 @@ supersede any earlier task report they contradict.
      safe program with only its checked slice constructions replaced — lands on
      R4″. The class members differ by `O(nrow)`, so no gate check can pick one.
   2. **A published spread cannot carry a safety number at all.** R4 is defined by
-     *permission*, so every safe program is an admissible R4 and
-     `inf(R4) <= inf(R3)` **by construction**. Publishing two intervals tells a
-     reader a theorem, not a measurement.
+     *permission*, so every safe program is textually an admissible R4 and
+     ~~`inf(R4) <= inf(R3)` **by construction**~~. Publishing two intervals tells
+     a reader a theorem, not a measurement.
+     ⚠ **The by-construction half is REFUTED (TASK_025_REVIEW).** All six
+     patterns pin `identity: unsafe ≡ verus, O3 exact`, so an R4 must have a
+     byte-identical R5 that **Verus verifies** — R4 is bounded by what vstd can
+     express and R3 is bounded by nothing. The classes are **incomparable**.
+     Measured on p16: the `chunks_exact(32)` fold is admissible as R3 at zero TCB
+     and inadmissible as R4 at five new trusted items. The rest of item 2 stands
+     — a spread still cannot carry a safety number — but it now stands on the
+     measurement in item 1, not on a theorem. See `.memory/01-ladder.md`.
 
   **IMPLEMENTED at TASK_016 — and its advertised mechanism is FALSE, proved by
   experiment at TASK_016_REVIEW.** The key is required and hashed (`check.py`
@@ -140,7 +148,10 @@ supersede any earlier task report they contradict.
   there: p17's cheaper spelling is genuinely admissible under its
   declaration — but it also beats **its own R4** by 19.00, so swapping R3 alone
   would re-commit TASK_014/015's unmatched-pair defect *as a shipped cell*, and
-  `inf(R4) <= inf(R3)` means no swap ever terminates. p16's case is **not even
+  ~~`inf(R4) <= inf(R3)` means no swap ever terminates~~ (refuted above at
+  TASK_025_REVIEW — the classes are incomparable, so the non-termination argument
+  is void; the swap is still refused, on the unmatched-pair ground, which is the
+  measured one). p16's case is **not even
   well-posed**: its hashed block contradicts itself, requiring `end - p >= 3`
   and `vlen > end - (p+3)` "in every rung" at `spec.md:269` while asserting at
   `:278` that `split_first_chunk::<3>()` — which contains **neither**
