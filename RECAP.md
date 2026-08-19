@@ -237,8 +237,14 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    nothing here should ever again be published as one. See finding 12.
    TASK_021's companion claim — that the *unsafe* side "does not
    move at all" (six spellings, four distinct machine-code bodies, zero
-   difference) — is **refuted** the same way: all six decoded the header the
-   shipped way, and respelling it moves R4 by 7 flat (TASK_022). Its
+   difference) — was **refuted** at TASK_022 on the ground that respelling the
+   header moves R4 by 7 flat. ⚠ **That refutation is itself refuted**
+   (TASK_027_REVIEW): the respelling needs `read_unaligned` and is not an
+   admissible rung at the pinned vstd, and every alternative route to it is
+   unsupported too. **TASK_021's claim was right for the wrong reason** — the
+   unsafe side does not move, not because six agents happened to spell the header
+   the same way, but because the `identity` pin leaves them nothing else to
+   spell it with. Its
    functional form, its sign
    and its `O(nrow)` conclusion all survive under that stated pairing, but the
    "21%/18% of the tax lives in unpinned spelling" figure is the **R3 side
@@ -286,16 +292,21 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    the shipped R4, byte-identical to the row an earlier task had excluded. Both
    patterns ship an R3 measurably off the floor of their own contract, so "the
    shipped R3 is the cheapest admissible spelling" is **false, not
-   unestablished**. **And the unsafe rung is a spelling too**: p05's R4 moves 7
-   flat (TASK_022), and on p16 the *safe* side moves further than the unsafe one
-   — ~~p16's R4 moves `4·nrec` via `r4_hdr`~~, which **cannot be a p16 rung at
-   all** (vstd cannot verify `read_unaligned` and the `identity` pin needs
-   R5 ≡ R4, so it would need a fourth trusted item), where the R3-side levers
-   cost zero TCB and are larger. Report the
-   in-contract **pair interval** beside every headline, with the shipped pair
-   located inside it, and the fixed-R4 bound if one number is wanted — and
-   **never a per-byte difference across unmatched fold spellings** (TASK_024,
-   under review).
+   unestablished**. ⚠ **But "the unsafe rung is a spelling too" is now REFUTED on
+   both of the two patterns that were said to show it** (TASK_027_REVIEW).
+   ~~p05's R4 moves 7 flat (TASK_022)~~ and ~~p16's R4 moves `4·nrec` via
+   `r4_hdr`~~ are **the same lever and it is not admissible on either**: at the
+   pinned vstd, `read_unaligned`, `as_ptr`, `add`, `from_raw_parts`,
+   `TryFromSliceError` and `from_le_bytes` are each `is not supported`, so every
+   route to respelling a header read needs a **new trusted item** — and the
+   `identity` pin makes a rung without a verifying twin not a rung. **Neither
+   pattern's R4 side has ever moved by a single admissible instruction**, while
+   the R3-side levers cost zero TCB and are large. Report the fixed-R4 bound —
+   **`R3ship − R4ship` bounding `inf(in-contract R3) − R4ship`, R4 held by
+   fiat** — and **do not report a pair interval until someone has built an
+   admissible R4 that moves**; both published ones were built from rungs that do
+   not exist. And **never a per-byte difference across unmatched fold
+   spellings**.
 
 ## Retracted — do not reinstate
 
@@ -464,6 +475,17 @@ headline. Say so in every task file.
   committed it prints `identical=False` at every `K`. The claim is *true* — a
   reviewer re-derived it — but for a year nobody would have known which. Re-run
   the artefact, do not cite it.
+- **Run `./verus_run.py` on an R5 twin BEFORE differencing any unsafe-side
+  variant.** Every `identity`-pinned rung is chained to the prover, so an
+  unsafe-side "cheaper spelling" that vstd cannot express is not a rung and its
+  number means nothing. This one check would have caught p16's `u_c32`, p16's
+  `r4_hdr`, p05's `c4_hu16_nz`, p05's `r4_dataslice` and both endpoints of p05's
+  published pair interval — five published figures, across two patterns, over
+  four tasks. It costs about eleven minutes.
+  **And read the error text, not the exit code**: `is not supported` disqualifies
+  (it forces a new *trusted* item); *"postcondition not satisfied"* disqualifies
+  nothing — measured on p05, the same exec code went from `11 verified, 1 errors`
+  to `13 verified, 0 errors` with one lemma and one `proof` block, at zero TCB.
 
 ## Priority — read this before planning
 
@@ -560,9 +582,46 @@ set before more results are added to it:
    that cannot happen. Note `.temp/p24/foldbody.py`, which §10a.2 cites as its
    evidence for mnemonic identity, **prints `identical=False` at every K when
    re-run as committed** — the claim is true and its cited artefact refutes it.
+   **TASK_027 landed all of it and the gate is green; TASK_027_REVIEW then found
+   the R4-expressibility step VALID and used it to break p05.** See the new item
+   1a. What p16 still owes is small: `NOTES.md:1535` says "reproduce the whole
+   table" and `foldcmp.py` reproduces 8 of 10 rows (the two manual-unroll rows
+   are not derivable from the tree), and `gen_controls.py`'s docstring says both
+   "eighteen" and "sixteen" variants — 18 is right.
+
+1a. **THE CORRECTION SWEEP — TASK_028, and it is next.** The sentence *"it moves
+   the UNSAFE rung too, by the same lever: p16's by `4·nrec`, p05's by 7 flat"*
+   is inside the hashed `why` of **all six patterns**, and **both instances are
+   now refuted** — the lever is a header respelling and at the pinned vstd every
+   route to it (`read_unaligned`, `as_ptr`, `add`, `from_raw_parts`,
+   `TryFromSliceError`, `from_le_bytes`) is `is not supported`, so it needs a new
+   trusted item and is not a rung. p05's published pair interval
+   `2·nrow − 2 … 6·nrow + 20` has **both** endpoints set by inadmissible R4s; the
+   admissible substitution is `5·nrow + 6 … 6·nrow + 13`, i.e. back to the
+   R3-only span it was introduced to replace. "An admissible pair has a tax of
+   exactly 0.00" is withdrawn — that pairing's R4 is `r4_dataslice`.
+   Six hashed blocks, six gate runs. It is a **deletion of refuted text**, not a
+   new investigation, and it is owed before p07 adds results on top of it — which
+   is the same argument that opened this arc at TASK_014_REVIEW.
+   Ride-alongs: `harness/check.py:56` and `:1723` call the identity pin *"a
+   RESULT, not a gate condition"*, which is **false** (`rep.fail` at `:1763` →
+   `verdict = "FAIL"` at `:4826`) and is the one sentence in the tree arguing
+   against the step; and `spec.md`'s new R4-expressibility sentence needs **"at
+   the pinned vstd"**, which the `r4_hdr` instance beside it already carries.
 2. **p01 and p08 still owe an in-contract spelling spread** — and after p05,
-   what they owe is an *interval*, not a minimum. Do not let either publish a
-   "floor"; four have been published across the project and four were refuted.
+   what they owe is an *R3-side* span with R4 held by fiat. **Do not let either
+   publish a pair interval**: both that have been published were built from R4s
+   that are not rungs. And do not let either publish a "floor"; four have been
+   published across the project and four were refuted.
+2a. **The unbuilt spelling, on two patterns, and it is the open question.**
+   Nobody has built an admissible R4 that moves — p05's `−2` residue (delete the
+   redundant zero-guard, keep the shipped header) verifies at **zero TCB**,
+   `13 verified, 0 errors`, but all 26 of TASK_022's round-3 variants pair that
+   deletion with `read_unaligned`, so it has never been compiled; and p16's
+   hand-unrolled 32× fold with explicit indices was never tried. **Until one of
+   them is built, "does the admissible R4 class move at all?" is open on every
+   pattern**, and the honest answer to "is the unsafe rung a spelling too?" is
+   *unknown*, not *yes*. Both are cheap. Either would settle it.
 3. **A shipped p17 sweep.** p17 has **no sweep inputs at all**, which is how its
    "+32 Ir/call flat" got published from two bands that both happen to have
    `nsuf = 3`. `.memory`'s own residue rule applied and was not followed. The

@@ -50,6 +50,34 @@ unsafe class cannot, because the unsafe class is chained to the prover. Whether
 32× fold with explicit indices is Verus-expressible in principle and was not
 tried. See `.memory/06-catalogue.md`, which carried the same false claim.
 
+**The rule, stated at its true width** (TASK_027_REVIEW, which validated the step
+on three independent grounds — the pin names *roles* and not files, so a candidate
+substituted into the role inherits it; this file's own R5 definition already says
+"ships the same machine code as R4", so a candidate R4 with no verifying twin
+leaves the pattern with four rungs; and the project has read the *other* key in
+the same hashed block, `idiom`, as a class constraint on unshipped variants since
+TASK_017):
+
+> **A rung covered by an `identity` pin is chained to the prover.** It is not
+> specific to R4 — p01 also pins `safe_naive ≡ safe_naive_verus, O3 exact`, so
+> p01's **R2** candidates are chained too.
+
+**Two qualifications, both measured, and both required before you use this to
+disqualify anything:**
+
+1. **"At the pinned vstd" is part of the claim.** Verus prints
+   *"you may be able to add a Verus specification to this function with
+   `assume_specification`"* on every rejection, and an upstream vstd that ships
+   one costs the pattern **zero** TCB. A disqualification is a statement about
+   `0.2026.08.09.92f466f`, not about Rust.
+2. **Unsupported-feature disqualifies; a failed transplant does not.** Measured on
+   p05 with the *same exec code* two ways: transplant plus minimal ghost tidy gave
+   `11 verified, 1 errors` — *postcondition not satisfied* — while the same exec
+   code with one real lemma and one `proof` block gave **`13 verified, 0 errors`**.
+   So "the twin did not verify" means nothing; only `is not supported` does,
+   because that is what forces a new **trusted** item. Read the error text, not the
+   exit code.
+
 **The named-spelling standard (TASK_018), and what it does and does not buy.**
 Every pattern's `slb-contract` block carries an `idiom` object naming the tokens
 each rung must spell literally. It is a **policy adopted after measuring**, not a
@@ -1007,15 +1035,46 @@ places and points at nothing. **Name the pattern, never the number.**
    - `5·nrow + 13` **exceeds** the published `6·nrow + 9` for `nrow < 4`, so a
      "minimum" can sit above the published number on 3 of 14 `nrow` values.
 
-   **What to publish instead.** The in-contract *pair interval*,
-   `2·nrow − 2 … 6·nrow + 20` = **36…134 / 128…410**, with the published
-   123 / 399 inside it — and, separately, the one real bound: **hold R4 at the
-   shipped cell**, and `6·nrow + 9` bounds `inf(R3) − R4ship` from above, with
-   `5·nrow + 6` tighter.
+   **What to publish instead — and BOTH ENDPOINTS OF THE ANSWER THIS FILE GAVE
+   ARE THEMSELVES REFUTED** (TASK_027_REVIEW, seven Verus twins). The pair
+   interval ~~`2·nrow − 2 … 6·nrow + 20` = 36…134 / 128…410~~ was built from a
+   *dearest* R4 (`r4_dataslice`) and a *cheapest* R4 (`c4_hu16_nz`) that **are
+   not p05 rungs**: p05 pins `identity: unsafe ≡ verus, O3 exact` like every
+   other pattern, and at the pinned vstd
 
-   **And an admissible pair exists whose tax is exactly 0** (`nrow = 1`,
-   `ncol ≢ 0 mod 8`; `sweep-r1c30` measures **0.00**). So p05 does not support
-   "safety costs something here" over free pairings at all.
+   - `c4_hu16_nz` needs `read_unaligned`, `as_ptr` and `add` — all three
+     `is not supported`; it verifies only with **one new trusted item**, exactly
+     the cost `r4_hdr` was disqualified for on p16;
+   - `r4_dataslice` needs `from_raw_parts` — `is not supported`;
+   - **and the lever is blocked as a *lever*, not as one spelling**: the
+     `try_into`-array route (`TryFromSliceError`) and the `from_le_bytes` route
+     are unsupported too. There is no admissible respelling of p05's header read.
+
+   So ⚠ **"p05's R4 moves 7 flat (TASK_022)" HAS NO RUNG BEHIND IT** — the same
+   defect as p16's `u_c32`, on a figure that is load-bearing in this file, in
+   `RECAP.md`, and inside the hashed `why` of **all six patterns**. The cheapest
+   *measured and admissible* p05 R4 is **the shipped cell, at 0**.
+   Substituting the admissible class into p05's own published laws gives
+   `5·nrow + 6 … 6·nrow + 13` = **101…127 / 331…403**, width `nrow + 7` = 26 / 72
+   — which is *exactly* the R3-side-only span of 21% / 18% that the pair interval
+   was introduced to replace. **p05's R4 side has never moved by a single
+   admissible instruction.**
+   The one real bound is untouched: **hold R4 at the shipped cell**, and
+   `6·nrow + 9` bounds `inf(R3) − R4ship` from above, with `5·nrow + 6` tighter.
+
+   ~~**And an admissible pair exists whose tax is exactly 0**~~ (`nrow = 1`,
+   `ncol ≢ 0 mod 8`; `sweep-r1c30` measures 0.00). **Withdrawn** — that pairing's
+   R4 is `r4_dataslice`, which is not a rung. Do not quote "p05 has a free
+   pairing".
+
+   ⚠ **One residue is UNBUILT and it is the open question here.** The `−2` half
+   (delete the redundant zero-guard, keep the shipped header) verifies at **zero
+   TCB** — `13 verified, 0 errors` — but **all 26 of TASK_022's round-3 variants
+   pair that deletion with `read_unaligned`**, so no admissible p05 R4 reaching
+   `−2` has ever been compiled. `−2` is an inference (`−7` minus `−5`), never a
+   measurement. This is the exact analogue of p16's never-built hand-unrolled 32×
+   fold: **on two patterns now, the question "does the admissible R4 class move at
+   all?" is open because nobody built the one spelling that would answer it.**
 
    **The number is also reading-dependent**, which an earlier write-up stated
    unconditionally: p05's `required[1]` read as p16's is gives one figure, the
