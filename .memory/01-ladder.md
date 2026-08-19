@@ -1224,19 +1224,24 @@ places and points at nothing. **Name the pattern, never the number.**
    in-contract R3-side span `2554.45…3017.14 / 8412.35…10019.42`.
 
    ⚠ **Do not quote p07's R2 `ns` numbers or the "8× conversion factor" — they
-   have NO SIGN, and the reason is sharper than a wide band** (TASK_029, 30
-   layouts). Code layout selects between **two discrete modes on bit 4 of the
-   kernel's entry address**, and R2's comparison flips across them: **+26.42% at
-   `kernel%32 == 0`, −0.93% at `%32 == 16`**, perfect separation 30/30. No number
-   of reps recovers a sign from that. The mode is invisible to every counter this
-   box has — a minimal pair 16 bytes apart has identical `Ir`, identical simulated
-   cache counters and `Bcm` 273.93 vs 273.92.
-   **R3's counterweight survives, but by dominance and mode-matching, not by
-   disjoint bands**: R3 is slower than the *worst* R4 layout at 30/30 on `small`
-   and 29/30 on `large` (R2: 19/30, 23/30). The disjoint-interval reading is
-   retracted — the worst-vs-best range is not a converging statistic and widened
-   from 28.91% to 30.78% purely by sampling more
-   (`.memory/03-measurement.md`).
+   have NO SIGN** (TASK_029, 30 layouts; mechanism identified at
+   TASK_030_REVIEW). Code layout selects between two modes and R2's comparison
+   flips across them: **+26.42% at one residue, −0.93% at the other**, perfect
+   separation 30/30. No number of reps recovers a sign from that.
+   **The mechanism is the 32-byte instruction-fetch / DSB window grid** — `win32`
+   (the loop body spans one more fetch window) or `jcc32` (a loop branch crosses a
+   32-byte boundary; this box carries Intel's **SKX102** JCC erratum). Both are
+   computable statically with zero fitted parameters and separate every mode
+   measured, including on 20 **pre-registered** fresh layouts. "Bit 4 of the
+   kernel address" is a *proxy* that works only because kernels are 16-byte
+   aligned. Full treatment: `.memory/03-measurement.md`.
+   **R3's counterweight survives by mode-matching** — but note that *dominance*,
+   which an earlier version of this entry cited beside it, is **retracted**: it is
+   defined against an extremum and does not converge (`.memory/03-measurement.md`).
+   Use mode-matched comparison and pairwise `P(A > B)`.
+   ⚠ **p07's R4 rung also has an unexplained 8–9% layout band** on `small`,
+   reproducible across passes and CPUs, separated by no bit and unmoved by
+   `jcc32`. It is larger than several published gaps and nothing accounts for it.
 
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how

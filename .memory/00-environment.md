@@ -178,22 +178,28 @@ thing.
 3. **Both slow callgrind down substantially.** Use them for a named question on
    a few cells, not across a matrix.
 
-**⚠ And the limit, measured at TASK_029: the simulators are blind to code
-layout.** A minimal pair 16 bytes apart on p07 differs by **27% of wall clock**
-with `Ir`, every cache counter and every branch counter *identical*
-(`Bcm` 273.93 vs 273.92). So `--branch-sim` and `--cache-sim` explain a
-*mechanism* when one is in reach and say nothing at all about the largest
-wall-clock confound this box has — see `.memory/03-measurement.md`. Use them to
-attribute, never to rank.
+**⚠ And the limit, restated correctly at TASK_030_REVIEW.** An earlier version of
+this paragraph said the simulators are *"blind to code layout"*. **They are not** —
+callgrind's cache model is address-indexed and its branch predictor address-hashed,
+and both register a layout move. They are blind to the **front end**: no model of
+instruction fetch, the uop cache, or the JCC-erratum mitigation, which is where
+100% of the effect lives. The surviving sentence, and it is the one to quote:
 
-**The layout lever itself, since it belongs here too:**
-`-C link-arg=-Wl,--symbol-ordering-file=<f>` (rust-lld) moves a kernel arbitrarily
-far — p07's went `0x15600` → `0x518f0` — at unchanged `n_fn` and unchanged
-executed instruction stream, which is far stronger than
-`-C llvm-args=-align-all-functions=N` (confined to `0x300`). Two levers that do
-**not** work: a padding object via `-C link-arg` (rustc appends it after the
-crate's `.text` and passes `--gc-sections`), and `-align-all-nofallthru-blocks`
-(inserts nops *inside* the kernel, so it is not byte-identical).
+> **Callgrind's simulators are address-sensitive but model no part of the front
+> end, so across a 27% layout mode they move by ≤6 events in 10⁸. Use them to
+> attribute a cache or branch mechanism, never to detect or rank a layout
+> effect.**
+
+(TASK_029's "all cache counters 0.00 both" were *per-call marginal* values rounded
+to two decimals, not absolute counts — which is how the stronger claim got made.)
+
+**This box is Cascade Lake and carries the JCC erratum.** `family 6 model 85
+stepping 7`, microcode `0x5000024` — the mitigated microcode for **Intel SKX102**,
+where a 32-byte chunk containing a jump that crosses or ends on a 32-byte boundary
+is not cached in the DSB. That, plus plain 32-byte fetch-window count, is the
+mechanism behind every layout mode measured here. Full treatment, including the
+levers for building a layout population and the two that do not work:
+`.memory/03-measurement.md`, "Code layout: the 32-byte fetch grid".
 
 **And a lever that needs no simulator at all: the workload.** Same binary, same
 alignment, same element arrays, only the query distribution changed — p07's

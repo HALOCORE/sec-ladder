@@ -448,102 +448,126 @@ TASK_014_REVIEW's own write-up mixed. Rule, in both cases and now with teeth:
 **say which convention a number is in, every time — a cross-rung delta is only
 meaningful inside one convention.**
 
-### Code layout selects between DISCRETE MODES worth ~27% of wall clock, at an unchanged executed instruction stream
+### Code layout: the 32-byte fetch grid, and why two patterns' `ns` columns are withdrawn
 
-**Measured on p07: TASK_026 (7 alignments), TASK_026_REVIEW (extended to R2),
-TASK_029 (30 layouts, and the reading below is TASK_029's, which overturned the
-first two).** This is the widest confound this project has, it is invisible to
-every counter available here, and it governs every `ns` number in `results/`.
+**TASK_026 → TASK_029 → TASK_030_REVIEW.** The final reading is TASK_030_REVIEW's,
+measured on **all seven patterns**; it corrected four things the two earlier
+tasks (and this file) had wrong. Read this section as the current one and ignore
+any "band" or "bit 4" phrasing elsewhere.
 
-**It is not a "band". It is two modes, selected by one address bit.** On p07's
-`safe_naive` / `small.bin`, over 30 layouts:
+#### What it is
+
+Two binaries built from identical source, differing only in where the linker put
+the kernel — same `n_fn`, same `md5_fn_norel`, same executed instruction stream —
+can differ by **up to 27% of wall clock**, and the difference can **flip the sign
+of a rung-to-rung comparison**.
+
+**The mechanism is the 32-byte instruction-fetch / DSB window grid**, in two forms,
+both computable statically from the disassembly with **zero fitted parameters**:
+
+- **`win32`** — the loop body occupies one more 32-byte fetch window in one
+  layout than the other. p01's `unsafe` SSE loop is 30 bytes: entirely inside one
+  window at one residue, straddling two at the other (`movdqu` spanning bytes
+  27..1). That is the whole mode.
+- **`jcc32`** — a loop branch crosses or ends on a 32-byte boundary, so the chunk
+  is not cached in the DSB. This box is **Cascade Lake (family 6 model 85 stepping
+  7, µcode `0x5000024`)**, which carries the mitigated microcode for the **Jump
+  Conditional Code erratum, Intel SKX102**.
+
+⚠ **"Bit 4 of the kernel's entry address" is a PROXY, not the law.** It works only
+because every kernel here is 16-byte aligned, so a 32-byte-granular property takes
+exactly two values. A toolchain with 32-byte function alignment would erase the
+proxy and leave the effect. Partition by `win32`/`jcc32` computed from the
+listing, not by an address bit.
+
+**The geometry flip is universal; being front-end-bound is not.** p02, p05, p16
+and p17 all have loops whose `win32`/`jcc32` flips with layout exactly as p01's
+and p07's do — and their time does not move. p07 is not special in layout; it is
+special in having a serial 73-byte loop where one extra fetch window is 33% more
+front-end work.
+
+#### Where it bites — measured, all seven patterns, 30 layouts each
+
+| pattern | verdict |
+|---|---|
+| **p07**, **p01** | **real mode, perfectly separated**; comparisons flip sign |
+| p08 | marginal (R2, ~3%) — the +105% gap survives it easily |
+| p02, p05, p16, p17 | **absent** (best bit ratio ≤ ×1.003, never perfect) |
 
 ```
-kernel entry %32 == 0   ->  17.708 ms   (n=18)
-kernel entry %32 == 16  ->  13.931 ms   (n=12)
+pattern in    rung        published   pooled    mode0    mode16   verdict
+p01    small safe_naive     +5.40%   +1.16%   +5.24%   -4.10%   SIGN FLIPS
+p01    small safe_tuned     +4.72%   +1.44%   +7.01%   -5.67%   SIGN FLIPS
+p02    small safe_naive    +18.04%  +16.75%  +16.68%  +17.03%   survives
+p08    small safe_naive   +105.16% +104.77% +104.43% +110.05%   survives
+p16    small safe_naive     -0.41%   -0.03%   +0.08%   -0.13%   gap <1% either way
+p17    small safe_naive     -0.22%   -0.09%   -0.12%   -0.18%   gap <1% either way
 ```
 
-Perfect separation — slowest fast layout 14.766 < fastest slow layout 16.993 —
-and the largest-gap clustering and the bit-4 partition are the **same partition,
-30/30**. A "spread" statistic averages across a bimodal population and reports
-neither mode.
+**Confirmed out of sample, pre-registered**: predictions written and SHA-256'd
+*before* any timing, on 20 fresh symbol orderings — p01 all three rungs held with
+perfect separation on both passes; p07 `safe_naive` held.
 
-**The sign of a rung-to-rung comparison flips with that bit:**
+⚠ **`large` is smaller, NOT safe.** p07 R2's mode is perfectly separated on
+`large` too (×0.970, three passes) and mode-matched R2-vs-R4 there is **+3.28% vs
++0.38%** — an 8× swing on the same partition. An earlier version of this section
+said memory-bound inputs are "far safer"; that invites the single-layout reading
+that failed.
 
-```
-kernel%32 = 0    unsafe 14.007 ms   safe_naive 17.708 (+26.42%)   safe_tuned 15.563 (+11.12%)
-kernel%32 = 16   unsafe 14.062 ms   safe_naive 13.931 ( -0.93%)   safe_tuned 16.505 (+17.37%)
-```
+#### The statistic to publish
 
-So p07's R2 `ns` comparison is not "uncertain because the band is wide" — **it has
-no sign at all**, and no number of reps recovers one. That is a stronger
-withdrawal than a wide interval, and it is the correct reason to withdraw.
+1. **Mode-matched comparison** — partition by `win32`/`jcc32`, compare within a
+   mode, report per mode. **A sign that flips between modes is not a sign.**
+   Converges: medians flat in `N`, spread ~1/√N.
+2. **Pairwise `P(A > B)`** over all `N²` layout pairs. A genuine proportion, flat
+   at every `N` (58.1 → 58.4 across N = 4…30).
 
-**No counter on this box resolves it.** Minimal pair, `-align-all-functions=1` vs
-`=2` (kernel 16 bytes apart, `md5_fn_norel bf70816958ed` both):
+⚠ **Two statistics this section previously recommended are RETRACTED, both because
+they are extrema and neither converges:**
 
-```
-Ir 12346.57 vs 12346.57  (Δ0.00) | Dr 530.71 both | Dw 6.01 both
-I1mr/D1mr/D1mw/ILmr/DLmr/DLmw  0.00 both
-Bc 3482.85 both | Bcm 273.93 vs 273.92 | Bi/Bim 0 both
-```
+- **worst-vs-best range / "disjoint bands"** — widened 28.91% → 30.78% on the same
+  binaries by adding samples, and flipped a verdict;
+- **dominance** ("slower than the *worst* layout of B") — p01 R2 drifts 28.7% at
+  `N = 4` → 13.3% at `N = 30`, sd ±26 points at `N = 4`. It was introduced *as the
+  fix for the range* and has the same defect. The claim that both replacements
+  "are proportions rather than extremes" was wrong about this one.
 
-A 27% wall-clock mode with an identical instruction stream, identical simulated
-cache behaviour and identical simulated branch behaviour. Callgrind's simulators
-(see `.memory/00-environment.md`) are **blind to it** — which is the limit of the
-capability that file recommends. Mechanism narrowed, not identified: not I-cache
-geometry (p07's R2 inner loop spans the same 3 32-byte windows and 2 64-byte
-lines in *both* modes, and the one geometric difference points the wrong way);
-front-end or an address-indexed predictor is what is left, and neither is
-observable here.
-
-#### The two levers, and how to build a layout population
+#### Building a layout population
 
 - **`-C llvm-args=-align-all-functions=N`** — moves the kernel inside `0x300`.
-  Cheap, and enough to *detect* a mode.
+  Cheap; enough to *detect* a mode.
 - **`-C link-arg=-Wl,--symbol-ordering-file=<f>`** (rust-lld) — moves it
-  arbitrarily far (p07: `0x15600` → `0x518f0`) at unchanged `n_fn` and unchanged
-  executed instruction stream. **This is the strong lever**; use it for anything
-  that has to be conclusive.
-- Two levers that do **not** work, so nobody re-runs them: a padding object via
-  `-C link-arg` does not shift the kernel (rustc appends it after the crate's
-  `.text` and passes `--gc-sections`; retained with `"axR"` it lands *after*
-  `kernel`); and `-align-all-nofallthru-blocks=K` is **not** byte-identical — it
-  inserts nops *inside* the kernel (p07 `n_fn` 66 → 67/71/73).
+  arbitrarily far, at unchanged `n_fn` and unchanged instruction stream.
+  ⚠ **It permutes all 582 text symbols**, so it moves the driver, libstd and
+  startup too, and the `order` sub-population differs systematically from the
+  `align` one by +5–10% *independent* of the kernel's address. Use both levers to
+  detect; never quote a pooled band across the mixture as "the layout band".
+- Two levers that do **not** work: a padding object via `-C link-arg` (rustc
+  appends it after the crate's `.text` and passes `--gc-sections`), and
+  `-align-all-nofallthru-blocks` (nops *inside* the kernel — not byte-identical).
+- **Enumerate every loop.** A "tightest backward branch" heuristic picks the wrong
+  one on any vectorised kernel (on p01 it finds the 12-byte scalar tail instead of
+  the 30-byte SSE loop). `.temp/r30/loopfit.py` does it properly.
 
 #### Verify invariance with `md5_fn_norel`, NOT `md5_fn`
 
-⚠ **An earlier version of this section said `md5_fn`, and that is wrong for any
-rung whose kernel can `call` a panic path** — the `call rel32` displacement moves
-with layout, so p07's R2 and R3 produce **28 distinct `md5_fn` over 30 layouts at
-constant `n_fn`**. `md5_fn_norel` is invariant (`bf70816958ed`). Following the old
-recipe, you would conclude the code changed and abandon the control.
+⚠ A kernel that can `call` a panic path produces a **different `md5_fn` at every
+layout**, because the `call rel32` displacement moves — 28–29 distinct digests
+over 30 layouts, on *every* pattern. `md5_fn_norel` and `n_fn` are the invariants.
+Following the `md5_fn` recipe, you conclude the code changed and abandon the
+control.
 
-#### The statistic to publish — and the one that does NOT converge
+#### Two published rows are withdrawn
 
-⚠ **The worst-vs-best RANGE is not a converging statistic.** Adding samples
-widens it, and it changed a verdict on the same binaries, same machine:
+- **p01's `small` R2/R3 `ns` cells** — sign flips with the mode.
+- **p05's `small` R2/R3 `ns` cells** — a *different* defect and worse: p05 has no
+  mode, but its **shipped** binary is the slowest R2 layout of 31 and its shipped
+  R3 is the fastest, so the published +36.01% is measured worst-against-best; over
+  the population it is +7.17%. p05's `small` cell also drifts 10–20 points between
+  sessions on byte-identical binaries (round-robin width ruled out; frequency, SMT
+  sibling or thermal remain, and none is diagnosable without root).
 
-| | 7 alignments | 30 layouts |
-|---|---|---|
-| `safe_naive` band, `small` | 28.91% | **30.78%** |
-| R2 vs R4, `small` | [−1.84%, +33.65%] overlap | [−4.67%, +33.80%] overlap |
-| **R3 vs R4, `large`** | **[+0.72%, +3.12%] DISJOINT** | **[−0.14%, +4.42%] OVERLAP** |
-
-So *"publish an interval and require disjoint bands"* — the rule this section
-carried for one task — **is not stable**, and it retracted a clean negative from
-p07's own review purely by sampling more.
-
-**Use these two instead. Both converged on p07:**
-
-1. **Mode-matched comparison** — partition by the address bit, compare within a
-   mode, report per mode. A sign that flips between modes is not a sign.
-2. **Dominance** — the fraction of layout pairs in which rung A beats the
-   *worst* layout of rung B. p07 R3 vs R4: **30/30** on `small`, **29/30** on
-   `large` (R2: 19/30, 23/30 — which is what "no sign" looks like).
-
-Memory-bound inputs are far safer (`large.bin` bands 0.61%…4.00%), which is itself
-the warning: the *cheap* input to measure is the one where layout dominates.
+### A per-byte rate from a marginal pair is good to ±0.09, not to five decimals
 
 ### A per-byte rate from a marginal pair is good to ±0.09, not to five decimals
 

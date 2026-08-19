@@ -39,7 +39,7 @@ claim.
 ## The findings so far — this is the actual output
 
 **Numbering warning, because it has already cost an agent time.** The list below
-is **RECAP's own digest** and is numbered 1–15. `.memory/01-ladder.md` has a
+is **RECAP's own digest** and is numbered 1–16. `.memory/01-ladder.md` has a
 *different* list, numbered 1–7, one entry per pattern, and **that one is
 authoritative**. "Finding 12" means different things in the two files. When
 writing a task file, name the pattern (*"p05's causal claim"*), never the number.
@@ -371,6 +371,36 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    midpoint overflow is unreachable by 2.1e9 because the `u32` header field binds
    long before RAM, while the reachable overflow is in the length check.
 
+16. **Code layout moves wall clock by up to 27% at an unchanged instruction
+   stream, and it is the 32-byte fetch grid.** (TASK_026 → TASK_029 →
+   TASK_030_REVIEW, measured on all seven patterns.) Two binaries from identical
+   source, differing only in where the linker put the kernel — same `n_fn`, same
+   `md5_fn_norel`, same executed instructions — differ by up to 27% of wall clock,
+   and the difference **flips the sign of a rung-to-rung comparison**.
+   **The mechanism is identified and is static**: `win32` (the loop body occupies
+   one more 32-byte fetch window — p01's 30-byte SSE loop sits inside one window
+   at one residue and straddles two at the other) or `jcc32` (a loop branch
+   crosses a 32-byte boundary, so the chunk is not DSB-cached — this box is
+   Cascade Lake carrying Intel's **SKX102** JCC erratum). Both computable from the
+   disassembly with **zero fitted parameters**, and both confirmed **out of sample
+   on 20 pre-registered layouts** whose predictions were SHA-256'd before timing.
+   **It does not hit everything.** Real on **p07 and p01**, marginal on p08,
+   **absent on p02, p05, p16, p17** — the geometry flips on all seven, but only a
+   front-end-bound loop pays for it. So p02's +18.04% and p08's +105.16% survive
+   intact; **p01's and p05's `small` wall-clock rows are withdrawn** — p01's
+   because the sign flips (+5.24% / −4.10%), p05's for a different and worse
+   reason: it has no mode, but its *shipped* binary is the slowest R2 layout of 31
+   and its shipped R3 the fastest, so the published +36.01% is worst-against-best
+   where the population says +7.17%.
+   **What to publish**: mode-matched comparison, and pairwise `P(A > B)` over all
+   layout pairs. Both converge. ~~Worst-vs-best range~~ and ~~dominance~~ are
+   **both retracted** — both are extrema, neither converges, and the second was
+   introduced as the fix for the first.
+   And the instruments: callgrind's simulators are address-*sensitive* but model
+   no part of the front end, so across a 27% mode they move by **≤6 events in
+   10⁸**. Use them to attribute a mechanism, never to detect or rank a layout
+   effect.
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds
@@ -505,7 +535,7 @@ headline. Say so in every task file.
 - **A tool that reports nothing may be a tool that cannot see.** ASan is silent
   on p08's overlap not because there is none but because fortify rewrote the call
   to `__memcpy_chk`. A gate row records `clean` for both reasons identically.
-- **Two files, two numbering schemes.** RECAP's findings are numbered 1–15,
+- **Two files, two numbering schemes.** RECAP's findings are numbered 1–16,
   `.memory/01-ladder.md`'s are 1–7. Name the pattern, never the number.
   **And one task file is misnumbered**: `.tasks/TASK_025_REVIEW.md` reviews
   **TASK_024**, not TASK_025 (there is no TASK_025). Every other
@@ -581,15 +611,9 @@ it once, land the corrections, repeat** — and per `PROTOCOL.md` rule 9, write
 (TASK_029). Finding 8 in `.memory/01-ladder.md` is written.** The headline
 survived six workloads; the manager's framing of it did not (see finding 15).
 
-**THE NEXT TASK IS `TASK_030_REVIEW` — the layout-mode finding, because it is
-cross-cutting.** TASK_029 measured that code layout selects between **two discrete
-modes on bit 4 of the kernel's entry address**, worth ~27% of wall clock at an
-**unchanged executed instruction stream and identical simulated cache and branch
-counters**. It is unreviewed, it retracted a clean negative from p07's own review
-by sampling more, and it destabilised a `.memory/` rule one task after that rule
-was written. **Every `ns` number in `results/` was measured at one layout**, so if
-the mode generalises past p07 the project's wall-clock column needs re-reading —
-that is the question.
+**THE LAYOUT FINDING IS REVIEWED AND IT GENERALISES — see finding 16. Two
+patterns' published wall-clock rows are withdrawn, and landing that in the
+pattern files and `results/` is the next task (`TASK_031`).**
 
 **Items 1–2a below are the closed spelling arc, kept for the history.** That arc
 ran TASK_015–028, thirteen tasks; it is finished and its rules are distilled in
