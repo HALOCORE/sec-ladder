@@ -288,10 +288,26 @@ supersede any earlier task report they contradict.
 | p04 | ring buffer with wraparound | modular index, aliasing | moderate | planned |
 | p05 | 2-D index flattening / matmul (`i*n+j`) | dimensions trusted vs buffer; overflow in the check | moderate | **done** (T013), gate PASS first run, R5 == R4 `exact` at O3; safety moves from per-element to **per-row**, and gets *worse* with wider lanes |
 | p06 | in-place reverse / rotate / swap | aliasing, permutation invariant | moderate | planned |
-| p07 | binary search | midpoint overflow (`(lo+hi)/2`) | moderate | planned |
+| p07 | binary search | ~~midpoint overflow (`(lo+hi)/2`)~~ — see below | moderate | **done** (T026), gate `PASS` first complete run, R5 10/0 first try, R5 == R4 `exact` at O3. **UNREVIEWED** — findings are in its `NOTES.md` and are not yet in this file |
 | p08 | memmove with overlapping regions | overlap UB | moderate | **done** (T014), reviewed; gate PASS first run, R4 == R5 `exact` at **both** O0 and O3; the UB **executes and is unobservable** (glibc `memcpy` *is* `memmove`), so p08 is a tooling-and-expressiveness result, not a performance one |
 | p09 | bit vector / bitset ops (set, test, popcount) | word-index vs bit-index confusion | easy–moderate | planned |
 | p10 | sliding-window / stencil over array | off-by-one at boundaries | moderate | planned |
+
+**p07's bug class was WRONG in this table for the whole life of the project, and
+the correction is PROVISIONAL — not yet reviewed** (TASK_026). "Midpoint overflow
+`(lo+hi)/2`" is not merely hard to reach, it is unreachable **by a factor of
+2.1e9 for any input p07's wire format can express** — and the binding constraint
+is not RAM, which is what the manager guessed, but the **`u32` header field**:
+`n ≤ 2³²−2` ⇒ `lo+hi ≤ 8 589 934 588 ≪ 2⁶⁴`. Measured thresholds by index type:
+`uint32_t` needs 8 GiB of `u32` elements, `int` (the JDK bug) 4 GiB, `size_t`
+3.7e19 B.
+**The overflow that IS reachable sits in the other multiplication**: the length
+check `4·n + 4·nq` needs 36 bits, so a 32-bit check is fooled at a window of
+**88 bytes** — and it ships as `adversarial-width.bin`, on which the 32-bit-check
+cells SIGSEGV. The second bug, the one that fires on well-formed input, is
+**unsigned underflow of an inclusive upper bound** (`hi = mid − 1` at `mid == 0`,
+reached by any key below `elements[0]`). Replace this row's bug column once the
+review lands; the argument and the arithmetic are `p07/NOTES.md` §0.
 
 ## Family B — strings & NUL-termination
 

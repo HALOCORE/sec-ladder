@@ -15,15 +15,25 @@ Rust, unsafe Rust + Verus proof — plus a sixth **R1h** hardened-C cell, across
 optimisation levels and two inline modes, and compared on assembly, executed
 instructions, timing, proof burden and trusted-base size.
 
-47 patterns are catalogued in `.memory/06-catalogue.md`. **Six exist, all green
-and all reviewed:** p01 (calibration), p02 (first real bug), p16 (first
+47 patterns are catalogued in `.memory/06-catalogue.md`. **Seven exist and all are
+green. Six are reviewed:** p01 (calibration), p02 (first real bug), p16 (first
 data-dependent bound), p17 (the limit of memory safety), p05 (the first
-vectorised kernel), p08 (the first structural Rust win).
+vectorised kernel), p08 (the first structural Rust win). **p07 (binary search) is
+built, green and UNREVIEWED** — per `PROTOCOL.md` rule 9 its findings are in
+`patterns/p07-binary-search/NOTES.md` and deliberately **not** in `.memory/` yet.
+Read them as provisional; the review is the next task.
+
+⚠ **If p07 survives review it changes the headline of this document.** It is the
+first kernel here that is not a linear fold — `Θ(log n)` probes, no inner loop to
+amortise a per-call constant over — and measured over `n` = 7 … 16 385 **R3's
+cost as a fraction of kernel `Ir` rises monotonically, 42.53% → 46.63%, toward
+48.0%**. Six patterns said safety is cheap; this one says that was a property of
+the *loop shape* those six shared. See finding 15.
 
 ## The findings so far — this is the actual output
 
 **Numbering warning, because it has already cost an agent time.** The list below
-is **RECAP's own digest** and is numbered 1–14. `.memory/01-ladder.md` has a
+is **RECAP's own digest** and is numbered 1–15. `.memory/01-ladder.md` has a
 *different* list, numbered 1–7, one entry per pattern, and **that one is
 authoritative**. "Finding 12" means different things in the two files. When
 writing a task file, name the pattern (*"p05's causal claim"*), never the number.
@@ -313,6 +323,42 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    not exist. And **never a per-byte difference across unmatched fold
    spellings**.
 
+15. **p07 — safety stops being cheap when there is no inner loop, and `Ir` and
+   `ns` disagree in *direction* with a named mechanism.** ⚠ **UNREVIEWED
+   (TASK_026); everything here is provisional and lives in
+   `patterns/p07-binary-search/NOTES.md`.**
+   Binary search: `Θ(log n)` probes, nothing to amortise a per-call constant
+   over. **R3's share of kernel `Ir` rises monotonically with `n` — 42.53% →
+   46.63% over `n` = 7 … 16 385, converging to `6.0000/12.5035` = 48.0%.** Six
+   patterns said safety is cheap; on the evidence so far that was a property of
+   the **loop shape** all six shared, not of safety.
+   The laws are **exact integers, zero fitted parameters, residual 0.00 over 113
+   swept blobs**, and both are re-derived from the listings rather than fitted:
+   `R2 − R4 = 36 + 11·nq + 11·probes` (four one-sided index checks) and
+   `R3 − R4 = 9 + 4·nq + 6·probes` (one two-sided slice range check). The x-axis
+   is the **exact probe count replayed from the file**; `⌈log2 n⌉` leaves
+   600–1250 residuals.
+   **The `Ir`/`ns` result, which needed two controls to be sayable.** Every
+   *source-level* branchless spelling is converted back to a branch by LLVM's
+   `X86CmovConverterPass` and measures the shipped rung exactly — the lever is
+   the pass, not the source. Disabling it on **unchanged** source gives
+   **+10.07% `Ir` → −18.13% `ns`** (`small`) and **+10.94% → −9.98%** (`large`),
+   bands non-overlapping. And the same +87.8% R2 gap is worth **28.0%** of wall
+   clock on the L1-resident input and **3.5%** on the memory-bound one: **the
+   `Ir`→`ns` conversion factor is a property of the *input*, program held
+   fixed.**
+   **Layout had to be controlled first, and it is the widest confound this
+   project has measured**: two binaries with *identical* `Ir` differ **32%** in
+   `ns`, and the *same machine code at seven different addresses* spans **6%** on
+   `small`. No `ns` ranking on an L1-resident kernel is readable below that band.
+   Two more: p07's R4 side is **degenerate, third pattern running** (`r4_ptr`
+   measures −460/−1605 and its twin dies on *"dereferencing a raw pointer is not
+   supported"*, so it is not a rung — the §0 rule fired on its first outing); and
+   the catalogue's stated bug for p07 was **wrong**, midpoint overflow being
+   unreachable by 2.1e9 because the `u32` header field binds long before RAM
+   does, while the reachable overflow is in the *length check* (`4·n + 4·nq`
+   needs 36 bits, fooled at an 88-byte window).
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds
@@ -447,7 +493,7 @@ headline. Say so in every task file.
 - **A tool that reports nothing may be a tool that cannot see.** ASan is silent
   on p08's overlap not because there is none but because fortify rewrote the call
   to `__memcpy_chk`. A gate row records `clean` for both reasons identically.
-- **Two files, two numbering schemes.** RECAP's findings are numbered 1–14,
+- **Two files, two numbering schemes.** RECAP's findings are numbered 1–15,
   `.memory/01-ladder.md`'s are 1–7. Name the pattern, never the number.
   **And one task file is misnumbered**: `.tasks/TASK_025_REVIEW.md` reviews
   **TASK_024**, not TASK_025 (there is no TASK_025). Every other
@@ -494,11 +540,14 @@ headline. Say so in every task file.
 
 ## Priority — read this before planning
 
-**Twenty-four tasks in, 6 of 47 patterns exist.** Six tasks went to gate
-hardening before the user called it; **TASK_015–024 — ten consecutive tasks —
-went to the *spelling* problem** and produced no new pattern. That arc has paid
-(the named-spelling standard, four refuted floors, p16's sign error) but the
-ratio is now the thing to watch: **the next pattern is overdue.** The gate's
+**Twenty-eight tasks in, 7 of 47 patterns exist.** Six tasks went to gate
+hardening before the user called it; **TASK_015–028 — thirteen consecutive tasks —
+went to the *spelling* problem** and produced no new pattern. That arc paid (the
+named-spelling standard, four refuted floors, p16's sign error, and the
+R4-is-chained-to-the-prover result that retired two published intervals), and p07
+was built to its rules natively rather than corrected into them. **It is closed.
+Alternate build → review from here, and do not reopen it without a measurement
+that forces it.** The gate's
 threat model is **honest mistake, not
 malicious author** (`.memory/02-bench-rules.md`, top section, with the list of
 residuals we are deliberately leaving open). New gate work must pass "could this
@@ -516,9 +565,20 @@ green on the first complete run. The working mode is: **build a pattern, review
 it once, land the corrections, repeat** — and per `PROTOCOL.md` rule 9, write
 `.memory/` only *after* the review.
 
-**The next task is not a new pattern.** TASK_014_REVIEW's blocker is the third
-instance of the same mistake, and the correction is owed across the whole result
-set before more results are added to it:
+**THE NEXT TASK IS `TASK_026_REVIEW` — p07 is built, green and unreviewed**, and
+per rule 9 nothing of it is in `.memory/` yet. It reports the **first
+counterexample to "safety is cheap" in seven patterns**, so it is the highest-value
+thing in the project to attack. Its engineer named the target itself: it shipped a
+defective input generator (every miss drawn as `element + 1`, so no key ever fell
+below `elements[0]`, which made its own inclusive-`hi` control print the *correct*
+checksum), caught it with its own control, and says the workload — not the kernel
+— is what a reviewer should go after. Attack the workload, the layout band, the
+`Ir`→`ns` inference, and the exact-integer laws.
+
+**Items 1–2a below are the closed spelling arc, kept for the history.** That arc
+ran TASK_015–028, thirteen tasks; it is finished and its rules are distilled in
+`.tasks/TASK_026.md` §0, which is the shortest statement of what this project
+learned about reporting spellings.
 
 1. ~~**TASK_023 — the `idiom.why` sentence is false in all six patterns.**~~
    **Done.** The sentence is replaced byte-identically in all six `idiom.why`
@@ -690,7 +750,20 @@ clean" from "sanitiser cannot see". Both are in `.memory/06-catalogue.md`.
   so the sweep cost nothing. The rule generalises: an agent deletes **its own**
   task's binaries when its gates are green and reports anything older to the
   manager.
-- Commits run through the **TASK_025_REVIEW landing**. Tree clean. TASK_024's
+- **Gate: all seven green.** p07 `PASS` on its first complete run (R5 10/0 first
+  try, `unsafe ≡ verus` exact at O3, Miri clean on all seven inputs including a
+  12 MB `large.bin` in 1.9 s of a 180 s budget). The shared named-spelling
+  paragraph is **byte-identical across all seven** `idiom.why` blocks
+  (`len=11003 sha=59748cce2db5c572`).
+- **p07's `idiom` is the first that pins anything mechanically.** Backticked
+  spellings by pattern: p01 **0**, p05 **0**, p08 8, p16 12, p17 12, p02 21,
+  **p07 34** (102 spelling×rung pairs). p01 and p05 backtick *nothing*, so the
+  standard's own audit has never fired on them — which is worth knowing before
+  quoting either as "in contract".
+- **`patterns/p07-binary-search/inputs/` holds 17 MB of gitignored blobs**,
+  regenerable in ~40 s from `inputs/gen.py --sweep`, verified deterministic
+  (120/120 byte-identical across two regenerations).
+- Commits run through the **p07 landing**. Tree clean. TASK_024's
   engineer died to an API 529 after finishing its work and before reporting, and
   the manager reconstructed and committed it; TASK_025_REVIEW then attacked it
   (PROTOCOL rule 3) and found a blocker and four majors. **p16's pattern files
