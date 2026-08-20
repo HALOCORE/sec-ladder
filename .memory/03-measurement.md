@@ -731,10 +731,14 @@ idea — R4 and R5 have byte-identical kernels and *exactly* equal `Ir`, so any
 `ns` difference between them looks like pure measurement noise, and it costs
 nothing because every pattern already ships the pair.
 
-**It is a biased sample of size one.** The `verus` build's kernel lands **0x20
-below** the `unsafe` build's — the same two addresses on p06 and p14 alike — so
+**It is a biased sample of size one.** On p06 and p14 the `verus` build's kernel
+lands **0x20 below** the `unsafe` build's — the same two addresses on both — so
 the pair samples one fixed `addr % 64` alignment contrast **every time you run
-it**. p14's kernel is bimodal there (`%64==16` costs 264–277 ns, `%64==48` costs
+it**. ⚠ **The 0x20 is not universal and must not be quoted as a law**: p18's
+R4/R5 pair lands at **offset 0** (PROVISIONAL — p18 is not yet reviewed), which
+biases that pair toward reading ≈0. **What generalises is that the offset is
+FIXED per pattern, not that it is 0x20** — either way the pair is one draw, not
+a sample. p14's kernel is bimodal there (`%64==16` costs 264–277 ns, `%64==48` costs
 244–248), its shipped `unsafe` sits in the fast class and its shipped `verus` in
 the slow one, and the pair reads **+8.95%**. That is not noise and it is not a
 floor: over a 24-layout population the pair's **median is ≈0** on both patterns
