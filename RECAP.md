@@ -758,21 +758,28 @@ the number.**
    fixes no bits"*. It fixes `< 64` (`computeKnownBits(urem x, 60)` zeroes the
    high 58), **and that survives the phi**: `% 60` into a `[u64; 64]` array
    elides. The measured rule, zero fitted parameters, is **`urem x, C` ⟹
-   `x < next_pow2(C)`, and the check is elided exactly when
-   `next_pow2(CAP) ≤ ARR_LEN`** — which reproduces every capacity p04 built *and*
-   the mixed cases it never built (`% 32` into `[u64;64]`, `% 64` into
-   `[u64;96]`: both elide). A **guard** in the loop destroys the fact for `urem`
-   and **not** for `and`.
+   `x < next_pow2(C)`, and `next_pow2(CAP) ≤ ARR_LEN` is NECESSARY for elision
+   and sufficient only ABSENT a cursor-relating guard** — the necessary half
+   reproduces every capacity p04 built *and* the mixed cases it never built
+   (`% 32` into `[u64;64]`, `% 64` into `[u64;96]`: both elide). ⚠ The qualifier
+   is load-bearing: `% 60` into `[u64;64]` **with** p04's two guards is 2 pads,
+   not 1 — the store check goes, the load check stays. A guard destroys the fact
+   for `urem` and **not** for `and`, which is what separates the two operators.
    **`RING_CAP = 60` is still the largest single effect**: at matched execution
    counts `R3 − R4` goes **+5 → +479**, p03's dead clamp takes it back exactly,
    and three middle-ends agree in both directions — **the operator, not safe
    Rust.**
 
-   ⚠ **THE TAX IS `+4.00`, NOT `+5.00`, AND THE SHIPPED R3 IS NOT THE CHEAPEST
-   FOUND.** Six in-contract spellings across **five distinct machine codes**
-   measure `3367 / 11666` against the shipped `3368 / 11667`. So *"the first
-   pattern whose shipped R3 is the cheapest found"* is **false** — beaten by the
-   next lever, exactly as on p03. **The lever is new**: a **two-step reslice**
+   ⚠ **THE SHIPPED R3 IS NOT THE CHEAPEST FOUND — and that yields TWO numbers,
+   not a correction to one.** Six in-contract spellings across **five distinct
+   machine codes** measure `3367 / 11666` against the shipped `3368 / 11667`.
+   p04 **did not re-ship** (now a project rule — `.memory/02-bench-rules.md`,
+   "never re-ship a rung because a cheaper spelling was found"), so the
+   **fixed-R4 bound stays `+5.00`** and the **cheapest-found in-contract bound is
+   `+4.00`**. Publish both, labelled; I briefly told the engineer to overwrite the
+   first with the second and it refused, correctly. *"The first pattern whose
+   shipped R3 is the cheapest found"* is **false** either way — beaten by the next
+   lever, exactly as on p03. **The lever is new**: a **two-step reslice**
    (`split_at(off).1.split_at(len).0`), whose mechanism is **register allocation,
    not bounds-check removal** — `off + len` needs a scratch register,
    `buf_len − off` is computed in place. **Untried on every pattern before p04,

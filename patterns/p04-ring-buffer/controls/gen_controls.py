@@ -155,6 +155,38 @@ R3 = {
          "    while k < nops {\n"
          "        assert!(head < RING_CAP && tail < RING_CAP);\n", 1),
     ],
+    # ---------------------------------------------------------------------
+    # THE TWO-STEP RESLICE, and it is the cheapest in-contract R3 found
+    # (TASK_042_REVIEW blocker 1, landed at TASK_044). `+4.00` against R4's
+    # 3363/11662 on both blobs, where every spelling above measures `+5.00`.
+    #
+    # ⚠ It is NOT bounds-check removal. Both forms keep both checks; the
+    # difference is REGISTER ALLOCATION, and it is four instructions against
+    # five in the entry block (`%rdi` buf, `%rsi` buf_len, `%rdx` off,
+    # `%rcx` len):
+    #
+    #   shipped   mov %rcx,%rax ; add %rdx,%rax ; jb ; cmp %rsi,%rax ; ja
+    #   two-step  sub %rdx,%rsi ; jb            ; cmp %rsi,%rcx ; ja
+    #
+    # `off + len` needs a scratch register because `%rcx` is still live as
+    # `len`; `buf_len - off` is computed IN PLACE in `%rsi`, which is dead
+    # afterwards. The two-step form also has TWO landing pads to the shipped
+    # rung's one, which is the cleanest available demonstration that pad count
+    # is not the tax (../NOTES.md 10a).
+    #
+    # Six spellings, FIVE distinct machine codes, all at the same number; two
+    # of the five are here and the rest are listed in ../NOTES.md 10a. The
+    # `idiom` block pins no reslice spelling, so all of them are in contract by
+    # construction -- what failed was the "cheapest found" claim, not the
+    # declaration.
+    "r3_reslice2_get": [
+        ("    let w: &[u8] = &buf[off..off + len];",
+         "    let w: &[u8] = buf.get(off..).unwrap().get(..len).unwrap();", 1),
+    ],
+    "r3_reslice2_split": [
+        ("    let w: &[u8] = &buf[off..off + len];",
+         "    let w: &[u8] = buf.split_at(off).1.split_at(len).0;", 1),
+    ],
 }
 
 # ---------------------------------------------------------------------------

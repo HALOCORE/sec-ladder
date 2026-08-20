@@ -1540,26 +1540,41 @@ places and points at nothing. **Name the pattern, never the number.**
    that fact does survive the phi** — `% 60` into a `[u64; 64]` array elides both
    checks. The measured rule, zero fitted parameters, is
 
-   > `urem x, C` ⟹ `x < next_pow2(C)`, and the access check is elided exactly
-   > when **`next_pow2(CAP) <= ARR_LEN`**.
+   > `urem x, C` ⟹ `x < next_pow2(C)`, and **`next_pow2(CAP) <= ARR_LEN` is
+   > NECESSARY for the access check to be elided, and sufficient only ABSENT a
+   > cursor-relating guard.**
 
-   It reproduces every capacity p04 built (64, 128 elide; 48, 60, 96, 33 do not)
-   **and the mixed cases it never built** (`% 32` into `[u64;64]`, `% 64` into
-   `[u64;96]`: both elide). Two refinements: a **guard** in the loop destroys the
-   surviving fact for `urem` and **not** for `and` (at `% 60` into `[u64;64]`,
-   adding the emptiness guard alone goes 1 pad → 3); and the elision at a power
-   of two is a property of the `%`/`&` **spelling**, not of the cursor's range.
+   ⚠ **The qualifier is not decoration and this file stated the rule without it
+   for one commit** (TASK_044). `% 60` into `[u64; 64]` with **both** of p04's
+   guards — the shipped shape — is **2 pads, not 1**: the *store* check goes and
+   the *load* check stays. Sufficiency is clean only with no guard
+   (`T_noguard_60_a64`, 1 pad) and in the one-cursor family.
+   The necessary half reproduces every capacity p04 built (64, 128 elide; 48, 60,
+   96, 33 do not) **and the mixed cases it never built** (`% 32` into `[u64;64]`,
+   `% 64` into `[u64;96]`: both elide). Second refinement: the elision at a power
+   of two is a property of the `%`/`&` **spelling**, not of the cursor's range —
+   and a guard does **not** destroy the `and` form, which is what separates the
+   two operators.
    Placed in the series: p05's **multiply** — no, the implication is nonlinear;
    p09's **shift** — yes alone, no through the composition with a multiply;
    p04's **modulus** — yes, whenever `next_pow2(CAP) <= ARR_LEN`.
 
-   **⚠ The safety tax is `+4.00`, not the published `+5.00`, and p04's shipped R3
-   is NOT the cheapest found.** Six in-contract spellings across **five distinct
-   machine codes** measure `3367 / 11666` against the shipped `3368 / 11667`,
-   all at `required_miss = 0`, `forbidden_hits = 0`, `model.py` agreeing on all
-   five matrix inputs. So *"the first pattern whose shipped R3 is the cheapest
-   found"* is **false**, and the `+5` was beaten by the next lever exactly as on
-   p03. **The lever is new and is untried on every pattern before p04**: a
+   **⚠ p04's shipped R3 is NOT the cheapest found, and TWO NUMBERS come out of
+   that — do not merge them.** Six in-contract spellings across **five distinct
+   machine codes** measure `3367 / 11666` against the shipped `3368 / 11667`, all
+   at `required_miss = 0`, `forbidden_hits = 0`, `model.py` agreeing on all five
+   matrix inputs. p04 **did not re-ship** (see `.memory/02-bench-rules.md`), so:
+
+   | quantity | value | what it is |
+   |---|---|---|
+   | **fixed-R4 bound**, `R3ship − R4ship` | **`+5.00`** | unchanged — the shipped rung did not move |
+   | **cheapest-found in-contract bound** | **`+4.00`** | `inf(in-contract found) − R4ship`, **name the spelling** |
+
+   ⚠ **This file conflated the two for one commit**, telling p04's engineer to
+   "restate the fixed-R4 bound as `+4.00`"; that is only true if the rung is
+   re-shipped, and the engineer refused the instruction and was right. So *"the
+   first pattern whose shipped R3 is the cheapest found"* is **false** — beaten by
+   the next lever exactly as on p03 — while the fixed-R4 bound is still `+5.00`. **The lever is new and is untried on every pattern before p04**: a
    **two-step reslice** (`buf.split_at(off).1.split_at(len).0`, or `get(..)`
    twice) — and its mechanism is **register allocation, not bounds-check
    removal**. Same two checks, one fewer instruction:

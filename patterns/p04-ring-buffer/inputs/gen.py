@@ -347,8 +347,62 @@ SWEEP_F_DROPS = tuple(range(0, 121, 10))
 SWEEP_E_NOPS = 200
 SWEEP_E_EMPTIES = tuple(range(0, 121, 10))
 
+# **Band X -- the ADVERSARIAL band, and it is not a fitting band.** Added at
+# TASK_044 from TASK_042_REVIEW's MAJOR 2.
+#
+# The four bands above are built to *isolate* regressors, and that is exactly
+# what makes them blind in one place: `walk()` asserts `dpush == 0 and
+# epop == 0`, band F fills the ring but never drains it (`epop == 0` BY
+# CONSTRUCTION) and band E drains it but never fills it (`dpush == 0`). So
+# **no blob in bands N/D/F/E, and neither matrix input, has `dpush` and `epop`
+# both non-zero** -- and the licence for fitting the two R1 cells over band F
+# ("R1's own execution counts equal the model's") was therefore checked only
+# where two of its three conditions could not fail.
+#
+# Band X turns every regressor on at once: a cycle of `63 + q` pushes (which
+# fill the ring and then overflow it, `dpush += q`) followed by `63 + q` pops
+# (which drain it and then over-drain it, `epop += q`), repeated as often as
+# fits, then PUSH/POP alternation for the remainder. Nothing here is random, so
+# the whole op stream is readable off this comment.
+#
+# **`q = 64` is the band's own negative control.** The divergence between R1's
+# counts and the model's is an arithmetic fact about `(USABLE + q) mod
+# RING_CAP`: R1 has no fullness test, so its `tail` advances once per push and
+# lands `(63 + q) mod 64` slots ahead of `head`, which is how many elements its
+# ring APPEARS to hold when the pops start. At `q = 64` that is 63 -- the same
+# as the model's -- so the two count vectors coincide and the published law
+# lands exactly. At `q = 10` it is 9 against 63 and the law misses by 16%.
+#
+# It is `sweep-`-prefixed, so the gate and `measure.py` skip it exactly as they
+# skip the other bands, and `controls/sweepfit.py` **excludes it from every
+# fit** and uses it only as a HELD-OUT PREDICTION: the pooled N/D/F/E laws are
+# evaluated on it and the two R1 rows miss (../NOTES.md 4c). `nops = 1500` also
+# puts it 6.25x outside every band and 1.8x outside `large`, so it is out of
+# sample on the count axis too.
+#
+# `.memory/03-measurement.md`, "A fitted law is a law in SOMEBODY's counts":
+# *build one out-of-sample blob that turns on EVERY regressor simultaneously,
+# and predict it before measuring.* Ninety-nine in-sample blobs did not see
+# this; one adversarial blob did.
+SWEEP_X_NOPS = 1500
+SWEEP_X_OVER = (10, 40, 64)
+
 SWEEP_WINS = 8
 SWEEP_ITERS = 2000
+
+
+def band_x_ops(q):
+    """Cycles of `63 + q` pushes (the last `q` REJECTED) then `63 + q` pops (the
+    last `q` on an EMPTY ring), then PUSH/POP alternation for the remainder. All
+    four regressors non-zero, which no other band can produce."""
+    cycle = [PUSH] * (USABLE + q) + [POP] * (USABLE + q)
+    n = SWEEP_X_NOPS // len(cycle)
+    ops = cycle * n
+    rest = SWEEP_X_NOPS - len(ops)
+    ops += [PUSH if (i % 2 == 0) else POP for i in range(rest)]
+    c = counts(ops)
+    assert c["dpush"] == n * q and c["epop"] == n * q, (c, n, q)
+    return ops
 
 
 def band_f_ops(q):
@@ -431,6 +485,19 @@ def main():
                                values(rng, SWEEP_E_NOPS))
             write(f"sweep-e{q:03d}.bin", SWEEP_ITERS, stride_of(SWEEP_E_NOPS),
                   bytes(body))
+        # Band X is emitted LAST so that every blob above is byte-identical to
+        # what this generator produced before band X existed: it draws from the
+        # same `rng` and appending cannot perturb an earlier draw.
+        for q in SWEEP_X_OVER:
+            ops = band_x_ops(q)
+            body = bytearray()
+            for _ in range(SWEEP_WINS):
+                body += window(SWEEP_X_NOPS, ops, values(rng, SWEEP_X_NOPS))
+            c = counts(ops)
+            write(f"sweep-x{q:03d}.bin", SWEEP_ITERS, stride_of(SWEEP_X_NOPS),
+                  bytes(body),
+                  note="  " + " ".join(f"{k}={c[k]}" for k in
+                                       ("xpush", "dpush", "xpop", "epop")))
     return 0
 
 

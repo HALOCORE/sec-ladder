@@ -8,7 +8,7 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "d0766c2f9136de47c164e1da4eb9d5f095ea035421eb0a0d867955c24af9fca9",
+  "contract_sha256": "792c15b23f7f5c4e91c0cc50bfc29e38121dbd45a775a36f53797bc724a0ac45",
   "idiom": {
     "required": [
       {
@@ -97,21 +97,21 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
     "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
-    "patterns/p04-ring-buffer/NOTES.md": "849bf6094a2afb45c0b23764ac913750d14930e4edeb22d9638083fbf30704b9",
-    "patterns/p04-ring-buffer/README.md": "d64062fcbce0a103f1b4bd4bbffb2a1dfbb5635cf9fb512014bbb7c8bc0cdd51",
+    "patterns/p04-ring-buffer/NOTES.md": "f9858b6211a52914c838baae8eba5bda9d9fb47f7e66f6db0a1902c16903d128",
+    "patterns/p04-ring-buffer/README.md": "7f8b543db59dd3f5b8470babbf661d8105ff6b7503fb2fb6eb857acc0f28727e",
     "patterns/p04-ring-buffer/c/kernel.c": "95bc661335bea8e21f887c743a4751456f5e06f39dfee6fcd0bcc58cf6cea2df",
     "patterns/p04-ring-buffer/c/kernel.h": "b912897b321df089943a8b9bfa30b1df930dfe879f316c8d0ff79f15c95d705c",
     "patterns/p04-ring-buffer/c/kernel_hardened.c": "c242d75dccaab160ab1c544222f3bd9b5966463bf0158dcdbba5e404bd148df7",
     "patterns/p04-ring-buffer/c/main.c": "89ce77ab596aa51f831e2a69e03ee37d607ae70f9b9e4969329d7dfa9f9b3c93",
-    "patterns/p04-ring-buffer/controls/gen_controls.py": "91c279d64704d9f3e4e8603cf2eb7ef48ebc141c518b82d40129b89215ca6aac",
-    "patterns/p04-ring-buffer/controls/sweepfit.py": "b54da85ae7e77a6f354d9508bf4ef5bf582a49b8e1393bc756f01455ef756c99",
-    "patterns/p04-ring-buffer/inputs/gen.py": "25077e52c054933e1c9fad4e1c8048139fcd55271b1a41760746268df6f779dc",
+    "patterns/p04-ring-buffer/controls/gen_controls.py": "cfd07e0ff57ab2adc005651017d4a762f825055174d67653bb16dbdb6f907bfc",
+    "patterns/p04-ring-buffer/controls/sweepfit.py": "550bc8b159b559b01eed5b2401b9810c31e17322ea3009363da158506485c213",
+    "patterns/p04-ring-buffer/inputs/gen.py": "7e43ac777b598eba8fac540421ac4f0b13d6e854ffc9b85ce6b52f23410cdf2a",
     "patterns/p04-ring-buffer/model.py": "2682c9972f8e6cb7bb739e7a8db4259d16c81f2fa745a6f2c5c1a37b1bc664d7",
-    "patterns/p04-ring-buffer/safe_naive.rs": "df20091d42e736fceb86485b9ca3c9eb945294e406e17af8ae700fa03fd43381",
-    "patterns/p04-ring-buffer/safe_tuned.rs": "cf19691cd04b7b89c4ce84c5ae49b780c2fe076bcf70bd59106c2af73723ae6a",
-    "patterns/p04-ring-buffer/spec.md": "31e7e758a9c978550dee314511476324831c3bb29ccc70bbfb5a5774e4e51fe8",
+    "patterns/p04-ring-buffer/safe_naive.rs": "52b9d59169a76b4b839a579ff2b09f003b2954ea871cf362f08e8ed4b39c0943",
+    "patterns/p04-ring-buffer/safe_tuned.rs": "20e785af4bd121e06276a8893e1682ae986baa5d71a682db76af28ce12b3cd8c",
+    "patterns/p04-ring-buffer/spec.md": "3cd2ee7be11eb37fcbf78c3a224db544ded1d415fb8313925d9744ccd90e1167",
     "patterns/p04-ring-buffer/unsafe.rs": "1059af0d1cb83784aa89b65b6a927c82439e9b5040b2a557f52b7a4615b4a093",
-    "patterns/p04-ring-buffer/verus.rs": "1128b44e6e88d0cfb11a6a5ade7f3fc8150aad0d17ad85a23ab2708b03d1cc3f",
+    "patterns/p04-ring-buffer/verus.rs": "2b53b17e4024b5512240b79f729ea939dd7c78cd19ba5b177c3e54cce87d8848",
     "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
   },
   "derived_contract": {
@@ -291,31 +291,31 @@
           "name": "buf_get_unchecked",
           "attr": "verifier::external_body",
           "body_lines": 1,
-          "line": 226
+          "line": 229
         },
         {
           "name": "ring_get_unchecked",
           "attr": "verifier::external_body",
           "body_lines": 1,
-          "line": 260
+          "line": 263
         },
         {
           "name": "ring_set_unchecked",
           "attr": "verifier::external_body",
           "body_lines": 3,
-          "line": 300
+          "line": 303
         },
         {
           "name": "load_input",
           "attr": "verifier::external_body",
           "body_lines": 4,
-          "line": 334
+          "line": 337
         },
         {
           "name": "emit",
           "attr": "verifier::external_body",
           "body_lines": 1,
-          "line": 346
+          "line": 349
         }
       ]
     }
@@ -852,7 +852,7 @@
   "loud": [
     {
       "section": "tcb-unsafe",
-      "message": "verus.rs:300 `ring_set_unchecked`'s `requires` constrains nothing about ['x'], which its trusted body uses. spec.md justifies it: `x` is a pure VALUE parameter: it is stored into the array and is never used as an address, an index or a length, so there is no precondition a caller could usefully be asked for -- every `u64` is a legal thing to store in a `u64` slot. The two parameters that DO decide whether the unchecked store is defined, `v` and `i`, are both constrained by `i < old(v)@.len()`, which for a `&mut [u64; 64]` reads `i < 64`. (A second conjunct `old(v)@.len() == 64` is a TAUTOLOGY on a fixed-size array -- vstd's `array_len_matches_n` discharges it from the parameter type alone -- and p03's draft shipped one and had it refused by stage 5c-req and by 5c-twin's per-conjunct deletion probe. p04 does not carry it, and NOTES.md 5b records that the omission is deliberate rather than an oversight.) This is the one documented false positive of stage 5a's parameter-coverage rule (.memory/04-verus.md: *a pure value parameter -- `fn write(dst, i, v)`, `v` is written, never used as an address -- genuinely needs no precondition*). What still guards the store is the `ensures` `final(v)@ == old(v)@.update(i as int, x)`, which is a WHOLE-SEQUENCE equality: it says both that slot `i` became `x` and that nothing else moved, so an implementation that wrote a second slot would contradict it. On p04 that clause is load-bearing in a way it was not on p03: R1's bug IS a store to a slot the checked kernel does not write, so a slot-`i`-only `ensures` would have been silent about the very thing this pattern models. NOTES.md 5b's SLB-TRUSTED-ARGUMENT (b) is the human reading of that."
+      "message": "verus.rs:303 `ring_set_unchecked`'s `requires` constrains nothing about ['x'], which its trusted body uses. spec.md justifies it: `x` is a pure VALUE parameter: it is stored into the array and is never used as an address, an index or a length, so there is no precondition a caller could usefully be asked for -- every `u64` is a legal thing to store in a `u64` slot. The two parameters that DO decide whether the unchecked store is defined, `v` and `i`, are both constrained by `i < old(v)@.len()`, which for a `&mut [u64; 64]` reads `i < 64`. (A second conjunct `old(v)@.len() == 64` is a TAUTOLOGY on a fixed-size array -- vstd's `array_len_matches_n` discharges it from the parameter type alone -- and p03's draft shipped one and had it refused by stage 5c-req and by 5c-twin's per-conjunct deletion probe. p04 does not carry it, and NOTES.md 5b records that the omission is deliberate rather than an oversight.) This is the one documented false positive of stage 5a's parameter-coverage rule (.memory/04-verus.md: *a pure value parameter -- `fn write(dst, i, v)`, `v` is written, never used as an address -- genuinely needs no precondition*). What still guards the store is the `ensures` `final(v)@ == old(v)@.update(i as int, x)`, which is a WHOLE-SEQUENCE equality: it says both that slot `i` became `x` and that nothing else moved, so an implementation that wrote a second slot would contradict it. On p04 that clause is load-bearing in a way it was not on p03: R1's bug IS a store to a slot the checked kernel does not write, so a slot-`i`-only `ensures` would have been silent about the very thing this pattern models. NOTES.md 5b's SLB-TRUSTED-ARGUMENT (b) is the human reading of that."
     }
   ],
   "blocked": [],

@@ -1,6 +1,6 @@
 # p04-ring-buffer — results
 
-Generated 2026-08-20T01:52:23Z from `results/p04-ring-buffer.json` (git `e8f3c733a26f`, working tree dirty).
+Generated 2026-08-20T04:09:56Z from `results/p04-ring-buffer.json` (git `e72ed7243c3a`, working tree dirty).
 
 ## Toolchain
 
@@ -63,7 +63,7 @@ Every delta below is a difference between rungs that are meant to be spellings o
 
 ### Spelling audit (stage `0b`, reporting only)
 
-Measured by the gate, not by this file — from `results/gate/p04-ring-buffer.json`, contract `d0766c2f9136`.
+Measured by the gate, not by this file — from `results/gate/p04-ring-buffer.json`, contract `792c15b23f7f`.
 
 `36` backticked spelling(s) over `6` rung(s) → **110** (spelling, rung) pair(s), **73** present — not the product, because a per-language entry is read against its own language's rungs only. Matching is `check.spelling_matches`: comments, string literals and Verus ghost clauses blanked, then all whitespace deleted.
 
@@ -156,30 +156,29 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 12.13 | 12.31 | 1.5% | 4.94 | 5.44 | 10.0% |
-| c-gcc | whole | 12.10 | 12.33 | 1.9% | 5.01 | 5.44 | 8.6% |
-| c-clang | isolated | 12.03 | 12.21 | 1.6% | 6.43 | 6.91 | 7.5% |
-| c-clang | whole | 12.47 | 12.76 | 2.3% | 6.16 | 6.93 | **12.5% ✗** |
-| safe_naive | isolated | 13.42 | 13.65 | 1.7% | 7.03 | 7.75 | **10.3% ✗** |
-| safe_naive | whole | 14.71 | 14.85 | 1.0% | 7.59 | 8.20 | 8.1% |
-| safe_tuned | isolated | 12.28 | 12.56 | 2.3% | 5.38 | 5.91 | 9.8% |
-| safe_tuned | whole | 12.56 | 12.76 | 1.6% | 5.69 | 6.13 | 7.9% |
-| unsafe | isolated | 12.27 | 12.49 | 1.9% | 5.37 | 5.72 | 6.6% |
-| unsafe | whole | 13.40 | 13.62 | 1.6% | 6.42 | 6.90 | 7.6% |
-| verus | isolated | 12.27 | 12.51 | 2.0% | 5.36 | 5.98 | **11.5% ✗** |
-| verus | whole | 13.31 | 13.56 | 1.8% | 6.66 | 7.08 | 6.3% |
-| c-gcc-h | isolated | 12.12 | 12.35 | 1.9% | 5.07 | 5.60 | **10.4% ✗** |
-| c-gcc-h | whole | 12.20 | 12.41 | 1.7% | 5.87 | 6.26 | 6.7% |
-| c-clang-h | isolated | 12.09 | 12.32 | 1.9% | 6.87 | 7.48 | 8.9% |
-| c-clang-h | whole | 12.57 | 12.74 | 1.4% | 6.02 | 6.65 | **10.6% ✗** |
+| c-gcc | isolated | 12.14 | 12.37 | 1.9% | 5.03 | 5.41 | 7.5% |
+| c-gcc | whole | 12.06 | 12.32 | 2.2% | 5.13 | 5.40 | 5.3% |
+| c-clang | isolated | 12.07 | 12.24 | 1.4% | 6.17 | 6.88 | **11.5% ✗** |
+| c-clang | whole | 12.52 | 12.75 | 1.8% | 6.14 | 6.84 | **11.4% ✗** |
+| safe_naive | isolated | 13.49 | 13.72 | 1.7% | 7.08 | 7.77 | 9.7% |
+| safe_naive | whole | 14.62 | 14.84 | 1.5% | 7.32 | 8.26 | **12.7% ✗** |
+| safe_tuned | isolated | 12.35 | 12.51 | 1.3% | 5.36 | 5.84 | 9.0% |
+| safe_tuned | whole | 12.65 | 12.77 | 1.0% | 5.62 | 6.00 | 6.7% |
+| unsafe | isolated | 12.32 | 12.48 | 1.3% | 5.44 | 5.81 | 6.8% |
+| unsafe | whole | 13.41 | 13.61 | 1.5% | 6.44 | 6.90 | 7.3% |
+| verus | isolated | 12.32 | 12.45 | 1.1% | 5.24 | 5.80 | **10.8% ✗** |
+| verus | whole | 13.35 | 13.55 | 1.5% | 6.38 | 7.01 | 9.8% |
+| c-gcc-h | isolated | 12.17 | 12.39 | 1.8% | 5.19 | 5.56 | 7.1% |
+| c-gcc-h | whole | 12.22 | 12.44 | 1.8% | 5.91 | 6.30 | 6.6% |
+| c-clang-h | isolated | 12.16 | 12.30 | 1.2% | 6.86 | 7.42 | 8.1% |
+| c-clang-h | whole | 12.54 | 12.74 | 1.5% | 5.94 | 6.48 | 9.2% |
 
-**5 of 32 wall-clock cells exceed the 10% min-to-median spread threshold and are DISCARDED** per `.memory/03-measurement.md` step 4. They are printed above marked ✗ rather than deleted, because a missing cell that looks like an omission is worse than a documented failure (`.memory/02-bench-rules.md`). **No claim in this report rests on a marked row.**
+**4 of 32 wall-clock cells exceed the 10% min-to-median spread threshold and are DISCARDED** per `.memory/03-measurement.md` step 4. They are printed above marked ✗ rather than deleted, because a missing cell that looks like an omission is worse than a documented failure (`.memory/02-bench-rules.md`). **No claim in this report rests on a marked row.**
 
-- `c-clang / whole` on `small.bin`: spread 12.5%
-- `safe_naive / isolated` on `small.bin`: spread 10.3%
-- `verus / isolated` on `small.bin`: spread 11.5%
-- `c-gcc-h / isolated` on `small.bin`: spread 10.4%
-- `c-clang-h / whole` on `small.bin`: spread 10.6%
+- `c-clang / isolated` on `small.bin`: spread 11.5%
+- `c-clang / whole` on `small.bin`: spread 11.4%
+- `safe_naive / whole` on `small.bin`: spread 12.7%
+- `verus / isolated` on `small.bin`: spread 10.8%
 
 
 ## Cells and metrics not measured

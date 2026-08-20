@@ -28,15 +28,33 @@ state.
 **Answer: at a power-of-two capacity the bound survives completely.** The safe
 indexed `ring[tail]` and `*ring.get_unchecked_mut(tail)` compile to the **same
 machine-code bytes**; R3's only surviving panic landing pad is the window
-reslice, decoded rather than counted; and the whole in-contract safety tax is
-**`5.00000` Ir per call and `0.00000` per operation**, swept over 99 blobs with
-zero residual.
+reslice, decoded rather than counted; and the whole in-contract safety tax is a
+**per-call constant with `0.00000` on every operation count** — the shipped R3
+measures `5.00000`, swept over 99 blobs at zero residual, and the cheapest
+in-contract spelling found measures **`4.00000`** on both blobs (NOTES.md 10a
+and 13c).
 
 The unifying statement the third data point buys:
 
 > **What LLVM carries around a loop-carried phi is known BITS, not a range.**
-> `% 64` lowers to `and $0x3f` and fixes six low bits. `% 60` fixes none — its
-> fact is the range `[0, 59]` — and the range does not survive the phi.
+
+The strongest evidence for it is a control nobody asked for: spelling the wrap
+as a **source-level branch** rather than `%` brings both ring checks back **at
+`RING_CAP = 64` as well as at 60**, at the identical provable cursor range
+(`L_br64`, 86 → 101 instructions, 1 → 3 pads). So the range is never what
+carries; what carries is known bits contributed by the operator. And *how many*
+bits is a quantitative rule with zero fitted parameters:
+
+> **`urem x, C` supplies `x < next_pow2(C)`, and the ring check is elided when
+> `next_pow2(CAP) ≤ ARR_LEN`** — necessarily, and sufficiently in the absence of
+> a guard relating the two cursors.
+
+⚠ TASK_042 published this as *"`% 60` fixes **no** bits — its fact is the range
+`[0, 59]`"*, and **that is false**: `% 60` supplies `x < 64`, which is exactly
+why it elides into a 64-slot array and not into a 60-slot one. The corrected
+rule predicts six configurations p04 never built (`% 32` into `[u64; 64]`,
+`% 64` into `[u64; 96]` and `% 128` elide; `% 48`, `% 96`, `% 33` into their own
+lengths do not), and all six were measured. NOTES.md 1e.
 
 **And the non-power-of-two control is the pattern's largest single effect.**
 One edit to one constant (`controls/gen_controls.py`, `RING_CAP = 60`, with the
@@ -104,7 +122,22 @@ bug satisfies).
 
 Second instance of p09's result, and the first where the mechanism is visible in
 the invariant rather than inferred from a probe. It is also stronger than p09's
-in one respect: **both** of p04's guards are invisible, not one substitution.
+in one respect: **both** of p04's guards are invisible — one at a time *and*
+both at once (`x_bothguards_msonly`, `9/0`) — not one substitution.
+
+⚠ **Two scoping corrections, both from TASK_042_REVIEW, both landed in
+NOTES.md 6c and 12c.**
+
+- **The sentence above is true and is not a characterisation.** Reading
+  `ring[tail]` where the kernel reads `ring[head]` — memory-safe, functionally
+  wrong, **no guard touched** — also verifies `9/0`. The memory-safety-only
+  configuration is blind to *every* functional change, which is the honest form.
+- **It is NOT about the modulus.** Remove `%` entirely — wrap with a
+  source-level branch reached under the guard — and the obligation is *still*
+  two independent one-variable clauses, and the missing fullness check is
+  *still* invisible. **The property is that the index bound is the array's own
+  fixed capacity**, so the next fixed-capacity container without a modulus is
+  the same class, not a different one.
 
 ## The ladder, `-O3 isolated`, kernel-exclusive Ir per call
 
@@ -116,28 +149,46 @@ in one respect: **both** of p04's guards are invisible, not one substitution.
 | R1h c-clang-h | 3230 | 11234 | −4.0% | |
 | **R2 safe-naive** | **8119** | **28278** | **+141.4%** | indexed `buf[..]`, five checks per operation |
 | **R3 safe-tuned** | **3368** | **11667** | **+0.149%** | one window reslice; the ring index is free |
+| **R3 cheapest found** | **3367** | **11666** | **+0.119%** | the **two-step** reslice; in contract, not shipped |
 | **R4 unsafe** | **3363** | **11662** | 0 | `get_unchecked` throughout |
 | **R5 verus** | **3363** | **11662** | **0.00%** | byte-identical to R4 (`md5_raw 1be5994704b2`) |
 
-Swept over 99 blobs in four bands, **max residual 0.0000**, pooled design **rank
-5/5** (no band and no *pair* of bands identifies the terms — the pooling is
-load-bearing):
+⚠ **The safety tax is `+4.00`, not the shipped rung's `+5.00`.** Six in-contract
+spellings across **five distinct machine codes** reach `3367 / 11666`, and the
+mechanism is **register allocation, not bounds-check removal**: `off + len`
+needs a scratch register, `buf_len - off` does not. p04 does **not** re-ship on
+the cheaper spelling — NOTES.md 13c states the decision and the project-wide
+rule it implies.
+
+Swept over 99 blobs in four bands, pooled design **rank 5/5** (no band and no
+*pair* of bands identifies the terms — the pooling is load-bearing):
 
 ```
   safe_tuned (R3)  = 13·xpush + 9·dpush + 15·xpop + 8·epop + 51
   unsafe     (R4)  = 13·xpush + 9·dpush + 15·xpop + 8·epop + 46
-  R3 - R4          = 5.00000, FLAT
+  R3 - R4          = 5.00000, FLAT      (shipped; +4.00 against the cheapest)
   R1h - R1         = +4.00000 per accepted push, both compilers
   R2 - R3          = 20.00000 per operation + 11      <-- p03's law, exactly
 ```
 
 `large` is 3.5× outside every band and the laws predict it to the instruction.
 
+⚠ **Five of the seven swept rows are laws of `model.py`'s counts; the two R1
+rows are laws of R1's OWN counts** — R1 has no fullness check, so a push the
+model calls `dpush` it *accepts*. The two vectors agree on all 99 fitting blobs
+and both matrix inputs, which is why the published fit shows zero residual, and
+they come apart on the adversarial band `sweep-x*` that now ships, where the R1
+rows miss by up to 19% and the same coefficients at R1's own counts land
+exactly. NOTES.md 4 and 4c; `.memory/03-measurement.md`, *"a fitted law is a law
+in SOMEBODY's counts"*.
+
 Wall clock (`common/layout/order.py` first, 31 byte-identical copies, two
 passes, three schedules): **R2 is +25.7% on `small` and +9.7% on `large`** for
 +141% of instructions — a conversion factor of 5.5× / 14.7× — and **`R3 − R4` is
 a clean null** (−0.30…+0.71% against a 0.64…6.03% floor), which is the null the
-`Ir` column predicts. NOTES.md 11.
+`Ir` column predicts. **Both figures survive a real 30-layout population**,
+mode-matched at +25.1…+26.0% and +9.3…+10.2% with `P(A>B) = 100%`, and the null
+holds with its sign flipping between modes. NOTES.md 11, 11d.
 
 ## What is here
 
@@ -145,10 +196,11 @@ a clean null** (−0.30…+0.71% against a 0.64…6.03% floor), which is the nul
 |---|---|
 | `spec.md` | the contract, the hashed `slb-contract` block, the `idiom` declaration |
 | `model.py` | the independent Python reference — two implementations, checked against each other |
-| `inputs/gen.py` | 5 matrix blobs + 4 sweep bands (99 blobs), deterministic, verified byte-identical over two runs |
+| `inputs/gen.py` | 5 matrix blobs + 4 sweep bands (99 blobs) + the adversarial band X (3 blobs, never fitted), deterministic, verified byte-identical over two runs |
 | `c/` | R1 (`kernel.c`, the bug), R1h (`kernel_hardened.c`), the driver |
 | `safe_naive.rs` `safe_tuned.rs` `unsafe.rs` `verus.rs` | R2–R5 |
-| `controls/gen_controls.py` | 31 controls: the `RING_CAP = 60` build, the R3/R4 spelling searches, the C-side bounds check, four proof mutants and the eight-file `_msonly` family |
+| `controls/gen_controls.py` | 33 controls: the `RING_CAP = 60` build, the R3/R4 spelling searches (including the two **two-step reslice** cells that are the cheapest found), the C-side bounds check, four proof mutants and the eight-file `_msonly` family |
+| `controls/sweepfit.py` | the swept fit, its exact-rational rank, the held-out band-X prediction and the R1-own-count law |
 | `NOTES.md` | every number, with the command that produced it |
 
 **TCB: 10 lines across 5 items, three of them `unsafe`** — the gate's own

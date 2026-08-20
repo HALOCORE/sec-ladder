@@ -1,10 +1,10 @@
 {
   "pattern": "p04-ring-buffer",
-  "generated_utc": "2026-08-20T01:52:23Z",
+  "generated_utc": "2026-08-20T04:09:56Z",
   "git": {
-    "commit": "e8f3c733a26fa76c7831d388f75130b6577e9650",
+    "commit": "e72ed7243c3a0170e202134540b3499adda7b5f6",
     "dirty": true,
-    "dirty_files": 2,
+    "dirty_files": 12,
     "note": "commit is HEAD when measured, i.e. the parent of the commit this file lands in; a fresh run always names HEAD~1 and reads dirty. For real staleness run `harness/measure.py --check-stale`, which compares this record's source_sha256/input_sha256 against the tree."
   },
   "source_sha256": {
@@ -19,12 +19,12 @@
     "patterns/p04-ring-buffer/c/kernel.h": "b912897b321df089943a8b9bfa30b1df930dfe879f316c8d0ff79f15c95d705c",
     "patterns/p04-ring-buffer/c/kernel_hardened.c": "c242d75dccaab160ab1c544222f3bd9b5966463bf0158dcdbba5e404bd148df7",
     "patterns/p04-ring-buffer/c/main.c": "89ce77ab596aa51f831e2a69e03ee37d607ae70f9b9e4969329d7dfa9f9b3c93",
-    "patterns/p04-ring-buffer/inputs/gen.py": "25077e52c054933e1c9fad4e1c8048139fcd55271b1a41760746268df6f779dc",
+    "patterns/p04-ring-buffer/inputs/gen.py": "7e43ac777b598eba8fac540421ac4f0b13d6e854ffc9b85ce6b52f23410cdf2a",
     "patterns/p04-ring-buffer/model.py": "2682c9972f8e6cb7bb739e7a8db4259d16c81f2fa745a6f2c5c1a37b1bc664d7",
-    "patterns/p04-ring-buffer/safe_naive.rs": "df20091d42e736fceb86485b9ca3c9eb945294e406e17af8ae700fa03fd43381",
-    "patterns/p04-ring-buffer/safe_tuned.rs": "cf19691cd04b7b89c4ce84c5ae49b780c2fe076bcf70bd59106c2af73723ae6a",
+    "patterns/p04-ring-buffer/safe_naive.rs": "52b9d59169a76b4b839a579ff2b09f003b2954ea871cf362f08e8ed4b39c0943",
+    "patterns/p04-ring-buffer/safe_tuned.rs": "20e785af4bd121e06276a8893e1682ae986baa5d71a682db76af28ce12b3cd8c",
     "patterns/p04-ring-buffer/unsafe.rs": "1059af0d1cb83784aa89b65b6a927c82439e9b5040b2a557f52b7a4615b4a093",
-    "patterns/p04-ring-buffer/verus.rs": "1128b44e6e88d0cfb11a6a5ade7f3fc8150aad0d17ad85a23ab2708b03d1cc3f",
+    "patterns/p04-ring-buffer/verus.rs": "2b53b17e4024b5512240b79f729ea939dd7c78cd19ba5b177c3e54cce87d8848",
     "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
   },
   "input_sha256": {
@@ -247,16 +247,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.004943203181028366,
-          "median_s": 0.005435820668935776,
+          "min_s": 0.005031153559684753,
+          "median_s": 0.005407561548054218,
           "reps": 31,
-          "spread_pct": 9.965552089746943
+          "spread_pct": 7.481544419269329
         },
         "large.bin": {
-          "min_s": 0.01213244441896677,
-          "median_s": 0.012309195473790169,
+          "min_s": 0.012144451029598713,
+          "median_s": 0.012370838783681393,
           "reps": 31,
-          "spread_pct": 1.4568461945482472
+          "spread_pct": 1.8641250520992898
         }
       }
     },
@@ -321,16 +321,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.0050062816590070724,
-          "median_s": 0.0054388828575611115,
+          "min_s": 0.005125978030264378,
+          "median_s": 0.005398550070822239,
           "reps": 31,
-          "spread_pct": 8.641167797175829
+          "spread_pct": 5.317464080972722
         },
         "large.bin": {
-          "min_s": 0.012102242559194565,
-          "median_s": 0.012330514378845692,
+          "min_s": 0.012059264816343784,
+          "median_s": 0.01232173666357994,
           "reps": 31,
-          "spread_pct": 1.886194385334803
+          "spread_pct": 2.1765161577713372
         }
       }
     },
@@ -489,16 +489,17 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.006425913423299789,
-          "median_s": 0.006906741298735142,
+          "min_s": 0.006165919825434685,
+          "median_s": 0.006877146661281586,
           "reps": 31,
-          "spread_pct": 7.48263855675231
+          "spread_pct": 11.534805122068887,
+          "warning": "min-to-median spread > 10% -- `.memory/03-measurement.md` says discard"
         },
         "large.bin": {
-          "min_s": 0.012026351876556873,
-          "median_s": 0.012213798239827156,
+          "min_s": 0.01207226887345314,
+          "median_s": 0.0122360959649086,
           "reps": 31,
-          "spread_pct": 1.5586302911664711
+          "spread_pct": 1.357053037608486
         }
       }
     },
@@ -561,17 +562,17 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.006159249693155289,
-          "median_s": 0.006932038813829422,
+          "min_s": 0.006135745905339718,
+          "median_s": 0.006838037632405758,
           "reps": 31,
-          "spread_pct": 12.546806172396712,
+          "spread_pct": 11.445906298936873,
           "warning": "min-to-median spread > 10% -- `.memory/03-measurement.md` says discard"
         },
         "large.bin": {
-          "min_s": 0.012473572976887226,
-          "median_s": 0.012756488285958767,
+          "min_s": 0.01252097636461258,
+          "median_s": 0.012745835818350315,
           "reps": 31,
-          "spread_pct": 2.2681176403566625
+          "spread_pct": 1.7958619774512552
         }
       }
     },
@@ -740,17 +741,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.0070285918191075325,
-          "median_s": 0.007754015736281872,
+          "min_s": 0.007076510228216648,
+          "median_s": 0.007765449583530426,
           "reps": 31,
-          "spread_pct": 10.32104205001979,
-          "warning": "min-to-median spread > 10% -- `.memory/03-measurement.md` says discard"
+          "spread_pct": 9.735580577086195
         },
         "large.bin": {
-          "min_s": 0.013415463268756866,
-          "median_s": 0.013646481558680534,
+          "min_s": 0.01349182054400444,
+          "median_s": 0.013716915622353554,
           "reps": 31,
-          "spread_pct": 1.7220299090355233
+          "spread_pct": 1.6683817992905507
         }
       }
     },
@@ -816,16 +816,17 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.007589299231767654,
-          "median_s": 0.008203175850212574,
+          "min_s": 0.007324881851673126,
+          "median_s": 0.008255405351519585,
           "reps": 31,
-          "spread_pct": 8.088712800719799
+          "spread_pct": 12.703597391593576,
+          "warning": "min-to-median spread > 10% -- `.memory/03-measurement.md` says discard"
         },
         "large.bin": {
-          "min_s": 0.014709562994539738,
-          "median_s": 0.01485277060419321,
+          "min_s": 0.014619321562349796,
+          "median_s": 0.014841211028397083,
           "reps": 31,
-          "spread_pct": 0.9735680774923924
+          "spread_pct": 1.517782238395625
         }
       }
     },
@@ -994,16 +995,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.0053843166679143906,
-          "median_s": 0.005909698083996773,
+          "min_s": 0.005356328561902046,
+          "median_s": 0.005836332216858864,
           "reps": 31,
-          "spread_pct": 9.757624755118426
+          "spread_pct": 8.96143037921421
         },
         "large.bin": {
-          "min_s": 0.012279595248401165,
-          "median_s": 0.012561713345348835,
+          "min_s": 0.012346141040325165,
+          "median_s": 0.012506517581641674,
           "reps": 31,
-          "spread_pct": 2.297454364258484
+          "spread_pct": 1.2990013704904617
         }
       }
     },
@@ -1069,16 +1070,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.005685837939381599,
-          "median_s": 0.006133579649031162,
+          "min_s": 0.005623773671686649,
+          "median_s": 0.006002029404044151,
           "reps": 31,
-          "spread_pct": 7.874682930169127
+          "spread_pct": 6.72601271743672
         },
         "large.bin": {
-          "min_s": 0.01255938969552517,
-          "median_s": 0.012759024277329445,
+          "min_s": 0.012646974995732307,
+          "median_s": 0.012772629968822002,
           "reps": 31,
-          "spread_pct": 1.5895245441377144
+          "spread_pct": 0.9935575355537348
         }
       }
     },
@@ -1247,16 +1248,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.005365566350519657,
-          "median_s": 0.0057172393426299095,
+          "min_s": 0.005438847467303276,
+          "median_s": 0.0058076027780771255,
           "reps": 31,
-          "spread_pct": 6.554256701647026
+          "spread_pct": 6.780026705854431
         },
         "large.bin": {
-          "min_s": 0.012266640551388264,
-          "median_s": 0.012494910508394241,
+          "min_s": 0.012322799302637577,
+          "median_s": 0.012480934150516987,
           "reps": 31,
-          "spread_pct": 1.8609003504235186
+          "spread_pct": 1.2832704971958973
         }
       }
     },
@@ -1322,16 +1323,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.006419045850634575,
-          "median_s": 0.006904935464262962,
+          "min_s": 0.0064351921901106834,
+          "median_s": 0.006901813670992851,
           "reps": 31,
-          "spread_pct": 7.569499033572931
+          "spread_pct": 7.251088500499657
         },
         "large.bin": {
-          "min_s": 0.01340152695775032,
-          "median_s": 0.013619601726531982,
+          "min_s": 0.013410630635917187,
+          "median_s": 0.013611986301839352,
           "reps": 31,
-          "spread_pct": 1.6272382204592426
+          "spread_pct": 1.5014630660461383
         }
       }
     },
@@ -1498,17 +1499,17 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.00536440871655941,
-          "median_s": 0.005979585461318493,
+          "min_s": 0.00523785874247551,
+          "median_s": 0.005804741755127907,
           "reps": 31,
-          "spread_pct": 11.467745603725007,
+          "spread_pct": 10.822800700128802,
           "warning": "min-to-median spread > 10% -- `.memory/03-measurement.md` says discard"
         },
         "large.bin": {
-          "min_s": 0.012270037084817886,
-          "median_s": 0.012511953711509705,
+          "min_s": 0.012319855391979218,
+          "median_s": 0.012450403533875942,
           "reps": 31,
-          "spread_pct": 1.9716046905118934
+          "spread_pct": 1.05965644679334
         }
       }
     },
@@ -1574,16 +1575,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.006658202037215233,
-          "median_s": 0.007075419649481773,
+          "min_s": 0.006380632519721985,
+          "median_s": 0.007008538581430912,
           "reps": 31,
-          "spread_pct": 6.266220369020826
+          "spread_pct": 9.840812172901725
         },
         "large.bin": {
-          "min_s": 0.013313477858901024,
-          "median_s": 0.013558435253798962,
+          "min_s": 0.013348788022994995,
+          "median_s": 0.013547098264098167,
           "reps": 31,
-          "spread_pct": 1.8399203986670247
+          "spread_pct": 1.4856048411403158
         }
       }
     },
@@ -1742,17 +1743,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.00507375318557024,
-          "median_s": 0.005599000491201878,
+          "min_s": 0.005194330587983131,
+          "median_s": 0.005562973208725452,
           "reps": 31,
-          "spread_pct": 10.352243919263584,
-          "warning": "min-to-median spread > 10% -- `.memory/03-measurement.md` says discard"
+          "spread_pct": 7.097018845800082
         },
         "large.bin": {
-          "min_s": 0.012122802436351776,
-          "median_s": 0.012349288910627365,
+          "min_s": 0.012171931564807892,
+          "median_s": 0.012386191636323929,
           "reps": 31,
-          "spread_pct": 1.8682682941069821
+          "spread_pct": 1.7602799553648216
         }
       }
     },
@@ -1817,16 +1817,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.005870427004992962,
-          "median_s": 0.0062630511820316315,
+          "min_s": 0.005909371189773083,
+          "median_s": 0.006298723630607128,
           "reps": 31,
-          "spread_pct": 6.688170668074601
+          "spread_pct": 6.5887287890777495
         },
         "large.bin": {
-          "min_s": 0.012199634686112404,
-          "median_s": 0.012409500777721405,
+          "min_s": 0.012219280004501343,
+          "median_s": 0.012442384846508503,
           "reps": 31,
-          "spread_pct": 1.7202653768633307
+          "spread_pct": 1.8258427822668173
         }
       }
     },
@@ -1985,16 +1985,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.006866835057735443,
-          "median_s": 0.007475603371858597,
+          "min_s": 0.006861569359898567,
+          "median_s": 0.007419230416417122,
           "reps": 31,
-          "spread_pct": 8.865340568176023
+          "spread_pct": 8.127310637967499
         },
         "large.bin": {
-          "min_s": 0.012092053890228271,
-          "median_s": 0.012316598556935787,
+          "min_s": 0.012161629274487495,
+          "median_s": 0.012301521375775337,
           "reps": 31,
-          "spread_pct": 1.8569605192462204
+          "spread_pct": 1.1502743434327964
         }
       }
     },
@@ -2057,17 +2057,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.006018593907356262,
-          "median_s": 0.006653998047113419,
+          "min_s": 0.0059374552220106125,
+          "median_s": 0.0064833033829927444,
           "reps": 31,
-          "spread_pct": 10.557351925348042,
-          "warning": "min-to-median spread > 10% -- `.memory/03-measurement.md` says discard"
+          "spread_pct": 9.193301516761423
         },
         "large.bin": {
-          "min_s": 0.012571258470416069,
-          "median_s": 0.012742547318339348,
+          "min_s": 0.012542882934212685,
+          "median_s": 0.012735066935420036,
           "reps": 31,
-          "spread_pct": 1.3625433629128914
+          "spread_pct": 1.532215537810208
         }
       }
     }

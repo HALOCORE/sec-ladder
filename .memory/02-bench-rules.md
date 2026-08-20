@@ -599,6 +599,55 @@ repeated defect in this project's history.
 - If a rung is impossible for a pattern (e.g. R5 defeated by a proof obligation),
   record *where it got stuck*. That is a finding, not a gap.
 
+## NEVER re-ship a rung because a cheaper in-contract spelling was found
+
+Settled at TASK_044, which was handed the decision open and argued it closed.
+The manager's task file said either answer was defensible; it is not.
+
+> **The shipped rung is chosen by IDIOM, before measurement, and it stays.** A
+> cheaper in-contract spelling moves the **published bound** —
+> `inf(in-contract found) − R4ship`, with the spelling named — and ships as a
+> **control**. Re-ship only for a reason that is not the rung's cost: the shipped
+> spelling turns out to be **out of contract**, **semantically wrong**, or **not
+> the idiom it claims to be**.
+
+Four reasons, and the first is the one that generalises:
+
+1. **Selecting the rung by measured cost is the same move as narrowing the
+   declaration to protect a number, one level over.** The direction test
+   (`.memory/01-ladder.md`) catches an edit to the *declaration*; it does not
+   catch an edit to the *rung*. A project that re-ships on cost has a
+   cost-selected R3 and a decidable-looking contract, which is the worst
+   combination available.
+2. **It is asymmetric in practice.** R4 is a spelling too, and the R4 side is
+   chained to the prover (finding 14) — so it usually cannot move. Applying
+   re-shipping to whichever side happens to be free systematically shrinks the
+   published tax in one direction.
+3. **It makes the shipped rung a function of how hard the last reviewer
+   searched.** Five published "minimums" on this project have been overturned by
+   the next search; a rung that moves with each of them has no stable meaning.
+4. **It buys nothing measurable.** The cheapest-found bound is `+4.00` on p04
+   whether or not the rung moves. **All the information is in the bound, not in
+   which spelling is nailed to the mast.**
+
+**Precedent was already consistent and three-deep before the rule existed**: p16,
+p05 and p03 each found cheaper in-contract spellings and each kept its shipped
+rung. p04 is the fourth.
+
+⚠ **The corollary for reporting.** When the shipped rung is not the cheapest
+found — which is now the case on four patterns — **publish both numbers,
+labelled**, and never let one stand in for the other:
+
+| quantity | definition | held fixed by |
+|---|---|---|
+| **fixed-R4 bound** | `R3ship − R4ship` | the shipped R3 *and* R4, both by fiat |
+| **cheapest-found in-contract bound** | `inf(in-contract found) − R4ship` | R4 by fiat; **name the spelling and the input** |
+
+On p04 they are `+5.00` and `+4.00`. Writing either alone loses information, and
+`.memory/01-ladder.md` briefly instructed an engineer to overwrite the first with
+the second — which would have published a number for a rung the tree does not
+contain. The engineer refused it.
+
 ## The precondition must be structural. The attack must be data.
 
 Settled at TASK_003_REVIEW, which found the rule below collides head-on with any

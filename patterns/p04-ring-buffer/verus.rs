@@ -21,10 +21,13 @@
 //!
 //! That is not a convenience, it *is* the security result. Because the guards
 //! are absent from the memory-safety argument, deleting one is invisible to it:
-//! NOTES.md 6 measures `nofull_msonly` at `12 verified, 0 errors` -- R1's bug
-//! transplanted into R5 with the functional specification stripped -- against a
-//! positive control (`tail = tail + 1` with the `%` removed) that fails on the
-//! very same invariant. **Memory safety is not the property that catches this**,
+//! NOTES.md 6 measures `m_nofull_msonly` at `9 verified, 0 errors` in the
+//! shipped configuration and `12 verified, 0 errors` under `--cfg slb_twin`
+//! (the twin adds the three `_twin` items) -- R1's bug transplanted into R5
+//! with the functional specification stripped -- against a positive control
+//! (`tail = tail + 1` with the `%` removed) that fails on the very same
+//! invariant. Both numbers are printed there; the citation used to name only
+//! the 12 and NOTES.md 6 used to print only the 9 (TASK_042_REVIEW minor 7). **Memory safety is not the property that catches this**,
 //! for the second time in this project after p09, and here the mechanism is
 //! visible in the invariant rather than inferred from a probe.
 //!

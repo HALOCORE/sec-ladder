@@ -24,11 +24,26 @@
 //! pads for `ring`** to prove it (../NOTES.md 1).
 //!
 //! It is not a property of `%`. `controls/gen_controls.py` ships the identical
-//! source at `RING_CAP = 60`, where the fact is a *range* rather than a set of
-//! known bits, the range does not survive the phi, and **both ring checks come
-//! back** -- 12 static instructions and 3 landing pads instead of 1
-//! (../NOTES.md 1a). One edit, and it is the largest single effect in this
-//! pattern.
+//! source at `RING_CAP = 60` and **both ring checks come back** -- 12 static
+//! instructions and 3 landing pads instead of 1 (../NOTES.md 1a). One edit, and
+//! it is the largest single effect in this pattern.
+//!
+//! ⚠ **This comment used to explain that as "at 60 the fact is a RANGE rather
+//! than known bits", and that is FALSE** (TASK_042_REVIEW MAJOR 3). `% 60`
+//! supplies known bits too -- `computeKnownBits(urem x, 60)` zeroes the high 58,
+//! i.e. `x % 60 < 64` -- and that fact *does* survive the loop-carried phi:
+//! `% 60` into a `[u64; 64]` array elides the check. The measured rule is
+//! quantitative and has zero fitted parameters:
+//!
+//!     urem x, C  supplies  x < next_pow2(C), and the ring check is elided when
+//!     next_pow2(CAP) <= ARR_LEN  -- necessarily, and sufficiently absent a
+//!     guard relating the two cursors.
+//!
+//! `next_pow2(64) = 64 <= 64`; `next_pow2(60) = 64 > 60`. That is the whole of
+//! the 60-vs-64 gap, and ../NOTES.md 1e is the 48-kernel separation that
+//! establishes it -- including the row that carries the headline: spelling the
+//! wrap as a source-level *branch* brings both checks back **at 64 as well**, at
+//! the identical provable range, so the range is never what carries.
 //!
 //! `ring` is `[0u64; RING_CAP]` because safe Rust has no uninitialised array;
 //! C's `uint64_t ring[64];` is not initialised. That is a per-call constant, it

@@ -12,7 +12,7 @@
 //! power-of-two `RING_CAP` is a mask and LLVM carries known bits around the
 //! loop-carried phi. Measured before this rung was written and again after
 //! (../NOTES.md 1): this kernel's *only* surviving panic landing pad is the
-//! window reslice on line 47, and it is the same one pad whether the ring is
+//! window reslice below, and it is the same one pad whether the ring is
 //! indexed or `get_unchecked`ed.
 //!
 //! | rung | opcode-stream check | ring check |
@@ -21,11 +21,33 @@
 //! | **R3** | one reslice per call | **0** |
 //! | R4/R5 | 0 | 0 |
 //!
-//! **There are two in-contract R3 spellings and this is the cheaper**
-//! (`.memory/01-ladder.md` finding 3 requires at least two, with the cheaper
-//! quoted). The other is `w[4..4 + 5 * nops].chunks_exact(5)`, built as a
-//! control in ../NOTES.md 10a. Neither touches the ring, because there is
-//! nothing there to touch.
+//! ⚠ **THIS IS NOT THE CHEAPEST IN-CONTRACT R3, and the header used to claim it
+//! was** (TASK_042_REVIEW blocker 1). Six in-contract spellings across **five
+//! distinct machine codes** measure `3367 / 11666` against this rung's
+//! `3368 / 11667` -- `+4.00` against R4 where this measures `+5.00`. Two of them
+//! ship as controls (`r3_reslice2_get`, `r3_reslice2_split`); the cheapest form
+//! is the **two-step reslice**, `buf.get(off..).unwrap().get(..len).unwrap()` or
+//! `buf.split_at(off).1.split_at(len).0`.
+//!
+//! The mechanism is **register allocation, not bounds-check removal**: both
+//! forms keep both checks, but `off + len` needs a scratch register while
+//! `buf_len - off` is computed in place in `%rsi`, which is dead afterwards
+//! (`mov ; add ; jb ; cmp ; ja` against `sub ; jb ; cmp ; ja`). ../NOTES.md 10a
+//! has the listings; **`+4.00` is p04's published safety tax** and this rung's
+//! `+5.00` is the shipped-rung difference.
+//!
+//! **This rung is NOT re-shipped on the cheaper spelling, deliberately** --
+//! ../NOTES.md 13c states the decision and the project-wide rule it implies. In
+//! one line: the shipped rung is chosen by *idiom*, before measurement, and
+//! `&buf[off..off + len]` is what an experienced Rust programmer writes; the
+//! search bounds the class and is published as a span with the cheapest
+//! endpoint named. The `idiom` block pins no reslice spelling at all, so every
+//! one of the six is in contract by construction.
+//!
+//! (`.memory/01-ladder.md` finding 3 requires at least two in-contract R3
+//! spellings with the cheaper quoted. There are now six; the dearest is
+//! `w[4..4 + 5 * nops].chunks_exact(5)` at `+239 / +832`. None of them touches
+//! the ring, because there is nothing there to touch.)
 //!
 //! **What is NOT here, and why**: `ring[tail & (RING_CAP - 1)]` is
 //! `idiom.forbidden` -- and ../NOTES.md 10a measures that forbidding it removes
