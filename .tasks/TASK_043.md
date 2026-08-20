@@ -11,6 +11,27 @@ for your adversarial rows — then `.memory/03-measurement.md`, `.memory/04-veru
 the template you clone (same family, same fixed destination, same NUL
 machinery). Where this spec is silent, **do what p12 did.**
 
+**Four `.memory/` sections landed since the last pattern was built, and three of
+them will change what you do rather than how you write it up:**
+
+- `.memory/01-ladder.md` **finding 3's two-step-reslice paragraph** — a
+  **`−1 Ir/call`** lever, untried on every pattern before p04, whose mechanism is
+  **register allocation, not bounds-check removal**. p13's R3 opens with a window
+  reslice. **Spell it the cheap way from the start** and you will not owe a
+  correction; it was 20% of p04's whole published tax.
+- `.memory/02-bench-rules.md` **"NEVER re-ship a rung"** and its reporting
+  corollary — when your shipped R3 is not the cheapest found, **two numbers ship,
+  labelled**: the fixed-R4 bound `R3ship − R4ship`, and the cheapest-found
+  in-contract bound with the spelling *and* the input named.
+- `.memory/03-measurement.md` **"A fitted law is a law in SOMEBODY's counts"** —
+  your R1 cell omits a line, so **it does not execute the model's program**. Two
+  of p04's seven laws were wrong out of sample for exactly this reason and 99
+  in-sample blobs could not see it. **Build one blob that turns on every
+  regressor at once, and pre-register the prediction** (p04's band X is the
+  model, including its within-band negative control).
+- `.memory/00-environment.md` **memcheck** — V-bit tracking *does* work on a
+  static build. That is the tool for item 2 of "least sure of", below.
+
 ## Why this pattern
 
 **1. Every R1 in this project so far omits a line a careful programmer would
@@ -195,10 +216,12 @@ and blobs once the gate is green; **keep every generator**.
 
 Notes to `.temp/p13/NOTES.md` as you go.
 
-**If a prescription here is wrong, say so with the measurement.** Fifty-five
-agents have contradicted the manager and all fifty-five were right — p04's
-engineer refuted three of my prescriptions in one task. **Settle these two before
-building five rungs on them**, the way p04's §0 did:
+**If a prescription here is wrong, say so with the measurement.** Fifty-seven
+agents have contradicted the manager and all fifty-seven were right — p04's
+engineer refuted three of my prescriptions when it built the pattern and three
+more when it landed the review, including one that would have published a number
+for a rung the tree does not contain. **Settle these two before building five
+rungs on them**, the way p04's §0 did:
 
 - **Whether `dst[DST_CAP - 1] = 0` is measurable at all.** If LLVM sinks it into
   the zero-fill or dead-store-eliminates it on every path, `R1h − R1` is exactly

@@ -9,8 +9,8 @@ this box is reference; this box is what to *do*.
 | | |
 |---|---|
 | **Patterns** | **12 of 47 exist, all green, all 12 reviewed.** |
-| **Immediate next task** | **dispatch `TASK_044`** (already written): p04's engineer lands one blocker + three majors from `TASK_042_REVIEW_REPORT.md` into p04's own files. `.memory/` and RECAP are **already corrected** — the task is prose and controls, not re-derivation. |
-| **Then** | **the next pattern: `TASK_043` is written and ready** — p13, `strncpy` truncation. Queue after it: **p06** (in-place reverse — a permutation invariant, a new *proof* shape), **p14** (tokenizer — in-place mutation + aliasing). |
+| **Immediate next task** | **`TASK_043` — p13, `strncpy` truncation.** Written and dispatched. p04 is built, reviewed and corrected; nothing is outstanding on it. |
+| **Then** | review p13, then **p06** (in-place reverse — a permutation invariant, a new *proof* shape), then **p14** (tokenizer — in-place mutation + aliasing). |
 | **The loop** | build a pattern → review it once → land corrections → repeat. Per `PROTOCOL.md` rule 9, write `.memory/` **only after** the review. |
 | **Git** | Commit at task boundaries; subagents never commit. ⚠ **There is a GitHub remote** (`origin`, `HALOCORE/sec-ladder`). **Do not push unless the user asks.** |
 | **Before quoting any number** | `harness/measure.py --check-stale` (exit 1 on STALE). |
