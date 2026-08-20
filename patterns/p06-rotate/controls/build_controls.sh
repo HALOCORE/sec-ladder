@@ -23,6 +23,7 @@ rc=0
 for f in "$CTL"/a_nored_safe_naive.rs "$CTL"/a_nored_safe_tuned.rs \
          "$CTL"/a_nored_unsafe.rs "$CTL"/c_idx.rs "$CTL"/c_oneshot.rs \
          "$CTL"/c_r4inline.rs "$CTL"/c_reverse.rs "$CTL"/c_rotate.rs \
+         "$CTL"/c_copywithin.rs "$CTL"/c_foldidx.rs \
          "$CTL"/c_swap.rs "$CTL"/e_revonly.rs "$CTL"/e_foldonly.rs "$CTL"/e_hdronly.rs; do
     n=$(basename "$f" .rs)
     if timeout 300 "$RUSTC" --edition 2021 -C opt-level=3 -C debug-assertions=off \

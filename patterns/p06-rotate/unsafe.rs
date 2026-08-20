@@ -47,22 +47,38 @@ mod driver;
 const SCR: usize = 64;
 
 // THE BULK LOAD, and the one place all seven rungs are held to the same
-// spelling: `memcpy` in C, this in all four Rust rungs, and verus.rs's trusted
-// `scr_load` wrapper -- whose body is exactly this line -- in R5. ../spec.md
-// pins it, so that the measured difference between rungs is the ROTATE and not
-// the load. p02's retraction is the precedent: one operator flips `bulk_calls`
-// and 100% of the delta.
+// spelling: `memcpy` in C and `.copy_from_slice(&src[from..from + n]);` in all
+// four Rust rungs. ../spec.md pins that call, so that the measured difference
+// between rungs is the ROTATE and not the load. p02's retraction is the
+// precedent: one operator flips `bulk_calls` and 100% of the delta.
+//
+// ** The RECEIVER is scoped 2-and-2 (TASK_048). ** safe_naive.rs and
+// safe_tuned.rs write `dst[..n]`; this rung and verus.rs write the three exec
+// lines below, character for character, because `..n` is a `RangeTo<usize>` and
+// `RangeTo` has NO `SliceIndexSpecImpl` at the pinned vstd -- so `dst[..n]`
+// cannot be VERIFIED at all, and R4 follows R5 because the `identity` pin makes
+// them one program. At -O3 the price is ZERO: `md5_raw 6608a63b5c52`,
+// `md5_fn 897c52ff4005`, 216/208, identical to the pre-TASK_048 bytes. At -O0 it
+// is +3 static instructions here, and it is what keeps `identity` at `norel`
+// there. ../NOTES.md 6a.
 //
 // It is a `#[inline(always)]` free function rather than an inline expression
-// because R5's copy has to be inside an `#[verifier::external_body]` item
-// (there is no vstd spec for `copy_from_slice`), and R4 must be byte-identical
+// because R4 must be byte-identical to R5 and R5's copy is a free function.
+// (The reason recorded here until TASK_048 -- "R5's copy has to be inside an
+// `#[verifier::external_body]` item, there is no vstd spec for
+// `copy_from_slice`" -- is FALSE in both halves: the pinned vstd specifies
+// `copy_from_slice` at `vstd/std_specs/slice.rs:205`, and R5's `scr_load` is
+// VERIFIED, not trusted, as of TASK_048. What survives is the helper BOUNDARY,
+// which is what changes LLVM's inlining order.) R4 must be byte-identical
 // to R5 at -O3. Written inline in `kernel` instead, R4 is 179 instructions;
 // written this way it is 208, because the call boundary changes LLVM's
 // inlining order. That 29-instruction delta is the `identity` pin's price on
 // this pattern and ../NOTES.md 3 measures what it costs in executed `Ir`.
 #[inline(always)]
 fn scr_load(dst: &mut [u8; SCR], src: &[u8], from: usize, n: usize) {
-    dst[..n].copy_from_slice(&src[from..from + n]);
+    let s: &mut [u8] = dst;
+    let (a, _b) = s.split_at_mut(n);
+    a.copy_from_slice(&src[from..from + n]);
 }
 
 // ---------------------------------------------------------------- kernel ----

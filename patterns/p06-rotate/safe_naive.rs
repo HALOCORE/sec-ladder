@@ -42,14 +42,24 @@ const SCR: usize = 64;
 
 // THE BULK LOAD, and the one place all seven rungs are held to the same
 // spelling: `memcpy` in C, this in all four Rust rungs, and verus.rs's trusted
-// `scr_load` wrapper -- whose body is exactly this line -- in R5. ../spec.md
+// `scr_load` -- whose body is the same bulk call -- in R5. THE RECEIVER is
+// scoped 2-and-2: this rung writes `dst[..n]`, and unsafe.rs and verus.rs write
+// `a` after `split_at_mut(n)` because `RangeTo<usize>` has no
+// `SliceIndexSpecImpl` at the pinned vstd. Its price is ZERO at -O3
+// (../NOTES.md 6a).
+// ../spec.md
 // pins it, so that the measured difference between rungs is the ROTATE and not
 // the load. p02's retraction is the precedent: one operator flips `bulk_calls`
 // and 100% of the delta.
 //
 // It is a `#[inline(always)]` free function rather than an inline expression
-// because R5's copy has to be inside an `#[verifier::external_body]` item
-// (there is no vstd spec for `copy_from_slice`), and R4 must be byte-identical
+// because R4 must be byte-identical to R5 and R5's copy is a free function.
+// (The reason recorded here until TASK_048 -- "R5's copy has to be inside an
+// `#[verifier::external_body]` item, there is no vstd spec for
+// `copy_from_slice`" -- is FALSE in both halves: the pinned vstd specifies
+// `copy_from_slice` at `vstd/std_specs/slice.rs:205`, and R5's `scr_load` is
+// VERIFIED, not trusted, as of TASK_048. What survives is the helper BOUNDARY,
+// which is what changes LLVM's inlining order.) R4 must be byte-identical
 // to R5 at -O3. Written inline in `kernel` instead, R4 is 179 instructions;
 // written this way it is 208, because the call boundary changes LLVM's
 // inlining order. That 29-instruction delta is the `identity` pin's price on

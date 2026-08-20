@@ -82,5 +82,18 @@ the bare check.
   publishable result about **rustc's loop-idiom recognition being sensitive to
   how a bound is spelled** — see `NOTES.md` §0a and §3a.
 
+- **The trusted `copy_bytes` wrapper is NOT there because vstd lacks a spec, and
+  that sentence is withdrawn (TASK_048).** The pinned vstd *does* specify
+  `<[T]>::copy_from_slice` (`vstd/std_specs/slice.rs:205`) and p02's `copy_bytes`
+  contract discharges from it with no `external_body` and no `unsafe` —
+  **`10 verified, 0 errors`, twin `13/0`**. p02 keeps the wrapper anyway, for a
+  **measured** reason: the verified spelling is 81/79 instructions against R4's
+  72/70, costs **+5.00 executed `Ir` per call flat**, leaves one panic landing
+  pad, and so **breaks `identity: unsafe == verus, O3 exact`** — because R4's
+  body is `copy_nonoverlapping`, and that call plus `as_ptr`, `as_mut_ptr` and
+  `<*const T>::add` are all `is not supported` at the pinned vstd. (p06's R4
+  already writes `copy_from_slice`, so p06 *did* land the same removal, at zero
+  cost, taking its TCB 6 items → 5.) `NOTES.md` §5b.
+
 Numbers, the residue curve, the full adversarial behaviour table, the TCB tally
 and the mutation results are in `NOTES.md`.

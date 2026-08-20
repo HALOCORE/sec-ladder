@@ -242,15 +242,67 @@ difference.
 
 | quantity | law | domain / residual |
 |---|---|---|
-| **`R1h − R1`, gcc** | **`+8.00·nrec − 1.00·rzero + 1.00`**, and `0.00000` per byte | **max residual 0.0000 over all 77 blobs** of bands N + M + X, `m` 1…48 including the degenerate `m = 1, 2` |
+| **`R1h − R1`, gcc** | **`+8.00·nrec − 1.00·rzero + 1.00`**, and `0.00000` per byte. ⚠ **Only `1.00` of that `8.00` is the divide** — see 3a′, which decomposes it and shows that `1.83` of it is *executed alignment padding* | **max residual 0.0000 over all 77 blobs** of bands N + M + X, `m` 1…48 including the degenerate `m = 1, 2` |
 | **`R1h − R1`, clang** | **`−10.00·nrec` (`m ≡ 0 mod 4`) / `−9.00·nrec` (otherwise) / `−8.00·nrec` (`m <= 2`, where every `r` reduces to 0)**, and `0.00000` per byte | exact per residue class over `m` 1…48; the pooled fit without residue regressors leaves 6.04 |
 | `R2 − R4` | `+32.00·nrec + 13.00`, **`0.00000` per byte** | exact; `269.00` flat over all 46 `m` in 3…48 |
-| `R3 − R4` | **`2.00000` Ir per byte of the live extent**, plus `α(m mod 8)·nrec + 1` with `α ∈ {3, 5, 19, 22}` | exact for `m >= 4`; `m = 3` is an outlier (§9) |
+| `R3ship − R4` | **`2.00000` Ir per byte of the live extent**, plus `α(m mod 4)·nrec + 1` with `α = {0: 19, 1: 3, 2: 22, 3: 5}`. ⚠ **This is ONE SPELLING's law, not R3's** — see 4a; and the residue period is **4, not the 8 published until TASK_048** | exact for `m >= 4`, 45/45; `m = 3` is an outlier (§9) |
+| **`c_idx − R4`** — the **cheapest-found in-contract R3 on `small`** | **`0.00000` Ir per byte**, `α′(m mod 4)·nrec + 1` with `α′ = {0: 13, 1: 15, 2: 16, 3: 17}` | exact, 45/45 over `m` 4…48 (§9a) |
 | `R5 − R4` | **`0.00000` everywhere** | pooled fit over 77 blobs, **all five coefficients exactly 0, max residual 0.0000** |
 
 **So the safety line has NO per-byte term on either compiler.** It executes once
-per record and it is priced once per record — which is what a per-record check
-should cost, and it is why the sign result below cannot be a size artefact.
+per record and it is priced once per record — and it is why the sign result below
+cannot be a size artefact. ⚠ **What it is NOT is "what a per-record check should
+cost"**, which is what this paragraph said until TASK_048; 3a′ decomposes the
+`8.00` and only `1.00` of it is the check.
+
+### 3a′. The gcc law decomposed — 23% of it is EXECUTED ALIGNMENT PADDING
+
+TASK_047_REVIEW's M2, re-measured here. Per-instruction callgrind
+(`--dump-instr=yes`, `.temp/p48/cg/al.*.out`) on `large`, 12 records/call, at the
+gate's own flags. The delta is `+95.00`/call exactly, i.e. `+7.917`/record:
+
+| mnemonic | R1 → R1h, Ir/call | per record | what it is |
+|---|---:|---:|---|
+| `divq` | 0.00 → 12.00 | **+1.000** | **THE SAFETY LINE** |
+| `nopl` + `nop`, net | 13.00 → 35.00 | **+1.833** | **EXECUTED `.p2align` PADDING** |
+| `movzbl` | 282.00 → 330.00 | +4.000 | the header decode, re-materialised |
+| `movb` | 130.00 → 154.00 | +2.000 | **two byte SPILLS**, named below |
+| `xorl` | 29.00 → 40.00 | +0.917 | |
+| `movq` | 244.00 → 246.00 | +0.167 | |
+| `cmpq` | 174.00 → 162.00 | −1.000 | |
+| `jae` | 24.00 → 12.00 | −1.000 | |
+| | | **= +7.917** | |
+
+The two spills are not inferred, they are named: `movb %r15b,0x17(%rsp)` at
+**12.00/call** and `movb %dl,0x16(%rsp)` at **12.00/call**, both **0.00 in R1**.
+The `div` and its zero-guard push gcc into spilling two decoded header bytes.
+
+**A semantics-free flag moves the law by 23%.** Same sources, same inputs, one
+gcc flag that changes no semantics and no work:
+
+| gcc flag | R1 Ir/call | R1h Ir/call | Δ | Δ/rec | executed nops R1 / R1h |
+|---|---:|---:|---:|---:|---|
+| shipped (`-O3`) | 1988.00 | 2083.00 | **+95.00** | +7.917 | 25 / 47 |
+| `-fno-align-loops` | 1963.00 | 2036.00 | **+73.00** | +6.083 | 0 / 0 |
+| `-falign-loops=1` | 1963.00 | 2036.00 | +73.00 | +6.083 | 0 / 0 |
+| `-falign-loops=32` | 2058.00 | 2153.00 | +95.00 | +7.917 | 95 / 117 |
+
+> **A law can be exact, zero-residual and validated out of sample and still be
+> 23% alignment padding.** `.memory/03-measurement.md:234` records the *static*
+> nop caveat — "the raw count overstates the gap". The **dynamic** one is this:
+> executed `.p2align` padding inside a hot loop lands in a published `Ir` law,
+> and no residual can see it because it is exactly as reproducible as the work.
+> It reaches a second p06 law independently — §9a's `[k > 0]` term is one
+> executed `nop` at `0x15a4f`.
+
+**And it reconciles §0b with §3a, which nothing joined until now.** §0b's
+standalone probe measures gcc `mod − bug = +1.00`/record and §3a measures
+`+8.00`/record on the shipped tree, 8× apart. The honest decomposition of the
+8.00 is **1.00 the divide, 1.83 executed padding, and 5.08 the register pressure
+the `div` and its guard put on the header decode** (the `movzbl`/`movb`/`xorl`
+rows above, net). The probe has no driver, no record loop and no spill, so it
+sees the 1.00 and nothing else. Both numbers are right; they measure different
+things and the file now says which.
 
 On the shipped inputs (whole-program marginal, `small` = 5 records / 157 bytes,
 `large` = 12 records / 52 bytes):
@@ -310,10 +362,22 @@ it.
 | clang `R1h − R1`, `large` | **−108.00 (−5.65%)** | **+15.35 (+10.56%)** | **the signs disagree** |
 | `R5 − R4` (the null) | 0.00 exactly | +3.00% / −1.41% | the floor |
 
-Every one of the four is a multiple of the ±3% floor. gcc's `large` figure is a
-64-bit `div` per record: 88.10 ns over 12 records is **7.34 ns/record**, i.e.
-≈ 21–28 cycles at this box's 2.8–3.9 GHz band — squarely Cascade Lake's `div r64`
-throughput, and 12 × what `Ir` charges.
+Every one of the four is a multiple of the ±3% floor, and **all four survive a
+30-layout population** (3c′: gcc `large` +57.87%, clang `large` +11.60%, no sign
+flip anywhere, worst-case layout pair still +53.7% on gcc).
+
+**gcc's `large` figure IS the divide, and that is now a control rather than an
+inference.** The attribution used to rest on a cycle estimate — *"7.34 ns/record,
+≈ 21–28 cycles at this box's 2.8–3.9 GHz band"* — which needs a frequency nobody
+measured. `d_cmp-gcc` replaces it: it contains the guard **and** the `div`
+instruction but never *executes* the `div` on either perf input, because every
+`r < m` there. On `large` it costs **+7.58 ns** where `c-gcc-h` costs **+88.01
+ns**, so **91.4% of gcc's `large` hardening cost is the executed divide** — 6.70
+ns per record for one `div r64`. The throughput column makes it plainer than any
+cycle estimate can (whole-program marginal `Ir` over the population's ns):
+`c-gcc` **13.17** Ir/ns, `d_cmp-gcc` **13.24** Ir/ns, `c-gcc-h` **8.74** Ir/ns. The two div-free gcc cells run at the *same* instructions per
+nanosecond, so there is no anomalous IPC left to explain; the cycle sentence is
+withdrawn as unnecessary rather than wrong.
 
 > **p06's methodological result, stated once: on a kernel whose safety line is a
 > DIVISION, the project's primary metric reports the hardening as FREE (gcc,
@@ -335,36 +399,107 @@ contract (they differ only in *how* `r` is reduced), `small`, same protocol:
 | `if (r >= m) r %= m;` (`d_cmp`) | 3542.96 | 238.21 | **+1.20%** | **2646.96** | **224.20** | **+0.64%** |
 | `while (r >= m) r -= m;` (`d_sub`) | 3560.96 | 239.51 | +1.75% | 2656.96 | 225.66 | +1.29%
 
-Two things to read off it, and the second is the sharper:
+⚠ **Until TASK_048 this table existed for `small` only, while p06's largest
+published number is the `large` one.** `.memory/02-bench-rules.md`'s two-number
+rule is *publish the fixed spelling and the cheapest found, both labelled, with
+the input named* — so it was satisfied on one input and not on the one that
+carries the headline. **3c′ is the missing half**, and it is where the sharper
+result was hiding.
+
+### 3c′. Both inputs, over a 30-LAYOUT POPULATION — and on `large` under clang, HARDENING IS FASTER THAN THE BUG
+
+`controls/clayout.py` (built at TASK_047_REVIEW as clean negative CN-1, moved
+into the pattern at TASK_048 so these numbers have a generator in the tree).
+`common/layout/order.py:48` and `layout_gen.py:59` hardcode
+`CELLS = ["safe_naive","safe_tuned","unsafe"]` and build with `rustc`, so
+neither can touch a C cell; the lever here is a **pad object**
+(`asm(".text\n.space N")` linked first, `N = 0,16,…,464`), which shifts every
+later `.text` symbol without touching a byte of `kernel.o`.
+
+Controls, the same ones `layout_gen` asserts: `n_fn` single-valued per cell
+(190 / 200 / 175 / 171 / 205 / 175 / 214 / 175), `md5_fn_norel` single-valued,
+**30 distinct kernel addresses** spanning both `addr % 32` residues, and one
+stdout per cell. Estimator: median over the 30 layouts of the per-layout min of
+5 reps, alternating, `taskset -c 5`, `(t(200000) − t(1))/199999`.
+
+| cell | `small` ns/call | vs R1 | `large` ns/call | vs R1 |
+|---|---:|---:|---:|---:|
+| `c-gcc` (R1, **the bug**) | 234.40 | — | 152.08 | — |
+| **`c-gcc-h` — `r %= m`, SHIPPED** | **278.54** | **+18.83%** | **240.09** | **+57.87%** |
+| `d_cmp-gcc` — `if (r >= m) r %= m;` | 235.44 | **+0.44%** | 159.66 | **+4.98%** |
+| `d_sub-gcc` — `while (r >= m) r -= m;` | 236.79 | +1.02% | 160.58 | +5.59% |
+| `c-clang` (R1, **the bug**) | 219.74 | — | 143.96 | — |
+| **`c-clang-h` — SHIPPED** | **242.40** | **+10.31%** | **160.66** | **+11.60%** |
+| `d_cmp-clang` | 221.08 | +0.61% | 134.09 | **−6.86%** |
+| `d_sub-clang` | 217.25 | **−1.13%** | 136.83 | **−4.95%** |
+
+Three things, and the third is p06's strongest single sentence about cost:
+
+1. **Within gcc, the factor between the shipped hardening and the cheapest found
+   is 42.8× on `small` and 11.6× on `large`** (18.83 → 0.44; 57.87 → 4.98).
+   Within clang there is no factor to quote, because the cheapest is *negative*
+   on both inputs; the pair is (+10.31%, −1.13%) on `small` and (+11.60%,
+   −6.86%) on `large`. The 16× quoted in 3c is the gcc statement measured with
+   the five-identical-copy protocol rather than the population; both are
+   reported, and neither is a universal —
+   on an input where `r >= m` is common the guarded form pays the branch *and*
+   the divide.
+2. `.memory/02-bench-rules.md` forbids re-shipping a rung because a cheaper
+   in-contract spelling was found, so **the textbook line ships and both numbers
+   are published, labelled, with the input named.**
+3. ⚠ **On `large` under clang the cheapest in-contract hardening is 6.9% FASTER
+   than the unhardened bug, and on `small` `d_sub-clang` is 1.1% faster.** That
+   is not noise and it is not a layout artefact: the worst layout pair —
+   `d_cmp-clang`'s slowest layout (139.51) against `c-clang`'s fastest (143.04)
+   — is **still 2.5% faster than the bug**. The mechanism is §0b's, arriving in
+   the clock: reducing `r` proves `r < m ≤ 64`, which lets LLVM fold the
+   four-byte header decode into one `mov`, and on `large` (12 records per call of
+   1…8 bytes each) the decode is most of the work. **The safety line does not
+   merely cost nothing here; it pays.**
+
+Two more things to read off 3c, and the second is the sharper:
 
 1. **The cheapest in-contract hardening costs +1.20% (gcc) / +0.64% (clang) on
-   `small`, against the textbook spelling's +19.30% / +10.04%** — a factor of 16.
-   `.memory/02-bench-rules.md` forbids re-shipping a rung because a cheaper
-   in-contract spelling was found, so the textbook line ships and both numbers
-   are published, labelled, **with the input named**: on an input where `r >= m`
-   is common the guarded form pays the branch *and* the divide, and this span is
-   a `small`-and-`large`-shaped statement, not a universal one.
+   `small`, against the textbook spelling's +19.30% / +10.04%** — a factor of 16
+   under the five-copy protocol, 42.8× under the population. Both numbers are
+   published, labelled, **with the input named**.
 2. ⚠ **`d_cmp-clang` and `c-clang-h` execute exactly the same number of
-   instructions — 2646.9640 both, to four decimals — and differ by 20.94 ns
-   (−8.5%) in wall clock.** They are genuinely two different programs, not one
-   binary measured twice: `n_fn_nopad` 167 vs 164, `md5_fn c0965f763fee` vs
-   `5844f1e091cf`. One `Ir` figure, an 8.5% time difference, same compiler, same
+   instructions — `2646.9640` both on `small` and `1802.0000` both on `large`,
+   to four decimals — and differ by 20.94 ns (−8.5%) on `small` and by
+   **26.57 ns (−16.5%)** on `large`.** They are genuinely two different programs,
+   not one binary measured twice: `n_fn_nopad` 167 vs 164, `md5_fn c0965f763fee`
+   vs `5844f1e091cf`, and distinct `md5_fn_norel` over the whole layout
+   population. One `Ir` figure, a 16.5% time difference, same compiler, same
    input. That is the tightest statement of *"instruction counts are not a cost
    model"* this project has produced, because there is no count difference left
    to explain it with — the 3-instruction static difference is a branch that is
    never taken, and what moves is which of them contains a `div` on the executed
-   path.
+   path. **The `large` half is TASK_048's addition and it doubles the effect.**
 
 ### 3d. The `identity` pin's price on this pattern
 
-R5's bulk load has to sit inside a `#[verifier::external_body]` item, so R4 must
-call the same `#[inline(always)] fn scr_load` to stay byte-identical. Written
-**inline** in `kernel` instead (`c_r4inline`), R4 is **179 instructions
+R5's bulk load sits in a free function, so R4 must call the same
+`#[inline(always)] fn scr_load` to stay byte-identical. Written **inline** in
+`kernel` instead (`c_r4inline`), R4 is **179 instructions
 (`md5_fn f7b24db6bfd9`)**; through the helper it is **208 (`897c52ff4005`)** —
 LLVM clones the record loop for `nelem >= SCR` and inlines the 64-byte copy as
 four `movups`. The *static* delta is +29 instructions; the **executed** delta is
 `c_r4inline − R4ship` = **−4.00 Ir/call on `small` and −8.00 on `large`, flat in
-`nrec`** (band N: `0.0000/record, −4.0000 flat`).
+`nrec`** (band N: `0.0000/record, −4.0000 flat`). ⚠ **The reason recorded here
+until TASK_048 was that R5's load "has to sit inside a
+`#[verifier::external_body]` item"; it does not — `scr_load` is verified now
+(§6a) — and the helper is still needed, because it is the CALL BOUNDARY and not
+the trust that changes LLVM's inlining order. The number is unaffected.**
+
+**And the `identity` pin has a SECOND measured price on p06, of a different
+kind.** §6a: because `RangeTo<usize>` has no `SliceIndexSpecImpl` at the pinned
+vstd, R5 cannot spell the load `dst[..n].copy_from_slice(...)` at all, and the
+pin drags R4 to `split_at_mut` with it. At `-O3` that costs **nothing** in either
+rung — the bytes are identical to the pre-TASK_048 ones — and at `-O0` it costs
+R4 **+3 static instructions** (416/416 → 419/419) and is what keeps `identity`
+at `norel` there. The first price is about *inlining*; this one is about *which
+spellings exist*, and it is finding 14 ("the R4 side is chained to the prover")
+arriving as an expressiveness constraint rather than a performance one.
 
 p12 published a static `n_fn` delta wearing a per-string label and had to correct
 it; the figure to quote here is **4–8 Ir per call, flat**, and it is the second
@@ -417,24 +552,90 @@ pair's 32.00** — the bounds-check tax **triples**.
 > the invariant had to be handed to LLVM as dead code, and here the *bug fix*
 > supplies it as a side effect.
 
-**R3, by contrast, IS `O(n)`.** `R3 − R4 = 2.00000 Ir per byte of the live
-extent`, exact for `m >= 4`. The idiomatic `split_at_mut` + `zip` + `mem::swap`
-spelling is **dearer per byte than the naive indexed swap, which is free** — and
-on `small` R3 is dearer than R2 outright (2958 vs 2797 kernel-exclusive), the
-project's second R3 > R2 inversion after p09's. §8 has the in-contract spellings
-that fix it.
+### 4a. The SHIPPED R3 is `O(n)`. **R3 is not.** — corrected at TASK_048
+
+Until TASK_048 this section read *"**R3, by contrast, IS `O(n)`.** `R3 − R4 =
+2.00000 Ir per byte` … the project's second R3 > R2 inversion after p09's"*, and
+that published **one spelling's cost as the class's cost** — the exact failure
+`.memory/01-ladder.md` finding 3 exists to prevent, and p06 is the **fourth**
+pattern to hit it after p02, p16 and p05. Finding 3 needs no correction; p06 did
+not follow it. Its rule is *"write at least two independent in-contract R3
+spellings and **quote the cheaper**"*, and p06 wrote them (§8) and then quoted
+the shipped one in its law table, its prose and its README.
+
+Measured on band M, whole-program marginal, `nrec = 8`, `sum_m` 64 → 384 (a 6×
+range), `.temp/p48/r3span_m.json`:
+
+| difference | at `sum_m = 64` | at `sum_m = 384` | **Ir per byte** |
+|---|---:|---:|---|
+| `safe_naive − unsafe` (R2) | 269.00 | 269.00 | **0.00000** |
+| `safe_tuned − unsafe` (**R3 shipped**) | 281.00 | 921.00 | **2.00000** |
+| **`c_idx − unsafe`** (in contract, zero `unsafe`) | **105.00** | **105.00** | **0.00000** |
+| `c_oneshot − unsafe` | 282.00 | 922.00 | 2.00000 |
+| `c_swap − unsafe` | 401.00 | 1361.00 | 3.00000 |
+
+**`c_idx` is in contract** — `spec.md` says in terms that *"the SPELLING OF THE
+SWAP is deliberately NOT pinned"* — contains **no `unsafe`**, and agrees with
+`model.py` on `small`, `large`, `degenerate` and `adversarial-inarray`. It is
+R3's two-step reslice and iterator fold with R2's indexed swap.
+
+So the two numbers, labelled, with the input named (`.memory/02-bench-rules.md`):
+
+> **Fixed-R4 bound (shipped R3):** `+334.00` on `small`, `+172.00` on `large`,
+> and `2.00000 Ir` per rotated byte.
+> **Cheapest-found in-contract R3 on `small` (`c_idx`):** `+80.00`, and
+> **`0.00000 Ir` per rotated byte** — 13…17 `Ir` per *record* and nothing per
+> byte, less than half R2's 33.6 per record.
+> ⚠ **The cheapest found differs by blob**: on `large` the shipped R3 (`+172`)
+> is cheaper than `c_idx` (`+187`). §8 already says so and is right.
+
+**And the `2.00 Ir/byte` contains ZERO bounds checks.** Per-instruction
+callgrind on `sweep-m48n08` (384 swap iterations/call, `.temp/p48/cg/*.m48.out`),
+the whole of `R3ship − R4` is the `zip`/`Rev` adaptor's **two exhaustion tests
+per item**:
+
+```
+cmpq +425.00   je +416.00   jne +360.00   jb −391.00   leaq +64.00
+movq −60.00    jae +56.00   addq +33.00   movl +32.00        total +921.00
+```
+
+≈ +2 instructions per swap against the two-cursor indexed loop's 8. Decoding the
+surviving panic pads with p12's `controls/pads.py` `core::panic::Location`
+decoder gives `safe_tuned`, `c_idx` and `c_foldidx` the **identical 11 pads at
+identical `line:col`** — `66:34` (the `scr_load` reslice), `76:24`/`76:40` (the
+two-step window reslice) and the eight header indexes — and **zero pads at any
+swap or fold site in any rung**. So p06's per-byte "safety" term contains no
+safety.
+
+**The R3 > R2 inversion is `small`-only and spelling-specific.** On `small` the
+shipped R3 is dearer than R2 outright (2958 vs 2797 kernel-exclusive); on `large`
+it is cheaper (1897 vs 2120); and `c_idx` is cheaper than R2 on both. So p06 is
+**not** "the project's second R3 > R2 inversion after p09's" — that sentence is
+withdrawn. What p06 has is one *spelling* that inverts on one *input*.
+
+⚠ **Scope, stated so it is not over-claimed. This is an `Ir` result and the wall
+clock cannot resolve it.** Re-measured with §3b's protocol (5 identical copies,
+alternating, 9 reps, `small`): `safe_naive` 250.86 / `c_foldidx` 251.54 /
+`safe_tuned` 249.17 / `c_idx` 247.60 / `verus` 241.96 / `unsafe` 235.52 ns. The
+whole R3 spread is **1.6%**, against a `verus − unsafe` null of **+2.73%** on
+byte-identical kernels. A 254-instruction `Ir` gap between `R3ship` and `c_idx`
+on this input is invisible in time; §11 says which p06 figures clear the floor
+and these do not.
 
 ## 5. The proof
 
-`./verus_run.py patterns/p06-rotate/verus.rs` → **`17 verified, 0 errors`**;
-`--cfg slb_twin` → **`22 verified, 0 errors`**. Both pinned in `spec.md` and
+`./verus_run.py patterns/p06-rotate/verus.rs` → **`18 verified, 0 errors`**;
+`--cfg slb_twin` → **`23 verified, 0 errors`**. Both pinned in `spec.md` and
 re-derived per item with `--verify-function <name> --verify-root`:
 
 ```
 SCR 1 + fold_scr 1 + walk 1 + lemma_rev_noop 1 + lemma_rev_step 1
-      + lemma_three_reverses 1 + kernel 6 + main 5   = 17
-twin: 17 + 1 + 1 + 1 + 2 (slb_twin_scr_load has a LOOP)  = 22
+      + lemma_three_reverses 1 + scr_load 1 + kernel 6 + main 5   = 18
+twin: 18 + 1 + 1 + 1 + 2 (slb_twin_scr_load has a LOOP)  = 23
 ```
+
+(It was `17` / `22` until TASK_048. `scr_load`'s `1` is the item that stopped
+being `external_body` — §6a.)
 
 **The postcondition is the FUNCTIONAL one** — the scratch ends up rotated left by
 `r mod m` — and getting there was cheaper than TASK_047 budgeted for, because of
@@ -472,47 +673,228 @@ will hit it.
 
 ## 6. The TCB, and the same disjointness fact discharged four ways
 
-**Six `external_body` items, 11 body lines**, recounted against the gate's own
+**Five `external_body` items, 10 body lines**, recounted against the gate's own
 `tcb_items` record (`results/gate/p06-rotate.json`), which lists exactly these
-six with body-line counts 1, 1, 3, 1, 4, 1:
+five with body-line counts 1, 1, 3, 4, 1:
 
-| item | body lines | `requires` | twin? |
+| item | body lines | `requires` | `unsafe` in the body? | twin? |
+|---|---|---|---|---|
+| `buf_get_unchecked` | 1 | `i < v@.len()` | **yes** | yes |
+| `scr_get_unchecked` | 1 | `i < v@.len()` | **yes** | yes |
+| `scr_set_unchecked` | 3 | `i < old(v)@.len()` | **yes** | yes |
+| `load_input` | 4 | *(none — it states no `ensures` either)* | no | n/a |
+| `emit` | 1 | *(none)* | no | n/a |
+
+### 6a. It was SIX until TASK_048, and the recorded reason for the sixth was FALSE
+
+Until TASK_048 `scr_load` was a sixth `external_body` item, and `verus.rs`, this
+file and `TASK_047_REPORT.md` all said that `<[T]>::split_at_mut` *"is the route
+that would delete this item; taking it changes the exec text of four rungs"*.
+**At `-O3` it changes the exec text of nothing** — and at `-O0` it costs three
+instructions, which is the half neither the report nor the review measured, see
+below. Measured (TASK_047_REVIEW B1, re-measured at TASK_048):
+
+```
+./verus_run.py patterns/p06-rotate/verus.rs                  18 verified, 0 errors   (was 17)
+./verus_run.py patterns/p06-rotate/verus.rs --cfg slb_twin   23 verified, 0 errors   (was 22)
+```
+
+| `-O3 isolated` binary | `n_fn` / nopad | `md5_raw` | `md5_fn` |
 |---|---|---|---|
-| `buf_get_unchecked` | 1 | `i < v@.len()` | yes |
-| `scr_get_unchecked` | 1 | `i < v@.len()` | yes |
-| `scr_set_unchecked` | 3 | `i < old(v)@.len()` | yes |
-| `scr_load` | 1 | `n <= old(dst)@.len()`, `from + n <= src@.len()` | yes |
-| `load_input` | 4 | *(none — it states no `ensures` either)* | n/a |
-| `emit` | 1 | *(none)* | n/a |
+| `unsafe` (R4) **before and after** | 216 / 208 | `6608a63b5c52` | `897c52ff4005` |
+| `verus` (R5) **before** | 216 / 208 | `6608a63b5c52` | `897c52ff4005` |
+| **`verus` (R5) after, `scr_load` VERIFIED** | **216 / 208** | **`6608a63b5c52`** | **`897c52ff4005`** |
 
-⚠ **`scr_load` is one item more than this pattern should need, and the reason it
-is here is NOT the reason TASK_047 and `.memory/04-verus.md` give.** Both say
-*"there is no vstd spec for a bulk copy"*. **That is false at the pinned vstd**:
+Checksums identical on `small`, `large`, `degenerate` and `adversarial-inarray`
+in all four Rust rungs, and the `identity: unsafe == verus, O3 exact` pin holds
+unchanged.
+
+⚠ **It is NOT free at `-O0`, and neither TASK_047_REVIEW's B1 nor TASK_048 said
+so, because both compiled only at `-O3`.** The gate found it:
 
 ```
-~/tools/verus/vstd/std_specs/slice.rs:205
-pub assume_specification<T: Copy>[ <[T]>::copy_from_slice ](dst: &mut [T], src: &[T])
-    requires old(dst)@.len() == src@.len(),
-    ensures  final(dst)@ == src@;
+FAIL [identity] unsafe vs verus at O0: identity dropped to 'differ', spec.md pins 'norel'
+  md5_fn 31bbc50177e9 vs 1a078f179e8f, counts [416, 416, 2445] vs [419, 419, 2471]
 ```
 
-Measured (`.temp/p06/vstdprobe/`): with the preconditions established, both of
-`copy_from_slice`'s and both range-index preconditions **discharge**
-(`cfs4.rs` — the only remaining error is the postcondition). What does *not* go
-through is carrying the mutation back from a `&mut [u8]` **reborrowed out of a
-`&mut [u8; 64]` by a range index**: `<[T; N]>::index_mut`'s `ensures` is an
-existential over the intermediate slice and Z3 does not instantiate it. So the
-honest statement is **"vstd specifies the copy; it is the array→slice reborrow
-that is unproved here"** — a materially different claim, and it means `scr_load`
-axiomatises the *write-back*, not the copy.
+At `-O0` nothing is inlined, so `split_at_mut` is a real call with a different
+argument setup and R5's O0 kernel gains 3 instructions that R4's does not have.
+**The repair is not to weaken the O0 pin; it is to give R4 the same three exec
+lines**, which is what `verus.rs`'s own opening sentence — *"R4's exec code
+verbatim, plus the specs and proofs"* — requires anyway. With that:
 
-**The route that should work and was not taken**, because taking it would have
-changed the exec text of four rungs after every number in this file was measured:
-`<[T]>::split_at_mut` **is** specified and its `ensures` carries the write-back
-explicitly (`final(slice)@ == final(ret.0)@ + final(ret.1)@`,
-`slice.rs:185`). Landing it would take p06's TCB from 6 items to 5 and delete an
-axiom. **Open, with the probes committed to `.temp/p06/vstdprobe/`.** The same
-correction applies to p02, whose `copy_bytes` comment cites the same false claim.
+| `-O0 isolated` | `n_fn` / nopad | `md5_fn` | `md5_fn_norel` |
+|---|---|---|---|
+| `unsafe` (R4) **before** | 416 / 416 | `31bbc50177e9` | — |
+| **`unsafe` (R4) after** | **419 / 419** | `912ca69aea47` | **`b70799689ce6`** |
+| **`verus` (R5) after** | **419 / 419** | `1a078f179e8f` | **`b70799689ce6`** |
+
+`identity` is back at **`norel` at `-O0`** (equal modulo pc-relative
+displacements — the crate names differ in length, which is link layout) and
+**`exact` at `-O3`**. **So the price of removing the axiom, stated in full: zero
+at `-O3` in every rung, and `+3` static instructions in R4's `-O0` kernel.** No
+performance claim rests on an O0 row (`.memory/02-bench-rules.md`), and none of
+p06's does.
+
+**What that does to the gate's idiom audit, stated because a diff will show it.**
+`required_absent` moves **2 → 6** and `required_pins_nothing` stays **0**. The
+two pre-existing absences are the bug's own two lines (`r %= m;` and
+`if (m != 0)`, both absent from `c/kernel.c` and present in
+`c/kernel_hardened.c`); the four new ones are exactly the 2-and-2 receiver
+scoping — `dst[..n]` absent from `unsafe.rs` and `verus.rs`, `s.split_at_mut(n)`
+absent from `safe_naive.rs` and `safe_tuned.rs` — and the entry's English names
+that scope, which is what the `absent` bucket is for. `forbidden_hits` stays 0.
+The bulk call itself, `.copy_from_slice(&src[from..from + n]);`, is pinned
+**unscoped** and matches all four rungs.
+
+⚠ **Why R2 and R3 do NOT follow, and it is a finding rather than laziness.**
+`.memory/01-ladder.md`'s finding 14 is *"the R4 side is chained to the prover"*,
+and this is that mechanism in a form the project has not recorded: what
+propagates into R4's **source** is not a performance constraint but the
+**verifier's expressiveness limit** — `RangeTo<usize>` has no
+`SliceIndexSpecImpl`, so the spelling every ordinary Rust programmer writes
+cannot appear in R5, and the `identity` pin drags R4 with it. It stops at R4,
+because nothing chains R2 and R3 to the prover, and re-spelling them would be a
+re-ship of two rungs for no reason the rule allows
+(`.memory/02-bench-rules.md`). **This is the second measured price the `identity`
+pin has extracted from p06** — the first was 179 → 208 instructions from the
+helper boundary (§3d), which is about inlining; this one is about which
+spellings exist at all.
+
+**This is NOT a re-ship under `.memory/02-bench-rules.md`, and the rule's text is
+about spellings so a reader will reach for it.** That rule forbids moving a
+shipped rung *because a cheaper in-contract spelling was found*. Here **no rung's
+`-O3` machine code changes and no published `Ir` or `ns` figure moves** — the two
+spellings compile to the same bytes. Nothing was selected on cost: the old
+spelling is not *dearer*, it is **unverifiable**, which is one of the three
+reasons that rule does allow (*"the shipped spelling turns out to be … not the
+idiom it claims to be"* — it claims to be the load R5 performs, and it was not).
+What moved is an obligation, from *assumed* to *proved*, plus 3 instructions in
+R4's `-O0` kernel.
+
+⚠ **The direction test, answered in writing, because a smaller trusted base is
+the direction that flatters this project's thesis.** `.memory/01-ladder.md`'s
+repaired test: *an edit to a **declaration** is self-certification if it moves the
+pattern's own published figure in the direction that flatters the author's
+thesis.*
+
+**TASK_048's own reading — "this is a measurement, not a declaration edit" — is
+incomplete, and the measurement that shows it is this**: the old body was
+`dst[..n].copy_from_slice(&src[from..from + n]);`, which `spec.md`'s
+`idiom.required[5]` pins **by name**, and it **cannot be verified at all**.
+`..n` is a `RangeTo<usize>`, and at the pinned vstd `RangeTo` has **no**
+`SliceIndexSpecImpl` — only `usize` and `Range<usize>` do
+(`vstd/std_specs/slice.rs:14,30`) — so the line reports `precondition not
+satisfied` at `vstd/std_specs/core.rs:69`. Respelling it `dst[0..n]` on the
+reborrowed slice discharges the preconditions and then fails the *post*condition,
+because `<[T] as IndexMut<I>>::index_mut`'s `ensures` is a `call_ensures(...)`
+Z3 does not instantiate (probes: `.temp/p48/vstd/keepspell.rs`, `keepspell2.rs`).
+`split_at_mut` is the only route that closes both ends — **so landing B1 forced
+an edit to the idiom block, which is a declaration edit and the test does apply.**
+
+It passes, for three reasons, and the third is the one that generalises:
+
+1. **The edit is forced, not chosen.** An entry naming a spelling the rung it
+   scopes to is *unable* to write is a bug in the ruler, not a thumb on the
+   scale — p13's middle case ("the exclusion is one layer down"), inverted.
+2. **The scoping is priced and the price is zero.** The receiver differs in one
+   rung (`verus.rs`) out of four, and the two receivers compile to
+   byte-identical machine code. p13's rule is *price every scoped entry and
+   dispose of it on what the price says*; this one measures `0.00 Ir` and
+   `0` bytes.
+3. **The obligation count went UP, 17 → 18 and 22 → 23.** That is the tell. An
+   item moving from *assumed* to *proved* adds a query and subtracts an axiom, so
+   the against-interest number and the flattering number move together and in
+   opposite directions. A TCB reduction with no obligation increase would be the
+   suspicious shape; this is not it.
+
+### 6b. The axiom RELOCATES into vstd — and what that does to the TCB column
+
+**`scr_load`'s postcondition is not discharged out of nothing.** Three vstd items
+take it over, and naming them is the point:
+
+| vstd item | what it supplies | its own status inside vstd |
+|---|---|---|
+| `vstd::array::ref_mut_array_unsizing_coercion` (`vstd/array.rs:175`) | the `&mut [u8; 64] → &mut [u8]` reborrow write-back: `out.view() == old(r).view()` **and** `final(out).view() == final(r).view()`. Verus inserts it for the *implicit* coercion, so no hidden API is named | `#[verifier::external_body]` |
+| `<[T]>::split_at_mut` (`vstd/std_specs/slice.rs:185`) | the halves' write-back, `final(slice)@ == final(ret.0)@ + final(ret.1)@` | `assume_specification` |
+| `<[T]>::copy_from_slice` (`vstd/std_specs/slice.rs:205`) | `final(dst)@ == src@` | `assume_specification` |
+
+**So the trust did not vanish; it moved out of a wrapper this pattern's author
+wrote and into specifications vstd ships.** Trusted-base size is one of the five
+axes this project compares, so *"can a pattern shrink its published TCB by
+choosing a spelling whose axioms live in vstd?"* is a question about the metric
+rather than about p06. TASK_048 proposed reporting **two numbers** —
+author-written trusted items, and vstd assumed specifications relied upon.
+
+**The second number is not the right one, and here is the measurement.**
+
+*(i) It is not computable per pattern.* The pinned vstd
+(`0.2026.08.09.92f466f`) ships **402 `assume_specification` sites, 272
+`external_body` items and 545 broadcast axiom lemmas across 44 files**. "Relied
+upon" is not decidable from the text: the coercion above is inserted **by Verus**
+and never appears in the source, and `broadcast use` pulls in whole families
+(`group_slice_axioms`, `group_array_axioms`) at once. A number nobody can recount
+is precisely what `.memory/04-verus.md` warns about — it is how the pilot's
+"TCB: one 3-line wrapper" hid two more items.
+
+*(ii) It would not distinguish the patterns.* Every rung on this project already
+depends on the same vstd core — slice `View`/`len`/index, the integer axioms,
+`Vec` in `main`. p06's marginal change is **3 items out of 674**. A column that
+is nearly identical for every row is not a comparison axis.
+
+*(iii) It measures the wrong thing.* What makes the two kinds of trust differ is
+not *which file the axiom lives in*; it is **who can be wrong and how far the
+error travels**. An author-written `ensures` is read by one reviewer and used by
+one program: if `scr_load`'s `load_into` had been wrong, p06's proof was wrong
+and nothing else was. A vstd `assume_specification` is shared by every Verus
+program in existence and is right or wrong independently of this project. That
+is a property *of the item*, and it partitions reproducibly.
+
+**So p06 keeps ONE headline number — pattern-local trusted items, exactly what
+`harness/check.py`'s `tcb_items` already counts and prints — and classifies it.**
+`.temp/p48/tcb_census.py` applies the classification to every pattern's committed
+gate record and every pattern's source:
+
+| bucket | test | p06 | project, 14 patterns |
+|---|---|---:|---:|
+| **U-license** — licenses an operation vstd does not specify | body contains `unsafe` | 3 | **25** |
+| **V-gap** — no `unsafe`; trusted only because of a claimed vstd gap | no `unsafe`, non-empty `ensures` | **1 → 0** | **3 → 2** |
+| **infra** — `load_input` / `emit`; states no `ensures` at all | no `unsafe`, no `ensures` | 2 | 30 |
+| **total** | the gate's own `tcb_items` | **6 → 5** | **58 → 57** items / **119 → 118** body lines |
+
+**And the gameability question is answered by the U-license row, measured.** For
+a `U-license` item to relocate into vstd, vstd would have to specify the
+operation. For 23 of the 25 it is a `get_unchecked` / `get_unchecked_mut`
+wrapper, and this is a probe rather than a memory: `<[T]>::get_unchecked`,
+`<[T]>::get_unchecked_mut` and `u64::count_ones` are all **`is not supported`**
+at the pinned vstd (`.temp/p48/vstd/{gu,gum,popcnt}.rs`), as are
+`core::ptr::copy_nonoverlapping`, `<[T]>::as_ptr`, `<[T]>::as_mut_ptr` and
+`<*const T>::add` (`cno.rs`). The other two U-license items are the bulk-copy
+wrappers p02's `copy_bytes` and p08's `move_right`, and p02's is the one this
+project has now *measured*: its contract discharges from vstd, and taking that
+route costs `+9` instructions, `+5.00 Ir`/call and the `identity` pin (p02
+`NOTES.md` 5b). So:
+
+> **The exposure was 2 items in 58 — 3.4% — and is now 1 in 57.** Exactly two of
+> this project's trusted items were removable by relocating an axiom into vstd:
+> p06's `scr_load`, removed here, and p08's `copy_in`. p09's `popcount64` is a
+> **real** vstd gap (`count_ones` is unsupported). The remaining 55 cannot move:
+> 25 license operations vstd does not specify, and 30 are infrastructure that
+> states no `ensures` and therefore cannot axiomatise anything.
+
+What that does to every other pattern's published TCB, computed and **not
+applied** (no other pattern's code was edited): **p08 would go 4 → 3 items if its
+`copy_in` is respelled the same way and its codegen holds; every other pattern's
+number is unchanged.** ⚠ And p02 is the measured counterexample that keeps this honest:
+its `copy_bytes` contract *also* discharges (`10 verified, 0 errors`, twin
+`13/0`), and the respelling still must not be landed, because p02's R4 body is
+`copy_nonoverlapping` and R5 must match it byte for byte — the verified spelling
+is 81/79 instructions against R4's 72/70, `+5.00` executed `Ir` per call, one
+extra panic pad, and it **breaks `identity: exact`**. p02's `NOTES.md` 5b carries
+the measurement. **The discriminator between p06 and p02 is what R4's body is**,
+and that is the sentence `.memory/04-verus.md:133` and `:813` should carry
+instead of *"there is no vstd spec for `copy_from_slice`"*, which is false in
+both halves.
 
 **The four trusted bases for ONE fact.** The disjointness question — *may I hold
 `scr[a]` and `scr[b-1]` at once?* — is answered four different ways by the four
@@ -529,6 +911,15 @@ Note the shape of that table: **the rung with the smallest trusted base and the
 rung with the largest cost are not the same rung, and the rung with `std`'s
 unsafe is the most expensive of the four.** R3 pays 51 Ir/record for a fact R2
 gets for free and R5 proves for nothing.
+
+⚠ **R3's `+51.00/rec` is the SHIPPED spelling's, and a different in-contract R3
+buys the same fact for `13…17`.** `c_idx` (§8) answers the disjointness question
+R2's way — momentary indexed accesses — while keeping R3's reslice and fold, and
+costs `α′(m mod 4) = 13, 15, 16, 17` `Ir`/record with **no per-byte term** (§4a).
+So the honest reading of the R3 row is *"`std`'s `unsafe` is the most expensive
+of the four **as p06 spells R3**"*, and the class contains a cheaper member that
+answers the question with rustc's bounds check instead. The trusted-base column
+does not move with the spelling; the cost column does.
 
 ### SLB-TRUSTED-ARGUMENT verus.rs buf_get_unchecked
 
@@ -587,10 +978,11 @@ gives an indexed store on a `[u8; 64]` an `IndexSetTrustedSpec` obligation of
 have discharged. **Measured, not asserted:** `controls/gen_controls.py`'s
 `b_weakreq` weakens the shared `requires` to `i <= old(v)@.len()` in the trusted
 item *and* in the twin, and the shipped configuration still reports
-**`17 verified, 0 errors`** while `--cfg slb_twin` reports
-**`21 verified, 1 errors — precondition not met: index in bounds for this
-access`**. So on p06 the twin is the **sole** catcher, which is the third pattern
-where that has happened. **This is the item p06 exists for** — it is the write
+**`18 verified, 0 errors`** while `--cfg slb_twin` reports
+**`22 verified, 1 errors — precondition not met: index in bounds for this
+access`**. So on p06 the twin is the sole **Verus-level** catcher — ⚠ **not the
+sole catcher**: `spec.md`'s contract pin fails it too, with two clause diffs, and
+§10b measures that and audits the same sentence on p12 and p02. **This is the item p06 exists for** — it is the write
 the buggy C rung performs past `scr[SCR]`, and it is called *twice* per swap, at
 `a` and at `b - 1`, so the `requires` has to hold at both ends of every reverse.
 
@@ -617,40 +1009,34 @@ never used as an address, an index or a length, so there is nothing a caller
 could usefully be asked to guarantee about it. The gate shouts that justification
 every run.
 
-### SLB-TRUSTED-ARGUMENT verus.rs scr_load
+### `scr_load` — the item that used to be here, and where its axiom went
 
-(a) *Is the twin's body the right checked stand-in?* The trusted body is
-`dst[..n].copy_from_slice(&src[from..from + n]);` and the twin's is an indexed
-loop `dst[j] = src[from + j]` for `j` in `0..n`. p02's wrinkle applies: the
-checked stand-in for a bulk copy is the element-wise loop, and the loop performs
-exactly the reads and writes the bulk call performs, at the same indices, in
-checked code. Weaken `from + n <= src@.len()` and the twin fails at
-`src[from + j]`; weaken `n <= old(dst)@.len()` and it fails at `dst[j]`. That the
-twin *verifies* (`2 verified` under `--cfg slb_twin`) is what rules out the
-false-failure reading of this stage.
+Until TASK_048 this was a fourth `SLB-TRUSTED` + `-ARGUMENT` block, because
+`scr_load` was `external_body`. It is not any more (6a), so the gate no longer
+requires an argument for it and one would be misleading. What is worth keeping is
+the part that is still true and the part that was not:
 
-(b) *Is the `ensures` complete?* The body performs one bulk copy of `n` bytes
-from `src[from ..]` into `dst[0 ..]` and nothing else. `load_into` is a
-whole-array equality: slots `[0, n)` become `src[from + i]` and **every slot from
-`n` up is the byte that was already there**. The second half is load-bearing on
-p06 in a way it is not on p02: the scratch is *not* re-zeroed between records, so
-`scr[m .. SCR)` carries the previous record's bytes, and regime 1 reads exactly
-those. An `ensures` that said nothing about them would leave `walk`'s state
-under-determined and the record loop's invariant unprovable. What the clause does
-not cover is aliasing between `src` and `dst`: it cannot, because `&[u8]` and
-`&mut [u8; 64]` cannot name the same allocation in safe Rust, so the
-disjointness `copy_from_slice` needs is discharged by Rust's own reference rules
-rather than by this contract. ⚠ **And the part of this item that is a genuine
-axiom is narrower than it looks** — see §6's vstd note: the pinned vstd
-*specifies* `copy_from_slice`, so what this `ensures` really assumes is the
-array→slice reborrow write-back, which `split_at_mut` would discharge. The body
-contains **no `unsafe`**; it is TCB anyway, because `.memory/04-verus.md` counts
-every `external_body` item.
+**(a) The checked stand-in.** `slb_twin_scr_load` is kept even though 5c-twin no
+longer requires it: it derives `load_into` from an **element-wise indexed loop**
+(`dst[j] = src[from + j]`), independently of the three vstd bulk specifications
+the shipped body now uses. Two routes to one postcondition, both checked. It
+still carries `2 verified` under `--cfg slb_twin` (the loop body is its own
+query), which is the `+2` in the 23.
 
-(c) *Does each clause mean the same in both configurations?* Yes. Both `requires`
-and the `ensures` are character-identical between the trusted item and the twin,
-over identically-typed parameters, and `load_into` is one `open spec fn` used by
-both. The only `#[cfg]` in the pair is the twin's own `#[cfg(slb_twin)]`.
+**(b) What the `ensures` says, and it is now PROVED rather than assumed.**
+`load_into` is a whole-array equality: slots `[0, n)` become `src[from + i]` and
+**every slot from `n` up is the byte that was already there**. The second half is
+load-bearing on p06 in a way it is not on p02 — the scratch is *not* re-zeroed
+between records, so `scr[m .. SCR)` carries the previous record's bytes and
+regime 1 reads exactly those. Verus now checks it.
+
+**(c) What is still trusted, said out loud.** The `&[u8]` / `&mut [u8; 64]`
+disjointness `copy_from_slice` needs is discharged by **Rust's own reference
+rules**, not by this contract and not by vstd — the two references cannot name
+the same allocation in safe Rust. And the three vstd items in 6b are trusted
+*inside vstd*. The reduction 6 → 5 is a reduction in **author-written** trusted
+items, which is the number `tcb_items` counts, and 6b says exactly what it is
+and is not.
 
 ## 7. The two regimes, per rung — and what safe Rust does with the check deleted
 
@@ -684,7 +1070,7 @@ a_nored_unsafe            exit 0   12407484466270198528
 | input | `r` | past `scr` | c-gcc | c-clang | `a_nored_safe_naive` | `a_nored_safe_tuned` | `a_nored_unsafe` |
 |---|---:|---:|---|---|---|---|---|
 | `adversarial-past1` | 65 | 1 | 0, `231815783968535` | 0, `3511210252634240` | **101 panic** | **101 panic** | 0, `1183642181752691` |
-| `adversarial-past48` | 112 | 48 | **134** canary | 0, `497` | **101 panic** | **101 panic** | 0, `14544551909971626112` |
+| `adversarial-past48` | 112 | 48 | **134** canary, ⚠ **stdout not reproducible** | 0, `497` | **101 panic** | **101 panic** | 0, `14544551909971626112` |
 | `adversarial-pastfar` | 100000 | 99936 | **139** | **139** | **101 panic** | **101 panic** | **139** |
 
 The safe-Rust panics are `safe_naive.rs:102:25` (`let u: u8 = scr[b - 1];`) and
@@ -692,6 +1078,28 @@ The safe-Rust panics are `safe_naive.rs:102:25` (`let u: u8 = scr[b - 1];`) and
 respectively, which is why R3's `if a < b` guard is in the shipped spelling: it
 keeps the second reverse's empty range from panicking on the range rather than on
 the index and hiding which regime the control is in.
+
+⚠ **`adversarial-past48.bin` / `c-gcc` is the one row in this pattern whose
+recorded stdout does not reproduce, and the mechanism is p06's own algebra.**
+**every observation so far has been a different answer, and the committed value
+will not match your run either.** Five so far: `5645006182206458263` (the record
+before TASK_048), `1380113329433944552` (TASK_047_REVIEW),
+`8830450532111958723` and `425172236597815642` (two consecutive TASK_048
+`check.py` runs), and **no stdout at all** on twelve direct runs
+(`rc = -6`, `*** stack smashing detected ***`, with `stdbuf -o0` as well as
+without). So **both the value and its presence vary**, and the *exit code and the
+stderr are the stable part of that row*. A diff of this field between two
+`check.py` runs is expected and means nothing.
+
+Why, from the contract rather than from "uninitialised memory": at `r = 112 > m`
+the second reverse is empty, so the triple is `rev(scr, 0, 112)` then
+`rev(scr, 0, m)`, and composing them leaves `scr[0 .. 64)` holding the ORIGINAL
+bytes `[48 .. 112)` — i.e. **the 48 bytes past `scr`, which include the
+stack-protector canary the kernel randomises per `execve` via `AT_RANDOM`**. The
+order-sensitive fold then reads exactly those. The canary *slot* meanwhile
+receives the original `scr[0 .. 48)` (record data and zeros), which is fixed —
+which is why the abort is deterministic while the checksum is not. **Read this
+row as "exit 134, canary tripped"; do not diff its stdout.**
 
 **Read the two tables together and the separation is exact**: bounds checking
 kills regime 2 and is completely blind to regime 1, and the two regimes are one
@@ -721,15 +1129,21 @@ the **shipped R4 held fixed by fiat**:
 | `c_idx` | R3's reslice + fold, R2's indexed swap | **+80.00** | +187.00 | yes |
 | **R3ship** | `split_at_mut` + `zip` + `mem::swap` | +334.00 | **+172.00** | yes (shipped) |
 | `c_oneshot` | R3ship with `&buf[off..off+len]` | +335.00 | +173.00 | yes |
+| `c_foldidx` | R3ship with the fold respelled as R2's indexed loop | +320.00 | +142.00 | yes |
 | `c_swap` | `<[T]>::swap(j, n-1-j)` | +490.00 | +286.00 | yes |
 | `c_reverse` | `scr[a..b].reverse()` | −358.00 | +320.00 | **FORBIDDEN** |
+| `c_copywithin` | `scr.copy_within(r..m, 0)` + a temporary | **−856.00** | **+497.00** | **FORBIDDEN** |
 | `c_rotate` | `scr[..m].rotate_left(r)` | −951.00 | +314.00 | **FORBIDDEN** |
 
-- **In-contract R3-side span: `+80.00 … +490.00` on `small`, `+172.00 … +286.00`
+- **In-contract R3-side span: `+80.00 … +490.00` on `small`, `+142.00 … +286.00`
   on `large`.** ⚠ **The cheapest found differs between the two blobs** — `c_idx`
-  on `small`, shipped R3 on `large` — which is the fifth pattern to reproduce
-  *"a cheapest-found figure must name its INPUT as well as its spelling"*. Write
-  "cheapest found", never "minimum".
+  on `small`, `c_foldidx` on `large` (and the *shipped* R3 is `+172.00` there) —
+  which is the fifth pattern to reproduce *"a cheapest-found figure must name its
+  INPUT as well as its spelling"*. Write "cheapest found", never "minimum".
+- ⚠ **The span is a span in the ASYMPTOTIC SHAPE, not only in the constant**, and
+  that is §4a: `c_idx` has **no per-byte term at all** while the shipped R3 and
+  `c_oneshot` have `2.00000` and `c_swap` has `3.00000`. Quoting the shipped
+  spelling's `2.00 Ir/byte` as *R3's* is the mistake TASK_048 corrected.
 - **The fixed-R4 bound is `+334.00 / +172.00`** (`R3ship − R4ship`), and it
   bounds `inf(in-contract R3) − R4ship` from above and **nothing else**.
 - **The two-step reslice is worth exactly `1.00 Ir/call`**, on both blobs
@@ -754,24 +1168,54 @@ construction — but a whole-pattern fiat still has a price:
 |---|---|---|---|
 | `<[T]>::reverse()` | **`is not supported`** | −358 / +320 vs R4ship | **KEEP** — the prover already excludes it from R4, so the declaration costs nothing extra. p13's middle case. |
 | `<[T]>::rotate_left()` | **`is not supported`** | −951 / +314 | **KEEP** — same. |
+| **`<[T]>::copy_within()`** | ⚠ **SUPPORTED** (`vstd/std_specs/slice.rs:235`; the probe returns `precondition not satisfied`) | **−856 / +497** | **KEEP BY FIAT, AND THIS IS THE PRICE** — p13's *third* bucket. Nothing but this declaration excludes it, so §8's claim that every fiat's price is published is only true with this row in it (TASK_048). |
 | `<[T]>::swap()` | **`is not supported`** | +490 / +286 | not forbidden; R3 may use it, and it is the *dearest* in-contract spelling, so nothing turns on it |
-| `split_at_mut` | **supported** (`precondition not satisfied` only) | R3's shipped spelling | — |
+| `split_at_mut` | **supported** (`precondition not satisfied` only) | R3's shipped spelling, and R5's `scr_load` since TASK_048 (§6a) | — |
 | `core::mem::swap` | **`2 verified, 0 errors`** | R3's shipped spelling | — |
+
+⚠ **`copy_within` is p06's one FIAT exclusion and it was unpriced until
+TASK_048.** Two things had to be corrected. First, the stated *reason* was
+inaccurate: `spec.md` said `copy_within` *"is the OUT-OF-PLACE rotate (rotate
+through a temporary)"*, and it is not — `<[T]>::copy_within` is `ptr::copy`
+**within one slice**, a `memmove`, and it cannot rotate on its own at all. What
+makes it out of contract is that a rotate *built on* it needs a temporary for the
+displaced prefix, so the rung stops being the in-place three-reverse algorithm
+p06 measures: `controls/gen_controls.py`'s `c_copywithin` writes
+`tmp[..r].copy_from_slice(&scr[..r]); scr.copy_within(r..m, 0);
+scr[m - r..m].copy_from_slice(&tmp[..r]);`, which visits every byte twice through
+`memmove` instead of `2m` scalar swaps and has **no in-place aliasing question at
+all** — and the aliasing question is p06's TCB result. Second, the price: it is
+**−856.00 on `small` and +497.00 on `large`**, and on band M its slope is
+**−8.075 `Ir` per byte** (it is a `memmove`; it gets *cheaper* per byte as `m`
+grows, which no in-contract spelling does). It agrees with `model.py` on `small`,
+`large`, `degenerate` and `adversarial-inarray`.
+
+**The direction test on that exclusion passes**, the same way `.reverse()`'s and
+`.rotate_left()`'s do: excluding `copy_within` makes p06's published safe-side
+figure **larger** on `small` — 936 `Ir`/call larger, cheapest in-contract `+80`
+against `−856` — and costs nothing on `large`, where it is the dearest spelling
+measured. The exclusion moves the number *against* the author's thesis.
 
 (`.temp/p06/vstdprobe/*.rs`, one spelling per file — a shared probe reports every
 spelling's error on every run, because `--verify-function` still type-checks the
 whole file. Measured after making exactly that mistake.)
 
-**So both forbidden entries fall into p13's "keep — the exclusion is one layer
-down" bucket**: an R4 could not spell them at the pinned vstd, so forbidding them
-on the *safe* side is what keeps the comparison symmetric rather than a thumb.
-The price is published anyway, because the numbers are large and blob-dependent:
-excluding them costs the safe side **1031 Ir/call on `small`** (cheapest
-forbidden `−951` against cheapest in-contract `+80`) and **nothing on `large`**,
-where the library forms are dearer than every in-contract spelling. The direction
-test: the exclusion makes p06's published safety figure **larger**, i.e. moves it
-*against* the author's thesis, so it is not self-certification under either
-reading of the test.
+**So p06's forbidden entries fall into TWO of p13's three buckets, not one.**
+`.reverse()` and `.rotate_left()` are the middle case — *"keep, the exclusion is
+one layer down"*: an R4 could not spell them at the pinned vstd, so forbidding
+them on the *safe* side is what keeps the comparison symmetric rather than a
+thumb. **`copy_within` is the third case** — *fiat*, because the prover does not
+exclude it — and its price is published above. (`from_le_bytes` and
+`chunks_exact` are also correctly disposed of one layer down; both re-measured
+`is not supported`.)
+
+The price is published for all three, because the numbers are large and
+blob-dependent: excluding them costs the safe side **1031 Ir/call on `small`**
+(cheapest forbidden `−951` against cheapest in-contract `+80`) and **nothing on
+`large`**, where every library form is dearer than every in-contract spelling.
+The direction test: each exclusion makes p06's published safety figure
+**larger**, i.e. moves it *against* the author's thesis, so none of them is
+self-certification under either reading of the test.
 
 ### The C hardening span
 
@@ -838,6 +1282,69 @@ member of that residue class, because `m = 3` is a different program: the fold's
 domain is `m >= 4` and that is measured rather than assumed** — a non-vacuous
 out-of-sample test, unlike one that cannot fail.
 
+### 9a. The residue term SOLVED — the period is 4, not 8, and the mechanism is on the listing
+
+Until TASK_048 the `R3ship − R4` law carried `α(m mod 8)` with
+`α ∈ {3, 5, 19, 22}` and **no mechanism**; TASK_047_REVIEW recorded it as still
+unexplained. It is now decomposed, with zero fitted parameters and **45/45 exact
+over the whole of band M, `m` = 4…48** (`.temp/p48/bandm_full.json`,
+`controls/sweep_ir.py`):
+
+```
+R3ship    − R4  =  2*sum_m + nrec * [ swap(m mod 2) + fold(m mod 4) ] + 1
+c_idx     − R4  =            nrec * [      13       + fold(m mod 4) ] + 1
+c_foldidx − R4  =  2*sum_m + nrec * [ swap(m mod 2)                 ] + 1
+
+     swap(even) = 19      swap(odd) = 1      fold(k) = k + [k > 0],  k = m mod 4
+```
+
+so `α(m mod 4) = {0: 19, 1: 3, 2: 22, 3: 5}` and
+`α′(m mod 4) = {0: 13, 1: 15, 2: 16, 3: 17}`. **The eight residue classes were
+four, repeated twice**; the period-8 statement was true but over-parameterised,
+and the period-4 one points straight at the mechanism.
+
+**What separates the two terms is a control, not an argument.** `c_foldidx`
+(family C8, added at TASK_048) is the shipped R3 with **only the fold** respelled
+as R2's indexed `while` loop — the two-step reslice and the `zip`/`Rev` swap
+untouched. It carries `swap(m mod 2)` and **no `m mod 4` part at all**; `c_idx`
+carries `fold(m mod 4)` and no per-byte term; `safe_naive` carries neither
+(`269.00` flat). The reslice happens once per *call* and so cannot produce a
+per-*record* term in `m`, which leaves the fold — and `c_foldidx` decides it by
+measurement rather than by elimination.
+
+**The mechanism for `fold(k) = k + [k > 0]`, read off the disassembly**
+(`harness/asm.py`, `-O3 isolated`):
+
+- **Every rung's fold is 4× unrolled.** `c_idx`, `safe_naive` and `unsafe` all
+  emit `mov %r13d,%edx ; and $0x7c,%edx`, four Horner steps
+  (`movzbl ; shl $0x5 ; sub ; add`), `add $0x4,%rcx ; cmp ; jne`, then
+  `test %rax,%rax ; je` into a **scalar epilogue of exactly `k = m mod 4`
+  iterations**. *That* is why the period is 4.
+- **The `k` term is one instruction per epilogue element.** `c_idx`'s epilogue
+  body is **9** instructions — `movzbl, mov, shl, sub, mov, add, inc, cmp, jne` —
+  against R4's **8** — `mov, shl, sub, movzbl, add, inc, cmp, jne`. The iterator
+  closure needs one extra register copy. `+1 Ir` per epilogue element.
+- **The `[k > 0]` term is a single EXECUTED alignment `nop`.** `c_idx` has
+  `nop` at `0x15a4f`, immediately before `0x15a50` — which is the epilogue
+  loop's own back-edge target (`jne 15a50`). So it is *outside* the loop and runs
+  **once**, and only when the epilogue is entered at all. R4 has no pad there.
+
+```
+c_idx    0x15a41 test %rax,%rax        R4      0x…963 test %rax,%rax
+         0x15a44 je   15a80                    0x…966 je   15970
+         0x15a46 add  %rsp,%rcx                0x…968 add  %rsp,%rcx
+         0x15a49 add  $0x10,%rcx               0x…96b add  $0x10,%rcx
+         0x15a4d xor  %edx,%edx                0x…96f xor  %edx,%edx
+         0x15a4f nop                  <<<      (no pad)
+         0x15a50 movzbl (%rcx,%rdx,1),%esi     0x…971 mov  %r15,%rsi
+         ... 9 instructions, jne 15a50         ... 8 instructions, jne …
+```
+
+> **So a second p06 law, independently of §3a′, has an executed `.p2align` pad
+> as one of its terms.** `[k > 0]` is literally one `nop`. Two of the three
+> published laws in this file contain executed padding, and neither residual can
+> see it, because padding is exactly as reproducible as work.
+
 **And the strongest out-of-sample statement is on a shipped input.** `small.bin`
 is **length-heterogeneous** — five records with five *different* `m` (13, 47, 29,
 61, 7), none of which any band visits — which is queue item 11's missing band
@@ -845,13 +1352,18 @@ arriving as a *perf row*. The band-fitted laws predict it with zero free
 parameters:
 
 ```
-R2 - R4 :  32*5 + 13                       = 173   measured 173.00
-R3 - R4 :  2*157 + sum(alpha(m mod 8)) + 1 = 334   measured 334.00
-R1h - R1 (gcc)   :  8*5 + 1 - 1*0          =  41   measured  41.00
-R1h - R1 (clang) : -9*5                    = -45   measured -45.00
+                         m = 13, 47, 29, 61, 7   ->   m mod 4 = 1, 3, 1, 1, 3
+R2      - R4 :  32*5 + 13                        = 173   measured 173.00
+R3ship  - R4 :  2*157 + (3+5+3+3+5)        + 1   = 334   measured 334.00
+c_idx   - R4 :          (15+17+15+15+17)   + 1   =  80   measured  80.00
+c_foldidx-R4 :  2*157 + (1+1+1+1+1)        + 1   = 320   measured 320.00
+R1h - R1 (gcc)   :  8*5 + 1 - 1*0                =  41   measured  41.00
+R1h - R1 (clang) : -9*5                          = -45   measured -45.00
 ```
 
-Four laws, four exact hits, on an input outside every band. The gcc law also hits
+Six laws, six exact hits, on an input outside every band — and the three R3-side
+ones use §9a's `α(m mod 4)` / `α′(m mod 4)` / `swap(m mod 2)` decomposition with
+**zero** fitted parameters. The gcc law also hits
 `large` exactly (`8*12 + 1 - 1*2 = 95`) and the clang one misses it by 1. ⚠ **`large.bin` is
 NOT predicted**: its `m` run 1…8, mostly below band M's clean domain, and
 `R3 − R4` misses by 47 there. That is the domain statement doing its job, and it
@@ -862,14 +1374,42 @@ is why both are reported.
 `controls/gen_controls.py` family B, `controls/verify_controls.sh`, both
 configurations:
 
+**Counts moved +1 / +1 at TASK_048** because `scr_load` stopped being
+`external_body` and its body became an obligation in every mutant too (§6a); the
+*verdicts* did not move. Two runs of `controls/verify_controls.sh`, identical
+both times:
+
 | mutant | what changed | shipped | `--cfg slb_twin` | caught by |
 |---|---|---|---|---|
-| `b_nored` | the reduction **deleted**, contract untouched | **16 / 1** `invariant not satisfied before loop` | 21 / 1 | Verus |
-| `b_nored_msonly` | deleted **and** the postcondition weakened to memory-safety-only | **16 / 1**, the same error | 21 / 1 | Verus |
-| `b_scrmod` | `r %= SCR` (the **wrong modulus**), contract untouched | **16 / 1** `precondition not satisfied` (at `lemma_three_reverses`) + `assertion failed` (at the driver's consuming assert) | 21 / 1 | Verus |
-| **`b_scrmod_msonly`** | `r %= SCR` **and** memory-safety-only | **17 / 0** | **22 / 0** | **nothing but `spec.md`'s contract pin** |
-| `b_weakreq` | `i < old(v)@.len()` → `i <= …` in the trusted item *and* the twin | **17 / 0** — undetected | **21 / 1** `precondition not met: index in bounds` | **the twin alone** |
-| `b_tautology` | the kernel `ensures` → `r == r`, nothing else | **16 / 1** `assertion failed` | 21 / 1 | the driver's consuming assert |
+| `b_nored` | the reduction **deleted**, contract untouched | **17 / 1** ⚠ `while loop: Resource limit (rlimit) exceeded` | 22 / 1 `invariant not satisfied before loop` | Verus |
+| `b_nored_msonly` | deleted **and** the postcondition weakened to memory-safety-only | **17 / 1** `invariant not satisfied before loop` | 22 / 1, the same error | Verus |
+| `b_scrmod` | `r %= SCR` (the **wrong modulus**), contract untouched | **17 / 1** `precondition not satisfied` | 22 / 1, the same error | Verus |
+| **`b_scrmod_msonly`** | `r %= SCR` **and** memory-safety-only | **18 / 0** | **23 / 0** | **`spec.md`'s contract pin AND the `identity` pin** — see 10b |
+| `b_weakreq` | `i < old(v)@.len()` → `i <= …` in the trusted item *and* the twin | **18 / 0** — undetected by Verus | **22 / 1** `precondition not met: index in bounds` | **the twin — and `spec.md`'s contract pin, 2 diffs** — see 10b |
+| `b_tautology` | the kernel `ensures` → `r == r`, nothing else | **17 / 1** `assertion failed` | 22 / 1, the same error | the driver's consuming assert **and the contract pin** |
+
+⚠ **`b_nored`'s shipped-configuration failure is a RESOURCE LIMIT, not an
+obligation, and TASK_048 measured what moved it there.** `NOTES.md` used to
+record `invariant not satisfied before loop` for `b_nored` and
+`precondition not satisfied` for `b_scrmod`; TASK_047_REVIEW measured `b_scrmod`
+failing by `Resource limit (rlimit) exceeded` twice in a row. **Both records were
+right about their own tree.** Regenerating the mutants from the *pre*-TASK_048
+`verus.rs` (`.temp/p48/oldctl/`, `git show HEAD:…/verus.rs`) reproduces the old
+pair exactly — `b_nored` → `invariant not satisfied before loop`, `b_scrmod` →
+`Resource limit (rlimit) exceeded` — while the current tree gives the mirror
+image. **Verifying `scr_load` moved the exhaustion from one mutant to the other.**
+`--rlimit 30` and `--rlimit 60` do not convert it into an obligation failure
+(still `17 / 1`, still the rlimit), so the query genuinely diverges rather than
+running out of a budget that could be raised.
+
+**What that costs the controls, stated rather than swept up.** A mutant that dies
+of resource exhaustion is a weaker control than one that fails on an obligation:
+it shows Verus did not accept the mutant, not that the specification rejected it.
+On p06 **every mutant fails on a real obligation in at least one of the two
+configurations**, and `b_nored` fails on the invariant under `--cfg slb_twin`, so
+the pair (shipped, twin) is what carries the strength claim — not either
+configuration alone. The rlimit is a property of the SMT context, and TASK_048
+is the measurement that shows how little it takes to move it.
 
 Four results, and three of them were not what the task file predicted:
 
@@ -883,18 +1423,65 @@ Four results, and three of them were not what the task file predicted:
 2. **`r %= SCR` is that program change, and it is one identifier from the
    contract.** Memory-safe on every input (`r < 64 == scr.len()`, so every index
    the three reverses touch is in bounds in *both* regimes); functionally wrong
-   on exactly regime 1's set. `b_scrmod_msonly` therefore **verifies, 17 / 0 and
-   twin 22 / 0**, and the compiled binary is a *verified, `unsafe`-using program
+   on exactly regime 1's set. `b_scrmod_msonly` therefore **verifies, 18 / 0 and
+   twin 23 / 0**, and the compiled binary is a *verified, `unsafe`-using program
    whose memory-safety obligations all discharge* which nonetheless prints
    `415744194194585216` on `adversarial-inarray.bin` where the model says
    `5453190234444350336` — and agrees with the model on `small`, `large` and
    `degenerate`. **That is the mutant that earns its keep**, and it is the
    complement of p09, where the bug went invisible *even to the spec* once the
    spec moved with it: here the two specs disagree on the same program.
-3. **`b_weakreq` is caught by the verified twin and by nothing else**, on a
-   weakening applied to the item *and* the twin in one edit — which is what a
-   real single-commit weakening looks like. Third pattern where the twin is the
-   sole catcher, and the first on a write accessor called twice per iteration.
+3. **`b_weakreq` is the only mutant Verus alone does not catch**, on a weakening
+   applied to the item *and* the twin in one edit — which is what a real
+   single-commit weakening looks like. It is the first instance on this project
+   of that shape on a **write** accessor called twice per iteration. ⚠ **But
+   "the twin is the sole catcher" is FALSE at the gate level and 10b measures
+   it.**
+
+### 10b. "The twin is the SOLE catcher" and "caught by nothing but `spec.md`'s pin" are both FALSE
+
+Corrected at TASK_048 on TASK_047_REVIEW's M3. The measured *premises* were
+right — the shipped Verus configuration really does report `18 / 0` on
+`b_weakreq`, and `b_scrmod_msonly` really does verify in both configurations —
+and the conclusions drawn about the **gate** did not follow.
+
+`harness/check.py`'s own comparison (`check.py:2200-2240`, `vparse.by_name` +
+`norm_clause`) run against `spec.md`'s pinned `verus.items`
+(`.temp/p48/pinsim.py`, which is that code and nothing else):
+
+```
+SHIPPED verus.rs   0 diffs
+b_weakreq          2 diffs   scr_set_unchecked.requires  ['i <= old(v)@.len()'] != pinned ['i < old(v)@.len()']
+                             slb_twin_scr_set_unchecked.requires        same
+b_scrmod_msonly    1 diff    kernel.ensures ['r == r'] != pinned ['r == rotate_fold(buf@, off as int, len as int)']
+b_tautology        1 diff    (same)
+b_nored_msonly     1 diff    (same)
+b_nored            0 diffs   b_scrmod   0 diffs
+```
+
+So **`b_weakreq` fails the `verus_contract` stage, which runs BEFORE
+`trusted_twins`.** And `b_scrmod_msonly` **also breaks the `identity` pin**:
+compiled at the gate's own flags it is **174 / 166 instructions,
+`md5_raw 3f32e343bfa7`, `md5_fn 779c99de203c`** against R4's **216 / 208,
+`6608a63b5c52`, `897c52ff4005`**.
+
+**The correct statements:**
+
+> The twin is the sole **Verus-level** catcher of `b_weakreq`. The contract pin
+> catches it too, with two clause diffs, and a clause weakening only reaches the
+> twin stage if the `spec.md` pin was edited in the same commit — which is
+> exactly what TASK_008_REVIEW's original attack did and is why the twin exists.
+>
+> `b_scrmod_msonly` is caught by the contract pin **and** by the `identity` pin,
+> not by "nothing but `spec.md`'s pin".
+
+**Audited on the two other patterns that could carry the same sentence, and they
+split** (TASK_048, report only — neither pattern was edited for this):
+
+| pattern | its version of the claim | measured |
+|---|---|---|
+| **p12** `NOTES.md:1046-1049` | *"one character, and only the TWIN sees it … the two signatures still match and `spec.md`'s item pin does not move"* | ⚠ **FALSE the same way.** `p2_weak_write_requires` gives **2 diffs** against p12's own pin (`dst_set_unchecked.requires` and its twin's). `p3_slotwise_write_ensures` 1 diff, `p4_taut_kernel_ensures` 1 diff, `p1_no_capacity_check` 0, shipped 0. |
+| **p02** `NOTES.md:773` | — | **CLEAN.** p02 makes no sole-catcher claim: its table header says the mutants edit *"verus.rs **and** the spec.md pins, one commit"*, and its last row records the twin-left-alone case as *"caught by the signature comparison instead"*. The shape does not reach it. |
 4. **`b_tautology` does not verify**, where p02's M7 did. The driver's consuming
    `assert(r == rotate_fold(...))` still names the real spec, so weakening the
    kernel's postcondition breaks the *call site*. That is the
@@ -907,7 +1494,8 @@ Four results, and three of them were not what the task file predicted:
 first pattern with a **pre-flight**, and "the declaration was written before any
 number existed" would be false:
 
-- The `idiom` block was written **after** the five rungs, the R5 proof (`17/0`),
+- The `idiom` block was written **after** the five rungs, the R5 proof (`17/0`
+  at the time; `18/0` since TASK_048 verified `scr_load`),
   the `identity` pin and the checksums existed, and **before** any p06 *cell* had
   been measured for perf — `harness/measure.py p06` had not been run and no `Ir`
   or `ns` figure for any of the eight cells existed.
@@ -934,19 +1522,28 @@ number existed" would be false:
   (`+6.44% / +13.39%`) and `safe_tuned − unsafe` (`+5.95% / +0.60%`) are
   reported and **not** headlined; only the `R1h − R1` figures (+9.8% … +57.1%)
   clear the floor by a comfortable multiple.
-- **No layout population.** `common/layout/order.py` knows only the three Rust
-  cells and p06's headline is a C-vs-C comparison, so `controls/wall_span.py`
-  re-implements the identical-copy floor and the alternating schedule over an
-  arbitrary binary list. What it does **not** do is build a 30-layout population
-  (`.memory/03-measurement.md`'s `win32`/`jcc32` modes). The `R1h − R1` effects
-  are 6–19× the identical-copy floor, so a layout mode could not plausibly
-  account for them, but that is an argument and not a measurement.
-- **`scr_load` should not need to be trusted.** §6: the pinned vstd *does*
-  specify `copy_from_slice`; the unproved step is the `&mut [u8; 64]` → `&mut
-  [u8]` range reborrow, and `split_at_mut`'s specification carries exactly the
-  write-back that would close it. Landing it takes the TCB from 6 items to 5 and
-  changes the exec text of four rungs, so it was not done after the numbers were
-  measured. Probes: `.temp/p06/vstdprobe/cfs*.rs`.
+- ~~**No layout population.**~~ **CLOSED at TASK_047_REVIEW / TASK_048.** There
+  is one now: `controls/clayout.py`, 30 layouts per cell via a pad object, with
+  `n_fn` and `md5_fn_norel` single-valued per cell and 30 distinct kernel
+  addresses spanning both `addr % 32` residues. §3c′ publishes both inputs from
+  it. **p06's headline survives it intact** — gcc `large` `+57.87%`, clang
+  `large` `+11.60%`, no sign flip at any layout, and the worst layout pair
+  (slowest hardened against fastest buggy) is still `+53.7%` on gcc. The old
+  entry's *"that is an argument and not a measurement"* is discharged: it is a
+  measurement now and it agrees with the argument.
+- ~~**`scr_load` should not need to be trusted.**~~ **CLOSED at TASK_048** — it
+  is not trusted any more (§6a), at zero codegen cost, and §6b names the three
+  vstd items the axiom relocated into and what that does and does not mean for
+  the TCB column.
+- **p08's `copy_in` is the same removal, unbuilt.** §6b's census says it is the
+  one remaining project-local trusted item whose *only* reason to exist is a vstd
+  gap that is not there. Nobody has measured whether p08's codegen holds; p02's
+  did not (p02 `NOTES.md` 5b), so the answer is not assumable in either
+  direction.
+- **`b_nored` fails its shipped configuration by a RESOURCE LIMIT** rather than
+  by an obligation, and raising `--rlimit` does not fix it (§10). It fails on the
+  invariant under `--cfg slb_twin`, so the mutant is not worthless, but the
+  shipped half of that row is weaker than the table's other rows.
 - **The `Ir`/`ns` sign disagreement is measured on two compilers and one box.**
   It is a property of *this* `div` on *this* microarchitecture; the `Ir` side is
   simulator-exact and portable, the ns side is not.

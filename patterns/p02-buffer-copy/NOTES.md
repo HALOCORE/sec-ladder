@@ -686,6 +686,62 @@ weak half.
 from TASK_005 (a trusted `unsafe` item must carry a non-empty `requires`) is
 satisfied by both items without a justification string, and the gate prints so.
 
+### 5b. `copy_bytes` STAYS TRUSTED, and the recorded reason was FALSE (TASK_048)
+
+Everything above this line said, and `.memory/04-verus.md:133` and `:813` still
+say, that **there is no vstd spec for `copy_from_slice`**. ⚠ **That is false at
+the pinned vstd** (`0.2026.08.09.92f466f`), found at TASK_047_REVIEW on p06 and
+re-measured here:
+
+```
+~/tools/verus/vstd/std_specs/slice.rs:205
+pub assume_specification<T: Copy>[ <[T]>::copy_from_slice ](dst: &mut [T], src: &[T])
+    requires old(dst)@.len() == src@.len(),
+    ensures  final(dst)@ == src@;
+```
+
+and **p02's own `copy_bytes` contract discharges from it, character for
+character, with no `external_body` and no `unsafe`** — replace the body with
+`let (a, b) = dst.split_at_mut(n); a.copy_from_slice(&src[from..from + n]);`
+(`vstd/std_specs/slice.rs:185` carries `split_at_mut`'s write-back) and
+
+```
+./verus_run.py  .temp/p48/p02/v_copybytes_verified.rs                 10 verified, 0 errors   (was 9)
+./verus_run.py  .temp/p48/p02/v_copybytes_verified.rs --cfg slb_twin  13 verified, 0 errors   (was 12)
+```
+
+**p02 keeps the trusted wrapper anyway, and now for a MEASURED reason rather
+than a false one.** Compiled at the gate's own `-O3 isolated` flags:
+
+| cell | `n_fn` / nopad | `md5_fn` | panic pads | marginal `Ir`/call, `small` | `large` |
+|---|---|---|---|---:|---:|
+| `unsafe` (R4) | 72 / 70 | `0e5b59364bb6` | 0 | 229.0075 | 10200.8730 |
+| `verus` (R5, SHIPPED) | 72 / 70 | `0e5b59364bb6` | 0 | 227.0075 | 10198.8730 |
+| R5 with `copy_bytes` **verified** | **81 / 79** | **`90b5fba6bc35`** | **1** (`verus.rs:202:27`) | **232.0075** | **10203.8730** |
+
+So the verified route costs p02 **+9 static instructions, +5.00 executed `Ir`
+per call flat in the copy length, and one surviving panic landing pad** — and,
+decisively, it **breaks `identity: unsafe == verus, O3 exact`**, which is p02's
+structural result. TASK_048's condition for landing it was *"if and only if the
+codegen is byte-identical"*; it is not, so it was not landed.
+
+**Why p06 lands it and p02 cannot, in one sentence: it depends on what R4's body
+is.** p06's R4 already writes the safe `copy_from_slice`, so the trusted and the
+verified spellings compile to the same bytes and its TCB went 6 items → 5 at
+zero cost (p06 `NOTES.md` 6). p02's R4 writes
+`core::ptr::copy_nonoverlapping(src.as_ptr().add(from), dst.as_mut_ptr(), n)`,
+and **all four of `core::ptr::copy_nonoverlapping`, `<[T]>::as_ptr`,
+`<[T]>::as_mut_ptr` and `<*const T>::add` are `is not supported` at the pinned
+vstd** (`.temp/p48/vstd/cno.rs`), so R5 cannot verify R4's body and cannot match
+R4's bytes without the wrapper. The wrapper is what buys the identity, and 5.00
+`Ir` is what it is worth.
+
+The corrected general statement, for `.memory/04-verus.md`: *the vstd spec for
+`copy_from_slice` exists and a bulk copy can be verified without a trusted
+wrapper; what still needs one is a rung whose R4 spells the copy with raw
+pointers, because the raw-pointer route is unsupported and the `identity` pin
+forces R5 to match R4.*
+
 ### The verified twins — what makes those `requires` more than *non-trivial*
 
 Added at TASK_009, and the reason is that everything above judges **triviality**
@@ -727,9 +783,15 @@ author cannot rescue a weakened `requires` by making the twin total. The fifth
 is why the contract is *lifted* rather than declared twice.
 
 **The copy twin is the interesting one, and it is where this mechanism could
-have been worse than useless.** There is no vstd spec for `copy_from_slice`
-(`.memory/04-verus.md`), so the checked equivalent of a bulk copy cannot be
-another bulk copy — it has to be the indexed loop. Had that loop failed *for
+have been worse than useless.** The checked equivalent of a bulk copy here
+cannot be another bulk copy — it has to be the indexed loop. ⚠ **The reason
+recorded until TASK_048 was false**: it said *"there is no vstd spec for
+`copy_from_slice`"*, and the pinned vstd does specify it
+(`vstd/std_specs/slice.rs:205`). The true reason is narrower and is 5b: the twin
+has to be a checked stand-in for `copy_nonoverlapping`, and `copy_from_slice`
+would be a stand-in for a *different* call — one whose own bounds checks vstd
+would then discharge for us, which is exactly the inheritance the twin exists to
+avoid. Had that loop failed *for
 want of a spec* rather than for want of a precondition, every failure the stage
 reported would have been uninterpretable. It verifies, so the failures above are
 about the precondition; the gate prints Verus's own diagnostic and says which
@@ -793,9 +855,13 @@ behind a shared `spec fn in_bounds` passed the whole gate while shipping
 SLB-TRUSTED-ARGUMENT verus.rs copy_bytes
 
 (a) **Is the twin's body the right checked stand-in?** Yes, and it is the one
-place where the answer needed thought. There is no vstd spec for
-`copy_from_slice`, so the checked equivalent of a bulk copy cannot be another
-bulk copy; the twin is the indexed loop `dst[j] = src[from + j]` for
+place where the answer needed thought. The checked equivalent of THIS bulk copy
+cannot be another bulk copy — ⚠ not because vstd lacks a `copy_from_slice`
+spec, which was the reason recorded until TASK_048 and is **false** (it is at
+`vstd/std_specs/slice.rs:205`; see 5b), but because the operation being stood in
+for is `core::ptr::copy_nonoverlapping`, and a `copy_from_slice` twin would
+inherit vstd's own bounds reasoning instead of re-deriving it. The twin is
+therefore the indexed loop `dst[j] = src[from + j]` for
 `j in 0..n`, with checked indexing on both sides. That is the byte-by-byte
 definition of `copy_nonoverlapping` over the same two extents, so the loop's
 reads and writes are the intrinsic's reads and writes, index by index. It

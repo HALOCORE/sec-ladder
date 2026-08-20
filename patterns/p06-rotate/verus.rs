@@ -56,9 +56,12 @@
 //! rows and `degenerate` are all inside the verified domain and the kernel
 //! agrees with `model.py` on all five.
 //!
-//! TCB tally: NOTES.md 6. Six `external_body` items, four of them with a
+//! TCB tally: NOTES.md 6. **Five** `external_body` items, three of them with a
 //! `requires`, all listed there individually, because an under-counted TCB is
-//! how the pilot's fatal defect hid in plain sight (`.memory/04-verus.md`).
+//! how the pilot's fatal defect hid in plain sight (`.memory/04-verus.md`). It
+//! was SIX until TASK_048: `scr_load` is now verified rather than trusted, and
+//! the axiom it used to state relocates into vstd -- see its comment below and
+//! ../NOTES.md 6, which names the three vstd items that take it over.
 
 use vstd::prelude::*;
 
@@ -297,7 +300,7 @@ pub proof fn lemma_three_reverses(s: Seq<u8>, m: int, r: int)
 }
 
 // ------------------------------------------------------------------- TCB ----
-// TRUSTED ITEM 1 of 6. vstd ships no specification for `<[T]>::get_unchecked`,
+// TRUSTED ITEM 1 of 5. vstd ships no specification for `<[T]>::get_unchecked`,
 // so this is the axiom that licenses the unchecked read of the SOURCE window.
 // It is sound because the standard library's documented contract for
 // `get_unchecked` is exactly this: if the caller guarantees `i < v.len()`, the
@@ -329,7 +332,7 @@ fn slb_twin_buf_get_unchecked(v: &[u8], i: usize) -> (r: u8)
     v[i]
 }
 
-// TRUSTED ITEM 2 of 6. The SCRATCH read, performed by the reverses and by the
+// TRUSTED ITEM 2 of 5. The SCRATCH read, performed by the reverses and by the
 // fold. The scratch is a fixed-size `[u8; 64]`, so the bound is the array's
 // type-level length rather than a runtime `len()`; p03's `stack_get_unchecked`
 // and p12's `dst_get_unchecked` are the same item.
@@ -360,7 +363,7 @@ fn slb_twin_scr_get_unchecked(v: &[u8; 64], i: usize) -> (r: u8)
     v[i]
 }
 
-// TRUSTED ITEM 3 of 6, and **the item p06 exists for**: the unchecked STORE into
+// TRUSTED ITEM 3 of 5, and **the item p06 exists for**: the unchecked STORE into
 // the fixed scratch. It is called TWICE per swap, at `a` and at `b - 1`, and the
 // `requires` is what excludes both of R1's out-of-bounds stores.
 //
@@ -401,52 +404,60 @@ fn slb_twin_scr_set_unchecked(v: &mut [u8; 64], i: usize, x: u8)
     v[i] = x;
 }
 
-// TRUSTED ITEM 4 of 6: THE BULK LOAD -- and it is trusted for a NARROWER reason
-// than `.memory/04-verus.md` and TASK_047 both give.
+// THE BULK LOAD -- and it is NOT a trusted item. It was one until TASK_048,
+// and the reason recorded for keeping it was FALSE.
 //
-// Both say *"there is no vstd spec for `copy_from_slice`"*. **That is false at
-// the pinned vstd**, measured at TASK_047 (`.temp/p06/vstdprobe/`):
+// Until TASK_048 this item carried `#[verifier::external_body]` and this
+// comment said that `<[T]>::split_at_mut` "is the route that would delete this
+// item; taking it changes the exec text of four rungs". **Measured at
+// TASK_047_REVIEW and re-measured at TASK_048: it changes the exec text of
+// NOTHING.** With the body below, `verus.rs` verifies `18 verified, 0 errors`
+// (twin `23 verified, 0 errors`) and the compiled kernel is BYTE-IDENTICAL to
+// the trusted spelling and to R4 -- `md5_raw 6608a63b5c52`, `md5_fn
+// 897c52ff4005`, 216/208 instructions, `identity: unsafe == verus, O3 exact`
+// holding, checksums unchanged on every input. So this is a MEASUREMENT and
+// not a re-ship: no rung's machine code moved and no published `Ir` moved
+// (`.memory/02-bench-rules.md`'s "NEVER re-ship a rung" is about spellings that
+// change a cost; nothing here changes one).
 //
-//     ~/tools/verus/vstd/std_specs/slice.rs:205
-//     pub assume_specification<T: Copy>[ <[T]>::copy_from_slice ](dst: &mut [T], src: &[T])
-//         requires old(dst)@.len() == src@.len(),
-//         ensures  final(dst)@ == src@;
+// Three vstd facts do the work, and NAMING them is the point -- the axiom
+// RELOCATES into vstd, it does not vanish (../NOTES.md 6):
 //
-// With the preconditions established, both of that call's obligations and both
-// range-index obligations DISCHARGE (`cfs4.rs`). What does not go through is
-// carrying the mutation back from a `&mut [u8]` REBORROWED out of a
-// `&mut [u8; 64]` by a range index: `<[T; N]>::index_mut`'s `ensures` is an
-// existential over the intermediate slice and Z3 does not instantiate it. So
-// what this item axiomatises is the reborrow write-back, not the copy.
-// `<[T]>::split_at_mut` IS specified with the write-back spelled out
-// (`slice.rs:185`, `final(slice)@ == final(ret.0)@ + final(ret.1)@`) and is the
-// route that would delete this item; taking it changes the exec text of four
-// rungs, so it is recorded as open in ../NOTES.md 6 and 11 rather than taken
-// after the numbers were measured.
+//   1. `vstd::array::ref_mut_array_unsizing_coercion` (`vstd/array.rs:175`),
+//      which Verus inserts for the implicit `&mut [u8; 64]` -> `&mut [u8]`
+//      reborrow on the line below, and whose `ensures` is exactly the write-back
+//      this item used to axiomatise: `out.view() == old(r).view()` **and**
+//      `final(out).view() == final(r).view()`. It is itself `external_body`
+//      INSIDE vstd.
+//   2. `<[T]>::split_at_mut` (`vstd/std_specs/slice.rs:185`), whose `ensures`
+//      spells the halves' write-back out: `final(slice)@ == final(ret.0)@ +
+//      final(ret.1)@`.
+//   3. `<[T]>::copy_from_slice` (`vstd/std_specs/slice.rs:205`), which the
+//      pinned vstd DOES specify, against what `.memory/04-verus.md:133` and
+//      `:813` say.
 //
-// **The body is the OTHER rungs' `scr_load` verbatim**, and it is a
-// `#[verifier::external_body]` free function rather than an expression inside
-// `kernel` because R4 has to be byte-identical to it: written inline, R4 is 179
-// instructions and R5 208, and the difference is entirely LLVM's inlining
-// order. That the `verus!` macro accepts a range-index expression in an
-// `external_body` body at all was MEASURED (`.temp/p06/bulktest.rs`,
-// `1 verified, 0 errors`) rather than assumed -- the first draft routed it
-// through a plain-Rust module to avoid a rewrite that does not happen, and paid
-// for it with an item the `verus.items` pin could not accept.
+// **Why the spelling had to change, measured rather than assumed.** The old
+// body was `dst[..n].copy_from_slice(&src[from..from + n]);`. `..n` is a
+// `RangeTo<usize>`, and at the pinned vstd `RangeTo` has **no**
+// `SliceIndexSpecImpl` at all -- only `usize` and `Range<usize>` do
+// (`vstd/std_specs/slice.rs:14,30`) -- so that line cannot verify: it reports
+// `precondition not satisfied` at `vstd/std_specs/core.rs:69` (`index_req`).
+// Respelling it `dst[0..n]` on the reborrowed slice discharges the
+// preconditions and then fails the POSTcondition, because
+// `<[T] as IndexMut<I>>::index_mut`'s `ensures` is a `call_ensures(...)` that Z3
+// does not instantiate. `split_at_mut` is the only route that closes both ends.
+// Probes: `.temp/p48/vstd/keepspell.rs`, `keepspell2.rs`.
 //
-// It contains no `unsafe` -- `copy_from_slice` is a safe function and the two
-// `requires` are what make its own bounds checks and its length-equality assert
-// unreachable. It is TCB anyway, because its `ensures` is an axiom about what
-// that call does, and `.memory/04-verus.md` counts every `external_body` item
-// whether or not it is `unsafe`.
+// It is a free function rather than an expression inside `kernel` because R4
+// has to be byte-identical to it: written inline, R4 is 179 instructions and R5
+// 208, and the difference is entirely LLVM's inlining order.
 //
 // One `ensures`, and it is the whole array: `load_into` says the prefix
 // `[0, n)` becomes `src[from .. from+n)` **and every byte from `n` up is the
 // byte that was already there**. The second half is not decoration here -- the
 // scratch is NOT re-zeroed between records, and regime 1 reads exactly those
-// untouched bytes.
+// untouched bytes. It is now a PROVED postcondition rather than an axiom.
 #[inline(always)]
-#[verifier::external_body]
 fn scr_load(dst: &mut [u8; 64], src: &[u8], from: usize, n: usize)
     requires
         n <= old(dst)@.len(),
@@ -454,15 +465,23 @@ fn scr_load(dst: &mut [u8; 64], src: &[u8], from: usize, n: usize)
     ensures
         final(dst)@ == load_into(old(dst)@, src@, from as int, n as int),
 {
-    dst[..n].copy_from_slice(&src[from..from + n]);
+    assert(src@.len() == vstd::slice::spec_slice_len(src));
+    let ghost d0 = dst@;
+    let s: &mut [u8] = dst;
+    let (a, _b) = s.split_at_mut(n);
+    a.copy_from_slice(&src[from..from + n]);
+    assert(dst@ =~= load_into(d0, src@, from as int, n as int));
 }
 
-// THE VERIFIED TWIN of trusted item 4. The checked equivalent of the bulk call
-// is the indexed loop below rather than another bulk call -- p02's wrinkle,
-// though for the reborrow reason above rather than for the missing-spec reason
-// p02 gives. That the loop verifies (`2 verified` under `--cfg slb_twin`) is
-// what rules out the false-failure reading of this stage: the failures it
-// reports are about the precondition and not about a spec Verus lacks.
+// `scr_load` IS NO LONGER A TRUSTED ITEM (TASK_048), so `check.py`'s 5c-twin
+// stage no longer requires this twin -- `_is_trusted` is keyed on
+// `external_body` + (`ensures` or `unsafe`), and `scr_load` is now none of
+// those. **It is kept anyway, deliberately**, and it is worth one sentence why:
+// it is a SECOND and INDEPENDENT derivation of `load_into`, from an ELEMENT-WISE
+// indexed loop rather than from vstd's three bulk specifications, so the two
+// routes to the same postcondition are both in the tree and both checked. It
+// still carries `2 verified` under `--cfg slb_twin` (the loop body is its own
+// query), which is the +2 in the twin count pinned in ../spec.md.
 #[cfg(slb_twin)]
 fn slb_twin_scr_load(dst: &mut [u8; 64], src: &[u8], from: usize, n: usize)
     requires
@@ -491,7 +510,7 @@ fn slb_twin_scr_load(dst: &mut [u8; 64], src: &[u8], from: usize, n: usize)
     assert(dst@ =~= load_into(d0, src@, from as int, n as int));
 }
 
-// TRUSTED ITEM 5 of 6. Argument parsing, file I/O and little-endian decoding,
+// TRUSTED ITEM 4 of 5. Argument parsing, file I/O and little-endian decoding,
 // delegated to common/driver.rs so that all seven rungs read the file the same
 // way. It states **no** `ensures` at all, deliberately: an `ensures` here would
 // be an axiom about the contents of a file, which nothing can justify. Every
@@ -507,8 +526,8 @@ fn load_input() -> (r: (u64, u64, Vec<u8>)) {
     (inp.n_iters, stride_w, bytes)
 }
 
-// TRUSTED ITEM 6 of 6. `println!` is not verifiable; no `ensures`. Counted with
-// the five above -- every `external_body` item is TCB, not just the interesting
+// TRUSTED ITEM 5 of 5. `println!` is not verifiable; no `ensures`. Counted with
+// the four above -- every `external_body` item is TCB, not just the interesting
 // one (`.memory/04-verus.md`: the pilot was published as "one 3-line wrapper"
 // and the true tally was three items, one of which was `main`).
 #[verifier::external_body]

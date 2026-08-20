@@ -205,14 +205,33 @@ fn copy_bytes(src: &[u8], from: usize, dst: &mut [u8], n: usize)
 
 // THE VERIFIED TWIN of trusted item 2 (`harness/check.py` step 5c-twin).
 //
-// The interesting one: there is **no vstd spec for `copy_from_slice`**
-// (`.memory/04-verus.md`), so the checked equivalent of a bulk copy cannot be
-// another bulk copy -- it has to be the indexed loop below. That is the twin
-// mechanism's known wrinkle, and it is worth being explicit that this loop
-// verifying is what rules out the false-failure reading: if the twin failed for
-// want of a spec rather than for want of a precondition, the stage would be
-// worse than useless. It verifies (12 verified, 0 errors with `--cfg
-// slb_twin`), so the failures it reports are about the precondition.
+// The interesting one: the checked equivalent of THIS bulk copy cannot be
+// another bulk copy -- it has to be the indexed loop below.
+//
+// ** The reason recorded here until TASK_048 was FALSE.** It read "there is no
+// vstd spec for `copy_from_slice` (`.memory/04-verus.md`)", and the pinned vstd
+// DOES specify it, at `vstd/std_specs/slice.rs:205`. Measured at TASK_048: with
+// the body respelled `let (a, b) = dst.split_at_mut(n);
+// a.copy_from_slice(&src[from..from + n]);` the item above needs no
+// `external_body` at all and the file verifies `10 verified, 0 errors`
+// (twin `13 verified, 0 errors`).
+//
+// ** p02 keeps the trusted wrapper anyway, and the price of NOT keeping it is
+// measured** (../NOTES.md 5b): the verified spelling is 81/79 instructions
+// against R4's 72/70, `md5_fn 90b5fba6bc35` against `0e5b59364bb6`, +5.00
+// executed `Ir` per call flat, one surviving panic pad -- so it BREAKS
+// `identity: unsafe == verus, O3 exact`. The discriminator is what R4's body is:
+// `core::ptr::copy_nonoverlapping`, `<[T]>::as_ptr`, `<[T]>::as_mut_ptr` and
+// `<*const T>::add` are all `is not supported` at the pinned vstd, so R5 cannot
+// verify R4's spelling and cannot match R4's bytes without this wrapper.
+// (p06's R4 writes `copy_from_slice` already, so p06 DID land the same removal
+// at zero cost -- p06 NOTES.md 6.)
+//
+// That the loop verifying is what rules out the false-failure reading is
+// unchanged: if the twin failed for want of a spec rather than for want of a
+// precondition, the stage would be worse than useless. It verifies (12
+// verified, 0 errors with `--cfg slb_twin`), so the failures it reports are
+// about the precondition.
 //
 // Weaken `from + n <= src@.len()` to `from + n <= src@.len() + 1` -- the copy's
 // form of the same off-by-one, which passed the whole gate at TASK_008_REVIEW --

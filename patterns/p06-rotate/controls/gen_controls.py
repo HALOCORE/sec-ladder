@@ -288,6 +288,26 @@ def family_c():
 """, 3, "c_idx")
     out["c_idx"] = fix_paths(t)
 
+    # C8 -- IN CONTRACT, and it is the MECHANISM CONTROL for the residue term
+    # (TASK_048, item 10): shipped R3 with ONLY the fold respelled as R2's
+    # indexed `while` loop -- the two-step reslice and the `zip`/`Rev` swap are
+    # untouched. `safe_naive - unsafe` is 269.00 FLAT with no residue term at
+    # all, and `c_idx` (R3's reslice AND fold, R2's swap) carries
+    # `8*alpha'(m mod 4) + 1`; the reslice happens ONCE PER CALL and so cannot
+    # produce a per-record term in `m`, which leaves the FOLD. This control
+    # decides it by measurement rather than by elimination.
+    t = src("safe_tuned.rs")
+    t = sub(t, """        acc = scr[..m]
+            .iter()
+            .fold(acc, |h, &e| h.wrapping_mul(31).wrapping_add(e as u64));
+""", """        let mut i: usize = 0;
+        while i < m {
+            acc = acc.wrapping_mul(31).wrapping_add(scr[i] as u64);
+            i = i + 1;
+        }
+""", 1, "c_foldidx")
+    out["c_foldidx"] = fix_paths(t)
+
     # C5 -- IN CONTRACT: the ONE-SHOT window reslice, i.e. shipped R3 with the
     # two-step reslice lever backed out. This is what prices
     # `.memory/01-ladder.md` finding 3 on p06.
@@ -296,10 +316,38 @@ def family_c():
             "    let w: &[u8] = &buf[off..off + len];", 1, "c_oneshot")
     out["c_oneshot"] = fix_paths(t)
 
+    # C7 -- the FORBIDDEN `<[T]>::copy_within` rotate, PRICED (TASK_048,
+    # TASK_047_REVIEW m4). `copy_within` IS specified at the pinned vstd
+    # (`vstd/std_specs/slice.rs:235`), so the prover does NOT exclude it: it is
+    # p13's THIRD bucket -- fiat, and a fiat's price must be published beside the
+    # number it protects. `copy_within` is `ptr::copy` WITHIN ONE SLICE, so it
+    # cannot rotate on its own; a rotate built on it needs a temporary for the
+    # displaced prefix, which is exactly the out-of-place rotate the declaration
+    # excludes -- different memory traffic, and no in-place aliasing question at
+    # all, which is p06's TCB result.
+    t = src("safe_tuned.rs")
+    t = sub(t, R3_REV + """        a = r;
+        b = m;
+""" + R3_REV + """        a = 0;
+        b = m;
+""" + R3_REV, """        let _ = (a, b);
+        if r > 0 && r < m {
+            let mut tmp: [u8; SCR] = [0; SCR];
+            tmp[..r].copy_from_slice(&scr[..r]);
+            scr.copy_within(r..m, 0);
+            scr[m - r..m].copy_from_slice(&tmp[..r]);
+        }
+""", 1, "c_copywithin")
+    out["c_copywithin"] = fix_paths(t)
+
     # C6 -- R4 with the bulk load written INLINE instead of through the
     # `scr_load` helper. Not a rung: it breaks `identity: unsafe == verus, O3
-    # exact`, because R5's copy has to be inside an `external_body` item. It is
-    # what prices the identity pin (NOTES.md 3).
+    # exact` (179 instructions against R5's 208). Until TASK_048 the reason
+    # given here was "R5's copy has to be inside an `external_body` item"; that
+    # is false -- `scr_load` is verified now and the kernel is byte-identical
+    # either way. The helper boundary is what changes LLVM's inlining order, and
+    # it does so in R4 and R5 alike. It is what prices the identity pin
+    # (NOTES.md 3).
     t = src("unsafe.rs")
     t = sub(t, "        scr_load(&mut scr, buf, off + p, m);",
             "        scr[..m].copy_from_slice(&buf[off + p..off + p + m]);",
