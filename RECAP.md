@@ -1,5 +1,36 @@
 # RECAP — state of the research programme
 
+## START HERE — the next action, in one screen
+
+**You are the research manager.** Read `.tasks/PROTOCOL.md` next (it carries the
+manager's own rules), then `.memory/` 00–06 as you need them. Everything below
+this box is reference; this box is what to *do*.
+
+| | |
+|---|---|
+| **Patterns** | **12 of 47 exist, all green.** 11 reviewed; **p04 is UNREVIEWED.** |
+| **Immediate next task** | **write `TASK_042_REVIEW` and dispatch a reviewer at p04.** Its findings are in `patterns/p04-ring-buffer/NOTES.md` and deliberately **not** in `.memory/` (rule 9). Point it at finding 23's two claims: the known-bits mechanism, and the unification of the non-relational invariant with the invisible bug. |
+| **Then** | land the review, then **the next pattern**. Queue: **p13** (`strncpy` truncation — check `.memory/02-bench-rules.md`'s inheritance table first, p13 does **not** inherit p12's write rule), **p06** (in-place reverse — a permutation invariant, a new *proof* shape), **p14** (tokenizer — in-place mutation + aliasing). |
+| **The loop** | build a pattern → review it once → land corrections → repeat. Per `PROTOCOL.md` rule 9, write `.memory/` **only after** the review. |
+| **Git** | Commit at task boundaries; subagents never commit. ⚠ **There is a GitHub remote** (`origin`, `HALOCORE/sec-ladder`). **Do not push unless the user asks.** |
+| **Before quoting any number** | `harness/measure.py --check-stale` (exit 1 on STALE). |
+
+**The three things most likely to waste your time**, all learned the hard way:
+
+1. **Ask to be corrected, not obeyed.** **Fifty-five agents have contradicted the
+   manager with a measurement and all fifty-five were right.** Put your least
+   certain call in every task file *by name* and ask for the measurement. The
+   single highest-yield sentence in this project's history is some version of
+   "I think X; prove me wrong."
+2. **A green gate is evidence about the gate.** Reviews have found real defects
+   past a fully green run repeatedly — including in `.memory/` text written one
+   task earlier, and in the manager's own tooling.
+3. **Never write a finding into `.memory/` before its review lands** (rule 9).
+   It is the only reason several overclaims were caught in RECAP rather than
+   asserted as authoritative.
+
+---
+
 For a manager picking this up cold. Read this, then `.tasks/PROTOCOL.md` (which
 now carries **the manager's own rules**), then `.memory/` 00–06.
 
@@ -15,35 +46,56 @@ Rust, unsafe Rust + Verus proof — plus a sixth **R1h** hardened-C cell, across
 optimisation levels and two inline modes, and compared on assembly, executed
 instructions, timing, proof burden and trusted-base size.
 
-47 patterns are catalogued in `.memory/06-catalogue.md`. **Twelve exist and all
-are green. Eleven are reviewed** (p04 is built, green and **UNREVIEWED** — rule 9,
-its findings are in `patterns/p04-ring-buffer/NOTES.md`)**:** p01 (calibration), p02 (first real bug), p16 (first
-data-dependent bound), p17 (the limit of memory safety), p05 (the first
-vectorised kernel), p08 (the first structural Rust win). **p07 (binary search) is
-built, green and UNREVIEWED** — per `PROTOCOL.md` rule 9 its findings are in
-`patterns/p07-binary-search/NOTES.md` and deliberately **not** in `.memory/` yet.
-Read them as provisional; the review is the next task.
+47 patterns are catalogued in `.memory/06-catalogue.md`. **Twelve exist, all
+green; eleven reviewed, p04 outstanding:**
 
-**p07 changes the headline of this document, in a narrower way than it was first
-written.** It is the first kernel here that is not a linear fold — `Θ(log n)`
-probes, no inner loop to amortise a per-call constant over — and it is **the first
-pattern where R3's tax has no axis along which it amortises at all**: `6.0000` Ir
-per probe with `probes = nq·⌈log2 n⌉`, so the fraction rises in *both* `n` and
-`nq`. Survives six deliberately different query distributions, monotone in every
-one. See finding 15.
-⚠ It is **not** "the first counterexample to safety is cheap" — that sentence was
-the manager's and it was refuted at TASK_026_REVIEW against this project's own
-`.memory/`, which already records p16/p17's **R2** tax of 4.25 Ir/folded byte
-(rising, toward 73.9%) and p05's `O(nrow)` **R3** tax. The R3 scoping is the whole
-claim.
+| | pattern | what it is here for |
+|---|---|---|
+| p01 | array reduce | calibration; the template every later pattern clones |
+| p02 | length-prefixed copy | **the security result** — idiomatic C silent in 7 of 8 builds |
+| p05 | 2-D index flatten | the first vectorised kernel; the proof→performance link |
+| p08 | overlapping move | the bug safe Rust **cannot express** |
+| p16 | TLV walker | the first data-dependent bound |
+| p17 | HTTP suffix range | **the limit** — provably memory-safe and still leaking |
+| p07 | binary search | the first kernel where R3's tax **never amortises** |
+| p11 | NUL scan | library vs spelling vs safety, separated three ways |
+| p03 | bounded stack | the proof's own invariant, handed to LLVM, closes the gap |
+| p09 | bitset | **one character** between a bug everything catches and one nothing does |
+| p12 | `strcat` fixed | the first **write**; a per-iteration check costs the bulk lowering |
+| p04 | ring buffer | known **bits** survive a loop-carried phi where a range does not |
+
+**If you read only one thing after this file**, read `.tasks/TASK_026.md` §0 — the
+distilled rules from the thirteen-task spelling arc. Every pattern built after it
+needed only prose corrections, and every pattern built before it needed
+re-measurement.
 
 ## The findings so far — this is the actual output
 
-**Numbering warning, because it has already cost an agent time.** The list below
-is **RECAP's own digest** and is numbered 1–24. `.memory/01-ladder.md` has a
-*different* list, numbered 1–7, one entry per pattern, and **that one is
-authoritative**. "Finding 12" means different things in the two files. When
-writing a task file, name the pattern (*"p05's causal claim"*), never the number.
+**TWO numbering schemes — here is the map, so you never have to guess.** This
+file's list is **RECAP's own digest, 1–24**. `.memory/01-ladder.md` has a
+*different* list, **1–12, one entry per pattern**, and **that one is
+authoritative**. They were confused repeatedly before this table existed.
+
+| pattern | `.memory/01-ladder.md` | RECAP (this file) |
+|---|---|---|
+| p16 | **4** | 9 |
+| p17 | **5** | 10 |
+| p05 | **6** | 12 |
+| p08 | **7** | 13 |
+| p07 | **8** | 15 |
+| p11 | **9** | 17 |
+| p03 | **10** | 18 |
+| p09 | **11** | 19 |
+| p12 | **12** | 21 |
+| p04 | *(owed — unreviewed)* | 23 |
+| p01, p02 | findings 1–3 | 1–8 |
+
+Cross-cutting entries exist only here: **14** (every rung is a spelling), **16**
+(code layout / the 32-byte fetch grid), **20** and **24** (measurement and
+infrastructure defects), **22** (decode panic pads).
+
+**When you write a task file, name the pattern — *"p05's causal claim"* — never
+the number.**
 
 1. **A Verus proof costs exactly zero instructions.** The proven binary is
    byte-identical to the unproven one; ghost code fully erases. Verified on raw
@@ -877,8 +929,9 @@ headline. Say so in every task file.
 - **A tool that reports nothing may be a tool that cannot see.** ASan is silent
   on p08's overlap not because there is none but because fortify rewrote the call
   to `__memcpy_chk`. A gate row records `clean` for both reasons identically.
-- **Two files, two numbering schemes.** RECAP's findings are numbered 1–24,
-  `.memory/01-ladder.md`'s are 1–7. Name the pattern, never the number.
+- **Two files, two numbering schemes** — now with a **map** at the head of the
+  findings list, which is the fix this entry asked for three times. Name the
+  pattern, never the number.
   **And one task file is misnumbered**: `.tasks/TASK_025_REVIEW.md` reviews
   **TASK_024**, not TASK_025 (there is no TASK_025). Every other
   `TASK_NNN_REVIEW` reviews `TASK_NNN`; `TASK_027_REVIEW` restores the
@@ -924,297 +977,121 @@ headline. Say so in every task file.
 
 ## Priority — read this before planning
 
-**Twenty-eight tasks in, 7 of 47 patterns exist.** Six tasks went to gate
-hardening before the user called it; **TASK_015–028 — thirteen consecutive tasks —
-went to the *spelling* problem** and produced no new pattern. That arc paid (the
-named-spelling standard, four refuted floors, p16's sign error, and the
-R4-is-chained-to-the-prover result that retired two published intervals), and p07
-was built to its rules natively rather than corrected into them. **It is closed.
-Alternate build → review from here, and do not reopen it without a measurement
-that forces it.** The gate's
-threat model is **honest mistake, not
-malicious author** (`.memory/02-bench-rules.md`, top section, with the list of
-residuals we are deliberately leaving open). New gate work must pass "could this
-happen by accident?" first.
+**Forty-two tasks in, 12 of 47 patterns exist**, and the ratio is the thing to
+watch. Six tasks went to gate hardening before the user called it; **T015–028 —
+thirteen consecutive tasks — went to the spelling problem** and produced no new
+pattern. Both arcs paid for themselves, and neither was on anyone's plan. But the
+honest reading is that **this project is better at discovering its own numbers are
+wrong than at producing new ones**, and the correction is simple: **alternate
+build → review, and make a methodology proposal argue for itself against a
+pattern.**
 
-**Spend the coming tasks producing patterns.** Review each pattern once; do not
-review each fix to each check. p16 is the proof this works: built, measured,
-proved and reviewed inside two tasks, and the review still found a real
-overclaim — which is the *right* place for review effort.
+**Since T033 the loop has held** — p11, p03, p09, p12, p04 each built and reviewed
+in two tasks, every one green on its first complete run, and every one produced a
+finding no one predicted. That is the working mode; do not drift off it.
+
+The gate's threat model is **honest mistake, not malicious author**
+(`.memory/02-bench-rules.md`, top section, with the residuals deliberately left
+open). **New gate work must pass "could this happen by accident?" first** — and
+`check.py` is ~4900 lines against 12 patterns, so the next gate proposal should
+have to beat that ratio.
+
+**Review each pattern once; do not review each fix to each check.** The two
+highest-yield review targets, measured across every review so far: a claim the
+engineer *flagged against itself*, and a mechanism asserted without a control.
 
 ## Immediate queue
 
-The gate-hardening arc is **closed**. Five pattern tasks since have each gone
-green on the first complete run. The working mode is: **build a pattern, review
-it once, land the corrections, repeat** — and per `PROTOCOL.md` rule 9, write
-`.memory/` only *after* the review.
+**The next task is `TASK_042_REVIEW` (p04). After it, patterns.** See the START
+HERE box; this section is the standing backlog, not the next action.
 
-**p07 is built, reviewed (TASK_026_REVIEW) and its corrections are landed
-(TASK_029). Finding 8 in `.memory/01-ladder.md` is written.** The headline
-survived six workloads; the manager's framing of it did not (see finding 15).
+### Owed, in priority order
 
-**The layout arc is closed: finding 16 is measured, reviewed, refined and landed
-in all seven patterns' files (TASK_026 → 029 → 030_REVIEW → 031).**
+1. **p04's review** — the only unreviewed pattern.
+2. **p03's span rests on one unreviewed measurement.** TASK_037's `a_tail` is
+   swept (`maxres 0.000000`, 19 blobs) and its admissibility comes from the gate's
+   own decidable matcher, which is why it was landed — but it refuted a number a
+   review had just confirmed. **And the `+5` per-call constant has never been
+   searched at all**; it is the whole remaining gap between p03's two class
+   minima, and the belief that safe Rust must pay it is an argument, not a
+   measurement.
+3. **p01 and p08 owe an in-contract R3-side span.** Do **not** let either publish
+   a pair interval — both this project published were built from R4s that are not
+   rungs — and never the word "minimum"; write "cheapest found" and name the
+   input, because on p03 and p16 the cheapest spelling changes with it.
+4. **p17 ships no sweep inputs**, which is how its "+32 Ir/call flat" was
+   published from two bands that both had `nsuf = 3`. A `sweep-*` band appended
+   last costs **one gate re-run, not a re-measure** (`.memory/05-layout.md`).
+5. **`check.py`'s `harness/*.py` glob is over-broad** — it imports five modules
+   but hashes all of them, so a `measure.py` edit costs eight gate re-runs (13 min
+   measured) for a file the gate never executes. Judgement call; belt-and-braces
+   cannot under-cover.
+6. **`results/*.json` has no `source_sha256` for six patterns** — p01 and p16 are
+   `FRESH`, the rest are `NO BASELINE` and clear on their next re-measure.
+   `results/p11-nul-scan.json` is *stale* on `bulk_calls` and understates p11's own
+   12.0× library finding.
 
-⚠ **p03's span rests on ONE unreviewed measurement.** TASK_037's `a_tail` finding
-is swept (`maxres 0.000000`, 19 blobs) and its admissibility comes from the gate's
-own decidable matcher, which is why I landed it without a further review — but it
-refuted a number a review had just confirmed, and **the `+5` per-call constant has
-never been searched at all.** The next task that touches p03 should verify both.
+### Deferred with a stated reason
 
-**TASK_032 shipped the layout harness and the methodology arc is CLOSED.**
-`common/layout/` is committed and hashed; p01's mode survived the fixed timer;
-all seven patterns carry the protocol control.
+- **The mechanical rate-vs-disassembly backstop** (~90 lines, prototype exists).
+  Deferred twice, and the second time the engineer's own session was the argument:
+  every defect that actually occurred was a class-membership or arithmetic error
+  no `body_len / K` assertion would catch.
+- **`harness/check.py:1753`'s display string** still says "recorded as a result";
+  the comments beside it were corrected. Free to fix on any task that already
+  re-runs all gates.
 
-**p11 is built and green (TASK_033); `TASK_033_REVIEW` is next, then patterns.**
+### Closed arcs — history, not work
 
-**Both harness defects are FIXED (TASK_034)** — `report.py`'s boilerplate no
-longer tells readers to use a column that inverts signs, and `asm.py::is_bulk_symbol`
-now knows the `str*` family (27 new selftest cases, 47 total). Measured while
-fixing them: **p08, not p11, is the sharpest instance** of the kernel-exclusive
-column's distortion — 10 inverted rung pairs, with `c-gcc` reading 58% *dearer*
-than `c-clang` where the marginal says 33% *cheaper*.
-
-**The staleness gap is closed (TASK_035).** `measure.py` now writes
-`source_sha256` + `input_sha256` and ships `--check-stale` over **both** record
-families; 0 STALE across 16 records. ⚠ But two things must be said precisely:
-**p01 and p16 are `FRESH`; the other six are `NO BASELINE`** (their records
-predate the key and clear on their next run), so "0 stale everywhere" overstates
-it — the deterministic half was closed by rebuild instead (252 cells, 5544 static
-leaves, **6 moved, all p11's `bulk_calls`**). And **`results/p11-nul-scan.json` is
-stale on that column**: it records the C rungs calling no bulk routine, where
-p11's own headline is that glibc `strlen` is a 12.0× library factor. Small, but it
-understates the pattern's own finding.
-⚠ **My method for sizing it was wrong in both directions** — I compared each
-record's commit against `common/driver.c`'s last change; **p16 was never at risk**
-(it cannot compile against the older driver) and **p11 was, via `harness/asm.py`,
-which that test could not see**. A commit test is not the test; hashes are
-(`.memory/03-measurement.md`).
-
-**p12 is landed and reviewed. THE NEXT TASK IS `TASK_042` — p04, the ring
-buffer.** Three reasons: its index is **modular**, so it is the **third operator**
-in a series this project built without meaning to (p05 asked whether LLVM carries
-a bound through a *multiply*, p09 through a *shift* — and answered that the
-composition through the multiply is what fails; p04 asks `%`); it is the first
-kernel with **two live cursors**, so its guard is a *relation* rather than a
-comparison against a constant, which is exactly the shape finding 12 records as
-p05's blocker; and **its bug stays in bounds** — drop the fullness check and a push
-onto a full ring overwrites the oldest element with no OOB access at all, which
-would be the **second instance** of finding 19's result that memory safety is not
-the property that catches this.
-
-After it: **p13** (`strncpy` truncation — silent, and the check is *inside* libc;
-note it does **not** inherit p12's write rule), **p06** (in-place reverse — a
-permutation invariant, a new *proof* shape), **p14** (tokenizer — in-place
-mutation plus aliasing).
-
-⚠ **Read the ratio before planning anything else. TASK_015–031 is seventeen
-consecutive tasks of methodology and correction against two patterns produced
-(p07, and p05/p16's repairs).** Both arcs were worth it — the named-spelling
-standard, the R4-is-chained-to-the-prover result, and finding 16 are three of the
-project's strongest results, and none of them was on anyone's plan. But 7 of 47
-patterns exist. **The queue after TASK_032 is patterns, and a methodology task
-should now have to argue for itself against a pattern.**
-
-**Items 1–2a below are the closed spelling arc, kept for the history.** That arc
-ran TASK_015–028, thirteen tasks; it is finished and its rules are distilled in
-`.tasks/TASK_026.md` §0, which is the shortest statement of what this project
-learned about reporting spellings.
-
-1. ~~**TASK_023 — the `idiom.why` sentence is false in all six patterns.**~~
-   **Done.** The sentence is replaced byte-identically in all six `idiom.why`
-   blocks; both ride-alongs done. The probe TASK_023 asked for — *is the
-   sentence false for the other patterns or merely unverified?* — came back
-   **false, not unverified**: p16's unsafe rung moves in contract by
-   `R4ship − r4_hdr = 4·nrec` Ir/call (the two length bytes as one unaligned
-   `u16`, the same lever that moved p05's R4), zero residual over 24 blobs, and
-   the admissible pair `(r3_hdrarray, r4_hdr)` **exceeds** the published
-   `+27/+77` by `5·nrec`. ⚠ **The pair interval TASK_023 published from that —
-   `nrec + 13` … `7 + 10·nrec` / `3·nrec + 13` … `7 + 12·nrec`, "111%/109%
-   wide" — is REFUTED** (TASK_023_REVIEW): it was a 2-lever search on a
-   declaration that also licenses **unrolling**, which is the only lever of the
-   three that acts *per byte*. Measured, the interval is **−239…+236 (1759%) /
-   −2449…+2244 (6095%)** and its **bottom is negative on all 24 blobs**; the
-   in-contract minimum against the shipped R4 is **−199 / −2365**, not
-   `+19 / +45`. `r4_hdr` also **cannot be a p16 rung** — vstd cannot verify
-   `read_unaligned` and the `identity` pin needs R5 ≡ R4, so it would need a
-   fourth trusted item — while the R3-side levers cost zero TCB. **What survives
-   and is now the statement to quote: fold both rungs the same way and the
-   per-byte rates are equal to five decimal places at all six spellings
-   measured, and the unsafe rung is cheaper per *record* on every point.** The
-   three R4 controls ship in
-   `patterns/p16-tlv-walk/controls/gen_controls.py`; the write-up is that
-   pattern's `NOTES.md` §10a.1 and §10a.2. **p17, p02, p01 and p08 remain
-   unverified on the R4 side** — their published figures are one-sided bounds,
-   not upper bounds on a tax, and p17's `−19.00` is the same shape of claim that
-   the unroll lever manufactured on p16.
-
-   **TASK_024 landed the corrections and contradicted the paragraph above;
-   TASK_025_REVIEW then attacked TASK_024 and found a blocker and four majors**
-   (`.tasks/TASK_025_REVIEW_REPORT.md`). What survives, what died, and what is
-   still owed:
-
-   **Survives, and is now stronger than published.** The matched-spelling null —
-   the *only* thing this arc leaves standing as p16's per-byte number — was
-   re-derived over **127 consecutive `vlen`** where TASK_024 had three pairs at
-   one residue offset: safe−unsafe is a single integer per call at every point,
-   slope `0.0000000`, max residual 0.00. Mnemonic identity holds at K=4 and 8 too
-   (TASK_024 under-claimed); all twelve probes honour **all four** `required`
-   entries, not just the two the matcher checks; the band-A offset is the
-   `println` term, now controlled; 1140 equivalence comparisons, 0 mismatches;
-   Miri clean; tree green.
-
-   **Died.** (i) `u_c32` **cannot be a p16 R4 rung** — the `identity` pin needs a
-   verifying byte-identical R5 and vstd supports none of `chunks_exact`,
-   `ChunksExact`, `by_ref`, `TryFromSliceError`, `get_unchecked`; shipping it
-   needs *five* new trusted items where `r4_hdr` was disqualified for needing one.
-   So "at matched spelling the unsafe rung is cheaper" has no rung behind it —
-   and see finding 14, which this overturned project-wide. (ii) `−0.5625` is
-   arithmetically wrong for the rung it names: **−0.65625**. (iii) `−199/−2365` is
-   not the minimum — `chunks_exact(64)` gives **−127/−2545**, the fifth published
-   minimum overturned by the next search. (iv) "`chunks_exact(4)` is dearer,
-   therefore the free parameter is not a dial that flatters the safe rung" is an
-   artefact of `try_into`: drop it and K=4 measures 5.37500 and is **1509 Ir/call
-   cheaper** than shipped R4 at `large`. (v) The **direction test is stated with
-   its sign inverted relative to its own cited precedent**, so TASK_024's
-   load-bearing "we are not allowed to pin it" argues from a rule that decides
-   nothing — and the exclusion would not have restored `+19` anyway, because
-   manual unrolling is licensed by name and manual 32× is 5.18750 < 5.75. **The
-   decision not to pin stands; every stated reason for it is withdrawn.**
-
-   **Still owed — TASK_027.** The pattern-file corrections for (ii)–(v), and the
-   reproduction gap: §10a.2's twelve probes exist only in gitignored
-   `.temp/p24/*.py`, where `controls/*.py` is inside `source_sha256` precisely so
-   that cannot happen. Note `.temp/p24/foldbody.py`, which §10a.2 cites as its
-   evidence for mnemonic identity, **prints `identical=False` at every K when
-   re-run as committed** — the claim is true and its cited artefact refutes it.
-   **TASK_027 landed all of it and the gate is green; TASK_027_REVIEW then found
-   the R4-expressibility step VALID and used it to break p05.** See the new item
-   1a. What p16 still owes is small: `NOTES.md:1535` says "reproduce the whole
-   table" and `foldcmp.py` reproduces 8 of 10 rows (the two manual-unroll rows
-   are not derivable from the tree), and `gen_controls.py`'s docstring says both
-   "eighteen" and "sixteen" variants — 18 is right.
-
-1a. **THE CORRECTION SWEEP — TASK_028, and it is next.** The sentence *"it moves
-   the UNSAFE rung too, by the same lever: p16's by `4·nrec`, p05's by 7 flat"*
-   is inside the hashed `why` of **all six patterns**, and **both instances are
-   now refuted** — the lever is a header respelling and at the pinned vstd every
-   route to it (`read_unaligned`, `as_ptr`, `add`, `from_raw_parts`,
-   `TryFromSliceError`, `from_le_bytes`) is `is not supported`, so it needs a new
-   trusted item and is not a rung. p05's published pair interval
-   `2·nrow − 2 … 6·nrow + 20` has **both** endpoints set by inadmissible R4s; the
-   admissible substitution is `5·nrow + 6 … 6·nrow + 13`, i.e. back to the
-   R3-only span it was introduced to replace. "An admissible pair has a tax of
-   exactly 0.00" is withdrawn — that pairing's R4 is `r4_dataslice`.
-   Six hashed blocks, six gate runs. It is a **deletion of refuted text**, not a
-   new investigation, and it is owed before p07 adds results on top of it — which
-   is the same argument that opened this arc at TASK_014_REVIEW.
-   Ride-alongs: `harness/check.py:56` and `:1723` call the identity pin *"a
-   RESULT, not a gate condition"*, which is **false** (`rep.fail` at `:1763` →
-   `verdict = "FAIL"` at `:4826`) and is the one sentence in the tree arguing
-   against the step; and `spec.md`'s new R4-expressibility sentence needs **"at
-   the pinned vstd"**, which the `r4_hdr` instance beside it already carries.
-2. **p01 and p08 still owe an in-contract spelling spread** — and after p05,
-   what they owe is an *R3-side* span with R4 held by fiat. **Do not let either
-   publish a pair interval**: both that have been published were built from R4s
-   that are not rungs. And do not let either publish a "floor"; four have been
-   published across the project and four were refuted.
-2a. **The unbuilt spelling, on two patterns, and it is the open question.**
-   Nobody has built an admissible R4 that moves — p05's `−2` residue (delete the
-   redundant zero-guard, keep the shipped header) verifies at **zero TCB**,
-   `13 verified, 0 errors`, but all 26 of TASK_022's round-3 variants pair that
-   deletion with `read_unaligned`, so it has never been compiled; and p16's
-   hand-unrolled 32× fold with explicit indices was never tried. **Until one of
-   them is built, "does the admissible R4 class move at all?" is open on every
-   pattern**, and the honest answer to "is the unsafe rung a spelling too?" is
-   *unknown*, not *yes*. Both are cheap. Either would settle it.
-3. **A shipped p17 sweep.** p17 has **no sweep inputs at all**, which is how its
-   "+32 Ir/call flat" got published from two bands that both happen to have
-   `nsuf = 3`. `.memory`'s own residue rule applied and was not followed. The
-   review's `nsuf` 1–8 inputs are generated under `.temp/` and are not shipped.
-4. **p07 binary search** — `O(log n)`, almost pure per-call overhead with no
-   inner loop to amortise over, so any R3 cost shows up as a large *fraction*
-   rather than a flat constant. Midpoint overflow `(lo+hi)/2` is p17's shape
-   again: an arithmetic bug giving a wrong-but-in-bounds index.
-5. **p47 constant-time compare** — a third security axis, where the adversary is
-   the **optimiser** and Verus cannot state the property at all. Expect it to
-   defeat R5 in an interesting way; a documented R5 failure is a finding here.
-6. **p27+ raw pointers.** No longer "the only place the twin can earn its keep"
-   — p08 did that (mutant M2, the weakened `requires`, caught by the twin and by
-   nothing else). p27 is now just the next hard proof.
-
-**Two harness items, both identified and deliberately not fixed**, because the
-"could this happen by accident?" test applies and neither blocks a pattern:
-stage 7 builds gcc-only at this box's fortify-3 default and is therefore blind
-to `_chk`-rewritten `mem*` misuse; and a gate row cannot distinguish "sanitiser
-clean" from "sanitiser cannot see". Both are in `.memory/06-catalogue.md`.
+- **Gate hardening** (T001–T010). Closed by the user's call.
+- **The spelling arc** (T015–028, thirteen tasks). Produced the named-spelling
+  standard, four refuted floors, p16's sign error, and the
+  **R4-is-chained-to-the-prover** result. Its distilled rules are
+  `.tasks/TASK_026.md` §0 — **the shortest statement of what this project knows
+  about reporting spellings, and worth reading before writing any task file.**
+- **The layout arc** (T026 → 029 → 030_REVIEW → 031). Produced finding 16 and
+  `common/layout/`.
 
 ## State
 
-- `harness/` — `check.py` (17 stages: `0b` is the declared-idiom key and its
-  reporting-only spelling audit, added at TASK_016/020; plus clause deletion,
-  `requires` strength, the verified twin, and region-actually-runs), `asm.py`,
-  `dloop.py`, `vparse.py`, `build.py`, `measure.py`, `report.py`, `fixture.py`.
-  **`check.py` is 4905 lines against six patterns** (9083 across all of
-  `harness/`). It was 4251 at p08 and frozen through it; **TASK_016–020 added
-  654 lines, all of it the idiom mechanism** — a 15% growth in the gate for one
-  concept, which is the largest single-arc increase since the hardening tasks.
-  Each increment passed the "could this happen by accident?" test with a
-  *measured count of accidents* rather than an argument, which is the standard
-  this file sets and the first arc to meet it with numbers. Note the ratio
-  anyway: the next gate proposal should have to beat it.
-- **Gate: all six re-run at TASK_016 and green** — p02, p16, p17, p05, p08
-  `PASS` — each green on
-  its first full run. **p01 is `PASS-WITH-BLOCKED-ROWS`**: Miri is mandatory for
-  any pattern with a trusted item and cannot finish p01's `large.bin` in 180 s,
-  so 8 of 9 inputs are checked and the ninth is documented. Policy working, not a
-  regression — do not read an old `PASS` as equivalent.
-- `results/p02-buffer-copy.json` was re-measured at TASK_011; **that debt is
-  closed.** `binary_text_bytes` moved in 10 of 32 cells, all C, for a structural
-  reason worth knowing (`.memory/03-measurement.md`).
-- Toolchain: Verus `0.2026.08.09.92f466f`, rustc 1.97.1, clang/LLVM 22.1.6,
+**Verified at this handoff** — re-run these three before trusting anything below:
+
+```bash
+harness/measure.py --check-stale          # -> 24 record(s) examined, 0 STALE
+harness/check.py p04                      # or any pattern; all 12 are green
+grep -rho '\.tasks/TASK_[A-Za-z0-9_]*\.md' .memory/ .tasks/ RECAP.md \
+  | sort -u | while read f; do [ -e "$f" ] || echo "MISSING: $f"; done
+```
+
+- **12 patterns, all green**: p01 `PASS-WITH-BLOCKED-ROWS` (Miri policy on its
+  `large.bin`, documented, not a regression); p02, p03, p04, p05, p07, p08, p09,
+  p11, p12, p16, p17 `PASS`. **24 records, 0 stale.**
+- **The shared named-spelling paragraph is byte-identical across all twelve**
+  `idiom.why` blocks — `sha c3d36c92a28a` over the span from
+  `NAMED-SPELLING STANDARD` to `p01 and p08 neither`. That invariant is cheap to
+  check and has caught real drift; keep checking it.
+- `harness/` — `check.py` (17 stages), `asm.py`, `dloop.py`, `vparse.py`,
+  `build.py`, `measure.py` (now writes `source_sha256` + `input_sha256` and has
+  `--check-stale`), `report.py`, `fixture.py`. `common/layout/` ships the layout
+  harness and `common/layout/data/` its p01 population, so finding 16 is
+  **auditable without re-measuring**.
+- **Reports exist for every task whose report is cited.** Six recent tasks
+  (T036, T038–T042) have **no `_REPORT.md`** — nothing cites them, and their
+  content lives in the commit messages and the patterns' own `NOTES.md`, which
+  the gate hashes. **Write one before citing it** (PROTOCOL rule 10); that rule
+  exists because the manager once cited a report it never wrote.
+- **Toolchain**: Verus `0.2026.08.09.92f466f`, rustc 1.97.1, clang/LLVM 22.1.6,
   valgrind 3.27.1, nightly+Miri, all in `~/tools`, no root. `TOOLCHAIN.md`.
-- **p05's `inputs/` holds ~189 MB of gitignored sweep blobs**, regenerable with
-  `gen.py --sweep`. Left in place because `rm` outside `.temp/` stalls on review;
-  delete by hand if the box gets tight (`df -h /`).
-- **p08's `inputs/` holds gitignored blobs too** — ~33 MB, of which only the
-  generators are tracked.
-- **`.temp/` was swept 2026-08-18: 12 GB → 574 MB**, and the rule that produced
-  it is now `.memory/00-environment.md` constraint 6 (**keep the generator,
-  delete the artefact**) and `CLAUDE.md`'s Don't-1. What was deleted: 10,567
-  files — 6.4 GB of compiled cell binaries, 4.9 GB of generated `.bin` blobs,
-  0.2 GB of `.o`/`.pyc` — inventoried by path and size in
-  `.temp/CLEANUP-MANIFEST-2026-08-18.txt`. What was kept: every text artefact,
-  36 MB, which is what the evidence always was. Verified afterwards by
-  `harness/fixture.py --check`, which rebuilt the pilot fixture from source and
-  reproduced all six `md5_fn`/`md5_raw` pins and both identity levels — `PASS`,
-  so the sweep cost nothing. The rule generalises: an agent deletes **its own**
-  task's binaries when its gates are green and reports anything older to the
-  manager.
-- **Gate: all seven green.** p07 `PASS` on its first complete run (R5 10/0 first
-  try, `unsafe ≡ verus` exact at O3, Miri clean on all seven inputs including a
-  12 MB `large.bin` in 1.9 s of a 180 s budget). The shared named-spelling
-  paragraph is **byte-identical across all seven** `idiom.why` blocks
-  (`len=11003 sha=59748cce2db5c572`).
-- **p07's `idiom` is the first that pins anything mechanically.** Backticked
-  spellings by pattern: p01 **0**, p05 **0**, p08 8, p16 12, p17 12, p02 21,
-  **p07 34** (102 spelling×rung pairs). p01 and p05 backtick *nothing*, so the
-  standard's own audit has never fired on them — which is worth knowing before
-  quoting either as "in contract".
-- **`patterns/p07-binary-search/inputs/` holds 17 MB of gitignored blobs**,
-  regenerable in ~40 s from `inputs/gen.py --sweep`, verified deterministic
-  (120/120 byte-identical across two regenerations).
-- Commits run through the **p07 landing**. Tree clean. TASK_024's
-  engineer died to an API 529 after finishing its work and before reporting, and
-  the manager reconstructed and committed it; TASK_025_REVIEW then attacked it
-  (PROTOCOL rule 3) and found a blocker and four majors. **p16's pattern files
-  still carry the four refuted figures — that is TASK_027**, and until it lands,
-  `patterns/p16-tlv-walk/` disagrees with `.memory/` and `.memory/` is the one to
-  believe.
-- **Background `nohup` jobs on this box report "completed" while still running.**
-  Two concurrent measurement runs shared a scratch path and produced one wrong
-  data point, caught only because the column was otherwise a constant. Run
-  measurements in the **foreground**, and give any scratch file a per-PID path.
+- **Gitignored blobs outside `.temp/`**: `patterns/*/inputs/*.bin`. All
+  regenerable from each pattern's `inputs/gen.py`, all verified deterministic by
+  regenerate-and-diff. `rm` outside `.temp/` stalls on review, so they are the
+  user's call.
+- **`.temp/`** is scratch and is swept periodically. ⚠ Read
+  `.memory/00-environment.md` constraint 6 **as it now stands** — its first
+  written form was destructive.
+- **Commits run through the p04 landing. Tree clean.** ⚠ **A GitHub remote exists
+  (`origin`, `HALOCORE/sec-ladder`) and the local branch runs ahead of it. Do not
+  push unless the user asks.**
 
 ## Decisions
 
