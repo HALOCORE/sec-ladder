@@ -8,9 +8,9 @@ this box is reference; this box is what to *do*.
 
 | | |
 |---|---|
-| **Patterns** | **12 of 47 exist, all green.** 11 reviewed; **p04 is UNREVIEWED.** |
-| **Immediate next task** | **write `TASK_042_REVIEW` and dispatch a reviewer at p04.** Its findings are in `patterns/p04-ring-buffer/NOTES.md` and deliberately **not** in `.memory/` (rule 9). Point it at finding 23's two claims: the known-bits mechanism, and the unification of the non-relational invariant with the invisible bug. |
-| **Then** | land the review, then **the next pattern**. Queue: **p13** (`strncpy` truncation — check `.memory/02-bench-rules.md`'s inheritance table first, p13 does **not** inherit p12's write rule), **p06** (in-place reverse — a permutation invariant, a new *proof* shape), **p14** (tokenizer — in-place mutation + aliasing). |
+| **Patterns** | **12 of 47 exist, all green, all 12 reviewed.** |
+| **Immediate next task** | **dispatch `TASK_044`** (already written): p04's engineer lands one blocker + three majors from `TASK_042_REVIEW_REPORT.md` into p04's own files. `.memory/` and RECAP are **already corrected** — the task is prose and controls, not re-derivation. |
+| **Then** | **the next pattern: `TASK_043` is written and ready** — p13, `strncpy` truncation. Queue after it: **p06** (in-place reverse — a permutation invariant, a new *proof* shape), **p14** (tokenizer — in-place mutation + aliasing). |
 | **The loop** | build a pattern → review it once → land corrections → repeat. Per `PROTOCOL.md` rule 9, write `.memory/` **only after** the review. |
 | **Git** | Commit at task boundaries; subagents never commit. ⚠ **There is a GitHub remote** (`origin`, `HALOCORE/sec-ladder`). **Do not push unless the user asks.** |
 | **Before quoting any number** | `harness/measure.py --check-stale` (exit 1 on STALE). |
@@ -47,7 +47,7 @@ optimisation levels and two inline modes, and compared on assembly, executed
 instructions, timing, proof burden and trusted-base size.
 
 47 patterns are catalogued in `.memory/06-catalogue.md`. **Twelve exist, all
-green; eleven reviewed, p04 outstanding:**
+green, all twelve reviewed:**
 
 | | pattern | what it is here for |
 |---|---|---|
@@ -62,7 +62,7 @@ green; eleven reviewed, p04 outstanding:**
 | p03 | bounded stack | the proof's own invariant, handed to LLVM, closes the gap |
 | p09 | bitset | **one character** between a bug everything catches and one nothing does |
 | p12 | `strcat` fixed | the first **write**; a per-iteration check costs the bulk lowering |
-| p04 | ring buffer | known **bits** survive a loop-carried phi where a range does not |
+| p04 | ring buffer | known **bits** survive a loop-carried phi where a range does not — `next_pow2(CAP) ≤ ARR_LEN` |
 
 **If you read only one thing after this file**, read `.tasks/TASK_026.md` §0 — the
 distilled rules from the thirteen-task spelling arc. Every pattern built after it
@@ -87,7 +87,7 @@ authoritative**. They were confused repeatedly before this table existed.
 | p03 | **10** | 18 |
 | p09 | **11** | 19 |
 | p12 | **12** | 21 |
-| p04 | *(owed — unreviewed)* | 23 |
+| p04 | **13** | 23 |
 | p01, p02 | findings 1–3 | 1–8 |
 
 Cross-cutting entries exist only here: **14** (every rung is a spelling), **16**
@@ -741,44 +741,79 @@ the number.**
    `R_X86_64_RELATIVE` addend, and prints the guarded expression with a caret).
    See `.memory/03-measurement.md`.
 
-23. **p04 — what LLVM carries around a loop-carried phi is known BITS, not a
-   range; and the bug hides in exactly the state the proof does not need.**
-   ⚠ **UNREVIEWED (TASK_042).**
+23. **p04 — known BITS survive a loop-carried phi where a range does not, and the
+   rule is `next_pow2(CAP) ≤ ARR_LEN`.** (TASK_042, reviewed at
+   TASK_042_REVIEW: **the headline was confirmed by a stronger test than I asked
+   for, and its stated mechanism was refuted**; one blocker, three majors.)
 
-   **The three-operator series closes.** p05 asked whether a bound survives a
-   **multiply**, p09 a **shift** (answer: the composition through the multiply is
-   what fails), p04 a **modulus** — and at a power of two **the bound survives**:
-   the safe ring access and the `get_unchecked` one are **byte-identical**
-   (`md5_fn_norel d0f2150795bb`, `n_fn 86`), with pads **decoded** rather than
-   counted — R3's only pad is the window reslice, ring pads are **zero** in every
-   rung. Mechanism off the listing: `inc %r14d ; and $0x3f,%r14d`. **A mask fixes
-   BITS, and known bits survive a loop-carried phi where a RANGE does not.** That
-   is the unifying statement the series was after.
-   **`RING_CAP = 60` is the largest single effect**: at matched execution counts
-   `R3 − R4` goes **+5 → +479**, and p03's dead clamp takes it back **exactly**.
-   Three middle-ends, both directions, byte-identical on the C side at 64 — **the
-   operator, not safe Rust.**
+   **The three-operator series closes, and the closing sentence survives.** p05
+   asked whether a bound survives a **multiply** (no — nonlinear), p09 a **shift**
+   (yes alone; no through the composition with a multiply), p04 a **modulus**.
+   The evidence that settles it is the control nobody asked for: spell the wrap as
+   a **source-level branch** and both ring checks come back **at `RING_CAP = 64`
+   as well as at 60** (86 → 101 instructions, 1 → 3 pads), at the identical
+   provable cursor range. **So the range is never what carries; what carries is
+   known bits contributed by the operator.**
+   ⚠ **What was FALSE is p04's published explanation of the 60 case** — *"`% 60`
+   fixes no bits"*. It fixes `< 64` (`computeKnownBits(urem x, 60)` zeroes the
+   high 58), **and that survives the phi**: `% 60` into a `[u64; 64]` array
+   elides. The measured rule, zero fitted parameters, is **`urem x, C` ⟹
+   `x < next_pow2(C)`, and the check is elided exactly when
+   `next_pow2(CAP) ≤ ARR_LEN`** — which reproduces every capacity p04 built *and*
+   the mixed cases it never built (`% 32` into `[u64;64]`, `% 64` into
+   `[u64;96]`: both elide). A **guard** in the loop destroys the fact for `urem`
+   and **not** for `and`.
+   **`RING_CAP = 60` is still the largest single effect**: at matched execution
+   counts `R3 − R4` goes **+5 → +479**, p03's dead clamp takes it back exactly,
+   and three middle-ends agree in both directions — **the operator, not safe
+   Rust.**
 
-   **And the bug is invisible to memory safety — BOTH guards.** `m_nofull_msonly`
-   and `m_noempty_msonly` both verify **9/0** with the functional spec stripped,
-   against five positive controls (three `assert(false)` placements, an
-   off-by-one, a no-mod variant) that all correctly fail. Second instance of
-   finding 19, now on a **container** rather than an index: drop the fullness
-   check and a push overwrites the oldest element with **no OOB access at all**.
-   ⚠ **The unification is the finding, and it was not asked for.** The R5
-   invariant is **not** relational — the memory-safety half is two *independent*
-   one-variable clauses (`head < CAP`, `tail < CAP`) and Z3 takes the file **first
-   try, no lemma**. So: **the relation between the cursors is exactly the part of
-   the state the memory-safety obligation does not need, which is WHY deleting
-   either guard is invisible to it.** Not two results — one.
+   ⚠ **THE TAX IS `+4.00`, NOT `+5.00`, AND THE SHIPPED R3 IS NOT THE CHEAPEST
+   FOUND.** Six in-contract spellings across **five distinct machine codes**
+   measure `3367 / 11666` against the shipped `3368 / 11667`. So *"the first
+   pattern whose shipped R3 is the cheapest found"* is **false** — beaten by the
+   next lever, exactly as on p03. **The lever is new**: a **two-step reslice**
+   (`split_at(off).1.split_at(len).0`), whose mechanism is **register allocation,
+   not bounds-check removal** — `off + len` needs a scratch register,
+   `buf_len − off` is computed in place. **Untried on every pattern before p04,
+   and most patterns' R3 opens with the reslice it improves.** The `idiom` block
+   pins no reslice spelling, so it is the *cheapest-found* claim that failed and
+   not the declaration; p04's direction test holds.
 
-   Swept laws over 99 blobs, max residual 0.0000, pooled rank **5/5** — and
-   **every pair of bands is ≤ 4/5**, so the two bands the task specified would not
-   have identified the design (the engineer added two more). `R2 − R3 = 20.00000`
-   per operation `+ 11` is **p03's law exactly, on a different kernel**. The
-   cheapest-found in-contract R3 is the **shipped rung** on both blobs — a first.
-   Pair interval **degenerate**, the opposite of p03, for a stated reason: there
-   is no fact to seed.
+   ⚠ **Two of the seven "exact integer cost models" fail out of sample, and no
+   in-sample blob could have shown it.** The two R1 rows were fitted over 99 blobs
+   on a licence verified only on band F — **where `epop == 0` by construction**.
+   One fresh blob with `dpush` *and* `epop` both non-zero misses by **−385 / −330**;
+   the same laws in *R1's own* counts land exactly. The other five re-derive by
+   independent exact-rational solve, rank 5/5 reproduces, and the `large`
+   out-of-sample prediction holds. See finding 20 and `.memory/03-measurement.md`.
+
+   **The bug is invisible to memory safety — both guards, and both at once.**
+   `m_nofull_msonly`, `m_noempty_msonly` and both-deleted all verify **9/0** with
+   the functional spec stripped, against five positive controls that correctly
+   fail. Second instance of finding 19, on a **container** rather than an index:
+   drop the fullness check and a push overwrites the oldest element with **no OOB
+   access at all**.
+   ⚠ **But the published characterisation is too specific, twice.** *"The relation
+   between the cursors is exactly the part of the state the obligation does not
+   need"* is true and **is not a characterisation** — reading `ring[tail]` instead
+   of `ring[head]`, memory-safe and functionally wrong with **no guard touched**,
+   also verifies 9/0. **The memory-safety-only configuration is blind to every
+   functional change.** ⚠ **And it is not about the modulus**: delete `%` entirely
+   and wrap with a source branch under the guard, and the obligation is *still*
+   two independent one-variable clauses and the bug *still* invisible. **The
+   property is that the index bound is the array's own fixed capacity.**
+
+   Sound and unchanged: R4 ≡ R5 `exact`, R5 **9/0 first try, no lemma**; TCB 10/5
+   matching the gate; `p1_weak_requires` caught **only** by the twin; pair
+   interval **degenerate** (the opposite of p03, because the clamp seeds a fact
+   LLVM already has); R1's wrong answer **reproducible** across 880 runs; and the
+   `ns` figures **survive a real 30-layout population** the delivery had declined
+   to build (`+25.1…+26.0%` / `+9.3…+10.2%`, `P(A>B) = 100%`).
+   `R2 − R3 = 20.00000·ops + 11` is p03's law exactly — and the **boundary is
+   named**: it reproduces for the **opcode stream** (identical 5-byte record) and
+   not for the **container** (p03's pop guard supplies only a lower bound, p04's
+   `%` supplies both cursors' upper bounds unconditionally).
 
 24. **Two defects in my own infrastructure, both found by a pattern task.**
    **(a) `.memory/00-environment.md` constraint 6's documented sweep rule was
@@ -1004,12 +1039,19 @@ engineer *flagged against itself*, and a mechanism asserted without a control.
 
 ## Immediate queue
 
-**The next task is `TASK_042_REVIEW` (p04). After it, patterns.** See the START
-HERE box; this section is the standing backlog, not the next action.
+**The next task is `TASK_044` (p04's corrections), then `TASK_043` (p13).** Both
+are written. See the START HERE box; this section is the standing backlog.
 
 ### Owed, in priority order
 
-1. **p04's review** — the only unreviewed pattern.
+1. **The two-step reslice is untried on every pattern except p04**, and most
+   patterns' R3 opens with the window reslice it improves. It is worth
+   **−1 Ir/call** — which on p04 was **20% of the whole published tax** — costs
+   zero `unsafe` and zero TCB, and its mechanism is register allocation rather
+   than bounds-check removal, so it is *not* the lever any prior spelling search
+   ran. **This is the cheapest outstanding correction on the project**: one
+   substitution per pattern, gate re-run, no re-measurement of anything else.
+   `.memory/01-ladder.md` finding 3 carries the spelling and the mechanism.
 2. **p03's span rests on one unreviewed measurement.** TASK_037's `a_tail` is
    swept (`maxres 0.000000`, 19 blobs) and its admissibility comes from the gate's
    own decidable matcher, which is why it was landed — but it refuted a number a
@@ -1032,6 +1074,15 @@ HERE box; this section is the standing backlog, not the next action.
    `FRESH`, the rest are `NO BASELINE` and clear on their next re-measure.
    `results/p11-nul-scan.json` is *stale* on `bulk_calls` and understates p11's own
    12.0× library finding.
+7. **p04's `small` R2 layout population is bimodal at 1.42× and unexplained**
+   (TASK_042_REVIEW minor 8): 27 layouts at 6.43–7.17 ms, four at 9.30–9.88 ms,
+   reproducible across both passes, and **neither `analyze.py`'s `(loop,
+   property)` pairs nor `addr%32` separates it**. All four outliers are `order|*`
+   builds and are among the *fastest* on `large`, so a startup-side effect is
+   plausible. Finding 16 says every layout mode found so far is `win32` or
+   `jcc32`; **this one is neither**, and it is the first counterexample to that.
+   It does not move a published verdict (the mode-matched `R2 − R4` figures agree
+   with the shipped ones), so it is a curiosity — but it is a *named* one.
 
 ### Deferred with a stated reason
 

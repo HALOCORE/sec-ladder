@@ -390,6 +390,19 @@ places and points at nothing. **Name the pattern, never the number.**
      cheaper than the shipped cell. The iterator/slice-consuming forms
      (`chunks_exact`, `split_at`, `iter().zip()`) are the ones that keep winning,
      because they hand the optimiser a length it does not have to re-derive.
+     ⚠ **The TWO-STEP RESLICE is a distinct lever from all of those, it wins for
+     a different reason, and it was untried on every pattern before p04**
+     (TASK_042_REVIEW). Replace the one-shot `&buf[off..off + len]` with
+     `buf.split_at(off).1.split_at(len).0` — or `get(off..).unwrap()` then
+     `get(..len).unwrap()`, five distinct machine codes, all equal — and the
+     window reslice costs **one instruction less**, on every pattern that reslices
+     a window this way. **The mechanism is REGISTER ALLOCATION, not bounds-check
+     removal**: both forms keep both checks, but `off + len` needs a scratch
+     register (`mov ; add ; jb ; cmp ; ja`) while `buf_len - off` is computed in
+     place in `%rsi`, which is dead afterwards (`sub ; jb ; cmp ; ja`). It took
+     p04's published safety tax from `+5.00` to `+4.00` — the *whole* tax — and
+     falsified *"the shipped R3 is the cheapest found"*. **Try it on any pattern
+     whose R3 opens with a window reslice**, which is most of them.
    - **…and that rule is still not enough — but the fix is not "match the
      idioms" either.** The audit measured four safe spellings of p05's kernel and
      the review took it to eleven; the spread across them **exceeds the
@@ -1507,6 +1520,112 @@ places and points at nothing. **Name the pattern, never the number.**
    canary from **+12**; clang's loop is destroyed +12…+48 and SIGSEGVs from +64. So
    `-fno-stack-protector` is **both a thumb on the scale and unnecessary**.
    Unsafe Rust with the check deleted prints **byte-for-byte C's wrong answer**.
+
+13. **p04 — known BITS survive a loop-carried phi where a range does not, and
+   the rule is quantitative: `next_pow2(CAP) <= ARR_LEN`.** (TASK_042, reviewed
+   at TASK_042_REVIEW: **headline confirmed by a stronger test than was asked
+   for, and its stated mechanism refuted**; one blocker, three majors.) Ring
+   buffer: the third operator in the bound-propagation series, the first kernel
+   with two live cursors, and the first whose bug stays **in bounds**.
+
+   **The result, as corrected.** Spelling the wrap as a **source-level branch**
+   keeps both ring checks at `RING_CAP = 64` (`L_br64`, 86 → 101 instructions,
+   1 → 3 pads) *and* at 60, at the identical provable cursor range. **So the
+   range is never what carries; what carries is known bits contributed by the
+   operator.** That is the sentence, and `L_br64` — which nobody asked for — is
+   its strongest single piece of evidence.
+   ⚠ **What is FALSE is the published explanation of the 60 case**: p04 shipped
+   *"`% 60` fixes no bits — its fact is the range `[0,59]`"*. It fixes bits:
+   `computeKnownBits(urem x, 60)` zeroes the high 58, i.e. `x % 60 < 64`, **and
+   that fact does survive the phi** — `% 60` into a `[u64; 64]` array elides both
+   checks. The measured rule, zero fitted parameters, is
+
+   > `urem x, C` ⟹ `x < next_pow2(C)`, and the access check is elided exactly
+   > when **`next_pow2(CAP) <= ARR_LEN`**.
+
+   It reproduces every capacity p04 built (64, 128 elide; 48, 60, 96, 33 do not)
+   **and the mixed cases it never built** (`% 32` into `[u64;64]`, `% 64` into
+   `[u64;96]`: both elide). Two refinements: a **guard** in the loop destroys the
+   surviving fact for `urem` and **not** for `and` (at `% 60` into `[u64;64]`,
+   adding the emptiness guard alone goes 1 pad → 3); and the elision at a power
+   of two is a property of the `%`/`&` **spelling**, not of the cursor's range.
+   Placed in the series: p05's **multiply** — no, the implication is nonlinear;
+   p09's **shift** — yes alone, no through the composition with a multiply;
+   p04's **modulus** — yes, whenever `next_pow2(CAP) <= ARR_LEN`.
+
+   **⚠ The safety tax is `+4.00`, not the published `+5.00`, and p04's shipped R3
+   is NOT the cheapest found.** Six in-contract spellings across **five distinct
+   machine codes** measure `3367 / 11666` against the shipped `3368 / 11667`,
+   all at `required_miss = 0`, `forbidden_hits = 0`, `model.py` agreeing on all
+   five matrix inputs. So *"the first pattern whose shipped R3 is the cheapest
+   found"* is **false**, and the `+5` was beaten by the next lever exactly as on
+   p03. **The lever is new and is untried on every pattern before p04**: a
+   **two-step reslice** (`buf.split_at(off).1.split_at(len).0`, or `get(..)`
+   twice) — and its mechanism is **register allocation, not bounds-check
+   removal**. Same two checks, one fewer instruction:
+   `off + len` needs a scratch register, `buf_len - off` is computed in place in
+   `%rsi`, which is dead after. `R2 - R3` is `20·ops + 12` against the cheapest.
+   ⚠ **The `idiom` block pins no reslice spelling at all**, so all six candidates
+   are in contract by construction: it is the *cheapest-found* claim that failed,
+   **not** the declaration — p04's direction test holds (both exclusions are
+   byte-identical to shipped R3 and move the figure by 0.00).
+
+   **⚠ Two of the seven swept "exact integer cost models" are laws of a DIFFERENT
+   COUNT VECTOR and fail out of sample.** The two R1 cells were fitted over all
+   99 blobs on a licence verified only on band F — **where `epop == 0` by
+   construction**. On a fresh blob with `dpush` *and* `epop` both non-zero, a
+   combination **no shipped blob has**, they miss by **−385 (gcc) and −330
+   (clang)**, and the same laws at *R1's own* counts land exactly. The other five
+   rows re-derive exactly by independent exact-rational solve, the pooled rank
+   5/5 reproduces, and `13·417 + 15·413 + 46 = 11662` holds out of sample. **The
+   general lesson is in `.memory/03-measurement.md`: a law fitted over a rung
+   whose own execution counts differ from the model's is a law in THAT RUNG's
+   counts** — and 99 in-sample blobs could not see it because one band zeroed a
+   regressor by construction.
+
+   **The bug is invisible to memory safety — but the published characterisation
+   of *why* is too specific, twice.** `m_nofull_msonly` and `m_noempty_msonly`
+   both verify `9/0` with the functional spec stripped, against five positive
+   controls; **both guards deleted at once** is also `9/0`. p04 published this as
+   *"the relation between `head` and `tail` is exactly the part of the state the
+   memory-safety obligation does not need"*. True, and **not a characterisation**:
+   `x_swaphead_msonly` — read `ring[tail]` instead of `ring[head]`, memory-safe,
+   functionally wrong, **no guard touched** — is also `9/0`. **The
+   memory-safety-only configuration is blind to every functional change**, which
+   is the honest statement and is p09's result restated, not a new mechanism.
+   ⚠ **And it is NOT about the modulus.** Remove `%` entirely — wrap with a
+   source branch reached under the guard — and the obligation is *still* two
+   independent one-variable clauses (`9/0`) and the missing fullness check is
+   *still* invisible. **The property is that the index bound is the array's own
+   fixed capacity**, not that the update is modular; the next fixed-capacity
+   container without a modulus is the same class, not a different one.
+
+   Sound and unchanged: **R4 ≡ R5 `exact`** (`md5_fn c0573f691c95`, 74
+   instructions), R5 `9/0` first try with **no lemma and no nonlinear
+   arithmetic**; TCB **10 lines / 5 items**, recounted against the gate's own
+   `tcb_items`; `p1_weak_requires` passes the shipped configuration at 9/0 and is
+   caught **only** by `--cfg slb_twin` (second pattern where the twin is the sole
+   catcher, first on a non-slice accessor); `ring_set_unchecked`'s whole-sequence
+   `ensures` is load-bearing (weakening it to a slot-`i` clause fails the shipped
+   configuration). The R4 side is **degenerate** — three candidates, all
+   byte-identical to shipped R4 — for the pattern's own reason: **the clamp seeds
+   a fact LLVM already has**, the opposite of p03 on the identical lever, and
+   p04's own `RING_CAP = 60` control shows the same lever worth −358 Ir/call
+   where the fact is missing. **R1's wrong answer IS reproducible** (unlike p03's)
+   — established three ways, including 880 runs under randomised environment size
+   and memcheck on a static build. And p04's `ns` figures **survive a real
+   30-layout population**: `+25.7%` / `+9.7%` reproduce mode-matched at
+   `+25.1…+26.0%` / `+9.3…+10.2%`, `P(A>B) = 100%`, with the `R3 − R4` null
+   holding and its sign flipping between modes, which is what a null looks like.
+
+   **The p03 reproduction has a named boundary.** `R2 − R3 = 20·(all four) + 11`
+   is p03's law to the instruction because it is the **opcode-stream** half —
+   both patterns walk the identical 5-byte record with the identical written-out
+   LE decode. p03's extra `3.00000·xpop` in `R2 − R4` is the **container** half:
+   p03's pop guard supplies only the lower bound `sp > 0`, so the upper bound
+   must cross the attacker branch and LLVM drops it, while p04 has no container
+   check to keep because `%` supplies both cursors' upper bounds unconditionally.
+   **The law reproduces for the stream and not for the container.**
 
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how

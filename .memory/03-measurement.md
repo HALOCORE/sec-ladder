@@ -1021,6 +1021,40 @@ otherwise sound and is how the `source_sha256` gap was proved closed.
 5. Frequency scaling is on and cannot be disabled without root. State this next to
    every wall-clock table.
 
+## A fitted law is a law in SOMEBODY's counts — say whose
+
+(TASK_042_REVIEW, on p04. Two of seven "exact integer cost models, max residual
+0.0000 over 99 blobs" were wrong out of sample, and **no in-sample blob could
+have shown it**.)
+
+A swept law regresses a cell's `Ir` on regressors taken from **`model.py`'s**
+execution counts. That is correct **only for cells that execute the model's
+program.** An R1 cell with a guard omitted does not: what the model counts as a
+*rejected* push, R1 *accepts*. So R1's law is stated in R1's own counts, and it
+coincides with the model's only where the two count vectors agree.
+
+**The trap is that a band can zero a regressor by construction and hide the
+disagreement.** p04's band F is the only band where the fullness check fires, and
+it has `epop == 0` *by construction* — so the licence *"R1's own counts equal the
+model's"* was checked exactly where two of its three conditions could not fail.
+On a fresh blob with `dpush` **and** `epop` both non-zero — a combination **no
+shipped blob had** — the published rows missed by −385 and −330 while the file
+said "max residual 0.0000".
+
+Three rules, and the third is the one that costs nothing:
+
+1. **State the regressor set per row**, not per table. If one row is in a
+   different count vector, say so on that row.
+2. **A self-consistency check that a rank-deficient or degenerate design cannot
+   fail is not a check.** p04's was *"R1's `xpush` and `dpush` coefficients come
+   out equal"* — real (the design is rank 5, so the coefficient vector is unique,
+   and R1h comes out unequal on the same design) but it tests only the first of
+   three conditions.
+3. **Build one out-of-sample blob that turns on EVERY regressor simultaneously**,
+   and predict it before measuring. Ninety-nine in-sample blobs did not catch
+   this; one adversarial blob did. Sweep bands are built to *isolate* regressors,
+   which is exactly why the pooled design needs a point where none is isolated.
+
 ## What we cannot measure, and must not fake
 
 - IPC, branch mispredictions, cache misses. These would need

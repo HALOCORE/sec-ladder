@@ -111,12 +111,27 @@ p02 was checked and is **not** affected — its ASan kernel calls
 the same way. So overlapping-`memcpy` UB cannot be made to misbehave on this
 box, at any size, under any `GLIBC_TUNABLES` hwcaps setting (320 runs, TASK_014).
 
-**valgrind memcheck is unusable on this box; callgrind is fine.** Dynamic
-binaries: refuses to start (`must-be-redirected ... memcmp in
-ld-linux-x86-64.so.2`, wants `libc6-dbg`, which needs root). Static binaries:
-start, but `--trace-redir=yes` shows three vDSO redirections and **zero**
-`mem*`/`str*` ones, so the interceptors that would report an overlap are not
-installed. Do not plan a detection story around memcheck.
+**valgrind memcheck is partly usable, and the earlier blanket "unusable" was too
+strong** (corrected at TASK_042_REVIEW, which used it successfully). Precisely:
+
+- **Dynamic binaries: no.** Refuses to start (`must-be-redirected ... memcmp in
+  ld-linux-x86-64.so.2`, wants `libc6-dbg`, which needs root).
+- **`mem*`/`str*` interception: no**, even static — `--trace-redir=yes` shows
+  three vDSO redirections and **zero** `mem*`/`str*` ones, so the interceptors
+  that would report an **overlap** are not installed. p08's detection story
+  genuinely cannot use memcheck, which is where the blanket claim came from.
+- **V-bit (uninitialised-value) tracking on a STATIC build: YES, and it works.**
+  That is exactly what *"is this rung reading memory nobody wrote?"* needs — the
+  question behind every "is R1's answer reproducible across runs?" claim.
+
+```bash
+gcc ... -static -o prog          # static is required
+~/tools/valgrind/bin/valgrind --tool=memcheck --track-origins=yes -q ./prog ...
+```
+
+Ignore the one `__libc_setup_tls` → `_IO_cleanup` report: it is glibc's own
+static-TLS artefact, present on a program that does nothing. **Scope any verdict
+to the kernel symbol**; a clean kernel with that one report standing is a pass.
 
 **ASan/UBSan need `-static-libasan -static-libubsan`.** The container ships
 `LD_PRELOAD=/usr/libexec/coreutils/libstdbuf.so`, and the *shared* ASan runtime
