@@ -52,29 +52,42 @@ kernel:  for each declared line
   — and the law is wrong by exactly 1.00 per field without it, so *the law's
   exactness is the evidence that the padding executes*. `.memory/03-measurement.md`
   trap 3, third instance, first one inside a derivation rather than a fit.
-- **gcc's hardening law is exact and out-of-sample exact.**
-  `R1h − R1 = 1.00·bytes + 2.00·fields − 3.00`, max residual **0.0000 over 66
-  blobs**, worst leave-one-length-out error **0.0000 over 29 hold-outs**, and it
-  predicts both shipped perf rows (`+238.00` / `+91.00`) which are not in the
-  sweep. ⚠ **Its `nline` coefficient is exactly 0.00 and that null hides
-  `−1.00 executed alignment NOP per line`** cancelled by `+1.00` of real work.
+- **gcc's hardening law is exact, out-of-sample exact — AND ITS DOMAIN IS
+  `nt ≤ MAXTOK` ON EVERY LINE.** `R1h − R1 = 1.00·bytes + 2.00·fields − 3.00`,
+  max residual **0.0000 over 66 blobs**, and it predicts three perf rows that are
+  not in the sweep (`+238.00` / `+91.00` / `+139.00`). ⚠ **Every blob in the fit
+  set has at most 16 fields per line, so the safety line never once EXECUTES**:
+  the law is the cost of a never-taken branch, which is the cost every benign
+  input pays. Outside the domain the difference inverts sign, and p14 **publishes
+  no cost comparison there** — R1 has already stored out of bounds, the two cells
+  no longer compute the same function, and on `adversarial-many` the `c-clang`
+  R1 cell returns 0 on every call after the first (`NOTES.md` 3a″). ⚠ **The
+  leave-one-length-out hold-out is NOT evidence for this law** — exact fit plus
+  rank 4 after every drop means it cannot fail (`NOTES.md` 9c). ⚠ **Its `nline`
+  coefficient is exactly 0.00 and that null hides `−1.00 executed alignment NOP
+  per line`** cancelled by `+1.00` of real work.
 - **clang's safety line costs `+663.00 Ir/call` on `small`, and none of it is the
   compare.** The *unhardened* scan is **2× unrolled with the `i == m` test peeled
   into an epilogue**; the hardened one is neither. 3.50 Ir per scanned byte for a
   lost optimisation, and the blocking line is a data-dependent `break`, not a
   bounds check (`NOTES.md` 3b).
-- **`4.25 = 2.00 + 2.25` on a fourth kernel, and the first time both halves are
-  readable in ONE listing.** R4's fold runs the *unchecked un-unrolled* body
-  (8.00 Ir/byte) in its `L mod 4` epilogue and the *unchecked unrolled* body
-  (5.75) in its main loop, while R2 runs the *checked un-unrolled* one (10.00)
-  throughout. The scan gives the other 2.00 (`cmp $0x3f ; ja`).
-- **A measured NULL for the wall-clock column that the whole project can reuse.**
-  `verus` and `unsafe` are byte-identical kernels with exactly equal marginal `Ir`
-  on all 66 sweep blobs, and they differ by **+8.97% / +8.91%** in differenced,
-  alternating, pinned wall clock over two passes — **larger than the gcc hardening
-  gap (+7.2%) and comparable to two of the other three rung comparisons.** So
-  p14 publishes no `ns` claim, and the R4/R5 pair is proposed as a free null
-  control every pattern already has and none has used (`NOTES.md` 11).
+- **`4.25 = 2.00 + 2.25` on a fourth kernel.** R4's fold runs the *unchecked
+  un-unrolled* body (8.00 Ir/byte) in its `L mod 4` epilogue and the *unchecked
+  unrolled* body (5.75) in its main loop, while R2 runs the *checked un-unrolled*
+  one (10.00) throughout. The scan gives the other 2.00 (`cmp $0x3f ; ja`).
+  ⚠ **The "first time both halves are readable in ONE listing" claim is
+  withdrawn** — `p16/NOTES.md:563-568` had it at TASK_007_REVIEW, and what is
+  readable off p14's R4 alone is the 2.25 unroll half (`NOTES.md` 4).
+- **A LAYOUT POPULATION for the R4/R5 pair, and the pair is a smoke alarm rather
+  than a floor.** `verus` and `unsafe` are byte-identical kernels with exactly
+  equal marginal `Ir` on all 66 sweep blobs, and the shipped pair differs by
+  **+8.95%** in differenced, alternating, pinned wall clock. ⚠ **Over 24 layouts
+  per cell that gap has median ≈ 0 and `P(R5 > R4) = 0.559`** — a coin flip — while
+  the within-cell layout spread is **12.68% / 9.73%** (and 13.22% / 13.75% in the review's independent population). The kernel has a **7.2% mode**
+  separated by `jcc32` computed on a **64-byte** grid (the 32-byte one is
+  coarser here), and the shipped pair happens to straddle the two extreme
+  classes. So p14 publishes no `ns` claim, and the honest floor is the
+  population, not the pair (`NOTES.md` 11, 11a; `controls/clayout.py`).
 - **The same bound discharged THREE ways, and the missing fourth is the finding.**
   p06 had four bases for its disjointness fact because `core` sells one
   (`split_at_mut`). **There is no standard-library routine that bounds a
@@ -92,19 +105,29 @@ kernel:  for each declared line
   leaves earlier indices alone by an axiom vstd already has (`NOTES.md` 5).
 - **`pm3_msonly` is p06's comparison and p14 comes out on the other side.**
   Weakening the postcondition to `true` does **not** rescue the
-  safety-line-deleted mutant: it still fails, at the same obligation. **Memory
-  safety alone suffices here and did not on p06**, and the discriminator is
+  safety-line-deleted mutant: it still fails, **at the same two obligations**
+  `pm1_nocap` fails at (`nt <= MAXTOK` and `tl_set_unchecked`'s `requires`), both
+  of them memory-safety obligations. ⚠ **`pm3` is not literally a
+  memory-safety-only spec** — only the kernel's `ensures` is weakened and the
+  functional loop invariants remain — so the claim it tests is *"weakening the
+  postcondition to `true` does not rescue the mutant"*. p06 has a regime where
+  its buggy kernel stays inside its array and p14 has none; the discriminator is
   whether the bug's harm can stay inside the object.
 
 ## Three corrections this pattern makes to the layer above it
 
 - **`.memory/06-catalogue.md`'s bug class for p14 — *"in-place mutation +
-  aliasing"* — is not merely wrong, it is EXCLUDED BY THE HARNESS.** A `strtok`
-  that tokenises the driver's payload is not a function of its arguments: on a
-  one-window blob the checksum stops satisfying `acc(n) = r·Σ31^j` at the first
-  repeat, measured on both compilers. The repair — a per-call scratch copy —
-  deletes the mutation. And the aliasing half is `E0506` / `E0515`, i.e. p08's
-  compile-time rejection with no run-time check to price. `NOTES.md` 0a.
+  aliasing"* — is wrong, and the reason is that it measures the WRONG WORKLOAD.**
+  A `strtok` that tokenises the driver's payload is not a function of its
+  arguments: on a one-window blob the checksum stops satisfying `acc(n) = r·Σ31^j`
+  at the first repeat, measured on both compilers. ⚠ **It is NOT "excluded by the
+  harness" and the sentence that said so is withdrawn** (TASK_049_REVIEW B2):
+  nothing in `harness/` enforces purity, the mutating kernel reaches a steady
+  state after exactly **one** call, and its `measure.py` marginal is **exactly
+  9044.0000 Ir/call with zero residual** — cleaner than the three legal kernels'.
+  What the repeat protocol really does is drive calls 2…n into tokenising an
+  **already-tokenised** buffer. And the aliasing half is `E0506` / `E0515`, i.e.
+  p08's compile-time rejection with no run-time check to price. `NOTES.md` 0a.
 - **`.memory/02-bench-rules.md`'s threshold table lists p14 as *"a delimiter is
   not a bound; the sentence reaches its scan's `i < len`"*, marked "not as
   stated". Settled by building it: the sentence is right and the mechanism is
@@ -141,6 +164,8 @@ kernel:  for each declared line
 | `controls/law.py` | the **zero-parameter** fold law, derived from the listing and predicted forward |
 | `controls/attr.py` | a law attributed MNEMONIC BY MNEMONIC, from callgrind `--dump-instr=yes` |
 | `controls/wall_span.py` | identical-copy noise floor, alternating schedule, `t(n)−t(1)` |
+| `controls/clayout.py` | the **layout population** for the R4/R5 pair (24 layouts/cell) and its mode analysis; the floor the pair is not |
+| `controls/flen_price.py` | prices the one `required` entry that was added in response to a measurement, on **all eight cells** at `-O0` and `-O3` |
 | `NOTES.md` | what was measured |
 
 ## Running
@@ -159,6 +184,10 @@ python3 patterns/p14-field-split/controls/law.py out.json --cell unsafe
 python3 patterns/p14-field-split/controls/attr.py \
     .temp/build/p14/c-gcc-O3-isolated .temp/build/p14/c-gcc-h-O3-isolated --input small
 python3 patterns/p14-field-split/controls/wall_span.py --input small --reps 11
+python3 patterns/p14-field-split/controls/clayout.py --build
+python3 patterns/p14-field-split/controls/clayout.py --time --input small --reps 13
+python3 patterns/p14-field-split/controls/clayout.py --modes --boundary 64
+python3 patterns/p14-field-split/controls/flen_price.py
 for m in pm1_nocap pm2_weakreq pm3_msonly; do
   ./verus_run.py .temp/p14/ctl/$m.rs; ./verus_run.py .temp/p14/ctl/$m.rs --cfg slb_twin
 done

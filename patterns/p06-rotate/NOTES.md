@@ -348,9 +348,18 @@ identical-copy noise floor is the spread over the five copies.
 byte-identical kernels: **+3.00% on `small` and −1.41% on `large`**. It is
 larger than the within-binary identical-copy floor and its **sign flips between
 the two inputs**, which is what a null looks like (`.memory/01-ladder.md`, p04).
-**Take ±3% as the honest inter-binary floor for every `ns` figure in this file**;
-the within-copy floor (0.45–2.05%) is a lower bound on noise, not the whole of
-it.
+**Take ±4.6% as the honest inter-binary floor for every `ns` figure in this
+file**; the within-copy floor (0.45–2.05%) is a lower bound on noise, not the
+whole of it. ⚠ **This number was ±3% until TASK_050 and ±3% is a slight
+UNDER-estimate** (TASK_049_REVIEW m2, measured on a 24-layout population per
+cell): p06's own within-cell layout spread is **4.02% (`unsafe`) / 5.10%
+(`verus`)** and its `R5 − R4` cross-pair range is **−4.31% … +4.61%**. **Nothing
+of p06's falls**: the clang column (+9.78% / +10.56%) still clears ±4.6% at
+~2.1×, and p06's 30-layout C population (§3c) defends the headline
+independently. ⚠ **Two later sentences in this file still say "the ±3% floor"**
+(§3b's *"a multiple of the ±3% floor"* and §11's first bullet); TASK_050 was
+scoped to this number alone and did not edit them, and both remain true at
+±4.6% — read them against this paragraph.
 
 **THE HEADLINE — the two columns and their disagreement:**
 

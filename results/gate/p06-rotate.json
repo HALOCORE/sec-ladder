@@ -148,7 +148,7 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
     "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
-    "patterns/p06-rotate/NOTES.md": "1caaf9b9af6e8b6a03a5140c9bfadf0ec40809af80d70dbd3202fbfb5ca1e071",
+    "patterns/p06-rotate/NOTES.md": "d7c4724bea6211d23870885544625838c5506e14592e64ce75f9e3912c8d8c07",
     "patterns/p06-rotate/README.md": "e11771fa40c70b79fc56c482e93a9705c932c45ad1be8f5889e7f8c1a905344d",
     "patterns/p06-rotate/c/kernel.c": "8baf222692697c003ed0ed6076678807860f97a83e3b584cbc9db9145a503a3a",
     "patterns/p06-rotate/c/kernel.h": "e993082c2d65a03abbfd89294ddd986c4f4607adb1032848ac4a570eeddc91ec",
@@ -748,7 +748,7 @@
     },
     "adversarial-past48.bin/c-gcc": {
       "exit": -6,
-      "stdout": "4853857454377993562",
+      "stdout": "2996342339164753988",
       "stderr": "*** stack smashing detected ***: terminated",
       "signal": 6,
       "model_exit": 0,
@@ -756,7 +756,7 @@
     },
     "adversarial-past48.bin/c-clang": {
       "exit": 0,
-      "stdout": "497",
+      "stdout": "6008526198855114936",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
@@ -952,21 +952,21 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7fd40c400060 with insufficient space for an object of type 'u"
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7f97eb800060 with insufficient space for an object of type 'u"
     },
     "adversarial-past48.bin": {
       "exit": 1,
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 111 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7fc1a1c0008f with insufficient space for an object of type '"
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 111 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7eff5ba0008f with insufficient space for an object of type '"
     },
     "adversarial-pastfar.bin": {
       "exit": 1,
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 99999 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7f16b98186bf with insufficient space for an object of type"
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 99999 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7f48c1c186bf with insufficient space for an object of type"
     },
     "adversarial-stride3.bin": {
       "exit": 0,

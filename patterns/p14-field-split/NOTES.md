@@ -30,22 +30,36 @@ per-call scratch copy, so their columns are comparable:
 | `k_cap` | the field-count bound PRESENT | **ships as R1h** |
 | `k_bug` | the bound omitted, and nothing else | **ships as R1** |
 | `k_strtok` | libc `strtok`, which COLLAPSES delimiter runs | ships as a priced control |
-| `k_unbnd` | TASK_049 candidate 1: the scan not bounded by `i < m` | rejected, = p11 |
+| `k_unbnd` | TASK_049 candidate 1: the scan bounded by a NUL sentinel instead of by `i <= m` | rejected, = p11 |
 | `k_life` | TASK_049 candidate 3: descriptors are POINTERS into a callee-local scratch | rejected, = p08 |
-| `k_mutate` | the CATALOGUE row: `strtok`'s in-place mutation, on `buf` | rejected, illegal here |
+| `k_mutate` | the CATALOGUE row: `strtok`'s in-place mutation, on `buf` | rejected — measures its own steady state, §0a |
 
-### 0a. The catalogue's row — "in-place mutation + aliasing" — is EXCLUDED BY THE HARNESS
+### 0a. The catalogue's row — "in-place mutation + aliasing" — measures the WRONG WORKLOAD. It is NOT excluded by the harness.
 
 `.memory/06-catalogue.md` gives p14's bug class as *"in-place mutation +
-aliasing"*. **Neither half survives contact with this benchmark, and the first
-half fails for a structural reason nobody had written down.**
+aliasing"*. **Neither half survives contact with this benchmark** — but the
+reason the first half fails is **not** the one this section carried until
+TASK_050, and the difference matters to every later pattern, so the corrected
+claim is stated first:
 
-**In-place mutation of the INPUT is not a function of its arguments.** The driver
+> ⚠ **RETRACTED (TASK_049_REVIEW B2, measured).** This section used to say *"a
+> rung that mutates `buf` cannot be measured at all"* and *"EXCLUDED BY THE
+> HARNESS"*. **That is false.** Nothing in `harness/` enforces purity, and both
+> stages a mutating rung has to pass are well defined for it. What the repeat
+> protocol actually does is drive the mutation into a **one-call steady state**,
+> after which the benchmark measures an *already-tokenised* buffer — a different
+> workload from the one the pattern names. The measurement below stands; the
+> inference did not, and it was aimed at `.memory/06-catalogue.md`, where it
+> would have been recorded as a property of the *infrastructure*.
+
+**A kernel that mutates the INPUT is not a function of its arguments.** The driver
 calls `kernel(buf, k*stride, stride)` `n_iters` times, and on a one-window blob
 `k` is always 0, so a pure kernel satisfies `acc(n) = r · Σ_{j<n} 31^j` exactly.
 `k_mutate` writes NUL over the delimiters of `buf` itself — the textbook `strtok`
 idiom — and the identity fails on the first repeat, on both compilers
-(`probe1_repeat.py`, one window, `stride=516`):
+(`probe1_repeat.py`, one window, `stride=516`; re-run at TASK_050 from the
+committed generators into fresh scratch, **byte-for-byte identical on both
+compilers**):
 
 ```
 kernel                      n=1                    n=2                    n=4  repeat-pure?
@@ -57,19 +71,62 @@ life       13685950752790025653   13675310393961133728    3120074435700344128  T
 mutate     13685950752790025653    2980032160863588016    8033375426539182928  False
 ```
 
-So a rung that mutates `buf` cannot be measured at all: the checksum is a
-function of `n_iters`, `harness/check.py`'s checksum stage cannot pass, and
-`harness/measure.py`'s marginal is meaningless. **The repair — a per-call scratch
-copy — is exactly what TASK_049 mandates for other reasons, and it DELETES the
-in-place mutation.** The bug class is not merely wrong; it is unreachable inside
-this benchmark's own protocol.
+**What that measurement licenses, and what it does not.** It licenses *"the
+checksum of a payload-mutating kernel is not `r · Σ31^j`"*. It does **not**
+license *"such a kernel cannot be measured"*, and three measurements say why not:
 
-⚠ **The precise claim, because a looser one would be false.** In-place mutation
-*of the scratch* is perfectly legal and is what `k_strtok` does — and `k_strtok`
-agrees with `k_cap` on the perf blob to the bit. So the honest statement is: **an
-in-place tokenizer of the INPUT is excluded by the repeat protocol; an in-place
-tokenizer of the SCRATCH is not a bug at all, it is the correct kernel.** Either
-way there is nothing for p14 to measure there.
+1. **The mutating kernel reaches a steady state after exactly ONE call**, and the
+   closed form is verifiable from the table above without rebuilding anything.
+   With `r1 = 13685950752790025653` and
+   `r2 = acc(2) − 31·r1 = 2990672519692479941`, substituting `r3 = r4 = r2` gives
+   `31·(31·acc(2) + r2) + r2 = 8033375426539182928` — **`acc(4)` exactly.** After
+   call 1 every delimiter in `buf` is already NUL, so every later call does the
+   same thing to the same bytes. `acc(n)` is a closed form in `(r1, r2, n)`:
+   deterministic and predictable, just not the *pure* one.
+2. **`harness/measure.py`'s marginal is exactly defined, not meaningless.** gcc,
+   the same one-window blob, `(Ir(6000) − Ir(2000))/4000`:
+
+```
+cap 9779.0180   bug 9265.0180   strtok 10356.0180   mutate 9044.0000
+```
+
+   The mutating kernel's marginal is **integral with zero residual** — *cleaner*
+   than the three legal ones, whose `+0.0180` is the driver's `println!`
+   digit-count term.
+3. **Nothing in `harness/` enforces purity.** `check.py`'s checksum stage
+   compares each cell's stdout against **`model.py`'s own simulation** and
+   against the other cells; the identity `acc(n) = r·Σ31^j` appears nowhere in
+   `harness/` (`grep -rn 'repeat\|idempot\|purity' harness/` returns nothing
+   relevant) — it lives only in `probe1_repeat.py`, which is p14's own probe. The
+   only obstacle is **p14's own `model.py:143-147`**, which memoises
+   `self._win[k]`; that is a p14 design choice, not a harness constraint.
+
+**So the honest objection is different, and it is stronger.** After call 1 the
+delimiters are gone, so calls 2…n scan a line with **zero delimiters: one field
+of length `m` instead of four.** The repeat protocol does not refuse to measure
+an in-place tokenizer — **it measures the wrong workload**, tokenising an
+already-tokenised buffer, and the gap is visible in the marginals above (9044
+against `cap`'s 9779 on the same bytes).
+
+⚠ **What the repeat protocol does and does not exclude, stated plainly, because
+this reaches beyond p14.** It does **not** exclude a payload-mutating rung: a
+later pattern that wants one (`strsep`, an in-place unescape, anything
+CWE-787-shaped that writes into its input) is not blocked by `harness/`, and
+rejecting it *on that ground* would be rejecting it on a constraint the harness
+does not have. What the protocol **does** do is fix the workload of calls 2…n to
+whatever call 1 left behind. Two repairs exist for that, and both are available:
+write a `model.py` that **simulates the mutation** instead of memoising the
+window, or **declare the steady state as the measured workload** and say so in
+`spec.md`. Neither repair exists for *"the harness forbids it"* — which is the
+practical reason the wrong reason was worth correcting.
+
+⚠ **The other precise claim, because a looser one would be false.** In-place
+mutation *of the scratch* is perfectly legal and is what `k_strtok` does — and
+`k_strtok` agrees with `k_cap` on the perf blob to the bit. So: **an in-place
+tokenizer of the SCRATCH is not a bug at all, it is the correct kernel**, and an
+in-place tokenizer of the INPUT is measurable but measures its own steady state.
+Either way there is nothing here for p14 to measure, which is why the decision
+below is unchanged — only its reason is.
 
 **And the "aliasing" half is a compile-time rejection, which is p08's result and
 has no run-time cost to price.** `probe2_borrow.rs` puts four spellings to
@@ -121,8 +178,20 @@ probe1_kernel.c:241:20: runtime error: index 64 out of bounds for type 'uint8_t 
 
 and at `-O3`, on both compilers, it prints **the same answer as `k_cap`**
 (`8709970208371219456`), because the byte after the array happened to be zero.
-The omitted line is literally `i < m`; the harm is an out-of-bounds READ; the
-loop body is p11's `strlen` shape. **`.memory/01-ladder.md` finding 9 already
+
+⚠ **What `k_unbnd` does, exactly — the looser sentence this paragraph carried
+until TASK_050 was wrong** (TASK_049_REVIEW m3). It does **not** merely delete
+`i <= m`. It replaces `while (i <= m)` with `for (;;)` **and adds a NUL
+sentinel**, `if (scr[i] == 0) break;`, beside the `DELIM` exit
+(`.temp/p14/probe1_kernel.c:238-249`). **The added sentinel is exactly what makes
+it p11**: p11's scan is a sentinel-bounded `strlen`, and its harm is the
+out-of-bounds READ that happens when the sentinel is not there — which is what
+`nonul.bin` supplies. So the conclusion below is right and the one-line
+description was not: the harm is an out-of-bounds READ and the loop body is
+p11's `strlen` shape, but the difference from the shipped scan is a
+*bound-for-sentinel substitution*, not a deletion.
+
+**`.memory/01-ladder.md` finding 9 already
 owns that measurement, including the 2.00-vs-3.00 Ir/byte constant that depends
 on the loop's other exit test.** A second copy is worth little, so candidate 1 is
 rejected — and the threshold-table row is settled as *the mechanism is real and
@@ -161,6 +230,16 @@ into it; `k_life` then folds through them after the helper has returned.
    would have no verifying R5 twin and **would not be a rung** (TASK_026 §0 item
    3). So four of the six Rust cells would change algorithm and the pattern would
    have no priceable safety line anywhere on the ladder.
+
+   ⚠ **Re-run independently at TASK_049_REVIEW (CN5) and it holds** — this is
+   *not* the "R4 is chained to the prover" wrong explanation that p13 got caught
+   by: `<[T]>::as_ptr` and `core::slice::from_raw_parts` both answer
+   `` is not supported ``, and `*p` / `*p.add(i)` answer *"The verifier does not
+   yet support … dereferencing a raw pointer."* ⚠ **One route is untried and is
+   flagged as open, not as settled**: the error text points at `vstd::raw_ptr`'s
+   permissioned interface, which needs a `PointsTo` token that a stack local
+   `[u8; 64]` cannot supply. Nobody has tried it. It is not expected to change
+   the answer, and it has not been measured.
 
 **Rejected, on 1 and 3.** It is p08 with an extra hazard, not a stronger p08.
 
@@ -388,7 +467,21 @@ and not across those groups; every same-compiler difference is identical under
 both conventions because the `memcpy` term cancels. **Every figure below is a
 same-compiler or same-language difference.**
 
-### 3a. gcc: `R1h − R1 = 1.00·bytes + 2.00·fields − 3.00`, exact on 66 blobs
+### 3a. gcc: `R1h − R1 = 1.00·bytes + 2.00·fields − 3.00`, exact on 66 blobs — WITH ITS DOMAIN, WHICH IS `nt ≤ MAXTOK` ON EVERY LINE
+
+⚠ **State the domain first, because the law is fitted entirely inside the regime
+where the safety line never executes** (TASK_049_REVIEW M1). Every one of the 66
+sweep blobs has **at most `MAXTOK` fields per line**. Counted off the blobs
+themselves rather than off `gen.py`: the **maximum fields on any line over the 66
+sweep blobs is exactly 16**, and `small` reaches 12, `large` 3, `degenerate` 16 —
+against `adversarial-run17`'s 17, `-many`'s 21, `-alt33`'s 33 and `-full65`'s 65.
+A line of exactly 16 fields *fills* the table and does not trip the guard
+(§7 reading 1), so **`if (nt == MAXTOK) break;` never executes anywhere in the
+fit set or in any of the three perf rows.** The law is the cost of
+a **never-taken branch**: `+1.00` per byte of gcc's hardened scan geometry and
+`+2.00` per field of guard *evaluation*, and `0.00` of it is the guard being
+*taken*. Quote the law with the clause `for inputs with at most 16 fields per
+line`; §3a″ is what happens outside it and it is not a continuation of this law.
 
 `controls/fit.py` over the whole sweep, four regressors, **max |residual|
 0.0000, rms 0.0000 over 66 points**:
@@ -398,17 +491,22 @@ c-gcc-h - c-gcc: -3.00000*const + -0.00000*nline + 1.00000*bytes + 2.00000*field
     max |residual| 0.0000 over 66 point(s); rms 0.0000
 ```
 
-**Leave-one-length-out**, holding out every blob containing a given `llen` —
-including the two hold-outs that remove 17 blobs each (`llen = 32` and
-`llen = 60`, the whole `l` and `t` bands): **worst out-of-sample error 0.0000
-over 29 hold-outs.**
+⚠ **The leave-one-length-out hold-out is NOT evidence for this law and is not
+quoted as such** — it cannot fail, provably. §9c has the proof; read it before
+quoting a hold-out figure from this pattern.
 
-And it predicts the two shipped perf rows, which are **not in the sweep**:
+**What is evidence** is that the law predicts inputs it was not fitted on and
+could have been wrong about. The two shipped perf rows are **not in the sweep**:
 
 | input | `1.00·bytes + 2.00·fields − 3.00` | measured `c-gcc-h − c-gcc` |
 |---|---:|---:|
 | `small` (179 bytes, 31 fields) | **238.00** | **238.00** |
 | `large` (52 bytes, 21 fields) | **91.00** | **91.00** |
+| `degenerate` (92 bytes, 25 fields) | **139.00** | **139.000** |
+
+`degenerate` is a third out-of-sample confirmation added at TASK_049_REVIEW: it
+is in no callgrind plan and was never used to fit anything. All three are inside
+the domain — no line of any of them reaches 16 fields.
 
 ### 3a′. The law attributed MNEMONIC BY MNEMONIC — and −1.00 per line is padding
 
@@ -442,6 +540,102 @@ a `lea`+`jb` pair.
 coefficient of *zero* concealed a padding term here, where p06's trap-3 instances
 concealed one inside a *non-zero* slope. Third instance in the project, first one
 inside a null.
+
+### 3a″. OUTSIDE the domain there is NO COST COMPARISON, and that is the honest statement
+
+⚠ **This section exists to refuse a headline, and the refusal is measured.** On
+the four adversarial inputs — the ones p14 exists to model — the guard fires, and
+the law does not merely lose accuracy, it **inverts sign**
+(`.temp/r49/sweep_ir_r49.py`, gcc, same whole-program marginal):
+
+| blob | bytes | fields | law predicts | measured `c-gcc-h − c-gcc` |
+|---|---:|---:|---:|---:|
+| `adversarial-run17` | 18 | 16 | +47.00 | **+16.036** |
+| `adversarial-alt33` | 64 | 16 | +93.00 | **−551.036** |
+| `adversarial-full65` | 64 | 16 | +93.00 | **−823.000** |
+| `adversarial-many` | 176 | 128 | +429.00 | **−610.982** |
+
+**It is tempting to read those minus signs as *"hardening is cheaper than the
+bug"*. Do not.** Three measurements say the comparison is not a cost comparison
+at all:
+
+1. **The two cells stop computing the same function.** Past `MAXTOK` fields R1h
+   truncates and R1 keeps recording, so R1h's "saving" is exactly the work of the
+   fields it refuses to record. That is `spec.md`'s own pinned semantics — p13's
+   shape, *the hardened cell is memory-safe and LOSES DATA* — and a program that
+   does less is cheaper for the same reason a program that returns early is
+   cheaper. §7's checksum column is the proof that they differ: R1 is *"wrong,
+   exit 0"* on every one of these rows.
+2. **R1 has already stored out of bounds before the extra work begins.** The
+   ASan+UBSan column **fires** on all four rows (§7), so every instruction R1
+   executes after its seventeenth descriptor — the store to `tl[16]` — is
+   executed by a program with a smashed frame. Its instruction count is one legal outcome of undefined behaviour, not
+   a property of "the kernel without the check".
+3. **And on one of the four rows the number is not even arithmetically defined.**
+   `measure.py`'s marginal presumes the kernel is a function of its arguments;
+   these are one-window blobs, so that is checkable exactly as in §0a. Measured
+   (`.temp/p50/r1purity.py`, shipped `-O3 isolated` cells, `acc(n)` against
+   `r·Σ31^j`):
+
+```
+adversarial-run17   c-gcc True    c-clang True     c-gcc-h/c-clang-h/unsafe True
+adversarial-many    c-gcc True    c-clang FALSE    (acc(2) = 10394069306267118060,
+                                                    pure prediction 1803517957900145280)
+adversarial-alt33   c-gcc True    c-clang rc=-11 (SIGSEGV) at every n
+adversarial-full65  c-gcc True    c-clang rc=-11 (SIGSEGV) at every n
+```
+
+   **`c-clang` on `adversarial-many` is not a function of its arguments**, and
+   the mechanism is readable off the checksums. Recovering each call's return
+   from the driver's fold, `r_k = acc(k) − 31·acc(k−1)`:
+
+```
+r_1 = 9856192725342578836    r_2 = 0    r_3 = 0    r_4 = 0    r_5 = 0
+```
+
+   **After the first call the kernel returns 0 forever** — the overflow reaches
+   the driver's own frame and one of the kernel's early exits fires on every
+   later call. That is why `c-clang`'s marginal on this blob is **17.982
+   Ir/call** for a kernel that folds 168 fields, and why the published
+   `c-clang-h − c-clang` there would read `+4287.05`: not a hardening cost, a
+   dead cell. (`c-clang`'s marginal on `alt33` and `full65` is **0.000** — it
+   SIGSEGVs at the same point whatever `n_iters` says.) The failure is
+   deterministic — five runs of the same binary agree — and still not a per-call
+   cost. The same source at `-O3 whole` **is** repeat-pure and prints the pure
+   prediction (`990332571241907456`), while `-O0` prints a third answer; `c-gcc`
+   prints `13881239473904541696` in all four build variants. One source, one
+   input, four builds, three answers.
+
+**The honest statements, and they are the ones to quote:**
+
+- **the law**, with its domain: *for inputs with at most `MAXTOK` fields per
+  line, gcc's safety line costs exactly `1.00·bytes + 2.00·fields − 3.00`* — and
+  that domain is where every benign input lives, so **that is the cost a
+  deployment pays**;
+- **outside the domain, publish behaviour and not cost.** §7's table is what p14
+  has to say about the inputs that trigger the bug: silent-and-wrong under gcc at
+  every magnitude, SIGSEGV under clang from 17 descriptors up, an answer that
+  depends on the `-O` level, and a sanitizer that fires on all four rows. **The
+  check is paid for on every benign input and repaid on the attack input in a
+  currency that is not instructions.**
+- **The harness already agrees, structurally.** `harness/measure.py`'s `CG_PLAN`
+  is six entries and every one of them is `small.bin` or `large.bin`
+  (`measure.py:56-61`), so **no adversarial input is ever in a callgrind plan on
+  any pattern** and no published `Ir` figure anywhere in this project is measured
+  on an input that triggers a bug. The numbers in the table above exist only
+  because `controls/sweep_ir.py` can be pointed at an arbitrary blob. p02's and
+  p12's adversarial sections publish behaviour-only tables for the same reason,
+  and p14 keeps to it — but says why, which they do not.
+
+**It is a gcc result even inside the domain.** clang's marginal is unusable on
+`alt33`/`full65` (SIGSEGV, `0.000` Ir/call, no reading at all) and its `many`
+reading is the dead cell of (3). §3b's clang result is a mechanism plus a
+mnemonic table, not a law, and nothing here is generalised beyond gcc.
+
+**Where R1 IS repeat-pure** — gcc on all four rows, and every checked cell on
+every row — the numbers above are reproducible readings of *those binaries*.
+They are still not a cost comparison, for reasons (1) and (2), which do not
+depend on (3).
 
 ### 3b. clang: `R1h − R1 = +663.00 / +237.00` — and the mechanism is a LOST 2× UNROLL
 
@@ -526,10 +720,21 @@ R4's fold is **4× unrolled with a scalar epilogue**; R2's is not, because the
 bounds check sits in the loop body. `10.00 − 5.75 = 4.25`, and
 `.memory/01-ladder.md` records `4.25 = 2.00 + 2.25` — 2.00 for the check, 2.25
 for the unroll it blocks — measured on p16, p17 and p11. **p14 is the fourth
-kernel, and the first where the split is visible in one listing**: the same R4
-executes the *unchecked un-unrolled* body (8.00) in its epilogue and the
-*unchecked unrolled* body (5.75) in its main loop, so both halves of the constant
-are readable off one function.
+kernel**, and what is readable off p14's R4 alone is the **2.25 unroll half**:
+the same function executes the *unchecked un-unrolled* body (8.00) in its
+`L mod 4` epilogue and the *unchecked unrolled* body (5.75) in its main loop.
+
+⚠ **The "first time both halves are readable in one listing" claim this section
+carried until TASK_050 is WITHDRAWN, and it was contradicted by the file p14
+cites for the constant** (TASK_049_REVIEW M3). `patterns/p16-tlv-walk/NOTES.md`
+`:563-568` already says of the same constant that *"the cheapest [sighting of
+8.00] is already in the shipped binary: R4's own remainder loop runs at 8
+insns/byte — R2's body minus exactly `cmp`+`je`"*, beside p16's own 5.75 unrolled
+body at `:505-515`. p16 had that at TASK_007_REVIEW. **And the sentence was
+imprecise about p14 as well**: the 2.00 half needs R2's 10.00, which is a
+different function, so *both* halves were never readable off one listing here
+either. The reproduction on a fourth kernel is real and is what this section
+claims; the priority is not.
 
 The consequence for the swept slope, confirmed on band `m` (29 blobs, field count
 held at 32, `llen` swept 4…60):
@@ -726,6 +931,50 @@ O3  unsafe / verus      md5_raw       3cfea50590f84bad0e12ea8aa1970032   -> exac
 later, in a smaller form, and it is in `spec.md`'s `required` list so that nobody
 "simplifies" it away.
 
+#### 6a′. The entry's price, measured on ALL EIGHT CELLS
+
+⚠ **This is the one `required` entry that was added in response to a gate
+measurement** (`spec.md`'s `why` says so, and TASK_049's report disclosed it).
+TASK_049 priced it on R4/R5 only, which is exactly the shape p13's blocker had —
+a price published for some rungs and not others. **Priced on every cell**
+(TASK_050, `controls/flen_price.py` — the excluded spelling `tl[nt] = i - s;`
+derived from the **committed** rung sources by exact-string substitution with an
+asserted hit count, built at the shipped flags, measured with `harness/asm.py`'s
+own kernel report):
+
+| cell | `-O0` without | `-O0` with (shipped) | `-O0` price | `-O3` |
+|---|---:|---:|---:|---|
+| `c-gcc` | 225 | 226 | **+1** | identical (`md5_fn_norel 1ec5fb96b686`) |
+| `c-gcc-h` | 229 | 230 | **+1** | identical (`75520cc35378`) |
+| `c-clang` | 177 | 179 | **+2** | identical (`225c9010d85e`) |
+| `c-clang-h` | 180 | 182 | **+2** | identical (`ff0e2147f37c`) |
+| `safe_naive` | 352 | 349 | **−3** | identical (`2a992db908f4`) |
+| `safe_tuned` | 350 | 347 | **−3** | identical (`25d6577d1e72`) |
+| `unsafe` | 289 | 286 | **−3** | identical (`9bdc8469333f`) |
+| `verus` | 286 | 286 | **0** | identical (`9bdc8469333f`) |
+
+Three things this says that the R4/R5-only version did not:
+
+- **At `-O3` the price is exactly zero on all eight cells** — `md5_fn_norel` and
+  `md5_raw_norel` are identical with and without the entry in every cell — so it
+  moves **no published p14 figure**, every one of which is an `-O3` marginal.
+  That is the direction test (`.memory/01-ladder.md`), and it comes out at
+  `0.0000`.
+- **At `-O0` the price is not zero and it is not sign-neutral**: the entry makes
+  the three Rust cells that move **cheaper** by 3 and the four C cells **dearer**
+  by 1 or 2. If any `-O0` row were ever published as a comparison, this entry
+  would flatter the Rust side of it. **No p14 claim rests on an `-O0` row** (§11)
+  and none may, but the disclosure belongs beside the entry rather than in a
+  reviewer's file.
+- **`verus` is the cell the entry does not move at all**, which is the point:
+  R4 goes 289 → 286 to *meet* R5, and that is what turns the `identity` pin from
+  `differ` to `norel`.
+
+`verus_noflen.rs` verifies **19 verified, 0 errors** (TASK_049_REVIEW CN10), so
+the entry is a **fiat the prover does not force** — legitimate, whole-pattern
+rather than scoped, and now priced on every rung it binds. The script's own last
+line is the direction test: `identical on all 8 cells: True`.
+
 ## 7. The bug, per rung, with distinct harms in distinct columns
 
 `c-gcc`/`c-clang` are R1. The delete-the-check controls put the same deletion in
@@ -829,6 +1078,24 @@ because it spells none of `if nt == MAXTOK {`, `while i <= m {` or `if i == m ||
 Its `pads.py` decode (§4b) says where the saving is: the hoisted bound elides
 `tl[nt]`'s bounds check.
 
+#### 8a′. The two out-of-contract fiats, DIRECTION-TESTED — a judgement upgraded to a measurement
+
+TASK_049 published `c_hcond` and `t_pos` as *"a judgement I made, not a
+measurement"*. **It is now a measurement** (TASK_049_REVIEW CN11), and both
+exclusions go **against** p14's own interest — which is the direction
+`.memory/01-ladder.md`'s direction test asks about:
+
+| fiat | if it were ADMITTED | the published figure | direction |
+|---|---|---|---|
+| `c_hcond` | R1h `small` 4244.96 (gcc, **dearer**) / `large` 2171.98 (cheaper) | hardening tax +238.00 / +91.00 | excluding it **raises** the gcc `large` tax by 8.00 and lowers nothing |
+| `t_pos` | R3 `small` 3953.99 / `large` 2521.99 | R3 − R4 +638.00 / +425.00 | excluding it **raises** the published safe-side tax from +300.00 → +638.00 and +340.00 → +425.00 |
+
+For a safety-tax number the flattering direction is *down*; both exclusions push
+*up*. So neither is a thumb on the scale, and both are priced beside the number
+they protect (§3c, §8a). ⚠ **That does not make them right** — it makes them
+legitimate fiats whose cost is known, which is all the direction test can
+establish.
+
 ### 8b. The forbidden spellings, PRICED — and put through the prover, not asserted
 
 `spec.md`'s `forbidden` list has eight entries. TASK_049: an entry the **prover**
@@ -841,7 +1108,16 @@ excludes is a fiat and must be priced.
 | `` `from_le_bytes` ``, `` `chunks_exact` `` | the prover (p05/p16/p06, measured) | free to keep |
 | `` `strtok(` `` | the declaration (C has no prover) | **+2817.00 / +2680.00** |
 | `` `memchr(` `` | the declaration | **−639.00 / +170.00** |
-| `` `strsep(` `` | the harness itself | not buildable — §0a |
+| `` `strsep(` `` | **the declaration** | **not priced — it would measure a different workload, §0a** |
+
+⚠ **The `strsep` row said *"the harness itself — not buildable"* until TASK_050
+and that was wrong** (TASK_049_REVIEW B2). It is buildable and it is measurable;
+what it is not is *comparable*, because the repeat protocol drives it into a
+one-call steady state that tokenises an already-tokenised buffer. So it is a
+**fiat of the declaration**, like `strtok` and `memchr` — and unlike those two it
+is **not priced**, because there is no honest number to publish: any marginal it
+produced would be the cost of the steady state and not of tokenising. That is
+the price, stated rather than left blank.
 
 **The prover verdict is a measurement.** `controls/gen_controls.py` derives an R5
 probe that calls `scr[..m].split(|b: &u8| *b == DELIM).count()` inside `kernel`,
@@ -984,20 +1260,61 @@ than a reading of the listing. `.memory/03-measurement.md` trap 3, third instanc
 in this project and the first where the NOP is *inside a zero-parameter
 derivation* rather than inside a fitted coefficient.
 
-### 9c. Leave-one-length-out
+### 9c. Leave-one-length-out — and on the gcc law it CANNOT FAIL, provably
+
+⚠ **Read this before quoting p14's hold-out figure. On the exact gcc law the
+hold-out is a corollary of the exactness and not independent evidence**
+(TASK_049_REVIEW M2, and this is p13's mistake in a new costume).
 
 The fit set is length-heterogeneous by construction — band `m` sweeps `llen`
 4…60 and band `x` carries several `llen` inside one window — so the honest
 hold-out removes **every blob containing a given `llen`**, i.e. a whole column of
 the design. On the exact gcc law that is 29 hold-outs including two that remove
-17 blobs each: **worst out-of-sample error 0.0000.**
+17 blobs each, and the worst out-of-sample error is **0.0000**.
 
-⚠ **This test CAN fail, and saying so is the point** (`.memory/03-measurement.md`,
-*"an out-of-sample test can be provably unable to fail"*). Run the same hold-out
-against the four-regressor fit of `safe_tuned` alone and it does fail, badly —
+**But it could not have been anything else.** Two facts, both re-measured:
+
+```
+law max|residual| over the 66 sweep blobs = 0.000000        (an EXACT fit)
+full design rank 4;  drop all sweep-l* -> n=50 rank 4;  sweep-t* -> n=50 rank 4
+                     drop all sweep-m* -> n=37 rank 4;  sweep-x* -> n=61 rank 4
+and every one of the 29 llen hold-outs leaves rank 4
+```
+
+An exact fit plus a design that keeps full rank after the drop means every
+hold-out's least-squares solution **is the same exact solution**, which then
+predicts the held-out rows exactly. The arithmetic cannot come out any other way,
+so the test distinguishes nothing.
+
+⚠ **§9c's old paragraph does not rescue it, and is corrected here.** It said
+*"this test CAN fail"* and demonstrated failure on a **different fit** —
+`safe_tuned`'s own four-regressor model, rms 168.68 in sample. That shows the
+*procedure* can fail on a bad model; it does not show that *this* hold-out could
+have failed. Compare p06, whose leave-one-length-out **did** fail (−48.000 at
+`m = 3`) precisely because its law was not exact.
+
+**What p14's gcc law actually rests on**, and all of it could have failed:
+
+1. the **exact** in-sample fit — `max |residual| 0.0000` over 66 blobs is not
+   guaranteed by anything and would have been destroyed by one wrong regressor;
+2. the **out-of-sample perf rows** `small` `+238.00` and `large` `+91.00`, plus
+   `degenerate` `+139.000` (§3a), none of which is in the sweep and any of which
+   could have missed;
+3. the **mnemonic-by-mnemonic attribution** of §3a′, which puts each coefficient
+   on named instructions;
+4. and, negatively, §3a″: the law is **false outside its domain**, which is the
+   sharpest evidence that it is a statement about a specific regime rather than a
+   curve fitted to anything.
+
+The `safe_tuned` demonstration stays, relabelled as what it is — a demonstration
+that the *procedure* has teeth on a wrong model:
+
+⚠ Run the same hold-out against the four-regressor fit of `safe_tuned` alone and it does fail, badly —
 rms 168.68 in sample — because R3's fold is unrolled and a linear model in
-`(nline, bytes, fields)` is the wrong model. The hold-out passing on the gcc law
-is therefore evidence about the law, not about the procedure.
+`(nline, bytes, fields)` is the wrong model. ~~The hold-out passing on the gcc law
+is therefore evidence about the law, not about the procedure.~~ **That last
+sentence is withdrawn**: the hold-out passing on the gcc law is evidence about
+neither — it is arithmetic.
 
 ## 10. The proof mutants
 
@@ -1017,8 +1334,27 @@ by exact-string substitution with an asserted hit count
 pm1_nocap:  error: invariant not satisfied at end of loop body
             error: precondition not satisfied            <- tl_set_unchecked's requires
 pm2_weakreq (twin): error: precondition not met: index in bounds for this access
-pm3_msonly: error: precondition not satisfied
+pm3_msonly: error: invariant not satisfied at end of loop body    <- `nt <= MAXTOK`
+            error: precondition not satisfied                     <- tl_set_unchecked's requires
 ```
+
+⚠ **`pm3_msonly` emits TWO errors and this block used to quote one**
+(TASK_049_REVIEW m1). Re-run at TASK_050 on the shipped mutant:
+
+```
+$ ./verus_run.py .temp/p14/ctl/pm3_msonly.rs
+error: invariant not satisfied at end of loop body
+   --> .temp/p14/ctl/pm3_msonly.rs:587:17   |  587 |  nt <= MAXTOK,
+error: precondition not satisfied
+   --> .temp/p14/ctl/pm3_msonly.rs:627:17   |  627 |  tl_set_unchecked(&mut tl, nt, flen);
+   (failed precondition, verus.rs:408: `i < old(v)@.len()`)
+verification results:: 18 verified, 1 errors
+error: aborting due to 2 previous errors
+```
+
+so it fails at **the same two obligations as `pm1_nocap`**, whose row already
+lists both. Both are memory-safety obligations, so the conclusion below is
+unchanged.
 
 Three readings.
 
@@ -1033,11 +1369,23 @@ p06 measured that a memory-safety-only spec **accepts** its buggy kernel in
 regime 1, because nothing leaves the array, and concluded that separating the two
 regimes needs a *program* change rather than a *spec* change. p14's bug is a
 spatial store, so there is no such regime: **weakening the postcondition to
-`true` does not rescue the mutant — it still fails, at the same obligation.**
-`ensures true` and `ensures r == split_fold(...)` reject the same program here.
-That is worth recording as the complement: **memory safety alone suffices on
-p14 and did not on p06**, and the discriminator is whether the bug's harm can
-stay inside the object.
+`true` does not rescue the mutant — it still fails, at the same TWO obligations
+`pm1_nocap` fails at.** `ensures true` and `ensures r == split_fold(...)` reject
+the same program here.
+
+⚠ **State what `pm3` actually tests, because the shorter summary overstates it.**
+`pm3_msonly` is **not** a memory-safety-*only* specification: only the kernel's
+`ensures` is weakened to `true`, and the functional loop invariants (`tkg`,
+`stg`, `toks`) all remain, so the proof still knows what the partition is. The
+claim it tests is precisely *"weakening the POSTCONDITION to `true` does not
+rescue the mutant"*. The stronger sentence — *"memory safety alone suffices on
+p14"* — is a reading of that result and not a measurement of it; a genuine
+memory-safety-only spec would have to delete the functional invariants too, and
+p14 did not build one. **Quote the narrow claim.** The complement to p06 survives
+it: p06 has a regime where the buggy kernel stays inside its array and p14 has
+none, so the discriminator is whether the bug's harm can stay inside the object —
+which is a statement about the two *bugs* and does not depend on how much of
+either spec was weakened.
 
 **`pm2_weakreq` is the twin's row, and "the twin is the SOLE catcher" is FALSE
 here too.** It verifies `19 / 0` in the shipped configuration — the caller can
@@ -1072,20 +1420,129 @@ applied on a fourth pattern rather than the overclaim it corrects.
 
   **`verus` and `unsafe` have byte-identical kernels** (`md5_raw
   3cfea50590f84bad0e12ea8aa1970032`) and **exactly equal marginal `Ir` on all 66
-  sweep blobs and both perf inputs** — so their `+8.9%` is the pattern's own NULL,
-  and it is **larger than the gcc hardening gap and comparable to two of the
+  sweep blobs and both perf inputs**, so two cells that cannot differ read
+  `+8.9%` — **larger than the gcc hardening gap and comparable to two of the
   three others.** Every p14 `ns` figure is therefore withdrawn as a claim; the
-  headline is the `Ir` decomposition.
+  headline is the `Ir` decomposition. ⚠ **That `+8.9%` is not "the pattern's own
+  null" and 11a is why**: it is one draw from a layout distribution whose median
+  is ≈ 0 and whose spread is wider still. The *conclusion* — withdraw the `ns`
+  column — is unchanged and is if anything better supported.
 
-  ⚠ **The R4/R5 pair is a null control the whole project can use and nobody has.**
-  It costs nothing — every pattern already builds both cells and already pins them
-  byte-identical — and it varies the *binary* rather than only the inode, so it
-  bounds layout and link effects that an identical-copy floor cannot see. On p14
-  it is 8× the identical-copy floor.
+  ⚠ **The R4/R5 pair is a SMOKE ALARM, not a floor — and the sentence that said
+  otherwise is withdrawn.** Until TASK_050 this bullet read *"it varies the
+  binary rather than only the inode, so it bounds layout and link effects that an
+  identical-copy floor cannot see"*. **That is false, measured** (TASK_049_REVIEW
+  B1, reproduced here in 11a): on p14 the pair reports **+8.95%** where the
+  measured within-cell layout spread is **12.68% (`unsafe`) / 9.73% (`verus`)**,
+  so it *under*-states the very quantity it claimed to bound on the cell that
+  moves most, and over a layout population its median is **≈ 0**. It is a biased sample of size one, because the `verus` build's kernel
+  lands `0x20` below the `unsafe` build's on p06 and p14 alike, so the pair
+  measures the *same fixed alignment contrast* every time — which is why p14's
+  two passes agreed to 0.06 pp. **A large value is worth having as a signal that
+  says "go and measure the layout population"; it is not the population and it is
+  not a floor. The floor is the population.**
 
-- **No layout population.** `controls/clayout.py` exists on p06 and was not ported;
-  with no `ns` claim to defend there is nothing for it to defend, but that means
-  the `win32`/`jcc32` question is **unasked** here, not answered.
+### 11a. The layout population — the floor, and the `win32`/`jcc32` question ANSWERED
+
+`controls/clayout.py`, ported at TASK_050 (p06's file of the same name populates
+p06's *C* cells; p14's headline pair is Rust, so the levers are
+`-align-all-functions 0…8`, 14 `--symbol-ordering-file` permutations and the
+shipped build — **24 layouts per cell**, `verus` built through
+`./verus_run.py --compile` with the same flags).
+
+**CONTROL 1 holds on all 48 binaries** — every one runs the same instruction
+stream and differs only in where the linker put it:
+
+```
+unsafe  24 builds  n_fn [185]  md5_fn_norel ['9bdc8469333f']  21 distinct addrs 0x15690..0x4ac60
+verus   24 builds  n_fn [185]  md5_fn_norel ['9bdc8469333f']  21 distinct addrs 0x14e40..0x46560
+single-valued per cell: True    verus == unsafe: True    distinct stdouts over the population: 1
+```
+
+`small`, 13 reps, cpu 5, alternating, min-of-reps:
+
+| | ns/call | median | IQR |
+|---|---|---:|---|
+| `unsafe` (n=24) | 245.36 … 276.48 | 250.22 | 249.50 … 263.37 |
+| `verus` (n=24) | 244.77 … 268.57 | 251.41 | 249.70 … 266.99 |
+
+| statistic | value |
+|---|---|
+| `R5 − R4`, the **shipped pair** | **+8.95%** (reproduces the published +8.97%) |
+| `R5 − R4` **paired by layout**, n=24 | median **−0.07%** |
+| `R5 − R4` over all **576 cross pairs** | median **+0.27%**, **`P(R5 > R4) = 0.559`** |
+
+⚠ **Quote the median and `P(A>B)`, not the range.** `.memory/03-measurement.md`
+retracts worst-vs-best range and dominance as layout statistics because neither
+converges in N; the ranges above are printed because the eye wants them, and the
+two converging statistics are the ones that decide the question. Both say the
+same thing: **`P(R5 > R4) = 0.559` is a coin flip, and the pair is a null.**
+
+**And the verdict does not depend on the estimator.** `--estimator median` (the
+median of the 13 reps per binary, instead of the min) on the same population:
+shipped pair **+8.54%**, paired-by-layout median **−0.00%**, cross-pair median
+**+0.77%**, **`P(R5 > R4) = 0.609`**. Same conclusion at both ends of the
+estimator choice.
+
+**A second, independent population agrees.** TASK_049_REVIEW built its own
+24-layout population with a different script (`.temp/r49/laynull.py`, different
+symbol-ordering seeds, p06 and p14 interleaved in one session) and read
+`unsafe` 244.36…276.67 (spread 13.22%), `verus` 244.00…277.56 (13.75%), shipped
+pair **+9.17%**, paired median **+0.10%**. Two populations, two scripts, same
+verdict — and the two spread figures differ by ~0.5–4 points, which is exactly
+the non-convergence that makes a **range** the wrong statistic to publish.
+
+**The mode, derived from the listing and not from an address bit.** All six loops
+in the kernel flip their `win32`/`jcc32` together — the whole function moves as a
+unit — so p14 **cannot separate `win32` from `jcc32`**; both predicates change at
+the same layouts. At the standard 32-byte fetch grid the partition is exactly
+`addr % 32`: 26 binaries at `%32 == 0` (245.54…255.34, median 250.58) against 22
+at `%32 == 16` (244.77…276.48, median 267.09), and mode-matched `R5 − R4` is
+**+0.46% / −0.24%**.
+
+⚠ **But the 32-byte grid is NOT the sharp predicate here, and that is a finding
+about the method rather than about p14.** `.memory/03-measurement.md` says to
+partition by `win32`/`jcc32` "computed from the listing, not by an address bit" —
+correct — but the *grid spacing* is a parameter, and on p14 the right one is
+**64**. `loopfit.kernel_report(..., boundary=64)` on loop 1 (the 46-byte loop)
+gives `jcc32 == 1` for exactly the 10 binaries with `addr % 64 == 16`:
+
+```
+jcc32@64(loop1)==1   n=10   267.09..276.48   median 268.09     <- SLOW
+jcc32@64(loop1)==0   n=38   244.77..267.35   median 250.15     <- FAST   (+7.2%)
+loopfit.perfect() is True on the verus sub-population; the unsafe one overlaps by 0.01 ns
+```
+
+Mode-matched under **that** partition, `R5 − R4` is **+0.20%** (n=38,
+`P(R5>R4) = 0.550`) and **−1.26%** (n=10, `P = 0.250`). The `%32` partition
+merges the *fastest* class (`%64 == 48`, median 248.67) into the slow group with
+the *slowest* (`%64 == 16`, median 268.09), which is why it separates less
+sharply than an address-bit reading would.
+
+**So the `win32`/`jcc32` question is answered, and the answer has three parts:**
+
+1. **p14 is a strongly layout-sensitive kernel** — a 7.2% mode between two
+   listing-derived classes, on top of which the within-cell spread reaches
+   12.68% (`unsafe`) in this population and 13.75% (`verus`) in the review's.
+2. **The shipped R4/R5 pair straddles the two extreme classes** — `unsafe` at
+   `0x156b0` (`%64 == 48`, the fastest class) and `verus` at `0x15690`
+   (`%64 == 16`, the slowest). The pair does not sample the distribution; it
+   samples its two ends.
+3. **p14 still publishes no `ns` claim**, and now for the better reason: not
+   *"the null is large"* but *"the null is ≈ 0 and the layout spread of the two
+   cells that were populated is 12.7–13.8%, which is at or above both Rust rung
+   gaps in the withdrawn table (`safe_naive − unsafe` +13.05%, `safe_tuned −
+   unsafe` +9.93%)."*
+   ⚠ **Stated exactly, because the population covers two cells and not eight.**
+   No layout population exists for `safe_naive`, `safe_tuned` or any C cell, so
+   the two safe-Rust rows are bounded only by the `unsafe`/`verus` spreads
+   measured here and **the two C rows (`c-gcc-h − c-gcc` +7.15%,
+   `c-clang-h − c-clang` +18.21%) are not bounded at all** — the larger of them
+   may well survive a population, and nobody has built one. That is why the
+   whole `ns` column is withdrawn rather than filtered.
+
+### 11b. The rest of what is open
+
 - **The clang `R1h − R1` law is not solved.** §3b names the mechanism (a lost 2×
   unroll and an un-peeled `i == m` test) and gives the mnemonic attribution, but
   clang's difference is not linear in `(nline, bytes, fields)` and no
