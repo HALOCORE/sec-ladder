@@ -314,7 +314,7 @@ review lands; the argument and the arithmetic are `p07/NOTES.md` §0.
 | ID | Pattern | C bug class modelled | Verus difficulty | Status |
 |---|---|---|---|---|
 | p11 | NUL-terminated string scan (`strlen`-shaped) | missing terminator → OOB read; **the loop simply does not stop** | moderate | **done** (T033), gate `PASS` first complete run, R5 12/0, R4 == R5 `exact`. **UNREVIEWED** — findings are in its `NOTES.md` and not yet in `.memory/`. Family B's first pattern; first kernel whose loop bound is not known before the loop, and first where C's rung calls a SIMD libc routine |
-| p12 | `strcat` into fixed stack buffer | classic stack overflow | moderate | planned |
+| p12 | `strcat` into a fixed stack buffer | classic stack overflow — **and the failure mode depends on the overflow MAGNITUDE and the compiler**: +1…+8 B silent and wrong on both, +16…+48 B gcc canary / clang corrupts `main`'s locals, +64…+128 B gcc canary / clang SIGSEGV | moderate | **done** (T040), gate `PASS` first complete run, R5 15/0, R4 == R5 `exact`. **UNREVIEWED**. First bug here that is a **WRITE** safe Rust cannot express; first time `c-gcc` and `c-clang` differ in **behaviour** |
 | p13 | `strncpy`/`snprintf` truncation semantics | silent truncation, missing NUL | moderate | planned |
 | p14 | tokenizer (`strtok`-style, in-place mutation) | in-place mutation + aliasing | hard | planned |
 | p15 | UTF-8 validation + decode | malformed continuation bytes | moderate–hard | planned |

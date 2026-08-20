@@ -15,8 +15,9 @@ Rust, unsafe Rust + Verus proof — plus a sixth **R1h** hardened-C cell, across
 optimisation levels and two inline modes, and compared on assembly, executed
 instructions, timing, proof burden and trusted-base size.
 
-47 patterns are catalogued in `.memory/06-catalogue.md`. **Ten exist, all green,
-all reviewed:** p01 (calibration), p02 (first real bug), p16 (first
+47 patterns are catalogued in `.memory/06-catalogue.md`. **Eleven exist and all
+are green. Ten are reviewed** (p12 is built, green and **UNREVIEWED** — rule 9,
+its findings are in `patterns/p12-strcat-fixed/NOTES.md`)**:** p01 (calibration), p02 (first real bug), p16 (first
 data-dependent bound), p17 (the limit of memory safety), p05 (the first
 vectorised kernel), p08 (the first structural Rust win). **p07 (binary search) is
 built, green and UNREVIEWED** — per `PROTOCOL.md` rule 9 its findings are in
@@ -39,7 +40,7 @@ claim.
 ## The findings so far — this is the actual output
 
 **Numbering warning, because it has already cost an agent time.** The list below
-is **RECAP's own digest** and is numbered 1–20. `.memory/01-ladder.md` has a
+is **RECAP's own digest** and is numbered 1–21. `.memory/01-ladder.md` has a
 *different* list, numbered 1–7, one entry per pattern, and **that one is
 authoritative**. "Finding 12" means different things in the two files. When
 writing a task file, name the pattern (*"p05's causal claim"*), never the number.
@@ -614,6 +615,48 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    shipped 5 forbidden entries and 0 audited spellings — its "forbidden: 0 hits"
    was kept **by auditing nothing**. Backtick every entry you want enforced.
 
+21. **p12 — a per-byte destination check costs the bulk-copy LOWERING, not a
+   per-byte rate; and a write bug cannot have a benign perf row.** ⚠ **UNREVIEWED
+   (TASK_040).** First bug here that is a **write** safe Rust cannot express
+   (p08's shape, on length); first time **`c-gcc` and `c-clang` differ in
+   behaviour** rather than instruction count.
+
+   **The mechanism, and nobody predicted it.** The copy is a byte loop in the
+   *source* of R1/R1h/R2/R4/R5, and gcc, clang and rustc all rewrite it to
+   `memcpy` — **in every cell except R2**, the one cell with no bulk-memory call
+   at all. Isolated by four cells differing in one thing: **a per-byte bounds
+   check on the destination blocks the bulk lowering**, and moving the same check
+   to *once per string* (`copy_from_slice`) recovers it at **zero `unsafe`**. So
+   `R2 − R4` has **no per-byte law** and p12 publishes none — p02's retraction in
+   a new place.
+
+   **The capacity check's SIGN is a middle-end property**: **−4.00 Ir/string under
+   gcc, +2.00 under clang and rustc**. Swept exact over 48 blobs (pooled rank 5/5,
+   band N alone 2/5), and out of sample on `large` — 3.5× outside the band — the
+   laws predict **−125.00 / +57.00 / −26.00** against measured **−125.00 / +57.00
+   / −26.00**. `R3 − R4 = 5 − 4·K + 3·nacc + 4·[dlen mod 4 ≠ 0]`, max residual
+   0.000000. **The shipped safe rung beats the shipped unsafe rung on `large`**
+   (−26.00) — fourth instance of R4-by-permission.
+
+   ⚠ **STRUCTURAL, and it generalises to p13, p14, p23, p24, p25.** The gate
+   requires every cell *including R1* to match `model.py` on every non-adversarial
+   input. R1 omits the capacity check, so **any window where the check fires makes
+   R1 fold different bytes** — therefore **a write bug has no p11-style
+   `zerotail` row**, perf rows are forced to 100% accept, and they are
+   **rank-deficient for the "per what?" axis** by construction. The acceptance
+   axis has to live in a sweep band where R1 is unmeasurable.
+
+   **The bug's observability is a function of magnitude and compiler** (gcc here
+   defaults to `-fstack-protector-strong`, upstream clang to nothing, and
+   `build.py` passes neither): +1…+8 B **silent and wrong on both**; +16…+48 B gcc
+   canary / **clang corrupts `main`'s locals**; +64…+128 B gcc canary / clang
+   SIGSEGV. So `-fno-stack-protector` is **both a thumb on the scale and
+   unnecessary** — the silent row already exists at the shipped flags. Unsafe Rust
+   with the check deleted prints **byte-for-byte C's wrong answer**.
+   Also: **p02's own subtraction-first idiom is the DEAREST** of three routes to
+   the one `requires`, and two of the three are out of contract by p12's own
+   `required[1]`.
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds
@@ -748,7 +791,7 @@ headline. Say so in every task file.
 - **A tool that reports nothing may be a tool that cannot see.** ASan is silent
   on p08's overlap not because there is none but because fortify rewrote the call
   to `__memcpy_chk`. A gate row records `clean` for both reasons identically.
-- **Two files, two numbering schemes.** RECAP's findings are numbered 1–20,
+- **Two files, two numbering schemes.** RECAP's findings are numbered 1–21,
   `.memory/01-ladder.md`'s are 1–7. Name the pattern, never the number.
   **And one task file is misnumbered**: `.tasks/TASK_025_REVIEW.md` reviews
   **TASK_024**, not TASK_025 (there is no TASK_025). Every other
