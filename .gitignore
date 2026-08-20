@@ -17,3 +17,6 @@ __pycache__/
 # beside the full-run record rather than over it. Only the full-run record is
 # committed evidence.
 results/gate/*.partial.json
+
+# maintained by user for understanding, do not interfere with research work
+.web/
