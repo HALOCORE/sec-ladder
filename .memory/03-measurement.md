@@ -78,6 +78,32 @@ Padding-excluded = every `int3`/`nop`*/`xchg %ax,%ax` dropped, wherever it sits
 (not just the tail). `ud2` is deliberately **counted**: it is the tail of a real
 panic path, not alignment.
 
+### Attribute a surviving panic pad by DECODING its `core::panic::Location`
+
+**Built at TASK_040_REVIEW (`.temp/r40/pads.py`), and it overturned a published
+mechanism the same day.** Counting panic landing pads tells you *how many* checks
+survived; it does not tell you **which**. The `Location` struct
+(`file*, len, line, col`) is reachable from each pad, so the attribution is
+mechanical:
+
+```
+safe_naive (R2)  pads=7   ... 70:29 `buf[off+i]`   71:17 `dst[dlen]`
+safe_tuned (R3)  pads=2   50:24 `&buf[off..off+len]`   71:54 `&w[p..q]`
+   ... and IDENTICAL for two other fold spellings
+unsafe/verus     pads=0
+```
+
+**Why it matters**: p12 read "the count stays at 2 across three fold spellings" as
+*the fold's check survives*. Decoded, **neither survivor is a destination check** —
+`dst[..dlen]` contributes **zero** pads in all three, so the constant 2 is evidence
+the fold **never** contributed a pad. The opposite conclusion had already reached a
+rung's source comment and a published mechanism.
+
+**Always decode before attributing.** And note the sharper discriminator it
+produced: `dlen ≤ DST_CAP` is bounded by a **constant** LLVM can see from the
+guarded increments and is elided; `q ≤ len` is bounded by a **runtime value** and
+is not. That is not p03's locality story and does not transplant it.
+
 ### `md5_fn` moves with the SOURCE FILE'S NAME when a panic survives
 
 **Measured at TASK_037.** A kernel that retains a `panic!`/`assert!` landing pad

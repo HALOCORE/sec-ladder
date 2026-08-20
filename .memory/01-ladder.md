@@ -1458,6 +1458,56 @@ places and points at nothing. **Name the pattern, never the number.**
    `forbidden` entry moves no number and is kept only because it makes "the shift
    implements the division" a real Verus obligation.
 
+12. **p12 — the bulk-copy lowering needs BOTH ends of the copy free of a
+   per-iteration check; and "safe beats unsafe" here is a fixed-R4 artefact.**
+   (TASK_040, reviewed at TASK_040_REVIEW: two blockers, three majors — the
+   headline mechanism **confirmed and sharpened**, two published numbers moved.)
+   First bug here that is a **write** safe Rust cannot express; first time
+   `c-gcc` and `c-clang` differ in **behaviour** rather than instruction count.
+
+   **The mechanism, confirmed by the control p12 did not build.** A per-iteration
+   bounds check kills the `memcpy` lowering of a hand-written byte loop — and the
+   recovery is about **where the check is**, not about `copy_from_slice` carrying
+   its own bound: a *safe byte loop* over `&mut dst[dlen..dlen+slen]` / `&w[p..q]`,
+   with no bulk call anywhere in its source, lowers to `memcpy@GLIBC_2.14`.
+   ⚠ **But "on the destination" is not the rule.** A cell with the destination
+   *unchecked* and only the **source** per-byte checked also loses the lowering.
+   **The bulk lowering needs both ends free of a per-iteration check.**
+   Consequence: `R2 − R4` has **no per-byte law**, and the reason is precise —
+   at constant `nacc` the R2 side is **exactly linear at 24.75 Ir per copied
+   byte**; the non-law is entirely **R4's `memcpy` size dispatch**.
+
+   **The capacity check's SIGN is a middle-end property** — `−4.00` Ir/string
+   under gcc, `+2.00` under clang and rustc — and gcc's mechanism is off the
+   listing: with no dominating branch, gcc computes the copy length *and* the
+   `dlen` update **branchlessly** (`setae`, spill, two `cmove`) around an
+   unconditional `call memcpy`; the capacity test supplies the branch, the work
+   moves into a guarded out-of-line block, and the `cmove`s vanish.
+   Out of sample on `large`, 3.5× outside the band, the laws predict
+   **−125.00 / +57.00 / −26.00** against measured **−125.00 / +57.00 / −26.00**.
+
+   ⚠ **The `−26.00` is a FIXED-R4 figure and must never be quoted without that
+   word.** p12 called its pair interval degenerate on the *inference* that the
+   cheaper R4 spelling could not verify; TASK_040_REVIEW **built it** — route A,
+   plain additive test with one extra `requires` and one extra driver conjunct —
+   and it verifies **15/0, twin 18/0**, holds `R4 ≡ R5 exact`, and measures
+   **17.00 / 92.00 cheaper** than the shipped R4. On `large` that is **3.5× the
+   headline and it flips the sign**: shipped R3 is **+66.00 dearer** than the
+   cheapest-found *verifying* R4. So p12's R4 endpoint has measured width, and
+   the fourth "safe beats unsafe" instance is **fixed-R4 only**.
+
+   **And the `identity` pin's own price is 3.00 Ir per string walked**, not the
+   `+2` p12 published — that was a static `n_fn` delta wearing a per-string label.
+   Law `3.00·K − 1.00`, exact at four `K` including two its inputs never visit;
+   92.00 Ir/call on `large`.
+
+   The bug's observability is a function of **magnitude and compiler** (gcc here
+   defaults to `-fstack-protector-strong`, upstream clang to nothing, and
+   `build.py` passes neither): +1…+8 B **silent and wrong on both**; gcc fires the
+   canary from **+12**; clang's loop is destroyed +12…+48 and SIGSEGVs from +64. So
+   `-fno-stack-protector` is **both a thumb on the scale and unnecessary**.
+   Unsafe Rust with the check deleted prints **byte-for-byte C's wrong answer**.
+
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how
 much proof keeps that base sound, and which C patterns resist this treatment.*

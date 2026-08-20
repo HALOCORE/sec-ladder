@@ -3,6 +3,47 @@
 These rules exist to stop the compiler from evaluating the benchmark away, and to
 keep the five rungs comparable. A cell that breaks one of them is invalid data.
 
+## A WRITE bug forces the adversarial row; it does NOT force the perf row
+
+**p12, corrected at TASK_040_REVIEW — the general form p12 shipped is refuted by a
+built row.** Land the first half; the second half is a design choice.
+
+> **Forced, and with no read analogue:** for a write bug whose guard *is* the
+> destination's own bound, **every input on which the guard fires is an input on
+> which the unguarded rung executes an out-of-bounds store.** A read bug can
+> return the right answer from the wrong place; a write bug cannot un-write.
+
+> **NOT forced:** whether such an input can *also* be a checksum-agreeing perf
+> row. That depends on whether the checksum is a function of state the OOB store
+> cannot reach.
+
+p12's is not — it folds `dlen` and `dst[0..dlen]`, and its own task file mandated
+that. **The counter-design was built and measured**: zero-initialise the
+destination, fold it at **fixed extent** (`dst[0..CAP]`), drop `dlen` from the
+result, and put the rejection point exactly at capacity. Checked and unchecked
+rungs then print **identical** checksums at every `n_iters` (1…1000), and ASan
+confirms the bug still fires:
+
+```
+kernel_capfold    (capacity check DELETED)  9617137326358488304
+kernel_capfold_h  (capacity check KEPT)     9617137326358488304   IDENTICAL
+runtime error: index 128 out of bounds for type 'uint8_t [128]'
+AddressSanitizer: stack-buffer-overflow  WRITE of size 1
+```
+
+⚠ **The price is that the perf row executes UB on every call.** It is only usable
+while the overflow stays in the *silent* regime (≤ +8 bytes on this box, both
+compilers), and that is a property of the frame layout, not a guarantee. **A
+pattern built this way must pin the overflow at ≤ +8, assert the marginal is
+non-zero, and say in `spec.md` that the R1 row executes UB by construction.**
+Relevant to **p13, p14, p23, p24, p25**.
+
+**Two scope corrections while you are here** (both measured): the gate's
+checksum-agreement requirement binds the **matrix** inputs only —
+`check.py:469` and `measure.py:64` drop `sweep-*` entirely, so a sweep band is
+never checksum-checked. And where an unguarded rung is excluded from a sweep band,
+check *why*: on p12's band A it is the **crash**, not the checksum.
+
 ## The gate's threat model — settled, do not re-litigate
 
 **The threat is an honest mistake, not a malicious pattern author.** Nobody is
