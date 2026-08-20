@@ -17,11 +17,13 @@ this box is reference; this box is what to *do*.
 
 **The three things most likely to waste your time**, all learned the hard way:
 
-1. **Ask to be corrected, not obeyed.** **Fifty-five agents have contradicted the
-   manager with a measurement and all fifty-five were right.** Put your least
+1. **Ask to be corrected, not obeyed.** **Every agent that has contradicted the
+   manager with a measurement has been right** — p13's engineer did it six times
+   in one task, then six more while landing the review of it. Put your least
    certain call in every task file *by name* and ask for the measurement. The
    single highest-yield sentence in this project's history is some version of
-   "I think X; prove me wrong."
+   "I think X; prove me wrong." (Running count: the closing paragraph of the
+   newest `.tasks/TASK_NNN*.md`, and nowhere else — two copies went stale here.)
 2. **A green gate is evidence about the gate.** Reviews have found real defects
    past a fully green run repeatedly — including in `.memory/` text written one
    task earlier, and in the manager's own tooling.
@@ -96,8 +98,13 @@ Cross-cutting entries exist only here: **14** (every rung is a spelling), **16**
 (code layout / the 32-byte fetch grid), **20** and **24** (measurement and
 infrastructure defects), **22** (decode panic pads).
 
+⚠ **AND THERE IS NOW A LIVE COLLISION: "finding 14".** In
+`.memory/01-ladder.md` it is **p13**; in this file it is the cross-cutting
+*"every rung is a spelling"* entry. Both are cited often and they are
+**unrelated**. The same trap exists at "13" (ladder = p04, here = p08).
+
 **When you write a task file, name the pattern — *"p05's causal claim"* — never
-the number.**
+the number.** Two task files have already sent an agent to the wrong finding.
 
 1. **A Verus proof costs exactly zero instructions.** The proven binary is
    byte-identical to the unproven one; ghost code fully erases. Verified on raw
@@ -1101,7 +1108,7 @@ and both copies went stale (13 and 7 against the task files' 55).
 
 ## Priority — read this before planning
 
-**Forty-two tasks in, 12 of 47 patterns exist**, and the ratio is the thing to
+**Forty-six tasks in, 13 of 47 patterns exist**, and the ratio is the thing to
 watch. Six tasks went to gate hardening before the user called it; **T015–028 —
 thirteen consecutive tasks — went to the spelling problem** and produced no new
 pattern. Both arcs paid for themselves, and neither was on anyone's plan. But the
@@ -1110,14 +1117,18 @@ wrong than at producing new ones**, and the correction is simple: **alternate
 build → review, and make a methodology proposal argue for itself against a
 pattern.**
 
-**Since T033 the loop has held** — p11, p03, p09, p12, p04 each built and reviewed
-in two tasks, every one green on its first complete run, and every one produced a
+**Since T033 the loop has held** — p11, p03, p09, p12, p04, p13 each built and
+reviewed, every one green on its first complete run, and every one produced a
 finding no one predicted. That is the working mode; do not drift off it.
+⚠ **The last two each needed a THIRD task to land their corrections** (T044,
+T046), and both were worth it: p04's review moved its headline number and p13's
+reversed its headline's sign. **Budget build → review → land, not build →
+review.**
 
 The gate's threat model is **honest mistake, not malicious author**
 (`.memory/02-bench-rules.md`, top section, with the residuals deliberately left
 open). **New gate work must pass "could this happen by accident?" first** — and
-`check.py` is ~4900 lines against 12 patterns, so the next gate proposal should
+`check.py` is ~5040 lines against 13 patterns, so the next gate proposal should
 have to beat that ratio.
 
 **Review each pattern once; do not review each fix to each check.** The two
@@ -1126,8 +1137,8 @@ engineer *flagged against itself*, and a mechanism asserted without a control.
 
 ## Immediate queue
 
-**The next task is `TASK_044` (p04's corrections), then `TASK_043` (p13).** Both
-are written. See the START HERE box; this section is the standing backlog.
+**The next task is `TASK_047` — p06.** See the START HERE box; this section is
+the standing backlog, not the next action.
 
 ### Owed, in priority order
 
@@ -1170,6 +1181,26 @@ are written. See the START HERE box; this section is the standing backlog.
    `jcc32`; **this one is neither**, and it is the first counterexample to that.
    It does not move a published verdict (the mode-matched `R2 − R4` figures agree
    with the shipped ones), so it is a curiosity — but it is a *named* one.
+8. **p13's `controls/library_axis.py` deliberately keeps the OLD narrow fold**,
+   because `strlcpy`/`snprintf` do not zero-fill and a full-extent fold would
+   make the six routines print six checksums for a non-cost reason. Its *levels*
+   are therefore not comparable with p13's §4; every *difference* inside it is.
+   Documented in the control — but it is the only place in the tree where two
+   folds coexist, so check it before quoting across the boundary.
+9. **p13's corrected wall-clock ratios (+7.64 / −5.39) do not clear the ±9-point
+   bar**, so its quotable timing evidence is the raw *level* under the
+   identical-copy protocol. Not a defect — the rule working — but it means p13
+   has no corrected-ratio row and someone will look for one.
+10. **`check.py::spelling_matches` does not blank `#[cfg(slb_twin)]` bodies**, so
+   a Verus rung's idiom audit can be satisfied by code no build contains
+   (constructed instance `False → True`). **Blast radius on the shipped tree is
+   0 of 15 pins**, so it is hygiene, not a live defect — and it must pass "could
+   this happen by accident?" before it becomes gate work.
+11. **A length-heterogeneous sweep band is what a step-basis test actually
+   needs**, and no pattern has one. p13's fit blobs are all length-homogeneous,
+   which makes every natural step basis *singular* — so p13 could not have
+   fitted the step law even if one exists. Whoever next hits a size-dispatched
+   library routine will need this.
 
 ### Deferred with a stated reason
 
@@ -1194,22 +1225,26 @@ are written. See the START HERE box; this section is the standing backlog.
 
 ## State
 
-**Verified at this handoff** — re-run these three before trusting anything below:
+**Verified at this handoff** — re-run these four before trusting anything below:
 
 ```bash
-harness/measure.py --check-stale          # -> 24 record(s) examined, 0 STALE
-harness/check.py p04                      # or any pattern; all 12 are green
+harness/measure.py --check-stale          # -> 26 record(s) examined, 0 STALE
+harness/check.py p13                      # or any pattern; all 13 are green
 grep -rho '\.tasks/TASK_[A-Za-z0-9_]*\.md' .memory/ .tasks/ RECAP.md \
   | sort -u | while read f; do [ -e "$f" ] || echo "MISSING: $f"; done
+# the shared named-spelling paragraph must be ONE hash across all patterns:
+python3 -c "import hashlib,glob;print({hashlib.sha256(open(f).read()[open(f).read().find('NAMED-SPELLING STANDARD'):open(f).read().find('p01 and p08 neither')+19].encode()).hexdigest()[:12] for f in glob.glob('patterns/*/spec.md')})"
 ```
 
-- **12 patterns, all green**: p01 `PASS-WITH-BLOCKED-ROWS` (Miri policy on its
+- **13 patterns, all green**: p01 `PASS-WITH-BLOCKED-ROWS` (Miri policy on its
   `large.bin`, documented, not a regression); p02, p03, p04, p05, p07, p08, p09,
-  p11, p12, p16, p17 `PASS`. **24 records, 0 stale.**
-- **The shared named-spelling paragraph is byte-identical across all twelve**
-  `idiom.why` blocks — `sha c3d36c92a28a` over the span from
-  `NAMED-SPELLING STANDARD` to `p01 and p08 neither`. That invariant is cheap to
-  check and has caught real drift; keep checking it.
+  p11, p12, p13, p16, p17 `PASS`. **26 records, 0 stale.**
+- **The shared named-spelling paragraph is byte-identical across all thirteen**
+  `idiom.why` blocks — currently one hash, `59748cce2db5`, 11 003 bytes.
+  ⚠ **The value depends on how you slice the span**, so trust the *command*
+  above (all patterns equal) and not a copied constant: this line previously
+  recorded `c3d36c92a28a` for the same intact invariant, measured over a span one
+  byte longer. **What matters is that the set has size 1.**
 - `harness/` — `check.py` (17 stages), `asm.py`, `dloop.py`, `vparse.py`,
   `build.py`, `measure.py` (now writes `source_sha256` + `input_sha256` and has
   `--check-stale`), `report.py`, `fixture.py`. `common/layout/` ships the layout
