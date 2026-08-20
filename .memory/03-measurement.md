@@ -707,6 +707,17 @@ not the tree: an independent re-time of the same binaries with the shipped
 refuted by a noisy session — only left unresolved**, which is the state
 `p16/README.md`'s "all 16 `-O3` cells within 1.3%" is now in.
 
+### `common/layout/order.py` appends `.bin` — and a nonexistent file reports a clean null
+
+**TASK_042.** `--input small.bin` silently times `small.bin.bin`. Every rung then
+measures ~4.5 ms of process startup and nothing else, and `R2 − R4` reads
+**+0.15%** — a tidy, publishable-looking null produced by a file that does not
+exist. It exits 3, which is easy to miss in a loop.
+
+**Pass the stem (`--input small`), and cross-check any `ns` null against the `Ir`
+column before believing it.** That cross-check is what caught this one: +141% `Ir`
+against a +0.15% `ns` null is not a conversion factor, it is a broken measurement.
+
 ### Interleave by CELL, never by block — it alone flipped a sign
 
 ### Interleave by CELL, never by block — it alone flipped a sign

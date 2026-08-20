@@ -238,9 +238,34 @@ compiler flag produced, and it is available on any data-dependent kernel.
      and let the manager sweep.
 
    The 2026-08-18 sweep is recorded in `.temp/CLEANUP-MANIFEST-2026-08-18.txt`
-   (path, size and mime of all 10,567 deleted files). The classification rule it
-   used is mechanical and worth reusing: `file --mime-type` every file under
-   `.temp/`, delete the non-`text/*` ones, keep everything else.
+   (path, size and mime of all 10,567 deleted files).
+
+   ⚠ **The rule as first written here was WRONG AND DESTRUCTIVE, and it did not
+   describe the sweep that was actually run** (found at TASK_042, which lost three
+   evidence files to it). It said *"`file --mime-type` every file, delete the
+   non-`text/*` ones"* — but **`file` reports JSON as `application/json`**, which
+   is not `text/*`:
+
+   ```
+   $ file --mime-type -N results/gate/p04-ring-buffer.json
+   results/gate/p04-ring-buffer.json: application/json
+   ```
+
+   That rule deletes **every `results/*.json` and every gate record** it is pointed
+   at. The 2026-08-18 sweep survived only because the script actually used a
+   **deny-list** — `application/x-pie-executable`, `application/octet-stream`,
+   `application/x-bytecode.python`, `application/x-executable`,
+   `application/x-object`, `image/x-sony-tim` — and kept everything else. **The
+   documented rule and the executed rule were different**, which is the failure
+   mode this project keeps finding one level up.
+
+   **Use an explicit KEEP list by extension**, which cannot fail open:
+
+   ```bash
+   # keep .json .log .md .py .rs .c .h .txt .sh .toml ; delete the rest
+   ```
+
+   and dry-run it against a manifest before deleting anything.
 
    **Not covered by this, deliberately**: `patterns/*/inputs/*.bin` (p05 ~189 MB,
    p08 ~33 MB) are gitignored and equally regenerable, but they live outside
