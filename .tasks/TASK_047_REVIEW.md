@@ -7,7 +7,11 @@ rules), then **`.tasks/TASK_047.md`** (what was asked) and
 `patterns/p06-rotate/NOTES.md` and `spec.md` in full, then `.memory/01-ladder.md`
 findings 3, 5, 9, 11, 12 and **the direction-test "IT FIRED" block**,
 `.memory/02-bench-rules.md`'s threshold table, `.memory/03-measurement.md`,
-`.memory/04-verus.md`, `.memory/05-layout.md` (**finding 16 — the layout modes**).
+`.memory/04-verus.md`, and **the layout modes at `.memory/03-measurement.md:789-921`**
+(`win32` / `jcc32`; they are `RECAP.md`'s "finding 16" — ⚠ this line first cited
+them to `.memory/05-layout.md`, which is repo layout and naming and contains no
+numbered findings at all: the 27th instance of the trap both numbering warnings
+exist to prevent, committed by the manager who wrote them).
 
 ⚠ **The manager designed p06's kernel, its wire format, its bug and its two
 regimes.** PROTOCOL rule 3: designer-validates-own-design is the configuration

@@ -345,10 +345,27 @@ is a much stronger claim than any p01 could produce.
 
 ## The structural findings (established by `pilot/`, do not re-litigate)
 
-**Numbering warning — 26 stale citations exist.** The findings in *this* file are
-numbered **1–7, one per pattern**. `RECAP.md` carries a *different* list, its own
-digest, numbered **1–14**. "`.memory/01-ladder.md` finding 14" appears in 26
-places and points at nothing. **Name the pattern, never the number.**
+**Numbering warning. `RECAP.md` carries a DIFFERENT list — its own digest — and
+the two schemes have collided.** The findings in *this* file are numbered **one
+per pattern**; `RECAP.md`'s digest is longer and includes cross-cutting entries
+that do not exist here. **Name the pattern, never the number.**
+
+⚠ **Do not trust a written range here or in `RECAP.md`** — this warning carried
+`1–7` and `RECAP` carried `1–12` while the true counts were 14 and 25, so *both*
+guards against citation drift had drifted, in opposite directions, and each
+asserted the other's number. Print them instead:
+
+```bash
+grep -c '^[0-9]\+\. \*\*' .memory/01-ladder.md   # this file's findings (+2: the
+                                                 # two at the top are a separate list)
+awk 'NR>109 && NR<930 && /^[0-9]+\. \*\*/' RECAP.md | tail -1   # RECAP's highest
+```
+
+⚠ **AND THE COLLISION IS LIVE, not hypothetical: "finding 14" is p13 here and
+*"every rung is a spelling"* in `RECAP.md`.** Both are cited often and they are
+unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
+(here = p12, there = p05). An earlier version of this paragraph claimed
+`.memory/01-ladder.md` had no finding 14 at all; it does.
 
 
 1. **A Verus proof costs zero instructions.** Ghost code, `requires`, `ensures`,

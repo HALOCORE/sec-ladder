@@ -75,9 +75,15 @@ re-measurement.
 ## The findings so far — this is the actual output
 
 **TWO numbering schemes — here is the map, so you never have to guess.** This
-file's list is **RECAP's own digest, 1–24**. `.memory/01-ladder.md` has a
-*different* list, **1–12, one entry per pattern**, and **that one is
-authoritative**. They were confused repeatedly before this table existed.
+file's list is **RECAP's own digest**; `.memory/01-ladder.md` has a *different*
+list, **one entry per pattern**, and **that one is authoritative**. They were
+confused repeatedly before this table existed.
+
+⚠ **The ranges that used to be written here were wrong** — this file claimed
+`1–24` for itself and `1–12` for the ladder when the true counts were 25 and 14,
+and the ladder's own warning claimed the mirror image. **Both guards against
+citation drift had drifted.** Print the counts rather than trusting a constant;
+the commands are in `.memory/01-ladder.md`'s numbering warning.
 
 | pattern | `.memory/01-ladder.md` | RECAP (this file) |
 |---|---|---|
