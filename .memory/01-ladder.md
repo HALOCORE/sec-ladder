@@ -2001,7 +2001,13 @@ Flags:
   (13.3.0) and `~/tools/llvm/bin/clang` (22.1.6) — clang is the same-backend
   baseline and is mandatory for any C-vs-Rust claim; gcc is the "what a distro
   ships" baseline.
-- **R2–R4**: `rustc -C opt-level=0 -C debug-assertions=on` / `-C opt-level=3 -C debug-assertions=off`.
+- **R2–R4**: `rustc -C opt-level=0 -C debug-assertions=off` / `-C opt-level=3 -C
+  debug-assertions=off`. ⚠ **This line said `debug-assertions=on` for the `O0`
+  column until TASK_051 and that was wrong** — it contradicted `build.py`
+  (`OPTS = ["O0", "O3"]`, and `rust_flags` gives `O0` **off**) and the "Two
+  traps" paragraph ten lines below, which is the one that is right.
+  **`debug-assertions=on` is the separate `O0d` axis, is not in the default 24
+  cells, and has never been measured on any pattern** (p01 `NOTES.md:697`).
 - **R5**: `./verus_run.py --compile verus.rs -o <out> -C opt-level=N ...` (same flags as R2–R4).
 - `-C codegen-units=1` everywhere for reproducible codegen.
 - `panic=unwind` is the default. `panic=abort` is a **secondary axis** (it deletes
