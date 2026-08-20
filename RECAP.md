@@ -15,8 +15,9 @@ Rust, unsafe Rust + Verus proof — plus a sixth **R1h** hardened-C cell, across
 optimisation levels and two inline modes, and compared on assembly, executed
 instructions, timing, proof burden and trusted-base size.
 
-47 patterns are catalogued in `.memory/06-catalogue.md`. **Eleven exist, all
-green, all reviewed:** p01 (calibration), p02 (first real bug), p16 (first
+47 patterns are catalogued in `.memory/06-catalogue.md`. **Twelve exist and all
+are green. Eleven are reviewed** (p04 is built, green and **UNREVIEWED** — rule 9,
+its findings are in `patterns/p04-ring-buffer/NOTES.md`)**:** p01 (calibration), p02 (first real bug), p16 (first
 data-dependent bound), p17 (the limit of memory safety), p05 (the first
 vectorised kernel), p08 (the first structural Rust win). **p07 (binary search) is
 built, green and UNREVIEWED** — per `PROTOCOL.md` rule 9 its findings are in
@@ -39,7 +40,7 @@ claim.
 ## The findings so far — this is the actual output
 
 **Numbering warning, because it has already cost an agent time.** The list below
-is **RECAP's own digest** and is numbered 1–22. `.memory/01-ladder.md` has a
+is **RECAP's own digest** and is numbered 1–24. `.memory/01-ladder.md` has a
 *different* list, numbered 1–7, one entry per pattern, and **that one is
 authoritative**. "Finding 12" means different things in the two files. When
 writing a task file, name the pattern (*"p05's causal claim"*), never the number.
@@ -688,6 +689,60 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    `R_X86_64_RELATIVE` addend, and prints the guarded expression with a caret).
    See `.memory/03-measurement.md`.
 
+23. **p04 — what LLVM carries around a loop-carried phi is known BITS, not a
+   range; and the bug hides in exactly the state the proof does not need.**
+   ⚠ **UNREVIEWED (TASK_042).**
+
+   **The three-operator series closes.** p05 asked whether a bound survives a
+   **multiply**, p09 a **shift** (answer: the composition through the multiply is
+   what fails), p04 a **modulus** — and at a power of two **the bound survives**:
+   the safe ring access and the `get_unchecked` one are **byte-identical**
+   (`md5_fn_norel d0f2150795bb`, `n_fn 86`), with pads **decoded** rather than
+   counted — R3's only pad is the window reslice, ring pads are **zero** in every
+   rung. Mechanism off the listing: `inc %r14d ; and $0x3f,%r14d`. **A mask fixes
+   BITS, and known bits survive a loop-carried phi where a RANGE does not.** That
+   is the unifying statement the series was after.
+   **`RING_CAP = 60` is the largest single effect**: at matched execution counts
+   `R3 − R4` goes **+5 → +479**, and p03's dead clamp takes it back **exactly**.
+   Three middle-ends, both directions, byte-identical on the C side at 64 — **the
+   operator, not safe Rust.**
+
+   **And the bug is invisible to memory safety — BOTH guards.** `m_nofull_msonly`
+   and `m_noempty_msonly` both verify **9/0** with the functional spec stripped,
+   against five positive controls (three `assert(false)` placements, an
+   off-by-one, a no-mod variant) that all correctly fail. Second instance of
+   finding 19, now on a **container** rather than an index: drop the fullness
+   check and a push overwrites the oldest element with **no OOB access at all**.
+   ⚠ **The unification is the finding, and it was not asked for.** The R5
+   invariant is **not** relational — the memory-safety half is two *independent*
+   one-variable clauses (`head < CAP`, `tail < CAP`) and Z3 takes the file **first
+   try, no lemma**. So: **the relation between the cursors is exactly the part of
+   the state the memory-safety obligation does not need, which is WHY deleting
+   either guard is invisible to it.** Not two results — one.
+
+   Swept laws over 99 blobs, max residual 0.0000, pooled rank **5/5** — and
+   **every pair of bands is ≤ 4/5**, so the two bands the task specified would not
+   have identified the design (the engineer added two more). `R2 − R3 = 20.00000`
+   per operation `+ 11` is **p03's law exactly, on a different kernel**. The
+   cheapest-found in-contract R3 is the **shipped rung** on both blobs — a first.
+   Pair interval **degenerate**, the opposite of p03, for a stated reason: there
+   is no fact to seed.
+
+24. **Two defects in my own infrastructure, both found by a pattern task.**
+   **(a) `.memory/00-environment.md` constraint 6's documented sweep rule was
+   destructive and never described the sweep that ran.** *"delete the non-`text/*`
+   ones"* deletes every `.json` — `file` reports JSON as `application/json` — so
+   it would delete **every gate record it is pointed at**. The actual 2026-08-18
+   script used a **deny-list** of six binary mime types; documentation and
+   execution had diverged. Replaced with a keep-list by extension, which cannot
+   fail open. It cost p04's engineer three evidence files.
+   **(b) `common/layout/order.py` appends `.bin`**, so `--input small.bin` times
+   `small.bin.bin`, every rung measures process startup, and `R2 − R4` reads
+   **+0.15%** — a clean publishable-looking null from a file that does not exist,
+   exit 3. **Caught only by cross-checking the `Ir` column**, which is now the
+   rule: +141% `Ir` against a +0.15% `ns` null is not a conversion factor, it is a
+   broken measurement.
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds
@@ -822,7 +877,7 @@ headline. Say so in every task file.
 - **A tool that reports nothing may be a tool that cannot see.** ASan is silent
   on p08's overlap not because there is none but because fortify rewrote the call
   to `__memcpy_chk`. A gate row records `clean` for both reasons identically.
-- **Two files, two numbering schemes.** RECAP's findings are numbered 1–22,
+- **Two files, two numbering schemes.** RECAP's findings are numbered 1–24,
   `.memory/01-ladder.md`'s are 1–7. Name the pattern, never the number.
   **And one task file is misnumbered**: `.tasks/TASK_025_REVIEW.md` reviews
   **TASK_024**, not TASK_025 (there is no TASK_025). Every other
