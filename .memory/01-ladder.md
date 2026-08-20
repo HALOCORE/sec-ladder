@@ -1810,6 +1810,92 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
    residuals are **estimator-dependent by ~3×** (exact interpolation 115/888
    against OLS 37/443).
 
+   ⚠ **Extended at TASK_048: the R4-chained-to-the-prover mechanism transmits the
+   verifier's EXPRESSIVENESS limits into R4's *source*, not only its
+   performance.** p06 could not use `u32` elements at all — every `u8 → u32` LE
+   route (`chunks_exact`, `try_into`, `from_le_bytes`) is `is not supported`, so
+   with `u32` R4 could not have had a verifying twin *and* one load spelling
+   across all rungs. The wire format changed to accommodate the prover. **Look
+   for this before blaming a design choice on the kernel** — and, per the
+   direction-test block above, **run `./verus_run.py` before blaming the prover
+   for anything.**
+
+15. **p06 — the `Ir` column is SIGN-WRONG on a safety line that is a division,
+   and the tuned safe rung published a point instead of its class.**
+   PROVISIONAL in part: items marked ⊘ landed at TASK_048 and have not been
+   through a second review.
+
+   An in-place rotate of a fixed `[u8; 64]` scratch by an attacker-supplied `r`;
+   the line C omits is `r %= m`. **A `div` is 1.00 `Ir` on both compilers and
+   ~20–40 cycles**, so this is the first pattern built to make the primary metric
+   understate a tax — and it does worse than that. **On clang, hardening
+   *removes* instructions: `R1h − R1` is −45.00 / −108.00 `Ir` and +21.78 /
+   +15.35 ns.** The mechanism is p09's lost load-merge and an `and` control with
+   no divide isolates it at **−12.00 Ir/record**: reducing `r` proves `r < 64`,
+   the value stays 32-bit, and clang's 7-instruction LE decode collapses to one
+   `mov`. **Finding 6 — `Ir` and wall clock disagreeing in direction — now has a
+   designed instance with a named mechanism, not an accidental one.**
+
+   **The wall-clock claim survived the strongest available attack.** The review
+   built the C-cell layout population that was missing (30 layouts/cell, both
+   `%32` residues, every loop's `win32`/`jcc32` flips): **`P(A>B) = 900/900`** on
+   both compilers and both inputs, mode-matched, no sign flip, worst-case pair
+   still +15.50% / +53.68%. A `d_cmp` control puts **91.6% of gcc's +88.08 ns on
+   the divide**. ⚠ But **23% of gcc's `+8.00·nrec` `Ir` law is EXECUTED
+   ALIGNMENT PADDING** and only 1.000 of it is the divide
+   (`.memory/03-measurement.md` trap 3).
+
+   ⊘ **Quote the cheapest in-contract R3, and p06 is the FOURTH pattern to get
+   this wrong** (after p02, p16, p05). The shipped R3 is `2.00000 Ir/byte`; the
+   in-contract, zero-`unsafe` control `c_idx` is **0.00000 Ir/byte, 105 flat**.
+   **None of the 2.00 is a bounds check** — it is the `zip`/`Rev` adaptor's two
+   exhaustion tests per item, and `pads.py` gives both spellings **identical 11
+   panic pads at identical `line:col`**. The "R3 dearer than R2" inversion is
+   therefore `small`-only and spelling-specific, and **finding 3 needed no
+   correction: it says write two in-contract R3 spellings and quote the cheaper,
+   and p06 simply did not.**
+
+   ⊘ **The per-record law, solved with zero parameters, period 4 (not 8), exact
+   on 45/45 `m` ∈ 4…48:**
+   `R3ship − R4 = 2·Σm + nrec·[swap(m mod 2) + fold(m mod 4)] + 1`, with
+   `swap(even) = 19`, `swap(odd) = 1`, `fold(k) = k + [k>0]`. Every fold is 4×
+   unrolled with a scalar epilogue of exactly `m mod 4`; the `[k>0]` term is a
+   **single executed `.p2align` nop**.
+
+   **And the swap law itself is parameter-free**: `swaps(m,r) = m + [m even AND
+   r odd]`, because a reverse of a half-open range of length `L` runs
+   `ceil(L/2)` iterations. So the rotate amount **does** enter the cost — the
+   manager predicted no `r` term and the prescribed falsifier would have fired on
+   a correct build.
+
+   **The two regimes, and p17's limit arriving on a WRITE.** For `m < r ≤ SCR`
+   the unreduced rotate stays inside the scratch: C, safe Rust, unsafe Rust and
+   the proved rung **all print the same wrong answer**, exit 0, ASan and UBSan
+   clean — and three delete-the-check controls, including one with zero `unsafe`,
+   print it too. Only at `r > SCR` does it leave the array, where the safe
+   controls panic and C walks p12's magnitude ladder (silent / canary 134 /
+   SIGSEGV 139). ⚠ **The boundary is `r > SCR`, not `r ≥ SCR`.**
+
+   ⊘ **`_msonly` cannot separate them, and the reason is general**: deleting the
+   check and weakening the spec to memory-safety-only **still fails to verify**,
+   because a proof quantifies over all inputs and regime 2 is genuinely unsafe.
+   **The separation needs a *program* change, not a *spec* change** — p17's
+   control-2 lesson, second instance. `r %= SCR` is memory-safe on every input
+   and wrong on exactly regime 1.
+
+   ⊘ **"The twin is the sole catcher" is false here and in p12.** p06's
+   `b_weakreq` also fails the **contract pin** (2 clause diffs under `check.py`'s
+   own comparator) and `b_scrmod_msonly` also breaks the **identity pin**
+   (`n_fn 174/166` vs 208). **The claim is *Verus-level* sole catcher.** p12's
+   `NOTES.md:1046-1049` is wrong the same way and is **not yet fixed**; p02's
+   equivalent is a clean negative.
+
+   Sound: Verus **17/0 first attempt** (twin 22/0), `R4 ≡ R5 exact`, then
+   **18/0 (twin 23/0) after TASK_048 removed a trusted item at zero `-O3` cost**
+   — TCB 6 → 5. ⚠ It was **not** free at `-O0`: `identity` dropped to `differ`
+   and the gate caught it; the repair is giving **R4 the same three exec lines**,
+   `+3 static instructions in R4's -O0 kernel`, R2/R3 unaffected.
+
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how
 much proof keeps that base sound, and which C patterns resist this treatment.*

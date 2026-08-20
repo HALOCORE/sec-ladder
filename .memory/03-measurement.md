@@ -237,6 +237,22 @@ published numbers. `TOOLCHAIN.md` had `awk '/kernel>:/,/^$/'`, which does reprod
    a raw count and a **padding-excluded** count; the raw one overstates the
    safe-vs-unsafe gap (57 vs 37 raw → 46 vs 33 real).
 
+   ⚠ **This entry was STATIC-ONLY until TASK_048, and the dynamic case is worse:
+   alignment padding inside a hot loop is EXECUTED, so it lands in `Ir` and
+   therefore inside a published law.** On p06, gcc's `R1h − R1 = +8.00·nrec`
+   decomposes as `divq +1.000` + **`nopl`/`nop` +1.833** + `movzbl +4.000` +
+   `movb +2.000` + `xorl +0.917` + `movq +0.167` − `cmpq 1.000` − `jae 1.000`:
+   **23% of the law is executed padding, and only 1.000 of it is the safety line
+   the law is named after.** `-fno-align-loops` moves it `+95.00 → +73.00`.
+   It happened **twice on the same pattern** — p06's `R3 − R4` per-record term
+   carries a `[k > 0]` indicator that is a single executed `.p2align` nop sitting
+   immediately before the fold epilogue's back-edge target.
+
+   **So: before naming a per-iteration `Ir` law after a mechanism, disassemble
+   and attribute it mnemonic by mnemonic.** A padding-excluded *static* count
+   does not protect a *dynamic* law, and the coefficient will look like a clean
+   small integer either way.
+
 ### Static count is not a cost model
 
 Reported at TASK_001: gcc's 32-instruction pilot kernel **executes 125,019** Ir at

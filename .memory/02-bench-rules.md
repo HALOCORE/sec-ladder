@@ -36,6 +36,7 @@ patterns behave exactly like read patterns.**
 | p12, **p23**, **p25** | `dlen + slen <= DST_CAP`, `i < len`, `len < cap` | **yes** |
 | **p13** | caller-supplied `n` — `n < sizeof dst` is the *correct* case; its bug is the missing NUL and the OOB **read** downstream | **no** |
 | **p24** | `child < n`, a live length below capacity — firing means logically wrong, still in bounds | **no** |
+| **p06** | `min(nelem, SCR)` — a threshold *inside* the destination's extent, so guard-fires and UB are independent | **no** — and this is the test's **first use at build time**, on p06 (T047), rather than as a retrospective classification |
 | **p14** | a delimiter is not a bound; the sentence reaches its scan's `i < len` | not as stated |
 
 > **NOT forced:** whether such an input can *also* be a checksum-agreeing perf

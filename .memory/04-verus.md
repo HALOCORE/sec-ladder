@@ -130,9 +130,35 @@ body is trusted. This is why Miri is mandatory for any pattern with a trusted
 item, and it is the sharpest justification that rule has.
 
 **An `external_body` item need not contain `unsafe`.** p08's `copy_in` wraps a
-perfectly safe `copy_from_slice`; it is trusted because vstd has no spec for it,
-not because it is dangerous. The TCB tally must count it anyway — "trusted"
-means "unchecked by the verifier", not "unsafe".
+perfectly safe `copy_from_slice`; it is trusted because the verifier does not
+check its body, not because it is dangerous. The TCB tally must count it anyway —
+"trusted" means "unchecked by the verifier", not "unsafe".
+
+⚠ **The reason given here until TASK_048 — *"vstd has no spec for
+`copy_from_slice`"* — was FALSE, and it had stood since TASK_004.** The pinned
+vstd specifies it at `vstd/std_specs/slice.rs:205`
+(`requires old(dst)@.len() == src@.len()`, `ensures final(dst)@ == src@`), along
+with `split_at_mut` (`:185`), `copy_within` (`:235`), and the write-back for the
+array→slice coercion (`vstd/array.rs:175 ref_mut_array_unsizing_coercion`, which
+**Verus inserts itself and which never appears in source**). A bulk copy can be
+verified with no trusted wrapper at all: p06 removed one and shipped
+`18 verified, 0 errors` with **byte-identical `-O3` machine code**.
+
+**The rule that replaces it, and it is about R4, not about the copy:**
+
+> A bulk copy needs a trusted wrapper when **R4's spelling** is unsupported, not
+> when the copy is. The `identity` pin forces R5 to match R4's bytes, so an R4
+> written with `copy_nonoverlapping` / `as_ptr` / `as_mut_ptr` / `ptr::add` —
+> **all `is not supported` at the pinned vstd** — drags the wrapper back in even
+> though the *same copy* spelled `copy_from_slice` verifies clean.
+
+Measured on both sides at TASK_048. **p06's R4 already spelled
+`copy_from_slice`, so its wrapper came out at zero cost (TCB 6 → 5). p02's R4
+spells `copy_nonoverlapping`, so removing its wrapper moves codegen 72/70 → 81/79,
+`+5.00 Ir/call` flat, one extra panic pad — it BREAKS `identity: exact`, and p02
+keeps the wrapper with the price recorded** (`p02/NOTES.md` §5b). Before
+recording "no spec exists", check `~/tools/verus/vstd/std_specs/` — this claim
+propagated into two patterns' source comments and one `.memory/` file.
 
 **Count every `external_body` item, not just the interesting one.** The pilot was
 published as "TCB: one 3-line `get_unchecked` wrapper"; the true tally is **3 items**
@@ -141,6 +167,49 @@ the pilot's fatal defect hid in plain sight: `main` being `external_body` is exa
 why no precondition was ever discharged (`.memory/02-bench-rules.md`, rule 2). An
 `external_body` on a *driver* is far more dangerous than one on a leaf helper,
 because it deletes call-site obligations wholesale. List them individually.
+
+### How the TCB column is counted, and whether it can be gamed (TASK_048)
+
+**PROVISIONAL — the census and the classification are measured; the accounting
+decision itself has not yet been through a review.**
+
+The question that forced this: removing a trusted wrapper does not always delete
+the trust, it can **relocate it into vstd**. Trusted-base size is one of the five
+axes this project compares, so if a pattern can shrink its published TCB by
+picking a spelling whose axioms live upstream, the column means something other
+than what it says.
+
+⚠ **The manager proposed reporting two numbers — author-written trusted items,
+and "vstd assumed specifications relied upon". That was refuted with a census
+and must not be reinstated.** The pinned vstd holds **402 `assume_specification`
+sites, 272 `external_body` items and 545 `broadcast` proof fns across 44 files**;
+"relied upon" is **undecidable from the text**, because Verus inserts some
+coercions itself (`ref_mut_array_unsizing_coercion` never appears in source) and
+`broadcast use` pulls whole families at once. Every rung depends on the same
+vstd core, so the second column would be near-identical for every row — it
+does not discriminate, and it measures the wrong thing.
+
+**What ships instead: one headline number — the gate's own `tcb_items` — plus a
+three-way classification of what each item is.**
+
+| class | what it is | why it matters |
+|---|---|---|
+| **U-license** | wraps an operation whose safety the *author* is asserting | the author can be wrong, and the error is local to this pattern |
+| **V-gap** | exists only because the verifier cannot express something | the error travels to every pattern using that operation |
+| **infra** | driver/print plumbing | deletes call-site obligations wholesale — see above |
+
+Census at TASK_048, 14 patterns: **57 items / 118 lines — 25 U-license, 2 V-gap,
+30 infra.**
+
+**And the gameability question is answered by measurement, not by policy: the
+column is NOT gameable, because the relocation almost never exists.**
+`<[T]>::get_unchecked`, `<[T]>::get_unchecked_mut`, `u64::count_ones`,
+`core::ptr::copy_nonoverlapping`, `<[T]>::as_ptr`, `<[T]>::as_mut_ptr` and
+`<*const T>::add` are **all `is not supported` at the pinned vstd**. Measured
+exposure was **2 of 58 items (3.4%)** — p06's `scr_load` (removed, TCB 6 → 5) and
+p08's `copy_in` (**untried**; p02's equivalent moved codegen where p06's did not,
+so do not assume it). p09's `popcount64` is a genuine V-gap. Every other
+pattern's TCB is unchanged by the question.
 
 ### Test the proof by breaking it — a green run proves nothing on its own
 
@@ -451,10 +520,11 @@ quoting 5c as a defence.**
    would compile into the measured binaries) and a twin whose body calls
    `get_unchecked` (it re-uses the axiom it exists to check).
 
-   The `copy_from_slice`-has-no-vstd-spec wrinkle resolves cleanly: the copy twin
-   is an indexed loop and it **verifies**, so a failure there is weakness, not a
-   missing spec — and the gate prints the Verus diagnostic so the two can be told
-   apart.
+   The copy twin is an indexed loop and it **verifies**, so a failure there is
+   weakness, not a missing spec — and the gate prints the Verus diagnostic so the
+   two can be told apart. (This paragraph used to attribute the wrinkle to
+   `copy_from_slice` having no vstd spec; it has one — see above. The twin's
+   argument is unaffected.)
 
    Shipped obligation counts: p02 9 → 12, p01 7 → 8, with the pins unmoved.
 
@@ -809,11 +879,23 @@ The reviewer agent checks all of the above by grep + reading. See `.tasks/PROTOC
   over the pilot's `&Vec<u64>`: it is idiomatic Rust and costs nothing.
 - **`&mut [T]` works too** (established at TASK_004 on p02): `old(dst)@` /
   `final(dst)@`, `Vec::as_mut_slice` is `assume_specification`'d with a
-  prophecy, and `dst[i] = v` has an `IndexSetTrustedSpec`. There is **no** vstd
-  spec for `copy_from_slice`, so a rung that wants the bulk copy verified needs
-  its own trusted wrapper around `ptr::copy_nonoverlapping` — which is the right
-  answer anyway, because that wrapper *is* the pattern's trusted base and its
-  contract is what a reviewer should attack.
+  prophecy, and `dst[i] = v` has an `IndexSetTrustedSpec`. ⚠ **This bullet used
+  to end *"there is no vstd spec for `copy_from_slice`"*; that is false and was
+  corrected at TASK_048** — see the `external_body`-need-not-contain-`unsafe`
+  section above for what actually decides it (**R4's spelling, not the copy's**).
+  `copy_from_slice`, `split_at_mut` and `copy_within` are all specified; a
+  wrapper is needed when R4 spells the copy with raw pointers, because
+  `copy_nonoverlapping` / `as_ptr` / `as_mut_ptr` / `ptr::add` are unsupported
+  and the `identity` pin forces R5 to match R4.
+- ⚠ **`RangeTo<usize>` has no `SliceIndexSpecImpl`** at the pinned vstd
+  (`std_specs/slice.rs:14,30`), so `dst[..n]` fails with `precondition not
+  satisfied` while `dst[0..n]` gets past the precondition and then fails its
+  *post*condition (`index_mut`'s `call_ensures` is never instantiated). Use
+  `split_at_mut`. Found at TASK_048, and it is why removing p06's wrapper forced
+  an **idiom** edit rather than being a pure measurement.
+- **`decreases b - a` is rejected on a two-cursor loop** whose cursors cross;
+  `decreases b` is the measure that works. Every two-cursor kernel here will hit
+  it (TASK_047).
 - **Dividing a length by a stride needs lemmas.** `n / s >= 1` from `s <= n`
   needs `vstd::arithmetic::div_mod::lemma_div_non_zero`; `(n / s) * s <= n`
   needs `lemma_fundamental_div_mod`; `k * s <= (nrec - 1) * s` from `k < nrec`

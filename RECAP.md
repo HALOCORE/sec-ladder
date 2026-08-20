@@ -8,9 +8,10 @@ this box is reference; this box is what to *do*.
 
 | | |
 |---|---|
-| **Patterns** | **13 of 47 exist, all green, all 13 reviewed.** p06 is the 14th and is being built now. |
-| **Immediate next task** | **p06 is built (`1408e79`) and reviewed (`5a38b39`, 2 blockers + 3 majors + 5 minors, 14 clean negatives). `TASK_048` — the corrections — is IN FLIGHT.** Running notes at `.temp/p48/NOTES.md`. Agents die to transient API errors (five so far, none lost work) — **resume with `SendMessage`, do not restart.** When it lands: commit, **then write `.memory/`** (rule 9 — **nothing about p06 is in `.memory/` yet, deliberately**), then the next pattern. ⚠ `TASK_048` carries a question bigger than p06 — **can a pattern shrink its published TCB by pushing the axiom into vstd?** It governs every pattern left to build; read its answer before writing any TCB number. |
-| **Then** | review p06, then **p14** (tokenizer — in-place mutation + aliasing), then **p10** (sliding window) or **p18** (LEB128). |
+| **Patterns** | **14 of 47 exist, all green, all 14 reviewed.** |
+| **Immediate next task** | **the next pattern: p14** (tokenizer — in-place mutation + aliasing). p06 is built, reviewed and corrected; **nothing is outstanding on it.** Write `TASK_049`. Read first: `.memory/01-ladder.md` **finding 15 (p06)** — p14 is the other in-place-mutation pattern and inherits p06's two-cursor `decreases`, its order-sensitive-fold requirement, and its warning that the catalogue's guessed bug class was **not** the one that got built. |
+| **Then** | review p14, then **p10** (sliding window) or **p18** (LEB128). |
+| **The TCB question is SETTLED** | A pattern **cannot** meaningfully shrink its TCB by pushing axioms into vstd — measured, 3.4% exposure, because `get_unchecked`, `copy_nonoverlapping`, `as_ptr`, `ptr::add` and `count_ones` are all unsupported at the pinned vstd. Ship **one number plus a three-way classification**; the two-number proposal was refuted by census and must not be reinstated. `.memory/04-verus.md`. |
 | **The loop** | build a pattern → review it once → land corrections → repeat. Per `PROTOCOL.md` rule 9, write `.memory/` **only after** the review. |
 | **Git** | Commit at task boundaries; subagents never commit. ⚠ **There is a GitHub remote** (`origin`, `HALOCORE/sec-ladder`). **Do not push unless the user asks.** |
 | **Before quoting any number** | `harness/measure.py --check-stale` (exit 1 on STALE). |
@@ -66,6 +67,7 @@ green, all thirteen reviewed:**
 | p12 | `strcat` fixed | the first **write**; a per-iteration check costs the bulk lowering |
 | p04 | ring buffer | known **bits** survive a loop-carried phi where a range does not — `next_pow2(CAP) ≤ ARR_LEN` |
 | p13 | `strncpy` truncation | a bound the optimiser can **see** outweighs the check that supplies it — and the contract pinned one side of the comparison |
+| p06 | in-place rotate | **the `Ir` column is sign-wrong** — clang's hardened rung executes *fewer* instructions and runs *slower* |
 
 **If you read only one thing after this file**, read `.tasks/TASK_026.md` §0 — the
 distilled rules from the thirteen-task spelling arc. Every pattern built after it
@@ -98,6 +100,7 @@ the commands are in `.memory/01-ladder.md`'s numbering warning.
 | p12 | **12** | 21 |
 | p04 | **13** | 23 |
 | p13 | **14** | 25 |
+| p06 | **15** | 26 |
 | p01, p02 | findings 1–3 | 1–8 |
 
 Cross-cutting entries exist only here: **14** (every rung is a spelling), **16**
@@ -930,6 +933,61 @@ the number.** Two task files have already sent an agent to the wrong finding.
    **could not fail, provably** — see finding 20 and the new
    `.memory/03-measurement.md` rule: hold out a **length**, not a **mixture**.
 
+26. **p06 — the `Ir` column is SIGN-WRONG, and the deterministic metric is the
+   one that misleads.** (TASK_047, reviewed at TASK_047_REVIEW — **2 blockers,
+   3 majors, 5 minors and 14 clean negatives** — corrected at TASK_048.
+   Authoritative version: `.memory/01-ladder.md` **finding 15**.)
+
+   An in-place rotate by three reverses over a fixed `[u8; 64]` scratch; the
+   omitted line is `r %= m`. It was built to make `Ir` *understate* a safety tax,
+   because a `div` is **1.00 `Ir` and ~20–40 cycles**. It does worse: **on clang
+   the hardened rung executes 45–108 FEWER instructions and runs 10–20% SLOWER.**
+   An `and` control with no divide isolates the mechanism at −12.00 Ir/record —
+   reducing `r` proves `r < 64`, the value stays 32-bit, and clang's
+   7-instruction LE decode collapses to one `mov`. **Finding 6 finally has a
+   designed instance with a named mechanism instead of an accident.**
+
+   **The best thing in the cycle is a clean negative.** The review did not argue
+   about the missing layout population — it **built** it (30 layouts/cell, both
+   `%32` residues, every loop's `win32`/`jcc32` flips) and the headline survived:
+   **`P(A>B) = 900/900`**, both compilers, both inputs, mode-matched, no sign
+   flip. A `d_cmp` control puts **91.6% of gcc's +88.08 ns on the divide**. The
+   manager's arithmetic objection to the headline was **wrong** — it divided by
+   the probe's `+1.00 Ir/record` instead of the shipped law's `+8.00`.
+
+   ⚠ **And 23% of that `+8.00·nrec` law is EXECUTED ALIGNMENT PADDING**, with
+   only 1.000 of it the divide. `.memory/03-measurement.md`'s padding trap was
+   static-only until now; it happened **twice on this one pattern**.
+
+   **Two blockers, both about publishing a point as though it were a class.**
+   The shipped R3 is `2.00000 Ir/byte`; an in-contract zero-`unsafe` control is
+   **0.00000 Ir/byte**, and **none of the 2.00 is a bounds check** — it is the
+   `zip`/`Rev` adaptor's exhaustion tests, with identical panic pads. **Fourth
+   pattern to make this mistake, and finding 3 needed no correction: it says
+   quote the cheaper of two in-contract R3 spellings, and p06 did not.** The
+   second blocker removed a trusted item at zero `-O3` cost (**TCB 6 → 5,
+   18/0, twin 23/0**) — but **not** free at `-O0`, where the gate caught
+   `identity` dropping to `differ`.
+
+   **p17's limit, arriving on a WRITE.** For `m < r ≤ SCR` (**not** `r ≥ SCR`)
+   the unreduced rotate stays inside the scratch and C, safe Rust, unsafe Rust
+   and the proved rung **all print the same wrong answer**, ASan and UBSan clean
+   — including three delete-the-check controls, one with zero `unsafe`.
+
+   **`_msonly` cannot separate the regimes, and the reason generalises**:
+   deleting the check *and* weakening the spec to memory-safety-only **still
+   fails**, because a proof quantifies over all inputs and regime 2 is genuinely
+   unsafe. **The separation needs a program change, not a spec change** — p17's
+   control-2 lesson, second instance.
+
+   **Two parameter-free laws**, both exact: `swaps(m,r) = m + [m even AND r odd]`
+   (so the rotate amount **does** enter the cost — the manager predicted no `r`
+   term), and the per-record law at period **4, not 8**, exact on 45/45.
+
+   ⚠ **"The twin is the sole catcher" is false on p06 AND p12** — both mutants
+   also break a pin the claim ignores. The correct form is ***Verus-level* sole
+   catcher**. **p12's `NOTES.md:1046-1049` is still wrong** (queue item).
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds
@@ -1114,7 +1172,7 @@ and both copies went stale (13 and 7 against the task files' 55).
 
 ## Priority — read this before planning
 
-**Forty-six tasks in, 13 of 47 patterns exist**, and the ratio is the thing to
+**Forty-eight tasks in, 14 of 47 patterns exist**, and the ratio is the thing to
 watch. Six tasks went to gate hardening before the user called it; **T015–028 —
 thirteen consecutive tasks — went to the spelling problem** and produced no new
 pattern. Both arcs paid for themselves, and neither was on anyone's plan. But the
@@ -1123,13 +1181,14 @@ wrong than at producing new ones**, and the correction is simple: **alternate
 build → review, and make a methodology proposal argue for itself against a
 pattern.**
 
-**Since T033 the loop has held** — p11, p03, p09, p12, p04, p13 each built and
-reviewed, every one green on its first complete run, and every one produced a
+**Since T033 the loop has held** — p11, p03, p09, p12, p04, p13, p06 each built
+and reviewed, every one green on its first complete run, and every one produced a
 finding no one predicted. That is the working mode; do not drift off it.
-⚠ **The last two each needed a THIRD task to land their corrections** (T044,
-T046), and both were worth it: p04's review moved its headline number and p13's
-reversed its headline's sign. **Budget build → review → land, not build →
-review.**
+⚠ **The last three each needed a THIRD task to land their corrections** (T044,
+T046, T048), and all three were worth it: p04's review moved its headline number,
+p13's reversed its headline's sign, and p06's corrected two published laws and a
+`.memory/` claim that had stood since TASK_004. **Budget build → review → land,
+not build → review.** Three tasks per pattern is the real cost; plan with it.
 
 The gate's threat model is **honest mistake, not malicious author**
 (`.memory/02-bench-rules.md`, top section, with the residuals deliberately left
@@ -1143,10 +1202,34 @@ engineer *flagged against itself*, and a mechanism asserted without a control.
 
 ## Immediate queue
 
-**`TASK_047` — p06 — is written and in flight.** See the START HERE box; this
-section is the standing backlog, not the next action. ⚠ **Item 1 (the two-step
-reslice) and item 11 (a length-heterogeneous sweep band) are both assigned into
-`TASK_047`**, so check p06's outcome before re-queuing either.
+**The next task is `TASK_049` — p14.** See the START HERE box; this section is
+the standing backlog, not the next action.
+
+**Closed by p06:** the two-step reslice (old item 1) is now measured on a sixth
+pattern at **exactly −1.00 Ir/call**, and p06 shipped the first
+**length-heterogeneous** fit set (old item 11), whose leave-one-`m`-out **can
+fail** — it misses by −48.000 at `m=3`, which is how the domain got established.
+Both retired.
+
+**New, from p06's cycle:**
+
+- **p12's `NOTES.md:1046-1049` says "the twin is the sole catcher" and it is
+  false** — the mutant also fails p12's own contract pin. p06's equivalent is
+  fixed; p12's is not. The correct form is ***Verus-level* sole catcher**, and
+  the phrase should be audited wherever it appears. (p02's is a clean negative —
+  already correct.)
+- **p08's `copy_in` is the one remaining relocatable TCB item** (4 → 3). Untried.
+  ⚠ **Do not assume it is free**: p06's removal was byte-identical at `-O3`,
+  p02's moved codegen by `+5.00 Ir/call` and broke `identity: exact`. The
+  discriminator is what **R4's body** spells.
+- **`b_nored`'s Verus failure is a resource-exhaustion, not an obligation**, and
+  `--rlimit 30/60` does not convert it. A mutant that dies of rlimit is a weaker
+  control than one that fails on a named obligation, and the pinned counts hide
+  the difference.
+- **p02 keeps a trusted wrapper it does not strictly need**, with the price now
+  measured (`+5.00 Ir/call`, one extra panic pad, breaks `identity: exact`). Not
+  a defect — the hard stop working — but someone will ask why p06 removed one and
+  p02 did not.
 
 ### Owed, in priority order
 
@@ -1244,9 +1327,9 @@ grep -rho '\.tasks/TASK_[A-Za-z0-9_]*\.md' .memory/ .tasks/ RECAP.md \
 python3 -c "import hashlib,glob;print({hashlib.sha256(open(f).read()[open(f).read().find('NAMED-SPELLING STANDARD'):open(f).read().find('p01 and p08 neither')+19].encode()).hexdigest()[:12] for f in glob.glob('patterns/*/spec.md')})"
 ```
 
-- **13 patterns, all green**: p01 `PASS-WITH-BLOCKED-ROWS` (Miri policy on its
-  `large.bin`, documented, not a regression); p02, p03, p04, p05, p07, p08, p09,
-  p11, p12, p13, p16, p17 `PASS`. **26 records, 0 stale.**
+- **14 patterns, all green**: p01 `PASS-WITH-BLOCKED-ROWS` (Miri policy on its
+  `large.bin`, documented, not a regression); p02, p03, p04, p05, p06, p07, p08,
+  p09, p11, p12, p13, p16, p17 `PASS`. **28 records, 0 stale.**
 - **The shared named-spelling paragraph is byte-identical across all thirteen**
   `idiom.why` blocks — currently one hash, `59748cce2db5`, 11 003 bytes.
   ⚠ **The value depends on how you slice the span**, so trust the *command*
