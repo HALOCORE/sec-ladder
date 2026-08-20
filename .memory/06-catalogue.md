@@ -46,7 +46,10 @@ for a too-weak trusted `requires` but *none*.
 gate hardening and 2 of 47 patterns existed. **It worked**: the two tasks since
 produced p16 and p17, each green on a complete run first try, each reviewed or
 awaiting one review — and p17 delivered the programme's first *negative* result
-about memory safety, and p05 the first causal link from proof to performance. 5 of 47 now exist. The gate's threat model is now
+about memory safety, and p05 the first causal link from proof to performance.
+**5 of 47 existed at that point; the current count is in the tables below and in
+`RECAP.md`, not here** — this paragraph is the T010 snapshot and its "now" is
+2026's earlier one. The gate's threat model is now
 explicitly *honest mistake, not malicious author* (`.memory/02-bench-rules.md`,
 top section, with the residuals we are deliberately leaving open). New gate work
 must pass "could this happen by accident?" first. **Produce patterns; review each
@@ -290,11 +293,13 @@ supersede any earlier task report they contradict.
 | p06 | in-place reverse / rotate / swap | aliasing, permutation invariant | moderate | planned |
 | p07 | binary search | **unsigned underflow of an inclusive upper bound** (`hi = mid − 1` at `mid == 0`, reached by any key below `elements[0]` — on *well-formed* input) + **32-bit overflow of the length check** `4·n + 4·nq`, fooled at an 88-byte window. ~~midpoint overflow~~ — see below | moderate | **done** (T026), **reviewed** (T026_REVIEW: headline confirmed, 2 majors + 5 minors against the prose); gate `PASS` first complete run, R5 10/0 first try, R5 == R4 `exact` at O3; **the first pattern where R3's tax has no axis along which it amortises** — `6.0000` Ir/probe, fraction rising in both `n` and `nq`, confirmed across six workloads |
 | p08 | memmove with overlapping regions | overlap UB | moderate | **done** (T014), reviewed; gate PASS first run, R4 == R5 `exact` at **both** O0 and O3; the UB **executes and is unobservable** (glibc `memcpy` *is* `memmove`), so p08 is a tooling-and-expressiveness result, not a performance one |
-| p09 | bit vector / bitset ops (test + popcount) | **two bugs**: the omitted `q < nbits` guard (spatial, caught everywhere) and `q & 31` (**invisible to a memory-safety proof, and invisible entirely once the spec moves with it**) | easy–moderate | **done** (T038), gate `PASS` first complete run, R5 18/0, R4 == R5 `exact`. **UNREVIEWED**. First kernel whose guard is not a bounds check; first where **R3 is dearer than R2**; first trusted item modelling a **CPU instruction** |
+| p09 | bit vector / bitset ops (test + popcount) | **two bugs**: the omitted `q < nbits` guard (spatial, caught everywhere) and `q & 31` (**invisible to a memory-safety proof, and invisible entirely once the spec moves with it**) | easy–moderate | **done** (T038), gate `PASS` first complete run, R5 18/0, R4 == R5 `exact`, **reviewed** (T038_REVIEW: invisibility confirmed against four vacuity attacks; 1 blocker + 5 majors against the prose, two of them project-wide). First kernel whose guard is not a bounds check; first where **R3 is dearer than R2**; first trusted item modelling a **CPU instruction** |
 | p10 | sliding-window / stencil over array | off-by-one at boundaries | moderate | planned |
 
-**p07's bug class was WRONG in this table for the whole life of the project, and
-the correction is PROVISIONAL — not yet reviewed** (TASK_026). "Midpoint overflow
+**p07's bug class was WRONG in this table for the whole life of the project**
+(TASK_026), and the correction is **CONFIRMED** (TASK_026_REVIEW — it is one of
+that review's two confirmed extras; the row's bug column above already carries
+it). "Midpoint overflow
 `(lo+hi)/2`" is not merely hard to reach, it is unreachable **by a factor of
 2.1e9 for any input p07's wire format can express** — and the binding constraint
 is not RAM, which is what the manager guessed, but the **`u32` header field**:
@@ -306,15 +311,22 @@ check `4·n + 4·nq` needs 36 bits, so a 32-bit check is fooled at a window of
 **88 bytes** — and it ships as `adversarial-width.bin`, on which the 32-bit-check
 cells SIGSEGV. The second bug, the one that fires on well-formed input, is
 **unsigned underflow of an inclusive upper bound** (`hi = mid − 1` at `mid == 0`,
-reached by any key below `elements[0]`). Replace this row's bug column once the
-review lands; the argument and the arithmetic are `p07/NOTES.md` §0.
+reached by any key below `elements[0]`). The argument and the arithmetic are
+`p07/NOTES.md` §0.
+
+**The lesson generalises past p07 and is why this paragraph stays:** a catalogue
+bug class is a *guess written before the pattern was built*, and it survived
+unchallenged until an engineer measured it. **Every remaining `planned` row's bug
+column is that same kind of guess.** Check it against the wire format before
+building on it — p07's was wrong by a factor of 2.1e9, and the binding constraint
+was not the one the manager named.
 
 ## Family B — strings & NUL-termination
 
 | ID | Pattern | C bug class modelled | Verus difficulty | Status |
 |---|---|---|---|---|
-| p11 | NUL-terminated string scan (`strlen`-shaped) | missing terminator → OOB read; **the loop simply does not stop** | moderate | **done** (T033), gate `PASS` first complete run, R5 12/0, R4 == R5 `exact`. **UNREVIEWED** — findings are in its `NOTES.md` and not yet in `.memory/`. Family B's first pattern; first kernel whose loop bound is not known before the loop, and first where C's rung calls a SIMD libc routine |
-| p12 | `strcat` into a fixed stack buffer | classic stack overflow — **and the failure mode depends on the overflow MAGNITUDE and the compiler**: +1…+8 B silent and wrong on both, +16…+48 B gcc canary / clang corrupts `main`'s locals, +64…+128 B gcc canary / clang SIGSEGV | moderate | **done** (T040), gate `PASS` first complete run, R5 15/0, R4 == R5 `exact`. **UNREVIEWED**. First bug here that is a **WRITE** safe Rust cannot express; first time `c-gcc` and `c-clang` differ in **behaviour** |
+| p11 | NUL-terminated string scan (`strlen`-shaped) | missing terminator → OOB read; **the loop simply does not stop** | moderate | **done** (T033), gate `PASS` first complete run, R5 12/0, R4 == R5 `exact`, **reviewed** (T033_REVIEW: headline confirmed by independent re-measurement; 2 majors + 6 minors, no blockers). Family B's first pattern; first kernel whose loop bound is not known before the loop, and first where C's rung calls a SIMD libc routine |
+| p12 | `strcat` into a fixed stack buffer | classic stack overflow — **and the failure mode depends on the overflow MAGNITUDE and the compiler**: +1…+8 B silent and wrong on both, +16…+48 B gcc canary / clang corrupts `main`'s locals, +64…+128 B gcc canary / clang SIGSEGV | moderate | **done** (T040), gate `PASS` first complete run, R5 15/0, R4 == R5 `exact`, **reviewed** (T040_REVIEW: headline confirmed and sharpened; 2 blockers + 3 majors, both blockers landed at T041 — the structural claim was too strong and `−26.00` is a fixed-R4 figure). First bug here that is a **WRITE** safe Rust cannot express; first time `c-gcc` and `c-clang` differ in **behaviour** |
 | p13 | `strncpy`/`snprintf` truncation semantics | silent truncation, missing NUL | moderate | planned |
 | p14 | tokenizer (`strtok`-style, in-place mutation) | in-place mutation + aliasing | hard | planned |
 | p15 | UTF-8 validation + decode | malformed continuation bytes | moderate–hard | planned |
