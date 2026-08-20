@@ -8,10 +8,35 @@ keep the five rungs comparable. A cell that breaks one of them is invalid data.
 **p12, corrected at TASK_040_REVIEW — the general form p12 shipped is refuted by a
 built row.** Land the first half; the second half is a design choice.
 
-> **Forced, and with no read analogue:** for a write bug whose guard *is* the
-> destination's own bound, **every input on which the guard fires is an input on
-> which the unguarded rung executes an out-of-bounds store.** A read bug can
-> return the right answer from the wrong place; a write bug cannot un-write.
+> **Forced, and with no read analogue:** for a write bug whose guard's
+> **THRESHOLD IS THE DESTINATION'S ALLOCATED EXTENT**, every input on which the
+> guard fires is an input on which the unguarded rung executes an out-of-bounds
+> store.
+
+⚠ **It is about the THRESHOLD, not about the write — and as first written it did
+not reach three of the five patterns it was written for** (TASK_041, measured with
+everything held fixed but the threshold):
+
+```
+   n  slen  guard  rc    sanitizer     what
+ 128   140      1   0        clean     threshold == sizeof dst, guard PRESENT
+ 128   140      0   1    OOB WRITE     threshold == sizeof dst, guard DELETED
+  64   100      1   0        clean     threshold  < sizeof dst, guard PRESENT
+  64   100      0   0        clean     threshold  < sizeof dst, guard DELETED
+```
+
+The guard fires in **both** pairs — the checksums differ — but only at
+`threshold == sizeof dst` does firing force UB. **A threshold at the allocation's
+extent makes "the guard fired" and "the unguarded rung committed UB" the same
+event; a threshold inside the allocation makes them independent, and then write
+patterns behave exactly like read patterns.**
+
+| pattern | guard | inherits? |
+|---|---|---|
+| p12, **p23**, **p25** | `dlen + slen <= DST_CAP`, `i < len`, `len < cap` | **yes** |
+| **p13** | caller-supplied `n` — `n < sizeof dst` is the *correct* case; its bug is the missing NUL and the OOB **read** downstream | **no** |
+| **p24** | `child < n`, a live length below capacity — firing means logically wrong, still in bounds | **no** |
+| **p14** | a delimiter is not a bound; the sentence reaches its scan's `i < len` | not as stated |
 
 > **NOT forced:** whether such an input can *also* be a checksum-agreeing perf
 > row. That depends on whether the checksum is a function of state the OOB store
