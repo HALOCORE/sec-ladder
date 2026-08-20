@@ -33,7 +33,11 @@ kernel:  for each declared string
   is a hand-written byte loop in the source of five of the seven cells, and gcc,
   clang and rustc all turn it back into `memcpy` — in every one of them *except*
   the safe-naive rung, which is the only cell in the pattern with no
-  bulk-memory call at all. `NOTES.md` 3.
+  bulk-memory call at all. What decides it is **where the check is, not which
+  call it is**: a *safe* byte loop with no bulk call anywhere in its source
+  still lowers to `memcpy` (`m1`), and the lowering needs **both** ends of the
+  copy free of a per-iteration check — checking only the *source* loses it just
+  as checking only the destination does (`m4`). `NOTES.md` 3.
 - **The second trusted item in this project that writes**, and the first whose
   licensing guard sits a loop level above the store rather than in the same basic
   block. `NOTES.md` 2 and 6.
@@ -41,13 +45,26 @@ kernel:  for each declared string
 ## What it cannot do, and why that is a result
 
 `harness/check.py` requires every cell *including R1* to agree with `model.py` on
-every non-adversarial input. R1 omits the capacity check, so any window where the
-check fires makes R1 fold different bytes and a different `dlen`. **A row on
-which a write bug fires cannot also be a checksum-agreeing row** — where p11 has
+every non-adversarial **matrix** input — `check.py:469` and `measure.py:64` both
+drop `sweep-*`, so a sweep band is never checksum-checked. R1 omits the capacity
+check, and p12 folds `dst[0..dlen]` **and** `dlen`, so any window where the check
+fires makes R1 fold different bytes *and* a different length. **p12 therefore has
+no row on which the write bug fires and R1 still agrees** — where p11 has
 `adversarial-zerotail`, a header lie on which even R1 agrees, p12 has nothing.
 So `small` and `large` are 100% accept by construction, they exercise the check
 on the accept path only, and the acceptance axis lives in `sweep-a*` and the
 adversarial rows. `NOTES.md` 1.
+
+⚠ **That is p12's fold, not a law about writes**, and p12 first published it as
+one. The counter-design ships as a control (`controls/gen_controls.py`'s `k*`
+pair and `fillreject.bin`) — zero-initialise `dst`, fold it at *fixed extent*,
+drop `dlen` from the result — and the checked and unchecked cells then print
+**identical** checksums at every `n_iters` while ASan still reports the
+`stack-buffer-overflow`. What is genuinely forced is narrower, it is about where
+the guard's **threshold** sits rather than about the bug being a write, and it
+does **not** reach p13 or p24: `NOTES.md` 1a and 1b. The price of the
+counter-design is that the perf row executes UB on every call, which is why p12
+does not take it.
 
 ## Files
 
@@ -64,6 +81,9 @@ adversarial rows. `NOTES.md` 1.
 | `unsafe.rs` | R4 — `get_unchecked` / `get_unchecked_mut` |
 | `verus.rs` | R5 — R4's exec code plus the proof |
 | `controls/gen_controls.py` | the mutants and the out-of-contract variants |
+| `controls/pads.py` | decodes a kernel's surviving panic pads to source `line:col` |
+| `controls/threshold_probe.py` | why "the guard fired ⇒ the unguarded rung stored OOB" needs its premise |
+| `controls/sweep_ir.py` | the two sweep bands and the exact-rational fits |
 | `NOTES.md` | what was measured |
 
 ## Running

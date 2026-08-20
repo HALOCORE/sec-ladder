@@ -22,7 +22,7 @@ Then, per ../NOTES.md:
         .temp/p12/controls/<name>.c patterns/p12-strcat-fixed/c/main.c \\
         -o .temp/p12/controls/<name>
 
-Four families:
+Six families:
 
   **p*  proof mutants.** Each one must FAIL, and each for a different reason.
   **n*  the narrow-type check.** A capacity check that is present, looks right,
@@ -35,6 +35,37 @@ Four families:
   **s*  the R3-side span.** In-contract respellings of the safe-tuned rung,
         for the cheapest-found figure `.memory/01-ladder.md` requires beside
         every headline.
+  **m*  the bulk-copy lowering, de-confounded** (TASK_040_REVIEW major 5).
+        ../NOTES.md 3a's four cells confound "where the check is" with "which
+        call it is", because the only once-per-string cell is also the only
+        `copy_from_slice` cell. `m1` is a *safe byte loop* with no bulk call
+        anywhere in its source and it still lowers to `memcpy`; `m4` is R4 with
+        only the SOURCE load checked and it does not. Together they say the
+        lowering needs BOTH ends of the copy free of a per-iteration check.
+  **k*  the counter-design to ../NOTES.md 1's structural claim** (blocker 1 of
+        TASK_040_REVIEW). p12 published "a row on which a write bug fires cannot
+        also be a checksum-agreeing row" as a law about writes. It is a law
+        about p12's FOLD. Zero-initialise `dst`, fold it at fixed extent, drop
+        `dlen` from the result, and put rejection exactly at capacity, and the
+        checked and unchecked kernels print IDENTICAL checksums while the
+        unchecked one still executes an out-of-bounds store. Run them on
+        `fillreject.bin`, which this file also builds. ⚠ The price is that the
+        unchecked cell executes UB on every call, so it is a CONTROL and this
+        pattern does not ship it as a row.
+  **a*  route A, built.** The plain additive capacity test with its `usize`
+        overflow discharged p17's way. ../NOTES.md 11a used to call p12's R4
+        endpoint zero-width on the inference that this could not verify; it
+        verifies (15/0, twin 18/0) and is 17.00/92.00 Ir/call cheaper than the
+        shipped R4. Out of contract (`required[1]`), so a control and not a
+        rung -- but the endpoint it collapsed is not degenerate.
+
+`pads.py` in this directory attributes the surviving panic landing pads of any
+of these to source `line:col`, which is what turns a pad COUNT into a claim
+about which check survived.
+
+Two blobs come out of here as well: `narrow.bin` for `n1` and `fillreject.bin`
+for the `k*` pair. Neither is an `inputs/*.bin`, and each says why in its own
+docstring below.
 """
 import argparse
 import os
@@ -55,6 +86,21 @@ UNSAFE = os.path.join(PDIR, "unsafe.rs")
 NAIVE = os.path.join(PDIR, "safe_naive.rs")
 TUNED = os.path.join(PDIR, "safe_tuned.rs")
 KERNH = os.path.join(PDIR, "c", "kernel_hardened.c")
+
+# The k* family's three edits, named so the two controls share them verbatim.
+_CAPFOLD_OLD = ("    for (i = 0; i < dlen; i++)\n"
+                "        acc = acc * 31 + (uint64_t)dst[i];\n"
+                "    return (acc * 31 + (uint64_t)dlen) * 31 + (uint64_t)nstr;")
+_CAPFOLD_NEW = ("    for (i = 0; i < DST_CAP; i++)\n"
+                "        acc = acc * 31 + (uint64_t)dst[i];\n"
+                "    return acc * 31 + (uint64_t)nstr;")
+_CHECK_OLD = ("        /* THE CHECK. In `size_t`, so it cannot itself overflow. */\n"
+              "        if (dlen + slen <= DST_CAP) {\n"
+              "            for (i = p; i < q; i++)\n"
+              "                dst[dlen++] = buf[off + i];\n"
+              "        }")
+_CHECK_NEW = ("        for (i = p; i < q; i++)\n"
+              "            dst[dlen++] = buf[off + i];")
 
 #: (name, source, [(old, new, expected_hits)], what it is for)
 CONTROLS = [
@@ -205,6 +251,107 @@ CONTROLS = [
      "`copy_from_slice`. In contract -- `idiom.required[3]` pins the byte loop "
      "for R1/R1h/R2 and leaves R3 free -- and it is the R3-side variant that "
      "isolates the COPY spelling from the reslice and the iterator fold."),
+
+    # ---- the bulk-copy lowering, de-confounded ---------------------------
+    ("m1_reslice_byteloop", TUNED, [
+        ("            dst[dlen..dlen + slen].copy_from_slice(&w[p..q]);\n"
+         "            dlen = dlen + slen;",
+         "            let d: &mut [u8] = &mut dst[dlen..dlen + slen];\n"
+         "            let sv: &[u8] = &w[p..q];\n"
+         "            let mut i: usize = 0;\n"
+         "            while i < slen {\n"
+         "                d[i] = sv[i];\n"
+         "                i = i + 1;\n"
+         "            }\n"
+         "            dlen = dlen + slen;", 1)],
+     "R3 with the copy spelled as a SAFE BYTE LOOP over two reslices taken "
+     "once per string -- no `copy_from_slice`, no bulk call anywhere in the "
+     "source. It still lowers to `memcpy@GLIBC_2.14`, which is what separates "
+     "../NOTES.md 3a's mechanism (WHERE the check is) from the alternative "
+     "explanation (`copy_from_slice` is a different routine carrying its own "
+     "bound). In contract: it misses only `required[3]`, same as shipped R3."),
+
+    ("m4_u_srcchecked", UNSAFE, [
+        ("            let mut i: usize = p;\n"
+         "            while i < q {\n"
+         "                let b: u8 = unsafe { *buf.get_unchecked(off + i) };\n"
+         "                unsafe { *dst.get_unchecked_mut(dlen) = b; }\n"
+         "                dlen = dlen + 1;\n"
+         "                i = i + 1;\n"
+         "            }",
+         "            let mut i: usize = p;\n"
+         "            while i < q {\n"
+         "                let b: u8 = buf[off + i];\n"
+         "                unsafe { *dst.get_unchecked_mut(dlen) = b; }\n"
+         "                dlen = dlen + 1;\n"
+         "                i = i + 1;\n"
+         "            }", 1)],
+     "R4 with the DESTINATION store still unchecked and only the SOURCE load "
+     "checked -- the cell that decides whether `on the destination` is "
+     "load-bearing in ../NOTES.md 3a. It is not: `m4` loses the `memcpy` "
+     "lowering just as R2 does. A control, never a rung: it is an unsafe rung "
+     "with half its `get_unchecked` calls, so it is neither R3 nor R4."),
+
+    # ---- the counter-design: a benign row on which the write bug fires ----
+    ("k1_capfold_hardened", KERNH, [
+        ("    uint8_t dst[DST_CAP];", "    uint8_t dst[DST_CAP] = {0};", 1),
+        (_CAPFOLD_OLD, _CAPFOLD_NEW, 1)],
+     "R1h with ONE edit to the fold: `dst` is zero-initialised, the destination "
+     "fold runs over the whole fixed array instead of over `dst[0..dlen]`, and "
+     "`dlen` is not folded into the result. The checksum is then a function of "
+     "state the out-of-bounds store cannot reach. Build it beside `k2` and run "
+     "both on `fillreject.bin`."),
+
+    ("k2_capfold_nocheck", KERNH, [
+        ("    uint8_t dst[DST_CAP];", "    uint8_t dst[DST_CAP] = {0};", 1),
+        (_CAPFOLD_OLD, _CAPFOLD_NEW, 1),
+        (_CHECK_OLD, _CHECK_NEW, 1)],
+     "`k1` with the capacity check DELETED -- the same one-line deletion that "
+     "turns R1h into R1. UNSOUND BY CONSTRUCTION and built only as evidence: on "
+     "`fillreject.bin` it prints k1's checksum EXACTLY, at every `n_iters`, "
+     "while ASan reports `stack-buffer-overflow, WRITE of size 1`. That pair is "
+     "the whole of `.memory/02-bench-rules.md`'s *a WRITE bug forces the "
+     "adversarial row, it does NOT force the perf row*."),
+
+    # ---- route A, built --------------------------------------------------
+    ("a1_verus_routeA", VERUS, [
+        ("        if slen <= DST_CAP && dlen + slen <= DST_CAP {",
+         "        if dlen + slen <= DST_CAP {", 1),
+        ("pub fn kernel(buf: &[u8], off: usize, len: usize) -> (r: u64)\n"
+         "    requires\n        off + len <= buf@.len(),",
+         "pub fn kernel(buf: &[u8], off: usize, len: usize) -> (r: u64)\n"
+         "    requires\n        off + len <= buf@.len(),\n"
+         "        buf@.len() <= isize::MAX,", 1),
+        # the outer walk, the scan and the copy loops each carry it
+        ("buf@.len() <= usize::MAX,", "buf@.len() <= isize::MAX,", 3),
+        ("    if stride_w >= 4 && stride_w <= n_blob as u64 {",
+         "    if stride_w >= 4 && stride_w <= n_blob as u64 "
+         "&& n_blob <= isize::MAX as usize {", 1),
+        ("                4 <= stride <= n_blob,\n"
+         "                buf@.len() == n_blob,",
+         "                4 <= stride <= n_blob,\n"
+         "                buf@.len() == n_blob,\n"
+         "                n_blob <= isize::MAX,", 1)],
+     "Route A of ../NOTES.md 5b, MADE TO VERIFY: the plain additive capacity "
+     "test, with the `usize` overflow `r1_verus_plain_additive` fails on "
+     "discharged p17's way -- one extra `requires buf@.len() <= isize::MAX`, "
+     "the three loop invariants raised from `usize::MAX`, one extra driver "
+     "conjunct and one extra driver invariant. `15 verified, 0 errors`, twin "
+     "`18 verified, 0 errors`. Out of contract (`required[1]` pins the shipped "
+     "`&&` spelling), so it is a control -- but it is the R4-side variant that "
+     "shows p12's R4 endpoint is not degenerate."),
+
+    ("a2_unsafe_routeA", UNSAFE, [
+        ("        if slen <= DST_CAP && dlen + slen <= DST_CAP {",
+         "        if dlen + slen <= DST_CAP {", 1),
+        ("    if stride_w >= 4 && stride_w <= n_blob as u64 {",
+         "    if stride_w >= 4 && stride_w <= n_blob as u64 "
+         "&& n_blob <= isize::MAX as usize {", 1)],
+     "Route A's exec code -- the two `a1` edits that are NOT ghost. This is "
+     "what route A costs in instructions, and `md5_fn` equal to `a1`'s is what "
+     "makes `R4 == R5 exact` survive the respelling. It differs from "
+     "`r3_unsafe_plain_additive` by the driver's third conjunct, which is a "
+     "once-per-process compare outside the loop and moves no marginal."),
 ]
 
 
@@ -235,6 +382,44 @@ def narrow_blob():
     print(f"  {os.path.relpath(path, REPO)}  (one window, strings 256 + 8)")
 
 
+def fillreject_blob():
+    """`.temp/p12/controls/fillreject.bin` -- the input the k* pair runs on.
+
+    64 windows, each four 32-byte strings (totalling exactly `DST_CAP`) and then
+    one 8-byte string. The capacity check therefore fires **once per window**,
+    on the last string only, and every byte the unchecked cell copies past the
+    checked one lands entirely OUTSIDE `dst[0..128]` -- so the 128 in-bounds
+    bytes are byte-identical in the two, and a fold at fixed extent cannot tell
+    them apart. The overflow is exactly **+8**, which ../NOTES.md 0 measures as
+    the silent, `rc=0` regime in both compilers.
+
+    A CONTROL blob and deliberately not an `inputs/*.bin`: the unchecked cell
+    executes UB on every call and no p12 row may do that."""
+    import random
+    import struct
+    rng = random.Random(0xF1117E)
+    nz = bytes([0x5a] + list(range(1, 256)))
+    lens = [32, 32, 32, 32, 8]
+
+    def window():
+        body = bytearray()
+        for n in lens:
+            body += rng.randbytes(n).translate(nz) + b"\x00"
+        return len(lens).to_bytes(4, "little") + bytes(body)
+
+    wins = [window() for _ in range(64)]
+    stride = len(wins[0])
+    assert all(len(w) == stride for w in wins), "windows must be one stride"
+    body = b"".join(wins)
+    payload = struct.pack("<Q", stride) + body
+    os.makedirs(OUT, exist_ok=True)
+    path = os.path.join(OUT, "fillreject.bin")
+    with open(path, "wb") as f:
+        f.write(struct.pack("<QQ", 20000, len(payload)) + payload)
+    print(f"  {os.path.relpath(path, REPO)}  (64 windows, 4x32 then 8, "
+          f"stride {stride}, the check fires once per window at +8)")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -246,6 +431,7 @@ def main():
         return 0
     os.makedirs(OUT, exist_ok=True)
     narrow_blob()
+    fillreject_blob()
     for name, src, subs, _why in CONTROLS:
         txt = open(src).read()
         for old, new, hits in subs:

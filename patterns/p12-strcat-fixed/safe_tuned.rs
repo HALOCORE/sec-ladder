@@ -21,19 +21,19 @@
 //! `R2 - R4`: byte-loop copy against byte-loop copy, indexed against unchecked,
 //! nothing else different. ../NOTES.md 3 gives both and says which is which.
 //!
-//! Two things worth watching on the disassembly, both measured in NOTES.md 1
-//! and 3 rather than assumed:
+//! **The two checks that survive here are NOT the destination's** -- measured
+//! by decoding their panic `Location`s (`controls/pads.py`), after ../NOTES.md
+//! 4 first read the pad COUNT the other way and this comment repeated it:
 //!
-//!   * whether `dst[dlen..dlen + slen].copy_from_slice(&w[p..q])` keeps its
-//!     range check, given that the guard `dlen + slen <= DST_CAP` one line
-//!     above is exactly the fact the check needs -- this is p03's "does LLVM
-//!     see the invariant" question, in a form where the fact is available in
-//!     the SAME basic block, which is the case p03 measured LLVM gets right;
-//!   * whether `&dst[..dlen]` keeps its check, where the bound comes from the
-//!     loop-carried invariant instead -- the case p03 measured LLVM gets wrong.
+//!   * `&buf[off..off + len]` (50:24) survives -- its bound is the CALLER's
+//!     precondition and is unprovable inside `kernel`;
+//!   * `&w[p..q]` (71:54) survives -- its bound `q <= len` is a RUNTIME value;
+//!   * both destination accesses are elided, `dst[dlen..dlen + slen]` and
+//!     `&dst[..dlen]` alike, because `dlen <= DST_CAP` is bounded by a
+//!     CONSTANT that the guarded increments show LLVM.
 //!
-//! One kernel, one array, two range checks with the same bound, reaching it two
-//! different ways.
+//! So the discriminator is literal-vs-runtime bound, not p03's same-block vs
+//! loop-carried one, and p03's result does not transplant. ../NOTES.md 4.
 
 #[path = "../../common/driver.rs"]
 mod driver;

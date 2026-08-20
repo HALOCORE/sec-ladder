@@ -32,18 +32,35 @@ Measured on `.temp/p12/probe_sp3.c` — one string of length `T` copied into
 | bytes copied | overflow | gcc -O3 | clang -O3 |
 |---|---|---|---|
 | 128 | 0 | rc=0, correct | rc=0, correct |
-| 129 … 136 | +1 … +8 | **rc=0, silent, wrong answer** | **rc=0, silent, wrong answer** |
-| 144 … 176 | +16 … +48 | rc=134 `*** stack smashing detected ***` | **rc=0, and it corrupts the CALLER's local** |
-| 192 … 256 | +64 … +128 | rc=134 | rc=139 SIGSEGV |
+| 129 … 136 | **+1 … +8** | **rc=0, silent, wrong answer** | **rc=0, silent, wrong answer** |
+| 137 … 184 | **+9 … +56** | rc=134 `*** stack smashing detected ***` | **rc=0, and it corrupts the CALLER's local** |
+| 185 … 256 | **+57 … +128** | rc=134 | rc=139 SIGSEGV |
 
-The clang rows at +16…+48 print a garbage value for `main`'s own `T`: the
-callee's overflow reached into the caller's frame and the program carried on.
-That is the p02-style silent corruption, at the gate's own flags, with no flag
-changed.
+⚠ **The boundaries are exact and were first published one sampling step off.**
+p12 sampled `T` on a coarse grid (128, 129…136, 144…176, 192…256) and wrote the
+middle regime as "+16…+48"; TASK_040_REVIEW re-scanned at step 4 on the *shipped*
+kernel and reported gcc firing from +12 and clang segfaulting from +64. Re-scanned
+here at **step 1 on §0's own probe**, both moves are grid artefacts and the real
+answer is sharper than either:
+
+```
+gcc    T=136 (+8)  rc=0        T=137 (+9)  rc=134   <- first canary
+clang  T=136 (+8)  T=136 ok    T=137 (+9)  T= 71 ok <- main's own T, corrupted
+clang  T=184 (+56) rc=0        T=185 (+57) rc=139
+```
+
+**Both compilers are silent and wrong up to exactly +8 and neither is silent at
++9.** That is not a compiler policy; it is 8 bytes of dead slack above `dst[128]`
+in this frame, and the shipped kernel's frame gives its own number (the review
+measured +12 there). Quote the regime, not the constant.
+
+The clang rows at +9…+56 print a garbage value for `main`'s own `T`: the callee's
+overflow reached into the caller's frame and the program carried on. That is the
+p02-style silent corruption, at the gate's own flags, with no flag changed.
 
 **So an `-fno-stack-protector` cell would be a thumb on the scale, and it is also
 unnecessary.** Unnecessary, because the silent-corruption row already exists at
-the shipped flags — in *both* compilers below +8, and in clang out to +48. A
+the shipped flags — in *both* compilers up to +8, and in clang out to +56. A
 thumb on the scale, because `-fstack-protector-strong` is what a Debian gcc
 actually compiles with, so deleting it would make the C rung *less* like the C
 that ships; and all it would buy is turning gcc's row into clang's, which the
@@ -72,30 +89,153 @@ identical flags.
 to 100% accept by the gate**, and a `large` row with "a different acceptance
 ratio" cannot be built.
 
-`harness/check.py:1249-1278` (`check_checksums`) requires **every cell, R1
-included, to print `model.py`'s checksum on every non-adversarial input**. R1
-omits the capacity check and nothing else, so on any window where the check would
-fire R1 copies bytes the checked rungs skip **and** ends with a larger `dlen` —
-and both are folded into the answer. R1's checksum therefore differs
-*necessarily*: for every value of `DST_CAP`, and for a truncating policy as much
-as for a skipping one.
+`harness/check.py:471-472` over `check.py:1249-1278` (`check_checksums`)
+requires **every cell, R1 included, to print `model.py`'s checksum on every
+non-adversarial input it is handed** — and what it is handed is the **matrix**.
+`check.py:469` and `measure.py:64` both drop `sweep-*` entirely, so **a sweep
+band is never checksum-checked**. (p12 first wrote this as "every
+non-adversarial input", which over-states the gate; corrected at
+TASK_040_REVIEW.) R1 omits the capacity check and nothing else, so on any window
+where the check would fire R1 copies bytes the checked rungs skip **and** ends
+with a larger `dlen` — and p12's fold takes both. R1's checksum therefore
+differs *necessarily*: for every value of `DST_CAP`, and for a truncating policy
+as much as for a skipping one.
 
-**This is structural for a WRITE bug and it has no analogue in the read
-patterns.** p11 ships `adversarial-zerotail`: the same header lie as
-`adversarial-count`, with a NUL tail, on which every rung *including R1* agrees
-and nothing happens. A read that stays inside the allocation is a silent wrong
-answer only when it reads different bytes; a write past a fixed local always
-changes what the kernel folds back. **p12 cannot have a zerotail row.**
+### 1a. What is forced, and what p12 shipped as forced and is not
 
-Two consequences, both stated rather than worked around:
+p12 published this as *"structural for a WRITE bug, with no analogue in the read
+patterns: a row on which a write bug fires cannot also be a checksum-agreeing
+row."* **The first clause is right and the published one is not.**
+TASK_040_REVIEW attacked it twice; the first attack failed and the second landed.
+
+Both attacks and their inputs are **committed and re-runnable**, in
+`controls/gen_controls.py`'s `k*` family and its `fillreject_blob()` — the
+review built them in gitignored scratch and this section would otherwise cite
+nothing a reader can run:
+
+```bash
+python3 patterns/p12-strcat-fixed/controls/gen_controls.py     # k1, k2, fillreject.bin
+```
+
+**The clean negative — under p12's own fold the row cannot be built.**
+`fillreject.bin` is 64 windows, each four 32-byte strings (exactly `DST_CAP`)
+and then an 8-byte one, so the check fires once per window at exactly +8 — §0's
+silent regime, `rc=0` everywhere.
+
+```
+c-gcc      10531535382307180616  rc=0   <- silent, and wrong
+c-clang    10531535382307180616  rc=0   <- silent, and wrong
+c-gcc-h    13744965160093837641  rc=0   == model.py's expected_stdout
+```
+
+**What landed: the forcing agent is the FOLD, not the write.** `k1`/`k2` are the
+hardened kernel with one edit to the fold — zero-initialise `dst`, fold
+`dst[0..DST_CAP]` at *fixed extent* instead of `dst[0..dlen]`, drop `dlen` from
+the result — and `k2` additionally has the capacity check deleted, which is the
+same one-line deletion that turns R1h into R1:
+
+```
+k1_capfold_hardened  (capacity check KEPT)     9617137326358488304
+k2_capfold_nocheck   (capacity check DELETED)  9617137326358488304   IDENTICAL
+
+n_iters   1  k1=12605653696781812108  k2=12605653696781812108  IDENTICAL
+n_iters   2  k1=11109895781008428530  k2=11109895781008428530  IDENTICAL
+n_iters   4  k1=11511695593773783267  k2=11511695593773783267  IDENTICAL
+n_iters 100  k1= 7572596882302193833  k2= 7572596882302193833  IDENTICAL
+n_iters 200  k1= 8993073921421418394  k2= 8993073921421418394  IDENTICAL
+n_iters1000  k1= 8990243233740411127  k2= 8990243233740411127  IDENTICAL
+```
+
+— identical at every `n_iters` **and not constant in `n_iters`**, so the marginal
+is real and `sweep_ir.py::usable()` would accept it (§10a). And the bug still
+fires, `clang -O1 -fsanitize=address,undefined`:
+
+```
+k1_capfold_hardened   rc=0   9617137326358488304                     <- CLEAN
+k2_capfold_nocheck    rc=1
+  k2_capfold_nocheck.c:63:13: runtime error: index 128 out of bounds
+                              for type 'uint8_t[128]'
+  ERROR: AddressSanitizer: stack-buffer-overflow ... WRITE of size 1
+```
+
+So a benign, checksum-agreeing, non-poisoned perf row on which a write bug fires
+**does exist**. What p12 measured was a consequence of `spec.md`'s own mandate
+that `dlen` be folded, not of the bug being a write.
+
+**The sentence that governs p13/p14/p23/p24/p25 is this one:**
+
+> **Forced, and with no read analogue:** for a write bug **whose guard's
+> threshold is the destination's allocated extent**, every input on which the
+> guard fires is an input on which the unguarded rung executes an out-of-bounds
+> store. A read bug can return the right answer from the wrong place; a store
+> past the end has already happened whatever the program prints.
+>
+> **NOT forced:** whether such an input can *also* be a checksum-agreeing perf
+> row. That is a **design choice** — it depends on whether the checksum is a
+> function of state the OOB store cannot reach. p12's is not.
+
+⚠ **The price of choosing the other way** is that the perf row **executes UB on
+every call**. It is usable only while the overflow stays in §0's *silent* regime
+(≤ +8 bytes here, on both compilers), and that is a frame-layout property of this
+box, not a guarantee. A pattern built that way must pin the overflow, assert the
+marginal is non-zero, and say in `spec.md` that R1 executes UB by construction.
+**p12 does not take that trade** — `k1`/`k2` are controls, and no p12 row runs
+them.
+
+### 1b. The premise is narrow, and it is the premise that does the work
+
+The forced half says *"whose guard's threshold is the destination's allocated
+extent"*, and that clause is not decoration. `controls/threshold_probe.py` holds
+*everything* fixed except the threshold — one NUL-terminated string into
+`dst[128]`, `lim = guard ? min(slen, n) : slen`, `clang -O1
+-fsanitize=address,undefined`:
+
+```
+$ python3 patterns/p12-strcat-fixed/controls/threshold_probe.py
+   n  slen  guard  rc    sanitizer               checksum  what
+ 128   140      1   0        clean    1806794244825891392  threshold == sizeof dst, guard PRESENT  (p12's R1h)
+ 128   140      0   1    OOB WRITE                      -  threshold == sizeof dst, guard DELETED   (p12's R1)
+  64   100      1   0        clean   12686003465447559840  threshold  < sizeof dst, guard PRESENT  (p13's strncpy)
+  64   100      0   0        clean   14881897922939209990  threshold  < sizeof dst, guard DELETED   (p13's strcpy)
+```
+
+`n = 128` is p12: the guard's threshold **is** the array's extent, the guard
+fires, and the unguarded rung stores out of bounds (`index 128 out of bounds for
+type 'uint8_t[128]'`, `stack-buffer-overflow WRITE of size 1`). `n = 64` is
+`strncpy`'s shape: the guard is a **caller-supplied** bound strictly inside the
+allocation, it fires just as loudly — the two checksums differ — and the
+unguarded rung is **ASan- and UBSan-clean**. Divergence is not the
+discriminator; the threshold is.
+
+So, for the patterns the sentence was written for:
+
+| pattern | the guard | premise holds? |
+|---|---|---|
+| p12 | `dlen + slen <= DST_CAP` | **yes** — `DST_CAP` *is* `sizeof dst` |
+| p13 `strncpy` | the caller's `n` | **no** — `n < sizeof dst` is the correct, non-overflowing case, and p13's bug is the *missing NUL* and the OOB **read** it causes downstream |
+| p14 tokenizer | the delimiter | **not as stated** — a delimiter is not a bound. p14's guard that *is* a bound is the scan's `i < len`, and the sentence reaches that one |
+| p24 heap sift | `child < n`, the live length | **no** — `n < capacity`, so firing means "logically wrong", still in bounds |
+| p23 partition, p25 growable | `i < len` / `len < cap` against the allocation | **yes** |
+
+**The generalisation to write into the next pattern's `spec.md` is therefore
+about the threshold, not about the write**: *a guard whose threshold is the
+allocation's extent makes "the guard fired" and "the unguarded rung committed
+UB" the same event; a guard whose threshold sits inside the allocation makes
+them independent, and then the write patterns behave exactly like the read
+patterns.* p12 is the first kind. p13 and p24 are the second.
+
+### 1c. Two consequences, both stated rather than worked around
 
 - `small` and `large` exercise the capacity check on the **accept path only**, so
   they are **rank-deficient for §3's "per what?" question** — with everything
   accepted, *per string* and *per accepted string* are the same regressor.
 - The acceptance axis therefore lives in `sweep-a*` and in the adversarial rows,
   and **R1 is absent from `sweep-a*`** for L ≥ 6, because it would copy `24·L`
-  bytes into a 128-byte destination. That exclusion is the price of the bug being
-  a write.
+  bytes into a 128-byte destination. ⚠ **The mechanism of that exclusion is the
+  CRASH, not the checksum** (`sweep-*` is never checksum-checked, above): R1's 29
+  usable points are exactly its 29 non-overflowing ones, and `sweep_ir.py`
+  drops the rest on `usable()` and on a non-zero return code. It is still the
+  price of the bug being a write; it is not the price of the gate.
 
 ## 2. "The first WRITE precondition in this project" — it is the second
 
@@ -156,22 +296,48 @@ The copy is a hand-written byte loop in the *source* of R1, R1h, R2, R4 and R5 -
 `idiom.required[3]` requires it for the first three -- and **gcc, clang and rustc
 all turn it back into a `memcpy` call, in every one of those cells except R2.**
 
+⚠ **The `loops` column counts backward branches inside the symbol, and only two
+of them are loop back-edges in either gcc cell.** c-gcc's 4 are the string-walk
+back-edge (`1aea jne 1a28`), the destination-fold back-edge (`1b31 jne 1b18`) and
+**two re-entries** from out-of-lined tail blocks (`1af8 jmp 1a3b`, `1b88 jmp
+1b05`); c-gcc-h's 6 are the same two back-edges plus **four** re-entries
+(`1b53 jae 1a4e`, `1b8a jmp 1a4e`, `1b93 jae 1ac9`, `1b9c jmp 1b59`). So the
+4 → 6 step is gcc out-of-lining the *guarded* copy — the same effect §3b's sign
+mechanism is about — and **not two extra loops**. Nobody should read it as a
+codegen difference in the loop structure; there isn't one.
+
 ⚠ **So the bounds check does not cost R2 a per-byte surcharge on top of a copy:
-it costs R2 the copy IDIOM.** The mechanism is isolated by four cells that differ
-in exactly one thing:
+it costs R2 the copy IDIOM.** The mechanism is isolated by cells that differ in
+exactly one thing. The first four are p12's original table; the last two are the
+controls TASK_040_REVIEW added because the first four confound *where the check
+is* with *which call it is* — the only once-per-string cell in them is also the
+only `copy_from_slice` cell.
 
-| copy spelling | destination write | `memcpy`? | loops | `n_fn` |
-|---|---|---|---:|---:|
-| byte loop, `dst[dlen] = b` (R2) | **checked, per byte** | **no** | 6 | 231 |
-| byte loop, `dst[dlen] = b` in R3 (`s3_tuned_copy_byteloop`) | **checked, per byte** | **no** | 6 | 204 |
-| `copy_from_slice` (R3 shipped) | checked, **per string** | **yes** | 4 | 164 |
-| byte loop, `get_unchecked_mut` (R4) | unchecked | **yes** | 4 | 142 |
+| cell | copy spelling | dst check | src check | `memcpy`? | `n_fn` |
+|---|---|---|---|---|---:|
+| R2 `safe_naive` | byte loop, `dst[dlen] = b` | **per byte** | per byte | **no** | 231 |
+| `s3_tuned_copy_byteloop` | byte loop over the reslice | **per byte** | per byte | **no** | 204 |
+| R3 shipped | `copy_from_slice` | per string | per string | **yes** | 164 |
+| R4 `unsafe` | byte loop, `get_unchecked_mut` | none | none | **yes** | 142 |
+| **`m1_reslice_byteloop`** | **safe byte loop, no bulk call in source** | per string | per string | **yes** | **169** |
+| **`m4_u_srcchecked`** | R4 with only the **source** load checked | none | **per byte** | **no** | **180** |
 
-**A per-byte bounds check on the destination is what blocks the bulk lowering;
-moving the same check to once-per-string brings it back, at zero `unsafe`.** That
-is p09's lost-`load`-merge mechanism arriving on a *write*, and it is why the
-safe-tuned rung is within 0.4% of the unsafe rung on wall clock (§3e) while the
-safe-naive rung is 22% behind it.
+**`m1` is the cell that decides the mechanism.** It is safe Rust, the copy is
+`d[i] = sv[i]` in a hand-written `while` loop, and there is no `copy_from_slice`,
+no `iter`, no bulk call anywhere in its source — and it still lowers to
+`memcpy@GLIBC_2.14`. So the recovery is **where the check is**, not
+`copy_from_slice` being a different routine that carries its own bound.
+
+⚠ **But "on the destination" is not the rule, and p12 published it as one.**
+`m4` leaves the destination store unchecked and checks only the *source* load,
+per byte — and it loses the lowering exactly as R2 does, at 2115.30 / 4033.70
+Ir/call against R4's 1847.30 / 3317.70. **The bulk lowering needs BOTH ends of
+the copy free of a per-iteration check.** That is p09's lost-`load`-merge
+mechanism arriving on a *write*, and it is why the safe-naive rung is the one
+cell whose wall clock is clearly behind the unsafe rung's (§3e). (p12 also wrote
+*"the safe-tuned rung is within 0.4% of the unsafe rung on wall clock"* here;
+that clause is **deleted** — three sessions straddle zero on it, and §3e is the
+only place p12 may be read for a wall-clock number.)
 
 Two consequences for how p12's numbers may be quoted, both from
 `.memory/03-measurement.md`'s rule *"name the routine beside every rate and
@@ -214,7 +380,7 @@ Both laws predict `large` -- K = 31, 3.5× outside the band's `K` range, on a
 L1-resident blobs -- **exactly**: −4·31−1 = **−125.00** measured **−125.00**;
 2·31−5 = **+57.00** measured **+57.00**.
 
-### 3c. R3 − R4: an exact four-term law, and it goes NEGATIVE
+### 3c. R3 − R4, both SHIPPED: an exact four-term law, and it goes NEGATIVE
 
 Both rungs call `memcpy@GLIBC_2.14`, so this difference is within-routine and is
 the one p12 can state as a law. Over **all 48 sweep blobs, max |residual|
@@ -239,18 +405,28 @@ parameters:
 | | K | nacc | dlen | predicted | measured |
 |---|---:|---:|---:|---:|---:|
 | `small` | 6 | 6 | 123 | **+3** | **+3.00** |
-| `large` | 31 | 31 | 124 | **−26** | **−26.00** |
+| `large` | 31 | 31 | 124 | **−26** | **−26.00 (vs the shipped R4)** |
 
 `small` and `large` sit outside the band on every axis the band moves -- mean
 string length 20.5 and 4.0 against a band held at 4 or at K = 24, 100 and 50 000
 windows against 8, L1-resident against 7.6 MiB.
 
-⚠ **So the shipped safe-tuned rung is 26.00 Ir per call CHEAPER than the shipped
-unsafe rung on `large`, and 3.00 dearer on `small`** -- the sign of p12's
-"safety tax" is decided by the string count, and it crosses zero at
+⚠ **So the shipped safe-tuned rung is 26.00 Ir per call CHEAPER than the
+SHIPPED unsafe rung on `large`, and 3.00 dearer on `small`** -- the sign of
+p12's "safety tax" is decided by the string count, and it crosses zero at
 `K = 8` when every string is accepted. This is the fourth measured instance of
 `.memory/01-ladder.md`'s R4-by-permission result and the first where the safe
 rung beats the unsafe one on a *shipped* pair with no respelling on either side.
+
+⚠⚠ **`−26.00` is a FIXED-R4 figure and must never be quoted without the words
+"against the shipped R4".** §11a used to justify holding R4 fixed by claiming its
+endpoint had zero measured width; that claim is false. Route A — the same kernel
+with the capacity test spelled `dlen + slen <= DST_CAP` and its `usize` overflow
+discharged in ghost code — **verifies** (`15 verified, 0 errors`, twin `18/0`,
+`R4 ≡ R5` still `exact`) and is **92.00 Ir/call cheaper** on `large`. Against
+*that* R4 the shipped R3 is **+66.00 dearer**, so the headline's sign is a
+property of which R4 spelling p12 pinned. Same qualifier on the fourth
+"safe beats unsafe" instance. §11a has the numbers and the control.
 
 ### 3d. R2 − R4 has no per-byte law, and that IS the result
 
@@ -266,8 +442,24 @@ by up to 1296 Ir/call**, and no linear model in `(1, K, nacc, xscan, xdst)` does
 better than a max residual of 548 (23% of the quantity). The reason is not noise:
 R4's copy is a `memcpy` call whose cost is a **step function** of the individual
 string length, and R2's is a scalar loop that is linear in it. Even inside the
-all-accept region the per-copied-byte figure wanders -- 13.500, 12.250, 12.500,
-13.375, 13.300 at L = 1..5 -- which is the size dispatch and not a rate.
+all-accept region the *difference* per copied byte wanders -- 13.500, 12.250,
+12.500, 13.375, 13.300 at L = 1..5 -- which is the size dispatch and not a rate.
+
+⚠ **And the non-law is entirely R4's.** Split the difference into its two sides
+on band A at constant `nacc = 24`, and the increments per 24 copied bytes are:
+
+| L | 1→2 | 2→3 | 3→4 | 4→5 |
+|---|---:|---:|---:|---:|
+| R2 | **24.750** | **24.750** | **24.750** | **24.737** |
+| R4 | 13.750 | 11.750 | 8.750 | 11.737 |
+| R3 | 13.750 | 11.750 | 8.750 | 11.737 |
+
+**R2 alone is exactly linear, at 24.75 Ir per copied byte.** It is the cell with
+no bulk call (§3a), so nothing dispatches on size and the rate is a rate. R4 and
+R3 both call `memcpy@GLIBC_2.14` and both inherit its size dispatch, in step.
+So the honest statement is not "the safety difference has no per-byte law" but
+**"the checked byte loop has one and the `memcpy` does not"** -- which is the
+same finding as §3a from the other side.
 
 **So p12 does not publish a per-byte safety tax for R2, and a five-decimal one
 would be a fiction.** What it publishes is the mechanism in §3a and the fixed-`L`
@@ -332,24 +524,56 @@ the correction. `.memory/03-measurement.md` quotes **±9 points** as the bar fro
 four earlier sessions; this session is far tighter, and both bars are reported
 because a quiet session cannot retire a noisy one.
 
-- **R2 is +23.76% / +23.30% behind R4**, corrected. That clears the 1.58% noise
-  floor by 15× and is the only wall-clock claim p12 makes. It is the same
-  quantity §3a explains: R2 is the one cell with no `memcpy`.
-- **R3 vs R4 is +0.29% / +4.00%, and p12 does NOT resolve it.** On `small` it is
-  inside the identical-copy floor; on `large` it clears the floor but sits inside
-  the correction's own error bar, and it **points the opposite way from `Ir`**,
-  which has R3 26.00/call *cheaper*. `.memory/03-measurement.md` records that Ir
-  and ns disagree in direction on this box (gcc: 10% fewer instructions, 23%
-  longer); this is a second instance and the deterministic column is the primary
-  one.
+⚠ **And the noisy bar is the one that held.** The same protocol, unchanged, run
+three more times — twice at TASK_040_REVIEW and once at TASK_041 — on `small`,
+corrected exactly as above:
+
+| `small`, corrected | table above | review A | review B | TASK_041 |
+|---|---:|---:|---:|---:|
+| `R5 − R4` (**must** be 0) | +0.59% | **+5.89%** | **+5.94%** | +0.21% |
+| R2 vs R4 | +23.76% | +35.72% | +25.75% | +27.33% |
+| R3 vs R4 | +0.29% | +3.89% | **−1.05%** | **−0.66%** |
+
+and on `large`: `R5 − R4` +0.09% / +0.24%, R2 +23.30% / +22.36%, R3 +4.00% /
++4.76%.
+
+So the live error bar on this box is `.memory/03-measurement.md`'s ±9 points and
+not this session's ±0.6; **`R3 − R4` on `small` takes both signs across four
+sessions** and is not resolvable here; and the paragraph below was the part of
+§3e that was right.
+
+⚠ **Where the scatter lives, measured**: the RAW levels reproduce and the
+CORRECTION does not. `results/p12-strcat-fixed.json`'s raw `min_s` column,
+re-measured at TASK_041, matches this session's raw column to within **1.0
+point on every one of the eight cells** — `R5 − R4` raw reads +0.67% / +0.04%
+here and −0.21% / +0.01% there. The `n_iters = 1` baseline is what moves: it is
+1.3…3.0 ms of a 24…37 ms level and its own `min` wanders by more than a
+millisecond between cells in one interleaved pass (`c-gcc` 1.346, `c-gcc-h`
+2.814, this run). Subtracting it is still right — the constant is 5.6…12.3% of
+`small` and 22.7…26.4% of `large`, so the raw ratios are biased — but the
+correction is where the ±9 points come from, and a corrected ratio under about
+10 points is not a measurement on this box.
+
+- **R2 is 24…36% behind R4** across four sessions, corrected. That clears the
+  1.58% noise floor by an order of magnitude and is the only wall-clock claim
+  p12 makes. It is the same quantity §3a explains: R2 is the one cell with no
+  `memcpy`.
+- **R3 vs R4 is NOT resolved by p12 and no reading of it may be quoted.** The
+  four sessions give +0.29%, +3.89%, −1.05% and −0.66% on `small` and they
+  straddle zero; on `large` +4.00% / +4.76% clears the floor but sits inside the
+  correction's own error bar and **points the opposite way from `Ir`**, which
+  has R3 26.00/call cheaper *against the shipped R4* (§3c, §11a).
+  `.memory/03-measurement.md` records that Ir and ns disagree in direction on
+  this box (gcc: 10% fewer instructions, 23% longer); this is a second instance
+  and the deterministic column is the primary one.
 - The C-vs-Rust rows change sign between the two inputs (C is 20–25% faster on
   `small` and 4–12% *slower* on `large`) and the `Ir` column agrees with them
   both ways. Naming the compiler is mandatory: the two C cells differ by up to
   5 points of that.
 
-## 4. Two range checks, one bound, two answers -- and what the optimiser did
+## 4. Which range checks survive -- ATTRIBUTED, and the first reading was backwards
 
-R3 is one function containing p03's question twice over:
+R3 is one function that looked like it contained p03's question twice over:
 
 - `dst[dlen..dlen + slen].copy_from_slice(&w[p..q])` -- the fact the range check
   needs, `dlen + slen <= DST_CAP`, is tested **one line above, in the same basic
@@ -357,17 +581,63 @@ R3 is one function containing p03's question twice over:
 - `dst[..dlen].iter()` -- the fact the range check needs, `dlen <= DST_CAP`,
   comes from the **loop-carried invariant** of a loop that has already exited.
 
-**Measured: two panic landing pads survive in R3** (§3a), against seven in R2 and
-zero in R4. Respelling the destination fold three ways -- shipped iterator,
-`s1_tuned_indexed_fold`, `s2_tuned_bytefold_reslice` -- leaves the count at **2
-in all three** and moves the marginal by at most 1.00 Ir/call, so the fold's
-check is not deleted by any admissible spelling of the fold. p03's result
-transplants: the guard that is local is elided, the bound that is loop-carried is
-not.
+p12 measured the pad **count** -- 7 in R2, 2 in R3, 0 in R4 (§3a) -- observed
+that respelling the destination fold three ways leaves it at 2, and read that as
+*the fold's check survives; p03's loop-carried result transplants*. **It does
+not.** The count says how many checks survived; it does not say which, and the
+attribution p12 declined to do contradicts the conclusion p12 drew from it.
 
-⚠ **What was NOT done**: identifying *which* two of R3's checks the two surviving
-pads belong to. The count is off the listing and is a fact; the attribution would
-need the panic `Location` symbols and was not attempted.
+`controls/pads.py` decodes each pad's `core::panic::Location`
+(`{file*, len, line, col}`) and prints the source expression it guards, with a
+caret. `-O3 isolated`, kernel symbol only:
+
+```
+$ python3 patterns/p12-strcat-fixed/controls/pads.py --source <binaries>
+safe_naive                 pads=7  48:23 48:50 49:20 49:57 61:16 70:29 71:17
+safe_tuned                 pads=2  50:24 `&buf[off..off + len]`   71:54 `&w[p..q]`
+s1_tuned_indexed_fold      pads=2  50:24  71:54       <- IDENTICAL pair
+s2_tuned_bytefold_reslice  pads=2  50:24  71:54       <- IDENTICAL pair
+s3_tuned_copy_byteloop     pads=3  50:24  73:29 `w[i]`  74:17 `dst[dlen] = b`
+m1_reslice_byteloop        pads=2  50:24  72:31 `&w[p..q]`
+m4_u_srcchecked            pads=1  84:29 `buf[off + i]`
+unsafe / verus             pads=0
+```
+
+⚠ **Neither of R3's two survivors is a destination check.** They are the window
+reslice `&buf[off..off + len]` -- whose bound is the *caller's* precondition and
+cannot be proved inside `kernel` -- and the source reslice `&w[p..q]`, whose
+bound `q <= len` is a **runtime value**. `dst[..dlen]`, the loop-carried case
+§4 was written about, contributes **zero** pads in all three fold spellings. So
+the constant 2 is evidence the fold **never** contributed a pad, not that its
+check survives.
+
+**The discriminator is not locality.** `dlen <= DST_CAP` is bounded by a
+**constant** LLVM can see from the guarded increments, so it is elided wherever
+it appears -- in the fold, and also in `m1`'s destination reslice `&mut
+dst[dlen..dlen + slen]`, which is likewise pad-free while the *source* reslice
+one line below it is not. `q <= len` is bounded by a **runtime value** and is
+not. That is a sharper statement than p03's same-block-vs-loop-carried one, and
+**it does not transplant p03's result**; p03's story is about where the fact is,
+this one is about whether the bound is a literal.
+
+Two further readings the decode makes available, and the counts alone did not:
+
+- **six of R2's seven pads are source READS** -- the four header bytes
+  (`48:23`, `48:50`, `49:20`, `49:57`), the scan's `buf[off + q]` (`61:16`) and
+  the copy's `buf[off + i]` (`70:29`). Exactly **one**, `71:17 dst[dlen]`, is
+  the destination store this pattern exists for. R2's pad count is mostly a
+  *scan and header* cost, not a write cost.
+- **`m4` isolates it**: an unsafe rung with only the source load re-checked
+  keeps exactly that one source pad and no destination pad, and that single pad
+  is enough to cost it the `memcpy` (§3a).
+
+**Method note, because it bit twice.** The `Location` pointer is passed in
+whatever register the panic entry's arity puts it -- `%rdx` for
+`panic_bounds_check`, `%rax` for the slice-range entries -- and matching one
+register silently under-counts: it lost 2 of R2's 7 on the first attempt here,
+and it is why `.temp/r40/pads.py` reported six distinct locations for R2 rather
+than seven. `controls/pads.py` matches any register and validates the decoded
+struct instead. `.memory/03-measurement.md` has the technique.
 
 ## 5. Keeping the `requires` at ONE clause — three routes, all three priced
 
@@ -401,11 +671,29 @@ $ ./verus_run.py patterns/p12-strcat-fixed/verus.rs           # shipped
 verification results:: 15 verified, 0 errors
 ```
 
+⚠ **`r1_verus_plain_additive` is route A *without its discharge*, and p12 read
+its failure as route A being unavailable.** It is not: the missing fact is
+`buf@.len() <= isize::MAX`, and supplying it p17's way makes route A verify.
+`a1_verus_routeA` is that control — one extra `requires`, the three loop
+invariants raised from `usize::MAX` to `isize::MAX`, one extra driver conjunct
+and one extra driver invariant, all ghost:
+
+```
+$ ./verus_run.py .temp/p12/controls/a1_verus_routeA.rs
+verification results:: 15 verified, 0 errors
+$ ./verus_run.py .temp/p12/controls/a1_verus_routeA.rs --cfg slb_twin
+verification results:: 18 verified, 0 errors
+```
+
+Same obligation count as the shipped rung, same twin count, and `md5_fn` of its
+kernel equals `a2_unsafe_routeA`'s (`a1b1a8366eb6`), so `R4 ≡ R5 exact` survives
+the respelling. What that costs the headline is section 11a.
+
 Three routes to the same obligation, and the ordering is not the one anyone would
 guess. Static `n_fn` of the R4-side exec code, `-O3 isolated`, all three printing
 the identical checksum on `small`:
 
-| route | spelling | `requires` clauses | driver conjuncts | `n_fn` | Δ |
+| route | spelling | `requires` clauses | driver conjuncts | `n_fn` | static Δ |
 |---|---|---:|---:|---:|---:|
 | A (p17's) | `dlen + slen <= DST_CAP` + `buf@.len() <= isize::MAX` | 2 | 3 | 140 | **0** |
 | **C (shipped)** | `slen <= DST_CAP && dlen + slen <= DST_CAP` | **1** | **2** | 142 | **+2** |
@@ -417,6 +705,27 @@ Every `n_fn` above is measured on the R4-side exec code built by
 `12909139622517405579` on `small`. Route A's precondition and driver conjunct are
 ghost and cost no instructions; that is p17's measured result and it is why the
 row reads 0.
+
+⚠ **The Δ column is STATIC, and p12 published it as "+2 instructions per
+string". It is not a per-string figure at all.** Measured as the whole-program
+marginal, interleaved, against route A's exec code on `sweep-nKL04` and on the
+two matrix blobs:
+
+| K | 6 | 12 | 20 | 24 | 31 (`large`) |
+|---|---:|---:|---:|---:|---:|
+| **C shipped − A** | **17.00** | **35.00** | **59.00** | **71.00** | **92.00** |
+| law `3.00·K − 1.00` | 17 | 35 | 59 | 71 | 92 |
+| B subtraction-first − A | 24.00 | 48.00 | 80.00 | 96.00 | — |
+| law `4.00·K` | 24 | 48 | 80 | 96 | — |
+
+Exact at every point, including two `K` p12's own inputs never visit. **So the
+shipped spelling costs `3.00 Ir per string WALKED`, not 2** — 1.5× the published
+figure and **92.00 Ir/call on `large`** — plus a `−1.00` once per call; the
+subtraction-first idiom costs `4.00` per string and nothing per call.
+**A static `n_fn` delta is not a rate**, and this is the cleanest instance the
+project has: +2 static, +3.00 dynamic per iteration, and the gap is not
+recoverable from the static count. ⚠ The *mechanism* for the third instruction
+was NOT derived from the listing here; only the law was measured.
 
 ⚠ **The subtraction-first respelling this project adopted as its safe idiom on
 p02 and p16 is the DEAREST of the three here.** `DST_CAP - dlen` is a constant
@@ -430,24 +739,27 @@ respells the test fails the declaration. Checked with the gate's own matcher and
 not by eye (section 11c): `r3_unsafe_plain_additive` and
 `r4_unsafe_subtraction_first` both miss `required[1]`, where the shipped
 `unsafe.rs` misses none of the entries it scopes to. **So the table above prices
-the PIN, and it is not an in-contract R4-side span.** The in-contract R4 side of
-p12 has zero measured width -- section 11a.
+the PIN, and it is not an in-contract R4-side span.** ⚠ It is *also* not a
+zero-width R4 endpoint, which is what p12 first concluded from it -- section 11a.
 
-**Route C ships**, and the +2 instructions per string is the price. Three reasons
-it is preferred over A: the `requires` stays at one clause and the driver at two
+**Route C ships**, and 3.00 Ir per string walked is the price. Three reasons it
+is preferred over A: the `requires` stays at one clause and the driver at two
 conjuncts, which keeps p12's contract directly comparable with p03's and p11's;
 the additive spelling the pattern is about survives verbatim on the right of the
 `&&`; and A's zero is already a published p17 result, where C's number is new.
+⚠ **None of the three is a performance reason**, and the price is now known to
+be 3.5× what p12 thought when it chose.
 
-⚠ **And C's +2 is charged to the four Rust rungs only.** R1h keeps the plain
+⚠ **And C's price is charged to the four Rust rungs only.** R1h keeps the plain
 `if (dlen + slen <= DST_CAP)`, because R1h is not chained to the prover and
 putting the conjunct there would charge the C column for a Verus concession. So
 this is, as far as this project's records go, **the first measured price the
 `identity` pin has extracted from a SHIPPED cell** rather than from a variant it
 disqualified: `.memory/01-ladder.md`'s R4-by-permission instances (p16's `u_c32`,
 p11's `r4_cstr`, p05's `r4_dataslice`) are all "this variant cannot be a rung".
-Here the rung pays, uniformly, +2 per string, and every Rust-side rung comparison
-is unaffected because all four carry it.
+Here the rung pays, uniformly, **3.00 Ir per string walked** — 92.00 Ir/call on
+`large`, **2.8% of R4's 3317.70** — and every Rust-side rung comparison is
+unaffected because all four carry it.
 
 ## 6. The proof, the TCB and the obligation count
 
@@ -846,7 +1158,7 @@ n_iters= 1000 c-clang  rc=0 out=10464138362225408507
 (against `c-clang-h` and `safe_naive`, which give six different answers for the
 six values, as they must.) **The kernel's overflow reached into `main`'s frame
 and destroyed the driver's own loop state**, so `while (it < inp.n_iters)` stopped
-depending on `n_iters` at all. This is the +16…+48 regime of §0 seen from the
+depending on `n_iters` at all. This is the +9…+56 regime of §0 seen from the
 other end: the corruption is not confined to the kernel that caused it, and any
 measurement of an overflowing R1 is measuring an unknown number of calls.
 
@@ -868,10 +1180,13 @@ checksum on both blobs.
 | `s1_tuned_indexed_fold` -- destination fold as an indexed loop | **1849.30** | **3291.70** | yes (`required[6]` pins the operation, not the loop form) |
 | `s2_tuned_bytefold_reslice` -- fold indexed through a reslice taken once | **1849.30** | **3291.70** | yes |
 | **OK shipped R3**, iterator fold over `&dst[..dlen]` | 1850.30 | **3291.70** | yes |
+| `m1_reslice_byteloop` -- copy as a SAFE byte loop over two reslices | 1868.30 | 3384.70 | yes (same misses as shipped R3) |
 | `s3_tuned_copy_byteloop` -- copy as a byte loop instead of `copy_from_slice` | 2448.30 | 4226.70 | yes (`required[3]` pins the byte loop for R1/R1h/R2 and leaves R3 free) |
 
 **R3-side span, cheapest found to dearest found:** `1849.30 ... 2448.30` on
-`small` and `3291.70 ... 4226.70` on `large`, width **599.00 / 935.00**.
+`small` and `3291.70 ... 4226.70` on `large`, width **599.00 / 935.00**. `m1`
+sits inside it on both blobs and moves neither endpoint -- which is the point:
+it keeps the `memcpy` (§3a) and pays only the two reslices.
 
 WARNING -- "cheapest found", and it names its input (`.memory/01-ladder.md`: a
 cheapest-found figure must name its input, because p03's cheapest spelling
@@ -883,34 +1198,66 @@ shipped cell already is the cheapest found.
 The **fixed-R4 bound**, R4 held by fiat (`R3ship - R4ship`): **+3.00 on `small`,
 -26.00 on `large`.** Cheapest-found R3 against `R4ship`: **+2.00 / -26.00**.
 
-WARNING -- this project publishes no pair interval and p12 does not either, and
-p12's R4 endpoint has **zero measured width**: the only R4-side variant that
-moves is `r3_unsafe_plain_additive` (route A, 2 instructions cheaper), and its
-twin does **not** verify at the pinned vstd -- `possible arithmetic
-underflow/overflow`, `14 verified, 1 errors`, section 5b. Making it verify needs a
-second `requires` and a third driver conjunct, which is p17's route and was **not
-built or measured here**; until somebody does, route A is a control and not a
-rung, exactly as p05's `r4_dataslice` and p16's `r4_hdr` are. So p12's pair
-interval is **degenerate** and collapses onto the R3-side span above.
+### 11a-bis. The R4 endpoint is NOT degenerate, and that flips the headline's sign
+
+p12 first wrote that its R4 endpoint had **zero measured width**, on the
+inference that the only cheaper R4-side variant -- `r3_unsafe_plain_additive`,
+route A -- could not verify (`possible arithmetic underflow/overflow`,
+`14 verified, 1 errors`, section 5b) and that making it verify "was not built or
+measured here". **It has now been built.** `a1_verus_routeA` supplies exactly the
+missing fact, in ghost code, and verifies:
+
+```
+$ ./verus_run.py .temp/p12/controls/a1_verus_routeA.rs              15 verified, 0 errors
+$ ./verus_run.py .temp/p12/controls/a1_verus_routeA.rs --cfg slb_twin  18 verified, 0 errors
+$ python3 harness/asm.py stat <a1> / <a2>   n_fn 140/135, md5_fn a1b1a8366eb6 in BOTH
+```
+
+Same 15 obligations as the shipped rung, same three twins, `R4 ≡ R5 exact`
+preserved, same checksum on both blobs. Marginal Ir/call, interleaved,
+`-O3 isolated`:
+
+| | `small` (K=6) | `large` (K=31) |
+|---|---:|---:|
+| shipped R4 (`&&`) | 1847.30 | 3317.70 |
+| **route A R4** | **1830.30** | **3225.70** |
+| shipped R3 | 1850.30 | 3291.70 |
+
+⚠ **The R4-side width is 17.00 / 92.00, not zero.** On `large` that is 3.5× the
+`−26.00` headline and it **flips its sign**: shipped R3 is **+66.00 dearer** than
+the cheapest-found *verifying* R4. So:
+
+- **`−26.00` may never be quoted without the words "against the shipped R4"**,
+  and the same qualifier attaches to p12's fourth instance of "the safe rung
+  beats the unsafe one" (§3c). Against the cheapest verifying R4 it is not an
+  instance at all.
+- The published *in-contract* number survives untouched: route A misses
+  `idiom.required[1]`, so it is a **control and not a rung**, exactly as p05's
+  `r4_dataslice` and p16's `r4_hdr` are. What falls is "zero measured width" and
+  the stated reason for it.
+- p12 still publishes no pair interval. But it no longer claims the interval is
+  degenerate: it is at least **17.00 / 92.00** wide on the R4 side and
+  **599.00 / 935.00** on the R3 side.
 
 ### 11b. The other spellings, and the "not the headline" line
 
 | axis | variants measured | effect |
 |---|---|---|
-| destination fold (R3) | iterator OK / indexed / reslice-indexed | at most **1.00** Ir/call, and the panic-pad count is 2 in all three (section 4) |
-| copy (R3) | `copy_from_slice` OK / byte loop | **+599.00 / +935.00** -- it is the `memcpy` idiom, not a rate (section 3a) |
-| capacity check (Rust) | `&&` OK / plain additive* / subtraction-first* | **+2 / 0 / +4** static instructions (section 5). *both starred variants are OUT of contract -- `required[1]` pins the shipped spelling |
+| destination fold (R3) | iterator OK / indexed / reslice-indexed | at most **1.00** Ir/call, and the panic-pad pair is the *same two source-side pads* in all three (section 4) |
+| copy (R3) | `copy_from_slice` OK / byte loop / **safe byte loop over two reslices** (`m1`) | **+599.00 / +935.00** for the per-byte-checked byte loop -- it is the `memcpy` idiom, not a rate; `m1` keeps `memcpy` and costs only **+18.00 / +93.00** (section 3a) |
+| capacity check (Rust) | `&&` OK / plain additive* / subtraction-first* | **+2 / 0 / +4** *static*; measured **3.00 / 0 / 4.00 Ir per string walked** (section 5). *both starred variants are OUT of contract -- `required[1]` pins the shipped spelling |
 | capacity check (C) | plain additive OK / `unsigned char` sum* | same instruction count, and the narrow one is exploitable (section 8). *out of contract: it misses `required[1]` |
 | copy (R2 and R4) | byte loop OK in both | R2 loses `memcpy`, R4 keeps it -- same source, different lowering (section 3a) |
+| which END is checked (control) | `m4_u_srcchecked` -- only the SOURCE load checked | loses `memcpy` too: **2115.30 / 4033.70**. A control, never a rung (section 3a) |
 
 WARNING -- none of these is the headline. p12's headline is section 3a's
-mechanism -- a per-byte bounds check on the destination costs the bulk-copy
-lowering, and moving the same check to once per string recovers it at zero
-`unsafe` -- together with section 3b's compiler-dependent sign and section 3c's
-exact `R3 - R4` law. The spread above is what the declaration leaves free, and it
-is reported so a reader can see how much of the headline is a choice of spelling:
-on `large`, **all of the R3-side width is the copy spelling and none of it is the
-fold's**.
+mechanism -- **a per-iteration bounds check at either end of the copy costs the
+bulk-copy lowering, and moving both checks to once per string recovers it at
+zero `unsafe`** -- together with section 3b's compiler-dependent sign and section
+3c's exact `R3 - R4` law, which is a **fixed-R4** law (section 11a-bis). The
+spread above is what the declaration leaves free, and it is reported so a reader
+can see how much of the headline is a choice of spelling: on `large`, **all of
+the R3-side width is the copy spelling and none of it is the fold's**.
 
 ### 11c. Every control checked against the gate's own matcher
 
@@ -943,7 +1290,16 @@ Controls:
 | `d1_naive_nocheck` | `required[1]` | out of contract **by construction** -- it is R1's bug |
 | `d2_unsafe_nocheck` | `required[1]`, `required[3]` | out of contract by construction |
 | `n1_uchar_sum` | `required[1]` | out of contract by construction |
+| `k1_capfold_hardened` | `required[2]`, `required[5]` | out of contract **by construction** — the point of it is the fold `required[5]` pins and the `= {0}` initialiser `required[2]` pins |
+| `k2_capfold_nocheck` | `required[1]`, `required[2]`, `required[5]` | out of contract by construction — `k1` plus R1's deletion |
+| `m1_reslice_byteloop` | `required[3]` | **in contract** (same as shipped R3) |
+| `m4_u_srcchecked` | `required[3]` | the ruler passes it, but it is **not a rung**: it mixes `unsafe` with a per-byte check, so it is neither the safe-tuned nor the unsafe idiom. Quoted only as a mechanism control |
+| `a1_verus_routeA` | `required[1]`, `required[3]` | out of contract (route A, verifying) |
+| `a2_unsafe_routeA` | `required[1]`, `required[3]` | out of contract (route A's exec code) |
 
-No control hits a `forbidden` spelling. The three `s*` variants are the only ones
-quoted as an in-contract span (section 11a); everything else is quoted as a
-control and labelled as one.
+No control hits a `forbidden` spelling. The three `s*` variants and `m1` are the
+only ones quoted as an in-contract span (sections 11a, 11b); everything else is
+quoted as a control and labelled as one. ⚠ `m4` is the case that shows the ruler
+is a *necessary* and not a sufficient condition: it passes and is still not a
+rung, because "which rungs an entry scopes to lives in its English"
+(`check.py:862`).

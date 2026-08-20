@@ -67,9 +67,13 @@ defaults to `-fstack-protector-strong`, the upstream clang tarball to no stack
 protector, and `harness/build.py` passes neither way):
 
     overflow  +1 .. +8      SILENT in gcc AND clang -- wrong answer, exit 0
-    overflow +16 .. +48     gcc `*** stack smashing detected ***` (134);
+    overflow  +9 .. +56     gcc `*** stack smashing detected ***` (134);
                             clang SILENT, and it corrupts the CALLER's locals
-    overflow +64 and up     gcc 134; clang SIGSEGV (139)
+    overflow +57 and up     gcc 134; clang SIGSEGV (139)
+
+(Boundaries re-scanned at step 1 at TASK_041 -- the first published ladder
+sampled T on a coarse grid and put both of them one step off; the regimes
+themselves reproduce exactly. ../NOTES.md 0.)
 
 so the adversarial rows are designed one per regime rather than all at one
 magnitude:

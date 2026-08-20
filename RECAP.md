@@ -631,14 +631,29 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
 
    ⚠ **THE STRUCTURAL CLAIM WAS TOO STRONG, and the reviewer built the row p12
    said could not exist.** What is forced, with no read analogue: *for a write bug
-   whose guard is the destination's own bound, every input on which the guard
-   fires is one on which the unguarded rung executes an out-of-bounds store.*
+   whose guard's threshold **is the destination's ALLOCATED EXTENT**, every input
+   on which the guard fires is one on which the unguarded rung executes an
+   out-of-bounds store.*
    Whether that input can **also** be a checksum-agreeing perf row is a **design
    choice** — fold the destination at *fixed extent* and put rejection exactly at
    capacity, and checked and unchecked print identical checksums at every
    `n_iters` while ASan still fires. The price: **the perf row executes UB on
-   every call**, usable only in the silent regime (≤ +8 B here). p13, p14, p23,
-   p24 and p25 inherit the first half only. See `.memory/02-bench-rules.md`.
+   every call**, usable only in the silent regime (≤ +8 B here).
+   ⚠⚠ **AND THE PREMISE DOES NOT REACH THREE OF THE FIVE PATTERNS IT WAS WRITTEN
+   FOR** (TASK_041, measured: `p12/NOTES.md` 1b, probe under ASan+UBSan). Hold
+   everything fixed but the guard's threshold: at `n == sizeof dst` the guard
+   fires and the unguarded rung stores OOB; at a **caller-supplied** `n < sizeof
+   dst` the guard fires just as loudly — the checksums differ — and the unguarded
+   rung is **ASan- and UBSan-clean**. So **p13** (`strncpy`'s `n` is
+   caller-supplied, and its bug is the missing NUL and the OOB *read* downstream)
+   and **p24** (`child < n`, a live length below capacity) do **not** inherit it;
+   **p14**'s delimiter is not a bound at all and it is the scan's `i < len` the
+   sentence reaches; **p23** and **p25** do inherit it. The generalisation is
+   about the **threshold**, not about the write: a threshold at the allocation's
+   extent makes "the guard fired" and "the unguarded rung committed UB" the same
+   event; a threshold inside the allocation makes them independent, and then the
+   write patterns behave exactly like the read patterns.
+   See `.memory/02-bench-rules.md`.
 
    ⚠ **`−26.00` is a FIXED-R4 figure.** p12 called its pair interval degenerate on
    an *inference*; the reviewer **built** the cheaper R4 (route A) and it verifies
@@ -648,10 +663,14 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    only. And the `identity` pin's price is **3.00 Ir per string walked**, not the
    `+2` published — that was a static `n_fn` delta wearing a per-string label.
 
-   Observability is a function of **magnitude and compiler**: +1…+8 B silent and
-   wrong on both; gcc's canary fires from **+12**; clang's loop is destroyed
-   +12…+48 and SIGSEGVs from +64. `-fno-stack-protector` would be **both a thumb
-   on the scale and unnecessary**.
+   Observability is a function of **magnitude and compiler**: **+1…+8 B silent
+   and wrong on both**, then gcc's canary and clang's caller-frame corruption,
+   then clang's SIGSEGV. ⚠ **Quote the regime, not the constant**: the two upper
+   boundaries are frame-layout properties and move with the binary — step-1 on
+   p12's own probe they are **+9** and **+57** (TASK_041), step-4 on the shipped
+   kernel the review read them as +12 and +64, and the first publication's coarse
+   grid gave +16 and +64. The **+8** boundary is the one that reproduces.
+   `-fno-stack-protector` would be **both a thumb on the scale and unnecessary**.
 
 22. **Attribute a surviving panic pad by DECODING its `core::panic::Location`.**
    (TASK_040_REVIEW.) Counting pads says *how many* checks survived, never
@@ -662,7 +681,12 @@ writing a task file, name the pattern (*"p05's causal claim"*), never the number
    survivors are the window reslice and the source reslice, which gives a sharper
    discriminator than p03's locality story and does **not** transplant it: a bound
    from a **constant** LLVM can see is elided; a bound from a **runtime value** is
-   not. Tool: `.temp/r40/pads.py`; see `.memory/03-measurement.md`.
+   not. **Tool, now committed: `patterns/p12-strcat-fixed/controls/pads.py`**
+   (TASK_041 — the review's `.temp/r40/pads.py` is gitignored, and its `%rcx`-only
+   `lea` match under-counted R2 by 2 of 7; the shipped one matches any register,
+   validates the decoded struct, resolves the file name through the
+   `R_X86_64_RELATIVE` addend, and prints the guarded expression with a caret).
+   See `.memory/03-measurement.md`.
 
 ## Retracted — do not reinstate
 

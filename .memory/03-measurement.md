@@ -99,6 +99,15 @@ unsafe/verus     pads=0
 the fold **never** contributed a pad. The opposite conclusion had already reached a
 rung's source comment and a published mechanism.
 
+⚠ **Two traps in the decoder itself** (TASK_041, which found a pad the first
+version missed — R2 has **seven** distinct pads, not six): **the `Location`
+pointer's register is not fixed** — it depends on the panic entry's arity (`%rdx`
+for `panic_bounds_check`, `%rax` for slice-range entries) — so a `%rcx`-only `lea`
+match *under-counts*; and **in a PIE the `file` pointer is 0 in the image**, with
+the real address in the `R_X86_64_RELATIVE` addend (`readelf -rW`). The shipped
+decoder is `patterns/p12-strcat-fixed/controls/pads.py`; it matches any register,
+validates the decoded struct, and has a `--source` mode.
+
 **Always decode before attributing.** And note the sharper discriminator it
 produced: `dlen ≤ DST_CAP` is bounded by a **constant** LLVM can see from the
 guarded increments and is elided; `q ≤ len` is bounded by a **runtime value** and
@@ -666,7 +675,13 @@ penalty exceeds its `Ir` penalty **on `small` only** (+215…+220% against `Ir`'
 
 1. **Never quote a wall-clock ratio off the raw column.** Quote the level if you
    must, and label it *"includes the per-process constant"*.
-2. The correction subtracts two noisy minima, so it is **noisier than the raw
+2. **The ±9-point bar lives in the CORRECTION, not in the level** (TASK_041):
+   p12's raw `min_s` reproduced within **1.0 point on all eight cells** across
+   sessions, while the corrected `R5 − R4` spanned **+0.21 … +5.94%**. The
+   `n_iters = 1` pass is the noisy half — its own `min` wanders by >1 ms between
+   cells within a single pass. So quote the raw level when you can, and treat the
+   corrected ratio as the derived, wider quantity.
+   The correction subtracts two noisy minima, so it is **noisier than the raw
    column**, and the residual is a **session property**: `R5 − R4` — which must be
    0, the kernels being byte-identical — read **−0.9%, +2.6%, +2.7%, +8.7%** over
    four runs (TASK_039). **Quote ±9 points as the error bar**, and only quote a

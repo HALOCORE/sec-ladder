@@ -36,7 +36,10 @@ while the overflow stays in the *silent* regime (≤ +8 bytes on this box, both
 compilers), and that is a property of the frame layout, not a guarantee. **A
 pattern built this way must pin the overflow at ≤ +8, assert the marginal is
 non-zero, and say in `spec.md` that the R1 row executes UB by construction.**
-Relevant to **p13, p14, p23, p24, p25**.
+The counter-design **ships**: `p12/controls/gen_controls.py`'s `k1`/`k2` pair plus
+`fillreject_blob()`, and the threshold probe is
+`p12/controls/threshold_probe.py` — both re-derivable from the tree rather than
+from gitignored scratch.
 
 **Two scope corrections while you are here** (both measured): the gate's
 checksum-agreement requirement binds the **matrix** inputs only —
