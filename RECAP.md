@@ -936,15 +936,22 @@ record's commit against `common/driver.c`'s last change; **p16 was never at risk
 which that test could not see**. A commit test is not the test; hashes are
 (`.memory/03-measurement.md`).
 
-**p03 and p09 are landed and reviewed. THE NEXT TASK IS `TASK_040` — p12,
-`strcat` into a fixed buffer.** It is the classic stack smash, the single
-most-cited memory-safety bug in C, and this project does not have it: **every bug
-here so far is a READ** except p02's bulk `memcpy`. It is also the first pattern
-where the safe rung **cannot express the bug at all** (p08's shape, on length
-rather than aliasing).
-After it: **p04** (ring buffer — modular index plus aliasing), **p13**
-(`strncpy` truncation — silent, and the check is *inside* libc), **p06**
-(in-place reverse — a permutation invariant, which is a new *proof* shape).
+**p12 is landed and reviewed. THE NEXT TASK IS `TASK_042` — p04, the ring
+buffer.** Three reasons: its index is **modular**, so it is the **third operator**
+in a series this project built without meaning to (p05 asked whether LLVM carries
+a bound through a *multiply*, p09 through a *shift* — and answered that the
+composition through the multiply is what fails; p04 asks `%`); it is the first
+kernel with **two live cursors**, so its guard is a *relation* rather than a
+comparison against a constant, which is exactly the shape finding 12 records as
+p05's blocker; and **its bug stays in bounds** — drop the fullness check and a push
+onto a full ring overwrites the oldest element with no OOB access at all, which
+would be the **second instance** of finding 19's result that memory safety is not
+the property that catches this.
+
+After it: **p13** (`strncpy` truncation — silent, and the check is *inside* libc;
+note it does **not** inherit p12's write rule), **p06** (in-place reverse — a
+permutation invariant, a new *proof* shape), **p14** (tokenizer — in-place
+mutation plus aliasing).
 
 ⚠ **Read the ratio before planning anything else. TASK_015–031 is seventeen
 consecutive tasks of methodology and correction against two patterns produced
