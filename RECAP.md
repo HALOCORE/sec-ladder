@@ -8,8 +8,8 @@ this box is reference; this box is what to *do*.
 
 | | |
 |---|---|
-| **Patterns** | **13 of 47 exist, all green, all 13 reviewed.** |
-| **Immediate next task** | **the next pattern: p06** (in-place reverse/rotate). p13 is built, reviewed and corrected; nothing is outstanding on it. Write `TASK_047` — and read `.memory/01-ladder.md`'s direction-test block first, because p06's spec will want per-rung spellings and that is what p13 got wrong. |
+| **Patterns** | **13 of 47 exist, all green, all 13 reviewed.** p06 is the 14th and is being built now. |
+| **Immediate next task** | **`TASK_047` is WRITTEN and IN FLIGHT** — p06, in-place rotate, with a research engineer building it. If you are resuming cold: check whether `patterns/p06-rotate/` exists and what `harness/check.py p06` says, and read the engineer's running notes at `.temp/p06/NOTES.md` **before** deciding anything. Agents die to transient API errors (five so far, none lost work) — **resume with `SendMessage`, do not restart.** When it lands: commit, then write `TASK_047_REVIEW`. |
 | **Then** | review p06, then **p14** (tokenizer — in-place mutation + aliasing), then **p10** (sliding window) or **p18** (LEB128). |
 | **The loop** | build a pattern → review it once → land corrections → repeat. Per `PROTOCOL.md` rule 9, write `.memory/` **only after** the review. |
 | **Git** | Commit at task boundaries; subagents never commit. ⚠ **There is a GitHub remote** (`origin`, `HALOCORE/sec-ladder`). **Do not push unless the user asks.** |
@@ -1137,8 +1137,10 @@ engineer *flagged against itself*, and a mechanism asserted without a control.
 
 ## Immediate queue
 
-**The next task is `TASK_047` — p06.** See the START HERE box; this section is
-the standing backlog, not the next action.
+**`TASK_047` — p06 — is written and in flight.** See the START HERE box; this
+section is the standing backlog, not the next action. ⚠ **Item 1 (the two-step
+reslice) and item 11 (a length-heterogeneous sweep band) are both assigned into
+`TASK_047`**, so check p06's outcome before re-queuing either.
 
 ### Owed, in priority order
 
