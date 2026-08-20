@@ -24,10 +24,16 @@ context still applies — do not restart from scratch.
 
 1. **Alternate engineer → reviewer.** Every review so far has found real defects
    in work that reported success; four found them past a fully green gate.
-2. **Ask to be corrected, not obeyed.** Say so in every task file. Engineers have
-   contradicted the manager's written instructions **seven times** with
-   measurements and were right all seven — twice on prescriptions that could not
-   have worked at all. This is the single highest-value behaviour on the project.
+2. **Ask to be corrected, not obeyed.** Say so in every task file, and **name the
+   call you are least sure of, by name, and ask for the measurement.** Every
+   agent that has contradicted the manager's written instructions with a
+   measurement has been right — twice on prescriptions that could not have worked
+   at all, once on three separate premises in one task. This is the single
+   highest-value behaviour on the project.
+   ⚠ **The running count lives in ONE place: the closing paragraph of the newest
+   `.tasks/TASK_NNN*.md`.** Increment it there when you write the next task file
+   and nowhere else. It used to be duplicated here and in `RECAP.md`, where both
+   copies went stale and disagreed with the task files by 48 and 42.
 3. **Never clear your own design.** If the manager designed a mechanism, or
    finished an agent's work, the review must say so explicitly and a *different*
    agent must attack it. Designer-validates-own-design is the configuration this

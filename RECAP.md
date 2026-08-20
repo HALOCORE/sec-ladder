@@ -880,12 +880,14 @@ manager lands `.memory/` corrections and commits.
 overclaiming, every time from the same cause. Engineer writes `NOTES.md`, manager
 commits it, reviewer attacks it, *then* `.memory/`.
 
-**Ask to be corrected, not obeyed.** Agents have contradicted the manager's
-written instructions **thirteen times** with measurements and were right all
-thirteen.
-Two were prescriptions that could not have worked at all; one overturned three
-premises in a single review; the latest caught the manager overclaiming a
-headline. Say so in every task file.
+**Ask to be corrected, not obeyed.** Every agent that has contradicted the
+manager's written instructions with a measurement has been right. Two were
+prescriptions that could not have worked at all; one overturned three premises in
+a single review; p04's engineer refuted three of the manager's prescriptions in
+one task. Say so in every task file, and **name the call you are least sure of**.
+⚠ **The running count lives in one place — the closing paragraph of the newest
+`.tasks/TASK_NNN*.md`** — because it was duplicated here and in `PROTOCOL.md`
+and both copies went stale (13 and 7 against the task files' 55).
 
 ## The recurring traps
 
