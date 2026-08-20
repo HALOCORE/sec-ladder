@@ -267,6 +267,37 @@ was an argument from a broken rule about an exclusion that would not have worked
 it has been withdrawn.** Do not cite this test again until a reviewer has
 attacked the repair.
 
+⚠ **THE REPAIR HAS NOW BEEN ATTACKED, AND IT FIRED — on p13, on shipped code,
+with a measured number** (TASK_045_REVIEW blocker 1). Until then every direction
+test on this project had come out at or near **0.00**, which is what a clean
+declaration looks like and also what a test that cannot fire looks like. It can
+fire.
+
+**The shape it caught is new and is the one to look for: an idiom entry SCOPED to
+some rungs and not others.** p13's `spec.md:374` and `:394` pin the byte-loop
+copy and fill in **`safe_naive.rs`, `unsafe.rs` and `verus.rs`**, exempting
+`safe_tuned.rs` **by name**. So R3 was permitted the bulk spelling and R4 was
+forbidden it — and p13's headline is *"safe Rust beats unsafe by 13.6–17.3%"*.
+Relax the pin symmetrically and it is **−7.54% / −14.74%**: **48% (small) and 17%
+(large) of the published margin was the pin.** The sign survives; the magnitude
+does not.
+
+> **An idiom entry whose scope names some rungs and excludes others is a thumb on
+> the scale until its direction is measured.** A whole-pattern exclusion is
+> visible — every rung loses the spelling and the comparison stays matched. A
+> *scoped* one silently makes the two sides of the comparison unequal, and the
+> `pins_nothing` signal cannot see it because the entry does pin something on
+> every rung it names.
+
+⚠ **And note where the error was reported.** p13's `NOTES.md:842` said the R4
+side "is not searched" and attributed it to **the prover** — the R4-is-chained-to
+-the-prover mechanism (finding 14) is real, invoked constantly, and it is now
+also **the most available wrong explanation on this project**. The prover did not
+bind: `copy_nonoverlapping` and `write_bytes` verify at the pinned vstd
+(15/0, twin 22/0, `identity: exact` holding). **Before blaming vstd for an
+unsearched R4 side, run `./verus_run.py`** — the same eleven minutes that has
+already killed five published figures.
+
 ### R1h — the hardened C cell (optional, added at TASK_004)
 
 | Rung | Dir/file stem | Definition |
@@ -1641,6 +1672,82 @@ places and points at nothing. **Name the pattern, never the number.**
    must cross the attacker branch and LLVM drops it, while p04 has no container
    check to keep because `%` supplies both cursors' upper bounds unconditionally.
    **The law reproduces for the stream and not for the container.**
+
+14. **p13 — a bound the optimiser can SEE is worth more than the check costs;
+   and the first pattern whose rungs call different libc routines.** (TASK_043,
+   reviewed at TASK_045_REVIEW: **three blockers, six majors** — the headline's
+   sign survives, its magnitude and its entire stated mechanism do not.)
+   `strncpy` truncation: the first bug here that is a **correctly-called library
+   function** rather than an omitted line, and the first whose **harm lands at a
+   different site from the bug**.
+
+   **The mechanism, as corrected — and it is a better result than the one
+   published.** p13 shipped the gap as *"R3's `copy_from_slice → memcpy` and
+   `fill(0) → memset` against R4's byte loops"*. **That is wrong: R4 makes the
+   same two library calls at the same cost** (identical `memcpy`/`memset`
+   marginals across R3ship, R4ship, R4bulk). **72% (small) and 90% (large) of the
+   gap is the CONSUMER scan, and its direction is the reverse of the published
+   one:**
+
+   > The **bounds check tells LLVM `d < 32`**, LLVM fully unrolls the consumer to
+   > 32×(`cmpb`/`je`) = **2 Ir/byte**, and the *unchecked* unbounded walk stays a
+   > 4-instruction loop at **4 Ir/byte**. Measured at matched spelling on band L:
+   > **+2.00000 Ir per consumed byte, exactly.**
+
+   And the discriminator is the **check**, not the iterator: respelling
+   `position()` as an unbounded *checked* `while dst[d] != 0 { d += 1 }` gives a
+   **byte-identical kernel** (`md5_fn c936658a0e82` both). **This is p03's and
+   p04's seeding result arriving from the other direction** — there the invariant
+   had to be *handed* to LLVM as dead code; here the safety check **is** the
+   seeding mechanism and it more than pays for itself. Fourth pattern in the
+   family, and the first where safety is net-negative *because* it is a check.
+
+   ⚠ **The published margin was inflated by the contract itself.** `spec.md`
+   pinned the byte-loop copy and fill in `unsafe.rs`/`verus.rs` and **exempted
+   `safe_tuned.rs` by name**, so only the safe rung could use the bulk spelling.
+   An admissible bulk R4 **exists and verifies** — `copy_nonoverlapping` +
+   `write_bytes`, **15/0, twin 22/0, `identity: exact`**, TCB 5 → 7. Relaxed
+   symmetrically the figure is **−7.54% / −14.74%** against the published
+   −13.6% / −17.3%. See the direction test above: **this is its first fire.**
+
+   ⚠ **THE KERNEL-EXCLUSIVE COLUMN IS NOT COMPARABLE ACROSS p13's RUNGS**, and
+   this is the first pattern where that is true — its rungs dispatch **different
+   work into libc**, all outside the kernel symbol (c-gcc: `strlen`; c-clang:
+   `strlen`+`memcpy`+`memset`; R2: `memset`; R3/R4/R5: `memcpy`+`memset`). Two
+   published figures move: the gcc-vs-clang gap **494 → 188**, and
+   **`R2 − R4 = +70.3% / +43.2%` → `+47.9% / +35.8%`** on totals. See
+   `.memory/03-measurement.md`.
+
+   ⚠ **And C's entire advantage here is a LIBRARY difference.** Every C `-O3`
+   cell calls glibc `strlen` for the consumer — both compilers recognise the byte
+   loop and rewrite it — while **no** Rust cell does. Priced with clang
+   `-fno-builtin-strlen`: **the sign of every same-backend C-vs-Rust row flips**
+   (C −130.97 / −1685.58 becomes **+38.03 / +70.42**). glibc `strlen` is
+   **14.00 Ir/call, 0.00000 Ir/byte**. p11's separation, unapplied — apply it.
+   **Consequence for the gate**: `strlen(` is a `forbidden` spelling, is absent
+   from every source, and the audit reports **0 hits** while every C object calls
+   it. **A text pin binds the source, not the object.** Audited across all twelve
+   patterns' objects: **p13 is the only one whose `forbidden` list the optimiser
+   reintroduces** — p12's four string routines appear in no `-O3` object and the
+   other ten forbid no library routine. Real limitation, blast radius one.
+
+   Sound and unchanged: Verus **17/0 first attempt** (twin 20/0), `R4 ≡ R5
+   exact`, TCB 5 matching the gate's own count, Miri clean 9/9. The
+   **termination store costs `1.00000` Ir per string on both compilers** and is
+   *not* dead-store-eliminated, because the fill's extent `DST_CAP − n` is a
+   runtime value — the manager predicted DSE and was wrong. **`strlcpy` is
+   dearer than `strncpy`** (+26 gcc, +30 clang) and `snprintf` far dearer
+   (+339 / +343): **the unsafe routine is the cheapest, on both compilers.**
+   And the two harms — memory-safe truncation, and the OOB read — **separate by
+   RUNG, not by input**: an adversarial row that truncates while every rung stays
+   memory-safe is **unsatisfiable** here, because content lost ⟺ no NUL in `dst`
+   ⟺ R1 reads out of bounds.
+
+   **What p13 does NOT have**: no cost law. `strncpy` lowers to size-dispatched
+   vector code, so cost is a **step function**, every natural step basis is
+   **singular** on a length-homogeneous fit set, and the published "no law"
+   residuals are **estimator-dependent by ~3×** (exact interpolation 115/888
+   against OLS 37/443).
 
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how

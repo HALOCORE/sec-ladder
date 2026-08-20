@@ -1021,6 +1021,72 @@ otherwise sound and is how the `source_sha256` gap was proved closed.
 5. Frequency scaling is on and cannot be disabled without root. State this next to
    every wall-clock table.
 
+## The kernel-exclusive column is comparable only when the rungs call the SAME libc routines
+
+(TASK_045_REVIEW, on p13 — the first pattern whose rungs differ in **which**
+library calls they make. Two published figures moved.)
+
+`kernel_exclusive_ir` counts the kernel symbol and **not** what it calls. That is
+the right column when every rung dispatches the same work outward — p03's and
+p04's `memset` for a stack array, where the callee's path length moves with
+alignment and the noise is the only thing excluded. **It is the wrong column when
+the rungs dispatch DIFFERENT work outward**, because then the column silently
+credits a rung for the work it moved into libc.
+
+p13's rungs: `c-gcc` calls `strlen`; `c-clang` calls `strlen` + `memcpy` +
+`memset`; `safe_naive` calls `memset` only; R3/R4/R5 call `memcpy` + `memset`.
+Measured consequences:
+
+```
+gcc-vs-clang gap     kernel column  494 Ir/call   ->  totals  188
+R2 - R4              +1119 (+70.3%) / +2817 (+43.2%)
+                 ->  +929  (+47.9%) / +2553 (+35.8%)   on totals
+```
+
+The matched-spelling safety tax was overstated by **190 / 264 Ir/call**, entirely
+because R2 makes no `memcpy` call and R4 does.
+
+**The rule**: before quoting the kernel column for a cross-rung difference,
+**list the `@plt`/`@GLIBC` calls of every cell and check the lists are equal.**
+If they are not, quote totals, or quote the kernel column **plus the libc
+marginals per rung**, and say which. Equal lists is the licence; it is one
+`objdump` per cell.
+
+## Hold out a LENGTH, not a MIXTURE — an out-of-sample test can be provably unable to fail
+
+(TASK_045_REVIEW, on p13. This **sharpens the section below**, which was written
+after p04 and asked for "one blob that turns on every regressor at once". That is
+necessary and it is **not sufficient**.)
+
+If the fit set is **rank `n` in an `n`-column design**, its rows span all of
+ℝⁿ — so **every** possible blob's regressor vector is a linear combination of
+blobs already fitted, and *no* blob is out of sample in regressor space. A
+"held-out" band built by mixing the fit set's own extremes is then a test that
+**cannot fail, provably**, and its residuals will read *smaller* than in-sample.
+
+p13's band T is exactly that: every row `= (t/8)·row(L=40) + ((16−t)/8)·row(L=8)
+− (1,0,0,0,0)`, verified for all 17 values of `t`, with `(1,0,0,0,0)` itself a
+difference of two band-N rows. Its residuals (5.10 / 12.24) were **smaller** than
+in-sample, which the delivery flagged against itself without diagnosing.
+
+**What does work: hold out a value of a structural parameter the model is
+linear in, not a mixture of ones you fitted.** Leave-one-*length*-out on p13's
+band L (fit `N + L \ {L₀}`, predict `L₀`) gives worst residuals **56.08 / 39.31 /
+454.14 / 38.50 / 39.21** across five cells — **5× to 90×** what band T reported.
+
+So the out-of-sample protocol is two-part:
+
+1. **A blob that turns on every regressor at once** — catches a law fitted in the
+   wrong count vector (p04, below).
+2. **A held-out level of a structural parameter** — catches a model that is the
+   wrong *shape*. Check the held-out point is **outside the row space of the fit
+   set**, or say plainly that it is an interpolation check.
+
+⚠ **And say which estimator produced a residual.** p13's "no law" verdict rested
+on residuals from **exact interpolation on 5 chosen rows** (115 / 888); ordinary
+least squares on the same data gives **37 / 443**. A "the model does not fit"
+claim that moves by 3× with the estimator is a claim about the estimator.
+
 ## A fitted law is a law in SOMEBODY's counts — say whose
 
 (TASK_042_REVIEW, on p04. Two of seven "exact integer cost models, max residual

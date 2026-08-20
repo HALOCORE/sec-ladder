@@ -8,9 +8,9 @@ this box is reference; this box is what to *do*.
 
 | | |
 |---|---|
-| **Patterns** | **12 of 47 exist, all green, all 12 reviewed.** |
-| **Immediate next task** | **`TASK_043` — p13, `strncpy` truncation.** Written and dispatched. p04 is built, reviewed and corrected; nothing is outstanding on it. |
-| **Then** | review p13, then **p06** (in-place reverse — a permutation invariant, a new *proof* shape), then **p14** (tokenizer — in-place mutation + aliasing). |
+| **Patterns** | **13 of 47 exist, all green, all 13 reviewed.** |
+| **Immediate next task** | **dispatch `TASK_046`** (already written): p13's engineer lands three blockers + six majors from `TASK_045_REVIEW_REPORT.md`. `.memory/` and RECAP are **already corrected**. |
+| **Then** | **the next pattern: p06** (in-place reverse — a permutation invariant, a new *proof* shape), then **p14** (tokenizer — in-place mutation + aliasing). |
 | **The loop** | build a pattern → review it once → land corrections → repeat. Per `PROTOCOL.md` rule 9, write `.memory/` **only after** the review. |
 | **Git** | Commit at task boundaries; subagents never commit. ⚠ **There is a GitHub remote** (`origin`, `HALOCORE/sec-ladder`). **Do not push unless the user asks.** |
 | **Before quoting any number** | `harness/measure.py --check-stale` (exit 1 on STALE). |
@@ -46,8 +46,8 @@ Rust, unsafe Rust + Verus proof — plus a sixth **R1h** hardened-C cell, across
 optimisation levels and two inline modes, and compared on assembly, executed
 instructions, timing, proof burden and trusted-base size.
 
-47 patterns are catalogued in `.memory/06-catalogue.md`. **Twelve exist, all
-green, all twelve reviewed:**
+47 patterns are catalogued in `.memory/06-catalogue.md`. **Thirteen exist, all
+green, all thirteen reviewed:**
 
 | | pattern | what it is here for |
 |---|---|---|
@@ -63,6 +63,7 @@ green, all twelve reviewed:**
 | p09 | bitset | **one character** between a bug everything catches and one nothing does |
 | p12 | `strcat` fixed | the first **write**; a per-iteration check costs the bulk lowering |
 | p04 | ring buffer | known **bits** survive a loop-carried phi where a range does not — `next_pow2(CAP) ≤ ARR_LEN` |
+| p13 | `strncpy` truncation | a bound the optimiser can **see** outweighs the check that supplies it |
 
 **If you read only one thing after this file**, read `.tasks/TASK_026.md` §0 — the
 distilled rules from the thirteen-task spelling arc. Every pattern built after it
@@ -88,6 +89,7 @@ authoritative**. They were confused repeatedly before this table existed.
 | p09 | **11** | 19 |
 | p12 | **12** | 21 |
 | p04 | **13** | 23 |
+| p13 | **14** | 25 |
 | p01, p02 | findings 1–3 | 1–8 |
 
 Cross-cutting entries exist only here: **14** (every rung is a spelling), **16**
@@ -836,6 +838,68 @@ the number.**
    exit 3. **Caught only by cross-checking the `Ir` column**, which is now the
    rule: +141% `Ir` against a +0.15% `ns` null is not a conversion factor, it is a
    broken measurement.
+
+25. **p13 — a bound the optimiser can SEE is worth more than the check costs;
+   and a contract that pinned one side of its own comparison.** (TASK_043,
+   reviewed at TASK_045_REVIEW: **three blockers, six majors.** The headline's
+   sign survives; its magnitude and its entire stated mechanism do not.)
+   `strncpy` truncation — the first bug here that is a **correctly-called library
+   function** rather than an omitted line, and the first whose **harm lands at a
+   different site from the bug**.
+
+   **The corrected mechanism, and it is a better result than the published one.**
+   p13 shipped the safe-beats-unsafe gap as *"R3 gets `memcpy`/`memset`, R4 has
+   byte loops"*. **R4 makes the same two library calls at the same cost.** 72%
+   (`small`) and 90% (`large`) of the gap is the **consumer scan**, and its
+   direction is the reverse of the published one: **the bounds check tells LLVM
+   `d < 32`, LLVM fully unrolls to 2 Ir/byte, and the *unchecked* unbounded walk
+   stays a 4-instruction loop at 4 Ir/byte** — `+2.00000` Ir per consumed byte at
+   matched spelling. The discriminator is the **check**, not the iterator: an
+   unbounded *checked* walk gives a **byte-identical kernel**. **This is p03's
+   and p04's seeding result from the other direction** — there the invariant had
+   to be handed to LLVM as dead code; here the safety check *is* the seeding
+   mechanism and more than pays for itself.
+
+   ⚠ **The margin was inflated by p13's own contract, and this is the DIRECTION
+   TEST's first fire.** `spec.md` pinned the byte-loop copy and fill in
+   `unsafe.rs`/`verus.rs` and **exempted `safe_tuned.rs` by name** — only the
+   safe rung could use the winning spelling. An admissible bulk R4 exists and
+   verifies (`copy_nonoverlapping` + `write_bytes`, **15/0, twin 22/0**,
+   `identity: exact`, TCB 5→7), giving **−7.54% / −14.74%** against the published
+   −13.6% / −17.3%: **48% / 17% of the margin was the pin.** The general shape to
+   watch for is an idiom entry **scoped to some rungs and not others** — a
+   whole-pattern exclusion keeps the comparison matched, a scoped one silently
+   does not, and `pins_nothing` cannot see it.
+   ⚠ **p13 blamed the prover for the unsearched R4 side and the prover did not
+   bind.** The R4-is-chained-to-the-prover mechanism (finding 14) is real and is
+   now also **the most available wrong explanation here.** Run `verus_run.py`
+   before invoking it.
+
+   ⚠ **Two published figures move because the kernel-exclusive column is not
+   comparable across p13's rungs** — the first pattern whose rungs call
+   *different* libc routines. gcc-vs-clang **494 → 188**; `R2 − R4`
+   **+70.3%/+43.2% → +47.9%/+35.8%** on totals. See `.memory/03-measurement.md`.
+   ⚠ **And C's whole advantage is a LIBRARY difference**: every C `-O3` cell
+   calls glibc `strlen` for the consumer and no Rust cell does. With clang
+   `-fno-builtin-strlen`, **the sign of every same-backend C-vs-Rust row flips**.
+   Consequence for the gate: `strlen(` is `forbidden`, absent from every source,
+   audited at **0 hits**, and in every C object — **a text pin binds the source,
+   not the object.** Audited across all twelve patterns: **p13 is the only one
+   where the optimiser reintroduces a forbidden spelling.**
+
+   Sound: Verus **17/0 first attempt**, `R4 ≡ R5 exact`, TCB 5 = the gate's own
+   count, Miri 9/9. The **termination store is `1.00000` Ir per string on both
+   compilers** and is *not* DSE'd, because the fill's extent is a runtime value —
+   I predicted DSE and was wrong. **`strlcpy` is dearer than `strncpy` and
+   `snprintf` far dearer, on both compilers: the unsafe routine is the cheapest.**
+   The two harms **separate by rung, not by input** — an adversarial row that
+   truncates while every rung stays memory-safe is **unsatisfiable**, because
+   content lost ⟺ no NUL in `dst` ⟺ R1 reads OOB.
+   **No cost law**: `strncpy` lowers to size-dispatched vector code, every
+   natural step basis is **singular** on a length-homogeneous fit set, and the
+   "no law" residuals are **estimator-dependent by 3×**. Its out-of-sample band
+   **could not fail, provably** — see finding 20 and the new
+   `.memory/03-measurement.md` rule: hold out a **length**, not a **mixture**.
 
 ## Retracted — do not reinstate
 

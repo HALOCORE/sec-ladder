@@ -432,7 +432,21 @@ quoting 5c as a defence.**
    The contract is **lifted from the trusted item and compared**, not declared,
    so weakening the item while leaving the twin alone is a signature mismatch —
    note that Verus *alone* passes that mutant at 12 verified / 0 errors, so the
-   comparison is doing real work. Eight mutants fail for eight distinct reasons,
+   comparison is doing real work.
+
+   ⚠ **Stage 5c-twin has TWO LIMBS and a mutation report must say which one
+   fired** (TASK_045_REVIEW). They are (i) **signature identity** —
+   `vparse.norm_clause(twin.sig)` against the trusted item's — and (ii) **the
+   twin verifying under `--cfg slb_twin`**. A mutant that weakens the item *and*
+   its twin together keeps limb (i) and is caught by (ii) (p04's
+   `p1_weak_requires`, which passes the shipped configuration at 9/0). A mutant
+   that weakens only the item trips limb (i) — p13's M2, measured
+   `signature_identical = False` where shipped and M2b are `True`.
+   **p13's `NOTES.md` reported M2 as caught by `spec.md`'s item pin alone; it is
+   caught twice**, and the control script reproduced only stage 5a, so its
+   verdict column understated the gate. **Report the limb, not just the pass** —
+   otherwise a report cannot distinguish "the twin has teeth here" from "the
+   contract pin happened to cover it". Eight mutants fail for eight distinct reasons,
    including two beyond the original design: a twin missing its `#[cfg]` (it
    would compile into the measured binaries) and a twin whose body calls
    `get_unchecked` (it re-uses the axiom it exists to check).
