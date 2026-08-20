@@ -70,7 +70,8 @@ SLB_NOINLINE uint64_t kernel(const uint8_t *buf, size_t buf_len, size_t off,
         while (dst[d] != 0)
             d = d + 1;
         acc = acc * 31 + (uint64_t)d;
-        acc = acc * 31 + (uint64_t)dst[0];
+        for (i = 0; i < DST_CAP; i++)
+            acc = acc * 31 + (uint64_t)dst[i];
         if (q >= len)
             break;
         p = q + 1;

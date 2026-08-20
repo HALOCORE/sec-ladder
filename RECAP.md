@@ -9,8 +9,8 @@ this box is reference; this box is what to *do*.
 | | |
 |---|---|
 | **Patterns** | **13 of 47 exist, all green, all 13 reviewed.** |
-| **Immediate next task** | **dispatch `TASK_046`** (already written): p13's engineer lands three blockers + six majors from `TASK_045_REVIEW_REPORT.md`. `.memory/` and RECAP are **already corrected**. |
-| **Then** | **the next pattern: p06** (in-place reverse — a permutation invariant, a new *proof* shape), then **p14** (tokenizer — in-place mutation + aliasing). |
+| **Immediate next task** | **the next pattern: p06** (in-place reverse/rotate). p13 is built, reviewed and corrected; nothing is outstanding on it. Write `TASK_047` — and read `.memory/01-ladder.md`'s direction-test block first, because p06's spec will want per-rung spellings and that is what p13 got wrong. |
+| **Then** | review p06, then **p14** (tokenizer — in-place mutation + aliasing), then **p10** (sliding window) or **p18** (LEB128). |
 | **The loop** | build a pattern → review it once → land corrections → repeat. Per `PROTOCOL.md` rule 9, write `.memory/` **only after** the review. |
 | **Git** | Commit at task boundaries; subagents never commit. ⚠ **There is a GitHub remote** (`origin`, `HALOCORE/sec-ladder`). **Do not push unless the user asks.** |
 | **Before quoting any number** | `harness/measure.py --check-stale` (exit 1 on STALE). |
@@ -63,7 +63,7 @@ green, all thirteen reviewed:**
 | p09 | bitset | **one character** between a bug everything catches and one nothing does |
 | p12 | `strcat` fixed | the first **write**; a per-iteration check costs the bulk lowering |
 | p04 | ring buffer | known **bits** survive a loop-carried phi where a range does not — `next_pow2(CAP) ≤ ARR_LEN` |
-| p13 | `strncpy` truncation | a bound the optimiser can **see** outweighs the check that supplies it |
+| p13 | `strncpy` truncation | a bound the optimiser can **see** outweighs the check that supplies it — and the contract pinned one side of the comparison |
 
 **If you read only one thing after this file**, read `.tasks/TASK_026.md` §0 — the
 distilled rules from the thirteen-task spelling arc. Every pattern built after it
@@ -841,8 +841,9 @@ the number.**
 
 25. **p13 — a bound the optimiser can SEE is worth more than the check costs;
    and a contract that pinned one side of its own comparison.** (TASK_043,
-   reviewed at TASK_045_REVIEW: **three blockers, six majors.** The headline's
-   sign survives; its magnitude and its entire stated mechanism do not.)
+   reviewed at TASK_045_REVIEW, corrected at TASK_046: **three blockers, six
+   majors, and six more manager prescriptions refuted while landing them.**
+   ⚠ **The headline's sign, magnitude and stated mechanism ALL moved.**)
    `strncpy` truncation — the first bug here that is a **correctly-called library
    function** rather than an omitted line, and the first whose **harm lands at a
    different site from the bug**.
@@ -850,26 +851,36 @@ the number.**
    **The corrected mechanism, and it is a better result than the published one.**
    p13 shipped the safe-beats-unsafe gap as *"R3 gets `memcpy`/`memset`, R4 has
    byte loops"*. **R4 makes the same two library calls at the same cost.** 72%
-   (`small`) and 90% (`large`) of the gap is the **consumer scan**, and its
-   direction is the reverse of the published one: **the bounds check tells LLVM
-   `d < 32`, LLVM fully unrolls to 2 Ir/byte, and the *unchecked* unbounded walk
-   stays a 4-instruction loop at 4 Ir/byte** — `+2.00000` Ir per consumed byte at
-   matched spelling. The discriminator is the **check**, not the iterator: an
-   unbounded *checked* walk gives a **byte-identical kernel**. **This is p03's
+   (`small`) and 91% (`large`) of the gap is the **consumer scan**, and its
+   direction is the reverse of the published one: **a consumer whose bound LLVM
+   can see fully unrolls to 2 Ir/byte; an unbounded walk stays a 4-instruction
+   loop at 4** — `+2.00000` Ir per consumed byte at matched spelling.
+   ⚠ **The discriminator is the BOUND, not the check**: an *unchecked but
+   bounded* scan costs exactly what safe `position()` costs, to the instruction.
+   A bounds check is one way of supplying the bound and is not what is paid for.
+   **This is p03's
    and p04's seeding result from the other direction** — there the invariant had
-   to be handed to LLVM as dead code; here the safety check *is* the seeding
-   mechanism and more than pays for itself.
+   to be handed to LLVM as dead code; here the safety check supplies it as a side
+   effect and more than pays for itself.
 
    ⚠ **The margin was inflated by p13's own contract, and this is the DIRECTION
    TEST's first fire.** `spec.md` pinned the byte-loop copy and fill in
    `unsafe.rs`/`verus.rs` and **exempted `safe_tuned.rs` by name** — only the
    safe rung could use the winning spelling. An admissible bulk R4 exists and
-   verifies (`copy_nonoverlapping` + `write_bytes`, **15/0, twin 22/0**,
-   `identity: exact`, TCB 5→7), giving **−7.54% / −14.74%** against the published
-   −13.6% / −17.3%: **48% / 17% of the margin was the pin.** The general shape to
-   watch for is an idiom entry **scoped to some rungs and not others** — a
-   whole-pattern exclusion keeps the comparison matched, a scoped one silently
-   does not, and `pins_nothing` cannot see it.
+   verifies (`copy_nonoverlapping` + `write_bytes`, **17/0, twin 24/0**,
+   `identity: exact`, TCB 5→7): the pin was worth **52% (small) / 16% (large)**
+   of the margin. ⚠ **AND THE SIGN DOES NOT SURVIVE.** Allow R4 a
+   *bounded* unchecked consumer — which verifies **19/0, twin 22/0, with no new
+   trusted items**, excluded by nothing but `spec.md`'s English — and
+   `R3ship − R4` is **+44.00 / +77.00**. **p13's "safe beats unsafe" is the price
+   of a bound, and it reverses the moment the unsafe rung is allowed one.**
+   Three numbers ship: fixed-R4 **−177 / −1054**, cheapest-found **−85 / −885**,
+   and **+44 / +77** once the fiat goes.
+   ⚠ **A scoped entry is not automatically a thumb.** p13 had three and measuring
+   each gave three answers: copy/fill was a thumb (relaxed), `position()` is
+   excluded by vstd one layer down (kept, free), the consumer *bound* is pure
+   fiat (kept and **priced**). Price every scoped entry; publish the price beside
+   the number it protects.
    ⚠ **p13 blamed the prover for the unsearched R4 side and the prover did not
    bind.** The R4-is-chained-to-the-prover mechanism (finding 14) is real and is
    now also **the most available wrong explanation here.** Run `verus_run.py`
@@ -877,15 +888,20 @@ the number.**
 
    ⚠ **Two published figures move because the kernel-exclusive column is not
    comparable across p13's rungs** — the first pattern whose rungs call
-   *different* libc routines. gcc-vs-clang **494 → 188**; `R2 − R4`
-   **+70.3%/+43.2% → +47.9%/+35.8%** on totals. See `.memory/03-measurement.md`.
+   *different* libc routines. On the corrected tree the gcc-vs-clang `small` gap
+   reads **1769** on the kernel column and **1463** on totals, and `R2 − R4`
+   goes **+33.34%/+28.98% → +25.59%/+24.93%** — the difference being `memcpy`'s
+   190/264 Ir/call **exactly**, which R2 never calls and R4 does. See `.memory/03-measurement.md`.
    ⚠ **And C's whole advantage is a LIBRARY difference**: every C `-O3` cell
    calls glibc `strlen` for the consumer and no Rust cell does. With clang
    `-fno-builtin-strlen`, **the sign of every same-backend C-vs-Rust row flips**.
    Consequence for the gate: `strlen(` is `forbidden`, absent from every source,
    audited at **0 hits**, and in every C object — **a text pin binds the source,
-   not the object.** Audited across all twelve patterns: **p13 is the only one
-   where the optimiser reintroduces a forbidden spelling.**
+   not the object.** Across all thirteen patterns, **p13 is the only one where the
+   optimiser reintroduces a forbidden spelling** (8 of 16 objects; p12 0 of 16).
+   ⚠ That audit is only right **scoped to `kernel` + `main`** — unscoped it flags
+   p12 too, because `std::env`, the backtrace machinery and `io::Error`'s
+   `Display` call `strlen` in every Rust binary of every pattern.
 
    Sound: Verus **17/0 first attempt**, `R4 ≡ R5 exact`, TCB 5 = the gate's own
    count, Miri 9/9. The **termination store is `1.00000` Ir per string on both

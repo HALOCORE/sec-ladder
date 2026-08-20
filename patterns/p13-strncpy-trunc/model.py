@@ -59,15 +59,18 @@ memory outside the program's control. The truncation axis therefore lives in
 `sweep-t*` and in the adversarial rows, and R1 is absent from the truncating
 part of both.
 
-**What this model does NOT discriminate, stated because it is a real hole and
-../NOTES.md 6a measures it.** ../spec.md's fold takes `d` and `dst[0]` and
-nothing else, so the *contents* of `dst[1 .. d]` are observable only through
-"is this byte zero?". A rung that copied `0xFF` into every slot `1 .. n` instead
-of the source bytes prints the identical checksum on every input this pattern
-ships. That is pinned by `idiom.required`'s copy spelling and by the Verus
-`ensures`' shape rather than by the checksum, and it is the price of the fold
-`strncpy` truncation needs: the point of the pattern is precisely that bytes
-past the truncation point stop influencing anything.
+**What this model DOES discriminate, and what it once did not.** ../spec.md's
+fold is **full-extent**: `d`, then every one of the `DST_CAP` destination
+bytes. Until TASK_046 it took `d` and `dst[0]` only -- TASK_043 specified that
+and `.memory/02-bench-rules.md` has said "keep the full-extent fold" since
+TASK_004_REVIEW -- and ../controls/oracle_hole.py measured the hole: a rung that
+copied `0xFF` into every slot `1 .. n` instead of the source bytes printed the
+identical checksum on all nine shipped inputs. Under the full-extent fold it
+does not. The narrow fold's two worries were both measured and both unfounded:
+the `exact`/`truncate`/`truncate-alt` triple still prints ONE checksum (the
+copy is capped at `n = min(slen, DST_CAP)` and `dst[31] = 0` overwrites the
+last slot, so `dst` is byte-identical across the three), and no C cell elides
+the copy in `whole` mode. ../NOTES.md 6a.
 """
 
 import itertools
@@ -148,7 +151,8 @@ class Model:
             dst[DST_CAP - 1] = 0                  # THE TERMINATION. R1 omits it.
             d = dst.index(0)
             acc = (acc * 31 + d) & MASK
-            acc = (acc * 31 + dst[0]) & MASK
+            for fi in range(DST_CAP):             # THE FULL-EXTENT FOLD
+                acc = (acc * 31 + dst[fi]) & MASK
             if q >= ln:
                 break
             p = q + 1
@@ -254,6 +258,20 @@ class Model:
             d += 1
         return d
 
+    def _fold_dst(self, acc, dst, i):
+        """`fold_dst` in ../verus.rs: THE FULL-EXTENT FOLD. Every one of the
+        `DST_CAP` destination bytes is mixed into the accumulator, in order.
+
+        `.memory/02-bench-rules.md` has required the full-extent fold since
+        TASK_004_REVIEW; p13 shipped a two-term one (`d` and `dst[0]`) at
+        TASK_043's instruction and ../controls/oracle_hole.py measured what that
+        cost -- a rung copying `0xFF` into every slot but the first agreed with
+        this model on all nine shipped inputs. It does not now."""
+        while i < DST_CAP:
+            acc = (acc * 31 + dst[i]) & MASK
+            i += 1
+        return acc
+
     def _fin(self, acc, nstr):
         """`fin` in ../verus.rs: mix in the declared count."""
         return (acc * 31 + nstr) & MASK
@@ -276,8 +294,7 @@ class Model:
             dst = self._fill_zero(dst, n)
             dst[DST_CAP - 1] = 0
             d = self._scan_dst(dst, 0)
-            acc = (acc * 31 + d) & MASK
-            acc = (acc * 31 + dst[0]) & MASK
+            acc = self._fold_dst((acc * 31 + d) & MASK, dst, 0)
             if q + 1 >= ln:
                 return self._fin(acc, nstr)
             p = q + 1

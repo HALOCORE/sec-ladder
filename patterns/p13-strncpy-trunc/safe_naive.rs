@@ -20,16 +20,29 @@
 //! rung comparison here moves on it, and R1-vs-R1h is the only place its cost
 //! is read. `.memory/02-bench-rules.md`.
 //!
-//! **The copy and the zero-fill are byte loops, not `copy_from_slice`/`fill`**
-//! (../spec.md `idiom.required`), for p02's reason: one operator flips
-//! `bulk_calls` and 100% of the delta. R3 spells both in bulk, deliberately,
-//! and ../NOTES.md 3 reports that as a spelling difference with the routine
-//! named.
+//! **The copy and the zero-fill are byte loops, not `copy_from_slice`/`fill`**,
+//! for p02's reason: one operator flips `bulk_calls` and 100% of the delta.
+//! ⚠ **That is a property of this file and NOT a pin since TASK_046.**
+//! ../spec.md used to pin the byte-loop spelling here, in unsafe.rs and in
+//! verus.rs while exempting safe_tuned.rs by name -- a scoped entry that bound
+//! one side of p13's published `R3 - R4` comparison and freed the other, worth
+//! a measured 52% (small) / 16% (large) of the margin. It was relaxed
+//! symmetrically; ../NOTES.md 10 has the direction and both bounds. R2 still
+//! spells them as byte loops because R2 is the mechanical port, and because
+//! `R2 - R4` is p13's matched-spelling safety number and R4 spells them the
+//! same way.
 //!
 //! **The zero-fill is not an optimisation target.** It is what `strncpy` does,
 //! it is why `dst` is written in full on every iteration, and it is why the
 //! per-string cost is O(DST_CAP) rather than O(slen). Deleting it would delete
 //! the pattern's largest measured effect (../NOTES.md 3).
+//!
+//! **The fold is FULL-EXTENT** -- `d`, then every one of the DST_CAP
+//! destination bytes -- as `.memory/02-bench-rules.md` has required since
+//! TASK_004_REVIEW. p13 shipped a two-term fold until TASK_046 and
+//! ../controls/oracle_hole.py measures what that cost: a rung copying `0xFF`
+//! into every slot but the first agreed with model.py on all nine shipped
+//! inputs.
 
 #[path = "../../common/driver.rs"]
 mod driver;
@@ -79,7 +92,11 @@ pub fn kernel(buf: &[u8], off: usize, len: usize) -> u64 {
             d = d + 1;
         }
         acc = acc.wrapping_mul(31).wrapping_add(d as u64);
-        acc = acc.wrapping_mul(31).wrapping_add(dst[0] as u64);
+        let mut fi: usize = 0;
+        while fi < DST_CAP {
+            acc = acc.wrapping_mul(31).wrapping_add(dst[fi] as u64);
+            fi = fi + 1;
+        }
         if q >= len {
             break;
         }

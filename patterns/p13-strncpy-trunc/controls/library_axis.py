@@ -16,7 +16,22 @@ pattern is about:
 **All four print the same checksum**, which is what makes this a matched
 comparison rather than four benchmarks: `d` is `min(slen, DST_CAP - 1)` for
 every one of them once the termination store is present, and `dst[0]` is the
-same byte. So the only thing that moves is the routine, and the difference of
+same byte.
+
+⚠ **THIS PROBE KEEPS THE NARROW `d` + `dst[0]` FOLD THAT THE RUNGS DROPPED AT
+TASK_046, and it has to.** The rungs now fold the destination's whole extent,
+which is what makes their checksum an oracle for the copy. Here that would
+break the comparison rather than strengthen it: `strlcpy` and `snprintf` do
+**not** zero-fill, so `dst[n+1 .. DST_CAP]` holds whatever the previous string
+left there, and a full-extent fold would make the four routines disagree for a
+reason that has nothing to do with their cost. The narrow fold is what makes
+"only the routine moves" true. Consequence, stated rather than buried: the
+absolute levels in this control are NOT comparable to the ladder's per-call
+figures in ../NOTES.md 4, which carry a 32-byte fold per string; what IS
+comparable is every DIFFERENCE inside this table, because the fold term is
+identical in all six columns and cancels.
+
+So the only thing that moves is the routine, and the difference of
 two rates is a *library* difference with both routines named.
 
 THE PREDICTION TASK_043 ASKS TO TEST:

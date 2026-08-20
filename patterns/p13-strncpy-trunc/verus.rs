@@ -60,6 +60,21 @@
 //! `adversarial-nonul-dst` and `adversarial-nonul-src` are all inside the
 //! verified domain and the kernel agrees with `model.py` on all four.
 //!
+//! **The FULL-EXTENT FOLD is the control for all of that, and it is in the same
+//! function on the same array through the same trusted accessor.**
+//!
+//!     let mut fi: usize = 0;
+//!     while fi < DST_CAP { acc = acc*31 + dst_get_unchecked(&dst, fi); fi += 1; }
+//!
+//! `dst_get_unchecked`'s `i < v@.len()` is discharged here from the loop bound
+//! itself, in the same basic block, with no invariant at all -- p03's easy
+//! shape. One item, one contract, two call sites: at one the clause is trivial
+//! and at the other it is the whole pattern. It costs a sixth recursive spec
+//! function (`fold_dst`), a sixth loop body in `kernel` and **zero** TCB.
+//! `.memory/02-bench-rules.md` has required the full-extent fold since
+//! TASK_004_REVIEW; p13 shipped a two-term one (`d` and `dst[0]`) until
+//! TASK_046, and ../controls/oracle_hole.py measures what that cost.
+//!
 //! TCB tally: NOTES.md 6. Five `external_body` items, three of them accessors
 //! with a `requires`, all listed there individually, because an under-counted
 //! TCB is how the pilot's fatal defect hid in plain sight
@@ -192,6 +207,26 @@ pub open spec fn scan_dst(dst: Seq<u8>, d: int) -> int
     }
 }
 
+/// THE FOLD, over the destination's **whole extent**: every one of the
+/// `DST_CAP` bytes is mixed into the accumulator, in order.
+///
+/// `.memory/02-bench-rules.md` has required the full-extent fold since
+/// TASK_004_REVIEW and p13 shipped a two-term one (`d` and `dst[0]`) at
+/// TASK_043's instruction. That was an error and `controls/oracle_hole.py`
+/// measured its price: under the narrow fold a rung that copied `0xFF` into
+/// every slot but the first agreed with `model.py` on all nine shipped inputs.
+/// Under this one it does not. The fold is what makes the checksum an oracle
+/// for the **copy**, which is half of what `strncpy` does.
+pub open spec fn fold_dst(acc: u64, dst: Seq<u8>, i: int) -> u64
+    decreases DST_CAP - i,
+{
+    if i >= DST_CAP as int {
+        acc
+    } else {
+        fold_dst(acc.wrapping_mul(31).wrapping_add(dst[i] as u64), dst, i + 1)
+    }
+}
+
 /// What the kernel returns once the walk is over: mix in the declared count, so
 /// a rung that walked a different number of strings cannot produce the same
 /// checksum.
@@ -236,9 +271,7 @@ pub open spec fn walk(
         };
         let dst2 = fill_zero(copy_into(dst, buf, off, p, 0, n), n).update(DST_CAP - 1, 0u8);
         let d = scan_dst(dst2, 0);
-        let acc2 = acc.wrapping_mul(31).wrapping_add(d as u64).wrapping_mul(31).wrapping_add(
-            dst2[0] as u64,
-        );
+        let acc2 = fold_dst(acc.wrapping_mul(31).wrapping_add(d as u64), dst2, 0);
         if q + 1 >= len {
             fin(acc2, nstr)
         } else {
@@ -563,7 +596,25 @@ pub fn kernel(buf: &[u8], off: usize, len: usize) -> (r: u64)
         }
         assert(d as int == scan_dst(dst@, 0));
         acc = acc.wrapping_mul(31).wrapping_add(d as u64);
-        acc = acc.wrapping_mul(31).wrapping_add(dst_get_unchecked(&dst, 0) as u64);
+        let ghost acc_folded = acc;
+        let mut fi: usize = 0;
+        // THE FOLD, over the destination's whole extent. `dst` does not change
+        // here, so the invariant is `fill_zero`'s shape with the sequence held
+        // fixed and the accumulator moving: "the fold from here is the whole
+        // fold." The unchecked read is licensed by the loop bound itself --
+        // `fi < DST_CAP == dst@.len()` -- so unlike the consumer above this
+        // loop is p03's easy shape and carries none of p13's obligation.
+        while fi < DST_CAP
+            invariant
+                fi <= DST_CAP,
+                dst@.len() == DST_CAP,
+                fold_dst(acc, dst@, fi as int) == fold_dst(acc_folded, dst@, 0),
+            decreases DST_CAP - fi,
+        {
+            acc = acc.wrapping_mul(31).wrapping_add(dst_get_unchecked(&dst, fi) as u64);
+            fi = fi + 1;
+        }
+        assert(acc == fold_dst(acc_folded, dst@, 0));
         // Ghost only: unfold `walk` once at the value it had on entry to this
         // iteration. Its `q` IS the scan loop's `q`, its `n` IS the `min` above,
         // its `copy_into`/`fill_zero`/`update` IS what the three loops and the

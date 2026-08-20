@@ -36,12 +36,29 @@
 //!   p13 has to **establish** the sentinel first, and carry it across the store
 //!   into the loop.
 //!
+//! SAFETY (7): the FULL-EXTENT FOLD reads `dst[fi]` under `fi < DST_CAP`, its
+//!   own loop bound, in the same basic block. It is p03's easy shape and it is
+//!   deliberately the CONTROL for (6): same array, same accessor, same
+//!   contract, one call site licensed by a bound and one by the array's
+//!   contents. The fold is what `.memory/02-bench-rules.md` has required since
+//!   TASK_004_REVIEW; p13 shipped a two-term one until TASK_046 and
+//!   ../controls/oracle_hole.py measures what that cost.
+//!
 //! **(6) is the first two-site obligation in this project.** Every earlier
 //! pattern's unchecked access is licensed by a guard on the same value, in the
 //! same loop or the one above it (p12's `dlen + slen <= DST_CAP` is a loop
 //! level up, which was the previous record). Here the licensing fact is not
 //! about the index at all: it is about the *contents* of the array being
 //! indexed.
+//!
+//! ⚠ **The copy's and the fill's LOOP FORM is not pinned by ../spec.md and has
+//! not been since TASK_046.** They are byte loops here because that keeps
+//! `R2 - R4` a matched-spelling comparison, not because the contract demands
+//! it: an admissible bulk-spelled R4/R5 pair exists (`copy_nonoverlapping` +
+//! `write_bytes`, 17 verified / 0 errors, twin 24/0, `identity: exact`, at
+//! TCB 5 -> 7) and ../NOTES.md 10b prices it. What IS held by fiat is that the
+//! consumer at (6) is UNBOUNDED, and ../NOTES.md 10c prices that too, because
+//! it is worth more than the pin was.
 //!
 //! The `if q >= len { break; }` line before the cursor step is p11's, and for
 //! p11's reason: the source scan may legitimately stop at `q == len`, so
@@ -99,7 +116,11 @@ pub fn kernel(buf: &[u8], off: usize, len: usize) -> u64 {
             d = d + 1;
         }
         acc = acc.wrapping_mul(31).wrapping_add(d as u64);
-        acc = acc.wrapping_mul(31).wrapping_add(unsafe { *dst.get_unchecked(0) } as u64);
+        let mut fi: usize = 0;
+        while fi < DST_CAP {
+            acc = acc.wrapping_mul(31).wrapping_add(unsafe { *dst.get_unchecked(fi) } as u64);
+            fi = fi + 1;
+        }
         if q >= len {
             break;
         }

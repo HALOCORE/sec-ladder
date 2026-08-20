@@ -122,6 +122,31 @@ def pin_problems(path):
     return out
 
 
+def twin_signature(path):
+    """LIMB (i) of gate stage 5c-twin, reproduced.
+
+    `.memory/04-verus.md`: **stage 5c-twin has TWO LIMBS and a mutation report
+    must say which one fired.** They are (i) SIGNATURE IDENTITY --
+    `vparse.norm_clause(twin.sig)` against the trusted item's, at
+    `check.py:3374` -- and (ii) the twin verifying under `--cfg slb_twin`.
+    Until TASK_046 this file reproduced stage 5a only, so its verdict column
+    understated the gate: it reported m2 as caught by `spec.md`'s item pin
+    ALONE when in fact limb (i) also fires on it. Reported per trusted item as
+    `name=True/False`; False means the twin's contract stopped being the
+    trusted item's, i.e. limb (i) FIRED."""
+    sys.path.insert(0, os.path.join(REPO, "harness"))
+    import vparse
+    items = {i.name: i for i in vparse.parse(open(path).read())}
+    out = []
+    for name, it in sorted(items.items()):
+        tw = items.get("slb_twin_" + name)
+        if tw is None:
+            continue
+        same = vparse.norm_clause(tw.sig) == vparse.norm_clause(it.sig)
+        out.append(f"{name}={same}")
+    return ", ".join(out)
+
+
 def verus(path, extra=()):
     r = subprocess.run([sys.executable, VERUS_RUN, path] + list(extra),
                        capture_output=True, text=True, cwd=REPO, timeout=1800)
@@ -143,8 +168,10 @@ def main():
     print(f"  verus.rs (shipped)                 {c[0]} verified, {c[1]} errors")
     c2, _, _ = verus(SRC, ["--cfg", "slb_twin"])
     print(f"  verus.rs --cfg slb_twin            {c2[0]} verified, {c2[1]} errors")
-    if c != (17, 0) or c2 != (20, 0):
+    if c != (19, 0) or c2 != (22, 0):
         print("  !! baseline does not match the pins in spec.md")
+    print(f"  5c-twin signature limb, shipped    "
+          f"{twin_signature(SRC)}")
 
     ok = True
     for name, why, subs, _ in MUTANTS:
@@ -163,11 +190,30 @@ def main():
         pin = pin_problems(path)
         for pp in pin:
             print(f"  spec.md pin: {pp}")
+        sig = twin_signature(path)
+        limb_i = "False" in sig
+        print(f"  5c-twin limb (i) signature_identical: {sig}"
+              + ("   <- LIMB (i) FIRED" if limb_i else ""))
         rejected = (c[1] or 0) > 0 or (ct[1] or 0) > 0
-        caught = rejected or bool(pin)
-        how = ("Verus" if rejected else "") + \
-              (" + " if rejected and pin else "") + \
-              ("spec.md `verus.items` pin (check.py stage 5a)" if pin else "")
+        # Limb (ii) of 5c-twin is specifically "the TWIN fails under
+        # `--cfg slb_twin`", which is only informative when the SHIPPED
+        # configuration verifies -- otherwise plain Verus already refused the
+        # file and the twin adds nothing.
+        limb_ii = (c[1] or 0) == 0 and (ct[1] or 0) > 0
+        parts = []
+        if (c[1] or 0) > 0:
+            parts.append("Verus, in the shipped configuration")
+        if limb_ii:
+            parts.append("check.py 5c-twin limb (ii): the shipped "
+                         "configuration VERIFIES and the TWIN fails under "
+                         "--cfg slb_twin")
+        if limb_i:
+            parts.append("check.py 5c-twin limb (i): the twin's signature is no "
+                         "longer the trusted item's")
+        if pin:
+            parts.append("spec.md `verus.items` pin (check.py stage 5a)")
+        caught = bool(parts)
+        how = " + ".join(parts)
         print(f"  ==> {'CAUGHT by ' + how if caught else 'NOT CAUGHT -- the obligation is not load-bearing and no pin sees it'}")
         ok = ok and caught
     print(f"\nall mutants rejected: {ok}")

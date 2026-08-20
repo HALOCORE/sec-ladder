@@ -251,6 +251,183 @@ def fmt(beta):
     return " ".join(parts) or "0"
 
 
+def ols(rows, ys):
+    """Ordinary least squares, floats, normal equations with partial pivoting.
+
+    Here **because the published verdict depended on the estimator and nobody
+    said which one it was** (TASK_045_REVIEW major 6). `solve()` above is EXACT
+    INTERPOLATION on the first 5 independent rows: it fits those 5 perfectly and
+    reports the worst residual over all of them, which is the right thing to do
+    when a law is expected to hold exactly -- but when it does NOT hold, that
+    number is an artefact of which 5 rows came first. OLS on the same data
+    answers a different and fairer question: *how far off is the best linear
+    model?* Both are printed. A "no law" claim that moves by 3x between them is
+    a claim about the estimator."""
+    n = len(rows[0])
+    m = [[sum(r[i] * r[j] for r in rows) for j in range(n)]
+         + [sum(r[i] * y for r, y in zip(rows, ys))] for i in range(n)]
+    for c in range(n):
+        p = max(range(c, n), key=lambda i: abs(m[i][c]))
+        if abs(m[p][c]) < 1e-9:
+            return None
+        m[c], m[p] = m[p], m[c]
+        pv = m[c][c]
+        m[c] = [x / pv for x in m[c]]
+        for i in range(n):
+            if i != c and m[i][c]:
+                f = m[i][c]
+                m[i] = [a - f * b for a, b in zip(m[i], m[c])]
+    return [m[i][n] for i in range(n)]
+
+
+def worst_resid(beta, rows, ys):
+    return max(abs(sum(b * x for b, x in zip(beta, r)) - y)
+               for r, y in zip(rows, ys))
+
+
+def out_of_sample(data):
+    """Why band T CANNOT falsify anything, and what a real test looks like.
+
+    (TASK_045_REVIEW major 7, and `.memory/03-measurement.md` "Hold out a
+    LENGTH, not a MIXTURE".)
+
+    (1) The fit set N+L has rank 5 in a 5-column design, so its row space is all
+        of R^5 and **no** count vector is outside it -- band T's rows are exact
+        linear combinations of rows already fitted, which is checked here rather
+        than argued. A held-out band built by MIXING the fit set's own extremes
+        is a test that cannot fail, and p13's band-T residuals came out SMALLER
+        than in-sample, which is what that looks like.
+    (2) The test that can fail: hold out a LENGTH. Fit on N + L\\{L0}, predict
+        L0. `L0` is a structural parameter the model is linear in, and dropping
+        every blob at that length removes a point the fit has never seen."""
+    import re
+    print("\n" + "=" * 74)
+    print("OUT OF SAMPLE -- band T cannot fail; leave-one-LENGTH-out can")
+    print("=" * 74)
+    b = bands()
+    fitrows = [counts(l) for _, l in b["N"]] + [counts(l) for _, l in b["L"]]
+    inside = 0
+    for _, lens in b["T"]:
+        r = counts(lens)
+        if rank(fitrows + [r]) == rank(fitrows):
+            inside += 1
+    print(f"  band T rows inside the fit set's row space: {inside}/{len(b['T'])}"
+          f"   (fit set rank {rank(fitrows)}/5)")
+    print("  => in REGRESSOR space band T is not out of sample at all.\n")
+    print(f"  {'cell':12s} {'in-sample (exact)':>18s} {'in-sample (OLS)':>17s} "
+          f"{'band T':>9s} {'leave-1-length-out':>19s}  worst L0")
+    out = {}
+    for cell in [c for c in CELLS if c in data]:
+        d = data[cell]
+        rows = [(v["counts"], v["ir"]) for v in d.values()
+                if v["band"] in ("N", "L")]
+        if not rows or rank([r for r, _ in rows]) < 5:
+            continue
+        beta, worst, _ = solve([r for r, _ in rows], [y for _, y in rows])
+        ob = ols([[float(x) for x in r] for r, _ in rows], [y for _, y in rows])
+        ow = worst_resid(ob, [[float(x) for x in r] for r, _ in rows],
+                         [y for _, y in rows]) if ob else float("nan")
+        toos = [(v["counts"], v["ir"]) for v in d.values() if v["band"] == "T"]
+        tw = max((abs(sum(Fraction(x) * bb for x, bb in zip(rr, beta))
+                      - Fraction(y).limit_denominator(10**6))
+                  for rr, y in toos), default=None)
+        # leave one LENGTH out of band L
+        lens = sorted({int(re.search(r"L(\d+)\.bin", n).group(1))
+                       for n, v in d.items() if v["band"] == "L"})
+        best, bestL = 0.0, None
+        for L0 in lens:
+            keep, held = [], []
+            for n, v in d.items():
+                if v["band"] not in ("N", "L"):
+                    continue
+                m = re.search(r"L(\d+)\.bin", n)
+                if v["band"] == "L" and int(m.group(1)) == L0:
+                    held.append((v["counts"], v["ir"]))
+                else:
+                    keep.append((v["counts"], v["ir"]))
+            if not held or rank([r for r, _ in keep]) < 5:
+                continue
+            bb = ols([[float(x) for x in r] for r, _ in keep],
+                     [y for _, y in keep])
+            if bb is None:
+                continue
+            r_ = worst_resid(bb, [[float(x) for x in r] for r, _ in held],
+                             [y for _, y in held])
+            if r_ > best:
+                best, bestL = r_, L0
+        print(f"  {cell:12s} {float(worst):18.2f} {ow:17.2f} "
+              f"{(float(tw) if tw is not None else float('nan')):9.2f} "
+              f"{best:19.2f}  L={bestL}")
+        out[cell] = {"in_sample_exact": float(worst), "in_sample_ols": ow,
+                     "band_T": float(tw) if tw is not None else None,
+                     "loo_worst": best, "loo_worst_L": bestL}
+    print("\n  The last column is the number that can falsify a law here. Band "
+          "T's is\n  SMALLER than in-sample because band T is inside the fit "
+          "set's row space.")
+    return out
+
+
+def step_bases(data):
+    """The step basis ../NOTES.md 8b named, built and refitted.
+
+    `strncpy`'s two halves compile to size-dispatched vector code, so the honest
+    hypothesis is that the cost is a STEP function of the byte counts rather
+    than a linear one. The candidate NOTES.md named was `ceil(F/32)` -- and it
+    is DEGENERATE: per string `ceil(f/32) == [f > 0] == K - T` and
+    `ceil(c/32) == [c > 0] == K`, both already columns of the design. Every fit
+    blob is length-HOMOGENEOUS, so every indicator column collapses onto
+    {1, K, T} the same way. The one non-degenerate candidate is glibc's own size
+    class, `ceil(log2)`. (TASK_045_REVIEW major 6.)"""
+    print("\n" + "=" * 74)
+    print("STEP BASES -- the candidate NOTES.md 8b named, and whether it can "
+          "work")
+    print("=" * 74)
+
+    def extra(lens, kind):
+        if kind == "ceil32":
+            return [sum(-(-min(l, DST_CAP) // 32) for l in lens),
+                    sum(-(-(DST_CAP - min(l, DST_CAP)) // 32) for l in lens)]
+        if kind == "pow2":
+            def cls(x):
+                return 0 if x <= 0 else max(0, (x - 1).bit_length())
+            return [sum(cls(min(l, DST_CAP)) for l in lens),
+                    sum(cls(DST_CAP - min(l, DST_CAP)) for l in lens)]
+        return []
+
+    b = bands()
+    lens_of = {}
+    for band, entries in b.items():
+        for name, lens in entries:
+            lens_of[name] = lens
+    print(f"  {'cell':12s} {'B0 (5 col, OLS)':>16s} {'+ceil32 (7 col)':>16s} "
+          f"{'+pow2 (7 col)':>15s}")
+    out = {}
+    for cell in [c for c in CELLS if c in data]:
+        d = data[cell]
+        got = {}
+        for kind in ("base", "ceil32", "pow2"):
+            rows, ys = [], []
+            for n, v in d.items():
+                if v["band"] not in ("N", "L"):
+                    continue
+                rows.append([float(x) for x in v["counts"]]
+                            + [float(x) for x in extra(lens_of[n], kind)])
+                ys.append(v["ir"])
+            if not rows:
+                got[kind] = None
+                continue
+            bb = ols(rows, ys)
+            got[kind] = worst_resid(bb, rows, ys) if bb else None
+        f = lambda x: f"{x:16.2f}" if x is not None else f"{'SINGULAR':>16s}"
+        print(f"  {cell:12s} {f(got['base'])} {f(got['ceil32'])} "
+              f"{f(got['pow2'])[1:]}")
+        out[cell] = got
+    print("\n  `ceil32` is SINGULAR on every cell, which is the finding: the "
+          "candidate\n  adds no column. `pow2` (glibc's size class) is the one "
+          "that is not, and it\n  does not close the law either.")
+    return out
+
+
 def regimes(data):
     """The honest model: p13's cost is PIECEWISE-LINEAR, not linear.
 
@@ -388,10 +565,13 @@ def main():
                          "band_T_worst_residual":
                              float(oworst) if oworst is not None else None,
                          "n_fit": len(fit_rows), "n_oos": len(oos)}
+    oos_tbl = out_of_sample(data)
+    steps = step_bases(data)
     reg = regimes(data)
     sout = os.path.join(SCRATCH, f"sweep_fit.{a.opt}.{a.mode}.json")
     with open(sout, "w") as f:
-        json.dump({"global_linear_fit": summary, "regimes": reg}, f, indent=1)
+        json.dump({"global_linear_fit": summary, "regimes": reg,
+                   "out_of_sample": oos_tbl, "step_bases": steps}, f, indent=1)
     print(f"\nwrote {sout}")
     print("\n  A non-zero `band T` residual means the law is a law in the FIT "
           "SET's\n  counts and not in the kernel's -- which is exactly what "

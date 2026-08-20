@@ -289,6 +289,24 @@ does not.
 > `pins_nothing` signal cannot see it because the entry does pin something on
 > every rung it names.
 
+⚠ **But a scoped entry is NOT automatically a thumb, and the repair is not
+"delete the scoping".** p13 had three of them and measuring each separately gave
+**three different answers** (TASK_046) — which is the whole method in one
+pattern:
+
+| scoped entry | what the measurement said | disposition |
+|---|---|---|
+| byte-loop **copy + fill** | the bulk spelling verifies (**17/0, twin 24/0**); the prover never excluded it | **relax symmetrically** — it *was* a thumb |
+| consumer **`position()`** | `` `…iter::…::position` is not supported `` at the pinned vstd | **keep** — the exclusion is one layer down, not a thumb |
+| consumer **bound** | a bounded unchecked scan verifies **19/0, twin 22/0, no new TCB** | **keep by fiat and PRICE it** — nothing but English excludes it |
+
+**So the rule is: price every scoped entry, then dispose of each on what the
+price says.** An entry the prover already excludes costs nothing to keep and is
+not a thumb. An entry only the declaration excludes is a **fiat**, and a fiat is
+legitimate — the whole named-spelling standard is fiat — **but its price must be
+published beside the number it protects.** p13's third entry is worth the sign of
+its headline.
+
 ⚠ **And note where the error was reported.** p13's `NOTES.md:842` said the R4
 side "is not searched" and attributed it to **the prover** — the R4-is-chained-to
 -the-prover mechanism (finding 14) is real, invoked constantly, and it is now
@@ -1689,26 +1707,46 @@ places and points at nothing. **Name the pattern, never the number.**
    gap is the CONSUMER scan, and its direction is the reverse of the published
    one:**
 
-   > The **bounds check tells LLVM `d < 32`**, LLVM fully unrolls the consumer to
-   > 32×(`cmpb`/`je`) = **2 Ir/byte**, and the *unchecked* unbounded walk stays a
+   > A consumer whose **bound is visible to LLVM** (`d < 32`) fully unrolls to
+   > 32×(`cmpb`/`je`) = **2 Ir/byte**; an **unbounded** walk stays a
    > 4-instruction loop at **4 Ir/byte**. Measured at matched spelling on band L:
    > **+2.00000 Ir per consumed byte, exactly.**
 
-   And the discriminator is the **check**, not the iterator: respelling
-   `position()` as an unbounded *checked* `while dst[d] != 0 { d += 1 }` gives a
-   **byte-identical kernel** (`md5_fn c936658a0e82` both). **This is p03's and
-   p04's seeding result arriving from the other direction** — there the invariant
-   had to be *handed* to LLVM as dead code; here the safety check **is** the
-   seeding mechanism and it more than pays for itself. Fourth pattern in the
-   family, and the first where safety is net-negative *because* it is a check.
+   ⚠ **THE DISCRIMINATOR IS THE BOUND, NOT THE CHECK**, and this file said "the
+   check" for one commit (TASK_046). An **unchecked but explicitly bounded** scan
+   — `while d < DST_CAP && *dst.get_unchecked(d) != 0` — costs **exactly** what
+   the safe `position()` costs, to the instruction (3718.70 / 9688.30 both). **A
+   bounds check is one way of supplying the bound, and it is not what is being
+   paid for.** (Nor is it the iterator: an unbounded *checked* `while dst[d] != 0`
+   walk gives the same instruction count and the same band-L slope as
+   `position()` — same 389 instructions and identical mnemonic multiset, though
+   **not** byte-identical after the full-extent fold, which rotates a `%rax`/`%rcx`
+   phase. Claim the exact `Ir` equality; do not claim byte-identity.)
+   **This is p03's and p04's seeding result arriving from the other direction** —
+   there the invariant had to be *handed* to LLVM as dead code; here the safety
+   check supplies it as a side effect and more than pays for itself. Fourth
+   pattern in the family, and the first where safety is net-negative *because* it
+   carries a bound.
 
-   ⚠ **The published margin was inflated by the contract itself.** `spec.md`
-   pinned the byte-loop copy and fill in `unsafe.rs`/`verus.rs` and **exempted
-   `safe_tuned.rs` by name**, so only the safe rung could use the bulk spelling.
-   An admissible bulk R4 **exists and verifies** — `copy_nonoverlapping` +
-   `write_bytes`, **15/0, twin 22/0, `identity: exact`**, TCB 5 → 7. Relaxed
-   symmetrically the figure is **−7.54% / −14.74%** against the published
-   −13.6% / −17.3%. See the direction test above: **this is its first fire.**
+   ⚠ **The published margin was inflated by the contract itself, and THE SIGN
+   DOES NOT SURVIVE.** `spec.md` pinned the byte-loop copy and fill in
+   `unsafe.rs`/`verus.rs` and **exempted `safe_tuned.rs` by name**. Three numbers,
+   all on the corrected (full-fold) tree, and the third is the one that decides
+   what p13 is:
+
+   | R4 permitted | `R3ship − R4` small / large | status |
+   |---|---|---|
+   | shipped byte loops (**fixed-R4 bound**) | **−177.00 (−4.49%) / −1054.00 (−9.74%)** | published |
+   | + bulk copy/fill (**cheapest found in contract**) | **−85.00 (−2.21%) / −885.00 (−8.31%)** | the pin was **52% / 16%** |
+   | + a **bounded** unchecked consumer | **+44.00 / +77.00** | ⚠ **sign flips** |
+
+   The bulk pair is admissible (**17/0, twin 24/0, `identity: exact`**, TCB 5→7,
+   shipped as a **control**). The bounded unchecked consumer verifies at **19/0,
+   twin 22/0, with NO new trusted items** and is excluded by nothing but
+   `spec.md`'s English. **So p13's "safe beats unsafe" is the price of a bound,
+   and it reverses the moment the unsafe rung is allowed one.** Quote the fiat
+   whenever the margin is quoted. See the direction test above: **this is its
+   first fire.**
 
    ⚠ **THE KERNEL-EXCLUSIVE COLUMN IS NOT COMPARABLE ACROSS p13's RUNGS**, and
    this is the first pattern where that is true — its rungs dispatch **different
@@ -1726,10 +1764,16 @@ places and points at nothing. **Name the pattern, never the number.**
    **14.00 Ir/call, 0.00000 Ir/byte**. p11's separation, unapplied — apply it.
    **Consequence for the gate**: `strlen(` is a `forbidden` spelling, is absent
    from every source, and the audit reports **0 hits** while every C object calls
-   it. **A text pin binds the source, not the object.** Audited across all twelve
-   patterns' objects: **p13 is the only one whose `forbidden` list the optimiser
-   reintroduces** — p12's four string routines appear in no `-O3` object and the
-   other ten forbid no library routine. Real limitation, blast radius one.
+   it. **A text pin binds the source, not the object.** Blast radius, audited
+   across all thirteen patterns' objects: **p13 is the only one whose `forbidden`
+   list the optimiser reintroduces** — `strlen` in **8 of 16** p13 objects, **0 of
+   16** p12, and the other eleven forbid no library routine.
+   ⚠ **That audit is only correct SCOPED TO `kernel` + `main`.** Unscoped it
+   reports p12 as a hit too, and the hit is spurious: `std::env`,
+   `current_dir`, the backtrace machinery and `io::Error`'s `Display` call
+   `strlen` in **every Rust binary of every pattern**. An object-level
+   forbidden-token audit that does not scope to the measured symbols reports the
+   standard library, not the kernel.
 
    Sound and unchanged: Verus **17/0 first attempt** (twin 20/0), `R4 ≡ R5
    exact`, TCB 5 matching the gate's own count, Miri clean 9/9. The

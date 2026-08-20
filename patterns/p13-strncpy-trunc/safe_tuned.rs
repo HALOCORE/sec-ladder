@@ -42,6 +42,14 @@
 //! safety tax.** The matched-spelling safety number on this pattern is
 //! `R2 − R4`: byte-loop copy against byte-loop copy, indexed against unchecked,
 //! nothing else different. ../NOTES.md 4 gives both and says which is which.
+//!
+//! ⚠ **And 73–91% of `R3 − R4` is the CONSUMER, not the copy.** ../NOTES.md 4c
+//! decomposes it: `position()` hands LLVM the bound `d < 32`, LLVM unrolls the
+//! scan to 32×(`cmpb`/`je`), and R4's unbounded unchecked walk cannot be
+//! bounded at all -- **2.00000 Ir per consumed byte, exactly**. The two bulk
+//! calls this rung makes are NOT the mechanism: R4's "byte loops" are
+//! idiom-recognised into the same `memcpy`/`memset` at the same per-call cost.
+//! Give R4 a bound and `R3 − R4` reverses (../NOTES.md 10c).
 
 #[path = "../../common/driver.rs"]
 mod driver;
@@ -80,7 +88,11 @@ pub fn kernel(buf: &[u8], off: usize, len: usize) -> u64 {
         dst[DST_CAP - 1] = 0;
         let d: usize = dst.iter().position(|&b| b == 0).unwrap_or(DST_CAP);
         acc = acc.wrapping_mul(31).wrapping_add(d as u64);
-        acc = acc.wrapping_mul(31).wrapping_add(dst[0] as u64);
+        let mut fi: usize = 0;
+        while fi < DST_CAP {
+            acc = acc.wrapping_mul(31).wrapping_add(dst[fi] as u64);
+            fi = fi + 1;
+        }
         if q >= len {
             break;
         }

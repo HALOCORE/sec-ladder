@@ -17,7 +17,8 @@ kernel:  for each declared string
              zero-fill dst[n .. DST_CAP]                <<< strncpy's padding
              dst[DST_CAP - 1] = 0                       <<< R1 omits THIS LINE
              d = 0 ; while dst[d] != 0: d += 1          <<< UNBOUNDED in C
-             acc = (acc*31 + d)*31 + dst[0]
+             acc = acc*31 + d
+             for i in 0..DST_CAP: acc = acc*31 + dst[i] <<< FULL-EXTENT fold
          return acc*31 + nstr
 ```
 
@@ -38,8 +39,17 @@ kernel:  for each declared string
   NUL is an out-of-bounds read and **only R1** has it. `NOTES.md` 1a and 7.
 - **The safety tax is a STORE, not a compare-and-branch**, and it is exactly
   **1.00000 `Ir` per string** on both compilers, on 57 blobs. `NOTES.md` 4a.
-- **The safe library routine is the expensive one.** `strlcpy` always terminates
-  and costs **+26.00 `Ir`/string** over `strncpy`; `snprintf` costs **+339.16**.
+- **A bound the optimiser can SEE is worth 2.00000 `Ir` per consumed byte** —
+  and the bounds check is one way of supplying it, so on this kernel *safety is
+  net-negative because it is a check*. That is 73–91% of the safe-beats-unsafe
+  margin, and it is p03's and p04's seeding result arriving from the other
+  direction. `NOTES.md` 4c.
+- **The first pattern whose rungs call DIFFERENT libc routines**, so the
+  kernel-exclusive column is not comparable across them and two published
+  figures move. `NOTES.md` 4b.
+- **The safe library routine is the expensive one, on both compilers.**
+  `strlcpy` always terminates and costs **+26.00 `Ir`/string** (gcc) / **+30.00**
+  (clang) over `strncpy`; `snprintf` costs **+339.16** / **+343.00**.
   `NOTES.md` 3a.
 - **Whether the bug is reproducible is a property of the binary, not of the
   compiler.** Three of `c-clang`'s four builds give different answers on
@@ -56,7 +66,8 @@ kernel:  for each declared string
   exactly the same inputs and separate **by rung**. What ships instead is a
   controlled triple — `adversarial-exact` (4×31 B), `adversarial-truncate`
   (4×32 B), `adversarial-truncate-alt` (4×40 B) — which destroys 0, 1 and 9
-  bytes per string and prints **one checksum** in every checked rung.
+  bytes per string and prints **one checksum** in every checked rung, with the
+  destination **byte-identical** across all three under a full-extent fold.
   `NOTES.md` 1a.
 - **A `large` with a different truncation ratio from `small`.** Any truncating
   string puts R1 out of checksum agreement — and on some builds out of agreement
@@ -69,18 +80,28 @@ kernel:  for each declared string
 - **`Ir` has no exact linear cost law here** — the first pattern in this project
   of which that is true. `strncpy`'s two halves compile to size-dispatched
   vector code, so the per-string cost is a step function with a discontinuity at
-  `slen == DST_CAP`. No law is published; the piecewise slopes are.
+  `slen == DST_CAP`. No law is published; the piecewise slopes are. ⚠ **Say
+  which estimator**: exact interpolation and OLS disagree by up to 4.2× on how
+  badly it fails. `NOTES.md` 8b.
+- **p13's out-of-sample test could not fail, provably** — all 17 band-T rows lie
+  inside the rank-5 fit set's row space, so band T is an interpolation check.
+  Holding out a **length** instead gives residuals 2.7× to 95× larger.
   `NOTES.md` 8b.
-- **R1's design is rank 3 of 5 and can never be more**, because R1 cannot be run
-  on a truncating blob at all. `NOTES.md` 8a.
-- **The checksum oracle cannot see a wrong copy.** The fold takes `d` and
-  `dst[0]`, so `dst[1..d]` is observable only through "is this byte zero?"; a
-  rung copying `0xFF` agrees on 9/9 shipped inputs. **R5's `ensures` catches it**
-  where the whole checksum apparatus does not. `NOTES.md` 6a.
+- **R1's design is rank 3 of 5**, because among non-truncating rows `C == S − K`.
+  ⚠ R1 *can* be measured on a truncating blob — its kernel `Ir` is bit-identical
+  over reps — so the exclusion is policy, and the defensible reason is that its
+  consumer reads 1–7 bytes that are not a regressor. `NOTES.md` 8a.
+- **The margin depends on a fiat, and the fiat is published.** With R4's
+  consumer allowed a bound, `R3 − R4` reverses to **+44 / +77 `Ir`/call**. The
+  unbounded consumer is held by fiat because it *is* the pattern; the number is
+  in the file so a reader can tell a language result from a contract artefact.
+  `NOTES.md` 10c.
 - **`strlen(` is `forbidden` in the declaration, absent from every source, and
   called by every C `-O3` cell** — both compilers turn the consumer scan into
-  `strlen`. A text-level idiom pin constrains the source, not the object.
-  `NOTES.md` 3d.
+  `strlen`. A text-level idiom pin constrains the source, not the object, and
+  **p13 is the only one of thirteen patterns where the optimiser puts a
+  forbidden routine back**. Priced with clang `-fno-builtin-strlen`: **the sign
+  of every same-backend C-vs-Rust row flips**. `NOTES.md` 3d, 4d.
 
 ## Files
 
@@ -98,9 +119,10 @@ kernel:  for each declared string
 | `verus.rs` | R5 — R4's exec code plus the proof |
 | `controls/library_axis.py` | six copy routines × two `DST_CAP`s, one checksum |
 | `controls/sweep_fit.py` | the design rank, the fits and the out-of-sample test |
-| `controls/spellings.py` | the audited in-contract R3-side span |
+| `controls/spellings.py` | the audited in-contract span, **both sides** |
+| `controls/gen_bulk_r5.py` | the R4-side candidates' R5 twins, put through Verus |
 | `controls/mutants.py` | four proof mutants and what catches each |
-| `controls/oracle_hole.py` | what the checksum cannot discriminate |
+| `controls/oracle_hole.py` | the oracle hole the narrow fold left, and its repair |
 | `NOTES.md` | what was measured |
 
 ## Running
@@ -111,4 +133,7 @@ python3 patterns/p13-strncpy-trunc/inputs/gen.py --sweep     # + the three sweep
 python3 harness/check.py p13                                 # the gate
 python3 harness/measure.py p13                               # the numbers
 python3 patterns/p13-strncpy-trunc/controls/sweep_fit.py --rank   # design rank, no measuring
+python3 patterns/p13-strncpy-trunc/controls/sweep_fit.py --refit  # + estimators, out-of-sample, step bases
+python3 patterns/p13-strncpy-trunc/controls/spellings.py --verus  # both spans, R5 twins through Verus
+python3 patterns/p13-strncpy-trunc/controls/oracle_hole.py        # the fold's oracle, before and after
 ```

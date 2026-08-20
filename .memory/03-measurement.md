@@ -1066,13 +1066,14 @@ blobs already fitted, and *no* blob is out of sample in regressor space. A
 
 p13's band T is exactly that: every row `= (t/8)·row(L=40) + ((16−t)/8)·row(L=8)
 − (1,0,0,0,0)`, verified for all 17 values of `t`, with `(1,0,0,0,0)` itself a
-difference of two band-N rows. Its residuals (5.10 / 12.24) were **smaller** than
-in-sample, which the delivery flagged against itself without diagnosing.
+difference of two band-N rows. Its residuals (**4.80 / 14.40** on the corrected tree) were **smaller** than
+in-sample, which the delivery flagged against itself without diagnosing. All
+**17 of 17** band-T rows are inside the fit set's row space.
 
 **What does work: hold out a value of a structural parameter the model is
 linear in, not a mixture of ones you fitted.** Leave-one-*length*-out on p13's
-band L (fit `N + L \ {L₀}`, predict `L₀`) gives worst residuals **56.08 / 39.31 /
-454.14 / 38.50 / 39.21** across five cells — **5× to 90×** what band T reported.
+band L (fit `N + L \ {L₀}`, predict `L₀`) gives worst residuals **37.63 … 454.83**
+across the five fitted cells — **3× to 95×** what band T reported.
 
 So the out-of-sample protocol is two-part:
 
@@ -1083,9 +1084,17 @@ So the out-of-sample protocol is two-part:
    set**, or say plainly that it is an interpolation check.
 
 ⚠ **And say which estimator produced a residual.** p13's "no law" verdict rested
-on residuals from **exact interpolation on 5 chosen rows** (115 / 888); ordinary
-least squares on the same data gives **37 / 443**. A "the model does not fit"
-claim that moves by 3× with the estimator is a claim about the estimator.
+on residuals from **exact interpolation on 5 chosen rows** (111.57 … 873.21);
+ordinary least squares on the same data gives **35.36 … 443.24** — **up to
+4.2×**. A "the model does not fit" claim that moves by 4× with the estimator is a
+claim about the estimator.
+
+⚠ **And a step basis needs a length-HETEROGENEOUS fit set to be identifiable at
+all.** Every p13 fit blob is length-homogeneous, which makes `ceil(f/32)` equal
+to `K − T` and `ceil(c/32)` equal to `K` — so the natural step basis is
+**singular**, as is every indicator basis. Nothing about the design could have
+fitted the step, and the honest report is *"not identifiable here"*, not *"no law
+exists"*.
 
 ## A fitted law is a law in SOMEBODY's counts — say whose
 

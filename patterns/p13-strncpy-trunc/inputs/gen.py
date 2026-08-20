@@ -129,10 +129,10 @@ So the rows are built as a controlled triple plus two routes to the overread:
                                 declared length.
   * `adversarial-empty`         `nstr = 8` and eight zero bytes. Every string is
                                 empty, `n = 0`, the zero-fill writes all 32
-                                bytes, `d = 0` and `dst[0] = 0`: the row where
-                                the per-string constant is measured with the
-                                source terms set to zero. Returns exactly
-                                `nstr == 8`.
+                                bytes, `d = 0` and every folded byte is 0: the
+                                row where the per-string constant is measured
+                                with the source terms set to zero. Returns
+                                exactly `nstr == 8`.
   * `adversarial-stride3`       a 3-byte window cannot hold the 4-byte header.
                                 The driver guard `stride_w >= 4` skips the loop,
                                 so every rung prints 0 after ZERO kernel calls.
@@ -274,7 +274,10 @@ def kernel_result(win):
 
     Used only by `_no_zero_window()` below. It is deliberately NOT imported
     from `../model.py`: `gen.py` must be runnable on its own, and a generator
-    that shares the oracle's code cannot check the oracle."""
+    that shares the oracle's code cannot check the oracle.
+
+    The fold here is ../spec.md's, i.e. FULL-EXTENT since TASK_046: `d` and then
+    every one of the `DST_CAP` destination bytes."""
     ln = len(win)
     if ln < HDR:
         return 0
@@ -294,7 +297,8 @@ def kernel_result(win):
         dst[DST_CAP - 1] = 0
         d = dst.index(0)
         acc = (acc * 31 + d) & mask
-        acc = (acc * 31 + dst[0]) & mask
+        for fi in range(DST_CAP):                 # THE FULL-EXTENT FOLD
+            acc = (acc * 31 + dst[fi]) & mask
         if q >= ln:
             break
         p = q + 1
@@ -482,7 +486,7 @@ def main():
           window(len(NONUL_SRC_LENS) + 1, body))
 
     # (6) the degenerate copy: every string is empty, so `n` is 0, the zero-fill
-    #     writes all DST_CAP bytes, `d` is 0 and `dst[0]` is 0.
+    #     writes all DST_CAP bytes, `d` is 0 and every folded byte is 0.
     write("adversarial-empty.bin", ADV_ITERS, HDR + EMPTY_NSTR,
           window(EMPTY_NSTR, bytes(EMPTY_NSTR)))
 
