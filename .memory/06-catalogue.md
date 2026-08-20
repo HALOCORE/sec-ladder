@@ -321,6 +321,23 @@ column is that same kind of guess.** Check it against the wire format before
 building on it — p07's was wrong by a factor of 2.1e9, and the binding constraint
 was not the one the manager named.
 
+⚠ **Three consecutive patterns have now overturned their own catalogue row**
+(p07, p06, p14), and p14's task made settling the bug class its **first
+deliverable** rather than an afterthought. **Do that on every remaining pattern.**
+p14 rejected all four candidates it was handed — the manager's three plus the
+catalogue's — and shipped a fifth.
+
+⚠ **And do NOT record that in-place mutation is "excluded by the harness".** That
+claim was p14's §0 headline, it is **false**, and it is not in this file only
+because rule 9 held the write until the review landed. **Nothing in `harness/`
+enforces purity**; `check.py` compares against `model.py`'s own simulation. What
+actually happens is that the driver's repeat protocol drives a payload-mutating
+kernel into a **one-call steady state** (`mutate` = 9044.0000 `Ir`/call, zero
+residual, against `cap` 9779.0180), and after call 1 every delimiter is already
+NUL — **so it measures an already-tokenised buffer, a different workload from the
+one the pattern names.** Two repairs exist: simulate the mutation in `model.py`,
+or declare the steady state. **An in-place tokenizer is still buildable here.**
+
 ## Family B — strings & NUL-termination
 
 | ID | Pattern | C bug class modelled | Verus difficulty | Status |
@@ -328,7 +345,7 @@ was not the one the manager named.
 | p11 | NUL-terminated string scan (`strlen`-shaped) | missing terminator → OOB read; **the loop simply does not stop** | moderate | **done** (T033), gate `PASS` first complete run, R5 12/0, R4 == R5 `exact`, **reviewed** (T033_REVIEW: headline confirmed by independent re-measurement; 2 majors + 6 minors, no blockers). Family B's first pattern; first kernel whose loop bound is not known before the loop, and first where C's rung calls a SIMD libc routine |
 | p12 | `strcat` into a fixed stack buffer | classic stack overflow — **and the failure mode depends on the overflow MAGNITUDE and the compiler**: +1…+8 B silent and wrong on both, +16…+48 B gcc canary / clang corrupts `main`'s locals, +64…+128 B gcc canary / clang SIGSEGV | moderate | **done** (T040), gate `PASS` first complete run, R5 15/0, R4 == R5 `exact`, **reviewed** (T040_REVIEW: headline confirmed and sharpened; 2 blockers + 3 majors, both blockers landed at T041 — the structural claim was too strong and `−26.00` is a fixed-R4 figure). First bug here that is a **WRITE** safe Rust cannot express; first time `c-gcc` and `c-clang` differ in **behaviour** |
 | p13 | `strncpy`/`snprintf` truncation semantics | **the first bug here that is a CORRECTLY-CALLED library function** — `strncpy(dst, src, sizeof dst)` is textbook C and still does not terminate on truncation; and **the harm lands at a different site from the bug** (memory-safe truncation at the copy, OOB read later in the consumer) | moderate | **done** (T043), gate `PASS`, R5 **17/0 first attempt** (twin 20/0), R4 == R5 `exact`, **reviewed** (T045_REVIEW: 3 blockers + 6 majors — headline sign survives, magnitude and stated mechanism do not; corrections at T046). First pattern whose rungs call **different libc routines**, and the only one where the optimiser reintroduces a `forbidden` spelling |
-| p14 | tokenizer (`strtok`-style, in-place mutation) | in-place mutation + aliasing | hard | planned |
+| p14 | **field split into a fixed descriptor table** (delivered as `p14-field-split`, not as a `strtok`-style in-place tokenizer) | **an unbounded FIELD COUNT against a fixed descriptor table** — the first bound here that is a **count of a byte value** rather than a length. ⚠ The guessed class *"in-place mutation + aliasing"* was **rejected by measurement** (T049 §0) — see below | hard | **done** (T049), gate `PASS` first complete run, R5 **19/0** (twin 23/0), `R4 ≡ R5 exact` at O3 / `norel` at O0, Miri 8/8, TCB 6 items = **4 U-license + 2 infra** (first use of the T048 classification on a new pattern), **reviewed** (T049_REVIEW: 2 blockers + 3 majors + 4 minors, **17 clean negatives**; corrections at T050). Its `strtok`/`strsep` delimiter-run split is the **trigger**, not the bug |
 | p15 | UTF-8 validation + decode | malformed continuation bytes | moderate–hard | planned |
 
 ## Family C — parsing & protocol decoding

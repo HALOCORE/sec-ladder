@@ -8,9 +8,9 @@ this box is reference; this box is what to *do*.
 
 | | |
 |---|---|
-| **Patterns** | **14 of 47 exist, all green, all 14 reviewed.** |
-| **Immediate next task** | **p14 is built (`4e5bc8a`) and reviewed (`b5867bb`, 2 blockers + 3 majors + 4 minors, 17 clean negatives). `TASK_050` — the corrections — is IN FLIGHT.** Notes at `.temp/p50/NOTES.md`. **Resume with `SendMessage`, do not restart.** When it lands: commit, **then write `.memory/`** (rule 9 — **nothing about p14 is in `.memory/` yet, deliberately**), then the next pattern. ⚠ **The p06 null question is SETTLED and p06's headline is intact** — see the note below this table. |
-| **The null-control question, settled** | The byte-identical **R4/R5 pair is NOT a null control**: the `verus` build's kernel lands **0x20 below** the `unsafe` build's on p06 and p14 alike, so it samples one fixed `addr % 64` alignment contrast every time — a **biased draw of size one**, median ≈0 over a layout population. **The floor is the layout population, not the pair.** p06's own floor is **±4.6%** (not the ±3% in its `NOTES.md`), and its clang column still clears it at ~2.1×. |
+| **Patterns** | **15 of 47 exist, all green, all 15 reviewed.** |
+| **Immediate next task** | **the next pattern: p10** (sliding window / stencil) **or p18** (LEB128). p14 is built, reviewed, corrected and written into `.memory/`; **nothing is outstanding on it.** Write `TASK_051`. ⚠ **Make settling the bug class the FIRST deliverable** — the catalogue's guessed class has now been overturned on **four** patterns (p07, p06, p14, and p13's in part), and p14 rejected all four candidates it was handed. |
+| **The null-control question, settled** | The byte-identical **R4/R5 pair is NOT a null control**: the `verus` build's kernel lands **0x20 below** the `unsafe` build's on p06 and p14 alike, so it samples one fixed `addr % 64` alignment contrast every time — a **biased draw of size one**, median ≈0 over a layout population. **The floor is the layout population, not the pair.** p06's own floor is **±4.6%**, and its clang column still clears it at ~2.1×. (p06's `NOTES.md` now says ±4.6%; two later sentences in that file still say ±3% and both remain true.) |
 | **Then** | review p14, then **p10** (sliding window) or **p18** (LEB128). |
 | **The TCB question is SETTLED** | A pattern **cannot** meaningfully shrink its TCB by pushing axioms into vstd — measured, 3.4% exposure, because `get_unchecked`, `copy_nonoverlapping`, `as_ptr`, `ptr::add` and `count_ones` are all unsupported at the pinned vstd. Ship **one number plus a three-way classification**; the two-number proposal was refuted by census and must not be reinstated. `.memory/04-verus.md`. |
 | **The loop** | build a pattern → review it once → land corrections → repeat. Per `PROTOCOL.md` rule 9, write `.memory/` **only after** the review. |
@@ -69,6 +69,7 @@ green, all thirteen reviewed:**
 | p04 | ring buffer | known **bits** survive a loop-carried phi where a range does not — `next_pow2(CAP) ≤ ARR_LEN` |
 | p13 | `strncpy` truncation | a bound the optimiser can **see** outweighs the check that supplies it — and the contract pinned one side of the comparison |
 | p06 | in-place rotate | **the `Ir` column is sign-wrong** — clang's hardened rung executes *fewer* instructions and runs *slower* |
+| p14 | field split | **an exact law, fitted where the guard never fires** — and why "hardening is cheaper than the bug" is not publishable |
 
 **If you read only one thing after this file**, read `.tasks/TASK_026.md` §0 — the
 distilled rules from the thirteen-task spelling arc. Every pattern built after it
@@ -102,6 +103,7 @@ the commands are in `.memory/01-ladder.md`'s numbering warning.
 | p04 | **13** | 23 |
 | p13 | **14** | 25 |
 | p06 | **15** | 26 |
+| p14 | **16** | 27 |
 | p01, p02 | findings 1–3 | 1–8 |
 
 Cross-cutting entries exist only here: **14** (every rung is a spelling), **16**
@@ -989,6 +991,48 @@ the number.** Two task files have already sent an agent to the wrong finding.
    also break a pin the claim ignores. The correct form is ***Verus-level* sole
    catcher**. **p12's `NOTES.md:1046-1049` is still wrong** (queue item).
 
+   ⚠ **p06's floor is ±4.6%, not the ±3% it published** (TASK_049_REVIEW).
+   Headline intact — the clang column clears it at ~2.1×.
+
+27. **p14 — an EXACT law, fitted entirely where the guard never fires.**
+   (TASK_049, reviewed at TASK_049_REVIEW — **2 blockers, 3 majors, 4 minors,
+   17 clean negatives** — corrected at TASK_050. Authoritative:
+   `.memory/01-ladder.md` **finding 16**.)
+
+   A CSV-style field split into a fixed descriptor table; the bound is
+   `nt < MAXTOK`, **the first bound here that is a count of a byte value rather
+   than a length.**
+
+   **Its task made settling the bug class the FIRST deliverable, and the
+   engineer rejected all four candidates it was handed** — the manager's three
+   and the catalogue's — and shipped a fifth. **Fourth pattern to overturn its
+   own catalogue row.** The lifetime candidate, which would have been the
+   ladder's first, is *not observably wrong at `-O3`* on either compiler (p08
+   exactly) and its pointer descriptors leave R4 unprovable.
+
+   **The result is a methodology result.** `c-gcc-h − c-gcc = 1.00·bytes +
+   2.00·fields − 3.00` is **exact — max residual 0.0000 over 66 blobs** — and
+   **contains zero fitted inputs where the guard fires**. On the inputs p14
+   exists to model it inverts: **−551, −823, −611** against +93, +93, +429.
+   **The manager wanted that as the headline *"hardening is cheaper than the
+   bug"*; the engineer refused it and was right** — past the cap the two cells
+   compute different functions, the unhardened rung is already committing UB,
+   and on one blob its `c-clang` cell **is not a function of its arguments**
+   (`r₂…r₅ = 0`, marginal 17.982 `Ir` for 168 folded fields). Ships as **the law
+   with its domain**, and **behaviour, not cost, outside it.**
+   ⚠ **The project already keeps that rule structurally**: `measure.py`'s
+   `CG_PLAN` is six entries, all `small.bin`/`large.bin`, so **no published `Ir`
+   figure anywhere is measured on a bug-triggering input.** p14 would have been
+   the first exception.
+
+   ⚠ **Its leave-one-length-out cannot fail** (exact fit, rank 4 survives
+   dropping any band) — p13's mistake in a new costume. ⚠ **And the R4/R5 pair
+   is not a null control**; see the START HERE box.
+
+   Sound: **19/0** (twin 23/0), `R4 ≡ R5 exact` / `norel`, **Miri 8/8**,
+   **TCB 6 = 4 U-license + 2 infra** — TASK_048's classification's first use on
+   a new pattern, and it survived review.
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds
@@ -1173,7 +1217,7 @@ and both copies went stale (13 and 7 against the task files' 55).
 
 ## Priority — read this before planning
 
-**Forty-eight tasks in, 14 of 47 patterns exist**, and the ratio is the thing to
+**Fifty tasks in, 15 of 47 patterns exist**, and the ratio is the thing to
 watch. Six tasks went to gate hardening before the user called it; **T015–028 —
 thirteen consecutive tasks — went to the spelling problem** and produced no new
 pattern. Both arcs paid for themselves, and neither was on anyone's plan. But the
@@ -1182,11 +1226,11 @@ wrong than at producing new ones**, and the correction is simple: **alternate
 build → review, and make a methodology proposal argue for itself against a
 pattern.**
 
-**Since T033 the loop has held** — p11, p03, p09, p12, p04, p13, p06 each built
-and reviewed, every one green on its first complete run, and every one produced a
+**Since T033 the loop has held** — p11, p03, p09, p12, p04, p13, p06, p14 each
+built and reviewed, every one green on its first complete run, and every one produced a
 finding no one predicted. That is the working mode; do not drift off it.
-⚠ **The last three each needed a THIRD task to land their corrections** (T044,
-T046, T048), and all three were worth it: p04's review moved its headline number,
+⚠ **The last four each needed a THIRD task to land their corrections** (T044, T046,
+T048, T050), and all four were worth it: p04's review moved its headline number,
 p13's reversed its headline's sign, and p06's corrected two published laws and a
 `.memory/` claim that had stood since TASK_004. **Budget build → review → land,
 not build → review.** Three tasks per pattern is the real cost; plan with it.
@@ -1194,7 +1238,7 @@ not build → review.** Three tasks per pattern is the real cost; plan with it.
 The gate's threat model is **honest mistake, not malicious author**
 (`.memory/02-bench-rules.md`, top section, with the residuals deliberately left
 open). **New gate work must pass "could this happen by accident?" first** — and
-`check.py` is ~5040 lines against 13 patterns, so the next gate proposal should
+`check.py` is ~5040 lines against 15 patterns, so the next gate proposal should
 have to beat that ratio.
 
 **Review each pattern once; do not review each fix to each check.** The two
@@ -1203,8 +1247,27 @@ engineer *flagged against itself*, and a mechanism asserted without a control.
 
 ## Immediate queue
 
-**The next task is `TASK_049` — p14.** See the START HERE box; this section is
-the standing backlog, not the next action.
+**The next task is `TASK_051` — p10 or p18.** See the START HERE box; this
+section is the standing backlog, not the next action.
+
+**New, from p14's cycle:**
+
+- **No C or safe-Rust cell on p14 has a layout population**, so its whole `ns`
+  column stays **withdrawn rather than filtered**. `c-clang-h − c-clang`
+  (+18.21%) may well survive one. `controls/clayout.py` now ships on both p06
+  and p14; porting it is cheap.
+- **p06's `adversarial-past48` `c-clang` stdout moved between BUILDS**
+  (`497` → `6008526198855114936`), and the same binary prints `497` on three
+  consecutive runs. p06 §7 records that cell as `0, 497`. The `c-gcc` instability
+  beside it is documented (six observations); **this one is new and undocumented,
+  and build-varying is a different mechanism from run-varying.**
+- **`vstd::raw_ptr` as the route to a provable R4 for a lifetime bug is
+  untried.** It is the one thing standing between this project and its first
+  lifetime-bug pattern. Expected to fail (a stack local cannot supply a
+  `PointsTo`), **but nobody has run it.**
+- **p14's `-O0` rows are unexplained** (R3 dearer than R2 there, sign inverting
+  at `-O3`) and **clang's `R1h − R1` law is unsolved** — mechanism and mnemonic
+  table only, no closed form. No claim rests on either.
 
 **Closed by p06:** the two-step reslice (old item 1) is now measured on a sixth
 pattern at **exactly −1.00 Ir/call**, and p06 shipped the first
@@ -1328,9 +1391,9 @@ grep -rho '\.tasks/TASK_[A-Za-z0-9_]*\.md' .memory/ .tasks/ RECAP.md \
 python3 -c "import hashlib,glob;print({hashlib.sha256(open(f).read()[open(f).read().find('NAMED-SPELLING STANDARD'):open(f).read().find('p01 and p08 neither')+19].encode()).hexdigest()[:12] for f in glob.glob('patterns/*/spec.md')})"
 ```
 
-- **14 patterns, all green**: p01 `PASS-WITH-BLOCKED-ROWS` (Miri policy on its
+- **15 patterns, all green**: p01 `PASS-WITH-BLOCKED-ROWS` (Miri policy on its
   `large.bin`, documented, not a regression); p02, p03, p04, p05, p06, p07, p08,
-  p09, p11, p12, p13, p16, p17 `PASS`. **28 records, 0 stale.**
+  p09, p11, p12, p13, p14, p16, p17 `PASS`. **30 records, 0 stale.**
 - **The shared named-spelling paragraph is byte-identical across all thirteen**
   `idiom.why` blocks — currently one hash, `59748cce2db5`, 11 003 bytes.
   ⚠ **The value depends on how you slice the span**, so trust the *command*

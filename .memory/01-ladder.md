@@ -1896,6 +1896,65 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
    and the gate caught it; the repair is giving **R4 the same three exec lines**,
    `+3 static instructions in R4's -O0 kernel`, R2/R3 unaffected.
 
+   ⚠ **p06's honest inter-binary floor is ±4.6%, not the ±3% it published**
+   (TASK_049_REVIEW m2, measured on a 24-layout population per cell: within-cell
+   spread 4.02% `unsafe` / 5.10% `verus`, `R5 − R4` cross-pair range
+   −4.31%…+4.61%). **Nothing of p06's falls** — its clang column clears ±4.6% at
+   ~2.1× and its 30-layout C population defends the headline independently. Two
+   later sentences in `p06/NOTES.md` still say "±3%" and both remain true.
+
+16. **p14 — a cost law fitted entirely inside the regime where the safety line
+   never runs, and the first bound that is a COUNT OF A BYTE VALUE.**
+   PROVISIONAL in part: items marked ⊘ landed at TASK_050 and have not been
+   through a second review.
+
+   A CSV-style field split into a **fixed descriptor table**; the bound is
+   `nt < MAXTOK`. **The catalogue's guessed bug class — "in-place mutation +
+   aliasing" — was rejected by measurement, along with all three the manager
+   ranked** (TASK_049 §0): the aliasing half is a compile-time `rustc`
+   rejection with **no run-time check to price**; the unbounded-scan candidate
+   is p11 with p11's loop body; and the **lifetime** candidate is *not*
+   observably wrong at `-O3` on either compiler — p08 exactly — and its pointer
+   descriptors would leave R4 unprovable, so R4 would not be a rung. **Fourth
+   pattern to overturn its own catalogue row**, and the first whose task made
+   settling it the *first deliverable*.
+
+   ⊘ **The headline result, and it is a methodology result.** The gcc hardening
+   law `c-gcc-h − c-gcc = 1.00·bytes + 2.00·fields − 3.00` is **exact — max
+   residual 0.0000 over 66 blobs** — and **its fit set contains zero inputs on
+   which the guard fires** (max fields per line: 16 across every sweep blob,
+   against 17/21/33/65 on the adversarial ones). On the inputs p14 exists to
+   model it inverts: **−551.04, −823.00, −610.98** where it predicts +93, +93,
+   +429.
+   **The manager wanted that published as *"hardening is cheaper than the bug"*
+   and the engineer refused it, correctly** — see `.memory/02-bench-rules.md`'s
+   new *"never compare COST on an input where the unhardened rung commits UB"*.
+   Ships instead as **the law with its domain**, and **behaviour rather than
+   cost** outside it.
+
+   ⊘ **Its leave-one-length-out test cannot fail** — exact fit, design stays
+   **rank 4 after dropping any whole band**. p13's mistake in a new costume;
+   the general test is now in `.memory/03-measurement.md`.
+
+   ⊘ **The R4/R5 pair is not a null control** — proposed here, refuted on two
+   patterns. It is one biased draw from a 64-byte alignment mode. See
+   `.memory/03-measurement.md`; **the floor is the layout population**, and
+   p14's whole `ns` column stays withdrawn rather than filtered, because no C
+   or safe-Rust cell has a population yet.
+
+   Sound: Verus **19/0 on the second attempt** (twin 23/0), `R4 ≡ R5 exact` at
+   O3 / `norel` at O0, **Miri 8/8**, **TCB 6 items = 4 U-license + 2 infra** —
+   the first use of TASK_048's classification on a new pattern, and it survived
+   review. `scr_load` **verified, not trusted**, from the start.
+
+   Also here: **`4.25 = 2.00 + 2.25` on a fourth kernel**; a new axis where band
+   `t` holds bytes and lines fixed and moves only the field count, and the safety
+   tax reads **6.456 → 3.506 Ir per line byte at constant input size** (R4 loses
+   its unroll); and `pm3_msonly` failing on **two** memory-safety obligations,
+   which is *not* the same as a memory-safety-only spec — only the kernel's
+   `ensures` is weakened, so the claim it tests is **"weakening the postcondition
+   to `true` does not rescue the mutant"**.
+
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how
 much proof keeps that base sound, and which C patterns resist this treatment.*

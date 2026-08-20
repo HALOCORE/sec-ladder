@@ -723,6 +723,45 @@ not the tree: an independent re-time of the same binaries with the shipped
 refuted by a noisy session — only left unresolved**, which is the state
 `p16/README.md`'s "all 16 `-O3` cells within 1.3%" is now in.
 
+### The byte-identical R4/R5 pair is a SMOKE ALARM, not a null control
+
+**Proposed at TASK_049 as a free null the project already had; refuted at
+TASK_049_REVIEW and restated at TASK_050, on two patterns.** It is an appealing
+idea — R4 and R5 have byte-identical kernels and *exactly* equal `Ir`, so any
+`ns` difference between them looks like pure measurement noise, and it costs
+nothing because every pattern already ships the pair.
+
+**It is a biased sample of size one.** The `verus` build's kernel lands **0x20
+below** the `unsafe` build's — the same two addresses on p06 and p14 alike — so
+the pair samples one fixed `addr % 64` alignment contrast **every time you run
+it**. p14's kernel is bimodal there (`%64==16` costs 264–277 ns, `%64==48` costs
+244–248), its shipped `unsafe` sits in the fast class and its shipped `verus` in
+the slow one, and the pair reads **+8.95%**. That is not noise and it is not a
+floor: over a 24-layout population the pair's **median is ≈0** on both patterns
+(p14 −0.07% paired, +0.27% across 576 cross-pairs, `P(R5>R4) = 0.559`), and the
++9.2% figure **under-states** the 13.22% within-cell layout spread it claimed to
+bound.
+
+> **The floor is the LAYOUT POPULATION.** Use the R4/R5 pair to notice that
+> something is alignment-sensitive — it agreed to 0.06 pp across two passes
+> precisely because it re-sampled the same draw — and never as the number a
+> published `ns` figure has to clear.
+
+**Consequence already landed:** p06's `NOTES.md` floor moved **±3% → ±4.6%**
+(its own measured spread is 4.02% `unsafe` / 5.10% `verus`, cross-pair range
+−4.31%…+4.61%). **p06's headline is intact** — its clang column clears ±4.6% at
+~2.1× and its 30-layout C population defends it independently.
+
+⚠ **And the fetch-grid spacing is a PARAMETER, which nobody had varied.**
+PROVISIONAL — measured at TASK_050, not yet reviewed. `loopfit.kernel_report(…,
+boundary=N)` has always taken it and every prior use was 32. On p14 the 32-byte
+predicates are **coarser than the effect**: they merge the fastest class
+(`%64==48`) with the slowest (`%64==16`). The sharp predicate is **`jcc32`
+computed at boundary 64** (10 of 48 binaries, +7.2%, `perfect=True` on the
+`verus` sub-population). The layout section below says *partition by
+`win32`/`jcc32`, not by an address bit* — still right, **but 32 is not always the
+grid to compute them on.**
+
 ### `common/layout/order.py` appends `.bin` — and a nonexistent file reports a clean null
 
 **TASK_042.** `--input small.bin` silently times `small.bin.bin`. Every rung then
@@ -1073,6 +1112,24 @@ marginals per rung**, and say which. Equal lists is the licence; it is one
 (TASK_045_REVIEW, on p13. This **sharpens the section below**, which was written
 after p04 and asked for "one blob that turns on every regressor at once". That is
 necessary and it is **not sufficient**.)
+
+⚠ **SECOND INSTANCE, and the general test is one line of linear algebra**
+(TASK_049_REVIEW, on p14). p14's leave-one-length-out reported
+`max|residual| = 0.0` over 29 hold-outs — because **an exact fit plus a design
+that keeps full rank after the drop makes leave-one-out arithmetically incapable
+of failing**: each hold-out re-derives the same exact solution. p14's design
+stays **rank 4 after dropping any whole band** (`-l*` n=50, `-t*` n=50, `-m*`
+n=37, `-x*` n=61 — all rank 4).
+
+> **Report the post-drop RANK beside any hold-out claim.** A residual of exactly
+> zero is not a strong pass; it is the signature of a test that could not fail.
+> If the rank survives the drop, say so and rest the law on something else — an
+> exact fit plus genuine out-of-sample *predictions* is honest evidence; the
+> hold-out is not.
+
+**p06 is the counter-example that shows the test has teeth**: its LOLO *can*
+fail, and does — it misses by **−48.000 at `m=3`**, which is how its domain got
+established.
 
 If the fit set is **rank `n` in an `n`-column design**, its rows span all of
 ℝⁿ — so **every** possible blob's regressor vector is a linear combination of

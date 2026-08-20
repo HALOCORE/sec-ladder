@@ -3,6 +3,42 @@
 These rules exist to stop the compiler from evaluating the benchmark away, and to
 keep the five rungs comparable. A cell that breaks one of them is invalid data.
 
+## Never compare COST on an input where the unhardened rung commits UB
+
+**Asked at TASK_050 and answered against the manager, who wanted to publish
+*"hardening is cheaper than the bug"* as p14's headline.** On p14's four
+adversarial blobs the hardened C rung really is cheaper than the unhardened one —
+by −551, −823 and −611 `Ir` where the law predicted +93, +93 and +429 — and
+**the comparison is meaningless**, for three independent reasons in increasing
+order of finality:
+
+1. **Semantics.** Past the cap the two cells stop computing the same function:
+   the hardened one truncates, the unhardened one keeps going. **The "saving"
+   IS the work it refuses to do.** A program is not cheaper for being hardened
+   if it is cheaper for returning early — and the checksum column already shows
+   they differ.
+2. **UB.** The unhardened rung has already stored out of bounds before the extra
+   work starts; ASan and UBSan fire on every row. The count is *one legal
+   outcome of undefined behaviour*: **one source, one input, four builds, three
+   answers.**
+3. **Arithmetic — the marginal does not exist.** On `adversarial-many` p14's
+   `c-clang` rung **is not a function of its arguments**: `r₂ = r₃ = r₄ = r₅ = 0`,
+   it returns 0 on every call after the first, and its per-call marginal reads
+   **17.982 `Ir`** for a kernel that folds 168 fields. Two other blobs read
+   `0.000` (SIGSEGV). Differencing against that publishes `+4287.05`.
+
+> **Publish a cost law WITH ITS DOMAIN — the regime where the guard does not
+> fire, which is where every benign input lives and is the cost a deployment
+> actually pays. Outside the domain publish BEHAVIOUR, not cost.**
+
+**The project already keeps this rule structurally, which is why no published
+figure is affected**: `harness/measure.py`'s `CG_PLAN` (`measure.py:56-61`) is
+six entries and **every one is `small.bin` or `large.bin`** — no adversarial
+input is ever in a callgrind plan on any pattern. p14's adversarial numbers exist
+only because `controls/sweep_ir.py` can be pointed at any blob. **p14 would have
+been the first exception.** Before adding an adversarial blob to any measurement
+plan, re-read this section.
+
 ## A WRITE bug forces the adversarial row; it does NOT force the perf row
 
 **p12, corrected at TASK_040_REVIEW — the general form p12 shipped is refuted by a
@@ -37,6 +73,7 @@ patterns behave exactly like read patterns.**
 | **p13** | caller-supplied `n` — `n < sizeof dst` is the *correct* case; its bug is the missing NUL and the OOB **read** downstream | **no** |
 | **p24** | `child < n`, a live length below capacity — firing means logically wrong, still in bounds | **no** |
 | **p06** | `min(nelem, SCR)` — a threshold *inside* the destination's extent, so guard-fires and UB are independent | **no** — and this is the test's **first use at build time**, on p06 (T047), rather than as a retrospective classification |
+| **p14** | `nt < MAXTOK` — the descriptor table's own extent | **YES** (T049, settling the "not as stated" row above). The sentence's mechanism *is* real and *is* p11's, so p14 puts its bug in the **outer** loop instead: the bound is a **count of a byte value**, not a length, and its threshold is the destination's extent — so guard-fires and OOB stores are the same event |
 | **p14** | a delimiter is not a bound; the sentence reaches its scan's `i < len` | not as stated |
 
 > **NOT forced:** whether such an input can *also* be a checksum-agreeing perf
