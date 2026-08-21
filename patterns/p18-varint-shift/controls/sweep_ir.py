@@ -34,19 +34,33 @@ Bands (`inputs/gen.py`):
                                                 WITHIN-BAND NEGATIVE CONTROL
                                                 whose regressors equal `x08a`'s
                                                 and whose bytes differ
-    y   three EXTRAPOLATION shapes             bytes 160..320, nv 16..64 --
+    y   three EXTRAPOLATION shapes              bytes 160..320, nv 16..64 --
                                                 outside the CONVEX HULL of
                                                 b/v/x in both regressors, and
                                                 predicted before being measured
                                                 (controls/predict.py)
 
-The pooled design is `[bytes, nv, 1]`, rank 3. **Dropping band b or band v
-takes it to rank 2 -- **but band x alone is already rank 3, so the pooled design
-stays rank 3 after dropping ANY single band and the leave-one-band-out test is
-arithmetically incapable of failing.** That is measured, printed by `fit.py`,
-and reported in ../NOTES.md 8 as a FAILED design goal rather than quoted as a
-pass. What replaces it is band `y`: an extrapolation whose predictions are
-registered and hashed before measurement (`controls/predict.py`).
+    t   eight DOMAIN shapes                     the only band where `cut` and
+                                                `brk` are non-zero. b/v/x/y all
+                                                have `term == nv` and
+                                                `nv_decl == nv`, so the laws
+                                                fitted on them are laws of ONE
+                                                REGIME of two structural
+                                                parameters that nothing named.
+                                                Added at TASK_052 after
+                                                TASK_051_REVIEW's blocker.
+
+The pooled `[bytes, nv, 1]` design over b/v/x is rank 3. **Band x alone is
+already rank 3**, so the pooled design stays rank 3 after dropping ANY single
+band and the leave-one-band-out test is arithmetically incapable of failing --
+which is a RANK fact, not a column-count fact (`.memory/03-measurement.md`; a
+3-column design whose bands are each rank 2 has a hold-out that can fail). That
+is measured, printed by `fit.py`, and reported in ../NOTES.md 8 as a FAILED
+design goal rather than quoted as a pass. What replaces it is band `y`: an
+extrapolation whose predictions are registered and hashed before measurement
+(`controls/predict.py`) -- and band `t`, which is the out-of-domain test band
+`y` could not be, because band `y` holds `cut` and `brk` at zero exactly as the
+fit set does.
 """
 
 import argparse
@@ -82,6 +96,7 @@ BANDS = {
     "v": "sweep-v*.bin",
     "x": "sweep-x*.bin",
     "y": "sweep-y*.bin",
+    "t": "sweep-t*.bin",
     "all": "sweep-*.bin",
 }
 
@@ -124,17 +139,29 @@ def shape(blob):
       nv       varints the kernel actually walks   the per-VARINT regressor
       bytes    inner-loop iterations, i.e. varint bytes consumed
       term     varints that ended on a terminator (as opposed to on window
-               exhaustion) -- a diagnostic, NOT a fit column
+               exhaustion)
+      cut      `nv - term`, 0 or 1: **the last varint ended on WINDOW
+               EXHAUSTION**, so the inner `while p < len` test is evaluated one
+               extra time and fails. A fit column since TASK_052.
+      nv_decl  the window's declared varint count, verbatim
+      brk      1 iff `nv_decl > nv`, i.e. the outer loop reached an iteration
+               whose `p == len` guard fired instead of exiting on `v == nv`.
+               A fit column since TASK_052.
       over     bytes shifted at shift >= VBITS: **zero on every sweep blob by
                construction**, and checked here so that a band can never
                silently acquire an undefined shift and turn its R1 column into
                one legal outcome of UB (`.memory/02-bench-rules.md`)
 
-    ⚠ `bytes` and `nv` are the only two columns the fit uses, with an intercept.
-    `term` equals `nv` on every blob where no varint is cut off by the window
-    end, i.e. on every sweep blob, so including it would make the design
-    singular; `fit.py` refuses a singular design rather than reporting a huge
-    condition number.
+    ⚠ **`cut` and `brk` are ZERO on every blob of bands b, v, x and y**, because
+    `gen.py`'s `tiled()` declares exactly as many varints as it writes and fills
+    the window exactly. Until TASK_052 that made both columns identically zero,
+    so the design was singular in them and the fit used `bytes`, `nv` and an
+    intercept only -- and the published laws were therefore laws of the
+    `cut == 0, brk == 0` regime with no statement of that domain anywhere.
+    `inputs/degenerate.bin`, a committed MATRIX input, has `cut = brk = 1` and
+    falsified the `R3 - R4` law's SIGN (TASK_051_REVIEW blocker 1). Band `t`
+    turns the two columns on independently; `fit.py --cols auto` adds a column
+    exactly when the row set actually varies it.
     """
     f = slb.read(blob)
     stride, body = slb.head1_u64_bytes(f.payload[: f.declared_len])
@@ -160,7 +187,8 @@ def shape(blob):
         term += 1 if ended else 0
         walked += 1
     return {"nv": walked, "bytes": nb, "term": term, "over": over,
-            "stride": stride}
+            "cut": walked - term, "nv_decl": nv,
+            "brk": 1 if nv > walked else 0, "stride": stride}
 
 
 def main():
@@ -195,7 +223,8 @@ def main():
     if not blobs:
         raise SystemExit(f"no blobs for band {a.band}; run inputs/gen.py --sweep")
     out = []
-    hdr = f"{'blob':22s} {'nv':>4s} {'byte':>5s} {'term':>4s} {'over':>4s}"
+    hdr = (f"{'blob':22s} {'nv':>4s} {'byte':>5s} {'term':>4s} {'cut':>4s} "
+           f"{'brk':>4s} {'over':>4s}")
     for c in cells:
         hdr += f" {c:>12s}"
     for b in extra:
@@ -205,7 +234,8 @@ def main():
         sh = shape(b)
         row = {"blob": os.path.basename(b), **sh, "ir": {}}
         line = (f"{os.path.basename(b):22s} {sh['nv']:4d} {sh['bytes']:5d} "
-                f"{sh['term']:4d} {sh['over']:4d}")
+                f"{sh['term']:4d} {sh['cut']:4d} {sh['brk']:4d} "
+                f"{sh['over']:4d}")
         for c in cells:
             binp = os.path.join(BUILD, f"{c}-{a.opt}-{a.mode}")
             v = marginal(binp, b, a.n1, a.n2)

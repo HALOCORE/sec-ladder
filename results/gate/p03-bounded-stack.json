@@ -91,7 +91,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "e7b9b11950677854fa76f14196963c85bad5afef4353bfc243c9984638bc66e9",
+    "harness/check.py": "8406efc38e78de7506a0736dfc68fd7fc682b1becd9e4812f30a3f1f36b33b6f",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
@@ -555,7 +555,7 @@
   "adversarial": {
     "adversarial-allpop.bin/c-gcc": {
       "exit": 0,
-      "stdout": "9620844446615770752",
+      "stdout": "5317153932393252608",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
@@ -563,7 +563,7 @@
     },
     "adversarial-allpop.bin/c-clang": {
       "exit": 0,
-      "stdout": "7874681405998970112",
+      "stdout": "6651752249298070144",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
@@ -747,7 +747,7 @@
     },
     "adversarial-underflow.bin/c-gcc": {
       "exit": 0,
-      "stdout": "8916605432913543296",
+      "stdout": "9434586250672752128",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
@@ -755,7 +755,7 @@
     },
     "adversarial-underflow.bin/c-clang": {
       "exit": 0,
-      "stdout": "6802454464588414464",
+      "stdout": "6734811095266690816",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
@@ -816,7 +816,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==905623==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f2"
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==1693148==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f"
     },
     "adversarial-count.bin": {
       "exit": 0,
@@ -837,7 +837,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==905628==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f4"
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==1693153==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f"
     },
     "large.bin": {
       "exit": 0,
@@ -879,6 +879,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-allpop.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "6156800",
         "model_stdout": "6156800",
@@ -888,6 +889,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-count.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "0",
         "model_stdout": "0",
@@ -897,6 +899,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-overflow.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "17534858048539192960",
         "model_stdout": "17534858048539192960",
@@ -906,6 +909,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-underflow.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "2952675218101715008",
         "model_stdout": "2952675218101715008",
@@ -915,6 +919,7 @@
         "source": "unsafe.rs",
         "input": "large.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "13026927928058472795",
         "model_stdout": "13026927928058472795",
@@ -924,6 +929,7 @@
         "source": "unsafe.rs",
         "input": "small.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "1899124265390257938",
         "model_stdout": "1899124265390257938",

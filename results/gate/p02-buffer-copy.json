@@ -128,7 +128,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "e7b9b11950677854fa76f14196963c85bad5afef4353bfc243c9984638bc66e9",
+    "harness/check.py": "8406efc38e78de7506a0736dfc68fd7fc682b1becd9e4812f30a3f1f36b33b6f",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
@@ -1044,7 +1044,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==1426280==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x506000000060 at pc 0x55ecf8729f13 bp 0x7ffebe29b0c0 sp 0x7ffebe29a868 WRITE of size 65 at 0x506000000060 thread T0 #0 0x55ecf8729f12 in __interceptor_memcpy (/home/"
+      "diagnostic": "================================================================= ==1690108==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x506000000060 at pc 0x55615901ff13 bp 0x7ffc95850c50 sp 0x7ffc958503f8 WRITE of size 65 at 0x506000000060 thread T0 #0 0x55615901ff12 in __interceptor_memcpy (/home/"
     },
     "adversarial-capbig.bin": {
       "exit": 7,
@@ -1065,7 +1065,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==1426286==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000038 at pc 0x564d6e9b9036 bp 0x7ffd8df2f080 sp 0x7ffd8df2e828 READ of size 61 at 0x504000000038 thread T0 #0 0x564d6e9b9035 in __interceptor_memcpy (/home/a"
+      "diagnostic": "================================================================= ==1690116==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000038 at pc 0x55dcd4c0d036 bp 0x7fff600889a0 sp 0x7fff60088148 READ of size 61 at 0x504000000038 thread T0 #0 0x55dcd4c0d035 in __interceptor_memcpy (/home/a"
     },
     "adversarial-stride1.bin": {
       "exit": 0,
@@ -1079,7 +1079,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==1426289==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x527000006a38 at pc 0x559519e03036 bp 0x7ffde9128040 sp 0x7ffde91277e8 READ of size 65535 at 0x527000006a38 thread T0 #0 0x559519e03035 in __interceptor_memcpy (/hom"
+      "diagnostic": "================================================================= ==1690119==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x527000006a38 at pc 0x557c90954036 bp 0x7ffcf47f3220 sp 0x7ffcf47f29c8 READ of size 65535 at 0x527000006a38 thread T0 #0 0x557c90954035 in __interceptor_memcpy (/hom"
     },
     "large.bin": {
       "exit": 0,
@@ -1120,6 +1120,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-cap.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "264465344",
         "model_stdout": "264465344",
@@ -1129,6 +1130,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-cap1.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "0",
         "model_stdout": "0",
@@ -1138,6 +1140,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-capbig.bin",
         "exit": 7,
+        "expected_exit": 7,
         "ub": false,
         "stdout": "",
         "model_stdout": "",
@@ -1147,6 +1150,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-shortlen.bin",
         "exit": 5,
+        "expected_exit": 5,
         "ub": false,
         "stdout": "",
         "model_stdout": "",
@@ -1156,6 +1160,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-srcend.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "0",
         "model_stdout": "0",
@@ -1165,6 +1170,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-stride1.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "0",
         "model_stdout": "0",
@@ -1174,6 +1180,7 @@
         "source": "unsafe.rs",
         "input": "adversarial.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "0",
         "model_stdout": "0",
@@ -1183,6 +1190,7 @@
         "source": "unsafe.rs",
         "input": "large.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "16186812096",
         "model_stdout": "16186812096",
@@ -1192,6 +1200,7 @@
         "source": "unsafe.rs",
         "input": "small.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "237406208",
         "model_stdout": "237406208",

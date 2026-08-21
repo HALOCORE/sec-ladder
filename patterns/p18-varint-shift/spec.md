@@ -609,7 +609,19 @@ kernel calls.
 
 `degenerate.bin` is one window carrying the shapes the contract has to decide,
 and **every rung including R1 agrees on it**, which is why it is not named
-`adversarial-*` and the gate holds all eight cells to `model.py` on it:
+`adversarial-*` and the gate holds all eight cells to `model.py` on it.
+
+> ⚠ **AND IT IS THE ONE INPUT IN THIS PATTERN THAT IS OUTSIDE THE DOMAIN OF
+> EVERY PUBLISHED PER-CALL `Ir` LAW.** Its last varint runs off the end of the
+> window (`cut = 1`) and it declares nine varints while holding five
+> (`brk = 1`); every other input here, and all 34 blobs of sweep bands b/v/x/y,
+> have `cut = brk = 0`. Read `../NOTES.md` **4a0 before 4a1** — the level laws
+> are stated with those two columns since TASK_052, and the two-column form is
+> their restriction to `cut = brk = 0`. Sweep band `t` is the band that
+> establishes it. **This paragraph is here because a reader meets this blob in
+> the results table before they meet the caveat** (TASK_051_REVIEW blocker 1).
+
+The five varints: 
 
 | varint | what it is |
 |---|---|
@@ -617,10 +629,11 @@ and **every rung including R1 agrees on it**, which is why it is not named
 | `80 80 00` | a padded zero — legal LEB128 that decodes to 0 through three bytes. A decoder that rejected non-canonical encodings would disagree. |
 | `ff*9 01` | ten bytes, last shift **exactly 63**: the boundary from the safe side. R1 and R1h agree here and diverge at eleven bytes. |
 | `b9 60` | an ordinary two-byte varint. |
-| `ff ff` | the continue bit is still set on the **last byte of the window**, so the scan exits on `p < len` rather than on a terminator — the truncated-tail case. |
+| `ff ff` | the continue bit is still set on the **last byte of the window**, so the scan exits on `p < len` rather than on a terminator — the truncated-tail case, i.e. **`cut = 1`**. |
 
 and `nv` is declared **9** against five varints, so the outer `p == len` guard
-fires after the fifth.
+fires after the fifth — i.e. **`brk = 1`**. Those last two rows are what put the
+blob outside the level laws' domain.
 
 The kernel's `len < 4` guard is, given the driver's `stride_w >= 4`, unreachable
 in this benchmark. It is kept anyway so the kernel is **total** and its

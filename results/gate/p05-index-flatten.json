@@ -57,7 +57,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "e7b9b11950677854fa76f14196963c85bad5afef4353bfc243c9984638bc66e9",
+    "harness/check.py": "8406efc38e78de7506a0736dfc68fd7fc682b1becd9e4812f30a3f1f36b33b6f",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
@@ -428,7 +428,7 @@
   "adversarial": {
     "adversarial-dims.bin/c-gcc": {
       "exit": 0,
-      "stdout": "18165815676368632064",
+      "stdout": "1995007930150557952",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
@@ -436,7 +436,7 @@
     },
     "adversarial-dims.bin/c-clang": {
       "exit": 0,
-      "stdout": "8750842130272023040",
+      "stdout": "7126985031508368896",
       "stderr": "",
       "signal": null,
       "model_exit": 0,
@@ -689,14 +689,14 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==778665==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d4 at pc 0x558d7711f7a1 bp 0x7ffd8c7c9990 sp 0x7ffd8c7c9980 READ of size 1 at 0x5070000000d4 thread T0 #0 0x558d7711f7a0 in kernel /home/apt/repos_common/s"
+      "diagnostic": "================================================================= ==1698601==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d4 at pc 0x55d3b21847a1 bp 0x7fff627c2710 sp 0x7fff627c2700 READ of size 1 at 0x5070000000d4 thread T0 #0 0x55d3b21847a0 in kernel /home/apt/repos_common/"
     },
     "adversarial-ovf.bin": {
       "exit": 1,
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==778666==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d8 at pc 0x55a0ff0757a1 bp 0x7ffe5cda5170 sp 0x7ffe5cda5160 READ of size 1 at 0x5070000000d8 thread T0 #0 0x55a0ff0757a0 in kernel /home/apt/repos_common/s"
+      "diagnostic": "================================================================= ==1698602==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d8 at pc 0x561fc8bce7a1 bp 0x7ffc4ffcc030 sp 0x7ffc4ffcc020 READ of size 1 at 0x5070000000d8 thread T0 #0 0x561fc8bce7a0 in kernel /home/apt/repos_common/"
     },
     "adversarial-stride3.bin": {
       "exit": 0,
@@ -750,6 +750,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-dims.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "0",
         "model_stdout": "0",
@@ -759,6 +760,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-ovf.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "0",
         "model_stdout": "0",
@@ -768,6 +770,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-stride3.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "0",
         "model_stdout": "0",
@@ -777,6 +780,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-zero.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "0",
         "model_stdout": "0",
@@ -786,6 +790,7 @@
         "source": "unsafe.rs",
         "input": "large.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "12411506697557515452",
         "model_stdout": "12411506697557515452",
@@ -795,6 +800,7 @@
         "source": "unsafe.rs",
         "input": "small.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "16632492000719087516",
         "model_stdout": "16632492000719087516",

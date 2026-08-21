@@ -5,7 +5,7 @@ and `harness/check.py` hashes it into `source_sha256`, so every law measured on
 these blobs is re-derivable from a file the gate record sees.
 
     python3 patterns/p18-varint-shift/inputs/gen.py            # the matrix inputs
-    python3 patterns/p18-varint-shift/inputs/gen.py --sweep     # + the three bands
+    python3 patterns/p18-varint-shift/inputs/gen.py --sweep     # + the five bands
 
 Payload layout (../spec.md), p06's/p11's/p14's/p16's/p17's/p05's/p07's/p03's/
 p12's verbatim:
@@ -89,10 +89,18 @@ arriving on arithmetic instead of on a range, and it is the catalogue's
     safe side**, on which R1 and R1h agree exactly and one more byte would not;
   * a varint whose continue bit is set on the LAST byte of the window, so the
     scan exits on `p < len` rather than on the terminator -- the truncated-tail
-    case;
+    case. **This is `cut = 1`.**
   * a declared `nv` LARGER than the window holds, so the outer `p == len` guard
-    fires;
+    fires. **This is `brk = 1`.**
   * a padded-zero varint (`80 80 00`), legal LEB128 that decodes to 0.
+
+⚠ **The last two make `degenerate.bin` the ONLY committed input outside the
+domain of every per-call `Ir` law p18 publishes**, and until TASK_052 no law
+said it had a domain: bands b/v/x/y all have `cut = brk = 0`, and the
+two-column law misses `degenerate.bin` by up to +8.00 Ir/call and reverses the
+sign of `R3 - R4` on it (TASK_051_REVIEW blocker 1). **Sweep band `t` below is
+the band that establishes the domain**, and ../NOTES.md 4a0 is the caveat a
+reader should meet before the laws.
 
 --------------------------------------------------------------------------
 small AND large: DIFFERENT RESIDUES, AND BOTH ARE LENGTH-HETEROGENEOUS
@@ -192,6 +200,16 @@ def _check_residues():
 
 # ---------------------------------------------------------------- content ----
 
+def cut_run(rng, u):
+    """`u` bytes that ALL carry the continue bit, i.e. a varint that never
+    terminates. Placed last in a window it makes the inner scan exit on
+    `p < len` rather than on a terminator, which is the `term < nv` shape band
+    T is built to price. `u <= SAFE_MAX_BYTES` keeps its last shift at
+    `7*(u-1) <= 63`, so `over == 0` and R1 still agrees with the model."""
+    assert 1 <= u <= SAFE_MAX_BYTES
+    return bytes(0x80 | rng.randrange(1, 0x80) for _ in range(u))
+
+
 def varint(rng, nbytes, last_payload=None):
     """A varint of exactly `nbytes` bytes.
 
@@ -228,6 +246,31 @@ def tiled(rng, nwin, lens):
     out = bytearray()
     for _ in range(nwin):
         out += window(len(lens), [varint(rng, L) for L in lens])
+    return bytes(out)
+
+
+def tiled_t(rng, nwin, lens, u, decl):
+    """Band T's tile: `lens` terminated varints, then `u` unterminated bytes if
+    `u`, with `nv` declared as `decl`.
+
+    The two structural parameters band T exists to vary, neither of which any
+    other band moves off zero:
+
+      cut = 1   `u > 0`: the last varint ends on WINDOW EXHAUSTION, so the inner
+                `while p < len` test is evaluated one extra time and fails.
+      brk = 1   `decl > walked`: the outer loop reaches an iteration whose
+                `p == len` guard fires, instead of exiting on `v == nv`.
+
+    `tiled()` produces `cut = 0, brk = 0` always, because it declares
+    `len(lens)` and fills the window exactly."""
+    walked = len(lens) + (1 if u else 0)
+    assert decl >= walked
+    out = bytearray()
+    for _ in range(nwin):
+        chunks = [varint(rng, L) for L in lens]
+        if u:
+            chunks.append(cut_run(rng, u))
+        out += window(decl, chunks)
     return bytes(out)
 
 
@@ -365,7 +408,8 @@ def degenerate_window():
 # guard skips the loop entirely, so every rung prints 0 after ZERO kernel calls.
 STRIDE3_BLOB = 30
 
-# `--sweep`: three bands, all skipped by `harness/check.py` and
+# `--sweep`: five bands (b, v, x, then y and t appended later -- see below), all
+# skipped by `harness/check.py` and
 # `harness/measure.py` on the `sweep-` prefix (`.memory/05-layout.md`: that
 # prefix IS the mechanism -- a band named anything else enters the measurement
 # matrix and costs a full re-measure). Appended LAST so the matrix blobs stay
@@ -407,6 +451,42 @@ SWEEP_Y_SHAPES = {
     "y16": tuple(10 for _ in range(16)),                    # bytes 160, nv 16
     "y40": tuple((1 + (i % 10)) for i in range(40)),        # bytes 220, nv 40
     "y64": tuple(5 for _ in range(64)),                     # bytes 320, nv 64
+}
+# Band T -- THE DOMAIN BAND, appended after b/v/x/y at TASK_052.
+#
+# TASK_051_REVIEW's blocker: **every blob of bands b/v/x/y has `term == nv`**,
+# because `tiled()` declares exactly as many varints as it writes and fills the
+# window exactly. So the published laws were fitted inside one regime of a
+# structural parameter nobody had named, and `degenerate.bin` -- a COMMITTED
+# MATRIX INPUT -- sits outside it and misses by +2.00 (six cells), +5.00 (the
+# two clang cells) and +8.00 (`safe_tuned`) against a quoted max residual of
+# 0.029, taking `R3 - R4` the wrong way round. Same CLASS of defect as p14's
+# law-fitted-inside-one-regime (`.memory/02-bench-rules.md`, `.memory/01-ladder.md`
+# finding 16), on a different axis.
+#
+# The two parameters, varied INDEPENDENTLY so the miss decomposes:
+#
+#   cut  the last varint ends on window exhaustion (`term = nv - 1`)
+#   brk  the outer loop exits on `p == len` rather than on `v == nv`
+#
+# `degenerate.bin` has BOTH, which is why it needed two rows to explain. t01-t04
+# are cut+brk; t05/t06 are cut only; t07/t08 are brk only; t08 is t07's
+# WITHIN-BAND NEGATIVE CONTROL -- identical regressors, 40 extra declared
+# varints that are never walked, predicted delta exactly 0.
+#
+# Every `u` is <= SAFE_MAX_BYTES so `over == 0` on every row, exactly as on
+# b/v/x/y (`.memory/02-bench-rules.md`: never compare cost on an input where R1
+# commits UB).
+SWEEP_T_SHAPES = {
+    #        lens                       u   decl-above-walked
+    "t01": ((2, 2, 2),                  1,  1),
+    "t02": ((1,) * 5,                   3,  1),
+    "t03": ((4,) * 8,                   5,  1),
+    "t04": ((6,) * 12,                 10,  1),
+    "t05": ((2, 2, 2),                  1,  0),
+    "t06": ((4,) * 8,                   5,  0),
+    "t07": ((3,) * 6,                   0,  1),
+    "t08": ((3,) * 6,                   0, 40),
 }
 SWEEP_WINS = 8
 SWEEP_ITERS = 20000
@@ -473,6 +553,10 @@ def main():
         for tag, lens in SWEEP_Y_SHAPES.items():
             write(f"sweep-{tag}.bin", SWEEP_ITERS, stride_of(lens),
                   tiled(rng, SWEEP_WINS, lens))
+        for tag, (lens, u, extra) in SWEEP_T_SHAPES.items():
+            decl = len(lens) + (1 if u else 0) + extra
+            write(f"sweep-{tag}.bin", SWEEP_ITERS, stride_of(lens) + u,
+                  tiled_t(rng, SWEEP_WINS, lens, u, decl))
     return 0
 
 

@@ -97,7 +97,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "e7b9b11950677854fa76f14196963c85bad5afef4353bfc243c9984638bc66e9",
+    "harness/check.py": "8406efc38e78de7506a0736dfc68fd7fc682b1becd9e4812f30a3f1f36b33b6f",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
@@ -799,7 +799,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==781092==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x508000004128 at pc 0x55a9f8e1d9af bp 0x7ffde9d84bc0 sp 0x7ffde9d84bb0 READ of size 1 at 0x508000004128 thread T0 #0 0x55a9f8e1d9ae in kernel /home/apt/repos_common/s"
+      "diagnostic": "================================================================= ==1704189==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x508000004128 at pc 0x55f0f58669af bp 0x7ffe687531e0 sp 0x7ffe687531d0 READ of size 1 at 0x508000004128 thread T0 #0 0x55f0f58669ae in kernel /home/apt/repos_common/"
     },
     "adversarial-stride7.bin": {
       "exit": 0,
@@ -820,7 +820,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==781097==ERROR: AddressSanitizer: SEGV on unknown address 0x508100000128 (pc 0x55a296a9f96b bp 0x508000000125 sp 0x7ffe9d3c1cf0 T0) ==781097==The signal is caused by a READ memory access. #0 0x55a296a9f9"
+      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==1704194==ERROR: AddressSanitizer: SEGV on unknown address 0x508100000128 (pc 0x55b02ac0d96b bp 0x508000000125 sp 0x7fff66eff3b0 T0) ==1704194==The signal is caused by a READ memory access. #0 0x55b02ac0"
     },
     "adversarial-zero.bin": {
       "exit": 0,
@@ -867,6 +867,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-count.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "0",
         "model_stdout": "0",
@@ -876,6 +877,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-stride7.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "0",
         "model_stdout": "0",
@@ -885,6 +887,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-unsorted.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "6346814175085999872",
         "model_stdout": "6346814175085999872",
@@ -894,6 +897,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-width.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "0",
         "model_stdout": "0",
@@ -903,6 +907,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-zero.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "0",
         "model_stdout": "0",
@@ -912,6 +917,7 @@
         "source": "unsafe.rs",
         "input": "large.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "15874584509015888776",
         "model_stdout": "15874584509015888776",
@@ -921,6 +927,7 @@
         "source": "unsafe.rs",
         "input": "small.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "11198392119132079368",
         "model_stdout": "11198392119132079368",

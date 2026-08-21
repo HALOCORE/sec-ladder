@@ -4602,22 +4602,45 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names):
             ub = "Undefined Behavior" in r.stderr or "error: unsupported" in r.stderr
             got = r.stdout.strip()
             want = (sbg(mod, "expected_stdout") or "").strip()
-            rec = dict(source=s, input=nm, exit=r.returncode, ub=ub,
+            want_exit = sbg(mod, "expected_exit")
+            rec = dict(source=s, input=nm, exit=r.returncode,
+                       expected_exit=want_exit, ub=ub,
                        stdout=got, model_stdout=want,
                        stderr=re.sub(r"\s+", " ", r.stderr.strip())[:400])
             runs.append(rec)
+            # The exit code is compared to the MODEL'S, and stdout is compared
+            # unconditionally. TASK_051_REVIEW M6: until then the chain read
+            # `returncode != 0 and expected_exit == 0` / `returncode == 0 and
+            # got != want`, so on an input whose model expects a NON-ZERO exit
+            # neither the code nor stdout was ever compared -- and the `ok` line
+            # below asserted that stdout "matches the model" anyway. The
+            # reviewer demonstrated it with a real Miri run of p01's R4 over
+            # `adversarial-shortlen.bin` from a mutant driver that panics
+            # instead of exiting 5: rc=101, no `Undefined Behavior`, reported
+            # green. Reachable on p01 and p02, whose adversarial inputs declare
+            # `expected_exit` 5 and 7 and are Miri-stage inputs.
+            #
+            # It passes `.memory/02-bench-rules.md`'s "could this happen by
+            # accident?" test: a rung that panics for the wrong reason, dies of
+            # a signal, or exits with a different non-zero code is an honest
+            # mistake, and Miri runs with debug-assertions ON, so an arithmetic
+            # overflow that the -O3 cells mask is a panic here (p18's own bug
+            # class). Regression check:
+            # `patterns/p18-varint-shift/controls/miri_exit_hole.py`.
             if ub:
                 rep.fail("miri", f"{s} on {nm} (n_iters={MIRI_PROBE_ITERS}): "
                                  f"Miri reports UB -- {rec['stderr'][:300]}")
-            elif r.returncode != 0 and sbg(mod, "expected_exit") == 0:
+            elif r.returncode != want_exit:
                 rep.fail("miri", f"{s} on {nm}: miri exited {r.returncode}, "
-                                 f"model expects 0 -- {rec['stderr'][:300]}")
-            elif r.returncode == 0 and got != want:
+                                 f"model expects {want_exit} -- "
+                                 f"{rec['stderr'][:300]}")
+            elif got != want:
                 rep.fail("miri", f"{s} on {nm}: miri printed {got!r}, model "
                                  f"predicts {want!r}")
             else:
                 rep.ok(f"miri {s} on {nm:28s} n_iters={MIRI_PROBE_ITERS}: no UB, "
-                       f"stdout {got!r} matches the model")
+                       f"exit {r.returncode} and stdout {got!r} both match the "
+                       f"model")
     out.update(ran=True, available=True, sysroot=sysroot,
                probe_iters=MIRI_PROBE_ITERS, runs=runs)
     return out

@@ -87,6 +87,14 @@ timeout 1200 "$REPO/verus_run.py" "$CTL/m_weakreq.rs" 2>&1 | grep -E '^error|ver
 echo "--- m_weakreq (--cfg slb_twin: the TWIN must fail)"
 timeout 1200 "$REPO/verus_run.py" "$CTL/m_weakreq.rs" --cfg slb_twin 2>&1 | grep -E '^error|verification results' | head -4
 echo "--- the shl family's availability to an R4, at the pinned vstd"
+echo "    probe_shl_family  (checked_shl / overflowing_shl / wrapping_shl -- ABORTS"
+echo "                       on the first two, so it says NOTHING about the third)"
 timeout 1200 "$REPO/verus_run.py" "$CTL/probe_shl_family.rs" 2>&1 | grep -E 'is not supported|verification results' | head -6
-timeout 1200 "$REPO/verus_run.py" "$CTL/probe_shl_bare.rs" 2>&1 | grep -E 'is not supported|verification results' | head -3
+echo "    probe_shl_bare    (the bare \`<<\`: an obligation, so it ERRORS)"
+timeout 1200 "$REPO/verus_run.py" "$CTL/probe_shl_bare.rs" 2>&1 | grep -E 'is not supported|possible bit shift|verification results' | head -3
+echo "    probe_shl_wrapping        (wrapping_shl ALONE: no obligation)"
+timeout 1200 "$REPO/verus_run.py" "$CTL/probe_shl_wrapping.rs" 2>&1 | grep -E 'is not supported|verification results' | head -3
+echo "    probe_shl_wrapping_spec   (wrapping_shl HAS a vstd spec: a false"
+echo "                               ensures fails as postcondition, not as unsupported)"
+timeout 1200 "$REPO/verus_run.py" "$CTL/probe_shl_wrapping_spec.rs" 2>&1 | grep -E 'is not supported|postcondition not satisfied|verification results' | head -3
 timeout 1200 "$REPO/verus_run.py" "$CTL/probe_shl_unchecked.rs" 2>&1 | grep -E 'is not supported|verification results' | head -3

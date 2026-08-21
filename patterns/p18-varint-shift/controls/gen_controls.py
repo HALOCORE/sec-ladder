@@ -382,6 +382,29 @@ fn f_overflowing(x: u64, s: u32) -> u64 { x.overflowing_shl(s).0 }
 fn main() { }
 }
 """)
+    # ⚠ `probe_shl_family.rs` ABORTS on `checked_shl` / `overflowing_shl` being
+    # `is not supported`, so it prints NO verdict for `wrapping_shl` -- and
+    # TASK_051_REVIEW M2 found ../NOTES.md quoting `probe_shl_bare.rs` (the `<<`
+    # probe, which errors) beside the `wrapping_shl` result. The claim was true
+    # and no committed generator produced the probe that established it. These
+    # two do.
+    write("probe_shl_wrapping.rs", """// Does `wrapping_shl` carry an obligation at the pinned vstd? ALONE, because
+// `probe_shl_family.rs` aborts on its other two functions before saying.
+use vstd::prelude::*;
+verus! {
+fn f_wrapping(x: u64, s: u32) -> u64 { x.wrapping_shl(s) }
+fn main() { }
+}
+""")
+    write("probe_shl_wrapping_spec.rs", """// ...and it is not merely UNOBLIGATED: it has a real vstd SPECIFICATION, so a
+// false `ensures` fails with `postcondition not satisfied` rather than with
+// `is not supported`. `.memory/01-ladder.md`: read the error text.
+use vstd::prelude::*;
+verus! {
+fn f_wrapping_zero(x: u64, s: u32) -> (r: u64) ensures r == 0u64, { x.wrapping_shl(s) }
+fn main() { }
+}
+""")
     write("probe_shl_unchecked.rs", """// ...and `unchecked_shl`, separately, because it is `unsafe`.
 use vstd::prelude::*;
 verus! {

@@ -125,7 +125,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "e7b9b11950677854fa76f14196963c85bad5afef4353bfc243c9984638bc66e9",
+    "harness/check.py": "8406efc38e78de7506a0736dfc68fd7fc682b1becd9e4812f30a3f1f36b33b6f",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
@@ -1076,14 +1076,14 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7fa98ec00040 with insufficient space for an obj"
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f572ec00040 with insufficient space for an obj"
     },
     "adversarial-nonul-src.bin": {
       "exit": 1,
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7effb9800040 with insufficient space for an obj"
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7fb812400040 with insufficient space for an obj"
     },
     "adversarial-stride3.bin": {
       "exit": 0,
@@ -1097,14 +1097,14 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7fc131e00040 with insufficient space for an obj"
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f31ff400040 with insufficient space for an obj"
     },
     "adversarial-truncate.bin": {
       "exit": 1,
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7fa2ff000040 with insufficient space for an obj"
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f941b200040 with insufficient space for an obj"
     },
     "large.bin": {
       "exit": 0,
@@ -1146,6 +1146,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-empty.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "246272",
         "model_stdout": "246272",
@@ -1155,6 +1156,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-exact.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "16103903038708065856",
         "model_stdout": "16103903038708065856",
@@ -1164,6 +1166,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-nonul-dst.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "9241606746870844480",
         "model_stdout": "9241606746870844480",
@@ -1173,6 +1176,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-nonul-src.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "10314142956009350208",
         "model_stdout": "10314142956009350208",
@@ -1182,6 +1186,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-stride3.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "0",
         "model_stdout": "0",
@@ -1191,6 +1196,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-truncate-alt.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "16103903038708065856",
         "model_stdout": "16103903038708065856",
@@ -1200,6 +1206,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-truncate.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "16103903038708065856",
         "model_stdout": "16103903038708065856",
@@ -1209,6 +1216,7 @@
         "source": "unsafe.rs",
         "input": "large.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "18086565971326949946",
         "model_stdout": "18086565971326949946",
@@ -1218,6 +1226,7 @@
         "source": "unsafe.rs",
         "input": "small.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "1990957316656372264",
         "model_stdout": "1990957316656372264",

@@ -186,7 +186,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "e7b9b11950677854fa76f14196963c85bad5afef4353bfc243c9984638bc66e9",
+    "harness/check.py": "8406efc38e78de7506a0736dfc68fd7fc682b1becd9e4812f30a3f1f36b33b6f",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
@@ -1038,28 +1038,28 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7fcaed8000a0 with insufficient space for an object "
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7f27cf2000a0 with insufficient space for an object "
     },
     "adversarial-full65.bin": {
       "exit": 1,
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7f71a4c000a0 with insufficient space for an object "
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7f78e9c000a0 with insufficient space for an object "
     },
     "adversarial-many.bin": {
       "exit": 1,
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7f201cc000a0 with insufficient space for an object "
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7f5ef4c000a0 with insufficient space for an object "
     },
     "adversarial-run17.bin": {
       "exit": 1,
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7f3a7ec000a0 with insufficient space for an object "
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7f17a34000a0 with insufficient space for an object "
     },
     "adversarial-stride3.bin": {
       "exit": 0,
@@ -1116,6 +1116,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-alt33.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "16054985108923303936",
         "model_stdout": "16054985108923303936",
@@ -1125,6 +1126,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-full65.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "15299648",
         "model_stdout": "15299648",
@@ -1134,6 +1136,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-many.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "1449901585140151680",
         "model_stdout": "1449901585140151680",
@@ -1143,6 +1146,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-run17.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "14078533561653437184",
         "model_stdout": "14078533561653437184",
@@ -1152,6 +1156,7 @@
         "source": "unsafe.rs",
         "input": "adversarial-stride3.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "0",
         "model_stdout": "0",
@@ -1161,6 +1166,7 @@
         "source": "unsafe.rs",
         "input": "degenerate.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "14318502625712913920",
         "model_stdout": "14318502625712913920",
@@ -1170,6 +1176,7 @@
         "source": "unsafe.rs",
         "input": "large.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "6501567032375655424",
         "model_stdout": "6501567032375655424",
@@ -1179,6 +1186,7 @@
         "source": "unsafe.rs",
         "input": "small.bin",
         "exit": 0,
+        "expected_exit": 0,
         "ub": false,
         "stdout": "5818188572430916443",
         "model_stdout": "5818188572430916443",

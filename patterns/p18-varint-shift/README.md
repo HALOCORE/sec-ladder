@@ -17,7 +17,7 @@ for each of nv varints:
         c = buf[off + p] ; p += 1 ; nb += 1
         if shift < VBITS:               # <<< THE SAFETY LINE. R1 omits THIS.
             val |= (c & 0x7f) << shift
-        shift +=32 7                    # wrapping, in every rung
+        shift += 7                      # wrapping (u32), in every rung
         if c & 0x80 == 0: break
     acc = acc*31 + val ; acc = acc*31 + nb
 return acc*31 + nv
@@ -39,12 +39,20 @@ at all.** No rung of p18 ever reads or writes out of bounds, on any input.
 
 **2. The safety line runs ONCE PER INPUT BYTE, so its cost does not amortise.**
 `c-gcc-h − c-gcc = 2.00 · varint bytes`, exactly, with a zero intercept and a
-zero per-varint term — 11.89% of the kernel's instructions on `small` **and
-11.11% on `large`**, because both the numerator and the denominator are per-byte
-terms. That is the first honest counterexample in this project to *"the safety
-check amortises away"* on the C side. In wall clock, defended by a 30-layout
+zero per-varint term. On band `b` — `nv` held at 8, varint bytes swept 8 → 80 —
+the *fraction* `(R1h − R1)/R1` rises monotonically **5.08% → 13.57%** across all
+ten rows, toward the `2/12 = 16.67%` the laws give as `bytes → ∞`. That is the
+first honest counterexample in this project to *"the safety check amortises
+away"* on the C side: it does not shrink with the input, it **grows**. (The two
+matrix inputs read 11.89% on `small` and 11.11% on `large`; they are two
+*shapes* — 112 varint bytes against 41 — and are quoted as levels, not as the
+trend. `NOTES.md` 4b.) In wall clock **on `small`**, defended by a 30-layout
 population per cell: **+7.14% on gcc (`P = 0.976`), +12.04% on clang
-(`P = 0.998`)**, mode-matched, sign stable.
+(`P = 0.998`)**, mode-matched, sign stable. `large`'s wall-clock row is weak
+(`P = 0.676 / 0.829`) and is reported in `NOTES.md` 4c with its `P` and nowhere
+else. ⚠ **Every other per-call `Ir` law here has a DOMAIN** — see the section
+below the numbered list, and `NOTES.md` 4a0, before quoting one. This particular
+difference is the exception and the section says why.
 
 **3. Safe Rust with the guard deleted is BIT-IDENTICAL to C, at both opt levels
 this benchmark measures.** Not "similar" — the same 64-bit integer, on four
@@ -55,7 +63,12 @@ does not see this bug and neither do the bounds checks.
 matrix:** **UBSan** on the C side, **`-C debug-assertions=on`** and **Miri** on
 the Rust side, and **Verus** — which raises `possible bit shift
 underflow/overflow` on the operator itself, with no accessor and no
-postcondition involved. p18 is p09's mirror: p09's bug was invisible to a
+postcondition involved. ⚠ **Verus's obligation attaches to the operator
+SPELLING**: `x.wrapping_shl(s)`, which computes exactly the masked shift the
+buggy rung realises, **verifies with no obligation at all**, so "Verus catches
+this" holds for a rung that writes `<<` and not for one that writes
+`wrapping_shl`. That exclusion is a declared, priced, whole-pattern fiat
+(`NOTES.md` 9). p18 is p09's mirror: p09's bug was invisible to a
 memory-safety proof and to everything else; p18's is invisible to the
 *postcondition* and caught by an obligation that is not part of the
 specification.
@@ -81,6 +94,34 @@ a payload wrapped round into a bit that is already set changes nothing.
 shifts execute, UBSan fires, and **all eight cells print the same number.** That
 is a property of the *bug*, not of the fold, and no choice of fold could repair
 it.
+
+## ⚠ Read this before any per-call `Ir` law in `NOTES.md`
+
+**Every level law p18 publishes has a stated domain, and one of the pattern's own
+committed inputs is outside it.** The kernel's cost depends on two control-flow
+parameters as well as on bytes and varints:
+
+| | what it means |
+|---|---|
+| **`cut`** | the last varint ran off the end of the window instead of ending on a terminator |
+| **`brk`** | the window declared more varints than it holds, so the outer loop exits on `p == len` |
+
+`small`, `large`, `truncating.bin`, every `adversarial-*` blob and all 34 blobs
+of sweep bands b/v/x/y have **`cut = brk = 0`**. **`degenerate.bin` has both**,
+and against the two-column law it misses by up to **+8.00 Ir/call** — which was
+enough to reverse the *sign* of `R3 − R4` there. Sweep band **`t`** (8 blobs,
+added at TASK_052 after TASK_051_REVIEW's blocker) varies the two independently;
+the four-column law is exact over all 42 sweep blobs and predicts
+`degenerate.bin`, which is in no band, on all eight cells. `NOTES.md` 4a0–4a3.
+
+The per-byte hardening figure quoted in **2** above is the one law with no
+domain to state: `cut` and `brk` cancel exactly between `c-gcc-h` and `c-gcc`
+(and between the two clang cells), and `degenerate.bin` confirms it out of
+domain — `410.018 − 374.018 = 36.000 = 2 × 18`.
+
+Same *class* of defect as p14's (a law fitted inside one regime of a parameter
+the design never varied — `.memory/01-ladder.md` finding 16), on a different
+axis. It is not a new kind of mistake.
 
 ## The rungs
 
@@ -110,13 +151,18 @@ And that item **has nothing to do with the pattern's bug** — weakening its
 spec.md      the contract every rung implements + the machine-readable pins
 model.py     the independent Python reference (unbounded ints + a final mask,
              against the helper's explicit per-byte width test)
-inputs/gen.py   deterministic generator: 8 matrix blobs + 4 sweep bands
+inputs/gen.py   deterministic generator: 8 matrix blobs + 5 sweep bands
 controls/    mkcontract.py  splices the slb-contract block, --check verifies it
              gen_controls.py  every control, by exact-string substitution
              build_controls.sh / verify_controls.sh
-             sweep_ir.py / fit.py     the swept laws, rank and hold-out analysis
-             predict.py               pre-registered extrapolation, hashed
+             sweep_ir.py / fit.py     the swept laws, their DOMAIN, rank and
+                                      hold-out analysis
+             predict.py               the zero-free-parameter extrapolation
+                                      (band y), hashed -- tamper-evidence, NOT
+                                      an ordering proof; NOTES.md 8b1
              clayout.py               layout populations, C and Rust
+             miri_exit_hole.py        regression check for harness/check.py's
+                                      Miri exit-code comparison (TASK_052)
 NOTES.md     the evidence, section by section
 ```
 

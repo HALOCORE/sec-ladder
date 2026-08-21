@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""Pre-register p18's extrapolation predictions, then score them.
+"""Fit p18's law on bands b/v/x, WRITE THE EXTRAPOLATION DOWN, then score it.
 
 `.memory/03-measurement.md`: *"an exact fit plus genuine out-of-sample
-predictions is honest evidence; the hold-out is not."* p18's pooled design is
-three columns wide (`bytes`, `nv`, `1`), so any three independent rows determine
-it and **no leave-one-band-out over b/v/x can fail** -- measured, `../NOTES.md`
-8. Band Y exists to replace that with something falsifiable: its shapes sit
-outside the convex hull of b/v/x in BOTH regressors.
+predictions is honest evidence; the hold-out is not."* p18's pooled b/v/x design
+**stays rank 3 after dropping any single band**, because band x alone is already
+rank 3 -- so **no leave-one-band-out over b/v/x can fail** (measured,
+`../NOTES.md` 8a). ⚠ The diagnosis is the post-drop RANK, not the column count:
+a three-column design whose bands are each rank-2 has a hold-out that CAN fail
+(TASK_051_REVIEW M5). Band Y replaces the hold-out with something falsifiable:
+its shapes sit outside the convex hull of b/v/x in BOTH regressors.
 
     # 1. fit on b/v/x and WRITE THE PREDICTIONS DOWN, hashed
     python3 patterns/p18-varint-shift/controls/predict.py register \
@@ -21,8 +23,24 @@ outside the convex hull of b/v/x in BOTH regressors.
         .temp/p18/predict_y.json .temp/p18/sweep_y_O3.json
 
 `register` prints the SHA-256 of the prediction file it wrote; `score` re-hashes
-it and refuses to run if it has changed, which is the whole mechanism -- a
-prediction that can be edited after the measurement is not a prediction.
+it and refuses to run if it has changed.
+
+⚠ **THE HASH IS TAMPER-EVIDENCE, NOT PRE-REGISTRATION, AND THIS DOCSTRING USED
+TO CLAIM OTHERWISE.** `register` is a **pure deterministic function** of the
+b/v/x sweep json plus shapes hard-coded from `inputs/gen.py`: re-running it long
+after band Y was measured reproduces the identical file and the identical hash
+(measured at TASK_051_REVIEW M4 -- `ca0bbe26...`, `cmp` identical). Anyone can
+compute that hash at any time, so it proves the file was not **altered** between
+`register` and `score` and proves **nothing** about whether the predictions
+predate the measurement.
+
+**What makes this test honest is that `register` has ZERO FREE PARAMETERS** --
+no threshold, no tolerance, nothing to tune after seeing the answer -- so a
+reader who doubts the ordering can re-derive all 24 numbers. If ORDERING is
+wanted, the mechanism that supplies it is a COMMIT: register the hash, commit
+that, and only then measure. `git` gives the order for free and nobody can forge
+it afterwards. See `../NOTES.md` 8b1/8b2. p18 does not have it (one commit,
+`18f7a28`), and says so.
 """
 
 import argparse
