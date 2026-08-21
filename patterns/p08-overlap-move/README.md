@@ -35,7 +35,10 @@ matters more than the row: it used to read *"the bug is not even expressible in
 the spec logic"*. Substitute `core::ptr::copy` → `core::ptr::copy_nonoverlapping`
 in `verus.rs`'s trusted body and nothing else, and Verus reports
 **`11 verified, 0 errors`** shipped and **`15 verified, 0 errors`** under
-`--cfg slb_twin`. The mutant is invisible to the verifier, to the verified twin,
+`--cfg slb_twin`. ⚠ **Those are pre-TASK_056 counts** — the shipped proof is now
+**12 / 16**, because `copy_in` stopped being `external_body`. The mutant has not
+been re-run, so its post-TASK_056 verdict is unmeasured; the *point* (it is
+invisible to verifier, twin, contract pin and gate) is unaffected. The mutant is invisible to the verifier, to the verified twin,
 to `spec.md`'s contract pin (the contract text does not change) and to gate
 stages 5c/5c-req. What catches it is the `O3` identity pin against R4 — the call
 target differs — and Miri, which reports *"`copy_nonoverlapping` called on

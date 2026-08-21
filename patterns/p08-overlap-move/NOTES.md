@@ -860,6 +860,15 @@ Three things did cost time, all mechanical rather than mathematical:
 
 ### 6b. Mutants — every one run, with its actual verdict
 
+⚠ **EVERY COUNT IN THIS TABLE IS A PRE-TASK_056 TRANSCRIPT** and is left exactly
+as it was run. §6's headline is `12 / 16`; this table's control says `11`,
+because `copy_in` was still `external_body` when these mutants were run. **§6c
+flags its transcript this way and §6b did not** — TASK_058 caught the asymmetry.
+**Do not add 1 to these rows to "update" them**: the shipped control is 12 by
+the gate's own `clause_deletion.verus.rs.control_verified`, but no one has re-run
+the mutants, so their post-TASK_056 verdicts are **unmeasured**, not inferable.
+Re-run them before quoting a mutant figure against the shipped proof.
+
 Generated from the shipped `verus.rs` by exact-string substitution with a
 hit-count assertion (`.temp/p08/mkmutants.py`) into `.temp/p08/mirror/`, per
 `.memory/05-layout.md` demand 11.

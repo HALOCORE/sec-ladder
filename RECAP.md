@@ -25,8 +25,12 @@ is written up in `.memory/`.**
   offset from the `unsafe` one, and **that offset is a source-path-length
   artefact** (it moves if you clone elsewhere), so the pair is a **biased draw of
   size one**. *The floor is the layout population.* p06's own floor is **±4.6%**.
-- **The TCB column is not gameable — retrospectively.** 3.4% exposure across the
-  16 patterns that exist. ⚠ **Prospectively it is**: a `raw_ptr` pattern needs
+- **The TCB column is not gameable — retrospectively.** The census found two
+  exposed items; **both have since been relocated, so the measured exposure is
+  now `0`.** ⚠ Do not quote *"3.4% across the 16 patterns"* — that was this
+  line, and it is wrong twice: the census ran over **14** patterns, and its
+  numerator is closed (`.memory/04-verus.md`, which ships the recount).
+  ⚠ **Prospectively the column IS gameable**: a `raw_ptr` pattern needs
   zero project-local trusted items. Ship **one number plus the U-license / V-gap
   / infra classification**; the two-number proposal was refuted by census.
 - **`-C debug-assertions=on` also enables `assert_unsafe_precondition!` inside
@@ -152,8 +156,12 @@ the number.** Two task files have already sent an agent to the wrong finding.
    only when the proof *licenses unsafe code*: R5 is R4's machine code with the
    obligations discharged.
 3. **Safety is cheap — and finding 9 says it stays cheap even when the optimiser
-   *cannot* see the loop.** Tuned safe Rust is **+8…+10 instructions per call**
-   versus unsafe on p01/p02 — flat in the size of the data, not a percentage.
+   *cannot* see the loop.** Tuned safe Rust is **+4…+5 instructions per call on
+   p01 and +10 on p02** versus unsafe — flat in the size of the data, not a
+   percentage. ⚠ **This line said `+8…+10` for both until TASK_058**; p01's
+   gate marginals are `safe_tuned 918.3 / 7205.3` against `unsafe 914.3 /
+   7200.3`, and `p01/NOTES.md:262` and `.memory/01-ladder.md:500` both say +4/+5.
+   Only p02's half was ever `+10`.
    Hardened C's check is +5 (gcc) / +12 (clang), also flat. **Always quote R3;
    R2 alone overstates safe Rust by 3.7× on p01 and by ~75× on p16.**
 4. **The security result (p02), the strongest thing here.** On a one-byte
@@ -948,8 +956,9 @@ the number.** Two task files have already sent an agent to the wrong finding.
    p12 too, because `std::env`, the backtrace machinery and `io::Error`'s
    `Display` call `strlen` in every Rust binary of every pattern.
 
-   Sound: Verus **17/0 first attempt**, `R4 ≡ R5 exact`, TCB 5 = the gate's own
-   count, Miri 9/9. The **termination store is `1.00000` Ir per string on both
+   Sound: Verus **19/0** (twin **22/0**), `R4 ≡ R5 exact`, TCB 5 = the gate's own
+   count, Miri 9/9. ⚠ **Said `17/0 first attempt` until TASK_058** — the delivery
+   counts, superseded by TASK_046's fold repair; the pins are 19 and 22. The **termination store is `1.00000` Ir per string on both
    compilers** and is *not* DSE'd, because the fill's extent is a runtime value —
    I predicted DSE and was wrong. **`strlcpy` is dearer than `strncpy` and
    `snprintf` far dearer, on both compilers: the unsafe routine is the cheapest.**
@@ -1014,8 +1023,11 @@ the number.** Two task files have already sent an agent to the wrong finding.
    term), and the per-record law at period **4, not 8**, exact on 45/45.
 
    ⚠ **"The twin is the sole catcher" was false on SIX patterns**, not two —
-   see the audit note in the queue. p06's and p12's are fixed; **p03, p04, p05,
-   p11 and p18 are not.**
+   see the audit note in the queue. **All six are now fixed** (p06 and p12
+   first, then p03, p04, p05, p11 and p18 at TASK_054/056, each naming the task
+   in its own `NOTES.md`). ⚠ This line said the last five were *not* fixed and
+   the queue section said they were; TASK_058 caught the contradiction and the
+   queue was right.
 
    ⚠ **p06's floor is ±4.6%, not the ±3% it published** (TASK_049_REVIEW).
    Headline intact — the clang column clears it at ~2.1×.
@@ -1431,10 +1443,15 @@ Both retired.
    but hashes all of them, so a `measure.py` edit costs eight gate re-runs (13 min
    measured) for a file the gate never executes. Judgement call; belt-and-braces
    cannot under-cover.
-6. **`results/*.json` has no `source_sha256` for six patterns** — p01 and p16 are
-   `FRESH`, the rest are `NO BASELINE` and clear on their next re-measure.
-   `results/p11-nul-scan.json` is *stale* on `bulk_calls` and understates p11's own
-   12.0× library finding.
+6. ✅ **CLOSED — every pattern record now carries `source_sha256`.** This item
+   said *"no `source_sha256` for six patterns"*; the re-measures cleared them,
+   and the only file without one is `results/p02-residue-sweep.json`, which is a
+   **side record, not a pattern**. Verify with the one-liner rather than trusting
+   this line:
+   `python3 -c "import json,glob;print([f for f in sorted(glob.glob('results/*.json')) if 'source_sha256' not in open(f).read()])"`
+   ⚠ **Still open, and NOT re-verified by the audit that closed the rest:**
+   `results/p11-nul-scan.json` was recorded *stale* on `bulk_calls`, understating
+   p11's own 12.0× library finding. Check it before quoting p11's library axis.
 7. **p04's `small` R2 layout population is bimodal at 1.42× and unexplained**
    (TASK_042_REVIEW minor 8): 27 layouts at 6.43–7.17 ms, four at 9.30–9.88 ms,
    reproducible across both passes, and **neither `analyze.py`'s `(loop,
@@ -1471,7 +1488,7 @@ Both retired.
   Deferred twice, and the second time the engineer's own session was the argument:
   every defect that actually occurred was a class-membership or arithmetic error
   no `body_len / K` assertion would catch.
-- **`harness/check.py:1753`'s display string** still says "recorded as a result";
+- **`harness/check.py:1766`'s display string** (stage 3c's `head()`; cited as `:1753` until TASK_058) still says "recorded as a result";
   the comments beside it were corrected. Free to fix on any task that already
   re-runs all gates.
 
@@ -1511,7 +1528,12 @@ python3 -c "import hashlib,glob;print({hashlib.sha256(open(f).read()[open(f).rea
   byte longer. **What matters is that the set has size 1.**
 - `harness/` — `check.py` (**18** stages; this line said 17 and
   `.memory/05-layout.md` said 16 — enumerate them with
-  `grep -on 'head("[0-9]' harness/check.py`, do not copy a constant),
+  `grep -o 'head("[0-9][^"]*"' harness/check.py | sort -u | wc -l`, do not copy a
+  constant. ⚠ **The `sort -u` is load-bearing and the first version of this
+  command lacked it**, returning 19: `head("1. build the matrix` appears at
+  `check.py:1218` *and* `:4903`, two entry points into one stage. TASK_058 caught
+  it — a command that is wrong is worse than a constant that is right, because it
+  looks self-verifying),
   `asm.py`, `dloop.py`, `vparse.py`,
   `build.py`, `measure.py` (now writes `source_sha256` + `input_sha256` and has
   `--check-stale`), `report.py`, `fixture.py`. `common/layout/` ships the layout

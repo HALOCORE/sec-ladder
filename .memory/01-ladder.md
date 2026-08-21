@@ -188,7 +188,8 @@ byte-for-byte) measures **−118 / −207**, so the R4 endpoint has *measured wi
 pair interval**, the first on this project, and "nobody has, on any pattern" is
 retired. ⚠ Note what it is **not**: the two class minima are 5 apart on both
 blobs, and that is the per-call constant, **not a tax** — `min(R3) − min(R4)`
-differences two upper bounds and bounds nothing (finding 12).
+differences two upper bounds and bounds nothing (**finding 6 in this file**; it
+said "finding 12", which here is p12).
 **And the asymmetry is measured on the same pattern**: the *safe* side's cheapest
 lever is `assert!(sp <= STACK_CAP)`, and on the unsafe side that is
 `error: panic is not supported` — so the safe class reaches a spelling the unsafe
@@ -274,7 +275,7 @@ declaration looks like and also what a test that cannot fire looks like. It can
 fire.
 
 **The shape it caught is new and is the one to look for: an idiom entry SCOPED to
-some rungs and not others.** p13's `spec.md:374` and `:394` pin the byte-loop
+some rungs and not others.** p13's `spec.md:378` and `:398` (cited as `:374`/`:394` until TASK_058) pin the byte-loop
 copy and fill in **`safe_naive.rs`, `unsafe.rs` and `verus.rs`**, exempting
 `safe_tuned.rs` **by name**. So R3 was permitted the bulk spelling and R4 was
 forbidden it — and p13's headline is *"safe Rust beats unsafe by 13.6–17.3%"*.
@@ -309,10 +310,14 @@ its headline.
 
 ⚠ **And note where the error was reported.** p13's `NOTES.md:842` said the R4
 side "is not searched" and attributed it to **the prover** — the R4-is-chained-to
--the-prover mechanism (finding 14) is real, invoked constantly, and it is now
+-the-prover mechanism (**RECAP finding 14**, not this file's 14 = p13) is real, invoked constantly, and it is now
 also **the most available wrong explanation on this project**. The prover did not
 bind: `copy_nonoverlapping` and `write_bytes` verify at the pinned vstd
-(15/0, twin 22/0, `identity: exact` holding). **Before blaming vstd for an
+(**17/0, twin 24/0**, `identity: exact` holding). ⚠ **This read `15/0, twin 22/0`
+until TASK_058, and the same file gives the right pair sixteen lines up** — the
+table row at the head of this entry says *"the bulk spelling verifies (17/0,
+twin 24/0)"*, and so does p13's own contract text. One control, two counts, one
+file. **Before blaming vstd for an
 unsearched R4 side, run `./verus_run.py`** — the same eleven minutes that has
 already killed five published figures.
 
@@ -485,7 +490,7 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
 
      **The rule that survives: a safety number is only meaningful as a
      matched-pair delta under an idiom the pattern *declared before measuring*.**
-     A published spread cannot carry a safety claim at all — see finding 14 for
+     A published spread cannot carry a safety claim at all — see **RECAP finding 14** for
      why that is a theorem rather than a preference. The declaration is p05's
      `spec.md:69-73` mechanism, which was right both times it was tested and
      failed only by being **invisible** to the gate. Fix: move it into the hashed
@@ -961,7 +966,7 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
    instructions) to the very row TASK_017 had declared out of contract. So p17's
    "R3 is free" survives *per byte* and does **not** survive as `+32`; and the
    R4 side has not been searched in contract, so −19 is an R3-side bound and
-   emphatically **not** "safe beats unsafe" (finding 14). Both shipped bands
+   emphatically **not** "safe beats unsafe" (**RECAP finding 14**). Both shipped bands
    happen to have `nsuf = 3`; swept over generated inputs at `nsuf` 1–8,
    `R3ship − R4` runs 18…63 and `R3ship − R3′` is exactly `17·nsuf`. p17 ships
    **no sweep inputs at all**, which is how a two-point constant got published as
@@ -1125,7 +1130,7 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
    apparatus), and the counterexample that overturned it used a spelling
    `spec.md` forbids. What the sentence may never do is generalise from "this
    kernel, written this way" to "safety costs this" — that is the step
-   finding 14 shows is not available.
+   **RECAP finding 14** shows is not available.
 
    **The sentence is REINSTATED, restricted to the row-scaled term** (TASK_021,
    adjudicated at TASK_021_REVIEW). Exactly these words and no wider:
@@ -1792,8 +1797,15 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
    forbidden-token audit that does not scope to the measured symbols reports the
    standard library, not the kernel.
 
-   Sound and unchanged: Verus **17/0 first attempt** (twin 20/0), `R4 ≡ R5
-   exact`, TCB 5 matching the gate's own count, Miri clean 9/9. The
+   Sound and unchanged: Verus **19/0** (twin **22/0**), `R4 ≡ R5 exact`, TCB 5
+   matching the gate's own count, Miri clean 9/9. ⚠ **This line read `17/0 first
+   attempt (twin 20/0)` until TASK_058 caught it, and those are the DELIVERY
+   counts** — TASK_046's fold repair added a sixth loop and a sixth recursive
+   spec function, moving the pins to 19 and 22 (`p13/spec.md:347-348`,
+   `p13/NOTES.md:707-709`, and the gate's `verified`). **The stale figure sat
+   inside the paragraph describing TASK_046**, i.e. in the sentence that explains
+   the very change that invalidated it. *"First attempt"* is dropped with it: it
+   was true of the 17 and is not a property of the shipped 19. The
    **termination store costs `1.00000` Ir per string on both compilers** and is
    *not* dead-store-eliminated, because the fill's extent `DST_CAP − n` is a
    runtime value — the manager predicted DSE and was wrong. **`strlcpy` is
@@ -1833,7 +1845,7 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
    +15.35 ns.** The mechanism is p09's lost load-merge and an `and` control with
    no divide isolates it at **−12.00 Ir/record**: reducing `r` proves `r < 64`,
    the value stays 32-bit, and clang's 7-instruction LE decode collapses to one
-   `mov`. **Finding 6 — `Ir` and wall clock disagreeing in direction — now has a
+   `mov`. **RECAP finding 6 — `Ir` and wall clock disagreeing in direction (this file's 6 is p05) — now has a
    designed instance with a named mechanism, not an accidental one.**
 
    **The wall-clock claim survived the strongest available attack.** The review
@@ -1887,8 +1899,10 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
    `b_weakreq` also fails the **contract pin** (2 clause diffs under `check.py`'s
    own comparator) and `b_scrmod_msonly` also breaks the **identity pin**
    (`n_fn 174/166` vs 208). **The claim is *Verus-level* sole catcher.** p12's
-   `NOTES.md:1046-1049` is wrong the same way and is **not yet fixed**; p02's
-   equivalent is a clean negative.
+   `NOTES.md` is **now fixed** — its §9b heading reads *"the twin is the sole
+   **Verus-level** catcher"* (`p12/NOTES.md:1047`). ⚠ This sentence said *"not
+   yet fixed"* until TASK_058; the fix had landed and the authoritative layer
+   still carried the to-do. p02's equivalent is a clean negative.
 
    Sound: Verus **17/0 first attempt** (twin 22/0), `R4 ≡ R5 exact`, then
    **18/0 (twin 23/0) after TASK_048 removed a trusted item at zero `-O3` cost**

@@ -1055,7 +1055,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2220468==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5060000000b6 at pc 0x560ea362f9b5 bp 0x7ffce6feda60 sp 0x7ffce6feda50 READ of size 1 at 0x5060000000b6 thread T0 #0 0x560ea362f9b4 in kernel /home/apt/repos_common/",
+      "diagnostic": "================================================================= ==2238106==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5060000000b6 at pc 0x555c084eb9b5 bp 0x7ffca5aded20 sp 0x7ffca5aded10 READ of size 1 at 0x5060000000b6 thread T0 #0 0x555c084eb9b4 in kernel /home/apt/repos_common/",
       "stdout": "",
       "model_stdout": "0"
     },

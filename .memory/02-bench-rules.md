@@ -592,7 +592,7 @@ un-greenable by any route:
 
 **Sizing inputs so Miri does not block the row — measured at TASK_010_REVIEW.**
 Miri's cost is driven by the **payload the kernel folds**, not by the file size,
-and `n_iters` is *not* the knob: `check.py:3819` rewrites it to
+and `n_iters` is *not* the knob: `check.py`'s Miri stage (`MIRI_PROBE_ITERS` is defined at `:311` and applied at `:4769`; this said `:3819`, which is neither -- **cite the SYMBOL, line numbers rot**) rewrites it to
 `MIRI_PROBE_ITERS = 4` for every Miri run, discarding whatever the pattern
 declared. Measured fold throughput on this box: **5.91e-5 s per folded byte
 (~16 900 B/s)**, so the 180 s budget is ≈ **3.05 M folded bytes**, i.e. a stride
@@ -673,7 +673,8 @@ Four reasons, and the first is the one that generalises:
    cost-selected R3 and a decidable-looking contract, which is the worst
    combination available.
 2. **It is asymmetric in practice.** R4 is a spelling too, and the R4 side is
-   chained to the prover (finding 14) — so it usually cannot move. Applying
+   chained to the prover (**RECAP finding 14**, *"every rung is a spelling"* — not
+   `01-ladder.md`'s 14, which is p13) — so it usually cannot move. Applying
    re-shipping to whichever side happens to be free systematically shrinks the
    published tax in one direction.
 3. **It makes the shipped rung a function of how hard the last reviewer

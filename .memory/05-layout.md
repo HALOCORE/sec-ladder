@@ -212,7 +212,7 @@ mentions. Budget for them up front; each has cost an engineer a surprise.
 
 11. **A Verus control that does not verify cleanly cannot live in a pattern dir
    at all** — measured at TASK_012, and it is a consequence of two existing rules
-   meeting. `check.py:1446` requires *every* `.rs` in the pattern dir containing a
+   meeting. `check.py`'s stage 5a (`:2197`; this said `:1446`) requires *every* `.rs` in the pattern dir containing a
    `verus!` block to be pinned in `verus.obligations`, and `:1549` fails the gate
    for any pinned file reporting `n_err > 0`. `build.py`'s `--cell` list is closed
    `choices`, so the file cannot be built either. So a **deliberately broken**
@@ -249,7 +249,7 @@ mentions. Budget for them up front; each has cost an engineer a surprise.
    This exists because the declaration used to be prose. p05's `spec.md` forbade
    `chunks_exact` **by name** and two consecutive tasks measured it anyway and
    published the result as p05's number — the pin was at line 69 and the hashed
-   block started at line 309. See `.memory/01-ladder.md` finding 14.
+   block started at line 309. See `.memory/01-ladder.md` **finding 3** (the named-spelling / two-step reslice entry). ⚠ This said "finding 14", which in that file is **p13**; the `chunks_exact` content is finding 3.
 
 13. **A spelling-spread section in `NOTES.md` is mandatory for any pattern with
    more than one measured spelling.** At least two alternates per rung; the
@@ -308,7 +308,7 @@ Two conditions the rule depends on, both verified at TASK_027_REVIEW against the
 harness rather than argued:
 
 - **The `sweep-` prefix IS the mechanism**, hardcoded in two module-level
-  literals (`check.py:459-460`, `measure.py:60`) with no pattern-specific input
+  literals (`check.py`'s inline `sweep-` test at `:474` — it has **no** module-level literal, despite this line having claimed `:459-460` — and `measure.py::SKIP_INPUT_PREFIX` at `:64`) with no pattern-specific input
   and no `spec.md` key that selects inputs. **A band named anything else enters
   the measurement matrix and costs a full re-measure.** Name it `sweep-*`.
 - **The gate hashes `gen.py` and never the blobs**, so a sweep-derived law's

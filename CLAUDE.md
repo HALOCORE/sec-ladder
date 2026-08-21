@@ -34,7 +34,15 @@ rest is reference.
   floor, identity levels, Miri policy); `model.py` is the independent reference
   implementation the gate drives. Both are mandatory per pattern.
 - `../LearnVeri/PITFALLS.md` — Verus gotchas; read before debugging.
-- `../LearnVeri/_VERUS_DOC_/` — Verus guide + full vstd source; grep before guessing.
+- `~/tools/verus/vstd/` — **the PINNED vstd, and the only one that decides
+  anything.** Grep it before claiming "no spec exists".
+- `../LearnVeri/_VERUS_DOC_/` — Verus guide, plus a vstd source tree that is a
+  **DIFFERENT, OLDER SNAPSHOT**. ⚠ Use it for the *guide*, never to settle
+  whether a spec exists: it has **no `copy_from_slice` and no `copy_within` at
+  all**, both of which the pinned vstd does have. *"vstd has no spec for
+  `copy_from_slice`"* was false, stood from TASK_004 to TASK_048, and propagated
+  into two patterns' comments — and this line, which pointed only here, is the
+  most likely way it happened.
 - `../LearnVeri/microbench/` — 20 CVE ports with security proofs; reusable kernels.
 
 ## Don't

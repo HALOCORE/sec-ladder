@@ -26,7 +26,7 @@ Status values: `planned` · `wip` · `done` · `partial` (some rungs missing, do
 | T012 | ship p17's slice-relative guard — the artefact T011 claimed | **done**, reproduced independently; gate PASS, no measured number moved |
 | T013 | p05 2-D index flattening — the first **vectorisable** kernel | **done**, gate PASS first run, **reviewed**; every number reproduced, four framing claims corrected |
 | T014 | p08 overlapping move — the bug safe Rust cannot express | **done**, gate PASS first run, **reviewed**; six manager prescriptions refuted, and the review's blocker landed on **p05**, not p08 |
-| T015 | the R3 audit across p05/p16/p17 | **done**, **reviewed**; the manager's specced cell swap was **declined and the decline was right**; produced finding 14 |
+| T015 | the R3 audit across p05/p16/p17 | **done**, **reviewed**; the manager's specced cell swap was **declined and the decline was right**; produced **RECAP finding 14** (*"every rung is a spelling"* — `01-ladder.md`'s 14 is p13) |
 | T016 | the declared-idiom key, hashed and required | **done**, all six green, **reviewed**; its advertised mechanism was disproved by experiment |
 | T017 | say what the key actually does; three declaration defects | **done**, all six green, **unreviewed** — the p16 `required[0]` reading is a judgement and needs one |
 
@@ -156,8 +156,8 @@ supersede any earlier task report they contradict.
   is void; the swap is still refused, on the unmatched-pair ground, which is the
   measured one). p16's case is **not even
   well-posed**: its hashed block contradicts itself, requiring `end - p >= 3`
-  and `vlen > end - (p+3)` "in every rung" at `spec.md:269` while asserting at
-  `:278` that `split_first_chunk::<3>()` — which contains **neither**
+  and `vlen > end - (p+3)` "in every rung" at `spec.md:289` while asserting at
+  `:60` that `split_first_chunk::<3>()` — which contains **neither**
   comparison — is admissible. Disambiguate `required[0]` before deciding
   anything downstream of it.
 
@@ -198,8 +198,8 @@ supersede any earlier task report they contradict.
   record cannot tell them apart. `results/gate/p08-overlap-move.json` shows
   `adversarial-overlap expect=clean fired=False exit=0` with empty
   `notes`/`blocked` — identical in shape to p17's genuinely-clean row, though
-  p08's means "the tool cannot see this". `check.py:566` admits only
-  `clean`/`fires`. The reason survives only in `model.py`'s docstring.
+  p08's means "the tool cannot see this". `check.py:1247-1249` admits only
+  `clean`/`fires` (cited as `:566` until TASK_058). The reason survives only in `model.py`'s docstring.
 
 - ~~**Miri is not installable**~~ — **closed at T005.** `nightly` +
   `cargo miri setup` alongside the pinned toolchain; R4 has no vstd dependency,

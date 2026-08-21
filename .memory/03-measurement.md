@@ -476,7 +476,7 @@ alone, and this box cannot supply the wall-clock column to rescue it** — say t
 win is instruction-count-only and stop. A constant chunk size is a different
 measurement from a runtime one.
 
-### ⚠ The two conventions can differ by 13×, and p08 is where. PUBLISH THE ONE THE TABLES READ.
+### ⚠ The two conventions can differ by 13×, and p08 is where. NAME THE ONE YOU USED.
 
 **TASK_056, measured; unreviewed — and this one propagated from a probe report
 into a manager's task file before anyone noticed.** The section below says the
@@ -495,10 +495,33 @@ The mechanism is that the respelling moves work **into callees**: `index_mut`
 10+25 becomes `split_at_mut` 35+25, so +25 of the +27 never appears in
 `kernel`'s exclusive count and only +2 (an ABI shuffle) does.
 
-> **`results/tables/*.md` and every published price read
-> `marginal_ir_per_call`.** A number taken with `callgrind_ir` is a *different
-> measurement*, not a rounding of the same one. **Say which tool produced it,
-> and when they disagree publish the marginal.**
+> **A number taken with `callgrind_ir` is a *different measurement* from one
+> taken with `_callgrind_total`, not a rounding of the same one. Say which tool
+> produced it. When a change RELOCATES WORK ACROSS A CALL BOUNDARY, the
+> kernel-exclusive column is blind to the part that moved, so publish the
+> marginal too and say why.**
+
+⚠ **THIS BOX USED TO ASSERT THAT `results/tables/*.md` READ
+`marginal_ir_per_call`. IT IS THE OPPOSITE, AND THE TABLES SAY SO THEMSELVES**
+(TASK_058, read-only audit). Every generated table's own header reads:
+
+> *"`Ir` is **callgrind per-function exclusive** for the kernel symbol. The
+> whole-program total is deliberately absent: it moves with the size of the
+> environment block and does not reproduce across shells."*
+
+and `:699` below says the same of `results/*.json`. The false sentence conflated
+two different things: **`results/tables/*.md` are uniformly kernel-exclusive**,
+while *"every published price"* varies **per pattern's `NOTES.md`** — which is
+exactly what the next section is about (p16 kernel-exclusive; p05 and p17
+marginal).
+
+**What survives, and it is the substantive half:** pricing p08's respelling at
+`+2.00` was still wrong, because +25 of the +27 **moved into `split_at_mut`**
+rather than disappearing. The right correction was *"the exclusive column cannot
+see relocated work"*; *"the tables read the marginal"* was a wrong reason
+attached to a right conclusion, and the manager repeated it in a task file and a
+handoff before the audit caught it. ⚠ **A right answer with a wrong justification
+propagates exactly like a wrong answer** — this one survived three commits.
 
 ⚠ **p08 is one of exactly two patterns whose own table already warns that the
 kernel-exclusive column REVERSES real comparisons** — which is precisely why it

@@ -84,7 +84,16 @@ context still applies — do not restart from scratch.
 
     Run it before every commit that cites a report. (`TASK_NNN.md` in this file is
     a placeholder and will always show up; ignore that one.)
-11. **Ask the review for the mechanism, not just the number.** p05's review was
+11. **Never `git add -A` while a subagent is working.** Stage explicit paths.
+    The manager did it at `e9d4271` and swept **23 files of an in-progress
+    pattern** into a commit whose message is about something else entirely — so
+    p10 has no commit message describing p10, and the history says a catalogue
+    edit created a pattern. Nothing was lost and the tree is green, but the
+    record is wrong and **it is not fixable by rewriting**: `97286d2` registers
+    p10's predictions and must keep *preceding* the measurement commit for that
+    registration to mean anything. Correct in a following commit, the way
+    `bb36e2f`'s message error was corrected. `git add <path> …`, always.
+12. **Ask the review for the mechanism, not just the number.** p05's review was
    asked "if five rungs emit identical mnemonics, where did the bounds check go?"
    and came back with the hoisted trip-count computation, the surviving scalar
    epilogue, the `cmove` that forces a zero remainder to a full vector width, and

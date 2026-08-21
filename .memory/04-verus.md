@@ -250,19 +250,30 @@ python3 -c "
 import json,glob
 n=0
 for f in sorted(glob.glob('results/gate/*.json')):
-    d=json.load(open(f))
-    def find(o):
+    hits=[]
+    def walk(o):
         if isinstance(o,dict):
-            if 'tcb_items' in o: return o['tcb_items']
-            for v in o.values():
-                r=find(v)
-                if r is not None: return r
-    n+=len(find(d) or [])
+            for k,v in o.items():
+                if k=='tcb_items' and isinstance(v,list): hits.append(len(v))
+                else: walk(v)
+        elif isinstance(o,list):
+            for v in o: walk(v)
+    walk(json.load(open(f)))
+    n+=sum(hits)
 print(n,'items')"
 ```
 
-At the time this correction was written that prints **62 items across 16
-patterns**. ⚠ **The denominator is recountable and the NUMERATOR is not** — "is
+⚠ **The first version of this command shipped here UNDERCOUNTED BY 3, and
+TASK_058 caught it three lines under the sentence that invokes the
+print-the-count rule.** It returned on the *first* `tcb_items` it found, and
+**p01 is the only pattern with two verified files**, so p01's `verus.rs` items
+were silently dropped. The version above sums every occurrence. **A command is
+only better than a constant if the command is right** — check yours against one
+pattern by hand before trusting the total.
+
+Dated readings from the corrected command: **65 items across 16 patterns**, and
+**68 across 17** once p10 landed. ⚠ **The denominator is recountable and the
+NUMERATOR is not** — "is
 there a vstd relocation for this item" is a judgement made against a pinned
 vstd, and the two that existed were found by hand. Do not report a fresh
 percentage without redoing that audit; report the count of items and say the
