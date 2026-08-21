@@ -217,8 +217,10 @@ Census at TASK_048, 14 patterns: **57 items / 118 lines — 25 U-license, 2 V-ga
 30 infra.**
 
 ⚠ **"NOT GAMEABLE" IS TRUE RETROSPECTIVELY AND FALSE PROSPECTIVELY** (TASK_055
-probe 2, measured; **unreviewed**). The census below is a fact about the sixteen
-patterns that exist, all of which reach unchecked memory through
+probe 2, measured; **unreviewed**). The census below is a fact about the patterns
+that existed when it ran — **14 of them, at TASK_048**, before p14 and p18; the
+line above says 14 and this sentence used to say 16 — all of which reach
+unchecked memory through
 `get_unchecked`-shaped accessors. **A pattern built on `vstd::raw_ptr` does
 not**: a verified `raw_ptr` kernel needs **zero project-local trusted items**, so
 it would publish `tcb_items = 2` — **fewer than p01's array sum** — while the
@@ -233,9 +235,38 @@ relocation almost never exists.**
 `core::ptr::copy_nonoverlapping`, `<[T]>::as_ptr`, `<[T]>::as_mut_ptr` and
 `<*const T>::add` are **all `is not supported` at the pinned vstd**. Measured
 exposure was **2 of 58 items (3.4%)** — p06's `scr_load` (removed, TCB 6 → 5) and
-p08's `copy_in` (**untried**; p02's equivalent moved codegen where p06's did not,
-so do not assume it). p09's `popcount64` is a genuine V-gap. Every other
-pattern's TCB is unchanged by the question.
+p08's `copy_in`. p09's `popcount64` is a genuine V-gap. Every other pattern's TCB
+is unchanged by the question.
+
+⚠ **BOTH named exposures are now CLOSED, so the measured exposure is `0`, and the
+denominator moved too.** p08's `copy_in` was tried at TASK_055 and landed at
+TASK_056: p08 is **TCB 4 → 3**, and its gate record now reads `identity: exact`
+at **both** opt levels — at `-O0` that is *better* than the `norel` its own
+`spec.md` expects. The census's own numbers therefore no longer describe the
+tree. **Recount rather than quoting `58` or `3.4%`:**
+
+```bash
+python3 -c "
+import json,glob
+n=0
+for f in sorted(glob.glob('results/gate/*.json')):
+    d=json.load(open(f))
+    def find(o):
+        if isinstance(o,dict):
+            if 'tcb_items' in o: return o['tcb_items']
+            for v in o.values():
+                r=find(v)
+                if r is not None: return r
+    n+=len(find(d) or [])
+print(n,'items')"
+```
+
+At the time this correction was written that prints **62 items across 16
+patterns**. ⚠ **The denominator is recountable and the NUMERATOR is not** — "is
+there a vstd relocation for this item" is a judgement made against a pinned
+vstd, and the two that existed were found by hand. Do not report a fresh
+percentage without redoing that audit; report the count of items and say the
+relocation audit is as of TASK_048.
 
 ### The tautology battery's tactics ABORT more often than the gate used to admit
 

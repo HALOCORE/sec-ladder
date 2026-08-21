@@ -1782,7 +1782,7 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
    **Consequence for the gate**: `strlen(` is a `forbidden` spelling, is absent
    from every source, and the audit reports **0 hits** while every C object calls
    it. **A text pin binds the source, not the object.** Blast radius, audited
-   across all thirteen patterns' objects: **p13 is the only one whose `forbidden`
+   across every pattern's objects: **p13 is the only one whose `forbidden`
    list the optimiser reintroduces** — `strlen` in **8 of 16** p13 objects, **0 of
    16** p12, and the other eleven forbid no library routine.
    ⚠ **That audit is only correct SCOPED TO `kernel` + `main`.** Unscoped it

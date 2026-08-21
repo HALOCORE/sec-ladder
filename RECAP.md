@@ -70,8 +70,10 @@ Rust, unsafe Rust + Verus proof — plus a sixth **R1h** hardened-C cell, across
 optimisation levels and two inline modes, and compared on assembly, executed
 instructions, timing, proof burden and trusted-base size.
 
-47 patterns are catalogued in `.memory/06-catalogue.md`. **Thirteen exist, all
-green, all thirteen reviewed:**
+47 patterns are catalogued in `.memory/06-catalogue.md`. **The ones that exist
+are the table below — all green, all reviewed.** ⚠ A spelled-out count used to
+sit on this line and it read *"thirteen"* against a sixteen-row table; count the
+rows, or run `ls -d patterns/p*/ | wc -l`.
 
 | | pattern | what it is here for |
 |---|---|---|
@@ -938,7 +940,7 @@ the number.** Two task files have already sent an agent to the wrong finding.
    `-fno-builtin-strlen`, **the sign of every same-backend C-vs-Rust row flips**.
    Consequence for the gate: `strlen(` is `forbidden`, absent from every source,
    audited at **0 hits**, and in every C object — **a text pin binds the source,
-   not the object.** Across all thirteen patterns, **p13 is the only one where the
+   not the object.** Across every pattern in the tree, **p13 is the only one where the
    optimiser reintroduces a forbidden spelling** (8 of 16 objects; p12 0 of 16).
    ⚠ That audit is only right **scoped to `kernel` + `main`** — unscoped it flags
    p12 too, because `std::env`, the backtrace machinery and `io::Error`'s
@@ -1478,8 +1480,9 @@ Both retired.
 **Verified at this handoff** — re-run these four before trusting anything below:
 
 ```bash
-harness/measure.py --check-stale          # -> 26 record(s) examined, 0 STALE
-harness/check.py p13                      # or any pattern; all 13 are green
+harness/measure.py --check-stale          # the invariant is "0 STALE"; the record
+                                          # count moves with every pattern added
+harness/check.py p13                      # or any pattern; every one is green
 grep -rho '\.tasks/TASK_[A-Za-z0-9_]*\.md' .memory/ .tasks/ RECAP.md \
   | sort -u | while read f; do [ -e "$f" ] || echo "MISSING: $f"; done
 # the shared named-spelling paragraph must be ONE hash across all patterns:
@@ -1489,13 +1492,16 @@ python3 -c "import hashlib,glob;print({hashlib.sha256(open(f).read()[open(f).rea
 - **16 patterns, all green**: p01 `PASS-WITH-BLOCKED-ROWS` (Miri policy on its
   `large.bin`, documented, not a regression); p02, p03, p04, p05, p06, p07, p08,
   p09, p11, p12, p13, p14, p16, p17, p18 `PASS`. **32 records, 0 stale.**
-- **The shared named-spelling paragraph is byte-identical across all thirteen**
-  `idiom.why` blocks — currently one hash, `59748cce2db5`, 11 003 bytes.
+- **The shared named-spelling paragraph is byte-identical across every**
+  `idiom.why` block — currently one hash, `59748cce2db5`, 11 003 bytes.
   ⚠ **The value depends on how you slice the span**, so trust the *command*
   above (all patterns equal) and not a copied constant: this line previously
   recorded `c3d36c92a28a` for the same intact invariant, measured over a span one
   byte longer. **What matters is that the set has size 1.**
-- `harness/` — `check.py` (17 stages), `asm.py`, `dloop.py`, `vparse.py`,
+- `harness/` — `check.py` (**18** stages; this line said 17 and
+  `.memory/05-layout.md` said 16 — enumerate them with
+  `grep -on 'head("[0-9]' harness/check.py`, do not copy a constant),
+  `asm.py`, `dloop.py`, `vparse.py`,
   `build.py`, `measure.py` (now writes `source_sha256` + `input_sha256` and has
   `--check-stale`), `report.py`, `fixture.py`. `common/layout/` ships the layout
   harness and `common/layout/data/` its p01 population, so finding 16 is
