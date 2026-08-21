@@ -1146,6 +1146,60 @@ n=37, `-x*` n=61 — all rank 4).
 fail, and does — it misses by **−48.000 at `m=3`**, which is how its domain got
 established.
 
+⚠ **THIRD instance on p18, and two corrections to the rule as stated above**
+(TASK_051_REVIEW, TASK_052):
+
+- **The criterion is POST-DROP RANK, not column count.** p18's proposed caveat
+  — *"a 3-column design makes every leave-one-band-out unable to fail"* — is
+  **wrong**. The cause was that **one band alone was already full rank**, so
+  dropping any *other* band changed nothing. p06 is rank 5 of 5 and its hold-out
+  fails. **Column count is not the test; the rank after the drop is.**
+- **A re-derivable hash is TAMPER-EVIDENCE, not pre-registration.** p18 replaced
+  its dead hold-out with 24 predictions committed under a `sha256` — and
+  re-running the registration script reproduces that hash byte-identically at any
+  later time. It proves the file was not altered; it proves **nothing** about
+  whether the predictions predate the measurement. **To make it real, register
+  the hash in a commit that PRECEDES the measurement commit** — git supplies the
+  ordering, the manager already commits at task boundaries, so it costs one extra
+  commit and nothing else. ⚠ And note a corollary p18 learned the hard way: a
+  **file mtime is not evidence** either — re-running a generator destroys it.
+
+### The out-of-sample test that finally worked: ADDITIVITY EXTRAPOLATION
+
+**p18, TASK_052 — the first out-of-sample test on this project that could have
+failed and did not.** Where a law has two structural parameters, **fit on rows
+where they are never observed TOGETHER, then predict the rows where both fire.**
+p18 fitted 38 rows in which `cut` and `brk` never co-occur and predicted the five
+rows where they do: **40 predictions, worst |error| 0.0228.**
+
+This has teeth where a hold-out does not, because the held-out cell is **outside
+the row space of the fit set** by construction rather than by hope — a linear
+combination of the fit rows cannot reach it. **Prefer it whenever the design has
+two or more parameters that can be varied independently.**
+
+## A per-call `Ir` law owes its DOMAIN, and the domain is usually MISSING COLUMNS
+
+**p14 and p18, and on p18 the distinction was measured.** p14's exact hardening
+law was fitted where its guard never fired; p18's exact level laws were fitted
+where `cut = brk = 0` and **a committed matrix input (`degenerate.bin`) violated
+both**, missing by up to **+8.00** against a quoted max residual of **0.029** —
+and its `R3 − R4` prediction had the **wrong sign** (−5.00 predicted, +1.00
+measured).
+
+> **Do not write the domain as a caveat. Test whether it is a missing column.**
+> On p18 the corrected design is rank 5 of 5, `max|resid|` stays 0.03, and the
+> old coefficients are **unchanged** — the published law is exactly the new law's
+> restriction to `cut = brk = 0`. Refitting the *old* two columns over all rows
+> takes the residual to **1.81…7.27** and knocks every coefficient off its
+> integer. A caveat would have hidden that.
+
+⚠ **And the parameter list is rarely complete on the first pass.** Both the
+manager's task file and the review named p18's domain as **one** condition
+(`term == nv`); the engineer measured **two** independent ones, and a band
+varying only the first would have produced a law that still missed the
+counterexample by +2 on six of eight cells. **Say explicitly which parameters you
+established and that you cannot claim the list is closed.**
+
 If the fit set is **rank `n` in an `n`-column design**, its rows span all of
 ℝⁿ — so **every** possible blob's regressor vector is a linear combination of
 blobs already fitted, and *no* blob is out of sample in regressor space. A

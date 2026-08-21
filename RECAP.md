@@ -8,8 +8,8 @@ this box is reference; this box is what to *do*.
 
 | | |
 |---|---|
-| **Patterns** | **15 of 47 exist, all green, all 15 reviewed.** |
-| **Immediate next task** | **p18 is BUILT and committed** (`18f7a28`, gate PASS complete run, 12/0, twin 13/0, Miri 9/9, `identity exact`). **`TASK_051_REVIEW` is IN FLIGHT**; report to `.tasks/TASK_051_REVIEW_REPORT.md`, notes at `.temp/r51/NOTES.md`. **Resume with `SendMessage`, do not restart.** When it lands: land corrections, *then* write `.memory/`. **Nothing about p18 is in `.memory/` yet** — rule 9. **Then:** **p10** (sliding window). ⚠ **Make settling the bug class the FIRST deliverable on every remaining pattern** — the catalogue's guess has been overturned on four (p07, p06, p14, p13 in part); **p18 is the first in five to uphold it.** |
+| **Patterns** | **16 of 47 exist, all green, all 16 reviewed.** |
+| **Immediate next task** | **the next pattern: p10** (sliding window / stencil). p18 is built, reviewed, corrected and in `.memory/`; **nothing is outstanding on it.** Write `TASK_053`. ⚠ **Make settling the bug class the FIRST deliverable** — the catalogue's guess has been overturned on four patterns (p07, p06, p14, p13 in part) and **upheld on one** (p18). ⚠ **And read `.memory/03-measurement.md`'s two new sections first**: a law owes its **domain** (usually *missing columns*, not a caveat), and the only out-of-sample test here that has ever been able to fail is **additivity extrapolation**. |
 | **The open question that is bigger than p18** | `-C debug-assertions=on` **also enables `assert_unsafe_precondition!` inside `get_unchecked`**, and **15 of 16 R4s here rest on it.** ⚠ **The manager's reading — "R4's advantage over R2 disappears" — was REFUTED**: it holds on p18 and p01 (`R4-O3d == R2-O3d` exactly) and **fails on p16**, where R4 keeps a 39% margin. **What holds on 3 of 3: at `-O3` with debug-assertions on, R4 becomes DEARER THAN R3, reversing the `-O3` ordering** (+17.0% p18, +2.4% p01, +0.6% p16). |
 | **The `O0d` question p18 opens** | An oversized shift is UB that touches **no memory**, and **ASan is silent** — but ⚠ **the manager's claim that Miri and a proof are blind too was WRONG**: **four things catch it — UBSan** (`-fsanitize=undefined` implies `-fsanitize=shift`), **`debug-assertions`, Miri** (as a **panic**, not a `ub` report — so a gate keying on the `ub` flag alone would miss it) **and Verus**. In Rust it is caught by **`debug-assertions`** and nothing else, and **every measured cell here has them OFF** (`build.py:143-148`, `OPTS = ["O0","O3"]`). The `O0d` mode that turns them on has existed since p01 and **has never been measured on any pattern**. ⚠ `O0d` is **not** semantics-matched to C `-O0` — it is a Rust-vs-Rust number only. |
 | **The null-control question, settled** | The byte-identical **R4/R5 pair is NOT a null control**: the `verus` build's kernel lands at a **fixed offset** from the `unsafe` build's, so it samples one `addr % 64` alignment contrast every time. ⚠ **That offset is a SOURCE-PATH-LENGTH artefact** — it moves if you clone the repo elsewhere — **not 0x20 and not a per-pattern constant**; both were manager generalisations and both were refuted — a **biased draw of size one**, median ≈0 over a layout population. **The floor is the layout population, not the pair.** p06's own floor is **±4.6%**, and its clang column still clears it at ~2.1×. (p06's `NOTES.md` now says ±4.6%; two later sentences in that file still say ±3% and both remain true.) |
@@ -72,6 +72,7 @@ green, all thirteen reviewed:**
 | p13 | `strncpy` truncation | a bound the optimiser can **see** outweighs the check that supplies it — and the contract pinned one side of the comparison |
 | p06 | in-place rotate | **the `Ir` column is sign-wrong** — clang's hardened rung executes *fewer* instructions and runs *slower* |
 | p14 | field split | **an exact law, fitted where the guard never fires** — and why "hardening is cheaper than the bug" is not publishable |
+| p18 | LEB128 varint | **UB that is not memory-unsafety** — four catchers, all outside the measured matrix |
 
 **If you read only one thing after this file**, read `.tasks/TASK_026.md` §0 — the
 distilled rules from the thirteen-task spelling arc. Every pattern built after it
@@ -106,6 +107,7 @@ the commands are in `.memory/01-ladder.md`'s numbering warning.
 | p13 | **14** | 25 |
 | p06 | **15** | 26 |
 | p14 | **16** | 27 |
+| p18 | **17** | 28 |
 | p01, p02 | findings 1–3 | 1–8 |
 
 Cross-cutting entries exist only here: **14** (every rung is a spelling), **16**
@@ -1035,6 +1037,50 @@ the number.** Two task files have already sent an agent to the wrong finding.
    **TCB 6 = 4 U-license + 2 infra** — TASK_048's classification's first use on
    a new pattern, and it survived review.
 
+28. **p18 — UB that is not memory-unsafety, and four catchers all outside the
+   measured matrix.** (TASK_051, reviewed at TASK_051_REVIEW — **1 blocker,
+   7 majors, 5 minors, 15 clean negatives** — corrected at TASK_052.
+   Authoritative: `.memory/01-ladder.md` **finding 17**.)
+
+   A LEB128 varint decoder with the shift bound removed. **The first bug here
+   that is UB but not a memory-safety bug**: it touches no memory and **ASan is
+   silent**. §0 **upheld the catalogue's guess — the first row in five patterns
+   to survive it.**
+
+   **Four things catch it — UBSan, `-C debug-assertions`, Miri and Verus — and
+   every one is outside the 24-cell matrix.** The manager published *"ASan, Miri
+   and a proof are all blind"* and was wrong on two of three. ⚠ **Miri catches it
+   as a PANIC, not a `Undefined Behavior` report**, so a gate keying on the `ub`
+   flag alone calls it clean.
+
+   **The row it exists for:** safe Rust with the guard deleted — **zero
+   `unsafe`** — at `-O3 -C debug-assertions=off` is **bit-identical to C's R1 on
+   every adversarial blob**.
+
+   **`R1h − R1 = 2.00·bytes`, zero fitted parameters, and it does not
+   amortise** — 11.89% of `small`'s kernel `Ir` *and* 11.11% of `large`'s.
+   p07's never-amortises result on a new axis.
+
+   ⚠ **`-C debug-assertions=on` also re-enables `assert_unsafe_precondition!`
+   inside `get_unchecked`, and 15 of 16 R4s rest on it.** The manager's reading
+   (*"R4's advantage over R2 vanishes"*) was **refuted** — true on p18 and p01,
+   **false on p16**. What holds on 3 of 3: **at `-O3` with debug-assertions on,
+   R4 becomes dearer than R3.**
+
+   ⚠ **"Verus catches this bug" is spelling-conditional** — `wrapping_shl`
+   verifies. **And the sanitizer catches the undefinedness, not the wrongness**:
+   a *defined* `<< (shift & 63)` control has R1's cost law and R1's wrong answer
+   with UBSan silent.
+
+   **Two infrastructure results.** Its blocker — an exact law with an unstated
+   domain, falsified by a **committed matrix input** — produced
+   `.memory/03-measurement.md`'s domain rule and **the first out-of-sample test
+   here that could have failed and did not** (additivity extrapolation: fit where
+   two parameters never co-occur, predict where both fire; 40 predictions, worst
+   error 0.0228). And it closed a **demonstrated gate hole** — `check.py`'s Miri
+   stage never compared exit code or stdout when `expected_exit != 0` — with a
+   committed regression check. **A second hole of the same shape is open.**
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds
@@ -1219,7 +1265,7 @@ and both copies went stale (13 and 7 against the task files' 55).
 
 ## Priority — read this before planning
 
-**Fifty tasks in, 15 of 47 patterns exist**, and the ratio is the thing to
+**Fifty-two tasks in, 16 of 47 patterns exist**, and the ratio is the thing to
 watch. Six tasks went to gate hardening before the user called it; **T015–028 —
 thirteen consecutive tasks — went to the spelling problem** and produced no new
 pattern. Both arcs paid for themselves, and neither was on anyone's plan. But the
@@ -1228,11 +1274,11 @@ wrong than at producing new ones**, and the correction is simple: **alternate
 build → review, and make a methodology proposal argue for itself against a
 pattern.**
 
-**Since T033 the loop has held** — p11, p03, p09, p12, p04, p13, p06, p14 each
-built and reviewed, every one green on its first complete run, and every one produced a
+**Since T033 the loop has held** — p11, p03, p09, p12, p04, p13, p06, p14, p18
+each built and reviewed, every one green on its first complete run, and every one produced a
 finding no one predicted. That is the working mode; do not drift off it.
-⚠ **The last four each needed a THIRD task to land their corrections** (T044, T046,
-T048, T050), and all four were worth it: p04's review moved its headline number,
+⚠ **The last five each needed a THIRD task to land their corrections** (T044, T046,
+T048, T050, T052), and all five were worth it: p04's review moved its headline number,
 p13's reversed its headline's sign, and p06's corrected two published laws and a
 `.memory/` claim that had stood since TASK_004. **Budget build → review → land,
 not build → review.** Three tasks per pattern is the real cost; plan with it.
@@ -1240,7 +1286,7 @@ not build → review.** Three tasks per pattern is the real cost; plan with it.
 The gate's threat model is **honest mistake, not malicious author**
 (`.memory/02-bench-rules.md`, top section, with the residuals deliberately left
 open). **New gate work must pass "could this happen by accident?" first** — and
-`check.py` is ~5040 lines against 15 patterns, so the next gate proposal should
+`check.py` is ~5070 lines against 16 patterns, so the next gate proposal should
 have to beat that ratio.
 
 **Review each pattern once; do not review each fix to each check.** The two
@@ -1254,20 +1300,31 @@ section is the standing backlog, not the next action.
 
 **New, from p18's cycle:**
 
-- **Three consecutive patterns have shipped an out-of-sample test that cannot
-  fail** (p13's band T, p14's LOLO, p18's hold-out *and* its hashed
-  pre-registration, which re-runs byte-identically today and is therefore
-  **tamper-evidence, not pre-registration**). `TASK_052` asks for a
-  recommendation; **whatever it lands becomes the standard and belongs in
-  `.memory/03-measurement.md`.** The cheap candidate: register the hash in a
-  commit that *precedes* the measurement commit — git supplies the ordering, the
-  manager already commits at task boundaries, so it costs one commit.
-- **Audit the other gate stages for the same shape as the `expected_exit != 0`
-  hole** — a stage that skips a comparison in one branch. One was demonstrated
-  reachable on p01/p02; nobody has looked for a second.
+- ⚠ **A SECOND gate hole of the same shape, found and reported but NOT fixed**
+  (`check.py:4405`, stage 7): `rc, so, se = run_bin(...)` binds the
+  ASan+UBSan build's **stdout**, and the name occurs exactly once in
+  `check_sanitizers` — it is never compared to `expected_stdout`, never stored,
+  never reaches the gate JSON. **Reachable by accident**: the sanitizer build is
+  a separate `-O1 -fsanitize=…` binary that stage 2's checksum agreement does not
+  cover, so a rung whose answer moves under ASan prints a different number and
+  stage 7 still says `ok … clean, exit=0`. **No reproduction built yet.**
+  (Stage 7 *also* skips the exit comparison on the `expect == "fires"` branch —
+  that one is defensible and is **not** the same defect.)
+- **Nobody has swept the remaining stages for the same shape.** Two instances
+  found in one review is the argument for looking.
 - **`O3d` is not a first-class build mode**: `ALL_OPTS` has `O0`, `O0d`, `O3` and
   no `-O3` + debug-assertions cell. p18 built it under `controls/`. A 4-line
   `build.py` change would fix it — **not made, reported.**
+- **p18's controls were never re-swept over its new band `t`** — `t_1step`,
+  `t_chain`, `t_iter`, `t_pos`, `t_wshl`, `t_cshl`, `c_mask`, `c_ncap`,
+  `c_reject`, every `*_noguard` rung and every `O0d`/`O3d` law are still
+  `cut = brk = 0` laws. **p18's own largest remaining gap**, recorded in its §8d
+  and §12. `cut`/`brk` are also `-O3 isolated` only.
+- ⚠ **`results/gate/*.partial.json` are UNTRACKED scratch and some carry
+  `FAIL`** — including a p05 record from an Aug-18 mid-edit run whose Verus
+  errors look alarming and are not live (p05's tracked record is `PASS` on a
+  complete run). **Glob `git ls-files results/gate/` — not `results/gate/*.json`
+  — when surveying verdicts.** They should arguably live under `.temp/`.
 - **p18 publishes no pair interval and its R4 side is unsearched in contract**;
   its `R3 − R4` is a fixed-R4 reading only. Same standing gap as p01 and p08.
 - **p18 has no `ns` figure for R2 or R3** (no layout population for the safe
@@ -1415,9 +1472,9 @@ grep -rho '\.tasks/TASK_[A-Za-z0-9_]*\.md' .memory/ .tasks/ RECAP.md \
 python3 -c "import hashlib,glob;print({hashlib.sha256(open(f).read()[open(f).read().find('NAMED-SPELLING STANDARD'):open(f).read().find('p01 and p08 neither')+19].encode()).hexdigest()[:12] for f in glob.glob('patterns/*/spec.md')})"
 ```
 
-- **15 patterns, all green**: p01 `PASS-WITH-BLOCKED-ROWS` (Miri policy on its
+- **16 patterns, all green**: p01 `PASS-WITH-BLOCKED-ROWS` (Miri policy on its
   `large.bin`, documented, not a regression); p02, p03, p04, p05, p06, p07, p08,
-  p09, p11, p12, p13, p14, p16, p17 `PASS`. **30 records, 0 stale.**
+  p09, p11, p12, p13, p14, p16, p17, p18 `PASS`. **32 records, 0 stale.**
 - **The shared named-spelling paragraph is byte-identical across all thirteen**
   `idiom.why` blocks — currently one hash, `59748cce2db5`, 11 003 bytes.
   ⚠ **The value depends on how you slice the span**, so trust the *command*

@@ -1955,6 +1955,61 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
    `ensures` is weakened, so the claim it tests is **"weakening the postcondition
    to `true` does not rescue the mutant"**.
 
+17. **p18 — the safety net exists and every column this project publishes has it
+   switched off; and `-O3` + debug-assertions makes R4 DEARER THAN R3.**
+   PROVISIONAL in part: ⊘ items landed at TASK_052 and have not had a second
+   review.
+
+   A LEB128 varint decoder; the omitted line bounds the shift. **The first bug
+   here that is UB but NOT a memory-safety bug** — it touches no memory, and
+   **ASan is silent**. §0 **upheld the catalogue's guessed bug class, the first
+   in five patterns to do so**, rejecting four candidates with measurements.
+
+   ⚠ **Four things catch it, and all four sit outside the 24-cell matrix:**
+   **UBSan** (`-fsanitize=undefined` implies `-fsanitize=shift`), **`-C
+   debug-assertions`**, **Miri**, and **Verus**. The manager published "ASan,
+   Miri and a proof are all blind" and was wrong on two of the three.
+   ⚠ **Miri catches it as a PANIC, not as a `Undefined Behavior` report** — a
+   gate stage keying on the `ub` flag alone would call it clean.
+
+   **The row the pattern exists for:** safe Rust with the guard deleted — **zero
+   `unsafe`** — at `-O3 -C debug-assertions=off` is **bit-identical to C's R1 on
+   every adversarial blob**, and panics at `O0d`/`O3d`.
+
+   ⊘ **`-C debug-assertions=on` also re-enables `assert_unsafe_precondition!`
+   inside `get_unchecked`, and 15 of 16 R4s here rest on it.** ⚠ **The manager's
+   reading — "R4's advantage over R2 vanishes" — is REFUTED**: `R4 == R2` exactly
+   under `O3d` on p18 and p01, and **fails on p16**, where R4 keeps a 39% margin.
+   **What holds on 3 of 3: at `-O3` with debug-assertions on, R4 becomes dearer
+   than R3, reversing the `-O3` ordering** (+17.0% p18, +2.4% p01, +0.6% p16).
+   So `O0d`/`O3d` are **not** "R4 plus a shift check", and any future rung
+   measured under them is measuring the accessor too.
+
+   **`R1h − R1 = 2.00·bytes`, zero intercept, zero per-varint, zero fitted
+   parameters** — and **the safety line runs once per input byte, so it does not
+   amortise**: 11.89% of `small`'s kernel `Ir` *and* 11.11% of `large`'s. p07's
+   never-amortises result on a new axis. `ns` over a 30-layout population per C
+   cell: **+7.14% gcc (P = 0.976) / +12.04% clang (P = 0.998)** on `small`;
+   `large`'s row is weak (P = 0.676 / 0.829) and is quoted with its P.
+
+   ⊘ **Its published laws had an unstated domain and a committed matrix input
+   violated it** — see `.memory/03-measurement.md`'s domain section, which is
+   the durable form. The corrected design is rank 5 of 5 with the old
+   coefficients unchanged.
+
+   ⚠ **"Verus catches this bug" is SPELLING-CONDITIONAL.** `wrapping_shl`
+   **verifies** at the pinned vstd (`checked_shl` / `overflowing_shl` /
+   `unchecked_shl` are `is not supported`), so the obligation attaches to the
+   **operator**, not the operation. Priced as a fiat with its domain.
+
+   **And the sanitizer catches the undefinedness, not the wrongness**: a control
+   spelling `<< (shift & 63)` — **defined** C — has R1's cost law *and* R1's
+   wrong answer, and UBSan is completely silent on it.
+
+   Sound: Verus **12/0** on the second attempt (twin 13/0), `R4 ≡ R5 exact`,
+   Miri 9/9, **TCB 3, no `assume`**. ⚠ p18 publishes **no pair interval** and its
+   **R4 side is unsearched in contract**; `R3 − R4` is a fixed-R4 reading only.
+
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how
 much proof keeps that base sound, and which C patterns resist this treatment.*
