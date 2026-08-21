@@ -476,6 +476,35 @@ alone, and this box cannot supply the wall-clock column to rescue it** — say t
 win is instruction-count-only and stop. A constant chunk size is a different
 measurement from a runtime one.
 
+### ⚠ The two conventions can differ by 13×, and p08 is where. PUBLISH THE ONE THE TABLES READ.
+
+**TASK_056, measured; unreviewed — and this one propagated from a probe report
+into a manager's task file before anyone noticed.** The section below says the
+two conventions differ and to name which. **On p08 they do not merely differ,
+they differ by an order of magnitude**, and quoting the wrong one understates a
+published price by 13×:
+
+```
+respelling p08's R4/R5 load, -O0, per call
+  kernel-exclusive `Ir` on `kernel`  (measure.py::callgrind_ir)      +2.00
+  whole-program marginal            (check.py::_callgrind_total)    +27.00
+  gate record `marginal_ir_per_call`                                +27.00
+```
+
+The mechanism is that the respelling moves work **into callees**: `index_mut`
+10+25 becomes `split_at_mut` 35+25, so +25 of the +27 never appears in
+`kernel`'s exclusive count and only +2 (an ABI shuffle) does.
+
+> **`results/tables/*.md` and every published price read
+> `marginal_ir_per_call`.** A number taken with `callgrind_ir` is a *different
+> measurement*, not a rounding of the same one. **Say which tool produced it,
+> and when they disagree publish the marginal.**
+
+⚠ **p08 is one of exactly two patterns whose own table already warns that the
+kernel-exclusive column REVERSES real comparisons** — which is precisely why it
+was the wrong column to price a p08 change with, and the warning was sitting in
+the file the whole time.
+
 ### Two `Ir` conventions are in shipped patterns — always say which
 
 p16's `NOTES.md` §2 quotes **callgrind kernel-exclusive `Ir` ÷ calls**; p05's and
@@ -566,6 +595,35 @@ symbol-independent. Where they disagree, the marginal is the one to publish.
 Note what does *not* work: the table prints no call column, and `bulk_calls` in
 the gate record names only *recognised bulk* routines — p11's
 `<CStr>::from_bytes_until_nul` never appears there.
+
+### ⚠ `harness/build.py` is hashed into the MEASUREMENT records, not just the gate records — so a `build.py` edit costs a full re-measure
+
+**TASK_056, measured. This is why `O3d` is NOT a first-class build mode.**
+
+The batching rule everyone has been using — *"a `harness/` edit makes all 16 gate
+records stale, so batch the fixes and pay one ~30-minute gate re-run"* — is
+**true of `check.py` and FALSE of `build.py`.** `build.py` is in
+`source_sha256`, so editing it makes **`results/pNN-*.json` stale too**, and
+clearing *those* means re-running callgrind over the whole matrix: **hours, not
+30 minutes.**
+
+**And the real cost is not the compute, it is the prose.** `measure.py` re-takes
+the **wall-clock** block, and this box's `ns` floor is a *session* property (see
+above): a p08 re-measure taken the same day read **~18% lower on every `large`
+cell, including cells that had not changed by a byte**. Re-measuring ten patterns
+to clear a hash would move ten patterns' published timing rows and stale every
+sentence quoting them.
+
+> **Decision recorded at TASK_056: the `O3d` mode was built, measured inert (all
+> 24 `(opt, mode, panic)` tuples byte-identical), and then REVERTED** — because
+> the choice was between a permanently red `--check-stale` (which destroys the
+> signal the project's own "before quoting any number" rule depends on) and
+> churning ten patterns' timing prose. The axis stays reachable exactly as p18
+> reached it: **build it under `controls/` with a direct `rustc` invocation.**
+
+**When to land it for real: bundled with a pattern that is being re-measured
+anyway**, so the re-measure is already being paid for. A `build.py` change is
+free *only* then.
 
 ### Staleness: `harness/measure.py --check-stale`, and why a COMMIT test is not the test
 

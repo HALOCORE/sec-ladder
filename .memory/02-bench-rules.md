@@ -134,6 +134,21 @@ costs nothing to retain. **What changes is the rule for new work:**
 
 Known residuals we are deliberately **not** closing, all measured:
 
+- **`forbidden_hits` is computed, printed, and never shouted** — the idiom audit
+  reports it and no stage fails on it. Currently **0 of 132**. **Proposed as a
+  fix at TASK_053 and DECLINED at TASK_056, with a measurement**, and the reason
+  generalises: the audit cited p05's `chunks_exact` accident as its
+  could-this-happen-by-accident precedent, and **`idiom_audit` structurally
+  cannot see that accident.** It scans `rung_sources(pdir)` only
+  (`check.py:820-834` — `c/kernel*.c` plus `MEASURED_CELLS + CONTROL_CELLS`),
+  while p05's measurements lived in `.temp/` and control variants. So
+  `forbidden_hits` was **0 throughout the accident**, exactly as it is 0 today,
+  and shouting would not have caught it.
+  ⚠ **The general form is worth more than the residual: before citing an
+  incident as an accident-test precedent, check that the proposed check could
+  have SEEN it.** p05's own `why` already says the gate does not verify that a
+  rung honours its declaration.
+
 - ~~`source_sha256` omits `patterns/*/inputs/gen.py` and `common/slb.py`~~ —
   **CLOSED at TASK_021**, with a demonstrated record move (a comment-only
   `gen.py` edit now changes `source_sha256`; before the fix it changed nothing).

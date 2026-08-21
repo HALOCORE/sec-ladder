@@ -237,6 +237,34 @@ p08's `copy_in` (**untried**; p02's equivalent moved codegen where p06's did not
 so do not assume it). p09's `popcount64` is a genuine V-gap. Every other
 pattern's TCB is unchanged by the question.
 
+### The tautology battery's tactics ABORT more often than the gate used to admit
+
+**TASK_053 found it, TASK_056 measured its true extent; unreviewed.** Stage 5c-req
+tries each `requires` conjunct under three tactics to check it is not a
+tautology. Two of the three **abort** — producing no `N verified, M errors` line
+at all — on shapes that are everywhere in this project:
+
+- **`by (bit_vector)` aborts on any clause mentioning `v@.len()`.**
+- **`by (nonlinear_arith)` aborts on any clause mentioning `old(...)`** — i.e.
+  on **every write accessor's precondition**: 8 clauses across 8 patterns (p02's
+  `copy_bytes`, p08's `move_right`, and the `*_set_unchecked` of p03, p04, p06,
+  p12, p13, p14).
+
+Until TASK_056 an aborting tactic **overwrote the real verdict**, so **51 of 52
+shipped rows recorded `verified: null, errors: null, tactic: "bit_vector",
+verdict: "not a tautology"`** on all 16 patterns. **The soundness was never
+affected** — a tactic that aborts could not have proved the clause either — but
+the record asserted a check it had not made.
+
+⚠ **The repair is NOT to fail on an abort.** That would red-line all 16 patterns,
+because the tactics are *genuinely inapplicable* to those shapes. The gate now
+records `tactics_ran` / `tactics_inapplicable` and names only tactics that ran.
+Current distribution: **41 rows ran [bare Z3, `nonlinear_arith`], 8 ran bare Z3
+alone, 1 ran all three.**
+
+**The lesson for any future battery: distinguish "the tactic said no" from "the
+tactic never ran", and never let the second overwrite the first.**
+
 ### Test the proof by breaking it — a green run proves nothing on its own
 
 Verification succeeding is not evidence that the specification says anything. Run

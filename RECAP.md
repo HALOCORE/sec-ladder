@@ -1297,36 +1297,34 @@ engineer *flagged against itself*, and a mechanism asserted without a control.
 
 ## Immediate queue
 
-**The next task is `TASK_051` — p10 or p18.** See the START HERE box; this
-section is the standing backlog, not the next action.
+**The next task is `TASK_057` — p10.** See the START HERE box; this section is
+the standing backlog, not the next action.
 
-**New, from p18's cycle:**
+### CLOSED at TASK_053–056 — history, not work
 
-- ⚠ **A SECOND gate hole of the same shape, found and reported but NOT fixed**
-  (`check.py:4405`, stage 7): `rc, so, se = run_bin(...)` binds the
-  ASan+UBSan build's **stdout**, and the name occurs exactly once in
-  `check_sanitizers` — it is never compared to `expected_stdout`, never stored,
-  never reaches the gate JSON. **Reachable by accident**: the sanitizer build is
-  a separate `-O1 -fsanitize=…` binary that stage 2's checksum agreement does not
-  cover, so a rung whose answer moves under ASan prints a different number and
-  stage 7 still says `ok … clean, exit=0`. **No reproduction built yet.**
-  (Stage 7 *also* skips the exit comparison on the `expect == "fires"` branch —
-  that one is defensible and is **not** the same defect.)
-- **Nobody has swept the remaining stages for the same shape.** Two instances
-  found in one review is the argument for looking.
-- **`O3d` is not a first-class build mode**: `ALL_OPTS` has `O0`, `O0d`, `O3` and
-  no `-O3` + debug-assertions cell. p18 built it under `controls/`. A 4-line
-  `build.py` change would fix it — **not made, reported.**
+The gate audit swept all **18** stages and found **6** defects; every one is now
+fixed or declined with a reason, on a tree that re-ran 16/16 green.
+**Do not re-open these:** the second sanitizer hole (F3) is **fixed**, with 114/114
+rows now carrying `stdout`; the tautology battery (F2) no longer lets an aborting
+tactic overwrite a real verdict; the adversarial key (F1) records all behaviours
+with their cells; the comment-in-a-clause bypass (F4) is repaired in `vparse`;
+`forbidden_hits` (F6) is **declined**, recorded as a known residual with the
+measurement. p12's, p03's, p04's, p05's, p11's and p18's sole-catcher prose is
+corrected; p08 is TCB 4 → 3 with `identity: exact` at both levels; `limbs.py`
+lives in `harness/`; the `.partial.json` trap is gone (they now write to
+`.temp/gate-partial/`).
+⚠ **`O3d` was built, measured inert, and REVERTED** — see
+`.memory/03-measurement.md`: `build.py` is hashed into the *measurement* records
+too, so landing it costs a full re-measure and would churn ten patterns' timing
+prose. **Land it bundled with a pattern that is being re-measured anyway.**
+
+**Still open, from p18's cycle:**
+
 - **p18's controls were never re-swept over its new band `t`** — `t_1step`,
   `t_chain`, `t_iter`, `t_pos`, `t_wshl`, `t_cshl`, `c_mask`, `c_ncap`,
   `c_reject`, every `*_noguard` rung and every `O0d`/`O3d` law are still
   `cut = brk = 0` laws. **p18's own largest remaining gap**, recorded in its §8d
   and §12. `cut`/`brk` are also `-O3 isolated` only.
-- ⚠ **`results/gate/*.partial.json` are UNTRACKED scratch and some carry
-  `FAIL`** — including a p05 record from an Aug-18 mid-edit run whose Verus
-  errors look alarming and are not live (p05's tracked record is `PASS` on a
-  complete run). **Glob `git ls-files results/gate/` — not `results/gate/*.json`
-  — when surveying verdicts.** They should arguably live under `.temp/`.
 - **p18 publishes no pair interval and its R4 side is unsearched in contract**;
   its `R3 − R4` is a fixed-R4 reading only. Same standing gap as p01 and p08.
 - **p18 has no `ns` figure for R2 or R3** (no layout population for the safe
@@ -1344,10 +1342,17 @@ section is the standing backlog, not the next action.
   consecutive runs. p06 §7 records that cell as `0, 497`. The `c-gcc` instability
   beside it is documented (six observations); **this one is new and undocumented,
   and build-varying is a different mechanism from run-varying.**
-- **`vstd::raw_ptr` as the route to a provable R4 for a lifetime bug is
-  untried.** It is the one thing standing between this project and its first
-  lifetime-bug pattern. Expected to fail (a stack local cannot supply a
-  `PointsTo`), **but nobody has run it.**
+- ⚠ **THE LIFETIME PATTERN IS UNBLOCKED AND UNBUILT — the biggest open
+  opportunity here.** `vstd::raw_ptr` **works** (TASK_055, unreviewed): a heap
+  kernel verifies **3/0** at **`exact` at O3 / `norel` at O0** with **zero
+  project-local trusted items**; p14's rejection reason is refuted (`add`/`offset`
+  are unsupported but **`addr`/`with_addr` are**). Stack locals are out
+  (`SharedReference::new` is private). Reproducibility is solved: **fold from
+  offset 16**, past glibc's tcache metadata. The formulation to build is a **slab
+  with pointer handles at R4/R5 and `(slot, generation)` at R1h/R2/R3**, so safe
+  Rust's cost is a **representation change, not a check** — an axis this project
+  has never had. ⚠ **Settle the TCB counting FIRST** (`.memory/04-verus.md`): such
+  a pattern publishes `tcb_items = 2`, fewer than p01's array sum.
 - **p14's `-O0` rows are unexplained** (R3 dearer than R2 there, sign inverting
   at `-O3`) and **clang's `R1h − R1` law is unsolved** — mechanism and mnemonic
   table only, no closed form. No claim rests on either.
@@ -1360,37 +1365,6 @@ Both retired.
 
 **New, from p06's cycle:**
 
-- ⚠ **THE SOLE-CATCHER AUDIT IS DONE (TASK_054) AND IT FOUND SIX, NOT ONE.**
-  p06 and p12 are **fixed**; **p03, p04, p05, p11 and p18 still carry the false
-  claim** — and **p05 contradicts itself**, printing both `[proof-pin]` FAILs
-  about twenty lines from the sentence that denies them. p16, p17, p09 and p02
-  are **clean negatives**; p01 and p07 make no such claim. Full measured table:
-  `.tasks/TASK_054_REPORT.md` §3. **Fixing the five is prose only — fold it into
-  the batched gate re-run** so the ~30-minute cost is paid once.
-  **The rule, sharper than the one the manager proposed, and it is about the
-  MUTANT'S CONSTRUCTION rather than the gate:** every `spec.md` pins the
-  **twin's** clause text in `verus.items` alongside the trusted item's, so the
-  canonical weakening (item *and* twin) moves **two** pinned clauses and fails
-  stage **5a**, which runs **before** 5c-twin. **The twin is the sole catcher
-  only of a mutant that edits `spec.md` in the same commit** — p16/p17/p09/p02
-  build them that way, the other six do not. *"Verus alone is blind"* is true
-  every time; only the gate conclusion was wrong. Also say whether `identity`
-  moved: a `requires` edit is ghost and **cannot** (p12 byte-identical), an
-  exec-code edit **can** (p06's `b_scrmod_msonly`).
-  ⚠ **Not yet in `.memory/`** — rule 9, unreviewed.
-- **p12 says it is "the second pattern to exercise this on a WRITE (p03 is the
-  first)". It is the FIRST** — p03's and p04's mutants both weaken a *read*
-  accessor. Measured at TASK_054, reported not fixed (out of that task's scope).
-- **`.temp/p54/limbs.py` should probably live in `harness/`.** It re-derives
-  `check.py`'s pin comparison across **eight** limbs, it is pattern-agnostic, and
-  **six patterns now need it** to substantiate a published sentence. Today it is
-  gitignored scratch, so those patterns cite a file the repo does not contain —
-  the same trap `p06/controls/clayout.py` was created to avoid. **Decide with
-  the `TASK_053` batch.**
-- **p08's `copy_in` is the one remaining relocatable TCB item** (4 → 3). Untried.
-  ⚠ **Do not assume it is free**: p06's removal was byte-identical at `-O3`,
-  p02's moved codegen by `+5.00 Ir/call` and broke `identity: exact`. The
-  discriminator is what **R4's body** spells.
 - **`b_nored`'s Verus failure is a resource-exhaustion, not an obligation**, and
   `--rlimit 30/60` does not convert it. A mutant that dies of rlimit is a weaker
   control than one that fails on a named obligation, and the pinned counts hide

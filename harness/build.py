@@ -26,15 +26,6 @@ separately if used:
   --opt O0d                 Rust with debug-assertions=ON. This is NOT
                             semantics-matched to C -O0: it inserts integer
                             overflow checks. Never compare it to a C column.
-  --opt O3d                 Rust at opt-level=3 with debug-assertions=ON. Same
-                            warning, and it is the one a COST claim about the
-                            safety net needs: `.memory/01-ladder.md` forbids a
-                            perf claim resting on an `O0` row, and `O0d - O0` is
-                            a difference of two `O0` rows. p18 measured that the
-                            `O3d` answer is not the `O0d` answer and had to
-                            build it under `controls/` with a direct rustc
-                            invocation because the axis did not exist
-                            (p18/NOTES.md 5b). It is a RUST-VS-RUST axis only.
   --panic abort             deletes landing pads; a real safety-cost lever
 
 Outputs land in `.temp/build/<pNN>/<cell>-<opt>-<mode>[-abort]`, never in the
@@ -73,12 +64,8 @@ CONTROL_CELLS = ["safe_naive_verus"]
 # For argparse only -- every cell name that exists anywhere. What a *pattern*
 # builds is measured_cells(pdir) / all_cells(pdir).
 ALL_CELLS = MEASURED_CELLS + HARDENED_CELLS + CONTROL_CELLS
-# The default matrix. `O0d` and `O3d` are opt-in and MUST NOT enter it: both
-# are `debug-assertions=on`, which is not semantics-matched to C `-O0` (see the
-# module docstring), so a default that contained them would put a C column and
-# an overflow-checked Rust column in the same table.
 OPTS = ["O0", "O3"]
-ALL_OPTS = ["O0", "O0d", "O3", "O3d"]
+ALL_OPTS = ["O0", "O0d", "O3"]
 MODES = ["isolated", "whole"]
 
 # Rung -> source stem. `c-gcc` and `c-clang` share c/.
@@ -139,9 +126,6 @@ def out_path(pdir, cell, opt, mode, panic):
 
 def c_flags(opt, mode, panic):
     f = ["-std=c99", "-Wall", "-Wextra"]
-    # `O0d`/`O3d` are Rust-only axes (debug-assertions); on the C side they are
-    # just their base optimisation level, and nothing should be comparing them
-    # to a C column anyway (module docstring).
     f.append("-O0" if opt in ("O0", "O0d") else "-O3")
     if mode == "isolated":
         # SLB_ISOLATED turns on __attribute__((noinline)) for the kernel; the
@@ -160,10 +144,6 @@ def rust_flags(opt, mode, panic):
         f += ["-C", "opt-level=0", "-C", "debug-assertions=off"]
     elif opt == "O0d":
         f += ["-C", "opt-level=0", "-C", "debug-assertions=on"]
-    elif opt == "O3d":
-        # TASK_056, from p18/NOTES.md 5b. NOT in the default 24, and NOT
-        # semantics-matched to C `-O0` -- a Rust-vs-Rust axis only.
-        f += ["-C", "opt-level=3", "-C", "debug-assertions=on"]
     else:
         f += ["-C", "opt-level=3", "-C", "debug-assertions=off"]
     if mode == "isolated":
