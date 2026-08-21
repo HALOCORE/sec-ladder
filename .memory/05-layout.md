@@ -268,7 +268,13 @@ mentions. Budget for them up front; each has cost an engineer a surprise.
 Stage list, so a failure name maps to a function: `selftests`, `build`,
 `checksums`, `no_collapse`, `marginal_ir`, `identity`, `adversarial`,
 `verus_contract`, `call_site`, `clause_deletion`, `requires_strength`,
-`trusted_twins`, `proof_domain`, `driver_identity`, `sanitizers`, `miri`.
+`trusted_twins`, `proof_domain`, `driver_identity`, `sanitizers`, `miri`,
+**`idiom`** (stage 0b, reporting-only) and **`derive_contract`** (stage 5d0).
+
+⚠ **This list said SIXTEEN until TASK_053 and there are EIGHTEEN** — the two in
+bold were missing, and the sweep that found them found live defects in three
+other stages at the same time. **If you are auditing the gate, enumerate from
+`check.py`'s `head()` calls, not from this list.**
 
 ## What is committed
 
