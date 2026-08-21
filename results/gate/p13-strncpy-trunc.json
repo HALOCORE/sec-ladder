@@ -124,7 +124,7 @@
     "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
-    "harness/build.py": "9019be5de10f74dd45f170f7c7ce95b941ded35ccc78c937f729affdd9a07954",
+    "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
     "harness/check.py": "28f91dff8192a28ba681ce3b0e078589e0a568c3bfd6e6c3b0fa73ade67f353c",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
@@ -1112,6 +1112,7 @@
         "stderr": "",
         "signal": null,
         "cells": [
+          "O0/whole",
           "O3/whole"
         ],
         "model_exit": 0,
@@ -1124,7 +1125,6 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole",
           "O3/isolated"
         ],
         "model_exit": 0,
@@ -1417,6 +1417,7 @@
         "stderr": "",
         "signal": null,
         "cells": [
+          "O0/whole",
           "O3/whole"
         ],
         "model_exit": 0,
@@ -1429,7 +1430,6 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole",
           "O3/isolated"
         ],
         "model_exit": 0,
@@ -1586,6 +1586,7 @@
         "stderr": "",
         "signal": null,
         "cells": [
+          "O0/whole",
           "O3/isolated"
         ],
         "model_exit": 0,
@@ -1610,7 +1611,6 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole",
           "O3/whole"
         ],
         "model_exit": 0,
@@ -1745,7 +1745,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f64f0200040 with insufficient space for an obj",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f0684400040 with insufficient space for an obj",
       "stdout": "",
       "model_stdout": "16725268236661028992"
     },
@@ -1754,7 +1754,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f7f16e00040 with insufficient space for an obj",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f2659c00040 with insufficient space for an obj",
       "stdout": "",
       "model_stdout": "11140422339664390272"
     },
@@ -1772,7 +1772,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f4837200040 with insufficient space for an obj",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f6e55a00040 with insufficient space for an obj",
       "stdout": "",
       "model_stdout": "8714310972305648768"
     },
@@ -1781,7 +1781,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7ff644400040 with insufficient space for an obj",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f1d12000040 with insufficient space for an obj",
       "stdout": "",
       "model_stdout": "8714310972305648768"
     },

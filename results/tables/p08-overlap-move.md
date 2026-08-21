@@ -1,6 +1,6 @@
 # p08-overlap-move — results
 
-Generated 2026-08-21T07:58:49Z from `results/p08-overlap-move.json` (git `91e4ff082c51`, working tree dirty).
+Generated 2026-08-21T08:31:07Z from `results/p08-overlap-move.json` (git `265753136a7c`, working tree dirty).
 
 ## Toolchain
 
@@ -135,26 +135,26 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 ## Wall clock (secondary)
 
-> taskset -c 5, interleaved round-robin, 31 reps, min and median; frequency scaling on, shared box. Frequency scaling is on and cannot be disabled without root; the box is shared and containerised. Wall clock is a sanity check on `Ir`, never the headline. Times include process start-up and reading the input file.
+> taskset -c 3, interleaved round-robin, 30 reps, min and median; frequency scaling on, shared box. Frequency scaling is on and cannot be disabled without root; the box is shared and containerised. Wall clock is a sanity check on `Ir`, never the headline. Times include process start-up and reading the input file.
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 59.57 | 60.35 | 1.3% | 13.92 | 14.13 | 1.5% |
-| c-gcc | whole | 59.47 | 60.30 | 1.4% | 13.91 | 14.06 | 1.1% |
-| c-clang | isolated | 59.60 | 60.31 | 1.2% | 13.75 | 13.88 | 0.9% |
-| c-clang | whole | 59.62 | 60.35 | 1.2% | 13.76 | 13.96 | 1.4% |
-| safe_naive | isolated | 96.10 | 97.36 | 1.3% | 28.37 | 28.63 | 0.9% |
-| safe_naive | whole | 86.16 | 87.09 | 1.1% | 24.50 | 24.91 | 1.7% |
-| safe_tuned | isolated | 59.53 | 60.58 | 1.8% | 13.89 | 14.01 | 0.9% |
-| safe_tuned | whole | 59.61 | 60.65 | 1.7% | 13.92 | 14.05 | 0.9% |
-| unsafe | isolated | 59.51 | 60.52 | 1.7% | 13.88 | 14.05 | 1.2% |
-| unsafe | whole | 59.92 | 60.49 | 1.0% | 13.99 | 14.12 | 0.9% |
-| verus | isolated | 59.91 | 60.50 | 1.0% | 13.87 | 14.05 | 1.3% |
-| verus | whole | 59.85 | 60.33 | 0.8% | 13.91 | 14.14 | 1.6% |
-| c-gcc-h | isolated | 59.42 | 60.15 | 1.2% | 13.92 | 14.14 | 1.6% |
-| c-gcc-h | whole | 59.78 | 60.29 | 0.9% | 13.93 | 14.13 | 1.4% |
-| c-clang-h | isolated | 59.74 | 60.34 | 1.0% | 13.73 | 13.91 | 1.3% |
-| c-clang-h | whole | 59.39 | 60.41 | 1.7% | 13.73 | 13.90 | 1.2% |
+| c-gcc | isolated | 58.99 | 59.61 | 1.0% | 13.86 | 14.09 | 1.7% |
+| c-gcc | whole | 58.65 | 59.80 | 2.0% | 13.92 | 14.06 | 1.0% |
+| c-clang | isolated | 59.12 | 59.78 | 1.1% | 13.76 | 13.89 | 0.9% |
+| c-clang | whole | 59.26 | 59.71 | 0.8% | 13.75 | 13.90 | 1.1% |
+| safe_naive | isolated | 95.66 | 96.70 | 1.1% | 28.44 | 28.67 | 0.8% |
+| safe_naive | whole | 85.28 | 86.77 | 1.7% | 24.56 | 24.85 | 1.2% |
+| safe_tuned | isolated | 59.10 | 60.10 | 1.7% | 13.85 | 14.08 | 1.6% |
+| safe_tuned | whole | 59.49 | 59.91 | 0.7% | 13.90 | 14.07 | 1.2% |
+| unsafe | isolated | 59.12 | 59.95 | 1.4% | 13.86 | 13.96 | 0.7% |
+| unsafe | whole | 59.49 | 60.07 | 1.0% | 13.93 | 14.08 | 1.0% |
+| verus | isolated | 59.16 | 59.93 | 1.3% | 13.85 | 14.04 | 1.3% |
+| verus | whole | 59.15 | 59.77 | 1.0% | 13.88 | 14.09 | 1.5% |
+| c-gcc-h | isolated | 59.09 | 59.57 | 0.8% | 13.92 | 14.16 | 1.7% |
+| c-gcc-h | whole | 59.39 | 59.90 | 0.8% | 13.89 | 14.04 | 1.1% |
+| c-clang-h | isolated | 58.82 | 59.70 | 1.5% | 13.66 | 13.87 | 1.5% |
+| c-clang-h | whole | 59.45 | 59.75 | 0.5% | 13.73 | 13.92 | 1.4% |
 
 Every wall-clock cell is within the 10% min-to-median spread threshold.
 

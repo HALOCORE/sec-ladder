@@ -141,7 +141,7 @@
     "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
-    "harness/build.py": "9019be5de10f74dd45f170f7c7ce95b941ded35ccc78c937f729affdd9a07954",
+    "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
     "harness/check.py": "28f91dff8192a28ba681ce3b0e078589e0a568c3bfd6e6c3b0fa73ade67f353c",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
@@ -980,7 +980,7 @@
       },
       {
         "exit": -6,
-        "stdout": "11805005201546037750",
+        "stdout": "2031408573467117409",
         "stderr": "*** stack smashing detected ***: terminated",
         "signal": 6,
         "cells": [
@@ -1006,6 +1006,18 @@
       },
       {
         "exit": 0,
+        "stdout": "11406004536867057005",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "10384349632315276160",
+        "diverges": true
+      },
+      {
+        "exit": 0,
         "stdout": "3987011862919846528",
         "stderr": "",
         "signal": null,
@@ -1023,18 +1035,6 @@
         "signal": null,
         "cells": [
           "O3/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "10384349632315276160",
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "5334021454490573295",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "10384349632315276160",
@@ -1431,7 +1431,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7f058f800060 with insufficient space for an object of type 'u",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7fc609c00060 with insufficient space for an object of type 'u",
       "stdout": "",
       "model_stdout": "9876901382056522496"
     },
@@ -1440,7 +1440,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 111 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7fdaa540008f with insufficient space for an object of type '",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 111 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7fd86ac0008f with insufficient space for an object of type '",
       "stdout": "",
       "model_stdout": "10384349632315276160"
     },
@@ -1449,7 +1449,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 99999 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7fbce3e186bf with insufficient space for an object of type",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 99999 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7fa1c82186bf with insufficient space for an object of type",
       "stdout": "",
       "model_stdout": "3401318320220520064"
     },

@@ -111,7 +111,7 @@
     "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
-    "harness/build.py": "9019be5de10f74dd45f170f7c7ce95b941ded35ccc78c937f729affdd9a07954",
+    "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
     "harness/check.py": "28f91dff8192a28ba681ce3b0e078589e0a568c3bfd6e6c3b0fa73ade67f353c",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
