@@ -21,11 +21,14 @@
 //!
 //! **The window reslice is the TWO-STEP form** (`.memory/01-ladder.md`
 //! finding 3, the p04 lever): `buf.split_at(off).1.split_at(len).0` rather than
-//! `&buf[off..off + len]`. Both keep both bounds checks; the two-step form is
-//! one instruction cheaper because `buf_len - off` is computed in place in a
-//! register that is dead afterwards while `off + len` needs a scratch one.
-//! ../NOTES.md 8 reports what it is worth here -- **including a clean negative
-//! if it is worth nothing**, which retires a standing backlog item either way.
+//! `&buf[off..off + len]`. Both keep both bounds checks and both contribute the
+//! same **two** panic landing pads, so the difference is not check removal.
+//! ⚠ **What is measured here is exactly `-1.00 Ir/call`, on both blobs, and
+//! `.memory/03-measurement.md` says a one-instruction win is
+//! INSTRUCTION-COUNT-ONLY and this box cannot supply the wall-clock column to
+//! rescue it.** So p10 confirms finding 3's sign and magnitude and **does not
+//! retire the backlog item** -- an earlier draft of ../NOTES.md 8d said it did,
+//! and that is retracted at ../NOTES.md 14.
 //!
 //! **TWO MORE IN-CONTRACT R3 SPELLINGS ARE MEASURED AND PUBLISHED BESIDE THIS
 //! ONE** (`.memory/01-ladder.md` finding 3, which four patterns have got wrong

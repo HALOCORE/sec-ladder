@@ -78,12 +78,18 @@ C_CELLS = {
     "c-clang-h": (CLANG, "kernel_hardened.c"),
 }
 # p10's `ns` question is not p18's. p18 asked C-vs-C (the price of the hardening
-# line); p10's hardening line is FREE on gcc and 1.00 Ir on clang, so the C
-# question is a null and the interesting pair is **safe_tuned vs unsafe** -- the
-# rung pair whose `Ir` gap is negative (safe Rust cheaper than unsafe Rust by
-# 323.00 / 603.00 Ir per call). `.memory/03-measurement.md` forbids an `ns`
-# claim without a layout population, so all four Rust cells are in the
-# population and not just the R4/R5 pair.
+# line); p10's hardening line costs 0.00 Ir on gcc and 1.00 on clang at
+# `-O3 isolated` on the accepting domain (and -1.00 / 0.00 at `-O3 whole`;
+# ../NOTES.md 4 has all four cells), so the C question is a null and the
+# interesting pair is **safe_tuned vs unsafe** -- the rung pair whose `Ir` gap is
+# negative, by 323.00 / 603.00 Ir per call at `-O3 isolated` against the SHIPPED
+# R4 and 129.00 / 241.00 against the cheapest R4 shown admissible
+# (../NOTES.md 8e). `.memory/03-measurement.md` forbids an `ns` claim without a
+# layout population, so all four Rust cells are in the population and not just
+# the R4/R5 pair.
+# ⚠ ONE LANGUAGE PER INVOCATION, so the C and Rust runs are different timing
+# sessions and `.memory/00-environment.md` forbids quoting a number across them.
+# p10 makes no Rust-vs-C `ns` claim anywhere for exactly that reason.
 RUST_CELLS = ("safe_naive", "safe_tuned", "unsafe", "verus")
 
 

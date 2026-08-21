@@ -13,19 +13,39 @@
 //! whatever the header asks for -- and `verus.rs` stops verifying. ../NOTES.md
 //! 10 has that mutant.
 //!
-//! ⚠ **AT `-O3` THIS RUNG'S TAP LOOP IS BYTE-IDENTICAL TO R2's IN ITS
-//! VECTORISED BODY** -- the same seventeen-instruction SSE2 sequence per eight
-//! taps. The difference between safe and unsafe here lives entirely in the
-//! scalar epilogue (`taps mod 8` taps per output) and in a 22-instruction
-//! per-output guard R2 pays and this rung does not. ../NOTES.md 8.
-//!
-//! ⚠ **AND SAFE RUST IS CHEAPER PER SCALAR-EPILOGUE TAP THAN THIS RUNG IS** --
-//! 7.00 against 9.00 -- because `windows()`+`zip()` hands the epilogue two
-//! consumed iterators where this rung's index arithmetic hands it three pointer
-//! bumps. That is a *fixed-R4* comparison and nothing more
-//! (`.memory/01-ladder.md` finding 14): it bounds
-//! `inf(in-contract R3) - R4ship` and does not bound the class.
+//! ⚠ **AT `-O3` THIS RUNG'S VECTORISED TAP BODY IS THE SAME SEVENTEEN SSE2
+//! INSTRUCTIONS AS R2's, IN THE SAME MNEMONIC ORDER -- but NOT byte-identical**
+//! (the register allocation differs; an earlier draft of this comment said
+//! "byte-identical" and that was wrong, ../NOTES.md 1). The difference between
+//! safe and unsafe lives in the scalar epilogue (`taps mod 8` taps per output)
+//! and in a **24**-instruction per-output guard R2 pays and this rung does not
+//! -- 24 counted on the shipped listing; a day-one probe with a different guard
+//! structure gave 22, so the number is a property of a spelling.
 //! ../NOTES.md 8c.
+//!
+//! ⚠ **THIS RUNG IS DEARER THAN SAFE `windows()+zip()`, AND NOT BECAUSE OF A
+//! BOUNDS CHECK.** Both figures are `-O3`, and BOTH MODES ARE QUOTED because
+//! the mechanism is different in each (../NOTES.md 8b, 8b3):
+//!
+//! * `isolated`: this rung and R3 cost the SAME 9 instructions per epilogue tap
+//!   -- the `scaltap` coefficient of `R3 - R4` is exactly **0.00** -- and the
+//!   whole margin is **-5.00 Ir per OUTPUT**, four outer induction variables and
+//!   two stack reloads against R3's one advancing pointer.
+//! * `whole`: the per-output difference vanishes (26.00 both) and the same cause
+//!   reappears in the epilogue as **-2.00 Ir per epilogue tap**, R3's 7 against
+//!   this rung's 9 -- two `lea`s re-forming `off + sb + i + j` and `off + 8 + j`
+//!   every tap.
+//!
+//! **It is the index expression and not the safety**: `c-clang`, idiomatic C
+//! with no bounds check anywhere and the same four-term index, fits `nout` at
+//! **30.00** isolated -- dearer per output than BOTH Rust rungs -- and matches
+//! R3 exactly in `whole` (26.00/output, 7/epilogue tap).
+//!
+//! ⚠ **The 7.00-against-9.00 figure this comment used to carry was the day-one
+//! probe's, not the shipped cells'**, and it flattered the pattern's headline;
+//! it is retracted at ../NOTES.md 14. All of the above is still a *fixed-R4*
+//! comparison (`.memory/01-ladder.md` finding 14) -- see ../NOTES.md 8e for the
+//! admissible cheaper R4 (`u_win`) and the span it opens.
 //!
 //! **`#[cfg(slb_isolated)] inline(never)`** matches every other rung, so the
 //! `isolated` column measures a real call in all seven cells.

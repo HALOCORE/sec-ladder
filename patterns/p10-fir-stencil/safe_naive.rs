@@ -7,12 +7,16 @@
 //!
 //! ⚠ **AND THE PRICE IS NOT WHAT IT LOOKS LIKE, WHICH IS THE PATTERN'S
 //! RESULT.** At `-O3` LLVM vectorises this loop -- an SSE2 body of seventeen
-//! instructions per eight taps, **byte-identical to `unsafe.rs`'s** -- and the
+//! instructions per eight taps, the **same seventeen mnemonics in the same
+//! order** as `unsafe.rs`'s but **not byte-identical** (the register allocation
+//! differs; ../NOTES.md 1 retracts an earlier "byte-identical" here) -- and the
 //! per-tap bounds checks survive only in the **scalar epilogue**, `taps mod 8`
 //! of them per output. What R2 pays instead of a per-tap check is a
-//! **22-instruction per-output `cmp`/`cmov` chain** computing how many taps may
-//! be vectorised without a bounds violation. So the tax is per OUTPUT and per
-//! EPILOGUE TAP, and **0.00 per vectorised tap**. ../NOTES.md 8.
+//! **24-instruction per-output `cmp`/`cmov` chain** computing how many taps may
+//! be vectorised without a bounds violation (24 on the shipped listing; a
+//! day-one probe with a different guard structure gave 22, so the count is a
+//! property of a spelling). So the tax is per OUTPUT and per EPILOGUE TAP, and
+//! **0.00 per vectorised tap**, at `-O3 isolated`. ../NOTES.md 8.
 //!
 //! **The tap loop's spelling is deliberately not pinned** (../spec.md's `idiom`
 //! block): indexed, `windows()` and `get_unchecked` are all in contract, and

@@ -13,10 +13,21 @@
  * in one opcode byte (`ja` -> `jae`) and in nothing else. ../NOTES.md 4
  * measures it, at both optimisation levels and on both compilers, rather than
  * asserting it -- and a zero there is a RESULT and not an absence of one: it is
- * the first hardening in this project that is free, and the reason is
- * structural rather than a property of this box (contrast p08's
- * `R1 == R1h at 0.00 Ir/call`, which is a glibc property and must never be
- * quoted as "memmove is free").
+ * the first hardening in this project whose cost is zero BECAUSE R1 ALREADY
+ * PERFORMS THE COMPARISON, structurally rather than as a property of this box
+ * (contrast p08's `R1 == R1h at 0.00 Ir/call`, which is a glibc property and
+ * must never be quoted as "memmove is free").
+ *
+ * ⚠ **"FREE" IS A MODE- AND DOMAIN-QUALIFIED STATEMENT AND MUST BE QUOTED WITH
+ * BOTH** (../NOTES.md 4). The four numbers, all `-O3`:
+ *
+ *     gcc    isolated  0.00/call    whole  -1.00/call   (hardened CHEAPER)
+ *     clang  isolated +1.00/call    whole   0.00/call
+ *
+ * and outside the ACCEPTING domain -- a call the guards reject -- clang's
+ * figure is **-2.00 per rejected call**, so on a fully rejecting blob the
+ * hardened cell is 1.00 Ir/call CHEAPER, not dearer. `+1.00 flat` is true only
+ * at `-O3 isolated` on inputs where every visited window is accepted.
  *
  * **THE COMPARISON IS LEGAL ON EVERY INPUT IT IS MEASURED ON.**
  * `.memory/02-bench-rules.md`'s first rule -- never compare cost on an input

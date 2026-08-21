@@ -48,6 +48,28 @@ so they are a property of the file the measurement used:
             whole safe-vs-unsafe difference lives (../NOTES.md 8)
     novec   1 iff floor(taps/8) == 0, i.e. the vector loop is never entered at
             all -- a separate REGIME, not a point on the same line
+
+REJECTED CALLS ARE REGRESSORS TOO -- the DOMAIN columns (TASK_057_REVIEW M4,
+`.memory/03-measurement.md`: *"do not write the domain as a caveat; test whether
+it is a missing column"*). Every `sweep-*` blob accepts every window it visits,
+so the laws TASK_057 published were fitted on a domain in which these three
+columns are identically zero and are exact only there:
+
+    rejwin   calls rejected by the WINDOW GUARD `n < taps`. All seven rungs
+             reject; the call costs a header decode, one compare and a return.
+    rejfar   calls rejected by the SAFETY LINE with `last > len`. All seven
+             rungs reject, R1 included -- its `last > len` is the same test.
+             Costs `rejwin` plus the `last` computation and a second compare.
+    fence    calls with `last == len` EXACTLY. This is p10's bug: the six
+             guarded cells reject exactly as they do on `rejfar`, and **R1
+             accepts and runs the whole tap loop over a stolen byte**. No
+             `R1h - R1` law is fitted here -- `.memory/02-bench-rules.md`'s
+             first rule forbids costing a pair where the unhardened rung
+             commits UB -- and the column exists so that exclusion is a
+             MEASURED domain boundary rather than a sentence.
+
+`controls/gen_domain.py` writes blobs that turn each of these on, alone and
+mixed; `--inputs` points this script at them.
 """
 import argparse
 import glob
@@ -78,7 +100,11 @@ CELLS = ["c-gcc", "c-gcc-h", "c-clang", "c-clang-h",
          "safe_naive", "safe_tuned", "unsafe", "verus"]
 
 BANDS = {"r": "sweep-r*.bin", "o": "sweep-o*.bin", "e": "sweep-e*.bin",
-         "h": "sweep-h*.bin", "all": "sweep-*.bin"}
+         "h": "sweep-h*.bin", "all": "sweep-*.bin",
+         # band `d` lives in controls/gen_domain.py's output directory, not in
+         # inputs/ -- it is a DOMAIN band, not a measured input, and adding it
+         # to inputs/ would move `input_sha256` on every committed record.
+         "d": "d-*.bin"}
 
 HDR = 8
 
@@ -110,12 +136,22 @@ def marginal(binary, blob, n1, n2):
 
 
 def _win_shape(blob, off, stride):
+    """(nout, taps, class) for one window, where `class` names WHICH guard
+    rejected it -- the domain columns of ../NOTES.md 8b2."""
     n = int.from_bytes(blob[off:off + 4], "little")
     r = int.from_bytes(blob[off + 4:off + 8], "little")
     taps = 2 * r + 1
-    if n < taps or 8 + taps + n - 1 >= stride:
-        return 0, taps
-    return n - 2 * r, taps
+    if n < taps:
+        return 0, taps, "rejwin"
+    last = 8 + taps + n - 1
+    if last > stride:
+        return 0, taps, "rejfar"
+    if last == stride:
+        # p10's bug lives here and NOWHERE else: `last >= len` rejects,
+        # `last > len` does not. The six guarded cells behave exactly as on
+        # `rejfar`; c-gcc/c-clang run the whole call over one stolen byte.
+        return 0, taps, "fence"
+    return n - 2 * r, taps, "acc"
 
 
 def shape(blob_path, n1=None, n2=None, width=8):
@@ -134,12 +170,14 @@ def shape(blob_path, n1=None, n2=None, width=8):
     n2 = f.n_iters if n2 is None else n2
     if not (HDR <= stride <= n_blob):
         return {"nout": 0, "taps": 0, "vecit": 0, "scaltap": 0, "novec": 0,
+                "novecout": 0, "v16": 0, "h8": 0, "t8": 0, "nov16out": 0,
+                "rejwin": 0, "rejfar": 0, "fence": 0, "rej": 0,
                 "stride": stride, "nwin": 0}
     nwin = n_blob // stride
     sh = [_win_shape(body, k * stride, stride) for k in range(nwin)]
     acc = 0
     keys = ("nout", "taps", "vecit", "scaltap", "novec", "novecout",
-            "v16", "h8", "t8", "nov16out")
+            "v16", "h8", "t8", "nov16out", "rejwin", "rejfar", "fence", "rej")
     tot = {k: 0 for k in keys}
     at_n1 = None
     MASK = (1 << 64) - 1
@@ -149,7 +187,15 @@ def shape(blob_path, n1=None, n2=None, width=8):
         if it == n1:
             at_n1 = dict(tot)
         k = (acc * nwin) >> 64
-        nout, taps = sh[k]
+        nout, taps, cls = sh[k]
+        # THE DOMAIN COLUMNS. A rejected call still costs the header decode and
+        # its guard, so it is a row of the design and not an outlier; which
+        # guard rejected decides HOW much (rejfar/fence pay `last` and a second
+        # compare on top of rejwin). `rej` is their sum, kept for reporting the
+        # rejected-call FRACTION beside a residual.
+        if cls != "acc":
+            tot[cls] += 1
+            tot["rej"] += 1
         tot["nout"] += nout
         tot["taps"] += taps if nout else 0
         tot["vecit"] += (taps // width) * nout
@@ -186,6 +232,12 @@ def shape(blob_path, n1=None, n2=None, width=8):
 
 
 def _win_value(blob, off, ln, MASK, M32):
+    """The GUARDED kernel -- i.e. what six of the eight cells compute, and what
+    `model.py` computes. On a `fence` window it returns 0 while c-gcc/c-clang
+    return a fold, so on a blob containing one the two C cells and the other six
+    visit DIFFERENT window sequences from that call onward. That is why the
+    fence blobs below are window-homogeneous (every window the same shape), and
+    why no `R1h - R1` law is fitted on them."""
     n = int.from_bytes(blob[off:off + 4], "little")
     r = int.from_bytes(blob[off + 4:off + 8], "little")
     taps = 2 * r + 1
@@ -218,7 +270,16 @@ def main():
     ap.add_argument("--n1", type=int, default=2000)
     ap.add_argument("--n2", type=int, default=6000)
     ap.add_argument("--json")
+    ap.add_argument("--inputs", help="directory the blobs are read from, "
+                                     "instead of inputs/. This is how "
+                                     "controls/gen_domain.py's rejected-call "
+                                     "blobs are put on the same differenced-"
+                                     "marginal axis as the sweep bands without "
+                                     "adding a blob to the measured tree.")
     a = ap.parse_args()
+    global INPUTS
+    if a.inputs:
+        INPUTS = os.path.abspath(a.inputs)
     os.makedirs(SCRATCH, exist_ok=True)
     cells = CELLS if a.cells == "all" else ([] if a.cells == "none"
                                             else a.cells.split(","))
@@ -233,7 +294,8 @@ def main():
         raise SystemExit(f"no blobs for band {a.band}; run inputs/gen.py --sweep")
     out = []
     hdr = (f"{'blob':20s} {'nout':>7s} {'taps':>6s} {'vecit':>8s} "
-           f"{'scaltap':>8s} {'novec':>5s} {'novecout':>8s}")
+           f"{'scaltap':>8s} {'novec':>5s} {'novecout':>8s} "
+           f"{'rejwin':>6s} {'rejfar':>6s} {'fence':>6s}")
     for c in cells:
         hdr += f" {c:>12s}"
     for b in extra:
@@ -251,7 +313,8 @@ def main():
         row = {"blob": os.path.basename(b), **sh, "ir": {}}
         line = (f"{os.path.basename(b):20s} {sh['nout']:7.2f} {sh['taps']:6.2f} "
                 f"{sh['vecit']:8.2f} {sh['scaltap']:8.2f} {sh['novec']:5.2f} "
-                f"{sh['novecout']:8.2f}")
+                f"{sh['novecout']:8.2f} {sh['rejwin']:6.3f} "
+                f"{sh['rejfar']:6.3f} {sh['fence']:6.3f}")
         for c in cells:
             binp = os.path.join(BUILD, f"{c}-{a.opt}-{a.mode}")
             v = marginal(binp, b, a.n1, a.n2)
@@ -268,6 +331,10 @@ def main():
             json.dump({"band": a.band or a.blobs,
                        "cells": cells + [os.path.basename(x) for x in extra],
                        "opt": a.opt, "mode": a.mode,
+                       # `inputs` is recorded so controls/fit.py can recompute
+                       # the regressors from the SAME blobs this run measured,
+                       # even when they are the domain band outside inputs/.
+                       "inputs": os.path.relpath(INPUTS, REPO),
                        "n1": a.n1, "n2": a.n2, "rows": out}, fh, indent=1)
         print("wrote", a.json)
     return 0

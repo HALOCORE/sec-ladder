@@ -1,6 +1,6 @@
 # p10-fir-stencil — results
 
-Generated 2026-08-21T12:36:05Z from `results/p10-fir-stencil.json` (git `9dce856a5154`, working tree dirty).
+Generated 2026-08-21T16:15:06Z from `results/p10-fir-stencil.json` (git `c7a7da8cfbf9`, working tree dirty).
 
 ## Toolchain
 
@@ -155,28 +155,30 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 ## Wall clock (secondary)
 
-> taskset -c 3, interleaved round-robin, 31 reps, min and median; frequency scaling on, shared box. Frequency scaling is on and cannot be disabled without root; the box is shared and containerised. Wall clock is a sanity check on `Ir`, never the headline. Times include process start-up and reading the input file.
+> taskset -c 3, interleaved round-robin, 30 reps, min and median; frequency scaling on, shared box. Frequency scaling is on and cannot be disabled without root; the box is shared and containerised. Wall clock is a sanity check on `Ir`, never the headline. Times include process start-up and reading the input file.
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 5.29 | 5.43 | 2.6% | 7.24 | 7.43 | 2.6% |
-| c-gcc | whole | 5.33 | 5.40 | 1.3% | 7.47 | 7.72 | 3.4% |
-| c-clang | isolated | 5.50 | 5.65 | 2.6% | 6.75 | 6.98 | 3.5% |
-| c-clang | whole | 5.43 | 5.54 | 2.0% | 6.38 | 6.53 | 2.4% |
-| safe_naive | isolated | 6.37 | 6.53 | 2.5% | 10.79 | 10.99 | 1.8% |
-| safe_naive | whole | 5.91 | 6.06 | 2.5% | 8.25 | 8.72 | 5.7% |
-| safe_tuned | isolated | 5.55 | 5.71 | 3.0% | 6.51 | 6.65 | 2.1% |
-| safe_tuned | whole | 5.58 | 5.71 | 2.2% | 6.47 | 6.64 | 2.6% |
-| unsafe | isolated | 5.64 | 5.74 | 1.8% | 6.90 | 7.06 | 2.3% |
-| unsafe | whole | 5.58 | 5.73 | 2.7% | 6.57 | 6.76 | 2.9% |
-| verus | isolated | 5.62 | 5.77 | 2.7% | 6.92 | 7.05 | 1.9% |
-| verus | whole | 5.59 | 5.67 | 1.5% | 6.55 | 6.73 | 2.8% |
-| c-gcc-h | isolated | 5.30 | 5.43 | 2.4% | 7.21 | 7.41 | 2.8% |
-| c-gcc-h | whole | 5.31 | 5.45 | 2.7% | 7.49 | 7.70 | 2.9% |
-| c-clang-h | isolated | 5.49 | 5.62 | 2.4% | 6.75 | 6.98 | 3.4% |
-| c-clang-h | whole | 5.41 | 5.55 | 2.6% | 6.39 | 6.52 | 2.1% |
+| c-gcc | isolated | 5.88 | 6.21 | 5.6% | 7.85 | 8.18 | 4.2% |
+| c-gcc | whole | 5.78 | 6.22 | 7.6% | 8.12 | 8.39 | 3.4% |
+| c-clang | isolated | 6.07 | 6.42 | 5.8% | 7.38 | 7.52 | 2.0% |
+| c-clang | whole | 6.06 | 6.40 | 5.7% | 6.91 | 7.11 | 2.9% |
+| safe_naive | isolated | 7.14 | 7.54 | 5.6% | 11.44 | 11.70 | 2.3% |
+| safe_naive | whole | 6.42 | 6.87 | 7.0% | 9.08 | 9.22 | 1.5% |
+| safe_tuned | isolated | 6.11 | 6.34 | 3.8% | 7.01 | 7.21 | 2.8% |
+| safe_tuned | whole | 6.05 | 6.33 | 4.5% | 6.98 | 7.35 | 5.3% |
+| unsafe | isolated | 6.11 | 6.39 | 4.6% | 7.48 | 7.90 | 5.6% |
+| unsafe | whole | 6.08 | 6.36 | 4.5% | 7.11 | 7.38 | 3.8% |
+| verus | isolated | 6.18 | 6.50 | 5.2% | 6.92 | 7.67 | **10.9% ✗** |
+| verus | whole | 6.14 | 6.41 | 4.4% | 7.17 | 7.40 | 3.3% |
+| c-gcc-h | isolated | 5.77 | 6.12 | 6.0% | 7.92 | 8.33 | 5.2% |
+| c-gcc-h | whole | 5.78 | 6.08 | 5.2% | 8.12 | 8.31 | 2.3% |
+| c-clang-h | isolated | 6.04 | 6.36 | 5.1% | 7.30 | 7.51 | 2.9% |
+| c-clang-h | whole | 5.97 | 6.37 | 6.7% | 6.93 | 7.16 | 3.3% |
 
-Every wall-clock cell is within the 10% min-to-median spread threshold.
+**1 of 32 wall-clock cells exceed the 10% min-to-median spread threshold and are DISCARDED** per `.memory/03-measurement.md` step 4. They are printed above marked ✗ rather than deleted, because a missing cell that looks like an omission is worse than a documented failure (`.memory/02-bench-rules.md`). **No claim in this report rests on a marked row.**
+
+- `verus / isolated` on `small.bin`: spread 10.9%
 
 
 ## Cells and metrics not measured

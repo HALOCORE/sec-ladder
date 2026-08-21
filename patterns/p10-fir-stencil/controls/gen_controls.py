@@ -44,7 +44,18 @@ ERROR TEXT is read rather than the exit code.
 
     u_win       reslice the window once, then `get_unchecked` INTO THE WINDOW,
                 so the per-tap index is `sb + i + j` rather than
-                `off + sb + i + j`
+                `off + sb + i + j`. 3397.00 / 8349.00 Ir/call against R4ship's
+                3591.00 / 8711.00 at `-O3 isolated`.
+                ⚠ **Its twin VERIFIES -- 10 verified, 0 errors, the same
+                obligation count as the shipped `verus.rs`, no new trusted item
+                and no lemma.** TASK_057 reported that it does not and called
+                the R4 side degenerate; that is retracted at ../NOTES.md 8e and
+                14, and 60% of p10's published margin was R4 spelling. What
+                excludes `u_win` from shipping is the IDENTITY PIN and not the
+                proof: its surviving `split_at` panic pad holds a pc-relative
+                `&core::panic::Location`, so the pair is `norel` and not
+                `exact`. ../NOTES.md 8e2 has the general consequence, which
+                bounds the R4 search space of every pattern here.
 
 MUTANTS -- ../NOTES.md 10:
 
@@ -60,7 +71,16 @@ MUTANTS -- ../NOTES.md 10:
                 10) still lands on the other.
     m_nowin     verus.rs with the window guard `n < taps` deleted. MUST fail.
     u_win_verus the R5 twin of `u_win`; an R4 candidate is not a rung until
-                this verifies (`.memory/01-ladder.md` finding 14).
+                this verifies (`.memory/01-ladder.md` finding 14). **It does:
+                10 verified, 0 errors.** The closing repair is ONE invariant
+                clause, `w@ == buf@.subrange(off as int, off + len as int)`, in
+                BOTH loops -- vstd's `<[T]>::split_at` spec gives the subrange
+                directly. Both clauses are load-bearing and the accompanying
+                `assert` is dead; `.temp/p10c/minimality.py` derives the three
+                probes that show it. TASK_057's repair round added
+                `w@.len() == len`, which constrains the window's LENGTH and
+                never relates its CONTENTS to `buf@`, so the `dotp` invariant --
+                written over `buf@` -- could not close.
     b_fence     unsafe.rs with `last >= len` weakened to `last > len`: the C
                 bug promoted into a Rust rung with no bounds check. MUST be
                 caught by Miri.
@@ -157,7 +177,31 @@ VARIANTS = [
     let sb: usize = 8 + taps;""",
          """    let nout: usize = n - 2 * r;
     let sb: usize = 8 + taps;
-    let w: &[u8] = buf.split_at(off).1.split_at(len).0;""")], True),
+    let w: &[u8] = buf.split_at(off).1.split_at(len).0;
+    assert(w@ == buf@.subrange(off as int, off + len as int));"""),
+        # THE CLAUSE THAT CLOSES IT, and the whole of TASK_057_REVIEW's B1.
+        # TASK_057 shipped this variant with `w@.len() == len` alone and reported
+        # the R4 side "degenerate"; that constrained the window's LENGTH but
+        # never related its CONTENTS to `buf@`, so the `dotp` invariant -- which
+        # is written over `buf@` -- had nothing to rewrite `w@[k]` into. vstd
+        # ships a spec for `<[T]>::split_at` (~/tools/verus/vstd/std_specs/slice.rs)
+        # and it gives the subrange directly, so this needs NO lemma, NO new
+        # trusted item and NO `by (nonlinear_arith)`: 10 verified, 0 errors,
+        # the same obligation count as the shipped `verus.rs`.
+        ("""            off + len <= buf@.len(),
+            buf@.len() <= usize::MAX,
+            fwalk(""",
+         """            off + len <= buf@.len(),
+            buf@.len() <= usize::MAX,
+            w@ == buf@.subrange(off as int, off + len as int),
+            fwalk("""),
+        ("""                off + len <= buf@.len(),
+                buf@.len() <= usize::MAX,
+                dotp(""",
+         """                off + len <= buf@.len(),
+                buf@.len() <= usize::MAX,
+                w@ == buf@.subrange(off as int, off + len as int),
+                dotp(""")], True),
     ("m_nowin", VERUS_RS, [(
         """    if n < taps {
         return 0;

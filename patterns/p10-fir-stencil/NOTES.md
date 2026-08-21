@@ -1,9 +1,13 @@
 # p10 — weighted FIR / sliding-window stencil: notes
 
 Built at TASK_057. `spec.md` is the contract; this file is the evidence.
-**Not yet reviewed** — every claim here is the engineer's, measured, and none of
-it has been through the adversarial pass `PROTOCOL.md` requires before anything
-reaches `.memory/`.
+
+**REVIEWED AND CORRECTED.** `.tasks/TASK_057_REVIEW_REPORT.md` is the adversarial
+pass; TASK_059 landed it. The measurement layer reproduced **exactly** — every
+fitted law, control figure, pad count, loop-body count and the whole Verus layer,
+with 21 clean negatives — and **fourteen interpretive claims were retracted.
+§14 is the complete list, with what replaced each.** Read §14 before quoting any
+figure from an older commit of this file.
 
 ---
 
@@ -73,7 +77,18 @@ if (last >= len) return 0;        /* c/kernel_hardened.c   -- correct  */
 `last` is an **index**, so `last == len` is already one past the window. R1
 admits exactly that one case and nothing beyond it.
 
-**Rejected candidates, and why:**
+**Rejected candidates, and why. FIVE of them, and they were rejected on
+ARGUMENT and not on measurement** — with exactly one exception, and the
+exception does not rest on a measurement either: `nout = n − 2r + 1` is ruled
+out by a *structural* fact about the harness, `harness/check.py:1254-1292`
+(`check_checksums` runs every built cell against every non-`adversarial-*`
+model input and hard-fails a mismatch), which is checkable by reading the gate
+rather than by running it. **TASK_059's own wording — "§0's four rejected
+candidates … rejected on measurements" — is wrong on both counts and is
+corrected here rather than left standing**; TASK_057_REVIEW m6 found it. The
+arguments below are sound and two of them are strong (a clamping bug deletes
+`windows()`, hence the whole three-way separation; `hi = n−1` is p07's bug with
+a different harm), but none of them was priced.
 
 | candidate | rejected because |
 |---|---|
@@ -248,18 +263,45 @@ instructions: +5 (gcc) / +12 (clang) per call on p02, `+2.00` per executed pop
 on p03, once per input byte on p18. **p10's R1 already executes the comparison
 and merely relates its two operands wrongly.**
 
-Marginal `Ir` per call (`controls/sweep_ir.py`, differenced over `n_iters`
-2000→6000 on the same blob and the same binary):
+⚠ **BUT "FREE" IS A MODE- AND DOMAIN-QUALIFIED STATEMENT, AND THE FIRST DRAFT
+OF THIS SECTION QUOTED ONE CELL OF A FOUR-CELL TABLE.** `controls/sweep_ir.py`
+defaults to `--mode isolated` and TASK_057 published only that column;
+TASK_057_REVIEW B2 found it, and the domain half is its M4. **Both are named at
+every figure now.** Marginal `Ir` per call (`controls/sweep_ir.py`, differenced
+over `n_iters` 2000→6000 on the same blob and the same binary, `-O3`):
 
-| | `small` | `large` | swept law, fitted on 26 blobs (bands `r`+`o`), verified on 7 more (`h`, `e`) |
-|---|---:|---:|---|
-| `c-gcc-h − c-gcc` | **0.0000** | **0.0000** | `0` — all four coefficients exactly zero, max resid 0.0000 |
-| `c-clang-h − c-clang` | **+1.0000** | **+1.0000** | `+1` flat — all three regressor coefficients exactly zero |
+Each cell is the **value** of the difference, not a coefficient:
 
-Kernel-exclusive `Ir` (gate stage 3b / `results/p10-fir-stencil.json`) agrees:
-c-gcc and c-gcc-h read **75,660,000** and **14,782,000** on the two blobs,
-identically; c-clang and c-clang-h read 70,280,000 / 70,300,000 and
-17,156,000 / 17,158,000, i.e. **+1.00 Ir/call**.
+| | `-O3 isolated` | `-O3 whole` |
+|---|---|---|
+| `c-gcc-h − c-gcc`, every call accepted | **0.00** | **−1.00** — the hardened cell is *cheaper* |
+| `c-clang-h − c-clang`, every call accepted | **+1.00** | **0.00** |
+| `c-gcc-h − c-gcc`, every call rejected | **0.00** | **0.00** |
+| `c-clang-h − c-clang`, every call rejected | **−1.00** — the hardened cell is *cheaper* | **0.00** |
+
+so the swept laws, exact to max |resid| **0.0000** in sample (32 blobs: bands
+`r`+`o`+`d`) and **0.0000** out of sample (bands `h`+`e`), are
+
+```
+-O3 isolated   c-gcc-h  − c-gcc   = 0
+               c-clang-h− c-clang = +1 − 2·rejwin − 2·rejfar
+-O3 whole      c-gcc-h  − c-gcc   = −1 + 1·rejwin + 1·rejfar
+               c-clang-h− c-clang = 0
+```
+
+**On a 100 %-rejecting blob the clang pair therefore reads −1.00 Ir/call at
+`-O3 isolated` — the hardened cell is cheaper, not dearer** (`d-allwin.bin`:
+c-clang 43, c-clang-h 42). *"`R1h − R1` (clang) = +1.00 flat"* is true only at
+`-O3 isolated`, and only where every visited window is accepted. §8b2 has the
+column, the design and the refit.
+
+Kernel-exclusive `Ir` (gate stage 3b / `results/p10-fir-stencil.json`,
+`-O3 isolated`) agrees with the isolated column: c-gcc and c-gcc-h read
+**75,660,000** and **14,782,000** on the two blobs, identically; c-clang and
+c-clang-h read 70,280,000 / 70,300,000 and 17,156,000 / 17,158,000, i.e.
+**+1.00 Ir/call**. There is no kernel-exclusive column at `-O3 whole` at all —
+the kernel is inlined into `main` and has no symbol — which is itself why the
+`whole` column can only ever be a whole-program marginal.
 
 **The mechanism, mnemonic by mnemonic** (`harness/asm.py show --raw`, full
 kernel diff):
@@ -275,12 +317,17 @@ kernel diff):
   path ends `add %rsi,%rax ; jmp <epilogue>` where the unhardened one falls
   straight through into the `pop`s. That `jmp` is the whole of the +1.00.
 
-So: **the fencepost is free on gcc and costs one unconditional branch on clang,
-and neither number is the price of a check** — both rungs perform the same
-comparison. This is the first hardening in this project that is free, and the
-reason is structural rather than a property of this box (contrast p08's
-`R1 ≡ R1h at 0.00 Ir/call`, which is a **glibc** property and must never be
-quoted as "memmove is free").
+So: **the fencepost costs at most one unconditional branch on either compiler in
+either mode, and no number in the table above is the price of a check** — both
+rungs perform the same comparison. The right form of the claim, and the only one
+that survives naming the mode and the domain, is:
+
+> **the first hardening in this project whose cost is zero BECAUSE R1 ALREADY
+> PERFORMS THE COMPARISON** — 0.00 gcc / +1.00 clang at `-O3 isolated`,
+> −1.00 gcc / 0.00 clang at `-O3 whole`, on the accepting domain.
+
+That reason is structural, unlike p08's `R1 ≡ R1h at 0.00 Ir/call`, which is a
+**glibc** property and must never be quoted as "memmove is free".
 
 ⚠ **And the comparison is LEGAL on every input it is read from.**
 `.memory/02-bench-rules.md`'s first rule — never compare cost where the
@@ -289,7 +336,26 @@ p12 and p13. Here `inputs/gen.py` packs every benign window exactly full
 (`stride == 8 + taps + n`, so `last == len − 1`), so on every input the cost is
 measured on the two rungs take the identical path over the identical bytes. The
 only two inputs on which they differ at all are `adversarial-fencepost.bin` and
-`adversarial-fenceslack.bin`, and no cost is read off either.
+`adversarial-fenceslack.bin`, and no cost is read off either. **§8b2's `fence`
+column is the machine-readable form of that exclusion**: on a call with
+`last == len` R1 accepts and every other cell rejects, so no `R1h − R1` law is
+fitted there, and the column exists so the boundary is a measured domain rather
+than a sentence.
+
+⚠ **THE BUG'S PRICE, ON THE DOMAIN NO p10 INPUT EXERCISES AT SCALE, IS NOT
+ZERO** — and it belongs beside "hardening is free" every time that phrase is
+used. `controls/gen_domain.py`'s `d-allfp.bin` is crafted so that **every** call
+hits the fencepost (`last == len` exactly). Marginal `Ir`/call, `-O3 isolated`:
+
+```
+c-gcc   1942.00   against c-gcc-h     62.00
+c-clang 1800.00   against c-clang-h   46.00
+```
+
+R1 runs the whole tap loop over a stolen byte where R1h returns 0. That is not a
+hardening cost, it is the *work the bug does*, and §4's "free" figures are
+statements about the benign domain only. (TASK_057_REVIEW measured this first;
+reproduced here exactly.)
 
 **No `ns` claim is made for either figure.** §11 has the layout populations: on
 `small` the gcc pair reads 254.10 vs 254.47 ns/call at the medians inside
@@ -522,15 +588,35 @@ matching the `identity` pin. At O0 the crate names differ in length so call
 displacements differ — link layout, not codegen.
 
 ⚠ **BUT THE WHOLE-PROGRAM MARGINAL IS NOT EQUAL, AND THE DIFFERENCE IS NOT IN
-THE KERNEL.** `verus` reads **1.00 Ir/call less** than `unsafe` on every blob
-(`small` 3590 vs 3591, `large` 8710.0075 vs 8711.0075, band `e` 19749.99 vs
-19750.99). The kernel symbols are byte-identical, and the **kernel-exclusive**
-column agrees exactly (both 71,540,000 on `small`, both 17,394,000 on `large`).
-The −1.00 lives in `main`: `Ir(main)` is 280,275 vs 260,274 on `small`, i.e.
-exactly `−1` per iteration and `−1` fixed. **Quote the kernel-exclusive column
-for the identity claim**; a whole-program marginal is not an identity oracle
-here, and this is the first pattern in the project where the two disagree on a
-byte-identical pair.
+THE KERNEL.** At **`-O3 isolated`** `verus` reads **1.00 Ir/call less** than
+`unsafe` on every blob (`small` 3590 vs 3591, `large` 8710.0075 vs 8711.0075,
+band `e` 19749.99 vs 19750.99). The kernel symbols are byte-identical, and the
+**kernel-exclusive** column agrees exactly (both 71,540,000 on `small`, both
+17,394,000 on `large`). The −1.00 lives in `main`: `Ir(main)` is 280,275 vs
+260,274 on `small`, i.e. exactly `−1` per iteration and `−1` fixed. **Quote the
+kernel-exclusive column for the identity claim**; a whole-program marginal is
+not an identity oracle here, and this is the first pattern in the project where
+the two disagree on a byte-identical pair.
+
+⚠ **AND THAT −1.00 IS ITSELF MODE- AND DOMAIN-SPECIFIC**, which is the same
+defect one layer down and is corrected here rather than left implicit. Fitted
+over bands `r`+`o`+`d` (max |resid| **0.0000** in sample, **0.0000** out on
+`h`+`e`):
+
+```
+-O3 isolated   R5 − R4 = −1                                    flat, EVERYWHERE
+                                                               (rejected calls included)
+-O3 whole      R5 − R4 =  0 − 2·rejwin − 2·rejfar − 2·fence
+```
+
+So in `whole` mode the pair is **equal on every accepted call** — the gate's
+`marginal_ir_per_call` reads `unsafe` 3385.00 and `verus` 3385.00 on `small` —
+and differs by 2.00 Ir on a call the guards reject (`d-allwin.bin`: 26 vs 24).
+The claim *"the first byte-identical R4/R5 pair whose whole-program marginals
+differ"* is therefore true in both modes but for different reasons, and the
+figure that goes with it must name the mode. `R5 − R4` at `-O3 isolated` is the
+**only one of p10's six laws whose domain did not move** when the rejected-call
+columns were added (§8b2).
 
 ---
 
@@ -541,7 +627,20 @@ All figures are **differenced marginals** — `(Ir(n₂) − Ir(n₁)) / (n₂ �
 (`controls/sweep_ir.py`), which cancels process start-up, the payload load and
 the fixed part of every call. Bands from `inputs/gen.py --sweep`:
 `r` (16 blobs, `nout` fixed at 32, `r` = 1…16), `o` (10 blobs, `r` fixed at 4,
-`nout` = 8…192), `h` (3 heterogeneous blobs), `e` (4 extrapolation blobs).
+`nout` = 8…192), `h` (3 heterogeneous blobs), `e` (4 extrapolation blobs), and
+`d` (7 blobs from `controls/gen_domain.py`, §8b2 — the REJECTED-CALL band, which
+lives outside `inputs/` so it moves no committed record's `input_sha256`).
+
+⚠⚠ **EVERY FIGURE IN THIS SECTION NAMES ITS MODE, AND THE TWO MODES DO NOT AGREE
+ABOUT THE MECHANISM.** `controls/sweep_ir.py` defaults to `--mode isolated`;
+TASK_057 fitted and published only that column and said so nowhere, and
+TASK_057_REVIEW B2 found it. `-O3 isolated` builds the kernel behind a real call
+(`#[inline(never)]`, separate TUs in C); `-O3 whole` lets LLVM inline it into the
+driver loop, and the kernel then has no symbol at all. **The `R3 − R4` margin
+survives in both — −323.00/−603.00 isolated, −127.00/−239.00 whole on
+`small`/`large` — but its structure is completely different, and §8b3 is the
+whole-mode column.** Where this file says a bare number without a mode, that is
+a defect; §14 lists the ones that were.
 
 ### 8a — the regressors, and the two that were WRONG first
 
@@ -550,6 +649,11 @@ nout       outputs the call emits
 scaltap    (taps mod 8) * nout   -- SCALAR-EPILOGUE taps
 vecit      floor(taps/8) * nout  -- VECTOR iterations, 8 samples each
 novecout   nout on calls where floor(taps/8) == 0
+--- added at TASK_059 (§8b2), because a REJECTED call is a row of the design ---
+rejwin     calls the window guard `n < taps` rejected
+rejfar     calls the safety line rejected with `last > len`
+fence      calls with `last == len` -- p10's BUG: R1 accepts, the other six
+           cells reject
 ```
 
 - **`taps` is not a regressor.** The tap loop vectorises (§1), so the tap count
@@ -562,8 +666,19 @@ novecout   nout on calls where floor(taps/8) == 0
   the model has the column it has, and this is a worked instance of
   `.memory/03-measurement.md`'s *"the parameter list is rarely complete on the
   first pass"*. **I cannot claim the list is closed.**
+- ⚠ **AND IT WAS NOT.** TASK_057_REVIEW M4 found a fifth parameter — a REJECTED
+  call — and a sixth behind it — *which* guard rejected. §8b2 adds three columns
+  and refits. **The list has now gone 3 → 4 → 6, established by measurement each
+  time, and it is still not closed.** What is *established* is: `nout`,
+  `scaltap`, `vecit`, `novecout`, `rejwin`, `rejfar`/`fence`. What has not been
+  searched at all: window strides that straddle a cache line, `nwin` large enough
+  that the driver's window choice misses L2, and any input where `len < 8`.
 
-### 8b — the fitted laws (`controls/fit.py`, exact rational, bands `r` + `o`)
+### 8b — the fitted laws at `-O3 isolated` (`controls/fit.py`, exact rational, bands `r` + `o`)
+
+**⚠ These are the `-O3 isolated` laws over the ACCEPTING domain.** §8b2 is the
+domain refit — which leaves every coefficient below **unchanged** — and §8b3 is
+the `-O3 whole` column, which does not.
 
 **Differences** — max |residual| **0.0000** in sample over 26 blobs, and
 **0.0000** out of sample on band `h`:
@@ -576,9 +691,12 @@ novecout   nout on calls where floor(taps/8) == 0
 | `R1h − R1` (gcc) | `0` — every coefficient zero | |
 | `R1h − R1` (clang) | `+1` flat | |
 
-**Levels**, 5 columns `[1, nout, scaltap, vecit, novecout]`, max |resid|
-0.0096 in sample / 0.0056 out (the residual is the driver's `println!`
-digit-count term, `.memory/03-measurement.md` puts it at 0.2263 Ir/call/digit):
+**Levels**, 5 columns `[1, nout, scaltap, vecit, novecout]`. ⚠ **The quoted
+max |resid| 0.0096 in sample / 0.0056 out covers the FOUR RUST ROWS, not the
+five rows of the table** — `c-clang` is **0.0239 / 0.0121**, re-measured
+(TASK_057_REVIEW m2; holdout is band `h`, and on band `e` the same fit reads
+0.0175). All of it is the driver's `println!` digit-count term,
+`.memory/03-measurement.md` puts it at 0.2263 Ir/call/digit:
 
 | cell | 1 | nout | scaltap | vecit | novecout |
 |---|---:|---:|---:|---:|---:|
@@ -602,13 +720,143 @@ The mechanism is §1: gcc has three regimes where LLVM has two. gcc's
 **difference** law, `c-gcc-h − c-gcc = 0`, is exact on every blob and needs no
 level law.
 
+### 8b2 — the DOMAIN: a rejected call is a missing COLUMN, and the old coefficients survive it exactly
+
+TASK_057 published the laws above with no domain. **Every blob in bands `r`, `o`,
+`h` and `e` accepts every window it visits**, so the five laws were fitted where
+three regressors are identically zero — and TASK_057_REVIEW M4 showed they break
+on any blob that contains a rejected call, with residuals *exactly linear* in the
+rejected-call fraction. `.memory/03-measurement.md`: **do not write the domain as
+a caveat; test whether it is a missing column.**
+
+`controls/gen_domain.py` writes band `d` — seven blobs that turn the three
+rejection columns on, alone and mixed (the shapes are TASK_057_REVIEW's, made
+re-derivable from the tree). `controls/sweep_ir.py --band d --inputs …` measures
+them on the same differenced-marginal axis; `controls/fit.py` recomputes the
+regressors from the blobs, so the fit is reproducible from the generator plus the
+`Ir` column alone. **Band `d` lives in `.temp/p10/domain/` and not in `inputs/`**,
+deliberately: a blob in `inputs/` moves `input_sha256` on every committed record
+(`harness/measure.py`) and would force a re-measure of the whole matrix to add a
+diagnostic. It is deterministic like `inputs/gen.py` — generated twice from
+scratch, all seven blobs byte-identical (`.temp/p10c/logs/domain_hash_{a,b}.txt`),
+and the fit below was re-run against the regenerated blobs and is unchanged.
+
+**A rejected call, priced directly** (`-O3 isolated`, marginal `Ir`/call on the
+100 %-rejecting blobs):
+
+| blob | what rejects | c-gcc | c-gcc-h | c-clang | c-clang-h | R2 | R3 | R4 | R5 |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `d-allwin` | `n < taps` | 59 | 59 | 43 | 42 | 79 | 47 | 28 | 27 |
+| `d-allfar` | `last > len` | 62 | 62 | 47 | 46 | 84 | 51 | 32 | 31 |
+| `d-allfp` | `last == len` | **1942** | 62 | **1800** | 46 | 84 | 51 | 32 | 31 |
+
+Three things fall out of that table before any fit:
+
+1. **The sixth parameter is real and it is +3/+4/+5.** Rejecting at the safety
+   line costs more than rejecting at the window guard, by exactly the `last`
+   computation and a second compare: +3 gcc, +4 clang/R3/R4/R5, +5 R2.
+2. **`rejfar` and `fence` are the SAME rejection in the six cells that make it** —
+   every guarded cell reads identically on the two blobs (62/46/84/51/32/31). The
+   two columns are kept separate anyway, because they are *not* the same in R1.
+3. **`fence` is where R1 diverges**, at 1942 and 1800 Ir/call. `.memory/02-bench-rules.md`
+   rule 1 forbids costing an R1/R1h pair there, so those rows are excluded from
+   the two `R1h − R1` fits (`controls/fit.py --exclude d-allfp`) and from nothing
+   else.
+
+**The refit, 33 rows (bands `r`+`o`+`d`), 7 columns, design rank 7 of 7, holdout
+bands `h` AND `e`:**
+
+| quantity | law | max abs resid, in / out |
+|---|---|---|
+| `R2 − R4` | `65 + 41·nout + 3·scaltap − 7·novecout − 14·rejwin − 13·rejfar − 13·fence` | 0.0000 / 0.0000 |
+| `R3 − R4` | `−3 − 5·nout + 0·scaltap − 1·novecout + 22·rejwin + 22·rejfar + 22·fence` | 0.0000 / 0.0000 |
+| `R2 − R3` | `68 + 46·nout + 3·scaltap − 6·novecout − 36·rejwin − 35·rejfar − 35·fence` | 0.0000 / 0.0000 |
+| `R5 − R4` | `−1` — every rejection coefficient **0** | 0.0000 / 0.0000 |
+| `R1h − R1` (gcc) | `0` — every coefficient **0**, `fence` excluded | 0.0000 / 0.0000 |
+| `R1h − R1` (clang) | `+1 − 2·rejwin − 2·rejfar`, `fence` excluded | 0.0000 / 0.0000 |
+
+> **EVERY ONE OF THE FOUR OLD COEFFICIENTS IS UNCHANGED, TO THE INTEGER, IN
+> EVERY LAW.** The published law is exactly the new law's restriction to
+> `rejwin = rejfar = fence = 0`. That is p18's corrected-design result reproduced
+> on an eighth pattern, and it is the reason `.memory/03-measurement.md` says to
+> add the column rather than write the caveat.
+
+**And here is what a caveat would have hidden** — refitting the **old four
+columns** over all 33 rows (the p18 diagnostic):
+
+| quantity | old cols over old rows | old cols over ALL rows |
+|---|---|---|
+| `R2 − R4` | 65 / 41 / 3 / −7, resid **0.0000** | 60.190 / 41.023 / 3.021 / −6.982, resid **9.19** |
+| `R3 − R4` | −3 / −5 / 0 / −1, resid **0.0000** | +4.879 / −5.038 / −0.034 / −1.030, resid **14.12** |
+| `R2 − R3` | 68 / 46 / 3 / −6, resid **0.0000** | 55.312 / 46.061 / 3.055 / −5.953, resid **23.31** |
+| `R1h − R1` (clang) | +1, resid **0.0000** | −147.273 / 0.730 / 0.682 / 0.931, resid **1606.73** |
+
+Every coefficient comes off its integer and the residual moves by three orders of
+magnitude. **The levels survive the same way**: `[1, nout, scaltap, vecit,
+novecout]` are 71/29/9/17/−8 (R4 and R5), 68/24/9/17/−9 (R3), 136/70/12/17/−15
+(R2) and 72/30/7/17/−8 (`c-clang`) **before and after**, at max |resid|
+0.0099 in sample against the old 0.0096 — and the three new columns then read
+off the rejected-call *levels* directly: a `rejwin` call costs `1 + rejwin`, i.e.
+R4 71−43 = **28**, R3 68−21 = **47**, R2 136−57 = **79**, `c-clang` 72−29 = **43**,
+each matching the measured table above exactly.
+
+⚠ **Neither the band-`e` registration nor the band-`h` hold-out could have caught
+this**, because both are entirely inside the accepting domain — which is exactly
+what `.memory/03-measurement.md` warns a hold-out cannot do for you.
+
+### 8b3 — the SAME laws at `-O3 whole`, where the mechanism is different
+
+Bands `r`, `o`, `d` refitted at `--mode whole`, holdout `h`+`e`, same 7 columns,
+rank 7 of 7:
+
+| quantity | `-O3 whole` law | in / out |
+|---|---|---|
+| `R3 − R4` | `+1 + 0.00·nout − 2.00·scaltap + 1·novecout + 4·rejwin + 5·rejfar + 5·fence` | 0.0000 / 0.0000 |
+| `R2 − R4` | `39 + 18·nout + 4·scaltap − 5·novecout − 8·rejwin − 8·rejfar − 8·fence` | 0.0000 / 0.0000 |
+| `R2 − R3` | `38 + 18·nout + 6·scaltap − 6·novecout − 12·rejwin − 13·rejfar − 13·fence` | 0.0000 / 0.0000 |
+
+**Levels at `-O3 whole`** (max |resid| 0.0099 in / 0.0232 out; `c-clang`
+0.0247 / 0.0767):
+
+| cell | 1 | nout | scaltap | vecit | novecout |
+|---|---:|---:|---:|---:|---:|
+| `unsafe` (R4) | 57 | **26** | **9** | 17 | −10 |
+| `verus` (R5) | 57 | **26** | **9** | 17 | −10 |
+| `safe_tuned` (R3) | 58 | **26** | **7** | 17 | −9 |
+| `safe_naive` (R2) | 96 | **44** | **13** | 17 | −15 |
+| `c-clang` (R1) | 53 | **26** | **7** | 17 | −9 |
+
+> ⚠ **THE `nout` COLUMN AND THE `scaltap` COLUMN SWAP ROLES BETWEEN THE MODES,
+> AND THAT IS THE POINT.** At `-O3 isolated` `R3 − R4` is `−5.00·nout` with
+> `scaltap` exactly **0.00**; at `-O3 whole` it is `−2.00·scaltap` with `nout`
+> exactly **0.00**. The published headline `−127.00 / −239.00` at `whole` is
+> `1 − 2·64` and `1 − 2·120`, to the instruction.
+
+**Both are counted off the listing, not fitted** (`controls/loops.py` on the
+`whole` binaries, where the kernel is inlined so the loops are enumerated inside
+`main`): vector body **17 / nops_inside = 0** on all four LLVM cells, and the
+scalar epilogue **9** (R4), **7** (R3), **13** (R2), **7** (`c-clang`), each with
+**0** nops inside — exactly the fitted `scaltap` coefficients. The mechanism is in
+§8c.
+
+Also visible in the whole column, and worth stating because it is what "the
+kernel is opaque" buys: `R2 − R4` **halves** (+1447/+2679 against +2881/+5345 on
+`small`/`large`), and `R1h − R1` changes sign on gcc (§4).
+
 ### 8c — what that says about safety's cost
 
 **FIRST, THE PADDING CHECK**, because TASK_057 asks for it before any
 per-iteration coefficient is named after a mechanism (*"executed alignment
 padding has landed inside a published law three times"*). `controls/loops.py`
 enumerates every backward-branch loop of the kernel symbol and counts the
-alignment `nop`s inside each body:
+alignment `nop`s inside each body. ⚠ **`controls/loops.py` is a second objdump
+caller, which `CLAUDE.md` used to say there should not be** — TASK_057_REVIEW m4
+checked it against `harness/asm.py`'s listing of the same binaries and the two
+**agree exactly**, and other patterns' controls (`p08`, `p12`, `p14` ×2, `p16`)
+do the same thing, so the stale artefact was the `CLAUDE.md` sentence rather
+than this control. **Already fixed by the manager at `c7a7da8`** — the rule is
+now *the gate* has one pipeline, not *the tree*. All figures below are
+`-O3 isolated` unless the row says `whole`:
 
 ```
 unsafe      loop 15700..15749  body= 17  nops_inside=0     <- the vector loop
@@ -657,6 +905,27 @@ they are NOT the same nine**: R4 has zero checks and three pointer bumps
 (`dec`/`inc`/`inc`), R3 has zero checks and three induction instructions
 (`lea`/`inc`/`inc`). C's 7 is the floor here — one induction variable and no
 checks.
+
+**AND AT `-O3 whole` R3 REACHES THAT FLOOR AND R4 DOES NOT**, which is where the
+whole-mode `−2.00·scaltap` of §8b3 comes from. Same tool, same convention, the
+loops enumerated inside the inlined `main`:
+
+```
+R4  (unsafe)      9   lea, movzbl, lea, movzbl, imul, add, inc, inc, jne
+R3  (safe_tuned)  7   movzbl, movzbl, inc, imul, add, inc, jne
+R1  (c-clang)     7   movzbl, movzbl, imul, add, inc, inc, jne
+R2  (safe_naive) 13
+```
+
+⚠ **The two extra instructions are the two `lea`s, and they are ADDRESS
+ARITHMETIC, not checks.** R4 forms two independent four-term indices per tap —
+`off + sb + i + j` for the sample and `off + 8 + j` for the coefficient — so
+once the kernel is inlined and the outer-loop strength reduction goes away, each
+has to be re-formed with a `lea` before its `movzbl`. R3's `windows()` +
+`zip` hands the epilogue two base pointers and **one shared index register**
+(`(%r8,%r13,1)` and `(%r15,%r13,1)`), so both loads address off the same
+induction variable — which is exactly what `c-clang` does, and `c-clang` costs
+the same 7. **There is no bounds check in any of the three.**
 
 ⚠ **The +3.00 is NOT "the check costs 3".** R2 spends **5** instructions on the
 two bounds checks (`lea/cmp/jae` for the sample, `cmp/je` for the coefficient)
@@ -710,6 +979,80 @@ unsafe      pads=0
 reslice, once per call. So R3 is genuinely check-free in the loop rather than
 having moved the check there.
 
+⚠⚠ **AND THAT IS THE WHOLE OF WHAT THE PAD DECODE CAN EXPLAIN — WHICH IS ZERO
+`Ir`.** TASK_057 offered the pad decode as the reason `R3 − R4` is *negative*
+(§13, P2). It cannot be: a pad is a bounds check, a bounds check in this kernel
+lives in the scalar epilogue, and **the `scaltap` coefficient of `R3 − R4` is
+exactly 0.00 at `-O3 isolated`** — worth nothing. TASK_057_REVIEW B3 found it.
+The whole isolated margin is the `−5.00·nout` term, and the mechanism is
+**induction-variable bookkeeping**. Mnemonic by mnemonic off the shipped
+`-O3 isolated` listing, executed path (vector loop entered), per output:
+
+| block | R4 `unsafe` | R3 `safe_tuned` |
+|---|---|---|
+| outer head | `cmpq $0x7,-0x8(%rsp)` `ja` = **2** | `cmp $0x8,%r9` `jae` = **2** |
+| vector preamble | `pxor` `xor` `pxor` = 3 (+1 nop) | `pxor` `xor` `pxor` = 3 (+1 nop) |
+| horizontal reduce + epilogue setup | 5×SSE + `movd` + **four** `mov`, two of them **reloads from `-0x18(%rsp)` and `-0x10(%rsp)`** = **10** (+1 nop) | 5×SSE + `movd` + **one** `mov %r11,%r14` = **7** (+1 nop) |
+| outer tail | Horner 5 + `mov` + **four** `inc` (`r14`,`r9`,`rdi`,`rbx`) + `cmp`/`jne` = **12** | Horner 5 + `mov` + **`dec %r8` + `inc %rcx`** + `cmp`/`jb` = **10** |
+| **executed total** | **27 real + 2 nop = 29** | **22 real + 2 nop = 24** |
+
+29 and 24 are the fitted `nout` coefficients exactly (29.000015 / 24.000015), the
+two alignment `nop`s cancel, and **the −5.00 is five real instructions**: R4's
+`off + sb + i + j` and `off + 8 + j` force LLVM to strength-reduce to **four**
+outer induction variables and to spill two epilogue starting values, reloading
+them once per output; `windows()` hands it one advancing pointer plus a trip
+counter and `zip` hands the epilogue one index. This is the same cause the
+`whole` epilogue shows as two `lea`s (above) — one loop level up, because in
+`isolated` the outer loop is where the strength reduction happens.
+
+> ⚠⚠ **AND IT IS NOT A SAFETY EFFECT AT ALL.** `c-clang` — idiomatic C, no
+> bounds check anywhere in it, **the same four-term index expression** — fits
+> `nout` at **30.00** at `-O3 isolated`, dearer per output than *both* Rust
+> rungs, and matches R3 exactly at `-O3 whole` (26.00/output, 7/epilogue tap).
+> The per-output figure is a property of the **index expression**, not of the
+> language and not of the checks.
+>
+> The zero-free-parameter check for all four LLVM cells, off the outer-loop spans
+> above (outer span − vector body − epilogue body − the 3-instruction no-vector
+> path − its `nop` where present): R4 59−17−9−3−1 = **29**, R3 53−17−9−3 = **24**,
+> R2 103−17−12−3−1 = **70**, `c-clang` 58−17−7−3−1 = **30**. Nothing in the level
+> law is fitted. (TASK_057_REVIEW clean negative 13; §8c's padding caveat still
+> stands — up to 2 of each of those is `nop` — which is why the *difference* is
+> what is claimed.)
+
+**Stated as the finding, with both modes and the domain named:**
+
+> **On this kernel the iterator form is cheaper than the four-term-index form,
+> and the language is not what decides it.** At `-O3 isolated`, per output:
+> `safe_tuned` **24**, `unsafe` **29**, `c-clang` **30**, `safe_naive` **70**.
+> At `-O3 whole`: `safe_tuned` **26**, `unsafe` **26**, `c-clang` **26**,
+> `safe_naive` **44**, and the gap moves entirely into the scalar epilogue
+> (7 / 9 / 7 / 13 per tap). The safety tax proper is the other axis and it is
+> the `scaltap` split R2 pays: **0.00 Ir on every tap the vectoriser reached,
+> +3.00 Ir on every tap it did not.**
+
+**And on the totals, with the input named, because they do not all point one
+way.** Kernel-exclusive `Ir`/call at `-O3 isolated` (`results/p10-fir-stencil.json`):
+
+| | `small.bin` | `large.bin` |
+|---|---:|---:|
+| `safe_tuned` (R3) | **3254.00** | 8094.00 |
+| `c-clang` (R1) | 3514.00 | 8578.00 |
+| `unsafe` (R4) | 3577.00 | 8697.00 |
+| `c-gcc` (R1) | 3783.00 | **7391.00** |
+| `safe_naive` (R2) | 6458.00 | 14042.00 |
+
+**Safe Rust is the cheapest cell in the pattern on `small` — ahead of both C
+cells — and it beats every LLVM cell on both blobs; it does NOT beat gcc on
+`large`,** where gcc's 16-wide vectorisation (§1) is worth more than everything
+else on the table. The `whole` column reorders it again (`c-clang` 3253 against
+`safe_tuned` 3258 on `small`). Any one-line version of this is wrong; quote the
+mode and the input.
+
+⚠ **No `ns` claim accompanies any Rust-vs-C row.** `controls/clayout.py` builds
+one language per invocation, so the C and Rust populations are different timing
+sessions and `.memory/00-environment.md` forbids quoting across them (§11).
+
 ### 8d — the in-contract R3 spread, and the two-step reslice
 
 What `spec.md`'s `idiom` block leaves free on R3 is the **window reslice**
@@ -739,68 +1082,213 @@ variant checksum-identical to the shipped cell on `small`, `large` and
   ships an R3 measurably off the floor of its own contract, like p16 and p17.
 
 **THE TWO-STEP RESLICE (`.memory/01-ladder.md` finding 3, backlog priority 1) IS
-WORTH −1.00 Ir/CALL ON p10, ON BOTH BLOBS.** The shipped R3 uses the two-step
+WORTH −1.00 Ir/CALL ON p10, ON BOTH BLOBS** (`-O3 isolated`; 3268 against 3269
+and 8108 against 8109). The shipped R3 uses the two-step
 `buf.split_at(off).1.split_at(len).0`; `t_1step` is the same cell with the
-one-step `&buf[off..off + len]` and reads **+1.00** on `small` and **+1.00** on
-`large`. That is finding 3's figure reproduced exactly, on a seventh pattern,
-at zero `unsafe` and zero TCB — **a clean positive, and the standing backlog
-item can be retired.** The panic-pad decode above shows the mechanism is not
-check removal: both forms contribute the same **two** pads.
+one-step `&buf[off..off + len]`. That is finding 3's figure reproduced on a
+seventh pattern, at zero `unsafe` and zero TCB, and the panic-pad decode above
+shows the mechanism is not check removal: both forms contribute the same **two**
+pads.
+
+⚠ **BUT THE WIN IS ONE INSTRUCTION WIDE, SO IT IS AN INSTRUCTION-COUNT-ONLY
+RESULT AND IT DOES NOT RETIRE THE BACKLOG ITEM.** `.memory/03-measurement.md`,
+closing the p08 retraction section: *"a spelling whose win is one instruction
+wide cannot be quoted on `Ir` alone, and this box cannot supply the wall-clock
+column to rescue it — say the win is instruction-count-only and stop."* p10
+quotes it on `Ir` alone; §11's layout populations do not separate the two
+spellings and cannot be made to at 1 `Ir` on a ~3300 `Ir` call. **An earlier
+draft of this paragraph said "a clean positive, and the standing backlog item
+can be retired"; that is retracted** (TASK_057_REVIEW M6, §14). ⚠ And it must
+not be levelled with p04's: 1.00 `Ir` here is not the same evidential thing as
+p04's figure, and a handoff that called it *"confirmed at −1.00 on a seventh
+pattern"* was over-reading it.
 
 The R2 side moves on the same lever and much harder: `n_2step` (R2 with the
 two-step reslice, indexing the window instead of the blob) reads 5645.00 /
 12557.00 against shipped R2's 6472.00 / 14056.00, i.e. **−827 / −1499**.
 
-### 8e — the R4 side: DEGENERATE, with the error text
+### 8e — the R4 side: NOT degenerate. `u_win` VERIFIES, and 60% of the published margin was R4 spelling
 
-`.memory/01-ladder.md` finding 14: an R4 candidate is not a rung unless a
-byte-identical R5 twin verifies at the pinned vstd. One lever was built:
+⚠⚠ **RETRACTION.** TASK_057 published *"Its twin does not verify … the R4 side
+is DEGENERATE as far as this task searched … the −194/−362 figure is a CONTROL
+and not a rung."* **That is wrong.** TASK_057_REVIEW B1 closed the proof with a
+**single invariant clause**, and I reproduced it from the shipped tree:
 
-- **`u_win`** — reslice the window once, then `get_unchecked` **into the
-  window**, so the per-tap index is `sb + i + j` rather than `off + sb + i + j`.
-  It measures **3397.00 / 8349.00** against R4's 3591.00 / 8711.00, i.e.
-  **−194 / −362** — a large move.
-- **Its twin does not verify.** `./verus_run.py .temp/p10/ctl/u_win_verus.rs`:
+```
+$ python3 patterns/p10-fir-stencil/controls/gen_controls.py     # regenerates u_win_verus
+$ ./verus_run.py .temp/p10/ctl/u_win_verus.rs
+verification results:: 10 verified, 0 errors
+```
 
-  ```
-  error: precondition not satisfied
-     --> u_win_verus.rs:358:18
-      |
-  220 |         i < v@.len(),
-      |         ------------ failed precondition
-  ...
-  358 |                 (buf_get_unchecked(w, sb + i + j) as u32).wrapping_mul(
-  error: precondition not satisfied      (line 359, the coefficient read)
-  verification results:: 9 verified, 1 errors
-  ```
+**Same obligation count as the shipped `verus.rs` (10). No new trusted item
+(still three `external_body`), no lemma, no `by (nonlinear_arith)`, no
+`by (bit_vector)`.** The closing repair, now in `controls/gen_controls.py` so it
+is re-derivable from the tree rather than from a `.temp/` directory, is exactly
 
-  Verus does not carry the resliced window's length. **One repair round was
-  spent** — adding `assert(w@.len() == len)` after the reslice and
-  `w@.len() == len` to both loop invariants — and it moved the failure to
-  `invariant not satisfied at end of loop body` without closing it.
+```rust
+w@ == buf@.subrange(off as int, off + len as int)   // in BOTH loop invariants
+```
 
-⚠ Note what the error is **not**: it is not `is not supported`. Per
-TASK_026 §0 item 3, *"`is not supported` disqualifies … `postcondition not
-satisfied` disqualifies nothing"*. This is a **precondition** failure, i.e. an
-unproved obligation rather than an inexpressible one, so `u_win` is plausibly
-admissible with more proof work than this task's Verus budget allowed. **What
-is reported is therefore: the R4 side is DEGENERATE as far as this task
-searched — one lever, one repair round — and the −194/−362 figure is a CONTROL
-and not a rung.** That is falsifiable, where "unavailable" would not be.
+**Both clauses are load-bearing and nothing else is** — measured, one Verus run
+each (each takes ~1.5 s, which is worth saying because "the Verus budget" was
+the excuse in the retracted paragraph):
 
-**So p10 publishes the fixed-R4 bound and the R3-side span, and no pair
-interval.** `R3ship − R4ship = −323.00` (`small`) / **−603.00** (`large`);
-against the cheapest-found in-contract R3, `−327.00` / `−607.00`.
+| variant | result |
+|---|---|
+| both invariant clauses, no `assert` after the reslice | **10 verified, 0 errors** |
+| both clauses + the `assert` (the reviewer's file) | 10 verified, 0 errors — the `assert` is **dead** |
+| drop the INNER loop's clause | `9 verified, 1 errors`, *precondition not satisfied* ×2 |
+| drop the OUTER loop's clause | `9 verified, 1 errors`, *invariant not satisfied before loop* |
+
+**Why TASK_057's repair round missed it.** It added `w@.len() == len`, which
+constrains the window's *length* and never relates its *contents* to `buf@` — so
+the `dotp` invariant, which is written over `buf@`, had nothing to rewrite
+`w@[k]` into. vstd does ship a spec for `<[T]>::split_at`
+(`~/tools/verus/vstd/std_specs/slice.rs:176`) and it gives the subrange
+directly. `.memory/01-ladder.md:320` already says to spend the eleven minutes on
+`verus_run.py` before blaming vstd, and this is what happens when it is not spent.
+
+**So the R4 side is NOT degenerate, and here is the span.** `-O3 isolated`,
+differenced marginal, `small` / `large`:
+
+| | `small` | `large` |
+|---|---:|---:|
+| R4ship (`unsafe`) | 3591.00 | 8711.00 |
+| **`u_win`** (admissible: twin 10/0) | **3397.00** | **8349.00** |
+| R3ship (`safe_tuned`) | 3268.00 | 8108.00 |
+| **published** `R3ship − R4ship` (fixed-R4 bound) | **−323.00** | **−603.00** |
+| **`R3ship − u_win`** (against the cheapest R4 found) | **−129.00** | **−241.00** |
+
+**60.1% (`small`) / 60.0% (`large`) of the published margin is R4 spelling.**
+The sign survives; the magnitude does not. Per `.memory/02-bench-rules.md` both
+are published, with the input named, and the word **"minimum" appears nowhere** —
+`u_win` is the **cheapest R4 found**, one lever, and a cheaper one may exist.
+
+> **The number to quote is a PAIR, not a point**: `R3ship − R4ship = −323.00 /
+> −603.00` is the fixed-R4 bound, `R3ship − u_win = −129.00 / −241.00` is the
+> bound against the cheapest admissible R4 found, both at `-O3 isolated` on
+> `small`/`large`. This is `.memory/01-ladder.md` finding 14 (p13) repeating:
+> **quote the fiat whenever the margin is quoted.**
+
+⚠ **AND STILL NO PAIR INTERVAL.** `spec.md`'s `identity[0].why` — which is this
+project's standing ruling, not p10's opinion — says `min(R3 found) − min(R4
+found)` is **not** the repair, because two upper bounds differenced bound nothing
+in either direction. What p10 publishes is therefore **three separate
+quantities**, never their difference:
+
+| quantity | `small` | `large` |
+|---|---:|---:|
+| the fixed-R4 bound `R3ship − R4ship` | −323.00 | −603.00 |
+| the **R3-side span**, cheapest-found to dearest-found in contract (§8d) | 3264.00…3269.00 | 8104.00…8109.00 |
+| the **R4-side span**, R4ship down to the cheapest R4 found admissible | 3397.00…3591.00 | 8349.00…8711.00 |
+
+The R4 side now has **measured width 194.00 / 362.00** where TASK_057 reported it
+as zero, which is the whole of B1. Against the cheapest-found in-contract R3 the
+fixed-R4 bound is `−327.00` / `−607.00`.
+
+**Two independent routes to the same number.** −129/−241 (isolated, against an
+admissible R4) lands within **2 Ir** of −127/−239 (`-O3 whole`, against the
+shipped R4, §8b3). Most of the isolated margin is LLVM failing to clean up R4's
+index arithmetic while the kernel is opaque, and it goes away either by making
+the kernel visible or by simplifying the index — which is the same statement
+twice.
+
+#### 8e2 — ⚠ WHY `u_win` IS NOT SIMPLY PROMOTED TO R4, and why it bounds every pattern
+
+**It is not the proof. It is the identity pin.** Built under the shipping
+filenames — the crate name is part of the symbol, so the pair has to be compiled
+as `unsafe.rs` and `verus.rs` for the comparison to be the one the gate makes —
+and compared on the declared symbol extent:
+
+```
+python3 patterns/p10-fir-stencil/controls/gen_controls.py
+mkdir -p .temp/p10c/idty
+cp .temp/p10/ctl/u_win.rs       .temp/p10c/idty/unsafe.rs
+cp .temp/p10/ctl/u_win_verus.rs .temp/p10c/idty/verus.rs
+~/.cargo/bin/rustc --edition 2021 -C codegen-units=1 -C opt-level=3 \
+    -C debug-assertions=off --cfg slb_isolated \
+    .temp/p10c/idty/unsafe.rs -o .temp/p10c/idty/u_win-O3-isolated
+python3 ./verus_run.py --compile .temp/p10c/idty/verus.rs \
+    -o .temp/p10c/idty/u_win_verus-O3-isolated \
+    -C codegen-units=1 -C opt-level=3 -C debug-assertions=off --cfg slb_isolated
+python3 harness/asm.py diff .temp/p10c/idty/u_win-O3-isolated \
+                            .temp/p10c/idty/u_win_verus-O3-isolated
+```
+
+```
+u_win        n_fn 116  md5_fn 769cbb7d…  md5_fn_norel aae0541c08aa18968178777857a80f57
+u_win_verus  n_fn 116  md5_fn b92e3e36…  md5_fn_norel aae0541c08aa18968178777857a80f57
+sole real difference:  lea -0xc7fd(%rip),%rdi   vs   lea -0xc7dc(%rip),%rdi
+```
+
+`harness/asm.py diff`: *identical by raw machine-code bytes: **False**;
+identical with pc-rel fields masked: **True***. So the `u_win` pair meets
+**`identity: norel`** and **not `exact`**. ⚠ The two `md5_fn` digests above are
+**not** the reviewer's — the two `u_win_verus` sources differ in comments, which
+moves the read-only data and therefore the displacement — but
+**`md5_fn_norel` is `aae0541c08aa18968178777857a80f57` in both derivations**, and
+so is `n_fn = 116`. That the *masked* digest is stable across two independently
+built pairs while the unmasked one is not is the mechanism stated as a
+measurement. `spec.md` pins `exact` at `-O3`, so
+`u_win` is out of its own pattern's declaration, and **that is the reason it
+cannot ship — not the proof, which closes.**
+
+**The mechanism, and it generalises.** `patterns/p12-strcat-fixed/controls/pads.py
+--source` on the same two binaries:
+
+```
+u_win-O3-isolated          pads=1   64:40  `buf.split_at(off).1.split_at(len).0`
+u_win_verus-O3-isolated    pads=1  322:40  the same reslice
+unsafe-O3-isolated  (ships) pads=0
+safe_tuned-O3-isolated      pads=2
+```
+
+`u_win`'s reslice leaves **one** surviving panic landing pad; rustc materialises
+that pad's `&core::panic::Location` with a **rip-relative `lea`**, and the two
+crates of an R4/R5 pair never lay their read-only data out identically (different
+crate names, and R5 links vstd), so the displacement field differs. `md5_fn`
+therefore differs and only `md5_fn_norel` can match.
+
+> ⚠ **THE GENERAL CONSEQUENCE, WHICH IS BIGGER THAN p10: an `identity: exact`
+> pin excludes every candidate R4 that carries a surviving panic pad.** A pad
+> embeds a `Location` reached pc-relatively; a pc-relative displacement into
+> per-crate read-only data cannot be equal across the pair. So on any pattern
+> pinning `exact`, the admissible-R4 search space is restricted to spellings
+> whose panic pads are all optimised away — which on p10 means `get_unchecked`
+> against the *whole* buffer and rules out every window-reslicing R4. **That is
+> the reason this span exists at all**, and it bounds the R4 search on every
+> pattern in the project, not just this one.
+>
+> **p10's pin is NOT relaxed**, deliberately: every other pattern pins `exact`
+> at `-O3` and p10 should not become the exception to make its own headline
+> smaller. The constraint is recorded instead. (Whether `norel` should be the
+> project-wide `-O3` pin is a question for `.memory/`, not for one pattern to
+> decide unilaterally — and the direction test would flag p10 relaxing its own
+> declaration to admit a cheaper R4 after measuring one, because that moves p10's
+> published safety-tax number **down**.)
+
+**What was NOT done**: no R4 cheaper than `u_win` was attempted — e.g.
+`get_unchecked` over a `Range` rather than an index, which would need a second
+trusted item — and `u_win` has not been run through `harness/check.py` as a rung,
+so its conformance to every `required` spelling is checked by reading and not by
+the gate.
 
 ### 8f — band `e`: the registered out-of-sample test
 
-`controls/predict.py` was run with band `e` **not yet measured for any cell**,
-and its output hashed:
+All figures in this section are `-O3 isolated`. `controls/predict.py` was run
+with band `e` **not yet measured for any cell**, and its output hashed:
 
 ```
 predictions sha256: da05048cf06ae7dbe3b304e2f38c74ccd79b14d9b9ce5a85ce7f9f13dba4db8a
 4 blob(s) x 10 quantities = 40 predictions, tolerance +/-0.05 Ir
 ```
+
+⚠ **TASK_059 added four keys to `sweep_ir.shape()`, which `predict.py` imports,
+so the registration had to be re-checked rather than assumed.** Re-run against
+the edited tooling it prints **`da05048cf06ae7db…` — the same digest, byte for
+byte** (`predict.py` selects the five original regressors by name), so the
+registration still means what it meant. A tooling edit that moved this hash
+would have destroyed the only genuinely pre-registered test p10 has.
 
 Then band `e` was measured. **40 of 40 hold. Worst |error| 0.0200**, and that
 worst case is a *level* row (the `println!` digit term); **every one of the 20
@@ -919,12 +1407,44 @@ direction, on either compiler.** The gcc pair is the sharper statement — its t
 kernels differ by one opcode byte and nothing else, and it reads 254.10 vs
 254.47, so that 0.15% *is* a measurement of the floor.
 
-`harness/measure.py`'s own wall rows: **16 of 32 cells exceed the 10%
-min-to-median spread threshold and are discarded**, all of them `large.bin`
-rows. The `small.bin` rows survive and rank the cells the same way
-(`safe_tuned` 7.18 ms min, `unsafe` 7.60, `safe_naive` 11.65) — but they include
-process start-up and are not the basis of any claim here; the populations above
-are.
+⚠ **CORRECTION, found by the TASK_059 figure sweep and NOT by the review.** An
+earlier draft of this paragraph said *"`harness/measure.py`'s own wall rows: 16
+of 32 cells exceed the 10% min-to-median spread threshold and are discarded, all
+of them `large.bin` rows … (`safe_tuned` 7.18 ms min, `unsafe` 7.60,
+`safe_naive` 11.65)"*. **Every number in that sentence was false against the
+record it described**, and `results/tables/p10-fir-stencil.md` — generated from
+the same JSON — contradicted it in one line. The "16 of 32" was a misreading of
+the 16 `O0` cells, which are not timed at all. The record as shipped at TASK_057
+had **32 wall measurements at spreads 1.3 %…5.7 % and NONE discarded**.
+
+⚠ **AND `results/p10-fir-stencil.json` WAS RE-MEASURED AT TASK_059, WHICH MUST BE
+DISCLOSED BECAUSE THE WALL ROWS MOVED.** TASK_059's C5 sweep edits *comments* in
+`safe_naive.rs`, `safe_tuned.rs`, `unsafe.rs` and `c/kernel_hardened.c`; those
+four files are in `measure.py`'s `source_sha256`, so the record went STALE and
+`harness/measure.py p10` had to be re-run for `--check-stale` to be clean.
+
+**What that re-run changed, diffed cell by cell against the previous record:**
+
+```
+static counts, kernel .text bytes, every md5, every checksum,
+every callgrind Ir value, all 8 cells x 2 opts x 2 modes:     0 differences
+wall clock:                                                   every row moved
+```
+
+**Zero deterministic differences and a uniformly ~8 % slower wall column** — the
+box was less quiet than at TASK_057 — which is the cleanest illustration this
+pattern has of why `.memory/03-measurement.md` ranks the two columns the way it
+does. The `-O3 isolated` `small.bin` minima are now
+
+```
+safe_tuned  7.01 ms   verus  6.92 ms   unsafe  7.48 ms   safe_naive 11.44 ms
+```
+
+— the same ranking, and still the basis of no claim here; the populations above
+are. **One cell now exceeds the 10 % spread threshold and is discarded**
+(`verus / isolated / small.bin`, 10.9 %), which the regenerated table marks `✗`.
+The `verus`-vs-`unsafe` null control is unaffected: it is a `clayout.py`
+population, not a `measure.py` row.
 
 **Not done:** no single timing run puts the C cells and the Rust cells in one
 population, so **no Rust-vs-C `ns` comparison is made**. `clayout.py` builds one
@@ -960,8 +1480,13 @@ audit  pins nothing  required[6]  c    0 of 2 rung(s)   `.wrapping_mul(`
 
 All five were **prose** inside an entry's English — `2r+1` written informally
 beside the pinned `2 * r + 1`, `windows()` named in the sentence saying the tap
-loop is *not* pinned, and so on. The backticks were removed from those five.
-`idiom_sha256` moved from `066841a9…` to `22af8747…`.
+loop is *not* pinned, and so on. ⚠ **SIX backticked spellings were removed, not
+five**, and the prose here used to say "those five" while the audit totals
+quoted below require six (TASK_057_REVIEW m1). The sixth is `get_unchecked` in
+`required[5]`'s Rust prose — it is the one the audit did **not** list above,
+because it matched two rungs rather than none, and it is disclosed on its own
+terms three paragraphs down. `idiom_sha256` moved from `066841a9…` to
+`22af8747…` across all six.
 
 **The direction test, in writing, in its REPAIRED form.**
 `.memory/01-ladder.md`'s original wording is flagged BROKEN and must not be
@@ -974,8 +1499,16 @@ cited; the repair, which has since been attacked and fired on p13, is:
 **Scored: it moves p10's published figures by 0.00 in either direction.** No
 cell was edited, no binary was rebuilt, no measurement was re-run after it, and
 the headline figures — `R2 − R4 = +2881.00 / +5345.00` and
-`R3 − R4 = −323.00 / −603.00` — are the same numbers before and after. The edit
-admitted no new spelling that was then measured and quoted.
+`R3 − R4 = −323.00 / −603.00`, both `-O3 isolated` — are the same numbers before
+and after. The edit admitted no new spelling that was then measured and quoted.
+
+⚠ **TASK_059 made NO declaration edit at all.** `spec.md` is byte-identical and
+`contract_sha256` is still `cb1c3c9f…` after two full gate runs. That matters
+here specifically: TASK_059 *found* an admissible R4 (`u_win`, §8e) that is
+cheaper than the shipped one and is excluded only by `identity: exact`, so
+relaxing the pin to `norel` would have shrunk p10's own published safety-tax
+number — **exactly the direction the repaired test flags**. The pin was left
+alone and the constraint recorded instead.
 
 **And on the shape the repaired test now flags** — *an idiom entry whose scope
 names some rungs and excludes others is a thumb on the scale* — the edit runs
@@ -1002,6 +1535,13 @@ audit  absent  required[0]  c  c/kernel_hardened.c  `if (last > len)`
 Each C rung must contain **exactly one** of the two, and the entry backticks
 both so a `grep` settles which rung has the bug. p18's `required[0]` has the
 same shape with one spelling.
+
+⚠ **`required_absent: 2` in the gate record is that entry WORKING, and nothing
+machine-readable says so** — the audit line is indistinguishable from a pin that
+missed (p18's `required[0]` reports 0). That is a gap in the audit's vocabulary
+and not a defect in p10 (TASK_057_REVIEW m3); it is reported here rather than
+fixed, because the fix belongs in `harness/check.py` and in
+`.memory/02-bench-rules.md`, neither of which a pattern may edit.
 
 **No entry of `required` or `forbidden` was ADDED in response to a measurement**
 — unlike p14, which had to disclose one. p10's `-O0` identity came out `norel`
@@ -1030,15 +1570,29 @@ dependence is `3.00 · scaltap` with `scaltap = (taps mod 8)·nout`, which is
 **bounded by `7·nout` and does not grow**. The growth that is real is in
 `nout`, at 41.00 Ir per output.
 
-**P2 — *"`R3 − R4` is flat in `r`."* TRUE, in the exact sense, and the SIGN is
-the surprise.** The fitted `scaltap` coefficient is **exactly 0.0000** and
-`vecit`'s is 0.00 too, so the only two `r`-dependent regressors both vanish:
-`R3 − R4 = −3 − 5.00·nout − 1.00·novecout`. It is flat in `r` and **negative** —
-safe `windows() + zip()` is *cheaper* than `get_unchecked`, by 323.00 Ir/call on
-`small` and 603.00 on `large`, and the gap **widens** with the output count.
-The predicted *reason* was right too ("the window slice is one range check
-however many taps it covers"): the panic-pad decode in §8c shows R3's tap loop
-contributes zero pads and its two survivors are the window reslice.
+**P2 — *"`R3 − R4` is flat in `r`."* TRUE at `-O3 isolated` on the accepting
+domain, and the SIGN is the surprise.** The fitted `scaltap` coefficient is
+**exactly 0.0000** and `vecit`'s is 0.00 too, so the only two `r`-dependent
+regressors both vanish: `R3 − R4 = −3 − 5.00·nout − 1.00·novecout`. It is flat
+in `r` and **negative** — safe `windows() + zip()` is *cheaper* than
+`get_unchecked` by 323.00 Ir/call on `small` and 603.00 on `large`, and the gap
+**widens** with the output count.
+
+⚠ **THE PREDICTED *REASON* WAS WRONG, AND SO WAS THE FIRST DRAFT OF THIS
+PARAGRAPH.** It said: *"The predicted reason was right too ('the window slice is
+one range check however many taps it covers'): the panic-pad decode in §8c shows
+R3's tap loop contributes zero pads."* The pad decode is correct and reproduces
+exactly — and it **cannot produce this sign**, because pads are checks, checks
+in this kernel live in the scalar epilogue, and the `scaltap` coefficient of
+`R3 − R4` is exactly **0.00**. A mechanism worth 0.00 `Ir` cannot explain
+−323.00. **The real mechanism is induction-variable bookkeeping, it is not a
+safety effect, and `c-clang` pays MORE of it than either Rust rung** — §8c has
+it mnemonic by mnemonic. TASK_057_REVIEW B3.
+
+⚠ **And P2's flatness is mode-specific.** At `-O3 whole` the same difference is
+`+1 − 2.00·scaltap`, i.e. **not** flat in `r` at all — it moves by 2·nout per
+residue step (§8b3). P2 is true in the mode it was scored in and false in the
+other, which no wording in the original verdict admitted.
 
 ⚠ **One caveat against my own P2 verdict.** A day-one probe
 (`.temp/p10/probe/`, a five-kernel standalone probe with a *different* guard
@@ -1059,16 +1613,123 @@ and **R2's vector body is the same seventeen SSE2 instructions as R4's**. The
 single `i + r < n` precondition, making R2 flat in `r` too — in which case P1
 and P3 are wrong, the finding is a stronger version of finding 3, and it is
 still worth publishing."* That is what happened, with one correction: the check
-is not hoisted into a *single* precondition but into a **22-instruction
-per-output `cmp`/`cmov` chain**, and it **survives in the scalar epilogue** at
-3.00 Ir per epilogue tap. So the finding is:
+is not hoisted into a *single* precondition but into a **24-instruction
+per-output `cmp`/`cmov` chain** (24 on the shipped listing — a day-one probe with
+a different guard structure gave 22, and this paragraph said 22 for one commit,
+370 lines below the §8c paragraph that corrects it), and it **survives in the
+scalar epilogue** at 3.00 Ir per epilogue tap. So the finding is — **and this is
+the corrected form; the retracted one is in §14**:
 
-> **Safe Rust's indexing tax is 0.00 Ir on every tap the vectoriser reached and
-> +3.00 Ir on every tap it did not, plus a 41.00 Ir per-output constant that is
-> mostly the vectoriser's runtime bounds guard. The tax is proportional to the
-> number of indexing operations LLVM could not prove in bounds in bulk — which
-> bounds finding 3's domain by naming a mechanism rather than a data size.**
+> **THE SAFETY TAX.** Safe Rust's indexing tax, R2 against R4, is **0.00 Ir on
+> every tap the vectoriser reached and +3.00 Ir on every tap it did not**, plus a
+> 41.00 Ir per-output constant whose largest identified component is the
+> vectoriser's 24-instruction runtime bounds guard. `-O3 isolated`, accepting
+> domain. That bounds finding 3's domain by naming a mechanism rather than a data
+> size.
+>
+> **AND THE OTHER AXIS IS NOT A SAFETY TAX AT ALL.** `R3 − R4` is negative — safe
+> `windows()+zip()` beats `get_unchecked` by −323.00/−603.00 (`-O3 isolated`,
+> fixed R4) and by −129.00/−241.00 against the cheapest admissible R4 found
+> (§8e), and by −127.00/−239.00 at `-O3 whole`. **None of that is a check.** It
+> is the cost of the *index expression*: R4 forms two independent four-term
+> indices per tap and pays for them in four outer induction variables and two
+> stack reloads (isolated, −5.00/output) or in two `lea`s (whole,
+> −2.00/epilogue-tap), while `windows()` + `zip` gives LLVM one advancing pointer
+> and one shared index. **`c-clang` — idiomatic C, no bounds check anywhere, the
+> same index expression — pays 30.00/output at `-O3 isolated`, more than either
+> Rust rung**, and matches R3 exactly at `-O3 whole`.
+>
+> So p10 measured **an index-expression result in three languages' worth of
+> codegen**, and TASK_057 published it as a safe-beats-unsafe result. The
+> corrected claim is the stronger one, because it transfers: *prefer the spelling
+> that hands LLVM one induction variable, in any language; in Rust that spelling
+> happens to be the safe one.*
 
 **And the fourth thing TASK_057 said it was least sure of** — *"if a runtime
 radius will not vectorise at all, R3 and R4 both go scalar and P3 is
 untestable"* — did not happen either. A runtime radius vectorises fine.
+
+---
+
+## 14 — TASK_059: every claim retracted, and HOW the sweep was done
+
+`.tasks/TASK_057_REVIEW_REPORT.md` confirmed p10's whole measurement layer —
+every fitted law, control figure, pad count, loop-body count and the entire
+Verus layer reproduced exactly, with **21 clean negatives**. Nothing in this
+section is a re-measurement of any of that. **What was wrong was what the numbers
+were said to mean**, and this is the complete list.
+
+| # | retracted claim | where it was | what replaces it |
+|---|---|---|---|
+| 1 | *"the R4 side is DEGENERATE as far as this task searched"* | §8e, README | **`u_win` verifies, 10/0**, one invariant clause. `R3ship − u_win = −129.00 / −241.00`, i.e. **60% of the published margin was R4 spelling**. §8e |
+| 2 | *"its Verus twin does not verify, so it is a control and not a rung"* | §8e, README | It is not the proof: `u_win` meets **`norel`, not `exact`**, on one pc-relative panic-`Location` displacement. §8e2, and the general bound it puts on every pattern's R4 search |
+| 3 | every headline figure, unqualified | §4, §7c, §8, §13, README | **`-O3 isolated` named at every figure**, and the `-O3 whole` column published beside it (§8b3). `R3−R4` is −323/−603 isolated and −127/−239 whole; `R1h−R1` gcc is 0.00 isolated and **−1.00 whole** |
+| 4 | *"the panic-pad decode … is why `R3 − R4` is negative"* | §13 P2 | Pads can only explain `scaltap`, which is **0.00**. The mechanism is induction-variable bookkeeping and **`c-clang` pays more of it than either Rust rung**. §8c |
+| 5 | the five laws, published with no domain | §8b | Three **columns**, not a caveat: `rejwin`, `rejfar`, `fence`. Every old coefficient survives unchanged; the old columns over the new rows give residuals 9.19…1606.73. §8b2 |
+| 6 | *"`R1h − R1` (clang) = +1 flat"* | §4, README | `+1 − 2·rejwin − 2·rejfar` at `-O3 isolated`; **−1.00 on a fully rejecting blob**; `0` at `-O3 whole` |
+| 7 | *"a clean positive, and the standing backlog item can be retired"* | §8d | The win is **1.00 Ir**, so it is instruction-count-only and retires nothing. §8d |
+| 8 | *"byte-identical to `unsafe.rs`'s"* (vector body) | `safe_naive.rs:10`, `unsafe.rs:16` | Same seventeen mnemonics, different register allocation — **not** byte-identical. §1 said so; the sources did not |
+| 9 | *"22-instruction per-output chain"* | `safe_naive.rs:13`, `unsafe.rs:19`, §13 | **24** on the shipped listing |
+| 10 | *"SAFE RUST IS CHEAPER PER SCALAR-EPILOGUE TAP — 7.00 against 9.00"* | `unsafe.rs:22-24`, **undisclosed** | The **day-one probe's** figure. Shipped cells are **9 vs 9** isolated (`scaltap` diff exactly 0.00) and **7 vs 9** whole |
+| 11 | *"max |resid| 0.0096 / 0.0056"* over a five-row table | §8b | Covers the **four Rust rows**; `c-clang` is 0.0239 / 0.0121 |
+| 12 | *"the backticks were removed from those five"* | §12 | **Six**; the totals quoted twenty lines later already required six |
+| 13 | *"§0's four rejected candidates, rejected on measurements"* (TASK_059's own premise) | §0.2 | **Five**, rejected on **argument**; the one exception is structural, not measured |
+| 14 | *"16 of 32 wall cells exceed the 10% spread threshold and are discarded"* + three ms figures | §11 | **None were**; the record's own generated table said so. Found by the sweep below, not by the review. §11 also discloses the TASK_059 re-measure the C5 comment edits forced, in which **no deterministic number moved at all** |
+
+**HOW THE SWEEP WAS DONE, so that "I checked" is checkable.** Not by reading:
+`.temp/p10c/figures.sh` extracts every quantitative claim from every committed
+p10 file — the five rung sources, both C kernels, the C driver and header,
+`model.py`, `inputs/gen.py`, all seven `controls/*.py`, `spec.md`, `NOTES.md`
+and `README.md` — under four patterns, because a stale figure in this pattern
+has taken all four shapes:
+
+```
+1.  [-+]?[0-9]+\.[0-9]{2}\b        a marginal or a coefficient   (7.00, -323.00)
+2.  [0-9]+[- ](instruction|instrs|insn)   a counted loop body    (22-instruction)
+3.  byte-identical|byte for byte   an identity claim
+4.  cheaper|dearer|beats|free|flat|degenerate|minimum|first
+                                   a superlative that must carry a mode
+```
+
+Pattern 1 returned **206 hits** on the pre-correction tree; each was checked against
+`results/gate/p10-fir-stencil.json`, `results/p10-fir-stencil.json` or a re-run
+fit. Patterns 2 and 3 are what caught items 8 and 9 in the table above; pattern 4
+is what caught items 3 and 6; and item 14 came out of the pattern-1 pass, from a
+figure the review had not looked at. **The sweep is re-runnable** (`sh
+.temp/p10c/figures.sh`) and its before/after output is under `.temp/p10c/logs/`.
+
+⚠ **What the sweep does NOT cover, stated because "I swept everything" is the
+claim that gets people into trouble**: it does not check prose *arguments*, only
+figures, identity words and superlatives; it does not read `spec.md`'s
+`slb-contract` JSON (deliberately — editing `spec.md` moves `contract_sha256`
+and none of its numbers is a measured p10 result, they are predictions about
+other patterns with `../NOTES.md 4 measures it` beside them); and it cannot see
+a figure that is *correct but mode-ambiguous* unless the sentence also contains
+one of pattern 4's words.
+
+**Adjacent, not p10 — both already closed by the manager while this task ran, and
+re-verified here rather than assumed:**
+
+- TASK_057_REVIEW m5 reported `results/gate/p08-overlap-move.json` STALE. **It is
+  not now**: `harness/measure.py --check-stale` reads `FRESH … 36 source(s)` for
+  it, fixed at `9fb54af`. The whole tree is **0 STALE**.
+- TASK_057_REVIEW m4 reported `CLAUDE.md:27`'s *"the only objdump caller"* stale
+  against six patterns' controls. Fixed at `c7a7da8`; the rule is now that the
+  *gate* has one pipeline, not the tree. p10's `controls/loops.py` agrees with
+  `harness/asm.py` exactly (§8c).
+
+**Not done at TASK_059, and each is a real gap:**
+
+- **No R4 cheaper than `u_win` was attempted.** `get_unchecked` over a `Range`
+  would need a second trusted item; a spelling with *no* surviving panic pad
+  would be the one that could actually ship under the `exact` pin, and none was
+  built. The R4-side span is therefore still a lower bound on the R4-side width.
+- **`u_win` has not been through `harness/check.py` as a rung.** Its conformance
+  to every `required` spelling is checked by reading, not by the gate.
+- **No `ns` measurement was re-taken.** The `clayout.py` populations in §11 are
+  TASK_057's and TASK_057_REVIEW's; nothing in TASK_059 touches them, and the
+  `measure.py` wall rows moved only because the record had to be regenerated.
+- **The `-O3 whole` laws have no registered out-of-sample test.** Band `e` was
+  registered for the `isolated` column only; the `whole` fits use band `e` as an
+  ordinary hold-out, which is weaker.
+- **No `O0`/`O0d` column was fitted in either mode**, and no claim rests on one.

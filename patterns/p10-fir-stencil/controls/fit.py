@@ -39,6 +39,25 @@ useful part:
     no-vector window there has the same `nout` -- and misses band `h` by up to
     15.6 Ir. That correction was made because band `h` refused the model, and
     it is the reason band `h` exists.
+
+THE DOMAIN COLUMNS -- `--cols` `1,nout,scaltap,novecout,rejwin,rejfar,fence`,
+added at TASK_059 from TASK_057_REVIEW's M4. Bands `r`/`o`/`h`/`e` accept every
+window they visit, so the four columns above were fitted where the three below
+are identically zero, and `.memory/03-measurement.md` says to test whether a
+domain is a missing column rather than to write it as a caveat:
+
+    rejwin   calls the window guard `n < taps` rejected
+    rejfar   calls the safety line rejected with `last > len`
+    fence    calls with `last == len` -- p10's BUG. The six guarded cells
+             reject; R1 accepts and runs the whole tap loop. Drop these rows
+             from any c-gcc/c-clang pair (`--exclude`), and note that the
+             fitted `fence` and `rejfar` coefficients coincide on every Rust
+             pair, which is the check that the two really are the same
+             rejection in the six cells that make it.
+
+    python3 controls/fit.py --json .temp/p10/sweep_r.json,.temp/p10/sweep_o.json,\\
+        .temp/p10/sweep_d.json --pair safe_tuned,unsafe --cols \\
+        1,nout,scaltap,novecout,rejwin,rejfar,fence
 """
 import argparse
 import json
@@ -48,11 +67,18 @@ from fractions import Fraction as F
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PDIR = os.path.dirname(HERE)
+REPO = os.path.dirname(os.path.dirname(PDIR))
 sys.path.insert(0, HERE)
 import sweep_ir  # noqa: E402
 
 INPUTS = os.path.join(PDIR, "inputs")
 DEFAULT_COLS = ["1", "nout", "scaltap", "novecout"]
+# The DOMAIN design (../NOTES.md 8b2). The four columns above are exact only
+# where every visited window is accepted; these three say what a REJECTED call
+# costs and which guard rejected it. `fence` must be dropped from any pair
+# involving c-gcc/c-clang -- there R1 accepts and R1h does not, which is p10's
+# bug and not a cost row (`.memory/02-bench-rules.md` rule 1).
+DOMAIN_COLS = DEFAULT_COLS + ["rejwin", "rejfar", "fence"]
 
 
 def load_rows(paths, n1=None, n2=None, width=8):
@@ -61,9 +87,14 @@ def load_rows(paths, n1=None, n2=None, width=8):
         d = json.load(open(p))
         a1 = d["n1"] if n1 is None else n1
         a2 = d["n2"] if n2 is None else n2
+        # A sweep JSON written after TASK_059 records the directory it measured;
+        # older ones predate the domain band and always mean inputs/.
+        indir = os.path.join(REPO, d["inputs"]) if "inputs" in d else INPUTS
         for r in d["rows"]:
-            sh = sweep_ir.shape(os.path.join(INPUTS, r["blob"]), a1, a2, width)
-            rows.append({"blob": r["blob"], "band": r["blob"][6],
+            sh = sweep_ir.shape(os.path.join(indir, r["blob"]), a1, a2, width)
+            # Band letter: `sweep-r01.bin` -> 'r', `d-allfar.bin` -> 'd'.
+            band = r["blob"][6] if r["blob"].startswith("sweep-") else r["blob"][0]
+            rows.append({"blob": r["blob"], "band": band,
                          "ir": r["ir"], **sh})
     return rows
 
@@ -128,12 +159,30 @@ def main():
                          "which is a fact about the compiler and not about the "
                          "kernel. The width is a MEASUREMENT from the "
                          "disassembly, not a fitted parameter.")
+    ap.add_argument("--exclude", default="",
+                    help="comma-separated substrings; any blob whose name "
+                         "contains one is dropped from BOTH the fit and the "
+                         "hold-out. Used to drop the `fence` blobs from a "
+                         "c-gcc/c-clang pair, where R1 accepts the call and "
+                         "R1h refuses it -- a behaviour difference, not a cost "
+                         "row (`.memory/02-bench-rules.md` rule 1).")
     ap.add_argument("--out")
     a = ap.parse_args()
     cols = a.cols.split(",")
     cells = a.pair.split(",")
     rows = load_rows(a.json.split(","), width=a.width)
     hold = load_rows(a.holdout.split(","), width=a.width) if a.holdout else []
+    if a.exclude:
+        pats = a.exclude.split(",")
+        drop = [r["blob"] for r in rows + hold
+                if any(p in r["blob"] for p in pats)]
+        rows = [r for r in rows if not any(p in r["blob"] for p in pats)]
+        hold = [r for r in hold if not any(p in r["blob"] for p in pats)]
+        print(f"  excluded {len(drop)} row(s): {', '.join(sorted(set(drop)))}")
+    rows = [r for r in rows if r["ir"].get(cells[0]) is not None
+            and (len(cells) < 2 or r["ir"].get(cells[1]) is not None)]
+    hold = [r for r in hold if r["ir"].get(cells[0]) is not None
+            and (len(cells) < 2 or r["ir"].get(cells[1]) is not None)]
 
     def target(r):
         v = r["ir"][cells[0]]
