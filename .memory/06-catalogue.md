@@ -515,7 +515,7 @@ p04's, p26 (RLE expansion) is p12/p13's.
 
 | missing axis | why nothing here covers it | opens with |
 |---|---|---|
-| **temporal / lifetime** | every bug here is spatial or logical. This is the one class safe Rust rejects at *compile* time, and the R5 catcher is **linearity, not SMT** | **p27 / p33** |
+| **temporal / lifetime** | every bug here is spatial or logical. This is the one class safe Rust rejects at *compile* time. ⚠ The *"R5 catches it by linearity, not SMT"* claim that used to sit here is **RETRACTED** — it was an artefact of a two-element probe; with a real permission map it is an ordinary `precondition not satisfied` (TASK_055_REVIEW) | **p27 / p33** |
 | **timing side channel** | the adversary is the **optimiser**, and **Verus cannot state the property at all** — the first security property the whole ladder is blind to | **p47** |
 | **UB the optimiser WEAPONISES** | p18's UB is masked by hardware (`shl` truncates the count) and the program limps on. Strict-aliasing UB is the opposite: the compiler *deletes code* on the strength of it | **p38** |
 | **control-flow integrity** | every harm here is data. An out-of-table indirect call is a different harm class, and R1h has a real answer (`-fsanitize=cfi`) that no pattern has priced | **p36** |

@@ -228,6 +228,37 @@ twin regime goes idle and prints the same sentence a macro bypass would.
 **Decide how such a pattern is counted BEFORE building one**, not after; the
 whole point of the classification is that the number means something.
 
+#### DECIDED (TASK_055_REVIEW): keep one number, add PROSE, and do NOT build a column
+
+The manager proposed a **`tcb_reach`** field beside `tcb_items` — `safe` /
+`local-external-body` / `vstd-axiom` — so a `raw_ptr` pattern's `2` would stop
+being comparable with p01's `3`. **The review attacked it and it does not
+survive. It is rejected, and the manager is NOT clearing its own design here.**
+
+- **It is undecidable for the same reason the two-number proposal was.** p01 is
+  **not** `safe`: its own `NOTES.md:481` lists the vstd axioms it rests on
+  (`u64::wrapping_add`, `wrapping_mul`). Every pattern reaches *some* axiom, so
+  the discriminator is a **per-item judgement**, which is exactly the property
+  the 402-site census killed the earlier proposal for.
+- **As a `spec.md` pin it fails `.memory/02-bench-rules.md`'s own rule** for what
+  may be pinned.
+- **The prose fix is cheaper and half-landed already** — say, in the pattern's
+  own text, how the rung reaches unchecked memory.
+- **The twin regime needed a separate fix regardless, and it was WORSE than the
+  probe reported.** The probe said stage 5c-twin *"prints the same sentence a
+  macro bypass would"*. It printed **nothing at all**: the `continue` preceded
+  both `out[src]` assignments, so the stage emitted no `ok`/`fail`/`shout` and
+  the file vanished from the gate record. That is **silence**, not a wrong
+  sentence. **Fixed** — it now `shout`s and records the file. ⚠ **A shout does
+  not make the two cases distinguishable**; it stops the gate reporting nothing.
+  Blast radius when landed was one file, p01's `safe_naive_verus.rs`.
+
+> **So the residual is live and named: a legitimate zero-trusted-item pattern
+> and the known macro bypass produce the same gate output.** It is now a *loud*
+> same output instead of a silent one. **Do not read a `raw_ptr` pattern's
+> `tcb_items` as comparable with a bounds-checked pattern's** — say how the rung
+> reaches memory, in words, beside the number.
+
 **With that caveat, the gameability question is answered by measurement, not by
 policy: across the patterns that exist the column is NOT gameable, because the
 relocation almost never exists.**
@@ -250,29 +281,30 @@ python3 -c "
 import json,glob
 n=0
 for f in sorted(glob.glob('results/gate/*.json')):
-    hits=[]
-    def walk(o):
-        if isinstance(o,dict):
-            for k,v in o.items():
-                if k=='tcb_items' and isinstance(v,list): hits.append(len(v))
-                else: walk(v)
-        elif isinstance(o,list):
-            for v in o: walk(v)
-    walk(json.load(open(f)))
-    n+=sum(hits)
+    d=json.load(open(f))['verus']
+    n+=len(d['verus.rs']['tcb_items'])          # R5 ONLY -- see the warning
 print(n,'items')"
 ```
 
-⚠ **The first version of this command shipped here UNDERCOUNTED BY 3, and
-TASK_058 caught it three lines under the sentence that invokes the
-print-the-count rule.** It returned on the *first* `tcb_items` it found, and
-**p01 is the only pattern with two verified files**, so p01's `verus.rs` items
-were silently dropped. The version above sums every occurrence. **A command is
-only better than a constant if the command is right** — check yours against one
-pattern by hand before trusting the total.
+⚠⚠ **THIS COMMAND HAS NOW BEEN WRONG TWICE, IN OPPOSITE DIRECTIONS, AND THE
+THIRD VERSION IS ABOVE. Three plausible commands give three different totals:**
 
-Dated readings from the corrected command: **65 items across 16 patterns**, and
-**68 across 17** once p10 landed. ⚠ **The denominator is recountable and the
+| version | p01 counted as | total | verdict |
+|---|---|---:|---|
+| return on first `tcb_items` found | **2** (`safe_naive_verus.rs`) | 62 → **65** | **wrong** — p01 is the only pattern with two verified files and its `verus.rs` was dropped |
+| sum **every** occurrence | **5** (both files) | **68** | **wrong** — double-counts `load_input` and `emit`, declared in both |
+| **`verus.rs` only** | **3** | **66** | ✅ **matches every pattern's published TCB** |
+
+> **The lesson is that it was never a counting question.** All three commands
+> count correctly; they disagree about **which files are the pattern's trusted
+> base**, and only the R5 file is. p01's `safe_naive_verus.rs` is a second
+> verified cell whose `load_input`/`emit` are *the same infra items re-declared*.
+> **Before replacing a constant with a command, check the command against one
+> pattern by hand** — a wrong command is worse than a right constant, because it
+> looks self-verifying. (TASK_058 caught version 1; TASK_055_REVIEW caught
+> version 2, which was TASK_058's own repair.)
+
+Dated reading from the corrected command: **66 items across 17 patterns**. ⚠ **The denominator is recountable and the
 NUMERATOR is not** — "is
 there a vstd relocation for this item" is a judgement made against a pinned
 vstd, and the two that existed were found by hand. Do not report a fresh
@@ -1073,19 +1105,62 @@ not be a rung. **That reasoning is refuted.**
 - **A stack local does NOT work, and the reason is exact**:
   `SharedReference::new` is **private** (`E0624`), and `allocate()` is vstd's
   sole origin of pointer permission. There is no `Vec` bridge.
-- ⚠ **The use-after-free at R5 is caught by rustc's MOVE CHECKER on a ghost
-  token (`E0382`) — linearity, not an SMT obligation.** Nothing else here has
-  that shape, and it means "the proof catches it" would be the wrong sentence.
+- ⚠⚠ **RETRACTED (TASK_055_REVIEW, measured): the use-after-free is NOT caught
+  by rustc's move checker in the formulation that would actually be built.** The
+  `E0382` is an **artefact of the hand-unrolled two-element probe**. With a real
+  permission map and the kernel called after `deallocate`, the failure is
+  `error: precondition not satisfied … wf(d@,*perms,n as int)` — **an ordinary
+  SMT obligation, no `E0382` anywhere**. So *"the proof catches it"* is the
+  RIGHT sentence after all, and the *"linearity, not SMT — a structurally
+  different R5 story"* paragraph this file carried is withdrawn. It was written
+  from a probe whose shape did not survive being generalised, and it had already
+  reached `RECAP.md`.
+- ✅ **The ghost loop a real pattern needs EXISTS and is cheap** (TASK_055_REVIEW,
+  A1 — the question the whole pattern was blocked on). Splitting `PointsToRaw`
+  `n` times under an invariant into `Map<int, PointsTo<u8>>`, joining all `n`
+  back, with a real `deallocate`: **7 verified, 0 errors, zero project-local
+  `external_body` / `assume` / `unsafe`.** SMT cost **150 ms / 711,948 rlimit**,
+  and the report's worry about a 4096-slot map is empty: raising the bound to
+  `n <= 1_000_000` gives the **identical rlimit**, because it is proved
+  symbolically. **So the TCB alarm above is REAL and not a scaffolding
+  artefact.**
 - **Gotchas**: `align_of_u8` sits outside the broadcast group; `Set::new` returns
   an `Option`; and see the TCB caveat above — a `raw_ptr` pattern would publish a
   *smaller* TCB than p01.
-- **Reproducibility is solvable.** A naked UAF prints five answers in five runs
-  because glibc's tcache metadata occupies the freed chunk's **first 16 bytes**;
-  **fold from offset 16** and gcc, clang and rustc all agree every run at `-O3`.
+- ⚠ **Reproducibility is solvable but NOT the way this said.** Folding from
+  offset 16 removes run-to-run variation and leaves variation **across `-O`
+  level**, which `build.py` puts in one matrix — and at `-O3` the writes into the
+  recycled slab are **dead-store-eliminated**, so that row does not execute the
+  UAF at all. **Put the UAF on adversarial inputs only.** Full measurement and
+  the general lesson: `.memory/03-measurement.md`, the tcache section.
 
 **The formulation to build** (probe report §2.8): a **slab with pointer handles**
 at R4/R5 and **`(slot, generation)`** at R1h/R2/R3 — so safe Rust's cost is a
 **representation change, not a check**. No pattern here has that axis.
+
+⚠ **THREE CONSTRAINTS ON BUILDING IT, all measured at TASK_055_REVIEW. None is
+fatal; all three are cheaper to know now than after five rungs exist.**
+
+1. **The UAF must live on ADVERSARIAL inputs only.** At `-O3` the stores into
+   the recycled slab are dead-store-eliminated, so that row does not execute the
+   bug at all, and the `-O0`/`-O3` checksums differ — which stage 2 rejects.
+   `.memory/03-measurement.md`'s tcache section has the numbers and the general
+   lesson. Precedent for per-cell divergence: p06's `adversarial-past48`.
+2. **The harness cannot express rungs with different SIGNATURES.** The
+   formulation wants `kernel(handles, k)` at R4/R5 and `kernel(slab, handles,
+   k)` at R1h/R2/R3, and `harness/dloop.py:361` **raises on arity**; ten
+   alias/`call_args` combinations were tried and none reconciles them. **The one
+   escape measured to work: give R4 a DEAD `slab` argument** (`identical? True`
+   against the two-argument build). ⚠ Whether that survives `-O3` codegen is
+   **unmeasured** — check it in `§0` before committing to the shape.
+3. **The R5 catcher is an ordinary SMT obligation**, not linearity — see the
+   retraction above. Two gate-style mutants on a zero-trusted-item file **do
+   fail** (6 verified / 1 errors each), so the two-failing-mutant requirement is
+   satisfiable, which was an open question.
+
+**The proof half is SETTLED and cheap**: the ghost split loop verifies 7/0 with
+zero project-local trusted items at 150 ms, and the cost does not grow with the
+slot count.
 
 For raw pointers and manual memory, use `vstd::raw_ptr` (`PointsTo` permissions),
 `vstd::simple_pptr`, or `vstd::cell::PCell` rather than growing the TCB. Prefer a

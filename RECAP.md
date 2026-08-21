@@ -9,10 +9,10 @@ this box is reference; this box is what to *do*.
 | | |
 |---|---|
 | **Patterns** | **17 of 47 exist, all green, all 17 reviewed. 0 STALE.** (Count it: `ls -d patterns/p*/ | wc -l`. A spelled-out number sat here reading "thirteen" against a sixteen-row table.) |
-| **Do this next** | **`TASK_055_REVIEW`** — written and committed, never run. It is what the **lifetime pattern is blocked on**, and it carries the manager's `tcb_reach` proposal for attack. ⚠ **Run it ALONE** — it takes measurements, and A2 asks it to re-measure under valgrind. |
-| **Then** | The **lifetime pattern**, if `TASK_055_REVIEW`'s A1 clears it — otherwise **p47** (constant-time compare). `.memory/06-catalogue.md`'s section **"The waves order by FAMILY, and after 16 patterns that is the wrong axis"** has the six missing axes, the recommended order (lifetime → p47 → p38 → p22 → p36), and a **feasibility triage** naming what would kill each. It is the manager's judgement with its own objections attached; **push back with the pattern you would rather build.** |
+| **Do this next** | **THE LIFETIME PATTERN — it is UNBLOCKED.** `TASK_055_REVIEW` cleared the proof half: the ghost split loop verifies **7/0 with zero project-local trusted items** at 150 ms, and the cost does not grow with the slot count. ⚠ **Read `.memory/04-verus.md`'s THREE measured build constraints first** — the UAF must live on adversarial inputs only (at `-O3` the stores are dead-store-eliminated, so that row does not execute the bug), `dloop.py` raises on rung-signature arity, and the R5 catcher is an ordinary SMT obligation and **not** linearity. |
+| **Then** | **p47** (constant-time compare). `.memory/06-catalogue.md`'s section **"The waves order by FAMILY, and after 16 patterns that is the wrong axis"** has the six missing axes, the recommended order (lifetime → p47 → p38 → p22 → p36), and a **feasibility triage** naming what would kill each. It is the manager's judgement with its own objections attached; **push back with the pattern you would rather build.** |
 | **Three rules for writing that task** | ⚠ **Settle the bug class as the FIRST deliverable** — overturned on four patterns, upheld on two. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat), and the only out-of-sample test here that has ever been able to fail is **additivity extrapolation**. ⚠ **Name the INLINE MODE at every figure** — p10 fitted both and the regressors *swapped*. All three in `.memory/03-measurement.md`. |
-| **The biggest opportunity, unbuilt** | **A LIFETIME bug can have a full ladder.** `vstd::raw_ptr` verifies **3/0** on a heap kernel with **zero project-local trusted items** (TASK_055, **unreviewed — that is what `TASK_055_REVIEW` is for**). Every bug here is spatial or logical; this is the one class safe Rust rejects at *compile* time. Shape: a **slab — pointer handles at R4/R5, `(slot, generation)` at R1h/R2/R3** — so safe Rust's cost is a **representation change, not a check**. ⚠ Settle TCB counting first; it would publish `tcb_items = 2`, fewer than p01. |
+| **The biggest opportunity, unbuilt** | **A LIFETIME bug can have a full ladder — REVIEWED and confirmed** (TASK_055 + TASK_055_REVIEW). `vstd::raw_ptr` verifies with **zero project-local trusted items**. Every bug here is spatial or logical; this is the one class safe Rust rejects at *compile* time. Shape: a **slab — pointer handles at R4/R5, `(slot, generation)` at R1h/R2/R3** — so safe Rust's cost is a **representation change, not a check**. ⚠ Settle TCB counting first; it would publish `tcb_items = 2`, fewer than p01. |
 | **The newest trap, from p10** | **A headline can be wrong in the FLATTERING direction and pass a green gate.** p10 published *"safe Rust cheaper than unsafe"*; 60% of it was an **unsearched R4 side** and the rest was **index-expression bookkeeping** that C pays more of than either Rust rung. **Before publishing any rung comparison, ask what the other rung's spelling is worth** — finding 14 (p13) is the same failure. |
 | **The loop** | build → review once → land corrections. **Three tasks per pattern is the measured cost.** Per `PROTOCOL.md` rule 9, write `.memory/` **only after** the review. |
 | **Git** | Commit at task boundaries; subagents never commit. ⚠ **There is a GitHub remote** (`origin`, `HALOCORE/sec-ladder`). **Do not push unless the user asks.** |
@@ -1436,17 +1436,29 @@ prose. **Land it bundled with a pattern that is being re-measured anyway.**
   consecutive runs. p06 §7 records that cell as `0, 497`. The `c-gcc` instability
   beside it is documented (six observations); **this one is new and undocumented,
   and build-varying is a different mechanism from run-varying.**
-- ⚠ **THE LIFETIME PATTERN IS UNBLOCKED AND UNBUILT — the biggest open
-  opportunity here.** `vstd::raw_ptr` **works** (TASK_055, unreviewed): a heap
-  kernel verifies **3/0** at **`exact` at O3 / `norel` at O0** with **zero
-  project-local trusted items**; p14's rejection reason is refuted (`add`/`offset`
-  are unsupported but **`addr`/`with_addr` are**). Stack locals are out
-  (`SharedReference::new` is private). Reproducibility is solved: **fold from
-  offset 16**, past glibc's tcache metadata. The formulation to build is a **slab
-  with pointer handles at R4/R5 and `(slot, generation)` at R1h/R2/R3**, so safe
-  Rust's cost is a **representation change, not a check** — an axis this project
-  has never had. ⚠ **Settle the TCB counting FIRST** (`.memory/04-verus.md`): such
-  a pattern publishes `tcb_items = 2`, fewer than p01's array sum.
+- ✅ **THE LIFETIME PATTERN IS UNBLOCKED AND UNBUILT — the biggest open
+  opportunity here, and it is now the NEXT ACTION.** `vstd::raw_ptr` works
+  (TASK_055, **reviewed at TASK_055_REVIEW**): a heap kernel verifies with **zero
+  project-local trusted items**, and the ghost split loop the probe never
+  wrote — the one thing the whole pattern was blocked on — verifies **7/0** at
+  **150 ms**, with the **identical rlimit** at `n <= 1_000_000`, so the slot
+  count is free. p14's rejection reason is refuted (`add`/`offset` unsupported,
+  **`addr`/`with_addr` supported**); stack locals are out
+  (`SharedReference::new` is private). Formulation: a **slab with pointer
+  handles at R4/R5 and `(slot, generation)` at R1h/R2/R3**, so safe Rust's cost
+  is a **representation change, not a check** — an axis this project has never
+  had.
+  ⚠ **Three measured constraints, all in `.memory/04-verus.md`, none fatal:**
+  the UAF must live on **adversarial inputs only** (at `-O3` the stores into the
+  recycled slab are **dead-store-eliminated**, so that row does not execute the
+  bug and the checksums disagree across `-O` level — the offset-16 fix was
+  necessary and **not sufficient**); **`dloop.py:361` raises on rung-signature
+  arity**, and the one escape measured to work is a **dead `slab` argument** on
+  R4, whose `-O3` survival is unmeasured; and the R5 catcher is an **ordinary
+  SMT obligation, not linearity** — that claim is retracted.
+  ⚠ **TCB counting is SETTLED**: the manager's `tcb_reach` column was proposed,
+  attacked and **rejected** — keep one number, add prose, and the residual is
+  live and named.
 - **p14's `-O0` rows are unexplained** (R3 dearer than R2 there, sign inverting
   at `-O3`) and **clang's `R1h − R1` law is unsolved** — mechanism and mnemonic
   table only, no closed form. No claim rests on either.

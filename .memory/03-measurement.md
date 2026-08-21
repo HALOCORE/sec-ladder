@@ -817,6 +817,39 @@ measured and withdrawn): glibc writes **tcache metadata into the first 16 bytes
 of the freed chunk**. **Fold from offset 16** and gcc, clang and rustc all print
 the same value on every run at `-O3`.
 
+> ⚠ **THAT LAST SENTENCE IS TRUE AND THE RULE BUILT ON IT IS INSUFFICIENT**
+> (TASK_055_REVIEW, measured). Folding from offset 16 removes the *run-to-run*
+> variation and leaves a **variation across `-O` LEVEL**, which is worse,
+> because `build.py`'s `OPTS = ["O0","O3"]` puts both in **one matrix**:
+>
+> ```
+> gcc  -O0/-O1/-O2/-Os : 2582767925679282152     gcc   -O3      : 6789584477807083544
+> clang -O0            : 2582767925679282152     clang -O1/-O2/-O3: 6789584477807083544
+> rust  -O0            : 2582767925679282152     rust  -O1/-O2/-O3: 6789584477807083544
+> ```
+>
+> `check.py`'s cell-agreement stage rejects that outright. **The pattern would
+> fail stage 2, having passed the offset-16 check.**
+>
+> **And the mechanism is the real finding, because it is not a measurement
+> problem at all.** Disassembly of the `-O3` build shows three `movups` into the
+> **first** slab and **no store loop into the recycled slab whatsoever** — the
+> writes are **dead-store-eliminated**. So the `-O3` row reads the *original*
+> bytes and **does not model "a stale handle reads a recycled record" in the
+> first place.** A checksum that agreed would have been agreeing about the wrong
+> program. (Not constant folding: the literal is absent from all three binaries.)
+>
+> **The repair is to put the UAF on ADVERSARIAL inputs only**, where
+> `check.py` records behaviour per rung and does *not* require cells to agree —
+> the engineer's own `.temp/p55/NOTES.md:389-393` said so and it was dropped when
+> a different explanation was withdrawn. Precedent already in the tree:
+> `results/gate/p06-rotate.json` records **four behaviours in four cells** for one
+> adversarial input.
+>
+> **The general lesson is bigger than the allocator**: *when a "reproducibility
+> fix" makes a UB row agree, check that the row still EXECUTES the UB.* Agreement
+> is equally consistent with the optimiser having deleted the bug.
+
 **Generalise it as: when a bug's harm lands in memory the allocator also uses,
 find the allocator's own footprint before concluding the harm is
 unobservable.** p13's runaway consumer and p06's canary read are the same

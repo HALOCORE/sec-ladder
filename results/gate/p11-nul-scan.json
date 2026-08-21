@@ -167,7 +167,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "28f91dff8192a28ba681ce3b0e078589e0a568c3bfd6e6c3b0fa73ade67f353c",
+    "harness/check.py": "82a6e943d900527eee9d83e0fd5e778cd84a2443d016bb108ed75adbc48f92c6",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
@@ -1244,7 +1244,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2058593==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000078 at pc 0x5603dfd85472 bp 0x7ffd569206c0 sp 0x7ffd5691fe68 READ of size 21 at 0x504000000078 thread T0 #0 0x5603dfd85471 in __interceptor_strlen.part.0 (",
+      "diagnostic": "================================================================= ==2344671==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000078 at pc 0x5609e5897472 bp 0x7ffc9cf88c10 sp 0x7ffc9cf883b8 READ of size 21 at 0x504000000078 thread T0 #0 0x5609e5897471 in __interceptor_strlen.part.0 (",
       "stdout": "",
       "model_stdout": "11408910424468685312"
     },
@@ -1262,7 +1262,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2058596==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d2 at pc 0x556dd33a7472 bp 0x7fff1e8c08d0 sp 0x7fff1e8c0078 READ of size 13 at 0x5070000000d2 thread T0 #0 0x556dd33a7471 in __interceptor_strlen.part.0 (",
+      "diagnostic": "================================================================= ==2344674==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d2 at pc 0x555c684f4472 bp 0x7fff4b637440 sp 0x7fff4b636be8 READ of size 13 at 0x5070000000d2 thread T0 #0 0x555c684f4471 in __interceptor_strlen.part.0 (",
       "stdout": "",
       "model_stdout": "18024987679707349248"
     },

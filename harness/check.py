@@ -3430,10 +3430,25 @@ def check_trusted_twins(pdir, rep, contract, enabled=True):
         trusted = [i for i in items.values() if _is_trusted(i)]
         ext_names = {i.name for i in items.values() if i.external}
         if not trusted:
-            print(f"    {src}: no trusted item with an `ensures` or an `unsafe` "
-                  f"body (`_is_trusted`), so no twin is required. "
-                  f"external_body items: "
-                  f"{sorted(i.name for i in items.values() if i.external)}")
+            # TASK_055_REVIEW. This was a bare `print` followed by `continue`,
+            # so the stage emitted no ok/fail/shout AND never set out[src] --
+            # the file vanished from the gate record entirely. That is SILENCE,
+            # not a verdict, and it is exactly the silence a legitimate
+            # `vstd::raw_ptr` pattern would produce, where no rung has a
+            # project-local trusted item at all: the reviewer measured that a
+            # zero-trusted-item file and TASK_009_REVIEW's macro bypass are
+            # indistinguishable here. A shout does not make them
+            # distinguishable -- see `.memory/04-verus.md` -- but it stops the
+            # gate reporting nothing at all, and it puts the file in the record
+            # so the omission is checkable from outside.
+            # Blast radius when landed: ONE file, p01's `safe_naive_verus.rs`.
+            ext = sorted(i.name for i in items.values() if i.external)
+            rep.shout("twin", f"{src}: no trusted item with an `ensures` or an "
+                              f"`unsafe` body (`_is_trusted`), so no twin is "
+                              f"required and NOTHING in this stage checked this "
+                              f"file. external_body items: {ext}")
+            out[src] = {"twins": [], "verified": None, "errors": None,
+                        "no_trusted_item": True, "external_body_items": ext}
             continue
         n_trusted += len(trusted)
         trusted_by_src[src] = [t.name for t in trusted]
