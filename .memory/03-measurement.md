@@ -723,6 +723,24 @@ not the tree: an independent re-time of the same binaries with the shipped
 refuted by a noisy session — only left unresolved**, which is the state
 `p16/README.md`'s "all 16 `-O3` cells within 1.3%" is now in.
 
+### A freed chunk's first 16 bytes are glibc's tcache metadata — fold past them
+
+**TASK_055 probe 2, measured; unreviewed.** A kernel that reads through a
+dangling pointer is **not reproducible**: a naked use-after-free printed **five
+different answers in five runs**, which `check.py:1249`'s cell-agreement
+requirement rejects outright — so "a lifetime bug cannot be benchmarked here"
+looks true and **is not**.
+
+The cause is not ASLR and not allocator growth (that first explanation was
+measured and withdrawn): glibc writes **tcache metadata into the first 16 bytes
+of the freed chunk**. **Fold from offset 16** and gcc, clang and rustc all print
+the same value on every run at `-O3`.
+
+**Generalise it as: when a bug's harm lands in memory the allocator also uses,
+find the allocator's own footprint before concluding the harm is
+unobservable.** p13's runaway consumer and p06's canary read are the same
+question asked of the *stack*.
+
 ### The byte-identical R4/R5 pair is a SMOKE ALARM, not a null control
 
 **Proposed at TASK_049 as a free null the project already had; refuted at

@@ -152,6 +152,21 @@ verified with no trusted wrapper at all: p06 removed one and shipped
 > **all `is not supported` at the pinned vstd** — drags the wrapper back in even
 > though the *same copy* spelled `copy_from_slice` verifies clean.
 
+⚠ **"Byte-identical" is an `-O3` claim and does not carry to `-O0`** (TASK_055
+probe 1, on p08; **unreviewed**). `split_at_mut` returns a **4-word tuple via
+`sret`** where `index_mut` returns 2 words in `rax:rdx`, so the respelling costs
+**+2.00 `Ir`/call flat at `-O0`** and drops `identity` to `differ` against a
+pinned `norel`. It is **not** a check — both keep one bounds check and the same
+panic pads. **The repair is p06's own precedent**: respell **only the rungs that
+need it** (p06's `idiom.required[5].rust` records a 2-and-2 receiver split and
+its own `-O0` price of +3 instructions). On p08 that route gives TCB 4 → 3,
+`-O3` unchanged and `-O0` identity **`exact`**.
+
+⚠ **And `RangeTo<usize>` has no `SliceIndexSpecImpl`** (only `usize` at
+`std_specs/slice.rs:14` and `Range` at `:31`), so a rung spelling `dst[..n]` is
+**unverifiable as written** — p08's shipped R4 is exactly that. `dst[0..n]` gets
+past the precondition and then fails its *postcondition*. Use `split_at_mut`.
+
 Measured on both sides at TASK_048. **p06's R4 already spelled
 `copy_from_slice`, so its wrapper came out at zero cost (TCB 6 → 5). p02's R4
 spells `copy_nonoverlapping`, so removing its wrapper moves codegen 72/70 → 81/79,
@@ -201,8 +216,19 @@ three-way classification of what each item is.**
 Census at TASK_048, 14 patterns: **57 items / 118 lines — 25 U-license, 2 V-gap,
 30 infra.**
 
-**And the gameability question is answered by measurement, not by policy: the
-column is NOT gameable, because the relocation almost never exists.**
+⚠ **"NOT GAMEABLE" IS TRUE RETROSPECTIVELY AND FALSE PROSPECTIVELY** (TASK_055
+probe 2, measured; **unreviewed**). The census below is a fact about the sixteen
+patterns that exist, all of which reach unchecked memory through
+`get_unchecked`-shaped accessors. **A pattern built on `vstd::raw_ptr` does
+not**: a verified `raw_ptr` kernel needs **zero project-local trusted items**, so
+it would publish `tcb_items = 2` — **fewer than p01's array sum** — while the
+twin regime goes idle and prints the same sentence a macro bypass would.
+**Decide how such a pattern is counted BEFORE building one**, not after; the
+whole point of the classification is that the number means something.
+
+**With that caveat, the gameability question is answered by measurement, not by
+policy: across the patterns that exist the column is NOT gameable, because the
+relocation almost never exists.**
 `<[T]>::get_unchecked`, `<[T]>::get_unchecked_mut`, `u64::count_ones`,
 `core::ptr::copy_nonoverlapping`, `<[T]>::as_ptr`, `<[T]>::as_mut_ptr` and
 `<*const T>::add` are **all `is not supported` at the pinned vstd**. Measured
@@ -922,6 +948,36 @@ fn get_unchecked(v: &Vec<u64>, i: usize) -> (r: u64)
     ensures  r == v[i as int],
 { unsafe { *v.get_unchecked(i) } }
 ```
+
+### `vstd::raw_ptr` WORKS, and it unlocks the bug class this project lacks
+
+**TASK_055 probe 2 — measured, unreviewed.** Every bug modelled here is spatial
+or logical; **none is a LIFETIME bug**, the one class safe Rust rejects at
+compile time. p14 rejected a lifetime candidate on the reasoning that R4 could
+not be a rung. **That reasoning is refuted.**
+
+- **`add` / `offset` are unsupported, but `addr` / `with_addr` ARE** — so pointer
+  arithmetic has a supported spelling. This is the specific claim p14 got wrong.
+- **A heap buffer works.** A 64-byte loop kernel over `&[*mut u8]` with
+  `Tracked<&Map<int, PointsTo<u8>>>` verifies **3/0** and is **`exact` at O3 /
+  `norel` at O0** against its plain-unsafe twin — p08's own pinned levels — with
+  **zero project-local trusted items**.
+- **A stack local does NOT work, and the reason is exact**:
+  `SharedReference::new` is **private** (`E0624`), and `allocate()` is vstd's
+  sole origin of pointer permission. There is no `Vec` bridge.
+- ⚠ **The use-after-free at R5 is caught by rustc's MOVE CHECKER on a ghost
+  token (`E0382`) — linearity, not an SMT obligation.** Nothing else here has
+  that shape, and it means "the proof catches it" would be the wrong sentence.
+- **Gotchas**: `align_of_u8` sits outside the broadcast group; `Set::new` returns
+  an `Option`; and see the TCB caveat above — a `raw_ptr` pattern would publish a
+  *smaller* TCB than p01.
+- **Reproducibility is solvable.** A naked UAF prints five answers in five runs
+  because glibc's tcache metadata occupies the freed chunk's **first 16 bytes**;
+  **fold from offset 16** and gcc, clang and rustc all agree every run at `-O3`.
+
+**The formulation to build** (probe report §2.8): a **slab with pointer handles**
+at R4/R5 and **`(slot, generation)`** at R1h/R2/R3 — so safe Rust's cost is a
+**representation change, not a check**. No pattern here has that axis.
 
 For raw pointers and manual memory, use `vstd::raw_ptr` (`PointsTo` permissions),
 `vstd::simple_pptr`, or `vstd::cell::PCell` rather than growing the TCB. Prefer a
