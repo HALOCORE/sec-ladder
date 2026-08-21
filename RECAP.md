@@ -1252,6 +1252,28 @@ engineer *flagged against itself*, and a mechanism asserted without a control.
 **The next task is `TASK_051` — p10 or p18.** See the START HERE box; this
 section is the standing backlog, not the next action.
 
+**New, from p18's cycle:**
+
+- **Three consecutive patterns have shipped an out-of-sample test that cannot
+  fail** (p13's band T, p14's LOLO, p18's hold-out *and* its hashed
+  pre-registration, which re-runs byte-identically today and is therefore
+  **tamper-evidence, not pre-registration**). `TASK_052` asks for a
+  recommendation; **whatever it lands becomes the standard and belongs in
+  `.memory/03-measurement.md`.** The cheap candidate: register the hash in a
+  commit that *precedes* the measurement commit — git supplies the ordering, the
+  manager already commits at task boundaries, so it costs one commit.
+- **Audit the other gate stages for the same shape as the `expected_exit != 0`
+  hole** — a stage that skips a comparison in one branch. One was demonstrated
+  reachable on p01/p02; nobody has looked for a second.
+- **`O3d` is not a first-class build mode**: `ALL_OPTS` has `O0`, `O0d`, `O3` and
+  no `-O3` + debug-assertions cell. p18 built it under `controls/`. A 4-line
+  `build.py` change would fix it — **not made, reported.**
+- **p18 publishes no pair interval and its R4 side is unsearched in contract**;
+  its `R3 − R4` is a fixed-R4 reading only. Same standing gap as p01 and p08.
+- **p18 has no `ns` figure for R2 or R3** (no layout population for the safe
+  cells), and its `large` `ns` row is weak (P = 0.676 / 0.829) and quoted with
+  its P.
+
 **New, from p14's cycle:**
 
 - **No C or safe-Rust cell on p14 has a layout population**, so its whole `ns`

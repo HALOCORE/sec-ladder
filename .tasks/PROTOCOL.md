@@ -103,6 +103,21 @@ A task is done when **all** hold:
 4. Durable facts learned went into `.memory/` or `../LearnVeri/PITFALLS.md`.
 5. Your report states, explicitly, what you did **not** do and what you are unsure
    about.
+6. **Record the `slb-contract` block's sha256 in `NOTES.md` the moment you first
+   write it, before building any cell.** One line: the hash, and "as first
+   written, before any measurement".
+
+   This exists because a pattern lands in **one commit**, so "no `required` or
+   `forbidden` entry moved after I measured" is **not independently checkable** —
+   a reviewer has no pre-edit snapshot to diff against (TASK_051_REVIEW, on p18,
+   where the engineer disclosed a `why` correction honestly and the reviewer
+   still could not verify the scope of it). The recorded hash is the snapshot,
+   and it costs one line.
+
+   **If the hash changes later, say so and say why** — a declaration edit made
+   after a measurement is exactly what the direction test governs
+   (`.memory/01-ladder.md`), and disclosing one has twice been upheld on review.
+   Editing the declaration is not the problem; an unverifiable claim about it is.
 
 ## Report format (both roles)
 
