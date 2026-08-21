@@ -993,9 +993,9 @@ the number.** Two task files have already sent an agent to the wrong finding.
    (so the rotate amount **does** enter the cost — the manager predicted no `r`
    term), and the per-record law at period **4, not 8**, exact on 45/45.
 
-   ⚠ **"The twin is the sole catcher" is false on p06 AND p12** — both mutants
-   also break a pin the claim ignores. The correct form is ***Verus-level* sole
-   catcher**. **p12's `NOTES.md:1046-1049` is still wrong** (queue item).
+   ⚠ **"The twin is the sole catcher" was false on SIX patterns**, not two —
+   see the audit note in the queue. p06's and p12's are fixed; **p03, p04, p05,
+   p11 and p18 are not.**
 
    ⚠ **p06's floor is ±4.6%, not the ±3% it published** (TASK_049_REVIEW).
    Headline intact — the clang column clears it at ~2.1×.
@@ -1360,11 +1360,33 @@ Both retired.
 
 **New, from p06's cycle:**
 
-- **p12's `NOTES.md:1046-1049` says "the twin is the sole catcher" and it is
-  false** — the mutant also fails p12's own contract pin. p06's equivalent is
-  fixed; p12's is not. The correct form is ***Verus-level* sole catcher**, and
-  the phrase should be audited wherever it appears. (p02's is a clean negative —
-  already correct.)
+- ⚠ **THE SOLE-CATCHER AUDIT IS DONE (TASK_054) AND IT FOUND SIX, NOT ONE.**
+  p06 and p12 are **fixed**; **p03, p04, p05, p11 and p18 still carry the false
+  claim** — and **p05 contradicts itself**, printing both `[proof-pin]` FAILs
+  about twenty lines from the sentence that denies them. p16, p17, p09 and p02
+  are **clean negatives**; p01 and p07 make no such claim. Full measured table:
+  `.tasks/TASK_054_REPORT.md` §3. **Fixing the five is prose only — fold it into
+  the batched gate re-run** so the ~30-minute cost is paid once.
+  **The rule, sharper than the one the manager proposed, and it is about the
+  MUTANT'S CONSTRUCTION rather than the gate:** every `spec.md` pins the
+  **twin's** clause text in `verus.items` alongside the trusted item's, so the
+  canonical weakening (item *and* twin) moves **two** pinned clauses and fails
+  stage **5a**, which runs **before** 5c-twin. **The twin is the sole catcher
+  only of a mutant that edits `spec.md` in the same commit** — p16/p17/p09/p02
+  build them that way, the other six do not. *"Verus alone is blind"* is true
+  every time; only the gate conclusion was wrong. Also say whether `identity`
+  moved: a `requires` edit is ghost and **cannot** (p12 byte-identical), an
+  exec-code edit **can** (p06's `b_scrmod_msonly`).
+  ⚠ **Not yet in `.memory/`** — rule 9, unreviewed.
+- **p12 says it is "the second pattern to exercise this on a WRITE (p03 is the
+  first)". It is the FIRST** — p03's and p04's mutants both weaken a *read*
+  accessor. Measured at TASK_054, reported not fixed (out of that task's scope).
+- **`.temp/p54/limbs.py` should probably live in `harness/`.** It re-derives
+  `check.py`'s pin comparison across **eight** limbs, it is pattern-agnostic, and
+  **six patterns now need it** to substantiate a published sentence. Today it is
+  gitignored scratch, so those patterns cite a file the repo does not contain —
+  the same trap `p06/controls/clayout.py` was created to avoid. **Decide with
+  the `TASK_053` batch.**
 - **p08's `copy_in` is the one remaining relocatable TCB item** (4 → 3). Untried.
   ⚠ **Do not assume it is free**: p06's removal was byte-identical at `-O3`,
   p02's moved codegen by `+5.00 Ir/call` and broke `identity: exact`. The
