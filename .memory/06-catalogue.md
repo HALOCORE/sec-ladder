@@ -455,3 +455,55 @@ High-value out-of-order candidates noted for later:
 - **Wave 5** (representation/idioms): p35–p42.
 - **Wave 6** (pointers, the hard wall): p27–p34, p46, p47.
 - **Wave 7**: cross-pattern analysis and writeup.
+
+## ⚠ The waves order by FAMILY, and after 16 patterns that is the wrong axis
+
+**Manager decision, 2026-08-21, recorded with its argument so it can be
+attacked.** The wave list above is a *pre-project* grouping by topic. It is still
+a fine map of the territory and nothing below retires it — but it is no longer a
+good work order, for a reason that only became visible once 16 patterns existed:
+
+**Ten of the sixteen are bounds bugs.** p02, p03, p05, p07, p11, p12, p13, p14,
+p16 and p17 all resolve to *"an index or length is not checked against a
+buffer"*. They differ in the mechanism that makes the check cheap or dear, and
+that was worth measuring ten times — findings 3, 9, 12 and p13's sign reversal
+all came out of it. **It is not obviously worth measuring an eleventh time.**
+(p10 is in flight and its bug class is unsettled by design — its §0 decides it,
+and four catalogue guesses have been overturned, so it is deliberately not
+counted here either way.) Waves 2–4 are largely more of it: p43 (CRC over an untrusted length) is
+p16's shape, p21 (CSV with escapes) is p14's, p24 (heap sift index arithmetic) is
+p04's, p26 (RLE expansion) is p12/p13's.
+
+**What the tree does not have is AXES, and they are almost all in waves 5 and 6
+— i.e. last.** The six missing ones, with the pattern that opens each:
+
+| missing axis | why nothing here covers it | opens with |
+|---|---|---|
+| **temporal / lifetime** | every bug here is spatial or logical. This is the one class safe Rust rejects at *compile* time, and the R5 catcher is **linearity, not SMT** | **p27 / p33** |
+| **timing side channel** | the adversary is the **optimiser**, and **Verus cannot state the property at all** — the first security property the whole ladder is blind to | **p47** |
+| **UB the optimiser WEAPONISES** | p18's UB is masked by hardware (`shl` truncates the count) and the program limps on. Strict-aliasing UB is the opposite: the compiler *deletes code* on the strength of it | **p38** |
+| **control-flow integrity** | every harm here is data. An out-of-table indirect call is a different harm class, and R1h has a real answer (`-fsanitize=cfi`) that no pattern has priced | **p36** |
+| **termination as the obligation** | every R5 so far proves *safety*. None proves the loop **ends** — and an open-addressing probe that never terminates is a real, shipped C bug | **p22** |
+| **provenance** | the property Miri checks and nothing else does; untested here | **p31** |
+
+**Recommended order after p10**, by marginal finding value rather than family:
+
+1. **p27 or p33** (lifetime) — **blocked on `TASK_055_REVIEW`**, and on the TCB
+   decision that review is asked to attack. Biggest single gap.
+2. **p47** (constant-time compare) — orthogonal to everything, `moderate`, and
+   the R5 story writes itself: the prover has nothing to say. Mirrors p17
+   (*provably memory-safe and still leaking*) one level up.
+3. **p38** (type punning) — cheap, and it pairs with p18 as the second half of
+   *"what UB actually does"*.
+4. **p22** (hash probe) — the first termination obligation; `decreases` on a
+   probe sequence is a genuinely different proof shape.
+5. **p36** (vtable dispatch) — first non-data harm.
+
+⚠ **This is a judgement call, not a measurement, and it is the manager's own** —
+PROTOCOL rule 3. Two honest objections to it, neither answered here: **(a)** the
+user's standing goal names *breadth over realistic C patterns*, and axis-first
+ordering trades breadth for depth; **(b)** "eleven of sixteen are bounds bugs"
+counts *bug classes*, and the project's actual findings are about **cost
+mechanisms**, which have been much less repetitive — p12's lost bulk lowering and
+p07's never-amortising tax came from two patterns this argument would call
+duplicates. **Push back on it with the pattern you would rather build.**
