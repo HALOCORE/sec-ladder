@@ -535,6 +535,46 @@ p04's, p26 (RLE expansion) is p12/p13's.
    probe sequence is a genuinely different proof shape.
 5. **p36** (vtable dispatch) — first non-data harm.
 
+### Feasibility triage for that slate — done before scheduling, not after
+
+p47's is above. The other four, each with the thing most likely to kill it. **None
+of these is a measurement; they are the questions each `§0` must answer first.**
+
+- **p38 (type punning) — cheapest on the list, and the risk is a NULL result.**
+  The Rust side is a gift: safe Rust has no strict-aliasing UB to have, and
+  `u32::from_ne_bytes` is the punning idiom, so the expected result is *"C's UB
+  idiom and its defined replacement compile to the same thing"* — measurable
+  exactly in `Ir` and in `asm.py`. ⚠ **But strict-aliasing miscompiles are
+  version-dependent**, and if clang 22 / gcc 14 simply do not exploit it, the
+  pattern's headline collapses to a clean negative. Decide in `§0` whether that
+  is worth building. **Check whether `-fsanitize=type` (TySan) exists in
+  `~/tools/llvm`** — if it does, it is a catcher this project has never used, and
+  it would sit in the same "outside the measured matrix" box as p18's four.
+- **p22 (hash probe) — the strongest result on the list and the most likely to
+  need harness work.** The bug is a probe loop that never terminates on a full
+  table: **memory-safe, a real DoS, and safe Rust does not prevent it either** —
+  R2, R3 and R4 all hang, and **only R5 catches it, as a `decreases` obligation**.
+  That is the exact mirror of p09 (invisible to the proof) and no pattern here
+  has it. ⚠ **An adversarial input that HANGS is not in the gate's vocabulary** —
+  stage 4 records per-rung behaviour, and a non-terminating cell is a new
+  behaviour class. Settle that before writing rungs, and **STOP and report if
+  `harness/` needs a change.** ⚠ Also `.memory/04-verus.md`: `decreases b - a`
+  fails on two-cursor loops, and a probe sequence's measure is *unvisited slots*,
+  which needs a ghost set — budget more than one session.
+- **p36 (vtable dispatch) — likeliest to hit p55's wall.** An out-of-table
+  indirect call jumps to whatever is adjacent, so **the harm is not
+  reproducible**, and there is no equivalent of the fold-from-offset-16 trick
+  that rescued the UAF. `check.py:1249` needs every non-adversarial cell to agree
+  with `model.py`. Settle reproducibility **first**, the way TASK_055 had to.
+  ⚠ And R1h's real answer is `-fsanitize=cfi`, which needs `-flto` and is
+  clang-only — a build-flag change, so **harness territory: report, do not make
+  it.**
+- **p31 (provenance) — demote it.** Miri is the only checker, which is fine (it
+  is already gate stage 8), but the expected shipped-compiler behaviour is
+  *nothing observable*, which makes it **p08's shape** — a tooling-and-
+  expressiveness result the tree already has one of. Build it for provenance
+  only if a pattern is wanted whose whole finding is a tooling claim.
+
 ⚠ **This is a judgement call, not a measurement, and it is the manager's own** —
 PROTOCOL rule 3. Two honest objections to it, neither answered here: **(a)** the
 user's standing goal names *breadth over realistic C patterns*, and axis-first
