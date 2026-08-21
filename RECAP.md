@@ -8,18 +8,34 @@ this box is reference; this box is what to *do*.
 
 | | |
 |---|---|
-| **Patterns** | **16 of 47 exist, all green, all 16 reviewed.** |
-| **Immediate next task** | ⚠ **THREE BACKLOG TASKS ARE IN FLIGHT CONCURRENTLY** — `TASK_053` (sweep every gate stage for the skipped-comparison defect; **audit only**, notes `.temp/p53/`), `TASK_054` (fix p12's false sole-catcher claim + cross-pattern audit; `.temp/p54/`), `TASK_055` (two prover probes: p08's last removable trusted item, and whether `vstd::raw_ptr` can give a **lifetime** bug a rung; `.temp/p55/`, lands nothing). **Resume each with `SendMessage`, do not restart.** When they land: **batch every `harness/` fix from 053 into ONE change** — `check.py` is hashed into every gate record, so a re-run costs ~30 min and must be paid once. **Then** the next pattern: **p10**. |
-| **Why three at once, and the rule it bends** | PROTOCOL says one agent at a time. The manager relaxed it **only** for work that touches neither **measurement** nor **gate JSONs** — those are the real hazards (concurrent timing jobs destroyed a whole sweep on p14; any `harness/` edit makes all 16 records stale). All three are barred from wall-clock work and confined to disjoint paths. **Do not widen this further without the same argument.** |
-| **When you reach p10** | ⚠ **Make settling the bug class the FIRST deliverable** — the catalogue's guess has been overturned on four patterns (p07, p06, p14, p13 in part) and **upheld on one** (p18). ⚠ **And read `.memory/03-measurement.md`'s two new sections first**: a law owes its **domain** (usually *missing columns*, not a caveat), and the only out-of-sample test here that has ever been able to fail is **additivity extrapolation**. |
-| **The open question that is bigger than p18** | `-C debug-assertions=on` **also enables `assert_unsafe_precondition!` inside `get_unchecked`**, and **15 of 16 R4s here rest on it.** ⚠ **The manager's reading — "R4's advantage over R2 disappears" — was REFUTED**: it holds on p18 and p01 (`R4-O3d == R2-O3d` exactly) and **fails on p16**, where R4 keeps a 39% margin. **What holds on 3 of 3: at `-O3` with debug-assertions on, R4 becomes DEARER THAN R3, reversing the `-O3` ordering** (+17.0% p18, +2.4% p01, +0.6% p16). |
-| **The `O0d` question p18 opens** | An oversized shift is UB that touches **no memory**, and **ASan is silent** — but ⚠ **the manager's claim that Miri and a proof are blind too was WRONG**: **four things catch it — UBSan** (`-fsanitize=undefined` implies `-fsanitize=shift`), **`debug-assertions`, Miri** (as a **panic**, not a `ub` report — so a gate keying on the `ub` flag alone would miss it) **and Verus**. In Rust it is caught by **`debug-assertions`** and nothing else, and **every measured cell here has them OFF** (`build.py:143-148`, `OPTS = ["O0","O3"]`). The `O0d` mode that turns them on has existed since p01 and **has never been measured on any pattern**. ⚠ `O0d` is **not** semantics-matched to C `-O0` — it is a Rust-vs-Rust number only. |
-| **The null-control question, settled** | The byte-identical **R4/R5 pair is NOT a null control**: the `verus` build's kernel lands at a **fixed offset** from the `unsafe` build's, so it samples one `addr % 64` alignment contrast every time. ⚠ **That offset is a SOURCE-PATH-LENGTH artefact** — it moves if you clone the repo elsewhere — **not 0x20 and not a per-pattern constant**; both were manager generalisations and both were refuted — a **biased draw of size one**, median ≈0 over a layout population. **The floor is the layout population, not the pair.** p06's own floor is **±4.6%**, and its clang column still clears it at ~2.1×. (p06's `NOTES.md` now says ±4.6%; two later sentences in that file still say ±3% and both remain true.) |
-| **Then** | review p14, then **p10** (sliding window) or **p18** (LEB128). |
-| **The TCB question is SETTLED** | A pattern **cannot** meaningfully shrink its TCB by pushing axioms into vstd — measured, 3.4% exposure, because `get_unchecked`, `copy_nonoverlapping`, `as_ptr`, `ptr::add` and `count_ones` are all unsupported at the pinned vstd. Ship **one number plus a three-way classification**; the two-number proposal was refuted by census and must not be reinstated. `.memory/04-verus.md`. |
-| **The loop** | build a pattern → review it once → land corrections → repeat. Per `PROTOCOL.md` rule 9, write `.memory/` **only after** the review. |
+| **Patterns** | **16 of 47 exist, all green, all 16 reviewed. 0 STALE.** |
+| **Do this next** | **p10** (sliding window / stencil) — write `TASK_057`. The backlog is **clear**: `TASK_053`–`056` swept all 18 gate stages, fixed or declined every defect, corrected six patterns' prose, took p08 to TCB 4 → 3, and re-ran 16/16 green. |
+| **Two rules for writing that task** | ⚠ **Settle the bug class as the FIRST deliverable** — the catalogue's guess has been overturned on four patterns and upheld on one. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat), and the only out-of-sample test here that has ever been able to fail is **additivity extrapolation**. Both in `.memory/03-measurement.md`. |
+| **The biggest opportunity, unbuilt** | **A LIFETIME bug can have a full ladder.** `vstd::raw_ptr` verifies **3/0** on a heap kernel at `exact`/`norel` with **zero project-local trusted items** (TASK_055, unreviewed). Every bug here is spatial or logical; this is the one class safe Rust rejects at *compile* time. Shape: a **slab — pointer handles at R4/R5, `(slot, generation)` at R1h/R2/R3** — so safe Rust's cost is a **representation change, not a check**. ⚠ Settle TCB counting first; it would publish `tcb_items = 2`, fewer than p01. |
+| **The loop** | build → review once → land corrections. **Three tasks per pattern is the measured cost.** Per `PROTOCOL.md` rule 9, write `.memory/` **only after** the review. |
 | **Git** | Commit at task boundaries; subagents never commit. ⚠ **There is a GitHub remote** (`origin`, `HALOCORE/sec-ladder`). **Do not push unless the user asks.** |
 | **Before quoting any number** | `harness/measure.py --check-stale` (exit 1 on STALE). |
+
+**Four settled answers that cost real time to get. Do not re-litigate them; each
+is written up in `.memory/`.**
+
+- **The R4/R5 pair is not a null control** — the `verus` kernel sits at a fixed
+  offset from the `unsafe` one, and **that offset is a source-path-length
+  artefact** (it moves if you clone elsewhere), so the pair is a **biased draw of
+  size one**. *The floor is the layout population.* p06's own floor is **±4.6%**.
+- **The TCB column is not gameable — retrospectively.** 3.4% exposure across the
+  16 patterns that exist. ⚠ **Prospectively it is**: a `raw_ptr` pattern needs
+  zero project-local trusted items. Ship **one number plus the U-license / V-gap
+  / infra classification**; the two-number proposal was refuted by census.
+- **`-C debug-assertions=on` also enables `assert_unsafe_precondition!` inside
+  `get_unchecked`**, and 15 of 16 R4s rest on it. *"R4's advantage over R2
+  disappears"* was **refuted** (true on p18/p01, false on p16). What holds on
+  3 of 3: **at `-O3` with debug-assertions on, R4 becomes dearer than R3.**
+- **`build.py` is hashed into the MEASUREMENT records, not just the gate
+  records.** So "one harness edit, one 30-minute gate re-run" is true of
+  `check.py` and **false of `build.py`** — that costs a full re-measure and
+  churns published timing prose. It is why `O3d` was built, measured inert, and
+  **reverted**; land it bundled with a pattern being re-measured anyway.
 
 **The three things most likely to waste your time**, all learned the hard way:
 
@@ -1267,7 +1283,7 @@ and both copies went stale (13 and 7 against the task files' 55).
 
 ## Priority — read this before planning
 
-**Fifty-two tasks in, 16 of 47 patterns exist**, and the ratio is the thing to
+**Fifty-six tasks in, 16 of 47 patterns exist**, and the ratio is the thing to
 watch. Six tasks went to gate hardening before the user called it; **T015–028 —
 thirteen consecutive tasks — went to the spelling problem** and produced no new
 pattern. Both arcs paid for themselves, and neither was on anyone's plan. But the
@@ -1288,7 +1304,7 @@ not build → review.** Three tasks per pattern is the real cost; plan with it.
 The gate's threat model is **honest mistake, not malicious author**
 (`.memory/02-bench-rules.md`, top section, with the residuals deliberately left
 open). **New gate work must pass "could this happen by accident?" first** — and
-`check.py` is ~5060 lines against 16 patterns, so the next gate proposal should
+`check.py` is ~5100 lines against 16 patterns, so the next gate proposal should
 have to beat that ratio.
 
 **Review each pattern once; do not review each fix to each check.** The two

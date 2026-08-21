@@ -184,3 +184,31 @@ are live falsehoods in committed records and I think those are clearly worth it.
 **F4, F5, F6, m1 and m2 are judgement calls, and I would rather you decline one
 with a reason than land all five out of completeness.** Tell me which you dropped
 and why.
+
+---
+
+## Outcome (recorded by the manager at the task boundary)
+
+**Landed** in `2657531`; records refreshed in `713624c`. 16/16 gates green,
+**32 records, 0 STALE**.
+
+**Two manager decisions taken on this task's findings:**
+
+1. **`O3d` was REVERTED**, though it was built correctly and is genuinely
+   useful. `harness/build.py` is hashed into the **measurement** records as well
+   as the gate records, so keeping it meant either a permanently red
+   `--check-stale` (10 records) or re-running callgrind over the whole matrix —
+   which re-takes the wall-clock block and would churn ten patterns' published
+   timing prose. The axis stays reachable under `controls/`, as p18 reached it.
+   **Land it bundled with a pattern that is being re-measured anyway.**
+   Rationale in `.memory/03-measurement.md`.
+2. **F6 stays declined**, recorded as a known residual in
+   `.memory/02-bench-rules.md` with the general form it produced.
+
+⚠ **PROTOCOL rule 2's running count is 89.** This task's engineer corrected the
+manager four times: the `-O0` price was the wrong metric (kernel-exclusive
++2.00 against the published marginal **+27.00**, a 13× divergence); F6's
+accident-test precedent is invisible to the check it was cited for;
+`nonlinear_arith` aborts as well as `bit_vector`; and the batching rule named
+only the gate half of `build.py`'s blast radius. **Carry 89 forward into the
+next task file's closing paragraph.**
