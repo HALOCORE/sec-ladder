@@ -906,6 +906,44 @@ A proof of a false or unreachable statement verifies happily. Guard against:
 
 The reviewer agent checks all of the above by grep + reading. See `.tasks/PROTOCOL.md`.
 
+### `global size_of usize == 8;` — Verus's `usize` is ARCHITECTURE-INDEPENDENT
+
+**p10, TASK_059; reviewed and cleared to land as-is (TASK_057_REVIEW).** Verus
+does not assume a 64-bit `usize`. So
+
+```rust
+let taps: usize = 2 * r + 1;        // r built from four header bytes
+```
+
+is `possible arithmetic underflow/overflow` — **on a hypothetical 32-bit
+target**, where `2·(2³²−1)+1` really does overflow.
+
+⚠ **Bounding the VALUES does not help.** `assert(n <= 0xffff_ffff); assert(r <=
+0xffff_ffff);` verify *themselves* and the two errors stand (measured both ways),
+because the missing bound is on **`usize::MAX`**, not on `n` or `r`. This is the
+kind of obligation that looks like an input-range problem and is not.
+
+Two routes, and the choice is forced by the pattern's own declaration:
+
+- **Widen the arithmetic.** p07 met the identical obligation and computed its
+  length check in `u64`. **p10 could not**: `spec.md` pins the spelling
+  `2 * r + 1` in all seven rungs, so an `(r as u64)` cast would put R5 outside
+  its own pattern's contract — `.memory/01-ladder.md`'s idiom pin reaching into
+  the proof, which is the R4-is-chained-to-the-prover mechanism running the
+  other way.
+- **`global size_of usize == 8;`** — one line, and the file goes to
+  `10 verified, 0 errors`.
+
+> **It costs NOTHING and that is measured, not argued.** It is **checked by
+> Verus against the actual compilation target**, not assumed — a `== 4` fails to
+> compile with **`E0080`**, so a 32-bit build cannot be produced at all. It adds
+> **no trusted item** and **no obligation of its own**: the count summing to
+> exactly 10 is the check.
+
+⚠ **Once it is in, value-bounding `assert`s of the kind above go DEAD** — verify
+identically with and without them. Remove them; a dead `assert` in a proof reads
+as load-bearing to the next person.
+
 ## Proof techniques that keep coming up
 
 - **Four traps a parser proof hits, all measured on p17 (TASK_011).** Full

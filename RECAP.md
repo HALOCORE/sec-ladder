@@ -8,12 +8,12 @@ this box is reference; this box is what to *do*.
 
 | | |
 |---|---|
-| **Patterns** | **16 of 47 exist, all green, all 16 reviewed. 0 STALE.** |
-| **In flight** | **`TASK_057` — p10** (sliding window / weighted FIR), engineer running. **`TASK_058`** — a read-only audit of the doc layer against the records (executes nothing, so it is safe beside a measuring agent). |
-| **Do this next** | Land p10: `TASK_057_REVIEW`, then a corrections task. Then **`TASK_055_REVIEW`** (written, uncommitted work — it is what the **lifetime pattern is blocked on**, and it also carries the manager's `tcb_reach` proposal for attack). ⚠ **Run `TASK_055_REVIEW` ALONE** — it takes measurements. |
-| **After that** | `.memory/06-catalogue.md`'s new section **"The waves order by FAMILY, and after 16 patterns that is the wrong axis"** — six missing axes, and the order the manager recommends (lifetime → p47 → p38 → p22 → p36). It is a judgement call with its own objections attached; **push back with the pattern you would rather build.** |
-| **Two rules for writing that task** | ⚠ **Settle the bug class as the FIRST deliverable** — the catalogue's guess has been overturned on four patterns and upheld on one. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat), and the only out-of-sample test here that has ever been able to fail is **additivity extrapolation**. Both in `.memory/03-measurement.md`. |
-| **The biggest opportunity, unbuilt** | **A LIFETIME bug can have a full ladder.** `vstd::raw_ptr` verifies **3/0** on a heap kernel at `exact`/`norel` with **zero project-local trusted items** (TASK_055, unreviewed). Every bug here is spatial or logical; this is the one class safe Rust rejects at *compile* time. Shape: a **slab — pointer handles at R4/R5, `(slot, generation)` at R1h/R2/R3** — so safe Rust's cost is a **representation change, not a check**. ⚠ Settle TCB counting first; it would publish `tcb_items = 2`, fewer than p01. |
+| **Patterns** | **17 of 47 exist, all green, all 17 reviewed. 0 STALE.** (Count it: `ls -d patterns/p*/ | wc -l`. A spelled-out number sat here reading "thirteen" against a sixteen-row table.) |
+| **Do this next** | **`TASK_055_REVIEW`** — written and committed, never run. It is what the **lifetime pattern is blocked on**, and it carries the manager's `tcb_reach` proposal for attack. ⚠ **Run it ALONE** — it takes measurements, and A2 asks it to re-measure under valgrind. |
+| **Then** | The **lifetime pattern**, if `TASK_055_REVIEW`'s A1 clears it — otherwise **p47** (constant-time compare). `.memory/06-catalogue.md`'s section **"The waves order by FAMILY, and after 16 patterns that is the wrong axis"** has the six missing axes, the recommended order (lifetime → p47 → p38 → p22 → p36), and a **feasibility triage** naming what would kill each. It is the manager's judgement with its own objections attached; **push back with the pattern you would rather build.** |
+| **Three rules for writing that task** | ⚠ **Settle the bug class as the FIRST deliverable** — overturned on four patterns, upheld on two. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat), and the only out-of-sample test here that has ever been able to fail is **additivity extrapolation**. ⚠ **Name the INLINE MODE at every figure** — p10 fitted both and the regressors *swapped*. All three in `.memory/03-measurement.md`. |
+| **The biggest opportunity, unbuilt** | **A LIFETIME bug can have a full ladder.** `vstd::raw_ptr` verifies **3/0** on a heap kernel with **zero project-local trusted items** (TASK_055, **unreviewed — that is what `TASK_055_REVIEW` is for**). Every bug here is spatial or logical; this is the one class safe Rust rejects at *compile* time. Shape: a **slab — pointer handles at R4/R5, `(slot, generation)` at R1h/R2/R3** — so safe Rust's cost is a **representation change, not a check**. ⚠ Settle TCB counting first; it would publish `tcb_items = 2`, fewer than p01. |
+| **The newest trap, from p10** | **A headline can be wrong in the FLATTERING direction and pass a green gate.** p10 published *"safe Rust cheaper than unsafe"*; 60% of it was an **unsearched R4 side** and the rest was **index-expression bookkeeping** that C pays more of than either Rust rung. **Before publishing any rung comparison, ask what the other rung's spelling is worth** — finding 14 (p13) is the same failure. |
 | **The loop** | build → review once → land corrections. **Three tasks per pattern is the measured cost.** Per `PROTOCOL.md` rule 9, write `.memory/` **only after** the review. |
 | **Git** | Commit at task boundaries; subagents never commit. ⚠ **There is a GitHub remote** (`origin`, `HALOCORE/sec-ladder`). **Do not push unless the user asks.** |
 | **Before quoting any number** | `harness/measure.py --check-stale` (exit 1 on STALE). |
@@ -99,6 +99,7 @@ rows, or run `ls -d patterns/p*/ | wc -l`.
 | p06 | in-place rotate | **the `Ir` column is sign-wrong** — clang's hardened rung executes *fewer* instructions and runs *slower* |
 | p14 | field split | **an exact law, fitted where the guard never fires** — and why "hardening is cheaper than the bug" is not publishable |
 | p18 | LEB128 varint | **UB that is not memory-unsafety** — four catchers, all outside the measured matrix |
+| p10 | weighted FIR stencil | **a headline wrong in the flattering direction** — safe beats unsafe, and none of it is safety |
 
 **If you read only one thing after this file**, read `.tasks/TASK_026.md` §0 — the
 distilled rules from the thirteen-task spelling arc. Every pattern built after it
@@ -134,6 +135,7 @@ the commands are in `.memory/01-ladder.md`'s numbering warning.
 | p06 | **15** | 26 |
 | p14 | **16** | 27 |
 | p18 | **17** | 28 |
+| p10 | **18** | 29 |
 | p01, p02 | findings 1–3 | 1–8 |
 
 Cross-cutting entries exist only here: **14** (every rung is a spelling), **16**
@@ -1115,6 +1117,40 @@ the number.** Two task files have already sent an agent to the wrong finding.
    stage never compared exit code or stdout when `expected_exit != 0` — with a
    committed regression check. **A second hole of the same shape is open.**
 
+29. **p10 — the safe rung beats the unsafe one, and none of it is safety.**
+   (TASK_057, reviewed at TASK_057_REVIEW — **1 blocker, 5 majors, 5 minors,
+   21 clean negatives** — corrected at TASK_059. Authoritative:
+   `.memory/01-ladder.md` **finding 18**.)
+
+   A weighted FIR stencil; **the first kernel here with more than one indexed
+   read per iteration** at a fixed offset from the cursor. Bug class **upheld**,
+   second of six settled.
+
+   **Safety's own cost is a two-part answer, not a number: `0.00` `Ir` per
+   VECTORISED tap and `+3.00` per SCALAR-EPILOGUE tap.** And the `+3.00` is not
+   *"the check costs 3"* — R2 spends **5** instructions on two bounds checks and
+   **saves 2**, because indexed addressing off one induction variable replaces
+   the unsafe rung's three pointer bumps.
+
+   ⚠ **Its headline was wrong in the FLATTERING direction and the corrected one
+   is bigger.** It shipped as `R3 − R4 = −323/−603`, *"safe Rust cheaper than
+   unsafe"*, blamed on panic pads. Pads can only explain the per-tap coefficient
+   and that coefficient is **0.00**. **60% of the margin was R4 spelling** — the
+   rejected candidate verifies once one invariant clause is added — and the rest
+   is **index-expression bookkeeping in any language**: `c-clang`, with the same
+   index expression as the unsafe rung, is **dearer than both Rust rungs**, and
+   there is no bounds check in any of the three. **Safe Rust beats every LLVM
+   cell and does not beat gcc on `large`. Quote the backend and the blob.**
+
+   **Three transferable results, all in `.memory/03-measurement.md`.** A law
+   fitted in one **inline mode** is not the law in the other — `nout` and
+   `scaltap` **swap roles** between `isolated` and `whole`, both fits rank-full
+   and exact. An **`identity: exact` pin excludes every candidate R4 carrying a
+   panic pad**, which bounds the R4 search space on *every* pattern. And p18's
+   domain rule reproduced on an **eighth** pattern, with the diagnostic
+   quantified: the old columns refitted over all rows go to residuals **9.19 …
+   1606.73**, which a caveat would have hidden.
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds
@@ -1329,7 +1365,7 @@ engineer *flagged against itself*, and a mechanism asserted without a control.
 
 ## Immediate queue
 
-**`TASK_057` (p10) and `TASK_058` (doc audit) are in flight.** See the START HERE
+**`TASK_055_REVIEW` is the next task, and it is already written.** See the START HERE
 box; this section is the standing backlog, not the next action.
 
 ⚠ **The concurrency rule, so it is not read as blanket licence.** One agent at a
@@ -1358,6 +1394,23 @@ lives in `harness/`; the `.partial.json` trap is gone (they now write to
 `.memory/03-measurement.md`: `build.py` is hashed into the *measurement* records
 too, so landing it costs a full re-measure and would churn ten patterns' timing
 prose. **Land it bundled with a pattern that is being re-measured anyway.**
+
+**New, from p10's cycle:**
+
+- **p10's R4-side span is a LOWER BOUND ON ITS OWN WIDTH.** `u_win` is the
+  cheapest admissible R4 found (194.00 / 362.00 below shipped), but it carries a
+  panic pad, so `identity: exact` excludes it. **Nobody has looked for an R4 that
+  is both cheaper and PAD-FREE**, which is the one that could actually ship.
+- **p10's `-O3 whole` laws have no registered out-of-sample test** — band `e` was
+  registered for the `isolated` column only, so for `whole` it is an ordinary
+  hold-out.
+- **p10's whole-mode per-output coefficients are not decomposed** mnemonic by
+  mnemonic, and its padding caveat applies to them.
+- **`u_win` was never run through `check.py` as a rung** — its `required`
+  spellings were checked by reading.
+- **`measure.py p10` was re-run at TASK_059** (comment edits touch
+  `source_sha256`). Every deterministic metric was diffed and is identical; the
+  wall column moved ~8% and one cell now trips the 10% spread threshold.
 
 **Still open, from p18's cycle:**
 
@@ -1417,14 +1470,18 @@ Both retired.
 
 ### Owed, in priority order
 
-1. **The two-step reslice is untried on every pattern except p04**, and most
-   patterns' R3 opens with the window reslice it improves. It is worth
-   **−1 Ir/call** — which on p04 was **20% of the whole published tax** — costs
-   zero `unsafe` and zero TCB, and its mechanism is register allocation rather
-   than bounds-check removal, so it is *not* the lever any prior spelling search
-   ran. **This is the cheapest outstanding correction on the project**: one
-   substitution per pattern, gate re-run, no re-measurement of anything else.
+1. **The two-step reslice is untried on most patterns**, and most patterns' R3
+   opens with the window reslice it improves. It costs zero `unsafe` and zero
+   TCB, and its mechanism is register allocation rather than bounds-check
+   removal, so it is *not* the lever any prior spelling search ran. **One
+   substitution per pattern, gate re-run, no re-measurement of anything else.**
    `.memory/01-ladder.md` finding 3 carries the spelling and the mechanism.
+   ⚠ **Do NOT quote "−1 `Ir`/call, confirmed on seven patterns" — the manager
+   did, and it levels two very different pieces of evidence.** On p04 the
+   −1 was **20% of the whole published tax**. On p10 it is **one instruction**
+   (3268 against 3269), which `.memory/03-measurement.md` requires be called
+   **instruction-count-only and stopped there** — it does not retire this item
+   on its own, and TASK_059 retracted the claim that it did.
 2. **p03's span rests on one unreviewed measurement.** TASK_037's `a_tail` is
    swept (`maxres 0.000000`, 19 blobs) and its admissibility comes from the gate's
    own decidable matcher, which is why it was landed — but it refuted a number a
@@ -1517,9 +1574,11 @@ grep -rho '\.tasks/TASK_[A-Za-z0-9_]*\.md' .memory/ .tasks/ RECAP.md \
 python3 -c "import hashlib,glob;print({hashlib.sha256(open(f).read()[open(f).read().find('NAMED-SPELLING STANDARD'):open(f).read().find('p01 and p08 neither')+19].encode()).hexdigest()[:12] for f in glob.glob('patterns/*/spec.md')})"
 ```
 
-- **16 patterns, all green**: p01 `PASS-WITH-BLOCKED-ROWS` (Miri policy on its
+- **17 patterns, all green**: p01 `PASS-WITH-BLOCKED-ROWS` (Miri policy on its
   `large.bin`, documented, not a regression); p02, p03, p04, p05, p06, p07, p08,
-  p09, p11, p12, p13, p14, p16, p17, p18 `PASS`. **32 records, 0 stale.**
+  p09, **p10**, p11, p12, p13, p14, p16, p17, p18 `PASS`. **34 records, 0 stale.**
+  ⚠ These two counts move with every pattern; the invariant is *all green* and
+  *0 STALE*, not the numbers.
 - **The shared named-spelling paragraph is byte-identical across every**
   `idiom.why` block — currently one hash, `59748cce2db5`, 11 003 bytes.
   ⚠ **The value depends on how you slice the span**, so trust the *command*

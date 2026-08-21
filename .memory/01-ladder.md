@@ -2024,6 +2024,80 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
    Miri 9/9, **TCB 3, no `assume`**. ⚠ p18 publishes **no pair interval** and its
    **R4 side is unsearched in contract**; `R3 − R4` is a fixed-R4 reading only.
 
+18. **p10 — the safe rung beats the unsafe one, and NONE of it is safety.** A
+   weighted FIR / sliding-window stencil, and the first kernel here with more
+   than one indexed read per iteration at a fixed offset from the cursor.
+   Reviewed (TASK_057_REVIEW: 1 blocker + 5 majors + 5 minors, **21 clean
+   negatives**), corrected at TASK_059.
+
+   **The safety tax proper, and it is a two-part answer, not a number:**
+   **0.00 `Ir` per VECTORISED tap** — R2's and R4's `vecit` coefficients are both
+   `17.00` and their vector loops are the same seventeen instructions in the same
+   order — and **+3.00 per SCALAR-EPILOGUE tap**. ⚠ **The +3.00 is not "the check
+   costs 3."** R2 spends **5** instructions on two bounds checks (`lea/cmp/jae`
+   for the sample, `cmp/je` for the coefficient) and **saves 2**, because indexed
+   addressing off one induction variable replaces R4's three pointer bumps.
+   5 − 2 = 3. **That is finding 9's shape (p11) one level further on: the loop's
+   ADDRESSING MODE pays back part of the check.** ⚠ p10's `NOTES.md:934` calls
+   that *"finding 17"*, which is correct in **RECAP's** scheme and is **p18**
+   here — the live collision, walked into twice in one day, once by the engineer
+   and once by the manager writing this entry. **Name the pattern.**
+
+   What R2 pays instead of a per-tap check is a **24-instruction per-output
+   `cmp`/`cmov` chain** at the outer loop head — the vectoriser's runtime bounds
+   guard, hoisted out of the tap loop. **That is finding 6 (p05) reproduced on a
+   different kernel, and it removes p05's stated excuse**: p05 attributed its
+   hoisted chain to a *nonlinear* obligation, and p10's is **linear**. ⚠ p05's
+   chain is 22 and p10's is **24** — the shapes match and the counts do not, so
+   neither number is a constant.
+
+   ⚠ **THE HEADLINE THIS PATTERN NEARLY SHIPPED WAS WRONG, AND THE CORRECTED ONE
+   IS BIGGER.** It was published as *"`R3 − R4` = −323.00 / −603.00 — safe Rust
+   cheaper than unsafe"*, attributed to a panic-pad count. Three independent
+   things were wrong with that:
+
+   - **Pads cannot produce it.** Pads can only explain the per-tap coefficient,
+     and that coefficient is **`0.00`** — worth nothing.
+   - **60% of the margin was R4 SPELLING.** The rejected R4 candidate `u_win`
+     **verifies** (10/0, no new trusted item, no lemma) once one invariant clause
+     relates `w@` to `buf@.subrange`; `R3ship − u_win` is **−129.00 / −241.00**.
+     This is finding 14 (p13) repeating: *an unsearched R4 side flatters the
+     safe rung.*
+   - **The rest is INDEX-EXPRESSION BOOKKEEPING, in any language.** R4 forms two
+     independent four-term indices per tap (`off + sb + i + j` and `off + 8 + j`)
+     and so needs four outer induction variables and two stack reloads per
+     output; R3's `windows()` + `zip` hands the epilogue two base pointers and
+     **one shared index register**. **`c-clang`, with the same index expression
+     as R4, fits the per-output coefficient at 30.00 — dearer than both Rust
+     rungs.** *There is no bounds check in any of the three.*
+
+   > **So the measurement is: on this kernel the safe ITERATOR gives LLVM a
+   > simpler induction-variable structure than explicit index arithmetic does,
+   > and that is a codegen result rather than a safety result.** Safe Rust beats
+   > **every LLVM cell** on both blobs; it does **not** beat gcc on `large`,
+   > where gcc vectorises 16 wide. **Quote it with the backend and the blob**, or
+   > it is the same overclaim in a different direction.
+
+   **Bug class: the catalogue's guess UPHELD** — off-by-one at the boundary,
+   `last > len` where the hardened rung writes `last >= len`, **one character**,
+   one byte of overread, conditional on attacker data. Second upheld of six
+   settled. ⚠ Its §0 rejected **five** candidates, and on **argument, not
+   measurement** — the manager's task file said four and said measured; both were
+   wrong (TASK_057_REVIEW).
+
+   **Hardening is free here — with a domain.** `c-gcc-h − c-gcc = 0.00` on every
+   fitted coefficient, and the review confirmed **the check is not deleted**
+   (`cmp %rcx,%rax ; jb` against `cmp %rax,%rcx ; jae`, 216 instructions both
+   ways). clang's is `+1.00`, a `jmp` from tail-merging `return 0`. ⚠ **But
+   `+1.00 flat` is false outside the accepting domain**, and at `-O3 whole` gcc's
+   is **−1.00** — hardened *cheaper*. **Never quote it without the mode and the
+   domain.** On a fully-rejecting blob the bug's real price shows: `c-gcc` 1942
+   against `c-gcc-h` 62.
+
+   Sound: Verus **10/0** (twin 11/0), `R4 ≡ R5` `exact` at O3 / `norel` at O0,
+   **TCB 3, no `assume`**, `global size_of usize == 8;` checked rather than
+   assumed (`.memory/04-verus.md`).
+
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how
 much proof keeps that base sound, and which C patterns resist this treatment.*

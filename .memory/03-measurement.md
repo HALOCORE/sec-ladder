@@ -1292,6 +1292,23 @@ measured).
 > takes the residual to **1.81…7.27** and knocks every coefficient off its
 > integer. A caveat would have hidden that.
 
+⚠ **EIGHTH PATTERN, and this time the diagnostic is quantified** (p10,
+TASK_059). p10's laws were fitted where every call is **accepted**; a blob whose
+windows are rejected (`taps > n`) breaks **every** difference law, with residuals
+**exactly linear in the rejected-call fraction** — `R2−R4` −14.00, `R3−R4`
++22.00, `R2−R3` −36.00, identical across three blobs at rejection fractions
+0.52 / 0.50 / 0.17. Adding the columns: **rank 7 of 7, `max|resid| 0.0000` in and
+out of sample, and every one of the four original coefficients survives to the
+integer.** Refitting the OLD columns over all 33 rows instead gives residuals
+**9.19, 14.12, 23.31** and **1606.73** on clang's hardening law. **A caveat would
+have hidden all of that** — exactly p18's result, now on a second pattern.
+
+⚠ **And p10 needed a SIXTH parameter behind the fifth, which is a distinction
+worth stealing: it is WHICH GUARD rejects, not which comparison.** Rejecting at
+`last >= len` costs +4/+5 more per rung than rejecting at `n < taps`, and the two
+"far" regressors are identical in all six guarded cells. p10's parameter count
+went **3 → 4 → 6**, and it says so rather than claiming the list is closed.
+
 ⚠ **And the parameter list is rarely complete on the first pass.** Both the
 manager's task file and the review named p18's domain as **one** condition
 (`term == nv`); the engineer measured **two** independent ones, and a band
@@ -1336,6 +1353,64 @@ to `K − T` and `ceil(c/32)` equal to `K` — so the natural step basis is
 **singular**, as is every indicator basis. Nothing about the design could have
 fitted the step, and the honest report is *"not identifiable here"*, not *"no law
 exists"*.
+
+## ⚠ A law fitted in one INLINE MODE is not the law in the other — the regressors can SWAP
+
+**p10, TASK_059, measured — and this is the sharpest instance of "say whose
+counts" on the project, because both fits are exact and both designs are full
+rank.** p10's `R3 − R4` was published from `-O3 isolated` (which is
+`controls/sweep_ir.py`'s default and was named nowhere) as:
+
+```
+-O3 isolated   R3 − R4 = −3  − 5.00·nout + 0.00·scaltap − 1·novecout + …
+-O3 whole      R3 − R4 = +1  + 0.00·nout − 2.00·scaltap + 1·novecout + …
+```
+
+**`nout` and `scaltap` swap roles.** Both fits are **rank 7 of 7** with
+`max|resid| 0.0000` in and out of sample. The whole-mode figure reproduces to the
+instruction as `1 − 2·64` and `1 − 2·120`, and the headline shrinks 2.5×
+(−323/−603 → −127/−239).
+
+> **The mechanism is real, not a fitting artefact.** Once the kernel is inlined
+> into `main`, the outer-loop strength reduction goes away, so the per-tap cost
+> absorbs the address arithmetic the per-output term carried in `isolated`. The
+> epilogue bodies, counted off the shipped binary rather than fitted, are
+> R4 = 9, R3 = 7, `c-clang` = 7 — and R4's two extra instructions are **two
+> `lea`s re-forming its two four-term indices**, not checks.
+
+**Consequences, and they are cheap to obey:**
+
+1. **Name the mode at every figure**, in `NOTES.md`, `README.md` and any
+   `.memory/` entry. A mode-free per-call `Ir` figure is under-specified in
+   exactly the way a convention-free one is (`:479`).
+2. **A sweep's default mode is a silent choice.** `sweep_ir.py --mode isolated`
+   was the default on p10 and nothing in the published text said so.
+3. **Fitting both modes is nearly free and can upgrade a correction into a
+   result.** p10's C2 was specced as *"the number is smaller"*; fitting the
+   second mode turned it into the swap above, and the whole-mode value landed
+   **within 2 `Ir`** of the value an independent route (a cheaper admissible R4)
+   produced. **Two routes to one number is worth more than either alone.**
+
+## ⚠ An `identity: exact` pin excludes every candidate R4 that carries a PANIC PAD
+
+**p10, TASK_057_REVIEW + TASK_059, measured on a pad count rather than inferred.**
+p10's rejected R4 candidate `u_win` **verifies** (10/0, no new trusted item), and
+its R4/R5 pair is `md5_fn_norel`-equal with `md5_fn` **different**: the sole real
+difference is one pc-relative `lea`, the `split_at` **panic-`Location`
+pointer**. `pads.py --source` gives `u_win` **1** surviving pad and the shipped
+`unsafe` rung **0**.
+
+> **So a pattern pinning `identity: exact` cannot admit any R4 whose spelling
+> leaves a panic pad standing, whatever the pad costs.** That is a bound on the
+> **R4 search space of every pattern**, not a p10 quirk, and it is the reason
+> p10 publishes an R4-side span instead of a cheaper R4. It sharpens
+> `:116`'s *"`md5_fn` moves with the SOURCE FILE'S NAME when a panic survives"*:
+> the same mechanism that makes a digest path-sensitive also makes `exact`
+> unreachable for the whole class.
+
+**Do not relax a pattern's pin to admit one** — p10 did not; every other pattern
+pins `exact` at `-O3` and the exception would be the finding. **Publish the
+fixed-R4 bound and the span, and name the pin as the binding constraint.**
 
 ## A fitted law is a law in SOMEBODY's counts — say whose
 
