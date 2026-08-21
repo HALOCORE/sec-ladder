@@ -9,7 +9,9 @@ this box is reference; this box is what to *do*.
 | | |
 |---|---|
 | **Patterns** | **16 of 47 exist, all green, all 16 reviewed. 0 STALE.** |
-| **Do this next** | **p10** (sliding window / stencil) — write `TASK_057`. The backlog is **clear**: `TASK_053`–`056` swept all 18 gate stages, fixed or declined every defect, corrected six patterns' prose, took p08 to TCB 4 → 3, and re-ran 16/16 green. |
+| **In flight** | **`TASK_057` — p10** (sliding window / weighted FIR), engineer running. **`TASK_058`** — a read-only audit of the doc layer against the records (executes nothing, so it is safe beside a measuring agent). |
+| **Do this next** | Land p10: `TASK_057_REVIEW`, then a corrections task. Then **`TASK_055_REVIEW`** (written, uncommitted work — it is what the **lifetime pattern is blocked on**, and it also carries the manager's `tcb_reach` proposal for attack). ⚠ **Run `TASK_055_REVIEW` ALONE** — it takes measurements. |
+| **After that** | `.memory/06-catalogue.md`'s new section **"The waves order by FAMILY, and after 16 patterns that is the wrong axis"** — six missing axes, and the order the manager recommends (lifetime → p47 → p38 → p22 → p36). It is a judgement call with its own objections attached; **push back with the pattern you would rather build.** |
 | **Two rules for writing that task** | ⚠ **Settle the bug class as the FIRST deliverable** — the catalogue's guess has been overturned on four patterns and upheld on one. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat), and the only out-of-sample test here that has ever been able to fail is **additivity extrapolation**. Both in `.memory/03-measurement.md`. |
 | **The biggest opportunity, unbuilt** | **A LIFETIME bug can have a full ladder.** `vstd::raw_ptr` verifies **3/0** on a heap kernel at `exact`/`norel` with **zero project-local trusted items** (TASK_055, unreviewed). Every bug here is spatial or logical; this is the one class safe Rust rejects at *compile* time. Shape: a **slab — pointer handles at R4/R5, `(slot, generation)` at R1h/R2/R3** — so safe Rust's cost is a **representation change, not a check**. ⚠ Settle TCB counting first; it would publish `tcb_items = 2`, fewer than p01. |
 | **The loop** | build → review once → land corrections. **Three tasks per pattern is the measured cost.** Per `PROTOCOL.md` rule 9, write `.memory/` **only after** the review. |
@@ -1315,8 +1317,17 @@ engineer *flagged against itself*, and a mechanism asserted without a control.
 
 ## Immediate queue
 
-**The next task is `TASK_057` — p10.** See the START HERE box; this section is
-the standing backlog, not the next action.
+**`TASK_057` (p10) and `TASK_058` (doc audit) are in flight.** See the START HERE
+box; this section is the standing backlog, not the next action.
+
+⚠ **The concurrency rule, so it is not read as blanket licence.** One agent at a
+time is the default. It is relaxed **only** for work that touches neither
+**measurement** — concurrent CPU load corrupts a `ns` column, and two timing jobs
+corrupt each other — nor **gate JSONs**, which `check.py` rewrites in place.
+`TASK_058` qualifies because it is forbidden from executing anything at all.
+`TASK_055_REVIEW` does **not** qualify: it runs valgrind and Verus. Deterministic
+`Ir` under callgrind is immune to contention; wall clock is not, and the failure
+is silent.
 
 ### CLOSED at TASK_053–056 — history, not work
 
