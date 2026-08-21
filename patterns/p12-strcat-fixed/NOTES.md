@@ -1044,10 +1044,10 @@ precondition of trusted item 3. Deleting the capacity check does not make the
 answer wrong first -- it makes the store unlicensed first, which is the correct
 order for a memory-safety result.
 
-### 9b. `p2_weak_write_requires` -- one character, and only the TWIN sees it
+### 9b. `p2_weak_write_requires` -- one character, and the twin is the sole *Verus-level* catcher
 
 `i < old(v)@.len()` → `i <= old(v)@.len()` in `dst_set_unchecked` **and** in its
-twin, so the two signatures still match and `spec.md`'s item pin does not move.
+twin, so the two signatures still match.
 
 ```
 $ ./verus_run.py .temp/p12/controls/p2_weak_write_requires.rs
@@ -1061,7 +1061,85 @@ verification results:: 17 verified, 1 errors
 
 A weaker precondition only *removes* obligations from callers, so ordinary Verus
 is happy; the twin's `v[i] = x` under `i <= v.len()` is a real out-of-bounds
-store and Verus can see that one. **This is the twin regime's whole case, and
+store and Verus can see that one.
+
+⚠ **This section used to be headed *"only the TWIN sees it"* and to say
+*"`spec.md`'s item pin does not move"*. The second half is FALSE and is
+corrected here at TASK_054**, on TASK_047_REVIEW's M3, which measured the same
+defect on p06. **p12's `spec.md` pins the clause text of the TWIN as well as of
+the trusted item** -- `verus.items` carries both `dst_set_unchecked` and
+`slb_twin_dst_set_unchecked` at `requires ["i < old(v)@.len()"]` -- so an edit
+that moves both moves **two** pinned clauses. Run through `check.py`'s own stage
+functions against a repo-layout mirror -- `.temp/p54/stages.py`, which imports
+`check_verus_contract` (`check.py:2140`), `check_call_site` (`:2295`),
+`check_clause_deletion` (`:2493`), `check_requires_strength` (`:2804`) and
+`check_trusted_twins` (`:3199`) and calls them on a copy of this pattern under
+`.temp/`, so nothing here is a re-implementation and the pattern directory is
+never written to. The shipped `verus.rs` through the same path gives
+`total failures: 0`; the mutant gives:
+
+```
+== 5a. the Verus contract matches the pin in spec.md ==
+  FAIL [proof-pin] verus.rs:327 `dst_set_unchecked` drifted from spec.md --
+      requires: ['i <= old(v)@.len()'] != pinned ['i < old(v)@.len()']
+  FAIL [proof-pin] verus.rs:343 `slb_twin_dst_set_unchecked` drifted -- (same)
+== 5c. clause deletion ==      ok  4 `ensures` conjunct(s), every one load-bearing
+== 5c-req. precondition strength ==
+  ok  dst_set_unchecked requires[0] is not a tautology -- `i <= old(v)@.len()`
+== 5c-twin. verified twin ==
+  FAIL [twin] verus.rs: with `--cfg slb_twin` Verus reports 17 verified, 1 errors
+      (15 verified without the twins)
+    error: precondition not met: index in bounds for this access --> verus.rs:350:5
+                                                        total failures: 3
+```
+
+So the mutant fails **stage 5a (`verus_contract`), which runs *before*
+5c-twin**, and then **5c-twin limb (ii)**. `.memory/04-verus.md` records that
+5c-twin has two limbs and that a mutation report must say which one fired:
+**limb (i), signature identity, does NOT fire** -- the signatures really do still
+match, which is the half of the old sentence that was true and is what makes
+limb (ii) the interesting one. (Contrast p13's M2, which weakens the item and
+leaves the twin alone and so trips limb (i) instead.)
+
+**What survives is the *Verus-level* claim, and the counterfactual measures it.**
+Of everything that reads `verus.rs` as a proof rather than as text, the twin is
+the only thing that objects: ordinary Verus is at 15/0, 5c finds every `ensures`
+conjunct load-bearing, and 5c-req reports the weakened clause is not a tautology.
+The contract pin catches this mutant only because the mutant did not edit
+`spec.md` in the same commit. Weaken the two pinned clauses in a copy of
+`spec.md` -- i.e. build the mutant the way p02, p09, p16 and p17 build theirs,
+which is TASK_008_REVIEW's original attack, an author who moves proof and pin
+together -- and the static limbs go silent:
+
+```
+$ python3 .temp/p54/limbs.py .temp/p54/pinmoved/patterns/p12-strcat-fixed \
+      verus.rs .temp/p12/controls/p2_weak_write_requires.rs --no-verus
+=== p2_weak_write_requires.rs   NO LIMB FIRES
+```
+
+with `--cfg slb_twin` still at `17 verified, 1 errors`. **Against that mutant the
+twin is the sole catcher, full stop; against this one it is the sole
+*Verus-level* catcher.** That is the attack the twin exists for.
+
+⚠ **The `identity` pin does NOT move here** -- p06's correction has two halves
+and only one of them transfers. A `requires` is ghost, so this mutant's kernel is
+byte-identical to the shipped one. Measured rather than argued, with the mutant
+and the shipped file at **equal-length paths** so that TASK_051_REVIEW M1's
+source-path-length artefact cannot confound it, compiled at the gate's own
+`-C opt-level=3 -C debug-assertions=off --cfg slb_isolated` (`.temp/p54/id/`):
+
+```
+                shipped R5           p2_weak_write_requires
+n_fn / n_nopad  142 / 138            142 / 138
+md5_raw         f154b78fc39aaeab...  f154b78fc39aaeab...
+md5_fn          f2572cd58e4426e4...  f2572cd58e4426e4...
+```
+
+and `f2572cd58e44` is what `results/gate/p12-strcat-fixed.json` records for
+`unsafe vs verus O3 exact`, so that is the shipped kernel. p06's identity limb
+fired for a *different* mutant, `b_scrmod_msonly`, which changes exec code.
+
+**This is the twin regime's whole case, and
 p12 is the second pattern to exercise it on a WRITE** (p03 is the first).
 `.memory/04-verus.md` records that both known instances were reviewer-built;
 so is this one, and the caveat stands.

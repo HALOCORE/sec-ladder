@@ -133,7 +133,7 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
     "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
-    "patterns/p12-strcat-fixed/NOTES.md": "3d11ba8e31a11f392b400fb6ca5c625e1b17e6380d6a16cb930ccf385de84a62",
+    "patterns/p12-strcat-fixed/NOTES.md": "4f42e3dfbfc262f9c60701f3ba79dd3e6a4af04e8a5fa10a0d28881fbacd1eae",
     "patterns/p12-strcat-fixed/README.md": "b055d1509e610d7191fb4d9590e5f3bfca20bd3118110e6e2221590745e40751",
     "patterns/p12-strcat-fixed/c/kernel.c": "8f40894e72413d7d4681498943d80839dd43e7ca7941edad6c055da29a630dbb",
     "patterns/p12-strcat-fixed/c/kernel.h": "c15eafe202c635ef0dca883cdfb84891d2df9bdcf1bae606101aed4529f8b3bf",
@@ -1007,21 +1007,21 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:16: runtime error: index 128 out of bounds for type 'uint8_t [128]' /home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:25: runtime error: store to address 0x7f34e89001a0 with insufficient space for an ob"
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:16: runtime error: index 128 out of bounds for type 'uint8_t [128]' /home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:25: runtime error: store to address 0x7f1fbef001a0 with insufficient space for an ob"
     },
     "adversarial-off1.bin": {
       "exit": 1,
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:16: runtime error: index 128 out of bounds for type 'uint8_t [128]' /home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:25: runtime error: store to address 0x7f29419001a0 with insufficient space for an ob"
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:16: runtime error: index 128 out of bounds for type 'uint8_t [128]' /home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:25: runtime error: store to address 0x7faf4bd001a0 with insufficient space for an ob"
     },
     "adversarial-overflow.bin": {
       "exit": 1,
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:16: runtime error: index 128 out of bounds for type 'uint8_t [128]' /home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:25: runtime error: store to address 0x7f5117f001a0 with insufficient space for an ob"
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:16: runtime error: index 128 out of bounds for type 'uint8_t [128]' /home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:25: runtime error: store to address 0x7f9db0d001a0 with insufficient space for an ob"
     },
     "adversarial-stride3.bin": {
       "exit": 0,
