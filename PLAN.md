@@ -125,10 +125,27 @@ Rules, so that nothing is optimised away and the ladder stays comparable:
 
 ---
 
-## Proposed pattern catalogue
+## Proposed pattern catalogue — ⚠ HISTORICAL, DO NOT BUILD FROM THIS TABLE
 
-Ordered by expected Verus difficulty. Start with the first three end-to-end
-before widening — the aim is depth on a few, not shallow coverage of ten.
+**The live catalogue is `.memory/06-catalogue.md`** (47 patterns, `p01`…`p47`,
+with real status per row). What follows is the *original proposal*, kept because
+the reasoning around it is still the argument for the project's shape. **Three
+reasons not to use it as a work list:**
+
+1. **It is a THIRD numbering scheme.** Its `#4` is not `p04`. This project
+   already has two live numbering schemes that have collided repeatedly (see the
+   warnings in `RECAP.md` and `.memory/01-ladder.md`); do not add a third by
+   citing a number from here.
+2. **At least one bug class in it is RETRACTED.** `#4 binary search — midpoint
+   overflow` is the class `.memory/06-catalogue.md` records as **wrong**:
+   `(lo+hi)/2` is unreachable **by a factor of 2.1e9** for any input the wire
+   format can express, and p07's real bugs are unsigned underflow of an inclusive
+   upper bound plus a 32-bit length check fooled at an 88-byte window.
+3. **Every remaining bug class here is a guess written before anything was
+   built**, and guesses have not held up: four patterns overturned their own
+   catalogue row (p07, p06, p14, and p13 in part) and one upheld it (p18).
+   **Settling the bug class against the wire format is now the first deliverable
+   of every pattern task.**
 
 | # | Pattern | C bug class it models | Verus difficulty |
 |---|---------|----------------------|------------------|
@@ -235,11 +252,18 @@ Verus notes, layout, pattern catalogue); task specs and reviews in `.tasks/`.
 - **P1 — harness + p01 (TASK_002).** `harness/{asm,build,check,measure,report}.py`
   plus the first real pattern as the template all 47 clone from.
 - **P2 — Wave 1 patterns**: p02 buffer copy, p16 TLV walker, p17 HTTP Range parser.
-  First results table; first adversarial-behaviour table.
-- **P3 — Waves 2–5**, breadth across families A–D and G.
+  ✅ Done. First results table; first adversarial-behaviour table.
+- **P3 — Waves 2–5**, breadth across families A–D and G. **In progress: 16 of 47
+  patterns exist, all green, all reviewed** (see `RECAP.md` for the live count —
+  do not copy a number here, it will go stale).
+  ⚠ **The measured cost is THREE tasks per pattern**, not two: build → review →
+  land corrections. The last five patterns each needed the third task and all
+  five were worth it.
 - **P4 — Wave 6**, the pointer-heavy patterns where R5 is expected to fail; record
-  where the proofs get stuck.
-- **P5 — cross-pattern analysis and writeup.**
+  where the proofs get stuck. **Not started.** ⚠ Note the one probe taken so far:
+  `vstd::raw_ptr` as a route to a provable R4 for a *lifetime* bug is **untried**,
+  and it is what stands between this project and its first lifetime-bug pattern.
+- **P5 — cross-pattern analysis and writeup.** Not started.
 
 Full pattern list, difficulty and status: `.memory/06-catalogue.md`.
 
@@ -250,5 +274,10 @@ Full pattern list, difficulty and status: `.memory/06-catalogue.md`.
 3. **Ask for `perf_event_paranoid ≤ 1`?** Still open, still needs root. Without it
    there is no IPC, branch-miss or cache-miss data — which is the one thing that
    could explain *why* gcc's shorter loop runs slower. Everything else is covered.
-4. **Proof-effort budget per cell** — proposed: a hard cap per R5 cell, past which
-   we record the sticking point and move on. Needs a number from you.
+4. ~~**Proof-effort budget per cell**~~ — **decided at TASK_008: one engineer
+   session per R5 cell**, then stop and report the exact Verus error and the
+   obligation it could not discharge; that report *is* the deliverable for the
+   row. Set by the manager, **still pending a user override**. Rationale and the
+   raise-it-when-the-sticking-point-is-the-finding caveat are in
+   `.memory/06-catalogue.md`. **No R5 has stalled yet** — every pattern so far
+   verified inside the budget, most on the first or second attempt.

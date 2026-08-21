@@ -1286,7 +1286,7 @@ not build → review.** Three tasks per pattern is the real cost; plan with it.
 The gate's threat model is **honest mistake, not malicious author**
 (`.memory/02-bench-rules.md`, top section, with the residuals deliberately left
 open). **New gate work must pass "could this happen by accident?" first** — and
-`check.py` is ~5070 lines against 16 patterns, so the next gate proposal should
+`check.py` is ~5060 lines against 16 patterns, so the next gate proposal should
 have to beat that ratio.
 
 **Review each pattern once; do not review each fix to each check.** The two

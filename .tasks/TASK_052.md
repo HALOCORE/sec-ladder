@@ -166,3 +166,19 @@ the old code silently permitted, in which case tightening the comparison
 produces a pile of false failures and the right fix is narrower — compare exit
 code but not stdout, say. **If that is what you find, stop at the measurement and
 tell me what the distribution of failures looks like before repairing anything.**
+
+---
+
+## Outcome (recorded by the manager at the task boundary)
+
+**Landed.** Part A's items and Part B's fix are in `b5f3edc`; `.memory/` written
+in `b907686`. Part B's condition 4 came back clean — **exactly three reachable
+rows across all 16 patterns, all already matching, zero new failures**, so the
+narrower fallback was not needed.
+
+⚠ **PROTOCOL rule 2's running count is 80** (this task's engineer contradicted
+the manager once more, correctly: p18's law domain is **two** independent
+structural parameters, not the one both the task file and the review named).
+**Carry 80 forward into the next task file's closing paragraph** — this line
+exists because the count lives in the newest task file and nowhere else, and the
+increment would otherwise have been lost with the agent's return message.

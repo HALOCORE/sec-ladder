@@ -7,7 +7,21 @@ timing, proof burden and trusted-base size.
 
 ## Where things are
 
-- `PLAN.md` — plan, feasibility argument, pattern catalogue, benchmark-cell rules, open decisions.
+**Start here, in this order** — the three files below carry the live state; the
+rest is reference.
+
+- `RECAP.md` — **the handoff document.** Its START HERE box is the next action.
+  Read it first, always.
+- `.tasks/PROTOCOL.md` — the agent protocol: roles, the manager's own rules,
+  definition of done, the reviewer checklist. One agent works at a time.
+- `.memory/` 00–06 — **the authoritative layer, and it supersedes any task report
+  it contradicts.** 00 environment, 01 ladder + per-pattern findings, 02 bench
+  rules, 03 measurement, 04 Verus, 05 repo layout, 06 the 47-pattern catalogue.
+
+- `PLAN.md` — the original plan and feasibility argument. ⚠ **Historical**: its
+  pattern table is a pre-project proposal with its own numbering and at least one
+  bug class the project has since retracted. `.memory/06-catalogue.md` is the
+  catalogue.
 - `TOOLCHAIN.md` — running Verus (`./verus_run.py`), version pins, Verus conventions, what's missing on this box.
 - `pilot/README.md` — calibration kernel at all five rungs; the evidence behind the plan.
 - `harness/` — `asm.py` (the only objdump caller), `vparse.py` (Verus items and
