@@ -56,14 +56,15 @@
     "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
-    "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "8406efc38e78de7506a0736dfc68fd7fc682b1becd9e4812f30a3f1f36b33b6f",
+    "harness/build.py": "9019be5de10f74dd45f170f7c7ce95b941ded35ccc78c937f729affdd9a07954",
+    "harness/check.py": "28f91dff8192a28ba681ce3b0e078589e0a568c3bfd6e6c3b0fa73ade67f353c",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+    "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
-    "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
-    "patterns/p05-index-flatten/NOTES.md": "0e8418fd775df3fd92b578381fca7ee9fa6812831168526c0fbe7f7ed467f8fa",
+    "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+    "patterns/p05-index-flatten/NOTES.md": "92a9c1046e1e73471b2077d0d2b36340b87d1e19c74520913930a02e93774ef4",
     "patterns/p05-index-flatten/README.md": "1d63da6e199fa8b5a981fbbb6fd9c13dbde52530f69632b44e5cea69a05c49c7",
     "patterns/p05-index-flatten/c/kernel.c": "484308a6fa4dd4f61aa00ccb58b25bbe8cd4cb182de0bbefa9308e4fed5296ae",
     "patterns/p05-index-flatten/c/kernel.h": "910c7479b88896eea27be86c34958ab9a6474c97844ea01b34865a1f23098c72",
@@ -313,9 +314,16 @@
           "kind": "trusted",
           "clause": "i < v@.len()",
           "test": "tautology",
-          "tactic": "bit_vector",
-          "verified": null,
-          "errors": null,
+          "tactic": "nonlinear_arith",
+          "tactics_ran": [
+            null,
+            "nonlinear_arith"
+          ],
+          "tactics_inapplicable": [
+            "bit_vector"
+          ],
+          "verified": 13,
+          "errors": 1,
           "verdict": "not a tautology"
         },
         {
@@ -323,9 +331,16 @@
           "kind": "verified",
           "clause": "off + len <= buf@.len()",
           "test": "tautology",
-          "tactic": "bit_vector",
-          "verified": null,
-          "errors": null,
+          "tactic": "nonlinear_arith",
+          "tactics_ran": [
+            null,
+            "nonlinear_arith"
+          ],
+          "tactics_inapplicable": [
+            "bit_vector"
+          ],
+          "verified": 13,
+          "errors": 1,
           "verdict": "not a tautology"
         },
         {
@@ -426,262 +441,616 @@
     }
   },
   "adversarial": {
-    "adversarial-dims.bin/c-gcc": {
-      "exit": 0,
-      "stdout": "1995007930150557952",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-dims.bin/c-clang": {
-      "exit": 0,
-      "stdout": "7126985031508368896",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-dims.bin/safe_naive": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-dims.bin/safe_tuned": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-dims.bin/unsafe": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-dims.bin/verus": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-dims.bin/c-gcc-h": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-dims.bin/c-clang-h": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-ovf.bin/c-gcc": {
-      "exit": -11,
-      "stdout": "",
-      "stderr": "",
-      "signal": 11,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-ovf.bin/c-clang": {
-      "exit": -11,
-      "stdout": "",
-      "stderr": "",
-      "signal": 11,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-ovf.bin/safe_naive": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-ovf.bin/safe_tuned": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-ovf.bin/unsafe": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-ovf.bin/verus": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-ovf.bin/c-gcc-h": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-ovf.bin/c-clang-h": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-stride3.bin/c-gcc": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-stride3.bin/c-clang": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-stride3.bin/safe_naive": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-stride3.bin/safe_tuned": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-stride3.bin/unsafe": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-stride3.bin/verus": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-stride3.bin/c-gcc-h": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-stride3.bin/c-clang-h": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-zero.bin/c-gcc": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-zero.bin/c-clang": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-zero.bin/safe_naive": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-zero.bin/safe_tuned": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-zero.bin/unsafe": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-zero.bin/verus": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-zero.bin/c-gcc-h": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-zero.bin/c-clang-h": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    }
+    "adversarial-dims.bin/c-gcc": [
+      {
+        "exit": 0,
+        "stdout": "17831305656827411968",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "3121335202191036160",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "8971025341573733632",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "9477025573474217984",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": true
+      }
+    ],
+    "adversarial-dims.bin/c-clang": [
+      {
+        "exit": 0,
+        "stdout": "10023248399139840256",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "12756491959589355776",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "2003478335327866368",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "8799535129214469376",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": true
+      }
+    ],
+    "adversarial-dims.bin/safe_naive": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-dims.bin/safe_tuned": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-dims.bin/unsafe": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-dims.bin/verus": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-dims.bin/c-gcc-h": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-dims.bin/c-clang-h": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-ovf.bin/c-gcc": [
+      {
+        "exit": -11,
+        "stdout": "",
+        "stderr": "",
+        "signal": 11,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": true
+      }
+    ],
+    "adversarial-ovf.bin/c-clang": [
+      {
+        "exit": -11,
+        "stdout": "",
+        "stderr": "",
+        "signal": 11,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": true
+      }
+    ],
+    "adversarial-ovf.bin/safe_naive": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-ovf.bin/safe_tuned": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-ovf.bin/unsafe": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-ovf.bin/verus": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-ovf.bin/c-gcc-h": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-ovf.bin/c-clang-h": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-stride3.bin/c-gcc": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-stride3.bin/c-clang": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-stride3.bin/safe_naive": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-stride3.bin/safe_tuned": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-stride3.bin/unsafe": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-stride3.bin/verus": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-stride3.bin/c-gcc-h": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-stride3.bin/c-clang-h": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-zero.bin/c-gcc": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-zero.bin/c-clang": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-zero.bin/safe_naive": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-zero.bin/safe_tuned": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-zero.bin/unsafe": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-zero.bin/verus": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-zero.bin/c-gcc-h": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-zero.bin/c-clang-h": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ]
   },
   "sanitizer": {
     "adversarial-dims.bin": {
@@ -689,42 +1058,54 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==1698601==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d4 at pc 0x55d3b21847a1 bp 0x7fff627c2710 sp 0x7fff627c2700 READ of size 1 at 0x5070000000d4 thread T0 #0 0x55d3b21847a0 in kernel /home/apt/repos_common/"
+      "diagnostic": "================================================================= ==1985557==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d4 at pc 0x5559b590d7a1 bp 0x7ffee7994e40 sp 0x7ffee7994e30 READ of size 1 at 0x5070000000d4 thread T0 #0 0x5559b590d7a0 in kernel /home/apt/repos_common/",
+      "stdout": "",
+      "model_stdout": "0"
     },
     "adversarial-ovf.bin": {
       "exit": 1,
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==1698602==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d8 at pc 0x561fc8bce7a1 bp 0x7ffc4ffcc030 sp 0x7ffc4ffcc020 READ of size 1 at 0x5070000000d8 thread T0 #0 0x561fc8bce7a0 in kernel /home/apt/repos_common/"
+      "diagnostic": "================================================================= ==1985558==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d8 at pc 0x555c9994d7a1 bp 0x7fff5b277b30 sp 0x7fff5b277b20 READ of size 1 at 0x5070000000d8 thread T0 #0 0x555c9994d7a0 in kernel /home/apt/repos_common/",
+      "stdout": "",
+      "model_stdout": "0"
     },
     "adversarial-stride3.bin": {
       "exit": 0,
       "expected_exit": 0,
       "expect": "clean",
       "fired": false,
-      "diagnostic": ""
+      "diagnostic": "",
+      "stdout": "0",
+      "model_stdout": "0"
     },
     "adversarial-zero.bin": {
       "exit": 0,
       "expected_exit": 0,
       "expect": "clean",
       "fired": false,
-      "diagnostic": ""
+      "diagnostic": "",
+      "stdout": "0",
+      "model_stdout": "0"
     },
     "large.bin": {
       "exit": 0,
       "expected_exit": 0,
       "expect": "clean",
       "fired": false,
-      "diagnostic": ""
+      "diagnostic": "",
+      "stdout": "9972956928725141114",
+      "model_stdout": "9972956928725141114"
     },
     "small.bin": {
       "exit": 0,
       "expected_exit": 0,
       "expect": "clean",
       "fired": false,
-      "diagnostic": ""
+      "diagnostic": "",
+      "stdout": "1506433241298462329",
+      "model_stdout": "1506433241298462329"
     }
   },
   "miri": {

@@ -1,6 +1,6 @@
 # p08-overlap-move — results
 
-Generated 2026-08-18T03:14:40Z from `results/p08-overlap-move.json` (git `4ab7a5505ef4`, working tree dirty).
+Generated 2026-08-21T07:58:49Z from `results/p08-overlap-move.json` (git `91e4ff082c51`, working tree dirty).
 
 ## Toolchain
 
@@ -46,7 +46,7 @@ Every delta below is a difference between rungs that are meant to be spellings o
 
 ### Spelling audit (stage `0b`, reporting only)
 
-Measured by the gate, not by this file — from `results/gate/p08-overlap-move.json`, contract `78f5575dee2d`.
+Measured by the gate, not by this file — from `results/gate/p08-overlap-move.json`, contract `e4eab08622dd`.
 
 `8` backticked spelling(s) over `6` rung(s) → **24** (spelling, rung) pair(s), **16** present — not the product, because a per-language entry is read against its own language's rungs only. Matching is `check.spelling_matches`: comments, string literals and Verus ghost clauses blanked, then all whitespace deleted.
 
@@ -91,8 +91,8 @@ Measured by the gate, not by this file — from `results/gate/p08-overlap-move.j
 | c-clang | 104 | 104 | 1 | 557 | 153,025,004 | - | 525,056 | - | `35eea7fd` | `97f4c9c3` | yes | - |
 | safe_naive | 241 | 241 | 7 | 1,385 | 770,425,000 | - | 625,077 | - | `00466200` | `398f2efc` | yes | - |
 | safe_tuned | 207 | 207 | 8 | 1,160 | 229,425,000 | - | 625,077 | - | `e961e8f4` | `5707c96c` | yes | - |
-| unsafe | 206 | 206 | 9 | 1,159 | 229,325,000 | - | 625,077 | - | `7bbb6ae9` | `9d7b97e3` | yes | - |
-| verus | 206 | 206 | 9 | 1,159 | 229,325,000 | - | 625,056 | - | `7bbb6ae9` | `9d7b97e3` | yes | - |
+| unsafe | 208 | 208 | 4 | 1,180 | 229,375,000 | - | 625,077 | - | `b7842f19` | `8f1835a6` | yes | - |
+| verus | 208 | 208 | 4 | 1,180 | 229,375,000 | - | 625,056 | - | `b7842f19` | `8f1835a6` | yes | - |
 | c-gcc-h | 135 | 135 | 0 | 678 | 203,550,000 | - | 900,066 | - | `0d39618a` | `0d39618a` | yes | - |
 | c-clang-h | 104 | 104 | 1 | 557 | 153,025,008 | - | 525,056 | - | `29a1dc65` | `3315f5df` | yes | - |
 
@@ -119,8 +119,8 @@ Measured by the gate, not by this file — from `results/gate/p08-overlap-move.j
 | c-clang | 67 | 67 | 0 | 277 | 152,975,004 | - | 525,055 | - | `273b5f18` | `273b5f18` | yes | - |
 | safe_naive | 123 | 123 | 12 | 612 | 770,425,000 | - | 625,077 | - | `97e0cb59` | `f2e1c45f` | yes | xmm |
 | safe_tuned | 123 | 123 | 12 | 612 | 229,425,000 | - | 625,077 | - | `778c41d9` | `ac1c611a` | yes | xmm |
-| unsafe | 123 | 123 | 12 | 612 | 229,325,000 | - | 625,077 | - | `a325bd16` | `aca80a8b` | yes | xmm |
-| verus | 86 | 86 | 7 | 329 | 229,325,000 | - | 625,056 | - | `686f4703` | `bac78b04` | yes | - |
+| unsafe | 123 | 123 | 12 | 612 | 229,375,000 | - | 625,077 | - | `1a5b3c1e` | `211dcf7c` | yes | xmm |
+| verus | 86 | 86 | 7 | 329 | 229,375,000 | - | 625,056 | - | `1f935cad` | `cf2247ce` | yes | - |
 | c-gcc-h | 100 | 100 | 0 | 426 | 203,550,000 | - | 900,066 | - | `9dbb8f7c` | `9dbb8f7c` | yes | - |
 | c-clang-h | 67 | 67 | 0 | 277 | 152,975,008 | - | 525,055 | - | `273b5f18` | `273b5f18` | yes | - |
 
@@ -130,7 +130,7 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 | pair | opt | md5_fn equal | md5_fn_norel equal | md5_raw equal | counts (fn / pad-excl) | padding |
 |---|---|---|---|---|---|---|
-| unsafe vs verus | O0 | **yes** | **yes** | **yes** | 206/206 vs 206/206 | 9 B vs 9 B |
+| unsafe vs verus | O0 | **yes** | **yes** | **yes** | 208/208 vs 208/208 | 4 B vs 4 B |
 | unsafe vs verus | O3 | **yes** | **yes** | **yes** | 168/166 vs 168/166 | 15 B vs 15 B |
 
 ## Wall clock (secondary)
@@ -139,22 +139,22 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 72.73 | 73.51 | 1.1% | 13.89 | 14.11 | 1.6% |
-| c-gcc | whole | 72.32 | 73.41 | 1.5% | 13.90 | 14.11 | 1.5% |
-| c-clang | isolated | 72.24 | 73.26 | 1.4% | 13.70 | 13.89 | 1.4% |
-| c-clang | whole | 72.69 | 73.56 | 1.2% | 13.73 | 13.93 | 1.5% |
-| safe_naive | isolated | 109.17 | 110.28 | 1.0% | 28.44 | 28.74 | 1.1% |
-| safe_naive | whole | 99.08 | 99.99 | 0.9% | 24.63 | 24.95 | 1.3% |
-| safe_tuned | isolated | 72.80 | 73.63 | 1.1% | 13.83 | 14.09 | 1.8% |
-| safe_tuned | whole | 72.57 | 73.76 | 1.6% | 13.81 | 14.10 | 2.1% |
-| unsafe | isolated | 72.34 | 73.44 | 1.5% | 13.86 | 14.06 | 1.4% |
-| unsafe | whole | 72.84 | 73.56 | 1.0% | 13.95 | 14.13 | 1.3% |
-| verus | isolated | 72.40 | 73.22 | 1.1% | 13.88 | 14.08 | 1.4% |
-| verus | whole | 72.88 | 73.41 | 0.7% | 13.97 | 14.12 | 1.1% |
-| c-gcc-h | isolated | 72.47 | 73.41 | 1.3% | 13.89 | 14.15 | 1.8% |
-| c-gcc-h | whole | 72.45 | 73.51 | 1.5% | 13.91 | 14.10 | 1.4% |
-| c-clang-h | isolated | 72.01 | 73.40 | 1.9% | 13.67 | 13.91 | 1.7% |
-| c-clang-h | whole | 71.97 | 73.25 | 1.8% | 13.80 | 13.99 | 1.4% |
+| c-gcc | isolated | 59.57 | 60.35 | 1.3% | 13.92 | 14.13 | 1.5% |
+| c-gcc | whole | 59.47 | 60.30 | 1.4% | 13.91 | 14.06 | 1.1% |
+| c-clang | isolated | 59.60 | 60.31 | 1.2% | 13.75 | 13.88 | 0.9% |
+| c-clang | whole | 59.62 | 60.35 | 1.2% | 13.76 | 13.96 | 1.4% |
+| safe_naive | isolated | 96.10 | 97.36 | 1.3% | 28.37 | 28.63 | 0.9% |
+| safe_naive | whole | 86.16 | 87.09 | 1.1% | 24.50 | 24.91 | 1.7% |
+| safe_tuned | isolated | 59.53 | 60.58 | 1.8% | 13.89 | 14.01 | 0.9% |
+| safe_tuned | whole | 59.61 | 60.65 | 1.7% | 13.92 | 14.05 | 0.9% |
+| unsafe | isolated | 59.51 | 60.52 | 1.7% | 13.88 | 14.05 | 1.2% |
+| unsafe | whole | 59.92 | 60.49 | 1.0% | 13.99 | 14.12 | 0.9% |
+| verus | isolated | 59.91 | 60.50 | 1.0% | 13.87 | 14.05 | 1.3% |
+| verus | whole | 59.85 | 60.33 | 0.8% | 13.91 | 14.14 | 1.6% |
+| c-gcc-h | isolated | 59.42 | 60.15 | 1.2% | 13.92 | 14.14 | 1.6% |
+| c-gcc-h | whole | 59.78 | 60.29 | 0.9% | 13.93 | 14.13 | 1.4% |
+| c-clang-h | isolated | 59.74 | 60.34 | 1.0% | 13.73 | 13.91 | 1.3% |
+| c-clang-h | whole | 59.39 | 60.41 | 1.7% | 13.73 | 13.90 | 1.2% |
 
 Every wall-clock cell is within the 10% min-to-median spread threshold.
 

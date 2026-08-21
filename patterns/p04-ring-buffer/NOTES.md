@@ -1062,13 +1062,40 @@ precondition is touched.
 ### 6b. The four `p_*` mutants each fail for a different reason
 
 - **`p1_weak_requires`** — `i < v@.len()` → `i <= v@.len()` in
-  `ring_get_unchecked` **and** its twin, so the signatures still match and the
-  contract pin does not move. **The shipped configuration PASSES (9/0)** and only
-  `--cfg slb_twin` catches it (*precondition not met: index in bounds*). The
-  tautology probe cannot see it, parameter coverage cannot see it, and deletion
-  is not applied to trusted items. **The verified twin is the only mechanism in
-  this project that catches it**, and this is the second pattern (after p03)
-  where it has been exercised on an accessor that is not the slice one.
+  `ring_get_unchecked` **and** its twin, so the signatures still match (5c-twin's
+  limb (i) does **not** fire) and **the shipped configuration PASSES (9/0)**;
+  only `--cfg slb_twin` catches it among the *Verus* oracles (*precondition not
+  met: index in bounds*, 11 verified / 1 error). The tautology probe cannot see
+  it, parameter coverage cannot see it, and deletion is not applied to trusted
+  items. This is the second pattern (after p03) where the twin has been exercised
+  on an accessor that is not the slice one.
+
+  ⚠ **CORRECTED AT TASK_056. Until then this bullet said *"the contract pin does
+  not move"* and *"the verified twin is the only mechanism in this project that
+  catches it"*. The first is FALSE and the second is true only of the Verus
+  stages.** `spec.md`'s `verus.items` pins the clause text of
+  **`slb_twin_ring_get_unchecked` as well as `ring_get_unchecked`**, so a
+  weakening applied to item *and* twin moves **two pinned clauses** and fails
+  stage 5a, which runs **before** 5c-twin. Measured with `harness/limbs.py` on
+  the mutant this pattern's own `controls/gen_controls.py` produces:
+
+  ```
+  === verus.rs              shipped 9/0   twin 12/0   NO LIMB FIRES
+  === p1_weak_requires.rs   shipped 9/0   twin 11/1
+        [5a-clause] ring_get_unchecked.requires          ['i <= v@.len()'] != pinned ['i < v@.len()']
+        [5a-clause] slb_twin_ring_get_unchecked.requires ['i <= v@.len()'] != pinned ['i < v@.len()']
+        [5ct-run]   --cfg slb_twin: 11 verified, 1 errors
+                    error: precondition not met: index in bounds for this access
+  ```
+
+  **Two limbs fire, not one.** The rule (TASK_054, TASK_056, measured on six
+  patterns): **the twin is the sole catcher only of a mutant that edits
+  `spec.md` in the same commit** — TASK_008_REVIEW's original attack, and the
+  reason the twin exists. p16, p17, p09 and p02 build theirs that way and say so.
+  What is true here is *sole **Verus-level** catcher*. **The `identity` pin does
+  not move**: a `requires` is ghost and cannot reach codegen — measured on p12
+  (TASK_054) and again on p03 at TASK_056, byte-identical kernels from
+  equal-length source paths. An exec-code edit can move it; this cannot.
 - **`p2_nofullguard`** — R1's bug in the exec code, functional spec in place:
   *invariant not satisfied at end of loop body*, i.e. the relational clause.
   **Not** a memory error, which is the whole point (contrast p03, whose same

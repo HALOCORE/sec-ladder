@@ -90,14 +90,15 @@
     "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
-    "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "8406efc38e78de7506a0736dfc68fd7fc682b1becd9e4812f30a3f1f36b33b6f",
+    "harness/build.py": "9019be5de10f74dd45f170f7c7ce95b941ded35ccc78c937f729affdd9a07954",
+    "harness/check.py": "28f91dff8192a28ba681ce3b0e078589e0a568c3bfd6e6c3b0fa73ade67f353c",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+    "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
-    "harness/vparse.py": "52718a80db6ffb38cb005aed6715452874194b20a796949c54f61179a41d99d7",
-    "patterns/p03-bounded-stack/NOTES.md": "5959aa391032a0a999bf5270610bb7c7832b962f3326f6a8c886bbddf68a1b6f",
+    "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+    "patterns/p03-bounded-stack/NOTES.md": "c0d9d6e42a070274d9d40ac695586d4c3217289a576cc75c11f1d8c22b228caa",
     "patterns/p03-bounded-stack/README.md": "3cc82de5b8db1b527cb3b0f37238646fd4111b38d602f385eab829436cbe91fa",
     "patterns/p03-bounded-stack/c/kernel.c": "9f1558cfbe298a11dc7edd231e2ee8d1efcf339e9f2332dc3e2cc0ef3782bf37",
     "patterns/p03-bounded-stack/c/kernel.h": "11a5cfc8f821fb56cbf3384ab99c24465c4d0d861cd6c770607cb84318d097bc",
@@ -234,47 +235,47 @@
     "safe_naive/O0/isolated/small.bin": 22429.0,
     "safe_naive/O0/isolated/large.bin": 73469.3,
     "safe_naive/O0/isolated/d_ir_d_work": 17.21426644182125,
-    "safe_naive/O0/whole/small.bin": 22429.0,
-    "safe_naive/O0/whole/large.bin": 73469.3,
+    "safe_naive/O0/whole/small.bin": 22436.0,
+    "safe_naive/O0/whole/large.bin": 73476.3,
     "safe_naive/O0/whole/d_ir_d_work": 17.21426644182125,
     "safe_naive/O3/isolated/small.bin": 8176.0,
     "safe_naive/O3/isolated/large.bin": 25685.3,
     "safe_naive/O3/isolated/d_ir_d_work": 5.905328836424958,
-    "safe_naive/O3/whole/small.bin": 8878.0,
-    "safe_naive/O3/whole/large.bin": 26721.3,
+    "safe_naive/O3/whole/small.bin": 8885.0,
+    "safe_naive/O3/whole/large.bin": 26728.3,
     "safe_naive/O3/whole/d_ir_d_work": 6.017976391231028,
     "safe_tuned/O0/isolated/small.bin": 20078.0,
     "safe_tuned/O0/isolated/large.bin": 65188.3,
     "safe_tuned/O0/isolated/d_ir_d_work": 15.214266441821248,
-    "safe_tuned/O0/whole/small.bin": 20078.0,
-    "safe_tuned/O0/whole/large.bin": 65188.3,
+    "safe_tuned/O0/whole/small.bin": 20071.0,
+    "safe_tuned/O0/whole/large.bin": 65181.3,
     "safe_tuned/O0/whole/d_ir_d_work": 15.214266441821248,
     "safe_tuned/O3/isolated/small.bin": 3418.0,
     "safe_tuned/O3/isolated/large.bin": 9067.3,
     "safe_tuned/O3/isolated/d_ir_d_work": 1.9053288364249577,
-    "safe_tuned/O3/whole/small.bin": 3642.0,
-    "safe_tuned/O3/whole/large.bin": 9884.3,
+    "safe_tuned/O3/whole/small.bin": 3649.0,
+    "safe_tuned/O3/whole/large.bin": 9891.3,
     "safe_tuned/O3/whole/d_ir_d_work": 2.1053288364249574,
-    "unsafe/O0/isolated/small.bin": 42512.0,
-    "unsafe/O0/isolated/large.bin": 137821.3,
+    "unsafe/O0/isolated/small.bin": 42519.0,
+    "unsafe/O0/isolated/large.bin": 137828.3,
     "unsafe/O0/isolated/d_ir_d_work": 32.1447892074199,
     "unsafe/O0/whole/small.bin": 42519.0,
     "unsafe/O0/whole/large.bin": 137828.3,
     "unsafe/O0/whole/d_ir_d_work": 32.1447892074199,
-    "unsafe/O3/isolated/small.bin": 3066.0,
-    "unsafe/O3/isolated/large.bin": 8448.3,
+    "unsafe/O3/isolated/small.bin": 3059.0,
+    "unsafe/O3/isolated/large.bin": 8441.3,
     "unsafe/O3/isolated/d_ir_d_work": 1.8152782462057333,
     "unsafe/O3/whole/small.bin": 5076.0,
     "unsafe/O3/whole/large.bin": 13620.3,
     "unsafe/O3/whole/d_ir_d_work": 2.8817200674536254,
-    "verus/O0/isolated/small.bin": 42512.0,
-    "verus/O0/isolated/large.bin": 137821.3,
+    "verus/O0/isolated/small.bin": 42519.0,
+    "verus/O0/isolated/large.bin": 137828.3,
     "verus/O0/isolated/d_ir_d_work": 32.1447892074199,
     "verus/O0/whole/small.bin": 42519.0,
     "verus/O0/whole/large.bin": 137828.3,
     "verus/O0/whole/d_ir_d_work": 32.1447892074199,
-    "verus/O3/isolated/small.bin": 3058.0,
-    "verus/O3/isolated/large.bin": 8440.3,
+    "verus/O3/isolated/small.bin": 3065.0,
+    "verus/O3/isolated/large.bin": 8447.3,
     "verus/O3/isolated/d_ir_d_work": 1.8152782462057333,
     "verus/O3/whole/small.bin": 5076.0,
     "verus/O3/whole/large.bin": 13620.3,
@@ -374,9 +375,16 @@
           "kind": "trusted",
           "clause": "i < v@.len()",
           "test": "tautology",
-          "tactic": "bit_vector",
-          "verified": null,
-          "errors": null,
+          "tactic": "nonlinear_arith",
+          "tactics_ran": [
+            null,
+            "nonlinear_arith"
+          ],
+          "tactics_inapplicable": [
+            "bit_vector"
+          ],
+          "verified": 10,
+          "errors": 1,
           "verdict": "not a tautology"
         },
         {
@@ -384,9 +392,16 @@
           "kind": "trusted",
           "clause": "i < v@.len()",
           "test": "tautology",
-          "tactic": "bit_vector",
-          "verified": null,
-          "errors": null,
+          "tactic": "nonlinear_arith",
+          "tactics_ran": [
+            null,
+            "nonlinear_arith"
+          ],
+          "tactics_inapplicable": [
+            "bit_vector"
+          ],
+          "verified": 10,
+          "errors": 1,
           "verdict": "not a tautology"
         },
         {
@@ -394,9 +409,16 @@
           "kind": "trusted",
           "clause": "i < old(v)@.len()",
           "test": "tautology",
-          "tactic": "bit_vector",
-          "verified": null,
-          "errors": null,
+          "tactic": null,
+          "tactics_ran": [
+            null
+          ],
+          "tactics_inapplicable": [
+            "nonlinear_arith",
+            "bit_vector"
+          ],
+          "verified": 9,
+          "errors": 1,
           "verdict": "not a tautology"
         },
         {
@@ -404,9 +426,16 @@
           "kind": "verified",
           "clause": "off + len <= buf@.len()",
           "test": "tautology",
-          "tactic": "bit_vector",
-          "verified": null,
-          "errors": null,
+          "tactic": "nonlinear_arith",
+          "tactics_ran": [
+            null,
+            "nonlinear_arith"
+          ],
+          "tactics_inapplicable": [
+            "bit_vector"
+          ],
+          "verified": 10,
+          "errors": 1,
           "verdict": "not a tautology"
         },
         {
@@ -553,262 +582,671 @@
     }
   },
   "adversarial": {
-    "adversarial-allpop.bin/c-gcc": {
-      "exit": 0,
-      "stdout": "5317153932393252608",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "5685940249600"
-    },
-    "adversarial-allpop.bin/c-clang": {
-      "exit": 0,
-      "stdout": "6651752249298070144",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "5685940249600"
-    },
-    "adversarial-allpop.bin/safe_naive": {
-      "exit": 0,
-      "stdout": "5685940249600",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "5685940249600"
-    },
-    "adversarial-allpop.bin/safe_tuned": {
-      "exit": 0,
-      "stdout": "5685940249600",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "5685940249600"
-    },
-    "adversarial-allpop.bin/unsafe": {
-      "exit": 0,
-      "stdout": "5685940249600",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "5685940249600"
-    },
-    "adversarial-allpop.bin/verus": {
-      "exit": 0,
-      "stdout": "5685940249600",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "5685940249600"
-    },
-    "adversarial-allpop.bin/c-gcc-h": {
-      "exit": 0,
-      "stdout": "5685940249600",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "5685940249600"
-    },
-    "adversarial-allpop.bin/c-clang-h": {
-      "exit": 0,
-      "stdout": "5685940249600",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "5685940249600"
-    },
-    "adversarial-count.bin/c-gcc": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-count.bin/c-clang": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-count.bin/safe_naive": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-count.bin/safe_tuned": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-count.bin/unsafe": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-count.bin/verus": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-count.bin/c-gcc-h": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-count.bin/c-clang-h": {
-      "exit": 0,
-      "stdout": "0",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "0"
-    },
-    "adversarial-overflow.bin/c-gcc": {
-      "exit": 0,
-      "stdout": "2401459682193218816",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "2401459682193218816"
-    },
-    "adversarial-overflow.bin/c-clang": {
-      "exit": 0,
-      "stdout": "2401459682193218816",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "2401459682193218816"
-    },
-    "adversarial-overflow.bin/safe_naive": {
-      "exit": 0,
-      "stdout": "2401459682193218816",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "2401459682193218816"
-    },
-    "adversarial-overflow.bin/safe_tuned": {
-      "exit": 0,
-      "stdout": "2401459682193218816",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "2401459682193218816"
-    },
-    "adversarial-overflow.bin/unsafe": {
-      "exit": 0,
-      "stdout": "2401459682193218816",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "2401459682193218816"
-    },
-    "adversarial-overflow.bin/verus": {
-      "exit": 0,
-      "stdout": "2401459682193218816",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "2401459682193218816"
-    },
-    "adversarial-overflow.bin/c-gcc-h": {
-      "exit": 0,
-      "stdout": "2401459682193218816",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "2401459682193218816"
-    },
-    "adversarial-overflow.bin/c-clang-h": {
-      "exit": 0,
-      "stdout": "2401459682193218816",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "2401459682193218816"
-    },
-    "adversarial-underflow.bin/c-gcc": {
-      "exit": 0,
-      "stdout": "9434586250672752128",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "7473563764999086208"
-    },
-    "adversarial-underflow.bin/c-clang": {
-      "exit": 0,
-      "stdout": "6734811095266690816",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "7473563764999086208"
-    },
-    "adversarial-underflow.bin/safe_naive": {
-      "exit": 0,
-      "stdout": "7473563764999086208",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "7473563764999086208"
-    },
-    "adversarial-underflow.bin/safe_tuned": {
-      "exit": 0,
-      "stdout": "7473563764999086208",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "7473563764999086208"
-    },
-    "adversarial-underflow.bin/unsafe": {
-      "exit": 0,
-      "stdout": "7473563764999086208",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "7473563764999086208"
-    },
-    "adversarial-underflow.bin/verus": {
-      "exit": 0,
-      "stdout": "7473563764999086208",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "7473563764999086208"
-    },
-    "adversarial-underflow.bin/c-gcc-h": {
-      "exit": 0,
-      "stdout": "7473563764999086208",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "7473563764999086208"
-    },
-    "adversarial-underflow.bin/c-clang-h": {
-      "exit": 0,
-      "stdout": "7473563764999086208",
-      "stderr": "",
-      "signal": null,
-      "model_exit": 0,
-      "model_stdout": "7473563764999086208"
-    }
+    "adversarial-allpop.bin/c-gcc": [
+      {
+        "exit": 0,
+        "stdout": "12518849166453756032",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "12731502229487263744",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "16184773254799820160",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "3111938602762132736",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "diverges": true
+      }
+    ],
+    "adversarial-allpop.bin/c-clang": [
+      {
+        "exit": 0,
+        "stdout": "11076214290076977664",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "13317759088041738880",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "16459369182077032192",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "799649465024911616",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "diverges": true
+      }
+    ],
+    "adversarial-allpop.bin/safe_naive": [
+      {
+        "exit": 0,
+        "stdout": "5685940249600",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "diverges": false
+      }
+    ],
+    "adversarial-allpop.bin/safe_tuned": [
+      {
+        "exit": 0,
+        "stdout": "5685940249600",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "diverges": false
+      }
+    ],
+    "adversarial-allpop.bin/unsafe": [
+      {
+        "exit": 0,
+        "stdout": "5685940249600",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "diverges": false
+      }
+    ],
+    "adversarial-allpop.bin/verus": [
+      {
+        "exit": 0,
+        "stdout": "5685940249600",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "diverges": false
+      }
+    ],
+    "adversarial-allpop.bin/c-gcc-h": [
+      {
+        "exit": 0,
+        "stdout": "5685940249600",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "diverges": false
+      }
+    ],
+    "adversarial-allpop.bin/c-clang-h": [
+      {
+        "exit": 0,
+        "stdout": "5685940249600",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "diverges": false
+      }
+    ],
+    "adversarial-count.bin/c-gcc": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-count.bin/c-clang": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-count.bin/safe_naive": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-count.bin/safe_tuned": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-count.bin/unsafe": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-count.bin/verus": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-count.bin/c-gcc-h": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-count.bin/c-clang-h": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-overflow.bin/c-gcc": [
+      {
+        "exit": 0,
+        "stdout": "2401459682193218816",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2401459682193218816",
+        "diverges": false
+      }
+    ],
+    "adversarial-overflow.bin/c-clang": [
+      {
+        "exit": 0,
+        "stdout": "2401459682193218816",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2401459682193218816",
+        "diverges": false
+      }
+    ],
+    "adversarial-overflow.bin/safe_naive": [
+      {
+        "exit": 0,
+        "stdout": "2401459682193218816",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2401459682193218816",
+        "diverges": false
+      }
+    ],
+    "adversarial-overflow.bin/safe_tuned": [
+      {
+        "exit": 0,
+        "stdout": "2401459682193218816",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2401459682193218816",
+        "diverges": false
+      }
+    ],
+    "adversarial-overflow.bin/unsafe": [
+      {
+        "exit": 0,
+        "stdout": "2401459682193218816",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2401459682193218816",
+        "diverges": false
+      }
+    ],
+    "adversarial-overflow.bin/verus": [
+      {
+        "exit": 0,
+        "stdout": "2401459682193218816",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2401459682193218816",
+        "diverges": false
+      }
+    ],
+    "adversarial-overflow.bin/c-gcc-h": [
+      {
+        "exit": 0,
+        "stdout": "2401459682193218816",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2401459682193218816",
+        "diverges": false
+      }
+    ],
+    "adversarial-overflow.bin/c-clang-h": [
+      {
+        "exit": 0,
+        "stdout": "2401459682193218816",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2401459682193218816",
+        "diverges": false
+      }
+    ],
+    "adversarial-underflow.bin/c-gcc": [
+      {
+        "exit": 0,
+        "stdout": "10019086399956028928",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "7473563764999086208",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "15732095425433054080",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "7473563764999086208",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "17687650266544029824",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "7473563764999086208",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "3241790986426416640",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "7473563764999086208",
+        "diverges": true
+      }
+    ],
+    "adversarial-underflow.bin/c-clang": [
+      {
+        "exit": 0,
+        "stdout": "11382158856433953024",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "7473563764999086208",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "4660071466859831040",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/whole",
+          "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "7473563764999086208",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "5119748423145018880",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "7473563764999086208",
+        "diverges": true
+      }
+    ],
+    "adversarial-underflow.bin/safe_naive": [
+      {
+        "exit": 0,
+        "stdout": "7473563764999086208",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "7473563764999086208",
+        "diverges": false
+      }
+    ],
+    "adversarial-underflow.bin/safe_tuned": [
+      {
+        "exit": 0,
+        "stdout": "7473563764999086208",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "7473563764999086208",
+        "diverges": false
+      }
+    ],
+    "adversarial-underflow.bin/unsafe": [
+      {
+        "exit": 0,
+        "stdout": "7473563764999086208",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "7473563764999086208",
+        "diverges": false
+      }
+    ],
+    "adversarial-underflow.bin/verus": [
+      {
+        "exit": 0,
+        "stdout": "7473563764999086208",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "7473563764999086208",
+        "diverges": false
+      }
+    ],
+    "adversarial-underflow.bin/c-gcc-h": [
+      {
+        "exit": 0,
+        "stdout": "7473563764999086208",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "7473563764999086208",
+        "diverges": false
+      }
+    ],
+    "adversarial-underflow.bin/c-clang-h": [
+      {
+        "exit": 0,
+        "stdout": "7473563764999086208",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "7473563764999086208",
+        "diverges": false
+      }
+    ]
   },
   "sanitizer": {
     "adversarial-allpop.bin": {
@@ -816,42 +1254,54 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==1693148==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f"
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==1980589==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f",
+      "stdout": "",
+      "model_stdout": "5685940249600"
     },
     "adversarial-count.bin": {
       "exit": 0,
       "expected_exit": 0,
       "expect": "clean",
       "fired": false,
-      "diagnostic": ""
+      "diagnostic": "",
+      "stdout": "0",
+      "model_stdout": "0"
     },
     "adversarial-overflow.bin": {
       "exit": 0,
       "expected_exit": 0,
       "expect": "clean",
       "fired": false,
-      "diagnostic": ""
+      "diagnostic": "",
+      "stdout": "2401459682193218816",
+      "model_stdout": "2401459682193218816"
     },
     "adversarial-underflow.bin": {
       "exit": 1,
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==1693153==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f"
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==1980594==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f",
+      "stdout": "",
+      "model_stdout": "7473563764999086208"
     },
     "large.bin": {
       "exit": 0,
       "expected_exit": 0,
       "expect": "clean",
       "fired": false,
-      "diagnostic": ""
+      "diagnostic": "",
+      "stdout": "12657562225574543262",
+      "model_stdout": "12657562225574543262"
     },
     "small.bin": {
       "exit": 0,
       "expected_exit": 0,
       "expect": "clean",
       "fired": false,
-      "diagnostic": ""
+      "diagnostic": "",
+      "stdout": "4507875919703971017",
+      "model_stdout": "4507875919703971017"
     }
   },
   "miri": {
@@ -942,7 +1392,7 @@
     "adversarial-allpop.bin/c-gcc: opt/mode variants of this rung disagree (4 distinct behaviours)",
     "adversarial-allpop.bin/c-clang: opt/mode variants of this rung disagree (4 distinct behaviours)",
     "adversarial-underflow.bin/c-gcc: opt/mode variants of this rung disagree (4 distinct behaviours)",
-    "adversarial-underflow.bin/c-clang: opt/mode variants of this rung disagree (4 distinct behaviours)"
+    "adversarial-underflow.bin/c-clang: opt/mode variants of this rung disagree (3 distinct behaviours)"
   ],
   "loud": [
     {

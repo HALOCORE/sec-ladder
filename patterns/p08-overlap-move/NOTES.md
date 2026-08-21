@@ -413,6 +413,16 @@ cancel exactly. `.memory/03-measurement.md`: never divide a total wall time by a
 count. Worst min-to-median spread over all 32 sample sets: **2.3%**, well inside
 the 10% discard threshold; nothing is discarded.
 
+⚠ **The wall-clock block in `results/tables/p08-overlap-move.md` is a DIFFERENT
+measurement from this table and it was re-taken at TASK_056** (`measure.py p08
+--reps 31 --cpu 5`, forced by the `copy_in` respelling in §6d, which moves the
+`-O0` cells). Every one of its 16 `large.bin` cells fell by about 18% —
+72.3–73.6 ms → 59.4–60.7 ms — **including the two C cells and R2/R3, none of
+which changed by a byte**, and `small.bin` did not move at all (13.7–14.1 ms
+before and after). So it is a machine/day effect and not a result: the ordering,
+the spreads and every ratio are preserved. This table below is unaffected — it is
+`taskset -c 3` with per-call differencing and it was not re-run.
+
 | rung | `small` ns/call (min) | `large` ns/call (min) | Δ vs R4 (`large`) | Δ Ir vs R4 (`large`) |
 |---|---:|---:|---:|---:|
 | c-gcc | 452.75 | 3670.08 | +3.8% | +19.8% |
@@ -753,22 +763,26 @@ gate's use of it is fine.
 
 ---
 
-## 6. The proof: 11 obligations, and what each mutant proves
+## 6. The proof: 12 obligations, and what each mutant proves
 
-`./verus_run.py patterns/p08-overlap-move/verus.rs` → **`11 verified, 0
-errors`**. With `--cfg slb_twin` → **`15 verified, 0 errors`**. Per item, all
-measured with `--verify-function <name> --verify-root`:
+`./verus_run.py patterns/p08-overlap-move/verus.rs` → **`12 verified, 0
+errors`**. With `--cfg slb_twin` → **`16 verified, 0 errors`**. ⚠ **Both counts
+were one lower (11 / 15) until TASK_056**, when `copy_in` stopped being
+`external_body` and became a verified function contributing one obligation of
+its own; §6d is the measurement and the price. Per item, all measured with
+`--verify-function <name> --verify-root`:
 
 | item | obligations | why |
 |---|---:|---|
 | `d_at`, `nrepw_at`, `init_scr`, `shift_round`, `shift_fold` | 0 | non-recursive `spec fn` |
 | `shift_rounds`, `fold_scr` | 1 each | recursive: one termination query |
-| `move_right`, `copy_in`, `load_input`, `emit` | 0 | `external_body` |
+| `move_right`, `load_input`, `emit` | 0 | `external_body` |
+| **`copy_in`** | **1** | **verified since TASK_056** — body only, it has no loop |
 | **`SCR`** | **1** | **a `const` item is its own Verus query — see below** |
 | `kernel` | 3 | body + 2 loop bodies, no `by`-block |
 | `main` | 5 | quoted as measured |
 | `slb_twin_move_right` (`--cfg slb_twin`) | 2 | body + loop body |
-| `slb_twin_copy_in` (`--cfg slb_twin`) | 2 | body + loop body |
+| `slb_twin_copy_in` (`--cfg slb_twin`) | 2 | body + loop body; **no longer required**, kept as a second derivation (§6d) |
 
 **A `const` inside `verus!` carries an obligation, and `.memory/04-verus.md`'s
 rule of thumb does not mention it** because no earlier pattern declared one.
@@ -948,6 +962,191 @@ survived the move, so the whole-sequence equality is unprovable. The
 refuses gets no ghost-stripping certificate and no identity measurement, so
 nothing downstream is evaluated on it.
 
+⚠ The transcript quoted above says *"4 TCB items"* and *"11 verified"*. Those
+were the numbers **before TASK_056**; they are 3 and 12 now (§6d). The quote is
+left as it was measured rather than retro-fitted, because it is a transcript.
+
+### 6d. De-trusting `copy_in` — the measurement, the price, and the direction test
+
+**TCB 4 items / 10 lines → 3 items / 9 lines.** `copy_in` is no longer
+`external_body`; its contract is unchanged, character for character, and Verus
+now proves the body instead of assuming it.
+
+**The recorded reason for trusting it was FALSE, in four places** — `verus.rs`'s
+item comment, this file's TCB table `why` cell, the paragraph under it, and the
+retired trusted-argument section. All four said *"vstd ships no specification for
+`copy_from_slice`"*. The pinned vstd specifies it at
+`vstd/std_specs/slice.rs:205` (`requires old(dst)@.len() == src@.len()`,
+`ensures final(dst)@ == src@`) and has done since before p08 existed; the same
+sentence was corrected in `.memory/04-verus.md` and on p06 at TASK_048 and
+survived here for eight more tasks. **The real gap is the INDEX TYPE.**
+`RangeTo<usize>` has no `SliceIndexSpecImpl<[T]>` — only `usize`
+(`std_specs/slice.rs:14`) and `Range<usize>` (`:31`) — so `dst[..n]` is
+unverifiable *as written*, and `dst[0..n]`, which is specified, gets past the
+precondition and then fails its **postcondition**, because `index_mut`'s
+`call_ensures` is never instantiated so the write-back is unavailable. Measured
+on p08's own contract at TASK_055 (`.temp/p55/w1755898/probe_keepspell.rs`,
+`probe_range.rs`): `1 verified, 1 errors` both ways.
+
+**The spelling that verifies, and the one ghost line it needs:**
+
+```rust
+assert(src@.len() == vstd::slice::spec_slice_len(src));   // else "possible
+                                                          // arithmetic overflow"
+let (a, _b) = dst.split_at_mut(n);                        // on `from + n`
+a.copy_from_slice(&src[from..from + n]);
+```
+
+**THE PRICE, both halves** (`.memory/02-bench-rules.md`'s two-number rule).
+⚠ **Do not describe this as free.** It is free at `-O3` and it is not free at
+`-O0`:
+
+(*"pads"* below means **panic landing pads** — `controls/pads.py`'s count of
+panic sites, not the alignment padding after the symbol, which is reported
+separately as `pad_a`/`pad_b` in the gate's identity evidence and is 15 B at
+`-O3` and 9 B → 4 B at `-O0`.)
+
+| | `-O3 isolated` | `-O0 isolated` |
+|---|---|---|
+| shipped `dst[..n]` | 168 / 166 insns, `md5_fn 9259612a652d`, `md5_raw 44b63d20ccf1`, 5 panic pads | 206 / 206 insns / 1159 B, `md5_fn 7bbb6ae949ad` |
+| respelled `split_at_mut` | **168 / 166 insns, `md5_fn 9259612a652d`, `md5_raw 44b63d20ccf1`, 5 panic pads — byte-identical** | **208 / 208 insns / 1180 B, `md5_fn b7842f19a14e`** |
+| `Ir`/call, `kernel` **exclusive** | **+0.00** | **+2.00, flat** |
+| `Ir`/call, **whole program** (the gate's `marginal_ir_per_call`) | **+0.00** | **+27.00, flat** |
+
+⚠⚠ **THE `-O0` PRICE IS +27.00 Ir/call, NOT +2.00, AND THE TWO NUMBERS MEASURE
+DIFFERENT THINGS.** TASK_055 measured +2.00 and TASK_056's task file repeated it
+as *the* price; that number is right for the metric it names — `measure.py`'s
+per-function **exclusive** Ir on the `kernel` symbol — and it is **not** the
+number this project publishes. `results/gate/p08-overlap-move.json`'s
+`marginal_ir_per_call`, which `results/tables/p08-overlap-move.md` reads, is
+built from `check.py::_callgrind_total` — the **whole-program** Ir differenced
+over kernel calls — and it moved **+27.00 on every `-O0` cell** of R4 and R5.
+Measured twice and both ways, on the same two binaries:
+
+```
+exclusive Ir on `kernel`  (measure.py::callgrind_ir)
+  small.bin  229,325,000 -> 229,375,000   over 25,000 calls  = +2.00/call
+  large.bin  590,488,000 -> 590,504,000   over  8,000 calls  = +2.00/call
+
+whole-program Ir          (check.py::_callgrind_total)
+  small.bin  729,144,118 -> 729,819,207   over 25,000 calls  = +27.00/call
+  large.bin  1,652,929,190 -> 1,653,145,311 over 8,000 calls = +27.02/call
+```
+
+`.temp/p56/ir_price.sh` rebuilds both halves and the per-symbol table below from
+the committed tree; the `ship` side is `git show HEAD:.../unsafe.rs`.
+
+The `+27.02` is start-up, not a second effect: a raw whole-program total counts
+process start-up and the 32 MiB file read, which a difference of two binaries on
+different paths does not cancel. **The gate's `marginal_ir_per_call` is a SLOPE
+over two `n_iters` probe shapes, so it does cancel it**, and it reads +27.00 on
+six of the eight moved cells and +26.94/+26.96 on the other two:
+
+```
+unsafe/O0/isolated  small 29,151.18 -> 29,178.18 (+27.00)   large 206,209.62 -> 206,236.58 (+26.96)
+unsafe/O0/whole     small 29,151.22 -> 29,178.18 (+26.96)   large 206,209.64 -> 206,236.58 (+26.94)
+verus /O0/isolated  small 29,151.22 -> 29,178.22 (+27.00)   large 206,209.62 -> 206,236.64 (+27.02)
+verus /O0/whole     small 29,151.22 -> 29,178.22 (+27.00)   large 206,209.62 -> 206,236.62 (+27.00)
+```
+
+**11 of the record's 96 `marginal_ir_per_call` rows moved, and all 11 are `O0`
+rows of `unsafe` or `verus`.** All **48 of 48** `O3` rows are unmoved to the last
+recorded digit, and so are all **72 of 72** rows belonging to the six cells that
+did not respell (`c-gcc`, `c-clang`, `c-gcc-h`, `c-clang-h`, `safe_naive`,
+`safe_tuned`) — the 2-and-2 scope holds in the dynamic measurement as well as in
+the static one. Three of the 11 are `d_ir_d_work`, which is a *ratio* of two
+slopes and moves in the 11th significant figure (49.306165 → 49.306154); it is
+not a cost.
+
+**Why the two differ, exactly.** At `-O0` nothing inlines, so
+`<[u8]>::split_at_mut` is a real call and its body is attributed to *its own*
+symbol rather than to `kernel`. The +2 inside `kernel` is ABI shuffle; the other
++25 is the callee. Per-symbol, per call, from `callgrind_annotate` on the same
+two runs:
+
+| | shipped | respelled |
+|---|---:|---:|
+| `<RangeTo<usize> as SliceIndex<[u8]>>::index_mut` | 10 | — |
+| `<Range<usize> as SliceIndex<[u8]>>::index_mut` (its delegate) | 25 | — |
+| `<[u8]>::split_at_mut` | — | 35 |
+| `<[u8]>::split_at_mut_unchecked` (its delegate) | — | 25 |
+| **callee subtotal** | **35** | **60** |
+| `kernel` exclusive | 9 173 | 9 175 |
+| **total** | — | **+27** |
+
+**No published p08 *claim* moves**, because `results/tables/p08-overlap-move.md`
+already carries *"`O0` rows exist to read the lowering. No performance claim may
+rest on one."* What moves is eight `-O0` `Ir(kernel)` table cells and their gate
+rows, and the gate's own anti-collapse floor is untouched (the run is PASS).
+
+**It is NOT a check.** Both spellings keep exactly one bounds check and emit the
+same 5 panic pads at the same source sites. The mechanism at the machine-code
+level, from `asm.py diff` at `-O0`: `<[T]>::split_at_mut` returns a two-slice
+tuple — four words — so it comes back through the hidden `sret` pointer
+(`lea (%rsp),%rdi` in the callee-argument setup), where
+`<[T] as IndexMut<Range>>::index_mut` returns a two-word slice in `rax:rdx`. Two
+`mov`s of ABI shuffle in `kernel`, and one deeper library call under it. The
+ghost `assert` costs nothing: a plain `rustc` build of the same exec code without
+it is `exact`-identical to the Verus one.
+
+**THE RECEIVER IS SCOPED 2-AND-2, and p06 is the precedent.** `dst[..n]` stays in
+`safe_naive.rs` and `safe_tuned.rs`; `split_at_mut` is the receiver in
+`unsafe.rs` and `verus.rs`. The reason is the `identity` pin: it makes R4 and R5
+one program, so they respell together, and nothing chains R2/R3 to the prover, so
+they do not. `patterns/p06-rotate/spec.md`'s `idiom.required[5].rust` records the
+same split with its own `-O0` price (+3 instructions on `unsafe.rs`).
+**p08's outcome is better than p06's on the axes that were compared**: p06's
+`scr_load` takes `&mut [u8; 64]` and needs an extra `let s: &mut [u8] = dst;`
+reborrow, landing at +3 *static instructions* with identity `norel`; p08's
+`copy_in` already takes `&mut [u8]`, so it is +2 static and identity at `-O0`
+measures **`exact`** — p08 keeps its "stronger than pinned" note. ⚠ p06's +3 is a
+STATIC instruction count and was never converted to `Ir`, so the two are not
+comparable as costs, and p06's own whole-program `-O0` price is unmeasured. Route A (edit `verus.rs` alone) was measured and rejected: it drops `-O0`
+identity to `differ` against a pinned `norel` and **fails gate stage 3c**. Route
+B (respell all four Rust rungs) works and costs +2 on four rungs instead of two.
+
+**THE DIRECTION TEST, run in writing** (`.memory/01-ladder.md`). Removing a
+trusted item makes the trusted base smaller, and trusted-base size is one of the
+five axes this project compares — so this is an edit in the direction that
+flatters the thesis, and the justification has to be a measurement rather than an
+argument. It is: the two numbers above, both published, neither rounded to
+"free". And **no declaration moved with it**: p08's `idiom.required` pins the
+memmove spelling, the guard, `dr = d + r`, `%` vs `&` and the scratch, and
+**none of its six entries mentions the copy** (this is where p08 is cheaper than
+p06, whose `required[5]` pinned `dst[..n].copy_from_slice(...)` verbatim and
+forced a declaration edit). What did move, and had to: `verus.items.copy_in.external`
+→ `null`, `verus.obligations` 11 → 12, `verus.twin_obligations` 15 → 16, and
+`contract_sha256` with them. The `contract_sha256` before this task's first edit
+was `17e7e4efe2c8ab35b2473d3f9786693d9cca6c8c29841d39f9ed037fcf34a6ac`.
+
+**DOES THE TRUST DISAPPEAR? NO — IT RELOCATES INTO VSTD.** Two
+`assume_specification`s are newly relied on: `<[T]>::split_at_mut`
+(`std_specs/slice.rs:185`) and `<[T]>::copy_from_slice` (`:205`). What changes is
+*whose* axiom it is — an `ensures` invented in this pattern and read by nobody
+else becomes a vstd specification every Verus user shares. The
+`&mut [u8; 4096] → &mut [u8]` coercion is **not** new exposure: it happens at the
+call site inside the verified `kernel` and the shipped 11/0 already relied on it.
+(p06's removal was larger: `scr_load` took `&mut [u8; 64]`, so it newly relied on
+`vstd/array.rs:175 ref_mut_array_unsizing_coercion`, itself `external_body`
+*inside* vstd.)
+
+**Classification before and after** (`.memory/04-verus.md`'s three-way scheme):
+
+| | class | what was trusted | p08 TCB |
+|---|---|---|---|
+| before | **V-gap** | author-written `external_body fn copy_in`; its `ensures` was invented here and read by no one else | 4 items / 10 lines |
+| after | *(item gone; trust is vstd's)* | `assume_specification` for `split_at_mut` and `copy_from_slice` | **3 items / 9 lines** |
+
+p08 is now **1 U-license (`move_right`) + 0 V-gap + 2 infra (`load_input`,
+`emit`)**, and **it cannot go below 3**: `move_right`'s stated reason is TRUE at
+the pinned vstd (the only copy-family spec is `<[T]>::copy_within`, the *safe*
+slice method) and p08's own `idiom.required[1]` requires R4/R5 to spell the move
+`core::ptr::copy`. Census consequence: TASK_048 measured relocatable exposure at
+2 of 58 items and TASK_055 at 1 of 57; after this it is **0 of 56** across the
+sixteen patterns that exist. ⚠ That is a fact about *these* patterns, all of
+which reach unchecked memory through `get_unchecked`-shaped accessors that are
+`is not supported`; TASK_055 probe 2 measured that it is false prospectively for
+a `vstd::raw_ptr` pattern.
 
 ---
 
@@ -985,16 +1184,24 @@ The security half of p08 is §5d's detection table, not this one.
 
 ## 8. The trusted base
 
-**TCB: 10 lines across 4 items.** Every `external_body` item is counted, not just
-the interesting one (`.memory/04-verus.md`: the pilot was published as "one
-3-line wrapper" and the true tally was three items, one of which was `main`).
+**TCB: 9 lines across 3 items.** ⚠ **It was 10 lines across 4 until TASK_056**,
+when `copy_in` was de-trusted; §6c is the measurement and the price. Every
+`external_body` item is counted, not just the interesting one
+(`.memory/04-verus.md`: the pilot was published as "one 3-line wrapper" and the
+true tally was three items, one of which was `main`).
 
-| item | lines in body | contains `unsafe` | `requires` | `ensures` | why it is trusted |
-|---|---:|---|---|---|---|
-| **`move_right`** | 4 | **yes** | 2 conjuncts | **3 conjuncts** | vstd ships no spec for `core::ptr::copy` |
-| `copy_in` | 1 | no | 2 conjuncts | 1 clause | vstd ships no spec for `copy_from_slice` |
-| `load_input` | 4 | no | — | none | file I/O and argv are not verifiable |
-| `emit` | 1 | no | — | none | `println!` is not verifiable |
+| item | lines in body | contains `unsafe` | `requires` | `ensures` | class | why it is trusted |
+|---|---:|---|---|---|---|---|
+| **`move_right`** | 4 | **yes** | 2 conjuncts | **3 conjuncts** | **U-license** | vstd ships no spec for `core::ptr::copy` — and this one is **TRUE**, checked rather than assumed: the only copy-family spec at the pinned vstd is `<[T]>::copy_within` (`std_specs/slice.rs:235`), the *safe slice* method, and `idiom.required[1]` *requires* R4/R5 to spell the move `core::ptr::copy` (R3 is the rung that uses `copy_within`). So this item cannot be de-trusted without deleting the pattern, and it is p08's own declaration that says so. **p08 cannot go below 3 items.** |
+| `load_input` | 4 | no | — | none | infra | file I/O and argv are not verifiable |
+| `emit` | 1 | no | — | none | infra | `println!` is not verifiable |
+
+**1 U-license + 0 V-gap + 2 infra**, in `.memory/04-verus.md`'s classification.
+The item that left was the only V-gap.
+
+| item | when | why it left |
+|---|---|---|
+| ~~`copy_in`~~ | TASK_056 | it was a **V-gap**, and the gap it named did not exist — see §6c |
 
 `main` is **not** `external_body` — `--verify-function main --verify-root`
 reports `5 verified`, so the kernel's precondition is discharged at a real,
@@ -1003,14 +1210,24 @@ confirms *"scanned for `unsafe` outside a trusted body: ['verus.rs'] +
 ['common/driver.rs'] (1 token(s) inside a trusted body)"* — **p08's whole rung
 contains exactly one `unsafe` token, and it is the pattern.**
 
-`copy_in` is worth a sentence because it is a shape this project has not had: an
-`external_body` item **with no `unsafe` in it**. It is trusted only because vstd
-has no specification for `copy_from_slice`, so a wrong `ensures` there cannot
-license an unchecked access — `copy_from_slice` panics rather than misbehaving —
-and the worst it can do is make the functional spec wrong, which step 2 catches.
-It is still inside the twin regime and still has a twin, because
+⚠ **`copy_in` used to be listed here, and the reason given for it was FALSE.**
+Until TASK_056 this paragraph read that `copy_in` *"is trusted only because vstd
+has no specification for `copy_from_slice`"*. The pinned vstd specifies
+`copy_from_slice` at `std_specs/slice.rs:205` and has done since before p08 was
+built; the same false sentence was corrected in `.memory/04-verus.md` and on p06
+at TASK_048 and stood here in four places. **The real gap was the index type:**
+`RangeTo<usize>` has no `SliceIndexSpecImpl<[T]>`, so `dst[..n]` — what every
+rung spelled — is unverifiable *as written*. `split_at_mut` is the route, the
+item is gone, and §6c has the measurement, the price and the direction test.
+
+What was true about it, and is worth keeping because the shape recurs: it was an
+`external_body` item **with no `unsafe` in it**, so a wrong `ensures` there could
+not have licensed an unchecked access — `copy_from_slice` panics rather than
+misbehaving — and the worst it could do was make the functional spec wrong, which
+step 2 catches. It was nonetheless inside the twin regime and had a twin, because
 `.memory/04-verus.md` keys the regime on `external_body` + a non-empty `ensures`
-**or** `unsafe`, which is the shape that can axiomatise a falsehood.
+**or** `unsafe`, which is the shape that can axiomatise a falsehood. `p08`'s
+remaining trusted item, `move_right`, is the one with the `unsafe`.
 
 ### The twin is NOT idle, for the first time in six patterns
 
@@ -1121,20 +1338,30 @@ could. `SCR` appears in the *kernel*, not in the contract, is not `#[cfg]`-gated
 and carries its own Verus obligation, so both pinned counts (11 and 15) move if
 it changes.
 
-### SLB-TRUSTED-ARGUMENT verus.rs copy_in
+### `copy_in` — RETIRED as a trusted item at TASK_056, argument kept
+
+⚠ **This section used to be `### SLB-TRUSTED-ARGUMENT verus.rs copy_in`. The
+marker is gone because the item is no longer trusted** (§6c), so `check.py`'s
+`_check_trusted_arguments` neither requires it nor prints it. It is kept as the
+record of what was argued while the item stood, with the false half struck out —
+p06 deleted its `scr_load` section outright at TASK_048 and this is the same
+event handled by keeping the evidence.
 
 **(a) Is the twin's body the right checked stand-in for the unchecked
-operation?** Yes. The trusted body is
-`dst[..n].copy_from_slice(&src[from..from + n])` and the twin's is the indexed
-loop `for j in 0..n { dst[j] = src[from + j] }`. `copy_from_slice` is documented
-as an element-wise copy that panics if the two slices differ in length, so the
-loop is its checked counterpart by construction. Note the asymmetry with
-`move_right` and it is the interesting part: **this item's body contains no
-`unsafe` at all**. It is `external_body` only because vstd ships no specification
-for `copy_from_slice` (`.memory/04-verus.md`), so the bulk copy every other rung
-writes has no verified spelling. That the twin *verifies* is what rules out the
-false-failure reading — if it failed for want of a library spec rather than for
-want of a precondition, the stage would be worse than useless.
+operation?** Yes, and the twin is still in the tree for that reason. The former
+trusted body was `dst[..n].copy_from_slice(&src[from..from + n])` (now
+`dst.split_at_mut(n)` + `copy_from_slice`, verified) and the twin's is the
+indexed loop `for j in 0..n { dst[j] = src[from + j] }`. `copy_from_slice` is
+documented as an element-wise copy that panics if the two slices differ in
+length, so the loop is its checked counterpart by construction. Note the
+asymmetry with `move_right` and it is the interesting part: **this item's body
+contained no `unsafe` at all**. ⚠ **The reason recorded here was FALSE**: it said
+the item was `external_body` *"only because vstd ships no specification for
+`copy_from_slice`"*, and the pinned vstd specifies it at
+`std_specs/slice.rs:205`. The real gap was `RangeTo<usize>`, i.e. the index type
+`..n`, not the copy — see §6c. That the twin *verifies* is what ruled out the
+false-failure reading — if it had failed for want of a library spec rather than
+for want of a precondition, the stage would have been worse than useless.
 
 **(b) Is the `ensures` complete with respect to every unchecked operation the
 body performs?** Yes. The single clause is an equality on the **whole**
@@ -1163,8 +1390,12 @@ are vstd operations with one meaning.
 
 **R4 ≡ R5, byte-identical, at BOTH optimisation levels.** `md5_fn =
 9259612a652d` for both at `-O3 isolated` (168 static instructions, 166
-padding-excluded, 15 B padding each) and `7bbb6ae949ad` at `-O0`; `md5_raw` equal
-in both cases too. The `spec.md` pin says `norel` at `-O0` and the gate reports
+padding-excluded, 15 B padding each) and **`b7842f19a14e` at `-O0`** (208 / 208,
+4 B padding each); `md5_raw` equal in both cases too. ⚠ **The `-O0` digest was
+`7bbb6ae949ad` at 206 / 206 until TASK_056** and moved with the `copy_in`
+respelling (§6d); the `-O3` digest did not move at all. The identity RESULT is
+unchanged: `exact` at both levels, and still stronger than the pinned `norel` at
+`-O0`. The `spec.md` pin says `norel` at `-O0` and the gate reports
 *"exact (stronger than pinned)"* — the pin is deliberately the weaker claim,
 because `-O0` identity between two crates whose names differ in length rests on
 call displacements, and pinning the stronger one would turn a benign relink of

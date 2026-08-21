@@ -1139,10 +1139,30 @@ and `f2572cd58e44` is what `results/gate/p12-strcat-fixed.json` records for
 `unsafe vs verus O3 exact`, so that is the shipped kernel. p06's identity limb
 fired for a *different* mutant, `b_scrmod_msonly`, which changes exec code.
 
-**This is the twin regime's whole case, and
-p12 is the second pattern to exercise it on a WRITE** (p03 is the first).
-`.memory/04-verus.md` records that both known instances were reviewer-built;
-so is this one, and the caveat stands.
+**This is the twin regime's whole case, and p12 is the FIRST pattern to
+exercise it on a WRITE.** ⚠ **This sentence used to read *"p12 is the second
+pattern to exercise it on a WRITE (p03 is the first)"*, and that is false;
+corrected at TASK_056** (reported, out of scope, at TASK_054). p03's
+`p1_weak_requires` weakens **`stack_get_unchecked`** — a **read**
+(`controls/gen_controls.py`) — and p03's only mutant that touches the write side,
+`p3_weak_invariant`, weakens a loop invariant and fails in the **shipped**
+configuration (`8 verified, 1 errors`, `harness/limbs.py`), so it is not a twin-
+regime demonstration at all. p04's `p1_weak_requires` is likewise on the reader.
+
+Six patterns ship a write accessor — p03, p04, p06, p12, p13, p14 — and only
+three weaken one's `requires` in the twin regime. By the order the patterns
+landed (`git log --diff-filter=A` on each `verus.rs`: … p03, p09, **p12**, p04,
+p13, p06, p14, p18):
+
+| # | pattern | mutant | write accessor |
+|---|---|---|---|
+| **1st** | **p12** | `p2_weak_write_requires` | `dst_set_unchecked` |
+| 2nd | p06 | `b_weakreq` | `scr_set_unchecked` — its generator's own comment says *"the WRITE accessor's precondition weakened by one, in the trusted item AND in its twin"* |
+| 3rd | p14 | `pm2_weakreq` | `tl_set_unchecked` |
+
+(p13's M2/M2b weaken `dst_get_unchecked`, a read, even though p13 ships a write
+accessor.) `.memory/04-verus.md` records that both known instances were
+reviewer-built; so is this one, and the caveat stands.
 
 ### 9c. `p3_slotwise_write_ensures` -- the clause that says "nothing else moved"
 

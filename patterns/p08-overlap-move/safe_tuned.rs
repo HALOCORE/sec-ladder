@@ -6,7 +6,9 @@
 //! is not checked for and not rejected, it is *defined*.
 //!
 //! **R2 and R3 differ in the body of `move_right` and in nothing else** -- same
-//! header decode, same guard, same `copy_in`, same fold, same loop forms. So
+//! header decode, same guard, same `copy_in` (both safe rungs keep the `dst[..n]`
+//! receiver; R4/R5 respell it `split_at_mut` -- NOTES.md 6d), same fold, same
+//! loop forms. So
 //! R2 - R3 is the cost of the naive spelling, measured rather than attributed
 //! (`.memory/01-ladder.md`: *attribute to a mechanism, never to a comparison*).
 //!
@@ -23,8 +25,17 @@ mod driver;
 /// measured length is attacker data and nothing is constant-folded.
 const SCR: usize = 4096;
 
-/// Copy the window's `n` data bytes into the scratch. Identical in all four
-/// Rust rungs; in verus.rs it is the one trusted item that is *not* the pattern.
+/// Copy the window's `n` data bytes into the scratch.
+///
+/// **THE RECEIVER IS SCOPED 2-AND-2 (TASK_056).** `dst[..n]` is the receiver
+/// here and in the other safe rung; `dst.split_at_mut(n)` is the receiver in
+/// `unsafe.rs` and `verus.rs`, because `RangeTo` has no `SliceIndexSpecImpl` at
+/// the pinned vstd and the `identity` pin makes R4 and R5 one program. Nothing
+/// chains this rung to the prover, so it does not respell. **The price of the
+/// split is published and it is not zero**: `-O3` byte-identical, `-O0` +2
+/// static instructions and **+27.00 whole-program `Ir`/call** on R4 and R5 only
+/// (+2.00 exclusive of `kernel`; the two metrics differ and NOTES.md 6d says
+/// why). p06's `idiom.required[5].rust` is the precedent for the 2-and-2 scope.
 #[inline(always)]
 fn copy_in(dst: &mut [u8], src: &[u8], from: usize, n: usize) {
     dst[..n].copy_from_slice(&src[from..from + n]);

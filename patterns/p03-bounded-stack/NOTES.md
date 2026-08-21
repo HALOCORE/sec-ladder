@@ -782,10 +782,11 @@ $ ./verus_run.py .temp/p03/controls/p1_weak_requires.rs [--cfg slb_twin]
 ⚠ Line numbers below move with `verus.rs`'s header comment and no gate stage can
 see that. Treat a drifted one as a stale citation and re-run the two commands.
 
-### 6a. `p1_weak_requires` — one character, and only the TWIN sees it
+### 6a. `p1_weak_requires` — one character; the twin is the sole VERUS-LEVEL catcher, and the pin catches it too
 
 `i < v@.len()` → `i <= v@.len()` in `stack_get_unchecked` **and** its twin, so
-the signatures still match and the contract pin does not move.
+the signatures still match — 5c-twin's limb (i) does **not** fire — and **Verus
+alone is perfectly happy**:
 
 ```
 $ ./verus_run.py .temp/p03/controls/p1_weak_requires.rs
@@ -796,13 +797,57 @@ error: precondition not met: index in bounds for this access
 verification results:: 11 verified, 1 errors
 ```
 
+⚠ **CORRECTED AT TASK_056. Until then this section said *"only the TWIN sees
+it"* and *"the contract pin does not move"*. The second sentence is FALSE, and
+the first is true only of the Verus stages.** `spec.md`'s `verus.items` pins the
+clause text of **`slb_twin_stack_get_unchecked` as well as
+`stack_get_unchecked`**, both at `requires ["i < v@.len()"]`, so a weakening
+applied to item *and* twin moves **two pinned clauses** and fails stage 5a —
+which runs **before** 5c-twin. Measured with `harness/limbs.py` on the mutant
+this pattern's own `controls/gen_controls.py` produces:
+
+```
+$ python3 harness/limbs.py patterns/p03-bounded-stack verus.rs \
+      patterns/p03-bounded-stack/verus.rs .temp/p03/controls/p1_weak_requires.rs
+=== verus.rs                 shipped 9/0   twin 12/0    NO LIMB FIRES
+=== p1_weak_requires.rs      shipped 9/0   twin 11/1
+      [5a-clause] slb_twin_stack_get_unchecked.requires ['i <= v@.len()'] != pinned ['i < v@.len()']
+      [5a-clause] stack_get_unchecked.requires        ['i <= v@.len()'] != pinned ['i < v@.len()']
+      [5ct-run]   --cfg slb_twin: 11 verified, 1 errors
+                  error: precondition not met: index in bounds for this access
+```
+
+**Two limbs fire, not one: stage 5a with two clause diffs, and 5c-twin limb
+(ii).** The rule, measured across all six patterns that made this claim
+(TASK_054, TASK_056): **the twin is the sole catcher only of a mutant that edits
+`spec.md` in the same commit** — that is TASK_008_REVIEW's original attack and
+the reason the twin exists. p16, p17, p09 and p02 build their mutants that way
+and say so; this one does not, so what is true here is *sole **Verus-level**
+catcher*.
+
+**The `identity` pin does NOT move — a clean negative, measured, not argued.** A
+`requires` is ghost, so it cannot reach codegen. The shipped `verus.rs` and this
+mutant were copied to **equal-length paths** (so TASK_051_REVIEW M1's
+source-path-length artefact cannot confound it) and compiled at the gate's own
+flags (`-C codegen-units=1 -C opt-level=3 -C debug-assertions=off --cfg
+slb_isolated`, both `9 verified, 0 errors`):
+
+```
+shipped R5      68 insns   md5_raw 1a9c2380b20c   md5_fn 52432361a348
+p1_weak_requires 68 insns   md5_raw 1a9c2380b20c   md5_fn 52432361a348
+asm.identity_level -> exact
+```
+
+An **exec-code** edit can move it (p06's `b_scrmod_msonly`); a `requires` edit
+cannot.
+
 R5's trusted base would otherwise axiomatise that **reading `stack[64]` — one
 `u64` past a 512-byte stack array — is defined and equals `v@[64]`**, which is
 the neighbouring-stack-slot read this pattern exists to model. The tautology
 probe cannot see it (it is not a tautology), parameter coverage cannot see it
 (both parameters appear), and deletion is not applied to trusted items by
-construction. **The verified twin is the only mechanism in this project that
-catches it** (`.memory/04-verus.md`), and p03 is the first pattern where the
+construction. **Among the Verus stages the verified twin is the only mechanism
+that catches it** (`.memory/04-verus.md`), and p03 is the first pattern where the
 twin has been exercised on an accessor that is *not* the slice one every earlier
 pattern ships.
 

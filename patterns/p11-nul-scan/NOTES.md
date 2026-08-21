@@ -585,10 +585,10 @@ $ ./verus_run.py .temp/p11/controls/m1_weak_requires.rs [--cfg slb_twin]
 The verdicts and the counts are what the section is about; treat a drifted line
 number as a stale citation and re-run the two commands above.
 
-### 6a. `m1_weak_requires` — one character, and only the TWIN sees it
+### 6a. `m1_weak_requires` — one character; the twin is the sole VERUS-LEVEL catcher, and the pin catches it too
 
 `i < v@.len()` → `i <= v@.len()` in the trusted item **and** its twin, so the
-signatures still match.
+signatures still match (5c-twin's limb (i) does **not** fire).
 
 ```
 $ ./verus_run.py .temp/p11/controls/m1_weak_requires.rs
@@ -605,12 +605,46 @@ verification results:: 12 verified, 1 errors
 
 R5's trusted base would otherwise axiomatise that **reading one byte past the end
 of a slice is defined and equals `v@[i]`** — which is CWE-125, the bug class p11
-exists to model. The contract pin does not move (both clauses change together),
-the tautology probe cannot see it (it is not a tautology), parameter coverage
-cannot see it (both parameters appear), and deletion is not applied to trusted
-items by construction. **The verified twin is the only mechanism in this project
-that catches it** (`.memory/04-verus.md`), and this is the first time p11 could
-have shown that, so it is stated rather than assumed.
+exists to model. The tautology probe cannot see it (it is not a tautology),
+parameter coverage cannot see it (both parameters appear), and deletion is not
+applied to trusted items by construction. **Among the Verus stages the verified
+twin is the only mechanism that catches it** (`.memory/04-verus.md`), and this is
+the first time p11 could have shown that, so it is stated rather than assumed.
+
+⚠ **CORRECTED AT TASK_056. Until then this paragraph read *"The contract pin does
+not move (both clauses change together)"* and *"The verified twin is the only
+mechanism in this project that catches it"*. The first is FALSE.** Both clauses
+changing together is exactly what makes the pin fire twice, because `spec.md`'s
+`verus.items` pins the clause text of **`slb_twin_get_unchecked` as well as
+`get_unchecked`**. Stage 5a therefore fails, and it runs **before** 5c-twin.
+Measured with `harness/limbs.py` on the mutant this pattern's own
+`controls/gen_controls.py` produces:
+
+```
+$ python3 harness/limbs.py patterns/p11-nul-scan verus.rs \
+      patterns/p11-nul-scan/verus.rs .temp/p11/controls/m1_weak_requires.rs
+=== verus.rs                 shipped 12/0   twin 13/0   NO LIMB FIRES
+=== m1_weak_requires.rs      shipped 12/0   twin 12/1
+      [5a-clause] get_unchecked.requires          ['i <= v@.len()'] != pinned ['i < v@.len()']
+      [5a-clause] slb_twin_get_unchecked.requires ['i <= v@.len()'] != pinned ['i < v@.len()']
+      [5ct-run]   --cfg slb_twin: 12 verified, 1 errors
+                  error: precondition not met: index in bounds for this access
+```
+
+**Two limbs fire, not one: 5a with two clause diffs, and 5c-twin limb (ii).**
+The rule (TASK_054, TASK_056, measured on six patterns): **the twin is the sole
+catcher only of a mutant that edits `spec.md` in the same commit** —
+TASK_008_REVIEW's original attack, and the reason the twin exists. p16, p17, p09
+and p02 build theirs that way and say so; this one does not. **The `identity` pin
+does not move either**: a `requires` is ghost and cannot reach codegen (measured
+on p12 at TASK_054 and on p03 at TASK_056, byte-identical kernels from
+equal-length source paths). An exec-code edit can move it; this cannot.
+
+⚠ **`controls/gen_controls.py`'s own header comment for this mutant repeats the
+overclaim** — *"The twin is the only mechanism in the project that catches it"* —
+and it is generated text, so it is reproduced in every regenerated copy of
+`.temp/p11/controls/m1_weak_requires.rs`. It is left alone here because editing a
+generator is out of TASK_056's scope; read it as *sole Verus-level* catcher.
 
 ### 6b. `m2_unbounded_scan` — deleting the bound from the SPEC is a termination failure
 
@@ -778,7 +812,10 @@ demand 8 and it cost nothing here.
 **The twin is idle, for the sixth pattern running.** p11 wraps the same
 single-clause `<[u8]>::get_unchecked` that p01, p02, p16, p17, p05 and p07 wrap,
 so 5c-twin's green line is not evidence that anything hard was checked — except
-that §6a *did* exercise it, on a mutant, and it was the only stage that moved.
+that §6a *did* exercise it, on a mutant, where it was the only **Verus** stage
+that moved (stage 5a's contract pin moved too, twice — corrected at TASK_056; the
+sentence here used to read *"it was the only stage that moved"* and that is
+false).
 `.memory/04-verus.md`'s standing item still applies: the twin's value accrues
 from the first pattern needing a **multi-clause** trusted accessor, which is a
 property of the intrinsic being wrapped and not of the pattern number.

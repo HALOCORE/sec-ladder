@@ -48,10 +48,16 @@ _IDENT = r"[A-Za-z_][A-Za-z0-9_]*"
 
 # --------------------------------------------------------------------------
 
-def blank_noncode(text):
+def blank_noncode(text, keep_strings=False):
     """Return `text` with comments, string and char literals replaced by spaces
     of the same length, so offsets are preserved and every search below sees
-    only code. Newlines are kept so line numbers still work."""
+    only code. Newlines are kept so line numbers still work.
+
+    `keep_strings=True` blanks **comments only** and leaves string and char
+    literals verbatim -- still skipping over them, so a `//` or `/*` inside a
+    string is not mistaken for a comment. That is what `blank_comments` below
+    wants: it needs the clause's real text back, and blanking a string literal
+    inside a clause would change what `spec.md` pins."""
     out = list(text)
     i, n = 0, len(text)
 
@@ -85,7 +91,8 @@ def blank_noncode(text):
             close = '"' + m.group(1)
             j = text.find(close, i + m.end())
             j = n if j < 0 else j + len(close)
-            blank(i, j)
+            if not keep_strings:
+                blank(i, j)
             i = j
         elif c == '"':
             j = i + 1
@@ -97,19 +104,51 @@ def blank_noncode(text):
                     j += 1
                     break
                 j += 1
-            blank(i, j)
+            if not keep_strings:
+                blank(i, j)
             i = j
         elif c == "'":
             # char literal or lifetime; only blank a real char literal
             m = re.match(r"'(\\.|[^\\'])'", text[i:])
             if m:
-                blank(i, i + m.end())
+                if not keep_strings:
+                    blank(i, i + m.end())
                 i += m.end()
             else:
                 i += 1
         else:
             i += 1
     return "".join(out)
+
+
+def blank_comments(text):
+    """`text` with **comments only** blanked to spaces of the same length.
+
+    A COMMENT IS NOT CLAUSE TEXT. `_clause_split` used to run over the raw
+    signature text, so `vparse` handed a comment inside a `requires` list back
+    as clause text -- as its own clause when it trailed, glued onto the front of
+    the next clause when it preceded (the newline having been collapsed by
+    `norm_clause`). Two things went wrong with that, and TASK_053 F4 measured
+    both:
+
+      * `check.py`'s parameter-coverage rule (`_check_trusted_unsafe`) is a bag
+        of identifiers taken from the joined `requires` text, so a parameter
+        named only in a COMMENT counted as constrained. An `external_body` item
+        whose body reads `*v.get_unchecked(i + n)` with nothing constraining `n`
+        passed the rule on the strength of the trailing comment
+        "// n is bounded by the caller". That is the rule TASK_006_REVIEW added
+        precisely because no verify/fail oracle can catch a weak trusted
+        precondition.
+      * `item.clauses[kw]` and `clause_spans(item)[kw]["spans"]` are documented
+        as parallel lists, and they were not: `clause_spans` works on the
+        blanked copy and therefore already drops a comment-only clause and
+        already trims a leading comment, so a comment made the two lists
+        different lengths and `requires[idx]` labels slid by one.
+
+    Blanking comments in `_clause_split` fixes both at once and makes the two
+    lists agree by construction. Strings are left alone deliberately -- they are
+    code, and blanking one would move a `spec.md` pin."""
+    return blank_noncode(text, keep_strings=True)
 
 
 def _match_bracket(code, i):
@@ -221,7 +260,14 @@ class Item:
 
 
 def _clause_split(text):
-    """Split a clause list on top-level commas."""
+    """Split a clause list on top-level commas.
+
+    Comments are blanked first (`blank_comments`), so a comment-only clause is
+    dropped and a comment beside a clause does not become part of that clause's
+    text -- which is what `clause_spans` has always done, and what makes the two
+    parallel. It also means a `,`, `(` or `)` inside a comment can no longer
+    move the split. TASK_053 F4."""
+    text = blank_comments(text)
     out, depth, cur = [], 0, ""
     for ch in text:
         if ch in "([{":
@@ -956,6 +1002,49 @@ fn f() { let r = kernel(v, 0, 1); }
     want("f: real call site found", it["f"].calls("kernel"), True)
     want("verus! end found by brace match, not a comment",
          verus_span(src.replace(" // verus!", "")) is not None, True)
+
+    # --- a comment inside a clause list is NOT clause text (TASK_053 F4) ----
+    # Before this, `check.py`'s parameter-coverage rule (the one built at
+    # TASK_006_REVIEW because no verify/fail oracle can catch a weak trusted
+    # precondition) read parameter names out of the comment, so
+    # `requires i < v@.len(), // n is bounded by the caller` on an item whose
+    # body reads `i + n` passed the rule -- and the same item with the comment
+    # deleted failed it. Three shapes, plus the two-lists-parallel invariant.
+    cmt = '''use vstd::prelude::*;
+verus! {
+#[verifier::external_body]
+fn g1(v: &[u8], i: usize, n: usize) -> (r: u8)
+    requires
+        i < v@.len(),   // `n` is bounded by the caller
+{ unsafe { *v.get_unchecked(i + n) } }
+
+#[verifier::external_body]
+fn g2(v: &[u8], i: usize, n: usize) -> (r: u8)
+    requires
+        // `n` is bounded by the caller
+        i < v@.len(),
+{ unsafe { *v.get_unchecked(i + n) } }
+
+#[verifier::external_body]
+fn g3(v: &[u8], i: usize, n: usize) -> (r: u8)
+    requires
+        i < v@.len(), /* `n` is bounded by the caller, len(v) */
+{ unsafe { *v.get_unchecked(i + n) } }
+} // verus!
+'''
+    ci = by_name(cmt)
+    for n in ("g1", "g2", "g3"):
+        want(f"{n}: comment is not a clause", ci[n].clauses["requires"],
+             ["i < v@.len()"])
+        want(f"{n}: clauses parallel to clause_spans",
+             len(clause_spans(ci[n])["requires"]["spans"]),
+             len(ci[n].clauses["requires"]))
+    want("a comment's own comma does not split a clause list",
+         len(ci["g3"].clauses["requires"]), 1)
+    want("blank_comments keeps string literals, blanks the comment",
+         (blank_comments('x == "a // b" /* c */').rstrip(),
+          len(blank_comments('x == "a // b" /* c */'))),
+         ('x == "a // b"', len('x == "a // b" /* c */')))
 
     # --- clause surgery, for the clause-deletion gate stage ----------------
     two = '''use vstd::prelude::*;

@@ -78,9 +78,12 @@
 //! benchmark runs, `adversarial-*` included, and the gate checks it call by
 //! call. `d` and `nrep_w`, all 2^32 pairs, are arguments of the problem.
 //!
-//! TCB tally: NOTES.md 8. Four `external_body` items, all listed there
+//! TCB tally: NOTES.md 8. **Three** `external_body` items, all listed there
 //! individually, because an under-counted TCB is how the pilot's fatal defect
-//! hid in plain sight (`.memory/04-verus.md`).
+//! hid in plain sight (`.memory/04-verus.md`). It was **four** until TASK_056,
+//! when `copy_in` was de-trusted -- the recorded reason for trusting it was
+//! false and the price of the respelling that made it verifiable is published
+//! in NOTES.md 6d, both halves.
 
 use vstd::prelude::*;
 
@@ -299,26 +302,45 @@ fn slb_twin_move_right(v: &mut [u8], dr: usize, m: usize)
     }
 }
 
-// TRUSTED ITEM 2 of 4. The copy *in*, which is scaffolding rather than the
-// pattern: it fills the scratch from the window before any shifting happens.
-// It is trusted for a boring reason -- **vstd ships no specification for
-// `copy_from_slice`** (`.memory/04-verus.md`), so the bulk copy every other
-// rung writes has no verified spelling.
+// `copy_in` IS NO LONGER A TRUSTED ITEM (TASK_056). It was trusted item 2 of 4
+// until this task, and the reason recorded for it was FALSE: it said *"vstd
+// ships no specification for `copy_from_slice`"*, and the pinned vstd specifies
+// it at `std_specs/slice.rs:205` and has done since before p08 was built. The
+// same false sentence was corrected in `.memory/04-verus.md` and on p06 at
+// TASK_048 and stood here in four places until now.
 //
-// Note what this item is *not*: its body contains **no `unsafe`**. It is the
-// same safe `copy_from_slice` call R2, R3 and R4 make, so a wrong `ensures`
-// here cannot license an unchecked memory access -- `copy_from_slice` panics
-// when the lengths differ rather than misbehaving. The worst a mistake here can
-// do is make the functional specification wrong, which the checksum stage would
-// catch. It is nonetheless inside the twin regime (`external_body` + a
-// non-empty `ensures`) and it has a twin, because `.memory/04-verus.md` keys
-// the regime on the shape that can axiomatise a falsehood and not on `unsafe`.
+// **The real gap was the INDEX TYPE, not the copy.** `RangeTo<usize>` has no
+// `SliceIndexSpecImpl<[T]>` at the pinned vstd (only `usize` at
+// `std_specs/slice.rs:14` and `Range<usize>` at `:31`), so `dst[..n]` -- what
+// every rung used to spell -- is unverifiable as written; and `dst[0..n]`, which
+// *is* specified, gets past the precondition and then fails its postcondition,
+// because `index_mut`'s `call_ensures` is never instantiated so the write-back
+// is not available. `split_at_mut` (`std_specs/slice.rs:185`) is the route, and
+// with it the contract below discharges with no trusted wrapper at all.
 //
-// The contract is p02's `copy_bytes` verbatim: one clause that says both "the
-// prefix is the source" and "the tail is untouched", because stating it over the
-// prefix alone would prove the easy half (`.memory/02-bench-rules.md`).
+// **THE TRUST DOES NOT DISAPPEAR, IT RELOCATES INTO VSTD** -- two
+// `assume_specification`s, for `<[T]>::split_at_mut` and `<[T]>::copy_from_slice`.
+// What changes is *whose* axiom it is: an author-written `ensures` invented in
+// this pattern and read by nobody else (a **V-gap** item, `.memory/04-verus.md`)
+// becomes a vstd specification every Verus user shares and reviews. p08's TCB
+// goes **4 items / 10 lines -> 3 items / 9 lines**, and the three left are
+// **1 U-license (`move_right`) + 0 V-gap + 2 infra (`load_input`, `emit`)**.
+// The `&mut [u8; 4096] -> &mut [u8]` coercion is NOT new exposure: it happens at
+// the call site inside the verified `kernel` and the shipped 11/0 already relied
+// on it (this is where p08 is cheaper than p06, whose `scr_load` took
+// `&mut [u8; 64]` and newly relied on `vstd/array.rs:175`).
+//
+// **THE DIRECTION TEST, in writing** (`.memory/01-ladder.md`). Removing a
+// trusted item makes the trusted base smaller, which is the direction that
+// flatters this project's thesis, so the justification has to be the
+// measurement and not the argument. It is: `-O3` is **byte-identical**
+// (`md5_raw 44b63d20ccf1`, 168/166, 5 pads, **+0.00 `Ir`/call**), and `-O0`
+// costs **+2 static instructions, +2.00 `Ir`/call exclusive of `kernel` and
+// +27.00 `Ir`/call whole-program** -- the gate records the last of the three --
+// on `unsafe.rs` and this file and on nothing else. `idiom.required` pins no copy spelling on p08
+// (its six entries pin the memmove, the guard, `dr = d + r`, `%` vs `&` and the
+// scratch), so no declaration moved with the measurement. ../NOTES.md 6d.
 #[inline(always)]
-#[verifier::external_body]
 fn copy_in(dst: &mut [u8], src: &[u8], from: usize, n: usize)
     requires
         from + n <= src@.len(),
@@ -329,15 +351,23 @@ fn copy_in(dst: &mut [u8], src: &[u8], from: usize, n: usize)
             old(dst)@.len() as int,
         ),
 {
-    dst[..n].copy_from_slice(&src[from..from + n]);
+    // Without this the `from + n` in the index expression below reports
+    // "possible arithmetic underflow/overflow": nothing else ties `src@.len()`
+    // to a `usize`.
+    assert(src@.len() == vstd::slice::spec_slice_len(src));
+    let (a, _b) = dst.split_at_mut(n);
+    a.copy_from_slice(&src[from..from + n]);
 }
 
-// THE VERIFIED TWIN of trusted item 2. p02's, adapted to the array type: the
-// checked equivalent of a bulk copy cannot be another bulk copy (there is no
-// spec for one), so it is an indexed loop. It verifies, which is what rules out
-// the false-failure reading -- if the twin failed for want of a library spec
-// rather than for want of a precondition, the stage would be worse than
-// useless.
+// `copy_in` is no longer trusted, so `check.py`'s 5c-twin stage no longer
+// REQUIRES this twin -- `_is_trusted` is keyed on `external_body` + (`ensures`
+// or `unsafe`) and `copy_in` is now none of those. **It is kept anyway,
+// deliberately, and p06 kept its orphaned `slb_twin_scr_load` for the same
+// reason**: it is a second and independent derivation of the same
+// postcondition, from an element-wise indexed loop rather than from vstd's bulk
+// specifications, so both routes are in the tree and both are checked. It still
+// contributes `2 verified` under `--cfg slb_twin` (the loop body is its own
+// query), which is part of the twin count pinned in ../spec.md.
 #[cfg(slb_twin)]
 fn slb_twin_copy_in(dst: &mut [u8], src: &[u8], from: usize, n: usize)
     requires

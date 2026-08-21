@@ -28,11 +28,32 @@ mod driver;
 /// measured length is attacker data and nothing is constant-folded.
 const SCR: usize = 4096;
 
-/// Copy the window's `n` data bytes into the scratch. Identical in all four
-/// Rust rungs; in verus.rs it is the one trusted item that is *not* the pattern.
+/// Copy the window's `n` data bytes into the scratch.
+///
+/// **THE RECEIVER IS SCOPED 2-AND-2, and the scope is TASK_056's.** `dst[..n]`
+/// is the receiver in `safe_naive.rs` and `safe_tuned.rs`; `dst.split_at_mut(n)`
+/// is the receiver here and in `verus.rs`. The split exists because `RangeTo`
+/// has no `SliceIndexSpecImpl` at the pinned vstd, so `dst[..n]` is not
+/// verifiable as written — and the `identity` pin makes R4 and R5 one program,
+/// so R4 respells with R5 while nothing chains R2 and R3 to the prover. p06's
+/// `idiom.required[5].rust` is the precedent and says the same thing.
+///
+/// **THE PRICE IS MEASURED, both halves** (`.memory/02-bench-rules.md`): at
+/// `-O3` it is ZERO — `md5_raw 44b63d20ccf1`, 168/166, 5 pads, +0.00 `Ir`/call,
+/// byte-identical to the `dst[..n]` spelling — and at `-O0` it costs this rung
+/// and `verus.rs` **+2 static instructions (206/206 → 208/208)**, **+2.00
+/// `Ir`/call exclusive of `kernel`** and **+27.00 `Ir`/call whole-program**,
+/// which is the number the gate records in `marginal_ir_per_call`. The two
+/// differ because at `-O0` `split_at_mut` is a real call and its 25
+/// instructions are attributed to its own symbol. It is not a check: both
+/// spellings keep exactly one bounds check and emit the same 5 panic pads at
+/// the same sites. `<[T]>::split_at_mut` returns a two-slice tuple — four
+/// words — so it comes back through the hidden `sret` pointer where
+/// `<[T] as IndexMut<Range>>` returns two words in `rax:rdx`. ../NOTES.md 6d.
 #[inline(always)]
 fn copy_in(dst: &mut [u8], src: &[u8], from: usize, n: usize) {
-    dst[..n].copy_from_slice(&src[from..from + n]);
+    let (a, _b) = dst.split_at_mut(n);
+    a.copy_from_slice(&src[from..from + n]);
 }
 
 /// THE OPERATION: `v[dr..m] <- v[0..m-dr]`.

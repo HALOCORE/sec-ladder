@@ -719,7 +719,7 @@ PY
 | **M0** | functional spec stripped (`ensures r == r`, consuming `assert` deleted) | `12 verified, 0 errors` | the **negative control** for M1b: stripping the spec is not itself an error |
 | **M1** | **the size check deleted from the exec code**, spec untouched | `11 verified, 1 errors` — *invariant not satisfied before loop*, at `nrow * ncol <= avail` | deleting the check fails a **memory-safety** obligation |
 | **M1b** | M1 **and** the functional spec stripped | `11 verified, 1 errors` — **the same** invariant | the **positive control** `.memory/04-verus.md` §2b demands: nothing was hiding behind a functional failure |
-| **M2** | trusted `requires` `i < v@.len()` → `i <= v@.len()`, on the item **and** its twin | **`12 verified, 0 errors`** shipped; **`12 verified, 1 errors`** under `--cfg slb_twin` — *precondition not met: index in bounds for this access* | **Verus alone passes the off-by-one; only the verified twin catches it** |
+| **M2** | trusted `requires` `i < v@.len()` → `i <= v@.len()`, on the item **and** its twin | **`12 verified, 0 errors`** shipped; **`12 verified, 1 errors`** under `--cfg slb_twin` — *precondition not met: index in bounds for this access* | **Verus alone passes the off-by-one; the verified twin is the only VERUS-level catcher.** ⚠ Not the only *gate* catcher: `spec.md`'s pin fails too, twice — §10 prints both `[proof-pin]` FAILs. Corrected at TASK_056; this cell used to read *"only the verified twin catches it"* |
 | **M3** | kernel `ensures` tautologised to `r == r` | `11 verified, 1 errors` at the driver's consuming `assert` | the `ensures` is load-bearing, not decoration |
 
 **M1 + M1b is the measurement that files p05 with p16 and not with p17.** On p17
@@ -895,9 +895,35 @@ wrapped* and not of the pattern number. **p05 wraps the same single-clause
 `<[u8]>::get_unchecked` that p01, p02, p16 and p17 wrap, so its twin is idle
 too**, and a green 5c-twin here is not evidence that anything hard was checked.
 
-It is not *nothing*: §5b's M2 shows the twin is the only mechanism that catches
-`i <= v@.len()`, and the gate re-runs that deletion probe every time. But that
-is the same demonstration p01 could have given. Manufacturing a multi-clause
+It is not *nothing*: §5b's M2 shows the twin is the only **Verus-level**
+mechanism that catches `i <= v@.len()`, and the gate re-runs that deletion probe
+every time. But that is the same demonstration p01 could have given.
+
+⚠ **CORRECTED AT TASK_056: this sentence used to read *"the twin is the only
+mechanism that catches `i <= v@.len()`"*, and this file CONTRADICTED ITSELF** —
+§10, about twenty lines of prose further on, prints the two `[proof-pin]` FAILs
+that the sentence denies, and gets it right. `spec.md`'s `verus.items` pins the
+clause text of **`slb_twin_get_unchecked` as well as `get_unchecked`**, so M2
+moves **two** pinned clauses and fails stage 5a, which runs **before** 5c-twin.
+Re-measured at TASK_056 by re-running this file's own §5b generator and putting
+the mutant through `harness/limbs.py`:
+
+```
+=== verus.rs                shipped 12/0   twin 13/0   NO LIMB FIRES
+=== verus_m2_offbyone.rs    shipped 12/0   twin 12/1
+      [5a-clause] get_unchecked.requires          ['i <= v@.len()'] != pinned ['i < v@.len()']
+      [5a-clause] slb_twin_get_unchecked.requires ['i <= v@.len()'] != pinned ['i < v@.len()']
+      [5ct-run]   --cfg slb_twin: 12 verified, 1 errors
+                  error: precondition not met: index in bounds for this access
+```
+
+The rule (TASK_054, TASK_056, six patterns): **the twin is the sole catcher only
+of a mutant that edits `spec.md` in the same commit.** §10's phrasing — *"the
+twin is the only mechanism that would still object if the pin had been edited in
+the same commit"* — is the correct form and was already in this file. **The
+`identity` pin does not move**: a `requires` is ghost (measured on p12 at
+TASK_054 and p03 at TASK_056, byte-identical kernels from equal-length paths).
+An exec-code edit — M1, the deleted size check — can move it. Manufacturing a multi-clause
 accessor for p05 would be gaming the gate, and p05's index arithmetic — a
 product of two attacker `u16`s — does not need one: the precondition it must
 discharge is still exactly "the index is below the length".

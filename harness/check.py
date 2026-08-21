@@ -125,6 +125,11 @@ What it enforces, in order:
 
 Results are written to `results/gate/<pattern>.json`, with a sha256 of the
 contract block and of every source read. Exit code: 0 pass, 1 fail, 2 partial.
+A **partial** run (`--skip` / `--no-build` / `--no-callgrind` /
+`--no-verus-mutants` / `--cells` != all) certifies strictly less and writes
+`.temp/gate-partial/<pattern>.partial.json` instead -- scratch, not evidence,
+and deliberately not in `results/gate/` where a verdict survey would find it
+(TASK_056).
 
   harness/check.py p01
   harness/check.py p01 --no-build          # reuse .temp/build/pNN
@@ -1271,8 +1276,16 @@ def check_checksums(built, rep, models, indir):
     for name in models:
         vals = {v[1] for k, v in results.items() if k[3] == name and v[0] == 0}
         if len(vals) == 1:
-            rep.ok(f"{name}: all {sum(1 for k in results if k[3] == name)} cells "
-                   f"agree -> {vals.pop()}")
+            # Count the cells whose value is actually IN `vals`. The old count
+            # was every row for this input, including cells that exited non-zero
+            # and were therefore excluded from the agreement set -- so "all N
+            # cells agree" over-reported N on exactly the runs where a cell had
+            # crashed (TASK_053 m1; red-run only, which is why it is a minor).
+            agreed = sum(1 for k, v in results.items()
+                         if k[3] == name and v[0] == 0)
+            total = sum(1 for k in results if k[3] == name)
+            rep.ok(f"{name}: all {agreed} of {total} cells that exited 0 agree "
+                   f"-> {vals.pop()}")
         elif vals:
             rep.fail("checksum", f"{name}: cells disagree: {sorted(vals)}")
     return results
@@ -1812,22 +1825,36 @@ def check_adversarial(built, rep, adv_models, indir, cells):
         print(f"    -- {name}: {sb(mod.describe)} -> model expects exit "
               f"{m_exit}, stdout {m_out.strip()!r}")
         for c in cells:
-            seen = set()
+            seen = {}
             for (cc, o, m), path in sorted(built.items()):
                 if cc != c or not path:
                     continue
                 rc, out, err = run_bin(path, os.path.join(indir, name))
                 sig = -rc if rc is not None and rc < 0 else None
-                seen.add((rc, out.strip(), err.strip()[:120], sig))
-            for rc, out, err, sig in sorted(seen, key=str):
-                table[f"{name}/{c}"] = dict(exit=rc, stdout=out, stderr=err,
-                                            signal=sig, model_exit=m_exit,
-                                            model_stdout=m_out.strip())
-                flag = ""
-                if rc != m_exit or out != m_out.strip():
-                    flag = "  <-- diverges from model"
-                print(f"       {c:18s} exit={rc!s:5s} stdout={out!r:24s}"
-                      f" stderr={err!r:60s}{flag}")
+                seen.setdefault((rc, out.strip(), err.strip()[:120], sig),
+                                []).append(f"{o}/{m}")
+            # A LIST, always. `table[f"{name}/{c}"]` used to be ASSIGNED inside
+            # this loop, so a rung whose opt/mode variants disagree had N-1 of
+            # its behaviours dropped and the survivor was whichever sorted last
+            # by `str()` -- with no `opt`/`mode` label saying which cell it came
+            # from, while `rep.note` below said only how many were lost.
+            # TASK_053 F1: live on 7 patterns (p02/p03/p05/p06/p12/p13/p14),
+            # 22 notes, up to 4 behaviours collapsed to 1. PROTOCOL.md's own
+            # reviewer checklist asks "adversarial behaviour recorded per rung
+            # rather than swept up?" -- this was the sweeping-up.
+            rows = []
+            for (rc, out, err, sig), where in sorted(seen.items(), key=str):
+                rows.append(dict(exit=rc, stdout=out, stderr=err, signal=sig,
+                                 cells=sorted(where), model_exit=m_exit,
+                                 model_stdout=m_out.strip(),
+                                 diverges=(rc != m_exit
+                                           or out != m_out.strip())))
+            table[f"{name}/{c}"] = rows
+            for r in rows:
+                flag = "  <-- diverges from model" if r["diverges"] else ""
+                print(f"       {c:18s} {','.join(r['cells']):24s} "
+                      f"exit={r['exit']!s:5s} stdout={r['stdout']!r:24s}"
+                      f" stderr={r['stderr']!r:60s}{flag}")
             if len(seen) > 1:
                 rep.note(f"{name}/{c}: opt/mode variants of this rung disagree "
                          f"({len(seen)} distinct behaviours)")
@@ -2086,7 +2113,18 @@ def _check_trusted_unsafe(rep, src, tcb, justifications):
                 rep.fail("tcb-unsafe", f"{src}:{i.line} `{i.name}`: {e}")
                 continue
             body_ids = set(re.findall(r"[A-Za-z_][A-Za-z0-9_]*", i.body or ""))
-            req_ids = set(re.findall(r"[A-Za-z_][A-Za-z0-9_]*", " ".join(reqs)))
+            # A COMMENT IS NOT CLAUSE TEXT. This rule is a bag of every
+            # identifier-shaped token in the joined clause text, so before
+            # TASK_053 F4 a parameter named only in a `//` or `/* */` beside the
+            # clause counted as constrained: `requires i < v@.len(), // n is
+            # bounded by the caller` on an item whose body reads `i + n` passed
+            # this rule, and the same item with the comment deleted fails it.
+            # The repair is in `vparse._clause_split`, which now blanks comments
+            # before splitting, so `reqs` cannot contain comment text at all;
+            # the second blanking here is belt-and-braces and costs nothing.
+            req_ids = set(re.findall(
+                r"[A-Za-z_][A-Za-z0-9_]*",
+                " ".join(vparse.blank_comments(c) for c in reqs)))
             used = [p for p in pars if p in body_ids]
             bare = [p for p in used if p not in req_ids]
             if bare and not justifications.get(i.name):
@@ -2103,7 +2141,10 @@ def _check_trusted_unsafe(rep, src, tcb, justifications):
                          f"so the file still reports 0 errors. If the parameter "
                          f"is a pure value that needs no precondition, declare "
                          f"verus.unsafe_justifications[{src!r}][{i.name!r}] in "
-                         f"spec.md and the verdict will shout it every run.")
+                         f"spec.md and the verdict will shout it every run. "
+                         f"AND: if the constraint is stated in a COMMENT beside "
+                         f"the clause, it is not stated -- comments are blanked "
+                         f"before this rule reads the clause text (TASK_053 F4).")
                 continue
             if bare:
                 rep.shout("tcb-unsafe",
@@ -2202,7 +2243,15 @@ def check_verus_contract(pdir, rep, contract):
             rep.fail("proof-pin", f"{src}: no item pin in spec.md")
             continue
         got, want = set(items), set(want_items)
+        # Per-source drift counter for the `ok` line at the bottom, which used
+        # to assert "all contracts identical to spec.md" without being gated on
+        # the per-item failures raised 60 lines below (TASK_053 m2). It can only
+        # lie on a run that is already FAIL, which is why it is a minor -- but
+        # the two `ok` strings this project has already been burnt by were
+        # dangerous precisely because they lied.
+        drifted = 0
         if got != want:
+            drifted += 1
             rep.fail("proof-pin", f"{src}: item set differs from spec.md; "
                                   f"added={sorted(got - want)} "
                                   f"removed={sorted(want - got)}")
@@ -2237,6 +2286,7 @@ def check_verus_contract(pdir, rep, contract):
                 if gotc != wantc:
                     diffs.append(f"{kw}: {gotc!r} != pinned {wantc!r}")
             if diffs:
+                drifted += 1
                 rep.fail("proof-pin", f"{src}:{it.line} `{name}` drifted from "
                                       f"spec.md -- " + "; ".join(diffs))
 
@@ -2285,6 +2335,10 @@ def check_verus_contract(pdir, rep, contract):
                      f"<name> --verify-root` per item before re-pinning; the "
                      f"count is *not* sensitive to any semantic weakening, so "
                      f"an unchanged count is not evidence of anything.")
+        elif drifted:
+            print(f"    {src}: {n_ver} verified, 0 errors -- matches the pinned "
+                  f"obligation count, but {drifted} pinned item(s) drifted "
+                  f"above, so no `ok` line is printed for this source")
         else:
             rep.ok(f"{src}: {n_ver} verified, 0 errors -- matches the pinned "
                    f"obligation count; {len(tcb)} TCB items, all contracts "
@@ -2599,6 +2653,21 @@ def check_clause_deletion(pdir, rep, contract, enabled=True):
                          f"is contradictory, so every obligation the call site "
                          f"discharges is vacuous and the proof constrains "
                          f"nothing.")
+            elif pv is None:
+                # `_verus` returns `(None, None)` whenever Verus emits no
+                # `N verified, M errors` line at all. Without this arm the
+                # `else` below reported a successful NEGATIVE result -- "the
+                # call site's context is satisfiable" -- from a run that
+                # produced no result. The clause-mutant loop 25 lines down and
+                # 5c-req's deletion loop both have this arm; these two did not
+                # (TASK_053 F5). Latent on the shipped tree: all 17 probe rows
+                # in the committed records carry real numbers.
+                rep.fail("clause-mut",
+                         f"{src}: Verus produced no result for the "
+                         f"`assert(false)` reachability probe, so the call "
+                         f"site's context was never tested for satisfiability "
+                         f"and this stage certified nothing about it.\n"
+                         f"      {(po or '')[-300:]}")
             else:
                 print(f"    {src}: assert(false) after `{kname}(...)` is "
                       f"unprovable ({pv} verified, {pe} errors) -- the call "
@@ -2772,33 +2841,64 @@ def _taut_probe(txt, item, a, b, tag, tactic=None):
 
 
 def _run_taut_battery(txt, item, a, b, tag, mpath, base_v):
-    """(verdict, verified, errors, output, tactic) for one `requires` conjunct.
+    """(verdict, verified, errors, output, tactic, tactics) for one `requires`
+    conjunct.
 
     Verdicts: `tautology` (some tactic proved it under no hypotheses),
     `not a tautology`, `unsynthesisable` (the probe could not be built -- the
     reason is in `output`), `nocompile` (Verus produced no result at all),
     `perturbed` (the probe moved something other than the one obligation it
     added, so the conjunct was not judged). Everything but the second is a
-    failure for the caller; none of them is a silent skip."""
+    failure for the caller; none of them is a silent skip.
+
+    `tactics` is `{"ran": [...], "inapplicable": [...]}`: which tactics actually
+    produced a verdict on THIS clause and which could not be applied to it at
+    all, so the caller can stop claiming the second group judged anything
+    (TASK_053 F2, landed at TASK_056)."""
     pv = pe = None
     po, used = "", None
+    tactics = {"ran": [], "inapplicable": []}
     for tac in _TAUT_TACTICS:
         probe, whynot = _taut_probe(txt, item, a, b, tag, tac)
         if probe is None:
-            return "unsynthesisable", None, None, whynot, tac
+            return "unsynthesisable", None, None, whynot, tac, tactics
         open(mpath, "w").write(probe)
-        pv, pe, po = _verus(mpath)
+        rv, re_, ro = _verus(mpath)
+        if tac is not None and rv is None:
+            # THE TACTIC COULD NOT BE APPLIED -- not a negative result, and not
+            # a failure. `by (bit_vector)` refuses any assertion mentioning
+            # `v@.len()`; Verus then emits no `N verified, M errors` line at all
+            # and `_verus` returns `(None, None)`. A tactic that aborts could
+            # not have proved the clause either, so there is no false negative
+            # to recover and 5c-req's SOUNDNESS is untouched. What was wrong was
+            # the CLAIM: this arm did not exist, control fell through to
+            # `return "not a tautology"`, and the record carried
+            # `verified: null, errors: null, tactic: "bit_vector"` while the
+            # transcript named `by (bit_vector)` as a tactic that had judged the
+            # clause. TASK_053 F2 measured 51 of the project's 52 shipped
+            # conjuncts landing here, on all 16 patterns; the only exception is
+            # p08's `0 < dr <= m`, the one conjunct with no `@` in it. Making
+            # this a hard failure would red-line all 16 patterns for Verus
+            # behaving correctly (measured, TASK_053), so it is RECORDED and the
+            # `ok` line below no longer names a tactic that never ran.
+            #
+            # `pv`/`pe`/`po`/`used` are deliberately NOT overwritten: the record
+            # must carry the last tactic that actually produced a verdict.
+            tactics["inapplicable"].append(tac)
+            continue
+        pv, pe, po = rv, re_, ro
         used = tac
+        tactics["ran"].append(tac)
         if tac is None:
             if pv is None:
-                return "nocompile", pv, pe, po, tac
+                return "nocompile", pv, pe, po, tac, tactics
             if pe == 0:
-                return "tautology", pv, pe, po, tac
+                return "tautology", pv, pe, po, tac, tactics
             if pe != 1 or pv != base_v:
-                return "perturbed", pv, pe, po, tac
-        elif pv is not None and pe == 0:
-            return "tautology", pv, pe, po, tac
-    return "not a tautology", pv, pe, po, used
+                return "perturbed", pv, pe, po, tac, tactics
+        elif pe == 0:
+            return "tautology", pv, pe, po, tac, tactics
+    return "not a tautology", pv, pe, po, used, tactics
 
 
 def check_requires_strength(pdir, rep, contract, enabled=True):
@@ -2854,6 +2954,7 @@ def check_requires_strength(pdir, rep, contract, enabled=True):
     also = list(vcfg.get("clause_deletion_extra_items") or [kname])
     resolved = set()
     out = {}
+    n_inapp = 0          # (clause, tactic) pairs where the tactic never ran
     if not enabled:
         rep.fail("req-mut", "--no-verus-mutants given: the precondition-strength "
                             "stage did not run, so nothing checked that this "
@@ -2905,10 +3006,17 @@ def check_requires_strength(pdir, rep, contract, enabled=True):
                     # is only reached because the previous one failed, so a
                     # genuine tautology usually costs one run and only a clause
                     # that survives all of them costs three.
-                    verdict, pv, pe, po, used = _run_taut_battery(
+                    verdict, pv, pe, po, used, tacs = _run_taut_battery(
                         txt, it, a, b, f"{it.name}_{idx}_{jdx}", mpath, base_v)
+                    inapp = tacs["inapplicable"]
+                    n_inapp += len(inapp)
                     rows.append(dict(item=it.name, kind=why, clause=ctext,
                                      test="tautology", tactic=used,
+                                     # TASK_053 F2: which tactics actually
+                                     # produced a verdict on THIS clause, and
+                                     # which aborted without one.
+                                     tactics_ran=tacs["ran"],
+                                     tactics_inapplicable=inapp,
                                      verified=pv, errors=pe, verdict=verdict))
                     if verdict == "unsynthesisable":
                         rep.fail("req-mut",
@@ -2947,12 +3055,16 @@ def check_requires_strength(pdir, rep, contract, enabled=True):
                                  f"conjunct was not judged.\n"
                                  f"      {(po or '')[-300:]}")
                     else:
+                        ran = [t for t in _TAUT_TACTICS
+                               if t and t not in inapp]
                         print(f"    {src}: {it.name} requires[{idx}]"
                               + (f".conjunct[{jdx}]" if len(cj["spans"]) > 1
                                  else "")
-                              + f" is not a tautology (bare Z3, "
-                              + ", ".join(f"`by ({t})`" for t in _TAUT_TACTICS
-                                          if t)
+                              + f" is not a tautology (bare Z3"
+                              + ("".join(f", `by ({t})`" for t in ran))
+                              + ("; INAPPLICABLE here, never ran: "
+                                 + ", ".join(f"`by ({t})`" for t in inapp)
+                                 if inapp else "")
                               + f") -- {ctext[:52]}")
                     # --- 1. deletion, for verified items only ---------------
                     if why != "verified":
@@ -2995,10 +3107,22 @@ def check_requires_strength(pdir, rep, contract, enabled=True):
                  f"preconditions has no obligations for a caller to discharge, "
                  f"which is the pilot's defect, not a clean run.")
     elif out and not any(f[0] == "req-mut" for f in rep.failures):
+        # The tactic list is per-run, not the constant `_TAUT_TACTICS`: a tactic
+        # that ABORTED on a clause judged nothing, and naming it here is exactly
+        # the false claim TASK_053 F2 found in all 16 transcripts.
         rep.ok(f"{n} `requires` conjunct(s) probed (n={n} > 0) and {dels} "
                f"deleted, across {len(out)} file(s): no `requires` "
-               f"conjunct is a tautology under bare Z3 or "
-               + " or ".join(f"`by ({t})`" for t in _TAUT_TACTICS if t)
+               f"conjunct is a tautology under bare Z3"
+               + "".join(f" or `by ({t})`" for t in _TAUT_TACTICS
+                         if t and any(t in (r.get("tactics_ran") or [])
+                                      for v in out.values()
+                                      for r in v["mutants"]
+                                      if r["test"] == "tautology"))
+               + (f". {n_inapp} (conjunct, tactic) pair(s) are NOT claimed: the "
+                  f"tactic could not be applied to that clause and produced no "
+                  f"verdict at all -- see `tactics_inapplicable` per row "
+                  f"(TASK_053 F2: `by (bit_vector)` aborts on any clause "
+                  f"mentioning a slice length)" if n_inapp else "")
                + f", and every *verified* item's "
                f"precondition fails the file when deleted. Note what is NOT "
                f"claimed: (a) deleting a trusted item's precondition can never "
@@ -3533,6 +3657,26 @@ def check_trusted_twins(pdir, rep, contract, enabled=True):
                                      f"a body that performs the operation that "
                                      f"conjunct licenses, or drop the conjunct "
                                      f"from both.")
+                        elif dv is None:
+                            # `_verus` gives `(None, None)` when Verus emits no
+                            # `N verified, M errors` line at all -- a parse
+                            # error in the mutant, or any environmental
+                            # no-verdict. Without this arm the `else` counted
+                            # such a run as LOAD-BEARING and incremented the
+                            # `load_bearing` counter that goes into the gate
+                            # JSON. `delete_conjunct`'s own docstring names this
+                            # symptom, and the 5c and 5c-req deletion loops both
+                            # report it (TASK_053 F5). Latent today: no
+                            # `vacuity_probe.per_conjunct` row in any committed
+                            # record has a null `verified`.
+                            rep.fail("twin",
+                                     f"{src}:{twin.line} Verus produced no "
+                                     f"result for the mutant that deletes "
+                                     f"`{frag}` from `{twin.name}`'s "
+                                     f"`requires`, so that conjunct was NOT "
+                                     f"tested -- and this arm used to count it "
+                                     f"as load-bearing.\n"
+                                     f"      {(do or '')[-300:]}")
                         else:
                             needed += 1
                             print(f"    {src}: `{twin.name}` fails when the "
@@ -4386,6 +4530,10 @@ def check_sanitizers(pdir, rep, indir, models):
     head("7. C rung under ASan + UBSan (per-input expectation)")
     out = os.path.join(REPO, ".temp", "build",
                        buildmod.pattern_id(pdir), "c-gcc-asan")
+    # This stage compiles its own binary and used to rely on `build.py` having
+    # created the directory earlier in the same run. Under `--no-build` on a
+    # fresh clone it died with a raw `ld: cannot open output file` (TASK_053).
+    os.makedirs(os.path.dirname(out), exist_ok=True)
     cmd = [buildmod.GCC, "-std=c99", "-Wall", "-Wextra", "-O1", "-g",
            "-fsanitize=address,undefined",
            # the container has an LD_PRELOAD that breaks the shared ASan
@@ -4403,13 +4551,20 @@ def check_sanitizers(pdir, rep, indir, models):
     res = {}
     for name, mod in sorted(models.items()):
         rc, so, se = run_bin(out, os.path.join(indir, name))
+        got = so.strip()
         expect = sbg(mod, "sanitizer_expect")
         m_exit = sbg(mod, "expected_exit")
+        want_out = (sbg(mod, "expected_stdout") or "").strip()
         fired = ("runtime error" in se or "AddressSanitizer" in se
                  or "UndefinedBehaviorSanitizer" in se or "ERROR:" in se)
         diag = re.sub(r"\s+", " ", se.strip())[:300]
         res[name] = {"exit": rc, "expected_exit": m_exit,
-                     "expect": expect, "fired": fired, "diagnostic": diag}
+                     "expect": expect, "fired": fired, "diagnostic": diag,
+                     # TASK_053 F3: `so` was bound here and dropped on the floor
+                     # since the stage was written. Recorded unconditionally so
+                     # a reviewer can diff it; compared only where a comparison
+                     # is meaningful -- see the `elif` below.
+                     "stdout": got, "model_stdout": want_out}
         if expect == "fires":
             if not fired:
                 rep.fail("sanitizer",
@@ -4427,8 +4582,37 @@ def check_sanitizers(pdir, rep, indir, models):
         elif rc != m_exit:
             # the old version printed the exit code and ignored it entirely
             rep.fail("sanitizer", f"{name}: exit {rc}, model expects {m_exit}")
+        elif not name.startswith("adversarial") and got != want_out:
+            # This is the ONLY C configuration anywhere in the gate at `-O1` and
+            # the only one built with `-fsanitize`, and it is not in `built`, so
+            # stage 2 (`OPTS = ["O0", "O3"]`) cannot reach it: its answer was
+            # compared to nothing and recorded nowhere. Reproduced at TASK_053
+            # with a one-character off-by-one in p01's `c/kernel.c`, which
+            # printed a wrong checksum under a GREEN stage 7.
+            #
+            # SCOPED TO NON-ADVERSARIAL INPUTS DELIBERATELY, and the scope is a
+            # measurement, not caution: across all 16 patterns stage 7 produces
+            # 114 rows, 37 of them differ from `model.py`, and every one of the
+            # 37 is an `adversarial-*` input -- including six declared
+            # `sanitizer_expect: "clean"` (p04 `-overwrite`, p06 `-inarray`,
+            # p09 `-edge`, p17 `-crosswin-hi`/`-lo`/`-leak`), which are the
+            # silent-wrong-answer rows those patterns are ABOUT. On an
+            # adversarial input the C rung diverging from the model IS the
+            # result (`.memory/02-bench-rules.md`; `check_adversarial` exists to
+            # record rather than require it), so comparing unconditionally would
+            # false-fail 37 rows on 14 patterns. 77 of 77 non-adversarial rows
+            # match today, so this costs zero new failures.
+            rep.fail("sanitizer",
+                     f"{name}: the ASan+UBSan build printed {got!r}, model says "
+                     f"{want_out!r}. Nothing else in the gate runs a C binary "
+                     f"at -O1 or under -fsanitize, so no other stage can see "
+                     f"this.")
         else:
-            print(f"    ok   {name:28s} clean, exit={rc} (model {m_exit})")
+            print(f"    ok   {name:28s} clean, exit={rc} (model {m_exit}), "
+                  f"stdout {got!r}"
+                  + ("  [adversarial: recorded, not required to agree]"
+                     if name.startswith("adversarial")
+                     else " matches the model"))
     return res
 
 
@@ -4894,9 +5078,21 @@ def main():
     doc["verdict"] = verdict
     doc["complete_run"] = not partial
     doc["invocation"] = " ".join(sys.argv[1:])
-    outdir = os.path.join(REPO, "results", "gate")
+    # A partial record is SCRATCH and now lives under `.temp/`, not beside the
+    # committed evidence. It used to be written to `results/gate/` with a
+    # `.partial.json` suffix and gitignored, which is enough for `measure.py`
+    # (it skips the suffix by name) and not enough for a human: six of them were
+    # sitting there, four carrying `FAIL`, including a p05 record from an Aug-18
+    # mid-edit run whose Verus errors are not live -- and the manager hit them
+    # while surveying verdicts with a `results/gate/*.json` glob (TASK_056).
+    # Nothing but a full run may write into `results/gate/` at all now.
+    if partial:
+        outdir = os.path.join(REPO, ".temp", "gate-partial")
+        suffix = ".partial.json"
+    else:
+        outdir = os.path.join(REPO, "results", "gate")
+        suffix = ".json"
     os.makedirs(outdir, exist_ok=True)
-    suffix = ".partial.json" if partial else ".json"
     outp = os.path.join(outdir, f"{os.path.basename(pdir)}{suffix}")
     with open(outp, "w") as fh:
         json.dump(doc, fh, indent=2, sort_keys=False, default=str)
@@ -5039,12 +5235,14 @@ def _probe_selftest():
         it = [i for i in vparse.parse(txt) if i.name == iname][0]
         cj = vparse.conjunct_spans(it, "requires")
         a, b = cj[0]["spans"][0]
-        got, pv, pe, po, tac = _run_taut_battery(txt, it, a, b, "sel", mpath,
-                                                 base_v)
+        got, pv, pe, po, tac, tacs = _run_taut_battery(txt, it, a, b, "sel",
+                                                       mpath, base_v)
         ok = got == expect
         bad += 0 if ok else 1
         print(f"  {'ok  ' if ok else 'FAIL'} {label:56s} {got}"
               + (f" via `by ({tac})`" if got == "tautology" and tac else "")
+              + (f"  [inapplicable: {tacs['inapplicable']}]"
+                 if tacs["inapplicable"] else "")
               + ("" if ok else f"  (want {expect})"))
         if not ok and po:
             print(f"       {po[-400:]}")

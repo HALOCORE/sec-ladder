@@ -1575,13 +1575,49 @@ pattern dir.
 | mutant | shipped config | `--cfg slb_twin` | which gate stage fails |
 |---|---|---|---|
 | `m_noguard` — the safety line deleted | **11 verified, 1 errors**: `possible bit shift underflow/overflow` at `val = val \| (((c & 0x7f) as u64) << shift);` | — | **5a** (`n_err > 0`) |
-| `m_weakreq` — `i < v@.len()` → `i <= v@.len()`, **both** the trusted item's copy and the twin's | **12 verified, 0 errors** — invisible | **12 verified, 1 errors**: `precondition not met: index in bounds for this access` at `v[i]` | **5c-twin** |
+| `m_weakreq` — `i < v@.len()` → `i <= v@.len()`, **both** the trusted item's copy and the twin's | **12 verified, 0 errors** — invisible | **12 verified, 1 errors**: `precondition not met: index in bounds for this access` at `v[i]` | **5a AND 5c-twin** — see below |
 
-`m_weakreq` weakens **both** copies deliberately: weakening only the trusted
-one never reaches the twin (which carries its own contract text in source) and
-is caught earlier and more cheaply by `spec.md`'s `items` pin at stage 5a. The
-attack the twin regime exists for is the author who weakens both in one commit,
-and that is the mutant.
+⚠ **CORRECTED AT TASK_056, twice.** The column above said **`5c-twin`**, and two
+stages fail. And the paragraph that stood here drew a contrast that does not
+exist; it read:
+
+> `m_weakreq` weakens **both** copies deliberately: weakening only the trusted
+> one never reaches the twin (which carries its own contract text in source) and
+> is caught earlier and more cheaply by `spec.md`'s `items` pin at stage 5a. The
+> attack the twin regime exists for is the author who weakens both in one commit,
+> and that is the mutant.
+
+**The one-side/both-sides contrast is FALSE: the pin catches BOTH.** `spec.md`'s
+`verus.items` pins the clause text of **`slb_twin_buf_get_unchecked` as well as
+`buf_get_unchecked`**, so weakening both copies moves **two** pinned clauses
+rather than none, and 5a runs **before** 5c-twin. Measured with
+`harness/limbs.py` on the mutant this pattern's own `controls/gen_controls.py`
+produces:
+
+```
+$ python3 harness/limbs.py patterns/p18-varint-shift verus.rs \
+      patterns/p18-varint-shift/verus.rs .temp/p18/ctl/m_weakreq.rs
+=== verus.rs           shipped 12/0   twin 13/0   NO LIMB FIRES
+=== m_weakreq.rs       shipped 12/0   twin 12/1
+      [5a-clause] buf_get_unchecked.requires          ['i <= v@.len()'] != pinned ['i < v@.len()']
+      [5a-clause] slb_twin_buf_get_unchecked.requires ['i <= v@.len()'] != pinned ['i < v@.len()']
+      [5ct-run]   --cfg slb_twin: 12 verified, 1 errors
+                  error: precondition not met: index in bounds for this access
+```
+
+What is true, and is what the paragraph should have said: **weakening both copies
+keeps the two signatures identical, so 5c-twin's limb (i) does not fire and limb
+(ii) — the `--cfg slb_twin` run — is the interesting one.** Weakening the trusted
+one *alone* trips limb (i) instead (p13's M2 is the shipped instance). And the
+attack the twin regime really exists for is the author who weakens both copies
+**and edits `spec.md`'s pin in the same commit** — TASK_008_REVIEW's original
+attack. p16, p17, p09 and p02 build their mutants that way; this one does not, so
+here the twin is the sole **Verus-level** catcher and not the sole catcher.
+
+**The `identity` pin does not move.** A `requires` is ghost and cannot reach
+codegen — measured on p12 (TASK_054) and on p03 (TASK_056), byte-identical
+kernels compiled from equal-length source paths. An exec-code edit can move it;
+`m_noguard` is p18's example of one.
 
 ### 10b — two more mutants, and the one that decides the headline
 
