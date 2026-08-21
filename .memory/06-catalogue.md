@@ -416,6 +416,42 @@ that is the deliverable for these rows**, not a green checkmark.
 p47 is special: the "security" axis is timing, not memory safety, and the threat is
 the *optimiser*. Worth doing precisely because it inverts the usual story.
 
+**Feasibility, settled before scheduling it — and it comes out BETTER than for
+most patterns, not worse.** The obvious objection is that this box cannot measure
+timing: `perf_event_paranoid = 3` means **no hardware counters**
+(`.memory/00-environment.md`), and the wall-clock noise floor is wide enough that
+two published `ns` rows are withdrawn and p06's own layout floor is **±4.6%**. A
+timing pattern measured in wall clock here would be unpublishable.
+
+**It does not need wall clock.** The leak is a *data-dependent instruction
+count*, and this project's primary metric is a **deterministic** one:
+
+- **`Ir` as a function of the input IS the side channel**, exactly and with zero
+  noise. An early-exit compare executes fewer instructions when the mismatch is
+  at byte 0 than at byte 31; a constant-time accumulate executes the same number
+  for both. So the finding is *"`Ir(mismatch at k)` is constant in `k`"* versus
+  *"it is linear in `k`"* — a slope, measured by callgrind, reproducible to the
+  instruction. **No other pattern here has a metric that is literally the harm.**
+- **"Did the optimiser reintroduce a branch" is a STATIC question**, and
+  `harness/asm.py` answers it exactly. That is the pattern's other half and it
+  costs no measurement at all.
+- **Verus is the punchline, not a gap**: R5 can prove the comparison *correct*
+  and has no vocabulary for the timing property, so the ladder's top rung
+  certifies a leaking kernel. That mirrors p17 (*provably memory-safe and still
+  leaking*) one level up, and it is a **clean negative that the project can state
+  precisely** rather than a stall.
+
+⚠ **Two hazards to settle in its `§0`, both from things already measured here.**
+(1) `Ir` is not time — callgrind **prices a hardware `div` at 1 `Ir`**
+(`.memory/03-measurement.md:434`) and **counts a `rep`-string instruction once
+per repetition** (`:411`), so a `memcmp` lowered to `repe cmpsb` and one lowered
+to a SIMD loop are not comparable in this metric. Name the routine
+(`.memory/03-measurement.md:551`) and check the lowering before reading the
+slope. (2) The constant-time rung must survive the optimiser *in the shipped
+build*, not in a probe — that is the whole pattern, and it is exactly the
+`forbidden`-spelling-reintroduced-by-the-optimiser problem p13 already hit, where
+**a text pin binds the source and not the object**.
+
 ## Sequencing
 
 Depth-first, template-first. Do not start a wave until the previous one's patterns
