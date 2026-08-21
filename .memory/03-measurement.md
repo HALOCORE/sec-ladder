@@ -732,13 +732,24 @@ idea — R4 and R5 have byte-identical kernels and *exactly* equal `Ir`, so any
 nothing because every pattern already ships the pair.
 
 **It is a biased sample of size one.** On p06 and p14 the `verus` build's kernel
-lands **0x20 below** the `unsafe` build's — the same two addresses on both — so
-the pair samples one fixed `addr % 64` alignment contrast **every time you run
-it**. ⚠ **The 0x20 is not universal and must not be quoted as a law**: p18's
-R4/R5 pair lands at **offset 0** (PROVISIONAL — p18 is not yet reviewed), which
-biases that pair toward reading ≈0. **What generalises is that the offset is
-FIXED per pattern, not that it is 0x20** — either way the pair is one draw, not
-a sample. p14's kernel is bimodal there (`%64==16` costs 264–277 ns, `%64==48` costs
+lands **0x20 below** the `unsafe` build's, so the pair samples one fixed
+`addr % 64` alignment contrast every time you run it.
+
+⚠ **Do NOT quote 0x20, and do NOT say "the offset is fixed per pattern" — both
+were the manager's generalisations from two patterns and BOTH ARE WRONG**
+(TASK_051_REVIEW M1, measured). **The offset is a SOURCE-PATH-LENGTH artefact.**
+p06's R4 kernel moves `0x15690 → 0x156d0` as its source path grows from 29 to 98
+characters, while R5 stays put — because `p06/unsafe.rs` embeds its path as a
+panic `Location` and `p18/unsafe.rs` embeds none. p18's pair therefore lands at
+**offset 0** and reads ≈0.
+
+> **So the offset is not a property of the pattern, of Verus, or of the linker —
+> it is a property of where the checkout happens to live and of whether a panic
+> pad survives in R4.** Which is a *stronger* reason not to use the pair as a
+> null: its bias moves if you clone the repo to a different path.
+
+**What survives unchanged is the conclusion**: the pair is one draw, not a
+sample, and **the floor is the layout population.** p14's kernel is bimodal there (`%64==16` costs 264–277 ns, `%64==48` costs
 244–248), its shipped `unsafe` sits in the fast class and its shipped `verus` in
 the slow one, and the pair reads **+8.95%**. That is not noise and it is not a
 floor: over a 24-layout population the pair's **median is ≈0** on both patterns
