@@ -24,7 +24,11 @@ rest is reference.
   catalogue.
 - `TOOLCHAIN.md` — running Verus (`./verus_run.py`), version pins, Verus conventions, what's missing on this box.
 - `pilot/README.md` — calibration kernel at all five rungs; the evidence behind the plan.
-- `harness/` — `asm.py` (the only objdump caller), `vparse.py` (Verus items and
+- `harness/` — `asm.py` (**the only objdump caller in `harness/`** — ⚠ this line
+  said "the only objdump caller" full stop, and **six patterns' `controls/`
+  disassemble directly**: p08, p10, p12, p14 ×2, p16. They agree with `asm.py`
+  exactly where checked, so the rule is *the gate* has one pipeline, not *the
+  tree*), `vparse.py` (Verus items and
   clauses), `dloop.py` (driver loop → language-neutral tokens), `fixture.py`,
   `build.py`, `check.py` (the gate), `measure.py`, `report.py`. Run
   `harness/check.py pNN` before believing anything.
