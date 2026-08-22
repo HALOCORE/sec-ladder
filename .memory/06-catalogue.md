@@ -614,8 +614,38 @@ of these is a measurement; they are the questions each `§0` must answer first.*
 - **p36 (vtable dispatch) — likeliest to hit p55's wall.** An out-of-table
   indirect call jumps to whatever is adjacent, so **the harm is not
   reproducible**, and there is no equivalent of the fold-from-offset-16 trick
-  that rescued the UAF. `check.py:1249` needs every non-adversarial cell to agree
-  with `model.py`. Settle reproducibility **first**, the way TASK_055 had to.
+  that rescued the UAF. Settle reproducibility **first**, the way TASK_055 had to.
+
+  > ⚠ **PROVISIONAL — manager read of the harness, not yet reviewed; rule 3
+  > applies.** Read at TASK_066 time, source-only. **This row's own citation was
+  > wrong and its risk is overstated.**
+  >
+  > - **`check.py:1249` is not the checksum rule** — it is a selftest for
+  >   `idiom_problems` ("a bare string is not a declaration"). The real rule is
+  >   **`check_checksums`, stage 2, `:1440-1476`**. A line number written against
+  >   a file that grew from ~5100 to ~5460 lines drifted, which is the ordinary
+  >   failure mode here: **cite the function, not the line.**
+  > - **And stage 2 runs on NON-ADVERSARIAL inputs only** (`models` vs
+  >   `adv_models`). p36's harm lives on the adversarial input, which stage 2
+  >   never executes — **so non-reproducible harm does not bite stage 2 at all.**
+  > - Stage 4 records without requiring; several distinct behaviours produce a
+  >   `rep.note`, not a failure (`:2044`).
+  > - Stage 7's exit-code check (`:4783`) **is** unscoped — but it is
+  >   short-circuited by the `expect == "fires"` branch (`:4769`), which requires
+  >   only that a sanitizer **fired**, not that the exit code matched. So an
+  >   adversarial input declared `"fires"` **tolerates a non-deterministic exit.**
+  >
+  > **So the binding requirement is not "the harm is identical" but "a sanitizer
+  > fires DETERMINISTICALLY".** That is a much weaker bar and it reopens p36.
+  > ⚠ **The real open question is instead: does anything in the gate's sanitizer
+  > set see an out-of-table indirect call?** Stage 7 builds `gcc -O1
+  > -fsanitize=address,undefined` (`:4738-4739`) — **no CFI**. `-fsanitize=cfi`
+  > needs `-flto`, is clang-only, and is a **`build.py`** change, i.e. a full
+  > re-measure (RECAP settled answer 4) — do not reach for it lightly. UBSan's
+  > `-fsanitize=function` (indirect call through a wrong function type) may
+  > already reach it and is *not* a matrix change. **UNVERIFIED — it needs a
+  > compile probe, deferred because an engineer was running.** Settle it before
+  > p36 is scheduled.
   ⚠ And R1h's real answer is `-fsanitize=cfi`, which needs `-flto` and is
   clang-only — a build-flag change, so **harness territory: report, do not make
   it.**
