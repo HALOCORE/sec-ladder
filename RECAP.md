@@ -1690,9 +1690,15 @@ Both retired.
    has no corrected-ratio row and someone will look for one.
 10. **`check.py::spelling_matches` does not blank `#[cfg(slb_twin)]` bodies**, so
    a Verus rung's idiom audit can be satisfied by code no build contains
-   (constructed instance `False → True`). **Blast radius on the shipped tree is
-   0 of 15 pins**, so it is hygiene, not a live defect — and it must pass "could
-   this happen by accident?" before it becomes gate work.
+   (constructed instance `False → True`).
+   ⚠ **THIS STOPPED BEING HYGIENE AT `ce06c21` and the line below is retracted.**
+   It used to read *"blast radius 0 of 15 pins, so it is hygiene, not a live
+   defect"*. **Making `forbidden_hits` hard-fail INVERTED the harm direction**:
+   the gap no longer falsely *satisfies* a `required` count that never failed —
+   it can now falsely *hit* a `forbidden` entry that **blocks the gate**. And the
+   denominator moved from 15 pins to **197 forbidden spellings across 20 files,
+   every one of which contains twin bodies** (TASK_068_REVIEW). **It is now part
+   of blocker B1's surface, not a latent nicety** — see `TASK_069`.
 11. **A length-heterogeneous sweep band is what a step-basis test actually
    needs**, and no pattern has one. p13's fit blobs are all length-homogeneous,
    which makes every natural step basis *singular* — so p13 could not have

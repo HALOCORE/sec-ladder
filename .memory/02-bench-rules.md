@@ -190,11 +190,18 @@ Known residuals we are deliberately **not** closing, all measured:
   > **Land the two together: one edit, one 20-gate sweep.** Neither is worth a
   > sweep alone.
   > **Two figures to carry with it.** (1) The same sweep with comments, string literals and
-  > ghost clauses **not** blanked gives **29 hits across 11 patterns** — that
-  > number *is* the value of `spelling_matches`'s blanking half, and it is what a
-  > naive implementation would fail on. (2) `rung_sources` includes
-  > `CONTROL_CELLS`, today `["safe_naive_verus"]`, which no pattern ships — a
-  > bounded latent false positive of the shape TASK_021 closed.
+  > ghost clauses **not** blanked gives **29 hits across 11 patterns**.
+  > ⚠ **BOTH numbers in this paragraph are WRONG, re-measured at
+  > TASK_068_REVIEW M3**: the sweep gives **40 hits across 13 patterns** (no
+  > decomposition yields 29/11), and the denominator is **197 forbidden
+  > spellings, not 183** — verified independently by summing the 20 gate records.
+  > **Both were cited as the evidence for making `forbidden_hits` fail.**
+  > (2) `rung_sources` includes `CONTROL_CELLS`, today `["safe_naive_verus"]`,
+  > ⚠ **and the words "which no pattern ships" that stood here were FALSE** —
+  > `patterns/p01-array-sum/safe_naive_verus.rs` exists (5688 B) and
+  > `results/gate/p01-array-sum.json` records `idiom_audit.rungs: 6`, the control
+  > cell being p01's sixth audited rung. **One `ls` refutes it, and it stood in
+  > the authoritative layer and was copied into `check.py:1191-1193`.**
   > ⚠ **And the strongest argument against is the engineer's own**: a failing
   > check here would have been dischargeable by the *wrong* fix — respell at
   > 0.0000 `Ir`/call — leaving the real defect (an entry whose purpose `why`
