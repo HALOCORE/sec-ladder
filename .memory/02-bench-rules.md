@@ -135,8 +135,8 @@ costs nothing to retain. **What changes is the rule for new work:**
 Known residuals we are deliberately **not** closing, all measured:
 
 - **`forbidden_hits` is computed, printed, and never shouted** — the idiom audit
-  reports it and no stage fails on it. Currently **0 of 132**. **Proposed as a
-  fix at TASK_053 and DECLINED at TASK_056, with a measurement**, and the reason
+  reports it and no stage fails on it. **Proposed as a fix at TASK_053 and
+  DECLINED at TASK_056, with a measurement**, and the reason
   generalises: the audit cited p05's `chunks_exact` accident as its
   could-this-happen-by-accident precedent, and **`idiom_audit` structurally
   cannot see that accident.** It scans `rung_sources(pdir)` only
@@ -148,6 +148,24 @@ Known residuals we are deliberately **not** closing, all measured:
   incident as an accident-test precedent, check that the proposed check could
   have SEEN it.** p05's own `why` already says the gate does not verify that a
   rung honours its declaration.
+
+  ⚠⚠ **THE EVIDENCE HAS CHANGED AND THIS RESIDUAL IS RE-OPENED** (measured at
+  TASK_062). The count above said **0 of 132**; it is now **2 of 162**, and the
+  two are a **real defect that shipped**: p27 forbids `` `memset(tab` `` and
+  **both of its own C rungs write it** (`c/kernel.c:66-67`,
+  `c/kernel_hardened.c:46-47`), so both are out of p27's own contract, and
+  `idiom.why` never says what the entry is forbidden *for* — it explains every
+  other one. **The decline rested on "shouting would not have caught it", and
+  here shouting WOULD have.** The check can see it: `forbidden_hits` is computed
+  from `rung_sources(pdir)` and these hits *are* rung sources.
+  ⚠ **But do not conclude "make it fail" too quickly, because the same task
+  measured the stronger fact**: this `2` has been **printed in the verdict,
+  written into the gate JSON, and transcribed into `NOTES.md`** across three
+  tasks and two adversarial reviews, and **nobody acted on it**. *A number that
+  is printed is not a check.* So the live question is not shout-vs-silent, it is
+  **fail-vs-print** — and the defect itself must be settled first: either p27's
+  rungs violate the contract, or the `forbidden` entry is wrong and its removal
+  is a declaration edit owing the direction test.
 
 - ~~`source_sha256` omits `patterns/*/inputs/gen.py` and `common/slb.py`~~ —
   **CLOSED at TASK_021**, with a demonstrated record move (a comment-only

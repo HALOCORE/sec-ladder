@@ -81,8 +81,15 @@ disqualify anything:**
 **The named-spelling standard (TASK_018), and what it does and does not buy.**
 Every pattern's `slb-contract` block carries an `idiom` object naming the tokens
 each rung must spell literally. It is a **policy adopted after measuring**, not a
-reading of what any earlier text meant, and all six carry a byte-identical
-statement of it. One clause is load-bearing and was found by measurement: **a
+reading of what any earlier text meant, and **every pattern carries a
+byte-identical statement of it** — ⚠ this sentence said **"all six"**, there are
+eighteen, and it was **FALSE for p27** from TASK_060 until TASK_062 restored it.
+It is the authoritative statement of an invariant that nothing in the gate could
+see until TASK_062 added `named_spelling_problem`; the standing one-liner that
+should have caught it lived in prose and did not fire across four tasks and two
+reviews. ⚠ **The paragraph's own text still says "all six patterns"** — that is
+historical and is deliberately NOT corrected, because it sits inside the hashed
+block and one adjective would move eighteen `contract_sha256` values. One clause is load-bearing and was found by measurement: **a
 rung spells the same operands the way its language forces, and nothing else
 varies**.
 
