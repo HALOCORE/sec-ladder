@@ -8,8 +8,8 @@ this box is reference; this box is what to *do*.
 
 | | |
 |---|---|
-| **Patterns** | **20 exist, all green. 19 reviewed; p38 is IN REVIEW. 0 STALE.** Count both ends rather than trusting either: `ls -d patterns/p*/ | wc -l` and `grep -c '^| p[0-9]' .memory/06-catalogue.md` (**the denominator moved from 47 to 48 at TASK_066**, which is why it is no longer written here — a spelled-out numerator sat on this line reading *"thirteen"* against a sixteen-row table). |
-| **Do this next** | **Land p38's review.** `.tasks/TASK_066_REVIEW.md` was dispatched; when its report arrives, write **`TASK_067`** (p38 corrections) and only then the `.memory/` findings — **rule 9**. ⚠ **p38's engineer refuted SIX manager prescriptions**, so the review was pointed at the *replacement* claims. The two calls the manager is least sure of are named in the review task: **is p38's C rung idiomatic** (the whole security claim rests on it) and **is the first-ever additivity failure real or a band that never varied `nw`** — those are very different findings and the write-up implies the larger one. |
+| **Patterns** | **20 exist, all green, all 20 reviewed. 0 STALE.** Count both ends rather than trusting either: `ls -d patterns/p*/ | wc -l` and `grep -c '^| p[0-9]' .memory/06-catalogue.md` (**the denominator moved from 47 to 48 at TASK_066**, which is why it is no longer written here — a spelled-out numerator sat on this line reading *"thirteen"* against a sixteen-row table). |
+| **Do this next** | **The batched `check.py` change — write `TASK_068`.** Four owed edits, **one 20-gate sweep**, and it is the critical path: **p22 cannot be built without it.** (1) **`forbidden_hits` fail-vs-print** — open since TASK_053, recommended *fail* by TASK_063, 0 of 183 today. (2) **p22's per-input timeout** — `RUN_TIMEOUT = 900` makes a deliberately non-terminating cell cost 3–5 h per gate run; a contract-declared timeout fixes it. (3) **one token, `-fstrict-aliasing` at `check.py:4739`** — stage 7 cannot see flag-gated UB; blast radius measured at **exactly one pattern**; ⚠ **do NOT raise stage 7's opt level instead.** (4) the **doc-citation sweep** (Owed 12) rides along free, since the `harness/*.py` glob stales every gate record anyway. ⚠ **PROTOCOL rule 5 says prefer a pattern over gate work — considered and overridden**: three of these are fixes to *known measured defects*, not speculative hardening, and the fourth unblocks the next pattern. **After it: p22.** |
 | **After that** | `.memory/06-catalogue.md`'s section **"The waves order by FAMILY…"** — the missing axes, the order (**lifetime ✅ → p47 ✅ → p38 ✅ → p22 → p36**), and a **feasibility triage** naming what would kill each. ⚠ **Three things moved at TASK_066, all PROVISIONAL and all needing a different agent to attack them** (rule 3): **p22's harness question is ANSWERED** — a hang is already in the gate's vocabulary and only `RUN_TIMEOUT = 900` kills it, so it needs a `check.py` change and is the **batching partner** the owed `forbidden_hits` fix was waiting for; **p36's row cited the wrong function and overstates its risk** (the bar is "a sanitizer fires deterministically", not "the harm is identical"); and there is a **SEVENTH axis, `p48` (initialisation), which was not in the catalogue at all** — the pinned vstd already forbids the bug (`ptr_ref`/`ptr_mut_read` both `requires perm.is_init()`). **Push back with the pattern you would rather build.** |
 | **Three rules for writing that task** | ⚠ **Settle the bug class as the FIRST deliverable** — overturned on four patterns, upheld on two. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat), and the only out-of-sample test here that has ever been able to fail is **additivity extrapolation**. ⚠ **Name the INLINE MODE at every figure** — p10 fitted both and the regressors *swapped*. All three in `.memory/03-measurement.md`. |
 | **The trap that keeps firing** | **A headline can be wrong in the FLATTERING direction and pass a green gate.** p10 published *"safe Rust cheaper than unsafe"*: 60% was an **unsearched R4 side**, the rest **index-expression bookkeeping C pays more of than either Rust rung**. **p27 repeated it one pattern later** — a dead store in R4 that R3 did not have. **p47 is the first pattern to search the R4 side properly** (six levers, each measured *and* run through Verus). ⚠ **Before publishing any rung comparison, ask what the OTHER rung's spelling is worth.** |
@@ -102,7 +102,7 @@ rows, or run `ls -d patterns/p*/ | wc -l`.
 | p10 | weighted FIR stencil | **a headline wrong in the flattering direction** — safe beats unsafe, and none of it is safety |
 | p27 | handle table | **the first TEMPORAL bug** — and the lifetime guarantee costs zero; safe Rust pays *less* spatial tax than unsafe |
 | p47 | constant-time compare | **the proof certifies a LEAKING kernel** — identical contract, and the obligation count does not move |
-| p38 | strict aliasing / type punning | ⚠ **IN REVIEW, unreviewed — do not quote from here yet.** **A MISCOMPILE is the harm**: gcc reads a record length before the clamp that narrows it and never reloads, so `-O3` overflows where `-O0` is correct. Also the project's **first failed additivity extrapolation** |
+| p38 | strict aliasing / type punning | **a MISCOMPILE is the harm** — and the undefined spelling is the **dearest of six neighbours**. Ships labelled a *demonstration kernel*; the first class **unsafe Rust does not reintroduce** |
 
 **If you read only one thing after this file**, read `.tasks/TASK_026.md` §0 — the
 distilled rules from the thirteen-task spelling arc. Every pattern built after it
@@ -141,6 +141,7 @@ the commands are in `.memory/01-ladder.md`'s numbering warning.
 | p10 | **18** | 29 |
 | p27 | **19** | 30 |
 | p47 | **20** | 31 |
+| p38 | **21** | 32 |
 | p01, p02 | findings 1–3 | 1–8 |
 
 Cross-cutting entries exist only here: **14** (every rung is a spelling), **16**
@@ -1223,6 +1224,39 @@ the number.** Two task files have already sent an agent to the wrong finding.
    mismatch-at-byte-0, AVX2, AVX-512, `__builtin_expect` and a branching caller.
    **The adversary is the idiom, not the optimiser** — so `volatile` buys nothing
    and costs **6.75× / 9.68×**, inverting the standard advice.
+
+32. **p38 — the harm is a MISCOMPILE, and the undefined spelling is the DEAREST
+   of its neighbours.** A parser clamps an over-long record length in place and
+   re-reads it through a punning `uint32_t` lvalue; gcc takes the trip count from
+   the load *before* the clamp's two `uint16_t` stores and never reloads. `-O3`
+   reads past a 256-entry array, `-O0` is correct, ASan says
+   `stack-buffer-overflow READ of size 2`, and **`-fno-strict-aliasing` makes it
+   vanish**. Reviewed: **no blocker**, 3 majors, 8 minors, **35 clean negatives**.
+
+   ⚠ **It ships labelled a DEMONSTRATION KERNEL and that is the honest label.**
+   Four conjunctive conditions, and **six neighbouring one-line spellings each
+   remove the harm**. ✅ **The quotable result is the PRICE: on gcc the undefined
+   spelling is the dearest of the six — every fix saves exactly 6.00 `Ir`/call.**
+   The UB buys nothing and costs 6, so **no optimising programmer arrives here**.
+
+   **The first bug class in the tree that UNSAFE Rust does not reintroduce** —
+   Rust has no type-based aliasing rule at any rung. And *"clang is safe"* is
+   false: with an offset opaque on **one side only**, clang exploits it from
+   `-O1`.
+
+   ⚠ **The R4 side is disclosed but not established, and it flatters SAFE** —
+   published `+21/+25` against a true `+24/+32`. **p10's defect in kind**, at
+   14%/28% of the headline.
+
+   ⚠ **The project's first additivity-extrapolation failure — and it was 100%
+   ATTRIBUTABLE.** Not to the `nw` column everyone named (`R2 − R4` is exactly
+   constant in it; adding it makes out-of-sample *worse*), but to three others:
+   `rlen` parity, **`nw mod 8`**, and `rlen == 1` as a law term. Repaired laws
+   have **zero free parameters and 0.00000 max residual over 106 rows**.
+   **The rule that generalises: check the RESIDUE CLASS of any parameter your
+   bands hold constant** — two of p38's three bands sat at `nw ≡ 0 (mod 8)` and
+   the third did not, which is exactly the configuration that fits in sample and
+   misses out of it.
 
 ## Retracted — do not reinstate
 
