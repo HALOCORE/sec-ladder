@@ -808,8 +808,9 @@ refuted by a noisy session — only left unresolved**, which is the state
 
 **TASK_055 probe 2, measured; unreviewed.** A kernel that reads through a
 dangling pointer is **not reproducible**: a naked use-after-free printed **five
-different answers in five runs**, which `check.py:1249`'s cell-agreement
-requirement rejects outright — so "a lifetime bug cannot be benchmarked here"
+different answers in five runs**, which **`check_checksums`**'s cell-agreement
+requirement (`check.py:1440-1476`; this read `:1249` until TASK_066, where it
+pointed at an unrelated selftest) rejects outright — so "a lifetime bug cannot be benchmarked here"
 looks true and **is not**.
 
 The cause is not ASLR and not allocator growth (that first explanation was

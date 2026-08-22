@@ -723,7 +723,8 @@ the number.** Two task files have already sent an agent to the wrong finding.
    quote a corrected ratio only where the effect clears it, as p09's do by 11–25×.
    See `.memory/03-measurement.md`.
    **(b) A `forbidden` entry without backticks is audited ZERO times**, while the
-   verdict line two above still counts it (`check.py:929` keys on `_TICK`). p09
+   verdict line two above still counts it (**`check_idiom`** keys on `_TICK`,
+   `check.py:1103-1105`; this read `:929` until TASK_066). p09
    shipped 5 forbidden entries and 0 audited spellings — its "forbidden: 0 hits"
    was kept **by auditing nothing**. Backtick every entry you want enforced.
 
@@ -1678,10 +1679,13 @@ python3 -c "import hashlib,glob;print({hashlib.sha256(open(f).read()[open(f).rea
   `.memory/05-layout.md` said 16 — enumerate them with
   `grep -o 'head("[0-9][^"]*"' harness/check.py | sort -u | wc -l`, do not copy a
   constant. ⚠ **The `sort -u` is load-bearing and the first version of this
-  command lacked it**, returning 19: `head("1. build the matrix` appears at
-  `check.py:1218` *and* `:4903`, two entry points into one stage. TASK_058 caught
+  command lacked it**, returning 19: `head("1. build the matrix")` appears
+  **twice**, two entry points into one stage. TASK_058 caught
   it — a command that is wrong is worse than a constant that is right, because it
-  looks self-verifying),
+  looks self-verifying. ⚠ The two line numbers written here were `:1218`/`:4903`
+  and had drifted to **`:1404`/`:5104`** by TASK_066 — **which is the point:
+  the command is still right, and the constants beside it rotted.** Run
+  `grep -n 'head("1\. build' harness/check.py` rather than trusting either),
   `asm.py`, `dloop.py`, `vparse.py`,
   `build.py`, `measure.py` (now writes `source_sha256` + `input_sha256` and has
   `--check-stale`), `report.py`, `fixture.py`. `common/layout/` ships the layout

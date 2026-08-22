@@ -140,7 +140,8 @@ Known residuals we are deliberately **not** closing, all measured:
   generalises: the audit cited p05's `chunks_exact` accident as its
   could-this-happen-by-accident precedent, and **`idiom_audit` structurally
   cannot see that accident.** It scans `rung_sources(pdir)` only
-  (`check.py:820-834` — `c/kernel*.c` plus `MEASURED_CELLS + CONTROL_CELLS`),
+  (`check.py:996-1010` — `c/kernel*.c` plus `MEASURED_CELLS + CONTROL_CELLS`;
+  this read `:820-834` until TASK_066),
   while p05's measurements lived in `.temp/` and control variants. So
   `forbidden_hits` was **0 throughout the accident**, exactly as it is 0 today,
   and shouting would not have caught it.
@@ -1007,9 +1008,13 @@ review as a change to the committed artefact rather than only as a source diff.
   carries a sha256 of the contract block and of every source the gate read, so a
   stale record is at least detectable by comparing hashes against the tree.
   ⚠ **A `forbidden` entry without BACKTICKS is audited zero times, and the
-  verdict line still counts it** (TASK_038_REVIEW). `check.py:929`'s audit keys on
-  `_TICK.findall`, so a bare-string entry is invisible to it while the line two
-  above still reports *"N forbidden spelling(s)"*. p09 shipped 5 forbidden entries
+  verdict line still counts it** (TASK_038_REVIEW). The audit inside
+  **`check_idiom`** keys on `_TICK.findall` (`check.py:1103-1105`; `_TICK` is
+  defined at `:993`), so a bare-string entry is invisible to it while the line two
+  above still reports *"N forbidden spelling(s)"*.
+  ⚠ **This citation read `:929` until TASK_066** — TASK_062 inserted ~187 lines
+  into stage 0b above it. **Cite the FUNCTION; a bare line number into `check.py`
+  is a decaying reference** (see the audit note at the end of this file). p09 shipped 5 forbidden entries
   and **0 audited spellings** — its "forbidden: 0 hits" was kept by auditing
   nothing. **Backtick every `forbidden` and `required` entry you want enforced**,
   and read `audit  forbidden: N spelling(s)` — not the declaration line — as the
@@ -1067,3 +1072,41 @@ is blocker B3 re-opened from the command line. Any other skip forces the verdict
 to `PARTIAL` (exit 2), a banner, and a separate `*.partial.json`, never the
 full-run record. `--no-build` additionally fails if any binary is older than the
 newest source file.
+
+## Line citations into `check.py` decay. Cite the FUNCTION.
+
+**Audited at TASK_066: 5 of 9 distinct `check.py:NNNN` citations in the
+authoritative layer pointed at the wrong code**, and two of the five were
+duplicated into a second file, so the same wrong line had to be fixed twice.
+`check.py` has grown to ~5460 lines and every insertion above a citation moves
+it; TASK_062 alone inserted ~187 lines into stage 0b.
+
+What was wrong, and what it should have been:
+
+| cited | actually | the real target |
+|---|---|---|
+| `:929` (×2) | a `named_spelling_problem` selftest comment | **`check_idiom`**, `:1103-1105` (`_TICK` at `:993`) |
+| `:1249` (×2) | an `idiom_problems` selftest | **`check_checksums`**, `:1440-1476` / **`build_models`**, `:1433` |
+| `:820-834` | the pinned-constant rationale comment | **`rung_sources`**, `:996-1010` |
+| `:1218`/`:4903` | mid-string in a `rep.ok` | `head("1. build the matrix")` at `:1404`/`:5104` |
+
+⚠ **One of them had drifted TWICE** — `:566` until TASK_058, then `:1247-1249`
+until TASK_066. A citation that has been "fixed" is not thereby stable.
+
+**The rule: name the function, and put the line beside it as a hint, not as the
+reference.** `` **`check_checksums`** (`check.py:1440-1476`) `` survives an
+insertion; `` `check.py:1249` `` does not.
+
+**The audit is an eyeball aid, not a checker** — nothing can know what a citation
+*meant*, so it prints each target for a human to judge. It found all five above:
+
+```bash
+grep -rno 'check\.py:[0-9]\+' .memory/ RECAP.md .tasks/PROTOCOL.md | sort -u \
+| while IFS=: read -r f l ref; do n=${ref#check.py:}; \
+    printf '%-34s -> %s\n' "$f:$l" "$(sed -n "${n}p" harness/check.py | cut -c1-72)"; done
+```
+
+⚠ **Dedupe on `file:line:ref`, not on `ref`.** The first version of this sorted
+`-u -t: -k3`, which collapsed the duplicated citations and reported 4 of the 5.
+*A wrong command is worse than a wrong constant, because it looks
+self-verifying* — TASK_065's own lesson, reproduced here inside the fix for it.

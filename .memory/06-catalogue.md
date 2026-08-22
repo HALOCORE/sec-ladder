@@ -198,8 +198,11 @@ supersede any earlier task report they contradict.
   record cannot tell them apart. `results/gate/p08-overlap-move.json` shows
   `adversarial-overlap expect=clean fired=False exit=0` with empty
   `notes`/`blocked` — identical in shape to p17's genuinely-clean row, though
-  p08's means "the tool cannot see this". `check.py:1247-1249` admits only
-  `clean`/`fires` (cited as `:566` until TASK_058). The reason survives only in `model.py`'s docstring.
+  p08's means "the tool cannot see this". **`build_models`** admits only
+  `clean`/`fires` (`check.py:1433`). The reason survives only in `model.py`'s docstring.
+  ⚠ **This one citation has now drifted TWICE** — `:566` until TASK_058,
+  `:1247-1249` until TASK_066, where it pointed at an `idiom_problems` selftest.
+  **Cite the function.**
 
 - ~~**Miri is not installable**~~ — **closed at T005.** `nightly` +
   `cargo miri setup` alongside the pinned toolchain; R4 has no vstd dependency,
