@@ -1621,6 +1621,27 @@ Both retired.
    which makes every natural step basis *singular* — so p13 could not have
    fitted the step law even if one exists. Whoever next hits a size-dispatched
    library routine will need this.
+12. **`check.py:NNNN` citations in the PATTERN docs have decayed — 22 of them
+    across 12 patterns**, audited at TASK_066 and **not yet fixed**. The
+    `.memory/` half *is* fixed (5 of 9 were wrong; the convention and the audit
+    aid are at the end of `.memory/02-bench-rules.md`). Spot-checks: p04 and p09
+    `spec.md` cite `:929`, now a **blank line**; p05 and p17 `NOTES.md` cite
+    `:1446`, now `return {}`; p10 cites `:1254-1292`, now an unrelated comment.
+    **Not all are wrong** — p47's `:1755-1760` is still right, and the newest
+    patterns' citations are the healthiest, which is the drift signature.
+
+    ⚠ **DO NOT do this as a standalone task, and the reason is a scheduling
+    fact worth keeping.** A pattern's gate record globs **`pdir/*.md`**
+    (`check.py:5197`), so editing any `NOTES.md`/`README.md`/`spec.md` makes
+    that gate record STALE — 12 gate re-runs. But `measure.py`'s `provenance()`
+    (`:226-235`) does **not** glob `*.md`, so **it costs no re-measure at all.**
+
+    > **Batch it with the `check.py` edit** that is already owed —
+    > `forbidden_hits` fail-vs-print plus p22's per-input timeout
+    > (`.memory/02-bench-rules.md`, `.memory/06-catalogue.md`'s p22 triage).
+    > That edit stales **every** gate record anyway via the `harness/*.py` glob
+    > (item 5 above), so the doc fixes ride along for free. **Three owed
+    > changes, one sweep.**
 
 ### Deferred with a stated reason
 

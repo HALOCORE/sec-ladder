@@ -1117,3 +1117,17 @@ self-verifying* — TASK_065's own lesson, reproduced here inside the fix for it
 still point at what they claim. **Only `check.py` decays**, because it is the one
 file that grows every task. Do not re-run this half; swap the filename in the aid
 above if a new harness file starts growing.
+
+⚠ **The PATTERN docs have the same decay and it is NOT yet fixed: 22 citations
+across 12 patterns** (p04, p05, p06, p09, p10, p12, p13, p16, p17, p18, p27,
+p47). Audited at TASK_066, queued as RECAP "Owed" item 12 rather than fixed,
+because of a scheduling fact worth keeping:
+
+- a pattern's **gate** record globs `pdir/*.md` (`check.py:5197`), so editing any
+  `NOTES.md`/`README.md`/`spec.md` makes that gate record **STALE**;
+- but `measure.py`'s `provenance()` (`:226-235`) does **not** glob `*.md`, so the
+  same edit costs **no re-measure** — the expensive half is not triggered.
+
+**So batch the doc fixes with the owed `check.py` edit** (`forbidden_hits`
+fail-vs-print + p22's per-input timeout), which stales every gate record anyway
+through the `harness/*.py` glob. **Three owed changes, one sweep.**
