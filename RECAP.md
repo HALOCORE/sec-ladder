@@ -1683,8 +1683,27 @@ Both retired.
     > `forbidden_hits` fail-vs-print plus p22's per-input timeout
     > (`.memory/02-bench-rules.md`, `.memory/06-catalogue.md`'s p22 triage).
     > That edit stales **every** gate record anyway via the `harness/*.py` glob
-    > (item 5 above), so the doc fixes ride along for free. **Three owed
-    > changes, one sweep.**
+    > (item 5 above), so the doc fixes ride along for free.
+    > ⚠ **A FOURTH joined the batch at TASK_066_REVIEW and it is one line**:
+    > stage 7 builds C at `-O1` **without `-fstrict-aliasing`**, so it cannot see
+    > a flag-gated UB class. **It is one flag wide, not one opt level wide** —
+    > adding `-fstrict-aliasing` at `check.py:4738` makes stage 7 see p38 at
+    > `-O1` (ASan `stack-buffer-overflow READ of size 2`). **Blast radius
+    > measured across all 20 gate records: exactly one pattern.** 16 patterns
+    > declare a `fires` input and **all 16 already fire at `-O1`**, p18 included.
+    > ⚠ Do **not** raise stage 7's optimisation level instead — that perturbs 20
+    > patterns to fix one.
+    > **Four owed changes, one sweep.**
+
+    ⚠ **Extend the doc sweep to CONTROL NAMES while you are in there.** Same
+    class, found by the same review: `s_asan_O3` is cited in **three** committed
+    p38 files (`NOTES.md`, `model.py`, `spec.md`, hence its generator) and
+    **does not exist** — the `-O3` ASan build is anonymous inside
+    `do_sanitizers()` and cannot be selected by name. **A doc referring to a
+    control nobody can run is PROTOCOL rule 10's failure inside the hashed
+    layer.** No cross-pattern audit has been done; control registries are
+    heterogeneous (p38 a dict plus hardcoded prints, p47 a `VARIANTS` list), so
+    it wants `--list` per pattern rather than a grep.
 
 13. **There is NO cross-pattern synthesis, and that is the project's stated
     purpose.** 20 per-pattern tables under `results/tables/`, nothing that
