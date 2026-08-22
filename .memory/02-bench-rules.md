@@ -181,8 +181,14 @@ Known residuals we are deliberately **not** closing, all measured:
   **`forbidden_hits` is now `0` across every pattern** (183 forbidden spellings at the time of writing; the invariant is the **zero**, not the denominator, which grows with each pattern).
 
   > **Recommendation from TASK_063, PROVISIONAL: MAKE IT FAIL, batched with the
-  > next `check.py` change** — zero false-positive surface today. **Two figures
-  > to carry with it.** (1) The same sweep with comments, string literals and
+  > next `check.py` change** — zero false-positive surface today.
+  > ⚠ **A batching partner has since been identified: p22's per-input timeout**
+  > (`.memory/06-catalogue.md`'s p22 triage, also PROVISIONAL). `RUN_TIMEOUT = 900`
+  > makes a deliberately non-terminating adversarial cell cost 3–5 hours per gate
+  > run, and the fix is a contract-declared timeout — another `check.py` edit.
+  > **Land the two together: one edit, one 20-gate sweep.** Neither is worth a
+  > sweep alone.
+  > **Two figures to carry with it.** (1) The same sweep with comments, string literals and
   > ghost clauses **not** blanked gives **29 hits across 11 patterns** — that
   > number *is* the value of `spelling_matches`'s blanking half, and it is what a
   > naive implementation would fail on. (2) `rung_sources` includes

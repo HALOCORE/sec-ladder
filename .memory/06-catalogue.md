@@ -574,7 +574,41 @@ of these is a measurement; they are the questions each `§0` must answer first.*
   has it. ⚠ **An adversarial input that HANGS is not in the gate's vocabulary** —
   stage 4 records per-rung behaviour, and a non-terminating cell is a new
   behaviour class. Settle that before writing rungs, and **STOP and report if
-  `harness/` needs a change.** ⚠ Also `.memory/04-verus.md`: `decreases b - a`
+  `harness/` needs a change.**
+
+  > ⚠ **PROVISIONAL — manager read of the harness, not yet reviewed, and rule 3
+  > applies: a DIFFERENT agent must attack this before p22 is scheduled.**
+  > Read at TASK_066 time, source-only, no gate run. **The vocabulary already
+  > exists; the COST is what kills it.**
+  >
+  > - `check.py::run_bin` (`:464-470`) already returns `(None, "", "<timeout
+  >   after Ns>")`, and `check_adversarial` (`:2006`) folds that into an ordinary
+  >   behaviour row — `exit=None`, `signal=None`, `diverges` computed against the
+  >   model. **It does not crash and it does not fail**; stage 4 records rather
+  >   than requires. A hang is already representable.
+  > - The checksum stage excludes `adversarial-*` from agreement (`:4786`), so a
+  >   hanging cell cannot false-fail there.
+  > - **`measure.py` never EXECUTES an adversarial input.** All three of its
+  >   execution paths — checksums (`:528`), `CG_PLAN` (`:56-61`) and `wall`
+  >   (`:558`) — are hardcoded to `small.bin`/`large.bin`. The loop that does
+  >   iterate every blob (`:483`) only calls `slb.read` and `model.build().describe()`.
+  >   ⚠ Note `SKIP_INPUT_PREFIX = "sweep-"` does **not** cover `adversarial-`, so
+  >   this holds by the hardcoded input lists, not by a filter — **a future edit
+  >   that generalises those lists would reintroduce the problem silently.**
+  > - **The killer is `RUN_TIMEOUT = 900` (`:169`).** p22's premise is that R2,
+  >   R3 and R4 all hang, so **12 to 20 cells × 900 s = 3 to 5 hours** added to
+  >   every `check.py p22` run — and a doc edit makes the record STALE, so that
+  >   is paid repeatedly. Not viable.
+  >
+  > **So p22 DOES need a `check.py` change**, and a small one: a per-input
+  > timeout the contract can declare (a probe loop that never terminates is
+  > detectable in ~5 s, not 900). ⚠ **Batch it with the open `forbidden_hits`
+  > fail-vs-print decision** (`.memory/02-bench-rules.md`, TASK_065 outcome 3) —
+  > both are `check.py` edits, and `check.py` costs **one gate re-run**, not the
+  > full re-measure a `build.py` edit costs (RECAP, settled answer 4). Two
+  > separate sweeps is the thing to avoid.
+
+  ⚠ Also `.memory/04-verus.md`: `decreases b - a`
   fails on two-cursor loops, and a probe sequence's measure is *unvisited slots*,
   which needs a ghost set — budget more than one session.
 - **p36 (vtable dispatch) — likeliest to hit p55's wall.** An out-of-table
