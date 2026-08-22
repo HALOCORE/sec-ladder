@@ -416,6 +416,77 @@ that is the deliverable for these rows**, not a green checkmark.
 | p46 | bignum limb add/mul (schoolbook) | carry propagation, limb bounds | hard | planned |
 | p47 | constant-time compare / select | **timing side channel.** ⚠ **The catalogue's guess -- *"compiler may reintroduce a branch"* -- is REFUTED** (T064 + T064_REVIEW: 5 accumulate spellings, gcc 13.3 and clang 22.1 at five opt levels, rustc at five, **LTO, PGO trained 100% on mismatch-at-byte-0, AVX2, AVX-512, `__builtin_expect` in three placements, a branching caller** -- `Ir(k=0) - Ir(k=n-1) = 0` **exactly**, with a detector control that fires). **The adversary is the IDIOM, not the optimiser**; the leaking rung is safe Rust's own `a == b` | moderate | **done** (T064), gate `PASS` first complete run, R5 **12/0 first run, no lemma** (twin 13/0), `R4 == R5` `exact` at O3 / `norel` at O0, **TCB 3**, Miri 7/7, additivity extrapolation **80/80 exact**, **reviewed** (T064_REVIEW: 3 majors, 6 minors, **32 clean negatives**; corrections at T065). **The proof certifies a LEAKING kernel**: `m_leak` verifies 14/0 with `kernel`'s obligation count unchanged at 3 and leaks **+7088 `Ir`**, under an **identical contract** -- a property of the TRACE is invisible to a logic about the VALUE |
 
+| p48 | **partially-filled buffer / struct with padding, written out wholesale** | **uninitialised-memory INFO LEAK** — in bounds, live, owned, never written | moderate | **proposed at TASK_066 (manager), UNREVIEWED** — see the triage below |
+
+⚠ **`p48` is NEW and it makes this a 48-row catalogue.** `CLAUDE.md` describes
+`.memory/06-catalogue.md` as *"the 47-pattern catalogue"*; that phrase is now one
+short. Numbers `p01`–`p47` are all used with **no gaps** (checked), so a seventh
+axis cannot reuse one.
+
+### p48 — the seventh axis, and why the manager is proposing it against the slate
+
+**This is a manager proposal written while p38's engineer was running, from
+source reads and `vstd` greps only — no compile, no measurement.** ⚠ **The
+catalogue's own record on bug-class guesses is three overturned against two
+upheld, and p47 overturned its own row.** Treat this the same way: a prior.
+
+**Why it is not one of the six.** The harm is an **information leak of heap
+residue**: every access is *in bounds* (not spatial), the allocation is *live and
+owned* (not temporal), and the leak is in the *value*, not the trace (not
+timing). p17 leaks by returning the wrong in-bounds slice and p47 leaks by
+timing; **neither leaks memory that was simply never written.**
+
+**The ladder story, and it is unusually sharp:**
+
+- **R1 (C)** — `malloc` a record, fill some fields, write the whole record out.
+  Utterly ordinary C. ⚠ **And the killer sub-case is PADDING**: initialise every
+  field of a `struct` and the padding bytes are *still* uninitialised, so the
+  obvious fix does not work and only a whole-object `memset` does. That is the
+  real CVE shape (kernel `copy_to_user` infoleaks).
+- **R2/R3 (safe Rust)** — **cannot express it.** `Vec::with_capacity(n)` has
+  `len 0`; reaching the residue needs `set_len`, which is `unsafe`. So the safe
+  answer is **total**, like p08 — and unlike p08, the C bug is not exotic.
+- **R4 (unsafe Rust)** — `MaybeUninit` + `assume_init` reintroduces it exactly.
+- **R5 (Verus)** — ✅ **the prover WINS here, and this is the load-bearing
+  check, already done.** The pinned `~/tools/verus/vstd/raw_ptr.rs` has
+  `ghost enum MemContents<T> { Init(T), Uninit }` (`:162-164`),
+  `PointsTo::is_init()` (`:250`), `leak_contents` (`:284`) — and **both readers
+  require initialisation**: `ptr_mut_read` (`:602-605`) and `ptr_ref`
+  (`:620-623`) each carry `requires ... is_init()`. `layout.rs:375-382` supplies
+  the `MaybeUninit<T>` size/align axioms. **p27 already ships `vstd::raw_ptr`
+  code**, so this is not new machinery for the project.
+
+> **That is the point of the pattern.** p09 the proof could not see; p47 the
+> proof could not state. **Here the proof statically forbids the bug**, so the
+> tree gets its first axis where R5 is not a null result — and the contrast
+> with p47 is the finding, not a coincidence.
+
+**Harness feasibility — mostly already answered**, by the same source read that
+re-triaged p36 (above):
+
+- The leak's observable is **non-deterministic** (whatever residue the allocator
+  hands back). `check_checksums` (stage 2) runs on **non-adversarial inputs
+  only**, and stage 7 tolerates a non-deterministic exit under
+  `sanitizer_expect: "fires"`. **So a non-deterministic adversarial row is
+  already legal** — this is exactly p36's re-triage, reused.
+- ⚠ **But the residue must be RELIABLY non-zero, or the pattern shows nothing.**
+  Fresh `mmap` pages are zero-filled by the kernel, so a first-touch `malloc`
+  leaks zeros and the harm is invisible. **This is p27's fold-from-offset-16
+  problem again** and it is the thing most likely to kill p48: settle
+  reproducibility FIRST, the way TASK_055 had to.
+- **Catcher: MSan (`-fsanitize=memory`)** — a third sanitizer this project has
+  never used, and valgrind's `--track-origins=yes` is a second. ⚠ **MSan
+  requires every dependency be instrumented** and is clang-only.
+  **UNVERIFIED — availability needs a compile probe**, deferred because an
+  engineer was running. TySan turned out to be present when the catalogue
+  assumed nothing; do not assume either way.
+
+**Where it sits on the slate.** The manager would build it **before p36** and
+argue it against p22, on the grounds that it is the only remaining axis with a
+*positive* R5 result and the only one whose safe-Rust answer is total. ⚠ **This
+is a recommendation from the agent that also wrote the slate it is displacing —
+PROTOCOL rule 3. A different agent should attack it before it is scheduled.**
+
 p47 is special: the "security" axis is timing, not memory safety, and the threat is
 the *optimiser*. Worth doing precisely because it inverts the usual story.
 
@@ -514,7 +585,9 @@ p16's shape, p21 (CSV with escapes) is p14's, p24 (heap sift index arithmetic) i
 p04's, p26 (RLE expansion) is p12/p13's.
 
 **What the tree does not have is AXES, and they are almost all in waves 5 and 6
-— i.e. last.** The six missing ones, with the pattern that opens each:
+— i.e. last.** The missing ones, with the pattern that opens each. ⚠ **This said
+"six" and listed six; a SEVENTH was found at TASK_066 and it was not in the
+catalogue at all** — see the `p48` row and its triage below.
 
 | missing axis | why nothing here covers it | opens with |
 |---|---|---|
@@ -524,6 +597,7 @@ p04's, p26 (RLE expansion) is p12/p13's.
 | **control-flow integrity** | every harm here is data. An out-of-table indirect call is a different harm class, and R1h has a real answer (`-fsanitize=cfi`) that no pattern has priced | **p36** |
 | **termination as the obligation** | every R5 so far proves *safety*. None proves the loop **ends** — and an open-addressing probe that never terminates is a real, shipped C bug | **p22** |
 | **provenance** | the property Miri checks and nothing else does; untested here | **p31** |
+| **INITIALISATION** ⚠ *new at TASK_066, and it was uncatalogued* | every harm here is out-of-bounds, out-of-lifetime, or a trace. **Reading memory that is in bounds, live, owned — and never written** is none of those, and it is the one axis where **Verus SUCCEEDS**: `vstd::raw_ptr`'s `ptr_ref`/`ptr_mut_read` both `requires perm.is_init()` | **p48** (proposed) |
 
 **Recommended order after p10**, by marginal finding value rather than family:
 
