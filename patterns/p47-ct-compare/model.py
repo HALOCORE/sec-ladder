@@ -7,8 +7,12 @@ file notes only where p47 differs.
     bindings      buf/off/len/buf_len/result -- the READ-ONLY shape p03, p06,
                   p11, p12, p14, p16, p17, p05, p07, p10 and p27 use. p47's
                   kernel writes nothing and allocates nothing.
-    work_per_call **bytes of the window** -- `stride`.
-    work_unit     "byte"; `work_unit_bits` 8.
+    work_per_call **byte comparisons** -- `min over windows of (ncmp * tlen)`,
+                  96 on small.bin and 512 on large.bin. ⚠ NOT `stride`, which
+                  every other pattern uses and which p47 used until the first
+                  gate run failed `collapse-ir` on ten of sixteen O3 cells; the
+                  `work_per_call` docstring below has the measurement.
+    work_unit     "byte comparison"; `work_unit_bits` 16.
     sanitizer     **"clean" on every input, always, and that is the pattern.**
 
 **p47 IS THE FIRST PATTERN HERE WHOSE R1 IS MEMORY-SAFE.** Every other pattern's
@@ -227,8 +231,21 @@ class Model:
     @property
     def work_unit_bits(self):
         """One unit is one byte of one tag tested against its counterpart --
-        two window bytes read, one xor. 8 bits of secret."""
-        return 8
+        **TWO window bytes read**, one xor, so **16**.
+
+        ⚠ This read 8 until TASK_065. `patterns/p10-fir-stencil/model.py` has
+        the structurally identical two-byte unit ("one sample byte times one
+        coefficient byte ... Two bytes are consumed per unit, so 16 bits") and
+        declares 16, and p07 declares 32 for a probe that reads one u32; 8 made
+        p47 the only two-byte unit in the tree declared as one byte
+        (TASK_064_REVIEW minor 1). It is LATENT rather than live -- the value
+        only sets `bound = MIN_DECLARABLE_IR_PER_BIT * work_unit_bits`, which
+        `harness/check.py` consults only when `min_ir_per_work` is declared and
+        p47 declares none -- but it moves the recorded
+        `collapse_floor_min_declarable` from 0.015625 to 0.03125, i.e. it is
+        the STRICTER of the two, and it was the loosening one that shipped
+        beside the denominator change in the same commit."""
+        return 16
 
     @property
     def work_per_call(self):

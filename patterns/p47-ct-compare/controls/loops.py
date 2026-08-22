@@ -15,6 +15,21 @@ of the loop body whose condition is derived from the loaded bytes is exactly
 the thing `.memory/06-catalogue.md` predicted the optimiser would reintroduce.
 The script reports every conditional branch in each body so the claim is
 readable rather than asserted.
+
+    python3 patterns/p47-ct-compare/controls/loops.py --vecops
+
+⚠ `--vecops` exists because TASK_064_REVIEW minor 6 measured that ../NOTES.md
+1's original "vector ops" column (18 / 22 / 22 / 22 / 22) **reproduced under no
+counting rule**, this script's included -- it was the only column of that table
+that did not. The column is withdrawn and replaced by this one, whose rule is
+one line of code and is printed with the numbers: **an instruction counts as
+vector when one of its operands names an `%xmm`/`%ymm`/`%zmm` register**, over
+the whole kernel symbol. That rule is checkable by a reader with objdump and
+does not depend on keeping a mnemonic list in sync with the toolchain -- which
+is how the original column went wrong: the `vec=` figure this file prints per
+LOOP BODY uses a mnemonic PREFIX list, and a prefix list silently under-counts
+whatever the next LLVM emits (here `pshufd`, `psrld`, `psrlw` and `movdqa` are
+all outside it).
 """
 import argparse
 import os
@@ -86,6 +101,37 @@ def inner_loops(ins):
     return sorted(loops, key=lambda p: p[1] - p[0])
 
 
+#: THE VECTOR-OP RULE, stated as code so ../NOTES.md 1 can name it: an
+#: instruction is a vector instruction when one of its operands is an
+#: %xmm/%ymm/%zmm register. Deliberately NOT a mnemonic list -- see the module
+#: docstring, and TASK_064_REVIEW minor 6.
+VECREG = re.compile(r"%[xyz]mm")
+
+
+def cmd_vecops(a):
+    print(f"# p47 vector ops in the kernel symbol  [{a.opt} {a.mode}]")
+    print("# RULE: one operand names an %xmm/%ymm/%zmm register. Whole kernel "
+          "symbol, not just the tag loop.")
+    print(f"{'cell':12s} {'insns':>6s} {'vector':>7s}   by mnemonic")
+    for c in a.cells.split(","):
+        b = os.path.join(BUILD, f"{c}-{a.opt}-{a.mode}")
+        if not os.path.exists(b):
+            print(f"{c:12s} MISSING {b}")
+            continue
+        ins = insns(kernel_body(b))
+        if not ins:
+            print(f"{c:12s} no `kernel` symbol (whole-mode inlines it into main)")
+            continue
+        tab = {}
+        for _, m, o in ins:
+            if VECREG.search(o):
+                tab[m] = tab.get(m, 0) + 1
+        n = sum(tab.values())
+        print(f"{c:12s} {len(ins):6d} {n:7d}   "
+              + ("  ".join(f"{k}:{v}" for k, v in sorted(tab.items())) or "-"))
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser(
         description=__doc__,
@@ -94,7 +140,11 @@ def main():
     ap.add_argument("--mode", default="isolated")
     ap.add_argument("--cells", default=",".join(CELLS))
     ap.add_argument("--show", action="store_true", help="print each body")
+    ap.add_argument("--vecops", action="store_true",
+                    help="count vector instructions in the kernel symbol")
     a = ap.parse_args()
+    if a.vecops:
+        return cmd_vecops(a)
     print(f"# p47 loop bodies  [{a.opt} {a.mode}]   {VECWIDTH_NOTE}")
     for c in a.cells.split(","):
         b = os.path.join(BUILD, f"{c}-{a.opt}-{a.mode}")

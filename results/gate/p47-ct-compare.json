@@ -10,7 +10,7 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "1f0b4ba6a9611fc94d11a2d30b3f175cfceea0b3f05b75a6ad250c2fce516e1a",
+  "contract_sha256": "04f034f09a679ed3ce090f62f4ca0496a8e3ec92045dab2f379ec5d30d22c091",
   "idiom": {
     "required": [
       {
@@ -172,25 +172,25 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
     "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
-    "patterns/p47-ct-compare/NOTES.md": "c1fc2e907671f8486b04407b8c984b3c1fcbaa3932713ef22d7a146b2a24ab79",
-    "patterns/p47-ct-compare/README.md": "b16b4875fd8c88f951085371e2d38875732288468d1d2c0c15330fa03b38e760",
+    "patterns/p47-ct-compare/NOTES.md": "d0d4c3cb55e440df4ff3c0ae4510e349c26086a99a9a9f7fad1f09648b4d1fdd",
+    "patterns/p47-ct-compare/README.md": "d520b574b8c134c6cb4f79faceda07a72f86351ffdabe920910003ed98c091c1",
     "patterns/p47-ct-compare/c/kernel.c": "9f671934377a348322ffa3fa8c7d6e7a3c368d420f25aba1bcc0afa6482c8d49",
     "patterns/p47-ct-compare/c/kernel.h": "7252951224967e284ab402c6acb4b50c75e521ecf2936de638ab1013a8b01765",
     "patterns/p47-ct-compare/c/kernel_hardened.c": "7bc11f3367f8a2aee8f5a18385380d1e3783c845ce5b9f7d04b264e02cd774bc",
     "patterns/p47-ct-compare/c/main.c": "0e31a35914fc75adcb4e95e8673d5cf2a9583c2645261a30ad44d6047a578f5c",
     "patterns/p47-ct-compare/controls/clayout.py": "ef388ae52358b7c4e1466569ca402de50e1cc7eb68ef69d047a19939f329ccb2",
-    "patterns/p47-ct-compare/controls/gen_controls.py": "a55df455d37560da253b4611c67f5fcab79656dd00e5b442bf1daed34687d65f",
-    "patterns/p47-ct-compare/controls/ir_table.py": "836521427e7c58ca675a795c750959a39ef71dd6a20f312880dcd7235670edc5",
-    "patterns/p47-ct-compare/controls/loops.py": "36220ce4ad7908d0b53af1191faa2eadf9b61e10cc582222af8fbad4e81be197",
-    "patterns/p47-ct-compare/controls/mkcontract.py": "a75e6f40ae9447001a774e7a61617a2aca1b18dd64f2ac65dede232a7e92a6b0",
+    "patterns/p47-ct-compare/controls/gen_controls.py": "c3d2c28c93a9457fd922ebed1483c0045164c275cbed65aa859b4ff97e72014e",
+    "patterns/p47-ct-compare/controls/ir_table.py": "466f9741426667b73cc6d64d82cd54089ea230eae53fda7b14f7ed14c737c775",
+    "patterns/p47-ct-compare/controls/loops.py": "ce42005fd7016a3495b86f9744b8c223471bc4abb4b5573cbed9aba3a57d5ccc",
+    "patterns/p47-ct-compare/controls/mkcontract.py": "83f6b9dfcf78fd460d3fafdcb3d2688d42785db31fe0aa42e275a1f9d28c48f2",
     "patterns/p47-ct-compare/controls/predict.py": "ca2a67b1ef77429f9169cbba8bdb7f8884e200c84d81a24ae3a5decfa880773f",
     "patterns/p47-ct-compare/controls/proof_mutants.py": "677939369b1708a70c741474348c12f8ef0450e32ebdbb19a690f21c44302137",
     "patterns/p47-ct-compare/controls/sweep_ir.py": "9d70e5322590da12c1eb677702342d1d009d7d41dc00d3c7ea8e31f52e83bb99",
     "patterns/p47-ct-compare/inputs/gen.py": "139af17ebf7da0ba0f3d658a4a1eb42f7e024e6ca598507df578b53ab6053229",
-    "patterns/p47-ct-compare/model.py": "cb7d9d6a95702e1aae6047571ea006425ebbb0fe016910a05ded9658b56bbe1d",
+    "patterns/p47-ct-compare/model.py": "80d11b5a6411da50f2953513ab683ba60d0c0915d65b6275c240e65f9cc6a18e",
     "patterns/p47-ct-compare/safe_naive.rs": "502cea6bdabcadb2ba422ca9070ab183b019a4ce08a3aa9d225a1de255242271",
     "patterns/p47-ct-compare/safe_tuned.rs": "15ca404fcf8696174b6e63d259e9facafbf1bc4ae06ed7d82d7b44904ac7d7ee",
-    "patterns/p47-ct-compare/spec.md": "b52bad25653a350940be3f089b2d8294663a9fadd2815146d1175ab067ac02e9",
+    "patterns/p47-ct-compare/spec.md": "bdb834f011d4bab58e3e6a07c54659e7a83a50102fd5dd91cf296da4314ec825",
     "patterns/p47-ct-compare/unsafe.rs": "5287d6a438107033302321b66a3715b62b46da9e02cf6357e6ffc75c631cfec6",
     "patterns/p47-ct-compare/verus.rs": "533e5c3405de055be30b0041149e5c8326f6492a812efc55a268e35fda6dc16c",
     "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
@@ -205,7 +205,7 @@
     "alpha_ir_per_work": 0.25,
     "collapse_rate_ir_per_work": 0.25,
     "collapse_work_unit": "byte comparison",
-    "collapse_floor_min_declarable": 0.015625,
+    "collapse_floor_min_declarable": 0.03125,
     "collapse_tightest_margin": 2.931875
   },
   "identity": [

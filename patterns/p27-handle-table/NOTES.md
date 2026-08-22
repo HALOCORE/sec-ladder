@@ -190,6 +190,53 @@ decidable evidence that only the `forbidden` array moved. `controls/mkspec.py`
 moves with it, and separately gains the repair for a staleness this task found
 in it (13c).
 
+**⚠ IT MOVED A FIFTH TIME, at TASK_065, to
+`397de62b01eaa1e20bd4d16786c406de225313c223ba83b800c49afbcb84d79a`, and this one
+corrects ARITHMETIC and moves no measured figure.** `obligations_note` said
+`main 4`; `main` measures **5**:
+
+```
+$ ./verus_run.py patterns/p27-handle-table/verus.rs --verify-function main --verify-root
+verification results:: 5 verified, 0 errors (partial verification with `--verify-*`)
+```
+
+`1+1+1+1+1+1+1+3+4 = 14` against this block's own pinned and separately measured
+total of **15**; with `main 5` it is exactly 15, so the note was inconsistent
+with its own pin from the first draft. Nothing in the gate checks the
+decomposition — only the total — which is why it passed four reviews. The note's
+closing sentence, *"the same off-by-one p03, p05, p06, p07, p11, p12, p14 and p17
+record for the identical driver"*, is **deleted: none of those eight records 4**
+— every pattern in this tree that records the term records `main 5`, and p27 was
+the only 4 (`grep -o 'main [0-9]' patterns/*/spec.md`). Found by
+TASK_064_REVIEW major 2, on p47, and fixed here because the error is p27's.
+
+⚠ **And that sentence was wrong twice over.** The note those patterns carry is a
+**prediction-minus-one** claim about `.memory/04-verus.md`'s
+one-query-per-function-plus-one-per-loop rule of thumb — p10's reads *"body +
+driver loop + one per by-block would predict 6 and Verus reports 5"* — not a
+claim about the value 4 at all. p27's copy transposed it into *"would predict 5
+and Verus reports 4"*, which is where the stray 4 entered the tree. With
+`main 5`, p27's own stated prediction and its measurement agree, so **p27
+records no off-by-one**.
+
+**The direction test passes trivially and the undo is byte-provable.**
+`git diff --stat patterns/p27-handle-table/spec.md` is **2 insertions, 2
+deletions** — the `obligations_note` pin and the prose pin-table row that
+restates it, nothing else — and
+
+```
+git checkout HEAD -- patterns/p27-handle-table/spec.md \
+                     patterns/p27-handle-table/controls/mkspec.py
+```
+
+restores `01e2137f9a1bcce2453ecdb43ea9260dbc6d91e7e5073104d0e13b7800ddef07`. No
+`required` or `forbidden` entry, no obligation total, no twin total, no rung, no
+input and no published p27 figure moves; `verus.obligations` stays 15 and
+`twin_obligations` stays 20. `controls/mkspec.py` carries the same correction, so
+regenerating reproduces the corrected block rather than reverting it — the
+generator and the artefact were checked to agree before and after (`mkspec.py`
+re-run produced a byte-identical `spec.md` on the pre-edit tree).
+
 ---
 
 ## 0. The bug class, settled before anything was built

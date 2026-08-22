@@ -74,7 +74,9 @@ MUTANTS -- ../NOTES.md 10:
                 into the proved rung. **Verus verifies it**, at the same
                 obligation count, against the same `ensures` -- which is p47's
                 whole result and the one place in this tree where a mutant
-                passing is the deliverable.
+                passing is the deliverable. `--build` COMPILES IT (see
+                `VERUS_BUILD`), because ../NOTES.md 6 publishes an Ir figure
+                measured on its object and a published blob owes a generator.
 """
 import argparse
 import os
@@ -112,6 +114,25 @@ SHIP_U4 = """        let mut d: u8 = 0;
         }"""
 SHIP_V5 = """        let mut d: u8 = 0;
         let mut i: usize = 0;"""
+
+#: `verus`-kind variants whose BINARY is measured, and therefore whose binary
+#: `--build` must produce. ⚠ **This set exists because TASK_064_REVIEW major 1
+#: found `--build` skipping every `verus` variant**, which left `m_leak`'s
+#: binary -- the object ../NOTES.md 6 and ../README.md quote `+7088.000` from --
+#: with **no generator**, in violation of `CLAUDE.md` "Don't" #1 (*if a blob has
+#: no script that rebuilds it, write one before finishing*).
+#:
+#: It is a NAMED SET rather than "all of them" for two measured reasons, and
+#: `build()` prints the reason for every variant it skips so the skip is visible
+#: rather than silent:
+#:   * `m_noguard` and `m_hdr` MUST FAIL to verify (that is their job), and
+#:     `verus_run.py --compile` refuses to emit an object for a file that does
+#:     not verify -- so a binary for them cannot exist and is not wanted;
+#:   * `u_*_verus` are the byte-identical R5 TWINS of the `u_*` Rust variants.
+#:     Their job is to answer *does this R4 candidate have a verifying twin?*,
+#:     which `--verus` does; the Ir figures in ../NOTES.md 8e come from the
+#:     `u_*` builds, which `--build` already produces in both inline modes.
+VERUS_BUILD = {"m_leak"}
 
 # (name, source rung, [(find, replace), ...], kind)  kind: rs | verus | c
 VARIANTS = [
@@ -413,21 +434,59 @@ def build(made):
     os.makedirs(BIN, exist_ok=True)
     common = os.path.join(REPO, "common")
     cdir = os.path.join(PDIR, "c")
+    lld = os.path.expanduser("~/tools/llvm/bin/ld.lld")
     for name, p, kind, _src in made:
         if kind == "verus":
+            # THE BRANCH TASK_064_REVIEW major 1 FOUND MISSING. The flags below
+            # are `harness/build.py::build_verus` + `rust_flags` verbatim for
+            # (O3, <mode>, unwind), minus `--edition`, which Verus fixes itself
+            # -- so a control binary is built the same way the shipped `verus`
+            # cell is and the two are comparable.
+            if name not in VERUS_BUILD:
+                print(f"  --   {name:14s} verus-kind, no binary wanted "
+                      f"(see VERUS_BUILD)")
+                continue
+            for mode in ("isolated", "whole"):
+                out = os.path.join(BIN, f"{name}-O3-{mode}")
+                cmd = [sys.executable, VERUS, "--compile", p, "-o", out,
+                       "-C", "codegen-units=1", "-C", "opt-level=3",
+                       "-C", "debug-assertions=off"]
+                if mode == "isolated":
+                    cmd += ["--cfg", "slb_isolated"]
+                r = subprocess.run(cmd, capture_output=True, text=True, cwd=REPO)
+                ok = r.returncode == 0 and os.path.exists(out)
+                vr = [ln for ln in (r.stdout + r.stderr).splitlines()
+                      if "verification results" in ln]
+                print(f"  {'ok ' if ok else 'FAIL'} "
+                      f"{name:14s} {mode:9s} {out}"
+                      + (f"   [{vr[0].strip()}]" if vr else ""))
+                if not ok:
+                    print((r.stdout + r.stderr)[-800:])
             continue
         if kind == "c":
+            # BOTH inline modes, mirroring harness/build.py::c_flags: isolated
+            # is -DSLB_ISOLATED and whole is -flto (+ lld under clang). Before
+            # TASK_065 only `isolated` was built, and ir_table.py::binary()
+            # silently served the isolated object under `--mode whole`.
             for cc, tag in ((GCC, "gcc"), (CLANG, "clang")):
-                out = os.path.join(BIN, f"{name}-{tag}-O3-isolated")
-                cmd = [cc, "-std=c99", "-O3", "-Wall", "-Wextra",
-                       "-DSLB_ISOLATED", "-I", common, "-I", cdir,
-                       os.path.join(common, "driver.c"), p,
-                       os.path.join(cdir, "main.c"), "-o", out]
-                r = subprocess.run(cmd, capture_output=True, text=True, cwd=REPO)
-                print(f"  {'ok ' if r.returncode == 0 else 'FAIL'} "
-                      f"{name}-{tag:6s} {out}")
-                if r.returncode:
-                    print((r.stdout + r.stderr)[-800:])
+                for mode in ("isolated", "whole"):
+                    out = os.path.join(BIN, f"{name}-{tag}-O3-{mode}")
+                    cmd = [cc, "-std=c99", "-O3", "-Wall", "-Wextra"]
+                    if mode == "isolated":
+                        cmd.append("-DSLB_ISOLATED")
+                    else:
+                        cmd.append("-flto")
+                        if tag == "clang" and os.path.exists(lld):
+                            cmd.append("-fuse-ld=lld")
+                    cmd += ["-I", common, "-I", cdir,
+                            os.path.join(common, "driver.c"), p,
+                            os.path.join(cdir, "main.c"), "-o", out]
+                    r = subprocess.run(cmd, capture_output=True, text=True,
+                                       cwd=REPO)
+                    print(f"  {'ok ' if r.returncode == 0 else 'FAIL'} "
+                          f"{name}-{tag:6s} {mode:9s} {out}")
+                    if r.returncode:
+                        print((r.stdout + r.stderr)[-800:])
             continue
         for mode in ("isolated", "whole"):
             out = os.path.join(BIN, f"{name}-O3-{mode}")

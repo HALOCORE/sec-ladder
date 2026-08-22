@@ -1,6 +1,6 @@
 # p47-ct-compare — results
 
-Generated 2026-08-22T07:02:10Z from `results/p47-ct-compare.json` (git `59bd159ecefc`, working tree dirty).
+Generated 2026-08-22T08:53:39Z from `results/p47-ct-compare.json` (git `c05d1926801e`, working tree dirty).
 
 ## Toolchain
 
@@ -73,7 +73,7 @@ Every delta below is a difference between rungs that are meant to be spellings o
 
 ### Spelling audit (stage `0b`, reporting only)
 
-Measured by the gate, not by this file — from `results/gate/p47-ct-compare.json`, contract `1f0b4ba6a961`.
+Measured by the gate, not by this file — from `results/gate/p47-ct-compare.json`, contract `04f034f09a67`.
 
 `44` backticked spelling(s) over `6` rung(s) → **138** (spelling, rung) pair(s), **52** present — not the product, because a per-language entry is read against its own language's rungs only. Matching is `check.spelling_matches`: comments, string literals and Verus ghost clauses blanked, then all whitespace deleted.
 
@@ -176,29 +176,29 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 6.57 | 6.81 | 3.7% | 4.72 | 5.19 | 9.9% |
-| c-gcc | whole | 6.56 | 6.81 | 3.8% | 4.73 | 5.18 | 9.3% |
-| c-clang | isolated | 6.54 | 6.79 | 3.9% | 4.89 | 5.26 | 7.6% |
-| c-clang | whole | 6.62 | 6.80 | 2.8% | 5.08 | 5.26 | 3.5% |
-| safe_naive | isolated | 6.71 | 6.96 | 3.7% | 6.18 | 6.63 | 7.2% |
-| safe_naive | whole | 6.78 | 6.96 | 2.6% | 6.09 | 6.52 | 7.0% |
-| safe_tuned | isolated | 6.79 | 6.99 | 2.9% | 6.70 | 7.30 | 9.0% |
-| safe_tuned | whole | 6.74 | 6.96 | 3.3% | 5.83 | 6.67 | **14.5% ✗** |
-| unsafe | isolated | 6.71 | 6.96 | 3.7% | 5.95 | 6.37 | 7.0% |
-| unsafe | whole | 6.71 | 6.99 | 4.1% | 5.98 | 6.28 | 5.1% |
-| verus | isolated | 6.71 | 6.96 | 3.7% | 5.75 | 6.30 | 9.7% |
-| verus | whole | 6.78 | 7.05 | 3.9% | 5.47 | 6.33 | **15.8% ✗** |
-| c-gcc-h | isolated | 6.57 | 6.83 | 3.9% | 5.26 | 6.00 | **14.2% ✗** |
-| c-gcc-h | whole | 6.57 | 6.83 | 4.0% | 5.63 | 6.26 | **11.1% ✗** |
-| c-clang-h | isolated | 6.57 | 6.80 | 3.5% | 5.47 | 6.01 | 9.8% |
-| c-clang-h | whole | 6.57 | 6.82 | 3.7% | 5.33 | 5.73 | 7.5% |
+| c-gcc | isolated | 6.79 | 6.97 | 2.7% | 4.81 | 5.18 | 7.7% |
+| c-gcc | whole | 6.78 | 6.98 | 3.0% | 4.90 | 5.26 | 7.5% |
+| c-clang | isolated | 6.77 | 6.98 | 3.1% | 4.95 | 5.25 | 6.0% |
+| c-clang | whole | 6.81 | 7.03 | 3.2% | 4.68 | 5.22 | **11.6% ✗** |
+| safe_naive | isolated | 6.98 | 7.19 | 3.0% | 6.09 | 6.65 | 9.2% |
+| safe_naive | whole | 6.97 | 7.17 | 2.9% | 6.01 | 6.44 | 7.2% |
+| safe_tuned | isolated | 6.99 | 7.20 | 2.9% | 6.68 | 7.21 | 8.0% |
+| safe_tuned | whole | 7.01 | 7.26 | 3.6% | 6.22 | 6.92 | **11.2% ✗** |
+| unsafe | isolated | 7.00 | 7.32 | 4.6% | 5.95 | 6.28 | 5.5% |
+| unsafe | whole | 7.06 | 7.21 | 2.2% | 5.99 | 6.29 | 5.0% |
+| verus | isolated | 6.99 | 7.23 | 3.4% | 5.73 | 6.31 | **10.2% ✗** |
+| verus | whole | 7.01 | 7.15 | 1.9% | 5.67 | 6.33 | **11.7% ✗** |
+| c-gcc-h | isolated | 6.80 | 7.08 | 4.1% | 5.44 | 5.81 | 6.8% |
+| c-gcc-h | whole | 6.79 | 7.07 | 4.1% | 5.65 | 6.08 | 7.6% |
+| c-clang-h | isolated | 6.80 | 7.01 | 3.1% | 5.63 | 6.01 | 6.7% |
+| c-clang-h | whole | 6.75 | 7.01 | 3.9% | 5.33 | 5.83 | 9.5% |
 
 **4 of 32 wall-clock cells exceed the 10% min-to-median spread threshold and are DISCARDED** per `.memory/03-measurement.md` step 4. They are printed above marked ✗ rather than deleted, because a missing cell that looks like an omission is worse than a documented failure (`.memory/02-bench-rules.md`). **No claim in this report rests on a marked row.**
 
-- `safe_tuned / whole` on `small.bin`: spread 14.5%
-- `verus / whole` on `small.bin`: spread 15.8%
-- `c-gcc-h / isolated` on `small.bin`: spread 14.2%
-- `c-gcc-h / whole` on `small.bin`: spread 11.1%
+- `c-clang / whole` on `small.bin`: spread 11.6%
+- `safe_tuned / whole` on `small.bin`: spread 11.2%
+- `verus / isolated` on `small.bin`: spread 10.2%
+- `verus / whole` on `small.bin`: spread 11.7%
 
 
 ## Cells and metrics not measured

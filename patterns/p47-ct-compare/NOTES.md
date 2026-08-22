@@ -8,7 +8,32 @@ Cascade Lake, `perf_event_paranoid = 3`.
 **`slb-contract` sha256, as shipped:**
 
 ```
-1f0b4ba6a9611fc94d11a2d30b3f175cfceea0b3f05b75a6ad250c2fce516e1a
+04f034f09a679ed3ce090f62f4ca0496a8e3ec92045dab2f379ec5d30d22c091
+```
+
+**It moved once, at TASK_065**, from
+`1f0b4ba6a9611fc94d11a2d30b3f175cfceea0b3f05b75a6ad250c2fce516e1a` (the value
+this line carried at `e6e86fc`, the commit that landed p47). **Two pins moved
+and both are corrections of text that was already false when it was written**,
+so no cell was admitted or excluded by the edit: `collapse.note` still described
+the *pre-repair* denominator (§12, major 3) and `obligations_note` had the
+`main` comparison **backwards** (§12, major 2). `git diff` on the block is
+confined to those two string values; `controls/mkcontract.py` carries both, so
+`python3 patterns/p47-ct-compare/controls/mkcontract.py --check` reproduces the
+shipped block byte for byte.
+
+⚠ **That last sentence is checked, not asserted, and checking it caught a
+defect of my own during this very task.** I edited `mkcontract.py`'s
+`obligations_note` after the run that produced the block, so for a while
+`spec.md` carried a hash (`b8ec990a6c5d…`) that the committed generator would
+not reproduce — the same "artefact and generator disagree" shape as §6a and
+§15, introduced while fixing them. `--check` is a diff and it is one command;
+**run it after every edit to the generator, not after the last one**:
+
+```
+python3 patterns/p47-ct-compare/controls/mkcontract.py --check \
+  | diff - <(python3 -c "import re;print(re.search(r'\`\`\`slb-contract\n(.*?)\n\`\`\`',
+      open('patterns/p47-ct-compare/spec.md').read(),re.S).group(1))")
 ```
 
 reproduce with
@@ -121,6 +146,31 @@ that **branches on the result**, plus fixed-size `[u8;16]` and `[u8;32]`.
 gives a second `ret` in every variant. The detectors are `Ir(k)` constancy (§4)
 and reading the loop body (§1).
 
+⚠ **A NEGATIVE CLAIM IS ONLY AS STRONG AS THE WIDEST SEARCH BEHIND IT, AND THE
+WIDEST ONE IS NOT THIS ONE.** TASK_064_REVIEW ran a strictly larger search
+against the same claim and could not break it either, so what p47 publishes is
+the union rather than the delivery's own grid:
+
+| search | this file (0e) | TASK_064_REVIEW A3 |
+|---|---|---|
+| spellings | 5 C | **7 C + 4 Rust**, incl. `__builtin_expect` in **three** placements and a branching caller with the callee `static inline` |
+| opt levels | `-O1 -O2 -O3 -Os -Oz`, gcc + clang + rustc | `-O3` |
+| link | — | **LTO** (`-flto`, `-C lto=fat`) |
+| profile | — | **PGO trained 100% on mismatch-at-byte-0** |
+| ISA | baseline | **AVX2** and **AVX-512** |
+| binaries | 5 × 2 × 5 + rustc | **16** |
+
+`Ir(k=0) − Ir(k=n−1) = 0` **exactly**, per function, in every one of them —
+whole-program *and* per-function self-cost, n = 256, 400 reps, with callgrind
+name-compression and `calls=` inclusive-cost handling done properly. **The
+detector is not blind**: the same instrument on the same runs reports the
+leaking Rust `a == b` at **+18 448 Ir**. On the AVX-512 builds a scripted check
+across all five binaries × seven spellings — *does any
+`test`/`or`/`ptest`/`pmovmskb`/`kortest` feed a conditional jump?* — returns
+**0 hits in 33 of 33 functions**, and that half is **static only** for the
+reason in §16. Optimisers here move *away* from branching: `vpternlogq`,
+`cmovne`, `sete`, `pcmpeqb/pmovmskb/cmove`.
+
 ### 0f. §0's decisions
 
 **(a) THE BUG CLASS — `.memory/06-catalogue.md`'s row is OVERTURNED.** It says
@@ -170,12 +220,47 @@ OBJECT.* Everything in this section is off the shipped binaries.
 |---|---:|---:|---:|---:|---:|
 | `c-gcc` | 89 | **1** | 0 | 0 | 0 |
 | `c-clang` | 69 | **1** | 0 | 0 | 0 |
-| `c-gcc-h` | 215 | 0 | 18 | 0 | 0 |
-| `c-clang-h` | 176 | 0 | 22 | 0 | 0 |
+| `c-gcc-h` | 215 | 0 | 27 | 0 | 0 |
+| `c-clang-h` | 176 | 0 | 32 | 0 | 0 |
 | `safe_naive` | 203 | 11 | 0 | 0 | 0 |
-| `safe_tuned` | 282 | 10 | 22 | 0 | 0 |
-| `unsafe` | 174 | 0 | 22 | 0 | 0 |
-| `verus` | 174 | 0 | 22 | 0 | 0 |
+| `safe_tuned` | 282 | 10 | 32 | 0 | 0 |
+| `unsafe` | 174 | 0 | 32 | 0 | 0 |
+| `verus` | 174 | 0 | 32 | 0 | 0 |
+
+⚠ **THE "vector ops" COLUMN WAS WITHDRAWN AND RE-DERIVED AT TASK_065.** As
+shipped it read 18 / 22 / 22 / 22 / 22 and it was **the one column of this table
+that reproduced under no counting rule** — TASK_064_REVIEW minor 6 could not
+get it, and neither could I on re-attempt: the whole-symbol count under
+`controls/loops.py`'s own mnemonic-prefix list is 47 / 56 / 84 / 54 / 54, and
+under an "is it an SSE/AVX mnemonic" reading 45 / 44 / 44 / 44 / 44. Only the
+18 is traceable, to `loops.py`'s per-**loop-body** `vec=` figure for `c-gcc-h`'s
+109-instruction second body, which is not what the column claims to be; the 22
+matches nothing. **The rule is now one line of code and is printed beside the
+numbers** — *an instruction counts as vector when one operand names an
+`%xmm`/`%ymm`/`%zmm` register*, over the whole kernel symbol:
+
+```
+$ python3 patterns/p47-ct-compare/controls/loops.py --vecops
+cell          insns  vector   by mnemonic
+c-gcc            89       0   -
+c-clang          69       0   -
+c-gcc-h         215      27   movd:1 movdqa:5 movdqu:2 movq:3 por:7 psrldq:5 pxor:4
+c-clang-h       176      32   movd:4 movdqa:4 movdqu:4 por:10 pshufd:2 psrld:2 psrlw:2 pxor:4
+safe_naive      203       0   -
+safe_tuned      282      32   movd:4 movdqa:4 movdqu:4 por:10 pshufd:2 psrld:2 psrlw:2 pxor:4
+unsafe          174      32   movd:4 movdqa:4 movdqu:4 por:10 pshufd:2 psrld:2 psrlw:2 pxor:4
+verus           174      32   movd:4 movdqa:4 movdqu:4 por:10 pshufd:2 psrld:2 psrlw:2 pxor:4
+```
+
+which agrees with the review's independent `xmm|ymm|zmm` count exactly. **A
+mnemonic list is what went wrong** and a register-operand test is what replaces
+it: `pshufd`, `psrld`, `psrlw` and `movdqa` are all outside `loops.py`'s prefix
+list, so any count built on it under-reports whatever the next LLVM emits.
+⚠ Note also the stronger fact the corrected column exposes: **hardened clang C,
+safe Rust, unsafe Rust and the proved rung have the byte-identical vector
+histogram**, not merely the same total — 32 instructions over the same eight
+mnemonics in the same multiplicities. That is §1a's eleven-instruction result
+holding over the whole symbol rather than only over the tag loop.
 
 **The call targets, resolved by GOT relocation and `nm`** — not guessed:
 
@@ -254,9 +339,46 @@ tag_fold          0 verified   kernel   3 verified   main    5 verified
 buf_get_unchecked 0 verified   load_input 0          emit    0
 ```
 
-⚠ `main` reports **5**, not the 4 that p03, p05, p06, p07, p10, p11, p12, p14,
-p17 and p27 record for the byte-identical driver loop. The per-item measurement
-governs and the shared off-by-one note does not transfer.
+⚠ **THIS PARAGRAPH SAID THE OPPOSITE UNTIL TASK_065, AND THE OPPOSITE WAS
+FALSE ABOUT NINE PATTERNS.** As shipped it read *"`main` reports 5, not the 4
+that p03, p05, p06, p07, p10, p11, p12, p14, p17 and p27 record"*. Measured:
+
+```
+$ grep -o 'main [0-9]' patterns/*/spec.md | sort | uniq -c
+     17 main 5          <- p03 p04 p05 p06 p07 p08 p09 p10 p11 p12 p13 p14
+                           p16 p17 p18 p27 p47
+      1 main 4          <- p27, BEFORE TASK_065 corrected it
+```
+
+**`main` is 5 and it is the rule**: every pattern in this tree that records the
+term records 5 (p01 and p02 record no term). p47 is not anomalous. The single
+`4` was **p27's, and p27 was wrong** — provably from its own arithmetic, since
+`TABCAP 1 + RECSZ 1 + SENT 1 + run 1 + rec_open 1 + rec_close 1 + rec_read 1 +
+kernel 3 + main 4` sums to **14** against p27's pinned and separately measured
+total of **15**, and `main 5` makes it exactly 15. Re-measured directly:
+
+```
+$ ./verus_run.py patterns/p27-handle-table/verus.rs --verify-function main --verify-root
+verification results:: 5 verified, 0 errors (partial verification with `--verify-*`)
+```
+
+⚠ **And the "shared off-by-one note" is not about the value 4 at all, so the
+sentence *"it does not transfer"* was denying something no pattern claims.** The
+note other patterns carry is about **prediction minus one** — p10's reads *"body
++ driver loop + one per by-block would predict 6 and Verus reports 5, the
+identical off-by-one p03's, p05's, p06's, p07's, p11's, p12's, p14's, p17's and
+p18's spec.md record"*. It is a claim about the **rule of thumb**
+(`.memory/04-verus.md`'s one-query-per-function-plus-one-per-loop, which p10
+records as giving 8 where Verus gives 5), not about any particular value. p27's
+copy mis-transposed it into *"would predict 5 and Verus reports 4"*, which is
+where the stray 4 entered the tree, and p47's ⚠ then read the 4 as the thing
+being shared. **What is shared is the shape; what is not shared is a 4, because
+there is no 4.**
+
+TASK_065 corrected `patterns/p27-handle-table/spec.md` and its generator
+`controls/mkspec.py`, which moved p27's `contract_sha256`; the disclosure and
+the byte-provable undo are in p27's own `NOTES.md`, and §15 below records why
+the fix landed out of p47's corrections task. Found by TASK_064_REVIEW major 2.
 
 `--cfg slb_twin`: **13 verified, 0 errors** (12 + the one twin).
 
@@ -282,9 +404,88 @@ that are demonstrably doing the whole job:
 fastest correct implementation is not a floor, it is a bug that happens not to
 have fired yet* — and the repair it points at is the denominator. `model.py`'s
 `work_per_call` is now `min over windows of (ncmp × tlen)`, the byte
-comparisons the checked kernel performs. The same two points then give
-**0.413**, and every `-O3` cell clears 0.25. **No `min_ir_per_work` is
-declared**, so the harness default applies unchanged.
+comparisons the checked kernel performs (**96 on `small.bin`, 512 on
+`large.bin`**, from `python3 model.py inputs/small.bin inputs/large.bin`). The
+same two points then give **0.413**, and every `-O3` cell clears 0.25. **No
+`min_ir_per_work` is declared**, so the harness default applies unchanged.
+
+### 3a. Why the window-byte floor *forbids* this kernel, off the disassembly
+
+⚠ **The delivery argued this from two whole-program marginals, which is an
+argument about two points on a line. The mechanism is in §1a's listings and is
+stronger** (TASK_064_REVIEW A1, which extracted it independently and upheld the
+change). The tag loop is:
+
+| rung | insns per iteration | window bytes per iteration | Ir per **window byte** |
+|---|---:|---:|---:|
+| `safe_tuned` / `c-clang-h` | 11 | 32 of *each* tag = **64** | **0.172** |
+| `unsafe` / `verus` | 12 | 32 of *each* tag = **64** | **0.188** |
+
+Both are **asymptotic rates read off the loop body**, not fits: at large `tlen`
+the whole call converges on them. **0.172 and 0.188 are below 0.25**, so a
+0.25-per-window-byte floor does not merely embarrass the shipped kernel — *it
+forbids it, and it forbids the fastest correct implementation of the pattern in
+either language.* On a wider ISA it is worse. `clang -march=native` on
+`c/kernel_hardened.c`, tag loop, read off the listing:
+
+```
+vmovdqu   -0x60(%r12,%rbx), %ymm4        ... x4
+vpternlogq $0xf6, -0x60(%r13,%rbx), %ymm4, %ymm1   # ymm1 = ymm1 | (ymm4 ^ mem)
+                                          ... x4   <- xor and or FUSED
+sub  $-0x80, %rbx ; cmp %rbx,%r15 ; jne             <- latch on the INDEX
+```
+
+**11 instructions per iteration, `$-0x80` = 128 bytes of *each* tag = 256 window
+bytes** → **0.043 Ir per window byte, 5.8× under the floor**, with **0 interior
+conditional branches** (so the constant-time property survives the wider ISA
+too). ⚠ That figure is **static only**: §16 records why no `-march=native` build
+on this box can be measured dynamically at all.
+
+**So the unit is forced, not chosen.** The alternative — declaring a
+`min_ir_per_work` — would have had to sit at or below 0.189 to admit `c-clang`,
+i.e. a rate *fitted to the measurement* when the achievable rate is 0.043, which
+is the thing the direction test exists to catch. A denominator is a fact about
+the algorithm and is the same fact on every input.
+
+**And p47 is the THIRD pattern to make this move, two of them after the
+identical gate stage failed:**
+
+| pattern | unit | bytes per unit | why it moved |
+|---|---|---:|---|
+| p07 | `probe` | 4 | a byte floor *"would fail a perfectly healthy pattern"* |
+| p10 | `tap` | **2** | a byte floor *"would understate the work by a factor of `taps`"* — it moved to make the check **stricter** |
+| p13 | `DST_CAP*K + S` | — | `stride` was *"WRONG for p13, **and the gate caught it**"* |
+| p47 | `byte comparison` | **2** | this pattern |
+
+`harness/check.py:1755-1760`'s own failure message prescribes it verbatim: *"the
+fix is to re-denominate `work_per_call` in the thing the kernel touches."*
+
+### 3b. ⚠ The cost, stated rather than left to a gate record
+
+**The redenomination left p47 with the TIGHTEST anti-collapse margin of all 19
+patterns, by a factor of 2.4.** From the committed gate JSONs
+(`collapse_tightest_margin`):
+
+```
+p47-ct-compare      2.93x   <- tolerates a 65.9% work loss before collapse-ir fires
+p01-array-sum       7.02x
+p03-bounded-stack   7.47x
+…
+p14-field-split    57.76x
+p18-varint-shift   65.46x
+p27-handle-table  134.45x   <- tolerates a 99.3% work loss
+```
+
+So the change did **not** neuter the check on this pattern; it left it the most
+binding it is anywhere in the tree. What it does not do is close the residual
+`.memory/02-bench-rules.md:215` has recorded since TASK_008_REVIEW — nothing
+checks that `work_per_call` is denominated in the unit `work_unit_bits` names,
+and `work_per_call` itself appears in **no** gate JSON (`grep -c work_per_call
+results/gate/*.json` → 0), so a *halving of the denominator under an unchanged
+unit name* would leave no trace. p47 neither creates nor widens that; the unit
+**name** did change and is recorded (`"collapse_work_unit": "byte comparison"`
+where p02 and p27 carry `"byte"`), so a reader diffing gate records sees this
+edit.
 
 **Which way the estimate errs: STRICT, in three ways** — the minimum over
 windows rather than window 0's or the mean; the header, the guard arithmetic,
@@ -437,10 +638,14 @@ are a **pair**:
 | `adversarial-equal` | same shape, every comparison **equal** | `15278858700986457088` |
 | `adversarial-stride7` | 7-byte window; the driver guard skips the loop | `0` |
 
-`controls/ir_table.py --leak-controls`, `-O3 isolated`, whole-program marginal:
+`controls/ir_table.py --mode isolated --leak-controls`, whole-program marginal.
+**Re-derived in full at TASK_065 after the generator repair below; every figure
+below is that run's output, and every one of the eleven rows the delivery
+published reproduced to the milli-instruction.**
 
 | binary | k=0 | k=127 | equal | **klast − k000** | verdict |
 |---|---:|---:|---:|---:|---|
+| `c-gcc` | 373.720 | 533.720 | 493.720 | **+160.000** | LEAKS |
 | `c-clang` | 333.720 | 493.720 | 453.720 | **+160.000** | LEAKS |
 | `safe_naive` | 524.300 | 684.300 | 644.300 | **+160.000** | LEAKS |
 | `c-clang-h` | 798.720 | 798.720 | 798.720 | **+0.000** | constant |
@@ -460,6 +665,54 @@ column, per rung, and it is the only column in this project that can hold it.
 leaked byte**, reproducing the standalone probe (0d) on the shipped kernel
 shape. **The library's early exit leaks at 32-byte resolution; a hand-written
 one leaks at 1-byte resolution and is 38× louder.**
+
+### 6a. ⚠ The `+7088.000` rested on a blob with NO GENERATOR, and now does not
+
+**As shipped, `controls/gen_controls.py:416-418` read**
+
+```python
+for name, p, kind, _src in made:
+    if kind == "verus":
+        continue
+```
+
+so `--build` wrote `m_leak`'s **source** and never built its **binary**;
+`ir_table.py --leak-controls` printed `MISSING` for the row this pattern's
+README quotes as its punchline. The `+7088.000` was correct — the review
+rebuilt it by hand and got it exactly — but it came from a blob the committed
+tree could not rebuild, which is `CLAUDE.md` "Don't" #1 (*if a blob has no
+script that rebuilds it, write one before finishing*). **The number was
+reproducible; the reproduction path was not, and only the second of those is
+checkable by the next reader.** TASK_064_REVIEW major 1, and the reviewer
+deliberately deleted their own hand-built `m_leak` binary rather than leave one
+that would have hidden the defect.
+
+**The repair, and it is in the generator rather than in a note.**
+`gen_controls.py::build()` grew a `verus`-kind branch whose flags are
+`harness/build.py::build_verus` verbatim, and a `VERUS_BUILD` set naming the
+variants whose binary is wanted — `m_leak` alone, because `m_noguard` and
+`m_hdr` **must fail** to verify (so no object can exist) and the `u_*_verus`
+files are twins whose job is verification, their Ir coming from the
+byte-identical `u_*` builds. Skips are **printed**, not silent:
+
+```
+$ python3 patterns/p47-ct-compare/controls/gen_controls.py --build
+  --   m_noguard      verus-kind, no binary wanted (see VERUS_BUILD)
+  --   m_hdr          verus-kind, no binary wanted (see VERUS_BUILD)
+  ok  m_leak         isolated  .../ctlbin/m_leak-O3-isolated   [verification results:: 14 verified, 0 errors]
+  ok  m_leak         whole     .../ctlbin/m_leak-O3-whole      [verification results:: 14 verified, 0 errors]
+```
+
+and the table above is that binary. Two adjacent reproduction defects in the
+same tooling went with it: `--leak-controls` defaulted to the **8 shipped
+cells**, so `README.md`'s documented line printed 8 rows against this 12-row
+table (fixed — `LEAK_CELLS` is the default, which is why `c-gcc` now appears);
+and `ir_table.py::binary()` fell back to `-O3-isolated` when a `whole` build was
+absent, so `--mode whole` on a control built only isolated printed an
+**isolated** figure under a `whole` heading. No published figure was affected —
+every `h_vol` number in §8c is isolated — but it was a silent-wrong-answer path
+in the tool that produced this pattern's tables. The fallback is gone and
+`--build` now writes **both** inline modes for every kind, C controls included.
 
 ---
 
@@ -484,6 +737,18 @@ answer on some input.
 ## 8. The rung comparison, both inline modes, both blobs
 
 `controls/ir_table.py`, whole-program marginal Ir/call, `n_iters` 100 → 200.
+
+⚠ **`results/p47-ct-compare.json` was re-measured from scratch at TASK_065**
+(`model.py` moved, so the record went STALE). **Every deterministic field
+reproduced exactly** — all 32 cells, all `n_raw` / `n_nopad` / `.text` bytes /
+`md5_raw` / `md5_raw_norel` / kernel-exclusive `Ir` values byte-for-byte
+identical to the record `e6e86fc` shipped, `0` non-wall field differences over
+the whole file. Only wall clock moved, which is what it is for: a *different*
+four of the 32 rows now exceed the 10% min-to-median spread threshold and are
+discarded, and they are printed marked in `results/tables/p47-ct-compare.md`.
+**No claim in this file rests on a discarded row**, and §11's wall-clock figures
+come from `controls/clayout.py`'s 72-binary layout population rather than from
+this record.
 
 | cell | small, isolated | large, isolated | small, whole | large, whole |
 |---|---:|---:|---:|---:|
@@ -619,10 +884,33 @@ and measures +41.000 / +69.000 against the shipped rung.** The admissible-at-
 ⚠ **But nothing found moves it DOWN at `exact`.** `u_win` is 24.000 cheaper on
 both blobs, verifies with no new trusted item and no lemma, and is excluded by
 the **identity level alone** — `md5_raw` differs while `md5_raw_norel` matches,
-which is p10's `u_win` situation exactly. `u_winu` removes that panic pad and
-is `exact`, but reaching `<[T]>::get_unchecked` on a *Range* needs a **fourth
-`external_body` item** (`slice_unchecked`), which is p16's `r4_hdr` shape: a
+which is p10's `u_win` situation exactly. `u_winu` reaches
+`<[T]>::get_unchecked` on a *Range* to remove the panic pad, which needs a
+**fourth `external_body` item** (`slice_unchecked`) — p16's `r4_hdr` shape: a
 respelling that costs a new axiom is not free.
+
+⚠ **And the prose above used to read *"`u_winu` removes that panic pad and is
+`exact`"*, which reads as a near-miss and understates the result.** Measured:
+
+```
+$ python3 harness/asm.py stat .temp/build/p47/unsafe-O3-isolated
+n_raw 174  n_nopad 156  md5_raw 4d99e76e0b10..  md5_raw_norel c52ba8187b22..
+$ python3 harness/asm.py stat .temp/p47/ctlbin/u_winu-O3-isolated
+n_raw 174  n_nopad 156  md5_raw 4d99e76e0b10..  md5_raw_norel c52ba8187b22..
+```
+
+**`u_winu` is BYTE-IDENTICAL to the shipped R4**, not a variant that removes
+something from it — the table's own 434.000 / 605.700 says so. LLVM already
+elides the panic pad on the shipped spelling, so the fourth axiom buys **zero
+instructions**, and "nothing found moves it down at `exact`" is therefore
+*stronger* than the prose suggested (TASK_064_REVIEW minor 4). The review pushed
+this further and I record it because it strengthens the exclusion: `get_unchecked`
+appears **nowhere** in `~/tools/verus/vstd/` for any index type, so no route to
+it exists without a new axiom; and `slice_unchecked` is `external_body` +
+`requires` + `ensures` + `unsafe` body, which puts it *inside* the verified-twin
+regime (`.memory/04-verus.md:820`) while `u_winu_verus.rs` supplies no twin for
+it — so shipping it would cost a fourth axiom **and** a fifth item **and** would
+fail gate stage 5c-twin as written.
 
 **What p47 therefore publishes is the FIXED-R4 bound** — `R3ship − R4ship`
 bounding `inf(in-contract R3) − R4ship`, R4 held by fiat — **beside the R3-side
@@ -688,13 +976,24 @@ Both loops terminate (`decreases ntag - o` and `decreases tlen - i`).
 **The two mutants that MUST fail, and do:**
 
 ```
-m_noguard  the window guard `len - p >= 2*tlen` deleted
-           -> 11 verified, 1 errors: invariant not satisfied before loop
-m_hdr      the second tag's read shifted by one byte
-           -> 11 verified, 2 errors: invariant not satisfied at end of loop
-              body; precondition not satisfied   <- buf_get_unchecked's
-                                                    `i < v@.len()`
+$ ./verus_run.py .temp/p47/ctl/m_noguard.rs     # window guard `len - p >= 2*tlen` deleted
+ 1: error: invariant not satisfied before loop
+ 7: verification results:: 11 verified, 1 errors
+ 8: error: aborting due to 1 previous error
+
+$ ./verus_run.py .temp/p47/ctl/m_hdr.rs         # second tag's read shifted by one byte
+ 7: error: invariant not satisfied at end of loop body
+19: error: precondition not satisfied            <- buf_get_unchecked's `i < v@.len()`
+32: verification results:: 11 verified, 1 errors
+33: error: aborting due to 2 previous errors
 ```
+
+⚠ **`m_hdr` was quoted here as "11 verified, 2 errors" and Verus says 1**
+(TASK_064_REVIEW minor 2). The 2 is **rustc's** *previous-errors* count on the
+last line, not Verus's; both error **texts** were right and the mutant fails as
+required, but the count was transposed from the wrong line of a block presented
+as pasted output. The full line numbering is reproduced above so the two counts
+cannot be confused again.
 
 **And the mutant that MUST PASS, which is p47's deliverable:**
 
@@ -718,6 +1017,49 @@ The compiled `m_leak` binary leaks **+7088.000 Ir/call** between
 checksum* (§6). It is the loudest leaker in the table, and it carries a proof.
 
 > **So the top rung of this project's ladder certifies a leaking kernel.**
+
+### 9b′. ⚠ The precise sense in which the two proofs differ — and it is not in the contract
+
+The obvious attack on §9b is *"the honest proof must establish something the
+leaking one does not, or the sentence is rhetoric."* **It does. The point is
+that the difference is invisible at the interface**, and stating it that way is
+strictly stronger than what this section said as shipped (TASK_064_REVIEW A2,
+which diffed the two files instruction by instruction and reproduced every
+count).
+
+- **Shipped `verus.rs:338-364`.** The loop invariant is
+  `xacc(buf@, base, tlen, i, d) == xacc(buf@, base, tlen, 0, 0)` and the loop
+  has a **single** exit, so at the base case `i == tlen` and the invariant
+  yields `d == xacc(…, 0, 0)` — **the accumulator's exact value**.
+- **`m_leak`.** The same invariant survives, but the loop can now exit with
+  `i < tlen`, so the base case **splits** and `lemma_xacc_sticky` gives only
+  `d == 0 <==> xacc(…, 0, 0) == 0` — **the accumulator's zero-ness**.
+
+So the shipped file proves a strictly **stronger intermediate fact**. It buys
+nothing at the interface, because `tag_fold` folds the **verdict** and never the
+accumulator, so both files discharge the *identical* `ensures`. **The diff
+touches no `requires` and no `ensures` — not one character of the kernel
+signature or of either clause differs**, and the whole exec delta is one
+conjunct, `while i < tlen` → `while i < tlen && d == 0`. Everything else added
+is a `proof fn`, a `proof {}` block and two `assert`s, all erased before
+codegen — visible on the object, and measured on the binary the repaired
+generator now builds (§6a):
+
+```
+$ python3 harness/asm.py stat .temp/p47/ctlbin/m_leak-O3-isolated
+n_raw 68   n_nopad 66    md5_raw 7c75757d95e1..
+$ python3 harness/asm.py stat .temp/build/p47/verus-O3-isolated
+n_raw 174  n_nopad 156   md5_raw 4d99e76e0b10..
+```
+
+**68 instructions against the shipped 174**, and the difference is the early
+exit rather than the lemma — a ghost lemma that survived codegen would show up
+as *more* instructions, not 106 fewer.
+
+**Identical contract, strictly stronger intermediate.** *"The proof certifies a
+leaking kernel"* is exactly right, and this is the precise reason: **the extra
+strength the honest proof carries is invisible in the specification the ladder
+certifies.**
 
 ### 9c. Why, stated precisely
 
@@ -843,15 +1185,32 @@ safe_naive vs safe_tuned  paired n= 24  MEDIAN -22.65%
 safe_naive vs unsafe   all cross pairs  n=576  MEDIAN  -6.34%  P(R2>R4) = 0.043
 ```
 
+⚠ **`P(R3>R4) = 1.000` IS SATURATED, AND A SATURATED PROPORTION IS NOT THE
+SANCTIONED STATISTIC** (TASK_064_REVIEW minor 5). `.memory/03-measurement.md:1075`
+licenses pairwise `P(A > B)` over all `N²` layout pairs on the strength of a
+flatness measurement taken at ≈0.58 — mid-range, *"flat at every `N`
+(58.1 → 58.4 across N = 4…30)"*. **That measurement does not cover the
+ceiling.** At `P = 1.000` the statistic is `min(R3) > max(R4)`, i.e. **disjoint
+bands** — which is exactly the *worst-vs-best range* statistic
+`.memory/03-measurement.md` **retracts six lines above**, for widening
+28.91% → 30.78% on the same binaries and flipping a verdict. It is the retracted
+statistic wearing the sanctioned one's clothes. **Nothing here is withdrawn**:
+the convergent medians below are published beside it and are what the headline
+should quote. `P = 1.000` is reported as a *separation flag* and never as a
+magnitude, and `README.md` now quotes the median.
+
 **Two claims are sayable and one is not:**
 
 1. **Safe Rust's constant-time rung is +21.6% wall clock over the unsafe one on
-   `small`, with `P = 1.000` over 576 cross pairs**, and it survives
+   `small`** — median of 576 layout cross pairs, +21.95% paired by layout
+   (n = 24). The bands are also disjoint (`P(R3>R4) = 1.000`), including under
    mode-matching: partitioned by `win32`/`jcc32` on every loop the predicate
-   applies to, `P(R3>R4) = 1.000` in **all four** partitions, medians
-   +20.63%…+23.60%. Compare `Ir`: +20.7%. **`Ir` and `ns` agree here, in
-   direction and to within a point** — which is worth saying because
-   `.memory/01-ladder.md` findings 5 and 6 are the two cases where they did not.
+   applies to, all **four** partitions separate, medians +20.63%…+23.60%. Quote
+   the median, and read the separation as *"no layout pair inverts it"* rather
+   than as a probability estimate — see the ⚠ above. Compare `Ir`: +20.7%.
+   **`Ir` and `ns` agree here, in direction and to within a point** — which is
+   worth saying because `.memory/01-ladder.md` findings 5 and 6 are the two
+   cases where they did not.
 2. **Constant time costs +29.6% wall clock over the leaking safe rung**
    (`P = 0.000`, i.e. perfect separation the other way; the median ratio
    `-22.86%` inverted). `Ir` says +47.1%, so **`Ir` overstates the wall-clock
@@ -893,19 +1252,75 @@ stronger in the one way that matters:
 **Every pin that moved after a measurement, and why** — this is the disclosure
 the recorded-hash rule exists to force:
 
+**Before `e6e86fc` — pins that moved while p47 was being built:**
+
 | pin | from | to | why | direction |
 |---|---|---|---|---|
 | `verus.obligations` | (never written wrong) | 12 | measured before the first gate run | — |
-| `obligations_note` | `main 4` | `main 5` | the arithmetic was copied from p10's note; **measured per item** afterwards and p47's `main` is 5 | corrects a *wrong* claim; the pinned total 12 never moved |
+| `obligations_note` | `main 4` | `main 5` | the term was **predicted** from a misreading of p10's note rather than measured; measured per item afterwards, and p47's `main` is 5 | corrects a *wrong* claim; the pinned total 12 never moved |
 | `forbidden` | ``memcmp``, ``bcmp`` universal | `{"rust": ...}` | `memcmp` is REQUIRED in `c/kernel.c`; a universal `forbidden` entry contradicted it and the gate's audit reported the hit | **narrows** nothing measured; it scopes an entry that was self-contradictory |
 | `forbidden` | had ``any(``, ``all(``, ``ct_eq`` | removed | prose-only tokens that pinned nothing and would fire on unrelated code | no cell moved |
-| `collapse.note` | window bytes | byte comparisons | the denominator repair of §3 | **changes the floor's units, not any published Ir figure** |
+| ~~`collapse.note`~~ | ~~window bytes~~ | ~~byte comparisons~~ | ⚠ **THIS ROW WAS FALSE. The edit it describes was never made.** See below. | — |
 
 **No `required` or `forbidden` entry was added, removed or reworded in order to
 admit a cell that had been measured.** The two `forbidden` edits both *reduce*
 what is excluded and neither was made after measuring a cell that violated it —
 `memcmp` was in `c/kernel.c` from the first draft, which is what made the
 universal entry wrong on the first gate run, before any `Ir` was taken.
+
+### 12a. ⚠ The fifth row of that table was a FALSE DISCLOSURE, and that is worse than the stale pin it described
+
+TASK_064_REVIEW major 3. As shipped at `e6e86fc`, the `collapse.note` pin inside
+the hashed block **still carried the pre-repair text verbatim**, both numbers
+included —
+
+```
+$ git show e6e86fc:patterns/p47-ct-compare/spec.md | grep -o 'work_per_call is [^-]*-- .\{0,60\}'
+work_per_call is **bytes of the window** -- `stride`, 200 on small and 1032 on large -- which is
+```
+
+— against a measured `work_per_call` of **96 and 512 byte comparisons**
+(`python3 model.py inputs/small.bin inputs/large.bin`). The denominator repair
+of §3 landed in `model.py` and in this file and **not** in the contract. The
+same staleness was in `model.py:10-11`'s own header, against `model.py:224-278`
+which return `"byte comparison"` and `ncmp*tlen`.
+
+**And the row above claimed it had been changed.** p47 lands in exactly one
+commit, so this disclosure table *is* the snapshot a reviewer has instead of a
+pre-edit tree — and one of its five rows described an edit the tree did not
+contain. **A false disclosure is worse than the stale note it describes**,
+because the disclosure is precisely what a reader trusts *instead of*
+re-checking. The concrete failure it invites is the audit §3 exists to invite: a
+reader checks the contract, reads "window bytes, 200 and 1032", recomputes
+`(606−434)/(1032−200) = 0.207 < 0.25`, and concludes the gate is passing a floor
+the kernel fails.
+
+**Both are now fixed and the contract hash moved** (see the top of this file).
+The rule I would write down from it: *a disclosure row is a claim about the
+tree and must be checked against `git show`, not against intent.* One command
+would have caught it —
+
+```
+git show HEAD:patterns/p47-ct-compare/spec.md | grep -c 'bytes of the window'
+```
+
+**Pins that moved at TASK_065, and why** — the second disclosure, made the way
+the first should have been, each row verified against `git diff` on the block:
+
+| pin | from | to | why | direction |
+|---|---|---|---|---|
+| `collapse.note` | ``stride``, 200 / 1032 window bytes | ``ncmp * tlen``, 96 / 512 byte comparisons | the edit the row above **claimed** had been made; §3's repair, now in the contract | **describes** the floor already in force; no published `Ir` figure moves, no cell is admitted or excluded, and the recorded `collapse_tightest_margin` 2.93× is unchanged |
+| `obligations_note` | *"`main` 5, not the 4 that ten patterns record"* | *"`main` 5, which every pattern recording the term records"* | the comparison was **backwards**; measured (§2) | corrects a *wrong* claim about **other** patterns; p47's own pinned total 12 and its `main` term 5 both unchanged |
+
+⚠ **The direction test on both rows passes trivially and it should still be
+stated rather than assumed**: neither pin decides admission of any cell, neither
+moves a published figure, and both replace text that was false when written with
+text that is measured. The *first* row is nonetheless a declaration edit made
+after a measurement, which is exactly what `.memory/01-ladder.md`'s direction
+test governs — the reason it is safe is that the pin it corrects had **no** effect
+on the gate run (`check.py` reads `collapse.probe_inputs` and
+`collapse.probe_iters`, never `collapse.note`), so the shipped record and the
+corrected record are the same record.
 
 ---
 
@@ -954,3 +1369,81 @@ universal entry wrong on the first gate run, before any `Ir` was taken.
   data-independent in their *addresses* — every one reads all `2·tlen` bytes in
   order — which is the other half of the usual argument, and it is read off the
   disassembly in §1a rather than assumed.
+- **No `Ir` figure exists for any `-march=native` build on this box at all** —
+  §16, and it is a property of the instrument rather than of p47.
+
+---
+
+## 15. The p27 correction, and why it landed out of p47's task
+
+§2 found `main 4` in `patterns/p27-handle-table/spec.md`, wrong by p27's own
+arithmetic. TASK_065 fixed it there rather than reporting it, because the
+alternative was leaving a pin the tree can prove false in the layer this project
+calls authoritative. **Exactly two lines of p27's `spec.md` changed** — the
+`obligations_note` pin and the prose pin-table row that restates it — and its
+generator `controls/mkspec.py` carries the same correction, which matters here
+for the same reason §6a does: p27's `spec.md` **is generated**, so a fix applied
+to the artefact alone would be silently reverted by the documented regeneration
+command. Verified before editing that `python3
+patterns/p27-handle-table/controls/mkspec.py` reproduced p27's committed
+`spec.md` **byte for byte**, so the generator and the artefact were in sync
+before the edit and are in sync after it.
+
+p27's `contract_sha256` moves
+`01e2137f…` → `c84673e1…`. **The disclosure with its byte-provable undo is in
+p27's own `NOTES.md`**, beside the four earlier moves of the same hash, because
+that is where a p27 reader looks. Nothing else of p27's was touched — not its
+sources, not its other controls, not its inputs, not its measured figures — and
+its gate is re-run green below.
+
+⚠ **What is NOT fixed, and is reported rather than chased**: §13's two ported-
+machinery defects are still open in p27 and p14, and TASK_064_REVIEW added a
+third observation about the first of them — **p27's own published layout
+population was produced while its control wrote into p14's directory**, before
+`915bb8a` repointed it. p27's CONTROL 1 (single-valued `n_fn`/`md5_fn_norel`
+per cell) would have caught a foreign binary — p14's kernel is `n_fn 185` — so
+p27's figures are protected by its own control rather than by luck, but nobody
+has re-run that population.
+
+---
+
+## 16. A MEASURABILITY LIMIT, not a defect: `Ir` does not exist for `-march=native` on this box
+
+**valgrind 3.27.1 cannot decode the EVEX encodings this box's compilers emit for
+Cascade Lake, so `Ir(k)` — p47's entire instrument — is unobtainable for an
+AVX-512 build.** `.memory/02-bench-rules.md:224-229` says *"Nothing on this box
+builds with `-march`, so it is not live — but a pattern that adds one must
+re-argue ALPHA."* **It should also say the figure cannot be taken at all**,
+which is a harder constraint and a cheaper one to check than re-arguing a
+constant.
+
+Measured, on p47's own rungs (`.temp/p47c/native/mknative.sh` rebuilds all of
+it; `native-probe.log` is the output):
+
+| build | `small.bin` | `large.bin` | `adversarial-k000.bin` |
+|---|---|---|---|
+| gcc 13.3 `-march=native`, `c/kernel_hardened.c` | **SIGILL** | **SIGILL** | **SIGILL** |
+| clang 22.1 `-march=native`, same source | 7 375 287 Ir | 2 472 414 Ir | **SIGILL** |
+| rustc 1.97 `-C target-cpu=native`, `unsafe.rs` | 6 933 473 Ir | **SIGILL** | **SIGILL** |
+
+```
+vex amd64->IR: unhandled instruction bytes: 0x62 0xF1 0x7F 0x28 0x6F 0x1C 0x2 ...
+valgrind: Unrecognised instruction at address 0x4001ac0.
+Process terminating with default action of signal 4 (SIGILL)
+```
+
+`0x62` is the EVEX prefix; the failing opcodes are `vmovdqu8`/`vmovdqu64` under
+gcc and `vpternlogd` under clang and rustc.
+
+⚠ **And the shape is worse than "it does not run", which is why it is worth
+recording precisely rather than as a slogan: 7 of the 9 cells die and 3 survive,
+and WHICH ones is a function of the INPUT.** The EVEX instruction sits on the
+widest vectorised path, which only some `tlen` reach — `small.bin` is `tlen` 24,
+`large.bin` 64, `adversarial-k000` 128 — so a `-march=native` build can hand
+back a plausible `Ir` on one blob and SIGILL on the next. **A partial table
+would look complete.** Anything reported from such a build must name the blob
+and say the rest could not be taken.
+
+This also strengthens §3a independently of the argument there: at AVX-512 the
+window-byte rate is 0.043, so a 0.25-per-window-byte floor would have had to
+move regardless of which unit p47 chose.

@@ -47,12 +47,27 @@ CELLS = ["c-gcc", "c-clang", "c-gcc-h", "c-clang-h",
 CONTROLS = ["t_split", "t_win", "t_iter", "u_base", "u_win", "u_ptr",
             "n_early", "m_leak"]
 C_CONTROLS = ["h_vol-gcc", "h_vol-clang"]
+#: what `--leak-controls` measures by DEFAULT: exactly the twelve rows
+#: ../NOTES.md 6 publishes. Before TASK_065 the default was `CELLS`, so
+#: ../README.md's documented reproduction line printed eight rows against a
+#: twelve-row published table (TASK_064_REVIEW major 1, second adjacent defect).
+LEAK_CELLS = CELLS + ["m_leak", "n_early", "h_vol-clang", "h_vol-gcc"]
 
 
 def binary(name, mode):
+    """The object for `name` at `-O3 <mode>`, or None.
+
+    ⚠ **No cross-MODE fallback.** Until TASK_065 this fell back to
+    `CTLBIN/{name}-O3-isolated` when a `whole` build was absent, so `--mode
+    whole` on a control built only isolated printed an ISOLATED figure under a
+    `whole` heading -- a silent wrong answer in the tool that produced this
+    pattern's tables (TASK_064_REVIEW major 1, third adjacent defect). No
+    published figure was affected: every `h_vol` number in ../NOTES.md 8c is
+    isolated. `gen_controls.py --build` now writes both modes for every kind,
+    so the fallback has nothing left to rescue and a genuine gap prints
+    MISSING."""
     for cand in (os.path.join(BUILD, f"{name}-O3-{mode}"),
-                 os.path.join(CTLBIN, f"{name}-O3-{mode}"),
-                 os.path.join(CTLBIN, f"{name}-O3-isolated")):
+                 os.path.join(CTLBIN, f"{name}-O3-{mode}")):
         if os.path.exists(cand):
             return cand
     return None
@@ -197,7 +212,9 @@ def main():
     ap = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--cells", default=",".join(CELLS))
+    ap.add_argument("--cells", default=None,
+                    help="default: the 8 shipped cells, or the 12 rows of "
+                         "NOTES.md 6 under --leak-controls")
     ap.add_argument("--inputs", default="small.bin,large.bin")
     ap.add_argument("--mode", required=True, choices=["isolated", "whole"])
     ap.add_argument("--n1", type=int, default=100)
@@ -208,6 +225,8 @@ def main():
     ap.add_argument("--b")
     ap.add_argument("--input", default="large.bin")
     a = ap.parse_args()
+    if a.cells is None:
+        a.cells = ",".join(LEAK_CELLS if a.leak_controls else CELLS)
     scr = os.path.join(REPO, ".temp", "p47", f"irt{os.getpid()}")
     os.makedirs(scr, exist_ok=True)
     try:
