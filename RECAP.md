@@ -1686,6 +1686,37 @@ Both retired.
     > (item 5 above), so the doc fixes ride along for free. **Three owed
     > changes, one sweep.**
 
+13. **There is NO cross-pattern synthesis, and that is the project's stated
+    purpose.** 20 per-pattern tables under `results/tables/`, nothing that
+    compares them — while `CLAUDE.md` describes the project as patterns
+    *"compared on assembly, instruction count, timing, proof burden and
+    trusted-base size"*. A working aggregation probe exists at
+    **`.temp/synth/aggregate.py`** (kept per the keep-the-generator rule; it
+    reads only committed records, runs in seconds, and needs no measurement).
+
+    ⚠ **It must NOT live in `harness/`** — `check.py` hashes `harness/*.py` into
+    every gate record (`check.py:5200`), so a file there stales all 20 gates for
+    a script the gate never executes. `common/` and `common/layout/` are hashed
+    too. Pick the location deliberately.
+
+    **Three things it already exposes — all PROVISIONAL, none reviewed:**
+
+    - **`R5 − R4 = 0.00` on all 40 rows**, both inputs, every pattern. The
+      `identity: exact` invariant, visible whole for the first time.
+    - **`R3 − R4` is NEGATIVE on 5 of 20 patterns** — p10 (−323/−603), p11
+      (−5768/**−24503**), p12 (−26 large), p13 (−177/−1054), p18 (−25/−12). So
+      *"safe tuned Rust is dearer than unsafe"* fails on a quarter of the tree.
+      ⚠ **Do not quote that as a result.** Several of those patterns have an
+      **unsearched R4 side** — the trap in the START HERE box — so the sign may
+      be an artefact of R4's spelling. **What the aggregate genuinely adds is
+      making that a systematic problem rather than a per-pattern footnote.**
+    - ⚠ **A cross-pattern `Ir` comparison is available in `isolated` mode ONLY.**
+      Measured: of 318 `-O3` cell/input pairs, `whole` mode has
+      `kernel_exclusive_ir = None` in **302** — the kernel is inlined and has no
+      symbol. Since **p10 showed regressors SWAP between modes**, any synthesis
+      can only ever speak for the mode where that swap was observed. **State that
+      limit before the first number, not after the table.**
+
 ### Deferred with a stated reason
 
 - **The mechanical rate-vs-disassembly backstop** (~90 lines, prototype exists).
