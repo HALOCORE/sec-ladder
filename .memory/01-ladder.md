@@ -2183,6 +2183,71 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
    Sound: Verus **15/0 first run** with a functional postcondition (twin 20/0),
    `R4 ≡ R5` `exact` at O3 / `norel` at O0, two proof mutants failing, TCB 7.
 
+20. **p47 — the proof certifies a LEAKING kernel, and its obligation count does
+   not move.** Constant-time compare: the first pattern here whose security
+   property is **timing**, and the only one the ladder is structurally unable to
+   measure. Reviewed (TASK_064_REVIEW: 3 majors, 6 minors, **32 clean
+   negatives**), corrected at TASK_065.
+
+   **The result, demonstrated on the binary rather than argued.** `m_leak` is
+   `verus.rs` with an early exit added. It verifies **14 verified, 0 errors**;
+   `kernel`'s own obligation count is **unchanged at 3**; the two files print
+   identical checksums on all 8 cells × 2 opts × 2 modes; and it leaks
+   **+7088.000 `Ir`** between `k = 0` and `k = 127`.
+
+   ⚠ **And the precise reason, which is stronger than "Verus can't see timing".**
+   The diff touches **no `requires` and no `ensures`** — the contracts are
+   **identical**. The shipped proof establishes `d == xacc(…)`, the exact value;
+   `m_leak` establishes only `d == 0 <==> xacc(…) == 0`, zero-ness. So the
+   shipped proof is a **strictly stronger intermediate under the same contract**,
+   and the leak lives entirely in what neither contract can say. **A property of
+   the TRACE is invisible to a logic about the VALUE**, and `tcb_items` and the
+   obligation count — the two numbers this project publishes for proof burden —
+   are both blind to it.
+
+   **`Ir` under callgrind IS the side channel**, which makes this the only
+   pattern whose primary metric is literally the harm. Measured over 35 blobs
+   with `cbytes`/`ncmp` held constant, `-O3 isolated` and `whole` identical:
+
+   ```
+   c-gcc / c-clang / safe_naive          spread 184.000 in k   LEAKS
+   c-gcc-h / c-clang-h / safe_tuned /
+     unsafe / verus                      spread   0.000 in k   constant
+   ```
+
+   The `0.000` is exact because all 35 blobs print the same checksum, so the
+   `println!` digit term cancels. ⚠ **`Ir(k)` constant is NECESSARY, NOT
+   SUFFICIENT** for constant time — cache and port pressure are unmeasured; the
+   rest is backed off the disassembly (branchless, data-independent addresses).
+
+   ⚠ **THE CATALOGUE'S BUG CLASS IS REFUTED — third overturned against two
+   upheld.** *"Compiler may reintroduce a branch"* **does not happen.** Across
+   the delivery's and the review's searches together: 5 accumulate spellings,
+   gcc 13.3 and clang 22.1 at `-O1 -O2 -O3 -Os -Oz`, rustc at 5 levels, **LTO,
+   PGO trained 100% on mismatch-at-byte-0, AVX2, AVX-512, `__builtin_expect` in
+   three placements, inlined into a branching caller and not, fixed and runtime
+   length** — `Ir(k=0) − Ir(k=n−1) = 0` **exactly**, per function, with a
+   detector control that fires (+18 448 on `a == b`) and 0 data-dependent jumps
+   in 33/33 functions. **The adversary is the IDIOM, not the optimiser.**
+
+   Consequences worth carrying: **`volatile` buys nothing and costs 6.75×
+   (clang) / 9.68× (gcc)** — the plain accumulate is already exactly constant at
+   every opt level, so the standard advice is inverted here. And **safe Rust's
+   idiomatic `a == b` is the leaking rung**: clang rewrites `memcmp(…) == 0` to
+   **`bcmp`, the same symbol rustc emits**, so `c-clang` vs `safe_naive` is a
+   **library** result, not a language one (`.memory/03-measurement.md`, "name the
+   routine").
+
+   ⚠ **`Ir(k)` is a 32-byte STAIRCASE, not linear** — and above 128 bytes not
+   even uniform: the per-comparison step table is `+7 +14 +19 +40 +43 +46 +46`,
+   **identical integer-for-integer** across `c-gcc`, `c-clang` and `safe_naive`,
+   with the jump at glibc's size-class boundary.
+
+   Sound: Verus **12/0 first run, no lemma** (twin 13/0), `R4 ≡ R5` `exact` at
+   O3 / `norel` at O0, **TCB 3**, Miri 7/7, additivity extrapolation **80/80
+   exact**. ⚠ Its `collapse_tightest_margin` is **2.93×, the tightest of all 19
+   patterns** (next 7.02) — see `.memory/02-bench-rules.md` on `work_per_call`.
+
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how
 much proof keeps that base sound, and which C patterns resist this treatment.*

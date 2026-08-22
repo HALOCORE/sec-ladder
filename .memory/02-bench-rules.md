@@ -227,6 +227,29 @@ Known residuals we are deliberately **not** closing, all measured:
   reach ~0.0625, which is below the constant. Nothing on this box builds with
   `-march`, so it is not live — but a pattern that adds one must re-argue ALPHA
   rather than inherit it.
+  ⚠⚠ **AND ON THIS BOX IT CANNOT BE MEASURED AT ALL** (p47, TASK_065, measured).
+  **`-march=native` binaries SIGILL under valgrind 3.27.1** (EVEX), so `Ir` — the
+  only deterministic instrument here — **does not exist for such a build.**
+  Sharper still, and the reason this is a trap rather than a limitation:
+  **the failure is INPUT-DEPENDENT.** 7 of 9 compiler × input cells died; clang
+  survived `small` and `large` and died on one adversarial input, rustc survived
+  `small` only, gcc died on all three. **So a partial `-march` `Ir` table looks
+  complete.** Do not re-argue ALPHA for such a pattern — say the figure cannot
+  be taken.
+
+- ⚠ **`work_per_call` must count the WORK UNIT, not the input bytes — and three
+  patterns have had to re-denominate.** p07 counts probes (4 B/unit), p10 taps
+  (2 B/unit), p47 byte comparisons (2 window B/unit); `check.py:1755-1760`
+  prescribes the repair verbatim. **This looks like defining a threshold away and
+  on p47 it was checked and is not**: the tag loops run 11 instructions per 64
+  window bytes (R3) and 12 (R4) — **0.172–0.188 `Ir` per window byte
+  asymptotically** — so the 0.25 floor **forbids the shipped kernel outright**
+  under the wrong unit. **The test to apply is whether the alternative unit is
+  arithmetically impossible or merely inconvenient**; the first is a forced move,
+  the second is the direction test firing.
+  ⚠ **Report `collapse_tightest_margin` when you redenominate.** p47's is
+  **2.93×, the tightest of all 19 patterns** (next 7.02, p27 134.45), which is
+  the honest cost of the choice and is not visible from a PASS.
 - `twin_justifications` is capped at 1 by a round number, not by an argument.
 - A trusted `requires` that is non-trivial, mentions every parameter and is still
   too weak by one is caught only by the verified twin; a trusted `ensures` that is

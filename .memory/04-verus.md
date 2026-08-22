@@ -980,6 +980,27 @@ support **ladder finding 1** (the proof costs exactly zero instructions), on the
 largest ghost state in the tree. **Ship the larger TCB and say why** — "we chose
 the bigger number" invites a question the 18-of-18 fact already answers.
 
+### The driver's `main` obligation term is **5** — there is no `main 4` anywhere
+
+**p47 + TASK_065, measured across the whole tree.** `grep -o 'main [0-9]'
+patterns/*/spec.md`: **17 patterns record `main` 5** (p01 and p02 record no
+term). **p27 recorded 4 and was wrong**, provably from its own arithmetic — its
+pinned decomposition read `… + kernel 3 + main 4 = 15` and **summed to 14**,
+against a pinned *and measured* 15. `./verus_run.py verus.rs --verify-function
+main --verify-root` on p27's own file returns **`5 verified, 0 errors`**.
+
+⚠ **And the "shared off-by-one" several patterns mention is a claim about the
+RULE OF THUMB, not about the value.** The prediction *body + driver loop + one
+per `by`-block* gives **6**; Verus reports **5**. p27's note inverted that into
+*"Verus reports 4"* and then named eight patterns as recording the same thing —
+**none of them does**. Both errors shipped through a build, an adversarial review
+and two corrections tasks, and were caught only because a **different** pattern
+recounted the same driver.
+
+> **Recount the term, do not inherit it.** It is one `verus_run.py` invocation,
+> and the arithmetic check is free: **the per-item terms must sum to the pinned
+> total.** p27's did not, in a `spec.md` the gate had passed nineteen times.
+
 ### `global size_of usize == 8;` — Verus's `usize` is ARCHITECTURE-INDEPENDENT
 
 **p10, TASK_059; reviewed and cleared to land as-is (TASK_057_REVIEW).** Verus
