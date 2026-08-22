@@ -469,11 +469,27 @@ re-triaged p36 (above):
   only**, and stage 7 tolerates a non-deterministic exit under
   `sanitizer_expect: "fires"`. **So a non-deterministic adversarial row is
   already legal** — this is exactly p36's re-triage, reused.
-- ⚠ **But the residue must be RELIABLY non-zero, or the pattern shows nothing.**
+- ⚠ **The residue must be RELIABLY non-zero, or the pattern shows nothing.**
   Fresh `mmap` pages are zero-filled by the kernel, so a first-touch `malloc`
-  leaks zeros and the harm is invisible. **This is p27's fold-from-offset-16
-  problem again** and it is the thing most likely to kill p48: settle
-  reproducibility FIRST, the way TASK_055 had to.
+  leaks zeros and the harm is invisible. **The kernel must therefore allocate,
+  fill, free, and re-allocate** — which is p27's shape, and p27 already paid for
+  the knowledge: `.memory/03-measurement.md:807-833` establishes that a freed
+  chunk's **first 16 bytes are glibc tcache metadata** and that reading past them
+  is deterministic run-to-run, **but varies across `-O` LEVEL** (dead-store
+  elimination changes what was stored before the free), which puts two values in
+  one matrix.
+
+  > ✅ **That variation is designed around, and cheaply.** Do not read raw
+  > residue. **Have the program write a KNOWN SENTINEL into record A, free it,
+  > allocate record B, fill B only partially, and emit B** — then the harm is
+  > *"A's sentinel appears in B's output"*, which is program-controlled and
+  > therefore deterministic across allocator state **and** opt level. It sidesteps
+  > the DSE problem that the offset-16 rule only half-solved.
+  > ⚠ **One hazard to check first**: the store of the sentinel into A must not
+  > itself be dead. A must be genuinely read before the free, or DSE removes the
+  > very thing the pattern detects. **Settle reproducibility FIRST**, the way
+  > TASK_055 had to — but the route is known, which is why this reads *moderate*
+  > and not *hard*.
 - **Catcher: MSan (`-fsanitize=memory`)** — a third sanitizer this project has
   never used, and valgrind's `--track-origins=yes` is a second. ⚠ **MSan
   requires every dependency be instrumented** and is clang-only.
