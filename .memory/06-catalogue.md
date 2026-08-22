@@ -456,10 +456,19 @@ timing; **neither leaks memory that was simply never written.**
   the `MaybeUninit<T>` size/align axioms. **p27 already ships `vstd::raw_ptr`
   code**, so this is not new machinery for the project.
 
-> **That is the point of the pattern.** p09 the proof could not see; p47 the
-> proof could not state. **Here the proof statically forbids the bug**, so the
-> tree gets its first axis where R5 is not a null result — and the contrast
-> with p47 is the finding, not a coincidence.
+> ⚠ **The manager first wrote here that this is "the first axis where R5 WINS"
+> and that is FALSE — self-caught before review.** **p27's R5 already catches
+> its use-after-free**, as an ordinary `precondition not satisfied`
+> (`patterns/p27-handle-table/NOTES.md:1421-1447`). p48 is not the first
+> non-null R5 and must not be sold as one.
+>
+> **What is actually distinctive is the KIND of obligation.** p27's precondition
+> is about **ownership** — do you hold the permission at all? `is_init` is about
+> the **contents of memory you already own and are entitled to touch**. No
+> pattern in the tree exercises that, and it is the obligation the C bug walks
+> straight through. Alongside p09 (the proof cannot *see* the bug) and p47 (the
+> proof cannot *state* the property), that gives a three-way contrast worth
+> having — but the contrast is the shape of the obligation, **not** a first.
 
 **Harness feasibility — mostly already answered**, by the same source read that
 re-triaged p36 (above):
@@ -613,7 +622,7 @@ catalogue at all** — see the `p48` row and its triage below.
 | **control-flow integrity** | every harm here is data. An out-of-table indirect call is a different harm class, and R1h has a real answer (`-fsanitize=cfi`) that no pattern has priced | **p36** |
 | **termination as the obligation** | every R5 so far proves *safety*. None proves the loop **ends** — and an open-addressing probe that never terminates is a real, shipped C bug | **p22** |
 | **provenance** | the property Miri checks and nothing else does; untested here | **p31** |
-| **INITIALISATION** ⚠ *new at TASK_066, and it was uncatalogued* | every harm here is out-of-bounds, out-of-lifetime, or a trace. **Reading memory that is in bounds, live, owned — and never written** is none of those, and it is the one axis where **Verus SUCCEEDS**: `vstd::raw_ptr`'s `ptr_ref`/`ptr_mut_read` both `requires perm.is_init()` | **p48** (proposed) |
+| **INITIALISATION** ⚠ *new at TASK_066, and it was uncatalogued* | every harm here is out-of-bounds, out-of-lifetime, or a trace. **Reading memory that is in bounds, live, owned — and never written** is none of those. The Verus obligation is a **new KIND** — not "do you own this?" (p27) but "is what you own INITIALISED?": `vstd::raw_ptr`'s `ptr_ref`/`ptr_mut_read` both `requires perm.is_init()`. ⚠ **Not** the first non-null R5; p27 is | **p48** (proposed) |
 
 **Recommended order after p10**, by marginal finding value rather than family:
 
