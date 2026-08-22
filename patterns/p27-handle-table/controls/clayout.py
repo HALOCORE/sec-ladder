@@ -64,7 +64,13 @@ import slb          # noqa: E402
 import loopfit      # noqa: E402
 
 PDIR = os.path.join(REPO, "patterns", "p27-handle-table")
-OUT = os.path.join(REPO, ".temp", "p14", "clay")
+# ⚠ This said `.temp/p14/clay` -- p14's OWN scratch directory -- because this
+# file was ported from p14 and the paths were not all repointed. Running it
+# unchanged OVERWRITES p14's `meta.json` beside p14's surviving layout blobs,
+# so the two patterns' populations silently mix. Found by TASK_064, which hit
+# it while porting this same file to p47. Same class as the shared scratch
+# path that corrupted a whole sweep on p14 (`.memory/03-measurement.md`).
+OUT = os.path.join(REPO, ".temp", "p27", "clay")
 RUSTC = os.path.expanduser("~/.cargo/bin/rustc")
 NM = os.path.expanduser("~/tools/llvm/bin/llvm-nm")
 BASE = ["-C", "codegen-units=1", "-C", "opt-level=3",
@@ -314,7 +320,7 @@ if __name__ == "__main__":
                          "window; 64 is the one that separates p14)")
     ap.add_argument("--scr", default="")
     a = ap.parse_args()
-    scr = a.scr or os.path.join(REPO, ".temp", "p14", f"clay.in.{os.getpid()}")
+    scr = a.scr or os.path.join(REPO, ".temp", "p27", f"clay.in.{os.getpid()}")
     rc = 0
     if a.build:
         rc = build(a.aligns, a.orders)
