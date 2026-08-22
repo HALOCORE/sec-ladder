@@ -304,7 +304,7 @@ THIRD VERSION IS ABOVE. Three plausible commands give three different totals:**
 > looks self-verifying. (TASK_058 caught version 1; TASK_055_REVIEW caught
 > version 2, which was TASK_058's own repair.)
 
-Dated reading from the corrected command: **66 items across 17 patterns**. ⚠ **The denominator is recountable and the
+Dated reading from the corrected command: **66 items across 17 patterns**, **76 across 19**. **Run it; do not quote either.** ⚠ **The denominator is recountable and the
 NUMERATOR is not** — "is
 there a vstd relocation for this item" is a judgement made against a pinned
 vstd, and the two that existed were found by hand. Do not report a fresh

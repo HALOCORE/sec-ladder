@@ -1427,7 +1427,7 @@ not build → review.** Three tasks per pattern is the real cost; plan with it.
 The gate's threat model is **honest mistake, not malicious author**
 (`.memory/02-bench-rules.md`, top section, with the residuals deliberately left
 open). **New gate work must pass "could this happen by accident?" first** — and
-`check.py` is ~5100 lines against 16 patterns, so the next gate proposal should
+`check.py` is ~5460 lines against 19 patterns, so the next gate proposal should
 have to beat that ratio.
 
 **Review each pattern once; do not review each fix to each check.** The two
@@ -1657,11 +1657,18 @@ grep -rho '\.tasks/TASK_[A-Za-z0-9_]*\.md' .memory/ .tasks/ RECAP.md \
 python3 -c "import hashlib,glob;print({hashlib.sha256(open(f).read()[open(f).read().find('NAMED-SPELLING STANDARD'):open(f).read().find('p01 and p08 neither')+19].encode()).hexdigest()[:12] for f in glob.glob('patterns/*/spec.md')})"
 ```
 
-- **17 patterns, all green**: p01 `PASS-WITH-BLOCKED-ROWS` (Miri policy on its
-  `large.bin`, documented, not a regression); p02, p03, p04, p05, p06, p07, p08,
-  p09, **p10**, p11, p12, p13, p14, p16, p17, p18 `PASS`. **34 records, 0 stale.**
-  ⚠ These two counts move with every pattern; the invariant is *all green* and
-  *0 STALE*, not the numbers.
+- **Every pattern green**: p01 is `PASS-WITH-BLOCKED-ROWS` (Miri policy on its
+  `large.bin`, documented, not a regression) and **every other pattern is
+  `PASS`, with 0 failures tree-wide.** ⚠ **A list of pattern names used to sit
+  here and it went stale twice.** Print it:
+
+  ```bash
+  python3 -c "
+  import json,glob
+  for f in sorted(glob.glob('results/gate/*.json')):
+      d=json.load(open(f))
+      print(f.split('/')[-1][:-5], d['verdict'], len(d.get('failures') or []))"
+  ```
 - **The shared named-spelling paragraph is byte-identical across every**
   `idiom.why` block — currently one hash, `59748cce2db5`, 11 003 bytes.
   ⚠ **The value depends on how you slice the span**, so trust the *command*

@@ -178,7 +178,7 @@ Known residuals we are deliberately **not** closing, all measured:
   initialisation spell the same characters and `spelling_matches` has no notion
   of position — while two `required` entries already exclude it.
 
-  **`forbidden_hits` is now `0` across all 18 patterns over 160 spellings.**
+  **`forbidden_hits` is now `0` across every pattern** (183 forbidden spellings at the time of writing; the invariant is the **zero**, not the denominator, which grows with each pattern).
 
   > **Recommendation from TASK_063, PROVISIONAL: MAKE IT FAIL, batched with the
   > next `check.py` change** — zero false-positive surface today. **Two figures

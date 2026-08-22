@@ -120,3 +120,54 @@ scratch paths. **You are the only agent running.**
 count 130** — 128, plus the review refuting the manager's A1 premise (I suspected
 a threshold was being defined past; the alternative unit is arithmetically
 impossible), plus the valgrind/AVX-512 measurability limit nobody had named.
+
+---
+
+## Outcome (recorded by the manager at the task boundary)
+
+**Landed** in `7028823`; `.memory/` written in `2f9fd12`; RECAP and the catalogue
+in `803fd2f`. **19 patterns, all green, all reviewed. 38 records, 0 STALE, 0
+failures tree-wide.**
+
+**Three manager decisions taken on this task's findings:**
+
+1. **The two p27 files the task did not name were CORRECTLY edited, and I
+   endorse both.** `controls/mkspec.py` was unavoidable — p27's `spec.md` is
+   generated and was verified to regenerate byte-identically *before* the edit,
+   so fixing only the artefact would have been silently reverted the next time it
+   ran. **That is precisely the defect TASK_063 found in this same file**, so
+   repeating it inside its own fix would have been the third instance. `NOTES.md`
+   likewise: p27's hash chain lives there and lists the prior moves, and leaving
+   the fifth undisclosed would have created a fresh instance of **M3** inside the
+   correction for M3.
+2. **The p27/p14 `clayout.py` shared-scratch bug was fixed by the manager**
+   (`915bb8a`), not left to a task: p27's control wrote `OUT` and its default
+   scratch path into `.temp/p14/`, overwriting p14's `meta.json`. **Chased and
+   closed**: p27 publishes **no `ns` figure at all**, so nothing published rested
+   on the contaminated population.
+3. **`forbidden_hits` fail-vs-print stays OPEN and PROVISIONAL.**
+   TASK_063 recommended *fail, batched with the next `check.py` change*, and
+   nothing has batched yet. `.memory/02-bench-rules.md` carries the
+   recommendation with both qualifying figures and the engineer's own
+   counter-argument. **Do not implement it as a standalone change** — it costs a
+   full 19-gate sweep on its own.
+
+⚠ **PROTOCOL rule 2's running count is 130, and the arithmetic is written out so
+the next manager can audit it rather than inherit it:** 89 at TASK_056, **+3**
+(p10's engineer killing all three registered predictions), **+3** (TASK_058's
+audit, including two replacement *commands* the manager wrote that were
+themselves wrong), **+5** (p10's review), **+7** (p27's engineer, including
+refuting the `(slot, generation)` formulation and the `tcb_items = 2`
+prediction), **+5** (p27's review and TASK_062's engineer refusing the manager's
+"keep it out of the gate" ratio argument with five measurements), **+8**
+(TASK_063 and p47's engineer, including *"zeroing the table is not optional"* on
+dead code and the catalogue's own bug class), **+2** (p47's review refuting the
+manager's A1 premise and naming the valgrind/AVX-512 measurability limit).
+**Carry 130 forward.**
+
+**The single most useful thing in this block:** three of the manager's errors
+this arc were *fixes* — stale constants replaced by commands, where **the
+commands were wrong**. Three plausible commands counting `tcb_items` returned
+**62, 65 and 68**; all counted correctly and disagreed about *what* was being
+counted. **A wrong command is worse than a wrong constant, because it looks
+self-verifying.**

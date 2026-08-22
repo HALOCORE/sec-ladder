@@ -356,7 +356,7 @@ p10's `--write` reproduces its `spec.md` **byte for byte** (backed up, run,
 and is not — check which SPAN a claim is about before believing it.** p18's
 generator prints *"shared paragraph: 11004 chars, byte-identical in 15
 pattern(s); differing/absent in ['p16-tlv-walk', 'p17-http-range']"*, while the
-standing one-liner reports **one hash across all 18**. Both are right:
+standing one-liner reports **one hash across every pattern**. Both are right:
 
 | measurement | span | what it asserts |
 |---|---|---|
