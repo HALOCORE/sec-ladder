@@ -1,6 +1,6 @@
 # p38-alias-pun — results
 
-Generated 2026-08-22T11:36:45Z from `results/p38-alias-pun.json` (git `928131b9f318`, working tree dirty).
+Generated 2026-08-22T12:55:21Z from `results/p38-alias-pun.json` (git `14f64166039c`, working tree dirty).
 
 ## Toolchain
 
@@ -35,7 +35,7 @@ Every delta below is a difference between rungs that are meant to be spellings o
   - `rust` — There is no Rust analogue of this entry and that is p38's result, so the entry pins the Rust rungs to the ABSENCE of the only spelling that could be one -- read_unaligned appears in no rung and is forbidden below.
 - **required** — *per language:*
   - `c` — THE DEFINED READ, present in c/kernel_hardened.c and ABSENT from c/kernel.c: `return (uint32_t)r[0] + 65536 * (uint32_t)r[1];`. It reads the two 16-bit halves the wire format is defined in terms of and combines them, and it needs no build flag. It is NOT free -- see the why key -- and it is here rather than the free memcpy spelling because it is the one every Rust rung is forced into, so R1h stays idiom-matched to R2..R5.
-  - `rust` — THE DEFINED READ, in all four Rust rungs and spelled the way the language forces (`sc` is a `[u16; 256]`, so there is no cast to make): `65536 *` combines the two halves. It is the only spelling any Rust rung has, which is the pattern.
+  - `rust` — THE DEFINED READ, in all four Rust rungs and spelled the way the language forces (`sc` is an array of u16, so there is no cast to make): `65536 *` combines the two halves. It is the only spelling any Rust rung has, which is the pattern. TASK_067: the array type was written here as a BACKTICKED span reading [u16; 256], which is the element type only verus.rs spells -- safe_naive.rs, safe_tuned.rs and unsafe.rs all write [u16; SCRATCH_W] -- so an entry whose English said "all four Rust rungs" reported three required_absent pairs every gate run and nobody read them (TASK_066_REVIEW m8). The span is now prose; what this entry pins in all four rungs is the COMBINING, and that is what it always meant to pin.
 - **required** — *per language:*
   - `c` — THE CLAMP, present in BOTH C rungs including the buggy one -- p38 models no MISSING check: `if (rec_len(&sc[i]) > room)`.
   - `rust` — the clamp, in all four Rust rungs, written through `u16` lvalues exactly as the C rungs write it: `> room`.
@@ -78,6 +78,8 @@ Every delta below is a difference between rungs that are meant to be spellings o
 ### Spelling audit (stage `0b`, reporting only)
 
 Measured by the gate, not by this file — from `results/gate/p38-alias-pun.json`, contract `9a413347f333`.
+
+> ⚠ **STALE.** The `slb-contract` block in `spec.md` no longer hashes to the gate record's `contract_sha256`, so the declaration above and the audit below are describing **different** declarations. Re-run `harness/check.py` for this pattern before reading these numbers.
 
 `37` backticked spelling(s) over `6` rung(s) → **112** (spelling, rung) pair(s), **63** present — not the product, because a per-language entry is read against its own language's rungs only. Matching is `check.spelling_matches`: comments, string literals and Verus ghost clauses blanked, then all whitespace deleted.
 
@@ -174,29 +176,28 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 7.13 | 7.34 | 3.0% | 5.13 | 5.50 | 7.1% |
-| c-gcc | whole | 7.16 | 7.42 | 3.7% | 5.30 | 5.50 | 3.7% |
-| c-clang | isolated | 9.82 | 10.05 | 2.3% | 6.31 | 7.01 | **11.1% ✗** |
-| c-clang | whole | 9.86 | 10.01 | 1.6% | 6.55 | 7.07 | 7.8% |
-| safe_naive | isolated | 9.92 | 10.07 | 1.5% | 6.52 | 7.28 | **11.7% ✗** |
-| safe_naive | whole | 10.98 | 11.20 | 2.0% | 7.16 | 7.80 | 9.0% |
-| safe_tuned | isolated | 9.96 | 10.16 | 2.0% | 6.18 | 6.77 | 9.6% |
-| safe_tuned | whole | 6.81 | 6.98 | 2.5% | 4.83 | 5.12 | 6.1% |
-| unsafe | isolated | 9.94 | 10.20 | 2.6% | 5.92 | 6.57 | **10.9% ✗** |
-| unsafe | whole | 9.90 | 10.10 | 2.1% | 6.23 | 6.76 | 8.4% |
-| verus | isolated | 9.94 | 10.15 | 2.0% | 6.07 | 6.67 | 9.9% |
-| verus | whole | 9.96 | 10.15 | 2.0% | 6.19 | 6.60 | 6.7% |
-| c-gcc-h | isolated | 7.19 | 7.31 | 1.7% | 4.99 | 5.22 | 4.6% |
-| c-gcc-h | whole | 7.14 | 7.42 | 3.9% | 4.97 | 5.30 | 6.6% |
-| c-clang-h | isolated | 9.83 | 10.10 | 2.7% | 6.08 | 6.65 | 9.5% |
-| c-clang-h | whole | 9.86 | 10.03 | 1.7% | 6.17 | 6.80 | **10.3% ✗** |
+| c-gcc | isolated | 7.18 | 7.39 | 2.9% | 5.26 | 5.54 | 5.3% |
+| c-gcc | whole | 7.17 | 7.50 | 4.5% | 5.06 | 5.55 | 9.7% |
+| c-clang | isolated | 9.92 | 10.28 | 3.6% | 6.42 | 6.92 | 7.8% |
+| c-clang | whole | 9.82 | 10.09 | 2.7% | 6.43 | 7.04 | 9.6% |
+| safe_naive | isolated | 9.99 | 10.14 | 1.5% | 6.57 | 7.20 | 9.7% |
+| safe_naive | whole | 11.04 | 11.20 | 1.4% | 7.00 | 7.87 | **12.5% ✗** |
+| safe_tuned | isolated | 10.00 | 10.17 | 1.8% | 6.25 | 6.82 | 9.2% |
+| safe_tuned | whole | 6.84 | 7.00 | 2.3% | 4.80 | 5.21 | 8.4% |
+| unsafe | isolated | 10.00 | 10.19 | 1.9% | 6.06 | 6.63 | 9.5% |
+| unsafe | whole | 9.98 | 10.13 | 1.5% | 6.26 | 6.84 | 9.4% |
+| verus | isolated | 10.02 | 10.13 | 1.1% | 6.06 | 6.72 | **10.9% ✗** |
+| verus | whole | 10.03 | 10.18 | 1.5% | 6.33 | 6.78 | 7.2% |
+| c-gcc-h | isolated | 7.25 | 7.38 | 1.7% | 5.00 | 5.27 | 5.4% |
+| c-gcc-h | whole | 7.23 | 7.52 | 4.0% | 5.02 | 5.38 | 7.3% |
+| c-clang-h | isolated | 9.87 | 10.18 | 3.2% | 6.07 | 6.71 | **10.7% ✗** |
+| c-clang-h | whole | 9.90 | 10.13 | 2.4% | 6.32 | 6.72 | 6.4% |
 
-**4 of 32 wall-clock cells exceed the 10% min-to-median spread threshold and are DISCARDED** per `.memory/03-measurement.md` step 4. They are printed above marked ✗ rather than deleted, because a missing cell that looks like an omission is worse than a documented failure (`.memory/02-bench-rules.md`). **No claim in this report rests on a marked row.**
+**3 of 32 wall-clock cells exceed the 10% min-to-median spread threshold and are DISCARDED** per `.memory/03-measurement.md` step 4. They are printed above marked ✗ rather than deleted, because a missing cell that looks like an omission is worse than a documented failure (`.memory/02-bench-rules.md`). **No claim in this report rests on a marked row.**
 
-- `c-clang / isolated` on `small.bin`: spread 11.1%
-- `safe_naive / isolated` on `small.bin`: spread 11.7%
-- `unsafe / isolated` on `small.bin`: spread 10.9%
-- `c-clang-h / whole` on `small.bin`: spread 10.3%
+- `safe_naive / whole` on `small.bin`: spread 12.5%
+- `verus / isolated` on `small.bin`: spread 10.9%
+- `c-clang-h / isolated` on `small.bin`: spread 10.7%
 
 
 ## Cells and metrics not measured

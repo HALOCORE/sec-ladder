@@ -138,9 +138,17 @@ IDIOM_REQUIRED = [
              "free memcpy spelling because it is the one every Rust rung is "
              "forced into, so R1h stays idiom-matched to R2..R5.",
         "rust": "THE DEFINED READ, in all four Rust rungs and spelled the way "
-                "the language forces (`sc` is a `[u16; 256]`, so there is no "
+                "the language forces (`sc` is an array of u16, so there is no "
                 "cast to make): `65536 *` combines the two halves. It is the "
-                "only spelling any Rust rung has, which is the pattern.",
+                "only spelling any Rust rung has, which is the pattern. "
+                "TASK_067: the array type was written here as a BACKTICKED "
+                "span reading [u16; 256], which is the element type only "
+                "verus.rs spells -- safe_naive.rs, safe_tuned.rs and unsafe.rs "
+                "all write [u16; SCRATCH_W] -- so an entry whose English said "
+                "\"all four Rust rungs\" reported three required_absent pairs "
+                "every gate run and nobody read them (TASK_066_REVIEW m8). The "
+                "span is now prose; what this entry pins in all four rungs is "
+                "the COMBINING, and that is what it always meant to pin.",
     },
     {
         "c": "THE CLAMP, present in BOTH C rungs including the buggy one -- "
@@ -625,14 +633,27 @@ all from one attacker field:
 `adversarial-stale` is p17's shape: the read stays *inside* the allocation, so
 every instrument is silent and the answer is merely wrong. `adversarial-oob` is
 the one that leaves it. **Neither is reproducible across runs** — the disclosed
-words are stack residue under ASLR — which is p03's pointer-disclosure shape and
-is recorded per rung in `NOTES.md` 5 rather than checksummed.
+words are stack residue — which is p03's pointer-disclosure shape and is
+recorded per rung in `NOTES.md` 5 rather than checksummed. ⚠ **The CAUSE is
+established for `-stale` and not for `-oob`**: `-stale` is deterministic under
+`setarch -R env -i` (4 of 4 identical) and so is ASLR; `-oob`, the row this
+pattern's headline uses, still varies 4 of 4 with randomisation disabled and
+again with `-fno-stack-protector`, and no cause is offered in place of the one
+that was measured false (`NOTES.md` 2).
 
 ⚠ **The gate's own sanitizer stage cannot see any of this**, and `model.py`
-declares `sanitizer_expect: "clean"` on every input because of it:
-`harness/check.py` stage 7 builds the C rung at **`-O1`**, and gcc enables
-`-fstrict-aliasing` at `-O2` and above. The same source at `-O3` under ASan
-reports the overflow; `controls/gen_controls.py` ships that build as `s_asan_O3`.
+declares `sanitizer_expect: "clean"` on every input because of it.
+`harness/check.py` stage 7 builds the C rung `-O1 -fsanitize=address,undefined`,
+and gcc enables `-fstrict-aliasing` at `-O2` and above — **but the hole is one
+FLAG wide, not one optimisation LEVEL wide.** `gcc -O1 -fstrict-aliasing`
+already prints the wrong checksum and ASan already reports
+`stack-buffer-overflow READ of size 2` at `-O1`, so the repair is one token on
+stage 7's command line and **not** a higher optimisation level, which would
+perturb 20 patterns' sanitizer rows. Both builds are selectable by name:
+`controls/gen_controls.py --run s_asan_O1_sa` is the gate's own command line
+plus that token, and `--run s_asan_O3` is the same source at `-O3`. Recounted
+across all 20 gate records, **exactly one pattern is affected, and it is this
+one** (`NOTES.md` 6b).
 
 ## Contract
 

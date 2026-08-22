@@ -83,6 +83,22 @@ ONCE = """        n = (size_t)rec_len(&sc[i]);
             n = room;
         }"""
 
+NOBACK = """        n = (size_t)rec_len(&sc[i]);
+        if (n > room)
+            n = room;
+        (void)rec_set_len;"""
+
+SETTER_HALVES = """static void rec_set_len(uint16_t *r, uint32_t v)
+{
+    r[0] = (uint16_t)(v % 65536);
+    r[1] = (uint16_t)(v / 65536);
+}"""
+
+SETTER_PUN = """static void rec_set_len(uint16_t *r, uint32_t v)
+{
+    *(uint32_t *)r = v;
+}"""
+
 
 def sub(text, old, new, what):
     if old not in text:
@@ -108,9 +124,18 @@ def c_controls():
         "c_union": (sub(h, HALVES, UNION, "union rec_len"), [],
                     "union punning -- the other legal spelling"),
         # THE RE-READ IS LOAD-BEARING. Fold the two rec_len calls into one and
-        # the compiler has nothing to forward past.
+        # the compiler has nothing to forward past.  -- condition (ii)
         "c_once": (sub(k, TWICE, ONCE, "single rec_len call"), [],
                    "the pun, but rec_len called ONCE -- no re-read to answer stale"),
+        # THE ACCESSOR PAIR AGREES ABOUT THE TYPE. Both getter and setter pun,
+        # so there is no incompatible pair for the type rule to separate.
+        #                                                   -- condition (i)
+        "c_symset": (sub(k, SETTER_HALVES, SETTER_PUN, "punning rec_set_len"), [],
+                     "SYMMETRIC accessor pair -- rec_set_len puns too"),
+        # THE CLAMP IS NEVER WRITTEN BACK. The store whose only consumer is the
+        # re-read three lines later simply does not happen. -- condition (iii)
+        "c_noback": (sub(k, TWICE, NOBACK, "no write-back"), [],
+                     "the pun, clamped into a local, NO write-back at all"),
         # THE FLAG PRICE. Same source as the shipped R1, one build flag.
         "c_nosa": (k, ["-fno-strict-aliasing"],
                    "the shipped R1 built -fno-strict-aliasing (what Linux does)"),
@@ -268,25 +293,40 @@ def do_r4_pun(want_ir, want_verus):
                 print("      " + line.strip()[:150])
 
 
-def do_sanitizers():
+# Every sanitizer build has a NAME, so a claim about one can be re-run rather
+# than re-derived. Until TASK_067 this table was anonymous and three committed
+# files -- ../NOTES.md, ../model.py and ../spec.md, the hashed layer -- cited a
+# build called `s_asan_O3` that `--list` did not ship (TASK_066_REVIEW m7).
+SAN_BUILDS = {
+    "s_asan_O1_gate": ("gcc -O1 asan+ubsan (WHAT THE GATE BUILDS)", GCC,
+                       ["-O1", "-fsanitize=address,undefined",
+                        "-static-libasan", "-static-libubsan"]),
+    "s_asan_O1_sa": ("gcc -O1 -fstrict-aliasing asan+ubsan (THE ONE-FLAG "
+                     "REPAIR: the hole is FLAG-gated, not LEVEL-gated)", GCC,
+                     ["-O1", "-fstrict-aliasing",
+                      "-fsanitize=address,undefined",
+                      "-static-libasan", "-static-libubsan"]),
+    "s_asan_O3": ("gcc -O3 asan+ubsan", GCC,
+                  ["-O3", "-fsanitize=address,undefined", "-static-libasan",
+                   "-static-libubsan"]),
+    "s_ubsan_O3": ("gcc -O3 ubsan only", GCC, ["-O3", "-fsanitize=undefined"]),
+    "s_tysan_iso": ("clang -O3 tysan (isolated)", CLANG,
+                    ["-O3", "-fsanitize=type", "-DSLB_ISOLATED"]),
+    "s_tysan_lto": ("clang -O3 tysan (whole/-flto)", CLANG,
+                    ["-O3", "-fsanitize=type", "-flto"]),
+}
+
+
+def do_sanitizers(names=None):
     """The two catchers that CAN see p38, and the one that cannot."""
     k = open(CK).read()
+    os.makedirs(OUT, exist_ok=True)
     src = os.path.join(OUT, "san_kernel.c")
     open(src, "w").write(k)
     print("\nsanitizers on c/kernel.c, adversarial-oob.bin")
-    for tag, cc, flags in (
-            ("gcc -O1 asan+ubsan (WHAT THE GATE BUILDS)", GCC,
-             ["-O1", "-fsanitize=address,undefined", "-static-libasan",
-              "-static-libubsan"]),
-            ("gcc -O3 asan+ubsan", GCC,
-             ["-O3", "-fsanitize=address,undefined", "-static-libasan",
-              "-static-libubsan"]),
-            ("gcc -O3 ubsan only", GCC, ["-O3", "-fsanitize=undefined"]),
-            ("clang -O3 tysan (isolated)", CLANG,
-             ["-O3", "-fsanitize=type", "-DSLB_ISOLATED"]),
-            ("clang -O3 tysan (whole/-flto)", CLANG,
-             ["-O3", "-fsanitize=type", "-flto"])):
-        exe = os.path.join(OUT, "san-" + re.sub(r"\W+", "_", tag))
+    for name in (names or list(SAN_BUILDS)):
+        tag, cc, flags = SAN_BUILDS[name]
+        exe = os.path.join(OUT, "san-" + name)
         cmd = [cc, "-std=c99", "-g"] + flags
         if "-flto" in flags and "clang" in cc:
             lld = os.path.expanduser("~/tools/llvm/bin/ld.lld")
@@ -299,13 +339,13 @@ def do_sanitizers():
                 os.path.join(PDIR, "c", "main.c"), "-o", exe]
         r = subprocess.run(cmd, capture_output=True, text=True)
         if r.returncode != 0:
-            print(f"    {tag:42s} BUILD FAILED: {r.stderr[-200:]}")
+            print(f"    {name:14s} {tag} BUILD FAILED: {r.stderr[-200:]}")
             continue
         rc, so, se = run(exe, "adversarial-oob.bin")
         hits = [ln for ln in se.splitlines()
                 if "runtime error" in ln or "ERROR:" in ln
                 or "type-aliasing-violation" in ln]
-        print(f"    {tag:42s} rc={rc} out={so!r}")
+        print(f"    {name:14s} {tag}\n        rc={rc} out={so!r}")
         for hh in hits[:2]:
             print(f"        | {hh.strip()[:150]}")
         if not hits:
@@ -313,18 +353,65 @@ def do_sanitizers():
 
 
 MUSTALIAS = r"""/* p38 control x_mustalias: WHY clang declines the shipped kernel's violation
-   and gcc takes it. Same violation, same address at run time; the only
-   difference is whether the two views reach the access through ONE base
-   pointer (BasicAA proves MustAlias, and LLVM then declines to use TBAA) or
-   through TWO the compiler cannot relate. gcc uses TBAA in both. */
+   and gcc takes it. Same violation, same address at run time in every variant;
+   what varies is what BasicAA can work out about the two accesses.
+
+   The two-variant version of this control (TASK_066) concluded "LLVM declines
+   TBAA when BasicAA has proved the two accesses are the SAME ADDRESS". That is
+   sufficient but NOT NECESSARY and it does not cover p38's own kernel, which
+   is the PARTIAL case -- two 2-byte stores against one 4-byte load, never
+   MustAlias. The three variants added at TASK_067 (TASK_066_REVIEW m4) settle
+   it: the discriminator is whether BasicAA can COMPUTE THE OFFSET.
+
+     one_base         one base, full overlap                    declined
+     one_base_partial one base, only w[0] written -- NOT MustAlias, declined
+     known_off        one base, constant offset                 declined
+     opaque_off       one base, offset opaque -- DECISIVE,      exploited
+     two_params       two pointers the compiler cannot relate,  exploited
+
+   ⚠ It is the offset BETWEEN the store and the load that has to be opaque,
+   not the offset itself. A first draft of `opaque_off` applied the same
+   opaque `k` to both accesses; their difference is then 0 symbolically,
+   BasicAA still answers MustAlias, and clang still declines (measured, 16 at
+   every level). What makes it exploit is an opaque offset on ONE side only.
+
+   gcc applies TBAA in all five. */
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #define CAP 16u
+static volatile size_t g_zero = 0;      /* 0 at run time, opaque at compile time */
 __attribute__((noinline))
 static uint32_t one_base(uint32_t *lenp)
 {
     uint16_t *w = (uint16_t *)lenp;
+    if (*lenp > CAP) { w[0] = (uint16_t)CAP; w[1] = 0; }
+    return *lenp;
+}
+__attribute__((noinline))
+static uint32_t one_base_partial(uint32_t *lenp)
+{
+    /* Only the LOW half is written, so the 2-byte store and the 4-byte load
+       PARTIALLY overlap and BasicAA can never answer MustAlias. This is p38's
+       own kernel's shape. */
+    uint16_t *w = (uint16_t *)lenp;
+    if (*lenp > CAP) { w[0] = (uint16_t)CAP; }
+    return *lenp;
+}
+__attribute__((noinline))
+static uint32_t known_off(uint32_t *base)
+{
+    uint16_t *w = (uint16_t *)(base + 1);
+    if (base[1] > CAP) { w[0] = (uint16_t)CAP; w[1] = 0; }
+    return base[1];
+}
+__attribute__((noinline))
+static uint32_t opaque_off(uint32_t *lenp)
+{
+    /* ONE base pointer, exactly as in one_base -- only the OFFSET FROM THE
+       LOAD TO THE STORE is hidden. `g_zero` is 0, so this is the same address
+       at run time as one_base's. */
+    uint16_t *w = (uint16_t *)lenp + g_zero;
     if (*lenp > CAP) { w[0] = (uint16_t)CAP; w[1] = 0; }
     return *lenp;
 }
@@ -337,9 +424,12 @@ static uint32_t two_params(uint32_t *lenp, uint16_t *w)
 int main(int argc, char **argv)
 {
     uint32_t a = (argc > 1) ? (uint32_t)strtoul(argv[1], NULL, 0) : 4000;
-    uint32_t l1 = a, l2 = a;
-    printf("one_base=%u two_params=%u   (defined answer: 16 16)\n",
-           one_base(&l1), two_params(&l2, (uint16_t *)&l2));
+    uint32_t l1 = a, l2 = a, l3 = a, l4 = a;
+    uint32_t arr1[2] = { 0, a };
+    printf("one_base=%u one_base_partial=%u known_off=%u opaque_off=%u "
+           "two_params=%u   (defined answer: 16 everywhere)\n",
+           one_base(&l1), one_base_partial(&l3), known_off(arr1),
+           opaque_off(&l4), two_params(&l2, (uint16_t *)&l2));
     return 0;
 }
 """
@@ -363,7 +453,8 @@ def do_mustalias():
                 print(f"    {tag:6s} {o:3s} {fl:21s} {out}")
 
 
-ALL = ["c_pun", "c_halves", "c_memcpy", "c_union", "c_once", "c_nosa"]
+ALL = ["c_pun", "c_halves", "c_memcpy", "c_union", "c_once", "c_symset",
+       "c_noback", "c_nosa"]
 
 
 def main():
@@ -374,29 +465,48 @@ def main():
     ap.add_argument("--verus", action="store_true", help="run r4_pun's R5 twin")
     ap.add_argument("--list", action="store_true")
     ap.add_argument("--clean", action="store_true")
+    ap.add_argument("--out", default=OUT,
+                    help="scratch dir (must be under .temp/; default "
+                         ".temp/p38/controls -- this pattern's OWN dir)")
     a = ap.parse_args()
+    globals()["OUT"] = os.path.abspath(a.out)
+    assert OUT.startswith(os.path.join(REPO, ".temp") + os.sep), OUT
     if a.clean:
         shutil.rmtree(OUT, ignore_errors=True)
         print(f"removed {OUT}")
         return 0
     if a.list:
         for n, (_t, f, why) in c_controls().items():
-            print(f"  {n:10s} {'flags=' + ' '.join(f) if f else '':26s} {why}")
-        print("  r4_pun     the Rust read_unaligned analogue (+ --verus)")
-        print("  sanitizers ASan/UBSan/TySan matrix")
-        print("  mustalias  why clang declines and gcc does not")
+            print(f"  {n:14s} {'flags=' + ' '.join(f) if f else '':26s} {why}")
+        print(f"  {'r4_pun':14s} {'':26s} "
+              "the Rust read_unaligned analogue (+ --verus)")
+        for n, (tag, _cc, _f) in SAN_BUILDS.items():
+            print(f"  {n:14s} {'':26s} {tag}")
+        print(f"  {'sanitizers':14s} {'':26s} all six s_* builds at once")
+        print(f"  {'mustalias':14s} {'':26s} "
+              "why clang declines and gcc does not (5 variants)")
         return 0
     names = a.run or ALL
     if names == ["all"]:
-        names = ALL
+        names = ALL + list(SAN_BUILDS) + ["r4_pun", "mustalias"]
+    unknown = [n for n in names if n not in c_controls() and n not in SAN_BUILDS
+               and n not in ("r4_pun", "sanitizers", "mustalias")]
+    if unknown:
+        raise SystemExit(f"gen_controls.py: no such control: {', '.join(unknown)}"
+                         f" (try --list)")
     os.makedirs(OUT, exist_ok=True)
     cs = [n for n in names if n in c_controls()]
     if cs:
         do_c(cs, a.ir)
-    if not a.run or "r4_pun" in names or names == ALL:
+    if not a.run or "r4_pun" in names:
         do_r4_pun(a.ir, a.verus)
-    do_sanitizers()
-    do_mustalias()
+    sans = [n for n in names if n in SAN_BUILDS]
+    if not a.run or "sanitizers" in names:
+        sans = list(SAN_BUILDS)
+    if sans:
+        do_sanitizers(sans)
+    if not a.run or "mustalias" in names:
+        do_mustalias()
     return 0
 
 

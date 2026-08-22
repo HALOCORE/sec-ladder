@@ -13,6 +13,13 @@ attacker-controlled length then bounds a fold that reads off the end of the
 scratch. clang 22.1.6 does not — **and the reason is a mechanism, not a version
 number** (§0d).
 
+⚠ **Read §11 before quoting any of that as a claim about code in the field.**
+The harm needs **four conjunctive conditions**, one of them structural; six
+defined spellings of the same kernel are **cheaper** on gcc than the undefined
+one; and p38 is labelled a **demonstration of a real bug class**, not evidence
+of its prevalence. The ladder result — that R2…R5 are immune by construction —
+is unaffected and is what the pattern is for.
+
 ---
 
 ## 0. §0 — the bug class and the harm, settled before any rung was written
@@ -75,23 +82,51 @@ gcc (`-static-libasan`) and clang alike.
 
 ### 0d. ⚠ WHY clang declines and gcc does not — the mechanism, not the version
 
-`controls/gen_controls.py` ships this as `x_mustalias`. One function body, two
-spellings, the same address at run time:
+⚠ **The two-variant version of this section was NARROWER THAN THE MECHANISM and
+did not cover p38's own kernel** (TASK_066_REVIEW m4). It read *"LLVM does not
+apply TBAA when BasicAA has already proved the two accesses are the same
+address"*. MustAlias is **sufficient but not necessary**, and p38's kernel is
+not a MustAlias case at all: two 2-byte stores against one 4-byte load only
+*partially* overlap. The correction is measured on **five** variants of one
+function, and `controls/gen_controls.py --run mustalias` ships all five as
+`x_mustalias` (three of them new at TASK_067):
 
 ```
-        one_base(uint32_t *lenp)               two_params(uint32_t *lenp, uint16_t *w)
-        u16 view derived from the u32 pointer  two parameters the compiler cannot relate
-gcc     4000 at -O1/-O2/-O3                    4000 at -O1/-O2/-O3
-clang   16 (declines)                          4000 at -O1/-O2/-O3
-both    16 under -fno-strict-aliasing          16 under -fno-strict-aliasing
+                                                 gcc O1/O2/O3   clang O1/O2/O3
+one_base          one base, FULL overlap             4000            16   declines
+one_base_partial  one base, only w[0] written        4000            16   declines
+known_off         one base, CONSTANT offset          4000            16   declines
+opaque_off        one base, offset OPAQUE            4000          4000   EXPLOITS
+two_params        two pointers it cannot relate      4000          4000   EXPLOITS
+both, -fno-strict-aliasing:  16 everywhere, every level, both compilers
 ```
 
-**LLVM does not apply TBAA when BasicAA has already proved the two accesses are
-the same address**; GCC applies it regardless. A single-base accessor pair — the
-idiomatic shape, and p38's — is exactly the case BasicAA settles first. So
-*"clang is safe from strict aliasing"* is **false**; the true statement is
-*"clang's alias analysis answers this particular query before TBAA is
-consulted"*, and a spelling one step away flips it.
+**The discriminator is whether BasicAA can compute the OFFSET between the store
+and the load, not whether the two are the same address and not whether there is
+one base pointer.** `one_base_partial` is *never* MustAlias and clang still
+declines; `opaque_off` keeps the single base and hides only the offset, and
+clang exploits it from `-O1`. GCC applies TBAA in all five.
+
+⚠ **It is the offset BETWEEN the two accesses that must be opaque.** A first
+draft of `opaque_off` applied the *same* opaque index to the store and the
+load; their difference is then 0 symbolically, BasicAA still answers MustAlias
+and clang still declines — measured, 16 at every level. That draft would have
+"refuted" the mechanism it was written to demonstrate, and the shipped control
+carries the note.
+
+**Second reason clang is quiet on p38's own kernel, read off the shipped
+listing rather than inferred** (`harness/asm.py show --sym kernel
+.temp/build/p38/c-clang-O3-isolated`, 1-based indices): clang issues **one**
+32-bit load at 100 (`mov -(%rsp,%r11,2),%r10d`) and **merges the two `uint16_t`
+clamp stores into one 32-bit store** at 104 (`mov %ebx,-(%rsp,%r11,2)`), where
+gcc emits two 16-bit stores (§2). It then folds from `%ebx`, the clamped value
+already in a register — so there is no incompatible store/load pair left for
+the type rule to separate even in principle.
+
+So *"clang is safe from strict aliasing"* is **false** — the conclusion is
+unchanged and the review upheld it. The true statement is *"clang's alias
+analysis answers this particular query before TBAA is consulted"*, and a
+spelling one step away flips it.
 
 ### 0e. The harm ladder, and the shape it inherits
 
@@ -212,10 +247,31 @@ So does `c-clang`. So does every Rust rung.
 | `c-clang` | defined | defined | defined | defined |
 | `c-gcc-h` / `c-clang-h` | defined | defined | defined | defined |
 
-The wrong value differs from run to run because what the fold reads past `sc` is
-stack residue under ASLR — p03's pointer-disclosure shape, not p02's
-deterministic corruption. Five consecutive runs of `c-gcc-O3-isolated` on the
-probe blob gave five different checksums.
+The wrong value differs from run to run because what the fold reads is stack
+residue — p03's pointer-disclosure shape, not p02's deterministic corruption.
+Five consecutive runs of `c-gcc-O3-isolated` on the probe blob gave five
+different checksums.
+
+⚠ **The CAUSE of that variation is established for one row and NOT for the
+other, and the earlier text got the headline row wrong** (TASK_066_REVIEW m3).
+Measured under `setarch -R env -i`:
+
+```
+adversarial-stale, ASLR on              4 runs, 4 different checksums
+adversarial-stale, ASLR OFF             4 runs, IDENTICAL (17682374070775870151)
+adversarial-oob,   ASLR OFF             4 runs, 4 different checksums
+adversarial-oob,   ASLR OFF, -fno-stack-protector   3 runs, 3 different
+```
+
+- **`adversarial-stale`** — the read that stays *inside* `sc` — **is** ASLR
+  deterministic, and the ASLR attribution holds for it.
+- **`adversarial-oob`** — the read that *leaves* `sc`, and **the row both the
+  README headline and the gate record use** — varies with address randomisation
+  disabled. **The cause is not established.** The shipped build does carry a
+  stack canary (`mov %fs:,%rax` in `kernel`), so at least one leaked word is
+  `AT_RANDOM`-derived, but removing the canary does not make it deterministic
+  either. No second guess is offered here in place of the one that was
+  measured false.
 
 ---
 
@@ -273,12 +329,27 @@ compiler drop — i.e. **the bug is the speed**. The honest C-vs-Rust column is
 
 ### 4b. Two exact laws, fitted on two bands and tested OUT OF SAMPLE
 
+⚠ **CONVENTION, named because `.memory/03-measurement.md` requires it at every
+figure and §4b/§4c did not carry it** (TASK_066_REVIEW m9): **§4a above is
+callgrind kernel-exclusive `Ir` per call. §4b, §4c and §8 are whole-program
+marginal `Ir` per call — the `n_iters` difference — from `-O3 isolated` cells.**
+They are two different conventions and a law fitted in one inline mode is not
+the law in the other (p10). Both conventions are used deliberately: §4a is the
+published matrix column, §4b/§4c are differences where the driver constant has
+to cancel exactly. Where a law is checked against §4a, it is said so and the
+convention is re-named at that line.
+
 `controls/fit.py`, over `inputs/gen.py --sweep`. `nrec` varies alone in band
 `sweep-r*` (10 blobs), `rlen` alone in band `sweep-w*` (12 blobs), and band
 `sweep-x*` (6 blobs) holds pairs **neither band contains**, so the model is
 *predicted* there rather than re-fitted. Every figure is a matched-spelling
 difference between two cells on the same blob, so the driver constant, the
 decode loop and the payload fold cancel exactly.
+
+⚠ **A THIRD structural parameter exists and no shipped band varies it: `nw`,
+the decoded window length in words** — 240 in band `r`, 244 in band `w`, 256 in
+band `x`, and it is a function of the blob's stride. It does not touch the two
+laws below and it is decisive for §4c.
 
 ```
 R1h - R1  =  3.00000 * nrec     (gcc)    22 fit blobs, max residual 0.00000
@@ -293,41 +364,155 @@ matrix without being fitted to it: `small` has `nrec` 4 → +12.0 (gcc) / +32.0
 (clang) and `large` has `nrec` 8 → +24.0 / +64.0, which is exactly §4a.
 
 ```
-R3 - R4   =  17 + 1.00 * nrec            exact on 27 of 28 sweep blobs
-                                          and on BOTH measured blobs
+R3 - R4   =  17 + 1.00 * nrec + 1.00 * nrec * [rlen == 1]
+             exact on ALL 28 sweep blobs, on the nw sweep, on a 49-cell grid,
+             and on BOTH measured blobs.  Independent of nw.
 ```
 
 `small` → 17+4 = **21** ✓, `large` → 17+8 = **25** ✓, and all six out-of-sample
-`sweep-x*` blobs hit it to 0.00. ⚠ **The one exception is named rather than
-smoothed:** `sweep-w01.bin` (`rlen` 1, i.e. a two-word payload) measures **21**
-where the law says 19. At that size the reslice's setup has nothing to amortise
-over. Every other blob, including `rlen` 60, is exact.
+`sweep-x*` blobs hit it to 0.00.
+
+⚠ **The one exception TASK_066 disclosed is now EXPLAINED and the explanation
+it shipped is WITHDRAWN.** `sweep-w01.bin` (`rlen` 1) measures **21** where
+`17 + 1.00*nrec` says 19, and that was written up as *"at that size the reslice's
+setup has nothing to amortise over"*. That is a story, not a measurement, and it
+is wrong: the residual is exactly `1.00 * nrec`. Measured on a `(nrec, rlen)`
+grid nobody had run, at `nw` = 256:
+
+```
+nrec           1     2     3     4     5     6     7
+rlen = 1  resid 1.00  2.00  3.00  4.00  5.00  6.00  7.00      = 1.00 * nrec
+rlen = 2  resid 0.00  0.00  0.00  0.00  0.00  0.00  0.00
+```
+
+So `rlen == 1` — the record whose payload fold runs `2*rlen = 2` iterations — is
+a **boundary term of the law**, not an anomaly of one blob, and p38's safety law
+now has **no unexplained residual anywhere**. The mechanism (what the fold does
+at trip count 2) is *not* established; the shape is.
 
 **So p38's safety tax is `O(1)` per record and 0.00 per payload byte** — the
-reslice sits outside the fold, which is p16's mechanism a fourth time.
+reslice sits outside the fold, which is p16's mechanism a fourth time. ⚠ **That
+is the FIXED-R4 bound and the R4 side is not degenerate**: `r4_slice` is 3.00 /
+7.00 cheaper and unbuilt, so the true `R3 − inf(R4 found)` is +24 / +32 and
+**the published figure flatters the SAFE rung** (§8b, and now `README.md`).
 
-### 4c. ⚠ The additivity test FAILED for `R2 − R4`, and that is worth more than the two passes
+### 4c. ⚠ The additivity test FAILED for `R2 − R4` — and the failure is 100% attributable, to columns nobody named
+
+**What TASK_066 published here was a misspecified fit presented as a result, and
+its stated cause was measured false** (TASK_066_REVIEW M1, P2, P4). Both halves
+of the retraction are recorded before the replacement, because the replacement
+is the better finding and it only reads that way against what it replaces.
+
+**RETRACTED — the equation.** §4c used to publish
 
 ```
-R2 - R4   fitted d = 61.20 - 6.66*nrec + 6.42*nrec*rlen
-          max in-sample residual  27.41
-          max OUT-OF-SAMPLE residual  86.66   (sweep-x09u03: 88 measured, 175 predicted)
+R2 - R4   fitted d = 61.20 - 6.66*nrec + 6.42*nrec*rlen        ⚠ ARTEFACT
+          max in-sample residual 27.41 ; max OUT-OF-SAMPLE 86.66
 ```
 
-The two-regressor model is **wrong** for R2, and the mechanism is identifiable
-rather than a shrug: R2 also pays a bounds check **per window byte in the decode
-loop**, and `nw` is a third structural parameter that neither band varies (240,
-244 and 256 across the three bands). The law is not "R2 is noisy"; it is "the
-model is missing a regressor, and the out-of-sample test is what said so". This
-is the first time this project's additivity test has failed, and it failed on
-the one pair whose regressor set was incomplete while passing on the two whose
-set was complete.
+Those three coefficients are artefacts of a model missing three columns. **None
+of them is a p38 result** and none should ever be quoted. `controls/fit.py`
+still prints the fit, because the failure is what found the columns, but it now
+prints `⚠ MISSPECIFIED` above it.
+
+**RETRACTED — the cause.** The text said *"R2 also pays a bounds check per
+window byte in the decode loop, and `nw` is a third structural parameter that
+neither band varies"*. `nw` is **not** the missing regressor: `R2 − R4` is
+**exactly constant in `nw`** at a fixed residue — 115.00 at `nw` = 240, 248 and
+256 for `(nrec, rlen) = (2, 4)` — and adding a linear `nw` column and refitting
+makes the out-of-sample residual **worse**, 86.66 → 102.74. Both were the
+manager's prescription and mine; both are wrong.
+
+**THE REPAIRED LAW. Five columns, ZERO free parameters, exact everywhere.**
+
+```
+R2 - R4 = A(nw mod 8) - 8*nrec + 6.5*nrec*rlen
+                      - 10.5*nrec*(rlen mod 2) + 6*nrec*[rlen == 1]
+          A(0) = 79 ;  A(m) = 33 + 6m   for m = 1..7
+```
+
+`controls/fit.py --law --nwsweep --grid`, whole-program marginal `Ir`/call,
+`-O3 isolated`. **Nothing below is fitted** — the coefficients are stated and
+the residual is printed:
+
+| set | rows | max abs residual |
+|---|---:|---:|
+| shipped bands `r` + `w` (`nw` 240 and 244) | 22 | **0.00000** |
+| shipped band `x` — **out of sample** (`nw` 256) | 6 | **0.00000** |
+| `nw` sweep 238…256 at `(nrec, rlen) = (2, 4)` | 19 | **0.00000** |
+| `nw` sweep 240…247 at `(2, 1)` — is the `rlen == 1` term additive? | 8 | **0.00000** |
+| independent `(nrec × rlen)` grid at `nw` = 256, 1…7 × 1…7 | 49 | **0.00000** |
+| the two measured matrix blobs, **kernel-exclusive** `Ir` (§4a's convention) | 2 | **0.00** |
+
+**106 rows, every residual zero, and `sweep-w01` is no longer an exception.**
+
+The three columns the shipped band design could not see:
+
+- **(a) `A(nw mod 8)` — a band-design defect, and the column is the RESIDUE of
+  `nw`, not `nw`.** Fine sweep at `(2, 4)`:
+
+  ```
+  nw     238 239 240 241 242 243 244 245 246 247 248 250 252 254 255 256
+  R2-R4  105 111 115  75  81  87  93  99 105 111 115  81  93 105 111 115
+  nw%8     6   7   0   1   2   3   4   5   6   7   0   2   4   6   7   0
+  ```
+
+  Band `r` sits at 240 and band `x` at 256 — both `0 mod 8` — while **band `w`
+  sits entirely at 244, `4 mod 8`, a flat −22 against them.** Two of the three
+  bands share a residue and the third does not, which is exactly what a
+  two-regressor fit cannot see and an out-of-sample test can.
+
+- **(b) `nrec * (rlen mod 2)` — a GENUINE `nrec × rlen` interaction, through the
+  PARITY of `rlen`.** At `nw` = 256, `R2 − R4 = 79 + s(rlen)·nrec` with
+
+  ```
+  rlen     2     3     4     5     6     7
+  s(rlen)  5     1    18    14    31    27
+           s = 6.5*rlen - 8      (rlen even)
+           s = 6.5*rlen - 18.5   (rlen odd)   -> an odd record costs 10.5 LESS
+  ```
+
+  No function of `nw` can remove that. **The additivity test failed for a real
+  reason as well as a design one.**
+
+- **(c) `nrec * [rlen == 1]` — the same boundary term §4b now carries**, +6.00
+  per record here and +1.00 per record there. It is additive against `A()`
+  rather than interacting with it: the residual against (a)+(b) alone is exactly
+  **12.00** at `(2, 1)` for **every one of the eight residues** `nw` = 240…247.
+
+⚠ **THE HEADLINE, RE-STATED HONESTLY.** *"The first failure of this project's
+additivity test"* survives **as an event but not as written**. It was not "R2 is
+noisy" and it was not "a missing regressor" in the singular: the model was
+missing **three** columns, **none of them the one named**, and the failure is
+**100% attributable** — part real interaction, part a band placed on an
+anomalous `nw` residue, part a fold boundary. That is a better result than the
+one TASK_066 published, and it is the project's own DOMAIN rule landing on a
+real case: *the domain was a missing column*, three times over.
+
+⚠ **What is NOT established: the mechanism.** Nobody has read the vector
+epilogue. The `nw mod 8` step is consistent with an unroll-by-8 decode loop and
+the parity step with a fold trip count of `2*rlen mod 4`, but neither is
+confirmed, and the law does not rest on either (PROTOCOL rule 12 asks for the
+mechanism; on this one the honest answer is that it is owed).
 
 ### 4d. Wall clock
 
-Secondary, and 6 of 32 O3 wall cells exceeded the 10% min-to-median spread and
-are discarded by `harness/measure.py` (marked ✗ in
-`results/tables/p38-alias-pun.md`). **No claim above rests on a wall-clock row.**
+Secondary, and **the discard count is NOT STABLE ACROSS RUNS, which is itself
+the reason no claim rests on it** — read the count off
+`results/tables/p38-alias-pun.md`, never from here. Three `measure.py p38` runs
+on this box, same tree, same binaries:
+
+```
+TASK_066 record   4 of 32   c-clang/iso 11.09  safe_naive/iso 11.66  unsafe/iso 10.92  c-clang-h/whole 10.25
+TASK_067 run 1    0 of 32   (none)
+TASK_067 run 2    3 of 32   safe_naive/whole 12.5  verus/iso 10.9  c-clang-h/iso 10.7     <- what SHIPS
+```
+
+⚠ **This file used to say "6 of 32", which disagreed with the very table it
+cited** (TASK_066_REVIEW m2). **Every kernel-exclusive `Ir` figure in §4a is
+byte-for-byte identical across all three runs**; only the wall column moved, and
+it did not move the same cells twice. **No claim above rests on a wall-clock
+row.**
 p38's per-call `Ir` differences are 0.4%–4% of the kernel, which is inside this
 box's layout band for several rungs (`.memory/05-layout.md`), so the honest
 statement is that the `ns` column neither confirms nor contradicts §4a.
@@ -368,9 +553,9 @@ the row is a per-(cell, opt, mode) table and not a per-rung one, and why the
 | instrument | sees p38? | domain |
 |---|---|---|
 | **model.py / stage 2 checksums** | on `c-gcc O3` only, and only on an adversarial input | every well-formed input clamps, so no measured cell can diverge |
-| **ASan** | **yes** — `stack-buffer-overflow READ of size 2` | ⚠ **only when built at `-O2` or above.** gcc enables `-fstrict-aliasing` at `-O2`; the gate's stage 7 builds at **`-O1`**, so **the gate's own sanitizer stage is structurally blind to p38** and `model.py` declares `sanitizer_expect: "clean"` on every input. `controls/gen_controls.py`'s `s_asan_O3` is the build that fires. |
+| **ASan** | **yes** — `stack-buffer-overflow READ of size 2` | ⚠ **only when built with `-fstrict-aliasing`, which is a FLAG and not a level** — see §6b. The gate's stage 7 builds `-O1` without it, so `model.py` declares `sanitizer_expect: "clean"` on every input. `controls/gen_controls.py --run s_asan_O3` and `--run s_asan_O1_sa` are the two builds that fire. |
 | **UBSan** | **partially, and for the wrong reason** | `-fsanitize=undefined` has **no strict-aliasing check at all**. It fires here as `array-bounds` — `index 256 out of bounds for type 'uint16_t [256]'` — i.e. it catches the *consequence* on `adversarial-oob`, where the index leaves a statically-typed fixed-size array, and is **silent on `adversarial-stale`**, where the same violation stays inside it. On `harm5.c` (heap buffer) UBSan is silent while 3994 words are read out of bounds. |
-| **TySan** (`-fsanitize=type`) | **yes, directly** — `TypeSanitizer: type-aliasing-violation` | **the only instrument that sees the violation itself rather than a consequence.** New to this project. |
+| **TySan** (`-fsanitize=type`) | **yes, directly** — `TypeSanitizer: type-aliasing-violation` | **the only instrument that sees the violation itself rather than a consequence.** New to this project. Its blind spot is §6a. |
 | **Miri** | **no, and there is nothing to see** | Miri checks the Rust rungs, which are correct. It is also silent on the `r4_pun` control, which performs the *exact analogue* of the C violation — because in Rust it is not a violation. |
 | **Verus** | **no** — §9 | the property is a rule of the **C** abstract machine and the proof is about a Rust program |
 
@@ -388,19 +573,44 @@ Reproduction of the manager's table (my `ty_main.c`+`ty_lib.c` vs
 | two TUs (not inlined) | 2 | 2 | 2 | 2 |
 | one TU, `static` (inlined) | 2 | **0** | **0** | **0** |
 
-Three mechanism probes that separate the two candidates:
+Four mechanism probes that separate the two candidates (`M4` added at TASK_067
+from TASK_066_REVIEW m5, which reproduced `M1`–`M3` exactly and supplied it):
 
 | probe | shape | `-O0` | `-O1` | `-O2` | `-O3` |
 |---|---|---|---|---|---|
 | `M1` | one TU, `static` + **`noinline`** | 2 | 2 | 2 | 2 |
 | `M2` | one TU, inlined, object on the **heap** | 2 | 2 | 1 | 1 |
 | `M3` | one TU, inlined, stack object whose **address escapes** to an opaque callee | 2 | 2 | 2 | 2 |
+| `M4` | one TU, inlined, stack object, address does **not** escape, **dynamically indexed so SROA cannot promote it** | 2 | 2 | 2 | 2 |
 
 `M1` shows "one TU" is not the discriminator — **inlining is necessary**. `M2`
 and `M3` show it is not sufficient: keep the object in memory and TySan fires at
-every level even fully inlined. **The blind spot is SROA/mem2reg promoting the
-object out of memory; inlining matters only because a cross-TU call forces the
-object into memory in the first place.**
+every level even fully inlined. **`M4` is the one that isolates the variable**:
+it removes inlining, escape and the heap as explanations at once and leaves only
+promotability, and it still fires 2 at every level. **The blind spot is
+SROA/mem2reg promoting the object out of memory; inlining matters only because a
+cross-TU call forces the object into memory in the first place.**
+
+⚠ **"Promotion" is right for the OBJECT and incomplete for the COUNT, and the
+accurate general statement is narrower than the one this section shipped**
+(TASK_066_REVIEW m5). `M2`'s `2 → 1` at `-O2` is **not** promotion — the IR
+shows the type-establishing `store i32` dead-stored away, after which the report
+even *changes direction* (`READ of size 4 with type int accesses an existing
+object of type short`). **The same halving happens on p38's own kernel**, on a
+512-byte in-memory array that is never promoted — re-measured here on
+`adversarial-oob.bin`, per call:
+
+```
+clang -fsanitize=type, violations reported     -O0  -O1  -O2  -O3
+  p38 c/kernel.c, -DSLB_ISOLATED                2    2    1    1
+  p38 c/kernel.c, -flto                         2    2    1    1
+```
+
+So: 
+
+> **TySan checks only the accesses that SURVIVE to the end of the pipeline.
+> Promotion is the case that removes all of them; dead-store elimination removes
+> some of them and changes what the rest are reported as.**
 
 **And that predicts p38, which is the test that could have failed.** p38's
 scratch is a real 512-byte in-memory array, so promotion cannot happen, so TySan
@@ -416,6 +626,61 @@ the reason it is not is the same measurement that explains why the manager's toy
 did. That is the correction: the domain is *promotable object*, and `isolated`
 vs `whole` is a proxy for it that happens to be exact on a two-line function and
 inexact on a real one.
+
+### 6b. ⚠ The gate's sanitizer stage does not see p38, and the hole is ONE FLAG WIDE
+
+⚠ **This section used to say the gate's stage 7 was "structurally blind" to p38
+because it builds at `-O1`, which read as *"the repair is to raise stage 7's
+optimisation level"* — and that would perturb 20 patterns' sanitizer rows**
+(TASK_066_REVIEW M2). The finding is real; the scoping was wrong.
+
+**The class is FLAG-gated, not LEVEL-gated.** gcc turns `-fstrict-aliasing` on
+at `-O2` and above, but the flag is what matters and `-O1` will take it:
+
+```
+adversarial-oob.bin, three consecutive runs each (defined answer 8516071857945885891):
+gcc -O1 (default)              8516071857945885891  8516071857945885891  8516071857945885891
+gcc -O1 -fstrict-aliasing     12462529406488791609 11691103919234551145  7713947493620221252  *** WRONG
+gcc -O1 -fno-strict-aliasing   8516071857945885891  8516071857945885891  8516071857945885891
+gcc -O1 -fstrict-aliasing -fsanitize=address        stack-buffer-overflow READ of size 2
+gcc -O1 -fstrict-aliasing -fsanitize=address,undefined
+    kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]'
+```
+
+(The wrong values are three *different* run-varying checksums, per §2's
+correction — do not quote any one of them as "the" wrong answer.)
+
+The last row is `controls/gen_controls.py --run s_asan_O1_sa`, which is
+`--run s_asan_O1_gate` — the gate's own stage-7 command line — **plus one
+token**. Stage 7 builds `-O1 -fsanitize=address,undefined` at
+`harness/check.py:4738`; adding `-fstrict-aliasing` there makes it see p38 **at
+`-O1`**, changing nothing about the level. ⚠ **`harness/` is not this pattern's
+to edit and the change is queued to be batched** (RECAP "Owed" 12).
+
+**Blast radius, across all 20 gate records: EXACTLY ONE PATTERN.**
+**15** patterns declare at least one `sanitizer_expect: "fires"` input, and
+**every declared row of every one of them fired**, at `-O1`, in the committed
+records — **36** `fires` rows, 36 fired, including **p18-varint-shift, the other UB
+pattern, on all four of its rows**. **5** declare none:
+
+| pattern | why its adversarial rows are sanitizer-clean |
+|---|---|
+| p01-array-sum, p08-overlap-move | model no memory-safety bug at all |
+| p04-ring-buffer | the missing fullness check **overwrites in bounds** — "every index it forms stays inside the array"; nothing to see, for a KERNEL reason |
+| p47-ct-compare | the harm is a **timing** property, outside every sanitizer's domain |
+| **p38-alias-pun** | **the kernel's harm is a real OOB read and ASan does see it — under a flag the gate does not pass** |
+
+⚠ **The review's arithmetic here was 16 and 4** (TASK_066_REVIEW M2); recounted
+from the records it is **15 and 5** — it missed p04, whose row is clean for
+p17's reason. **The conclusion is unchanged**, because p04's cleanliness is a
+property of its kernel:
+
+> **p38 is the only pattern in this tree whose declared-clean adversarial row is
+> clean because of the gate's BUILD FLAGS rather than because of its kernel.**
+
+So this is a p38 note plus a one-line gate fix, and not a `major` about the
+gate's history: the hole has never hidden anything but p38, and p38 discloses it
+here, in `model.py::sanitizer_expect` and in `spec.md`.
 
 ---
 
@@ -557,6 +822,17 @@ at a cost of two trusted items on a pattern that has three. What ships is the
 **fixed-R4 bound** — `R3ship − R4ship = +21.00 / +25.00`, R4 held by fiat — and
 the R3-side span above. **No pair interval.**
 
+⚠ **AND THE DIRECTION, which TASK_066 and its task file both got backwards.**
+A cheaper R4 makes `R3 − R4` **larger**, so the true `R3 − inf(R4 found)` is
+**+24.00 / +32.00** while what ships is **+21.00 / +25.00**. **Publishing the
+smaller number makes the SAFE rung look closer to unsafe** — which is
+`.memory/01-ladder.md` finding 18's defect direction verbatim, and it is p10's
+and p27's defect **in kind**, at 14% / 28% of the headline (TASK_066_REVIEW P1).
+The task file said the unsearched side flatters *unsafe*; it flatters **safe**.
+This is now also stated in `README.md`, which is the file a reader reaches
+first and which carried the fixed-R4 bound with no disclosure at all
+(TASK_066_REVIEW m1).
+
 ⚠ **The `r4_pun` row is p38's sharpest instance of `.memory/01-ladder.md`
 finding 14.** The Rust spelling that is the *exact* analogue of the C bug is
 **defined in Rust** — it prints the model's checksum on `small.bin` and on
@@ -565,31 +841,55 @@ finding 14.** The Rust spelling that is the *exact* analogue of the C bug is
 class reaches a spelling the unsafe class cannot, on the pattern whose entire
 subject is that spelling. Fifth instance, and the sharpest.
 
-### 8c. The flag price — and it is negative
+### 8c. ⚠ THE UNDEFINED SPELLING IS THE DEAREST OF ITS NEIGHBOURS — p38's best result
 
-No pattern in this tree had priced a whole-program-semantics flag.
-`controls/gen_controls.py`'s `c_nosa` is the shipped `c/kernel.c` with one flag
-added, measured in the same run as `c_pun` (whole-program marginal, `small.bin`,
-`O3 isolated`):
+**This is the pattern's strongest honest sentence and TASK_066 did not write
+it** (TASK_066_REVIEW M3). §8c used to frame the −6.00 as a property of the
+**flag** `-fno-strict-aliasing`. It is not: it is a property of **not doing the
+double read**, and five *different* one-line edits buy the identical 6.00.
 
-| | `-fstrict-aliasing` (default) | `-fno-strict-aliasing` | price |
-|---|---:|---:|---|
-| gcc 13.3.0 | 1043.72 | 1037.72 | **−6.00 Ir/call** |
-| clang 22.1.6 | 1274.72 | 1274.72 | **0.00, byte-identical** (`md5_fn 366e3be50428…`) |
+`controls/gen_controls.py --run <name> --ir`, all eight built and run in one
+invocation, whole-program marginal `Ir` per call on `small.bin`, `-O3
+isolated`, behaviour on `adversarial-oob.bin` (defined answer
+`8516071857945885891`):
 
-**The flag that fixes the bug is free on clang and *saves* 6 instructions per
-call on gcc**, because what strict aliasing bought gcc here was the deletion of
-a reload that the surrounding code then had to work around. ⚠ **Domain, not a
+| control | one-line change from the shipped R1 | gcc `Ir`/call | vs `c_pun` | answer | clang `Ir`/call | vs `c_pun` |
+|---|---|---:|---:|---|---:|---:|
+| **`c_pun`** | **— (ships; UNDEFINED)** | **1043.72** | — | **WRONG, run-varying** | **1274.72** | — |
+| `c_symset` | `rec_set_len` puns too — a **symmetric** pair | 1037.72 | **−6.00** | correct | 1274.72 | 0.00 |
+| `c_once` | `rec_len` called **once**, clamp via a local | 1037.72 | **−6.00** | correct | 1266.72 | −8.00 |
+| `c_nosa` | identical source, `-fno-strict-aliasing` | 1037.72 | **−6.00** | correct | 1274.72 | 0.00 |
+| `c_memcpy` | `memcpy(&v, r, 4)` | 1037.72 | **−6.00** | correct | 1274.72 | 0.00 |
+| `c_union` | the union spelling | 1037.72 | **−6.00** | correct | 1274.72 | 0.00 |
+| `c_noback` | clamp into a local, **no write-back at all** | 1041.72 | −2.00 | correct | 1267.72 | −7.00 |
+| `c_halves` | the shipped R1h two-half read | 1055.72 | **+12.00** | correct | 1306.72 | +32.00 |
+
+> **On gcc the undefined spelling is the DEAREST of its neighbours: SIX defined
+> spellings are cheaper — five of them by exactly 6.00 `Ir`/call and one by
+> 2.00 — and the only defined spelling that costs more is the two-half read the
+> Rust rungs are forced into. The undefined behaviour is not a speed win here;
+> against the natural single-read spelling it is a 6.00 `Ir`/call LOSS.**
+
+On clang it is not a win either: `c_once` is 8.00 cheaper, `c_noback` 7.00, and
+the other four are **byte-identical** to it (`md5_fn 366e3be50428…`, 175
+instructions).
+
+**Why that matters for what p38 is.** Three of the six cheaper spellings remove
+a *different one* of the four conjunctive conditions in `c/kernel.c`'s header —
+`c_symset` removes (i), `c_once` removes (ii), `c_noback` removes (iii) — and
+each of them is one line. A shape that needs four conditions to co-occur, costs
+6.00 `Ir`/call more than three independent ways of not having it, and whose
+realistic multi-pass alternative does not reproduce at all (§0c), is a
+**demonstration of a real bug class rather than a claim about prevalent code**.
+That is the label p38 ships under; see §11.
+
+**The flag price, which is still a first for this tree.** No pattern here had
+priced a whole-program-semantics flag: `-fno-strict-aliasing` is **free on
+clang** (byte-identical) and **saves 6.00 `Ir`/call on gcc**. ⚠ **Domain, not a
 law**: this kernel is a straight-line record walk with no loop that writes
 through one type and reads through another, which is where the flag's real cost
 would be. p38 prices the flag *on p38*; it does not price the Linux kernel's
 build.
-
-Two further zero-cost fixes, from §1: `c_memcpy` and `c_union` are
-byte-identical to the UB spelling on clang and one instruction from it on gcc.
-`c_once` — the same pun with `rec_len` called once instead of twice — is
-**correct on every cell** and 6.00 Ir/call cheaper than the buggy spelling,
-which is the control that shows the *re-read* is what the bug needs.
 
 ---
 
@@ -650,22 +950,58 @@ place where the assumption lives (§7), and it is an assumption about the
 |---|---|---|
 | as first written, **before any measurement** (no `measure.py` run, no gate run) | `2a3ba24c7e9246c2b4b31ed1de91dea7362ff0596cb0822929d4ea3b8b63d79f` | — |
 | after §1 was measured | `9336ca3ebfc44f2c3136ed5181c81fc8a82fc7ea621ebed7c81ac34a0eaa3a34` | **a false claim in `idiom.why` and in `required[1]`** — both said the UB spelling and the defined two-half spelling *"emit the SAME 32-bit load"*. §1 measured +6 (gcc) / +10 (clang) and the text was corrected to say so. |
-| after the first gate run | `ba34065a4fa2370681f9c199acc4b9f394c83a107738d6a8965efb49d89d1d5e` | **six** backticked spans in `required[0]`, `required[1]` and `required[3]` that were prose rather than pins were de-backticked, because `idiom_audit` reported them as `pins nothing` (`read_unaligned`, `forbidden`, `why`, `memcpy`, `nw - i >= 2`, `i <= nw`). `required_pins_nothing` goes 4 → 0 and `forbidden_hits` stays 0. |
-| final (shipped) | `9a413347f3336869c2f7c0add48b6f760d9a50ce7791c8dcc4cf0f4c287adccd` | **a second false claim in `idiom.why`**, this time mine and not the manager's: it said *all three* compilers merge the two 16-bit loads and then fail to fold. Reading the shipped `c-gcc-h` listing shows **gcc never merges them at all** (two `movzwl`, a `shl`, an `add`); clang and rustc do merge and then fail to fold. The costs, +6 and +10, are unchanged; the mechanism sentence was wrong for one of the three. |
+| after the first gate run | `ba34065a4fa2370681f9c199acc4b9f394c83a107738d6a8965efb49d89d1d5e` | ⚠ **THE ACCOUNT OF THIS EDIT CANNOT BE RECONSTRUCTED — see below.** As written at TASK_066 it said: *"**six** backticked spans in `required[0]`, `required[1]` and `required[3]` that were prose rather than pins were de-backticked, because `idiom_audit` reported them as `pins nothing` (`read_unaligned`, `forbidden`, `why`, `memcpy`, `nw - i >= 2`, `i <= nw`); `required_pins_nothing` goes 4 → 0."* |
+| final at TASK_066 | `9a413347f3336869c2f7c0add48b6f760d9a50ce7791c8dcc4cf0f4c287adccd` | **a second false claim in `idiom.why`**, this time mine and not the manager's: it said *all three* compilers merge the two 16-bit loads and then fail to fold. Reading the shipped `c-gcc-h` listing shows **gcc never merges them at all** (two `movzwl`, a `shl`, an `add`); clang and rustc do merge and then fail to fold. The costs, +6 and +10, are unchanged; the mechanism sentence was wrong for one of the three. |
+| **shipped, after TASK_067** | `314bf2e385d4e6f8fcc1f8b587f4e33202fb814ff6b34d26ee50f84e9218c582` | `required[1].rust`'s `` `[u16; 256]` `` de-backticked and its English corrected — §10a′ below. **One span; `required_pins_nothing` stays 0, `required_absent` goes 5 → 2.** ⚠ This edit **is** checkable against `git`, and the check is in the task report: `git show HEAD:…/spec.md \| diff - …/spec.md` shows **three hunks**, of which exactly **one** is inside the `slb-contract` block and it is this one. |
 
-⚠ **No `required` or `forbidden` ENTRY was added, removed or re-scoped after any
-measurement.** The entry list, the forbidden list, `verus.obligations`,
+⚠ **ROW 3 DOES NOT ADD UP AND I CANNOT REPAIR IT, so it is labelled rather than
+re-told** (TASK_066_REVIEW m8). Three things are wrong with it and the honest
+statement is that the *narrative* of that edit is lost:
+
+- `required_pins_nothing` counts **(entry, lang, spelling)** triples
+  (`harness/check.py::idiom_audit`), so **six** spans that each pin nothing move
+  it by **six**, not by four. The "4 → 0" and the "six" cannot both be true.
+- `nw - i >= 2` and `i <= nw` are **not in the shipped block at all**, as
+  standalone spans or otherwise — the guard is pinned as
+  `while (o < nrec && i + 2 <= nw) {`. So at least one listed span was
+  *rewritten*, not de-backticked, and the row does not say so.
+- `read_unaligned` and `memcpy` **are still backticked** in the shipped block,
+  as `forbidden[0].rust` and `forbidden[5].c`. Whatever was de-backticked was
+  some *other* occurrence of those tokens, and the row does not say which.
+
+**A wrong disclosure removes the check it exists to enable**, so no second guess
+is offered. What IS checkable, and was re-checked at TASK_067, stands: the
+shipped block has **9 `required` and 10 `forbidden`** entries, `forbidden_hits`
+0, `required_pins_nothing` 0, and the recorded sha256 matches the file.
+
+⚠ **No `required` or `forbidden` ENTRY has been added, removed or re-scoped at
+any point.** The entry list, the forbidden list, `verus.obligations`,
 `verus.twin_obligations`, `identity`, `collapse` and `driver` are as first
-written. Both edits are corrections to *English inside* entries.
+written. Every edit above is a correction to *English inside* an entry, and the
+TASK_067 one also de-backticks one span.
 
-⚠ **This disclosure cannot be checked with `git show HEAD:…`** because p38 is a
-new pattern and lands in one commit — which is precisely the situation
-PROTOCOL's rule 6 exists for, and why the first hash is recorded above.
+⚠ **The TASK_066 disclosure could not be checked with `git show HEAD:…`** —
+p38 landed in one commit, which is the situation PROTOCOL rule 6 exists for.
+**The TASK_067 edit CAN be**, and is: `git show HEAD:patterns/p38-alias-pun/spec.md
+| diff - patterns/p38-alias-pun/spec.md` is run in the task report and shows
+exactly the hunks described here and nowhere else in the block.
 
 **Two of the three cells were built before the contract block existed**, during
 §0, to *decide* the design. That is the intended order — §0 is a deliverable
 that precedes the rungs — and no `measure.py` run or gate run preceded the
 block.
+
+### 10a′. m8's related item — `required[1].rust` pinned a spelling only one rung has
+
+`required[1].rust`'s English said *"in all four Rust rungs"* while its backticked
+`` `[u16; 256]` `` occurs **only in `verus.rs`**; `safe_naive.rs`, `safe_tuned.rs`
+and `unsafe.rs` all write `[u16; SCRATCH_W]`. The gate reported that as three
+`required_absent` pairs every run and nobody read them. The span is now prose,
+so the entry pins what it always meant to pin — `65536 *`, the *combining*, in
+all four rungs — and `required_absent` falls from **5 to 2**, the two remaining
+being the deliberate scoped-absent pairs on `required[0]`/`required[1]`'s C keys
+(the pun is absent from the hardened rung and the defined read from the buggy
+one, which is the point of those entries).
 
 ### 10b. `spec.md` is GENERATED
 
@@ -695,3 +1031,54 @@ rustc 1.97.1 (LLVM 22.1.6), Verus `0.2026.08.09.92f466f`.
 - **The `-fno-strict-aliasing` price is measured on p38's kernel only** (§8c),
   which has no loop that writes through one type and reads through another. The
   case where the flag would cost real vectorisation is not built here.
+- **The mechanism behind `A(nw mod 8)`, the `rlen` parity term and the
+  `rlen == 1` term is NOT established** (§4c). The shapes are exact over 106
+  measured points; nobody has read the vector epilogue that would explain them.
+- **The cause of `adversarial-oob`'s run-to-run variation with ASLR disabled is
+  NOT established** (§2). The stated cause was measured false; no replacement is
+  offered.
+
+---
+
+## 11. ⚠ What p38 IS, and what it is not — the label, stated rather than implied
+
+TASK_067 asked, by name, whether p38 *"still reads as a **security** pattern or
+as a carefully-built demonstration"* once its conditions are stated honestly,
+and asked to be contradicted with a measurement. **It does not need
+contradicting. The measurements say demonstration, and this is the label p38
+ships under.** Four of them, all in this file:
+
+1. **The harm needs FOUR conjunctive conditions**, and removing any one removes
+   it (`c/kernel.c`'s header, §8c): (i) getter and setter disagree about the
+   access type; (ii) the getter is called a **second** time after the setter;
+   (iii) the write-back has **no consumer** but that second read; (iv) both
+   accessors are visible in one optimisable region.
+2. **Condition (iii) is structural and is the least realistic.** `sc[i]` and
+   `sc[i+1]` are read by nothing else and the cursor never revisits them, so
+   **the clamp store exists only to be re-read three lines later**. The
+   realistic reason to write a clamp *back* into a buffer is a later pass — and
+   the two-pass shape is measured **not to reproduce**, 12 of 12 cells (§0c).
+3. **The undefined spelling is the DEAREST of its neighbours on gcc** (§8c):
+   six defined spellings are cheaper, five of them by exactly 6.00 `Ir`/call.
+   There is no performance incentive to write it, so the shape does not arise
+   from anyone optimising.
+4. **The compiler that takes it is one of two**, and the one that declines does
+   so for a reason a spelling one step away flips (§0d). "gcc miscompiles this"
+   is true; "compilers miscompile this" is not.
+
+**What p38 therefore measures, and what it does not.** It measures, on a kernel
+built to exhibit the class: what the bug class costs (§8c), which instrument
+sees it and with what domain (§6, §6a), that the gate's own sanitizer stage
+misses it and by exactly one flag (§6b), and — the ladder result, which is why
+the pattern exists — **that R2…R5 are immune by construction and `unsafe` has
+nothing to unlock, because Rust has no type-based aliasing rule** (§5, §9). It
+does **not** measure how often this shape occurs in real parsers, and TASK_066's
+claim that *"the pair is written this way in real parsers"* was uncited and is
+**withdrawn** (TASK_066_REVIEW M3).
+
+⚠ **This lowers the severity of p38's security claim; it does not retract it.**
+The class is real: ASan reports `stack-buffer-overflow READ of size 2` on a
+shipped binary, TySan reports the aliasing violation itself, a heap-buffer
+variant reproduces (`harm5.c`, §0b), and the Linux kernel builds
+`-fno-strict-aliasing` for exactly this. What is retracted is the *prevalence*
+claim, which was never measured and never could be from inside this repo.

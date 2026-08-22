@@ -227,23 +227,48 @@ class Model:
     @property
     def sanitizer_expect(self):
         """**"clean", on every input including the adversarial ones -- and it
-        is a fact about the GATE, not about the kernel.**
+        is a fact about the GATE'S BUILD FLAGS, not about the kernel.**
 
-        `harness/check.py`'s stage 7 builds `c/kernel.c` with gcc at **`-O1`**.
-        gcc enables `-fstrict-aliasing` at `-O2` and above and not at `-O1`, so
-        the stage-7 binary is one in which p38's undefined behaviour is not
-        exploited: it clamps, it stays inside the scratch, and ASan and UBSan
-        have nothing to report. Measured -- gcc `-O1`, with and without
-        `-fsanitize=address,undefined`, prints the model's checksum on every
-        adversarial input.
+        `harness/check.py`'s stage 7 builds `c/kernel.c` with gcc at
+        `-O1 -fsanitize=address,undefined`. gcc enables `-fstrict-aliasing` at
+        `-O2` and above and not at `-O1`, so the stage-7 binary is one in which
+        p38's undefined behaviour is not exploited: it clamps, it stays inside
+        the scratch, and ASan and UBSan have nothing to report. Measured -- gcc
+        `-O1`, with and without `-fsanitize=address,undefined`, prints the
+        model's checksum on every adversarial input.
+
+        ⚠ **THE HOLE IS ONE FLAG WIDE, NOT ONE OPTIMISATION LEVEL WIDE, and
+        this docstring said the second thing until TASK_067** (TASK_066_REVIEW
+        M2). The class is FLAG-gated: `gcc -O1 -fstrict-aliasing` already
+        prints the wrong checksum and ASan already reports
+        `stack-buffer-overflow READ of size 2` at `-O1`. Add `-fstrict-aliasing`
+        to stage 7's command line and stage 7 sees p38 **at `-O1`**, changing
+        nothing else. Read literally, the old wording said the repair was to
+        RAISE stage 7's optimisation level, which would perturb 20 patterns'
+        sanitizer rows; it is one token, and `harness/` is not this pattern's
+        to edit (RECAP "Owed" 12).
+
+        **Blast radius, recounted across all 20 gate records: exactly one
+        pattern.** 15 patterns declare at least one `sanitizer_expect: "fires"`
+        input -- 36 rows in all -- and every one of the 36 fired at `-O1`,
+        p18-varint-shift, the other UB pattern, on all four of its rows. Five
+        declare none: p01 and p08 model no memory-safety bug; p04's missing
+        fullness check overwrites IN BOUNDS, so there is nothing for a
+        sanitizer to see; p47's harm is a timing property outside every
+        sanitizer's domain. **p38 is the only pattern in the tree whose
+        declared-clean adversarial row is clean because of the gate's BUILD
+        FLAGS rather than because of its kernel.** (TASK_066_REVIEW M2 put the
+        split at 16/4 and missed p04; the conclusion is unchanged, because
+        p04's row is clean for p17's reason and not for p38's.)
 
         The same source at `-O3` under ASan reports
         `stack-buffer-overflow READ of size 2` on `adversarial-oob.bin`.
-        ../controls/gen_controls.py ships that build as `s_asan_O3`, so the
-        figure is checkable rather than asserted, and ../NOTES.md 6 records
-        both. **Declaring "fires" here would fail the gate for a true reason
-        stated in the wrong place**: the bug is real and ASan does see it; the
-        gate's own sanitizer stage cannot be run at the optimisation level that
+        `../controls/gen_controls.py --run s_asan_O3` is that build, selectable
+        by name, so the figure is checkable rather than asserted, and
+        `--run s_asan_O1_sa` is the one-flag repair above; ../NOTES.md 6
+        records both. **Declaring "fires" here would fail the gate for a true
+        reason stated in the wrong place**: the bug is real and ASan does see
+        it; the gate's own sanitizer stage is not built with the flag that
         creates it."""
         return "clean"
 

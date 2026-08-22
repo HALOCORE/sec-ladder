@@ -19,8 +19,11 @@
  *
  * which is undefined behaviour by C99 6.5p7: the object is an array of
  * `uint16_t` and the lvalue has type `uint32_t`, and neither is a character
- * type. `c/kernel_hardened.c` writes `(uint32_t)r[0] | ((uint32_t)r[1] << 16)`
- * instead and is otherwise character-identical.
+ * type. `c/kernel_hardened.c` writes `(uint32_t)r[0] + 65536 * (uint32_t)r[1]`
+ * instead and is otherwise character-identical. ⚠ It is spelled with `+` and
+ * `*` and NEVER with `|` and `<<`, so the whole specification stays inside
+ * linear arithmetic (.memory/04-verus.md) -- ../spec.md's `why` says so, and
+ * this line said `|`/`<<` until TASK_067 (TASK_066_REVIEW m6).
  *
  *   window = buf[off .. off+len)
  *   nrec        = u32 LE at window byte 0        DECLARED. ATTACKER DATA.
@@ -33,7 +36,7 @@
  *     words i+2 ..   2*rlen payload words   (`rlen` counts 32-bit units)
  *
  *   acc = 0 ; i = 0 ; o = 0
- *   while o < nrec && nw - i >= 2:
+ *   while o < nrec && i + 2 <= nw:          <<< ADDITIVE, and pinned that way
  *       room = (nw - i - 2) / 2
  *       if REC_LEN(sc+i) > room:  REC_SET_LEN(sc+i, room)     <<< THE CLAMP
  *       n = REC_LEN(sc+i)                                     <<< re-read
@@ -55,11 +58,18 @@
  *   clang 22.1.6 -O3    the clamp works; no out-of-bounds read
  *   either, -fno-strict-aliasing   the clamp works
  *
- * The compiler difference is not luck and it is not a version accident: LLVM
- * declines to apply TBAA when BasicAA has already proved the two accesses are
- * the *same address*, which is exactly the situation a single-base accessor
- * pair creates. Hand it two pointers it cannot relate and clang exploits the
- * same violation at every level from -O1. ../NOTES.md 0d has the control.
+ * The compiler difference is not luck and it is not a version accident, and
+ * the discriminator is narrower than "the same address": LLVM declines to
+ * apply TBAA when **BasicAA can compute the OFFSET between the two accesses**
+ * -- MustAlias is sufficient but not necessary. Measured on five variants of
+ * one function (`x_mustalias`, ../NOTES.md 0d): a partial overlap that is
+ * never MustAlias is still declined, and hiding only the offset behind an
+ * opaque value -- same single base pointer -- makes clang exploit the
+ * violation at every level from -O1. p38's own kernel is the PARTIAL case:
+ * two 2-byte stores against one 4-byte load. Hand clang two pointers it
+ * cannot relate and it exploits it too. (Second reason, from the shipped
+ * listing: clang MERGES the two `uint16_t` clamp stores into one 32-bit store
+ * where gcc emits two, so the value it forwards is type-consistent anyway.)
  *
  * Both C rungs take `buf_len` and both ignore it: p38's bound is the window's
  * and the scratch's, not the blob's. p47's, p12's, p06's, p14's, p10's and
