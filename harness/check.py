@@ -38,7 +38,12 @@ What it enforces, in order:
      scratch file. **Since TASK_068 a `forbidden` HIT FAILS the run** -- its
      scope is universal by the key's own meaning, so it is decidable with no
      English involved; the `required` numbers stay presence, not compliance,
-     and never fail -- see `idiom_audit`. TASK_062 adds
+     and never fail -- see `idiom_audit`. **TASK_069 made that fail SAFE**: the
+     hard fail shipped with `exec_code` blanking ghost CLAUSES only, so
+     `proof {}`, `assert(...)`, `spec fn`/`proof fn` bodies, `let ghost` and
+     `#[cfg(slb_twin)]` bodies could all fire it -- 11 of 14 honest shapes
+     blocked, on constructs present in 20 of 20 shipped `verus.rs`
+     (TASK_068_REVIEW B1). TASK_062 adds
      the one thing in this stage that DOES fail on the declaration's text:
      `idiom.why` must carry the shared named-spelling paragraph verbatim,
      because that paragraph is where a backticked pin's MEANING is written
@@ -78,7 +83,12 @@ What it enforces, in order:
      (TASK_068 -- `RUN_TIMEOUT` is 900 s, which for a deliberately
      non-terminating cell is hours per gate run). The prediction is derived and
      the budget is pinned, they are required to agree, and `diverges` is still
-     computed against the CONFORMING `expected_exit` -- see `run_budgets`
+     computed against the CONFORMING `expected_exit` -- see `run_budgets`.
+     TASK_069 makes the budget itself checkable: it has a floor
+     (`RUN_BUDGET_FLOOR`), and one hung cell is RE-RUN at 10x it and must still
+     not terminate, because before that a 3.5 s cell under a 2 s budget was
+     accepted as a hang -- which switched stage 7's sanitizer expectation and
+     stage 8's Miri row off for that input (TASK_068_REVIEW B2)
   5  the "Proof domain must cover the measured domain" rules:
        - the Verus obligation count equals the number pinned in `spec.md`
        - every item's `external` attribute, `requires` and `ensures` match
@@ -153,6 +163,7 @@ and deliberately not in `results/gate/` where a verdict survey would find it
 import argparse
 import contextlib
 import difflib
+import functools
 import glob
 import hashlib
 import importlib.util
@@ -174,6 +185,16 @@ import dloop  # noqa: E402
 import fixture  # noqa: E402
 
 RUN_TIMEOUT = 900
+
+#: Smallest `run.timeout_s` a contract may pin, and the multiplier the
+#: confirmation re-run uses (TASK_069, from TASK_068_REVIEW B2). Measured on
+#: this box: bare process startup 1.1-2.2 ms, the slowest shipped O0 cell on
+#: `large.bin` 198 ms (p01) -- so 1.0 s is ~5x the slowest honest cell and ~500x
+#: startup, while still being 900x below `RUN_TIMEOUT`. Below the floor,
+#: "did not terminate within the budget" stops carrying information at all.
+RUN_BUDGET_FLOOR = 1.0
+RUN_BUDGET_CONFIRM = 10
+
 ENSURES_SAMPLE = 128  # calls re-checked with the model's independent summation
 VALGRIND = os.path.expanduser("~/tools/valgrind/bin/valgrind")
 
@@ -561,7 +582,32 @@ def run_budgets(contract, rep, all_stems):
     expectation at all -- a hanging good cell fails "run" whatever it declared.
     This guard is therefore fail-closed defence in depth against a *later* edit
     that teaches stage 2 about `expected_hang`, not the closure of a live hole.
-    Do not upgrade the claim."""
+    Do not upgrade the claim.
+
+    ⚠ **`timeout_s` shipped with no lower bound, and that made it the first pin
+    in a `slb-contract` block that is NEITHER prose-judgeable NOR cross-checked
+    against a measurement** (TASK_068_REVIEW B2 -- the general point, and it is
+    worth more than the bug). Every other pin is one or the other:
+    `driver.statements`, `driver.regions`, `identity` and
+    `collapse.probe_inputs` are judged by reading them; `verus.obligations`,
+    the identity digests and `miri.required` are diffed against something the
+    gate measures. `run.timeout_s` was self-certifying, and it reproduced
+    `min_ir_per_work`'s known weakness exactly -- bounded only by `> 0`, which
+    TASK_006_REVIEW drove through the whole gate at `1e-9`
+    (`.memory/02-bench-rules.md:345-360`). Measured on the shipped code:
+    `timeout_s = 1e-9` was accepted, and a real gcc binary that terminates in
+    3.5 s, declared with `timeout_s: 2`, was recorded as a declared hang with
+    **0 failures** -- after which stage 7 skipped its sanitizer expectation and
+    stage 8 raised the row BLOCKED. Two things convert it into a cross-checked
+    pin, and both are needed:
+
+      * **`RUN_BUDGET_FLOOR` (below).** 10x a budget smaller than process
+        startup is still smaller than process startup, so the re-run alone does
+        not catch `1e-9`.
+      * **the confirmation re-run in `check_adversarial`**: one hung cell is
+        re-run at `min(10 x budget, RUN_TIMEOUT)` and the pattern FAILS if it
+        terminates. That is declared-vs-measured, which is the model
+        `.memory/02-bench-rules.md` names as the one to copy."""
     run = contract.get("run")
     if run is None:
         return {}
@@ -599,9 +645,18 @@ def run_budgets(contract, rep, all_stems):
                      f"agreement.")
             continue
         if not isinstance(secs, (int, float)) or isinstance(secs, bool) \
-                or not 0 < secs <= RUN_TIMEOUT:
-            rep.fail("run-budget", f"`run.timeout_s[{stem}]` is {secs!r}, want "
-                                   f"a number in (0, {RUN_TIMEOUT}]")
+                or not RUN_BUDGET_FLOOR <= secs <= RUN_TIMEOUT:
+            rep.fail("run-budget",
+                     f"`run.timeout_s[{stem}]` is {secs!r}, want a number in "
+                     f"[{RUN_BUDGET_FLOOR}, {RUN_TIMEOUT}]. The floor is not "
+                     f"decoration: below it, 'did not terminate in the budget' "
+                     f"stops distinguishing a hang from an ordinary cell -- "
+                     f"bare process startup on this box measures 1-2 ms and the "
+                     f"slowest shipped O0 cell on `large.bin` 198 ms "
+                     f"(`.temp/p69/NOTES.md`) -- and the confirmation re-run "
+                     f"cannot catch it either, since 10x a sub-startup budget "
+                     f"is still sub-startup. `timeout_s = 1e-9` was accepted "
+                     f"before TASK_069 (TASK_068_REVIEW B2).")
             continue
         out[stem] = secs
     return out
@@ -749,19 +804,304 @@ def _blank_ghost(code):
     return "".join(out)
 
 
-def exec_code(src):
-    """`src` with comments, string/char literals and Verus ghost clauses blanked.
+#: cfg names some cell this project actually BUILDS or RUNS sets. Everything
+#: else names code that reaches no codegen unit here, so `exec_code` blanks it.
+#:
+#: Derived, not enumerated from failures: the first entry is the only `--cfg`
+#: `build.py` passes (`build.py:150`, isolated mode), the second is set by the
+#: interpreter stage 8 runs, and the rest are rustc's own, defined for every
+#: compilation by the target rather than by any flag of ours (Rust reference,
+#: "Conditional compilation"). `test` is deliberately NOT here: nothing in this
+#: repo ever passes `--test`, so a `#[cfg(test)]` module is dead in every cell
+#: that is built, measured or interpreted.
+CODEGEN_CFGS = frozenset({
+    "slb_isolated", "miri",
+    "unix", "windows", "panic", "debug_assertions", "overflow_checks",
+    "target_arch", "target_os", "target_family", "target_env", "target_endian",
+    "target_pointer_width", "target_vendor", "target_feature",
+    "target_has_atomic", "target_abi", "target_thread_local",
+})
 
-    Offset- and line-preserving, so a hit's line number is still the source's."""
-    return _blank_ghost(vparse.blank_noncode(src))
+_CFG_ATTR = re.compile(r"#!?\[\s*cfg\s*\(")
+_ATTR_START = re.compile(r"#!?\[")
+_IDENT_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+_CFG_WORDS = frozenset({"cfg", "all", "any", "not"})
+
+#: Verus ghost STATEMENTS. `assert`/`assume` are matched only as bare
+#: identifiers, so Rust's `assert!`, `assert_eq!` and `debug_assert!` macros --
+#: which do reach codegen -- are untouched.
+_GHOST_STMT = re.compile(r"\b(proof|assert|assume)\b(?!\s*!)")
+_GHOST_LET = re.compile(r"\blet\s+(?:mut\s+)?(?:ghost|tracked)\b")
+_GHOST_CTOR = re.compile(r"\b(?:Ghost|Tracked)\s*(?:::\s*(?:new|assume_new))?\s*\(")
 
 
-def spelling_matches(spelling, src):
+def _blank_span(out, a, b):
+    """Blank `out[a:b]` in place, preserving offsets and line numbers."""
+    for k in range(max(a, 0), min(b, len(out))):
+        if out[k] != "\n":
+            out[k] = " "
+
+
+def _bracket_end(code, i):
+    """Index just past the bracket group opening at `code[i]`, or None."""
+    try:
+        return vparse._match_bracket(code, i)
+    except (ValueError, IndexError):
+        return None
+
+
+def _item_end(code, i):
+    """End of the item that starts at `code[i]`: the `;` or the `{...}` that
+    closes it, whichever comes first at depth 0. Attribute-agnostic, so it works
+    for `mod x { }`, `fn f() { }`, `const X: u8 = 3;` and `use a::{b, c};`
+    alike -- it is the token structure that decides, not a list of item kinds."""
+    j, n, depth = i, len(code), 0
+    while j < n:
+        c = code[j]
+        if c in "([":
+            depth += 1
+        elif c in ")]":
+            depth -= 1
+        elif depth == 0 and c == ";":
+            return j + 1
+        elif depth == 0 and c == "{":
+            e = _bracket_end(code, j)
+            return None if e is None else e
+        j += 1
+    return None
+
+
+def _cfg_reaches_codegen(attr):
+    """Does `#[cfg(P)]`'s predicate `P` mention a cfg any cell here sets?
+
+    Direction matters and is deliberate. Answering "no" for code that IS built
+    only WEAKENS the audit (a real forbidden spelling goes uncounted, which is
+    the state the whole check was in before TASK_068). Answering "yes" for code
+    that is NOT built HARD-FAILS an honest pattern -- TASK_068_REVIEW B1. So the
+    unknown name is treated as unbuilt."""
+    return any(w in CODEGEN_CFGS for w in _IDENT_RE.findall(attr)
+               if w not in _CFG_WORDS)
+
+
+def _blank_unbuilt_cfg(code):
+    """Blank every item gated on a `#[cfg(...)]` no cell here compiles.
+
+    This closes RECAP "Owed" 10 (`#[cfg(slb_twin)]` twin bodies: 43 attributes
+    across 20 of 20 `verus.rs`) and the `#[cfg(test)]` shape TASK_068_REVIEW
+    found beside it, and it closes them the same way, by asking *"does any cell
+    set this cfg?"* rather than by naming the two attributes. `slb_isolated` is
+    the one cfg a build does set, so an item gated on it is exec code and stays.
+
+    It was hygiene while a hit only moved a printed counter; since TASK_068 a
+    hit fails the run, which inverts the harm: a spelling that exists only in a
+    trusted twin no build contains would block the pattern that discloses it."""
+    out, i, n = list(code), 0, len(code)
+    while i < n:
+        m = _CFG_ATTR.match(code, i)
+        if not m:
+            i += 1
+            continue
+        end = _bracket_end(code, code.index("[", m.start()))
+        if end is None:
+            i = m.end()
+            continue
+        if _cfg_reaches_codegen(code[m.start():end]):
+            i = end
+            continue
+        # skip any further attributes stacked on the same item
+        j = end
+        while True:
+            k = j
+            while k < n and code[k].isspace():
+                k += 1
+            a = _ATTR_START.match(code, k)
+            if not a:
+                break
+            nxt = _bracket_end(code, code.index("[", a.start()))
+            if nxt is None:
+                break
+            j = nxt
+        stop = _item_end(code, j)
+        _blank_span(out, m.start(), stop if stop is not None else n)
+        i = stop if stop is not None else n
+    return "".join(out)
+
+
+def _blank_ghost_items(text, code):
+    """Blank every `spec fn` / `proof fn` item, signature and body.
+
+    Structural, not syntactic: `vparse.parse` already classifies items by kind
+    and returns absolute offsets, so this asks the parser the gate's other
+    stages ask rather than adding two more regexes. TASK_068_REVIEW B1 measured
+    127 `spec fn` and 10 `proof fn` surviving into the audit, over 21 of 21
+    Rust rung sources."""
+    out = list(code)
+    try:
+        items = vparse.parse(text)
+    except Exception:
+        return code
+    for it in items:
+        if it.kind in ("spec fn", "proof fn") and it.start is not None \
+                and it.body_end is not None:
+            _blank_span(out, it.start, it.body_end + 1)
+    return "".join(out)
+
+
+def _blank_ghost_stmts(code):
+    """Blank Verus ghost STATEMENTS inside exec bodies.
+
+    `proof { ... }` blocks, `assert(...)` / `assert ... by { ... }` /
+    `assume(...)`, `let ghost` / `let tracked` bindings and `Ghost(...)` /
+    `Tracked(...)` constructions. Every one erases before codegen, which is
+    `spelling_matches`' own stated reason for blanking clauses.
+
+    ⚠ This is the one part of `exec_code` that is NOT structural -- see
+    `exec_code`'s docstring for why, and for what would be."""
+    out, i, n = list(code), 0, len(code)
+    while i < n:
+        m = _GHOST_LET.match(code, i)
+        if m:
+            j, depth = m.end(), 0
+            while j < n:
+                c = code[j]
+                if c in "([{":
+                    depth += 1
+                elif c in ")]}":
+                    if depth == 0:
+                        break
+                    depth -= 1
+                elif c == ";" and depth == 0:
+                    j += 1
+                    break
+                j += 1
+            _blank_span(out, i, j)
+            i = j
+            continue
+        m = _GHOST_CTOR.match(code, i)
+        if m:
+            e = _bracket_end(code, m.end() - 1)
+            if e is not None:
+                _blank_span(out, i, e)
+                i = e
+                continue
+        m = _GHOST_STMT.match(code, i)
+        if not m:
+            i += 1
+            continue
+        kw, j = m.group(1), m.end()
+        while j < n and code[j].isspace():
+            j += 1
+        if kw == "proof":
+            # `proof fn` is an item and was blanked above; only `proof { ... }`
+            # is a statement.
+            if j >= n or code[j] != "{":
+                i = m.end()
+                continue
+            e = _bracket_end(code, j)
+            if e is None:
+                i = m.end()
+                continue
+            _blank_span(out, m.start(), e)
+            i = e
+            continue
+        # assert / assume: consume bracket groups, `forall`/`by`/`implies`
+        # words and one trailing block, and stop at the `;` or at the `}` that
+        # closes the enclosing body.
+        j, stop = m.end(), None
+        while j < n:
+            c = code[j]
+            if c.isspace():
+                j += 1
+            elif c in "([":
+                e = _bracket_end(code, j)
+                if e is None:
+                    break
+                j = e
+            elif c == "{":
+                e = _bracket_end(code, j)
+                stop = j if e is None else e
+                break
+            elif c == ";":
+                stop = j + 1
+                break
+            elif c in ")]}" or c == ",":
+                stop = j
+                break
+            elif _IDENT_RE.match(code, j) or c in "|&<>=!+-*/%.:_":
+                w = _IDENT_RE.match(code, j)
+                j = w.end() if w else j + 1
+            else:
+                stop = j
+                break
+        _blank_span(out, m.start(), stop if stop is not None else j)
+        i = (stop if stop is not None else j) or m.end()
+    return "".join(out)
+
+
+@functools.lru_cache(maxsize=512)
+def exec_code(src, lang="rust"):
+    """`src` with everything that does not reach a codegen unit blanked.
+
+    Offset- and line-preserving, so a hit's line number is still the source's.
+    Five layers, in order:
+
+      1. comments and string/char literals (`vparse.blank_noncode`);
+      2. items gated on a `#[cfg(...)]` no cell here builds (`CODEGEN_CFGS`);
+      3. `spec fn` / `proof fn` items, by kind, from `vparse.parse`;
+      4. Verus ghost CLAUSES -- `requires`/`ensures`/`invariant`/`decreases`
+         and the rest of `_GHOST_KW`, on items and on loop headers alike;
+      5. Verus ghost STATEMENTS -- `proof {}`, `assert`/`assume`, `let ghost`,
+         `let tracked`, `Ghost(...)`, `Tracked(...)`.
+
+    Layers 2-5 are Rust-only and skipped for `lang="c"`; blanking a C `assert(`
+    would be wrong, since C's is exec code.
+
+    **Why layers 2-5 exist at all, and it is one sentence, this function's
+    own**: they erase before codegen, so they cannot carry the property a
+    `forbidden` spelling is forbidden for. Layer 4 shipped with that
+    justification (`spelling_matches` below quotes it verbatim); layers 2, 3
+    and 5 are the same argument applied to the constructs it did not cover, and
+    TASK_068_REVIEW B1 measured what they were worth once a hit began to FAIL:
+    **11 of 14 honest shapes blocked**, with 275 `assert(`, 127 `spec fn`, 78
+    `proof {` and 43 `#[cfg(slb_twin)]` surviving the audit across 21 of 21
+    Rust rung sources. `patterns/p09-bitset/spec.md`'s `idiom.why` -- inside
+    `contract_sha256` -- documents the trap and says p09's spec functions spell
+    an index `q as int / 64` to dodge it: **the specification was contorted to
+    keep an audit count at zero**, and after TASK_068 that contortion was the
+    only thing keeping p09 green.
+
+    ⚠ **Structural where the parser can answer, enumerated where it cannot, and
+    the boundary is worth knowing** (TASK_069, answering the question the task
+    file asked by name). Layers 2 and 3 are *structural*: "which items reach
+    codegen" is answered by `vparse.parse`'s item kinds plus the cfg set
+    `build.py` passes, so neither is a special case and neither grew out of a
+    failure. Layer 5 cannot be: `proof`/`assert`/`ghost` are STATEMENTS inside
+    an exec body, `vparse` models items and clauses only, and Verus's real
+    exec/ghost boundary is a mode judgement made by its front end. The
+    enumeration in `_blank_ghost_stmts` is closed and comes from the language's
+    ghost grammar rather than from this project's incident history -- which is
+    the difference that matters -- but it IS an enumeration. The only true
+    oracle is Verus itself, and it is not available cheaply: the pinned build
+    has no erased-source dump (`--log` offers VIR/AIR/SMT, no Rust), a Verus
+    run costs minutes per pattern, and it would answer for `verus.rs` only
+    while the audit spans all six rungs."""
+    code = vparse.blank_noncode(src)
+    if lang == "c":
+        return code
+    code = _blank_unbuilt_cfg(code)
+    code = _blank_ghost_items(src, code)
+    return _blank_ghost_stmts(_blank_ghost(code))
+
+
+def spelling_matches(spelling, src, lang="rust"):
     """Does `src` spell `spelling`? The named-spelling standard's matching rule.
 
-    This is a DEFINITION, not a gate check. Nothing in this file calls it
-    against a rung source: stage 0b is presence-only and the threat model is
-    honest mistake, not malicious author (`.memory/02-bench-rules.md`). It lives
+    This is the DEFINITION the standard's word "literal" refers to, and since
+    TASK_068 it is also a gate check: `idiom_audit` calls it against every rung
+    source and a `forbidden` hit FAILS the run (`forbidden_verdict`). Before
+    TASK_068 nothing in this file called it against a rung source and this
+    docstring said so; it was true then and is false now, and TASK_068_REVIEW
+    m1 found it still saying it. It lives
     here, selftested at stage 0 and therefore inside `source_sha256`, because
     the standard's word "literal" was undefined for three tasks and **twenty
     shipped obligations turned on the gap** (TASK_018_REVIEW B1, TASK_019). A
@@ -780,17 +1120,30 @@ def spelling_matches(spelling, src):
         not use it; and `patterns/p17-http-range/c/kernel.c` matches
         `2 + 2*nsuf > len` on raw text only because a comment spells it that way
         while the code writes the spaced form -- a match for the wrong reason.
-      * **Verus ghost clauses are blanked.** They erase before codegen and their
-        arithmetic is over unbounded `int`, so they cannot carry the overflow an
+      * **Verus ghost code is blanked.** It erases before codegen and its
+        arithmetic is over unbounded `int`, so it cannot carry the overflow an
         additive spelling is forbidden for. Without this,
         `patterns/p16-tlv-walk/verus.rs`'s loop invariant `p + 3 + vlen <= end`
         makes p16's own R5 violate p16's `forbidden[0]` -- on the one pattern
-        TASK_018_REVIEW called decidable.
+        TASK_018_REVIEW called decidable. ⚠ **That sentence shipped covering
+        CLAUSES only** while the same argument holds verbatim of `proof {}`
+        blocks, `assert(...)`, `spec fn`/`proof fn` bodies, `let ghost` and
+        code gated on a cfg no cell sets -- TASK_068_REVIEW B1, closed at
+        TASK_069; `exec_code` above has the measurement and the five layers.
 
     What it does NOT decide, and no code can: the POLARITY of a quoted span
     (p02's `|`, p08's `&`, p17's `continue` are quoted in order to be absent)
-    and the SET OF RUNGS an entry scopes to. Both live in the entry's English."""
-    return _WS.sub("", spelling) in _WS.sub("", exec_code(src))
+    and the SET OF RUNGS an entry scopes to. Both live in the entry's English.
+
+    ⚠ **Nor does it decide what a SUBSTRING is.** Matching is substring
+    matching after whitespace deletion, so a `forbidden` entry that backticks
+    `strlen(` also matches an honest `slb_strlen(`, `position(` matches
+    `rposition(`, `split` matches `split_first`, and `q / 64` matches
+    `freq / 64`. Those are not false positives of the blanking -- they are the
+    entry quoting a span that is genuinely present -- so they are the author's
+    to write more specifically (`= strlen(`, ` v.split(`), and
+    `forbidden_verdict`'s failure text names them."""
+    return _WS.sub("", spelling) in _WS.sub("", exec_code(src, lang))
 
 
 _WS = re.compile(r"\s+")
@@ -1125,10 +1478,42 @@ def rung_sources(pdir):
     return [(r, l) for r, l in out if os.path.exists(os.path.join(pdir, r))]
 
 
-def idiom_audit(contract, rungs):
+def forbidden_only_sources(pdir):
+    """Sources audited for `forbidden` but NOT for `required`.
+
+    `c/kernel.h` is `#include`d into the C rung and compiled with it, so a
+    kernel body moved into a `static inline` there would leave the audit
+    entirely -- the honest-refactor escape route TASK_068_REVIEW m7 named. It
+    is closed for the half where scope is decidable, and only that half:
+
+      * `forbidden` is universal by the key's own meaning -- *no* compiled code
+        may spell the token -- and the header is compiled code, so scanning it
+        adds hits and nothing else. Measured at TASK_069: **0 hits over 197
+        spellings**, and no `kernel.h` in the tree contains a `static inline`
+        yet;
+      * `required` is scoped by the entry's English, and a header holds
+        prototypes rather than implementations, so every C spelling would be
+        "absent" from it. Measured: adding `c/kernel.h` to `rung_sources`
+        outright takes `required_absent` from **94 to 301** tree-wide, 207 rows
+        of noise in the one bucket whose value is that a non-zero is worth
+        reading. Adding `c/main.c` as well takes it to **507**. Declined for
+        that half, deliberately, and the measurement is the reason.
+
+    `c/main.c` is not here either: it is the driver, identical in shape across
+    all 20 patterns, and it implements no kernel."""
+    return [(r, "c") for r in (os.path.join("c", "kernel.h"),)
+            if os.path.exists(os.path.join(pdir, r))]
+
+
+def idiom_audit(contract, rungs, extra=()):
     """Where each declared spelling is, and is not, in the tree.
 
-    `rungs` is `[(relpath, language, source_text)]`. This function itself is
+    `rungs` is `[(relpath, language, source_text)]`; `extra` is the same shape
+    for sources audited against `forbidden` ONLY -- today `c/kernel.h`, see
+    `forbidden_only_sources` for why that split is measured rather than chosen.
+    `extra` deliberately does NOT enter `pairs` or `present`, which are
+    `required`'s numbers and are compared against committed records.
+    This function itself is
     pure: it computes and returns, it never calls `rep`. **Its `forbidden_hits`
     are failed by `check_idiom`** (TASK_068); everything else it returns is an
     observation printed into the record so that a reviewer can read it, and so
@@ -1168,12 +1553,17 @@ def idiom_audit(contract, rungs):
         transcribed into `NOTES.md`, across three tasks and two adversarial
         reviews, and nobody acted on it.
       * **The false-positive surface is nil today**: `forbidden_hits` is **0**
-        across all 20 patterns (183 forbidden spellings at the time of writing;
-        the invariant is the ZERO, not the denominator). The same sweep with
-        comments, string literals and ghost clauses NOT blanked gives **29 hits
-        across 11 patterns** -- that difference *is* the value of
-        `spelling_matches`'s blanking half, and it is what a naive
-        implementation would fail on.
+        across all 20 patterns. ⚠ **Every denominator below is RECOMPUTABLE and
+        none of them is a constant** -- `.temp/p69/audit_probe.py` prints the
+        whole table from the committed tree, and TASK_068 shipped this
+        paragraph quoting *183 spellings* and *29 hits across 11 patterns*,
+        both transcribed rather than measured and both wrong against artefacts
+        in their own commit (TASK_068_REVIEW M3). Re-measured at TASK_069:
+        **197 backticked forbidden spellings over 111 entries**, and the same
+        sweep on RAW text gives **40 hits across 13 patterns** (blanking
+        comments and string literals only leaves **2 across 2**). The invariant
+        is the ZERO; the 40 is what `exec_code` is worth, and it is what a
+        naive implementation would fail on.
 
     ⚠ **The counter-argument, recorded because it is right about strength and
     wrong about direction** (TASK_063's own engineer): a failure here is
@@ -1184,13 +1574,32 @@ def idiom_audit(contract, rungs):
     forcing beats none**, and the check is not being asked to judge the entry's
     English, only to make the contradiction impossible to walk past.
 
-    ⚠ **Two known false-positive shapes, both measured at 0 on the shipped tree,
-    named here so that a hit that IS one is recognisable rather than
-    mysterious**: `spelling_matches` does not blank `#[cfg(slb_twin)]` bodies,
-    so a forbidden spelling that exists only in a twin no build contains would
-    count (RECAP "Owed" 10, blast radius 0 of 15 pins); and `rung_sources`
-    includes `CONTROL_CELLS`, today `["safe_naive_verus"]`, which no pattern
-    ships. Both are harness defects if they ever fire -- not pattern defects.
+    ⚠ **The false-positive shapes, corrected at TASK_069, because TASK_068
+    named two and there were at least seven.** Both of the two it named were
+    wrong on their own terms: the `#[cfg(slb_twin)]` one was real and is now
+    CLOSED (`exec_code` layer 2), and the other said `rung_sources` includes
+    `CONTROL_CELLS` *"which no pattern ships"* -- **p01 ships
+    `safe_naive_verus.rs` and it is p01's 6th audited rung**, which one `ls`
+    refutes (TASK_068_REVIEW M1; `.memory/02-bench-rules.md:196`, where it was
+    copied from, is corrected too). What remains, and what a debugger reading a
+    hit should check in this order:
+
+      * **a hit in the CONTROL cell.** `safe_naive_verus.rs` is a control, not
+        a rung of the ladder -- by construction a different implementation --
+        so a `forbidden` entry scoped to the ladder can hit it honestly. p01
+        ships one; 0 tokens hit it today.
+      * **substring matching**, which `spelling_matches` documents: `strlen(`
+        matches `slb_strlen(`, `position(` matches `rposition(`, `split`
+        matches `split_first`, `q / 64` matches `freq / 64` after whitespace
+        deletion. The entry is quoting a span that really is present; write a
+        longer one.
+      * **an entry that backticks its REPLACEMENT.** `required` entries are
+        written that way all over the tree (`written `%` and not `&`), and in a
+        `forbidden` entry *every* backticked span becomes a banned token, so
+        `` `strcpy(` -- use `memcpy(` instead `` forbids `memcpy(` too.
+
+    Ghost code, cfg-gated code, comments and string literals are NOT on this
+    list any more: `exec_code` blanks all five layers, measured at TASK_069.
 
     `required` has no such scope. Which rungs an entry applies to lives in its
     English -- "R1 has no fit check at all", "R1 omits only `&& start >= 0`" --
@@ -1218,12 +1627,28 @@ def idiom_audit(contract, rungs):
       * `absent` -- present in some rungs of that language and not others, i.e.
         the entry is scoped and the reader should check the scope.
 
-    The 11 residual `pins_nothing` on the shipped tree are all expected, and
-    they split 6/5: **six** are prose references that happen to be backticked
+    The residual `pins_nothing` on the shipped tree are all expected. ⚠ **The
+    count is 16 as of TASK_069 and it is RECOMPUTABLE, not a constant** --
+    `.temp/p69/audit_regress.py` prints it and the per-entry rows beside the
+    committed records; this paragraph said *"11 ... split 6/5"* while the tree
+    summed to 15, because p27, p38 and p47 shipped after it was written. They
+    split **11 / 5**: eleven are prose references that happen to be backticked
     (`c/kernel.c`, `adversarial-overrun.bin` twice, `md5_fn e207ec6c8697...`,
-    and the word `why` twice) and **five** are spans quoted in order to be
-    absent (`src_len`, `dst_cap`, `&`, `continue` twice). **A non-zero here is
-    normal**; what is worth reading is a change.
+    the word `why` twice, p27's `vstd::raw_ptr::deallocate`, `deallocate`,
+    `malloc` and `align <= 8`, p47's `bcmp`) and five are spans quoted in order
+    to be absent (`src_len`, `dst_cap`, `&`, `continue` twice). **A non-zero
+    here is normal**; what is worth reading is a change.
+
+    ⚠ **Two of those rows arrived at TASK_069 and they are the ghost-blanking
+    fix working on the `required` half**, which is worth knowing because that
+    half is presence-only and cannot fail: p27's `deallocate` was spelled in
+    exactly one place in the whole tree, its `#[cfg(slb_twin)]` verified twin
+    (`verus.rs:558`), and a twin is in no build -- so the entry read as PRESENT
+    on the strength of code no cell compiles, which is precisely the false
+    *satisfaction* RECAP "Owed" 10 predicted. p12's `.wrapping_add(nstr as u64)`
+    was matched only inside `spec fn fin` (`verus.rs:178`) and is now correctly
+    scoped-absent on `verus.rs`. Tree-wide, `required_absent` moved 96 -> 94 and
+    `pins_nothing` 15 -> 16; no `forbidden_hits` moved, from 0.
 
     **`no_rung` -- a fourth bucket, closed at TASK_021.** A per-language entry
     may name a language this pattern ships no rung for. Before TASK_021 that
@@ -1245,8 +1670,9 @@ def idiom_audit(contract, rungs):
     rung to ask", which is a fact about the pattern's shape."""
     langs = sorted({l for _, l, _ in rungs})
     text = {(r, l): s for r, l, s in rungs}
+    xtext = {(r, l): s for r, l, s in extra}
     n_sp = n_pair = n_present = n_forb_sp = 0
-    pins_nothing, absent, hits, no_rung = [], [], [], []
+    pins_nothing, absent, hits, no_rung, unaudited = [], [], [], [], []
     for key in ("required", "forbidden"):
         for i, e in enumerate(contract.get("idiom", {}).get(key) or []):
             per = ({l: e for l in langs} if isinstance(e, str)
@@ -1258,13 +1684,15 @@ def idiom_audit(contract, rungs):
                         continue        # a typo; `idiom_problems` already failed
                     no_rung.append({"entry": f"{key}[{i}]", "lang": lang,
                                     "spellings": _TICK.findall(e[lang])})
+            n_entry_sp = 0
             for lang in sorted(per):
                 for tok in _TICK.findall(per[lang]):
                     here = [r for r, l in sorted(text) if l == lang]
                     on = [r for r in here
-                          if spelling_matches(tok, text[(r, lang)])]
+                          if spelling_matches(tok, text[(r, lang)], lang)]
                     off = [r for r in here if r not in on]
                     n_sp += 1
+                    n_entry_sp += 1
                     n_pair += len(here)
                     n_present += len(on)
                     row = {"entry": f"{key}[{i}]", "lang": lang,
@@ -1273,15 +1701,31 @@ def idiom_audit(contract, rungs):
                         n_forb_sp += 1
                         for r in on:
                             hits.append(dict(row, rung=r))
+                        for r, l in sorted(xtext):
+                            if l == lang and spelling_matches(
+                                    tok, xtext[(r, l)], l):
+                                hits.append(dict(row, rung=r))
                     elif not on:
                         pins_nothing.append(dict(row, of_rungs=len(here)))
                     else:
                         for r in off:
                             absent.append(dict(row, rung=r))
+            # TASK_069, from TASK_068_REVIEW M2. PER ENTRY, because the shout
+            # this feeds used to fire only when EVERY entry lacked a backtick:
+            # p08 (3 of 4), p16 (1 of 2) and p17 (2 of 3) took the `ok` branch
+            # and printed "0 hit(s) over N forbidden spelling(s) ... Decidable
+            # and ENFORCED" while most of the declaration was audited zero
+            # times. The list of 2 was a list of 5.
+            if key == "forbidden" and n_entry_sp == 0:
+                unaudited.append({"entry": f"forbidden[{i}]",
+                                  "text": idiom_entry_text(e)})
     return {"spellings": n_sp, "rungs": len(rungs), "pairs": n_pair,
             "present": n_present, "languages": langs,
+            "forbidden_only_sources": sorted(r for r, _ in xtext),
             "forbidden_spellings": n_forb_sp, "forbidden_hits": len(hits),
             "hits": hits,
+            "forbidden_unaudited_entries": len(unaudited),
+            "forbidden_unaudited": unaudited,
             "required_pins_nothing": len(pins_nothing),
             "pins_nothing": pins_nothing,
             "required_absent": len(absent), "absent": absent,
@@ -1300,8 +1744,12 @@ def idiom_audit_lines(au):
            f"{au['rungs']} rung(s) -> {au['pairs']} (spelling, rung) pair(s), "
            f"{au['present']} present  [the `required` numbers never fail]",
            f"    audit  forbidden: {au['forbidden_spellings']} spelling(s), "
-           f"{au['forbidden_hits']} hit(s)  "
-           f"(decidable: no rung may spell a forbidden token -- a hit FAILS)",
+           f"{au['forbidden_hits']} hit(s), "
+           f"{au.get('forbidden_unaudited_entries', 0)} entry/entries with NO "
+           f"backticked spelling  "
+           f"(decidable: no rung may spell a forbidden token -- a hit FAILS; "
+           f"also scanned, for `forbidden` only: "
+           f"{au.get('forbidden_only_sources') or 'none'})",
            f"    audit  required : {au['required_pins_nothing']} pin nothing, "
            f"{au['required_absent']} scoped-absent pair(s)  "
            f"(NOT decidable -- an entry's rung scope is its English; a "
@@ -1317,6 +1765,9 @@ def idiom_audit_lines(au):
     for h in au["hits"]:
         out.append(f"    audit    FORBIDDEN HIT {h['entry']:<13}{h['lang']:<5}"
                    f"{h['rung']:<22}`{h['spelling']}`")
+    for u in au.get("forbidden_unaudited") or []:
+        out.append(f"    audit    NOT AUDITED   {u['entry']:<13}{'':<5}"
+                   f"{'no backticked span':<22}{u['text'][:44]}")
     for p in au["pins_nothing"]:
         out.append(f"    audit    pins nothing  {p['entry']:<13}{p['lang']:<5}"
                    f"0 of {p['of_rungs']} rung(s){'':<9}`{p['spelling']}`")
@@ -1367,7 +1818,9 @@ def check_idiom(rep, pdir, contract):
     # carries the accident test and the counter-argument.
     rungs = [(r, l, open(os.path.join(pdir, r)).read())
              for r, l in rung_sources(pdir)]
-    au = idiom_audit(contract, rungs)
+    extra = [(r, l, open(os.path.join(pdir, r)).read())
+             for r, l in forbidden_only_sources(pdir)]
+    au = idiom_audit(contract, rungs, extra)
     if au["spellings"] == 0:
         rep.ok("idiom spelling audit: this declaration backticks NO spelling, "
                "so the named-spelling standard's own trigger never fires here "
@@ -1398,7 +1851,23 @@ def forbidden_verdict(rep, au, nforb):
     Split out of `check_idiom` so `_FORBIDDEN_VERDICT_CASES` can drive it with a
     stub report -- the check that TASK_053/TASK_056 declined and TASK_063
     recommended is worth a selftest of its own, not just of the counter it
-    reads."""
+    reads.
+
+    ⚠ **The vacuity shout is PER ENTRY, not all-or-nothing** (TASK_069, from
+    TASK_068_REVIEW M2). TASK_068 reached it only when `forbidden_spellings`
+    was 0, i.e. when *every* entry lacked a backtick, so it named p01 and p05
+    and missed p08 (3 of 4 entries unaudited), p16 (1 of 2) and p17 (2 of 3) --
+    which took the `ok` branch and printed *"0 hit(s) over N forbidden
+    spelling(s) ... Decidable and ENFORCED"* over a declaration most of which
+    is audited zero times. **The list of 2 was a list of 5.**
+
+    ⚠ **And the obvious repair does not work on every entry**, which is why
+    this shouts rather than fails: p05's `forbidden[1]` is *"a running row
+    pointer"*, a structural property with **no token to backtick at all**.
+    Backticking p05's other entry would move it out of the loud all-vacuous
+    state into a quiet partly-vacuous one -- the exact regression this split
+    exists to prevent. An entry that cannot be backticked is legitimate; an
+    entry that is silently unaudited is not."""
     if au["forbidden_hits"]:
         for h in au["hits"]:
             rep.fail("idiom-forbidden",
@@ -1414,27 +1883,50 @@ def forbidden_verdict(rep, au, nforb):
         rep.shout("idiom-forbidden",
                   f"{au['forbidden_hits']} forbidden hit(s) over "
                   f"{au['forbidden_spellings']} forbidden spelling(s). If one "
-                  f"of these looks wrong, check the two known false-positive "
-                  f"shapes first -- a spelling that exists only inside a "
-                  f"`#[cfg(slb_twin)]` body (`spelling_matches` does not blank "
-                  f"those) or a hit in a CONTROL_CELLS source. Both were 0 on "
-                  f"the whole tree when this check was turned on.")
+                  f"of these looks wrong, these are the shapes that are the "
+                  f"HARNESS's fault or the ENTRY's, not the rung's, and none "
+                  f"of them is ghost code any more (`exec_code` blanks comments,"
+                  f" string literals, ghost clauses, `proof`/`assert`/`let "
+                  f"ghost` statements, `spec fn`/`proof fn` bodies and items "
+                  f"gated on a cfg no cell builds): (1) the hit is in "
+                  f"`safe_naive_verus.rs`, a CONTROL cell rather than a rung of "
+                  f"the ladder -- p01 ships one; (2) the spelling is a SUBSTRING "
+                  f"of an honest longer one (`strlen(` in `slb_strlen(`, "
+                  f"`position(` in `rposition(`, `q / 64` in `freq / 64` after "
+                  f"whitespace deletion); (3) the entry backticks its own "
+                  f"REPLACEMENT (`` `strcpy(` -- use `memcpy(` ``) and so "
+                  f"forbids both. All were 0 on the whole tree at TASK_069.")
     elif au["forbidden_spellings"]:
         rep.ok(f"idiom forbidden: 0 hit(s) over {au['forbidden_spellings']} "
                f"forbidden spelling(s) x the rungs of the language(s) each "
                f"declares. Decidable and ENFORCED since TASK_068 -- a hit is a "
                f"gate failure, not a printed number.")
-    elif nforb:
-        # The p09 shape, and it is exactly the vacuous-truth defect
-        # `.memory/02-bench-rules.md` calls this project's most repeated one: a
-        # `forbidden` entry with no BACKTICKED span is audited zero times, so
-        # "0 hits" would be earned by auditing nothing. Never `rep.ok` here.
+    # The p09 shape, and it is exactly the vacuous-truth defect
+    # `.memory/02-bench-rules.md` calls this project's most repeated one: a
+    # `forbidden` entry with no BACKTICKED span is audited zero times, so its
+    # share of "0 hits" is earned by auditing nothing. Never silent, and
+    # reached whether or not the pattern's OTHER entries are audited.
+    for u in au.get("forbidden_unaudited") or []:
+        rep.shout("idiom-forbidden",
+                  f"idiom.{u['entry']} has NOT ONE backticked spelling, so the "
+                  f"enforced audit never ranges over it and its share of the "
+                  f"0 hits above is vacuous: {u['text'][:160]}. Backtick the "
+                  f"spelling if it has one (p09 shipped 5 entries and 0 audited "
+                  f"spellings; TASK_038_REVIEW) -- and if it has none, because "
+                  f"the entry forbids a STRUCTURE rather than a token (p05's "
+                  f"'a running row pointer'), say so in `why`: this line is "
+                  f"then permanent and correct, and it is what stops the "
+                  f"pattern's `ok` above from reading as enforcement it "
+                  f"does not have.")
+    if nforb and not au.get("forbidden_unaudited") and \
+            not au["forbidden_spellings"]:
+        # Defensive: entries exist, none is unaudited, and yet nothing was
+        # audited -- unreachable while `forbidden_unaudited` is computed from
+        # the same loop, and loud rather than silent if that ever changes.
         rep.shout("idiom-forbidden",
                   f"this pattern declares {nforb} forbidden entry/entries and "
-                  f"NOT ONE backticked spelling, so the enforced audit ranges "
-                  f"over an EMPTY set and its 0 hits are vacuous. Backtick "
-                  f"every `forbidden` entry you want enforced (p09 shipped 5 "
-                  f"entries and 0 audited spellings; TASK_038_REVIEW).")
+                  f"the audit ranges over an EMPTY set, with no entry named as "
+                  f"unaudited. That combination is a harness defect.")
 
 
 class _StubReport:
@@ -1550,6 +2042,55 @@ _MATCH_CASES = [
      spelling_matches("end - p >= 3",
                       "while end - p >= 3\n    invariant end - p >= 0,\n"
                       "{\n    p = p + 1;\n}\n"), True),
+    # ---- TASK_069, from TASK_068_REVIEW B1: the four ghost shapes the clause
+    # blanker did not cover, each measured surviving into the audit on 20 of 20
+    # shipped `verus.rs`, and each a HARD FAIL since TASK_068. The negative
+    # cases below them are the over-blanking guard: this must not eat exec code.
+    ("a `proof {}` block is ghost (p22 discharges its `decreases` this way)",
+     spelling_matches("i + step <= cap",
+                      "while i < cap {\n"
+                      "    proof { assert(i + step <= cap); }\n"
+                      "    i = i + step;\n}\n"), False),
+    ("a `spec fn` body is ghost -- p09 respelled its SPECIFICATION to dodge this",
+     spelling_matches("q / 64",
+                      "spec fn word_of(q: nat) -> nat { q / 64 }\n"
+                      "fn kernel(v: &[u64]) -> u64 { v[0] }\n"), False),
+    ("a statement-level `assert(...)` is ghost",
+     spelling_matches("p + 3 + vlen <= end",
+                      "fn kernel() -> u64 {\n"
+                      "    assert(p + 3 + vlen <= end);\n    0\n}\n"), False),
+    ("a `let ghost` binding is ghost",
+     spelling_matches("acc + v[i]",
+                      "fn kernel() -> u64 {\n"
+                      "    let ghost before = acc + v[i];\n    0\n}\n"), False),
+    ("a `#[cfg(slb_twin)]` body is in no build (RECAP 'Owed' 10)",
+     spelling_matches("get_unchecked",
+                      "fn kernel(v: &[u64]) -> u64 { v[0] }\n"
+                      "#[cfg(slb_twin)]\nfn twin(v: &[u64]) -> u64 {\n"
+                      "    unsafe { *v.get_unchecked(0) }\n}\n"), False),
+    ("a `#[cfg(test)]` module is in no build either",
+     spelling_matches("chunks_exact",
+                      "fn kernel(v: &[u8]) -> u64 { 0 }\n"
+                      "#[cfg(test)]\nmod tests {\n    #[test]\n"
+                      "    fn oracle() { DATA.chunks_exact(8).count(); }\n}\n"),
+     False),
+    # --- and the four things that must NOT be blanked ---
+    ("`#[cfg(slb_isolated)]` IS built (build.py:150) and still matches",
+     spelling_matches("v.get_unchecked",
+                      "#[cfg(slb_isolated)]\nfn kernel(v: &[u64]) -> u64 {\n"
+                      "    unsafe { *v.get_unchecked(0) }\n}\n"), True),
+    ("Rust's `assert!` macro is exec code and still matches",
+     spelling_matches("assert!(n > 0)",
+                      "fn kernel(n: usize) -> u64 { assert!(n > 0); 0 }\n"),
+     True),
+    ("exec code after a `proof {}` block survives",
+     spelling_matches("i = i + step",
+                      "while i < cap {\n    proof { assert(i <= cap); }\n"
+                      "    i = i + step;\n}\n"), True),
+    ("a C `assert(` is exec code -- the ghost layers are Rust-only",
+     spelling_matches("assert(len < cap)",
+                      "uint64_t kernel(void) { assert(len < cap); return 0; }\n",
+                      "c"), True),
 ]
 
 #: `idiom_audit` selftests (TASK_020). Synthetic two-rung patterns, one per
@@ -1632,6 +2173,19 @@ _AUDIT_CASES = [
      0),
     ("a plain-string entry can never hit this bucket",
      _aud(["`len > cap - 2`"], rungs=_AUD_RUNGS_C)["no_rung_entries"], 0),
+    # TASK_069: the per-entry vacuity counter `forbidden_verdict` shouts from.
+    # Counted PER ENTRY, so a declaration that is half audited reports 1 rather
+    # than 0 (TASK_068_REVIEW M2 -- p08 3 of 4, p16 1 of 2, p17 2 of 3).
+    ("an unbackticked forbidden entry is counted even beside a backticked one",
+     [_aud(["`len > cap - 2`"], ["`2 + len > cap`", "a running row pointer"])[k]
+      for k in ("forbidden_spellings", "forbidden_unaudited_entries")], [2, 1]),
+    ("a fully backticked forbidden list has nothing unaudited",
+     _aud(["`len > cap - 2`"],
+          ["`2 + len > cap`"])["forbidden_unaudited_entries"], 0),
+    ("a per-language forbidden entry backticked on ONE side is audited",
+     _aud(["`len > cap - 2`"],
+          [{"c": "`2 + len > cap`", "rust": "no cleverness"}]
+          )["forbidden_unaudited_entries"], 0),
 ]
 
 
@@ -1649,8 +2203,12 @@ _FORBIDDEN_VERDICT_CASES = [
     # token and neither is a hit.
     ("a forbidden spelling only in a comment / ghost clause is NOT a hit",
      _fv(["`len > cap - 2`"], ["`2 + len > cap`"]), [0, 1, 0]),
-    # A pattern that forbids nothing is legal (p01/p08) -- and must not get a
-    # count-bearing `ok` over an empty set.
+    # A pattern that forbids nothing must not get a count-bearing `ok` over an
+    # empty set. ⚠ NO SHIPPED PATTERN HAS `nforb == 0`: p01 declares 1 entry and
+    # p08 declares 4, and TASK_068 cited both here as if they were this case
+    # (TASK_068_REVIEW m3). `idiom_problems` permits it -- `MAX_TWIN_JUSTIFICATIONS`
+    # is why -- so the shape is legal and untested on the tree, which is exactly
+    # what a selftest is for.
     ("forbidding nothing is legal and earns no ok",
      _fv(["`len > cap - 2`"]), [0, 0, 0]),
     # The p09 shape: entries with no backticked span are audited zero times, so
@@ -1658,6 +2216,17 @@ _FORBIDDEN_VERDICT_CASES = [
     ("a forbidden entry with no backticks SHOUTS instead of passing",
      _fv(["`len > cap - 2`"], ["chunks_exact, spelled out in English"]),
      [0, 0, 1]),
+    # TASK_069, TASK_068_REVIEW M2: the branch NO selftest constrained, and the
+    # one 3 of the 5 affected patterns are in. One entry audited, one not: the
+    # `ok` is earned for the first and the second must still shout. Before this
+    # the whole pattern took `ok` and printed "Decidable and ENFORCED".
+    ("a PARTLY unaudited declaration shouts for the unaudited entry AND oks",
+     _fv(["`len > cap - 2`"], ["`2 + len > cap`", "a running row pointer"]),
+     [0, 1, 1]),
+    # ...and the shout is per entry, so two unbackticked entries shout twice.
+    ("two unaudited entries shout twice, not once",
+     _fv(["`len > cap - 2`"], ["a running row pointer", "a strength-reduced "
+                               "induction variable"]), [0, 0, 2]),
 ]
 
 
@@ -1706,6 +2275,20 @@ def build_models(modmod, indir, names, rep):
         eh = sbg_opt(m, "expected_hang", False)
         if not isinstance(eh, bool):
             rep.fail("model", f"{name}: expected_hang is {eh!r}, want a bool")
+        elif eh and se == "fires":
+            # TASK_069, TASK_068_REVIEW M4. The two were validated
+            # independently and never against each other, so one input could
+            # carry both -- and the hang arm of `check_sanitizers` runs first,
+            # which discharged the "fires" obligation silently. Refused here as
+            # well as there, because a declaration that cannot be honoured
+            # should fail where it is written and not four stages later.
+            rep.fail("model",
+                     f"{name}: model.py declares BOTH expected_hang and "
+                     f"sanitizer_expect='fires'. A sanitizer that fires aborts "
+                     f"the process, so this input cannot both trip the bug and "
+                     f"run forever in the same C cell; whichever is true, the "
+                     f"other is unobservable and would be skipped rather than "
+                     f"checked.")
         elif eh and not name.startswith("adversarial"):
             rep.fail("model",
                      f"{name}: expected_hang is True on a NON-adversarial "
@@ -1715,6 +2298,13 @@ def build_models(modmod, indir, names, rep):
                      f"terminate is declaring its way out of it.")
         models[name] = m
     return models
+
+
+def stem_of(name):
+    """`adversarial-full.bin` -> `adversarial-full`. The contract's
+    `run.timeout_s` is keyed by stem and the models by file name, and this
+    expression was written out three times (TASK_068_REVIEW m6)."""
+    return name[:-4] if name.endswith(".bin") else name
 
 
 def check_hang_declarations(rep, all_models, budgets):
@@ -1727,10 +2317,22 @@ def check_hang_declarations(rep, all_models, budgets):
     failure modes: a prediction with no budget still costs `RUN_TIMEOUT` per
     cell (the whole cost this exists to avoid, and it would be invisible), and a
     budget with no prediction is a shortened timeout on an input nobody said
-    hangs, which is how a slow honest cell gets recorded as a hang."""
+    hangs, which is how a slow honest cell gets recorded as a hang.
+
+    ⚠ **Retrofitting a hang declaration onto an EXISTING pattern costs a
+    re-measure**, and a pattern author should know that before starting:
+    `expected_hang` lives in `model.py`, `model.py` is in
+    `measure.py::measurement_sources`, so adding it clears that pattern's
+    `source_sha256` and `measure.py --check-stale` reports STALE. Re-measuring
+    re-takes the WALL-CLOCK block, and this box's timing floor is a session
+    property -- a same-day p08 re-measure read ~18% lower on every `large` cell
+    including cells that had not changed by a byte, and a p10 one ~8% -- so the
+    pattern's published timing rows move with it. Free for a pattern that has
+    not been measured yet; a scheduled unit for anything else
+    (`.memory/03-measurement.md`, TASK_068_REVIEW m6)."""
     declared = sorted(n for n, m in all_models.items()
                       if sbg_opt(m, "expected_hang", False))
-    stems = {n[:-4] if n.endswith(".bin") else n for n in declared}
+    stems = {stem_of(n) for n in declared}
     for s in sorted(stems - set(budgets)):
         rep.fail("run-budget",
                  f"model.py declares {s}.bin non-terminating (expected_hang) "
@@ -1866,9 +2468,17 @@ def _callgrind_total(binary, arg, outfile):
     *difference*: `.memory/03-measurement.md` shows the absolute value moves
     with the size of the environment block, and every one of those terms cancels
     when the same binary is run twice in the same shell."""
-    r = subprocess.run([VALGRIND, "--tool=callgrind",
-                        f"--callgrind-out-file={outfile}", binary, arg],
-                       capture_output=True, text=True, timeout=RUN_TIMEOUT)
+    try:
+        r = subprocess.run([VALGRIND, "--tool=callgrind",
+                            f"--callgrind-out-file={outfile}", binary, arg],
+                           capture_output=True, text=True, timeout=RUN_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        # TASK_069, TASK_068_REVIEW m5. `run.timeout_s` does not reach here, so
+        # a probe input that does not terminate would take `RUN_TIMEOUT` and
+        # then kill the gate with an uncaught traceback instead of failing the
+        # stage. `check_marginal_ir` refuses such an input up front now; this is
+        # the backstop for a cell that is merely slower than 900 s.
+        return None
     if r.returncode != 0:
         return None
     for line in open(outfile):
@@ -1972,6 +2582,21 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
         pr = {n: _probe_input(src, n, os.path.join(scratch, f"probe.{nm}.{n}.bin"))
               for n in (lo, hi)}
         mods = {n: sb(modmod.build, pr[n]) for n in (lo, hi)}
+        if any(sbg_opt(mods[n], "expected_hang", False) for n in (lo, hi)):
+            # TASK_069, TASK_068_REVIEW m5. `run.timeout_s` is applied by stage
+            # 4 only, so a declared-hang probe input would be handed to
+            # callgrind with the full `RUN_TIMEOUT` and the stage would die
+            # after 900 s rather than say why. No shipped pattern names one --
+            # all 20 probe `["small.bin", "large.bin"]` -- so this is closed
+            # before the first pattern that could reach it, not after.
+            rep.fail("collapse-ir",
+                     f"{nm}: model.py declares this input non-terminating "
+                     f"(expected_hang), so it cannot be a `collapse.probe_"
+                     f"inputs` entry -- the marginal-Ir probe runs it under "
+                     f"callgrind twice and no `run.timeout_s` applies there. "
+                     f"Probe a terminating input; the hang is stage 4's to "
+                     f"record.")
+            return {}
         dcalls = sbg(mods[hi], "n_calls") - sbg(mods[lo], "n_calls")
         work = sbg(mods[hi], "work_per_call")
         rates[nm] = (sbg_opt(mods[hi], "min_ir_per_work"),
@@ -2347,13 +2972,14 @@ def check_adversarial(built, rep, adv_models, indir, cells, budgets=None):
     table = {}
     for name, mod in adv_models.items():
         m_exit, m_out = sbg(mod, "expected_exit"), sbg(mod, "expected_stdout")
-        stem = name[:-4] if name.endswith(".bin") else name
+        stem = stem_of(name)
         budget, hangs = budgets.get(stem), sbg_opt(mod, "expected_hang", False)
         print(f"    -- {name}: {sb(mod.describe)} -> model expects exit "
               f"{m_exit}, stdout {m_out.strip()!r}"
               + (f"  [declared NON-TERMINATING; budget {budget}s]"
                  if hangs else ""))
         n_hung = n_cell = 0
+        hung_cells = []
         for c in cells:
             seen = {}
             for (cc, o, m), path in sorted(built.items()):
@@ -2363,6 +2989,8 @@ def check_adversarial(built, rep, adv_models, indir, cells, budgets=None):
                                        timeout=budget)
                 n_cell += 1
                 n_hung += rc is None
+                if rc is None:
+                    hung_cells.append((f"{c} {o}/{m}", path))
                 sig = -rc if rc is not None and rc < 0 else None
                 seen.setdefault((rc, out.strip(), err.strip()[:120], sig),
                                 []).append(f"{o}/{m}")
@@ -2406,15 +3034,69 @@ def check_adversarial(built, rep, adv_models, indir, cells, budgets=None):
             rep.fail("hang",
                      f"{name}: model.py declares expected_hang, but all "
                      f"{n_cell} cell(s) terminated inside the {budget}s "
-                     f"budget. Either the budget is too short to be a hang "
-                     f"detector at all, or this input does not make any rung "
-                     f"run forever and the declaration is false.")
-        elif hangs:
+                     f"budget, so no rung ran forever and the declaration is "
+                     f"false -- or it was true of a rung this matrix no longer "
+                     f"builds. (It cannot be a budget that is too SHORT: a "
+                     f"short budget makes cells look like they hang, which is "
+                     f"the other branch. A budget that is too LONG is not a "
+                     f"failure here either, only slower.)")
+        elif hangs and _confirm_hang(rep, name, hung_cells, budget, indir):
+            # Only when the confirmation re-run AGREES. Otherwise this `ok`
+            # would be printed beside its own failure and would quantify over a
+            # cell the gate has just proved terminates -- the same rule
+            # `check_hang_declarations` follows.
             rep.ok(f"{name}: declared non-terminating and {n_hung} of {n_cell} "
                    f"cell(s) did not terminate within {budget}s "
                    f"(RUN_TIMEOUT is {RUN_TIMEOUT}s; the budget is a "
                    f"`contract_sha256` pin).")
     return table
+
+
+def _confirm_hang(rep, name, hung_cells, budget, indir):
+    """Re-run ONE hung cell at `10 x budget` and fail if it terminates.
+
+    TASK_069, from TASK_068_REVIEW B2. Without this, "hang" and "slow" are
+    indistinguishable to the gate: a real gcc binary that finishes in 3.5 s,
+    declared with `timeout_s: 2`, was recorded as a declared hang with **0
+    failures**, and being "hung" then switched two checks OFF for that input --
+    stage 7 skips the whole `sanitizer_expect` arm (`check_sanitizers`) and
+    stage 8 raises the row BLOCKED, unchecked for UB. The budget was the
+    author's own number and nothing measured against it.
+
+    **One cell, not all of them**, and the trade is deliberate: the cost is
+    `10 x budget` once per declared-hang input, where re-running every hung
+    cell would be `10 x budget x n_hung` on a pattern whose whole point is that
+    most rungs hang. So this is a SPOT CHECK -- it proves the budget is not
+    absurdly short for the cell it picked, not that every `hung=True` in the
+    recorded table is right. The cell is picked deterministically (first in
+    sorted matrix order) so the check does not move between runs.
+
+    A failure here is about the BUDGET, not the declaration: the input may
+    still make some other rung run forever.
+
+    Returns True when the hang is confirmed, so the caller can withhold its own
+    `ok` rather than print one beside this failure."""
+    if not hung_cells:
+        return False
+    label, path = sorted(hung_cells)[0]
+    longer = min(RUN_BUDGET_CONFIRM * budget, RUN_TIMEOUT)
+    rc, out, _ = run_bin(path, os.path.join(indir, name), timeout=longer)
+    if rc is None:
+        rep.ok(f"{name}: confirmed -- {label} still had not terminated at "
+               f"{longer}s ({RUN_BUDGET_CONFIRM}x the pinned budget), so the "
+               f"{budget}s budget is measuring a hang and not a slow cell.")
+        return True
+    rep.fail("hang",
+             f"{name}: {label} was recorded as NON-TERMINATING at the pinned "
+             f"{budget}s budget, but it TERMINATED in under {longer}s "
+             f"({RUN_BUDGET_CONFIRM}x that budget) with exit {rc}, stdout "
+             f"{out.strip()[:60]!r}. The budget is too short to tell a hang "
+             f"from a slow cell, and `run.timeout_s` is the one pin nothing "
+             f"else cross-checks -- so raise it until this cell really does "
+             f"run forever, or drop the `expected_hang` declaration. Note what "
+             f"the short budget was buying: a 'hung' row makes stage 7 skip "
+             f"this input's sanitizer expectation and stage 8 report it "
+             f"BLOCKED for Miri.")
 
 
 # ==========================================================================
@@ -5122,7 +5804,7 @@ def check_sanitizers(pdir, rep, indir, models, budgets=None):
     budgets = budgets or {}
     res = {}
     for name, mod in sorted(models.items()):
-        stem = name[:-4] if name.endswith(".bin") else name
+        stem = stem_of(name)
         hangs = sbg_opt(mod, "expected_hang", False)
         rc, so, se = run_bin(out, os.path.join(indir, name),
                              timeout=budgets.get(stem))
@@ -5142,16 +5824,38 @@ def check_sanitizers(pdir, rep, indir, models, budgets=None):
                      # is meaningful -- see the `elif` below.
                      "stdout": got, "model_stdout": want_out}
         if hangs and rc is None:
-            # TASK_068. Recorded, not required, and deliberately NOT a failure
-            # in either direction. Whether the *C* rung is one of the rungs that
-            # runs forever is a per-rung fact and this stage only ever builds
+            # TASK_068. Whether the *C* rung is one of the rungs that runs
+            # forever is a per-rung fact and this stage only ever builds
             # `c/kernel.c`; the load-bearing "at least one rung really did hang"
             # check is stage 4's, which sees every rung. Without this branch the
             # `rc != m_exit` test below would fail every declared hang, since
             # `expected_exit` keeps describing the CONFORMING behaviour.
-            print(f"    ok   {name:28s} did not terminate within "
-                  f"{budgets.get(stem)}s, as declared "
-                  f"[adversarial: recorded, not required]")
+            #
+            # ⚠ But it is NOT a free pass, and TASK_068 made it one
+            # (TASK_068_REVIEW M4): this arm precedes `elif expect == "fires"`,
+            # so a model declaring BOTH on one input had its
+            # `sanitizer_expect: "fires"` obligation discharged by a bare
+            # `print`, which does not even appear in the verdict's counts. The
+            # "fires" case now fails -- an obligation that cannot be evaluated
+            # is not an obligation that is met -- and the "clean" case is a
+            # `rep.note`, which is recorded rather than printed and lost.
+            # `build_models` also refuses the combination up front.
+            if expect == "fires":
+                rep.fail("sanitizer",
+                         f"{name}: model.py declares sanitizer_expect='fires' "
+                         f"AND expected_hang, and the ASan+UBSan C cell did not "
+                         f"terminate within {budgets.get(stem)}s -- so the "
+                         f"'fires' obligation was not observed, it was skipped. "
+                         f"A sanitizer that fires aborts the process, so the "
+                         f"two declarations cannot both hold of this cell: "
+                         f"declare the hang on an input whose C rung is not the "
+                         f"one that trips the bug.")
+            else:
+                rep.note(f"{name:28s} did not terminate within "
+                         f"{budgets.get(stem)}s, as declared "
+                         f"[adversarial: recorded, not required; its "
+                         f"sanitizer_expect={expect!r} is UNCHECKED on this "
+                         f"input]")
         elif expect == "fires":
             if not fired:
                 rep.fail("sanitizer",
@@ -5364,10 +6068,22 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names):
                 # call is the one that never returns. Waiting 180 s to learn
                 # that, then reporting a payload-size reason that is false, is
                 # worse than saying so. A BLOCKED row, so the verdict reads
-                # PASS-WITH-BLOCKED-ROWS and the row is loud: it cannot be used
-                # to skip a Miri check quietly, because only an `adversarial*`
-                # input may declare a hang and stage 4 fails the declaration
-                # unless a cell really did run forever.
+                # PASS-WITH-BLOCKED-ROWS and the row is loud.
+                #
+                # ⚠ TASK_068 asserted here that this "cannot be used to skip a
+                # Miri check quietly, because only an `adversarial*` input may
+                # declare a hang and stage 4 fails the declaration unless a
+                # cell really did run forever". **That was FALSE as written**
+                # (TASK_068_REVIEW B2): "really did run forever" was only ever
+                # evaluated against the author's own `run.timeout_s`, which had
+                # no floor, so a 3.5 s cell under a 2 s budget satisfied stage
+                # 4 with 0 failures and switched this check off. It is true
+                # NOW, and only because of what TASK_069 added: a
+                # `RUN_BUDGET_FLOOR` on the pin, and `_confirm_hang`, which
+                # re-runs one hung cell at 10x the budget and FAILS if it
+                # terminates. A false comment is what the next reader trusts
+                # instead of reading the code, so it is fixed here as well as
+                # in the code it described.
                 why = (f"model.py declares this input non-terminating "
                        f"(expected_hang), so R4 does not return under Miri "
                        f"either. n_iters is clamped to {MIRI_PROBE_ITERS} but "
@@ -5501,8 +6217,13 @@ def main():
     audit = check_idiom(rep, pdir, contract)
     budgets = run_budgets(contract, rep, all_stems)
     if budgets:
+        # `.get`, not `[...]`: `run_budgets` FAILS on a missing `why` and still
+        # returns the budgets it parsed, so indexing here turned a clean gate
+        # failure into a Python traceback with no verdict and no
+        # `results/gate/*.json` at all -- the author lost the very message the
+        # guard was written to print (TASK_068_REVIEW M5).
         print(f"  run budgets {budgets} s (RUN_TIMEOUT {RUN_TIMEOUT}s "
-              f"otherwise) -- {contract['run']['why']}")
+              f"otherwise) -- {contract['run'].get('why')}")
 
     if a.no_build:
         built = {}

@@ -33,9 +33,19 @@
       "c",
       "rust"
     ],
+    "forbidden_only_sources": [
+      "c/kernel.h"
+    ],
     "forbidden_spellings": 4,
     "forbidden_hits": 0,
     "hits": [],
+    "forbidden_unaudited_entries": 1,
+    "forbidden_unaudited": [
+      {
+        "entry": "forbidden[1]",
+        "text": "tag dispatch or skipped records"
+      }
+    ],
     "required_pins_nothing": 2,
     "pins_nothing": [
       {
@@ -78,7 +88,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "7965e53a73db0408083cac03c4cb3e7d53a5a58e3f6c26cef7dda613077f230b",
+    "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
@@ -898,7 +908,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2912371==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51f000001a80 at pc 0x56009bce7717 bp 0x7ffcad3f2610 sp 0x7ffcad3f2600 READ of size 1 at 0x51f000001a80 thread T0 #0 0x56009bce7716 in kernel /home/apt/repos_common/",
+      "diagnostic": "================================================================= ==3154387==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51f000001a80 at pc 0x55d502c3e717 bp 0x7ffeec9febf0 sp 0x7ffeec9febe0 READ of size 1 at 0x51f000001a80 thread T0 #0 0x55d502c3e716 in kernel /home/apt/repos_common/",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1022,7 +1032,12 @@
   },
   "failures": [],
   "notes": [],
-  "loud": [],
+  "loud": [
+    {
+      "section": "idiom-forbidden",
+      "message": "idiom.forbidden[1] has NOT ONE backticked spelling, so the enforced audit never ranges over it and its share of the 0 hits above is vacuous: tag dispatch or skipped records. Backtick the spelling if it has one (p09 shipped 5 entries and 0 audited spellings; TASK_038_REVIEW) -- and if it has none, because the entry forbids a STRUCTURE rather than a token (p05's 'a running row pointer'), say so in `why`: this line is then permanent and correct, and it is what stops the pattern's `ok` above from reading as enforcement it does not have."
+    }
+  ],
   "blocked": [],
   "verdict": "PASS",
   "complete_run": true,

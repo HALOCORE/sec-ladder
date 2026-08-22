@@ -34,9 +34,19 @@
       "c",
       "rust"
     ],
+    "forbidden_only_sources": [
+      "c/kernel.h"
+    ],
     "forbidden_spellings": 0,
     "forbidden_hits": 0,
     "hits": [],
+    "forbidden_unaudited_entries": 1,
+    "forbidden_unaudited": [
+      {
+        "entry": "forbidden[0]",
+        "text": "a dead v_len parameter on the C kernel"
+      }
+    ],
     "required_pins_nothing": 0,
     "pins_nothing": [],
     "required_absent": 0,
@@ -59,7 +69,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "7965e53a73db0408083cac03c4cb3e7d53a5a58e3f6c26cef7dda613077f230b",
+    "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
@@ -1525,7 +1535,7 @@
   "loud": [
     {
       "section": "idiom-forbidden",
-      "message": "this pattern declares 1 forbidden entry/entries and NOT ONE backticked spelling, so the enforced audit ranges over an EMPTY set and its 0 hits are vacuous. Backtick every `forbidden` entry you want enforced (p09 shipped 5 entries and 0 audited spellings; TASK_038_REVIEW)."
+      "message": "idiom.forbidden[0] has NOT ONE backticked spelling, so the enforced audit never ranges over it and its share of the 0 hits above is vacuous: a dead v_len parameter on the C kernel. Backtick the spelling if it has one (p09 shipped 5 entries and 0 audited spellings; TASK_038_REVIEW) -- and if it has none, because the entry forbids a STRUCTURE rather than a token (p05's 'a running row pointer'), say so in `why`: this line is then permanent and correct, and it is what stops the pattern's `ok` above from reading as enforcement it does not have."
     },
     {
       "section": "twin",
