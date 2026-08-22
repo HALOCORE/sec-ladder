@@ -411,7 +411,7 @@ that is the deliverable for these rows**, not a green checkmark.
 | p44 | fixed-point arithmetic | overflow, rounding | moderate | planned |
 | p45 | saturating / wrapping arithmetic helpers | signed overflow UB | easy–moderate | planned |
 | p46 | bignum limb add/mul (schoolbook) | carry propagation, limb bounds | hard | planned |
-| p47 | constant-time compare / select | **timing side channel** — compiler may reintroduce a branch | moderate | planned |
+| p47 | constant-time compare / select | **timing side channel.** ⚠ **The catalogue's guess -- *"compiler may reintroduce a branch"* -- is REFUTED** (T064 + T064_REVIEW: 5 accumulate spellings, gcc 13.3 and clang 22.1 at five opt levels, rustc at five, **LTO, PGO trained 100% on mismatch-at-byte-0, AVX2, AVX-512, `__builtin_expect` in three placements, a branching caller** -- `Ir(k=0) - Ir(k=n-1) = 0` **exactly**, with a detector control that fires). **The adversary is the IDIOM, not the optimiser**; the leaking rung is safe Rust's own `a == b` | moderate | **done** (T064), gate `PASS` first complete run, R5 **12/0 first run, no lemma** (twin 13/0), `R4 == R5` `exact` at O3 / `norel` at O0, **TCB 3**, Miri 7/7, additivity extrapolation **80/80 exact**, **reviewed** (T064_REVIEW: 3 majors, 6 minors, **32 clean negatives**; corrections at T065). **The proof certifies a LEAKING kernel**: `m_leak` verifies 14/0 with `kernel`'s obligation count unchanged at 3 and leaks **+7088 `Ir`**, under an **identical contract** -- a property of the TRACE is invisible to a logic about the VALUE |
 
 p47 is special: the "security" axis is timing, not memory safety, and the threat is
 the *optimiser*. Worth doing precisely because it inverts the usual story.

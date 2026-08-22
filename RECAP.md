@@ -8,8 +8,8 @@ this box is reference; this box is what to *do*.
 
 | | |
 |---|---|
-| **Patterns** | **18 of 47 exist, all green, all 18 reviewed. 0 STALE.** (Count it: `ls -d patterns/p*/ | wc -l`. A spelled-out number sat here reading "thirteen" against a sixteen-row table.) |
-| **Do this next** | **`TASK_064` — p47, constant-time compare**, written and committed, engineer not yet launched. The adversary is the **optimiser** and **Verus cannot state the property at all**, so R5 certifies a leaking kernel — p17 one level up. ⚠ Its measurement is unusually good here: **`Ir` under callgrind IS the side channel**, so the finding is *"`Ir(k)` constant in the first-mismatch position"* versus *"linear in `k`"*, noise-free — and *"did the optimiser put the branch back"* is a **static** question `asm.py` answers exactly. **No hardware counters needed.** |
+| **Patterns** | **19 of 47 exist, all green, all 19 reviewed. 0 STALE.** (Count it: `ls -d patterns/p*/ | wc -l`. A spelled-out number sat here reading "thirteen" against a sixteen-row table.) |
+| **Do this next** | **p38 — type punning / strict aliasing.** Write `TASK_066`. ⚠ Read `.memory/06-catalogue.md`'s feasibility triage first: it is the cheapest on the slate and **its risk is a NULL result** — if clang 22 and gcc 14 simply do not exploit strict aliasing, the headline collapses to a clean negative. Check whether **`-fsanitize=type` (TySan)** exists in `~/tools/llvm` while there; that would be a catcher this project has never used. ⚠ **p47 just refuted its own catalogue row the same way** — three overturned against two upheld — so treat p38's row as a prior, not a fact. |
 | **After that** | `.memory/06-catalogue.md`'s section **"The waves order by FAMILY, and after 16 patterns that is the wrong axis"** — the six missing axes, the recommended order (**lifetime ✅ done** → p47 → p38 → p22 → p36), and a **feasibility triage** naming what would kill each. It is the manager's judgement with its own objections attached; **push back with the pattern you would rather build.** |
 | **Three rules for writing that task** | ⚠ **Settle the bug class as the FIRST deliverable** — overturned on four patterns, upheld on two. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat), and the only out-of-sample test here that has ever been able to fail is **additivity extrapolation**. ⚠ **Name the INLINE MODE at every figure** — p10 fitted both and the regressors *swapped*. All three in `.memory/03-measurement.md`. |
 | **✅ BUILT — the lifetime axis** | p27 exists (TASK_060), green, **R5 15/0 first run**. ⚠ **Two predictions this box carried for weeks were BOTH wrong.** Safe Rust is *not* forced onto `(slot, generation)` — the handle comes out of a **file**, so it is an integer in every rung; safe Rust is forced onto `Option<Box<u8>>`, niche-optimised into the hardened-C representation. And `tcb_items` is **7**, not the 2 that was called the prospective gameability alarm — right in substance (the allocation adds *zero* project-local axioms), wrong in its number. The finding that replaced them: **the free and the invalidation are ONE operation in safe Rust and TWO in C, and the bug is the third — the ASKING — going missing.** |
@@ -101,6 +101,7 @@ rows, or run `ls -d patterns/p*/ | wc -l`.
 | p18 | LEB128 varint | **UB that is not memory-unsafety** — four catchers, all outside the measured matrix |
 | p10 | weighted FIR stencil | **a headline wrong in the flattering direction** — safe beats unsafe, and none of it is safety |
 | p27 | handle table | **the first TEMPORAL bug** — and the lifetime guarantee costs zero; safe Rust pays *less* spatial tax than unsafe |
+| p47 | constant-time compare | **the proof certifies a LEAKING kernel** — identical contract, and the obligation count does not move |
 
 **If you read only one thing after this file**, read `.tasks/TASK_026.md` §0 — the
 distilled rules from the thirteen-task spelling arc. Every pattern built after it
@@ -138,6 +139,7 @@ the commands are in `.memory/01-ladder.md`'s numbering warning.
 | p18 | **17** | 28 |
 | p10 | **18** | 29 |
 | p27 | **19** | 30 |
+| p47 | **20** | 31 |
 | p01, p02 | findings 1–3 | 1–8 |
 
 Cross-cutting entries exist only here: **14** (every rung is a spelling), **16**
@@ -1192,6 +1194,33 @@ the number.** Two task files have already sent an agent to the wrong finding.
    byte-exactly for the first time**: the pre-build contract reconstructed from
    the disclosed edits alone reproduces the recorded hash, and no single edit
    does.
+
+31. **p47 — the proof certifies a LEAKING kernel and its obligation count does
+   not move.** (TASK_064, reviewed at TASK_064_REVIEW — 3 majors, 6 minors,
+   **32 clean negatives** — corrected at TASK_065. Authoritative:
+   `.memory/01-ladder.md` **finding 20**.)
+
+   Constant-time compare, and the first pattern whose security property the
+   ladder is structurally unable to measure. `m_leak` is `verus.rs` plus an early
+   exit: **14 verified, 0 errors**, `kernel`'s obligation count **unchanged at
+   3**, identical checksums on all 32 cells, **+7088.000 `Ir`** of leak.
+
+   ⚠ **The precise reason is stronger than "Verus can't see timing".** The diff
+   touches **no `requires` and no `ensures`** — the contracts are **identical**,
+   and the shipped proof is a *strictly stronger intermediate* under the same
+   contract. **A property of the TRACE is invisible to a logic about the VALUE**,
+   and both numbers this project publishes for proof burden are blind to it.
+
+   **`Ir` under callgrind IS the side channel** — the only pattern here whose
+   primary metric is literally the harm. Spread in first-mismatch position:
+   **184.000** for C, hardened C and safe Rust's `==`; **0.000** for every
+   constant-time rung, identical at both inline modes.
+
+   ⚠ **Catalogue bug class REFUTED — third overturned against two upheld.** The
+   optimiser never reintroduces the branch, across LTO, PGO trained 100% on
+   mismatch-at-byte-0, AVX2, AVX-512, `__builtin_expect` and a branching caller.
+   **The adversary is the idiom, not the optimiser** — so `volatile` buys nothing
+   and costs **6.75× / 9.68×**, inverting the standard advice.
 
 ## Retracted — do not reinstate
 
