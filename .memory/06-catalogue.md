@@ -545,11 +545,27 @@ of these is a measurement; they are the questions each `§0` must answer first.*
   `u32::from_ne_bytes` is the punning idiom, so the expected result is *"C's UB
   idiom and its defined replacement compile to the same thing"* — measurable
   exactly in `Ir` and in `asm.py`. ⚠ **But strict-aliasing miscompiles are
-  version-dependent**, and if clang 22 / gcc 14 simply do not exploit it, the
+  version-dependent**, and if clang 22.1.6 / gcc **13.3.0** (not 14 — this line
+  said 14, and p47's review had it right) simply do not exploit it, the
   pattern's headline collapses to a clean negative. Decide in `§0` whether that
   is worth building. **Check whether `-fsanitize=type` (TySan) exists in
   `~/tools/llvm`** — if it does, it is a catcher this project has never used, and
   it would sit in the same "outside the measured matrix" box as p18's four.
+
+  > ⚠ **PROVISIONAL — manager probes, not yet reviewed** (`.tasks/TASK_066.md`,
+  > sources in `.temp/p38probe/`). Three of them move this row:
+  > **(a)** TySan **exists and fires**, and its blind spot is **inlining, not
+  > optimisation level** — silent at `-O1/-O2/-O3` once the punning function
+  > inlines, fires at all four levels across two TUs.
+  > **(b)** The bug class **is** exploited here — both compilers, `-O1/-O2/-O3`,
+  > 12 of 12 cells flip on `-fstrict-aliasing`. The null-result risk above is
+  > refuted **for the two-non-char-type shape**.
+  > **(c)** ⚠ **But this row's own spelling is the benign one.** *"Read a
+  > `uint32_t` out of an `unsigned char` array"* is UB by 6.5p7 and **neither
+  > compiler exploits it** — 8 of 8 cells give the defined answer with and
+  > without the flag. A pattern built on `memcpy`-vs-cast-on-a-byte-buffer
+  > returns a null result **for the wrong reason**. p38 must pick its shape from
+  > the weaponised direction; TASK_066 §0 owns that decision.
 - **p22 (hash probe) — the strongest result on the list and the most likely to
   need harness work.** The bug is a probe loop that never terminates on a full
   table: **memory-safe, a real DoS, and safe Rust does not prevent it either** —
