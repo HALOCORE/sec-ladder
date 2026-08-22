@@ -1165,3 +1165,75 @@ FLAGS rather than its kernel.**
 
 **The fix is one token — `-fstrict-aliasing` at `check.py:4739`.** ⚠ **Batch
 it**; it is the fourth `check.py` change waiting on one sweep (RECAP "Owed" 12).
+
+## `forbidden_hits` HARD-FAILS since TASK_068, and `exec_code` blanks ghost CODE
+
+**The check now fails the gate.** Rule 5's accident test was applied and answered
+**yes**: p27 forbade `` `memset(tab` `` and both its own C rungs spelled it, and
+the printed `2` survived three tasks and two adversarial reviews with nobody
+acting on it. ⚠ **Denominators are RECOMPUTABLE, not constants** — today
+**111 entries / 197 spellings**, and the unblanked sweep gives **40 hits across
+13 patterns**. *(Both figures were wrong when first written — 183 and "29 across
+11" — and both were cited as the evidence for the hard fail.)*
+
+⚠ **It shipped with a false-positive surface understated by five shapes and
+TASK_068_REVIEW found them: 11 of 14 honest shapes hard-failed.** The strongest
+evidence that it was real: **`patterns/p09-bitset/spec.md`'s `idiom.why`, inside
+`contract_sha256`, documents the trap**, and p09's author spelled its spec
+functions `q as int / 64` to dodge it. **That contortion of the SPECIFICATION was
+briefly the only thing keeping p09 green.**
+
+### `exec_code` blanks in five layers (TASK_069), and the boundary is principled
+
+comments/strings → **items gated on a cfg no cell sets** → `spec fn`/`proof fn`
+items → ghost clauses → ghost statements (`proof {}`, `assert`/`assume`,
+`let ghost`/`let tracked`, `Ghost(…)`/`Tracked(…)`). `spelling_matches`/`exec_code`
+take a `lang`, so the Rust-only layers never touch C (a C `assert(` is exec).
+
+> **The item level IS structural and the statement level is NOT, and that was
+> measured rather than assumed.** `vparse.parse` already returns item kinds and
+> offsets, and the built cfg set is derivable from `build.py`, so
+> **`#[cfg(slb_twin)]` and `#[cfg(test)]` fall OUT of the rule instead of being
+> named by it** — two of seven special cases dissolve. Statement level cannot be:
+> `proof`/`assert`/`ghost` are statements *inside exec bodies* and `vparse`
+> models items and clauses only. ⚠ **Verus was checked as an oracle and cannot
+> answer** — `--log` offers `vir|air|smt|triggers|call-graph` and **no
+> erased-Rust dump at all**, a run costs minutes per pattern, and it would speak
+> for `verus.rs` only while the audit spans six rungs. **So layer 5 is an
+> enumeration — but a CLOSED one taken from the Verus ghost grammar, not from
+> incident history.**
+
+**Three false-positive shapes SURVIVE deliberately** (`fp_probe` 11/14 → 6/14),
+each an entry quoting a span genuinely present in exec code: **substring**
+(`split` vs `split_first()`, `position(` vs `rposition(`), **whitespace-collapse**
+(`q / 64` vs `freq / 64`), and an entry that **backticks the replacement** rather
+than the banned spelling. Token-aware matching would break the standard itself —
+most of the 197 spellings are **expressions** (`2 + 2*nsuf > len`), not
+identifiers, and whitespace deletion is **forced by p17**. **0 of 197 fire today,
+the route out is a longer spelling (which sharpens the declaration), and all
+three are named in the failure text.**
+
+⚠ **`CODEGEN_CFGS` is a WHITELIST**: an unknown cfg is treated as unbuilt and
+**blanked**. That direction only weakens the audit (the other hard-fails an
+honest pattern), so it is the right default — **but a new `--cfg` in `build.py`
+must be added here or its code silently leaves the audit, and NOTHING ENFORCES
+THAT COUPLING.**
+
+### `run.timeout_s` was the first pin that was neither judgeable nor cross-checked
+
+Every other `slb-contract` pin is **prose-judgeable** (`driver.statements`,
+`identity`, `collapse.probe_inputs`) or **cross-checked against a measurement**
+(`verus.obligations`, identity digests, `miri.required`). `run.timeout_s` was
+neither, reproducing `min_ir_per_work`'s `> 0`-only weakness that TASK_006_REVIEW
+drove through the whole gate at `1e-9`.
+
+**Closed by TWO mechanisms, and the review's prescribed one was insufficient
+alone.** `_confirm_hang` re-runs one hung cell at `min(10 × budget, RUN_TIMEOUT)`
+and fails if it terminates — ⚠ **but 10× a sub-startup budget is still
+sub-startup, so the re-run never catches `1e-9`.** Hence **`RUN_BUDGET_FLOOR =
+1.0 s`**, justified by measurement: `/bin/true` startup **1.13–2.17 ms**, slowest
+shipped `O0` cell on `large.bin` **198 ms** — so 1.0 s is ~5× the slowest honest
+cell and 900× below `RUN_TIMEOUT`.
+⚠ `_confirm_hang` checks **one** cell (first in sorted matrix order): it proves
+the budget is not absurdly short, **not** that every recorded `hung=True` is
+right. One-line change if a pattern needs all of them.

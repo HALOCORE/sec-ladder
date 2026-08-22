@@ -1688,17 +1688,25 @@ Both retired.
    bar**, so its quotable timing evidence is the raw *level* under the
    identical-copy protocol. Not a defect — the rule working — but it means p13
    has no corrected-ratio row and someone will look for one.
-10. **`check.py::spelling_matches` does not blank `#[cfg(slb_twin)]` bodies**, so
-   a Verus rung's idiom audit can be satisfied by code no build contains
-   (constructed instance `False → True`).
-   ⚠ **THIS STOPPED BEING HYGIENE AT `ce06c21` and the line below is retracted.**
-   It used to read *"blast radius 0 of 15 pins, so it is hygiene, not a live
-   defect"*. **Making `forbidden_hits` hard-fail INVERTED the harm direction**:
-   the gap no longer falsely *satisfies* a `required` count that never failed —
-   it can now falsely *hit* a `forbidden` entry that **blocks the gate**. And the
-   denominator moved from 15 pins to **197 forbidden spellings across 20 files,
-   every one of which contains twin bodies** (TASK_068_REVIEW). **It is now part
-   of blocker B1's surface, not a latent nicety** — see `TASK_069`.
+10. ✅ **CLOSED at TASK_069 — and its prediction was confirmed LIVE on the way
+    out.** This said `check.py::spelling_matches` does not blank
+    `#[cfg(slb_twin)]` bodies, so a Verus rung's idiom audit could be satisfied
+    by code no build contains, and called it *"hygiene, 0 of 15 pins"*.
+    **`exec_code` now blanks it structurally** — items gated on a cfg no cell
+    sets, so `slb_twin` falls out of the rule rather than being named by it.
+
+    ⚠ **Two things this item got wrong, both worth keeping.** (a) It stopped
+    being hygiene the moment `forbidden_hits` began hard-failing: the harm
+    direction **inverted**, from falsely *satisfying* a `required` count that
+    never failed to falsely *hitting* a `forbidden` entry that blocks the gate,
+    and the denominator went from 15 pins to **197 spellings across 20 files,
+    all containing twin bodies**. (b) *"0 of 15"* was wrong — **the predicted
+    false satisfaction was live**: p27's `` `deallocate` `` was spelled in exactly
+    one place in the tree, **its own `#[cfg(slb_twin)]` twin**, so the entry read
+    PRESENT on code no cell compiles. p12's matched only inside `spec fn fin`.
+    Tree-wide `required_absent` **96 → 94**, `required_pins_nothing` **15 → 16**
+    (manager-verified).
+
 11. **A length-heterogeneous sweep band is what a step-basis test actually
    needs**, and no pattern has one. p13's fit blobs are all length-homogeneous,
    which makes every natural step basis *singular* — so p13 could not have
@@ -1811,6 +1819,29 @@ Both retired.
     backticking them is a **declaration** edit and owes the direction test, which
     makes it pattern work, not harness work. ⚠ **Now that `forbidden_hits`
     HARD-FAILS, re-ask whether shout is still the right severity.**
+
+16. **Two residuals from the gate's new hard fail, both deliberate, both worth
+    re-asking when a pattern trips them.** (a) **Three false-positive shapes
+    survive** — substring (`split` vs `split_first()`), whitespace-collapse
+    (`q / 64` vs `freq / 64`), and an entry that backticks the *replacement*.
+    Each is an entry quoting a span genuinely present in exec code, and
+    token-aware matching would break the standard itself: most of the **197**
+    spellings are *expressions*, not identifiers, and whitespace deletion is
+    **forced by p17**. 0 of 197 fire today. (b) ⚠ **`CODEGEN_CFGS` is a
+    whitelist and nothing couples it to `build.py`** — a new `--cfg` there and
+    that code silently leaves the audit. **A cross-check against `build.py`'s
+    flag list would close it**; it was not built because `build.py` was out of
+    scope. ⚠ **`build.py` is measurement-hashed**, so pair it with item 14.
+17. **`_confirm_hang` verifies ONE cell** (first in sorted matrix order) — it
+    proves the declared budget is not absurdly short, **not** that every recorded
+    `hung=True` is right. Checking all of them costs `10 × budget × n_hung`.
+    **p22 hangs 12–20 cells, so decide there**; it is a one-line change.
+18. **p27's `required[2]` finding lives in `check.py`'s docstring, not in
+    `patterns/p27-handle-table/NOTES.md`.** Its `` `deallocate` `` entry pinned
+    only twin-gated code. The engineer judged a pattern-doc edit outside
+    TASK_069's authorised set and **flagged it rather than doing it** — correct.
+    ⚠ Landing it moves p27's `source_sha256` and costs a gate run; **bundle it
+    with the next thing that re-runs p27.**
 
 ### Deferred with a stated reason
 
