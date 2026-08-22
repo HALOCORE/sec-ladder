@@ -8,7 +8,7 @@ this box is reference; this box is what to *do*.
 
 | | |
 |---|---|
-| **Patterns** | **19 of 47 exist, all green, all 19 reviewed. 0 STALE.** (Count it: `ls -d patterns/p*/ | wc -l`. A spelled-out number sat here reading "thirteen" against a sixteen-row table.) |
+| **Patterns** | **19 exist, all green, all 19 reviewed. 0 STALE.** Count both ends rather than trusting either: `ls -d patterns/p*/ | wc -l` and `grep -c '^| p[0-9]' .memory/06-catalogue.md` (**the denominator moved from 47 to 48 at TASK_066**, which is why it is no longer written here — a spelled-out numerator sat on this line reading *"thirteen"* against a sixteen-row table). |
 | **Do this next** | **p38 — type punning / strict aliasing.** `.tasks/TASK_066.md` is **written**; spawn the engineer. ⚠ **Four manager probes already moved the catalogue row before the task was written** (`.temp/p38probe/`, PROVISIONAL in `.memory/06-catalogue.md`): the bug class **is** exploited here (12 of 12 cells flip on the flag), **TySan exists and fires** and its blind spot is **inlining, not opt level**, and — the one that reshapes the pattern — **the catalogue's own spelling is the benign direction**: reading a `uint32_t` out of an `unsigned char` array is UB that *neither* compiler exploits, 8 of 8. Only two incompatible **non-char** types move. |
 | **After that** | `.memory/06-catalogue.md`'s section **"The waves order by FAMILY, and after 16 patterns that is the wrong axis"** — the six missing axes, the recommended order (**lifetime ✅ done** → p47 → p38 → p22 → p36), and a **feasibility triage** naming what would kill each. It is the manager's judgement with its own objections attached; **push back with the pattern you would rather build.** |
 | **Three rules for writing that task** | ⚠ **Settle the bug class as the FIRST deliverable** — overturned on four patterns, upheld on two. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat), and the only out-of-sample test here that has ever been able to fail is **additivity extrapolation**. ⚠ **Name the INLINE MODE at every figure** — p10 fitted both and the regressors *swapped*. All three in `.memory/03-measurement.md`. |
@@ -75,7 +75,8 @@ Rust, unsafe Rust + Verus proof — plus a sixth **R1h** hardened-C cell, across
 optimisation levels and two inline modes, and compared on assembly, executed
 instructions, timing, proof burden and trusted-base size.
 
-47 patterns are catalogued in `.memory/06-catalogue.md`. **The ones that exist
+**48** patterns are catalogued in `.memory/06-catalogue.md` — 47 until TASK_066
+added `p48` (the initialisation axis, which was missing entirely). **The ones that exist
 are the table below — all green, all reviewed.** ⚠ A spelled-out count used to
 sit on this line and it read *"thirteen"* against a sixteen-row table; count the
 rows, or run `ls -d patterns/p*/ | wc -l`.

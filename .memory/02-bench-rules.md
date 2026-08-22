@@ -322,7 +322,7 @@ emits `mov eax, <answer>; ret`. Then you are timing `printf`.
 
    and the gate asserts `marginal_Ir >= ALPHA_IR_PER_WORK * work_per_call`, with
    ALPHA a constant in `harness/check.py` — changing it is a harness diff that
-   moves all 47 patterns at once. Given **two probe inputs of different shape**
+   moves every catalogued pattern at once. Given **two probe inputs of different shape**
    (`collapse.probe_inputs`) it additionally asserts the marginal rate
    `d(Ir)/d(work) >= ALPHA`, which is the assertion an author cannot satisfy by
    making the kernel do a fixed amount of work regardless of its input. A
@@ -637,7 +637,7 @@ So the class has a backstop, but a **two-part and partial** one: identity for
 R5-only drift, Miri for the identical-code case, and Miri only on inputs that
 actually reach the boundary. Neither is a proof that a trusted `ensures` is
 complete. That remains a human reading — see the `SLB-TRUSTED-ARGUMENT`
-requirement in `.memory/04-verus.md`. When they are not, R4 is unverified unsafe code that 47 patterns will
+requirement in `.memory/04-verus.md`. When they are not, R4 is unverified unsafe code that every catalogued pattern will
 imitate, and nothing has checked it.
 
 `harness/check.py` step 8 wires this. Three details, all settled at TASK_005

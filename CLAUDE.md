@@ -16,7 +16,9 @@ rest is reference.
   definition of done, the reviewer checklist. One agent works at a time.
 - `.memory/` 00–06 — **the authoritative layer, and it supersedes any task report
   it contradicts.** 00 environment, 01 ladder + per-pattern findings, 02 bench
-  rules, 03 measurement, 04 Verus, 05 repo layout, 06 the 47-pattern catalogue.
+  rules, 03 measurement, 04 Verus, 05 repo layout, 06 the pattern catalogue
+  (**48 rows** since TASK_066 added `p48`; count it with
+  `grep -c '^| p[0-9]' .memory/06-catalogue.md` rather than trusting this line).
 
 - `PLAN.md` — the original plan and feasibility argument. ⚠ **Historical**: its
   pattern table is a pre-project proposal with its own numbering and at least one
