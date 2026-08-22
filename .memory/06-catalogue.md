@@ -400,7 +400,7 @@ that is the deliverable for these rows**, not a green checkmark.
 | p35 | tagged union / discriminated dispatch | tag-payload mismatch | moderate | planned |
 | p36 | function-pointer table dispatch (vtable-like) | index out of table | moderate | planned |
 | p37 | callback with `void*` userdata | type confusion | moderate–hard | planned |
-| p38 | endian conversion / type punning (`memcpy` vs union) | strict-aliasing UB | moderate | planned |
+| p38 | **record parser that clamps a length in place and re-reads it through a pun** (delivered as `p38-alias-pun`). ⚠ **The catalogue's own spelling — *"endian conversion, `memcpy` vs union"* on a byte buffer — is the BENIGN aliasing direction and was retracted before the build**: neither compiler exploits it, 8 of 8 cells. Only two incompatible **non-char** types move | **strict-aliasing UB — the class UPHELD** (unusual: three of the previous five were overturned), and the harm is a **MISCOMPILE**, not a wrong answer | moderate | **done** (T066), gate `PASS` first complete run, R5 **13/0** (twin 16/0), `R4 ≡ R5` `exact` at O3 / `norel` at O0, TCB 5, Miri 8/8, **reviewed** (T066_REVIEW: **no blocker**, 3 majors, 8 minors, **35 clean negatives**; corrections at T067, which refuted three of the *review's* own numbers). **Ships labelled a DEMONSTRATION KERNEL** — the harm needs four conjunctive conditions and **six neighbouring one-line spellings each remove it**. ⚠ **The quotable result is the price: on gcc the undefined spelling is the DEAREST of the six, and every fix saves exactly 6.00 `Ir`/call.** **The first bug class here that unsafe Rust does not reintroduce** — Rust has no type-based aliasing rule at any rung. Also the project's **first additivity-extrapolation failure**, which turned out **100% attributable** to three missing columns, none of them the one named |
 | p39 | bitfield pack/unpack into wire format | shift/mask off-by-one | moderate | planned |
 | p40 | struct-of-arrays vs array-of-structs traversal | none — pure perf axis | easy | planned |
 | p41 | flexible array member struct | size computation overflow | moderate–hard | planned |
@@ -654,11 +654,16 @@ of these is a measurement; they are the questions each `§0` must answer first.*
   `~/tools/llvm`** — if it does, it is a catcher this project has never used, and
   it would sit in the same "outside the measured matrix" box as p18's four.
 
-  > ⚠ **PROVISIONAL — manager probes, not yet reviewed** (`.tasks/TASK_066.md`,
-  > sources in `.temp/p38probe/`). Three of them move this row:
-  > **(a)** TySan **exists and fires**, and its blind spot is **inlining, not
-  > optimisation level** — silent at `-O1/-O2/-O3` once the punning function
-  > inlines, fires at all four levels across two TUs.
+  > ✅ **LANDED AND REVIEWED at TASK_067** (was PROVISIONAL; sources in
+  > `.temp/p38probe/`). Three of these moved this row:
+  > **(a)** TySan **exists and fires**. ⚠ **The manager's mechanism here was
+  > WRONG and is retracted**: it read *"the blind spot is inlining, not
+  > optimisation level"*. It is neither — **TySan checks only accesses that
+  > survive to the end of the pipeline**, and promotion is the case that removes
+  > all of them. One TU *plus `noinline`* fires at every level; inlined builds
+  > with a heap or escaped object fire at every level. Inlining mattered only
+  > because a cross-TU call forces the object into memory
+  > (`.memory/03-measurement.md`).
   > **(b)** The bug class **is** exploited here — both compilers, `-O1/-O2/-O3`,
   > 12 of 12 cells flip on `-fstrict-aliasing`. The null-result risk above is
   > refuted **for the two-non-char-type shape**.

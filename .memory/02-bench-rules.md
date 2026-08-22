@@ -1131,3 +1131,30 @@ because of a scheduling fact worth keeping:
 **So batch the doc fixes with the owed `check.py` edit** (`forbidden_hits`
 fail-vs-print + p22's per-input timeout), which stales every gate record anyway
 through the `harness/*.py` glob. **Three owed changes, one sweep.**
+
+## A gate hole that is one FLAG wide — stage 7 and flag-gated UB
+
+**Found by p38's engineer, scoped by its review, recounted at TASK_067.**
+`check_sanitizers` builds the C rung `gcc -std=c99 -O1 -g
+-fsanitize=address,undefined` (`check.py:4738-4739`). **gcc enables
+`-fstrict-aliasing` only at `-O2` and above**, so stage 7 cannot see a UB class
+that the flag gates.
+
+⚠ **"Structurally blind to any UB class that only exists at `-O2` and above" —
+p38's first wording, which the manager repeated — is WRONG, and dangerously so:
+it implies the repair is to raise stage 7's optimisation level, which would
+perturb 20 patterns to fix one.** The class is **flag-gated, not level-gated**:
+`gcc -O1 -fstrict-aliasing` already prints the wrong checksum, and ASan already
+reports `stack-buffer-overflow READ of size 2` **at `-O1`**.
+
+✅ **Blast radius, recounted across all 20 gate records: EXACTLY ONE PATTERN.**
+**36 `fires` rows across 15 patterns, and all 36 already fire at `-O1`** —
+including **p18, the other UB pattern, on all four rows**. ⚠ The review first
+reported 15/5 as *16/4*; it missed **p04-ring-buffer**, whose adversarial rows
+are sanitizer-clean because the missing fullness check **overwrites in bounds** —
+p17's reason, a *kernel* reason. **The conclusion is unchanged: p38 is the only
+pattern whose declared-clean adversarial row is clean because of the gate's BUILD
+FLAGS rather than its kernel.**
+
+**The fix is one token — `-fstrict-aliasing` at `check.py:4739`.** ⚠ **Batch
+it**; it is the fourth `check.py` change waiting on one sweep (RECAP "Owed" 12).

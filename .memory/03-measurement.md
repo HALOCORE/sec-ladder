@@ -1614,3 +1614,88 @@ hash was mistaken for the hash.** Parse the JSON and test the top-level key:
 ```bash
 python3 -c "import json,glob;print([f for f in sorted(glob.glob('results/*.json')+glob.glob('results/gate/*.json')) if 'source_sha256' not in json.load(open(f))])"
 ```
+
+## Additivity extrapolation failed once, and the failure was 100% attributable
+
+**p38 — TASK_066, its review, and TASK_067.** The only out-of-sample test on this
+project that has ever been *able* to fail did fail: `R2 − R4` missed by **86.66**.
+Then it was repaired exactly. **The repair is the finding.**
+
+⚠ **The published cause was wrong, and so was the manager's prescribed fix.**
+p38 blamed a missing `nw` (window-bytes) column. **`R2 − R4` is exactly CONSTANT
+in `nw`** — `115.00` at `nw` ∈ {128,160,200,240,248,256} for `(nrec,rlen)=(2,4)`.
+And **adding `nw` makes out-of-sample WORSE**: 86.66 → 102.74. The manager
+prescribed precisely that repair in `TASK_066_REVIEW.md`.
+
+**The model was missing THREE columns and none of them was the one named:**
+
+1. **A real `nrec × rlen` interaction, carried by the PARITY of `rlen`** — odd
+   records cost **10.5 less each**. Invisible because band `r` fixes `rlen = 4`.
+2. **A band-design defect whose column is `nw mod 8`** — bands `r` (240) and `x`
+   (256) are **both `0 mod 8`** while band `w` sits entirely at 244 (`4 mod 8`),
+   a flat −22.
+3. **`rlen == 1` is a law TERM, not an anomaly** (TASK_067; the review's grid
+   started at `rlen = 2`). Its residual is exactly `6·nrec`. ✅ **This retires
+   `sweep-w01`, the pattern's one disclosed exception, and withdraws the
+   "the reslice has nothing to amortise" explanation that stood for it.**
+
+**The repaired laws, ZERO free parameters:**
+
+```
+R2 - R4 = A(nw mod 8) - 8*nrec + 6.5*nrec*rlen - 10.5*nrec*(rlen mod 2)
+          + 6*nrec*[rlen==1]          A(0) = 79 ;  A(m) = 33 + 6m, m = 1..7
+R3 - R4 = 17 + 1.00*nrec + 1.00*nrec*[rlen==1]      (exactly independent of nw)
+```
+
+**106 rows, max abs residual `0.00000` on both** — 22 in sample, **6 out of
+sample**, a 49-cell `(nrec × rlen)` grid never measured before, two `nw` sweeps,
+and both matrix blobs exactly (small 257, large 711).
+
+> ⚠ **So "the additivity test finally failed" is TRUE AS AN EVENT AND FALSE AS
+> WRITTEN.** Nothing was non-additive in the parameters named; the law was fitted
+> over bands holding three further structures fixed. **This is the DOMAIN rule
+> landing on a real case — the domain was a missing column, three times over —
+> and it is a better result than the failure was.**
+>
+> ⚠ **The generalisable rule, and it is cheap: CHECK THE RESIDUE CLASS of any
+> parameter your bands hold constant.** Two of p38's three bands shared
+> `nw ≡ 0 (mod 8)` and the third did not. **That is exactly the configuration
+> that fits in sample and misses out of it**, and no amount of in-sample residual
+> would have shown it. Vary the parameter, or prove independence of it — holding
+> it at one value in every band is the trap.
+
+⚠ **Mechanism NOT established** for `A(nw mod 8)`, the parity term or the
+`rlen == 1` term. The shapes are exact over 106 points; nobody has read the
+vector epilogue. Owed in p38's §4c/§10d.
+
+⚠ **Cross-pattern `Ir` comparison is `isolated`-mode ONLY.** Of 318 `-O3`
+cell/input pairs tree-wide, `whole` has `kernel_exclusive_ir = None` in **302** —
+the kernel is inlined and has no symbol. Since **p10 showed regressors swap
+between modes**, any cross-pattern synthesis speaks for one mode only. *(Manager
+measurement, TASK_066; probe at `.temp/synth/aggregate.py`.)*
+
+## TySan, the project's third sanitizer — and it checks only what survives
+
+**p38.** `~/tools/llvm/…/libclang_rt.tysan.a` exists, `-fsanitize=type` links, and
+it reports `TypeSanitizer: type-aliasing-violation`. **It is the only tool here
+that sees type-based aliasing**: UBSan has **no** strict-aliasing check and fires
+only as `array-bounds`, where the index leaves a typed array.
+
+⚠ **The manager's mechanism was wrong.** A probe showed a one-TU `static` build
+silent at `-O1/-O2/-O3` where a two-TU build fired at all four levels, written up
+as *"the blind spot is INLINING"*. **It is not.** One TU **plus `noinline`** fires
+at every level; inlined builds whose object is **heap-allocated or
+address-escaped** fire at every level; and a fourth control (one TU, inlined,
+stack, no escape, **dynamic index ⇒ unpromotable**) also fires. Inlining matters
+only because a cross-TU call **forces the object into memory**.
+
+> **The accurate statement is broader than "promotion": TySan checks only
+> accesses that SURVIVE TO THE END OF THE PIPELINE. Promotion is the case that
+> removes all of them.** A dead `store i32` eliminated at `-O2` halves the report
+> count *and changes its direction*, and p38's own kernel halves 160000 → 80000
+> at `-O2` on an array that is never promoted.
+
+✅ p38's scratch is a real array, so **TySan fires in BOTH inline modes**, 8/8 —
+a prediction that could have failed. So p38 is **not** a pattern where the
+catcher has an inline-mode domain, and the same measurement says why the toy
+looked like one.

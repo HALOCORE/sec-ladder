@@ -2248,6 +2248,61 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
    exact**. ⚠ Its `collapse_tightest_margin` is **2.93×, the tightest of all 19
    patterns** (next 7.02) — see `.memory/02-bench-rules.md` on `work_per_call`.
 
+21. **p38 — strict aliasing: the harm is a MISCOMPILE, and the undefined
+   spelling is the DEAREST of its neighbours.** A record parser clamps an
+   over-long length in place and re-reads it through a punning `uint32_t` lvalue.
+   gcc computes the fold's trip count from the load **before** the clamp's two
+   `uint16_t` stores and never reloads: `-O3` reads past a 256-entry array where
+   `-O0` is correct, and ASan reports `stack-buffer-overflow READ of size 2`.
+   **`-fno-strict-aliasing` makes it vanish** (236 vs 237 insns) — the decisive
+   control. Reviewed (TASK_066_REVIEW: **no blocker**, 3 majors, 8 minors,
+   **35 clean negatives**), corrected at TASK_067.
+
+   ⚠ **It ships labelled a DEMONSTRATION KERNEL, and that is the honest label.**
+   The harm needs **four conjunctive conditions** — (i) getter and setter
+   disagree about type, (ii) a *second* getter call after the setter, (iii) the
+   write-back has no consumer but that second read, (iv) both accessors in one
+   optimisable region — and **six neighbouring one-line spellings each remove
+   it**. Condition (iii) is **structural**: the clamp store exists only to be
+   re-read three lines later, and the realistic reason to write a clamp back (a
+   later sanitising pass) measures **12/12 clean**. The uncited *"real parsers
+   write it this way"* claim is **withdrawn**; prevalence is explicitly
+   unmeasured.
+
+   > ✅ **The quotable result is the PRICE, not the harm: on gcc the undefined
+   > spelling is the dearest of six neighbours — `c_memcpy`, `c_union`,
+   > `c_symset`, `c_once` and `-fno-strict-aliasing` each save exactly
+   > **6.00 `Ir`/call**, and `c_noback` 2.00.** The UB buys nothing and costs 6,
+   > so **no optimising programmer arrives here** — which is most of why the
+   > demonstration label is right. ⚠ That 6.00 is a property of **not doing the
+   > double read**, *not* of the flag, which is how p38 first framed it.
+
+   **Rust is immune at EVERY rung, including unsafe** — Rust has no type-based
+   aliasing rule (`noalias` on `&mut` is uniqueness, a *provenance* property), so
+   `read_unaligned::<u32>` into a `[u8]` is fully defined. **The first bug class
+   in this tree that unsafe Rust does not reintroduce.** Only one of the two C
+   compilers takes it.
+
+   ⚠ **The R4 side is disclosed but NOT established, and it flatters SAFE.**
+   `r4_slice` is −3.00/−7.00 below the shipped R4, so `R3 − inf(R4 found)` is
+   **+24/+32** against a published **+21/+25** — **p10's defect in kind, at
+   14%/28% of the headline.** Its twin was not built: **the pinned vstd has no
+   `get_unchecked` spec at all**, so it needs two new trusted items.
+
+   ⚠ **`r4_pun` is DEFINED Rust, correct and Miri-silent — and inadmissible as a
+   rung**, with exactly three `is not supported` (`read_unaligned`, `add`,
+   `as_ptr`). That is a statement about the ladder, not about p38.
+
+   **"clang is safe" is FALSE.** With two unrelatable pointers, or one base with
+   an offset opaque **on one side only**, clang exploits the same violation from
+   `-O1`. ⚠ The discriminator is **whether BasicAA can compute the offset**, not
+   "the two accesses are the same address": `one_base_partial` is never MustAlias
+   and is still declined. ⚠ **An offset opaque on BOTH sides does not defeat
+   BasicAA** — the difference stays symbolically 0 (TASK_067, correcting the
+   review's own construction). Clang also **merges the two `uint16_t` clamp
+   stores into one 32-bit store** where gcc emits two — a second reason its
+   forward is type-consistent.
+
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how
 much proof keeps that base sound, and which C patterns resist this treatment.*
