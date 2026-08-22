@@ -1590,3 +1590,27 @@ translation unit.** So a shared-`common/` addition is invisible to the Rust rung
 and visible to every C one — which means a C-vs-Rust *whole-binary* size
 comparison silently charges C for code no pattern calls. Never compare
 `binary_text_bytes` across languages without saying this.
+
+## "0 STALE" is not "every record is verified"
+
+**Measured at TASK_066.** `measure.py --check-stale` prints `NO BASELINE` for a
+record lacking `source_sha256` and **`continue`s without incrementing `bad`**
+(`measure.py:325-328`), so the run reports `0 STALE` and **exits 0** while some
+records are unverifiable by hash.
+
+Today that is **five of nineteen measurement records** — `p02-buffer-copy`,
+`p05-index-flatten`, `p07-binary-search`, `p11-nul-scan`, `p17-http-range` —
+including **p02, the project's strongest security result**.
+✅ **All 19 GATE records do carry it**, so the gap is the measurement layer only
+and the provenance exists one file over. The fix is a re-measure of those five;
+RECAP "Owed" item 6 carries it.
+
+⚠ **The audit that first "closed" this used
+`'source_sha256' not in open(f).read()`** — a raw substring search. Each of those
+five files contains the string exactly once, inside `/git/note`, in a sentence
+advising *"Use `results/gate/*.json`'s `source_sha256`"`*. **The pointer to the
+hash was mistaken for the hash.** Parse the JSON and test the top-level key:
+
+```bash
+python3 -c "import json,glob;print([f for f in sorted(glob.glob('results/*.json')+glob.glob('results/gate/*.json')) if 'source_sha256' not in json.load(open(f))])"
+```

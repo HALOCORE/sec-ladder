@@ -1584,15 +1584,46 @@ Both retired.
    but hashes all of them, so a `measure.py` edit costs eight gate re-runs (13 min
    measured) for a file the gate never executes. Judgement call; belt-and-braces
    cannot under-cover.
-6. ✅ **CLOSED — every pattern record now carries `source_sha256`.** This item
-   said *"no `source_sha256` for six patterns"*; the re-measures cleared them,
-   and the only file without one is `results/p02-residue-sweep.json`, which is a
-   **side record, not a pattern**. Verify with the one-liner rather than trusting
-   this line:
-   `python3 -c "import json,glob;print([f for f in sorted(glob.glob('results/*.json')) if 'source_sha256' not in open(f).read()])"`
-   ⚠ **Still open, and NOT re-verified by the audit that closed the rest:**
-   `results/p11-nul-scan.json` was recorded *stale* on `bulk_calls`, understating
-   p11's own 12.0× library finding. Check it before quoting p11's library axis.
+6. ⚠ **RE-OPENED at TASK_066. It was marked ✅ CLOSED on the strength of a
+   command that cannot tell the hash from a sentence ABOUT the hash.**
+
+   The item claimed *"every pattern record now carries `source_sha256`; the only
+   file without one is `results/p02-residue-sweep.json`, a side record"*.
+   **Measured today: six files lack the top-level key, five of them real
+   patterns** — `p02-buffer-copy`, `p05-index-flatten`, `p07-binary-search`,
+   `p11-nul-scan`, `p17-http-range`, plus the side record. That is the *original*
+   count this item said the re-measures had cleared. **Nothing was cleared.**
+
+   **The mechanism, and it is worth remembering.** The closing one-liner was
+   `'source_sha256' not in open(f).read()` — a substring search over raw text. In
+   all five files the string occurs exactly once, inside `/git/note`, in a
+   sentence advising *"Use `results/gate/*.json`'s `source_sha256`"*.
+   **The note telling you where to find the hash is what convinced the checker
+   the hash was there.** Third instance of TASK_065's lesson: *a wrong command is
+   worse than a wrong constant, because it looks self-verifying.* Parse the JSON:
+
+   ```bash
+   python3 -c "import json,glob;print([f for f in sorted(glob.glob('results/*.json')+glob.glob('results/gate/*.json')) if 'source_sha256' not in json.load(open(f))])"
+   ```
+
+   **What it actually means — and it is narrower than it sounds.**
+   `measure.py --check-stale` prints `NO BASELINE` for those five and **does not
+   count them as `bad`**, so the run says `38 record(s) examined, 0 STALE` and
+   **exits 0**. ⚠ **"0 STALE" is therefore not "everything is verified"**: five
+   of nineteen *measurement* records cannot be checked by hash at all, and they
+   include **p02 (the project's strongest security result)** and **p17**.
+   ✅ **Mitigating, and verified: all 19 GATE records DO carry `source_sha256`**
+   — which is exactly what that `/git/note` sentence is pointing at. So the gap
+   is in the **measurement layer only**, and provenance for those five exists one
+   file over.
+
+   **The fix is a re-measure of those five**, which is the expensive operation
+   (settled answer 4) and must not run concurrently with anything. Queue it
+   behind pattern work; do not let it displace a pattern.
+   ⚠ The old sub-claim that `p11-nul-scan.json` was *"recorded stale on
+   `bulk_calls`"* is **not checkable as written** — with no baseline there is
+   nothing to compare — and p11's `bulk_calls` are populated today
+   (`memchr@plt` on the C rungs). Re-derive it after the re-measure, or drop it.
 7. **p04's `small` R2 layout population is bimodal at 1.42× and unexplained**
    (TASK_042_REVIEW minor 8): 27 layouts at 6.43–7.17 ms, four at 9.30–9.88 ms,
    reproducible across both passes, and **neither `analyze.py`'s `(loop,
