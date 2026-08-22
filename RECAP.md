@@ -9,7 +9,7 @@ this box is reference; this box is what to *do*.
 | | |
 |---|---|
 | **Patterns** | **20 exist, all green, all 20 reviewed. 0 STALE.** Count both ends rather than trusting either: `ls -d patterns/p*/ | wc -l` and `grep -c '^| p[0-9]' .memory/06-catalogue.md` (**the denominator moved from 47 to 48 at TASK_066**, which is why it is no longer written here — a spelled-out numerator sat on this line reading *"thirteen"* against a sixteen-row table). |
-| **Do this next** | **The batched `check.py` change — write `TASK_068`.** Four owed edits, **one 20-gate sweep**, and it is the critical path: **p22 cannot be built without it.** (1) **`forbidden_hits` fail-vs-print** — open since TASK_053, recommended *fail* by TASK_063, 0 of 183 today. (2) **p22's per-input timeout** — `RUN_TIMEOUT = 900` makes a deliberately non-terminating cell cost 3–5 h per gate run; a contract-declared timeout fixes it. (3) **one token, `-fstrict-aliasing` at `check.py:4739`** — stage 7 cannot see flag-gated UB; blast radius measured at **exactly one pattern**; ⚠ **do NOT raise stage 7's opt level instead.** (4) the **doc-citation sweep** (Owed 12) rides along free, since the `harness/*.py` glob stales every gate record anyway. ⚠ **PROTOCOL rule 5 says prefer a pattern over gate work — considered and overridden**: three of these are fixes to *known measured defects*, not speculative hardening, and the fourth unblocks the next pattern. **After it: p22.** |
+| **Do this next** | **Land `TASK_068`'s review** (dispatched; report at `.tasks/TASK_068_REVIEW_REPORT.md` when it arrives), then **p22 — it is UNBLOCKED.** ⚠ TASK_068 changed **the gate itself**, so its review matters more than a pattern's: `forbidden_hits` now **hard-fails** (a false positive blocks a pattern) and a pattern can now **declare that a cell hangs**. The manager's least-certain call is whether the first of those should have shipped at all — *"if you can build an honest pattern that this blocks, that is a blocker"*. **Do not write `TASK_069` for p22 until that review lands.** |
 | **After that** | `.memory/06-catalogue.md`'s section **"The waves order by FAMILY…"** — the missing axes, the order (**lifetime ✅ → p47 ✅ → p38 ✅ → p22 → p36**), and a **feasibility triage** naming what would kill each. ⚠ **Three things moved at TASK_066, all PROVISIONAL and all needing a different agent to attack them** (rule 3): **p22's harness question is ANSWERED** — a hang is already in the gate's vocabulary and only `RUN_TIMEOUT = 900` kills it, so it needs a `check.py` change and is the **batching partner** the owed `forbidden_hits` fix was waiting for; **p36's row cited the wrong function and overstates its risk** (the bar is "a sanitizer fires deterministically", not "the harm is identical"); and there is a **SEVENTH axis, `p48` (initialisation), which was not in the catalogue at all** — the pinned vstd already forbids the bug (`ptr_ref`/`ptr_mut_read` both `requires perm.is_init()`). **Push back with the pattern you would rather build.** |
 | **Three rules for writing that task** | ⚠ **Settle the bug class as the FIRST deliverable** — overturned on four patterns, upheld on two. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat), and the only out-of-sample test here that has ever been able to fail is **additivity extrapolation**. ⚠ **Name the INLINE MODE at every figure** — p10 fitted both and the regressors *swapped*. All three in `.memory/03-measurement.md`. |
 | **The trap that keeps firing** | **A headline can be wrong in the FLATTERING direction and pass a green gate.** p10 published *"safe Rust cheaper than unsafe"*: 60% was an **unsearched R4 side**, the rest **index-expression bookkeeping C pays more of than either Rust rung**. **p27 repeated it one pattern later** — a dead store in R4 that R3 did not have. **p47 is the first pattern to search the R4 side properly** (six levers, each measured *and* run through Verus). ⚠ **Before publishing any rung comparison, ask what the OTHER rung's spelling is worth.** |
@@ -1729,7 +1729,22 @@ Both retired.
     > patterns to fix one.
     > **Four owed changes, one sweep.**
 
-    ⚠ **Extend the doc sweep to CONTROL NAMES while you are in there.** Same
+    ✅ **MOSTLY DONE at TASK_068: 25 citations across 13 patterns re-cited by
+    function.** ⚠ **6 are deliberately LEFT** — they live in `model.py` /
+    `inputs/gen.py` (p12, p13 ×3, p16 ×2, p38), which are **measurement-hashed**,
+    so fixing them costs a re-measure. **This item's claim that the sweep costs
+    no re-measure is true of the `*.md`/`controls/` subset ONLY.** Targets are in
+    `.temp/p68/NOTES.md`; land them behind the p38 re-measure in item 14.
+    ⚠ p09's `contract_sha256` moved in the sweep and is disclosed in its
+    `NOTES.md`.
+    ✅ **The control-name audit is a clean negative — and incomplete.** Only
+    **8 of 20** patterns have a `--list`; the other 12 cannot be audited that
+    way. All 32 candidates on the 8 were false positives, in five shapes; the
+    instructive one is p38's `r4_end`/`r4_slice`, selectable through a *second*
+    generator (`controls/span.py --only`) that has no `--list` — **so a naive aid
+    would have produced a false accusation.**
+
+    ⚠ **Original note kept for the next sweep: extend it to CONTROL NAMES.** Same
     class, found by the same review: `s_asan_O3` is cited in **three** committed
     p38 files (`NOTES.md`, `model.py`, `spec.md`, hence its generator) and
     **does not exist** — the `-O3` ASan build is anonymous inside
@@ -1769,6 +1784,27 @@ Both retired.
       symbol. Since **p10 showed regressors SWAP between modes**, any synthesis
       can only ever speak for the mode where that swap was observed. **State that
       limit before the first number, not after the table.**
+
+14. **`-fstrict-aliasing` on stage 7 is MEASURED, CORRECT, and BLOCKED — land it
+    bundled with a p38 re-measure.** TASK_068 proved the one-token fix works and
+    that the blast radius is **exactly one pattern** (153 matrix rows × 20; p02's
+    and p11's apparent diffs are **ELF BuildId inside the ASan text, not
+    behaviour**). ⚠ **But the token turns p38's gate RED**, because
+    `p38/model.py::sanitizer_expect` returns `"clean"` unconditionally and two
+    adversarial rows then fire on an input declared clean. Correcting that edits
+    a **measurement-hashed** file → stales `results/p38-alias-pun.json` → forces
+    a re-measure → which re-takes the **wall-clock** block, whose `ns` floor is a
+    *session* property (≈18% shift measured on p08 for unchanged cells), so it
+    **moves p38's published timing rows**. **Schedule token + `sanitizer_expect`
+    + re-measure as ONE unit**, and pull item 12's six measurement-hashed
+    citations into the same commit.
+15. **p01 (1 entry) and p05 (2 entries) ship `forbidden` entries with ZERO
+    backticked spellings**, so their *"forbidden: 0 hits"* is earned by auditing
+    an **empty set** — the p09 defect `TASK_038_REVIEW` found and TASK_039 fixed
+    **on p09 only**. Both now **shout**. Left as a shout deliberately:
+    backticking them is a **declaration** edit and owes the direction test, which
+    makes it pattern work, not harness work. ⚠ **Now that `forbidden_hits`
+    HARD-FAILS, re-ask whether shout is still the right severity.**
 
 ### Deferred with a stated reason
 
