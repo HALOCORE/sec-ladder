@@ -219,7 +219,7 @@ and rendered by `report.py` with a **STALE** banner when `spec.md` no longer
 hashes to the record. But it splits into a decidable half and an undecidable one,
 and the file must not imply otherwise:
 
-- **`forbidden` is decidable and reports a verdict: 0 hits on all six.** That is
+- **`forbidden` is decidable and reports a verdict: 0 hits, now across all 18 patterns and 160 spellings** (re-measured TASK_063; this line said *"all six"*, and the count was briefly **2** while p27 forbade a spelling both its own C rungs wrote). That is
   the reproducible core of "0 of 82". Raw substring matching gives **5** — two
   hardened-C files quoting their own forbidden spelling in the comment explaining
   why they avoid it, p16's *ghost* loop invariant, and two p17 comment/format

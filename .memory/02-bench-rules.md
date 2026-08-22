@@ -150,8 +150,9 @@ Known residuals we are deliberately **not** closing, all measured:
   rung honours its declaration.
 
   ⚠⚠ **THE EVIDENCE HAS CHANGED AND THIS RESIDUAL IS RE-OPENED** (measured at
-  TASK_062). The count above said **0 of 132**; it is now **2 of 162**, and the
-  two are a **real defect that shipped**: p27 forbids `` `memset(tab` `` and
+  TASK_062; **settled at TASK_063, PROVISIONAL — not yet reviewed**). The count
+  above said **0 of 132**; at TASK_062 it was **2 of 162**, and the two were a
+  **real defect that shipped**: p27 forbids `` `memset(tab` `` and
   **both of its own C rungs write it** (`c/kernel.c:66-67`,
   `c/kernel_hardened.c:46-47`), so both are out of p27's own contract, and
   `idiom.why` never says what the entry is forbidden *for* — it explains every
@@ -166,6 +167,32 @@ Known residuals we are deliberately **not** closing, all measured:
   **fail-vs-print** — and the defect itself must be settled first: either p27's
   rungs violate the contract, or the `forbidden` entry is wrong and its removal
   is a declaration edit owing the direction test.
+
+  ✅ **SETTLED at TASK_063 as the second: the ENTRY was wrong and is deleted**,
+  as a declaration edit with a byte-provable undo. Three measured reasons: all
+  seven rungs zero the table (**the four Rust rungs are FORCED to**, so a
+  universal-scope `forbidden` excluded an operation every rung performs); the
+  admissible respelling costs **0.0000 `Ir`/call on clang with identical `n_fn`**,
+  so the entry constrained **typography, not the program**; and the hazard it was
+  aimed at is **not expressible as a token** — a CLOSE-arm bulk clear and the
+  initialisation spell the same characters and `spelling_matches` has no notion
+  of position — while two `required` entries already exclude it.
+
+  **`forbidden_hits` is now `0` across all 18 patterns over 160 spellings.**
+
+  > **Recommendation from TASK_063, PROVISIONAL: MAKE IT FAIL, batched with the
+  > next `check.py` change** — zero false-positive surface today. **Two figures
+  > to carry with it.** (1) The same sweep with comments, string literals and
+  > ghost clauses **not** blanked gives **29 hits across 11 patterns** — that
+  > number *is* the value of `spelling_matches`'s blanking half, and it is what a
+  > naive implementation would fail on. (2) `rung_sources` includes
+  > `CONTROL_CELLS`, today `["safe_naive_verus"]`, which no pattern ships — a
+  > bounded latent false positive of the shape TASK_021 closed.
+  > ⚠ **And the strongest argument against is the engineer's own**: a failing
+  > check here would have been dischargeable by the *wrong* fix — respell at
+  > 0.0000 `Ir`/call — leaving the real defect (an entry whose purpose `why`
+  > never stated) in place. **Weak forcing still beats none**, because a rung
+  > respelling at least moves `source_sha256` in a commit.
 
 - ~~`source_sha256` omits `patterns/*/inputs/gen.py` and `common/slb.py`~~ —
   **CLOSED at TASK_021**, with a demonstrated record move (a comment-only

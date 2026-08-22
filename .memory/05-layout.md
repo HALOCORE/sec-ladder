@@ -317,6 +317,39 @@ harness rather than argued:
   95 pre-existing blobs unchanged) — it is one command and it is the whole basis
   of the claim.
 
+## ⚠ A generator that EMBEDS shared text will silently revert a cross-pattern amendment
+
+**p27, TASK_063, found by running the generator rather than by reading it.**
+`CLAUDE.md` constraint 6 says *keep the generator, delete the artefact* — a
+pattern's `spec.md` is meant to be re-derivable from `controls/mk*.py`. p27's
+generator **embedded its whole `idiom.why` as a literal**, and one task earlier
+TASK_062 had appended the 11 003-byte shared named-spelling paragraph to that
+`why` **in `spec.md` only**.
+
+> **So running the documented regeneration path DELETED the paragraph** — a `why`
+> of 2 602 bytes where the committed one is 13 607 — reverting, silently, a fix
+> that had landed the previous task and cost a full 18-pattern sweep.
+
+**The shape that does not do this**: slice the shared text out of a **donor**
+`spec.md` at run time and assert its `sha256` against
+`check.NAMED_SPELLING_SHA256`, so the generator **fails closed** if the donor
+moves. p10's and p18's `mkcontract.py` already did it that way; **p27's was the
+outlier**, and it is now repaired and reproduces `spec.md` byte for byte.
+
+**The general rule, and it is not only about this paragraph:** *any text shared
+across patterns must be READ by a generator, never embedded in one.* An embedded
+copy makes the generator a nineteenth copy of an invariant that is supposed to
+have one, and the failure is invisible until somebody runs it.
+
+⚠ **What caught it was the gate check added the task before** — without
+`named_spelling_problem`, the regenerated `spec.md` would have passed. **A check
+added for one accident caught a second, of a different shape, one task later.**
+That is worth remembering the next time the accident test is argued.
+
+⚠ **Owed:** p10's and p18's generators were *reported* to read from a donor and
+were **not re-run to confirm they reproduce their own `spec.md` byte for byte**.
+Do that before trusting either — it is the same latent defect.
+
 ## An input generator's RNG is a shared sequential stream — and it can re-converge
 
 **Measured at TASK_034.** `inputs/gen.py` draws every blob from one advancing

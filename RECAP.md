@@ -1427,7 +1427,7 @@ fixed or declined with a reason, on a tree that re-ran 16/16 green.
 rows now carrying `stdout`; the tautology battery (F2) no longer lets an aborting
 tactic overwrite a real verdict; the adversarial key (F1) records all behaviours
 with their cells; the comment-in-a-clause bypass (F4) is repaired in `vparse`;
-`forbidden_hits` (F6) is **declined**, recorded as a known residual with the
+`forbidden_hits` (F6) was **declined** and is now **RE-OPENED** (TASK_062 found a real defect it could see; TASK_063 settled the defect and recommends **fail, batched** — `.memory/02-bench-rules.md`, PROVISIONAL). It was recorded as a known residual with the
 measurement. p12's, p03's, p04's, p05's, p11's and p18's sole-catcher prose is
 corrected; p08 is TCB 4 → 3 with `identity: exact` at both levels; `limbs.py`
 lives in `harness/`; the `.partial.json` trap is gone (they now write to
