@@ -13,6 +13,8 @@
     "small.bin"
   ],
   "contract_sha256": "5b0a67de468c4c11dab51c13e42b2d9c1766c4362e01f42b1f49e7747230ad78",
+  "run_timeout_s": {},
+  "expected_hang": [],
   "idiom": {
     "required": [
       {
@@ -128,7 +130,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "5b57db8dcb1815816fbfb1976314c95f037eafbf08e4886929d0649bd7e231d6",
+    "harness/check.py": "7965e53a73db0408083cac03c4cb3e7d53a5a58e3f6c26cef7dda613077f230b",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
@@ -625,6 +627,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "244239563421568",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -642,6 +645,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "244239563421568",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -659,6 +663,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "244239563421568",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -676,6 +681,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "244239563421568",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -693,6 +699,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "244239563421568",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -710,6 +717,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "244239563421568",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -727,6 +735,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "244239563421568",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -744,6 +753,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "244239563421568",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -758,6 +768,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": true
       },
       {
@@ -772,6 +783,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -789,6 +801,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -806,6 +819,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -823,6 +837,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -840,6 +855,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -857,6 +873,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -874,6 +891,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -891,6 +909,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -908,6 +927,7 @@
         ],
         "model_exit": 7,
         "model_stdout": "",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -925,6 +945,7 @@
         ],
         "model_exit": 7,
         "model_stdout": "",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -942,6 +963,7 @@
         ],
         "model_exit": 7,
         "model_stdout": "",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -959,6 +981,7 @@
         ],
         "model_exit": 7,
         "model_stdout": "",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -976,6 +999,7 @@
         ],
         "model_exit": 7,
         "model_stdout": "",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -993,6 +1017,7 @@
         ],
         "model_exit": 7,
         "model_stdout": "",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1010,6 +1035,7 @@
         ],
         "model_exit": 7,
         "model_stdout": "",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1027,6 +1053,7 @@
         ],
         "model_exit": 7,
         "model_stdout": "",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1044,6 +1071,7 @@
         ],
         "model_exit": 5,
         "model_stdout": "",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1061,6 +1089,7 @@
         ],
         "model_exit": 5,
         "model_stdout": "",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1078,6 +1107,7 @@
         ],
         "model_exit": 5,
         "model_stdout": "",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1095,6 +1125,7 @@
         ],
         "model_exit": 5,
         "model_stdout": "",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1112,6 +1143,7 @@
         ],
         "model_exit": 5,
         "model_stdout": "",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1129,6 +1161,7 @@
         ],
         "model_exit": 5,
         "model_stdout": "",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1146,6 +1179,7 @@
         ],
         "model_exit": 5,
         "model_stdout": "",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1163,6 +1197,7 @@
         ],
         "model_exit": 5,
         "model_stdout": "",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1180,6 +1215,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -1197,6 +1233,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -1214,6 +1251,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1231,6 +1269,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1248,6 +1287,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1265,6 +1305,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1282,6 +1323,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1299,6 +1341,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1316,6 +1359,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1333,6 +1377,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1350,6 +1395,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1367,6 +1413,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1384,6 +1431,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1401,6 +1449,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1418,6 +1467,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1435,6 +1485,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1449,6 +1500,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": true
       },
       {
@@ -1463,6 +1515,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -1480,6 +1533,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -1497,6 +1551,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1514,6 +1569,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1531,6 +1587,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1548,6 +1605,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1565,6 +1623,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1582,6 +1641,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ]
@@ -1593,6 +1653,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "244239563421568",
       "model_stdout": "244239563421568"
     },
@@ -1601,7 +1663,9 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2539483==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x506000000060 at pc 0x55c8a345ff13 bp 0x7ffef4e24c00 sp 0x7ffef4e243a8 WRITE of size 65 at 0x506000000060 thread T0 #0 0x55c8a345ff12 in __interceptor_memcpy (/home/",
+      "diagnostic": "================================================================= ==2877617==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x506000000060 at pc 0x557fdb6d6f13 bp 0x7fff8ccf6ad0 sp 0x7fff8ccf6278 WRITE of size 65 at 0x506000000060 thread T0 #0 0x557fdb6d6f12 in __interceptor_memcpy (/home/",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "",
       "model_stdout": "0"
     },
@@ -1611,6 +1675,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "slb: destination capacity 1099511627776 out of range (1..67108864)",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "",
       "model_stdout": ""
     },
@@ -1620,6 +1686,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "slb: /home/apt/repos_common/sec-ladder/patterns/p02-buffer-copy/inputs/adversarial-shortlen.bin: payload_len 4616 exceeds file size",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "",
       "model_stdout": ""
     },
@@ -1628,7 +1696,9 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2539488==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000038 at pc 0x55d2c3cdf036 bp 0x7fff14435ee0 sp 0x7fff14435688 READ of size 61 at 0x504000000038 thread T0 #0 0x55d2c3cdf035 in __interceptor_memcpy (/home/a",
+      "diagnostic": "================================================================= ==2877622==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000038 at pc 0x55d83e38b036 bp 0x7ffc681aced0 sp 0x7ffc681ac678 READ of size 61 at 0x504000000038 thread T0 #0 0x55d83e38b035 in __interceptor_memcpy (/home/a",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "",
       "model_stdout": "0"
     },
@@ -1638,6 +1708,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "0",
       "model_stdout": "0"
     },
@@ -1646,7 +1718,9 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2539491==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x527000006a38 at pc 0x55bbce381036 bp 0x7ffd1d1b06e0 sp 0x7ffd1d1afe88 READ of size 65535 at 0x527000006a38 thread T0 #0 0x55bbce381035 in __interceptor_memcpy (/hom",
+      "diagnostic": "================================================================= ==2877625==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x527000006a38 at pc 0x55f49eca8036 bp 0x7ffe195d2eb0 sp 0x7ffe195d2658 READ of size 65535 at 0x527000006a38 thread T0 #0 0x55f49eca8035 in __interceptor_memcpy (/hom",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "",
       "model_stdout": "0"
     },
@@ -1656,6 +1730,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "4856715052625337940",
       "model_stdout": "4856715052625337940"
     },
@@ -1665,6 +1741,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "15997819096698035934",
       "model_stdout": "15997819096698035934"
     }

@@ -9,6 +9,8 @@
     "small.bin"
   ],
   "contract_sha256": "a0d431d916e061f9cfd391e3bd75f1555df40d6f1ab808ad5c1b3bcb14c53f72",
+  "run_timeout_s": {},
+  "expected_hang": [],
   "idiom": {
     "required": [
       "every comparison is subtraction-first AND IS SPELLED AS THESE TOKENS -- `end - p >= 3` and `vlen > end - (p + 3)` -- in every rung (R1: fourth entry below). This entry names TOKENS, not the weaker property 'contains no additive comparison'. That is the named-spelling standard, adopted as POLICY at TASK_018 for all six patterns AFTER the alternate spellings had been measured -- it is not a disambiguation of what this entry always meant. The argument, the history of the sentence, and what the standard demonstrably does NOT buy are in `why`",
@@ -76,7 +78,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "5b57db8dcb1815816fbfb1976314c95f037eafbf08e4886929d0649bd7e231d6",
+    "harness/check.py": "7965e53a73db0408083cac03c4cb3e7d53a5a58e3f6c26cef7dda613077f230b",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
@@ -95,7 +97,7 @@
     "patterns/p16-tlv-walk/model.py": "8b35eae6926af6654d6816d9a1733808234217fda9cdb8a8ee1d873d1877a6e9",
     "patterns/p16-tlv-walk/safe_naive.rs": "3f58f658310c5615d0899d01e0907a68b5689673b79d856b6372dbf8cd149054",
     "patterns/p16-tlv-walk/safe_tuned.rs": "6044ce0394896c3605e02178e84aa38b05d9c3bc4d31444cb52ab8674889d2fd",
-    "patterns/p16-tlv-walk/spec.md": "a52ebf5dc9e4e92560008b50ae396938b0abb25edf65d571ab77781c7271dbba",
+    "patterns/p16-tlv-walk/spec.md": "e9cf91c6c38d926817cfd1e9fbfd8ff2192d67ed7947fd4c5ba07963fa04fa66",
     "patterns/p16-tlv-walk/unsafe.rs": "ae04d5ee891f29376555b3ef60f99348bb3bfa080eb897f4520dd8bbbbf6f2a4",
     "patterns/p16-tlv-walk/verus.rs": "58c6d06cd6f86430578f5e3120644324162e5822db489ace7cdbba191e79332e",
     "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
@@ -471,6 +473,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8267139675305953920",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -488,6 +491,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8267139675305953920",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -505,6 +509,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8267139675305953920",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -522,6 +527,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8267139675305953920",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -539,6 +545,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8267139675305953920",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -556,6 +563,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8267139675305953920",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -573,6 +581,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8267139675305953920",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -590,6 +599,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8267139675305953920",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -607,6 +617,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -624,6 +635,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -641,6 +653,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -658,6 +671,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -675,6 +689,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -692,6 +707,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -709,6 +725,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -726,6 +743,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -743,6 +761,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "3988538283260473009",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -760,6 +779,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "3988538283260473009",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -777,6 +797,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "3988538283260473009",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -794,6 +815,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "3988538283260473009",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -811,6 +833,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "3988538283260473009",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -828,6 +851,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "3988538283260473009",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -845,6 +869,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "3988538283260473009",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -862,6 +887,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "3988538283260473009",
+        "hung": false,
         "diverges": false
       }
     ]
@@ -872,7 +898,9 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2574753==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51f000001a80 at pc 0x5614e27bc717 bp 0x7ffd29780f20 sp 0x7ffd29780f10 READ of size 1 at 0x51f000001a80 thread T0 #0 0x5614e27bc716 in kernel /home/apt/repos_common/",
+      "diagnostic": "================================================================= ==2912371==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51f000001a80 at pc 0x56009bce7717 bp 0x7ffcad3f2610 sp 0x7ffcad3f2600 READ of size 1 at 0x51f000001a80 thread T0 #0 0x56009bce7716 in kernel /home/apt/repos_common/",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "",
       "model_stdout": "8267139675305953920"
     },
@@ -882,6 +910,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "0",
       "model_stdout": "0"
     },
@@ -891,6 +921,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "3988538283260473009",
       "model_stdout": "3988538283260473009"
     },
@@ -900,6 +932,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "16533539788217857060",
       "model_stdout": "16533539788217857060"
     },
@@ -909,6 +943,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "71049275114976110",
       "model_stdout": "71049275114976110"
     }

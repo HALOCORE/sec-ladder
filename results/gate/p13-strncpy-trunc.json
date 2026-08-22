@@ -13,6 +13,8 @@
     "small.bin"
   ],
   "contract_sha256": "9e896ab6d07f5f066524e628517e61b7ce0e5f6cde327ced017cc66c27c3cdbe",
+  "run_timeout_s": {},
+  "expected_hang": [],
   "idiom": {
     "required": [
       {
@@ -125,14 +127,14 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "5b57db8dcb1815816fbfb1976314c95f037eafbf08e4886929d0649bd7e231d6",
+    "harness/check.py": "7965e53a73db0408083cac03c4cb3e7d53a5a58e3f6c26cef7dda613077f230b",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
     "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
-    "patterns/p13-strncpy-trunc/NOTES.md": "d40710afac17fa2acb242bd50cff6362beb1be2cf8d203f8b8bcc1939d0beb8a",
+    "patterns/p13-strncpy-trunc/NOTES.md": "965433acea9e4d51d367b49a99f6b46fc7494c203c554b605f39f45e128afd01",
     "patterns/p13-strncpy-trunc/README.md": "87b0261b50597a71710e8573336bb569deca0a6cb0f516171c3a3d194f7311ca",
     "patterns/p13-strncpy-trunc/c/kernel.c": "fd76e9c128584f4d0779639b8ade864afc05417897ea066701e25b685c0a84c8",
     "patterns/p13-strncpy-trunc/c/kernel.h": "f977e19494d16766d3c25648a5bc44747764fa7b43fdf61607bb774b00e56f1d",
@@ -140,7 +142,7 @@
     "patterns/p13-strncpy-trunc/c/main.c": "a79b73afd93a7a4945e930744bc65708ac5b363f196410df1067a7b624176662",
     "patterns/p13-strncpy-trunc/controls/gen_bulk_r5.py": "c7d7e189a6694430cdbb972a9096deb350d64c59bd1b5c8674966ac46fda580a",
     "patterns/p13-strncpy-trunc/controls/library_axis.py": "3010b04536e67d8a105b67180367053dd7d0aa6761da325a77298a1ba4420db7",
-    "patterns/p13-strncpy-trunc/controls/mutants.py": "5274e21354c2e76bef1fda551082f264f4f29135115f5a00ec904be7f679da0b",
+    "patterns/p13-strncpy-trunc/controls/mutants.py": "200b81490e1a9b6072856a2b238e4062d7d35636e06f683e54e224a54eb289b3",
     "patterns/p13-strncpy-trunc/controls/oracle_hole.py": "0da681bd519948222677eb7c66659ba7dc3eb7027b0407dc543f7fb6aaa14d75",
     "patterns/p13-strncpy-trunc/controls/spellings.py": "ad6c72ec15450d2f553c530b1c2f2b1e41fa4e929b2406d50b7f72cc4151ef04",
     "patterns/p13-strncpy-trunc/controls/sweep_fit.py": "c7d003379605eccf78966d7265769c9416b4a2979457e8d4bc7094a08a7de8f9",
@@ -148,7 +150,7 @@
     "patterns/p13-strncpy-trunc/model.py": "bd2df54d21a1daac5cfc549ce9458dba667f0910405b3e2faa28dc10751e0eb4",
     "patterns/p13-strncpy-trunc/safe_naive.rs": "ecb8597e5811a82a737ca4db3c7b372ab61033c4a1d70c9e863b4061ab9cd050",
     "patterns/p13-strncpy-trunc/safe_tuned.rs": "fc8b720185403917122156d2f3276e532184fbeff5ad92e1a2fa990b30c5d5a5",
-    "patterns/p13-strncpy-trunc/spec.md": "cefab0b5ac96f459604a6bb2d954040f74ec33d1459718dcfec618c3c9c29a64",
+    "patterns/p13-strncpy-trunc/spec.md": "e178780b1b8bbc24213db0044e63da70beeedd03d1b1950f4fd55fa97e3c4f0c",
     "patterns/p13-strncpy-trunc/unsafe.rs": "82dd14142a71573c506fcae7b8969d07e054cfb5309faa4652945c04975040a5",
     "patterns/p13-strncpy-trunc/verus.rs": "c6d45ccc197838ec1874c134bf2c354e1038cc8fdc75c52524512a2e09938916",
     "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
@@ -650,6 +652,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "227437609984",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -667,6 +670,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "227437609984",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -684,6 +688,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "227437609984",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -701,6 +706,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "227437609984",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -718,6 +724,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "227437609984",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -735,6 +742,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "227437609984",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -752,6 +760,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "227437609984",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -769,6 +778,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "227437609984",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -786,6 +796,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -803,6 +814,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -820,6 +832,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -837,6 +850,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -854,6 +868,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -871,6 +886,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -888,6 +904,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -905,6 +922,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -920,6 +938,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "16725268236661028992",
+        "hung": false,
         "diverges": true
       },
       {
@@ -933,6 +952,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "16725268236661028992",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -943,10 +963,12 @@
         "stderr": "",
         "signal": null,
         "cells": [
+          "O0/whole",
           "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "16725268236661028992",
+        "hung": false,
         "diverges": true
       },
       {
@@ -955,11 +977,11 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole",
           "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "16725268236661028992",
+        "hung": false,
         "diverges": true
       },
       {
@@ -972,6 +994,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "16725268236661028992",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -989,6 +1012,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "16725268236661028992",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1006,6 +1030,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "16725268236661028992",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1023,6 +1048,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "16725268236661028992",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1040,6 +1066,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "16725268236661028992",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1057,6 +1084,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "16725268236661028992",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1074,6 +1102,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "16725268236661028992",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1089,6 +1118,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "11140422339664390272",
+        "hung": false,
         "diverges": true
       },
       {
@@ -1102,6 +1132,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "11140422339664390272",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -1112,11 +1143,11 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole",
           "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "11140422339664390272",
+        "hung": false,
         "diverges": true
       },
       {
@@ -1125,10 +1156,12 @@
         "stderr": "",
         "signal": null,
         "cells": [
+          "O0/whole",
           "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "11140422339664390272",
+        "hung": false,
         "diverges": true
       },
       {
@@ -1141,6 +1174,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "11140422339664390272",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -1158,6 +1192,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "11140422339664390272",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1175,6 +1210,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "11140422339664390272",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1192,6 +1228,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "11140422339664390272",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1209,6 +1246,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "11140422339664390272",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1226,6 +1264,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "11140422339664390272",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1243,6 +1282,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "11140422339664390272",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1260,6 +1300,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1277,6 +1318,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1294,6 +1336,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1311,6 +1354,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1328,6 +1372,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1345,6 +1390,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1362,6 +1408,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1379,6 +1426,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1394,6 +1442,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": true
       },
       {
@@ -1407,6 +1456,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -1422,6 +1472,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": true
       },
       {
@@ -1434,6 +1485,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": true
       },
       {
@@ -1446,6 +1498,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -1463,6 +1516,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1480,6 +1534,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1497,6 +1552,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1514,6 +1570,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1531,6 +1588,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1548,6 +1606,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1563,6 +1622,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": true
       },
       {
@@ -1576,6 +1636,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -1591,6 +1652,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": true
       },
       {
@@ -1603,6 +1665,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": true
       },
       {
@@ -1615,6 +1678,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -1632,6 +1696,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1649,6 +1714,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1666,6 +1732,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1683,6 +1750,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1700,6 +1768,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1717,6 +1786,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
+        "hung": false,
         "diverges": false
       }
     ]
@@ -1728,6 +1798,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "227437609984",
       "model_stdout": "227437609984"
     },
@@ -1737,6 +1809,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "8714310972305648768",
       "model_stdout": "8714310972305648768"
     },
@@ -1745,7 +1819,9 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7fdd88600040 with insufficient space for an obj",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f7e82e00040 with insufficient space for an obj",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "",
       "model_stdout": "16725268236661028992"
     },
@@ -1754,7 +1830,9 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f5a48800040 with insufficient space for an obj",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7fc984400040 with insufficient space for an obj",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "",
       "model_stdout": "11140422339664390272"
     },
@@ -1764,6 +1842,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "0",
       "model_stdout": "0"
     },
@@ -1772,7 +1852,9 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f4469000040 with insufficient space for an obj",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7fa33b600040 with insufficient space for an obj",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "",
       "model_stdout": "8714310972305648768"
     },
@@ -1781,7 +1863,9 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f0f91800040 with insufficient space for an obj",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7fa675800040 with insufficient space for an obj",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "",
       "model_stdout": "8714310972305648768"
     },
@@ -1791,6 +1875,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "10467335530746193689",
       "model_stdout": "10467335530746193689"
     },
@@ -1800,6 +1886,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "17479224122809884383",
       "model_stdout": "17479224122809884383"
     }

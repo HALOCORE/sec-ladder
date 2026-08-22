@@ -88,7 +88,7 @@ Two consequences, and both are structural rather than choices:
 - **`small` and `large` must be 100% accept, and that is not negotiable.**
   `harness/check.py`'s `check_checksums` requires every cell, R1 included, to
   print `model.py`'s checksum on every non-adversarial **matrix** input
-  (`sweep-*` is dropped before it, at `check.py:469`). R1 omits the capacity
+  (`sweep-*` is dropped before it, in **`inputs_of`** at `check.py:495`). R1 omits the capacity
   check, so on any window where the check fires R1 copies bytes the checked
   rungs skip *and* ends with a larger `dlen` — and **p12's fold takes both**, so
   no such row can also be a checksum-agreeing one **here**. ⚠ That is a property

@@ -10,6 +10,8 @@
     "small.bin"
   ],
   "contract_sha256": "e4eab08622dd111436baa49290cf47d2e994e7d785e3026ff7faa1406ed20b70",
+  "run_timeout_s": {},
+  "expected_hang": [],
   "idiom": {
     "required": [
       "R1 spells the move memcpy and R1h memmove -- that one token is the whole difference between them",
@@ -68,7 +70,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "5b57db8dcb1815816fbfb1976314c95f037eafbf08e4886929d0649bd7e231d6",
+    "harness/check.py": "7965e53a73db0408083cac03c4cb3e7d53a5a58e3f6c26cef7dda613077f230b",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
@@ -81,7 +83,7 @@
     "patterns/p08-overlap-move/c/kernel.h": "0849b814a8299dd729a16fdb195cb604cd6c795abc8d410ed80b0ecfd39f8302",
     "patterns/p08-overlap-move/c/kernel_hardened.c": "11512d63c0ef067b06a1e9eb181f9a13cbc84561c785cc2e00c1f9caff0b767c",
     "patterns/p08-overlap-move/c/main.c": "1c832f94f3e48fd5a722069cb4ea1d7fc251886417d8c5c0b7b6d6e886e01a26",
-    "patterns/p08-overlap-move/controls/gen_controls.py": "b7ce9b3fa6bd498d62ab53b32879d59750385d47a96eeeb10b25cd84252d352a",
+    "patterns/p08-overlap-move/controls/gen_controls.py": "82631f960a5e30be97b6ff4e66f3a0cf0170dbe7887aa9e96e569a437129f1b6",
     "patterns/p08-overlap-move/inputs/gen.py": "36526ac3c090ed49f3b188990c5792e678da5012f45bdad2ea8e8f7ddd297db9",
     "patterns/p08-overlap-move/model.py": "6933ee18a8d53566ae4cfac1448253984b4ea83f4901c5b902e76ea1fe415d10",
     "patterns/p08-overlap-move/safe_naive.rs": "08afa4f9ecd706164a7d4103198d9f2b4df88785b16eee40f8d915c0bf143577",
@@ -505,6 +507,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -522,6 +525,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -539,6 +543,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -556,6 +561,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -573,6 +579,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -590,6 +597,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -607,6 +615,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -624,6 +633,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -641,6 +651,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -658,6 +669,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -675,6 +687,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -692,6 +705,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -709,6 +723,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -726,6 +741,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -743,6 +759,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -760,6 +777,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -777,6 +795,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "17006177784580028288",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -794,6 +813,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "17006177784580028288",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -811,6 +831,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "17006177784580028288",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -828,6 +849,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "17006177784580028288",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -845,6 +867,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "17006177784580028288",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -862,6 +885,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "17006177784580028288",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -879,6 +903,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "17006177784580028288",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -896,6 +921,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "17006177784580028288",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -913,6 +939,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -930,6 +957,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -947,6 +975,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -964,6 +993,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -981,6 +1011,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -998,6 +1029,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1015,6 +1047,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1032,6 +1065,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ]
@@ -1043,6 +1077,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "0",
       "model_stdout": "0"
     },
@@ -1052,6 +1088,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "0",
       "model_stdout": "0"
     },
@@ -1061,6 +1099,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "17006177784580028288",
       "model_stdout": "17006177784580028288"
     },
@@ -1070,6 +1110,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "0",
       "model_stdout": "0"
     },
@@ -1079,6 +1121,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "16961355432730674521",
       "model_stdout": "16961355432730674521"
     },
@@ -1088,6 +1132,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "5963384295905503290",
       "model_stdout": "5963384295905503290"
     }

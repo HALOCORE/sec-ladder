@@ -33,11 +33,12 @@ What it enforces, in order:
      language (TASK_019); `spelling_matches` below DEFINES what matching one
      means. TASK_020 adds a REPORTING-ONLY audit here -- where every backticked
      spelling is and is not, across every rung of the languages it declares,
-     printed and written to `results/gate/*.json`. It never fails and never
-     enters the verdict; it exists so TASK_019's "0 of 82" is reproducible from
-     the committed tree instead of from a scratch file. `forbidden` carries a
-     verdict (its scope is universal by the key's own meaning); the `required`
-     numbers are presence, not compliance -- see `idiom_audit`. TASK_062 adds
+     printed and written to `results/gate/*.json`. It exists so TASK_019's
+     "0 of 82" is reproducible from the committed tree instead of from a
+     scratch file. **Since TASK_068 a `forbidden` HIT FAILS the run** -- its
+     scope is universal by the key's own meaning, so it is decidable with no
+     English involved; the `required` numbers stay presence, not compliance,
+     and never fail -- see `idiom_audit`. TASK_062 adds
      the one thing in this stage that DOES fail on the declaration's text:
      `idiom.why` must carry the shared named-spelling paragraph verbatim,
      because that paragraph is where a backticked pin's MEANING is written
@@ -71,7 +72,13 @@ What it enforces, in order:
      that could occupy the rung, which is the step that disqualifies an
      unverifiable R4 candidate (`.memory/01-ladder.md`, TASK_027_REVIEW Q1)
   4  `adversarial-*` behaviour is recorded per rung and compared to the model's
-     expected exit/stdout
+     expected exit/stdout. A cell that DOES NOT TERMINATE is one of those
+     behaviours: `model.py` may declare `expected_hang` on an adversarial input
+     and the contract's `run.timeout_s` then pins how long the gate waits
+     (TASK_068 -- `RUN_TIMEOUT` is 900 s, which for a deliberately
+     non-terminating cell is hours per gate run). The prediction is derived and
+     the budget is pinned, they are required to agree, and `diverges` is still
+     computed against the CONFORMING `expected_exit` -- see `run_budgets`
   5  the "Proof domain must cover the measured domain" rules:
        - the Verus obligation count equals the number pinned in `spec.md`
        - every item's `external` attribute, `requires` and `ensures` match
@@ -461,13 +468,23 @@ def head(title):
     print(f"\n== {title} " + "=" * max(0, 66 - len(title)))
 
 
-def run_bin(path, arg):
+def run_bin(path, arg, timeout=None):
+    """Run one cell on one input. `(exit, stdout, stderr)`, with `exit is None`
+    meaning *it did not terminate inside the budget*.
+
+    `timeout` defaults to `RUN_TIMEOUT` (900 s), which is a ceiling for a cell
+    that is merely slow. A pattern whose adversarial input is a **deliberate
+    non-terminating loop** pays that ceiling on every cell of every gate run --
+    for a hash-probe pattern, 12 to 20 cells x 900 s = 3 to 5 hours, paid again
+    on every doc edit because `pdir/*.md` is in `source_sha256`. So the
+    `slb-contract` block may shorten the budget per input; see `run_budgets`."""
+    t = RUN_TIMEOUT if timeout is None else timeout
     try:
         r = subprocess.run([path, arg], capture_output=True, text=True,
-                           timeout=RUN_TIMEOUT)
+                           timeout=t)
         return r.returncode, r.stdout, r.stderr
     except subprocess.TimeoutExpired:
-        return None, "", f"<timeout after {RUN_TIMEOUT}s>"
+        return None, "", f"<timeout after {t}s>"
 
 
 def inputs_of(pdir, skip=()):
@@ -495,6 +512,99 @@ def read_contract(pdir):
     if not m:
         raise SystemExit("check.py: spec.md has no ```slb-contract block")
     return json.loads(m.group(1)), m.group(1)
+
+
+def run_budgets(contract, rep, all_stems):
+    """`{input stem: seconds}` from the contract's optional `run` block.
+
+    ```json
+    "run": {"timeout_s": {"adversarial-full": 5},
+            "why": "R1..R4's probe loop does not terminate on a full table; ..."}
+    ```
+
+    **Where this lives, and why -- settled at TASK_068, which was handed the
+    question open.** The manager's proposal was one declaration in `model.py`
+    (an optional per-input `run_timeout_s`, with `expected_exit = None` meaning
+    "expected not to terminate"), and asked the deciding question: *should
+    declaring a hang move `contract_sha256`?* The answer is **yes -- but there
+    are TWO declarations here, not one, and they belong in different files**:
+
+      * **Which inputs do not terminate is a SEMANTIC PREDICTION**, derivable
+        from the blob's own bytes (a full table and an absent key), and it is
+        `model.py`'s job to derive it -- `model.py` is the *independent
+        reference*, and `sanitizer_expect` / `expected_exit` / `expected_stdout`
+        are already there. `.memory/02-bench-rules.md`'s rule on declared pins
+        is *"acceptable only for something a reviewer can check by reading
+        `spec.md` alone"*; whether a given blob makes a probe loop run forever
+        is emphatically not that. So it stays derived: `model.expected_hang`.
+      * **How many seconds the gate waits before calling it a hang is a RESOURCE
+        PIN.** It is not a function of the input bytes at all -- it is a claim
+        that the hang is *detectable* in that long -- and it is exactly what a
+        reviewer can judge from prose. It is also the knob that could quietly
+        turn a slow-but-honest cell into a "declared hang", which is the edit
+        that must show up in review. So it is a pin, here, hashed into
+        `contract_sha256`.
+
+    The two are **required to agree** (`check_hang_declarations`): a model that
+    declares a hang must have a budget, and a budget must name an input the
+    model declares. That is what makes the answer to the deciding question a
+    *yes* mechanically -- a hang cannot be declared without moving
+    `contract_sha256` -- while leaving the prediction itself derived.
+
+    ⚠ **A NON-adversarial input may never carry either half.** Enforced twice
+    (here, and on the model side in `build_models`) because it is the accident
+    this design could enable: stage 2's checksum agreement is the gate's only
+    load-bearing correctness check, and a pattern that could declare its `small`
+    or `large` cell non-terminating would be declaring its way out of it.
+    ⚠ **Honest scope**: as the code stands today that accident is already
+    caught, because `check_checksums` requires `rc == 0` and reads no model
+    expectation at all -- a hanging good cell fails "run" whatever it declared.
+    This guard is therefore fail-closed defence in depth against a *later* edit
+    that teaches stage 2 about `expected_hang`, not the closure of a live hole.
+    Do not upgrade the claim."""
+    run = contract.get("run")
+    if run is None:
+        return {}
+    if not isinstance(run, dict):
+        rep.fail("run-budget", "contract `run` must be an object with "
+                               "`timeout_s` and `why`")
+        return {}
+    unknown = sorted(set(run) - {"timeout_s", "why"})
+    if unknown:
+        rep.fail("run-budget", f"contract `run` has unknown key(s) {unknown}; "
+                               f"a mistyped key is silently empty")
+    if not (run.get("why") or "").strip():
+        rep.fail("run-budget", "contract `run.why` is empty. A shortened run "
+                               "budget is a pin, and a pin whose reason is not "
+                               "written down is not checkable by reading "
+                               "`spec.md` alone.")
+    tos = run.get("timeout_s")
+    if not isinstance(tos, dict) or not tos:
+        rep.fail("run-budget", "contract `run.timeout_s` must be a non-empty "
+                               "object {input stem: seconds}")
+        return {}
+    out = {}
+    for stem, secs in sorted(tos.items()):
+        if stem not in all_stems:
+            rep.fail("run-budget", f"`run.timeout_s` names {stem!r}, which is "
+                                   f"not an input of this pattern")
+            continue
+        if not stem.startswith("adversarial"):
+            rep.fail("run-budget",
+                     f"`run.timeout_s` names {stem!r}, which is not an "
+                     f"adversarial input. A shortened budget is only ever for a "
+                     f"deliberately non-terminating cell, and those are "
+                     f"adversarial by construction; on a matrix input it would "
+                     f"be a way to declare out of stage 2's checksum "
+                     f"agreement.")
+            continue
+        if not isinstance(secs, (int, float)) or isinstance(secs, bool) \
+                or not 0 < secs <= RUN_TIMEOUT:
+            rep.fail("run-budget", f"`run.timeout_s[{stem}]` is {secs!r}, want "
+                                   f"a number in (0, {RUN_TIMEOUT}]")
+            continue
+        out[stem] = secs
+    return out
 
 
 def load_model(pdir, contract):
@@ -576,6 +686,11 @@ def check_selftests(rep):
         if got != want:
             rep.fail("audit-selftest",
                      f"idiom_audit: {label}: got {got}, want {want}")
+    for label, got, want in _FORBIDDEN_VERDICT_CASES:
+        if got != want:
+            rep.fail("forbidden-verdict-selftest",
+                     f"forbidden_verdict: {label}: got [fail,ok,shout]={got}, "
+                     f"want {want}")
     for label, got, want in _NAMED_SPELLING_CASES:
         if got != want:
             rep.fail("named-spelling-selftest",
@@ -1011,12 +1126,13 @@ def rung_sources(pdir):
 
 
 def idiom_audit(contract, rungs):
-    """REPORTING ONLY. Where each declared spelling is, and is not, in the tree.
+    """Where each declared spelling is, and is not, in the tree.
 
-    `rungs` is `[(relpath, language, source_text)]`. Never fails, never blocks,
-    never touches the verdict -- it is an observation printed into the record so
-    that a reviewer can read it, and so that `results/gate/*.json` carries a
-    number whose movement a diff shows.
+    `rungs` is `[(relpath, language, source_text)]`. This function itself is
+    pure: it computes and returns, it never calls `rep`. **Its `forbidden_hits`
+    are failed by `check_idiom`** (TASK_068); everything else it returns is an
+    observation printed into the record so that a reviewer can read it, and so
+    that `results/gate/*.json` carries a number whose movement a diff shows.
 
     **Why this exists.** TASK_019 audited all six declarations against every
     rung and found **20 raw / 15 comment-stripped / 9 normalised violations of
@@ -1034,6 +1150,47 @@ def idiom_audit(contract, rungs):
     the five are two hardened-C comments quoting the spelling they refuse,
     p16's verus.rs GHOST loop invariant, and p17's `Range:` inside a comment and
     a format string. That 0 is the reproducible core of TASK_019's number.
+
+    **FAIL, not print -- settled at TASK_068, and here is the accident test.**
+    `.memory/02-bench-rules.md`'s threat model requires a new gate check to
+    answer *"could this defect happen BY ACCIDENT?"* first. Answer: **yes, and
+    it is not hypothetical -- it happened, it shipped, and it was invisible for
+    three tasks.** p27 forbade `` `memset(tab` `` and both of its own C rungs
+    spelled it (`c/kernel.c:66-67`, `c/kernel_hardened.c:46-47`): nobody wrote
+    that on purpose, and the entry itself turned out to be the wrong half --
+    every rung must zero the table, the four Rust rungs are FORCED to, so a
+    universal-scope `forbidden` excluded an operation the whole ladder performs
+    (TASK_063 deleted the entry as a declaration edit with a byte-provable
+    undo). Two further facts decided the direction:
+
+      * **A number that is printed is not a check.** That `2` was printed in the
+        verdict, written into `results/gate/p27-handle-table.json` and
+        transcribed into `NOTES.md`, across three tasks and two adversarial
+        reviews, and nobody acted on it.
+      * **The false-positive surface is nil today**: `forbidden_hits` is **0**
+        across all 20 patterns (183 forbidden spellings at the time of writing;
+        the invariant is the ZERO, not the denominator). The same sweep with
+        comments, string literals and ghost clauses NOT blanked gives **29 hits
+        across 11 patterns** -- that difference *is* the value of
+        `spelling_matches`'s blanking half, and it is what a naive
+        implementation would fail on.
+
+    ⚠ **The counter-argument, recorded because it is right about strength and
+    wrong about direction** (TASK_063's own engineer): a failure here is
+    dischargeable by the WRONG fix -- respell the rung at 0.0000 `Ir`/call --
+    leaving the real defect (an entry whose `why` never said what it forbids
+    *for*) in place. True. But a respelling at least moves `source_sha256` in a
+    commit, whereas the printed number moved nothing for three tasks; **weak
+    forcing beats none**, and the check is not being asked to judge the entry's
+    English, only to make the contradiction impossible to walk past.
+
+    ⚠ **Two known false-positive shapes, both measured at 0 on the shipped tree,
+    named here so that a hit that IS one is recognisable rather than
+    mysterious**: `spelling_matches` does not blank `#[cfg(slb_twin)]` bodies,
+    so a forbidden spelling that exists only in a twin no build contains would
+    count (RECAP "Owed" 10, blast radius 0 of 15 pins); and `rung_sources`
+    includes `CONTROL_CELLS`, today `["safe_naive_verus"]`, which no pattern
+    ships. Both are harness defects if they ever fire -- not pattern defects.
 
     `required` has no such scope. Which rungs an entry applies to lives in its
     English -- "R1 has no fit check at all", "R1 omits only `&& start >= 0`" --
@@ -1132,16 +1289,19 @@ def idiom_audit(contract, rungs):
 
 
 def idiom_audit_lines(au):
-    """The audit as text for the verdict. Data, not a diagnostic: no `FAIL`, no
-    `!!`, and every list is printed in full so a miss travels with its reason."""
+    """The audit as text for the verdict. Every list is printed in full so a
+    miss travels with its reason. The `required` half is data -- no `FAIL`, no
+    `!!`. The `forbidden` half is a verdict since TASK_068 and `check_idiom`
+    raises it separately, so a FORBIDDEN HIT line below always has a
+    `rep.fail("idiom-forbidden", ...)` beside it."""
     # NOT `spellings x rungs`: a per-language entry is read against its own
     # language's rungs only, so the product is not the pair count.
     out = [f"    audit  {au['spellings']} backticked spelling(s) over "
            f"{au['rungs']} rung(s) -> {au['pairs']} (spelling, rung) pair(s), "
-           f"{au['present']} present  [reporting only -- never fails]",
+           f"{au['present']} present  [the `required` numbers never fail]",
            f"    audit  forbidden: {au['forbidden_spellings']} spelling(s), "
            f"{au['forbidden_hits']} hit(s)  "
-           f"(decidable: no rung may spell a forbidden token)",
+           f"(decidable: no rung may spell a forbidden token -- a hit FAILS)",
            f"    audit  required : {au['required_pins_nothing']} pin nothing, "
            f"{au['required_absent']} scoped-absent pair(s)  "
            f"(NOT decidable -- an entry's rung scope is its English; a "
@@ -1201,9 +1361,10 @@ def check_idiom(rep, pdir, contract):
                            "rungs are matched only by the `required` list and "
                            "its safety number is a spelling's number unless "
                            f"`why` argues otherwise: {idi['why']}")
-    # The reporting line (TASK_020). Never fails, never blocks, never shouts --
-    # `rep.ok` and plain prints, because this is data. `idiom_audit`'s docstring
-    # says why `forbidden` carries a verdict and `required` does not.
+    # The audit (TASK_020). Its `required` half never fails, never blocks,
+    # never shouts -- `rep.ok` and plain prints, because that half is data. Its
+    # `forbidden` half became a verdict at TASK_068; `idiom_audit`'s docstring
+    # carries the accident test and the counter-argument.
     rungs = [(r, l, open(os.path.join(pdir, r)).read())
              for r, l in rung_sources(pdir)]
     au = idiom_audit(contract, rungs)
@@ -1213,13 +1374,91 @@ def check_idiom(rep, pdir, contract):
                "and there is nothing for the audit to report. Its rungs are "
                "matched by the entries' English alone (TASK_019, TASK_020).")
     else:
-        rep.ok("idiom spelling audit follows -- REPORTING ONLY. It cannot fail "
-               "the gate and does not enter the verdict; it exists so that "
-               "TASK_019's '0 of 82' is reproducible from the committed tree "
-               "rather than from a scratch file.")
+        rep.ok("idiom spelling audit follows. The `required` numbers are "
+               "REPORTING ONLY -- they cannot fail the gate; a `forbidden` hit "
+               "FAILS it (TASK_068). It exists so that TASK_019's '0 of 82' is "
+               "reproducible from the committed tree rather than from a "
+               "scratch file.")
         for ln in idiom_audit_lines(au):
             print(ln)
+    forbidden_verdict(rep, au, nforb)
     return au
+
+
+def forbidden_verdict(rep, au, nforb):
+    """TASK_068. Fail, don't print.
+
+    A `forbidden` entry's scope is universal by the key's own meaning, so this
+    is decidable with no English involved, and the tree's own history says the
+    defect happens by accident: p27 forbade a spelling both of its C rungs used,
+    the `2` was printed for three tasks and two adversarial reviews, and nothing
+    moved. `idiom_audit`'s docstring carries the whole argument;
+    `.memory/02-bench-rules.md` carries the residual it retires.
+
+    Split out of `check_idiom` so `_FORBIDDEN_VERDICT_CASES` can drive it with a
+    stub report -- the check that TASK_053/TASK_056 declined and TASK_063
+    recommended is worth a selftest of its own, not just of the counter it
+    reads."""
+    if au["forbidden_hits"]:
+        for h in au["hits"]:
+            rep.fail("idiom-forbidden",
+                     f"{h['rung']} spells `{h['spelling']}`, which this "
+                     f"pattern's own idiom.{h['entry']} ({h['lang']}) forbids. "
+                     f"Two routes out, and they are not equivalent: respell "
+                     f"the rung (moves `source_sha256`), or fix the entry -- "
+                     f"narrow its scope, make it per-language, or delete it -- "
+                     f"which is a DECLARATION edit and owes the direction test "
+                     f"(`.memory/01-ladder.md`). If the entry is what is wrong, "
+                     f"say so in `why`; p27's said nothing about what the "
+                     f"spelling was forbidden FOR, and that is how it survived.")
+        rep.shout("idiom-forbidden",
+                  f"{au['forbidden_hits']} forbidden hit(s) over "
+                  f"{au['forbidden_spellings']} forbidden spelling(s). If one "
+                  f"of these looks wrong, check the two known false-positive "
+                  f"shapes first -- a spelling that exists only inside a "
+                  f"`#[cfg(slb_twin)]` body (`spelling_matches` does not blank "
+                  f"those) or a hit in a CONTROL_CELLS source. Both were 0 on "
+                  f"the whole tree when this check was turned on.")
+    elif au["forbidden_spellings"]:
+        rep.ok(f"idiom forbidden: 0 hit(s) over {au['forbidden_spellings']} "
+               f"forbidden spelling(s) x the rungs of the language(s) each "
+               f"declares. Decidable and ENFORCED since TASK_068 -- a hit is a "
+               f"gate failure, not a printed number.")
+    elif nforb:
+        # The p09 shape, and it is exactly the vacuous-truth defect
+        # `.memory/02-bench-rules.md` calls this project's most repeated one: a
+        # `forbidden` entry with no BACKTICKED span is audited zero times, so
+        # "0 hits" would be earned by auditing nothing. Never `rep.ok` here.
+        rep.shout("idiom-forbidden",
+                  f"this pattern declares {nforb} forbidden entry/entries and "
+                  f"NOT ONE backticked spelling, so the enforced audit ranges "
+                  f"over an EMPTY set and its 0 hits are vacuous. Backtick "
+                  f"every `forbidden` entry you want enforced (p09 shipped 5 "
+                  f"entries and 0 audited spellings; TASK_038_REVIEW).")
+
+
+class _StubReport:
+    """Counts `fail`/`ok`/`shout` without printing. Selftest use only."""
+
+    def __init__(self):
+        self.n = {"fail": 0, "ok": 0, "shout": 0}
+
+    def fail(self, section, msg):
+        self.n["fail"] += 1
+
+    def ok(self, msg):
+        self.n["ok"] += 1
+
+    def shout(self, section, msg):
+        self.n["shout"] += 1
+
+
+def _fv(req, forb=(), rungs=None):
+    """(fails, oks, shouts) from `forbidden_verdict` on a synthetic pattern."""
+    au = _aud(req, forb, rungs)
+    r = _StubReport()
+    forbidden_verdict(r, au, len(list(forb)))
+    return [r.n["fail"], r.n["ok"], r.n["shout"]]
 
 
 _IDIOM_CASES = [
@@ -1396,6 +1635,32 @@ _AUDIT_CASES = [
 ]
 
 
+#: `forbidden_verdict` selftests (TASK_068). The counter above was printed and
+#: not acted on for three tasks; these pin that it is now a FAILURE, and that
+#: the three no-hit shapes are told apart rather than all reading as a pass.
+_FORBIDDEN_VERDICT_CASES = [
+    # The p27 shape: an entry both C rungs spell. 4 hits -> 4 fails + 1 shout.
+    # This is the case TASK_053 proposed, TASK_056 declined and TASK_063
+    # recommended; before TASK_068 it produced 0 fails.
+    ("a forbidden spelling in exec code FAILS, once per hit",
+     _fv(["`len > cap - 2`"], ["`len > cap - 2`"]), [4, 0, 1]),
+    # ...and the blanking half is what keeps it at 0 on the shipped tree: the
+    # hardened C rung's comment and verus.rs's ghost invariant both spell the
+    # token and neither is a hit.
+    ("a forbidden spelling only in a comment / ghost clause is NOT a hit",
+     _fv(["`len > cap - 2`"], ["`2 + len > cap`"]), [0, 1, 0]),
+    # A pattern that forbids nothing is legal (p01/p08) -- and must not get a
+    # count-bearing `ok` over an empty set.
+    ("forbidding nothing is legal and earns no ok",
+     _fv(["`len > cap - 2`"]), [0, 0, 0]),
+    # The p09 shape: entries with no backticked span are audited zero times, so
+    # "0 hits" would be vacuous. Shout, never ok.
+    ("a forbidden entry with no backticks SHOUTS instead of passing",
+     _fv(["`len > cap - 2`"], ["chunks_exact, spelled out in English"]),
+     [0, 0, 1]),
+]
+
+
 # ==========================================================================
 # 1. build
 # ==========================================================================
@@ -1433,8 +1698,59 @@ def build_models(modmod, indir, names, rep):
         if se not in ("clean", "fires"):
             rep.fail("model", f"{name}: sanitizer_expect is {se!r}, want "
                               f"'clean' or 'fires'")
+        # TASK_068. `expected_hang` is OPTIONAL and defaults False, so no
+        # existing model.py moves. It is the termination analogue of
+        # `sanitizer_expect: "fires"`: the input on which a rung that omits this
+        # pattern's guard does not terminate. See `run_budgets` for why the
+        # prediction is derived here and the seconds are pinned in the contract.
+        eh = sbg_opt(m, "expected_hang", False)
+        if not isinstance(eh, bool):
+            rep.fail("model", f"{name}: expected_hang is {eh!r}, want a bool")
+        elif eh and not name.startswith("adversarial"):
+            rep.fail("model",
+                     f"{name}: expected_hang is True on a NON-adversarial "
+                     f"input. Stage 2's checksum agreement is the gate's only "
+                     f"load-bearing correctness check and every matrix input "
+                     f"must reach it; an input that declares it does not "
+                     f"terminate is declaring its way out of it.")
         models[name] = m
     return models
+
+
+def check_hang_declarations(rep, all_models, budgets):
+    """The two halves of a declared hang must agree (TASK_068).
+
+    `model.expected_hang` predicts; `contract.run.timeout_s` budgets. Neither is
+    allowed without the other, which is what makes *declaring a hang move
+    `contract_sha256`* -- the deciding question the design was handed -- true
+    mechanically rather than by convention. It also stops the two silent
+    failure modes: a prediction with no budget still costs `RUN_TIMEOUT` per
+    cell (the whole cost this exists to avoid, and it would be invisible), and a
+    budget with no prediction is a shortened timeout on an input nobody said
+    hangs, which is how a slow honest cell gets recorded as a hang."""
+    declared = sorted(n for n, m in all_models.items()
+                      if sbg_opt(m, "expected_hang", False))
+    stems = {n[:-4] if n.endswith(".bin") else n for n in declared}
+    for s in sorted(stems - set(budgets)):
+        rep.fail("run-budget",
+                 f"model.py declares {s}.bin non-terminating (expected_hang) "
+                 f"and the contract gives it no `run.timeout_s` budget, so "
+                 f"every cell would still be waited on for {RUN_TIMEOUT}s.")
+    for s in sorted(set(budgets) - stems):
+        rep.fail("run-budget",
+                 f"contract `run.timeout_s` shortens {s}.bin to {budgets[s]}s "
+                 f"but model.py does not declare it non-terminating "
+                 f"(expected_hang). A shortened budget on a terminating input "
+                 f"records a slow cell as a hang.")
+    if declared and stems == set(budgets):
+        # Only when the two halves AGREE -- otherwise the `ok` would be printed
+        # beside its own failure, and the count it quantifies over would include
+        # an input with no budget at all.
+        rep.ok(f"{len(declared)} input(s) declared non-terminating "
+               f"({declared}), each with a contract budget "
+               f"({ {s: budgets[s] for s in sorted(stems)} } s) -- so the "
+               f"declaration is inside `contract_sha256`.")
+    return declared
 
 
 def check_checksums(built, rep, models, indir):
@@ -2003,19 +2319,50 @@ def check_identity(digests, rep, contract):
 # 4. adversarial behaviour
 # ==========================================================================
 
-def check_adversarial(built, rep, adv_models, indir, cells):
+def check_adversarial(built, rep, adv_models, indir, cells, budgets=None):
+    """`.memory/02-bench-rules.md`: the adversarial row RECORDS per-rung
+    behaviour rather than requiring agreement.
+
+    **A cell that does not terminate is one of those behaviours** (TASK_068),
+    and it was already representable -- `run_bin` returns `exit=None` and this
+    stage folds it into an ordinary row without crashing. What was not viable
+    was the COST: `RUN_TIMEOUT` per cell. `budgets` is `{stem: seconds}` from
+    the contract (`run_budgets`); an input the model declares `expected_hang`
+    gets its budget here, and the row carries `hung` so the table says which
+    rungs ran forever instead of leaving it to be inferred from `exit=None`.
+
+    ⚠ **`diverges` is still computed against the model's `expected_exit`, and
+    that is deliberate.** The proposal this replaced was `expected_exit = None`
+    meaning "expected not to terminate"; it inverts this column. `model.py` is
+    the *independent reference* and its `expected_exit`/`expected_stdout` are
+    what a CONFORMING implementation does -- and the conforming implementation
+    (the Python model itself, and the R5 rung whose `decreases` obligation is
+    the whole point of such a pattern) TERMINATES. Under `expected_exit = None`
+    the hanging rungs would read `diverges=False` and the one rung that
+    terminates would read `diverges=True`: the headline result, printed upside
+    down. So the hang is declared in its own field and the divergence column
+    keeps its meaning."""
     head("4. adversarial inputs -- behaviour recorded, not required to agree")
+    budgets = budgets or {}
     table = {}
     for name, mod in adv_models.items():
         m_exit, m_out = sbg(mod, "expected_exit"), sbg(mod, "expected_stdout")
+        stem = name[:-4] if name.endswith(".bin") else name
+        budget, hangs = budgets.get(stem), sbg_opt(mod, "expected_hang", False)
         print(f"    -- {name}: {sb(mod.describe)} -> model expects exit "
-              f"{m_exit}, stdout {m_out.strip()!r}")
+              f"{m_exit}, stdout {m_out.strip()!r}"
+              + (f"  [declared NON-TERMINATING; budget {budget}s]"
+                 if hangs else ""))
+        n_hung = n_cell = 0
         for c in cells:
             seen = {}
             for (cc, o, m), path in sorted(built.items()):
                 if cc != c or not path:
                     continue
-                rc, out, err = run_bin(path, os.path.join(indir, name))
+                rc, out, err = run_bin(path, os.path.join(indir, name),
+                                       timeout=budget)
+                n_cell += 1
+                n_hung += rc is None
                 sig = -rc if rc is not None and rc < 0 else None
                 seen.setdefault((rc, out.strip(), err.strip()[:120], sig),
                                 []).append(f"{o}/{m}")
@@ -2032,18 +2379,41 @@ def check_adversarial(built, rep, adv_models, indir, cells):
             for (rc, out, err, sig), where in sorted(seen.items(), key=str):
                 rows.append(dict(exit=rc, stdout=out, stderr=err, signal=sig,
                                  cells=sorted(where), model_exit=m_exit,
-                                 model_stdout=m_out.strip(),
+                                 model_stdout=m_out.strip(), hung=rc is None,
                                  diverges=(rc != m_exit
                                            or out != m_out.strip())))
             table[f"{name}/{c}"] = rows
             for r in rows:
                 flag = "  <-- diverges from model" if r["diverges"] else ""
+                flag += "  [DID NOT TERMINATE]" if r["hung"] else ""
                 print(f"       {c:18s} {','.join(r['cells']):24s} "
                       f"exit={r['exit']!s:5s} stdout={r['stdout']!r:24s}"
                       f" stderr={r['stderr']!r:60s}{flag}")
             if len(seen) > 1:
                 rep.note(f"{name}/{c}: opt/mode variants of this rung disagree "
                          f"({len(seen)} distinct behaviours)")
+        # Silence is the failure, exactly as it is for `sanitizer_expect:
+        # "fires"`: an input declared non-terminating on which every cell
+        # terminated means the DoS this pattern exists to model is not being
+        # exercised, and the security half of the result is unsupported. Stated
+        # with its `n`, and `n == 0` cannot reach the `ok` branch -- this is the
+        # count-bearing-`rep.ok` rule (`.memory/02-bench-rules.md`).
+        if hangs and n_cell == 0:
+            rep.fail("hang", f"{name}: declared non-terminating and no cell was "
+                             f"run at all, so the declaration was checked "
+                             f"against nothing")
+        elif hangs and n_hung == 0:
+            rep.fail("hang",
+                     f"{name}: model.py declares expected_hang, but all "
+                     f"{n_cell} cell(s) terminated inside the {budget}s "
+                     f"budget. Either the budget is too short to be a hang "
+                     f"detector at all, or this input does not make any rung "
+                     f"run forever and the declaration is false.")
+        elif hangs:
+            rep.ok(f"{name}: declared non-terminating and {n_hung} of {n_cell} "
+                   f"cell(s) did not terminate within {budget}s "
+                   f"(RUN_TIMEOUT is {RUN_TIMEOUT}s; the budget is a "
+                   f"`contract_sha256` pin).")
     return table
 
 
@@ -4706,7 +5076,7 @@ def check_driver_identity(pdir, rep, contract, verus_ok=frozenset(),
 # 7. sanitizers
 # ==========================================================================
 
-def check_sanitizers(pdir, rep, indir, models):
+def check_sanitizers(pdir, rep, indir, models, budgets=None):
     """ASan/UBSan on the C rung, with a **per-input expectation**.
 
     The previous version failed the gate on any sanitizer hit on any input. p02
@@ -4749,9 +5119,13 @@ def check_sanitizers(pdir, rep, indir, models):
     if r.returncode != 0:
         rep.fail("sanitizer", f"asan build failed: {(r.stdout + r.stderr)[-400:]}")
         return {}
+    budgets = budgets or {}
     res = {}
     for name, mod in sorted(models.items()):
-        rc, so, se = run_bin(out, os.path.join(indir, name))
+        stem = name[:-4] if name.endswith(".bin") else name
+        hangs = sbg_opt(mod, "expected_hang", False)
+        rc, so, se = run_bin(out, os.path.join(indir, name),
+                             timeout=budgets.get(stem))
         got = so.strip()
         expect = sbg(mod, "sanitizer_expect")
         m_exit = sbg(mod, "expected_exit")
@@ -4761,12 +5135,24 @@ def check_sanitizers(pdir, rep, indir, models):
         diag = re.sub(r"\s+", " ", se.strip())[:300]
         res[name] = {"exit": rc, "expected_exit": m_exit,
                      "expect": expect, "fired": fired, "diagnostic": diag,
+                     "declared_hang": hangs, "hung": rc is None,
                      # TASK_053 F3: `so` was bound here and dropped on the floor
                      # since the stage was written. Recorded unconditionally so
                      # a reviewer can diff it; compared only where a comparison
                      # is meaningful -- see the `elif` below.
                      "stdout": got, "model_stdout": want_out}
-        if expect == "fires":
+        if hangs and rc is None:
+            # TASK_068. Recorded, not required, and deliberately NOT a failure
+            # in either direction. Whether the *C* rung is one of the rungs that
+            # runs forever is a per-rung fact and this stage only ever builds
+            # `c/kernel.c`; the load-bearing "at least one rung really did hang"
+            # check is stage 4's, which sees every rung. Without this branch the
+            # `rc != m_exit` test below would fail every declared hang, since
+            # `expected_exit` keeps describing the CONFORMING behaviour.
+            print(f"    ok   {name:28s} did not terminate within "
+                  f"{budgets.get(stem)}s, as declared "
+                  f"[adversarial: recorded, not required]")
+        elif expect == "fires":
             if not fired:
                 rep.fail("sanitizer",
                          f"{name}: model.py declares sanitizer_expect='fires', "
@@ -4970,6 +5356,26 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names):
             probe = _probe_input(os.path.join(indir, nm), MIRI_PROBE_ITERS,
                                  os.path.join(scratch, f"miri.{nm}"))
             mod = sb(modmod.build, probe)
+            if sbg_opt(mod, "expected_hang", False):
+                # TASK_068. Blocked UP FRONT rather than after MIRI_TIMEOUT: an
+                # input the model declares non-terminating will not terminate
+                # under an interpreter either, and `MIRI_PROBE_ITERS` cannot
+                # help -- it clamps the number of kernel CALLS, and the first
+                # call is the one that never returns. Waiting 180 s to learn
+                # that, then reporting a payload-size reason that is false, is
+                # worse than saying so. A BLOCKED row, so the verdict reads
+                # PASS-WITH-BLOCKED-ROWS and the row is loud: it cannot be used
+                # to skip a Miri check quietly, because only an `adversarial*`
+                # input may declare a hang and stage 4 fails the declaration
+                # unless a cell really did run forever.
+                why = (f"model.py declares this input non-terminating "
+                       f"(expected_hang), so R4 does not return under Miri "
+                       f"either. n_iters is clamped to {MIRI_PROBE_ITERS} but "
+                       f"the FIRST kernel call is the one that hangs. This "
+                       f"input is unchecked for UB; the others are not.")
+                rep.block("miri", f"{s} on {nm}", why)
+                runs.append(dict(source=s, input=nm, blocked=why))
+                continue
             try:
                 r = subprocess.run(
                     [MIRI_BIN, "--sysroot", sysroot, "--edition", "2021",
@@ -5093,6 +5499,10 @@ def main():
     rep = Report()
     check_selftests(rep)
     audit = check_idiom(rep, pdir, contract)
+    budgets = run_budgets(contract, rep, all_stems)
+    if budgets:
+        print(f"  run budgets {budgets} s (RUN_TIMEOUT {RUN_TIMEOUT}s "
+              f"otherwise) -- {contract['run']['why']}")
 
     if a.no_build:
         built = {}
@@ -5130,13 +5540,15 @@ def main():
     adv_models = build_models(modmod, indir, adv, rep)
     all_models = dict(good_models)
     all_models.update(adv_models)
+    hangs = check_hang_declarations(rep, all_models, budgets)
 
     check_checksums(built, rep, good_models, indir)
     digests = check_no_collapse(built, rep)
     slopes = check_marginal_ir(pdir, built, rep, modmod, contract, indir,
                                not a.no_callgrind)
     identity = check_identity(digests, rep, contract)
-    advtable = check_adversarial(built, rep, adv_models, indir, cells)
+    advtable = check_adversarial(built, rep, adv_models, indir, cells,
+                                 budgets)
     verus_res = check_verus_contract(pdir, rep, contract)
     callsite = check_call_site(pdir, rep, contract)
     clausemut = check_clause_deletion(pdir, rep, contract,
@@ -5150,7 +5562,7 @@ def main():
     drivers = check_driver_identity(pdir, rep, contract, verus_ok, built,
                                     slopes.pop("_cg_files", None),
                                     slopes.pop("_cg_probe", None))
-    san = check_sanitizers(pdir, rep, indir, all_models)
+    san = check_sanitizers(pdir, rep, indir, all_models, budgets)
     miri = check_miri(pdir, rep, contract, identity, modmod, indir,
                       sorted(all_models))
 
@@ -5210,16 +5622,25 @@ def main():
         # TASK_005 A4: weakening a pin now shows up in review as a change to the
         # committed gate artefact, not only as a source diff.
         "contract_sha256": contract_sha,
+        # TASK_068: the per-input run budgets this run actually used, and the
+        # inputs `model.py` declared non-terminating. Both are empty on every
+        # pattern that has neither, so the key is a no-op until a pattern needs
+        # it -- and on one that does, the record says how long the gate was
+        # willing to wait, which is otherwise invisible from `exit: null`.
+        "run_timeout_s": budgets,
+        "expected_hang": hangs,
         # TASK_016: the declared idiom, recorded so the gate artefact says what
         # the rungs were supposed to be spellings *of*. It is inside the hashed
         # block, so this is a convenience copy, not a second pin.
         "idiom": contract.get("idiom"),
         # TASK_020: where each declared spelling is and is not, measured against
-        # the shipped rungs. REPORTING ONLY -- it never fails and never enters
-        # the verdict. It is here so the audit is reproducible from the
-        # committed tree and so a diff shows when the count moves;
-        # `idiom_audit`'s docstring says why `forbidden_hits` is a verdict and
-        # the `required` numbers are not.
+        # the shipped rungs. The `required` numbers are REPORTING ONLY -- they
+        # never fail and never enter the verdict. `forbidden_hits` DOES fail
+        # since TASK_068, so a record with a non-zero one is a record of a
+        # failed run. It is here so the audit is reproducible from the committed
+        # tree and so a diff shows when the count moves; `idiom_audit`'s
+        # docstring says why `forbidden` carries a verdict and `required`
+        # cannot.
         "idiom_audit": audit,
         "source_sha256": {os.path.relpath(s, REPO): sha256_file(s)
                           for s in srcs if os.path.isfile(s)},

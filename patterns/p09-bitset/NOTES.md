@@ -4,6 +4,29 @@ Everything here was measured on this box with the commands quoted. Where a
 number is an interpolation rather than a sweep it says so. `spec.md` is the
 contract; this file is the evidence.
 
+⚠ **`contract_sha256` MOVED AT TASK_068, and here is why** (PROTOCOL
+definition-of-done item 6 — an unverifiable claim about a declaration edit is
+worse than the edit):
+
+    HEAD before  23169852ace6449f408640c0a68bb9406fb46f0f281e27075c36e60516e51b5a
+    after        c391270c673f2c322892e863b99747dec4f9f68153f999ae4a047bb9e1e540fd
+
+**Two decayed `check.py` line citations inside `idiom.why`, and nothing else.**
+A bare line number (the old one was `:929`, deliberately not written here in the
+citation form so the audit aid does not report this paragraph as a live one) and
+a bare `check.py::exec_code` were re-cited by FUNCTION with the line as a hint —
+`idiom_audit` (`check.py:1262`) and `exec_code` (`check.py:752`) — the
+convention at the end of `.memory/02-bench-rules.md`. The old number had already
+decayed to a blank line. **No `required`, `forbidden` or
+`why` claim changed**, and the named-spelling standard's shared paragraph is
+byte-identical (gate stage 0b re-checks it verbatim against its own sha256).
+Verify with two commands rather than trusting this paragraph:
+
+```bash
+git show HEAD:patterns/p09-bitset/spec.md | diff - patterns/p09-bitset/spec.md
+harness/check.py p09        # stage 0b prints the named-spelling sha256
+```
+
 ---
 
 ## 0. What p09 is for, in one paragraph

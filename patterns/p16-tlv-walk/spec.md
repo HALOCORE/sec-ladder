@@ -236,8 +236,8 @@ multiply — while the **kernel's** trip count stays data-dependent, which is th
 entire point of the pattern.
 
 It is also what makes `work_per_call` a single scalar. A parser that early-exits
-has a *distribution* of work per call, and `check.py:625` needs one number and
-hard-fails on `work <= 0` at `:632`; p02's min-over-records convention collapses
+has a *distribution* of work per call, and **`check_marginal_ir`** (`check.py:1976`) needs one number and
+hard-fails on `work <= 0` at `:1987`; p02's min-over-records convention collapses
 to 0 the moment a probe input contains one rejected record, which is exactly
 what a TLV corpus contains. The window is fixed by the payload header, identical
 on every call, and a strict over-estimate of the bytes actually folded — so the

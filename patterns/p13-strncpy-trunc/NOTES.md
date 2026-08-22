@@ -1065,7 +1065,7 @@ ALONE"*, and that UNDERSTATED THE GATE.** `.memory/04-verus.md`: **stage 5c-twin
 has two limbs and a mutation report must say which one fired.** They are
 
 - **limb (i)** — signature identity, `vparse.norm_clause(twin.sig)` against the
-  trusted item's (`check.py:3374`);
+  trusted item's (**`check_trusted_twins`**, `check.py:4069`);
 - **limb (ii)** — the twin verifying under `--cfg slb_twin`.
 
 Measured per mutant, on the shipped file and on each mutant:

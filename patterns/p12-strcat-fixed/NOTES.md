@@ -89,10 +89,10 @@ identical flags.
 to 100% accept by the gate**, and a `large` row with "a different acceptance
 ratio" cannot be built.
 
-`harness/check.py:471-472` over `check.py:1249-1278` (`check_checksums`)
+**`inputs_of`** (`harness/check.py:495`) over **`check_checksums`** (`check.py:1756`)
 requires **every cell, R1 included, to print `model.py`'s checksum on every
 non-adversarial input it is handed** — and what it is handed is the **matrix**.
-`check.py:469` and `measure.py:64` both drop `sweep-*` entirely, so **a sweep
+**`inputs_of`** (`check.py:495`) and `measure.py:64` (`SKIP_INPUT_PREFIX`) both drop `sweep-*` entirely, so **a sweep
 band is never checksum-checked**. (p12 first wrote this as "every
 non-adversarial input", which over-states the gate; corrected at
 TASK_040_REVIEW.) R1 omits the capacity check and nothing else, so on any window
@@ -1071,9 +1071,9 @@ the trusted item** -- `verus.items` carries both `dst_set_unchecked` and
 `slb_twin_dst_set_unchecked` at `requires ["i < old(v)@.len()"]` -- so an edit
 that moves both moves **two** pinned clauses. Run through `check.py`'s own stage
 functions against a repo-layout mirror -- `.temp/p54/stages.py`, which imports
-`check_verus_contract` (`check.py:2140`), `check_call_site` (`:2295`),
-`check_clause_deletion` (`:2493`), `check_requires_strength` (`:2804`) and
-`check_trusted_twins` (`:3199`) and calls them on a copy of this pattern under
+`check_verus_contract` (`check.py:2737`), `check_call_site` (`:2905`),
+`check_clause_deletion` (`:3103`), `check_requires_strength` (`:3460`) and
+`check_trusted_twins` (`:3879`) and calls them on a copy of this pattern under
 `.temp/`, so nothing here is a re-implementation and the pattern directory is
 never written to. The shipped `verus.rs` through the same path gives
 `total failures: 0`; the mutant gives:
@@ -1400,4 +1400,4 @@ only ones quoted as an in-contract span (sections 11a, 11b); everything else is
 quoted as a control and labelled as one. ⚠ `m4` is the case that shows the ruler
 is a *necessary* and not a sufficient condition: it passes and is still not a
 rung, because "which rungs an entry scopes to lives in its English"
-(`check.py:862`).
+(**`idiom_audit`**, `check.py:1195`).

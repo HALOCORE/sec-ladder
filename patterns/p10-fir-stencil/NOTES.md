@@ -59,7 +59,7 @@ and `windows(` is neither required nor forbidden.
 four patterns' have been).
 
 What forced the *shape* of it is the gate, not taste. `harness/check.py` stage 2
-(`check_checksums`, `check.py:1254-1292`) requires **every cell including R1** to
+(**`check_checksums`**, `check.py:1756`) requires **every cell including R1** to
 print `model.py`'s checksum on every non-`adversarial-*` input; the only
 exemption mechanism in the harness is the input filename prefix. So a fencepost
 in the output loop — `nout = n − 2r + 1`, the classic width-off-by-one — could
@@ -80,8 +80,8 @@ admits exactly that one case and nothing beyond it.
 **Rejected candidates, and why. FIVE of them, and they were rejected on
 ARGUMENT and not on measurement** — with exactly one exception, and the
 exception does not rest on a measurement either: `nout = n − 2r + 1` is ruled
-out by a *structural* fact about the harness, `harness/check.py:1254-1292`
-(`check_checksums` runs every built cell against every non-`adversarial-*`
+out by a *structural* fact about the harness, **`check_checksums`** (`harness/check.py:1756`)
+(it runs every built cell against every non-`adversarial-*`
 model input and hard-fails a mismatch), which is checkable by reading the gate
 rather than by running it. **TASK_059's own wording — "§0's four rejected
 candidates … rejected on measurements" — is wrong on both counts and is

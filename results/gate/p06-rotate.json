@@ -12,6 +12,8 @@
     "small.bin"
   ],
   "contract_sha256": "370bb98010e4702f824307138e4eae5277f68164f5e3c7cedf6696767bb60782",
+  "run_timeout_s": {},
+  "expected_hang": [],
   "idiom": {
     "required": [
       {
@@ -142,14 +144,14 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "5b57db8dcb1815816fbfb1976314c95f037eafbf08e4886929d0649bd7e231d6",
+    "harness/check.py": "7965e53a73db0408083cac03c4cb3e7d53a5a58e3f6c26cef7dda613077f230b",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
     "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
-    "patterns/p06-rotate/NOTES.md": "d7c4724bea6211d23870885544625838c5506e14592e64ce75f9e3912c8d8c07",
+    "patterns/p06-rotate/NOTES.md": "7a058acb363abcde426f5880bfa9ee70b5fb69b02eaa35fe289fc1e76236f567",
     "patterns/p06-rotate/README.md": "e11771fa40c70b79fc56c482e93a9705c932c45ad1be8f5889e7f8c1a905344d",
     "patterns/p06-rotate/c/kernel.c": "8baf222692697c003ed0ed6076678807860f97a83e3b584cbc9db9145a503a3a",
     "patterns/p06-rotate/c/kernel.h": "e993082c2d65a03abbfd89294ddd986c4f4607adb1032848ac4a570eeddc91ec",
@@ -661,6 +663,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "5453190234444350336",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -678,6 +681,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "5453190234444350336",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -695,6 +699,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "5453190234444350336",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -712,6 +717,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "5453190234444350336",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -729,6 +735,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "5453190234444350336",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -746,6 +753,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "5453190234444350336",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -763,6 +771,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "5453190234444350336",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -780,6 +789,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "5453190234444350336",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -795,6 +805,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "9876901382056522496",
+        "hung": false,
         "diverges": true
       },
       {
@@ -808,6 +819,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "9876901382056522496",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -822,18 +834,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "9876901382056522496",
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "231815783968535",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "9876901382056522496",
+        "hung": false,
         "diverges": true
       },
       {
@@ -846,6 +847,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "9876901382056522496",
+        "hung": false,
         "diverges": true
       },
       {
@@ -858,6 +860,20 @@
         ],
         "model_exit": 0,
         "model_stdout": "9876901382056522496",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "5308223238817367",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "9876901382056522496",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -875,6 +891,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "9876901382056522496",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -892,6 +909,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "9876901382056522496",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -909,6 +927,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "9876901382056522496",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -926,6 +945,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "9876901382056522496",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -943,6 +963,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "9876901382056522496",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -960,6 +981,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "9876901382056522496",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -976,11 +998,12 @@
         ],
         "model_exit": 0,
         "model_stdout": "10384349632315276160",
+        "hung": false,
         "diverges": true
       },
       {
         "exit": -6,
-        "stdout": "16563099354809215693",
+        "stdout": "8276865518422086403",
         "stderr": "*** stack smashing detected ***: terminated",
         "signal": 6,
         "cells": [
@@ -988,6 +1011,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "10384349632315276160",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -1002,6 +1026,20 @@
         ],
         "model_exit": 0,
         "model_stdout": "10384349632315276160",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "3698762665564109832",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "10384349632315276160",
+        "hung": false,
         "diverges": true
       },
       {
@@ -1014,6 +1052,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "10384349632315276160",
+        "hung": false,
         "diverges": true
       },
       {
@@ -1026,18 +1065,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "10384349632315276160",
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "6609535720261000944",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "10384349632315276160",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -1055,6 +1083,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "10384349632315276160",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1072,6 +1101,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "10384349632315276160",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1089,6 +1119,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "10384349632315276160",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1106,6 +1137,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "10384349632315276160",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1123,6 +1155,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "10384349632315276160",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1140,6 +1173,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "10384349632315276160",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1157,6 +1191,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "3401318320220520064",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -1174,6 +1209,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "3401318320220520064",
+        "hung": false,
         "diverges": true
       }
     ],
@@ -1191,6 +1227,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "3401318320220520064",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1208,6 +1245,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "3401318320220520064",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1225,6 +1263,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "3401318320220520064",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1242,6 +1281,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "3401318320220520064",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1259,6 +1299,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "3401318320220520064",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1276,6 +1317,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "3401318320220520064",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1293,6 +1335,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1310,6 +1353,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1327,6 +1371,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1344,6 +1389,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1361,6 +1407,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1378,6 +1425,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1395,6 +1443,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1412,6 +1461,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ]
@@ -1423,6 +1473,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "12407484466270198528",
       "model_stdout": "5453190234444350336"
     },
@@ -1431,7 +1483,9 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7f725ec00060 with insufficient space for an object of type 'u",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7f4cb1600060 with insufficient space for an object of type 'u",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "",
       "model_stdout": "9876901382056522496"
     },
@@ -1440,7 +1494,9 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 111 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7f0afa40008f with insufficient space for an object of type '",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 111 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7fb566a0008f with insufficient space for an object of type '",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "",
       "model_stdout": "10384349632315276160"
     },
@@ -1449,7 +1505,9 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 99999 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7fcb040186bf with insufficient space for an object of type",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 99999 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7f59436186bf with insufficient space for an object of type",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "",
       "model_stdout": "3401318320220520064"
     },
@@ -1459,6 +1517,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "0",
       "model_stdout": "0"
     },
@@ -1468,6 +1528,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "3109437583815045504",
       "model_stdout": "3109437583815045504"
     },
@@ -1477,6 +1539,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "6613059981622886789",
       "model_stdout": "6613059981622886789"
     },
@@ -1486,6 +1550,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "14776424234206161905",
       "model_stdout": "14776424234206161905"
     }

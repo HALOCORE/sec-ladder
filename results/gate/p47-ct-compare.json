@@ -11,6 +11,8 @@
     "small.bin"
   ],
   "contract_sha256": "04f034f09a679ed3ce090f62f4ca0496a8e3ec92045dab2f379ec5d30d22c091",
+  "run_timeout_s": {},
+  "expected_hang": [],
   "idiom": {
     "required": [
       {
@@ -165,14 +167,14 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "5b57db8dcb1815816fbfb1976314c95f037eafbf08e4886929d0649bd7e231d6",
+    "harness/check.py": "7965e53a73db0408083cac03c4cb3e7d53a5a58e3f6c26cef7dda613077f230b",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
     "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
-    "patterns/p47-ct-compare/NOTES.md": "d0d4c3cb55e440df4ff3c0ae4510e349c26086a99a9a9f7fad1f09648b4d1fdd",
+    "patterns/p47-ct-compare/NOTES.md": "c770cb176372f0abfdd4e95eb06e999c2a91bbebd17eeb417c99fb3671c85d9b",
     "patterns/p47-ct-compare/README.md": "d520b574b8c134c6cb4f79faceda07a72f86351ffdabe920910003ed98c091c1",
     "patterns/p47-ct-compare/c/kernel.c": "9f671934377a348322ffa3fa8c7d6e7a3c368d420f25aba1bcc0afa6482c8d49",
     "patterns/p47-ct-compare/c/kernel.h": "7252951224967e284ab402c6acb4b50c75e521ecf2936de638ab1013a8b01765",
@@ -576,6 +578,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15278858700986457088",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -593,6 +596,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15278858700986457088",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -610,6 +614,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15278858700986457088",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -627,6 +632,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15278858700986457088",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -644,6 +650,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15278858700986457088",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -661,6 +668,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15278858700986457088",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -678,6 +686,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15278858700986457088",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -695,6 +704,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15278858700986457088",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -712,6 +722,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15618968502624590848",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -729,6 +740,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15618968502624590848",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -746,6 +758,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15618968502624590848",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -763,6 +776,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15618968502624590848",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -780,6 +794,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15618968502624590848",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -797,6 +812,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15618968502624590848",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -814,6 +830,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15618968502624590848",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -831,6 +848,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15618968502624590848",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -848,6 +866,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15618968502624590848",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -865,6 +884,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15618968502624590848",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -882,6 +902,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15618968502624590848",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -899,6 +920,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15618968502624590848",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -916,6 +938,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15618968502624590848",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -933,6 +956,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15618968502624590848",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -950,6 +974,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15618968502624590848",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -967,6 +992,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "15618968502624590848",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -984,6 +1010,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1001,6 +1028,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1018,6 +1046,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1035,6 +1064,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1052,6 +1082,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1069,6 +1100,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1086,6 +1118,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ],
@@ -1103,6 +1136,7 @@
         ],
         "model_exit": 0,
         "model_stdout": "0",
+        "hung": false,
         "diverges": false
       }
     ]
@@ -1114,6 +1148,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "15278858700986457088",
       "model_stdout": "15278858700986457088"
     },
@@ -1123,6 +1159,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "15618968502624590848",
       "model_stdout": "15618968502624590848"
     },
@@ -1132,6 +1170,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "15618968502624590848",
       "model_stdout": "15618968502624590848"
     },
@@ -1141,6 +1181,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "0",
       "model_stdout": "0"
     },
@@ -1150,6 +1192,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "13001800165042993012",
       "model_stdout": "13001800165042993012"
     },
@@ -1159,6 +1203,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "6032580231827418624",
       "model_stdout": "6032580231827418624"
     },
@@ -1168,6 +1214,8 @@
       "expect": "clean",
       "fired": false,
       "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
       "stdout": "6525366822079760384",
       "model_stdout": "6525366822079760384"
     }

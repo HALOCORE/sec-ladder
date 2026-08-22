@@ -684,8 +684,8 @@ discharges by construction the thing the C rung gets wrong.
 Generated from the shipped `verus.rs` by **exact-string substitution with a
 hit-count assertion**, so they cannot drift from it, into `.temp/p05/mirror/`
 (`.memory/05-layout.md` demand 11: a Verus control that does not verify cleanly
-cannot live in a pattern dir at all — `check.py:1446` requires every `.rs` with
-a `verus!` block to be pinned, and `:1549` fails the gate for any pinned file
+cannot live in a pattern dir at all — **`check_verus_contract`** (`check.py:2770`) requires every `.rs` with
+a `verus!` block to be pinned, and the same function at `:2880` fails the gate for any pinned file
 with errors). The generator:
 
 ```sh

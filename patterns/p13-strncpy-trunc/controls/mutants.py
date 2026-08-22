@@ -127,8 +127,8 @@ def twin_signature(path):
 
     `.memory/04-verus.md`: **stage 5c-twin has TWO LIMBS and a mutation report
     must say which one fired.** They are (i) SIGNATURE IDENTITY --
-    `vparse.norm_clause(twin.sig)` against the trusted item's, at
-    `check.py:3374` -- and (ii) the twin verifying under `--cfg slb_twin`.
+    `vparse.norm_clause(twin.sig)` against the trusted item's, in
+    **`check_trusted_twins`** at `check.py:4069` -- and (ii) the twin verifying under `--cfg slb_twin`.
     Until TASK_046 this file reproduced stage 5a only, so its verdict column
     understated the gate: it reported m2 as caught by `spec.md`'s item pin
     ALONE when in fact limb (i) also fires on it. Reported per trusted item as

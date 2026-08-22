@@ -159,8 +159,8 @@ edit to break. It reads **62 spellings, 194 pairs, 88 present, 2 forbidden hits,
 entry (`hits`, `pins_nothing`, `absent`) compares equal element for element.
 That is *not* luck: the added paragraph contains **176 backticks, i.e. 88
 backticked spans**, any one of which would have moved `spellings` if it were
-seen. `idiom_audit` iterates `("required", "forbidden")` only
-(`harness/check.py:922`) and never reads `why`, so prose inside `why` is
+seen. **`idiom_audit`** iterates `("required", "forbidden")` only
+(`harness/check.py:1250`) and never reads `why`, so prose inside `why` is
 invisible to it by construction. The contrast with TASK_061 is exactly the key
 the backtick landed in: `62 → 63` there because the backtick went into
 `required[2].rust`; `62 → 62` here because 88 of them went into `why`.
@@ -1751,7 +1751,7 @@ hashes files, not outputs. The only cost is the gate-JSON diff, and what it need
 was an accurate scope note.
 
 ⚠ **The ASan leaves are not p27's and should not be fixed here.**
-`check.py:4575` records the sanitiser diagnostic verbatim, `==<pid>==` included,
+**`check_sanitizers`** (`check.py:5135`) records the sanitiser diagnostic verbatim, `==<pid>==` included,
 so **every** pattern in the tree with a firing sanitiser row rewrites one leaf
 per row on every gate run. Stripping `==\d+==` would make the block byte-stable;
 that is a `harness/` change, it is reported and not made (TASK_060_REVIEW minor

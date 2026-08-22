@@ -4,7 +4,7 @@
     python3 patterns/p08-overlap-move/controls/gen_controls.py
 
 `.memory/05-layout.md` demand 11: **a source that does not verify cleanly, or
-does not compile at all, cannot live in a pattern dir.** `check.py:1446`
+does not compile at all, cannot live in a pattern dir.** **`check_verus_contract`** (`check.py:2770`)
 requires every `.rs` in the pattern dir with a `verus!` block to be pinned in
 `verus.obligations`, `:1549` fails the gate for any pinned file reporting
 errors, and `build.py`'s `--cell` list is closed `choices`, so a deliberately

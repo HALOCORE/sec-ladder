@@ -1454,7 +1454,7 @@ right — the shipped Verus configuration really does report `18 / 0` on
 `b_weakreq`, and `b_scrmod_msonly` really does verify in both configurations —
 and the conclusions drawn about the **gate** did not follow.
 
-`harness/check.py`'s own comparison (`check.py:2200-2240`, `vparse.by_name` +
+`harness/check.py`'s own comparison (**`check_verus_contract`**, `check.py:2839-2843`, `vparse.by_name` +
 `norm_clause`) run against `spec.md`'s pinned `verus.items`
 (`.temp/p48/pinsim.py`, which is that code and nothing else):
 

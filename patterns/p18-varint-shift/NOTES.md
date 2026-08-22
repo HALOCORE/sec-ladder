@@ -135,7 +135,7 @@ TASK_051 says: *"Nothing in the ladder's usual toolkit sees it — not ASan, not
 Miri on the Rust side, not a memory-safety proof."* **Two thirds of that is
 false**, measured at the gate's own flags.
 
-**(a) UBSan sees it, at `harness/check.py:4390`'s exact flags.**
+**(a) UBSan sees it, at **`check_sanitizers`**'s exact flags (`harness/check.py:5108`).**
 `-fsanitize=undefined` implies `-fsanitize=shift`, and gate stage 7 greps for
 `runtime error`, so p18's own sanitizer row **fires** — on every adversarial
 blob, from the shipped `c/kernel.c`:

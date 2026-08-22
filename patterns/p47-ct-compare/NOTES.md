@@ -457,7 +457,7 @@ identical gate stage failed:**
 | p13 | `DST_CAP*K + S` | — | `stride` was *"WRONG for p13, **and the gate caught it**"* |
 | p47 | `byte comparison` | **2** | this pattern |
 
-`harness/check.py:1755-1760`'s own failure message prescribes it verbatim: *"the
+**`check_marginal_ir`**'s own failure message (`harness/check.py:2069-2075`) prescribes it verbatim: *"the
 fix is to re-denominate `work_per_call` in the thing the kernel touches."*
 
 ### 3b. ⚠ The cost, stated rather than left to a gate record

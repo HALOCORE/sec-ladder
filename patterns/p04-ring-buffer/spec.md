@@ -150,7 +150,7 @@ and the prose is the bug.
   measurement.
 - **`% RING_CAP`, spelled as `%` in every rung.** `& (RING_CAP - 1)` is the
   `forbidden` spelling. Both are backticked, because a bare-string entry is
-  audited zero times (`check.py:929`). **The exclusion moves no machine code**:
+  audited zero times (**`idiom_audit`**, `check.py:1262` -- `_TICK.findall`). **The exclusion moves no machine code**:
   at `RING_CAP = 64` the two spellings are byte-identical (NOTES.md 1), so this
   is not a declaration protecting a number — it is forbidden because a mask
   answers p09's question rather than p04's.

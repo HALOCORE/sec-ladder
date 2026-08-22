@@ -652,8 +652,8 @@ correction — do not quote any one of them as "the" wrong answer.)
 
 The last row is `controls/gen_controls.py --run s_asan_O1_sa`, which is
 `--run s_asan_O1_gate` — the gate's own stage-7 command line — **plus one
-token**. Stage 7 builds `-O1 -fsanitize=address,undefined` at
-`harness/check.py:4738`; adding `-fstrict-aliasing` there makes it see p38 **at
+token**. Stage 7 builds `-O1 -fsanitize=address,undefined` in
+**`check_sanitizers`** (`harness/check.py:5108`); adding `-fstrict-aliasing` there makes it see p38 **at
 `-O1`**, changing nothing about the level. ⚠ **`harness/` is not this pattern's
 to edit and the change is queued to be batched** (RECAP "Owed" 12).
 
