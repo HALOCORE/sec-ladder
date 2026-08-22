@@ -1453,8 +1453,10 @@ is silent.
 
 The gate audit swept all **18** stages and found **6** defects; every one is now
 fixed or declined with a reason, on a tree that re-ran 16/16 green.
-**Do not re-open these:** the second sanitizer hole (F3) is **fixed**, with 114/114
-rows now carrying `stdout`; the tautology battery (F2) no longer lets an aborting
+**Do not re-open these:** the second sanitizer hole (F3) is **fixed**, and **every
+sanitizer row carries `stdout`** — 114/114 when that was written against 16
+patterns, **135/135 re-verified at TASK_066 across 19**; the invariant is the
+*zero missing*, not the count; the tautology battery (F2) no longer lets an aborting
 tactic overwrite a real verdict; the adversarial key (F1) records all behaviours
 with their cells; the comment-in-a-clause bypass (F4) is repaired in `vparse`;
 `forbidden_hits` (F6) was **declined** and is now **RE-OPENED** (TASK_062 found a real defect it could see; TASK_063 settled the defect and recommends **fail, batched** — `.memory/02-bench-rules.md`, PROVISIONAL). It was recorded as a known residual with the
@@ -1462,6 +1464,14 @@ measurement. p12's, p03's, p04's, p05's, p11's and p18's sole-catcher prose is
 corrected; p08 is TCB 4 → 3 with `identity: exact` at both levels; `limbs.py`
 lives in `harness/`; the `.partial.json` trap is gone (they now write to
 `.temp/gate-partial/`).
+
+✅ **Clean negative, TASK_066: this section re-verifies.** After item 6 below
+turned out to have been closed by a command that matched prose, four of this
+list's checkable claims were re-derived from the tree — `harness/limbs.py`
+present, **no `.partial.json` under `results/`**, **135/135 sanitizer rows carry
+`stdout`**, **p08 `tcb_items` = 3** (`move_right`, `load_input`, `emit`). All
+four hold. **The CLOSED list is trustworthy; item 6 was the anomaly, and it was
+in "Owed", not here.** Do not re-run this check.
 ⚠ **`O3d` was built, measured inert, and REVERTED** — see
 `.memory/03-measurement.md`: `build.py` is hashed into the *measurement* records
 too, so landing it costs a full re-measure and would churn ten patterns' timing
