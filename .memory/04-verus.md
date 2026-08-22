@@ -938,6 +938,48 @@ A proof of a false or unreachable statement verifies happily. Guard against:
 
 The reviewer agent checks all of the above by grep + reading. See `.tasks/PROTOCOL.md`.
 
+### The verified twin WORKS, and both of its legs are load-bearing — measured
+
+**p27, TASK_060_REVIEW.** The twin regime is the manager's own design and has
+never been tested against a determined attempt to make it vacuous. It was, four
+ways, and it holds — this is the strongest positive result the mechanism has.
+
+p27 ships two trusted items (`rec_alloc`, `rec_free`) that are local
+`#[inline(always)]` copies of vstd's allocator API, **licensed by twins whose
+bodies are that vstd API**. The obvious worry is circularity: a twin that calls
+the function it exists to check is **re-stating the axiom rather than
+re-deriving it**, which is what `_TWIN_BANNED` prevents one level up.
+
+**It is not circular, and the two halves catch different things:**
+
+| attack | caught by | verdict |
+|---|---|---|
+| weaken the trusted `requires` **and** the twin together (4 variants) | **Verus** | shipped 15/0, **twin 19/1** every time, failing at `slb_twin_rec_alloc`'s `allocate(size, align)` → `vstd/raw_ptr.rs:915` |
+| weaken the trusted item **alone** | **the gate, structurally** | Verus verifies it **20/0 — it does NOT catch it**; `norm_clause(twin.sig) == norm_clause(t.sig)` goes `True → False` |
+
+> **So: a twin whose body is ANOTHER CRATE's `external_body` API is a valid
+> strength oracle** — it proves contract *refinement* against that crate's
+> axiom. What it does **not** prove is body equivalence, and on p27 that gap is
+> closed separately and uniquely by `#[inline(always)]` plus
+> `md5_fn(unsafe::kernel) == md5_fn(verus::kernel)` plus Miri. **Do not reuse
+> this shape without closing the gap the same way.**
+
+### `identity: exact` is an 18-of-18 invariant, so TCB-vs-identity is NOT a trade
+
+**p27, TASK_060_REVIEW.** p27 can be built at **`tcb_items = 5`**
+(`r5_vstdpure`, verifies 15/0) instead of 7 — but that variant's R4/R5 pair is
+**`differ` at both opt levels**, because `vstd::raw_ptr::allocate`/`deallocate`
+carry **no `#[inline]`**, so an R5 that calls them emits a GOT-indirect
+cross-crate call R4 cannot produce. Cost of the minimal TCB: **+130.11 / +416.00**
+`Ir`/call whole-program marginal (**−30.03 kernel + 150.13 `vstd::allocate`
++ 10.01 `vstd::deallocate`** — so it is the *call*, not the kernel).
+
+**Count before treating it as a choice: 18 of 18 shipped `spec.md` files pin
+`O0: norel, O3: exact`.** A pattern at TCB 5 would be the only one unable to
+support **ladder finding 1** (the proof costs exactly zero instructions), on the
+largest ghost state in the tree. **Ship the larger TCB and say why** — "we chose
+the bigger number" invites a question the 18-of-18 fact already answers.
+
 ### `global size_of usize == 8;` — Verus's `usize` is ARCHITECTURE-INDEPENDENT
 
 **p10, TASK_059; reviewed and cleared to land as-is (TASK_057_REVIEW).** Verus

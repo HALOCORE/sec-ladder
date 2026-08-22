@@ -27,6 +27,65 @@ a mechanical dump of `verus.rs` through `harness/vparse`
 pin followed. **No `required` or `forbidden`
 entry moved**, and the direction of both edits is *toward* a stricter gate.
 
+**And that claim is no longer asserted — it is byte-provable, which is the first
+time on this project the recorded hash has actually been used to check a
+disclosure end to end.** TASK_060_REVIEW clean negative 25 reconstructed the
+pre-build contract block from the *two disclosed edits alone* — restore
+`rec_alloc`/`slb_twin_rec_alloc`'s two `ensures` in vstd's positions, restore
+`rec_free`/`slb_twin_rec_free`'s six `requires` to the destructured `dealloc.` /
+`pt.` spelling — re-serialised, and got **`b1f2dbb3e48542af…` exactly**;
+**neither edit alone does** (`6d176cdf…`, `26a8ef39…`). So "no `required`,
+`forbidden`, `obligations`, `twin_obligations`, `identity`, `miri`, `note` or
+`why` entry moved" is a *checked* statement about the whole block, not a promise
+about the parts its author remembered. That is what PROTOCOL definition-of-done 6
+was added for, and 12 below records it as a method result.
+
+**⚠ IT MOVED A SECOND TIME, at TASK_061, to
+`0c9f0e9784642dd9b6a68c9dee88fb03c15e07dcd7fb97df9bfb3058451524c5`, and the
+reason is THREE FACTUAL CORRECTIONS to English prose inside the block** — one
+sentence, in three places, each saying that `rec_alloc` / `rec_free` are vstd's
+items *"character for character"* or *"verbatim"*. They are not, and this file
+already said so one paragraph above, which is the point: **the block contradicted
+itself, and the machine-readable `verus.items` pin was right all along.**
+
+| key | said | ships |
+|---|---|---|
+| `verus.unsafe_justifications.rec_alloc` | "constrained by **five** `ensures` clauses copied from vstd verbatim" | **three**; the other two are the ones dropped above |
+| `verus.unsafe_justifications.rec_free` | vstd's preconditions "copied **verbatim**" | all six, **respelled** — vstd destructures its tracked parameters and writes `dealloc.addr()`, this item takes plain ones and writes `dealloc@.addr()` |
+| `idiom.required[2].rust` | "**character-for-character** `vstd::raw_ptr::deallocate`" | same respelling, and the body writes `std::alloc::` where vstd writes `::alloc::alloc::` |
+
+(The `rec_alloc` correction also names the two dropped clauses, so its `verus.items` cross-reference is checkable without leaving the block.)
+
+⚠ **The third is inside a `required` entry, which is the sensitive case, so state
+exactly what did and did not change: no BACKTICKED SPELLING moved.** The entry's
+tokens — `std::alloc::dealloc(p, layout);`, `vstd::raw_ptr::deallocate`,
+`deallocate`, `Option<Box<u8>>` — are the same tokens in the same order, so no
+rung becomes admissible or inadmissible that was not before. Only the English
+*around* the tokens changed.
+
+**And that is CHECKED, not asserted — it failed once first.** The gate's
+stage-`0b` audit counts every backticked span, so it is a decidable test of
+"only the English moved", and the first draft of this correction FAILED it:
+writing *"deallocate's six `requires`"* introduced a backticked `requires`, and
+the audit went `62 → 63` spellings, `194 → 198` pairs, `pins_nothing 3 → 4`. The
+shipped wording says "six preconditions" instead, and the audit reads **62
+spellings, 194 pairs, 88 present, 3 pins-nothing, 36 scoped-absent, 2 forbidden
+hits — identical on both sides of the edit.** A prose edit inside a `required`
+entry is one careless backtick away from being a ruler edit, and the audit is
+what tells the two apart.
+
+**Checked the same way, and it is the same check:** a semantic JSON diff of the
+two blocks reports **exactly three changed keys**, and undoing *only* those three
+prose edits reproduces `a0e83e2f2ee2e3bb…` byte for byte. **No `forbidden`
+entry, no backticked `required` spelling, and no `obligations`,
+`twin_obligations`, `identity`, `miri`, `items`, `note` or `why` entry moved.**
+**Direction test** (`.memory/01-ladder.md`): none of the three moves any
+published figure — they replace a false count with the true one and a false
+"verbatim" with the respelling this file was already disclosing — so there is no
+direction in which they could flatter the thesis. The declaration got *more*
+accurate about how much vstd this pattern actually re-states, which is the
+direction that costs the author something.
+
 ---
 
 ## 0. The bug class, settled before anything was built
@@ -105,10 +164,19 @@ replaces §2.8's is better:
   operation.** C does those two things in two statements — `free(tab[h]);
   live[h] = 0;` — and R1's bug is that the *third* thing, asking, is missing.
 - **At R4 the invalidation is a hand-written line, and at R5 the proof forces
-  it.** Delete `arr_set_unchecked(&mut live, h, 0u8)` from `verus.rs` and the
-  loop invariant cannot be re-established, because `rec_free` has consumed slot
-  `h`'s permission while the liveness array still claims the record exists. That
-  is mutant **M2** in 10 below, and it is the pattern's sentence made checkable.
+  it.** Delete `arr_set_unchecked(&mut live, h, 0u8)` from the **CLOSE path** of
+  `verus.rs` and the loop invariant cannot be re-established, because `rec_free`
+  has consumed slot `h`'s permission while the liveness array still claims the
+  record exists. That is mutant **M2** in 10 below, and it is the pattern's
+  sentence made checkable.
+  ⚠ **Do not confuse it with the store 8a deleted.** The epilogue used to carry a
+  line that *looks* the same, `arr_set_unchecked(&mut live, j, 0u8)` — and that
+  one was **dead**, because nothing reads `live[j]` after the epilogue passes
+  `j`. The CLOSE-path store with `h` is load-bearing and is pinned; the
+  epilogue's store with `j` was not, and deleting it is what let the epilogue's
+  invariant weaken to the suffix `[j, ntab)`. **One line the proof forces, one
+  line the proof never needed** — and telling them apart is the whole difference
+  between a safety obligation and symmetry for its own sake.
 
 **The sentence p27 exists for: the free and the invalidation are one operation in
 safe Rust and two in C, and the bug is the third one — the asking — going
@@ -180,11 +248,20 @@ equals `model.py`'s on every non-adversarial input, and all cells agree with eac
 other. That is the evidence `.memory/02-bench-rules.md` names.
 
 **And it is measured, not only argued**: callgrind's per-function table gives
-`malloc` `421.1211` Ir/call and `free` `310.2635` Ir/call **identically** for
-`safe_tuned` and for `unsafe` on `small.bin` (5e), and the sweep's `R3 − R4`
-regression puts `nopen`'s coefficient at `−0.0157`, zero to within a residual of
-2.92 over 80 blobs (9c). *The two representations make the same allocator calls,
-in the same number, of the same size.*
+`malloc` `421.1211` Ir/call, `free` `310.2635`, `_int_malloc` `587.8332`,
+`_int_free` `72.9715`, the unix shim `80.0680` and all three `__rust_*` symbols
+`10.0085` — **identically, to the last digit, for `safe_tuned` and for `unsafe`
+on `small.bin`, and the same on `large.bin`** — inside a decomposition whose sum
+over every function equals the whole-program delta, so nothing outside those
+symbols is hiding allocator work either (5e). *The two representations make the
+same allocator calls, in the same number, of the same size.*
+
+⚠ **This paragraph used to cite a second piece of evidence and that citation is
+RETRACTED**: *"the sweep's `R3 − R4` regression puts `nopen`'s coefficient at
+`−0.0157`, zero to within a residual of 2.92 over 80 blobs"*. The coefficient is
+now `+0.9781` with the allocator table above unchanged (9c item 1), so it was
+never measuring the allocation — it absorbs everything that scales with OPEN.
+The per-function table is the direct evidence and it is enough on its own.
 
 **Structurally**, per record, every rung does:
 
@@ -223,14 +300,20 @@ language. See 3.
 | R1h | `c-clang-h` | 874.5739 | 3645.2917 | 2280.7224 | 8491.0960 |
 | R2 | `safe_naive` | 1041.1426 | 4562.3795 | 2697.4293 | 9955.1610 |
 | R3 | `safe_tuned` | 1031.6288 | 4530.3795 | 2687.9135 | 9923.1610 |
-| R4 | `unsafe` | 928.4304 | 3879.0121 | 2464.6514 | 9140.9146 |
-| R5 | `verus` | **928.4304** | **3879.0121** | **2464.6514** | 9140.9278 |
+| R4 | `unsafe` | 921.6538 | 3868.5595 | 2457.8441 | 9130.4152 |
+| R5 | `verus` | **921.6538** | **3868.5595** | **2457.8441** | 9130.4284 |
+
+⚠ **The R4 and R5 rows moved at TASK_061** and no other row did: the epilogue's
+dead liveness store was deleted, which is **−6.81 / −10.49 Ir/call**. The
+before/after, the mechanism and the direction test are in **8a**; the old figures
+were `928.4304 / 3879.0121` kernel-exclusive and `2464.6514 / 9140.9146`
+whole-program, and `controls/`'s `r4_epiclear` reproduces them exactly.
 
 ### 3a. ⚠ TWO DENOMINATORS, and on p27 they are not interchangeable
 
-**58–62% of this kernel's work is inside `malloc` and `free`, which are in glibc
+**58–63% of this kernel's work is inside `malloc` and `free`, which are in glibc
 and therefore inside no symbol `harness/measure.py`'s `_sum_rows` matches.**
-`1 − 928.4304/2464.6514 = 62.33%` on `small` and `57.56%` on `large`. Every
+`1 − 921.6538/2457.8441 = 62.50%` on `small` and `57.63%` on `large`. Every
 kernel-exclusive figure above is therefore *the part of an operation that is not
 the allocation*, and every whole-program figure is the operation.
 
@@ -241,13 +324,34 @@ marginal, because the allocator is what p27 is about.
 
 ### 3b. What the table says
 
-- **`R5 − R4 = 0.0000` kernel-exclusive on both inputs, and `0.0000` /
-  `+0.0132` whole-program.** Finding 1 reconfirmed on the first kernel in this
+- **`R5 − R4 = 0.0000` kernel-exclusive on both inputs, and `0.0000`
+  whole-program on `small`.** Finding 1 reconfirmed on the first kernel in this
   project that allocates and frees — and it took the two source lines in 5 to
-  get there. The `large` whole-program `+0.0132` Ir/call is 132 instructions
-  over a 5000-call increment against a byte-identical kernel and an identical
-  checksum; it is below the resolution of the marginal and is quoted rather than
-  rounded away.
+  get there.
+
+  ⚠ **RETRACTED: the `large` whole-program `R5 − R4 = +0.0132` this section used
+  to publish is a SCRATCH-PATH ARTEFACT, not a property of the code, and its
+  gloss was wrong arithmetic too** (`0.0132 × 5000 = 66`, not the "132
+  instructions" claimed). TASK_060_REVIEW minor 2 found it, and TASK_061
+  re-measured the same two binaries on the same input from three different
+  scratch directories:
+
+  ```
+  scratch dir                       unsafe        verus     R5 - R4
+  .temp/p27/irt<pid>   (ir_table)   9140.9146   9140.9278   +0.0132   <- the published figure
+  .temp/p27c/av<pid>   (argvlen)    9140.9154   9140.9258   +0.0104
+  TASK_060_REVIEW's path                    -           -   +0.0020
+  ```
+
+  The binaries and the input bytes are identical across all three rows; only the
+  path the input file sits at changes. **p27 is the only kernel here that calls
+  `malloc`**, so the initial `brk` — which depends on the size of `argv`/`envp`
+  — decides at which iteration glibc extends the heap, and that lands inside or
+  outside the marginal window. The honest statement is **`R5 − R4` is `0.0000`
+  kernel-exclusive on both inputs and `±0.02` whole-program on `large`, and the
+  `±0.02` is the measurement's own floor**. It must not be quoted as a number.
+  (The figure is stable *within* one scratch path: the same run reproduces
+  `+0.0132` after the TASK_061 source change too.)
 - **`R1h − R1 = +19.83` (gcc) / `+4.95` (clang) on `small`, `+91.01` / `+3.76`
   on `large`** (whole-program). **The two compilers disagree by 4× on `small`
   and by 24× on `large`** for one added conjunct — which is finding 5's shape
@@ -255,16 +359,35 @@ marginal, because the allocator is what p27 is about.
   column. Kernel-exclusive the same pair reads `+19.93` / `+4.98` and `+90.80` /
   `+3.47`, so the disagreement is in the kernel and not in the allocator.
 - **`R2 − R3 = +9.52` on `small` and `+32.00` on `large`**, whole-program, and
-  the same to four decimals kernel-exclusive — the two R3 levers of 8, and they
-  are *exactly* `nread + nclose` per call on each blob.
+  the same to four decimals kernel-exclusive — the two R3 levers of 8.
+  ⚠ **DISPUTED, and left standing only as a question.** This bullet used to end
+  *"and they are **exactly** `nread + nclose` per call on each blob"*. Measured
+  against the sweep's own regressors that is **false**: `9.5158` against
+  `nread + nclose = 10.875` on `small`, and `32.0000` against `50.6094` on
+  `large`. Either the English meant *"on the `nread` and `nclose` paths"* — a
+  much weaker claim — or the identity is wrong. **It cannot be settled from what
+  is committed**, because `safe_naive` is not in the sweep, so **no `R2 − R3` fit
+  exists**. Flagged by TASK_061's engineer as adjacent to their task; it was in
+  neither the review nor the task file, and it is the only unresolved claim in
+  this pattern. **Whoever sweeps R2 settles it.** (Manager's edit, TASK_061
+  boundary: the false half is removed rather than left to be quoted.)
 
 ⚠ **What must NOT be read off this table is "the cost of safe Rust's lifetime
-guarantee".** `R3 − R4` is `+223.26` / `+782.25` whole-program, and **it is not
-a safety number**: 5e decomposes it per function and **54% of it is the epilogue
-asymmetry** — the safe rungs' out-of-line drop glue over all `TABCAP` slots
-against the unsafe rungs' inline loop over `ntab` — while the allocator
-contributes **exactly 0.0000**, `malloc` and `free` costing the two rungs the
-same to the last digit.
+guarantee".** `R3 − R4` is `+230.07` / `+792.75` whole-program, and **it is not
+a safety number**. Two independent decompositions say so and 5e and 5f carry
+them:
+
+- **per function, and the decomposition is CLOSED** (5e): `+230.0694 =
+  +109.6476` inside the kernel `+ 120.4218` of out-of-line drop glue `+ 0.0000`
+  of allocator, and **the sum over *every* function in the program equals the
+  whole-program delta**, so nothing else moved. **52% of it on `small` is the
+  epilogue asymmetry** — the safe rungs' drop glue over all `TABCAP` slots
+  against the unsafe rungs' inline loop over `ntab` — and 17% of it on `large`.
+- **the in-kernel remainder is the SPATIAL bounds-check tax and nothing else**
+  (5f): an R4 that keeps R3's bounds checks costs `+153.51` in the kernel where
+  R3's whole in-kernel excess is `+109.65`, so **R3 pays 43.86 Ir/call LESS of
+  that tax than an unsafe rung carrying the same checks. Not one instruction of
+  `R3 − R4` is the lifetime guarantee.**
 
 ### 3c. Wall clock — recorded, not published
 
@@ -292,12 +415,26 @@ count. `harness/asm.py stat`, `-O3 isolated`, kernel symbol:
 | `c-clang-h` | 146 | 142 | 1 | 9 |
 | `safe_naive` | 210 | 206 | 15 | 15 |
 | `safe_tuned` | 213 | 209 | 15 | 15 |
-| `unsafe` | 156 | 151 | 2 | 2 |
-| `verus` | 156 | 151 | 2 | 2 |
+| `unsafe` | 154 | 150 | 7 | 7 |
+| `verus` | 154 | 150 | 7 | 7 |
 
-⚠ **`c-clang-h` has one FEWER static instruction than `c-clang`** (146 vs 147,
-142 vs 141 unpadded) while executing **more** — finding 5's inversion, on the
-hardening column, inside one compiler. The safe rungs' 15 pad instructions are
+(R4/R5 were `156 / 151 / 2 / 2` before 8a's deletion: **one instruction out of
+the padding-excluded count**, five bytes out of the symbol, and five bytes more
+of tail padding in their place. `md5_fn` moved from `87ced153` to `38ae720c`,
+**equal between the two rungs on both sides of the edit**.)
+
+⚠ **`c-clang-h` has one FEWER static instruction than `c-clang` on the RAW count
+— 146 vs 147 — while executing more.** That is finding 5's inversion on the
+hardening column inside one compiler, and it is real. ⚠ **But it REVERSES on the
+padding-excluded count, 142 vs 141, which is the one this project says to
+quote** (`harness/asm.py`'s own docstring, `.memory/03-measurement.md`).
+TASK_060_REVIEW minor 3. Both numbers are in the table and always were; what was
+wrong was drawing the arrow from the convention the project tells you not to use,
+over a one-instruction difference. **The honest reading is that the two counts
+disagree about the sign of a 0.7% static difference while `Ir` says `c-clang-h`
+executes `+4.95 / +3.76` more** — i.e. the static count is not a cost model here
+in either convention, which is the finding, and it is *stronger* than the
+one-sided version. The safe rungs' 15 pad instructions are
 `int3` tail padding, not landing pads; the landing pads themselves are the
 `_Unwind_Resume` block and the two `drop_glue` call sites, and they are counted
 in `n_fn_nopad`. **`bulk_calls` is empty on all eight kernels**, so no rung is
@@ -326,20 +463,33 @@ accessor would buy nothing and cost two trusted items.
 
 **That was written without measuring it and it is false.** Three
 `core::panicking::panic_bounds_check` call sites survive in the checked kernel
-at `-O3` (8 `call`s in the kernel symbol against 5 in the unchecked one), and the
-control `r4_tabchecked` — the draft itself, regenerated by
+at `-O3` — 8 `call`s in the kernel symbol against 5 in the unchecked one, and
+**resolved by SYMBOL and not by counting**: each is an indirect
+`call *disp(%rip)` through a GOT slot whose `R_X86_64_RELATIVE` addend `nm` maps
+to `core::panicking::panic_bounds_check` (`controls/gotresolve.py`, the probe
+TASK_060_REVIEW clean negative 13 used and 5f re-uses):
+
+```
+unsafe::kernel         1x __rust_no_alloc_shim  1x __rust_alloc  1x __rust_dealloc
+                       1x std::process::abort        -- ZERO panic sites
+r4_tabchecked::kernel  3x core::panicking::panic_bounds_check   + the same four
+```
+
+The control `r4_tabchecked` — the draft itself, regenerated by
 `controls/gen_controls.py` from the shipped rung by exact-string substitution —
-measures (`controls/ir_table.py --marginal`):
+measures (`controls/ir_table.py --closed`, marginal, `-O3 isolated`):
 
 | | kernel Ir/call small | large | whole-program small | large |
 |---|---:|---:|---:|---:|
-| `unsafe` (shipped, unchecked, `-O3 isolated`) | 928.4304 | 3879.0121 | 2464.6514 | 9140.9146 |
-| `r4_tabchecked` | 970.1321 | 4044.4534 | 2506.2728 | 9306.5702 |
-| **difference** | **+41.7017** | **+165.4413** | **+41.6214** | **+165.6556** |
+| `unsafe` (shipped, unchecked) | 921.5427 | 3869.1756 | 2457.8441 | 9130.4152 |
+| `r4_tabchecked` | 963.1643 | 4034.8228 | 2499.4656 | 9296.0708 |
+| **difference** | **+41.6215** | **+165.6472** | **+41.6215** | **+165.6556** |
 
-**+41.62 Ir/call on `small` and +165.66 on `large`, whole-program** — and note
-that the two denominators agree here to within 0.09, because a bounds check is
-entirely inside the kernel and touches no allocator.
+**+41.62 Ir/call on `small` and +165.66 on `large`** — and note that the two
+denominators agree here to 4 decimals on `small` and to 0.009 on `large`, because
+a bounds check is entirely inside the kernel and touches no allocator. `--closed`
+proves that directly: the sum of the per-function deltas equals the
+whole-program delta and **every term outside `kernel` is 0.0000**.
 
 Per operation that is `41.62 / 24 = 1.73` on `small` and `165.66 / 120 = 1.38` on
 `large`. So the shipped R4 and R5 index the table through `arr_get_unchecked` /
@@ -424,7 +574,15 @@ and inlines at every level.
 O0/isolated    md5_raw: False   md5_raw_norel: True
 O0/whole       md5_raw: False   md5_raw_norel: True
 O3/isolated    md5_raw: True    md5_raw_norel: True
+O3/whole       -- NO ROW, and the reason is not an omission --
 ```
+
+⚠ **There is no `O3/whole` row because there is no `kernel` symbol to compare.**
+At `-O3` in `whole` mode the kernel is inlined into `main`, so `asm.py syms`
+finds no symbol containing `kernel` in either binary (558 symbols in `unsafe`,
+none of them it) and `asm.py diff --sym kernel` raises `KeyError`. Section 1's
+dead-argument table shows the same effect as "(inlined away)". The `identity`
+pin is therefore over three cells, not four, and always was.
 
 At `-O0` the crate names differ in length so call displacements differ — link
 layout, not codegen. **This is the first pattern here where the `identity` pin
@@ -440,9 +598,9 @@ than the shipped pair. That reading is an artefact and it is the exact trap
 ```
 -O3 isolated     kernel Ir/call            whole-program Ir/call
                 small       large           small        large
-verus (shipped) 928.4304   3879.0121      2464.6514    9140.9278
-r5_vstdpure     898.4134   3783.0121      2594.7618    9556.9250
-difference      -30.0170    -96.0000       +130.1104    +415.9972
+verus (shipped) 921.4525   3868.6520      2457.8441    9130.4284
+r5_vstdpure     891.4458   3772.6520      2587.9546    9546.4256
+difference      -30.0067    -96.0000       +130.1105    +415.9972
 ```
 
 The kernel-exclusive column falls because the work **left the `kernel` symbol**:
@@ -465,33 +623,102 @@ record still alive. R4, R5 and both C rungs walk `0..ntab` by hand.
 **The clean measurement is not a control at all — it is callgrind's own
 per-function table**, because rustc emits the drop as an out-of-line
 `core::ptr::drop_glue::<[Option<Box<u8>>; 32]>` and glibc's `malloc` and `free`
-are their own symbols. Marginal per call, `small.bin`, `n_iters` 20000 → 40000,
-from `controls/ir_table.py --functions`:
+are their own symbols.
 
-| function (`-O3 isolated`) | `safe_tuned` | `unsafe` | difference |
-|---|---:|---:|---:|
-| `kernel` | 1031.1904 | 928.3500 | **+102.8404** |
-| `malloc` | **421.1211** | **421.1211** | **0.0000** |
-| `free` | **310.2635** | **310.2635** | **0.0000** |
-| `drop_glue::<[Option<Box<u8>>; 32]>` | 120.4218 | — | **+120.4218** |
-| whole program | 2687.9135 | 2464.6514 | +223.2621 |
+⚠ **And it is a CLOSED decomposition, not four needles that agreed.** The first
+version of this section looked up four function names and reported that three of
+them accounted for the whole delta — which cannot answer *is anything else
+moving?*. `controls/ir_table.py --closed` (ported from TASK_060_REVIEW's
+`fndelta.py`, which is where the closure was first measured) parses the **entire**
+`callgrind_annotate` table, normalises the object-path and crate-name
+qualifiers so one function is one row, and prints the sum over **every**
+function beside the whole-program delta. Marginal per call, `-O3 isolated`,
+`small.bin` at `n_iters` 20000 → 40000 and `large.bin` at 5000 → 10000:
 
-**`malloc` and `free` are equal to the last digit between the safe and the
-unsafe rung.** The two representations make *the same allocator calls*, in the
-same number, of the same size — the equivalence argument of 2, measured rather
-than asserted, and the strongest form of it available.
+| function (`-O3 isolated`) | `safe_tuned` | `unsafe` | difference (small) | difference (large) |
+|---|---:|---:|---:|---:|
+| `kernel` | 1031.1904 | 921.5427 | **+109.6476** | **+661.6520** |
+| `drop_glue::<[Option<Box<u8>>; 32]>` | 120.4218 | — | **+120.4218** | **+131.0938** |
+| `malloc` | **421.1211** | **421.1211** | **0.0000** | **0.0000** |
+| `free` | **310.2635** | **310.2635** | **0.0000** | **0.0000** |
+| `_int_malloc` (`libc+0xab170`) | 587.8332 | 587.8332 | 0.0000 | 0.0000 |
+| `_int_free` (`libc+0xab570`) | 72.9715 | 72.9715 | 0.0000 | 0.0000 |
+| `__rdl_alloc` / `__rdl_dealloc` (the unix shim) | 80.0680 | 80.0680 | 0.0000 | 0.0000 |
+| `__rust_alloc` / `__rust_dealloc` / `__rust_no_alloc_shim` | 10.0085 ea | 10.0085 ea | 0.0000 | 0.0000 |
+| `main` | 14.0000 | 14.0000 | 0.0000 | 0.0000 |
+| **SUM over EVERY function** | | | **+230.0694** | **+792.7458** |
+| whole program | 2687.9135 | 2457.8441 | **+230.0694** | **+792.7458** |
 
-**And the `R3 − R4` gap decomposes exactly**: `+223.2621 = +102.8404` inside the
-kernel `+ 120.4218` of drop glue `+ 0.0000` of allocator. **54% of it is the
-epilogue asymmetry** — the safe rungs' scope-exit drop, which walks all `TABCAP`
-slots out of line, against the unsafe rungs' inline loop over `ntab`. That is
-not a safety cost; it is what the language does with the table on the way out.
+**The sum over every function equals the whole-program delta to the last digit,
+so `+230.0694 = +109.6476 + 120.4218 + 0.0000` is not three cherry-picked terms
+— nothing else moved.** That is a much stronger statement than four needles
+agreeing, and it is what licenses the next sentence:
+
+**The ENTIRE allocator stack is equal to the last digit between the safe and the
+unsafe rung** — not just `malloc` and `free` but `_int_malloc`, `_int_free`, the
+unix shim and all three `__rust_*` symbols. The two representations make *the
+same allocator calls*, in the same number, of the same size — the equivalence
+argument of 2, measured rather than asserted, and the strongest form of it
+available. ⚠ **This, and NOT the sweep's `nopen` coefficient, is the evidence for
+that claim**; see 9c item 1, where the coefficient is shown to move by ~1 while
+this table does not move at all.
+
+**The epilogue asymmetry is `120.4218 / 230.0694 = 52.3%` of the gap on `small`
+and `131.0938 / 792.7458 = 16.5%` on `large`** — the safe rungs' scope-exit drop,
+which walks all `TABCAP` slots out of line, against the unsafe rungs' inline loop
+over `ntab`. It is not a safety cost; it is what the language does with the table
+on the way out. The share collapses on `large` because the drop glue is nearly
+input-independent (it always walks 32 slots) while the kernel's own work is not.
 
 The control `r2_epilogue` (R2 plus an explicit loop, on top of the drop glue)
 measures `+115.4983` / `+324.9026`, which brackets the same quantity from the
 other side and agrees with the 120.4218 above on `small` to within 5%. ⚠ It is
 an **upper** bound and not the asymmetry itself, because it pays the drop glue
 as well; the per-function table is the number to quote.
+
+### 5f. The other 48% is the SPATIAL bounds-check tax, and none of it is the lifetime guarantee
+
+5e leaves `+109.6476` "inside the kernel", and the sentence a reader supplies for
+themselves is that *that* part is what the lifetime guarantee costs. **It is not,
+and the pattern now owns the controls that say so.** Three one-lever siblings of
+the shipped R4, all generated by `controls/gen_controls.py` and all printing the
+shipped checksums on all seven inputs:
+
+| | `panic_bounds_check` sites in `kernel` | kernel Ir/call small | vs R4ship | large | vs R4ship |
+|---|---:|---:|---:|---:|---:|
+| `unsafe` (shipped R4, 3 U-license items) | **0** | 921.5427 | — | 3869.1756 | — |
+| `r4_tabchecked` (table read+store checked) | 3 | 963.1643 | +41.6215 | 4034.8228 | +165.6472 |
+| `r4_bufchecked` (window read checked) | 2 | 1033.4335 | +111.8908 | 4387.4350 | +518.2594 |
+| **`r4_allchecked`** (both — **zero** U-license items) | **5** | 1075.0550 | **+153.5123** | 4553.0822 | **+683.9066** |
+| `safe_tuned` (R3) | **5** | 1031.1904 | +109.6476 | 4530.8276 | +661.6520 |
+
+Read three things off it:
+
+1. **The two levers are exactly additive**, in instructions *and* in panic sites:
+   `111.8908 + 41.6215 = 153.5123` on `small` and `518.2594 + 165.6472 =
+   683.9066` on `large`, to the last digit on both; and `2 + 3 = 5` sites, which
+   is **the same number R3 has**. `r4_allchecked` is therefore the right control:
+   it is an unsafe rung carrying exactly R3's surviving bounds checks. (Call
+   targets resolved by symbol with `controls/gotresolve.py`, not by counting
+   `call`s: `safe_tuned::kernel` has 5 `core::panicking::panic_bounds_check`,
+   `unsafe::kernel` has 0.)
+2. **An R4 that keeps R3's bounds checks costs `+153.51` in the kernel, and R3's
+   whole in-kernel excess is `+109.65`.** So **R3 pays 43.86 Ir/call LESS of the
+   spatial tax than an unsafe rung carrying the same checks** (22.25 less on
+   `large`) — rustc's proofs delete more checks in the safe spelling than in the
+   raw-pointer one.
+3. Therefore **not one instruction of `R3 − R4` is the lifetime guarantee.** The
+   gap is (i) three trusted items' worth of *spatial* checks, bought back at a
+   discount by R3's better-typed table, and (ii) the epilogue asymmetry of 5e.
+   The temporal property costs zero instructions, exactly as it costs zero
+   trusted items (6).
+
+⚠ **What this does NOT do is decompose the `+109.65` mnemonic by mnemonic.** It
+attributes it — to a named, buildable, checksum-equal control that isolates one
+lever — but it is an attribution by difference, not a listing-level derivation
+like 9c item 2's `cmpb`/`je` pair. `r4_allchecked` and R3 are not the same
+program, so "R3's in-kernel excess is the spatial tax" is a statement about two
+measured endpoints and a bracket, not about instructions.
 
 ## 6. The TCB, and what the number does not rank
 
@@ -502,8 +729,8 @@ as well; the per-function table is the number to quote.
 | `buf_get_unchecked` | U-license | the unchecked window read |
 | `arr_get_unchecked` | U-license | the unchecked table read (4) |
 | `arr_set_unchecked` | U-license | the unchecked table store (4) |
-| `rec_alloc` | **relocation** | `vstd::raw_ptr::allocate`, verbatim, twin = vstd's own |
-| `rec_free` | **relocation** | `vstd::raw_ptr::deallocate`, verbatim, twin = vstd's own |
+| `rec_alloc` | **relocation** | `vstd::raw_ptr::allocate`, 3 of its 5 `ensures`, twin = vstd's own |
+| `rec_free` | **relocation** | `vstd::raw_ptr::deallocate`, all 6 `requires` respelled, twin = vstd's own |
 | `load_input` | infra | argv, file I/O, LE decode; no `ensures` |
 | `emit` | infra | `println!`; no `ensures` |
 
@@ -543,6 +770,29 @@ smaller trusted base or the byte-identical R4/R5 pair, not both.*
 The comparison that means something is 5 of p27's 7 against p01's 3, plus the
 sentence above.
 
+### 6b. **p27 ships 7, and that is FORCED, not chosen** — the trade is not this pattern's to make
+
+The sentence above says the tension is real, and it is; what it under-sold is
+that **only one side of it exists as a shipping option.** TASK_060_REVIEW A2 read
+the `identity` pin out of every shipped `spec.md` in the tree:
+
+> **18 of 18 pin `O0: norel, O3: exact`.**
+
+So the alternative is not "publish 5 instead of 7". It is "p27 becomes the only
+pattern in the tree whose R4/R5 pair is not byte-identical, i.e. the only one
+that cannot contribute to `.memory/01-ladder.md` finding 1" — and it would be
+that on the kernel where *"the proof erases"* is **least** a priori plausible,
+because p27 carries the largest ghost state in the project (two tracked `Map`s
+threaded through two loops, with `tracked_remove` in both). It would also make R5
+the dearest Rust rung by `+130.11 / +416.00` (5d).
+
+**What that costs is two items whose contracts the gate re-derives every run as
+no stronger than vstd's own**, and which cost **zero** in the dimension the
+pattern is about: the temporal property costs 0 trusted items in *both*
+configurations — `r5_vstdpure`'s five are the same three spatial accessors plus
+the same two infra items. **Ship 7.** Say it that way, and not "we chose the
+bigger TCB", which invites a question the 18-of-18 fact has already answered.
+
 ---
 
 ## 7. The adversarial rows
@@ -574,7 +824,9 @@ disclosure**: with no OPEN between the CLOSE and the READ the chunk is still in
 the tcache, so R1 reads glibc's own safe-linked `next` word, which is a function
 of the heap address and therefore of ASLR. ⚠ **Its `c-gcc` and `c-clang` cells
 are deliberately not reproducible, and their recorded stdout in
-`results/gate/p27-handle-table.json` changes on every gate run.** Stage 4 records
+`results/gate/p27-handle-table.json` changes on every gate run** — **and so are
+`adversarial-many`'s, to the same measured count, which this file used to
+disclose for only one of the two inputs (11a).** Stage 4 records
 adversarial behaviour rather than requiring it, so this is a note and not a
 failure — and it is the measurement behind `.memory/03-measurement.md`'s
 constraint that a naked use-after-free is not a reproducible number.
@@ -598,9 +850,19 @@ ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010
     #0 ... in kernel .../patterns/p27-handle-table/c/kernel.c
 ```
 
-**Three for three on the adversarial rows and clean on all four benign ones**,
-with the expectation *derived* by `model.py` from the simulated run rather than
-tabulated per file. ⚠ **This is the opposite of p02's result**, where idiomatic C
+**Three for three on the adversarial rows, and clean on THREE benign ones — the
+fourth is empty and no sanitiser evidence should be read into it.**
+⚠ `adversarial-stride3.bin` declares `stride = 3` and the pinned driver loop
+guards on `stride_w >= 4`, so the loop body never runs: **every rung prints 0
+after ZERO kernel calls**, `inputs/gen.py:76-78` says exactly that, and the
+gate's `proof_domain` records `"calls": 0, "ensures_checked": 0` for it. ASan is
+`fired=False` there because there was no kernel to be clean about. The real
+sanitiser evidence on this pattern is **3 firing / 3 clean**, and the empty row
+is a *driver-guard* control, not a memory-safety one (TASK_060_REVIEW minor 4).
+The expectation is *derived* by `model.py` from the simulated run rather than
+tabulated per file, which is why the empty row is expected-clean automatically.
+
+⚠ **This is the opposite of p02's result**, where idiomatic C
 was silent in seven of eight builds: a use-after-free of a *freed chunk* is
 exactly what ASan's quarantine is built to see, where p02's one-byte heap
 overflow was absorbed by glibc's chunk rounding. **The interesting silence here
@@ -658,6 +920,7 @@ r3_issome                                 2697.4293    9955.1694
 safe_naive                                2697.4293    9955.1610
 ```
 
+
 **`r3_issome` is `safe_naive` — to the last digit on `small` and to within
 0.0084 on `large`.** That is not a coincidence and it is worth stating: p27's R2
 and R3 differ in *exactly* these two spellings and in nothing else, so the
@@ -671,14 +934,110 @@ refuted by the first lever the next agent pulled
 (`.memory/01-ladder.md` finding 12). Two spellings is a two-lever search and is
 not evidence of a floor.
 
-**The fixed-R4 bound.** `R3ship − R4ship` is `+223.26` / `+782.25`
+**The fixed-R4 bound.** `R3ship − R4ship` is `+230.07` / `+792.75`
 whole-program, and per finding 14 it bounds `inf(in-contract R3) − R4ship` and
 nothing else — a bound only because R4 is held fixed **by fiat**. ⚠ And on p27
 it is a bound on something that is **not the safety tax**, because of the
-epilogue asymmetry in 5e. No pair interval is reported: the R4 side was searched
-once (`r4_tabchecked`, which is dearer and inadmissible) and no admissible
-cheaper R4 was found, so the R4 endpoint is **degenerate as far as this task
-searched** — which is falsifiable, where "unavailable" would not be.
+epilogue asymmetry in 5e and the spatial-check attribution in 5f. No pair
+interval is reported, and 8a is why: the R4 endpoint **moved once**, so it has a
+history rather than a width, and one endpoint that has moved once is not an
+interval.
+
+### 8a. THE R4 SIDE MOVED: a dead store the unsafe rung was carrying, deleted
+
+TASK_060 shipped this sentence: *"the R4 side was searched once
+(`r4_tabchecked`, which is dearer and inadmissible) and no admissible cheaper R4
+was found, so the R4 endpoint is degenerate as far as this task searched"*.
+**TASK_060_REVIEW major 2 falsified it with one deletion, and TASK_061 shipped
+the deletion.** `.memory/01-ladder.md` finding 18 (p10) is the same sentence and
+the same blocker: *an unsearched R4 side flatters the safe rung.* p27 would have
+been the second pattern in a row to ship it.
+
+**The line.** The epilogue used to read
+
+```rust
+if arr_get_unchecked(&live, j) == 1u8 {
+    rec_close(arr_get_unchecked(&tab, j));
+    arr_set_unchecked(&mut live, j, 0u8);      // <- DEAD
+}
+```
+
+`live` is a kernel local, `j` only increases, and nothing reads `live[j]` again —
+the store is dead in the plainest sense. It was there for symmetry with the CLOSE
+path's line, which is **not** dead and which the pattern is *about*. **R3 has no
+counterpart to it**, because R3's scope-exit drop does not maintain a liveness
+array at all, so carrying it was a handicap on the unsafe rung.
+
+**Before / after**, marginal, `-O3 isolated`, `controls/ir_table.py --closed`;
+`r4_epiclear` regenerates the "before" rung from the shipped one by exact-string
+substitution and reproduces it to the last digit:
+
+```
+                     whole small   whole large   kernel small   kernel large
+r4_epiclear (before)   2464.6514     9140.9146       928.3500      3879.6750
+unsafe      (shipped)  2457.8441     9130.4152       921.5427      3869.1756
+                        -6.8073      -10.4994         -6.8073      -10.4994
+```
+
+**The two denominators agree to the last digit, and `--closed` says why: every
+per-function term outside `kernel` is 0.0000.**
+
+**The mechanism, three ways.**
+
+1. **Counting.** The deleted line executes once per record still alive at scope
+   exit, which is `nopen − nclose` — **6.75 on `small`, 10.50 on `large`**,
+   computed from the blob with zero fitted parameters (`controls/sweep_ir.py`'s
+   `regressors`). `10.4994 / 10.50 = 0.99994` and `6.8073 / 6.75 = 1.0085`
+   instructions per surviving record. The 0.85% on `small` is codegen, not a
+   second store.
+2. **The regression, independently.** The 80-blob level fit for `unsafe` moved by
+   **`nopen −0.9937`, `nclose +0.9952`**, and by `≤0.03` on every other
+   regressor — i.e. the fit recovers *minus one instruction per OPEN, plus one
+   per CLOSE*, which is exactly "one per surviving record" written in the fit's
+   basis. Evaluated at the matrix inputs it predicts `−6.75 / −10.54` against the
+   measured `−6.81 / −10.50`. Nothing told the regression what was deleted.
+3. **Statically.** `n_fn_nopad` 151 → 150 and `fn_bytes` 638 → 633.
+
+**It is admissible, and every leg was checked:**
+
+- **R5 verifies `15 verified, 0 errors`** — the pinned count, unchanged — and
+  `--cfg slb_twin` gives `20 verified, 0 errors`, also unchanged. The proof needs
+  one edit and it is the ordinary one: the epilogue's invariant weakens from
+  `wf(..)` over `[0, ntab)` to the same two conjuncts over `[j, ntab)`, after
+  which neither `live[j]` nor the ghost `lv` needs updating. **A weakened
+  invariant that DELETES exec work**, which is the shape worth noticing.
+- **`R4 ≡ R5` `exact`**: `harness/asm.py diff --sym kernel` reports
+  `identical by raw machine-code bytes : True` at `-O3 isolated`, and the
+  `identity` pin is untouched.
+- **Checksums identical on all seven inputs**, benign and adversarial, to the
+  values `model.py` derives.
+- **In contract**: `spec.md`'s `idiom.required[1]` pins
+  `arr_set_unchecked(&mut live, h, 0u8);` — the **CLOSE**-path line, with `h` —
+  and that line is untouched; `required[6]` pins `while j < ntab {`, also
+  untouched. No `forbidden` token appears. The contract block did not move for
+  this edit at all (the hash note at the top records the two prose keys that did
+  move, for an unrelated reason).
+- **`verus.items` did not move**: `controls/mkspec.py` regenerates `spec.md`
+  byte-identically from the edited `verus.rs`, and `verus.items` is a mechanical
+  `vparse` dump, so no item's `requires`/`ensures` changed.
+
+**The direction test, in writing** (`.memory/01-ladder.md`): *an edit is
+self-certification if it moves the pattern's own published figure in the
+direction that flatters the author's thesis; for a safety-tax number that
+direction is down.* This edit makes **R4 cheaper**, so the headline
+`R3 − R4` goes **up**: `+223.26 / +782.25` → **`+230.07 / +792.75`**. Safe Rust
+looks **worse** by 6.81 / 10.49 Ir/call than it did before. **Against interest —
+passes**, and that is the reason to trust it rather than a reason to hesitate.
+
+**And the word is "cheapest FOUND", not "minimum".** The R4 side has now been
+searched **twice**: `r4_tabchecked` (dearer, and inadmissible — it spends the two
+accessors 4 exists to justify) and `r4_epiclear` (dearer, admissible, and it was
+the shipped rung). What was searched is: the two U-license levers (4, 5f), the
+epilogue's per-slot work (here), and the vstd-call spelling (5a). What was **not**
+searched: the fold's spelling, the cursor arithmetic, the table's layout, any
+`#[inline]` placement, and anything at all on the R2 side. **A third lever may
+exist and this section is the standing invitation to find it** — that is what
+"cheapest found on `small.bin` and `large.bin`" means and "minimum" would not.
 
 ## 9. The sweep: what fits, what does not, and the DOMAIN
 
@@ -706,11 +1065,21 @@ the file with zero fitted parameters: `nopen`, `nclose`, `nread` (operations
 ```
 c-gcc          nopen= 205.5226  nclose=  16.6407  nread=  22.4160  nrej=  24.2276  const= -72.2877   max|resid| 164.5959  n=80
 c-gcc-h        nopen= 205.4624  nclose=  18.4425  nread=  24.3568  nrej=  24.1926  const= -72.9441   max|resid| 162.7976  n=80
+c-clang        nopen= 207.1276  nclose=  10.5693  nread=  23.4968  nrej=  28.9165  const=-116.5077   max|resid| 152.6409  n=80
+c-clang-h      nopen= 207.1377  nclose=  10.6064  nread=  24.7203  nrej=  27.9647  const=-116.1939   max|resid| 153.9943  n=80
 safe_tuned     nopen= 223.1133  nclose=  25.5964  nread=  33.7158  nrej=  33.9437  const=  -4.1873   max|resid| 153.3527  n=80
-unsafe         nopen= 223.1289  nclose=  12.6104  nread=  26.7182  nrej=  28.9679  const=-117.0504   max|resid|-153.6308  n=80
+unsafe         nopen= 222.1352  nclose=  13.6056  nread=  26.7180  nrej=  28.9652  const=-117.0837   max|resid| 153.5792  n=80
 ```
 
-**A max residual of ~154–165 Ir/call on levels of 6 000–10 000 is 2%, and 2% is
+⚠ **`unsafe` is the TASK_061 rung** (8a). The old fit was
+`nopen 223.1289 nclose 12.6104 nread 26.7182 nrej 28.9679 const −117.0504`; the
+`c-gcc`, `c-gcc-h` and `safe_tuned` rows above reproduce the earlier sweep **to
+the last digit**, which is what makes the `unsafe` row's `∓1` shift readable as
+the deleted store and not as run-to-run noise. **The `c-clang` pair is new** —
+TASK_060 did not sweep it (9c) and TASK_060_REVIEW did; both sweeps agree to the
+last digit, and 9c now carries the result.
+
+**A max residual of ~153–165 Ir/call on levels of 6 000–10 000 is 2%, and 2% is
 not a law.** It is a fit with a missing column, and the residual has no band
 structure (band means −1.4, +19.1, −8.8 for `unsafe`), so it is not a band
 offset either. **This is not published as a law and the word is not used for
@@ -720,44 +1089,68 @@ it.**
 
 Split `nopen` into tcache **hits** and **misses** — an OPEN reuses a chunk iff a
 CLOSE has put one in the bin since the last OPEN took it out, which is
-computable from the file with a 7-deep LIFO simulation and no fitted parameter:
+computable from the file with a 7-deep LIFO simulation and no fitted parameter.
+`controls/sweep_ir.py hitmiss <sweep.json>`, all six swept cells:
 
 ```
-              nopen (one rate)   ->   hit / miss
-c-gcc         205.52                  178.11 / 221.96     max|resid| 164.60 -> 142.16
-c-gcc-h       205.46                  177.88 / 222.01     max|resid| 162.80 -> 140.03
-safe_tuned    223.11                  194.26 / 240.41     max|resid| 153.35 -> 126.89
-unsafe        223.13                  194.35 / 240.39     max|resid| 153.63 -> 127.22
+cell            nopen (one)         hit      miss    resid 4-col  resid 5-col
+c-gcc              205.5226    178.1106  221.9597       164.5959     142.1613
+c-gcc-h            205.4624    177.8754  222.0046       162.7976     140.0339
+c-clang            207.1276    178.0636  224.5555       152.6409     124.3984
+c-clang-h          207.1377    178.3294  224.4121       153.9943     127.3678
+safe_tuned         223.1133    194.2635  240.4126       153.3527     126.8890
+unsafe             222.1352    193.3539  239.3934       153.5792     127.2230
 ```
 
-**A recycled allocation is ~44 Ir cheaper than a fresh one, consistently on all
-four rungs** — and the split cuts the residual by only 17%. So the op *order*
-is a real column, it is now measured rather than hypothesised, and **it is not
-the only one left**. This is p10's 3 → 4 → 6 arc arriving on the first try: the
-domain is a list of missing columns, and the list is not closed.
+**A recycled allocation is 43.8–46.5 Ir cheaper than a fresh one, consistently on
+all six rungs** — and the split cuts the residual by only **14–19%**. So the op
+*order* is a real column, it is now measured rather than hypothesised, and **it
+is not the only one left**. This is p10's 3 → 4 → 6 arc arriving on the first
+try: the domain is a list of missing columns, and the list is not closed.
+
+⚠ Two bookkeeping notes. **The split used to be prose only** — the numbers were
+printed by an ad-hoc probe and quoted here, so they could not be re-derived from
+the tree and did not move when a rung did; `hitmiss` is now a shipped subcommand
+and it reproduces the four previously published rows to the last digit. And **the
+`unsafe` row is the TASK_061 rung**: `194.35 / 240.39` before the dead store went
+(8a), `193.3539 / 239.3934` after, with the residual unchanged at `127.22` —
+i.e. **deleting the store moved the level and not the fit's quality**, which is
+what a single removed instruction should do.
 
 ### 9c. The DIFFERENCES, which is what may be quoted
 
-The allocator is 58–62% of every level (3a) and **cancels exactly** in a
+The allocator is 58–63% of every level (3a) and **cancels exactly** in a
 matched-spelling difference, which is why these residuals are two orders of
 magnitude smaller:
 
 ```
   R1h - R1  (gcc)      nopen=  -0.0601  nclose=   1.8017  nread=   1.9408  nrej=  -0.0350  const=  -0.6564   max|resid|   6.4487
-  R3 - R4              nopen=  -0.0157  nclose=  12.9860  nread=   6.9976  nrej=   4.9758  const= 112.8630   max|resid|   2.9232
+  R1h - R1  (clang)    nopen=   0.0100  nclose=   0.0370  nread=   1.2235  nrej=  -0.9519  const=   0.3138   max|resid|   5.9706
+  R3 - R4              nopen=   0.9781  nclose=  11.9908  nread=   6.9978  nrej=   4.9785  const= 112.8963   max|resid|   2.5917
   R3 - R1h (gcc)       nopen=  17.6508  nclose=   7.1539  nread=   9.3590  nrej=   9.7510  const=  68.7568   max|resid|  33.5069
-  R4 - R1h (gcc)       nopen=  17.6665  nclose=  -5.8321  nread=   2.3614  nrej=   4.7752  const= -44.1062   max|resid|  32.5159
+  R4 - R1h (gcc)       nopen=  16.6727  nclose=  -4.8369  nread=   2.3612  nrej=   4.7725  const= -44.1395   max|resid|  32.5951
 ```
 
-Three things are worth reading off this, and one thing must not be:
+Four things are worth reading off this, and one thing must not be:
 
-1. **`R3 − R4`'s `nopen` coefficient is `−0.0157` — zero to within the
-   residual.** *The allocation itself costs the two representations the same.*
-   That is the equivalence argument of 2, confirmed by measurement rather than
-   asserted: `Box::new(a)` and `std::alloc::alloc(layout)` are the same
-   `malloc(1)` and the fit cannot tell them apart. The `R3 − R4` gap is
-   `nclose`, `nread`, `nrej` and a constant — i.e. **the per-operation
-   bookkeeping and the epilogue asymmetry (5e), not the allocation**.
+1. ⚠ **RETRACTED, and this is the sharpest methodological result on the pattern:
+   `R3 − R4`'s `nopen` coefficient is NOT a measurement of the allocation.** This
+   section used to read *"`R3 − R4`'s `nopen` coefficient is `−0.0157` — zero to
+   within the residual. The allocation itself costs the two representations the
+   same"*, and cited it as the sweep's confirmation of the equivalence argument
+   of 2. **It now reads `+0.9781` — with the same allocator, the same allocation
+   sites, and a per-function table (5e) that still shows `malloc`, `free`,
+   `_int_malloc`, `_int_free`, the unix shim and all three `__rust_*` symbols
+   equal to the last digit.** The coefficient moved by ~1 while the thing it was
+   claimed to measure did not move at all, because 8a's deleted store also scaled
+   with `nopen`, and a regression coefficient absorbs *everything* that scales
+   with its regressor. **The coefficient was never evidence for that claim**; the
+   per-function decomposition was, and it is direct. Cite 5e, not this line.
+
+   What `R3 − R4` does say: the gap is `≈1·nopen + 12·nclose + 7·nread +
+   5·nrej + 113`, with `max|resid| 2.59` over 80 blobs — the per-operation
+   bookkeeping plus the epilogue asymmetry, and **no term of it is the lifetime
+   guarantee** (5f).
 2. **`R1h − R1`'s `nread` coefficient is `1.9408`, with `max|resid| 6.4487` over
    80 blobs** — the liveness conjunct costs gcc about **2 Ir per READ**, and the
    attribution is mnemonic by mnemonic off the listing, not inferred from the
@@ -789,16 +1182,54 @@ Three things are worth reading off this, and one thing must not be:
    about 1.8 per close, and only the first has a mechanism. Constraining the fit
    to `nread` alone gives `2.2180·nread + 13.8198` with `max|resid| 26.4193`,
    four times worse: the `nclose` term is carrying real signal.
-4. **`R4 − R1h` and `R3 − R1h` carry `17.67·nopen`** — unsafe Rust's allocation
-   is ~18 Ir/record dearer than C's `malloc(1)`, identically on both Rust rungs.
-   That is `__rust_alloc`'s wrapper around `malloc`, not a safety cost, and it
-   is why the C-vs-Rust rows of 3 must not be read as a safety column.
+4. **`R3 − R1h` carries `17.65·nopen` and `R4 − R1h` carries `16.67`** — Rust's
+   allocation is ~17–18 Ir/record dearer than C's `malloc(1)`. That is
+   `__rust_alloc`'s wrapper around `malloc`, not a safety cost, and it is why the
+   C-vs-Rust rows of 3 must not be read as a safety column. ⚠ The two used to be
+   `17.6508` and `17.6665` — *"identically on both Rust rungs"* — and they now
+   differ by `0.98`, which is 8a's store again and **item 1's lesson a second
+   time**: what looked like two rungs agreeing about the allocator was two rungs
+   agreeing about the allocator *plus* an epilogue store that happened to cancel.
 
-**Not measured in this sweep: `c-clang` and `c-clang-h`.** The sweep ran four
-cells; the clang pair's difference is quoted only at the two matrix inputs (3b),
-where it is `+4.95` / `+3.76` against gcc's `+19.83` / `+91.01`. **A four-fold
-and twenty-four-fold compiler disagreement on one added conjunct deserves the
-band and did not get it** — see "not done" in the report.
+### 9e. The clang band, which TASK_060 named as the first thing to attack
+
+TASK_060 swept four cells and wrote: *"**Not measured in this sweep: `c-clang`
+and `c-clang-h`.** … A four-fold and twenty-four-fold compiler disagreement on
+one added conjunct deserves the band and did not get it."* It cost one command —
+`sweep_ir.py` already took `--cells` and already carried the fit pair — and
+TASK_060_REVIEW ran it first; TASK_061's six-cell sweep reproduces it to the last
+digit. **Three things it settles:**
+
+1. **The conjunct's own cost differs by 1.59×, not by 4× or 24×.** The only term
+   with a listing-level mechanism is `nread` (item 2), and it is `1.9408` for gcc
+   against `1.2235` for clang. **The "4× / 24×" of 3b is a property of the two
+   blobs' op mixes, not of the conjunct** — which is finding 5's shape one level
+   deeper than 3b could see it.
+2. **Item 3's hedge is confirmed by an independent compiler.** gcc's
+   `1.8017·nclose` was flagged here as having no mechanism — R1's and R1h's CLOSE
+   paths are character-identical — and clang's is **`0.0370`**. The same source
+   change costs clang essentially nothing on CLOSE. On `large` that term alone is
+   `21.5 × 1.8017 = +38.7` of gcc's `+91`. **So the term is gcc codegen churn,
+   measured rather than argued.**
+3. **Clang's `nrej = −0.9519` is what collapses its `large` total.** With 37.39
+   rejected operations per call the hardened clang build *saves* about 35.6
+   Ir/call on the reject path, which is why more work gives it a *smaller*
+   hardening cost (`+3.76` on `large` against `+4.95` on `small`) — the paradox
+   3b flags and could not explain.
+
+Both fits predict the matrix-input totals inside their own residual:
+
+| | predicted | measured |
+|---|---:|---:|
+| gcc, `small` | +19.29 | +19.83 |
+| gcc, `large` | +91.34 | +91.01 |
+| clang, `small` | +6.89 | +4.95 |
+| clang, `large` | +1.45 | +3.76 |
+
+And the clang LEVELS are the same 2% story as the four cells 9a swept —
+`max|resid|` 152.6 and 154.0 on levels of 6 000–10 000 — so **9a's "2% is not a
+law" reproduces on two more cells** rather than being a property of the four that
+happened to be measured.
 
 ### 9d. The DOMAIN
 
@@ -854,6 +1285,13 @@ still says the record exists; `wf` cannot be re-established. Note *which*
 obligation fails: not a precondition at the deletion site, but the **loop
 invariant** — the temporal property is a global fact about the table, and that
 is why forgetting the line is invisible locally, in C as in Rust.
+
+⚠ **M2 is the CLOSE path's store, with `h`. The EPILOGUE's store, with `j`, was
+deleted at TASK_061 and the file still verifies 15/0** — see 8a and 0a. The two
+lines are one character apart and could not be more different: deleting the first
+fails the invariant, deleting the second lets the invariant get *weaker*. Both
+mutants above were re-run after the TASK_061 edit and are unchanged (`14 verified,
+1 errors` each, with the same diagnostics).
 
 ⚠ **The catcher is an ordinary `precondition not satisfied` / invariant failure,
 NOT rustc's move checker.** TASK_055_REPORT §2.6's `E0382` is an artefact of a
@@ -953,6 +1391,43 @@ what step 5c-twin proves is that this crate's contract is **no stronger than the
 one vstd already discharges**. If any `requires` here were weaker than vstd's, or
 any `ensures` stronger, the twin would not verify.
 
+⚠ **The obvious attack on that is circularity — "the twin's body *is* the axiom,
+so it re-states it rather than re-deriving it" — and it is a CLEAN NEGATIVE,
+broken four ways** (TASK_060_REVIEW A1, the strongest result of that review).
+Weakening the trusted contract **and its twin together**, which is the only way
+past the gate's signature-identity rule, is caught every time:
+
+| mutant, edited on BOTH sides | shipped cfg | `--cfg slb_twin` |
+|---|---|---|
+| baseline | 15 verified, 0 errors | **20 verified, 0 errors** |
+| `rec_alloc`: drop `size != 0` | 15/0 | **19 verified, 1 error** |
+| `rec_alloc`: `valid_layout(size, align)` → `align != 0` | 15/0 | **19/1** |
+| `rec_free`: `dealloc@.size() == size` → `>= size` | 15/0 | **19/1** |
+| `rec_free`: delete the provenance conjunct | 15/0 | **19/1** |
+| `rec_alloc`: drop `size != 0` from the **trusted item only** | 15/0 | 20/0 — *Verus does not catch it* |
+
+The diagnostic names vstd's own site (`raw_ptr.rs:915`, which is vstd's
+`size != 0`), and **vstd's `allocate` is not in this file's `external_body` set**,
+so the twin is checked against a *different* axiom rather than against the item's
+own — the "body calls the trusted item" rule is not being side-stepped. **The
+last row is the important one: a ONE-SIDED weakening verifies 20/0 and is caught
+by the gate's STRUCTURAL rule instead** (`norm_clause(twin.sig) ==
+norm_clause(trusted.sig)`, `True` on the shipped file and `False` on that
+mutant). **Both legs of the twin regime are load-bearing on p27**, which nothing
+on this project had shown before.
+
+**What the twin still cannot see is the item's BODY**, which here is a *copy* of
+vstd's rather than a call to it, so body drift is invisible to Verus
+(TASK_009_REVIEW ×4). Two backstops close it on this pattern and they belong in
+the same breath: (i) both items are `#[inline(always)]` and inline into `kernel`,
+and `md5_fn` of `unsafe::kernel` and `verus::kernel` are equal at `-O3 isolated`
+— so R5's inlined body **is** R4's, byte for byte; (ii) Miri runs over
+`unsafe.rs`, which contains that body. ⚠ Note the shape: the `identity` pin
+certifies the two items whose reason for existing is to make the `identity` pin
+`exact`. That is not vicious — **Miri is the independent leg** — but it is the
+only place in the tree where the pin and a trusted item justify each other, and
+it is worth saying out loud.
+
 The item exists for **codegen and not for trust** (NOTES 5a): vstd carries no
 `#[inline]` on `allocate`, so calling it emits a GOT-indirect cross-crate call
 that `unsafe.rs` cannot produce and the `identity` pin drops to `differ`.
@@ -964,7 +1439,10 @@ returns the pointer plus two tracked permissions. The three clauses state exactl
 what a caller may conclude: the `PointsToRaw` covers `[addr, addr+size)`, the
 `Dealloc` records the address, size, align and provenance the eventual
 `rec_free` must match, and the returned pointer's provenance is the
-`PointsToRaw`'s. ⚠ **Two further clauses were copied from vstd and then
+`PointsToRaw`'s. **Three clauses, and `spec.md` says three** — it said "five"
+until TASK_061, contradicting the same block's own `verus.items` dump two keys
+away; the contract-hash note at the top of this file records the correction.
+⚠ **Two further clauses were copied from vstd and then
 DROPPED** — `addr + size <= usize::MAX + 1` and `addr % align == 0` — because
 the gate's clause-mutation stage found them **not load-bearing**: this kernel
 allocates at `align == 1`, where `addr % 1 == 0` is a tautology and the
@@ -1025,24 +1503,135 @@ imports and the same `opens_invariants none`.
   unknown width** and none is quoted here (3c). p27 needs it more than p14 did,
   because its wall clock is a function of the allocator's state as well as of
   the code.
-- **The sweep measured four cells, not six.** `c-clang` and `c-clang-h` were not
-  swept, so the compiler disagreement in 3b (`+4.95` / `+3.76` against gcc's
-  `+19.83` / `+91.01` for one added conjunct) has **no band behind it**. That is
-  the single most interesting unexplained number in this pattern and it is the
-  first thing to attack.
+- ~~**The sweep measured four cells, not six.**~~ **DONE at TASK_061**: all six
+  are swept and 9e is the result. The compiler disagreement of 3b is now
+  explained — the conjunct itself differs by 1.59×, and the 4×/24× is the two
+  blobs' op mixes plus clang's negative `nrej`.
 - **The level fit is not a law and is not offered as one** (9a): max residual
   ~2% after the tcache hit/miss column is added (9b). At least one column is
-  still missing.
-- **`R2` was not searched.** Two in-contract R3 spellings were priced (8) and
-  one R4 lever (4); no attempt was made to find a cheaper R2, and none to find a
-  cheaper *admissible* R4. The R4 endpoint is reported as degenerate **as far as
-  this task searched**, not as a floor.
+  still missing, and 9c item 1 is the standing warning about what a coefficient
+  of that fit does and does not measure.
+- **`R2` was not searched, and the R4 side has now been searched twice.** Two
+  in-contract R3 spellings were priced (8), two R4 levers (4, 8a) and the
+  spatial-check attribution needed two more controls (5f); no attempt has been
+  made to find a cheaper R2. **The R4 endpoint moved once** (8a) and is reported
+  as *cheapest found on `small.bin` and `large.bin`*, never as a floor — 8a
+  lists what was and was not searched.
 - **`RECSZ` is 1 and was never varied** (9d). Everything here is one glibc size
   class inside the tcache.
-- **The `adversarial-noreuse` R1 cells are not reproducible across runs**, by
-  design (7). The gate JSON's recorded stdout for those two cells changes on
-  every run; that is a note, not a failure, and it is the row's point — but a
-  reviewer diffing two gate runs will see it and should not read it as churn.
 - **`c/kernel.c`'s `abort()` on allocation failure is unreachable at `RECSZ = 1`
   on this box** and is present so that all seven rungs agree with
   `vstd::raw_ptr::allocate`'s own behaviour, not because it fires.
+- **The `+109.65` in-kernel half of `R3 − R4` is attributed but not decomposed
+  mnemonic by mnemonic** (5f). The attribution is by difference against a named
+  buildable control, which is weaker than 9c item 2's listing-level derivation of
+  the `cmpb`/`je` pair, and the section says so.
+- **No `ns` claim, and none is possible yet** — see the first bullet.
+
+### 11a. The gate JSON churns on every run, and here is the measured scope
+
+⚠ This note exists so that a reviewer diffing two gate runs does not have to
+re-derive whether the tree moved. **The scope it used to state was wrong in both
+directions** (TASK_060_REVIEW major 3): it named `adversarial-noreuse` alone and
+said the gate prints two notes.
+
+**Both non-reproducible C inputs, not one.** Measured over the 8 buggy C cells
+(2 compilers × 2 opt levels × 2 inline modes) × 3 runs:
+
+```
+adversarial-many       24 values, 21 DISTINCT  -> non-reproducible
+adversarial-noreuse    24 values, 21 DISTINCT  -> non-reproducible
+adversarial-uaf        24 values,  1 DISTINCT  -> 1402190519230396416
+```
+
+**`adversarial-many` is *exactly* as non-reproducible as `adversarial-noreuse`,
+to the same count**, because most of its 24 stale reads land on a chunk still in
+the tcache and return glibc's safe-linked `next` word, which is ASLR-dependent.
+(TASK_060_REVIEW measured 24 of 24 distinct on its runs and TASK_061 21 of 24 on
+its own — the collisions are two draws landing on the same address, and the
+*equality* of the two rows is the reproducible part, not the count.)
+`adversarial-uaf` recycles first and **is** deterministic, identically on both
+compilers and at both opt levels. **And the gate already prints four notes, not
+two:**
+
+```
+note: adversarial-many.bin/c-gcc:      opt/mode variants of this rung disagree (4 distinct behaviours)
+note: adversarial-many.bin/c-clang:    opt/mode variants of this rung disagree (4 distinct behaviours)
+note: adversarial-noreuse.bin/c-gcc:   opt/mode variants of this rung disagree (4 distinct behaviours)
+note: adversarial-noreuse.bin/c-clang: opt/mode variants of this rung disagree (4 distinct behaviours)
+```
+
+**The measured churn**, two consecutive `check.py p27` runs on an unchanged tree,
+diffed leaf by leaf (`controls/gatediff.py`):
+
+```
+verdict: PASS -> PASS | failures: 0 -> 0 | contract_sha256 unchanged
+changed leaves: 33 of 1291
+    16  adversarial stdout value
+    14  adversarial cells[] group permutation
+     3  ASan ==<pid>== in the recorded diagnostic
+  by input: adversarial-many 15, adversarial-noreuse 17, adversarial-uaf 1
+```
+
+**Every one of the 33 is the adversarial non-determinism or an ASan PID**, and
+the `adversarial-uaf` leaf is one of the three PIDs, not a checksum — that input
+is deterministic. The count is not itself constant: TASK_060_REVIEW measured
+`31 of 1290` on a different pair of runs, because how many `cells[]` groups end
+up permuted depends on which values collide. **The invariant to check is the
+categories, not the total.**
+
+**Is the churn acceptable?** Yes, and the three things that could make it
+otherwise were checked: `--check-stale` hashes `measurement_sources` and
+`matrix_inputs` and never touches stdout (`measure.py:225-262`);
+`results/p27-handle-table.json` records checksums for `small.bin` and `large.bin`
+only, so **the measurement record does not churn at all**; and `source_sha256`
+hashes files, not outputs. The only cost is the gate-JSON diff, and what it needed
+was an accurate scope note.
+
+⚠ **The ASan leaves are not p27's and should not be fixed here.**
+`check.py:4575` records the sanitiser diagnostic verbatim, `==<pid>==` included,
+so **every** pattern in the tree with a firing sanitiser row rewrites one leaf
+per row on every gate run. Stripping `==\d+==` would make the block byte-stable;
+that is a `harness/` change, it is reported and not made (TASK_060_REVIEW minor
+8), and `.memory/02-bench-rules.md`'s "could this happen by accident?" test
+applies to it.
+
+---
+
+## 12. The direction test, verified BYTE-EXACTLY — a method result, not a measurement
+
+This is worth its own section because it is a first for the project and it cost
+one line.
+
+PROTOCOL definition-of-done 6 asks an engineer to record the `slb-contract`
+block's sha256 *before* any cell is measured, because **a pattern lands in one
+commit**: "no `required` or `forbidden` entry moved after I measured" is not
+independently checkable, since a reviewer has no pre-edit snapshot to diff
+against. That is exactly what happened at TASK_051 on p18, where the engineer
+disclosed an edit honestly and the reviewer still could not verify its scope.
+
+**On p27 the recorded hash was used, and it worked.** TASK_060 disclosed two
+edits to the block and asserted nothing else moved. TASK_060_REVIEW clean
+negative 25 reconstructed the pre-build block **from those two disclosures
+alone** — restore `rec_alloc`/`slb_twin_rec_alloc`'s two `ensures` in vstd's
+positions, restore `rec_free`/`slb_twin_rec_free`'s six `requires` to the
+destructured spelling — re-serialised it, and got **`b1f2dbb3e48542af…`
+exactly**. **Neither edit alone does** (`6d176cdf…`, `26a8ef39…`), so the
+reconstruction is not a coincidence of a hash with slack in it: the two edits
+are jointly necessary and jointly sufficient.
+
+**So "no `required`, `forbidden`, `obligations`, `twin_obligations`, `identity`,
+`miri`, `note` or `why` entry moved" became PROVABLE rather than asserted** — and
+the direction of both edits (fewer `ensures`; more conjuncts judgeable, which the
+gate's `requires_strength` record confirms as six `rec_free` conjuncts now judged
+"not a tautology") is *toward* a stricter gate.
+
+**TASK_061 did the same check on its own edit** and it is now the pattern's
+habit: three prose keys moved, a semantic JSON diff names exactly those three,
+and undoing only them reproduces `a0e83e2f2ee2e3bb…` byte for byte (the note at
+the top of this file). One of the three is inside a `required` entry, which is
+precisely the case where "I only changed the English" needs to be checkable — and
+here it is, twice over: the reconstruction is byte-exact, and the gate's own
+stage-`0b` audit reports the same 62 spellings / 88 present pairs on both sides. **The general lesson: one recorded line turns "editing the
+declaration" from an unverifiable claim into a checkable one.** Editing a
+declaration was never the problem; an unverifiable claim about it was.

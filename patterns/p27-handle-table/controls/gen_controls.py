@@ -25,6 +25,27 @@ THE CONTROLS, and what each is for:
                   admissible R4, and it is not offered as one; it is the
                   measurement that justifies two trusted items.
 
+  r4_bufchecked   R4 with the WINDOW read checked (`buf_get_unchecked`'s body
+                  becomes `v[i]`) and the table left unchecked. The second of
+                  the two U-license levers.
+
+  r4_allchecked   R4 with BOTH checked -- **zero U-license trusted items**, so
+                  it carries exactly the spatial checks R3 carries while keeping
+                  R4's hand-written epilogue and raw table. It is what attributes
+                  the +102.84 half of `R3 - R4` that ../NOTES.md 5e used to leave
+                  as "inside the kernel": the two levers are exactly additive and
+                  their sum is DEARER than R3, so none of `R3 - R4` is the
+                  lifetime guarantee (../NOTES.md 5f). Not an admissible R4 --
+                  it is the measurement that attributes the gap.
+
+  r4_epiclear     R4 with the epilogue's DEAD `arr_set_unchecked(&mut live, j,
+                  0u8)` store restored -- i.e. the R4 this pattern shipped at
+                  TASK_060, before TASK_061 deleted the line. It is the "before"
+                  side of ../NOTES.md 8a and prices the store at 6.81 / 10.49
+                  Ir/call. The store is dead (`live` is a kernel local, `j` only
+                  increases, nothing reads `live[j]` again), R3 has no
+                  counterpart to it, and leaving it in flattered the safe rung.
+
   r3_issome       R3 with R2's liveness spellings restored -- `is_some()` then
                   `tab[h] = None` on CLOSE, `is_some()` then `unwrap()` on READ.
                   IN CONTRACT: `spec.md`'s idiom block pins the operations and
@@ -93,11 +114,32 @@ CHECKED = [
                 let v: u8 = rec_read(tab[h]);"""),
     ("""        if arr_get_unchecked(&live, j) == 1u8 {
             rec_close(arr_get_unchecked(&tab, j));
-            arr_set_unchecked(&mut live, j, 0u8);
         }""",
      """        if live[j] == 1u8 {
             rec_close(tab[j]);
-            live[j] = 0u8;
+        }"""),
+]
+
+# The WINDOW read, checked. One accessor, one call site shape -- replacing the
+# body is enough, because every window read goes through it.
+BUFCHECKED = [
+    ("""fn buf_get_unchecked(v: &[u8], i: usize) -> u8 {
+    unsafe { *v.get_unchecked(i) }
+}""",
+     """fn buf_get_unchecked(v: &[u8], i: usize) -> u8 {
+    v[i]
+}"""),
+]
+
+# The dead store the shipped R4 does NOT have, restored. This is the "before"
+# side of ../NOTES.md 8a's before/after and the thing that prices it.
+EPICLEAR = [
+    ("""        if arr_get_unchecked(&live, j) == 1u8 {
+            rec_close(arr_get_unchecked(&tab, j));
+        }""",
+     """        if arr_get_unchecked(&live, j) == 1u8 {
+            rec_close(arr_get_unchecked(&tab, j));
+            arr_set_unchecked(&mut live, j, 0u8);
         }"""),
 ]
 
@@ -160,7 +202,11 @@ def main():
     a1 = "// --------------------------------------------------------- the record ops ---"
     i, j = pure.index(a0), pure.index(a1)
     pure = pure[:i] + pure[j:]
-    made = [("r4_tabchecked.rs", sub(unsafe, CHECKED, "r4_tabchecked")),
+    tabchecked = sub(unsafe, CHECKED, "r4_tabchecked")
+    made = [("r4_tabchecked.rs", tabchecked),
+            ("r4_bufchecked.rs", sub(unsafe, BUFCHECKED, "r4_bufchecked")),
+            ("r4_allchecked.rs", sub(tabchecked, BUFCHECKED, "r4_allchecked")),
+            ("r4_epiclear.rs", sub(unsafe, EPICLEAR, "r4_epiclear")),
             ("r3_issome.rs", sub(tuned, ISSOME, "r3_issome")),
             ("r2_epilogue.rs", sub(naive, EPILOGUE, "r2_epilogue")),
             ("r5_vstdpure.rs", pure)]

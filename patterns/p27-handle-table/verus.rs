@@ -22,11 +22,18 @@
 //! **the temporal property costs none of them.** Two of those are the
 //! allocation API, and they are here
 //! for a CODEGEN reason rather than a trust reason: they are
-//! `vstd::raw_ptr::allocate` / `deallocate` copied character for character into
-//! this crate so that the call is direct and `#[inline(always)]`, because vstd
-//! carries no `#[inline]` and R4 cannot emit a GOT-indirect cross-crate call.
-//! **Their verified twins are vstd's own `allocate` and `deallocate`**, so the
-//! gate itself proves the copies are no stronger than the originals.
+//! `vstd::raw_ptr::allocate` / `deallocate` copied into this crate so that the
+//! call is direct and `#[inline(always)]`, because vstd carries no `#[inline]`
+//! and R4 cannot emit a GOT-indirect cross-crate call. ⚠ The copies are not
+//! character-for-character and the items say where they differ: `rec_alloc`
+//! ships **three** of vstd's five `ensures` (stage 5c found the other two not
+//! load-bearing), `rec_free` spells vstd's six `requires` through `dealloc@.`
+//! rather than a destructured `dealloc.`, and both bodies write `std::alloc::`
+//! where vstd writes `alloc::alloc::`. **Every difference is a weakening or a
+//! respelling, and the twins are what prove it**: **their verified twins are
+//! vstd's own `allocate` and `deallocate`**, so the gate itself re-derives every
+//! run that the copies are no stronger than the originals. A copy that had
+//! STRENGTHENED a clause would not verify against vstd's own API.
 //!
 //! The measured alternative ships as a control: with vstd's API called directly
 //! the TCB is **five** items and **zero** of them touches the lifetime
@@ -34,11 +41,17 @@
 //! this project's `identity` pin that configuration is not a rung. That is
 //! TASK_055 §2.5's alarm in its true, measured form. ../NOTES.md 5 and 6.
 //!
-//! **The table is indexed CHECKED, in this rung and in unsafe.rs**, and that is
-//! a measured decision rather than a concession: `h < ntab` and `ntab <= TABCAP`
-//! together already delete rustc's bounds check on `tab[h]`, so a
-//! `get_unchecked` accessor here would buy zero instructions and cost two
-//! trusted items. ../NOTES.md 4 has the disassembly and the control.
+//! **The table is indexed UNCHECKED, in this rung and in unsafe.rs**, through
+//! `arr_get_unchecked` / `arr_set_unchecked` -- trusted items 2 and 3 above. An
+//! earlier draft indexed it checked, on the argument that `h < ntab` and
+//! `ntab <= TABCAP` together already delete rustc's bounds check on `tab[h]`, so
+//! that a `get_unchecked` accessor would buy zero instructions and cost two
+//! trusted items for nothing. **That argument is false**: three
+//! `core::panicking::panic_bounds_check` call sites survive in the checked
+//! kernel at `-O3` and the checked spelling costs **41.62 Ir/call** on `small`.
+//! ../NOTES.md 4 is the section that REFUTES it and has the control and the
+//! disassembly. (This paragraph said the opposite until TASK_061: the retraction
+//! reached unsafe.rs at TASK_060 and not its twin here.)
 //!
 //! SAFETY (1): `off + len <= buf.len()` is the caller's structural
 //!   precondition. Unchecked in unsafe.rs; discharged at the call site here.
@@ -343,7 +356,7 @@ fn emit(acc: u64) {
 // standard library's documented contract is exactly this `requires`/`ensures`
 // pair.
 //
-// **It is here because it is worth 41.70 Ir/call on `small`** -- the bound
+// **It is here because it is worth 41.62 Ir/call on `small`** -- the bound
 // `h < ntab <= TABCAP` does NOT delete rustc's check on `tab[h]`, which an
 // earlier draft of this pattern asserted without measuring. Three
 // `panic_bounds_check` call sites survive in the checked kernel at `-O3`.
@@ -404,14 +417,21 @@ fn slb_twin_arr_set_unchecked<T: Copy, const N: usize>(v: &mut [T; N], i: usize,
 }
 
 // TRUSTED ITEM 4 of 7, and **the one that is not what it looks like.** This is
-// `vstd::raw_ptr::allocate` (`raw_ptr.rs:908`) -- its `requires`, its `ensures`
-// and its body, character for character -- copied into this crate for ONE
+// `vstd::raw_ptr::allocate` (`raw_ptr.rs:908`) -- vstd's `requires` verbatim,
+// **THREE of vstd's FIVE `ensures`**, and vstd's body with `alloc::alloc::`
+// respelled `std::alloc::` -- copied into this crate for ONE
 // reason, which is codegen: vstd carries no `#[inline]` on `allocate`, so a
 // rung that called it would emit a GOT-indirect cross-crate `call` that
 // unsafe.rs cannot produce, and R4 and R5 would stop being the same machine
 // code. Measured: with vstd's own `allocate` the pair is `differ` at both opt
 // levels, and with this wrapper it is `exact`. ../NOTES.md 5 has the
 // disassembly, and controls/ ships the vstd-pure rung so the claim is checkable.
+//
+// The two dropped `ensures` are vstd's `pt.0.addr() + size <= usize::MAX + 1`
+// and `pt.0.addr() as int % align as int == 0`; the gate's clause-mutation stage
+// (5c) found neither load-bearing at `align == 1`, and dropping them makes the
+// item strictly WEAKER, which is the direction the gate asks for. ../NOTES.md's
+// contract-hash note records the edit.
 //
 // **Its verified twin is vstd's `allocate` itself** (below), so the gate proves
 // that this contract is no stronger than the one vstd already discharges. That
@@ -478,8 +498,14 @@ fn slb_twin_rec_alloc(size: usize, align: usize) -> (pt: (
 }
 
 // TRUSTED ITEM 5 of 7, and THE REAL `free`. `vstd::raw_ptr::deallocate`
-// (`raw_ptr.rs:948`), contract and body character for character, local for the
-// same codegen reason as item 4, with vstd's own `deallocate` as its twin.
+// (`raw_ptr.rs:948`): all six of vstd's `requires` and no `ensures`, exactly as
+// vstd has it, local for the same codegen reason as item 4, with vstd's own
+// `deallocate` as its twin. ⚠ **Two respellings, neither semantic**: vstd
+// destructures its tracked parameters (`Tracked(pt): Tracked<PointsToRaw>`) and
+// so writes `dealloc.addr()`, while this item takes plain `pt` / `dealloc` and
+// writes `dealloc@.addr()` -- changed because the destructured form made the
+// gate's tautology probe unsynthesisable and left six conjuncts unjudged; and
+// the body writes `std::alloc::dealloc` where vstd writes `::alloc::alloc::`.
 //
 // **It CONSUMES the `PointsToRaw` and the `Dealloc`**, and that is the whole
 // temporal argument: after this call the caller has no permission to present,
@@ -759,26 +785,47 @@ pub fn kernel(buf: &[u8], off: usize, len: usize) -> (r: u64)
     // R2 and R3 do not have this loop: dropping the table IS this loop, written
     // by the language. That is the pattern's headline and ../NOTES.md 3 prices
     // it.
+    //
+    // ⚠ **The invariant is `wf` weakened to the SUFFIX `[j, ntab)`, and that is
+    // what lets the epilogue skip the liveness store.** An earlier draft carried
+    // `wf(..)` over `[0, ntab)` and therefore had to write
+    // `arr_set_unchecked(&mut live, j, 0u8)` after each `rec_close` to
+    // re-establish it -- a DEAD STORE worth 6.81 / 10.49 Ir/call that R3 does
+    // not have (../NOTES.md 8a). Slots below `j` are already freed and nothing
+    // reads them again, so the suffix form is the honest invariant: it says
+    // exactly what the rest of the loop needs and no more. Note this is a
+    // *weakening* of the proof obligation that DELETES exec work -- the
+    // obligation count is unchanged at 15.
     let mut j: usize = 0;
     while j < ntab
         invariant
             j <= ntab,
-            wf(tab@, live@, vals, lv, ntab as int, perms, dal),
+            0 <= ntab <= TABCAP,
+            tab@.len() == TABCAP,
+            live@.len() == TABCAP,
+            vals.len() == ntab as int,
+            lv.len() == ntab as int,
+            forall|k: int| j as int <= k < ntab as int ==> ((#[trigger] lv[k]) <==> live@[k]
+                == 1u8),
+            forall|k: int| j as int <= k < ntab as int && lv[k] ==> #[trigger] slot_ok(
+                tab@,
+                vals,
+                perms,
+                dal,
+                k,
+            ),
         decreases ntab - j,
     {
         if arr_get_unchecked(&live, j) == 1u8 {
             assert(lv[j as int]);
             assert(slot_ok(tab@, vals, perms, dal, j as int));
-            let ghost tab0 = tab@;
             let ghost perms0 = perms;
             let ghost dal0 = dal;
             let tracked pt = perms.tracked_remove(j as int);
             let tracked dd = dal.tracked_remove(j as int);
             rec_close(arr_get_unchecked(&tab, j), Tracked(pt), Tracked(dd));
-            arr_set_unchecked(&mut live, j, 0u8);
             proof {
-                lv = lv.update(j as int, false);
-                assert forall|k: int| 0 <= k < ntab as int && lv[k] implies slot_ok(
+                assert forall|k: int| j as int + 1 <= k < ntab as int && lv[k] implies slot_ok(
                     tab@,
                     vals,
                     perms,
@@ -786,7 +833,7 @@ pub fn kernel(buf: &[u8], off: usize, len: usize) -> (r: u64)
                     k,
                 ) by {
                     assert(k != j as int);
-                    assert(slot_ok(tab0, vals, perms0, dal0, k));
+                    assert(slot_ok(tab@, vals, perms0, dal0, k));
                 }
             }
         }

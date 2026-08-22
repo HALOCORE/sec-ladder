@@ -1,6 +1,6 @@
 # p27-handle-table — results
 
-Generated 2026-08-21T19:01:07Z from `results/p27-handle-table.json` (git `f03e6c5e9238`, working tree dirty).
+Generated 2026-08-21T20:10:31Z from `results/p27-handle-table.json` (git `098237f4d531`, working tree dirty).
 
 ## Toolchain
 
@@ -37,7 +37,7 @@ Every delta below is a difference between rungs that are meant to be spellings o
   - `rust` — the same line in the unsafe rungs, `arr_set_unchecked(&mut live, h, 0u8);` in unsafe.rs and verus.rs -- and at R5 the proof FORCES it: without it the loop invariant cannot be re-established, because `rec_free` has consumed slot h's permission while the liveness array would still claim it exists. In the safe rungs there is no such line, because `tab[h] = None` and `tab[h].take()` free the record and invalidate the handle in ONE operation.
 - **required** — *per language:*
   - `c` — THE REAL `free`, in both C rungs: `free(tab[h]);`. Not a freelist push into a slab -- see the why key.
-  - `rust` — THE REAL free, in all four Rust rungs: `std::alloc::dealloc(p, layout);` inside rec_free in unsafe.rs and verus.rs (character-for-character `vstd::raw_ptr::deallocate`, whose verified twin in verus.rs is vstd's own `deallocate`), and the drop of `Option<Box<u8>>` in safe_naive.rs and safe_tuned.rs.
+  - `rust` — THE REAL free, in all four Rust rungs: `std::alloc::dealloc(p, layout);` inside rec_free in unsafe.rs and verus.rs (`vstd::raw_ptr::deallocate`'s six preconditions and its body, respelled but not weakened -- see the TCB section -- whose verified twin in verus.rs is vstd's own `deallocate`), and the drop of `Option<Box<u8>>` in safe_naive.rs and safe_tuned.rs.
 - **required** — *per language:*
   - `c` — ONE ALLOCATION PER RECORD, in both C rungs: `malloc(RECSZ)`.
   - `rust` — ONE ALLOCATION PER RECORD, in all four Rust rungs: `std::alloc::alloc(layout)` inside rec_alloc in unsafe.rs and verus.rs, and `Box::new(a)` in safe_naive.rs and safe_tuned.rs. Rust's default global allocator calls `malloc` for `align <= 8`, so all seven rungs hit the same glibc, in the same size class, once per record.
@@ -81,7 +81,7 @@ Every delta below is a difference between rungs that are meant to be spellings o
 
 ### Spelling audit (stage `0b`, reporting only)
 
-Measured by the gate, not by this file — from `results/gate/p27-handle-table.json`, contract `a0e83e2f2ee2`.
+Measured by the gate, not by this file — from `results/gate/p27-handle-table.json`, contract `0c9f0e978464`.
 
 `62` backticked spelling(s) over `6` rung(s) → **194** (spelling, rung) pair(s), **88** present — not the product, because a per-language entry is read against its own language's rungs only. Matching is `check.spelling_matches`: comments, string literals and Verus ghost clauses blanked, then all whitespace deleted.
 
@@ -151,8 +151,8 @@ Measured by the gate, not by this file — from `results/gate/p27-handle-table.j
 | c-clang | 147 | 141 | 1 | 599 | 173,918,253 | 72,836,379 | 2,800,055 | 280,055 | `e828ef00` | `84240989` | yes | xmm |
 | safe_naive | 210 | 206 | 15 | 897 | 208,228,514 | 91,247,591 | 2,800,275 | 280,275 | `079519b5` | `b6620e25` | yes | xmm |
 | safe_tuned | 213 | 209 | 15 | 913 | 206,325,767 | 90,607,591 | 2,800,275 | 280,275 | `05dbebfc` | `edff3df5` | yes | xmm |
-| unsafe | 156 | 151 | 2 | 638 | 185,686,077 | 77,580,242 | 2,800,275 | 280,275 | `87ced153` | `087e3fd4` | yes | xmm |
-| verus | 156 | 151 | 2 | 638 | 185,686,077 | 77,580,242 | 2,800,270 | 280,270 | `87ced153` | `087e3fd4` | yes | xmm |
+| unsafe | 154 | 150 | 7 | 633 | 184,330,754 | 77,371,189 | 2,800,275 | 280,275 | `38ae720c` | `7f7d4ec7` | yes | xmm |
+| verus | 154 | 150 | 7 | 633 | 184,330,754 | 77,371,189 | 2,800,270 | 280,270 | `38ae720c` | `7f7d4ec7` | yes | xmm |
 | c-gcc-h | 155 | 149 | 0 | 646 | 172,899,171 | 70,617,758 | 3,000,056 | 300,056 | `3ec8a3fc` | `3ec8a3fc` | yes | xmm |
 | c-clang-h | 146 | 142 | 1 | 599 | 174,914,776 | 72,905,833 | 2,800,055 | 280,055 | `f785f3fc` | `6777646c` | yes | xmm |
 
@@ -166,8 +166,8 @@ Measured by the gate, not by this file — from `results/gate/p27-handle-table.j
 | c-clang | 174 | 174 | 1 | 922 | 304,554,831 | - | 4,200,052 | - | `4039a8dd` | `263be7b7` | yes | - |
 | safe_naive | 434 | 434 | 10 | 2,486 | 480,165,220 | - | 5,000,077 | - | `0a101c20` | `fad7694f` | yes | - |
 | safe_tuned | 392 | 392 | 11 | 2,245 | 452,364,506 | - | 5,000,077 | - | `8498eb21` | `1cfb3c1c` | yes | - |
-| unsafe | 277 | 277 | 6 | 1,466 | 467,171,168 | - | 5,000,077 | - | `dd5d146b` | `46718247` | yes | - |
-| verus | 277 | 277 | 6 | 1,466 | 467,171,168 | - | 5,000,056 | - | `89480b10` | `9e5371fa` | yes | - |
+| unsafe | 271 | 271 | 13 | 1,427 | 459,039,230 | - | 5,000,077 | - | `14da8205` | `cddead1c` | yes | - |
+| verus | 271 | 271 | 13 | 1,427 | 459,039,230 | - | 5,000,056 | - | `0451fa67` | `77f1159e` | yes | - |
 | c-gcc-h | 227 | 226 | 0 | 1,116 | 309,962,380 | - | 7,200,066 | - | `1eeae974` | `1eeae974` | yes | - |
 | c-clang-h | 178 | 178 | 1 | 942 | 310,647,747 | - | 4,200,052 | - | `386c75f5` | `4ad20858` | yes | - |
 
@@ -179,8 +179,8 @@ Measured by the gate, not by this file — from `results/gate/p27-handle-table.j
 | c-clang | 385 | 376 | 0 | 1,627 | - | - | 178,061,497 | 75,087,507 | `6542cee2` | `6542cee2` | yes | xmm |
 | safe_naive | 843 | 833 | 1 | 4,015 | - | - | 215,721,552 | 95,089,770 | `287489e7` | `0dfb2d56` | yes | xmm |
 | safe_tuned | 845 | 835 | 1 | 3,999 | - | - | 213,172,995 | 94,018,823 | `791cf7ee` | `72ca70d8` | yes | xmm |
-| unsafe | 796 | 785 | 1 | 3,711 | - | - | 197,814,198 | 83,534,536 | `1f5f1f52` | `93e8d001` | yes | xmm |
-| verus | 812 | 798 | 1 | 3,727 | - | - | 196,858,874 | 83,365,482 | `75c1941c` | `c059e339` | yes | xmm |
+| unsafe | 795 | 784 | 1 | 3,711 | - | - | 196,458,875 | 83,325,483 | `045a236f` | `f56b41aa` | yes | xmm |
+| verus | 811 | 797 | 1 | 3,711 | - | - | 195,503,551 | 83,156,429 | `e299d68a` | `4b2ba469` | yes | xmm |
 | c-gcc-h | 381 | 377 | 1 | 1,595 | - | - | 166,512,673 | 66,909,590 | `232ea324` | `1f142ff9` | yes | - |
 | c-clang-h | 381 | 373 | 0 | 1,633 | - | - | 181,160,767 | 75,816,961 | `58d2925d` | `58d2925d` | yes | xmm |
 
@@ -194,8 +194,8 @@ Measured by the gate, not by this file — from `results/gate/p27-handle-table.j
 | c-clang | 67 | 67 | 0 | 277 | 304,754,831 | - | 4,200,051 | - | `73d6d3a7` | `73d6d3a7` | yes | - |
 | safe_naive | 123 | 123 | 12 | 612 | 480,165,220 | - | 5,000,077 | - | `4d648185` | `2e75a48b` | yes | xmm |
 | safe_tuned | 123 | 123 | 12 | 612 | 452,364,506 | - | 5,000,077 | - | `647bd6e5` | `fafdf07d` | yes | xmm |
-| unsafe | 123 | 123 | 12 | 612 | 467,171,168 | - | 5,000,077 | - | `b32ec5df` | `c2e2e477` | yes | xmm |
-| verus | 86 | 86 | 7 | 329 | 467,171,168 | - | 5,000,056 | - | `a331919f` | `c27df4da` | yes | - |
+| unsafe | 123 | 123 | 12 | 612 | 459,039,230 | - | 5,000,077 | - | `86245bd5` | `cf65c2b4` | yes | xmm |
+| verus | 86 | 86 | 7 | 329 | 459,039,230 | - | 5,000,056 | - | `a331919f` | `c27df4da` | yes | - |
 | c-gcc-h | 100 | 100 | 0 | 426 | 309,962,380 | - | 7,200,066 | - | `29c7be96` | `29c7be96` | yes | - |
 | c-clang-h | 67 | 67 | 0 | 277 | 310,847,747 | - | 4,200,051 | - | `5078de89` | `5078de89` | yes | - |
 
@@ -205,8 +205,8 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 | pair | opt | md5_fn equal | md5_fn_norel equal | md5_raw equal | counts (fn / pad-excl) | padding |
 |---|---|---|---|---|---|---|
-| unsafe vs verus | O0 | no | **yes** | no | 277/277 vs 277/277 | 6 B vs 6 B |
-| unsafe vs verus | O3 | **yes** | **yes** | **yes** | 156/151 vs 156/151 | 2 B vs 2 B |
+| unsafe vs verus | O0 | no | **yes** | no | 271/271 vs 271/271 | 13 B vs 13 B |
+| unsafe vs verus | O3 | **yes** | **yes** | **yes** | 154/150 vs 154/150 | 7 B vs 7 B |
 
 ## Wall clock (secondary)
 
@@ -214,22 +214,22 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 26.75 | 27.14 | 1.5% | 35.41 | 35.86 | 1.3% |
-| c-gcc | whole | 27.95 | 28.25 | 1.1% | 36.26 | 36.56 | 0.8% |
-| c-clang | isolated | 27.81 | 28.09 | 1.0% | 33.65 | 34.19 | 1.6% |
-| c-clang | whole | 29.77 | 30.09 | 1.1% | 34.01 | 34.52 | 1.5% |
-| safe_naive | isolated | 29.68 | 29.89 | 0.7% | 39.98 | 40.41 | 1.1% |
-| safe_naive | whole | 31.44 | 31.90 | 1.5% | 40.07 | 40.62 | 1.4% |
-| safe_tuned | isolated | 29.69 | 30.05 | 1.2% | 39.51 | 40.02 | 1.3% |
-| safe_tuned | whole | 31.23 | 31.60 | 1.2% | 39.78 | 40.33 | 1.4% |
-| unsafe | isolated | 30.23 | 30.55 | 1.1% | 37.42 | 37.77 | 1.0% |
-| unsafe | whole | 31.16 | 31.68 | 1.7% | 38.17 | 38.64 | 1.2% |
-| verus | isolated | 29.54 | 29.94 | 1.4% | 37.57 | 37.94 | 1.0% |
-| verus | whole | 31.30 | 31.61 | 1.0% | 38.08 | 38.56 | 1.3% |
-| c-gcc-h | isolated | 27.55 | 27.74 | 0.7% | 35.84 | 36.31 | 1.3% |
-| c-gcc-h | whole | 28.49 | 28.83 | 1.2% | 36.74 | 37.12 | 1.0% |
-| c-clang-h | isolated | 27.64 | 27.95 | 1.1% | 34.03 | 34.47 | 1.3% |
-| c-clang-h | whole | 28.21 | 28.60 | 1.4% | 34.33 | 34.61 | 0.8% |
+| c-gcc | isolated | 26.85 | 27.09 | 0.9% | 35.49 | 36.03 | 1.5% |
+| c-gcc | whole | 27.82 | 28.16 | 1.2% | 36.20 | 36.54 | 0.9% |
+| c-clang | isolated | 27.74 | 28.04 | 1.1% | 33.87 | 34.21 | 1.0% |
+| c-clang | whole | 29.71 | 29.99 | 1.0% | 33.96 | 34.45 | 1.5% |
+| safe_naive | isolated | 29.63 | 29.92 | 1.0% | 39.08 | 40.53 | 3.7% |
+| safe_naive | whole | 31.58 | 31.82 | 0.8% | 40.25 | 40.67 | 1.1% |
+| safe_tuned | isolated | 29.69 | 30.02 | 1.1% | 39.81 | 40.23 | 1.0% |
+| safe_tuned | whole | 31.20 | 31.63 | 1.4% | 39.86 | 40.34 | 1.2% |
+| unsafe | isolated | 30.14 | 30.39 | 0.8% | 37.37 | 37.78 | 1.1% |
+| unsafe | whole | 31.31 | 31.59 | 0.9% | 38.22 | 38.66 | 1.2% |
+| verus | isolated | 29.52 | 29.93 | 1.4% | 37.42 | 37.90 | 1.3% |
+| verus | whole | 31.43 | 31.72 | 0.9% | 38.34 | 38.78 | 1.2% |
+| c-gcc-h | isolated | 27.55 | 27.73 | 0.7% | 35.95 | 36.35 | 1.1% |
+| c-gcc-h | whole | 28.46 | 28.78 | 1.1% | 36.80 | 37.29 | 1.3% |
+| c-clang-h | isolated | 27.61 | 27.90 | 1.1% | 34.10 | 34.56 | 1.3% |
+| c-clang-h | whole | 28.27 | 28.61 | 1.2% | 34.38 | 34.83 | 1.3% |
 
 Every wall-clock cell is within the 10% min-to-median spread threshold.
 

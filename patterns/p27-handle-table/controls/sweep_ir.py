@@ -249,6 +249,81 @@ def cmd_fit(a):
     return 0
 
 
+def hitmiss_regressors(path):
+    """`nopen` split into tcache HITS and MISSES, from the file alone.
+
+    An OPEN reuses a chunk iff a CLOSE has put one in the bin since the last
+    OPEN took it out. glibc's tcache is a 7-deep LIFO per size class and every
+    record here is `malloc(1)`, so one bin and one stack is the whole
+    simulation -- zero fitted parameters, exactly like `regressors` above.
+    ../NOTES.md 9b is what this prints."""
+    f = slb.read(path)
+    stride, buf = slb.head1_u64_bytes(f.payload[: f.declared_len])
+    nwin = len(buf) // stride
+    tot = [0, 0, 0, 0, 0]                      # hit, miss, nclose, nread, nrej
+    for w in range(nwin):
+        win = buf[w * stride:(w + 1) * stride]
+        nops = int.from_bytes(win[0:4], "little")
+        tab, p, tcache = [], HDR, 0
+        for _ in range(nops):
+            if len(win) - p < OPSZ:
+                break
+            c, a = win[p], win[p + 1]
+            p += OPSZ
+            op, h = c % 4, a
+            if op == 0:
+                if len(tab) < TABCAP:
+                    tab.append(a)
+                    if tcache > 0:
+                        tcache -= 1
+                        tot[0] += 1
+                    else:
+                        tot[1] += 1
+                else:
+                    tot[4] += 1
+            elif op == 1:
+                if h < len(tab) and tab[h] is not None:
+                    tab[h] = None
+                    tcache = min(tcache + 1, 7)
+                    tot[2] += 1
+                else:
+                    tot[4] += 1
+            else:
+                if h < len(tab) and tab[h] is not None:
+                    tot[3] += 1
+                else:
+                    tot[4] += 1
+    return [t / nwin for t in tot]
+
+
+def cmd_hitmiss(a):
+    """Refit every swept cell with `nopen` SPLIT, and print both residuals.
+
+    ../NOTES.md 9b's table. It exists as a command rather than as prose because
+    the numbers move whenever a rung does: TASK_061 deleted a store from R4 and
+    the `unsafe` row moved with it."""
+    d = json.load(open(a.path))
+    print(f"{'cell':14s} {'nopen (one)':>12s}   {'hit':>9s} {'miss':>9s}   "
+          f"{'resid 4-col':>12s} {'resid 5-col':>12s}")
+    for c in d["cells"]:
+        X1 = [[r["nopen"], r["nclose"], r["nread"], r["nrej"], 1.0] for r in d["rows"]]
+        hm = [hitmiss_regressors(os.path.join(INDIR, r["blob"])) for r in d["rows"]]
+        X2 = [[g[0], g[1], r["nclose"], r["nread"], r["nrej"], 1.0]
+              for g, r in zip(hm, d["rows"])]
+        y = [r[c] for r in d["rows"]]
+        b1, b2 = lstsq(X1, y), lstsq(X2, y)
+        r1 = max(abs(y[i] - sum(b1[j] * X1[i][j] for j in range(5)))
+                 for i in range(len(y)))
+        r2 = max(abs(y[i] - sum(b2[j] * X2[i][j] for j in range(6)))
+                 for i in range(len(y)))
+        print(f"{c:14s} {b1[0]:12.4f}   {b2[0]:9.4f} {b2[1]:9.4f}   "
+              f"{r1:12.4f} {r2:12.4f}")
+    print("\nThe split is an IMPROVEMENT and nowhere near closure: the op ORDER")
+    print("is a real missing column, it is now measured, and it is not the only")
+    print("one left (../NOTES.md 9a, 9d).")
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -263,6 +338,9 @@ def main():
     f = sub.add_parser("fit")
     f.add_argument("path")
     f.set_defaults(fn=cmd_fit)
+    hm = sub.add_parser("hitmiss")
+    hm.add_argument("path")
+    hm.set_defaults(fn=cmd_hitmiss)
     a = ap.parse_args()
     return a.fn(a)
 

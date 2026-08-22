@@ -2098,6 +2098,75 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
    **TCB 3, no `assume`**, `global size_of usize == 8;` checked rather than
    assumed (`.memory/04-verus.md`).
 
+19. **p27 — the first TEMPORAL bug, and not one instruction of its safety tax is
+   the lifetime guarantee.** A handle table over **per-record `malloc`/`free`**;
+   R1 omits one conjunct (`&& live[h] == 1`) on the READ path and dereferences a
+   freed record. Reviewed (TASK_060_REVIEW: **no blocker**, 3 majors, 8 minors,
+   **28 clean negatives**), corrected at TASK_061.
+
+   **The headline, and it is a decomposition rather than a number.**
+   `R3 − R4 = +230.07 / +792.75` (whole-program marginal, `-O3 isolated`), and
+   **it is not a safety figure**:
+
+   ```
+   230.0694  =  kernel 109.6476  +  drop_glue 120.4218  +  allocator 0.0000
+   ```
+
+   ⚠ **"Closed" is literal and it is the methodological point.** Parsing the
+   *whole* callgrind annotate table rather than four named functions, **the sum
+   over EVERY function equals the whole-program delta exactly** —
+   `malloc`, `free`, `_int_malloc`, `_int_free`, the unix shim and all three
+   `__rust_*` are **equal to the last digit** between the safe and unsafe rungs.
+   **That is a far stronger statement than four needles agreeing**, and it is
+   cheap: `controls/ir_table.py --closed`.
+
+   **And the spatial tax runs the other way.** An R4 that *keeps* R3's bounds
+   checks costs **+153.51**, where R3's whole in-kernel excess is **+109.65** —
+   so **safe Rust pays 43.86 LESS of the spatial tax than an unsafe rung
+   carrying the same checks** (five surviving `panic_bounds_check` sites each,
+   call targets resolved by GOT reloc + `nm`). The remaining 120.42 is **drop
+   glue** — an epilogue asymmetry. **Nothing in `R3 − R4` is temporal safety.**
+
+   > **The lifetime guarantee's real cost here is ZERO, and its shape is
+   > structural: the free and the invalidation are ONE operation in safe Rust
+   > and TWO in C, and the bug is neither of them going wrong — it is the
+   > THIRD, the *asking*, going missing.**
+
+   ⚠ **TWO predictions this project carried for weeks were both wrong**, and
+   they had reached `RECAP.md` and this file:
+
+   - *"Safe Rust is forced onto `(slot, generation)`, so its cost is a
+     representation change rather than a check"* — **false.** The handle comes
+     out of a **file**, so it is an integer in every rung. Safe Rust is forced
+     onto `Option<Box<u8>>`, which is **niche-optimised into the hardened-C
+     representation** (verified on the shipped binary: 16 `movaps` covering
+     256 B / 32 slots, stride 8; `tab[h] = None` is `movq $0x0`,
+     `take().is_some()` is `test %rdi,%rdi`).
+   - *"Such a pattern publishes `tcb_items = 2`, fewer than p01"* — **false in
+     its number, true in its substance.** p27 publishes **7**. The allocation
+     itself really does add **zero** project-local axioms; a real pattern also
+     indexes a table and reads a window.
+
+   **TCB 7 is FORCED, not chosen.** The minimal variant (`r5_vstdpure`) verifies
+   **15/0 at `tcb_items = 5`** and its R4/R5 pair is **`differ` at both opt
+   levels**, because `vstd::raw_ptr::allocate`/`deallocate` carry **no
+   `#[inline]`** and an R5 calling them emits a GOT-indirect cross-crate call R4
+   cannot produce. **18 of 18 shipped `spec.md` files pin `O0: norel,
+   O3: exact`**, so TCB 5 would make p27 the only pattern unable to support
+   finding 1 — on the largest ghost state in the tree.
+
+   ⚠ **Finding 18's blocker repeated one pattern later and was caught, not
+   shipped.** *"Degenerate as far as this task searched"* was false again: a
+   **dead store in R4 that R3 does not have** (`arr_set_unchecked(&mut live, j,
+   0)` in the epilogue) was flattering the safe rung by **6.81 / 10.49**
+   `Ir`/call. Deleting it verifies 15/0, is byte-identical, and moved the
+   headline **against** safe Rust — which is why the direction test says trust
+   it. **An under-searched R4 side is now the most reliable defect this project
+   produces.**
+
+   Sound: Verus **15/0 first run** with a functional postcondition (twin 20/0),
+   `R4 ≡ R5` `exact` at O3 / `norel` at O0, two proof mutants failing, TCB 7.
+
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how
 much proof keeps that base sound, and which C patterns resist this treatment.*

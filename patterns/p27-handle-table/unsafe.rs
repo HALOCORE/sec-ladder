@@ -14,13 +14,19 @@
 //! `arr_set_unchecked`. An earlier draft indexed it checked, on the argument
 //! that `h < ntab` and `ntab <= TABCAP` already delete rustc's check; that
 //! argument is **false**, three `panic_bounds_check` call sites survive at
-//! `-O3`, and the checked spelling costs **41.70 Ir/call** on `small`.
+//! `-O3`, and the checked spelling costs **41.62 Ir/call** on `small`.
 //! ../NOTES.md 4 has the control and the disassembly.
 //!
-//! **`rec_alloc` and `rec_free` are character-for-character
-//! `vstd::raw_ptr::allocate` / `deallocate`** (`raw_ptr.rs:908`, `:948`) with
-//! the ghost returns deleted, and verus.rs carries the same two bodies as
-//! trusted items with vstd's own API as their verified twins. Both sides are
+//! **`rec_alloc` and `rec_free` are `vstd::raw_ptr::allocate` / `deallocate`**
+//! (`raw_ptr.rs:908`, `:948`) with the ghost returns and arguments deleted and
+//! `alloc::alloc::` respelled `std::alloc::`, and verus.rs carries the same two
+//! bodies as trusted items with vstd's own API as their verified twins. ⚠ The
+//! word is NOT "character for character": verus.rs's `rec_alloc` ships three of
+//! vstd's five `ensures` and its `rec_free` spells vstd's six `requires` with
+//! `dealloc@.` instead of a destructured `dealloc.`. Both differences are
+//! weakenings or respellings, both are recorded in verus.rs at the items
+//! themselves, and the twins are what prove they are not strengthenings. This
+//! file has no clauses at all, so nothing here is affected. Both sides are
 //! `#[inline(always)]`, which is what makes R4 and R5 the same machine code:
 //! vstd carries no `#[inline]`, so an R5 that called vstd's `allocate` directly
 //! emits a GOT-indirect cross-crate `call` that R4 cannot produce and the pair
@@ -59,7 +65,7 @@ fn buf_get_unchecked(v: &[u8], i: usize) -> u8 {
 
 // The unchecked TABLE read and store, generic over the element type so that the
 // pointer table and the liveness array share one accessor. verus.rs's trusted
-// items 2 and 3. Worth 41.70 Ir/call on `small` against the checked spelling --
+// items 2 and 3. Worth 41.62 Ir/call on `small` against the checked spelling --
 // `h < ntab <= TABCAP` does NOT delete rustc's check, and ../NOTES.md 4 has the
 // control that measures it.
 #[inline(always)]
@@ -193,11 +199,21 @@ pub fn kernel(buf: &[u8], off: usize, len: usize) -> u64 {
     }
     // The epilogue. R2 and R3 do not have it: dropping the table IS this loop,
     // written by the language.
+    //
+    // ⚠ **There is deliberately NO `arr_set_unchecked(&mut live, j, 0u8)`
+    // here.** An earlier draft carried one, symmetrically with the CLOSE path's
+    // line above -- and it is a DEAD STORE: `live` is a kernel local, `j` is
+    // strictly increasing and nothing reads `live[j]` again. It cost
+    // **6.81 / 10.49 Ir/call** (`small` / `large`, whole-program and
+    // kernel-exclusive alike), i.e. one store per record still alive at scope
+    // exit, and R3 has no such store, so leaving it in was a handicap on the
+    // UNSAFE rung that flattered the safe one. Deleted at TASK_061;
+    // `controls/gen_controls.py`'s `r4_epiclear` restores it and prices it, and
+    // ../NOTES.md 8a has the before/after.
     let mut j: usize = 0;
     while j < ntab {
         if arr_get_unchecked(&live, j) == 1u8 {
             rec_close(arr_get_unchecked(&tab, j));
-            arr_set_unchecked(&mut live, j, 0u8);
         }
         j = j + 1;
     }

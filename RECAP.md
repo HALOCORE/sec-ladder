@@ -8,10 +8,9 @@ this box is reference; this box is what to *do*.
 
 | | |
 |---|---|
-| **Patterns** | **18 of 47 exist, all green. 0 STALE.** (Count it: `ls -d patterns/p*/ | wc -l`. A spelled-out number sat here reading "thirteen" against a sixteen-row table.) ⚠ **p27 is green and UNDER REVIEW** — nothing of it is in `.memory/` yet, per rule 9. |
-| **In flight** | **`TASK_060_REVIEW` — p27**, the lifetime pattern. **Its A1 could be a blocker**: `vstd::raw_ptr`'s allocator API is not `#[inline]`, so an R5 that calls it cannot be byte-identical to R4, and the two extra trusted items that fix it are licensed by **twins that are vstd's own API** — which may be re-stating the axiom rather than re-deriving it. |
-| **Do this next** | Land p27's review (a corrections task — **three tasks per pattern is the measured cost**), then **p47** (constant-time compare). |
-| **Then** | **p47** (constant-time compare). `.memory/06-catalogue.md`'s section **"The waves order by FAMILY, and after 16 patterns that is the wrong axis"** has the six missing axes, the recommended order (lifetime → p47 → p38 → p22 → p36), and a **feasibility triage** naming what would kill each. It is the manager's judgement with its own objections attached; **push back with the pattern you would rather build.** |
+| **Patterns** | **18 of 47 exist, all green, all 18 reviewed. 0 STALE.** (Count it: `ls -d patterns/p*/ | wc -l`. A spelled-out number sat here reading "thirteen" against a sixteen-row table.) |
+| **Do this next** | **p47 — constant-time compare.** Write `TASK_062`. p27 is fully landed (build -> review -> corrections). ⚠ Read `.memory/06-catalogue.md`'s p47 feasibility note FIRST: this box has **no hardware counters**, and p47 does not need them — **`Ir` under callgrind IS the side channel**, deterministic and noise-free, so the finding is *"`Ir(mismatch at k)` is constant in `k`"* versus *"linear in `k`"*. The other half, *"did the optimiser put the branch back"*, is a **static** question `asm.py` already answers exactly. |
+| **After that** | `.memory/06-catalogue.md`'s section **"The waves order by FAMILY, and after 16 patterns that is the wrong axis"** — the six missing axes, the recommended order (**lifetime ✅ done** → p47 → p38 → p22 → p36), and a **feasibility triage** naming what would kill each. It is the manager's judgement with its own objections attached; **push back with the pattern you would rather build.** |
 | **Three rules for writing that task** | ⚠ **Settle the bug class as the FIRST deliverable** — overturned on four patterns, upheld on two. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat), and the only out-of-sample test here that has ever been able to fail is **additivity extrapolation**. ⚠ **Name the INLINE MODE at every figure** — p10 fitted both and the regressors *swapped*. All three in `.memory/03-measurement.md`. |
 | **✅ BUILT — the lifetime axis** | p27 exists (TASK_060), green, **R5 15/0 first run**. ⚠ **Two predictions this box carried for weeks were BOTH wrong.** Safe Rust is *not* forced onto `(slot, generation)` — the handle comes out of a **file**, so it is an integer in every rung; safe Rust is forced onto `Option<Box<u8>>`, niche-optimised into the hardened-C representation. And `tcb_items` is **7**, not the 2 that was called the prospective gameability alarm — right in substance (the allocation adds *zero* project-local axioms), wrong in its number. The finding that replaced them: **the free and the invalidation are ONE operation in safe Rust and TWO in C, and the bug is the third — the ASKING — going missing.** |
 | **The newest trap, from p10** | **A headline can be wrong in the FLATTERING direction and pass a green gate.** p10 published *"safe Rust cheaper than unsafe"*; 60% of it was an **unsearched R4 side** and the rest was **index-expression bookkeeping** that C pays more of than either Rust rung. **Before publishing any rung comparison, ask what the other rung's spelling is worth** — finding 14 (p13) is the same failure. |
@@ -101,6 +100,7 @@ rows, or run `ls -d patterns/p*/ | wc -l`.
 | p14 | field split | **an exact law, fitted where the guard never fires** — and why "hardening is cheaper than the bug" is not publishable |
 | p18 | LEB128 varint | **UB that is not memory-unsafety** — four catchers, all outside the measured matrix |
 | p10 | weighted FIR stencil | **a headline wrong in the flattering direction** — safe beats unsafe, and none of it is safety |
+| p27 | handle table | **the first TEMPORAL bug** — and the lifetime guarantee costs zero; safe Rust pays *less* spatial tax than unsafe |
 
 **If you read only one thing after this file**, read `.tasks/TASK_026.md` §0 — the
 distilled rules from the thirteen-task spelling arc. Every pattern built after it
@@ -137,6 +137,7 @@ the commands are in `.memory/01-ladder.md`'s numbering warning.
 | p14 | **16** | 27 |
 | p18 | **17** | 28 |
 | p10 | **18** | 29 |
+| p27 | **19** | 30 |
 | p01, p02 | findings 1–3 | 1–8 |
 
 Cross-cutting entries exist only here: **14** (every rung is a spelling), **16**
@@ -1151,6 +1152,46 @@ the number.** Two task files have already sent an agent to the wrong finding.
    domain rule reproduced on an **eighth** pattern, with the diagnostic
    quantified: the old columns refitted over all rows go to residuals **9.19 …
    1606.73**, which a caveat would have hidden.
+
+30. **p27 — the first TEMPORAL bug, and the lifetime guarantee costs ZERO.**
+   (TASK_060, reviewed at TASK_060_REVIEW — **no blocker**, 3 majors, 8 minors,
+   **28 clean negatives** — corrected at TASK_061. Authoritative:
+   `.memory/01-ladder.md` **finding 19**.)
+
+   A handle table over **per-record `malloc`/`free`**; R1 omits one conjunct on
+   the READ path and dereferences a freed record. Every other bug here is
+   spatial or logical; this is the class safe Rust rejects at **compile** time.
+
+   **`R3 − R4 = +230.07 / +792.75` and NONE of it is temporal safety.** A
+   decomposition closed over *every* function — not four chosen ones — gives
+   `230.07 = 109.65 kernel + 120.42 drop glue + 0.00 allocator`, with `malloc`,
+   `free`, `_int_malloc`, `_int_free` and all three `__rust_*` **equal to the
+   last digit** between the rungs. And the spatial tax runs backwards: an R4
+   that *keeps* R3's bounds checks costs **+153.51** against R3's **+109.65**,
+   so **safe Rust pays 43.86 LESS of it**. The rest is drop glue.
+
+   > **The lifetime guarantee's cost is zero and its shape is structural: the
+   > free and the invalidation are ONE operation in safe Rust and TWO in C, and
+   > the bug is neither of them going wrong — it is the THIRD, the *asking*,
+   > going missing.**
+
+   ⚠ **Two predictions this file carried for weeks were both wrong.** Safe Rust
+   is **not** forced onto `(slot, generation)` — the handle comes out of a
+   **file**, so it is an integer in every rung, and safe Rust is forced onto
+   `Option<Box<u8>>`, niche-optimised into the hardened-C representation
+   (verified on the shipped binary). And `tcb_items` is **7**, not the 2 this
+   file called the prospective gameability alarm: right in substance (the
+   allocation adds **zero** project-local axioms), wrong in its number.
+   **TCB 7 is forced, not chosen** — `identity: exact` is an **18-of-18**
+   invariant and the minimal-TCB variant's R4/R5 pair is `differ`.
+
+   **Two methodological results, both in `.memory/`.** The **verified twin
+   works and both its legs are load-bearing** — four weakenings caught at twin
+   19/1, and the one-sided case caught **structurally** by signature equality
+   where Verus verifies it 20/0. And the **direction test was verified
+   byte-exactly for the first time**: the pre-build contract reconstructed from
+   the disclosed edits alone reproduces the recorded hash, and no single edit
+   does.
 
 ## Retracted — do not reinstate
 

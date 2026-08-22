@@ -1424,6 +1424,48 @@ instruction as `1 − 2·64` and `1 − 2·120`, and the headline shrinks 2.5×
    **within 2 `Ir`** of the value an independent route (a cheaper admissible R4)
    produced. **Two routes to one number is worth more than either alone.**
 
+## Close a decomposition over EVERY function, not over the four you suspect
+
+**p27, TASK_060_REVIEW + TASK_061.** p27's safety tax was first decomposed by
+naming four functions (`kernel`, `drop_glue`, `malloc`, `free`) and observing
+that the allocator terms were equal between rungs. That is corroboration. The
+review re-did it by **parsing the whole callgrind annotate table**, and the
+result is categorically stronger:
+
+```
+230.0694  =  kernel 109.6476  +  drop_glue 120.4218  +  allocator 0.0000
+SUM OVER EVERY FUNCTION = 230.0694 = the whole-program delta.   closed? YES
+```
+
+`_int_malloc`, `_int_free`, the unix shim and all three `__rust_*` are also
+**equal to the last digit**. **Nothing else moved** — which four needles cannot
+establish, because they cannot see the fifth.
+
+> **A closed decomposition is the difference between "these terms explain it" and
+> "these terms ARE it."** It costs one pass over a table you already generate
+> (`controls/ir_table.py --closed`), and it is what let p27 say *nothing* in
+> `R3 − R4` is temporal safety rather than *most of it isn't*.
+
+## ⚠ A whole-program marginal figure can be a function of the SCRATCH DIRECTORY
+
+**p27, TASK_061 — and the correction is to the reason, not the retraction.** p27
+published `R5 − R4 = +0.0132` on `large`. It was retracted, and the first stated
+reason (*"it does not reproduce"*) is **wrong**: it reproduces exactly, twice,
+under the tool's own scratch path. It moves to **`+0.0104`** under a
+per-PID path and to **`+0.0020`** under a third — **on identical binaries and
+identical bytes**.
+
+> **The finding is "it is a function of the scratch directory", not "it is
+> noisy".** A whole-program count includes the process's own argv and
+> environment handling, so a path-length change of a few characters moves it by
+> **±0.02 `Ir`/call**. That is below anything this project publishes, and it is
+> exactly the size at which a five-decimal figure looks meaningful and is not.
+> ⚠ **Sanity-check the arithmetic too**: `0.0132 × 5000 calls = 66`, not 132 —
+> the figure never had a consistent reading.
+> **Kernel-exclusive counts do not have this problem.** Related but distinct
+> from `:1099` (the environment block does not always cancel) and from the
+> source-path-length artefact in the R4/R5 null.
+
 ## ⚠ An `identity: exact` pin excludes every candidate R4 that carries a PANIC PAD
 
 **p10, TASK_057_REVIEW + TASK_059, measured on a pad count rather than inferred.**

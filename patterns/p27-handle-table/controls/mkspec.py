@@ -71,7 +71,7 @@ contract = {
    {"c": "THE LINE THE C RUNG MUST NOT FORGET, present in BOTH C rungs: `live[h] = 0;` immediately after the `free`. R1's bug is NOT that it skips this -- it does not -- it is that its READ path never asks. Splitting the free from the invalidation is what makes forgetting possible at all.",
     "rust": "the same line in the unsafe rungs, `arr_set_unchecked(&mut live, h, 0u8);` in unsafe.rs and verus.rs -- and at R5 the proof FORCES it: without it the loop invariant cannot be re-established, because `rec_free` has consumed slot h's permission while the liveness array would still claim it exists. In the safe rungs there is no such line, because `tab[h] = None` and `tab[h].take()` free the record and invalidate the handle in ONE operation."},
    {"c": "THE REAL `free`, in both C rungs: `free(tab[h]);`. Not a freelist push into a slab -- see the why key.",
-    "rust": "THE REAL free, in all four Rust rungs: `std::alloc::dealloc(p, layout);` inside rec_free in unsafe.rs and verus.rs (character-for-character `vstd::raw_ptr::deallocate`, whose verified twin in verus.rs is vstd's own `deallocate`), and the drop of `Option<Box<u8>>` in safe_naive.rs and safe_tuned.rs."},
+    "rust": "THE REAL free, in all four Rust rungs: `std::alloc::dealloc(p, layout);` inside rec_free in unsafe.rs and verus.rs (`vstd::raw_ptr::deallocate`'s six preconditions and its body, respelled but not weakened -- see the TCB section -- whose verified twin in verus.rs is vstd's own `deallocate`), and the drop of `Option<Box<u8>>` in safe_naive.rs and safe_tuned.rs."},
    {"c": "ONE ALLOCATION PER RECORD, in both C rungs: `malloc(RECSZ)`.",
     "rust": "ONE ALLOCATION PER RECORD, in all four Rust rungs: `std::alloc::alloc(layout)` inside rec_alloc in unsafe.rs and verus.rs, and `Box::new(a)` in safe_naive.rs and safe_tuned.rs. Rust's default global allocator calls `malloc` for `align <= 8`, so all seven rungs hit the same glibc, in the same size class, once per record."},
    {"c": "the handle table's extent is a COMPILE-TIME CONSTANT and the capacity guard is in every rung including R1: `if (ntab < TABCAP) {` in both C rungs.",
@@ -172,7 +172,12 @@ contract = {
    "rec_alloc": (
     "`size` and `align` are constrained by `valid_layout(size, align)` and `size != 0`, which is "
     "vstd's own precondition for the identical body, and the returned pointer is constrained by "
-    "five `ensures` clauses copied from vstd verbatim. There is no unconstrained parameter. The "
+    "THREE `ensures` clauses copied from vstd verbatim -- vstd states five, and the other two "
+    "(`pt.0.addr() + size <= usize::MAX + 1` and `pt.0.addr() as int % align as int == 0`) were "
+    "dropped when the gate's clause-mutation stage found them not load-bearing at `align == 1`; "
+    "the `verus.items` dump below is the authority and lists three. Dropping them makes the item "
+    "strictly WEAKER, and the twin -- vstd's own `allocate` -- still verifies, which is what a "
+    "weakening has to do. There is no unconstrained parameter. The "
     "reason this item exists at all is CODEGEN and not trust: vstd carries no `#[inline]` on "
     "`allocate`, so an R5 that called it directly emits a GOT-indirect cross-crate `call` that "
     "unsafe.rs cannot produce, and the `identity` pin drops from `exact` to `differ` (measured, "
@@ -180,8 +185,11 @@ contract = {
    "rec_free": (
     "Every parameter is constrained: `p`, `size` and `align` by the four `dealloc.*` equalities, "
     "and the two tracked permissions by `pt.is_range(..)` and the provenance equalities -- vstd's "
-    "own preconditions for the identical body, copied verbatim. Its verified twin is vstd's "
-    "`deallocate`. Same codegen reason as `rec_alloc`."),
+    "own six preconditions for the identical body, all six shipped, RESPELLED through `dealloc@.` "
+    "/ `pt@.` because vstd destructures its tracked parameters "
+    "(`Tracked(pt): Tracked<PointsToRaw>`) and this item takes plain ones; the destructured form "
+    "made the gate's tautology probe unsynthesisable and left all six conjuncts unjudged. Its "
+    "verified twin is vstd's `deallocate`. Same codegen reason as `rec_alloc`."),
   }},
   "items": {"verus.rs": items},
  },
@@ -494,9 +502,14 @@ project-local trusted items, and **not one of them is the temporal property**:
   accessors, the same axiom every unsafe rung in this project ships;
 - `load_input`, `emit` — infra, in every pattern here;
 - `rec_alloc`, `rec_free` — `vstd::raw_ptr::allocate` and `deallocate` copied
-  character for character into the crate **for a codegen reason**, whose
-  *verified twins are vstd's own `allocate` and `deallocate`*, so the gate itself
-  proves the copies are no stronger than the originals.
+  into the crate **for a codegen reason**, whose *verified twins are vstd's own
+  `allocate` and `deallocate`*, so the gate itself proves the copies are no
+  stronger than the originals. ⚠ Not *character for character*: `rec_alloc`
+  ships **three** of vstd's five `ensures` (two were dropped as not
+  load-bearing), `rec_free` spells vstd's six `requires` through `dealloc@.`
+  rather than a destructured `dealloc.`, and both bodies write `std::alloc::`
+  where vstd writes `alloc::alloc::`. Every difference is a weakening or a
+  respelling; the twins are what make that checkable rather than asserted.
 
 The whole lifetime argument — `PointsTo` consumed by a deallocation, a
 permission map maintained across `open`/`close`, and a stale read that has no

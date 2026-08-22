@@ -16,7 +16,7 @@ RFLAGS="--edition 2021 -C codegen-units=1 -C opt-level=3 -C debug-assertions=off
 
 python3 "$REPO/patterns/p27-handle-table/controls/gen_controls.py" --out "$OUT"
 
-for f in r4_tabchecked r3_issome r2_epilogue; do
+for f in r4_tabchecked r4_bufchecked r4_allchecked r4_epiclear r3_issome r2_epilogue; do
     for mode in isolated whole; do
         cfg=""; [ "$mode" = isolated ] && cfg="--cfg slb_isolated"
         # shellcheck disable=SC2086

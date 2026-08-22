@@ -6,6 +6,7 @@ and the PER-FUNCTION decomposition that 5e of ../NOTES.md rests on.
     sh patterns/p27-handle-table/controls/build_controls.sh  # the controls
     python3 patterns/p27-handle-table/controls/ir_table.py --marginal
     python3 patterns/p27-handle-table/controls/ir_table.py --functions
+    python3 .../ir_table.py --closed --cells safe_tuned,unsafe   # the CLOSED one
 
 **WHY WHOLE-PROGRAM AND NOT KERNEL-EXCLUSIVE.** p27's kernel calls `malloc` and
 `free` once per record and those bodies live in glibc, inside no symbol
@@ -28,6 +29,7 @@ cell inner), foreground, per-PID scratch.
 """
 import argparse
 import os
+import re
 import struct
 import subprocess
 import sys
@@ -46,7 +48,8 @@ CTRL = os.path.join(REPO, ".temp", "p27", "controls")
 
 SHIPPED = ["c-gcc", "c-gcc-h", "c-clang", "c-clang-h",
            "safe_naive", "safe_tuned", "unsafe", "verus"]
-CONTROLS = ["r5_vstdpure", "r4_tabchecked", "r3_issome", "r2_epilogue"]
+CONTROLS = ["r5_vstdpure", "r4_tabchecked", "r4_bufchecked", "r4_allchecked",
+            "r4_epiclear", "r3_issome", "r2_epilogue"]
 
 
 def path_of(cell, opt, mode):
@@ -134,10 +137,78 @@ def cmd_functions(a):
     return 0
 
 
+def cmd_closed(a):
+    """The CLOSED per-function decomposition ../NOTES.md 5e publishes.
+
+    `--functions` above substring-matches four needles and takes a `max` over
+    the matching `callgrind_annotate` lines, so it can only ever confirm the
+    terms it was told to look for -- it cannot answer *is anything else
+    moving?*. This mode parses the WHOLE annotate table, prints every function
+    whose marginal moved, and prints the SUM of the per-function deltas beside
+    the whole-program delta. When the two agree, the decomposition is closed:
+    nothing outside the printed terms moved. Ported from TASK_060_REVIEW's
+    `fndelta.py`, which is where the closure was first measured."""
+    scr = os.path.join(REPO, ".temp", "p27", f"irc{os.getpid()}")
+    os.makedirs(scr, exist_ok=True)
+    res = {}
+    cells = a.cells.split(",")
+    for c in cells:
+        b = path_of(c, a.opt, a.mode)
+        per = {}
+        tots = {}
+        for n in (a.n1, a.n2):
+            tots[n], o = total_ir(b, with_iters(os.path.join(IND, a.input), n, scr),
+                                  scr, f"{c}.{n}")
+            ann = subprocess.run([CGA, "--threshold=100", o],
+                                 capture_output=True, text=True).stdout
+            for line in ann.splitlines():
+                m = re.match(r"^([\d,]+)\s*(\([^)]*\))?\s+(.*)$", line.strip())
+                if not m:
+                    continue
+                v = m.group(1).replace(",", "")
+                name = m.group(3).strip()
+                if not v.isdigit() or not name or "PROGRAM TOTALS" in name:
+                    continue
+                # Normalise so the SAME function in two different binaries is
+                # ONE row: callgrind qualifies every symbol with the object
+                # path it came from and rustc mangles the crate name in, so
+                # `safe_tuned::kernel` and `unsafe::kernel` would otherwise be
+                # two rows with a zero in the other column and the reader would
+                # have to match them by eye.
+                name = re.sub(r"\s*\[[^\]]*\]\s*$", "", name)
+                name = re.sub(r"^\?\?\?:", "", name)
+                name = re.sub(r"^/rustc/[0-9a-f]+/library/", "", name)
+                name = name.replace(f"{c}::", "")
+                per.setdefault(name, {}).setdefault(n, 0)
+                per[name][n] += int(v)
+        d = float(a.n2 - a.n1)
+        res[c] = ((tots[a.n2] - tots[a.n1]) / d,
+                  {k: (v.get(a.n2, 0) - v.get(a.n1, 0)) / d for k, v in per.items()})
+        print(f"  {c:16s} whole={res[c][0]:12.4f}   "
+              f"({a.input} {a.opt} {a.mode} n {a.n1}->{a.n2})", flush=True)
+    if len(cells) == 2:
+        (ta, pa), (tb, pb) = res[cells[0]], res[cells[1]]
+        print(f"\n{'function':62s} {cells[0]:>12s} {cells[1]:>12s} {'delta':>12s}")
+        tot_d = 0.0
+        for k in sorted(set(pa) | set(pb),
+                        key=lambda k: -abs(pa.get(k, 0.0) - pb.get(k, 0.0))):
+            dv = pa.get(k, 0.0) - pb.get(k, 0.0)
+            tot_d += dv
+            if abs(dv) > 0.0005 or max(pa.get(k, 0.0), pb.get(k, 0.0)) > 1.0:
+                print(f"{k[:62]:62s} {pa.get(k,0.0):12.4f} {pb.get(k,0.0):12.4f} {dv:12.4f}")
+        print(f"\n{'SUM over EVERY function':62s} {'':12s} {'':12s} {tot_d:12.4f}")
+        print(f"{'whole-program delta':62s} {ta:12.4f} {tb:12.4f} {ta - tb:12.4f}")
+        print(f"{'closed?':62s} {'':12s} {'':12s} "
+              f"{'YES' if abs(tot_d - (ta - tb)) < 0.001 else 'NO':>12s}")
+    subprocess.run(["rm", "-rf", scr])
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--marginal", action="store_true")
     ap.add_argument("--functions", action="store_true")
+    ap.add_argument("--closed", action="store_true")
     ap.add_argument("--controls", action="store_true", default=True)
     ap.add_argument("--opt", default="O3")
     ap.add_argument("--mode", default="isolated")
@@ -146,6 +217,8 @@ def main():
     ap.add_argument("--n1", type=int, default=20000)
     ap.add_argument("--n2", type=int, default=40000)
     a = ap.parse_args()
+    if a.closed:
+        return cmd_closed(a)
     if a.functions:
         return cmd_functions(a)
     return cmd_marginal(a)

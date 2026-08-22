@@ -42,8 +42,8 @@ kernel:  tab[32] = {NULL} ; live[32] = {0} ; ntab = 0 ; p = 4
   `live[h] = 0` from `verus.rs` does not fail a precondition — it fails the loop
   *invariant*, because `rec_free` has consumed slot `h`'s permission while the
   liveness array still claims the record exists. `NOTES.md` 10, mutant M2.
-- **`R5 − R4 = 0.00000` on the first kernel in this project that allocates and
-  frees** — and it took two source lines to get there. `vstd::raw_ptr::allocate`
+- **`R5 − R4 = 0.00000` kernel-exclusive on the first kernel in this project
+  that allocates and frees** — and it took two source lines to get there. `vstd::raw_ptr::allocate`
   and `deallocate` carry no `#[inline]`, so an R5 that called them emits a
   GOT-indirect cross-crate `call` that R4 cannot produce and the pair measures
   `differ`; and `core::ptr::write` survives as a call at `-O0` where vstd's
@@ -51,16 +51,34 @@ kernel:  tab[32] = {NULL} ; live[32] = {0} ; ntab = 0 ; p = 4
 - **The disclosure is deterministic and the noise is not, and both ship.**
   `adversarial-uaf` recycles the chunk before reading it, so R1 returns *the
   newer record's byte under the older record's handle* — the same number on
-  every run and on both compilers. `adversarial-noreuse` does not recycle, so R1
-  reads glibc's safe-linked tcache `next` word and prints a **different number
-  every run**. That second row is the measurement behind
+  every run and on both compilers. `adversarial-noreuse` **and
+  `adversarial-many`** do not recycle before reading, so R1 reads glibc's
+  safe-linked tcache `next` word and prints a **different number every run** — 24
+  of 24 values distinct across 8 C cells × 3 runs, on each of the two inputs, and
+  the gate prints four notes about it. Those rows are the measurement behind
   `.memory/03-measurement.md`'s constraint that a naked use-after-free is not a
-  reproducible number.
+  reproducible number, and `NOTES.md` 11a is their measured churn scope.
 - **A claim this pattern made and then refuted.** The first draft indexed the
   handle table *checked*, asserting that `h < ntab` with `ntab <= TABCAP`
   already deletes rustc's bounds check. Three `panic_bounds_check` call sites
-  survive at `-O3` and the checked spelling costs **41.70 Ir/call** on `small`.
-  `NOTES.md` 4.
+  survive at `-O3` — resolved by symbol through the GOT relocation, not by
+  counting `call`s — and the checked spelling costs **41.62 Ir/call** on
+  `small`. `NOTES.md` 4.
+- **None of `R3 − R4` is the lifetime guarantee, and that is measured twice.**
+  The gap is `+230.07 / +792.75` whole-program. A CLOSED per-function
+  decomposition — the sum over *every* function equals the whole-program delta,
+  so nothing else moved — puts `120.42` of it in the safe rungs' out-of-line drop
+  glue and **`0.0000` in the entire allocator stack**; and an unsafe rung that
+  keeps R3's five surviving bounds checks costs `+153.51` in the kernel where
+  R3's whole in-kernel excess is `+109.65`, so **R3 pays 43.86 Ir/call LESS of
+  the spatial tax than an unsafe rung carrying the same checks.** `NOTES.md` 5e
+  and 5f.
+- **The R4 side moved, in the direction that makes safe Rust look worse.** The
+  unsafe epilogue was carrying a **dead** liveness store that R3 has no
+  counterpart to — `−6.81 / −10.49 Ir/call`, one instruction per record alive at
+  scope exit, confirmed independently by the 80-blob regression moving by
+  `−1·nopen +1·nclose`. Deleting it raises the published `R3 − R4` by that much.
+  `.memory/01-ladder.md` finding 18 is the blocker it avoids. `NOTES.md` 8a.
 
 ## What it is NOT
 
@@ -74,9 +92,11 @@ kernel:  tab[32] = {NULL} ; live[32] = {0} ; ntab = 0 ; p = 4
 - **Not a `tcb_items = 2` pattern.** §2.5 predicted one; p27 publishes **7**,
   because a real pattern also indexes a table and reads a window. What survives
   of the alarm — and is the sharper claim — is that **none of the seven is the
-  temporal property**, and that on this pattern the trusted base and the
-  `identity` pin are **in tension**: call vstd's allocation API directly and the
-  TCB drops to 5, and the R4/R5 pair stops being byte-identical. `NOTES.md` 6.
+  temporal property**. Calling vstd's allocation API directly would publish 5 —
+  and **that is not a choice p27 has**: 18 of 18 shipped `spec.md` files pin
+  `O3: exact`, so the vstd-pure configuration is not a rung, on the pattern with
+  the largest ghost state in the tree. p27 **ships 7**, and the two extra items
+  are a codegen device whose verified twins are vstd's own API. `NOTES.md` 6, 6b.
 - **Not a perf row for the bug.** The use-after-free lives on `adversarial-*`
   inputs only, for two independent reasons: stage 2 requires benign cells to
   agree, and at `-O3` the stores into the recycled record are
@@ -95,4 +115,4 @@ kernel:  tab[32] = {NULL} ; live[32] = {0} ; ntab = 0 ; p = 4
 | `unsafe.rs` `verus.rs` | R4, R5 — `[*mut u8; 32]` + `[u8; 32]`, explicit epilogue |
 | `model.py` | the independent reference model, two implementations |
 | `inputs/gen.py` | deterministic generator; refuses a benign blob that reads a closed handle |
-| `controls/` | the levers, the sweep fitter and the layout population |
+| `controls/` | the levers, the sweep fitter, the closed decomposition and the layout population |
