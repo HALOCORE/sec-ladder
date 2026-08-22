@@ -373,6 +373,15 @@ grep -c '^[0-9]\+\. \*\*' .memory/01-ladder.md   # this file's findings (+2: the
 awk 'NR>109 && NR<930 && /^[0-9]+\. \*\*/' RECAP.md | tail -1   # RECAP's highest
 ```
 
+⚠ **A THIRD TRAP, and it is the one the manager keeps hitting: SOME OF THE MOST
+CITED BLOCKS ARE NOT NUMBERED AT ALL.** The **named-spelling standard** is the
+unnumbered block at **`:81` of this file** — it has no finding number, and it has
+been cited as *"finding 3"* (TASK_062's task file, by the manager), as
+*"finding 14"* (p27's own `why`, and `.memory/05-layout.md` before TASK_058) and
+as *"finding 18"*. Each of those numbers means something else in one scheme or
+the other. **Cite it as "the named-spelling standard block, `01-ladder.md:81`"**,
+and cite every unnumbered block by its heading text.
+
 ⚠ **AND THE COLLISION IS LIVE, not hypothetical: "finding 14" is p13 here and
 *"every rung is a spelling"* in `RECAP.md`.** Both are cited often and they are
 unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
