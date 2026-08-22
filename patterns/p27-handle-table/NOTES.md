@@ -86,6 +86,96 @@ direction in which they could flatter the thesis. The declaration got *more*
 accurate about how much vstd this pattern actually re-states, which is the
 direction that costs the author something.
 
+**⚠ IT MOVED A THIRD TIME, at TASK_062, to
+`371a680bb5b85f2bdbfb418ab6796b1665037aa199419fce32a5eafb9d5596ac`, and this one
+is a RESTORATION rather than an edit: p27 shipped without the shared
+named-spelling paragraph.** Every other pattern's `idiom.why` ends with the same
+11 003 bytes, byte-identical — `NAMED-SPELLING STANDARD -- POLICY ADOPTED AT
+TASK_018 …` through `… and p01 and p08 neither` — and that paragraph is what
+**defines what a backticked pin means**: that a backticked `required` /
+`forbidden` entry pins *that spelling* and not merely the property the expression
+has, plus the three-part matching rule (whitespace deleted, comments and string
+literals blanked, Verus ghost clauses blanked) that `check.py::spelling_matches`
+implements. p27's `why` was **2 607 bytes of its own text** and carried none of
+it, while p27 pins **62 backticked spellings**. So for three tasks and two
+adversarial reviews **p27's pins were undefined by p27's own contract**, and every
+argument the other seventeen patterns rest on that paragraph for did not apply
+here in writing. It was found by the manager's standing one-liner, after p27 was
+fully landed — not by a review, and not by the gate.
+
+The invariant, and how to check it in one second:
+
+```bash
+python3 -c "import hashlib,glob;print({hashlib.sha256(open(f).read()[open(f).read().find('NAMED-SPELLING STANDARD'):open(f).read().find('p01 and p08 neither')+19].encode()).hexdigest()[:12] for f in glob.glob('patterns/*/spec.md')})"
+# before TASK_062: {'59748cce2db5', 'e3b0c44298fc'}   <- e3b0c44298fc is sha256("")
+# after:           {'59748cce2db5'}                   <- set size 1
+```
+
+⚠ **The paragraph says "this paragraph is byte-identical in all six patterns'
+`why`", and that "six" is HISTORICAL — there are eighteen — and it is
+deliberately NOT corrected.** The phrase sits *inside* the hashed
+`slb-contract` block, so changing one adjective would move **eighteen**
+`contract_sha256` values and cost eighteen gate re-runs (~50 minutes measured)
+to buy nothing a reader of this note does not already have. It is copied
+verbatim, "six" included, precisely so that the one-liner above stays a
+one-liner: the invariant is *byte*-identity, and an invariant that tolerates a
+per-pattern correction is not checkable by a hash. The count is **18** as of
+TASK_062; the paragraph's own internal figures (82 obligations, 0 failing, "all
+six patterns", "six p17 rungs") were all measured at TASK_019 over the six
+patterns that existed then and are frozen as of that date.
+
+**Byte-provable, the same way TASK_061's disclosure was.** Undoing *only* this
+edit — deleting the appended `" " + paragraph + "."` from `idiom.why` and
+nothing else — reproduces the previous block exactly:
+
+```
+contract_sha256 before  0c9f0e9784642dd9b6a68c9dee88fb03c15e07dcd7fb97df9bfb3058451524c5
+contract_sha256 after   371a680bb5b85f2bdbfb418ab6796b1665037aa199419fce32a5eafb9d5596ac
+undo -> contract_sha256 0c9f0e9784642dd9b6a68c9dee88fb03c15e07dcd7fb97df9bfb3058451524c5   (equal)
+spec.md sha256 before   72383d55c0667f1002dd63aca0a73ff5448d6e11d7646232cd03b3fb0e8cf3f4
+spec.md sha256 after    8225423c0ce70f8d8c25642bfc313022e3727cd7722922eea24bba2679fcbf89
+undo -> spec.md sha256  72383d55c0667f1002dd63aca0a73ff5448d6e11d7646232cd03b3fb0e8cf3f4   (equal)
+```
+
+`git diff --stat` is **1 insertion, 1 deletion** — the `why` line and nothing
+else. The insert/undo script is `.temp/t62/para.py`, and it never embeds the
+paragraph: it reads it out of a donor `spec.md` at run time, so it cannot become
+a nineteenth divergent copy.
+
+**Direction test** (`.memory/01-ladder.md`): it passes trivially, and saying so
+is not the same as assuming it. The edit moves **no published figure** — no
+`Ir`, no `ns`, no static count, no `tcb_items`, no obligation count — and it
+touches no `required`, `forbidden`, `obligations`, `twin_obligations`,
+`identity`, `miri`, `items` or `note` entry. It only **adds** constraints: 62
+pins that meant whatever a reader assumed now mean what the standard says, which
+can only narrow the admissible class, never widen it. There is no direction in
+which restoring a shared rule can flatter this pattern's numbers, and if it
+changed the admissible class at all the change is *against* the author.
+
+**Stage `0b`'s audit does not move, and the mechanism is worth naming** — this
+is the check TASK_061's first draft failed, so it was the obvious thing for this
+edit to break. It reads **62 spellings, 194 pairs, 88 present, 2 forbidden hits,
+3 pins-nothing, 36 scoped-absent** on both sides of the edit, and every list
+entry (`hits`, `pins_nothing`, `absent`) compares equal element for element.
+That is *not* luck: the added paragraph contains **176 backticks, i.e. 88
+backticked spans**, any one of which would have moved `spellings` if it were
+seen. `idiom_audit` iterates `("required", "forbidden")` only
+(`harness/check.py:922`) and never reads `why`, so prose inside `why` is
+invisible to it by construction. The contrast with TASK_061 is exactly the key
+the backtick landed in: `62 → 63` there because the backtick went into
+`required[2].rust`; `62 → 62` here because 88 of them went into `why`.
+
+**And the gate now enforces it** (TASK_062 deliverable 2,
+`harness/check.py::named_spelling_problem`): stage `0b` fails a pattern whose
+`idiom.why` does not carry the paragraph verbatim, against a sha256 pinned in
+`check.py` and therefore inside every gate record's
+`source_sha256["harness/check.py"]`. The check is **stricter than the one-liner
+it mechanises**: the one-liner greps `spec.md` as a *file*, so a copy pasted
+into the prose above the fenced block satisfies it — which is p05's original
+accident exactly, a declaration at line 69 while the hashed block started at
+line 309. The gate check reads `contract["idiom"]["why"]`, the parsed value
+*inside* the hash, so a paragraph outside it does not count.
+
 ---
 
 ## 0. The bug class, settled before anything was built

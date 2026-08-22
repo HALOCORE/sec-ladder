@@ -99,7 +99,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "82a6e943d900527eee9d83e0fd5e778cd84a2443d016bb108ed75adbc48f92c6",
+    "harness/check.py": "5b57db8dcb1815816fbfb1976314c95f037eafbf08e4886929d0649bd7e231d6",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
@@ -1056,7 +1056,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2342332==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5060000000b6 at pc 0x55d76face9b5 bp 0x7ffe1c836590 sp 0x7ffe1c836580 READ of size 1 at 0x5060000000b6 thread T0 #0 0x55d76face9b4 in kernel /home/apt/repos_common/",
+      "diagnostic": "================================================================= ==2561838==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5060000000b6 at pc 0x55f0671a69b5 bp 0x7ffd5f7e97a0 sp 0x7ffd5f7e9790 READ of size 1 at 0x5060000000b6 thread T0 #0 0x55f0671a69b4 in kernel /home/apt/repos_common/",
       "stdout": "",
       "model_stdout": "0"
     },

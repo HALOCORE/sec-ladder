@@ -37,7 +37,12 @@ What it enforces, in order:
      enters the verdict; it exists so TASK_019's "0 of 82" is reproducible from
      the committed tree instead of from a scratch file. `forbidden` carries a
      verdict (its scope is universal by the key's own meaning); the `required`
-     numbers are presence, not compliance -- see `idiom_audit`
+     numbers are presence, not compliance -- see `idiom_audit`. TASK_062 adds
+     the one thing in this stage that DOES fail on the declaration's text:
+     `idiom.why` must carry the shared named-spelling paragraph verbatim,
+     because that paragraph is where a backticked pin's MEANING is written
+     down, and p27 shipped 62 pinned spellings without it past three tasks and
+     two adversarial reviews (`named_spelling_problem`)
   1  every cell of the matrix builds (and under `--no-build`, that no binary
      predates the newest source)
   2  every cell prints the checksum the pattern's own `model.py` predicts. The
@@ -571,6 +576,10 @@ def check_selftests(rep):
         if got != want:
             rep.fail("audit-selftest",
                      f"idiom_audit: {label}: got {got}, want {want}")
+    for label, got, want in _NAMED_SPELLING_CASES:
+        if got != want:
+            rep.fail("named-spelling-selftest",
+                     f"named_spelling_problem: {label}: got {got}, want {want}")
 
 
 # ==========================================================================
@@ -791,6 +800,168 @@ def idiom_problems(contract):
     return probs
 
 
+#: The shared NAMED-SPELLING STANDARD paragraph, located by its own first and
+#: last words. Every pattern's `idiom.why` ends with it (p17 carries pattern text
+#: after it), byte-identical, and it is the text that DEFINES what a backticked
+#: `required`/`forbidden` entry means: that it pins THAT SPELLING, and the
+#: three-part matching rule `spelling_matches` implements. A pattern that pins a
+#: backticked spelling without carrying it has pins its own contract never
+#: defines.
+NAMED_SPELLING_BEGIN = "NAMED-SPELLING STANDARD"
+NAMED_SPELLING_END = "p01 and p08 neither"
+
+#: sha256 of that paragraph, MEASURED at TASK_062 over the 17 patterns that
+#: carried it -- p01..p14, p16, p17, p18 -- on 2026-08-22, and 11003 bytes long.
+#: p27 is the eighteenth and did not carry it at all: it shipped at TASK_060 with
+#: 2607 bytes of its own `why` and no paragraph, pinning 62 backticked spellings
+#: whose meaning its own contract therefore did not state, and it survived three
+#: tasks and two adversarial reviews before the manager's standing one-liner
+#: found it.
+#:
+#: WHY A PINNED CONSTANT AND NOT A CROSS-PATTERN READ. Reading the paragraph out
+#: of a sibling `spec.md` at run time is self-maintaining, and it was rejected for
+#: three measured reasons:
+#:
+#:   * it FAILS OPEN in the one direction that matters. If the paragraph is
+#:     dropped from every pattern -- or from whichever one the reader picks --
+#:     the comparison succeeds against nothing and 18 gates go green on a tree
+#:     where the standard has evaporated. Vacuous success is the exact failure
+#:     this check exists to close.
+#:   * it puts a pattern's verdict outside that pattern's record. `check.py pNN`
+#:     hashes `harness/*.py` plus pNN's own files into `source_sha256`; a sibling
+#:     `spec.md` is in neither list, so the text a run was judged against would
+#:     not be recoverable from the run's own artefact. The constant IS in that
+#:     list -- editing this line moves `source_sha256["harness/check.py"]` in all
+#:     18 committed gate records, which is a diff review already reads.
+#:   * it makes a single-pattern gate depend on 17 files the pattern does not
+#:     own, so a mid-edit `spec.md` anywhere moves an unrelated verdict.
+#:
+#: The cost of a constant is that an amendment to the standard must move this
+#: line too. That is not rot, it is the point: the standard has been amended
+#: twice (TASK_019's repair, TASK_028's withdrawal), each time across every
+#: pattern at once and each time paying a full sweep because `contract_sha256`
+#: moves everywhere anyway. One extra line in that same commit buys detection of
+#: a PARTIAL amendment -- 17 patterns edited and one forgotten -- which is p27's
+#: accident with the sign flipped and which nothing else in the tree would see.
+NAMED_SPELLING_SHA256 = \
+    "59748cce2db5c57258677242cd59ff7e9766817bb659e7a874038d21f7150a7d"
+NAMED_SPELLING_LEN = 11003
+
+#: Reproduces this pin from the tree; printed in the failure so the repair is in
+#: the message. It reads raw `spec.md` text, which equals the parsed `idiom.why`
+#: span because the paragraph contains no character JSON escapes (measured:
+#: 11003 bytes, all ASCII, no `"` and no backslash).
+NAMED_SPELLING_ONELINER = (
+    "python3 -c \"import hashlib,glob;print({hashlib.sha256(open(f).read()"
+    "[open(f).read().find('NAMED-SPELLING STANDARD'):open(f).read()"
+    ".find('p01 and p08 neither')+19].encode()).hexdigest()[:12] "
+    "for f in glob.glob('patterns/*/spec.md')})\"   # -> a set of size 1")
+
+
+def named_spelling_problem(contract, want=NAMED_SPELLING_SHA256):
+    """Does this pattern's `idiom.why` carry the shared paragraph, verbatim?
+
+    TASK_062. Returns a message or `None`. `want` is a parameter only so the
+    selftest can exercise the matching branch without a second copy of 11 KB of
+    prose in this file; every caller uses the pin.
+
+    **This is stricter than the one-liner it mechanises, in the one way that
+    matters.** The one-liner greps `spec.md` as a file, so it is satisfied by a
+    copy pasted into the prose ABOVE the fenced block -- which is
+    `patterns/p05-index-flatten/spec.md`'s original accident exactly: a
+    declaration that lived at line 69 while the hashed block started at line 309,
+    so `contract_sha256` was blind to it and two tasks published a forbidden
+    spelling as p05's number (`idiom_problems`). This reads
+    `contract["idiom"]["why"]`, i.e. the parsed value inside the hashed block, so
+    a paragraph outside it does not count.
+
+    **The accident test (`PROTOCOL.md` rule 5) has an instance, not an
+    argument**, and the instance passes `.memory/02-bench-rules.md`'s own
+    follow-up rule -- *before citing an incident as an accident-test precedent,
+    check that the proposed check could have SEEN it.* This one sees p27
+    directly: p27's `idiom.why` is 2607 bytes of pattern-specific text with no
+    `NAMED-SPELLING STANDARD` in it, so the first branch below fires on the
+    shipped tree at `676f685`. That is the contrast with `forbidden_hits`, which
+    was proposed as a hardening at TASK_053 and DECLINED at TASK_056 because it
+    was structurally blind to the accident it cited.
+
+    Hard failure, not a shout, because there is no honest pattern that cannot
+    comply -- `.memory/02-bench-rules.md` warns against a new hard failure with
+    no route out, and the route out here is `cp` from any sibling. The two
+    patterns that pin no spelling at all, p01 and p05, both carry it, and the
+    paragraph's own text is about them (`required` in p01 and p05 contains no
+    backticks at all), so it is load-bearing even where `spellings == 0`."""
+    idi = contract.get("idiom")
+    why = idi.get("why") if isinstance(idi, dict) else None
+    if not isinstance(why, str):
+        return None                 # `idiom_problems` has already failed on it
+    i, j = why.find(NAMED_SPELLING_BEGIN), why.find(NAMED_SPELLING_END)
+    if i < 0 or j < 0:
+        return (f"idiom.why does NOT carry the shared named-spelling paragraph "
+                f"({NAMED_SPELLING_LEN} bytes, "
+                f"sha256 {NAMED_SPELLING_SHA256[:12]}..., from "
+                f"'{NAMED_SPELLING_BEGIN}' to '{NAMED_SPELLING_END}'). Every "
+                f"pattern's `why` ends with it, byte-identical, and it is what "
+                f"DEFINES what a backticked `required`/`forbidden` entry pins -- "
+                f"that spelling, not merely the property -- and the three-part "
+                f"matching rule `spelling_matches` implements. Without it this "
+                f"pattern's backticked pins are undefined by its own contract. "
+                f"Copy it verbatim from any other pattern's `idiom.why`, "
+                f"INCLUDING its stale 'all six patterns' phrase, which is "
+                f"historical and inside the hashed block. Reproduce this pin "
+                f"with:\n      {NAMED_SPELLING_ONELINER}")
+    got = why[i:j + len(NAMED_SPELLING_END)]
+    h = hashlib.sha256(got.encode()).hexdigest()
+    if h != want:
+        return (f"idiom.why carries the named-spelling paragraph but it is "
+                f"ALTERED: {len(got)} bytes, sha256 {h[:12]}..., against the "
+                f"pinned {want[:12]}.... The "
+                f"paragraph is byte-identical in every pattern by construction, "
+                f"so either this copy drifted or the standard was amended in "
+                f"ONE pattern instead of all of them. If the amendment is "
+                f"intended, apply it to every `spec.md` and move "
+                f"`NAMED_SPELLING_SHA256` in the same commit; the sweep is owed "
+                f"either way, because `contract_sha256` moves everywhere. "
+                f"Diff against a sibling with:\n      "
+                f"{NAMED_SPELLING_ONELINER}")
+    return None
+
+
+#: `named_spelling_problem` selftests (TASK_062). A synthetic paragraph, so the
+#: matching branch is covered without a nineteenth copy of the real text; the
+#: real text's positive case is every one of the 18 gate runs.
+_NS_SYN = (f"{NAMED_SPELLING_BEGIN} -- synthetic, for the selftest only. "
+           f"... and on the R4 side ONLY p05 and p16, and {NAMED_SPELLING_END}")
+_NS_SYN_SHA = hashlib.sha256(_NS_SYN.encode()).hexdigest()
+
+_NAMED_SPELLING_CASES = [
+    ("absent is a failure -- p27 at 676f685",
+     bool(named_spelling_problem(
+         {"idiom": {"why": "POLICY ADOPTED AFTER MEASURING: the tokens above "
+                           "must appear literally."}})), True),
+    ("present and byte-identical passes",
+     named_spelling_problem({"idiom": {"why": f"prose. {_NS_SYN}."}},
+                            want=_NS_SYN_SHA), None),
+    ("present with pattern text after it still passes -- p17's shape",
+     named_spelling_problem({"idiom": {"why": f"prose. {_NS_SYN}. WHAT THE "
+                                              f"STANDARD SAYS ABOUT p17..."}},
+                            want=_NS_SYN_SHA), None),
+    ("one word changed inside it is ALTERED, not absent",
+     "ALTERED" in (named_spelling_problem(
+         {"idiom": {"why": _NS_SYN.replace("ONLY", "only")}},
+         want=_NS_SYN_SHA) or ""), True),
+    ("a truncated copy is ALTERED too",
+     "ALTERED" in (named_spelling_problem(
+         {"idiom": {"why": _NS_SYN[:40] + " " + NAMED_SPELLING_END}},
+         want=_NS_SYN_SHA) or ""), True),
+    # Shape errors belong to `idiom_problems`; this one must not double-report.
+    ("a non-string why is idiom_problems' business, not this check's",
+     named_spelling_problem({"idiom": {"why": 3}}), None),
+    ("no idiom key at all is idiom_problems' business too",
+     named_spelling_problem({}), None),
+]
+
+
 def idiom_lines(contract, keys=("required", "forbidden"), why=True):
     """The declaration itself, for the verdict: a reviewer reading a run sees
     what was declared without opening `spec.md`.
@@ -1002,6 +1173,21 @@ def check_idiom(rep, pdir, contract):
         rep.fail("idiom", p)
     if probs:
         return None
+    # TASK_062. The shared paragraph is what makes a backticked pin MEAN
+    # something; a pattern that pins spellings without it pins nothing its own
+    # contract defines. Reported after the structural problems so a broken
+    # `idiom` does not produce two failures for one cause, and NOT returning --
+    # the run continues and the record is complete, the way every other
+    # `rep.fail` in this stage behaves.
+    ns = named_spelling_problem(contract)
+    if ns:
+        rep.fail("idiom-named-spelling", ns)
+    else:
+        rep.ok(f"named-spelling standard present in idiom.why, verbatim "
+               f"({NAMED_SPELLING_LEN} bytes, sha256 "
+               f"{NAMED_SPELLING_SHA256[:12]}...) and therefore inside "
+               f"contract sha256 -- so what this pattern's backticked pins MEAN "
+               f"is hashed alongside the pins themselves.")
     idi = contract["idiom"]
     nreq, nforb = len(idi["required"]), len(idi.get("forbidden") or [])
     nlang = sum(1 for k in ("required", "forbidden")

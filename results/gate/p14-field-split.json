@@ -186,7 +186,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "82a6e943d900527eee9d83e0fd5e778cd84a2443d016bb108ed75adbc48f92c6",
+    "harness/check.py": "5b57db8dcb1815816fbfb1976314c95f037eafbf08e4886929d0649bd7e231d6",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
@@ -1511,7 +1511,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7fe50de000a0 with insufficient space for an object ",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7f020d6000a0 with insufficient space for an object ",
       "stdout": "",
       "model_stdout": "8006196804099674112"
     },
@@ -1520,7 +1520,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7f86898000a0 with insufficient space for an object ",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7f7f2fc000a0 with insufficient space for an object ",
       "stdout": "",
       "model_stdout": "14129561520256"
     },
@@ -1529,7 +1529,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7fe8b3c000a0 with insufficient space for an object ",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7faba1a000a0 with insufficient space for an object ",
       "stdout": "",
       "model_stdout": "3752889374227114752"
     },
@@ -1538,7 +1538,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7ffa53c000a0 with insufficient space for an object ",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7f082a8000a0 with insufficient space for an object ",
       "stdout": "",
       "model_stdout": "16846452602349536768"
     },
