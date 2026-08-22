@@ -346,9 +346,28 @@ have one, and the failure is invisible until somebody runs it.
 added for one accident caught a second, of a different shape, one task later.**
 That is worth remembering the next time the accident test is argued.
 
-⚠ **Owed:** p10's and p18's generators were *reported* to read from a donor and
-were **not re-run to confirm they reproduce their own `spec.md` byte for byte**.
-Do that before trusting either — it is the same latent defect.
+✅ **Owed and now CLOSED (manager, at the TASK_063 boundary).** p10's and p18's
+generators were only *reported* to read from a donor. Both were re-run:
+`p18 .../mkcontract.py --check` prints *"spec.md matches the generator"*, and
+p10's `--write` reproduces its `spec.md` **byte for byte** (backed up, run,
+`diff` empty, restored, sha256 verified). **Neither has p27's defect.**
+
+⚠ **And running them surfaced a discrepancy that looks like an invariant break
+and is not — check which SPAN a claim is about before believing it.** p18's
+generator prints *"shared paragraph: 11004 chars, byte-identical in 15
+pattern(s); differing/absent in ['p16-tlv-walk', 'p17-http-range']"*, while the
+standing one-liner reports **one hash across all 18**. Both are right:
+
+| measurement | span | what it asserts |
+|---|---|---|
+| the standing one-liner, and `check.py::named_spelling_problem` | `MARK` … `'p01 and p08 neither'+19` | the paragraph is **present and verbatim**, anywhere in `why` |
+| p18's `shared_why()` | `MARK` … **end of `why`** | the paragraph is present **and is the LAST thing in `why`** |
+
+**p16 and p17 carry pattern text AFTER the paragraph**, which the first accepts
+and the second does not. **Position is not the invariant** — the gate check was
+deliberately built not to require it. The two counts (11003 vs 11004) differ for
+the same reason. This is the third time a "shared paragraph" number has been
+compared across incompatible slices; **quote the span with the number.**
 
 ## An input generator's RNG is a shared sequential stream — and it can re-converge
 
