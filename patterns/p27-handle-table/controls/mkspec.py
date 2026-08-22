@@ -21,13 +21,52 @@ the reason it moved** (PROTOCOL definition-of-done item 6):
     raw = re.search(r"```slb-contract\s*\n(.*?)```", t, re.S).group(1)
     print(hashlib.sha256(raw.encode()).hexdigest())
     EOF
+
+⚠ **THIS FILE WENT STALE AT TASK_062 AND RUNNING IT DELETED THE PARAGRAPH THE
+GATE NOW HARD-FAILS WITHOUT** -- found at TASK_063, by running it. TASK_062
+appended the 11 003-byte shared named-spelling paragraph to `spec.md`'s
+`idiom.why` and did not append it here, so the documented regenerator produced a
+`why` 11 004 bytes short and `check.py::named_spelling_problem` would have
+failed the pattern. Same "stale or absent reproduction path" family as the
+control-generator defects in `.memory/02-bench-rules.md`.
+
+**The repair, and why it reads the paragraph instead of embedding it.** A
+nineteenth verbatim copy is the thing the byte-identity invariant exists to
+prevent, so `named_spelling_paragraph()` below slices it out of a DONOR
+`spec.md` at run time and asserts its sha256 against
+`check.NAMED_SPELLING_SHA256` -- the pin the gate itself uses. The
+"reading it from a sibling FAILS OPEN" objection recorded beside that constant
+is about the GATE, where a missing paragraph must be a failure; here a missing
+or altered donor raises, so this reader fails closed.
 """
-import sys, os, json, re
+import hashlib, sys, os, json, re
 HERE = os.path.dirname(os.path.abspath(__file__))
 PD = os.path.dirname(HERE)
 REPO = os.path.dirname(os.path.dirname(PD))
 sys.path.insert(0, os.path.join(REPO, "harness"))
 import vparse
+import check as _check
+
+DONOR = os.path.join(REPO, "patterns", "p01-array-sum", "spec.md")
+
+
+def named_spelling_paragraph(donor=DONOR):
+    """The shared paragraph, sliced from `donor` and checked against the pin."""
+    t = open(donor).read()
+    i = t.find(_check.NAMED_SPELLING_BEGIN)
+    j = t.find(_check.NAMED_SPELLING_END)
+    if i < 0 or j < 0:
+        raise SystemExit(f"mkspec.py: {donor} carries no named-spelling "
+                         f"paragraph; pick another donor")
+    para = t[i:j + len(_check.NAMED_SPELLING_END)]
+    h = hashlib.sha256(para.encode()).hexdigest()
+    if h != _check.NAMED_SPELLING_SHA256 or len(para) != _check.NAMED_SPELLING_LEN:
+        raise SystemExit(
+            f"mkspec.py: donor paragraph is {len(para)} bytes / {h[:12]}..., "
+            f"against the pinned {_check.NAMED_SPELLING_LEN} / "
+            f"{_check.NAMED_SPELLING_SHA256[:12]}.... Refusing to write a "
+            f"spec.md whose `why` would fail check.py stage 0b.")
+    return para
 
 PD = os.path.join(REPO, "patterns/p27-handle-table")
 txt = open(os.path.join(PD, "verus.rs")).read()
@@ -91,7 +130,12 @@ contract = {
    "the slot count is folded last so that a rung which opened a different number of records cannot produce the same checksum: `ntab` appears in the return expression of all seven rungs.",
   ],
   "forbidden": [
-   "`memset(tab`",
+   # `memset(tab` was forbidden[0] until TASK_063 and is DELETED, not narrowed:
+   # all seven rungs zero the table (`[const { None }; TABCAP]` in the safe
+   # rungs, where Rust makes it compulsory), so the entry excluded an operation
+   # every rung performs, and the admissible C respelling that satisfies it --
+   # `uint8_t *tab[TABCAP] = {NULL};` in the memsets' own position -- performs
+   # the identical zeroing at 0.0000 Ir/call on clang. ../NOTES.md 13.
    "`realloc(`",
    "`calloc(`",
    "`Vec::with_capacity`",
@@ -131,7 +175,10 @@ contract = {
    "PINNED is how the liveness test is SPELLED -- `is_some()` in R2, a `match` arm in R3, "
    "`take().is_some()` in R3's CLOSE -- exactly as p14 leaves its fold loop unpinned: those are "
    "the R3-side levers, they cost zero TCB, and the pattern reports the cheapest one FOUND on a "
-   "named input rather than a minimum (../NOTES.md 8)."),
+   "named input rather than a minimum (../NOTES.md 8)."
+   # TASK_062's append, restored to the generator at TASK_063: `" " + paragraph
+   # + "."`, the paragraph read from a donor at run time (see the docstring).
+   + " " + named_spelling_paragraph() + "."),
  },
  "verus": {
   "call_site": "main",

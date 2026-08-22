@@ -391,7 +391,6 @@ the price of the identity pin.
       "the slot count is folded last so that a rung which opened a different number of records cannot produce the same checksum: `ntab` appears in the return expression of all seven rungs."
     ],
     "forbidden": [
-      "`memset(tab`",
       "`realloc(`",
       "`calloc(`",
       "`Vec::with_capacity`",

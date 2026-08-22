@@ -10,7 +10,7 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "371a680bb5b85f2bdbfb418ab6796b1665037aa199419fce32a5eafb9d5596ac",
+  "contract_sha256": "01e2137f9a1bcce2453ecdb43ea9260dbc6d91e7e5073104d0e13b7800ddef07",
   "idiom": {
     "required": [
       {
@@ -60,7 +60,6 @@
       "the slot count is folded last so that a rung which opened a different number of records cannot produce the same checksum: `ntab` appears in the return expression of all seven rungs."
     ],
     "forbidden": [
-      "`memset(tab`",
       "`realloc(`",
       "`calloc(`",
       "`Vec::with_capacity`",
@@ -74,30 +73,17 @@
     "why": "POLICY ADOPTED AFTER MEASURING (`.memory/01-ladder.md` finding 14): a published spread cannot carry a safety number, so what ships is a named-spelling standard -- the tokens above must appear literally, uniform across all seven rungs, with ONE measured clause: a rung spells the same operands the way its language forces. Here that clause is load-bearing and it IS the pattern. THE FREE AND THE INVALIDATION ARE ONE OPERATION IN SAFE RUST AND TWO IN C: `tab[h] = None` frees the record and invalidates the handle together, and `free(tab[h]); live[h] = 0;` is the same thing written twice, which is what makes forgetting the second half possible. So the safe rungs have no `live[]` array and cannot be asked to spell one, and the unsafe rungs have no `Option` and cannot be asked to spell that. THE HANDLE IS AN INTEGER AND THAT IS WHY NULLING IS NOT A DEFENCE: the op stream comes out of a file and a file cannot name a pointer, so the READ has an index and must consult something to learn whether the record is there. Nulling `tab[h]` on close would make a stale read a NULL DEREFERENCE -- a crash, a different bug class -- rather than a use-after-free, and it would leave the epilogue unable to tell a closed slot from a live one without the very bit it is trying to avoid carrying. `live[]` is a generation counter with slot reuse removed, and every real handle table carries one. THE FREE MUST BE A REAL `free`: if the slab were one allocation and 'close' were a freelist push, the stale read would be IN BOUNDS OF A LIVE ALLOCATION -- Miri would not flag it, `PointsTo` would license it, and the bug would be LOGICAL, which is p17's class and the tree already has one (TASK_055 \u00a72.8 caveat 1). That is what `Box::into_raw`, `ManuallyDrop`, `mem::forget` and `Box::leak` are forbidden for: each is a route to holding a record past its free without the allocator knowing, i.e. to turning the temporal bug back into a logical one. `realloc`/`calloc`/`Vec::with_capacity` are forbidden because they change the allocator traffic and the pattern's fairness argument is that every rung makes exactly one allocation and one free per record; `Rc`/`RefCell` because they would move the liveness decision to run time inside the library and delete the comparison. WHAT IS DELIBERATELY NOT PINNED is how the liveness test is SPELLED -- `is_some()` in R2, a `match` arm in R3, `take().is_some()` in R3's CLOSE -- exactly as p14 leaves its fold loop unpinned: those are the R3-side levers, they cost zero TCB, and the pattern reports the cheapest one FOUND on a named input rather than a minimum (../NOTES.md 8). NAMED-SPELLING STANDARD -- POLICY ADOPTED AT TASK_018, AFTER the alternate spellings had been measured, and REPAIRED AT TASK_019 because TASK_018_REVIEW B1 measured that the version it replaced did not describe the shipped tree. It is NOT a disambiguation of what these entries always meant, and presenting it as one would be the self-certification this mechanism exists to prevent (TASK_017_REVIEW). The rule, and this paragraph is byte-identical in all six patterns' `why` -- diff them: where a `required` entry quotes an expression in backticks it pins THAT SPELLING, not merely the property the expression has, so a rung that establishes the same fact by a different expression is out of contract even when it is semantically identical and even when it compiles to the same bytes; a `forbidden` entry excludes the spelling it quotes, the same way. HOW A SPELLING IS MATCHED -- written down because `literal` never was, and twenty shipped obligations turned on the gap: a rung matches a quoted spelling when the spelling occurs in that rung's EXEC source after comments and string literals are blanked, after Verus ghost clauses are blanked, and after every whitespace character is deleted from both sides. That is `harness/check.py::spelling_matches`, selftested at gate stage 0 and therefore hashed into `source_sha256`, so the convention cannot drift while remaining an adjective. Each of its three parts was forced by a shipped cell, not chosen. (a) Whitespace is not a spelling: p17 declares `2 + 2*nsuf > len` and all six p17 rungs write `2 + 2 * nsuf > len`, which put six cells out of their own contract on two space characters. (b) A comment is not code: `patterns/p02-buffer-copy/c/kernel_hardened.c` and `patterns/p16-tlv-walk/c/kernel_hardened.c` each quote their own pattern's `forbidden` spelling inside the comment that explains why they do not use it, and `patterns/p17-http-range/c/kernel.c` would otherwise satisfy `2 + 2*nsuf > len` on the strength of a comment while its code writes the spaced form -- a match for the wrong reason is as bad as a miss. (c) Ghost is not exec: a Verus `requires`/`ensures`/`invariant`/`decreases` is erased before codegen and its arithmetic is over unbounded `int`, so it cannot carry the overflow an additive spelling is forbidden for; `patterns/p16-tlv-walk/verus.rs`'s loop invariant `p + 3 + vlen <= end` is the shipped instance, and without this part p16's own R5 violates p16's `forbidden[0]` on a grep. PER-LANGUAGE ENTRIES: an entry of `required` or `forbidden` may be an object keyed by language, with keys `c` and `rust`, instead of a string; each rung is then matched only against its own language's spelling. A plain string still applies to every rung and stays the right shape whenever one spelling covers all six -- which it does for p16's comparisons, so per-language is a tool and not a habit. THE CLAUSE THIS REPLACED IS RETRACTED, and so is the count that justified it. Until TASK_019 this paragraph read `where a rung's LANGUAGE cannot express the quoted spelling, that rung spells the same operands the way its language forces and nothing else varies`, justified by EIGHT SHIPPED CELLS. Both are wrong (TASK_018_REVIEW B1). The count was never eight: p08's `dr = d + r` carries no backticks and so was never pinned, and six p17 cells nobody had counted were out on spacing. TASK_018_REVIEW put the corrected figure at 10, or 4 once whitespace is normalised; measured against the WHOLE declaration rather than the two entries that review looked at, the pre-repair figure is 20 obligations failing on raw text, 15 once comments and ghost are blanked and 9 once whitespace is deleted. The five it adds are p17's `required[1]`, which quoted an ELLIPSIS -- `if start < end && start >= 0 { ... }` -- that no rung can contain, and which nobody had counted either. And the clause's antecedent is FALSE exactly where it was needed -- Rust CAN spell `len > src_len - (src_off + 2)`, and a p02 R3 variant that does is byte-identical to the shipped cell (`md5_fn e207ec6c8697...`, identical marginal on both bands), so the clause never fired for the four cells it existed to rescue. Per-language entries do that job, and they do it by NARROWING and not by widening: with p02's `required[0]` and `forbidden[0]` carrying Rust spellings, the shipped R3 matches and BOTH variants that are not it fail to match -- the forbidden additive guard, 3.00 Ir/call cheaper than shipped R3, and the byte-identical `src_len`-spelled guard -- where before the edit the pin matched none of the three and decided nothing at all. THE COUNT, MEASURED AFTER THE REPAIR RATHER THAN ASSERTED (TASK_019, `.temp/p19/pins.py`, a hand-transcribed table of every backticked spelling against every rung it scopes to): the repaired declaration makes 82 (spelling x rung) obligations across the six patterns, of which 11 fail on raw text, 6 once comments and ghost are blanked, and 0 under the rule above -- so NO shipped cell is out of its own declaration, and that is a count and not an adjective. The pre-repair declaration made 78 obligations and failed 20 / 15 / 9. The total ROSE because per-language entries pin MORE and not less: the Rust three-term guard `len > dst.len() || len > src.len() - (src_off + 2)` is now pinned where before only a sub-expression of it was. WHY IT WAS ADOPTED: TASK_017 applied this reading to p16 and refused it for p17 in the same commit, writing into p17's NOTES.md that a spelling with no `end` binding anywhere in its code satisfied entries naming `start < end` (TASK_017_REVIEW B1). One rule across all six is the repair, and it still holds `.temp/p05r3/v17/tuned_suffix.rs` out: every p17 rung binds `end`, so p17's entries name spellings its rungs really write and no per-language key rescues a variant that binds no `end` at all. TOKENS rather than SEMANTICS, for a reason that is checkable rather than rhetorical: only the token reading partitions cleanly. `.temp/p05r3/v16/tuned_split.rs` satisfies p16's `every comparison is subtraction-first` VACUOUSLY -- it contains no comparison at all -- and `tuned_splitat.rs`'s `rest.len() >= 3` is neither subtraction-first nor additive, so the semantic reading does not decide either of them (TASK_017_REVIEW m5). A contract a grep can settle beats a contract only an argument can settle -- WHERE a grep settles it, which is narrower than TASK_018 wrote. WHAT NO GREP SETTLES, recorded so nobody re-derives it: `required` in p01 and p05 contains no backticks at all, so those two patterns pin no token and their rungs are matched by prose only; and the POLARITY of a quoted span (p02's `|`, p08's `&` and p17's `continue` are quoted in order to be ABSENT) and the SET OF RUNGS it scopes to (p02's first entry, p16's fourth, p17's third) live in the entry's English. `spelling_matches` decides one spelling against one rung; which spelling and which rung is a reading, and no gate stage reproduces it. WHAT THE STANDARD DOES NOT BUY, measured and put here rather than in a footnote: a pinned idiom makes the admissible class DECIDABLE, not SINGULAR. Respelling only what the declaration leaves free moves p16's R3 by `4*nrec - 8` Ir/call, p17's by 51 flat and p02's by 3 to 4. THE UNSAFE SIDE DOES NOT MOVE, AND THE SENTENCE THAT SAID IT DID IS WITHDRAWN (TASK_028, on TASK_027_REVIEW's seven Verus twins). Until TASK_028 this paragraph read `and it moves the UNSAFE rung too, by the same lever: p16's R4 by 4*nrec (TASK_023) and p05's by 7 flat (TASK_022)`, and that names ONE lever -- respelling the header read -- which is NOT ADMISSIBLE ON EITHER PATTERN. All six patterns pin `identity: unsafe == verus, O3 exact`, so an R4 is not merely a program that MAY use `unsafe`: it is a program that must have a byte-identical R5 twin that Verus verifies. At the pinned vstd every route to that respelling is `is not supported` -- `read_unaligned`, `as_ptr`, `add`, `from_raw_parts`, `TryFromSliceError` and `from_le_bytes` -- so p16's `r4_hdr` and p05's `c4_hu16_nz` are controls and not rungs, and shipping either costs a NEW TRUSTED ITEM, which is exactly what disqualified `r4_hdr` on p16. `4*nrec` and `7 flat` are therefore both withdrawn, NEITHER PATTERN'S R4 SIDE HAS MOVED BY A SINGLE ADMISSIBLE INSTRUCTION, and the reason is this block's own `identity` pin rather than anything about those two patterns -- it binds all six, and p01's R2 as well, which is pinned the same way. Read the ERROR TEXT and not the exit code: `is not supported` disqualifies, because it is what forces a new TRUSTED item, while `postcondition not satisfied` disqualifies nothing -- the same p05 exec code went from `11 verified, 1 errors` to `13 verified, 0 errors` with one lemma and one `proof` block, at zero TCB. THIS PROJECT PUBLISHES NO PAIR INTERVAL, and the two it did publish fall with that sentence: p05's `2*nrow - 2` ... `6*nrow + 20` (36...134 / 128...410, whose bottom endpoint was quoted as `exactly 0.00`) took its endpoints from `r4_dataslice` and `c4_hu16_nz`, and p16's from `r4_hdr`; none of the three is a rung. What ships is TWO quantities and not three. THE ONE REAL BOUND needs R4 held fixed BY FIAT rather than minimised: then, and only then, `R3ship - R4ship` bounds `inf(in-contract R3) - R4ship`. Beside it goes the R3-SIDE SPAN, cheapest-found to dearest-found in contract. A pair interval over the ADMISSIBLE class is not unavailable, it is DEGENERATE, which is the more informative thing to say and is why `unavailable` is not written here: the only p05 R4 SHOWN admissible is the shipped cell -- six more measure exactly R4ship and were never put through Verus, and the two that MOVE were put through it and failed -- so the R4 endpoint has ZERO measured width and the interval collapses onto the R3-side span, `5*nrow + 6` ... `6*nrow + 13` = 101...127 / 331...403, width `nrow + 7` = 26 / 72. That is p05's R3-side span exactly, i.e. a third NAME for a second NUMBER, so do not quote it as a pair result; it becomes one the day somebody builds an admissible R4 that MOVES, and on two patterns now -- p05's unbuilt zero-guard deletion and p16's unbuilt hand-unrolled 32x fold -- that is the open question and nobody has built it. And `min(R3 found) - min(R4 found)` is NOT the repair -- two upper bounds differenced bound nothing in either direction; on p05 one edit moved it -2 on R4 and +1 on R3, so the constant does not cancel (the R4 half of that illustration is an inference from the inadmissible `c4_hu16_nz` family and has never been compiled; the arithmetic point does not rest on it), and its third published minimum EXCEEDS its published figure at `nrow <= 3`. Every pattern owes an in-contract spread beside its headline; on the R3 side p16 and p17 have one from TASK_018, p02 from TASK_019 and p05 from TASK_021 (their NOTES.md 10a / 14; 14 also measured that this audit CANNOT settle p05 -- its declaration backticks nothing, so `spellings` is 0 and admission is decided by prose plus one grep), on the R4 side ONLY p05 and p16, and p01 and p08 neither."
   },
   "idiom_audit": {
-    "spellings": 62,
+    "spellings": 60,
     "rungs": 6,
-    "pairs": 194,
-    "present": 88,
+    "pairs": 188,
+    "present": 86,
     "languages": [
       "c",
       "rust"
     ],
-    "forbidden_spellings": 20,
-    "forbidden_hits": 2,
-    "hits": [
-      {
-        "entry": "forbidden[0]",
-        "lang": "c",
-        "spelling": "memset(tab",
-        "rung": "c/kernel.c"
-      },
-      {
-        "entry": "forbidden[0]",
-        "lang": "c",
-        "spelling": "memset(tab",
-        "rung": "c/kernel_hardened.c"
-      }
-    ],
+    "forbidden_spellings": 18,
+    "forbidden_hits": 0,
+    "hits": [],
     "required_pins_nothing": 3,
     "pins_nothing": [
       {
@@ -363,7 +349,7 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
     "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
-    "patterns/p27-handle-table/NOTES.md": "4adc075f86b9a75f48ad482f7883ca7808c1d171525b4d364d575d085855abbf",
+    "patterns/p27-handle-table/NOTES.md": "e31983a2b6cb13aaad10d051974d8b8d16620a485f0615307535b927a2b713cc",
     "patterns/p27-handle-table/README.md": "dd34cd576615d771d74c9ff8fd4d463096aac5b8a07665a87062be309d3631c5",
     "patterns/p27-handle-table/c/kernel.c": "8e20a7f4e0fcdac61453e48552103d34a2301e4cb8b4d277c07354d8d672f2f3",
     "patterns/p27-handle-table/c/kernel.h": "46e457d6f455f939104afa720118651226902d3ea8882032e6ff3fc0a237b956",
@@ -374,14 +360,14 @@
     "patterns/p27-handle-table/controls/gen_controls.py": "a18a10cbc81471f24ddee31a8711868e4ea1f08bbc3a431baabb1f622a666e65",
     "patterns/p27-handle-table/controls/gotresolve.py": "86cd87b27e81d37e6939d555f509278f49a676a72e07f8851ea74412e69864cd",
     "patterns/p27-handle-table/controls/ir_table.py": "02b7b48abac9bb66a4fbd7c5ea6ff6fdcf62f8b6ad40c092c2d1e7d7f9be4777",
-    "patterns/p27-handle-table/controls/mkspec.py": "0f9a2982d435496564dbc46b8caef15ef909efd539907cf71f96c990c757ad93",
+    "patterns/p27-handle-table/controls/mkspec.py": "06f3b2ebc3245d87a1c03f7b2dd7cfc6f3c33ceebab345bfad842938b4419205",
     "patterns/p27-handle-table/controls/proof_mutants.py": "c515ca5958f84dcc311d190ba0ad75f969f9a31dd8e461b30ba1705ee51a7770",
     "patterns/p27-handle-table/controls/sweep_ir.py": "ae2cd43c074fa5cd2355859e429d008edd2fa0499fa8b6c4b02a55c4639125c1",
     "patterns/p27-handle-table/inputs/gen.py": "19c9fe676bc074efe28d854c80dfc6d1d11e46154516208bd0eab8860b473aab",
     "patterns/p27-handle-table/model.py": "e637543f16807bac846298c1d0962b3ccda6258b300759ab24e86113368c4808",
     "patterns/p27-handle-table/safe_naive.rs": "0b983901b13109fbe15dc9592bcaf972bdc703b9c1fc5a8d139952d39f7cd5b4",
     "patterns/p27-handle-table/safe_tuned.rs": "d4ea2eb335ca894ddad20eade4c49baa04b0df20e8a6cc3e5cd8d2d2843fbf23",
-    "patterns/p27-handle-table/spec.md": "8225423c0ce70f8d8c25642bfc313022e3727cd7722922eea24bba2679fcbf89",
+    "patterns/p27-handle-table/spec.md": "ab10a2bb62907261d693a915759a56bbf9b3b83257b1e24ad35051f6d3f031b5",
     "patterns/p27-handle-table/unsafe.rs": "638d9d71d32b885405bdb97891d7b64e3f8e2a162480daed4d11bd82a198ff18",
     "patterns/p27-handle-table/verus.rs": "75fef39e60a30041e2883052213722b6bb7bba90a8a11f12ff5a3253ea2abd41",
     "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
@@ -1112,11 +1098,11 @@
     "adversarial-many.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "1101576811288477357",
+        "stdout": "14277769015884889342",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/whole"
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "6582356636790626304",
@@ -1124,19 +1110,7 @@
       },
       {
         "exit": 0,
-        "stdout": "17827523186720353165",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "6582356636790626304",
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "6809425235186245146",
+        "stdout": "14596920464685434661",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1148,11 +1122,23 @@
       },
       {
         "exit": 0,
-        "stdout": "9689297236884450502",
+        "stdout": "15903295355883229332",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/isolated"
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "6582356636790626304",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "8252579318727130668",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "6582356636790626304",
@@ -1162,19 +1148,7 @@
     "adversarial-many.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "1055983747174113740",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "6582356636790626304",
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "10910381405444680957",
+        "stdout": "1147169875402840974",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1186,11 +1160,11 @@
       },
       {
         "exit": 0,
-        "stdout": "14232175951770525725",
+        "stdout": "16657927487865649345",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/whole"
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "6582356636790626304",
@@ -1198,11 +1172,23 @@
       },
       {
         "exit": 0,
-        "stdout": "15766516163540138481",
+        "stdout": "3344956090926146509",
         "stderr": "",
         "signal": null,
         "cells": [
           "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "6582356636790626304",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "5132410425482378521",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "6582356636790626304",
@@ -1314,31 +1300,7 @@
     "adversarial-noreuse.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "1250343428627605504",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "3390747988282288128",
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "15870580052641294336",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "3390747988282288128",
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "302453136773130240",
+        "stdout": "12957016612521945088",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1350,11 +1312,35 @@
       },
       {
         "exit": 0,
-        "stdout": "7234728579117131776",
+        "stdout": "13044382318216849408",
         "stderr": "",
         "signal": null,
         "cells": [
           "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "3390747988282288128",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "7252201720256112640",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "3390747988282288128",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "8165145729832626176",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "3390747988282288128",
@@ -1364,11 +1350,11 @@
     "adversarial-noreuse.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "3355801706004326400",
+        "stdout": "1232870287488624640",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/isolated"
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "3390747988282288128",
@@ -1376,19 +1362,7 @@
       },
       {
         "exit": 0,
-        "stdout": "3390747988282288128",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "3390747988282288128",
-        "diverges": false
-      },
-      {
-        "exit": 0,
-        "stdout": "4233799433302878208",
+        "stdout": "16853416626773731328",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1400,11 +1374,23 @@
       },
       {
         "exit": 0,
-        "stdout": "5199162866296334336",
+        "stdout": "3303382282587383808",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/whole"
+          "O0/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "3390747988282288128",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "337399419051091968",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "3390747988282288128",
@@ -1792,7 +1778,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2583866==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x55eeb73d7fbd bp 0x7ffe87b30f00 sp 0x7ffe87b30ef0 READ of size 1 at 0x502000000010 thread T0 #0 0x55eeb73d7fbc in kernel /home/apt/repos_common/s",
+      "diagnostic": "================================================================= ==2607566==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x55a69f3bdfbd bp 0x7fff33e78c70 sp 0x7fff33e78c60 READ of size 1 at 0x502000000010 thread T0 #0 0x55a69f3bdfbc in kernel /home/apt/repos_common/s",
       "stdout": "",
       "model_stdout": "6582356636790626304"
     },
@@ -1801,7 +1787,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2583867==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x5592d76d5fbd bp 0x7ffc8a1ef100 sp 0x7ffc8a1ef0f0 READ of size 1 at 0x502000000010 thread T0 #0 0x5592d76d5fbc in kernel /home/apt/repos_common/s",
+      "diagnostic": "================================================================= ==2607567==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x55f6ecbf5fbd bp 0x7ffe2f4411a0 sp 0x7ffe2f441190 READ of size 1 at 0x502000000010 thread T0 #0 0x55f6ecbf5fbc in kernel /home/apt/repos_common/s",
       "stdout": "",
       "model_stdout": "3390747988282288128"
     },
@@ -1819,7 +1805,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2583870==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x558ea270afbd bp 0x7ffdcbeaf780 sp 0x7ffdcbeaf770 READ of size 1 at 0x502000000010 thread T0 #0 0x558ea270afbc in kernel /home/apt/repos_common/s",
+      "diagnostic": "================================================================= ==2607570==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x5569a9ea3fbd bp 0x7ffe0b0aa000 sp 0x7ffe0b0a9ff0 READ of size 1 at 0x502000000010 thread T0 #0 0x5569a9ea3fbc in kernel /home/apt/repos_common/s",
       "stdout": "",
       "model_stdout": "4295919549966416896"
     },
