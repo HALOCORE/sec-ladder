@@ -123,6 +123,22 @@ A task is done when **all** hold:
    still could not verify the scope of it). The recorded hash is the snapshot,
    and it costs one line.
 
+   ⚠ **AND VERIFY YOUR OWN DISCLOSURE AGAINST `git`, because a FALSE disclosure
+   is worse than the stale thing it describes.** p47 shipped a table saying a
+   pinned note *had been changed* when `git show HEAD:` proves it had not
+   (TASK_064_REVIEW M3). **A disclosure is what a reviewer trusts INSTEAD of
+   re-checking**, so a wrong one removes the check it was meant to enable. The
+   test costs one command:
+
+   ```bash
+   git show HEAD:patterns/pNN-name/spec.md | diff - patterns/pNN-name/spec.md
+   ```
+
+   ⚠ **The same applies to the ARTEFACT-vs-GENERATOR skew**: if a `spec.md` is
+   generated, fix the generator too and re-run it. Three tasks in a row shipped
+   an edit the generator would have silently reverted
+   (`.memory/05-layout.md`), and one of them was the task fixing that defect.
+
    **If the hash changes later, say so and say why** — a declaration edit made
    after a measurement is exactly what the direction test governs
    (`.memory/01-ladder.md`), and disclosing one has twice been upheld on review.
