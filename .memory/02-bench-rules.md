@@ -1110,3 +1110,10 @@ grep -rno 'check\.py:[0-9]\+' .memory/ RECAP.md .tasks/PROTOCOL.md | sort -u \
 `-u -t: -k3`, which collapsed the duplicated citations and reported 4 of the 5.
 *A wrong command is worse than a wrong constant, because it looks
 self-verifying* — TASK_065's own lesson, reproduced here inside the fix for it.
+
+⚠ **Clean negative, same audit: the OTHER harness files' citations are fine.**
+`measure.py:56` (`CG_PLAN`), `measure.py:64` (`SKIP_INPUT_PREFIX`) and
+`dloop.py:361` (`if keep[-1] >= len(args):`, the arity raise, cited twice) all
+still point at what they claim. **Only `check.py` decays**, because it is the one
+file that grows every task. Do not re-run this half; swap the filename in the aid
+above if a new harness file starts growing.
