@@ -1,0 +1,1573 @@
+{
+  "pattern": "p38-alias-pun",
+  "skipped_inputs": [],
+  "inputs_checked": [
+    "adversarial-huge.bin",
+    "adversarial-nrec.bin",
+    "adversarial-oob.bin",
+    "adversarial-stale.bin",
+    "adversarial-stride7.bin",
+    "degenerate.bin",
+    "large.bin",
+    "small.bin"
+  ],
+  "contract_sha256": "9a413347f3336869c2f7c0add48b6f760d9a50ce7791c8dcc4cf0f4c287adccd",
+  "idiom": {
+    "required": [
+      {
+        "c": "THE PUN, and the whole of what c/kernel.c does differently: `return *(const uint32_t *)r;` in `rec_len`. The object is an array of `uint16_t` and the lvalue has type `uint32_t`; neither is a character type, so C99 6.5p7 does not permit the access. c/kernel_hardened.c writes the two-half spelling instead and is otherwise character-identical, so the scoped-absent audit pair this entry reports is on that rung and is correct.",
+        "rust": "There is no Rust analogue of this entry and that is p38's result, so the entry pins the Rust rungs to the ABSENCE of the only spelling that could be one -- read_unaligned appears in no rung and is forbidden below."
+      },
+      {
+        "c": "THE DEFINED READ, present in c/kernel_hardened.c and ABSENT from c/kernel.c: `return (uint32_t)r[0] + 65536 * (uint32_t)r[1];`. It reads the two 16-bit halves the wire format is defined in terms of and combines them, and it needs no build flag. It is NOT free -- see the why key -- and it is here rather than the free memcpy spelling because it is the one every Rust rung is forced into, so R1h stays idiom-matched to R2..R5.",
+        "rust": "THE DEFINED READ, in all four Rust rungs and spelled the way the language forces (`sc` is a `[u16; 256]`, so there is no cast to make): `65536 *` combines the two halves. It is the only spelling any Rust rung has, which is the pattern."
+      },
+      {
+        "c": "THE CLAMP, present in BOTH C rungs including the buggy one -- p38 models no MISSING check: `if (rec_len(&sc[i]) > room)`.",
+        "rust": "the clamp, in all four Rust rungs, written through `u16` lvalues exactly as the C rungs write it: `> room`."
+      },
+      {
+        "c": "the WINDOW/SCRATCH GUARD, in both C rungs: `while (o < nrec && i + 2 <= nw) {`. Additive rather than subtraction-first on purpose: i is the one quantity a miscompiled clamp can push PAST nw, and the subtraction-first form would then underflow into a second, unbounded walk. The loop invariant i <= nw keeps the addition from overflowing in the verified rungs.",
+        "rust": "the same guard in all four Rust rungs: `while o < nrec && i + 2 <= nw`."
+      },
+      {
+        "c": "the CURSOR ADVANCE is by a whole record including its length field, so a rung that walked overlapping or misaligned records cannot produce the same fold: `i = i + 2 + 2 * n;` in both C rungs.",
+        "rust": "the cursor advance in all four Rust rungs: `i = i + 2 + 2 * n;`."
+      },
+      {
+        "c": "the PAYLOAD FOLD, spelled with the literal multiplier: `acc = acc * 31 + (uint64_t)sc[i + 2 + k];` in both C rungs.",
+        "rust": "the payload fold in all four Rust rungs: `.wrapping_mul(31).wrapping_add(`."
+      },
+      {
+        "c": "the header and every word are decoded with + and * and never with | and <<, so the whole specification stays inside linear arithmetic (.memory/04-verus.md): `256 *` in both C rungs.",
+        "rust": "the same decode in all four Rust rungs: `256 *`."
+      },
+      "the number of records actually walked is folded LAST, so a rung that stopped at a different point cannot produce the same checksum: `o` appears in the return expression of all eight rungs.",
+      "the declared record count is rejected before any record is read, so no rung can walk a header it has not validated: `nrec == 0` appears in all eight rungs."
+    ],
+    "forbidden": [
+      {
+        "rust": "`read_unaligned`"
+      },
+      {
+        "rust": "`transmute`"
+      },
+      {
+        "rust": "`align_to`"
+      },
+      {
+        "rust": "`from_le_bytes`"
+      },
+      {
+        "c": "`union`"
+      },
+      {
+        "c": "`memcpy`"
+      },
+      "`copy_from_slice`",
+      "`chunks_exact`",
+      "`black_box`",
+      "`volatile`"
+    ],
+    "why": "POLICY ADOPTED AFTER MEASURING (`.memory/01-ladder.md` finding 14): a published spread cannot carry a safety number, so what ships is a named-spelling standard -- the tokens above must appear literally, uniform across all eight rungs, with ONE measured clause: a rung spells the same operands the way its language forces. ON p38 THE PINNED SPELLING IS THE UNDEFINED BEHAVIOUR ITSELF. `*(const uint32_t *)r` in c/kernel.c and `(uint32_t)r[0] + 65536 * (uint32_t)r[1]` in c/kernel_hardened.c compute the same function of the same two bytes on this target and differ only in that the first is undefined by C99 6.5p7. THEY ARE NOT THE SAME MACHINE CODE, AND THAT IS MEASURED RATHER THAN ASSUMED: the defined spelling costs 6 static instructions on gcc and 10 on clang, by two different routes -- clang and rustc MERGE the two 16-bit loads back into one 32-bit load and then fail to simplify `(x & 0xffff) + 65536 * (x >> 16)` back to `x`, while gcc does not merge at all and pays for two movzwl plus a shift and an add. rustc pays clang's 10 in every Rust rung (../NOTES.md 1). The defined spellings that ARE free are `memcpy(&v, r, 4)` and the union: on clang both are BYTE-IDENTICAL to c/kernel.c and on gcc one instruction from it. Neither is the shipped R1h, because neither is a spelling any Rust rung can write, and a C rung spelling the length read a way no Rust rung can would put a codegen difference into p38's safety column; they ship as the controls `c_memcpy` and `c_union`. Every other check in this gate is blind to that difference: both cells agree with model.py on every non-adversarial input, both are ASan- and UBSan-clean in the gate's own -O1 sanitizer build, and Miri never sees a C rung at all. THE PIN IS THEREFORE THE ONLY THING IN THIS TREE THAT RECORDS WHICH C RUNG HAS THE BUG. WHY THE CLAMP IS `required` IN BOTH C RUNGS AND NOT ABSENT FROM ONE: p38 is not a pattern with a missing bounds check -- ten of the twenty patterns here already are. The check is WRITTEN in c/kernel.c, character for character as in c/kernel_hardened.c, and the type rule licenses the compiler to ignore it. A `required` entry that scoped the clamp to the hardened rung only would have described a different pattern. WHY THE ACCESSOR PAIR IS SPLIT INTO A GETTER AND A SETTER, AND WHY THE GETTER IS CALLED TWICE: the clamp writes through `uint16_t` lvalues and the re-read loads through a `uint32_t` lvalue, and a compiler is entitled to answer the second call from the value the first returned. Fold the two calls into one local and the question cannot be asked; that variant is shipped as the control `c_once` in controls/gen_controls.py and it is measured, not asserted. WHY `rlen` COUNTS 32-BIT UNITS: every record header then sits at an even word index, so the punning load is ALIGNED. Misalignment is a second, different undefined behaviour, and UBSan's `alignment` check would otherwise take credit for catching p38's bug when it cannot see it at all (../NOTES.md 6). WHY THE DECODE LOOP IS WORD-AT-A-TIME AND NOT `memcpy`/`copy_from_slice`: a bulk copy in the C rungs against an indexed loop in the Rust rungs would put p12's lost-bulk-lowering finding inside p38's cost column. All eight rungs read two bytes and combine them with `+` and `*`. WHAT IS DELIBERATELY NOT PINNED is how the scratch and the window are ADDRESSED -- R2 indexes, R3 reslices once per record, R4 and R5 use `get_unchecked` -- because that is the SAFETY axis and it is the axis the R3-side span is measured along (../NOTES.md 8). WHY `read_unaligned` IS FORBIDDEN IN THE RUST RUNGS: it is the DIRECT analogue of the C pun and it is DEFINED in Rust, which is p38's headline -- but ../spec.md pins `identity: unsafe == verus, O3 exact`, and at the pinned vstd `as_ptr`, `add` and `read_unaligned` are each `is not supported`, so a rung that spelled it would have no verifying twin and would not be a rung (`.memory/01-ladder.md` finding 14). It ships as the control `r4_pun`, measured and run through Verus, and ../NOTES.md 8 records both numbers. NAMED-SPELLING STANDARD -- POLICY ADOPTED AT TASK_018, AFTER the alternate spellings had been measured, and REPAIRED AT TASK_019 because TASK_018_REVIEW B1 measured that the version it replaced did not describe the shipped tree. It is NOT a disambiguation of what these entries always meant, and presenting it as one would be the self-certification this mechanism exists to prevent (TASK_017_REVIEW). The rule, and this paragraph is byte-identical in all six patterns' `why` -- diff them: where a `required` entry quotes an expression in backticks it pins THAT SPELLING, not merely the property the expression has, so a rung that establishes the same fact by a different expression is out of contract even when it is semantically identical and even when it compiles to the same bytes; a `forbidden` entry excludes the spelling it quotes, the same way. HOW A SPELLING IS MATCHED -- written down because `literal` never was, and twenty shipped obligations turned on the gap: a rung matches a quoted spelling when the spelling occurs in that rung's EXEC source after comments and string literals are blanked, after Verus ghost clauses are blanked, and after every whitespace character is deleted from both sides. That is `harness/check.py::spelling_matches`, selftested at gate stage 0 and therefore hashed into `source_sha256`, so the convention cannot drift while remaining an adjective. Each of its three parts was forced by a shipped cell, not chosen. (a) Whitespace is not a spelling: p17 declares `2 + 2*nsuf > len` and all six p17 rungs write `2 + 2 * nsuf > len`, which put six cells out of their own contract on two space characters. (b) A comment is not code: `patterns/p02-buffer-copy/c/kernel_hardened.c` and `patterns/p16-tlv-walk/c/kernel_hardened.c` each quote their own pattern's `forbidden` spelling inside the comment that explains why they do not use it, and `patterns/p17-http-range/c/kernel.c` would otherwise satisfy `2 + 2*nsuf > len` on the strength of a comment while its code writes the spaced form -- a match for the wrong reason is as bad as a miss. (c) Ghost is not exec: a Verus `requires`/`ensures`/`invariant`/`decreases` is erased before codegen and its arithmetic is over unbounded `int`, so it cannot carry the overflow an additive spelling is forbidden for; `patterns/p16-tlv-walk/verus.rs`'s loop invariant `p + 3 + vlen <= end` is the shipped instance, and without this part p16's own R5 violates p16's `forbidden[0]` on a grep. PER-LANGUAGE ENTRIES: an entry of `required` or `forbidden` may be an object keyed by language, with keys `c` and `rust`, instead of a string; each rung is then matched only against its own language's spelling. A plain string still applies to every rung and stays the right shape whenever one spelling covers all six -- which it does for p16's comparisons, so per-language is a tool and not a habit. THE CLAUSE THIS REPLACED IS RETRACTED, and so is the count that justified it. Until TASK_019 this paragraph read `where a rung's LANGUAGE cannot express the quoted spelling, that rung spells the same operands the way its language forces and nothing else varies`, justified by EIGHT SHIPPED CELLS. Both are wrong (TASK_018_REVIEW B1). The count was never eight: p08's `dr = d + r` carries no backticks and so was never pinned, and six p17 cells nobody had counted were out on spacing. TASK_018_REVIEW put the corrected figure at 10, or 4 once whitespace is normalised; measured against the WHOLE declaration rather than the two entries that review looked at, the pre-repair figure is 20 obligations failing on raw text, 15 once comments and ghost are blanked and 9 once whitespace is deleted. The five it adds are p17's `required[1]`, which quoted an ELLIPSIS -- `if start < end && start >= 0 { ... }` -- that no rung can contain, and which nobody had counted either. And the clause's antecedent is FALSE exactly where it was needed -- Rust CAN spell `len > src_len - (src_off + 2)`, and a p02 R3 variant that does is byte-identical to the shipped cell (`md5_fn e207ec6c8697...`, identical marginal on both bands), so the clause never fired for the four cells it existed to rescue. Per-language entries do that job, and they do it by NARROWING and not by widening: with p02's `required[0]` and `forbidden[0]` carrying Rust spellings, the shipped R3 matches and BOTH variants that are not it fail to match -- the forbidden additive guard, 3.00 Ir/call cheaper than shipped R3, and the byte-identical `src_len`-spelled guard -- where before the edit the pin matched none of the three and decided nothing at all. THE COUNT, MEASURED AFTER THE REPAIR RATHER THAN ASSERTED (TASK_019, `.temp/p19/pins.py`, a hand-transcribed table of every backticked spelling against every rung it scopes to): the repaired declaration makes 82 (spelling x rung) obligations across the six patterns, of which 11 fail on raw text, 6 once comments and ghost are blanked, and 0 under the rule above -- so NO shipped cell is out of its own declaration, and that is a count and not an adjective. The pre-repair declaration made 78 obligations and failed 20 / 15 / 9. The total ROSE because per-language entries pin MORE and not less: the Rust three-term guard `len > dst.len() || len > src.len() - (src_off + 2)` is now pinned where before only a sub-expression of it was. WHY IT WAS ADOPTED: TASK_017 applied this reading to p16 and refused it for p17 in the same commit, writing into p17's NOTES.md that a spelling with no `end` binding anywhere in its code satisfied entries naming `start < end` (TASK_017_REVIEW B1). One rule across all six is the repair, and it still holds `.temp/p05r3/v17/tuned_suffix.rs` out: every p17 rung binds `end`, so p17's entries name spellings its rungs really write and no per-language key rescues a variant that binds no `end` at all. TOKENS rather than SEMANTICS, for a reason that is checkable rather than rhetorical: only the token reading partitions cleanly. `.temp/p05r3/v16/tuned_split.rs` satisfies p16's `every comparison is subtraction-first` VACUOUSLY -- it contains no comparison at all -- and `tuned_splitat.rs`'s `rest.len() >= 3` is neither subtraction-first nor additive, so the semantic reading does not decide either of them (TASK_017_REVIEW m5). A contract a grep can settle beats a contract only an argument can settle -- WHERE a grep settles it, which is narrower than TASK_018 wrote. WHAT NO GREP SETTLES, recorded so nobody re-derives it: `required` in p01 and p05 contains no backticks at all, so those two patterns pin no token and their rungs are matched by prose only; and the POLARITY of a quoted span (p02's `|`, p08's `&` and p17's `continue` are quoted in order to be ABSENT) and the SET OF RUNGS it scopes to (p02's first entry, p16's fourth, p17's third) live in the entry's English. `spelling_matches` decides one spelling against one rung; which spelling and which rung is a reading, and no gate stage reproduces it. WHAT THE STANDARD DOES NOT BUY, measured and put here rather than in a footnote: a pinned idiom makes the admissible class DECIDABLE, not SINGULAR. Respelling only what the declaration leaves free moves p16's R3 by `4*nrec - 8` Ir/call, p17's by 51 flat and p02's by 3 to 4. THE UNSAFE SIDE DOES NOT MOVE, AND THE SENTENCE THAT SAID IT DID IS WITHDRAWN (TASK_028, on TASK_027_REVIEW's seven Verus twins). Until TASK_028 this paragraph read `and it moves the UNSAFE rung too, by the same lever: p16's R4 by 4*nrec (TASK_023) and p05's by 7 flat (TASK_022)`, and that names ONE lever -- respelling the header read -- which is NOT ADMISSIBLE ON EITHER PATTERN. All six patterns pin `identity: unsafe == verus, O3 exact`, so an R4 is not merely a program that MAY use `unsafe`: it is a program that must have a byte-identical R5 twin that Verus verifies. At the pinned vstd every route to that respelling is `is not supported` -- `read_unaligned`, `as_ptr`, `add`, `from_raw_parts`, `TryFromSliceError` and `from_le_bytes` -- so p16's `r4_hdr` and p05's `c4_hu16_nz` are controls and not rungs, and shipping either costs a NEW TRUSTED ITEM, which is exactly what disqualified `r4_hdr` on p16. `4*nrec` and `7 flat` are therefore both withdrawn, NEITHER PATTERN'S R4 SIDE HAS MOVED BY A SINGLE ADMISSIBLE INSTRUCTION, and the reason is this block's own `identity` pin rather than anything about those two patterns -- it binds all six, and p01's R2 as well, which is pinned the same way. Read the ERROR TEXT and not the exit code: `is not supported` disqualifies, because it is what forces a new TRUSTED item, while `postcondition not satisfied` disqualifies nothing -- the same p05 exec code went from `11 verified, 1 errors` to `13 verified, 0 errors` with one lemma and one `proof` block, at zero TCB. THIS PROJECT PUBLISHES NO PAIR INTERVAL, and the two it did publish fall with that sentence: p05's `2*nrow - 2` ... `6*nrow + 20` (36...134 / 128...410, whose bottom endpoint was quoted as `exactly 0.00`) took its endpoints from `r4_dataslice` and `c4_hu16_nz`, and p16's from `r4_hdr`; none of the three is a rung. What ships is TWO quantities and not three. THE ONE REAL BOUND needs R4 held fixed BY FIAT rather than minimised: then, and only then, `R3ship - R4ship` bounds `inf(in-contract R3) - R4ship`. Beside it goes the R3-SIDE SPAN, cheapest-found to dearest-found in contract. A pair interval over the ADMISSIBLE class is not unavailable, it is DEGENERATE, which is the more informative thing to say and is why `unavailable` is not written here: the only p05 R4 SHOWN admissible is the shipped cell -- six more measure exactly R4ship and were never put through Verus, and the two that MOVE were put through it and failed -- so the R4 endpoint has ZERO measured width and the interval collapses onto the R3-side span, `5*nrow + 6` ... `6*nrow + 13` = 101...127 / 331...403, width `nrow + 7` = 26 / 72. That is p05's R3-side span exactly, i.e. a third NAME for a second NUMBER, so do not quote it as a pair result; it becomes one the day somebody builds an admissible R4 that MOVES, and on two patterns now -- p05's unbuilt zero-guard deletion and p16's unbuilt hand-unrolled 32x fold -- that is the open question and nobody has built it. And `min(R3 found) - min(R4 found)` is NOT the repair -- two upper bounds differenced bound nothing in either direction; on p05 one edit moved it -2 on R4 and +1 on R3, so the constant does not cancel (the R4 half of that illustration is an inference from the inadmissible `c4_hu16_nz` family and has never been compiled; the arithmetic point does not rest on it), and its third published minimum EXCEEDS its published figure at `nrow <= 3`. Every pattern owes an in-contract spread beside its headline; on the R3 side p16 and p17 have one from TASK_018, p02 from TASK_019 and p05 from TASK_021 (their NOTES.md 10a / 14; 14 also measured that this audit CANNOT settle p05 -- its declaration backticks nothing, so `spellings` is 0 and admission is decided by prose plus one grep), on the R4 side ONLY p05 and p16, and p01 and p08 neither"
+  },
+  "idiom_audit": {
+    "spellings": 37,
+    "rungs": 6,
+    "pairs": 112,
+    "present": 63,
+    "languages": [
+      "c",
+      "rust"
+    ],
+    "forbidden_spellings": 14,
+    "forbidden_hits": 0,
+    "hits": [],
+    "required_pins_nothing": 0,
+    "pins_nothing": [],
+    "required_absent": 5,
+    "absent": [
+      {
+        "entry": "required[0]",
+        "lang": "c",
+        "spelling": "return *(const uint32_t *)r;",
+        "rung": "c/kernel_hardened.c"
+      },
+      {
+        "entry": "required[1]",
+        "lang": "c",
+        "spelling": "return (uint32_t)r[0] + 65536 * (uint32_t)r[1];",
+        "rung": "c/kernel.c"
+      },
+      {
+        "entry": "required[1]",
+        "lang": "rust",
+        "spelling": "[u16; 256]",
+        "rung": "safe_naive.rs"
+      },
+      {
+        "entry": "required[1]",
+        "lang": "rust",
+        "spelling": "[u16; 256]",
+        "rung": "safe_tuned.rs"
+      },
+      {
+        "entry": "required[1]",
+        "lang": "rust",
+        "spelling": "[u16; 256]",
+        "rung": "unsafe.rs"
+      }
+    ],
+    "no_rung_entries": 0,
+    "no_rung": []
+  },
+  "source_sha256": {
+    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+    "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+    "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+    "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+    "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+    "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+    "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+    "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+    "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+    "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+    "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+    "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+    "harness/check.py": "5b57db8dcb1815816fbfb1976314c95f037eafbf08e4886929d0649bd7e231d6",
+    "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+    "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+    "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+    "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+    "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+    "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+    "patterns/p38-alias-pun/NOTES.md": "dad8aaa5c46d0e606260cdc38e8e9b9afd22ba8c8f1312da396cb76ea73c2e88",
+    "patterns/p38-alias-pun/README.md": "6df48bec61543f8d97d08e7545e7e43bd76ba05c55860008aad591b98243646a",
+    "patterns/p38-alias-pun/c/kernel.c": "054adb730d2472b6a2d0cc9a4f9bc8fcadcf34eda2565707d6a7454a8dbf1e5a",
+    "patterns/p38-alias-pun/c/kernel.h": "08dde7f58cf94b1cd15da8bcec2bc3dd520b91bc749a47fa7b59f9e8a61e9269",
+    "patterns/p38-alias-pun/c/kernel_hardened.c": "dbfb9d24a522295f537e9b6833735cb19f8db2200c051aa24b7403201608dc07",
+    "patterns/p38-alias-pun/c/main.c": "5314a7830f81f25373048b0b018dd7c9629d78d50f5baeb021cdd71f8c16b4d2",
+    "patterns/p38-alias-pun/controls/fit.py": "576cafffb12ca10f1183befc4fcb2989cb258d33dfc66980ac7ab34aa186b7e7",
+    "patterns/p38-alias-pun/controls/gen_controls.py": "4042aaa9555ffc0429ec4354227860730a1d6d7f64240593eab7e69988ea018d",
+    "patterns/p38-alias-pun/controls/mkcontract.py": "03e8d7f39cc1eeb3b349f833d27ff31a7ba3983298eee18eec5bd392026038d2",
+    "patterns/p38-alias-pun/controls/proof_mutants.py": "43dbe97999122bace02d71dc5f669bb8840f71d9ff105bc8c01060ffd4b6aac9",
+    "patterns/p38-alias-pun/controls/span.py": "d625520fd52f7dab1f9ba1e09a415e4ea5c2416f489af9eddc41f0170cede0c2",
+    "patterns/p38-alias-pun/inputs/gen.py": "d0ca7efdbd21915b106286537fac14be2354f531bae23cdf959f6f03d87d1324",
+    "patterns/p38-alias-pun/model.py": "742e2e750e5404d7acb411d6b0e25348896d631bb26ca09d6cdb66dd12f42f32",
+    "patterns/p38-alias-pun/safe_naive.rs": "3e497d62b303969a13485bc2d523e2f2138b7f1d5c3ed6d31b08a8e34ca69e94",
+    "patterns/p38-alias-pun/safe_tuned.rs": "215e6787cfba29a3421b0b3fa6342df0691d554d36987d1935557dcb03c5f985",
+    "patterns/p38-alias-pun/spec.md": "51bced8c3405ad0a5492d977b5ddfc3d752c4e6148d947a05221b292ada9be2c",
+    "patterns/p38-alias-pun/unsafe.rs": "c3b55e6a478c154d6969ed6cc08b89299754f2a5cb855cb755518b08adc2c014",
+    "patterns/p38-alias-pun/verus.rs": "7c6cab70fd088de81840b63aee0e31949e412ef2a7dfc559c5e15da87face87d",
+    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "derived_contract": {
+    "requires": [
+      "off + len <= buf_len"
+    ],
+    "ensures": [
+      "result == rec_fold(buf, off, len)"
+    ],
+    "alpha_ir_per_work": 0.25,
+    "collapse_rate_ir_per_work": 0.25,
+    "collapse_work_unit": "window byte",
+    "collapse_floor_min_declarable": 0.015625,
+    "collapse_tightest_margin": 15.170542635658915
+  },
+  "identity": [
+    {
+      "pair": "unsafe vs verus",
+      "opt": "O0",
+      "level": "norel",
+      "expected": "norel",
+      "md5_fn_a": "80c21bd46135039e84bb5443f7240164",
+      "md5_fn_b": "f2b9c438eea28ee64e85b12067c43cd7",
+      "md5_raw_equal": false,
+      "counts_a": [
+        233,
+        233,
+        1247
+      ],
+      "counts_b": [
+        233,
+        233,
+        1247
+      ],
+      "pad_a": [
+        1,
+        1
+      ],
+      "pad_b": [
+        1,
+        1
+      ]
+    },
+    {
+      "pair": "unsafe vs verus",
+      "opt": "O3",
+      "level": "exact",
+      "expected": "exact",
+      "md5_fn_a": "59ee6732b504cd73ba0debfa08772b86",
+      "md5_fn_b": "59ee6732b504cd73ba0debfa08772b86",
+      "md5_raw_equal": true,
+      "counts_a": [
+        192,
+        185,
+        774
+      ],
+      "counts_b": [
+        192,
+        185,
+        774
+      ],
+      "pad_a": [
+        10,
+        10
+      ],
+      "pad_b": [
+        10,
+        10
+      ]
+    }
+  ],
+  "marginal_ir_per_call": {
+    "c-clang/O0/isolated/small.bin": 4484.72,
+    "c-clang/O0/isolated/large.bin": 11592.0,
+    "c-clang/O0/isolated/d_ir_d_work": 22.49139240506329,
+    "c-clang/O0/whole/small.bin": 4372.72,
+    "c-clang/O0/whole/large.bin": 11310.0,
+    "c-clang/O0/whole/d_ir_d_work": 21.953417721518985,
+    "c-clang/O3/isolated/small.bin": 1274.72,
+    "c-clang/O3/isolated/large.bin": 3189.0,
+    "c-clang/O3/isolated/d_ir_d_work": 6.057848101265822,
+    "c-clang/O3/whole/small.bin": 1266.72,
+    "c-clang/O3/whole/large.bin": 3169.0,
+    "c-clang/O3/whole/d_ir_d_work": 6.019873417721519,
+    "c-clang-h/O0/isolated/small.bin": 4516.72,
+    "c-clang-h/O0/isolated/large.bin": 11656.0,
+    "c-clang-h/O0/isolated/d_ir_d_work": 22.5926582278481,
+    "c-clang-h/O0/whole/small.bin": 4404.72,
+    "c-clang-h/O0/whole/large.bin": 11374.0,
+    "c-clang-h/O0/whole/d_ir_d_work": 22.054683544303796,
+    "c-clang-h/O3/isolated/small.bin": 1306.72,
+    "c-clang-h/O3/isolated/large.bin": 3253.0,
+    "c-clang-h/O3/isolated/d_ir_d_work": 6.159113924050633,
+    "c-clang-h/O3/whole/small.bin": 1290.72,
+    "c-clang-h/O3/whole/large.bin": 3241.0,
+    "c-clang-h/O3/whole/d_ir_d_work": 6.171772151898734,
+    "c-gcc/O0/isolated/small.bin": 4476.72,
+    "c-gcc/O0/isolated/large.bin": 11552.0,
+    "c-gcc/O0/isolated/d_ir_d_work": 22.39012658227848,
+    "c-gcc/O0/whole/small.bin": 4476.72,
+    "c-gcc/O0/whole/large.bin": 11552.0,
+    "c-gcc/O0/whole/d_ir_d_work": 22.39012658227848,
+    "c-gcc/O3/isolated/small.bin": 1043.72,
+    "c-gcc/O3/isolated/large.bin": 2573.0,
+    "c-gcc/O3/isolated/d_ir_d_work": 4.839493670886076,
+    "c-gcc/O3/whole/small.bin": 1038.72,
+    "c-gcc/O3/whole/large.bin": 2568.0,
+    "c-gcc/O3/whole/d_ir_d_work": 4.839493670886076,
+    "c-gcc-h/O0/isolated/small.bin": 4532.72,
+    "c-gcc-h/O0/isolated/large.bin": 11664.0,
+    "c-gcc-h/O0/isolated/d_ir_d_work": 22.5673417721519,
+    "c-gcc-h/O0/whole/small.bin": 4532.72,
+    "c-gcc-h/O0/whole/large.bin": 11664.0,
+    "c-gcc-h/O0/whole/d_ir_d_work": 22.5673417721519,
+    "c-gcc-h/O3/isolated/small.bin": 1055.72,
+    "c-gcc-h/O3/isolated/large.bin": 2597.0,
+    "c-gcc-h/O3/isolated/d_ir_d_work": 4.87746835443038,
+    "c-gcc-h/O3/whole/small.bin": 1054.72,
+    "c-gcc-h/O3/whole/large.bin": 2600.0,
+    "c-gcc-h/O3/whole/d_ir_d_work": 4.890126582278481,
+    "safe_naive/O0/isolated/small.bin": 6584.3,
+    "safe_naive/O0/isolated/large.bin": 16994.0,
+    "safe_naive/O0/isolated/d_ir_d_work": 32.94208860759494,
+    "safe_naive/O0/whole/small.bin": 6584.3,
+    "safe_naive/O0/whole/large.bin": 16994.0,
+    "safe_naive/O0/whole/d_ir_d_work": 32.94208860759494,
+    "safe_naive/O3/isolated/small.bin": 1627.3,
+    "safe_naive/O3/isolated/large.bin": 4036.0,
+    "safe_naive/O3/isolated/d_ir_d_work": 7.622468354430379,
+    "safe_naive/O3/whole/small.bin": 2464.3,
+    "safe_naive/O3/whole/large.bin": 6314.0,
+    "safe_naive/O3/whole/d_ir_d_work": 12.18259493670886,
+    "safe_tuned/O0/isolated/small.bin": 6073.3,
+    "safe_tuned/O0/isolated/large.bin": 15517.0,
+    "safe_tuned/O0/isolated/d_ir_d_work": 29.885126582278485,
+    "safe_tuned/O0/whole/small.bin": 6073.3,
+    "safe_tuned/O0/whole/large.bin": 15517.0,
+    "safe_tuned/O0/whole/d_ir_d_work": 29.885126582278485,
+    "safe_tuned/O3/isolated/small.bin": 1391.3,
+    "safe_tuned/O3/isolated/large.bin": 3350.0,
+    "safe_tuned/O3/isolated/d_ir_d_work": 6.198417721518988,
+    "safe_tuned/O3/whole/small.bin": 838.3,
+    "safe_tuned/O3/whole/large.bin": 1957.0,
+    "safe_tuned/O3/whole/d_ir_d_work": 3.5401898734177215,
+    "unsafe/O0/isolated/small.bin": 12615.3,
+    "unsafe/O0/isolated/large.bin": 32667.0,
+    "unsafe/O0/isolated/d_ir_d_work": 63.45474683544304,
+    "unsafe/O0/whole/small.bin": 12615.3,
+    "unsafe/O0/whole/large.bin": 32667.0,
+    "unsafe/O0/whole/d_ir_d_work": 63.45474683544304,
+    "unsafe/O3/isolated/small.bin": 1370.3,
+    "unsafe/O3/isolated/large.bin": 3325.0,
+    "unsafe/O3/isolated/d_ir_d_work": 6.185759493670886,
+    "unsafe/O3/whole/small.bin": 1360.3,
+    "unsafe/O3/whole/large.bin": 3307.0,
+    "unsafe/O3/whole/d_ir_d_work": 6.160443037974684,
+    "verus/O0/isolated/small.bin": 12615.3,
+    "verus/O0/isolated/large.bin": 32667.0,
+    "verus/O0/isolated/d_ir_d_work": 63.45474683544304,
+    "verus/O0/whole/small.bin": 12615.3,
+    "verus/O0/whole/large.bin": 32667.0,
+    "verus/O0/whole/d_ir_d_work": 63.45474683544304,
+    "verus/O3/isolated/small.bin": 1369.3,
+    "verus/O3/isolated/large.bin": 3324.0,
+    "verus/O3/isolated/d_ir_d_work": 6.185759493670886,
+    "verus/O3/whole/small.bin": 1368.3,
+    "verus/O3/whole/large.bin": 3323.0,
+    "verus/O3/whole/d_ir_d_work": 6.185759493670886
+  },
+  "verus": {
+    "verus.rs": {
+      "verified": 13,
+      "errors": 0,
+      "pinned": 13,
+      "tcb_items": [
+        {
+          "name": "buf_get_unchecked",
+          "attr": "verifier::external_body",
+          "body_lines": 1,
+          "line": 200
+        },
+        {
+          "name": "sc_get_unchecked",
+          "attr": "verifier::external_body",
+          "body_lines": 1,
+          "line": 234
+        },
+        {
+          "name": "sc_set_unchecked",
+          "attr": "verifier::external_body",
+          "body_lines": 3,
+          "line": 271
+        },
+        {
+          "name": "load_input",
+          "attr": "verifier::external_body",
+          "body_lines": 4,
+          "line": 302
+        },
+        {
+          "name": "emit",
+          "attr": "verifier::external_body",
+          "body_lines": 1,
+          "line": 313
+        }
+      ]
+    }
+  },
+  "verified_call_site": {
+    "main": 5,
+    "kernel": 5
+  },
+  "clause_deletion": {
+    "verus.rs": {
+      "control_verified": 13,
+      "mutants": [
+        {
+          "item": "main",
+          "kind": "assert(false) probe",
+          "clause": null,
+          "verified": 12,
+          "errors": 1
+        },
+        {
+          "item": "buf_get_unchecked",
+          "kind": "trusted",
+          "clause": "r == v@[i as int]",
+          "verified": 11,
+          "errors": 2
+        },
+        {
+          "item": "sc_get_unchecked",
+          "kind": "trusted",
+          "clause": "r == v@[i as int]",
+          "verified": 11,
+          "errors": 2
+        },
+        {
+          "item": "sc_set_unchecked",
+          "kind": "trusted",
+          "clause": "final(v)@ == old(v)@.update(i as int, x)",
+          "verified": 11,
+          "errors": 2
+        },
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "r == rec_fold(buf@, off as int, len as int)",
+          "verified": 12,
+          "errors": 1
+        }
+      ]
+    }
+  },
+  "requires_strength": {
+    "verus.rs": {
+      "control_verified": 13,
+      "mutants": [
+        {
+          "item": "buf_get_unchecked",
+          "kind": "trusted",
+          "clause": "i < v@.len()",
+          "test": "tautology",
+          "tactic": "nonlinear_arith",
+          "tactics_ran": [
+            null,
+            "nonlinear_arith"
+          ],
+          "tactics_inapplicable": [
+            "bit_vector"
+          ],
+          "verified": 14,
+          "errors": 1,
+          "verdict": "not a tautology"
+        },
+        {
+          "item": "sc_get_unchecked",
+          "kind": "trusted",
+          "clause": "i < v@.len()",
+          "test": "tautology",
+          "tactic": "nonlinear_arith",
+          "tactics_ran": [
+            null,
+            "nonlinear_arith"
+          ],
+          "tactics_inapplicable": [
+            "bit_vector"
+          ],
+          "verified": 14,
+          "errors": 1,
+          "verdict": "not a tautology"
+        },
+        {
+          "item": "sc_set_unchecked",
+          "kind": "trusted",
+          "clause": "i < old(v)@.len()",
+          "test": "tautology",
+          "tactic": null,
+          "tactics_ran": [
+            null
+          ],
+          "tactics_inapplicable": [
+            "nonlinear_arith",
+            "bit_vector"
+          ],
+          "verified": 13,
+          "errors": 1,
+          "verdict": "not a tautology"
+        },
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "off + len <= buf@.len()",
+          "test": "tautology",
+          "tactic": "nonlinear_arith",
+          "tactics_ran": [
+            null,
+            "nonlinear_arith"
+          ],
+          "tactics_inapplicable": [
+            "bit_vector"
+          ],
+          "verified": 14,
+          "errors": 1,
+          "verdict": "not a tautology"
+        },
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "off + len <= buf@.len()",
+          "test": "deletion",
+          "verified": 12,
+          "errors": 1
+        }
+      ]
+    }
+  },
+  "verified_twins": {
+    "verus.rs": {
+      "twins": [
+        {
+          "trusted": "buf_get_unchecked",
+          "twin": "slb_twin_buf_get_unchecked",
+          "signature_identical": true,
+          "requires": [
+            "i < v@.len()"
+          ],
+          "ensures": [
+            "r == v@[i as int]"
+          ],
+          "body_lines": 1,
+          "vacuity_probe": {
+            "per_conjunct": [
+              {
+                "conjunct": "i < v@.len()",
+                "verified": 15,
+                "errors": 1
+              }
+            ],
+            "load_bearing": 1,
+            "conjuncts": 1
+          }
+        },
+        {
+          "trusted": "sc_get_unchecked",
+          "twin": "slb_twin_sc_get_unchecked",
+          "signature_identical": true,
+          "requires": [
+            "i < v@.len()"
+          ],
+          "ensures": [
+            "r == v@[i as int]"
+          ],
+          "body_lines": 1,
+          "vacuity_probe": {
+            "per_conjunct": [
+              {
+                "conjunct": "i < v@.len()",
+                "verified": 15,
+                "errors": 1
+              }
+            ],
+            "load_bearing": 1,
+            "conjuncts": 1
+          }
+        },
+        {
+          "trusted": "sc_set_unchecked",
+          "twin": "slb_twin_sc_set_unchecked",
+          "signature_identical": true,
+          "requires": [
+            "i < old(v)@.len()"
+          ],
+          "ensures": [
+            "final(v)@ == old(v)@.update(i as int, x)"
+          ],
+          "body_lines": 1,
+          "vacuity_probe": {
+            "per_conjunct": [
+              {
+                "conjunct": "i < old(v)@.len()",
+                "verified": 15,
+                "errors": 1
+              }
+            ],
+            "load_bearing": 1,
+            "conjuncts": 1
+          }
+        }
+      ],
+      "verified": 16,
+      "errors": 0,
+      "without_twins": 13
+    }
+  },
+  "proof_domain": {
+    "adversarial-huge.bin": {
+      "calls": 1,
+      "requires_ok": true,
+      "ensures_checked": 1
+    },
+    "adversarial-nrec.bin": {
+      "calls": 200,
+      "requires_ok": true,
+      "ensures_checked": 128
+    },
+    "adversarial-oob.bin": {
+      "calls": 1,
+      "requires_ok": true,
+      "ensures_checked": 1
+    },
+    "adversarial-stale.bin": {
+      "calls": 1,
+      "requires_ok": true,
+      "ensures_checked": 1
+    },
+    "adversarial-stride7.bin": {
+      "calls": 0,
+      "requires_ok": true,
+      "ensures_checked": 0
+    },
+    "degenerate.bin": {
+      "calls": 4000,
+      "requires_ok": true,
+      "ensures_checked": 128
+    },
+    "large.bin": {
+      "calls": 20000,
+      "requires_ok": true,
+      "ensures_checked": 128
+    },
+    "small.bin": {
+      "calls": 20000,
+      "requires_ok": true,
+      "ensures_checked": 128
+    }
+  },
+  "driver_loops": {
+    "c/main.c": {
+      "statements": 12,
+      "matches_pin": true
+    },
+    "safe_naive.rs": {
+      "statements": 12,
+      "matches_pin": true
+    },
+    "safe_tuned.rs": {
+      "statements": 12,
+      "matches_pin": true
+    },
+    "unsafe.rs": {
+      "statements": 12,
+      "matches_pin": true
+    },
+    "verus.rs": {
+      "statements": 12,
+      "matches_pin": true
+    }
+  },
+  "adversarial": {
+    "adversarial-huge.bin/c-gcc": [
+      {
+        "exit": -11,
+        "stdout": "",
+        "stderr": "",
+        "signal": 11,
+        "cells": [
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "15963742333423663363",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "15963742333423663363",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "15963742333423663363",
+        "diverges": false
+      }
+    ],
+    "adversarial-huge.bin/c-clang": [
+      {
+        "exit": 0,
+        "stdout": "15963742333423663363",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "15963742333423663363",
+        "diverges": false
+      }
+    ],
+    "adversarial-huge.bin/safe_naive": [
+      {
+        "exit": 0,
+        "stdout": "15963742333423663363",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "15963742333423663363",
+        "diverges": false
+      }
+    ],
+    "adversarial-huge.bin/safe_tuned": [
+      {
+        "exit": 0,
+        "stdout": "15963742333423663363",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "15963742333423663363",
+        "diverges": false
+      }
+    ],
+    "adversarial-huge.bin/unsafe": [
+      {
+        "exit": 0,
+        "stdout": "15963742333423663363",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "15963742333423663363",
+        "diverges": false
+      }
+    ],
+    "adversarial-huge.bin/verus": [
+      {
+        "exit": 0,
+        "stdout": "15963742333423663363",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "15963742333423663363",
+        "diverges": false
+      }
+    ],
+    "adversarial-huge.bin/c-gcc-h": [
+      {
+        "exit": 0,
+        "stdout": "15963742333423663363",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "15963742333423663363",
+        "diverges": false
+      }
+    ],
+    "adversarial-huge.bin/c-clang-h": [
+      {
+        "exit": 0,
+        "stdout": "15963742333423663363",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "15963742333423663363",
+        "diverges": false
+      }
+    ],
+    "adversarial-nrec.bin/c-gcc": [
+      {
+        "exit": 0,
+        "stdout": "573548035304320128",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "573548035304320128",
+        "diverges": false
+      }
+    ],
+    "adversarial-nrec.bin/c-clang": [
+      {
+        "exit": 0,
+        "stdout": "573548035304320128",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "573548035304320128",
+        "diverges": false
+      }
+    ],
+    "adversarial-nrec.bin/safe_naive": [
+      {
+        "exit": 0,
+        "stdout": "573548035304320128",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "573548035304320128",
+        "diverges": false
+      }
+    ],
+    "adversarial-nrec.bin/safe_tuned": [
+      {
+        "exit": 0,
+        "stdout": "573548035304320128",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "573548035304320128",
+        "diverges": false
+      }
+    ],
+    "adversarial-nrec.bin/unsafe": [
+      {
+        "exit": 0,
+        "stdout": "573548035304320128",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "573548035304320128",
+        "diverges": false
+      }
+    ],
+    "adversarial-nrec.bin/verus": [
+      {
+        "exit": 0,
+        "stdout": "573548035304320128",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "573548035304320128",
+        "diverges": false
+      }
+    ],
+    "adversarial-nrec.bin/c-gcc-h": [
+      {
+        "exit": 0,
+        "stdout": "573548035304320128",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "573548035304320128",
+        "diverges": false
+      }
+    ],
+    "adversarial-nrec.bin/c-clang-h": [
+      {
+        "exit": 0,
+        "stdout": "573548035304320128",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "573548035304320128",
+        "diverges": false
+      }
+    ],
+    "adversarial-oob.bin/c-gcc": [
+      {
+        "exit": 0,
+        "stdout": "17863223868068973372",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "8516071857945885891",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "7287691799540052089",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "8516071857945885891",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "8516071857945885891",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "8516071857945885891",
+        "diverges": false
+      }
+    ],
+    "adversarial-oob.bin/c-clang": [
+      {
+        "exit": 0,
+        "stdout": "8516071857945885891",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "8516071857945885891",
+        "diverges": false
+      }
+    ],
+    "adversarial-oob.bin/safe_naive": [
+      {
+        "exit": 0,
+        "stdout": "8516071857945885891",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "8516071857945885891",
+        "diverges": false
+      }
+    ],
+    "adversarial-oob.bin/safe_tuned": [
+      {
+        "exit": 0,
+        "stdout": "8516071857945885891",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "8516071857945885891",
+        "diverges": false
+      }
+    ],
+    "adversarial-oob.bin/unsafe": [
+      {
+        "exit": 0,
+        "stdout": "8516071857945885891",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "8516071857945885891",
+        "diverges": false
+      }
+    ],
+    "adversarial-oob.bin/verus": [
+      {
+        "exit": 0,
+        "stdout": "8516071857945885891",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "8516071857945885891",
+        "diverges": false
+      }
+    ],
+    "adversarial-oob.bin/c-gcc-h": [
+      {
+        "exit": 0,
+        "stdout": "8516071857945885891",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "8516071857945885891",
+        "diverges": false
+      }
+    ],
+    "adversarial-oob.bin/c-clang-h": [
+      {
+        "exit": 0,
+        "stdout": "8516071857945885891",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "8516071857945885891",
+        "diverges": false
+      }
+    ],
+    "adversarial-stale.bin/c-gcc": [
+      {
+        "exit": 0,
+        "stdout": "10509230270850152637",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "10509230270850152637",
+        "diverges": false
+      },
+      {
+        "exit": 0,
+        "stdout": "3054000223247709499",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "10509230270850152637",
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "7759447446181303206",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "10509230270850152637",
+        "diverges": true
+      }
+    ],
+    "adversarial-stale.bin/c-clang": [
+      {
+        "exit": 0,
+        "stdout": "10509230270850152637",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "10509230270850152637",
+        "diverges": false
+      }
+    ],
+    "adversarial-stale.bin/safe_naive": [
+      {
+        "exit": 0,
+        "stdout": "10509230270850152637",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "10509230270850152637",
+        "diverges": false
+      }
+    ],
+    "adversarial-stale.bin/safe_tuned": [
+      {
+        "exit": 0,
+        "stdout": "10509230270850152637",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "10509230270850152637",
+        "diverges": false
+      }
+    ],
+    "adversarial-stale.bin/unsafe": [
+      {
+        "exit": 0,
+        "stdout": "10509230270850152637",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "10509230270850152637",
+        "diverges": false
+      }
+    ],
+    "adversarial-stale.bin/verus": [
+      {
+        "exit": 0,
+        "stdout": "10509230270850152637",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "10509230270850152637",
+        "diverges": false
+      }
+    ],
+    "adversarial-stale.bin/c-gcc-h": [
+      {
+        "exit": 0,
+        "stdout": "10509230270850152637",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "10509230270850152637",
+        "diverges": false
+      }
+    ],
+    "adversarial-stale.bin/c-clang-h": [
+      {
+        "exit": 0,
+        "stdout": "10509230270850152637",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "10509230270850152637",
+        "diverges": false
+      }
+    ],
+    "adversarial-stride7.bin/c-gcc": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-stride7.bin/c-clang": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-stride7.bin/safe_naive": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-stride7.bin/safe_tuned": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-stride7.bin/unsafe": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-stride7.bin/verus": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-stride7.bin/c-gcc-h": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ],
+    "adversarial-stride7.bin/c-clang-h": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "diverges": false
+      }
+    ]
+  },
+  "sanitizer": {
+    "adversarial-huge.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "stdout": "15963742333423663363",
+      "model_stdout": "15963742333423663363"
+    },
+    "adversarial-nrec.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "stdout": "573548035304320128",
+      "model_stdout": "573548035304320128"
+    },
+    "adversarial-oob.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "stdout": "8516071857945885891",
+      "model_stdout": "8516071857945885891"
+    },
+    "adversarial-stale.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "stdout": "10509230270850152637",
+      "model_stdout": "10509230270850152637"
+    },
+    "adversarial-stride7.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "stdout": "0",
+      "model_stdout": "0"
+    },
+    "degenerate.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "stdout": "15819171708748271115",
+      "model_stdout": "15819171708748271115"
+    },
+    "large.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "stdout": "6576101629690481408",
+      "model_stdout": "6576101629690481408"
+    },
+    "small.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "stdout": "8087734315336093952",
+      "model_stdout": "8087734315336093952"
+    }
+  },
+  "miri": {
+    "pair": "unsafe vs verus",
+    "identity_o3": "exact",
+    "inherits_proof": true,
+    "trusted_items": {
+      "verus.rs": [
+        "buf_get_unchecked",
+        "sc_get_unchecked",
+        "sc_set_unchecked"
+      ]
+    },
+    "required_because": [
+      "this pattern has 3 trusted item(s) {'verus.rs': ['buf_get_unchecked', 'sc_get_unchecked', 'sc_set_unchecked']} whose `ensures` need not be COMPLETE with respect to the unchecked operations their bodies perform (TASK_009_REVIEW x4)",
+      "spec.md sets miri.required"
+    ],
+    "required": true,
+    "ran": true,
+    "available": true,
+    "sysroot": "/home/apt/.cache/miri",
+    "probe_iters": 4,
+    "runs": [
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-huge.bin",
+        "exit": 0,
+        "expected_exit": 0,
+        "ub": false,
+        "stdout": "6581868491597916352",
+        "model_stdout": "6581868491597916352",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-nrec.bin",
+        "exit": 0,
+        "expected_exit": 0,
+        "ub": false,
+        "stdout": "11326724325740216384",
+        "model_stdout": "11326724325740216384",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-oob.bin",
+        "exit": 0,
+        "expected_exit": 0,
+        "ub": false,
+        "stdout": "12076043519713253568",
+        "model_stdout": "12076043519713253568",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-stale.bin",
+        "exit": 0,
+        "expected_exit": 0,
+        "ub": false,
+        "stdout": "15593837206692087616",
+        "model_stdout": "15593837206692087616",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-stride7.bin",
+        "exit": 0,
+        "expected_exit": 0,
+        "ub": false,
+        "stdout": "0",
+        "model_stdout": "0",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "degenerate.bin",
+        "exit": 0,
+        "expected_exit": 0,
+        "ub": false,
+        "stdout": "3736053323538472396",
+        "model_stdout": "3736053323538472396",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "large.bin",
+        "exit": 0,
+        "expected_exit": 0,
+        "ub": false,
+        "stdout": "14630675597461656064",
+        "model_stdout": "14630675597461656064",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "small.bin",
+        "exit": 0,
+        "expected_exit": 0,
+        "ub": false,
+        "stdout": "10006549040005309440",
+        "model_stdout": "10006549040005309440",
+        "stderr": ""
+      }
+    ]
+  },
+  "failures": [],
+  "notes": [
+    "adversarial-huge.bin/c-gcc: opt/mode variants of this rung disagree (2 distinct behaviours)",
+    "adversarial-oob.bin/c-gcc: opt/mode variants of this rung disagree (3 distinct behaviours)",
+    "adversarial-stale.bin/c-gcc: opt/mode variants of this rung disagree (3 distinct behaviours)"
+  ],
+  "loud": [
+    {
+      "section": "tcb-unsafe",
+      "message": "verus.rs:271 `sc_set_unchecked`'s `requires` constrains nothing about ['x'], which its trusted body uses. spec.md justifies it: `x` is a pure VALUE parameter -- written into the scratch, never used as an address or a length -- so it needs no precondition. This is the false positive of the parameter-coverage rule that `.memory/04-verus.md` names and that p03 was the first pattern to exercise; p38 is the second."
+    }
+  ],
+  "blocked": [],
+  "verdict": "PASS",
+  "complete_run": true,
+  "invocation": "p38"
+}
