@@ -1260,6 +1260,36 @@ the number.** Two task files have already sent an agent to the wrong finding.
    the third did not, which is exactly the configuration that fits in sample and
    misses out of it.
 
+33. **p22 — the first pattern where SAFE RUST DOES NOT HELP.** An open-addressing
+   probe loop that never terminates on a full table: **memory-safe, ASan and
+   UBSan silent, Miri silent for 90 s.** No bounds check, no lifetime, no
+   `unsafe` to point at — **the safe rungs are not better.** Only R5 sees it.
+   Reviewed: 1 blocker, 3 majors, 4 minors, **54 named attacks**.
+
+   ⚠ **Narrowed in §0, and the narrowing is the honest part.** No-guard variants
+   of R2/R3/R4 all hang, but `for _ in 0..TABCAP` is idiomatic and terminates —
+   so the claim is *"nothing on this ladder **emits** the capacity check; five
+   rungs write it by hand"*. ✅ The review checked whether that rests on p22's own
+   contract: **it does not** — the bounded spelling is measurably a **different
+   function** (differs on the adversarial input, agrees on the other seven).
+
+   ⚠ **"The first termination proof in the project" was FALSE, came from the
+   MANAGER's task file, and shipped in eight places — two inside
+   `contract_sha256`.** Verus demands a `decreases` on **every** exec loop, so
+   there were 72 prior obligations. The counted replacement: **the tree's only
+   exec-loop measure not expressible in the loop's own exec variables — 1 of
+   73.** ⚠ In both files **the true sentence already sat beside the false one.**
+
+   **The measure costs ZERO instructions** (all ghost, so `R4 ≡ R5` stays
+   `exact`) — but the exec-code alternative is **334 `Ir`/call cheaper**, so the
+   ghost proof does not *save* anything; it buys R4 and R5 being the same
+   program. ⚠ **The bounded probe is faster too**, so *"the careful programmer
+   pays for the bound"* is false here.
+
+   ⚠ **Fifth consecutive under-searched R4 side, and it flatters SAFE**:
+   published `+2.00` against `+125/+1021` — **510×** on the large band. Disclosed
+   proactively this time.
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds
