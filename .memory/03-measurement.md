@@ -1318,22 +1318,41 @@ therefore symbol-independent — so
 (marg[A] − marg[B]) − (kex[A] − kex[B])   =   the callee correction
 ```
 
-Scored tree-wide against a measured callgrind sidecar, **176 rows**:
+It reproduces every large correction independently: p11 `+9815.56/+7116.78`,
+p08 `−4152.92/−4488.90`, p09 `+379/+2626`, p13 `−190/−264`, p27
+`+120.33/+130.95`, p47 `+88.37/+166.00`, p36 `+129/+1025`. The residual is
+**structured, not noise** — exactly `+1.00` on 26 of 44 `gcc-clang` rows and
+`−1.00` on 28 of 44 `R5−R4` rows (the driver term).
+
+⚠ **THIS BLOCK FIRST SAID *"zero misses at every threshold"* AND THAT WAS A
+SCORING ARTEFACT** (TASK_076, correcting TASK_075_REVIEW and the manager who
+copied it). **The review scored the ORACLE at the same threshold as the
+ESTIMATE** — `truth = |cg| >= th` — which makes misses impossible by
+construction. Against a **fixed** truth threshold, 176 rows:
 
 | threshold | hit | **miss (false OK)** | false alarm |
 |---|---:|---:|---:|
-| 2.0 Ir | 162 | **0** | 14 |
-| 3.0 Ir | 166 | **0** | 10 |
-| 5.0 Ir | 167 | **0** | 9 |
+| **2.0 Ir** | 162 | **0** | 14 |
+| 3.0 Ir | 164 | **2** | 10 |
+| 5.0 Ir | 165 | **2** | 9 |
 
-**Zero misses at every threshold**, and it reproduces every large correction
-independently: p11 `+9815.56/+7116.78`, p08 `−4152.92/−4488.90`, p09
-`+379/+2626`, p13 `−190/−264`, p27 `+120.33/+130.95`, p47 `+88.37/+166.00`,
-p36 `+129/+1025`. The residual is **structured, not noise** — a constant
-`+1.00` on every `gcc-clang` row and `−1.00` on `R5−R4` (the driver term).
-⚠ **Its floor is ±2 Ir (±16 on p07 and p22, whose per-call work is
-data-dependent), so it CANNOT resolve the ±7 `memset` or the +2 PLT thunk
-below.** Use it as the trigger; disassembly or a callee sweep is the refinement.
+**Zero misses holds at 2.0 Ir and nowhere else**; both misses are `p02
+gcc-clang` at exactly `+2.00` — the PLT thunk, i.e. the term the method cannot
+resolve, sitting exactly on the boundary.
+
+**The useful form is three bands, measured, not a single threshold:**
+
+```
+|corr| <  2.00    120 rows    0 real / 120 spurious   <- nothing real hides below the floor
+2.00 .. 16.00      22 rows    8 real /  14 spurious   <- print these with a "?"
+|corr| >= 16.00    34 rows   34 real /   0 spurious   <- smallest is 17.00
+```
+
+⚠ **And the floor is ±2 Ir with a measured max residual of 15.79** (p22) and
+**10.11** (p07) — ~~"±16 on p07 and p22"~~ was this block's own guess and
+**nothing reaches 16**. The method **cannot** resolve the ±7 `memset` or the
++2 PLT thunk below. Use it as the trigger; disassembly or a callee sweep is the
+refinement.
 
 ### The callee column is an ADDITION, never a REPLACEMENT — it is less reproducible than the column it corrects
 

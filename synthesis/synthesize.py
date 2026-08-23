@@ -20,16 +20,34 @@ that re-takes the wall-clock block).  `synthesis/` is in neither glob, and so is
 `results/synthesis.md` -- verified by evaluating both globs literally, not by
 reading the docstring that describes them.
 
-WHAT IT READS.  Committed records only: `results/pNN-*.json` (measurement) and
-`results/gate/pNN-*.json` (gate).  It never builds, never runs a binary and
-never writes a record.  One exception, declared at the top of every table it
-affects: the outward-dispatch LICENCE comes from `synthesis/licence.json`,
-because **no committed record carries the information** -- see `LICENCE_NOTE`.
+WHAT IT READS.  Committed records: `results/pNN-*.json` (measurement) and
+`results/gate/pNN-*.json` (gate).  It never builds, never runs a compiled
+binary and never writes a record.
+
+⚠ **THE CALLEE CORRECTION IS DERIVED FROM COMMITTED RECORDS** -- see
+`CALLEE_NOTE`.  An earlier version of this file printed *"the licence is not in
+the committed records and cannot be derived from them"*, which was false:
+`results/gate/pNN.json::marginal_ir_per_call` is whole-program and therefore
+symbol-independent, so `(marg[A]-marg[B]) - (kex[A]-kex[B])` is the callee
+correction, from files already in `git` (TASK_075_REVIEW B1;
+`.memory/03-measurement.md`, which prescribed exactly this test).
+
+Three things here are NOT derived from a record, each declared where it prints:
+
+  * the LICENCE TAG (`synthesis/licence.json`) -- a disassembly property, a
+    different question from the magnitude, and pinned to the gate
+    `source_sha256` it was taken against;
+  * the CALIBRATION of the derived column against a callgrind sweep
+    (`synthesis/outward_ir.json`) -- evidence for the floor, not a column;
+  * the REVIEWED SEARCH VERDICT (`SEARCH_REVIEWED`), beside a *derived* control
+    census this file computes by running each pattern's `controls/*.py --list`.
 """
 import argparse
 import glob
 import json
 import os
+import re
+import subprocess
 import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -45,22 +63,39 @@ PAIRS = [("safe_naive", "unsafe", "R2-R4"),
          ("safe_tuned", "unsafe", "R3-R4"),
          ("verus", "unsafe", "R5-R4"),
          ("c-gcc", "c-clang", "gcc-clang")]
+# The gate records one `identity` entry per compared pair; p01 ships two at
+# `-O3`.  Anything about "the proof costs zero instructions" is about this one.
+R5_PAIR = "unsafe vs verus"
 
 # --------------------------------------------------------------------------
-# The search state, and why it is a DECLARED table and not a derived one.
+# The search state.  TWO columns, because neither alone is honest.
 #
 # `R3 - R4` differences two rungs whose spellings have been searched to wildly
 # different depths.  A table that puts a well-searched pattern beside an
 # unsearched one and differences both is partly measuring SEARCH EFFORT, and
 # the tree has three measured instances of the difference moving a long way
-# when a side was finally searched (below).  The honest first column is
-# therefore the search state -- but **nothing committed records it**: control
-# registries are heterogeneous and only 8 of 22 patterns have a `--list`
-# (RECAP "Owed" 12).  So each entry below quotes the reviewed sentence it comes
-# from, and every pattern not listed prints `undeclared`, which is the true
+# when a side was finally searched.
+#
+# ⚠ TASK_075_REVIEW M6 prescribed DELETING the declared table and deriving the
+# lever count from `controls/*.py --list` for "the 10 patterns that expose one".
+# **MEASURED (`.temp/p76/list_parse_probe.py`): that cannot be done.**  Ten
+# patterns expose a `--list` and only FIVE of them print a source file at all:
+#
+#     from <file>.rs   p10 p47          <- <file>.rs   p03 p04 p12
+#     NO source column p06 p09 p22 p36 p38
+#
+# and p36 -- the pattern the review cited as the worked example -- is in the
+# second group: its `--list` prints `r3_hdr4  rust`, the LANGUAGE, not the file.
+# Deriving p36's split from the `r3_`/`r4_` NAME PREFIX instead gives 4 R3 and
+# **2** R4, while `.memory/01-ladder.md` finding 23 says **3** R4 -- i.e. the
+# derivation-by-convention rots in the same direction the hand table does, and
+# less visibly.  So: DERIVE what is derivable (`control_census`, below, which
+# degrades to "no source attribution" and can never print a wrong count), and
+# keep the reviewed verdict beside it with every entry cited to a REVIEWED
+# artefact.  A pattern with no entry prints `undeclared`, which is its true
 # state and not a default.
 # --------------------------------------------------------------------------
-SEARCH = {
+SEARCH_REVIEWED = {
     "p01": ("R3 span OWED",
             "RECAP 'Owed' 3: p01 and p08 owe an in-contract R3-side span"),
     "p03": ("R3 span 1 unreviewed measurement; the +5 constant NEVER searched",
@@ -84,34 +119,120 @@ SEARCH = {
             "(fixed-R4 bound, cheapest R3 found) and +10.00 flat (matched "
             "pair), never a single number, and NO pair interval"),
     "p47": ("R4 searched, six levers",
-            ".tasks/TASK_075.md, from p47's delivery"),
+            "`patterns/p47-ct-compare/NOTES.md` §8e, REVIEWED — \"Six R4 "
+            "levers were built, each measured and put through "
+            "`./verus_run.py`\" — and §8e's table has six rows: `unsafe` "
+            "shipped, `u_base`, `u_winu`, `u_end`, `u_win`, `u_ptr`. "
+            "`gen_controls.py --list` registers five `from unsafe.rs`; the "
+            "sixth is the shipped rung. ⚠ TASK_075_REVIEW M6.3 read this as "
+            "four and called the number unsupported; it is supported, and the "
+            "citation — not the figure — was what was wrong"),
 }
 
-LICENCE_NOTE = """\
-**The licence is not in the committed records and cannot be derived from them.**
-`.memory/03-measurement.md`'s rule -- *"does every cell execute the same work
-OUTSIDE the kernel symbol"* -- is a statement about the kernel's callees, and
-the only callee information any record carries is `static.bulk_calls`, which is
-a **whitelist of recognised bulk routines**.  Measured, on the current records:
+# The two bands of the derived column, MEASURED rather than asserted
+# (`.temp/p76/derived_probe.py`, `.temp/p76/bands.txt`; see `CALLEE_NOTE`):
+#   |correction| <  FLOOR      120 rows, ALL spurious -- nothing real hides here
+#   FLOOR .. CONFIDENT          22 rows, 8 real / 14 spurious -- a coin flip
+#   |correction| >= CONFIDENT   34 rows, ALL real, smallest 17.00
+FLOOR = 2.00
+CONFIDENT = 16.00
 
-* `p11`'s four plain C cells record `bulk_calls: []` while their disassembly
-  calls `strlen@plt`, and p11's own headline is a 12.0x glibc-`strlen` library
-  factor (RECAP "Owed" 6: the record predates `asm.py`'s `_BULK_STR_WORDS`);
-* `p11`'s `safe_tuned` calls `CStr::from_bytes_until_nul` **out of line** and no
-  whitelist would ever name it -- that call is worth **+9821.15 Ir/call** and it
-  **reverses** p11's `R3-R4` on `small`;
-* `p47`'s `c-clang` and `safe_naive` call `bcmp`, which `asm.is_bulk_symbol`
-  does not recognise, so the record says their routine lists differ from
-  `c-gcc`'s `memcmp` when the pattern's own source says they are the same
-  glibc entry point;
-* `p09`'s `c-gcc` calls `__popcountdi2` (378.00 / 2625.00 Ir/call) and `p27`'s
-  `unsafe` dispatches through `call *%r12`; neither is a bulk routine and
-  neither appears anywhere in a record.
+BULK_CALLS_NOTE = """\
+⚠ **`static.bulk_calls` is a WHITELIST, and on three patterns the record it
+produces is wrong about what the cell calls.** This is the one genuinely new
+defect the licence work turned up, it is in `harness/`, and it is **not fixed
+here** -- reported for the owed `harness/` batch:
 
-So this file reads the licence from `synthesis/licence.json`, emitted by
-`synthesis/licence.py` from the built `-O3 isolated` matrix, and it prints
-`LICENCE STALE` for any pattern whose gate `source_sha256` has moved since.
-Closing this properly is harness work: see `synthesis/README.md`.
+* **`asm.is_bulk_symbol('bcmp')` is `False`** (measured), so
+  `results/p47-ct-compare.json` records `c-gcc: ['memcmp@plt']`, `c-clang: []`
+  and `safe_naive: []` for three cells that call **the same glibc entry point**
+  -- both names resolve to address `0x188320`, and p47's own reviewed
+  `NOTES.md` says clang rewrites `memcmp(...) == 0` into `bcmp`.
+* **`__popcountdi2` is not a bulk name either**, so all eight of p09's cells
+  record `[]` while `c-gcc` calls libgcc's software popcount at
+  **378.00 / 2625.00 `Ir` per call**.
+* **p11's four plain C cells record `[]` while calling `strlen@plt`**, which
+  `is_bulk_symbol` *does* recognise -- the record predates `asm.py`'s
+  `_BULK_STR_WORDS` and only the two `-h` cells are populated. (RECAP "Owed"
+  6's follow-up sentence says p11's `bulk_calls` *are* populated; it is wrong
+  as written.)
+
+**And the four "adjacent findings" this work reported are, three of them,
+already published by the patterns they name** (TASK_075_REVIEW M5) -- so they
+are citation fixes and cost no gate re-run:
+
+| finding | disclosed where |
+|---|---|
+| p27 `R2-R4`/`R3-R4` understated by `+120.33 / +130.95` | `p27/NOTES.md` §5e, as a **closed** decomposition summing to `+230.0694 / +792.7458` |
+| p09's gcc column carries `__popcountdi2`, `378 / 2625` | `p09/NOTES.md` §2: *"Quote `marginal_ir_per_call` for anything involving a gcc cell"* |
+| p47's `R2-R4` moves (`bcmp`) | `p47/NOTES.md` §1, "The call targets, resolved by GOT relocation and `nm`" |
+| p11's `R3-R4` reverses | `p11/NOTES.md:143`, and the boilerplate in 22 of 22 `results/tables/*.md` |
+| **p27's `gcc-clang` reverses on `small`, `-25.02 -> +15.00`** | **new** |
+
+⚠ **And p27's mechanism, as this file first stated it, was wrong.** It said
+*"p27's `unsafe` dispatches through `call *%r12`"* was the cause of the
+`+120.33`. Measured outward `Ir` on `small`: `unsafe` pays `dealloc 917.33`;
+`safe_naive` pays `dealloc 280.93 + drop_glue 756.73`. **The cost is the SAFE
+side's out-of-line `drop_glue::<[Option<Box<u8>>; 32]>`**, not the unsafe
+side's indirect call -- which is a second call to `__rust_dealloc` already
+inside p27's decomposition. `.memory/01-ladder.md` finding 19 had this right
+before this file was written and was re-confirmed against it.
+*A right answer with a wrong justification propagates exactly like a wrong
+answer* (`.memory/03-measurement.md`).
+"""
+
+CALLEE_NOTE = """\
+**The callee correction below is DERIVED FROM COMMITTED RECORDS.**
+`results/gate/pNN.json` carries **`marginal_ir_per_call`** for every
+`(cell, opt, mode, input)`. That figure is whole-program -- the `n_iters`
+200-minus-100 construction -- and therefore *symbol-independent*, so it already
+contains exactly the callee work the kernel-exclusive column drops. For two
+cells whose driver is compiled the same way the driver term cancels, and
+
+```
+(marg[A] - marg[B]) - (kex[A] - kex[B])   =   the callee correction
+```
+
+is computable from files already in `git`. This is `.memory/03-measurement.md`'s
+own *"author-checkable test, which needs no disassembly"*, and the same
+arithmetic is the generated boilerplate in 22 of 22 `results/tables/*.md`.
+
+⚠ **An earlier version of this file said the opposite** -- *"the licence is not
+in the committed records and cannot be derived from them"* -- and scheduled two
+sidecars on the strength of it (TASK_075_REVIEW B1). Nothing in the tables moved;
+the provenance sentence was the defect.
+
+⚠ **ITS FLOOR IS 2.00 `Ir` AND THAT IS THE ONLY THRESHOLD AT WHICH IT MISSES
+NOTHING.** TASK_075_REVIEW B1 and `.memory/03-measurement.md` report *"zero
+misses at every threshold (2.0 -> 14 false alarms, 3.0 -> 10, 5.0 -> 9)"*.
+Re-measured (`.temp/p76/derived_probe.py`), scoring the oracle at 5e-3 rather
+than at the same threshold as the estimate:
+
+| threshold | hit | **miss (false OK)** | false alarm |
+|---|---:|---:|---:|
+| **2.00 Ir** | 162 | **0** | 14 |
+| 3.00 Ir | 164 | **2** | 10 |
+| 5.00 Ir | 165 | **2** | 9 |
+
+The review's version scores `truth = |correction| >= threshold`, which excuses
+the estimator from finding exactly the corrections it is too coarse to find.
+Both misses are `p02 gcc-clang`, both worth exactly **+2.00** -- one libc call
+per kernel call through gcc's PLT thunk, and the only true-but-small correction
+in the tree. **So this file uses 2.00, and the smallest real correction sits
+exactly on it.**
+
+**What the derived column cannot do.** It does not name a callee, and it cannot
+resolve the +-7.00 `memset` term or the +2.00 PLT thunk. **Its residual is
+structured, not noise**: exactly **+1.00 on 26 of 44 `gcc-clang` rows** and
+exactly **-1.00 on 28 of 44 `R5-R4` rows** -- the driver-codegen term, which is
+what puts the floor at 2.00 rather than at 0. It is **not** subtracted here; a
+fitted correction is not a measurement.
+
+**Where the mechanism comes from instead**: the licence column, which is a
+disassembly property with zero run noise and answers a *different* question --
+*may this row be differenced at all* -- and names the callee when the answer is
+no. The two disagree on p03/p04 `R2-R4` (`LICENSED`, derived +7.00) and that
+disagreement **is** the `memset` finding, not a defect in either.
 """
 
 
@@ -152,29 +273,175 @@ def fmt(x, w=11, p=2):
     return f"{x:{w}.{p}f}" if x is not None else f"{'-':>{w}}"
 
 
-def corrected(outw, pat, lab):
-    """`kernel + callees` for this pair, printed ONLY where it differs from the
-    kernel-exclusive column -- so a blank cell means "measured, and the callee
-    column changes nothing", not "not measured"."""
-    p = outw.get(pat) or {}
-    cells = []
-    for inp in ("small.bin", "large.bin"):
-        e = ((p.get(inp) or {}).get("pairs") or {}).get(lab)
-        cells.append(None if e is None else (e["kernel_plus_callees"],
-                                             e["moves_by"]))
-    if all(c is None for c in cells):
-        return "not measured"
-    if all(c is not None and abs(c[1]) < 5e-3 for c in cells):
-        return ""
-    out = []
-    for c, nm in zip(cells, ("small", "large")):
-        if c is None:
-            out.append(f"{nm} -")
-        elif abs(c[1]) < 5e-3:
-            out.append(f"{nm} 0.00")
+def marginal(gates, pat, cell, inp, opt="O3", mode="isolated"):
+    """`results/gate/pNN.json::marginal_ir_per_call` -- whole-program, so it
+    carries the callee work the kernel-exclusive column drops."""
+    m = (gates.get(pat) or {}).get("marginal_ir_per_call") or {}
+    return m.get(f"{cell}/{opt}/{mode}/{inp}")
+
+
+def derived_correction(meas, gates, pat, a_, b_, inp):
+    """The callee correction for one pair on one blob, FROM COMMITTED RECORDS.
+
+    `(marg[A] - marg[B]) - (kex[A] - kex[B])`.  Returns `None` when either
+    record is missing rather than guessing."""
+    ka = ir_per_call(meas[pat], a_, "O3", "isolated", inp) if pat in meas else None
+    kb = ir_per_call(meas[pat], b_, "O3", "isolated", inp) if pat in meas else None
+    ma, mb = marginal(gates, pat, a_, inp), marginal(gates, pat, b_, inp)
+    if None in (ka, kb, ma, mb):
+        return None
+    return (ma - mb) - (ka - kb)
+
+
+def derived(meas, gates, pat, a_, b_):
+    """The `corrected (derived)` cell: the corrected difference with the
+    correction in parentheses, on both blobs.  A dash means the derived
+    correction is inside the +-2.00 Ir floor, where this route cannot tell it
+    from zero -- NOT that the row was not computed."""
+    out, any_move, any_row = [], False, False
+    for inp, nm in (("small.bin", "small"), ("large.bin", "large")):
+        c = derived_correction(meas, gates, pat, a_, b_, inp)
+        k = ir_per_call(meas[pat], a_, "O3", "isolated", inp)
+        k2 = ir_per_call(meas[pat], b_, "O3", "isolated", inp)
+        if c is None or k is None or k2 is None:
+            out.append(f"{nm} no record")
+            continue
+        any_row = True
+        if abs(c) < FLOOR:
+            out.append(f"{nm} <{FLOOR:.2f}")
+        elif abs(c) < CONFIDENT:
+            any_move = True
+            out.append(f"{nm} {k - k2 + c:+.2f} ({c:+.2f}) **?**")
         else:
-            out.append(f"**{nm} {c[0]:+.2f}** ({c[1]:+.2f})")
-    return " / ".join(out)
+            any_move = True
+            out.append(f"**{nm} {k - k2 + c:+.2f}** ({c:+.2f})")
+    if not any_row:
+        return "no record"
+    return " / ".join(out) if any_move else ""
+
+
+# --------------------------------------------------------------------- census
+_CTL_SRC = re.compile(r"^\s*(\w[\w.]*)\s+(?:from|<-)\s+(\S+)")
+_RUNG_OF = {"safe_naive.rs": "R2", "safe_tuned.rs": "R3", "unsafe.rs": "R4",
+            "verus.rs": "R5"}
+
+
+def control_census(pat_dir, timeout=60):
+    """DERIVED control census: run every `controls/*.py` that advertises a
+    `--list` and count the entries it attributes to each rung's source file.
+
+    It can print three things and never a wrong count: the attribution, or
+    `--list, no source attribution`, or `no --list`.  ⚠ Five of the ten
+    patterns with a `--list` are in the middle case (p06 p09 p22 p36 p38) --
+    which is why this does not replace `SEARCH_REVIEWED`."""
+    scripts = [s for s in sorted(glob.glob(os.path.join(pat_dir, "controls",
+                                                        "*.py")))
+               if "--list" in open(s, errors="replace").read()]
+    if not scripts:
+        return "no `--list`"
+    counts, entries = {}, 0
+    for s in scripts:
+        try:
+            r = subprocess.run([sys.executable, s, "--list"], timeout=timeout,
+                               capture_output=True, text=True, cwd=REPO)
+        except (subprocess.TimeoutExpired, OSError) as e:
+            return f"`--list` failed: {type(e).__name__}"
+        if r.returncode != 0:
+            return f"`--list` exit {r.returncode}"
+        for line in r.stdout.splitlines():
+            m = _CTL_SRC.match(line)
+            if not m:
+                continue
+            entries += 1
+            k = _RUNG_OF.get(os.path.basename(m.group(2)),
+                             os.path.basename(m.group(2)))
+            counts[k] = counts.get(k, 0) + 1
+    if not counts:
+        return "`--list`, **no source attribution**"
+    return ", ".join(f"{k} {counts[k]}" for k in sorted(counts))
+
+
+def calibrate(meas, gates, outw):
+    """Score the DERIVED column against the callgrind sidecar, live.
+
+    This is the sidecar's only remaining job in this file: it is the evidence
+    for the floor, not a published column.  A `miss` is the dangerous
+    direction -- the derived route saying `< floor` where callgrind measured a
+    real correction."""
+    if not outw:
+        return None
+    s = {"rows": 0, "hit": 0, "miss": 0, "false alarm": 0}
+    # bands[name] = [rows, real, spurious, smallest |correction| in the band]
+    bands = {b: [0, 0, 0, None] for b in ("low", "mid", "high")}
+    resid, misses = [], []
+    for pat in sorted(meas):
+        for inp in ("small.bin", "large.bin"):
+            for a_, b_, lab in PAIRS:
+                o = (((outw.get(pat) or {}).get(inp) or {})
+                     .get("pairs") or {}).get(lab)
+                c = derived_correction(meas, gates, pat, a_, b_, inp)
+                if o is None or c is None:
+                    continue
+                s["rows"] += 1
+                resid.append(abs(c - o["moves_by"]))
+                pred, truth = abs(c) >= FLOOR, abs(o["moves_by"]) >= 5e-3
+                if pred == truth:
+                    s["hit"] += 1
+                elif truth and not pred:
+                    s["miss"] += 1
+                    misses.append(f"{pat} {inp[:-4]} {lab} "
+                                  f"{o['moves_by']:+.2f}")
+                else:
+                    s["false alarm"] += 1
+                b = bands["low" if abs(c) < FLOOR
+                          else "mid" if abs(c) < CONFIDENT else "high"]
+                b[0] += 1
+                b[1 if truth else 2] += 1
+                b[3] = abs(c) if b[3] is None else min(b[3], abs(c))
+    resid.sort()
+    s["max_resid"] = resid[-1] if resid else None
+    s["p95_resid"] = resid[int(.95 * len(resid))] if resid else None
+    s["median_resid"] = resid[len(resid) // 2] if resid else None
+    s["misses"] = misses
+    s["bands"] = bands
+    return s
+
+
+def calibrate_licence(meas, lic, outw):
+    """Score the LICENCE TAG against the same sidecar, live.
+
+    `LICENSED` is a prediction that including the callees moves the pair
+    difference by 0.00.  ⚠ This is recomputed on every run rather than quoted,
+    because the score is a property of the sweep AND of the rule, and the rule
+    has been corrected once already (TASK_075_REVIEW M4)."""
+    if not outw or not lic:
+        return None
+    s = {"hit": 0, "false LICENSED": 0, "false alarm": 0, "abstain": 0}
+    smallest = None
+    for pat in sorted(meas):
+        for inp in ("small.bin", "large.bin"):
+            for _, _, lab in PAIRS:
+                e = ((lic.get(pat) or {}).get("pairs") or {}).get(lab)
+                o = (((outw.get(pat) or {}).get(inp) or {})
+                     .get("pairs") or {}).get(lab)
+                if e is None or o is None:
+                    continue
+                moves = abs(o["moves_by"]) >= 5e-3
+                v = e["verdict"]
+                if v not in ("LICENSED", "NOT-LIC"):
+                    s["abstain"] += 1
+                    continue
+                if v == "NOT-LIC":
+                    smallest = (abs(o["moves_by"]) if smallest is None
+                                else min(smallest, abs(o["moves_by"])))
+                if (v == "LICENSED") != moves:
+                    s["hit"] += 1
+                elif v == "LICENSED":
+                    s["false LICENSED"] += 1
+                else:
+                    s["false alarm"] += 1
+    s["smallest_NOT-LIC_move"] = smallest
+    return s
 
 
 def whole_mode_census(meas):
@@ -207,10 +474,20 @@ def main():
 
     w("# Cross-pattern synthesis")
     w("")
-    w("Generated by `synthesis/synthesize.py` from **committed records only** "
-      "(`results/pNN-*.json`, `results/gate/pNN-*.json`) plus the licence "
-      "sidecar. It builds nothing and measures nothing. Re-run it after any "
-      "`harness/measure.py --check-stale` that is not `0 STALE`.")
+    w("Generated by `synthesis/synthesize.py` from **committed records** "
+      "(`results/pNN-*.json`, `results/gate/pNN-*.json`). It builds nothing and "
+      "measures nothing. Re-run it after any `harness/measure.py --check-stale` "
+      "that is not `0 STALE`.")
+    w("")
+    w("**Both `Ir` columns are derived from those records, including the callee "
+      "correction** — see §2. Three things are not, and each says so where it "
+      "prints: the **licence tag** (`synthesis/licence.json`, a disassembly "
+      "property pinned to the gate `source_sha256`), the **calibration** of the "
+      "derived correction against a callgrind sweep "
+      "(`synthesis/outward_ir.json`, evidence for a floor rather than a "
+      "column), and the **reviewed search verdict**, which prints beside a "
+      "control census this file derives by running each pattern's "
+      "`controls/*.py --list`.")
     w("")
     w(f"Patterns: **{len(meas)}**. Gate records: **{len(gates)}**.")
     w("")
@@ -242,25 +519,56 @@ def main():
     w("**2. The column is kernel-EXCLUSIVE, and its licence is stated per "
       "row.** `.memory/03-measurement.md`: the column is comparable only when "
       "the cells being differenced dispatch the *same* work outside the kernel "
-      "symbol. `LICENSED` means their outward call sets are equal; "
-      "`NOT-LIC` means the difference in this table is **known to be wrong** "
-      "and the corrected value is given where it has been measured; "
-      "`UNDEC` means a cell dispatches through a pointer with no static "
-      "target and the question cannot be settled from the disassembly.")
+      "symbol. The licence tag answers **only** that question — *may this row "
+      "be differenced* — and never *by how much*; the magnitude is §2's derived "
+      "column. Five tags, and **each is a distinct condition**:")
     w("")
-    w("⚠ **And the corrected column is LESS reproducible than the column it "
-      "corrects — measured, not argued.** Two independent callgrind sweeps of "
-      "the same binaries on the same blobs, differing only in the "
-      "`--callgrind-out-file=` path (which is part of *valgrind's* argv and so "
-      "shifts the client's stack): **kernel-exclusive `Ir`/call moved in 0 of "
-      "348 (pattern, input, cell) triples; outward `Ir`/call moved in 6**, all "
-      "±7.00, all glibc `memset` on p03's and p04's `safe_tuned` and `verus` "
-      "cells, and the *sign* is not stable (p03 `safe_tuned` +7.00, p04 "
-      "`verus` −7.00). `.memory/03-measurement.md` predicts exactly this: "
-      "p03's `[0u64; 64]` lowers to a `memset` whose path length moves with "
-      "the array's alignment. **So the callee column is an addition to the "
-      "kernel-exclusive column and never a replacement for it**, and on p03 "
-      "and p04 the kernel-exclusive column is the correct one.")
+    w("| tag | means |")
+    w("|---|---|")
+    w("| `LICENSED` | the two cells' live outward call multisets are **equal** |")
+    w("| `NOT-LIC` | they are not: the difference in this table is **known to "
+      "be wrong**, and the `why` under the table names what only one side calls |")
+    w("| `UNDEC` | **both** sides dispatch through a pointer with no static "
+      "target — a genuine limit of the disassembly |")
+    w("| `NO-KSYM` | a cell has **no kernel symbol** (inlined away), so there "
+      "is no column to license |")
+    w("| `NOT-BUILT` | the `-O3 isolated` binary is **absent** — a tooling "
+      "state, not a property of the pattern. **It cannot appear in this "
+      "table**: `licence.py --emit` refuses to write a sidecar containing one |")
+    w("")
+    w("⚠ **The last two used to print as `UNDEC` under this legend's first "
+      "sentence** (TASK_075_REVIEW M2). `.temp/build/` is gitignored and "
+      "`CLAUDE.md` rule 1 tells agents to delete exactly those blobs, so "
+      "re-emitting the licence on a cleaned tree turned all 88 verdicts into "
+      "`UNDEC` — and this file republished them under a legend asserting all "
+      "88 dispatched through an unresolvable pointer, with nothing failing "
+      "anywhere because none of it is gate-checked. Now `--emit` exits **2** "
+      "and writes nothing, naming the cells.")
+    w("")
+    w("⚠ **The callee-inclusive figure is LESS reproducible than the "
+      "kernel-exclusive one it corrects — measured, not argued.** Two "
+      "independent callgrind sweeps of the same binaries on the same blobs, "
+      "differing only in **one 64-byte environment variable**: "
+      "**kernel-exclusive `Ir`/call moved in 0 of 348 (pattern, input, cell) "
+      "triples; outward `Ir`/call moved in 11** — p03 and p04 `safe_tuned` on "
+      "both blobs (`50.00 → 43.00`, glibc `memset`'s alignment-dependent path "
+      "length) and **p08 on seven cells** (`+0.0627`/`+0.0676` on `small`, "
+      "`+0.0065` on `large` `unsafe`). p08's offset cancels within a language "
+      "and so moves no verdict today; p03's and p04's does not.")
+    w("")
+    w("⚠ **The knob that produced the first version of this paragraph was "
+      "INERT.** It said the two sweeps *\"differ only in the "
+      "`--callgrind-out-file=` path, which is part of valgrind's argv and so "
+      "shifts the client's stack\"*. Valgrind **strips its own options before "
+      "building the client stack**: replicating the two paths at their exact "
+      "lengths (97 and 99 characters) gives identical kernel-exclusive *and* "
+      "identical outward figures. The environment block is the knob that works "
+      "(`.memory/03-measurement.md`, `check.py::check_marginal_ir`), and it is "
+      "**scatter, not a trend**. The published `6 of 348` was a floor and its "
+      "exposed-pattern list was short by one (TASK_075_REVIEW M1). "
+      "**So the callee correction is an addition to the kernel-exclusive "
+      "column and never a replacement for it**, and on p03 and p04 the "
+      "kernel-exclusive column is the correct one.")
     w("")
     w("**3. `Ir` is not time, and three named mechanisms make them disagree "
       "in DIRECTION**: `rep`-string instructions counted once per repetition "
@@ -278,6 +586,17 @@ def main():
       "libgcc's software popcount, absent from clang) and a 2-instruction PLT "
       "thunk on every gcc libc call (below).")
     w("")
+    w("⚠ **And a per-process constant hiding inside a per-call column, which "
+      "is why the thunk rows never read as a clean multiple of 2.00.** A "
+      "one-off lazy-binding / IFUNC resolver call (**725–794 `Ir` per "
+      "process**, present in clang's and rustc's binaries and not gcc's) is "
+      "charged to whichever call site triggers it, and it scales as "
+      "`1/n_iters` — **0.0065 … 0.5293 `Ir` per call** across this tree. It is "
+      "why p11's thunk term reads `+299.87` where `150 × 2.00 = 300.00`, and "
+      "it is the shape `.memory/03-measurement.md` already condemns for `ns`. "
+      "The `large`-blob rows are quieter than the `small` ones for the same "
+      "reason.")
+    w("")
     w("Three standing rules govern every figure: **never the word "
       "\"minimum\"** -- write *cheapest found* and name the input, because on "
       "p03 and p16 the cheapest spelling changes with the blob; **no pair "
@@ -290,6 +609,9 @@ def main():
 
     # ------------------------------------------------------------ levels
     w("## 1. Kernel-exclusive `Ir` per call, `-O3 isolated`")
+    w("")
+    w("*A `-` is a cell the pattern does not ship, not a missing measurement: "
+      "the `-h` columns are the hardened C rungs, and p01 ships none.*")
     w("")
     w("| pattern | input | " + " | ".join(RUNGS) + " |")
     w("|---|---|" + "---:|" * len(RUNGS))
@@ -306,26 +628,110 @@ def main():
     # ------------------------------------------------------------ differences
     w("## 2. The differences the project argues about -- with their licence")
     w("")
-    w(LICENCE_NOTE)
+    w(CALLEE_NOTE)
+    w("")
+    cal = calibrate(meas, gates, outw)
+    if cal is None:
+        w(f"⚠ **`synthesis/outward_ir.json` is absent, so the bands are "
+          f"QUOTED and not recomputed.** Every corrected figure below is still "
+          f"present — the derived column needs no sidecar at all. As last "
+          f"measured (TASK_076, 176 rows): `<{FLOOR:.2f}` **120 rows, 0 real**; "
+          f"`{FLOOR:.2f}–{CONFIDENT:.2f}` **22 rows, 8 real / 14 spurious**; "
+          f"`≥{CONFIDENT:.2f}` **34 rows, all real, smallest 17.00**. "
+          f"Re-emit the sidecar (`synthesis/outward_ir.py --emit`, ~4m40s) to "
+          f"make this line live again.")
+    else:
+        w(f"**Calibration, recomputed on every run of this file** — the "
+          f"derived column scored against `synthesis/outward_ir.json`, a "
+          f"callgrind caller→callee sweep, at the {FLOOR:.2f} `Ir` floor: "
+          f"**{cal['rows']} rows, {cal['hit']} hit, {cal['miss']} miss "
+          f"(the dangerous direction), {cal['false alarm']} false alarm**; "
+          f"residual median **{cal['median_resid']:.2f}**, p95 "
+          f"**{cal['p95_resid']:.2f}**, max **{cal['max_resid']:.2f}**."
+          + (f" ⚠ Misses: {', '.join(cal['misses'])}." if cal["misses"] else ""))
+        w("")
+        w("**So the column has three bands, and they are measured on every "
+          "run rather than chosen** — each row sorted by `|correction|` "
+          "against whether the sweep says the row moves at all:")
+        w("")
+        w("| band | rows | real | spurious | smallest \\|correction\\| | "
+          "reading |")
+        w("|---|---:|---:|---:|---:|---|")
+        for key, lo, hi, mark, read in (
+                ("low", None, FLOOR, "blank / `<2.00`",
+                 "**safe**: nothing real hides below the floor"),
+                ("mid", FLOOR, CONFIDENT, "marked **?**",
+                 "**a coin flip — do not quote alone**"),
+                ("high", CONFIDENT, None, "**bold**",
+                 "**every one is real**")):
+            n, real, spur, small = cal["bands"][key]
+            rng = (f"< {hi:.2f}" if lo is None
+                   else f"≥ {lo:.2f}" if hi is None
+                   else f"{lo:.2f} … {hi:.2f}")
+            w(f"| `{rng}` ({mark}) | {n} | {real} | {spur} | "
+              + (f"{small:.2f}" if small is not None else "-") + f" | {read} |")
+        w("")
+        w("⚠ **The middle band is where p03, p04, p07 and p22 live**, and on "
+          "p03 and p04 `R5-R4` the derived route gets the `memset` term's "
+          "**sign** wrong (`+6.00` derived against `−7.00` measured) while "
+          "still correctly saying *something is there*. Treat a **?** as "
+          "*\"look with the licence or a callgrind run\"*, never as a figure.")
+        w("")
+        w("⚠ **That sidecar is the only thing in this file with no staleness "
+          "pin**: `licence.json` carries the gate `source_sha256` it was taken "
+          "against and prints `LICENCE STALE` on a mismatch, but "
+          "`outward_ir.json` carries nothing, and re-emitting it costs 352 "
+          "callgrind runs against a fully built `.temp/build/`. That is "
+          "precisely why it calibrates a column here and no longer **is** one.")
+        w("")
+        lc = calibrate_licence(meas, lic, outw)
+        if lc:
+            w(f"**And the LICENCE TAG scored against the same sweep, also "
+              f"recomputed here**: **{lc['hit']} hit, "
+              f"{lc['false LICENSED']} false `LICENSED` (the dangerous "
+              f"direction), {lc['false alarm']} false alarm, "
+              f"{lc['abstain']} abstain**. The smallest movement under a "
+              f"`NOT-LIC` verdict is "
+              f"**{lc['smallest_NOT-LIC_move']:.2f} `Ir`/call**, so "
+              f"*0 false alarms* is robust to any tolerance below that and is "
+              f"not an artefact of the 5e-3 cut.")
+            w("")
+            w("⚠ **`0 false alarms` is a statement about this sweep, not about "
+              "the rule** (TASK_075_REVIEW M4) — which is why this line is "
+              "recomputed rather than quoted. Correcting one thing the rule "
+              "got right for a contradicted reason (`kernel.cold`, below) "
+              "moved the score from `156 / 10 / 0 / 10` to "
+              "`154 / 12 / 0 / 10` **in this task**, by converting p27's "
+              "`gcc-clang` from a lucky `NOT-LIC` into an honest false "
+              "`LICENSED`. The false-alarm zero survived; the hit count did "
+              "not. A second sweep under a 64-byte-longer environment block "
+              "reads `152 / 14 / 0 / 10`, the excess being p03's and p04's "
+              "`memset` term — **so the published triple is one draw and "
+              "`0 false alarms` is the part that holds across all of them.**")
+    w("")
+    w(BULK_CALLS_NOTE)
     w("")
     for a_, b_, lab in PAIRS:
         show_search = lab in ("R2-R4", "R3-R4")
         w(f"### `{lab}`  (`{a_}` - `{b_}`)")
         w("")
-        w("*`corrected` is blank when the callee column was measured and "
-          "changes the difference by 0.00 — blank means measured-and-equal, "
-          "not unmeasured. ⚠ On **p03** and **p04** a blank is run-dependent: "
-          "their `memset` term is worth ±7.00 and does not reproduce between "
-          "sweeps (limit 2).*")
+        w(f"*`corrected (derived)` is blank when **both** blobs' derived "
+          f"corrections are inside the ±{FLOOR:.2f} `Ir` floor; a cell marked "
+          f"**?** is in the {FLOOR:.2f}–{CONFIDENT:.2f} band and means *look "
+          f"further*, not a figure; **bold** is ≥{CONFIDENT:.2f}. The three "
+          f"bands are scored above. ⚠ On **p03** and **p04** the `memset` "
+          f"term is worth ±7.00 and does not reproduce between environments "
+          f"(limit 2).*")
         w("")
         if show_search:
             w("⚠ The last column is the **R3/R4 spelling search state**, and it "
               "is the reason this table cannot be read as a per-pattern "
               "property: see claim 2 in §5.")
             w("")
-        w("| pattern | small | large | licence | corrected (kernel+callees)"
+        w("| pattern | small | large | licence | corrected (derived)"
           + (" | R3/R4 search state |" if show_search else " |"))
         w("|---|---:|---:|---|---|" + ("---|" if show_search else ""))
+        whys = []
         for pat in sorted(meas):
             d = meas[pat]
             v = [None, None]
@@ -341,17 +747,39 @@ def main():
             if pl.get("gate_source_sha256") and pat in gates and \
                     pl["gate_source_sha256"] != gates[pat].get("source_sha256"):
                 verd = "LICENCE STALE"
-            corr = corrected(outw, pat, lab)
-            s = SEARCH.get(pat)
+            # ⚠ Include LICENSED rows whose `why` carries an UNPRICED warning:
+            # p27's `gcc-clang` is exactly the row where a LICENSED verdict is
+            # known to be wrong, and dropping its `why` would hide that.
+            if entry.get("why") and (verd != "LICENSED"
+                                     or "UNPRICED" in entry["why"]):
+                whys.append(f"- **{pat}** `{verd}` — {entry['why']}")
+            corr = derived(meas, gates, pat, a_, b_)
+            s = SEARCH_REVIEWED.get(pat)
             w(f"| {d['pattern']} | {fmt(v[0], 1)} | {fmt(v[1], 1)} | {verd} "
               f"| {corr} |"
               + (f" {s[0] if s else 'undeclared'} |" if show_search else ""))
         w("")
+        if whys:
+            w(f"⚠ **Why each non-`LICENSED` row is not licensed, plus every "
+              f"`LICENSED` row carrying an unpriced term** — the `why` string "
+              f"`licence.py` recorded. An earlier version of this file printed "
+              f"the tag and dropped this, which is how three different "
+              f"conditions came to share one tag (limit 2). "
+              f"`⚠ UNPRICED` counts **live** `@plt` sites and means the row "
+              f"carries gcc's 2-instruction PLT thunk at `+2.00 Ir` per "
+              f"*dynamic* libc call — a count no static check can have:")
+            w("")
+            for x in whys:
+                w(x)
+            w("")
         if lab == "gcc-clang":
-            w("⚠ **This is the pair in trouble, not `R3-R4`.** 7 of 22 are "
-              "`NOT-LICENSED` and 1 more is undecidable — every C-vs-C "
-              "statement in the tree runs through this column. Two gcc-only "
-              "terms, both measured here and neither previously recorded:")
+            tags = [((lic.get(p) or {}).get("pairs") or {})
+                    .get(lab, {}).get("verdict") for p in sorted(meas)]
+            w(f"⚠ **This is the pair in trouble, not `R3-R4`.** "
+              f"{tags.count('NOT-LIC')} of {len(meas)} are `NOT-LIC` and "
+              f"{tags.count('UNDEC')} more is undecidable — every C-vs-C "
+              f"statement in the tree runs through this column. Two gcc-only "
+              f"terms, both measured here and neither previously recorded:")
             w("")
             w("* **`__popcountdi2`, p09** — gcc emits a call to libgcc's "
               "software popcount that clang inlines; **378.00 / 2625.00 "
@@ -371,6 +799,38 @@ def main():
               "argument for publishing both columns, not for replacing one "
               "with the other.")
             w("")
+            w("⚠ **Two `gcc-clang` verdicts were right for reasons the "
+              "measurement contradicts** (TASK_075_REVIEW M4), and the thunk "
+              "is what actually carried both. It is a **dynamic** term — "
+              "`2.00 × libc calls per kernel call` — and the licence is a "
+              "**static** check, so it cannot see it at all.")
+            w("")
+            w("* **p27** was `NOT-LIC` because *\"only `c-gcc` calls "
+              "`kernel.cold`\"*. `kernel.cold`'s entire body is "
+              "`call abort@plt` — it executes **zero** times in any accepted "
+              "run — **and it matches `measure.py::_sum_rows`'s own kernel "
+              "needle** `(?:^|::)kernel(?:$|[^A-Za-z0-9_])`, so if it ever "
+              "executed its cost would land *inside* `kernel_exclusive_ir`, "
+              "not outside it. It cannot make the column incomparable in "
+              "either state. `licence.py` now filters kernel siblings, and "
+              "**p27's `gcc-clang` is `LICENSED` — which is an honest false "
+              "`LICENSED`**, because the row does move, by `+40.02` = 20 libc "
+              "calls × 2.00, all of it thunk.")
+            w("* **p47** is `NOT-LIC` on `memcmp@plt` against `bcmp@plt`. With "
+              "call counts those are **literally the same address "
+              "`0x188320`** — glibc aliases them and p47's own reviewed "
+              "`NOTES.md` says clang rewrites `memcmp(...) == 0` into `bcmp` — "
+              "and the entire `+7.96` the row moves by is the thunk (4 calls "
+              "× 2.00 − the resolver). The verdict is **kept**: a static check "
+              "cannot know that two dynamic names resolve to one address, and "
+              "an alias whitelist is the shape this check exists to avoid. "
+              "But the `why` no longer stands alone.")
+            w("")
+            w("The `why` strings above now carry an **`⚠ UNPRICED`** clause "
+              "wherever a `gcc-clang` pair has an `@plt` call site, whichever "
+              "way the verdict went. The call **sites** are static and "
+              "countable; the per-call **count** is not.")
+            w("")
 
     # ------------------------------------------------- proof burden and TCB
     w("## 3. Proof burden and trusted base")
@@ -380,7 +840,9 @@ def main():
       "`external_body` / `assume`d items the proof rests on and `TCB lines` "
       "their bodies. **`R4 = R5` identity is the thing the `Ir` column cannot "
       "establish**: quote the digest, not the zero (`.memory/01-ladder.md` "
-      "finding 1).")
+      "finding 1). The `R4=R5 @O3` column is the entry whose `pair` is "
+      f"`{R5_PAIR}` — p01 ships **two** `-O3` identity pairs and an earlier "
+      "version of this file took whichever came first (TASK_075_REVIEW m6).")
     w("")
     w("| pattern | obligations | errors | TCB items | TCB lines | "
       "R4=R5 @O3 | verdict |")
@@ -392,7 +854,8 @@ def main():
         items = vb.get("tcb_items") or []
         lines = sum(i.get("body_lines", 0) for i in items)
         lvl = next((e["level"] for e in g.get("identity", [])
-                    if e.get("opt") == "O3"), "-")
+                    if e.get("opt") == "O3"
+                    and e.get("pair") == R5_PAIR), "-")
         tot_ob += vb.get("verified", 0)
         tot_tcb += len(items)
         tot_lines += lines
@@ -411,6 +874,12 @@ def main():
       "gcc kernel executed 125 019 `Ir` where the 37-instruction LLVM one "
       "executed 87 520. It is here as *assembly*, one of `CLAUDE.md`'s five "
       "axes, not as a proxy for work.")
+    w("")
+    w("*Each cell is `n_fn_nopad`, then `/` and **the first letter of every "
+      "entry in the record's `static.vector_regs`**. Every populated entry in "
+      "the tree today is `[\"xmm\"]`, so the only suffix that appears is `/x`; "
+      "a `/xy` would be `xmm` and `ymm`. No `/` means the record lists no "
+      "vector register. A `-` is a cell the pattern does not ship.*")
     w("")
     w("| pattern | " + " | ".join(f"{r} n/vec" for r in RUNGS) + " |")
     w("|---|" + "---|" * len(RUNGS))
@@ -449,40 +918,66 @@ def main():
             if x != y:
                 bad.append((pat, inp, x - y))
     norel = sorted(p for p, g in gates.items()
-                   if any(e.get("opt") == "O3" and e["level"] != "exact"
+                   if any(e.get("opt") == "O3" and e.get("pair") == R5_PAIR
+                          and e["level"] != "exact"
                           for e in g.get("identity", [])))
     exact = sorted(p for p, g in gates.items()
                    if p not in norel
-                   and any(e.get("opt") == "O3" for e in g.get("identity", [])))
-    # where the callee column breaks the zero, this sweep
+                   and any(e.get("opt") == "O3" and e.get("pair") == R5_PAIR
+                           for e in g.get("identity", [])))
+    # where the callee correction breaks the zero, DERIVED from the records
     broke = []
-    for pat in sorted(outw):
+    for pat in sorted(meas):
         for inp in ("small.bin", "large.bin"):
-            e = ((outw[pat].get(inp) or {}).get("pairs") or {}).get("R5-R4")
-            if e and abs(e["kernel_plus_callees"]) >= 5e-3:
-                broke.append(f"{pat} {inp[:-4]} {e['kernel_plus_callees']:+.2f}")
+            c = derived_correction(meas, gates, pat, "verus", "unsafe", inp)
+            k = ir_per_call(meas[pat], "verus", "O3", "isolated", inp)
+            k2 = ir_per_call(meas[pat], "unsafe", "O3", "isolated", inp)
+            if c is None or k is None or k2 is None or abs(c) < FLOOR:
+                continue
+            broke.append(f"{pat} {inp[:-4]} {k - k2 + c:+.2f}")
     w(f"**Claim 1 -- `R5 - R4 = 0.00` on every row. SCOPED, and it is a "
       f"TAUTOLOGY rather than a result.** Re-derived: **{len(bad)} of "
       f"{rows_seen}** `-O3 isolated` pattern/input rows differ from 0.00. But "
-      f"at `-O3` the gate records `identity: exact` for {len(exact)} patterns "
-      f"and `norel` for {len(norel)} ({', '.join(norel)}) -- and *both* levels "
-      f"force `Ir` equality: `exact` means the machine code is byte-identical, "
-      f"`norel` means it differs only in pc-relative **displacement fields**, "
-      f"which cannot change how many instructions execute. **So p36 being "
-      f"`norel` explains the row rather than breaking it, and the zero is "
-      f"entailed by a check the gate already makes.** Two consequences: the "
-      f"evidence for *\"a proof costs zero instructions\"* is the raw-byte "
-      f"digest, not this column (`.memory/01-ladder.md` finding 1); and the "
-      f"zero is column-specific -- on p16's whole-program **marginal** the "
-      f"same pair reads **-1.00**, the driver's.")
+      f"at `-O3` the gate records `identity: exact` for the `{R5_PAIR}` pair "
+      f"on {len(exact)} patterns and `norel` for {len(norel)} "
+      f"({', '.join(norel)}) -- and *both* levels force `Ir` equality here. "
+      f"`exact` means the machine code is byte-identical, so the entailment is "
+      f"immediate.")
+    w("")
+    w("⚠ **`norel` does NOT entail it in general, and this file used to say it "
+      "did** (TASK_075_REVIEW m3). `md5_fn_norel` **zeroes branch-displacement "
+      "fields**, so `je +0x10` and `je +0x20` normalise to the same digest — a "
+      "`norel` pair *can* differ in control flow and therefore in how many "
+      "instructions execute. What licenses the claim is a **check on the one "
+      f"pattern it applies to**: p36's six differing instruction texts are "
+      "five branches at **identical relative offsets** (`+0xa7 +0x64 +0x8d "
+      "+0x40 +0x64`) plus one rip-relative `lea` to the dispatch table. So the "
+      "zero holds for p36 by inspection, not by entailment.")
+    w("")
+    w("Two consequences: the evidence for *\"a proof costs zero "
+      "instructions\"* is the raw-byte digest, not this column "
+      "(`.memory/01-ladder.md` finding 1); and the zero is column-specific -- "
+      "on p16's whole-program **marginal** the same pair reads **-1.00**, the "
+      "driver's.")
     w("")
     if broke:
-        w(f"⚠ **And the zero does NOT survive the fix §0 debates.** On the "
-          f"kernel+callees column `R5 - R4` is non-zero on "
-          f"{len(broke)} rows -- {', '.join(broke)} -- i.e. *\"the proof "
-          f"costs -7 instructions\"*, from glibc `memset`'s "
+        w(f"⚠ **And the zero does NOT survive the callee correction.** On the "
+          f"derived callee-corrected column `R5 - R4` clears the "
+          f"±{FLOOR:.2f} floor on {len(broke)} rows -- {', '.join(broke)} -- "
+          f"i.e. *\"the proof costs instructions\"* between two "
+          f"**byte-identical** kernels.")
+        w("")
+        w(f"**Every one of those rows is in the uncertain "
+          f"{FLOOR:.2f}–{CONFIDENT:.2f} band, and the two halves resolve "
+          f"differently.** On **p03** and **p04** the callgrind sweep confirms "
+          f"a real term and puts it at **−7.00**, glibc `memset`'s "
           f"alignment-dependent path length between two byte-identical "
-          f"kernels. Which cells carry it changes between sweeps (limit 2).")
+          f"kernels — so the derived `+6.00` has the right existence and the "
+          f"**wrong sign**. On **p02** the sweep measures **0.00**: the "
+          f"derived `−2.00` is the driver residual and nothing else. Which "
+          f"cells carry the `memset` term changes with the environment "
+          f"(limit 2). **The kernel-exclusive zero is the correct reading on "
+          f"all six.**")
         w("")
 
     # claim 2
@@ -497,16 +992,17 @@ def main():
       f"patterns. CONFIRMED as arithmetic, and the reason it was doubted is "
       f"the WRONG reason.**")
     w("")
-    w("| pattern | negative on | licence for `R3-R4` | callee correction | "
-      "search state |")
+    w("| pattern | negative on | licence for `R3-R4` | callee correction "
+      "(derived) | search state |")
     w("|---|---|---|---|---|")
     for pat in sorted(neg):
         pl = (lic.get(pat) or {}).get("pairs", {}).get("R3-R4", {})
-        s = SEARCH.get(pat)
+        s = SEARCH_REVIEWED.get(pat)
         w(f"| {meas[pat]['pattern']} | "
           + ", ".join(f"{i} {v:.2f}" for i, v in neg[pat]) + " | "
           + pl.get("verdict", "-") + " | "
-          + (corrected(outw, pat, "R3-R4") or "no change") + " | "
+          + (derived(meas, gates, pat, "safe_tuned", "unsafe")
+             or f"inside the ±{FLOOR:.2f} floor") + " | "
           + (s[0] if s else "undeclared") + " |")
     w("")
     w("The argument that scheduled this work said the claim rests *\"at its "
@@ -522,10 +1018,35 @@ def main():
       "`memcpy` + `memset`**\"* -- R3 and R4 are grouped **together** in the "
       "sentence being cited, and the two figures p13's rule moved are "
       "`gcc-vs-clang` and **`R2 - R4`**. Likewise p11's 12.0x library factor "
-      "is C-`strlen` against Rust-`memchr`, an **R1-vs-R3** factor. Measured: "
-      "the callee correction to `R3 - R4` is **exactly 0.00** on p10, p12, "
-      "p13 and p18, and non-zero only on **p11**, where `small` does reverse "
-      "(-5768.00 -> +4053.15) and `large` does not (-24503.00 -> -17378.66).")
+      "is C-`strlen` against Rust-`memchr`, an **R1-vs-R3** factor.")
+    w("")
+    w("Derived from committed records, by the arithmetic at the top of this "
+      "section — **no disassembly, no callgrind, no sidecar**:")
+    w("")
+    w("```")
+    w(f"{'':5s} {'':6s} {'kernel-excl':>12s} {'correction':>12s} "
+      f"{'corrected':>12s}")
+    for pat in ("p10", "p11", "p12", "p13", "p18"):
+        for inp in ("small.bin", "large.bin"):
+            c = derived_correction(meas, gates, pat, "safe_tuned", "unsafe", inp)
+            k = ir_per_call(meas[pat], "safe_tuned", "O3", "isolated", inp)
+            k2 = ir_per_call(meas[pat], "unsafe", "O3", "isolated", inp)
+            if c is None or k is None or k2 is None:
+                continue
+            w(f"{pat:5s} {inp[:-4]:6s} {k - k2:12.2f} {c:12.2f} "
+              f"{k - k2 + c:12.2f}"
+              + ("   <- SIGN FLIPS" if (k - k2) * (k - k2 + c) < 0 else ""))
+    w("```")
+    w("")
+    w("**Four of the five named patterns are unaffected, exactly.** Only "
+      "**p11** moves, and only its `small` row reverses. The independent "
+      "callgrind sweep puts p11's correction at `+9821.15 / +7124.34` against "
+      "the derived `+9815.56 / +7116.78` — 0.06% and 0.11% apart, which is the "
+      "one-off resolver term (limit 4) that the marginal construction cancels "
+      "and the single-run figure does not. **So the defect is real and it is "
+      "ONE pattern, not five**, and the pattern the argument called *\"the one "
+      "that established the rule\"* (p13) is a clean 0.00 on both blobs by both "
+      "routes.")
     w("")
     w("⚠ **What the claim does NOT survive is the SEARCH objection, which "
       "nobody raised.** `R3 - R4` differences two rungs searched to wildly "
@@ -553,27 +1074,82 @@ def main():
     # ------------------------------------------------------- provenance
     w("## 6. Where the non-derived columns come from")
     w("")
-    w("Everything above except two columns is computed from "
-      "`results/pNN-*.json` and `results/gate/pNN-*.json`. The exceptions, "
-      "with their provenance:")
+    w("**Both `Ir` columns above are derived from committed records**, "
+      "including the callee correction (§2). Three things are not:")
     w("")
-    w("**Licence** — `synthesis/licence.json`, emitted by "
+    w("**Licence tag and `why`** — `synthesis/licence.json`, emitted by "
       "`synthesis/licence.py` from the built `-O3 isolated` matrix. Each entry "
       "carries the gate `source_sha256` it was taken against; a mismatch "
-      "prints `LICENCE STALE` above instead of a verdict.")
+      "prints `LICENCE STALE` above instead of a verdict. It answers *may this "
+      "row be differenced*, never *by how much* — a different question from "
+      "the derived column, not a second route to it.")
     w("")
-    w("**Corrected (kernel+callees)** — `synthesis/outward_ir.json`, emitted "
-      "by `synthesis/outward_ir.py`, one callgrind run per cell, parsing the "
-      "caller→callee edges the annotation discards.")
+    w("**Calibration of the derived column** — `synthesis/outward_ir.json`, "
+      "emitted by `synthesis/outward_ir.py`, one callgrind run per cell, "
+      "parsing the caller→callee edges the annotation discards. It is scored "
+      "against the derived column on every run of this file (§2) and supplies "
+      "**no published figure**. ⚠ It carries **no staleness pin at all**, "
+      "which is why it is not a column.")
     w("")
-    w("**R3/R4 search state** — hand-maintained in `synthesize.py::SEARCH`, "
-      "because **nothing committed records it**: control registries are "
-      "heterogeneous and only 8 of 22 patterns expose a `--list` "
-      "(RECAP \"Owed\" 12). Every entry quotes its source, and a pattern with "
-      "no entry prints `undeclared`, which is its true state:")
+    w("**R3/R4 search state** — two things side by side, because neither alone "
+      "is honest.")
     w("")
-    for pat in sorted(SEARCH):
-        w(f"- **{pat}** — {SEARCH[pat][0]}  \n  *{SEARCH[pat][1]}*")
+    w("*Derived*, by running each pattern's `controls/*.py --list` (this is "
+      "the only place this file executes anything, and it executes committed "
+      "Python, never a compiled binary):")
+    w("")
+    w("| pattern | controls registered, by source file |")
+    w("|---|---|")
+    for pat in sorted(meas):
+        pdir = os.path.join(REPO, "patterns", meas[pat]["pattern"])
+        w(f"| {pat} | {control_census(pdir)} |")
+    w("")
+    w("⚠ **TASK_075_REVIEW M6 prescribed deriving the lever count this way for "
+      "\"the 10 patterns that expose a `--list`\" and deleting the declared "
+      "table. Measured, that cannot be done.** Ten patterns expose a `--list` "
+      "and **five of them print no source file at all** (p06 p09 p22 p36 p38); "
+      "the other five split two ways (`from x.rs` on p10 and p47, `<- x.rs` on "
+      "p03, p04 and p12). **p36 — the review's own worked example — is in the "
+      "first group**: its `--list` prints `r3_hdr4  rust`, the *language*. "
+      "Deriving p36's split from the `r3_`/`r4_` **name prefix** instead gives "
+      "4 R3 and **2** R4, while `.memory/01-ladder.md` finding 23 says **3** "
+      "R4 — so the derivation-by-convention rots in the same direction the "
+      "hand table does and less visibly. The census above is therefore built "
+      "to degrade to *\"no source attribution\"* rather than to a wrong count.")
+    w("")
+    w("*Declared*, in `synthesize.py::SEARCH_REVIEWED`, every entry cited to a "
+      "**reviewed** artefact. A pattern with no entry prints `undeclared`, "
+      "which is its true state:")
+    w("")
+    for pat in sorted(SEARCH_REVIEWED):
+        w(f"- **{pat}** — {SEARCH_REVIEWED[pat][0]}  \n  "
+          f"*{SEARCH_REVIEWED[pat][1]}*")
+    w("")
+    w("⚠ **Three corrections to this section's own provenance, and the "
+      "paragraph that carried them predicted exactly this rot** "
+      "(TASK_075_REVIEW M6, two of whose three items do not survive "
+      "re-checking):")
+    w("")
+    w("1. **`8 of 22` was wrong and is gone.** RECAP records *\"8 of **20** "
+      "patterns have a `--list`\"*, from when the tree had 20 patterns; the "
+      "synthesis re-based the denominator to 22 and did not recount the "
+      "numerator. Measured: `grep -l -- '--list' patterns/*/controls/*.py` is "
+      "**11 files across 10 patterns** (p03 p04 p06 p09 p10 p12 p22 p36 p38 "
+      "p47). The table above now derives it instead of quoting it.")
+    w("2. **The `RECAP \"Owed\" 12` citation was RIGHT and the review's "
+      "correction to it is wrong.** RECAP item 12 spans `RECAP.md:1808-1863` "
+      "(item 13 opens at `:1864`) and the `--list` census at `:1847-1852` is "
+      "inside it. RECAP \"Owed\" **6** is the `source_sha256` item, whose tail "
+      "is the p11 `bulk_calls` sentence — which is a *different* citation this "
+      "file also makes, correctly. The two were swapped.")
+    w("3. **`p47`'s \"six levers\" checks out, and its citation did not.** "
+      "The figure was cited to `.tasks/TASK_075.md`, unreviewed manager prose, "
+      "and that was the defect. The number is supported by "
+      "`patterns/p47-ct-compare/NOTES.md` §8e — *\"Six R4 levers were "
+      "built\"*, a six-row table — and `gen_controls.py --list` registers five "
+      "`from unsafe.rs`, the sixth being the shipped rung. TASK_075_REVIEW "
+      "M6.3 counted the four non-baseline rows and called the figure "
+      "unsupported.")
     w("")
 
     txt = "\n".join(L) + "\n"

@@ -1,15 +1,30 @@
 #!/usr/bin/env python3
-"""Price the work the kernel DISPATCHES OUTWARD -- the number a licence cannot give.
+"""Price the work the kernel DISPATCHES OUTWARD -- a callgrind caller->callee sweep.
 
-⚠ **PROTOTYPE, parked here deliberately.**  `.tasks/TASK_075.md` §0 asks whether
-the callee column should be *recorded*, computed *on demand*, or replaced by a
-*static licence*.  `synthesis/licence.py` is the static check; this is the
-on-demand tool, and the two are complements rather than alternatives:
+⚠ **THIS IS NO LONGER A COLUMN IN THE ARTEFACT.**  `results/synthesis.md`
+publishes the callee correction **derived from committed records**
+(`results/gate/pNN.json::marginal_ir_per_call`; see
+`synthesis/synthesize.py::CALLEE_NOTE`), because that route is recomputed on
+every run and needs no build, no callgrind and no sidecar.  What this file
+still does, and what nothing else can:
 
-  * the licence says **"this row is quotable"** and costs ~2 s for the tree;
-  * it does **not** say what the number would be if you corrected it, and on
-    p11 the correction **reverses the sign** (`R3 - R4` on `small`:
-    -5768.00 kernel-exclusive, **+4053.15** with the callee).
+  * it is the **oracle that calibrates** the derived column.  `synthesize.py`
+    scores against it live and prints the three measured bands -- below
+    2.00 `Ir` nothing real hides, 2.00..16.00 is a coin flip, at or above
+    16.00 every row is real.  Those numbers are this file's whole remaining
+    job in the artefact.
+  * it **names the callee and now counts the calls**, which the derived route
+    cannot do at all.
+
+Its soundness as an oracle was established with two purpose-built probes
+(TASK_075_REVIEW A0): a tail-`jmp` into a helper is still recorded as a
+`calls=` edge, so the tail-call blind spot does not exist; and a callee reached
+from two call sites plus transitively sums to exactly
+`callgrind_annotate --inclusive=yes`, counted once.
+
+⚠ **It carries no staleness pin**, unlike `synthesis/licence.json`, and
+re-emitting costs 352 callgrind runs against a fully built `.temp/build/`.
+That is the reason it calibrates rather than publishes.
 
 It is NOT in `harness/`: `check.py` hashes `harness/*.py` into all 22 gate
 records and `measure.py` is hashed into all 22 MEASUREMENT records, so putting
@@ -44,17 +59,32 @@ adding callees is not uniformly an improvement:
     alignment, so cells with identical call sets differ by +-7.00 Ir/call.
     On this column p03's `R5 - R4` reads **-7.00** -- "the proof costs -7
     instructions" -- and p04's `R3 - R4` flips sign.  There the
-    kernel-EXCLUSIVE column is the correct one.
+    kernel-EXCLUSIVE column is the correct one.  ⚠ **The figure itself does
+    not reproduce**: two sweeps of the same binaries differing only in one
+    64-byte ENVIRONMENT VARIABLE moved the outward figure on **11 of 348**
+    (pattern, input, cell) triples -- p03/p04 `safe_tuned` and seven p08 cells
+    -- while the kernel-EXCLUSIVE figure moved on **0 of 348**.  (A first
+    version of this note blamed the `--callgrind-out-file=` path length.  That
+    knob is INERT: valgrind strips its own options before building the client
+    stack, and two paths of different length give identical figures.)
   * **gcc's PLT thunk**: gcc routes each libc call through `endbr64 ; jmp *GOT`,
     which callgrind attributes as its own function; clang's thunk is a bare
     `jmp` and is folded into the callee.  **+2.00 Ir per libc call, gcc only**,
     and one of the two instructions is the `endbr64` of gcc's default
     `-fcf-protection=full`.  This column therefore carries an IBT term the
     kernel-exclusive column never had.
+  * **a one-off lazy-binding / IFUNC resolver**, 725-794 Ir per PROCESS, in
+    clang's and rustc's binaries and not gcc's.  It is a per-process constant
+    inside a per-call column, scaling as `1/n_iters` -- 0.0065 .. 0.5293
+    Ir/call here -- and it is why p11 reads 299.8727 where 150 x 2.00 = 300.00.
 
 Usage:
     synthesis/outward_ir.py p13 --input small.bin
     synthesis/outward_ir.py --emit synthesis/outward_ir.json     # whole tree
+
+⚠ The emitted JSON gained `outward_calls_per_kernel_call` and
+`outward_ir_per_callee_call` at TASK_076 (m5); a file emitted before that has
+neither, and `synthesize.py` does not read them.  Re-emit to populate.
 """
 import argparse
 import glob
@@ -79,9 +109,18 @@ PAIRS = [("safe_naive", "unsafe", "R2-R4"),
 
 
 def parse_cg(path):
-    """-> (names{id: str}, exclusive{id: Ir}, edges{(caller,callee): Ir})."""
-    names, excl, edges = {}, {}, {}
-    cur, pend, armed = None, None, False
+    """-> (names{id: str}, exclusive{id: Ir}, edges{(caller,callee): Ir},
+           calls{(caller,callee): n}).
+
+    ⚠ The `calls=<n>` COUNT is kept, not discarded.  Without it the record
+    cannot check its own per-call attribution -- TASK_075_REVIEW had to re-run
+    callgrind to verify *"150 `strlen` calls x 2.00"*, because the earlier
+    version of this parser read `calls=` only as an "the next cost line is an
+    edge" flag and threw the number away (m5).  With it, `outward_by_callee`
+    divides into `Ir per call of the callee`, which is what a thunk claim or a
+    libc-path-length claim is actually about."""
+    names, excl, edges, calls = {}, {}, {}, {}
+    cur, pend, armed, ncalls = None, None, False, 0
     for line in open(path, errors="replace"):
         line = line.rstrip("\n")
         m = re.match(r"^(c?fn)=\((\d+)\)(?:\s+(.*))?$", line)
@@ -96,18 +135,20 @@ def parse_cg(path):
             continue
         if re.match(r"^(c?ob|c?fl|c?fi|c?fe)=", line):
             continue
-        if line.startswith("calls="):
-            armed = True
+        m = re.match(r"^calls=(\d+)", line)
+        if m:
+            armed, ncalls = True, int(m.group(1))
             continue
         m = re.match(r"^([+\-*]?\d+|\*)\s+(\d+)", line)
         if m:
             ir = int(m.group(2))
             if armed and pend is not None and cur is not None:
                 edges[(cur, pend)] = edges.get((cur, pend), 0) + ir
-                armed, pend = False, None
+                calls[(cur, pend)] = calls.get((cur, pend), 0) + ncalls
+                armed, pend, ncalls = False, None, 0
             elif cur is not None:
                 excl[cur] = excl.get(cur, 0) + ir
-    return names, excl, edges
+    return names, excl, edges, calls
 
 
 def measure(binary, arg, tag, timeout=3600):
@@ -118,18 +159,21 @@ def measure(binary, arg, tag, timeout=3600):
                        capture_output=True, text=True, timeout=timeout)
     if r.returncode != 0:
         raise RuntimeError(f"callgrind exit {r.returncode}: {r.stderr[-300:]}")
-    names, excl, edges = parse_cg(out)
+    names, excl, edges, calls = parse_cg(out)
     kids = [i for i, n in names.items() if KERNEL_RE.search(n)]
     kex = sum(excl.get(i, 0) for i in kids)
-    by = {}
+    by, ncalls = {}, {}
     for (x, y), ir in edges.items():
         if x in kids:
             n = names.get(y, f"?{y}")
             by[n] = by.get(n, 0) + ir
+            ncalls[n] = ncalls.get(n, 0) + calls.get((x, y), 0)
     return {"kernel_symbols": [names[i] for i in kids],
             "kernel_exclusive_ir": kex,
             "outward_ir": sum(by.values()),
             "outward_by_callee": dict(sorted(by.items(), key=lambda kv: -kv[1])),
+            "outward_calls_by_callee": {k: ncalls.get(k, 0)
+                                        for k in sorted(by, key=lambda k: -by[k])},
             "kernel_inclusive_ir": kex + sum(by.values())}
 
 
@@ -208,7 +252,17 @@ def main():
                          "outward_ir_per_call": v["outward_ir"] / n,
                          "kernel_inclusive_ir_per_call": v["kernel_inclusive_ir"] / n,
                          "outward_by_callee_per_call":
-                             {k: x / n for k, x in v["outward_by_callee"].items()}}
+                             {k: x / n for k, x in v["outward_by_callee"].items()},
+                         # m5: without these the record cannot check its own
+                         # per-call attribution.
+                         "outward_calls_per_kernel_call":
+                             {k: x / n for k, x
+                              in v["outward_calls_by_callee"].items()},
+                         "outward_ir_per_callee_call":
+                             {k: (v["outward_by_callee"][k]
+                                  / v["outward_calls_by_callee"][k])
+                              for k in v["outward_by_callee"]
+                              if v["outward_calls_by_callee"].get(k)}}
                      for c, v in r["cells"].items()}
             pairs = {}
             for x, y, lab in PAIRS:

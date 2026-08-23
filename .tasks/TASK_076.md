@@ -209,3 +209,71 @@ thing that rots is the one nobody re-runs. ⚠ **If a single route is defensible
 derived-only, with the sidecars demoted to `.temp/` probes — argue for it.**
 **I would rather have one number that is always recomputed than three that
 disagree in a year.**
+
+---
+
+## Outcome (recorded by the manager at the task boundary)
+
+**Landed.** `synthesis/` + `results/synthesis.md` only; **44 records, 0 STALE,
+no measurement touched, no gate re-run needed** (nothing changed sits in any of
+`check.py`'s eleven globs — verified by evaluating them literally). **22
+patterns unchanged and green.**
+
+⚠ **The engineer refuted FOUR prescriptions, three of them the REVIEW's, and one
+of those had already reached `.memory/` in the manager's hand.**
+
+1. ⚠⚠ ***"Zero misses at every threshold"* was a SCORING ARTEFACT.** The review
+   set `truth = |cg| >= th`, i.e. **scored the oracle at the same threshold as
+   the estimate**, which makes a miss impossible by construction. Against a fixed
+   truth threshold there are **2 misses at 3.0 and at 5.0** — both `p02
+   gcc-clang` at exactly `+2.00`, the PLT thunk sitting on the boundary. **The
+   manager had already copied the false version into
+   `.memory/03-measurement.md`; it is corrected there, together with the ±16
+   floor guess (measured max residual 15.79).** ✅ **And the replacement is
+   better than either**: three measured bands, of which the top one —
+   `|corr| >= 16.00`, 34 rows — is **34 real, 0 spurious**.
+2. **M6a is refuted: the delivery's citation was RIGHT.** RECAP "Owed" 12 spans
+   `:1808–1863` and the `--list` census at `:1847-1852` is inside it —
+   manager-verified. The review swapped it with "Owed" 6.
+3. **M6c is refuted**: `patterns/p47-ct-compare/NOTES.md:865` says *"**Six** R4
+   levers were built"* and §8e's table has six rows. Only the **citation** was
+   wrong — which was the manager's unreviewed task prose.
+4. **M6's remedy cannot be executed as written.** Only **5 of 10** `--list`s
+   print a source file, and **p36 — the review's own worked example — prints
+   none**; name-prefix derivation gives p36 2 R4 levers against finding 23's 3.
+
+**Three manager decisions:**
+
+1. **The engineer's split of the manager's question is ACCEPTED and is better
+   than the question.** *"Three routes to one number"* was the wrong frame:
+   there is **one magnitude** (now single-route and derived, recomputed every
+   run) and **two different questions**. So `outward_ir.json` was demoted to
+   publishing **nothing** — it only calibrates, live — while `licence.py` was
+   **kept**, because it answers *may this row be differenced* rather than *by how
+   much*, has zero run noise, and is the only thing producing the **mechanism**
+   (PROTOCOL rule 12). ✅ **Verified self-containment: `synthesize.py` run with
+   both sidecars pointed at nonexistent paths still writes every corrected
+   figure, including p11's `+9815.56` reversal.**
+2. **A published score was allowed to get WORSE, deliberately.** Fixing M4's
+   symbol boundary to match `measure.py`'s own needle turns p27's lucky
+   `NOT-LIC` into an honest **false `LICENSED`**, moving `156/10/0/10` →
+   `154/12/0/10`. **Matching the harness's real boundary beats keeping the
+   number**, and the artefact says so out loud.
+3. **The `bcmp` alias was NOT whitelisted**, on the engineer's argument that a
+   static check cannot know two dynamic names resolve to one address and that an
+   alias list is the shape the licence's own docstring exists to reject. p47's
+   `gcc-clang` stays `NOT-LIC` **with the mechanism named beside it**.
+
+⚠ **PROTOCOL rule 2's running count is 184:** 180 at TASK_076's writing, **+4**
+from this task — the threshold artefact, M6a, M6c, and M6's underivable remedy.
+**Carry 184 forward.**
+
+**The single most useful thing in this block.** ⚠ **A scoring artefact travelled
+from a review, through the manager's hand, into `.memory/` — the layer this
+project calls authoritative — in one commit.** Rule 9 exists to stop unreviewed
+*findings* reaching `.memory/`; this one **had** been reviewed, and the review
+was the thing that was wrong. **The defence that worked was the next agent
+re-deriving the number instead of citing it**, and it is the same defence that
+caught `183` forbidden spellings, the spelled-out *"thirteen"*, and *"the six
+original axes are complete"*. **A number in `.memory/` is a claim, not a
+citation; re-derive before you quote.**

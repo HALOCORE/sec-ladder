@@ -6,37 +6,49 @@
      "kernel_exclusive_ir_per_call": 7187.0,
      "kernel_inclusive_ir_per_call": 7187.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 10259.0,
      "kernel_inclusive_ir_per_call": 10259.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 7216.0,
      "kernel_inclusive_ir_per_call": 7216.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 7192.0,
      "kernel_inclusive_ir_per_call": 7192.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 7187.0,
      "kernel_inclusive_ir_per_call": 7187.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 7187.0,
      "kernel_inclusive_ir_per_call": 7187.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 20000,
@@ -69,37 +81,49 @@
      "kernel_exclusive_ir_per_call": 900.0,
      "kernel_inclusive_ir_per_call": 900.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 1272.0,
      "kernel_inclusive_ir_per_call": 1272.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 912.0,
      "kernel_inclusive_ir_per_call": 912.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 905.0,
      "kernel_inclusive_ir_per_call": 905.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 901.0,
      "kernel_inclusive_ir_per_call": 901.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 901.0,
      "kernel_inclusive_ir_per_call": 901.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 200000,
@@ -136,7 +160,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 412.8733
      },
-     "outward_ir_per_call": 412.8733
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 1.0
+     },
+     "outward_ir_per_call": 412.8733,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 412.8733
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 9776.0,
@@ -144,7 +174,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 412.8733
      },
-     "outward_ir_per_call": 412.8733
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 1.0
+     },
+     "outward_ir_per_call": 412.8733,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 412.8733
+     }
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 8765.0,
@@ -152,7 +188,13 @@
      "outward_by_callee_per_call": {
       "0x0000000004001190": 414.8733
      },
-     "outward_ir_per_call": 414.8733
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001190": 1.0
+     },
+     "outward_ir_per_call": 414.8733,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001190": 414.8733
+     }
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 8770.0,
@@ -160,13 +202,21 @@
      "outward_by_callee_per_call": {
       "0x0000000004001190": 414.8733
      },
-     "outward_ir_per_call": 414.8733
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001190": 1.0
+     },
+     "outward_ir_per_call": 414.8733,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001190": 414.8733
+     }
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 11211.0,
      "kernel_inclusive_ir_per_call": 11211.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 9783.0,
@@ -174,7 +224,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 412.8777
      },
-     "outward_ir_per_call": 412.8777
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 1.0
+     },
+     "outward_ir_per_call": 412.8777,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 412.8777
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 9772.0,
@@ -182,7 +238,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 412.8777
      },
-     "outward_ir_per_call": 412.8777
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 1.0
+     },
+     "outward_ir_per_call": 412.8777,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 412.8777
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 9772.0,
@@ -190,7 +252,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 412.8777
      },
-     "outward_ir_per_call": 412.8777
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 1.0
+     },
+     "outward_ir_per_call": 412.8777,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 412.8777
+     }
     }
    },
    "n_iters": 20000,
@@ -225,7 +293,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 12.0
      },
-     "outward_ir_per_call": 12.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 1.0
+     },
+     "outward_ir_per_call": 12.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.0
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 205.0,
@@ -233,7 +307,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 12.0
      },
-     "outward_ir_per_call": 12.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 1.0
+     },
+     "outward_ir_per_call": 12.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.0
+     }
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 202.0,
@@ -241,7 +321,13 @@
      "outward_by_callee_per_call": {
       "0x0000000004001190": 14.0
      },
-     "outward_ir_per_call": 14.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001190": 1.0
+     },
+     "outward_ir_per_call": 14.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001190": 14.0
+     }
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 207.0,
@@ -249,13 +335,21 @@
      "outward_by_callee_per_call": {
       "0x0000000004001190": 14.0
      },
-     "outward_ir_per_call": 14.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001190": 1.0
+     },
+     "outward_ir_per_call": 14.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001190": 14.0
+     }
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 392.0,
      "kernel_inclusive_ir_per_call": 392.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 212.0,
@@ -263,7 +357,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 12.0
      },
-     "outward_ir_per_call": 12.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 1.0
+     },
+     "outward_ir_per_call": 12.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.0
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 201.0,
@@ -271,7 +371,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 12.0
      },
-     "outward_ir_per_call": 12.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 1.0
+     },
+     "outward_ir_per_call": 12.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.0
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 201.0,
@@ -279,7 +385,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 12.0
      },
-     "outward_ir_per_call": 12.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 1.0
+     },
+     "outward_ir_per_call": 12.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.0
+     }
     }
    },
    "n_iters": 200000,
@@ -314,25 +426,33 @@
      "kernel_exclusive_ir_per_call": 7748.0,
      "kernel_inclusive_ir_per_call": 7748.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 8162.0,
      "kernel_inclusive_ir_per_call": 8162.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 9931.0,
      "kernel_inclusive_ir_per_call": 9931.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 10345.0,
      "kernel_inclusive_ir_per_call": 10345.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 25621.0,
@@ -340,7 +460,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 9010.0,
@@ -348,7 +474,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 8384.0,
@@ -356,7 +488,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 8384.0,
@@ -364,7 +502,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 43.0
      },
-     "outward_ir_per_call": 43.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 43.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 43.0
+     }
     }
    },
    "n_iters": 1500,
@@ -397,25 +541,33 @@
      "kernel_exclusive_ir_per_call": 2633.0,
      "kernel_inclusive_ir_per_call": 2633.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 2869.0,
      "kernel_inclusive_ir_per_call": 2869.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 3600.0,
      "kernel_inclusive_ir_per_call": 3600.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 3836.0,
      "kernel_inclusive_ir_per_call": 3836.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 8112.0,
@@ -423,7 +575,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 3361.0,
@@ -431,7 +589,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 3002.0,
@@ -439,7 +603,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 3002.0,
@@ -447,7 +617,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 43.0
      },
-     "outward_ir_per_call": 43.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 43.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 43.0
+     }
     }
    },
    "n_iters": 6000,
@@ -482,25 +658,33 @@
      "kernel_exclusive_ir_per_call": 9979.0,
      "kernel_inclusive_ir_per_call": 9979.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 11234.0,
      "kernel_inclusive_ir_per_call": 11234.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 13336.0,
      "kernel_inclusive_ir_per_call": 13336.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 15004.0,
      "kernel_inclusive_ir_per_call": 15004.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 28278.0,
@@ -508,7 +692,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 11667.0,
@@ -516,7 +706,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 11662.0,
@@ -524,7 +720,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 11662.0,
@@ -532,7 +734,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 43.0
      },
-     "outward_ir_per_call": 43.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 43.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 43.0
+     }
     }
    },
    "n_iters": 1500,
@@ -565,25 +773,33 @@
      "kernel_exclusive_ir_per_call": 2872.0,
      "kernel_inclusive_ir_per_call": 2872.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 3230.0,
      "kernel_inclusive_ir_per_call": 3230.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 3842.0,
      "kernel_inclusive_ir_per_call": 3842.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 4318.0,
      "kernel_inclusive_ir_per_call": 4318.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 8119.0,
@@ -591,7 +807,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 3368.0,
@@ -599,7 +821,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 3363.0,
@@ -607,7 +835,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 3363.0,
@@ -615,7 +849,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 43.0
      },
-     "outward_ir_per_call": 43.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 43.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 43.0
+     }
     }
    },
    "n_iters": 6000,
@@ -650,49 +890,65 @@
      "kernel_exclusive_ir_per_call": 8422.0,
      "kernel_inclusive_ir_per_call": 8422.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 8424.0,
      "kernel_inclusive_ir_per_call": 8424.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 9204.0,
      "kernel_inclusive_ir_per_call": 9204.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 9211.0,
      "kernel_inclusive_ir_per_call": 9211.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 11317.0,
      "kernel_inclusive_ir_per_call": 11317.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 8821.0,
      "kernel_inclusive_ir_per_call": 8821.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 8422.0,
      "kernel_inclusive_ir_per_call": 8422.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 8422.0,
      "kernel_inclusive_ir_per_call": 8422.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 12000,
@@ -725,49 +981,65 @@
      "kernel_exclusive_ir_per_call": 1367.0,
      "kernel_inclusive_ir_per_call": 1367.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 1369.0,
      "kernel_inclusive_ir_per_call": 1369.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 1730.0,
      "kernel_inclusive_ir_per_call": 1730.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 1737.0,
      "kernel_inclusive_ir_per_call": 1737.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 2067.0,
      "kernel_inclusive_ir_per_call": 2067.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 1490.0,
      "kernel_inclusive_ir_per_call": 1490.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 1367.0,
      "kernel_inclusive_ir_per_call": 1367.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 1367.0,
      "kernel_inclusive_ir_per_call": 1367.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 25000,
@@ -804,7 +1076,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 189.0
      },
-     "outward_ir_per_call": 189.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 12.0
+     },
+     "outward_ir_per_call": 189.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 15.75
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 1599.0,
@@ -812,19 +1090,29 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 189.0
      },
-     "outward_ir_per_call": 189.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 12.0
+     },
+     "outward_ir_per_call": 189.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 15.75
+     }
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 1988.0,
      "kernel_inclusive_ir_per_call": 1988.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 2083.0,
      "kernel_inclusive_ir_per_call": 2083.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 2120.0,
@@ -832,7 +1120,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 189.0
      },
-     "outward_ir_per_call": 189.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 12.0
+     },
+     "outward_ir_per_call": 189.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 15.75
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 1897.0,
@@ -840,7 +1134,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 189.0
      },
-     "outward_ir_per_call": 189.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 12.0
+     },
+     "outward_ir_per_call": 189.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 15.75
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 1725.0,
@@ -848,7 +1148,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 189.0
      },
-     "outward_ir_per_call": 189.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 12.0
+     },
+     "outward_ir_per_call": 189.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 15.75
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 1725.0,
@@ -856,7 +1162,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 189.0
      },
-     "outward_ir_per_call": 189.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 12.0
+     },
+     "outward_ir_per_call": 189.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 15.75
+     }
     }
    },
    "n_iters": 20000,
@@ -891,7 +1203,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 63.0
      },
-     "outward_ir_per_call": 63.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 5.0
+     },
+     "outward_ir_per_call": 63.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.6
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 2570.0,
@@ -899,19 +1217,29 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 63.0
      },
-     "outward_ir_per_call": 63.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 5.0
+     },
+     "outward_ir_per_call": 63.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.6
+     }
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 3477.0,
      "kernel_inclusive_ir_per_call": 3477.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 3518.0,
      "kernel_inclusive_ir_per_call": 3518.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 2797.0,
@@ -919,7 +1247,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 63.0
      },
-     "outward_ir_per_call": 63.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 5.0
+     },
+     "outward_ir_per_call": 63.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.6
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 2958.0,
@@ -927,7 +1261,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 63.0
      },
-     "outward_ir_per_call": 63.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 5.0
+     },
+     "outward_ir_per_call": 63.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.6
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 2624.0,
@@ -935,7 +1275,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 63.0
      },
-     "outward_ir_per_call": 63.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 5.0
+     },
+     "outward_ir_per_call": 63.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.6
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 2624.0,
@@ -943,7 +1289,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 63.0
      },
-     "outward_ir_per_call": 63.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 5.0
+     },
+     "outward_ir_per_call": 63.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.6
+     }
     }
    },
    "n_iters": 60000,
@@ -978,49 +1330,65 @@
      "kernel_exclusive_ir_per_call": 19588.845833333333,
      "kernel_inclusive_ir_per_call": 19588.845833333333,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 19593.845833333333,
      "kernel_inclusive_ir_per_call": 19593.845833333333,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 38143.93916666666,
      "kernel_inclusive_ir_per_call": 38143.93916666666,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 38150.93916666666,
      "kernel_inclusive_ir_per_call": 38150.93916666666,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 40088.92833333334,
      "kernel_inclusive_ir_per_call": 40088.92833333334,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 31377.9825,
      "kernel_inclusive_ir_per_call": 31377.9825,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 21353.0475,
      "kernel_inclusive_ir_per_call": 21353.0475,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 21353.0475,
      "kernel_inclusive_ir_per_call": 21353.0475,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 1200,
@@ -1053,49 +1421,65 @@
      "kernel_exclusive_ir_per_call": 6005.49075,
      "kernel_inclusive_ir_per_call": 6005.49075,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 6010.49075,
      "kernel_inclusive_ir_per_call": 6010.49075,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 11640.93875,
      "kernel_inclusive_ir_per_call": 11640.93875,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 11647.93875,
      "kernel_inclusive_ir_per_call": 11647.93875,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 12321.206,
      "kernel_inclusive_ir_per_call": 12321.206,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 9576.86975,
      "kernel_inclusive_ir_per_call": 9576.86975,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 6562.26625,
      "kernel_inclusive_ir_per_call": 6562.26625,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 6562.26625,
      "kernel_inclusive_ir_per_call": 6562.26625,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 8000,
@@ -1134,7 +1518,17 @@
       "0x0000000000188a80": 1296.88,
       "0x0000000000189480": 4112.485875
      },
-     "outward_ir_per_call": 5409.969375
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 0.000125,
+      "0x0000000000188a80": 5.0,
+      "0x0000000000189480": 0.999875
+     },
+     "outward_ir_per_call": 5409.969375,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 4828.0,
+      "0x0000000000188a80": 259.376,
+      "0x0000000000189480": 4113.0
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 23615.001,
@@ -1144,7 +1538,17 @@
       "0x0000000000188a80": 1296.849875,
       "0x0000000000189480": 4112.485875
      },
-     "outward_ir_per_call": 5410.07225
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 0.00025,
+      "0x0000000000188a80": 4.999875,
+      "0x0000000000189480": 0.999875
+     },
+     "outward_ir_per_call": 5410.07225,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 2946.0,
+      "0x0000000000188a80": 259.3764594114853,
+      "0x0000000000189480": 4113.0
+     }
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 33871.0,
@@ -1152,7 +1556,13 @@
      "outward_by_callee_per_call": {
       "0x0000000004001160": 920.0
      },
-     "outward_ir_per_call": 920.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001160": 4.0
+     },
+     "outward_ir_per_call": 920.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001160": 230.0
+     }
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 33871.0,
@@ -1160,7 +1570,13 @@
      "outward_by_callee_per_call": {
       "0x0000000004001170": 920.0
      },
-     "outward_ir_per_call": 920.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001170": 4.0
+     },
+     "outward_ir_per_call": 920.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001170": 230.0
+     }
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 115571.0,
@@ -1169,7 +1585,15 @@
       "0x0000000000188a80": 412.8785,
       "0x0000000000189480": 4113.0
      },
-     "outward_ir_per_call": 4525.8785
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 1.0,
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 4525.8785,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 412.8785,
+      "0x0000000000189480": 4113.0
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 23656.0,
@@ -1178,7 +1602,15 @@
       "0x0000000000188a80": 1296.8785,
       "0x0000000000189480": 4113.0
      },
-     "outward_ir_per_call": 5409.8785
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 5.0,
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 5409.8785,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 259.3757,
+      "0x0000000000189480": 4113.0
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 23630.0,
@@ -1187,7 +1619,15 @@
       "0x0000000000188a80": 1296.87675,
       "0x0000000000189480": 4113.0
      },
-     "outward_ir_per_call": 5409.87675
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 5.0,
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 5409.87675,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 259.37535,
+      "0x0000000000189480": 4113.0
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 23630.0,
@@ -1196,7 +1636,15 @@
       "0x0000000000188a80": 1296.8785,
       "0x0000000000189480": 4113.0
      },
-     "outward_ir_per_call": 5409.8785
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 5.0,
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 5409.8785,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 259.3757,
+      "0x0000000000189480": 4113.0
+     }
     }
    },
    "n_iters": 8000,
@@ -1233,7 +1681,17 @@
       "0x0000000000188a80": 196.81224,
       "0x0000000000189480": 4112.83548
      },
-     "outward_ir_per_call": 4309.84084
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 4e-05,
+      "0x0000000000188a80": 5.0,
+      "0x0000000000189480": 0.99996
+     },
+     "outward_ir_per_call": 4309.84084,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 4828.0,
+      "0x0000000000188a80": 39.362448,
+      "0x0000000000189480": 4113.0
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 2969.00032,
@@ -1243,7 +1701,17 @@
       "0x0000000000188a80": 196.81104,
       "0x0000000000189480": 4112.83548
      },
-     "outward_ir_per_call": 4309.87456
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 8e-05,
+      "0x0000000000188a80": 4.99996,
+      "0x0000000000189480": 0.99996
+     },
+     "outward_ir_per_call": 4309.87456,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 2850.5,
+      "0x0000000000188a80": 39.3625229001832,
+      "0x0000000000189480": 4113.0
+     }
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 4694.0,
@@ -1251,7 +1719,13 @@
      "outward_by_callee_per_call": {
       "0x0000000004001160": 156.0
      },
-     "outward_ir_per_call": 156.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001160": 4.0
+     },
+     "outward_ir_per_call": 156.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001160": 39.0
+     }
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 4694.0,
@@ -1259,7 +1733,13 @@
      "outward_by_callee_per_call": {
       "0x0000000004001170": 156.0
      },
-     "outward_ir_per_call": 156.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001170": 4.0
+     },
+     "outward_ir_per_call": 156.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001170": 39.0
+     }
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 14060.0,
@@ -1268,7 +1748,15 @@
       "0x0000000000188a80": 76.87176,
       "0x0000000000189480": 4113.0
      },
-     "outward_ir_per_call": 4189.87176
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 1.0,
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 4189.87176,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 76.87176,
+      "0x0000000000189480": 4113.0
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 3010.0,
@@ -1277,7 +1765,15 @@
       "0x0000000000188a80": 196.87176,
       "0x0000000000189480": 4113.0
      },
-     "outward_ir_per_call": 4309.87176
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 5.0,
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 4309.87176,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 39.374352,
+      "0x0000000000189480": 4113.0
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 2984.0,
@@ -1286,7 +1782,15 @@
       "0x0000000000188a80": 196.87176,
       "0x0000000000189480": 4113.0
      },
-     "outward_ir_per_call": 4309.87176
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 5.0,
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 4309.87176,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 39.374352,
+      "0x0000000000189480": 4113.0
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 2984.0,
@@ -1295,7 +1799,15 @@
       "0x0000000000188a80": 196.87176,
       "0x0000000000189480": 4113.0
      },
-     "outward_ir_per_call": 4309.87176
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 5.0,
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 4309.87176,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 39.374352,
+      "0x0000000000189480": 4113.0
+     }
     }
    },
    "n_iters": 25000,
@@ -1330,13 +1842,17 @@
      "kernel_exclusive_ir_per_call": 18709.0,
      "kernel_inclusive_ir_per_call": 18709.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 21199.0,
      "kernel_inclusive_ir_per_call": 21199.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 44617.0,
@@ -1344,7 +1860,13 @@
      "outward_by_callee_per_call": {
       "__popcountdi2": 2625.0
      },
-     "outward_ir_per_call": 2625.0
+     "outward_calls_per_kernel_call": {
+      "__popcountdi2": 125.0
+     },
+     "outward_ir_per_call": 2625.0,
+     "outward_ir_per_callee_call": {
+      "__popcountdi2": 21.0
+     }
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 46277.0,
@@ -1352,31 +1874,45 @@
      "outward_by_callee_per_call": {
       "__popcountdi2": 2625.0
      },
-     "outward_ir_per_call": 2625.0
+     "outward_calls_per_kernel_call": {
+      "__popcountdi2": 125.0
+     },
+     "outward_ir_per_call": 2625.0,
+     "outward_ir_per_callee_call": {
+      "__popcountdi2": 21.0
+     }
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 60914.0,
      "kernel_inclusive_ir_per_call": 60914.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 73390.0,
      "kernel_inclusive_ir_per_call": 73390.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 24505.0,
      "kernel_inclusive_ir_per_call": 24505.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 24505.0,
      "kernel_inclusive_ir_per_call": 24505.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 1500,
@@ -1409,13 +1945,17 @@
      "kernel_exclusive_ir_per_call": 5019.0,
      "kernel_inclusive_ir_per_call": 5019.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 5736.0,
      "kernel_inclusive_ir_per_call": 5736.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 12341.0,
@@ -1423,7 +1963,13 @@
      "outward_by_callee_per_call": {
       "__popcountdi2": 378.0
      },
-     "outward_ir_per_call": 378.0
+     "outward_calls_per_kernel_call": {
+      "__popcountdi2": 18.0
+     },
+     "outward_ir_per_call": 378.0,
+     "outward_ir_per_callee_call": {
+      "__popcountdi2": 21.0
+     }
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 12819.0,
@@ -1431,31 +1977,45 @@
      "outward_by_callee_per_call": {
       "__popcountdi2": 378.0
      },
-     "outward_ir_per_call": 378.0
+     "outward_calls_per_kernel_call": {
+      "__popcountdi2": 18.0
+     },
+     "outward_ir_per_call": 378.0,
+     "outward_ir_per_callee_call": {
+      "__popcountdi2": 21.0
+     }
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 16614.0,
      "kernel_inclusive_ir_per_call": 16614.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 20434.0,
      "kernel_inclusive_ir_per_call": 20434.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 6678.0,
      "kernel_inclusive_ir_per_call": 6678.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 6678.0,
      "kernel_inclusive_ir_per_call": 6678.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 6000,
@@ -1490,49 +2050,65 @@
      "kernel_exclusive_ir_per_call": 8578.0,
      "kernel_inclusive_ir_per_call": 8578.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 8579.0,
      "kernel_inclusive_ir_per_call": 8579.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 7391.0,
      "kernel_inclusive_ir_per_call": 7391.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 7391.0,
      "kernel_inclusive_ir_per_call": 7391.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 14042.0,
      "kernel_inclusive_ir_per_call": 14042.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 8094.0,
      "kernel_inclusive_ir_per_call": 8094.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 8697.0,
      "kernel_inclusive_ir_per_call": 8697.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 8697.0,
      "kernel_inclusive_ir_per_call": 8697.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 2000,
@@ -1565,49 +2141,65 @@
      "kernel_exclusive_ir_per_call": 3514.0,
      "kernel_inclusive_ir_per_call": 3514.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 3515.0,
      "kernel_inclusive_ir_per_call": 3515.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 3783.0,
      "kernel_inclusive_ir_per_call": 3783.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 3783.0,
      "kernel_inclusive_ir_per_call": 3783.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 6458.0,
      "kernel_inclusive_ir_per_call": 6458.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 3254.0,
      "kernel_inclusive_ir_per_call": 3254.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 3577.0,
      "kernel_inclusive_ir_per_call": 3577.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 3577.0,
      "kernel_inclusive_ir_per_call": 3577.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 20000,
@@ -1645,7 +2237,15 @@
       "0x0000000000015220": 0.5293333333333333,
       "0x000000000018b7c0": 1355.3806666666667
      },
-     "outward_ir_per_call": 1355.91
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 0.0006666666666666666,
+      "0x000000000018b7c0": 40.99933333333333
+     },
+     "outward_ir_per_call": 1355.91,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 794.0,
+      "0x000000000018b7c0": 33.058602578903724
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 25481.002666666667,
@@ -1654,7 +2254,15 @@
       "0x0000000000015220": 0.532,
       "0x0000000000188080": 1701.8433333333332
      },
-     "outward_ir_per_call": 1702.3753333333334
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 0.0006666666666666666,
+      "0x0000000000188080": 40.99933333333333
+     },
+     "outward_ir_per_call": 1702.3753333333334,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 798.0,
+      "0x0000000000188080": 41.50904892762484
+     }
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 33990.0,
@@ -1662,7 +2270,13 @@
      "outward_by_callee_per_call": {
       "0x0000000004001150": 1437.4006666666667
      },
-     "outward_ir_per_call": 1437.4006666666667
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001150": 41.0
+     },
+     "outward_ir_per_call": 1437.4006666666667,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001150": 35.05855284552845
+     }
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 34319.0,
@@ -1670,13 +2284,21 @@
      "outward_by_callee_per_call": {
       "0x0000000004001160": 1783.8686666666667
      },
-     "outward_ir_per_call": 1783.8686666666667
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001160": 41.0
+     },
+     "outward_ir_per_call": 1783.8686666666667,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001160": 43.5089918699187
+     }
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 79248.0,
      "kernel_inclusive_ir_per_call": 79248.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 25657.0,
@@ -1684,19 +2306,29 @@
      "outward_by_callee_per_call": {
       "<core::ffi::c_str::CStr>::from_bytes_until_nul": 7124.337333333333
      },
-     "outward_ir_per_call": 7124.337333333333
+     "outward_calls_per_kernel_call": {
+      "<core::ffi::c_str::CStr>::from_bytes_until_nul": 41.0
+     },
+     "outward_ir_per_call": 7124.337333333333,
+     "outward_ir_per_callee_call": {
+      "<core::ffi::c_str::CStr>::from_bytes_until_nul": 173.76432520325204
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 50160.0,
      "kernel_inclusive_ir_per_call": 50160.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 50160.0,
      "kernel_inclusive_ir_per_call": 50160.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 1500,
@@ -1732,7 +2364,15 @@
       "0x0000000000015220": 0.12966666666666668,
       "0x000000000018b7c0": 2105.0265
      },
-     "outward_ir_per_call": 2105.1561666666666
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 0.00016666666666666666,
+      "0x000000000018b7c0": 149.99983333333333
+     },
+     "outward_ir_per_call": 2105.1561666666666,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 778.0,
+      "0x000000000018b7c0": 14.033525592806214
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 12761.000666666667,
@@ -1741,7 +2381,15 @@
       "0x0000000000015220": 0.12983333333333333,
       "0x0000000000188080": 2860.3166666666666
      },
-     "outward_ir_per_call": 2860.4465
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 0.00016666666666666666,
+      "0x0000000000188080": 149.99983333333333
+     },
+     "outward_ir_per_call": 2860.4465,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 779.0,
+      "0x0000000000188080": 19.068798965332185
+     }
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 12546.0,
@@ -1749,7 +2397,13 @@
      "outward_by_callee_per_call": {
       "0x0000000004001150": 2405.0288333333333
      },
-     "outward_ir_per_call": 2405.0288333333333
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001150": 150.0
+     },
+     "outward_ir_per_call": 2405.0288333333333,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001150": 16.033525555555556
+     }
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 13747.0,
@@ -1757,13 +2411,21 @@
      "outward_by_callee_per_call": {
       "0x0000000004001160": 3160.3198333333335
      },
-     "outward_ir_per_call": 3160.3198333333335
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001160": 150.0
+     },
+     "outward_ir_per_call": 3160.3198333333335,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001160": 21.06879888888889
+     }
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 24558.0,
      "kernel_inclusive_ir_per_call": 24558.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 13302.0,
@@ -1771,19 +2433,29 @@
      "outward_by_callee_per_call": {
       "<core::ffi::c_str::CStr>::from_bytes_until_nul": 9821.148
      },
-     "outward_ir_per_call": 9821.148
+     "outward_calls_per_kernel_call": {
+      "<core::ffi::c_str::CStr>::from_bytes_until_nul": 150.0
+     },
+     "outward_ir_per_call": 9821.148,
+     "outward_ir_per_callee_call": {
+      "<core::ffi::c_str::CStr>::from_bytes_until_nul": 65.47432
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 19070.0,
      "kernel_inclusive_ir_per_call": 19070.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 19070.0,
      "kernel_inclusive_ir_per_call": 19070.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 6000,
@@ -1822,7 +2494,17 @@
       "0x0000000000188080": 590.54225,
       "0x0000000000188a80": 494.0
      },
-     "outward_ir_per_call": 1084.561725
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 2.5e-05,
+      "0x0000000000188080": 30.999975,
+      "0x0000000000188a80": 31.0
+     },
+     "outward_ir_per_call": 1084.561725,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 779.0,
+      "0x0000000000188080": 19.049765362714002,
+      "0x0000000000188a80": 15.935483870967742
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 2193.0001,
@@ -1832,7 +2514,17 @@
       "0x0000000000188080": 590.54225,
       "0x0000000000188a80": 494.0
      },
-     "outward_ir_per_call": 1084.561725
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 2.5e-05,
+      "0x0000000000188080": 30.999975,
+      "0x0000000000188a80": 31.0
+     },
+     "outward_ir_per_call": 1084.561725,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 779.0,
+      "0x0000000000188080": 19.049765362714002,
+      "0x0000000000188a80": 15.935483870967742
+     }
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 2757.0,
@@ -1841,7 +2533,15 @@
       "0x0000000004001170": 652.542725,
       "0x00000000040011b0": 556.0
      },
-     "outward_ir_per_call": 1208.542725
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001170": 31.0,
+      "0x00000000040011b0": 31.0
+     },
+     "outward_ir_per_call": 1208.542725,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001170": 21.049765322580644,
+      "0x00000000040011b0": 17.93548387096774
+     }
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 2632.0,
@@ -1850,13 +2550,23 @@
       "0x0000000004001170": 652.542725,
       "0x00000000040011b0": 556.0
      },
-     "outward_ir_per_call": 1208.542725
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001170": 31.0,
+      "0x00000000040011b0": 31.0
+     },
+     "outward_ir_per_call": 1208.542725,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001170": 21.049765322580644,
+      "0x00000000040011b0": 17.93548387096774
+     }
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 4930.0,
      "kernel_inclusive_ir_per_call": 4930.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 2784.0,
@@ -1864,7 +2574,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 494.0
      },
-     "outward_ir_per_call": 494.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 31.0
+     },
+     "outward_ir_per_call": 494.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 15.935483870967742
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 2810.0,
@@ -1872,7 +2588,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 494.0
      },
-     "outward_ir_per_call": 494.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 31.0
+     },
+     "outward_ir_per_call": 494.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 15.935483870967742
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 2810.0,
@@ -1880,7 +2602,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 494.0
      },
-     "outward_ir_per_call": 494.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 31.0
+     },
+     "outward_ir_per_call": 494.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 15.935483870967742
+     }
     }
    },
    "n_iters": 40000,
@@ -1917,7 +2645,17 @@
       "0x0000000000188080": 143.36941666666667,
       "0x0000000000188a80": 77.0
      },
-     "outward_ir_per_call": 220.37590833333334
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 8.333333333333334e-06,
+      "0x0000000000188080": 5.999991666666666,
+      "0x0000000000188a80": 6.0
+     },
+     "outward_ir_per_call": 220.37590833333334,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 779.0,
+      "0x0000000000188080": 23.89493596518884,
+      "0x0000000000188a80": 12.833333333333334
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 1048.0000333333332,
@@ -1927,7 +2665,17 @@
       "0x0000000000188080": 143.36941666666667,
       "0x0000000000188a80": 77.0
      },
-     "outward_ir_per_call": 220.37590833333334
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 8.333333333333334e-06,
+      "0x0000000000188080": 5.999991666666666,
+      "0x0000000000188a80": 6.0
+     },
+     "outward_ir_per_call": 220.37590833333334,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 779.0,
+      "0x0000000000188080": 23.89493596518884,
+      "0x0000000000188a80": 12.833333333333334
+     }
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 1374.0,
@@ -1936,7 +2684,15 @@
       "0x0000000004001170": 155.369575,
       "0x00000000040011b0": 89.0
      },
-     "outward_ir_per_call": 244.369575
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001170": 6.0,
+      "0x00000000040011b0": 6.0
+     },
+     "outward_ir_per_call": 244.369575,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001170": 25.894929166666667,
+      "0x00000000040011b0": 14.833333333333334
+     }
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 1349.0,
@@ -1945,13 +2701,23 @@
       "0x0000000004001170": 155.369575,
       "0x00000000040011b0": 89.0
      },
-     "outward_ir_per_call": 244.369575
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001170": 6.0,
+      "0x00000000040011b0": 6.0
+     },
+     "outward_ir_per_call": 244.369575,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001170": 25.894929166666667,
+      "0x00000000040011b0": 14.833333333333334
+     }
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 2592.0,
      "kernel_inclusive_ir_per_call": 2592.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 1759.0,
@@ -1959,7 +2725,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 77.0
      },
-     "outward_ir_per_call": 77.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 6.0
+     },
+     "outward_ir_per_call": 77.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.833333333333334
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 1756.0,
@@ -1967,7 +2739,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 77.0
      },
-     "outward_ir_per_call": 77.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 6.0
+     },
+     "outward_ir_per_call": 77.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.833333333333334
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 1756.0,
@@ -1975,7 +2753,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 77.0
      },
-     "outward_ir_per_call": 77.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 6.0
+     },
+     "outward_ir_per_call": 77.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.833333333333334
+     }
     }
    },
    "n_iters": 120000,
@@ -2015,7 +2799,19 @@
       "0x0000000000189480": 323.99925,
       "0x000000000018b7c0": 335.9993
      },
-     "outward_ir_per_call": 924.0778
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 0.0001,
+      "0x0000000000188a80": 24.0,
+      "0x0000000000189480": 23.99995,
+      "0x000000000018b7c0": 23.99995
+     },
+     "outward_ir_per_call": 924.0778,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 792.5,
+      "0x0000000000188a80": 11.0,
+      "0x0000000000189480": 13.49999687499349,
+      "0x000000000018b7c0": 14.0
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 8219.0004,
@@ -2026,7 +2822,19 @@
       "0x0000000000189480": 323.99925,
       "0x000000000018b7c0": 335.9993
      },
-     "outward_ir_per_call": 924.0778
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 0.0001,
+      "0x0000000000188a80": 24.0,
+      "0x0000000000189480": 23.99995,
+      "0x000000000018b7c0": 23.99995
+     },
+     "outward_ir_per_call": 924.0778,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 792.5,
+      "0x0000000000188a80": 11.0,
+      "0x0000000000189480": 13.49999687499349,
+      "0x000000000018b7c0": 14.0
+     }
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 11135.0,
@@ -2034,7 +2842,13 @@
      "outward_by_callee_per_call": {
       "0x0000000004001150": 384.0
      },
-     "outward_ir_per_call": 384.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001150": 24.0
+     },
+     "outward_ir_per_call": 384.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001150": 16.0
+     }
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 11159.0,
@@ -2042,7 +2856,13 @@
      "outward_by_callee_per_call": {
       "0x0000000004001150": 384.0
      },
-     "outward_ir_per_call": 384.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001150": 24.0
+     },
+     "outward_ir_per_call": 384.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001150": 16.0
+     }
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 13178.0,
@@ -2050,7 +2870,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 324.0
      },
-     "outward_ir_per_call": 324.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 24.0
+     },
+     "outward_ir_per_call": 324.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 13.5
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 9163.0,
@@ -2059,7 +2885,15 @@
       "0x0000000000188a80": 264.0,
       "0x0000000000189480": 324.0
      },
-     "outward_ir_per_call": 588.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 24.0,
+      "0x0000000000189480": 24.0
+     },
+     "outward_ir_per_call": 588.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 11.0,
+      "0x0000000000189480": 13.5
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 10217.0,
@@ -2068,7 +2902,15 @@
       "0x0000000000188a80": 264.0,
       "0x0000000000189480": 324.0
      },
-     "outward_ir_per_call": 588.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 24.0,
+      "0x0000000000189480": 24.0
+     },
+     "outward_ir_per_call": 588.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 11.0,
+      "0x0000000000189480": 13.5
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 10217.0,
@@ -2077,7 +2919,15 @@
       "0x0000000000188a80": 264.0,
       "0x0000000000189480": 324.0
      },
-     "outward_ir_per_call": 588.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 24.0,
+      "0x0000000000189480": 24.0
+     },
+     "outward_ir_per_call": 588.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 11.0,
+      "0x0000000000189480": 13.5
+     }
     }
    },
    "n_iters": 20000,
@@ -2115,7 +2965,19 @@
       "0x0000000000189480": 142.99981666666667,
       "0x000000000018b7c0": 181.99976666666666
      },
-     "outward_ir_per_call": 515.0259333333333
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 3.3333333333333335e-05,
+      "0x0000000000188a80": 13.0,
+      "0x0000000000189480": 12.999983333333333,
+      "0x000000000018b7c0": 12.999983333333333
+     },
+     "outward_ir_per_call": 515.0259333333333,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 790.5,
+      "0x0000000000188a80": 14.615384615384615,
+      "0x0000000000189480": 11.0,
+      "0x000000000018b7c0": 14.0
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 3292.0001333333335,
@@ -2126,7 +2988,19 @@
       "0x0000000000189480": 142.99981666666667,
       "0x000000000018b7c0": 181.99976666666666
      },
-     "outward_ir_per_call": 515.0259333333333
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 3.3333333333333335e-05,
+      "0x0000000000188a80": 13.0,
+      "0x0000000000189480": 12.999983333333333,
+      "0x000000000018b7c0": 12.999983333333333
+     },
+     "outward_ir_per_call": 515.0259333333333,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 790.5,
+      "0x0000000000188a80": 14.615384615384615,
+      "0x0000000000189480": 11.0,
+      "0x000000000018b7c0": 14.0
+     }
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 5048.0,
@@ -2134,7 +3008,13 @@
      "outward_by_callee_per_call": {
       "0x0000000004001150": 208.0
      },
-     "outward_ir_per_call": 208.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001150": 13.0
+     },
+     "outward_ir_per_call": 208.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001150": 16.0
+     }
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 5061.0,
@@ -2142,7 +3022,13 @@
      "outward_by_callee_per_call": {
       "0x0000000004001150": 208.0
      },
-     "outward_ir_per_call": 208.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001150": 13.0
+     },
+     "outward_ir_per_call": 208.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001150": 16.0
+     }
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 4791.0,
@@ -2150,7 +3036,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 143.0
      },
-     "outward_ir_per_call": 143.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 13.0
+     },
+     "outward_ir_per_call": 143.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 11.0
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 3416.0,
@@ -2159,7 +3051,15 @@
       "0x0000000000188a80": 190.0,
       "0x0000000000189480": 143.0
      },
-     "outward_ir_per_call": 333.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 13.0,
+      "0x0000000000189480": 13.0
+     },
+     "outward_ir_per_call": 333.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 14.615384615384615,
+      "0x0000000000189480": 11.0
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 3593.0,
@@ -2168,7 +3068,15 @@
       "0x0000000000188a80": 190.0,
       "0x0000000000189480": 143.0
      },
-     "outward_ir_per_call": 333.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 13.0,
+      "0x0000000000189480": 13.0
+     },
+     "outward_ir_per_call": 333.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 14.615384615384615,
+      "0x0000000000189480": 11.0
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 3593.0,
@@ -2177,7 +3085,15 @@
       "0x0000000000188a80": 190.0,
       "0x0000000000189480": 143.0
      },
-     "outward_ir_per_call": 333.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 13.0,
+      "0x0000000000189480": 13.0
+     },
+     "outward_ir_per_call": 333.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 14.615384615384615,
+      "0x0000000000189480": 11.0
+     }
     }
    },
    "n_iters": 60000,
@@ -2214,7 +3130,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 189.0
      },
-     "outward_ir_per_call": 189.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 12.0
+     },
+     "outward_ir_per_call": 189.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 15.75
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 1980.0,
@@ -2222,19 +3144,29 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 189.0
      },
-     "outward_ir_per_call": 189.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 12.0
+     },
+     "outward_ir_per_call": 189.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 15.75
+     }
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 2074.0,
      "kernel_inclusive_ir_per_call": 2074.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 2165.0,
      "kernel_inclusive_ir_per_call": 2165.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 2343.0,
@@ -2242,7 +3174,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 189.0
      },
-     "outward_ir_per_call": 189.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 12.0
+     },
+     "outward_ir_per_call": 189.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 15.75
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 2404.0,
@@ -2250,7 +3188,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 189.0
      },
-     "outward_ir_per_call": 189.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 12.0
+     },
+     "outward_ir_per_call": 189.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 15.75
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 1979.0,
@@ -2258,7 +3202,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 189.0
      },
-     "outward_ir_per_call": 189.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 12.0
+     },
+     "outward_ir_per_call": 189.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 15.75
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 1979.0,
@@ -2266,7 +3216,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 189.0
      },
-     "outward_ir_per_call": 189.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 12.0
+     },
+     "outward_ir_per_call": 189.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 15.75
+     }
     }
    },
    "n_iters": 20000,
@@ -2301,7 +3257,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 74.0
      },
-     "outward_ir_per_call": 74.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 6.0
+     },
+     "outward_ir_per_call": 74.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.333333333333334
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 3601.0,
@@ -2309,19 +3271,29 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 74.0
      },
-     "outward_ir_per_call": 74.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 6.0
+     },
+     "outward_ir_per_call": 74.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.333333333333334
+     }
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 3903.0,
      "kernel_inclusive_ir_per_call": 3903.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 4141.0,
      "kernel_inclusive_ir_per_call": 4141.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 4474.0,
@@ -2329,7 +3301,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 74.0
      },
-     "outward_ir_per_call": 74.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 6.0
+     },
+     "outward_ir_per_call": 74.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.333333333333334
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 4204.0,
@@ -2337,7 +3315,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 74.0
      },
-     "outward_ir_per_call": 74.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 6.0
+     },
+     "outward_ir_per_call": 74.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.333333333333334
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 3566.0,
@@ -2345,7 +3329,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 74.0
      },
-     "outward_ir_per_call": 74.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 6.0
+     },
+     "outward_ir_per_call": 74.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.333333333333334
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 3566.0,
@@ -2353,7 +3343,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000188a80": 74.0
      },
-     "outward_ir_per_call": 74.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 6.0
+     },
+     "outward_ir_per_call": 74.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.333333333333334
+     }
     }
    },
    "n_iters": 60000,
@@ -2388,49 +3384,65 @@
      "kernel_exclusive_ir_per_call": 23761.0,
      "kernel_inclusive_ir_per_call": 23761.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 23815.0,
      "kernel_inclusive_ir_per_call": 23815.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 32694.0,
      "kernel_inclusive_ir_per_call": 32694.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 32735.0,
      "kernel_inclusive_ir_per_call": 32735.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 40921.0,
      "kernel_inclusive_ir_per_call": 40921.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 23875.0,
      "kernel_inclusive_ir_per_call": 23875.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 23798.0,
      "kernel_inclusive_ir_per_call": 23798.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 23798.0,
      "kernel_inclusive_ir_per_call": 23798.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 20000,
@@ -2463,49 +3475,65 @@
      "kernel_exclusive_ir_per_call": 2993.0,
      "kernel_inclusive_ir_per_call": 2993.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 3017.0,
      "kernel_inclusive_ir_per_call": 3017.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 4062.0,
      "kernel_inclusive_ir_per_call": 4062.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 4079.0,
      "kernel_inclusive_ir_per_call": 4079.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 5095.0,
      "kernel_inclusive_ir_per_call": 5095.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 3037.0,
      "kernel_inclusive_ir_per_call": 3037.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 3010.0,
      "kernel_inclusive_ir_per_call": 3010.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 3010.0,
      "kernel_inclusive_ir_per_call": 3010.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 25000,
@@ -2540,49 +3568,65 @@
      "kernel_exclusive_ir_per_call": 41221.0,
      "kernel_inclusive_ir_per_call": 41221.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 41240.0,
      "kernel_inclusive_ir_per_call": 41240.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 57243.0,
      "kernel_inclusive_ir_per_call": 57243.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 57252.0,
      "kernel_inclusive_ir_per_call": 57252.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 71559.0,
      "kernel_inclusive_ir_per_call": 71559.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 41298.0,
      "kernel_inclusive_ir_per_call": 41298.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 41266.0,
      "kernel_inclusive_ir_per_call": 41266.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 41266.0,
      "kernel_inclusive_ir_per_call": 41266.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 12000,
@@ -2615,49 +3659,65 @@
      "kernel_exclusive_ir_per_call": 5150.0,
      "kernel_inclusive_ir_per_call": 5150.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 5169.0,
      "kernel_inclusive_ir_per_call": 5169.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 7051.0,
      "kernel_inclusive_ir_per_call": 7051.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 7060.0,
      "kernel_inclusive_ir_per_call": 7060.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 8819.0,
      "kernel_inclusive_ir_per_call": 8819.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 5227.0,
      "kernel_inclusive_ir_per_call": 5227.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 5195.0,
      "kernel_inclusive_ir_per_call": 5195.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 5195.0,
      "kernel_inclusive_ir_per_call": 5195.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 25000,
@@ -2692,49 +3752,65 @@
      "kernel_exclusive_ir_per_call": 790.0,
      "kernel_inclusive_ir_per_call": 790.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 874.0,
      "kernel_inclusive_ir_per_call": 874.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 738.0,
      "kernel_inclusive_ir_per_call": 738.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 820.0,
      "kernel_inclusive_ir_per_call": 820.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 1039.0,
      "kernel_inclusive_ir_per_call": 1039.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 876.0,
      "kernel_inclusive_ir_per_call": 876.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 888.0,
      "kernel_inclusive_ir_per_call": 888.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 888.0,
      "kernel_inclusive_ir_per_call": 888.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 40000,
@@ -2767,49 +3843,65 @@
      "kernel_exclusive_ir_per_call": 2020.0,
      "kernel_inclusive_ir_per_call": 2020.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 2246.0,
      "kernel_inclusive_ir_per_call": 2246.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 1884.0,
      "kernel_inclusive_ir_per_call": 1884.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 2108.0,
      "kernel_inclusive_ir_per_call": 2108.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 2681.0,
      "kernel_inclusive_ir_per_call": 2681.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 2293.0,
      "kernel_inclusive_ir_per_call": 2293.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 2318.0,
      "kernel_inclusive_ir_per_call": 2318.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 2318.0,
      "kernel_inclusive_ir_per_call": 2318.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 60000,
@@ -2844,49 +3936,65 @@
      "kernel_exclusive_ir_per_call": 31852.7932,
      "kernel_inclusive_ir_per_call": 31852.7932,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 36972.7932,
      "kernel_inclusive_ir_per_call": 36972.7932,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 28383.9227,
      "kernel_inclusive_ir_per_call": 28383.9227,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 29407.9227,
      "kernel_inclusive_ir_per_call": 29407.9227,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 39038.7932,
      "kernel_inclusive_ir_per_call": 39038.7932,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 36973.7932,
      "kernel_inclusive_ir_per_call": 36973.7932,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 36971.7932,
      "kernel_inclusive_ir_per_call": 36971.7932,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 36971.7932,
      "kernel_inclusive_ir_per_call": 36971.7932,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 20000,
@@ -2919,49 +4027,65 @@
      "kernel_exclusive_ir_per_call": 3760.3652,
      "kernel_inclusive_ir_per_call": 3760.3652,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 4400.3652,
      "kernel_inclusive_ir_per_call": 4400.3652,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 3446.5497,
      "kernel_inclusive_ir_per_call": 3446.5497,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 3574.5497,
      "kernel_inclusive_ir_per_call": 3574.5497,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 4674.3652,
      "kernel_inclusive_ir_per_call": 4674.3652,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 4401.3652,
      "kernel_inclusive_ir_per_call": 4401.3652,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 4399.3652,
      "kernel_inclusive_ir_per_call": 4399.3652,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 4399.3652,
      "kernel_inclusive_ir_per_call": 4399.3652,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 20000,
@@ -3000,7 +4124,17 @@
       "free": 3038.60075,
       "malloc": 1794.36885
      },
-     "outward_ir_per_call": 4833.00725
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 5e-05,
+      "free": 31.99995,
+      "malloc": 32.0
+     },
+     "outward_ir_per_call": 4833.00725,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 753.0,
+      "free": 94.95642180690908,
+      "malloc": 56.0740265625
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 3645.29165,
@@ -3010,7 +4144,17 @@
       "free": 3038.60075,
       "malloc": 1794.36885
      },
-     "outward_ir_per_call": 4833.00725
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 5e-05,
+      "free": 31.99995,
+      "malloc": 32.0
+     },
+     "outward_ir_per_call": 4833.00725,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 753.0,
+      "free": 94.95642180690908,
+      "malloc": 56.0740265625
+     }
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 3440.0865,
@@ -3019,7 +4163,15 @@
       "0x0000000004001120": 3102.605,
       "0x00000000040011a0": 1858.36885
      },
-     "outward_ir_per_call": 4960.97385
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001120": 32.0,
+      "0x00000000040011a0": 32.0
+     },
+     "outward_ir_per_call": 4960.97385,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001120": 96.95640625,
+      "0x00000000040011a0": 58.0740265625
+     }
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 3530.8879,
@@ -3028,7 +4180,15 @@
       "0x0000000004001120": 3102.605,
       "0x00000000040011a0": 1858.36885
      },
-     "outward_ir_per_call": 4960.97385
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001120": 32.0,
+      "0x00000000040011a0": 32.0
+     },
+     "outward_ir_per_call": 4960.97385,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001120": 96.95640625,
+      "0x00000000040011a0": 58.0740265625
+     }
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 4562.37955,
@@ -3039,7 +4199,19 @@
       "__rustc::__rust_no_alloc_shim_is_unstable_v2": 32.0,
       "core::ptr::drop_glue::<[core::option::Option<alloc::boxed::Box<u8>>; 32]>": 1252.35955
      },
-     "outward_ir_per_call": 5379.93385
+     "outward_calls_per_kernel_call": {
+      "__rustc::__rust_alloc": 32.0,
+      "__rustc::__rust_dealloc": 21.54735,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 32.0,
+      "core::ptr::drop_glue::<[core::option::Option<alloc::boxed::Box<u8>>; 32]>": 1.0
+     },
+     "outward_ir_per_call": 5379.93385,
+     "outward_ir_per_callee_call": {
+      "__rustc::__rust_alloc": 66.07419375,
+      "__rustc::__rust_dealloc": 91.94634607039845,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0,
+      "core::ptr::drop_glue::<[core::option::Option<alloc::boxed::Box<u8>>; 32]>": 1252.35955
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 4530.37955,
@@ -3050,7 +4222,19 @@
       "__rustc::__rust_no_alloc_shim_is_unstable_v2": 32.0,
       "core::ptr::drop_glue::<[core::option::Option<alloc::boxed::Box<u8>>; 32]>": 1252.35955
      },
-     "outward_ir_per_call": 5379.93385
+     "outward_calls_per_kernel_call": {
+      "__rustc::__rust_alloc": 32.0,
+      "__rustc::__rust_dealloc": 21.54735,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 32.0,
+      "core::ptr::drop_glue::<[core::option::Option<alloc::boxed::Box<u8>>; 32]>": 1.0
+     },
+     "outward_ir_per_call": 5379.93385,
+     "outward_ir_per_callee_call": {
+      "__rustc::__rust_alloc": 66.07419375,
+      "__rustc::__rust_dealloc": 91.94634607039845,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0,
+      "core::ptr::drop_glue::<[core::option::Option<alloc::boxed::Box<u8>>; 32]>": 1252.35955
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 3868.55945,
@@ -3060,7 +4244,17 @@
       "__rustc::__rust_dealloc": 3102.605,
       "__rustc::__rust_no_alloc_shim_is_unstable_v2": 32.0
      },
-     "outward_ir_per_call": 5248.9792
+     "outward_calls_per_kernel_call": {
+      "__rustc::__rust_alloc": 32.0,
+      "__rustc::__rust_dealloc": 32.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 32.0
+     },
+     "outward_ir_per_call": 5248.9792,
+     "outward_ir_per_callee_call": {
+      "__rustc::__rust_alloc": 66.07419375,
+      "__rustc::__rust_dealloc": 96.95640625,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 3868.55945,
@@ -3070,7 +4264,17 @@
       "__rustc::__rust_dealloc": 3102.605,
       "__rustc::__rust_no_alloc_shim_is_unstable_v2": 32.0
      },
-     "outward_ir_per_call": 5248.98185
+     "outward_calls_per_kernel_call": {
+      "__rustc::__rust_alloc": 32.0,
+      "__rustc::__rust_dealloc": 32.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 32.0
+     },
+     "outward_ir_per_call": 5248.98185,
+     "outward_ir_per_callee_call": {
+      "__rustc::__rust_alloc": 66.0742765625,
+      "__rustc::__rust_dealloc": 96.95640625,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     }
     }
    },
    "n_iters": 20000,
@@ -3107,7 +4311,17 @@
       "free": 897.3194,
       "malloc": 493.147675
      },
-     "outward_ir_per_call": 1390.47084
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 5e-06,
+      "free": 10.00566,
+      "malloc": 10.005665
+     },
+     "outward_ir_per_call": 1390.47084,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 753.0,
+      "free": 89.68118045186425,
+      "malloc": 49.28684650145693
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 874.57388,
@@ -3117,7 +4331,17 @@
       "free": 897.3194,
       "malloc": 493.147675
      },
-     "outward_ir_per_call": 1390.47084
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 5e-06,
+      "free": 10.00566,
+      "malloc": 10.005665
+     },
+     "outward_ir_per_call": 1390.47084,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 753.0,
+      "free": 89.68118045186425,
+      "malloc": 49.28684650145693
+     }
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 844.56846,
@@ -3126,7 +4350,15 @@
       "0x0000000004001120": 917.331155,
       "0x00000000040011a0": 513.159005
      },
-     "outward_ir_per_call": 1430.49016
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001120": 10.005665,
+      "0x00000000040011a0": 10.005665
+     },
+     "outward_ir_per_call": 1430.49016,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001120": 91.68117811259921,
+      "0x00000000040011a0": 51.28684650145693
+     }
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 864.495855,
@@ -3135,7 +4367,15 @@
       "0x0000000004001120": 917.331155,
       "0x00000000040011a0": 513.159005
      },
-     "outward_ir_per_call": 1430.49016
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001120": 10.005665,
+      "0x00000000040011a0": 10.005665
+     },
+     "outward_ir_per_call": 1430.49016,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001120": 91.68117811259921,
+      "0x00000000040011a0": 51.28684650145693
+     }
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 1041.14257,
@@ -3146,7 +4386,19 @@
       "__rustc::__rust_no_alloc_shim_is_unstable_v2": 10.005665,
       "core::ptr::drop_glue::<[core::option::Option<alloc::boxed::Box<u8>>; 32]>": 756.73365
      },
-     "outward_ir_per_call": 1640.871445
+     "outward_calls_per_kernel_call": {
+      "__rustc::__rust_alloc": 10.005665,
+      "__rustc::__rust_dealloc": 3.22905,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 10.005665,
+      "core::ptr::drop_glue::<[core::option::Option<alloc::boxed::Box<u8>>; 32]>": 1.0
+     },
+     "outward_ir_per_call": 1640.871445,
+     "outward_ir_per_callee_call": {
+      "__rustc::__rust_alloc": 59.28689197569577,
+      "__rustc::__rust_dealloc": 87.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0,
+      "core::ptr::drop_glue::<[core::option::Option<alloc::boxed::Box<u8>>; 32]>": 756.73365
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 1031.628835,
@@ -3157,7 +4409,19 @@
       "__rustc::__rust_no_alloc_shim_is_unstable_v2": 10.005665,
       "core::ptr::drop_glue::<[core::option::Option<alloc::boxed::Box<u8>>; 32]>": 756.73365
      },
-     "outward_ir_per_call": 1640.871445
+     "outward_calls_per_kernel_call": {
+      "__rustc::__rust_alloc": 10.005665,
+      "__rustc::__rust_dealloc": 3.22905,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 10.005665,
+      "core::ptr::drop_glue::<[core::option::Option<alloc::boxed::Box<u8>>; 32]>": 1.0
+     },
+     "outward_ir_per_call": 1640.871445,
+     "outward_ir_per_callee_call": {
+      "__rustc::__rust_alloc": 59.28689197569577,
+      "__rustc::__rust_dealloc": 87.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0,
+      "core::ptr::drop_glue::<[core::option::Option<alloc::boxed::Box<u8>>; 32]>": 756.73365
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 921.65377,
@@ -3167,7 +4431,17 @@
       "__rustc::__rust_dealloc": 917.331155,
       "__rustc::__rust_no_alloc_shim_is_unstable_v2": 10.005665
      },
-     "outward_ir_per_call": 1520.5416
+     "outward_calls_per_kernel_call": {
+      "__rustc::__rust_alloc": 10.005665,
+      "__rustc::__rust_dealloc": 10.005665,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 10.005665
+     },
+     "outward_ir_per_call": 1520.5416,
+     "outward_ir_per_callee_call": {
+      "__rustc::__rust_alloc": 59.28689197569577,
+      "__rustc::__rust_dealloc": 91.68117811259921,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 921.65377,
@@ -3177,7 +4451,17 @@
       "__rustc::__rust_dealloc": 917.331155,
       "__rustc::__rust_no_alloc_shim_is_unstable_v2": 10.005665
      },
-     "outward_ir_per_call": 1520.5416
+     "outward_calls_per_kernel_call": {
+      "__rustc::__rust_alloc": 10.005665,
+      "__rustc::__rust_dealloc": 10.005665,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 10.005665
+     },
+     "outward_ir_per_call": 1520.5416,
+     "outward_ir_per_callee_call": {
+      "__rustc::__rust_alloc": 59.28689197569577,
+      "__rustc::__rust_dealloc": 91.68117811259921,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     }
     }
    },
    "n_iters": 200000,
@@ -3221,7 +4505,27 @@
       "op6": 384.0,
       "op7": 384.0
      },
-     "outward_ir_per_call": 3072.0
+     "outward_calls_per_kernel_call": {
+      "op0": 128.0,
+      "op1": 128.0,
+      "op2": 128.0,
+      "op3": 128.0,
+      "op4": 128.0,
+      "op5": 128.0,
+      "op6": 128.0,
+      "op7": 128.0
+     },
+     "outward_ir_per_call": 3072.0,
+     "outward_ir_per_callee_call": {
+      "op0": 3.0,
+      "op1": 3.0,
+      "op2": 3.0,
+      "op3": 3.0,
+      "op4": 3.0,
+      "op5": 3.0,
+      "op6": 3.0,
+      "op7": 3.0
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 15391.0,
@@ -3236,7 +4540,27 @@
       "op6": 384.0,
       "op7": 384.0
      },
-     "outward_ir_per_call": 3072.0
+     "outward_calls_per_kernel_call": {
+      "op0": 128.0,
+      "op1": 128.0,
+      "op2": 128.0,
+      "op3": 128.0,
+      "op4": 128.0,
+      "op5": 128.0,
+      "op6": 128.0,
+      "op7": 128.0
+     },
+     "outward_ir_per_call": 3072.0,
+     "outward_ir_per_callee_call": {
+      "op0": 3.0,
+      "op1": 3.0,
+      "op2": 3.0,
+      "op3": 3.0,
+      "op4": 3.0,
+      "op5": 3.0,
+      "op6": 3.0,
+      "op7": 3.0
+     }
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 10279.0,
@@ -3251,7 +4575,27 @@
       "op6": 512.0,
       "op7": 512.0
      },
-     "outward_ir_per_call": 4096.0
+     "outward_calls_per_kernel_call": {
+      "op0": 128.0,
+      "op1": 128.0,
+      "op2": 128.0,
+      "op3": 128.0,
+      "op4": 128.0,
+      "op5": 128.0,
+      "op6": 128.0,
+      "op7": 128.0
+     },
+     "outward_ir_per_call": 4096.0,
+     "outward_ir_per_callee_call": {
+      "op0": 4.0,
+      "op1": 4.0,
+      "op2": 4.0,
+      "op3": 4.0,
+      "op4": 4.0,
+      "op5": 4.0,
+      "op6": 4.0,
+      "op7": 4.0
+     }
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 12326.0,
@@ -3266,7 +4610,27 @@
       "op6": 512.0,
       "op7": 512.0
      },
-     "outward_ir_per_call": 4096.0
+     "outward_calls_per_kernel_call": {
+      "op0": 128.0,
+      "op1": 128.0,
+      "op2": 128.0,
+      "op3": 128.0,
+      "op4": 128.0,
+      "op5": 128.0,
+      "op6": 128.0,
+      "op7": 128.0
+     },
+     "outward_ir_per_call": 4096.0,
+     "outward_ir_per_callee_call": {
+      "op0": 4.0,
+      "op1": 4.0,
+      "op2": 4.0,
+      "op3": 4.0,
+      "op4": 4.0,
+      "op5": 4.0,
+      "op6": 4.0,
+      "op7": 4.0
+     }
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 27690.0,
@@ -3281,7 +4645,27 @@
       "<safe_naive::OpTag<6> as safe_naive::Op>::apply": 384.0,
       "<safe_naive::OpTag<7> as safe_naive::Op>::apply": 384.0
      },
-     "outward_ir_per_call": 3072.0
+     "outward_calls_per_kernel_call": {
+      "<safe_naive::OpTag<0> as safe_naive::Op>::apply": 128.0,
+      "<safe_naive::OpTag<1> as safe_naive::Op>::apply": 128.0,
+      "<safe_naive::OpTag<2> as safe_naive::Op>::apply": 128.0,
+      "<safe_naive::OpTag<3> as safe_naive::Op>::apply": 128.0,
+      "<safe_naive::OpTag<4> as safe_naive::Op>::apply": 128.0,
+      "<safe_naive::OpTag<5> as safe_naive::Op>::apply": 128.0,
+      "<safe_naive::OpTag<6> as safe_naive::Op>::apply": 128.0,
+      "<safe_naive::OpTag<7> as safe_naive::Op>::apply": 128.0
+     },
+     "outward_ir_per_call": 3072.0,
+     "outward_ir_per_callee_call": {
+      "<safe_naive::OpTag<0> as safe_naive::Op>::apply": 3.0,
+      "<safe_naive::OpTag<1> as safe_naive::Op>::apply": 3.0,
+      "<safe_naive::OpTag<2> as safe_naive::Op>::apply": 3.0,
+      "<safe_naive::OpTag<3> as safe_naive::Op>::apply": 3.0,
+      "<safe_naive::OpTag<4> as safe_naive::Op>::apply": 3.0,
+      "<safe_naive::OpTag<5> as safe_naive::Op>::apply": 3.0,
+      "<safe_naive::OpTag<6> as safe_naive::Op>::apply": 3.0,
+      "<safe_naive::OpTag<7> as safe_naive::Op>::apply": 3.0
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 13358.0,
@@ -3296,7 +4680,27 @@
       "<safe_tuned::OpTag<6> as safe_tuned::Op>::apply": 384.0,
       "<safe_tuned::OpTag<7> as safe_tuned::Op>::apply": 384.0
      },
-     "outward_ir_per_call": 3072.0
+     "outward_calls_per_kernel_call": {
+      "<safe_tuned::OpTag<0> as safe_tuned::Op>::apply": 128.0,
+      "<safe_tuned::OpTag<1> as safe_tuned::Op>::apply": 128.0,
+      "<safe_tuned::OpTag<2> as safe_tuned::Op>::apply": 128.0,
+      "<safe_tuned::OpTag<3> as safe_tuned::Op>::apply": 128.0,
+      "<safe_tuned::OpTag<4> as safe_tuned::Op>::apply": 128.0,
+      "<safe_tuned::OpTag<5> as safe_tuned::Op>::apply": 128.0,
+      "<safe_tuned::OpTag<6> as safe_tuned::Op>::apply": 128.0,
+      "<safe_tuned::OpTag<7> as safe_tuned::Op>::apply": 128.0
+     },
+     "outward_ir_per_call": 3072.0,
+     "outward_ir_per_callee_call": {
+      "<safe_tuned::OpTag<0> as safe_tuned::Op>::apply": 3.0,
+      "<safe_tuned::OpTag<1> as safe_tuned::Op>::apply": 3.0,
+      "<safe_tuned::OpTag<2> as safe_tuned::Op>::apply": 3.0,
+      "<safe_tuned::OpTag<3> as safe_tuned::Op>::apply": 3.0,
+      "<safe_tuned::OpTag<4> as safe_tuned::Op>::apply": 3.0,
+      "<safe_tuned::OpTag<5> as safe_tuned::Op>::apply": 3.0,
+      "<safe_tuned::OpTag<6> as safe_tuned::Op>::apply": 3.0,
+      "<safe_tuned::OpTag<7> as safe_tuned::Op>::apply": 3.0
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 13343.0,
@@ -3311,7 +4715,27 @@
       "<unsafe::OpTag<6> as unsafe::Op>::apply": 384.0,
       "<unsafe::OpTag<7> as unsafe::Op>::apply": 384.0
      },
-     "outward_ir_per_call": 3072.0
+     "outward_calls_per_kernel_call": {
+      "<unsafe::OpTag<0> as unsafe::Op>::apply": 128.0,
+      "<unsafe::OpTag<1> as unsafe::Op>::apply": 128.0,
+      "<unsafe::OpTag<2> as unsafe::Op>::apply": 128.0,
+      "<unsafe::OpTag<3> as unsafe::Op>::apply": 128.0,
+      "<unsafe::OpTag<4> as unsafe::Op>::apply": 128.0,
+      "<unsafe::OpTag<5> as unsafe::Op>::apply": 128.0,
+      "<unsafe::OpTag<6> as unsafe::Op>::apply": 128.0,
+      "<unsafe::OpTag<7> as unsafe::Op>::apply": 128.0
+     },
+     "outward_ir_per_call": 3072.0,
+     "outward_ir_per_callee_call": {
+      "<unsafe::OpTag<0> as unsafe::Op>::apply": 3.0,
+      "<unsafe::OpTag<1> as unsafe::Op>::apply": 3.0,
+      "<unsafe::OpTag<2> as unsafe::Op>::apply": 3.0,
+      "<unsafe::OpTag<3> as unsafe::Op>::apply": 3.0,
+      "<unsafe::OpTag<4> as unsafe::Op>::apply": 3.0,
+      "<unsafe::OpTag<5> as unsafe::Op>::apply": 3.0,
+      "<unsafe::OpTag<6> as unsafe::Op>::apply": 3.0,
+      "<unsafe::OpTag<7> as unsafe::Op>::apply": 3.0
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 13343.0,
@@ -3326,7 +4750,27 @@
       "<verus::OpTag<6> as verus::Op>::apply": 384.0,
       "<verus::OpTag<7> as verus::Op>::apply": 384.0
      },
-     "outward_ir_per_call": 3072.0
+     "outward_calls_per_kernel_call": {
+      "<verus::OpTag<0> as verus::Op>::apply": 128.0,
+      "<verus::OpTag<1> as verus::Op>::apply": 128.0,
+      "<verus::OpTag<2> as verus::Op>::apply": 128.0,
+      "<verus::OpTag<3> as verus::Op>::apply": 128.0,
+      "<verus::OpTag<4> as verus::Op>::apply": 128.0,
+      "<verus::OpTag<5> as verus::Op>::apply": 128.0,
+      "<verus::OpTag<6> as verus::Op>::apply": 128.0,
+      "<verus::OpTag<7> as verus::Op>::apply": 128.0
+     },
+     "outward_ir_per_call": 3072.0,
+     "outward_ir_per_callee_call": {
+      "<verus::OpTag<0> as verus::Op>::apply": 3.0,
+      "<verus::OpTag<1> as verus::Op>::apply": 3.0,
+      "<verus::OpTag<2> as verus::Op>::apply": 3.0,
+      "<verus::OpTag<3> as verus::Op>::apply": 3.0,
+      "<verus::OpTag<4> as verus::Op>::apply": 3.0,
+      "<verus::OpTag<5> as verus::Op>::apply": 3.0,
+      "<verus::OpTag<6> as verus::Op>::apply": 3.0,
+      "<verus::OpTag<7> as verus::Op>::apply": 3.0
+     }
     }
    },
    "n_iters": 20000,
@@ -3368,7 +4812,27 @@
       "op6": 49.43235,
       "op7": 47.42055
      },
-     "outward_ir_per_call": 384.0
+     "outward_calls_per_kernel_call": {
+      "op0": 16.1039,
+      "op1": 16.3835,
+      "op2": 15.48335,
+      "op3": 16.14315,
+      "op4": 15.9353,
+      "op5": 15.6665,
+      "op6": 16.47745,
+      "op7": 15.80685
+     },
+     "outward_ir_per_call": 384.0,
+     "outward_ir_per_callee_call": {
+      "op0": 3.0,
+      "op1": 3.0,
+      "op2": 3.0,
+      "op3": 3.0,
+      "op4": 3.0,
+      "op5": 3.0,
+      "op6": 3.0,
+      "op7": 3.0
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 1951.0,
@@ -3383,7 +4847,27 @@
       "op6": 49.43235,
       "op7": 47.42055
      },
-     "outward_ir_per_call": 384.0
+     "outward_calls_per_kernel_call": {
+      "op0": 16.1039,
+      "op1": 16.3835,
+      "op2": 15.48335,
+      "op3": 16.14315,
+      "op4": 15.9353,
+      "op5": 15.6665,
+      "op6": 16.47745,
+      "op7": 15.80685
+     },
+     "outward_ir_per_call": 384.0,
+     "outward_ir_per_callee_call": {
+      "op0": 3.0,
+      "op1": 3.0,
+      "op2": 3.0,
+      "op3": 3.0,
+      "op4": 3.0,
+      "op5": 3.0,
+      "op6": 3.0,
+      "op7": 3.0
+     }
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 1319.0,
@@ -3398,7 +4882,27 @@
       "op6": 65.9098,
       "op7": 63.2274
      },
-     "outward_ir_per_call": 512.0
+     "outward_calls_per_kernel_call": {
+      "op0": 16.1039,
+      "op1": 16.3835,
+      "op2": 15.48335,
+      "op3": 16.14315,
+      "op4": 15.9353,
+      "op5": 15.6665,
+      "op6": 16.47745,
+      "op7": 15.80685
+     },
+     "outward_ir_per_call": 512.0,
+     "outward_ir_per_callee_call": {
+      "op0": 4.0,
+      "op1": 4.0,
+      "op2": 4.0,
+      "op3": 4.0,
+      "op4": 4.0,
+      "op5": 4.0,
+      "op6": 4.0,
+      "op7": 4.0
+     }
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 1574.0,
@@ -3413,7 +4917,27 @@
       "op6": 65.9098,
       "op7": 63.2274
      },
-     "outward_ir_per_call": 512.0
+     "outward_calls_per_kernel_call": {
+      "op0": 16.1039,
+      "op1": 16.3835,
+      "op2": 15.48335,
+      "op3": 16.14315,
+      "op4": 15.9353,
+      "op5": 15.6665,
+      "op6": 16.47745,
+      "op7": 15.80685
+     },
+     "outward_ir_per_call": 512.0,
+     "outward_ir_per_callee_call": {
+      "op0": 4.0,
+      "op1": 4.0,
+      "op2": 4.0,
+      "op3": 4.0,
+      "op4": 4.0,
+      "op5": 4.0,
+      "op6": 4.0,
+      "op7": 4.0
+     }
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 3498.0,
@@ -3428,7 +4952,27 @@
       "<safe_naive::OpTag<6> as safe_naive::Op>::apply": 49.43235,
       "<safe_naive::OpTag<7> as safe_naive::Op>::apply": 47.42055
      },
-     "outward_ir_per_call": 384.0
+     "outward_calls_per_kernel_call": {
+      "<safe_naive::OpTag<0> as safe_naive::Op>::apply": 16.1039,
+      "<safe_naive::OpTag<1> as safe_naive::Op>::apply": 16.3835,
+      "<safe_naive::OpTag<2> as safe_naive::Op>::apply": 15.48335,
+      "<safe_naive::OpTag<3> as safe_naive::Op>::apply": 16.14315,
+      "<safe_naive::OpTag<4> as safe_naive::Op>::apply": 15.9353,
+      "<safe_naive::OpTag<5> as safe_naive::Op>::apply": 15.6665,
+      "<safe_naive::OpTag<6> as safe_naive::Op>::apply": 16.47745,
+      "<safe_naive::OpTag<7> as safe_naive::Op>::apply": 15.80685
+     },
+     "outward_ir_per_call": 384.0,
+     "outward_ir_per_callee_call": {
+      "<safe_naive::OpTag<0> as safe_naive::Op>::apply": 3.0,
+      "<safe_naive::OpTag<1> as safe_naive::Op>::apply": 3.0,
+      "<safe_naive::OpTag<2> as safe_naive::Op>::apply": 3.0,
+      "<safe_naive::OpTag<3> as safe_naive::Op>::apply": 3.0,
+      "<safe_naive::OpTag<4> as safe_naive::Op>::apply": 3.0,
+      "<safe_naive::OpTag<5> as safe_naive::Op>::apply": 3.0,
+      "<safe_naive::OpTag<6> as safe_naive::Op>::apply": 3.0,
+      "<safe_naive::OpTag<7> as safe_naive::Op>::apply": 3.0
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 1710.0,
@@ -3443,7 +4987,27 @@
       "<safe_tuned::OpTag<6> as safe_tuned::Op>::apply": 49.43235,
       "<safe_tuned::OpTag<7> as safe_tuned::Op>::apply": 47.42055
      },
-     "outward_ir_per_call": 384.0
+     "outward_calls_per_kernel_call": {
+      "<safe_tuned::OpTag<0> as safe_tuned::Op>::apply": 16.1039,
+      "<safe_tuned::OpTag<1> as safe_tuned::Op>::apply": 16.3835,
+      "<safe_tuned::OpTag<2> as safe_tuned::Op>::apply": 15.48335,
+      "<safe_tuned::OpTag<3> as safe_tuned::Op>::apply": 16.14315,
+      "<safe_tuned::OpTag<4> as safe_tuned::Op>::apply": 15.9353,
+      "<safe_tuned::OpTag<5> as safe_tuned::Op>::apply": 15.6665,
+      "<safe_tuned::OpTag<6> as safe_tuned::Op>::apply": 16.47745,
+      "<safe_tuned::OpTag<7> as safe_tuned::Op>::apply": 15.80685
+     },
+     "outward_ir_per_call": 384.0,
+     "outward_ir_per_callee_call": {
+      "<safe_tuned::OpTag<0> as safe_tuned::Op>::apply": 3.0,
+      "<safe_tuned::OpTag<1> as safe_tuned::Op>::apply": 3.0,
+      "<safe_tuned::OpTag<2> as safe_tuned::Op>::apply": 3.0,
+      "<safe_tuned::OpTag<3> as safe_tuned::Op>::apply": 3.0,
+      "<safe_tuned::OpTag<4> as safe_tuned::Op>::apply": 3.0,
+      "<safe_tuned::OpTag<5> as safe_tuned::Op>::apply": 3.0,
+      "<safe_tuned::OpTag<6> as safe_tuned::Op>::apply": 3.0,
+      "<safe_tuned::OpTag<7> as safe_tuned::Op>::apply": 3.0
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 1695.0,
@@ -3458,7 +5022,27 @@
       "<unsafe::OpTag<6> as unsafe::Op>::apply": 49.43235,
       "<unsafe::OpTag<7> as unsafe::Op>::apply": 47.42055
      },
-     "outward_ir_per_call": 384.0
+     "outward_calls_per_kernel_call": {
+      "<unsafe::OpTag<0> as unsafe::Op>::apply": 16.1039,
+      "<unsafe::OpTag<1> as unsafe::Op>::apply": 16.3835,
+      "<unsafe::OpTag<2> as unsafe::Op>::apply": 15.48335,
+      "<unsafe::OpTag<3> as unsafe::Op>::apply": 16.14315,
+      "<unsafe::OpTag<4> as unsafe::Op>::apply": 15.9353,
+      "<unsafe::OpTag<5> as unsafe::Op>::apply": 15.6665,
+      "<unsafe::OpTag<6> as unsafe::Op>::apply": 16.47745,
+      "<unsafe::OpTag<7> as unsafe::Op>::apply": 15.80685
+     },
+     "outward_ir_per_call": 384.0,
+     "outward_ir_per_callee_call": {
+      "<unsafe::OpTag<0> as unsafe::Op>::apply": 3.0,
+      "<unsafe::OpTag<1> as unsafe::Op>::apply": 3.0,
+      "<unsafe::OpTag<2> as unsafe::Op>::apply": 3.0,
+      "<unsafe::OpTag<3> as unsafe::Op>::apply": 3.0,
+      "<unsafe::OpTag<4> as unsafe::Op>::apply": 3.0,
+      "<unsafe::OpTag<5> as unsafe::Op>::apply": 3.0,
+      "<unsafe::OpTag<6> as unsafe::Op>::apply": 3.0,
+      "<unsafe::OpTag<7> as unsafe::Op>::apply": 3.0
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 1695.0,
@@ -3473,7 +5057,27 @@
       "<verus::OpTag<6> as verus::Op>::apply": 49.43235,
       "<verus::OpTag<7> as verus::Op>::apply": 47.42055
      },
-     "outward_ir_per_call": 384.0
+     "outward_calls_per_kernel_call": {
+      "<verus::OpTag<0> as verus::Op>::apply": 16.1039,
+      "<verus::OpTag<1> as verus::Op>::apply": 16.3835,
+      "<verus::OpTag<2> as verus::Op>::apply": 15.48335,
+      "<verus::OpTag<3> as verus::Op>::apply": 16.14315,
+      "<verus::OpTag<4> as verus::Op>::apply": 15.9353,
+      "<verus::OpTag<5> as verus::Op>::apply": 15.6665,
+      "<verus::OpTag<6> as verus::Op>::apply": 16.47745,
+      "<verus::OpTag<7> as verus::Op>::apply": 15.80685
+     },
+     "outward_ir_per_call": 384.0,
+     "outward_ir_per_callee_call": {
+      "<verus::OpTag<0> as verus::Op>::apply": 3.0,
+      "<verus::OpTag<1> as verus::Op>::apply": 3.0,
+      "<verus::OpTag<2> as verus::Op>::apply": 3.0,
+      "<verus::OpTag<3> as verus::Op>::apply": 3.0,
+      "<verus::OpTag<4> as verus::Op>::apply": 3.0,
+      "<verus::OpTag<5> as verus::Op>::apply": 3.0,
+      "<verus::OpTag<6> as verus::Op>::apply": 3.0,
+      "<verus::OpTag<7> as verus::Op>::apply": 3.0
+     }
     }
    },
    "n_iters": 20000,
@@ -3508,25 +5112,33 @@
      "kernel_exclusive_ir_per_call": 3175.0,
      "kernel_inclusive_ir_per_call": 3175.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 3239.0,
      "kernel_inclusive_ir_per_call": 3239.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 2558.0,
      "kernel_inclusive_ir_per_call": 2558.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 2582.0,
      "kernel_inclusive_ir_per_call": 2582.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 3972.0,
@@ -3534,7 +5146,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 3286.0,
@@ -3542,7 +5160,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 3261.0,
@@ -3550,7 +5174,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 3261.0,
@@ -3558,7 +5188,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     }
    },
    "n_iters": 20000,
@@ -3591,25 +5227,33 @@
      "kernel_exclusive_ir_per_call": 1260.0,
      "kernel_inclusive_ir_per_call": 1260.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 1292.0,
      "kernel_inclusive_ir_per_call": 1292.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 1028.0,
      "kernel_inclusive_ir_per_call": 1028.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 1040.0,
      "kernel_inclusive_ir_per_call": 1040.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 1563.0,
@@ -3617,7 +5261,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 1327.0,
@@ -3625,7 +5275,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 1306.0,
@@ -3633,7 +5289,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 1306.0,
@@ -3641,7 +5303,13 @@
      "outward_by_callee_per_call": {
       "0x0000000000189480": 50.0
      },
-     "outward_ir_per_call": 50.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 1.0
+     },
+     "outward_ir_per_call": 50.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 50.0
+     }
     }
    },
    "n_iters": 20000,
@@ -3679,13 +5347,23 @@
       "0x0000000000015220": 0.47933333333333333,
       "0x0000000000188320": 165.98866666666666
      },
-     "outward_ir_per_call": 166.468
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 0.0006666666666666666,
+      "0x0000000000188320": 7.999333333333333
+     },
+     "outward_ir_per_call": 166.468,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 719.0,
+      "0x0000000000188320": 20.750312526043835
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 608.0,
      "kernel_inclusive_ir_per_call": 608.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 230.0,
@@ -3693,13 +5371,21 @@
      "outward_by_callee_per_call": {
       "0x0000000004001160": 182.0
      },
-     "outward_ir_per_call": 182.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001160": 8.0
+     },
+     "outward_ir_per_call": 182.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001160": 22.75
+     }
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 631.0,
      "kernel_inclusive_ir_per_call": 631.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 398.0,
@@ -3707,25 +5393,37 @@
      "outward_by_callee_per_call": {
       "0x0000000000188320": 166.0
      },
-     "outward_ir_per_call": 166.0
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188320": 8.0
+     },
+     "outward_ir_per_call": 166.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188320": 20.75
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 734.0,
      "kernel_inclusive_ir_per_call": 734.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 592.0,
      "kernel_inclusive_ir_per_call": 592.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 592.0,
      "kernel_inclusive_ir_per_call": 592.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 1500,
@@ -3761,13 +5459,23 @@
       "0x0000000000015220": 0.03625,
       "0x0000000000188320": 88.2521
      },
-     "outward_ir_per_call": 88.28835
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 5e-05,
+      "0x0000000000188320": 3.99995
+     },
+     "outward_ir_per_call": 88.28835,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 725.0,
+      "0x0000000000188320": 22.06330079125989
+     }
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 428.0,
      "kernel_inclusive_ir_per_call": 428.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "c-gcc": {
      "kernel_exclusive_ir_per_call": 142.0,
@@ -3775,13 +5483,21 @@
      "outward_by_callee_per_call": {
       "0x0000000004001160": 96.25325
      },
-     "outward_ir_per_call": 96.25325
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001160": 4.0
+     },
+     "outward_ir_per_call": 96.25325,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001160": 24.0633125
+     }
     },
     "c-gcc-h": {
      "kernel_exclusive_ir_per_call": 407.0,
      "kernel_inclusive_ir_per_call": 407.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 254.0,
@@ -3789,25 +5505,37 @@
      "outward_by_callee_per_call": {
       "0x0000000000188320": 88.26555
      },
-     "outward_ir_per_call": 88.26555
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188320": 4.0
+     },
+     "outward_ir_per_call": 88.26555,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188320": 22.0663875
+     }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 510.0,
      "kernel_inclusive_ir_per_call": 510.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "unsafe": {
      "kernel_exclusive_ir_per_call": 420.0,
      "kernel_inclusive_ir_per_call": 420.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 420.0,
      "kernel_inclusive_ir_per_call": 420.0,
      "outward_by_callee_per_call": {},
-     "outward_ir_per_call": 0.0
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
     }
    },
    "n_iters": 20000,

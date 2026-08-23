@@ -40,16 +40,32 @@ measured wrong answer from an earlier draft of this file:
     `core::panicking::*`, `slice_index_fail` or `__stack_chk_fail` executed
     exactly zero times.  Counting those would mark almost every safe-vs-unsafe
     pair NOT LICENSED for panic pads that never fire.  This is an argument, not
-    a heuristic -- all of them are `-> !`.
+    a heuristic -- every name in `_NORETURN` is `-> !`.
+    ⚠ It STOPPED being an argument once, and the docstring kept asserting it:
+    `copy_from_slice` was in the list and **returns** (TASK_075_REVIEW M3).  It
+    is the one place this check can emit a silent false LICENSED, so anything
+    added to `_NORETURN` must be `-> !` and must be checked, not assumed.
+ 5. **A `kernel.cold` / `kernel.part.N` sibling is NOT outward.**  It leaves
+    the kernel's `nm` extent, so a naive scan lists it -- but `measure.py`'s
+    own kernel regex `(?:^|::)kernel(?:$|[^A-Za-z0-9_])` MATCHES it, so its
+    cost lands INSIDE `kernel_exclusive_ir`, the very column being licensed.
+    Listing it produced p27's `gcc-clang` verdict, which was right for a reason
+    the measurement contradicts (TASK_075_REVIEW M4).
 
-WHAT IT CANNOT DO, MEASURED (`.temp/p75/crosscheck2.py`, 176 pair/blob rows
-scored against `synthesis/outward_ir.json`, a callgrind caller->callee sweep):
+WHAT IT CANNOT DO, MEASURED (176 pair/blob rows scored against
+`synthesis/outward_ir.json`, a callgrind caller->callee sweep).  ⚠ **The score
+is a property of the SWEEP, not of the rule**, and the numbers move when the
+rule is corrected -- re-score rather than quoting these:
 
-    hits 156   false LICENSED 10   false alarms 0   abstentions 10
+    before item 5 above:  hits 156   false LICENSED 10   false alarms 0   abstentions 10
 
-⚠ Scored against a SECOND, independent sweep the same numbers read
-154 / 12 / 0 / 10, and the two-row difference is itself the first mechanism
-below: p03's and p04's `memset` term does not reproduce.
+⚠ Scored against a second sweep taken under a 64-byte-longer ENVIRONMENT BLOCK
+the same numbers read 152 / 14 / 0 / 10, and the difference is the first
+mechanism below.  **`0 false alarms` survives both sweeps; the hit count does
+not.**  (The FIRST version of this docstring attributed the difference to the
+`--callgrind-out-file=` path length.  That knob is INERT -- valgrind strips its
+own options before building the client stack, and two paths differing by 2
+characters give identical figures.  The environment is the knob that works.)
 
 The misses are exactly two mechanisms, and BOTH are cost differences behind an
 equal set of names:
@@ -58,21 +74,25 @@ equal set of names:
     (p03, p04): +-7.00 `Ir`/call between cells with IDENTICAL call sets and,
     on `R5 - R4`, between BYTE-IDENTICAL kernels.  On the callee-inclusive
     column that makes `R5 - R4` read **-7.00** -- *"the proof costs -7
-    instructions"* -- and which cells carry it is not stable: two independent
-    sweeps of the same binaries moved the outward figure on 6 of 348
-    (pattern, input, cell) triples while the kernel-EXCLUSIVE figure moved on
-    **0 of 348**.  Here the kernel-exclusive column is the right one and
-    adding callees is strictly worse.
+    instructions"* -- and which cells carry it is not stable: two sweeps of the
+    same binaries under different environments moved the outward figure on 11
+    of 348 (pattern, input, cell) triples while the kernel-EXCLUSIVE figure
+    moved on **0 of 348**.  Here the kernel-exclusive column is the right one
+    and adding callees is strictly worse.
   * gcc routes every libc call through a 2-instruction PLT thunk
     (`endbr64 ; jmp *GOT`) that callgrind attributes as its own function;
     clang's thunk is a bare `jmp` and is folded into the callee.  That is
     **+2.00 `Ir` per libc call in gcc's column only** (p02 +2.00, p12 +23.99,
     p11 +299.87 = 150 `strlen` calls x 2.00), and one of the two instructions
     is the `endbr64` of gcc's default `-fcf-protection=full`.
+    ⚠ **This term is DYNAMIC and this check is STATIC**, so it cannot be
+    priced here at all -- only warned about, which `verdict()` now does for
+    every `gcc-clang` pair with an `@plt` call site.
 
 Usage:
     synthesis/licence.py p13 --show
-    synthesis/licence.py --all
+    synthesis/licence.py --all                 # ~43 s for the 22-pattern tree
+    synthesis/licence.py p13                   # ~2 s for ONE pattern
     synthesis/licence.py --emit synthesis/licence.json
 """
 import argparse
@@ -94,15 +114,34 @@ PAIRS = [("safe_naive", "unsafe", "R2-R4"),
          ("c-gcc", "c-clang", "gcc-clang")]
 
 _BRANCHY = re.compile(r"^(j[a-z]+|callq?)$")
+# ⚠ EVERY name here must be `-> !`.  `copy_from_slice` was in this list and
+# RETURNS (TASK_075_REVIEW M3): it is the routine that does the copy, so
+# deleting it from a live set is the one way this check can emit a silent false
+# LICENSED.  `len_mismatch` below already covers the panic helper
+# `copy_from_slice::len_mismatch_fail`, which is what it was aimed at.
+# `abort` needs an explicit boundary rather than `\b`: the v0 mangling
+# `_RNvNtCs2AWtUsOyxgP_3std7process5abort` puts a DIGIT before the `a`, so
+# `\babort\b` does not match it and p27's Rust rungs carried a never-executing
+# `abort` in their live sets.
 _NORETURN = re.compile(
     r"panic|slice_index_fail|slice_end_index|slice_start_index|len_mismatch"
     r"|unwrap_failed|expect_failed|assert_failed|handle_alloc_error"
-    r"|rust_begin_unwind|__stack_chk_fail|\babort\b|_Unwind_Resume"
-    r"|core.*9panicking|copy_from_slice")
+    r"|rust_begin_unwind|__stack_chk_fail|(?<![A-Za-z_])abort(?![A-Za-z0-9_])"
+    r"|_Unwind_Resume|core.*9panicking")
+
+# `measure.py::_sum_rows`'s kernel needle, verbatim.  A target matching it is
+# INSIDE `kernel_exclusive_ir` and is therefore not outward work.
+_KERNEL_SIBLING = re.compile(r"(?:^|::)kernel(?:$|[^A-Za-z0-9_])")
 
 
 def is_noreturn(sym):
     return bool(_NORETURN.search(sym))
+
+
+def is_kernel_sibling(sym):
+    """`kernel.cold`, `kernel.part.0`, ... -- cost that `measure.py` sums INTO
+    the kernel-exclusive column, so it cannot make that column incomparable."""
+    return bool(_KERNEL_SIBLING.search(sym.split("  [")[0]))
 
 
 _GOT_CACHE = {}
@@ -171,22 +210,38 @@ def outward(k, binary):
 
 
 def survey(pat, opt="O3", mode="isolated", cells=None):
+    """{cell: (error_code, targets, unresolved_indirect)}.
+
+    ⚠ `error_code` is a CODE, not prose: `verdict()` maps the two error states
+    to two DIFFERENT tags.  They shared `UNDEC` until TASK_075_REVIEW M2, and
+    the "not built" one is a property of `.temp/build/` rather than of the
+    pattern -- so an emit on a cleaned tree used to fill the published table
+    with `UNDEC` under a legend that misdescribed every one of them."""
     pdir = pattern_dir(pat)
     cells = cells or bld.measured_cells(pdir)
     out = {}
     for c in cells:
         p = os.path.join(BUILD, pat, f"{c}-{opt}-{mode}")
         if not os.path.exists(p):
-            out[c] = ("NOT BUILT", None, None)
+            out[c] = ("not_built", None, None)
             continue
         k = asm.try_kernel(p)
         if k is None:
-            out[c] = ("no kernel symbol (inlined; the column is None here)",
-                      None, None)
+            out[c] = ("no_kernel_symbol", None, None)
             continue
         t, ind = outward(k, p)
         out[c] = (None, t, ind)
     return out
+
+
+ERR_WHY = {
+    "not_built": (f"NOT BUILT -- no `-O3 isolated` binary under "
+                  f"`{os.path.relpath(BUILD, REPO)}/`. This is a tooling "
+                  f"state, not a property of the pattern: run "
+                  f"`harness/build.py pNN`"),
+    "no_kernel_symbol": ("no kernel symbol (inlined away), so there is no "
+                         "kernel-exclusive column to license"),
+}
 
 
 def pattern_dir(pat):
@@ -203,20 +258,43 @@ def short(s):
     return s.lstrip(":")
 
 
+def _thunk_warning(a, b, la, lb):
+    """gcc's PLT thunk is `2.00 Ir x calls-per-kernel-call` in gcc's column
+    only.  The call SITES are static and countable here; the per-call COUNT is
+    dynamic and is not.  So a `gcc-clang` row with any LIVE `@plt` site carries
+    a term this check cannot price, whichever way it votes (TASK_075_REVIEW M4).
+
+    ⚠ Only the LIVE sets are counted.  Counting `ta`/`tb` warns on p03, p04,
+    p22 and p38, whose only `@plt` target is `__stack_chk_fail@plt` -- a
+    diverging callee that executes zero times and costs nothing."""
+    if {a, b} != {"c-gcc", "c-clang"}:
+        return ""
+    n = sum(1 for x in la + lb if "@plt" in x)
+    return f"; ⚠ UNPRICED: gcc's PLT thunk on {n} live `@plt` site(s)" if n else ""
+
+
 def verdict(a, b, sa, sb):
+    """-> (tag, why).  Five tags; see `synthesis/README.md`."""
     ea, ta, ia = sa
     eb, tb, ib = sb
+    if "not_built" in (ea, eb):
+        bad = [n for n, e in ((a, ea), (b, eb)) if e == "not_built"]
+        return "NOT-BUILT", f"{', '.join(bad)}: {ERR_WHY['not_built']}"
     if ea or eb:
-        return None, f"cannot decide: {a}={ea or 'ok'}, {b}={eb or 'ok'}"
+        bad = [n for n, e in ((a, ea), (b, eb)) if e]
+        return "NO-KSYM", f"{', '.join(bad)}: {ERR_WHY[ea or eb]}"
     if len(ia) != len(ib):
-        return False, (f"ASYMMETRIC INDIRECT dispatch ({a}: {len(ia)}, "
-                       f"{b}: {len(ib)}); e.g. `{(ia or ib)[0]}`")
+        return "NOT-LIC", (f"ASYMMETRIC INDIRECT dispatch ({a}: {len(ia)}, "
+                           f"{b}: {len(ib)}); e.g. `{(ia or ib)[0]}`")
     if ia or ib:
-        return None, (f"both sides dispatch through an unresolvable pointer "
-                      f"({len(ia)} each); e.g. `{ia[0]}`")
+        return "UNDEC", (f"both sides dispatch through an unresolvable pointer "
+                         f"({len(ia)} each); e.g. `{ia[0]}`")
+    ta = [x for x in ta if not is_kernel_sibling(x)]
+    tb = [x for x in tb if not is_kernel_sibling(x)]
     la = sorted(x for x in ta if not is_noreturn(x))
     lb = sorted(x for x in tb if not is_noreturn(x))
     cold = sorted(set(x for x in ta + tb if is_noreturn(x)))
+    warn = _thunk_warning(a, b, la, lb)
     if la == lb:
         note = ("0 outward transfers" if not la
                 else "identical live set: " + ", ".join(short(x) for x in la))
@@ -224,7 +302,7 @@ def verdict(a, b, sa, sb):
             note += ("; differs only in DIVERGING callees, which execute 0 "
                      "times in any accepted run: "
                      + ", ".join(short(c) for c in cold))
-        return True, note
+        return "LICENSED", note + warn
     only_a = sorted(set(x for x in la if la.count(x) > lb.count(x)))
     only_b = sorted(set(x for x in lb if lb.count(x) > la.count(x)))
     bits = []
@@ -232,14 +310,29 @@ def verdict(a, b, sa, sb):
         bits.append(f"only {a} calls {[short(x) for x in only_a]}")
     if only_b:
         bits.append(f"only {b} calls {[short(x) for x in only_b]}")
-    return False, "; ".join(bits)
-
-
-TAG = {True: "LICENSED", False: "NOT-LIC", None: "UNDEC"}
+    return "NOT-LIC", "; ".join(bits) + warn
 
 
 def all_patterns():
-    return sorted(d for d in os.listdir(BUILD) if re.fullmatch(r"p\d\d", d))
+    """⚠ Enumerating `.temp/build/` rather than `patterns/` is deliberate BUT
+    it is why a cleaned tree used to be silent instead of loud: with no build
+    dir there are no patterns, so `--emit` wrote an EMPTY sidecar and exited 0.
+    Both states are now fatal (see `main`)."""
+    if not os.path.isdir(BUILD):
+        die(f"`{os.path.relpath(BUILD, REPO)}/` does not exist -- nothing is "
+            f"built. `synthesis/licence.py` reads the `-O3 isolated` matrix "
+            f"and cannot run without it. Build with `harness/build.py pNN`.")
+    pats = sorted(d for d in os.listdir(BUILD) if re.fullmatch(r"p\d\d", d))
+    if not pats:
+        die(f"`{os.path.relpath(BUILD, REPO)}/` contains no `pNN` directory. "
+            f"Build with `harness/build.py pNN`.")
+    return pats
+
+
+def die(msg):
+    sys.stderr.write("\n" + "=" * 72 + "\nLICENCE NOT EMITTED\n" + "=" * 72
+                     + f"\n{msg}\n\n")
+    sys.exit(2)
 
 
 def main():
@@ -253,9 +346,11 @@ def main():
     a = ap.parse_args()
 
     pats = all_patterns() if (a.all or a.emit) else [a.pattern]
-    doc = {}
+    doc, unbuilt = {}, []
     for pat in pats:
         s = survey(pat, a.opt, a.mode)
+        unbuilt += [f"{pat}/{c}" for c, (e, _, _) in s.items()
+                    if e == "not_built"]
         gf = [f for f in sorted(os.listdir(os.path.join(REPO, "results", "gate")))
               if f.startswith(pat + "-") and not f.endswith(".partial.json")]
         gsha = None
@@ -275,15 +370,32 @@ def main():
         for x, y, lab in PAIRS:
             if x not in s or y not in s:
                 continue
-            ok, why = verdict(x, y, s[x], s[y])
-            rec["pairs"][lab] = {"verdict": TAG[ok], "why": why}
+            tag, why = verdict(x, y, s[x], s[y])
+            rec["pairs"][lab] = {"verdict": tag, "why": why}
             if not a.emit:
-                print(f"  {lab:10s} {x:11s} - {y:11s}  {TAG[ok]:9s} {why}")
+                print(f"  {lab:10s} {x:11s} - {y:11s}  {tag:9s} {why}")
         doc[pat] = rec
     if a.emit:
+        # ⚠ TASK_075_REVIEW M2's failure scenario, made LOUD.  `.temp/build/`
+        # is gitignored and CLAUDE.md rule 1 tells agents to delete exactly
+        # those blobs; re-emitting on a cleaned tree used to write 88 `UNDEC`
+        # verdicts that `results/synthesis.md` then published under a legend
+        # asserting all 88 dispatched through an unresolvable pointer.
+        if unbuilt:
+            die(f"{len(unbuilt)} cell(s) have no `{a.opt} {a.mode}` binary, so "
+                f"their pairs would be tagged NOT-BUILT and published as if "
+                f"they were a property of the pattern:\n\n  "
+                + "\n  ".join(unbuilt[:12])
+                + (f"\n  ... and {len(unbuilt) - 12} more" if len(unbuilt) > 12
+                   else "")
+                + f"\n\nBuild them (`harness/build.py pNN`) and re-run. "
+                  f"{os.path.relpath(a.emit, REPO)} was NOT written.")
         json.dump(doc, open(a.emit, "w"), indent=1, sort_keys=True)
         n = sum(len(v["pairs"]) for v in doc.values())
-        print(f"wrote {a.emit}: {len(doc)} patterns, {n} pair verdicts")
+        tags = sorted({p["verdict"] for v in doc.values()
+                       for p in v["pairs"].values()})
+        print(f"wrote {a.emit}: {len(doc)} patterns, {n} pair verdicts "
+              f"({', '.join(tags)})")
 
 
 if __name__ == "__main__":

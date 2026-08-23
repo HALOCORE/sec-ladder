@@ -6,22 +6,92 @@ here is hashed by anything.
 | file | what it is |
 |---|---|
 | `synthesize.py` | **the artefact.** Reads committed records, writes `results/synthesis.md`. |
-| `licence.py` | §0 option **(c)** prototype: the *static* outward-dispatch licence. `--emit licence.json`. |
-| `outward_ir.py` | §0 option **(b)** prototype: the *dynamic* callee `Ir` column. `--emit outward_ir.json`. |
+| `licence.py` | the *static* outward-dispatch licence: **may this row be differenced at all**. `--emit licence.json`. |
+| `outward_ir.py` | the *dynamic* callee `Ir` sweep. **No longer a published column** — it calibrates one, and it names callees. `--emit outward_ir.json`. |
 | `licence.json` | per-pattern outward call sets and per-pair verdicts, with the gate `source_sha256` they were taken against. |
-| `outward_ir.json` | per-cell `kernel_exclusive` / `outward` / `kernel_inclusive` `Ir` per call, `-O3 isolated`, both blobs. |
+| `outward_ir.json` | per-cell `kernel_exclusive` / `outward` / `kernel_inclusive` `Ir` per call **and per-callee call counts**, `-O3 isolated`, both blobs. |
 
 ```bash
 synthesis/synthesize.py                              # -> results/synthesis.md
-synthesis/licence.py --all                           # ~2 s, no callgrind
+synthesis/licence.py p13                             # ~2 s for ONE pattern
+synthesis/licence.py --all                           # ~43 s for the 22-pattern tree
 synthesis/licence.py --emit synthesis/licence.json
-synthesis/outward_ir.py --emit synthesis/outward_ir.json   # 352 callgrind runs, needs the built matrix
+synthesis/outward_ir.py --emit synthesis/outward_ir.json   # 352 callgrind runs, ~4m40s
 ```
+
+⚠ **`~2 s for the tree` was wrong in three files** and is `~2 s` for **one**
+pattern; `--all` is 43.4 s / 43.7 s measured twice (TASK_075_REVIEW m1). It
+is still cheap enough that the decision below is unaffected.
 
 Both sidecars need `harness/build.py pNN` to have produced
 `.temp/build/pNN/<cell>-O3-isolated`. Neither reads or writes a measurement
-record. `synthesize.py` prints `LICENCE STALE` for any pattern whose gate
-`source_sha256` has moved since `licence.json` was emitted.
+record.
+
+## The number is DERIVED FROM COMMITTED RECORDS, and that is the whole point
+
+`results/gate/pNN.json` carries **`marginal_ir_per_call`** per
+`(cell, opt, mode, input)`. It is whole-program and therefore
+symbol-independent, so it already contains exactly the callee work the
+kernel-exclusive column drops:
+
+```
+(marg[A] − marg[B]) − (kex[A] − kex[B])   =   the callee correction
+```
+
+`synthesize.py` computes that on every run. **The artefact is therefore
+self-contained from `git`**: it needs no build, no callgrind and no sidecar to
+produce a corrected figure.
+
+⚠ **An earlier version of `synthesize.py` printed *"the licence is not in the
+committed records and cannot be derived from them"* and scheduled two sidecars
+on the strength of it.** That was false, it was the sentence the delivery
+rested on, and it is `.memory/03-measurement.md`'s own prescribed
+*"author-checkable test, which needs no disassembly"* (TASK_075_REVIEW B1).
+**No figure in any table moved** — the provenance claim was the defect.
+
+**Three measured bands, recomputed by `synthesize.py` on every run** (176 rows
+against the callgrind sweep):
+
+| `\|correction\|` | rows | real | spurious | reading |
+|---|---:|---:|---:|---|
+| `< 2.00` | 120 | **0** | 120 | nothing real hides below the floor |
+| `2.00 … 16.00` | 22 | 8 | 14 | a coin flip — printed with a **?** |
+| `≥ 16.00` | 34 | **34** | 0 | every one real, smallest 17.00 |
+
+⚠ **2.00 is the only threshold at which it misses nothing.** At 3.0 and 5.0 it
+misses two rows — `p02 gcc-clang`, worth exactly `+2.00` each, the PLT thunk.
+TASK_075_REVIEW B1 and `.memory/03-measurement.md` say *"zero misses at every
+threshold"*; that scores the oracle at the same threshold as the estimate.
+Re-measured at `.temp/p76/derived_probe.py`.
+
+## Why the sidecars are still here, and what changed
+
+The manager's question at TASK_076 was whether the derived route should be the
+**only** route, with both sidecars demoted to `.temp/` probes — *"one number
+that is always recomputed rather than three that disagree in a year."*
+**Answered by splitting it, because there were never three routes to one
+number.** There is one magnitude and two other questions:
+
+| question | who answers it | in the artefact? |
+|---|---|---|
+| **by how much is this row wrong?** | the derived column, from committed records | **yes, and it is the ONLY route — this is the part that was three-way and is now one-way** |
+| **may this row be differenced at all?** | `licence.py`, from the disassembly | yes: the tag and its `why` |
+| **which callee, and how many calls?** | `outward_ir.py`, from callgrind | **no.** It supplies no published figure; it calibrates the derived column's bands, live, on every run |
+
+So `outward_ir.json` was demoted exactly as the manager suggested — it is now a
+probe whose only output in the artefact is a score — while `licence.py` was
+**not**, because it answers a different question and produces the *mechanism*,
+which PROTOCOL rule 12 says is the difference between a finding and one a
+reader disbelieves. The full argument, including the case for demoting the
+licence too and why it loses, is in this task's report.
+
+⚠ **`outward_ir.json` carries no staleness pin.** `licence.json` carries the
+gate `source_sha256` and `synthesize.py` prints `LICENCE STALE` on a mismatch;
+the callgrind sidecar has nothing equivalent, and re-emitting it costs 352
+runs. That asymmetry is the second reason it calibrates rather than publishes.
+It re-emitted **bit-identically on all 348 cells** at TASK_076 (a fourth
+independent reproduction), so it is stable in a fixed environment — it is
+*provenance* it lacks, not reproducibility.
 
 ## Why this directory and not `harness/`
 
@@ -43,46 +113,32 @@ property (~18% shift measured on unchanged p08 cells).
 
 `synthesis/*` and `results/synthesis.md` are in neither glob. That was checked
 by evaluating both glob lists literally against the candidate paths, not by
-reading the prose that describes them.
+reading the prose that describes them — and re-checked independently at
+TASK_075_REVIEW, which evaluated all eleven globs and
+`measure.py::measurement_sources` and got **zero hits**.
 
-## The open decision this directory is holding
+## Owed to `harness/`, REPORTED not built
 
-`.tasks/TASK_075.md` §0 asks whether the kernel-column licence should be **(a)**
-a recorded column, **(b)** an on-demand tool, or **(c)** a static check. The
-measured answer is **(c) as the trigger and (b) as the correction, and NOT (a)
-in `measure.py`**:
+1. **`asm.py::is_bulk_symbol` does not recognise `bcmp`** (measured:
+   `is_bulk_symbol('bcmp@plt') = False`), so `results/p47-ct-compare.json`
+   records `c-gcc: ['memcmp@plt']`, `c-clang: []`, `safe_naive: []` for three
+   cells calling the **same** glibc entry point (`0x188320`). `__popcountdi2`
+   is absent too (p09, all eight cells `[]`), and p11's four plain C cells
+   record `[]` while calling `strlen@plt` — a stale record, not a whitelist
+   gap. ⚠ `asm.py` is measurement-hashed, so bundle with a re-measure or
+   accept that only the gate record improves.
+2. **A `check.py` stage that parses the callgrind files it already writes.**
+   `check_marginal_ir` writes `cg_files[(c,o,m,nm,n)]` per probe run and reads
+   only its `summary:` line — the caller→callee edges are on disk and
+   discarded. Cost: **zero additional callgrind runs**, one gate sweep, no
+   re-measure. ⚠ Its probe blobs are **both** `small.bin` and `large.bin`
+   (every pattern declares `probe_inputs: ["small.bin", "large.bin"]`, and
+   `.temp/check/p13/` holds 64 `small` + 64 `large` `.out` files), so the stage
+   would cover both — which matters, because most of the large corrections are
+   `large` rows. An earlier version of this file said "the probe blobs are
+   `small.bin`" and understated its own case (TASK_075_REVIEW m2).
 
-* **(c) is cheap and almost never wrong in the dangerous direction.** Scored
-  against a full callgrind caller→callee sweep over 176 pair/blob rows:
-  **156 hits, 10 false LICENSED, 0 false alarms, 10 abstentions** (`154 / 12 /
-  0 / 10` against a second independent sweep — the two-row difference is p03's
-  and p04's non-reproducing `memset` term, below). It costs ~2 s for the tree
-  and needs no run at all.
-* **(c) is not sufficient, and the two ways it fails are named.** It abstains
-  on p27 and p36 — the patterns with an indirect dispatch, and p36 is the
-  pattern that caused this — and its misses are two cost-behind-an-equal-name
-  mechanisms: glibc `memset`'s alignment-dependent path length (p03/p04,
-  ±7.00 `Ir`/call) and gcc's 2-instruction PLT thunk (+2.00 `Ir` per libc call,
-  gcc's column only, one of the two being an `endbr64`).
-* **A licence does not give you the number.** On p11 the correction *reverses*
-  `R3 − R4` on `small`. That is what (b) is for, and (b) needs no `harness/`
-  edit whatsoever — 352 callgrind runs for the whole tree, minutes on this box.
-* **(a) in `measure.py` is the expensive way round and cannot be back-filled.**
-  `measure.py::callgrind_ir` reads only `callgrind_annotate`'s summary; the
-  caller→callee edges live in a scratch `callgrind.out` that is not kept, so
-  populating the column means re-running callgrind everywhere. And
-  `measure.py` is hashed into all 22 measurement records *and* into all 22 gate
-  records, so the edit forces the project's single most expensive operation and
-  moves 22 patterns' published timing prose.
-* **(a′) in `check.py` is nearly free and is the version worth landing.**
-  `check.py::check_marginal_ir` **already writes a `callgrind.out` per probe run**
-  (`cg_files[(c,o,m,nm,n)]`) and reads only its `summary:` line — the
-  caller→callee edges are already on disk and are being discarded. A stage that
-  parses them costs **zero additional callgrind runs**, records the licence and
-  the outward `Ir` into `results/gate/pNN.json`, and rides the five-item
-  `check.py` batch that is already owed. Gate re-runs do not re-take wall clock.
-  The probe blobs are `small.bin` with `n_iters` rewritten, so per-call outward
-  work on the probe is per-call outward work on `small.bin`.
-
-Until that lands, the sidecars here are the licence, and `synthesize.py` says so
-above every table that uses one.
+   ⚠ **This is now a REFINEMENT, not the fix.** The derived column above
+   already makes the artefact self-contained; a `check.py` stage would add the
+   callee *names* and the +2.00/±7.00 terms the derived route cannot resolve.
+   Schedule it on that basis, not as a dependency.

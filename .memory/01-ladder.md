@@ -2188,7 +2188,11 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
    fix, not a correction, and it costs no gate re-run.**
 
    ⚠ **What IS new: p27's `gcc-clang` comparison REVERSES on `small`** —
-   `−25.02` on the kernel column against `+15.00` once callees are included.
+   `−25.02` on the kernel column against **`+15.00` (callgrind sweep) or
+   `+15.65` (derived from `marginal_ir_per_call`)** once callees are included.
+   ⚠ **Two numbers 0.65 apart now coexist for one finding, and that is inside
+   the derived route's own ±2 Ir floor** — quote **the sign and the reversal**,
+   not the magnitude, and say which route produced any figure you do quote.
    p27's `c-gcc` cell reaches libc through gcc's 2-instruction PLT thunk that
    clang folds away (`.memory/03-measurement.md`). **Do not quote p27's
    gcc-vs-clang direction from the kernel column.**

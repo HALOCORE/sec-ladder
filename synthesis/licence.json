@@ -212,7 +212,7 @@
    },
    "gcc-clang": {
     "verdict": "LICENSED",
-    "why": "identical live set: memcpy@plt"
+    "why": "identical live set: memcpy@plt; \u26a0 UNPRICED: gcc's PLT thunk on 2 live `@plt` site(s)"
    }
   }
  },
@@ -724,7 +724,7 @@
    },
    "gcc-clang": {
     "verdict": "NOT-LIC",
-    "why": "only c-clang calls ['memcpy@plt']"
+    "why": "only c-clang calls ['memcpy@plt']; \u26a0 UNPRICED: gcc's PLT thunk on 1 live `@plt` site(s)"
    }
   }
  },
@@ -1020,7 +1020,7 @@
    },
    "gcc-clang": {
     "verdict": "NOT-LIC",
-    "why": "only c-gcc calls ['__memcpy_chk@plt']; only c-clang calls ['memcpy@plt', 'memset@plt']"
+    "why": "only c-gcc calls ['__memcpy_chk@plt']; only c-clang calls ['memcpy@plt', 'memset@plt']; \u26a0 UNPRICED: gcc's PLT thunk on 7 live `@plt` site(s)"
    }
   }
  },
@@ -1421,7 +1421,7 @@
    },
    "gcc-clang": {
     "verdict": "LICENSED",
-    "why": "identical live set: strlen@plt"
+    "why": "identical live set: strlen@plt; \u26a0 UNPRICED: gcc's PLT thunk on 2 live `@plt` site(s)"
    }
   }
  },
@@ -1556,7 +1556,7 @@
    },
    "gcc-clang": {
     "verdict": "LICENSED",
-    "why": "identical live set: memchr@plt, memcpy@plt; differs only in DIVERGING callees, which execute 0 times in any accepted run: __stack_chk_fail@plt"
+    "why": "identical live set: memchr@plt, memcpy@plt; differs only in DIVERGING callees, which execute 0 times in any accepted run: __stack_chk_fail@plt; \u26a0 UNPRICED: gcc's PLT thunk on 4 live `@plt` site(s)"
    }
   }
  },
@@ -1697,7 +1697,7 @@
    },
    "gcc-clang": {
     "verdict": "NOT-LIC",
-    "why": "only c-clang calls ['memcpy@plt', 'memset@plt']"
+    "why": "only c-clang calls ['memcpy@plt', 'memset@plt']; \u26a0 UNPRICED: gcc's PLT thunk on 4 live `@plt` site(s)"
    }
   }
  },
@@ -1848,7 +1848,7 @@
    },
    "gcc-clang": {
     "verdict": "NOT-LIC",
-    "why": "only c-clang calls ['memcpy@plt']"
+    "why": "only c-clang calls ['memcpy@plt']; \u26a0 UNPRICED: gcc's PLT thunk on 1 live `@plt` site(s)"
    }
   }
  },
@@ -2477,8 +2477,8 @@
     "why": "both sides dispatch through an unresolvable pointer (1 each); e.g. `call *%r12`"
    },
    "gcc-clang": {
-    "verdict": "NOT-LIC",
-    "why": "only c-gcc calls ['kernel.cold  [tail/outlined]']"
+    "verdict": "LICENSED",
+    "why": "identical live set: free@plt, free@plt, malloc@plt; differs only in DIVERGING callees, which execute 0 times in any accepted run: __stack_chk_fail@plt, abort@plt; \u26a0 UNPRICED: gcc's PLT thunk on 6 live `@plt` site(s)"
    }
   }
  },
@@ -2885,7 +2885,7 @@
    },
    "gcc-clang": {
     "verdict": "NOT-LIC",
-    "why": "only c-gcc calls ['memcmp@plt']; only c-clang calls ['bcmp@plt']"
+    "why": "only c-gcc calls ['memcmp@plt']; only c-clang calls ['bcmp@plt']; \u26a0 UNPRICED: gcc's PLT thunk on 2 live `@plt` site(s)"
    }
   }
  }
