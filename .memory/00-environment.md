@@ -228,6 +228,25 @@ compiler flag produced, and it is available on any data-dependent kernel.
    category (`.temp/verus/`, `.temp/build/`, ...). `rm` is only auto-permitted there.
 2. **No blind process killing.** Never `pkill`/`killall`/substring match. Resolve an
    exact PID, confirm its full command line, kill that PID. Prefer `timeout <N> <cmd>`.
+
+   ⚠ **And no self-matching `pgrep` wait-loops — this has now cost real time
+   twice and was in nobody's file until TASK_070.** A loop like
+
+   ```bash
+   until ! pgrep -f "harness/check.py p22"; do sleep 30; done      # NEVER EXITS
+   ```
+
+   **contains its own pattern in its own command line**, so it matches itself —
+   and several such loops match each other. p22's engineer ran six, none could
+   ever exit, and **no `python3 harness/check.py` process existed at all**; the
+   "still running" report was entirely self-inflicted. Diagnosed by reading
+   `/proc/<pid>/cmdline` for each PID, which is the right way.
+
+   **Use `timeout <N> <cmd>` in the FOREGROUND and read the exit status.** If you
+   genuinely must wait on something, match on a file or a marker the job writes,
+   never on a command line your own waiter also has. ⚠ **And no `nohup … &`** —
+   a job you cannot see the exit status of is a job whose failure you will
+   attribute to something else.
 3. **No GitHub/CI infrastructure.** No `.github/`, no CI config, no badges.
 4. **Subagents never run `git commit`/`git add`** or any history-mutating git command.
    Read-only git is fine. The manager commits at task boundaries.
