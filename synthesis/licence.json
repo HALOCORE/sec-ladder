@@ -1,0 +1,2892 @@
+{
+ "p01": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p01-array-sum/NOTES.md": "bd27f74ede3d4b9cf0b6bbb95c3bbf853c10eee4fabeff02f1971975cd67ee8c",
+   "patterns/p01-array-sum/README.md": "e450c2e9b261f7576b08ca60d6891924b14578d10249bc1469582da0e3e2d042",
+   "patterns/p01-array-sum/c/kernel.c": "1b79c738a5ab4da534d62a931919ec2d16a6add4f3710b29a347e16b88c96fe7",
+   "patterns/p01-array-sum/c/kernel.h": "2eaee3e8be741b9ef00a9d6061e72f8ab6199143724b2438251c7032db01add4",
+   "patterns/p01-array-sum/c/main.c": "065a6d17209b6c5ddb03d33ea38b623265b73293d98415ac99d5f66f467d18ef",
+   "patterns/p01-array-sum/inputs/gen.py": "967329fdb0e24c79a21f8e39c92bcb65ecd81fc52913fe33d688e5091b9982ee",
+   "patterns/p01-array-sum/model.py": "cd2e58963a390b0ae40e88af505924f10eab7785dcee8205fa740c513eea182a",
+   "patterns/p01-array-sum/safe_naive.rs": "31718428bae78cc7c8d50ba5c520091e0596dca1b5216a6bb76f85bbd88abbfb",
+   "patterns/p01-array-sum/safe_naive_verus.rs": "6e84117379183aef6345c849ed2bea0777be2ec5422715bf9475c6c9b8a8bb87",
+   "patterns/p01-array-sum/safe_tuned.rs": "ff2d49dd5338f48a3051989565137f8f7ae685521e4fa78999874edff48e4c16",
+   "patterns/p01-array-sum/spec.md": "3655bdb1867d769cb04a5e57063dfbb029b79c59035222cceaf2236ab5498b90",
+   "patterns/p01-array-sum/unsafe.rs": "026e4b6aa62113972c6881f0daa5e12da366c0eb0b9e7d5369cd0fc8c12db8e9",
+   "patterns/p01-array-sum/verus.rs": "2b2b8d1c63fecfacb9f3487e2db205a4ba415808ed1b99fba2be6918108afe70",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: NtNt::core::slice::index::slice_index_fail"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   },
+   "gcc-clang": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   }
+  }
+ },
+ "p02": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [
+     "memcpy@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [
+     "memcpy@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [
+     "memcpy@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [
+     "memcpy@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [
+     "memcpy@GLIBC_2.14"
+    ],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [
+     "memcpy@GLIBC_2.14"
+    ],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p02-buffer-copy/NOTES.md": "7172b6acf5542cf22264ccef0c9acc1d829dbc9b404e6d94cbee7f5cf3a56d31",
+   "patterns/p02-buffer-copy/README.md": "675248ea9ccda4e76145e62678bf04b3c46ab8fe786289878470f9c71e2647bb",
+   "patterns/p02-buffer-copy/c/kernel.c": "60a0e02c9394e0fba94d229b011d1b237cee71c7adc99e1ed326bca4700ee090",
+   "patterns/p02-buffer-copy/c/kernel.h": "df4d7ff77c75b24e648005c3e160634f6c4cfd28750b3642969822c351b8f8f1",
+   "patterns/p02-buffer-copy/c/kernel_hardened.c": "6bdb40962acc154134de0d551827cfdaeeb0db11e47b75ebae9c3a1af12d38da",
+   "patterns/p02-buffer-copy/c/main.c": "457769c4cb05725ca9aa8ce5acaf6e0cf8a1b0ef494ab08b86d914a37a42bd47",
+   "patterns/p02-buffer-copy/inputs/gen.py": "98f026f15c859be4f85797b9c20a22b568d8ba3732924ab49f87dd2925390b3f",
+   "patterns/p02-buffer-copy/model.py": "45dba85095cdc6108813bcc528caceb43cb5584f16956dda5577754bd4c809d9",
+   "patterns/p02-buffer-copy/safe_naive.rs": "82d6331dc4d2b028b4ceb11dd82d9c62ea49593fb00f491b9b5a4d3e4321a360",
+   "patterns/p02-buffer-copy/safe_tuned.rs": "23f1b0b7a7d45856ad430fe176062b4342044195f9393d2cd623b52c25850b4b",
+   "patterns/p02-buffer-copy/spec.md": "8d9eb01ab8a84660b957ab92afe726d09ef4acbe52f422f5a329f149cbfb1d6c",
+   "patterns/p02-buffer-copy/unsafe.rs": "d295410141f7ae1879305a0b57763f76e2f232a58688fd9efda59481b999c55c",
+   "patterns/p02-buffer-copy/verus.rs": "af43f782703a2a55a7e81dba6e91ce1f4e8919c82ea400f2e76751a5e8c53c60",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "NOT-LIC",
+    "why": "only unsafe calls ['memcpy@GLIBC_2.14']"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memcpy@GLIBC_2.14; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check, NtNt::core::slice::index::slice_index_fail"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memcpy@GLIBC_2.14"
+   },
+   "gcc-clang": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memcpy@plt"
+   }
+  }
+ },
+ "p03": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p03-bounded-stack/NOTES.md": "c0d9d6e42a070274d9d40ac695586d4c3217289a576cc75c11f1d8c22b228caa",
+   "patterns/p03-bounded-stack/README.md": "3cc82de5b8db1b527cb3b0f37238646fd4111b38d602f385eab829436cbe91fa",
+   "patterns/p03-bounded-stack/c/kernel.c": "9f1558cfbe298a11dc7edd231e2ee8d1efcf339e9f2332dc3e2cc0ef3782bf37",
+   "patterns/p03-bounded-stack/c/kernel.h": "11a5cfc8f821fb56cbf3384ab99c24465c4d0d861cd6c770607cb84318d097bc",
+   "patterns/p03-bounded-stack/c/kernel_hardened.c": "5cba2e2c70b3946c57d0c0fcbf2037ff8a066006126bf6f082287e5754e80486",
+   "patterns/p03-bounded-stack/c/main.c": "09a0b93a61d861465ade53467faab2a342fe3159a57805c8142b102ae0ae9bc7",
+   "patterns/p03-bounded-stack/controls/gen_controls.py": "efe7ba5590770ad8e1eab9665dc5c8a6011502ce003d277eb6df7d3c58ed1b13",
+   "patterns/p03-bounded-stack/inputs/gen.py": "aeb1ef44a77d7fe967a810cf030d870278d4ed48f4301db3cd99ee12477359ee",
+   "patterns/p03-bounded-stack/model.py": "8813c186c3902aa239ee94f5e83b1aec35d501055e8364353d5ddf6dca017835",
+   "patterns/p03-bounded-stack/safe_naive.rs": "8d7f24002a402e3f8113f275fb58ed5931f2fc2ab1d27cf4f87b27fe2d05bb70",
+   "patterns/p03-bounded-stack/safe_tuned.rs": "9cc6fe2f60f4d1ae6953bc2a270a2926a643f590c492a3c3f274509d2a73bcc1",
+   "patterns/p03-bounded-stack/spec.md": "3d0d445a5c032011660ecbcc31c375b882d9c888f7605ae2adf80a23ccad37a6",
+   "patterns/p03-bounded-stack/unsafe.rs": "cabf872d67893b12845aa60a55d7b9041cb7f26f87e9520e217dbe6b38c63517",
+   "patterns/p03-bounded-stack/verus.rs": "06d8f71f7e9b4de82466fc19e90cb064cc515cead87de8f81d70a11361c65a8a",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memset@GLIBC_2.2.5; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memset@GLIBC_2.2.5; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check, NtNt::core::slice::index::slice_index_fail"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memset@GLIBC_2.2.5"
+   },
+   "gcc-clang": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: __stack_chk_fail@plt"
+   }
+  }
+ },
+ "p04": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p04-ring-buffer/NOTES.md": "8d6932ec83fbb2dda714999e9b52161ae9154613b9f029059086fc6c91de9500",
+   "patterns/p04-ring-buffer/README.md": "7f8b543db59dd3f5b8470babbf661d8105ff6b7503fb2fb6eb857acc0f28727e",
+   "patterns/p04-ring-buffer/c/kernel.c": "95bc661335bea8e21f887c743a4751456f5e06f39dfee6fcd0bcc58cf6cea2df",
+   "patterns/p04-ring-buffer/c/kernel.h": "b912897b321df089943a8b9bfa30b1df930dfe879f316c8d0ff79f15c95d705c",
+   "patterns/p04-ring-buffer/c/kernel_hardened.c": "c242d75dccaab160ab1c544222f3bd9b5966463bf0158dcdbba5e404bd148df7",
+   "patterns/p04-ring-buffer/c/main.c": "89ce77ab596aa51f831e2a69e03ee37d607ae70f9b9e4969329d7dfa9f9b3c93",
+   "patterns/p04-ring-buffer/controls/gen_controls.py": "cfd07e0ff57ab2adc005651017d4a762f825055174d67653bb16dbdb6f907bfc",
+   "patterns/p04-ring-buffer/controls/sweepfit.py": "550bc8b159b559b01eed5b2401b9810c31e17322ea3009363da158506485c213",
+   "patterns/p04-ring-buffer/inputs/gen.py": "7e43ac777b598eba8fac540421ac4f0b13d6e854ffc9b85ce6b52f23410cdf2a",
+   "patterns/p04-ring-buffer/model.py": "2682c9972f8e6cb7bb739e7a8db4259d16c81f2fa745a6f2c5c1a37b1bc664d7",
+   "patterns/p04-ring-buffer/safe_naive.rs": "52b9d59169a76b4b839a579ff2b09f003b2954ea871cf362f08e8ed4b39c0943",
+   "patterns/p04-ring-buffer/safe_tuned.rs": "20e785af4bd121e06276a8893e1682ae986baa5d71a682db76af28ce12b3cd8c",
+   "patterns/p04-ring-buffer/spec.md": "eb621749e85855f31932fe22f9e21cdf5661850b57c7d75dbba6c32d9bd1f332",
+   "patterns/p04-ring-buffer/unsafe.rs": "1059af0d1cb83784aa89b65b6a927c82439e9b5040b2a557f52b7a4615b4a093",
+   "patterns/p04-ring-buffer/verus.rs": "2b53b17e4024b5512240b79f729ea939dd7c78cd19ba5b177c3e54cce87d8848",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memset@GLIBC_2.2.5; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memset@GLIBC_2.2.5; differs only in DIVERGING callees, which execute 0 times in any accepted run: NtNt::core::slice::index::slice_index_fail"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memset@GLIBC_2.2.5"
+   },
+   "gcc-clang": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: __stack_chk_fail@plt"
+   }
+  }
+ },
+ "p05": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p05-index-flatten/NOTES.md": "166a697d0f923674216f202dbd4fda433dddf53aed10f126c8dfbe0623ffb279",
+   "patterns/p05-index-flatten/README.md": "1d63da6e199fa8b5a981fbbb6fd9c13dbde52530f69632b44e5cea69a05c49c7",
+   "patterns/p05-index-flatten/c/kernel.c": "484308a6fa4dd4f61aa00ccb58b25bbe8cd4cb182de0bbefa9308e4fed5296ae",
+   "patterns/p05-index-flatten/c/kernel.h": "910c7479b88896eea27be86c34958ab9a6474c97844ea01b34865a1f23098c72",
+   "patterns/p05-index-flatten/c/kernel_hardened.c": "960540172dda6666a97a93eb2cc116bebce7d29b9cdcd17e1dc042c5443fdf99",
+   "patterns/p05-index-flatten/c/main.c": "8c97ad24ee97e19807c1fcc6b90b42147f8ded6e66ef07199420130333e2caea",
+   "patterns/p05-index-flatten/inputs/gen.py": "cd3100b155beb24fdf874e1751aff46cc636085cf5c5da497203c2aa1673d6b3",
+   "patterns/p05-index-flatten/model.py": "4be696c0a069a249f48abdd8d0238b1978cf520f1acd7b64cdbdf7072d1ef118",
+   "patterns/p05-index-flatten/safe_naive.rs": "f1bdc43ae2fbc5e0efcff53d23f6510a5ea495d3769df65573b026cc7bfda482",
+   "patterns/p05-index-flatten/safe_tuned.rs": "af4a170e21f7624d2bbb14efc805a2bb1c5025c93e2d0db4e14ce8d1cc57aa09",
+   "patterns/p05-index-flatten/spec.md": "6d6fa03258513de00a37385b0cce4a2a849b0a889e020f8f692a896f728560e8",
+   "patterns/p05-index-flatten/unsafe.rs": "d188a0a02300d051ac2a07cf6105267752ca29a19ebce1af9ff13320a08ab879",
+   "patterns/p05-index-flatten/verus.rs": "42c94e0fcb9acb4bcd02456da7f0b4aed924d3a04a772c46e82683043911b22e",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: NtNt::core::slice::index::slice_index_fail"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   },
+   "gcc-clang": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   }
+  }
+ },
+ "p06": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [
+     "memcpy@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [
+     "memcpy@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking9panic_fmt",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking9panic_fmt",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14"
+    ],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14"
+    ],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p06-rotate/NOTES.md": "7a058acb363abcde426f5880bfa9ee70b5fb69b02eaa35fe289fc1e76236f567",
+   "patterns/p06-rotate/README.md": "e11771fa40c70b79fc56c482e93a9705c932c45ad1be8f5889e7f8c1a905344d",
+   "patterns/p06-rotate/c/kernel.c": "8baf222692697c003ed0ed6076678807860f97a83e3b584cbc9db9145a503a3a",
+   "patterns/p06-rotate/c/kernel.h": "e993082c2d65a03abbfd89294ddd986c4f4607adb1032848ac4a570eeddc91ec",
+   "patterns/p06-rotate/c/kernel_hardened.c": "9bcf321d3aeb76128d2f4b0dcefdea88c0e5a6dc3527c9f4f61747378879a78e",
+   "patterns/p06-rotate/c/main.c": "2e63a96b7dfabd6f28f2e540b3057c8d7fc45f9c90428f69477dbc39f56283d1",
+   "patterns/p06-rotate/controls/clayout.py": "fa5b020499d6b57c0dcad514c0eec7b25f89eb42f70c7040bcf10956b6b8708a",
+   "patterns/p06-rotate/controls/fit.py": "4a7851d3a7d84da865bfabb4d992afe1304d98a7a916f81f9e5c26183cdbdae0",
+   "patterns/p06-rotate/controls/gen_controls.py": "9014ad4bce68e0072fe4471b8151073af28e0375636e3e8839b8a6965e062828",
+   "patterns/p06-rotate/controls/sweep_ir.py": "80786c39894fd3cbc200e0f2be511419b8274f4f3bf703cf4c0d9091e64a3db9",
+   "patterns/p06-rotate/controls/wall_span.py": "43b95c4dcb3efc2e25ef627228ed59e8807b69b0742729ee49ed10f5d5648994",
+   "patterns/p06-rotate/inputs/gen.py": "9b0594f6459a9e7c94aa62e343c391b955c269820f7c14b02cecc62e4bbeab08",
+   "patterns/p06-rotate/model.py": "c4889d015ec638d77105ec5ac3ad4bd79f73e940eafe998d0002e52629b249ab",
+   "patterns/p06-rotate/safe_naive.rs": "71baa85e8c4b6e6758bcb91c8a5e398f195e12790001de255672780e9ad79e12",
+   "patterns/p06-rotate/safe_tuned.rs": "61ade37283aa39912be28055b2a99613f7fa2a31397454a028340000b19aa173",
+   "patterns/p06-rotate/spec.md": "89ece8ca5cf7669cc8be62d6bfc68be2ffca446152e71ffdeb683998588d3592",
+   "patterns/p06-rotate/unsafe.rs": "b191fc8d09513ee68142f8f7d85a142d05113b724545c404eb76250e739800ba",
+   "patterns/p06-rotate/verus.rs": "7f006d38720ddbbddfdf6706ea468cec643bc964fbbea71029647cc126fd5bb1",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memcpy@GLIBC_2.14; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check, NtNt::core::slice::index::slice_index_fail"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memcpy@GLIBC_2.14; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check, Nt::core::panicking::panic_fmt, NtNt::core::slice::index::slice_index_fail"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memcpy@GLIBC_2.14"
+   },
+   "gcc-clang": {
+    "verdict": "NOT-LIC",
+    "why": "only c-clang calls ['memcpy@plt']"
+   }
+  }
+ },
+ "p07": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p07-binary-search/NOTES.md": "d50783ef3e0e6f70d620d26609b1893c4a37f417f851d7d121b2a863ff106d06",
+   "patterns/p07-binary-search/README.md": "3843aa876d1992bbe34833152e9c281f2857c0c83bf62e9dd96200cb43095de3",
+   "patterns/p07-binary-search/c/kernel.c": "0442f65e78a943d43bbb4025cacb8ac3cdb59cd93358d2b70f1b90e458acabdf",
+   "patterns/p07-binary-search/c/kernel.h": "c9fbc3a97360785b5c5bf0f39902de7790a27b77970190e1487c17a8798ea69c",
+   "patterns/p07-binary-search/c/kernel_hardened.c": "482afd02c19226166bee91842d1b6e7fc7c620f088f242f661f7333e797dcd68",
+   "patterns/p07-binary-search/c/main.c": "c91f1b099a6fc782b7ed3964224f203766e0e3a4b2f19e8be3ef608cc1d9719a",
+   "patterns/p07-binary-search/controls/gen_controls.py": "41180da02e95efe72e805b2089d2376db98cb4306bddfe935a0a1972b6e8db87",
+   "patterns/p07-binary-search/inputs/gen.py": "392a9ccb36517b9012deb0085ea39f05aed01da5d522caa6ddb2250193c6c2d1",
+   "patterns/p07-binary-search/model.py": "006c0d9b4b103e0669520cf633c1ea2b1c4c4d6b52d82099c5a96763403e5df1",
+   "patterns/p07-binary-search/safe_naive.rs": "8f4f830a71715a8b60d6ba9c43895716c8d82481fe839def4d75b3bedc663b03",
+   "patterns/p07-binary-search/safe_tuned.rs": "8fb449181022196a22ff1e7123ce382618eb679a9cb5b002af2c7400c109ba97",
+   "patterns/p07-binary-search/spec.md": "de442dd065869e83939e086b602f843487b6cf38474635a7652406f512681006",
+   "patterns/p07-binary-search/unsafe.rs": "75afd26ac939c386629272fe9792472c7f065f05b9f1540415cc6ff69718de44",
+   "patterns/p07-binary-search/verus.rs": "65a717b1262a501741ca7aa51578ab72d842650a41c763d3f01dafc604690f9c",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: NtNt::core::slice::index::slice_index_fail"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   },
+   "gcc-clang": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   }
+  }
+ },
+ "p08": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [
+     "memcpy@plt",
+     "memcpy@plt",
+     "memcpy@plt",
+     "memcpy@plt",
+     "memcpy@plt",
+     "memset@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [
+     "memcpy@plt",
+     "memmove@plt",
+     "memmove@plt",
+     "memmove@plt",
+     "memmove@plt",
+     "memset@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [
+     "__memcpy_chk@plt",
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [
+     "__memmove_chk@plt",
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14",
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking9panic_fmt",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14",
+     "memmove@GLIBC_2.2.5",
+     "memmove@GLIBC_2.2.5",
+     "memmove@GLIBC_2.2.5",
+     "memmove@GLIBC_2.2.5",
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14",
+     "memmove@GLIBC_2.2.5",
+     "memmove@GLIBC_2.2.5",
+     "memmove@GLIBC_2.2.5",
+     "memmove@GLIBC_2.2.5",
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14",
+     "memmove@GLIBC_2.2.5",
+     "memmove@GLIBC_2.2.5",
+     "memmove@GLIBC_2.2.5",
+     "memmove@GLIBC_2.2.5",
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p08-overlap-move/NOTES.md": "5a1ac6217e3f4ded583707e67cc7cdf39f4e7c2dd5b85dd9f024e2fddc1dcc39",
+   "patterns/p08-overlap-move/README.md": "9234d887fa9fc70016f1c668d026bbbae4a73195353c0fff1e700206f95815cd",
+   "patterns/p08-overlap-move/c/kernel.c": "a1240809985bda7164c99d60aed2ca1efee4b1f8fc36afa0754fd0cbef202a8c",
+   "patterns/p08-overlap-move/c/kernel.h": "0849b814a8299dd729a16fdb195cb604cd6c795abc8d410ed80b0ecfd39f8302",
+   "patterns/p08-overlap-move/c/kernel_hardened.c": "11512d63c0ef067b06a1e9eb181f9a13cbc84561c785cc2e00c1f9caff0b767c",
+   "patterns/p08-overlap-move/c/main.c": "1c832f94f3e48fd5a722069cb4ea1d7fc251886417d8c5c0b7b6d6e886e01a26",
+   "patterns/p08-overlap-move/controls/gen_controls.py": "82631f960a5e30be97b6ff4e66f3a0cf0170dbe7887aa9e96e569a437129f1b6",
+   "patterns/p08-overlap-move/inputs/gen.py": "36526ac3c090ed49f3b188990c5792e678da5012f45bdad2ea8e8f7ddd297db9",
+   "patterns/p08-overlap-move/model.py": "6933ee18a8d53566ae4cfac1448253984b4ea83f4901c5b902e76ea1fe415d10",
+   "patterns/p08-overlap-move/safe_naive.rs": "08afa4f9ecd706164a7d4103198d9f2b4df88785b16eee40f8d915c0bf143577",
+   "patterns/p08-overlap-move/safe_tuned.rs": "644b61f50ba17672461db5ed35ff22104a70314a579eba99ed385899c33ededc",
+   "patterns/p08-overlap-move/spec.md": "549f2905927458dbba7b1a3bf466b120ce9b227484bcc36e0b4590fd8fec7701",
+   "patterns/p08-overlap-move/unsafe.rs": "69a6babbb2c886ff43a517f8dbba559e4336be347818803b5456b0a24206592f",
+   "patterns/p08-overlap-move/verus.rs": "44368f1124e857ae186dc500fa73e8813cb4af8da68ca1475b0cec078d30c6f5",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "NOT-LIC",
+    "why": "only unsafe calls ['memmove@GLIBC_2.2.5']"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memcpy@GLIBC_2.14, memmove@GLIBC_2.2.5, memmove@GLIBC_2.2.5, memmove@GLIBC_2.2.5, memmove@GLIBC_2.2.5, memset@GLIBC_2.2.5; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check, Nt::core::panicking::panic_fmt, NtNt::core::slice::index::slice_index_fail"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memcpy@GLIBC_2.14, memmove@GLIBC_2.2.5, memmove@GLIBC_2.2.5, memmove@GLIBC_2.2.5, memmove@GLIBC_2.2.5, memset@GLIBC_2.2.5"
+   },
+   "gcc-clang": {
+    "verdict": "NOT-LIC",
+    "why": "only c-gcc calls ['__memcpy_chk@plt']; only c-clang calls ['memcpy@plt', 'memset@plt']"
+   }
+  }
+ },
+ "p09": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [
+     "__popcountdi2"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [
+     "__popcountdi2"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p09-bitset/NOTES.md": "6eaf0308ab3b95fec92c019edb00034379dac2c756715a425ae89851a4955f0d",
+   "patterns/p09-bitset/README.md": "86f16831041b13e094ac308164db2a233be5ccc32455e410b8f4a4a52b66e840",
+   "patterns/p09-bitset/c/kernel.c": "962971116e73d2e3276ad23ce1fd9e02cc3fea40d19cef41b8ce49585789e913",
+   "patterns/p09-bitset/c/kernel.h": "a8dad60f84cecd1e7c599c5530f3fb933f1835af32522918db65af5dccb7a4f6",
+   "patterns/p09-bitset/c/kernel_hardened.c": "0b735e606354850d4977e52ec3a8dac22cd4216e4561b789f466131404771b5f",
+   "patterns/p09-bitset/c/main.c": "13a81c55d33fd2acd4e260d211b6f6f4778bb9698d313fcd29d497d2b9d5c55d",
+   "patterns/p09-bitset/controls/gen_controls.py": "a3ff92aea69016b0896fe05bfa18225615cc1cbf56df9e49c8ebb5eae1281a53",
+   "patterns/p09-bitset/inputs/gen.py": "9a2d77ead4009919c6c85a16821c14b6ee4bd553047bf257948f15af6955b5ec",
+   "patterns/p09-bitset/model.py": "66472fa3e0944e73680bf88418b27dbea81d7534598070f614f08b8d6bdb93d6",
+   "patterns/p09-bitset/safe_naive.rs": "b260fd51f4b7541aae8ceb34af32782e147096ee62d9252328eb5c6a32826584",
+   "patterns/p09-bitset/safe_tuned.rs": "0e1945f10e4289e34bac3a64d0eed05508b2783e7476962cc348f4c912238f68",
+   "patterns/p09-bitset/spec.md": "c3848c73d870aca3bf000dadd290d0ce397da51012d9f86cf3d1d1ef317d0efc",
+   "patterns/p09-bitset/unsafe.rs": "416d57c0f8140fde01da09a8edb561ec670ccae8c7575cb8f3372ad8869b11e1",
+   "patterns/p09-bitset/verus.rs": "b6064d0a90bd2ed6e3d4a4a4bb3d04d7ee84869d0ede0616c652ae8b8f788c6e",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check, NtNt::core::slice::index::slice_index_fail"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   },
+   "gcc-clang": {
+    "verdict": "NOT-LIC",
+    "why": "only c-gcc calls ['__popcountdi2']"
+   }
+  }
+ },
+ "p10": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking9panic_fmt",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking9panic_fmt"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p10-fir-stencil/NOTES.md": "a23e88d4cd79f762e798000ef59b1e8ebc151754e5401f1974c178a92e8f3de9",
+   "patterns/p10-fir-stencil/README.md": "01e25ff4b42fbf154125e18d282445f6553ad5b511892960f66bc6120fe32279",
+   "patterns/p10-fir-stencil/c/kernel.c": "94827f68ea7c31d663c30b098563bcc3561e97e8139b1431ae2dfc3e28dfcf15",
+   "patterns/p10-fir-stencil/c/kernel.h": "d5ae31eab24b460ae100659ea6fd87034115bfd260d7048cd27de7dbcb4415eb",
+   "patterns/p10-fir-stencil/c/kernel_hardened.c": "cc90de9f7caceb6d75ba6e303ae316bf9cd292739a830fe19bf0c5b39a550a81",
+   "patterns/p10-fir-stencil/c/main.c": "6bd1325c165b985e62c4456969487abf8f0e08df7d31a2cf392dc0846a0daa21",
+   "patterns/p10-fir-stencil/controls/clayout.py": "bbe34b30a7daf06ace55719a6078d289d9afbf56953ec550f3a1958b7f69f6c5",
+   "patterns/p10-fir-stencil/controls/fit.py": "e286452461414adb76edcc39841b689ba4c7506eeea61c45ed7629b07873b88a",
+   "patterns/p10-fir-stencil/controls/gen_controls.py": "5e4090f88cbd42dfb6ac30cced31b3d4b6b7b1519f9cc088a4918ee2408953ab",
+   "patterns/p10-fir-stencil/controls/gen_domain.py": "bf3832ed131087670a9077ce9f73321ee51408893d1b2e633543de0e569c1c93",
+   "patterns/p10-fir-stencil/controls/loops.py": "4d45a28b338426a398bf87c32844d387855c83f33238eed3a68e73c594b78897",
+   "patterns/p10-fir-stencil/controls/mkcontract.py": "712d1a7e3441448d500065bf56812ab1df40f65581acc5b65278940543f1050c",
+   "patterns/p10-fir-stencil/controls/predict.py": "c1b076091782a4dec3e4a77218879f8a6b1bbf4fee5c069f4db8032349bca94c",
+   "patterns/p10-fir-stencil/controls/sweep_ir.py": "e7c9e933ae0346b753d6c3c6035174cd9f000afd572ce005414c1a7284c1b759",
+   "patterns/p10-fir-stencil/inputs/gen.py": "8f331a638a4c22785230243f9da4d3afeac8c52fb5700204b3e01411f28e8cf4",
+   "patterns/p10-fir-stencil/model.py": "daa05b5b0f5c3ea481e4ee28db61dc452eda3aa95258820a39c9bb24962af426",
+   "patterns/p10-fir-stencil/safe_naive.rs": "ff50c0c15d00182ea9045c9f1ba55f8fecfd1828366cd13a8910d24be9fab6a4",
+   "patterns/p10-fir-stencil/safe_tuned.rs": "7cb93ea0ea4afea8779d5bcd2dc203a64f519621e2c1ca4339eab759a433d89d",
+   "patterns/p10-fir-stencil/spec.md": "c1741a3a48837d3fb3fcbc5d05153e3c0610d4c7ce69fbc764effcd619bba4e9",
+   "patterns/p10-fir-stencil/unsafe.rs": "860d2bbc86d4661a6e4defbdc6442cdd9ec7c63c0bbf4d9184f8f85e681ca3b2",
+   "patterns/p10-fir-stencil/verus.rs": "f05c8516acff46c5c3b734e402c04a0a286698b2a3dbcb2359e227aa023f8fa9",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_fmt"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   },
+   "gcc-clang": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   }
+  }
+ },
+ "p11": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [
+     "strlen@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [
+     "memchr@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [
+     "strlen@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [
+     "memchr@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvMs3_NtNtCs4NRVxsYgnAr_4core3ffi5c_strNtB5_4CStr20from_bytes_until_nul",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p11-nul-scan/NOTES.md": "a2527e5d27420176fb01878f7f13f9f4dc5f3272394f4618a6e07b56885d5d84",
+   "patterns/p11-nul-scan/README.md": "1ee4371f8cac420d963d490645f39321b8193ae16e309334d01ab6191bcd9d44",
+   "patterns/p11-nul-scan/c/kernel.c": "e4f3f2d0c3dfc871e83d28ec822e4bda7c98aaa1566c018d5c79bb7e0f971f96",
+   "patterns/p11-nul-scan/c/kernel.h": "aa44dd53403a286c7fbd6dea582d1c48771b6d022469804be0c80d801edc9d89",
+   "patterns/p11-nul-scan/c/kernel_hardened.c": "f0bda03b36f3e8334a35c14ce6863435a10faf80eac73b8df629e3aa213b09f5",
+   "patterns/p11-nul-scan/c/main.c": "0896021efbca0fc3b5b40415c2ddb4da9a6db098fa640efd60b3a271854777cb",
+   "patterns/p11-nul-scan/controls/gen_controls.py": "49a24d4ac3bb9c268947a8bee7683f7a2122194a3206faf75b539fb7670ccf30",
+   "patterns/p11-nul-scan/inputs/gen.py": "35b668a4fb9029de63b44cfe51f7395aa97b41c96693a062bfcd35c8b673cddf",
+   "patterns/p11-nul-scan/model.py": "238bce2309f0f728732f4000599caccde16857450a5a525206f0726fe823e758",
+   "patterns/p11-nul-scan/safe_naive.rs": "3c053c7d80c10b40fee9029b14d6b352ebb1c7f01ad5d8045b7b7e122503e630",
+   "patterns/p11-nul-scan/safe_tuned.rs": "251657e52838beceab27ba38a049c51bfe189a2fabc00d6f347024b86f1d79ce",
+   "patterns/p11-nul-scan/spec.md": "271219fbd88814eadfa27d294d20c0cdf4b062e52cc6aa4b0902ffe064db100f",
+   "patterns/p11-nul-scan/unsafe.rs": "c6d2e114b65c01e6668e0a7120d4f78b186ba952e70f1db60427f369739829a6",
+   "patterns/p11-nul-scan/verus.rs": "291f34bd92c9140b7f30044a23aebc524bd123669ecd4040a66236d4d2b8b950",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check"
+   },
+   "R3-R4": {
+    "verdict": "NOT-LIC",
+    "why": "only safe_tuned calls ['Ms::_NtNt::core::ffi::c_strNtB::_::CStr::from_bytes_until_nul']"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   },
+   "gcc-clang": {
+    "verdict": "LICENSED",
+    "why": "identical live set: strlen@plt"
+   }
+  }
+ },
+ "p12": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [
+     "memchr@plt",
+     "memcpy@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [
+     "memchr@plt",
+     "memcpy@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt",
+     "memchr@plt",
+     "memcpy@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt",
+     "memchr@plt",
+     "memcpy@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [
+     "memcpy@GLIBC_2.14"
+    ],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [
+     "memcpy@GLIBC_2.14"
+    ],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p12-strcat-fixed/NOTES.md": "3b24c2f10ca2bf89679cf8a55028b405f449402599566aee0435b5714adac5b2",
+   "patterns/p12-strcat-fixed/README.md": "0a579c9a49c41ad33cda2e428859555da1e4297e3441467a41bdf188211a7fa1",
+   "patterns/p12-strcat-fixed/c/kernel.c": "8f40894e72413d7d4681498943d80839dd43e7ca7941edad6c055da29a630dbb",
+   "patterns/p12-strcat-fixed/c/kernel.h": "c15eafe202c635ef0dca883cdfb84891d2df9bdcf1bae606101aed4529f8b3bf",
+   "patterns/p12-strcat-fixed/c/kernel_hardened.c": "275164743c2b66eefd42b08864f2e8ae3acee0002a2169478c652c2344479726",
+   "patterns/p12-strcat-fixed/c/main.c": "0f9406cdf8ab0beb4ec5365a3060d00b8c23decbbd1ea6cb7946dfb1dc37b717",
+   "patterns/p12-strcat-fixed/controls/gen_controls.py": "347030bfb7ec4ffa738d557fc3573dd22cf9bef79c4ec3f6f3037e9aad797069",
+   "patterns/p12-strcat-fixed/controls/pads.py": "cb9af76e8a42b1037f63cc8aaf960b6fcce3e30e90a9e53d8432c79761898b93",
+   "patterns/p12-strcat-fixed/controls/sweep_ir.py": "e93760b15703f7d091a99e6a218709ec5fff48e618be9c765048ec26cbe119cb",
+   "patterns/p12-strcat-fixed/controls/threshold_probe.py": "ac3ab421ff885fbb8ea0e21db08a1a0c4aa5af5e2a96d1fddae007084cc32111",
+   "patterns/p12-strcat-fixed/inputs/gen.py": "40e163e63417abab3a0bffd70399e323246740421aa26963cd6f4c895dac130a",
+   "patterns/p12-strcat-fixed/model.py": "9e7a2c1fa9f28068d955e385051c562073deaf510eeadd06a45fa1140545627f",
+   "patterns/p12-strcat-fixed/safe_naive.rs": "8ee597f6587dc9fa85cbe2465214a5aa2eac85985cb85d86f595a133a9dfd002",
+   "patterns/p12-strcat-fixed/safe_tuned.rs": "0e2d6d822935209bf726ee672c9f993849b3193f595033de97400dd8c77bc8de",
+   "patterns/p12-strcat-fixed/spec.md": "927b8804b495439c5ad4b38d0f914b29f76802a3a93bf3218eb5461e02184da9",
+   "patterns/p12-strcat-fixed/unsafe.rs": "725789c9db6d777d5e715ebbe07942ce23e86508be03640c2c62e6b57590c6ce",
+   "patterns/p12-strcat-fixed/verus.rs": "9065a14588c3ffa1f8d4eaafcca464635003a298276ed9f1ad3252d8650fffa3",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "NOT-LIC",
+    "why": "only unsafe calls ['memcpy@GLIBC_2.14']"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memcpy@GLIBC_2.14; differs only in DIVERGING callees, which execute 0 times in any accepted run: NtNt::core::slice::index::slice_index_fail"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memcpy@GLIBC_2.14"
+   },
+   "gcc-clang": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memchr@plt, memcpy@plt; differs only in DIVERGING callees, which execute 0 times in any accepted run: __stack_chk_fail@plt"
+   }
+  }
+ },
+ "p13": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [
+     "memcpy@plt",
+     "memset@plt",
+     "strlen@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [
+     "memcpy@plt",
+     "memset@plt",
+     "strlen@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt",
+     "strlen@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt",
+     "strlen@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking9panic_fmt",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking9panic_fmt",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14",
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [
+     "memcpy@GLIBC_2.14",
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [
+     "memcpy@GLIBC_2.14",
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p13-strncpy-trunc/NOTES.md": "965433acea9e4d51d367b49a99f6b46fc7494c203c554b605f39f45e128afd01",
+   "patterns/p13-strncpy-trunc/README.md": "87b0261b50597a71710e8573336bb569deca0a6cb0f516171c3a3d194f7311ca",
+   "patterns/p13-strncpy-trunc/c/kernel.c": "fd76e9c128584f4d0779639b8ade864afc05417897ea066701e25b685c0a84c8",
+   "patterns/p13-strncpy-trunc/c/kernel.h": "f977e19494d16766d3c25648a5bc44747764fa7b43fdf61607bb774b00e56f1d",
+   "patterns/p13-strncpy-trunc/c/kernel_hardened.c": "ca4fe4d8ab8d2ab98f02701211cfb045c3d438797323023a74be4ed9e3060c90",
+   "patterns/p13-strncpy-trunc/c/main.c": "a79b73afd93a7a4945e930744bc65708ac5b363f196410df1067a7b624176662",
+   "patterns/p13-strncpy-trunc/controls/gen_bulk_r5.py": "c7d7e189a6694430cdbb972a9096deb350d64c59bd1b5c8674966ac46fda580a",
+   "patterns/p13-strncpy-trunc/controls/library_axis.py": "3010b04536e67d8a105b67180367053dd7d0aa6761da325a77298a1ba4420db7",
+   "patterns/p13-strncpy-trunc/controls/mutants.py": "200b81490e1a9b6072856a2b238e4062d7d35636e06f683e54e224a54eb289b3",
+   "patterns/p13-strncpy-trunc/controls/oracle_hole.py": "0da681bd519948222677eb7c66659ba7dc3eb7027b0407dc543f7fb6aaa14d75",
+   "patterns/p13-strncpy-trunc/controls/spellings.py": "ad6c72ec15450d2f553c530b1c2f2b1e41fa4e929b2406d50b7f72cc4151ef04",
+   "patterns/p13-strncpy-trunc/controls/sweep_fit.py": "c7d003379605eccf78966d7265769c9416b4a2979457e8d4bc7094a08a7de8f9",
+   "patterns/p13-strncpy-trunc/inputs/gen.py": "c2335f5b677c93924ef4fcbb9dbc853238411a37abe037086f28a31b54f202b7",
+   "patterns/p13-strncpy-trunc/model.py": "bd2df54d21a1daac5cfc549ce9458dba667f0910405b3e2faa28dc10751e0eb4",
+   "patterns/p13-strncpy-trunc/safe_naive.rs": "ecb8597e5811a82a737ca4db3c7b372ab61033c4a1d70c9e863b4061ab9cd050",
+   "patterns/p13-strncpy-trunc/safe_tuned.rs": "fc8b720185403917122156d2f3276e532184fbeff5ad92e1a2fa990b30c5d5a5",
+   "patterns/p13-strncpy-trunc/spec.md": "e178780b1b8bbc24213db0044e63da70beeedd03d1b1950f4fd55fa97e3c4f0c",
+   "patterns/p13-strncpy-trunc/unsafe.rs": "82dd14142a71573c506fcae7b8969d07e054cfb5309faa4652945c04975040a5",
+   "patterns/p13-strncpy-trunc/verus.rs": "c6d45ccc197838ec1874c134bf2c354e1038cc8fdc75c52524512a2e09938916",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "NOT-LIC",
+    "why": "only unsafe calls ['memcpy@GLIBC_2.14']"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memcpy@GLIBC_2.14, memset@GLIBC_2.2.5; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_fmt, NtNt::core::slice::index::slice_index_fail"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memcpy@GLIBC_2.14, memset@GLIBC_2.2.5"
+   },
+   "gcc-clang": {
+    "verdict": "NOT-LIC",
+    "why": "only c-clang calls ['memcpy@plt', 'memset@plt']"
+   }
+  }
+ },
+ "p14": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [
+     "memcpy@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [
+     "memcpy@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking9panic_fmt",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking9panic_fmt",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14"
+    ],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14"
+    ],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p14-field-split/NOTES.md": "ce7b00093e23fbccf3f71e1889770bc80576e72aed466b1eec47f5d2b811189d",
+   "patterns/p14-field-split/README.md": "0b6a76e8bb3fbedc1cf92018719f0610212bd0e7fc62e9237a0f0afc63287b6f",
+   "patterns/p14-field-split/c/kernel.c": "23fd96ea04fc8ba8ca982a6defc77e21799270bc1d69cea8bb7e021ca5ee5f02",
+   "patterns/p14-field-split/c/kernel.h": "7c65f5261facad4c62f9cd0e5cdc40435269335bcad3807f98ed1008decfefb0",
+   "patterns/p14-field-split/c/kernel_hardened.c": "b126bd0191624387784fdca88a59e24f487212c0c0da73da503aecf24f5b9a8f",
+   "patterns/p14-field-split/c/main.c": "fab95b323dbae4e85befdb59ee419cae08bcff9992ac4740903979fae33c0c7f",
+   "patterns/p14-field-split/controls/attr.py": "a356e7a15d00d0f1c384031ac0b09fb49635b8175277be1f29af770167ffb5b3",
+   "patterns/p14-field-split/controls/clayout.py": "c652da0e6d2cbd2ed6f92f069f0bcea28a317488d46c49fead1b030b31e46c2b",
+   "patterns/p14-field-split/controls/fit.py": "f716971b038cefeb414e5075fade789fcd1347398468c72a68a0b7cacaa47e68",
+   "patterns/p14-field-split/controls/flen_price.py": "b88c09f9631482991389dfbe59cd1d4fc6059f3ed8afdfccdff660c8a2e0f597",
+   "patterns/p14-field-split/controls/gen_controls.py": "79b208bac2229c4723c1113cca760e76352f45ce266e63e5030584079bfc60cb",
+   "patterns/p14-field-split/controls/law.py": "55e04adf417c2e0e7caaaaef230097893af9467ad18d06f6cc4e140d5bc65e1d",
+   "patterns/p14-field-split/controls/sweep_ir.py": "318a0ef110bd58111b2f56826471e01fcf85869d69dd2918d5c499b1c28bb0bf",
+   "patterns/p14-field-split/controls/wall_span.py": "ffdba1ebcc0d9f224e7ca7559732042483a217d49f80a0726281309fd43d4184",
+   "patterns/p14-field-split/inputs/gen.py": "bf8084e4166e56395f9bcbeea17adbbdfa146cecaec721bc6903b54f0645ef2e",
+   "patterns/p14-field-split/model.py": "40be6cf4f201e572822063e50a180c665cd943478674a619a84d00fbe12bd8be",
+   "patterns/p14-field-split/safe_naive.rs": "e73298e9ee4bfe1f15dffb119c883c89575be9b7d6333db80e4aba94a8965277",
+   "patterns/p14-field-split/safe_tuned.rs": "26458aca0ed99e6d05335b95b8c6d4950a9002b8507893a4439bc77305b786ae",
+   "patterns/p14-field-split/spec.md": "40c3bca95b01af78c43c201fb308bb019ab74f118f3749aaf78b2af994d34ea7",
+   "patterns/p14-field-split/unsafe.rs": "cce8ad50866def4e230c5dc20429d36a36a843fbcecaaeeee9cf58a046e0c3ae",
+   "patterns/p14-field-split/verus.rs": "d2af5de9c1af57d5da0b328f62385640d495c3d29c42c40e95083aa9098c6e66",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memcpy@GLIBC_2.14; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check, NtNt::core::slice::index::slice_index_fail"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memcpy@GLIBC_2.14; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check, Nt::core::panicking::panic_fmt, NtNt::core::slice::index::slice_index_fail"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memcpy@GLIBC_2.14"
+   },
+   "gcc-clang": {
+    "verdict": "NOT-LIC",
+    "why": "only c-clang calls ['memcpy@plt']"
+   }
+  }
+ },
+ "p16": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p16-tlv-walk/NOTES.md": "06a402d0b76638f73b7cc4217a4c19bb6b0f2d61d05726445dd4a391bd38d3e7",
+   "patterns/p16-tlv-walk/README.md": "f15228277fb40556da91f02dfa7bd453eada8276cf34d529db519b65a2911bd6",
+   "patterns/p16-tlv-walk/c/kernel.c": "a59fbef6d3427711a78b7806569978223367c6cba81bfcf1881e1ac83977aba0",
+   "patterns/p16-tlv-walk/c/kernel.h": "2cc7285986c387baed556449abb63ad25cc3409e27a081300a1ca5e2c84641aa",
+   "patterns/p16-tlv-walk/c/kernel_hardened.c": "a8a078fda62dae779146c3c32dd2dc53766b13e866222a2c9665e67efa39e470",
+   "patterns/p16-tlv-walk/c/main.c": "7bb5a45a3f0103b60a2dd27b8e45eb52ce0015fa31c813b1135d77fc444be6aa",
+   "patterns/p16-tlv-walk/controls/foldcmp.py": "3bb15bd9fc21c5056a306e0da31f670d93bcf0ccfcd6811b4219991a0d391089",
+   "patterns/p16-tlv-walk/controls/gen_controls.py": "a59ac84ef83ca240686726c78130a98328315be0833fc5249943dcb61f02526a",
+   "patterns/p16-tlv-walk/inputs/gen.py": "7891a2f6fe438908a0e663da8660b58fcacfa2ec859f1f3105571fe13f054a03",
+   "patterns/p16-tlv-walk/model.py": "8b35eae6926af6654d6816d9a1733808234217fda9cdb8a8ee1d873d1877a6e9",
+   "patterns/p16-tlv-walk/safe_naive.rs": "3f58f658310c5615d0899d01e0907a68b5689673b79d856b6372dbf8cd149054",
+   "patterns/p16-tlv-walk/safe_tuned.rs": "6044ce0394896c3605e02178e84aa38b05d9c3bc4d31444cb52ab8674889d2fd",
+   "patterns/p16-tlv-walk/spec.md": "e9cf91c6c38d926817cfd1e9fbfd8ff2192d67ed7947fd4c5ba07963fa04fa66",
+   "patterns/p16-tlv-walk/unsafe.rs": "ae04d5ee891f29376555b3ef60f99348bb3bfa080eb897f4520dd8bbbbf6f2a4",
+   "patterns/p16-tlv-walk/verus.rs": "58c6d06cd6f86430578f5e3120644324162e5822db489ace7cdbba191e79332e",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: NtNt::core::slice::index::slice_index_fail"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   },
+   "gcc-clang": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   }
+  }
+ },
+ "p17": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p17-http-range/NOTES.md": "9696df80d0c27556d6bebd7bf66a62de99d9ec211ffa8b46ca3a024daa435d56",
+   "patterns/p17-http-range/README.md": "b17e898b60e8f20ad812f95ad76af578c64aba3bf50463497449ac4af19130e3",
+   "patterns/p17-http-range/c/kernel.c": "7c4e302d420db1ef666a7218a884c611120811324629dc9cdc7884c0e0ad7db6",
+   "patterns/p17-http-range/c/kernel.h": "09bfe23afa37872032784e8d0afe473713fbac12cd8a6c28e5f8ffe6b8c85f05",
+   "patterns/p17-http-range/c/kernel_hardened.c": "603c7e13ba191725a6a15fbbd347b0c97319176d5a9607e1064c594ff41993b8",
+   "patterns/p17-http-range/c/main.c": "32788ae111359ab8ecfa90067376c208079c886b20f041e648573bacd907c478",
+   "patterns/p17-http-range/inputs/gen.py": "ca5a5b3f52c65196de4ef76f7aaccf6fe279fb2629bc6943a65a7381d1de6ef5",
+   "patterns/p17-http-range/model.py": "d3e26cfeb6a076b423b474a40d77bbab47e50d0abf133e457ef046ed12b5813c",
+   "patterns/p17-http-range/safe_naive.rs": "43fadb4c64f6f60e219ba8ce16bf27daa1085f6239d873a16bca7a7b5e20340b",
+   "patterns/p17-http-range/safe_tuned.rs": "4afff314daf7d1fdadfeb1fe661a13a07808da9dce560bece1798518fbbf0414",
+   "patterns/p17-http-range/spec.md": "558790b46315ac9e9090a7de1a75ad1d0db2d1a55b3ead823fa5280805e44f88",
+   "patterns/p17-http-range/unsafe.rs": "a119e3782f413cfdaa2e71fcf5fe572ed820d5db6daade7e06ea13cc2a415960",
+   "patterns/p17-http-range/verus.rs": "5a09e9d58df3639b5802a955e66fafd01e4b2b49cbff80ee0d82d4fa9ca6cc12",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: NtNt::core::slice::index::slice_index_fail"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   },
+   "gcc-clang": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   }
+  }
+ },
+ "p18": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking9panic_fmt",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking9panic_fmt"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p18-varint-shift/NOTES.md": "f2379bdf0cb6e5195c2e50fb2c4e9709b7b66eed2b3d8e25a191c595ad04c92e",
+   "patterns/p18-varint-shift/README.md": "3b1b2d62ae44ecaa8d190a7bcc6be4e1f2d2593be22053a5a4f376260ac708eb",
+   "patterns/p18-varint-shift/c/kernel.c": "0c7a4348ece77e33ea759bed5c194b673492e5a57e832e9fe793455332de2fb9",
+   "patterns/p18-varint-shift/c/kernel.h": "3d33b0217d5a9ded582ea48cc9995fae80f659c548bbff2aa8c530da4c6e74a9",
+   "patterns/p18-varint-shift/c/kernel_hardened.c": "e0b9b1c66a80b3e61707ea529b0c9c9586237d4fe7057d2ce857379609c387f5",
+   "patterns/p18-varint-shift/c/main.c": "c834d3e6b43c56b07901bdffd8104fd5e829ea0cae63bcfe65a1ac4434c7761d",
+   "patterns/p18-varint-shift/controls/clayout.py": "1aef3543aa07bce54711c197adc4ac0095918c1a2129083982a7afeee00c4199",
+   "patterns/p18-varint-shift/controls/fit.py": "0218af36fa0233153daa6fe3ef941d94ac603f4ad730dafdd33520dcb0b502bf",
+   "patterns/p18-varint-shift/controls/gen_controls.py": "c04c0c1c6f27d7bcaf875ee7d7d0e0035b083e7e1119ffc386adfba75f440546",
+   "patterns/p18-varint-shift/controls/miri_exit_hole.py": "271c8fec055712a67c943d4575b1266a2a65ea833f01d4b6300d294ff8d10210",
+   "patterns/p18-varint-shift/controls/mkcontract.py": "493a857a6efb782d006c83b027c8af527182a56f3bee8c16270df3def3693d0b",
+   "patterns/p18-varint-shift/controls/predict.py": "e14378a5f4f66f516d19a39178f5f187e7ebf95c8964a0fd892ce7cfb88f889c",
+   "patterns/p18-varint-shift/controls/sweep_ir.py": "f714bdf3019930cde10a0ce39dfd1cdb1adafc3b18cd56ef636b5f6ab1ce0317",
+   "patterns/p18-varint-shift/inputs/gen.py": "1d5bd763d82d9b03544ff3edbb072e8a724f4cc6e917c13d4f6f79d130793436",
+   "patterns/p18-varint-shift/model.py": "aa1e09d4bd76f536f0cbf61fffe55a0f77ec8e6de0228228ec3e4f0f8b1f592d",
+   "patterns/p18-varint-shift/safe_naive.rs": "afce0114f361de09282a17a8686331020cf7b02a61415d504d417654118711b3",
+   "patterns/p18-varint-shift/safe_tuned.rs": "2a45369416b3038eea0e43270416440a9e1f8cb74957c86e375d742f603e4746",
+   "patterns/p18-varint-shift/spec.md": "2eb336029baed87fcd088bc73937566f786113f69aeb87fe3abd763c52381c6b",
+   "patterns/p18-varint-shift/unsafe.rs": "14b841461bbeca4e3d518e60b4d383e8c4f47c3fdd490efd2c5fcb9094c075b3",
+   "patterns/p18-varint-shift/verus.rs": "0764a7426b1256e304bf87bdc831953154db1e2b62d1eb66a37797f928b31198",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_fmt"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   },
+   "gcc-clang": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   }
+  }
+ },
+ "p22": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p22-hash-probe/NOTES.md": "9616fd25b3fd1f896830af59bbc1870ad6f328bf5c2dc65f013ddc8a9e68bca1",
+   "patterns/p22-hash-probe/README.md": "4c89b807f672f3202096da3e4b629d46d322068012dbecb582ea6c3b404e2d4f",
+   "patterns/p22-hash-probe/c/kernel.c": "f3ea8cc679f5c86d3c20289c009ae64a965366764394d052f37de79858202528",
+   "patterns/p22-hash-probe/c/kernel.h": "911260a439df516ab72d6283212e0ef86daa0ad8f0f5cc77fdb0d293a291c9d7",
+   "patterns/p22-hash-probe/c/kernel_hardened.c": "bcbfa36ce7acd64db13c330cc5ac1359461bd9d7ccef063f56aa0a5930546af7",
+   "patterns/p22-hash-probe/c/main.c": "4f2d43744047e3f210535a6f2140e8486d8bdfc31fdf6b9026c509377ef09834",
+   "patterns/p22-hash-probe/controls/clayout.py": "4db25cde386cdb5f1403a3e46c102bd60d2f48e6b1fb467ff08a97e981fdb2ac",
+   "patterns/p22-hash-probe/controls/dyn_ir.py": "31b60d9b3c8402c43359e4844a5837cf75bf0a6c32445402777885f5e0b25a7c",
+   "patterns/p22-hash-probe/controls/gen_controls.py": "6f17675d472e3918d31498d0df61d7245c221f41c81a22a5a29132c16106df79",
+   "patterns/p22-hash-probe/controls/mkcontract.py": "a2e9109cd0c820037a3b2bc8cb64118276cab7fa68993e49e2f5d1bc8e9173ce",
+   "patterns/p22-hash-probe/controls/sweep_ir.py": "965971c507964c9845416496cc6f5770061ef4c8fa8d70eef1cc2389c3d58f7b",
+   "patterns/p22-hash-probe/inputs/gen.py": "0fee3932b1b506a09344c7e8287d87cf241b99c4d52c529c2b89a4fab14998ce",
+   "patterns/p22-hash-probe/model.py": "24b9b418eeec1d914ee2de13bac113ebb0664cb56c64ecdf956e2f58f5a4faad",
+   "patterns/p22-hash-probe/safe_naive.rs": "9c71760f4f876ee8faec963278f8a559a28575f149498cef17421cece55fcd45",
+   "patterns/p22-hash-probe/safe_tuned.rs": "f86d71efb9eea6251cf0d659909c845ba8608d2f74b6985ca788de3622e637b1",
+   "patterns/p22-hash-probe/spec.md": "3983d39ed1101531b41157af8c6405f064dbd1b61e0cbb7ab98a7d29a07fc0f4",
+   "patterns/p22-hash-probe/unsafe.rs": "63a1e32ae8b7205c5cd06e373c716d4b5c07b3b15707db61cd342d690bf30671",
+   "patterns/p22-hash-probe/verus.rs": "22f3538929c4b2e8ebda09686b30395648b9f90f3eee985d32b06a0e0975a6fe",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: NtNt::core::slice::index::slice_index_fail"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   },
+   "gcc-clang": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: __stack_chk_fail@plt"
+   }
+  }
+ },
+ "p27": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [
+     "abort@plt",
+     "free@plt",
+     "free@plt",
+     "malloc@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [
+     "abort@plt",
+     "free@plt",
+     "free@plt",
+     "malloc@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt",
+     "free@plt",
+     "free@plt",
+     "kernel.cold  [tail/outlined]",
+     "malloc@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt",
+     "free@plt",
+     "free@plt",
+     "kernel.cold  [tail/outlined]",
+     "malloc@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RINvNtCs4NRVxsYgnAr_4core3ptr9drop_glueAINtNtB4_6option6OptionINtNtCscdodAO9FK5_5alloc5boxed3BoxhEEj20_ECsaBH6GJeUSWJ_10safe_naive",
+     "_RINvNtCs4NRVxsYgnAr_4core3ptr9drop_glueAINtNtB4_6option6OptionINtNtCscdodAO9FK5_5alloc5boxed3BoxhEEj20_ECsaBH6GJeUSWJ_10safe_naive",
+     "_RNvCs9wFQrvczXsK_7___rustc12___rust_alloc",
+     "_RNvCs9wFQrvczXsK_7___rustc14___rust_dealloc",
+     "_RNvCs9wFQrvczXsK_7___rustc14___rust_dealloc",
+     "_RNvCs9wFQrvczXsK_7___rustc35___rust_no_alloc_shim_is_unstable_v2",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCscdodAO9FK5_5alloc5alloc18handle_alloc_error",
+     "_Unwind_Resume@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RINvNtCs4NRVxsYgnAr_4core3ptr9drop_glueAINtNtB4_6option6OptionINtNtCscdodAO9FK5_5alloc5boxed3BoxhEEj20_ECs86OlWC8CPt8_10safe_tuned",
+     "_RINvNtCs4NRVxsYgnAr_4core3ptr9drop_glueAINtNtB4_6option6OptionINtNtCscdodAO9FK5_5alloc5boxed3BoxhEEj20_ECs86OlWC8CPt8_10safe_tuned",
+     "_RNvCs9wFQrvczXsK_7___rustc12___rust_alloc",
+     "_RNvCs9wFQrvczXsK_7___rustc14___rust_dealloc",
+     "_RNvCs9wFQrvczXsK_7___rustc14___rust_dealloc",
+     "_RNvCs9wFQrvczXsK_7___rustc35___rust_no_alloc_shim_is_unstable_v2",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCscdodAO9FK5_5alloc5alloc18handle_alloc_error",
+     "_Unwind_Resume@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [
+     "_RNvCs9wFQrvczXsK_7___rustc12___rust_alloc",
+     "_RNvCs9wFQrvczXsK_7___rustc14___rust_dealloc",
+     "_RNvCs9wFQrvczXsK_7___rustc35___rust_no_alloc_shim_is_unstable_v2",
+     "_RNvNtCs2AWtUsOyxgP_3std7process5abort"
+    ],
+    "unresolved_indirect": [
+     "call *%r12"
+    ]
+   },
+   "verus": {
+    "error": null,
+    "outward": [
+     "_RNvCs9wFQrvczXsK_7___rustc12___rust_alloc",
+     "_RNvCs9wFQrvczXsK_7___rustc14___rust_dealloc",
+     "_RNvCs9wFQrvczXsK_7___rustc35___rust_no_alloc_shim_is_unstable_v2",
+     "_RNvNtCs2AWtUsOyxgP_3std7process5abort"
+    ],
+    "unresolved_indirect": [
+     "call *%r12"
+    ]
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p27-handle-table/NOTES.md": "18fd3a4f3f179ce3de3fbccb41c9c070520de64a06e961fbb9be23f2810d9aa5",
+   "patterns/p27-handle-table/README.md": "dd34cd576615d771d74c9ff8fd4d463096aac5b8a07665a87062be309d3631c5",
+   "patterns/p27-handle-table/c/kernel.c": "8e20a7f4e0fcdac61453e48552103d34a2301e4cb8b4d277c07354d8d672f2f3",
+   "patterns/p27-handle-table/c/kernel.h": "46e457d6f455f939104afa720118651226902d3ea8882032e6ff3fc0a237b956",
+   "patterns/p27-handle-table/c/kernel_hardened.c": "508059641e1157edda5fc853c45cf75be16d443429ef1342f7d469df7d194be2",
+   "patterns/p27-handle-table/c/main.c": "2533f37e9d7760ecc132cfda86c304bfebcb550e1fb8ccb2a2448b5b3ef56859",
+   "patterns/p27-handle-table/controls/clayout.py": "d7647ec42fb8a05948adc04bf6b7a83e6d8802dce1d552da3d6c7453ede09531",
+   "patterns/p27-handle-table/controls/gatediff.py": "83b06d2cef21bbca5eb6df05e32a19d324a4868307a189b714365906196e09c6",
+   "patterns/p27-handle-table/controls/gen_controls.py": "a18a10cbc81471f24ddee31a8711868e4ea1f08bbc3a431baabb1f622a666e65",
+   "patterns/p27-handle-table/controls/gotresolve.py": "86cd87b27e81d37e6939d555f509278f49a676a72e07f8851ea74412e69864cd",
+   "patterns/p27-handle-table/controls/ir_table.py": "02b7b48abac9bb66a4fbd7c5ea6ff6fdcf62f8b6ad40c092c2d1e7d7f9be4777",
+   "patterns/p27-handle-table/controls/mkspec.py": "cc4263aeea838190b11c5fc423c953f4e0f0fff8e54d77c5a4bba447b26022df",
+   "patterns/p27-handle-table/controls/proof_mutants.py": "c515ca5958f84dcc311d190ba0ad75f969f9a31dd8e461b30ba1705ee51a7770",
+   "patterns/p27-handle-table/controls/sweep_ir.py": "ae2cd43c074fa5cd2355859e429d008edd2fa0499fa8b6c4b02a55c4639125c1",
+   "patterns/p27-handle-table/inputs/gen.py": "19c9fe676bc074efe28d854c80dfc6d1d11e46154516208bd0eab8860b473aab",
+   "patterns/p27-handle-table/model.py": "e637543f16807bac846298c1d0962b3ccda6258b300759ab24e86113368c4808",
+   "patterns/p27-handle-table/safe_naive.rs": "0b983901b13109fbe15dc9592bcaf972bdc703b9c1fc5a8d139952d39f7cd5b4",
+   "patterns/p27-handle-table/safe_tuned.rs": "d4ea2eb335ca894ddad20eade4c49baa04b0df20e8a6cc3e5cd8d2d2843fbf23",
+   "patterns/p27-handle-table/spec.md": "417f60f2ed62613a8847f257a8dbe8de17a192ddce1cc9355340e302d63fb73a",
+   "patterns/p27-handle-table/unsafe.rs": "638d9d71d32b885405bdb97891d7b64e3f8e2a162480daed4d11bd82a198ff18",
+   "patterns/p27-handle-table/verus.rs": "75fef39e60a30041e2883052213722b6bb7bba90a8a11f12ff5a3253ea2abd41",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "NOT-LIC",
+    "why": "ASYMMETRIC INDIRECT dispatch (safe_naive: 0, unsafe: 1); e.g. `call *%r12`"
+   },
+   "R3-R4": {
+    "verdict": "NOT-LIC",
+    "why": "ASYMMETRIC INDIRECT dispatch (safe_tuned: 0, unsafe: 1); e.g. `call *%r12`"
+   },
+   "R5-R4": {
+    "verdict": "UNDEC",
+    "why": "both sides dispatch through an unresolvable pointer (1 each); e.g. `call *%r12`"
+   },
+   "gcc-clang": {
+    "verdict": "NOT-LIC",
+    "why": "only c-gcc calls ['kernel.cold  [tail/outlined]']"
+   }
+  }
+ },
+ "p36": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": [
+     "call *0x0(%r13,%rcx,8)"
+    ]
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": [
+     "call *0x0(%r13,%rcx,8)"
+    ]
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": [
+     "call *0x0(%r13,%rax,8)"
+    ]
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": [
+     "call *0x0(%rbp,%rdx,8)"
+    ]
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check"
+    ],
+    "unresolved_indirect": [
+     "call *0x18(%rcx)"
+    ]
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail"
+    ],
+    "unresolved_indirect": [
+     "call *0x18(%rcx)"
+    ]
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": [
+     "call *0x18(%rcx)"
+    ]
+   },
+   "verus": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": [
+     "call *0x18(%rcx)"
+    ]
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p36-vtable-dispatch/NOTES.md": "4905f019d1814a40a024620ac53c544ddd7fe224d4d8437f04f1b5451eb78529",
+   "patterns/p36-vtable-dispatch/README.md": "4c27129642205bf167f848a1e217240d27c79de12885cc915812799550498dbb",
+   "patterns/p36-vtable-dispatch/c/kernel.c": "7826367c087a6950c5d57eeb18c751f411ed43b38f6e3bf917a33b6854e827e1",
+   "patterns/p36-vtable-dispatch/c/kernel.h": "63533f4dcc74cdf1005466dd2f5b9e8bbe4371790b81c01c621bcda8c7d0b92d",
+   "patterns/p36-vtable-dispatch/c/kernel_hardened.c": "f2903ef64463bf54c3be3b1630f6d404594f14e1703781de41265183fcbfa28d",
+   "patterns/p36-vtable-dispatch/c/main.c": "c9e96b7ae706897c3947217172fef21e237efff5cbaf1d45314e14bc981772b3",
+   "patterns/p36-vtable-dispatch/controls/cfi_probe.py": "a930cfa356bfc6a8645b156477669f08a72baef0ed23668458d6595a580a2156",
+   "patterns/p36-vtable-dispatch/controls/clayout.py": "a8da28e2fddd982b53e053b06fb77dd1dbab82edb0f1b9f12c8489b43aea071f",
+   "patterns/p36-vtable-dispatch/controls/gen_controls.py": "8f1ff1dced984906b8f583bcf86d931e232a521c18306b335c6bb4cd4a8ffc81",
+   "patterns/p36-vtable-dispatch/controls/identity_probe.py": "02f04dfc66e2067f864b0faa7f4f086c354ba6f859be732815f55ba1bfaa7157",
+   "patterns/p36-vtable-dispatch/controls/mkcontract.py": "6fcca85dfab812002d528f273cd76e660ee72cd1df8ab5954c56aaea983e4e87",
+   "patterns/p36-vtable-dispatch/controls/mkmutants.py": "a44511ad57f8cbfe583e3c658064d2cf2a15e423be1402fa2596e0ece73db3c2",
+   "patterns/p36-vtable-dispatch/controls/r3_contract.py": "1d641a07d91d497465ec9055cdec7d289ed5809dc3b4b2a46e80ce27f7f9053c",
+   "patterns/p36-vtable-dispatch/controls/sweep_ir.py": "dc895d1ca289261d10b7fbb53bc15dc3645d73533aab13cb179080a3b4f1816d",
+   "patterns/p36-vtable-dispatch/inputs/gen.py": "e6b42b5ee52cecd10825ec43a8a2f47d73685b9ce05cfdff1e13e53ad0923b43",
+   "patterns/p36-vtable-dispatch/model.py": "58df0795558765edb8b67ada0dbd5f7e97cb3d30a1d8d57292245eacd23b971b",
+   "patterns/p36-vtable-dispatch/safe_naive.rs": "b8aa807b5ed727a76be70324dcff4a1158ba566056d75aae02b1293fc9a7a120",
+   "patterns/p36-vtable-dispatch/safe_tuned.rs": "94e2328d86cdc15a53dc33dac1173778751905739d8a0533d4a3222079dcd5b6",
+   "patterns/p36-vtable-dispatch/spec.md": "6fd03a0eb69a806d7841eb501d6485023416e06e7da2bb63e9d84879e4827e85",
+   "patterns/p36-vtable-dispatch/unsafe.rs": "acd480931200640ec1b9dffb4cc70721dae3f0093ab941496c638d0c65c1d15f",
+   "patterns/p36-vtable-dispatch/verus.rs": "936a4a1b7d69480f14bdbaef7ee340ec0b15c7714feb006afba7b7f1e021dcf3",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "UNDEC",
+    "why": "both sides dispatch through an unresolvable pointer (1 each); e.g. `call *0x18(%rcx)`"
+   },
+   "R3-R4": {
+    "verdict": "UNDEC",
+    "why": "both sides dispatch through an unresolvable pointer (1 each); e.g. `call *0x18(%rcx)`"
+   },
+   "R5-R4": {
+    "verdict": "UNDEC",
+    "why": "both sides dispatch through an unresolvable pointer (1 each); e.g. `call *0x18(%rcx)`"
+   },
+   "gcc-clang": {
+    "verdict": "UNDEC",
+    "why": "both sides dispatch through an unresolvable pointer (1 each); e.g. `call *0x0(%r13,%rax,8)`"
+   }
+  }
+ },
+ "p38": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [
+     "memset@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p38-alias-pun/NOTES.md": "d95158e0e28b74d88520d52353c49b11532d39f8b0f47a198e4bb546a49f681d",
+   "patterns/p38-alias-pun/README.md": "4cb99c8f5641ccde8feb11b5a21f70c822e92012e8482429936cb8d99c7daa58",
+   "patterns/p38-alias-pun/c/kernel.c": "3e5f9f518672d7ff518a4eb93708b1539fa41ba5ef7160dcf8a0714b946e4e4f",
+   "patterns/p38-alias-pun/c/kernel.h": "0ff681bf67d48ee649480acb2181855176257e00f3f9409828ef89261decb205",
+   "patterns/p38-alias-pun/c/kernel_hardened.c": "dbfb9d24a522295f537e9b6833735cb19f8db2200c051aa24b7403201608dc07",
+   "patterns/p38-alias-pun/c/main.c": "5314a7830f81f25373048b0b018dd7c9629d78d50f5baeb021cdd71f8c16b4d2",
+   "patterns/p38-alias-pun/controls/fit.py": "cc98a0ba77dde06104d0242c197c37849e5c21e85b56fdbd457aff895661b06b",
+   "patterns/p38-alias-pun/controls/gen_controls.py": "d569b3fa863c32ae3bf4cc51e481081c62f4f441225e5868a0d917b4902abd3d",
+   "patterns/p38-alias-pun/controls/mkcontract.py": "eebc54544711bb9accca5aa1cb15d995f57e2a2644d90d82b4285393fe0efd30",
+   "patterns/p38-alias-pun/controls/proof_mutants.py": "43dbe97999122bace02d71dc5f669bb8840f71d9ff105bc8c01060ffd4b6aac9",
+   "patterns/p38-alias-pun/controls/span.py": "d625520fd52f7dab1f9ba1e09a415e4ea5c2416f489af9eddc41f0170cede0c2",
+   "patterns/p38-alias-pun/inputs/gen.py": "d0ca7efdbd21915b106286537fac14be2354f531bae23cdf959f6f03d87d1324",
+   "patterns/p38-alias-pun/model.py": "ae05e4d8d6c6593eac96788a19d91e4173016b2be47c60108602c0415320dce9",
+   "patterns/p38-alias-pun/safe_naive.rs": "3e497d62b303969a13485bc2d523e2f2138b7f1d5c3ed6d31b08a8e34ca69e94",
+   "patterns/p38-alias-pun/safe_tuned.rs": "215e6787cfba29a3421b0b3fa6342df0691d554d36987d1935557dcb03c5f985",
+   "patterns/p38-alias-pun/spec.md": "ecd7d0f8c782b69c7699fcd33b56952faee5371d84cb63f49fd2a541fabc2934",
+   "patterns/p38-alias-pun/unsafe.rs": "c3b55e6a478c154d6969ed6cc08b89299754f2a5cb855cb755518b08adc2c014",
+   "patterns/p38-alias-pun/verus.rs": "7c6cab70fd088de81840b63aee0e31949e412ef2a7dfc559c5e15da87face87d",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memset@GLIBC_2.2.5; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memset@GLIBC_2.2.5; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check, NtNt::core::slice::index::slice_index_fail"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memset@GLIBC_2.2.5"
+   },
+   "gcc-clang": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: __stack_chk_fail@plt"
+   }
+  }
+ },
+ "p47": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [
+     "bcmp@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [
+     "memcmp@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "bcmp@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "123581a3bda90d98105e25b9c1a54c0deea767eeda4410c7c4f59dfbd6a8e245",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "73fed193dcfbd7e154e4a269dbf1c5e9cbb25f5148408aafe1110de0f276d458",
+   "patterns/p47-ct-compare/NOTES.md": "c770cb176372f0abfdd4e95eb06e999c2a91bbebd17eeb417c99fb3671c85d9b",
+   "patterns/p47-ct-compare/README.md": "d520b574b8c134c6cb4f79faceda07a72f86351ffdabe920910003ed98c091c1",
+   "patterns/p47-ct-compare/c/kernel.c": "9f671934377a348322ffa3fa8c7d6e7a3c368d420f25aba1bcc0afa6482c8d49",
+   "patterns/p47-ct-compare/c/kernel.h": "7252951224967e284ab402c6acb4b50c75e521ecf2936de638ab1013a8b01765",
+   "patterns/p47-ct-compare/c/kernel_hardened.c": "7bc11f3367f8a2aee8f5a18385380d1e3783c845ce5b9f7d04b264e02cd774bc",
+   "patterns/p47-ct-compare/c/main.c": "0e31a35914fc75adcb4e95e8673d5cf2a9583c2645261a30ad44d6047a578f5c",
+   "patterns/p47-ct-compare/controls/clayout.py": "ef388ae52358b7c4e1466569ca402de50e1cc7eb68ef69d047a19939f329ccb2",
+   "patterns/p47-ct-compare/controls/gen_controls.py": "c3d2c28c93a9457fd922ebed1483c0045164c275cbed65aa859b4ff97e72014e",
+   "patterns/p47-ct-compare/controls/ir_table.py": "466f9741426667b73cc6d64d82cd54089ea230eae53fda7b14f7ed14c737c775",
+   "patterns/p47-ct-compare/controls/loops.py": "ce42005fd7016a3495b86f9744b8c223471bc4abb4b5573cbed9aba3a57d5ccc",
+   "patterns/p47-ct-compare/controls/mkcontract.py": "83f6b9dfcf78fd460d3fafdcb3d2688d42785db31fe0aa42e275a1f9d28c48f2",
+   "patterns/p47-ct-compare/controls/predict.py": "ca2a67b1ef77429f9169cbba8bdb7f8884e200c84d81a24ae3a5decfa880773f",
+   "patterns/p47-ct-compare/controls/proof_mutants.py": "677939369b1708a70c741474348c12f8ef0450e32ebdbb19a690f21c44302137",
+   "patterns/p47-ct-compare/controls/sweep_ir.py": "9d70e5322590da12c1eb677702342d1d009d7d41dc00d3c7ea8e31f52e83bb99",
+   "patterns/p47-ct-compare/inputs/gen.py": "139af17ebf7da0ba0f3d658a4a1eb42f7e024e6ca598507df578b53ab6053229",
+   "patterns/p47-ct-compare/model.py": "80d11b5a6411da50f2953513ab683ba60d0c0915d65b6275c240e65f9cc6a18e",
+   "patterns/p47-ct-compare/safe_naive.rs": "502cea6bdabcadb2ba422ca9070ab183b019a4ce08a3aa9d225a1de255242271",
+   "patterns/p47-ct-compare/safe_tuned.rs": "15ca404fcf8696174b6e63d259e9facafbf1bc4ae06ed7d82d7b44904ac7d7ee",
+   "patterns/p47-ct-compare/spec.md": "bdb834f011d4bab58e3e6a07c54659e7a83a50102fd5dd91cf296da4314ec825",
+   "patterns/p47-ct-compare/unsafe.rs": "5287d6a438107033302321b66a3715b62b46da9e02cf6357e6ffc75c631cfec6",
+   "patterns/p47-ct-compare/verus.rs": "533e5c3405de055be30b0041149e5c8326f6492a812efc55a268e35fda6dc16c",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "NOT-LIC",
+    "why": "only safe_naive calls ['bcmp@GLIBC_2.2.5']"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check, NtNt::core::slice::index::slice_index_fail"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   },
+   "gcc-clang": {
+    "verdict": "NOT-LIC",
+    "why": "only c-gcc calls ['memcmp@plt']; only c-clang calls ['bcmp@plt']"
+   }
+  }
+ }
+}
