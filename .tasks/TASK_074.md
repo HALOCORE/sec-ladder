@@ -202,3 +202,79 @@ with a working probe already at `.temp/synth/aggregate.py`; (c) **a different
 catalogue row you argue for.** ⚠ **(c) is the one the manager most wants to
 hear** — the slate is the manager's and RECAP has invited push-back on it since
 TASK_066 with no taker.
+
+---
+
+## Outcome (recorded by the manager at the task boundary)
+
+⚠ **p48 was REFUSED, and this is the first time rule 3 has been run as a
+designed experiment rather than as a warning.** No pattern directory was
+created; the argument and eight measurement blocks are the deliverable
+(`.temp/p48pat/NOTES.md`, re-runnable via `.temp/p48pat/repro.sh`).
+**22 patterns, all green, 44 records 0 STALE — unchanged, by design.**
+
+**The three findings that killed it**, two of them **manager-verified before
+landing** because they contradict text the manager wrote:
+
+1. **The axis's sole distinguishing claim was false.** The catalogue said *"no
+   pattern in the tree exercises [`is_init`]"*; **p27 exercises it in four
+   places, including a conjunct of its core invariant** (`verus.rs:267`), and
+   calls `ptr_ref` at `:620` against the same `raw_ptr.rs:623` precondition. ✅
+   Manager-checked both files directly. A new **clause**, not a new **kind**.
+2. **The PADDING sub-case — the row's own "real CVE shape" — is unbuildable
+   here**, measured across 3 layouts × 2 compilers × 4 opt levels × 3 DSE
+   defences, and the reason is structural: a padding byte cannot be written by
+   the program, so the only store that can plant a value in it is adjacent to a
+   `free()` and the load is a load of `undef`.
+3. **It is p08's shape by this project's own test** — the catalogue demotes
+   `p31` in exactly those words, and the defence (*"the C bug is not exotic"*) is
+   about frequency in the wild, **which no rung measures**.
+
+**Four manager decisions taken:**
+
+1. ⚠ **The refusal is ACCEPTED without a review task.** Rule 1 alternates
+   engineer → reviewer, and this is the exception: the deliverable **refuses the
+   manager**, so rule 3's *designer-validates-own-design* hazard runs the right
+   way, and the decision's cost is *not spending three tasks*. **The two claims
+   that overturn manager-written text were verified by the manager instead.**
+   ⚠ **The remaining findings are marked PROVISIONAL in `.memory/`** per rule 9
+   and are named in `TASK_075`'s reading list for attack.
+2. **The recommendation is TAKEN, and it inverts PROTOCOL rule 5 deliberately.**
+   Next is the `harness/` batch's callee/total `Ir` column, then the synthesis.
+   The argument that decided it: `.temp/synth/aggregate.py` reads
+   `kernel_exclusive_ir`, and its headline provisional finding *"`R3 − R4`
+   negative on 5 of 20"* has as its **two largest data points p11 and p13 —
+   exactly the two patterns whose `.memory/` entries already say their rungs
+   dispatch different work outward.** Rule 5's own standard is *"could this
+   happen by accident?"*; the TASK_068 override's is *"measured defects, not
+   speculative hardening"*. **Four of five now qualify, and the fifth is what
+   makes the project's stated purpose measurable at all.**
+3. ⚠ **`p31` is NOT scheduled on the strength of this report.** The engineer
+   offered it third and **labelled it unmeasured** — the catalogue demotes p31
+   for a reason (*"nothing observable"* → p08's shape) that **nobody has tested**,
+   and it is the same test that just refused p48. **Test it before scheduling
+   it**, not after. That honesty is why the recommendation was taken at (1)/(2)
+   and not at (3).
+4. **`p48`'s survivors are preserved in the catalogue rather than discarded** —
+   the V1 sentinel design with its two unstated preconditions, the 48/48 R4
+   result, MSan-through-`printf`, and the cost axis with its `rep stosb` domain.
+   **A refused axis that leaves four reusable measurements behind is a cheap
+   task, not a wasted one.**
+
+⚠ **PROTOCOL rule 2's running count is 170:** 165 at TASK_073, **+5** from this
+task — the `.temp/p48/` scratch prescription (which would have **destroyed
+TASK_048's evidence directory**), the padding sub-case being unbuildable, the
+catalogue's *"no pattern exercises that"*, **RECAP's *"the six original axes are
+complete"* — which the manager wrote one commit earlier and which is false,
+`p31` being the unbuilt sixth — and §0b's implication that the sentinel design
+sidesteps DSE generally. **Carry 170 forward.**
+
+**The single most useful thing in this block.** ⚠ **The manager scheduled a
+SEVENTH axis while the SIXTH was unbuilt, and wrote "the six original axes are
+complete" into the handoff document one commit before an agent counted the
+table.** The axis table has seven rows; five are built. **Both errors are the
+same error — a count asserted in prose instead of derived from the artefact** —
+and it is the third time this project has caught one (a spelled-out *"thirteen"*
+against a sixteen-row table; `183` forbidden spellings against 197; now this).
+**RECAP's own instruction is to count both ends and trust neither. The manager
+wrote that instruction and then did not follow it.**

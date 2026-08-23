@@ -242,6 +242,17 @@ compiler flag produced, and it is available on any data-dependent kernel.
 
 1. **No `/tmp`.** All scratch goes under the repo's `.temp/`, one subdir per
    category (`.temp/verus/`, `.temp/build/`, ...). `rm` is only auto-permitted there.
+
+   ⚠ **`.temp/pNN/` IS AMBIGUOUS BETWEEN A PATTERN AND A TASK, AND IT IS A LIVE
+   COLLISION** (TASK_074, caught by the engineer before any damage). `.temp/p48/`
+   is **TASK_048's evidence directory** — it holds `gate-p06-BEFORE.json`,
+   `oldctl/` and `resid.json`, and its `NOTES.md` opens *"TASK_048 working notes"*.
+   A task file prescribing `.temp/p48/` for **pattern p48** would have had the
+   engineer overwrite it. **The manager wrote exactly that prescription.**
+   **Before naming a scratch dir in a task file, `ls` it.** If it exists and is
+   not yours, pick another name (`.temp/p48pat/` was used) — and ⚠ **the same
+   check applies to `clayout.py`'s `OUT` default**, which has already overwritten
+   one pattern's `meta.json` from another pattern's copy.
 2. **No blind process killing.** Never `pkill`/`killall`/substring match. Resolve an
    exact PID, confirm its full command line, kill that PID. Prefer `timeout <N> <cmd>`.
 

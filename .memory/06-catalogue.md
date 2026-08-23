@@ -416,19 +416,88 @@ that is the deliverable for these rows**, not a green checkmark.
 | p46 | bignum limb add/mul (schoolbook) | carry propagation, limb bounds | hard | planned |
 | p47 | constant-time compare / select | **timing side channel.** ⚠ **The catalogue's guess -- *"compiler may reintroduce a branch"* -- is REFUTED** (T064 + T064_REVIEW: 5 accumulate spellings, gcc 13.3 and clang 22.1 at five opt levels, rustc at five, **LTO, PGO trained 100% on mismatch-at-byte-0, AVX2, AVX-512, `__builtin_expect` in three placements, a branching caller** -- `Ir(k=0) - Ir(k=n-1) = 0` **exactly**, with a detector control that fires). **The adversary is the IDIOM, not the optimiser**; the leaking rung is safe Rust's own `a == b` | moderate | **done** (T064), gate `PASS` first complete run, R5 **12/0 first run, no lemma** (twin 13/0), `R4 == R5` `exact` at O3 / `norel` at O0, **TCB 3**, Miri 7/7, additivity extrapolation **80/80 exact**, **reviewed** (T064_REVIEW: 3 majors, 6 minors, **32 clean negatives**; corrections at T065). **The proof certifies a LEAKING kernel**: `m_leak` verifies 14/0 with `kernel`'s obligation count unchanged at 3 and leaks **+7088 `Ir`**, under an **identical contract** -- a property of the TRACE is invisible to a logic about the VALUE |
 
-| p48 | **partially-filled buffer / struct with padding, written out wholesale** | **uninitialised-memory INFO LEAK** — in bounds, live, owned, never written | moderate | **proposed at TASK_066 (manager), UNREVIEWED** — see the triage below |
+| p48 | **partially-filled buffer / struct with padding, written out wholesale** | **uninitialised-memory INFO LEAK** — in bounds, live, owned, never written | moderate | ⚠ **REFUSED at TASK_074 — proposed by the manager at TASK_066, attacked by a different agent under rule 3, and the attack landed.** Its distinguishing Verus claim is false (p27 already exercises `is_init`) and its headline **padding** sub-case is **unbuildable here**. **What survives is real but smaller** — see the triage below |
 
 ⚠ **`p48` is NEW and it makes this a 48-row catalogue.** `CLAUDE.md` describes
 `.memory/06-catalogue.md` as *"the 47-pattern catalogue"*; that phrase is now one
 short. Numbers `p01`–`p47` are all used with **no gaps** (checked), so a seventh
 axis cannot reuse one.
 
-### p48 — the seventh axis, and why the manager is proposing it against the slate
+### p48 — REFUSED at TASK_074. Rule 3 worked; read the refusal before rescheduling.
 
-**This is a manager proposal written while p38's engineer was running, from
-source reads and `vstd` greps only — no compile, no measurement.** ⚠ **The
-catalogue's own record on bug-class guesses is three overturned against two
-upheld, and p47 overturned its own row.** Treat this the same way: a prior.
+⚠⚠ **VERDICT FIRST, because everything below it was written BEFORE the
+measurements and is kept as the record of a prior that was wrong.**
+
+**This was a manager proposal written while p38's engineer was running, from
+source reads and `vstd` greps only — no compile, no measurement** — and
+PROTOCOL rule 3 was flagged against it in this file from the day it was written.
+At TASK_074 a different agent was given authority to refuse it and **did**, with
+measurements. ⚠ **The catalogue's record on bug-class guesses is now three
+overturned against two upheld, plus p47 overturning its own row and this one
+being refused outright.**
+
+**The three findings that killed it:**
+
+1. **The axis's sole distinguishing claim is FALSE.** *"No pattern in the tree
+   exercises that"* — **p27 exercises `is_init()` in four places, including its
+   core invariant `slot_ok` (`verus.rs:267`)**, and calls `ptr_ref` at `:620`
+   against the same `raw_ptr.rs:623` precondition. Probe: two `precondition not
+   satisfied` errors at that exact vstd line. **Manager-verified.** A new
+   *clause*, not a new *kind*.
+2. ⚠ **The PADDING sub-case — this row's own "real CVE shape" — is
+   UNBUILDABLE here, and the reason is structural.** Measured across **3
+   padding layouts × 2 compilers × 4 opt levels × 3 DSE defences**: padding at
+   offsets 1–7 differs **every run**; at 17–23 and 41–47 it is stable per-level
+   but **splits at `-O1`** because DSE deletes the dirtying store before the
+   `free`. Making the dirty store live does not fix it — the split just moves to
+   clang `-O2`. **A padding byte cannot be written by the program, so the only
+   store that can plant a value in it sits adjacent to a `free()`, and the load
+   is a load of `undef`.** The obvious fix does not work *and neither does the
+   pattern that would demonstrate it*.
+3. **It is p08's shape by this file's own test.** The `p31` row three sections
+   down demotes p31 in exactly these words — *"which makes it **p08's shape** — a
+   tooling-and-expressiveness result the tree already has one of"*. **p48's safe
+   rungs cannot express the bug either.** The stated defence, *"unlike p08, the C
+   bug is not exotic"*, is about frequency in the wild, **which no rung
+   measures.**
+
+✅ **What SURVIVES, recorded so it is not lost:**
+
+- **The V1 sentinel design WORKS**, and it is the reusable part: allocate A,
+  write a sentinel, free, allocate B, fill B **partially**, emit B. Checksum
+  `07eb3361a6c0a78b` in **40/40** cells (5 runs × 2 compilers × O0–O3), equal to
+  an independent model. ⚠ **Two preconditions nobody had stated: the partial
+  fill must be ≥ 16 bytes** (to clear glibc's tcache metadata) **and the warm
+  read must be NON-CANCELLING** — an XOR fold over two identical warm reads
+  cancels, and it did, silently, at `-C opt-level=3` only.
+- **"R4 reintroduces it exactly" is UPHELD, 48/48** — gcc, clang and rustc,
+  O0–O3, four variants each, every cell on the modelled leak value.
+- **MSan fires through `printf` at O0–O3, exit 1, with working origins.**
+  ⚠ **But gcc has no MSan and stage 7 is gcc, so it is a CONTROL, not a rung** —
+  p36's `cfi-icall` situation exactly.
+- ⚠ **A real cost axis exists and THE PRIMARY METRIC MIS-PRICES IT.** LLVM does
+  not eliminate a redundant zero-fill (n=4096: identical to 0.01 `Ir` whether
+  `k=n` or `k=16`). But the safe−unsafe delta **jumps 6.46× for a 2× increase in
+  `n`, at 2048** — glibc's `__x86_rep_stosb_threshold`, where `__memset_avx2`
+  switches to `rep stos`. **Callgrind counts a `rep` instruction once per
+  repetition, so `Ir` reports the cost RISING 6.5× at exactly the size the real
+  cost FALLS.** See `.memory/03-measurement.md`.
+- ⚠ **And the tax is INVISIBLE to `kernel_exclusive_ir` — worse than p13.** The
+  kernel symbol is byte-for-byte identical between the rungs (44,239,600 `Ir`
+  both); the entire difference is 13,112,237 `Ir` inside `__memset_avx2`. **p13's
+  kernel column overstated by 190/264 of ~1100. p48's would report the tax as
+  exactly ZERO.** This is the third measured instance of that column reversing or
+  erasing a comparison.
+
+**If it is ever rescheduled**: V1 only, `FILLK ≥ 16`, non-cancelling warm read,
+**drop the padding sub-case from the pitch**, publish whole-program marginal `Ir`
+only with the `rep stosb` domain stated, do not sell the R5 obligation as new —
+**and build it only AFTER the callee/total `Ir` column exists**, because that is
+what makes its cost axis measurable in the project's primary framework at all.
+
+---
+
+**The original proposal is kept below, unedited, as the record of the prior.**
 
 **Why it is not one of the six.** The harm is an **information leak of heap
 residue**: every access is *in bounds* (not spatial), the allocation is *live and
@@ -626,7 +695,7 @@ catalogue at all** — see the `p48` row and its triage below.
 | **control-flow integrity** | every harm here is data. An out-of-table indirect call is a different harm class, and R1h has a real answer (`-fsanitize=cfi`) that no pattern has priced | **p36** |
 | **termination as the obligation** | every R5 so far proves *safety*. None proves the loop **ends** — and an open-addressing probe that never terminates is a real, shipped C bug | **p22** |
 | **provenance** | the property Miri checks and nothing else does; untested here | **p31** |
-| **INITIALISATION** ⚠ *new at TASK_066, and it was uncatalogued* | every harm here is out-of-bounds, out-of-lifetime, or a trace. **Reading memory that is in bounds, live, owned — and never written** is none of those. The Verus obligation is a **new KIND** — not "do you own this?" (p27) but "is what you own INITIALISED?": `vstd::raw_ptr`'s `ptr_ref`/`ptr_mut_read` both `requires perm.is_init()`. ⚠ **Not** the first non-null R5; p27 is | **p48** (proposed) |
+| **INITIALISATION** ⚠ *new at TASK_066* | ⚠⚠ **THIS ROW'S JUSTIFICATION IS FALSE AND THE AXIS IS REFUSED (TASK_074).** It read: *"The Verus obligation is a **new KIND** … no pattern in the tree exercises that."* **p27 exercises `is_init()` in FOUR places** — `verus.rs:267` (a conjunct of `slot_ok`, i.e. **p27's core invariant**), `:575`, `:616`, `:606` (`leak_contents`) — and calls `ptr_ref` at `:620` against **the same `~/tools/verus/vstd/raw_ptr.rs:623` precondition**, giving the same `precondition not satisfied` diagnostic. **Manager-verified.** A new **clause**, not a new **kind** | **p48 — REFUSED**, see the triage |
 
 **Recommended order after p10**, by marginal finding value rather than family:
 

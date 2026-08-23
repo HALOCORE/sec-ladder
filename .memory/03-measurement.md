@@ -426,6 +426,28 @@ the code.
 above a size threshold — `memcpy`/`memmove` stay on the vector path at 0.104
 Ir/byte up to somewhere between 8 KiB and 16 KiB, `memset` flips at 3 KiB — and
 p02's copies (61 B = 26 Ir, 4092 B = 425 Ir) are well inside the vector regime.
+
+⚠ **PROVISIONAL — measured at TASK_074, NOT YET REVIEWED. The threshold does not
+merely inflate the number; at the crossing it INVERTS THE DIRECTION, and that is
+new.** Probing a zero-fill cost axis (`vec![0; n]` against `MaybeUninit`), rustc
+1.97.1 `-C opt-level=3`, whole-program `Ir`:
+
+| `n` | 512 | 1024 | **2048** | 4096 | 65536 |
+|---|---:|---:|---:|---:|---:|
+| (safe − unsafe) / call | 300.97 | 326.30 | **2106.94** | 4154.94 | 65595.01 |
+
+**The delta jumps 6.46× for a 2× increase in `n`**, at glibc's
+`__x86_rep_stosb_threshold` — `libc.so.6+0x18954a` is `f3 aa  rep stos
+%al,%es:(%rdi)`, guarded at `+0x1894c0`. **`rep stosb` is what the hardware runs
+BECAUSE it is fast, so `Ir` reports the cost rising 6.5× at exactly the size the
+real cost falls.** The `memset` flip above is quoted at 3 KiB; this measured one
+is at 2 KiB, so **do not trust either constant — probe it at the sizes you are
+about to publish.**
+
+⚠ **A law fitted across 2048 has no domain**, and the `Ir/byte` column makes it
+look benign: 0.58783 → 0.31865 → **1.02878** → 1.01439 → 1.00090. **A fit banded
+below the threshold extrapolates into a different regime with no in-sample
+residual to warn you** — the RESIDUE-CLASS rule's shape, in a different variable.
 p01, p05, p16 and p17 call no bulk routine at all. **Only p08's gcc kernels
 contain a `rep` instruction**, so no previously published `Ir` comparison is
 contaminated. Re-check this before denominating any future pattern in bytes
