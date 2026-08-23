@@ -1699,3 +1699,46 @@ only because a cross-TU call **forces the object into memory**.
 a prediction that could have failed. So p38 is **not** a pattern where the
 catcher has an inline-mode domain, and the same measurement says why the toy
 looked like one.
+
+## A static diff cannot close a dynamic gap — derive per-instruction or say "presumed"
+
+**p22 §4e, TASK_071.** The capacity conjunct costs **gcc 1.00/key, clang
+5.00/key**, and the natural move — diff the disassembly — **gives the wrong
+answer for gcc**: `asm.py stat` reports **87 → 89 (+2)** against a measured
+**+1.00/key**. A review derived clang's side statically and was *right*, then
+derived gcc's the same way and was **incomplete**.
+
+**Per-instruction callgrind (`--dump-instr=yes`) closes it:**
+
+```
+gcc  : +128.00/call = 1.00/key    cmp +1  ja +1  lea -1
+clang: +640.00/call = 5.00/key    setne +1 setb +1 and +1 cmp +2 jne +1 je -1
+```
+
+**gcc DOES short-circuit and recovers a `lea` by re-associating the Horner
+shift.** That **−1 is invisible in a static count** and is the entire 2-vs-1
+discrepancy. clang's +5 is `setne`/`setb`/`and` — it **refuses** to short-circuit
+the `&&`.
+
+> **The rule: a static instruction diff bounds the change, it does not measure
+> it.** Static counts miss compensating reassociation. **Either derive it
+> per-instruction, or label the mechanism a presumption** — p22 labelled it,
+> which is why its wrong explanation was a *minor* and not a *major*.
+
+## Concurrent load corrupts a wall-clock block — now MEASURED, not just warned
+
+**p22, TASK_071, self-disclosed.** A `measure.py` run that overlapped the
+engineer's own **log-polling shell loop** came back with **14 of 32 O3 cells over
+the 10% spread threshold**. Re-run on a quiet box: **0 of 32**, with **every `Ir`
+figure bit-identical**.
+
+> This is the concurrency rule with a number attached. **Deterministic `Ir` under
+> callgrind is immune to contention; the `ns` column is not, and the failure is
+> SILENT** — the run completes and simply reports a degraded spread. ⚠ **Even a
+> polling loop counts as load.** Run `measure.py` in the foreground on an
+> otherwise idle box, and re-run rather than shipping a visibly degraded timing
+> block even when no published number depends on it.
+
+⚠ **A re-measure after a docs+generator change moved 101 leaves and ZERO measured
+numbers** — 96 wall-clock, 3 provenance, 2 source hashes. Useful calibration for
+what a "stale" record actually costs to refresh.

@@ -1237,3 +1237,33 @@ cell and 900× below `RUN_TIMEOUT`.
 ⚠ `_confirm_hang` checks **one** cell (first in sorted matrix order): it proves
 the budget is not absurdly short, **not** that every recorded `hung=True` is
 right. One-line change if a pattern needs all of them.
+
+## Two gate defects the hang machinery shipped with, both measured twice
+
+**Found on p22, the mechanism's first user. Neither is fixed; both need
+`harness/` edits and are queued (RECAP "Owed").**
+
+**1. `check_miri`'s block reason is structurally false for EVERY pattern here.**
+It says *"R4 does not return under Miri either"*. Measured on p22: `miri` on the
+shipped `unsafe.rs` gives **`rc=0 UB=False`** — the hanging rung is `c/kernel.c`.
+⚠ **This is not a p22 quirk.** `expected_hang` is per-**input**, but its Miri
+consequence assumes the hanging rung is the one Miri runs — and
+**`.memory/01-ladder.md` puts the bug in R1 only**, so `miri.sources` *always*
+names a rung carrying the fix. **Cost: one unnecessarily blocked Miri row per
+declared hang, i.e. a genuinely unchecked row.** Repair needs a **per-rung axis**
+on `expected_hang`; `model.py` has a per-input bool only.
+
+**2. `_confirm_hang` selects on the wrong axis.** It confirms the first cell in
+sorted matrix order — on p22, `c-clang O0` — and **never an `-O3` cell**, which
+is the one C11 6.8.5p6 puts at risk of being optimised away.
+⚠ **The obvious repair is REFUTED**: picking one cell per distinct **rung** would
+still have chosen two `O0` cells and **would have caught nothing on p22**. **The
+right axis is (rung × opt).**
+
+⚠ **A related limit worth knowing before you write a `forbidden` entry.** p22
+excludes a bounded-loop spelling that writes `while n < TABCAP`, which matches
+**neither** backticked entry (`for _ in 0..TABCAP`, `(0..TABCAP)`). A review
+assumed the entries excluded it; **they do not.** It is excluded only by a
+`required` entry's **prose**, and **no grep settles it** — which is the honest
+boundary of the idiom mechanism: it decides *spellings*, and a semantic exclusion
+has to be argued in `why` and checked by a human.

@@ -1228,3 +1228,46 @@ slot count.
 For raw pointers and manual memory, use `vstd::raw_ptr` (`PointsTo` permissions),
 `vstd::simple_pptr`, or `vstd::cell::PCell` rather than growing the TCB. Prefer a
 vstd-provided permission model over another `external_body`.
+
+## A guard cannot be isolated as "needed only for termination" — and the reason is structural
+
+**p22, TASK_071.** The obvious mutant — delete the capacity conjunct and expect
+`decreases not satisfied` — **can never work**, and it is not a p22 quirk:
+
+> **The guard reaches the measure through a LEMMA'S PRECONDITION, and Verus
+> assumes a callee's POSTCONDITION even when its precondition fails.** So
+> deleting the guard fails at the call site and the measure is never reached.
+> The control is `m8_nolemma`: its invariant fails **before** the loop and it
+> still produces **no `decreases` error at all**.
+
+**Only breaking an invariant the measure itself consumes reaches the measure.**
+p22's `m3_noempty` does, and fails **first** on
+`decreases not satisfied at end of loop`. Measured with the full battery:
+`m1` 3 errors (the first, `nfill <= TABCAP`, is **not** a termination
+obligation), `m2` `loop must have a decreases clause`, `m3` 2 with the measure
+first, `m7_isolate` surfaces an **arithmetic overflow** once the conjunct is
+peeled — the conjunct is load-bearing three ways, so *"required only for
+termination"* is not merely unproven, it is **false**.
+
+⚠ **`--multiple-errors` is not optional on any pattern whose result is a claim
+about WHICH obligation fires.** Verus prints *"not all errors may have been
+reported"* and stops at one; p22 published a mutant battery twice before anyone
+ran with the flag. Set it **module-level** in the control so it cannot be dropped
+at a call site.
+
+## `decreases` on a ring loop: the ghost unwrapped cursor
+
+This file's open problem — *"`decreases b - a` fails on two-cursor loops"* — has
+an answer for **wrapping** loops (p22). A probe index `i = (i + 1) % CAP` does not
+decrease in any direction, so:
+
+- carry a **ghost** unwrapped cursor `u` with the invariant `i == u % CAP`;
+- obtain a **ghost witness** for the terminating condition (p22: an EMPTY slot,
+  from `nfill < CAP` by a counting lemma);
+- `decreases i0 as int + d - u`.
+
+**All ghost, so `R4 ≡ R5` stays `exact` and the termination proof costs ZERO
+instructions.** ⚠ **And it is not free in a different currency**: the exec-code
+alternative (a bounded probe counter) is **334.16 `Ir`/call CHEAPER** on p22's
+large band, so *"the ghost proof saves instructions"* is **false**. What the
+ghost route buys is that **R4 and R5 remain the same program**.

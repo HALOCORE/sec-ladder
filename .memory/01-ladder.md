@@ -2303,6 +2303,47 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
    stores into one 32-bit store** where gcc emits two — a second reason its
    forward is type-consistent.
 
+22. **p22 — the first pattern where SAFE RUST DOES NOT HELP, and the proof is
+   the only rung that sees the bug.** An open-addressing probe loop that never
+   terminates on a full table: **memory-safe, ASan/UBSan silent, Miri silent for
+   90 s.** No bounds check, no lifetime, no `unsafe` to point at. Reviewed
+   (TASK_070_REVIEW: **1 blocker, 3 majors, 4 minors, 54 named attacks**),
+   corrected at TASK_071.
+
+   ⚠ **The headline was narrowed in §0 and the narrowing is the honest part.**
+   `r2_noguard`/`r3_noguard`/`r4_noguard` — one asserted substitution each, zero
+   `unsafe` — **all hang at `-O0` and `-O3`**. But `for _ in 0..TABCAP` is
+   idiomatic safe Rust and terminates. So the claim is **"nothing on this ladder
+   EMITS the capacity check — five rungs write it by hand"**, not "every safe
+   programmer hangs". ✅ **The review tested whether that rests on the contract
+   and it does not**: `r3_bounded` differs on `adversarial-full.bin` and agrees
+   on the other seven, so it is genuinely a **different function**.
+
+   ⚠ **"The first termination proof in the project" was FALSE and is RETRACTED**
+   — it came from the manager's `TASK_070.md` and shipped in **eight places, two
+   inside `contract_sha256`**. **Verus demands a `decreases` on every exec loop
+   by default**, so there were **72 prior exec-loop obligations**. The true claim
+   was *counted*: **p22 carries the tree's only exec-loop measure not expressible
+   in the loop's own exec variables** (`i0 as int + d - u`; `i` wraps and appears
+   nowhere in it) — **1 of 73**. ⚠ In both files **the true sentence already sat
+   next to the false one** — 13 lines below in `verus.rs`, 99 above in
+   `NOTES.md`. Rule 9's shape, arriving from the manager's side.
+
+   **The measure is a ghost unwrapped cursor + a ghost witness from a counting
+   lemma, so it costs ZERO instructions and `R4 ≡ R5` stays `exact`**
+   (`.memory/04-verus.md`). ⚠ **The exec-code alternative is 334.16 `Ir`/call
+   CHEAPER**, so *"the ghost proof saves instructions"* is false — what it buys
+   is that R4 and R5 remain the same program. ⚠ **And the bounded probe is
+   FASTER too** (440.84/3844.04 below shipped R3), so *"the careful programmer
+   pays for the bound"* is false here.
+
+   ⚠ **The R4 side is under-searched — the FIFTH consecutive pattern — and it
+   flatters SAFE.** `r4_reslice` is in contract, verifies 20/0, is byte-identical
+   to its own R5 at O3, and is `1·nkw − 5` cheaper: the published
+   `R3 − R4 = +2.00` is a **fixed-R4 bound**, and against the cheapest admissible
+   R4 the gap is **+125.00 / +1021.00 — 510× on the large band.** ✅ Disclosed
+   proactively this time, and it reaches `README.md`.
+
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how
 much proof keeps that base sound, and which C patterns resist this treatment.*

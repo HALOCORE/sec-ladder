@@ -366,7 +366,7 @@ or declare the steady state. **An in-place tokenizer is still buildable here.**
 
 | ID | Pattern | C bug class modelled | Verus difficulty | Status |
 |---|---|---|---|---|
-| p22 | open-addressing hash table (linear probe) | capacity mask, probe termination | moderate–hard | planned |
+| p22 | **open-addressing probe over a full table** (delivered as `p22-hash-probe`) | **non-termination — the class UPHELD, and reframed in §0.** Memory-safe, ASan/UBSan silent, Miri silent 90 s. ⚠ *"R2/R3/R4 all hang"* is true of a **mechanical port** and false of the shipped ladder, which puts the bug in **R1 only**; the published claim is *"nothing on this ladder EMITS the capacity check"* | hard | **done** (T070), gate `PASS-WITH-BLOCKED-ROWS` (a declared-hang input blocks a Miri row) first complete run, 0 failures, R5 **20/0** (twin 23/0), `R4 ≡ R5` `exact` at O3, TCB 5, **reviewed** (T070_REVIEW: **1 blocker, 3 majors, 4 minors, 54 named attacks**; corrections at T071, which refuted the review twice). **First user of the hang machinery.** ⚠ **"The first termination obligation" was FALSE** — 73 exec-loop measures already existed. The counted claim: **the tree's only exec-loop measure not expressible in the loop's own exec variables, 1 of 73** |
 | p23 | in-place quicksort partition | aliasing, permutation invariant | hard | planned |
 | p24 | binary heap (sift up/down) | parent/child index arithmetic | moderate–hard | planned |
 | p25 | dynamic array with `realloc` growth | growth overflow, stale pointer | moderate–hard | planned |
