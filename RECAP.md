@@ -8,8 +8,8 @@ this box is reference; this box is what to *do*.
 
 | | |
 |---|---|
-| **Patterns** | **20 exist, all green, all 20 reviewed. 0 STALE.** Count both ends rather than trusting either: `ls -d patterns/p*/ | wc -l` and `grep -c '^| p[0-9]' .memory/06-catalogue.md` (**the denominator moved from 47 to 48 at TASK_066**, which is why it is no longer written here — a spelled-out numerator sat on this line reading *"thirteen"* against a sixteen-row table). |
-| **Do this next** | **p22 — hash probe / open addressing. Write `TASK_070`.** ⚠ **Its harness support was built and hardened specifically for it** (TASK_068/069): a contract-declared `run.timeout_s` + `model.expected_hang`, with a `1.0 s` floor and a `_confirm_hang` re-run so a *slow* cell cannot pass as a *hung* one. **Building p22 validates that work.** Three things it must decide, all measured and waiting: ⚠ **`_confirm_hang` verifies ONE cell** and p22 hangs 12–20 — decide there (Owed 17); ⚠ a declared-hang input is a **BLOCKED Miri row**, so p22 lands `PASS-WITH-BLOCKED-ROWS`, not `PASS` — say so up front; ⚠ `.memory/04-verus.md`: **`decreases b - a` fails on two-cursor loops** and a probe sequence's measure is *unvisited slots*, needing a ghost set — **budget more than one session.** |
+| **Patterns** | **21 exist, all green, all 21 reviewed. 0 STALE.** Count both ends rather than trusting either: `ls -d patterns/p*/ | wc -l` and `grep -c '^| p[0-9]' .memory/06-catalogue.md` (**the denominator moved from 47 to 48 at TASK_066**, which is why it is no longer written here — a spelled-out numerator sat on this line reading *"thirteen"* against a sixteen-row table). |
+| **Do this next** | **p36 — vtable dispatch / CFI, the last of the six original axes. Write `TASK_072`.** ⚠ **Its row was re-triaged at TASK_066 and the risk is much smaller than the catalogue says**: the bar is *"a sanitizer fires DETERMINISTICALLY"*, not *"the harm is identical"* — stage 2 never executes an adversarial input, and stage 7 tolerates a non-deterministic exit under `sanitizer_expect: "fires"`. **The real open question is whether anything in the gate's sanitizer set sees an out-of-table indirect call**: stage 7 builds `gcc -O1 -fsanitize=address,undefined`, **no CFI**. `-fsanitize=cfi` needs `-flto`, is clang-only and is a **`build.py`** change (a full re-measure — do not reach for it); **UBSan's `-fsanitize=function` may reach it without touching the matrix. UNVERIFIED — probe it in §0.** ⚠ **Or push back with `p48`** (initialisation — the seventh axis, uncatalogued until TASK_066, and the manager's own proposal, so **rule 3 says a different agent must attack it first**). |
 | **After that** | `.memory/06-catalogue.md`'s section **"The waves order by FAMILY…"** — the missing axes, the order (**lifetime ✅ → p47 ✅ → p38 ✅ → p22 → p36**), and a **feasibility triage** naming what would kill each. ⚠ **Three things moved at TASK_066, all PROVISIONAL and all needing a different agent to attack them** (rule 3): **p22's harness change is LANDED** (TASK_068) — a hang was already in the gate's vocabulary and only `RUN_TIMEOUT = 900` killed it; a contract-declared `run.timeout_s` plus `model.expected_hang` now costs 5 s against 900, so **p22 is unblocked**; **p36's row cited the wrong function and overstates its risk** (the bar is "a sanitizer fires deterministically", not "the harm is identical"); and there is a **SEVENTH axis, `p48` (initialisation), which was not in the catalogue at all** — the pinned vstd already forbids the bug (`ptr_ref`/`ptr_mut_read` both `requires perm.is_init()`). **Push back with the pattern you would rather build.** |
 | **Three rules for writing that task** | ⚠ **Settle the bug class as the FIRST deliverable** — overturned on four patterns, upheld on two. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat). **Additivity extrapolation — the only out-of-sample test here that can fail — HAS now failed once, on p38, and it was 100% attributable to three missing columns, none of them the one named.** The rule that came out of it: ⚠ **check the RESIDUE CLASS of any parameter your bands hold constant** — two of p38's three bands sat at `nw ≡ 0 (mod 8)` and the third did not, which fits in sample and misses out of it with no in-sample residual to warn you. ⚠ **Name the INLINE MODE at every figure** — p10 fitted both and the regressors *swapped*. All three in `.memory/03-measurement.md`. |
 | **The trap that keeps firing** | **A headline can be wrong in the FLATTERING direction and pass a green gate.** p10 published *"safe Rust cheaper than unsafe"*: 60% was an **unsearched R4 side**, the rest **index-expression bookkeeping C pays more of than either Rust rung**. **p27 repeated it one pattern later** — a dead store in R4 that R3 did not have. **p47 is the first pattern to search the R4 side properly** (six levers, each measured *and* run through Verus). ⚠ **p38 made it four** — its published `R3 − R4` is `+21/+25` against a true `+24/+32`, disclosed only after review. ⚠ **Before publishing any rung comparison, ask what the OTHER rung's spelling is worth.** |
@@ -102,6 +102,7 @@ rows, or run `ls -d patterns/p*/ | wc -l`.
 | p10 | weighted FIR stencil | **a headline wrong in the flattering direction** — safe beats unsafe, and none of it is safety |
 | p27 | handle table | **the first TEMPORAL bug** — and the lifetime guarantee costs zero; safe Rust pays *less* spatial tax than unsafe |
 | p47 | constant-time compare | **the proof certifies a LEAKING kernel** — identical contract, and the obligation count does not move |
+| p22 | hash probe / open addressing | **the first pattern where SAFE RUST DOES NOT HELP** — a memory-safe non-terminating probe loop, Miri and ASan silent; the proof is the only rung that sees it |
 | p38 | strict aliasing / type punning | **a MISCOMPILE is the harm** — and the undefined spelling is the **dearest of six neighbours**. Ships labelled a *demonstration kernel*; the first class **unsafe Rust does not reintroduce** |
 
 **If you read only one thing after this file**, read `.tasks/TASK_026.md` §0 — the
@@ -142,6 +143,7 @@ the commands are in `.memory/01-ladder.md`'s numbering warning.
 | p27 | **19** | 30 |
 | p47 | **20** | 31 |
 | p38 | **21** | 32 |
+| p22 | **22** | 33 |
 | p01, p02 | findings 1–3 | 1–8 |
 
 Cross-cutting entries exist only here: **14** (every rung is a spelling), **16**
@@ -1842,6 +1844,20 @@ Both retired.
     TASK_069's authorised set and **flagged it rather than doing it** — correct.
     ⚠ Landing it moves p27's `source_sha256` and costs a gate run; **bundle it
     with the next thing that re-runs p27.**
+
+19. **Two gate defects from the hang machinery, both measured twice on p22 and
+    NEITHER fixed** (`.memory/02-bench-rules.md` carries both). (a)
+    **`check_miri`'s block reason is structurally false for every pattern here** —
+    it says *"R4 does not return under Miri either"*, but the bug is in R1 only,
+    so `miri.sources` always names a rung carrying the fix. **Cost: one genuinely
+    unchecked Miri row per declared hang.** Needs a **per-rung axis** on
+    `expected_hang`; `model.py` has a per-input bool only. (b) **`_confirm_hang`
+    picks the first cell in sorted order** — `c-clang O0` on p22, **never an
+    `-O3` cell**, which is the one C11 6.8.5p6 puts at risk. ⚠ The obvious repair
+    is **refuted**: per distinct *rung* would still pick two `O0` cells and would
+    have caught nothing. **The axis is (rung × opt).**
+    ⚠ **Both are `check.py` edits — batch them**, and note the batch is now
+    **three**: these two plus item 14's `-fstrict-aliasing` token.
 
 ### Deferred with a stated reason
 
