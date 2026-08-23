@@ -1,6 +1,6 @@
 # p38-alias-pun — results
 
-Generated 2026-08-22T12:55:21Z from `results/p38-alias-pun.json` (git `14f64166039c`, working tree dirty).
+Generated 2026-08-23T18:11:43Z from `results/p38-alias-pun.json` (git `018c1d13655c`, working tree dirty).
 
 ## Toolchain
 
@@ -17,9 +17,9 @@ Generated 2026-08-22T12:55:21Z from `results/p38-alias-pun.json` (git `14f641660
 
 | file | n_iters | declared payload | present | truncated | model |
 |---|---:|---:|---:|---|---|
-| adversarial-huge.bin | 1 | 208 | 208 | False | n_iters=1 stride=200 n_blob=200 nwin=1 calls=1 work/call=200B rec(win0)=[(268435455, 48)] clamped=1 san=clean truncated=False expected=15963742333423663363 |
+| adversarial-huge.bin | 1 | 208 | 208 | False | n_iters=1 stride=200 n_blob=200 nwin=1 calls=1 work/call=200B rec(win0)=[(268435455, 48)] clamped=1 san=fires truncated=False expected=15963742333423663363 |
 | adversarial-nrec.bin | 200 | 208 | 208 | False | n_iters=200 stride=200 n_blob=200 nwin=1 calls=200 work/call=200B rec(win0)=[(11, 11), (11, 11), (11, 11), (11, 11), (0, 0)] clamped=0 san=clean truncated=False expected=573548035304320128 |
-| adversarial-oob.bin | 1 | 208 | 208 | False | n_iters=1 stride=200 n_blob=200 nwin=1 calls=1 work/call=200B rec(win0)=[(200, 48)] clamped=1 san=clean truncated=False expected=8516071857945885891 |
+| adversarial-oob.bin | 1 | 208 | 208 | False | n_iters=1 stride=200 n_blob=200 nwin=1 calls=1 work/call=200B rec(win0)=[(200, 48)] clamped=1 san=fires truncated=False expected=8516071857945885891 |
 | adversarial-stale.bin | 1 | 208 | 208 | False | n_iters=1 stride=200 n_blob=200 nwin=1 calls=1 work/call=200B rec(win0)=[(60, 48)] clamped=1 san=clean truncated=False expected=10509230270850152637 |
 | adversarial-stride7.bin | 100 | 15 | 15 | False | n_iters=100 stride=7 n_blob=7 nwin=0 calls=0 work/call=0B rec(win0)=[] clamped=0 san=clean truncated=False expected=0 |
 | degenerate.bin | 4,000 | 808 | 808 | False | n_iters=4000 stride=200 n_blob=800 nwin=4 calls=4000 work/call=200B rec(win0)=[(5, 5), (5, 5)] clamped=0 san=clean truncated=False expected=15819171708748271115 |
@@ -77,19 +77,14 @@ Every delta below is a difference between rungs that are meant to be spellings o
 
 ### Spelling audit (stage `0b`, reporting only)
 
-Measured by the gate, not by this file — from `results/gate/p38-alias-pun.json`, contract `9a413347f333`.
+Measured by the gate, not by this file — from `results/gate/p38-alias-pun.json`, contract `314bf2e385d4`.
 
-> ⚠ **STALE.** The `slb-contract` block in `spec.md` no longer hashes to the gate record's `contract_sha256`, so the declaration above and the audit below are describing **different** declarations. Re-run `harness/check.py` for this pattern before reading these numbers.
-
-`37` backticked spelling(s) over `6` rung(s) → **112** (spelling, rung) pair(s), **63** present — not the product, because a per-language entry is read against its own language's rungs only. Matching is `check.spelling_matches`: comments, string literals and Verus ghost clauses blanked, then all whitespace deleted.
+`36` backticked spelling(s) over `6` rung(s) → **108** (spelling, rung) pair(s), **62** present — not the product, because a per-language entry is read against its own language's rungs only. Matching is `check.spelling_matches`: comments, string literals and Verus ghost clauses blanked, then all whitespace deleted.
 
 - **FORBIDDEN — 0 hit(s)** of 14 spelling(s). *Decidable*: no rung may spell a forbidden token, in any language the entry names, so this number needs no reading of the entry's English. It is the only number here that a non-zero makes wrong.
-- **required — 0 spelling(s) pin nothing**, 5 scoped-absent pair(s). *Not decidable*, and **a non-zero here is normal**: a `required` entry may quote a span in order to say it is absent, may quote a file name or a digest, and may scope itself to some rungs in prose ("R1 omits only …"). Read each line against the entry above it.
+- **required — 0 spelling(s) pin nothing**, 2 scoped-absent pair(s). *Not decidable*, and **a non-zero here is normal**: a `required` entry may quote a span in order to say it is absent, may quote a file name or a digest, and may scope itself to some rungs in prose ("R1 omits only …"). Read each line against the entry above it.
   - absent — `return *(const uint32_t *)r;` (required[0], c, **c/kernel_hardened.c**)
   - absent — `return (uint32_t)r[0] + 65536 * (uint32_t)r[1];` (required[1], c, **c/kernel.c**)
-  - absent — `[u16; 256]` (required[1], rust, **safe_naive.rs**)
-  - absent — `[u16; 256]` (required[1], rust, **safe_tuned.rs**)
-  - absent — `[u16; 256]` (required[1], rust, **unsafe.rs**)
 - **no rung — 0 per-language entry/entries** name a language this pattern ships no rung for; rungs here are `c`, `rust`. Such a key used to be dropped silently, so the declaration read as constraining rungs that do not exist.
 
 
@@ -176,28 +171,31 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 7.18 | 7.39 | 2.9% | 5.26 | 5.54 | 5.3% |
-| c-gcc | whole | 7.17 | 7.50 | 4.5% | 5.06 | 5.55 | 9.7% |
-| c-clang | isolated | 9.92 | 10.28 | 3.6% | 6.42 | 6.92 | 7.8% |
-| c-clang | whole | 9.82 | 10.09 | 2.7% | 6.43 | 7.04 | 9.6% |
-| safe_naive | isolated | 9.99 | 10.14 | 1.5% | 6.57 | 7.20 | 9.7% |
-| safe_naive | whole | 11.04 | 11.20 | 1.4% | 7.00 | 7.87 | **12.5% ✗** |
-| safe_tuned | isolated | 10.00 | 10.17 | 1.8% | 6.25 | 6.82 | 9.2% |
-| safe_tuned | whole | 6.84 | 7.00 | 2.3% | 4.80 | 5.21 | 8.4% |
-| unsafe | isolated | 10.00 | 10.19 | 1.9% | 6.06 | 6.63 | 9.5% |
-| unsafe | whole | 9.98 | 10.13 | 1.5% | 6.26 | 6.84 | 9.4% |
-| verus | isolated | 10.02 | 10.13 | 1.1% | 6.06 | 6.72 | **10.9% ✗** |
-| verus | whole | 10.03 | 10.18 | 1.5% | 6.33 | 6.78 | 7.2% |
-| c-gcc-h | isolated | 7.25 | 7.38 | 1.7% | 5.00 | 5.27 | 5.4% |
-| c-gcc-h | whole | 7.23 | 7.52 | 4.0% | 5.02 | 5.38 | 7.3% |
-| c-clang-h | isolated | 9.87 | 10.18 | 3.2% | 6.07 | 6.71 | **10.7% ✗** |
-| c-clang-h | whole | 9.90 | 10.13 | 2.4% | 6.32 | 6.72 | 6.4% |
+| c-gcc | isolated | 7.16 | 7.33 | 2.4% | 5.26 | 5.49 | 4.5% |
+| c-gcc | whole | 7.20 | 7.38 | 2.6% | 5.17 | 5.49 | 6.3% |
+| c-clang | isolated | 9.91 | 10.19 | 2.8% | 6.59 | 7.03 | 6.7% |
+| c-clang | whole | 9.87 | 10.05 | 1.8% | 6.35 | 7.02 | **10.5% ✗** |
+| safe_naive | isolated | 9.97 | 10.17 | 1.9% | 6.71 | 7.21 | 7.4% |
+| safe_naive | whole | 11.00 | 11.22 | 2.1% | 7.11 | 7.90 | **11.1% ✗** |
+| safe_tuned | isolated | 9.98 | 10.18 | 2.0% | 6.15 | 6.78 | **10.4% ✗** |
+| safe_tuned | whole | 6.88 | 7.01 | 2.0% | 4.78 | 5.10 | 6.6% |
+| unsafe | isolated | 9.98 | 10.22 | 2.4% | 6.04 | 6.55 | 8.4% |
+| unsafe | whole | 9.92 | 10.12 | 2.0% | 6.31 | 6.85 | 8.6% |
+| verus | isolated | 10.04 | 10.16 | 1.2% | 6.17 | 6.85 | **11.1% ✗** |
+| verus | whole | 10.01 | 10.17 | 1.6% | 6.10 | 6.75 | **10.6% ✗** |
+| c-gcc-h | isolated | 7.22 | 7.36 | 1.9% | 4.97 | 5.26 | 5.9% |
+| c-gcc-h | whole | 7.27 | 7.59 | 4.4% | 4.93 | 5.27 | 6.8% |
+| c-clang-h | isolated | 9.83 | 10.09 | 2.6% | 5.98 | 6.70 | **12.0% ✗** |
+| c-clang-h | whole | 9.90 | 10.04 | 1.5% | 6.23 | 6.77 | 8.7% |
 
-**3 of 32 wall-clock cells exceed the 10% min-to-median spread threshold and are DISCARDED** per `.memory/03-measurement.md` step 4. They are printed above marked ✗ rather than deleted, because a missing cell that looks like an omission is worse than a documented failure (`.memory/02-bench-rules.md`). **No claim in this report rests on a marked row.**
+**6 of 32 wall-clock cells exceed the 10% min-to-median spread threshold and are DISCARDED** per `.memory/03-measurement.md` step 4. They are printed above marked ✗ rather than deleted, because a missing cell that looks like an omission is worse than a documented failure (`.memory/02-bench-rules.md`). **No claim in this report rests on a marked row.**
 
-- `safe_naive / whole` on `small.bin`: spread 12.5%
-- `verus / isolated` on `small.bin`: spread 10.9%
-- `c-clang-h / isolated` on `small.bin`: spread 10.7%
+- `c-clang / whole` on `small.bin`: spread 10.5%
+- `safe_naive / whole` on `small.bin`: spread 11.1%
+- `safe_tuned / isolated` on `small.bin`: spread 10.4%
+- `verus / isolated` on `small.bin`: spread 11.1%
+- `verus / whole` on `small.bin`: spread 10.6%
+- `c-clang-h / isolated` on `small.bin`: spread 12.0%
 
 
 ## Cells and metrics not measured

@@ -904,21 +904,132 @@ def delete_conjunct(text, item, kw, ci, ji):
     return text[:a] + text[b:]
 
 
-def duplicate_names(items):
+_IMPL_HEAD_GENERICS_RE = re.compile(r"^impl\s*")
+
+
+def impl_self_type(head):
+    """`impl<const K: u8> Op for OpTag<K>` -> `OpTag`; `impl Buf` -> `Buf`.
+
+    The Self type as a **path segment**, which is how Verus prints an item in
+    `--verify-function`'s "matched results are:" list (`OpTag::apply`) and
+    therefore what a caller must hand back to disambiguate one. Returns None
+    for a head this does not model, so a caller can fall back rather than
+    invent a name.
+
+    Deliberately textual: `impl_spans` already hands over the head verbatim and
+    a second Rust type parser is exactly the drift `parse()`'s docstring warns
+    about. It has to survive three shapes the tree can hold -- inherent
+    (`impl Buf`), trait (`impl Op for A`) and generic-with-const
+    (`impl<const K: u8> Op for OpTag<K>`) -- and nothing more."""
+    if not head:
+        return None
+    s = _IMPL_HEAD_GENERICS_RE.sub("", head.strip(), count=1)
+    # drop the impl's own generic parameter list, balanced
+    if s.startswith("<"):
+        depth, k = 0, 0
+        for k, c in enumerate(s):
+            depth += (c == "<") - (c == ">")
+            if depth == 0:
+                break
+        s = s[k + 1:]
+    s = re.split(r"\bwhere\b", s)[0].strip()
+    # `Trait for Type` -> `Type`; a bare `Type` is an inherent impl
+    m = re.search(r"\bfor\b", s)
+    if m:
+        s = s[m.end():].strip()
+    # `&'a mut dyn Wrap<T>` -> `Wrap<T>`: reference, lifetime, `mut`, `dyn`
+    s = s.lstrip("&").strip()
+    s = re.sub(r"^'[A-Za-z_][A-Za-z0-9_]*\s*", "", s)
+    s = re.sub(r"^\bmut\b\s*", "", s)
+    s = re.sub(r"^\bdyn\b\s*", "", s)
+    s = s.split("<")[0].strip()          # `OpTag<K>` -> `OpTag`
+    s = s.split("::")[-1].strip()        # `crate::Buf` -> `Buf`
+    return s or None
+
+
+def scope_label(item):
+    """The item's enclosing scope as Verus would path-qualify it, or `""`.
+
+    `mod_path` and the enclosing `impl` are BOTH scopes and both are already
+    computed by `parse()`; this is only the two of them joined."""
+    parts = [p for p in [(item.mod_path or ""),
+                         (impl_self_type(item.impl_head) or "")] if p]
+    return "::".join(parts)
+
+
+def qualified_name(item):
+    """`Type::name` / `mod::name` / `mod::Type::name`, or the bare name."""
+    sc = scope_label(item)
+    return f"{sc}::{item.name}" if sc else item.name
+
+
+def duplicate_names(items, qualified=False):
     """{name: [Item, ...]} for every name defined more than once.
 
     Two items with one name is not a style problem: whichever the gate keeps
     supplies the pinned contract for whichever the compiler keeps, and there is
-    no reason those are the same one."""
+    no reason those are the same one.
+
+    ⚠ **`qualified=True` keys by (mod path, impl Self type, name) instead**,
+    which is the fix for RECAP "Owed" 20 (TASK_077). Keying by BARE name made a
+    pinned `verus.rs` unable to define one item name twice, so p36's first
+    spelling -- eight `impl Op for OpN` blocks, which is the shape a reader of
+    its `c/kernel.c` would write -- **verified `19/0` and the gate refused it**
+    (`patterns/p36-vtable-dispatch/NOTES.md` 9b). Rust has no ambiguity between
+    `<OpN as Op>::apply` and `<OpM as Op>::apply`; only the gate's name->item
+    map did.
+
+    **The default is still bare, and that is not timidity.** The two callers
+    want different things and it took a measurement to see it:
+
+      * `check.py::check_verus_contract` keys items so `spec.md`'s per-item
+        contract lands on the right item. Qualified is right there, and
+        `unique_names` keeps every existing pin working unchanged.
+      * `by_name` returns `{name: Item}`, so a qualified duplicate would
+        silently drop one and re-open TASK_003_REVIEW's decoy. Bare is right
+        there and must stay.
+    """
     seen = {}
     for i in items:
-        seen.setdefault(i.name, []).append(i)
+        seen.setdefault(qualified_name(i) if qualified else i.name, []).append(i)
     return {k: v for k, v in seen.items() if len(v) > 1}
+
+
+def unique_names(items):
+    """{label: Item} where `label` is the BARE name when that is unambiguous in
+    this file and the qualified name when it is not.
+
+    The degradation is the point: every `verus.rs` in the tree today has unique
+    bare names, so this returns exactly `{i.name: i}` for all of them and no
+    `spec.md` item pin has to move. A file that really does define one name in
+    two scopes gets `OpTag0::apply`-shaped keys, and its `spec.md` must name
+    them that way -- which is the honest cost of the eight-impl spelling and is
+    why "Owed" 20 was never a one-liner.
+
+    **Raises** if two items share even the qualified name, because then there
+    is no key that distinguishes them and the caller must not pick one."""
+    bare = {}
+    for i in items:
+        bare.setdefault(i.name, []).append(i)
+    out = {}
+    for i in items:
+        key = i.name if len(bare[i.name]) == 1 else qualified_name(i)
+        if key in out:
+            raise ValueError(
+                f"vparse: `{key}` is defined more than once even after "
+                f"qualification (lines {[out[key].line, i.line]}); no key "
+                f"distinguishes them")
+        out[key] = i
+    return out
 
 
 def by_name(text):
     """Name -> Item. **Raises** on a duplicate; use `parse()` if you want to
-    handle it yourself."""
+    handle it yourself.
+
+    Bare-name keyed **on purpose** -- see `duplicate_names`: the return type is
+    `{name: Item}`, so admitting a qualified duplicate here would drop one of
+    the two silently, which is TASK_003_REVIEW's decoy."""
     items = parse(text)
     dup = duplicate_names(items)
     if dup:
@@ -1298,6 +1409,55 @@ fn outside_verus() { }
     want("an item's own #[cfg] is seen too",
          ditems[2].cfg_gated, "own #[cfg(...)]")
     want("item outside verus! is flagged", ditems[3].in_verus, False)
+
+    # --- RECAP "Owed" 20 / TASK_077: one name in two IMPLS is not a decoy ---
+    eight = '''use vstd::prelude::*;
+verus! {
+struct Op0;
+struct Op1;
+trait Op { fn apply(&self, x: u64) -> u64; }
+impl Op for Op0 { fn apply(&self, x: u64) -> u64 { x } }
+impl Op for Op1 { fn apply(&self, x: u64) -> u64 { x + 1 } }
+impl<const K: u8> Op for OpTag<K> { fn apply(&self, x: u64) -> u64 { x + 2 } }
+} // verus!
+'''
+    eitems = parse(eight)
+    want("impl_self_type: trait impl", impl_self_type("impl Op for Op0"), "Op0")
+    want("impl_self_type: inherent impl", impl_self_type("impl Buf"), "Buf")
+    want("impl_self_type: generic const impl",
+         impl_self_type("impl<const K: u8> Op for OpTag<K>"), "OpTag")
+    want("impl_self_type: where-clause and reference",
+         impl_self_type("impl<'a, T> Op for &'a Wrap<T> where T: Copy"), "Wrap")
+    want("impl_self_type on a free fn's None head", impl_self_type(None), None)
+    want("bare keying still calls three `apply`s a duplicate",
+         sorted(duplicate_names(eitems)), ["apply"])
+    want("qualified keying does NOT -- three distinct impls",
+         sorted(duplicate_names(eitems, qualified=True)), [])
+    want("qualified_name spells the Self type",
+         sorted(qualified_name(i) for i in eitems),
+         ["Op0::apply", "Op1::apply", "OpTag::apply"])
+    want("unique_names falls back to qualified only where it must",
+         sorted(unique_names(eitems)),
+         ["Op0::apply", "Op1::apply", "OpTag::apply"])
+    # ...and the decoy is STILL caught, by both keyings, because a mod path is
+    # part of the scope: `decoy::kernel` vs `kernel` are two labels, so the
+    # pinned item SET no longer matches and `by_name` still raises.
+    want("the mod decoy is still two distinct labels",
+         sorted(unique_names(ditems)),
+         ["decoy::kernel", "gated_leaf", "kernel", "outside_verus"])
+    same_scope = '''verus! {
+fn kernel(v: &[u64]) -> u64 { 0 }
+fn kernel(v: &[u64]) -> u64 { 1 }
+}
+'''
+    want("two items in the SAME scope are a duplicate under both keyings",
+         (sorted(duplicate_names(parse(same_scope))),
+          sorted(duplicate_names(parse(same_scope), qualified=True))),
+         (["kernel"], ["kernel"]))
+    raises("unique_names refuses what no key distinguishes",
+           lambda: unique_names(parse(same_scope)), ValueError)
+    want("unique_names is the identity on a file with unique bare names",
+         sorted(unique_names(parse(src))), sorted(i.name for i in parse(src)))
 
     print("vparse selftest:", "PASS" if bad == 0 else f"FAIL ({bad})")
     return 0 if bad == 0 else 1

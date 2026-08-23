@@ -2990,7 +2990,10 @@ def check_adversarial(built, rep, adv_models, indir, cells, budgets=None):
                 n_cell += 1
                 n_hung += rc is None
                 if rc is None:
-                    hung_cells.append((f"{c} {o}/{m}", path))
+                    # (rung, opt, mode, path). Structured rather than a label,
+                    # because `_confirm_hang` selects on (rung x opt) and a
+                    # pre-formatted string would have to be re-parsed to do it.
+                    hung_cells.append((c, o, m, path))
                 sig = -rc if rc is not None and rc < 0 else None
                 seen.setdefault((rc, out.strip(), err.strip()[:120], sig),
                                 []).append(f"{o}/{m}")
@@ -3053,7 +3056,8 @@ def check_adversarial(built, rep, adv_models, indir, cells, budgets=None):
 
 
 def _confirm_hang(rep, name, hung_cells, budget, indir):
-    """Re-run ONE hung cell at `10 x budget` and fail if it terminates.
+    """Re-run one hung cell **per (rung x opt)** at `10 x budget` and fail if
+    any of them terminates.
 
     TASK_069, from TASK_068_REVIEW B2. Without this, "hang" and "slow" are
     indistinguishable to the gate: a real gcc binary that finishes in 3.5 s,
@@ -3063,40 +3067,67 @@ def _confirm_hang(rep, name, hung_cells, budget, indir):
     stage 8 raises the row BLOCKED, unchecked for UB. The budget was the
     author's own number and nothing measured against it.
 
-    **One cell, not all of them**, and the trade is deliberate: the cost is
-    `10 x budget` once per declared-hang input, where re-running every hung
-    cell would be `10 x budget x n_hung` on a pattern whose whole point is that
-    most rungs hang. So this is a SPOT CHECK -- it proves the budget is not
-    absurdly short for the cell it picked, not that every `hung=True` in the
-    recorded table is right. The cell is picked deterministically (first in
-    sorted matrix order) so the check does not move between runs.
+    ⚠ **THE AXIS IS (rung x opt), AND IT USED TO BE "the first cell in sorted
+    matrix order"** (TASK_077, RECAP "Owed" 19b). Sorted order picked
+    `c-clang O0` on p22 and **never an `-O3` cell**, which is the one at risk:
+    C11 6.8.5p6 lets a compiler assume a side-effect-free loop terminates, so
+    the `-O3` build is exactly where a declared hang can quietly stop being
+    one. ⚠ **The obvious repair -- one cell per distinct RUNG -- is REFUTED**:
+    on p22 that still selects two `O0` cells (`c-gcc O0`, `c-clang O0`) and
+    would have caught nothing. Opt level is the axis the risk runs along, and
+    rung is the axis the *reason* runs along, so the product is what gets
+    confirmed.
+
+    **Still not every cell**, and the trade is still deliberate. The cost is
+    `10 x budget x n_distinct(rung, opt)` rather than `10 x budget x n_hung`.
+    Measured on p22, the only pattern that declares a hang: 8 hung cells but
+    **4 distinct (rung, opt) pairs** -- `c-gcc`/`c-clang` x `O0`/`O3` -- so the
+    confirmation goes from 20 s to 80 s at p22's 2.0 s budget, and the two
+    `-O3` cells that C11 6.8.5p6 puts at risk are now both checked. The
+    remaining collapse is over `mode` (isolated/whole), which is a linkage
+    difference and not a licence to delete a loop.
+
+    Cells are picked deterministically (first `mode` in sorted order within
+    each pair) so the check does not move between runs.
 
     A failure here is about the BUDGET, not the declaration: the input may
     still make some other rung run forever.
 
-    Returns True when the hang is confirmed, so the caller can withhold its own
-    `ok` rather than print one beside this failure."""
+    Returns True when every selected cell is confirmed, so the caller can
+    withhold its own `ok` rather than print one beside this failure."""
     if not hung_cells:
         return False
-    label, path = sorted(hung_cells)[0]
+    # One representative per (rung, opt); `sorted` makes it the lowest `mode`.
+    chosen = {}
+    for rung, opt, mode, path in sorted(hung_cells):
+        chosen.setdefault((rung, opt), (mode, path))
     longer = min(RUN_BUDGET_CONFIRM * budget, RUN_TIMEOUT)
-    rc, out, _ = run_bin(path, os.path.join(indir, name), timeout=longer)
-    if rc is None:
-        rep.ok(f"{name}: confirmed -- {label} still had not terminated at "
-               f"{longer}s ({RUN_BUDGET_CONFIRM}x the pinned budget), so the "
-               f"{budget}s budget is measuring a hang and not a slow cell.")
-        return True
-    rep.fail("hang",
-             f"{name}: {label} was recorded as NON-TERMINATING at the pinned "
-             f"{budget}s budget, but it TERMINATED in under {longer}s "
-             f"({RUN_BUDGET_CONFIRM}x that budget) with exit {rc}, stdout "
-             f"{out.strip()[:60]!r}. The budget is too short to tell a hang "
-             f"from a slow cell, and `run.timeout_s` is the one pin nothing "
-             f"else cross-checks -- so raise it until this cell really does "
-             f"run forever, or drop the `expected_hang` declaration. Note what "
-             f"the short budget was buying: a 'hung' row makes stage 7 skip "
-             f"this input's sanitizer expectation and stage 8 report it "
-             f"BLOCKED for Miri.")
+    good = []
+    for (rung, opt), (mode, path) in sorted(chosen.items()):
+        label = f"{rung} {opt}/{mode}"
+        rc, out, _ = run_bin(path, os.path.join(indir, name), timeout=longer)
+        if rc is None:
+            good.append(label)
+            continue
+        rep.fail("hang",
+                 f"{name}: {label} was recorded as NON-TERMINATING at the "
+                 f"pinned {budget}s budget, but it TERMINATED in under "
+                 f"{longer}s ({RUN_BUDGET_CONFIRM}x that budget) with exit "
+                 f"{rc}, stdout {out.strip()[:60]!r}. The budget is too short "
+                 f"to tell a hang from a slow cell, and `run.timeout_s` is the "
+                 f"one pin nothing else cross-checks -- so raise it until this "
+                 f"cell really does run forever, or drop the `expected_hang` "
+                 f"declaration. Note what the short budget was buying: a "
+                 f"'hung' row makes stage 7 skip this input's sanitizer "
+                 f"expectation and stage 8 report it BLOCKED for Miri.")
+    if len(good) != len(chosen):
+        return False
+    rep.ok(f"{name}: confirmed -- all {len(good)} (rung x opt) representative(s) "
+           f"{good} still had not terminated at {longer}s "
+           f"({RUN_BUDGET_CONFIRM}x the pinned budget), so the {budget}s budget "
+           f"is measuring a hang and not a slow cell. The -O3 cells are in that "
+           f"list by construction: C11 6.8.5p6 makes them the ones at risk.")
+    return True
 
 
 # ==========================================================================
@@ -3462,18 +3493,48 @@ def check_verus_contract(pdir, rep, contract):
         txt = open(path).read()
         item_list = vparse.parse(txt)
 
-        # --- one item per name (TASK_003_REVIEW: last wins) ----------------
-        dup = vparse.duplicate_names(item_list)
+        # --- one item per SCOPED name (TASK_003_REVIEW: last wins) ---------
+        # ⚠ Keyed by (mod path, impl Self type, name) since TASK_077, not by
+        # bare name (RECAP "Owed" 20). Keying by bare name made a pinned
+        # `verus.rs` unable to define one name twice, so p36's eight
+        # `impl Op for OpN` blocks -- which verified `19/0` -- were refused by
+        # the gate and it shipped one generic impl instead
+        # (`patterns/p36-vtable-dispatch/NOTES.md` 9b).
+        #
+        # The decoy this check exists to stop is stopped by TWO things now, and
+        # the second is what makes widening the first safe:
+        #
+        #   * a duplicate that no scope distinguishes still fails HERE (two
+        #     `fn kernel` in one module is still `defined 2x`);
+        #   * a duplicate that a scope DOES distinguish gets two distinct
+        #     labels from `vparse.unique_names`, and the pinned item-set check
+        #     20 lines below then fails with `added=['decoy::kernel']`. That
+        #     pin is inside `contract_sha256`, so admitting the eight-impl
+        #     spelling costs the pattern an explicit, hashed declaration of
+        #     every qualified name -- which is the honest price and the reason
+        #     "Owed" 20 was never a one-liner.
+        #
+        # `unique_names` degrades to the bare name wherever it is unambiguous,
+        # so every `verus.rs` in the tree today keys exactly as it did before
+        # and no `spec.md` item pin moves.
+        dup = vparse.duplicate_names(item_list, qualified=True)
         if dup:
             for nm, its in sorted(dup.items()):
                 rep.fail("proof-pin",
                          f"{src}: `{nm}` is defined {len(its)}x (lines "
-                         f"{[i.line for i in its]}). The gate used to key items "
-                         f"by name and keep the last, so a decoy could supply "
-                         f"the pinned contract for the real item -- and nothing "
-                         f"says the compiler keeps the same one.")
+                         f"{[i.line for i in its]}) with nothing to tell them "
+                         f"apart -- same module, same impl. The gate used to "
+                         f"key items by name and keep the last, so a decoy "
+                         f"could supply the pinned contract for the real item "
+                         f"-- and nothing says the compiler keeps the same "
+                         f"one. Two items in DIFFERENT impls or modules are "
+                         f"fine and get qualified names.")
             continue
-        items = {i.name: i for i in item_list}
+        try:
+            items = vparse.unique_names(item_list)
+        except ValueError as e:
+            rep.fail("proof-pin", f"{src}: {e}")
+            continue
 
         # --- item set -----------------------------------------------------
         want_items = pinned_items.get(src)
@@ -5237,23 +5298,53 @@ def _verus_verified_files(pdir, rep, contract, verus_res):
         if not os.path.exists(path):
             continue
         # The duplicate-name failure is the only thing standing between this
-        # certificate and the wrong item -- Verus itself does NOT object to two
-        # items sharing a name (`S::drive` and `inner::drive` ->
-        # `--verify-function drive` silently reports `1 verified`, measured at
-        # TASK_008_REVIEW). It is checked FIRST and named explicitly, so the
-        # refusal is attributed to the duplicate rather than to the generic
-        # "no verified body" text below.
+        # certificate and the wrong item.
+        #
+        # ⚠ **THE REASON WRITTEN HERE UNTIL TASK_077 WAS REFUTED BY RE-RUNNING
+        # IT.** It said *"Verus itself does NOT object to two items sharing a
+        # name (`S::drive` and `inner::drive` -> `--verify-function drive`
+        # silently reports `1 verified`, measured at TASK_008_REVIEW)"*. At the
+        # PINNED Verus (0.2026.08.09.92f466f) it objects loudly. The probe is
+        # ten lines -- a `verus!` block with `trait Op { fn apply(..); }` and
+        # two `impl Op for {A,B}`, each defining `apply` and `spec_apply`:
+        #
+        #   $ ./verus_run.py dupname.rs --verify-root --verify-function apply
+        #   error: more than one match found for --verify-function apply,
+        #          consider using wildcard *apply* ... matched results are:
+        #            - A::apply
+        #            - A::spec_apply
+        #            - B::apply    ...
+        #   $ ./verus_run.py dupname.rs --verify-root --verify-function A::apply
+        #   verification results:: 1 verified, 0 errors (partial verification)
+        #
+        # So the query resolves fine given a name that identifies ONE item, and
+        # matching is by SUBSTRING over the qualified path. That is why the
+        # refusal is now scoped to duplicates that qualification cannot
+        # separate, and why the name handed to `--verify-function` below is
+        # `vparse.unique_names`' label -- bare wherever it is unambiguous,
+        # which is every pattern in the tree today, and `Type::name` where it
+        # is not (TASK_077, RECAP "Owed" 20).
+        #
+        # It is checked FIRST and named explicitly, so the refusal is
+        # attributed to the duplicate rather than to the generic "no verified
+        # body" text below.
         try:
-            dup = vparse.duplicate_names(vparse.parse(open(path).read()))
+            dup_items = vparse.parse(open(path).read())
+            dup = vparse.duplicate_names(dup_items, qualified=True)
         except ValueError as e:
             rep.fail("driver", f"{src}: {e}")
             continue
         if dup:
             rep.fail("driver",
-                     f"{src}: `{sorted(dup)}` defined more than once, so "
-                     f"`--verify-function` cannot be trusted to name the item "
-                     f"enclosing the driver region -- Verus does not object to "
-                     f"two items with one name. No harbour certificate issued.")
+                     f"{src}: `{sorted(dup)}` defined more than once with "
+                     f"nothing to tell them apart -- same module, same impl -- "
+                     f"so `--verify-function` cannot be given a name that "
+                     f"identifies the item enclosing the driver region. "
+                     f"(Verus matches by substring over the qualified path and "
+                     f"errors on more than one match, so it will not pick "
+                     f"either; the gate refuses first so the reason is stated "
+                     f"rather than inferred from an aborted run.) No harbour "
+                     f"certificate issued.")
             continue
         r = verus_res.get(src) or {}
         if r.get("errors") or not r.get("verified"):
@@ -5279,7 +5370,15 @@ def _verus_verified_files(pdir, rep, contract, verus_res):
         if not inner:
             continue
         it = max(inner, key=lambda i: i.body_start)
-        name = it.name
+        # The label `--verify-function` is given: the bare name wherever it
+        # identifies one item, `Type::name` where it does not. On every pattern
+        # in the tree today this is `it.name` unchanged (TASK_077).
+        try:
+            labels = {id(v): k for k, v in vparse.unique_names(items).items()}
+        except ValueError as e:
+            rep.fail("driver", f"{src}: {e}")
+            continue
+        name = labels.get(id(it), it.name)
         nv, ne, out, resolved = _verify_function(path, name, it.mod_path or "")
         q = (f"--verify-only-module {it.mod_path} --verify-function {name}"
              if it.mod_path else f"--verify-function {name} --verify-root")
@@ -5779,6 +5878,40 @@ def check_sanitizers(pdir, rep, indir, models, budgets=None):
                  unsupported. The exit code is recorded, not required: ASan
                  exits 1 by default, aborts (-6) under `abort_on_error`, and a
                  UBSan-only build may continue to 0.
+
+    ⚠ **`-fstrict-aliasing` is passed EXPLICITLY** (TASK_077, RECAP "Owed" 14).
+    gcc enables it at `-O2` and above and this stage builds at `-O1`, so
+    without the token the stage was structurally unable to see a UB class that
+    the flag gates -- p38's type pun, whose whole harm is a MISCOMPILE. The
+    hole is **one FLAG wide, not one optimisation level wide**, and that
+    distinction is the whole reason the repair is a token here rather than
+    `-O2` in the line above: raising the level would perturb every pattern's
+    sanitizer rows to fix one (`.memory/02-bench-rules.md`, "A gate hole that
+    is one FLAG wide").
+
+    Blast radius, RE-DERIVED at TASK_077 rather than carried:
+    **158 rows, 3 differ, all 3 on p38, so exactly one pattern moves.**
+    (TASK_068 measured "153 rows x 20 patterns" and its review re-derived 143;
+    both predate p22 and p36. **Recount rather than quote.**) The probe is this
+    function's own build line twice, with and without the token, over every
+    pattern and every input, comparing `(exit, fired, stdout, diagnostic)` --
+    ⚠ **mask the ELF BuildId hex, the ASan pid and pointers out of the
+    diagnostic before comparing**, or p02 and p11 read as differing when only
+    the BuildId moved (TASK_068_REVIEW attack 32). Of p38's three:
+
+      adversarial-huge, adversarial-oob   UBSan `index 256 out of bounds for
+                                          type 'uint16_t [256]'` -- these are
+                                          why p38's model now says "fires"
+      adversarial-stale                   checksum 10509230270850152637 ->
+                                          16931469174358590653 with **no
+                                          diagnostic at all**: the miscompile
+                                          reads uninitialised scratch that is
+                                          still INSIDE the array, so neither
+                                          sanitizer has anything to say. It
+                                          stays `sanitizer_expect: "clean"`,
+                                          and it is the row that shows why a
+                                          sanitizer is not a miscompile
+                                          detector.
     """
     head("7. C rung under ASan + UBSan (per-input expectation)")
     out = os.path.join(REPO, ".temp", "build",
@@ -5789,6 +5922,9 @@ def check_sanitizers(pdir, rep, indir, models, budgets=None):
     os.makedirs(os.path.dirname(out), exist_ok=True)
     cmd = [buildmod.GCC, "-std=c99", "-Wall", "-Wextra", "-O1", "-g",
            "-fsanitize=address,undefined",
+           # See the docstring: gcc turns this on at -O2, this stage builds at
+           # -O1, and without it stage 7 cannot see a flag-gated UB class.
+           "-fstrict-aliasing",
            # the container has an LD_PRELOAD that breaks the shared ASan
            # runtime's init ordering; static linking sidesteps it
            "-static-libasan", "-static-libubsan",
@@ -5939,7 +6075,32 @@ def _trusted_items(pdir, contract):
     return out
 
 
-def check_miri(pdir, rep, contract, identity, modmod, indir, names):
+def _hung_rungs(advtable, input_name):
+    """{rung names that DID NOT TERMINATE on `input_name`}, as stage 4 measured
+    it -- or None when stage 4 has nothing to say about this input.
+
+    This is the **per-rung axis** `expected_hang` does not have. `model.py`
+    declares a hang per INPUT, and a per-input bool cannot say WHICH rung runs
+    forever; stage 4 runs every cell of every rung at both opt levels and both
+    modes and records `hung` per row, so the axis already exists as a
+    measurement and only needed reading (TASK_077, RECAP "Owed" 19a).
+
+    `None` (no stage-4 rows for this input) is distinguished from `set()` (rows
+    exist, none hung) on purpose: the caller must not read "nothing hung" out of
+    "nothing was run".
+    """
+    if not advtable:
+        return None
+    pre = f"{input_name}/"
+    keys = [k for k in advtable if k.startswith(pre)]
+    if not keys:
+        return None
+    return {k[len(pre):] for k in keys
+            if any(r.get("hung") for r in (advtable[k] or []))}
+
+
+def check_miri(pdir, rep, contract, identity, modmod, indir, names,
+               advtable=None):
     """`.memory/02-bench-rules.md`: Miri is mandatory for any pattern that has a
     trusted `unsafe` item at all, and *may never be skipped* when R4 and R5 are
     not byte-identical.
@@ -6036,6 +6197,12 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names):
     out["required"] = True
     print(f"    Miri is REQUIRED because: " + "; ".join(why_required))
     srcs = cfg.get("sources") or [buildmod.RUST_SRC.get(a, f"{a}.rs")]
+    # source file -> the matrix rung stage 4 measured, so a per-input hang
+    # declaration can be tested against the rung Miri is about to interpret
+    # rather than against the pattern as a whole. `verus.rs` is not in the
+    # measured-cell set for this purpose only when a pattern renames it; the
+    # map is `build.py`'s, so the two cannot drift.
+    rung_of = {v: k for k, v in buildmod.RUST_SRC.items()}
     blocked = cfg.get("blocked_reason")
     sysroot = _miri_sysroot() if os.path.exists(MIRI_BIN) else None
     if sysroot is None:
@@ -6060,14 +6227,44 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names):
             probe = _probe_input(os.path.join(indir, nm), MIRI_PROBE_ITERS,
                                  os.path.join(scratch, f"miri.{nm}"))
             mod = sb(modmod.build, probe)
-            if sbg_opt(mod, "expected_hang", False):
-                # TASK_068. Blocked UP FRONT rather than after MIRI_TIMEOUT: an
-                # input the model declares non-terminating will not terminate
-                # under an interpreter either, and `MIRI_PROBE_ITERS` cannot
-                # help -- it clamps the number of kernel CALLS, and the first
-                # call is the one that never returns. Waiting 180 s to learn
-                # that, then reporting a payload-size reason that is false, is
-                # worse than saying so. A BLOCKED row, so the verdict reads
+            # --- does the rung MIRI RUNS hang on this input? -----------------
+            # TASK_077, RECAP "Owed" 19a. `expected_hang` is per INPUT; its
+            # Miri consequence is per RUNG, and until now the code assumed the
+            # two were the same thing.
+            #
+            # ⚠ THE REASON THIS BLOCK USED TO PRINT WAS STRUCTURALLY FALSE FOR
+            # EVERY PATTERN THIS TREE CAN HOLD. It said "so R4 does not return
+            # under Miri either". `.memory/01-ladder.md` puts the modelled bug
+            # in **R1 only** -- every Rust rung carries the fix -- so
+            # `miri.sources` always names a rung that TERMINATES, and the row
+            # was blocked for a reason that could not apply. Measured on p22,
+            # the only pattern that declares a hang: `miri` on the shipped
+            # `unsafe.rs` over the clamped `adversarial-full.bin` probe gives
+            # **rc=0, no UB, 0.2 s**, printing 15820751917455319872, which is
+            # exactly what `model.py` predicts. Stage 4 agrees and says which
+            # rungs really hang: `c-gcc` and `c-clang` at both opt levels, and
+            # no Rust rung at all. **Cost of the old reading: one genuinely
+            # unchecked Miri row per declared hang.**
+            #
+            # So the block is now conditioned on a MEASUREMENT rather than on a
+            # declaration -- `_hung_rungs` reads stage 4's own `hung` column --
+            # and it still fires, unchanged, in the case it was written for: an
+            # input on which the rung Miri interprets is itself one of the
+            # rungs that ran forever. `None` means stage 4 said nothing about
+            # this input (it is not adversarial, or the matrix was empty), in
+            # which case the declaration is all there is and the conservative
+            # answer is the old one.
+            hung = _hung_rungs(advtable, nm) if sbg_opt(
+                mod, "expected_hang", False) else set()
+            rung = rung_of.get(s)
+            if hung is None or (hung and (rung is None or rung in hung)):
+                # Blocked UP FRONT rather than after MIRI_TIMEOUT: a rung that
+                # does not terminate natively will not terminate under an
+                # interpreter either, and `MIRI_PROBE_ITERS` cannot help -- it
+                # clamps the number of kernel CALLS, and the first call is the
+                # one that never returns. Waiting 180 s to learn that, then
+                # reporting a payload-size reason that is false, is worse than
+                # saying so. A BLOCKED row, so the verdict reads
                 # PASS-WITH-BLOCKED-ROWS and the row is loud.
                 #
                 # ⚠ TASK_068 asserted here that this "cannot be used to skip a
@@ -6080,18 +6277,36 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names):
                 # 4 with 0 failures and switched this check off. It is true
                 # NOW, and only because of what TASK_069 added: a
                 # `RUN_BUDGET_FLOOR` on the pin, and `_confirm_hang`, which
-                # re-runs one hung cell at 10x the budget and FAILS if it
-                # terminates. A false comment is what the next reader trusts
-                # instead of reading the code, so it is fixed here as well as
-                # in the code it described.
-                why = (f"model.py declares this input non-terminating "
-                       f"(expected_hang), so R4 does not return under Miri "
-                       f"either. n_iters is clamped to {MIRI_PROBE_ITERS} but "
-                       f"the FIRST kernel call is the one that hangs. This "
-                       f"input is unchecked for UB; the others are not.")
+                # re-runs a hung cell per (rung x opt) at 10x the budget and
+                # FAILS if any terminates. A false comment is what the next
+                # reader trusts instead of reading the code, so it is fixed
+                # here as well as in the code it described.
+                if hung is None:
+                    why = (f"model.py declares this input non-terminating "
+                           f"(expected_hang) and stage 4 recorded no per-rung "
+                           f"result for it, so the gate cannot tell whether "
+                           f"the rung Miri runs ({s}) is one of the rungs that "
+                           f"hangs. Blocked conservatively. This input is "
+                           f"unchecked for UB; the others are not.")
+                else:
+                    why = (f"model.py declares this input non-terminating "
+                           f"(expected_hang) and stage 4 measured "
+                           f"{sorted(hung)} as the rung(s) that did not "
+                           f"terminate, which includes the rung Miri runs "
+                           f"({s} -> {rung!r}). n_iters is clamped to "
+                           f"{MIRI_PROBE_ITERS} but the FIRST kernel call is "
+                           f"the one that hangs. This input is unchecked for "
+                           f"UB; the others are not.")
                 rep.block("miri", f"{s} on {nm}", why)
-                runs.append(dict(source=s, input=nm, blocked=why))
+                runs.append(dict(source=s, input=nm, blocked=why,
+                                 hung_rungs=None if hung is None
+                                 else sorted(hung)))
                 continue
+            if hung:
+                print(f"    {s} on {nm}: input declares expected_hang, but "
+                      f"stage 4 measured the hang in {sorted(hung)} and NOT in "
+                      f"{rung!r} -- running Miri instead of blocking the row "
+                      f"(TASK_077).")
             try:
                 r = subprocess.run(
                     [MIRI_BIN, "--sysroot", sysroot, "--edition", "2021",
@@ -6284,8 +6499,11 @@ def main():
                                     slopes.pop("_cg_files", None),
                                     slopes.pop("_cg_probe", None))
     san = check_sanitizers(pdir, rep, indir, all_models, budgets)
+    # `advtable` carries stage 4's per-rung `hung` column, which is the
+    # per-rung axis `model.expected_hang` does not have (TASK_077, "Owed" 19a).
+    # Stage 4 runs at :6271 above, so the measurement is in hand by here.
     miri = check_miri(pdir, rep, contract, identity, modmod, indir,
-                      sorted(all_models))
+                      sorted(all_models), advtable)
 
     # What `source_sha256` covers, and why each line is here. The rule is: a
     # file whose contents a committed claim depends on must be hashed, or a

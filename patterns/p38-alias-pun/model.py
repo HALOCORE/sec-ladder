@@ -13,9 +13,17 @@ file notes only where p38 differs.
                   the decode loop before it walks a single record, so the
                   estimate is tight from below and strict.
     work_unit     "window byte"; `work_unit_bits` 8.
-    sanitizer     **"clean" on every input, including the adversarial ones,
-                  and that is a MEASUREMENT about the gate rather than about
-                  the kernel.** See `sanitizer_expect`.
+    sanitizer     derived, not tabulated: an input **"fires"** exactly when the
+                  miscompiled walk indexes the `uint16_t[256]` scratch at or
+                  past 256, which is `adversarial-huge` and `adversarial-oob`.
+                  ⚠ **This read `"clean" on every input` until TASK_077**, and
+                  that was a fact about the GATE's build flags -- stage 7 built
+                  at `-O1` with no `-fstrict-aliasing`, so the UB was not
+                  exploited in the binary the sanitizers ran on. The token is
+                  in `check.py::check_sanitizers` now. **`adversarial-stale`
+                  stays "clean" and is the interesting row**: its checksum
+                  changes with no diagnostic from either sanitizer, because the
+                  over-read stays inside the array. See `sanitizer_expect`.
 
 **WHAT THIS MODEL COMPUTES IS THE DEFINED SEMANTICS, WHICH IS WHAT EVERY RUNG
 EXCEPT ONE PRODUCES.** p38's C rung executes undefined behaviour, and on
@@ -224,52 +232,120 @@ class Model:
         return self._work if self.entered else 0
 
     # -- sanitizer expectation ---------------------------------------------
+    def _ub_scratch_overrun(self, off):
+        """Does the MISCOMPILED walk of the window at `off` index the scratch
+        at or past `SCRATCH_W`?
+
+        This is a model of the *undefined* execution, which nothing else in
+        this file models: `_window`/`_rwalk` compute the DEFINED semantics --
+        what the source says and what all seven other rungs produce. Here the
+        clamp is written to `sc[i]`/`sc[i+1]` through `uint16_t` lvalues, and
+        the re-read through the `uint32_t` pun is answered from the value the
+        compiler already had, so `n` keeps its **declared** value while the
+        stored words really are clamped. The fold then reads `sc[i+2+k]` for
+        `k < 2*declared`, and `sc` is a `uint16_t[SCRATCH_W]`.
+
+        Two outcomes, and p38's shipped inputs contain both:
+
+          index >= SCRATCH_W   out of the array. UBSan says `index 256 out of
+                               bounds for type 'uint16_t [256]'` and ASan says
+                               `stack-buffer-overflow READ of size 2`. This is
+                               `sanitizer_expect: "fires"`.
+          index in [nw, SCRATCH_W)  past the DECODED words but still inside the
+                               array. Uninitialised scratch, a wrong checksum,
+                               and **no diagnostic from either sanitizer** --
+                               `adversarial-stale.bin`'s shape, still "clean",
+                               and the row that shows a sanitizer is not a
+                               miscompile detector.
+
+        The walk position `i` is exact up to and including the FIRST clamped
+        record, because the two executions agree exactly while no clamp fires;
+        after one, the defined walk's `i` and the miscompiled one's diverge, so
+        this continues with the miscompiled `i` rather than the model's."""
+        if self.stride < HDR:
+            return False
+        b = self.buf
+        nrec = int.from_bytes(b[off:off + 4], "little")
+        if nrec == 0:
+            return False
+        sc = self._words(off)
+        nw = len(sc)
+        i = o = 0
+        while o < nrec and i + 2 <= nw:
+            room = (nw - i - 2) // 2
+            declared = sc[i] | (sc[i + 1] << 16)
+            if declared > room:                       # the clamp is STORED...
+                sc[i] = room & 0xFFFF
+                sc[i + 1] = (room >> 16) & 0xFFFF
+            n = declared                              # ...and IGNORED here
+            if n and i + 2 + 2 * n - 1 >= SCRATCH_W:
+                return True
+            i = i + 2 + 2 * n
+            o = o + 1
+        return False
+
     @property
     def sanitizer_expect(self):
-        """**"clean", on every input including the adversarial ones -- and it
-        is a fact about the GATE'S BUILD FLAGS, not about the kernel.**
+        """**"fires" exactly where the type pun walks the scratch out of the
+        array, and "clean" everywhere else** -- derived from the simulated run,
+        never tabulated per file (p18's rule).
 
-        `harness/check.py`'s stage 7 builds `c/kernel.c` with gcc at
-        `-O1 -fsanitize=address,undefined`. gcc enables `-fstrict-aliasing` at
-        `-O2` and above and not at `-O1`, so the stage-7 binary is one in which
-        p38's undefined behaviour is not exploited: it clamps, it stays inside
-        the scratch, and ASan and UBSan have nothing to report. Measured -- gcc
-        `-O1`, with and without `-fsanitize=address,undefined`, prints the
-        model's checksum on every adversarial input.
+        ⚠ **THIS PROPERTY RETURNED `"clean"` UNCONDITIONALLY UNTIL TASK_077,
+        and that was a fact about the GATE'S BUILD FLAGS rather than about the
+        kernel.** `harness/check.py`'s stage 7 builds `c/kernel.c` with gcc at
+        `-O1 -fsanitize=address,undefined`; gcc enables `-fstrict-aliasing` at
+        `-O2` and above and not at `-O1`, so the stage-7 binary was one in
+        which p38's undefined behaviour is not exploited -- it clamps, it stays
+        inside the scratch, and both sanitizers had nothing to report. **The
+        hole was one FLAG wide, not one optimisation level wide** (a distinction
+        this docstring got wrong until TASK_067, TASK_066_REVIEW M2: read
+        literally the old wording said the repair was to RAISE stage 7's
+        optimisation level, which would perturb every other pattern's sanitizer
+        rows to fix this one). TASK_077 added the token
+        `-fstrict-aliasing` to `check.py::check_sanitizers`, so stage 7 now
+        sees p38 **at `-O1`** and this declaration has to describe what it
+        sees.
 
-        ⚠ **THE HOLE IS ONE FLAG WIDE, NOT ONE OPTIMISATION LEVEL WIDE, and
-        this docstring said the second thing until TASK_067** (TASK_066_REVIEW
-        M2). The class is FLAG-gated: `gcc -O1 -fstrict-aliasing` already
-        prints the wrong checksum and ASan already reports
-        `stack-buffer-overflow READ of size 2` at `-O1`. Add `-fstrict-aliasing`
-        to stage 7's command line and stage 7 sees p38 **at `-O1`**, changing
-        nothing else. Read literally, the old wording said the repair was to
-        RAISE stage 7's optimisation level, which would perturb 20 patterns'
-        sanitizer rows; it is one token, and `harness/` is not this pattern's
-        to edit (RECAP "Owed" 12).
+        **What the token changes, re-derived at TASK_077 by building gate stage
+        7's own command line twice -- with and without the token -- for all 22
+        patterns and running both on every input**: **158 rows, 3 differ, all 3
+        on p38.** Exactly one pattern moves. Of p38's three:
 
-        **Blast radius, recounted across all 20 gate records: exactly one
-        pattern.** 15 patterns declare at least one `sanitizer_expect: "fires"`
-        input -- 36 rows in all -- and every one of the 36 fired at `-O1`,
-        p18-varint-shift, the other UB pattern, on all four of its rows. Five
-        declare none: p01 and p08 model no memory-safety bug; p04's missing
-        fullness check overwrites IN BOUNDS, so there is nothing for a
-        sanitizer to see; p47's harm is a timing property outside every
-        sanitizer's domain. **p38 is the only pattern in the tree whose
-        declared-clean adversarial row is clean because of the gate's BUILD
-        FLAGS rather than because of its kernel.** (TASK_066_REVIEW M2 put the
-        split at 16/4 and missed p04; the conclusion is unchanged, because
-        p04's row is clean for p17's reason and not for p38's.)
+          adversarial-huge   declared record length 268435455 at word 0 with
+                             room 48 -> `"fires"`, UBSan `index 256 out of
+                             bounds for type 'uint16_t [256]'`
+          adversarial-oob    declared 200, room 48, same diagnostic -> `"fires"`
+          adversarial-stale  declared 60, room 48 -- the unclamped extent
+                             reaches word 121, past the 98 decoded words and
+                             **inside** the 256-word array. Checksum
+                             10509230270850152637 -> 16931469174358590653 with
+                             **no diagnostic at all**, so it stays `"clean"`.
+                             That row is the pattern's point: the harm is a
+                             MISCOMPILE, and a sanitizer is not a miscompile
+                             detector.
 
-        The same source at `-O3` under ASan reports
-        `stack-buffer-overflow READ of size 2` on `adversarial-oob.bin`.
-        `../controls/gen_controls.py --run s_asan_O3` is that build, selectable
-        by name, so the figure is checkable rather than asserted, and
-        `--run s_asan_O1_sa` is the one-flag repair above; ../NOTES.md 6
-        records both. **Declaring "fires" here would fail the gate for a true
-        reason stated in the wrong place**: the bug is real and ASan does see
-        it; the gate's own sanitizer stage is not built with the flag that
-        creates it."""
+        The remaining five inputs (`small`, `large`, `degenerate`,
+        `adversarial-nrec`, `adversarial-stride7`) clamp nothing, and the
+        sweep blobs clamp nothing either -- 0 clamped records across all 30 of
+        them -- so the two builds are bit-identical in behaviour there.
+
+        **Why this is derived and not a filename table**: the condition is a
+        property of the *blob*, computed by `_ub_scratch_overrun` from the same
+        decode the rungs perform, so appending a sweep band cannot silently
+        acquire or lose a declaration. p18's `sanitizer_expect` is written the
+        same way and for the same reason.
+
+        `../controls/gen_controls.py --run s_asan_O3` is the `-O3` ASan build
+        and `--run s_asan_O1_sa` the one-flag `-O1` one; ../NOTES.md 6 records
+        both. Both now agree with gate stage 7 rather than standing in for it.
+        """
+        if not self.entered or self.truncated:
+            return "clean"
+        for k, w in enumerate(self._win):
+            if w is None:           # a window the driver loop never visits
+                continue
+            if self._ub_scratch_overrun(k * self.stride):
+                return "fires"
         return "clean"
 
     # -- what a conforming driver does -------------------------------------
