@@ -1308,6 +1308,79 @@ and all wrong on the kernel column alone:
 devirtualised `match`, a `static` helper the optimiser did not inline, and a
 library call are the same hazard.
 
+⚠ **THE LICENCE IS DERIVABLE FROM COMMITTED RECORDS — NO DISASSEMBLY, NO NEW
+MEASUREMENT** (TASK_075_REVIEW B1, and this file already prescribed it as *"the
+author-checkable test"*). `results/gate/pNN.json` carries
+**`marginal_ir_per_call`** per `(cell, opt, mode, input)` — whole-program and
+therefore symbol-independent — so
+
+```
+(marg[A] − marg[B]) − (kex[A] − kex[B])   =   the callee correction
+```
+
+Scored tree-wide against a measured callgrind sidecar, **176 rows**:
+
+| threshold | hit | **miss (false OK)** | false alarm |
+|---|---:|---:|---:|
+| 2.0 Ir | 162 | **0** | 14 |
+| 3.0 Ir | 166 | **0** | 10 |
+| 5.0 Ir | 167 | **0** | 9 |
+
+**Zero misses at every threshold**, and it reproduces every large correction
+independently: p11 `+9815.56/+7116.78`, p08 `−4152.92/−4488.90`, p09
+`+379/+2626`, p13 `−190/−264`, p27 `+120.33/+130.95`, p47 `+88.37/+166.00`,
+p36 `+129/+1025`. The residual is **structured, not noise** — a constant
+`+1.00` on every `gcc-clang` row and `−1.00` on `R5−R4` (the driver term).
+⚠ **Its floor is ±2 Ir (±16 on p07 and p22, whose per-call work is
+data-dependent), so it CANNOT resolve the ±7 `memset` or the +2 PLT thunk
+below.** Use it as the trigger; disassembly or a callee sweep is the refinement.
+
+### The callee column is an ADDITION, never a REPLACEMENT — it is less reproducible than the column it corrects
+
+(TASK_075 + TASK_075_REVIEW M1. ⚠ **The delivery's own perturbation knob —
+lengthening `--callgrind-out-file=` — is MEASURABLY INERT**, because valgrind
+strips its own options before building the client stack; the review replicated
+the two paths at exact length and got identical figures. **Re-run with the
+ENVIRONMENT BLOCK as the knob, which demonstrably works.**)
+
+Two independent sweeps, 348 `(pattern, input, cell)` triples:
+
+```
+kernel-EXCLUSIVE Ir/call moved in   0 of 348
+OUTWARD          Ir/call moved in  11 of 348
+   p03/p04 safe_tuned, both blobs   50.00 -> 43.00   (glibc memset, alignment)
+   p08 x6 cells small +0.0627/+0.0676 ; p08 large unsafe +0.0065
+```
+
+**On the callee column `R5 − R4` reads −7.00 on p03 and p04** — *"the proof
+costs −7 instructions"* — **between byte-identical kernels.** So the kernel
+column is the *correct* one there. ⚠ **p08 is a third exposed pattern** and its
+offset cancels within a language, so it changes no verdict today and would
+change one the moment a cross-language row used it.
+
+### gcc's PLT thunk: +2.00 `Ir` per libc call, gcc's column only
+
+(TASK_075_REVIEW, verified with call counts on p02, p11, p12 and p47.) gcc
+routes every libc call through a 2-instruction thunk that **callgrind attributes
+as its own function**:
+
+```
+gcc    memcpy@plt:  endbr64 ; jmp *0x2e06(%rip)     <- 2 insns, 2.00 Ir/call
+clang  memcpy@plt:  jmp *0x2f92(%rip)               <- 1 insn, folded away
+```
+
+⚠ **One of the two instructions is the `endbr64` of gcc's default
+`-fcf-protection=full`** — so that mitigation is priced **twice** in gcc's
+column, once per function entry and once per libc call. On p47 both compilers
+call the *same address* (`0x188320`); the entire `memcmp`-vs-`bcmp` difference
+is this thunk. **Two rows of a licence census survive only through a term the
+disassembly-based rule cannot see.**
+
+**And a per-process constant hiding inside a per-call column**: a one-off lazy
+binding / IFUNC resolver (`725–794` Ir per process, **clang and rustc only**),
+which scales as `1/n_iters` — 0.0065 … **0.5293** Ir/call. It is why p11 reads
+`299.8727` where `150 × 2.00 = 300.00`.
+
 ### ⚠ gcc's DEFAULT `-fcf-protection=full` prices a CFI mitigation in gcc's column, invisibly, tree-wide
 
 (TASK_073, on p36; **manager-verified independently** — `gcc -Q --help=common`

@@ -2174,6 +2174,25 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
    call targets resolved by GOT reloc + `nm`). The remaining 120.42 is **drop
    glue** — an epilogue asymmetry. **Nothing in `R3 − R4` is temporal safety.**
 
+   ✅ **This paragraph was RE-CONFIRMED at TASK_075_REVIEW against a claim that
+   it was wrong**, and the confirmation is worth keeping because the wrong
+   version is the intuitive one. A cross-pattern probe reported p27's
+   `R3 − R4` understated by `+120.33/+130.95` *"because its `unsafe` dispatches
+   through `call *%r12`"*. **The number is right and the mechanism is not.**
+   Measured outward `Ir` on `small`: unsafe `dealloc 917.33`; safe
+   `dealloc 280.93 + drop_glue 756.73` — **the cost is the SAFE side's
+   out-of-line drop glue**, exactly as written above, and the `call *%r12` is a
+   second call to `__rust_dealloc` already inside the closed decomposition
+   (`patterns/p27-handle-table/NOTES.md` §5e, `SUM over EVERY function
+   +230.0694 / +792.7458`). ⚠ **p27 already publishes this; it is a citation
+   fix, not a correction, and it costs no gate re-run.**
+
+   ⚠ **What IS new: p27's `gcc-clang` comparison REVERSES on `small`** —
+   `−25.02` on the kernel column against `+15.00` once callees are included.
+   p27's `c-gcc` cell reaches libc through gcc's 2-instruction PLT thunk that
+   clang folds away (`.memory/03-measurement.md`). **Do not quote p27's
+   gcc-vs-clang direction from the kernel column.**
+
    > **The lifetime guarantee's real cost here is ZERO, and its shape is
    > structural: the free and the invalidation are ONE operation in safe Rust
    > and TWO in C, and the bug is neither of them going wrong — it is the
