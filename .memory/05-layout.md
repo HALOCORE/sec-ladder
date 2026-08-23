@@ -384,6 +384,34 @@ from that point on (index 343 vs 339 immediately before, identical after).
 Never assume "only the ones I edited", and never assume "everything after".**
 Both guesses were available here and both were wrong.
 
+## What is hashed, what is generated, and which layer nothing watches
+
+⚠ **`patterns/*/*.md` IS in the gate `source_sha256`** (TASK_077_REVIEW M6,
+manager-verified: p22's record hashes its `NOTES.md`, `README.md` and
+`spec.md`). **So a PROSE fix to any pattern doc costs a gate re-run** — a cost
+column that answers only *"is it inside the `slb-contract` block?"* will say
+"free" for eight sites that are not. `measure.py`'s `provenance()` does **not**
+glob `*.md`, so the same edit costs **no re-measure**.
+
+⚠⚠ **AND THERE IS A GENERATED, UNHASHED LAYER THAT NOTHING WATCHES.**
+`results/tables/*.md` and `results/synthesis.md` are produced from the records
+and are in **no** hash set — so `--check-stale` cannot see them, no gate stage
+validates them, and they rot silently. Measured at TASK_077/078: **`p22`'s
+verdict stayed wrong in `results/synthesis.md` after the gate had been fixed**,
+and **4 of 22 tables were content-stale** — three citing a superseded
+`contract_sha256`, two publishing pre-TASK_069 audit counts.
+
+- ⚠ **"22 of 22 tables are stale" was an ARTEFACT**: `report.py --stdout` emits
+  one trailing blank line the file writer does not, so a naive diff flags every
+  table. **Compare content, not bytes.**
+- ⚠ **`results/synthesis.md` cannot simply be regenerated after a gate sweep.**
+  `synthesis/licence.json` pins each gate record's `source_sha256`, so a naive
+  re-run publishes **22 `LICENCE STALE` verdicts** — worse than the one wrong
+  row it was meant to fix. **Re-emit the sidecar first, then the artefact.**
+
+**Regenerating both costs no gate run and no re-measure.** Do it whenever a
+verdict, a contract hash or an audit count moves.
+
 ## Editing rules
 
 - `pilot/` is frozen evidence for `PLAN.md`. Do not edit it; p01 is its successor.

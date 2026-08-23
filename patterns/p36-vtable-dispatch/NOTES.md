@@ -1525,6 +1525,11 @@ says plainly rather than dressing up.
 
 ### 9b. ⚠ EIGHT `impl` BLOCKS VERIFY AND THE GATE REFUSES THEM
 
+> ⚠ **STATUS, TASK_078: still refused, and the REASON HAS MOVED. Read
+> "What changed at TASK_077/078" at the end of this section before quoting
+> anything above it** — the mechanism this section names as the refusal was
+> fixed and is no longer the one that fires. p36 needs no change either way.
+
 The first `verus.rs` used eight separate `impl Op for OpN` blocks. It verified —
 **`19 verified, 0 errors`** shipped and `21 verified, 0 errors` under
 `--cfg slb_twin` — and every rung agreed with `model.py` on all seven inputs.
@@ -1561,6 +1566,62 @@ would have to be qualified in every pattern, and the decoy attack the check
 exists to stop (*"the gate used to key items by name and keep the last, so a
 decoy could supply the pinned contract for the real item"*) has to keep being
 stopped. **Queued for the manager; p36 needs no `harness/` change to ship.**
+
+#### What changed at TASK_077/078 — the refusal moved, it did not lift
+
+⚠ **Everything above is HISTORY from here down.** *"a pinned `verus.rs` may not
+define one item name twice"* was true when it was written and is now the wrong
+statement of a constraint that still exists.
+
+**TASK_077 (RECAP "Owed" 20) did the keying work this section asked for.**
+`vparse.duplicate_names(qualified=True)` keys by `(mod path, impl Self type,
+name)`; `vparse.unique_names` hands back the **bare** name wherever it is
+unambiguous and `Type::name` where it is not, so the eight impls key as
+`Op0::apply` … `Op7::apply` and **no `spec.md` item pin in the tree moved** —
+`unique_names` is the identity on 25 of 25 verus-bearing files. `check.py`'s
+per-item contract stage and its `--verify-function` label were switched to it.
+The decoy is still caught by both keyings, because a `mod` path is part of the
+scope: `decoy::kernel` and `kernel` are two labels, so the pinned item **set**
+fails with `added=['decoy::kernel']`, and that pin is inside `contract_sha256`.
+
+**TASK_077_REVIEW B1 then measured that the spelling is still refused, by five
+other stages.** `vparse.by_name` returns `{name: Item}` and stays bare-keyed on
+purpose — a qualified duplicate would silently drop one of the two and re-open
+the decoy — and it is called by `check_call_site`, `check_clause_deletion`,
+`check_requires_strength`, `check_trusted_twins` and `derive_contract`, plus
+`harness/limbs.py`. Each turns its `ValueError` into a failure, so the
+eight-impl file now collects **five `FAIL`s and a fired limb** whose text still
+reads *"duplicate item name(s): apply"*.
+
+**TASK_078 measured the route to closing that and declined it**
+(`.temp/p78/f1_probe.py`), because *"thread `qualified=True` through five call
+sites"* is not what it costs:
+
+1. `check_trusted_twins` and `limbs.py` build the twin's key by **string
+   concatenation**, `TWIN_PREFIX + t.name`, from the bare name. In a
+   qualified map that key misses on every trusted method inside an `impl`
+   (`slb_twin_apply` looked up in a map holding `Op0::slb_twin_apply`), so
+   every trusted item would report `NO TWIN` — a failure saying the opposite of
+   the truth. Scope-aware key construction is a change to the **twin rule**,
+   not to a dict key.
+2. `harness/limbs.py` is a sixth consumer and is not a gate stage, but six
+   patterns' published `NOTES.md` sentences rest on what it reports.
+3. the clause-deletion and precondition-strength stages label every recorded row
+   with the bare `it.name`, so an eight-impl file writes eight rows all labelled
+   `apply` into `results/gate/*.json` — a record-schema change on top.
+4. and **the qualification would not even separate the twins**: `vparse.
+   impl_spans` only recognises `impl` at item position (`pre[-1] not in "{};"`),
+   and `#[cfg(slb_twin)]` ends in `]`, so an attribute-preceded `impl` is
+   invisible and its methods qualify to the bare name. Measured: two
+   `#[cfg(slb_twin)] impl OpN { fn slb_twin_apply … }` blocks both qualify to
+   `slb_twin_apply` and `unique_names` **raises** — on the very file the fix
+   exists for.
+
+**So the honest status is: the *contract* stage was widened, the *spelling* is
+still refused, and RECAP "Owed" 20 is NARROWED rather than closed.** The
+remaining work is those six call sites, the twin-key construction, the row
+labels, and `impl_spans`' attribute gap. p36 still needs no `harness/` change,
+and the const-generic shape is still the right one to ship.
 
 ---
 

@@ -386,13 +386,18 @@ MIRI_REASON = (
     "(`controls/gen_controls.py --run r2_noguard`, ../NOTES.md 0b). Miri is "
     "listed here because the three contract-bearing trusted items are real and "
     "a wrong `arr_set_unchecked` would still be invisible to Verus. "
-    "⚠ **`adversarial-full.bin` is a BLOCKED Miri row**, not a passing one: "
-    "model.py declares `expected_hang` on it and check.py blocks the row up "
-    "front rather than waiting out MIRI_TIMEOUT. p22 therefore lands "
-    "PASS-WITH-BLOCKED-ROWS and not PASS. ⚠ On p22 the block's stated reason -- "
-    "*R4 does not return under Miri either* -- is FALSE: it is the C rung that "
-    "hangs and unsafe.rs returns. ../NOTES.md 11 reports that as a harness "
-    "finding rather than working around it."
+    "⚠ **`adversarial-full.bin` WAS a BLOCKED Miri row until TASK_077 and is "
+    "now a PASSING one.** model.py declares `expected_hang` on it, and "
+    "check.py used to block the row up front on the strength of that "
+    "declaration alone, with a stated reason -- *R4 does not return under Miri "
+    "either* -- that was FALSE on p22 and structurally false for every pattern "
+    "this tree can hold, because `.memory/01-ladder.md` puts the modelled bug "
+    "in R1 only: it is the C rung that hangs and unsafe.rs returns. check_miri "
+    "now reads stage 4's own per-rung `hung` column, measures the hang in "
+    "['c-clang', 'c-gcc'] and NOT in 'unsafe', and runs Miri on the row: no "
+    "UB, exit 0, stdout 15820751917455319872 matching model.py. p22 therefore "
+    "lands **PASS**, and its unchecked-for-UB rows go 1 -> 0. ../NOTES.md 11 "
+    "and 11a record the closed harness defect rather than a live one."
 )
 
 RUN_WHY = (
@@ -409,10 +414,16 @@ RUN_WHY = (
     "cell anywhere in this tree on `large.bin` is 198 ms -- so 2.0 s is about "
     "10x the slowest honest cell in the project and roughly 1000x the slowest "
     "honest cell on THIS input. It is also 2x RUN_BUDGET_FLOOR, so it is not "
-    "sitting on the floor. `_confirm_hang` re-runs one hung cell at 20 s and "
-    "the pattern FAILS if it terminates, which is what stops this pin from "
-    "being self-certifying. Total added cost of the declaration: about 36 s per "
-    "gate run against about two hours without it. "
+    "sitting on the floor. `_confirm_hang` re-runs EVERY hung cell at 20 s "
+    "(10x the pin) and the pattern FAILS if any of them terminates, which is "
+    "what stops this pin from being self-certifying. ⚠ It re-ran ONE cell until "
+    "TASK_077 and one per (rung x opt) until TASK_078; both collapsed an axis "
+    "on an argument nobody had measured, and `sorted()` made the survivor the "
+    "`isolated` cell every time -- so the `whole` cells, where the kernel is "
+    "inlined into `main` and C11 6.8.5p6's licence is most available, were "
+    "never re-run (../NOTES.md 11b-ii). Total added cost of the declaration: "
+    "8 x 2.0 s in stage 4 plus 8 x 20 s of confirmation, about 176 s per gate "
+    "run, against about two hours without it. "
     "⚠ **`adversarial-nearfull.bin` deliberately carries NO budget**: 63 "
     "distinct keys and then 64 more from the same 63, so `nfill` stops one "
     "short of TABCAP and every cell including c/kernel.c terminates. It is the "
@@ -624,10 +635,15 @@ have silently reverted (`.memory/05-layout.md`). The generator reads the shared
 named-spelling paragraph out of a DONOR pattern's `spec.md` and refuses to write
 anything if the result does not satisfy `harness/check.py::named_spelling_problem`.
 
-⚠ **p22's gate verdict is `PASS-WITH-BLOCKED-ROWS`, not `PASS`.** One input,
-`adversarial-full.bin`, is declared non-terminating, and a declared-hang input
-is a blocked Miri row by construction. p01 is the only other pattern in the tree
-that lands there. Nothing is broken.
+⚠ **p22's gate verdict is `PASS`.** It read `PASS-WITH-BLOCKED-ROWS` until
+TASK_077, because `adversarial-full.bin` is declared non-terminating and a
+declared-hang input was a blocked Miri row **by construction** — the block was
+conditioned on the per-input declaration, which cannot say *which rung* runs
+forever. It is now conditioned on stage 4's own per-rung measurement, the hang
+is measured in `c-gcc`/`c-clang` and not in `unsafe`, and the row runs and
+passes. p01 is now the only pattern in the tree on
+`PASS-WITH-BLOCKED-ROWS`, for an unrelated reason (its `large.bin` Miri
+timeout). See ../NOTES.md 11a.
 
 ## What makes p22 different from the other twenty
 

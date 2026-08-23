@@ -641,19 +641,25 @@ pattern's headline uses, still varies 4 of 4 with randomisation disabled and
 again with `-fno-stack-protector`, and no cause is offered in place of the one
 that was measured false (`NOTES.md` 2).
 
-⚠ **The gate's own sanitizer stage cannot see any of this**, and `model.py`
-declares `sanitizer_expect: "clean"` on every input because of it.
-`harness/check.py` stage 7 builds the C rung `-O1 -fsanitize=address,undefined`,
-and gcc enables `-fstrict-aliasing` at `-O2` and above — **but the hole is one
-FLAG wide, not one optimisation LEVEL wide.** `gcc -O1 -fstrict-aliasing`
-already prints the wrong checksum and ASan already reports
-`stack-buffer-overflow READ of size 2` at `-O1`, so the repair is one token on
-stage 7's command line and **not** a higher optimisation level, which would
-perturb 20 patterns' sanitizer rows. Both builds are selectable by name:
-`controls/gen_controls.py --run s_asan_O1_sa` is the gate's own command line
-plus that token, and `--run s_asan_O3` is the same source at `-O3`. Recounted
-across all 20 gate records, **exactly one pattern is affected, and it is this
-one** (`NOTES.md` 6b).
+⚠ **The gate's own sanitizer stage could not see any of this until TASK_077**,
+and `model.py` declared `sanitizer_expect: "clean"` on every input because of
+it. `harness/check.py` stage 7 built the C rung
+`-O1 -fsanitize=address,undefined`, and gcc enables `-fstrict-aliasing` at `-O2`
+and above — **but the hole was one FLAG wide, not one optimisation LEVEL wide.**
+`gcc -O1 -fstrict-aliasing` already prints the wrong checksum and ASan already
+reports `stack-buffer-overflow READ of size 2` at `-O1`, so the repair was one
+token on stage 7's command line and **not** a higher optimisation level, which
+would have perturbed every other pattern's sanitizer rows. ✅ **The token is in
+the gate since TASK_077**, and `model.py::sanitizer_expect` now DERIVES its
+answer — `"fires"` on `adversarial-huge` and `adversarial-oob`, `"clean"` on the
+other six, including `adversarial-stale`, whose over-read stays inside
+`sc[256]` so no sanitizer has anything to say about a real miscompile. Both
+standalone builds are still selectable by name and both now agree with stage 7
+rather than standing in for it: `controls/gen_controls.py --run s_asan_O1_sa` is
+the gate's own command line plus that token, and `--run s_asan_O3` is the same
+source at `-O3`. Blast radius, re-derived by building stage 7's command line
+twice for all 22 patterns and running both on every input: **158 rows, 3 differ,
+all 3 on this pattern** (`NOTES.md` 6b).
 
 ## Contract
 

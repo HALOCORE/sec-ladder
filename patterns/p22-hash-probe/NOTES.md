@@ -2,23 +2,44 @@
 
 Contract: `spec.md`. Summary: `README.md`. This file is the evidence.
 
-> ⚠ **p22's gate verdict is `PASS-WITH-BLOCKED-ROWS`, not `PASS`, and that is
-> correct.** `model.py` declares `adversarial-full.bin` non-terminating, and
-> `harness/check.py` blocks a declared-hang input's Miri row up front rather than
-> waiting out `MIRI_TIMEOUT`. p01 is the only other pattern in the tree that
-> lands there. §11 has the disclosure and a harness finding that goes with it.
+> ⚠ **p22's gate verdict is `PASS`. It read `PASS-WITH-BLOCKED-ROWS` from
+> TASK_070 to TASK_077, and the change is a STRENGTHENING, not a relaxed
+> check.** `model.py` declares `adversarial-full.bin` non-terminating, and
+> `harness/check.py` used to block a declared-hang input's Miri row up front on
+> the strength of that declaration alone — a per-input bool, which cannot say
+> which **rung** runs forever. It now reads stage 4's own per-rung `hung`
+> column: on p22 the hang is measured in `c-gcc`/`c-clang` and **not** in
+> `unsafe`, so Miri runs the row and it passes clean. p22's unchecked-for-UB
+> rows go **1 → 0**, and p01 is now the only pattern in the tree on
+> `PASS-WITH-BLOCKED-ROWS`. §11 and §11a have the disclosure and the harness
+> finding, now recorded as a **closed** defect.
 
 > **`slb-contract` sha256, as first written:**
 > `1f29b02eac0bf442d646cdcc03b83ced321a25b3f0c74109dc1c1028831c1d71`
 > — written by `controls/mkcontract.py` before any measurement was published.
-> **It has changed TWICE**: to
+> **It has changed THREE times**: to
 > `044f02cded64694e54484df7b69cda3154019e0d350cf049e55dac07199bd5da` at TASK_070
 > (shipped at `b7cd39b`) and to
 > `09eea1c6f8ee1d89b98ca744367fcaa2e796d970293d6cadcf564043ba42311a` at TASK_071,
-> which retracted a false claim that was inside the block. §11c says exactly
-> what moved, why, and ⚠ **why the `git show HEAD:` check PROTOCOL used to
-> prescribe cannot verify the first move on a one-commit pattern.** The current
-> value is in `results/gate/p22-hash-probe.json`.
+> which retracted a false claim that was inside the block; and to
+> `40a96deb7de992326da81319a3832c041487710956fcd0edef61ed47060513b7` at
+> TASK_078, which retracted two more — `miri.reason` said
+> `adversarial-full.bin` *"is a BLOCKED Miri row, not a passing one"* and since
+> TASK_077 it is a passing one, and `run.why` said `_confirm_hang` *"re-runs one
+> hung cell"* when it now re-runs all eight. §11c says exactly what moved, why,
+> and ⚠ **why
+> the `git show HEAD:` check PROTOCOL used to prescribe cannot verify the first
+> move on a one-commit pattern.** The current value is in
+> `results/gate/p22-hash-probe.json`.
+>
+> **Direction test on the TASK_078 move** (`.memory/01-ladder.md`), measured
+> leaf by leaf against `01bf438` with `.temp/p78/contract_jsondiff.py`:
+> **1 of 151 leaves differs, and it is `.miri.reason`** — a prose field the gate
+> reads and prints but does not enforce. `miri.required`, `miri.sources`,
+> every `requires`/`ensures`, the obligation counts, the item pins, the `Ir`
+> floor and the identity levels are byte-identical. The edit makes the gate ask
+> **more**, not less: the row it describes went from unchecked-for-UB to
+> checked-and-clean.
 
 ## 0. §0 — the bug class and the harm, settled before any rung was written
 
@@ -694,10 +715,13 @@ performs?* The body performs exactly one — a byte read at `i` — and the sing
 and is not closed here: a body that *also* read `i + 1` would satisfy this
 contract, so the argument rests on the body being three tokens long and visible
 in the same file. Miri on `unsafe.rs` is the backstop and `miri.required` is
-true. ⚠ On p22 that backstop is **weaker than usual on exactly one input**:
-`adversarial-full.bin`'s Miri row is BLOCKED by the hang declaration (§11). It
-was run by hand anyway and reports no UB — `controls/gen_controls.py --run hang
---miri`, last line.
+true. ⚠ **That backstop used to be weaker than usual on exactly one input, and
+since TASK_077 it is not.** `adversarial-full.bin`'s Miri row was BLOCKED by the
+hang declaration (§11a/§11b); the gate now measures that the hang is in the C
+rungs and not in `unsafe`, runs the row, and it is clean. All 8 of p22's Miri
+rows are checked. The hand-run that established this before the fix is still
+reproducible — `controls/gen_controls.py --run hang --miri`, last line — and
+agrees with the gate.
 
 (c) *Does each clause mean the same in both configurations?* Yes. The signature,
 the `requires` and the `ensures` are character-identical between the shipped item
@@ -979,15 +1003,47 @@ no measure.
 
 ## 11. Provenance and disclosures
 
-### 11a. Why the verdict is PASS-WITH-BLOCKED-ROWS
+### 11a. Why the verdict WAS `PASS-WITH-BLOCKED-ROWS`, and why it is now `PASS`
 
-`model.py` declares `expected_hang` on `adversarial-full.bin`;
-`harness/check.py::check_miri` blocks a declared-hang input's row up front rather
-than waiting out `MIRI_TIMEOUT`. One blocked row, and the verdict is
-`PASS-WITH-BLOCKED-ROWS` with **0 failures**. p01 is the only other pattern in
-the tree that lands there.
+**⚠ HISTORY, NOT A LIVE CONSTRAINT. TASK_077 fixed the harness defect §11b
+reported and p22's verdict moved to `PASS`.** What follows is what it used to
+say, kept because the defect is the interesting part:
 
-### 11b. ⚠ HARNESS FINDING — the block's stated reason is FALSE on p22, and one Miri row is lost that need not be
+> `model.py` declares `expected_hang` on `adversarial-full.bin`;
+> `harness/check.py::check_miri` blocks a declared-hang input's row up front
+> rather than waiting out `MIRI_TIMEOUT`. One blocked row, and the verdict is
+> `PASS-WITH-BLOCKED-ROWS` with **0 failures**.
+
+**What replaced it.** `check_miri` no longer reads the per-input declaration on
+its own. It reads stage 4's own per-rung `hung` column — the axis §11b said
+`model.py` could not express, which turned out to exist already as a
+*measurement* rather than as a declaration — and blocks only when the rung Miri
+interprets is itself one that did not terminate. On p22:
+
+```
+unsafe.rs on adversarial-full.bin: input declares expected_hang, and stage 4
+  measured ['c-clang', 'c-clang-h', 'c-gcc', 'c-gcc-h', 'safe_naive',
+  'safe_tuned', 'unsafe', 'verus']: the hang is in ['c-clang', 'c-gcc'] and NOT
+  in 'unsafe' -- running Miri instead of blocking the row (TASK_077).
+ok   miri unsafe.rs on adversarial-full.bin  n_iters=4: no UB, exit 0 and
+     stdout '15820751917455319872' both match the model
+```
+
+**Unchecked-for-UB rows: 1 → 0. Verdict: `PASS`. Blocked rows: 0.** p01 is now
+the only pattern in the tree on `PASS-WITH-BLOCKED-ROWS`, and for an unrelated
+reason (Miri does not finish its `large.bin` inside `MIRI_TIMEOUT`).
+
+⚠ **It is a strengthening, and it was attacked as one** (TASK_077_REVIEW A0,
+19 named attacks). An independent gate re-run returned `PASS` with the record
+**byte-identical**; nine doctored stage-4 tables were built and the block still
+fires in six of them, including *"the rung hangs only at `-O3`"* and *"only in
+`whole` mode"* — `_hung_rungs`' `any()` collapses opt and mode conservatively.
+Two shapes where it did **not** fire were found and are fixed at TASK_078: a
+rung whose key is absent from stage 4's table, and one whose row list is empty,
+now block with *"stage 4 produced NO ROW for the rung Miri runs"* instead of
+being read as *"that rung terminated"*.
+
+### 11b. ⚠ HARNESS FINDING, NOW FIXED (TASK_077) — the block's stated reason was FALSE on p22, and one Miri row was lost that need not have been
 
 `check_miri`'s block text reads:
 
@@ -1026,7 +1082,16 @@ that hangs, and `model.py` cannot express that today: **`expected_hang` is a
 per-input bool with no per-rung axis**, so `check.py` cannot state the right
 condition at all. That is the change the manager has to queue.
 
-### 11b-ii. ⚠ HARNESS FINDING — `_confirm_hang` confirms the cell least at risk, and the strengthening TASK_070 PROPOSED FOR IT IS REFUTED
+✅ **CLOSED at TASK_077** (RECAP "Owed" 19a), and the last sentence above is the
+part that was wrong in an instructive way: the per-rung axis did not have to be
+*added to `model.py`* at all. **Stage 4 already measured it** — it runs every
+cell of every rung at both opt levels and both modes and records `hung` per row
+— so the fix was to read a column the gate had been writing all along, not to
+extend a declaration. The block reason quoted at the top of this section no
+longer exists in `check.py`; the code and the comment describing it were both
+replaced. See §11a for what the row prints now.
+
+### 11b-ii. ⚠ HARNESS FINDING, NOW FIXED (TASK_077/078) — `_confirm_hang` confirmed the cell least at risk, and the strengthening TASK_070 PROPOSED FOR IT IS REFUTED
 
 `harness/check.py:3081` picks `sorted(hung_cells)[0]` and the labels are
 `f"{c} {o}/{m}"`, so on p22 the confirmed cell is **`c-clang O0/isolated`**:
@@ -1057,13 +1122,59 @@ cells across `c-gcc` and `c-clang` at both levels. Leaving `_confirm_hang` at on
 cell is defensible; the *reason* given for it should be that one, and not "all 8
 hung cells are the same two programs". `harness/` is not edited here either.
 
-### 11c. ⚠ The `slb-contract` sha256 has moved TWICE, and neither move is checkable by `git show HEAD:`
+✅ **CLOSED, in two steps, and the second one is the lesson.** TASK_077 took the
+`(rung × opt)` axis this section prescribes — 4 representatives, both `-O3` cells
+in the set, 80 s. **TASK_077_REVIEW m3 then pointed out that `sorted()` makes
+the representative the `isolated` cell every time**, so the `whole` cell — where
+the kernel is inlined into `main` and the C11 6.8.5p6 licence is *most*
+available — was still never re-run, and the docstring had replaced one unmeasured
+axis-collapse argument with another of exactly the same shape. TASK_078 re-runs
+**every hung cell**: on p22 that is all 8, at 20 s each, 160 s. No axis is
+collapsed, so there is no argument left to be wrong about. RECAP "Owed" 17's
+*"p22 hangs 12–20 cells"* was a pre-measurement estimate; it is **8**.
+
+### 11c. ⚠ The `slb-contract` sha256 has moved THREE times, and the first two are not checkable by `git show HEAD:`
 
 | when | sha256 | what |
 |---|---|---|
 | as first written (TASK_070) | `1f29b02eac0b…` | `controls/mkcontract.py`'s first output, before any measurement was published |
 | shipped at TASK_070 | `044f02cded64…` | two edits, both to `idiom` prose, neither to a pin |
-| **shipped at TASK_071** | **`09eea1c6f8ee…`** | **the F1 retraction and the F3 `why` split — see below** |
+| shipped at TASK_071 | `09eea1c6f8ee…` | the F1 retraction and the F3 `why` split — see below |
+| **shipped at TASK_078** | **`40a96deb7de9…`** | **two retractions: `miri.reason` said `adversarial-full.bin` *"is a BLOCKED Miri row, not a passing one"* and *"p22 therefore lands PASS-WITH-BLOCKED-ROWS and not PASS"*; `run.why` said `_confirm_hang` *"re-runs one hung cell at 20 s"* and priced the declaration at *"about 36 s per gate run"*. All three are false since TASK_077/078 (§11a, §11b-ii).** |
+
+**The TASK_078 move, in full, and its direction test.** Measured leaf by leaf
+against `01bf438` (`.temp/p78/contract_jsondiff.py`):
+
+```
+p22: 151 leaves, 2 differ vs 01bf438
+  .miri.reason: string, 1264 -> 1647 chars
+  .run.why:     string, 1568 -> 1997 chars
+```
+
+**Two leaves, and both are prose the gate prints rather than enforces.**
+`run.timeout_s` itself (`{"adversarial-full": 2.0}`) is **unchanged** — the pin
+the budget argument is about did not move; only its explanation did.
+`miri.required` (`true`) and `miri.sources` (`["unsafe.rs"]`) are unchanged, as
+are every `requires`/`ensures`, both obligation counts, every item pin, the `Ir`
+floor, the identity levels and the whole `idiom` object. The direction is
+**tighter, not looser** on both: the row `miri.reason` describes went from
+unchecked-for-UB to checked-and-clean, and the confirmation `run.why` describes
+went from 1 cell to 8. ⚠ Unlike the first two moves this one
+**is** checkable from `git`, because p22 no longer lands in one commit:
+
+```
+$ git show 01bf438:patterns/p22-hash-probe/spec.md \
+    | diff - patterns/p22-hash-probe/spec.md | grep -E '^[0-9]'
+12,15c12,20      <- PROSE, above the block: the PASS-WITH-BLOCKED-ROWS banner
+557c562          <- run.why       } inside the block; these two, and only
+577c582          <- miri.reason   } these two, move contract_sha256
+```
+
+**Three hunks, two leaves** — the first is the prose banner at the top of the
+file, which is not in the hashed block at all. And `spec.md` is generated
+(§11d), so the edit was made in `controls/mkcontract.py` and the file re-derived
+from it; `controls/mkcontract.py --check` reports *"spec.md matches the
+generator"*.
 
 **The TASK_070 move, in full:**
 
@@ -1164,6 +1275,13 @@ contract fails `check.idiom_problems` or `check.named_spelling_problem`.
   (rung × opt) cell selection. `harness/` is outside this task's scope by
   instruction; both are recorded for the manager to queue, and neither changes
   any number in this file.
+  ✅ **Both were fixed at TASK_077** (RECAP "Owed" 19a/19b) and refined at
+  TASK_078. The per-rung axis did not have to be added to `expected_hang` at
+  all — stage 4 already measured it — and `_confirm_hang` went past
+  (rung × opt) to **every** hung cell, because the `mode` collapse the
+  intermediate version kept was the same unmeasured argument in a smaller
+  costume (TASK_077_REVIEW m3). The only number in this file they change is the
+  verdict: `PASS-WITH-BLOCKED-ROWS` → `PASS`.
 * **`r3_bounded_kept` was NOT admitted to the contract**, and that is a decision
   rather than an omission — §0c reason 2 argues it and §8b publishes what it
   costs. The alternative (admit it, republish the span at 16.8× the width) is

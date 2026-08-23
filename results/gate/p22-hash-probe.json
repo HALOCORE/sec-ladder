@@ -11,7 +11,7 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "09eea1c6f8ee1d89b98ca744367fcaa2e796d970293d6cadcf564043ba42311a",
+  "contract_sha256": "40a96deb7de992326da81319a3832c041487710956fcd0edef61ed47060513b7",
   "run_timeout_s": {
     "adversarial-full": 2.0
   },
@@ -144,15 +144,15 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "4afa37f4d1e985c8910f8a368b4033baeb65ae0349077e82e7671b1d1e29b6ea",
+    "harness/check.py": "4158ba37a8aea7c789128185e061b4962a3550107c6fccfcb3ab4e6077ecdeb9",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
-    "harness/vparse.py": "50cd7ee67ff72efade74cb8da59cfc7dd00720d9dd89c7dda7dbddb2b7340185",
-    "patterns/p22-hash-probe/NOTES.md": "9616fd25b3fd1f896830af59bbc1870ad6f328bf5c2dc65f013ddc8a9e68bca1",
-    "patterns/p22-hash-probe/README.md": "4c89b807f672f3202096da3e4b629d46d322068012dbecb582ea6c3b404e2d4f",
+    "harness/vparse.py": "17e87555e53c37b05f1ac924b40a2a530c8ad1b18edc873b681e0c86ed0394c2",
+    "patterns/p22-hash-probe/NOTES.md": "50582f63adf776869b27634f96560243ac8f74283a299b2177787e78f21fa922",
+    "patterns/p22-hash-probe/README.md": "3ff315f9957f5b0e0d6ae7dca9df98242cd71eccea52d6604560b1f7e3fad858",
     "patterns/p22-hash-probe/c/kernel.c": "f3ea8cc679f5c86d3c20289c009ae64a965366764394d052f37de79858202528",
     "patterns/p22-hash-probe/c/kernel.h": "911260a439df516ab72d6283212e0ef86daa0ad8f0f5cc77fdb0d293a291c9d7",
     "patterns/p22-hash-probe/c/kernel_hardened.c": "bcbfa36ce7acd64db13c330cc5ac1359461bd9d7ccef063f56aa0a5930546af7",
@@ -160,13 +160,13 @@
     "patterns/p22-hash-probe/controls/clayout.py": "4db25cde386cdb5f1403a3e46c102bd60d2f48e6b1fb467ff08a97e981fdb2ac",
     "patterns/p22-hash-probe/controls/dyn_ir.py": "31b60d9b3c8402c43359e4844a5837cf75bf0a6c32445402777885f5e0b25a7c",
     "patterns/p22-hash-probe/controls/gen_controls.py": "6f17675d472e3918d31498d0df61d7245c221f41c81a22a5a29132c16106df79",
-    "patterns/p22-hash-probe/controls/mkcontract.py": "a2e9109cd0c820037a3b2bc8cb64118276cab7fa68993e49e2f5d1bc8e9173ce",
+    "patterns/p22-hash-probe/controls/mkcontract.py": "fe884b7d059b4a59bfc90d2f5d7d11e29c21d6efd99245f3c08deccc2f432931",
     "patterns/p22-hash-probe/controls/sweep_ir.py": "965971c507964c9845416496cc6f5770061ef4c8fa8d70eef1cc2389c3d58f7b",
     "patterns/p22-hash-probe/inputs/gen.py": "0fee3932b1b506a09344c7e8287d87cf241b99c4d52c529c2b89a4fab14998ce",
     "patterns/p22-hash-probe/model.py": "24b9b418eeec1d914ee2de13bac113ebb0664cb56c64ecdf956e2f58f5a4faad",
     "patterns/p22-hash-probe/safe_naive.rs": "9c71760f4f876ee8faec963278f8a559a28575f149498cef17421cece55fcd45",
     "patterns/p22-hash-probe/safe_tuned.rs": "f86d71efb9eea6251cf0d659909c845ba8608d2f74b6985ca788de3622e637b1",
-    "patterns/p22-hash-probe/spec.md": "3983d39ed1101531b41157af8c6405f064dbd1b61e0cbb7ab98a7d29a07fc0f4",
+    "patterns/p22-hash-probe/spec.md": "1b8291dd63967d1dafad33adb209eb185ac6a74d697a28bd29347712dddf0418",
     "patterns/p22-hash-probe/unsafe.rs": "63a1e32ae8b7205c5cd06e373c716d4b5c07b3b15707db61cd342d690bf30671",
     "patterns/p22-hash-probe/verus.rs": "22f3538929c4b2e8ebda09686b30395648b9f90f3eee985d32b06a0e0975a6fe",
     "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
@@ -1499,7 +1499,22 @@
         "ub": false,
         "stdout": "15820751917455319872",
         "model_stdout": "15820751917455319872",
-        "stderr": ""
+        "stderr": "",
+        "expected_hang": true,
+        "hung_rungs": [
+          "c-clang",
+          "c-gcc"
+        ],
+        "measured_rungs": [
+          "c-clang",
+          "c-clang-h",
+          "c-gcc",
+          "c-gcc-h",
+          "safe_naive",
+          "safe_tuned",
+          "unsafe",
+          "verus"
+        ]
       },
       {
         "source": "unsafe.rs",

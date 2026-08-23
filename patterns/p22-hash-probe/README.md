@@ -6,10 +6,15 @@ where safe Rust does not help.**
 `spec.md` is the contract. `NOTES.md` has every measurement. This file is the
 summary.
 
-> ⚠ **The gate verdict for p22 is `PASS-WITH-BLOCKED-ROWS`, not `PASS`.** One
-> input is declared non-terminating, and a declared-hang input is a blocked Miri
-> row by construction. p01 is the only other pattern in the tree that lands
-> there. Nothing is broken; see `NOTES.md` §11.
+> ⚠ **The gate verdict for p22 is `PASS`** — it read `PASS-WITH-BLOCKED-ROWS`
+> until TASK_077. One input is declared non-terminating, and a declared-hang
+> input used to be a blocked Miri row *by construction*, because the block read
+> the per-input declaration and a per-input bool cannot say which **rung** runs
+> forever. The gate now reads stage 4's own per-rung `hung` column: on p22 the
+> hang is `c-gcc`/`c-clang` and the rung Miri interprets (`unsafe.rs`) returns,
+> so the row runs and passes. p01 is now the only pattern in the tree on
+> `PASS-WITH-BLOCKED-ROWS`, for the unrelated reason that Miri does not finish
+> its `large.bin`. See `NOTES.md` §11 and §11a.
 
 ## What it is
 

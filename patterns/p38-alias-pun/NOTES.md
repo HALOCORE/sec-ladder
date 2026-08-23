@@ -495,27 +495,100 @@ the parity step with a fold trip count of `2*rlen mod 4`, but neither is
 confirmed, and the law does not rest on either (PROTOCOL rule 12 asks for the
 mechanism; on this one the honest answer is that it is owed).
 
-### 4d. Wall clock
+### 4d. Wall clock — and **the 10% discard threshold is the wrong instrument**
 
 Secondary, and **the discard count is NOT STABLE ACROSS RUNS, which is itself
 the reason no claim rests on it** — read the count off
-`results/tables/p38-alias-pun.md`, never from here. Three `measure.py p38` runs
-on this box, same tree, same binaries:
+`results/tables/p38-alias-pun.md`, never from here. ⚠ **Never quote a cell out
+of the history below as "what ships": the shipped set is whatever the current
+table says, and this list is a record of how far it moves.** Seven
+`measure.py p38` runs on this box, on a tree whose measured behaviour never
+changed; **five left a committed record and two did not**. Read straight out of
+`git`, so what is here is re-derivable —
+`git show <rev>:results/p38-alias-pun.json` and count
+`wall[*].spread_pct > 10`:
 
 ```
-TASK_066 record   4 of 32   c-clang/iso 11.09  safe_naive/iso 11.66  unsafe/iso 10.92  c-clang-h/whole 10.25
-TASK_067 run 1    0 of 32   (none)
-TASK_067 run 2    3 of 32   safe_naive/whole 12.5  verus/iso 10.9  c-clang-h/iso 10.7     <- what SHIPS
+rev       task              discards   safe_naive/whole small.bin
+51de7e1   TASK_066            4 of 32        8.98%
+(uncommitted) TASK_067 run 1  0 of 32        -- record OVERWRITTEN, unrecoverable
+8a26ead   TASK_067 run 2      3 of 32       12.48%
+018c1d1   (no re-measure)     3 of 32       12.48%
+(uncommitted) TASK_077 run 1  ? of 32       -- record OVERWRITTEN, unrecoverable
+01bf438   TASK_077 run 2      6 of 32       11.09%
+working   TASK_078            5 of 32       10.86%
 ```
 
-⚠ **This file used to say "6 of 32", which disagreed with the very table it
-cited** (TASK_066_REVIEW m2). **Every kernel-exclusive `Ir` figure in §4a is
-byte-for-byte identical across all three runs**; only the wall column moved, and
-it did not move the same cells twice. **No claim above rests on a wall-clock
-row.**
+**4 → (0) → 3 → 6 → 5 on a tree whose measured behaviour never changed**, and
+`safe_naive/whole` on `small.bin` has read **8.98 → 12.48 → 11.09 → 10.86**
+across the four recoverable records.
+
+⚠ **Two of the seven runs left no artefact, and a figure from one of them has
+already been quoted twice.** TASK_077's `NOTES.md` reported *"safe_naive/whole
+lost, 12.5% → 6.1%"* from a first re-measure that a second one overwrote 55
+minutes later; TASK_077_REVIEW M3 correctly refuted the *conclusion* and then
+carried the `6.1%` forward into its own sequence *"12.5% → 6.1% → 11.1%"*. **The
+`6.1%` is not in any committed record and cannot be checked.** It is dropped
+here rather than repeated. `measure.py` overwrites `results/pNN.json` in place,
+so **a wall figure that was not committed did not happen**; that is the rule this
+row exists to make concrete.
+
+⚠ **The TASK_077 → TASK_078 step is the cleanest measurement of it, because the
+only committed change between the two runs is a DOCSTRING** in `model.py`
+(verified: the two files have identical ASTs once docstrings are blanked,
+`.temp/p78/docstring_only.py`). The re-measure was owed by the hash, not by the
+semantics. Straight off the two records (`.temp/p78/p38diff.py`):
+
+```
+ir          : 32/32 identical
+static      : 32/32 identical
+checksum    : 32/32 identical
+wall figures: n=64 (min_s + median_s over 32 rows)  median |move| 0.48%  max 3.73%
+spread_pct  : n=32  before median 4.46% max 11.97%   after median 4.18% max 12.82%
+discarded (> 10.0% min-to-median):  before 6, after 5
+  GAINED (3): c-gcc/O3/isolated, c-gcc/O3/whole, unsafe/O3/whole   (all small.bin)
+  LOST   (4): c-clang/O3/whole, safe_tuned/O3/isolated, verus/O3/isolated,
+              verus/O3/whole
+```
+
+**Seven of 32 cells crossed the threshold while the timings underneath moved by
+a median of 0.48%.** That is not a noisy measurement being reported honestly; it
+is a **cliff**, and `small.bin` sits on it.
+
+**And the statistic the threshold reads is far noisier than the ones the report
+quotes.** `spread_pct` is `(median − min)/min`, a difference of two order
+statistics of 30 reps, so it inherits the noise of both:
+
+```
+timings   (min_s, median_s) : n=64  median |move| 0.48%   max  3.73%
+spread_pct                  : n=32  median |move| 0.76pp  max  6.48pp
+```
+
+— and a 6.5-point move on a 10-point threshold decides the row. `TASK_077_REVIEW`
+measured the same shape against the TASK_067 record (`spread_pct` median 14.18%,
+max 48.77%, against 0.50% / 3.62% for the timings).
+
+**Conclusion, and it is a project-level one rather than a p38 one:** the
+min-to-median spread is a fine *warning* and a bad *gate*. The count belongs in
+the table as a caution flag, and **no cross-run comparison of discard sets means
+anything** — including the tempting reading *"this change made cell X noisy"*.
+`.memory/03-measurement.md` step 4 is where the rule lives; this section is the
+fifth observation behind it.
+
+**Every kernel-exclusive `Ir` figure in §4a is byte-for-byte identical across
+every one of these records**; only the wall column moved, and it has never moved
+the same cells twice. **No claim above rests on a wall-clock row.**
 p38's per-call `Ir` differences are 0.4%–4% of the kernel, which is inside this
 box's layout band for several rungs (`.memory/05-layout.md`), so the honest
 statement is that the `ns` column neither confirms nor contradicts §4a.
+
+⚠ **This file used to say "6 of 32", which disagreed with the very table it
+cited** (TASK_066_REVIEW m2) — and then, at TASK_077, it carried a *"what
+SHIPS"* annotation on the TASK_067 row after two further runs had superseded it,
+plus a gained/lost list computed from a first re-measure that a second one had
+already overwritten (TASK_077_REVIEW B2, M3). Both defects are the same one:
+**a wall-clock cell quoted in prose is stale the next time anybody runs
+`measure.py`.**
 
 ---
 
@@ -553,7 +626,7 @@ the row is a per-(cell, opt, mode) table and not a per-rung one, and why the
 | instrument | sees p38? | domain |
 |---|---|---|
 | **model.py / stage 2 checksums** | on `c-gcc O3` only, and only on an adversarial input | every well-formed input clamps, so no measured cell can diverge |
-| **ASan** | **yes** — `stack-buffer-overflow READ of size 2` | ⚠ **only when built with `-fstrict-aliasing`, which is a FLAG and not a level** — see §6b. The gate's stage 7 builds `-O1` without it, so `model.py` declares `sanitizer_expect: "clean"` on every input. `controls/gen_controls.py --run s_asan_O3` and `--run s_asan_O1_sa` are the two builds that fire. |
+| **ASan** | **yes** — `stack-buffer-overflow READ of size 2` | ⚠ **only when built with `-fstrict-aliasing`, which is a FLAG and not a level** — see §6b. ✅ **The gate's stage 7 passes that flag since TASK_077**, so `model.py` declares `sanitizer_expect: "fires"` on `adversarial-huge` and `adversarial-oob` and `"clean"` on the other six. (Until TASK_077 stage 7 built `-O1` without it and the declaration was `"clean"` on every input.) `controls/gen_controls.py --run s_asan_O3` and `--run s_asan_O1_sa` are the two standalone builds that fire; both now agree with stage 7 rather than standing in for it. |
 | **UBSan** | **partially, and for the wrong reason** | `-fsanitize=undefined` has **no strict-aliasing check at all**. It fires here as `array-bounds` — `index 256 out of bounds for type 'uint16_t [256]'` — i.e. it catches the *consequence* on `adversarial-oob`, where the index leaves a statically-typed fixed-size array, and is **silent on `adversarial-stale`**, where the same violation stays inside it. On `harm5.c` (heap buffer) UBSan is silent while 3994 words are read out of bounds. |
 | **TySan** (`-fsanitize=type`) | **yes, directly** — `TypeSanitizer: type-aliasing-violation` | **the only instrument that sees the violation itself rather than a consequence.** New to this project. Its blind spot is §6a. |
 | **Miri** | **no, and there is nothing to see** | Miri checks the Rust rungs, which are correct. It is also silent on the `r4_pun` control, which performs the *exact analogue* of the C violation — because in Rust it is not a violation. |
@@ -627,7 +700,14 @@ did. That is the correction: the domain is *promotable object*, and `isolated`
 vs `whole` is a proxy for it that happens to be exact on a two-line function and
 inexact on a real one.
 
-### 6b. ⚠ The gate's sanitizer stage does not see p38, and the hole is ONE FLAG WIDE
+### 6b. ⚠ The gate's sanitizer stage did not see p38, and the hole was ONE FLAG WIDE — **CLOSED at TASK_077**
+
+> ✅ **STATUS: the flag was added and this section is now HISTORY.**
+> `check.py::check_sanitizers` passes `-fstrict-aliasing` since TASK_077, so
+> stage 7 sees p38 at `-O1` and `model.py::sanitizer_expect` declares `"fires"`
+> on `adversarial-huge` and `adversarial-oob`. What follows is the finding as it
+> stood; **the census at the bottom of the section is recomputed** and the two
+> sentences the fix falsified are corrected in place.
 
 ⚠ **This section used to say the gate's stage 7 was "structurally blind" to p38
 because it builds at `-O1`, which read as *"the repair is to raise stage 7's
@@ -652,35 +732,58 @@ correction — do not quote any one of them as "the" wrong answer.)
 
 The last row is `controls/gen_controls.py --run s_asan_O1_sa`, which is
 `--run s_asan_O1_gate` — the gate's own stage-7 command line — **plus one
-token**. Stage 7 builds `-O1 -fsanitize=address,undefined` in
-**`check_sanitizers`** (`harness/check.py:5108`); adding `-fstrict-aliasing` there makes it see p38 **at
-`-O1`**, changing nothing about the level. ⚠ **`harness/` is not this pattern's
-to edit and the change is queued to be batched** (RECAP "Owed" 12).
+token**. ✅ **That token is now in the gate.** `check_sanitizers` builds
+`-O1 -fsanitize=address,undefined -fstrict-aliasing`, so stage 7 sees p38 **at
+`-O1`**, changing nothing about the level.
 
-**Blast radius, across all 20 gate records: EXACTLY ONE PATTERN.**
-**15** patterns declare at least one `sanitizer_expect: "fires"` input, and
-**every declared row of every one of them fired**, at `-O1`, in the committed
-records — **36** `fires` rows, 36 fired, including **p18-varint-shift, the other UB
-pattern, on all four of its rows**. **5** declare none:
+**Blast radius, re-derived at TASK_077 by building stage 7's own command line
+twice — with and without the token — for all 22 patterns and running both on
+every input: 158 rows, 3 differ, all 3 on p38.** Confirmed at the record level
+by TASK_077_REVIEW #49: every non-p38 `sanitizer` change lies inside the
+`diagnostic` string (ASan pid, stack/heap addresses); `exit`, `fired`, `expect`
+and `stdout` move only on p38's `adversarial-huge` and `adversarial-oob`
+(clean → fires) and `adversarial-stale` (checksum moves, no diagnostic).
+
+⚠ **THE CENSUS IN THIS SECTION IS A DENOMINATOR AND HAS GONE STALE TWICE.
+RECOMPUTE IT, DO NOT QUOTE IT** — `.temp/p78/fires_census.py`, which drives
+every pattern's `model.py` over its matrix inputs:
+
+```
+22 patterns, 158 rows, 17 pattern(s) declare >=1 `fires`, 40 fires row(s)
+```
+
+It read **15 patterns / 36 rows / 20 gate records** when this section was
+written, **16 / 38 / 158** immediately before TASK_077, and **17 / 40 / 158**
+after it. Two of those moves are new patterns (p22, p36) and one is p38's own
+two rows; **the direction of the claim never changed** — every declared `fires`
+row still fires at `-O1`. The **5** patterns declaring none are now **5** still,
+but the membership moved: p38 left it.
 
 | pattern | why its adversarial rows are sanitizer-clean |
 |---|---|
 | p01-array-sum, p08-overlap-move | model no memory-safety bug at all |
 | p04-ring-buffer | the missing fullness check **overwrites in bounds** — "every index it forms stays inside the array"; nothing to see, for a KERNEL reason |
+| p22-hash-probe | the harm is **non-termination**; every access is `tab[i % 64]` |
 | p47-ct-compare | the harm is a **timing** property, outside every sanitizer's domain |
-| **p38-alias-pun** | **the kernel's harm is a real OOB read and ASan does see it — under a flag the gate does not pass** |
 
 ⚠ **The review's arithmetic here was 16 and 4** (TASK_066_REVIEW M2); recounted
-from the records it is **15 and 5** — it missed p04, whose row is clean for
-p17's reason. **The conclusion is unchanged**, because p04's cleanliness is a
-property of its kernel:
+at the time it was **15 and 5** — it missed p04, whose row is clean for
+p17's reason.
 
-> **p38 is the only pattern in this tree whose declared-clean adversarial row is
-> clean because of the gate's BUILD FLAGS rather than because of its kernel.**
+> ⚠ **The sentence that used to close this section — *"p38 is the only pattern
+> in this tree whose declared-clean adversarial row is clean because of the
+> gate's BUILD FLAGS rather than because of its kernel"* — is now FALSE, and it
+> is false because the flag was added.** p38 declares `"fires"` on two of its
+> three clamping rows; the third, `adversarial-stale`, is clean for a **kernel**
+> reason — the unclamped extent stays inside `sc[256]`, so there is no
+> out-of-bounds access for a sanitizer to report, and the harm is a wrong
+> checksum. **No pattern in the tree is now in the BUILD-FLAGS category.** That
+> category having exactly one member, and that member disclosing it, is what
+> made the hole cheap to close.
 
-So this is a p38 note plus a one-line gate fix, and not a `major` about the
-gate's history: the hole has never hidden anything but p38, and p38 discloses it
-here, in `model.py::sanitizer_expect` and in `spec.md`.
+So this was a p38 note plus a one-line gate fix, and not a `major` about the
+gate's history: the hole never hid anything but p38, p38 disclosed it here, in
+`model.py::sanitizer_expect` and in `spec.md`, and it is shut.
 
 ---
 

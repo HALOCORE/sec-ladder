@@ -1187,7 +1187,22 @@ perturb 20 patterns to fix one.** The class is **flag-gated, not level-gated**:
 `gcc -O1 -fstrict-aliasing` already prints the wrong checksum, and ASan already
 reports `stack-buffer-overflow READ of size 2` **at `-O1`**.
 
-✅ **Blast radius, recounted across all 20 gate records: EXACTLY ONE PATTERN.**
+✅ **CLOSED at TASK_077 — the token is in `check_sanitizers` and the hole is
+shut.** ⚠ **RECOUNT BEFORE QUOTING ANY NUMBER IN THIS PARAGRAPH: the census
+below is STALE THREE WAYS and was stale in three separate files at once.**
+Measured after the change: **22 patterns, 158 sanitizer rows, 17 declaring at
+least one `fires`, 40 `fires` rows** (16/38 immediately before). The paragraph
+says 15/36, a task file said 16, and p38's README said *"20 gate records"* —
+all three predate p22 and p36. **The conclusion is unchanged and the blast
+radius re-derived at 158 rows / 3 differ / all 3 on p38.** Recompute rather
+than quote:
+```
+python3 -c "import glob,json;rs=[r for f in glob.glob('results/gate/p*.json') for r in json.load(open(f)).get('sanitizer',[])];print(len(rs),sum(1 for r in rs if r.get('expect')=='fires'))"
+```
+
+*Original text kept below.*
+
+**Blast radius, recounted across all 20 gate records: EXACTLY ONE PATTERN.**
 **36 `fires` rows across 15 patterns, and all 36 already fire at `-O1`** —
 including **p18, the other UB pattern, on all four rows**. ⚠ The review first
 reported 15/5 as *16/4*; it missed **p04-ring-buffer**, whose adversarial rows
@@ -1270,10 +1285,31 @@ cell and 900× below `RUN_TIMEOUT`.
 the budget is not absurdly short, **not** that every recorded `hung=True` is
 right. One-line change if a pattern needs all of them.
 
-## Two gate defects the hang machinery shipped with, both measured twice
+## Two gate defects the hang machinery shipped with — BOTH FIXED at TASK_077
 
-**Found on p22, the mechanism's first user. Neither is fixed; both need
-`harness/` edits and are queued (RECAP "Owed").**
+✅ **Both closed. Kept because defect (1) turned out to be a check that was NOT
+RUNNING AT ALL, not merely a comment that was wrong** — and the shape is worth
+remembering: the *reason string* was false, the *consequence* was a silently
+skipped Miri row, and the gate was green throughout.
+
+**What replaced them.** `check_miri` now reads **stage 4's MEASURED per-rung
+`hung` column** instead of the per-input `model.expected_hang` declaration, so a
+declared hang no longer blocks anything by itself; `_confirm_hang` re-runs
+**every** hung cell rather than one. **Tree-wide, unchecked-for-UB rows went
+1 → 0**, and p22 moved `PASS-WITH-BLOCKED-ROWS` → `PASS`.
+
+⚠ **That verdict move is the shape of a WEAKENED check, and it was verified not
+to be one** (TASK_077_REVIEW A0): an independent gate re-run reproduced the
+record byte-identically, **nine doctored stage-4 tables were built and the block
+still fires in six** — including *hangs only at `-O3`* and *hangs only in
+`whole`*, because `_hung_rungs`' `any()` collapses conservatively — and **zero
+changed lines touch the `ub` / exit-code / stdout comparison chain**.
+⚠ **`_hung_rungs` now returns `(hung, measured)`** so a rung that was never
+measured cannot be reported as one that terminated.
+
+*The original entry is kept below, because the diagnosis is the reusable part.*
+
+**Found on p22, the mechanism's first user.**
 
 **1. `check_miri`'s block reason is structurally false for EVERY pattern here.**
 It says *"R4 does not return under Miri either"*. Measured on p22: `miri` on the

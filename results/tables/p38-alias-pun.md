@@ -1,6 +1,6 @@
 # p38-alias-pun — results
 
-Generated 2026-08-23T18:11:43Z from `results/p38-alias-pun.json` (git `018c1d13655c`, working tree dirty).
+Generated 2026-08-23T19:54:37Z from `results/p38-alias-pun.json` (git `50472d227f36`, working tree dirty).
 
 ## Toolchain
 
@@ -171,31 +171,30 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 7.16 | 7.33 | 2.4% | 5.26 | 5.49 | 4.5% |
-| c-gcc | whole | 7.20 | 7.38 | 2.6% | 5.17 | 5.49 | 6.3% |
-| c-clang | isolated | 9.91 | 10.19 | 2.8% | 6.59 | 7.03 | 6.7% |
-| c-clang | whole | 9.87 | 10.05 | 1.8% | 6.35 | 7.02 | **10.5% ✗** |
-| safe_naive | isolated | 9.97 | 10.17 | 1.9% | 6.71 | 7.21 | 7.4% |
-| safe_naive | whole | 11.00 | 11.22 | 2.1% | 7.11 | 7.90 | **11.1% ✗** |
-| safe_tuned | isolated | 9.98 | 10.18 | 2.0% | 6.15 | 6.78 | **10.4% ✗** |
-| safe_tuned | whole | 6.88 | 7.01 | 2.0% | 4.78 | 5.10 | 6.6% |
-| unsafe | isolated | 9.98 | 10.22 | 2.4% | 6.04 | 6.55 | 8.4% |
-| unsafe | whole | 9.92 | 10.12 | 2.0% | 6.31 | 6.85 | 8.6% |
-| verus | isolated | 10.04 | 10.16 | 1.2% | 6.17 | 6.85 | **11.1% ✗** |
-| verus | whole | 10.01 | 10.17 | 1.6% | 6.10 | 6.75 | **10.6% ✗** |
-| c-gcc-h | isolated | 7.22 | 7.36 | 1.9% | 4.97 | 5.26 | 5.9% |
-| c-gcc-h | whole | 7.27 | 7.59 | 4.4% | 4.93 | 5.27 | 6.8% |
-| c-clang-h | isolated | 9.83 | 10.09 | 2.6% | 5.98 | 6.70 | **12.0% ✗** |
-| c-clang-h | whole | 9.90 | 10.04 | 1.5% | 6.23 | 6.77 | 8.7% |
+| c-gcc | isolated | 7.17 | 7.31 | 2.0% | 5.06 | 5.57 | **10.1% ✗** |
+| c-gcc | whole | 7.28 | 7.36 | 1.1% | 5.02 | 5.66 | **12.8% ✗** |
+| c-clang | isolated | 9.93 | 10.08 | 1.5% | 6.56 | 7.04 | 7.3% |
+| c-clang | whole | 9.86 | 10.01 | 1.5% | 6.40 | 7.03 | 9.8% |
+| safe_naive | isolated | 9.96 | 10.13 | 1.8% | 6.80 | 7.11 | 4.5% |
+| safe_naive | whole | 11.05 | 11.22 | 1.5% | 7.13 | 7.90 | **10.9% ✗** |
+| safe_tuned | isolated | 10.00 | 10.17 | 1.7% | 6.15 | 6.70 | 8.9% |
+| safe_tuned | whole | 6.83 | 7.00 | 2.5% | 4.79 | 5.16 | 7.8% |
+| unsafe | isolated | 9.99 | 10.22 | 2.3% | 5.99 | 6.54 | 9.2% |
+| unsafe | whole | 9.99 | 10.14 | 1.5% | 6.13 | 6.75 | **10.1% ✗** |
+| verus | isolated | 10.00 | 10.16 | 1.6% | 6.34 | 6.71 | 5.9% |
+| verus | whole | 9.95 | 10.17 | 2.2% | 6.14 | 6.60 | 7.5% |
+| c-gcc-h | isolated | 7.16 | 7.37 | 2.9% | 4.90 | 5.23 | 6.8% |
+| c-gcc-h | whole | 7.27 | 7.54 | 3.8% | 4.90 | 5.15 | 5.1% |
+| c-clang-h | isolated | 9.90 | 10.12 | 2.2% | 5.96 | 6.65 | **11.5% ✗** |
+| c-clang-h | whole | 9.85 | 10.07 | 2.3% | 6.23 | 6.71 | 7.7% |
 
-**6 of 32 wall-clock cells exceed the 10% min-to-median spread threshold and are DISCARDED** per `.memory/03-measurement.md` step 4. They are printed above marked ✗ rather than deleted, because a missing cell that looks like an omission is worse than a documented failure (`.memory/02-bench-rules.md`). **No claim in this report rests on a marked row.**
+**5 of 32 wall-clock cells exceed the 10% min-to-median spread threshold and are DISCARDED** per `.memory/03-measurement.md` step 4. They are printed above marked ✗ rather than deleted, because a missing cell that looks like an omission is worse than a documented failure (`.memory/02-bench-rules.md`). **No claim in this report rests on a marked row.**
 
-- `c-clang / whole` on `small.bin`: spread 10.5%
-- `safe_naive / whole` on `small.bin`: spread 11.1%
-- `safe_tuned / isolated` on `small.bin`: spread 10.4%
-- `verus / isolated` on `small.bin`: spread 11.1%
-- `verus / whole` on `small.bin`: spread 10.6%
-- `c-clang-h / isolated` on `small.bin`: spread 12.0%
+- `c-gcc / isolated` on `small.bin`: spread 10.1%
+- `c-gcc / whole` on `small.bin`: spread 12.8%
+- `safe_naive / whole` on `small.bin`: spread 10.9%
+- `unsafe / whole` on `small.bin`: spread 10.1%
+- `c-clang-h / isolated` on `small.bin`: spread 11.5%
 
 
 ## Cells and metrics not measured

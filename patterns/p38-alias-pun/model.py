@@ -326,14 +326,59 @@ class Model:
 
         The remaining five inputs (`small`, `large`, `degenerate`,
         `adversarial-nrec`, `adversarial-stride7`) clamp nothing, and the
-        sweep blobs clamp nothing either -- 0 clamped records across all 30 of
-        them -- so the two builds are bit-identical in behaviour there.
+        sweep blobs clamp nothing either -- 0 clamped records across all **31**
+        of them -- so the two builds are bit-identical in behaviour there.
+        (**31, not 30**: TASK_077_REVIEW m5 recounted it and
+        `.memory/02-bench-rules.md`'s rule is *denominators are RECOMPUTABLE,
+        not constants*. Recompute with
+        `ls inputs/sweep-*.bin | wc -l`; the clamp count comes from
+        `_window()`'s second element, `sum(d != u for d, u in recs)`.)
 
-        **Why this is derived and not a filename table**: the condition is a
-        property of the *blob*, computed by `_ub_scratch_overrun` from the same
-        decode the rungs perform, so appending a sweep band cannot silently
-        acquire or lose a declaration. p18's `sanitizer_expect` is written the
-        same way and for the same reason.
+        **Why this is derived and not a filename table**: the condition is
+        computed by `_ub_scratch_overrun` from the same decode the rungs
+        perform, so appending a sweep band cannot silently acquire or lose a
+        declaration by being forgotten in a table. p18's `sanitizer_expect` is
+        written the same way and for the same reason.
+
+        ⚠ **BUT SAY THE DOMAIN EXACTLY, BECAUSE THE OBVIOUS STATEMENT OF IT IS
+        FALSE.** This docstring used to say the condition is *"a property of the
+        BLOB"*. It is a property of the blob **and of the DEFINED window
+        chain** -- and those are not the same thing on a blob with more than one
+        window (TASK_077_REVIEW M4). The loop below iterates `self._win` and
+        skips `None`, *"a window the driver loop never visits"*; but `_win` is
+        populated by `_run`, which walks `k = (acc * self.nwin) >> 64` using the
+        **defined** checksum. A clamped record is precisely where the
+        miscompiled binary's return value parts company with the model's, so
+        from the first divergence the binary visits a **different window
+        sequence** -- and a window this property never looked at can be the one
+        that fires.
+
+        Constructed counter-example, re-run at TASK_078 on a freshly built gate
+        stage-7 binary (`.temp/p78/p38_chain.py`, `.temp/p78/build_asan.sh`):
+        a 2-window blob whose window 0 clamps with the over-read staying inside
+        `sc[256]` and whose window 1 overruns.
+
+            seed  4: model 'clean' (defined chain visits [0]), binary FIRED rc=1
+            seed 11: model 'clean' (defined chain visits [0]), binary FIRED rc=1
+            seed 35: model 'clean' (defined chain visits [0]), binary FIRED rc=1
+              kernel.c:119:42: runtime error: index 256 out of bounds for
+                               type 'uint16_t [256]'
+            3 mismatch(es) found in 400 seeds
+
+        **Why it is latent on everything this pattern ships, and what would
+        break it.** Measured over all 39 shipped blobs
+        (`.temp/p78/p38-census.out`): `visited == nwin` on every one of them --
+        the defined chain reaches every window, so there is nothing it can miss
+        -- and every input that clamps at all (`adversarial-huge`, `-oob`,
+        `-stale`) has `nwin == 1`, so the chain has nowhere to diverge TO. A
+        future sweep band with **>1 window AND a clamping record** is what
+        breaks it. It would break LOUDLY in both directions -- stage 7 compares
+        this declaration against the real binary and fails either way -- so the
+        failure mode is a red gate blaming the model's declaration rather than a
+        silent wrong row. That is why it is recorded here rather than repaired:
+        repairing it means simulating the UNDEFINED chain, i.e. modelling what
+        gcc chose to do, which is the thing `.memory/02-bench-rules.md` says a
+        model must not do.
 
         `../controls/gen_controls.py --run s_asan_O3` is the `-O3` ASan build
         and `--run s_asan_O1_sa` the one-flag `-O1` one; ../NOTES.md 6 records

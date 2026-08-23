@@ -88,7 +88,7 @@ Every delta below is a difference between rungs that are meant to be spellings o
 
 ### Spelling audit (stage `0b`, reporting only)
 
-Measured by the gate, not by this file — from `results/gate/p22-hash-probe.json`, contract `09eea1c6f8ee`.
+Measured by the gate, not by this file — from `results/gate/p22-hash-probe.json`, contract `40a96deb7de9`.
 
 `39` backticked spelling(s) over `6` rung(s) → **116** (spelling, rung) pair(s), **64** present — not the product, because a per-language entry is read against its own language's rungs only. Matching is `check.spelling_matches`: comments, string literals and Verus ghost clauses blanked, then all whitespace deleted.
 

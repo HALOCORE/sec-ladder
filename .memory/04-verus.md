@@ -446,6 +446,30 @@ does. Every pattern's `spec.md` now carries, and `harness/check.py` diffs:
    longer depends on recognising an attribute. Useful in its own right when
    debugging: it tells you which item an obligation belongs to.
 
+   ⚠ **IT HAS THREE ANSWERS, NOT TWO, AND `check.py` HANDLED TWO** (TASK_077,
+   corrected at TASK_078). A `check.py` comment claimed an ambiguous
+   `--verify-function` *"silently reports 1 verified"*. **Measured at the pin, it
+   does not — it errors and refuses to pick:**
+
+   ```
+   error: more than one match found for --verify-function apply
+      matched results are: A::apply, A::spec_apply, B::apply ...
+   ```
+
+   **The three answers are: resolved-and-verified, `could not find function`, and
+   AMBIGUOUS.** The gate's `_UNRESOLVED_RE` matched only the second, so an
+   ambiguous query returned `resolved=True, verified=None` and printed *"Verus
+   resolved the item and has no verified body for it"* — **TASK_008_REVIEW major
+   E's false diagnosis, one answer over.** A branch now exists.
+
+   ⚠⚠ **AND THE TRAP IS SUBSTRING MATCHING, NOT DUPLICATE NAMES.**
+   `--verify-function apply` matches **`spec_apply`**, so ambiguity fires with
+   **one `impl` and no duplicate item name at all**. **All 22 `verus.rs` files
+   already carry a substring-ambiguous pair** — `slb_twin_*`, `shift_round` /
+   `shift_rounds`, `popcnt` / `lemma_popcnt_le`, `toks` / `fold_toks`,
+   `suf_at` / `nsuf_at`, `apply` / `spec_apply`. **Qualify the name, and never
+   assume a bare one selects what you meant.**
+
 4. **The Python contract the gate evaluates is generated from the Verus clause
    text**, through a declared `verus.translate` table in `spec.md` (TASK_005).
    `contract["requires"]` and `verus.items[...]["requires"]` used to be two

@@ -203,3 +203,62 @@ regression. (b) leaves the tree honest but leaves the eight-impl spelling
 refused, so "Owed" 20 stays open with a smaller claim. **I lean (a) only if the
 five call sites are mechanical; if any consumer's semantics depend on the bare
 key, take (b) and say so.** **Do not take (a) to make an item close.**
+
+---
+
+## Outcome (recorded by the manager at the task boundary)
+
+**Landed.** **22 patterns, 21 `PASS` + 1 `PASS-WITH-BLOCKED-ROWS` (p01 only),
+0 failures, 44 records 0 STALE.** Full sweep **2672 s = 44.5 min**, of which
+**+79 s is p22 alone** — the whole price of `_confirm_hang` going from 1 cell to
+8.
+
+⚠ **F1 came out route (b), and the engineer produced the argument that makes it
+not a judgement call.** Threading `qualified=True` cannot work, for a reason
+nobody had found: **`check_trusted_twins` builds its lookup key as
+`TWIN_PREFIX + t.name`, which HITS in a bare-keyed map and MISSES in a qualified
+one**; and **`vparse.impl_spans` refuses any `impl` whose preceding character is
+not `{};`**, while `#[cfg(slb_twin)]` ends in `]` — **so qualification cannot
+separate the twins the twin stage requires, on the very file "Owed" 20 exists
+for.** The engineer also found a **sixth** consumer the review did not name
+(`harness/limbs.py:102`). ✅ **The claim was corrected instead of the code, with
+five new selftest assertions pinning both limits. "Owed" 20 is NARROWED, not
+closed, and the manager was one commit from closing it.**
+
+**Four manager decisions:**
+
+1. **Rule 5 returns to force.** Two consecutive overrides is the most this
+   project has run; both were justified by *measured* defects and the queue is
+   now empty of them. **Next task is a pattern.**
+2. **`.memory/` landed across six files** — the two gate defects **closed** with
+   the diagnosis kept (defect 1 was *a check that was not running at all*, not a
+   comment that was wrong); the **≈18% session-shift figure RETRACTED** as a p08
+   one-off; the **10% discard threshold recorded as a cliff**; `--verify-function`'s
+   **third answer** and its substring trap; and a new section in
+   `.memory/05-layout.md` for **the generated, unhashed layer nothing watches.**
+3. ⚠ **RECAP's "expect that verdict" advice was INVERTED, not updated.** It told
+   readers a blocked Miri row on a hang-declaring pattern *"is not a defect"*.
+   **It was one** — the row was silently skipped on a false reason for as long as
+   the mechanism has existed. **A blocked Miri row is now worth investigating.**
+4. **`results/tables/{p09,p12,p27}` are content-stale and were NOT regenerated**
+   — not this task's patterns, free to fix, and p27's still shows "Owed" 10's
+   pre-correction counts. **Queued as new "Owed" work, not silently left.**
+
+⚠ **PROTOCOL rule 2's running count is 203:** 197 at TASK_078's writing, **+6**
+— `p22/spec.md` also being generated (the task file said this only of p38), a
+**second** false sentence inside p22's contract block that the review missed
+(`run.why` pricing `_confirm_hang` at *"one hung cell, about 36 s"*),
+`results/synthesis.md` not being safely regenerable without re-emitting
+`licence.json` first, the review's `6.1%` figure being carried forward from an
+**overwritten** run and present in no committed record, *"22 of 22 tables are
+stale"* being a **trailing-newline artefact** (real content staleness: 4), and the
+sixth `by_name` consumer. **Carry 203 forward.**
+
+**The single most useful thing in this block.** ⚠ **The engineer caught its own
+false disclosure before shipping it** — §11c claimed a `git show | diff` printed
+*"exactly the two hunks"*; it prints **three**. That is PROTOCOL
+definition-of-done 6's exact failure mode (*"a disclosure is what a reviewer
+trusts INSTEAD of re-checking, so a wrong one removes the check it was meant to
+enable"*), caught by the author rather than the reviewer, and paid for with a
+gate re-run rather than argued away. **That is the behaviour the running count
+exists to produce, arriving unprompted.**

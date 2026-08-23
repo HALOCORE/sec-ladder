@@ -117,8 +117,12 @@ identical `Bi`, and **2.33× apart in wall clock**.
    included** — permute `TABLE` and `md5_fn` is unchanged while the checksum
    moves. The gate is not unsound; the *checksum* stage is what catches it.
    `controls/identity_probe.py`, `NOTES.md` §5b.
-2. **Eight `impl Op for OpN` blocks verify and the gate refuses them**
-   (`vparse.duplicate_names`). The shipped shape is one
+2. **Eight `impl Op for OpN` blocks verify and the gate refuses them** — still
+   true, but **not** for the reason this line gave until TASK_078. It said
+   `vparse.duplicate_names`; that check keys by scope since TASK_077 and admits
+   them. The refusal now comes from `vparse.by_name`, which is bare-keyed on
+   purpose and is reached by five other `check.py` stages plus
+   `harness/limbs.py`. The shipped shape is one
    `impl<const K: u8> Op for OpTag<K>` with eight monomorphisations, which is
    what makes p36 expressible with no `harness/` change. `NOTES.md` §9b.
 

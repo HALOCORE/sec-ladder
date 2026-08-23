@@ -659,6 +659,20 @@ cell, including cells that had not changed by a byte**. Re-measuring ten pattern
 to clear a hash would move ten patterns' published timing rows and stale every
 sentence quoting them.
 
+⚠ **THE ≈18% FIGURE IS RETRACTED AS A GENERAL ESTIMATE — it is a p08 one-off,
+and it is now the OUTLIER of four observations** (TASK_077/078). Measured
+across re-measures of unchanged cells: **p08 ~18%**, **p10 ~8%**, and **p38
+median 0.50% / max 3.62%** — and on p38's `large` band the mean movement is
+**−0.22%, sign-mixed (−1.52 … +0.89), with no level shift at all.** ⚠ **Do not
+size a re-measure's prose cost at 18%.** The honest statement is that the shift
+**varies by pattern across at least 0.2% … 18%**, so the cost is *"unknown until
+measured, and it has been small three times out of four."*
+
+✅ **And the decision it was used to justify still stands for a better reason**:
+a re-measure moves *which cells are discarded* (see the 10%-cliff note in the
+protocol section below), which is a **presentation** change that no amount of
+timing stability prevents.
+
 > **Decision recorded at TASK_056: the `O3d` mode was built, measured inert (all
 > 24 `(opt, mode, panic)` tuples byte-identical), and then REVERTED** — because
 > the choice was between a permanently red `--check-stale` (which destroys the
@@ -1254,6 +1268,25 @@ otherwise sound and is how the `source_sha256` gap was proved closed.
    all cells instead of concentrating it in one.
 3. ≥30 reps. Report min (the least-perturbed sample) and median. Never mean.
 4. Discard a run whose min-to-median spread exceeds 10% and say so.
+
+   ⚠⚠ **THE 10% THRESHOLD IS A CLIFF, AND ITS OUTPUT IS UNSTABLE ON AN
+   UNCHANGED TREE** (TASK_077 + TASK_077_REVIEW M3 + TASK_078; the cleanest
+   instrument measurement this project has). **p38's discard count, recoverable
+   from `git`, reads `4 → 3 → 6 → 5`** across re-measures where **`Ir` is
+   32/32, static 32/32 and checksums 32/32 BYTE-IDENTICAL**. One cell —
+   `safe_naive/whole` — has read **8.98 / 12.48 / 11.09 / 10.86%**, crossing the
+   line twice. Between the last two runs the only committed change was **a
+   docstring**, and **7 of 32 cells crossed**.
+
+   **Why it is a cliff and not a filter**: the *timings* move by a median of
+   0.50% (max 3.62%) while **`spread_pct` itself moves 30× more** — median
+   14.18%, max 48.77%. **The quantity the rule thresholds is far noisier than
+   the quantity it is protecting.**
+
+   **So: a discard COUNT is not a stable property of a pattern.** Quote it from
+   the table you are looking at, never from prose, and ⚠ **never write "no claim
+   rests on a marked row" without checking** — p38's own §4d quoted three
+   discarded cells and annotated them *"what SHIPS"*.
 5. Frequency scaling is on and cannot be disabled without root. State this next to
    every wall-clock table.
 

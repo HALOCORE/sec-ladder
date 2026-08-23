@@ -521,11 +521,18 @@ Both are runtime-indexed indirect calls. C's is one load and a `call
 it is measured rather than waved at.
 
 ⚠ **Eight `impl Op for OpN` blocks were written first and VERIFIED (19/0). The
-GATE refuses them**: `harness/vparse.py::duplicate_names` fails any pinned file
-that defines a name more than once, and eight impls define `apply` eight times.
-The const-generic `OpTag<K>` shape is what makes p36 expressible inside the
-existing gate with **no `harness/` change**; `OpTag<0>` .. `OpTag<7>` are eight
-distinct types with eight distinct vtables and eight distinct code addresses.
+GATE refuses them** — still, and the REASON has moved. Until TASK_077 the
+refusal was `harness/vparse.py::duplicate_names`, which failed any pinned file
+defining a name more than once; that check now keys by scope and admits the
+eight impls. Five other `check.py` stages, plus `harness/limbs.py`, reach the
+same file through `vparse.by_name`, which is bare-keyed **on purpose** — it
+returns `{name: Item}` and a qualified duplicate would silently drop one — so
+the spelling still fails, now with five messages instead of one (TASK_077_REVIEW
+B1; the route to fixing it was measured and declined at TASK_078, see
+`vparse.by_name`'s docstring). The const-generic `OpTag<K>` shape is what makes
+p36 expressible inside the existing gate with **no `harness/` change**;
+`OpTag<0>` .. `OpTag<7>` are eight distinct types with eight distinct vtables
+and eight distinct code addresses.
 
 ## The adversarial rows
 

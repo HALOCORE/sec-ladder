@@ -2466,8 +2466,18 @@ def _probe_input(src, n_iters, out):
 def _callgrind_total(binary, arg, outfile):
     """Whole-program Ir for one run. Only ever used as one half of a
     *difference*: `.memory/03-measurement.md` shows the absolute value moves
-    with the size of the environment block, and every one of those terms cancels
-    when the same binary is run twice in the same shell."""
+    with the size of the environment block, and the CONSTANT part of that
+    cancels when the same binary is run twice in the same shell.
+
+    ⚠ **The PER-CALL part does not cancel, and this docstring used to say
+    "every one of those terms cancels"** (TASK_077_REVIEW m8). Whatever the
+    environment block does to the initial stack pointer, it does the same way in
+    both runs of a difference -- so a *constant* start-up cost is removed. But a
+    kernel that `memset`s a stack array pays an alignment-dependent cost **per
+    call**, and that term scales with the call count and therefore survives the
+    subtraction. Measured across three patterns at **7 Ir/call** (p03, p04,
+    p38); see `check_marginal_ir`'s docstring for the size, the bistability and
+    the rule."""
     try:
         r = subprocess.run([VALGRIND, "--tool=callgrind",
                             f"--callgrind-out-file={outfile}", binary, arg],
@@ -2523,12 +2533,40 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
     Union over all five probes: **7292.10 … 7292.30**, spread **0.20**, of which
     ~0.10 is the environment and the rest is the build. 100% of the drift is
     inside one glibc `memmove` whose alignment-dependent tail changes by ~0.04
-    Ir/iteration. It is a real between-session term, it is bounded and small,
-    and it threatens no published number (p08's tightest, `R1h - R1 = 0.00`,
-    measured exactly 0.00 in 12 configurations). Two consequences: quote
-    marginals **to the instruction, never to the hundredth**, across sessions;
-    and if p08's 12 cells move by a few hundredths between gate runs, that is
-    this effect and not a code change.
+    Ir/iteration.
+
+    ⚠ **EVERY NUMBER IN THE THREE PARAGRAPHS ABOVE IS p08's, AND p08 IS THE
+    SMALL CASE. Read the next paragraph before quoting `±0.20` at another
+    pattern** (TASK_077_REVIEW m8). This docstring used to close *"it is bounded
+    and small, and it threatens no published number"*, on the strength of p08's
+    `R1h - R1 = 0.00` in 12 configurations. The tree now has **three patterns at
+    ±7 Ir/call**, 35x that bound:
+
+      * **The term is `whole`-mode only.** TASK_077 moved 97 gate marginals
+        without touching p03's or p04's files at all: 40 `isolated` keys moved
+        by at most **0.14** (inside the p08 band above), 57 `whole` keys moved
+        by up to **7.14**. `isolated` is not merely small, it is **exactly
+        invariant** -- p04 `safe_naive O3 isolated large` read 28342.00 at all
+        seven environment sizes probed.
+      * **It is BISTABLE, not scattered.** p08's ±0.10 really is scatter over
+        the pad LENGTH; the ±7 is not. Pad lengths 1, 7, 8, 40, 200 and 700 all
+        give one value and pad 0 gives the other -- the discriminator is the
+        **presence** of a single environment variable, not its size
+        (TASK_077_REVIEW A2 #32). So two gate runs from shells differing by one
+        variable disagree by exactly 7 Ir/call, forever, on an unchanged tree.
+      * **The mechanism is a stack array, not a heap one.** p03, p04 and p38 all
+        `memset` a stack scratch buffer per call; the environment block shifts
+        the initial stack pointer, which shifts that array's alignment, which
+        picks a different tail in `__memset_avx2_unaligned_erms` --
+        `patterns/p03-bounded-stack/NOTES.md` 3b names the same 7 Ir. p08's work
+        is a heap `memmove`, which is why p08 moves in hundredths.
+
+    Three consequences. Quote marginals **to the instruction, never to the
+    hundredth**, across sessions. **Never quote a `whole`-mode marginal across
+    sessions at all** -- quote the `isolated` one, which is what
+    `synthesis/synthesize.py::marginal` already defaults to. And if p08's 12
+    cells move by a few hundredths, or p03/p04/p38's `whole` cells move by
+    exactly 7, between gate runs, that is this effect and not a code change.
 
     **The floor is derived, not declared** (TASK_005 A1). `spec.md` used to pin
     an absolute `min_marginal_ir_per_call`, which is a number the pattern author
@@ -3056,8 +3094,7 @@ def check_adversarial(built, rep, adv_models, indir, cells, budgets=None):
 
 
 def _confirm_hang(rep, name, hung_cells, budget, indir):
-    """Re-run one hung cell **per (rung x opt)** at `10 x budget` and fail if
-    any of them terminates.
+    """Re-run **every** hung cell at `10 x budget` and fail if any terminates.
 
     TASK_069, from TASK_068_REVIEW B2. Without this, "hang" and "slow" are
     indistinguishable to the gate: a real gcc binary that finishes in 3.5 s,
@@ -3078,17 +3115,27 @@ def _confirm_hang(rep, name, hung_cells, budget, indir):
     rung is the axis the *reason* runs along, so the product is what gets
     confirmed.
 
-    **Still not every cell**, and the trade is still deliberate. The cost is
-    `10 x budget x n_distinct(rung, opt)` rather than `10 x budget x n_hung`.
-    Measured on p22, the only pattern that declares a hang: 8 hung cells but
-    **4 distinct (rung, opt) pairs** -- `c-gcc`/`c-clang` x `O0`/`O3` -- so the
-    confirmation goes from 20 s to 80 s at p22's 2.0 s budget, and the two
-    `-O3` cells that C11 6.8.5p6 puts at risk are now both checked. The
-    remaining collapse is over `mode` (isolated/whole), which is a linkage
-    difference and not a licence to delete a loop.
+    ⚠ **AND THE `mode` COLLAPSE IS GONE TOO, because it was the same unmeasured
+    argument in a smaller costume** (TASK_077_REVIEW m3). TASK_077 kept one
+    representative per `(rung, opt)`, and `sorted()` made it the **isolated**
+    cell every time -- so the `whole` cell, where the kernel is inlined into
+    `main` and the C11 6.8.5p6 licence is MOST available, was never re-run. The
+    docstring then asserted *"the remaining collapse is over `mode` ... which is
+    a linkage difference and not a licence to delete a loop"*, which is an
+    argument of exactly the shape this item had just refuted for `rung`. An
+    axis is either measured or it is not; this one now is.
 
-    Cells are picked deterministically (first `mode` in sorted order within
-    each pair) so the check does not move between runs.
+    **So the cost is `10 x budget x n_hung`, the number RECAP "Owed" 17
+    priced.** Measured on p22, the only pattern that declares a hang: **8** hung
+    cells (`c-gcc`/`c-clang` x `O0`/`O3` x `isolated`/`whole`) at a 2.0 s
+    budget, so confirmation goes 20 s -> 80 s -> **160 s**. ⚠ "Owed" 17's
+    *"p22 hangs 12-20 cells"* is a pre-measurement estimate; it is 8.
+    The worst case the matrix allows is 8 rungs x 2 opts x 2 modes = 32 cells,
+    which at a 2 s budget is 640 s -- if a pattern ever gets there, the cheap
+    lever is `run.timeout_s`, not another collapse.
+
+    Cells are keyed by `(rung, opt, mode)`, which is unique per cell, so the
+    dict is a deterministic ordering rather than a selection.
 
     A failure here is about the BUDGET, not the declaration: the input may
     still make some other rung run forever.
@@ -3097,13 +3144,14 @@ def _confirm_hang(rep, name, hung_cells, budget, indir):
     withhold its own `ok` rather than print one beside this failure."""
     if not hung_cells:
         return False
-    # One representative per (rung, opt); `sorted` makes it the lowest `mode`.
+    # Every hung cell. The key is the whole cell coordinate, so this is a sort,
+    # not a choice (TASK_078, from TASK_077_REVIEW m3).
     chosen = {}
     for rung, opt, mode, path in sorted(hung_cells):
-        chosen.setdefault((rung, opt), (mode, path))
+        chosen.setdefault((rung, opt, mode), path)
     longer = min(RUN_BUDGET_CONFIRM * budget, RUN_TIMEOUT)
     good = []
-    for (rung, opt), (mode, path) in sorted(chosen.items()):
+    for (rung, opt, mode), path in sorted(chosen.items()):
         label = f"{rung} {opt}/{mode}"
         rc, out, _ = run_bin(path, os.path.join(indir, name), timeout=longer)
         if rc is None:
@@ -3122,11 +3170,12 @@ def _confirm_hang(rep, name, hung_cells, budget, indir):
                  f"expectation and stage 8 report it BLOCKED for Miri.")
     if len(good) != len(chosen):
         return False
-    rep.ok(f"{name}: confirmed -- all {len(good)} (rung x opt) representative(s) "
+    rep.ok(f"{name}: confirmed -- all {len(good)} hung cell(s) "
            f"{good} still had not terminated at {longer}s "
            f"({RUN_BUDGET_CONFIRM}x the pinned budget), so the {budget}s budget "
-           f"is measuring a hang and not a slow cell. The -O3 cells are in that "
-           f"list by construction: C11 6.8.5p6 makes them the ones at risk.")
+           f"is measuring a hang and not a slow cell. Every (rung x opt x mode) "
+           f"is in that list: no axis is collapsed, which matters most for the "
+           f"-O3/whole cells C11 6.8.5p6 puts at risk.")
     return True
 
 
@@ -3517,6 +3566,17 @@ def check_verus_contract(pdir, rep, contract):
         # `unique_names` degrades to the bare name wherever it is unambiguous,
         # so every `verus.rs` in the tree today keys exactly as it did before
         # and no `spec.md` item pin moves.
+        #
+        # ⚠ **AND THE EIGHT-IMPL SPELLING STILL DOES NOT SHIP -- THIS STAGE
+        # ADMITS IT AND FIVE OTHERS REFUSE IT** (TASK_077_REVIEW B1, measured
+        # again at TASK_078). `vparse.by_name` is bare-keyed on purpose and is
+        # called by `check_call_site`, `check_clause_deletion`,
+        # `check_requires_strength`, `check_trusted_twins` and
+        # `derive_contract`, plus `harness/limbs.py`; each turns its
+        # `ValueError` into a failure reading *"duplicate item name(s):
+        # apply"*. So do NOT read the sentence below as "write eight impls and
+        # the gate is happy": it is not, and RECAP "Owed" 20 is NARROWED, not
+        # closed. The remaining work is in `vparse.by_name`'s docstring.
         dup = vparse.duplicate_names(item_list, qualified=True)
         if dup:
             for nm, its in sorted(dup.items()):
@@ -3683,7 +3743,7 @@ def check_call_site(pdir, rep, contract):
 
     for name in (site, kname):
         mp = (items.get(name).mod_path or "") if items.get(name) else ""
-        nv, ne, res, resolved = _verify_function(src, name, mp)
+        nv, ne, res, resolved, ambiguous = _verify_function(src, name, mp)
         n = nv or 0
         out[name] = n
         if not resolved:
@@ -3693,6 +3753,21 @@ def check_call_site(pdir, rep, contract):
                      f"could not ask the question', not 'the item has no "
                      f"verified body' (TASK_008_REVIEW major E).\n"
                      f"      {(res or '')[-300:]}")
+        elif ambiguous:
+            # TASK_078 / TASK_077_REVIEW M5. Verus's third answer. Without this
+            # arm the `elif` below reports `0 verified` -- "Verus has no
+            # verified body for `{name}`" -- about a query Verus refused to
+            # answer. That is major E's false diagnosis, one answer over.
+            rep.fail("proof-rule2",
+                     f"`--verify-function {name}` is AMBIGUOUS: Verus matches "
+                     f"by substring over the qualified path and more than one "
+                     f"item matched, so it refused to pick and verified "
+                     f"nothing. This is 'the gate could not ask the question' "
+                     f"again -- NOT 'the item has no verified body'. Give "
+                     f"spec.md's `verus.{'call_site' if name == site else 'kernel_item'}` "
+                     f"a name that identifies one item (a `Type::name` "
+                     f"qualification, or a name that is not a proper substring "
+                     f"of another item's).\n      {(res or '')[-300:]}")
         elif nv is None or ne or n < 1:
             rep.fail("proof-rule2",
                      f"`verus --verify-function {name}` reports {n} verified: "
@@ -3721,27 +3796,64 @@ def _verus(path, *extra):
 _UNRESOLVED_RE = re.compile(
     r"could not find function .*specified by --verify-function")
 
+# TASK_078, from TASK_077_REVIEW M5. Verus's THIRD answer.
+_AMBIGUOUS_RE = re.compile(
+    r"more than one match found for --verify-function")
+
 
 def _verify_function(path, name, mod_path=""):
-    """(verified, errors, output, resolved) for one item, asked of Verus.
+    """(verified, errors, output, resolved, ambiguous) for one item, asked of
+    Verus.
 
-    Two answers that used to be one (TASK_008_REVIEW, major E). `--verify-root`
-    restricts the query to the crate root, so a function inside a `mod` is not
-    *unverified* -- it is **unnameable**: Verus replies *"could not find
-    function drive specified by --verify-function; available functions are: -
-    main"*, `_verus` returns `(None, None)`, and the caller reported "the item
-    enclosing the region has no verified body", which is false. The file
-    verifies 2/0.
+    **THREE answers, not two, and the third was measured in the same commit
+    that failed to add it** (TASK_077, caught by TASK_077_REVIEW M5).
 
-    `--verify-only-module <mod> --verify-function <name>` is the query that does
-    resolve it (measured: `1 verified, 0 errors`), so a mod-nested item is now
-    asked properly instead of being misdiagnosed. `resolved` is False only when
-    Verus says it cannot find the name at all, which is a different failure and
-    must be reported as one -- an `impl` method resolves fine either way."""
+    1. **verified** -- `N verified, M errors`.
+    2. **unnameable** (TASK_008_REVIEW, major E). `--verify-root` restricts the
+       query to the crate root, so a function inside a `mod` is not *unverified*
+       -- Verus replies *"could not find function drive specified by
+       --verify-function; available functions are: - main"*, `_verus` returns
+       `(None, None)`, and the caller reported "the item enclosing the region
+       has no verified body", which is false. The file verifies 2/0.
+       `--verify-only-module <mod> --verify-function <name>` is the query that
+       does resolve it (measured: `1 verified, 0 errors`), so a mod-nested item
+       is asked properly instead of being misdiagnosed.
+    3. **ambiguous by SUBSTRING.** Verus matches `--verify-function` against a
+       substring of the qualified path and refuses to pick:
+
+           error: more than one match found for --verify-function apply,
+                  consider using wildcard *apply* to verify all matched
+                  results, or specify a unique substring for the desired
+                  function, matched results are:
+                    - A::apply    - A::spec_apply
+
+       ⚠ **This fires on a file with NO duplicate item name at all** --
+       measured at the pinned Verus on one `impl A` defining `apply` and
+       `spec_apply` (`.temp/p78/vprobe/subambig.log`, TASK_078). So
+       `vparse.duplicate_names(qualified=True)` is not a guard for it: `apply`
+       and `spec_apply` are two different names, and one contains the other.
+       Without this branch `_verus` returns `(None, None)`, `_UNRESOLVED_RE`
+       does not match, `resolved` comes back **True**, and the caller prints
+       *"Verus resolved the item and has no verified body for it"* -- major E's
+       false diagnosis exactly, one answer over.
+
+       Latent today: the label handed to `--verify-function` is `main` on 23 of
+       23 verus-bearing files. But **22 of 22 `verus.rs` files already carry a
+       substring-ambiguous name pair** -- every `slb_twin_*`/base pair, plus
+       `shift_round`/`shift_rounds` (p08), `popcnt`/`lemma_popcnt_le` (p09),
+       `toks`/`fold_toks` (p14), `suf_at`/`nsuf_at` (p17),
+       `apply`/`spec_apply` (p36) -- so the first pattern whose driver region
+       sits outside `fn main` reaches it.
+
+    `resolved` is False only for answer 2; `ambiguous` is True only for answer
+    3. They are reported separately because the fix differs: answer 2 wants a
+    different query, answer 3 wants a longer name."""
     extra = (["--verify-only-module", mod_path, "--verify-function", name]
              if mod_path else ["--verify-function", name, "--verify-root"])
     nv, ne, out = _verus(path, *extra)
-    return nv, ne, out, not (nv is None and _UNRESOLVED_RE.search(out or ""))
+    unresolved = nv is None and bool(_UNRESOLVED_RE.search(out or ""))
+    ambiguous = nv is None and bool(_AMBIGUOUS_RE.search(out or ""))
+    return nv, ne, out, not unresolved, ambiguous
 
 
 def _mutant_path(pdir, src):
@@ -5328,6 +5440,15 @@ def _verus_verified_files(pdir, rep, contract, verus_res):
         # It is checked FIRST and named explicitly, so the refusal is
         # attributed to the duplicate rather than to the generic "no verified
         # body" text below.
+        #
+        # ⚠ **IT IS NOT THE WHOLE OF THE AMBIGUITY, and TASK_077's comment read
+        # as if it were** (TASK_077_REVIEW M5). The refusal fires only on
+        # duplicates qualification cannot separate. Verus matches by SUBSTRING,
+        # so `apply` is ambiguous against `spec_apply` in the same impl -- two
+        # DIFFERENT names, `duplicate_names(qualified=True)` returns `{}`, and
+        # `unique_names` correctly hands back the bare `apply`. The `ambiguous`
+        # answer from `_verify_function` is what covers that, in the branch
+        # below.
         try:
             dup_items = vparse.parse(open(path).read())
             dup = vparse.duplicate_names(dup_items, qualified=True)
@@ -5379,13 +5500,32 @@ def _verus_verified_files(pdir, rep, contract, verus_res):
             rep.fail("driver", f"{src}: {e}")
             continue
         name = labels.get(id(it), it.name)
-        nv, ne, out, resolved = _verify_function(path, name, it.mod_path or "")
+        nv, ne, out, resolved, ambiguous = _verify_function(
+            path, name, it.mod_path or "")
         q = (f"--verify-only-module {it.mod_path} --verify-function {name}"
              if it.mod_path else f"--verify-function {name} --verify-root")
         if nv and not ne:
             ok.add(src)
             print(f"    {src}: `fn {name}` encloses the driver region and Verus "
                   f"reports {nv} verified for it -- ghost stripping licensed")
+        elif ambiguous:
+            # TASK_078 / TASK_077_REVIEW M5. THE THIRD ANSWER, and the one the
+            # duplicate refusal above does NOT cover: Verus matches by
+            # substring, so `apply` is ambiguous against `spec_apply` in the
+            # SAME impl -- two different names, no duplicate at all, and
+            # `vparse.unique_names` correctly hands back the bare `apply`.
+            # Measured at the pinned Verus: `.temp/p78/vprobe/subambig.log`.
+            rep.fail("driver",
+                     f"{src}: the driver region is inside `fn {name}`, and "
+                     f"`verus {q}` is AMBIGUOUS -- Verus matches "
+                     f"`--verify-function` by SUBSTRING over the qualified "
+                     f"path, more than one item matched, and it refused to "
+                     f"pick. No certificate is issued, and the reason is that "
+                     f"the gate could not ask the question -- not that the item "
+                     f"has no verified body. Rename the enclosing item so its "
+                     f"name is not a proper substring of another item's (a "
+                     f"`spec_` twin of the same base name is the usual "
+                     f"cause).\n      {(out or '')[-300:]}")
         elif not resolved:
             rep.fail("driver",
                      f"{src}: the driver region is inside `fn {name}`"
@@ -6076,8 +6216,11 @@ def _trusted_items(pdir, contract):
 
 
 def _hung_rungs(advtable, input_name):
-    """{rung names that DID NOT TERMINATE on `input_name`}, as stage 4 measured
-    it -- or None when stage 4 has nothing to say about this input.
+    """`(hung, measured)` for `input_name` as stage 4 measured it, or **None**
+    when stage 4 has nothing to say about this input.
+
+      * `hung`     -- rungs with at least one row recorded `hung`
+      * `measured` -- rungs stage 4 actually produced at least one row for
 
     This is the **per-rung axis** `expected_hang` does not have. `model.py`
     declares a hang per INPUT, and a per-input bool cannot say WHICH rung runs
@@ -6085,9 +6228,22 @@ def _hung_rungs(advtable, input_name):
     modes and records `hung` per row, so the axis already exists as a
     measurement and only needed reading (TASK_077, RECAP "Owed" 19a).
 
-    `None` (no stage-4 rows for this input) is distinguished from `set()` (rows
-    exist, none hung) on purpose: the caller must not read "nothing hung" out of
-    "nothing was run".
+    ⚠ **`measured` IS THE HALF TASK_077 LEFT OUT, and the omission made the
+    caller print a sentence stage 4 never said** (TASK_077_REVIEW m2,
+    demonstrated by deleting `adversarial-full.bin/unsafe` from p22's stage-4
+    table and again by setting it to `[]`). The first version returned a bare
+    set of hung rungs, so a rung whose key was **absent** and a rung that
+    **terminated** were the same answer -- `rung not in hung` -- and the gate
+    ran Miri on the strength of a measurement that did not exist, announcing
+    *"stage 4 measured the hang in [...] and NOT in 'unsafe'"* when stage 4 had
+    measured nothing about `unsafe` at all. The distinction is the same one
+    `None` already made one level up, applied one level down.
+
+    An empty row list counts as NOT measured: `check_adversarial` writes the
+    key before it runs the rows, so `[]` means the rows are missing, not that
+    the rung was silent. If **no** rung has a row, this returns `None` rather
+    than `(set(), set())` -- there is nothing to read either way, and the caller
+    already handles `None` conservatively.
     """
     if not advtable:
         return None
@@ -6095,8 +6251,12 @@ def _hung_rungs(advtable, input_name):
     keys = [k for k in advtable if k.startswith(pre)]
     if not keys:
         return None
-    return {k[len(pre):] for k in keys
+    measured = {k[len(pre):] for k in keys if advtable[k]}
+    if not measured:
+        return None
+    hung = {k[len(pre):] for k in keys
             if any(r.get("hung") for r in (advtable[k] or []))}
+    return hung, measured
 
 
 def check_miri(pdir, rep, contract, identity, modmod, indir, names,
@@ -6199,9 +6359,24 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names,
     srcs = cfg.get("sources") or [buildmod.RUST_SRC.get(a, f"{a}.rs")]
     # source file -> the matrix rung stage 4 measured, so a per-input hang
     # declaration can be tested against the rung Miri is about to interpret
-    # rather than against the pattern as a whole. `verus.rs` is not in the
-    # measured-cell set for this purpose only when a pattern renames it; the
-    # map is `build.py`'s, so the two cannot drift.
+    # rather than against the pattern as a whole.
+    #
+    # ⚠ THE SENTENCE THAT USED TO BE HERE WAS FALSE, in the function TASK_069
+    # already had to de-falsify a comment in (TASK_077_REVIEW m1). It said
+    # *"`verus.rs` is not in the measured-cell set for this purpose only when a
+    # pattern renames it; the map is `build.py`'s, so the two cannot drift."*
+    # `verus.rs` IS a measured cell (`build.py::RUST_SRC` maps it to the
+    # `verus` rung), a pattern CANNOT rename it (`RUST_SRC` is module-level and
+    # takes no per-pattern input), and the two things that really can drift are
+    # `spec.md`'s `miri.sources` and `RUST_SRC`, which are independent pins --
+    # `miri.sources` is a free list of file names and nothing requires its
+    # entries to be rung sources at all. Today it is `['unsafe.rs']` on 22 of
+    # 22 patterns.
+    #
+    # The drift is handled, but by the CODE rather than by that argument:
+    # `rung_of.get(s)` returns None for any name `RUST_SRC` does not carry, and
+    # `rung is None` blocks the row. Fail-closed, and the block reason names the
+    # file.
     rung_of = {v: k for k, v in buildmod.RUST_SRC.items()}
     blocked = cfg.get("blocked_reason")
     sysroot = _miri_sysroot() if os.path.exists(MIRI_BIN) else None
@@ -6254,10 +6429,22 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names,
             # this input (it is not adversarial, or the matrix was empty), in
             # which case the declaration is all there is and the conservative
             # answer is the old one.
-            hung = _hung_rungs(advtable, nm) if sbg_opt(
-                mod, "expected_hang", False) else set()
+            #
+            # ⚠ **AND THE ROW IS BLOCKED WHEN STAGE 4 MEASURED NOTHING FOR THIS
+            # RUNG**, which TASK_077 did not do (TASK_077_REVIEW m2). The first
+            # version tested `rung not in hung`, so "this rung terminated" and
+            # "this rung was never measured" were the same answer and the gate
+            # ran Miri on the strength of a measurement that did not exist. Now
+            # `_hung_rungs` returns `measured` as well and there are FOUR
+            # outcomes: no stage-4 rows at all (block), the rung is not in the
+            # measured set (block), the rung is in the hung set (block), or the
+            # rung was measured and terminated (run).
+            declared = sbg_opt(mod, "expected_hang", False)
+            stage4 = _hung_rungs(advtable, nm) if declared else None
+            hung, measured = stage4 if stage4 else (None, None)
             rung = rung_of.get(s)
-            if hung is None or (hung and (rung is None or rung in hung)):
+            if declared and (stage4 is None or rung is None
+                             or rung not in measured or rung in hung):
                 # Blocked UP FRONT rather than after MIRI_TIMEOUT: a rung that
                 # does not terminate natively will not terminate under an
                 # interpreter either, and `MIRI_PROBE_ITERS` cannot help -- it
@@ -6281,16 +6468,27 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names,
                 # FAILS if any terminates. A false comment is what the next
                 # reader trusts instead of reading the code, so it is fixed
                 # here as well as in the code it described.
-                if hung is None:
-                    why = (f"model.py declares this input non-terminating "
-                           f"(expected_hang) and stage 4 recorded no per-rung "
-                           f"result for it, so the gate cannot tell whether "
-                           f"the rung Miri runs ({s}) is one of the rungs that "
-                           f"hangs. Blocked conservatively. This input is "
-                           f"unchecked for UB; the others are not.")
+                common = (f"model.py declares this input non-terminating "
+                          f"(expected_hang) and ")
+                tail = ("Blocked conservatively. This input is unchecked for "
+                        "UB; the others are not.")
+                if stage4 is None:
+                    why = (common + f"stage 4 recorded no per-rung result for "
+                           f"it, so the gate cannot tell whether the rung Miri "
+                           f"runs ({s}) is one of the rungs that hangs. " + tail)
+                elif rung is None:
+                    why = (common + f"miri.sources names {s}, which is not a "
+                           f"file `build.py::RUST_SRC` maps to a matrix rung "
+                           f"({sorted(rung_of)}), so stage 4's per-rung hang "
+                           f"column cannot be indexed for it. " + tail)
+                elif rung not in measured:
+                    why = (common + f"stage 4 produced NO ROW for the rung Miri "
+                           f"runs ({s} -> {rung!r}); it measured "
+                           f"{sorted(measured)}. That is not the same answer as "
+                           f"'{rung} terminated' and must not be read as one "
+                           f"(TASK_077_REVIEW m2). " + tail)
                 else:
-                    why = (f"model.py declares this input non-terminating "
-                           f"(expected_hang) and stage 4 measured "
+                    why = (common + f"stage 4 measured "
                            f"{sorted(hung)} as the rung(s) that did not "
                            f"terminate, which includes the rung Miri runs "
                            f"({s} -> {rung!r}). n_iters is clamped to "
@@ -6300,13 +6498,15 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names,
                 rep.block("miri", f"{s} on {nm}", why)
                 runs.append(dict(source=s, input=nm, blocked=why,
                                  hung_rungs=None if hung is None
-                                 else sorted(hung)))
+                                 else sorted(hung),
+                                 measured_rungs=None if measured is None
+                                 else sorted(measured)))
                 continue
             if hung:
-                print(f"    {s} on {nm}: input declares expected_hang, but "
-                      f"stage 4 measured the hang in {sorted(hung)} and NOT in "
-                      f"{rung!r} -- running Miri instead of blocking the row "
-                      f"(TASK_077).")
+                print(f"    {s} on {nm}: input declares expected_hang, and "
+                      f"stage 4 measured {sorted(measured)}: the hang is in "
+                      f"{sorted(hung)} and NOT in {rung!r} -- running Miri "
+                      f"instead of blocking the row (TASK_077).")
             try:
                 r = subprocess.run(
                     [MIRI_BIN, "--sysroot", sysroot, "--edition", "2021",
@@ -6329,6 +6529,20 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names,
                        expected_exit=want_exit, ub=ub,
                        stdout=got, model_stdout=want,
                        stderr=re.sub(r"\s+", " ", r.stderr.strip())[:400])
+            # TASK_078, from TASK_077_REVIEW m4: the record has to show what
+            # UN-blocked the row, not only what blocked one. Until now
+            # `hung_rungs` was written on the `rep.block` branch alone, so
+            # p22's `miri.runs[1]` carried `ub`/`exit`/`stdout` and no trace of
+            # the stage-4 measurement that let Miri run at all -- a reviewer
+            # reading `results/gate/` could not tell a row that was never
+            # blocked from one this change un-blocked. TASK_068 added
+            # `run_timeout_s` and `expected_hang` to the record for exactly this
+            # reason. `expected_hang` False -> both keys absent, as before.
+            if declared:
+                rec.update(expected_hang=True,
+                           hung_rungs=None if hung is None else sorted(hung),
+                           measured_rungs=(None if measured is None
+                                           else sorted(measured)))
             runs.append(rec)
             # The exit code is compared to the MODEL'S, and stdout is compared
             # unconditionally. TASK_051_REVIEW M6: until then the chain read

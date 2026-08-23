@@ -920,7 +920,38 @@ def impl_self_type(head):
     a second Rust type parser is exactly the drift `parse()`'s docstring warns
     about. It has to survive three shapes the tree can hold -- inherent
     (`impl Buf`), trait (`impl Op for A`) and generic-with-const
-    (`impl<const K: u8> Op for OpTag<K>`) -- and nothing more."""
+    (`impl<const K: u8> Op for OpTag<K>`) -- and nothing more.
+
+    ⚠ **TWO MEASURED LIMITS, both found by TASK_077_REVIEW / TASK_078 and
+    neither of them fixed here.** Both are invisible on today's tree and both
+    bite the first pattern that writes the eight-impl spelling "Owed" 20 is
+    about, so they are written down rather than left to be re-discovered:
+
+      1. **Generic arguments are collapsed** (TASK_077_REVIEW m6). `impl Op for
+         OpTag<0>` ... `impl Op for OpTag<7>` are eight monomorphisations of one
+         generic type and all eight return `"OpTag"`, so `unique_names` raises
+         *"`OpTag::apply` is defined more than once even after qualification"* --
+         which is FALSE, Verus distinguishes them. Keeping `<0>`..`<7>` would
+         need the Self type printed the way Verus prints it in
+         `--verify-function`'s "matched results are:" list, and that is not
+         verified to be the source spelling.
+      2. **An `impl` preceded by an ATTRIBUTE is not seen at all**, so its
+         methods get `impl_head=None` and qualify to the bare name.
+         `impl_spans` only recognises `impl` at item position, testing
+         `pre[-1] not in "{};"`; `#[cfg(slb_twin)]` ends in `]`. Measured
+         (`.temp/p78/f1_probe.py`): a `#[cfg(slb_twin)] impl Op0 { fn
+         slb_twin_apply ... }` and its `Op1` sibling BOTH qualify to
+         `slb_twin_apply`, so `unique_names` raises on the very file the fix
+         exists for -- an eight-impl `verus.rs` whose trusted methods carry the
+         verified twins `check.py::check_trusted_twins` requires. The same two
+         impls with the attribute deleted qualify correctly to
+         `Op0::slb_twin_apply` / `Op1::slb_twin_apply`.
+
+    No pattern in the tree has an attribute-preceded `impl` today (every
+    `slb_twin_*` is a free function), so 2 changes nothing that is measured;
+    widening `impl_spans` would also widen the `requires`-tautology probe's
+    synthesis site, which is a gate-semantics change and wants PROTOCOL rule
+    5's accident test first."""
     if not head:
         return None
     s = _IMPL_HEAD_GENERICS_RE.sub("", head.strip(), count=1)
@@ -979,15 +1010,46 @@ def duplicate_names(items, qualified=False):
     `<OpN as Op>::apply` and `<OpM as Op>::apply`; only the gate's name->item
     map did.
 
-    **The default is still bare, and that is not timidity.** The two callers
-    want different things and it took a measurement to see it:
+    **The default is still bare, and that is not timidity.** The callers want
+    different things and it took a measurement to see it:
 
-      * `check.py::check_verus_contract` keys items so `spec.md`'s per-item
-        contract lands on the right item. Qualified is right there, and
-        `unique_names` keeps every existing pin working unchanged.
+      * `check.py::check_verus_contract` and `check.py::_verus_verified_files`
+        key items so `spec.md`'s per-item contract lands on the right item.
+        Qualified is right there, and `unique_names` keeps every existing pin
+        working unchanged.
       * `by_name` returns `{name: Item}`, so a qualified duplicate would
         silently drop one and re-open TASK_003_REVIEW's decoy. Bare is right
         there and must stay.
+
+    ⚠ **SO THE EIGHT-IMPL SPELLING IS STILL REFUSED, AND "Owed" 20 IS NARROWED
+    RATHER THAN CLOSED** (TASK_077_REVIEW B1; TASK_078 measured the route and
+    declined it). `by_name` has **six** consumers, all of which turn its
+    `ValueError` into a failure: `check.py::check_call_site`,
+    `check_clause_deletion`, `check_requires_strength`, `check_trusted_twins`,
+    `derive_contract`, and `harness/limbs.py::main`. TASK_077 switched the
+    *contract* stage and the *driver-identity* stage only. Threading
+    `qualified=True` through the rest is **not** mechanical, measured
+    (`.temp/p78/f1_probe.py`, TASK_078):
+
+      * `check_trusted_twins` and `limbs.py` build the twin's key by string
+        concatenation, `TWIN_PREFIX + t.name`, from the item's BARE name. In a
+        qualified map that key MISSES on every trusted method inside an `impl`
+        (`slb_twin_apply` looked up in a map holding `Op0::slb_twin_apply`), so
+        every trusted item reports `NO TWIN` -- a failure that says the
+        opposite of the truth. Scope-aware key construction is a semantic
+        change to the twin rule, not a keying change.
+      * `harness/limbs.py` is not a gate stage but six patterns' published
+        `NOTES.md` sentences rest on what it reports, so it has to move too.
+      * the clause-deletion and precondition-strength stages label every
+        recorded row with `it.name`, so an eight-impl file emits eight rows all
+        labelled `apply` into `results/gate/*.json`. That is a record-schema
+        change on top of the keying.
+      * and see `impl_self_type`'s limit 2: with the twins in place,
+        `unique_names` RAISES on the eight-impl file anyway.
+
+    **What IS closed**: the per-item contract map and the `--verify-function`
+    label are scope-keyed, and `check_driver_identity`'s duplicate refusal is
+    now scoped to duplicates qualification cannot separate.
     """
     seen = {}
     for i in items:
@@ -1007,7 +1069,20 @@ def unique_names(items):
     why "Owed" 20 was never a one-liner.
 
     **Raises** if two items share even the qualified name, because then there
-    is no key that distinguishes them and the caller must not pick one."""
+    is no key that distinguishes them and the caller must not pick one.
+    ⚠ **Two shapes reach that raise for a reason that is `impl_self_type`'s
+    limitation and NOT the file's** -- eight `OpTag<0..7>` monomorphisations,
+    and any `impl` preceded by an attribute. Both are written out in
+    `impl_self_type`'s docstring; read it before believing the message.
+
+    ⚠ **A label this returns is NOT guaranteed to be a name Verus can be given.**
+    Verus matches `--verify-function` by SUBSTRING over the qualified path and
+    errors on more than one match, so a BARE label is ambiguous whenever another
+    item's name contains it -- measured on a file with **no** duplicate item name
+    at all, one `impl A` defining `apply` and `spec_apply`
+    (`.temp/p78/vprobe/subambig.log`, TASK_078 M5). `check.py::_verify_function`
+    reports that as its own third answer; it is not something this function can
+    see, because it is a property of the whole name set and of Verus's matcher."""
     bare = {}
     for i in items:
         bare.setdefault(i.name, []).append(i)
@@ -1029,7 +1104,17 @@ def by_name(text):
 
     Bare-name keyed **on purpose** -- see `duplicate_names`: the return type is
     `{name: Item}`, so admitting a qualified duplicate here would drop one of
-    the two silently, which is TASK_003_REVIEW's decoy."""
+    the two silently, which is TASK_003_REVIEW's decoy.
+
+    ⚠ **THIS RAISE IS WHAT STILL REFUSES THE EIGHT-IMPL SPELLING, and it costs
+    SIX failures, not one** (TASK_077_REVIEW B1). Every consumer turns it into a
+    `rep.fail` / a fired limb: `check.py::check_call_site` (`FAIL [proof-rule2]`),
+    `check_clause_deletion` (`FAIL [clause-mut]`), `check_requires_strength`
+    (`FAIL [req-mut]`), `check_trusted_twins` (`FAIL [twin]`),
+    `derive_contract` (`FAIL [contract-source]`), and `harness/limbs.py::main`.
+    Their message is *"duplicate item name(s): apply"*, which is the same text
+    `duplicate_names`' qualified path calls fine -- so read `duplicate_names`'
+    docstring before concluding the gate has changed its mind."""
     items = parse(text)
     dup = duplicate_names(items)
     if dup:
@@ -1458,6 +1543,34 @@ fn kernel(v: &[u64]) -> u64 { 1 }
            lambda: unique_names(parse(same_scope)), ValueError)
     want("unique_names is the identity on a file with unique bare names",
          sorted(unique_names(parse(src))), sorted(i.name for i in parse(src)))
+
+    # --- TASK_078: the two LIMITS of the qualification, pinned as tests so a
+    # later fix has something that changes. Both are documented in
+    # `impl_self_type`'s docstring and both are why "Owed" 20 is narrowed and
+    # not closed. NEITHER is exercised by any pattern in the tree today.
+    gen8 = "verus! {\n" + "".join(
+        f"impl Op for OpTag<{k}> {{ fn apply(&self) -> u64 {{ {k} }} }}\n"
+        for k in range(8)) + "}\n"
+    want("LIMIT 1 (m6): eight OpTag<K> monomorphisations collapse to one scope",
+         sorted({qualified_name(i) for i in parse(gen8)}), ["OpTag::apply"])
+    raises("LIMIT 1: ...so unique_names refuses a file Verus accepts",
+           lambda: unique_names(parse(gen8)), ValueError)
+    attr_impl = '''verus! {
+#[cfg(slb_twin)]
+impl Op0 { fn slb_twin_apply(&self) -> u64 { 0 } }
+#[cfg(slb_twin)]
+impl Op1 { fn slb_twin_apply(&self) -> u64 { 1 } }
+}
+'''
+    want("LIMIT 2: an impl preceded by an ATTRIBUTE is invisible to impl_spans",
+         [i.impl_head for i in parse(attr_impl)], [None, None])
+    want("LIMIT 2: ...so its methods qualify to the bare name",
+         sorted(qualified_name(i) for i in parse(attr_impl)),
+         ["slb_twin_apply", "slb_twin_apply"])
+    want("LIMIT 2 control: delete the attribute and both qualify correctly",
+         sorted(qualified_name(i)
+                for i in parse(attr_impl.replace("#[cfg(slb_twin)]\n", ""))),
+         ["Op0::slb_twin_apply", "Op1::slb_twin_apply"])
 
     print("vparse selftest:", "PASS" if bad == 0 else f"FAIL ({bad})")
     return 0 if bad == 0 else 1

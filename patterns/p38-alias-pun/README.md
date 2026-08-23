@@ -131,17 +131,23 @@ Miri is silent.
    strict-aliasing check at all and catches only the consequence, and only when
    the index leaves a statically-typed array.
 
-5. **The gate's own sanitizer stage does not see p38, and the hole is ONE FLAG
-   wide.** It is **flag-gated, not level-gated**: `gcc -O1 -fstrict-aliasing`
-   already miscompiles and ASan already reports the overflow, so adding that one
-   token to stage 7's command line makes it see p38 **at `-O1`** — raising the
-   optimisation level is *not* the repair and would perturb 20 patterns.
-   **Blast radius, recounted across all 20 gate records: exactly one pattern.**
-   15 declare ≥1 `sanitizer_expect: "fires"` row and all 36 such rows fired at
-   `-O1`; of the 5 that declare none, p01/p08 model no memory bug, p04
-   overwrites in bounds and p47's harm is timing. **p38 is the only pattern
-   whose declared-clean adversarial row is clean because of the gate's BUILD
-   FLAGS rather than its kernel** (`model.py::sanitizer_expect`, `NOTES.md` §6b).
+5. **The gate's own sanitizer stage did not see p38, and the hole was ONE FLAG
+   wide — ✅ CLOSED at TASK_077.** It was **flag-gated, not level-gated**:
+   `gcc -O1 -fstrict-aliasing` already miscompiles and ASan already reports the
+   overflow, so adding that one token to stage 7's command line makes it see p38
+   **at `-O1`** — raising the optimisation level was *not* the repair and would
+   have perturbed every other pattern. **Blast radius, re-derived by running
+   stage 7's command line with and without the token over all 22 patterns and
+   every input: 158 rows, 3 differ, all 3 on p38.**
+   `model.py::sanitizer_expect` now derives `"fires"` on `adversarial-huge` and
+   `adversarial-oob`; `adversarial-stale` stays `"clean"` for a **kernel**
+   reason — the over-read stays inside `sc[256]`, so the harm is a wrong
+   checksum and no sanitizer is a miscompile detector.
+   ⚠ **The census this line used to carry (*"20 gate records, 15 declare ≥1
+   fires, all 36 fired"*) is a DENOMINATOR and went stale twice. Recompute it,
+   do not quote it**: `.temp/p78/fires_census.py` gives **22 patterns, 158 rows,
+   17 declaring ≥1 `fires`, 40 `fires` rows** today. `NOTES.md` §6b has the
+   history and the five patterns that declare none.
 
 ## Cost
 
