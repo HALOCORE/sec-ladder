@@ -19,7 +19,8 @@
 //! ../spec.md pins `identity: unsafe == verus`, so an R4 is not a program that
 //! *may* use `unsafe` -- it is a program that must have an R5 twin Verus
 //! verifies and that erases to the same machine code (`.memory/01-ladder.md`
-//! finding 14). A bare `fn`-pointer table has no such twin at the pinned Verus, so it
+//! *every rung is a spelling*, RECAP finding 14). A bare `fn`-pointer table has no
+//! such twin at the pinned Verus, so it
 //! is **not an admissible rung**, and the four Rust rungs use the closest thing
 //! that is: a single-trait object, which is a real vtable dispatch and a real
 //! computed-target indirect call. **The `fn`-pointer spelling ships as the

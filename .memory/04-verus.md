@@ -1271,3 +1271,55 @@ instructions.** ⚠ **And it is not free in a different currency**: the exec-cod
 alternative (a bounded probe counter) is **334.16 `Ir`/call CHEAPER** on p22's
 large band, so *"the ghost proof saves instructions"* is **false**. What the
 ghost route buys is that **R4 and R5 remain the same program**.
+
+## Function pointers and trait objects (p36, TASK_072/073)
+
+**`fn(u64) -> u64` IS NOT SUPPORTED AT THE PIN, AND THE ERROR IS ON THE
+DECLARATION.**
+
+```
+error: The verifier does not yet support the following Rust feature:
+       function pointer types
+   |   const TABLE: [fn(u64) -> u64; 2] = [op_inc, op_dbl];
+```
+
+Not on the call — on the **type**. So a C function-pointer table has **no
+admissible Rust rung** in this project, because the `identity` pin makes an R4 a
+program that must have a verifying R5 twin. ⚠ **Do not read
+`vstd/function.rs`'s `call_requires`/`call_ensures` as covering this**: that
+machinery is for a **generic `F: Fn(..)` parameter**, and the guide chapter
+(`exec_funs_as_values.md`) shows only that shape. It was the manager's premise
+that it would reach a bare `fn` in an array, and it does not.
+
+**The route that works, settled over fourteen probes:**
+
+- `const TABLE: [&'static dyn Op; N]` — a **single**-trait object. It verifies,
+  and it keeps each slot's dynamic type through an `external_body` accessor
+  whose `ensures` is `r == TABLE@[i as int]`, i.e. it claims the **slot's
+  identity only**; what calling it does comes from `Op::apply`'s own *verified*
+  `ensures`. (The alternative — an `external_body` wrapper claiming
+  `r == op_spec(i, x)` — also verifies and **axiomatises all eight bodies into
+  the TCB**. Prefer the identity-only accessor.)
+- ⚠ **A `static` is impossible twice over**: rustc wants `Sync` (`E0277`), and
+  `dyn Op + Sync` is `dyn with more that one trait`. It must be a `const`.
+- **Cost**: two dependent loads where C has one — **exactly `3.00000` `Ir` per
+  dispatch**, measured, mechanism derived with zero fitted parameters.
+
+⚠ **A `spec fn` DECLARED IN A TRAIT OCCUPIES A VTABLE SLOT IN THE ERASED
+BUILD, IN DECLARATION ORDER.** Declare the exec method **first**, or R5's
+dispatch becomes `call *0x20(%rcx)` where R4's is `*0x18(%rcx)` and the
+`identity` pin fails at every level. Even declared correctly it costs 8 bytes of
+`.data.rel.ro` per implementing type plus one emitted stub — see
+`.memory/01-ladder.md` finding 1's **scope clause**, which this measurement
+forced.
+
+⚠ **`harness/vparse.py::duplicate_names` keys by BARE NAME**, so a pinned
+`verus.rs` cannot define `apply` once per implementing type — eight
+`impl Op for OpN` blocks **verify 19/0 and the gate refuses them**. Use one
+generic `impl<const K: u8> Op for OpTag<K>`. This is a harness limitation, not a
+Verus one (`parse()` already computes each item's enclosing impl); it is queued.
+
+**And the twin regime has TWO teeth, which is easy to miss**: weakening only the
+*trusted* item's `requires` leaves Verus silent (`12 verified, 0 errors`) and is
+caught by the **gate**, under `--cfg slb_twin`. A mutant battery that only reads
+Verus's exit status will score it as a no-op.

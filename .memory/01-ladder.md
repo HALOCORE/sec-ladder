@@ -431,6 +431,37 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
    grouping, i.e. the function *plus* its trailing padding. Quote `md5_fn` for
    identity — `harness/asm.py` now reads padding separately so a benign relink
    at a different alignment cannot be mistaken for "the proof cost something".
+
+   ⚠ **SCOPE CLAUSE, ADDED AT TASK_073 AND MEASURED ON p36. The claim is about
+   INSTRUCTIONS, and two of the words this finding has always been written in
+   are false on p36: *"ghost code fully erases"* and *"the proven binary is
+   byte-identical to the unproven one"*.**
+
+   **What holds, unchanged, and is what every published number rests on:** a
+   Verus proof costs **zero executed instructions** and **zero instructions in
+   the kernel symbol**. p36's R4 and R5 kernels are 55 / 54 / 170 either way.
+
+   **What does not hold: a `spec fn` declared in a TRAIT is codegenned as a stub
+   and occupies a vtable slot in every implementing type.** Measured on p36's
+   shipped pair — R4 vtables are **32 bytes**, R5's are **40**, and all eight of
+   R5's slot-4 entries point at one folded **26-byte emitted
+   `<OpTag<0> as Op>::spec_apply`**. So the proof adds **64 B of
+   `.data.rel.ro` (8 types × 8) plus 26 B of `.text`** that R4 does not have,
+   and `md5_fn` differs (`60e41a42…` vs `244e6712…`). ⚠ **The manager verified
+   this independently before landing it** (`.temp/p36rev/vtable_size.log`).
+
+   ⚠ **And the DECLARATION POSITION is part of the vtable ABI.** With
+   `spec_apply` declared *before* `apply` in the trait, R5's dispatch becomes
+   `call *0x20(%rcx)` where R4's is `*0x18(%rcx)` — same instruction count, same
+   byte count, same normalised text, and **not equal even under
+   `md5_fn_norel`**. Declaring the exec method first is the whole fix; p36 ships
+   the control (`controls/gen_controls.py`, `v_specfirst`).
+
+   **Why it matters beyond p36**: the 64 B and the 26 B are **unequal** section
+   growths, so code and data cannot shift together — which is *why* p36 is the
+   first pattern whose `identity` level is `norel` rather than `exact`. A
+   pattern that dispatches through a trait should expect this and say so, rather
+   than reading it as proof cost.
 2. **A proof buys nothing on its own.** Proving R2 panic-free leaves every bounds
    check in place — rustc never learns what Z3 knew. The win only materialises
    when the proof *licenses unsafe code* (R5 = R4 codegen + discharged obligations).
@@ -2343,6 +2374,57 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
    `R3 − R4 = +2.00` is a **fixed-R4 bound**, and against the cheapest admissible
    R4 the gap is **+125.00 / +1021.00 — 510× on the large band.** ✅ Disclosed
    proactively this time, and it reaches `README.md`.
+
+23. **p36 — the prover excludes the MECHANISM, not a spelling, at 3.00000 `Ir`
+   per dispatch; and the kernel-exclusive column hid an entire callee.**
+   A function-pointer dispatch table with no `op < NOPS` check. Reviewed
+   (TASK_072_REVIEW: **2 blockers, 5 majors, 7 minors, 36 named clean
+   negatives**), corrected at TASK_073.
+
+   ⚠ **The bug class is the tree's TWELFTH `index >= len` and the pattern says
+   so.** What is not the twelfth is everything below.
+
+   **Verus at the pin cannot type `fn(u64) -> u64` AT ALL** — `error: the
+   verifier does not yet support … function pointer types`, **on the
+   declaration**, not the call. The `identity` pin makes an R4 a program that
+   must have a verifying R5 twin, so **C's own dispatch mechanism is not an
+   admissible rung**; the four Rust rungs use `const TABLE: [&'static dyn Op;
+   NOPS]`. **That difference is priced rather than waved at: exactly `3.00000`
+   `Ir` per dispatch** (`r_fnptr` `10·nrw + 31` against the shipped `13·nrw +
+   31`, **same intercept**, zero residual over twelve swept points, confirmed
+   out of sample at `nrw = 1024`), with a **zero-fitted-parameter mechanism** —
+   the `dyn` loop is the `fnptr` loop plus `{shl; mov 0x8(…); mov $1,%edi; mov
+   %rax,%rsi}` minus `{mov %rax,%rdi}`. ⚠ **This is finding 14's sharpest
+   instance: the prior ones exclude a SPELLING, this one excludes the
+   MECHANISM**, and it survives on both `Ir` columns (13 vs 16).
+
+   ⚠ **EVERY published `Ir` here was kernel-EXCLUSIVE on the one pattern whose
+   kernel IS a call, and the excluded work is not equal across cells** —
+   dispatch targets are **512 `Ir`/call on gcc, 384 on clang/rustc, 0 for the
+   `match` control** (which inlines all eight arms). Three claims moved and one
+   was **inside the hashed contract**: the `match` control **reverses to
+   cheaper**, and *"it is DEARER"* was `forbidden[0]`'s stated reason. See
+   `.memory/03-measurement.md` — the p13 outward-dispatch rule now governs and
+   was not applied.
+
+   ⚠ **`R3 − R4 = +15.00 flat` was published against an R3 side that was never
+   searched** (one lever, and it moved R3 *dearer*). The review built an
+   in-contract respelling at `13·nrw + 38`; the corrections task added two more.
+   **What p36 publishes is `+7.00 flat` (fixed-R4 bound, cheapest R3 found) and
+   `+10.00 flat` (matched pair), never a single number, and NO pair interval** —
+   the interval would read `−1015 … +537`, i.e. *"safe beats unsafe by 1015"*,
+   which is the artefact the search existed to prevent. ✅ **The R4 side WAS
+   searched first and it changed which rung ships**: the R2-shaped unsafe rung
+   verifies and is 1022/8190 dearer, so shipping it would have published *"safe
+   beats unsafe by 1007/8175"* — the flattering-direction trap, caught before
+   publication for the second pattern running.
+
+   **`Ir` is exactly constant while wall clock moves 3.13×** — one binary, same
+   blob shape, verified on **program totals** (8,635,685 across all four
+   `sweep-t*`) as well as the kernel column. ⚠ **Not p07's finding in a
+   costume**: p07's `Ir` *moves* and its branch is conditional; p36's is exactly
+   constant and its branch is indirect. **The novel content is about the
+   INSTRUMENT** — see `.memory/03-measurement.md` on `Bim`.
 
 So the research question is **not** "does verification cost performance" (it
 doesn't). It is: *what must move into the trusted base to reach C's assembly, how

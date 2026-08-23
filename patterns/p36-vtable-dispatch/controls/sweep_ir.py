@@ -23,9 +23,24 @@ counters at all (`.memory/00-environment.md`). The wall-clock half compares the
 layout population is needed -- p07's *"changing only the workload"* control,
 reused.
 
+⚠ **THE WALL-CLOCK HALF IS INTERLEAVED BY BLOB SINCE TASK_073, AND IT WAS NOT
+BEFORE.** `.memory/03-measurement.md`'s methodology rule is interleave-by-cell:
+time one rep of every cell, then the next rep, so a drift in machine state
+spreads across all of them instead of landing on whichever went last. This
+script's first version timed **all reps of one blob and then all reps of the
+next** (TASK_072_REVIEW m2). It changed no ordering on p36 -- both protocols put
+`sweep-t8` slowest and `sweep-t1` fastest and both give ~3.1x -- but it is the
+wrong shape for the next pattern that copies this file, so the default is now
+`--protocol interleaved` and the old shape is still reachable as
+`--protocol blocked` for reproducing ../NOTES.md 7's shipped column.
+
+Scratch goes under `$SLB_P36_SCRATCH` (default `.temp/p36/`), so a later task
+can run this file without writing into an earlier task's evidence directory.
+
     python3 patterns/p36-vtable-dispatch/controls/sweep_ir.py --band mix
     python3 patterns/p36-vtable-dispatch/controls/sweep_ir.py --band n --cell unsafe
     python3 patterns/p36-vtable-dispatch/controls/sweep_ir.py --band mix --wall
+    SLB_P36_SCRATCH=.temp/xxx python3 .../sweep_ir.py --band t --wall --reps 31
 """
 
 import argparse
@@ -42,7 +57,8 @@ PDIR = os.path.dirname(HERE)
 REPO = os.path.dirname(os.path.dirname(PDIR))
 VALGRIND = os.path.expanduser("~/tools/valgrind/bin/valgrind")
 CG_ANN = os.path.expanduser("~/tools/valgrind/bin/callgrind_annotate")
-CGDIR = os.path.join(REPO, ".temp", "p36", "cg")
+SCRATCH = os.environ.get("SLB_P36_SCRATCH", os.path.join(REPO, ".temp", "p36"))
+CGDIR = os.path.join(SCRATCH, "cg")
 
 sys.path.insert(0, os.path.join(REPO, "common"))
 import slb  # noqa: E402
@@ -102,14 +118,27 @@ def counters(binary, blob, branch=False):
     return ir, bi, bim
 
 
-def wall(binary, blob, reps=15):
-    ts = []
-    for _ in range(reps):
+def wall_many(binary, blobs, reps=15, protocol="interleaved"):
+    """`{label: (min_s, median_s)}` over `blobs = [(label, path)]`.
+
+    ⚠ **`protocol="interleaved"` times one rep of EVERY blob before the second
+    rep of any of them**, which is `.memory/03-measurement.md`'s rule; it is the
+    default. `protocol="blocked"` reproduces this script's original shape -- all
+    reps of one blob, then all reps of the next -- and exists only so
+    ../NOTES.md 7's shipped column stays reproducible."""
+    ts = {lab: [] for lab, _ in blobs}
+    if protocol == "interleaved":
+        order = [(r, lab, p) for r in range(reps) for lab, p in blobs]
+    elif protocol == "blocked":
+        order = [(r, lab, p) for lab, p in blobs for r in range(reps)]
+    else:
+        raise SystemExit(f"sweep_ir.py: unknown --protocol {protocol!r}")
+    for _, lab, p in order:
         t0 = time.perf_counter()
-        subprocess.run(["taskset", "-c", "3", binary, blob],
+        subprocess.run(["taskset", "-c", "3", binary, p],
                        capture_output=True, check=True)
-        ts.append(time.perf_counter() - t0)
-    return min(ts), statistics.median(ts)
+        ts[lab].append(time.perf_counter() - t0)
+    return {lab: (min(v), statistics.median(v)) for lab, v in ts.items()}
 
 
 def rescale(blob, n_iters, scr):
@@ -156,6 +185,12 @@ def main():
                          "finding 16's methodology rule)")
     ap.add_argument("--wall-iters", type=int, default=200000,
                     help="rewrite n_iters for the wall-clock half; see rescale()")
+    ap.add_argument("--protocol", default="interleaved",
+                    choices=("interleaved", "blocked"),
+                    help="wall-clock rep ordering. interleaved is "
+                         "`.memory/03-measurement.md`'s rule and the default "
+                         "since TASK_073; blocked is what ../NOTES.md 7's "
+                         "shipped column was taken with")
     a = ap.parse_args()
     b = a.bin or cell_bin(a.cell, a.opt, a.mode)
     if not os.path.exists(b):
@@ -165,25 +200,38 @@ def main():
         raise SystemExit(f"no sweep-{a.band}* blobs -- run inputs/gen.py --sweep")
     print(f"cell {a.bin or a.cell} {a.opt}/{a.mode}   band sweep-{a.band}*")
     if a.floor:
-        scr = os.path.join(REPO, ".temp", "p36", f"floor.{os.getpid()}")
+        scr = os.path.join(SCRATCH, f"floor.{os.getpid()}")
         os.makedirs(scr, exist_ok=True)
         src = slb.read(blobs[0])
         print(f"NOISE FLOOR: {a.floor} byte-identical copies of "
               f"{os.path.basename(blobs[0])}, n_iters={a.wall_iters}, "
-              f"{a.reps} reps each")
-        vals = []
+              f"{a.reps} reps each, protocol={a.protocol}")
+        copies = []
         for i in range(a.floor):
             cp = os.path.join(scr, f"copy{i}.bin")
             slb.write(cp, a.wall_iters, src.payload, src.declared_len)
-            mn, md = wall(b, cp, a.reps)
+            copies.append((f"copy{i}", cp))
+        res = wall_many(b, copies, a.reps, a.protocol)
+        vals = []
+        for lab, _ in copies:
+            mn, md = res[lab]
             vals.append(mn / a.wall_iters * 1e9)
-            print(f"  copy{i}  min ns/call={vals[-1]:9.2f}  med={md / a.wall_iters * 1e9:9.2f}")
+            print(f"  {lab}  min ns/call={vals[-1]:9.2f}  med={md / a.wall_iters * 1e9:9.2f}")
         print(f"  floor: min={min(vals):.2f} max={max(vals):.2f} "
               f"spread={100 * (max(vals) - min(vals)) / min(vals):.2f}% of min")
         return 0
     hdr = f"{'blob':22s} {'calls':>7s} {'Ir/call':>13s} {'Bi':>12s} {'Bim':>12s} {'Bim/Bi':>8s}"
     if a.wall:
         hdr += f" {'min ns/call':>13s} {'med ns/call':>13s}"
+    rows = {}
+    if a.wall:
+        # ⚠ Every blob is rescaled and the reps are ordered BEFORE any timing,
+        # so `--protocol interleaved` really does interleave (TASK_073).
+        scr = os.path.join(SCRATCH, f"wall.{os.getpid()}")
+        big = [(os.path.basename(x), rescale(x, a.wall_iters, scr)) for x in blobs]
+        rows = wall_many(b, big, a.reps, a.protocol)
+        print(f"wall protocol: {a.protocol}, {a.reps} reps, taskset -c 3, "
+              f"n_iters={a.wall_iters}")
     print(hdr)
     for blob in blobs:
         nc = n_calls(blob)
@@ -193,9 +241,7 @@ def main():
                f"{bim if bim is not None else -1:12d} "
                f"{(bim / bi if bi else 0):8.4f}")
         if a.wall:
-            scr = os.path.join(REPO, ".temp", "p36", f"wall.{os.getpid()}")
-            big = rescale(blob, a.wall_iters, scr)
-            mn, md = wall(b, big, a.reps)
+            mn, md = rows[os.path.basename(blob)]
             row += f" {mn / a.wall_iters * 1e9:13.2f} {md / a.wall_iters * 1e9:13.2f}"
         print(row)
     return 0

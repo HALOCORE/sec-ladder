@@ -647,6 +647,23 @@ complete. That remains a human reading — see the `SLB-TRUSTED-ARGUMENT`
 requirement in `.memory/04-verus.md`. When they are not, R4 is unverified unsafe code that every catalogued pattern will
 imitate, and nothing has checked it.
 
+⚠ **AND THE SCOPE OF `identity` IS THE KERNEL FUNCTION'S BYTES — NOTHING ELSE**
+(TASK_073, on p36, where the pattern's own write-up had said *"the identity pin
+caught it"*). The pin compares the **kernel symbol**; it says nothing about the
+rest of the binary. Two measured consequences, both on p36:
+
+- **Static data is outside it, at `exact` as well as `norel`.** `unsafe.rs`
+  with the dispatch `TABLE` **reversed** gives a **byte-identical `md5_fn`**
+  (`60e41a42…`) and a **different checksum**. The gate is not unsound — **stage
+  2 (`check_checksums`) catches it** — but it is a *different stage*, and a
+  pattern whose behaviour lives in a table must say which one is load-bearing.
+- **Ghost code can add bytes outside the kernel symbol.** p36's R5 vtables are
+  40 bytes to R4's 32, plus one emitted 26-byte `spec_apply` stub — invisible to
+  `identity` at every level. See `.memory/01-ladder.md` finding 1's scope clause.
+
+**When a pattern's semantics live anywhere but the kernel's instructions, name
+the stage that actually checks them.**
+
 `harness/check.py` step 8 wires this. Three details, all settled at TASK_005
 because between them they made the first pattern with a non-trivial proof
 un-greenable by any route:

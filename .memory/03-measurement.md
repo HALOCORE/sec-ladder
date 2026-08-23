@@ -675,6 +675,17 @@ stays literally true while "the inputs changed under this record" is still caugh
 — and caught better than a generator hash alone, which cannot tell a comment edit
 from a data change.
 
+⚠ **SAY IT THE OTHER WAY ROUND, BECAUSE THE MANAGER GOT IT BACKWARDS AT
+TASK_073 AND ALMOST DEFERRED A FIX ON IT.** *"`gen.py` is measurement-hashed"*
+is true and is **not** the same as *"editing `gen.py` forces a re-measure"*.
+**`STALE` is the only verdict that sets the exit code.** So a **comment-only**
+edit and an **appended sweep band** are both `GEN-ONLY`, exit 0, **no
+re-measure** — measured twice now (`.memory/05-layout.md`'s band case, and
+p36 at TASK_073, where a docstring correction *and* a new `sweep-mixrand6` blob
+landed together with all 30 committed blobs byte-identical). **What forces a
+re-measure is a `gen.py` edit that changes a MATRIX blob's bytes.** Run the
+command and read the verdict; do not infer it from the hash list.
+
 ⚠ **A commit test is NOT the test. Hashes are.** The manager sized the damage by
 comparing each record's `git_state.commit` against the last commit touching
 `common/driver.c`. That method was wrong in both directions:
@@ -1254,6 +1265,47 @@ because R2 makes no `memcpy` call and R4 does.
 If they are not, quote totals, or quote the kernel column **plus the libc
 marginals per rung**, and say which. Equal lists is the licence; it is one
 `objdump` per cell.
+
+⚠ **WIDENED AT TASK_073, on p36: the rule is about OUTWARD-DISPATCHED WORK, not
+about libc.** Written as `@plt`/`@GLIBC` it reads as a rule about library calls,
+and p36 walked straight past it — its callees are **its own project-local
+functions**, reached through a dispatch table, so every `@plt` list in the
+pattern is equal and the licence appeared to hold. **It did not.** Measured
+dispatch-target `Ir`/call on `small.bin`: **gcc 512, clang/rustc 384, and 0 for
+the `match` control**, which inlines all eight arms. Consequences, all published
+and all wrong on the kernel column alone:
+
+- the `match` control **reverses** — dearer on the kernel column, **cheaper by
+  58.23 / 507.00 on kernel + targets** — and *"it is DEARER"* was quoted inside
+  `spec.md`'s **hashed** `idiom.why` as the reason it was forbidden;
+- the **gcc-vs-clang C gap vanishes**: `10·nrw` vs `11·nrw` becomes `14` vs `14`;
+- a *"2.00000 `Ir` per dispatch cheaper"* claim is **3.00000**.
+
+**Ask "does every cell execute the same work OUTSIDE the kernel symbol", not
+"does every cell call the same libc routines".** An indirect call, a
+devirtualised `match`, a `static` helper the optimiser did not inline, and a
+library call are the same hazard.
+
+### ⚠ gcc's DEFAULT `-fcf-protection=full` prices a CFI mitigation in gcc's column, invisibly, tree-wide
+
+(TASK_073, on p36; **manager-verified independently** — `gcc -Q --help=common`
+prints `-fcf-protection=full` as the default, and a one-line function compiles
+to **1 `endbr64` on gcc and 0 on clang**.)
+
+Every gcc-compiled function on this box opens with an `endbr64` **IBT landing
+pad**; clang and rustc emit none. On p36 that is **49 `endbr64` in each gcc
+binary against 5 in all six others**, and it is measurable exactly: building
+with `-fcf-protection=none` moves the dispatch targets **512 → 384** `Ir`/call
+and the total **1855.3740 → 1726.3331**, i.e. gcc's default IBT costs
+**`1.00000·nrw + 1` `Ir` per call**.
+
+⚠ **The consequence is bigger than one pattern.** p36's own write-up said the
+real-world hardened answer for its bug class was *"a compiler mitigation this
+matrix cannot price"* — **it has been pricing one all along**, in one compiler's
+column only, and never said so. **Any gcc-vs-clang instruction-count comparison
+in this tree carries an IBT term.** It is small where the kernel is one function
+(one pad per call) and it is `O(dispatches)` wherever control leaves the kernel.
+**Name it before attributing a gcc-vs-clang gap to codegen.**
 
 ## Hold out a LENGTH, not a MIXTURE — an out-of-sample test can be provably unable to fail
 

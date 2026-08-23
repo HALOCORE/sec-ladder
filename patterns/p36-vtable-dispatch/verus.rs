@@ -23,10 +23,12 @@
 //! ../spec.md pins `identity: unsafe == verus` at `norel` (../NOTES.md 5a says
 //! why `exact` is unavailable and it has nothing to do with the proof), so an
 //! R4 is a program that must have an R5 twin Verus verifies and that erases to
-//! the same instruction stream (`.memory/01-ladder.md` finding 14). A bare `fn`-pointer table has no such
+//! the same instruction stream (the *every rung is a spelling* finding, RECAP
+//! finding 14 -- named rather than numbered, because 14 in
+//! `.memory/01-ladder.md` is p13). A bare `fn`-pointer table has no such
 //! twin, so **the four Rust rungs dispatch through a single-trait object
 //! instead** -- a real vtable and a real computed-target call, but two loads
-//! where C has one. That is the sixth instance of finding 14 and the sharpest:
+//! where C has one. That is its sixth instance and the sharpest:
 //! elsewhere the prover has excluded a *spelling* of the kernel (p16's
 //! `chunks_exact`, p11's `memchr`, p05's and p16's header reads); here it
 //! excludes the kernel's central *mechanism*, and the price is exactly
@@ -118,10 +120,24 @@ pub trait Op {
     // A Verus `spec fn` declared in a trait STILL OCCUPIES A VTABLE SLOT in the
     // erased build, in declaration order. With `spec_apply` written first, R5's
     // dispatch is `call *0x20(%rcx)` where R4's is `call *0x18(%rcx)` -- same
-    // 60 instructions, same 193 bytes, same normalised text, and **not**
+    // 55 instructions, same 170 bytes, same normalised text, and **not**
     // byte-identical even after pc-relative masking, which would be the first
     // time in this project that a proof moved the object code. Measured both
     // ways (../NOTES.md 5), and swapping the two declarations is the whole fix.
+    //
+    // ⚠ **THIS COMMENT SAID `60 instructions, 193 bytes` UNTIL TASK_073 AND
+    // THOSE ARE `r4_cursor`'S** -- the R4 spelling that ../NOTES.md 8b says was
+    // replaced. The shipped pair is 55 / 54 / 170, which is what the gate's own
+    // `identity` record says (TASK_072_REVIEW M2).
+    //
+    // ⚠ **AND THE SLOT IS NOT FREE.** The declared ghost item is codegenned as
+    // a stub: R4's vtables are 32 bytes, R5's are 40, and all eight of R5's
+    // slot 4 point at ONE folded 26-byte `<OpTag<0> as Op>::spec_apply`. So the
+    // proof costs 64 bytes of `.data.rel.ro` and 26 of `.text` that R4 does not
+    // have, which is the scope clause `.memory/01-ladder.md` finding 1 needs:
+    // ghost code costs zero EXECUTED instructions and zero instructions in the
+    // kernel symbol, and *byte-identical binary* is false here at `md5_fn`
+    // (TASK_072_REVIEW M4; ../NOTES.md 5).
     fn apply(&self, x: u64) -> (r: u64)
         ensures
             r == self.spec_apply(x),

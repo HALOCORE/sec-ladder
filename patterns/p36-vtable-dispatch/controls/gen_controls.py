@@ -27,8 +27,17 @@ The controls, and what each answers:
               the one that decided what p36 ships: it verifies, and it is
               1022 / 8190 Ir/call DEARER.
   r4_reslice  R4 plus R3's single reslice, so it and R3 differ in NOTHING but
-              the bounds checks -- the matched-spelling pair.
-  r3_idx      R3 with R2's per-record cursor test -- an R3-SIDE lever.
+              the bounds checks -- the matched-spelling pair, +10.00 flat, and
+              since TASK_073 a VERIFIED R4 (`--verus`, `v_r4_reslice`).
+  r3_idx      R3 with R2's per-record cursor test -- R3-SIDE lever 1, dear.
+  r3_window   R3 with the WINDOW resliced once at the top -- R3-SIDE lever 2,
+              and **cheaper than the shipped R3** (1702 / 13350 against
+              1710 / 13358), in contract and with zero `unsafe`. Landed at
+              TASK_073 on TASK_072_REVIEW B1, which found that p36 had searched
+              the R4 side and not the R3 side.
+  r3_hdr4     the header alone resliced -- R3-SIDE lever 3, 1704 / 13352.
+  r3_iter     r3_window plus `chunks_exact(2)` -- R3-SIDE lever 4, 1705 / 13353,
+              i.e. the iterator spelling buys nothing here.
   r2_nodead   R2 with the (dead) table bounds check removed by `get_unchecked`
               ONLY on the table, so the two halves of R4's win separate.
 """
@@ -196,7 +205,18 @@ def c_r4_cursor():
 def c_r4_reslice():
     """R4-SIDE LEVER 2: the shipped R4 plus R3's single reslice, so R3 and this
     control differ in NOTHING but the bounds checks. Its difference from R3 is
-    the MATCHED-SPELLING safety number (`.tasks/TASK_026.md` §0.1)."""
+    the MATCHED-SPELLING safety number (`.tasks/TASK_026.md` §0.1): **+10.00
+    flat**, and that is the number ../NOTES.md 8b publishes as such.
+
+    ⚠ **THIS DOCSTRING AND ../NOTES.md 8b USED TO NAME DIFFERENT NUMBERS AS
+    "the matched-spelling difference" IN ONE COMMIT** -- this one +10, NOTES.md
+    the shipped `R3ship - R4ship` = +15 -- and the headline shipped was the
+    larger (TASK_072_REVIEW B1). This one was right and NOTES.md's was wrong:
+    the shipped R4 carries a second induction variable `p` and indexes
+    `buf[off + p]`, where R3 indexes `rec[2 * t]` into a reslice, so R3ship and
+    R4ship are NOT the same loop written twice. `r4_reslice` is. Since TASK_073
+    it is also a VERIFIED R4 (`v_r4_reslice`, `12 verified, 0 errors`), so the
+    +10 is admissible-to-admissible."""
     s = rung("unsafe.rs")
     s = sub(s, """    let mut acc: u64 = 0;
     let mut p: usize = 4;
@@ -214,9 +234,91 @@ def c_r4_reslice():
     return s
 
 
+# The header block every R3-side lever below rewrites, quoted once so the three
+# substitutions cannot drift apart.
+_R3_HDR = """    let nrec: usize = buf[off] as usize + 256 * (buf[off + 1] as usize)
+        + 65536 * (buf[off + 2] as usize) + 16777216 * (buf[off + 3] as usize);
+    if nrec == 0 {
+        return 0;
+    }
+    // The hoisted record count: the same records the per-record cursor test
+    // would have admitted, computed once.
+    let room: usize = (len - 4) / 2;
+    let nw: usize = if nrec < room { nrec } else { room };
+    let rec: &[u8] = &buf[off + 4..off + 4 + 2 * nw];"""
+
+
+def c_r3_window():
+    """R3-SIDE LEVER 2, **CHEAPER THAN THE SHIPPED R3** (TASK_072_REVIEW B1,
+    landed at TASK_073): reslice the WINDOW once at the top and index the header
+    inside it, so `w.len() == len >= 4` is visible and LLVM collapses the four
+    separate `off + k < buf.len()` header checks into the single reslice test.
+
+    `13.00000*nrw + 38` against the shipped R3's `13.00000*nrw + 46` -- 1702 /
+    13350 against 1710 / 13358, **identical checksums on both blobs, zero
+    `unsafe`, and in contract**: all 11 required backticked rust spellings match
+    exactly as the shipped R3 does and no forbidden spelling is hit
+    (`controls/r3_contract.py`, which uses the gate's own
+    `check.py::spelling_matches`).
+
+    ⚠ **The SLOPE does not move: 13.00000 in both.** The whole R3-side spread is
+    prologue, i.e. per call and zero per record, which is why the shipped rung
+    was kept and the SPAN published instead of reshipping -- ../NOTES.md 8b."""
+    return sub(rung("safe_tuned.rs"), _R3_HDR,
+               """    let w: &[u8] = &buf[off..off + len];
+    let nrec: usize = w[0] as usize + 256 * (w[1] as usize)
+        + 65536 * (w[2] as usize) + 16777216 * (w[3] as usize);
+    if nrec == 0 {
+        return 0;
+    }
+    // The hoisted record count: the same records the per-record cursor test
+    // would have admitted, computed once.
+    let room: usize = (len - 4) / 2;
+    let nw: usize = if nrec < room { nrec } else { room };
+    let rec: &[u8] = &w[4..4 + 2 * nw];""")
+
+
+def c_r3_hdr4():
+    """R3-SIDE LEVER 3: reslice ONLY the four header bytes, leaving the record
+    reslice exactly as shipped. It isolates the lever `r3_window` pulls -- one
+    bounds check on the header instead of four -- and lands at
+    `13.00000*nrw + 40` (1704 / 13352), two dearer than `r3_window` because the
+    record reslice is still measured against `buf` rather than against `w`."""
+    return sub(rung("safe_tuned.rs"), _R3_HDR,
+               """    let h: &[u8] = &buf[off..off + 4];
+    let nrec: usize = h[0] as usize + 256 * (h[1] as usize)
+        + 65536 * (h[2] as usize) + 16777216 * (h[3] as usize);
+    if nrec == 0 {
+        return 0;
+    }
+    // The hoisted record count: the same records the per-record cursor test
+    // would have admitted, computed once.
+    let room: usize = (len - 4) / 2;
+    let nw: usize = if nrec < room { nrec } else { room };
+    let rec: &[u8] = &buf[off + 4..off + 4 + 2 * nw];""")
+
+
+def c_r3_iter():
+    """R3-SIDE LEVER 4: `r3_window` plus an iterator over the record pairs, so
+    the per-record indexing disappears from the source entirely.
+    `13.00000*nrw + 41` (1705 / 13353) -- DEARER than `r3_window`, which is the
+    useful half of the result: on p36 the iterator spelling buys nothing,
+    because R3's loop was already check-free (../NOTES.md 4)."""
+    return sub(c_r3_window(), """    let mut acc: u64 = 0;
+    let mut t: usize = 0;
+    while t < nw {
+        let op: usize = rec[2 * t] as usize;
+        let arg: u64 = rec[2 * t + 1] as u64;""",
+               """    let mut acc: u64 = 0;
+    let mut t: usize = 0;
+    for c in rec.chunks_exact(2) {
+        let op: usize = c[0] as usize;
+        let arg: u64 = c[1] as u64;""")
+
+
 def c_r3_idx():
-    """R3-SIDE LEVER: R2's per-record cursor test on the tuned rung, i.e. the
-    reslice without the hoist."""
+    """R3-SIDE LEVER 1: R2's per-record cursor test on the tuned rung, i.e. the
+    reslice without the hoist. The DEAR end of the R3-side span."""
     s = rung("safe_tuned.rs")
     s = sub(s, """    let room: usize = (len - 4) / 2;
     let nw: usize = if nrec < room { nrec } else { room };
@@ -287,6 +389,60 @@ def v_r4_cursor():
             break;
         }
         let op: usize""")
+    return s
+
+
+def v_r4_reslice():
+    """`r4_reslice`, as an R5 twin. **Built at TASK_073, on TASK_072_REVIEW M1.**
+
+    ../NOTES.md 8b and 11c used to say this twin was NOT built -- *"it needs
+    `vstd::slice::slice_subrange` and the subrange-indexing proof that goes with
+    it, which is real work this task did not do"* -- so `r4_reslice`'s
+    1700 / 13348 was reported and NOT counted in the R4-side span. Measured, the
+    proof is four `assert` lines and two `invariant` lines and it verifies
+    **first try**: `12 verified, 0 errors`, the same obligation count as the
+    shipped R5, and **no new `#[verifier::external_body]` item in this
+    pattern** -- the reslice's contract comes from `vstd::slice::slice_subrange`,
+    which is `external_body` *inside the pinned vstd*, i.e. in the trusted base
+    every pattern in this tree already stands on rather than in p36's own tally.
+
+    So `r4_reslice` IS an admissible R4 and the R4-side span has THREE verified
+    members. 1700 / 13348 is interior to 1695...2717 / 13343...21533, so the
+    endpoints do not move -- what moves is that `R3ship - r4_reslice` is now an
+    admissible-to-admissible MATCHED-SPELLING pair at `+10.00 flat`.
+
+    Compiled (`--compile ... -C opt-level=3 --cfg slb_isolated`) it is
+    `md5_fn_norel`-identical to the `r4_reslice` control with equal checksums on
+    both blobs; ../NOTES.md 8b has the run."""
+    s = rung("verus.rs")
+    # 1. the reslice, and drop the exec cursor `p`.
+    s = sub(s, """    let nw: usize = if nrec < room { nrec } else { room };
+    let mut acc: u64 = 0;
+    let mut p: usize = 4;
+    let mut t: usize = 0;""",
+            """    let nw: usize = if nrec < room { nrec } else { room };
+    assert(off + 4 + 2 * nw <= buf@.len()) by {
+        assert(2 * nw <= len - 4);
+    }
+    let rec: &[u8] = vstd::slice::slice_subrange(buf, off + 4, off + 4 + 2 * nw);
+    let mut acc: u64 = 0;
+    let mut t: usize = 0;""")
+    # 2. the invariant: `p` becomes `4 + 2*t`, plus the two subrange facts.
+    s = sub(s, """            p == 4 + 2 * t,
+            t <= nw,
+            run(buf@, off as int, len as int, t as int, nrec as int, p as int, acc) == run(""",
+            """            t <= nw,
+            rec@ == buf@.subrange(off + 4, off + 4 + 2 * nw),
+            rec@.len() == 2 * nw,
+            run(buf@, off as int, len as int, t as int, nrec as int, 4 + 2 * t, acc) == run(""")
+    # 3. the body: index the reslice, no cursor.
+    s = sub(s, """        let op: usize = buf_get_unchecked(buf, off + p) as usize;
+        let arg: u64 = buf_get_unchecked(buf, off + p + 1) as u64;
+        p = p + 2;""",
+            """        assert(rec@[2 * t as int] == buf@[off + 4 + 2 * t]);
+        assert(rec@[2 * t as int + 1] == buf@[off + 4 + 2 * t + 1]);
+        let op: usize = buf_get_unchecked(rec, 2 * t) as usize;
+        let arg: u64 = buf_get_unchecked(rec, 2 * t + 1) as u64;""")
     return s
 
 
@@ -376,6 +532,8 @@ def v_specfirst():
 
 VERUS_TWINS = {
     "v_r4_cursor": (v_r4_cursor, "the R2-shaped unsafe rung, as an R5 twin"),
+    "v_r4_reslice": (v_r4_reslice, "the matched-spelling R4, as an R5 twin "
+                                   "-- TASK_073, on TASK_072_REVIEW M1"),
     "v_specfirst": (v_specfirst, "the trait with the GHOST item declared first "
                                  "-- verifies, and moves the vtable slot"),
     "v_r_fnptr": (v_r_fnptr, "C's bare `fn`-pointer table, as an R5 twin"),
@@ -403,6 +561,9 @@ CONTROLS = {
     "r4_cursor": ("rust", c_r4_cursor),
     "r4_reslice": ("rust", c_r4_reslice),
     "r3_idx": ("rust", c_r3_idx),
+    "r3_window": ("rust", c_r3_window),
+    "r3_hdr4": ("rust", c_r3_hdr4),
+    "r3_iter": ("rust", c_r3_iter),
     "r2_nodead": ("rust", c_r2_nodead),
 }
 

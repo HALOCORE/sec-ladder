@@ -398,7 +398,7 @@ that is the deliverable for these rows**, not a green checkmark.
 | ID | Pattern | C bug class modelled | Verus difficulty | Status |
 |---|---|---|---|---|
 | p35 | tagged union / discriminated dispatch | tag-payload mismatch | moderate | planned |
-| p36 | function-pointer table dispatch (vtable-like) | index out of table | moderate | planned |
+| p36 | function-pointer table dispatch (vtable-like) (delivered as `p36-vtable-dispatch`). ⚠ **The catalogue's *"the harm is not reproducible"* worry is REFUTED — 24/24 SIGSEGV** across gcc/clang × O0–O3 × 3 opcodes; and the *"likeliest to hit p55's wall"* triage was wrong twice over | **index out of table — the class UPHELD, but it is the tree's TWELFTH `index >= len` and the pattern says so.** What is not twelfth: ⚠ **Verus at the pin cannot type `fn(u64) -> u64` AT ALL** (error on the *declaration*), so C's own dispatch mechanism is **not an admissible rung** and the Rust rungs use `[&'static dyn Op; NOPS]` — **priced at exactly `3.00000` Ir/dispatch, finding 14's sharpest instance because it excludes the MECHANISM, not a spelling** | moderate | **done** (T072), gate `PASS` first complete run, R5 **19/0**, `R4 ≡ R5` **`norel` at O3 — the first pattern in the tree not `exact`**, TCB 4 (2 contract-bearing), **reviewed** (T072_REVIEW: **2 blockers, 5 majors, 7 minors, 36 clean negatives**; corrections at T073, which refuted **three** prescriptions — two the manager's, one the review's). ⚠ **Both published headlines moved.** `R3 − R4 = +15.00 flat` was fitted against an R3 side **never searched** (one lever, and it moved R3 *dearer*): p36 now publishes **`+7.00` (fixed-R4 bound, cheapest R3 found) and `+10.00` (matched pair), never one number and no pair interval.** And every `Ir` was **kernel-exclusive on the one pattern whose kernel IS a call** — dispatch targets are 512/384/0 Ir per call, which **reverses** the `match` control and vanishes the gcc-vs-clang gap. **`Ir` exactly constant while wall clock moves 3.13×**, verified on program totals; ⚠ **not p07's finding in a costume** — p07's `Ir` moves and its branch is conditional. Catchers: ASan/UBSan name the **array read**, never the call; `-fsanitize=function` is **gcc-absent and clang-defeated**; only `-fsanitize=cfi-icall` names the transfer, and it is a control (needs `-flto` + `-fuse-ld=lld`), not a rung |
 | p37 | callback with `void*` userdata | type confusion | moderate–hard | planned |
 | p38 | **record parser that clamps a length in place and re-reads it through a pun** (delivered as `p38-alias-pun`). ⚠ **The catalogue's own spelling — *"endian conversion, `memcpy` vs union"* on a byte buffer — is the BENIGN aliasing direction and was retracted before the build**: neither compiler exploits it, 8 of 8 cells. Only two incompatible **non-char** types move | **strict-aliasing UB — the class UPHELD** (unusual: three of the previous five were overturned), and the harm is a **MISCOMPILE**, not a wrong answer | moderate | **done** (T066), gate `PASS` first complete run, R5 **13/0** (twin 16/0), `R4 ≡ R5` `exact` at O3 / `norel` at O0, TCB 5, Miri 8/8, **reviewed** (T066_REVIEW: **no blocker**, 3 majors, 8 minors, **35 clean negatives**; corrections at T067, which refuted three of the *review's* own numbers). **Ships labelled a DEMONSTRATION KERNEL** — the harm needs four conjunctive conditions and **six neighbouring one-line spellings each remove it**. ⚠ **The quotable result is the price: on gcc the undefined spelling is the DEAREST of the six, and every fix saves exactly 6.00 `Ir`/call.** **The first bug class here that unsafe Rust does not reintroduce** — Rust has no type-based aliasing rule at any rung. Also the project's **first additivity-extrapolation failure**, which turned out **100% attributable** to three missing columns, none of them the one named |
 | p39 | bitfield pack/unpack into wire format | shift/mask off-by-one | moderate | planned |
@@ -502,9 +502,13 @@ re-triaged p36 (above):
 - **Catcher: MSan (`-fsanitize=memory`)** — a third sanitizer this project has
   never used, and valgrind's `--track-origins=yes` is a second. ⚠ **MSan
   requires every dependency be instrumented** and is clang-only.
-  **UNVERIFIED — availability needs a compile probe**, deferred because an
-  engineer was running. TySan turned out to be present when the catalogue
-  assumed nothing; do not assume either way.
+  ✅ **UNVERIFIED ITEM CLOSED at TASK_072/073: MSan EXISTS AND WORKS on this box**
+  (clang, **including origin tracking**), and **gcc has no `-fsanitize=memory`**
+  at all. Probed out of scope by p36's engineer, spot-checked by p36's reviewer
+  — both halves reproduce; `.temp/p48probe/NOTES.md`. ⚠ One recorded omission:
+  the probe **exits 1** and that was not written down, so read the exit code
+  before building an expectation on it. **So p48's catcher story is settled and
+  the axis is no longer blocked on tooling.**
 
 **Where it sits on the slate.** The manager would build it **before p36** and
 argue it against p22, on the grounds that it is the only remaining axis with a

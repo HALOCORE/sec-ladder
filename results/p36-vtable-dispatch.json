@@ -1,10 +1,10 @@
 {
   "pattern": "p36-vtable-dispatch",
-  "generated_utc": "2026-08-23T10:50:39Z",
+  "generated_utc": "2026-08-23T12:11:46Z",
   "git": {
-    "commit": "7fd8a41b025fd46d030ee7750d5dac7eabe40700",
+    "commit": "15e94de3c3414e665c1ac2d0ec50852032c833d6",
     "dirty": true,
-    "dirty_files": 4,
+    "dirty_files": 12,
     "note": "commit is HEAD when measured, i.e. the parent of the commit this file lands in; a fresh run always names HEAD~1 and reads dirty. For real staleness run `harness/measure.py --check-stale`, which compares this record's source_sha256/input_sha256 against the tree."
   },
   "source_sha256": {
@@ -19,12 +19,12 @@
     "patterns/p36-vtable-dispatch/c/kernel.h": "63533f4dcc74cdf1005466dd2f5b9e8bbe4371790b81c01c621bcda8c7d0b92d",
     "patterns/p36-vtable-dispatch/c/kernel_hardened.c": "f2903ef64463bf54c3be3b1630f6d404594f14e1703781de41265183fcbfa28d",
     "patterns/p36-vtable-dispatch/c/main.c": "c9e96b7ae706897c3947217172fef21e237efff5cbaf1d45314e14bc981772b3",
-    "patterns/p36-vtable-dispatch/inputs/gen.py": "482ba3e53edb2ea9349a31825c8263e52c14d388cba3e4e5c640ebe01a10e492",
+    "patterns/p36-vtable-dispatch/inputs/gen.py": "e6b42b5ee52cecd10825ec43a8a2f47d73685b9ce05cfdff1e13e53ad0923b43",
     "patterns/p36-vtable-dispatch/model.py": "58df0795558765edb8b67ada0dbd5f7e97cb3d30a1d8d57292245eacd23b971b",
-    "patterns/p36-vtable-dispatch/safe_naive.rs": "33cd0b01623092453f5a6b7032046d02aac6cb5fedac0325da48857b41774204",
+    "patterns/p36-vtable-dispatch/safe_naive.rs": "b8aa807b5ed727a76be70324dcff4a1158ba566056d75aae02b1293fc9a7a120",
     "patterns/p36-vtable-dispatch/safe_tuned.rs": "94e2328d86cdc15a53dc33dac1173778751905739d8a0533d4a3222079dcd5b6",
-    "patterns/p36-vtable-dispatch/unsafe.rs": "77cddb6b3b9b1358c6a7bf645de572e178b320b23a4a66854dd5934af2df390d",
-    "patterns/p36-vtable-dispatch/verus.rs": "3a95b361d6a56c639e4f7854c87b6d5ad2b8194e6a0c1df448bb78843bf083c9",
+    "patterns/p36-vtable-dispatch/unsafe.rs": "acd480931200640ec1b9dffb4cc70721dae3f0093ab941496c638d0c65c1d15f",
+    "patterns/p36-vtable-dispatch/verus.rs": "936a4a1b7d69480f14bdbaef7ee340ec0b15c7714feb006afba7b7f1e021dcf3",
     "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
   },
   "input_sha256": {
@@ -263,16 +263,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.014170488342642784,
-          "median_s": 0.014422491658478975,
+          "min_s": 0.014079452492296696,
+          "median_s": 0.014380191452801228,
           "reps": 30,
-          "spread_pct": 1.7783671934427687
+          "spread_pct": 2.1360131771393487
         },
         "large.bin": {
-          "min_s": 0.09759010747075081,
-          "median_s": 0.09868310810998082,
+          "min_s": 0.09741348959505558,
+          "median_s": 0.09847453515976667,
           "reps": 30,
-          "spread_pct": 1.1199912240670513
+          "spread_pct": 1.0892183096220274
         }
       }
     },
@@ -333,16 +333,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.013859263621270657,
-          "median_s": 0.014150967355817556,
+          "min_s": 0.013960630632936954,
+          "median_s": 0.014071940444409847,
           "reps": 30,
-          "spread_pct": 2.1047563746403113
+          "spread_pct": 0.797312201715891
         },
         "large.bin": {
-          "min_s": 0.09367838967591524,
-          "median_s": 0.09527257783338428,
+          "min_s": 0.09347393456846476,
+          "median_s": 0.09464522590860724,
           "reps": 30,
-          "spread_pct": 1.7017672517473907
+          "spread_pct": 1.2530673342787118
         }
       }
     },
@@ -501,16 +501,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.013971984386444092,
-          "median_s": 0.014402642846107483,
+          "min_s": 0.014108243398368359,
+          "median_s": 0.014360152184963226,
           "reps": 30,
-          "spread_pct": 3.082299892069911
+          "spread_pct": 1.7855432422154085
         },
         "large.bin": {
-          "min_s": 0.09405484516173601,
-          "median_s": 0.09572636056691408,
+          "min_s": 0.09366391692310572,
+          "median_s": 0.09475059574469924,
           "reps": 30,
-          "spread_pct": 1.7771709711538461
+          "spread_pct": 1.1601893848680729
         }
       }
     },
@@ -573,16 +573,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.014773149974644184,
-          "median_s": 0.015053481329232454,
+          "min_s": 0.014806011691689491,
+          "median_s": 0.015002833679318428,
           "reps": 30,
-          "spread_pct": 1.8975733345252392
+          "spread_pct": 1.3293383236986875
         },
         "large.bin": {
-          "min_s": 0.10082813445478678,
-          "median_s": 0.10221857391297817,
+          "min_s": 0.1005112249404192,
+          "median_s": 0.10155374696478248,
           "reps": 30,
-          "spread_pct": 1.379019324030927
+          "spread_pct": 1.0372194995944612
         }
       }
     },
@@ -749,16 +749,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.02516914252191782,
-          "median_s": 0.025537961162626743,
+          "min_s": 0.025158189237117767,
+          "median_s": 0.025508068036288023,
           "reps": 30,
-          "spread_pct": 1.4653603728762246
+          "spread_pct": 1.3907153486788038
         },
         "large.bin": {
-          "min_s": 0.1827982710674405,
-          "median_s": 0.18604878429323435,
+          "min_s": 0.18218342680484056,
+          "median_s": 0.1832374450750649,
           "reps": 30,
-          "spread_pct": 1.778196919923063
+          "spread_pct": 0.5785478342952806
         }
       }
     },
@@ -823,16 +823,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.026110799983143806,
-          "median_s": 0.026570050977170467,
+          "min_s": 0.02607632242143154,
+          "median_s": 0.02642718330025673,
           "reps": 30,
-          "spread_pct": 1.7588545518449716
+          "spread_pct": 1.3455151886633485
         },
         "large.bin": {
-          "min_s": 0.19796935934573412,
-          "median_s": 0.20199223421514034,
+          "min_s": 0.19648211169987917,
+          "median_s": 0.19788865000009537,
           "reps": 30,
-          "spread_pct": 2.0320694488790387
+          "spread_pct": 0.7158607407297439
         }
       }
     },
@@ -999,16 +999,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.01695501059293747,
-          "median_s": 0.01721305027604103,
+          "min_s": 0.01691696234047413,
+          "median_s": 0.01714614685624838,
           "reps": 30,
-          "spread_pct": 1.5219081208421459
+          "spread_pct": 1.3547616360528394
         },
         "large.bin": {
-          "min_s": 0.11462074890732765,
-          "median_s": 0.11693416442722082,
+          "min_s": 0.1137875011190772,
+          "median_s": 0.11523061525076628,
           "reps": 30,
-          "spread_pct": 2.0183217628106718
+          "spread_pct": 1.2682536460475309
         }
       }
     },
@@ -1073,16 +1073,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.017275630496442318,
-          "median_s": 0.017568600829690695,
+          "min_s": 0.017275452613830566,
+          "median_s": 0.017481565941125154,
           "reps": 30,
-          "spread_pct": 1.695858992288068
+          "spread_pct": 1.1930994336413256
         },
         "large.bin": {
-          "min_s": 0.12084582261741161,
-          "median_s": 0.12272315798327327,
+          "min_s": 0.1200538007542491,
+          "median_s": 0.12117499858140945,
           "reps": 30,
-          "spread_pct": 1.5534962857633487
+          "spread_pct": 0.9339128125193285
         }
       }
     },
@@ -1247,16 +1247,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.016556963324546814,
-          "median_s": 0.016853570006787777,
+          "min_s": 0.016493739560246468,
+          "median_s": 0.016703650821000338,
           "reps": 30,
-          "spread_pct": 1.7914316558352437
+          "spread_pct": 1.272672337204852
         },
         "large.bin": {
-          "min_s": 0.11203633714467287,
-          "median_s": 0.11409186758100986,
+          "min_s": 0.11244751885533333,
+          "median_s": 0.11359925800934434,
           "reps": 30,
-          "spread_pct": 1.8346997846624362
+          "spread_pct": 1.0242459466738023
         }
       }
     },
@@ -1321,16 +1321,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.017634466290473938,
-          "median_s": 0.01797280227765441,
+          "min_s": 0.017521535977721214,
+          "median_s": 0.01786003727465868,
           "reps": 30,
-          "spread_pct": 1.9186063337978028
+          "spread_pct": 1.9319156572110632
         },
         "large.bin": {
-          "min_s": 0.12189852073788643,
-          "median_s": 0.12372153252363205,
+          "min_s": 0.12178478203713894,
+          "median_s": 0.12293406762182713,
           "reps": 30,
-          "spread_pct": 1.4955159215308043
+          "spread_pct": 0.9437021321249364
         }
       }
     },
@@ -1493,16 +1493,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.016837777569890022,
-          "median_s": 0.017199262976646423,
+          "min_s": 0.016914311796426773,
+          "median_s": 0.017106920946389437,
           "reps": 30,
-          "spread_pct": 2.146871255757788
+          "spread_pct": 1.1387347725454204
         },
         "large.bin": {
-          "min_s": 0.11605541314929724,
-          "median_s": 0.11823427071794868,
+          "min_s": 0.11611065454781055,
+          "median_s": 0.11706455331295729,
           "reps": 30,
-          "spread_pct": 1.8774286433744272
+          "spread_pct": 0.8215428367548717
         }
       }
     },
@@ -1567,16 +1567,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.01735622901469469,
-          "median_s": 0.01770777255296707,
+          "min_s": 0.017453649081289768,
+          "median_s": 0.01763661438599229,
           "reps": 30,
-          "spread_pct": 2.0254603576315207
+          "spread_pct": 1.0482925596267336
         },
         "large.bin": {
-          "min_s": 0.11846485920250416,
-          "median_s": 0.12038037413731217,
+          "min_s": 0.11779751069843769,
+          "median_s": 0.11873847991228104,
           "reps": 30,
-          "spread_pct": 1.616947800135084
+          "spread_pct": 0.7988022906971542
         }
       }
     },
@@ -1735,16 +1735,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.014081796631217003,
-          "median_s": 0.014356523286551237,
+          "min_s": 0.014023704454302788,
+          "median_s": 0.01423898572102189,
           "reps": 30,
-          "spread_pct": 1.9509346891518864
+          "spread_pct": 1.5351240994889173
         },
         "large.bin": {
-          "min_s": 0.09613889642059803,
-          "median_s": 0.09807756915688515,
+          "min_s": 0.09631865005940199,
+          "median_s": 0.09771661227568984,
           "reps": 30,
-          "spread_pct": 2.01653317072168
+          "spread_pct": 1.4513930743689774
         }
       }
     },
@@ -1805,16 +1805,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.013705740682780743,
-          "median_s": 0.013922747690230608,
+          "min_s": 0.013723306357860565,
+          "median_s": 0.013900911435484886,
           "reps": 30,
-          "spread_pct": 1.5833292958949887
+          "spread_pct": 1.2941857668475838
         },
         "large.bin": {
-          "min_s": 0.0921208681538701,
-          "median_s": 0.09359781490638852,
+          "min_s": 0.09181397408246994,
+          "median_s": 0.09245449490845203,
           "reps": 30,
-          "spread_pct": 1.6032705532599425
+          "spread_pct": 0.697628909306071
         }
       }
     },
@@ -1973,16 +1973,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.020156271755695343,
-          "median_s": 0.02036591386422515,
+          "min_s": 0.02013320568948984,
+          "median_s": 0.02032989589497447,
           "reps": 30,
-          "spread_pct": 1.040083756910897
+          "spread_pct": 0.9769443004663041
         },
         "large.bin": {
-          "min_s": 0.1496332325041294,
-          "median_s": 0.15184696577489376,
+          "min_s": 0.14828924741595984,
+          "median_s": 0.1492673149332404,
           "reps": 30,
-          "spread_pct": 1.4794395828501925
+          "spread_pct": 0.6595673889537271
         }
       }
     },
@@ -2045,16 +2045,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.020548369735479355,
-          "median_s": 0.020912459585815668,
+          "min_s": 0.020609447732567787,
+          "median_s": 0.02084241947159171,
           "reps": 30,
-          "spread_pct": 1.771867330709288
+          "spread_pct": 1.1304123334453722
         },
         "large.bin": {
-          "min_s": 0.14850813429802656,
-          "median_s": 0.15226743975654244,
+          "min_s": 0.14832235407084227,
+          "median_s": 0.14955497765913606,
           "reps": 30,
-          "spread_pct": 2.5313801673460508
+          "spread_pct": 0.8310437061328332
         }
       }
     }

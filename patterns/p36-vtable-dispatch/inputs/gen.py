@@ -41,6 +41,13 @@ would enter it.
     band that makes `Ir` and `ns` disagree for a NAMED reason, and
     `callgrind --branch-sim=yes` reports the mechanism directly as `Bi` / `Bim`
     (`.memory/00-environment.md`).
+    ⚠ **`mixrand6` is the band's SIXTH-WINDOW control, added at TASK_073 on
+    TASK_072_REVIEW.** Every other blob of the band repeats ONE 256-opcode
+    sequence in all six windows; `mixrand6` gives each window a DIFFERENT
+    permutation of the same multiset, so a history-indexed predictor has 1536
+    positions to learn instead of 256 while `Ir` stays fixed by construction.
+    It is what turns ../NOTES.md 7's *disclosure* about the band into a
+    measurement.
   * band **t** varies the number of DISTINCT targets (1, 2, 4, 8) at a fixed
     record count. ⚠ Unlike band mix this does **not** hold the multiset fixed,
     so its `Ir` is not identical by construction; it is measured and reported
@@ -49,10 +56,19 @@ would enter it.
 ⚠ **RESIDUE CLASSES.** `.memory/03-measurement.md`'s rule after p38: a fit whose
 bands all sit at one residue of the regressor fits in sample and misses out of
 it. p36's regressor is `nrw`, the records actually walked per window. Band n's
-values span residues {0, 2, 4, 6} of `nrw mod 8` **and** both parities of
-`nrw mod 3`, and the row prints both so a class-dependent fit is visible before
-it is published. Band mix holds `nrw = 256` fixed on purpose -- it is not a
-length band and no length law is fitted on it.
+values are `{8, 18, 32, 46, 61, 96, 128, 151, 192, 257, 384, 512}`, which span
+residues **{0, 1, 2, 5, 6, 7} mod 8** and **{0, 1, 2} mod 3**, and the row prints
+both so a class-dependent fit is visible before it is published. Band mix holds
+`nrw = 256` fixed on purpose -- it is not a length band and no length law is
+fitted on it.
+⚠ **THIS PARAGRAPH SAID `{0, 2, 4, 6}` AND "both parities of `nrw mod 3`" UNTIL
+TASK_073** (TASK_072_REVIEW m3). Both were wrong, in the one file the
+residue-class rule exists to make checkable, and in the strict direction: the
+band's real coverage is six residues mod 8 rather than four, and `mod 3` has
+three classes and no parity. `main()`'s own printed rows and ../NOTES.md 4 had
+the right sets the whole time; only the documentation was wrong. The measurement
+is unaffected, which is why fixing it is a comment-only edit and
+`harness/measure.py --check-stale` reports **GEN-ONLY** rather than STALE.
 
 The opcodes and operands come from a plain LCG rather than `random`, so no draw
 is rejection-sampled and the stream cannot re-converge after an edit
@@ -271,6 +287,26 @@ def matrix(out):
 
 
 # ------------------------------------------------------------------ sweep ----
+def rand_perm(nrec, seed):
+    """A pseudo-random permutation of the band-mix multiset: `nrec // NOPS`
+    copies of each of the eight opcodes, Fisher-Yates-shuffled from `seed` with
+    this file's own LCG.
+
+    Factored out at TASK_073 so `mix_orders`' `rand` entry and the new
+    `mixrand6` blob draw from ONE implementation. `rand_perm(256, 97)` is
+    byte-for-byte what `mix_orders` produced before the refactor, which is
+    checked the only way that means anything: regenerate and diff the committed
+    `sweep-mixrand.bin`."""
+    per = nrec // NOPS
+    base = [o for o in range(NOPS) for _ in range(per)]
+    g = lcg(seed)
+    for i in range(len(base) - 1, 0, -1):
+        j = (next(g) >> 3) % (i + 1)
+        base[i], base[j] = base[j], base[i]
+    assert all(base.count(o) == per for o in range(NOPS))
+    return base
+
+
 def mix_orders(nrec):
     """The band-mix opcode arrangements. **Every one is a permutation of the
     same multiset** -- `nrec // NOPS` copies of each of the eight opcodes -- so
@@ -291,20 +327,16 @@ def mix_orders(nrec):
         assert len(seq) == nrec and all(seq.count(o) == per for o in range(NOPS))
         out[f"run{run:03d}"] = seq
     # a pseudo-random permutation of the SAME multiset
-    base = [o for o in range(NOPS) for _ in range(per)]
-    g = lcg(97)
-    for i in range(len(base) - 1, 0, -1):
-        j = (next(g) >> 3) % (i + 1)
-        base[i], base[j] = base[j], base[i]
-    assert all(base.count(o) == per for o in range(NOPS))
-    out["rand"] = base
+    out["rand"] = rand_perm(nrec, 97)
     return out
 
 
 def sweep(out):
     rows = []
-    # band n: records per window. Residues of `nrw` mod 8 span {0,2,4,6} and
+    # band n: records per window. Residues of `nrw` mod 8 span {0,1,2,5,6,7} and
     # mod 3 spans {0,1,2}, so no fitted law can be an artefact of one class.
+    # (This comment said {0,2,4,6} until TASK_073; the printed rows below always
+    # said otherwise -- TASK_072_REVIEW m3.)
     for n in (8, 18, 32, 46, 61, 96, 128, 151, 192, 257, 384, 512):
         st = HDR + 2 * n
         rows.append((f"sweep-n{n:03d}.bin", b"".join(
@@ -316,6 +348,15 @@ def sweep(out):
     for tag, seq in sorted(mix_orders(MIX_N).items()):
         rows.append((f"sweep-mix{tag}.bin", b"".join(
             window(records_ordered(seq, 61 * w + 5), st) for w in range(6)), st))
+    # ⚠ `mixrand6`: SIX DIFFERENT permutations of the SAME multiset, one per
+    # window, against `mixrand`'s one sequence repeated six times. The multiset
+    # is still fixed per window, so `Ir` is still constant BY CONSTRUCTION; what
+    # changes is how much history a predictor would have to learn (1536
+    # positions against 256). Same operand seeds `61 * w + 5` as the rest of the
+    # band, so the two differ in opcode ORDER and in nothing else.
+    rows.append(("sweep-mixrand6.bin", b"".join(
+        window(records_ordered(rand_perm(MIX_N, 97 + 13 * w), 61 * w + 5), st)
+        for w in range(6)), st))
     # band t: number of DISTINCT targets, at a fixed record count. The multiset
     # is NOT held fixed here, so this band's `Ir` is measured, not assumed.
     # ⚠ The alphabets are SPREAD over the three operations rather than being

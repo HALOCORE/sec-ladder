@@ -264,3 +264,74 @@ publish the span. **The manager leans to the span, on the p16/p17 precedent and
 because a re-measure perturbs the one number p36 is strongest on — but that
 reasoning conveniently preserves a headline, which is the shape this project
 keeps catching itself in. Argue it against that objection, not around it.**
+
+---
+
+## Outcome (recorded by the manager at the task boundary)
+
+**Landed** in `207a83e` (pattern) and this task's corrections commit; `.memory/`
+and RECAP alongside. **22 patterns, all green, all 22 reviewed. 44 records, 0
+STALE, 0 failures, 20 `PASS` + 2 `PASS-WITH-BLOCKED-ROWS`.**
+✅ **The six original axes are complete.**
+
+**F1 came out the manager's way and the manager's REASON was refuted**, which is
+the part worth keeping. The engineer kept the shipped R3 and published the span
+— but **not** because a re-measure would move the wall-clock headline. That
+argument is **false**: `measure.py`'s `SKIP_INPUT_PREFIX = "sweep-"` excludes
+every sweep blob from `input_sha256` and `measurement_sources` excludes
+`<pattern>/controls/*.py`, so p36's wall-clock headline **is not in the
+measurement record at all**. And a re-measure *was* taken (M2's `verus.rs` fix
+forced one): **0 of 32 cells moved a static column, a checksum or an `Ir`; only
+the wall block moved, by −0.90% to +0.98%, median −0.16%** — against the ≈18%
+p08 session shift the manager cited. **A right decision reached through a wrong
+mechanism is a decision that will be made wrongly next time.**
+
+**Four manager decisions taken across this arc:**
+
+1. **§0 was given authority to STOP the pattern, and it used it three times**
+   before a rung existed — killing the manager's `[fn(u64) -> u64; N]` design
+   default, re-basing the Rust rungs on trait objects, and pricing the
+   substitution at `3.00000` Ir/dispatch instead of waving at it. **That
+   authority is why p36 cost three tasks and not five**, and it is the pattern
+   to copy into `TASK_074`.
+2. **The `harness/` batch was NOT opened**, on rule 5, even though it grew from
+   three items to **five** in this arc and three of the five are now *measured*
+   defects rather than speculative hardening. ⚠ **Recorded as a decision rather
+   than a default**: RECAP's "After that" row now carries an explicit trigger —
+   **land it before the pattern after p48, or when it reaches six.**
+3. **p48 is next, and the manager will NOT clear it.** Rule 3 has been flagged
+   against it in the catalogue since TASK_066 and it is still unattacked;
+   `TASK_074`'s §0 must open by arguing whether to build it at all, with
+   authority to refuse — the `TASK_072` shape, which worked.
+4. **The `WHY_HEAD` divergence is UPHELD and owed propagation.** p36's contract
+   opener now **names** the *every rung is a spelling* finding where p22, p27 and
+   p38 still cite the bare number. The engineer flagged the divergence and asked;
+   **naming it is correct** — RECAP's own rule is *name the pattern, never the
+   number*, and finding 14 is a live collision (ladder = p13, RECAP = the
+   cross-cutting entry). ⚠ **Propagating touches three patterns' hashed
+   contracts = three gate re-runs; queued, not taken.**
+
+⚠ **PROTOCOL rule 2's running count is 165, arithmetic written out so the next
+manager can audit rather than inherit it:** 155 at TASK_071, **+3** (p36's
+engineer: the `[fn]` design default being unbuildable at the pin, *"no pattern
+has an indirect call at all"* being false as literally written, and the R4
+default refused on a measurement that would otherwise have published a sixth
+flattering-direction headline), **+2** (p36's review, on the manager's *"a
+mitigation this matrix cannot price"* prescription and the manager's own
+repetition of the finding-14/15 mis-citation **in the task file forwarding the
+rule against it**), **+2** (TASK_073's engineer on the manager: F1's re-measure
+argument and m3's *"`gen.py` forces a re-measure"*), **+3** (TASK_073's engineer
+on the **review**: the *"64 is most of the 96-byte shift"* conflation of a
+displacement with an absolute shift, `r3_idx`'s slope being **17** and not 13,
+and the noise-floor range being 0.19–0.55% and not 0.19–0.34%).
+**Carry 165 forward.**
+
+**The single most useful thing in this block, and it is a new shape.** ⚠ **p36
+searched the R4 side FIRST — correctly, and it changed which rung ships — and
+then published a difference whose R3 endpoint had ONE lever that moved the wrong
+way.** The review's first R3 respelling turned `+15.00 flat` into `+7`, and `+2`
+against the cheapest R4. **The trap this project has been tracking for six
+patterns is not "the R4 side is under-searched". It is "a difference is only as
+honest as its WEAKER-SEARCHED endpoint"**, and searching one side hard makes the
+other side's silence *more* convincing, not less. **Count the levers on each
+side and publish the count.**

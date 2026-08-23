@@ -192,6 +192,22 @@ thing.
    what makes the branch attribution stick.
 3. **Both slow callgrind down substantially.** Use them for a named question on
    a few cells, not across a matrix.
+4. ⚠ **THE CONDITIONAL AND INDIRECT HALVES ARE NOT EQUALLY GOOD, AND THE ABOVE
+   IS ESTABLISHED ONLY FOR THE CONDITIONAL HALF** (TASK_073, on p36 — added
+   because rule 1's *"strong evidence about direction"* was read as covering
+   both, and on p36 it is wrong in **direction**).
+   **`Bi` COUNTS and is exact; `Bim` DOES NOT PREDICT.** Measured on p36, one
+   binary, inputs differing only in the *order* of a fixed opcode multiset:
+   `mixrun001` simulates **99.87%** mispredict and is among the **fastest**
+   cells; `mixrand` simulates 86.6% and is the **slowest**. Sharper still,
+   `mixrand6` and `mixrand` have **identical `Ir` (3359.0000) and identical `Bi`
+   (513089)**, `Bim/Bi` of **0.8730 vs 0.8662** — a 0.8-point simulated
+   difference — and **1843.56 ns vs 789.86 ns, a 2.33× wall-clock gap.**
+   **The mechanism is that callgrind's indirect predictor is LAST-VALUE**, so it
+   cannot represent the history-based target prediction a real BTB does; a
+   periodic target sequence is trivial for the hardware and maximally bad for
+   the model. **Use `Bi` as a count of indirect branches. Do not read `Bim` as
+   evidence about time, in either direction.**
 
 **⚠ And the limit, restated correctly at TASK_030_REVIEW.** An earlier version of
 this paragraph said the simulators are *"blind to code layout"*. **They are not** —

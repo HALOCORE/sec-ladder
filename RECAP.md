@@ -8,11 +8,11 @@ this box is reference; this box is what to *do*.
 
 | | |
 |---|---|
-| **Patterns** | **21 exist, all 21 reviewed, 0 failures tree-wide, 0 STALE.** ⚠ **19 `PASS` + 2 `PASS-WITH-BLOCKED-ROWS`** — p01 (documented) and **p22, where a declared-hang input blocks a Miri row by design**. *Expect that verdict on any pattern declaring a hang; it is not a defect.* Count both ends rather than trusting either: `ls -d patterns/p*/ | wc -l` and `grep -c '^| p[0-9]' .memory/06-catalogue.md` (**the denominator moved from 47 to 48 at TASK_066**, which is why it is no longer written here — a spelled-out numerator sat on this line reading *"thirteen"* against a sixteen-row table). |
-| **Do this next** | **p36 — vtable dispatch / CFI, the last of the six original axes. Write `TASK_072`.** ⚠ **Its row was re-triaged at TASK_066 and the risk is much smaller than the catalogue says**: the bar is *"a sanitizer fires DETERMINISTICALLY"*, not *"the harm is identical"* — stage 2 never executes an adversarial input, and stage 7 tolerates a non-deterministic exit under `sanitizer_expect: "fires"`. **The real open question is whether anything in the gate's sanitizer set sees an out-of-table indirect call**: stage 7 builds `gcc -O1 -fsanitize=address,undefined`, **no CFI**. `-fsanitize=cfi` needs `-flto`, is clang-only and is a **`build.py`** change (a full re-measure — do not reach for it); **UBSan's `-fsanitize=function` may reach it without touching the matrix. UNVERIFIED — probe it in §0.** ⚠ **Or push back with `p48`** (initialisation — the seventh axis, uncatalogued until TASK_066, and the manager's own proposal, so **rule 3 says a different agent must attack it first**). |
-| **After that** | `.memory/06-catalogue.md`'s section **"The waves order by FAMILY…"** — the missing axes and a **feasibility triage** naming what would kill each. **Order: lifetime ✅ → p47 ✅ → p38 ✅ → p22 ✅ → p36**, which is the last of the original six. ⚠ **A SEVENTH axis was added at TASK_066 — `p48` (initialisation)** — and it was not in the catalogue at all; the pinned vstd already forbids the bug (`ptr_ref`/`ptr_mut_read` both `requires perm.is_init()`). **It is the manager's own proposal and rule 3 is flagged against it in the catalogue: a different agent must attack it before it is scheduled.** **Push back with the pattern you would rather build.** |
+| **Patterns** | **22 exist, all 22 reviewed, 0 failures tree-wide, 0 STALE.** ⚠ **20 `PASS` + 2 `PASS-WITH-BLOCKED-ROWS`** — p01 (documented) and **p22, where a declared-hang input blocks a Miri row by design**. *Expect that verdict on any pattern declaring a hang; it is not a defect.* Count both ends rather than trusting either: `ls -d patterns/p*/ | wc -l` and `grep -c '^| p[0-9]' .memory/06-catalogue.md` (**the denominator moved from 47 to 48 at TASK_066**, which is why it is no longer written here — a spelled-out numerator sat on this line reading *"thirteen"* against a sixteen-row table). |
+| **Do this next** | ✅ **THE SIX ORIGINAL AXES ARE COMPLETE** — p36 landed at TASK_072/073 and was the last. **Next: `p48` (initialisation / uninitialised-memory info leak), the seventh axis. Write `TASK_074`.** ✅ **Its one blocking unknown is CLOSED: MSan exists and works on this box** (clang, with origin tracking; gcc has no `-fsanitize=memory`), probed out of scope by p36's engineer and spot-checked by its reviewer — ⚠ but the probe **exits 1** and that was not recorded, so read the exit code. ⚠⚠ **`p48` IS THE MANAGER'S OWN PROPOSAL AGAINST THE MANAGER'S OWN SLATE and rule 3 is flagged against it in the catalogue — it is STILL UNATTACKED.** **Write the task so its §0's FIRST deliverable is to argue whether p48 should be built at all, with authority to refuse**; that is how `TASK_072` handled p36 and §0 changed the pattern three times before a rung existed. **Do not have the manager clear it.** |
+| **After that** | `.memory/06-catalogue.md`'s section **"The waves order by FAMILY…"** — the missing axes and a **feasibility triage** naming what would kill each. ✅ **Order: lifetime → p47 → p38 → p22 → p36, all done.** ⚠ **Two things now compete with the next pattern, and both are measured rather than speculative.** (1) **The `harness/` batch is FIVE items** (RECAP "Owed" 14, 19 ×2, plus p36's two: `vparse.py::duplicate_names` keying by bare name, and whether `results/*.json` should carry a callee/total `Ir` column — **p36's B2 was a reviewer summing `callgrind_annotate` rows by hand to find a reversed published comparison**). PROTOCOL rule 5 prefers a pattern, and the TASK_068 override precedent is *"fixes to measured defects, not speculative hardening"* — **three of the five now qualify. Land it before the pattern AFTER p48, or when it reaches six.** (2) **There is still no cross-pattern synthesis** ("Owed" 13), which is the project's stated purpose, and p36 just added a hazard to it. |
 | **Rules for writing that task** | ⚠⚠ **STATE NOVELTY CLAIMS AS QUESTIONS TO BE MEASURED, never as fact.** *"The first termination proof in the project"* was the manager's sentence in `TASK_070.md`; it was **false**, the engineer had no reason to doubt it, and it shipped into **eight places, two inside `contract_sha256`** — a review and a re-gate to remove. **Rule 9 protects `.memory/` from unreviewed findings and protects NOTHING from the task file itself.** p22's §0 counted 73 measures in one command once it was finally asked. ⚠ **Settle the bug class as the FIRST deliverable** — overturned on four patterns, upheld on two. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat). **Additivity extrapolation — the only out-of-sample test here that can fail — HAS now failed once, on p38, and it was 100% attributable to three missing columns, none of them the one named.** The rule that came out of it: ⚠ **check the RESIDUE CLASS of any parameter your bands hold constant** — two of p38's three bands sat at `nw ≡ 0 (mod 8)` and the third did not, which fits in sample and misses out of it with no in-sample residual to warn you. ⚠ **Name the INLINE MODE at every figure** — p10 fitted both and the regressors *swapped*. All three in `.memory/03-measurement.md`. |
-| **The trap that keeps firing** | **A headline can be wrong in the FLATTERING direction and pass a green gate.** p10 published *"safe Rust cheaper than unsafe"*: 60% was an **unsearched R4 side**, the rest **index-expression bookkeeping C pays more of than either Rust rung**. **p27 repeated it one pattern later** — a dead store in R4 that R3 did not have. **p47 is the first pattern to search the R4 side properly** (six levers, each measured *and* run through Verus). ⚠ **p38 made it four** (`+21/+25` published against a true `+24/+32`) and **p22 made it FIVE, and widest yet — `+2.00` published against `+125/+1021`, 510×.** ✅ **The trend is the good news: p38 disclosed after review, p22 disclosed BEFORE being asked.** ⚠ **Before publishing any rung comparison, ask what the OTHER rung's spelling is worth.** |
+| **The trap that keeps firing** | **A headline can be wrong in the FLATTERING direction and pass a green gate.** p10 published *"safe Rust cheaper than unsafe"*: 60% was an **unsearched R4 side**, the rest **index-expression bookkeeping C pays more of than either Rust rung**. **p27 repeated it one pattern later** — a dead store in R4 that R3 did not have. **p47 is the first pattern to search the R4 side properly** (six levers, each measured *and* run through Verus). ⚠ **p38 made it four** (`+21/+25` published against a true `+24/+32`) and **p22 made it FIVE, and widest yet — `+2.00` published against `+125/+1021`, 510×.** ✅ **The trend is the good news: p38 disclosed after review, p22 disclosed BEFORE being asked, and p36 searched the R4 side FIRST and CHANGED WHICH RUNG SHIPS** — the R2-shaped unsafe rung verifies and is 1022/8190 dearer, so shipping it would have published *"safe beats unsafe by 1007/8175"*. ⚠⚠ **AND THEN p36 FELL INTO THE MIRROR IMAGE, WHICH IS THE NEW LESSON: it searched R4 and left R3 with ONE lever, which moved R3 the wrong way.** Published `R3 − R4 = +15.00 flat`; the review's first in-contract R3 respelling made it **+7**, and **+2** against the cheapest R4. ⚠ **Searching one side is not searching. A difference is only as honest as its WEAKER-searched endpoint** — count the levers on each side and say whether they are comparable. **Before publishing any rung comparison, ask what BOTH rungs' spellings are worth.** |
 | **The loop** | build → review once → land corrections. **Three tasks per pattern is the measured cost.** Per `PROTOCOL.md` rule 9, write `.memory/` **only after** the review. |
 | **Git** | Commit at task boundaries; subagents never commit. ⚠ **There is a GitHub remote** (`origin`, `HALOCORE/sec-ladder`). **Do not push unless the user asks.** |
 | **Before quoting any number** | `harness/measure.py --check-stale` (exit 1 on STALE). |
@@ -104,6 +104,7 @@ rows, or run `ls -d patterns/p*/ | wc -l`.
 | p47 | constant-time compare | **the proof certifies a LEAKING kernel** — identical contract, and the obligation count does not move |
 | p22 | hash probe / open addressing | **the first pattern where SAFE RUST DOES NOT HELP** — a memory-safe non-terminating probe loop, Miri and ASan silent; the proof is the only rung that sees it |
 | p38 | strict aliasing / type punning | **a MISCOMPILE is the harm** — and the undefined spelling is the **dearest of six neighbours**. Ships labelled a *demonstration kernel*; the first class **unsafe Rust does not reintroduce** |
+| p36 | vtable / function-pointer dispatch | **the prover excludes the MECHANISM, not a spelling** — Verus cannot type `fn(u64)->u64` at all, so C's dispatch has no admissible Rust rung and the substitute costs **3.00000 `Ir`/dispatch**. Bug class is the tree's **twelfth** `index >= len` and it says so |
 
 **If you read only one thing after this file**, read `.tasks/TASK_026.md` §0 — the
 distilled rules from the thirteen-task spelling arc. Every pattern built after it
@@ -144,6 +145,7 @@ the commands are in `.memory/01-ladder.md`'s numbering warning.
 | p47 | **20** | 31 |
 | p38 | **21** | 32 |
 | p22 | **22** | 33 |
+| p36 | **23** | 34 |
 | p01, p02 | findings 1–3 | 1–8 |
 
 Cross-cutting entries exist only here: **14** (every rung is a spelling), **16**
@@ -1290,6 +1292,64 @@ the number.** Two task files have already sent an agent to the wrong finding.
    published `+2.00` against `+125/+1021` — **510×** on the large band. Disclosed
    proactively this time.
 
+34. **p36 — the prover excludes the MECHANISM, not a spelling; and the
+   kernel-exclusive column hid an entire callee.** (TASK_072, reviewed at
+   TASK_072_REVIEW: **2 blockers, 5 majors, 7 minors, 36 named clean
+   negatives**; corrected at TASK_073, which refuted **three** prescriptions —
+   two the manager's and one the review's.) A dispatch table with no
+   `op < NOPS` check. ⚠ **The bug class is the tree's TWELFTH `index >= len`
+   and the pattern says so up front** — everything below is what is not twelfth.
+
+   **Verus at the pin cannot type `fn(u64) -> u64` at all** — the error is on the
+   **declaration**, not the call — and the `identity` pin makes an R4 a program
+   that must have a verifying R5 twin, so **C's own dispatch mechanism has no
+   admissible Rust rung.** The four Rust rungs use `[&'static dyn Op; NOPS]`,
+   and the difference is **priced, not waved at: exactly `3.00000` `Ir` per
+   dispatch**, same intercept, zero residual over twelve swept points, with a
+   **zero-fitted-parameter mechanism** off the two listings. ⚠ **Finding 14's
+   prior instances exclude a SPELLING; this one excludes a MECHANISM**, and it
+   is the one result here that survived both blockers untouched.
+
+   ⚠ **Both published headlines moved.** `R3 − R4 = +15.00 flat` was fitted
+   against an **R3 side with one lever, which moved R3 the wrong way**; p36 now
+   publishes **`+7.00` (fixed-R4 bound, cheapest R3 found)** and **`+10.00`
+   (matched pair)**, never one number and **no pair interval** — the interval
+   reads `−1015 … +537`, i.e. *"safe beats unsafe by 1015"*, the exact artefact
+   the search existed to prevent. And **every `Ir` was kernel-exclusive on the
+   one pattern whose kernel IS a call**: dispatch targets run **512 (gcc) / 384
+   (clang, rustc) / 0 (the `match` control, which inlines all eight arms)**, which
+   **reverses** `match` from dearer to cheaper — *and "it is DEARER" was quoted
+   inside the HASHED `idiom.why` as the reason it was forbidden* — and vanishes
+   the gcc-vs-clang C gap (10 vs 11 → 14 vs 14).
+
+   ⚠ **The `endbr64` finding is bigger than p36**: gcc defaults to
+   `-fcf-protection=full`, so **this project has been pricing a CFI mitigation
+   all along, at `1.00000·nrw + 1` `Ir` per call, in gcc's column only, and never
+   said so.** Manager-verified. See `.memory/03-measurement.md`.
+
+   **`Ir` exactly constant while wall clock moves 3.13×** — one binary, verified
+   on **program totals** too. ⚠ **Not p07's finding in a costume**: p07's `Ir`
+   *moves* and its branch is conditional; p36's is exactly constant and its
+   branch is indirect, **and the novel content is about the INSTRUMENT** —
+   callgrind's `Bi` counts, its `Bim` does **not** predict, and on p36 it is
+   wrong in *direction* (see `.memory/00-environment.md` rule 4).
+
+   **Catchers name the ARRAY READ, never the call**: ASan `global-buffer-overflow`
+   and UBSan `index 8 out of bounds`; `-fsanitize=function` is **absent in gcc
+   13.3 and defeated here under clang**; only `-fsanitize=cfi-icall` names the
+   transfer, and it needs `-flto` + `-fuse-ld=lld`, so it is a control, not a
+   rung. ✅ **Clean negative worth keeping**: there is **no** input where the read
+   is in bounds and the call is wrong, so the sanitizers and CFI fire on
+   **identical input sets** — CFI adds *vocabulary*, not *coverage*.
+
+   ⚠ **And a scope clause on finding 1, the project's number-one result.** R5's
+   vtables are **40 bytes to R4's 32**, and slot 4 of all eight points at one
+   emitted **26-byte `spec_apply`** stub. A proof still costs **zero executed
+   instructions and zero in the kernel symbol** — but *"ghost code fully erases"*
+   and *"the proven binary is byte-identical"* are **false** for a `spec fn`
+   declared in a **trait**, and its declaration position is part of the vtable
+   ABI. Manager-verified before landing.
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds
@@ -1887,7 +1947,28 @@ Both retired.
     is **refuted**: per distinct *rung* would still pick two `O0` cells and would
     have caught nothing. **The axis is (rung × opt).**
     ⚠ **Both are `check.py` edits — batch them**, and note the batch is now
-    **three**: these two plus item 14's `-fstrict-aliasing` token.
+    **FIVE**: these two, item 14's `-fstrict-aliasing` token, and items 20–21
+    below.
+
+20. **`harness/vparse.py::duplicate_names` keys by BARE NAME**, so a pinned
+    `verus.rs` cannot define one item name twice — **eight `impl Op for OpN`
+    blocks verify `19/0` and the gate refuses them** (p36 §9b). `parse()`
+    already computes each item's enclosing impl, so the fix is to key by
+    `(impl, name)`. ⚠ **It is a real limitation and it FORCED a spelling**: p36
+    ships one generic `impl<const K: u8> Op for OpTag<K>` because of it. Reported
+    by the engineer, not fixed, correctly — it is `harness/` work.
+21. ⚠ **Should `results/*.json` carry a callee / whole-program `Ir` column?**
+    p36's **B2 was found by a reviewer summing `callgrind_annotate` rows by
+    hand**, and what it found was a *reversed published comparison* sitting
+    inside a hashed `idiom.why`. The kernel-exclusive column is right for a
+    self-contained kernel and silently wrong when work leaves the symbol — and
+    `.memory/03-measurement.md`'s rule was phrased as `@plt`/`@GLIBC`, which p36
+    walked past because **its callees are project-local**. The rule is now
+    widened; **the open question is whether the harness should record the column
+    so the next pattern cannot walk past it either.** ⚠ Cost: `measure.py` is in
+    the gate's `harness/*.py` glob (item 5), so it stales every gate record —
+    **batch it**, and note `measure.py` is *not* executed by the gate, which is
+    why item 5 calls that glob over-broad.
 
 ### Deferred with a stated reason
 

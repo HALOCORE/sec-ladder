@@ -28,7 +28,9 @@
 //! ```
 //!
 //! on the declaration itself, so C's own mechanism is **not an admissible R4**.
-//! This is the sixth instance of `.memory/01-ladder.md` finding 14 -- the
+//! This is the sixth instance of the *EVERY RUNG IS A SPELLING* finding (RECAP
+//! finding 14; in `.memory/01-ladder.md` that number is p13 and this one is not
+//! numbered -- name the finding, never the number) -- the
 //! unsafe class is chained to the prover -- and the sharpest, because what the
 //! prover cannot reach is not a *spelling* of the kernel but the kernel's
 //! central *mechanism*. The `fn`-pointer spelling is measured as the control

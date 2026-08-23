@@ -15,7 +15,9 @@ several inputs**, holding the opcode multiset (and therefore `Ir`) exactly fixed
 and varying only the opcode ORDER. Code layout is identical across that
 comparison BY CONSTRUCTION -- it is literally the same file -- so the layout
 population is not the control that comparison needs, and p07's *"changing only
-the workload"* control is the precedent (`.memory/01-ladder.md` finding 15).
+the workload"* control is the precedent (p07 -- RECAP finding 15, which is
+`.memory/01-ladder.md` finding **8**; in that file 15 is p06, so the finding is
+named here rather than numbered).
 This file exists because `.memory/03-measurement.md` forbids an `ns` claim
 without a layout population **for a RUNG-TO-RUNG comparison**, and because the
 R4/R5 pair sits at a fixed source-path-length offset that moves if the repo is

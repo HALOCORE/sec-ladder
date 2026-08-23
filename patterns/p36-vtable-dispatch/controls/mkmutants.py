@@ -66,8 +66,20 @@ def m2():
 
     Nothing about memory safety moves; the kernel's `ensures` simply stops
     describing what the table does. It is here to show that the postcondition is
-    load-bearing rather than decorative, i.e. that `op_fold` really is pinned to
-    the dynamic types in `TABLE`."""
+    load-bearing rather than decorative.
+
+    ⚠ **THIS DOCSTRING USED TO CLAIM IT SHOWS `op_fold` IS PINNED TO THE DYNAMIC
+    TYPES IN `TABLE`, AND IT DOES NOT** (TASK_072_REVIEW m6). Measured, the
+    mutant fails at **`OpTag::apply`'s own postcondition** and the kernel is
+    never reached, because `spec_apply` for `OpTag<K>` is DEFINED as
+    `op_spec(K, x)` -- so moving `op_spec` breaks the impl before anything about
+    the table is considered. ../NOTES.md 10/m2 recorded that honestly the whole
+    time; this docstring did not. ✅ **`m3` is the mutant that does establish the
+    tie to `TABLE`**: shift the trusted `ensures` by one slot and the failure is
+    `invariant not satisfied` in the `run` relation, i.e. in the kernel. So the
+    property IS demonstrated -- by a different mutant than the one that claimed
+    it, which is exactly the shape `.memory/04-verus.md` 2b's
+    `--multiple-errors` rule exists to make visible."""
     s = shipped()
     return sub(s, """    } else if i == 3 {
         x.wrapping_add(0xc4ceb9fe1a85ec53)""",
