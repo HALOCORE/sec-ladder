@@ -729,7 +729,7 @@ the number.** Two task files have already sent an agent to the wrong finding.
    See `.memory/03-measurement.md`.
    **(b) A `forbidden` entry without backticks is audited ZERO times**, while the
    verdict line two above still counts it (**`check_idiom`** keys on `_TICK`,
-   `check.py:1103-1105`; this read `:929` until TASK_066). p09
+   `check.py::spelling_matches`; this read `:929` until TASK_066 and `:1103-1105` until TASK_071). p09
    shipped 5 forbidden entries and 0 audited spellings — its "forbidden: 0 hits"
    was kept **by auditing nothing**. Backtick every entry you want enforced.
 
@@ -1755,7 +1755,7 @@ Both retired.
 
     ⚠ **DO NOT do this as a standalone task, and the reason is a scheduling
     fact worth keeping.** A pattern's gate record globs **`pdir/*.md`**
-    (`check.py:5197`), so editing any `NOTES.md`/`README.md`/`spec.md` makes
+    (in `check.py::main`), so editing any `NOTES.md`/`README.md`/`spec.md` makes
     that gate record STALE — 12 gate re-runs. But `measure.py`'s `provenance()`
     (`:226-235`) does **not** glob `*.md`, so **it costs no re-measure at all.**
 
@@ -1767,7 +1767,7 @@ Both retired.
     > ⚠ **A FOURTH joined the batch at TASK_066_REVIEW and it is one line**:
     > stage 7 builds C at `-O1` **without `-fstrict-aliasing`**, so it cannot see
     > a flag-gated UB class. **It is one flag wide, not one opt level wide** —
-    > adding `-fstrict-aliasing` at `check.py:4738` makes stage 7 see p38 at
+    > adding `-fstrict-aliasing` to `check.py::check_sanitizers` makes stage 7 see p38 at
     > `-O1` (ASan `stack-buffer-overflow READ of size 2`). **Blast radius
     > measured across all 20 gate records: exactly one pattern.** 16 patterns
     > declare a `fires` input and **all 16 already fire at `-O1`**, p18 included.
@@ -1809,7 +1809,7 @@ Both retired.
     reads only committed records, runs in seconds, and needs no measurement).
 
     ⚠ **It must NOT live in `harness/`** — `check.py` hashes `harness/*.py` into
-    every gate record (`check.py:5200`), so a file there stales all 20 gates for
+    every gate record (the `harness/*.py` glob in `check.py::main`), so a file there stales all 21 gates for
     a script the gate never executes. `common/` and `common/layout/` are hashed
     too. Pick the location deliberately.
 
@@ -1895,7 +1895,7 @@ Both retired.
   Deferred twice, and the second time the engineer's own session was the argument:
   every defect that actually occurred was a class-membership or arithmetic error
   no `body_len / K` assertion would catch.
-- **`harness/check.py:1766`'s display string** (stage 3c's `head()`; cited as `:1753` until TASK_058) still says "recorded as a result";
+- **`check.py::check_marginal_ir`'s display string** (stage 3c's `head()`; cited as `:1753` until TASK_058 and `:1766` until TASK_071, both drifted) still says "recorded as a result";
   the comments beside it were corrected. Free to fix on any task that already
   re-runs all gates.
 

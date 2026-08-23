@@ -106,7 +106,7 @@ from gitignored scratch.
 
 **Two scope corrections while you are here** (both measured): the gate's
 checksum-agreement requirement binds the **matrix** inputs only —
-`check.py:469` and `measure.py:64` drop `sweep-*` entirely, so a sweep band is
+`check.py::inputs_of` and `measure.py`'s `SKIP_INPUT_PREFIX` drop `sweep-*` entirely, so a sweep band is
 never checksum-checked. And where an unguarded rung is excluded from a sweep band,
 check *why*: on p12's band A it is the **crash**, not the checksum.
 
@@ -140,7 +140,7 @@ Known residuals we are deliberately **not** closing, all measured:
   generalises: the audit cited p05's `chunks_exact` accident as its
   could-this-happen-by-accident precedent, and **`idiom_audit` structurally
   cannot see that accident.** It scans `rung_sources(pdir)` only
-  (`check.py:996-1010` — `c/kernel*.c` plus `MEASURED_CELLS + CONTROL_CELLS`;
+  (`check.py::rung_sources` — `c/kernel*.c` plus `MEASURED_CELLS + CONTROL_CELLS`;
   this read `:820-834` until TASK_066),
   while p05's measurements lived in `.temp/` and control variants. So
   `forbidden_hits` was **0 throughout the accident**, exactly as it is 0 today,
@@ -201,7 +201,7 @@ Known residuals we are deliberately **not** closing, all measured:
   > `patterns/p01-array-sum/safe_naive_verus.rs` exists (5688 B) and
   > `results/gate/p01-array-sum.json` records `idiom_audit.rungs: 6`, the control
   > cell being p01's sixth audited rung. **One `ls` refutes it, and it stood in
-  > the authoritative layer and was copied into `check.py:1191-1193`.**
+  > the authoritative layer and was copied into `check.py::rung_sources`' docstring.**
   > ⚠ **And the strongest argument against is the engineer's own**: a failing
   > check here would have been dischargeable by the *wrong* fix — respell at
   > 0.0000 `Ir`/call — leaving the real defect (an entry whose purpose `why`
@@ -253,7 +253,7 @@ Known residuals we are deliberately **not** closing, all measured:
 
 - ⚠ **`work_per_call` must count the WORK UNIT, not the input bytes — and three
   patterns have had to re-denominate.** p07 counts probes (4 B/unit), p10 taps
-  (2 B/unit), p47 byte comparisons (2 window B/unit); `check.py:1755-1760`
+  (2 B/unit), p47 byte comparisons (2 window B/unit); `check.py::check_marginal_ir`
   prescribes the repair verbatim. **This looks like defining a threshold away and
   on p47 it was checked and is not**: the tag loops run 11 instructions per 64
   window bytes (R3) and 12 (R4) — **0.172–0.188 `Ir` per window byte
@@ -1016,12 +1016,12 @@ review as a change to the committed artefact rather than only as a source diff.
   stale record is at least detectable by comparing hashes against the tree.
   ⚠ **A `forbidden` entry without BACKTICKS is audited zero times, and the
   verdict line still counts it** (TASK_038_REVIEW). The audit inside
-  **`check_idiom`** keys on `_TICK.findall` (`check.py:1103-1105`; `_TICK` is
-  defined at `:993`), so a bare-string entry is invisible to it while the line two
+  **`check_idiom`** keys on `_TICK.findall` (in `check.py::spelling_matches`), so
+  a bare-string entry is invisible to it while the line two
   above still reports *"N forbidden spelling(s)"*.
-  ⚠ **This citation read `:929` until TASK_066** — TASK_062 inserted ~187 lines
-  into stage 0b above it. **Cite the FUNCTION; a bare line number into `check.py`
-  is a decaying reference** (see the audit note at the end of this file). p09 shipped 5 forbidden entries
+  ⚠ **This citation read `:929`, then `:1103-1105`, and both had rotted.**
+  **Cite the FUNCTION and give NO line number at all** — see the audit note at
+  the end of this file for why the "line as a hint" compromise was abandoned. p09 shipped 5 forbidden entries
   and **0 audited spellings** — its "forbidden: 0 hits" was kept by auditing
   nothing. **Backtick every `forbidden` and `required` entry you want enforced**,
   and read `audit  forbidden: N spelling(s)` — not the declaration line — as the
@@ -1085,8 +1085,9 @@ newest source file.
 **Audited at TASK_066: 5 of 9 distinct `check.py:NNNN` citations in the
 authoritative layer pointed at the wrong code**, and two of the five were
 duplicated into a second file, so the same wrong line had to be fixed twice.
-`check.py` has grown to ~5460 lines and every insertion above a citation moves
-it; TASK_062 alone inserted ~187 lines into stage 0b.
+Every insertion above a citation moves it, and `check.py` grows every task —
+**5460 → 5884 → 6605 lines across TASK_066–071 alone.** Do not write a line
+count here either; run `wc -l harness/check.py`.
 
 What was wrong, and what it should have been:
 
@@ -1100,9 +1101,24 @@ What was wrong, and what it should have been:
 ⚠ **One of them had drifted TWICE** — `:566` until TASK_058, then `:1247-1249`
 until TASK_066. A citation that has been "fixed" is not thereby stable.
 
-**The rule: name the function, and put the line beside it as a hint, not as the
-reference.** `` **`check_checksums`** (`check.py:1440-1476`) `` survives an
-insertion; `` `check.py:1249` `` does not.
+⚠⚠ **THE "LINE AS A HINT" COMPROMISE WAS TRIED AND IT FAILED INSIDE ONE
+SESSION. The rule is now: name the FUNCTION and give NO LINE NUMBER AT ALL —
+`` `check.py::check_checksums` ``.**
+
+TASK_066 fixed every citation in this layer to *"function name, line beside it as
+a hint"*. **By TASK_071 every one of those hints was wrong again** — `check.py`
+went 5460 → 5884 → 6605 lines in three tasks, and the re-audit found the hints
+had drifted onto *unrelated functions*: `:1440-1476`, written as
+**`check_checksums`**, now lands inside `idiom_lines`; `:4738-4739`, written as
+the stage-7 build, lands inside `check_trusted_twins`.
+
+**A hint that is wrong is worse than no hint**, because a reader who checks it
+lands somewhere plausible and concludes the citation is fine. **The two lines
+directly above this paragraph were themselves the surviving example of the
+failed convention** and are the reason it is retracted here.
+
+⚠ **A function name cannot rot silently**: rename it and `grep` returns nothing,
+which is a loud failure. That is the whole argument.
 
 **The audit is an eyeball aid, not a checker** — nothing can know what a citation
 *meant*, so it prints each target for a human to judge. It found all five above:
@@ -1130,7 +1146,7 @@ across 12 patterns** (p04, p05, p06, p09, p10, p12, p13, p16, p17, p18, p27,
 p47). Audited at TASK_066, queued as RECAP "Owed" item 12 rather than fixed,
 because of a scheduling fact worth keeping:
 
-- a pattern's **gate** record globs `pdir/*.md` (`check.py:5197`), so editing any
+- a pattern's **gate** record globs `pdir/*.md` (in `check.py::main`), so editing any
   `NOTES.md`/`README.md`/`spec.md` makes that gate record **STALE**;
 - but `measure.py`'s `provenance()` (`:226-235`) does **not** glob `*.md`, so the
   same edit costs **no re-measure** — the expensive half is not triggered.
@@ -1143,7 +1159,7 @@ through the `harness/*.py` glob. **Three owed changes, one sweep.**
 
 **Found by p38's engineer, scoped by its review, recounted at TASK_067.**
 `check_sanitizers` builds the C rung `gcc -std=c99 -O1 -g
--fsanitize=address,undefined` (`check.py:4738-4739`). **gcc enables
+-fsanitize=address,undefined` (`check.py::check_sanitizers`). **gcc enables
 `-fstrict-aliasing` only at `-O2` and above**, so stage 7 cannot see a UB class
 that the flag gates.
 
@@ -1163,7 +1179,7 @@ p17's reason, a *kernel* reason. **The conclusion is unchanged: p38 is the only
 pattern whose declared-clean adversarial row is clean because of the gate's BUILD
 FLAGS rather than its kernel.**
 
-**The fix is one token — `-fstrict-aliasing` at `check.py:4739`.** ⚠ **Batch
+**The fix is one token — `-fstrict-aliasing` in `check.py::check_sanitizers`' build line.** ⚠ **Batch
 it**; it is the fourth `check.py` change waiting on one sweep (RECAP "Owed" 12).
 
 ## `forbidden_hits` HARD-FAILS since TASK_068, and `exec_code` blanks ghost CODE
