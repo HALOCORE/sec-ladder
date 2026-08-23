@@ -134,6 +134,20 @@ A task is done when **all** hold:
    git show HEAD:patterns/pNN-name/spec.md | diff - patterns/pNN-name/spec.md
    ```
 
+   ⚠ **THAT COMMAND IS VACUOUS ON A NEW PATTERN, and this instruction said so
+   nowhere until TASK_070_REVIEW.** It compares the **working tree to HEAD** —
+   not *first written* to *shipped*. A pattern lands in **one commit**, so on a
+   clean tree it always prints nothing and **always looks like it passed**. p22
+   ran it, got silence, and its `1f29b02e… → 044f02cd…` disclosure **still has no
+   artefact behind it.**
+
+   - **New pattern** → the command proves nothing. **The recorded first hash is
+     the ONLY evidence** — which is exactly why rule 6 opens by demanding you
+     write it down *before building any cell*. Say in `NOTES.md` that the diff is
+     unavailable and why, rather than citing a command that cannot fire.
+   - **Existing pattern** → the command is real; use `git show <commit>:` for the
+     commit the pattern landed in, not `HEAD`, once anything else has touched it.
+
    ⚠ **The same applies to the ARTEFACT-vs-GENERATOR skew**: if a `spec.md` is
    generated, fix the generator too and re-run it. Three tasks in a row shipped
    an edit the generator would have silently reverted

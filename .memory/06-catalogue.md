@@ -633,8 +633,12 @@ catalogue at all** — see the `p48` row and its triage below.
    (*provably memory-safe and still leaking*) one level up.
 3. **p38** (type punning) — cheap, and it pairs with p18 as the second half of
    *"what UB actually does"*.
-4. **p22** (hash probe) — the first termination obligation; `decreases` on a
-   probe sequence is a genuinely different proof shape.
+4. **p22** (hash probe) — ⚠ **"the first termination obligation" was FALSE and
+   is retracted** (TASK_070_REVIEW). **73 exec-loop `decreases` measures already
+   existed across the tree**, because **Verus demands one on every exec loop by
+   default**. The true claim is narrower and was counted: p22 carries the tree's
+   **only exec-loop measure not expressible in the loop's own exec variables**
+   (`i0 as int + d - u`, where `i` wraps and appears nowhere in it) — 1 of 73.
 5. **p36** (vtable dispatch) — first non-data harm.
 
 ### Feasibility triage for that slate — done before scheduling, not after
