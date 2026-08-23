@@ -151,3 +151,55 @@ which the manager added this arc and which is **vacuous on a new pattern**.
 whether the `why` should simply be split so it stops asserting something false.
 **Both are honest; they are not equally informative.** Argue it and choose; the
 one thing that cannot stand is a `why` that is false of what it forbids.
+
+---
+
+## Outcome (recorded by the manager at the task boundary)
+
+**Landed** in `050228d`; `.memory/` in `2bd4a03`; RECAP in `a4db0a9`/`8f2b763`.
+**21 patterns, all green, all 21 reviewed. 42 records, 0 STALE, 0 failures.**
+
+**Four manager decisions taken across this arc:**
+
+1. **PROTOCOL rule 5 was OVERRIDDEN deliberately** to do batched gate work
+   (`TASK_068`) before another pattern. Reason, recorded in RECAP at the time:
+   three of the four edits were fixes to **measured** defects rather than
+   speculative hardening, and the fourth **unblocked p22**, which could not
+   otherwise be built. **The override was right and the review vindicated it** —
+   it found 2 blockers in that work, both of which would have hit p22 directly.
+2. **`p48` was added to the catalogue as a seventh axis** (initialisation),
+   proposed by the manager from source reads and `vstd` greps. ⚠ **Rule 3 is
+   flagged against it in the catalogue itself**: the manager both wrote the slate
+   and moved it, so **a different agent must attack the proposal before it is
+   scheduled.** It is still unattacked.
+3. **F4 and F5 (two gate defects) were NOT fixed inline**, on the engineer's
+   correct judgement that they need `harness/` edits out of task scope. Queued as
+   RECAP "Owed" 19, which makes the pending `check.py` batch **three** items.
+4. **The "line as a hint" citation convention, introduced at TASK_066, was
+   RETRACTED at TASK_071** after failing inside a single session.
+
+⚠ **PROTOCOL rule 2's running count is 155, arithmetic written out so the next
+manager can audit rather than inherit it:** 130 at TASK_065, **+6** (p38's
+engineer, including the load-bearing probe-4 mechanism), **+4** (p38's review,
+refuting the manager's inverted A5 direction and the *"add `nw` and refit"*
+prescription), **+3** (TASK_067 refuting the **review's** blast radius, its
+`opaque_off` construction, and `rlen == 1` as an anomaly), **+2** (TASK_068's
+engineer on `expected_exit = None` and the overstated guard), **+2**
+(TASK_068_REVIEW on the manager's `183` premise and the six-vs-seven citation
+list), **+3** (p22's engineer on the hung-cell count, the Verus route, and
+*"the careful programmer pays for the bound"*), **+3** (p22's review, including
+the `per-distinct-rung` refutation and PROTOCOL's own vacuous `git show HEAD:`
+check), **+2** (TASK_071 refuting the **review's** gcc derivation and its
+assumption about which spellings the `forbidden` entries exclude).
+**Carry 155 forward.**
+
+**The single most useful thing in this block, and it is about the manager, not
+the agents.** ⚠ **A false premise written in a task file shipped into a
+pattern's HASHED CONTRACT.** *"The first termination proof in the project"* was
+the manager's sentence in `TASK_070.md`; the engineer propagated it to eight
+places, two inside `contract_sha256`, and it took a review and a re-gate to
+remove. **PROTOCOL rule 9 protects `.memory/` from unreviewed findings and
+protects nothing from the task file itself** — the engineer has no reason to
+doubt a premise the manager states as fact. **State novelty claims as questions
+to be measured** (*"is this the first X? count it"*), never as fact. p22's own
+`§0` counted 73 measures in one command when finally asked.

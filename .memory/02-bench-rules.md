@@ -179,7 +179,7 @@ Known residuals we are deliberately **not** closing, all measured:
   initialisation spell the same characters and `spelling_matches` has no notion
   of position — while two `required` entries already exclude it.
 
-  **`forbidden_hits` is now `0` across every pattern** (183 forbidden spellings at the time of writing; the invariant is the **zero**, not the denominator, which grows with each pattern).
+  **`forbidden_hits` is now `0` across every pattern** (the invariant is the **zero**; the denominator grows with every pattern and **must not be written here** — it has been wrong three times. Recompute: `python3 -c "import glob,json;print(sum(json.load(open(f))['idiom_audit']['forbidden_spellings'] for f in glob.glob('results/gate/p*.json')))"`).
 
   > **Recommendation from TASK_063, PROVISIONAL: MAKE IT FAIL, batched with the
   > next `check.py` change** — zero false-positive surface today.
@@ -187,7 +187,7 @@ Known residuals we are deliberately **not** closing, all measured:
   > (`.memory/06-catalogue.md`'s p22 triage, also PROVISIONAL). `RUN_TIMEOUT = 900`
   > makes a deliberately non-terminating adversarial cell cost 3–5 hours per gate
   > run, and the fix is a contract-declared timeout — another `check.py` edit.
-  > **Land the two together: one edit, one 20-gate sweep.** Neither is worth a
+  > **Land the two together: one edit, one full-tree sweep.** Neither is worth a
   > sweep alone.
   > **Two figures to carry with it.** (1) The same sweep with comments, string literals and
   > ghost clauses **not** blanked gives **29 hits across 11 patterns**.
@@ -1188,8 +1188,7 @@ it**; it is the fourth `check.py` change waiting on one sweep (RECAP "Owed" 12).
 **yes**: p27 forbade `` `memset(tab` `` and both its own C rungs spelled it, and
 the printed `2` survived three tasks and two adversarial reviews with nobody
 acting on it. ⚠ **Denominators are RECOMPUTABLE, not constants** — today
-**111 entries / 197 spellings**, and the unblanked sweep gives **40 hits across
-13 patterns**. *(Both figures were wrong when first written — 183 and "29 across
+**recompute both, never quote them** — `python3 -c "import glob,json;print(sum(json.load(open(f))['idiom_audit']['forbidden_spellings'] for f in glob.glob('results/gate/p*.json')))"` (it read 183, then 197, and p22 moved it again). The unblanked sweep gave **40 hits across 13 patterns** when last run. *(Both figures were wrong when first written — 183 and "29 across
 11" — and both were cited as the evidence for the hard fail.)*
 
 ⚠ **It shipped with a false-positive surface understated by five shapes and
@@ -1224,8 +1223,8 @@ each an entry quoting a span genuinely present in exec code: **substring**
 (`split` vs `split_first()`, `position(` vs `rposition(`), **whitespace-collapse**
 (`q / 64` vs `freq / 64`), and an entry that **backticks the replacement** rather
 than the banned spelling. Token-aware matching would break the standard itself —
-most of the 197 spellings are **expressions** (`2 + 2*nsuf > len`), not
-identifiers, and whitespace deletion is **forced by p17**. **0 of 197 fire today,
+most spellings are **expressions** (`2 + 2*nsuf > len`), not
+identifiers, and whitespace deletion is **forced by p17**. **0 fire today,
 the route out is a longer spelling (which sharpens the declaration), and all
 three are named in the failure text.**
 

@@ -1731,7 +1731,7 @@ Both retired.
     being hygiene the moment `forbidden_hits` began hard-failing: the harm
     direction **inverted**, from falsely *satisfying* a `required` count that
     never failed to falsely *hitting* a `forbidden` entry that blocks the gate,
-    and the denominator went from 15 pins to **197 spellings across 20 files,
+    and the denominator went from 15 pins to **every forbidden spelling in the tree, across 21 files,
     all containing twin bodies**. (b) *"0 of 15"* was wrong — **the predicted
     false satisfaction was live**: p27's `` `deallocate` `` was spelled in exactly
     one place in the tree, **its own `#[cfg(slb_twin)]` twin**, so the entry read
