@@ -15,9 +15,12 @@ import time.
 under an explicit `timeout=`; nothing is backgrounded and nothing is killed by
 name (`.memory/00-environment.md`).
 
-Every control is derived from a shipped source by an exact-string substitution
+Every control is derived from a shipped source by exact-string substitutions
 recorded here, so a reader can see what changed without a diff, and a
 substitution that stops matching is a hard error rather than a silent no-op.
+Every control but the three isolation mutants is ONE substitution.
+
+⚠ **Verus is always run with `--multiple-errors 20`** -- see `VERUS_FLAGS`.
 """
 
 import argparse
@@ -132,9 +135,16 @@ def r4_noguard():
 
 def r3_bounded():
     """R3 with a BOUNDED trip count instead of the capacity conjunct: the
-    spelling a careful safe-Rust programmer writes, and the one ../spec.md
-    forbids. It terminates on a full table WITHOUT the guard -- and it is a
-    different function there (it finds a key that is present in a full table)."""
+    spelling a careful safe-Rust programmer writes. It terminates on a full
+    table WITHOUT the guard -- and it is a DIFFERENT FUNCTION there (it finds a
+    key that is present in a full table), measured: it disagrees with the
+    shipped R3 on adversarial-full.bin and agrees on the other seven.
+
+    ⚠ **It is out of contract, but NOT by a backticked `forbidden` entry.**
+    ../spec.md forbids `for _ in 0..TABCAP` and `(0..TABCAP)` literally; the
+    loop below is a while against its own counter and matches neither. What
+    puts both bounded controls out of contract is `required` entry 3's prose,
+    *no trip count anywhere*. TASK_070_REVIEW F3, and ../NOTES.md 0c."""
     s = sub(open(R3).read(), GUARD_RS, NOGUARD_RS, "r3_bounded guard")
     return sub(s, PROBE_R3, BOUNDED_R3, "r3_bounded probe")
 
@@ -142,7 +152,16 @@ def r3_bounded():
 def r3_bounded_kept():
     """The same bounded probe with the capacity conjunct KEPT, so the function
     is identical to the shipped R3 on every input and the Ir difference is
-    purely the cost of the trip count."""
+    purely the cost of the trip count.
+
+    ⚠ **This control is why ../spec.md's `why` had to be SPLIT.** The single
+    reason the contract used to give for excluding a bounded probe -- *it is a
+    different function* -- is TRUE of `r3_bounded` and **FALSE of this one**,
+    which agrees with the shipped R3 on all eight matrix inputs (this
+    docstring said so from the start; TASK_070_REVIEW F3 measured it and found
+    the contract contradicting it). It is excluded on IDIOM grounds instead,
+    and it is 167.65 / 1235.96 Ir/call DEARER -- so the exclusion does not
+    flatter. ../NOTES.md 8b publishes what admitting it would do to the span."""
     return sub(open(R3).read(), PROBE_R3, BOUNDED_R3, "r3_bounded_kept")
 
 
@@ -294,17 +313,41 @@ def kstat(exe):
         return None
 
 
-def verus(text, name):
+# ⚠ **ALWAYS `--multiple-errors`.** `.memory/04-verus.md` 2b: Verus reports the
+# FIRST failure per query by default -- and prints `not all errors may have been
+# reported` when it does -- so a mutant that reports one error may be concealing
+# others. p22's whole result is a claim about WHICH obligation fires, which is
+# the case that file calls fatal, and TASK_070_REVIEW F2 measured that the
+# default had hidden an error on two of the four failing mutants (m1 had three,
+# not two; m3's FIRST error is the `decreases` and NOT an invariant). The flag
+# is not optional here and is therefore a module constant, not a call site.
+VERUS_FLAGS = ["--multiple-errors", "20"]
+
+
+def verus(text, name, flags=VERUS_FLAGS):
     os.makedirs(OUT, exist_ok=True)
     p = os.path.join(OUT, f"{name}.rs")
     open(p, "w").write(text)
-    r = subprocess.run([sys.executable, VERUS_RUN, p],
+    r = subprocess.run([sys.executable, VERUS_RUN, p] + list(flags),
                        capture_output=True, text=True, timeout=1800)
     txt = r.stdout + r.stderr
-    lines = [l.strip()[:160] for l in txt.splitlines()
-             if "is not supported" in l or "verification results" in l
-             or l.startswith("error:")]
-    return lines or ["(no verus output)"]
+    out, want_site = [], False
+    for l in txt.splitlines():
+        s = l.strip()
+        if "is not supported" in s or "verification results" in s:
+            out.append(s[:160])
+            want_site = False
+        elif s.startswith("error:"):
+            out.append(s[:160])
+            # `aborting due to N previous errors` carries no site of its own
+            want_site = not s.startswith("error: aborting")
+        elif want_site and s.startswith("-->"):
+            # THE SITE. Which obligation fired is the whole point of the flag,
+            # so the location is reported next to the message rather than left
+            # in a log nobody keeps.
+            out.append("     " + s.replace(OUT + os.sep, "")[:160])
+            want_site = False
+    return out or ["(no verus output)"]
 
 
 # ----------------------------------------------------------------- reports ---
@@ -533,29 +576,62 @@ def do_mech(want_ir):
           f"md5_raw {'equal' if ka.md5_raw == kb.md5_raw else 'differ'}")
 
 
+# The exec-side guard is GUARD_RS; the SPEC function `run` carries the same
+# conjunct over `int`, and m6/m7 need both so the functional obligation stops
+# being the thing that fails.
+GUARD_SPEC = "if k != EMPTY && nfill < TABCAP as int {"
+INV_NFILL_CAP = "            nfill <= TABCAP,\n"
+LEMMA_CALL = """            proof {
+                lemma_exists_empty(tab@);
+            }
+"""
+
+# name -> ([(old, new), ...], why). ⚠ m1..m5 are ONE substitution each, which
+# is what makes them readable without a diff. m6..m8 are the ISOLATION battery
+# TASK_070_REVIEW F2 asked for and they need more than one by construction --
+# each removes a *further* obligation in order to ask whether anything is left
+# but termination. The answer is no, and ../NOTES.md 10 says why it cannot be.
 PROOF_MUTANTS = {
-    "m1_noguard": (GUARD_RS, NOGUARD_RS,
+    "m1_noguard": ([(GUARD_RS, NOGUARD_RS)],
                    "delete the capacity conjunct -- c/kernel.c's bug, in R5"),
-    "m2_nodecreases": ("                decreases i0 as int + d - u,\n", "",
+    "m2_nodecreases": ([("                decreases i0 as int + d - u,\n", "")],
                        "delete the probe loop's `decreases` clause"),
-    "m3_noempty": ("                    tab@[e] == EMPTY,\n", "",
+    "m3_noempty": ([("                    tab@[e] == EMPTY,\n", "")],
                    "forget that the witness slot is EMPTY"),
-    "m4_nofill": ("            count_ne(tab@, TABCAP as int) == nfill as int,\n", "",
+    "m4_nofill": ([("            count_ne(tab@, TABCAP as int) == nfill as int,\n", "")],
                   "drop the fullness invariant, so `nfill` stops meaning "
                   "`the number of non-EMPTY slots`"),
-    "m5_wronghash": ("(k as int * 2654435761) / 16777216 % (TABCAP as int)",
-                     "(k as int * 2654435761) / 16777216 % (TABCAP as int) + 0",
+    "m5_wronghash": ([("(k as int * 2654435761) / 16777216 % (TABCAP as int)",
+                       "(k as int * 2654435761) / 16777216 % (TABCAP as int) + 0")],
                      "a NO-OP edit to the spec hash: the control that says the "
                      "battery is not just breaking the file"),
+    "m6_specmatched": ([(GUARD_RS, NOGUARD_RS), (GUARD_SPEC, NOGUARD_RS)],
+                       "m1 PLUS the same conjunct deleted from the SPEC fn "
+                       "`run`, so the functional obligation becomes satisfiable "
+                       "and cannot mask what else the conjunct was carrying"),
+    "m7_isolate": ([(GUARD_RS, NOGUARD_RS), (GUARD_SPEC, NOGUARD_RS),
+                    (INV_NFILL_CAP, "")],
+                   "m6 PLUS the outer invariant `nfill <= TABCAP` deleted -- "
+                   "the attempt to leave termination as the ONLY failure"),
+    "m8_nolemma": ([(LEMMA_CALL, "")],
+                   "delete the `lemma_exists_empty` CALL, keeping the guard: "
+                   "the mechanism control for why deleting the guard can never "
+                   "report `decreases not satisfied`"),
 }
 
 
 def do_mutants():
-    print("\n== proof mutants (each ONE exact-string substitution of "
-          "verus.rs) ==")
+    print("\n== proof mutants (m1-m5 are ONE exact-string substitution of "
+          "verus.rs each; m6-m8 are the isolation battery) ==")
+    print("   ⚠ every run below is with --multiple-errors 20 "
+          "(`.memory/04-verus.md` 2b): the DEFAULT reports only the first "
+          "failure per query,\n     and on this pattern the claim IS which "
+          "obligation fires. TASK_070_REVIEW F2.\n")
     base = open(R5).read()
-    for name, (old, new, why) in PROOF_MUTANTS.items():
-        src = sub(base, old, new, name)
+    for name, (subs, why) in PROOF_MUTANTS.items():
+        src = base
+        for i, (old, new) in enumerate(subs):
+            src = sub(src, old, new, f"{name}[{i}]")
         print(f"    {name:16s} {why}")
         for line in verus(src, name):
             print(f"        {line}")

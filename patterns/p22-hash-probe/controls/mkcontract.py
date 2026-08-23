@@ -68,14 +68,50 @@ WHY_HEAD = (
     "check its language would have supplied, and pinning it in the safe rungs "
     "would be pinning something they cannot avoid. Here every rung writes it by "
     "hand or hangs. "
-    "WHY THE PROBE LOOP IS UNBOUNDED IN ALL EIGHT RUNGS AND `for _ in "
-    "0..TABCAP` IS FORBIDDEN: a bounded trip count also makes the loop "
-    "terminate, it is idiomatic safe Rust, and it is a DIFFERENT FUNCTION -- it "
-    "finds a key that is present in a full table, where the shipped semantics "
-    "rejects every operation once the table is full and folds SENT. Shipping it "
-    "in one rung would put a semantic difference inside p22's safety column. It "
-    "is measured as the control `r3_bounded` instead (../NOTES.md 8), and what "
-    "that control prices is exactly *what the proof buys over the bound*. "
+    "WHY THE PROBE LOOP IS UNBOUNDED IN ALL EIGHT RUNGS -- ⚠ **TWO REASONS, "
+    "BECAUSE ONE OF THEM IS FALSE OF HALF OF WHAT IS EXCLUDED** "
+    "(TASK_070_REVIEW F3, which measured it; until then this paragraph gave "
+    "only reason (1) and gave it for both). "
+    "(1) THE BOUND WRITTEN *INSTEAD OF* THE CONJUNCT IS A DIFFERENT FUNCTION. "
+    "A bounded trip count also makes the loop terminate and it is idiomatic "
+    "safe Rust, but put in place of `nfill < TABCAP` it finds a key that is "
+    "present in a full table, where the shipped semantics rejects every "
+    "operation once the table is full and folds SENT. That is measured and not "
+    "asserted: the control `r3_bounded` prints `8190810770250110748` on "
+    "adversarial-full.bin against the shipped `8190810770250117165`, and "
+    "agrees on the other seven matrix inputs. Shipping it in one rung would "
+    "put a semantic difference inside p22's safety column. "
+    "(2) THE BOUND WRITTEN *IN ADDITION TO* THE CONJUNCT IS THE SAME FUNCTION, "
+    "AND IS EXCLUDED ON DIFFERENT GROUND. The control `r3_bounded_kept` agrees "
+    "with the shipped R3 on ALL EIGHT matrix inputs, so calling it a different "
+    "function is false. What excludes it is the PROBE-LOOP `required` entry -- "
+    "`required[2]` in the gate record -- and its *no "
+    "trip count anywhere* -- and the ground is the same one that forbids "
+    "`probes < TABCAP` two sentences below: a trip count in the OBJECT CODE is "
+    "the fix wearing the proof's clothes. p22 IS an unbounded probe loop whose "
+    "termination follows from a global invariant; a bounded one is a different "
+    "pattern. The two spellings are the same edit on opposite sides of the "
+    "safety axis, so admitting it in R3 while forbidding it in R5 would be "
+    "incoherent, and admitting it in R5 would let the `decreases` be "
+    "discharged from the trip count and delete the pattern's result. "
+    "⚠ **THE PRICE OF EXCLUSION (2) IS PUBLISHED RATHER THAN HIDDEN.** The "
+    "in-contract R3 span is 4401.6100 ... 4411.6100, width 10.00; admitting "
+    "`r3_bounded_kept` would take it to 4401.6100 ... 4569.2600 -- width "
+    "167.65 on small and 1235.96 on large, 16.8x wider. ⚠ **The direction does "
+    "NOT flatter**: `r3_bounded_kept` is DEARER, so `R3ship` remains the "
+    "cheapest in-contract R3 found and `R3 - R4 = +2.00` is unaffected. A "
+    "16.8x span movement reads like a retraction and is not one. "
+    "⚠ **AND NO GREP SETTLES (2).** The two backticked entries below, `for _ "
+    "in 0..TABCAP` and `(0..TABCAP)`, exclude the two ITERATOR spellings "
+    "literally -- they are the ones measured in `.temp/p22/probe/probe_rs.rs` "
+    "-- but `r3_bounded_kept` writes `while n < TABCAP` with its own counter "
+    "and matches NEITHER. It is out of contract by the English of "
+    "`required[2]` and by nothing a token test decides, which is the same "
+    "class as "
+    "the polarity and rung-scope readings the shared paragraph below already "
+    "records under WHAT NO GREP SETTLES. Both controls are measured "
+    "(../NOTES.md 8b), and what they price is exactly *what the proof buys "
+    "over the bound*. "
     "WHY `probes < TABCAP` IS FORBIDDEN: an exec-side probe counter is the "
     "other way to satisfy Verus's `decreases`, and it is the one that would "
     "make the proof CIRCULAR WITH THE FIX -- the loop would be bounded in the "
@@ -138,8 +174,19 @@ IDIOM_REQUIRED = [
                 "arr_get_unchecked, so this entry pins the property in prose "
                 "and pins the STEP, in backticks, in the entry above. What all "
                 "four spell is a test of the slot against EMPTY and against the "
-                "key, with no trip count anywhere -- the bounded spelling is "
-                "forbidden below.",
+                "key, WITH NO TRIP COUNT ANYWHERE. ⚠ It is this clause, in "
+                "prose, that excludes a bounded probe -- not the two backticked "
+                "entries in the forbidden list, which exclude the two ITERATOR "
+                "spellings literally and match no hand-rolled counter at all: "
+                "the control r3_bounded_kept writes a while loop against its "
+                "own counter and matches neither of them. TASK_070_REVIEW F3; "
+                "the why key gives the two separate reasons and prices what "
+                "the exclusion costs. ⚠ NOTHING IN THIS SENTENCE IS "
+                "BACKTICKED, deliberately: a backtick in a required entry PINS "
+                "A SPELLING, and an earlier draft of this correction "
+                "accidentally added three spellings no rung writes -- the same "
+                "defect the take(nkey) entry below records and the gate "
+                "reported it the same way, as required_pins_nothing.",
     },
     {
         "c": "THE HASH, in both C rungs, spelled with / and % and never with "
@@ -236,8 +283,19 @@ CONTRACT_NOTE = (
     "clause here: it is the `decreases` on verus.rs's probe loop, an obligation "
     "Verus imposes on every exec loop by default and whose absence is reported "
     "as `error: loop must have a decreases clause` before any postcondition is "
-    "considered. **That is the first termination obligation in this project and "
-    "it is p22's whole subject** (../NOTES.md 9). "
+    "considered. ⚠ **THAT IS NOT THE FIRST TERMINATION OBLIGATION IN THIS "
+    "PROJECT AND THE SENTENCE THAT SAID SO IS RETRACTED** (TASK_070_REVIEW F1, "
+    "which counted it; the claim came from TASK_070.md and shipped in eight "
+    "places, TWO OF THEM INSIDE THIS HASHED BLOCK). Verus imposes a "
+    "`decreases` on EVERY exec loop by default, so this tree carries 73 "
+    "exec-loop measures across 21 verus.rs files and 72 of them are not p22's "
+    "probe loop. What IS p22's own is counted rather than argued: of those 73, "
+    "the probe loop's is the ONLY measure that is not expressible in the "
+    "loop's own exec variables. It is `i0 as int + d - u` -- a ghost cursor "
+    "and a ghost witness handed over by a counting lemma, with the loop's own "
+    "control variable `i` absent from it entirely, because `i` WRAPS. The "
+    "other 72 are `B - c` for a loop-invariant bound and a monotone exec "
+    "cursor, or a bare monotone exec variable (../NOTES.md 0e, 9). "
     "What the `ensures` deliberately does NOT say is that `nkey` is honest, "
     "that the key stream is well formed, or that the window has fewer than "
     "TABCAP distinct keys: a precondition about the contents of a file is one "
@@ -303,9 +361,16 @@ IDENTITY_WHY = (
     "for an EMPTY slot and a ghost distance `d`, none of which survives "
     "erasure; the alternative route -- an exec-side probe counter -- would have "
     "put a bound in the binary and is forbidden by the idiom. So `exact` at O3 "
-    "is what says the first termination proof in this tree cost zero "
-    "instructions. At O0 the crate names differ in length so call displacements "
-    "differ, which is link layout and not codegen, hence `norel` there."
+    "is what says p22's termination proof cost zero instructions. ⚠ It is NOT "
+    "what says *the first* termination proof in this tree cost zero: that "
+    "sentence stood here until TASK_070_REVIEW F1 counted 73 exec-loop "
+    "`decreases` measures across 21 verus.rs files and retracted it. Every R5 "
+    "here has discharged termination obligations since p01, because Verus "
+    "demands a measure on every exec loop by default. p22's is the only one of "
+    "the 73 built from GHOST state rather than from the loop's own exec "
+    "variables, and that is what `exact` prices at zero. At O0 the crate names "
+    "differ in length so call displacements differ, which is link layout and "
+    "not codegen, hence `norel` there."
 )
 
 MIRI_REASON = (
@@ -577,7 +642,21 @@ buy.**
 | does ASan/UBSan see it? | usually | **no — measured silent** |
 | does Miri see it? | on the Rust port, yes | **no — measured silent, it just spins** |
 | does safe Rust prevent it? | yes, by construction | **no. The safe port hangs identically** |
-| what does R5 add? | a spatial or temporal obligation | **a TERMINATION obligation — the first here** |
+| what does R5 add? | a spatial or temporal obligation | **a TERMINATION obligation** — see below, it is *not* the first here |
+
+⚠ **"the first termination obligation in this project" was FALSE and is
+retracted** (TASK_070_REVIEW F1). Verus demands a `decreases` on every exec
+loop by default, so every R5 in this tree has been discharging termination
+obligations since p01: **73 exec-loop measures across 21 `verus.rs` files**, of
+which 70 are in the other twenty patterns and 72 are not p22's probe loop (p22
+carries 3 — the key walk, the probe loop and the driver loop). What is p22's own
+is the *shape* of its measure, and it
+is counted rather than argued — **of those 73, p22's probe loop carries the only
+one that is not expressible in the loop's own exec variables.** The other 72 are
+`B - c` for a loop-invariant bound `B` and a monotone exec cursor `c`, or a bare
+monotone exec variable. p22's is `i0 as int + d - u`: a ghost cursor and a ghost
+witness, with the loop's own control variable `i` nowhere in it, because `i`
+wraps.
 
 The line `c/kernel.c` omits is not a check any language emits. It is written by
 hand in `c/kernel_hardened.c`, in `safe_naive.rs`, in `safe_tuned.rs`, in
@@ -665,10 +744,21 @@ unbounded loop terminate. This distinction is the pattern:
 * `nfill < TABCAP` says *some slot is still EMPTY*, and an EMPTY slot is what
   the probe stops at. It is a **global invariant enforced elsewhere in the
   function**, which is how every real open-addressing table argues termination.
-* `for _ in 0..TABCAP` would also make the loop stop, and it is idiomatic safe
-  Rust — but it is a **different function**: it finds a key that is present in a
-  full table, where these semantics reject every operation once the table is
-  full. It is forbidden by the contract and measured as a control instead.
+* A bounded trip count would also make the loop stop, and it is idiomatic safe
+  Rust. It is out of contract, for **two different reasons depending on where
+  it goes** (TASK_070_REVIEW F3):
+  * written *instead of* the conjunct it is a **different function** — it finds
+    a key that is present in a full table, where these semantics reject every
+    operation once the table is full. Measured: the control `r3_bounded`
+    disagrees with the shipped R3 on `adversarial-full.bin`.
+  * written *in addition to* the conjunct it is the **same function** — the
+    control `r3_bounded_kept` agrees on all eight matrix inputs — and what
+    excludes it is the probe-loop `required` entry's *no trip count anywhere*: a bound in
+    the object code is the fix wearing the proof's clothes, which is the same
+    ground on which `probes < TABCAP` is forbidden.
+
+  Both are measured as controls, and the `why` key publishes what excluding the
+  second one costs the R3-side span.
 
 ## The bug, and why it is the one this project has never had
 
@@ -689,8 +779,16 @@ present makes the probe walk the ring for ever.
    (`controls/gen_controls.py --run r2_noguard`) and it is the closest thing
    this project has to a direct measurement of what safe Rust buys.
 3. **The proof is the only thing that refuses it.** Verus requires a `decreases`
-   clause on every exec loop by default, and discharging it needs exactly the
-   fact `nfill < TABCAP` provides. `../NOTES.md` 10 has the mutants.
+   clause on every exec loop by default, and discharging p22's needs the EMPTY
+   witness that `nfill < TABCAP` supplies through a counting lemma.
+   ⚠ **It is not the ONLY obligation the conjunct discharges, and no mutant
+   here isolates it as such** (TASK_070_REVIEW F2): re-run with
+   `--multiple-errors 20`, deleting the conjunct also breaks the outer
+   invariant `nfill <= TABCAP` and, once that is weakened too, the overflow
+   check on `nfill + 1`. The defensible claim is the narrower one — *the
+   termination obligation is real, is checked, and cannot be discharged
+   without the conjunct*. `../NOTES.md` 10 has every error list and the
+   mechanism that makes the isolation impossible.
 
 ## Why the hang lives on ONE adversarial input
 

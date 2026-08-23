@@ -39,11 +39,24 @@ per window) and `nd` (distinct keys drawn from) -- which is what makes
 additivity extrapolation available, the only out-of-sample test this project has
 that can fail (`.memory/03-measurement.md`).
 
-⚠ **RESIDUE CLASSES of the held-constant parameter are printed by `--sweep`**,
-because p38's additivity miss was two-thirds a band sitting at `nw = 0 (mod 8)`
-while the third did not. Band k holds `nd = 24` and band d holds `nk = 256`;
-band x draws (nk, nd) pairs from neither, and `nk mod 8` and `nd mod 8` are
-listed so a fit that depends on one is visible before it is published.
+⚠ **RESIDUE CLASSES of the fitted regressor are printed on every row**, because
+p38's additivity miss was two-thirds a band sitting at `nw = 0 (mod 8)` while
+the third did not. Band k holds `nd = 24` and band d holds `nk = 256`; band x
+draws (nk, nd) pairs from neither, and the residues of `nkw` are listed so a fit
+that depends on the class is visible before it is published.
+
+⚠ **The regressor is `nkw = min(nkey, stride - 4)` PER WINDOW, and never
+`stride - 4`** -- see `keys_walked()`. The first version of this diagnostic
+printed `(stride - HDR) % 8`, which is the regressor `controls/sweep_ir.py:84`
+explicitly warns against, and it therefore printed ONE residue for the whole of
+band x, whose true residues are {0, 4, 6} (TASK_070_REVIEW F6).
+
+⚠ On a HETEROGENEOUS blob -- the `sweep-h*` band, which exists to be one -- the
+row prints a `nkw` RANGE and the set of per-window residues. The quantity the
+law is fitted against there is a weighted MEAN over exactly the calls the
+marginal differences, it is not an integer (98.24, 183.04, 124.00), and its
+residue is not determined by the per-window set. `controls/sweep_ir.py` prints
+that one; this row does not pretend to.
 
 The keys come from a plain LCG rather than `random`, so no draw is
 rejection-sampled and the stream cannot re-converge after an edit
@@ -162,11 +175,30 @@ def sim(blob, off, stride):
     return (acc * 31 + nfill) & MASK, nfill, maxpr, hang
 
 
-def distinct_keys(blob, off, stride):
+def keys_walked(blob, off, stride):
+    """`nkw` for ONE window: the number of key bytes the kernel actually walks,
+    `min(nkey, stride - HDR)`.
+
+    ⚠ **NOT `stride - HDR`.** `nkey` is a per-window header field and the walk
+    stops at whichever of the two runs out first. `controls/sweep_ir.py:84`
+    says the same thing about the same quantity, and says it because the first
+    version of THAT script used `stride - 4` and reported residuals up to 992
+    against a law whose residual is 0.00 -- and then the first version of THIS
+    diagnostic used it too, printing `nk%8=4` for the whole of band x, whose
+    true regressor `nkw` spans residues {0, 4, 6} (TASK_070_REVIEW F6). A
+    reader auditing the residue-class design from the generator's own output
+    would have concluded band x sits at ONE residue: p38's exact failure
+    mode."""
     if stride < HDR:
         return 0
     nkey = int.from_bytes(blob[off:off + 4], "little")
-    n = min(nkey, stride - HDR)
+    return min(nkey, stride - HDR)
+
+
+def distinct_keys(blob, off, stride):
+    if stride < HDR:
+        return 0
+    n = keys_walked(blob, off, stride)
     return len({b for b in blob[off + HDR:off + HDR + n] if b != EMPTY})
 
 
@@ -336,11 +368,22 @@ def main():
             r0, nf0, mp0, hg0 = sim(blob, 0, stride)
             nd0 = distinct_keys(blob, 0, stride)
             mx = max(sim(blob, w * stride, stride)[2] for w in range(nwin))
+            # ⚠ THE REGRESSOR IS `nkw`, PER WINDOW, and a blob can carry more
+            # than one value of it -- the sweep-h* band exists to. Print the
+            # RANGE and the SET of residues, never `(stride - HDR) % 8`, which
+            # collapses a whole band onto one class (TASK_070_REVIEW F6).
+            nkws = sorted({keys_walked(blob, w * stride, stride)
+                           for w in range(nwin)})
+            res = "{" + ",".join(str(v % 8) for v in sorted({v % 8
+                                                             for v in nkws})) + "}"
+            nkw = (f"{nkws[0]}" if len(nkws) == 1
+                   else f"{nkws[0]}..{nkws[-1]}")
         else:
             r0, nf0, mp0, hg0, nd0, mx = 0, 0, 0, False, 0, 0
+            nkw, res = "0", "{}"
         print(f"{name:30s} stride={stride:5d} nwin={nwin:4d} n_iters={iters:6d} "
               f"bytes={len(blob):8d} nd(w0)={nd0:3d} nfill(w0)={nf0:3d} "
-              f"maxprobe={mx:3d} nk%8={(stride - HDR) % 8} "
+              f"maxprobe={mx:3d} nkw={nkw:9s} nkw%8={res:9s} "
               f"hang={'YES' if hg0 else 'no':3s} win0={r0}")
     for p in bad:
         print("AUDIT:", p, file=sys.stderr)

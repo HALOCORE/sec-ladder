@@ -2,16 +2,33 @@
 //!
 //! R4's exec code verbatim, plus the specs and proofs that discharge every
 //! unchecked read and write in it -- **and one obligation that is not about
-//! memory at all and that no other R5 in this tree has: `decreases` on the
-//! probe loop.**
+//! memory at all: `decreases` on the probe loop.**
 //!
-//! ⚠⚠ **THIS IS THE FIRST TERMINATION PROOF IN THE PROJECT.** Every other R5
-//! here proves that an access is in bounds, that a pointer is live, or that a
-//! fold computes the declared function. p22's bug is none of those: `c/kernel.c`
-//! reads nothing out of bounds, frees nothing twice and executes no undefined
-//! behaviour. It simply never returns. So the interesting question is not
-//! *"does the proof catch the bug?"* but *"is there an obligation for the bug to
-//! violate at all?"*, and the answer is measured rather than argued:
+//! ⚠⚠ **THIS IS NOT THE FIRST TERMINATION PROOF IN THE PROJECT, AND THE
+//! SENTENCE THAT SAID IT WAS IS RETRACTED** (TASK_070_REVIEW F1; the claim came
+//! from TASK_070.md and was copied into eight places, two of them inside
+//! ../spec.md's hashed contract). **Verus demands a `decreases` on every exec
+//! loop by default**, so every R5 in this tree has been discharging termination
+//! obligations since p01. Counted, over all 21 `patterns/*/verus.rs`:
+//!
+//! ```text
+//! exec-loop measures: 73   spec/proof-fn measures: 56
+//! exec-loop measures MENTIONING A GHOST BINDING: 1
+//! ```
+//!
+//! **What is actually new here is the 1, and it is counted rather than
+//! argued: p22's probe loop carries the tree's ONLY exec-loop measure that is
+//! not expressible in the loop's own exec variables.** The other 72 are `B - c`
+//! for a loop-invariant bound `B` and a monotone exec cursor `c`, or a bare
+//! monotone exec variable. p22's is `i0 as int + d - u`, built from a ghost
+//! cursor and a ghost witness handed over by a counting lemma -- and the loop's
+//! own control variable `i` does not appear in it at all, because `i` wraps.
+//!
+//! p22's bug is not a spatial or a temporal one: `c/kernel.c` reads nothing out
+//! of bounds, frees nothing twice and executes no undefined behaviour. It simply
+//! never returns. So the interesting question is not *"does the proof catch the
+//! bug?"* but *"is there an obligation for the bug to violate at all?"*, and the
+//! answer is measured rather than argued:
 //!
 //! ```text
 //! error: loop must have a decreases clause
@@ -21,10 +38,24 @@
 //! **Verus demands a termination measure for every exec loop by default**, and
 //! the opt-out is a named attribute that a reader and a grep can both see.
 //! Delete `&& nfill < TABCAP` from the exec code below -- the one conjunct
-//! `c/kernel.c` omits -- and this file stops verifying: `precondition not
-//! satisfied` on `lemma_exists_empty`, whose precondition is exactly *"some slot
-//! is still EMPTY"*, plus `invariant not satisfied` on the functional
-//! invariant. ../NOTES.md 10 has all of the mutants and their output.
+//! `c/kernel.c` omits -- and this file stops verifying with **THREE** errors,
+//! counted with `--multiple-errors 20` because the default reports only the
+//! first per query and hid one of these (TASK_070_REVIEW F2):
+//!
+//!   1. `invariant not satisfied` on `nfill <= TABCAP` -- ⚠ **not a
+//!      termination obligation**, and the reason no mutant here isolates the
+//!      conjunct as needed ONLY for termination;
+//!   2. `invariant not satisfied` on the functional `run` invariant;
+//!   3. `precondition not satisfied` on `lemma_exists_empty`, whose
+//!      precondition is exactly *"some slot is still EMPTY"* -- this is the
+//!      termination path.
+//!
+//! ⚠ Deleting the conjunct can never report `decreases not satisfied`: the
+//! guard reaches the measure through that lemma's PRECONDITION, and Verus
+//! assumes a callee's postcondition even when its precondition fails, so the
+//! witness survives inside the loop. The mutant that DOES fail on the measure
+//! is `m3_noempty`, which deletes the witness invariant.
+//! ../NOTES.md 10 has all eight mutants and their full error lists.
 //!
 //! **HOW THE MEASURE WORKS, because the obvious two both fail.**
 //!
@@ -605,7 +636,12 @@ pub fn kernel(buf: &[u8], off: usize, len: usize) -> (r: u64)
                         k,
                         (TABCAP as int - (u - i0 as int)) as nat,
                     ),
-                    u - i0 as int <= d,
+                // ⚠ There was a tenth conjunct here, `u - i0 as int <= d`, and
+                // TASK_070_REVIEW F8 measured that deleting it still gives
+                // `20 verified, 0 errors`: it is implied by
+                // `i0 as int <= u <= i0 as int + d` four lines above. It is
+                // gone, so that every clause in the set ../NOTES.md 0e calls
+                // "the termination argument" is load-bearing.
                 decreases i0 as int + d - u,
             {
                 i = (i + 1) % TABCAP;

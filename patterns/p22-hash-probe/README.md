@@ -44,7 +44,23 @@ for ever: a denial of service with no memory error anywhere in it.
 | ASan + UBSan | 15 of the 20 patterns before p22 declare at least one `"fires"` row | **silent** on every row — measured |
 | Miri on the Rust port of the bug | reports UB | **silent** — measured, it just spins |
 | safe Rust | prevents it by construction | **does not.** The safe port hangs |
-| what R5 adds | a spatial or temporal obligation | **a TERMINATION obligation** |
+| what R5 adds | a spatial or temporal obligation | **a TERMINATION obligation** — see the retraction below |
+
+⚠ **"the first termination obligation in this project" was FALSE and is
+retracted** (TASK_070_REVIEW F1, the manager's premise from `TASK_070.md`,
+shipped in eight places and two of them inside `spec.md`'s hashed contract).
+Verus demands a `decreases` on **every** exec loop by default, so every R5 here
+has discharged termination obligations since p01 — **73 exec-loop measures
+across 21 `verus.rs` files**, 70 of them in the other twenty patterns and 72 of
+them not p22's probe loop. What is p22's own is counted, not argued:
+
+> **Of those 73, p22's probe loop carries the only measure that is not
+> expressible in the loop's own exec variables.** The rest are `B − c` for a
+> loop-invariant bound and a monotone exec cursor, or a bare monotone exec
+> variable. p22's is `i0 as int + d - u` — a ghost cursor and a ghost witness,
+> with the loop's own control variable `i` nowhere in it, because `i` wraps.
+
+`NOTES.md` §0e-i has the census.
 
 ## The measured core, in one table
 
@@ -60,7 +76,7 @@ absent. `timeout` in seconds; every other input agrees across all eight rungs.
 | **`r3_noguard`**, **`r4_noguard`** — likewise | agrees | agrees | **does not terminate** |
 | `c_asan` — gcc `-O1 -fsanitize=address,undefined` | clean | clean | **spins, stderr empty** |
 | Miri on `r2_noguard` | — | no UB | **spins, no diagnostic** |
-| Verus on `verus.rs` minus the conjunct | — | — | **2 errors** |
+| Verus on `verus.rs` minus the conjunct | — | — | **3 errors** (`--multiple-errors 20`; the default reported 2) |
 
 The `*_noguard` rows are one exact-string substitution away from the shipped
 rungs (`controls/gen_controls.py --run hang --miri`, which asserts the
@@ -85,11 +101,26 @@ and shipped**, not by a hanging rung. It is a stronger claim that way, because
 result does not depend on which safe spelling you pick.
 
 ⚠ **And the counterweight is stated rather than buried.** A bounded trip count
-(`for _ in 0..TABCAP`) also terminates and is idiomatic safe Rust. It is
-forbidden by `spec.md` because it is a *different function* on a full table, and
-it is measured as the control `r3_bounded` — so what p22 publishes is *what the
-proof buys over the bound*, not a claim that no safe programmer would write the
-bound.
+(`for _ in 0..TABCAP`) also terminates and is idiomatic safe Rust. It is out of
+contract — but for **two different reasons**, and the single reason p22 shipped
+first was false of half of what it excluded (TASK_070_REVIEW F3):
+
+* the bound written **instead of** the conjunct (`r3_bounded`) is a *different
+  function* — it disagrees with the shipped R3 on `adversarial-full.bin`;
+* the bound written **in addition to** the conjunct (`r3_bounded_kept`) is the
+  *same function*, agreeing on all eight matrix inputs. It is excluded by
+  `spec.md`'s probe-loop `required` entry (`required[2]`), *no trip count anywhere* — the same ground
+  that forbids `probes < TABCAP` in R4/R5, because a bound in the object code is
+  the fix wearing the proof's clothes.
+
+⚠ **What that second exclusion costs is published, not hidden.** The in-contract
+R3 span is width **10.00**; with `r3_bounded_kept` admitted it would be
+**167.65 / 1235.96 — 16.8× wider**. The direction does **not** flatter:
+`r3_bounded_kept` is *dearer*, so `R3ship` is still the cheapest in-contract R3
+found and `R3 − R4 = +2.00` does not move. `NOTES.md` §0c and §8b.
+
+So what p22 publishes is *what the proof buys over the bound*, not a claim that
+no safe programmer would write the bound.
 
 ## The cost column, and the caveat that comes with it
 
@@ -113,27 +144,47 @@ i.e. 510× the shipped figure on the large band. The shipped R4 is kept
 (`.memory/02-bench-rules.md`: never re-ship a rung because a cheaper in-contract
 spelling was found) and the span is published instead. `NOTES.md` §4d.
 
-⚠ **And the bounded probe is FASTER, not slower.** `r3_bounded` runs 440.84 /
-3844.04 `Ir`/call **below** the shipped R3 because the trip count lets LLVM
-restructure the loop. So "the careful programmer pays for the bound" is false
-here; `spec.md` forbids the bound for a semantic reason only. `NOTES.md` §8c.
+⚠ **And the bounded probe straddles the shipped R3 — one side is FASTER.**
+`r3_bounded` runs 440.84 / 3844.04 `Ir`/call **below** the shipped R3 because the
+trip count lets LLVM restructure the loop, so "the careful programmer pays for
+the bound" is false here. `r3_bounded_kept` runs 167.65 / 1235.96 **above** it.
+Neither figure is a safety cost. `NOTES.md` §8b, §8c.
+
+⚠ **The C column's 1× / 5× split is a DERIVATION, not a guess.** An earlier
+version of `NOTES.md` §4e said clang "presumably" restructured the key loop; it
+does not. Counted per instruction with callgrind (`controls/dyn_ir.py`): clang
+**refuses to short-circuit** the `&&` and pays `+setne +setb +and +2·cmp +jne
+−je` = **+5.00/key**; gcc does short-circuit (`+cmp +ja`) and recovers a `lea`
+by re-associating the Horner shift, = **+1.00/key**. TASK_070_REVIEW F7.
 
 ## What R5 adds, precisely
 
-Verus **requires a `decreases` clause on every exec loop by default**:
+Verus **requires a `decreases` clause on every exec loop by default** — on every
+R5 in this tree, since p01, which is why the "first termination obligation"
+claim above is retracted:
 
 ```text
 error: loop must have a decreases clause
     = help: to disable this check, use #[verifier::exec_allows_no_decreases_clause]
 ```
 
-Discharging it needs exactly what `nfill < TABCAP` provides. The measure is a
-**ghost** unwrapped cursor `u` with `i == u % TABCAP` plus a **ghost** witness
-`e` for an EMPTY slot, obtained from `nfill < TABCAP` by a counting lemma — so
-**the termination proof costs zero instructions** and R4 ≡ R5 stays `exact` at
-O3. The alternative, an exec-side probe counter, would have put the bound in the
-binary and made the proof circular with the fix; it is forbidden by the contract
-and priced as a control.
+Discharging **p22's** needs the EMPTY witness that `nfill < TABCAP` supplies
+through a counting lemma. The measure is a **ghost** unwrapped cursor `u` with
+`i == u % TABCAP` plus a **ghost** witness `e` for an EMPTY slot — so **the
+termination proof costs zero instructions** and R4 ≡ R5 stays `exact` at O3. The
+alternative, an exec-side probe counter, would have put the bound in the binary
+and made the proof circular with the fix; it is forbidden by the contract and
+priced as a control.
+
+⚠ **What the mutant battery does and does not show** (`NOTES.md` §10, re-run with
+`--multiple-errors 20`, which `.memory/04-verus.md` §2b prescribes and the first
+version omitted). It **does** show the measure is checked: `m3_noempty` fails
+*first* with `decreases not satisfied at end of loop` **at the probe loop**. It
+**does not** show the conjunct is required *only* for termination — deleting it
+also breaks the arithmetic invariant `nfill <= TABCAP`, and once that is deleted
+too, the overflow check on `nfill + 1`. The defensible claim is the narrower one:
+*the termination obligation is real, is checked, and cannot be discharged without
+the conjunct.*
 
 ## Layout
 
@@ -146,8 +197,11 @@ model.py                the independent Python reference
 inputs/gen.py           deterministic blobs; audits every window by SIMULATING
                         the unguarded rung and refuses to ship an undeclared hang
 controls/mkcontract.py  writes spec.md (edit the generator, not spec.md)
-controls/gen_controls.py  every non-rung variant, measured
+controls/gen_controls.py  every non-rung variant, measured. Verus always with
+                        --multiple-errors 20 (VERUS_FLAGS)
 controls/sweep_ir.py    the sweep-band marginals and the additivity test
+controls/dyn_ir.py      per-INSTRUCTION dynamic Ir for two cells, and the diff
+                        — what a static asm.py diff cannot settle (NOTES.md 4e)
 controls/clayout.py     the code-layout population behind any `ns` figure
                         (ported, NOT run — p22 publishes no `ns` figure)
 ```

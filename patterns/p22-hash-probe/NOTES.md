@@ -11,10 +11,14 @@ Contract: `spec.md`. Summary: `README.md`. This file is the evidence.
 > **`slb-contract` sha256, as first written:**
 > `1f29b02eac0bf442d646cdcc03b83ced321a25b3f0c74109dc1c1028831c1d71`
 > — written by `controls/mkcontract.py` before any measurement was published.
-> **It changed once, to
-> `044f02cded64694e54484df7b69cda3154019e0d350cf049e55dac07199bd5da`**, and §11c
-> says exactly what moved and why. The final value is in
-> `results/gate/p22-hash-probe.json`.
+> **It has changed TWICE**: to
+> `044f02cded64694e54484df7b69cda3154019e0d350cf049e55dac07199bd5da` at TASK_070
+> (shipped at `b7cd39b`) and to
+> `09eea1c6f8ee1d89b98ca744367fcaa2e796d970293d6cadcf564043ba42311a` at TASK_071,
+> which retracted a false claim that was inside the block. §11c says exactly
+> what moved, why, and ⚠ **why the `git show HEAD:` check PROTOCOL used to
+> prescribe cannot verify the first move on a one-commit pattern.** The current
+> value is in `results/gate/p22-hash-probe.json`.
 
 ## 0. §0 — the bug class and the harm, settled before any rung was written
 
@@ -92,13 +96,49 @@ checkable:
 > **by hand** — five times, once per rung that has it. The rung that omits it
 > hangs whatever language it is written in.
 
-The bounded spelling is **forbidden by `spec.md`** for a reason that is semantic
-and not stylistic: on a full table it is a **different function** — it finds a
-key that is present, where the shipped semantics rejects every operation once
-`nfill == TABCAP` and folds `SENT`. Shipping it in one rung would put a semantic
-difference inside p22's cost column. It is measured as a control instead
-(`r3_bounded` and `r3_bounded_kept`, §8), and what p22 therefore publishes is
-**what the proof buys over the bound**, which is the smaller, honest result.
+The bounded spelling is **out of contract**, and ⚠ **the single reason this
+section used to give for that is FALSE of half of what is excluded**
+(TASK_070_REVIEW F3, which measured it). There are two reasons and they are not
+interchangeable:
+
+1. **The bound written *instead of* the conjunct is a different function.**
+   `r3_bounded` returns `8190810770250110748` on `adversarial-full.bin` against
+   the shipped `8190810770250117165`, and agrees on the other seven matrix
+   inputs — it finds a key that is present in a full table, where the shipped
+   semantics rejects every operation once `nfill == TABCAP` and folds `SENT`.
+   Shipping it in one rung would put a semantic difference inside p22's cost
+   column. The exclusion is semantic and it is measured.
+2. **The bound written *in addition to* the conjunct is the SAME function.**
+   `r3_bounded_kept` agrees with the shipped R3 on **all eight** matrix inputs;
+   `controls/gen_controls.py`'s own docstring says so and it reproduced. Calling
+   it "a different function" is simply false, and until TASK_071 `spec.md` and
+   this file both did. What excludes it is `spec.md`'s probe-loop `required` entry
+   (`required[2]` in the gate record) — *no trip count anywhere* — on the same ground that forbids `probes < TABCAP`
+   for R4/R5: a trip count **in the object code** is the fix wearing the proof's
+   clothes. p22 *is* an unbounded probe loop whose termination follows from a
+   global invariant. Admitting the bound in R3 while forbidding it in R5 would
+   be incoherent, and admitting it in R5 would discharge the `decreases` from
+   the trip count and delete the result.
+
+⚠ **What excluding (2) costs is published rather than hidden — see §8b.** The
+in-contract R3 span stays at width 10.00; it would be **167.65 / 1235.96 — 16.8×
+wider** — with `r3_bounded_kept` in it. **The direction does not flatter:**
+`r3_bounded_kept` is *dearer*, so `R3ship` is still the cheapest in-contract R3
+found and `R3 − R4 = +2.00` does not move. A 16.8× span movement reads like a
+retraction and this one is not.
+
+⚠ **And no grep settles (2).** `spec.md`'s two backticked `forbidden` entries are
+`for _ in 0..TABCAP` and `(0..TABCAP)` — the two iterator spellings measured in
+`.temp/p22/probe/probe_rs.rs`. The shipped control `r3_bounded_kept` writes
+`while n < TABCAP` with its own counter and matches **neither**, so it is out of
+contract by the English of `required[2]` and by nothing `spelling_matches`
+decides. That is the same class as the polarity and rung-scope readings the
+shared named-spelling paragraph already files under *WHAT NO GREP SETTLES*, and
+it is recorded here rather than left for a reader to discover.
+
+Both spellings are measured as controls (`r3_bounded` and `r3_bounded_kept`,
+§8b), and what p22 therefore publishes is **what the proof buys over the bound**,
+which is the smaller, honest result.
 
 ### 0d. The catalogue's "R2, R3 and R4 all hang" is REFRAMED, not upheld
 
@@ -162,6 +202,66 @@ entry, *"only R5 catches it"* would be a statement about Verus's defaults rather
 than about this tree. `.memory/04-verus.md`'s warning that `decreases b - a`
 fails on two-cursor loops is **upheld in its purest form**: a ring cursor
 `i = (i + 1) % TABCAP` does not decrease in any direction at all.
+
+### 0e-i. ⚠ RETRACTED: *"the first termination proof in the project"*
+
+**It was false, it shipped in eight places, two of them inside
+`contract_sha256`, and the sentence one paragraph above — the one you have just
+read — already said why.** The claim came from `TASK_070.md`, the manager's own
+premise, and was copied through; TASK_070_REVIEW F1 counted it out. ⚠ **This is
+the third time on this project that the correction sat in the same file as the
+headline it contradicts** (`PROTOCOL.md` rule 9), and here it did so twice
+over, checkable against `b7cd39b`:
+
+| file (at `b7cd39b`) | the false line | the true line |
+|---|---|---|
+| `verus.rs` | `:8` *"THIS IS THE FIRST TERMINATION PROOF IN THE PROJECT"* | `:21` *"Verus demands a termination measure for every exec loop by default"* — **13 lines below it** |
+| `NOTES.md` | `:258` (§4a) *"the first termination proof in this tree"* | `:159` (§0e) *"Verus requires a termination measure on every exec loop by default"* — 99 lines **above** it |
+
+Re-measured for this task over all 21 `patterns/*/verus.rs`
+(`.temp/p22rev/decr.py`, the reviewer's census, re-run):
+
+```text
+exec-loop measures: 73   spec/proof-fn measures: 56
+exec-loop measures MENTIONING A GHOST BINDING: 1
+```
+
+p22 contributes 3 of those 73 (the key walk, the probe loop and the driver
+loop), so **70 exec-loop termination obligations belong to the other twenty
+patterns and 72 of the 73 are not p22's probe loop** — every R5 here has been
+discharging them since p01. What is p22's own is the
+*shape* of the measure, and it is a count rather than an argument:
+
+> **Of the 73 exec-loop `decreases` measures in this tree, p22's probe loop
+> carries the only one that is not expressible in the loop's own exec
+> variables.** The other 72 are `B − c` for a loop-invariant bound `B` and a
+> monotone exec cursor `c` (`nkey - t`, `end - p`, `DST_CAP - d`, `2*n - k`,
+> `hi - lo`, `m + 1 - i`, …) or a bare monotone exec variable (`decreases b`,
+> `decreases y`). p22's is `i0 as int + d - u`, built from a ghost cursor and a
+> ghost witness handed over by a counting lemma — and the loop's own control
+> variable `i` does not appear in it at all, because `i` wraps.
+
+The candidates that could have shrunk the 1 were checked individually by the
+review and none does: p07:356 `hi - lo`, p06:641/670/695 `decreases b`,
+p16:255 `end - p`, p38:442 `2 * n - k`, p14:622 `m + 1 - i`, p13:591
+`DST_CAP - d` are all exec arithmetic.
+
+### 0e-ii. One invariant in that set was doing nothing, and it is gone
+
+TASK_070_REVIEW F8 deleted the probe loop's tenth conjunct
+`u - i0 as int <= d` and still got `20 verified, 0 errors`: it is implied by
+`i0 as int <= u <= i0 as int + d` four lines above. Reproduced and **removed**,
+because this section calls the invariant set *the termination argument* and a
+clause that does nothing has no business in it. Re-verified after the deletion:
+
+```text
+verus.rs            : 20 verified, 0 errors
+verus.rs --cfg slb_twin : 23 verified, 0 errors
+```
+
+⚠ **It was not free of consequence for the mutant battery** — with the dead
+conjunct gone, `m3_noempty` reports **two** errors rather than three (§10). The
+two it keeps are the two that matter.
 
 ## 1. The safety line, and what no language supplies
 
@@ -255,8 +355,10 @@ table shows why.)
 `-O3 isolated` kernels are byte-identical (`md5_fn 4ac4bd132a50`, `md5_raw`
 equal, `identity: exact`). ⚠ **On p22 that pin carries an extra job:** the
 `decreases` measure is built entirely from ghost state (`u`, `e`, `d`), so
-`exact` is the statement that **the first termination proof in this tree cost
-zero instructions**. Had route (b) been taken — a probe counter in the exec code
+`exact` is the statement that **p22's termination proof cost zero
+instructions**. ⚠ This sentence read *"the **first** termination proof in this
+tree"* until TASK_071; that was false and §0e-i retracts it with the count.
+Had route (b) been taken — a probe counter in the exec code
 — the pair would still have been `exact` but the *object code* would have moved;
 §8c prices that.
 
@@ -400,8 +502,69 @@ specification stays inside linear arithmetic — cost nothing against `>>` and `
 
 **The capacity conjunct costs gcc one instruction per key and clang five.** Both
 are exact on both bands. The conjunct is *never taken* on either input (the table
-never fills), so this is the cost of evaluating a correctly-predicted branch —
-and clang pays 5× for it, presumably by restructuring the key loop around it.
+never fills), so this is the cost of evaluating a correctly-predicted branch.
+
+⚠ **The mechanism, DERIVED rather than presumed.** This paragraph used to say
+clang pays 5× *"presumably by restructuring the key loop around it"*. That is
+wrong (TASK_070_REVIEW F7; it was labelled a presumption, which is why the
+review graded it a minor). **The loop is not restructured at all.**
+`harness/asm.py diff <unhardened> <hardened> --sym kernel`, re-run here:
+
+```
+clang -O3 isolated       unhardened (3 insns/key)   hardened (8 insns/key)
+                         movzbl (%rdi,%rsi,1),%r11d movzbl (%rdi,%rsi,1),%r10d
+                         test %r11,%r11             test %r10,%r10
+                         je   TGT                   setne %r11b   <- (k != EMPTY) to a byte
+                                                    cmp  $,%rdx   <- nfill vs TABCAP
+                                                    setb %bl      <- (nfill < TABCAP) to a byte
+                                                    and  %r11b,%bl
+                                                    cmp  $,%bl
+                                                    jne  TGT
+```
+
+**clang REFUSES TO SHORT-CIRCUIT the `&&`**: it materialises both conjuncts into
+byte registers and branches once.
+
+⚠ **And the static diff is NOT sufficient on the gcc side, which is a second
+correction the review did not have.** `harness/asm.py stat --sym kernel` puts
+`c-gcc` at **87 → 89** instructions in the extent, i.e. **+2**, against a
+measured **+1.00 per key**; `c-clang` is 69 → 74, +5. A static count says what
+is *in* the extent, not what *ran*. `controls/dyn_ir.py` counts what ran —
+callgrind with `--dump-instr=yes`, attributed per instruction inside the
+`kernel` symbol, `small.bin` at 200 iterations, 128 keys per call:
+
+```
+c-gcc-O3-isolated          kernel Ir = 688259
+c-gcc-h-O3-isolated        kernel Ir = 713859
+delta = 25600   per call = 128.0000   per key = 1.0000
+    cmp             78305 ->     103905    +128.00/call    +1.00/key
+    ja                  0 ->      25600    +128.00/call    +1.00/key
+    lea             25800 ->        200    -128.00/call    -1.00/key
+
+c-clang-O3-isolated        kernel Ir = 750810
+c-clang-h-O3-isolated      kernel Ir = 878810
+delta = 128000   per call = 640.0000   per key = 5.0000
+    and             33215 ->      58815    +128.00/call    +1.00/key
+    cmp             78305 ->     129505    +256.00/call    +2.00/key
+    setb                0 ->      25600    +128.00/call    +1.00/key
+    setne               0 ->      25600    +128.00/call    +1.00/key
+    jne             78105 ->     103705    +128.00/call    +1.00/key
+    je              59015 ->      33415    -128.00/call    -1.00/key
+    cs                  0 ->      25600    +128.00/call    +1.00/key
+    data16          25800 ->        200    -128.00/call    -1.00/key
+```
+
+**So the two mechanisms are now arithmetic rather than narrative.**
+
+* **gcc: `+cmp +ja −lea` = +1.00/key.** It *does* short-circuit — the added pair
+  is a second conditional branch, `cmp $,%r11 ; ja` — and it recovers one
+  instruction per key by **re-associating the Horner shift**, dropping a `lea`
+  from the loop body (`mov %rax,%rdi ; shl ; sub ; lea (%rdi),%rax` becomes
+  `lea (%r8),%rax ; mov %rax,%r8 ; shl ; sub`, with the `lea` hoisted out).
+  That −1 is invisible to the static count and is the whole of the 2-vs-1 gap.
+* **clang: `+setne +setb +and +2·cmp +jne −je` = +5.00/key.** `cs`/`data16` are
+  the same padding nop under two mnemonic spellings and cancel.
+
 This is a **compiler** result, not a language one, and it is why the C-vs-Rust
 row below needs both columns:
 
@@ -628,10 +791,28 @@ is a difference between two *named* spellings, not between two minima.
 |---|---:|---:|---|---|
 | **`R3ship`** | **4401.6100** | **37120.9600** | yes | **SHIPPED** — cheapest in-contract R3 found |
 | `r3_noresl` | 4411.6100 | 37130.9600 | yes | +10.00 flat |
-| `r3_bounded_kept` | 4569.2600 | 38356.9200 | **NO** | bounded trip count, conjunct kept |
-| `r3_bounded` | 3960.7700 | 33276.9200 | **NO** | bounded trip count *instead of* the conjunct |
+| `r3_bounded_kept` | 4569.2600 | 38356.9200 | **NO** — see below | bounded trip count, conjunct kept. **Same function as `R3ship` on all 8 inputs** |
+| `r3_bounded` | 3960.7700 | 33276.9200 | **NO** | bounded trip count *instead of* the conjunct. **Different function on `adversarial-full.bin`** |
 
-**Span (in contract): 4401.6100 … 4411.6100, width 10.00.**
+**Span (in contract): 4401.6100 … 4411.6100, width 10.00 — AND THE EXCLUSION IS
+NAMED, because one of the two excluded spellings is not excluded for the reason
+the contract used to give.**
+
+⚠ `r3_bounded_kept` is semantically identical to the shipped R3 (same checksum
+on all eight matrix inputs) and would be a legitimate R3 on the *function* test.
+It is out of contract on the *idiom* test instead — `spec.md`'s `required` entry
+entry (`required[2]`), *no trip count anywhere*, the same ground on which
+`probes < TABCAP` is forbidden in R4/R5 (§0c reason 2). Admitting it would take the published span to
+
+> **4401.6100 … 4569.2600 — width 167.65 on small and 1235.96 on large, 16.8×
+> the width above.**
+
+⚠ **That number is published here so nobody has to re-derive it, and the
+direction does NOT flatter:** `r3_bounded_kept` is *dearer* than `R3ship`, so
+`R3ship` remains the cheapest in-contract R3 found and the headline
+`R3 − R4 = +2.00` is unaffected either way. A 16.8× movement in a published span
+reads like a retraction; this one is a disclosure of what an idiom pin excludes.
+(TASK_070_REVIEW F3.)
 
 ### 8c. ⚠ What the ghost proof buys over the exec bound — and it is NOT instructions
 
@@ -666,9 +847,14 @@ out:
 `r3_bounded` (§8b) is the same point on the safe side and it is the sharper one:
 the bounded R3 is **440.84 / 3844.04 CHEAPER than the shipped R3**, because the
 bound lets LLVM restructure. ⚠ **So "the safe programmer who writes the bounded
-loop pays for it" is FALSE on this pattern.** The bounded loop is faster, it
-terminates, and the reason `spec.md` forbids it is purely semantic: it computes a
-different function on a full table.
+loop pays for it" is FALSE on this pattern.** The bounded loop is faster and it
+terminates. ⚠ **What is NOT true is that `spec.md` excludes it "purely for a
+semantic reason"** — this sentence said that until TASK_071 and it is false of
+the other bounded spelling: `r3_bounded_kept` is the *same function* and is
+excluded on idiom grounds, and it is **dearer** rather than cheaper. §0c has both
+reasons and §8b prices the second one. So the bounded family straddles the
+shipped R3 (−440.84 one side, +167.65 the other) and neither figure is a safety
+cost.
 
 ### 8d. Sanity: the controls reproduce the shipped cells
 
@@ -712,28 +898,84 @@ reader should ask:
 
 ## 10. The proof mutants
 
-`controls/gen_controls.py --run mutants`. Each is **one exact-string
-substitution** of `verus.rs`, asserted to hit exactly once.
+`controls/gen_controls.py --run mutants`. `m1`–`m5` are **one exact-string
+substitution** of `verus.rs` each, asserted to hit exactly once; `m6`–`m8` are
+the isolation battery and need more than one by construction.
 
-| mutant | edit | result |
+> ⚠ **EVERY RUN IS WITH `--multiple-errors 20`, AND THE FIRST VERSION OF THIS
+> SECTION WAS NOT.** `.memory/04-verus.md` §2b prescribes the flag and says
+> plainly that *"if a claim rests on which obligation failed, that ambiguity is
+> fatal"* — and **p22's whole result is a claim about which obligation fires.**
+> Verus printed the instruction itself on both of the original runs (*"not all
+> errors may have been reported; rerun with a higher value for
+> `--multiple-errors`"*) and it was not taken. TASK_070_REVIEW F2. The flag now
+> lives in `gen_controls.py::VERUS_FLAGS`, not at a call site, so it cannot be
+> dropped by accident.
+
+The full output, re-run for TASK_071 against the shipped `verus.rs`. ⚠ **Line
+numbers below are the SHIPPED file's**, so `awk 'NR==<n>' verus.rs` prints the
+clause named; a mutant that deletes lines reports its own numbering, lower by
+what it deleted (`m4` −1, `m7` −1, `m8` −3), and `.temp/p22c/mutants2.log` has
+the raw output.
+
+| mutant | edit | errors, in the order Verus reports them |
 |---|---|---|
-| `m1_noguard` | delete `&& nfill < TABCAP` — **`c/kernel.c`'s bug, in R5** | **`19 verified, 1 errors`**: *precondition not satisfied* on `lemma_exists_empty` (its precondition is `count_ne(s, TABCAP) < TABCAP`, i.e. *"some slot is still EMPTY"*) **and** *invariant not satisfied at end of loop body* on the functional invariant |
-| `m2_nodecreases` | delete the probe loop's `decreases` clause | **`error: loop must have a decreases clause`** — Verus refuses before verifying anything |
-| `m3_noempty` | delete the invariant `tab@[e] == EMPTY` | **`19 verified, 1 errors`**, two *invariant not satisfied* — the witness stops being a witness |
-| `m4_nofill` | delete the invariant `count_ne(tab@, TABCAP) == nfill` | **`19 verified, 1 errors`**, *precondition not satisfied* — `nfill < TABCAP` stops meaning "an EMPTY slot exists" |
+| `m1_noguard` | delete `&& nfill < TABCAP` — **`c/kernel.c`'s bug, in R5** | **THREE.** (1) *invariant not satisfied at end of loop body* on `nfill <= TABCAP` (`verus.rs:547`) — ⚠ **NOT a termination obligation**; (2) the same, on the functional `run` invariant (`:552`); (3) *precondition not satisfied* on `lemma_exists_empty` (`:601`), whose precondition is `count_ne(s, TABCAP) < TABCAP` |
+| `m2_nodecreases` | delete the probe loop's `decreases` clause (`:645`) | **`error: loop must have a decreases clause`** at the probe loop (`:623`) — Verus refuses before verifying anything |
+| `m3_noempty` | delete the invariant `tab@[e] == EMPTY` (`:631`) | **TWO, and the FIRST IS THE MEASURE**: *decreases not satisfied at end of loop* at the probe loop (`:623`), then *invariant not satisfied* on `i0 <= u <= i0 + d` (`:627`) |
+| `m4_nofill` | delete the invariant `count_ne(tab@, TABCAP) == nfill` | **ONE**: *precondition not satisfied* on `lemma_exists_empty` (`:601`) — `nfill < TABCAP` stops meaning "an EMPTY slot exists" |
 | `m5_wronghash` | a no-op edit to the spec hash (`… % TABCAP` → `… % TABCAP + 0`) | **`20 verified, 0 errors`** — the CONTROL: the battery is not just breaking the file |
+| `m6_specmatched` | `m1` **plus** the same conjunct deleted from the spec fn `run` | **TWO**: `nfill <= TABCAP` (`:547`) and the lemma precondition (`:601`). Matching the spec removes the functional failure and **nothing else** |
+| `m7_isolate` | `m6` **plus** the outer invariant `nfill <= TABCAP` deleted | **TWO**: the lemma precondition (`:601`) and ***possible arithmetic underflow/overflow* on `nfill = nfill + 1`** (`:658`) |
+| `m8_nolemma` | delete the `lemma_exists_empty` **call** (`:601`), keeping the guard | **THREE**, none of them the measure: *requires not satisfied* on the `by (nonlinear_arith)` hypothesis (`:615`), *invariant not satisfied **before** loop* on `tab@[e] == EMPTY` (`:631`), *assertion failed* (`:611`) |
 
-**Two of the four failing mutants fail on the termination argument and not on a
-safety clause**, which is what makes p22 a termination result: `m3` and `m4`
-delete facts that exist *only* to discharge the `decreases`, and the file stops
-verifying. `m2` is the sharpest: it is not a failed proof at all, it is Verus
-refusing to accept a program with an unbounded loop and no measure.
+⚠ **`m6` is `.memory/04-verus.md` §2b's SECOND prescribed probe, not an
+invention.** §2b asks for two: `--multiple-errors 20`, and *"strip the functional
+spec and re-run — if the memory-safety obligations then give `N verified,
+0 errors`, nothing was hidden behind the functional failure"*. `m6` matches the
+spec to the mutated exec rather than stripping it, which is the same experiment
+with the postcondition still meaningful. **It does not give `0 errors`** — and
+§2b's own positive control says that is the informative outcome: something real
+was behind the functional failure, and it is `nfill <= TABCAP`.
 
-⚠ **`m1` is the one to read carefully.** Deleting the exec conjunct fails on the
-*lemma's precondition* rather than on the `decreases` line itself, because the
-lemma is what supplies the witness the measure is built from. The `decreases`
-clause is still there and is still what the failure is about; Verus reports the
-first unprovable obligation on the path to it.
+### 10a. ⚠ Two corrections to what this section used to say, pulling opposite ways
+
+1. **In p22's favour, and the first version UNDERSOLD its own battery.** `m3` —
+   a mutant that was already shipped — **fails first on the `decreases` at the
+   probe loop.** The single-error default hid it and *"two `invariant not
+   satisfied`"* is what got recorded. So the battery already contained a mutant
+   that fails on the measure itself, at the probe loop, with the guard intact.
+2. **Against p22.** `m1`'s first error, `nfill <= TABCAP` at `verus.rs:547`,
+   is **not a termination obligation** and was not mentioned.
+
+### 10b. ⚠ THE CONJUNCT CANNOT BE ISOLATED AS "REQUIRED ONLY FOR TERMINATION", and here is why it cannot
+
+The review asked for a mutant that isolates the termination obligation, or a
+plain statement that none exists. **None exists, for two independent reasons,
+and both are measured above.**
+
+* **The conjunct carries non-termination obligations too.** `m6` matches the
+  spec to the exec so the functional invariant stops failing, and
+  `nfill <= TABCAP` still fails. `m7` deletes that invariant too, and now
+  `nfill = nfill + 1` **overflows** — nothing else in the loop bounds `nfill`.
+  Peel one and the next appears; the conjunct is load-bearing three ways.
+* **Deleting the guard can never report `decreases not satisfied`, structurally.**
+  The guard reaches the measure only through `lemma_exists_empty`'s
+  *precondition*, and **Verus assumes a callee's postcondition even when its
+  precondition fails** — so the witness `tab@[e] == EMPTY` is still available
+  inside the loop and the measure still discharges. `m8` is the control for
+  that: delete the lemma call outright and the witness invariant fails **before
+  the loop** (`:631`), and there is still no `decreases` error, because a loop
+  invariant is *assumed* in the body once its entry check has been reported. The
+  only way to a `decreases not satisfied` is to break an invariant the measure
+  itself consumes — which is exactly `m3`, and `m3` does.
+
+**So the defensible claim is the narrower one**, and it is what this file now
+says: *the `decreases` obligation is real, it is checked, and it cannot be
+discharged without the capacity conjunct* — **not** *the conjunct is needed
+because of termination*. `m2` remains the sharpest single row: it is not a failed
+proof at all, it is Verus refusing to accept a program with an unbounded loop and
+no measure.
 
 ## 11. Provenance and disclosures
 
@@ -762,24 +1004,68 @@ miri SHIPPED unsafe.rs adversarial-full.bin rc=0 UB=False out='15820751917455319
 ```
 
 `expected_hang` is a **per-input** declaration, but its Miri consequence assumes
-the hanging rung is the one Miri runs. That is true whenever the bug lives in the
-Rust rungs and false whenever it lives only in C — which is the shape of **every
-pattern in this tree except a hypothetical one whose R4 has the bug**. The cost
-is one unnecessarily blocked row per declared-hang input.
+the hanging rung is the one Miri runs.
 
-**Reported, not worked around.** `harness/` is not this pattern's to edit
-(TASK_070's constraint), and the gate is green either way. The obvious repair is
-to condition the block on the Miri source rung actually being one that hangs,
-which `model.py` cannot express today: `expected_hang` has no per-rung axis.
+⚠ **SCOPE, WIDENED BY TASK_070_REVIEW F4 FROM "a p22 note" TO "a gate defect":
+the block's stated reason is STRUCTURALLY FALSE FOR EVERY PATTERN IN THIS TREE,
+not just for p22.** `.memory/01-ladder.md`'s rung table puts the bug in **R1
+only** — *"written the way a competent systems programmer writes it, including
+the bug class the pattern is about"* — and `miri.sources` names a **Rust** rung.
+So on any pattern that follows the ladder's own rung definition, the rung Miri
+runs is one that **carries the fix**, and the condition that would make the
+block correct (the *Rust* rung hanging) is the one the ladder forbids. The
+review reproduced the measurement independently:
+`miri SHIPPED unsafe.rs adversarial-full.bin rc=0 UB=False`.
 
-### 11c. ⚠ The `slb-contract` sha256 changed once, and this is what moved
+**Reported, not worked around, and NOT fixed here.** `harness/` is not this
+pattern's to edit (TASK_070's and TASK_071's constraint), and the gate is green
+either way. The cost is one unnecessarily blocked Miri row per declared-hang
+input, landing the pattern on `PASS-WITH-BLOCKED-ROWS` rather than `PASS`. The
+repair is to condition the block on the Miri **source rung** actually being one
+that hangs, and `model.py` cannot express that today: **`expected_hang` is a
+per-input bool with no per-rung axis**, so `check.py` cannot state the right
+condition at all. That is the change the manager has to queue.
+
+### 11b-ii. ⚠ HARNESS FINDING — `_confirm_hang` confirms the cell least at risk, and the strengthening TASK_070 PROPOSED FOR IT IS REFUTED
+
+`harness/check.py:3081` picks `sorted(hung_cells)[0]` and the labels are
+`f"{c} {o}/{m}"`, so on p22 the confirmed cell is **`c-clang O0/isolated`**:
+
+```
+ok   adversarial-full.bin: confirmed -- c-clang O0/isolated still had not terminated
+     at 20.0s (10x the pinned budget)
+```
+
+The cell where the hang is *least* assured is **`c-clang O3`** — §0a exists
+because C11 6.8.5p6 and LLVM `mustprogress` let a compiler assume a loop with a
+non-constant controlling expression terminates. The spot check picks the cell
+with no such risk.
+
+⚠ **The fix proposed for it — one cell per distinct RUNG — is refuted**
+(TASK_070_REVIEW F5). It was proposed in TASK_070's own engineer report and
+repeated in TASK_071's task file; it is *not* in this file, which said nothing
+about `_confirm_hang` at all, and that gap is why it survived to be shipped as
+advice. Measured: per-distinct-rung picks `c-clang O0/isolated` **and**
+`c-gcc O0/isolated`, **still both `-O0`**, doubling the cost to 40 s and
+covering none of the risk. **The axis that matters on this bug class is the
+optimisation level**, so the cheap correct version is one cell per distinct
+**(rung × opt)** — 4 cells, 80 s.
+
+⚠ **And it would have caught nothing here**, which is why it is a minor: §0a
+measured all four (compiler × opt) cells hanging, and the gate run records 8 hung
+cells across `c-gcc` and `c-clang` at both levels. Leaving `_confirm_hang` at one
+cell is defensible; the *reason* given for it should be that one, and not "all 8
+hung cells are the same two programs". `harness/` is not edited here either.
+
+### 11c. ⚠ The `slb-contract` sha256 has moved TWICE, and neither move is checkable by `git show HEAD:`
 
 | when | sha256 | what |
 |---|---|---|
-| as first written | `1f29b02eac0b…` | `controls/mkcontract.py`'s first output, before any measurement was published |
-| shipped | `044f02cded64…` | two edits, both to `idiom` prose, neither to a pin |
+| as first written (TASK_070) | `1f29b02eac0b…` | `controls/mkcontract.py`'s first output, before any measurement was published |
+| shipped at TASK_070 | `044f02cded64…` | two edits, both to `idiom` prose, neither to a pin |
+| **shipped at TASK_071** | **`09eea1c6f8ee…`** | **the F1 retraction and the F3 `why` split — see below** |
 
-The two edits, in full:
+**The TASK_070 move, in full:**
 
 1. `required[6]`'s `rust` value backticked `` `.take(nkey)` `` while its own
    English said *"prose, therefore, and not a backtick"*. The gate's audit
@@ -788,15 +1074,58 @@ The two edits, in full:
    entry pins nothing on the Rust side, as its English always said.
 2. A sentence was added to the same entry recording (1).
 
-**No `required` or `forbidden` spelling was added, removed or weakened, and no
-`verus`, `driver`, `collapse`, `run`, `identity` or `miri` value moved.** The
-direction test (`.memory/01-ladder.md`) is therefore not engaged: the change
-*narrows* nothing and *widens* nothing that any measurement depends on. Verify it
-against `git` once this lands:
+**The TASK_071 move, in full** — all of it prose, all of it in `note`,
+`idiom.why`, `idiom.required[2]` and `identity.why`:
 
-```bash
-git show HEAD:patterns/p22-hash-probe/spec.md | diff - patterns/p22-hash-probe/spec.md
-```
+1. **F1.** The sentences asserting *"the first termination obligation / proof in
+   this project"* are **retracted** and replaced by the counted claim (§0e-i).
+   Two of the eight sites were inside this block, which is why the hash moved.
+2. **F3.** `idiom.why`'s single reason for excluding a bounded probe is split
+   into two, because it was false of `r3_bounded_kept`; `required[2]`'s rust
+   entry now says which of the two carries the exclusion; and the cost of the
+   exclusion is published in the `why`.
+3. **F2.** `note`'s *"discharging it needs exactly the fact `nfill < TABCAP`
+   provides"* is narrowed, and the prose body records that no mutant isolates
+   the conjunct as required only for termination.
+
+⚠ **AND ONE DISCLOSURE ABOUT THE FIX ITSELF, because the gate caught it and a
+reader could not have.** The first draft of correction (2) wrote
+`` `r3_bounded_kept` ``, `` `while n < TABCAP` `` and `` `forbidden` `` **in
+backticks inside `required[2]`** — and a backtick in a `required` entry *pins a
+spelling*. The gate reported it immediately: `spellings` went 39 → 42, `pairs`
+116 → 128, and `required_pins_nothing` **0 → 3**, all three naming
+`required[2]`. That is the **same defect** as the `` `.take(nkey)` `` backticks
+the TASK_070 move removed, committed while writing the paragraph that records
+it. The backticks were removed before anything was measured or published; the
+final block is the one hashed above, and `required_pins_nothing` is back to
+**0**. The lesson is in the entry's own text now.
+
+**In BOTH moves: no `required` or `forbidden` SPELLING was added, removed or
+weakened, and no `verus`, `driver`, `collapse`, `run`, `identity` or `miri`
+VALUE moved.** `obligations` is still 20, `twin_obligations` still 23,
+`identity` still `exact`/`norel`, `run.timeout_s` still 2.0. The direction test
+(`.memory/01-ladder.md`) is not engaged by either: both narrow the *English*
+and neither narrows or widens anything a measurement depends on. A diff of the
+two `slb-contract` bodies is the evidence and it is one command:
+`python3 controls/mkcontract.py --check` after `git stash`, or simply
+`git diff patterns/p22-hash-probe/spec.md` while TASK_071 is uncommitted.
+
+> ⚠ **AND THE `git show HEAD:` CHECK THAT USED TO BE PRINTED HERE IS VACUOUS ON
+> THIS PATTERN. IT IS REMOVED RATHER THAN RE-RUN.**
+> `PROTOCOL.md` definition-of-done 6 asked for
+> `git show HEAD:…/spec.md | diff - …/spec.md`, p22 ran it at TASK_070, got
+> silence, and recorded that as verification. **It verifies nothing here.** The
+> command compares the **working tree to HEAD** — not *first written* to
+> *shipped* — and p22 landed in **one commit**, so on a clean tree it can only
+> ever print nothing and can only ever look like it passed. The
+> `1f29b02e… → 044f02cd…` disclosure **has no artefact behind it and cannot
+> acquire one**: nothing was ever committed at `1f29b02e…`.
+> **The recorded first hash is the only evidence**, which is exactly why rule 6
+> demands it be written down before any cell is built, and PROTOCOL was
+> corrected on this point after TASK_070_REVIEW.
+> The `044f02cd… → 09eea1c6…` move *is* diffable, because `044f02cd…` is committed
+> at `b7cd39b`; the diff to use is against **that commit**, not `HEAD`, once
+> anything else has touched the file.
 
 ### 11d. `spec.md` is GENERATED
 
@@ -827,3 +1156,58 @@ contract fails `check.idiom_problems` or `check.named_spelling_problem`.
   `19 verified, 1 errors` — a failed transplant, **not** `is not supported`
   (`.memory/01-ladder.md`: only the second disqualifies), and its exec code is
   byte-identical to the shipped R4 at `-O3` anyway, so nothing rests on it.
+
+**Added at TASK_071, the corrections task:**
+
+* **Neither harness defect was fixed.** §11b's `check_miri` block reason needs a
+  per-rung axis on `expected_hang` and §11b-ii's `_confirm_hang` needs a
+  (rung × opt) cell selection. `harness/` is outside this task's scope by
+  instruction; both are recorded for the manager to queue, and neither changes
+  any number in this file.
+* **`r3_bounded_kept` was NOT admitted to the contract**, and that is a decision
+  rather than an omission — §0c reason 2 argues it and §8b publishes what it
+  costs. The alternative (admit it, republish the span at 16.8× the width) is
+  equally honest and less informative, because it would put a trip count inside
+  the class of programs p22 exists to measure without one.
+* **The measurement record WAS re-run, and it had to be.** F8 edits `verus.rs`
+  and F6 edits `inputs/gen.py`, and both are in `measure.py`'s
+  `measurement_sources`, so `results/p22-hash-probe.json` went stale by hash
+  even though nothing it records could move. `harness/measure.py p22` was
+  re-run and the two records diffed key by key:
+
+  > **Against the record committed at `b7cd39b`: 101 differing leaves, and ZERO
+  > of them is a measured number.** 96 are wall-clock
+  > (`median_s`/`min_s`/`spread_pct` on 16 O3 cells × 2 blobs — noise, and
+  > unpublished, §4g), 3 are provenance (`generated_utc`, `git.commit`,
+  > `git.dirty_files`) and 2 are the `source_sha256` entries for the two edited
+  > files. **Every `Ir`, every `md5_fn`/`md5_raw`, every static count and every
+  > checksum is bit-identical**, which is the direct evidence that F8's deleted
+  > invariant and F1's comment rewrite erase and that F6's diagnostic does not
+  > touch a blob.
+
+  ⚠ **It took three runs, and the reason is worth recording because it is a
+  measurement-hygiene fact and not an accident.** `measure.py` was run once
+  after the F8/F6 edits, once more after `verus.rs` was edited again to correct
+  its own error list, and a **third** time because the second run's wall block
+  came back with **14 of 32 cells over the 10% min-to-median spread threshold**
+  — `results/tables/p22-hash-probe.md` renders those as `✗`. The box was not
+  idle during that run's wall stage: this agent was polling its log in a shell
+  loop while 16 O3 cells × 30 interleaved reps were being timed on a pinned
+  CPU. Re-run on a quiet box, **0 of 32 cells carry a warning** and the `Ir`
+  columns are unchanged, so nothing but the wall block ever moved. The
+  published result does not depend on it — §4g publishes no `ns` figure — but
+  a benchmark harness's own timing block is not something to leave visibly
+  degraded in a committed artefact.
+
+  The 38 input blobs were regenerated too —
+  `python3 inputs/gen.py --sweep --out <dir>`, whose audit is silent and whose
+  row-by-row output is `.temp/p22c/gen.log` — and are **38 of 38
+  byte-identical** to the committed ones. (The regenerated copies are a
+  re-derivable artefact and were deleted; the generator and its log are the
+  evidence, `.memory/00-environment.md` constraint 6.)
+* **The one number this task derived fresh is §4e's dynamic decomposition**
+  (`controls/dyn_ir.py`). Nothing else in the Ir columns was re-derived.
+* **`.temp/p22rev/`'s `decr.py` census was re-run, not re-implemented.** The
+  73/56/1 counts in §0e-i are the reviewer's script re-executed against the
+  current tree, and the reviewer's per-candidate audit of the near misses
+  (p07, p06, p16, p38, p14, p13) was taken on trust rather than repeated.
