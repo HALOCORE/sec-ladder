@@ -348,3 +348,155 @@ and logs retained; binaries deleted, per `CLAUDE.md` "Don't" 1.
 wrong cells). **Clean negatives, all upheld:** Q1's rule reading (0/22
 counter-examples), the §3-A prediction (confirmed with its stated mechanism), and
 the §3-B guess (confirmed and understated).
+
+---
+
+## ⚠ THE VALIDATOR, EMBEDDED — because `.temp/` is GITIGNORED
+
+`.gitignore` contains `.temp/`, so **every path this report cites under
+`.temp/t85/` is absent from a fresh clone.** `.memory/05-layout.md` item 11's
+convention — *"a `.temp/` artefact plus a committed generator plus a `NOTES.md`
+section"* — **assumes a pattern directory exists**, and a **refused** row has
+none. So the source is inlined here, in the tracked file, and
+`.memory/06-catalogue.md`'s refusal block points at **this section** rather than
+at a path that does not survive a clone.
+
+Verbatim, `sha256 593b25e0759c511377eb25546c509cacb7e61bc48143864c0e0c80b9a444fec5`,
+`./verus_run.py <file> --multiple-errors 8` → **`5 verified, 0 errors`**:
+
+```rust
+// TASK_085 Q3 — a VERIFIED UTF-8 validator at the pin.
+// Bar: `fn is_valid_utf8(b: &[u8]) -> (res: bool) ensures res == valid_utf8(b@)`
+// BOTH directions. No assume/admit/external_body/assume_specification anywhere.
+use vstd::prelude::*;
+use vstd::utf8::*;
+
+verus! {
+
+/// Decides `valid_first_scalar` on the suffix `b@[i..]` and returns its length,
+/// or 0 when the suffix does not start with a well-formed scalar.
+fn first_scalar_len(b: &[u8], i: usize) -> (res: usize)
+    requires
+        i < b.len(),
+    ensures
+        (res != 0) == valid_first_scalar(b@.subrange(i as int, b.len() as int)),
+        res != 0 ==> res == length_of_first_scalar(b@.subrange(i as int, b.len() as int)),
+        res <= 4,
+{
+    let n = b.len();
+    let ghost s = b@.subrange(i as int, n as int);
+    let b0 = b[i];
+    assert(s[0] == b0);
+    assert(s.len() == n - i);
+
+    if b0 <= 0x7f {
+        assert(codepoint_width_1(b0) <= 0x7f) by (bit_vector);
+        1
+    } else if 0xc0 <= b0 && b0 <= 0xdf {
+        if n - i >= 2 {
+            let b1 = b[i + 1];
+            assert(s[1] == b1);
+            if 0x80 <= b1 && b1 <= 0xbf {
+                let cp: u32 = (((b0 & 0x1f) as u32) << 6) | ((b1 & 0x3f) as u32);
+                assert(cp == codepoint_width_2(b0, b1));
+                if 0x80 <= cp && !(0xd800 <= cp && cp <= 0xdfff) {
+                    2
+                } else {
+                    0
+                }
+            } else {
+                0
+            }
+        } else {
+            0
+        }
+    } else if 0xe0 <= b0 && b0 <= 0xef {
+        if n - i >= 3 {
+            let b1 = b[i + 1];
+            let b2 = b[i + 2];
+            assert(s[1] == b1);
+            assert(s[2] == b2);
+            if 0x80 <= b1 && b1 <= 0xbf && 0x80 <= b2 && b2 <= 0xbf {
+                let cp: u32 = (((b0 & 0x0f) as u32) << 12) | (((b1 & 0x3f) as u32) << 6)
+                    | ((b2 & 0x3f) as u32);
+                assert(cp == codepoint_width_3(b0, b1, b2));
+                if 0x800 <= cp && !(0xd800 <= cp && cp <= 0xdfff) {
+                    3
+                } else {
+                    0
+                }
+            } else {
+                0
+            }
+        } else {
+            0
+        }
+    } else if 0xf0 <= b0 && b0 <= 0xf7 {
+        if n - i >= 4 {
+            let b1 = b[i + 1];
+            let b2 = b[i + 2];
+            let b3 = b[i + 3];
+            assert(s[1] == b1);
+            assert(s[2] == b2);
+            assert(s[3] == b3);
+            if 0x80 <= b1 && b1 <= 0xbf && 0x80 <= b2 && b2 <= 0xbf && 0x80 <= b3 && b3 <= 0xbf {
+                let cp: u32 = (((b0 & 0x07) as u32) << 18) | (((b1 & 0x3f) as u32) << 12)
+                    | (((b2 & 0x3f) as u32) << 6) | ((b3 & 0x3f) as u32);
+                assert(cp == codepoint_width_4(b0, b1, b2, b3));
+                if 0x10000 <= cp && cp <= 0x10ffff && !(0xd800 <= cp && cp <= 0xdfff) {
+                    4
+                } else {
+                    0
+                }
+            } else {
+                0
+            }
+        } else {
+            0
+        }
+    } else {
+        0
+    }
+}
+
+/// The bar.
+fn is_valid_utf8(b: &[u8]) -> (res: bool)
+    ensures
+        res == valid_utf8(b@),
+{
+    let n = b.len();
+    let mut i: usize = 0;
+    assert(b@.subrange(0, 0) =~= Seq::<u8>::empty());
+    while i < n
+        invariant
+            i <= n,
+            n == b.len(),
+            partial_valid_utf8(b@, i as int),
+        decreases n - i,
+    {
+        let w = first_scalar_len(b, i);
+        if w == 0 {
+            proof {
+                let s = b@.subrange(i as int, n as int);
+                assert(s.len() > 0);
+                assert(!valid_utf8(s));
+                partial_valid_partial_invalid_utf8(b@, i as int);
+            }
+            return false;
+        }
+        proof {
+            partial_valid_utf8_extend(b@, i as int);
+        }
+        i = i + w;
+    }
+    proof {
+        assert(b@.subrange(0, n as int) =~= b@);
+    }
+    true
+}
+
+fn main() {
+}
+
+} // verus!
+```

@@ -1080,8 +1080,11 @@ lines (~10 proof), ZERO trusted items**, on three vstd lemmas
 `partial_valid_utf8` as the loop invariant). The **end-to-end call site**
 verifies **`8 verified, 0 errors`**, discharging `vstd/string.rs`'s
 `requires valid_utf8(v@)` **from the validator's postcondition alone**.
-Source and rebuild script: `.temp/t85/v01_validator.rs`, `v03_callsite.rs`,
-`rebuild.sh`.
+⚠ **The source is EMBEDDED VERBATIM in `.tasks/TASK_085_REPORT.md`'s final
+section**, `sha256 593b25e0…`, because **`.temp/` is gitignored and a refused row
+has no pattern dir to put a generator in** — every `.temp/t85/` path cited
+anywhere is absent from a fresh clone. `.temp/t85/rebuild.sh` still re-derives
+the binaries **on this box only**.
 
 **Non-vacuous three ways, and the third is the one to copy:**
 an unmediated differential oracle against `core::str::from_utf8` —

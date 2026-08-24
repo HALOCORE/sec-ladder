@@ -224,6 +224,23 @@ mentions. Budget for them up front; each has cost an engineer a surprise.
    hit count, so it cannot drift, and (b) a `NOTES.md` section carrying the diff,
    the commands and the measured output. p17 §1c is the model.
 
+   ⚠⚠ **COROLLARY, AND THE RULE ABOVE DOES NOT COVER IT: a REFUSED row has no
+   pattern dir, so it has neither a generator to derive from nor a `NOTES.md` to
+   put the diff in — and `.gitignore` contains `.temp/`, so every `.temp/` path
+   its refusal block cites is ABSENT FROM A FRESH CLONE.** The rule above
+   silently assumes a shipped `verus.rs` exists to substitute into.
+
+   **So: a refused row's reusable artefact is EMBEDDED VERBATIM in its committed
+   `.tasks/TASK_NNN_REPORT.md`, with its `sha256` and its verification output
+   beside it**, and the catalogue's refusal block cites **that section**, never
+   the `.temp/` path. **`p15` is the instance and the reason this corollary
+   exists**: its refusal block was written citing
+   `.temp/t85/v01_validator.rs` — a **verified UTF-8 validator, `5 verified, 0
+   errors`, zero trusted items**, and the most reusable thing the row produced —
+   and that path does not survive a clone. ⚠ **Check this whenever you refuse a
+   row: the more valuable the residue, the more likely it is sitting in
+   `.temp/`.**
+
 12. **The `slb-contract` block requires an `idiom` object** (TASK_016, gate stage
    `0b`): `required` — a non-empty list of what every rung must spell out;
    `forbidden` — spellings that would delete the pattern, **allowed to be empty**
