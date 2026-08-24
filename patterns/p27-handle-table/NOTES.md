@@ -2153,3 +2153,46 @@ sweep for it alone.** The reasoning, and the ratio, both ways:
 ⚠ **Not implemented here.** TASK_063 forbids touching `harness/`, and the
 recommendation is the deliverable. The number above is what it should be
 measured against on the day it lands.
+
+### 13e. `required[2]` reads PRESENT on the strength of a twin no cell compiles (RECAP "Owed" 18)
+
+**Measured at TASK_069, recorded only in `harness/check.py::idiom_audit`'s
+docstring, and moved here at TASK_082** — the engineer who found it judged a
+pattern-doc edit outside TASK_069's authorised set and flagged it rather than
+doing it, which was right, and it then sat in a harness docstring for thirteen
+tasks. It is a defect in the RULER, exactly like §13's `forbidden[0]`, and it is
+the second one this pattern has produced.
+
+`required[2]`'s Rust key backticks **`vstd::raw_ptr::deallocate`** as a prose
+reference. `deallocate` occurs in p27's Rust code — comments and string literals
+blanked, i.e. what `spelling_matches` actually sees — in **exactly one place in
+the whole tree**:
+
+```
+$ python3 -c "...vparse.blank_noncode over patterns/p27-handle-table/*.rs..."
+verus.rs line 558          # inside `#[cfg(slb_twin)] fn slb_twin_rec_free`
+```
+
+and `verus.rs:558` is the body of the **verified twin**, which stage 5c-twin
+requires to be `#[cfg]`'d out of **every** build — that is what makes a twin cost
+zero instructions structurally. **So the entry read as PRESENT on the strength of
+code no cell compiles.** That is precisely the false *satisfaction* RECAP
+"Owed" 10 predicted, and it is why the ghost-blanking fix landed at TASK_069:
+after it, the entry is correctly reported in the audit's `pins_nothing` bucket.
+
+⚠ **Nothing here is a defect in a rung, and no number moves.** The four Rust
+rungs really do perform the real free — `std::alloc::dealloc(p, layout)` in
+`unsafe.rs` and `verus.rs`, the `Option<Box<u8>>` drop in the two safe rungs —
+which is the property the entry exists to pin, and §13's TCB section derives
+`rec_free`'s six preconditions against vstd's `deallocate` line by line. What is
+wrong is the **backticked spelling**: under the named-spelling standard a
+backticked span pins THAT SPELLING, and this one names a vstd path that only the
+twin ever writes. The entry pins its property in English and pins nothing
+mechanically.
+
+✅ **Two residuals from the same audit, both expected and both left alone**:
+`vstd::raw_ptr::deallocate` and the bare `deallocate` are two of the eleven
+tree-wide `pins_nothing` rows that are prose references which happen to be
+backticked (`malloc` and `align <= 8` are p27's other two). **A non-zero
+`pins_nothing` is normal; what is worth reading is a change** — recompute it with
+`.temp/p69/audit_regress.py` rather than quoting the count.

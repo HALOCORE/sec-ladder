@@ -504,6 +504,94 @@ def parse(text):
 
 
 # --------------------------------------------------------------------------
+# body-less TRUSTED declarations -- what `parse()` structurally cannot report
+# --------------------------------------------------------------------------
+
+#: The three body-less forms Verus offers for asserting something about code it
+#: does not verify. `axiom fn` covers `broadcast axiom fn` and `pub axiom fn`;
+#: `uninterp spec fn` covers the `open`/`closed` spellings.
+_AXIOM_RE = (
+    ("axiom fn", re.compile(r"\baxiom\s+fn\s+(" + _IDENT + r")")),
+    ("uninterp spec fn",
+     re.compile(r"\buninterp\s+(?:open\s+|closed\s+)?spec\s+fn\s+("
+                + _IDENT + r")")),
+)
+_ASSUME_SPEC_RE = re.compile(r"\bassume_specification\b")
+
+
+def axiom_decls(text, code=None):
+    """[{kind, name, line, in_verus}] for every body-less TRUSTED declaration.
+
+    **`assume_specification`, `axiom fn` and `uninterp spec fn` are axioms about
+    real Rust semantics, written by hand and checked by nothing** -- Verus does
+    not prove them and this project's gate did not, until TASK_082, even *see*
+    them (TASK_081_REVIEW blocker 1, RECAP "Owed" 0). They are the strongest
+    kind of trusted item there is, and `.memory/04-verus.md`'s final section has
+    the measurement: the declaration Verus's own error message prints for you to
+    paste carries **no `requires` and no `ensures`**, so pasting it verifies a
+    1 MiB out-of-bounds read and a null dereference at `4 verified, 0 errors`.
+
+    ⚠ **THIS IS A SEPARATE MATCHER AND `parse()` MUST NOT BE MADE TO REPORT
+    THESE. Measured at TASK_082, not argued.** The obvious repair -- delete
+    `parse()`'s `if body_open is None: continue` so body-less items become
+    `Item`s -- makes `by_name` raise on a file that is green today, because a
+    **trait method declaration** is body-less too:
+
+        patterns/p36-vtable-dispatch/verus.rs:141  fn apply       (trait decl)
+        patterns/p36-vtable-dispatch/verus.rs:166  fn apply       (impl)
+        -> vparse: duplicate item name(s): apply at lines [166, 141],
+                                           spec_apply at lines [186, 146]
+
+    and `by_name` has six consumers that each turn that `ValueError` into a gate
+    failure (see its docstring), so p36 would go from PASS to six FAILs. p36's
+    three other rung sources declare `apply` the same way. A trait method
+    declaration is *not* trusted -- the implementing item is verified -- so
+    widening `parse()` would both break a green pattern and count the wrong
+    thing. Keyword-keyed detection does neither.
+
+    `assume_specification` has no `fn` token at all, so `parse()`'s
+    `\\bfn\\s+NAME` matcher never had any chance of seeing it in the first
+    place.
+
+    Comments and string literals are blanked first, so
+    `patterns/p08-overlap-move/verus.rs:322` -- which *discusses*
+    `assume_specification` in a comment -- is correctly not a hit."""
+    code = code if code is not None else blank_noncode(text)
+    vs = verus_span(text, code)
+    out = []
+
+    def add(kind, name, at):
+        out.append(dict(kind=kind, name=name,
+                        line=text.count("\n", 0, at) + 1,
+                        in_verus=bool(vs) and vs[0] <= at < vs[1]))
+
+    for kind, rx in _AXIOM_RE:
+        for m in rx.finditer(code):
+            add(kind, m.group(1), m.start())
+
+    # `assume_specification` names its target in brackets rather than after
+    # `fn`: `pub assume_specification<T>[ <[T]>::starts_with ](s: &[T]) -> ...`.
+    for m in _ASSUME_SPEC_RE.finditer(code):
+        j, name = m.end(), "?"
+        try:
+            while j < len(code) and code[j] in " \t\r\n":
+                j += 1
+            if j < len(code) and code[j] == "<":
+                j = _match_angle(code, j)
+            while j < len(code) and code[j] in " \t\r\n":
+                j += 1
+            if j < len(code) and code[j] == "[":
+                end = _match_bracket(code, j)
+                name = re.sub(r"\s+", " ", text[j + 1:end - 1]).strip()
+        except ValueError:
+            name = "?"          # unreadable target: still an axiom, still counted
+        add("assume_specification", name, m.start())
+
+    out.sort(key=lambda d: d["line"])
+    return out
+
+
+# --------------------------------------------------------------------------
 # clause surgery -- what the clause-deletion gate stage is built on
 # --------------------------------------------------------------------------
 
@@ -1571,6 +1659,58 @@ impl Op1 { fn slb_twin_apply(&self) -> u64 { 1 } }
          sorted(qualified_name(i)
                 for i in parse(attr_impl.replace("#[cfg(slb_twin)]\n", ""))),
          ["Op0::slb_twin_apply", "Op1::slb_twin_apply"])
+
+    # --- TASK_082: body-less TRUSTED declarations (RECAP "Owed" 0) ----------
+    # The gate could not see any of these at all. The last two cases are the
+    # ones that make this a separate matcher rather than a widened `parse()`:
+    # a trait method declaration is body-less and is NOT trusted, and p36 ships
+    # two of them beside impl definitions of the same names.
+    ax = '''use vstd::prelude::*;
+verus! {
+// assume_specification for `<[T]>::copy_from_slice` -- a COMMENT, not an axiom
+pub uninterp spec fn view_of(s: &[u8]) -> Seq<u8>;
+pub open spec fn defined(x: int) -> bool { x > 0 }
+broadcast axiom fn axiom_view(s: &[u8]) ensures view_of(s).len() == s@.len();
+pub axiom fn tracked_empty() -> (tracked out_v: u8);
+pub assume_specification[ u32::rotate_left ](x: u32, n: u32) -> (r: u32)
+    ensures r == x, opens_invariants none no_unwind ;
+pub assume_specification<T: PartialEq>[ <[T]>::starts_with ](s: &[T], p: &[T]) -> (b: bool)
+    ensures b == (p@.len() <= s@.len()) ;
+trait Op { fn apply(&self) -> u64; }
+impl Op for u8 { fn apply(&self) -> u64 { 0 } }
+fn hide() { let s = "assume_specification"; let _ = s; }
+}
+'''
+    want("axiom_decls: every body-less trusted form, in source order",
+         [(d["kind"], d["name"]) for d in axiom_decls(ax)],
+         [("uninterp spec fn", "view_of"),
+          ("axiom fn", "axiom_view"),
+          ("axiom fn", "tracked_empty"),
+          ("assume_specification", "u32::rotate_left"),
+          ("assume_specification", "<[T]>::starts_with")])
+    want("axiom_decls: a comment/string mention is not a declaration",
+         [d for d in axiom_decls(ax) if d["name"] in ("?", "copy_from_slice")],
+         [])
+    want("axiom_decls: a defined `open spec fn` is not an axiom",
+         [d for d in axiom_decls(ax) if d["name"] == "defined"], [])
+    want("axiom_decls: a TRAIT METHOD DECLARATION is not an axiom",
+         [d for d in axiom_decls(ax) if d["name"] == "apply"], [])
+    want("axiom_decls: all inside verus!",
+         sorted({d["in_verus"] for d in axiom_decls(ax)}), [True])
+    want("axiom_decls: none of these are `parse()` items",
+         sorted(set(i.name for i in parse(ax))
+                & {d["name"] for d in axiom_decls(ax)}), [])
+    # ...and the reason `parse()` was NOT widened: p36's shape, reduced.
+    trait_dup = '''verus! {
+trait Op { spec fn spec_apply(&self) -> u64; fn apply(&self) -> u64; }
+impl Op for u8 { spec fn spec_apply(&self) -> u64 { 0 }
+                 fn apply(&self) -> u64 { 0 } }
+}
+'''
+    want("body-less trait decls stay out of parse(), so by_name still works",
+         sorted(by_name(trait_dup)), ["apply", "spec_apply"])
+    want("...and they are not counted as axioms either",
+         axiom_decls(trait_dup), [])
 
     print("vparse selftest:", "PASS" if bad == 0 else f"FAIL ({bad})")
     return 0 if bad == 0 else 1

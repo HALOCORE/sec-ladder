@@ -88,13 +88,13 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "4158ba37a8aea7c789128185e061b4962a3550107c6fccfcb3ab4e6077ecdeb9",
+    "harness/check.py": "821ef770fe7a6efedc2e3ac8274d7456a9b198f64879ee4174654e5505a7cb92",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
-    "harness/vparse.py": "17e87555e53c37b05f1ac924b40a2a530c8ad1b18edc873b681e0c86ed0394c2",
+    "harness/vparse.py": "31fb494613c7650be07a1d90865f0ff0662c10b0b87ba3c441f426222b69fd2d",
     "patterns/p16-tlv-walk/NOTES.md": "06a402d0b76638f73b7cc4217a4c19bb6b0f2d61d05726445dd4a391bd38d3e7",
     "patterns/p16-tlv-walk/README.md": "f15228277fb40556da91f02dfa7bd453eada8276cf34d529db519b65a2911bd6",
     "patterns/p16-tlv-walk/c/kernel.c": "a59fbef6d3427711a78b7806569978223367c6cba81bfcf1881e1ac83977aba0",
@@ -303,7 +303,8 @@
           "body_lines": 1,
           "line": 204
         }
-      ]
+      ],
+      "axiom_decls": []
     }
   },
   "verified_call_site": {
@@ -908,7 +909,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==4109821==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51f000001a80 at pc 0x561533e4b717 bp 0x7ffe7bd3f030 sp 0x7ffe7bd3f020 READ of size 1 at 0x51f000001a80 thread T0 #0 0x561533e4b716 in kernel /home/apt/repos_common/",
+      "diagnostic": "================================================================= ==102242==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51f000001a80 at pc 0x55932fd17717 bp 0x7ffd81efed30 sp 0x7ffd81efed20 READ of size 1 at 0x51f000001a80 thread T0 #0 0x55932fd17716 in kernel /home/apt/repos_common/s",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -968,6 +969,7 @@
         "get_unchecked"
       ]
     },
+    "axiom_decls": {},
     "required_because": [
       "this pattern has 1 trusted item(s) {'verus.rs': ['get_unchecked']} whose `ensures` need not be COMPLETE with respect to the unchecked operations their bodies perform (TASK_009_REVIEW x4)",
       "spec.md sets miri.required"
@@ -1041,5 +1043,5 @@
   "blocked": [],
   "verdict": "PASS",
   "complete_run": true,
-  "invocation": "p16"
+  "invocation": "p16-tlv-walk"
 }

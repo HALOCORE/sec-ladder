@@ -3,6 +3,7 @@
 gitignored and this script is what is committed (`.memory/02-bench-rules.md`).
 
     python3 patterns/p17-http-range/inputs/gen.py
+    python3 patterns/p17-http-range/inputs/gen.py --sweep   # + the `nsuf` sweep
 
 Payload layout (../spec.md):
 
@@ -250,6 +251,68 @@ CW_ATTACK_SUFFIXES = (10, 56, 122)
 CW_SECRETS = (("lo", 0x00), ("hi", 0xFF))     # the only difference in the pair
 
 
+# ---- `--sweep`: the `nsuf` axis, appended LAST (TASK_082, RECAP "Owed" 4) ----
+#
+# **This is the axis p17's headline is denominated in and the one it never
+# swept.** `small` and `large` differ 8x in body size and NOT AT ALL in `nsuf`
+# -- both serve 3 requests -- so the published "+32 Ir/call" is two points at one
+# `nsuf`, which is the residue-class failure that broke p16's `nrec + 3` and
+# p38's additivity, sitting inside a published law. NOTES.md 10 already carries
+# TASK_015_REVIEW M2's finding that the difference is `~= 7*nsuf + 9`, i.e. **per
+# REQUEST and not per call**, measured on inputs that were never committed
+# (`.temp/review015/gen17.py`). The tree could state the law and not reproduce
+# it; this band is what makes it re-derivable from a hashed file.
+#
+# Three decisions, each forced rather than chosen:
+#
+#   * **the same shape TASK_015_REVIEW used** -- body 498, 32 windows, and the
+#     same `BODY - 1 - (i*37) % (BODY - 8)` suffix spread -- so the shipped band
+#     is directly comparable with NOTES.md 10's published table rather than being
+#     a second, differently-shaped experiment that cannot be checked against it.
+#     `nsuf = 3` here is `small`'s `nsuf` at `small`'s body length, so the band
+#     lands on a point the matrix already measures.
+#   * **`nsuf` 1..8 CONSECUTIVE, not two full mod-16 cycles.** The file's own
+#     rule elsewhere is two cycles of the largest modulus that has bitten this
+#     project, and it does not apply here: `nsuf` is a REQUEST COUNT, the outer
+#     loop's trip count, not a byte length -- no unrolled epilogue is keyed on
+#     it, so it has no residue class to hide a sawtooth in. Eight consecutive
+#     points test an affine law directly, and NOTES.md 10 reports exactly zero
+#     residual for `17*nsuf` over these eight.
+#   * **appended LAST, drawn from the shared sequential rng**, so every one of
+#     the eight pre-existing blobs stays BYTE-IDENTICAL -- verified by sha256
+#     before and after at TASK_082, 8 of 8 unchanged. That is what makes this
+#     cost a gate re-run and not a re-measure: `check.inputs_of` and
+#     `measure.SKIP_INPUT_PREFIX` both drop the `sweep-` prefix, so no matrix
+#     input, no `inputs_checked` entry and no number in
+#     `results/p17-http-range.json` depends on any of it. ⚠ The prefix IS the
+#     mechanism (`.memory/05-layout.md`): a band named anything else enters the
+#     measurement matrix and costs 43 minutes.
+#
+# ⚠ **What this band deliberately does NOT hold fixed: the folded bytes.** The
+# suffix values are large, so `sum(suffixes)` -- p17's `work_per_call` -- rises
+# with `nsuf`. That is TASK_015_REVIEW's shape and it is sound for the quantity
+# NOTES.md 10 publishes, because that quantity is a *difference between rungs*
+# and §3b measured the per-byte rate of `R3ship - R4` at exactly 0, so the byte
+# term cancels. It is NOT sound for an absolute per-call law of any single rung;
+# for that, sweep the body length, which is what §3b's 34-point band already
+# does at fixed `nsuf`. The two bands are orthogonal on purpose.
+SWEEP_NSUFS = tuple(range(1, 9))
+SWEEP_BODY = 498                  # == SMALL_BODY: the band crosses `small`
+SWEEP_WINS = 32                   # == SMALL_WINS
+SWEEP_ITERS = 5_000
+
+
+def sweep_suffixes(nsuf, body=SWEEP_BODY):
+    """`nsuf` well-formed suffix values, spread over the body.
+
+    Byte-identical to `.temp/review015/gen17.py`'s formula, which is what
+    NOTES.md 10's published `17*nsuf` / `7*nsuf + 9` table was measured on. All
+    values are `<= content_len`, so every request is in the *correct* regime and
+    no rung enters an adversarial band: all rungs must print the same checksum
+    on every blob of this sweep."""
+    return [body - 1 - (i * 37) % (body - 8) for i in range(nsuf)]
+
+
 def crosswin(secret_byte):
     """The two-window blob, parameterised by the victim's secret fill byte.
 
@@ -270,7 +333,12 @@ def crosswin(secret_byte):
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.parse_args()
+    ap.add_argument("--sweep", action="store_true",
+                    help="also emit sweep-nsuf-NN.bin (diagnostic; the gate and "
+                         "measure.py skip the sweep- prefix)")
+    # `args`, not `a`: the crosswin assertion below binds `a, b = ...` and p16's
+    # `a = ap.parse_args()` spelling would be silently shadowed by it.
+    args = ap.parse_args()
     rng = random.Random(SEED)
 
     print("p17 inputs ->", os.path.relpath(HERE, os.getcwd()))
@@ -348,6 +416,20 @@ def main():
     #     the calls happen and the kernel is what rejects.
     write("adversarial-stride1.bin", 8, 1,
           tiled(rng, 8, 2, (3, 4), 8))
+
+    # ---- the `nsuf` sweep, appended LAST ----------------------------------
+    # Everything above is emitted from the same rng in the same order as before
+    # TASK_082, so all eight blobs above are byte-identical to the committed
+    # ones. See SWEEP_NSUFS above for why this band exists.
+    if args.sweep:
+        print(f"  -- sweep over nsuf (NOTES.md 10's axis, "
+              f"{len(SWEEP_NSUFS)} consecutive request counts at body "
+              f"{SWEEP_BODY})")
+        for nsuf in SWEEP_NSUFS:
+            sufs = sweep_suffixes(nsuf)
+            write(f"sweep-nsuf-{nsuf:02d}.bin", SWEEP_ITERS,
+                  2 + 2 * nsuf + SWEEP_BODY,
+                  tiled(rng, SWEEP_WINS, nsuf, sufs, SWEEP_BODY))
     return 0
 
 

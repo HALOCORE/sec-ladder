@@ -1026,10 +1026,40 @@ claim is one trusted `requires`.
 
 **This is the sharpest instance in the project of `.memory/01-ladder.md`'s
 R4-by-permission paragraph.** The safe class can reach `core::slice::memchr` at
-zero TCB and the unsafe class cannot reach it at all; the two classes are
+zero TCB; the unsafe class reaches it **at four hand-written axioms that no gate
+stage checked until TASK_082** (see below); the
+two classes are
 **incomparable**, and on p11 the incomparability is worth a third of the kernel
 rather than a handful of instructions. It is also why R3-beats-R4 on `large` is
 *not* a defect in R4: no admissible R4 can close it.
+
+⚠ **This paragraph read "and the unsafe class cannot reach it at all" until
+TASK_082, and it contradicted the sentence eleven lines above it** — which
+already priced the same spelling at *four new trusted items*, i.e. reachable and
+expensive rather than unreachable. TASK_081_REVIEW measured the escape: all four
+`is not supported` items above take an `external_type_specification` /
+`assume_specification` declaration and `.temp/r81/p_cstr_escape.rs` verifies
+`2 verified, 0 errors` **first try**.
+
+⚠ **And the escape is worse than a price, which is why the correction matters
+more than the wording.** Two of the four are **TYPES**, and **both functions are
+SAFE** (`from_bytes_until_nul`, `to_bytes`), so there is **no `requires` to
+bite**: the declarations assert what those functions do and nothing constrains
+their callers. Until TASK_082 **no gate stage could see any of them** — an
+`assume_specification` adds no verified function, emits no instructions, carries
+no `#[verifier::external_body]`, and `vparse.parse` dropped it as body-less — so
+`results/synthesis.md` would have gone on publishing p11's TCB as **3** while the
+proof rested on **seven** (RECAP "Owed" 0). The gate now counts them, requires
+the count to be declared in `spec.md`'s `verus.axioms`, and shouts every one in
+every verdict.
+
+✅ **p11's finding does NOT flip and nothing here licenses shipping `r4_cstr`.**
+The −35% is still not a measured admissible rung: its `Ir` cost as a *verified*
+cell is unmeasured, four hand-written axioms on a pattern whose whole
+memory-safety claim is one trusted `requires` is a TCB more than doubled, and
+`.memory/01-ladder.md`'s direction test governs any declaration edit that would
+admit it. What changed is only that *"cannot"* is now *"can, at a price the gate
+can finally see"*.
 
 ## 11. Wall clock — the noise floor first, then the mode, then the statistic
 

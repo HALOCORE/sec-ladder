@@ -105,20 +105,20 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "4158ba37a8aea7c789128185e061b4962a3550107c6fccfcb3ab4e6077ecdeb9",
+    "harness/check.py": "821ef770fe7a6efedc2e3ac8274d7456a9b198f64879ee4174654e5505a7cb92",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
-    "harness/vparse.py": "17e87555e53c37b05f1ac924b40a2a530c8ad1b18edc873b681e0c86ed0394c2",
-    "patterns/p17-http-range/NOTES.md": "9696df80d0c27556d6bebd7bf66a62de99d9ec211ffa8b46ca3a024daa435d56",
+    "harness/vparse.py": "31fb494613c7650be07a1d90865f0ff0662c10b0b87ba3c441f426222b69fd2d",
+    "patterns/p17-http-range/NOTES.md": "b522040f8cb46fd17c1586ae878f107207b4e8f6bbb6e4f10cb23a70f72f5cad",
     "patterns/p17-http-range/README.md": "b17e898b60e8f20ad812f95ad76af578c64aba3bf50463497449ac4af19130e3",
     "patterns/p17-http-range/c/kernel.c": "7c4e302d420db1ef666a7218a884c611120811324629dc9cdc7884c0e0ad7db6",
     "patterns/p17-http-range/c/kernel.h": "09bfe23afa37872032784e8d0afe473713fbac12cd8a6c28e5f8ffe6b8c85f05",
     "patterns/p17-http-range/c/kernel_hardened.c": "603c7e13ba191725a6a15fbbd347b0c97319176d5a9607e1064c594ff41993b8",
     "patterns/p17-http-range/c/main.c": "32788ae111359ab8ecfa90067376c208079c886b20f041e648573bacd907c478",
-    "patterns/p17-http-range/inputs/gen.py": "ca5a5b3f52c65196de4ef76f7aaccf6fe279fb2629bc6943a65a7381d1de6ef5",
+    "patterns/p17-http-range/inputs/gen.py": "31631fec3d1e53846312af1f39d721684f7059240d478abf37c03ad011fe6f42",
     "patterns/p17-http-range/model.py": "d3e26cfeb6a076b423b474a40d77bbab47e50d0abf133e457ef046ed12b5813c",
     "patterns/p17-http-range/safe_naive.rs": "43fadb4c64f6f60e219ba8ce16bf27daa1085f6239d873a16bca7a7b5e20340b",
     "patterns/p17-http-range/safe_tuned.rs": "4afff314daf7d1fdadfeb1fe661a13a07808da9dce560bece1798518fbbf0414",
@@ -319,7 +319,8 @@
           "body_lines": 1,
           "line": 254
         }
-      ]
+      ],
+      "axiom_decls": []
     }
   },
   "verified_call_site": {
@@ -1440,7 +1441,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==4112318==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x50600000001a at pc 0x55de9985d921 bp 0x7fffe3f7f0e0 sp 0x7fffe3f7f0d0 READ of size 1 at 0x50600000001a thread T0 #0 0x55de9985d920 in kernel /home/apt/repos_common/",
+      "diagnostic": "================================================================= ==104754==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x50600000001a at pc 0x563319fd8921 bp 0x7ffe5df72830 sp 0x7ffe5df72820 READ of size 1 at 0x50600000001a thread T0 #0 0x563319fd8920 in kernel /home/apt/repos_common/s",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1489,6 +1490,7 @@
         "get_unchecked"
       ]
     },
+    "axiom_decls": {},
     "required_because": [
       "this pattern has 1 trusted item(s) {'verus.rs': ['get_unchecked']} whose `ensures` need not be COMPLETE with respect to the unchecked operations their bodies perform (TASK_009_REVIEW x4)",
       "spec.md sets miri.required"
@@ -1596,5 +1598,5 @@
   "blocked": [],
   "verdict": "PASS",
   "complete_run": true,
-  "invocation": "p17"
+  "invocation": "p17-http-range"
 }

@@ -103,6 +103,14 @@ What it enforces, in order:
        - every `unsafe` token in a pinned Verus source sits inside a trusted
          item's body, and the `common/` files the rungs `#[path]`-include carry
          none at all -- otherwise the unchecked operation is outside every rule
+       - every BODY-LESS trusted declaration -- `assume_specification`,
+         `axiom fn`, `uninterp spec fn` -- is COUNTED and its count is declared
+         in `spec.md`'s `verus.axioms` (TASK_082, RECAP "Owed" 0). These are
+         axioms about real Rust semantics that Verus does not prove; they add no
+         verified function, emit no instructions and carry no `external_body`,
+         so the obligation count, the `identity` pin and the TCB tally are all
+         blind to them, and `vparse.parse` could not even see them. The gate
+         SHOUTS every one in every verdict; it does not forbid them
        - Verus itself confirms the call site verifies (`--verify-function`),
          rather than a regex confirming it looks like it might
        - the Python `requires`/`ensures` are GENERATED from `verus.rs`'s clause
@@ -140,7 +148,8 @@ What it enforces, in order:
   7  the C rung matches `model.py`'s per-input `sanitizer_expect`: "clean" means
      no ASan/UBSan diagnostic and the predicted exit, "fires" means a diagnostic
      is REQUIRED (p02's adversarial input is defined as the one that trips ASan)
-  8  the Miri policy: mandatory wherever the pattern has a trusted item at all,
+  8  the Miri policy: mandatory wherever the pattern has a trusted item or a
+     hand-written axiom at all,
      and never waivable when R4 and R5 are not the same machine code (`norel` or
      better); run for real on a nightly toolchain. A row Miri cannot be run on is
      a documented blocked row, not a pattern failure
@@ -1645,7 +1654,10 @@ def idiom_audit(contract, rungs, extra=()):
     exactly one place in the whole tree, its `#[cfg(slb_twin)]` verified twin
     (`verus.rs:558`), and a twin is in no build -- so the entry read as PRESENT
     on the strength of code no cell compiles, which is precisely the false
-    *satisfaction* RECAP "Owed" 10 predicted. p12's `.wrapping_add(nstr as u64)`
+    *satisfaction* RECAP "Owed" 10 predicted. ⚠ **That finding now lives in
+    `patterns/p27-handle-table/NOTES.md` 13e, where a reader of p27 will meet
+    it** (TASK_082, RECAP "Owed" 18); it sat in this docstring alone for
+    thirteen tasks. p12's `.wrapping_add(nstr as u64)`
     was matched only inside `spec fn fin` (`verus.rs:178`) and is now correctly
     scoped-absent on `verus.rs`. Tree-wide, `required_absent` moved 96 -> 94 and
     `pins_nothing` 15 -> 16; no `forbidden_hits` moved, from 0.
@@ -3496,6 +3508,80 @@ def _check_trusted_unsafe(rep, src, tcb, justifications):
                       f"with NO precondition. spec.md justifies it: {why}")
 
 
+def _check_axiom_decls(rep, src, txt, vcfg):
+    """Body-less TRUSTED declarations: count them, print them, and require the
+    count to be DECLARED. Returns the list, for the gate record.
+
+    **RECAP "Owed" 0 / TASK_081_REVIEW blocker 1.** `assume_specification`,
+    `axiom fn` and `uninterp spec fn` were invisible to every mechanism here:
+    `vparse.parse` drops body-less items and `assume_specification` has no `fn`
+    token at all, so the published TCB column (`tcb_items` above), the pinned
+    obligation count, the `identity` pin, `check_miri`'s *"NO trusted item, so
+    Miri is not required"* and stages 5c / 5c-req / 5c-twin all missed them.
+    Demonstrated on p01's real `verus.rs` plus **two deliberately false axioms
+    on safe std functions**: `7 verified, 0 errors` (the pinned count, unmoved),
+    the same seven item names, `_is_trusted` unchanged, and a byte-identical
+    kernel (`md5 e3e4441313c93057730ab568fb000846`).
+
+    **Why this is a declared count and not a prohibition.** The threat model in
+    `.memory/02-bench-rules.md` is accident, and the accident here is the tool's
+    own help text: Verus prints an `assume_specification` declaration and
+    invites you to paste it, and the printed form carries **no `requires` and no
+    `ensures`**, so it verifies a 1 MiB out-of-bounds read and a null
+    dereference at `4 verified, 0 errors` (`.memory/04-verus.md`, final
+    section). An author who writes an axiom and *says so* is doing nothing
+    wrong; an author who writes one and does not notice has silently added the
+    strongest kind of trusted item there is. So the rule is: declare
+    `verus.axioms[<src>]` -- an integer, or the list of names -- and the gate
+    prints every one of them in every verdict.
+
+    ⚠ **These are deliberately NOT fed to `_is_trusted`.** 5c-twin would then
+    demand a verified twin of an item that has no body to twin, which turns a
+    legitimate declaration into an unpassable gate -- exactly the shape
+    `MAX_TWIN_JUSTIFICATIONS` was deleted for. Visibility, not prohibition."""
+    axioms = vparse.axiom_decls(txt)
+    want = (vcfg.get("axioms") or {}).get(src, 0)
+    want_n = len(want) if isinstance(want, (list, tuple)) else int(want)
+    print(f"    {src}: body-less trusted declarations "
+          f"(`assume_specification` / `axiom fn` / `uninterp spec fn`): "
+          f"{len(axioms)} (spec.md declares {want_n})")
+    for d in axioms:
+        print(f"       {d['kind']:22s} {d['name']:36s} (line {d['line']}, "
+              f"in_verus={d['in_verus']})")
+    got_names = sorted(d["name"] for d in axioms)
+    if isinstance(want, (list, tuple)) and got_names != sorted(want):
+        rep.fail("proof-axiom",
+                 f"{src}: spec.md declares verus.axioms {sorted(want)} but the "
+                 f"source declares {got_names}")
+    elif len(axioms) != want_n:
+        rep.fail("proof-axiom",
+                 f"{src}: {len(axioms)} body-less trusted declaration(s) "
+                 f"{[(d['kind'], d['name'], d['line']) for d in axioms]}, but "
+                 f"spec.md's verus.axioms declares {want_n}. An "
+                 f"`assume_specification` / `axiom fn` / `uninterp spec fn` is "
+                 f"an AXIOM about real Rust semantics: Verus does not prove it, "
+                 f"it adds NO verified function so the obligation count does not "
+                 f"move, it emits no instructions so the `identity` pin does not "
+                 f"move, and it carries no `#[verifier::external_body]` so the "
+                 f"TCB tally above does not move either. The declaration Verus "
+                 f"prints for you to paste has no `requires` and no `ensures`, "
+                 f"and pasting it verifies a 1 MiB out-of-bounds read and a null "
+                 f"dereference at `4 verified, 0 errors` "
+                 f"(`.memory/04-verus.md`). Declare it -- "
+                 f"`verus.axioms[{src!r}] = {len(axioms)}` or the list of names "
+                 f"-- and count it in this pattern's NOTES.md TCB tally, with "
+                 f"the `requires` that makes it bite and a deliberately bad call "
+                 f"site proving that it does.")
+    if axioms:
+        rep.shout("tcb-axiom",
+                  f"{src}: {len(axioms)} hand-written axiom(s) "
+                  f"{[d['name'] for d in axioms]} that NOTHING checks -- not "
+                  f"Verus, not the obligation count, and no gate stage. They "
+                  f"are part of this pattern's trusted base and must be in its "
+                  f"TCB tally.")
+    return axioms
+
+
 def check_verus_contract(pdir, rep, contract):
     """B1 + B2: obligation count, item set, and every `requires`/`ensures`
     diffed against the pin in spec.md.
@@ -3660,10 +3746,17 @@ def check_verus_contract(pdir, rep, contract):
         print(f"    {src}: items the trusted-item rules govern (`_is_trusted`: "
               f"external_body + an `ensures`, or `unsafe` in the body): "
               f"{sorted(i.name for i in item_list if _is_trusted(i))}")
+        # `rep.note` until TASK_082, i.e. informational and gone by the time the
+        # verdict is read. RECAP "Owed" 0: these three keywords are the whole
+        # textual trace the gate had of an axiom, and an axiom is the one shape
+        # that can verify a false program at an unmoved obligation count.
         for kw in ("assume(", "assume_specification", "admit("):
             n = len(re.findall(re.escape(kw), vparse.blank_noncode(txt)))
             if n:
-                rep.note(f"{src}: {kw} appears {n}x -- must be justified in NOTES.md")
+                rep.shout("tcb-axiom",
+                          f"{src}: {kw} appears {n}x -- must be justified in "
+                          f"NOTES.md and counted in this pattern's TCB tally")
+        axioms = _check_axiom_decls(rep, src, txt, vcfg)
 
         # --- obligation count --------------------------------------------
         r = subprocess.run([sys.executable, os.path.join(REPO, "verus_run.py"), path],
@@ -3678,7 +3771,8 @@ def check_verus_contract(pdir, rep, contract):
         out[src] = {"verified": n_ver, "errors": n_err, "pinned": want_n,
                     "tcb_items": [dict(name=i.name, attr=i.external,
                                        body_lines=i.body_lines, line=i.line)
-                                  for i in tcb]}
+                                  for i in tcb],
+                    "axiom_decls": axioms}
         if n_err:
             rep.fail("proof-verify", f"{src}: {n_ver} verified, {n_err} errors")
         elif n_ver != want_n:
@@ -6215,6 +6309,29 @@ def _trusted_items(pdir, contract):
     return out
 
 
+def _axiom_items(pdir, contract):
+    """{pinned Verus source: [axiom names]} -- the body-less trusted
+    declarations `_is_trusted` structurally cannot see (`_check_axiom_decls`).
+
+    The Miri policy's *"this pattern has NO trusted item, so there is no trusted
+    `ensures` whose incompleteness Miri would have to backstop"* was one of the
+    five mechanisms RECAP "Owed" 0 measured blind. An `assume_specification` on
+    a **safe** std function leaves no `unsafe` token for `_scan_unsafe_sites` to
+    find and no `external_body` for `_is_trusted` to key on, so that sentence
+    could be printed over a proof resting on a hand-written axiom. Miri is a
+    real backstop for exactly that: the axiom is ghost, but the call it licenses
+    is executed."""
+    out = {}
+    for src in sorted((contract.get("verus") or {}).get("obligations") or {}):
+        path = os.path.join(pdir, src)
+        if not os.path.exists(path):
+            continue
+        got = [d["name"] for d in vparse.axiom_decls(open(path).read())]
+        if got:
+            out[src] = got
+    return out
+
+
 def _hung_rungs(advtable, input_name):
     """`(hung, measured)` for `input_name` as stage 4 measured it, or **None**
     when stage 4 has nothing to say about this input.
@@ -6316,8 +6433,10 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names,
     inherits = idx >= asm.IDENTITY_LEVELS.index("norel")
     trusted = _trusted_items(pdir, contract)
     n_trusted = sum(len(v) for v in trusted.values())
+    axioms = _axiom_items(pdir, contract)
+    n_axioms = sum(len(v) for v in axioms.values())
     out = {"pair": pair, "identity_o3": level, "inherits_proof": inherits,
-           "trusted_items": trusted}
+           "trusted_items": trusted, "axiom_decls": axioms}
 
     # DERIVED, and it overrides the declared flag in one direction only: the
     # flag can add Miri, never remove it.
@@ -6327,6 +6446,12 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names,
             f"this pattern has {n_trusted} trusted item(s) {trusted} whose "
             f"`ensures` need not be COMPLETE with respect to the unchecked "
             f"operations their bodies perform (TASK_009_REVIEW x4)")
+    if n_axioms:
+        why_required.append(
+            f"this pattern declares {n_axioms} hand-written axiom(s) {axioms} "
+            f"about real Rust semantics that Verus does not check and no gate "
+            f"stage probes (RECAP \"Owed\" 0); the axiom is ghost but the call "
+            f"it licenses is executed, so Miri is the only backstop")
     if not inherits:
         why_required.append(
             f"R4 and R5 differ at O3 (identity {level!r}), so R4 does not "
@@ -6337,16 +6462,18 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names,
 
     if not why_required:
         rep.ok(f"R4/R5 ({pair}) are the same machine code at O3 (identity "
-               f"{level!r} >= 'norel') and this pattern has NO trusted item, so "
+               f"{level!r} >= 'norel') and this pattern has NO trusted item and "
+               f"NO hand-written axiom, so "
                f"there is no trusted `ensures` whose incompleteness Miri would "
                f"have to backstop -- Miri not required. spec.md: "
                f"{cfg.get('reason', '(no reason given)')}")
         out.update(required=False, ran=False)
         return out
-    if n_trusted and cfg.get("required") is False:
+    if (n_trusted or n_axioms) and cfg.get("required") is False:
         rep.fail("miri",
                  f"spec.md sets miri.required=false, but this pattern has "
-                 f"{n_trusted} trusted item(s) {trusted}, which makes Miri "
+                 f"{n_trusted} trusted item(s) {trusted} and {n_axioms} "
+                 f"hand-written axiom(s) {axioms}, which makes Miri "
                  f"mandatory whatever the R4/R5 identity level is "
                  f"(`.memory/02-bench-rules.md`, revised at TASK_010): a trusted "
                  f"`ensures` need not cover every unchecked operation its body "

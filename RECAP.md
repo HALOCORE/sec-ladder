@@ -9,7 +9,7 @@ this box is reference; this box is what to *do*.
 | | |
 |---|---|
 | **Patterns** | **22 exist, all 22 reviewed, 0 failures tree-wide, 0 STALE.** ⚠ **21 `PASS` + 1 `PASS-WITH-BLOCKED-ROWS`** — **p01 only**, and its block is a real 180 s Miri timeout on `large.bin`. ⚠⚠ **THE ADVICE THAT SAT HERE IS NOW INVERTED, AND IT WAS WRONG WHEN WRITTEN.** It read *"a declared-hang input blocks a Miri row by design — expect that verdict on any pattern declaring a hang; it is not a defect."* **It WAS a defect** (TASK_077 item 2): `check_miri` blocked the row with the reason *"R4 does not return under Miri either"*, which is **structurally false for every pattern here**, because the bug lives in R1 and `miri.sources` always names a rung carrying the fix. Measured, `miri` on p22's shipped `unsafe.rs` returns `rc=0`, no UB, in 0.2 s. **`check_miri` now reads stage 4's MEASURED per-rung `hung` column, so a declared hang no longer blocks anything by itself.** **Expect `PASS`; a blocked Miri row is now worth investigating, not shrugging at.** Count both ends rather than trusting either: `ls -d patterns/p*/ | wc -l` and `grep -c '^| p[0-9]' .memory/06-catalogue.md`. |
-| **Do this next** | **`TASK_082` — land "Owed" 0, the gate's `assume_specification` blindness.** It is the top of the Owed list, it is **manager-verified**, and it is a **measured defect in a PUBLISHED column** — which is the TASK_068 override's own standard, so it clears rule 5 on evidence rather than on argument. ⚠ **Batch it**: a `check.py`/`vparse.py` edit stales every gate record, so pull in the queued doc fixes that ride along free (`.memory/02-bench-rules.md`'s citation-rot list, RECAP "Owed" 12's six measurement-hashed citations are **NOT** free — leave those). ⚠ **Then RECAP "Owed" 4** — p17's `sweep-*` bands, whose spec is written and ready to hand over. ⚠ **Do NOT start a new pattern until Owed 0 is closed**: three rows in a row were refused, the LADDER TEST that came out of that was **retracted and restated one task later**, and the restatement has not been used to pick anything yet. |
+| **Do this next** | **`TASK_083` — REVIEW `TASK_082`, then BACK TO PATTERNS.** ✅ The gate batch is done (**"Owed" 0, 4 and 18 CLOSE**; a fourth deferred item was **retired as already-done-for-fifty-tasks**). Rule 1's alternation is due, and there is a specific thing to attack: **p17's `6.50 Ir`/request lag-4 law is PROVISIONAL** in its own `NOTES.md` §10b and rule 9 keeps it out of `.memory/` until reviewed — it reproduces a published table byte-for-byte but recharacterises *"`≈7·nsuf + 9`"* as a **straight line through a staircase**. ⚠ **Then pick a pattern using the THREE PROBES**, which have never been used to choose anything. **The refusal streak is over as a matter of process, not of luck: it ended when the selection rule was fixed.** |
 | **Pattern selection** | ⚠⚠ **THREE ROWS REFUSED IN A ROW — p48, p31, p45 — and the "LADDER TEST" that came out of it was RETRACTED AND RESTATED ONE TASK LATER.** ⚠ **Do not use the first version** (*"a bug R4 can reintroduce and R3 cannot, and a cost that differs"*): it misclassifies **p08** (satisfies it, shipped) and **p47** (violates it, shipped) **in opposite directions**, and the manager's own defence of it was aimed at the wrong half — p47 passes the cost half at **+90.0/+142.0 `Ir`/call**. **Use the THREE PROBES** in `.memory/06-catalogue.md`: *(1)* a rung boundary must exist **somewhere** and the row must name it — p08's is at compile time, p47's is inside the safe class, p16's is a slope; *(2)* the rungs must differ **as machine code**, checked by extracting each kernel's bytes and `md5`-ing them, **not** by the retracted "two symbols on one section" form, which cannot fire when every rung is its own binary; *(3)* any published `0.00` must name its **axis and `Ir` convention in advance**. ⚠ **The novelty question all three triages DID ask is the less useful one** — p36 shipped the tree's twelfth `index >= len` and was worth building. |
 | **After that** | ⚠⚠ **THE AXIS PROGRAMME IS CLOSED — do not open `.memory/06-catalogue.md`'s axis table looking for what to build next.** All **seven** rows are resolved: **5 BUILT** (p27 lifetime, p47 timing, p38 weaponised UB, p36 CFI, p22 termination) **+ 2 REFUSED WITH MEASUREMENTS** (`p48` at TASK_074, `p31` at TASK_079). That table was the argument for axis-first over family-first ordering and **the argument is now spent**; the catalogue's own two objections to it — *breadth over realistic C patterns*, and *"the findings are about cost MECHANISMS, which have been much less repetitive"* — were never answered and now have nothing standing against them. ⚠ **Neither refused row may be rescheduled without reading its refusal block.** ⚠ **And derive the counts** — `ls -d patterns/p*/ \| wc -l` against `grep -c '^\| p[0-9]' .memory/06-catalogue.md`; *"the six original axes are complete"* was written into this box while five were built, the third time a count was asserted in prose instead of derived. |
 | **Rules for writing that task** | ⚠⚠ **STATE NOVELTY CLAIMS AS QUESTIONS TO BE MEASURED, never as fact.** *"The first termination proof in the project"* was the manager's sentence in `TASK_070.md`; it was **false**, the engineer had no reason to doubt it, and it shipped into **eight places, two inside `contract_sha256`** — a review and a re-gate to remove. **Rule 9 protects `.memory/` from unreviewed findings and protects NOTHING from the task file itself.** p22's §0 counted 73 measures in one command once it was finally asked. ⚠ **Settle the bug class as the FIRST deliverable** — overturned on four patterns, upheld on two. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat). **Additivity extrapolation — the only out-of-sample test here that can fail — HAS now failed once, on p38, and it was 100% attributable to three missing columns, none of them the one named.** The rule that came out of it: ⚠ **check the RESIDUE CLASS of any parameter your bands hold constant** — two of p38's three bands sat at `nw ≡ 0 (mod 8)` and the third did not, which fits in sample and misses out of it with no in-sample residual to warn you. ⚠ **Name the INLINE MODE at every figure** — p10 fitted both and the regressors *swapped*. All three in `.memory/03-measurement.md`. |
@@ -1719,7 +1719,38 @@ Both retired.
 
 ### Owed, in priority order
 
-0. ⚠⚠ **NEW AND IT IS THE TOP OF THE LIST: THE GATE COUNTS NO
+0. ✅ **CLOSED at TASK_082 — and the repair the item PRESCRIBED would have broken
+   a green pattern.** `vparse.axiom_decls()` is a **separate keyword-keyed
+   matcher**; `parse()` is untouched. New gate stage: counts body-less trusted
+   declarations, compares against an optional `spec.md` `verus.axioms` key
+   (**default 0**), `rep.fail("proof-axiom")` on mismatch and
+   `rep.shout("tcb-axiom")` whenever any exist; the `assume(`/`admit(` scan went
+   `rep.note` → `rep.shout`; `axiom_decls` now ships in every gate record.
+
+   ⚠⚠ **DO NOT "SIMPLIFY" IT BY WIDENING `parse()` — that is what this item
+   originally implied and it turns p36 RED in six stages.** A **trait method
+   declaration is body-less**, and p36 declares `fn apply` / `spec fn spec_apply`
+   in the trait and defines them in the impl, so keeping body-less items makes
+   `by_name` raise `duplicate item name(s)`. ⚠ **And `assume_specification` has
+   no `fn` token at all, so widening would have paid p36's price and still missed
+   the target.** Full write-up: `.memory/05-layout.md`.
+
+   ✅ **Acceptance, all three limbs, manager-verified:** 22 verdicts identical
+   (21 `PASS` + p01 `PASS-WITH-BLOCKED-ROWS`), **0 failures**; **TCB total 92 →
+   92** with `axiom_decls` present and empty in all 22; and the injected-false-
+   axiom demonstration now **FAILS** where every other pin still says green —
+   `parse()` sees 7 items either way, `_is_trusted` is unchanged, the obligation
+   count matches, and only the new stage catches it.
+   ⚠ **The design is VISIBILITY, not prohibition** — declare `verus.axioms` and
+   it passes, with a shout in every verdict. **No pattern declares one today, so
+   no `contract_sha256` moved.**
+   ⚠ **Deliberately NOT fed into `_is_trusted`**: stage 5c-twin would demand a
+   twin of an item with no body, turning a legal declaration into an unpassable
+   gate.
+
+   *Original text kept below.*
+
+   ⚠⚠ **THE GATE COUNTS NO
    `assume_specification`, AND TCB SIZE IS A PUBLISHED COLUMN.**
    (TASK_081_REVIEW blocker 1, **manager-verified**.) `harness/vparse.py`'s item
    matcher keys on `fn NAME` **with a body**, and drops every body-less item — so
@@ -1782,6 +1813,33 @@ Both retired.
 4. **p17 ships no sweep inputs**, which is how its "+32 Ir/call flat" was
    published from two bands that both had `nsuf = 3`. A `sweep-*` band appended
    last costs **one gate re-run, not a re-measure** (`.memory/05-layout.md`).
+
+   ✅ **CLOSED at TASK_082, and the law's CHARACTER moved while its VALUE did
+   not.** `patterns/p17-http-range/inputs/gen.py --sweep` emits
+   `sweep-nsuf-01..08.bin`; the 8 pre-existing matrix blobs are byte-identical
+   and `matrix_inputs` still returns **8, not 16**, so no re-measure was
+   triggered (`0 STALE`, manager-verified).
+
+   ⚠ **`≈7·nsuf + 9` is a straight line drawn through a STAIRCASE.** Measured
+   `R3ship − R4` over `nsuf = 1..8`: **18, 23, 30, 37, 44, 49, 56, 63** — steps
+   of `+5, +7, +7, +7, +5, +7, +7`. Least squares gives `6.4762·nsuf + 10.8571`
+   with max residual **0.81**; **lag-4 differencing gives 26, 26, 26, 26 with
+   ZERO residual = 6.50 `Ir` per request** — a **mod-4 sawtooth** from the 4×-
+   unrolled table walk, the same device p17 §3b already uses on the byte axis.
+   ⚠ **This reproduces TASK_015_REVIEW's published table byte-for-byte**, now
+   from committed inputs and a hashed generator rather than uncommitted ones.
+   ✅ **No published p17 number is wrong**: `+32` is the shipped pair at
+   `nsuf = 3`, this band gives 30 there, and §10 already discloses that.
+   **PROVISIONAL — in `patterns/p17-http-range/NOTES.md` §10b per rule 9,
+   awaiting review.**
+   ⚠ **The band does NOT hold folded bytes fixed**, which is sound for a rung
+   *difference* (§3b measured the per-byte rate at exactly 0, so it cancels) and
+   **unsound for an absolute per-call law of any single rung.**
+   ⚠ **`R3ship − R3′ = 17·nsuf` was NOT re-measured** — `R3′` is out of contract
+   and p17 ships no cell for it, so that row is still TASK_015_REVIEW's, on
+   uncommitted inputs.
+
+   *Original text kept below.*
 
    ✅ **The SPEC now exists, written by TASK_080's engineer at zero cost after it
    declined the work** (`TASK_080` authorised this item by name in one section and
@@ -2061,7 +2119,13 @@ Both retired.
     proves the declared budget is not absurdly short, **not** that every recorded
     `hung=True` is right. Checking all of them costs `10 × budget × n_hung`.
     **p22 hangs 12–20 cells, so decide there**; it is a one-line change.
-18. **p27's `required[2]` finding lives in `check.py`'s docstring, not in
+18. ✅ **CLOSED at TASK_082** — landed as `patterns/p27-handle-table/NOTES.md`
+    §13e with a pointer from `check.py`, bundled into the tree-wide gate sweep
+    exactly as this item prescribed.
+
+    *Original text kept below.*
+
+    **p27's `required[2]` finding lives in `check.py`'s docstring, not in
     `patterns/p27-handle-table/NOTES.md`.** Its `` `deallocate` `` entry pinned
     only twin-gated code. The engineer judged a pattern-doc edit outside
     TASK_069's authorised set and **flagged it rather than doing it** — correct.
@@ -2206,9 +2270,23 @@ Both retired.
   Deferred twice, and the second time the engineer's own session was the argument:
   every defect that actually occurred was a class-membership or arithmetic error
   no `body_len / K` assertion would catch.
-- **`check.py::check_marginal_ir`'s display string** (stage 3c's `head()`; cited as `:1753` until TASK_058 and `:1766` until TASK_071, both drifted) still says "recorded as a result";
-  the comments beside it were corrected. Free to fix on any task that already
-  re-runs all gates.
+- ⚠ **RETIRED at TASK_082 — THIS ITEM WAS ALREADY DONE AND SAT HERE FOR FIFTY
+  TASKS.** It said stage 3c's `head()` still reads *"recorded as a result"*.
+  **It has read `"3c. structural identity R4-vs-R5 (recorded as a result AND
+  enforced)"` since `1b41c85` (TASK_032).** ⚠ **The mechanism is worth more than
+  the item was: a naive `grep` for the substring `recorded as a result` STILL
+  HITS the corrected line**, because the correction *appended* rather than
+  replaced — so every re-audit confirmed the item was live. **A substring search
+  cannot tell a claim from its own correction**, which is the third instance of
+  TASK_065's lesson (*a wrong command is worse than a wrong constant, because it
+  looks self-verifying*). **Grep for what the FIXED text would say, not for what
+  the broken text said.**
+  ⚠ **Adjacent and NOT fixed, found while retiring this:**
+  `patterns/p01-array-sum/spec.md` still carries
+  `| identity | recorded as a **result**, not a gate condition` — the exact
+  sentence `check.py` says was false. **Only p01 has it.** It is a hashed pattern
+  doc, so it costs a p01 gate re-run; **bundle it with the next thing that
+  re-gates p01.**
 
 ### Closed arcs — history, not work
 

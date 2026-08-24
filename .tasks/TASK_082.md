@@ -185,3 +185,109 @@ parser see body-less items cannot collide today **because no pattern has one** �
 but that is an argument from the same `grep` that justifies the whole task, and
 if it is wrong the failure mode is a green pattern turning red. **Run all 22
 before you believe me.**
+
+---
+
+## Outcome (recorded by the manager at the task boundary)
+
+✅ **All three deliverables landed, the acceptance test passes on all three
+limbs, and the tree is unchanged where it had to be: 22 verdicts identical,
+0 failures, TCB 92 → 92, `--check-stale` 0 STALE.** ⚠ **"Owed" 0, 4 and 18
+CLOSE**, and a fourth item was **retired as already-done**.
+
+⚠⚠ **THE MANAGER'S SECOND-LEAST-SURE CALL WAS WRONG, AND THE REPAIR THIS TASK
+PRESCRIBED WOULD HAVE BROKEN A GREEN PATTERN.** The task file said the `by_name`
+collision *"cannot happen today because no pattern has one of these items"*.
+**The collision is real today and has nothing to do with `assume_specification`:
+a TRAIT METHOD DECLARATION is body-less**, and `p36-vtable-dispatch/verus.rs`
+declares `fn apply` (`:141`) and `spec fn spec_apply` (`:146`) in the trait and
+defines them in the impl (`:166`, `:186`). Deleting `parse()`'s
+`if body_open is None: continue` — **the obvious repair, and the one the task
+file's own hazard note pointed at** — raises
+`duplicate item name(s): apply at lines [166, 141]` and turns **p36 red in six
+stages**; its other three rung sources declare `apply` the same way.
+⚠ **And it would have counted the wrong thing**: a trait method declaration is
+not trusted, it is proved by its impl. ⚠ **And `assume_specification` has no `fn`
+token at all**, so widening `parse()` would have paid p36's price *and still not
+found the target.* ✅ **Manager-verified** (`:141`/`:146` against `:166`/`:186`).
+
+**The engineer's design instead: a separate keyword-keyed matcher**
+(`vparse.axiom_decls()`), `parse()` untouched, and `vparse.py selftest` now pins
+**both** directions — body-less trait decls stay out of `parse()` *and* are not
+counted as axioms. **That is a better design than the one the task specified.**
+
+**What the new stage does, and the shape is deliberate:** counts body-less
+trusted declarations, compares against an optional `spec.md` `verus.axioms` key
+(**default 0**), `rep.fail("proof-axiom")` on mismatch, `rep.shout("tcb-axiom")`
+whenever any exist; the `assume(`/`admit(` scan went `rep.note` → `rep.shout`.
+⚠ **VISIBILITY, NOT PROHIBITION** — declare the axiom and it passes, loudly.
+⚠ **Deliberately NOT fed into `_is_trusted`**, because stage 5c-twin would then
+demand a twin of an item with no body, making a legal declaration unpassable.
+✅ **Matcher validated against the pinned vstd, not just the demo: 400 raw-grep
+hits, 400 matched, 0 mismatched files.**
+
+✅ **Acceptance limb (c), manager-re-verified**: with two false axioms injected
+into `p01/verus.rs`, `parse()` still returns **the same 7 items with the same
+names**, `_is_trusted` is unchanged, the obligation count still matches — **every
+other pin says green** — and only the new stage fires (`FAIL [proof-axiom]` plus
+`!! [tcb-axiom]`). The real file returns `[]`.
+
+**Deliverable 2 — and a published law's CHARACTER moved while its VALUE did
+not.** `R3ship − R4` over `nsuf = 1..8` is **18, 23, 30, 37, 44, 49, 56, 63**:
+steps of `+5,+7,+7,+7,+5,+7,+7`. ⚠ **`≈7·nsuf + 9` is a straight line through a
+STAIRCASE** (max residual 0.81); **lag-4 differencing gives 26 four times with
+zero residual = 6.50 `Ir` per request**, a mod-4 sawtooth from the 4×-unrolled
+table walk. It **reproduces TASK_015_REVIEW's table byte-for-byte**, now from
+committed inputs and a hashed generator. ✅ **No published p17 number is wrong**
+— `+32` is the shipped pair at `nsuf = 3` and this band gives 30 there, which
+§10 already discloses. **PROVISIONAL, in p17's `NOTES.md` §10b per rule 9.**
+
+**Manager decisions:**
+
+1. ⚠ **The engineer's push-back on the justification is ACCEPTED and is sharper
+   than the manager's.** It agreed the batch was worth it but narrowed the
+   reason: **the strongest limb is that the accident produces a false green in
+   the same edit**, not that Verus prints the declaration. The demonstration
+   above is why — every other pin says green. **The manager's framing *"the gate
+   cannot see it"* is replaced by *"the gate cannot see it, and nothing else
+   catches it either."***
+2. **`synthesis/licence.json` was re-emitted BY THE MANAGER**, since `synthesis/`
+   was outside the engineer's writable surface and the engineer correctly
+   reported rather than reached. ✅ **Verified pure re-certification: 88 pair
+   verdicts, 0 licence properties changed, only the pinned hash block moved.**
+   ✅ **And `results/synthesis.md` regenerates BYTE-IDENTICAL** — so adding
+   `axiom_decls` to 22 gate records moved **no published number**, which is the
+   claim the acceptance test was really making.
+3. ⚠ **A deferred item was RETIRED AS ALREADY DONE — after fifty tasks.** RECAP
+   said stage 3c's `head()` still reads *"recorded as a result"*; it has read
+   *"…AND enforced"* since TASK_032. **The correction APPENDED rather than
+   replaced, so a naive substring grep still hits it** and every re-audit
+   confirmed a live item. ⚠ **A substring search cannot tell a claim from its own
+   correction** — third instance of *"a wrong command is worse than a wrong
+   constant"*. **Adjacent and queued, not fixed:** `p01/spec.md` still carries the
+   retracted `identity | recorded as a result, not a gate condition`.
+4. **The sweep cost figure in this task file was wrong: ~45 minutes, not ~30**
+   (11:40:41 → 12:26:09; p22 301 s and p01 337 s are the outliers, the rest
+   76–203 s). ⚠ **And `check.py`'s stdout is block-buffered when redirected — a
+   stalled log is not a stalled process**, and `grep '^check.py:'` is a useless
+   completion marker because that is its *first* line.
+
+⚠ **PROTOCOL rule 2's running count is 227:** 223 at TASK_082's writing, **+4** —
+the `by_name` collision being live today via p36's trait declarations (the named
+least-sure call), the prescribed `parse()` widening being wrong in two
+independent ways, the deferred display-string item having been done fifty tasks
+ago, and the sweep-cost figure. **Carry 227 forward.**
+
+**The single most useful thing in this block.** ⚠ **The task file named the
+hazard, pointed at the exact repair that triggers it, and asserted it could not
+fire — all in the same paragraph.** The hazard note said *"making the parser see
+more items changes `by_name`… a new item whose name collides turns a green
+pattern red"*, and the least-sure call then said the collision *"cannot happen
+today because no pattern has one of these items"*. **Both sentences were about
+`assume_specification`; the collision was about trait declarations, which the
+manager never considered and which are four lines from the thing being counted.**
+✅ **What saved it is that the acceptance test was written as "all 22 still PASS
+and every TCB count UNCHANGED" rather than "the new items appear"** — a
+behavioural test the engineer had to run, and which fails loudly on the wrong
+design. **Specify the acceptance test, not the implementation; the implementation
+was wrong here and the test caught it.**

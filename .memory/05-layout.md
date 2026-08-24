@@ -412,6 +412,44 @@ and **4 of 22 tables were content-stale** — three citing a superseded
 **Regenerating both costs no gate run and no re-measure.** Do it whenever a
 verdict, a contract hash or an audit count moves.
 
+## ⚠ `vparse.parse()` DROPS BODY-LESS ITEMS ON PURPOSE — widening it turns p36 red
+
+(TASK_082. **The manager predicted the opposite and was wrong; this is the
+measurement.**)
+
+`harness/vparse.py::parse()` keys on `fn NAME` **with a body** and skips anything
+body-less. When TASK_081 found that the gate therefore cannot see an
+`assume_specification`, the obvious repair was to delete that skip. ⚠⚠ **It
+breaks a green pattern, today, and not because of axioms at all.**
+
+**A trait method DECLARATION is body-less.** `patterns/p36-vtable-dispatch/verus.rs`
+declares `fn apply` and `spec fn spec_apply` in the trait and defines them in the
+impl:
+
+```
+:141  fn apply(&self, x: u64) -> (r: u64)        <- trait decl, body-less
+:146  spec fn spec_apply(&self, x: u64) -> u64;  <- trait decl, body-less
+:166  fn apply(...) { ... }                      <- the impl
+:186  open spec fn spec_apply(...) { ... }       <- the impl
+```
+
+Keep the declarations and `vparse.by_name` — which is **bare-keyed** — raises
+`ValueError: duplicate item name(s): apply at lines [166, 141], spec_apply at
+[186, 146]`, and **six consumers turn that into a gate failure** (RECAP "Owed"
+20 is the record of this map's fragility). **p36 goes red in six stages, and its
+other three rung sources declare `apply` the same way.**
+
+⚠ **And it would count the wrong thing anyway**: a trait method declaration is
+**not** a trusted item — it is proved by its impl.
+
+> **The rule: `parse()`'s skip is load-bearing. To make a NEW class of item
+> visible, add a separate keyword-keyed matcher — do not widen `parse()`.**
+> That is what `vparse.axiom_decls()` is, and `vparse.py selftest` now pins
+> **both** directions: body-less trait decls stay out of `parse()` *and* are not
+> counted as axioms. ⚠ Note `assume_specification` has **no `fn` token at all**,
+> so `parse()` never had a route to it — widening the skip would have paid p36's
+> price and still not found the thing it was aimed at.
+
 ## Editing rules
 
 - `pilot/` is frozen evidence for `PLAN.md`. Do not edit it; p01 is its successor.
