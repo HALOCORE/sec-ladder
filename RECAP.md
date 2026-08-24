@@ -10,7 +10,7 @@ this box is reference; this box is what to *do*.
 |---|---|
 | **Patterns** | **22 exist, all 22 reviewed, 0 failures tree-wide, 0 STALE.** **21 `PASS` + 1 `PASS-WITH-BLOCKED-ROWS`** — **p01 only**, a real 180 s Miri timeout on `large.bin`. ⚠ **Expect `PASS`. A blocked Miri row is worth INVESTIGATING, not shrugging at** — the old advice here (*"a declared hang blocks a Miri row by design; it is not a defect"*) was itself the defect, fixed at TASK_077; `check_miri` now reads stage 4's **measured** per-rung `hung` column. ⚠ **Count both ends rather than trusting either:** `ls -d patterns/p*/ \| wc -l` and `grep -c '^\| p[0-9]' .memory/06-catalogue.md`. |
 | **Do this next** | **`TASK_084` — finish "Owed" 0, THEN `TASK_085` builds `p15`.** ⚠⚠ **"Owed" 0 IS RE-OPENED: `TASK_082` closed ONE OF AT LEAST FOUR ROUTES**, and an earlier version of this box said it closed. Still owed: **`#[verifier::external_trait_specification]`** (54× in the pinned vstd, absent from all nine `harness/*.py`), **`#[verifier::external_fn_specification]`** (`\bverifier::external\b` misses it — next char is `_`), an axiom in a **`#[path]`-included SUBDIR** (`os.listdir` is flat; ⚠ **this vector is live in ALL 22 patterns** via `common/driver.rs`), and **wiring axioms into `tcb_items`/`synthesis`** — the published column reads `tcb_items` and the word *"axiom"* appears **zero times** in `synthesis/`. **Batch the two queued hashed-doc fixes with it** (p17 `NOTES.md` §10b's wrong mechanism, `p01/spec.md`'s retracted `identity` line). ⚠ **Gate work goes FIRST because `p15`'s named kill-risk is a stalled proof reaching for a hand-written axiom** — three of the four routes still cannot see one. |
-| **Then: `p15`, chosen by an AGENT with measurements** | **UTF-8 validation + decode.** ✅ `str::from_utf8_unchecked` **(INHERENT path) verifies 2/0** — `vstd/string.rs:136` ships the `assume_specification` with `requires valid_utf8`, and `vstd/utf8.rs:272` ships `valid_utf8` as a full recursive spec, so **R5 is not a stall**. ⚠ **The FREE path `core::str::from_utf8_unchecked` IS `is not supported`** — the diagnostic is right about the function you named and the wrong answer to the question; **grep the inherent spelling too.** Probes: kernels 206 B vs 146 B (no collision); cost **+4.1% ASCII / +100.1% on 2–3-byte scalars**, and **the axis is the input alphabet, which no pattern varies**. ⚠ **The C harm IS the tree's thirteenth `index >= len`** — the row carries on the R4 side, where the harm has **no bounds violation at all** and at `-O` the optimiser **deletes the program's own `println!`**. ⚠⚠ **NAMED KILL-RISK: R5's call site must discharge `valid_utf8` over file bytes, needing a VERIFIED validator. If it stalls, REFUSE the row — do not axiomatise it.** |
+| **Then: `p15`, chosen by an AGENT with measurements** | **UTF-8 validation + decode.** ✅ `str::from_utf8_unchecked` **(INHERENT path) verifies 2/0** — `vstd/string.rs:136` ships the `assume_specification` with `requires valid_utf8`, and `vstd/utf8.rs:272` ships `valid_utf8` as a full recursive spec, so **R5 is not a stall**. ⚠ **The FREE path `core::str::from_utf8_unchecked` IS `is not supported`** — the diagnostic is right about the function you named and the wrong answer to the question; **grep the inherent spelling too.** Probes: kernels 206 B vs 146 B (no collision); cost **+4.1% ASCII / +100.1% on 2–3-byte scalars**, and **the axis is the input alphabet, which no pattern varies**. ⚠ **The C harm IS the tree's thirteenth `index >= len`** — the row carries on the R4 side, where the harm has **no bounds violation at all** and at `-O` the optimiser **deletes the program's own `println!`**. ⚠⚠ **NAMED KILL-RISK: R5's call site must discharge `valid_utf8` over file bytes, needing a VERIFIED validator. If it stalls, REFUSE the row — do not axiomatise it.** ⚠⚠ **AND ITS CONTRACT SHAPE IS UNSETTLED — read "Owed" 25 BEFORE writing the task.** The review's prescribed contract cannot ship as written: `requires valid_utf8` is forbidden by *"the precondition must be structural"*, **and** "R4 assumes and is UB" has no verifying twin, because **21 of 22 patterns pin `unsafe vs verus` at `exact` and none allows R4 ≠ R5** — so R4 must validate too, **and the +4.1%/+100.1% probe that selected the row compares validating against not validating.** Three shapes, one of them REFUSE; the engineer settles it as deliverable §1. |
 | **Pattern selection** | ⚠⚠ **THREE ROWS REFUSED IN A ROW — p48, p31, p45 — and the "LADDER TEST" that came out of it was RETRACTED AND RESTATED ONE TASK LATER.** ⚠ **Do not use the first version** (*"a bug R4 can reintroduce and R3 cannot, and a cost that differs"*): it misclassifies **p08** (satisfies it, shipped) and **p47** (violates it, shipped) **in opposite directions**, and the manager's own defence of it was aimed at the wrong half — p47 passes the cost half at **+90.0/+142.0 `Ir`/call**. **Use the THREE PROBES** in `.memory/06-catalogue.md`: *(1)* a rung boundary must exist **somewhere** and the row must name it — p08's is at compile time, p47's is inside the safe class, p16's is a slope; *(2)* the rungs must differ **as machine code**, checked by extracting each kernel's bytes and `md5`-ing them, **not** by the retracted "two symbols on one section" form, which cannot fire when every rung is its own binary; *(3)* any published `0.00` must name its **axis and `Ir` convention in advance**. ⚠ **The novelty question all three triages DID ask is the less useful one** — p36 shipped the tree's twelfth `index >= len` and was worth building. ⚠⚠ **AND THE AXIS PROGRAMME IS CLOSED — do not open the catalogue's axis table looking for what to build next.** All **seven** rows are resolved: **5 BUILT** (p27, p47, p38, p36, p22) **+ 2 REFUSED WITH MEASUREMENTS** (`p48`, `p31`); **neither refused row may be rescheduled without reading its refusal block.** That table was the argument for axis-first ordering and **the argument is spent** — the catalogue's own two objections to it (*breadth over realistic C patterns*; *the findings are about cost MECHANISMS, which have been much less repetitive*) were never answered and now have nothing standing against them. |
 | **Rules for writing that task** | ⚠⚠ **STATE NOVELTY CLAIMS AS QUESTIONS TO BE MEASURED, never as fact.** *"The first termination proof in the project"* was the manager's sentence in `TASK_070.md`; it was **false**, the engineer had no reason to doubt it, and it shipped into **eight places, two inside `contract_sha256`** — a review and a re-gate to remove. **Rule 9 protects `.memory/` from unreviewed findings and protects NOTHING from the task file itself.** p22's §0 counted 73 measures in one command once it was finally asked. ⚠ **Settle the bug class as the FIRST deliverable** — overturned on four patterns, upheld on two. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat). **Additivity extrapolation — the only out-of-sample test here that can fail — HAS now failed once, on p38, and it was 100% attributable to three missing columns, none of them the one named.** The rule that came out of it: ⚠ **check the RESIDUE CLASS of any parameter your bands hold constant** — two of p38's three bands sat at `nw ≡ 0 (mod 8)` and the third did not, which fits in sample and misses out of it with no in-sample residual to warn you. ⚠ **Name the INLINE MODE at every figure** — p10 fitted both and the regressors *swapped*. All three in `.memory/03-measurement.md`. |
 | **The trap that keeps firing** | **A headline can be wrong in the FLATTERING direction and pass a green gate.** p10 published *"safe Rust cheaper than unsafe"*: 60% was an **unsearched R4 side**, the rest **index-expression bookkeeping C pays more of than either Rust rung**. **p27 repeated it one pattern later** — a dead store in R4 that R3 did not have. **p47 is the first pattern to search the R4 side properly** (six levers, each measured *and* run through Verus). ⚠ **p38 made it four** (`+21/+25` published against a true `+24/+32`) and **p22 made it FIVE, and widest yet — `+2.00` published against `+125/+1021`, 510×.** ✅ **The trend is the good news: p38 disclosed after review, p22 disclosed BEFORE being asked, and p36 searched the R4 side FIRST and CHANGED WHICH RUNG SHIPS** — the R2-shaped unsafe rung verifies and is 1022/8190 dearer, so shipping it would have published *"safe beats unsafe by 1007/8175"*. ⚠⚠ **AND THEN p36 FELL INTO THE MIRROR IMAGE, WHICH IS THE NEW LESSON: it searched R4 and left R3 with ONE lever, which moved R3 the wrong way.** Published `R3 − R4 = +15.00 flat`; the review's first in-contract R3 respelling made it **+7**, and **+2** against the cheapest R4. ⚠ **Searching one side is not searching. A difference is only as honest as its WEAKER-searched endpoint** — count the levers on each side and say whether they are comparable. **Before publishing any rung comparison, ask what BOTH rungs' spellings are worth.** |
@@ -2321,6 +2321,78 @@ Both retired.
     the gate's `harness/*.py` glob (item 5), so it stales every gate record —
     **batch it**, and note `measure.py` is *not* executed by the gate, which is
     why item 5 calls that glob over-broad.
+
+25. ⚠⚠ **`p15`'S CONTRACT SHAPE IS UNSETTLED, AND THE RECOMMENDATION IT WAS
+    SELECTED WITH COLLIDES WITH TWO SETTLED RULES.** Found by the manager while
+    writing `TASK_084`, **not measured, not yet attacked** — it is an argument
+    from two committed rules and it is exactly the kind of manager reasoning
+    this project keeps refuting, so **treat it as a question, not a finding.**
+
+    `TASK_083_REVIEW` selected p15 and named the right kill-risk (R5 needs a
+    *verified* validator). Its prescribed contract is: *"`kernel(bytes) -> u64`
+    with the validation **inside** the measured kernel (R3 validates and returns
+    0; R4 assumes and is UB), **not** a `requires valid_utf8` on the kernel."*
+    **Both halves of that sentence cannot hold at once**, for two independent
+    reasons I checked against the tree:
+
+    - **`requires valid_utf8(b@)` is forbidden outright.**
+      `.memory/02-bench-rules.md` *"The precondition must be structural. The
+      attack must be data"* is settled at TASK_003_REVIEW and names this exact
+      failure: *"a precondition narrow enough to make the proof easy is a
+      precondition no caller can discharge."* p15's adversarial inputs are
+      invalid UTF-8 **by construction**, so such a `requires` assumes the attack
+      away. Same class as the pilot's `requires n < 1000`. **This half of the
+      review's advice is right and is not in doubt.**
+    - **But "R4 assumes and is UB" cannot ship either, because of the
+      `identity` pin.** Measured across the tree: **21 of 22 patterns pin
+      `unsafe vs verus` at `exact`** and p36 pins `norel`; **none allows R4 ≠
+      R5.** So R4's exec code *is* R5's, R5 must verify with no attack-excluding
+      `requires`, and therefore **R4 must be provably memory-safe on invalid
+      UTF-8** — i.e. it may not hand unvalidated bytes to
+      `str::from_utf8_unchecked`. An R4 that "assumes and is UB" has **no
+      verifying twin and is therefore not a rung** (finding 14).
+
+    ⚠ **And that is not a technicality — it eats the measurement p15 was
+    selected on.** The probe-3 numbers (**+4.1% ASCII / +100.1% on 2–3-byte
+    scalars**) compare *validating* against *not validating*. If R4 must
+    validate, that gap is **not a gap between admissible rungs**, and probe 3
+    has to be re-run against whatever R4 actually becomes.
+
+    **Three shapes are on the table; the engineer settles it with measurements
+    as deliverable §1, before a single cell is built:**
+
+    - **(A) R4 validates with a hand-written verified validator, then calls
+      `from_utf8_unchecked`.** Keeps the alphabet axis, and the comparison
+      becomes *std's `from_utf8` (SIMD/word-at-a-time ASCII fast path) versus a
+      verified hand-written validator*. ⚠ **Predicted outcome is that R4 comes
+      out DEARER than R3** — which is **p11's result, a fourth time** (*the safe
+      class reaches a library the unsafe class cannot*), and is a real finding
+      rather than a consolation prize. The "assumes and is UB" cell still ships,
+      as a **control**, which is where its two adversarial rows belong anyway.
+    - **(B) R4's cheap check is STRUCTURAL ONLY** (continuation-byte shape, no
+      overlong / surrogate rejection), so R4 is total and never reads out of
+      bounds, and the proof obligation is what the *missing* checks cost. ⚠
+      **Unverified guess: `valid_utf8` is not derivable from the structural
+      check** (overlongs pass it), so R5 would have to add them back and the
+      identity pin breaks again. **Check this before believing it.**
+    - **(C) REFUSE the row**, and publish the refusal as *"the `identity` pin
+      makes the interesting unsafe rung inadmissible"* — finding 14's
+      R4-chained-to-the-prover result, with p11 and p16 as prior instances.
+      ⚠ **A refusal here is a legitimate outcome and the fourth in a row is
+      not, by itself, a reason to force a build.**
+
+    ⚠ **What survives all three, and is why the row is still worth a session:**
+    p15's **row-2 adversarial cell** — truncated lead byte, `rustc -O`, the
+    binary **prints nothing and exits 0** because `unreachable_unchecked` inside
+    `next_code_point` let LLVM delete the program's own `println!`, with **no
+    bounds violation anywhere**. Miri catches it, ASan has nothing to catch.
+    That is *"the optimiser deleted the programmer's code"* — the harm class
+    proposed for `p45` and **refuted as stated there** — real, measured, and in
+    the shipped-language rung. **It ships as a control under (A) and (B) and as
+    the evidence under (C).** ⚠ **Row 1 is the honest weakness and belongs in
+    `spec.md` up front, not discovered later:** an invalid *continuation* byte
+    is a silent wrong answer **Miri does not catch**, which is p18's harm, and
+    p18's harm is what killed p45.
 
 ### Deferred with a stated reason
 
