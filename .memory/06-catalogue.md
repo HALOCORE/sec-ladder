@@ -412,7 +412,7 @@ that is the deliverable for these rows**, not a green checkmark.
 |---|---|---|---|---|
 | p43 | checksum / CRC over untrusted length | loop bound from input | easy | planned |
 | p44 | fixed-point arithmetic | overflow, rounding | moderate | planned |
-| p45 | saturating / wrapping arithmetic helpers | signed overflow UB | easy–moderate | ⚠ **SCHEDULED at TASK_080 — and it is the FIRST catalogue row an AGENT argued for**, which RECAP has invited since TASK_066 with no taker. Proposed by TASK_079's engineer **with its kill-risk probe already run**, not offered as a guess. ✅ **Manager-verified before scheduling**: `guard_add(INT_MAX-1,5)` returns the defined `0` at `-O0` on both compilers and **`-2147483645` at `-O2` on both**; `-fwrapv` restores the defined answer in every flagged cell; gcc exploits `(a*2)/2 == a` at **`-O0` as well**; and the gate's own stage-7 shape (`gcc -O1 -fsanitize=address,undefined`) **fires on both sites with file:line and values**. ⚠ **The difficulty rating is about the PROOF, not the finding.** ⚠ **Named kill-risk, unmeasured: the cost may be 1–2 `Ir` (a `seto`/`jo`)** — p47's situation, and `§0` must decide it rather than assume it |
+| p45 | saturating / wrapping arithmetic helpers | signed overflow UB — **the UB class is absent from the tree; the HARM is p18's, second instance** | easy–moderate | ⚠ **REFUSED at TASK_080, and it was refused BY ITS OWN PROPOSER.** It is the **first catalogue row an AGENT argued for** (RECAP invited that from TASK_066 with no taker) and the manager took it **because it arrived with its kill-risk probe already run** — then §0 killed it on a ground neither party had named. ⚠⚠ **`p45` HAS NO UNSAFE RUNG WITH A JOB**, and that is the whole finding: under a *"detect overflow"* contract `unchecked_add` **cannot implement it** (the only admissible R4 would price a *bounds* check, i.e. p01's axis, so the bug class would be absent from the pattern's own unsafe rungs — **p31's finding 2 verbatim**); under a *"caller guarantees no overflow"* contract **R2 = R3 = R4 = R5 byte-identical, 0.00 `Ir` apart — the ladder is ONE RUNG.** Measured: `k_plain` and `k_wrapping` are **two symbols on ONE section**, and `k_unchecked`'s own 155-byte section **md5s identically** to `k_plain`'s. See the refusal block below |
 | p46 | bignum limb add/mul (schoolbook) | carry propagation, limb bounds | hard | planned |
 | p47 | constant-time compare / select | **timing side channel.** ⚠ **The catalogue's guess -- *"compiler may reintroduce a branch"* -- is REFUTED** (T064 + T064_REVIEW: 5 accumulate spellings, gcc 13.3 and clang 22.1 at five opt levels, rustc at five, **LTO, PGO trained 100% on mismatch-at-byte-0, AVX2, AVX-512, `__builtin_expect` in three placements, a branching caller** -- `Ir(k=0) - Ir(k=n-1) = 0` **exactly**, with a detector control that fires). **The adversary is the IDIOM, not the optimiser**; the leaking rung is safe Rust's own `a == b` | moderate | **done** (T064), gate `PASS` first complete run, R5 **12/0 first run, no lemma** (twin 13/0), `R4 == R5` `exact` at O3 / `norel` at O0, **TCB 3**, Miri 7/7, additivity extrapolation **80/80 exact**, **reviewed** (T064_REVIEW: 3 majors, 6 minors, **32 clean negatives**; corrections at T065). **The proof certifies a LEAKING kernel**: `m_leak` verifies 14/0 with `kernel`'s obligation count unchanged at 3 and leaks **+7088 `Ir`**, under an **identical contract** -- a property of the TRACE is invisible to a logic about the VALUE |
 
@@ -950,6 +950,121 @@ axis-first ordering beat family-first ordering, and that argument has now been
 spent. **Derive the count rather than trusting this paragraph:** the table rows
 are between the *"missing axis"* header and the *"Recommended order"* line, and
 `ls -d patterns/p*/` says which exist.
+
+## ⚠⚠ THE LADDER TEST — run it before writing a task file. Three rows in a row died on it.
+
+**Manager rule, adopted at TASK_080 after three consecutive refusals.** `p48`,
+`p31` and `p45` were each refused, and the refusals were each *correct and
+cheap*. But they share a cause that none of the three triages tested, and it is
+**not** *"is the bug class new?"*:
+
+> ⚠ **A PATTERN NEEDS A BUG THAT R4 CAN REINTRODUCE AND R3 CANNOT, AND A COST
+> THAT DIFFERS BETWEEN THEM. If either half fails, the ladder collapses and
+> there is nothing to measure — however novel the bug class is.**
+
+How each row failed it, and note that **all three failures are visible from a
+probe, none from an argument**:
+
+| row | which half failed | the measurement that showed it |
+|---|---|---|
+| `p48` | **R3 cannot express it** → so R4-vs-R3 is p08's *"compile-time, nothing to measure"* | safe Rust needs `set_len`, i.e. `unsafe`, to reach the residue at all |
+| `p31` | **the bug class is absent from the kernel** — an arena's carve is *correct* C | the arena shape is provenance-clean **24/24**; only two adjacent top-level objects are exploitable |
+| `p45` | **BOTH.** `unchecked_add` cannot implement *"detect overflow"*; and under the other contract every rung is byte-identical | `k_plain`/`k_wrapping` are **two symbols on ONE section**; `k_unchecked`'s section **md5s identically** to `k_plain`'s |
+
+⚠ **The novelty question is the one the triages DID ask, and it is the less
+useful one.** `p36` shipped with the tree's **twelfth** `index >= len` and was
+worth building; `p45`'s UB class is **genuinely absent** from the tree and was
+not. **Novelty of the bug class predicts neither way. The ladder test does.**
+
+⚠ **And it is cheap — cheaper than the triage prose it replaces.** Each of the
+three failures above is one compile plus one `md5sum`/`objdump`/run. **Write the
+probe before the row, not before the task**, which is the same lesson RECAP's
+time-waster 4 draws about novelty claims: *both* of the manager's axis proposals
+were argued from source reads with nothing run.
+
+⚠⚠ **THE HALF OF THE TEST NOBODY HAD, AND IT IS A GATE BLIND SPOT: a pattern
+whose rungs are ACCIDENTALLY BYTE-IDENTICAL is indistinguishable from a pattern
+where safety is genuinely free.** p45 could have shipped as a green 23rd pattern
+by taking the *"caller guarantees no overflow"* contract and never running
+`readelf` — every rung agrees on every checksum, the gate passes, and the
+published **`R3 − R4 = 0.00`** reads as *"safety is free"* when the truth is
+*"there is only one rung here"*.
+
+> **`R5 − R4 = 0.00` is already scoped as a TAUTOLOGY** in `results/synthesis.md`,
+> because the `identity` pin forces it. ⚠ **NOTHING scopes `R3 − R4 = 0.00` the
+> same way, and no gate stage looks.** The discriminator is two commands:
+>
+> ```bash
+> readelf -sW <bin> | awk '{print $7, $8}'    # two rung symbols on ONE section index?
+> md5sum <each rung's extracted kernel bytes> # identical bodies?
+> ```
+>
+> **Run them on any pattern that reports a rung difference of 0.00 before
+> publishing it as a safety result.** p16's `0.00000 Ir/byte` is the shipped
+> instance of a *genuine* zero — it has a **mechanism** (the reslice and the
+> `get_unchecked` both sit outside the fold loop) and the bodies are
+> mnemonic-identical **for a stated reason**. **A zero with a mechanism is a
+> finding; a zero because two rungs compiled to the same symbol is an artefact.**
+
+### p45 — REFUSED at TASK_080. Read this before rescheduling it.
+
+**The two contracts, and both collapse** (`.temp/p45pat/NOTES.md`, re-runnable
+via `repro.sh`):
+
+- *"the kernel detects overflow"* → **`unchecked_add` cannot implement it.** The
+  only admissible R4 prices a **bounds** check, which is p01's axis, so p45's own
+  bug class would be **absent from p45's own unsafe rungs** — the shape that
+  refused `p31`.
+- *"the caller guarantees no overflow"* → **R2 = R3 = R4 = R5, byte-identical.**
+  `readelf -sW`: `k_plain` and `k_wrapping` are two symbols on **one** section;
+  `k_checked`/`k_overflowing` likewise; `k_unchecked` has its own section whose
+  155 bytes **md5 identically** to `k_plain`'s. **0.00 `Ir` apart.**
+
+⚠ **AND THE C SIDE IS THE SAME STORY: the UB buys 0.00.** Signed `k_plain` (UB)
+against unsigned `k_wrapu` (defined), jump targets normalised, are **identical
+instruction-for-instruction** at gcc `-O3`, clang `-O2` and clang `-O3`; gcc
+`-O2` differs in **one operand order** at the same `Ir`.
+
+⚠ **The manager's own objection 1 was REFUTED AS STATED, and it owed a
+disassembly.** The manager proposed the class was *"the optimiser deleting the
+programmer's own check"*. Measured over **six guard spellings in the same fold**:
+**gcc never deletes any of them, at any level, with or without `-fwrapv`**;
+clang deletes **2 of 4** from `-O1`. The manager-verified
+`-2147483645`-at-`-O2`-on-both is a property of the **scalar helper**, not of the
+fold p45 would ship. **So the harm is a wrong value, ASan-silent — p18's harm,
+second instance** — and it becomes a bounds bug only by bolting an allocation on,
+at which point it *is* the thirteenth `index >= len`. **Both branches of the
+objection land.**
+
+**p36's three grounds for shipping a duplicate bug class: 0 of 3.** Prover story
+weaker than p36's and already owned by p18; catcher ordinary and free (**the
+absence of a problem is not a finding**); no `Ir`-structure or non-data-harm
+story.
+
+✅ **What SURVIVES, recorded so it is not lost:**
+
+- **The overflow-detection tax, and it does NOT amortise.** Kernel-exclusive
+  `Ir`/element at `-O3`: C `k_builtin` (`__builtin_add_overflow`, the correct
+  hardened idiom) **7.00 gcc / 5.00 clang** against `k_plain` **1.25 / 0.875**;
+  the self-referential guard costs **11.00 on both**. In Rust `k_checked` and
+  `k_overflowing` are **7.00** and `k_saturating` **7.50** against
+  `k_plain`/`k_wrapping`/`k_unchecked` at **0.875**. ⚠ **PROVISIONAL — one fold,
+  n = 2²⁰, no sweep and no fitted law.**
+- ⚠ **`checked_add` against `wrapping_add` is 8.0×, i.e. 87.5% of the kernel —
+  the largest single fraction this project has measured** — and it is
+  **safe-against-safe**, so it is not a safety number at all. **PROVISIONAL, one
+  fold, unswept.** It is the strongest reason someone will want to reschedule
+  p45; the reason not to is that **no rung boundary runs through it.**
+- **Does `nsw` ever pay? Yes — on the INDUCTION VARIABLE, never the
+  accumulator.** `nsw_2d` at gcc `-O3` is 75 instructions → **28 with `-fwrapv`**
+  (it de-vectorises); clang goes 62 → **112**. And the `size_t` spelling is
+  `-fwrapv`-immune and **13 instructions smaller** than the `int` one at clang
+  `-O3`. ⚠ **That is p05's kernel and p05's axis**, not a new pattern — but it is
+  the first measurement in the tree of what signed-index UB buys the vectoriser.
+- ⚠ **A probe hazard worth keeping:** `grep -E "$SYM"` over
+  `callgrind_annotate` output **matches the echoed command line** when a kernel
+  name is passed as `argv`. It produced a garbage first run. **Parse the table,
+  do not grep it.**
 
 ⚠ **This is a judgement call, not a measurement, and it is the manager's own** —
 PROTOCOL rule 3. Two honest objections to it, neither answered here: **(a)** the

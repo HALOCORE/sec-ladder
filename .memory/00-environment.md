@@ -167,20 +167,25 @@ the binding one.
    `size_t n = SIZE_MAX-15`, gcc reads the offset as **signed** (a legal `-16`)
    and stays silent, while clang reports *"addition of unsigned offset …
    overflowed"* — and clang has it in its **default** `-fsanitize=undefined` set.
-   **PROVISIONAL — not yet reviewed** (the acceptance is verified; the miss is
-   the engineer's measurement).
+   ✅ **ATTACKED AND UPHELD at TASK_080** in the exact stage-7 command line.
 2. ⚠ **ASan's redzones destroy object adjacency, so the gate cannot observe a
    provenance harm even in principle.** A one-past-end-of-`x`-equals-`y` shape
    prints `notadjacent` under `-fsanitize=address` on **both** compilers — the
    two globals are no longer neighbours. **A pattern whose harm depends on two
    objects being adjacent has no stage-7 row available to it.**
-   **PROVISIONAL — not yet reviewed.** (gcc also needs `-static-libasan` on this
-   box or a runtime-ordering error fires first — manager-hit while verifying.)
+   ✅ **ATTACKED AND UPHELD at TASK_080** (gcc delta `-64`, clang `+32` under
+   ASan). ⚠ **With a refinement that matters if you write the probe: without
+   ASan, gcc lays `y` SIXTEEN BYTES BEFORE `x` (`-16`) and clang `+16` — both
+   adjacent — so the test must be `|delta| == 16`, not `delta == +16`.** A
+   `y - x == +16` probe reports gcc *"notadjacent"* **with no sanitizer at all**,
+   i.e. it manufactures the result it is looking for. (gcc also needs
+   `-static-libasan` on this box or a runtime-ordering error fires first —
+   manager-hit while verifying.)
 3. ✅ **`-fsanitize=alignment` is in BOTH compilers' default `undefined` set and
    fires in the stage-7 shape**, naming the store and the load. Recorded because
    the manager had assumed an alignment catcher would land **outside** the matrix
    the way p18's four, p36's `cfi-icall` and p48's MSan did. It does not.
-   **PROVISIONAL — not yet reviewed.**
+   ✅ **ATTACKED AND UPHELD at TASK_080** in the exact stage-7 command line.
 
 ⚠ **The reusable half of all three: the gate's sanitizer reach is a per-CHECK
 question, not a per-tool one, and it is gcc's set that decides.** Three patterns

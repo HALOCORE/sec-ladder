@@ -261,3 +261,121 @@ three grounds. **Check p45 against all three before agreeing with me.**
 on it.** Four patterns have had an R4 candidate die on `is not supported` at this
 pin. **Run that probe first** — it is the cheapest thing in this file and it can
 end the task.
+
+---
+
+## Outcome (recorded by the manager at the task boundary)
+
+⚠⚠ **p45 was REFUSED — BY ITS OWN PROPOSER — and it is the THIRD refusal in a
+row.** No pattern directory was created; nothing under `patterns/`, `harness/`,
+`common/`, `pilot/`, `.memory/` or `results/` was touched. **22 patterns, all
+green, 44 records 0 STALE — unchanged, by design.** Deliverable is
+`.temp/p45pat/NOTES.md` (384 lines) + `repro.sh`.
+
+⚠ **It died on a ground NEITHER PARTY HAD NAMED**, which is the important part:
+not the kill-risk the proposer flagged (the cost axis is real and *large*), and
+not the bug-class objection the manager wrote. **`p45` has no unsafe rung with a
+job.** Under a *"detect overflow"* contract `unchecked_add` **cannot implement
+it**, so the only admissible R4 prices a *bounds* check — p31's finding 2
+verbatim. Under a *"caller guarantees no overflow"* contract **every rung is
+byte-identical**: `k_plain` and `k_wrapping` are two symbols on **one** section,
+and `k_unchecked`'s own 155-byte section **md5s identically** to `k_plain`'s.
+**The ladder is one rung.** ⚠ **And the C side matches — the UB buys 0.00**:
+signed and unsigned folds are identical instruction-for-instruction at gcc `-O3`
+and clang `-O2`/`-O3`.
+
+**Findings against manager-written text, all six landed:**
+
+1. ⚠ **The manager's objection 1 was REFUTED AS STATED, and it owed a
+   disassembly — which the task file said and the manager then did not do.** The
+   proposed class was *"the optimiser deleting the programmer's own check"*.
+   Measured over **six guard spellings in one fold**: **gcc never deletes any of
+   them, at any level, with or without `-fwrapv`**; clang deletes 2 of 4 from
+   `-O1`. The manager-verified `-2147483645`-at-`-O2`-on-both is a property of
+   the **scalar helper**, not of the fold p45 would ship. **So the harm is p18's
+   harm, second instance.**
+2. ⚠ **THE TASK FILE CONTRADICTS ITSELF and the engineer caught it instead of
+   guessing.** The *"Secondary"* section authorises RECAP "Owed" 4 **by name**;
+   *Constraints* forbids editing **any existing pattern** — and Owed 4 *is*
+   editing `patterns/p17-http-range/inputs/gen.py`. The dispatch message carried
+   no carve-out either. **The engineer did not touch p17**, diagnosed it at zero
+   cost (`grep -c sweep` on that `gen.py` → **0**, and p17's own `NOTES.md:85`
+   already says the sweep is owed), and **handed back a spec for the next task**.
+   ✅ That is the right response to a contradictory instruction and it is worth
+   more than the work it declined.
+3. ⚠ **The manager's `8.6×` was WRONG — `12.30×` is right**, and the manager
+   landed it into `.memory/03-measurement.md` **one commit earlier**, copied out
+   of TASK_079's report without deriving it, **into the same entry that marked
+   the rest PROVISIONAL.** ✅ Manager-verified from the committed log:
+   15,565,615 / 1,265,467 = **12.30**. ⚠ **Three ratios exist here and `8.6` is
+   none of them** — level 12.30×, marginal 14.00×. Corrected in place.
+4. ⚠ **The manager's framing of p27's `0.00 allocator` conflated ABSENT with
+   EQUAL, and the open question is now ANSWERED: the term is GENUINE.** p27's
+   `NOTES.md:793` records `malloc` at **421.1211 `Ir`/call in BOTH rungs** and
+   `:465` says 58–63% of that kernel is inside `malloc`/`free`; an elided
+   allocator cannot produce 421.1211. Independently confirmed by rebuilding both
+   cells (`3 free@GLIBC 1 realloc@GLIBC 1 malloc@GLIBC`, identical).
+   ✅ Manager-verified from the committed record. **The rule extracted: check
+   whether the SYMBOL IS PRESENT, not whether the difference is zero.**
+5. **The task file's *"R3 has at least four levers by construction"* is
+   refuted** — at most three mechanisms and only **two distinct machine-code
+   bodies**; the four-way split exists only at `O0d`/`O3d`, which
+   `.memory/01-ladder.md` forbids comparing to C.
+6. ⚠⚠ **`is not supported` MAY BE ESCAPABLE AT +1 TRUSTED ITEM, AND VERUS PRINTS
+   THE FIX ITSELF.** `assume_specification[i32::unchecked_add]` gives
+   **2 verified, 1 errors** with the one error a **deliberately bad call site**
+   failing `precondition not satisfied` — so the declaration works *and* the
+   `requires` bites. Same for `u64::unchecked_shl`. ✅ **Manager-verified, both
+   runs.** **This is the highest-reach item on the table and it is the subject of
+   `TASK_081`.**
+
+**Four manager decisions taken:**
+
+1. ⚠ **The refusal is ACCEPTED without a dedicated review of the refusal**, on
+   TASK_074's and TASK_079's precedent — the deliverable refuses the manager, so
+   rule 3 runs the right way, and the six overturning claims were
+   **manager-verified** instead. ⚠ **But `TASK_081` IS a reviewer task**, because
+   this refusal produced a **positive finding of project-wide reach** (item 6)
+   that rule 9 forbids landing unreviewed. **The refusal is accepted; the finding
+   is not.**
+2. ⚠ **THE LADDER TEST IS ADOPTED AS A SELECTION RULE** (`.memory/06-catalogue.md`).
+   Three rows refused in a row — p48, p31, p45 — and they share a cause **none of
+   the three triages tested**: *a pattern needs a bug that R4 can reintroduce and
+   R3 cannot, and a cost that differs between them.* ⚠ **The question all three
+   triages DID ask — is the bug class new? — is the less useful one**: p36 shipped
+   the tree's twelfth `index >= len` and was worth building, and p45's UB class is
+   genuinely absent and was not. **Novelty predicts neither way; the ladder test
+   does, and it is one compile plus one `md5sum`.**
+3. **Item 6 is recorded PROVISIONAL with the question that decides its reach
+   spelled out**, rather than landed or dropped. Both verified escapes are
+   **arithmetic intrinsics with one-line contracts**; finding 14's six items are
+   mostly **memory** operations whose `assume_specification` needs a *permission*
+   precondition. **The escape may stop exactly where finding 14's claim lives**,
+   and nobody has run it. That is `TASK_081`'s core.
+4. **The survivors are preserved** — the non-amortising overflow-detection tax,
+   the **8.0× `checked_add`-vs-`wrapping_add`** gap (largest kernel fraction the
+   project has measured, and **safe-against-safe**, so no rung boundary runs
+   through it), and the `nsw`-pays-on-the-induction-variable result, which is
+   **p05's axis** and the first measurement here of what signed-index UB buys the
+   vectoriser. ⚠ Also a probe hazard: `grep -E "$SYM"` over `callgrind_annotate`
+   **matches the echoed command line**. Parse the table.
+
+⚠ **PROTOCOL rule 2's running count is 214:** 208 at TASK_080's writing, **+6** —
+the six findings above. **Four of the six are manager errors, and two of those
+were committed one task apart** (`8.6×` and the p27 framing, both landed in the
+TASK_079 outcome commit). **Carry 214 forward.**
+
+**The single most useful thing in this block.** ⚠ **The agent that ARGUED FOR
+this pattern is the agent that KILLED it**, on its own measurements, having been
+told it was the first catalogue row an agent had ever won. **It could have
+delivered a green 23rd pattern by choosing the *"caller guarantees no overflow"*
+contract and never running `readelf`** — R2 through R5 would have agreed on every
+checksum, the gate would have passed, and the published `R3 − R4 = 0.00` would
+have read as *"safety is free"* when the truth is *"there is only one rung
+here"*. ⚠ **That is finding 1's failure mode inverted**: `R5 − R4 = 0.00` is
+already scoped as a **tautology** in `results/synthesis.md` because the
+`identity` pin forces it — **and nothing in the gate scopes `R3 − R4 = 0.00` the
+same way.** A pattern whose rungs are accidentally byte-identical is
+**indistinguishable from a pattern where safety is genuinely free**, and the
+`readelf`-two-symbols-one-section check is what tells them apart. **Add it to the
+ladder test; it is the half nobody had.**

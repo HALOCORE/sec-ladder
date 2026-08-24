@@ -1395,3 +1395,57 @@ allocate/deallocate. So an exec bump allocator must either thread an
 tree-wide**, genuinely unused) or add a project-local `external_body` offset
 wrapper at **+1 TCB**. The token threads exactly like p27's `Dealloc`, so it is
 a new **clause**, not a new **kind** — which is what refused the axis.
+
+## ⚠⚠ PROVISIONAL — `is not supported` may be ESCAPABLE at +1 trusted item, and this touches finding 14
+
+**NOT YET REVIEWED. It is the subject of `TASK_081` and must not be quoted as
+authoritative until that review lands (PROTOCOL rule 9).** Found at TASK_080
+while refusing p45; the two Verus runs below are **manager-verified**, the
+consequences are **not**.
+
+**What was measured.** `i32::unchecked_add` at the pin gives
+`error: ... is not supported` — **and Verus itself prints the fix**:
+
+```
+= help: The following declaration may resolve this error:
+        pub assume_specification [core::num::<impl i32>::unchecked_add] (_0: i32, _1: i32) -> i32;
+```
+
+Adding it — with `requires i32::MIN <= a + b <= i32::MAX`, `ensures r == a + b`,
+`opens_invariants none`, `no_unwind` — gives **`2 verified, 1 errors`**, the one
+error being a **deliberately bad call site** failing
+`precondition not satisfied`. ✅ **So the declaration works AND the `requires`
+bites; it is not vacuous.** The same escape works for `u64::unchecked_shl`.
+Miri reports a violated `unchecked_add` as a genuine
+`error: Undefined Behavior: arithmetic overflow in unchecked_add`, not a panic.
+
+**Why this matters, stated carefully in both directions.**
+
+- ✅ **Finding 14's PRICING already says this.** Its own words are that every
+  route *"needs a **new trusted item**"*. **The finding is not refuted by the
+  escape existing** — the escape *is* the new trusted item.
+- ⚠ **But at least two patterns' TRIAGE LANGUAGE reads as a technical
+  impossibility rather than a TCB price.** p11's `r4_cstr` — worth
+  **−17 526 `Ir`/call (−35%)** on `large`, the largest instance of the
+  R4-chained-to-the-prover result — is recorded as *"rejected with four
+  `is not supported` errors"*. Under the escape that is **"+4 author-written
+  V-gap items"** on a pattern whose whole claim rests on **one**, which is a
+  judgement, not a wall. **Four patterns (p05, p07, p11, p18) triaged R4
+  candidates in that language.**
+
+⚠⚠ **THE QUESTION THAT DECIDES HOW FAR THIS GOES, AND NOBODY HAS RUN IT.** Both
+verified escapes are **arithmetic intrinsics with trivial contracts** —
+`r == a + b` is one line and obviously right. **Finding 14's six items are mostly
+MEMORY operations**: `read_unaligned`, `as_ptr`, `add`, `from_raw_parts`,
+`TryFromSliceError`, `from_le_bytes`. A sound `assume_specification` for
+`read_unaligned` must express a **permission** precondition, which is a different
+order of difficulty and may not be expressible at all at this pin.
+**So the escape may stop exactly where finding 14's claim lives.** Until that is
+run, the honest statement is: **`is not supported` is a TCB price for simple
+arithmetic intrinsics and an open question for memory operations.**
+
+⚠ **And the soundness hazard is the reviewer checklist's own**: an
+`assume_specification` **axiomatises** the function's contract, so *"a wrong one
+axiomatises a falsehood"*. A `+N trusted items` route is only as good as N
+hand-written contracts — which is precisely why the TCB column exists, and why
+this is a judgement for a pattern's author rather than a free lever.

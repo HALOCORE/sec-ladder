@@ -1480,21 +1480,35 @@ threshold to be crossed — it fires at `-O2` on the first non-escaping allocati
 ⚠ **And the kernel-exclusive column REVERSES THE SIGN on the same pair** —
 the sharpest instance of the outward-dispatch rule found so far. `main` is
 **990,034 `Ir`** in the malloc rung against **1,100,035** in the bump rung, while
-the *whole program* is **8.6× dearer** in the malloc rung, because **89.75%** of
-its cost is inside libc. A `kernel_exclusive_ir` reading publishes *"the bump
+the *whole program* is **12.30× dearer** in the malloc rung, because **89.75%**
+of its cost is inside libc. A `kernel_exclusive_ir` reading publishes *"the bump
 allocator is 1.00 `Ir`/object WORSE"* against a true *"130.00 BETTER"*.
-**PROVISIONAL — not yet reviewed** (the sign reversal and the 89.75% are the
-engineer's numbers; the elision above is the manager-verified half).
+✅ **ATTACKED AND REPRODUCED EXACTLY at TASK_080** — both `main` figures, both
+marginals, and `38.16 + 29.68 + 21.91 = 89.75%`.
+⚠ **With ONE number corrected, and it was the MANAGER'S: `8.6×` is wrong and
+`12.30×` is right** (15,565,615 / 1,265,467). The manager copied `8.6` out of
+the engineer's report without deriving it, into the same entry that marked the
+rest PROVISIONAL. ⚠ **Note there are THREE ratios here and only two are real** —
+the whole-program *level* ratio is **12.30×**, the *marginal* ratio is **14.00×**
+(140.00/10.00), and `8.6` is neither and reconstructs from nothing in the
+committed log. **Quote 12.30× for levels, 14.00× for marginals.**
 Fourth instance of the rule: p13 overstated, p48 would have reported zero, p36
 **reversed a control**, and p31 would have reversed **its own headline**.
 
-⚠ **An open question this raises about a COMMITTED number, asked rather than
-asserted:** p27's closed decomposition publishes `230.07 = 109.65 kernel +
-120.42 drop glue + **0.00 allocator**`. p27's pointers are stored in a handle
-table and therefore **escape**, so the elision above should not apply — but
-nobody has checked, and `0.00` is exactly what the elision produces. **Check it
-before quoting p27's allocator term again**; the check is one `objdump | grep`
-on a committed binary.
+✅ **The open question about p27 is ANSWERED, and the answer is GENUINE — plus
+the manager's framing of it was wrong.** p27's closed decomposition publishes
+`230.07 = 109.65 kernel + 120.42 drop glue + **0.00 allocator**`, and this entry
+asked whether that `0.00` was the elision above. **It is not.** ⚠ **The framing
+conflated ABSENT with EQUAL**: the elision produces a **missing symbol**, whereas
+p27's `0.00` is a **difference of two present, equal, large terms** —
+`patterns/p27-handle-table/NOTES.md:793` records `malloc` at **421.1211 `Ir`/call
+in BOTH rungs**, and `:465` says **58–63% of that kernel's work is inside
+`malloc`/`free`**. An elided allocator cannot produce 421.1211. Confirmed
+independently by rebuilding both cells: `objdump -d | grep` gives
+`3 free@GLIBC 1 realloc@GLIBC 1 malloc@GLIBC` **identically** for
+`safe_tuned-O3-whole` and `unsafe-O3-whole`. ✅ **Manager-verified from the
+committed record**, no rebuild needed. **The distinction to keep: check whether
+the symbol is PRESENT, not whether the difference is zero.**
 
 ## Hold out a LENGTH, not a MIXTURE — an out-of-sample test can be provably unable to fail
 
