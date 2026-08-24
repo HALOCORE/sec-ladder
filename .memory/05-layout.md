@@ -577,10 +577,25 @@ records every run, so a second pattern growing a second Verus source
 ## ⚠ A `spec.md` prose fix outside the fenced block costs a GATE RE-RUN, not a contract move
 
 `read_contract()` hashes **`spec.md`'s fenced block and nothing else**. p01's
-`| identity |` row sits at offset 5473 and the `slb-contract` fence opens at
-5676 — **203 characters outside it**. So correcting that row left
-`contract_sha256` at `5360d6f3…` **byte-identical**, and moved only
+`| identity |` row is in the **prose above the fence**, so correcting it left
+`contract_sha256` at `5360d6f3…` **byte-identical** and moved only
 `source_sha256[patterns/p01-array-sum/spec.md]`.
+
+⚠⚠ **DO NOT WRITE THE CHARACTER OFFSETS HERE, AND THE FIRST VERSION OF THIS
+PARAGRAPH DID.** It said *"the row sits at 5473 and the fence opens at 5676 —
+**203 characters** outside it"*. ⚠ **All three numbers were stale before the
+commit that recorded them**: the edit being described **lengthened the row by 405
+characters**, so the post-edit gap is **592**, and 5676-vs-5660 is the difference
+between the fence *marker* and the fence *content* start — **two people measuring
+two things and both being right** is exactly how the `check.py:NNNN` citations
+rotted. **This is "line citations decay" in numeric form.** State the
+**invariant** — *the row is in the prose, before the fence* — and give the
+command, never the offsets:
+
+```python
+s = open('patterns/pNN-x/spec.md').read()
+s.find('| `identity` |') > s.find('```slb-contract')   # False ⇒ outside the hash
+```
 
 **The practical rule: an edit to `spec.md` PROSE costs one gate re-run; an edit
 inside the fence costs a contract move and everything that hangs off it.** Check
