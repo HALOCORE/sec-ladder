@@ -506,3 +506,83 @@ it is evidence the published column never reads the field.**
 - Any agent that learns a durable fact (a Verus workaround, a measurement gotcha)
   writes it to the right `.memory/` file or `../LearnVeri/PITFALLS.md` and says so
   in its report. Facts that live only in a chat log are lost.
+
+## The axiom scan: key convention, the disjointness rule, and a span-guard trap
+
+(TASK_084, closing RECAP "Owed" 0's routes B1–B3. ⚠ **UNREVIEWED —
+`TASK_084_REVIEW` attacks it next.**)
+
+**Key convention for an axiom outside the pattern dir: the path RELATIVE TO THE
+REPO ROOT.** `verus.axioms["common/driver.rs"] = 1`, not
+`"../../common/driver.rs"` — that spelling has many forms normalising to one
+file, it moves if the pattern dir moves, and repo-relative is what
+`_scan_unsafe_sites` already prints. **It cannot collide with a
+`verus.obligations` key**, because those are bare filenames with no `/`. Hits
+land as `record["verus"][<relpath>] = {"path_included": true, "axiom_decls":
+[...]}`, so `synthesize.py`'s `.get("verus.rs")` is untouched.
+
+⚠ **The blast radius is the whole tree and that is the point:** one axiom planted
+in the **real** `common/driver.rs` takes **0 of 22 → 22 of 22 patterns failing**.
+Every `verus.rs` `#[path]`-includes it, and before this the scanned file list was
+`sorted(pinned_obl)`, so **the module was never opened.**
+
+**THE DISJOINTNESS RULE — body-less → `axiom_decls`, bodied → `.external`.**
+
+| form | has a body? | seen by |
+|---|---|---|
+| `assume_specification` | no `fn` token at all | `axiom_decls` |
+| `broadcast axiom fn`, `uninterp spec fn` | body-less | `axiom_decls` |
+| `external_trait_specification` methods | body-less | `axiom_decls` |
+| `external_type_specification` | declaration | `axiom_decls` |
+| `external_fn_specification` | **must have one** | `parse().external` |
+
+⚠ **`external_fn_specification` CANNOT be written body-less** — measured, not
+assumed: Verus rejects it twice, `error[E0308]: ... implicitly returns () as its
+body has no tail`, and on a unit return `error: assume_specification encoding
+error: body should end in call expression`.
+
+⚠⚠ **And Verus's own error message calls an `external_fn_specification` an
+"assume_specification".** They are **one mechanism**, which is the argument for
+treating the bodied form as trusted-not-verified.
+
+⚠⚠ **`impl_spans`' LIMIT 2 GUARD SHAPE IS A LIVE TRAP FOR ANY NEW SPAN
+FUNCTION.** `trait_spans` was written by copying that guard and **missed every
+ATTRIBUTED trait** — i.e. **every external-trait declaration, the entire target**
+— because the guard does not allow `]` in the preceding item position and an
+attribute ends in `]`. **Caught by a probe, not by reading it.** Copy
+`impl_spans` and you inherit its documented limit silently; **if a new span
+function must see attributed items, allow `]`.**
+
+## ⚠ The published TCB total is 90, and the "92" that four documents quote is a DIFFERENT SUM
+
+`results/synthesis.md` prints **90 items / 188 lines**. That is the sum over
+**`verus.rs` only**, which is what `synthesize.py` reads (`TCB_SRC`, pinned the
+way `R5_PAIR` is). **92 is the sum over ALL pinned Verus sources**, and the
+difference is **p01's `safe_naive_verus.rs`** (`['load_input','emit']`) — p01
+being the only pattern with two.
+
+⚠ **Both numbers are real; the error is the LABEL.** `RECAP.md`, `TASK_082.md`,
+`TASK_083.md` and `TASK_083_REVIEW_REPORT.md` all quote **92 as the published
+total**, and the last one **names this very table while doing so**. ✅
+**Manager-verified: `results/synthesis.md` `| **total** | ... | **90** |`, and
+the all-sources sum recomputed from `results/gate/*.json` is 92.**
+
+⚠ **Summing them would be WRONG, not merely different**: `safe_naive_verus.rs`
+proves the **R2** rung panic-free, so its trusted base is not R5's, and the sum
+describes no rung. **Reading one source is correct; failing to SAY SO is the
+defect** — which is why the table now carries a footnote computed from the
+records every run, so a second pattern growing a second Verus source
+**announces itself** rather than being silently dropped.
+
+## ⚠ A `spec.md` prose fix outside the fenced block costs a GATE RE-RUN, not a contract move
+
+`read_contract()` hashes **`spec.md`'s fenced block and nothing else**. p01's
+`| identity |` row sits at offset 5473 and the `slb-contract` fence opens at
+5676 — **203 characters outside it**. So correcting that row left
+`contract_sha256` at `5360d6f3…` **byte-identical**, and moved only
+`source_sha256[patterns/p01-array-sum/spec.md]`.
+
+**The practical rule: an edit to `spec.md` PROSE costs one gate re-run; an edit
+inside the fence costs a contract move and everything that hangs off it.** Check
+which side of the fence you are on before budgeting — a manager task file
+budgeted this one as a contract move and it was not.

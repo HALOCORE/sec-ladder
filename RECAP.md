@@ -1819,7 +1819,16 @@ Both retired.
 
    ✅ **Acceptance, all three limbs, manager-verified:** 22 verdicts identical
    (21 `PASS` + p01 `PASS-WITH-BLOCKED-ROWS`), **0 failures**; **TCB total 92 →
-   92** with `axiom_decls` present and empty in all 22; and the injected-false-
+   92** with `axiom_decls` present and empty in all 22 — ⚠⚠ **but `92` IS NOT THE
+   PUBLISHED TOTAL AND THIS LINE IS ONE OF FOUR THAT SAY IT IS.**
+   `results/synthesis.md` prints **90**: 92 is the sum over **all** Verus
+   sources, 90 is the sum over **`verus.rs`**, and the difference is p01's
+   `safe_naive_verus.rs` (`['load_input','emit']`). ✅ **Manager-verified.**
+   The other three are `TASK_082.md`, `TASK_083.md` and
+   `TASK_083_REVIEW_REPORT.md` — **and the last one names this very table while
+   quoting 92.** ⚠ **Both numbers are real; the error is the LABEL. Say which
+   sum you mean.** This is "Owed" 0's fifth route showing up in the project's
+   own bookkeeping (TASK_084 #236); and the injected-false-
    axiom demonstration now **FAILS** where every other pin still says green —
    `parse()` sees 7 items either way, `_is_trusted` is unchanged, the obligation
    count matches, and only the new stage catches it.
