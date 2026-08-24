@@ -10,7 +10,8 @@ this box is reference; this box is what to *do*.
 |---|---|
 | **Patterns** | **22 exist, all 22 reviewed, 0 failures tree-wide, 0 STALE.** **21 `PASS` + 1 `PASS-WITH-BLOCKED-ROWS`** — **p01 only**, a real 180 s Miri timeout on `large.bin`. ⚠ **Expect `PASS`. A blocked Miri row is worth INVESTIGATING, not shrugging at** — the old advice here (*"a declared hang blocks a Miri row by design; it is not a defect"*) was itself the defect, fixed at TASK_077; `check_miri` now reads stage 4's **measured** per-rung `hung` column. ⚠ **Count both ends rather than trusting either:** `ls -d patterns/p*/ \| wc -l` and `grep -c '^\| p[0-9]' .memory/06-catalogue.md`. |
 | **Do this next** | **`TASK_084` (gate) and `TASK_085` (`p15` contract probe) RAN CONCURRENTLY** — the one-agent rule relaxed because the probe touches neither measurement nor gate records, is confined to `.temp/t85/`, and is forbidden from running `check.py`/`measure.py` while the harness is half-edited. ✅ `verus_run.py` **single-file mode is concurrency-safe** (`tempfile.mkdtemp()` per invocation); **`--cargo` mode is not** — it shares `target/`. **Then `TASK_086` builds `p15` — or writes its refusal, which `TASK_085` is explicitly authorised to recommend.** ⚠ **An earlier version of this box said `TASK_085` builds p15; it does not, it decides whether p15 CAN be built.** **`TASK_084` — finish "Owed" 0.** ⚠⚠ **"Owed" 0 IS RE-OPENED: `TASK_082` closed ONE OF AT LEAST FOUR ROUTES**, and an earlier version of this box said it closed. Still owed: **`#[verifier::external_trait_specification]`** (54× in the pinned vstd, absent from all nine `harness/*.py`), **`#[verifier::external_fn_specification]`** (`\bverifier::external\b` misses it — next char is `_`), an axiom in a **`#[path]`-included SUBDIR** (`os.listdir` is flat; ⚠ **this vector is live in ALL 22 patterns** via `common/driver.rs`), and **wiring axioms into `tcb_items`/`synthesis`** — the published column reads `tcb_items` and the word *"axiom"* appears **zero times** in `synthesis/`. **Batch the two queued hashed-doc fixes with it** (p17 `NOTES.md` §10b's wrong mechanism, `p01/spec.md`'s retracted `identity` line). ⚠ **Gate work goes FIRST because `p15`'s named kill-risk is a stalled proof reaching for a hand-written axiom** — three of the four routes still cannot see one. |
-| **Then: `p15`, chosen by an AGENT with measurements** | **UTF-8 validation + decode.** ✅ `str::from_utf8_unchecked` **(INHERENT path) verifies 2/0** — `vstd/string.rs:136` ships the `assume_specification` with `requires valid_utf8`, and `vstd/utf8.rs:272` ships `valid_utf8` as a full recursive spec, so **R5 is not a stall**. ⚠ **The FREE path `core::str::from_utf8_unchecked` IS `is not supported`** — the diagnostic is right about the function you named and the wrong answer to the question; **grep the inherent spelling too.** Probes: kernels 206 B vs 146 B (no collision); cost **+4.1% ASCII / +100.1% on 2–3-byte scalars**, and **the axis is the input alphabet, which no pattern varies**. ⚠ **The C harm IS the tree's thirteenth `index >= len`** — the row carries on the R4 side, where the harm has **no bounds violation at all** and at `-O` the optimiser **deletes the program's own `println!`**. ⚠⚠ **NAMED KILL-RISK: R5's call site must discharge `valid_utf8` over file bytes, needing a VERIFIED validator. If it stalls, REFUSE the row — do not axiomatise it.** ⚠⚠ **AND ITS CONTRACT SHAPE IS UNSETTLED — read "Owed" 25 BEFORE writing the task.** The review's prescribed contract cannot ship as written: `requires valid_utf8` is forbidden by *"the precondition must be structural"*, **and** "R4 assumes and is UB" has no verifying twin, because **21 of 22 patterns pin `unsafe vs verus` at `exact` and none allows R4 ≠ R5** — so R4 must validate too, **and the +4.1%/+100.1% probe that selected the row compares validating against not validating.** Three shapes, one of them REFUSE; the engineer settles it as deliverable §1. |
+| **Then: `p15` — ⚠⚠ NOW RECOMMENDED FOR REFUSAL, and the question has MOVED** | ⚠⚠ **`TASK_085` ran the probes and all three of the row's justifications were measured away in one session** (`.tasks/TASK_085_REPORT.md`, **UNREVIEWED** — read "Owed" 25). ✅ **The named kill-risk is DEAD: a verified UTF-8 validator CLOSES at the pin — `ensures res == valid_utf8(b@)` bidirectional, `5 verified, 0 errors`, ZERO trusted items**, end-to-end call site `8/0`, non-vacuous against an 18.5 M-case oracle and a 10-mutant battery. **That artefact is reusable; do not lose it with the row.** ⚠ **The harm row is REFUTED** — the *"optimiser deleted the `println!`"* cell is `exit 139` **SIGSEGV** with an ASan `heap-buffer-overflow READ`, i.e. the tree's **fourteenth `index >= len`**; RECAP repeated it without re-running it. ✅ **What DOES survive is p11's result a fourth time:** a verified validator is **dearer than `core::str::from_utf8` at every alphabet — 15.58× on ASCII**, collapsing to 1.13× on non-ASCII. ⚠⚠ **AND THE LIVE QUESTION IS NO LONGER "CAN p15 BE BUILT" BUT "IS `check.py::_scan_unsafe_sites` RIGHT?"** — it forbids **verified** unsafe, so a Verus-discharged `from_utf8_unchecked` would have to be moved *into* the counted TCB behind an unwritable twin. **The manager has not decided it (rule 3), and the probe's evidence is a CODE READ, not an executed gate.** |
+| ~~**Then: `p15`, chosen by an AGENT with measurements**~~ *(superseded; kept for the probe record)* | **UTF-8 validation + decode.** ✅ `str::from_utf8_unchecked` **(INHERENT path) verifies 2/0** — `vstd/string.rs:136` ships the `assume_specification` with `requires valid_utf8`, and `vstd/utf8.rs:272` ships `valid_utf8` as a full recursive spec, so **R5 is not a stall**. ⚠ **The FREE path `core::str::from_utf8_unchecked` IS `is not supported`** — the diagnostic is right about the function you named and the wrong answer to the question; **grep the inherent spelling too.** Probes: kernels 206 B vs 146 B (no collision); cost **+4.1% ASCII / +100.1% on 2–3-byte scalars**, and **the axis is the input alphabet, which no pattern varies**. ⚠ **The C harm IS the tree's thirteenth `index >= len`** — the row carries on the R4 side, where the harm has **no bounds violation at all** and at `-O` the optimiser **deletes the program's own `println!`**. ⚠⚠ **NAMED KILL-RISK: R5's call site must discharge `valid_utf8` over file bytes, needing a VERIFIED validator. If it stalls, REFUSE the row — do not axiomatise it.** ⚠⚠ **AND ITS CONTRACT SHAPE IS UNSETTLED — read "Owed" 25 BEFORE writing the task.** The review's prescribed contract cannot ship as written: `requires valid_utf8` is forbidden by *"the precondition must be structural"*, **and** "R4 assumes and is UB" has no verifying twin, because **21 of 22 patterns pin `unsafe vs verus` at `exact` and none allows R4 ≠ R5** — so R4 must validate too, **and the +4.1%/+100.1% probe that selected the row compares validating against not validating.** Three shapes, one of them REFUSE; the engineer settles it as deliverable §1. |
 | **Pattern selection** | ⚠⚠ **THREE ROWS REFUSED IN A ROW — p48, p31, p45 — and the "LADDER TEST" that came out of it was RETRACTED AND RESTATED ONE TASK LATER.** ⚠ **Do not use the first version** (*"a bug R4 can reintroduce and R3 cannot, and a cost that differs"*): it misclassifies **p08** (satisfies it, shipped) and **p47** (violates it, shipped) **in opposite directions**, and the manager's own defence of it was aimed at the wrong half — p47 passes the cost half at **+90.0/+142.0 `Ir`/call**. **Use the THREE PROBES** in `.memory/06-catalogue.md`: *(1)* a rung boundary must exist **somewhere** and the row must name it — p08's is at compile time, p47's is inside the safe class, p16's is a slope; *(2)* the rungs must differ **as machine code**, checked by extracting each kernel's bytes and `md5`-ing them, **not** by the retracted "two symbols on one section" form, which cannot fire when every rung is its own binary; *(3)* any published `0.00` must name its **axis and `Ir` convention in advance**. ⚠ **The novelty question all three triages DID ask is the less useful one** — p36 shipped the tree's twelfth `index >= len` and was worth building. ⚠⚠ **AND THE AXIS PROGRAMME IS CLOSED — do not open the catalogue's axis table looking for what to build next.** All **seven** rows are resolved: **5 BUILT** (p27, p47, p38, p36, p22) **+ 2 REFUSED WITH MEASUREMENTS** (`p48`, `p31`); **neither refused row may be rescheduled without reading its refusal block.** That table was the argument for axis-first ordering and **the argument is spent** — the catalogue's own two objections to it (*breadth over realistic C patterns*; *the findings are about cost MECHANISMS, which have been much less repetitive*) were never answered and now have nothing standing against them. |
 | **Throughput — PROBE IN BATCHES, and this is a scheduling change, not a theory** | ⚠ **The last five tasks produced ZERO new patterns** (two refusals, two reviews, one gate fix), and **23 catalogue rows are AVAILABLE** against a measured cost of **three tasks per pattern**. ⚠ **Count it, do not trust that number** — `48 rows − 22 built − 3 REFUSED (p48, p31, p45) = 23`, and *"26 unbuilt"* was this line until it was checked; the three refusals **may not be rescheduled without reading their refusal blocks**. The available set is `p15 p19 p20 p21 p23 p24 p25 p26 p28 p29 p30 p32 p33 p34 p35 p37 p39 p40 p41 p42 p43 p44 p46`. ⚠ **`p42` is in that list and should NOT be re-probed**: `TASK_083_REVIEW` triaged it **Refuse with a measurement** — *"`Ir` sees the leak with the wrong sign"* — but that triage has not itself been reviewed, so per rule 9 the catalogue row is deliberately left unmarked and this is the only record of it. The bottleneck is *selection*, and it has failed the same way twice: **both manager-proposed axes died on a novelty claim that one `grep` plus one run would have settled.** The fix is not another ordering theory — the axis programme *was* one and it is closed. It is that **probing is cheap and batched probing is much cheaper**: `TASK_083_REVIEW` cleared **four rows in part of one session** (p15 build, p23 fallback, p25 defer, p42 refuse) using the three probes, and that is the only selection this project has done that produced a *ranked queue* instead of a single guess. ⚠ **So the next selection task probes 8–10 rows and returns a QUEUE**, and the manager proposes nothing it has not run. ⚠ **`p23` is already probed and ranked 2** — its permutation invariant verifies `2 verified, 0 errors` at the pin with no `assume`, so it is the standing fallback if `p15` refuses, with the same one-session budget. |
 | **Rules for writing that task** | ⚠⚠ **STATE NOVELTY CLAIMS AS QUESTIONS TO BE MEASURED, never as fact.** *"The first termination proof in the project"* was the manager's sentence in `TASK_070.md`; it was **false**, the engineer had no reason to doubt it, and it shipped into **eight places, two inside `contract_sha256`** — a review and a re-gate to remove. **Rule 9 protects `.memory/` from unreviewed findings and protects NOTHING from the task file itself.** p22's §0 counted 73 measures in one command once it was finally asked. ⚠ **Settle the bug class as the FIRST deliverable** — overturned on four patterns, upheld on two. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat). **Additivity extrapolation — the only out-of-sample test here that can fail — HAS now failed once, on p38, and it was 100% attributable to three missing columns, none of them the one named.** The rule that came out of it: ⚠ **check the RESIDUE CLASS of any parameter your bands hold constant** — two of p38's three bands sat at `nw ≡ 0 (mod 8)` and the third did not, which fits in sample and misses out of it with no in-sample residual to warn you. ⚠ **Name the INLINE MODE at every figure** — p10 fitted both and the regressors *swapped*. All three in `.memory/03-measurement.md`. |
@@ -2323,18 +2324,101 @@ Both retired.
     **batch it**, and note `measure.py` is *not* executed by the gate, which is
     why item 5 calls that glob over-broad.
 
-25. ⚠⚠ **`p15`'S CONTRACT SHAPE IS UNSETTLED, AND THE RECOMMENDATION IT WAS
-    SELECTED WITH COLLIDES WITH TWO SETTLED RULES.** Found by the manager while
-    writing `TASK_084`, **not measured, not yet attacked** — it is an argument
-    from two committed rules and it is exactly the kind of manager reasoning
-    this project keeps refuting, so **treat it as a question, not a finding.**
+25. ⚠⚠ **`p15` IS RECOMMENDED FOR REFUSAL, AND THE MANAGER'S HALF OF THIS ITEM
+    WAS MEASURED WRONG. RUN BY `TASK_085`
+    (`.tasks/TASK_085_REPORT.md`) — UNREVIEWED, so nothing here is in `.memory/`
+    yet.** ⚠ **The named kill-risk is DEAD and was never the problem.**
 
-    `TASK_083_REVIEW` selected p15 and named the right kill-risk (R5 needs a
-    *verified* validator). Its prescribed contract is: *"`kernel(bytes) -> u64`
-    with the validation **inside** the measured kernel (R3 validates and returns
-    0; R4 assumes and is UB), **not** a `requires valid_utf8` on the kernel."*
-    **Both halves of that sentence cannot hold at once**, for two independent
-    reasons I checked against the tree:
+    ✅ **A verified UTF-8 validator CLOSES at the pin.**
+    `fn is_valid_utf8(b: &[u8]) -> (res: bool) ensures res == valid_utf8(b@)` —
+    the **`==`**, not the one-directional `==>` — **`5 verified, 0 errors`,
+    ~120 lines, ~10 of them proof, ZERO trusted items**, on three vstd lemmas
+    (`partial_valid_utf8_extend`, `partial_valid_partial_invalid_utf8`,
+    `partial_valid_utf8` as the loop invariant). The **end-to-end call site**
+    the review said it did not know closes verifies **`8 verified, 0 errors`**,
+    with vstd's `requires valid_utf8(v@)` discharged **by the validator's
+    postcondition alone**. Non-vacuous two ways: a differential oracle against
+    `core::str::from_utf8` over **18 499 985 cases, 0 mismatches**, and a
+    **10-mutant battery, all 10 failing** — ⚠ **three of them break only the
+    COMPLETENESS direction, which a `res ==> valid_utf8` bar would not have
+    caught.** ⚠ **This validator is reusable and is the most valuable artefact
+    the probe produced; do not let it be lost with the row.**
+
+    **THE THREE JUSTIFICATIONS THE ROW WAS SELECTED ON, EACH MEASURED AWAY:**
+
+    - ⚠⚠ **The harm row is REFUTED — and RECAP repeated it, so this item was
+      part of the error.** TASK_083_REVIEW published the truncated-lead cell as
+      *"prints NOTHING, exit 0"*, *"ASan n/a"*, *"bounds violation: none"*, i.e.
+      *"the optimiser deleted the program's own `println!`"*. **Measured on a
+      byte-for-byte replica of the review's own file: `exit 139` — SIGSEGV, not
+      exit 0 — 30/30 runs across `-O`, `-O2`, `-O1`, `-O3`, `±codegen-units=1`,
+      `±debug-assertions`, and nightly.** And **ASan catches it**:
+      `heap-buffer-overflow READ`, a one-past-the-end heap read. **So it is a
+      bounds violation, it is the tree's FOURTEENTH `index >= len`, and the new
+      harm class does not exist.** What survives is row 1 — a silent wrong
+      answer **Miri does not catch** — **which is p18's harm, and p18's harm is
+      what killed p45.**
+    - **The cost axis survives but reverses the row's point.** A verified
+      validator is **DEARER than `core::str::from_utf8` at every alphabet**:
+      **15.58× on pure ASCII** (0.449 vs 7.001 `Ir`/byte — std's word-at-a-time
+      fast path), collapsing to **1.13×** on all-non-ASCII; slopes `R3 +384.78`
+      vs `A +191.18` `Ir`/call per point of non-ASCII. TASK_083's `+4.1% ASCII`
+      reproduces exactly. **That is p11's result a fourth time** — *the safe
+      class reaches a library the unsafe class cannot* — **and it is a real
+      finding, not a consolation prize.**
+    - **The rung boundary does not survive the gate**, see the new obstacle
+      below.
+
+    ⚠⚠ **AND THE OBSTACLE NOBODY NAMED, which is the sharpest thing here:
+    `check.py::_scan_unsafe_sites` FORBIDS VERIFIED UNSAFE.** Every `unsafe`
+    token in a pinned Verus source must sit inside an `#[verifier::external_body]`
+    item or it is a hard `tcb-unsafe` failure. p15's R5 needs
+    `unsafe { str::from_utf8_unchecked(b) }` inside a **verified** fn — precondition
+    discharged by Verus, **TCB contribution zero**. Complying would *move a
+    Verus-discharged call into the counted TCB*, need a hand-written `ensures`
+    about `&str` semantics (**the axiom class `TASK_084` is closing**), and need
+    a twin that is **unwritable** — `grep -rn "from_utf8" ~/tools/verus/vstd/`
+    returns **one** line, the unchecked one. ✅ **Clean negative:**
+    `grep -rn "get_unchecked" ~/tools/verus/vstd/` → **0 hits**, so the tree's
+    **47** `external_body` wrappers are all unavoidable and **this rule has cost
+    the project nothing so far.** **p15 would be the first pattern whose unsafe
+    operation vstd actually specs** — i.e. the first R5 that could carry a
+    *legitimate* zero in the TCB column. ⚠ **So the live question is no longer
+    "can p15 be built" but "is `_scan_unsafe_sites` right?", and the manager has
+    NOT decided it** — rule 3 forbids clearing its own call, and the probe's
+    evidence for it is a **code read, not an executed gate**.
+
+    ⚠ **What the probe did NOT run, in its own words:** it was barred from
+    `check.py`/`measure.py` by the concurrency constraint, so **Q2 and the
+    `_scan_unsafe_sites` finding are both code reads of `git show HEAD:`**, and
+    **no pattern with `identity: differ` has been through the gate.** One real
+    run is owed before either enters `.memory/`.
+
+    *The manager's original analysis is kept below. Its first bullet is
+    UPHELD and strengthened; **its second bullet is REFUTED**.*
+
+    - ✅ **UPHELD, and by a hard gate stage rather than the rule reading the
+      manager offered.** `check.py::check_proof_domain` (stage 5d) `eval`s every
+      derived `requires` at **every kernel call of every model, adversarial
+      included**, and `rep.fail`s on the first violation — so this is a **gate
+      failure**, not a style objection. ✅ **Clean negative: 0 of 22 patterns
+      violate**, re-derived independently by driving each `model.py` over each
+      `adversarial-*.bin`. **21 of 22 kernels carry exactly one `requires`** and
+      it is the window fact `off + len <= buf@.len()`.
+    - ⚠⚠ **REFUTED: `identity` is mandatory as a MEASUREMENT, but the LEVEL is
+      a free choice, and the gate EXPLICITLY ADMITS R4 ≠ R5.** `check_identity`
+      enforces a **floor only** (`got_i < want_i` is the sole failure path) and
+      `rep.note`s when a pattern pins nothing at all;
+      `asm.IDENTITY_LEVELS = ["differ", "counts", "norel", "exact"]`, so
+      **`differ` is a legal pin.** What makes an identity measurement mandatory
+      is `check_miri`, transitively — no pin naming the R4/R5 pair is a hard
+      failure at stage 8. And `check_miri` treats R4 ≠ R5 as **supported**: it
+      appends *"R4 and R5 differ at O3 …, so R4 does not inherit R5's discharged
+      obligations at all"* to `why_required` — **a reason Miri is REQUIRED, not
+      a failure.** **So *"21 of 22 pin `exact`"* is true and *"none allows
+      R4 ≠ R5"* is true of the `spec.md` files and FALSE about the gate.**
+
+    *Original text of both bullets, kept:*
 
     - **`requires valid_utf8(b@)` is forbidden outright.**
       `.memory/02-bench-rules.md` *"The precondition must be structural. The
@@ -2382,11 +2466,17 @@ Both retired.
       ⚠ **A refusal here is a legitimate outcome and the fourth in a row is
       not, by itself, a reason to force a build.**
 
-    ⚠ **What survives all three, and is why the row is still worth a session:**
+    ⚠⚠ **THE PARAGRAPH BELOW IS REFUTED — `TASK_085` MEASURED IT AND TWO OF ITS
+    FOUR CELLS ARE WRONG. It is kept because it is the reason the row was
+    scheduled, and because RECAP repeating TASK_083_REVIEW's cell without
+    re-running it is the error worth remembering: `exit 139` (SIGSEGV) not exit
+    0, and ASan reports `heap-buffer-overflow READ`. See the top of this item.**
+
+    ~~⚠ **What survives all three, and is why the row is still worth a session:**
     p15's **row-2 adversarial cell** — truncated lead byte, `rustc -O`, the
     binary **prints nothing and exits 0** because `unreachable_unchecked` inside
     `next_code_point` let LLVM delete the program's own `println!`, with **no
-    bounds violation anywhere**. Miri catches it, ASan has nothing to catch.
+    bounds violation anywhere**. Miri catches it, ASan has nothing to catch.~~
     That is *"the optimiser deleted the programmer's code"* — the harm class
     proposed for `p45` and **refuted as stated there** — real, measured, and in
     the shipped-language rung. **It ships as a control under (A) and (B) and as
