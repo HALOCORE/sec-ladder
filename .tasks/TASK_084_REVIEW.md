@@ -131,10 +131,23 @@ of the `spec.md` files, false about the gate. **Run it**: take a pattern into
 ### G2 — does `_scan_unsafe_sites` really forbid VERIFIED unsafe, end-to-end?
 
 The probe's reading: every `unsafe` token in a pinned Verus source must sit
-inside a `#[verifier::external_body]` item (`_is_trusted` requires
-`item.external == "verifier::external_body"`), or it is a hard `tcb-unsafe`
-failure. Census: **47 `unsafe` tokens across 22 `patterns/*/verus.rs`, all inside
-`external_body`, zero outside.**
+inside a `#[verifier::external_body]` item or it is a hard `tcb-unsafe` failure.
+Census: **47 `unsafe` tokens across 22 `patterns/*/verus.rs`, all inside
+`external_body`, zero outside.** ⚠ **Correction already landed by
+`TASK_085_REVIEW`: `_is_trusted` requires `external_body` AND (`ensures` **or**
+`unsafe` in the body), not `external_body` alone** — the probe's report states it
+the loose way. Same conclusion; recorded so you do not re-derive it.
+
+⚠⚠ **AND `TASK_085_REVIEW` ASKED FOR ONE SPECIFIC THING FROM YOU, BY NAME:
+exercise `check_miri`'s `if not why_required` branch.** Its blocker 1 lives
+there and **a code read is not enough for a PRINTED sentence.** The claim: a
+pattern that merely *calls* a vstd `assume_specification` declares nothing, so
+`_trusted_items` = 0 and `_axiom_items` = 0, and the gate then **prints** *"this
+pattern has NO trusted item and NO hand-written axiom, so there is no trusted
+`ensures` whose incompleteness Miri would have to backstop — Miri not
+required."* **Make that sentence print over a proof that rests on a vstd axiom,
+or show that it cannot.** This is **RECAP "Owed" 0's sixth route** and it is the
+widest one found so far.
 
 **The probe could not demonstrate the failure end-to-end** because that needs
 writing a `.rs` into a pattern directory. **You can — in a `.temp/r84/` copy.**
