@@ -2551,6 +2551,23 @@ Both retired.
     record — BATCH IT with the next thing that re-gates**, and do **not** send it
     to an agent mid-sweep, which would invalidate the records already written.
 
+27. **The authoritative layer cites 34 `.temp/` paths, and NONE of them exists in
+    a fresh clone.** Measured, not estimated:
+    `grep -rho '\.temp/[A-Za-z0-9_./-]*' .memory/ RECAP.md | sort -u` gives
+    **36**, of which **2 are `pNN` PLACEHOLDERS** (`.temp/build/pNN/`,
+    `.temp/pNN/`) and the other **34 all exist on this box**. ✅ **So there are
+    ZERO broken citations today** — do not go chasing the two, they are prose.
+
+    ⚠ **The open question is not "are they broken" but "are they BACKED".**
+    `.memory/05-layout.md` item 11 permits a `.temp/` artefact **provided a
+    committed generator derives it**; `p15` exposed the gap where no generator
+    can exist (a refused row has no pattern dir), and that gap is now closed by
+    item 11's corollary. **Nobody has audited the other 34 against item 11's
+    condition.** ⚠ **This is a manager's count plus a manager's inference, and
+    the inference is the untested half** — the count is one command and it is
+    above; whether a missing generator actually costs anything is not.
+    **Cheap to settle: for each of the 34, does a committed file regenerate it?**
+
 ### Deferred with a stated reason
 
 - **The mechanical rate-vs-disassembly backstop** (~90 lines, prototype exists).
