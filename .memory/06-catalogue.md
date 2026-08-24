@@ -795,10 +795,19 @@ of these is a measurement; they are the questions each `§0` must answer first.*
   ⚠ Also `.memory/04-verus.md`: `decreases b - a`
   fails on two-cursor loops, and a probe sequence's measure is *unvisited slots*,
   which needs a ghost set — budget more than one session.
-- **p36 (vtable dispatch) — likeliest to hit p55's wall.** An out-of-table
-  indirect call jumps to whatever is adjacent, so **the harm is not
-  reproducible**, and there is no equivalent of the fold-from-offset-16 trick
-  that rescued the UAF. Settle reproducibility **first**, the way TASK_055 had to.
+- ✅ **p36 — BUILT at TASK_072/073. THE TRIAGE BELOW IS SUPERSEDED; it is kept
+  only because two of its three predictions were WRONG and the pattern of the
+  error is the reusable part.** ⚠ **Its headline worry — *"the harm is not
+  reproducible"* — is REFUTED: 24/24 SIGSEGV** across gcc/clang × O0–O3 × 3
+  opcodes. Its *"likeliest to hit p55's wall"* ranking was wrong. **What it got
+  right was the re-triage** (the bar is *"a sanitizer fires deterministically"*,
+  not *"the harm is identical"*), and **the question it left UNVERIFIED was the
+  one that mattered** — see the p36 row above for what actually fires.
+
+  **Historical triage, superseded:** *"An out-of-table
+  indirect call jumps to whatever is adjacent, so the harm is not
+  reproducible, and there is no equivalent of the fold-from-offset-16 trick
+  that rescued the UAF. Settle reproducibility first, the way TASK_055 had to."*
 
   > ⚠ **PROVISIONAL — manager read of the harness, not yet reviewed; rule 3
   > applies.** Read at TASK_066 time, source-only. **This row's own citation was
@@ -806,9 +815,12 @@ of these is a measurement; they are the questions each `§0` must answer first.*
   >
   > - **`check.py:1249` is not the checksum rule** — it is a selftest for
   >   `idiom_problems` ("a bare string is not a declaration"). The real rule is
-  >   **`check_checksums`, stage 2, `:1440-1476`**. A line number written against
-  >   a file that grew from ~5100 to ~5460 lines drifted, which is the ordinary
-  >   failure mode here: **cite the function, not the line.**
+  >   **`check.py::check_checksums`** (stage 2). ⚠ **This bullet originally
+  >   pointed at `:1440-1476` and THAT ROTTED TOO** — by TASK_071 those lines
+  >   were inside `idiom_lines`. A line number written against a file that has
+  >   gone 5100 → 7037 lines drifts every time: **cite the function, and only the
+  >   function.** The "line as a hint" compromise was tried at TASK_066 and
+  >   **retracted at TASK_071 after every hint rotted inside one session.**
   > - **And stage 2 runs on NON-ADVERSARIAL inputs only** (`models` vs
   >   `adv_models`). p36's harm lives on the adversarial input, which stage 2
   >   never executes — **so non-reproducible harm does not bite stage 2 at all.**

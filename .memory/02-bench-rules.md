@@ -1103,7 +1103,7 @@ newest source file.
 authoritative layer pointed at the wrong code**, and two of the five were
 duplicated into a second file, so the same wrong line had to be fixed twice.
 Every insertion above a citation moves it, and `check.py` grows every task —
-**5460 → 5884 → 6605 lines across TASK_066–071 alone.** Do not write a line
+**5460 → 5884 → 6605 → **7037** lines across TASK_066–078.** Do not write a line
 count here either; run `wc -l harness/check.py`.
 
 What was wrong, and what it should have been:
@@ -1124,7 +1124,7 @@ SESSION. The rule is now: name the FUNCTION and give NO LINE NUMBER AT ALL —
 
 TASK_066 fixed every citation in this layer to *"function name, line beside it as
 a hint"*. **By TASK_071 every one of those hints was wrong again** — `check.py`
-went 5460 → 5884 → 6605 lines in three tasks, and the re-audit found the hints
+went 5460 → 5884 → 6605 → 7037 lines in five tasks, and the re-audit found the hints
 had drifted onto *unrelated functions*: `:1440-1476`, written as
 **`check_checksums`**, now lands inside `idiom_lines`; `:4738-4739`, written as
 the stage-7 build, lands inside `check_trusted_twins`.
