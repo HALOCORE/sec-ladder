@@ -17,15 +17,34 @@ Scratch in `.temp/r84/` — free, I checked.
 
 ## §0 — what came back
 
-*(manager fills this at launch)*
+✅ **`.tasks/TASK_084_REPORT.md` now exists**; the forward citation noted here
+before launch is satisfied. **All eight deliverables done, every acceptance limb
+reported passing, sweep 45 min, 21 `PASS` + p01 `PASS-WITH-BLOCKED-ROWS`, 0
+failures, `contract_sha256` moved `[]`, `0 STALE`.** Read the report; the
+headlines you must attack:
 
-⚠ **`.tasks/TASK_084_REPORT.md`, cited above, does not exist yet — this file was
-written before the engineer returned, so the citation is deliberately forward.
-PROTOCOL rule 10 says write the report file BEFORE citing it, and the manager is
-in violation of it until launch. The report is created at the same moment §0 is
-filled**, which is before this file is handed to anyone. The rule-10 sweep will
-flag it as `MISSING` until then; that is expected and is not a second dangling
-citation to chase.
+- **D4 took route (b)**, a separate `axioms` column — **the manager's lean.**
+  §2 M2 is therefore live and is *your* job, not a formality.
+- **D5 took disclose-and-pin** (`TCB_SRC = "verus.rs"`, mirroring `R5_PAIR`)
+  **plus a footnote computed from the records every run**, and **declined a gate
+  check** under PROTOCOL rule 5. §2 M1 asks whether that closes the complaint.
+- **B3's key convention is the path RELATIVE TO THE REPO ROOT** —
+  `verus.axioms["common/driver.rs"]`. §4 asks whether it is unambiguous and
+  survives two patterns including the same file.
+- ⚠ **Two contradictions of the manager, both inside acceptance limbs, both
+  landed:** **#236** the published TCB total is **90, not 92** (92 is the
+  all-sources sum; four documents had the label wrong), and **#237** D7's edit
+  **does not** move `contract_sha256` — the `identity` row is **203 characters
+  outside the fence**, so the cost is a gate re-run. ⚠ **Re-derive both. They
+  are now in `.memory/05-layout.md` as authoritative and a wrong one there is
+  expensive.**
+- ⚠ **The engineer reports one thing it fixed that reads like a near-miss:**
+  `trait_spans` copied `impl_spans`' guard and **missed every attributed trait —
+  the entire target of B1** — caught by a probe, not by reading. **Ask what else
+  that guard shape touches.**
+- ✅ **Already closed by the manager, do not re-report:** RECAP "Owed" 23, the
+  three content-stale `results/tables/*.md` the engineer flagged as adjacent
+  (`report.py p09 p12 p27`, 9+/10−, all three now cite their record's hash).
 
 ---
 
