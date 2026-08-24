@@ -1347,3 +1347,51 @@ Verus one (`parse()` already computes each item's enclosing impl); it is queued.
 *trusted* item's `requires` leaves Verus silent (`12 verified, 0 errors`) and is
 caught by the **gate**, under `--cfg slb_twin`. A mutant battery that only reads
 Verus's exit status will score it as a no-op.
+
+## Raw-pointer arenas: carving one permission into many (p31, TASK_079 — the axis was REFUSED, the vstd facts stand)
+
+**Recorded because the probes verify and the next `raw_ptr` pattern will want
+them, not because a pattern shipped.** All from `~/tools/verus/vstd/raw_ptr.rs`
+at the pin. ✅ **The `6 verified, 0 errors` below is manager-verified** (re-ran
+`./verus_run.py` on the probe); the surrounding readings are **PROVISIONAL —
+not yet reviewed**.
+
+**`PointsToRaw::split`/`join` are axioms and nothing in the tree uses them**
+(`grep -rn '\.split(\|\.join(' patterns/*/verus.rs` → empty). They are also
+**easy**. The full arena chain —
+
+```
+allocate(CAP, 8) -> (base, PointsToRaw, Dealloc)
+expose_provenance(base) -> IsExposed
+loop { raw.split(Set::range(lo, lo+8)) -> into_typed::<u64>(addr)
+       with_exposed_provenance::<u64>(addr, exposed) -> ptr_mut_write }
+```
+
+— with a 6-conjunct loop invariant and an accumulating `Map<int, PointsTo<u64>>`
+verifies **`6 verified, 0 errors`** with **zero lemmas, zero
+`by(nonlinear_arith)`, zero set-theory lemmas**. `split`'s own
+`range.subset_of(self.dom())` and `into_typed`'s `is_range` extensional equality
+**discharge with no ghost help at all**. ⚠ **So "the tree has never split a
+permission" is a statement about the tree, not about difficulty** — the proof is
+**smaller than p27's** 15/0.
+
+⚠ **`layout_of_primitives` gives `size_of` and says NOTHING about `align_of`.**
+The one obligation that does *not* discharge is `into_typed`'s
+`start as int % align_of::<V>() as int == 0`. The fix is one line:
+
+```rust
+global layout u64 is size == 8, align == 8;
+```
+
+Five patterns already ship a `global size_of usize == 8` directive (p10, p22,
+p36, p38, p47); **only the `align ==` clause is new**, and vstd's own
+`layout.rs` comment points at the directive. **Reach for `global layout` the
+moment an alignment precondition appears** — it is not a lemma problem.
+
+⚠ **The pinned vstd has NO exec pointer-offset function at all.** `raw_ptr`'s
+exec surface is casts, read/write/ref, expose / with-exposed, and
+allocate/deallocate. So an exec bump allocator must either thread an
+**`IsExposed`** token (`expose_provenance` / `with_exposed_provenance` — **0 hits
+tree-wide**, genuinely unused) or add a project-local `external_body` offset
+wrapper at **+1 TCB**. The token threads exactly like p27's `Dealloc`, so it is
+a new **clause**, not a new **kind** — which is what refused the axis.

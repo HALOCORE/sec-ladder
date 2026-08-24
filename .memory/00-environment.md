@@ -154,6 +154,40 @@ bump; if they diverge, every same-backend claim in `results/` must be re-labelle
 `valgrind` and `clang` were the other two gaps. Both closed in TASK_001; they are
 in the installed table above. Hardware counters remain the only hard gap.
 
+## Sanitizer coverage gaps found while refusing p31 (TASK_079)
+
+**Three, all about what the gate's own stage-7 build can and cannot see.**
+Stage 7 is **`gcc -O1 -fsanitize=address,undefined`**, so gcc's sanitizer set is
+the binding one.
+
+1. ✅ **gcc DOES accept `-fsanitize=pointer-overflow` and links
+   `__ubsan_handle_pointer_overflow`** — manager-verified, `rc=0` on a compile
+   probe. The project had never checked. ⚠ **But it does not fire on the
+   arena-exhaustion spelling that clang catches**: for `p + n` with
+   `size_t n = SIZE_MAX-15`, gcc reads the offset as **signed** (a legal `-16`)
+   and stays silent, while clang reports *"addition of unsigned offset …
+   overflowed"* — and clang has it in its **default** `-fsanitize=undefined` set.
+   **PROVISIONAL — not yet reviewed** (the acceptance is verified; the miss is
+   the engineer's measurement).
+2. ⚠ **ASan's redzones destroy object adjacency, so the gate cannot observe a
+   provenance harm even in principle.** A one-past-end-of-`x`-equals-`y` shape
+   prints `notadjacent` under `-fsanitize=address` on **both** compilers — the
+   two globals are no longer neighbours. **A pattern whose harm depends on two
+   objects being adjacent has no stage-7 row available to it.**
+   **PROVISIONAL — not yet reviewed.** (gcc also needs `-static-libasan` on this
+   box or a runtime-ordering error fires first — manager-hit while verifying.)
+3. ✅ **`-fsanitize=alignment` is in BOTH compilers' default `undefined` set and
+   fires in the stage-7 shape**, naming the store and the load. Recorded because
+   the manager had assumed an alignment catcher would land **outside** the matrix
+   the way p18's four, p36's `cfi-icall` and p48's MSan did. It does not.
+   **PROVISIONAL — not yet reviewed.**
+
+⚠ **The reusable half of all three: the gate's sanitizer reach is a per-CHECK
+question, not a per-tool one, and it is gcc's set that decides.** Three patterns
+running have landed a catcher outside the matrix. **Probe the specific check in
+the stage-7 command line before designing a pattern around it** — the probe is
+one compile and one run.
+
 ## Branch and cache behaviour ARE measurable here — by simulation (TASK_026_REVIEW)
 
 **This was missed for 28 tasks and it cost real work.** The table above says "no

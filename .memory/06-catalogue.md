@@ -388,7 +388,7 @@ that is the deliverable for these rows**, not a green checkmark.
 
 | ID | Pattern | C bug class modelled | Verus difficulty | Status |
 |---|---|---|---|---|
-| p31 | bump / arena allocator | alignment, exhaustion, provenance | hard | planned |
+| p31 | **bump / arena allocator** | **provenance / alignment / exhaustion — ALL THREE REFUTED as distinguishing** | hard | ⚠ **REFUSED at TASK_079**, the sixth axis and the second refusal. The demotion below was **right in its verdict and wrong in its reason**, and the real reason is stronger: **the arena's own shape is provenance-clean in 24/24 cells** (sub-objects carved from one allocation legitimately share its provenance), **no gcc flag flips the one shape that IS exploited** — so p38's `-fstrict-aliasing`/`-fno-` control **does not exist for provenance** — and the axis table's own justification (*"the property Miri checks"*) is **false in the gate's configuration**. See the refusal block below |
 | p32 | free-list allocator | double free, corruption | research-grade | planned |
 | p33 | object pool with recycling | use-after-recycle | hard | planned |
 | p34 | reference counting | leak, premature free | hard | planned |
@@ -412,7 +412,7 @@ that is the deliverable for these rows**, not a green checkmark.
 |---|---|---|---|---|
 | p43 | checksum / CRC over untrusted length | loop bound from input | easy | planned |
 | p44 | fixed-point arithmetic | overflow, rounding | moderate | planned |
-| p45 | saturating / wrapping arithmetic helpers | signed overflow UB | easy–moderate | planned |
+| p45 | saturating / wrapping arithmetic helpers | signed overflow UB | easy–moderate | ⚠ **SCHEDULED at TASK_080 — and it is the FIRST catalogue row an AGENT argued for**, which RECAP has invited since TASK_066 with no taker. Proposed by TASK_079's engineer **with its kill-risk probe already run**, not offered as a guess. ✅ **Manager-verified before scheduling**: `guard_add(INT_MAX-1,5)` returns the defined `0` at `-O0` on both compilers and **`-2147483645` at `-O2` on both**; `-fwrapv` restores the defined answer in every flagged cell; gcc exploits `(a*2)/2 == a` at **`-O0` as well**; and the gate's own stage-7 shape (`gcc -O1 -fsanitize=address,undefined`) **fires on both sites with file:line and values**. ⚠ **The difficulty rating is about the PROOF, not the finding.** ⚠ **Named kill-risk, unmeasured: the cost may be 1–2 `Ir` (a `seto`/`jo`)** — p47's situation, and `§0` must decide it rather than assume it |
 | p46 | bignum limb add/mul (schoolbook) | carry propagation, limb bounds | hard | planned |
 | p47 | constant-time compare / select | **timing side channel.** ⚠ **The catalogue's guess -- *"compiler may reintroduce a branch"* -- is REFUTED** (T064 + T064_REVIEW: 5 accumulate spellings, gcc 13.3 and clang 22.1 at five opt levels, rustc at five, **LTO, PGO trained 100% on mismatch-at-byte-0, AVX2, AVX-512, `__builtin_expect` in three placements, a branching caller** -- `Ir(k=0) - Ir(k=n-1) = 0` **exactly**, with a detector control that fires). **The adversary is the IDIOM, not the optimiser**; the leaking rung is safe Rust's own `a == b` | moderate | **done** (T064), gate `PASS` first complete run, R5 **12/0 first run, no lemma** (twin 13/0), `R4 == R5` `exact` at O3 / `norel` at O0, **TCB 3**, Miri 7/7, additivity extrapolation **80/80 exact**, **reviewed** (T064_REVIEW: 3 majors, 6 minors, **32 clean negatives**; corrections at T065). **The proof certifies a LEAKING kernel**: `m_leak` verifies 14/0 with `kernel`'s obligation count unchanged at 3 and leaks **+7088 `Ir`**, under an **identical contract** -- a property of the TRACE is invisible to a logic about the VALUE |
 
@@ -694,7 +694,7 @@ catalogue at all** — see the `p48` row and its triage below.
 | **UB the optimiser WEAPONISES** | p18's UB is masked by hardware (`shl` truncates the count) and the program limps on. Strict-aliasing UB is the opposite: the compiler *deletes code* on the strength of it | **p38** |
 | **control-flow integrity** | every harm here is data. An out-of-table indirect call is a different harm class, and R1h has a real answer (`-fsanitize=cfi`) that no pattern has priced | **p36** |
 | **termination as the obligation** | every R5 so far proves *safety*. None proves the loop **ends** — and an open-addressing probe that never terminates is a real, shipped C bug | **p22** |
-| **provenance** | the property Miri checks and nothing else does; untested here | **p31** |
+| **provenance** | ⚠⚠ **THIS ROW'S JUSTIFICATION IS FALSE AND THE AXIS IS REFUSED (TASK_079).** It read: *"the property Miri checks and nothing else does; untested here."* **Measured in the gate's own configuration — default Stacked Borrows, no `MIRIFLAGS`** — a correct raw bump arena is Miri-**clean**; a `usize` round-trip is a **WARNING that runs to completion with the right answer**; `-Zmiri-strict-provenance` says *"unsupported operation"*, i.e. it **refuses to run rather than diagnosing**; and the only thing Miri **errors** on is **aliasing**, which is **p08's already-shipped Miri class**. **Manager-verified** (all three variants re-run). Same failure mode as the `p48` row: the axis's sole distinguishing claim does not survive a grep-plus-run | **p31 — REFUSED**, see the row and the refusal block |
 | **INITIALISATION** ⚠ *new at TASK_066* | ⚠⚠ **THIS ROW'S JUSTIFICATION IS FALSE AND THE AXIS IS REFUSED (TASK_074).** It read: *"The Verus obligation is a **new KIND** … no pattern in the tree exercises that."* **p27 exercises `is_init()` in FOUR places** — `verus.rs:267` (a conjunct of `slot_ok`, i.e. **p27's core invariant**), `:575`, `:616`, `:606` (`leak_contents`) — and calls `ptr_ref` at `:620` against **the same `~/tools/verus/vstd/raw_ptr.rs:623` precondition**, giving the same `precondition not satisfied` diagnostic. **Manager-verified.** A new **clause**, not a new **kind** | **p48 — REFUSED**, see the triage |
 
 **Recommended order after p10**, by marginal finding value rather than family:
@@ -845,11 +845,111 @@ of these is a measurement; they are the questions each `§0` must answer first.*
   ⚠ And R1h's real answer is `-fsanitize=cfi`, which needs `-flto` and is
   clang-only — a build-flag change, so **harness territory: report, do not make
   it.**
-- **p31 (provenance) — demote it.** Miri is the only checker, which is fine (it
-  is already gate stage 8), but the expected shipped-compiler behaviour is
-  *nothing observable*, which makes it **p08's shape** — a tooling-and-
-  expressiveness result the tree already has one of. Build it for provenance
-  only if a pattern is wanted whose whole finding is a tooling claim.
+- ⚠ **p31 — REFUSED at TASK_079. THE TRIAGE BELOW IS SUPERSEDED**, and it is kept
+  because **its verdict was right and every clause of its reason was wrong**,
+  which is a more instructive failure than p36's.
+
+  **Historical triage, superseded:** *"**p31 (provenance) — demote it.** Miri is
+  the only checker, which is fine (it is already gate stage 8), but the expected
+  shipped-compiler behaviour is nothing observable, which makes it **p08's
+  shape** — a tooling-and-expressiveness result the tree already has one of.
+  Build it for provenance only if a pattern is wanted whose whole finding is a
+  tooling claim."*
+
+  **Wrong in three places, each measured:** *"Miri is the only checker"* is false
+  (see the axis row — Miri **warns** and does not diagnose); *"nothing
+  observable"* is **half false** — gcc 13.3.0 at `-O2`/`-O3` **does** exploit
+  provenance, and the mechanism is exact — and the half that is true is true for
+  a reason the triage never gave; and *"p08's shape"* understates it, because
+  **p08 at least has a harm that executes** and p31's arena shape has none.
+
+  ### p31 — the refusal, in four findings
+
+  ⚠ **Two refusals in a row now share finding 1: the axis's own justification was
+  false and one `grep` plus one run settled it.** That is a pattern in the
+  *manager's* triage, not in the catalogue's rows.
+
+  1. ⚠ **`PointsToRaw::split`/`join` is a new CLAUSE, not a new KIND** — p48's
+     objection 2 verbatim, and p31 fails it identically. This was the call the
+     manager named as least certain, and the whole prover half of the pattern
+     rested on it. The **full** arena chain — `allocate` → `expose_provenance` →
+     loop{`split` → `into_typed` → `with_exposed_provenance` → `ptr_mut_write` →
+     `tracked_insert`}, with a 6-conjunct loop invariant — verifies
+     **`6 verified, 0 errors`** with **zero lemmas, zero `by(nonlinear_arith)`,
+     zero set-theory lemmas**. `split`'s own `range.subset_of(self.dom())` and
+     `into_typed`'s `is_range` discharge with **no ghost help at all**.
+     ✅ **Manager-verified** (re-ran `./verus_run.py` on the probe).
+     **p31's proof is SMALLER than p27's**, which is 15/0 over two Maps.
+     ✅ *Clean negative, and it is the honest version of the manager's sentence:*
+     the genuinely unused vocabulary is
+     **`expose_provenance` / `with_exposed_provenance` / `IsExposed`** (0 hits
+     across `patterns/`, `harness/`, `common/`), and it is **forced** — the
+     pinned vstd's `raw_ptr` has **no exec pointer-offset function at all**, so
+     an exec bump allocator either threads an `IsExposed` token or adds a
+     project-local `external_body` offset wrapper (+1 TCB). **But the token
+     threads exactly like p27's `Dealloc`.** Same answer.
+  2. ⚠ **THE CONTROL DOES NOT EXIST, and this is the finding to carry forward.**
+     gcc `-O2`/`-O3` exploits the one-past-end/representation-equal shape — a
+     load hoisted **above a store to the identical address**, confirmed in the
+     disassembly — but **15 gcc flags all leave it exploited**
+     (`-fno-tree-pta`, `-fno-ipa-pta`, `-fipa-pta`, `-fno-strict-aliasing`,
+     `-fwrapv`, `-fno-strict-overflow`, `-fno-tree-fre`, `-fno-tree-dse`,
+     `-fno-tree-vrp`, `-fno-tree-pre`, `-fno-aggressive-loop-optimizations`, …).
+     ✅ **Manager-verified on 9 of the 15.**
+     **p38 could ship because `-fstrict-aliasing`/`-fno-` makes its claim
+     falsifiable. Provenance has no such lever** — and TASK_079's task file named
+     *"the control that shows it is real is missing"* as itself a finding. It is.
+  3. **The arena's own shape is CLEAN, 24/24.** Sub-objects carved from one
+     allocation legitimately share its provenance; the exploitable shape needs
+     **two distinct top-level objects that happen to be adjacent**, which is a
+     two-static-`int` demonstration kernel and not an allocator. ✅ Manager-seen
+     in the flag sweep (s4 prints the defined answer in every configuration).
+     **So the bug class is absent from p31's own kernel.**
+  4. **Triple duplicate, confirmed, and worse than the manager's guess.**
+     *alignment* → **p18's shape with NO harm at all on x86-64** (16/16 cells
+     correct, both compilers emitting unaligned SIMD) — though ⚠ **its catcher
+     `-fsanitize=alignment` IS in-matrix**, unlike p18's four, so the manager's
+     objection was wrong in that direction too. *exhaustion* → ⚠ **not "the
+     thirteenth `index >= len`"** (the manager's armchair claim) but **p12's
+     mechanism and p04's harm**: `p12` *is* a bump allocator over a `char` array
+     whose `dlen` is a program-computed loop-carried cursor, and `p04` is
+     *"the first kernel with two live cursors, and the first whose bug stays in
+     bounds"* — p31's exhaustion harm verbatim. ✅ Manager-verified against
+     `.memory/01-ladder.md`. **p36's escape hatch does not apply**: p36 shipped
+     with a duplicate bug class because its *mechanism*, *catcher* and *prover*
+     stories were each new; p31's mechanism is p12's, its prover story is p27's
+     minus a Map, and its catcher story is finding 1 of the axis row.
+
+  ✅ **What SURVIVES, and one item is a live trap for any future pattern:**
+
+  - ⚠⚠ **BOTH gcc `-O2` AND clang `-O2` DELETE A NON-ESCAPING `malloc`/`free`
+    PAIR ENTIRELY.** Measured `2.00 Ir/object` for a malloc rung whose
+    disassembly contains **zero** `malloc`/`free` call sites; with
+    `-fno-builtin-malloc -fno-builtin-free` (2 call sites on both compilers) the
+    true figure is **140.00**, against the arena's **10.00** — a **14×** saving
+    the naive measurement reports as a **7× loss**. ✅ **Manager-verified on both
+    compilers.** **Any pattern that puts allocation in the kernel must defeat
+    that elision or its C rung measures nothing.** Full entry in
+    `.memory/03-measurement.md`; it is the p31 analogue of p48's `rep stosb`
+    trap and **cheaper to hit**.
+  - **The cost axis is real and large and is NOT a safety number.** `140 → 10` is
+    R1-against-R1: the *algorithm* changed, not the safety level. The ladder's
+    actual safe-vs-unsafe question here is **+7.00 Ir/object** (safe `Vec<u64>` +
+    index against unsafe raw bump), **one lever on each side, unsearched** — a
+    bounds check on an index, the thing the tree has measured twelve times.
+  - **gcc accepts `-fsanitize=pointer-overflow` and links
+    `__ubsan_handle_pointer_overflow`** (✅ manager-verified) — see
+    `.memory/00-environment.md` for what it then fails to catch.
+
+⚠ **THE AXIS PROGRAMME IS CLOSED, and this is the state to hand over.** The axis
+table has **seven** rows and every one is now resolved: **5 BUILT** (p27
+lifetime, p47 timing, p38 weaponised UB, p36 CFI, p22 termination) **+ 2 REFUSED
+WITH MEASUREMENTS** (p48 at TASK_074, p31 at TASK_079). ⚠ **So this table is no
+longer the thing to consult for what to build next** — it was the reason
+axis-first ordering beat family-first ordering, and that argument has now been
+spent. **Derive the count rather than trusting this paragraph:** the table rows
+are between the *"missing axis"* header and the *"Recommended order"* line, and
+`ls -d patterns/p*/` says which exist.
 
 ⚠ **This is a judgement call, not a measurement, and it is the manager's own** —
 PROTOCOL rule 3. Two honest objections to it, neither answered here: **(a)** the

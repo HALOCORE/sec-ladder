@@ -1454,6 +1454,48 @@ in this tree carries an IBT term.** It is small where the kernel is one function
 (one pad per call) and it is `O(dispatches)` wherever control leaves the kernel.
 **Name it before attributing a gcc-vs-clang gap to codegen.**
 
+### ⚠⚠ BOTH COMPILERS DELETE A NON-ESCAPING `malloc`/`free` PAIR AT `-O2` — an allocator in the kernel measures NOTHING by default
+
+(TASK_079, on the refused p31. ✅ **Manager-verified on both compilers**:
+`grep -cE 'call.*(malloc|free)'` over `-S` output is **0** for
+`/usr/bin/gcc -O2` and **0** for `~/tools/llvm/bin/clang -O2`, and **2** for each
+once `-fno-builtin-malloc -fno-builtin-free` is added.)
+
+A loop doing `p = malloc(8); *p = i; acc += *p; free(p);` — where the pointer
+never escapes — compiles to **no allocator call at all** on both compilers at
+`-O2`. Measured whole-program marginals:
+
+```
+c-malloc-free  (builtin elision live)      2.00 Ir/object   <-- ARTEFACT
+c-malloc-free  -fno-builtin-malloc/free  140.00 Ir/object   <-- the truth
+c-bump-arena                              10.00 Ir/object
+```
+
+**The naive measurement reports the arena as 7× WORSE where it is in fact 14×
+BETTER.** ⚠ **Any pattern that puts allocation in the kernel must defeat that
+elision or its C rung is measuring an empty loop.** This is the p31 analogue of
+p48's `rep stosb` mis-pricing and it is **cheaper to hit**, because it needs no
+threshold to be crossed — it fires at `-O2` on the first non-escaping allocation.
+
+⚠ **And the kernel-exclusive column REVERSES THE SIGN on the same pair** —
+the sharpest instance of the outward-dispatch rule found so far. `main` is
+**990,034 `Ir`** in the malloc rung against **1,100,035** in the bump rung, while
+the *whole program* is **8.6× dearer** in the malloc rung, because **89.75%** of
+its cost is inside libc. A `kernel_exclusive_ir` reading publishes *"the bump
+allocator is 1.00 `Ir`/object WORSE"* against a true *"130.00 BETTER"*.
+**PROVISIONAL — not yet reviewed** (the sign reversal and the 89.75% are the
+engineer's numbers; the elision above is the manager-verified half).
+Fourth instance of the rule: p13 overstated, p48 would have reported zero, p36
+**reversed a control**, and p31 would have reversed **its own headline**.
+
+⚠ **An open question this raises about a COMMITTED number, asked rather than
+asserted:** p27's closed decomposition publishes `230.07 = 109.65 kernel +
+120.42 drop glue + **0.00 allocator**`. p27's pointers are stored in a handle
+table and therefore **escape**, so the elision above should not apply — but
+nobody has checked, and `0.00` is exactly what the elision produces. **Check it
+before quoting p27's allocator term again**; the check is one `objdump | grep`
+on a committed binary.
+
 ## Hold out a LENGTH, not a MIXTURE — an out-of-sample test can be provably unable to fail
 
 (TASK_045_REVIEW, on p13. This **sharpens the section below**, which was written

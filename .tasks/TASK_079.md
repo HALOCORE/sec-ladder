@@ -324,4 +324,105 @@ defect queue is empty.
 
 ## Outcome (recorded by the manager at the task boundary)
 
-*(to be written)*
+⚠ **p31 was REFUSED — the second refusal, and the axis programme is now CLOSED:
+7 axis-table rows = 5 BUILT + 2 REFUSED WITH MEASUREMENTS.** No pattern directory
+was created; the argument and six measurement blocks are the deliverable
+(`.temp/p31pat/NOTES.md`, re-runnable via `.temp/p31pat/repro.sh`).
+**22 patterns, all green, 44 records 0 STALE — unchanged, by design.**
+
+⚠ **The demotion this task was sent to test was RIGHT IN ITS VERDICT AND WRONG IN
+EVERY CLAUSE OF ITS REASON**, which is the outcome neither branch of the task file
+anticipated. It said *"Miri is the only checker"* (false), *"nothing observable"*
+(**half false** — gcc `-O2`/`-O3` does exploit provenance), and *"p08's shape"*
+(an understatement — p08 at least has a harm that executes; p31's arena shape has
+none). **The real reason is stronger than the stated one**, and it is finding 2
+below.
+
+**The four findings that killed it**, three **manager-verified before landing**
+because they contradict text the manager wrote:
+
+1. ✅ **`PointsToRaw::split`/`join` is a new CLAUSE, not a new KIND** — p48's
+   objection 2 verbatim. **This was the call the manager named as least certain
+   and the whole prover half of the pattern rested on it.** The full arena chain
+   verifies **6/0 with zero lemmas**; the `subset_of` and `is_range` obligations
+   discharge with no ghost help; the only failure is an alignment precondition
+   fixed by a one-line `global layout` directive **five patterns already ship**.
+   **p31's proof is smaller than p27's.** ✅ Manager re-ran `./verus_run.py`.
+2. ✅ **THE CONTROL DOES NOT EXIST — and this is the finding to carry forward.**
+   gcc exploits the one-past-end shape at `-O2`/`-O3` (a load hoisted above a
+   store to the **identical address**), and **15 gcc flags all leave it
+   exploited** — including `-fno-tree-pta`, `-fipa-pta` and
+   `-fno-strict-aliasing`. ✅ **Manager-verified on 9 of the 15.** p38 could ship
+   because `-fstrict-aliasing`/`-fno-` makes its claim falsifiable; **provenance
+   has no such lever**, and this task file named that outcome as itself a
+   finding. It is. ⚠ **And the arena's own shape is clean 24/24** — sub-objects
+   carved from one allocation legitimately share its provenance — so the bug
+   class is **absent from p31's own kernel**.
+3. ✅ **The axis table's justification is false in the gate's configuration.**
+   Default Stacked Borrows, which is what `check_miri` runs: a correct raw bump
+   is **clean**; a `usize` round-trip is a **warning that runs to completion with
+   the right answer**; `-Zmiri-strict-provenance` **refuses to run** rather than
+   diagnosing; the only Miri **error** is **aliasing**, i.e. p08's shipped class.
+   ✅ Manager re-ran all three variants.
+4. **Triple duplicate, worse than the manager's guess.** *alignment* → p18's
+   shape **with no harm at all** (16/16 correct, unaligned SIMD) and ⚠ **its
+   catcher is IN the matrix**, which the manager had assumed it would not be;
+   *exhaustion* → ⚠ **not "the thirteenth `index >= len`"** but **p12's mechanism
+   and p04's harm**, both already published with fitted laws. ✅ Manager-verified
+   against `.memory/01-ladder.md`.
+
+**Four manager decisions taken:**
+
+1. ⚠ **The refusal is ACCEPTED without a review task**, on TASK_074's precedent
+   and for TASK_074's reason: the deliverable **refuses the manager**, so rule
+   3's designer-validates-own-design hazard runs the right way, and the
+   decision's cost is *not spending three tasks*. **The claims that overturn
+   manager-written text were manager-verified instead** — six of them, listed
+   above and in the `.memory/` entries. **The remaining findings are marked
+   PROVISIONAL** per rule 9 and are named in `TASK_080`'s reading list for
+   attack.
+2. ⚠ **The p45 recommendation is TAKEN, and the reason is the DIFFERENCE from
+   TASK_074's option (c).** That one was offered *"third and labelled
+   unmeasured"*, and the manager declined to schedule on it. **This one arrived
+   with its kill-risk probe already run** — 24 cells, both compilers, the control
+   flipping every flagged cell. ✅ **Manager-verified before scheduling**:
+   `guard_add(INT_MAX-1,5)` is `0` at `-O0` and **`-2147483645` at `-O2` on both
+   compilers**, `-fwrapv` restores the defined answer everywhere, gcc exploits
+   `(a*2)/2 == a` at `-O0` too, and **the gate's own stage-7 command line fires
+   on both sites with file:line and values**. **A recommendation with a
+   measurement behind it is schedulable; one without is not.** That distinction
+   is now twice-demonstrated.
+3. ⚠ **`p45` IS THE FIRST CATALOGUE ROW AN AGENT HAS ARGUED FOR.** RECAP has
+   invited push-back on the manager's slate since TASK_066 and until now `p48`'s
+   refusal was the only taker. **Recorded in the catalogue row itself**, because
+   the invitation is worthless if nobody can see it was ever accepted.
+4. **The elision finding is landed as MEASUREMENT knowledge, not as p31 debris.**
+   *Both compilers delete a non-escaping `malloc`/`free` pair at `-O2`* is a trap
+   for any future pattern with allocation in the kernel, and it raises a **named
+   open question about a committed number** — p27's `0.00 allocator` term is
+   exactly what the elision produces. **Asked, not asserted**
+   (`.memory/03-measurement.md`); p27's pointers escape into a handle table, so
+   the expected answer is that it is genuine. The check is one `objdump | grep`.
+
+⚠ **PROTOCOL rule 2's running count is 208:** 203 at TASK_079's writing, **+5** —
+`split`/`join` being a clause not a kind (the named least-sure call), the
+*"arena's own cursor"* distinction being one without a mechanism, the axis
+table's Miri justification being false, *"nothing observable"* being half false
+in the direction that makes the demotion's stated reason wrong, and the alignment
+sub-case's catcher being **inside** the matrix where the manager put it outside.
+**Carry 208 forward.**
+
+**The single most useful thing in this block.** ⚠ **BOTH refusals died on the
+same finding: the axis's own distinguishing justification was FALSE, and one
+`grep` plus one run settled it each time.** p48's was *"no pattern exercises
+`is_init`"* (p27 exercises it in four places); p31's was *"the property Miri
+checks and nothing else does"* (Miri warns, and errors only on aliasing).
+**That is a defect in the MANAGER'S TRIAGE, not in the catalogue's rows** — both
+justifications were written from source reads and `vstd` greps with nothing run,
+and both were flagged PROVISIONAL under rule 3 at the time and then scheduled
+anyway. **Two proposals, two refusals, one cause.** The rule that follows is
+cheap and specific: ⚠ **a proposed axis's novelty claim must be RUN before the
+row is written, not before the task is scheduled** — the run is one probe, and
+it would have cost two tasks less than the two refusals did. **The refusals were
+still the right outcome and both left reusable measurements behind; the cheaper
+outcome was not proposing them.**
