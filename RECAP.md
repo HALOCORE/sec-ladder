@@ -2327,9 +2327,24 @@ Both retired.
     which said p11's `bulk_calls` are populated today. Reported by two agents,
     fixed by neither — it is `harness/` work.
 
-23. **Three `results/tables/*.md` are CONTENT-stale and cost nothing to fix**
+23. ✅ **CLOSED at TASK_084 — the manager regenerated all three, and the fix
+    was exactly the one command this item named.** `harness/report.py p09 p12
+    p27` (run separately), diff **9+/10−** across the three files, and all three
+    now cite their record's `contract_sha256` — verified by reading each
+    `results/gate/*.json` back and checking the hash appears in the table
+    (`c391270c673f`, `809c0d6041f5`, `397de62b01ea`, all **True**). No gate run,
+    no re-measure, no `contract_sha256` moved. ⚠ **The item had drifted by ONE
+    ANYWAY**: it said p12 was stale only on audit counts, but p12's cited
+    contract hash moved too. **Re-derive before trusting a stale-list.**
+    ⚠ **And nothing will detect the NEXT three**: `results/tables/` is still in
+    no hash set, so `--check-stale` remains blind to it. **This item will
+    recur.**
+
+    *Original text kept below.*
+
+    **Three `results/tables/*.md` are CONTENT-stale and cost nothing to fix**
     (TASK_078, flagged by the engineer and deliberately not done — not that
-    task's patterns). **p09, p12 and p27**: p09/p27 cite a **superseded
+    task's patterns), **re-measured at 3 of 22 by TASK_084**. **p09, p12 and p27**: p09/p27 cite a **superseded
     `contract_sha256`**, and p12/p27 publish **pre-TASK_069 audit counts** —
     p27's still shows RECAP "Owed" 10's *pre*-correction numbers
     (`required pins nothing 3` where its record says 4, missing the

@@ -79,14 +79,15 @@ Every delta below is a difference between rungs that are meant to be spellings o
 
 Measured by the gate, not by this file — from `results/gate/p12-strcat-fixed.json`, contract `809c0d6041f5`.
 
-`41` backticked spelling(s) over `6` rung(s) → **124** (spelling, rung) pair(s), **84** present — not the product, because a per-language entry is read against its own language's rungs only. Matching is `check.spelling_matches`: comments, string literals and Verus ghost clauses blanked, then all whitespace deleted.
+`41` backticked spelling(s) over `6` rung(s) → **124** (spelling, rung) pair(s), **83** present — not the product, because a per-language entry is read against its own language's rungs only. Matching is `check.spelling_matches`: comments, string literals and Verus ghost clauses blanked, then all whitespace deleted.
 
 - **FORBIDDEN — 0 hit(s)** of 12 spelling(s). *Decidable*: no rung may spell a forbidden token, in any language the entry names, so this number needs no reading of the entry's English. It is the only number here that a non-zero makes wrong.
-- **required — 0 spelling(s) pin nothing**, 4 scoped-absent pair(s). *Not decidable*, and **a non-zero here is normal**: a `required` entry may quote a span in order to say it is absent, may quote a file name or a digest, and may scope itself to some rungs in prose ("R1 omits only …"). Read each line against the entry above it.
+- **required — 0 spelling(s) pin nothing**, 5 scoped-absent pair(s). *Not decidable*, and **a non-zero here is normal**: a `required` entry may quote a span in order to say it is absent, may quote a file name or a digest, and may scope itself to some rungs in prose ("R1 omits only …"). Read each line against the entry above it.
   - absent — `if (dlen + slen <= DST_CAP) {` (required[1], c, **c/kernel.c**)
   - absent — `dst[dlen] = b;` (required[3], rust, **safe_tuned.rs**)
   - absent — `dst[dlen] = b;` (required[3], rust, **unsafe.rs**)
   - absent — `dst[dlen] = b;` (required[3], rust, **verus.rs**)
+  - absent — `.wrapping_add(nstr as u64)` (required[12], rust, **verus.rs**)
 - **no rung — 0 per-language entry/entries** name a language this pattern ships no rung for; rungs here are `c`, `rust`. Such a key used to be dropped silently, so the declaration read as constraining rungs that do not exist.
 
 

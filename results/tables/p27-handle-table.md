@@ -80,13 +80,14 @@ Every delta below is a difference between rungs that are meant to be spellings o
 
 ### Spelling audit (stage `0b`, reporting only)
 
-Measured by the gate, not by this file — from `results/gate/p27-handle-table.json`, contract `01e2137f9a1b`.
+Measured by the gate, not by this file — from `results/gate/p27-handle-table.json`, contract `397de62b01ea`.
 
-`60` backticked spelling(s) over `6` rung(s) → **188** (spelling, rung) pair(s), **86** present — not the product, because a per-language entry is read against its own language's rungs only. Matching is `check.spelling_matches`: comments, string literals and Verus ghost clauses blanked, then all whitespace deleted.
+`60` backticked spelling(s) over `6` rung(s) → **188** (spelling, rung) pair(s), **85** present — not the product, because a per-language entry is read against its own language's rungs only. Matching is `check.spelling_matches`: comments, string literals and Verus ghost clauses blanked, then all whitespace deleted.
 
 - **FORBIDDEN — 0 hit(s)** of 18 spelling(s). *Decidable*: no rung may spell a forbidden token, in any language the entry names, so this number needs no reading of the entry's English. It is the only number here that a non-zero makes wrong.
-- **required — 3 spelling(s) pin nothing**, 36 scoped-absent pair(s). *Not decidable*, and **a non-zero here is normal**: a `required` entry may quote a span in order to say it is absent, may quote a file name or a digest, and may scope itself to some rungs in prose ("R1 omits only …"). Read each line against the entry above it.
+- **required — 4 spelling(s) pin nothing**, 33 scoped-absent pair(s). *Not decidable*, and **a non-zero here is normal**: a `required` entry may quote a span in order to say it is absent, may quote a file name or a digest, and may scope itself to some rungs in prose ("R1 omits only …"). Read each line against the entry above it.
   - pins nothing — `vstd::raw_ptr::deallocate` (required[2], rust, 0 of 4 rungs)
+  - pins nothing — `deallocate` (required[2], rust, 0 of 4 rungs)
   - pins nothing — `malloc` (required[3], rust, 0 of 4 rungs)
   - pins nothing — `align <= 8` (required[3], rust, 0 of 4 rungs)
   - absent — `if (h < ntab) {` (required[0], c, **c/kernel_hardened.c**)
@@ -114,9 +115,6 @@ Measured by the gate, not by this file — from `results/gate/p27-handle-table.j
   - absent — `tab[h].take()` (required[1], rust, **verus.rs**)
   - absent — `std::alloc::dealloc(p, layout);` (required[2], rust, **safe_naive.rs**)
   - absent — `std::alloc::dealloc(p, layout);` (required[2], rust, **safe_tuned.rs**)
-  - absent — `deallocate` (required[2], rust, **safe_naive.rs**)
-  - absent — `deallocate` (required[2], rust, **safe_tuned.rs**)
-  - absent — `deallocate` (required[2], rust, **unsafe.rs**)
   - absent — `Option<Box<u8>>` (required[2], rust, **unsafe.rs**)
   - absent — `Option<Box<u8>>` (required[2], rust, **verus.rs**)
   - absent — `std::alloc::alloc(layout)` (required[3], rust, **safe_naive.rs**)
