@@ -411,6 +411,83 @@ def impl_spans(text, code=None):
     return out
 
 
+def trait_spans(text, code=None):
+    """[(name, [attr, ...], body_start, body_end)] for every `trait NAME { ... }`.
+
+    Exists for one reason: **`#[verifier::external_trait_specification]` sits on
+    the `trait`, and every method it introduces is body-less**, so neither
+    `parse()` (which drops body-less items, on purpose --
+    `.memory/05-layout.md`) nor `parse()`'s own attribute walk (which only ever
+    looks at `fn` items) can see that those declarations are trusted. The
+    discriminator `axiom_decls` needs is the ENCLOSING item's attribute, and
+    this is what computes it.
+
+    ⚠ It must distinguish an external-trait declaration from an **ordinary**
+    trait method declaration, which is body-less too and is *not* trusted -- it
+    is proved by its impl, and `patterns/p36-vtable-dispatch/verus.rs` ships two
+    of them (`fn apply`, `spec fn spec_apply`). p36 is the live negative control
+    for that, and `_selftest` pins both directions.
+
+    A `trait ... ;` (no body) and a trait whose generics this cannot read are
+    simply not reported; `axiom_decls` has a fallback that still counts an
+    unattached attribute, so an unreadable trait cannot make one invisible."""
+    code = code if code is not None else blank_noncode(text)
+    attr_end = {e: (s, e) for s, e in attribute_spans(code)}
+    out = []
+    for m in re.finditer(r"\btrait\s+(" + _IDENT + r")", code):
+        pre = code[:m.start()].rstrip()
+        # `impl Trait for X`, `dyn Trait`, `T: Trait` -- only an item-position
+        # `trait` opens a declaration. Step back over `pub`/`unsafe`/... first.
+        start = m.start()
+        while True:
+            p = code[:start].rstrip()
+            w = re.search(r"(" + _IDENT + r")$", p)
+            if not w or w.group(1) not in _MODIFIERS:
+                break
+            start = w.start()
+        pre = code[:start].rstrip()
+        # ⚠ `]` MUST be in this set. `impl_spans`' identical guard omits it and
+        # that is its documented LIMIT 2 (an attributed `impl` is not reported);
+        # here the whole point is an **attributed** trait -- the external-trait
+        # form is `#[verifier::external_trait_specification] pub trait X` -- so
+        # a guard that stops at the attribute's `]` reports nothing at all. It
+        # costs nothing to allow: `trait` is a reserved keyword and cannot
+        # appear anywhere but item position (`impl Trait`/`dyn Trait` capitalise
+        # the *name*, not the keyword).
+        if pre and pre[-1] not in "{};]":
+            continue
+        j, body = m.end(), None
+        try:
+            while j < len(code):
+                if code.startswith("->", j) or code.startswith("=>", j):
+                    j += 2
+                    continue
+                c = code[j]
+                if c == "<":
+                    j = _match_angle(code, j)
+                    continue
+                if c in "([":
+                    j = _match_bracket(code, j)
+                    continue
+                if c == "{":
+                    body = j
+                    break
+                if c == ";":
+                    break                  # a trait alias / forward decl
+                j += 1
+        except ValueError:
+            continue
+        if body is None:
+            continue
+        try:
+            end = _match_bracket(code, body)
+        except ValueError:
+            continue
+        attrs, _ = _attrs_before(code, text, start, attr_end)
+        out.append((m.group(1), attrs, body + 1, end - 1))
+    return out
+
+
 def parse(text):
     """Every `fn`-like item in `text`, in source order.
 
@@ -474,6 +551,28 @@ def parse(text):
             if re.search(r"\bexternal_body\b", a):
                 ext = "verifier::external_body"
                 break
+            # ⚠ `\bverifier::external\b` DOES NOT MATCH `verifier::external_fn_
+            # specification` -- the next character is `_`, a word character, so
+            # there is no word boundary (TASK_083_REVIEW blocker 2). The item
+            # therefore came back `external=None` and in `spec.md`'s
+            # `verus.items` pin was **indistinguishable from an ordinary
+            # verified function**, while its `ensures` is a hand-written claim
+            # about real Rust semantics that Verus never checks:
+            # `.temp/t84/probe/p_extfn.rs` verifies `r == 0` at `2 verified, 0
+            # errors` and the compiled program prints `3`.
+            #
+            # This form is NOT body-less -- measured, not assumed: strip the
+            # body and the pinned Verus refuses it twice over, `error[E0308]:
+            # ... implicitly returns () as its body has no tail` and
+            # `error: assume_specification encoding error: body should end in
+            # call expression`. So `parse()` does see the item and the only
+            # defect was the classification; `axiom_decls` handles the
+            # body-less forms and the two matchers stay disjoint.
+            m_es = re.search(r"\bverifier::(external_(?:fn|trait|type)"
+                             r"_specification)\b", a)
+            if m_es:
+                ext = "verifier::" + m_es.group(1)
+                break
             if re.search(r"\bverifier::external\b", a):
                 ext = "verifier::external"
                 break
@@ -507,7 +606,7 @@ def parse(text):
 # body-less TRUSTED declarations -- what `parse()` structurally cannot report
 # --------------------------------------------------------------------------
 
-#: The three body-less forms Verus offers for asserting something about code it
+#: The body-less forms Verus offers for asserting something about code it
 #: does not verify. `axiom fn` covers `broadcast axiom fn` and `pub axiom fn`;
 #: `uninterp spec fn` covers the `open`/`closed` spellings.
 _AXIOM_RE = (
@@ -517,6 +616,13 @@ _AXIOM_RE = (
                 + _IDENT + r")")),
 )
 _ASSUME_SPEC_RE = re.compile(r"\bassume_specification\b")
+#: `#[verifier::external_trait_specification]` sits on a `trait` and
+#: `#[verifier::external_type_specification]` on a `struct`/`enum`/`union`, so
+#: neither is reachable from `parse()`'s `fn`-keyed attribute walk.
+_EXT_TRAIT_ATTR_RE = re.compile(r"\bexternal_trait_specification\b")
+_EXT_TYPE_ATTR_RE = re.compile(r"\bexternal_type_specification\b")
+_TYPE_ITEM_RE = re.compile(r"\b(?:struct|enum|union)\s+(" + _IDENT + r")")
+_FN_NAME_RE = re.compile(r"\bfn\s+(" + _IDENT + r")")
 
 
 def axiom_decls(text, code=None):
@@ -555,7 +661,46 @@ def axiom_decls(text, code=None):
 
     Comments and string literals are blanked first, so
     `patterns/p08-overlap-move/verus.rs:322` -- which *discusses*
-    `assume_specification` in a comment -- is correctly not a hit."""
+    `assume_specification` in a comment -- is correctly not a hit.
+
+    ---- TASK_084, from TASK_083_REVIEW blocker 1 -------------------------
+
+    **`#[verifier::external_trait_specification]` is a fourth body-less form,
+    it is in the pinned vstd 54 times, and until now no file in `harness/`
+    mentioned it.** The attribute sits on the **`trait`**, not on a `fn`, so
+    `parse()`'s attribute walk -- which only ever looks at `fn` items -- could
+    not reach it, and the method declarations it introduces are body-less and
+    dropped. Re-measured at TASK_084 on `.temp/t84/probe/p_ets.rs`: Verus
+    reports `2 verified, 0 errors` proving `r == 0`, and the compiled program
+    prints **7**.
+
+    ⚠ **The discriminator is the ENCLOSING trait's attribute, and it has to be,
+    because the shape is identical to p36's.** An ordinary trait's method
+    declarations are body-less too and are *not* trusted -- they are proved by
+    the impl. `trait_spans()` computes the enclosing attribute; the selftest
+    pins both directions, and `p36-vtable-dispatch` is the live negative
+    control (its four rung sources declare `fn apply` / `spec fn spec_apply` in
+    a trait with no `external_*` attribute anywhere).
+
+    **`#[verifier::external_type_specification]` is counted too**, one per
+    declared item. On its own it cannot lie -- it carries no `ensures` -- but it
+    is the *enabling* declaration for the trait form, and it is the exact line
+    **Verus prints for you to paste** when it refuses an external type
+    (*"The following declaration may resolve this error:"*), which is the same
+    accident vector as `assume_specification`'s. Over-counting is the safe
+    direction for a mechanism whose job is visibility.
+
+    **`#[verifier::external_fn_specification]` is deliberately NOT here.** It
+    is not body-less -- Verus rejects it without one, twice over
+    (`error[E0308] ... implicitly returns ()` and `error: assume_specification
+    encoding error: body should end in call expression`, measured at TASK_084)
+    -- so `parse()` does see it, and it is classified there instead, by the
+    attribute matcher this task also fixed. The rule that keeps the two
+    matchers disjoint is exactly **body-less here, bodied there**.
+
+    An attribute this cannot attach to a readable item is still counted, with
+    `name='?'`, so an unparseable trait cannot make a trusted declaration
+    invisible."""
     code = code if code is not None else blank_noncode(text)
     vs = verus_span(text, code)
     out = []
@@ -587,7 +732,72 @@ def axiom_decls(text, code=None):
             name = "?"          # unreadable target: still an axiom, still counted
         add("assume_specification", name, m.start())
 
-    out.sort(key=lambda d: d["line"])
+    # --- `#[verifier::external_trait_specification]` -----------------------
+    # One axiom per body-less method declaration inside the trait: each carries
+    # a hand-written `ensures` about a trait method Verus never checks. The
+    # attribute is matched on the ENCLOSING trait, which is the only thing that
+    # separates this from an ordinary (verified-by-its-impl) trait method decl.
+    traits = trait_spans(text, code)
+    ext_traits = {}
+    for tname, tattrs, bs, be in traits:
+        if not any(_EXT_TRAIT_ATTR_RE.search(a) for a in tattrs):
+            continue
+        ext_traits.setdefault(tname, []).append(bs)
+        n_here, j = 0, bs
+        while True:
+            m = _FN_NAME_RE.search(code, j, be)
+            if not m:
+                break
+            k, depth, bodied = m.end(), 0, None
+            while k < be:
+                c = code[k]
+                if c in "([":
+                    depth += 1
+                elif c in ")]":
+                    depth -= 1
+                elif c == "{" and depth == 0:
+                    bodied = k
+                    break
+                elif c == ";" and depth == 0:
+                    break
+                k += 1
+            if bodied is None:                      # body-less -> an axiom
+                add("external_trait_specification",
+                    f"{tname}::{m.group(1)}", m.start())
+                n_here += 1
+                j = k + 1
+            else:                                   # a default body: skip it
+                try:
+                    j = _match_bracket(code, bodied)
+                except ValueError:
+                    j = bodied + 1
+        if not n_here:
+            # An external-trait declaration with no method declarations still
+            # tells Verus to trust a trait it never checks. Never let the
+            # construct be invisible.
+            add("external_trait_specification", tname, bs)
+
+    # ...and the fallback: an attribute whose `trait` this could not read at
+    # all. Located by looking FORWARD for the `trait NAME` the attribute must
+    # precede, then asking whether `trait_spans` reported a body for it.
+    for s, e in attribute_spans(code):
+        if not _EXT_TRAIT_ATTR_RE.search(text[s:e]):
+            continue
+        m = re.compile(r"\btrait\s+(" + _IDENT + r")").search(
+            code, e, min(len(code), e + 400))
+        if m is None:
+            add("external_trait_specification", "?", s)
+        elif not any(bs > e for bs in ext_traits.get(m.group(1), [])):
+            add("external_trait_specification", m.group(1) + "::?", s)
+
+    # --- `#[verifier::external_type_specification]` ------------------------
+    for s, e in attribute_spans(code):
+        if not _EXT_TYPE_ATTR_RE.search(text[s:e]):
+            continue
+        m = _TYPE_ITEM_RE.search(code, e, min(len(code), e + 400))
+        add("external_type_specification", m.group(1) if m else "?", s)
+
+    out.sort(key=lambda d: (d["line"], d["kind"], d["name"]))
     return out
 
 
@@ -1711,6 +1921,69 @@ impl Op for u8 { spec fn spec_apply(&self) -> u64 { 0 }
          sorted(by_name(trait_dup)), ["apply", "spec_apply"])
     want("...and they are not counted as axioms either",
          axiom_decls(trait_dup), [])
+
+    # --- TASK_084: the two `*_specification` attributes -------------------
+    # TASK_083_REVIEW blockers 1 and 2. Both are trusted declarations about
+    # code Verus never checks; neither was visible to anything in `harness/`,
+    # and `external_trait_specification` is in the pinned vstd 54 times.
+    #
+    # ⚠ The pair of pins that matters most is the NEGATIVE one directly above
+    # (`trait_dup`) against the positive one here: the two shapes differ ONLY
+    # by the attribute on the enclosing trait, and p36 ships the negative in
+    # four rung sources.
+    extspec = '''use vstd::prelude::*;
+pub trait Widget { fn width(&self) -> usize; }
+pub struct W;
+impl Widget for W { fn width(&self) -> usize { 7 } }
+verus! {
+#[verifier::external_type_specification]
+pub struct ExW(crate::W);
+
+#[verifier::external_trait_specification]
+pub trait ExWidget {
+    type ExternalTraitSpecificationFor: Widget;
+    fn width(&self) -> (r: usize) ensures r == 0, ;
+    fn height(&self) -> (r: usize) ensures r == 0, ;
+    fn area(&self) -> (r: usize) { 0 }          // a DEFAULT body: not body-less
+}
+
+#[verifier::external_fn_specification]
+pub fn ex_count_ones(x: u64) -> (r: u32) ensures r == 0, { x.count_ones() }
+}
+'''
+    want("external_trait_specification: one axiom per BODY-LESS method decl",
+         [(d["kind"], d["name"]) for d in axiom_decls(extspec)],
+         [("external_type_specification", "ExW"),
+          ("external_trait_specification", "ExWidget::width"),
+          ("external_trait_specification", "ExWidget::height")])
+    want("...a DEFAULT body inside an external trait is not counted",
+         [d for d in axiom_decls(extspec) if d["name"].endswith("::area")], [])
+    want("...and the trait's methods are still not `parse()` items",
+         sorted(set(i.name for i in parse(extspec))
+                & {"width", "height"}), ["width"])   # only the plain-Rust impl
+    want("trait_spans reports the enclosing attribute (the discriminator)",
+         [(n, a) for n, a, _, _ in trait_spans(extspec)],
+         [("Widget", []),
+          ("ExWidget", ["#[verifier::external_trait_specification]"])])
+    want("external_fn_specification is BODIED, so it is classified in parse()",
+         [(i.name, i.external) for i in parse(extspec) if i.external],
+         [("ex_count_ones", "verifier::external_fn_specification")])
+    want("...and is therefore NOT double-counted as an axiom",
+         [d for d in axiom_decls(extspec) if d["name"] == "ex_count_ones"], [])
+    want("a bare `#[verifier::external]` still classifies as before",
+         [(i.name, i.external) for i in
+          parse("verus!{ #[verifier::external] fn z() {} }")],
+         [("z", "verifier::external")])
+    # An attribute whose trait this cannot read must still be VISIBLE.
+    unreadable = ('verus! {\n'
+                  '#[verifier::external_trait_specification]\n'
+                  'pub trait Broken<F: Fn(u8) -> u8 {\n'
+                  '    fn go(&self) -> (r: u8) ensures r == 0, ;\n'
+                  '}\n'
+                  '}\n')
+    want("an unparseable external trait is still counted, as `?`",
+         [(d["kind"], d["name"]) for d in axiom_decls(unreadable)],
+         [("external_trait_specification", "Broken::?")])
 
     print("vparse selftest:", "PASS" if bad == 0 else f"FAIL ({bad})")
     return 0 if bad == 0 else 1

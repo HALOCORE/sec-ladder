@@ -3538,12 +3538,46 @@ def _check_axiom_decls(rep, src, txt, vcfg):
     ⚠ **These are deliberately NOT fed to `_is_trusted`.** 5c-twin would then
     demand a verified twin of an item that has no body to twin, which turns a
     legitimate declaration into an unpassable gate -- exactly the shape
-    `MAX_TWIN_JUSTIFICATIONS` was deleted for. Visibility, not prohibition."""
+    `MAX_TWIN_JUSTIFICATIONS` was deleted for. Visibility, not prohibition.
+
+    ---- TASK_084 --------------------------------------------------------
+
+    Two more forms and one more FILE SET, all from TASK_083_REVIEW:
+
+      * `#[verifier::external_trait_specification]` (blocker 1) and
+        `#[verifier::external_type_specification]` -- the attribute sits on a
+        `trait`/`struct`, so `vparse.parse()`'s `fn`-keyed attribute walk could
+        not reach it and its method declarations are body-less. 54 uses in the
+        pinned vstd. `vparse.axiom_decls` matches them now.
+      * `#[verifier::external_fn_specification]` (blocker 2) is **bodied**, so
+        it is classified by `vparse.parse()` instead and lands in the `tcb`
+        inventory above; it is not double-counted here.
+      * ⚠ **`src` MAY NOW BE A FILE OUTSIDE THE PATTERN DIRECTORY** (blocker
+        3). `os.listdir` is flat and `_check_axiom_decls` used to run only over
+        `verus.obligations`, so an axiom in a `#[path]`-included module was
+        invisible -- and every pattern's `verus.rs` `#[path]`-includes
+        `common/driver.rs`, which makes it the one vector here whose blast
+        radius is all 22 patterns from a single edit.
+
+    **The key convention for a file outside `pdir`, because `verus.axioms` is
+    otherwise keyed by a `verus.obligations` source NAME:** the path
+    **relative to the repository root**, e.g.
+
+        verus.axioms["common/driver.rs"] = 1
+
+    Chosen over a `pdir`-relative `"../../common/driver.rs"` because that has
+    many spellings that normalise to one file (`../..//common/driver.rs`,
+    `./../../common/driver.rs`) and because it moves if the pattern dir does. A
+    repo-relative key has exactly one spelling -- `os.path.relpath(p, REPO)`,
+    which is what `_scan_unsafe_sites` already prints -- and it cannot collide
+    with a `verus.obligations` key, since those are bare file names with no
+    `/`. The gate prints the exact key in its failure message either way."""
     axioms = vparse.axiom_decls(txt)
     want = (vcfg.get("axioms") or {}).get(src, 0)
     want_n = len(want) if isinstance(want, (list, tuple)) else int(want)
     print(f"    {src}: body-less trusted declarations "
-          f"(`assume_specification` / `axiom fn` / `uninterp spec fn`): "
+          f"(`assume_specification` / `axiom fn` / `uninterp spec fn` / "
+          f"`external_trait_specification` / `external_type_specification`): "
           f"{len(axioms)} (spec.md declares {want_n})")
     for d in axioms:
         print(f"       {d['kind']:22s} {d['name']:36s} (line {d['line']}, "
@@ -3743,6 +3777,28 @@ def check_verus_contract(pdir, rep, contract):
                   f"({i.body_lines} body lines, line {i.line}, "
                   f"requires={_clauses(i, 'requires') or '[]'})")
         _check_trusted_unsafe(rep, src, tcb, justif.get(src) or {})
+        # TASK_084 / TASK_083_REVIEW blocker 2. An
+        # `#[verifier::external_fn_specification]` now reaches the inventory
+        # above (`vparse.parse` recognises the attribute), which is what makes
+        # the `verus.items` pin able to tell it from an ordinary verified
+        # function and what moves the published TCB column. But it is NOT
+        # `_is_trusted` -- there is no checked stand-in for a std function, so
+        # demanding a twin would make a legal declaration unpassable -- and so
+        # `_check_trusted_unsafe` above says nothing about it. Without this
+        # line the loudest of the four routes would be the only one with no
+        # sentence in the verdict.
+        for i in tcb:
+            if not (i.external or "").endswith("_specification"):
+                continue
+            rep.shout("tcb-axiom",
+                      f"{src}:{i.line} `{i.name}` is {i.external} -- its "
+                      f"`ensures` {_clauses(i, 'ensures') or '[]'} is a "
+                      f"HAND-WRITTEN claim about a function Verus never "
+                      f"compiles, and Verus's own error message for a "
+                      f"malformed one calls it an `assume_specification`. It "
+                      f"is in the TCB inventory above and must be in this "
+                      f"pattern's NOTES.md TCB tally with the argument for "
+                      f"why the clause matches real Rust semantics.")
         print(f"    {src}: items the trusted-item rules govern (`_is_trusted`: "
               f"external_body + an `ensures`, or `unsafe` in the body): "
               f"{sorted(i.name for i in item_list if _is_trusted(i))}")
@@ -3796,6 +3852,34 @@ def check_verus_contract(pdir, rep, contract):
             rep.ok(f"{src}: {n_ver} verified, 0 errors -- matches the pinned "
                    f"obligation count; {len(tcb)} TCB items, all contracts "
                    f"identical to spec.md")
+
+    # --- and the files the rungs `#[path]`-include, which are NOT in pdir ---
+    #
+    # TASK_083_REVIEW blocker 3. `os.listdir(pdir)` above is FLAT and the loop
+    # that just ended runs only over `verus.obligations`, so an axiom one
+    # directory down -- or in the shared `common/driver.rs` that every pattern's
+    # `verus.rs` `#[path]`-includes -- was invisible to the stage built for it.
+    # Demonstrated at `.temp/t84/probe/p_hidden.rs`: an `assume_specification`
+    # in `macro/ax_mod.rs` proves `x.count_ones() == 0` at `2 verified, 0
+    # errors` while the program prints `3`, and `axiom_decls` on the top file
+    # returns `[]`.
+    #
+    # `_scan_unsafe_sites` already walks exactly this file list for exactly this
+    # threat (`_path_includes`); the two stages had the same threat and
+    # different file lists. This is that walk, and the key convention for
+    # declaring one of these is in `_check_axiom_decls`' docstring: the path
+    # relative to the REPO root.
+    included = _path_includes(
+        pdir, sorted(pinned_obl) + sorted(f for f in os.listdir(pdir)
+                                          if f.endswith(".rs")))
+    if included:
+        print(f"    scanned for hand-written axioms in `#[path]`-included "
+              f"files: {[os.path.relpath(p, REPO) for p in included]}")
+    for p in included:
+        rel = os.path.relpath(p, REPO)
+        ax = _check_axiom_decls(rep, rel, open(p).read(), vcfg)
+        if ax:
+            out[rel] = {"path_included": True, "axiom_decls": ax}
     return out
 
 
@@ -6320,15 +6404,44 @@ def _axiom_items(pdir, contract):
     find and no `external_body` for `_is_trusted` to key on, so that sentence
     could be printed over a proof resting on a hand-written axiom. Miri is a
     real backstop for exactly that: the axiom is ghost, but the call it licenses
-    is executed."""
+    is executed.
+
+    ⚠ **TASK_084 widens this in two directions, and the widening is what stops
+    the fix to stage 5a from opening a hole here.**
+
+      * **`#[path]`-included files.** Same argument as blocker 3: an axiom in
+        `common/driver.rs` or in a subdirectory module is licensed by the
+        pattern's proof and executed by the pattern's binary, so it must make
+        Miri mandatory in exactly the same way. The file list is
+        `_path_includes`, the one `_scan_unsafe_sites` already uses.
+      * **`#[verifier::external_fn_specification]` items.** These are *bodied*,
+        so `vparse.axiom_decls` deliberately does not report them (they are
+        classified by `vparse.parse()` instead) -- but `_is_trusted` keys on
+        `external_body` alone, so without this line a pattern could ship a
+        false `ensures` about a **safe** std function and print the
+        "no trusted item, so Miri is not required" sentence over it. Verus's
+        own error message for a malformed one reads *"assume_specification
+        encoding error"*, which is the tool saying the two forms are one
+        mechanism."""
     out = {}
-    for src in sorted((contract.get("verus") or {}).get("obligations") or {}):
-        path = os.path.join(pdir, src)
+    vcfg = contract.get("verus") or {}
+    srcs = sorted(vcfg.get("obligations") or {})
+    paths = [(s, os.path.join(pdir, s)) for s in srcs]
+    paths += [(os.path.relpath(p, REPO), p) for p in _path_includes(
+        pdir, srcs + sorted(f for f in os.listdir(pdir) if f.endswith(".rs")))]
+    for key, path in paths:
         if not os.path.exists(path):
             continue
-        got = [d["name"] for d in vparse.axiom_decls(open(path).read())]
+        txt = open(path).read()
+        got = [d["name"] for d in vparse.axiom_decls(txt)]
+        try:
+            got += [i.name for i in vparse.parse(txt)
+                    if (i.external or "").startswith(
+                        "verifier::external_fn_specification")]
+        except ValueError:
+            pass
         if got:
-            out[src] = got
+            out[key] = sorted(set(got))
     return out
 
 

@@ -98,13 +98,13 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "821ef770fe7a6efedc2e3ac8274d7456a9b198f64879ee4174654e5505a7cb92",
+    "harness/check.py": "c4b13e11a37bf5ee283ae487a3ba3f8ec53346814c75e8f6448715f3e29eb246",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
-    "harness/vparse.py": "31fb494613c7650be07a1d90865f0ff0662c10b0b87ba3c441f426222b69fd2d",
+    "harness/vparse.py": "8580d851b5b9c9a1cb516237a4266a09d5cc64a744cbb33dfc6d36c8070ca929",
     "patterns/p03-bounded-stack/NOTES.md": "c0d9d6e42a070274d9d40ac695586d4c3217289a576cc75c11f1d8c22b228caa",
     "patterns/p03-bounded-stack/README.md": "3cc82de5b8db1b527cb3b0f37238646fd4111b38d602f385eab829436cbe91fa",
     "patterns/p03-bounded-stack/c/kernel.c": "9f1558cfbe298a11dc7edd231e2ee8d1efcf339e9f2332dc3e2cc0ef3782bf37",
@@ -593,33 +593,7 @@
     "adversarial-allpop.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "1862669379130928128",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "5685940249600",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "2350841382909228288",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "5685940249600",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "2496134005934884992",
+        "stdout": "15066166644964722816",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -632,11 +606,37 @@
       },
       {
         "exit": 0,
-        "stdout": "7138189764347683584",
+        "stdout": "6489055424970173312",
         "stderr": "",
         "signal": null,
         "cells": [
           "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "9160493521857693952",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "9488802108369219584",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/whole"
         ],
         "model_exit": 0,
         "model_stdout": "5685940249600",
@@ -647,20 +647,7 @@
     "adversarial-allpop.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "11340229903805879552",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "5685940249600",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "13979052701059957376",
+        "stdout": "12467945180376908416",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -673,7 +660,7 @@
       },
       {
         "exit": 0,
-        "stdout": "17436119075341145856",
+        "stdout": "17672446553773918208",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -686,11 +673,24 @@
       },
       {
         "exit": 0,
-        "stdout": "6219738264192116224",
+        "stdout": "5598982468222518656",
         "stderr": "",
         "signal": null,
         "cells": [
           "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "7325468533692443264",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/whole"
         ],
         "model_exit": 0,
         "model_stdout": "5685940249600",
@@ -1097,11 +1097,11 @@
     "adversarial-underflow.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "10642569922972784128",
+        "stdout": "12938232270249148544",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/isolated"
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "7473563764999086208",
@@ -1110,20 +1110,7 @@
       },
       {
         "exit": 0,
-        "stdout": "15684664240972573568",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "7473563764999086208",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "16496163627415240192",
+        "stdout": "16263011748079918592",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1136,11 +1123,24 @@
       },
       {
         "exit": 0,
-        "stdout": "3812551225609633920",
+        "stdout": "5322633619435017728",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/isolated"
+          "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "7473563764999086208",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "7671302204320459648",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "7473563764999086208",
@@ -1151,7 +1151,20 @@
     "adversarial-underflow.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "17219555855079303424",
+        "stdout": "14225674928967900928",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "7473563764999086208",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "14420573211316201728",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1164,11 +1177,11 @@
       },
       {
         "exit": 0,
-        "stdout": "18446734635048737280",
+        "stdout": "459667517624373504",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/isolated"
+          "O0/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "7473563764999086208",
@@ -1182,19 +1195,6 @@
         "signal": null,
         "cells": [
           "O0/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "7473563764999086208",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "5119748423145018880",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "7473563764999086208",
@@ -1317,7 +1317,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==72122==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f55",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==168561==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7fd",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1350,7 +1350,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==72127==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7fb3",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==168567==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7fe",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1479,5 +1479,5 @@
   "blocked": [],
   "verdict": "PASS",
   "complete_run": true,
-  "invocation": "p03-bounded-stack"
+  "invocation": "p03"
 }

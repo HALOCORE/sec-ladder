@@ -57,9 +57,15 @@ bands have `nsuf = 3`, and §2's own bullet says the +32 splits as roughly 9–1
 per call plus 7–8 per *range request*; §3b's 34-point sweep holds the request
 count at 1 and so establishes the per-byte rate and nothing about the constant.
 ✅ **The request axis is swept and shipped since TASK_082 (§10b)**: `nsuf` 1…8,
-`R3ship − R4` = 18…63, **6.50 `Ir` per request at lag 4 with zero residual**, a
-mod-4 sawtooth — so the "7–8 per range request" above is the sawtooth's two
-steps, not two estimates of one constant.
+`R3ship − R4` = 18…63, and the law with zero free parameters and zero residual
+on 49 measured points is
+**`R3ship − R4 = 11 + 7·nsuf − 2·#{ i < nsuf : s_i ≡ 0 (mod 4) }`** — **+7 per
+request, less 2 for every served range whose length is a multiple of 4** — so
+the "7–8 per range request" above is one rate plus a residue-class discount, not
+two estimates of one constant. ⚠ **`6.50 per request` is retracted**
+(TASK_083_REVIEW major 7): it is the mean of a band that samples each residue
+once per four, **both shipped inputs pay 7.00**, and quoting 6.50 makes a
+20-range extrapolation 11 low.
 On that reading R3 is still the fifth
 pattern in a row where idiomatic safe Rust is free **per byte**.
 ⚠ **And `+32` bounds `inf(in-contract R3) − R4ship` and nothing else
@@ -91,10 +97,14 @@ dependence**.
 inputs — and the *fit* does not survive. ⚠ **`≈ 7·nsuf + 9` is a straight line
 through a staircase**: least squares over the eight committed points is
 `6.4762·nsuf + 10.8571` with max │residual│ 0.8095, and the steps alternate
-+5, +7, +7, +7, +5, +7, +7. Lag-4 differencing gives **26 over every one of the
-four pairs, zero residual — 6.50 `Ir` per request**, a mod-4 sawtooth of
-amplitude 2 from the 4×-unrolled table walk. Quote **6.5 per request at lag 4**,
-not `7·nsuf + 9`. R2's naive spelling pays
++5, +7, +7, +7, +5, +7, +7. ⚠ **Lag-4 differencing gives 26 four times with zero
+residual, and TASK_082 read that as `6.50 Ir` per request from a 4×-unrolled
+table walk. BOTH HALVES WERE WRONG** (TASK_083_REVIEW majors 6 and 7, §10b).
+Quote the level law —
+**`R3ship − R4 = 11 + 7·nsuf − 2·#{ i < nsuf : s_i ≡ 0 (mod 4) }`**, i.e. **+7
+per request, less 2 for every served range of length ≡ 0 (mod 4)** — which has
+zero free parameters, zero residual on 49 points, and predicts **+32** for both
+shipped inputs. R2's naive spelling pays
 **4.2500 Ir per folded byte**, which is p16's swept constant **exactly**, on a
 completely different kernel — as are the two rates it is the difference of,
 10.0000 and 5.7500, once the driver's per-input `println!` term is removed
@@ -1387,11 +1397,12 @@ checksums on all eight):
 | R3ship − R4 | 18 | 23 | **30** | 37 | 44 | 49 | 56 | 63 |
 
 `R3ship − R3′ = 17·nsuf` **exactly**, zero intercept, zero residual over eight
-points. `R3ship − R4 ≈ 7·nsuf + 9` — ⚠ **a fit, and §10b measures the shipped
-band as `6.50` per request at lag 4 with a mod-4 sawtooth; quote that instead.**
-**Both are per-request, not per-call**, so
+points. `R3ship − R4 ≈ 7·nsuf + 9` — ⚠ **a fit; §10b's level law
+`11 + 7·nsuf − 2·#{ i < nsuf : s_i ≡ 0 (mod 4) }` is exact and is what to
+quote.** **Both are per-request, not per-call**, so
 "+32 flat" is flat in *bytes* and rising in *requests* — a reader applying it to
-a request with 20 ranges gets ≈ +140.
+a 20-range request with `small.bin`'s residue profile gets **+151**, which the
+level law gives exactly.
 
 Two caveats that bound this, both load-bearing:
 
@@ -1439,20 +1450,75 @@ over the eight committed points gives **`6.4762·nsuf + 10.8571`, max │residua
 
 Differencing at **lag 4** — the same device §3b uses on the byte axis, for the
 same reason — removes it exactly: `d(n+4) − d(n)` is **26, 26, 26, 26** over all
-four pairs, **zero residual**, i.e. **6.50 `Ir` per request**. So the honest
-statement is *6.5 per request with a period-4 sawtooth of amplitude 2*, and
-`7·nsuf + 9` is a straight line drawn through a staircase. The mechanism is the
-same one §3b found in the fold: a 4×-unrolled walk over the suffix table with a
-scalar epilogue, so the cost is flat across a group of four and steps at the
-group boundary. ⚠ **A reader applying `7·nsuf` to 20 ranges gets ≈ +149 where
-the lag-4 law gives ≈ +140**; the correction is small and the *shape* is the
-point — the third time on this project that a residue class has been found
-hiding inside a published constant.
+four pairs, **zero residual**.
 
-**Result 3 — no published p17 number moves.** `+32` is the *shipped* pair at
-`nsuf = 3`; this band at `nsuf = 3` gives **30**, which is the `+30` §10 already
-discloses for these inputs. `+32` is still flat in *bytes* (§3b) and still rising
-in *requests*; it was never a flat-in-`nsuf` claim after TASK_016's correction.
+⚠⚠ **RETRACTED, TASK_083_REVIEW majors 6 and 7: this section read that as
+`6.50 Ir` per request from "a 4×-unrolled walk over the suffix table", and BOTH
+HALVES ARE WRONG.** The arithmetic survives — the lag-4 26 holds four more times
+out of sample at `nsuf` 9…12, on an independent `n_iters` pair — but *"an
+out-of-sample test validates the LAW, not the STORY"*
+(`.memory/03-measurement.md`). Any 8-point sequence can be lag-4 differenced;
+four equal differences are a fact about the numbers, not evidence of which loop.
+
+**(i) The mechanism.** ⚠ **Neither rung's suffix-table walk is unrolled at all.**
+In R3 `safe_tuned::kernel` the outer per-request loop does **one request per
+iteration** — `inc rax` / `inc r15` / `cmp r15,r11` / `je`, then
+`movzx BYTE PTR [r8+r15*2]` and `[r8+r15*2+0x1]` for the suffix lo/hi. R4
+`unsafe::kernel` has the same scalar shape (`inc rbx`). The 4× unroll is the
+**inner byte fold**, and it is keyed on the **served length**: `and r10d,0x3`
+for the remainder, four `movzx` steps, `add rcx,0x4`, then a `test`-guarded
+scalar epilogue. ⚠ **`inputs/gen.py` said so itself, in a hashed comment** —
+*"`nsuf` is a REQUEST COUNT, the outer loop's trip count, not a byte length —
+no unrolled epilogue is keyed on it, so it has no residue class to hide a
+sawtooth in"* — and §2 of this file already published the same 2-instruction
+step, correctly attributed as *"+16 (served length ≡ 0 mod 4) or +18"*, twelve
+hundred lines above.
+
+**(ii) The period is the GENERATOR'S.** Re-emitting the band with only
+`sweep_suffixes`' step changed, request count still 1…8 in every row:
+
+| suffix step | `R3ship − R4` over `nsuf` 1…8 | steps | served len mod 4 |
+|---|---|---|---|
+| 36 (≡ 0) | 18 25 32 39 46 53 60 67 | +7 ×7 | 1,1,1,1,1,1,1,1 |
+| **37 (≡ 1)** | **18 23 30 37 44 49 56 63** | +5,+7,+7,+7,+5,+7,+7 | 1,0,3,2,1,0,3,2 |
+| 38 (≡ 2) | 18 25 32 39 46 53 60 67 | +7 ×7 | 1,3,1,3,1,3,1,3 |
+| 39 (≡ 3) | 18 25 32 37 44 51 58 63 | +7,+7,+5,+7,+7,+7,+5 | 1,2,3,0,1,2,3,0 |
+
+At steps 36 and 38 **the sawtooth is gone**. The `+5` lands exactly and only
+where the newly added request's served length is `≡ 0 (mod 4)`. The shipped band
+has period 4 because `37 ≡ 1 (mod 4)`, so the residue advances by one per
+request.
+
+**(iii) The replacement law, zero free parameters:**
+
+```
+R3ship − R4  =  11 + 7·nsuf − 2 · #{ i < nsuf : s_i ≡ 0 (mod 4) }
+```
+
+**+7 per request, less 2 for every served range whose length is a multiple of
+4.** It predicts all **49** measured points with zero residual — the 12 sweep
+points (8 committed + 4 out of sample), the 32 points of the four step-bands
+above, and 5 predicted-before-measured rows at the shipped `nsuf = 3` with only
+the residues moved (26 / 32 / 28 / 30 / 32, all exact).
+
+⚠⚠ **DO NOT CARRY `6.50 per request` FORWARD.** It is `7 − 2/4`: the mean over a
+band that happens to sample each residue class once per four. **Both of p17's
+shipped inputs have NO served length `≡ 0 (mod 4)`** — `small` 498/251/122 →
+residues 2,3,2; `large` 4085/2041/1019 → 1,1,3 — so both pay **7.00**. For a
+20-range request with `small.bin`'s profile the level law gives **151**;
+`7·nsuf + 9` gives 149 and is nearly right; **`6.50/request` gives ≈ 140 and is
+11 low**. The "correction" moved the reader away from the answer.
+
+**Result 3 — no published p17 number moves, and the `30 ≠ 32` gap is now a
+mechanism rather than a caveat.** `+32` is the *shipped* pair at `nsuf = 3` and
+the law gives `11 + 21 − 0 = 32` for **both** shipped inputs. This band at
+`nsuf = 3` gives **30** — not because "the inputs are not the shipped ones" in
+general (the shapes are in fact identical: `SWEEP_BODY == SMALL_BODY == 498`,
+`SWEEP_WINS == SMALL_WINS == 32`, stride 506) but for one reason the law names:
+`sweep-nsuf-03`'s suffixes are 497/460/423 → residues 1, **0**, 3 → one
+`≡ 0 (mod 4)` → `32 − 2 = 30`. `+32` is still flat in *bytes* (§3b) and still
+rising in *requests*; it was never a flat-in-`nsuf` claim after TASK_016's
+correction.
 
 ⚠ **Not re-measured at TASK_082: the `R3ship − R3′ = 17·nsuf` row.** `R3′` is
 `v17-tuned_suffix.rs`, which §10 rules **out of contract** and p17 does not ship,

@@ -393,31 +393,43 @@ The `why` strings above now carry an **`⚠ UNPRICED`** clause wherever a `gcc-c
 
 From `results/gate/*.json` (`verus`, `identity`, `verdict`). `obligations` is what Verus verified for `verus.rs`; `TCB` counts the `external_body` / `assume`d items the proof rests on and `TCB lines` their bodies. **`R4 = R5` identity is the thing the `Ir` column cannot establish**: quote the digest, not the zero (`.memory/01-ladder.md` finding 1). The `R4=R5 @O3` column is the entry whose `pair` is `unsafe vs verus` — p01 ships **two** `-O3` identity pairs and an earlier version of this file took whichever came first (TASK_075_REVIEW m6).
 
-| pattern | obligations | errors | TCB items | TCB lines | R4=R5 @O3 | verdict |
-|---|---:|---:|---:|---:|---|---|
-| p01-array-sum | 7 | 0 | 3 | 6 | exact | PASS-WITH-BLOCKED-ROWS |
-| p02-buffer-copy | 9 | 0 | 4 | 10 | exact | PASS |
-| p03-bounded-stack | 9 | 0 | 5 | 10 | exact | PASS |
-| p04-ring-buffer | 9 | 0 | 5 | 10 | exact | PASS |
-| p05-index-flatten | 12 | 0 | 3 | 6 | exact | PASS |
-| p06-rotate | 18 | 0 | 5 | 10 | exact | PASS |
-| p07-binary-search | 10 | 0 | 3 | 6 | exact | PASS |
-| p08-overlap-move | 12 | 0 | 3 | 9 | exact | PASS |
-| p09-bitset | 18 | 0 | 4 | 7 | exact | PASS |
-| p10-fir-stencil | 10 | 0 | 3 | 6 | exact | PASS |
-| p11-nul-scan | 12 | 0 | 3 | 6 | exact | PASS |
-| p12-strcat-fixed | 15 | 0 | 5 | 10 | exact | PASS |
-| p13-strncpy-trunc | 19 | 0 | 5 | 10 | exact | PASS |
-| p14-field-split | 19 | 0 | 6 | 11 | exact | PASS |
-| p16-tlv-walk | 10 | 0 | 3 | 6 | exact | PASS |
-| p17-http-range | 10 | 0 | 3 | 6 | exact | PASS |
-| p18-varint-shift | 12 | 0 | 3 | 6 | exact | PASS |
-| p22-hash-probe | 20 | 0 | 5 | 10 | exact | PASS |
-| p27-handle-table | 15 | 0 | 7 | 20 | exact | PASS |
-| p36-vtable-dispatch | 12 | 0 | 4 | 7 | norel | PASS |
-| p38-alias-pun | 13 | 0 | 5 | 10 | exact | PASS |
-| p47-ct-compare | 12 | 0 | 3 | 6 | exact | PASS |
-| **total** | **283** | | **90** | **188** | | |
+⚠ **`axioms` is a SEPARATE column and is deliberately not folded into `TCB items`, because the two are not the same kind of thing.** A TCB item is an `#[verifier::external_body]` wrapper: it has a body a reviewer can read, an `ensures` that can be checked against real Rust semantics, and — under this project's rules — a verified twin and a written `(a)/(b)/(c)` argument (`.memory/05-layout.md` steps 6–7). An **axiom** is a hand-written claim about code Verus never compiles: `assume_specification`, `axiom fn`, `uninterp spec fn`, `#[verifier::external_trait_specification]`. It has **no body**, so it adds **0** to `TCB lines`; it adds no verified function, so `obligations` does not move; it emits no instructions, so `R4=R5 @O3` does not move; and the form Verus's own error message prints for you to paste carries **no `requires` and no `ensures` at all**, which verifies a 1 MiB out-of-bounds read and a null dereference at `4 verified, 0 errors` (`.memory/04-verus.md`). One column would let a 7-line reviewed wrapper be traded for a zero-line unconditional axiom **at par**, and nothing in the table would move.
+
+**So the trusted base of a row is `TCB items` + `axioms`, and the totals below are reported that way rather than summed** — the `axioms` column reading `0` in every row today is a *result*, not spare real estate: it is this tree's statement that no published number rests on a hand-written axiom, and until TASK_084 the table could not have made that statement either way. The gate has carried `axiom_decls` per Verus source since TASK_082; nothing published read it, so a byte-identical regeneration was **not** evidence that nothing moved (TASK_083_REVIEW major 4).
+
+| pattern | obligations | errors | TCB items | TCB lines | axioms | R4=R5 @O3 | verdict |
+|---|---:|---:|---:|---:|---:|---|---|
+| p01-array-sum | 7 | 0 | 3 | 6 | 0 | exact | PASS-WITH-BLOCKED-ROWS |
+| p02-buffer-copy | 9 | 0 | 4 | 10 | 0 | exact | PASS |
+| p03-bounded-stack | 9 | 0 | 5 | 10 | 0 | exact | PASS |
+| p04-ring-buffer | 9 | 0 | 5 | 10 | 0 | exact | PASS |
+| p05-index-flatten | 12 | 0 | 3 | 6 | 0 | exact | PASS |
+| p06-rotate | 18 | 0 | 5 | 10 | 0 | exact | PASS |
+| p07-binary-search | 10 | 0 | 3 | 6 | 0 | exact | PASS |
+| p08-overlap-move | 12 | 0 | 3 | 9 | 0 | exact | PASS |
+| p09-bitset | 18 | 0 | 4 | 7 | 0 | exact | PASS |
+| p10-fir-stencil | 10 | 0 | 3 | 6 | 0 | exact | PASS |
+| p11-nul-scan | 12 | 0 | 3 | 6 | 0 | exact | PASS |
+| p12-strcat-fixed | 15 | 0 | 5 | 10 | 0 | exact | PASS |
+| p13-strncpy-trunc | 19 | 0 | 5 | 10 | 0 | exact | PASS |
+| p14-field-split | 19 | 0 | 6 | 11 | 0 | exact | PASS |
+| p16-tlv-walk | 10 | 0 | 3 | 6 | 0 | exact | PASS |
+| p17-http-range | 10 | 0 | 3 | 6 | 0 | exact | PASS |
+| p18-varint-shift | 12 | 0 | 3 | 6 | 0 | exact | PASS |
+| p22-hash-probe | 20 | 0 | 5 | 10 | 0 | exact | PASS |
+| p27-handle-table | 15 | 0 | 7 | 20 | 0 | exact | PASS |
+| p36-vtable-dispatch | 12 | 0 | 4 | 7 | 0 | norel | PASS |
+| p38-alias-pun | 13 | 0 | 5 | 10 | 0 | exact | PASS |
+| p47-ct-compare | 12 | 0 | 3 | 6 | 0 | exact | PASS |
+| **total** | **283** | | **90** | **188** | **0** | | |
+
+**Trusted base, all 22 rows: 90 items (188 lines) and 0 axioms.** Quote both numbers; there is no single one.
+
+*This table reads **one** Verus source per pattern, `verus.rs` — the R5 rung's. The list below is derived from the records on every run, so a pattern that grows a second pinned source announces itself here instead of being silently dropped.*
+
+| pattern | other pinned Verus source | obligations | TCB items | axioms | why it is not in the row above |
+|---|---|---:|---:|---:|---|
+| p01-array-sum | `safe_naive_verus.rs` | 7 | 2 | 0 | the **R2v control**: safe Rust carrying the same proof, which holds up `.memory/01-ladder.md` finding 2 (*a proof alone buys nothing*). It is not a rung and is not in the measured 6-cell matrix, so its trusted base is not R5's and summing the two would publish a number describing no rung. |
 
 ## 4. Static shape, `-O3 isolated`
 

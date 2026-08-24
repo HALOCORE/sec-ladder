@@ -67,6 +67,37 @@ PAIRS = [("safe_naive", "unsafe", "R2-R4"),
 # `-O3`.  Anything about "the proof costs zero instructions" is about this one.
 R5_PAIR = "unsafe vs verus"
 
+# ⚠ **THE SAME PATTERN'S TWO-NESS BITES A SECOND COLUMN, AND THIS PIN IS THE
+# DISCLOSURE.**  `§3`'s proof-burden row reads ONE Verus source per pattern.
+# The line below used to be a bare `.get("verus.rs")` inline, with no comment,
+# no constant and nothing that would notice a second source appearing —
+# exactly the shape `R5_PAIR` was introduced for one column earlier
+# (TASK_075_REVIEW m6).
+#
+# **p01 pins TWO Verus sources** and is the only pattern that does (checked
+# across all 22 gate records, TASK_084):
+#
+#     safe_naive_verus.rs   7 verified   TCB ['load_input', 'emit']
+#     verus.rs              7 verified   TCB ['get_unchecked', 'load_input', 'emit']
+#
+# **Reading only `verus.rs` is CORRECT and summing would be wrong**, so this is
+# a disclosure, not a repair: `safe_naive_verus.rs` is the R2v control that
+# proves the *safe naive* rung panic-free (`.memory/01-ladder.md` finding 2,
+# *"a proof alone buys nothing"*).  Its trusted base is not R5's, and adding
+# the two would publish a trusted-base size that describes no rung on the
+# ladder.  The column is R5's, and `TCB_SRC` says so.
+#
+# ⚠ **What the silence already cost, measured at TASK_084:** with two
+# candidate totals in the tree — 90 over `verus.rs` and 92 over every source —
+# four documents quote **92** *as the published total* (`RECAP.md:1798`,
+# `.tasks/TASK_082.md:195`, `.tasks/TASK_083.md:26` and
+# `.tasks/TASK_083_REVIEW_REPORT.md:268`, the last of them naming this very
+# table), while this file has published **90** since it was written.  So the
+# table now also emits a DERIVED footnote naming every additional Verus source
+# it did not read, per pattern — which is the part that will still work when a
+# second pattern grows a second source.
+TCB_SRC = "verus.rs"
+
 # --------------------------------------------------------------------------
 # The search state.  TWO columns, because neither alone is honest.
 #
@@ -836,7 +867,7 @@ def main():
     w("## 3. Proof burden and trusted base")
     w("")
     w("From `results/gate/*.json` (`verus`, `identity`, `verdict`). "
-      "`obligations` is what Verus verified for `verus.rs`; `TCB` counts the "
+      f"`obligations` is what Verus verified for `{TCB_SRC}`; `TCB` counts the "
       "`external_body` / `assume`d items the proof rests on and `TCB lines` "
       "their bodies. **`R4 = R5` identity is the thing the `Ir` column cannot "
       "establish**: quote the digest, not the zero (`.memory/01-ladder.md` "
@@ -844,25 +875,100 @@ def main():
       f"`{R5_PAIR}` — p01 ships **two** `-O3` identity pairs and an earlier "
       "version of this file took whichever came first (TASK_075_REVIEW m6).")
     w("")
-    w("| pattern | obligations | errors | TCB items | TCB lines | "
+    w("⚠ **`axioms` is a SEPARATE column and is deliberately not folded into "
+      "`TCB items`, because the two are not the same kind of thing.** A TCB "
+      "item is an `#[verifier::external_body]` wrapper: it has a body a "
+      "reviewer can read, an `ensures` that can be checked against real Rust "
+      "semantics, and — under this project's rules — a verified twin and a "
+      "written `(a)/(b)/(c)` argument (`.memory/05-layout.md` steps 6–7). An "
+      "**axiom** is a hand-written claim about code Verus never compiles: "
+      "`assume_specification`, `axiom fn`, `uninterp spec fn`, "
+      "`#[verifier::external_trait_specification]`. It has **no body**, so it "
+      "adds **0** to `TCB lines`; it adds no verified function, so "
+      "`obligations` does not move; it emits no instructions, so `R4=R5 @O3` "
+      "does not move; and the form Verus's own error message prints for you "
+      "to paste carries **no `requires` and no `ensures` at all**, which "
+      "verifies a 1 MiB out-of-bounds read and a null dereference at "
+      "`4 verified, 0 errors` (`.memory/04-verus.md`). One column would let a "
+      "7-line reviewed wrapper be traded for a zero-line unconditional axiom "
+      "**at par**, and nothing in the table would move.")
+    w("")
+    w("**So the trusted base of a row is `TCB items` + `axioms`, and the "
+      "totals below are reported that way rather than summed** — the "
+      "`axioms` column reading `0` in every row today is a *result*, not "
+      "spare real estate: it is this tree's statement that no published "
+      "number rests on a hand-written axiom, and until TASK_084 the table "
+      "could not have made that statement either way. The gate has carried "
+      "`axiom_decls` per Verus source since TASK_082; nothing published read "
+      "it, so a byte-identical regeneration was **not** evidence that nothing "
+      "moved (TASK_083_REVIEW major 4).")
+    w("")
+    w("| pattern | obligations | errors | TCB items | TCB lines | axioms | "
       "R4=R5 @O3 | verdict |")
-    w("|---|---:|---:|---:|---:|---|---|")
-    tot_ob = tot_tcb = tot_lines = 0
+    w("|---|---:|---:|---:|---:|---:|---|---|")
+    tot_ob = tot_tcb = tot_lines = tot_ax = 0
+    extra_srcs = {}
     for pat in sorted(gates):
         g = gates[pat]
-        vb = (g.get("verus") or {}).get("verus.rs") or {}
+        vall = g.get("verus") or {}
+        vb = vall.get(TCB_SRC) or {}
         items = vb.get("tcb_items") or []
         lines = sum(i.get("body_lines", 0) for i in items)
+        # R5's axioms: `verus.rs`'s own, plus every file it `#[path]`-includes.
+        # The gate keys an included file by its path relative to the repo root
+        # and flags it `path_included` (`check.py::_check_axiom_decls`); an
+        # axiom in `common/driver.rs` is licensed by this pattern's proof and
+        # executed by this pattern's binary, so it belongs in this row.
+        ax = list(vb.get("axiom_decls") or [])
+        for k, v in sorted(vall.items()):
+            if v.get("path_included"):
+                ax += [dict(d, src=k) for d in (v.get("axiom_decls") or [])]
+        others = {k: v for k, v in sorted(vall.items())
+                  if k != TCB_SRC and not v.get("path_included")}
+        if others:
+            extra_srcs[g["pattern"]] = others
         lvl = next((e["level"] for e in g.get("identity", [])
                     if e.get("opt") == "O3"
                     and e.get("pair") == R5_PAIR), "-")
         tot_ob += vb.get("verified", 0)
         tot_tcb += len(items)
         tot_lines += lines
+        tot_ax += len(ax)
         w(f"| {g['pattern']} | {vb.get('verified', '-')} | "
-          f"{vb.get('errors', '-')} | {len(items)} | {lines} | {lvl} | "
-          f"{g.get('verdict', '-')} |")
-    w(f"| **total** | **{tot_ob}** | | **{tot_tcb}** | **{tot_lines}** | | |")
+          f"{vb.get('errors', '-')} | {len(items)} | {lines} | {len(ax)} | "
+          f"{lvl} | {g.get('verdict', '-')} |")
+    w(f"| **total** | **{tot_ob}** | | **{tot_tcb}** | **{tot_lines}** | "
+      f"**{tot_ax}** | | |")
+    w("")
+    w(f"**Trusted base, all 22 rows: {tot_tcb} items ({tot_lines} lines) and "
+      f"{tot_ax} axioms.** Quote both numbers; there is no single one.")
+    w("")
+    # ---- the DERIVED disclosure of every Verus source this table skipped ----
+    w(f"*This table reads **one** Verus source per pattern, `{TCB_SRC}` — the "
+      "R5 rung's. The list below is derived from the records on every run, so "
+      "a pattern that grows a second pinned source announces itself here "
+      "instead of being silently dropped.*")
+    w("")
+    if not extra_srcs:
+        w(f"*No pattern pins a Verus source other than `{TCB_SRC}`.*")
+    else:
+        w("| pattern | other pinned Verus source | obligations | TCB items | "
+          "axioms | why it is not in the row above |")
+        w("|---|---|---:|---:|---:|---|")
+        for pat in sorted(extra_srcs):
+            for src, v in sorted(extra_srcs[pat].items()):
+                why = ("the **R2v control**: safe Rust carrying the same "
+                       "proof, which holds up `.memory/01-ladder.md` finding "
+                       "2 (*a proof alone buys nothing*). It is not a rung "
+                       "and is not in the measured 6-cell matrix, so its "
+                       "trusted base is not R5's and summing the two would "
+                       "publish a number describing no rung."
+                       if src == "safe_naive_verus.rs" else
+                       "**not a known control — this source is unclassified "
+                       "and its trusted base is unaccounted for above.**")
+                w(f"| {pat} | `{src}` | {v.get('verified', '-')} | "
+                  f"{len(v.get('tcb_items') or [])} | "
+                  f"{len(v.get('axiom_decls') or [])} | {why} |")
     w("")
 
     # --------------------------------------------------------- static shape
