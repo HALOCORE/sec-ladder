@@ -358,7 +358,7 @@ or declare the steady state. **An in-place tokenizer is still buildable here.**
 | p16 | TLV / length-prefixed record walker | length field vs remaining buffer | easy–moderate | **done** (T007), reviewed; gate PASS first run, R5 == R4 `exact` at O3; **first O(n) cost of a *spelling* — R3 is still 0/byte** |
 | p17 | HTTP `Range:` style header parser | int overflow → OOB (cf. CVE-2017-7529) | moderate | **done** (T011), reviewed; gate PASS first run, R5 == R4 `exact` at O3; **memory-safe but functionally wrong**; the *leaking* slice-guard variant reproduced at T012 (`.temp/` artefact + committed generator — see `.memory/05-layout.md` item 11 for why it cannot live in the pattern dir) |
 | p18 | varint / LEB128 decoder | **unbounded shift** — ✅ **the catalogue's guess UPHELD, the first row in five patterns to survive its own guess** (T049 §0, four alternatives rejected with measurements). **The first bug here that is UB but NOT a memory-safety bug**: it touches no memory and **ASan is silent** | easy–moderate | **done** (T051), gate `PASS` first complete run, R5 **12/0** (twin 13/0), `R4 ≡ R5 exact`, Miri 9/9, **TCB 3, no `assume`**, **reviewed** (T051_REVIEW: 1 blocker + 7 majors + 5 minors, **15 clean negatives**; corrections at T052). **Four catchers — UBSan, `debug-assertions`, Miri, Verus — all outside the 24-cell matrix**, and Miri catches it as a **panic**, not a `ub` report |
-| p19 | protocol state machine (byte-at-a-time) | state confusion | moderate | planned |
+| p19 | protocol state machine (byte-at-a-time) | state confusion | moderate | ⚠ **RANKED 1 by TASK_086 — BUILD. PROVISIONAL, unreviewed.** All four probes pass. **TWO boundaries**: R3-vs-R4 *and* inside the safe class (p47's shape) — `table[st*256+b]` vs `table[(st&7)*256+b]`. Cost is a **per-byte SLOPE**: naive **+5.25 `Ir`/byte**, 2-D rows **+4.25**, masked **+0.999** (whole-program marginal, `-O3`, `isolated`). ⚠ **The checked section is SMALLER (76 B vs 173 B) and executes 1.91x the instructions** — `st` is loop-carried and data-dependent so the check cannot be hoisted and the exit edge blocks unrolling. Harm: `gcc -O2` **exit 139 SIGSEGV**, UBSan `index 200 out of bounds`, non-adversarial clean. vstd: `::get_unchecked` **0 hits**, ordinary wrapper route, **not p15's obstacle**. ⚠ **Kill risk: the memory-unsafe framing may be contrived** — a textbook state-confusion CVE is a *logic* bug with no OOB, and if the spec settles there the row dies **p31's death**. |
 | p20 | length/offset pair validation (heartbeat-style) | trusted length field (cf. CVE-2014-0160) | moderate | planned |
 | p21 | CSV/field splitter with escapes | quote-state off-by-one | moderate | planned |
 
@@ -377,7 +377,7 @@ or declare the steady state. **An in-place tokenizer is still buildable here.**
 | ID | Pattern | C bug class modelled | Verus difficulty | Status |
 |---|---|---|---|---|
 | p27 | **handle table over per-record `malloc`/`free`** (delivered as `p27-handle-table`; the *singly linked list* SHAPE is retracted -- where `next` sits decides observability and that is a glibc detail, and the bug would fire on **every** input, which the adversarial-only constraint forbids) | **use-after-free -- the class UPHELD, and the project's FIRST TEMPORAL bug.** R1 omits one conjunct (`&& live[h] == 1`) on the READ path | hard (`vstd::raw_ptr`) | **done** (T060), gate `PASS` first complete run, R5 **15/0 first run** with a functional postcondition (twin 20/0), `R4 == R5` `exact` at O3 / `norel` at O0, **TCB 7 (forced -- see below)**, **reviewed** (T060_REVIEW: **no blocker**, 3 majors, 8 minors, **28 clean negatives**; corrections at T061). **Not one instruction of `R3 - R4` is the lifetime guarantee** -- a closed decomposition over *every* function gives `230.07 = 109.65 kernel + 120.42 drop glue + 0.00 allocator`, and an R4 keeping R3's bounds checks costs **+153.51**, so safe Rust pays **43.86 LESS** of the spatial tax. The lifetime guarantee itself costs **zero**, and its shape is structural: **the free and the invalidation are one operation in safe Rust and two in C, and the bug is the third -- the ASKING -- going missing** |
-| p28 | intrusive doubly linked list | aliasing, ownership | research-grade | planned |
+| p28 | intrusive doubly linked list | aliasing, ownership | research-grade | ⚠⚠ **THE *"expect R5 to be defeated"* PREDICTION BELOW IS CONTRADICTED for the STRUCTURAL obligation** (TASK_086 #241, **PROVISIONAL — unreviewed**). A `Dll` over `Ghost<Seq<*mut Node>>` + `Tracked<Map<usize, PointsTo<Node>>>` with `wf()` = domain/`is_init` + **address injectivity** + the `next` chain + the `prev` chain verifies **`4 verified, 0 errors`** — including **`unlink`** of a middle node, which reads the victim's links out of memory and rewrites both neighbours through `tracked_remove`/`ptr_mut_read`/`ptr_mut_write`/`tracked_insert`. ~25 lines of ghost proof, **no lemma, no `assume`, no `external_body`**. ⚠ **`wf` was proved PRESERVED, not ESTABLISHABLE** — no constructor, so nothing discharges `unlink`'s `requires` and a 0- or 1-node list satisfies it **vacuously**; a >=3-node list needs `raw_ptr::allocate` plus a disjointness argument, which p27 already ships. ✅ **`vstd::raw_ptr`'s exec API is SAFE Verus, so p28 is the OPPOSITE of p15/p35** — `_scan_unsafe_sites` is trivially satisfied. Bug class **temporal**, shares with p27. Ranked **5** only because no rung pair was built (no probe 2 or 3). |
 | p29 | binary search tree insert/lookup | recursive ownership | hard | planned |
 | p30 | chained hash table (buckets of lists) | combines p22 + p27 | research-grade | planned |
 
@@ -397,7 +397,7 @@ that is the deliverable for these rows**, not a green checkmark.
 
 | ID | Pattern | C bug class modelled | Verus difficulty | Status |
 |---|---|---|---|---|
-| p35 | tagged union / discriminated dispatch | tag-payload mismatch | moderate | planned |
+| p35 | tagged union / discriminated dispatch | tag-payload mismatch | moderate | ⚠⚠ **BUILD, BUT BLOCKED ON THE SAME GATE RULE AS `p15` — fix `_scan_unsafe_sites` and TWO rows unblock, not one** (TASK_086, **PROVISIONAL — unreviewed**). ✅ **Verus supports the Rust `union` NATIVELY**: the correct-variant obligation is **first class in the type system** — declared inside `verus!` it is `error: requirement not met: to access this field, the union must be in the correct variant` (`1 verified, 1 errors`), and `requires v is i` gives **`2 verified, 0 errors`**. **No vstd spec is involved**, which is why probe 4's grep MISSES it and the row is blocked anyway: the read is still `unsafe { v.i }` in a **verified** fn. Boundary is **compile-time, p08's shape** — safe Rust's `enum` makes the mismatch unrepresentable. Cost **+0.829 `Ir`/element (+6.5%)**, ⚠ **and the mechanism is UNROLLING, not the check — both rungs execute the same tag test.** Bug class **type confusion, ABSENT from the built tree**. Harm has a magnitude axis: the `double` arm is a **silent wrong value with NO detector firing at all**; the pointer arm is **exit 139 SIGSEGV**. Traps: declare the union **inside** `verus!` (outside, Verus prints `external_type_specification`); `#[derive(Clone, Copy)]` fails; use `v is i`, not `v->i`. |
 | p36 | function-pointer table dispatch (vtable-like) (delivered as `p36-vtable-dispatch`). ⚠ **The catalogue's *"the harm is not reproducible"* worry is REFUTED — 24/24 SIGSEGV** across gcc/clang × O0–O3 × 3 opcodes; and the *"likeliest to hit p55's wall"* triage was wrong twice over | **index out of table — the class UPHELD, but it is the tree's TWELFTH `index >= len` and the pattern says so.** What is not twelfth: ⚠ **Verus at the pin cannot type `fn(u64) -> u64` AT ALL** (error on the *declaration*), so C's own dispatch mechanism is **not an admissible rung** and the Rust rungs use `[&'static dyn Op; NOPS]` — **priced at exactly `3.00000` Ir/dispatch, finding 14's sharpest instance because it excludes the MECHANISM, not a spelling** | moderate | **done** (T072), gate `PASS` first complete run, R5 **19/0**, `R4 ≡ R5` **`norel` at O3 — the first pattern in the tree not `exact`**, TCB 4 (2 contract-bearing), **reviewed** (T072_REVIEW: **2 blockers, 5 majors, 7 minors, 36 clean negatives**; corrections at T073, which refuted **three** prescriptions — two the manager's, one the review's). ⚠ **Both published headlines moved.** `R3 − R4 = +15.00 flat` was fitted against an R3 side **never searched** (one lever, and it moved R3 *dearer*): p36 now publishes **`+7.00` (fixed-R4 bound, cheapest R3 found) and `+10.00` (matched pair), never one number and no pair interval.** And every `Ir` was **kernel-exclusive on the one pattern whose kernel IS a call** — dispatch targets are 512/384/0 Ir per call, which **reverses** the `match` control and vanishes the gcc-vs-clang gap. **`Ir` exactly constant while wall clock moves 3.13×**, verified on program totals; ⚠ **not p07's finding in a costume** — p07's `Ir` moves and its branch is conditional. Catchers: ASan/UBSan name the **array read**, never the call; `-fsanitize=function` is **gcc-absent and clang-defeated**; only `-fsanitize=cfi-icall` names the transfer, and it is a control (needs `-flto` + `-fuse-ld=lld`), not a rung |
 | p37 | callback with `void*` userdata | type confusion | moderate–hard | planned |
 | p38 | **record parser that clamps a length in place and re-reads it through a pun** (delivered as `p38-alias-pun`). ⚠ **The catalogue's own spelling — *"endian conversion, `memcpy` vs union"* on a byte buffer — is the BENIGN aliasing direction and was retracted before the build**: neither compiler exploits it, 8 of 8 cells. Only two incompatible **non-char** types move | **strict-aliasing UB — the class UPHELD** (unusual: three of the previous five were overturned), and the harm is a **MISCOMPILE**, not a wrong answer | moderate | **done** (T066), gate `PASS` first complete run, R5 **13/0** (twin 16/0), `R4 ≡ R5` `exact` at O3 / `norel` at O0, TCB 5, Miri 8/8, **reviewed** (T066_REVIEW: **no blocker**, 3 majors, 8 minors, **35 clean negatives**; corrections at T067, which refuted three of the *review's* own numbers). **Ships labelled a DEMONSTRATION KERNEL** — the harm needs four conjunctive conditions and **six neighbouring one-line spellings each remove it**. ⚠ **The quotable result is the price: on gcc the undefined spelling is the DEAREST of the six, and every fix saves exactly 6.00 `Ir`/call.** **The first bug class here that unsafe Rust does not reintroduce** — Rust has no type-based aliasing rule at any rung. Also the project's **first additivity-extrapolation failure**, which turned out **100% attributable** to three missing columns, none of them the one named |
@@ -1047,6 +1047,66 @@ on p16**, which was the worry: p16's shipped kernels are **410 bytes /
 `0b8c64b6…` against 324 bytes / `7952ec0b…`** — different, while `unsafe ≡ verus`
 collides exactly, as the `identity` pin requires.
 
+⚠⚠ **BUT ON AN OBJECT FILE IT DOES FALSE-POSITIVE, AND IT PRODUCES EXACTLY
+p45's VERDICT. LINK FIRST, OR READ `readelf -rW`.** (TASK_086 #238. ✅
+**MANAGER-VERIFIED on an independent minimal case**, `.temp/mgr86/reloc.rs` +
+`README.md`, which rebuild it.) **A relocated field is ZERO in the object file**,
+so two kernels differing *only* in **which function they call** — or in a global
+address, or a jump-table base — **md5 identically there and differ once
+linked**:
+
+```
+ .o     k_calls_a  d96e2a3350186ba3f3e7f13dcde2fe2e
+ .o     k_calls_b  d96e2a3350186ba3f3e7f13dcde2fe2e   <- IDENTICAL
+linked  k_calls_a  9fd9563c2de5747d7883758f234d8b5c
+linked  k_calls_b  9a346d637748fbb3640af34ec205e7ba
+```
+
+TASK_086 hit it for real on `k24_heapify_checked`/`_unchecked` (62 B, identical
+in the `.o`; 58 B and distinct linked). ⚠ **This matters because probe 2 is a
+KILL criterion and the object-file form is what a cheap pre-check reaches for** —
+`TASK_083_REVIEW`'s p15 probe said so explicitly.
+
+✅ **What it does NOT disturb, both checked:** **p45's kill stands** — its
+`k_plain`/`k_unchecked` are **leaf arithmetic folds over `&[i32]` with no call
+and no global**, so they carry no relocations to hide a difference in. And
+**p15's refusal stands** — a false-*positive* collision mode cannot turn a PASS
+into a FAIL, and p15's probe 2 **passed** (206 B vs 146 B).
+
+⚠ **AND THE FIRST ATTEMPT TO VERIFY THIS WAS WRONG AND LOOKED RIGHT.** In an
+object file each `#[inline(never)]` function sits at **address 0 of its OWN
+section** (`.text.k_calls_a`, `.text.k_calls_b`), so extracting *by address*
+returns the same bytes for both **by construction** and prints a collision that
+means nothing. **Extract per SECTION — `objcopy -O binary --only-section=.text.<sym>` —
+never by address, in a `.o`.**
+
+**4. DOES THE ROW'S UNSAFE OPERATION HAVE A `vstd` SPEC — AND THE GREP IS
+NECESSARY, NOT SUFFICIENT.** (Added TASK_086; the caveat is its finding #239,
+**PROVISIONAL — unreviewed**.) `check.py::_scan_unsafe_sites` requires every
+`unsafe` token in a pinned Verus source to sit inside an `external_body` item, so
+a row whose R4 operation vstd *does* spec cannot put the Verus-discharged call in
+a **verified** fn — that is exactly why **p15 is refused**. Measured across the
+tree: **47 `unsafe` tokens in 22 `patterns/*/verus.rs`, all inside wrappers**,
+and `grep -rn "get_unchecked" ~/tools/verus/vstd/` → **0 hits**, so every
+existing wrapper was unavoidable.
+
+⚠ **So grep `~/tools/verus/vstd/` — the PINNED one — for the operation, and grep
+the INHERENT spelling as well as the free one** (`core::str::from_utf8_unchecked`
+is `is not supported` while `str::from_utf8_unchecked` verifies `2/0`).
+
+⚠⚠ **BUT A MISS DOES NOT MEAN "ordinary wrapper route", AND `p35` IS THE
+COUNTER-EXAMPLE.** The Rust `union` keyword is **not in vstd at all** — 318 hits
+for `union` are every one of them `Set::union` — and p35 is blocked by
+`_scan_unsafe_sites` **anyway**, because Verus supports `union` **natively**: the
+correct-variant obligation is **first class in the type system** (`requires v is
+i` takes it from `1 verified, 1 errors` to **`2 verified, 0 errors`**), and the
+read is still `unsafe { v.i }` inside a **verified** fn.
+
+**The test that actually decides it is not the grep. It is: DOES AN `unsafe`
+TOKEN END UP INSIDE A VERIFIED BODY?** Run the rule itself —
+`.temp/t86/scan_unsafe_probe.py` drives HEAD's `_scan_unsafe_sites` against a
+candidate source and prints `host=NONE -> rep.fail(tcb-unsafe)`.
+
 **3. Any published `0.00` must name its AXIS and its CONVENTION in advance.**
 Which axis carries the finding when the cost gap is zero — behaviour matrix, TCB,
 compile-time expressiveness, or a **slope** rather than a level — and which `Ir`
@@ -1105,7 +1165,11 @@ everything.**
    `-O1`, `-O2`, `-O3`, `±codegen-units=1`, `±debug-assertions` and nightly; and
    **ASan reports `heap-buffer-overflow READ`**. ✅ **Reproduced independently by
    the reviewer AND by the manager.** So it is an ordinary out-of-bounds read,
-   **the tree's fourteenth `index >= len`**, and the new harm class does not
+   **an `index >= len`** — ⚠ **and it would have been the tree's THIRTEENTH, not
+   its fourteenth, because TWELVE BUILT patterns carry that class and p36 is the
+   twelfth** (TASK_086 #240; the 13th and 14th an earlier count reached were
+   `p45`'s and `p15`'s **own would-be ones, both REFUSED rows that were never
+   built**). **Count BUILT patterns.** The new harm class does not
    exist. **Two rows have now claimed that class and neither had it** (p45 was
    the other).
 2. **What survives is row 1 — an invalid *continuation* byte gives a silent
