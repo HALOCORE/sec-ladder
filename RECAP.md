@@ -16,7 +16,7 @@ this box is reference; this box is what to *do*.
 | **Rules for writing that task** | ⚠⚠ **STATE NOVELTY CLAIMS AS QUESTIONS TO BE MEASURED, never as fact.** *"The first termination proof in the project"* was the manager's sentence in `TASK_070.md`; it was **false**, the engineer had no reason to doubt it, and it shipped into **eight places, two inside `contract_sha256`** — a review and a re-gate to remove. **Rule 9 protects `.memory/` from unreviewed findings and protects NOTHING from the task file itself.** p22's §0 counted 73 measures in one command once it was finally asked. ⚠ **Settle the bug class as the FIRST deliverable** — overturned on four patterns, upheld on two. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat). **Additivity extrapolation — the only out-of-sample test here that can fail — HAS now failed once, on p38, and it was 100% attributable to three missing columns, none of them the one named.** The rule that came out of it: ⚠ **check the RESIDUE CLASS of any parameter your bands hold constant** — two of p38's three bands sat at `nw ≡ 0 (mod 8)` and the third did not, which fits in sample and misses out of it with no in-sample residual to warn you. ⚠ **Name the INLINE MODE at every figure** — p10 fitted both and the regressors *swapped*. All three in `.memory/03-measurement.md`. |
 | **The trap that keeps firing** | **A headline can be wrong in the FLATTERING direction and pass a green gate.** p10 published *"safe Rust cheaper than unsafe"*: 60% was an **unsearched R4 side**, the rest **index-expression bookkeeping C pays more of than either Rust rung**. **p27 repeated it one pattern later** — a dead store in R4 that R3 did not have. **p47 is the first pattern to search the R4 side properly** (six levers, each measured *and* run through Verus). ⚠ **p38 made it four** (`+21/+25` published against a true `+24/+32`) and **p22 made it FIVE, and widest yet — `+2.00` published against `+125/+1021`, 510×.** ✅ **The trend is the good news: p38 disclosed after review, p22 disclosed BEFORE being asked, and p36 searched the R4 side FIRST and CHANGED WHICH RUNG SHIPS** — the R2-shaped unsafe rung verifies and is 1022/8190 dearer, so shipping it would have published *"safe beats unsafe by 1007/8175"*. ⚠⚠ **AND THEN p36 FELL INTO THE MIRROR IMAGE, WHICH IS THE NEW LESSON: it searched R4 and left R3 with ONE lever, which moved R3 the wrong way.** Published `R3 − R4 = +15.00 flat`; the review's first in-contract R3 respelling made it **+7**, and **+2** against the cheapest R4. ⚠ **Searching one side is not searching. A difference is only as honest as its WEAKER-searched endpoint** — count the levers on each side and say whether they are comparable. **Before publishing any rung comparison, ask what BOTH rungs' spellings are worth.** |
 | **The loop** | build → review once → land corrections. **Three tasks per pattern is the measured cost.** Per `PROTOCOL.md` rule 9, write `.memory/` **only after** the review. |
-| **Git** | Commit at task boundaries; subagents never commit. ⚠ **There is a GitHub remote** (`origin`, `HALOCORE/sec-ladder`). **Do not push unless the user asks.** |
+| **Git** | Commit at task boundaries; subagents never commit. ⚠ **There is a GitHub remote** (`origin`, `HALOCORE/sec-ladder`). **Do not push unless the user asks.** ⚠⚠ **RULE 11'S HAZARD IS LIVE WHENEVER A REVIEWER PLANTS INTO TRACKED PATTERN FILES, AND THE MANAGER CAME WITHIN THREE MINUTES OF IT.** `TASK_084_REVIEW` plants real axioms into `patterns/p01-array-sum/{verus.rs,spec.md}` and restores them in a `finally:`; the manager committed **`bce8aa8` / `087a0af` / `ae19119` at 15:14:01–15:14:49** and the first plant began at **15:18**. ✅ **Nothing was contaminated** — every HEAD blob equalled the reviewer's pre-plant snapshot — **but that was luck, not sequencing.** ⚠ **Commit BEFORE launching a planting reviewer, never during**, and note the reviewer snapshotted **by bytes** rather than `git show HEAD:` precisely because the tree was dirty when it started. |
 | **Before quoting any number** | `harness/measure.py --check-stale` (exit 1 on STALE). |
 
 **Four settled answers that cost real time to get. Do not re-litigate them; each
@@ -66,6 +66,20 @@ is written up in `.memory/`.**
    ENGINEER was good and caught a wrong design; the one it wrote for ITSELF was a
    tautology.** ⚠ **Before believing a check, ask what would make it FAIL.** Here
    nothing would have, and the `grep` that shows it is one command.
+   ⚠⚠ **AND `TASK_084` FOUND A SECOND, DIFFERENT WAY FOR A *GOOD* ACCEPTANCE
+   TEST TO MISS: IT WAS VERIFIED IN TWO HALVES AND THE JOIN WAS NEVER RUN.**
+   Limb 3 was a genuinely good test — four planted axioms, one per route, and a
+   checker that **exits 1 on a byte-identical `synthesis.md`**. It passed. But
+   one script proved *source → gate log* and a **second** proved *hand-edited
+   JSON → `synthesis.md`*, and **nobody ran a real axiom through a real gate
+   into the record it wrote and on into the published table.**
+   `TASK_084_REVIEW` did, on **ten** routes, and **limb 3's own stated failure
+   mode reproduced on three of them** — including one where
+   `grep -c r84_lie gate.log` is **0** while the gate prints *"3 TCB items"* and
+   `synthesis.md` is byte-identical. ⚠ **A test split across two artefacts tests
+   neither seam.** Ask **which single command carries a change from the source
+   all the way to the number a reader quotes** — and if there isn't one, that is
+   the test you are missing.
 3. **Never write a finding into `.memory/` before its review lands** (rule 9).
    It is the only reason several overclaims were caught in RECAP rather than
    asserted as authoritative.
@@ -1795,9 +1809,33 @@ Both retired.
    that would have walked through it, and that is why it is refused.**
    **Softening that rule is admissible only AFTER this route is closed.**
 
-   **Still owed:** the fourth and fifth forms, the `#[path]` walk, wiring
-   axioms into `tcb_items`/synthesis so the published column moves, **and the
-   sixth route above.**
+   ⚠⚠ **B5 — A SEVENTH ROUTE, AND `TASK_084` OPENED HALF OF IT WHILE CLOSING
+   B3: THE `#[path]` WALK FEEDS ONE OF THREE DETECTORS.** (TASK_084_REVIEW major
+   1, **three planted gate runs**.) D3 widened `_check_axiom_decls` and
+   `_axiom_items` to `_path_includes`. It did **not** widen **`_trusted_items`**
+   — *the function immediately above `_axiom_items`, same shape, same purpose* —
+   nor the TCB inventory `tcb = [i for i in item_list if i.external]` inside
+   `check_verus_contract`. Both still iterate `verus.obligations` only. So an
+   `#[verifier::external_body]` with a **false `ensures`** in a
+   `#[path]`-included module ships **fully green with no gate output at all**:
+   `grep -c r84_lie gate.log` → **0**, the gate prints *"3 TCB items"*, and
+   `synthesis.md` is **byte-identical**. Same for a bodied
+   `external_fn_specification`, and the `assume(`/`admit(` shout also runs over
+   `sorted(pinned_obl)` only.
+   ✅ **Clean negative that bounds it: `unsafe` in an included module IS
+   caught** (`[tcb-unsafe]`), **so the vector is false claims about SAFE
+   operations** — exactly the threat `_check_axiom_decls`' own docstring names.
+   **Fix: widen `_trusted_items`, the `tcb` inventory and the keyword shout the
+   same way `_axiom_items` was.**
+
+   **Still owed:** the `#[path]` walk's **other two detectors** (B5), the
+   **sixth route** (used vstd `assume_specification`s), and **minors 1, 4 and 5
+   of `TASK_084_REVIEW`** — a shared axiom in `common/driver.rs` is counted
+   **22 times** in the published total (dedupe on `(key, name, line)`), a
+   `pub(crate) trait` under an external-trait attribute under-counts to one
+   `ExW::?`, and a `#[path]` include resolving *inside* `pdir` gets **two keys**
+   and is counted twice. ✅ **B1, B2, B3 and the published column are CLOSED at
+   `TASK_084` and reviewed.**
 
    *Original closure text kept below — it is right about what it covers.*
 
