@@ -2355,7 +2355,10 @@ Both retired.
       `±debug-assertions`, and nightly.** And **ASan catches it**:
       `heap-buffer-overflow READ`, a one-past-the-end heap read. **So it is a
       bounds violation, it is the tree's FOURTEENTH `index >= len`, and the new
-      harm class does not exist.** What survives is row 1 — a silent wrong
+      harm class does not exist.** ✅ **MANAGER-VERIFIED on an independent
+      build** — `rustc -O` on the probe's replica, `trunc` → `exit=139` with
+      empty stdout, `other` → `exit=0 len=4 fold=100507`, three runs each. **This
+      refutation does not need the review to land.** What survives is row 1 — a silent wrong
       answer **Miri does not catch** — **which is p18's harm, and p18's harm is
       what killed p45.**
     - **The cost axis survives but reverses the row's point.** A verified
@@ -2477,13 +2480,21 @@ Both retired.
     binary **prints nothing and exits 0** because `unreachable_unchecked` inside
     `next_code_point` let LLVM delete the program's own `println!`, with **no
     bounds violation anywhere**. Miri catches it, ASan has nothing to catch.~~
-    That is *"the optimiser deleted the programmer's code"* — the harm class
+    ~~That is *"the optimiser deleted the programmer's code"* — the harm class
     proposed for `p45` and **refuted as stated there** — real, measured, and in
     the shipped-language rung. **It ships as a control under (A) and (B) and as
-    the evidence under (C).** ⚠ **Row 1 is the honest weakness and belongs in
-    `spec.md` up front, not discovered later:** an invalid *continuation* byte
-    is a silent wrong answer **Miri does not catch**, which is p18's harm, and
-    p18's harm is what killed p45.
+    the evidence under (C).**~~ ⚠⚠ **STRUCK TOO. `p45`'s harm class was refuted
+    there and it is refuted here as well** — the truncated-lead cell is an
+    ordinary out-of-bounds read that SIGSEGVs and that ASan reports, so nothing
+    in it is *"the optimiser deleted the programmer's code"*. **Two rows now
+    claimed that class and neither had it.**
+
+    ✅ **Row 1 SURVIVES, was re-measured, and is the honest weakness — it belongs
+    in any p15 `spec.md` up front, not discovered later:** an invalid
+    *continuation* byte is a silent wrong answer, `len=4 fold=100507`, exit 0,
+    **Miri clean** — which is p18's harm, **and p18's harm is what killed p45.**
+    ⚠ **With row 2 gone, row 1 is the WHOLE of p15's harm story, and it is a
+    class the project has already refused a row over.**
 
 ### Deferred with a stated reason
 
