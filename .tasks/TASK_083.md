@@ -218,3 +218,126 @@ with a measurement, before recommending it.**
 reason (5c-twin would demand a twin of a body-less item) and I did not verify it.
 **If that reason is wrong, the TCB column is still under-counting and TASK_082
 only half-closed the blocker it was written for.**
+
+---
+
+## Outcome (recorded by the manager at the task boundary)
+
+⚠⚠ **THREE BLOCKERS ON THE GATE STAGE LANDED ONE COMMIT EARLIER, AND "Owed" 0 IS
+RE-OPENED. `TASK_082` CLOSED ONE OF AT LEAST FOUR ROUTES.** Report:
+`.tasks/TASK_083_REVIEW_REPORT.md` (961 lines). ✅ **All four findings
+manager-verified.** Part B delivered a **measured** pattern selection.
+
+**B1 — `#[verifier::external_trait_specification]`**, a fourth body-less trusted
+form, **54× in the pinned vstd**, and
+`grep -c 'external_trait_specification\|external_fn_specification' harness/*.py`
+is **0 in all nine files**. ✅ **Manager-re-run: Verus reports `2 verified, 0
+errors` proving `r == 0`; the compiled program PRINTS 7; `axiom_decls` returns
+`[]`.** The attributes sit on a `struct`/`trait`, so no item carries `.external`
+and the TCB inventory is empty. ⚠ **And Verus printed the
+`external_type_specification` line to paste — the same accident vector as the
+original.**
+
+**B2 — `#[verifier::external_fn_specification]`**: `\bverifier::external\b` does
+not match it (next char `_`), so in `verus.items` it is **indistinguishable from
+a verified function**.
+
+**B3 — an axiom in a `#[path]`-included SUBDIR module**, because the one
+directory guard uses **`os.listdir`, which is flat**. ⚠⚠ **This vector is LIVE IN
+ALL 22 PATTERNS** — ✅ manager-verified that every `verus.rs` `#[path]`-includes
+`common/driver.rs`. `_scan_unsafe_sites` already walks `_path_includes` for
+exactly this threat.
+
+⚠⚠ **MAJOR 4, AND IT IS ABOUT THE MANAGER'S OWN VERIFICATION.** `synthesize.py`
+reads **`tcb_items`**, and *"axiom"* appears **zero times** in `synthesis/*.py`
+and `results/synthesis.md` (✅ manager-verified). **So the TASK_082 check that
+*"`results/synthesis.md` regenerates byte-identical, therefore nothing moved"*
+PASSED FOR THE WRONG REASON** — it is byte-identical because **the published TCB
+column cannot see the new field at all.** *A green check is evidence about the
+check*, and this one was the manager's.
+
+✅ **What TASK_082 got right, and the clean negatives that establish it:** 7 of 7
+spelling variants caught; the `broadcast proof fn`-with-a-body boundary is
+exactly where claimed; the declared-count escape works as int and name-list.
+✅ **And the manager's second-least-sure call was WRONG IN THE SAFE DIRECTION** —
+the `_is_trusted` exclusion reason is **true** (`uninterp` with a body is a Verus
+error), though its stated *consequence* named the wrong function.
+
+**A2 — the law survives out of sample and its MECHANISM dies.** `nsuf = 9..12` on
+an independent `n_iters` pair gives `70, 75, 82, 89`, lag-4 **26 four more times,
+8/8**. ⚠ **But the table walk is SCALAR in both rungs** — the 4× unroll is the
+**inner byte fold**, and perturbing only the *generator's* suffix step moves the
+period (`step ≡ 0 or 2 mod 4` → no sawtooth at all). **The period is the
+generator's, not a loop's.** Replacement law, zero free parameters:
+**`R3ship − R4 = 11 + 7·nsuf − 2·#{i : s_i ≡ 0 mod 4}`**, predicting all 49
+points and both published inputs. ✅ **It also closes the `30 ≠ 32` question** —
+no published p17 number is wrong. ⚠ **And `6.50`/request must NOT be quoted: both
+shipped inputs pay 7.00, so it makes p17's own inputs less accurate.**
+
+**A3 — two more stale counts in `.memory/01-ladder.md`, both the same shape.**
+*"every one of the **six** patterns pins `identity`"* (not marked historical) and
+a correction that reads *"there are **eighteen**"* — ✅ **measured 22 of 22.**
+⚠ **A CORRECTION THAT CARRIES A CONSTANT GOES STALE THE WAY THE THING IT
+CORRECTED DID**; that line has now been wrong three times in the same place.
+
+**PART B — build `p15` (UTF-8 validation + decode), and the manager's question
+(i) was REVERSED.** ✅ Manager-re-run: `core::str::from_utf8_unchecked` →
+`is not supported`; **`str::from_utf8_unchecked` (INHERENT) → `2 verified, 0
+errors`**, because `vstd/string.rs:136` ships the `assume_specification` with
+`requires valid_utf8(v@)`, and `vstd/utf8.rs:272` ships `valid_utf8` as a full
+recursive spec. **R5 is not a stall.** ⚠ **The diagnostic was correct about the
+function named and the wrong answer to the question asked** — same family as the
+44-task false *"no spec for `copy_from_slice`"*.
+
+⚠ **The manager's named least-sure call (iii) was RIGHT, and the row carries
+anyway.** The C harm **is** the thirteenth `index >= len` (ASan
+`heap-buffer-overflow READ of size 1`). **But the R4 harm splits into two rows
+with NO bounds violation at all**: invalid continuation → silent wrong answer,
+**Miri clean**; truncated lead → Miri `entering unreachable code`, **and the `-O`
+binary prints nothing and exits 0 — the optimiser deleted the program's own
+`println!`.** ⚠ **That is the harm class the manager proposed for `p45` and which
+was refuted there; here it is real.** **p15 is not p31: p31 had no boundary
+anywhere; p15's is measured on all three probes** (kernels 206 B vs 146 B,
+different digests; cost axis **+4.1% ASCII / +100.1% on 2–3-byte scalars**, and
+**the axis is the input alphabet, which no pattern varies**).
+
+**Manager decisions:**
+
+1. ⚠ **"Owed" 0 is RE-OPENED and the closure claim in commit `5883909` is
+   corrected in RECAP.** What TASK_082 closed stands; three routes and the
+   published column remain. **The next gate task owes: the fourth and fifth
+   forms, the `#[path]` walk, and wiring axioms into `tcb_items`/synthesis.**
+2. ⚠ **THE VALGRIND FINDING IS NOT TAKEN AS REPORTED — it is too strong, and the
+   existing memory was right.** The report says memcheck is *"unavailable on this
+   box"*; `.memory/00-environment.md` already scopes that to **dynamic** binaries
+   and says a `-static` build works. ✅ **Manager-re-verified: a static build runs,
+   with exactly the `__libc_setup_tls` artefact that paragraph says to ignore.**
+   ⚠ **Second agent to re-find the dynamic half and generalise it** — which is how
+   the original blanket *"unusable"* got written. **What IS new and landed: the
+   same restriction applies to `--leak-check`, so `p42` has no valgrind catcher in
+   the shipped link mode.**
+3. **The p15 recommendation is TAKEN**, and it is the **second** row an agent has
+   chosen. ⚠ **Its named kill-risk is carried verbatim into the build task**:
+   R5's call site must discharge `valid_utf8` over file bytes, which needs a
+   *verified* validator. **If it stalls, the only escape is a hand-written axiom
+   — i.e. blockers 1–3 — so the row must be REFUSED rather than axiomatised.**
+   That coupling is why the gate work goes first.
+4. **The p17 doc correction is queued, not landed** — §10b is a hashed pattern
+   doc, so it rides the next sweep with `p01/spec.md`'s retracted `identity` line.
+
+⚠ **PROTOCOL rule 2's running count is 235:** 227 at TASK_083's writing, **+8** —
+the three missed trusted forms, the `os.listdir` path hole, the synthesis column
+never reading the field (which invalidated a manager verification), p17's
+mechanism, and the two stale `identity` counts. **Carry 235 forward.**
+
+**The single most useful thing in this block.** ⚠⚠ **The manager verified
+TASK_082 with a test that could not fail.** *"`results/synthesis.md` regenerates
+byte-identical, so adding `axiom_decls` moved no published number"* was run,
+passed, and quoted in a commit message — and it was byte-identical **because the
+published column never reads the field.** ✅ **The three-limb acceptance test the
+manager wrote for the ENGINEER was good and caught a wrong design; the one the
+manager wrote for ITSELF was a tautology.** **The fix is the same discipline
+already in `.memory/`: before believing a check, ask what would make it FAIL.**
+Here nothing would have — `synthesize.py` reads `tcb_items`, and a `grep` for
+*"axiom"* over `synthesis/` returns zero. **That grep is one command and it was
+never run.**

@@ -28,7 +28,10 @@ patterns is FALSE, measured at TASK_025_REVIEW.** The claim was
 It does not hold here, and the counterexample is this project's own gate:
 
 > **Every one of the six patterns pins `identity: unsafe ≡ verus, O3 exact`**
-> (checked, all six `results/gate/*.json`). So an R4 is not merely a program that
+> (checked, all six `results/gate/*.json`). ⚠ **"six" IS STALE AND THIS QUOTE IS
+> NOT MARKED HISTORICAL — it is 22 of 22** (TASK_083_REVIEW; derive it with
+> `grep -l identity patterns/*/spec.md | wc -l` against `ls -d patterns/p*/ | wc -l`).
+> **The argument is unaffected; the count is not a constant.** So an R4 is not merely a program that
 > *may* use `unsafe` — **it is a program that must have a byte-identical R5 twin
 > that Verus verifies.** R4 is therefore constrained by what vstd can express,
 > and R3 is not constrained at all. The two classes are **incomparable**, not
@@ -82,8 +85,12 @@ disqualify anything:**
 Every pattern's `slb-contract` block carries an `idiom` object naming the tokens
 each rung must spell literally. It is a **policy adopted after measuring**, not a
 reading of what any earlier text meant, and **every pattern carries a
-byte-identical statement of it** — ⚠ this sentence said **"all six"**, there are
-eighteen, and it was **FALSE for p27** from TASK_060 until TASK_062 restored it.
+byte-identical statement of it** — ⚠ this sentence said **"all six"**, then
+**"eighteen"**, and it is **22 of 22** (TASK_083_REVIEW; count it with
+`grep -l identity patterns/*/spec.md | wc -l`). ⚠⚠ **A CORRECTION THAT CARRIES A
+CONSTANT GOES STALE THE SAME WAY THE THING IT CORRECTED DID** — this line has now
+been wrong three times in the same place. It was **FALSE for p27** from TASK_060
+until TASK_062 restored it.
 It is the authoritative statement of an invariant that nothing in the gate could
 see until TASK_062 added `named_spelling_problem`; the standing one-liner that
 should have caught it lived in prose and did not fire across four tasks and two

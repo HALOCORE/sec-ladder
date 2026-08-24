@@ -1525,6 +1525,62 @@ presence in the symbol table** — and note that this is the same shape as the
 outward-dispatch rule above: a symbol list answers a weaker question than a
 column of numbers.
 
+## ⚠ A LAW CAN SURVIVE OUT-OF-SAMPLE AND ITS MECHANISM STILL BE WRONG — p17's sawtooth
+
+(TASK_082 fitted it, TASK_083_REVIEW kept the law and killed the explanation.
+**This is the cleanest instance in the project of the two coming apart.**)
+
+**The law held everything you could ask of it.** `R3ship − R4` over `nsuf = 1..8`
+is `18, 23, 30, 37, 44, 49, 56, 63`; lag-4 differencing gives **26 four times,
+zero residual**; extended **out of sample to `nsuf = 9..12`** on an independent
+`n_iters` pair it gives `70, 75, 82, 89` and **26 four more times, 8/8**.
+
+⚠⚠ **AND THE STATED MECHANISM WAS STILL WRONG.** TASK_082 attributed the period
+to *"the 4×-unrolled walk over the suffix table"*. **The table walk is SCALAR in
+both rungs** — one `movzx` pair, `inc`, `cmp`, `je`. The 4× unroll is the **inner
+BYTE fold**, keyed on the *served length*, with an `and $0x3` epilogue.
+
+**The experiment that settles it — perturb only the GENERATOR's suffix step:**
+
+```
+step=36 (0 mod 4): 18 25 32 39 46 53 60 67   +7 x7        NO SAWTOOTH
+step=37 (1 mod 4): 18 23 30 37 44 49 56 63   +5,+7,+7,+7,+5,+7,+7
+step=38 (2 mod 4): 18 25 32 39 46 53 60 67   +7 x7        NO SAWTOOTH
+step=39 (3 mod 4): 18 25 32 37 44 51 58 63   +7,+7,+5,+7,+7,+7,+5
+```
+
+Request count is `1..8` in every row. ⚠ **The period is the GENERATOR'S, not a
+loop's** — and `p17/inputs/gen.py`'s own hashed comment already said the suffix
+index *"has no residue class"*.
+
+**The replacement law, zero free parameters:**
+
+```
+R3ship − R4 = 11 + 7·nsuf − 2·#{ i : s_i ≡ 0 (mod 4) }
+```
+
+It predicts **all 49 measured points** and **both published inputs** — `small`
+(suffixes 498/251/122 → residues 2,3,2 → **32**) and `large` (4085/2041/1019 →
+1,1,3 → **32**), each matching to `0.00`.
+
+✅ **It also closes the `30 ≠ 32` question**, which looked like a published
+number being off by 2: `sweep-nsuf-03`'s suffixes are 497/460/423, **one of which
+is ≡ 0 mod 4**, so 30 is what the law requires. **No published p17 number is
+wrong.**
+
+⚠⚠ **DO NOT QUOTE `6.50 Ir`/request. It is BAND-SPECIFIC and it makes p17's own
+shipped inputs LESS accurate.** Both shipped inputs have **no** residue-0 suffix
+and therefore pay **7.00**; over 20 ranges the truth is 151, `7n + 9` gives 149,
+and `6.50` gives ~140.
+
+> **The rule, and it is the reusable part: an out-of-sample test validates the
+> LAW, not the STORY.** A sawtooth in the data is evidence of *a* period; it is
+> not evidence of *which* loop. ⚠ **Any 8-point sequence can be lag-4 differenced
+> — four equal differences are a fact about the numbers.** **Confirm a mechanism
+> in the disassembly, or by perturbing the thing you claim causes it, before
+> naming it.** Here, perturbing the generator moved the period and the
+> disassembly named a different loop.
+
 ## Hold out a LENGTH, not a MIXTURE — an out-of-sample test can be provably unable to fail
 
 (TASK_045_REVIEW, on p13. This **sharpens the section below**, which was written

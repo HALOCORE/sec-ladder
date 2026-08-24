@@ -1719,7 +1719,55 @@ Both retired.
 
 ### Owed, in priority order
 
-0. ✅ **CLOSED at TASK_082 — and the repair the item PRESCRIBED would have broken
+0. ⚠⚠ **RE-OPENED at TASK_083_REVIEW, ONE COMMIT AFTER BEING CLOSED. TASK_082
+   CLOSED ONE OF AT LEAST FOUR ROUTES.** Three more body-less trusted forms
+   verify a falsehood and are **invisible to the new stage**, and the published
+   column never saw the fix at all. ✅ **All four manager-verified.**
+
+   **B1 — `#[verifier::external_trait_specification]`.** A fourth body-less
+   trusted form, **54× in the pinned vstd**, and
+   `grep -c 'external_trait_specification\|external_fn_specification' harness/*.py`
+   is **0 in all nine files**. Probe: Verus proves `r == 0`, **the compiled
+   program prints 7**, `axiom_decls` returns `[]`, and no item carries
+   `.external` (the attributes sit on a `struct`/`trait`), so the TCB inventory
+   is empty and 5c-twin shouts *"no trusted item"*. ⚠ **And Verus PRINTED the
+   `external_type_specification` line to paste — the identical accident vector as
+   this item's original.**
+   **B2 — `#[verifier::external_fn_specification]`.** `vparse`'s
+   `\bverifier::external\b` does not match it (next char is `_`), so `.external`
+   is `None` and it is **not a TCB item**. In `verus.items` it is
+   **indistinguishable from a verified function**.
+   **B3 — an axiom in a `#[path]`-included SUBDIR module.** The scan runs over
+   `verus.obligations` and its one guard uses **`os.listdir`, which is FLAT**.
+   ⚠⚠ **THIS VECTOR IS LIVE IN ALL 22 PATTERNS** — every `verus.rs`
+   `#[path]`-includes `common/driver.rs`, so `common/` is in every pattern's
+   token stream. `_scan_unsafe_sites` already walks `_path_includes` for exactly
+   this threat; the axiom scan does not.
+
+   ⚠⚠ **AND THE PUBLISHED COLUMN NEVER SAW THE FIX.** `synthesize.py` reads
+   **`tcb_items`**, and the word *"axiom"* appears **zero times** in
+   `synthesis/*.py` and `results/synthesis.md`. ⚠ **So the manager's
+   verification that *"`results/synthesis.md` regenerates byte-identical, so
+   nothing moved"* PASSED FOR THE WRONG REASON** — it is byte-identical because
+   **the published TCB column cannot see `axiom_decls` at all.** *A green check is
+   evidence about the check.*
+
+   **What TASK_082 DID close, and it stands:** the three-keyword matcher is
+   sound on what it claims — **7 of 7 spelling variants caught** (`pub(crate)`,
+   split keywords, comment between, generic + `where`, mod-nested, target on the
+   next line), the `broadcast proof fn`-with-a-body boundary is exactly where it
+   was said to be, and the declared-count escape works as int and as name-list.
+   ✅ **And the `_is_trusted` exclusion reason is TRUE** — `uninterp` with a body
+   is a Verus error, so 5c-twin really would demand an impossible twin. ⚠ **But
+   its stated CONSEQUENCE pointed at the wrong function**: the published column
+   is `tcb_items`, not `_is_trusted`.
+
+   **Still owed:** the fourth and fifth forms, the `#[path]` walk, and wiring
+   axioms into `tcb_items`/synthesis so the published column moves.
+
+   *Original closure text kept below — it is right about what it covers.*
+
+   ✅ **CLOSED at TASK_082 — and the repair the item PRESCRIBED would have broken
    a green pattern.** `vparse.axiom_decls()` is a **separate keyword-keyed
    matcher**; `parse()` is untouched. New gate stage: counts body-less trusted
    declarations, compares against an optional `spec.md` `verus.axioms` key

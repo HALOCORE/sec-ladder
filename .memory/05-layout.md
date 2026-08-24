@@ -442,6 +442,37 @@ other three rung sources declare `apply` the same way.**
 ⚠ **And it would count the wrong thing anyway**: a trait method declaration is
 **not** a trusted item — it is proved by its impl.
 
+⚠⚠ **AND THERE ARE AT LEAST FIVE BODY-LESS TRUSTED FORMS, NOT THREE — TASK_082
+COUNTED THREE AND TASK_083_REVIEW FOUND TWO MORE PLUS A PATH HOLE.** All
+manager-verified. **A body-less trusted declaration is any construct that makes
+Verus believe something about code it never checks**, and the keyword list is:
+
+| form | counted at TASK_082? | why it is missed |
+|---|---|---|
+| `assume_specification` | ✅ | — |
+| `axiom fn` / `broadcast axiom fn` | ✅ | — |
+| `uninterp spec fn` | ✅ | — |
+| **`#[verifier::external_trait_specification]`** | ❌ | **54× in the pinned vstd**; the attribute sits on a `struct`/`trait`, so **no item carries `.external`** and the TCB inventory is empty |
+| **`#[verifier::external_fn_specification]`** | ❌ | `\bverifier::external\b` **does not match** — the next character is `_` — so `.external` is `None` and in `verus.items` it is **indistinguishable from a verified function** |
+
+**Demonstrated:** Verus reports `2 verified, 0 errors` proving `r == 0`; the
+compiled program **prints 7**; `axiom_decls` returns `[]`; 5c-twin shouts *"no
+trusted item"*. ⚠ **And Verus PRINTS the `external_type_specification` line for
+you to paste**, which is the same accident vector as `assume_specification`'s.
+
+⚠⚠ **A THIRD HOLE THAT IS NOT ABOUT KEYWORDS: `os.listdir` IS FLAT.** The axiom
+scan runs over the obligation set and its one directory guard does not recurse,
+so **an axiom in a `#[path]`-included SUBDIR module is invisible**. ⚠ **This
+vector is live in all 22 patterns** — every `verus.rs` `#[path]`-includes
+`common/driver.rs`. `_scan_unsafe_sites` already walks `_path_includes` for
+exactly this threat; **copy that walk.**
+
+⚠ **And the PUBLISHED column still cannot see any of it**: `synthesize.py` reads
+**`tcb_items`**, and *"axiom"* appears **zero times** in `synthesis/*.py` or
+`results/synthesis.md`. **A `results/synthesis.md` that regenerates
+byte-identical after adding `axiom_decls` is NOT evidence that nothing moved —
+it is evidence the published column never reads the field.**
+
 > **The rule: `parse()`'s skip is load-bearing. To make a NEW class of item
 > visible, add a separate keyword-keyed matcher — do not widen `parse()`.**
 > That is what `vparse.axiom_decls()` is, and `vparse.py selftest` now pins

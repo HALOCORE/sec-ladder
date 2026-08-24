@@ -133,6 +133,20 @@ Ignore the one `__libc_setup_tls` → `_IO_cleanup` report: it is glibc's own
 static-TLS artefact, present on a program that does nothing. **Scope any verdict
 to the kernel symbol**; a clean kernel with that one report standing is a pass.
 
+⚠ **RE-HIT at TASK_083_REVIEW, which reported memcheck as flatly "unavailable on
+this box". That is TOO STRONG and the text above is right** — the reviewer probed
+a **dynamic** binary, which is the documented refusal; a `-static` build runs
+fine (manager-re-verified, with exactly the `__libc_setup_tls` artefact this
+paragraph says to ignore). ⚠ **This is the second agent to re-find the dynamic
+half and generalise it**, which is how the original blanket "unusable" got
+written. **The distinction is `-static`, and it is one flag.**
+
+⚠ **One consequence that IS new and does bite pattern selection: LEAK checking.**
+`--leak-check` inherits the same restriction, so **a leak-on-error-path pattern
+(`p42`) has no valgrind catcher for a normally-linked cell** — its only catcher
+is LeakSanitizer. Recorded because p42's triage named *"Miri's leak check or
+valgrind"* and one of those two is not available in the shipped link mode.
+
 **ASan/UBSan need `-static-libasan -static-libubsan`.** The container ships
 `LD_PRELOAD=/usr/libexec/coreutils/libstdbuf.so`, and the *shared* ASan runtime
 then refuses to start ("ASan runtime does not come first in initial library

@@ -1480,3 +1480,40 @@ to know that**, and the message does not say it.
   checks"** — **not** *"cannot reach it at all"*, and **not** that p11's finding
   flips. ⚠ `patterns/p11-nul-scan/NOTES.md` already contains **both** sentences,
   which is a contradiction that now matters.
+
+## ⚠ `is not supported` may be right about the FUNCTION YOU NAMED and wrong about the question
+
+(TASK_083_REVIEW, on p15. ✅ **Manager-verified — both runs.**)
+
+**The same operation has a FREE path and an INHERENT path, and vstd may spec one
+and not the other:**
+
+```
+core::str::from_utf8_unchecked(v)   ->  error: ... is not supported
+str::from_utf8_unchecked(v)         ->  verification results:: 2 verified, 0 errors
+```
+
+`~/tools/verus/vstd/string.rs:136` ships
+`pub assume_specification[ str::from_utf8_unchecked ](v: &[u8]) -> (res: &str)`
+with `requires valid_utf8(v@)` and `ensures res.spec_bytes() =~= v@`, and
+`~/tools/verus/vstd/utf8.rs:272` ships `pub open spec fn valid_utf8` as a full
+recursive spec with `decode_utf8`.
+
+⚠⚠ **So the diagnostic is CORRECT and the conclusion drawn from it can still be
+false.** *"`from_utf8_unchecked` is not supported"* was true of the path that was
+typed and false of the operation. **Before recording an item as unreachable,
+grep the pinned vstd for the INHERENT spelling as well as the free one** —
+`grep -rn 'assume_specification\[ *TYPE::NAME' ~/tools/verus/vstd/`.
+
+**This is the same family as the 44-task false *"vstd has no spec for
+`copy_from_slice`"***: a negative about the library asserted from one probe.
+⚠ **Four patterns' R4 triages (p05, p07, p11, p18) rest on `is not supported`
+messages that nobody re-ran against the inherent path.**
+
+### Two smaller pins from the same task
+
+- **A postcondition cannot mention a bare `v@` for a `&mut` parameter** at this
+  pin — use `old(v)` / `final(v)`. Costs a run to rediscover.
+- **`uninterp` with a body is a Verus error**, which is why body-less trusted
+  declarations cannot be given twins — and therefore why feeding them to
+  `_is_trusted` would make a legal declaration unpassable. ✅ Verified.
