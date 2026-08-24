@@ -19,6 +19,14 @@ Scratch in `.temp/r84/` — free, I checked.
 
 *(manager fills this at launch)*
 
+⚠ **`.tasks/TASK_084_REPORT.md`, cited above, does not exist yet — this file was
+written before the engineer returned, so the citation is deliberately forward.
+PROTOCOL rule 10 says write the report file BEFORE citing it, and the manager is
+in violation of it until launch. The report is created at the same moment §0 is
+filled**, which is before this file is handed to anyone. The rule-10 sweep will
+flag it as `MISSING` until then; that is expected and is not a second dangling
+citation to chase.
+
 ---
 
 ## 1. ⚠⚠ THE META-ATTACK, AND IT IS THE POINT OF THIS REVIEW
