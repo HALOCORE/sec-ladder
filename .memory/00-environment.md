@@ -174,11 +174,15 @@ the binding one.
    two globals are no longer neighbours. **A pattern whose harm depends on two
    objects being adjacent has no stage-7 row available to it.**
    ✅ **ATTACKED AND UPHELD at TASK_080** (gcc delta `-64`, clang `+32` under
-   ASan). ⚠ **With a refinement that matters if you write the probe: without
-   ASan, gcc lays `y` SIXTEEN BYTES BEFORE `x` (`-16`) and clang `+16` — both
-   adjacent — so the test must be `|delta| == 16`, not `delta == +16`.** A
-   `y - x == +16` probe reports gcc *"notadjacent"* **with no sanitizer at all**,
-   i.e. it manufactures the result it is looking for. (gcc also needs
+   ASan). ⚠ **Use `|delta| == 16`, never `delta == +16`** — a signed test
+   reports *"notadjacent"* **with no sanitizer at all** and manufactures the
+   result it is looking for. ⚠ **The PER-COMPILER attribution once written here
+   was wrong and is retracted** (TASK_081_REVIEW): it said *"without ASan, gcc
+   lays `y` sixteen bytes BEFORE `x` and clang `+16`"*. Measured across opt
+   levels, **gcc `-O0` is `+16`** and only `-O1`/`-O2` are `−16`, while clang is
+   `+16` throughout — **and a `.bss` variant flips clang too.** So the layout
+   sign is a function of **opt level and storage class**, not of the compiler.
+   **Name the opt level, and test the absolute value.** (gcc also needs
    `-static-libasan` on this box or a runtime-ordering error fires first —
    manager-hit while verifying.)
 3. ✅ **`-fsanitize=alignment` is in BOTH compilers' default `undefined` set and

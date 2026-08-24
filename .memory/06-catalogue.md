@@ -953,23 +953,47 @@ are between the *"missing axis"* header and the *"Recommended order"* line, and
 
 ## ⚠⚠ THE LADDER TEST — run it before writing a task file. Three rows in a row died on it.
 
-**Manager rule, adopted at TASK_080 after three consecutive refusals.** `p48`,
-`p31` and `p45` were each refused, and the refusals were each *correct and
-cheap*. But they share a cause that none of the three triages tested, and it is
-**not** *"is the bug class new?"*:
+**Manager rule, adopted at TASK_080 after three consecutive refusals — and
+⚠⚠ ITS FIRST HALF WAS RETRACTED AT TASK_081_REVIEW, ONE TASK LATER, AS A
+BLOCKER.** `p48`, `p31` and `p45` were each refused, and the refusals were each
+*correct and cheap*. They share a cause none of the three triages tested, and it
+is **not** *"is the bug class new?"* — that part stands. **The manager's first
+attempt to state the cause did not.**
 
-> ⚠ **A PATTERN NEEDS A BUG THAT R4 CAN REINTRODUCE AND R3 CANNOT, AND A COST
-> THAT DIFFERS BETWEEN THEM. If either half fails, the ladder collapses and
-> there is nothing to measure — however novel the bug class is.**
+⚠ **RETRACTED, and it is kept because HOW it was wrong is the useful part:**
 
-How each row failed it, and note that **all three failures are visible from a
-probe, none from an argument**:
+> ~~**A PATTERN NEEDS A BUG THAT R4 CAN REINTRODUCE AND R3 CANNOT, AND A COST
+> THAT DIFFERS BETWEEN THEM.**~~
 
-| row | which half failed | the measurement that showed it |
+**It misclassifies two of the project's own reference patterns, in OPPOSITE
+directions, and it contradicts the table three lines below it:**
+
+- ⚠ **`p08` SATISFIES it and shipped as finding 7.** Its bug is an overlapping
+  `memcpy`: R4 reintroduces it via `copy_nonoverlapping`, and safe Rust **cannot
+  express it** — the borrow checker rejects it at compile time. That is the first
+  half met exactly, while this block's own table cites *"R3 cannot express it"*
+  as `p48`'s **failure**. **The table means the KERNEL; the rule says the BUG.**
+- ⚠ **`p47` VIOLATES it and shipped.** Its timing leak **is reintroducible in
+  safe Rust** — `safe_naive` is one of the leaking rungs — so *"R3 cannot"* is
+  false for p47.
+- ⚠⚠ **AND THE MANAGER'S OWN STATED WORRY WAS AIMED AT THE WRONG HALF.** The
+  manager predicted p47 would fail the **cost** half. ✅ **Measured, it passes
+  comfortably: `R3 − R4 = +90.0 / +142.0 `Ir`/call`** (`safe_tuned` 524.0/747.7
+  against `unsafe` 434.0/605.7, O3/isolated, manager-re-run from
+  `results/gate/p47-ct-compare.json`). **The half the manager defended is the half
+  that was wrong.**
+- **The cost half never says WHICH `Ir` CONVENTION**, and both are defined. On
+  p08 the level difference is **+26.02/+26.00** (differs) and the slope
+  difference is **5.6e-6** (does not) — **opposite verdicts from an unstated
+  choice.**
+
+How each row failed, restated against probe 1 below:
+
+| row | what was missing | the measurement that showed it |
 |---|---|---|
-| `p48` | **R3 cannot express it** → so R4-vs-R3 is p08's *"compile-time, nothing to measure"* | safe Rust needs `set_len`, i.e. `unsafe`, to reach the residue at all |
-| `p31` | **the bug class is absent from the kernel** — an arena's carve is *correct* C | the arena shape is provenance-clean **24/24**; only two adjacent top-level objects are exploitable |
-| `p45` | **BOTH.** `unchecked_add` cannot implement *"detect overflow"*; and under the other contract every rung is byte-identical | `k_plain`/`k_wrapping` are **two symbols on ONE section**; `k_unchecked`'s section **md5s identically** to `k_plain`'s |
+| `p48` | **no rung boundary in the KERNEL** — safe Rust needs `set_len`, i.e. `unsafe`, to reach the residue at all, so R3 has nothing to build | the padding sub-case is unbuildable across 3 layouts × 2 compilers × 4 opt levels |
+| `p31` | **no boundary anywhere** — an arena's carve is *correct* C, so no rung differs | the arena shape is provenance-clean **24/24** |
+| `p45` | **the rungs are the same machine code** | `k_plain` and `k_unchecked`, 155 bytes each, both `85bd268b3def0d5e386f1498706a6b2b` |
 
 ⚠ **The novelty question is the one the triages DID ask, and it is the less
 useful one.** `p36` shipped with the tree's **twelfth** `index >= len` and was
@@ -992,19 +1016,51 @@ published **`R3 − R4 = 0.00`** reads as *"safety is free"* when the truth is
 
 > **`R5 − R4 = 0.00` is already scoped as a TAUTOLOGY** in `results/synthesis.md`,
 > because the `identity` pin forces it. ⚠ **NOTHING scopes `R3 − R4 = 0.00` the
-> same way, and no gate stage looks.** The discriminator is two commands:
->
-> ```bash
-> readelf -sW <bin> | awk '{print $7, $8}'    # two rung symbols on ONE section index?
-> md5sum <each rung's extracted kernel bytes> # identical bodies?
-> ```
->
-> **Run them on any pattern that reports a rung difference of 0.00 before
-> publishing it as a safety result.** p16's `0.00000 Ir/byte` is the shipped
-> instance of a *genuine* zero — it has a **mechanism** (the reslice and the
-> `get_unchecked` both sit outside the fold loop) and the bodies are
-> mnemonic-identical **for a stated reason**. **A zero with a mechanism is a
-> finding; a zero because two rungs compiled to the same symbol is an artefact.**
+> same way, and no gate stage looks.**
+
+### The three probes. Run them BEFORE the row is written.
+
+**Restated at TASK_081_REVIEW after the first attempt was retracted above.**
+
+**1. A rung boundary must exist somewhere, and the row must NAME it.** ⚠ **Not
+necessarily R3-vs-R4** — that assumption is what broke the first version. p08's
+boundary runs at **compile time** (R2/R3 cannot express the bug, R4 can); p47's
+runs **inside the safe class** (idiom against idiom); p16's is a **slope**, not a
+level. **What is fatal is no boundary ANYWHERE**, which is p31.
+
+**2. The rungs must differ AS MACHINE CODE, and this is checked, not argued.**
+⚠ **The earlier *"two rung symbols on ONE section index"* form CANNOT FIRE on a
+shipped pattern** — in this project **every rung is its own binary**
+(`harness/build.py`), so no binary ever holds two rungs' kernels. That form
+applies to a **probe object file**, which is what p45's was. The form that
+transfers:
+
+```bash
+# per rung binary: kernel symbol's Ndx and Size from -sW, section file offset
+# from -SW, then md5 the extracted bytes
+readelf -sW <bin> ; readelf -SW <bin>     # -> (offset, size) for the kernel
+md5sum <extracted kernel bytes>            # collide => the pattern is ONE RUNG
+```
+
+**A collision is what would have caught p45.** ⚠ **And it does NOT false-positive
+on p16**, which was the worry: p16's shipped kernels are **410 bytes /
+`0b8c64b6…` against 324 bytes / `7952ec0b…`** — different, while `unsafe ≡ verus`
+collides exactly, as the `identity` pin requires.
+
+**3. Any published `0.00` must name its AXIS and its CONVENTION in advance.**
+Which axis carries the finding when the cost gap is zero — behaviour matrix, TCB,
+compile-time expressiveness, or a **slope** rather than a level — and which `Ir`
+convention the zero is stated in. **p47 knew that going in; p45 did not**, and
+could have shipped `R3 − R4 = 0.00` as *"safety is free"*.
+
+⚠ **A note on p16, because this block previously got it wrong.** p16's headline
+zero is a **per-byte rate**; its **level** difference is **+27.0 / +77.0**. And
+*"the bodies are mnemonic-identical"* is **not** true of p16's shipped kernels —
+p16's own `NOTES.md` says the shipped pair is *"23 instructions on each side, the
+same multiset, a different order"*. The mnemonic-identity claim is about the
+**chunk-loop body at matched fold spellings**, which is a narrower thing.
+**A zero with a named axis and a mechanism is a finding; a zero because two rungs
+compiled to the same bytes is an artefact — and only probe 2 tells them apart.**
 
 ### p45 — REFUSED at TASK_080. Read this before rescheduling it.
 

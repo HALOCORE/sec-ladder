@@ -9,8 +9,8 @@ this box is reference; this box is what to *do*.
 | | |
 |---|---|
 | **Patterns** | **22 exist, all 22 reviewed, 0 failures tree-wide, 0 STALE.** ⚠ **21 `PASS` + 1 `PASS-WITH-BLOCKED-ROWS`** — **p01 only**, and its block is a real 180 s Miri timeout on `large.bin`. ⚠⚠ **THE ADVICE THAT SAT HERE IS NOW INVERTED, AND IT WAS WRONG WHEN WRITTEN.** It read *"a declared-hang input blocks a Miri row by design — expect that verdict on any pattern declaring a hang; it is not a defect."* **It WAS a defect** (TASK_077 item 2): `check_miri` blocked the row with the reason *"R4 does not return under Miri either"*, which is **structurally false for every pattern here**, because the bug lives in R1 and `miri.sources` always names a rung carrying the fix. Measured, `miri` on p22's shipped `unsafe.rs` returns `rc=0`, no UB, in 0.2 s. **`check_miri` now reads stage 4's MEASURED per-rung `hung` column, so a declared hang no longer blocks anything by itself.** **Expect `PASS`; a blocked Miri row is now worth investigating, not shrugging at.** Count both ends rather than trusting either: `ls -d patterns/p*/ | wc -l` and `grep -c '^| p[0-9]' .memory/06-catalogue.md`. |
-| **Do this next** | **`TASK_081` — a REVIEWER task, and its subject is the highest-reach open item in the project.** ⚠⚠ **`is not supported` MAY BE ESCAPABLE AT +1 TRUSTED ITEM, AND VERUS PRINTS THE FIX ITSELF.** `assume_specification[i32::unchecked_add]` verifies, and a deliberately bad call site **fails on `precondition not satisfied`** — so the declaration works *and* the `requires` bites (manager-verified; same for `unchecked_shl`). **Finding 14's pricing already says *"needs a new trusted item"* and is NOT refuted** — but at least four patterns' triage language (p05, p07, p11, p18) reads as a technical **wall**, and p11's `r4_cstr` is **−35%**, the largest instance of the whole result. ⚠ **THE QUESTION THAT DECIDES ITS REACH IS UNRUN:** both verified escapes are **arithmetic** intrinsics with one-line contracts, while finding 14's six items are mostly **MEMORY** operations needing a *permission* precondition — **so the escape may stop exactly where finding 14's claim lives.** Marked **PROVISIONAL** in `.memory/04-verus.md` under rule 9. |
-| **Pattern selection** | ⚠⚠ **THREE ROWS REFUSED IN A ROW — p48, p31, p45 — and `.memory/06-catalogue.md`'s new "LADDER TEST" is the rule that came out of it.** *A pattern needs a bug that R4 can reintroduce and R3 cannot, and a cost that differs between them.* ⚠ **The question all three triages DID ask — is the bug class new? — is the LESS USEFUL one**: p36 shipped the tree's **twelfth** `index >= len` and was worth building; p45's UB class is **genuinely absent** and was not. **Novelty predicts neither way.** ⚠ **And the half nobody had is a GATE BLIND SPOT**: a pattern whose rungs are **accidentally byte-identical** passes every stage and publishes `R3 − R4 = 0.00` as *"safety is free"*. `R5 − R4 = 0.00` is scoped as a tautology; **`R3 − R4 = 0.00` is scoped by nothing and no stage looks.** Two commands tell an artefact from p16's genuine zero — they are in the ladder-test block. **Run the probe before writing the row.** |
+| **Do this next** | **`TASK_082` — land "Owed" 0, the gate's `assume_specification` blindness.** It is the top of the Owed list, it is **manager-verified**, and it is a **measured defect in a PUBLISHED column** — which is the TASK_068 override's own standard, so it clears rule 5 on evidence rather than on argument. ⚠ **Batch it**: a `check.py`/`vparse.py` edit stales every gate record, so pull in the queued doc fixes that ride along free (`.memory/02-bench-rules.md`'s citation-rot list, RECAP "Owed" 12's six measurement-hashed citations are **NOT** free — leave those). ⚠ **Then RECAP "Owed" 4** — p17's `sweep-*` bands, whose spec is written and ready to hand over. ⚠ **Do NOT start a new pattern until Owed 0 is closed**: three rows in a row were refused, the LADDER TEST that came out of that was **retracted and restated one task later**, and the restatement has not been used to pick anything yet. |
+| **Pattern selection** | ⚠⚠ **THREE ROWS REFUSED IN A ROW — p48, p31, p45 — and the "LADDER TEST" that came out of it was RETRACTED AND RESTATED ONE TASK LATER.** ⚠ **Do not use the first version** (*"a bug R4 can reintroduce and R3 cannot, and a cost that differs"*): it misclassifies **p08** (satisfies it, shipped) and **p47** (violates it, shipped) **in opposite directions**, and the manager's own defence of it was aimed at the wrong half — p47 passes the cost half at **+90.0/+142.0 `Ir`/call**. **Use the THREE PROBES** in `.memory/06-catalogue.md`: *(1)* a rung boundary must exist **somewhere** and the row must name it — p08's is at compile time, p47's is inside the safe class, p16's is a slope; *(2)* the rungs must differ **as machine code**, checked by extracting each kernel's bytes and `md5`-ing them, **not** by the retracted "two symbols on one section" form, which cannot fire when every rung is its own binary; *(3)* any published `0.00` must name its **axis and `Ir` convention in advance**. ⚠ **The novelty question all three triages DID ask is the less useful one** — p36 shipped the tree's twelfth `index >= len` and was worth building. |
 | **After that** | ⚠⚠ **THE AXIS PROGRAMME IS CLOSED — do not open `.memory/06-catalogue.md`'s axis table looking for what to build next.** All **seven** rows are resolved: **5 BUILT** (p27 lifetime, p47 timing, p38 weaponised UB, p36 CFI, p22 termination) **+ 2 REFUSED WITH MEASUREMENTS** (`p48` at TASK_074, `p31` at TASK_079). That table was the argument for axis-first over family-first ordering and **the argument is now spent**; the catalogue's own two objections to it — *breadth over realistic C patterns*, and *"the findings are about cost MECHANISMS, which have been much less repetitive"* — were never answered and now have nothing standing against them. ⚠ **Neither refused row may be rescheduled without reading its refusal block.** ⚠ **And derive the counts** — `ls -d patterns/p*/ \| wc -l` against `grep -c '^\| p[0-9]' .memory/06-catalogue.md`; *"the six original axes are complete"* was written into this box while five were built, the third time a count was asserted in prose instead of derived. |
 | **Rules for writing that task** | ⚠⚠ **STATE NOVELTY CLAIMS AS QUESTIONS TO BE MEASURED, never as fact.** *"The first termination proof in the project"* was the manager's sentence in `TASK_070.md`; it was **false**, the engineer had no reason to doubt it, and it shipped into **eight places, two inside `contract_sha256`** — a review and a re-gate to remove. **Rule 9 protects `.memory/` from unreviewed findings and protects NOTHING from the task file itself.** p22's §0 counted 73 measures in one command once it was finally asked. ⚠ **Settle the bug class as the FIRST deliverable** — overturned on four patterns, upheld on two. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat). **Additivity extrapolation — the only out-of-sample test here that can fail — HAS now failed once, on p38, and it was 100% attributable to three missing columns, none of them the one named.** The rule that came out of it: ⚠ **check the RESIDUE CLASS of any parameter your bands hold constant** — two of p38's three bands sat at `nw ≡ 0 (mod 8)` and the third did not, which fits in sample and misses out of it with no in-sample residual to warn you. ⚠ **Name the INLINE MODE at every figure** — p10 fitted both and the regressors *swapped*. All three in `.memory/03-measurement.md`. |
 | **The trap that keeps firing** | **A headline can be wrong in the FLATTERING direction and pass a green gate.** p10 published *"safe Rust cheaper than unsafe"*: 60% was an **unsearched R4 side**, the rest **index-expression bookkeeping C pays more of than either Rust rung**. **p27 repeated it one pattern later** — a dead store in R4 that R3 did not have. **p47 is the first pattern to search the R4 side properly** (six levers, each measured *and* run through Verus). ⚠ **p38 made it four** (`+21/+25` published against a true `+24/+32`) and **p22 made it FIVE, and widest yet — `+2.00` published against `+125/+1021`, 510×.** ✅ **The trend is the good news: p38 disclosed after review, p22 disclosed BEFORE being asked, and p36 searched the R4 side FIRST and CHANGED WHICH RUNG SHIPS** — the R2-shaped unsafe rung verifies and is 1022/8190 dearer, so shipping it would have published *"safe beats unsafe by 1007/8175"*. ⚠⚠ **AND THEN p36 FELL INTO THE MIRROR IMAGE, WHICH IS THE NEW LESSON: it searched R4 and left R3 with ONE lever, which moved R3 the wrong way.** Published `R3 − R4 = +15.00 flat`; the review's first in-contract R3 respelling made it **+7**, and **+2** against the cheapest R4. ⚠ **Searching one side is not searching. A difference is only as honest as its WEAKER-searched endpoint** — count the levers on each side and say whether they are comparable. **Before publishing any rung comparison, ask what BOTH rungs' spellings are worth.** |
@@ -453,11 +453,24 @@ the number.** Two task files have already sent an agent to the wrong finding.
    ~~p05's R4 moves 7 flat (TASK_022)~~ and ~~p16's R4 moves `4·nrec` via
    `r4_hdr`~~ are **the same lever and it is not admissible on either**: at the
    pinned vstd, `read_unaligned`, `as_ptr`, `add`, `from_raw_parts`,
-   `TryFromSliceError` and `from_le_bytes` are each `is not supported`, so every
-   route to respelling a header read needs a **new trusted item** — and the
-   `identity` pin makes a rung without a verifying twin not a rung. **Neither
-   pattern's R4 side has ever moved by a single admissible instruction**, while
-   the R3-side levers cost zero TCB and are large. Report the fixed-R4 bound —
+   `TryFromSliceError` and `from_le_bytes` are each `is not supported`, so
+   ~~every route to respelling a header read needs a **new trusted item**~~ — and
+   the `identity` pin makes a rung without a verifying twin not a rung.
+   ⚠⚠ **"EVERY ROUTE" IS REFUTED (TASK_081_REVIEW, major 4) AND THE SIX
+   `is not supported` ITEMS ARE STILL CORRECT — the error was inferring a
+   universal from a list.** `vstd::slice::slice_subrange` +
+   `vstd::bytes::u64_from_le_bytes` reads an arbitrary-offset little-endian
+   `u64` **with its value**, at **ZERO author-written trusted items**:
+   `2 verified, 0 errors`, manager-re-run. ⚠ **What this does and does not
+   move:** it refutes the stated **reason**, not necessarily the conclusion —
+   **that route's `Ir` cost has never been measured**, and `u64_from_le_bytes`
+   wraps `try_into().unwrap()`, so it may be *dearer* than the shipped spelling.
+   **Anyone re-opening p05's or p16's R4 side must measure it before claiming the
+   side moves.** Until then: **neither pattern's R4 side has been shown to move
+   by a single admissible instruction, and the route that might is unpriced** —
+   which is a weaker sentence than the one it replaces, and is the one the
+   evidence supports. The R3-side levers cost zero TCB and are large.
+   Report the fixed-R4 bound —
    **`R3ship − R4ship` bounding `inf(in-contract R3) − R4ship`, R4 held by
    fiat** — and **do not report a pair interval until someone has built an
    admissible R4 that moves**; both published ones were built from rungs that do
@@ -1705,6 +1718,43 @@ Both retired.
   p02 did not.
 
 ### Owed, in priority order
+
+0. ⚠⚠ **NEW AND IT IS THE TOP OF THE LIST: THE GATE COUNTS NO
+   `assume_specification`, AND TCB SIZE IS A PUBLISHED COLUMN.**
+   (TASK_081_REVIEW blocker 1, **manager-verified**.) `harness/vparse.py`'s item
+   matcher keys on `fn NAME` **with a body**, and drops every body-less item — so
+   `assume_specification`, `broadcast axiom fn` and `uninterp spec fn` are **all
+   invisible to the parser**, and `check.py::_is_trusted` additionally requires
+   `verifier::external_body`.
+
+   **Demonstrated on a real pattern.** `patterns/p01-array-sum/verus.rs` with
+   **two deliberately FALSE axioms on safe std functions** added:
+
+   ```
+   ./verus_run.py .temp/r81/p01_axiom.rs   ->  7 verified, 0 errors
+   parser: n_items 7, identical names to the untouched file
+   _is_trusted: ['get_unchecked']  (unchanged)
+   kernel bytes: md5 e3e4441313c93057730ab568fb000846 — IDENTICAL to baseline
+   ```
+
+   **Blind to it:** the published TCB column in `results/synthesis.md`, the pinned
+   obligation count, the `identity` pin, `check_miri` (`n_trusted == 0` ⇒ *"Miri
+   not required"*), and stages 5c / 5c-req / 5c-twin. The only trace is an
+   informational `rep.note`.
+
+   ⚠ **Scope it correctly — the hole is axioms on SAFE functions.** An unsafe
+   intrinsic's call site still trips `_scan_unsafe_sites`. **But safe functions
+   are exactly finding 14's list** — p16's `chunks_exact`/`by_ref`/
+   `TryFromSliceError`, p11's four `CStr` items, `from_le_bytes` — i.e. precisely
+   the items someone now has a measured reason to want to axiomatise.
+   ⚠ **`RECAP`'s settled answer already says the TCB column is *prospectively*
+   gameable; this is a SECOND and sharper mechanism** — not "needs zero
+   project-local items" but "adds items the parser cannot see".
+
+   **Cheapest honest repair** (the reviewer's, not implemented): a declared count
+   plus `rep.note` → `rep.shout`. ⚠ **It is a `check.py`/`vparse.py` edit, so it
+   stales every gate record — batch it**, and it clears rule 5's *"could this
+   happen by accident?"* test on the evidence above rather than on an argument.
 
 1. **The two-step reslice is untried on most patterns**, and most patterns' R3
    opens with the window reslice it improves. It costs zero `unsafe` and zero

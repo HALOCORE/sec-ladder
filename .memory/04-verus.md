@@ -1396,56 +1396,87 @@ tree-wide**, genuinely unused) or add a project-local `external_body` offset
 wrapper at **+1 TCB**. The token threads exactly like p27's `Dealloc`, so it is
 a new **clause**, not a new **kind** — which is what refused the axis.
 
-## ⚠⚠ PROVISIONAL — `is not supported` may be ESCAPABLE at +1 trusted item, and this touches finding 14
+## ⚠⚠ `is not supported` IS escapable — and the escape Verus PRINTS FOR YOU is VACUOUS
 
-**NOT YET REVIEWED. It is the subject of `TASK_081` and must not be quoted as
-authoritative until that review lands (PROTOCOL rule 9).** Found at TASK_080
-while refusing p45; the two Verus runs below are **manager-verified**, the
-consequences are **not**.
+**Found at TASK_080 while refusing p45, and REVIEWED at TASK_081_REVIEW, which
+found the recorded version wrong in the direction that matters.** The TASK_080
+entry read *"`is not supported` is a TCB price for simple arithmetic intrinsics"*
+plus *"Verus itself prints the fix"*. ⚠ **Both halves fail on the memory
+operations, which are the ones finding 14 is about.** Manager-verified re-runs
+below.
 
-**What was measured.** `i32::unchecked_add` at the pin gives
-`error: ... is not supported` — **and Verus itself prints the fix**:
+### The trap, first, because it is the part that can ship a false result
+
+`assume_specification` **axiomatises** a function's contract, and **nothing in
+Verus or in this project's gate checks it against anything.** Verus's help text
+prints only the **signature** — no `requires`, no `ensures` — so a declaration
+shaped like the printed one asserts the operation has **no precondition at all**.
+
+Pasted as printed for `as_ptr` / `add` / `read_unaligned`, this verifies:
 
 ```
-= help: The following declaration may resolve this error:
-        pub assume_specification [core::num::<impl i32>::unchecked_add] (_0: i32, _1: i32) -> i32;
+verification results:: 4 verified, 0 errors
 ```
 
-Adding it — with `requires i32::MIN <= a + b <= i32::MAX`, `ensures r == a + b`,
-`opens_invariants none`, `no_unwind` — gives **`2 verified, 1 errors`**, the one
-error being a **deliberately bad call site** failing
-`precondition not satisfied`. ✅ **So the declaration works AND the `requires`
-bites; it is not vacuous.** The same escape works for `u64::unchecked_shl`.
-Miri reports a violated `unchecked_add` as a genuine
-`error: Undefined Behavior: arithmetic overflow in unchecked_add`, not a panic.
+and the four include **a 1 MiB out-of-bounds read off a possibly-empty slice**
+and **a null-pointer dereference**. ✅ **Manager-re-run.** The reviewer
+checklist's *"a wrong one axiomatises a falsehood"* lands here as
+**"a missing one axiomatises everything"**.
 
-**Why this matters, stated carefully in both directions.**
+⚠ **And it is one omitted line away on the arithmetic case that looked safe.**
+Delete the `requires` from TASK_080's `unchecked_add` declaration, keep the
+`ensures`, and `assert(false)` **verifies**. Compiled, a function whose `ensures`
+says it returns `false` returns `true`, and the binary aborts with
+`unsafe precondition(s) violated: i32::unchecked_add cannot overflow`.
+**Verus verified a program that hits real UB on its first call.**
 
-- ✅ **Finding 14's PRICING already says this.** Its own words are that every
-  route *"needs a **new trusted item**"*. **The finding is not refuted by the
-  escape existing** — the escape *is* the new trusted item.
-- ⚠ **But at least two patterns' TRIAGE LANGUAGE reads as a technical
-  impossibility rather than a TCB price.** p11's `r4_cstr` — worth
-  **−17 526 `Ir`/call (−35%)** on `large`, the largest instance of the
-  R4-chained-to-the-prover result — is recorded as *"rejected with four
-  `is not supported` errors"*. Under the escape that is **"+4 author-written
-  V-gap items"** on a pattern whose whole claim rests on **one**, which is a
-  judgement, not a wall. **Four patterns (p05, p07, p11, p18) triaged R4
-  candidates in that language.**
+> **The rule: an `assume_specification` is a TRUSTED ITEM in the strongest sense
+> — it is an axiom about real Rust semantics, written by hand, checked by
+> nothing. Never paste the printed declaration. Write the `requires` first and
+> prove it bites with a deliberately bad call site**, which is the one test that
+> distinguishes an escape from a hole.
 
-⚠⚠ **THE QUESTION THAT DECIDES HOW FAR THIS GOES, AND NOBODY HAS RUN IT.** Both
-verified escapes are **arithmetic intrinsics with trivial contracts** —
-`r == a + b` is one line and obviously right. **Finding 14's six items are mostly
-MEMORY operations**: `read_unaligned`, `as_ptr`, `add`, `from_raw_parts`,
-`TryFromSliceError`, `from_le_bytes`. A sound `assume_specification` for
-`read_unaligned` must express a **permission** precondition, which is a different
-order of difficulty and may not be expressible at all at this pin.
-**So the escape may stop exactly where finding 14's claim lives.** Until that is
-run, the honest statement is: **`is not supported` is a TCB price for simple
-arithmetic intrinsics and an open question for memory operations.**
+### What it actually costs, per item
 
-⚠ **And the soundness hazard is the reviewer checklist's own**: an
-`assume_specification` **axiomatises** the function's contract, so *"a wrong one
-axiomatises a falsehood"*. A `+N trusted items` route is only as good as N
-hand-written contracts — which is precisely why the TCB column exists, and why
-this is a judgement for a pattern's author rather than a free lever.
+**All six of finding 14's items are confirmed `is not supported` at the pin.**
+The price is **not** `+1`:
+
+| what you want | trusted items | note |
+|---|---|---|
+| a safe fn or an arithmetic intrinsic, one-line contract | **1** | `unchecked_add`, `unchecked_shl`; the `requires` bites |
+| `from_raw_parts` | **1** | works first try and bites |
+| **memory safety alone** on a pointer read | **4** | 1 `uninterp spec fn` + 3 `assume_specification`; `ensures` is empty, so the value read is unconstrained — **useless for a kernel with a functional postcondition** |
+| **memory safety AND the value** | **6** | adds a cross-type little-endian representation axiom |
+| `from_le_bytes` | **unreachable** | the array-length const has no writable spelling |
+
+⚠ **The `+6` route cannot be avoided by monomorphising.** `assume_specification`
+must match the real signature exactly — providing `(*const u64) -> u64` against
+`for<T> (*const T) -> T` is refused — so relating a `u64` read to `u8` slice
+bytes **forces** a hand-written representation axiom about real Rust memory,
+which is the item carrying the most risk in the whole list.
+
+⚠ **Three of the six printed help texts do not even parse** (`read_unaligned`,
+`add`, `as_ptr`), one is malformed Rust (`from_le_bytes`) and one is rejected
+(`TryFromSliceError`). `<*const T>::read_unaligned` *does* parse — **but you have
+to know that**, and the message does not say it.
+
+### What this does to finding 14
+
+- ✅ **Finding 14's pricing stands** — the escape *is* the new trusted item, and
+  at 4–6 items it is a **larger** price than the entry first recorded, not a
+  smaller one.
+- ⚠ **But its stated REASON is refuted**: *"every route to respelling a header
+  read needs a new trusted item"* is false. **`vstd::slice::slice_subrange` +
+  `vstd::bytes::u64_from_le_bytes` reads an arbitrary-offset LE `u64` with its
+  value at ZERO author-written trusted items** — `2 verified, 0 errors`,
+  manager-re-run. ⚠ **Its `Ir` cost is UNMEASURED** and `u64_from_le_bytes`
+  wraps `try_into().unwrap()`, so it may be dearer than the shipped spelling.
+  **Measure before claiming the R4 side moves.** See `RECAP.md` finding 14.
+- ⚠ **p11's `r4_cstr` — the −35% case — DOES escape, all four items, first
+  try** (`2 verified, 0 errors`). **But two of the four are TYPES, not
+  `assume_specification`, and both functions are SAFE, so there is no `requires`
+  to bite at all.** The supported sentence is therefore **"the unsafe class
+  reaches `core::slice::memchr` at four hand-written axioms that no gate stage
+  checks"** — **not** *"cannot reach it at all"*, and **not** that p11's finding
+  flips. ⚠ `patterns/p11-nul-scan/NOTES.md` already contains **both** sentences,
+  which is a contradiction that now matters.

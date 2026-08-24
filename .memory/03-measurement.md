@@ -1507,8 +1507,23 @@ in BOTH rungs**, and `:465` says **58–63% of that kernel's work is inside
 independently by rebuilding both cells: `objdump -d | grep` gives
 `3 free@GLIBC 1 realloc@GLIBC 1 malloc@GLIBC` **identically** for
 `safe_tuned-O3-whole` and `unsafe-O3-whole`. ✅ **Manager-verified from the
-committed record**, no rebuild needed. **The distinction to keep: check whether
-the symbol is PRESENT, not whether the difference is zero.**
+committed record**, no rebuild needed.
+
+⚠ **THE RULE THIS ENTRY FIRST EXTRACTED — *"check whether the symbol is PRESENT,
+not whether the difference is zero"* — DOES NOT GENERALISE, and was refuted at
+TASK_081_REVIEW with a counterexample.** Put **one escaping allocation outside
+the loop** and the symbols are all present — `1 malloc@GLIBC 2 malloc@plt
+1 free@GLIBC 2 free@plt` — while **every allocation inside the loop is still
+elided**, giving exactly the artefact rate (185,298 → 385,520 = **2.00222
+`Ir`/object**, the committed BUILTIN-ELIDED figure). **Presence is NECESSARY,
+NOT SUFFICIENT.**
+
+**The test that actually settles it is a RATE, which is what p27 had all
+along**: `malloc` at **421.1211 `Ir`/call in both rungs** is a per-call cost no
+elision can produce. **Check the per-call rate of the allocator symbol, not its
+presence in the symbol table** — and note that this is the same shape as the
+outward-dispatch rule above: a symbol list answers a weaker question than a
+column of numbers.
 
 ## Hold out a LENGTH, not a MIXTURE — an out-of-sample test can be provably unable to fail
 

@@ -250,3 +250,123 @@ so.**
 this project has already called prospectively gameable.** If the answer is "it
 does not count them", that is a real finding and it arrives at exactly the moment
 someone has a reason to want the escape.
+
+---
+
+## Outcome (recorded by the manager at the task boundary)
+
+⚠ **The review landed TWO BLOCKERS, both against manager-written text, and one of
+them retracts a rule the manager adopted ONE COMMIT EARLIER and put in RECAP's
+START HERE box.** Report: `.tasks/TASK_081_REVIEW_REPORT.md` (700 lines);
+evidence and `repro.sh` at `.temp/r81/`. **Nine ranked findings, eleven named
+clean negatives.** ⚠ **Two prior attempts at this task died to API 529s having
+produced nothing**; the third was given explicit resilience instructions (notes
+appended per measurement, report written incrementally) and completed.
+
+**BLOCKER 1 — the gate counts no `assume_specification`, and TCB size is a
+PUBLISHED column.** ✅ **Manager-verified.** `vparse.py`'s matcher needs a body,
+so `assume_specification`, `broadcast axiom fn` and `uninterp spec fn` are all
+invisible; `check.py::_is_trusted` additionally requires `external_body`.
+Demonstrated on `patterns/p01-array-sum/verus.rs` with **two deliberately FALSE
+axioms on safe std functions**: `7 verified, 0 errors`, **identical parsed item
+list, identical TCB, byte-identical kernel** (`md5 e3e4441313c93057…`). Blind to
+it: the synthesis TCB column, the obligation count, the `identity` pin,
+`check_miri`, and stages 5c/5c-req/5c-twin. ⚠ **Correctly scoped by the
+reviewer — the hole is axioms on SAFE functions**, and those are exactly finding
+14's list. **Landed as RECAP "Owed" 0 and it is now the top of the queue.**
+
+**BLOCKER 2 — the LADDER TEST's first half is wrong in BOTH directions.**
+`p08` **satisfies** it and shipped as finding 7; `p47` **violates** it and
+shipped. ⚠⚠ **And the manager's own least-sure call was aimed at the wrong
+half**: the manager predicted p47 would fail the **cost** half, and ✅
+**manager-re-measured it passes comfortably — `R3 − R4 = +90.0 / +142.0`**
+(524.0/747.7 against 434.0/605.7, O3/isolated). The rule also never named its
+`Ir` convention (p08: level differs, slope does not — **opposite verdicts**), and
+its `readelf` half **cannot fire on a shipped pattern**, because every rung here
+is its own binary. **Retracted and restated as three probes**, keeping the
+`md5`-the-extracted-kernel-bytes half, which is the part that would have caught
+p45 — and which ✅ **does not false-positive on p16** (410 B vs 324 B, different
+digests).
+
+**MAJOR 3 — the escape as the manager recorded it is VACUOUS for the memory
+items, which are the ones that matter.** ✅ **Manager-verified**: the declaration
+shaped like Verus's own printed help text gives `4 verified, 0 errors` **while a
+1 MiB out-of-bounds read and a null dereference both verify.** ⚠ **And the same
+hazard is one omitted line from TASK_080's "safe" arithmetic case** — delete the
+`requires` and `assert(false)` verifies; compiled, the binary aborts on
+`unsafe precondition(s) violated`. **Verus verified a program that hits real UB on
+its first call, and nothing checks an `assume_specification` against anything.**
+The honest price is **1 / 4 / 6 trusted items**, not `+1`, and `from_le_bytes` is
+**unreachable**. **Rewritten in `.memory/04-verus.md`, trap first.**
+
+**MAJOR 4 — RECAP finding 14's *"every route to respelling a header read needs a
+new trusted item"* is REFUTED.** ✅ **Manager-re-run:**
+`vstd::slice::slice_subrange` + `vstd::bytes::u64_from_le_bytes` gives an
+arbitrary-offset LE `u64` **with its value** at **zero** author-written trusted
+items, `2 verified, 0 errors`. ⚠ **The six `is not supported` items are still
+correct — the error was inferring a universal from a list.** ⚠ **And it refutes
+the REASON, not necessarily the conclusion: that route's `Ir` cost is unmeasured
+and may be dearer than the shipped spelling.** Landed as the weaker sentence the
+evidence supports.
+
+**MAJOR 5 — the p27 rule the manager extracted does not generalise.** *"Check
+whether the symbol is PRESENT"* is refuted by one escaping allocation outside the
+loop: symbols all present, loop allocations still elided, **exactly the artefact
+rate**. **Presence is necessary, not sufficient; the test is a RATE**, which is
+what p27 had all along (421.1211 `Ir`/call in both rungs).
+
+**MINOR 6 — the adjacency per-compiler attribution was wrong**: gcc `-O0` is
+`+16`, and a `.bss` variant flips clang. The sign is a function of **opt level
+and storage class**, not compiler. Retracted; `|delta| == 16` upheld and
+strengthened.
+
+⚠ **MINORS 7 AND 8 ARE THE MANAGER'S OWN CITATIONS, IN THE TASK FILE THAT
+FORWARDS THE RULE AGAINST THEM.** This file's reading list cites
+*"`.memory/01-ladder.md` findings 14/17"* using **RECAP's** numbering — the live
+collision this project documents in three places and warns about in every task
+file (**ladder 14 is p13; p11 is ladder 9**). And this file points at
+`cost_functions.log` for `15,565,615 / 1,265,467`, which contains **neither
+number** — they are in `.temp/p45pat/NOTES.md`. **Both are left in place and
+recorded here rather than silently edited**, per rule 11's precedent: correct in
+a following commit, do not rewrite the record. **This is the third time the
+manager has mis-cited across the two numbering schemes.**
+
+**Manager decisions:**
+
+1. **All six corrections landed before this commit** (rule 4). The LADDER TEST is
+   **retracted in place with the retraction kept**, not deleted — how it was
+   wrong is the reusable part, and it is the second manager rule this project has
+   had to retract within two tasks of adopting.
+2. ⚠ **"Owed" 0 is the next task, and NO NEW PATTERN until it closes.** Rule 5's
+   *"prefer producing a pattern over hardening the gate"* is **overridden on the
+   TASK_068 standard** — a measured defect in a published column, demonstrated on
+   a real pattern's own file, not speculative hardening.
+3. **The escape is NOT recorded as a lever anyone should reach for.**
+   `.memory/04-verus.md` now leads with the vacuity trap and prices the honest
+   route at 4–6 hand-written axioms **that no gate stage checks** — which is
+   worse than the wall it replaces, not better, and is the correct reading.
+4. **p11's sentence is narrowed, not flipped**: *"reaches `core::slice::memchr`
+   at four hand-written axioms that no gate stage checks"* — ⚠ and two of the
+   four are **types**, both functions are **safe**, so **there is no `requires` to
+   bite at all.** `patterns/p11-nul-scan/NOTES.md` contains both the old and the
+   new sentence; **queued, not silently fixed** — it is a pattern doc and editing
+   it stales p11's gate record.
+
+⚠ **PROTOCOL rule 2's running count is 223:** 214 at TASK_081's writing, **+9** —
+the nine ranked findings, **seven of them against manager-written text**, and
+**two of those inside the task file that forwards the rule against them.**
+**Carry 223 forward.**
+
+**The single most useful thing in this block.** ⚠ **The manager adopted a
+selection rule and put it in the handoff document in the SAME COMMIT, and it
+survived one task.** The rule was reasoned from three refusals — real evidence —
+and was still wrong on the two patterns most available to test it against, both
+of which are *already built and already written up*. **The manager did not check
+it against the tree before shipping it as guidance**, which is the same failure as
+*"the six original axes are complete"* and *"183 forbidden spellings"*: **a claim
+about the corpus asserted instead of run against the corpus.** ⚠ **The one thing
+that worked is that the manager named the rule as its own least-sure call and
+told the reviewer to attack it — and the reviewer found the defence was aimed at
+the wrong half.** That is rule 2 paying for itself: **being wrong in public and
+early cost one task; the rule sitting in the START HERE box unchallenged would
+have cost every pattern selected under it.**
