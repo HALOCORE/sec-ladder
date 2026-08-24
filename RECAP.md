@@ -10,7 +10,7 @@ this box is reference; this box is what to *do*.
 |---|---|
 | **Patterns** | **22 exist, all 22 reviewed, 0 failures tree-wide, 0 STALE.** **21 `PASS` + 1 `PASS-WITH-BLOCKED-ROWS`** — **p01 only**, a real 180 s Miri timeout on `large.bin`. ⚠ **Expect `PASS`. A blocked Miri row is worth INVESTIGATING, not shrugging at** — the old advice here (*"a declared hang blocks a Miri row by design; it is not a defect"*) was itself the defect, fixed at TASK_077; `check_miri` now reads stage 4's **measured** per-rung `hung` column. ⚠ **Count both ends rather than trusting either:** `ls -d patterns/p*/ \| wc -l` and `grep -c '^\| p[0-9]' .memory/06-catalogue.md`. |
 | **Do this next** | **THREE TASKS RAN, TWO STILL LIVE.** ✅ **`TASK_085` (`p15` contract probe) is DONE and recommends REFUSAL** — see the `p15` row and "Owed" 25; **`TASK_085_REVIEW` is attacking it now**, with the pricing table as the named highest-value target. ⏳ **`TASK_084` (gate) is still running.** **`TASK_086` (batched row selection) is ALSO live** — 8-10 rows probed into a ranked queue, disjoint from everything else. **`TASK_087` takes the `p15` decision** — refuse, or fix `_scan_unsafe_sites` and build. ⚠ **An earlier box said `TASK_085` BUILDS p15; it does not, it decided whether p15 CAN be built.** ⚠ **The one-agent rule was relaxed for work touching neither measurement nor gate records, confined to its own `.temp/` subdir and barred from `check.py`/`measure.py` while the harness is half-edited.** ✅ `verus_run.py` **single-file mode is concurrency-safe** (`tempfile.mkdtemp()` per invocation); **`--cargo` mode is NOT** — it shares `target/`. ⚠ **`TASK_084` — finish "Owed" 0**, and **"Owed" 0 IS RE-OPENED: `TASK_082` closed ONE OF AT LEAST FOUR ROUTES**. Still owed: **`#[verifier::external_trait_specification]`** (54× in the pinned vstd, absent from all nine `harness/*.py`), **`#[verifier::external_fn_specification]`** (`\bverifier::external\b` misses it — next char is `_`), an axiom in a **`#[path]`-included SUBDIR** (`os.listdir` is flat; ⚠ **live in ALL 22 patterns** via `common/driver.rs`), and **wiring axioms into `tcb_items`/`synthesis`**. **Batched with two hashed-doc fixes** (p17 `NOTES.md` §10b's wrong mechanism, `p01/spec.md`'s retracted `identity` line). |
-| **Then: `p15` — ⚠⚠ NOW RECOMMENDED FOR REFUSAL, and the question has MOVED** | ⚠⚠ **`TASK_085` ran the probes and all three of the row's justifications were measured away in one session** (`.tasks/TASK_085_REPORT.md`, **UNREVIEWED** — read "Owed" 25). ✅ **The named kill-risk is DEAD: a verified UTF-8 validator CLOSES at the pin — `ensures res == valid_utf8(b@)` bidirectional, `5 verified, 0 errors`, ZERO trusted items**, end-to-end call site `8/0`, non-vacuous against an 18.5 M-case oracle and a 10-mutant battery. **That artefact is reusable; do not lose it with the row.** ⚠ **The harm row is REFUTED** — the *"optimiser deleted the `println!`"* cell is `exit 139` **SIGSEGV** with an ASan `heap-buffer-overflow READ`, i.e. the tree's **fourteenth `index >= len`**; RECAP repeated it without re-running it. ✅ **What DOES survive is p11's result a fourth time:** a verified validator is **dearer than `core::str::from_utf8` at every alphabet — 15.58× on ASCII**, collapsing to 1.13× on non-ASCII. ⚠⚠ **AND THE LIVE QUESTION IS NO LONGER "CAN p15 BE BUILT" BUT "IS `check.py::_scan_unsafe_sites` RIGHT?"** — it forbids **verified** unsafe, so a Verus-discharged `from_utf8_unchecked` would have to be moved *into* the counted TCB behind an unwritable twin. **The manager has not decided it (rule 3), and the probe's evidence is a CODE READ, not an executed gate.** |
+| **Then: `p15` — ⚠⚠ NOW RECOMMENDED FOR REFUSAL, and the question has MOVED** | ⚠⚠ **`TASK_085` ran the probes and all three of the row's justifications were measured away in one session** (`.tasks/TASK_085_REPORT.md`, **UNREVIEWED** — read "Owed" 25). ✅ **The named kill-risk is DEAD: a verified UTF-8 validator CLOSES at the pin — `ensures res == valid_utf8(b@)` bidirectional, `5 verified, 0 errors`, ZERO trusted items**, end-to-end call site `8/0`, non-vacuous against an 18.5 M-case oracle and a 10-mutant battery. **That artefact is reusable; do not lose it with the row.** ⚠ **The harm row is REFUTED** — the *"optimiser deleted the `println!`"* cell is `exit 139` **SIGSEGV** with an ASan `heap-buffer-overflow READ`, i.e. the tree's **fourteenth `index >= len`**; RECAP repeated it without re-running it. ✅ **What DOES survive is p11's result a fourth time:** a verified validator is **dearer than `core::str::from_utf8` at every alphabet — `+57%` on ASCII, `+7%` on all-non-ASCII** (73756 vs 46921 and 87661 vs 81960 marginal `Ir`/call, **whole-program marginal, `-O3`, inline mode `isolated`**). ⚠⚠ **DO NOT QUOTE `15.58×` — this row did, and it is a RESIDUAL ratio dressed as a rung ratio** (TASK_085_REVIEW major 3): both its terms are differences against `ctl_assume`, **which is neither rung**. The residual view is still the mechanism — std validates ASCII at **0.449 `Ir`/byte** against the verified validator's **7.001** — but the number a reader quotes is the rung one. ⚠⚠ **AND THE LIVE QUESTION IS NO LONGER "CAN p15 BE BUILT" BUT "IS `check.py::_scan_unsafe_sites` RIGHT?"** — it forbids **verified** unsafe, so a Verus-discharged `from_utf8_unchecked` would have to be moved *into* the counted TCB behind an unwritable twin. **The manager has not decided it (rule 3), and the probe's evidence is a CODE READ, not an executed gate.** |
 | **Pattern selection** | ⚠⚠ **THREE ROWS REFUSED IN A ROW — p48, p31, p45 — and the "LADDER TEST" that came out of it was RETRACTED AND RESTATED ONE TASK LATER.** ⚠ **Do not use the first version** (*"a bug R4 can reintroduce and R3 cannot, and a cost that differs"*): it misclassifies **p08** (satisfies it, shipped) and **p47** (violates it, shipped) **in opposite directions**, and the manager's own defence of it was aimed at the wrong half — p47 passes the cost half at **+90.0/+142.0 `Ir`/call**. **Use the THREE PROBES** in `.memory/06-catalogue.md`: *(1)* a rung boundary must exist **somewhere** and the row must name it — p08's is at compile time, p47's is inside the safe class, p16's is a slope; *(2)* the rungs must differ **as machine code**, checked by extracting each kernel's bytes and `md5`-ing them, **not** by the retracted "two symbols on one section" form, which cannot fire when every rung is its own binary; *(3)* any published `0.00` must name its **axis and `Ir` convention in advance**. ⚠ **The novelty question all three triages DID ask is the less useful one** — p36 shipped the tree's twelfth `index >= len` and was worth building. ⚠⚠ **AND THE AXIS PROGRAMME IS CLOSED — do not open the catalogue's axis table looking for what to build next.** All **seven** rows are resolved: **5 BUILT** (p27, p47, p38, p36, p22) **+ 2 REFUSED WITH MEASUREMENTS** (`p48`, `p31`); **neither refused row may be rescheduled without reading its refusal block.** That table was the argument for axis-first ordering and **the argument is spent** — the catalogue's own two objections to it (*breadth over realistic C patterns*; *the findings are about cost MECHANISMS, which have been much less repetitive*) were never answered and now have nothing standing against them. |
 | **Throughput — PROBE IN BATCHES, and this is a scheduling change, not a theory** | ⚠ **The last five tasks produced ZERO new patterns** (two refusals, two reviews, one gate fix), and **23 catalogue rows are AVAILABLE** against a measured cost of **three tasks per pattern**. ⚠ **Count it, do not trust that number** — `48 rows − 22 built − 3 REFUSED (p48, p31, p45) = 23`, and *"26 unbuilt"* was this line until it was checked; the three refusals **may not be rescheduled without reading their refusal blocks**. The available set is `p15 p19 p20 p21 p23 p24 p25 p26 p28 p29 p30 p32 p33 p34 p35 p37 p39 p40 p41 p42 p43 p44 p46`. ⚠ **`p42` is in that list and should NOT be re-probed**: `TASK_083_REVIEW` triaged it **Refuse with a measurement** — *"`Ir` sees the leak with the wrong sign"* — but that triage has not itself been reviewed, so per rule 9 the catalogue row is deliberately left unmarked and this is the only record of it. The bottleneck is *selection*, and it has failed the same way twice: **both manager-proposed axes died on a novelty claim that one `grep` plus one run would have settled.** The fix is not another ordering theory — the axis programme *was* one and it is closed. It is that **probing is cheap and batched probing is much cheaper**: `TASK_083_REVIEW` cleared **four rows in part of one session** (p15 build, p23 fallback, p25 defer, p42 refuse) using the three probes, and that is the only selection this project has done that produced a *ranked queue* instead of a single guess. ⚠ **So the next selection task probes 8–10 rows and returns a QUEUE**, and the manager proposes nothing it has not run. ⚠ **`p23` is already probed and ranked 2** — its permutation invariant verifies `2 verified, 0 errors` at the pin with no `assume`, so it is the standing fallback if `p15` refuses, with the same one-session budget. |
 | **Rules for writing that task** | ⚠⚠ **STATE NOVELTY CLAIMS AS QUESTIONS TO BE MEASURED, never as fact.** *"The first termination proof in the project"* was the manager's sentence in `TASK_070.md`; it was **false**, the engineer had no reason to doubt it, and it shipped into **eight places, two inside `contract_sha256`** — a review and a re-gate to remove. **Rule 9 protects `.memory/` from unreviewed findings and protects NOTHING from the task file itself.** p22's §0 counted 73 measures in one command once it was finally asked. ⚠ **Settle the bug class as the FIRST deliverable** — overturned on four patterns, upheld on two. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat). **Additivity extrapolation — the only out-of-sample test here that can fail — HAS now failed once, on p38, and it was 100% attributable to three missing columns, none of them the one named.** The rule that came out of it: ⚠ **check the RESIDUE CLASS of any parameter your bands hold constant** — two of p38's three bands sat at `nw ≡ 0 (mod 8)` and the third did not, which fits in sample and misses out of it with no in-sample residual to warn you. ⚠ **Name the INLINE MODE at every figure** — p10 fitted both and the regressors *swapped*. All three in `.memory/03-measurement.md`. |
@@ -1773,8 +1773,31 @@ Both retired.
    its stated CONSEQUENCE pointed at the wrong function**: the published column
    is `tcb_items`, not `_is_trusted`.
 
-   **Still owed:** the fourth and fifth forms, the `#[path]` walk, and wiring
-   axioms into `tcb_items`/synthesis so the published column moves.
+   ⚠⚠ **B4 — A SIXTH ROUTE, AND IT IS THE WIDEST: A *USED* vstd
+   `assume_specification` IS INVISIBLE TOO.** (TASK_085_REVIEW blocker 1.)
+   `_axiom_items` scans the pattern's own sources with `vparse.axiom_decls`,
+   which matches **declarations**. **A pattern that merely CALLS a vstd
+   `assume_specification` declares nothing**, so `_trusted_items` = 0 and
+   `_axiom_items` = 0 — and then `check_miri`'s `if not why_required` branch
+   **prints** *"this pattern has NO trusted item and NO hand-written axiom, so
+   there is no trusted `ensures` whose incompleteness Miri would have to
+   backstop — Miri not required."* ⚠ **That sentence would be FALSE**, because
+   the executed call is licensed by `vstd/string.rs:135-139`'s
+   `assume_specification[str::from_utf8_unchecked] … requires valid_utf8(v@)
+   ensures res.spec_bytes() =~= v@` — **verbatim the `ensures` a wrapper would
+   write, and verbatim `_axiom_items`' own definition of an axiom.**
+   ⚠ **Today nothing exploits it**, because `check.py::_scan_unsafe_sites`
+   forbids an `unsafe` token outside an `external_body` item and **vstd specs
+   none of the operations the tree uses** (`grep -rn "get_unchecked"
+   ~/tools/verus/vstd/` → **0 hits**, so all 47 wrappers were unavoidable).
+   ⚠⚠ **So `_scan_unsafe_sites` is LOAD-BEARING, not backwards — it is the only
+   thing standing between this hole and a green verdict.** **`p15` is the row
+   that would have walked through it, and that is why it is refused.**
+   **Softening that rule is admissible only AFTER this route is closed.**
+
+   **Still owed:** the fourth and fifth forms, the `#[path]` walk, wiring
+   axioms into `tcb_items`/synthesis so the published column moves, **and the
+   sixth route above.**
 
    *Original closure text kept below — it is right about what it covers.*
 
@@ -2362,12 +2385,31 @@ Both retired.
       what killed p45.**
     - **The cost axis survives but reverses the row's point.** A verified
       validator is **DEARER than `core::str::from_utf8` at every alphabet**:
-      **15.58× on pure ASCII** (0.449 vs 7.001 `Ir`/byte — std's word-at-a-time
-      fast path), collapsing to **1.13×** on all-non-ASCII; slopes `R3 +384.78`
-      vs `A +191.18` `Ir`/call per point of non-ASCII. TASK_083's `+4.1% ASCII`
-      reproduces exactly. **That is p11's result a fourth time** — *the safe
-      class reaches a library the unsafe class cannot* — **and it is a real
-      finding, not a consolation prize.**
+      **`+57%` on pure ASCII and `+7%` on all-non-ASCII** — 73756 vs 46921 and
+      87661 vs 81960 marginal `Ir`/call, **whole-program marginal, `-O3`, inline
+      mode `isolated`**. TASK_083's `+4.1% ASCII` reproduces exactly. **That is
+      p11's result a fourth time** — *the safe class reaches a library the
+      unsafe class cannot* — **and it is a real finding, not a consolation
+      prize.**
+      ⚠⚠ **`15.58×` IS WITHDRAWN AND THIS ITEM IS WHERE IT WAS PUBLISHED**
+      (TASK_085_REVIEW major 3). ~~`15.58×` on pure ASCII, collapsing to
+      `1.13×`~~ is a **RESIDUAL ratio dressed as a rung ratio**: both terms are
+      differences against `ctl_assume`, **which is neither rung**. It also
+      shipped **with no `Ir` convention and no inline mode beside it**, which
+      `.memory/03-measurement.md` requires at every figure because p10 fitted
+      both modes and the regressors *swapped*. ✅ **The residual view is still
+      the MECHANISM and is worth keeping** — std validates ASCII at **0.449
+      `Ir`/byte** against the verified validator's **7.001**, which is the
+      word-at-a-time fast path — **but a mechanism ratio is not a rung
+      penalty.**
+      ⚠ **The slopes are also withdrawn as headline figures.** `R3 +384.78 /
+      A +191.18` `Ir`/call per point are **OLS over a strongly concave curve**:
+      R3 runs **1210 `Ir`/pt** over 0→10 and **129** over 75→100, and the fit is
+      off by **−7210 at pct = 0, which is exactly where the headline ratio
+      lives.** ⚠ **And the axis is labelled two ways in the probe's own source**
+      — *"non-ASCII **bytes**"* in one place and *"scalars"* in two others, and
+      they differ by more than a factor of two (pct=10 by scalars is ~21.9% by
+      bytes).
     - **The rung boundary does not survive the gate**, see the new obstacle
       below.
 
