@@ -1335,3 +1335,41 @@ assumed the entries excluded it; **they do not.** It is excluded only by a
 `required` entry's **prose**, and **no grep settles it** — which is the honest
 boundary of the idiom mechanism: it decides *spellings*, and a semantic exclusion
 has to be argued in `why` and checked by a human.
+
+## The `identity` pin: mandatory as a MEASUREMENT, free in its LEVEL
+
+**PROVISIONAL — code read, not an executed gate.** (TASK_085 Q2, confirmed by
+TASK_085_REVIEW. ⚠ **No pattern with `identity: differ` has been through the
+gate; one real run is owed before this is treated as settled.**)
+
+Every shipped pattern pins `unsafe vs verus` and, at `-O3`, **21 of 22 pin
+`exact`** with p36 at `norel`. That uniformity invites the inference *"the gate
+requires R4 ≡ R5"*. **It does not**, and the manager made exactly that inference:
+
+- **`check_identity` enforces a FLOOR only.** `got_i < want_i` is the sole
+  failure path; stronger-than-pinned is `rep.ok(... "(stronger than pinned)")`,
+  and a pattern that pins nothing gets a **`rep.note`**, not a fail.
+- **`asm.IDENTITY_LEVELS = ["differ", "counts", "norel", "exact"]`**, so
+  **`differ` is a legal pin value.**
+- **What makes an identity measurement mandatory is `check_miri`, transitively:**
+  it looks for the `-O3` row whose `pair` is the R4/R5 pair, and *"no identity
+  measurement for the pair"* is a hard failure at stage 8. `check_identity`
+  records rows only for **pinned** pairs, so not pinning that pair fails the run
+  — one stage removed from where you would look for it.
+- ⚠⚠ **`check_miri` treats R4 ≠ R5 as SUPPORTED, not as an error.** When
+  `inherits` is false it appends *"R4 and R5 differ at O3 …, so R4 does not
+  inherit R5's discharged obligations at all"* to `why_required` — **a reason
+  Miri is REQUIRED, with Miri as the compensating control.**
+
+**So: *"21 of 22 pin `exact`"* is TRUE, and *"none allows R4 ≠ R5"* is true of
+the `spec.md` files and FALSE about the gate.** The uniformity is a **choice the
+patterns made**, not a constraint the gate imposes — which matters whenever a
+row's interesting unsafe rung has no byte-identical verifying twin.
+
+⚠ **And the project has already made that choice once, explicitly.**
+`patterns/p27-handle-table/NOTES.md:686-705` records a **built, verified,
+measured** vstd-pure control (`r5_vstdpure.rs`, `15 verified, 0 errors`) carrying
+**two fewer trusted items**, **rejected because R4-vs-R5 measured `differ`.**
+**A smaller TCB was available and identity was preferred.** Anyone arguing either
+way about a future row should start from that precedent rather than from the
+`exact` count.

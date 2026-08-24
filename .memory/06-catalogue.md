@@ -349,7 +349,7 @@ or declare the steady state. **An in-place tokenizer is still buildable here.**
 | p12 | `strcat` into a fixed stack buffer | classic stack overflow — **and the failure mode depends on the overflow MAGNITUDE and the compiler**: +1…+8 B silent and wrong on both, +16…+48 B gcc canary / clang corrupts `main`'s locals, +64…+128 B gcc canary / clang SIGSEGV | moderate | **done** (T040), gate `PASS` first complete run, R5 15/0, R4 == R5 `exact`, **reviewed** (T040_REVIEW: headline confirmed and sharpened; 2 blockers + 3 majors, both blockers landed at T041 — the structural claim was too strong and `−26.00` is a fixed-R4 figure). First bug here that is a **WRITE** safe Rust cannot express; first time `c-gcc` and `c-clang` differ in **behaviour** |
 | p13 | `strncpy`/`snprintf` truncation semantics | **the first bug here that is a CORRECTLY-CALLED library function** — `strncpy(dst, src, sizeof dst)` is textbook C and still does not terminate on truncation; and **the harm lands at a different site from the bug** (memory-safe truncation at the copy, OOB read later in the consumer) | moderate | **done** (T043), gate `PASS`, R5 **17/0 first attempt** (twin 20/0), R4 == R5 `exact`, **reviewed** (T045_REVIEW: 3 blockers + 6 majors — headline sign survives, magnitude and stated mechanism do not; corrections at T046). First pattern whose rungs call **different libc routines**, and the only one where the optimiser reintroduces a `forbidden` spelling |
 | p14 | **field split into a fixed descriptor table** (delivered as `p14-field-split`, not as a `strtok`-style in-place tokenizer) | **an unbounded FIELD COUNT against a fixed descriptor table** — the first bound here that is a **count of a byte value** rather than a length. ⚠ The guessed class *"in-place mutation + aliasing"* was **rejected by measurement** (T049 §0) — see below | hard | **done** (T049), gate `PASS` first complete run, R5 **19/0** (twin 23/0), `R4 ≡ R5 exact` at O3 / `norel` at O0, Miri 8/8, TCB 6 items = **4 U-license + 2 infra** (first use of the T048 classification on a new pattern), **reviewed** (T049_REVIEW: 2 blockers + 3 majors + 4 minors, **17 clean negatives**; corrections at T050). Its `strtok`/`strsep` delimiter-run split is the **trigger**, not the bug |
-| p15 | UTF-8 validation + decode | malformed continuation bytes | moderate–hard | planned |
+| p15 | UTF-8 validation + decode | malformed continuation bytes | moderate–hard | ⚠ **REFUSED at TASK_085/TASK_085_REVIEW — CONDITIONALLY, and the condition is NAMED.** Unlike p48/p31/p45 the justification was not false a priori: **all three probes PASSED** and the named kill-risk **closed** (a verified UTF-8 validator, `ensures res == valid_utf8(b@)` bidirectional, **5/0, zero trusted items**). It is refused because **all three of the row's justifications were then measured away in one session** *and* because the shape worth building is the shape the gate cannot audit. ⚠ **It becomes buildable the day `_axiom_items` learns to see a USED vstd `assume_specification`** (RECAP "Owed" 0, sixth route). See the refusal block below |
 
 ## Family C — parsing & protocol decoding
 
@@ -1061,6 +1061,103 @@ same multiset, a different order"*. The mnemonic-identity claim is about the
 **chunk-loop body at matched fold spellings**, which is a narrower thing.
 **A zero with a named axis and a mechanism is a finding; a zero because two rungs
 compiled to the same bytes is an artefact — and only probe 2 tells them apart.**
+
+### p15 — REFUSED at TASK_085 / TASK_085_REVIEW. ⚠ **A DIFFERENT KIND OF REFUSAL, and it names its own unblocking condition.**
+
+⚠⚠ **Do not file this beside p48/p31/p45.** Those three were refused because
+their **distinguishing justification was false a priori** and one `grep` plus one
+run would have settled it. **p15's probes all PASSED** — a named rung boundary,
+non-colliding machine code (206 B vs 146 B), a declared cost axis — and **its
+named kill-risk closed.** It is refused because the justifications were
+**measured away**, and because the shape worth building is the shape **this gate
+cannot audit**.
+
+**✅ WHAT WAS BUILT AND MUST NOT BE LOST — a verified UTF-8 validator at the
+pin.** `fn is_valid_utf8(b: &[u8]) -> (res: bool) ensures res ==
+valid_utf8(b@)` — the **bidirectional `==`** — **`5 verified, 0 errors`, ~120
+lines (~10 proof), ZERO trusted items**, on three vstd lemmas
+(`partial_valid_utf8_extend`, `partial_valid_partial_invalid_utf8`, and
+`partial_valid_utf8` as the loop invariant). The **end-to-end call site**
+verifies **`8 verified, 0 errors`**, discharging `vstd/string.rs`'s
+`requires valid_utf8(v@)` **from the validator's postcondition alone**.
+Source and rebuild script: `.temp/t85/v01_validator.rs`, `v03_callsite.rs`,
+`rebuild.sh`.
+
+**Non-vacuous three ways, and the third is the one to copy:**
+an unmediated differential oracle against `core::str::from_utf8` —
+**18 499 985 cases, 0 mismatches**, plus **316 602** independent reviewer cases
+including the `F4 90 80 80` boundary the probe's alphabet missed; a **10-mutant
+battery, all 10 failing**, three of which break only the **completeness**
+direction; and ⚠⚠ **a measured vacuity control: `ensures res ==> valid_utf8(b@)`
+with body `false` verifies `2 verified, 0 errors`.** **The `==` bar is
+load-bearing — a one-directional bar certifies a validator that rejects
+everything.**
+
+**THE THREE JUSTIFICATIONS, EACH MEASURED AWAY:**
+
+1. ⚠ **The harm row is REFUTED.** `TASK_083_REVIEW` published the truncated-lead
+   cell as *"prints nothing, exit 0, no bounds violation"* — *"the optimiser
+   deleted the program's own `println!`"*. Measured on a byte-for-byte replica of
+   that review's **own** file: **`exit 139` (SIGSEGV)**, 30/30 runs across `-O`,
+   `-O1`, `-O2`, `-O3`, `±codegen-units=1`, `±debug-assertions` and nightly; and
+   **ASan reports `heap-buffer-overflow READ`**. ✅ **Reproduced independently by
+   the reviewer AND by the manager.** So it is an ordinary out-of-bounds read,
+   **the tree's fourteenth `index >= len`**, and the new harm class does not
+   exist. **Two rows have now claimed that class and neither had it** (p45 was
+   the other).
+2. **What survives is row 1 — an invalid *continuation* byte gives a silent
+   wrong answer, `len=4 fold=100507`, exit 0, Miri CLEAN. That is p18's harm,
+   and p18's harm is what killed p45.**
+3. **The cost result survives and is real, but it is p11's, a fourth time.** A
+   verified validator is **dearer than `core::str::from_utf8` at every
+   alphabet — `+57%` on pure ASCII, `+7%` on all-non-ASCII** (73756 vs 46921 and
+   87661 vs 81960 marginal `Ir`/call; **whole-program marginal, `-O3`, inline
+   mode `isolated`**). Mechanism: std validates ASCII at **0.449 `Ir`/byte**
+   against the verified validator's **7.001** — the word-at-a-time fast path.
+   ⚠⚠ **DO NOT QUOTE `15.58×`** — it is a **residual ratio dressed as a rung
+   ratio**, both terms being differences against a control that is neither rung
+   (TASK_085_REVIEW major 3). ⚠ **And do not quote the OLS slopes** (`R3
+   +384.78 / A +191.18` `Ir`/call per point): the curve is strongly concave —
+   1210 `Ir`/pt over 0→10 against 129 over 75→100 — and the fit is off by
+   **−7210 at pct = 0, exactly where the headline lives.**
+
+**⚠⚠ THE REAL REASON, WHICH IS ABOUT THE GATE AND NOT ABOUT p15.**
+`check.py::_scan_unsafe_sites` requires every `unsafe` token in a pinned Verus
+source to sit inside an `#[verifier::external_body]` item. p15's interesting R5
+puts a **Verus-discharged** `str::from_utf8_unchecked` inside a **verified** fn.
+The two shapes available are both bad:
+
+- **Comply** → the *proved* call moves into the *trusted* column, and the
+  `#[cfg(slb_twin)]` twin is **unwritable** (`grep -rn "from_utf8"
+  ~/tools/verus/vstd/` returns **one** line, the unchecked one) ⇒
+  `PASS-WITH-BLOCKED-ROWS` **on the row that IS the pattern**, and p15 becomes
+  the **23rd instance of a wrapper the tree already has 45 of**.
+- **Soften the rule** → the gate certifies `TCB 0`, `axioms 0` and *"Miri not
+  required"* over a proof whose executed call rests **entirely on a vstd
+  axiom** — because `_axiom_items` matches **declarations** and a *used*
+  `assume_specification` declares nothing. **RECAP "Owed" 0's sixth route, on
+  the one row that exploits it.**
+
+✅ **Clean negative that makes this a finding rather than a complaint:**
+`grep -rn "get_unchecked" ~/tools/verus/vstd/` → **0 hits**, so **all 47 existing
+`unsafe` tokens are inside wrappers that were unavoidable, and this rule has cost
+the project nothing to date.** **p15 is the first row where vstd actually specs
+the operation, which is exactly why it is the first row the rule bites.**
+
+⚠⚠ **THE UNBLOCKING CONDITION, NAMED: reschedule p15 the day `_axiom_items` can
+see a USED vstd `assume_specification`.** Until then, softening
+`_scan_unsafe_sites` is **not** *"preferring a pattern over hardening the gate"*
+(PROTOCOL rule 5) — **it is un-hardening the gate on the one row that exploits
+the gap.**
+
+⚠ **And a live precedent for choosing identity over a smaller TCB:**
+`patterns/p27-handle-table/NOTES.md:686-705` records a **built, verified,
+measured** vstd-pure control (`r5_vstdpure.rs`, `15 verified, 0 errors`) with
+**two fewer trusted items**, **rejected because R4-vs-R5 measured `differ`.**
+
+**Full evidence:** `.tasks/TASK_085_REPORT.md` and
+`.tasks/TASK_085_REVIEW_REPORT.md`; scratch `.temp/t85/` and `.temp/r85/`, both
+with `rebuild.sh`.
 
 ### p45 — REFUSED at TASK_080. Read this before rescheduling it.
 

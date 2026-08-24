@@ -1517,3 +1517,122 @@ messages that nobody re-ran against the inherent path.**
 - **`uninterp` with a body is a Verus error**, which is why body-less trusted
   declarations cannot be given twins — and therefore why feeding them to
   `_is_trusted` would make a legal declaration unpassable. ✅ Verified.
+
+## ⚠⚠ A one-directional `ensures` on a validator is VACUOUS, and here is the measurement
+
+(TASK_085 + TASK_085_REVIEW, on the `p15` probe. The row was refused; **this
+result is independent of that and is the reusable half.**)
+
+Writing a validator, the natural-looking contract is
+
+```rust
+fn is_valid_utf8(b: &[u8]) -> (res: bool)
+    ensures res ==> valid_utf8(b@)          // ⚠ SOUNDNESS ONLY
+```
+
+⚠⚠ **A body of `false` satisfies it: `2 verified, 0 errors`, measured.** The
+implication says *"if I accepted, it was valid"* and says **nothing** about
+rejecting. A validator that rejects every input is certified by it.
+
+**The bar is the equality:**
+
+```rust
+    ensures res == valid_utf8(b@)           // soundness AND completeness
+```
+
+**And that bar is reachable.** A verified UTF-8 validator closes at the pinned
+vstd: **`5 verified, 0 errors`, ~120 lines of which ~10 are proof, ZERO trusted
+items** — no `assume`, no `admit`, no `external_body`, no `assume_specification`.
+The three vstd lemmas that do the work:
+
+| lemma | role |
+|---|---|
+| `partial_valid_utf8_extend` | advance the prefix by one scalar |
+| `partial_valid_partial_invalid_utf8` | reject |
+| `partial_valid_utf8` | the **loop invariant** |
+
+Both are directly callable proof fns — **no `broadcast use` needed**. Two
+obstacles, both trivial and both worth knowing: **`i + 2 <= n` overflows** (write
+`n - i >= 2`), and one `assert ... by (bit_vector)` is needed for
+`codepoint_width_1(b) <= 0x7f`.
+
+**How the obligation count decodes** (measured empirically, not assumed): a plain
+`fn` is +1, a `while` loop is +1, and an `assert by (bit_vector)` is **+1**. So
+the 5 above are `first_scalar_len` + its bit-vector query + `is_valid_utf8` + its
+loop + `main`.
+
+⚠ **The end-to-end call site is the part that was doubted and it closes too:**
+`8 verified, 0 errors` for a kernel that calls
+`unsafe { str::from_utf8_unchecked(b) }` guarded by the validator, with vstd's
+`requires valid_utf8(v@)` discharged **from the validator's postcondition
+alone**, plus a verified `drive(buf, n_iters)`.
+
+**Non-vacuity, three ways, and the third is the one to copy.** A differential
+oracle against **unmediated** `core::str::from_utf8` (18 499 985 + 316 602
+independent cases, **0 mismatches**); a 10-mutant battery, **all 10 failing**,
+of which **three break only the completeness direction**; and the `false`-body
+control above. ⚠ **Do NOT build the oracle's expected value from the validator's
+own width table** — that tests the transcription, not the semantics.
+
+⚠ **One surviving equivalent mutant, recorded so nobody re-derives it:** dropping
+the surrogate test from the **width-4** branch still verifies, because a 4-byte
+encoding already has `cp >= 0x10000`. The validator carries one provably dead
+comparison.
+
+✅ **The pinned `vstd/utf8.rs` is a real spec, not a shape check** — it rejects
+**overlongs** (`:206`), **surrogates** (`:214`) and **> U+10FFFF**. A
+*structural-only* validator (continuation shape, no overlong/surrogate
+rejection) **cannot** discharge it: `1 verified, 3 errors`, and its call site
+fails `precondition not satisfied` outright — **R5 cannot make the unsafe call at
+all.**
+
+## ⚠⚠ The gate forbids VERIFIED unsafe — and that rule is LOAD-BEARING
+
+(TASK_085_REVIEW blocker 1. ⚠ **The reasoning is a code read plus a tree census;
+the end-to-end gate demonstration is still owed.**)
+
+`check.py::_scan_unsafe_sites` requires **every `unsafe` token in a pinned Verus
+source to sit inside an `#[verifier::external_body]` item**. Census: **47
+`unsafe` tokens across 22 `patterns/*/verus.rs`, all inside `external_body`, zero
+outside**, and **all 45 unsafe-bearing wrappers carry a non-empty `requires`**
+(structurally enforced by `_check_trusted_unsafe`).
+
+⚠ **It looks backwards** — an operation whose precondition Verus *discharged*
+gets pushed into the *trusted* column. **It is not.** `_axiom_items` matches
+**declarations**, so a pattern that merely **calls** a vstd
+`assume_specification` declares nothing, shows `trusted 0 / axioms 0`, and
+`check_miri` then **prints** *"no trusted `ensures` whose incompleteness Miri
+would have to backstop — Miri not required."* Over a call licensed by
+`vstd/string.rs`'s `assume_specification[str::from_utf8_unchecked] … ensures
+res.spec_bytes() =~= v@`, **that sentence is false**, and the `ensures` in
+question is verbatim what a wrapper would have written. **`_scan_unsafe_sites` is
+the only thing standing between that hole and a green verdict.**
+
+✅ **Why it has cost nothing so far:** `grep -rn "get_unchecked"
+~/tools/verus/vstd/` → **0 hits**. vstd specs **none** of the operations the tree
+uses, so all 47 wrappers were unavoidable. **`p15` is the first row where vstd
+DOES spec the operation — which is exactly why it is the first row the rule
+bites, and why it is refused** (`.memory/06-catalogue.md`).
+
+⚠ **Correction to a claim made in passing:** `_is_trusted` requires
+`external_body` **AND** (`ensures` **or** `unsafe` in the body) — **not
+`external_body` alone.**
+
+⚠⚠ **AND THE MANAGER'S INFERENCE FROM THE CENSUS WAS WRONG.** From *"47 tokens,
+all inside wrappers"* the manager concluded *"in all 22 patterns the unsafe
+operation is TRUSTED, not PROVED."* **Refuted by name:**
+`patterns/p27-handle-table/verus.rs`'s `rec_free` wraps
+`unsafe { std::alloc::dealloc(p, layout) }` behind a **six-clause `requires`**,
+and its call site `rec_close` is a **verified** fn that discharges it from
+tracked permissions whose facts come from **verified** `rec_open`'s `ensures`.
+Weaker instances: p36's `tab_get_unchecked`, p03's `stack_set_unchecked`, p09's
+shadowed accessor. **What is trusted is the IMPLICATION; the ANTECEDENT is
+already Verus-discharged at ~130 call sites.** That is the correct sentence.
+
+- ⚠ **`str::chars` IS spec'd in the pinned vstd** — `string.rs:465`,
+  `assume_specification[ str::chars ] … ensures IteratorSpec::remaining(&iter)
+  == s@`, plus `into_iter_elts` (`:462`) and `impl IteratorSpecImpl for Chars`
+  (`:473`). **A verified DECODE fold over a `&str` is available**, not just
+  validation. Sixth instance of *"grep the pinned vstd first"*.
+- `s.spec_bytes()` needs `use vstd::string::StringSliceAdditionalSpecFns;` —
+  **`vstd::prelude::*` does not bring the trait in.** Costs two runs.
