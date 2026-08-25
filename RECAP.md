@@ -845,8 +845,12 @@ the number.** Two task files have already sent an agent to the wrong finding.
    quote a corrected ratio only where the effect clears it, as p09's do by 11–25×.
    See `.memory/03-measurement.md`.
    **(b) A `forbidden` entry without backticks is audited ZERO times**, while the
-   verdict line two above still counts it (**`check_idiom`** keys on `_TICK`,
-   `check.py::spelling_matches`; this read `:929` until TASK_066 and `:1103-1105` until TASK_071). p09
+   verdict line two above still counts it (**`check.py::idiom_audit`** keys on
+   `_TICK`, which is defined in `check.py::idiom_lines`). ⚠ **This citation has
+   now been wrong THREE ways**: `:929` until TASK_066, `:1103-1105` until
+   TASK_071, and then `spelling_matches` -- a FUNCTION NAME, introduced by
+   `f4d0e63`, **the commit whose entire subject is fixing citation rot**.
+   `_TICK` appears nowhere in `spelling_matches`. p09
    shipped 5 forbidden entries and 0 audited spellings — its "forbidden: 0 hits"
    was kept **by auditing nothing**. Backtick every entry you want enforced.
 

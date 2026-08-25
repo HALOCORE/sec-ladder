@@ -691,7 +691,10 @@ un-greenable by any route:
 
 **Sizing inputs so Miri does not block the row — measured at TASK_010_REVIEW.**
 Miri's cost is driven by the **payload the kernel folds**, not by the file size,
-and `n_iters` is *not* the knob: `check.py`'s Miri stage (`MIRI_PROBE_ITERS` is defined at `:311` and applied at `:4769`; this said `:3819`, which is neither -- **cite the SYMBOL, line numbers rot**) rewrites it to
+and `n_iters` is *not* the knob: `check.py`'s Miri stage (the constant is `check.py::MIRI_PROBE_ITERS` and the
+rewrite is in `check.py::check_miri` -- **cite the SYMBOL; every line number
+this sentence has carried has rotted, `:3819` then `:311`/`:4769`, the last of
+which landed in `check_requires_strength`**) rewrites it to
 `MIRI_PROBE_ITERS = 4` for every Miri run, discarding whatever the pattern
 declared. Measured fold throughput on this box: **5.91e-5 s per folded byte
 (~16 900 B/s)**, so the 180 s budget is ≈ **3.05 M folded bytes**, i.e. a stride
@@ -1033,7 +1036,7 @@ review as a change to the committed artefact rather than only as a source diff.
   stale record is at least detectable by comparing hashes against the tree.
   ⚠ **A `forbidden` entry without BACKTICKS is audited zero times, and the
   verdict line still counts it** (TASK_038_REVIEW). The audit inside
-  **`check_idiom`** keys on `_TICK.findall` (in `check.py::spelling_matches`), so
+  **`check.py::idiom_audit`** keys on `_TICK.findall`, so
   a bare-string entry is invisible to it while the line two
   above still reports *"N forbidden spelling(s)"*.
   ⚠ **This citation read `:929`, then `:1103-1105`, and both had rotted.**
@@ -1108,12 +1111,16 @@ count here either; run `wc -l harness/check.py`.
 
 What was wrong, and what it should have been:
 
+⚠⚠ **THE "the real target" COLUMN BELOW ONCE CARRIED LINE NUMBERS TOO, AND THEY
+ROTTED — inside the table whose whole subject is rotted line numbers.** They are
+struck. **Function names only.**
+
 | cited | actually | the real target |
 |---|---|---|
-| `:929` (×2) | a `named_spelling_problem` selftest comment | **`check_idiom`**, `:1103-1105` (`_TICK` at `:993`) |
-| `:1249` (×2) | an `idiom_problems` selftest | **`check_checksums`**, `:1440-1476` / **`build_models`**, `:1433` |
-| `:820-834` | the pinned-constant rationale comment | **`rung_sources`**, `:996-1010` |
-| `:1218`/`:4903` | mid-string in a `rep.ok` | `head("1. build the matrix")` at `:1404`/`:5104` |
+| `:929` (×2) | a `named_spelling_problem` selftest comment | **`check.py::idiom_audit`** (`_TICK` is defined in `check.py::idiom_lines`) |
+| `:1249` (×2) | an `idiom_problems` selftest | **`check.py::check_checksums`** / **`check.py::build_models`** |
+| `:820-834` | the pinned-constant rationale comment | **`check.py::rung_sources`** |
+| `:1218`/`:4903` | mid-string in a `rep.ok` | the two `head("1. build the matrix")` call sites — **two entry points into one stage**, which is why `grep -o 'head("[0-9][^"]*"' \| sort -u \| wc -l` needs the `sort -u` |
 
 ⚠ **One of them had drifted TWICE** — `:566` until TASK_058, then `:1247-1249`
 until TASK_066. A citation that has been "fixed" is not thereby stable.
@@ -1373,3 +1380,108 @@ measured** vstd-pure control (`r5_vstdpure.rs`, `15 verified, 0 errors`) carryin
 **A smaller TCB was available and identity was preferred.** Anyone arguing either
 way about a future row should start from that precedent rather than from the
 `exact` count.
+
+---
+
+## ⚠⚠ DECISION: `_scan_unsafe_sites` STAYS AS IT IS. The catalogue closes.
+
+**Manager decision, TASK_096 / TASK_096_REVIEW, recorded with its argument so it
+can be attacked.** The question was: *should the rule be narrowed so a
+Verus-discharged `unsafe` may live in a verified body, unblocking `p35` (type
+confusion — the only bug class absent from the built tree) and `p15`?*
+
+**No.** Five reasons, in order of weight:
+
+1. ⚠⚠ **A TEXTUAL SPAN RULE CANNOT DISTINGUISH `unsafe` THAT VERUS DISCHARGES
+   FROM `unsafe` THAT VERUS IGNORES**, and that is structural, not a bug in one
+   predicate. The reviewer's end-to-end demonstration: a `#[verifier::external]`
+   fn **nested inside a verified fn's body**, wrapped by an `external_body`
+   sibling. Verus reports **`2 verified, 0 errors`**; **zero items are
+   `_is_trusted`**, so stage 5a skips, 5c-twin `continue`s and
+   `_check_trusted_arguments` owes nothing; the narrowed rule **ADMITS** it and
+   the shipped rule refuses it — and **the compiled binary reads out of bounds**
+   (`slice::get_unchecked` precondition violated, exit 134). **The first
+   predicate anyone wrote for this was unsound, and the hole shipped past a
+   green Verus run.** ⚠ The fix is one word — **innermost** enclosing item, not
+   *any* — and it was verified. **That it is one word wide is the point: so was
+   the hole.**
+2. **The discriminator that separates the two target rows is NOT GATE-ENFORCEABLE.**
+   It is *"does vstd spec the operation"* with **the opposite polarity to
+   catalogue probe 4** — a vstd spec is a reason to **refuse**, not to admit
+   (`p15`'s licence is `vstd/string.rs`; `p35`'s `union` is absent from vstd
+   entirely). ✅ It retro-refuses **0 of 24** built rows. ⚠ **But no gate check
+   can evaluate it**, so it is human judgement wearing a policy's clothes — and
+   **the battery built to validate the narrowing encoded its own violation as
+   *expected* and printed `ALL AS EXPECTED`.** That is the tautology trap, inside
+   the instrument meant to catch it.
+3. **`_check_trusted_arguments` owes NOTHING at zero trusted items**, so the
+   prose half of `.memory/04-verus.md`'s TCB policy — *one number **plus
+   prose*** — is unenforced on **exactly** the shape the hatch creates. A `p35`
+   would publish `tcb_items = 2`, both infra: **honest under the policy, and the
+   policy's backstop is absent.** ⚠ **The second "vstd relied upon" column stays
+   REFUSED** — the reviewer looked for an argument beating the 402-site census
+   and did not find one.
+4. **It buys exactly ONE row.** `p35` has **no legal configuration** — executed,
+   not read — and `p15` is refused on grounds this rule does not touch.
+5. **This project's entire output is "measured numbers you can trust because a
+   gate checks them."** Rule 5 says prefer a pattern over hardening the gate;
+   it does not say prefer a pattern over **loosening** it. **Trading a
+   soundness-relevant loosening for one pattern is a bad trade.**
+
+✅ **What survives and is worth keeping:** the enumeration is **stronger than it
+was claimed to be** — everything Verus *admits* inside a verified body carries an
+obligation, over 26 + 8 constructs including macros, trait default bodies, nested
+`unsafe fn` and closures; the only obligation-free token is `unsafe impl Send`
+outside `verus!{}`, which **both** rules refuse.
+
+⚠⚠ **ONE THING IS NOT CLOSED, AND IT IS A DIFFERENT TARGET: `_TWIN_BANNED`.**
+The reviewer's MAJOR 3 — **the shape is not union-specific, and the gate's own
+rule is what produces it.** `_TWIN_BANNED` forbids the `unsafe` keyword in a
+twin, but a pattern whose *operation* is `unsafe` has no safe spelling to write
+there (`error[E0133]`), so the twin must be justified away, which is
+`n_twins == 0` → hard FAIL. **That is a defect in the twin rule, not a policy
+question about verified `unsafe`** — and fixing it might ship `p35` the
+**comply** way with no soundness loosening at all. **Probe it before declaring
+the catalogue closed.**
+
+## ⚠⚠ `check.py::_verus` DISCARDS THE SUBPROCESS RETURN CODE
+
+✅ **MANAGER-VERIFIED end to end.** `_verus` regex-matches
+`(\d+) verified, (\d+) errors` out of `stdout + stderr` and **never reads
+`r.returncode`**. A `verus!` union read with `requires v is i` prints
+**`2 verified, 0 errors`** while `verus_run.py` **exits 1** with `error[E0133]`.
+
+> **So the twin oracle can CERTIFY SOURCE THAT `rustc` REJECTS**, and on a real
+> gate run it did.
+
+- ✅ **Latent, not live** — 50/50 shipped rows exit 0 with 0 errors.
+- ⚠ **Scope: 11 `_verus` call sites, not 12; 6 expect success, not 4**
+  (`_verify_function` and `_probe_selftest` were omitted from the first count).
+- ⚠ **Two more rc-blind readers exist** — `check.py::check_verus_contract`
+  (inline, the site that writes every gate record) and `harness/limbs.py::verus`
+  — **but both are backstopped by `build.py::build_verus --compile`**, so this is
+  **smaller** than "a second site would be a bigger finding", not bigger.
+- **The safe universal fix:** flag `rc != 0` **only when the summary parsed AND
+  `errors == 0`.** ⚠ **A bare returncode check is WRONG**: 5 of the 11 sites are
+  mutants that **must** exit non-zero, and bolting it on turns the mutant battery
+  green for the wrong reason — the tautology trap, fourth instance.
+
+## ⚠ CITATION ROT, AND THE COMMIT THAT FIXED IT INTRODUCED SOME
+
+`f4d0e63` — subject *"the 'line as a hint' citation convention failed inside one
+session"* — **introduced a wrong FUNCTION NAME** into this file: `_TICK.findall`
+was attributed to `spelling_matches`, and `_TICK` appears **nowhere** in it (it
+is defined in `check.py::idiom_lines` and used only in `check.py::idiom_audit`).
+✅ **Manager-verified and fixed here, in `RECAP.md`, and in the rot-history table
+below, whose own "the real target" column carried line numbers that had rotted.**
+
+⚠⚠ **AND TASK_096's SWEEP FIXED THE COPIES AND LEFT THE ORIGINALS WRONG** — the
+inverse of this project's precedence rule, since `.memory/` supersedes any file
+it contradicts. `.memory/05-layout.md`'s **demand 11 is the SOURCE three pattern
+files quote**, and it still carried `:2197`/`:1549`; `.memory/02-bench-rules.md`'s
+Miri sizing paragraph carried `:311`/`:4769` **while its own parenthesis says
+"cite the SYMBOL, line numbers rot."** ✅ **All fixed.**
+
+> **When you correct a rotted citation, fix the `.memory/` ORIGINAL first and the
+> derived copies second.** A sweep that only touches `patterns/` leaves the
+> authoritative layer contradicting the tree it governs.

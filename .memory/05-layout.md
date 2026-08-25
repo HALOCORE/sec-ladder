@@ -212,9 +212,13 @@ mentions. Budget for them up front; each has cost an engineer a surprise.
 
 11. **A Verus control that does not verify cleanly cannot live in a pattern dir
    at all** — measured at TASK_012, and it is a consequence of two existing rules
-   meeting. `check.py`'s stage 5a (`:2197`; this said `:1446`) requires *every* `.rs` in the pattern dir containing a
-   `verus!` block to be pinned in `verus.obligations`, and `:1549` fails the gate
-   for any pinned file reporting `n_err > 0`. `build.py`'s `--cell` list is closed
+   meeting. `check.py::check_verus_contract` (stage 5a) requires *every* `.rs` in the
+   pattern dir containing a `verus!` block to be pinned in `verus.obligations`,
+   and fails the gate for any pinned file reporting `n_err > 0`. ⚠ **This
+   sentence carried `:1446`, then `:2197`/`:1549`, and every one of them
+   rotted** -- `:2197` now lands at module level and `:1549` inside
+   `idiom_audit`. **This is demand 11, the ORIGINAL that three pattern files
+   quote**, so a rotted hint here propagates. `build.py`'s `--cell` list is closed
    `choices`, so the file cannot be built either. So a **deliberately broken**
    proof — the most valuable kind of control, the one that shows what an obligation
    is load-bearing *for* — has nowhere to live.
@@ -325,7 +329,9 @@ Two conditions the rule depends on, both verified at TASK_027_REVIEW against the
 harness rather than argued:
 
 - **The `sweep-` prefix IS the mechanism**, hardcoded in two module-level
-  literals (`check.py`'s inline `sweep-` test at `:474` — it has **no** module-level literal, despite this line having claimed `:459-460` — and `measure.py::SKIP_INPUT_PREFIX` at `:64`) with no pattern-specific input
+  literals (`check.py`'s inline `sweep-` test, in `check.py::inputs_of` -- it has **no**
+  module-level literal, despite this line having claimed `:459-460` and then
+  `:474`, which now lands in `Report.ok` -- and `measure.py::SKIP_INPUT_PREFIX`) with no pattern-specific input
   and no `spec.md` key that selects inputs. **A band named anything else enters
   the measurement matrix and costs a full re-measure.** Name it `sweep-*`.
 - **The gate hashes `gen.py` and never the blobs**, so a sweep-derived law's
