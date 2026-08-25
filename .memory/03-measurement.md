@@ -2068,3 +2068,56 @@ figure bit-identical**.
 ⚠ **A re-measure after a docs+generator change moved 101 leaves and ZERO measured
 numbers** — 96 wall-clock, 3 provenance, 2 source hashes. Useful calibration for
 what a "stale" record actually costs to refresh.
+
+## ⚠⚠ AN INTERCEPT MEASURED ON A PROBE BINARY DOES NOT TRANSFER. ONLY THE SLOPE DOES.
+
+**PROVISIONAL — measured at TASK_088, not yet reviewed.** ⚠ **This bears
+directly on every row in `TASK_086`'s queue, because all of their numbers are
+probe numbers.**
+
+p19 shipped two laws taken from a 5-length probe (`.temp/t87/cost.rs`):
+`R2 − R4 = 6.25·m − 8` and `R3 − R4 = 1.00·m − 2`. Re-fitted from the
+**committed** blobs against the **shipped** binaries, with zero residual over all
+19 lengths:
+
+```
+R2 - R4 = 6.25*m - 6 - 2.25*(m mod 4) - 4*[m mod 4 != 0]
+R3 - R4 = 1.00*m + 4                  - 1*[m mod 4 != 0]
+```
+
+**Two independent things were wrong, and only one of them is the residue rule.**
+
+1. **The residue term.** The probe never varied `m mod 4`, so it could not see a
+   `2.25·r + 4·[r≠0]` epilogue term. That is the known rule — *check the residue
+   class of any parameter your bands hold constant.*
+2. ⚠⚠ **A FIXED PER-PROGRAM OFFSET, AND THIS ONE IS NEW.** The probe sampled
+   **only `m ≡ 0 (mod 4)`**, where the correct law *is* `6.25m − 6` / `1.00m + 4`
+   — and it still published `−8` / `−2`. **The delta is exactly `+2` and `+6` at
+   all ten `m ≡ 0 (mod 4)` points.** The probe was a **different binary**: a
+   different driver, different call overhead, different register pressure.
+
+⚠ **The second failure mode is INVISIBLE TO A RESIDUE-COVERING BAND**, because
+it is constant in `m`. Sweeping every residue class perfectly would not have
+caught it. **What catches it is re-fitting against the SHIPPED cells** — and
+p19's own `NOTES.md` printed the four shipped marginals **two sections above the
+law that contradicted them**.
+
+**The rule: a probe measures a SLOPE. Carry the slope forward as a prior and
+RE-FIT THE INTERCEPT from the shipped binary, always.** A probe's intercept is a
+property of the probe.
+
+## `GEN-ONLY` cannot fire on a GATE record
+
+**PROVISIONAL — measured at TASK_088.** Editing only a docstring in
+`patterns/pNN/inputs/gen.py` classifies **`GEN-ONLY` on the measurement record**
+and **`STALE` on the gate record**. `check_stale`'s `gen_only` branch requires
+`"input_sha256" in rec`, and **gate records carry none**; they also hash
+`NOTES.md` / `README.md` / `spec.md`. **A `check.py pNN` re-run clears it.**
+⚠ **So "a docstring edit is free" is true of the measurement record and false of
+the gate record.** Budget one gate run.
+
+⚠ **And any edit at all to `c/kernel.c` / `c/kernel.h` — a comment included —
+stales the MEASUREMENT record.** There is no comment-only escape. Measured cost
+for one pattern: `measure.py p19` = **1 m 17 s**, moving `min_s` / `median_s` /
+`spread_pct` across 32 cells plus timestamps and source hashes — **zero `Ir`,
+zero static/md5, zero checksum, zero identity.**

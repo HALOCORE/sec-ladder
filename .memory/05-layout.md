@@ -601,3 +601,25 @@ s.find('| `identity` |') > s.find('```slb-contract')   # False ⇒ outside the h
 inside the fence costs a contract move and everything that hangs off it.** Check
 which side of the fence you are on before budgeting — a manager task file
 budgeted this one as a contract move and it was not.
+
+## ⚠ A `#[path]` include used in a GATE TEST must be an ABSOLUTE path
+
+**PROVISIONAL — measured at TASK_088.** Stage 5's clause-mutation arms **copy
+the pattern** to `.temp/clausemut/<pid>/patterns/<slug>/`, so a `pdir`-relative
+`#[path]` **does not resolve from there** and the run reports
+`[clause-mut]` / `[req-mut]` / `[twin]` failures that are **artefacts, not
+detections**.
+
+⚠ **This is the same class as the *"7 failures, all diagnostic-mode"* recorded
+for `TASK_084_REVIEW` route J — so RECAP's summary of that route,
+*"fully green with no gate output at all"*, is LOOSER than the review's own
+text.** With an **absolute** `#[path]` the control is clean: 0 failures, `PASS`,
+byte-identical.
+
+**Key convention, extended at TASK_088:** `verus.included_tcb[<repo-relative
+path>]` declares bodied trusted items in `#[path]`-included files, sibling to
+`verus.axioms`. **`_verus_file_list` is now the single DEDUPED file list every
+Verus-side detector shares** — `_trusted_items`, `_axiom_items`, the
+`assume(`/`admit(` shout and `_check_included_tcb`. Before that, `_axiom_items`
+had been widened alone and the other three still iterated `verus.obligations`,
+which is how a false `ensures` one hop away shipped green.
