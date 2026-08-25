@@ -41,7 +41,18 @@ rest is reference.
   implementation the gate drives. Both are mandatory per pattern.
 - `../LearnVeri/PITFALLS.md` — Verus gotchas; read before debugging.
 - `~/tools/verus/vstd/` — **the PINNED vstd, and the only one that decides
-  anything.** Grep it before claiming "no spec exists".
+  anything.** Grep it before claiming "no spec exists". ⚠⚠ **AND GREP
+  `~/tools/verus/vstd/std_specs/` SPECIFICALLY, because that is where the specs
+  for std types live and a `vstd/<mod>.rs` TRAIT DECLARATION IS NOT THE
+  SPECIFICATION.** This exact confusion has now produced a false "no spec
+  exists" claim **twice**: `copy_from_slice` (stood TASK_004→048) and
+  **`index_mut` for a mutable sub-slice at TASK_089** — where `vstd/slice.rs`'s
+  `ExSliceIndex` trait carries a `requires` and no `ensures`, while
+  `std_specs/slice.rs` ships
+  `assume_specification[ <Range<usize> as SliceIndex<[T]>>::index_mut ]` with a
+  full **value-level** `final(r)@ == final(slice)@.subrange(...)`. ⚠ **Grep the
+  INHERENT spelling as well as the free one** — `core::str::from_utf8_unchecked`
+  is `is not supported` while `str::from_utf8_unchecked` verifies.
 - `../LearnVeri/_VERUS_DOC_/` — Verus guide, plus a vstd source tree that is a
   **DIFFERENT, OLDER SNAPSHOT**. ⚠ Use it for the *guide*, never to settle
   whether a spec exists: it has **no `copy_from_slice` and no `copy_within` at

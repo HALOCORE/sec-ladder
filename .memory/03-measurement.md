@@ -2128,22 +2128,39 @@ probe measured **`+5.05 Ir` per MAC step, +49.6 %**, safe over unsafe. Shipped,
 the ordering is **reversed** — `safe_naive` < `safe_tuned` < `unsafe` — and **the
 per-MAC safety tax is `0.00000`.**
 
-**The mechanism, and it is the part to remember:** the probe wrapped its
-dimensions in **`black_box`**, which withheld the `u8` range on `n` and `m`, so
-LLVM **could not prove `i+j < 96`**. The shipped kernel derives that range from
-its own input, **proves it, and deletes all three bounds checks.** ⚠ **The probe
-did not mis-measure a cost; it measured a DIFFERENT PROGRAM — one in which the
-safety check is live and in the shipped one it is dead.**
+⚠⚠ **THE MECHANISM THE MANAGER FIRST LANDED HERE WAS WRONG, AND IT IS
+RETRACTED (TASK_089_REVIEW B2, measured).** ~~*"the probe wrapped its dimensions
+in `black_box`, which withheld the `u8` range … `black_box` is not a neutral
+stop-the-optimiser tool, it is a fact-hiding tool"*~~ — **`black_box` changed
+NOTHING.** Rebuilt with and without it, **every probe kernel is byte-identical**
+on the linked binaries: p46's 296 B `a73eda77…` / 126 B `daca171e…`, and the same
+for p23's, p24's, p26's and p35's. ⚠ **A `black_box` at a CALL SITE cannot reach
+the codegen of an `#[inline(never)]` callee.**
+⚠ **And the retraction has teeth for the next probe author: dropping
+`black_box` "so as not to hide range facts" would re-enable the constant folding
+it exists to prevent, while the real cause went unfixed.**
 
-⚠ **So `black_box` is not a neutral "stop the optimiser folding this" tool.** It
-is a *fact-hiding* tool, and the facts it hides are exactly the ones a bounds
-check is eliminated by. **Anything a probe hides behind `black_box` that the real
-kernel derives from its input can invent a rung boundary that does not exist.**
+✅ **THE CORRECT MECHANISM, and it is stronger: A PROBE WHOSE KERNEL SIGNATURE
+DIFFERS FROM THE SHIPPED KERNEL'S LOSES THE RANGE FACTS THE SHIPPED KERNEL
+DERIVES FROM ITS INPUT HEADER.** Isolated by a control that puts p46's **shipped
+body** inside the probe harness, **both called through `black_box`**: the shipped
+body loses every bounds check while the probe kernel keeps ten conditional
+branches. **The probe did not mis-measure a cost; it measured a DIFFERENT
+PROGRAM** — one where the safety check is live, and dead in the shipped one.
 
-⚠⚠ **BLAST RADIUS, AND IT IS NOT CHECKED: every row in `TASK_086`'s queue was
-measured this way.** p46's is the only one re-measured against built rungs so
-far, and its sign flipped. **Treat every unbuilt row's probe cost as a
-DIRECTION-UNKNOWN prior until its rungs exist.**
+⚠⚠ **BLAST RADIUS, now RANKED from the probe sources rather than asserted** —
+and it governs four unbuilt rows:
+
+| row | exposure | why |
+|---|---|---|
+| **p24** heapify | **HIGH** | `l = 2*i+1` guarded by `l < n`; with a fixed-capacity scratch and a header-derived `n <= CAP`, the accesses are provable by **the same linear reasoning as p46's `i+j < 96`. Expect the same sign flip.** |
+| **p26** RLE | **HIGH** | `out[o]` already guarded one line above, and `k26_checked` 247 B vs `k26_unchecked` 221 B is nearly free already |
+| **p35** union | MEDIUM | `tags[k]` needs `tags.len() >= vals.len()`; in a one-window shipped kernel both come from one header. (p35's headline is punning, not bounds cost.) |
+| **p23** partition | **LOW — and it is the ROBUST one** | `while v[i] < pivot { i += 1 }` has **no upper guard**: the bounds check **IS** the termination bound and cannot be deleted |
+| **p28** DLL | **not exposed** | it is **not in `cost.rs` at all**, and its probe validated `Ir` against static loop-body counts to three decimals |
+
+**Treat every unbuilt row's probe cost as a DIRECTION-UNKNOWN prior until its
+rungs exist** — but note p23 and p28 are the two that do not need the caveat.
 
 ## ⚠ A two-parameter law fitted on axis-aligned bands can be UNDERDETERMINED
 
