@@ -1636,3 +1636,50 @@ already Verus-discharged at ~130 call sites.** That is the correct sentence.
   validation. Sixth instance of *"grep the pinned vstd first"*.
 - `s.spec_bytes()` needs `use vstd::string::StringSliceAdditionalSpecFns;` —
   **`vstd::prelude::*` does not bring the trait in.** Costs two runs.
+
+## ⚠⚠ WHEN A VERUS OBLIGATION IS HARD, IT IS ALMOST NEVER THE MATHEMATICS. IT IS THE CONTRACT SHAPE OR THE API SHAPE.
+
+**PROVISIONAL — three probes, TASK_086 / TASK_090 / TASK_091, unreviewed.**
+**This is the manager's prediction record turned into something useful: 0 for 3,
+and the three misses have ONE shape.**
+
+| row | the manager predicted the hard part was | what it actually cost | where the difficulty really was |
+|---|---|---|---|
+| **p23** quicksort partition | the two-index multiset loop invariant | **`4 verified, 0 errors` FIRST ATTEMPT** | nowhere — it was the easy part |
+| **p24** binary heap | `heapify`'s loop invariant | **no proof at all**; one `assert` before the loop | `sift_down`'s invariant is **not inductive** — the swap raises `v[i]` and can break `heap_at(parent(i))`, needing a **parent-dominance conjunct** |
+| **p28** intrusive DLL | the address-**injectivity** conjunct | **one 8-line `proof fn`, one `if`, no loop, no induction** | (1) the struct needed **EXEC fields** it only had in ghost — a **contract change**; (2) `is_disjoint` takes **`&mut self`** and so **cannot be called inside `assert forall|i| … by`** |
+
+**The rule that falls out, and it is actionable when SCOPING a row, not after:**
+
+- ⚠ **Ask what EXEC STATE the proof needs that the contract does not yet
+  carry.** p28's `push_front` had to branch on *"is the list empty?"* and the
+  length existed only in `Ghost`. **That is a `spec.md` change, and it is
+  invisible if you only look at the invariant.**
+- ⚠⚠ **Ask whether the vstd API can be CALLED WHERE YOU NEED IT.** A `&mut
+  self` method cannot appear inside a quantified `assert forall … by`. **This is
+  not a hint problem and no amount of proof-hint fiddling fixes it** — it is a
+  goal-reformulation problem, and p28's probe called it *"the trap that would
+  have burned a session."* **The fix was to reduce a per-element quantified goal
+  to a single `dom` fact.**
+- **The mathematical invariant is usually the part Z3 is good at.** Three for
+  three, the "obviously hard" invariant was not the cost.
+
+⚠ **A corollary worth pricing in: STRENGTHENING an invariant to make one proof
+legal makes every OTHER proof over it harder.** p28's extra key-discipline
+conjunct made `unlink` — already proved — need new work to survive.
+
+## ⚠ The anti-vacuity clause is never the headline clause
+
+**Three instances now, and in each the clause whose deletion admits a degenerate
+body is NOT the one the row is about:**
+
+| row | the headline `ensures` | the clause actually carrying the anti-vacuity weight | what passes without it |
+|---|---|---|---|
+| **p15** | `res == valid_utf8(b@)` | **the `==` rather than `==>`** | a body of `false` — `2 verified, 0 errors` |
+| **p24** | `is_heap(final(v)@)` | **the multiset clause** | a body that **zeroes the array** |
+| **p28** | `wf()` preserved by `unlink` | **the address-injectivity conjunct** | **ONE node with `prev = next = itself`**, declared `len = 3`, `ptrs@ = [p,p,p]` — and it discharges `unlink`'s *entire* precondition |
+
+⚠ **So the vacuity probe is not "is the postcondition true?" but "what is the
+CHEAPEST body that satisfies it?"** Write that body and run it. **Every one of
+these three was found by a probe that tried, and none by reading the
+postcondition.**
