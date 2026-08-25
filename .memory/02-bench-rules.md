@@ -1434,6 +1434,42 @@ obligation, over 26 + 8 constructs including macros, trait default bodies, neste
 `unsafe fn` and closures; the only obligation-free token is `unsafe impl Send`
 outside `verus!{}`, which **both** rules refuse.
 
+⚠⚠ **~~ONE THING IS NOT CLOSED … `_TWIN_BANNED`~~ — RESOLVED AT TASK_097, AND
+THE PARAGRAPH BELOW IS WRONG. `_TWIN_BANNED` IS NOT THE BLOCKER AND REPAIRING IT
+DOES NOT SHIP `p35`. THE CATALOGUE CLOSES.**
+
+✅ **Manager-verified.** `check.py::_is_trusted` returns `False` unless the item
+is `#[verifier::external_body]` — and **a twin may not be `external_body`**, by
+**three** independent rules (`_TWIN_BANNED` lists `external_body`; it lists
+`external`; `check_trusted_twins` has an explicit `if twin.external:` limb).
+**So a twin is STRUCTURALLY never `_is_trusted`, and `_scan_unsafe_sites` — the
+rule that stays — hard-fails every route:**
+
+```
+route                   tcb-unsafe fails     _TWIN_BANNED
+twin_holds_unsafe                      1     FAIL
+verified_helper                        1     clean
+cfg_gated_helper                       1     clean
+macro_helper                           1     clean
+safe_spelling_E0133                    0     clean   <- and rustc refuses it
+```
+
+**Isolated:** delete `unsafe` from `_TWIN_BANNED` and change nothing else — 5c-twin
+goes **fully green** and `FAIL [tcb-unsafe]` is **unchanged**. ⚠ **The twin rule
+was never what fired.**
+
+✅ **Two things worth keeping from the probe.** *(a)* The manager's guess at the
+ban's purpose was **right and is the recorded reason** (`f1229af`: *"`unsafe` …
+would make the twin a second copy of the axiom"*) — ⚠ **but that premise is
+FALSE for a union read**, where **Verus imposes the obligation itself**:
+`unsafe { v.i }` under `requires v is i` is `2 verified, 0 errors`, and deleting
+the conjunct gives `1 verified, 1 errors`, *"union must be in the correct
+variant"*. **A repaired twin would have had real teeth — it just would not have
+helped.** *(b)* The other five banned words **are** load-bearing:
+`proof { assume(false); } 0u64` verifies **vacuously at 2/0**.
+
+**Superseded text follows, kept as the record of a wrong call.**
+
 ⚠⚠ **ONE THING IS NOT CLOSED, AND IT IS A DIFFERENT TARGET: `_TWIN_BANNED`.**
 The reviewer's MAJOR 3 — **the shape is not union-specific, and the gate's own
 rule is what produces it.** `_TWIN_BANNED` forbids the `unsafe` keyword in a

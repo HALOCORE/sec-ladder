@@ -3968,15 +3968,28 @@ def check_verus_contract(pdir, rep, contract):
         axioms = _check_axiom_decls(rep, src, txt, vcfg)
 
         # --- obligation count --------------------------------------------
-        r = subprocess.run([sys.executable, os.path.join(REPO, "verus_run.py"), path],
-                           capture_output=True, text=True, cwd=REPO,
-                           timeout=RUN_TIMEOUT)
-        res = (r.stdout + r.stderr).strip()
-        m = re.search(r"(\d+) verified, (\d+) errors", res)
-        if not m:
+        #
+        # ⚠ **`_verus`, not a fourth inline copy of it.** This was a
+        # byte-for-byte duplicate of `check.py::_verus`'s body -- same command,
+        # same regex, same `cwd`, same timeout -- and it inherited the same
+        # defect: it never read `subprocess.CompletedProcess.returncode`, so a
+        # `verus.rs` that Verus verifies and rustc rejects was recorded here as
+        # `N verified, 0 errors` and printed an `ok` line (TASK_096_REVIEW
+        # MAJOR 2, which named this as "the primary certificate site" -- it is
+        # the run that fills every gate record's `verified`, `errors` and
+        # `tcb_items`). Calling `_verus` fixes it and deletes the duplicate in
+        # one edit; `_verus` is defined below this function, which is fine
+        # because Python resolves globals at call time.
+        #
+        # This site *is* backstopped -- `build.py::build_verus` passes
+        # `--compile` and does check `rc`, and every pinned obligation source
+        # is a built cell -- but the backstop is stage `[build]`, which
+        # `--no-build` skips, and a diagnostic that points at the wrong stage
+        # is how the finding stayed invisible for 96 tasks.
+        n_ver, n_err, res = _verus(path)
+        if n_ver is None:
             rep.fail("proof-verify", f"{src}: no verification result: {res[-500:]}")
             continue
-        n_ver, n_err = int(m.group(1)), int(m.group(2))
         out[src] = {"verified": n_ver, "errors": n_err, "pinned": want_n,
                     "tcb_items": [dict(name=i.name, attr=i.external,
                                        body_lines=i.body_lines, line=i.line)
@@ -4123,8 +4136,55 @@ def check_call_site(pdir, rep, contract):
     return out
 
 
+#: Every `_verus` run whose SUMMARY said "0 errors" and whose PROCESS said
+#: otherwise. Module-level rather than threaded through eleven call sites
+#: because three of them (`_verify_function`, `_run_taut_battery`,
+#: `_probe_selftest`) have no `rep` to fail on, and because
+#: `check_verus_exit_codes` must be able to fail the run even if some future
+#: caller swallows the `(None, None, ...)` this makes `_verus` return.
+_VERUS_RC_ANOMALIES = []
+
+
 def _verus(path, *extra):
-    """(verified, errors, raw output). `(None, None, out)` if Verus said neither."""
+    """(verified, errors, raw output). `(None, None, out)` if Verus said neither.
+
+    ⚠⚠ **THE RETURN CODE IS PART OF THE ANSWER, AND THIS FUNCTION DISCARDED IT
+    UNTIL TASK_097** (TASK_096_REVIEW MAJOR 2/3, manager-verified end to end).
+    `verus_run.py` prints Verus's `N verified, M errors` summary and *then*
+    lets rustc finish the compilation. Verus can be entirely satisfied while
+    rustc rejects the file, and the canonical instance is the one the gate's
+    own rules produce:
+
+        #[cfg(slb_twin)] fn slb_twin_read_i(v: Slot) -> u64
+            requires v is i, { v.i }
+
+    Verus makes the correct-variant obligation first class and discharges it
+    from `requires v is i` -- `2 verified, 0 errors` -- while rustc emits
+    `error[E0133]: access to union field is unsafe` and `verus_run.py` exits
+    **1**. Reading only the summary, stage 5c-twin then printed *"`slb_twin_x`
+    verifies against `x`'s own contract"* and *"13 verified, 0 errors with
+    `--cfg slb_twin` -- matches the pinned verus.twin_obligations"* **about
+    source that does not compile** (`.temp/t96/a3_gate_comply.log:424-425`, a
+    real gate run). `--cfg slb_twin` is compiled by nothing else, so the twin
+    oracle is the unbackstopped one.
+
+    ⚠ **A BARE RETURNCODE CHECK WOULD BE WORSE THAN THE HOLE.** Of the eleven
+    `_verus` call sites, **five are mutants that MUST exit non-zero** -- the
+    `assert(false)` reachability probe and the three deletion loops -- and
+    failing them on `rc != 0` turns the whole mutant battery green for the
+    wrong reason. That is the tautology trap, which this project has now hit
+    four times. So the condition is the narrow one:
+
+        the summary PARSED  and  errors == 0  and  returncode != 0
+
+    which no mutant site can reach, because `errors == 0` at a mutant site is
+    already a `rep.fail`. The answer is then downgraded to "Verus said
+    neither", which every call site already treats as a failure, and the reason
+    is APPENDED to the output (not prepended -- callers print `out[-300:]`) so
+    the tail a failure message quotes carries it. `check_verus_exit_codes`
+    turns the recorded anomalies into a named stage failure as well, so the
+    diagnostic points at the right thing rather than at "no verification
+    result"."""
     r = subprocess.run([sys.executable, os.path.join(REPO, "verus_run.py"), path,
                         *extra], capture_output=True, text=True, cwd=REPO,
                        timeout=RUN_TIMEOUT)
@@ -4132,7 +4192,55 @@ def _verus(path, *extra):
     m = re.search(r"(\d+) verified, (\d+) errors", res)
     if not m:
         return None, None, res
-    return int(m.group(1)), int(m.group(2)), res
+    nv, ne = int(m.group(1)), int(m.group(2))
+    if ne == 0 and r.returncode != 0:
+        _VERUS_RC_ANOMALIES.append(
+            {"file": os.path.relpath(path, REPO), "flags": list(extra),
+             "verified": nv, "errors": ne, "returncode": r.returncode,
+             "output_tail": res[-800:]})
+        return None, None, res + (
+            f"\n\n      [check.py::_verus] SUMMARY SUPPRESSED: verus_run.py "
+            f"exited {r.returncode} while reporting `{nv} verified, 0 errors` "
+            f"for {os.path.relpath(path, REPO)} {list(extra)}. Verus was "
+            f"satisfied and the COMPILER was not, so the summary is not a "
+            f"certificate: this file does not build. Look for a rustc error "
+            f"above (`error[E0133]` is the one the twin rules produce, because "
+            f"`_TWIN_BANNED` forbids the `unsafe` keyword in a twin and some "
+            f"operations have no safe spelling).")
+    return nv, ne, res
+
+
+def check_verus_exit_codes(rep):
+    """Stage 5e. Did any Verus run this gate believed exit non-zero?
+
+    `_verus` already downgrades such a run to `(None, None, ...)`, and every
+    call site treats that as a failure -- but "every call site" is a claim
+    about eleven call sites, and one of them (`_run_taut_battery`, when a
+    tactic is named) deliberately reads `(None, None)` as *"the tactic could
+    not be applied"* and `continue`s. That arm is correct for what it was
+    written for (`by (bit_vector)` aborts on any clause mentioning a slice
+    length -- TASK_053 F2, 51 of 52 conjuncts) and it would swallow this.
+
+    So the anomaly is ALSO recorded module-side and failed here, where no
+    caller's local interpretation can absorb it. Fires at `n > 0` only; at
+    `n == 0` it prints nothing, because an `ok` line asserting a property over
+    an empty set is the shape `.memory/02-bench-rules.md` forbids."""
+    if not _VERUS_RC_ANOMALIES:
+        return []
+    head("5e. every Verus run's EXIT CODE, not just its summary")
+    for a in _VERUS_RC_ANOMALIES:
+        rep.fail("verus-exit",
+                 f"{a['file']} {a['flags']}: verus_run.py exited "
+                 f"{a['returncode']} while reporting `{a['verified']} "
+                 f"verified, 0 errors`. Verus discharged every obligation and "
+                 f"the COMPILER REJECTED THE FILE, so the summary certifies "
+                 f"nothing -- there is no binary and, for a `--cfg "
+                 f"{TWIN_CFG}` run, nothing else in the gate compiles that "
+                 f"configuration. On the run that found this the gate printed "
+                 f"`13 verified, 0 errors with --cfg {TWIN_CFG} -- matches the "
+                 f"pinned verus.twin_obligations` about source rustc refuses "
+                 f"(TASK_096_REVIEW MAJOR 2/3).\n      {a['output_tail'][-700:]}")
+    return list(_VERUS_RC_ANOMALIES)
 
 
 _UNRESOLVED_RE = re.compile(
@@ -7195,6 +7303,11 @@ def main():
     # Stage 4 runs at :6271 above, so the measurement is in hand by here.
     miri = check_miri(pdir, rep, contract, identity, modmod, indir,
                       sorted(all_models), advtable)
+    # LAST of the Verus-facing stages, because it adjudicates every `_verus`
+    # run the stages above made: `check_verus_contract`, `check_call_site`,
+    # `check_clause_deletion`, `check_requires_strength`,
+    # `check_trusted_twins` and `check_driver_identity` all reach it.
+    verus_rc = check_verus_exit_codes(rep)
 
     # What `source_sha256` covers, and why each line is here. The rule is: a
     # file whose contents a committed claim depends on must be hashed, or a
@@ -7301,6 +7414,11 @@ def main():
         "clause_deletion": clausemut,
         "requires_strength": reqmut,
         "verified_twins": twins,
+        # TASK_097. Empty on every healthy run -- the key exists so that a run
+        # in which Verus was satisfied and rustc was not says so in the record,
+        # not only in the transcript. `.temp/t96/b1_verus_exit_census.py`
+        # measured 50/50 shipped rows at rc=0, so this is latent on this tree.
+        "verus_exit_anomalies": verus_rc,
         "proof_domain": domain,
         "driver_loops": drivers,
         "adversarial": advtable,

@@ -92,7 +92,7 @@ ratio" cannot be built.
 **`check.py::inputs_of`** over **`check.py::check_checksums`**
 requires **every cell, R1 included, to print `model.py`'s checksum on every
 non-adversarial input it is handed** — and what it is handed is the **matrix**.
-**`check.py::inputs_of`** and `measure.py`'s `SKIP_INPUT_PREFIX`) both drop `sweep-*` entirely, so **a sweep
+**`check.py::inputs_of`** and `measure.py`'s `SKIP_INPUT_PREFIX` both drop `sweep-*` entirely, so **a sweep
 band is never checksum-checked**. (p12 first wrote this as "every
 non-adversarial input", which over-states the gate; corrected at
 TASK_040_REVIEW.) R1 omits the capacity check and nothing else, so on any window

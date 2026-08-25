@@ -104,10 +104,10 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "96f51a28a93bdc1674033b13fb91ff2b423cbd6a0c5cf98537d140bcb2b87c8d",
+    "harness/check.py": "265a4e7f23127c2f8b54e4ba43140a74ab5193ddedf41a263f6bc8823902eac7",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
-    "harness/limbs.py": "6e8191a6ce2370500b605a18cc53e320259f5c507661c321573fff1b6672a4f1",
+    "harness/limbs.py": "140a0354d35970059b2948e986fa5744ccb24d50fde19d64e15dde55d4eaa327",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
@@ -435,6 +435,7 @@
       "without_twins": 10
     }
   },
+  "verus_exit_anomalies": [],
   "proof_domain": {
     "adversarial-count.bin": {
       "calls": 8,
@@ -1222,7 +1223,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==781285==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x508000004128 at pc 0x557ef18369af bp 0x7ffc62fe0890 sp 0x7ffc62fe0880 READ of size 1 at 0x508000004128 thread T0 #0 0x557ef18369ae in kernel /home/apt/repos_common/s",
+      "diagnostic": "================================================================= ==864062==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x508000004128 at pc 0x555a5f6479af bp 0x7fff560e7ad0 sp 0x7fff560e7ac0 READ of size 1 at 0x508000004128 thread T0 #0 0x555a5f6479ae in kernel /home/apt/repos_common/s",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1255,7 +1256,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==781290==ERROR: AddressSanitizer: SEGV on unknown address 0x508100000128 (pc 0x557c5b54e96b bp 0x508000000125 sp 0x7ffd1d9ef180 T0) ==781290==The signal is caused by a READ memory access. #0 0x557c5b54e9",
+      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==864067==ERROR: AddressSanitizer: SEGV on unknown address 0x508100000128 (pc 0x55e5ff8e596b bp 0x508000000125 sp 0x7fff5d48fb70 T0) ==864067==The signal is caused by a READ memory access. #0 0x55e5ff8e59",
       "declared_hang": false,
       "hung": false,
       "stdout": "",

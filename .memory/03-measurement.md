@@ -2353,3 +2353,72 @@ length dependence). It is the **rung-pair** question recorded above: *probe shap
 not measured away.* **A task file that pins a declared zero before the pair is
 designed pins the wrong number** — the `p29` task file did exactly that and the
 engineer refused the instruction with a measurement.
+
+---
+
+## ⚠⚠⚠ `-O3 isolated` IS **NOT** INVARIANT. The published marginal moves ±7 with the ENVIRONMENT BLOCK.
+
+**TASK_097 found it; ✅ the MANAGER PROVED THE MECHANISM with a one-variable
+experiment the engineer said it had only inferred.** `.temp/mgr97/README.md`
+rebuilds it.
+
+`check.py::check_marginal_ir`'s docstring says the ±7 bistable term is
+`whole`-mode only and that `-O3 isolated` is *"not merely small, it is **exactly
+invariant**"* — *"the only cell class no probe has moved"*. **False.**
+
+**Same binary, same input, same shell; only the length of one environment
+variable varied.** p03, `-O3 isolated`, marginal `Ir`/call on `small.bin`:
+
+```
+ envpad   unsafe   verus    pair (verus - unsafe)
+      0     3059    3065     +6
+      1     3059    3065     +6
+      7     3059    3065     +6
+     15     3066    3058     -8    <-- BOTH FLIP, IN OPPOSITE DIRECTIONS
+     63     3059    3065     +6
+    255     3059    3065     +6
+   1023     3059    3065     +6
+   4095     3059    3065     +6
+```
+
+⚠⚠ **THE TWO RUNGS MOVE IN OPPOSITE DIRECTIONS, so the PAIR swings by 14** —
+`unsafe +7`, `verus −7` — and p03's published `derived_correction`
+`(ma−mb)−(ka−kb)` goes **`+6.00 → −8.00`: A SIGN FLIP IN A PUBLISHED NUMBER.**
+**14 is 7× the `±2.00` floor the same table uses.**
+
+⚠ **BISTABLE, NOT MONOTONE** — `pad=15` flips it and `pad=63/255/1023` flip it
+back. It is a stack-alignment effect, exactly the mechanism the docstring
+describes. **Only its SCOPE was wrong**, and the scope is what everything rests
+on: **`synthesize.py::marginal` DEFAULTS to `O3/isolated` BECAUSE of that rule.**
+
+**What this does and does not mean.**
+
+- ✅ **It is NOT new in kind.** `RECAP.md`'s settled answer 1 already says the
+  R4/R5 pair *"is not a null control … that offset is a **source-path-length
+  artefact** (it moves if you clone elsewhere), so the pair is a **biased draw of
+  size one**"*, and p06's own floor is **±4.6%**. **This is the KNOWN layout
+  population reaching the one class that was declared immune to it.**
+- ⚠ **Binaries are byte-reproducible** (`unsafe e7ea55fa488df703`,
+  `verus 75a48f319f14e689`, twice), so this is **not** a build nondeterminism.
+  The *program* is fixed; the *process image* is not.
+- ⚠⚠ **Any published `-O3 isolated` difference between two rungs carries ±7 PER
+  RUNG, i.e. up to ±14 on a pair**, and a pair difference smaller than that is
+  **not resolvable without a layout population.** ⚠ **Several published pair
+  differences in this tree are smaller than 14.**
+- ⚠ **TASK_097 also observed it as a between-RUN difference** — a `nohup`'d
+  script against an interactive shell, which differ in environment size — and
+  that is the same variable. **It is not a property of the launching method; it
+  is a property of the environment block's LENGTH.**
+
+**What is owed, and none of it is done:** the docstring's scope; a decision on
+whether every `-O3 isolated` pair difference now needs the layout harness
+(`common/layout/`) the way p06's did; and a re-read of every published pair
+difference under `|Δ| < 14`. ⚠ **BLAST RADIUS UNREVIEWED — measured on `p03`
+only; `p04`, `p38` and `p46` are unprobed.**
+
+⚠ **AND ONE OF THE MANAGER'S OWN COMMIT MESSAGES IS NOW WRONG.** `9f8fa9d` says
+of `results/synthesis.md`: *"unlike the last time I quoted a byte-identical
+synthesis.md, that zero is MEANINGFUL."* **The acceptance test behind that claim
+is sound, but the byte-identity itself is conditional on the launching shell's
+environment size.** The zero is evidence about the *acceptance test*, not about
+the tree.

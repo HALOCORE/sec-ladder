@@ -4,23 +4,54 @@ Everything here was measured on this box with the commands quoted. Where a
 number is an interpolation rather than a sweep it says so. `spec.md` is the
 contract; this file is the evidence.
 
-⚠ **`contract_sha256` MOVED AT TASK_068, and here is why** (PROTOCOL
+⚠ **`contract_sha256` HAS MOVED THREE TIMES, and here is why** (PROTOCOL
 definition-of-done item 6 — an unverifiable claim about a declaration edit is
 worse than the edit):
 
-    HEAD before  23169852ace6449f408640c0a68bb9406fb46f0f281e27075c36e60516e51b5a
-    after        c391270c673f2c322892e863b99747dec4f9f68153f999ae4a047bb9e1e540fd
+    TASK_068 before  23169852ace6449f408640c0a68bb9406fb46f0f281e27075c36e60516e51b5a
+    TASK_068 after   c391270c673f2c322892e863b99747dec4f9f68153f999ae4a047bb9e1e540fd
+    TASK_096 after   0a37c0cd1418ae4d5e665c090365cb456dafbf8d1085149ce174a27ff2de9130
+    TASK_097 after   ea0295eaea6ae199c6520c93855cfb80f0399d72a31312fd3154243163f375b7
 
-**Two decayed `check.py` line citations inside `idiom.why`, and nothing else.**
-A bare line number (the old one was `:929`, deliberately not written here in the
-citation form so the audit aid does not report this paragraph as a live one) and
-a bare `check.py::exec_code` were re-cited by FUNCTION with the line as a hint —
-`check.py::idiom_audit` and `check.py::exec_code` — the
-convention at the end of `.memory/02-bench-rules.md`. The old number had already
-decayed to a blank line. **No `required`, `forbidden` or
-`why` claim changed**, and the named-spelling standard's shared paragraph is
-byte-identical (gate stage 0b re-checks it verbatim against its own sha256).
-Verify with two commands rather than trusting this paragraph:
+⚠ **The third line was missing until TASK_097**, so this paragraph named a
+digest the tree had not carried since `9f8fa9d` — and `results/gate/p09-bitset.json`
+is where a reviewer checks it. ⚠ **`RECAP.md` carries the stale `c391270c673f…`
+too; that file is manager-only, so it is reported rather than fixed here.**
+
+**TASK_068: two decayed `check.py` line citations inside `idiom.why`, and
+nothing else.** A bare line number (the old one was `:929`, deliberately not
+written here in the citation form so the audit aid does not report this
+paragraph as a live one) and a bare `check.py::exec_code` were re-cited by
+FUNCTION — `check.py::idiom_audit` and `check.py::exec_code`. The old number had
+already decayed to a blank line.
+
+**TASK_096 (`9f8fa9d`): the line-number HINTS beside those function names were
+deleted.** ⚠ This sentence used to read *"re-cited by FUNCTION **with the line
+as a hint**"*, describing hints the same sweep had removed — the "line as a
+hint" compromise was tried at TASK_066 and **retracted at TASK_071** after every
+hint rotted inside one session, and `.memory/02-bench-rules.md`'s convention is
+now the FUNCTION NAME and no line number at all. The manager verified that move
+himself: one changed line, four edit opcodes, all four of them the two
+citations.
+
+⚠⚠ **TASK_097: A `why` CLAIM DID CHANGE, and this is the one move of the three
+that is not a citation repair.** PROTOCOL rule 6's added step — *a frozen
+declaration is evidence about WHEN it was written, not about whether it is
+still true* — applied to `idiom.why`, which asserted that
+`check.py::exec_code` *"does NOT blank a `spec fn` BODY"*. **False since
+TASK_069**: `exec_code` calls `_blank_ghost_items` and its own docstring lists
+`spec fn` / `proof fn` items as layer 3 of five. The sentence is now marked as
+history and the correction is beside it. **No `required` and no `forbidden`
+entry moved**, and `verus.rs` is untouched (it is measurement-hashed, and the
+`q as int / 64` contortion it describes is now belt-and-braces rather than
+load-bearing).
+
+**Across the first two moves no `required`, `forbidden` or `why` claim
+changed**, and the named-spelling standard's shared paragraph is byte-identical
+across all three (gate stage 0b re-checks it verbatim against its own sha256).
+Verify with two commands rather than trusting this paragraph — ⚠ **and note
+that the first one is NOT vacuous here, because TASK_097 edited `spec.md`
+without committing it: it will print the `why` diff above.**
 
 ```bash
 git show HEAD:patterns/p09-bitset/spec.md | diff - patterns/p09-bitset/spec.md

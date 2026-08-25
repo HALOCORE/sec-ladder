@@ -1454,9 +1454,22 @@ right — the shipped Verus configuration really does report `18 / 0` on
 `b_weakreq`, and `b_scrmod_msonly` really does verify in both configurations —
 and the conclusions drawn about the **gate** did not follow.
 
-`harness/check.py`'s own comparison (**`check.py::check_verus_contract`**, `vparse.by_name` +
-`norm_clause`) run against `spec.md`'s pinned `verus.items`
-(`.temp/p48/pinsim.py`, which is that code and nothing else):
+`harness/check.py`'s own comparison (**`check.py::check_verus_contract`**,
+`vparse.parse` → `vparse.duplicate_names(qualified=True)` →
+`vparse.unique_names` + `vparse.norm_clause`) run against `spec.md`'s pinned
+`verus.items` (`.temp/p48/pinsim.py`):
+
+⚠ **TASK_097 correction, twice over.** This sentence named **`vparse.by_name`**,
+which `check_verus_contract` **does not call** — it keys items with
+`unique_names`, which degrades to the bare name only where that is unambiguous,
+after `duplicate_names(qualified=True)` has refused a real duplicate. And the
+parenthesis said `pinsim.py` *"is that code and nothing else"*: `pinsim.py`
+really does call `vparse.by_name`, so it is a re-derivation with a **different
+item-keying function**, not a copy. `by_name` *raises* on a duplicate bare name
+where `unique_names` qualifies it (`vparse.by_name`'s own docstring: the raise
+costs six separate `rep.fail`s), so the two agree on every table below — p06 has
+no duplicate bare name — and would diverge on a pattern that had one. The table
+stands; the claim about how it was produced is corrected.
 
 ```
 SHIPPED verus.rs   0 diffs

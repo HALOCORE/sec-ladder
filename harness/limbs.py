@@ -88,6 +88,19 @@ def is_trusted(it):
 
 
 def verus(path, *extra):
+    """`check.py::_verus`, re-derived -- INCLUDING its return-code rule.
+
+    TASK_097. This was the third copy of a body that read the `N verified, M
+    errors` summary and never read `subprocess.CompletedProcess.returncode`
+    (TASK_096_REVIEW MAJOR 2 named all three). A file Verus verifies and rustc
+    rejects -- `#[cfg(slb_twin)] fn slb_twin_read_i(..) { v.i }`, `2 verified,
+    0 errors`, `error[E0133]`, exit 1 -- read as clean here too, so the
+    `5ct-run` / `5a-verify` limbs this tool reports would have said the mutant
+    passed them.
+
+    Same narrow predicate as `check.py::_verus`, and for the same reason: this
+    tool exists to run MUTANTS, most of which are supposed to exit non-zero, so
+    only `summary parsed AND errors == 0 AND rc != 0` is an anomaly."""
     r = subprocess.run([sys.executable, os.path.join(REPO, "verus_run.py"), path,
                         *extra], capture_output=True, text=True, cwd=REPO,
                        timeout=1800)
@@ -95,7 +108,15 @@ def verus(path, *extra):
     m = re.search(r"(\d+) verified, (\d+) errors", out)
     if not m:
         return None, None, out
-    return int(m.group(1)), int(m.group(2)), out
+    nv, ne = int(m.group(1)), int(m.group(2))
+    if ne == 0 and r.returncode != 0:
+        return None, None, out + (
+            f"\n\n[limbs.py::verus] SUMMARY SUPPRESSED: verus_run.py exited "
+            f"{r.returncode} while reporting `{nv} verified, 0 errors` for "
+            f"{os.path.relpath(path, REPO)} {list(extra)} -- Verus was "
+            f"satisfied and the compiler was not, so no limb may be reported "
+            f"as passing from this run.\n")
+    return nv, ne, out
 
 
 def main():
