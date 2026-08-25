@@ -2656,8 +2656,36 @@ reused on the next row; it needs the same scrutiny as a finding.**
   safe tuned and unsafe, i.e. **no boundary anywhere, which is p31's death.**
 - **p34** — outcome 4. The leak is real and belongs to a leak-shaped row; see
   `.memory/00-environment.md` for why the C side has no detector for it here.
-- ⚠ **p29 is CONSISTENT with the rule, not a counterexample** — a BST does not
-  recycle, it frees, so the guarantee attaches. **PROVISIONAL (TASK_094,
-  unreviewed): `allocs=2001 frees=2000`, `remove_leaf` releases one 24-byte
-  block, and the mechanism is `E0502` at COMPILE TIME rather than p27's runtime
-  ask.** That is a fifth outcome and the only good one found so far.
+- ⚠⚠ **p29 — REFUSED at TASK_095, and ~~the fifth outcome~~ IS STRUCK.** The
+  half that survives is that **its safe representation really frees**
+  (`allocs=2001 frees=2000`, `remove_leaf` releases one 24-byte block, against
+  p28's `0`). ~~*"the mechanism is `E0502` at COMPILE TIME rather than p27's
+  runtime ask"*~~ **is REFUTED, and a shipped p29 lands in outcome 2 or outcome
+  3 like everything else.** ✅ **Manager-verified, three ways:**
+  - **`E0502` is generic borrowck, not a fact about the BST.** A `struct S { v:
+    u32 }` with **no data structure at all** prints the identical error with the
+    identical message — **and so does `p27`'s own `Vec<Option<Box<Rec>>>`.**
+  - **Key-addressed, the same BST compiles and runs and exhibits p27's sentence
+    verbatim** — `*cur = None` frees and invalidates in one operation and the
+    second `find` gets `None` at run time.
+  - **Key-addressed, the C rung has NO BUG AT ALL** (ASan silent, positive
+    controls firing). **p29's UAF requires a saved raw pointer; p27's does not,
+    because C's `tab[h]` retains the dangling pointer after `free`.** ⚠ **And 22
+    of 24 patterns take their payload from a file blob, so the shipped kernel
+    cannot host a pointer** — p27's own hashed `why` says exactly this.
+
+⚠⚠ **METHOD RULE, AND IT HAS NOW FIRED TWICE IN THREE TASKS: A BORROW-CHECKER
+DIAGNOSTIC IS NOT EVIDENCE ABOUT A DATA STRUCTURE UNTIL A CONTROL CONTAINING NO
+DATA STRUCTURE HAS BEEN COMPILED.** TASK_093 read `E0382` as *"safe Rust has no
+owned intrusive DLL"* — it was a plain double move. TASK_094 read `E0502` as
+*"p29 rejects at compile time"* — it is `hold & across &mut`, which every type in
+Rust does. **Both were the load-bearing limb of a row's pitch; both fell to one
+control that takes one minute to write.** ✅ Both controls manager-re-run.
+
+⚠ **`allocator = 0.00` IS NOW THREE-FOR-THREE** — p27's shipped decomposition
+(`230.07 = 109.65 kernel + 120.42 drop glue + 0.00 allocator`), p28's `box_arena`
+pair (`+24.00 = 12.00 + 11.00 + 1.00`, allocator `0.00`), and p29
+(`malloc`/`free`/libc **byte-identical** between rungs). **And on p29 the safe
+drop glue is CHEAPER than the hand-written recursive free — 16.99 against 19.00
+`Ir`/key.** The lifetime guarantee has never yet cost an instruction on any
+pattern that measured it.

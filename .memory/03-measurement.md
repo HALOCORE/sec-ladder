@@ -2322,3 +2322,34 @@ charges ≈1 `Ir` per byte moved) and **`__x86_rep_stosb_threshold` at 2048**
 `rc` collapses to +4.02 one band over"* is **false** — it is a stable `+68.00`,
 and *"p28 could not be costed until its input band was designed"* does not
 follow.
+
+---
+
+### ⚠⚠ A COST PAIR THAT OMITS THE ALLOC/FREE MEASURES THE **WALK**, NOT THE CLASS
+
+**Third instance, and `p29` is the one where the same instrument gives both
+answers on the SAME PROGRAM.** (TASK_095, PROVISIONAL — unreviewed; the two
+earlier instances are reviewed.)
+
+| pattern | pair as probed | pair with the alloc/free present |
+|---|---|---|
+| `p28` (TASK_091) | `+12.50 Ir`/victim | `+24.00 Ir`/victim (TASK_093_REVIEW) |
+| `p29` (TASK_094) | **`−0.00024 Ir`/lookup** | **`+48.01 Ir`/key** (TASK_095) |
+
+`p29`'s `−0.00024` is **real and it reproduces exactly** — a tree walk has no
+index, so there is no bounds check to remove, and `Option<Box<T>>`'s niche **is**
+the null pointer, so `while let Some(n)` and `while !cur.is_null()` lower to the
+same `test/je`. ⚠ **It is a true zero about the part of the program the pattern
+is not about.** Add the build and the free and the pair reads `+48.01`, of which
+the `remove` term alone is `+18.95`.
+
+> **Before declaring a cost zero, ask which OPERATIONS the pair contains — not
+> just whether the two rungs are the same shape.** A pair can be honest, matched,
+> reproducible **and still measure the wrong half of the program.**
+
+⚠ **This is NOT the probe-shape defect** (`p46`'s lost range facts, `p26`'s
+length dependence). It is the **rung-pair** question recorded above: *probe shape
+= same rungs, different harness; different operations = a design choice, argued
+not measured away.* **A task file that pins a declared zero before the pair is
+designed pins the wrong number** — the `p29` task file did exactly that and the
+engineer refused the instruction with a measurement.
