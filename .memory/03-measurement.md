@@ -427,6 +427,22 @@ above a size threshold — `memcpy`/`memmove` stay on the vector path at 0.104
 Ir/byte up to somewhere between 8 KiB and 16 KiB, `memset` flips at 3 KiB — and
 p02's copies (61 B = 26 Ir, 4092 B = 425 Ir) are well inside the vector regime.
 
+⚠ **THE THRESHOLD IS 8192 BYTES EXACTLY, not a range** (TASK_090, PROVISIONAL).
+Pinned with a cleaner instrument than a bisection:
+`GLIBC_TUNABLES=glibc.cpu.x86_rep_movsb_threshold=1000000` **collapses the
+effect** — at n=2048 a clone costs `16740 → 1951` `Ir` — and the per-element
+clone cost steps `1.15 → 8.34` between **n = 1024 and n = 1025** on `u64`s, i.e.
+8192 bytes. **`rep movsb` is one retired instruction that callgrind charges at
+≈1 `Ir` per byte moved**, roughly **10× the vector path's 0.104**.
+
+⚠⚠ **AND "BLAST RADIUS CHECKED AND EMPTY" IS A TASK_074 STATEMENT WITH SIX
+PATTERNS BUILT SINCE — see RECAP "Owed" 28.** It has **not** been re-run over
+p13, p14, p18, p10, p27, p47, p38, p22, p36 or p19. ⚠ **Do not read it as
+current.** Note the distinction the re-check must respect: **what matters is the
+size of an individual `memcpy`/`memmove`/`memset` CALL inside the measured
+window, not the size of the input file.** p02 copies 61 B and 4092 B out of a
+16 KB blob; conflating the two overstates the risk.
+
 ⚠ **PROVISIONAL — measured at TASK_074, NOT YET REVIEWED. The threshold does not
 merely inflate the number; at the crossing it INVERTS THE DIRECTION, and that is
 new.** Probing a zero-fill cost axis (`vec![0; n]` against `MaybeUninit`), rustc

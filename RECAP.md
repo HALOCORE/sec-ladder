@@ -2666,7 +2666,41 @@ Both retired.
     above; whether a missing generator actually costs anything is not.
     **Cheap to settle: for each of the 34, does a committed file regenerate it?**
 
-### Deferred with a stated reason
+28. ⚠ **"BLAST RADIUS CHECKED AND EMPTY" FOR THE `rep movsb` `Ir` INFLATION IS A
+    TASK_074 STATEMENT, AND SIX PATTERNS HAVE LANDED SINCE.** (Raised by
+    TASK_090, disposed by the manager.) `.memory/03-measurement.md` records that
+    glibc's byte-wise `rep` paths cost **≈1 `Ir` per byte** against the vector
+    path's **0.104** — a **10×** inflation of one retired instruction — and that
+    the blast radius was checked **at TASK_074**, when p02's 61 B and 4092 B
+    copies were the evidence. ✅ **TASK_090 sharpened the crossover to
+    EXACTLY 8192 bytes** with a `GLIBC_TUNABLES` control, which is a better
+    instrument than the original bisection.
+
+    ⚠ **What is owed is only the RE-CHECK**, over the patterns built since —
+    p13, p14, p18, p10, p27, p47, p38, p22, p36, p19. ⚠ **And it must respect
+    the distinction TASK_090's own worry blurred: what matters is the size of an
+    individual `memcpy`/`memmove`/`memset` CALL inside the measured window, not
+    the size of the input file.** The shipped 16 KB and 12 MB blobs are not
+    themselves copied. **Needs `measure.py`, so batch it with something that
+    re-measures anyway.**
+
+29. ⚠⚠ **`TASK_086`'s HARM TABLE IS HALF-SHOWN FOR FOUR ROWS, AND THE CAUSE IS
+    `head -4`.** (TASK_090.) `.temp/t86/harms.sh` truncates each run's output to
+    four lines; **gcc's UBSan report for these rows is exactly four lines and
+    ASan's banner is on lines 5–6.** Re-reported with `grep`, rows **`p21`,
+    `p24`, `p26` and `p41` each fire BOTH detectors.** The p24 cell — *"only
+    UBSan sees it, ASan did NOT report a heap-buffer-overflow"* — is **false**:
+    ASan reports it in **all three storage classes on both compilers**, and
+    **UBSan alone reports nothing anywhere.** ✅ **Reproduced on TASK_086's own
+    unmodified binary.** ⚠ **Treat every harm cell in that table as half-shown
+    until re-run.** ✅ **p24's row is corrected in the catalogue; p21, p26 and
+    p41 are NOT** — p41's refusal does not rest on its harm (it died on probe 3
+    and on duplicating p07), and p21 and p26 are deferred, **but whoever
+    schedules them re-runs the harm first.**
+    ⚠ **The general lesson: `head -N` on a sanitizer's output is a truncation
+    that looks like a measurement.** Use `grep` for the banner you want.
+
+### Deferred with a stated reason### Deferred with a stated reason
 
 - **The mechanical rate-vs-disassembly backstop** (~90 lines, prototype exists).
   Deferred twice, and the second time the engineer's own session was the argument:
