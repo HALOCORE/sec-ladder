@@ -175,10 +175,28 @@ A task is done when **all** hold:
    > true.** Anything the build refuted must be struck **even though — indeed
    > especially because — the hash still matches.**
 
-   ⚠ **Budget it:** `spec.md`'s fenced block is contract-hashed, so a `why` fix
-   moves `contract_sha256`; `c/kernel.{c,h}` are **measurement**-hashed, so even
-   a comment fix there costs a re-measure. **Doc comments in `.rs` rung sources
-   and `NOTES.md`/`README.md` cost only a gate re-run.**
+   ⚠ **Budget it, and the first version of this note was WRONG — corrected at
+   TASK_092, manager-verified:**
+
+   | file | hashed into | a comment-only fix costs |
+   |---|---|---|
+   | `spec.md` **inside** the fence | contract + gate | **a `contract_sha256` move** |
+   | `spec.md` prose, `NOTES.md`, `README.md` | gate | **a gate re-run** |
+   | `c/kernel.{c,h}` | **measurement** | **a re-measure** |
+   | ⚠ **`safe_naive.rs`, `safe_tuned.rs`, `unsafe.rs`, `verus.rs`** | ⚠ **MEASUREMENT** | ⚠ **a re-measure** |
+
+   ⚠⚠ **THERE IS NO CHEAP DOC FIX IN ANY RUNG SOURCE.** This note previously
+   said *"doc comments in `.rs` rung sources … cost only a gate re-run"*, and
+   that is **false**: `harness/measure.py::measurement_sources` **globs
+   `pdir/*.rs`**, and every rung `.rs` appears in the measurement record's
+   `source_sha256`. ✅ **Verified by reading `results/pNN-*.json`.**
+
+   ✅ **The good news, measured twice (p19 and p46): the re-measure is cheap and
+   moves nothing you publish.** p19's took **1 m 17 s**; p46's moved **111 of
+   1371 leaf values — 102 wall-clock, 6 source hashes, a timestamp and git
+   metadata. ZERO `Ir`, zero md5, zero identity, zero checksum.** ⚠ **So batch
+   every rung-source doc fix into ONE pass rather than avoiding them** — fixing
+   `c/kernel.c` alongside them is then free at the margin.
 
    **If the hash changes later, say so and say why** — a declaration edit made
    after a measurement is exactly what the direction test governs

@@ -28,20 +28,47 @@
 //!
 //! ⚠⚠ **THE R4 SIDE WAS SEARCHED BEFORE THIS SPELLING WAS CHOSEN, AND THE
 //! SEARCH FOUND A CHEAPER SPELLING THAT IS NOT A RUNG** (`.memory/01-ladder.md`;
-//! the p10/p27/p38/p22 trap). Three admissible-shaped R4 spellings were
-//! measured: this one, the same with a running output index `oi` (`+25` Ir/call
-//! flat, degenerate), and a checked per-row reslice with unchecked indexing
-//! inside it -- which is **`1.5` Ir/MAC CHEAPER than this rung and cheaper than
-//! every safe spelling too**. It is **inadmissible**: it takes a MUTABLE
-//! sub-slice, and at the pinned vstd `slice_subrange` covers `&[T]` only while
-//! `ExSliceIndex::index_mut` carries a `requires` and **no `ensures`**, so a
-//! write through it cannot be related back to the array and R5 cannot discharge
-//! its postcondition. Measured, four ways, in ../NOTES.md 0c.
+//! the p10/p27/p38/p22 trap). Three admissible R4 spellings were measured on
+//! the shipped shape: this one, the `mac` helper written out in the loop body
+//! (`0.00` Ir/call flat) and a running output index `oi` (`-2.00` flat). Both
+//! levers are flat in `n` and in `m`, so this side's span is **2 Ir/call** and
+//! the published `R3 - R4` law does not depend on which of the three ships
+//! (../NOTES.md 8b). ⚠ This comment said `+25` Ir/call flat for the running
+//! index; that was `.temp/t89/cost.rs`'s `r4d` row -- a PRE-BUILD probe number,
+//! retracted with the rest of that probe (../NOTES.md 0b) -- and it disagreed
+//! with this pattern's own NOTES 8b as shipped.
+//!
+//! A fourth spelling, `r4_mutreslice` -- a checked per-row reslice with
+//! unchecked indexing inside it -- is **`1.5` Ir/MAC CHEAPER than this rung and
+//! cheaper than every safe spelling too**, and it is **NOT a rung.**
+//!
+//! ⚠⚠ **THE REASON THIS COMMENT USED TO GIVE FOR THAT IS FALSE AND IS
+//! RETRACTED** (TASK_089_REVIEW B1, settled at TASK_092). It said the pinned
+//! vstd cannot specify a mutable sub-slice -- *"`slice_subrange` covers `&[T]`
+//! only while `ExSliceIndex::index_mut` carries a `requires` and no
+//! `ensures`"*. `vstd/slice.rs`'s `ExSliceIndex` is a **trait declaration, not
+//! the specification**; `~/tools/verus/vstd/std_specs/slice.rs` ships
+//! `assume_specification[ <Range<usize> as SliceIndex<[T]>>::index_mut ]` with
+//! a full **value-level** `final(r)@ == final(slice)@.subrange(..)`, and
+//! `r4_mutreslice`'s **full R5 verifies: `21 verified, 0 errors`**, mutation
+//! tested twice.
+//!
+//! **What actually disqualifies it, measured** (../NOTES.md 0c):
+//!   (a) it costs **two new trusted items** -- unchecked read and write through
+//!       a `&mut [u64]` -- because the pinned vstd has **zero** occurrences of
+//!       `get_unchecked` anywhere. 5 `external_body` items become 7, 3
+//!       contracted become 5. That is the same disqualifier ../spec.md's own
+//!       named-spelling paragraph records for p16's `r4_hdr`.
+//!   (b) its R4/R5 pair is **`differ` at `-O3`**: `R5 - R4 = 15n + 1` Ir/call,
+//!       against this pattern's pinned `identity: unsafe == verus, O3 exact`.
+//!       LLVM keeps the per-row reslice bound test in the R5 build (+3/row) and
+//!       does not fold `load_u64`'s eight byte reads into one `mov` (+12/row).
 //!
 //! **So this rung is off the floor of its own class, by a known amount, for a
-//! reason that is a property of the prover and not of the program** -- and that
-//! is why ../safe_tuned.rs beats it. Do not read p46's `R3 - R4` as a safety
-//! number.
+//! reason that is a property of the TCB and of the identity pin rather than of
+//! the program** -- and that is why ../safe_tuned.rs beats it. Do not read
+//! p46's `R3 - R4` as a safety number, and read ../NOTES.md 0c before quoting
+//! "safe beats unsafe": it says exactly what that headline is contingent on.
 
 #[path = "../../common/driver.rs"]
 mod driver;

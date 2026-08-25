@@ -10,19 +10,27 @@
  * `BN_mul()` calls `bn_wexpand(rr, top)` before it multiplies. This kernel is
  * that program with the expand removed.
  *
- * ⚠ **THE HARM IS LOUD HERE, AND THAT IS ITSELF THE MEASUREMENT.** p02's
+ * ⚠ **THE HARM IS SILENT HERE, AND THAT IS ITSELF THE MEASUREMENT.** p02's
  * result is that idiomatic C absorbs a one-byte HEAP overflow silently in seven
- * of eight builds. Move the same bug class onto the STACK and the distribution
- * inverts: on this box (Ubuntu, `gcc -Q --help=common` reports
- * `-fstack-protector-strong [enabled]` by default) five of six plain builds
- * abort or fault, and only one is silent (../NOTES.md 0a):
+ * of eight builds. Move the same bug class onto the STACK and it stays silent:
+ * **6 of the 8 shipped plain C cells exit 0 with a WRONG ANSWER and 2 fault**
+ * (../NOTES.md 0a):
  *
- *     gcc   -O0/-O2/-O3   exit 134   *** stack smashing detected ***
- *     clang -O2/-O3       exit 139   SIGSEGV
- *     clang -O0, (n,m) = (97,1)   exit 0, WRONG ANSWER      <- the silent cell
+ *     c-gcc    O0/O3 x isolated/whole  exit 0, WRONG ANSWER   <- 4 silent cells
+ *     c-clang  O3    x isolated/whole  exit 0, WRONG ANSWER   <- 2 silent cells
+ *     c-clang  O0    x isolated/whole  exit -11 SIGSEGV       <- the 2 that fault
  *
- * The canary fires AFTER the out-of-bounds writes have happened; it protects
- * the return address, not the object. ASan calls it what it is:
+ * ⚠⚠ **THIS COMMENT SAID THE OPPOSITE UNTIL TASK_092** -- *"five of six plain
+ * builds abort or fault, and only one is silent"* -- and cited ../NOTES.md 0a,
+ * the section that retracts it (TASK_089_REVIEW M1). That sentence was
+ * `.temp/t89/harms.c`'s, a standalone PRE-BUILD probe with only one automatic
+ * array; the shipped kernel has a second one, `bl[256]`, and where the compiler
+ * places it immediately above `out` the overflow lands *inside it*. The shipped
+ * cells win. `controls/harm_layout.py --layout` prints the frame order.
+ *
+ * `-fstack-protector-strong` is on by default on this box and does not save
+ * this kernel: the canary protects the return address, not the object, and the
+ * canary is not what gets written. ASan calls it what it is:
  * `stack-buffer-overflow`, `WRITE of size 8`.
  *
  * ⚠ **AND THE MEMORY-UNSAFE FRAMING IS CONDITIONAL** (kernel.h, ../NOTES.md

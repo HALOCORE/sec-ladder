@@ -7,30 +7,59 @@
 //!     for (o, &bj) in out[i..i + m].iter_mut().zip(bl[..m].iter()) { ... }   // R3
 //!     while j < m { ... bl[j] ... out[i + j] ... }                           // R2
 //!
-//! The reslice `out[i..i + m]` is one bounds check per ROW -- `O(n)` -- and the
-//! `zip` then walks two cursors with no per-step test at all, where R2 pays
-//! three per MAC step, `O(n*m)`. **That asymptotic change is the whole lever.**
+//! ⚠⚠ **THAT LEVER IS A SPELLING AND NOT AN ASYMPTOTIC, AND THE PARAGRAPH
+//! THAT SAID OTHERWISE IS RETRACTED** (TASK_089_REVIEW M2, re-derived at
+//! TASK_092). It used to read *"the reslice `out[i..i + m]` is one bounds check
+//! per ROW -- `O(n)` -- where R2 pays three per MAC step, `O(n*m)`; that
+//! asymptotic change is the whole lever."* **There is no such check in either
+//! rung's machine code.** The two safe rungs have the *identical*
+//! conditional-branch multiset -- `ja:2 jae:2 jb:1 jbe:1 je:6 jne:5`, plus
+//! `jmp:6` on both, from
+//! `harness/asm.py show <cell>-O3-isolated | grep -oE '^j[a-z]+' | sort | uniq -c`
+//! run on both binaries -- and R2's three per-step checks were already gone
+//! (../NOTES.md 0b, 8a).
+//!
+//! What the measured `R3 - R2 = 2n - 2` (m even) / `-2` (m odd) actually is:
+//! **address arithmetic.** This rung hoists the row base `lea (%rsp,%r13,8),%r8
+//! ; add $0x8,%r8` into the row header, +2 instructions per row; `safe_naive`
+//! computes the same base inside its ODD-`m` remainder block, which is exactly
+//! why the law has two branches on `m` parity -- when `m` is odd the two
+//! cancel, when `m` is even only this rung pays. The `-2` is a once-per-call
+//! `lea`/`add` pair this rung does not need. Derived from both sides in
+//! ../NOTES.md 8e, and checked by one committed command --
+//! `controls/sweep_ir.py --check`, which re-derives the law over **48 sweep
+//! blobs, max |residual| 0.00000**, and exits non-zero on any residual.
 //!
 //! ⚠⚠ **AND IT MAKES SAFE RUST CHEAPER THAN THE UNSAFE RUNG. READ THE NEXT
 //! PARAGRAPH BEFORE QUOTING THAT.**
 //!
 //! ⚠⚠ **NONE OF IT IS SAFETY, AND THE R4 SIDE WAS SEARCHED FIRST**
-//! (`.memory/01-ladder.md`; the p10/p27/p38/p22 trap). Three R3 spellings and
-//! three R4 spellings were measured on a 2x2 `(n, m)` grid before either rung
-//! was written (../NOTES.md 0b). The **cheapest unsafe spelling found**, a
-//! checked per-row reslice with unchecked indexing inside it, is
-//! `1.5` Ir/MAC **cheaper than this rung** -- and it is **not an admissible
-//! R4**, because it takes a MUTABLE sub-slice and the pinned vstd has no
-//! specification for one: `slice_subrange` exists for `&[T]` only, and
-//! `ExSliceIndex::index_mut` carries a `requires` and no `ensures` at all, so a
-//! write through it cannot be related back to the array and R5 cannot discharge
-//! its postcondition. **Measured, not read off the source** (../NOTES.md 0c).
+//! (`.memory/01-ladder.md`; the p10/p27/p38/p22 trap). Three admissible R4
+//! spellings and three R3 spellings were measured **on the shipped shape**, on
+//! five shapes of the shipped sweep band, from `controls/mkvariants.py`'s
+//! output built with the shipped flag set; both sides are flat and degenerate
+//! (../NOTES.md 8b).
+//! ⚠ An earlier version of this paragraph cited a *"2x2 `(n, m)` grid"* -- that
+//! was `.temp/t89/cost.rs`, the PRE-BUILD probe whose slope ../NOTES.md 0b
+//! retracts, and it is not a p46 measurement.
 //!
-//! So p46's "safe beats unsafe" is `.memory/01-ladder.md` finding 14's
-//! mechanism with a number on it -- *the safe class can reach spellings the
-//! unsafe class cannot, because the unsafe class is chained to the prover* --
-//! and it is the second measured instance after p16's, the first on a WRITE,
-//! and the first where the gap is priced rather than argued.
+//! **The cheapest unsafe spelling found** -- a checked per-row reslice with
+//! unchecked indexing inside it, `r4_mutreslice` -- is `1.5` Ir/MAC cheaper
+//! than **R4** (against this rung, `1.0`), and it is **still not an admissible
+//! R4**, but ⚠ **NOT for the reason this comment used to give.** It said the
+//! pinned vstd cannot specify a mutable sub-slice. It can, at the value level
+//! (`~/tools/verus/vstd/std_specs/slice.rs`), and its **full R5 verifies,
+//! `21 verified, 0 errors`.** What disqualifies it is measured instead: it
+//! needs **two new trusted items** (the pinned vstd has zero `get_unchecked`
+//! specifications anywhere), and its R4/R5 pair is `differ` at `-O3` --
+//! `R5 - R4 = 15n + 1` Ir/call -- against this pattern's pinned
+//! `identity: unsafe == verus, O3 exact`. ../NOTES.md 0c has all of it.
+//!
+//! So p46's "safe beats unsafe" is still `.memory/01-ladder.md` finding 14's
+//! shape -- *the unsafe class is chained to the prover* -- but the chain here
+//! is the **TCB and the identity pin**, not a missing specification, and
+//! ../NOTES.md 0c says what happens to this rung's headline if either is
+//! relaxed.
 
 #[path = "../../common/driver.rs"]
 mod driver;

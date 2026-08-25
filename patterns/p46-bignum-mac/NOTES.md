@@ -106,17 +106,35 @@ unreachable by construction.
 ### 0b. The rung boundary — and the pre-build probe was wrong about that too
 
 ⚠⚠ **`.temp/t89/cost.rs` measured `R2 − R4 = +7 Ir per MAC step`. The shipped
-cells measure `−0.39`. The probe passed `n` and `m` through `black_box`, so LLVM
-had no range for them; in the shipped kernel `n = w[0] as usize` and
+cells measure `−0.39`.** In the shipped kernel `n = w[0] as usize` and
 `m = w[1] as usize` are `u8`-derived and `n + m <= OUTCAP` is tested, which is
-everything LLVM needs to discharge `i + j < 96` itself.**
+everything LLVM needs to discharge `i + j < 96` itself. **The probe's kernels
+took `n` and `m` as parameters, so they had none of that.**
+
+⚠ **THE MECHANISM THIS SECTION GAVE UNTIL TASK_092 WAS THE WRONG ONE, AND IT
+HAD ALREADY REACHED `.memory/`** (TASK_089_REVIEW B2). It blamed `black_box`.
+It is not `black_box`: every probe kernel in `.temp/t89/cost.rs` is
+`#[no_mangle] #[inline(never)] pub fn`, i.e. **external linkage, so a
+caller-side `black_box` cannot reach the callee's codegen at all** — and the
+review rebuilt the probes with and without it and got **byte-identical
+binaries** (`k46_checked` 296 B `a73eda77…`, `k46_unchecked` 126 B `daca171e…`,
+both unchanged). The real cause is one level up:
+
+> **A PROBE WHOSE KERNEL *SIGNATURE* DIFFERS FROM THE SHIPPED KERNEL'S LOSES
+> THE RANGE FACTS THE SHIPPED KERNEL DERIVES FROM ITS INPUT HEADER.** Isolated
+> by compiling p46's *shipped* body beside the probe's `k46_checked` in one
+> binary, both called through `black_box`: `k46_checked` keeps **10 conditional
+> branches**; the shipped body loses every bounds check.
+
+⚠ **The retraction has teeth in the other direction too**: a probe author who
+drops `black_box` *"so as not to hide range facts"* re-enables the constant
+folding `black_box` exists to prevent, while the real cause goes unfixed. Give
+the probe the **shipped signature** — fixed-capacity scratch, dimensions derived
+from an input header — and keep the `black_box`.
 
 **This is `.memory/03-measurement.md`'s rule landing on a new case.** That
 section says a probe's *intercept* does not transfer; here the probe's **slope**
-did not transfer either, and the reason is not the binary — it is that the probe
-withheld a range fact the shipped kernel supplies. **A `black_box` on a value
-the real kernel derives from the input changes what the optimiser can prove, and
-therefore changes which rung boundary exists.**
+did not transfer either.
 
 Shipped, `-O3`, `isolated`, **kernel-exclusive `Ir` per call**
 (`results/p46-bignum-mac.json`):
@@ -148,59 +166,185 @@ the instruction.
 > §8's rolled-vs-rolled control puts a number on that and §8a derives it
 > instruction by instruction.
 
-### 0c. ⚠ The cheapest unsafe spelling found is NOT A RUNG, and the reason is the prover
+### 0c. ⚠⚠ The cheapest unsafe spelling found is NOT A RUNG — and the reason this section gave until TASK_092 was FALSE
 
 `identity: unsafe == verus` chains R4 to the pinned vstd. The cheapest unsafe
 spelling found takes a **mutable** sub-slice of the product scratch,
 `&mut out[i..i + m + 1]`, and indexes *that* unchecked. Measured on the shipped
-shape (`controls/mkvariants.py --write`, variant `r4_mutreslice`; whole-program marginal):
+shape (`controls/mkvariants.py --write`, variant `r4_mutreslice`; whole-program
+marginal, **`-C codegen-units=1` — see the flag warning below**):
 
 | blob | `R4` shipped | `r4_mutreslice` | Δ | `R3` shipped |
 |---|---|---|---|---|
-| `sweep-n024m024` | 6618.00 | **5921.00** | −697.00 | 6499.00 |
-| `sweep-n048m024` | 12708.00 | **11315.00** | −1393.00 | 12469.00 |
-| `sweep-n024m048` | 12611.70 | **11050.70** | −1561.00 | 12204.70 |
-| `sweep-n044m044` | 20687.70 | **18090.70** | −2597.00 | 20028.70 |
-| `sweep-n010m010` | 1529.00 | **1448.00** | −81.00 | 1550.00 |
+| `sweep-n024m024` | 6618.00 | **5923.00** | −695.00 | 6499.00 |
+| `sweep-n048m024` | 12708.00 | **11317.00** | −1391.00 | 12469.00 |
+| `sweep-n024m048` | 12611.70 | **11052.70** | −1559.00 | 12204.70 |
+| `sweep-n044m044` | 20687.70 | **18092.70** | −2595.00 | 20028.70 |
+| `sweep-n010m010` | 1529.00 | **1450.00** | −79.00 | 1550.00 |
 
-Exact over all 48 sweep blobs with `m >= 2`, zero residual:
+**and it is below every safe spelling on every one of these blobs.** Exact over
+all 48 sweep blobs with `m >= 2`, zero residual, re-fitted at TASK_092 with the
+shipped flag set. **Re-derivable by three commands from the committed tree**,
+which is the standard `.memory/05-layout.md` step 11's corollary sets — a
+mechanism cited to a `.temp/` path is cited to nothing, because `.gitignore`
+contains `.temp/`:
 
 ```
-r4_mutreslice - R4ship  =  -1 + 7n - 1.5*n*m - 2.5*n*[m odd]
+controls/mkvariants.py --write DIR
+~/.cargo/bin/rustc --edition 2021 -C codegen-units=1 -C opt-level=3 \
+    -C debug-assertions=off --cfg slb_isolated DIR/r4_mutreslice.rs -o r4m
+# then the marginal of `r4m` against .temp/build/p46/unsafe-O3-isolated,
+# by controls/sweep_ir.py's convention, on each sweep blob
 ```
 
-**and it is below every safe spelling on every one of the 49 blobs.**
 
-**It is inadmissible.** At the pinned vstd
-(`~/tools/verus/vstd/{slice,array}.rs`):
+```
+r4_mutreslice - R4ship  =  1 + 7n - 1.5*n*m - 2.5*n*[m odd]
+```
 
-- `slice_subrange` exists for **`&[T]` only**; there is no mutable counterpart.
-- `ExSliceIndex::index_mut` carries a `requires` and **no `ensures` at all**.
-- `array.rs` has `ref_mut_array_unsizing_coercion` (whole array) and no
-  subrange.
+(It read `-1 + 7n - ...` until TASK_092; only the constant moved, so the
+`1.5` Ir/MAC coefficient this pattern quotes is unchanged.)
 
-Measured, four ways, and **re-runnable from the committed tree** —
-`controls/census.py --mutsub` writes the four probes, runs them, and **exits
-non-zero unless three verify and the fourth fails**:
+⚠ **THE FLAG WARNING, because it moved every number in this section and in 8b.**
+Until TASK_092 the table above read `5921 / 11315 / 11050.70 / 18090.70 / 1448`,
+Δ `−697 … −2597`. Those variants were built by `controls/mkvariants.py`'s
+documented command, which **omitted `-C codegen-units=1`** — a flag
+`harness/build.py::rust_flags` passes to *every* measured cell. Unlike 8a's
+rolled-vs-rolled control, where both sides were rebuilt and the shift cancelled
+(TASK_089_REVIEW m3), here only the variant side moved, so it did **not**
+cancel: every variant is 1 to 2 Ir/call off. Re-measured with the shipped flag
+set — rebuild each variant with and without `-C codegen-units=1` and the
+`default` build reproduces the old table exactly while the `codegen-units=1`
+build gives the table above. **The generator's docstring now carries the flag**,
+so the command a reader runs is the right one.
 
-| probe | result |
+#### The stated reason was false. The pinned vstd DOES specify a mutable sub-slice.
+
+Until TASK_092 this section said a mutable sub-slice at the pinned vstd is
+*"sound but valueless"* — that you can prove what did **not** change and not
+what did. **That is wrong** (TASK_089_REVIEW B1). The engineer read
+`vstd/slice.rs`'s `ExSliceIndex` **trait declaration**, which does carry a
+`requires` and no `ensures`, and mistook it for the specification.
+`~/tools/verus/vstd/std_specs/slice.rs` ships
+
+```rust
+pub assume_specification<T>[ <Range<usize> as SliceIndex<[T]>>::index_mut ]
+    (i: Range<usize>, slice: &mut [T]) -> (r: &mut [T])
+    ensures  r@ == old(slice)@.subrange(i.start as int, i.end as int),
+             final(r)@ == final(slice)@.subrange(i.start as int, i.end as int),
+             forall|j: int| !(i.start <= j < i.end) ==> final(slice)@[j] == old(slice)@[j],
+```
+
+— a full **value-level** specification. This is the `copy_from_slice` failure
+mode recurring, and `CLAUDE.md` now names `std_specs/` for that reason.
+
+#### And the FULL R5 closes. `21 verified, 0 errors`.
+
+Built at TASK_092 as `controls/mkvariants.py`'s `v46_mutreslice`, derived from
+the shipped `verus.rs` by exact-string substitution:
+
+```
+controls/mkvariants.py --write DIR
+./verus_run.py DIR/v46_mutreslice.rs --multiple-errors 12
+verification results:: 21 verified, 0 errors
+```
+
+Same count as the shipped `verus.rs`, same postcondition
+`r == bn_fold(buf@, off as int, len as int)`, **no `assume`, no `admit`, no
+`assume_specification`**. Three ingredients close it, and all three are cheap:
+
+1. a ghost mirror `gout: Seq<u64>` of the array, taken **before** the borrow —
+   `out` cannot be named while it is mutably borrowed, so the invariant is
+   carried on the mirror;
+2. the invariant `row@ == gout.subrange(i, i + m + 1)` plus a frame clause
+   `forall q outside [i, i+m+1) ==> gout[q] == out0[q]`;
+3. `vstd::seq::lemma_seq_subrange_index` at each use, and once more **after the
+   borrow ends** to turn `index_mut`'s `final(r)@ == final(slice)@.subrange(..)`
+   into `out@ =~= gout`.
+
+**Mutation-tested, so it is not vacuous** (`controls/census.py --mutsub` runs
+both):
+
+| mutation | result |
 |---|---|
-| `&mut out[i..j]` type-checks; `assert(row@.len() == m + 1)` | **verifies** |
-| the frame survives: `ensures final(out)@[0] == old(out)@[0]` with `i >= 1` | **verifies** |
-| the write does not vanish: `ensures final(out)@ =~= old(out)@` | **FAILS**, correctly |
-| **the value is unreachable**: `row[0] = 7` then `ensures final(out)@[i as int] == 7` | **FAILS — `postcondition not satisfied`** |
+| delete the safety line `if n + m > OUTCAP { return REJ; }` | **`20 verified, 1 errors`**, *invariant not satisfied before loop* on `n + m <= OUTCAP` |
+| write `lo ^ 1` instead of `lo` | **`20 verified, 1 errors`**, *assertion failed* |
 
-So a mutable sub-slice at this pin is *sound but valueless*: you can prove what
-did **not** change and not what did, and R5 therefore cannot discharge
-`r == bn_fold(...)` through one.
+#### What DOES disqualify it — two measured reasons, neither of them the one this section used to give
 
-> **This is `.memory/01-ladder.md` finding 14's mechanism with a number on it —
-> *the safe class can reach spellings the unsafe class cannot, because the
-> unsafe class is chained to the prover* — and it is the second measured
-> instance after p16's, the first on a WRITE, and the first where the size of
-> the gap is priced rather than argued.**
+**(a) It costs TWO NEW TRUSTED ITEMS.** The win comes from
+`row.get_unchecked(j)` / `row.get_unchecked_mut(j)` on a `&mut [u64]`, and the
+pinned vstd has **zero** occurrences of `get_unchecked` anywhere:
 
-⚠ **What that does NOT license.** It does not make p46's `R3 − R4` a safety
+```
+grep -rn "get_unchecked" ~/tools/verus/vstd/     ->  0 hits
+```
+
+so R5 must add `slice_get_unchecked` and `slice_set_unchecked` as
+`external_body` items with hand-written contracts. p46's TCB goes **5
+`external_body` / 3 contracted → 7 / 5**. That is the same disqualifier
+`spec.md`'s own named-spelling paragraph records for p16's `r4_hdr`: *"shipping
+either costs a NEW TRUSTED ITEM, which is exactly what disqualified `r4_hdr` on
+p16."*
+
+**(b) The R4/R5 pair is `differ` at `-O3`, and the gap is `15n + 1` Ir/call.**
+This pattern pins `identity: unsafe == verus, O0 norel / O3 exact`. The
+mutreslice pair does not meet it — and this is the first spelling in this tree
+where the same exec source compiles **differently** at the two rungs:
+
+| blob | `r4_mutreslice` | `v46_mutreslice` | `R5 − R4` | `15n + 1` |
+|---|---|---|---|---|
+| `sweep-n024m024` | 5923.00 | 6284.00 | **+361.00** | 361 |
+| `sweep-n048m024` | 11317.00 | 12038.00 | **+721.00** | 721 |
+| `sweep-n024m048` | 11052.70 | 11413.70 | **+361.00** | 361 |
+| `sweep-n044m044` | 18092.70 | 18753.70 | **+661.00** | 661 |
+| `sweep-n010m010` | 1450.00 | 1601.00 | **+151.00** | 151 |
+
+**MECHANISM, FROM THE DISASSEMBLY**, and it is two effects that sum to 15 per
+outer-loop iteration:
+
+```
+harness/asm.py diff <r4_mutreslice> <v46_mutreslice>
+  identical by raw machine-code bytes : False
+  identical with pc-rel fields masked : False        -> identity level `differ`
+
+conditional branches (harness/asm.py show | grep '^j'):
+  r4_mutreslice  ja:2 jae:2 jb:1 jbe:1 je:6 jne:5
+  v46_mutreslice ja:3 jae:2 jb:1 jbe:1 je:6 jne:5    <- ONE extra `ja`
+```
+
+1. **The per-row reslice bound test survives in R5 and not in R4**:
+   `lea (%r8,%rbx,1),%rsi ; cmp $0x60,%rsi ; ja <panic>` — **+3 per row**.
+2. **R5 does not fold `load_u64`'s eight byte reads into one 8-byte load.**
+   R4 emits `mov (%r12,%r13,8),%rcx`, one instruction; R5 emits a 4-byte `mov`,
+   four `movzbl`, four `shl` and four `or` — **+12 per row**. `movzbl` count in
+   the kernel: R4 3, R5 7; shipped `unsafe` 3, shipped `verus` 3.
+
+`3 + 12 = 15`, and the `+1` is one-time. Static: `n_nopad` 169 against 189.
+
+⚠ **The exec source of the two is textually identical** (ghost-stripped diff:
+brace placement only), and the shipped nest does **not** diverge — shipped
+`verus` and `unsafe` are `O3 exact`. **Why LLVM diverges on this spelling and
+not on the shipped one is NOT established.** Flagged, not explained, the same
+way 8d is.
+
+#### What this does and does not license, said plainly
+
+> **The exclusion stands, the reason has changed, and the headline is now
+> contingent on things that could be relaxed.** Under the pinned
+> `identity` and the TCB rule, `r4_mutreslice` is out, both in-contract spans
+> stay degenerate (8b) and *safe beats unsafe* survives. **If either were
+> relaxed the headline would invert**: `r4_mutreslice` at 5923 and even
+> `v46_mutreslice` at 6284 are below `safe_naive`'s 6453 and `safe_tuned`'s
+> 6499 at `(24,24)`, and below both on 4 of the 5 shapes above.
+
+So this is still `.memory/01-ladder.md` finding 14's shape — *the safe class can
+reach spellings the unsafe class cannot, because the unsafe class is chained to
+the prover* — but **the chain is the trusted base and the identity pin, not a
+missing specification**, and that is a weaker and more specific claim than the
+one this section shipped.
+
+⚠ **What it does NOT license.** It does not make p46's `R3 − R4` a safety
 number: §0b already showed the safe rung has no checks left to pay for. p46
 supports *"the admissible-unsafe class is bounded above the safe class here"*
 and nothing stronger.
@@ -214,9 +358,16 @@ and nothing stronger.
 | R1 | `c/kernel.c` | `out[i + j]` | **it is not** | — |
 | R1h | `c/kernel_hardened.c` | `out[i + j]` | one compare, before the loops | **`O(1)` per call** |
 | R2 | `safe_naive.rs` | `out[i + j]`, `bl[j]` | the language checks per access | **`0.00` — LLVM removed them** |
-| R3 | `safe_tuned.rs` | `out[i..i+m].iter_mut().zip(` | one reslice check per row | `O(n)` |
+| R3 | `safe_tuned.rs` | `out[i..i+m].iter_mut().zip(` | the language checks it — and LLVM removed that too | **`0.00`; the measured `2n − 2` is ADDRESS ARITHMETIC (§8e)** |
 | R4 | `unsafe.rs` | `arr_get_unchecked(&out, i + j)` | the author asserts it | 0 |
 | R5 | `verus.rs` | the same, verbatim | **Verus proves it** | 0 instructions |
+
+⚠ **The R3 row said *"one reslice check per row"*, cost `O(n)`, until TASK_092.
+There is no such check in the machine code** (TASK_089_REVIEW M2, re-derived
+here). `safe_tuned` and `safe_naive` have the **identical** conditional-branch
+multiset — `ja:2 jae:2 jb:1 jbe:1 je:6 jne:5` — so R3 does not add a check, it
+removes none, and the `2n − 2` it is dearer by is a hoisted `lea`/`add` pair.
+**There are THREE hardening strategies in this pattern, not four** (§8e).
 
 ---
 
@@ -473,8 +624,17 @@ R3 - R4  =  1 + 7n - n*floor(m/2)   (m even)
             1 + 5n - n*floor(m/2)   (m odd)
 
 R1h - R1, clang  =  +2.00 flat                    exact, 49/49
-R1h - R1, gcc    =  +4.00 flat, WITH TWO MEASURED EXCEPTIONS AT +3.00 (see 8d)
+R1h - R1, gcc    =  +4.00 flat, WITH ONE MEASURED EXCEPTION AT +3.00 (see 8d)
 ```
+
+⚠ **NAME THE CONVENTION AT THE EXCEPTION, because there are two and this line
+is under a header declaring one of them** (TASK_089_REVIEW m1). Under **this
+section's convention — whole-program marginal, the 49 sweep blobs — there is
+exactly ONE exception**, `sweep-n024m048`. §8d's *second* exception is real but
+belongs to the **kernel-exclusive** convention on the matrix inputs
+(`8275 − 8271 = +4` on `small`, `28869 − 28866 = +3` on `large`). Neither prose
+nor tool was wrong; the summary line was counting across both conventions
+without saying so.
 
 ### 8a. ⚠ THE SIGN OF `R3 − R4` IS AN UNROLL, AND HERE IS THE CONTROL
 
@@ -547,29 +707,42 @@ substitution, by the committed generator `controls/mkvariants.py`, which asserts
 each substitution applies exactly once and **fails closed** if a rung moves:
 
 ```
-controls/mkvariants.py --check     # 7 substitutions, each applying exactly once
+controls/mkvariants.py --check     # 8 substitutions, each applying exactly once
 controls/mkvariants.py --write <dir>
 ```
 
+⚠⚠ **BUILD THE VARIANTS WITH `-C codegen-units=1`.** `harness/build.py` passes
+it to every measured cell; the generator's documented command omitted it until
+TASK_092, and every number in this table moved by 1–2 Ir/call as a result
+(§0c's flag warning has the before/after). Unlike 8a's control, where both sides
+were rebuilt and the shift cancelled, here only the variant side had moved.
+
 | side | lever | Δ vs shipped |
 |---|---|---|
-| **R4** | `r4_inline` — the `mac` helper written out in the loop body | **−1.00 flat** |
-| **R4** | `r4_runidx` — a running output index `oi` instead of `i + j` | **−3.00 flat** |
-| **R3** | `r3_reslice` — reslice the row, index it with a `while` | **−2.00 flat** |
-| **R3** | `r3_rangefor` — reslice the row, index it with `for j in 0..m` | **−2.00 flat** |
-| **R2** | `r2_rangefor` — the same body with `for` loops | **−2.00 flat** |
+| **R4** | `r4_inline` — the `mac` helper written out in the loop body | **0.00 flat** |
+| **R4** | `r4_runidx` — a running output index `oi` instead of `i + j` | **−2.00 flat** |
+| **R3** | `r3_reslice` — reslice the row, index it with a `while` | **0.00 flat** |
+| **R3** | `r3_rangefor` — reslice the row, index it with `for j in 0..m` | **0.00 flat** |
+| **R2** | `r2_rangefor` — the same body with `for` loops | **0.00 flat** |
+
+(The same table under the *old*, wrong flag set read −1.00 / −3.00 / −2.00 /
+−2.00 / −2.00; rebuilding each variant without `-C codegen-units=1` reproduces
+it exactly, which is how the flag was identified as the cause.)
 
 **Three levers on the R4 side and three on the R3 side, and BOTH SIDES ARE
-DEGENERATE** — every lever is flat in `n` and in `m`, R4's span is 3 Ir/call and
-R3's is 2. So the pair interval collapses onto the R3-side span
-(`.tasks/TASK_026.md` §0 item 4), and the published `R3 − R4` law does not
-depend on which of the three is shipped.
+DEGENERATE** — every lever is flat in `n` and in `m`, R4's span is **2** Ir/call
+and R3's is **0**. So the pair interval collapses onto the R3-side span
+(`.tasks/TASK_026.md` §0 item 4), which is itself zero, and the published
+`R3 − R4` law does not depend on which of the three is shipped.
 
 ⚠ **The exception is `r4_mutreslice` (§0c), which is NOT flat and NOT
-degenerate — `−1 + 7n − 1.5nm − 2.5n[m odd]`, i.e. −697 to −2597 Ir/call over
+degenerate — `1 + 7n − 1.5nm − 2.5n[m odd]`, i.e. −695 to −2595 Ir/call over
 these five shapes — and it is NOT A RUNG.** It is the reason this pattern's R4
-is knowingly off the floor of its own class, and the reason is a property of the
-prover.
+is knowingly off the floor of its own class. ⚠ **The reason is NOT the one this
+file gave until TASK_092:** its full R5 verifies, `21 verified, 0 errors`. What
+excludes it is two new trusted items and an R4/R5 pair that is `differ` at
+`-O3` by `15n + 1` Ir/call. §0c has all of it, including what happens to the
+headline if either constraint is relaxed.
 
 ### 8c. `m = 1` is off the laws' domain, and only one blob is there
 
@@ -584,27 +757,88 @@ explained.**
 
 clang's is exactly `+2.00` on all 49 sweep blobs — one `cmp` and one `ja`,
 executed once per call, and nothing else. gcc's is `+4.00` on 48 of the 49 and
-**`+3.00` on `sweep-n024m048`**; by the kernel-exclusive convention it is `+4`
-on `small.bin` (24,24) and `+3` on `large.bin` (48,48). Both exceptions sit at
-`m = 48`. **No mechanism is offered**: a static diff would bound it and not
+**`+3.00` on `sweep-n024m048`** — that is **one** exception, and it is the only
+one this section's *whole-program marginal* convention has. **Under the
+kernel-exclusive convention on the matrix inputs** it is `+4` on `small.bin`
+(24,24) and `+3` on `large.bin` (48,48) — a second, *different* exception, in a
+*different* convention (TASK_089_REVIEW m1; §8's summary line used to add them
+up without saying so). Both sit at `m = 48`. **No mechanism is offered**: a static diff would bound it and not
 measure it, and nobody has run a per-instruction callgrind on it. Most likely
 code alignment. Flagged rather than explained.
 
-### 8e. The four hardening strategies, priced side by side
+### 8e. ⚠ THREE hardening strategies, not four — and the retracted fourth is R3's
 
-This is p19's *"the two hardening strategies have different asymptotics"* with
-four terms instead of two, and it is the pattern's cleanest positive result:
+Until TASK_092 this section, `README.md` and `spec.md`'s `why` all said **four
+hardening strategies with four different asymptotics** — `0`, `O(1)`,
+`O(n·m)`-that-vanishes and R3's `O(n)`. **R3's does not exist**
+(TASK_089_REVIEW M2), and it was called *"the pattern's cleanest positive
+result"*, so this is the correction that costs the most.
 
 | how `i + j < OUTCAP` is established | cost |
 |---|---|
 | R5, statically, by proof | **0 instructions** |
 | R1h, one compare on `n + m` before the loops | **+2.00 (clang) / +4.00 (gcc) per call, flat in n and m** |
-| R2/R3, per access, by the language | **0.00** — LLVM discharges it and deletes them |
+| R2/R3, per access, by the language | **0.00** — LLVM discharges it and deletes them, in **both** safe rungs |
 | R4, by assertion | 0, and it is the DEAREST Rust rung anyway (§8a) |
 
-⚠ **C's fix is the cheapest non-zero one and it is `O(1)`, not `O(table)`**:
+**RE-DERIVED HERE FROM BOTH SIDES, not taken from the review.**
+
+```
+harness/asm.py show .temp/build/p46/<cell>-O3-isolated | grep -oE '^j[a-z]+' | sort | uniq -c
+
+safe_naive :  ja:2  jae:2  jb:1  jbe:1  je:6  jne:5      (jmp:6)
+safe_tuned :  ja:2  jae:2  jb:1  jbe:1  je:6  jne:5      (jmp:6)   <- IDENTICAL
+unsafe     :  ja:2  jae:2  jb:1  jbe:1  je:4  jne:5      (jmp:4)
+```
+
+**The two safe rungs have the identical conditional-branch multiset.** R3
+therefore adds no check and removes none; the whole of `R3 − R2` is address
+arithmetic, and `harness/asm.py diff safe_naive safe_tuned` shows exactly where:
+
+```
+row header, once per row            safe_naive        safe_tuned
+  mov (%r12,%r13,8),%rcx               yes               yes
+  lea (%rsp,%r13,8),%r8                 -                yes   <- +1
+  add $0x8,%r8                          -                yes   <- +1
+                                                       ------------
+                                                        +2 per row
+
+odd-m remainder block, once per row when m is ODD
+  lea (%rsp,%r13,8),%rcx               yes                -    <- -1
+  add $0x8,%rcx                        yes                -    <- -1
+                                                       ------------
+                                                        -2 per row, m odd only
+
+call preamble, once per call
+  lea (%rsp,%r14,8),%rsi               yes                -    <- -1
+  add $0x8,%rsi                        yes                -    <- -1
+                                                       ------------
+                                                        -2 per call
+```
+
+`safe_tuned` hoists the row base into the row header; `safe_naive` computes the
+**same** base inside the block that handles the odd-`m` remainder step. **That
+is why the law has two branches on `m` parity** — when `m` is odd the two
+cancel and only the preamble term survives; when `m` is even `safe_naive` never
+executes the remainder block and `safe_tuned`'s `+2` per row stands:
+
+```
+R3 - R2  =  2n - 2  (m even)  /  -2  (m odd)
+```
+
+Confirmed on the shipped binaries at TASK_092, residual 0 on all five:
+`n024m024 +46`, `n048m024 +94`, `n024m048 +46`, `n044m044 +86`, `n010m010 +18`
+(all `m` even, `2n − 2`), and `n024m023 −2.00`, `n024m011 −2.00` (`m` odd).
+
+> **So R3's `2n` is a SPELLING cost, not a hardening strategy.** The three that
+> remain are `0` (proof), `O(1)` (C's pre-loop compare) and `0` (the language's
+> checks, deleted). Two of the three are zero, which is a duller result than the
+> one this section shipped and is the one the machine code supports.
+
+⚠ **C's fix is the cheapest NON-ZERO one and it is `O(1)`, not `O(table)`**:
 because the limb counts are two bytes in the header, C can test the *whole*
 obligation once, before it starts. p19's hardened rung had to walk 2048 bytes.
+**That contrast with p19 survives intact** — it never involved R3.
 
 ---
 
@@ -679,8 +913,9 @@ wall-clock claim is made for p46 and none should be quoted from its table.**
 |---|---|---|
 | `controls/harm_layout.py --clamp` | the clamped spelling is exit 0 with both sanitizers silent — the row's memory-unsafe framing is conditional (0a run D) | one command |
 | `controls/harm_layout.py --layout` | the frame order of the two automatic arrays, which is why the shipped C rung is silent (0a) | one command |
-| `controls/mkvariants.py --check` | all 7 variants still derive from the shipped sources by an exact-string substitution that applies **exactly once** | one command |
-| `controls/mkvariants.py --write D` | emits the 6 spelling levers of 8b/0c and the deliberately-broken Verus control of 6a | one command |
+| `controls/mkvariants.py --check` | all 8 variants still derive from the shipped sources by an exact-string substitution that applies **exactly once** | one command |
+| `controls/mkvariants.py --write D` | emits the 6 spelling levers of 8b/0c, the **verifying** `v46_mutreslice` R5 of 0c, and the deliberately-broken Verus control of 6a | one command |
+| `controls/census.py --mutsub` | 0c: the pinned vstd **does** specify a value-level mutable sub-slice, the mutreslice R5 verifies `21/0`, and the two disqualifiers are the TCB and the identity pin | one command, ~4 min |
 | `controls/sweep_ir.py --measure/--check` | re-derives §8's laws from the shipped binaries and **exits 1 on any residual** | two commands |
 
 ⚠ **The pre-build probes are NOT here and should not be re-run as if they were
@@ -699,5 +934,17 @@ a p46 measurement.
 - **No wall-clock claim** (§9).
 - **No cross-inline-mode comparison**: at `-O3 whole` the kernel is inlined and
   `kernel_exclusive_ir` is `None` in 10 of 16 cells.
-- **The `black_box` finding in §0b is p46's own measurement and has not been
-  checked against any other pattern's probe.** It may or may not generalise.
+- **The `black_box` finding in §0b is p46's own measurement, and TASK_089_REVIEW
+  B2 replaced its mechanism.** The cause is not `black_box` — every probe kernel
+  had external linkage, so a caller-side `black_box` could not reach its
+  codegen, and the binaries are byte-identical with and without it. The cause is
+  that **the probe kernel's SIGNATURE differed from the shipped kernel's**, so
+  it lost the range facts the shipped kernel derives from its input header.
+- **Why LLVM keeps the reslice bound test and the byte-wise limb load in
+  `v46_mutreslice` but not in `r4_mutreslice`, from a textually identical exec
+  source, is NOT established** (§0c). The *instruction* accounting is complete —
+  `3 + 12 = 15` per row — but the pass-level cause is not, and no `-C` flag was
+  bisected. Flagged, like §8d.
+- **`r4_mutreslice` was not put through Miri, `check.py`, or the twin regime**,
+  because it is a control and not a rung. Its R5 was verified and mutation
+  tested, and nothing else.

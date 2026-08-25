@@ -36,8 +36,10 @@
 //! is this program with the output-side bound deleted; the invariant
 //! `n + m <= OUTCAP` then has no establishing step and the whole nest fails.
 //! Demonstrated rather than argued: deleting those three lines from a copy of
-//! this file gives `14 verified, 1 errors`, *"invariant not satisfied before
-//! loop"* on `n + m <= OUTCAP` (../NOTES.md 6a).
+//! this file gives `20 verified, 1 errors`, *"invariant not satisfied before
+//! loop"* on `n + m <= OUTCAP` (../NOTES.md 6a). ⚠ This line said `14` until
+//! TASK_092; `controls/mkvariants.py`, ../NOTES.md 6a and every run of the
+//! control say `20` (TASK_089_REVIEW M3).
 //!
 //! **What is NOT proved, said here rather than left implied.** The
 //! postcondition is `r == bn_fold(buf@, off, len)`, where `bn_fold` is a

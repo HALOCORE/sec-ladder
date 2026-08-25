@@ -1,29 +1,39 @@
 //! p46 rung R2 -- safe Rust, naive. The obvious port of `c/kernel_hardened.c`:
 //! index the scratch arrays, let the language check the index.
 //!
-//! **What the language's checks ARE here, and why there are THREE of them.**
-//! The MAC step reads `bl[j]`, reads `out[i + j]` and writes `out[i + j]`, so
-//! one schoolbook step carries three bounds checks -- the densest check site in
-//! this tree. Measured against R4 they cost `7.00` instructions per MAC step
-//! (../NOTES.md 8), i.e. the check apparatus is two thirds again as large as
-//! the ten-instruction MAC it guards.
+//! **What the language's checks ARE here, and why there are THREE of them IN
+//! THE SOURCE.** The MAC step reads `bl[j]`, reads `out[i + j]` and writes
+//! `out[i + j]`, so one schoolbook step is written with three bounds checks --
+//! the densest check site in this tree.
 //!
-//! ⚠ The checks are NOT hoistable, and that is not an accident of spelling.
-//! `i + j < OUTCAP` follows from `i < n`, `j < m` and `n + m <= OUTCAP` by
-//! purely LINEAR reasoning -- there is no `lemma_mul_inequality` in it, which
-//! is exactly what makes p46 not p05 -- and LLVM still does not do it. The
-//! measurement that establishes there IS a rung boundary here is in
-//! ../NOTES.md 0b, and it was run before any cell was written precisely because
-//! a fixed-capacity `[u64; 96]` gives LLVM a compile-time length and the checks
-//! might have vanished. They do not: this rung's kernel body is 186
-//! instructions against the unsafe rung's 111.
+//! ⚠⚠ **AND ALL THREE ARE GONE FROM THE MACHINE CODE. THIS RUNG'S MEASURED
+//! SAFETY TAX IS `0.00` PER MAC STEP** (../NOTES.md 0b, 8a). `i + j < OUTCAP`
+//! follows from `i < n`, `j < m` and `n + m <= OUTCAP` by purely LINEAR
+//! reasoning -- there is no `lemma_mul_inequality` in it, which is exactly what
+//! makes p46 not p05 -- and LLVM *does* do it. The MAC loop of this rung
+//! contains **no conditional branch but its own `jne`**, and its
+//! conditional-branch multiset is identical to ../unsafe.rs's outside the loop.
+//!
+//! ⚠ **THREE FIGURES THAT USED TO BE IN THIS COMMENT WERE THE PRE-BUILD
+//! PROBE'S AND ARE RETRACTED** (TASK_089_REVIEW M1). It said the checks cost
+//! `7.00` instructions per MAC step, that they are *"NOT hoistable"* and that
+//! *"LLVM still cannot remove them"*, and that *"this rung's kernel body is 186
+//! instructions against the unsafe rung's 111"*. All four come from
+//! `.temp/t89/cost.rs`, the probe whose slope ../NOTES.md 0b retracts, and no
+//! pipeline on the shipped binaries yields 111: `harness/asm.py stat` gives
+//! **179 / 150** (`n_fn`), 174 / 147 without padding, 184 / 155 raw objdump.
+//! The shipped `R2 - R4` law is `3 + 5n - n*floor(m/2)` and is NEGATIVE for
+//! all but the smallest shapes -- safe Rust is *cheaper* here, and ../NOTES.md
+//! 8a shows instruction by instruction that none of that is safety either.
 //!
 //! This rung keeps the output-side bound as well, so that all six rungs compute
 //! the same function on every input including the adversarial ones. That is a
-//! deliberate choice with a cost: it means R2's per-access checks are *provably
-//! redundant* on every call the benchmark makes, and LLVM still cannot remove
-//! them. ../verus.rs proves the fact that would let it; rustc never learns it.
-//! See `.memory/01-ladder.md` finding 2.
+//! deliberate choice, and on p46 it costs nothing: R2's per-access checks are
+//! *provably redundant* on every call the benchmark makes and **LLVM works
+//! that out on its own.** `.memory/01-ladder.md` finding 2 -- *a proof buys
+//! nothing on its own, because rustc never learns what Z3 knew* -- is not
+//! contradicted and does not bite here: nothing had to teach rustc anything,
+//! so on p46 there is no check left for a proof to have removed.
 
 #[path = "../../common/driver.rs"]
 mod driver;

@@ -66,14 +66,24 @@ Both were settled by runs before any cell was built (`NOTES.md` 0a).
    residual — a carry-materialisation difference derived instruction by
    instruction in `NOTES.md` 8a. Do not read `R3 − R4` as a safety number.
 
-4. **The cheapest unsafe spelling found is not a rung, and the reason is the
-   prover.** It takes a mutable sub-slice of the product scratch; at the pinned
-   vstd `slice_subrange` covers `&[T]` only and `ExSliceIndex::index_mut`
-   carries a `requires` and **no `ensures`**, so a write through it is sound but
-   valueless — you can prove what did not change and not what did. It is
-   **−697 to −2597 Ir/call** below the shipped R4 and below every safe spelling.
-   `.memory/01-ladder.md` finding 14's mechanism with a number on it
-   (`NOTES.md` 0c).
+4. **The cheapest unsafe spelling found is not a rung — and it is excluded by
+   the TRUSTED BASE and the IDENTITY PIN, not by the prover.** It takes a
+   mutable sub-slice of the product scratch and is **−695 to −2595 Ir/call**
+   below the shipped R4 and below every safe spelling. Its **full R5 verifies,
+   `21 verified, 0 errors`**, mutation-tested twice. What excludes it is
+   measured: (a) it needs **two new trusted items**, because the pinned vstd has
+   zero `get_unchecked` specifications, taking p46's TCB from 5 `external_body`
+   / 3 contracted to 7 / 5; (b) its R4/R5 pair is **`differ` at `-O3`**,
+   `R5 − R4 = 15n + 1` Ir/call, against this pattern's pinned
+   `identity: unsafe == verus, O3 exact`.
+
+   ⚠ **This result used to be stated as a prover limitation and that was
+   false** (TASK_089_REVIEW B1). `~/tools/verus/vstd/std_specs/slice.rs` ships a
+   full **value-level** specification of `<Range<usize> as SliceIndex<[T]>>::
+   index_mut`; `vstd/slice.rs`'s `ExSliceIndex` is a *trait declaration*, not
+   the specification. So the headline *"safe Rust beats unsafe Rust here"* is
+   contingent on the identity pin and the TCB rule, and `NOTES.md` 0c says what
+   happens if either is relaxed: **it inverts.**
 
 ## The rungs
 
@@ -82,15 +92,25 @@ Both were settled by runs before any cell was built (`NOTES.md` 0a).
 | R1 | `c/kernel.c` | **it is not** — the bug | — |
 | R1h | `c/kernel_hardened.c` | one compare before the loops | **+2.00 (clang) / +4.00 (gcc) per call, flat** |
 | R2 | `safe_naive.rs` | the language checks per access | **0.00 — LLVM removes them** |
-| R3 | `safe_tuned.rs` | one reslice check per row | `O(n)` |
+| R3 | `safe_tuned.rs` | the language checks it — LLVM removes those too | **0.00**; the `2n − 2` is address arithmetic |
 | R4 | `unsafe.rs` | the author asserts it | 0, and it is the dearest Rust rung |
 | R5 | `verus.rs` | **Verus proves it** | 0 instructions; byte-identical to R4 at `-O3` |
 
-**Four hardening strategies with four different asymptotics** — `0`, `O(1)`,
-`O(n·m)`-that-vanishes, `O(n)` — priced side by side in `NOTES.md` 8e. C's fix
-is the cheapest non-zero one *and* it is `O(1)`: the limb counts are two bytes
-in the header, so C can test the whole obligation once before it starts, where
-p19's hardened rung had to walk 2048 bytes.
+**THREE hardening strategies, and two of the three are zero** — `0` (proof),
+`O(1)` (C's pre-loop compare) and `0` (the language's checks, deleted in *both*
+safe rungs) — priced side by side in `NOTES.md` 8e.
+
+⚠ **This section said FOUR strategies with four different asymptotics, the
+fourth being R3's `O(n)` reslice check, and called it the pattern's cleanest
+positive result. There is no such check in the machine code**
+(TASK_089_REVIEW M2): `safe_naive` and `safe_tuned` have the *identical*
+conditional-branch multiset, and R3's `2n − 2` is a hoisted `lea`/`add` pair,
+re-derived from both sides in `NOTES.md` 8e.
+
+C's fix is the cheapest **non-zero** one *and* it is `O(1)`: the limb counts are
+two bytes in the header, so C can test the whole obligation once before it
+starts, where p19's hardened rung had to walk 2048 bytes. That contrast is
+unaffected.
 
 ## What is proved, and what is not
 
