@@ -2540,3 +2540,37 @@ Flags:
 
   **Always report a clang column.** A gcc-only C baseline overstates C's dynamic
   cost here by 43% — gcc emits *fewer* instructions and executes 42.9% *more*.
+
+## ⚠ THE FIRST COUNTEREXAMPLE TO "R4 AND R5 COMPILE THE SAME": p46's `r4_mutreslice`
+
+**PROVISIONAL — TASK_092, unreviewed.** Finding 1 says a Verus proof costs
+exactly zero instructions, verified on raw machine code across every shipped
+pattern. ⚠ **That result is about SHIPPED rungs and is UNTOUCHED — all 24
+patterns still pin and measure `unsafe ≡ verus`.** But the counterexample now
+exists, and anyone generalising finding 1 to *"the same exec source always
+compiles the same at R4 and R5"* is over-reading it.
+
+p46's `r4_mutreslice` control and its Verus twin have **textually identical exec
+source** (ghost-stripped diff = brace placement only) and measure:
+
+```
+blob        R4        R5        R5 - R4      15n + 1
+n024m024  5923.00   6284.00     +361.00        361
+n048m024 11317.00  12038.00     +721.00        721
+n044m044 18092.70  18753.70     +661.00        661
+n010m010  1450.00   1601.00     +151.00        151
+```
+
+**`R5 − R4 = 15n + 1` exactly.** Per-instruction: R5 keeps one extra `ja` — the
+per-row reslice bound, `lea/cmp/ja`, **+3/row** — and **fails to fold
+`load_u64`'s eight byte reads into one `mov`** (13 insns against 1, **+12/row**).
+`movzbl` count 7 against 3; the shipped `unsafe` and `verus` are both 3.
+**3 + 12 = 15.**
+
+⚠ **The pass-level cause is NOT established** — the instruction accounting is
+complete, the reason LLVM diverges from identical source is not, and no `-C` flag
+was bisected. **Do not explain it; cite it.**
+
+⚠ **The consequence that matters: this is one of the two things that disqualify
+`r4_mutreslice` as a rung** — the other being two new trusted items — **and
+NEITHER is a specification gap**, which is what p46 originally claimed.

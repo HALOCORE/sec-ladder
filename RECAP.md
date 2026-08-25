@@ -2701,7 +2701,31 @@ Both retired.
     ⚠ **The general lesson: `head -N` on a sanitizer's output is a truncation
     that looks like a measurement.** Use `grep` for the banner you want.
 
-### Deferred with a stated reason### Deferred with a stated reason
+30. ⚠ **`check.py::check_marginal_ir`'s DOCSTRING IS TOO STRONG ABOUT THE ±7
+    BISTABLE TERM, and p46 is the FOURTH pattern to hit it.** (TASK_092.) The
+    docstring says *"the term is `whole`-mode only"* and that `isolated` *"is not
+    merely small, it is **exactly invariant**"* — evidenced on an **`-O3
+    isolated`** cell. **p46's movers include five `-O0 isolated` cells.**
+    ✅ **Corrected rule: `-O3 isolated` is invariant; `-O0` moves in BOTH
+    modes.** The docstring also names **three** patterns at ±7 (p03, p04, p38);
+    **p46 is the fourth.**
+
+    ✅ **The rest of the docstring is RIGHT and TASK_092 confirmed it end to
+    end:** the term is **bistable**, the discriminator is *"the presence of a
+    single environment variable, not its size"*, and the mechanism is the
+    environment block shifting the stack pointer → a per-call stack array's
+    alignment → a different tail in `__memset_avx2_unaligned_erms`. **p46
+    `memset`s TWO stack arrays per call, which is why its `unsafe`/`verus`
+    `O3 whole` cells move by exactly `−14 = 2 × 7`.** ✅ **And it explains the
+    "gate record is not bit-reproducible" minor two reviews have now raised: two
+    consecutive `check.py p46` runs move 2 of 963 values, both ASan address
+    strings, ZERO `Ir`.**
+
+    ⚠ **Cost: it is a `check.py` edit, so it stales every gate record — a
+    24-pattern sweep (~45 min) for a comment. BATCH IT** with "Owed" 0's sixth
+    route, B5's remaining minors, and the `p09/spec.md` citations.
+
+### Deferred with a stated reason### Deferred with a stated reason### Deferred with a stated reason
 
 - **The mechanical rate-vs-disassembly backstop** (~90 lines, prototype exists).
   Deferred twice, and the second time the engineer's own session was the argument:

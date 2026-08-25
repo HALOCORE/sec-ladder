@@ -1683,3 +1683,43 @@ body is NOT the one the row is about:**
 CHEAPEST body that satisfies it?"** Write that body and run it. **Every one of
 these three was found by a probe that tried, and none by reading the
 postcondition.**
+
+## ✅ A MUTABLE SUB-SLICE IS USABLE AT THE PIN — and the bridge is one lemma
+
+**TASK_089_REVIEW + TASK_092, manager-verified. This entry exists because the
+opposite was claimed and landed.**
+
+`~/tools/verus/vstd/std_specs/slice.rs` ships
+
+```rust
+pub assume_specification<T>[ <Range<usize> as SliceIndex<[T]>>::index_mut ]
+    (i: Range<usize>, slice: &mut [T]) -> (r: &mut [T])
+    ensures  r@ == old(slice)@.subrange(i.start as int, i.end as int),
+             final(r)@ == final(slice)@.subrange(i.start as int, i.end as int),
+             forall|j: int| !(i.start <= j < i.end) ==> final(slice)@[j] == old(slice)@[j],
+```
+
+— **a full VALUE-LEVEL specification**, plus `<[T]>::split_at_mut` and
+`ref_mut_array_unsizing_coercion`.
+
+⚠⚠ **`vstd/slice.rs`'s `ExSliceIndex` TRAIT DECLARATION carries a `requires` and
+no `ensures`, AND IT IS NOT THE SPECIFICATION.** Reading it and concluding *"the
+pin cannot specify a mutable sub-slice — frame provable, value not"* is the
+**`copy_from_slice` failure mode recurring**, and it reached a shipped
+`spec.md`'s hashed `why`. **`CLAUDE.md` now names `std_specs/` for this reason.**
+
+**The recipe, from a full R5 that closes at `21 verified, 0 errors`:**
+
+- take a **ghost mirror** `let ghost gout = out@;` **before** the borrow;
+- carry `row@ == gout.subrange(i, i + m + 1)` **plus a frame clause** in the loop
+  invariant;
+- call **`vstd::seq::lemma_seq_subrange_index`** once per use, and **once more
+  after the borrow ends** to turn `final(r)@ == final(slice)@.subrange(..)` back
+  into `out@ =~= gout`.
+
+⚠ **The path is `vstd::seq::`, not `vstd::seq_lib::` — the latter is private.**
+
+⚠ **What DOES disqualify such a spelling, measured on p46, and neither reason is
+a specification gap:** it needs **`get_unchecked`, which has 0 hits anywhere in
+the pinned vstd**, so R5 must add two new trusted items (TCB 5/3 → 7/5); **and**
+its R4/R5 pair measures **`differ` at `-O3`** against an `identity: exact` pin.
