@@ -153,6 +153,33 @@ A task is done when **all** hold:
    an edit the generator would have silently reverted
    (`.memory/05-layout.md`), and one of them was the task fixing that defect.
 
+   ⚠⚠ **RULE 6 HAS A HOLE, AND `p46` IS THE FIRST PATTERN TO DEMONSTRATE IT
+   WITH A MATCHING HASH (TASK_089_REVIEW).** This rule protects against a
+   declaration **edited AFTER measuring**. It does **NOTHING** about a
+   declaration that **measurement has since FALSIFIED**.
+
+   p46's Rule 6 disclosure verified *perfectly* — the reviewer reconstructed the
+   recorded pre-build sha256 **exactly**, proving no `required` / `forbidden` /
+   `identity` / `why` had moved. **And that is precisely WHY the hashed `why`
+   still asserted `"NEITHER SIDE IS DEGENERATE"` with two numbers that appear
+   nowhere in the pattern's own `NOTES.md`**, plus three rung sources quoting
+   retracted pre-build figures — one of them citing, as its authority, the very
+   section that retracts it.
+
+   **So Rule 6 is necessary and not sufficient. Add this step, and it costs one
+   `grep`:**
+
+   > **Before you finish, re-read the hashed `why` and every rung-source doc
+   > comment AGAINST YOUR OWN MEASURED NUMBERS.** A frozen declaration is
+   > evidence about *when* it was written, **not about whether it is still
+   > true.** Anything the build refuted must be struck **even though — indeed
+   > especially because — the hash still matches.**
+
+   ⚠ **Budget it:** `spec.md`'s fenced block is contract-hashed, so a `why` fix
+   moves `contract_sha256`; `c/kernel.{c,h}` are **measurement**-hashed, so even
+   a comment fix there costs a re-measure. **Doc comments in `.rs` rung sources
+   and `NOTES.md`/`README.md` cost only a gate re-run.**
+
    **If the hash changes later, say so and say why** — a declaration edit made
    after a measurement is exactly what the direction test governs
    (`.memory/01-ladder.md`), and disclosing one has twice been upheld on review.
