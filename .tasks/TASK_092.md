@@ -126,7 +126,7 @@ and that is far cheaper to learn now than after a build session.
 
 ---
 
-⚠ **PROTOCOL rule 2's running count is 259.** **Every agent that has contradicted
+⚠ **PROTOCOL rule 2's running count is 261** (259 when this file was written; `TASK_092` added two — the re-measure cost model for rung `.rs` doc comments, and Part B's *"expect the same sign flip"* for `p24`, which is a collapse to byte-identity, with `p26` the more exposed row). **Carry 261 forward.** **Every agent that has contradicted
 the manager with a measurement has been right — 259 times, and the last review
 refuted two claims the manager had already committed into `.memory/`.** ⚠ **My
 prediction record is poor and getting more specific: 0 for 3 on which Verus
