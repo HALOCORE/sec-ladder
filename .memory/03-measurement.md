@@ -2162,6 +2162,74 @@ and it governs four unbuilt rows:
 **Treat every unbuilt row's probe cost as a DIRECTION-UNKNOWN prior until its
 rungs exist** — but note p23 and p28 are the two that do not need the caveat.
 
+### ⚠⚠ p24 and p26 MEASURED at shipped shape (TASK_092) — and the ranking above was wrong IN KIND
+
+Four cells per pattern in **one harness** — same driver loop, input, decode and
+checksum, so *shape* is the only variable. `ship` = fixed-capacity scratch,
+count from a window-header byte, capacity tested. `probe` = identical everything
+with the work behind a `#[no_mangle] #[inline(never)]` fn on a runtime-length
+slice. **Shipped flags.**
+
+**`p24` — the sign does not flip. IT COLLAPSES TO EXACTLY ZERO.**
+
+```
+input          ship_safe  ship_unsafe    S-U    probe_safe probe_unsafe      S-U
+p24-n016.bin      701.29       701.29  +0.00        852.17       749.52  +102.65
+p24-n128.bin     4635.63      4635.63  +0.00       5906.15      4924.85  +981.30
+p24-n255.bin     8968.51      8968.51  +0.00      11455.80      9513.25 +1942.55
+```
+
+⚠ **`ship_safe` and `ship_unsafe` are BYTE-IDENTICAL** — *"identical by raw
+machine-code bytes: True"*, `md5_fn 3d37ca7b…` both, `n_nopad 133` both, **no
+panic edge in either**. The **probe** shape reproduces the published number
+(+6.42 … +7.62 `Ir`/element against TASK_086's 7.85 and TASK_090's 7.9 ± 0.1).
+Mechanism: the probe's sift is 54 insns with **`jae:6`** safe against 36 with
+`jae:1` unsafe — **five surviving bounds branches per sift**, because `i` is an
+opaque parameter and `n = v.len()` an ABI value, so `v[m]` cannot be discharged.
+✅ **Robust: with the count read as a `u16` (only `n > CAP → REJ` bounds it) the
+two kernels are STILL byte-identical.**
+
+⚠ **So `TASK_090`'s `≈7.9 ± 0.1 Ir/element` is a PROBE-SHAPE number** — it was
+measured with `TASK_086`'s own binary and convention, i.e. the same exposed
+shape.
+
+**⚠⚠ `p26` — the sign holds on four inputs, roughly halves, AND INVERTS ON THE
+FIFTH.**
+
+```
+input                ship_safe ship_unsafe        S-U   probe_safe probe_unsafe       S-U
+p26-np016r016.bin      7570.30     6837.30    +733.00      7659.30      6161.30  +1498.00
+p26-np016r200.bin     24450.30    32837.30   -8387.00     24555.30     23329.30  +1226.00
+p26-np200r020.bin     55794.00    44381.00  +11413.00     56619.00     33025.00 +23594.00
+```
+
+At **run length 200 safe is CHEAPER by 8387 = −2.62 `Ir` per output byte**, where
+the probe shape shows `+1226` on the same input. Mechanism: the two shipped
+spellings reach **different fill strategies** — `ship_safe` 166 insns, one
+`memset@GLIBC` and `xmm` regs (run fill vectorised inline); `ship_unsafe` 116
+insns, **two** `memset@GLIBC`, no vector regs (loop-idiom-recognize turned the
+unchecked writes into a `memset` call). **Neither has a panic edge.**
+⚠ **And p26's probe pair is worse than shape-mismatched — it is NOT THE SAME
+FUNCTION**: `k26_checked` early-returns on capacity, `k26_unchecked` has **no
+capacity test at all**, which is why it read 495454 vs 92942.
+
+⚠⚠ **RE-RANK: `p26` IS THE MORE EXPOSED ROW, NOT `p24`.** p24's answer is a
+clean, robust **`0.00`**; **p26's sign is not a property of the row at all — it
+is a property of the RUN LENGTH**, so **p26 cannot be costed until its input band
+is designed.** The manager ranked p24 HIGH and *"expect the same sign flip"*;
+the flip direction was wrong (it is a collapse to byte-identity) and the ordering
+was wrong.
+
+### ⚠ A control differenced against a shipped cell must use `harness/build.py::rust_flags`
+
+**TASK_092, and it was a blocker-class defect no review caught.**
+`controls/mkvariants.py` omitted **`-C codegen-units=1`**, which `build.py`
+passes to every measured cell — so every number in p46's `NOTES.md` 8b and 0c
+was a **ONE-SIDED flag mismatch**, 1–2 `Ir`/call off. ⚠ **One-sided mismatches do
+NOT cancel; two-sided ones do** — p46's §8a rolled-vs-rolled control applied the
+flag to both sides and was unaffected. **Corrected spans: R4 2, R3 0 — both still
+degenerate, so the conclusion got stronger.**
+
 ## ⚠ A two-parameter law fitted on axis-aligned bands can be UNDERDETERMINED
 
 **PROVISIONAL — TASK_089, on p46, and it is sharper than p38's missing column.**
