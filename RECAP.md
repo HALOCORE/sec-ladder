@@ -8,7 +8,7 @@ this box is reference; this box is what to *do*.
 
 | | |
 |---|---|
-| **Patterns** | **23 exist** (`p19` landed at TASK_087, **UNREVIEWED — `TASK_087_REVIEW` is next**); the other 22 are reviewed, **0 failures tree-wide, 0 STALE**. **22 `PASS` + 1 `PASS-WITH-BLOCKED-ROWS`** — **p01 only**, a real 180 s Miri timeout on `large.bin`. ⚠ **Expect `PASS`. A blocked Miri row is worth INVESTIGATING, not shrugging at** — the old advice here (*"a declared hang blocks a Miri row by design; it is not a defect"*) was itself the defect, fixed at TASK_077; `check_miri` now reads stage 4's **measured** per-rung `hung` column. ⚠ **Count both ends rather than trusting either:** `ls -d patterns/p*/ \| wc -l` and `grep -c '^\| p[0-9]' .memory/06-catalogue.md`. |
+| **Patterns** | **23 exist and all 23 are REVIEWED.** `p19` landed at TASK_087 and was reviewed at TASK_087_REVIEW (**4 majors, 4 minors, 12 clean negatives; headline CONFIRMED and stated harder**). ⚠ **Its corrections are OWED — `TASK_088`**; the other 22 are reviewed, **0 failures tree-wide, 0 STALE**. **22 `PASS` + 1 `PASS-WITH-BLOCKED-ROWS`** — **p01 only**, a real 180 s Miri timeout on `large.bin`. ⚠ **Expect `PASS`. A blocked Miri row is worth INVESTIGATING, not shrugging at** — the old advice here (*"a declared hang blocks a Miri row by design; it is not a defect"*) was itself the defect, fixed at TASK_077; `check_miri` now reads stage 4's **measured** per-rung `hung` column. ⚠ **Count both ends rather than trusting either:** `ls -d patterns/p*/ \| wc -l` and `grep -c '^\| p[0-9]' .memory/06-catalogue.md`. |
 | **Do this next** | ⏳ **`TASK_087` BUILDS `p19` — the protocol state machine, ranked 1 of 11 by `TASK_086` with all four probes passing** (`.tasks/TASK_086_REPORT.md`). **TWO rung boundaries** (R3-vs-R4 *and* inside the safe class — p47's shape), cost a **per-byte slope** (`+5.25 / +4.25 / +0.999` `Ir`/byte), harm `exit 139` SIGSEGV + UBSan, and **not** blocked by `_scan_unsafe_sites`. ⚠ **Its kill risk is that the memory-unsafe framing may be contrived** — settle the bug class as deliverable §0 and **REFUSE if it is p31's shape.** **Then `TASK_088` takes the gate work**, which now unblocks TWO rows: `TASK_084_REVIEW` major 1 (the `#[path]` walk feeds one of three detectors), the sixth route (**used** vstd `assume_specification`s), the `_scan_unsafe_sites` policy that blocks **`p15` AND `p35`**, and the manager's `check.py:NNNN` citations that reached `p01/spec.md`. ✅ **DONE: `TASK_084` (`bce8aa8`, reviewed), `TASK_085`+review (p15 REFUSED), `TASK_086` (the queue), "Owed" 23.** |
 | **`p15` — ⚠⚠ REFUSED, CONDITIONALLY, and the condition is NAMED** | ⚠⚠ **`TASK_085` ran the probes and all three of the row's justifications were measured away in one session** (`.tasks/TASK_085_REPORT.md`, **UNREVIEWED** — read "Owed" 25). ✅ **The named kill-risk is DEAD: a verified UTF-8 validator CLOSES at the pin — `ensures res == valid_utf8(b@)` bidirectional, `5 verified, 0 errors`, ZERO trusted items**, end-to-end call site `8/0`, non-vacuous against an 18.5 M-case oracle and a 10-mutant battery. **That artefact is reusable; do not lose it with the row.** ⚠ **The harm row is REFUTED** — the *"optimiser deleted the `println!`"* cell is `exit 139` **SIGSEGV** with an ASan `heap-buffer-overflow READ`, i.e. an **`index >= len`** — **the would-be THIRTEENTH, since twelve BUILT patterns carry it** (an earlier count here said fourteenth by counting two refused rows); RECAP repeated it without re-running it. ✅ **What DOES survive is p11's result a fourth time:** a verified validator is **dearer than `core::str::from_utf8` at every alphabet — `+57%` on ASCII, `+7%` on all-non-ASCII** (73756 vs 46921 and 87661 vs 81960 marginal `Ir`/call, **whole-program marginal, `-O3`, inline mode `isolated`**). ⚠⚠ **DO NOT QUOTE `15.58×` — this row did, and it is a RESIDUAL ratio dressed as a rung ratio** (TASK_085_REVIEW major 3): both its terms are differences against `ctl_assume`, **which is neither rung**. The residual view is still the mechanism — std validates ASCII at **0.449 `Ir`/byte** against the verified validator's **7.001** — but the number a reader quotes is the rung one. ⚠⚠ **AND THE LIVE QUESTION IS NO LONGER "CAN p15 BE BUILT" BUT "IS `check.py::_scan_unsafe_sites` RIGHT?"** — it forbids **verified** unsafe, so a Verus-discharged `from_utf8_unchecked` would have to be moved *into* the counted TCB behind an unwritable twin. **The manager has not decided it (rule 3), and the probe's evidence is a CODE READ, not an executed gate.** |
 | **Pattern selection** | ⚠⚠ **FOUR ROWS REFUSED IN A ROW — p48, p31, p45, p15 — and the "LADDER TEST" that came out of the first three was RETRACTED AND RESTATED ONE TASK LATER.** ⚠ **`p15` is NOT the same kind and must not be counted as a fourth of a kind:** the other three had a distinguishing justification that was **false a priori**; **p15's three probes all PASSED and its named kill-risk CLOSED** (a verified UTF-8 validator, `5/0`, zero trusted items). It is refused because the justifications were **measured away** and because the shape worth building is the shape **the gate cannot audit** — with a **named unblocking condition**. ⚠ **Do not use the first version** (*"a bug R4 can reintroduce and R3 cannot, and a cost that differs"*): it misclassifies **p08** (satisfies it, shipped) and **p47** (violates it, shipped) **in opposite directions**, and the manager's own defence of it was aimed at the wrong half — p47 passes the cost half at **+90.0/+142.0 `Ir`/call**. **Use the THREE PROBES** in `.memory/06-catalogue.md`: *(1)* a rung boundary must exist **somewhere** and the row must name it — p08's is at compile time, p47's is inside the safe class, p16's is a slope; *(2)* the rungs must differ **as machine code**, checked by extracting each kernel's bytes and `md5`-ing them, **not** by the retracted "two symbols on one section" form, which cannot fire when every rung is its own binary; *(3)* any published `0.00` must name its **axis and `Ir` convention in advance**. ⚠ **The novelty question all three triages DID ask is the less useful one** — p36 shipped the tree's twelfth `index >= len` and was worth building. ⚠⚠ **AND THE AXIS PROGRAMME IS CLOSED — do not open the catalogue's axis table looking for what to build next.** All **seven** rows are resolved: **5 BUILT** (p27, p47, p38, p36, p22) **+ 2 REFUSED WITH MEASUREMENTS** (`p48`, `p31`); **neither refused row may be rescheduled without reading its refusal block.** That table was the argument for axis-first ordering and **the argument is spent** — the catalogue's own two objections to it (*breadth over realistic C patterns*; *the findings are about cost MECHANISMS, which have been much less repetitive*) were never answered and now have nothing standing against them. |
@@ -97,6 +97,41 @@ is written up in `.memory/`.**
    one command and it would have cost two tasks less than the two refusals did.
    ⚠ **Both refusals were still the right OUTCOME** — each left four reusable
    measurements behind — **but the cheaper outcome was not proposing them.**
+
+5. ⚠⚠ **BEFORE CLAIMING A QUESTION IS OPEN, CHECK WHETHER `.memory/` ALREADY
+   CLOSED IT. THE MANAGER DID NOT, AND IT COST A COMMITTED FALSE FINDING.**
+   (TASK_087_REVIEW major 4.) Verifying an engineer's note, the manager
+   committed *"p19 is the ONLY pattern that calls a vstd exec trusted function
+   from its kernel, so 'Owed' 0's sixth route is no longer hypothetical."*
+   **Refuted three ways, and each way is a different manager failure:**
+
+   - **The grep was a WHITELIST of four slice-shaped names**, so it could only
+     find slice-shaped calls. Enumerating all **187** exec `external_body` fns in
+     the pinned vstd finds **p27 calling `ptr_mut_write` and `ptr_ref` from its
+     kernel** — and **p27's own source says so in a comment.** ⚠ **A grep that
+     can only find what you already thought of is not a census.**
+   - ⚠⚠ **THE FRAMING RE-OPENED A DECISION THE AUTHORITATIVE LAYER HAD ALREADY
+     CLOSED.** `.memory/04-verus.md` decided at **TASK_055_REVIEW**: one number =
+     project-local trusted items, prose beside it, and a second *"vstd relied
+     upon"* column **refuted with a 402-site census** and *"must not be
+     reinstated"*. ⚠ **It named this exact case IN ADVANCE** — *"A pattern built
+     on `vstd::raw_ptr` … **Decide how such a pattern is counted BEFORE building
+     one.**"* **p27 is that pattern and it was built.** The manager wrote a
+     "finding" that the layer it calls authoritative had already disposed of, in
+     a section about the very column in question.
+   - **It was not even the route it named.** The sixth route is about **used
+     `assume_specification`s** reaching `check_miri`'s *"no trusted item ⇒ Miri
+     not required"* branch. `slice_subrange` is `external_body`, and p19 has
+     three local trusted items with `miri.required: true`, so **it never reaches
+     that branch** — while the **literal** sixth route has been live in **22 of
+     23 patterns all along** via `bytes.len()` and `bytes.as_slice()`.
+
+   ✅ **RULE 9 CONTAINED IT.** The claim was written into a report marked
+   UNREVIEWED and into the review task that asked for it to be attacked; **it
+   never reached `.memory/` or this file's body, and nothing published moved.**
+   **That is the process working, and it is the reason the rule exists.**
+   ⚠ **The cheap check the manager skipped is one `grep` of `.memory/` for the
+   column's own name.**
 
 ---
 

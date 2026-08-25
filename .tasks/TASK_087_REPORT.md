@@ -184,13 +184,37 @@ pattern** and is **not cited**; NOTES §2 says so.
   item and is NOT in the TCB tally.** Measured: **p19 is the only pattern in the
   tree that calls a vstd *exec* trusted function from its kernel** — every other
   hit is a broadcast axiom group or a ghost `spec_slice_len`. ✅
-  **MANAGER-VERIFIED both halves**: `grep -l slice_subrange patterns/*/verus.rs`
-  returns **p19 alone**, `vstd/slice.rs:107-108` is
-  `#[verifier::external_body] pub exec fn slice_subrange`, and p19's gate record
-  shows `tcb_items ['buf_get_unchecked','load_input','emit']` — **three, none of
-  them vstd's.** ⚠ **So RECAP "Owed" 0's sixth route is no longer hypothetical:
-  a published TCB of 3 omits a trusted exec body this kernel actually calls.**
-  It does not settle what the column *should* say.
+  ⚠⚠ **THIS PARAGRAPH'S CLAIM WAS THE MANAGER'S AND IT IS REFUTED THREE WAYS
+  (TASK_087_REVIEW major 4). It never reached `.memory/` or `RECAP.md` — rule 9
+  held it here.**
+
+  ~~MANAGER-VERIFIED both halves: `grep -l slice_subrange patterns/*/verus.rs`
+  returns p19 alone … So RECAP "Owed" 0's sixth route is no longer
+  hypothetical.~~
+
+  **(1) The grep was a WHITELIST of four slice-shaped names**, so it could only
+  find slice-shaped calls. Enumerating all **187** exec `external_body` fns in
+  the pinned vstd finds **p27 calling `ptr_mut_write` and `ptr_ref`** from its
+  kernel — ✅ **manager-re-verified**: `vstd/raw_ptr.rs:578` and `:619` are both
+  `#[verifier::external_body]`, p27's `verus.rs:586`/`:620` call them, its own
+  comment says so at `:564`, and its published TCB is **7, none of them vstd's**.
+  **p19 is the SECOND such pattern, not the first.**
+  **(2) The FRAMING re-opened a decision the authoritative layer had already
+  closed.** `.memory/04-verus.md` decided at **TASK_055_REVIEW**: one number =
+  project-local trusted items, prose beside it, and a second *"vstd relied
+  upon"* column **refuted with a 402-site census** and *"must not be
+  reinstated"*. ⚠ **It named this exact case IN ADVANCE** — *"A pattern built on
+  `vstd::raw_ptr` … Decide how such a pattern is counted BEFORE building one."*
+  **p27 is that pattern and it was built.**
+  **(3) It is NOT the sixth route.** That route is about used
+  `assume_specification`s reaching `check_miri`'s *"no trusted item ⇒ Miri not
+  required"* branch; `slice_subrange` is `external_body`, and p19 has three local
+  trusted items with `miri.required: true`, so it never reaches it. **The literal
+  sixth route has been live in 22 of 23 patterns all along** via `bytes.len()`
+  and `bytes.as_slice()`.
+
+  ✅ **Under the decided accounting p19's `tcb_items` stays 3, and p19 already
+  does the required prose.** **Nothing published moves.**
 - **The sweep band's laws are not re-fitted from the committed blobs.**
   `R2−R4 = 6.25·m − 8` and `R3−R4 = 1.00·m − 2` come from the probe at 5 lengths
   (zero residual); the band **ships** (19 lengths, all residues mod 4 and mod 8)
