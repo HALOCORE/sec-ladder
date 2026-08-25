@@ -2157,10 +2157,32 @@ and it governs four unbuilt rows:
 | **p26** RLE | **HIGH** | `out[o]` already guarded one line above, and `k26_checked` 247 B vs `k26_unchecked` 221 B is nearly free already |
 | **p35** union | MEDIUM | `tags[k]` needs `tags.len() >= vals.len()`; in a one-window shipped kernel both come from one header. (p35's headline is punning, not bounds cost.) |
 | **p23** partition | **LOW — and it is the ROBUST one** | `while v[i] < pivot { i += 1 }` has **no upper guard**: the bounds check **IS** the termination bound and cannot be deleted |
-| **p28** DLL | **not exposed** | it is **not in `cost.rs` at all**, and its probe validated `Ir` against static loop-body counts to three decimals |
+| **p28** DLL | **not exposed — UPHELD, but read the note below** | it is **not in `cost.rs` at all**, and its probe validated `Ir` against static loop-body counts to three decimals |
 
 **Treat every unbuilt row's probe cost as a DIRECTION-UNKNOWN prior until its
 rungs exist** — but note p23 and p28 are the two that do not need the caveat.
+
+⚠⚠ **A RUNG-PAIR CHANGE IS NOT A PROBE-SHAPE DEFECT, AND CONFLATING THEM WAS
+ALMOST THIS FILE'S FOURTH WRONG ENTRY.** (TASK_093 claimed it; TASK_093_REVIEW
+refuted it as a **category error**; manager-verified by reading the probe
+source.) TASK_093 reported that `p28`'s probe *"reports the wrong SIGN"* —
+`+12.50` against a true `−296.00` — and proposed it as a **third** probe-shape
+mechanism beside p46's lost range facts and p26's length dependence.
+
+**It is not one.** `.temp/t91/p28probe.rs`'s `k28_checked` and `k28_rawptr`
+**both** run over a pre-built arena: there is **no `alloc`/`dealloc` in any
+TASK_091 kernel**, so the allocator is absent from **both** sides. TASK_093's
+`−296.00` put a per-node `malloc` on **one** side only. That is a **different
+pair of rungs**, not the same rungs measured through a different harness.
+
+> **Probe shape = SAME rungs, DIFFERENT harness. Different rungs = a design
+> choice, and it is argued, not measured away.**
+
+**Measured like-for-like** — free present in *both* rungs, TASK_093's own kernel
+— the tax is **`+24.00`, R3 dearer: the SAME SIGN as the probe's `+12.50`.**
+✅ **So the p28 entry above stands, and there is no third mechanism.** ⚠ **The
+two that ARE established remain p46's (signature ⇒ lost range facts) and p26's
+(input band ⇒ length dependence).**
 
 ### ⚠⚠ p24 and p26 MEASURED at shipped shape (TASK_092) — and the ranking above was wrong IN KIND
 
@@ -2258,3 +2280,45 @@ stales the MEASUREMENT record.** There is no comment-only escape. Measured cost
 for one pattern: `measure.py p19` = **1 m 17 s**, moving `min_s` / `median_s` /
 `spread_pct` across 32 cells plus timestamps and source hashes — **zero `Ir`,
 zero static/md5, zero checksum, zero identity.**
+
+---
+
+### ⚠⚠ `malloc_consolidate` fires at a 64 KiB freed chunk and taxes a WHOLE BAND
+
+**TASK_093_REVIEW major 2, reviewed.** A probe's own *bookkeeping* container can
+add a step to every `Ir`/element figure in a band, and it looks exactly like a
+property of the rung.
+
+`box_arena` read `408.078 Ir`/node on the 2048→4096 band and **`472.050`** on
+4096→8192 — a clean `+64`/node that TASK_093 reported as unexplained and
+suspected was p26's length dependence. **It is neither.** It is **not** `Vec`
+growth doubling: the probe uses `with_capacity(n)` and never reallocates. The
+kernel symbol itself is **exactly `99.0 Ir`/node at every `n`**.
+
+`callgrind_annotate` finds a libc symbol carrying **262,010 `Ir` present only at
+n=8192** and absent at 2048/4096; `262010/4096 = 63.97`, i.e. the entire step.
+Its body is the `xchg %rbx,0(%r13)` / `add $0x8,%r13` fastbin-array sweep —
+glibc **`malloc_consolidate`**. The decisive control is one node wide:
+
+```
+n=8188 vec_bytes=65504 Ir=3659465
+n=8189 vec_bytes=65512 Ir=3659903
+n=8190 vec_bytes=65520 Ir=3922410   <- +262,507 Ir for ONE more node
+n=8191 vec_bytes=65528 Ir=3922880
+n=8192 vec_bytes=65536 Ir=3923290
+```
+
+`free()` of the `Vec` backing store crosses **`FASTBIN_CONSOLIDATION_THRESHOLD`
+(a 65536-byte chunk)** between 8189 and 8190. Below it the rung is flat:
+`(3659903 − 1989775)/4093 = 408.045` against `408.078`.
+
+⚠ **The rule: any `Ir` sweep whose band crosses a 64 KiB freed allocation picks
+up a one-off ~262k `Ir` that a per-element figure smears across the whole band.**
+Sibling traps already recorded here: **`rep movsb` at 8192 bytes** (callgrind
+charges ≈1 `Ir` per byte moved) and **`__x86_rep_stosb_threshold` at 2048**
+(`Ir` rises 6.5× exactly where the real cost falls).
+
+✅ **The consequence for p28 was real:** *"`box_arena`'s +68.00 advantage over
+`rc` collapses to +4.02 one band over"* is **false** — it is a stable `+68.00`,
+and *"p28 could not be costed until its input band was designed"* does not
+follow.

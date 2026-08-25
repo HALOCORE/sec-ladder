@@ -2574,3 +2574,90 @@ was bisected. **Do not explain it; cite it.**
 ⚠ **The consequence that matters: this is one of the two things that disqualify
 `r4_mutreslice` as a rung** — the other being two new trusted items — **and
 NEITHER is a specification gap**, which is what p46 originally claimed.
+
+---
+
+## ⚠⚠ SAFE RUST'S TEMPORAL GUARANTEE IS A GUARANTEE ABOUT THE **ALLOCATOR**
+
+**TASK_093 + TASK_093_REVIEW, reviewed. ✅ Manager-verified — every program
+below rebuilt and re-run independently, and the Miri counts re-taken with the
+mode argument actually passed.** This is the rule that decides every remaining
+pointer-backed row, and it replaces a wrong sentence that nearly reached this
+file.
+
+> **Safe Rust's temporal guarantee is a guarantee about the ALLOCATOR. A
+> structure that RECYCLES ITS OWN STORAGE gets no guarantee at all.**
+
+**Four outcomes, not two.** A safe rung for a pointer-backed structure lands in
+exactly one of these, and *which one* decides whether the row is worth building:
+
+1. **It never frees per node.** The temporal class is then **structurally
+   absent** from the safe rung. Measured on p28's index arena: *"heap blocks
+   released by unlink = 0"*, `len 5→5`, `cap 8→8`.
+2. **It frees per node, and catches the bug by p27's RUNTIME mechanism** — a
+   discriminant or refcount test, *"the free and the invalidation are one
+   operation in safe Rust and two in C, and the bug is the third — the ASKING —
+   going missing"*. Both `Vec<Option<Box<_>>>` and `Rc`/`Weak` do this.
+   `rcdll` measured: `bwd=32127` = the backward walk truncating at `upgrade() ->
+   None`.
+3. ⚠⚠ **THE TYPE SYSTEM IS SILENT.** A slot free list recycles storage the
+   program owns throughout, so nothing is freed and **there is nothing for the
+   guarantee to attach to.** Under `#![forbid(unsafe_code)]`, zero `unsafe`
+   tokens, ✅ **manager-re-run:**
+
+   ```
+   uar  read-through-stale-index val=9999 (expected 1002, the recycled node's)
+   df   x=2 y=2 ALIASED=true x.val=8888 y.val=8888
+   miri a_freelist  ok:0  uar:0  df:0     <- ZERO UB in all three modes
+   ```
+
+   **Use-after-recycle and slot double-free are both writable in safe Rust,
+   silently wrong, and Miri-clean.** That is **p04's** finding (*"stays in
+   bounds, invisible to a memory-safety proof"*), not p27's.
+   ⚠ **A generation tag does NOT rescue it** — the bump is a hand-written second
+   store, exactly the one C omits: `gbug get(stale) = Some(val=7777) <- NOT
+   CAUGHT`, `forbid(unsafe_code)`, Miri-clean. ⚠⚠ **So `RECAP.md`'s p14-cycle
+   `(slot, gen)` proposal yields a p04-shaped row, NOT a temporal one.**
+4. **The safe rung is WORSE than C.** `Rc` in both directions is a cycle and
+   leaks; `Weak` for `prev` does not. ✅ Manager-re-run: **`miri cycle` → 5
+   `memory leaked` lines, `miri weak` → 0**, same checksum both.
+
+### ⚠⚠ The sentence this REPLACES was false, and it is p31's failure mode
+
+TASK_093 offered *"Safe Rust has no owned intrusive DLL (`E0382` + `E0499`), so
+any linked pattern's safe rung is an arena that never frees, or p27's
+representation."* **It was one compile of one program, and it does not hold.**
+
+- **`E0382` was a plain double move in the probe** — reproduced with a control
+  containing no data structure at all (`take(s); take(s);`).
+- **`E0499` is NOT a barrier to a safe `O(1)` unlink.** ✅ **Manager-re-run,
+  all `#![forbid(unsafe_code)]`, 0 bare `unsafe` tokens, rustc 1.97.1:**
+
+  ```
+  s1 sequential-&mut      fwd=30785058 bwd=30906078
+  s2 split_at_mut         fwd=30785058  (two &mut alive SIMULTANEOUSLY)
+  s3 Box + REAL free      fwd=30785058 bwd=30906078 live_slots=4
+  a_cell_arena            fully intrusive, Cell<Option<&'a Node>>, O(1) unlink
+  ```
+- **And the claim was self-contradicted by its own table two rows below it** —
+  which lists `Rc<RefCell<Node>>` + `Weak` as *"frees: yes"*, i.e. an intrusive
+  DLL with owned nodes in safe Rust.
+
+⚠ **Right verdict, wrong reason — `p31`'s failure mode exactly**, and rule 9 is
+the only thing that kept it out of this file. **A refusal's REASON is what gets
+reused on the next row; it needs the same scrutiny as a finding.**
+
+### What this rules on
+
+- **p28** — refused. Both its safe spellings that free land in outcome 2.
+- **p32 / p33** — outcome 3. The class is p04's and the harm framing is p48's,
+  which is refused. ⚠ **PROVISIONAL corroboration (TASK_094, unreviewed): probe 1
+  kills them independently** — the bug compiles identically at C, safe naive,
+  safe tuned and unsafe, i.e. **no boundary anywhere, which is p31's death.**
+- **p34** — outcome 4. The leak is real and belongs to a leak-shaped row; see
+  `.memory/00-environment.md` for why the C side has no detector for it here.
+- ⚠ **p29 is CONSISTENT with the rule, not a counterexample** — a BST does not
+  recycle, it frees, so the guarantee attaches. **PROVISIONAL (TASK_094,
+  unreviewed): `allocs=2001 frees=2000`, `remove_leaf` releases one 24-byte
+  block, and the mechanism is `E0502` at COMPILE TIME rather than p27's runtime
+  ask.** That is a fifth outcome and the only good one found so far.

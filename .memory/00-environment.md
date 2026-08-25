@@ -389,3 +389,73 @@ compiler flag produced, and it is available on any data-dependent kernel.
    p08 ~33 MB) are gitignored and equally regenerable, but they live outside
    `.temp/` where `rm` stalls on human review. They are the manager's call, not
    an agent's.
+
+---
+
+## ⚠⚠ HAND-RUN ASan IS BLIND ON THIS BOX — and it fails SILENTLY to the exit code
+
+✅ **MANAGER-VERIFIED independently** (`.temp/mgr93/uaf.c` carries its own rebuild
+line), and confirmed a third time by TASK_094's detector matrix.
+
+This shell inherits **`LD_PRELOAD=/usr/libexec/coreutils/libstdbuf.so`**, and a
+**dynamically** linked ASan binary refuses to start behind it:
+
+```
+with LD_PRELOAD   : exit 1,  grep -c AddressSanitizer -> 0
+                    prints only "==N==ASan runtime does not come first in
+                    initial library list"
+env -u LD_PRELOAD : exit 1,  grep -c AddressSanitizer -> 2, full report
+```
+
+⚠⚠ **BOTH CONFIGURATIONS EXIT 1**, so an exit-code check cannot tell them apart,
+**and the diagnostic says `"ASan"` while every probe in this tree greps
+`"AddressSanitizer"`.** TASK_093 lost a full round of detector runs to it and
+read the result as *"nothing fires"*.
+
+**Use `env -u LD_PRELOAD` for every hand-run ASan binary.**
+
+✅ **`harness/check.py` is NOT affected** — stage 7 passes `-static-libasan
+-static-libubsan`, so the runtime is inside the binary. **This bites hand-run
+probes only.** ✅ **UBSan-only is unaffected**: gcc + shared `libubsan.so.1` with
+`LD_PRELOAD` set still prints `runtime error:`. ✅ **clang is immune** — it links
+the ASan runtime statically by default, which is why
+`patterns/p12-strcat-fixed/controls/threshold_probe.py` is safe (measured: `ldd`
+shows no `libasan`). **The exposure is gcc-plus-shared-ASan.**
+
+⚠ **One tracked-tree residual, re-derivability only:** `.temp/p36/run_c_probe.sh`
+builds gcc + shared ASan with no `env -u`. The output
+`patterns/p36-vtable-dispatch/NOTES.md` quotes **does** contain the ASan report,
+so nothing published is wrong — but re-running that script today yields a silent
+false negative.
+
+⚠ **Same class as TASK_086's `head -4`**, which hid ASan's banner for four
+catalogue rows: **a detector that is not running looks exactly like a detector
+that found nothing.** Always give a harm probe a **positive control that must
+fire**, and `grep` the log — never `head` it.
+
+## ⚠⚠ THERE IS NO WORKING LEAK DETECTOR FOR THE C RUNGS ON THIS BOX
+
+**TASK_093_REVIEW, reviewed.** This closes a question any leak-shaped row
+(`p34`, `p42`) must answer before it is scheduled.
+
+- **LeakSanitizer IS live** under the gate's own flags — `-O0 -static-libasan`
+  gives `ERROR: LeakSanitizer: detected memory leaks`, exit 1, and
+  `check.py`'s `"ERROR:" in se` would catch it.
+- ⚠⚠ **But it is `-O`-DEPENDENT on a leaked linked list**, at the gate's exact
+  stage-7 flags:
+
+  ```
+  -O0  leak=1 -> exit=1  reports=1
+  -O1  leak=1 -> exit=0  reports=0
+  -O2  leak=1 -> exit=0  reports=0
+  ```
+
+  `__lsan_do_recoverable_leak_check()` also returns 0 at `-O1` — stale
+  register/stack reachability keeps the block "live".
+  ⚠⚠ **AND THE GATE BUILDS STAGE 7 AT `-O1`.**
+- **valgrind memcheck CANNOT RUN HERE AT ALL** — `Cannot continue`, it needs
+  `libc6-dbg`, which needs root. **callgrind is fine**; it is memcheck
+  specifically.
+
+**So on the C side there is no leak detector at the gate's configuration.
+Miri is the only working one, and it covers the Rust rungs only.**
