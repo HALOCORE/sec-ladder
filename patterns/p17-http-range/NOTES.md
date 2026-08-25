@@ -341,9 +341,9 @@ harness constraint rather than a choice:
   add an axis to `harness/build.py` instead."* `harness/build.py`'s
   `CONTROL_CELLS` / `RUST_SRC` / `ALL_CELLS` are closed lists used as argparse
   `choices`, so a new control cell is a harness change;
-- **`check_verus_contract`** (`harness/check.py:2770`) requires every `.rs` in the pattern directory that
+- **`check.py::check_verus_contract`** requires every `.rs` in the pattern directory that
   opens a `verus!` block to be pinned in `spec.md`'s `verus.obligations`, and
-  the same function at `:2880` fails the gate for any pinned file Verus reports errors
+  the same function fails the gate for any pinned file Verus reports errors
   on. The mutant as such is `9 verified, 1 errors`, so pinning it turns the gate
   **red**;
 - the only 0-error form with the guard swapped and nothing else touched is the

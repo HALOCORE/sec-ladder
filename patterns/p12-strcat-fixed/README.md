@@ -45,7 +45,7 @@ kernel:  for each declared string
 ## What it cannot do, and why that is a result
 
 `harness/check.py` requires every cell *including R1* to agree with `model.py` on
-every non-adversarial **matrix** input — **`inputs_of`** (`check.py:495`) and `measure.py:64` both
+every non-adversarial **matrix** input — **`check.py::inputs_of`** and `measure.py:64` both
 drop `sweep-*`, so a sweep band is never checksum-checked. R1 omits the capacity
 check, and p12 folds `dst[0..dlen]` **and** `dlen`, so any window where the check
 fires makes R1 fold different bytes *and* a different length. **p12 therefore has

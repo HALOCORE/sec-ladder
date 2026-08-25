@@ -1093,7 +1093,7 @@ replaced. See §11a for what the row prints now.
 
 ### 11b-ii. ⚠ HARNESS FINDING, NOW FIXED (TASK_077/078) — `_confirm_hang` confirmed the cell least at risk, and the strengthening TASK_070 PROPOSED FOR IT IS REFUTED
 
-`harness/check.py:3081` picks `sorted(hung_cells)[0]` and the labels are
+`check.py::_confirm_hang` picks `sorted(hung_cells)[0]` and the labels are
 `f"{c} {o}/{m}"`, so on p22 the confirmed cell is **`c-clang O0/isolated`**:
 
 ```

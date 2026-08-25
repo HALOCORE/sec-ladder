@@ -16,7 +16,7 @@ Three things the naive regex got wrong and this does not:
     attribute can never be stolen from the previous item.
   * **Comments and string literals are blanked before anything is searched.**
     `// calls kernel(...)` used to satisfy the "there is a verified call site"
-    check all by itself (`check.py:411`).
+    check all by itself (`check.py::check_call_site`).
   * **`external_body` is matched wherever it appears in an attribute**, so
     `#[cfg_attr(all(), verifier::external_body)]` counts. The previous regex
     only matched a bare `#[verifier::external_body]`.
@@ -237,7 +237,9 @@ def verus_span(text, code=None):
     """(start, end) of the body of the outermost `verus! { ... }`, by brace
     matching. The previous version located the end with a literal
     `^}\\s*//\\s*verus!` comment, so deleting the comment moved every item
-    'outside' the block (`check.py:511`)."""
+    'outside' the block. That end-finder lived in `check.py` before this module
+    existed; it has no line to cite today, and the convention is the function
+    name and no line number (`.memory/02-bench-rules.md`)."""
     code = code if code is not None else blank_noncode(text)
     m = re.search(r"\bverus!\s*[{(\[]", code)
     if not m:

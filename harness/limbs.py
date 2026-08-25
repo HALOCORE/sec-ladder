@@ -16,20 +16,30 @@ nothing. That coupling is deliberate: this file RE-DERIVES `check.py`'s own pin
 comparison, so if `check.py`'s comparison moves and this does not, every
 sentence citing it silently becomes wrong. The staleness is the alarm.
 
-The eight limbs a `verus.rs` edit can trip, each named with the `check.py` code
-it re-derives (line numbers as of TASK_056):
+The eight limbs a `verus.rs` edit can trip, each named with the `check.py`
+FUNCTION it re-derives. ⚠ **This table carried `check.py:<line>` ranges
+"as of TASK_056" until TASK_096, and every one of them had rotted** -- the
+range that opened it now lands inside `check_build`, not inside the pin
+comparison it names. `.memory/02-bench-rules.md`'s convention is the FUNCTION
+NAME and NO LINE NUMBER AT ALL; the "line as a hint" compromise was tried at
+TASK_066 and retracted at TASK_071 after every hint rotted inside one session.
 
-  5a-items   item set added/removed vs `verus.items`      check.py:2253-2257
-  5a-clause  per-item external/requires/ensures vs the pin      :2258-2277
-  5a-obl     shipped-config `N verified` vs `verus.obligations` :2333-2346
-  5a-verify  shipped-config errors > 0                          :2337-2338
+  5a-items   item set added/removed vs `verus.items`
+                                          check.py::check_verus_contract
+  5a-clause  per-item external/requires/ensures vs the pin
+                                          check.py::check_verus_contract
+  5a-obl     shipped-config `N verified` vs `verus.obligations`
+                                          check.py::check_verus_contract
+  5a-verify  shipped-config errors > 0    check.py::check_verus_contract
   5ct-sig    5c-twin LIMB (i): twin signature == the trusted item's
-                                                                :3494-3506
+                                          check.py::check_trusted_twins
   5ct-cfg    twin `#[cfg(slb_twin)]` / in_verus / external / banned-word
-             hygiene (`_check_twin_cfg_hygiene`)                :3152, :3507-3516
-  5ct-run    5c-twin LIMB (ii): `--cfg slb_twin` errors > 0     :3530-3545
+             hygiene                      check.py::_check_twin_cfg_hygiene
+                                          and check.py::check_trusted_twins
+  5ct-run    5c-twin LIMB (ii): `--cfg slb_twin` errors > 0
+                                          check.py::check_trusted_twins
   5ct-obl    `--cfg slb_twin` `N verified` vs `verus.twin_obligations`
-                                                                :3560-3590
+                                          check.py::check_trusted_twins
 
 **What it is FOR, and the rule it exists to make checkable.** TASK_054 measured
 that every pattern's `spec.md` pins the clause text of the verified TWIN in

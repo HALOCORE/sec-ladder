@@ -62,7 +62,7 @@ for b in c_mask-gcc c_mask-clang c_ncap-gcc c_reject-gcc t_wshl-O3 t_cshl-O3 u_u
   done
 done
 echo
-echo "  c_mask under the GATE'S OWN ASan+UBSan flags (check.py:4390):"
+echo "  c_mask under the GATE'S OWN ASan+UBSan flags (check.py::check_sanitizers):"
 if [ ! -x "$BIN/c_mask-asan" ]; then
   /usr/bin/gcc -std=c99 -Wall -Wextra -O1 -g -fsanitize=address,undefined \
     -static-libasan -static-libubsan -DSLB_ISOLATED \

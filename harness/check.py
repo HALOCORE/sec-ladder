@@ -2487,9 +2487,10 @@ def _callgrind_total(binary, arg, outfile):
     both runs of a difference -- so a *constant* start-up cost is removed. But a
     kernel that `memset`s a stack array pays an alignment-dependent cost **per
     call**, and that term scales with the call count and therefore survives the
-    subtraction. Measured across three patterns at **7 Ir/call** (p03, p04,
-    p38); see `check_marginal_ir`'s docstring for the size, the bistability and
-    the rule."""
+    subtraction. Measured across **four** patterns at **7 Ir/call** (p03, p04,
+    p38, and p46 at TASK_092, which `memset`s TWO stack arrays per call and so
+    moves by `-14 = 2 x 7`); see `check_marginal_ir`'s docstring for the size,
+    the bistability and the rule."""
     try:
         r = subprocess.run([VALGRIND, "--tool=callgrind",
                             f"--callgrind-out-file={outfile}", binary, arg],
@@ -2551,34 +2552,52 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
     SMALL CASE. Read the next paragraph before quoting `±0.20` at another
     pattern** (TASK_077_REVIEW m8). This docstring used to close *"it is bounded
     and small, and it threatens no published number"*, on the strength of p08's
-    `R1h - R1 = 0.00` in 12 configurations. The tree now has **three patterns at
-    ±7 Ir/call**, 35x that bound:
+    `R1h - R1 = 0.00` in 12 configurations. The tree now has **FOUR patterns at
+    ±7 Ir/call** (p03, p04, p38 and -- since TASK_092 -- p46), 35x that bound.
+    This line said *three* until TASK_096:
 
-      * **The term is `whole`-mode only.** TASK_077 moved 97 gate marginals
-        without touching p03's or p04's files at all: 40 `isolated` keys moved
-        by at most **0.14** (inside the p08 band above), 57 `whole` keys moved
-        by up to **7.14**. `isolated` is not merely small, it is **exactly
-        invariant** -- p04 `safe_naive O3 isolated large` read 28342.00 at all
-        seven environment sizes probed.
+      * ⚠ **The mode rule is `-O3 isolated` is invariant -- NOT "the term is
+        `whole`-mode only", which is what this bullet said until TASK_096 and
+        which p46 refutes** (RECAP "Owed" 30, measured at TASK_092). TASK_077
+        moved 97 gate marginals without touching p03's or p04's files at all:
+        40 `isolated` keys moved by at most **0.14** (inside the p08 band
+        above), 57 `whole` keys moved by up to **7.14**, and p04
+        `safe_naive O3 isolated large` read 28342.00 at all seven environment
+        sizes probed. **That evidence is all `-O3`.** Two consecutive
+        `check.py p46` runs on an identical tree move cells at `-O0` in BOTH
+        modes -- **five `-O0 isolated` cells among them** -- so the surviving
+        rule is the one the evidence actually supports:
+
+              -O3 isolated  invariant (0.00 across every probe to date)
+              -O3 whole     moves by 7 per per-call stack `memset`
+              -O0           moves in BOTH modes
+
+        ⚠ **And the pattern count in the paragraph above is FOUR, not three:
+        p46 is the fourth** (p03, p04, p38, p46) and it `memset`s **two** stack
+        arrays per call, so its `unsafe`/`verus` `O3 whole` cells move by
+        exactly `-14 = 2 x 7` rather than by 7. **A pattern's step is
+        `7 x (per-call stack arrays)`, not a flat 7.**
       * **It is BISTABLE, not scattered.** p08's ±0.10 really is scatter over
         the pad LENGTH; the ±7 is not. Pad lengths 1, 7, 8, 40, 200 and 700 all
         give one value and pad 0 gives the other -- the discriminator is the
         **presence** of a single environment variable, not its size
         (TASK_077_REVIEW A2 #32). So two gate runs from shells differing by one
         variable disagree by exactly 7 Ir/call, forever, on an unchanged tree.
-      * **The mechanism is a stack array, not a heap one.** p03, p04 and p38 all
-        `memset` a stack scratch buffer per call; the environment block shifts
-        the initial stack pointer, which shifts that array's alignment, which
-        picks a different tail in `__memset_avx2_unaligned_erms` --
+      * **The mechanism is a stack array, not a heap one.** p03, p04, p38 and
+        p46 all `memset` a stack scratch buffer per call; the environment block
+        shifts the initial stack pointer, which shifts that array's alignment,
+        which picks a different tail in `__memset_avx2_unaligned_erms` --
         `patterns/p03-bounded-stack/NOTES.md` 3b names the same 7 Ir. p08's work
         is a heap `memmove`, which is why p08 moves in hundredths.
 
     Three consequences. Quote marginals **to the instruction, never to the
     hundredth**, across sessions. **Never quote a `whole`-mode marginal across
-    sessions at all** -- quote the `isolated` one, which is what
-    `synthesis/synthesize.py::marginal` already defaults to. And if p08's 12
-    cells move by a few hundredths, or p03/p04/p38's `whole` cells move by
-    exactly 7, between gate runs, that is this effect and not a code change.
+    sessions at all** -- quote the `-O3 isolated` one, which is what
+    `synthesis/synthesize.py::marginal` already defaults to, and which is the
+    only cell class no probe has moved. And if p08's 12 cells move by a few
+    hundredths, or p03/p04/p38/p46's `whole` cells move by exactly 7 (14 for
+    p46), or any `-O0` cell moves in either mode, between gate runs, that is
+    this effect and not a code change.
 
     **The floor is derived, not declared** (TASK_005 A1). `spec.md` used to pin
     an absolute `min_marginal_ir_per_call`, which is a number the pattern author
@@ -6739,13 +6758,66 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names,
     out["required_because"] = why_required
 
     if not why_required:
+        # ⚠⚠ THE SENTENCE THIS BRANCH USED TO PRINT WAS TOO STRONG, AND IT WAS
+        # MADE TO PRINT (`TASK_084_REVIEW` major 3, route G; narrowed here at
+        # TASK_096). It read:
+        #
+        #     "... this pattern has NO trusted item and NO hand-written axiom,
+        #      so there is no trusted `ensures` whose incompleteness Miri would
+        #      have to backstop -- Miri not required."
+        #
+        # Both counts above are PATTERN-LOCAL. `_trusted_items` keys on
+        # `#[verifier::external_body]` in this pattern's own (and
+        # `#[path]`-included) sources, and `_axiom_items` matches
+        # DECLARATIONS. **A proof that merely CALLS a vstd
+        # `assume_specification` declares nothing**, so both are 0 and the old
+        # sentence's second clause -- "there is no trusted `ensures`" -- is
+        # false of it. The pinned vstd's
+        # `assume_specification[str::from_utf8_unchecked] requires
+        # valid_utf8(v@) ensures res.spec_bytes() =~= v@` is verbatim the
+        # `ensures` a local wrapper would write, and
+        # `std_specs/slice.rs`'s `assume_specification<T>[ <usize as
+        # SliceIndex<[T]>>::index ]` is what licenses every `v[i]` in every
+        # verified body in this tree. That is RECAP "Owed" 0's SIXTH ROUTE.
+        #
+        # Two things are NOT changed here, deliberately:
+        #
+        #   * **it is still not a failure.** The policy is a derived one and
+        #     the honest derivation says only that no *pattern-local* trusted
+        #     `ensures` exists. Failing here would hard-fail a legitimate
+        #     zero-trusted-item pattern with no route out, which is the shape
+        #     `MAX_TWIN_JUSTIFICATIONS` was deleted for.
+        #   * **`_axiom_items` is not widened to "vstd specs used".** That was
+        #     refuted by census: the pinned vstd holds 402 `assume_specification`
+        #     sites, "relied upon" is undecidable from the text (Verus inserts
+        #     coercions that never appear in source), and every rung depends on
+        #     the same vstd core (`.memory/04-verus.md`, TASK_055_REVIEW -- the
+        #     second column "must not be reinstated").
+        #
+        # What changes is that the sentence now says what it can support and
+        # SHOUTS the residual, so the branch cannot be read as a clean bill of
+        # health. Zero patterns reach it today: all 24 gate records carry
+        # `n_trusted >= 1` (censused at TASK_096), so this moves no verdict.
         rep.ok(f"R4/R5 ({pair}) are the same machine code at O3 (identity "
-               f"{level!r} >= 'norel') and this pattern has NO trusted item and "
-               f"NO hand-written axiom, so "
-               f"there is no trusted `ensures` whose incompleteness Miri would "
-               f"have to backstop -- Miri not required. spec.md: "
+               f"{level!r} >= 'norel') and this pattern declares NO "
+               f"PATTERN-LOCAL trusted item and NO PATTERN-LOCAL hand-written "
+               f"axiom, so there is no trusted `ensures` OF THIS PATTERN'S OWN "
+               f"whose incompleteness Miri would have to backstop -- Miri not "
+               f"required by the derived policy. spec.md: "
                f"{cfg.get('reason', '(no reason given)')}")
-        out.update(required=False, ran=False)
+        rep.shout("miri",
+                  f"...and that `ok` is a claim about PATTERN-LOCAL "
+                  f"declarations ONLY. A proof that merely CALLS a vstd "
+                  f"`assume_specification` declares nothing, so it counts 0 "
+                  f"here while its executed call rests entirely on an upstream "
+                  f"`ensures` -- RECAP \"Owed\" 0's sixth route. Set "
+                  f"`miri.required: true` in spec.md for any pattern whose "
+                  f"kernel reaches memory through a vstd-specified operation "
+                  f"rather than through a local wrapper; the flag can only ADD "
+                  f"Miri, never remove it. This shout is the only thing "
+                  f"standing between that route and a silent green verdict, "
+                  f"and no pattern in the tree reaches this branch today.")
+        out.update(required=False, ran=False, local_only=True)
         return out
     if (n_trusted or n_axioms) and cfg.get("required") is False:
         rep.fail("miri",

@@ -125,13 +125,13 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "a9ae6c1efc51fb7407e1d914f739f3857d9af95d4ae7d007b09cddbd5d875028",
+    "harness/check.py": "96f51a28a93bdc1674033b13fb91ff2b423cbd6a0c5cf98537d140bcb2b87c8d",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
-    "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
+    "harness/limbs.py": "6e8191a6ce2370500b605a18cc53e320259f5c507661c321573fff1b6672a4f1",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
-    "harness/vparse.py": "70ec4a2077b5def61aaa8347dbd8bf0d7c0a911adcf0e0003970fddc171e0213",
+    "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
     "patterns/p38-alias-pun/NOTES.md": "7cdccdd61c2508f6547c9a5f92506b3cb7981760333388a98197f99ceb049e0d",
     "patterns/p38-alias-pun/README.md": "486d16a4d87c1ffb0afe49d2259036f2ac6ddca8e53905302ac1cdb6aba5d7e9",
     "patterns/p38-alias-pun/c/kernel.c": "3e5f9f518672d7ff518a4eb93708b1539fa41ba5ef7160dcf8a0714b946e4e4f",
@@ -934,11 +934,11 @@
     "adversarial-oob.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "16159184193229710263",
+        "stdout": "12031088173114646609",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/isolated"
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "8516071857945885891",
@@ -947,11 +947,11 @@
       },
       {
         "exit": 0,
-        "stdout": "2103025434082744532",
+        "stdout": "4464982415220652689",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/whole"
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "8516071857945885891",
@@ -1116,7 +1116,7 @@
       },
       {
         "exit": 0,
-        "stdout": "11519390191821150392",
+        "stdout": "10608497495944332656",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1129,7 +1129,7 @@
       },
       {
         "exit": 0,
-        "stdout": "12697573662680887718",
+        "stdout": "127239327411174309",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1418,7 +1418,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7f1238900220 with insufficient space for an object",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7f8162700220 with insufficient space for an object",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1440,7 +1440,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7f4461500220 with insufficient space for an object",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7f3aef100220 with insufficient space for an object",
       "declared_hang": false,
       "hung": false,
       "stdout": "",

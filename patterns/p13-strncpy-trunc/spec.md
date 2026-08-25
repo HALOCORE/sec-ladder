@@ -94,7 +94,7 @@ Two consequences, and both are structural rather than choices:
 - **`small` and `large` must be 100% NON-TRUNCATING, and that is not
   negotiable.** `harness/check.py`'s `check_checksums` requires every cell, R1
   included, to print `model.py`'s checksum on every non-adversarial **matrix**
-  input (`sweep-*` is dropped before it, in **`inputs_of`** at `check.py:495`). The source scan
+  input (`sweep-*` is dropped before it, in **`check.py::inputs_of`**). The source scan
   stops at the first zero byte, so every copied byte is non-zero, and the
   zero-fill is empty exactly when `slen >= DST_CAP`; `dst` therefore holds a NUL
   **iff** the string was short. On a truncating window R1's consumer reads past

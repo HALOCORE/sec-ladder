@@ -15,7 +15,7 @@ worse than the edit):
 A bare line number (the old one was `:929`, deliberately not written here in the
 citation form so the audit aid does not report this paragraph as a live one) and
 a bare `check.py::exec_code` were re-cited by FUNCTION with the line as a hint —
-`idiom_audit` (`check.py:1262`) and `exec_code` (`check.py:752`) — the
+`check.py::idiom_audit` and `check.py::exec_code` — the
 convention at the end of `.memory/02-bench-rules.md`. The old number had already
 decayed to a blank line. **No `required`, `forbidden` or
 `why` claim changed**, and the named-spelling standard's shared paragraph is
