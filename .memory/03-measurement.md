@@ -2122,6 +2122,42 @@ law that contradicted them**.
 RE-FIT THE INTERCEPT from the shipped binary, always.** A probe's intercept is a
 property of the probe.
 
+⚠⚠ **AND ONE PATTERN LATER THAT RULE WAS ITSELF TOO WEAK: A PROBE CAN LOSE THE
+SLOPE, AND THE RUNG BOUNDARY WITH IT.** (TASK_089, on p46. PROVISIONAL.) The
+probe measured **`+5.05 Ir` per MAC step, +49.6 %**, safe over unsafe. Shipped,
+the ordering is **reversed** — `safe_naive` < `safe_tuned` < `unsafe` — and **the
+per-MAC safety tax is `0.00000`.**
+
+**The mechanism, and it is the part to remember:** the probe wrapped its
+dimensions in **`black_box`**, which withheld the `u8` range on `n` and `m`, so
+LLVM **could not prove `i+j < 96`**. The shipped kernel derives that range from
+its own input, **proves it, and deletes all three bounds checks.** ⚠ **The probe
+did not mis-measure a cost; it measured a DIFFERENT PROGRAM — one in which the
+safety check is live and in the shipped one it is dead.**
+
+⚠ **So `black_box` is not a neutral "stop the optimiser folding this" tool.** It
+is a *fact-hiding* tool, and the facts it hides are exactly the ones a bounds
+check is eliminated by. **Anything a probe hides behind `black_box` that the real
+kernel derives from its input can invent a rung boundary that does not exist.**
+
+⚠⚠ **BLAST RADIUS, AND IT IS NOT CHECKED: every row in `TASK_086`'s queue was
+measured this way.** p46's is the only one re-measured against built rungs so
+far, and its sign flipped. **Treat every unbuilt row's probe cost as a
+DIRECTION-UNKNOWN prior until its rungs exist.**
+
+## ⚠ A two-parameter law fitted on axis-aligned bands can be UNDERDETERMINED
+
+**PROVISIONAL — TASK_089, on p46, and it is sharper than p38's missing column.**
+p46's `R2 − R4 = 3 + 5n − n·floor(m/2)` was fitted over `n` and `m`. **Fitting on
+the two axis-aligned bands alone (vary `n` at fixed `m`, vary `m` at fixed `n`)
+leaves a ONE-PARAMETER FAMILY that fits BOTH EXACTLY.** One off-axis point pins
+it, and the other **nine are then out of sample at zero residual.**
+
+⚠ **No in-sample residual could have shown this** — unlike p38, where three
+missing columns left a fit that was merely wrong out of sample. **A band that
+holds every other parameter at its axis value does not constrain a product
+term.** **Ship at least one off-axis point per pair of parameters.**
+
 ## `GEN-ONLY` cannot fire on a GATE record
 
 **PROVISIONAL — measured at TASK_088.** Editing only a docstring in
