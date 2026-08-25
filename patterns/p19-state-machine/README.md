@@ -15,9 +15,18 @@ for (p = TBL; p < len; p++) { st = w[st * 256 + w[p]]; acc = acc * 31 + st; }
 naming a state that does not exist becomes the next row index, and
 `w[st * 256 + b]` reads outside the blob.
 
-That is **CVE-2026-23269**'s shape — the AppArmor fix titled *"`unpack_pdb` DFA
-bounds validation hardening"* — and `c/kernel_hardened.c` is the same file with
-the pass that closes it and nothing else changed.
+That is **CVE-2026-23407**'s shape — *"apparmor: fix missing bounds check on
+DEFAULT table in `verify_dfa()`"* — and `c/kernel_hardened.c` is the same file
+with the pass that closes it and nothing else changed. The CVE's own description
+is this kernel: *"it reads `k = DEFAULT_TABLE[j]` and uses `k` as an array index
+without validation. A malformed DFA with `DEFAULT_TABLE[j] >= state_count`,
+therefore, causes both out-of-bounds reads and writes."*
+
+⚠ **An earlier version of this section named `CVE-2026-23269` here.** That CVE
+is real — *"apparmor: validate DFA start states are in bounds in
+`unpack_pdb`"* — but it is a **different bug**: an untrusted *start state*
+indexing `dfa->tables[YYTD_ID_BASE][start]`. p19's walk starts at `st = 0` by
+construction and models no start state (TASK_087_REVIEW major 3).
 
 ## Why this is a memory-safety bug at all — the condition is named
 
@@ -33,8 +42,13 @@ was settled by a run before any cell was built (`NOTES.md` 0a):
    entry written as `switch (st) { … default: }` is a wrong answer with **no
    memory event at all** — ASan and UBSan both silent.
 
-Both are `forbidden` entries in `spec.md`'s hashed block: the only entries in
-this tree that forbid a spelling for being *safe* rather than for being *fast*.
+Both are `forbidden` entries in `spec.md`'s hashed block, forbidding a spelling
+for being *safe* rather than for being *fast*. ⚠ **p19 is the third pattern to
+do that, not the first** — p36 forbids `op & 7` / `op % 8` on both the Rust and
+the C side because masking the opcode into range "makes every byte a legal
+opcode, so the out-of-table input stops being adversarial", and p03 forbids
+`& (STACK_CAP - 1)` because it "silently turns an out-of-range access into an
+in-range one". See `NOTES.md` §0a.
 
 Both hold of real DFA decoders. The Linux kernel's AppArmor policy engine
 (`security/apparmor/match.c`) indexes four tables with no test at all in

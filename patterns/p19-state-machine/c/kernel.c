@@ -4,9 +4,19 @@
  * handed. There is no validation pass, so an entry naming a state that does not
  * exist becomes the next row index and `w[st*256 + b]` reads outside the blob.
  *
- * That is CVE-2026-23269's shape -- the AppArmor fix titled *"unpack_pdb DFA
- * bounds validation hardening"* -- and c/kernel_hardened.c is this file with
- * the pass that closes it, and nothing else.
+ * That is CVE-2026-23407's shape -- *"apparmor: fix missing bounds check on
+ * DEFAULT table in verify_dfa()"*, whose own description is this kernel in the
+ * CVE's words: *"it reads k = DEFAULT_TABLE[j] and uses k as an array index
+ * without validation. A malformed DFA with DEFAULT_TABLE[j] >= state_count,
+ * therefore, causes both out-of-bounds reads and writes."* And
+ * c/kernel_hardened.c is this file with the pass that closes it, and nothing
+ * else.
+ *
+ * (An earlier version of this comment named CVE-2026-23269 here instead.
+ * That CVE is real -- *"apparmor: validate DFA start states are in bounds in
+ * unpack_pdb"* -- but it is a DIFFERENT bug: an untrusted START state indexing
+ * dfa->tables[YYTD_ID_BASE][start]. This kernel starts at st = 0 by
+ * construction and models no start state at all. TASK_087_REVIEW major 3.)
  *
  * ⚠ **THE HARM IS SILENT ON A PLAIN BUILD.** The table lives in the driver's
  * heap payload buffer, so a bad entry reads other heap bytes and the program

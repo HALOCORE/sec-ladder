@@ -39,8 +39,28 @@ rebuilds them). Built exactly as the gate's stage-7 C recipe
 **So the memory-unsafe framing holds iff BOTH:** the transition table is loaded
 data (run A closes the constant case exhaustively), **and** the decoder
 dispatches by indexing rather than by `switch` (run C is the logic-bug shape).
-Both are `forbidden` entries in `spec.md` — the only entries in this tree that
-forbid a spelling for being *safe* rather than for being *fast*.
+Both are `forbidden` entries in `spec.md`, which forbid a spelling for being
+*safe* rather than for being *fast*.
+
+⚠ **p19 is the THIRD pattern to do that, not the first, and an earlier version
+of this paragraph claimed these were "the only entries in this tree" that do.
+They are not** (TASK_087_REVIEW major 1). The precedent, each with its reason in
+its own `idiom.why`:
+
+* **p36** — `forbidden[2]` and `[3]` are `op & 7` and `op % 8`, and `[5]`/`[6]`
+  are the same two again on the C side: *"masking the opcode into range is a
+  THIRD program — it makes every byte a legal opcode, so the out-of-table input
+  stops being adversarial and the pattern's whole security half evaporates."*
+  ⚠ **That is the same exclusion for the same reason, in the pattern §0 above
+  names as p19's nearest sibling.**
+* **p03** — `forbidden[1]` is `& (STACK_CAP - 1)`: *"MASKING IS FORBIDDEN … it
+  silently turns an out-of-range access into an in-range one, which is the
+  opposite of what this pattern models."*
+
+✅ **The practice is the right one and the correction is only to the
+uniqueness.** Forbidding the *safe* spelling is not Rust-in-C-syntax in reverse:
+the alternative is a benchmark whose bug is unreachable (run A) or absent (run
+C), and p03 and p36 established the precedent before p19 existed.
 
 **Both hold of real DFA decoders, and the precedent is in the Linux kernel.**
 `security/apparmor/match.c` (fetched to `.temp/t87/apparmor_match.c`) folds with
@@ -63,11 +83,34 @@ for (i = 0; i < trans_count; i++) {
 ```
 
 The tables are unpacked from a userspace-supplied binary policy blob. Getting
-that validator wrong is a live CVE class — **CVE-2026-23407** *"apparmor: fix
-missing bounds check on DEFAULT table in `verify_dfa()`"* and **CVE-2026-23269**
-*"AppArmor `unpack_pdb` DFA bounds validation hardening"*. **Validate-once-then-
-index-unchecked is not a benchmark contrivance; it is the shipped kernel idiom,
-and it is exactly p19's R4/R5 rung.**
+that validator wrong is a live CVE class, and **the CVE this pattern models is
+`CVE-2026-23407`** *"apparmor: fix missing bounds check on DEFAULT table in
+`verify_dfa()`"* — published 2026-04-01, CVSS 7.8. ✅ **Its description is p19's
+kernel, in the CVE's own words** (checked against the CVE Program's API at
+`cveawg.mitre.org`, twice, by two agents):
+
+> *"When the verification loop traverses the differential encoding chain, it
+> reads `k = DEFAULT_TABLE[j]` and uses `k` as an array index without
+> validation. A malformed DFA with `DEFAULT_TABLE[j] >= state_count`, therefore,
+> causes both out-of-bounds reads and writes."*
+
+**Validate-once-then-index-unchecked is not a benchmark contrivance; it is the
+shipped kernel idiom, and it is exactly p19's R4/R5 rung.**
+
+⚠ **CORRECTION — `CVE-2026-23269` was MISQUOTED AND MISATTRIBUTED, and it is
+cited now for the class and never for the shape** (TASK_087_REVIEW major 3).
+It is a real CVE, published 2026-03-18, CVSS 7.1, in the same file and the same
+validator — but:
+
+* its **real title** is *"apparmor: validate DFA start states are in bounds in
+  `unpack_pdb`"*. This pattern used to quote *"AppArmor `unpack_pdb` DFA bounds
+  validation hardening"* **in quotation marks**, which is a paraphrase presented
+  as a title;
+* and it is a **different bug**: an untrusted **start state** indexing
+  `dfa->tables[YYTD_ID_BASE][start]`, rejected at unpack time. **p19's walk
+  starts at `st = 0` by construction and models no start state at all**, so
+  *"that is CVE-2026-23269's shape"* — which stood in `c/kernel.c` and
+  `README.md` — named the wrong CVE. **The shape is 23407's.**
 
 ⚠ p19 uses the **uncompressed** table (`w[st * 256 + b]`), not AppArmor's
 comb-compressed `base[state] + c` with a `check[]` guard. The compressed form
@@ -244,9 +287,14 @@ fixed them). `results/gate/p19-state-machine.json`, `complete_run: true`.
   `large.bin` 32 of 32 → `18289686085753579055`; `degenerate.bin` 32 of 32 →
   `16891030843067612262`.
 * **`requires` on every measured input, adversarial included**:
-  `off + len <= buf_len` holds on 8000 / 2000 / 2000 / 100 / 100 / 100 / 100
-  kernel calls, `off` 0…92160 on `large.bin`. **`ensures` re-derived
-  independently** by `model.py` on 128 sampled calls per matrix input.
+  `off + len <= buf_len` holds on 8000 (`small`) / 2000 (`large`) / 2000
+  (`degenerate`) / 100 each on `adversarial-confuse`, `-oob`, `-oobnear` and
+  `-tiny` kernel calls, `off` 0…92160 on `large.bin`. ⚠ **That is seven of the
+  eight `inputs_checked`, and the eighth is not an omission**:
+  `adversarial-shortlen.bin` over-declares `payload_len`, so the driver exits 5
+  before the kernel is called at all and `proof_domain` records **0 calls** for
+  it. **`ensures` re-derived independently** by `model.py` on 128 sampled calls
+  per matrix input.
 * **anti-collapse**: 64 cell/probe pairs, marginal `Ir` per call 2269…290931,
   tightest margin 3.9× over the derived floor; `d(Ir)/d(work)` 8.75…56.00.
 * **identity**: `unsafe vs verus O0: norel`, `O3: exact` (`md5_fn 0ddbc5381b7d`,
@@ -281,8 +329,10 @@ fixed them). `results/gate/p19-state-machine.json`, `complete_run: true`.
   `contract_sha256` a second time to remove three benign report rows**, and a
   second unexplained declaration edit is worth less than this paragraph. Noted
   rather than silently carried.
-* **Miri**: 7 of 7 inputs, **no UB**, exits and stdout all match the model. No
-  blocked rows — the inputs were sized for it (§3).
+* **Miri**: **8 of 8 inputs** (`miri.runs` in the gate record, one per entry of
+  `inputs_checked`), **no UB**, exits and stdout all match the model. No
+  blocked rows — the inputs were sized for it (§3). ⚠ This line said *"7 of 7"*;
+  the record has eight, and `inputs_checked` has eight (TASK_087_REVIEW minor 3).
 * **sanitizers**: `adversarial-oobnear` and `adversarial-oob` fire as declared;
   the other five are clean, and the three matrix inputs match the model's
   stdout under `-O1 -fsanitize=address,undefined`.
@@ -330,9 +380,18 @@ R3 - R4 :  ( 4100 -  260) / (4096 - 256) =  3840 / 3840 = 1.00000
   **A percentage quoted at either input would be wrong at the other, in sign.**
 * **Hardened C on clang and unsafe Rust are within 5 `Ir` per call of each other
   at both inputs** — `0.06 %` at `small` and `0.011 %` at `large`. Same LLVM
-  22.1.6 backend, same fold shape (35 instructions for 4 bytes), and
-  `.memory/01-ladder.md` finding 7 gets a fresh instance on a data-dependent
-  loop.
+  22.1.6 backend, same fold shape (35 instructions for 4 bytes), so **the
+  same-backend result** — *clang 22.1.6 is bit-for-bit rustc 1.97.1's LLVM, so
+  every C-vs-Rust claim needs the clang column* — gets a fresh instance on a
+  data-dependent loop.
+
+  ⚠ **NAMED, NOT NUMBERED, AND AN EARLIER VERSION OF THIS LINE GOT IT WRONG.**
+  It cited *"`.memory/01-ladder.md` finding 7"*. That result is **RECAP's**
+  finding 7; `.memory/01-ladder.md`'s finding 7 is **p08** and its finding 5 is
+  **p17**. The two numbering schemes are the live collision RECAP maps and p36's
+  `spec.md` records as having *"already sent agents to the wrong finding"* —
+  **cite the result by its sentence, never by a number** (TASK_087_REVIEW minor
+  1).
 
 ---
 
@@ -445,20 +504,43 @@ this tally.** The tally counts project-local trusted items (`.memory/04-verus.md
 which is what `synthesize.py` publishes; a *used* vstd trusted item is a
 standing open question about the gate (`RECAP`, the sixth route) and p19 does
 not settle it. Saying so beside the number rather than leaving it implied is the
-point — **and the novelty claim was MEASURED rather than assumed**, because this
-project has shipped two false ones:
+point.
 
-```
-$ grep -rn "slice_subrange(\|slice_index_get(\|slice_to_vec(\|u64_from_le_bytes(" \
-      patterns/*/verus.rs | grep -v ^patterns/p19
-                                                    (no output)
-```
+⚠⚠ **AND THE NOVELTY CLAIM THAT USED TO SIT HERE IS FALSE — STRUCK, WITH ITS
+METHOD** (TASK_087_REVIEW major 4; re-derived at TASK_088). It read *"p19 is the
+only pattern in the tree that calls a vstd exec `external_body` function from
+its kernel's exec path … the first pattern for which the sixth-route gap is not
+hypothetical."* Three things are wrong with it and the first is the one to
+learn:
 
-Every other pattern's `vstd::slice::` / `vstd::array::` hit is a
-`broadcast use … group_*_axioms` line or a `spec_slice_len` inside a ghost
-`assert` — ghost, not exec. **So p19 is the only pattern in the tree that calls
-a vstd exec `external_body` function from its kernel's exec path**, and it is
-the first pattern for which the sixth-route gap is not hypothetical.
+1. **The `grep` behind it was a WHITELIST of four slice-shaped names**
+   (`slice_subrange(`, `slice_index_get(`, `slice_to_vec(`,
+   `u64_from_le_bytes(`), so it could only ever have found slice-shaped calls.
+   ⚠ **A grep that can only find what you already thought of is not a census.**
+   Enumerating **every** exec `#[verifier::external_body]` fn in the pinned vstd
+   and grepping all 23 patterns finds **`p27`**: `vstd/raw_ptr.rs:579
+   ptr_mut_write` and `:620 ptr_ref` are both exec `external_body`, and
+   `patterns/p27-handle-table/verus.rs` calls them at `:586` (in `rec_open`) and
+   `:620` (in `rec_read`), both reached from `kernel` at `:626` via `:708` and
+   `:776`. **p27's own comment at `verus.rs:564` says so.** So **p19 is the
+   SECOND such pattern, not the first.**
+2. **The framing re-opened a decision `.memory/04-verus.md` had already closed**
+   at TASK_055_REVIEW: one number = project-local trusted items, prose beside
+   it, and a second *"vstd relied upon"* column refuted by census and *"must not
+   be reinstated"*. That section names this exact case in advance — *"a pattern
+   built on `vstd::raw_ptr` … decide how such a pattern is counted BEFORE
+   building one"* — and p27 is that pattern.
+3. **It was not even the route it named.** The sixth route is about *used* vstd
+   `assume_specification`s reaching `check_miri`'s *"no trusted item ⇒ Miri not
+   required"* branch. `slice_subrange` is `external_body`, and p19 has three
+   local trusted items with `miri.required: true`, so it never reaches that
+   branch — while the literal sixth route has been live in nearly every pattern
+   all along through `bytes.len()` / `bytes.as_slice()`
+   (`vstd/std_specs/vec.rs`).
+
+✅ **None of this moves the number.** Under the decided accounting p19's
+`tcb_items` is **3**, and the prose beside it — this section and
+`verus.rs:31-35` — is exactly what `.memory/04-verus.md` asks for.
 
 ### SLB-TRUSTED-ARGUMENT verus.rs buf_get_unchecked
 
@@ -580,8 +662,10 @@ is out of line; what is in line is a loop the check refuses to let LLVM unroll.
 same rate as `unsafe.rs`'s, on the same LLVM 22.1.6 backend. `c-gcc`'s is
 **11 for 1**: gcc does not unroll it at all, so gcc's *unchecked* C fold is
 **dearer per byte than safe Rust's masked one** (11.00 vs 9.75). ⚠ Any
-C-vs-Rust claim on this pattern needs the clang column, and `.memory/01-ladder.md`
-finding 5 gets a fresh instance.
+C-vs-Rust claim on this pattern needs the clang column — **the same-backend
+result again, cited by its sentence and not by a number** (§4; an earlier
+version of this line said *"`.memory/01-ladder.md` finding 5"*, which is
+**p17**).
 
 ---
 
@@ -696,11 +780,11 @@ happens to be nearly free on all three sides.
 * **No `safe_naive_verus.rs` control.** p01 ships one to hold up
   `.memory/01-ladder.md` finding 2; p19 does not, and the finding is not
   re-tested here.
-* **The `sweep-m*` laws are not re-fitted from the committed blobs in this
-  file.** The two laws in §8 come from the probe at five message lengths
-  (1024/2048/4096/8192/16384, zero residual: `R2 − R4 = 6.25·m − 8` and
-  `R3 − R4 = 1.00·m − 2`). The sweep band ships so that they *can* be
-  re-derived from a hashed generator, and nobody has yet.
+* ~~**The `sweep-m*` laws are not re-fitted from the committed blobs in this
+  file.**~~ **DONE at TASK_088, and the re-fit CORRECTED them — see §12.** The
+  laws this file used to publish, `R2 − R4 = 6.25·m − 8` and
+  `R3 − R4 = 1.00·m − 2`, came from a throwaway probe at five message lengths
+  and **their intercepts are wrong at every residue class**.
 * **No wall-clock analysis.** p19's fold is a serial dependent-load chain
   (`st` gates the next load's address), so it should be latency-bound and `Ir`
   should understate the safe rungs' penalty rather than overstate it — a
@@ -710,3 +794,99 @@ happens to be nearly free on all three sides.
 * **`sanitizer_expect` on `adversarial-confuse` is "clean" by computation**, and
   no attempt was made to find a build on which it fires. It should not: the read
   is inside the object.
+
+---
+
+## 12. The two laws, RE-FITTED from the committed band — and the intercepts were wrong
+
+**⚠ CORRECTION.** This pattern shipped `R2 − R4 = 6.25·m − 8` and
+`R3 − R4 = 1.00·m − 2` in §11 and in `inputs/gen.py`'s docstring. Both came from
+the **throwaway five-length probe of §10** (`.temp/t87/cost.rs`, m =
+1024/2048/4096/8192/16384). **The slopes survive exactly. The intercepts are
+wrong, and they are wrong for TWO INDEPENDENT REASONS — which is worth separating
+because only one of them is the residue rule.**
+
+1. ⚠ **The probe was a DIFFERENT BINARY, so its per-call constant was its own
+   driver's and never the shipped cells'.** All five of its lengths are
+   `m ≡ 0 (mod 4)`, where the re-fit below gives `6.25·m − 6` and `1.00·m + 4`;
+   the probe gave `− 8` and `− 2`. The gap is **exactly `+2` and `+6` at every
+   `m ≡ 0 (mod 4)`, constant** — the signature of a fixed per-program offset,
+   not of a modelling error. **An intercept measured on a probe binary does not
+   transfer to the shipped one; only the slope does.** §10's own numbers
+   (`+25592`, `+4094` at m = 4096) are the probe's and are correct *as the
+   probe's*.
+2. ⚠ **And there is a real `m mod 4` term that the probe could not have seen**,
+   because a five-point band all at one residue fits in sample and misses out of
+   it with no in-sample residual to warn you — `.memory/03-measurement.md`'s
+   residue rule, stepped in by the pattern that ships the residue-covering band
+   precisely so it would not be.
+
+⚠⚠ **And the shipped laws disagreed with this file's own §4 numbers, two
+sections above them**: §4 prints `1594` / `25594` / `260` / `4100` and the laws
+say `1592` / `25592` / `254` / `4094` — the `+2` / `+6` of reason 1.
+
+**Re-fitted here from the 19 COMMITTED `sweep-m*.bin` blobs**, on the shipped
+`-O3 isolated` binaries, marginal `Ir` per kernel call by `n_iters` 100↔200
+differencing (the gate's own convention, §4). Probe: `.temp/t88/refit.py`, log
+`.temp/t88/refit.log`. **Zero residual over all 19 lengths, both laws:**
+
+```
+R2 - R4  =  6.25*m  -  6  -  2.25*(m mod 4)  -  4*[m mod 4 != 0]
+R3 - R4  =  1.00*m  +  4                     -  1*[m mod 4 != 0]
+```
+
+Per residue class, which is how the review first stated it, and every class is
+exact with zero scatter:
+
+| `m mod 4` | n | `R2 − R4` | `R3 − R4` |
+|---|---|---|---|
+| 0 | 10 | `6.25·m − 6` | `1.00·m + 4` |
+| 1 | 5 | `6.25·m − 12.25` | `1.00·m + 3` |
+| 2 | 2 | `6.25·m − 14.5` | `1.00·m + 3` |
+| 3 | 2 | `6.25·m − 16.75` | `1.00·m + 3` |
+
+**The slopes are the part that was right, and they are right to six places**:
+two-parameter OLS over all 19 lengths gives **`6.250530`** and **`1.000035`**,
+and the whole of §8's rate argument stands unchanged.
+
+### 12a. The mechanism, read off the disassembly rather than fitted
+
+`.memory/03-measurement.md` asks for the mechanism, not the residual. **The
+`m mod 4` term is R4's and R3's scalar epilogue, and every one of its
+coefficients is a counted instruction** (`harness/asm.py show … --sym kernel
+--raw` on the shipped `-O3 isolated` binaries):
+
+| | main fold | epilogue body | epilogue preheader, taken | preheader, not taken |
+|---|---|---|---|---|
+| R4 `unsafe` | 35 / 4 B = **8.75** | **11** / 1 B | `test`,`je`,`add %rsi,%rdx`,`xor`,`mov`,`nop` = **6** | `test`,`je` = **2** |
+| R3 `safe_tuned` | 39 / 4 B = **9.75** | **12** / 1 B (the extra `and $0x7,%edi`) | `test`,`je`,`xor`,`mov`,`nopw` = **5** | **2** |
+| R2 `safe_naive` | **not unrolled**, 15 / 1 B | — none — | — | — |
+
+So with `r = m mod 4`:
+
+* **R4's excess over a pure `8.75·m` line is `2.25·r + 4·[r ≠ 0]`.** The `2.25`
+  is the epilogue byte costing 11 where an unrolled byte costs 8.75; the flat
+  `4` is entering the epilogue loop at all (6 instructions instead of 2).
+* **R3's is `2.25·r + 3·[r ≠ 0]`** — same `2.25` (12 against 9.75), but its
+  preheader is **one instruction shorter**.
+* **R2 has no epilogue at all**, so `R2 = 15·m + const` with no residue term —
+  which is why the whole `m mod 4` structure of `R2 − R4` is R4's, with the
+  sign flipped.
+
+⚠ **The `−1` in `R3 − R4` is therefore one named instruction: R4's
+`add %rsi,%rdx`.** R4 rebases the message pointer before the epilogue; R3 keeps
+`%rax` as the message base and indexes `(%rax,%rcx,1)`. That is the entire
+`m ≡ 0` vs `m ≢ 0` difference in the second law.
+
+### 12b. What a reader should quote
+
+* **The slopes**, `6.25` and `1.00` `Ir` per message byte, which are what §8 is
+  about and which nothing here moves.
+* If an *absolute* difference at a given `m` is wanted, **the closed forms
+  above**, and only with the `m mod 4` term. Extrapolating the old
+  `1.00·m − 2` to a small `m` is off by **6** at `m = 64` (measured **68**,
+  law **62**) and by **5** at `m = 97` (measured **100**, law **95**) — on a
+  quantity of order 60 to 100, i.e. 5–10 %.
+* ⚠ **Never a rate divided out of a single small `m`.** R3's own epilogue term
+  is `0` at `m = 64` and would be `5.25` at `m = 65`; the per-byte quotient
+  moves by more than the mask it is supposed to be measuring.

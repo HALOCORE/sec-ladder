@@ -16,7 +16,9 @@
 //! reaches it, so `st & (NST - 1) == st` **identically, on every input this
 //! benchmark can present**, adversarial ones included -- and that equality is
 //! precisely the loop invariant ../verus.rs discharges (`st < NST`, ../NOTES.md
-//! 6). R2 and R3 return the same `u64` on all nine inputs, checked by the gate.
+//! 6). R2 and R3 return the same `u64` on all EIGHT gate-checked inputs. (They
+//! also agree on the 19 `sweep-m*` blobs, but those are diagnostic and are not
+//! in `inputs_checked`; this line used to say "nine", which was neither count.)
 //! **Delete the validation pass and the claim fails**: the mask would silently
 //! remap an out-of-range state where the checked spelling panics. So this rung
 //! is a respelling *because* the pattern validates, and the same two lines
@@ -24,8 +26,11 @@
 //! says so in the hashed block.
 //!
 //! ⚠ **AND THE MASK IS NOT FREE.** It is exactly one `and $0x7` per message
-//! byte -- `R3 - R4 = 1.00000 * m - 2` instructions per call, zero residual
-//! over five message lengths, and the identical +1.00 appears when the mask is
+//! byte -- `R3 - R4 = 1.00000 * m + 4 - [m mod 4 != 0]` instructions per call,
+//! zero residual over the 19 committed `sweep-m*` lengths (../NOTES.md 12).
+//! ⚠ This line used to read `1.00000 * m - 2`, from a five-length probe on a
+//! DIFFERENT BINARY whose lengths were all `m = 0 (mod 4)`: **the slope was
+//! right and the intercept was not, twice over.** The identical +1.00 appears when the mask is
 //! added to the *unsafe* rung, which is how ../NOTES.md 8 attributes it to the
 //! mask rather than to the check. **Safe Rust reaches within one instruction
 //! per byte of unsafe Rust here, and not to it: that one instruction is what a

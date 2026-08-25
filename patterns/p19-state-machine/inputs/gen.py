@@ -42,7 +42,22 @@ would enter it and cost a full re-measure.
 **ONE band, and it is the length axis the two published laws are fitted on.**
 `sweep-m*` varies the MESSAGE length `m = stride - 2048` with the table held
 byte-identical across the whole band, so every difference is the fold and
-nothing else. The laws are `R2 - R4 = 6.25*m - 8` and `R3 - R4 = 1.00*m - 2`.
+nothing else. Re-fitted from these committed blobs at TASK_088, zero residual
+over all 19 lengths (../NOTES.md 12):
+
+    R2 - R4  =  6.25*m  -  6  -  2.25*(m mod 4)  -  4*[m mod 4 != 0]
+    R3 - R4  =  1.00*m  +  4                     -  1*[m mod 4 != 0]
+
+The `m mod 4` term is R4's and R3's scalar epilogue and every coefficient is a
+counted instruction; ../NOTES.md 12a has the disassembly.
+
+WARNING: this docstring used to publish `R2 - R4 = 6.25*m - 8` and
+`R3 - R4 = 1.00*m - 2`. THE SLOPES ARE RIGHT AND THE INTERCEPTS WERE NOT, for
+two independent reasons (../NOTES.md 12): they came from a DIFFERENT BINARY, so
+their per-call constant was that probe's and not the shipped cells' -- exactly
++2 and +6 off at every `m = 0 (mod 4)` -- AND the probe's five lengths were all
+at that one residue, so it could not see the `m mod 4` term, which is what the
+residue paragraph below exists to stop.
 
 ⚠ **RESIDUE CLASSES** (`.memory/03-measurement.md`, the rule that came out of
 p38): a fit whose bands all sit at one residue of the regressor fits in sample

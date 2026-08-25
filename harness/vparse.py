@@ -168,6 +168,29 @@ def _match_bracket(code, i):
     raise ValueError(f"vparse: unbalanced {code[i]!r} at offset {i}")
 
 
+def _match_bracket_back(code, i):
+    """Index of the bracket that `code[i]` closes. `code` must already be
+    comment/string-blanked.
+
+    The mirror of `_match_bracket`, added at TASK_088 for `trait_spans`'
+    walk-back over a restricted visibility group (`pub(crate) trait ...`,
+    `TASK_084_REVIEW` minor 4): the scan there runs right to left, so it needs
+    to step from the `)` to its `(` rather than the other way round."""
+    pairs = {")": "(", "]": "[", "}": "{"}
+    if code[i] not in pairs:
+        raise ValueError(f"vparse: {code[i]!r} at offset {i} is not a closer")
+    depth, j = 0, i
+    while j >= 0:
+        if code[j] in pairs:
+            depth += 1
+        elif code[j] in "([{":
+            depth -= 1
+            if depth == 0:
+                return j
+        j -= 1
+    raise ValueError(f"vparse: unbalanced {code[i]!r} at offset {i}")
+
+
 def _match_angle(code, i):
     """Index just past the `<` opened at `code[i]`.
 
@@ -441,6 +464,24 @@ def trait_spans(text, code=None):
         start = m.start()
         while True:
             p = code[:start].rstrip()
+            # ⚠ A RESTRICTED VISIBILITY GROUP FIRST -- `pub(crate)`,
+            # `pub(super)`, `pub(in path)` (TASK_084_REVIEW minor 4). Without
+            # this the walk-back sees `)` where an identifier has to be, stops,
+            # and the item-position guard below rejects a perfectly legal
+            # `#[verifier::external_trait_specification] pub(crate) trait X`.
+            # `axiom_decls`' fallback then reported it as ONE `ExW::?` instead
+            # of one axiom per body-less method: visible, but the count wrong.
+            if p.endswith(")"):
+                try:
+                    o = _match_bracket_back(code, len(p) - 1)
+                except ValueError:
+                    break
+                q = code[:o].rstrip()
+                wv = re.search(r"(" + _IDENT + r")$", q)
+                if wv and wv.group(1) == "pub":
+                    start = wv.start()
+                    continue
+                break
             w = re.search(r"(" + _IDENT + r")$", p)
             if not w or w.group(1) not in _MODIFIERS:
                 break
@@ -1984,6 +2025,37 @@ pub fn ex_count_ones(x: u64) -> (r: u32) ensures r == 0, { x.count_ones() }
     want("an unparseable external trait is still counted, as `?`",
          [(d["kind"], d["name"]) for d in axiom_decls(unreadable)],
          [("external_trait_specification", "Broken::?")])
+
+    # TASK_084_REVIEW minor 4, fixed at TASK_088. A RESTRICTED VISIBILITY GROUP
+    # between the attribute and `trait` used to stop `trait_spans`' walk-back
+    # dead: `code[:start].rstrip()` ends `)`, no identifier matches, and the
+    # item-position guard then rejects the item. Measured before the fix:
+    # `trait_spans` -> `[]` and `axiom_decls` -> ONE `ExVis::?` for a trait with
+    # TWO body-less methods. Visible, but the count wrong for a legal spelling.
+    vis = ('verus! {\n'
+           '#[verifier::external_trait_specification]\n'
+           'pub(crate) trait ExVis {\n'
+           '    type ExternalTraitSpecificationFor: Vis;\n'
+           '    fn a(&self) -> usize;\n'
+           '    fn b(&self) -> usize;\n'
+           '}\n'
+           '#[verifier::external_trait_specification]\n'
+           'pub(in crate::deep) trait ExVis2 {\n'
+           '    type ExternalTraitSpecificationFor: Vis2;\n'
+           '    fn c(&self) -> usize;\n'
+           '}\n'
+           'pub(crate) trait PlainVis { fn d(&self) -> usize; }\n'
+           '}\n')
+    want("pub(crate) / pub(in path) trait: the walk-back steps over the group",
+         [n for n, _, _, _ in trait_spans(vis)],
+         ["ExVis", "ExVis2", "PlainVis"])
+    want("...so it is ONE AXIOM PER BODY-LESS METHOD, not one `?`",
+         [(d["kind"], d["name"]) for d in axiom_decls(vis)],
+         [("external_trait_specification", "ExVis::a"),
+          ("external_trait_specification", "ExVis::b"),
+          ("external_trait_specification", "ExVis2::c")])
+    want("...and a pub(crate) ORDINARY trait is still not an axiom",
+         [d for d in axiom_decls(vis) if d["name"].startswith("PlainVis")], [])
 
     print("vparse selftest:", "PASS" if bad == 0 else f"FAIL ({bad})")
     return 0 if bad == 0 else 1

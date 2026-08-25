@@ -60,9 +60,17 @@ for (i = 0; i < trans_count; i++) {
 ```
 
 The tables are unpacked from a userspace-supplied binary policy blob, and
-getting that validator wrong is a live CVE class — **CVE-2026-23407**
-*"apparmor: fix missing bounds check on DEFAULT table in `verify_dfa()`"* and
-**CVE-2026-23269** *"AppArmor `unpack_pdb` DFA bounds validation hardening"*.
+getting that validator wrong is a live CVE class. **The one this pattern models
+is `CVE-2026-23407`** *"apparmor: fix missing bounds check on DEFAULT table in
+`verify_dfa()`"*, whose description is p19's bug in the CVE's own words: *"it
+reads `k = DEFAULT_TABLE[j]` and uses `k` as an array index without validation.
+A malformed DFA with `DEFAULT_TABLE[j] >= state_count`, therefore, causes both
+out-of-bounds reads and writes."* ⚠ **`CVE-2026-23269` is cited here for the
+class and NOT for the shape**: its real title is *"apparmor: validate DFA start
+states are in bounds in `unpack_pdb`"* and its bug is an untrusted *start
+state*, which p19 does not model — the walk starts at `st = 0` by construction.
+An earlier version of this paragraph gave it a paraphrased title in quotation
+marks and attributed p19's shape to it (TASK_087_REVIEW major 3).
 **So "validate the whole table once, then index it unchecked" is not a benchmark
 contrivance; it is the shipped kernel idiom, and it is exactly this pattern's
 R4/R5 rung.**
@@ -209,7 +217,7 @@ Two pins are specific to p19 and worth reading before the block:
 
 | pin | what it is doing here |
 |---|---|
-| `idiom.forbidden[0]` and `[1]` | **the bug class's own preconditions, written as spellings.** `switch (st)` and a `static` table are each excluded because a rung that took either would still compute p19's function and would no longer model p19's bug. They are the only entries in this tree that forbid a spelling for being *safe* rather than for being *fast*. |
+| `idiom.forbidden[0]` and `[1]` | **the bug class's own preconditions, written as spellings.** `switch (st)` and a `static` table are each excluded because a rung that took either would still compute p19's function and would no longer model p19's bug. They forbid a spelling for being *safe* rather than for being *fast* — ⚠ **p19 is the third pattern to do that and not the first**, after p36's `op & 7` / `op % 8` (masking makes every byte a legal opcode, so the adversarial input stops being adversarial) and p03's `& (STACK_CAP - 1)` (masking turns an out-of-range access into an in-range one). `NOTES.md` §0a carries both quotations. |
 | `identity` | pinned `exact` at O3, and established **before either rung was written**: an R4 written with `&w[0..TBL]` and the R5 written with `vstd::slice::slice_subrange` compile to the same 235 bytes, `md5 ac3fb207cd05963419d722adcd8b9da2`, extracted from the **linked** binaries because a relocated field is zero in an object file (`TASK_086` #238). |
 
 ```slb-contract

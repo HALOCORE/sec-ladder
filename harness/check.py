@@ -3304,6 +3304,44 @@ def _path_includes(pdir, srcs):
     return out
 
 
+def _verus_file_list(pdir, srcs):
+    """`[(key, path)]` for every file a Verus-side check must read: the pinned
+    `verus.obligations` sources keyed by their bare names, then every file the
+    rungs `#[path]`-include, keyed **repo-relative**.
+
+    One list, so the detectors that share a threat stop having different file
+    sets. That divergence is `TASK_084_REVIEW` major 1 and RECAP "Owed" 0's
+    seventh route: `_check_axiom_decls` and `_axiom_items` walked the includes
+    and `_trusted_items`, the TCB inventory and the `assume(`/`admit(` shout did
+    not.
+
+    ⚠ **Deduplicated by real path, the pinned key winning**
+    (`TASK_084_REVIEW` minor 5). `_path_includes` resolves `#[path]` targets
+    against `pdir`, so an include that lands *inside* the pattern directory --
+    `#[path = "helper.rs"] mod helper;` where `helper.rs` is also a pinned
+    obligation source -- used to arrive **twice**, once as `helper.rs` and once
+    as `patterns/pNN-x/helper.rs`. Every caller then demanded two declarations
+    for one file and counted its axioms and its trusted items twice.
+    `.memory/05-layout.md`'s *"the two key spaces cannot collide"* is true;
+    *"cannot duplicate"* was not, and this is where it is fixed."""
+    seen, out = set(), []
+    for src in srcs:
+        path = os.path.join(pdir, src)
+        real = os.path.realpath(path)
+        if real in seen:
+            continue
+        seen.add(real)
+        out.append((src, path))
+    for p in _path_includes(pdir, list(srcs) + sorted(
+            f for f in os.listdir(pdir) if f.endswith(".rs"))):
+        real = os.path.realpath(p)
+        if real in seen:
+            continue
+        seen.add(real)
+        out.append((os.path.relpath(p, REPO), p))
+    return out
+
+
 def _scan_unsafe_sites(rep, pdir, contract):
     """Every `unsafe` token in the proof's source, not one `fn` body at a time.
 
@@ -3616,6 +3654,105 @@ def _check_axiom_decls(rep, src, txt, vcfg):
     return axioms
 
 
+def _axiom_keyword_shout(rep, src, txt):
+    """The `assume(` / `admit(` / `assume_specification` keyword scan.
+
+    Split out of `check_verus_contract` at TASK_088 so it can run over
+    `#[path]`-included files as well as over `verus.obligations`. It used to run
+    over `sorted(pinned_obl)` only, which is `TASK_084_REVIEW` major 1's third
+    detector: route C planted `assume(x==0); admit();` in a proof fn of an
+    included module and **the axiom stage was silent** -- the plant was caught
+    only because it happened to move the obligation count, which a plant in an
+    `#[verifier::external]` file would not."""
+    for kw in ("assume(", "assume_specification", "admit("):
+        n = len(re.findall(re.escape(kw), vparse.blank_noncode(txt)))
+        if n:
+            rep.shout("tcb-axiom",
+                      f"{src}: {kw} appears {n}x -- must be justified in "
+                      f"NOTES.md and counted in this pattern's TCB tally")
+
+
+def _check_included_tcb(rep, src, txt, vcfg):
+    """BODIED trusted items in a `#[path]`-included file: inventory them, print
+    them, and require the count to be DECLARED. Returns the list.
+
+    **`TASK_084_REVIEW` major 1, the second of the three detectors the `#[path]`
+    walk did not feed, and the one with the measured exploit.** The TCB
+    inventory inside `check_verus_contract` is
+    `tcb = [i for i in item_list if i.external]` over `verus.obligations` only,
+    so route J -- a real
+    `#[verifier::external_body] fn r84_lie(x: u64) -> (r: u64) ensures r == 0`
+    in a `#[path]`-included module -- shipped **fully green with no gate output
+    at all**: `grep -c r84_lie gate.log` was **0**, the verdict said *"3 TCB
+    items"*, and `results/synthesis.md` regenerated **byte-identical**.
+
+    ✅ **What bounds the vector, and it is why this is about `ensures` rather
+    than about `unsafe`:** an `unsafe` token in an included module IS caught,
+    by `_scan_unsafe_sites`, which has walked `_path_includes` since TASK_069
+    (route I: `[tcb-unsafe] .temp/r84/plant/ax_mod.rs:9`). What was left was
+    **false claims about SAFE operations** -- exactly the threat
+    `_check_axiom_decls`' own docstring names.
+
+    **Visibility, not prohibition**, the same design as `_check_axiom_decls`
+    and for the same reason: declaring the item is not the wrong thing to do,
+    not noticing it is. Declare `verus.included_tcb[<repo-relative path>]` --
+    an integer or the list of names -- and every verdict prints them.
+
+    ⚠ **A separate key from `verus.axioms` on purpose.** These items are
+    **bodied**, so `vparse.parse` classifies them and `vparse.axiom_decls`
+    deliberately does not; putting them in one key would make the declared count
+    unreadable and would double-count an `external_fn_specification`, which is
+    bodied and reaches both. Nothing in the tree declares either today: the only
+    `#[path]`-included file any pattern has is `common/driver.rs`, which carries
+    no `external` item, so this stage is measured inert across all 23."""
+    try:
+        items = vparse.parse(txt)
+    except ValueError as e:
+        rep.fail("tcb-included", f"{src}: {e}")
+        return []
+    tcb = [i for i in items if i.external]
+    want = (vcfg.get("included_tcb") or {}).get(src, 0)
+    want_n = len(want) if isinstance(want, (list, tuple)) else int(want)
+    print(f"    {src}: bodied trusted items in a `#[path]`-included file "
+          f"(`external_body` / `external_fn_specification`): {len(tcb)} "
+          f"(spec.md declares {want_n})")
+    for i in tcb:
+        print(f"       {i.external:32s} {i.name:16s} "
+              f"({i.body_lines} body lines, line {i.line}, "
+              f"ensures={_clauses(i, 'ensures') or '[]'})")
+    got_names = sorted(i.name for i in tcb)
+    if isinstance(want, (list, tuple)) and got_names != sorted(want):
+        rep.fail("tcb-included",
+                 f"{src}: spec.md declares verus.included_tcb {sorted(want)} "
+                 f"but the file declares {got_names}")
+    elif len(tcb) != want_n:
+        rep.fail("tcb-included",
+                 f"{src}: {len(tcb)} bodied trusted item(s) "
+                 f"{[(i.external, i.name, i.line) for i in tcb]} in a file the "
+                 f"rungs `#[path]`-include, but spec.md's verus.included_tcb "
+                 f"declares {want_n}. An `#[verifier::external_body]` here is "
+                 f"in this pattern's trusted base exactly as one in verus.rs "
+                 f"is -- Verus takes its `ensures` on trust and the binary "
+                 f"executes its body -- but until TASK_088 no stage looked: the "
+                 f"TCB inventory, `_trusted_items` and the `assume(`/`admit(` "
+                 f"shout all ran over `verus.obligations` alone, so a planted "
+                 f"`ensures r == 0` shipped green with `grep -c <name> "
+                 f"gate.log` == 0 and a byte-identical synthesis.md "
+                 f"(TASK_084_REVIEW major 1, route J). Declare it -- "
+                 f"`verus.included_tcb[{src!r}] = {len(tcb)}` or the list of "
+                 f"names -- and count it in this pattern's NOTES.md TCB tally "
+                 f"with the argument for why its `ensures` matches real Rust "
+                 f"semantics.")
+    if tcb:
+        rep.shout("tcb-included",
+                  f"{src}: {len(tcb)} bodied trusted item(s) {got_names} in a "
+                  f"`#[path]`-included file. Their `ensures` are HAND-WRITTEN "
+                  f"claims Verus never proves, and this file is shared -- an "
+                  f"item here is in EVERY pattern that includes it.")
+    return [dict(name=i.name, attr=i.external, body_lines=i.body_lines,
+                 line=i.line) for i in tcb]
+
+
 def check_verus_contract(pdir, rep, contract):
     """B1 + B2: obligation count, item set, and every `requires`/`ensures`
     diffed against the pin in spec.md.
@@ -3806,12 +3943,9 @@ def check_verus_contract(pdir, rep, contract):
         # verdict is read. RECAP "Owed" 0: these three keywords are the whole
         # textual trace the gate had of an axiom, and an axiom is the one shape
         # that can verify a false program at an unmoved obligation count.
-        for kw in ("assume(", "assume_specification", "admit("):
-            n = len(re.findall(re.escape(kw), vparse.blank_noncode(txt)))
-            if n:
-                rep.shout("tcb-axiom",
-                          f"{src}: {kw} appears {n}x -- must be justified in "
-                          f"NOTES.md and counted in this pattern's TCB tally")
+        # TASK_088 moved the body into `_axiom_keyword_shout` so the
+        # `#[path]`-included files get it too (TASK_084_REVIEW major 1, route C).
+        _axiom_keyword_shout(rep, src, txt)
         axioms = _check_axiom_decls(rep, src, txt, vcfg)
 
         # --- obligation count --------------------------------------------
@@ -3869,17 +4003,28 @@ def check_verus_contract(pdir, rep, contract):
     # different file lists. This is that walk, and the key convention for
     # declaring one of these is in `_check_axiom_decls`' docstring: the path
     # relative to the REPO root.
-    included = _path_includes(
-        pdir, sorted(pinned_obl) + sorted(f for f in os.listdir(pdir)
-                                          if f.endswith(".rs")))
+    #
+    # ⚠ **TASK_088: this loop now feeds ALL THREE detectors, not one.**
+    # `TASK_084_REVIEW` major 1 measured the other two missing, on real gate
+    # runs: the bodied TCB inventory (route J -- an `external_body` with
+    # `ensures r == 0`, green, `grep -c` == 0, byte-identical `synthesis.md`)
+    # and the `assume(`/`admit(` keyword shout (route C -- silent). The file
+    # list is `_verus_file_list`, which is also DEDUPED, so an include that
+    # resolves back inside `pdir` no longer arrives under two keys
+    # (`TASK_084_REVIEW` minor 5).
+    included = [(k, p) for k, p in _verus_file_list(pdir, sorted(pinned_obl))
+                if k not in pinned_obl]
     if included:
-        print(f"    scanned for hand-written axioms in `#[path]`-included "
-              f"files: {[os.path.relpath(p, REPO) for p in included]}")
-    for p in included:
-        rel = os.path.relpath(p, REPO)
-        ax = _check_axiom_decls(rep, rel, open(p).read(), vcfg)
-        if ax:
-            out[rel] = {"path_included": True, "axiom_decls": ax}
+        print(f"    scanned `#[path]`-included files for hand-written axioms, "
+              f"bodied trusted items and assume/admit: {[k for k, _ in included]}")
+    for rel, p in included:
+        txt = open(p).read()
+        ax = _check_axiom_decls(rep, rel, txt, vcfg)
+        itcb = _check_included_tcb(rep, rel, txt, vcfg)
+        _axiom_keyword_shout(rep, rel, txt)
+        if ax or itcb:
+            out[rel] = {"path_included": True, "axiom_decls": ax,
+                        "tcb_items": itcb}
     return out
 
 
@@ -6377,10 +6522,30 @@ def _trusted_items(pdir, contract):
     """{pinned Verus source: [trusted item names]} -- `_is_trusted` applied to
     every file `verus.obligations` names. Used by the Miri policy, which is now
     keyed on "does this pattern have a trusted base at all" rather than on
-    whether R4 and R5 happen to be byte-identical."""
+    whether R4 and R5 happen to be byte-identical.
+
+    ⚠ **TASK_088 widens the file list to `_path_includes`, the way
+    `_axiom_items` was widened at TASK_084.** `TASK_084_REVIEW` major 1: D3
+    widened `_check_axiom_decls` and `_axiom_items` and left this function --
+    *the one immediately below it, same shape, same purpose* -- iterating
+    `verus.obligations` only. Measured consequence (route J, a planted
+    `#[verifier::external_body] fn r84_lie(x:u64)->(r:u64) ensures r==0 { x }`
+    in a `#[path]`-included module): `grep -c r84_lie gate.log` -> **0**, the
+    gate printed *"3 TCB items"*, and `synthesis.md` came out **byte-identical**.
+    A false `ensures` about a SAFE operation was the whole vector -- `unsafe` in
+    an included module was already caught by `_scan_unsafe_sites`, which walks
+    this same list.
+
+    Keys for included files are **repo-relative**, the convention
+    `_check_axiom_decls`' docstring fixes and `_axiom_items` already uses, so a
+    `common/driver.rs` item cannot collide with a bare `verus.obligations` name.
+    ⚠ Because the include list is shared, one item in `common/driver.rs` lands
+    in every pattern's dict; that is right for the Miri policy (every pattern's
+    binary executes it) and WRONG for a published total, which is why
+    `synthesize.py` dedupes -- see `TASK_084_REVIEW` minor 1."""
     out = {}
-    for src in sorted((contract.get("verus") or {}).get("obligations") or {}):
-        path = os.path.join(pdir, src)
+    srcs = sorted((contract.get("verus") or {}).get("obligations") or {})
+    for src, path in _verus_file_list(pdir, srcs):
         if not os.path.exists(path):
             continue
         try:
@@ -6426,10 +6591,10 @@ def _axiom_items(pdir, contract):
     out = {}
     vcfg = contract.get("verus") or {}
     srcs = sorted(vcfg.get("obligations") or {})
-    paths = [(s, os.path.join(pdir, s)) for s in srcs]
-    paths += [(os.path.relpath(p, REPO), p) for p in _path_includes(
-        pdir, srcs + sorted(f for f in os.listdir(pdir) if f.endswith(".rs")))]
-    for key, path in paths:
+    # TASK_088: one shared, DEDUPED file list (`_verus_file_list`). This used to
+    # build its own and could hand the same file back under two keys --
+    # `TASK_084_REVIEW` minor 5.
+    for key, path in _verus_file_list(pdir, srcs):
         if not os.path.exists(path):
             continue
         txt = open(path).read()

@@ -267,6 +267,31 @@ disagreement **is** the `memset` finding, not a defect in either.
 """
 
 
+
+def _n_named(name):
+    """How many published `verus.rs` TCB items carry this name. COMPUTED, because
+    a hardcoded count in a generated file goes stale the moment a pattern lands
+    (TASK_088: the prose said 22 with 23 patterns in the tree)."""
+    import json as _j, glob as _g
+    n = 0
+    for f in _g.glob(os.path.join(REPO, "results", "gate", "*.json")):
+        if ".partial" in f:
+            continue
+        vb = (_j.load(open(f)).get("verus") or {}).get("verus.rs") or {}
+        n += sum(1 for i in (vb.get("tcb_items") or []) if i.get("name") == name)
+    return n
+
+
+def _n_verus_rs():
+    import glob as _g
+    return len(_g.glob(os.path.join(REPO, "patterns", "*", "verus.rs")))
+
+
+def _n_broadcast():
+    import glob as _g
+    return sum(1 for f in _g.glob(os.path.join(REPO, "patterns", "*", "verus.rs"))
+               if "broadcast use" in open(f).read())
+
 def load_measurements():
     out = {}
     for f in sorted(glob.glob(os.path.join(RESULTS, "p*.json"))):
@@ -885,10 +910,13 @@ def main():
       "*also* counts as a TCB item — and `.memory/05-layout.md` records that it "
       "and `assume_specification` are **one mechanism**, so the split between "
       "these two columns is *has a reviewable body*, not *is a different kind "
-      "of trust*. And the twin-and-`(a)/(b)/(c)` requirement covers **46 of "
-      "the 90** published items, not all of them: `load_input` and `emit` "
-      "(22 each) are `external_body` with **no `ensures`**, so `_is_trusted` is "
-      "false and nothing is demanded of them. An "
+      "of trust*. And the twin-and-`(a)/(b)/(c)` requirement does NOT cover "
+      "every published item: `load_input` and `emit` "
+      f"({_n_named('load_input')} and {_n_named('emit')}, one per pattern) are "
+      "`external_body` with **no `ensures`**, so `_is_trusted` is "
+      "false and nothing is demanded of them. ⚠ **These counts are COMPUTED "
+      "from the records every run — an earlier version hardcoded them and went "
+      "stale the moment a pattern was added.** An "
       "**axiom** is a hand-written claim about code Verus never compiles: "
       "`assume_specification`, `axiom fn`, `uninterp spec fn`, "
       "`#[verifier::external_trait_specification]`. It has **no body**, so it "
@@ -906,8 +934,9 @@ def main():
       "`axioms` column counts PATTERN-LOCAL declarations only, and reading `0` "
       "does NOT mean this tree rests on no hand-written axiom — an earlier "
       "version of this paragraph claimed exactly that and it is FALSE "
-      "(TASK_084_REVIEW major 2).** All **22** `verus.rs` carry "
-      "`broadcast use vstd::slice::group_slice_axioms`, which is six "
+      "(TASK_084_REVIEW major 2).** All "
+      f"**{_n_broadcast()}** of the **{_n_verus_rs()}** `verus.rs` carry "
+      "`broadcast use`, and `vstd::slice::group_slice_axioms` alone is six "
       "`broadcast axiom fn`s in the pinned vstd (`vstd/slice.rs:186`); ten also "
       "import `group_array_axioms`, and `lemma_u128_shr_is_div` appears 23 "
       "times. **Every published number here rests on hand-written axioms. They "
@@ -924,22 +953,40 @@ def main():
       "R4=R5 @O3 | verdict |")
     w("|---|---:|---:|---:|---:|---:|---|---|")
     tot_ob = tot_tcb = tot_lines = tot_ax = 0
+    # ⚠ **THE TOTALS DEDUPE THE `#[path]`-INCLUDED ROWS** (`TASK_084_REVIEW`
+    # minor 1). `common/driver.rs` is included by all 23 `verus.rs`, so ONE
+    # axiom or ONE trusted item there lands in all 23 records. The per-row `1`
+    # is right -- every one of those patterns' binaries executes it -- but the
+    # column total then reads 23 for one item, and the prose below tells the
+    # reader to quote the total. Distinct key: `(source, name, line)`.
+    shared_ax, shared_tcb = set(), {}
     extra_srcs = {}
     for pat in sorted(gates):
         g = gates[pat]
         vall = g.get("verus") or {}
         vb = vall.get(TCB_SRC) or {}
-        items = vb.get("tcb_items") or []
-        lines = sum(i.get("body_lines", 0) for i in items)
-        # R5's axioms: `verus.rs`'s own, plus every file it `#[path]`-includes.
-        # The gate keys an included file by its path relative to the repo root
-        # and flags it `path_included` (`check.py::_check_axiom_decls`); an
-        # axiom in `common/driver.rs` is licensed by this pattern's proof and
-        # executed by this pattern's binary, so it belongs in this row.
-        ax = list(vb.get("axiom_decls") or [])
+        # R5's trusted base: `verus.rs`'s own items and axioms, plus everything
+        # in the files it `#[path]`-includes. The gate keys an included file by
+        # its path relative to the repo root and flags it `path_included`
+        # (`check.py::_verus_file_list`); an axiom or an `external_body` in
+        # `common/driver.rs` is licensed by this pattern's proof and executed by
+        # this pattern's binary, so it belongs in this row.
+        #
+        # ⚠ **`tcb_items` on an included row is TASK_088**, and it is what makes
+        # a planted `external_body ... ensures r == 0` in an included module
+        # MOVE THIS TABLE. Before it, route J of `TASK_084_REVIEW` shipped green
+        # with `grep -c <name> gate.log` == 0 and a byte-identical
+        # `synthesis.md`: the gate did not look and this column could not see.
+        own_ax = list(vb.get("axiom_decls") or [])
+        own_items = list(vb.get("tcb_items") or [])
+        inc_ax, inc_items = [], []
         for k, v in sorted(vall.items()):
             if v.get("path_included"):
-                ax += [dict(d, src=k) for d in (v.get("axiom_decls") or [])]
+                inc_ax += [dict(d, src=k) for d in (v.get("axiom_decls") or [])]
+                inc_items += [dict(d, src=k) for d in (v.get("tcb_items") or [])]
+        ax = own_ax + inc_ax
+        items = own_items + inc_items
+        lines = sum(i.get("body_lines", 0) for i in items)
         others = {k: v for k, v in sorted(vall.items())
                   if k != TCB_SRC and not v.get("path_included")}
         if others:
@@ -948,17 +995,38 @@ def main():
                     if e.get("opt") == "O3"
                     and e.get("pair") == R5_PAIR), "-")
         tot_ob += vb.get("verified", 0)
-        tot_tcb += len(items)
-        tot_lines += lines
-        tot_ax += len(ax)
+        tot_tcb += len(own_items)
+        tot_lines += sum(i.get("body_lines", 0) for i in own_items)
+        tot_ax += len(own_ax)
+        for d in inc_ax:
+            shared_ax.add((d.get("src"), d.get("name"), d.get("line")))
+        for d in inc_items:
+            shared_tcb[(d.get("src"), d.get("name"), d.get("line"))] = \
+                d.get("body_lines", 0)
         w(f"| {g['pattern']} | {vb.get('verified', '-')} | "
           f"{vb.get('errors', '-')} | {len(items)} | {lines} | {len(ax)} | "
           f"{lvl} | {g.get('verdict', '-')} |")
+    n_shared_ax, n_shared_tcb = len(shared_ax), len(shared_tcb)
+    tot_ax += n_shared_ax
+    tot_tcb += n_shared_tcb
+    tot_lines += sum(shared_tcb.values())
     w(f"| **total** | **{tot_ob}** | | **{tot_tcb}** | **{tot_lines}** | "
       f"**{tot_ax}** | | |")
     w("")
-    w(f"**Trusted base, all 22 rows: {tot_tcb} items ({tot_lines} lines) and "
-      f"{tot_ax} axioms.** Quote both numbers; there is no single one.")
+    w(f"**Trusted base, all {len(gates)} rows: {tot_tcb} items ({tot_lines} "
+      f"lines) and {tot_ax} axioms.** Quote both numbers; there is no single "
+      f"one.")
+    w("")
+    w(f"⚠ **The totals are DISTINCT counts, not column sums, and the rows are "
+      f"not** (`TASK_084_REVIEW` minor 1, fixed at TASK_088). Every pattern's "
+      f"`verus.rs` `#[path]`-includes the same `common/driver.rs`, so one "
+      f"trusted item or one axiom there is real in every row and would be "
+      f"counted {len(gates)} times in a column sum. The rows above add the "
+      f"shared file's items because that row's binary executes them; the "
+      f"totals add each `(source, name, line)` **once**. Today the shared file "
+      f"contributes **{n_shared_tcb} item(s)** and **{n_shared_ax} axiom(s)**, "
+      f"so the two agree — the dedupe is measured inert and is here for the "
+      f"day it is not.")
     w("")
     # ---- the DERIVED disclosure of every Verus source this table skipped ----
     w(f"*This table reads **one** Verus source per pattern, `{TCB_SRC}` — the "

@@ -1,6 +1,6 @@
 # p19-state-machine — results
 
-Generated 2026-08-24T18:12:09Z from `results/p19-state-machine.json` (git `f4937ada1c8b`, working tree dirty).
+Generated 2026-08-25T04:28:28Z from `results/p19-state-machine.json` (git `6e52208fc1cf`, working tree dirty).
 
 ## Toolchain
 
@@ -161,22 +161,22 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 18.12 | 18.37 | 1.4% | 6.63 | 6.83 | 3.1% |
-| c-gcc | whole | 18.11 | 18.33 | 1.2% | 6.60 | 6.81 | 3.1% |
-| c-clang | isolated | 18.37 | 18.62 | 1.4% | 6.71 | 7.15 | 6.5% |
-| c-clang | whole | 18.30 | 18.61 | 1.7% | 6.72 | 7.11 | 5.8% |
-| safe_naive | isolated | 19.54 | 19.75 | 1.1% | 11.67 | 12.09 | 3.6% |
-| safe_naive | whole | 19.48 | 19.77 | 1.5% | 11.44 | 11.63 | 1.7% |
-| safe_tuned | isolated | 22.10 | 22.39 | 1.3% | 12.26 | 12.46 | 1.6% |
-| safe_tuned | whole | 22.05 | 22.39 | 1.5% | 12.26 | 12.43 | 1.4% |
-| unsafe | isolated | 19.60 | 19.78 | 0.9% | 11.65 | 11.78 | 1.1% |
-| unsafe | whole | 19.53 | 19.77 | 1.2% | 11.42 | 11.67 | 2.2% |
-| verus | isolated | 19.60 | 19.74 | 0.8% | 11.68 | 11.84 | 1.4% |
-| verus | whole | 19.54 | 19.76 | 1.1% | 11.62 | 11.83 | 1.8% |
-| c-gcc-h | isolated | 19.31 | 19.66 | 1.9% | 12.10 | 12.28 | 1.5% |
-| c-gcc-h | whole | 19.45 | 19.68 | 1.2% | 12.12 | 12.28 | 1.3% |
-| c-clang-h | isolated | 19.52 | 19.72 | 1.0% | 11.57 | 11.78 | 1.8% |
-| c-clang-h | whole | 19.37 | 19.62 | 1.3% | 11.23 | 11.38 | 1.4% |
+| c-gcc | isolated | 18.11 | 18.37 | 1.4% | 6.58 | 6.78 | 3.0% |
+| c-gcc | whole | 18.08 | 18.31 | 1.3% | 6.60 | 6.92 | 4.9% |
+| c-clang | isolated | 18.34 | 18.56 | 1.2% | 6.84 | 7.12 | 4.1% |
+| c-clang | whole | 18.36 | 18.61 | 1.4% | 6.73 | 6.91 | 2.7% |
+| safe_naive | isolated | 19.54 | 19.74 | 1.0% | 11.65 | 11.97 | 2.7% |
+| safe_naive | whole | 19.40 | 19.72 | 1.6% | 11.49 | 11.63 | 1.3% |
+| safe_tuned | isolated | 22.10 | 22.38 | 1.3% | 12.30 | 12.45 | 1.2% |
+| safe_tuned | whole | 22.13 | 22.35 | 1.0% | 12.19 | 12.42 | 1.9% |
+| unsafe | isolated | 19.50 | 19.74 | 1.2% | 11.68 | 11.85 | 1.5% |
+| unsafe | whole | 19.55 | 19.71 | 0.8% | 11.43 | 11.63 | 1.7% |
+| verus | isolated | 19.57 | 19.82 | 1.3% | 11.67 | 11.80 | 1.1% |
+| verus | whole | 19.67 | 19.83 | 0.8% | 11.68 | 11.78 | 0.9% |
+| c-gcc-h | isolated | 19.43 | 19.63 | 1.0% | 12.13 | 12.29 | 1.3% |
+| c-gcc-h | whole | 19.46 | 19.74 | 1.4% | 12.06 | 12.25 | 1.6% |
+| c-clang-h | isolated | 19.58 | 19.83 | 1.3% | 11.59 | 11.74 | 1.3% |
+| c-clang-h | whole | 19.49 | 19.65 | 0.8% | 11.26 | 11.44 | 1.7% |
 
 Every wall-clock cell is within the 10% min-to-median spread threshold.
 

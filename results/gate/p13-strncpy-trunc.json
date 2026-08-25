@@ -132,13 +132,13 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "c4b13e11a37bf5ee283ae487a3ba3f8ec53346814c75e8f6448715f3e29eb246",
+    "harness/check.py": "a9ae6c1efc51fb7407e1d914f739f3857d9af95d4ae7d007b09cddbd5d875028",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "ee1f2ace4cdcaff61a8bb234a271d7d7a2d6b089f532a926bc4dca06f56a6881",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
-    "harness/vparse.py": "8580d851b5b9c9a1cb516237a4266a09d5cc64a744cbb33dfc6d36c8070ca929",
+    "harness/vparse.py": "70ec4a2077b5def61aaa8347dbd8bf0d7c0a911adcf0e0003970fddc171e0213",
     "patterns/p13-strncpy-trunc/NOTES.md": "965433acea9e4d51d367b49a99f6b46fc7494c203c554b605f39f45e128afd01",
     "patterns/p13-strncpy-trunc/README.md": "87b0261b50597a71710e8573336bb569deca0a6cb0f516171c3a3d194f7311ca",
     "patterns/p13-strncpy-trunc/c/kernel.c": "fd76e9c128584f4d0779639b8ade864afc05417897ea066701e25b685c0a84c8",
@@ -969,7 +969,6 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole",
           "O3/whole"
         ],
         "model_exit": 0,
@@ -983,6 +982,7 @@
         "stderr": "",
         "signal": null,
         "cells": [
+          "O0/whole",
           "O3/isolated"
         ],
         "model_exit": 0,
@@ -1149,6 +1149,7 @@
         "stderr": "",
         "signal": null,
         "cells": [
+          "O0/whole",
           "O3/whole"
         ],
         "model_exit": 0,
@@ -1162,7 +1163,6 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole",
           "O3/isolated"
         ],
         "model_exit": 0,
@@ -1473,7 +1473,6 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole",
           "O3/whole"
         ],
         "model_exit": 0,
@@ -1487,6 +1486,7 @@
         "stderr": "",
         "signal": null,
         "cells": [
+          "O0/whole",
           "O3/isolated"
         ],
         "model_exit": 0,
@@ -1653,7 +1653,6 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole",
           "O3/isolated"
         ],
         "model_exit": 0,
@@ -1680,6 +1679,7 @@
         "stderr": "",
         "signal": null,
         "cells": [
+          "O0/whole",
           "O3/whole"
         ],
         "model_exit": 0,
@@ -1825,7 +1825,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7fb4fe600040 with insufficient space for an obj",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f6565a00040 with insufficient space for an obj",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1836,7 +1836,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7fb847c00040 with insufficient space for an obj",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f0a2c600040 with insufficient space for an obj",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1858,7 +1858,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7fa237800040 with insufficient space for an obj",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f13e6800040 with insufficient space for an obj",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1869,7 +1869,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f7ff1000040 with insufficient space for an obj",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7fb957600040 with insufficient space for an obj",
       "declared_hang": false,
       "hung": false,
       "stdout": "",

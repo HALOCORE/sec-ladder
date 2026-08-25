@@ -48,9 +48,19 @@
  *     }
  *
  * The tables come from a userspace-supplied binary policy blob, and getting
- * that validator wrong is a live CVE class -- CVE-2026-23407 *"apparmor: fix
- * missing bounds check on DEFAULT table in verify_dfa()"* and CVE-2026-23269
- * *"AppArmor unpack_pdb DFA bounds validation hardening"*.
+ * that validator wrong is a live CVE class. THE ONE THIS PATTERN MODELS is
+ * CVE-2026-23407 *"apparmor: fix missing bounds check on DEFAULT table in
+ * verify_dfa()"*, whose description is p19's bug verbatim: an unvalidated
+ * DEFAULT_TABLE entry used as an array index, which "causes both out-of-bounds
+ * reads and writes".
+ *
+ * A neighbouring CVE in the same file and the same validator, cited for the
+ * CLASS and expressly NOT for the shape: CVE-2026-23269 *"apparmor: validate
+ * DFA start states are in bounds in unpack_pdb"* -- an untrusted START state,
+ * which p19 does not model at all because its walk starts at st = 0 by
+ * construction. An earlier version of this comment gave that CVE a PARAPHRASED
+ * title inside quotation marks; the title above is the real one
+ * (TASK_087_REVIEW major 3).
  *
  * **So "validate the whole table once, then index it unchecked" is not a
  * benchmark contrivance -- it is the shipped kernel idiom, and it is exactly
