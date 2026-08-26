@@ -555,3 +555,49 @@ Miri is the only working one, and it covers the Rust rungs only.**~~
 ⚠⚠ **THAT CONCLUSION IS WITHDRAWN — see the top of this section.** The `-O`
 dependence is real and reproduces; what does not follow is *"no detector"*. It is
 one stale stack root, and `use_stacks=0` removes it at zero measured cost.
+
+---
+
+## Toolchain facts established by probing candidate rows (TASK_102, PROVISIONAL)
+
+⚠ **All four were found while REFUSING rows, and they outlive the rows.**
+
+### ⚠⚠ `check.py` SETS NO `MIRIFLAGS`, AND MIRI'S ALIGNMENT CHECK IS SEED-DEPENDENT
+
+**This is a live gate defect, not a curiosity.** The **same source** is clean
+under `-Zmiri-seed=0` and `-Zmiri-seed=2` and reports **UB** under
+`-Zmiri-seed=1` and `-Zmiri-seed=3`. `harness/check.py` passes **no** seed, so
+Miri runs at its default and **a `miri.required: true` row can pass or fail on
+which seed the default happens to be.**
+
+⚠ **Consequence: "Miri: N of N, no UB" is a statement about one unpinned draw.**
+Every pattern in the tree carries such a line. **Owed:** pin the seed in
+`check.py` (⚠ a `check.py` edit stales every gate record — batch it), or sweep
+several seeds and record which were run. ⚠ **Until then, do not read a green
+Miri row as "no UB"; read it as "no UB at whatever seed ran".**
+
+### `unchecked_div` / `unchecked_rem` DO NOT EXIST at the pinned rustc
+
+`E0599` on the method, then `E0635 unknown feature` on the gate. **So a
+division-by-zero row has no unsafe lever at all** — the only spelling available
+is `unreachable_unchecked`, which is an **annotation**, not an operation. ⚠ **A
+row whose "unsafe rung" is an annotation has no rung boundary; check for the
+operation before designing the ladder.**
+
+### `-fstack-clash-protection` is ON by default for gcc and OFF for clang
+
+⚠ **Measured from the emitted probe bytes, not from `-Q --help=common`** — the
+manager asserted it as on for both and that is **false for clang**. ⚠ **The
+`--help` output is a statement about the driver's defaults table, not about what
+the compiler emitted; read the bytes.** ✅ Note this did **not** rescue the
+VLA/stack-clash row either way: `witness_dirty=0` in every cell, on **both**
+compilers, probed and unprobed.
+
+### glibc 2.39's `qsort` is mergesort + heapsort, not quicksort
+
+So **a hostile comparator cannot drive it out of bounds** — every loop bound is a
+count or an index, not a sentinel scan. **80 cells, zero ASan reports**,
+including a comparator that always returns `−1`, against a positive control
+firing `ASan=2` in 4/4. ⚠ **This refusal is DATED, not absolute: it rests on
+glibc 2.39, and the classic hostile-comparator OOB is real against a
+sentinel-scan quicksort.** Re-check after any libc bump.

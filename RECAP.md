@@ -1736,6 +1736,58 @@ the number.** Two task files have already sent an agent to the wrong finding.
     Evidence: `.tasks/TASK_089_REPORT.md`, `.tasks/TASK_089_REVIEW_REPORT.md`,
     `.tasks/TASK_092_REPORT.md`, `patterns/p46-bignum-mac/NOTES.md`.
 
+37. ⚠⚠ **THE INSTRUMENT HAS A STRUCTURAL LIMIT, AND IT IS WHY THE CATALOGUE RAN
+    OUT. This is the finding that answers "how many more patterns?" — and it is
+    measured, not argued.** ⚠ **PROVISIONAL — `TASK_102` is unreviewed.**
+
+    > **This benchmark can price a safety property IF AND ONLY IF some rung emits
+    > it as a compare-and-branch and another rung omits it.** A property enforced
+    > by **the type system**, by **a library contract**, by **an absent
+    > operation**, by **a resource limit no rung emits**, or by **a compiler
+    > diagnostic** has **no machine-code footprint at all** — and probe 2 says so
+    > every single time.
+
+    **Eight candidate rows were probed and all eight were refused, each on a
+    measurement** — the manager's four and the engineer's own four, ⚠ **and both
+    lists had a hit rate of ZERO, which is the point: this is structural, not bad
+    luck.**
+
+    | candidate | what killed it |
+    |---|---|
+    | recursion depth | `k_safe_naive`/`k_safe_tuned`/`k_unsafe` all `call` **the same ICF-merged symbol** — no bounds check, no panic edge. **R2 = R3 = R4, one rung.** Depth headroom flat too: gcc `-O2` and Rust `-O3` both **48 B/frame**, both survive **173 950**. |
+    | division by zero | ⚠ **`unchecked_div` does not exist at the pin** (`E0599`, then `E0635 unknown feature`). The only lever is `unreachable_unchecked`, an **annotation**. Behaviour matrix has **one column**: C `rc=136` SIGFPE, safe Rust `rc=101` panic, unsafe Rust `rc=136`. |
+    | unaligned load | Probe 2 twice: gcc `k_cast` ≡ `k_memcpy` (19 insns, `437d7f5cbf20`); Rust `ptr::read` ≡ `read_unaligned` (58 insns, `9fc2e1d8889a`). Harm never observable without a sanitizer — **36 plain cells, all `rc=0`**. |
+    | format string | Harm is **ASLR-nondeterministic** (3/3 different `%p`), `%n` blocked at `-O2` by fortify. The cost axis is **glibc**, `+162 Ir`/call, **none of it a check**. |
+    | stack use-after-return | **Both compilers warn by default** (`-Wreturn-local-addr` / `-Wreturn-stack-address`) and gcc then SIGSEGVs instead of exhibiting it. |
+    | VLA / `alloca` stack clash | `witness_dirty=0` in **every** cell; every oversize case a plain `rc=139`. **No clash observable even unprobed, even on clang.** |
+    | `qsort` comparator | **80 cells, ZERO ASan reports**, including a comparator that always returns `−1`; positive control fires `ASan=2` in 4/4. Mechanism fetched: **glibc 2.39's `qsort` is mergesort + heapsort**, all bounds are counts. |
+    | TOCTOU double fetch | `k_double_fetch` ≡ `k_single_fetch`, 22 insns, `7b0e28cdead4` — **CSE'd to one load**. And it *is* `p38`, which already ships the folded control. |
+
+    ✅ **ONE KEEPER, and it belongs in the synthesis rather than in a row: A
+    TERMINATION PROOF DOES NOT BOUND THE STACK.** `b3_verus_rec.rs` verifies
+    **`3 verified, 0 errors`** with `decreases buf.len() - i`, and the compiled
+    binary at depth 1e6 prints **`fatal runtime error: stack overflow, aborting`,
+    `rc=134`**. **The proof discharges exactly what it says and the program still
+    dies** — `p47`'s shape (the proof certifies a leaking kernel), second
+    instance, on a different resource.
+
+    ⚠⚠ **THE SCHEDULING CONSEQUENCE, and it is the endgame answer: NEW ROWS ARE
+    NOT WHERE THE REMAINING VALUE IS.** Eight refusals on eight probes, after
+    fifteen refusals on the original catalogue, is the instrument telling us its
+    domain. **Finish `p23`, take `p42` (a bug class the tree genuinely lacks and
+    which fires at the gate's own flags), and spend the rest on the synthesis.**
+
+    ⚠ **AND THE "FIFTEENTH `index >= len`" BAR WAS ON THE WRONG QUANTITY** — the
+    manager suspected this and asked for it to be argued from the CVE
+    distribution rather than from taste. **The replacement bar, which is better:**
+    *a row is admissible whenever it brings a **new mechanism** — a new operator
+    on the safety line, a new source of the bound, or a new reason the check is or
+    is not elided.* **"Another `index >= len`" is not the question; "another
+    `cmp`/`jbe` in the same place for the same reason" is.** `p36` shipped as the
+    twelfth and was worth it; `p45`'s class was genuinely absent and was not.
+
+    Evidence: `.tasks/TASK_102_REPORT.md`, `.temp/t102/` (`REBUILD.sh`).
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds

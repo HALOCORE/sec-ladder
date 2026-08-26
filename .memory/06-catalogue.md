@@ -1137,6 +1137,22 @@ k44_unchecked insns=67 mnemonic-multiset=f815d5d3b2f4 normalised-text=fed7c19bd6
 ✅ **Independently corroborated by probe 3**: under a fixed driver all three read
 **`12849.00` marginal `Ir`/call, identical to the unit.**
 
+⚠⚠ **AND `knorm.py` ITSELF HAS A DEFECT — THE THIRD ONE FOUND IN PROBE 2, AND
+THIS ONE FAILS ON THE KILL SIDE.** (TASK_102, PROVISIONAL.) **It counts
+inter-function alignment padding as instructions**, so it reported a pair that is
+**literally the same program** (`k_double_fetch` vs `k_single_fetch`, CSE'd to
+one load) as **24 vs 22 insns, `!=`.** ⚠ **A FALSE NEGATIVE ON A KILL CRITERION
+IS THE DANGEROUS DIRECTION: probe 2 saying "these differ" is what KEEPS a row
+alive, so this defect manufactures rungs that do not exist.** The two earlier
+defects were false-*positives* on relocations and false-*negatives* on linked
+md5; **this is a third, in the form that was supposed to be the one that works.**
+✅ **Four-line fix in `.temp/t102/b4_norm.py`** — stop at the function's own
+extent instead of running into the next symbol's padding.
+⚠ **Every probe-2 result taken with `knorm.py` on a kernel whose symbol is
+followed by padding is suspect until re-run with the fix.** `p44`'s numbers above
+are **not** affected — all three read `insns=67` and the same normalised text, so
+the padding term is common to all three and cancels.
+
 **4. DOES THE ROW'S UNSAFE OPERATION HAVE A `vstd` SPEC — AND THE GREP IS
 NECESSARY, NOT SUFFICIENT.** (Added TASK_086; the caveat is its finding #239,
 **PROVISIONAL — unreviewed**.) `check.py::_scan_unsafe_sites` requires every
