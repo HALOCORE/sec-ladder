@@ -1886,8 +1886,11 @@ the number.** Two task files have already sent an agent to the wrong finding.
     guard's price **flips sign twice across p23's own rank band** (`+168.48` at
     0.03, `−144.59` at 0.50, `+139.87` at 0.97), and the two shipped inputs sit at
     ranks 0.44 and 0.28 — **both inside the negative window, which `gen.py`
-    enforces.** ⚠ **p23's own warning is *"any number quoted without its rank is
-    quoted without its domain"*, and its C row was quoted without one.** The
+    enforces.** ⚠⚠ **And the negative sign is absent from p23's OWN MIXED BAND:
+    the guard price is POSITIVE at all five band-X points.** So *"the safety line
+    has a negative price on gcc"* holds on two enforced inputs and on no mixed
+    input measured. ⚠ **p23's own warning is *"any number quoted without its rank
+    is quoted without its domain"*, and its C row was quoted without one.** The
     stated mechanism is refuted too: scan steps fit R² `0.023`, **exchanges
     `0.973`**.
 
