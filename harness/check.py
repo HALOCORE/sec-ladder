@@ -2552,52 +2552,94 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
     SMALL CASE. Read the next paragraph before quoting `±0.20` at another
     pattern** (TASK_077_REVIEW m8). This docstring used to close *"it is bounded
     and small, and it threatens no published number"*, on the strength of p08's
-    `R1h - R1 = 0.00` in 12 configurations. The tree now has **FOUR patterns at
-    ±7 Ir/call** (p03, p04, p38 and -- since TASK_092 -- p46), 35x that bound.
-    This line said *three* until TASK_096:
+    `R1h - R1 = 0.00` in 12 configurations. There are patterns at **±7 Ir/call**,
+    35x that bound.
 
-      * ⚠ **The mode rule is `-O3 isolated` is invariant -- NOT "the term is
-        `whole`-mode only", which is what this bullet said until TASK_096 and
-        which p46 refutes** (RECAP "Owed" 30, measured at TASK_092). TASK_077
-        moved 97 gate marginals without touching p03's or p04's files at all:
-        40 `isolated` keys moved by at most **0.14** (inside the p08 band
-        above), 57 `whole` keys moved by up to **7.14**, and p04
-        `safe_naive O3 isolated large` read 28342.00 at all seven environment
-        sizes probed. **That evidence is all `-O3`.** Two consecutive
-        `check.py p46` runs on an identical tree move cells at `-O0` in BOTH
-        modes -- **five `-O0 isolated` cells among them** -- so the surviving
-        rule is the one the evidence actually supports:
+    ⚠⚠ **THE EXPOSED SET IS A MEASUREMENT, SO IT IS QUOTED AS ONE -- WITH ITS
+    INSTRUMENT, ITS DATE AND ITS DENOMINATOR.** Every earlier version of this
+    paragraph asserted a pattern list instead, and every one of them was wrong:
+    *three* until TASK_096, *four* until TASK_099, and **`-O3 isolated` is
+    invariant** until TASK_097 refuted it with a one-variable experiment. The
+    honest form is the census, and re-taking it costs ~90 minutes:
 
-              -O3 isolated  invariant (0.00 across every probe to date)
-              -O3 whole     moves by 7 per per-call stack `memset`
+        2026-08-22, `.temp/r98/treescan.py` (TASK_098, reviewed), 24 patterns
+        x 6 cells x 2 blobs at `-O3 isolated`, pad 0 against pad 16:
+
+              288 (pattern, input, cell) triples
+              marginal_ir_per_call        moved in  14
+              kernel_exclusive_ir         moved in   0   <- structurally immune
+              exposed (pattern, cell) pairs:   7 of 144
+                p03 {safe_tuned, unsafe, verus}
+                p04 {safe_tuned, unsafe, verus}
+                p46 {c-clang}      <- NOT a Rust rung, NOT the memset story
+
+      * ⚠ **SO "TWO PATTERNS, 7 OF 144 CELLS" IS ARITHMETICALLY IMPOSSIBLE and
+        it is in `.memory/03-measurement.md`'s RESOLVED block, in
+        `TASK_098_REPORT.md` MAJOR 3 and in `TASK_099.md` §C.** The seventh cell
+        is p46's `c-clang`, so the count is **three patterns**; what is true --
+        and is what those sentences were reaching for -- is that **p38 and p46's
+        RUST rungs swing `0.00` over 32 pads**, which is what kills the
+        four-pattern list.
+      * ⚠ **`-O3 isolated` IS NOT INVARIANT.** The line here used to read
+        *"invariant (0.00 across every probe to date)"* and the closing
+        paragraph called it *"the only cell class no probe has moved"*.
+        TASK_097 refuted both and `.memory/03-measurement.md` records the fix
+        as **owed and not done**; this is it. What the evidence supports:
+
+              -O3 isolated  p03/p04's Rust rungs move by 7 per rung, 14 per
+                            pair; 137 of 144 cells do not move
+              -O3 whole     moves by 7 per per-call stack `memset`  (p03, p04,
+                            p38, p46 -- measured at TASK_077/TASK_092, and NOT
+                            re-measured since, so it is the older claim)
               -O0           moves in BOTH modes
+              kernel_exclusive_ir   immune in every mode probed (0 of 288)
 
-        ⚠ **And the pattern count in the paragraph above is FOUR, not three:
-        p46 is the fourth** (p03, p04, p38, p46) and it `memset`s **two** stack
-        arrays per call, so its `unsafe`/`verus` `O3 whole` cells move by
-        exactly `-14 = 2 x 7` rather than by 7. **A pattern's step is
+        p46 `memset`s **two** stack arrays per call, so its `unsafe`/`verus`
+        `O3 whole` cells move by `-14 = 2 x 7`: **a pattern's step is
         `7 x (per-call stack arrays)`, not a flat 7.**
-      * **It is BISTABLE, not scattered.** p08's ±0.10 really is scatter over
-        the pad LENGTH; the ±7 is not. Pad lengths 1, 7, 8, 40, 200 and 700 all
-        give one value and pad 0 gives the other -- the discriminator is the
-        **presence** of a single environment variable, not its size
-        (TASK_077_REVIEW A2 #32). So two gate runs from shells differing by one
-        variable disagree by exactly 7 Ir/call, forever, on an unchanged tree.
+      * **It is BISTABLE with a PERIOD OF 32 BYTES and a WINDOW EXACTLY 16 WIDE,
+        and the phase differs per binary.** ⚠ This bullet said the
+        discriminator was the **presence** of an environment variable *"not its
+        size"* (TASK_077_REVIEW A2 #32). **False at `-O3 isolated`**: over a
+        full period (`.temp/r98/{p03,p04}_sweep.json`, 32 pads, and reproduced
+        independently at TASK_099 in a different session at pads 0/8/16/24),
+
+              p03 unsafe      3066 for pads  6..21, else 3059
+              p03 verus       3058 for pads  8..23, else 3065
+              p03 safe_tuned  3425 for pads 14..29, else 3418
+
+        so pad 1 and pad 7 disagree on the same binary. Two consequences worth
+        having: **the pair swing is 14, not 7**, because `unsafe` and `verus`
+        have different phases and can sit in opposite states (that is TASK_097's
+        `+6.00 -> -8.00` sign flip); and **a 16-apart two-pad screen is a
+        COMPLETE detector, not a lower bound**, because a 16-wide window in a
+        32-period puts `p` and `p+16` in opposite states always -- which is why
+        the census above only needed two pads. ⚠ That completeness argument
+        rests on the 16-wide window, verified on p03's and p04's six Rust cells
+        only.
       * **The mechanism is a stack array, not a heap one.** p03, p04, p38 and
         p46 all `memset` a stack scratch buffer per call; the environment block
         shifts the initial stack pointer, which shifts that array's alignment,
         which picks a different tail in `__memset_avx2_unaligned_erms` --
-        `patterns/p03-bounded-stack/NOTES.md` 3b names the same 7 Ir. p08's work
-        is a heap `memmove`, which is why p08 moves in hundredths.
+        `patterns/p03-bounded-stack/NOTES.md` 3b names the same 7 Ir, and
+        TASK_098 attributed **100% of the swing** to that one libc symbol by
+        per-symbol differencing. p08's work is a heap `memmove`, which is why
+        p08 moves in hundredths.
 
     Three consequences. Quote marginals **to the instruction, never to the
-    hundredth**, across sessions. **Never quote a `whole`-mode marginal across
-    sessions at all** -- quote the `-O3 isolated` one, which is what
-    `synthesis/synthesize.py::marginal` already defaults to, and which is the
-    only cell class no probe has moved. And if p08's 12 cells move by a few
-    hundredths, or p03/p04/p38/p46's `whole` cells move by exactly 7 (14 for
-    p46), or any `-O0` cell moves in either mode, between gate runs, that is
-    this effect and not a code change.
+    hundredth**, across sessions. **`-O3 isolated` is the least bad column and
+    is what `synthesis/synthesize.py::marginal` defaults to, but on p03 and p04
+    it is not a quantity** -- there the immune column is `kernel_exclusive_ir`,
+    and `results/synthesis.md` withdraws the four cells where the correction
+    *is* the whole figure. And if p08's 12 cells move by a few hundredths, or
+    p03/p04's `-O3 isolated` cells or p03/p04/p38/p46's `whole` cells move by
+    exactly 7 (14 for p46), or any `-O0` cell moves in either mode, between gate
+    runs, that is this effect and not a code change.
+
+    ⚠ **Do NOT "fix" this by pinning the gate's environment.** It is cheap --
+    `check.py` is not in `measure.py::measurement_sources` -- and it makes the
+    number reproducible-and-wrong: one arbitrary draw from a two-state
+    distribution, permanently, with nothing marking it as such.
 
     **The floor is derived, not declared** (TASK_005 A1). `spec.md` used to pin
     an absolute `min_marginal_ir_per_call`, which is a number the pattern author
@@ -3291,23 +3333,93 @@ def _is_trusted(item):
     return bool(_clauses(item, "ensures")) or bool(_UNSAFE_RE.search(item.body or ""))
 
 
+# `include!("h.rs")` -- a MACRO, not a `#[path] mod`, and the fifth route past
+# the Verus-side detectors (TASK_098 §4A / MAJOR 4, `.memory/02-bench-rules.md`).
+# Rust accepts `include!` with any bracket, and the argument may be a raw string.
+_INCLUDE_LIT_RE = re.compile(
+    r"\binclude!\s*[(\[{]\s*"
+    r"(?:r(?P<hashes>\#*)\"(?P<raw>.*?)\"(?P=hashes)|\"(?P<plain>[^\"]*)\")",
+    re.S)
+_INCLUDE_ANY_RE = re.compile(r"\binclude!\s*[(\[{]")
+
+
+def _include_literals(txt):
+    """The string literal argument of every `include!` in `txt`, plus the count
+    of `include!`s whose argument is NOT a plain literal.
+
+    The second number is what stops this being a whack-a-mole regex: an
+    `include!(concat!(...))` or `include!(env!("OUT_DIR"))` resolves to no path
+    a static reader can name, so the honest answer is "I cannot see this file",
+    which `_check_opaque_includes` turns into a gate failure rather than into
+    the silence that TASK_098 measured."""
+    lits, n_opaque = [], 0
+    for m in _INCLUDE_ANY_RE.finditer(txt):
+        lit = _INCLUDE_LIT_RE.match(txt, m.start())
+        if lit is None:
+            n_opaque += 1
+            continue
+        lits.append(lit.group("raw") if lit.group("raw") is not None
+                    else lit.group("plain"))
+    return lits, n_opaque
+
+
 def _path_includes(pdir, srcs):
     """Every file the given sources pull into their crate with
-    `#[path = "..."] mod ...`. Those files are part of the token stream the
-    compiler and Verus see, and no pattern-local check ever parsed them:
-    `common/driver.rs` is `#[verifier::external]` for R5, so an `unsafe` helper
-    or a `#[cfg(slb_twin)]` item in it is invisible to every rule keyed on the
-    pattern's own sources."""
-    out = []
+    `#[path = "..."] mod ...` **or `include!("...")`**, TRANSITIVELY. Those
+    files are part of the token stream the compiler and Verus see, and no
+    pattern-local check ever parsed them: `common/driver.rs` is
+    `#[verifier::external]` for R5, so an `unsafe` helper or a
+    `#[cfg(slb_twin)]` item in it is invisible to every rule keyed on the
+    pattern's own sources.
+
+    ⚠ **Two holes closed at TASK_099, both latent (0 hits over the 24 shipped
+    patterns) and both reaching every detector this feeds** -- the three
+    Verus-side ones through `_verus_file_list`, plus `_scan_unsafe_sites` and
+    `_check_twin_cfg_hygiene`, which call it directly:
+
+    1. **`include!` is a macro, not a module declaration**, so neither pattern
+       below matched it and the walk never saw the file. TASK_098 §4A measured a
+       `verus.rs` whose `unsafe` lived in an `include!`d sibling: `1 verified, 0
+       errors`, `_scan_unsafe_sites` 0 failures, `_path_includes` `[]` -- which
+       is TASK_009_REVIEW's blocker x1 reached by a different spelling.
+    2. **The walk was ONE LEVEL DEEP.** `verus.rs` -> `#[path]` -> `driver.rs`
+       was seen; anything `driver.rs` itself pulled in was not, because the
+       loop only ever read `srcs`. That is the same hole with no new spelling at
+       all, and it needs no macro. It is now a fixed point, and
+       `.temp/t99/b3_routes.py` shows it live at HEAD:
+       `#[path]`-of-`#[path]` verifies `1 verified, 0 errors` with the leaf
+       unscanned.
+
+    Include paths resolve against **the directory of the file that names them**
+    (both `#[path]` on a file-level `mod` and `include!` are relative to the
+    including file), which is what makes the transitive step correct rather than
+    merely deeper: a `mod` inside `common/driver.rs` names a file beside
+    `driver.rs`, not beside `verus.rs`.
+
+    ⚠ **A file that is BOTH a root and an include target is still returned**,
+    and the two sets are tracked separately for that reason. `srcs` are read for
+    *their* includes, but being readable is not being scanned: callers scan
+    `verus.obligations` plus what this returns, and `pdir/*.rs` is passed in as
+    a root purely so a stray sibling's `#[path]` is followed. Folding the roots
+    into the emitted set would drop exactly TASK_098 §4A's measured route --
+    `verus.rs` `include!`ing a **sibling** `.rs`, which is in `pdir/*.rs` and
+    therefore a root -- and this function returned `[]` for it in the first
+    version of this fix."""
+    out, queue, walked, emitted = [], [], set(), set()
     for src in srcs:
-        path = os.path.join(pdir, src)
-        if not os.path.exists(path):
-            continue
+        p = os.path.join(pdir, src)
+        if os.path.exists(p):
+            queue.append(p)
+            walked.add(os.path.realpath(p))
+    while queue:
+        path = queue.pop(0)
+        base = os.path.dirname(path) or "."
         # The RAW text, not `blank_noncode`: the path is a string literal, which
         # blanking erases. A commented-out `#[path]` therefore gets scanned too,
         # which is the safe direction.
         txt = open(path).read()
         cand = re.findall(r"#\[\s*path\s*=\s*\"([^\"]+)\"\s*\]", txt)
+        cand += _include_literals(txt)[0]
         # ...and a plain `mod foo;`, which resolves to a sibling file rather than
         # to a declared path. No pattern uses that today; leaving it out would
         # mean an `unsafe` helper or a `#[cfg(slb_twin)]` item in `foo.rs` was
@@ -3317,10 +3429,59 @@ def _path_includes(pdir, srcs):
                              vparse.blank_noncode(txt)):
             cand += [m.group(1) + ".rs", os.path.join(m.group(1), "mod.rs")]
         for inc in cand:
-            p = os.path.normpath(os.path.join(pdir, inc))
-            if p not in out and os.path.exists(p):
+            p = os.path.normpath(os.path.join(base, inc))
+            if not os.path.exists(p):
+                continue
+            real = os.path.realpath(p)
+            if real not in emitted:
+                emitted.add(real)
                 out.append(p)
+            if real not in walked:
+                walked.add(real)
+                queue.append(p)
     return out
+
+
+def _check_opaque_includes(rep, pdir, contract):
+    """`include!` whose argument no static reader can resolve: refuse it.
+
+    `_path_includes` closes `include!("h.rs")` by resolving the literal. The
+    residue is `include!(concat!(env!("OUT_DIR"), "/gen.rs"))` and friends,
+    where there is no path to resolve and the honest verdict is a refusal
+    rather than an empty list -- the same posture as `--emit` refusing to write
+    a `NOT-BUILT` licence sidecar. **This is the only new failure mode TASK_099
+    adds, and the "could this happen by accident?" test is why it is safe: the
+    24 shipped patterns contain ZERO `include!` of any spelling**, and no
+    honest author of a five-rung micro-benchmark reaches for a generated
+    include when `harness/build.py` invokes `rustc` directly with no build
+    script and no `OUT_DIR` in the environment."""
+    vcfg = contract.get("verus") or {}
+    srcs = sorted(vcfg.get("obligations") or {})
+    files = [(s, os.path.join(pdir, s)) for s in srcs]
+    files += [(os.path.relpath(p, REPO), p) for p in _path_includes(
+        pdir, srcs + sorted(f for f in os.listdir(pdir) if f.endswith(".rs")))]
+    for rel, path in files:
+        if not os.path.exists(path):
+            continue
+        txt = open(path).read()
+        lits, n_opaque = _include_literals(txt)
+        for lit in lits:
+            if not os.path.exists(os.path.normpath(
+                    os.path.join(os.path.dirname(path) or ".", lit))):
+                rep.fail("tcb-unsafe",
+                         f"{rel}: `include!(\"{lit}\")` names a file that does "
+                         f"not exist, so the gate cannot scan what the compiler "
+                         f"splices in. Point it at a real file or delete it.")
+        if n_opaque:
+            rep.fail("tcb-unsafe",
+                     f"{rel}: {n_opaque} `include!` whose argument is not a "
+                     f"string literal. The gate resolves `include!(\"h.rs\")` "
+                     f"and walks the file (TASK_099); a computed argument -- "
+                     f"`concat!`, `env!`, a `macro_rules!` expansion -- names no "
+                     f"path a static reader can follow, so every Verus-side "
+                     f"detector would report on a file set that is missing the "
+                     f"spliced tokens. That is TASK_098 §4A's route with the "
+                     f"resolution step removed. Use a literal path.")
 
 
 def _verus_file_list(pdir, srcs):
@@ -3802,6 +3963,8 @@ def check_verus_contract(pdir, rep, contract):
     # third regex is what was defeated. The fix is `_verus_verified_files`,
     # which asks Verus.
     _scan_unsafe_sites(rep, pdir, contract)
+    # ...and the one thing `_path_includes` cannot resolve for it (TASK_099).
+    _check_opaque_includes(rep, pdir, contract)
     for f in sorted(os.listdir(pdir)):
         if f.endswith(".rs") and vparse.verus_span(open(os.path.join(pdir, f)).read()):
             if f not in pinned_obl:

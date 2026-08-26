@@ -47,9 +47,9 @@ So there is **not one `whole`-mode row in the tree** where the kernel column mea
 
 ⚠ **The last two used to print as `UNDEC` under this legend's first sentence** (TASK_075_REVIEW M2). `.temp/build/` is gitignored and `CLAUDE.md` rule 1 tells agents to delete exactly those blobs, so re-emitting the licence on a cleaned tree turned all 88 verdicts into `UNDEC` — and this file republished them under a legend asserting all 88 dispatched through an unresolvable pointer, with nothing failing anywhere because none of it is gate-checked. Now `--emit` exits **2** and writes nothing, naming the cells.
 
-⚠ **The callee-inclusive figure is LESS reproducible than the kernel-exclusive one it corrects — measured, not argued.** Two independent callgrind sweeps of the same binaries on the same blobs, differing only in **one 64-byte environment variable**: **kernel-exclusive `Ir`/call moved in 0 of 348 (pattern, input, cell) triples; outward `Ir`/call moved in 11** — p03 and p04 `safe_tuned` on both blobs (`50.00 → 43.00`, glibc `memset`'s alignment-dependent path length) and **p08 on seven cells** (`+0.0627`/`+0.0676` on `small`, `+0.0065` on `large` `unsafe`). p08's offset cancels within a language and so moves no verdict today; p03's and p04's does not.
+⚠ **The callee-inclusive figure is LESS reproducible than the kernel-exclusive one it corrects — measured, not argued.** Two independent callgrind sweeps of the same binaries on the same blobs, differing only in **one added environment variable** (`SLB_ALIGN_PAD=z*64`, i.e. **+87 bytes** of environment block once the `envp` slot, the name and the NUL are counted — ⚠ **not +64**, and that difference is what made someone call this control vacuous; see the calibration section): **kernel-exclusive `Ir`/call moved in 0 of 348 (pattern, input, cell) triples; outward `Ir`/call moved in 11** — p03 and p04 `safe_tuned` on both blobs (`50.00 → 43.00`, glibc `memset`'s alignment-dependent path length, re-measured at TASK_099) and **p08 on seven cells** (`+0.0627`/`+0.0676` on `small`, `+0.0065` on `large` `unsafe`). p08's offset cancels within a language and so moves no verdict today; p03's and p04's does not.
 
-⚠ **The knob that produced the first version of this paragraph was INERT.** It said the two sweeps *"differ only in the `--callgrind-out-file=` path, which is part of valgrind's argv and so shifts the client's stack"*. Valgrind **strips its own options before building the client stack**: replicating the two paths at their exact lengths (97 and 99 characters) gives identical kernel-exclusive *and* identical outward figures. The environment block is the knob that works (`.memory/03-measurement.md`, `check.py::check_marginal_ir`), and it is **scatter, not a trend**. The published `6 of 348` was a floor and its exposed-pattern list was short by one (TASK_075_REVIEW M1). **So the callee correction is an addition to the kernel-exclusive column and never a replacement for it**, and on p03 and p04 the kernel-exclusive column is the correct one.
+⚠ **The knob that produced the first version of this paragraph was INERT.** It said the two sweeps *"differ only in the `--callgrind-out-file=` path, which is part of valgrind's argv and so shifts the client's stack"*. Valgrind **strips its own options before building the client stack**: replicating the two paths at their exact lengths (97 and 99 characters) gives identical kernel-exclusive *and* identical outward figures. The environment block is the knob that works (`.memory/03-measurement.md`, `check.py::check_marginal_ir`). ⚠ **This line used to add *"and it is scatter, not a trend"*. That is p08's behaviour, not p03's and p04's**: theirs is **bistable with a 32-byte period and a 16-wide window** (`‡`, below), which is why a two-pad screen 16 apart detects all of it and a single contrast can miss nothing. The published `6 of 348` was a floor and its exposed-pattern list was short by one (TASK_075_REVIEW M1). **So the callee correction is an addition to the kernel-exclusive column and never a replacement for it**, and on p03 and p04 the kernel-exclusive column is the correct one.
 
 **3. `Ir` is not time, and three named mechanisms make them disagree in DIRECTION**: `rep`-string instructions counted once per repetition (p08), a hardware `div` priced at 1 (p05), and a latency-bound chain (p16). There is no wall-clock column here at all: this box's `ns` floor is a *session* property, so cross-pattern timing taken across 22 separate measurement sessions is not a measurement.
 
@@ -168,6 +168,12 @@ disassembly property with zero run noise and answers a *different* question --
 no. The two disagree on p03/p04 `R2-R4` (`LICENSED`, derived +7.00) and that
 disagreement **is** the `memset` finding, not a defect in either.
 
+⚠ **And that `+7.00` is one draw of a two-state variable, not a constant**: the
+same cell derives `0.00` at half of the 32 environment phases (`‡` below). The
+disagreement is real at every phase -- the licence says "differenceable", the
+sweep says the callee moves -- but its MAGNITUDE is a phase, so quote the
+support, never the draw.
+
 
 **Calibration, recomputed on every run of this file** — the derived column scored against `synthesis/outward_ir.json`, a callgrind caller→callee sweep, at the 2.00 `Ir` floor: **176 rows, 162 hit, 0 miss (the dangerous direction), 14 false alarm**; residual median **1.00**, p95 **7.00**, max **15.79**.
 
@@ -175,17 +181,21 @@ disagreement **is** the `memset` finding, not a defect in either.
 
 | band | rows | real | spurious | smallest \|correction\| | reading |
 |---|---:|---:|---:|---:|---|
-| `< 2.00` (blank / `<2.00`) | 120 | 0 | 120 | 0.00 | **safe**: nothing real hides below the floor |
+| `< 2.00` (blank / `<2.00`) | 120 | 0 | 120 | 0.00 | **not safe — this is one environment phase.** ⚠ See `‡` |
 | `2.00 … 16.00` (marked **?**) | 22 | 8 | 14 | 2.00 | **a coin flip — do not quote alone** |
 | `≥ 16.00` (**bold**) | 34 | 34 | 0 | 17.00 | **every one is real** |
 
-⚠ **The middle band is where p03, p04, p07 and p22 live**, and on p03 and p04 `R5-R4` the derived route gets the `memset` term's **sign** wrong (`+6.00` derived against `−7.00` measured) while still correctly saying *something is there*. Treat a **?** as *"look with the licence or a callgrind run"*, never as a figure.
+⚠⚠ **THE `< 2.00` BAND'S OWN CLAIM WAS FALSE, AND THIS IS THE CORRECTION.** It read *"safe: nothing real hides below the floor"*, scored `0 real / 120 spurious`. Both numbers are right **about the environment this run was taken in**, and the adjective was not: **p03's and p04's `R3-R4` correction is `0.00` — blank, in this band — at 16 of 32 environment phases and `±7.00` at the other 16**, three and a half times the floor. A band scored at one draw cannot certify the absence of a term that is invisible at that draw. The rows that carry it are marked `‡` below; the band is otherwise unchanged and still means *the derived route cannot resolve this*.
+
+⚠ **The middle band is where p03, p04, p07 and p22 live.** On p03 and p04 `R5-R4` the derived route was reporting `+6.00`, one draw from `{−8.00, −1.00, +6.00}` — **tied with its own sign-reverse** — and those four cells are now **withdrawn** rather than marked **?**: `?` means *look further*, and there is nothing further to look at. Treat a surviving **?** as *"look with the licence or a callgrind run"*, never as a figure.
 
 ⚠ **That sidecar is the only thing in this file with no staleness pin**: `licence.json` carries the gate `source_sha256` it was taken against and prints `LICENCE STALE` on a mismatch, but `outward_ir.json` carries nothing, and re-emitting it costs 352 callgrind runs against a fully built `.temp/build/`. That is precisely why it calibrates a column here and no longer **is** one.
 
 **And the LICENCE TAG scored against the same sweep, also recomputed here**: **154 hit, 12 false `LICENSED` (the dangerous direction), 0 false alarm, 10 abstain**. The smallest movement under a `NOT-LIC` verdict is **7.96 `Ir`/call**, so *0 false alarms* is robust to any tolerance below that and is not an artefact of the 5e-3 cut.
 
-⚠ **`0 false alarms` is a statement about this sweep, not about the rule** (TASK_075_REVIEW M4) — which is why this line is recomputed rather than quoted. Correcting one thing the rule got right for a contradicted reason (`kernel.cold`, below) moved the score from `156 / 10 / 0 / 10` to `154 / 12 / 0 / 10` **in this task**, by converting p27's `gcc-clang` from a lucky `NOT-LIC` into an honest false `LICENSED`. The false-alarm zero survived; the hit count did not. A second sweep under a 64-byte-longer environment block reads `152 / 14 / 0 / 10`, the excess being p03's and p04's `memset` term — **so the published triple is one draw and `0 false alarms` is the part that holds across all of them.**
+⚠ **`0 false alarms` is a statement about this sweep, not about the rule** (TASK_075_REVIEW M4) — which is why this line is recomputed rather than quoted. Correcting one thing the rule got right for a contradicted reason (`kernel.cold`, below) moved the score from `156 / 10 / 0 / 10` to `154 / 12 / 0 / 10` **in this task**, by converting p27's `gcc-clang` from a lucky `NOT-LIC` into an honest false `LICENSED`. The false-alarm zero survived; the hit count did not. A second sweep under a **longer environment block** reads `152 / 14 / 0 / 10`, the excess being p03's and p04's `memset` term — **so the published triple is one draw and `0 false alarms` is the part that holds across both of them.**
+
+⚠ **That control was called VACUOUS on an arithmetic slip, and it is not** (TASK_098 BLOCKER 2, TASK_099 §A2; re-measured here). The reading was *"a 64-byte pad is `64 mod 32 == 0`, i.e. the same alignment phase as pad 0, so the second sweep could not have moved"*. But the sweep does not lengthen an existing variable — `.temp/p75rev/envsweep.py` **adds** one, `SLB_ALIGN_PAD=z*64`, so the block grows by `8 (envp slot) + 14 ("SLB_ALIGN_PAD=") + 64 + 1 (NUL) = 87` bytes and `87 mod 32 = 23`. **Measured directly at TASK_099** (`.temp/t99/a2_phase.py`, one callgrind run per environment): the block grows by exactly **+87 bytes**, and p03 `safe_tuned`'s glibc `memset` goes **300129 → 258129 Ir** whole-process, which is `129 + 50.00*6000` against `129 + 43.00*6000` at `n_iters = 6000` — **exactly the `50.00 → 43.00` per kernel call** that this paragraph is about, reproduced in a different session. **The control fired.** ⚠ It is still ONE contrast rather than a period, which is what `‡` is for.
 
 ⚠ **`static.bulk_calls` is a WHITELIST, and on three patterns the record it
 produces is wrong about what the cell calls.** This is the one genuinely new
@@ -232,7 +242,7 @@ answer* (`.memory/03-measurement.md`).
 
 ### `R2-R4`  (`safe_naive` - `unsafe`)
 
-*`corrected (derived)` is blank when **both** blobs' derived corrections are inside the ±2.00 `Ir` floor; a cell marked **?** is in the 2.00–16.00 band and means *look further*, not a figure; **bold** is ≥16.00. The three bands are scored above. ⚠ On **p03** and **p04** the `memset` term is worth ±7.00 and does not reproduce between environments (limit 2).*
+*`corrected (derived)` is blank when **both** blobs' derived corrections are inside the ±2.00 `Ir` floor; a cell marked **?** is in the 2.00–16.00 band and means *look further*, not a figure; **bold** is ≥16.00. The three bands are scored above. ⚠ **`‡` marks a cell whose correction is a phase of the environment block rather than a property of the code** — see the note under the table.*
 
 ⚠ The last column is the **R3/R4 spelling search state**, and it is the reason this table cannot be read as a per-pattern property: see claim 2 in §5.
 
@@ -240,8 +250,8 @@ answer* (`.memory/03-measurement.md`).
 |---|---:|---:|---|---|---|
 | p01-array-sum | 11.00 | 29.00 | LICENSED |  | R3 span OWED |
 | p02-buffer-copy | 191.00 | 1439.00 | NOT-LIC | small +178.00 (-13.00) **?** / **large +1025.16** (-413.84) | undeclared |
-| p03-bounded-stack | 5110.00 | 17237.00 | LICENSED | small +5117.00 (+7.00) **?** / large +17244.00 (+7.00) **?** | R3 span 1 unreviewed measurement; the +5 constant NEVER searched |
-| p04-ring-buffer | 4756.00 | 16616.00 | LICENSED | small +4763.00 (+7.00) **?** / large +16623.00 (+7.00) **?** | undeclared |
+| p03-bounded-stack | 5110.00 | 17237.00 | LICENSED | small +5117.00 (+7.00) **?** / large +17244.00 (+7.00) **?** ‡ | R3 span 1 unreviewed measurement; the +5 constant NEVER searched |
+| p04-ring-buffer | 4756.00 | 16616.00 | LICENSED | small +4763.00 (+7.00) **?** / large +16623.00 (+7.00) **?** ‡ | undeclared |
 | p05-index-flatten | 700.00 | 2895.00 | LICENSED |  | undeclared |
 | p06-rotate | 173.00 | 395.00 | LICENSED |  | undeclared |
 | p07-binary-search | 5758.94 | 18735.88 | LICENSED | small +5763.59 (+4.65) **?** / large +18725.77 (-10.11) **?** | undeclared |
@@ -263,6 +273,13 @@ answer* (`.memory/03-measurement.md`).
 | p46-bignum-mac | -165.00 | -909.00 | LICENSED |  | undeclared |
 | p47-ct-compare | -166.00 | -194.00 | NOT-LIC | **small -77.63** (+88.37) / **large -28.00** (+166.00) | R4 searched, six levers |
 
+⚠ **`‡` — the environment-phase term, and it is not noise.** The derived correction is a **whole-program** figure, so it contains the callees; a per-call `memset` of a **stack** array takes an alignment-dependent tail in `__memset_avx2_unaligned_erms`, and the initial stack pointer moves with the **length of the environment block**. The effect is bistable, period **32 bytes**, window exactly **16 wide**, and the phase differs per binary — so one rung can sit high while another sits low and **a pair swings by 14, not 7**. Per row, with its instrument:
+
+- **p03** `R2-R4` — `+0.00` on 16, `+7.00` on 16 of 32 *(32-pad sweep `.temp/r98/sweep.py`, one full period, both blobs; TASK_098, reviewed)*
+- **p04** `R2-R4` — `+0.00` on 16, `+7.00` on 16 of 32 *(32-pad sweep `.temp/r98/sweep.py`, one full period, both blobs; TASK_098, reviewed)*
+
+**The kernel-exclusive columns beside them are immune** — a callee is not in a per-function exclusive count, and under the same perturbation **0 of 288** (pattern, input, cell) triples moved on that column while **14 of 288** marginals did. So where the two disagree on **p03**, **p04**, **the kernel-exclusive column is the one that reproduces** (`.memory/03-measurement.md`, `check.py::check_marginal_ir`).
+
 ⚠ **Why each non-`LICENSED` row is not licensed, plus every `LICENSED` row carrying an unpriced term** — the `why` string `licence.py` recorded. An earlier version of this file printed the tag and dropped this, which is how three different conditions came to share one tag (limit 2). `⚠ UNPRICED` counts **live** `@plt` sites and means the row carries gcc's 2-instruction PLT thunk at `+2.00 Ir` per *dynamic* libc call — a count no static check can have:
 
 - **p02** `NOT-LIC` — only unsafe calls ['memcpy@GLIBC_2.14']
@@ -275,7 +292,7 @@ answer* (`.memory/03-measurement.md`).
 
 ### `R3-R4`  (`safe_tuned` - `unsafe`)
 
-*`corrected (derived)` is blank when **both** blobs' derived corrections are inside the ±2.00 `Ir` floor; a cell marked **?** is in the 2.00–16.00 band and means *look further*, not a figure; **bold** is ≥16.00. The three bands are scored above. ⚠ On **p03** and **p04** the `memset` term is worth ±7.00 and does not reproduce between environments (limit 2).*
+*`corrected (derived)` is blank when **both** blobs' derived corrections are inside the ±2.00 `Ir` floor; a cell marked **?** is in the 2.00–16.00 band and means *look further*, not a figure; **bold** is ≥16.00. The three bands are scored above. ⚠ **`‡` marks a cell whose correction is a phase of the environment block rather than a property of the code** — see the note under the table.*
 
 ⚠ The last column is the **R3/R4 spelling search state**, and it is the reason this table cannot be read as a per-pattern property: see claim 2 in §5.
 
@@ -283,8 +300,8 @@ answer* (`.memory/03-measurement.md`).
 |---|---:|---:|---|---|---|
 | p01-array-sum | 4.00 | 5.00 | LICENSED |  | R3 span OWED |
 | p02-buffer-copy | 11.00 | 11.00 | LICENSED |  | undeclared |
-| p03-bounded-stack | 359.00 | 626.00 | LICENSED |  | R3 span 1 unreviewed measurement; the +5 constant NEVER searched |
-| p04-ring-buffer | 5.00 | 5.00 | LICENSED |  | undeclared |
+| p03-bounded-stack | 359.00 | 626.00 | LICENSED | ‡ | R3 span 1 unreviewed measurement; the +5 constant NEVER searched |
+| p04-ring-buffer | 5.00 | 5.00 | LICENSED | ‡ | undeclared |
 | p05-index-flatten | 123.00 | 399.00 | LICENSED |  | undeclared |
 | p06-rotate | 334.00 | 172.00 | LICENSED |  | undeclared |
 | p07-binary-search | 3014.60 | 10024.93 | LICENSED | small +3017.14 (+2.54) **?** / large +10019.42 (-5.51) **?** | undeclared |
@@ -306,6 +323,13 @@ answer* (`.memory/03-measurement.md`).
 | p46-bignum-mac | -119.00 | -815.00 | LICENSED |  | undeclared |
 | p47-ct-compare | 90.00 | 142.00 | LICENSED |  | R4 searched, six levers |
 
+⚠ **`‡` — the environment-phase term, and it is not noise.** The derived correction is a **whole-program** figure, so it contains the callees; a per-call `memset` of a **stack** array takes an alignment-dependent tail in `__memset_avx2_unaligned_erms`, and the initial stack pointer moves with the **length of the environment block**. The effect is bistable, period **32 bytes**, window exactly **16 wide**, and the phase differs per binary — so one rung can sit high while another sits low and **a pair swings by 14, not 7**. Per row, with its instrument:
+
+- **p03** `R3-R4` — `-7.00` on 8, `+0.00` on 16, `+7.00` on 8 of 32 *(32-pad sweep `.temp/r98/sweep.py`, one full period, both blobs; TASK_098, reviewed)*
+- **p04** `R3-R4` — `-7.00` on 8, `+0.00` on 16, `+7.00` on 8 of 32 *(32-pad sweep `.temp/r98/sweep.py`, one full period, both blobs; TASK_098, reviewed)*
+
+**The kernel-exclusive columns beside them are immune** — a callee is not in a per-function exclusive count, and under the same perturbation **0 of 288** (pattern, input, cell) triples moved on that column while **14 of 288** marginals did. So where the two disagree on **p03**, **p04**, **the kernel-exclusive column is the one that reproduces** (`.memory/03-measurement.md`, `check.py::check_marginal_ir`).
+
 ⚠ **Why each non-`LICENSED` row is not licensed, plus every `LICENSED` row carrying an unpriced term** — the `why` string `licence.py` recorded. An earlier version of this file printed the tag and dropped this, which is how three different conditions came to share one tag (limit 2). `⚠ UNPRICED` counts **live** `@plt` sites and means the row carries gcc's 2-instruction PLT thunk at `+2.00 Ir` per *dynamic* libc call — a count no static check can have:
 
 - **p11** `NOT-LIC` — only safe_tuned calls ['Ms::_NtNt::core::ffi::c_strNtB::_::CStr::from_bytes_until_nul']
@@ -314,14 +338,14 @@ answer* (`.memory/03-measurement.md`).
 
 ### `R5-R4`  (`verus` - `unsafe`)
 
-*`corrected (derived)` is blank when **both** blobs' derived corrections are inside the ±2.00 `Ir` floor; a cell marked **?** is in the 2.00–16.00 band and means *look further*, not a figure; **bold** is ≥16.00. The three bands are scored above. ⚠ On **p03** and **p04** the `memset` term is worth ±7.00 and does not reproduce between environments (limit 2).*
+*`corrected (derived)` is blank when **both** blobs' derived corrections are inside the ±2.00 `Ir` floor; a cell marked **?** is in the 2.00–16.00 band and means *look further*, not a figure; **bold** is ≥16.00. The three bands are scored above. ⚠ **`‡` marks a cell whose correction is a phase of the environment block rather than a property of the code** — see the note under the table.*
 
 | pattern | small | large | licence | corrected (derived) |
 |---|---:|---:|---|---|
 | p01-array-sum | 0.00 | 0.00 | LICENSED |  |
 | p02-buffer-copy | 0.00 | 0.00 | LICENSED | small -2.00 (-2.00) **?** / large -2.00 (-2.00) **?** |
-| p03-bounded-stack | 0.00 | 0.00 | LICENSED | small +6.00 (+6.00) **?** / large +6.00 (+6.00) **?** |
-| p04-ring-buffer | 0.00 | 0.00 | LICENSED | small +6.00 (+6.00) **?** / large +6.00 (+6.00) **?** |
+| p03-bounded-stack | 0.00 | 0.00 | LICENSED | ‡ **WITHDRAWN — not a quantity.** Over 32 environment phases the correction takes `-8.00` on 14, `-1.00` on 4, `+6.00` on 14 of 32, identically on both blobs; the published `+6.00` was one draw and is tied with its own sign-reverse. Reproducible content **-1.00** (`main` 14 vs 13); the `memset` term `{−7, 0, +7}` is unresolvable here. |
+| p04-ring-buffer | 0.00 | 0.00 | LICENSED | ‡ **WITHDRAWN — not a quantity.** Over 32 environment phases the correction takes `-8.00` on 14, `-1.00` on 4, `+6.00` on 14 of 32, identically on both blobs; the published `+6.00` was one draw and is tied with its own sign-reverse. Reproducible content **-1.00** (`main` 14 vs 13); the `memset` term `{−7, 0, +7}` is unresolvable here. |
 | p05-index-flatten | 0.00 | 0.00 | LICENSED |  |
 | p06-rotate | 0.00 | 0.00 | LICENSED |  |
 | p07-binary-search | 0.00 | 0.00 | LICENSED |  |
@@ -343,6 +367,13 @@ answer* (`.memory/03-measurement.md`).
 | p46-bignum-mac | 0.00 | 0.00 | LICENSED |  |
 | p47-ct-compare | 0.00 | 0.00 | LICENSED |  |
 
+⚠ **`‡` — the environment-phase term, and it is not noise.** The derived correction is a **whole-program** figure, so it contains the callees; a per-call `memset` of a **stack** array takes an alignment-dependent tail in `__memset_avx2_unaligned_erms`, and the initial stack pointer moves with the **length of the environment block**. The effect is bistable, period **32 bytes**, window exactly **16 wide**, and the phase differs per binary — so one rung can sit high while another sits low and **a pair swings by 14, not 7**. Per row, with its instrument:
+
+- **p03** `R5-R4` — `-8.00` on 14, `-1.00` on 4, `+6.00` on 14 of 32 *(32-pad sweep `.temp/r98/sweep.py`, one full period, both blobs; TASK_098, reviewed)*  ⟵ **WITHDRAWN above**
+- **p04** `R5-R4` — `-8.00` on 14, `-1.00` on 4, `+6.00` on 14 of 32 *(32-pad sweep `.temp/r98/sweep.py`, one full period, both blobs; TASK_098, reviewed)*  ⟵ **WITHDRAWN above**
+
+**The kernel-exclusive columns beside them are immune** — a callee is not in a per-function exclusive count, and under the same perturbation **0 of 288** (pattern, input, cell) triples moved on that column while **14 of 288** marginals did. So where the two disagree on **p03**, **p04**, **the kernel-exclusive column is the one that reproduces** (`.memory/03-measurement.md`, `check.py::check_marginal_ir`).
+
 ⚠ **Why each non-`LICENSED` row is not licensed, plus every `LICENSED` row carrying an unpriced term** — the `why` string `licence.py` recorded. An earlier version of this file printed the tag and dropped this, which is how three different conditions came to share one tag (limit 2). `⚠ UNPRICED` counts **live** `@plt` sites and means the row carries gcc's 2-instruction PLT thunk at `+2.00 Ir` per *dynamic* libc call — a count no static check can have:
 
 - **p27** `UNDEC` — both sides dispatch through an unresolvable pointer (1 each); e.g. `call *%r12`
@@ -350,7 +381,7 @@ answer* (`.memory/03-measurement.md`).
 
 ### `gcc-clang`  (`c-gcc` - `c-clang`)
 
-*`corrected (derived)` is blank when **both** blobs' derived corrections are inside the ±2.00 `Ir` floor; a cell marked **?** is in the 2.00–16.00 band and means *look further*, not a figure; **bold** is ≥16.00. The three bands are scored above. ⚠ On **p03** and **p04** the `memset` term is worth ±7.00 and does not reproduce between environments (limit 2).*
+*`corrected (derived)` is blank when **both** blobs' derived corrections are inside the ±2.00 `Ir` floor; a cell marked **?** is in the 2.00–16.00 band and means *look further*, not a figure; **bold** is ≥16.00. The three bands are scored above. ⚠ **`‡` marks a cell whose correction is a phase of the environment block rather than a property of the code** — see the note under the table.*
 
 | pattern | small | large | licence | corrected (derived) |
 |---|---:|---:|---|---|
@@ -376,8 +407,14 @@ answer* (`.memory/03-measurement.md`).
 | p27-handle-table | -25.02 | -201.73 | LICENSED | **small +15.65** (+40.67) / **large -75.88** (+125.85) |
 | p36-vtable-dispatch | -120.00 | -1016.00 | UNDEC | **small +9.00** (+129.00) / **large +9.00** (+1025.00) |
 | p38-alias-pun | -232.00 | -617.00 | LICENSED |  |
-| p46-bignum-mac | 2163.00 | 5778.00 | NOT-LIC | **small +2076.00** (-87.00) / **large +5656.10** (-121.90) |
+| p46-bignum-mac | 2163.00 | 5778.00 | NOT-LIC | **small +2076.00** (-87.00) / **large +5656.10** (-121.90) ‡ |
 | p47-ct-compare | 15.00 | 23.00 | NOT-LIC | small +24.00 (+9.00) **?** / **large +40.00** (+17.00) |
+
+⚠ **`‡` — the environment-phase term, and it is not noise.** The derived correction is a **whole-program** figure, so it contains the callees; a per-call `memset` of a **stack** array takes an alignment-dependent tail in `__memset_avx2_unaligned_erms`, and the initial stack pointer moves with the **length of the environment block**. The effect is bistable, period **32 bytes**, window exactly **16 wide**, and the phase differs per binary — so one rung can sit high while another sits low and **a pair swings by 14, not 7**. Per row, with its instrument:
+
+- **p46** `gcc-clang` — `c-clang`'s marginal moves `6216.00 → 6209.00` (`small`) and `23230.66 → 23223.66` (`large`) between pad 0 and pad 16, so the correction carries the same ±7.00 — **2-pad screen only, no full period taken**. It is 8% of the `-87.00` correction and 0.34% of the `+2076.00` figure, so nothing here is withdrawn *(2-pad screen `.temp/r98/treescan_*.json`; TASK_098, reviewed)*
+
+**The kernel-exclusive columns beside them are immune** — a callee is not in a per-function exclusive count, and under the same perturbation **0 of 288** (pattern, input, cell) triples moved on that column while **14 of 288** marginals did. So where the two disagree on **p46**, **the kernel-exclusive column is the one that reproduces** (`.memory/03-measurement.md`, `check.py::check_marginal_ir`).
 
 ⚠ **Why each non-`LICENSED` row is not licensed, plus every `LICENSED` row carrying an unpriced term** — the `why` string `licence.py` recorded. An earlier version of this file printed the tag and dropped this, which is how three different conditions came to share one tag (limit 2). `⚠ UNPRICED` counts **live** `@plt` sites and means the row carries gcc's 2-instruction PLT thunk at `+2.00 Ir` per *dynamic* libc call — a count no static check can have:
 
@@ -495,9 +532,9 @@ From `results/gate/*.json` (`verus`, `identity`, `verdict`). `obligations` is wh
 
 Two consequences: the evidence for *"a proof costs zero instructions"* is the raw-byte digest, not this column (`.memory/01-ladder.md` finding 1); and the zero is column-specific -- on p16's whole-program **marginal** the same pair reads **-1.00**, the driver's.
 
-⚠ **And the zero does NOT survive the callee correction.** On the derived callee-corrected column `R5 - R4` clears the ±2.00 floor on 6 rows -- p02 small -2.00, p02 large -2.00, p03 small +6.00, p03 large +6.00, p04 small +6.00, p04 large +6.00 -- i.e. *"the proof costs instructions"* between two **byte-identical** kernels.
+⚠ **And the zero does NOT survive the callee correction.** On the derived callee-corrected column `R5 - R4` clears the ±2.00 floor on 6 rows -- p02 small -2.00, p02 large -2.00, p03 small **WITHDRAWN** `‡`, p03 large **WITHDRAWN** `‡`, p04 small **WITHDRAWN** `‡`, p04 large **WITHDRAWN** `‡` -- i.e. *"the proof costs instructions"* between two **byte-identical** kernels.
 
-**Every one of those rows is in the uncertain 2.00–16.00 band, and the two halves resolve differently.** On **p03** and **p04** the callgrind sweep confirms a real term and puts it at **−7.00**, glibc `memset`'s alignment-dependent path length between two byte-identical kernels — so the derived `+6.00` has the right existence and the **wrong sign**. On **p02** the sweep measures **0.00**: the derived `−2.00` is the driver residual and nothing else. Which cells carry the `memset` term changes with the environment (limit 2). **The kernel-exclusive zero is the correct reading on all six.**
+**Every one of those rows is in the uncertain 2.00–16.00 band, and the two halves resolve differently.** On **p03** and **p04** there is a real term — glibc `memset`'s alignment-dependent path length between two byte-identical kernels — but **it has no value**: over 32 environment phases the correction takes `{−8.00, −1.00, +6.00}` with support 14 / 4 / 14, so the `+6.00` this file used to print was one draw **tied with its own sign-reverse**, and the four cells are withdrawn in §2 (`‡`). The part that reproduces is `main`'s **−1.00**. On **p02** the sweep measures **0.00**: the derived `−2.00` is the driver residual and nothing else. **The kernel-exclusive zero is the correct reading on all six**, and on p03/p04 it is the only one of the two columns that reproduces at all.
 
 **Claim 2 -- `R3 - R4` is negative on 6 of 24 patterns. CONFIRMED as arithmetic, and the reason it was doubted is the WRONG reason.**
 

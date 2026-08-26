@@ -59,10 +59,21 @@ rule is corrected -- re-score rather than quoting these:
 
     before item 5 above:  hits 156   false LICENSED 10   false alarms 0   abstentions 10
 
-⚠ Scored against a second sweep taken under a 64-byte-longer ENVIRONMENT BLOCK
-the same numbers read 152 / 14 / 0 / 10, and the difference is the first
-mechanism below.  **`0 false alarms` survives both sweeps; the hit count does
-not.**  (The FIRST version of this docstring attributed the difference to the
+⚠ Scored against a second sweep taken under a LONGER ENVIRONMENT BLOCK the same
+numbers read 152 / 14 / 0 / 10, and the difference is the first mechanism below.
+**`0 false alarms` survives both sweeps; the hit count does not.**
+
+⚠⚠ **SAY "+87 BYTES", NOT "64".**  `.temp/p75rev/envsweep.py` does not lengthen
+an existing variable -- it ADDS one, `SLB_ALIGN_PAD=z*64`, so the block grows by
+`8 (envp slot) + 14 ("SLB_ALIGN_PAD=") + 64 + 1 (NUL) = 87`.  TASK_098 read the
+"64" literally, computed `64 mod 32 == 0`, and called this control VACUOUS on
+that arithmetic; TASK_099 measured it (`.temp/t99/a2_phase.py`): the block grows
+by exactly +87, `87 mod 32 = 23`, and p03 `safe_tuned`'s glibc `memset` moves
+`50.00 -> 43.00` Ir/call under it (whole-process memset
+`300129 -> 258129` = `129 + 50*6000` against `129 + 43*6000`, the 129 being
+startup memset outside the kernel).  **The control fires.**
+
+(The FIRST version of this docstring attributed the difference to the
 `--callgrind-out-file=` path length.  That knob is INERT -- valgrind strips its
 own options before building the client stack, and two paths differing by 2
 characters give identical figures.  The environment is the knob that works.)

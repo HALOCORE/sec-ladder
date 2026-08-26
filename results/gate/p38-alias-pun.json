@@ -125,7 +125,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "265a4e7f23127c2f8b54e4ba43140a74ab5193ddedf41a263f6bc8823902eac7",
+    "harness/check.py": "da3887bb56c1ae44a9b0cd8bcaa98118a77e8dc218d8cc993b4708ef278185f4",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "140a0354d35970059b2948e986fa5744ccb24d50fde19d64e15dde55d4eaa327",
@@ -935,7 +935,7 @@
     "adversarial-oob.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "1597909341167435385",
+        "stdout": "14034090108485174844",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -948,7 +948,7 @@
       },
       {
         "exit": 0,
-        "stdout": "16216781216308659018",
+        "stdout": "6569307640383828144",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1117,11 +1117,11 @@
       },
       {
         "exit": 0,
-        "stdout": "13827180785880955442",
+        "stdout": "14666022104146996195",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/isolated"
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "10509230270850152637",
@@ -1130,11 +1130,11 @@
       },
       {
         "exit": 0,
-        "stdout": "7460569966813653238",
+        "stdout": "9315526257717963115",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/whole"
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "10509230270850152637",
@@ -1419,7 +1419,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7fa79db00220 with insufficient space for an object",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7f9454100220 with insufficient space for an object",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1441,7 +1441,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7f2a12b00220 with insufficient space for an object",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7fe16f700220 with insufficient space for an object",
       "declared_hang": false,
       "hung": false,
       "stdout": "",

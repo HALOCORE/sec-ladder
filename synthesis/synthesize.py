@@ -168,6 +168,74 @@ SEARCH_REVIEWED = {
 FLOOR = 2.00
 CONFIDENT = 16.00
 
+# ---- the ENVIRONMENT-PHASE census, pinned ------------------------------------
+# `marginal_ir_per_call` at `-O3 isolated` is not a constant on p03 and p04: a
+# per-call `memset` of a stack scratch buffer takes an alignment-dependent tail
+# in `__memset_avx2_unaligned_erms`, and the initial stack pointer moves with the
+# length of the environment block.  The effect is BISTABLE with a period of 32
+# bytes and a window exactly 16 wide, and the phase differs per binary, so a PAIR
+# can swing by 14 (`check.py::check_marginal_ir`).
+#
+# Below: the derived correction `(marg[A]-marg[B]) - (kex[A]-kex[B])` over 32
+# consecutive environment lengths -- one full period -- as `value: pads`.
+# Instrument `.temp/r98/sweep.py`, data `.temp/r98/{p03,p04}_sweep.json`
+# (TASK_098, reviewed; re-derived at TASK_099).  Identical on both blobs.
+#
+# ⚠ This is a PIN, not a derivation: nothing in `results/` carries a sweep, and
+# re-taking it costs ~2 min/pattern -- the instrument is `.temp/r98/sweep.py`,
+# and `.memory/03-measurement.md`'s RESOLVED block is the reviewed write-up.
+# ⚠ `common/layout/` is the WRONG instrument and fails in the dangerous
+# direction: it varies the PROGRAM and measures `ns`, and callgrind is
+# layout-blind, so it returns ~0 on a term worth 7.
+PHASE_SWEEP = {
+    ("p03", "R2-R4"): {0.00: 16, 7.00: 16},
+    ("p03", "R3-R4"): {-7.00: 8, 0.00: 16, 7.00: 8},
+    ("p03", "R5-R4"): {-8.00: 14, -1.00: 4, 6.00: 14},
+    ("p04", "R2-R4"): {0.00: 16, 7.00: 16},
+    ("p04", "R3-R4"): {-7.00: 8, 0.00: 16, 7.00: 8},
+    ("p04", "R5-R4"): {-8.00: 14, -1.00: 4, 6.00: 14},
+}
+
+# ⚠⚠ WITHDRAWN: the pairs where the correction IS the whole published figure.
+# R4 and R5 are byte-identical binaries, so the kernel column is exactly 0.00 and
+# the printed cell is the correction alone -- there is no large true difference
+# for a 7-Ir term to be a rounding error of.  `value` is the part that
+# reproduces: `R5-R4 = kernel 0 + memset {-7,0,+7} + main (-1)`, attributed
+# symbol by symbol at TASK_098 (`.temp/mgr98/`), so `main`'s -1.00 is all that
+# survives the phase.  ⚠ It is the OPPOSITE SIGN to the `+6.00` this file
+# published for five tasks.
+WITHDRAWN = {
+    ("p03", "R5-R4"): (-1.00, "`main` 14 vs 13"),
+    ("p04", "R5-R4"): (-1.00, "`main` 14 vs 13"),
+}
+
+
+# ⚠ The SEVENTH exposed cell, and it is neither p03 nor p04.  A 2-pad screen
+# over the whole tree (24 patterns x 6 cells x 2 blobs, pad 0 against pad 16,
+# `.temp/r98/treescan_{small,large}.json`) moved 14 of 288 triples: p03's and
+# p04's three Rust rungs each, AND p46's `c-clang`.  No full period was taken
+# for it, so it is marked and not quantified.  ⚠ **"2 patterns, 7 of 144 cells"
+# -- in `.memory/03-measurement.md`'s RESOLVED block, `TASK_098_REPORT.md`
+# MAJOR 3 and `TASK_099.md` §C -- is arithmetically impossible for that reason:
+# the count is THREE patterns.**
+PHASE_SCREEN = {
+    ("p46", "gcc-clang"):
+        "`c-clang`'s marginal moves `6216.00 → 6209.00` (`small`) and "
+        "`23230.66 → 23223.66` (`large`) between pad 0 and pad 16, so the "
+        "correction carries the same ±7.00 — **2-pad screen only, no full "
+        "period taken**. It is 8% of the `-87.00` correction and 0.34% of the "
+        "`+2076.00` figure, so nothing here is withdrawn",
+}
+
+
+def _phase_note(pat, lab):
+    """`{-8.00: 14, ...}` -> `−8.00 on 14 pads, −1.00 on 4, +6.00 on 14`."""
+    if (pat, lab) in PHASE_SCREEN:
+        return PHASE_SCREEN[(pat, lab)]
+    sup = PHASE_SWEEP[(pat, lab)]
+    return ", ".join(f"`{v:+.2f}` on {n}"
+                     for v, n in sorted(sup.items())) + " of 32"
+
 BULK_CALLS_NOTE = """\
 ⚠ **`static.bulk_calls` is a WHITELIST, and on three patterns the record it
 produces is wrong about what the cell calls.** This is the one genuinely new
@@ -264,6 +332,12 @@ disassembly property with zero run noise and answers a *different* question --
 *may this row be differenced at all* -- and names the callee when the answer is
 no. The two disagree on p03/p04 `R2-R4` (`LICENSED`, derived +7.00) and that
 disagreement **is** the `memset` finding, not a defect in either.
+
+⚠ **And that `+7.00` is one draw of a two-state variable, not a constant**: the
+same cell derives `0.00` at half of the 32 environment phases (`‡` below). The
+disagreement is real at every phase -- the licence says "differenceable", the
+sweep says the callee moves -- but its MAGNITUDE is a phase, so quote the
+support, never the draw.
 """
 
 
@@ -349,11 +423,29 @@ def derived_correction(meas, gates, pat, a_, b_, inp):
     return (ma - mb) - (ka - kb)
 
 
-def derived(meas, gates, pat, a_, b_):
+def derived(meas, gates, pat, a_, b_, lab=None):
     """The `corrected (derived)` cell: the corrected difference with the
     correction in parentheses, on both blobs.  A dash means the derived
     correction is inside the +-2.00 Ir floor, where this route cannot tell it
-    from zero -- NOT that the row was not computed."""
+    from zero -- NOT that the row was not computed.
+
+    ⚠ **Two pairs print no figure at all.**  `WITHDRAWN` above names the cells
+    where the correction is a phase of the environment block rather than a
+    property of the code, and where it is also the entire published figure.
+    They print the measured support and the reproducible term, and they do
+    **not** print `**?**`: that marker means *look further*, and there is
+    nothing further to look at -- the quantity has no value.  Blanking them was
+    the cheaper option and is the wrong one, because in this table BLANK ALREADY
+    MEANS SOMETHING ELSE (`|correction| < 2.00`), which is the band this file
+    used to call *"safe: nothing real hides below the floor"*."""
+    if (pat, lab) in WITHDRAWN:
+        val, prov = WITHDRAWN[(pat, lab)]
+        return (f"‡ **WITHDRAWN — not a quantity.** Over 32 environment phases "
+                f"the correction takes {_phase_note(pat, lab)}, identically on "
+                f"both blobs; the published `+6.00` was one draw and is tied "
+                f"with its own sign-reverse. Reproducible content "
+                f"**{val:+.2f}** ({prov}); the `memset` term "
+                f"`{{−7, 0, +7}}` is unresolvable here.")
     out, any_move, any_row = [], False, False
     for inp, nm in (("small.bin", "small"), ("large.bin", "large")):
         c = derived_correction(meas, gates, pat, a_, b_, inp)
@@ -373,7 +465,14 @@ def derived(meas, gates, pat, a_, b_):
             out.append(f"**{nm} {k - k2 + c:+.2f}** ({c:+.2f})")
     if not any_row:
         return "no record"
-    return " / ".join(out) if any_move else ""
+    s = " / ".join(out) if any_move else ""
+    # ...and the same term on a pair where it is NOT the whole figure: mark it,
+    # do not withdraw it.  On p03/p04 `R2-R4` the 7.00 rides on a difference of
+    # 5110.00, i.e. 0.14% -- but the MARKER is still one draw, since the same
+    # cell prints blank at half the phases.
+    if (pat, lab) in PHASE_SWEEP or (pat, lab) in PHASE_SCREEN:
+        s = (s + " ‡") if s else "‡"
+    return s
 
 
 # --------------------------------------------------------------------- census
@@ -604,13 +703,17 @@ def main():
     w("⚠ **The callee-inclusive figure is LESS reproducible than the "
       "kernel-exclusive one it corrects — measured, not argued.** Two "
       "independent callgrind sweeps of the same binaries on the same blobs, "
-      "differing only in **one 64-byte environment variable**: "
-      "**kernel-exclusive `Ir`/call moved in 0 of 348 (pattern, input, cell) "
-      "triples; outward `Ir`/call moved in 11** — p03 and p04 `safe_tuned` on "
-      "both blobs (`50.00 → 43.00`, glibc `memset`'s alignment-dependent path "
-      "length) and **p08 on seven cells** (`+0.0627`/`+0.0676` on `small`, "
-      "`+0.0065` on `large` `unsafe`). p08's offset cancels within a language "
-      "and so moves no verdict today; p03's and p04's does not.")
+      "differing only in **one added environment variable** "
+      "(`SLB_ALIGN_PAD=z*64`, i.e. **+87 bytes** of environment block once the "
+      "`envp` slot, the name and the NUL are counted — ⚠ **not +64**, and that "
+      "difference is what made someone call this control vacuous; see the "
+      "calibration section): **kernel-exclusive `Ir`/call moved in 0 of 348 "
+      "(pattern, input, cell) triples; outward `Ir`/call moved in 11** — p03 "
+      "and p04 `safe_tuned` on both blobs (`50.00 → 43.00`, glibc `memset`'s "
+      "alignment-dependent path length, re-measured at TASK_099) and **p08 on "
+      "seven cells** (`+0.0627`/`+0.0676` on `small`, `+0.0065` on `large` "
+      "`unsafe`). p08's offset cancels within a language and so moves no "
+      "verdict today; p03's and p04's does not.")
     w("")
     w("⚠ **The knob that produced the first version of this paragraph was "
       "INERT.** It said the two sweeps *\"differ only in the "
@@ -619,9 +722,13 @@ def main():
       "building the client stack**: replicating the two paths at their exact "
       "lengths (97 and 99 characters) gives identical kernel-exclusive *and* "
       "identical outward figures. The environment block is the knob that works "
-      "(`.memory/03-measurement.md`, `check.py::check_marginal_ir`), and it is "
-      "**scatter, not a trend**. The published `6 of 348` was a floor and its "
-      "exposed-pattern list was short by one (TASK_075_REVIEW M1). "
+      "(`.memory/03-measurement.md`, `check.py::check_marginal_ir`). ⚠ **This "
+      "line used to add *\"and it is scatter, not a trend\"*. That is p08's "
+      "behaviour, not p03's and p04's**: theirs is **bistable with a 32-byte "
+      "period and a 16-wide window** (`‡`, below), which is why a two-pad "
+      "screen 16 apart detects all of it and a single contrast can miss "
+      "nothing. The published `6 of 348` was a floor and its exposed-pattern "
+      "list was short by one (TASK_075_REVIEW M1). "
       "**So the callee correction is an addition to the kernel-exclusive "
       "column and never a replacement for it**, and on p03 and p04 the "
       "kernel-exclusive column is the correct one.")
@@ -715,7 +822,7 @@ def main():
         w("|---|---:|---:|---:|---:|---|")
         for key, lo, hi, mark, read in (
                 ("low", None, FLOOR, "blank / `<2.00`",
-                 "**safe**: nothing real hides below the floor"),
+                 "**not safe — this is one environment phase.** ⚠ See `‡`"),
                 ("mid", FLOOR, CONFIDENT, "marked **?**",
                  "**a coin flip — do not quote alone**"),
                 ("high", CONFIDENT, None, "**bold**",
@@ -727,11 +834,25 @@ def main():
             w(f"| `{rng}` ({mark}) | {n} | {real} | {spur} | "
               + (f"{small:.2f}" if small is not None else "-") + f" | {read} |")
         w("")
-        w("⚠ **The middle band is where p03, p04, p07 and p22 live**, and on "
-          "p03 and p04 `R5-R4` the derived route gets the `memset` term's "
-          "**sign** wrong (`+6.00` derived against `−7.00` measured) while "
-          "still correctly saying *something is there*. Treat a **?** as "
-          "*\"look with the licence or a callgrind run\"*, never as a figure.")
+        w("⚠⚠ **THE `< 2.00` BAND'S OWN CLAIM WAS FALSE, AND THIS IS THE "
+          "CORRECTION.** It read *\"safe: nothing real hides below the "
+          "floor\"*, scored `0 real / 120 spurious`. Both numbers are right "
+          "**about the environment this run was taken in**, and the adjective "
+          "was not: **p03's and p04's `R3-R4` correction is `0.00` — blank, in "
+          "this band — at 16 of 32 environment phases and `±7.00` at the other "
+          "16**, three and a half times the floor. A band scored at one draw "
+          "cannot certify the absence of a term that is invisible at that "
+          "draw. The rows that carry it are marked `‡` below; the band is "
+          "otherwise unchanged and still means *the derived route cannot "
+          "resolve this*.")
+        w("")
+        w("⚠ **The middle band is where p03, p04, p07 and p22 live.** On p03 "
+          "and p04 `R5-R4` the derived route was reporting `+6.00`, one draw "
+          "from `{−8.00, −1.00, +6.00}` — **tied with its own sign-reverse** — "
+          "and those four cells are now **withdrawn** rather than marked "
+          "**?**: `?` means *look further*, and there is nothing further to "
+          "look at. Treat a surviving **?** as *\"look with the licence or a "
+          "callgrind run\"*, never as a figure.")
         w("")
         w("⚠ **That sidecar is the only thing in this file with no staleness "
           "pin**: `licence.json` carries the gate `source_sha256` it was taken "
@@ -760,10 +881,29 @@ def main():
               "`154 / 12 / 0 / 10` **in this task**, by converting p27's "
               "`gcc-clang` from a lucky `NOT-LIC` into an honest false "
               "`LICENSED`. The false-alarm zero survived; the hit count did "
-              "not. A second sweep under a 64-byte-longer environment block "
-              "reads `152 / 14 / 0 / 10`, the excess being p03's and p04's "
-              "`memset` term — **so the published triple is one draw and "
-              "`0 false alarms` is the part that holds across all of them.**")
+              "not. A second sweep under a **longer environment block** reads "
+              "`152 / 14 / 0 / 10`, the excess being p03's and p04's `memset` "
+              "term — **so the published triple is one draw and "
+              "`0 false alarms` is the part that holds across both of them.**")
+            w("")
+            w("⚠ **That control was called VACUOUS on an arithmetic slip, and "
+              "it is not** (TASK_098 BLOCKER 2, TASK_099 §A2; re-measured "
+              "here). The reading was *\"a 64-byte pad is `64 mod 32 == 0`, "
+              "i.e. the same alignment phase as pad 0, so the second sweep "
+              "could not have moved\"*. But the sweep does not lengthen an "
+              "existing variable — `.temp/p75rev/envsweep.py` **adds** one, "
+              "`SLB_ALIGN_PAD=z*64`, so the block grows by "
+              "`8 (envp slot) + 14 (\"SLB_ALIGN_PAD=\") + 64 + 1 (NUL) = 87` "
+              "bytes and `87 mod 32 = 23`. **Measured directly at TASK_099** "
+              "(`.temp/t99/a2_phase.py`, one callgrind run per environment): "
+              "the block grows by exactly **+87 bytes**, and p03 `safe_tuned`'s "
+              "glibc `memset` goes **300129 → 258129 Ir** whole-process, "
+              "which is `129 + 50.00*6000` against `129 + 43.00*6000` at "
+              "`n_iters = 6000` — **exactly the `50.00 → 43.00` per kernel "
+              "call** that this "
+              "paragraph is about, reproduced in a different session. **The "
+              "control fired.** ⚠ It is still ONE contrast rather than a "
+              "period, which is what `‡` is for.")
     w("")
     w(BULK_CALLS_NOTE)
     w("")
@@ -775,9 +915,9 @@ def main():
           f"corrections are inside the ±{FLOOR:.2f} `Ir` floor; a cell marked "
           f"**?** is in the {FLOOR:.2f}–{CONFIDENT:.2f} band and means *look "
           f"further*, not a figure; **bold** is ≥{CONFIDENT:.2f}. The three "
-          f"bands are scored above. ⚠ On **p03** and **p04** the `memset` "
-          f"term is worth ±7.00 and does not reproduce between environments "
-          f"(limit 2).*")
+          f"bands are scored above. ⚠ **`‡` marks a cell whose correction is a "
+          f"phase of the environment block rather than a property of the "
+          f"code** — see the note under the table.*")
         w("")
         if show_search:
             w("⚠ The last column is the **R3/R4 spelling search state**, and it "
@@ -809,12 +949,46 @@ def main():
             if entry.get("why") and (verd != "LICENSED"
                                      or "UNPRICED" in entry["why"]):
                 whys.append(f"- **{pat}** `{verd}` — {entry['why']}")
-            corr = derived(meas, gates, pat, a_, b_)
+            corr = derived(meas, gates, pat, a_, b_, lab)
             s = SEARCH_REVIEWED.get(pat)
             w(f"| {d['pattern']} | {fmt(v[0], 1)} | {fmt(v[1], 1)} | {verd} "
               f"| {corr} |"
               + (f" {s[0] if s else 'undeclared'} |" if show_search else ""))
         w("")
+        marked = sorted({p for (p, l) in list(PHASE_SWEEP) + list(PHASE_SCREEN)
+                         if l == lab})
+        if marked:
+            w(f"⚠ **`‡` — the environment-phase term, and it is not noise.** "
+              f"The derived correction is a **whole-program** figure, so it "
+              f"contains the callees; a per-call `memset` of a **stack** array "
+              f"takes an alignment-dependent tail in "
+              f"`__memset_avx2_unaligned_erms`, and the initial stack pointer "
+              f"moves with the **length of the environment block**. The effect "
+              f"is bistable, period **32 bytes**, window exactly **16 wide**, "
+              f"and the phase differs per binary — so one rung can sit high "
+              f"while another sits low and **a pair swings by 14, not 7**. "
+              f"Per row, with its instrument:")
+            w("")
+            for p in marked:
+                src = ("2-pad screen `.temp/r98/treescan_*.json`"
+                       if (p, lab) in PHASE_SCREEN
+                       else "32-pad sweep `.temp/r98/sweep.py`, one full "
+                            "period, both blobs")
+                w(f"- **{p}** `{lab}` — {_phase_note(p, lab)} "
+                  f"*({src}; TASK_098, reviewed)*"
+                  + ("  ⟵ **WITHDRAWN above**"
+                     if (p, lab) in WITHDRAWN else ""))
+            w("")
+            w(f"**The kernel-exclusive columns beside them are immune** — a "
+              f"callee is not in a per-function exclusive count, and under the "
+              f"same perturbation **0 of 288** (pattern, input, cell) triples "
+              f"moved on that column while **14 of 288** marginals did. So "
+              f"where the two disagree on "
+              f"{', '.join('**' + p + '**' for p in marked)}, **the "
+              f"kernel-exclusive column is the one that reproduces** "
+              f"(`.memory/03-measurement.md`, "
+              f"`check.py::check_marginal_ir`).")
+            w("")
         if whys:
             w(f"⚠ **Why each non-`LICENSED` row is not licensed, plus every "
               f"`LICENSED` row carrying an unpriced term** — the `why` string "
@@ -1125,7 +1299,12 @@ def main():
             k2 = ir_per_call(meas[pat], "unsafe", "O3", "isolated", inp)
             if c is None or k is None or k2 is None or abs(c) < FLOOR:
                 continue
-            broke.append(f"{pat} {inp[:-4]} {k - k2 + c:+.2f}")
+            # ⚠ Do NOT reprint a figure §2 withdrew. This list is *which rows
+            # clear the floor*, which is still true of them at this phase; the
+            # number is what has no value.
+            broke.append(f"{pat} {inp[:-4]} "
+                         + ("**WITHDRAWN** `‡`" if (pat, "R5-R4") in WITHDRAWN
+                            else f"{k - k2 + c:+.2f}"))
     w(f"**Claim 1 -- `R5 - R4 = 0.00` on every row. SCOPED, and it is a "
       f"TAUTOLOGY rather than a result.** Re-derived: **{len(bad)} of "
       f"{rows_seen}** `-O3 isolated` pattern/input rows differ from 0.00. But "
@@ -1160,15 +1339,18 @@ def main():
         w("")
         w(f"**Every one of those rows is in the uncertain "
           f"{FLOOR:.2f}–{CONFIDENT:.2f} band, and the two halves resolve "
-          f"differently.** On **p03** and **p04** the callgrind sweep confirms "
-          f"a real term and puts it at **−7.00**, glibc `memset`'s "
-          f"alignment-dependent path length between two byte-identical "
-          f"kernels — so the derived `+6.00` has the right existence and the "
-          f"**wrong sign**. On **p02** the sweep measures **0.00**: the "
-          f"derived `−2.00` is the driver residual and nothing else. Which "
-          f"cells carry the `memset` term changes with the environment "
-          f"(limit 2). **The kernel-exclusive zero is the correct reading on "
-          f"all six.**")
+          f"differently.** On **p03** and **p04** there is a real term — glibc "
+          f"`memset`'s alignment-dependent path length between two "
+          f"byte-identical kernels — but **it has no value**: over 32 "
+          f"environment phases the correction takes `{{−8.00, −1.00, +6.00}}` "
+          f"with support 14 / 4 / 14, so the `+6.00` this file used to print "
+          f"was one draw **tied with its own sign-reverse**, and the four "
+          f"cells are withdrawn in §2 (`‡`). The part that reproduces is "
+          f"`main`'s **−1.00**. On **p02** the sweep measures **0.00**: the "
+          f"derived `−2.00` is the driver residual and nothing else. **The "
+          f"kernel-exclusive zero is the correct reading on all six**, and on "
+          f"p03/p04 it is the only one of the two columns that reproduces at "
+          f"all.")
         w("")
 
     # claim 2
@@ -1192,7 +1374,7 @@ def main():
         w(f"| {meas[pat]['pattern']} | "
           + ", ".join(f"{i} {v:.2f}" for i, v in neg[pat]) + " | "
           + pl.get("verdict", "-") + " | "
-          + (derived(meas, gates, pat, "safe_tuned", "unsafe")
+          + (derived(meas, gates, pat, "safe_tuned", "unsafe", "R3-R4")
              or f"inside the ±{FLOOR:.2f} floor") + " | "
           + (s[0] if s else "undeclared") + " |")
     w("")

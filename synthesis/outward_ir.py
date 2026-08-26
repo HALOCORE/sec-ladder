@@ -61,12 +61,20 @@ adding callees is not uniformly an improvement:
     instructions" -- and p04's `R3 - R4` flips sign.  There the
     kernel-EXCLUSIVE column is the correct one.  ⚠ **The figure itself does
     not reproduce**: two sweeps of the same binaries differing only in one
-    64-byte ENVIRONMENT VARIABLE moved the outward figure on **11 of 348**
-    (pattern, input, cell) triples -- p03/p04 `safe_tuned` and seven p08 cells
-    -- while the kernel-EXCLUSIVE figure moved on **0 of 348**.  (A first
-    version of this note blamed the `--callgrind-out-file=` path length.  That
-    knob is INERT: valgrind strips its own options before building the client
-    stack, and two paths of different length give identical figures.)
+    ADDED ENVIRONMENT VARIABLE (`SLB_ALIGN_PAD=z*64`, i.e. **+87 bytes** of
+    environment block -- ⚠ NOT +64, once the `envp` slot, the name and the NUL
+    are counted; TASK_098 read it as 64, computed `64 mod 32 == 0` and called
+    the control vacuous, and TASK_099 measured the block growing by exactly 87
+    with the `memset` moving `50.00 -> 43.00` per kernel call) moved the
+    outward figure on
+    **11 of 348** (pattern, input, cell) triples -- p03/p04 `safe_tuned` and
+    seven p08 cells -- while the kernel-EXCLUSIVE figure moved on **0 of 348**.
+    ⚠ The effect is BISTABLE with a 32-byte period and a 16-wide window whose
+    phase differs per binary, so `43.00` and `50.00` are not properties of the
+    two cells: each takes both.  (A first version of this note blamed the
+    `--callgrind-out-file=` path length.  That knob is INERT: valgrind strips
+    its own options before building the client stack, and two paths of
+    different length give identical figures.)
   * **gcc's PLT thunk**: gcc routes each libc call through `endbr64 ; jmp *GOT`,
     which callgrind attributes as its own function; clang's thunk is a bare
     `jmp` and is folded into the callee.  **+2.00 Ir per libc call, gcc only**,
