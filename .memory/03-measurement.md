@@ -2499,8 +2499,25 @@ kept, per convention, because the refutation matters more than the tidiness.**
 > control that cannot fail.**~~
 
 **Measured:** the sweep does not add 64 bytes. It sets `SLB_ALIGN_PAD=z*64`,
-which lengthens the environment block by **87 bytes** — the variable name, the
-`=` and the NUL come with it — and **`87 mod 32 = 23`, not 0. THE CONTROL FIRED.**
+which lengthens the environment block by **87 bytes**, and **`87 mod 32 = 23`,
+not 0. THE CONTROL FIRED.**
+
+✅ **MANAGER-VERIFIED INDEPENDENTLY — the 87 decomposes exactly, and the
+decomposition is the whole lesson:**
+
+```
+  envp pointer slot        8      <-- the part the manager forgot entirely
+  name "SLB_ALIGN_PAD"    13
+  "="                      1
+  pad z*64                64      <-- the ONLY part the manager counted
+  NUL                      1
+  ----------------------  87      87 mod 32 = 23    (64 mod 32 = 0)
+```
+
+⚠⚠ **Four of the five terms were invisible to the original argument**, which
+reasoned about *"a 64-byte-longer environment"* because that is what the prose
+said. **A variable does not cost its value; it costs a pointer slot, its name,
+an `=`, its value and a NUL.**
 It is not the fifth vacuous control; **it is a working one**, and it produced the
 published `50.00 → 43.00` to the instruction: p03 `safe_tuned`'s memset goes
 `300129 → 258129`, i.e. `129 + 50.00×6000` against `129 + 43.00×6000`.
