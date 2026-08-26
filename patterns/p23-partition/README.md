@@ -40,8 +40,9 @@ build it; the three limbs of RECAP's replacement bar are (see `NOTES.md` 0).
 | TCB | 5 `external_body` items, 3 contract-bearing |
 | identity | `unsafe ≡ verus` **exact** at `-O3` (`md5_fn 43acbc727fc6`, 157 insns), `norel` at `-O0` |
 | R3 − R4 | **+305.74** `Ir`/call on `small`, **+443.55** on `large` … **and see below** |
-| R1 − R1h | **−39.10 / −60.34** on gcc — **the guard has a NEGATIVE price**; clang flips sign between inputs |
-| harm | SIGSEGV in both directions; **silent on a one-element record, with eight C cells printing eight different wrong numbers**; **silent and sanitiser-clean** in the in-bounds middle regime |
+| in-contract R3 span | **2991.00 … 3719.00** probe-`Ir`/call, twelve spellings, median band — ⚠ **both endpoints corrected at TASK_106**; the cheapest in-contract R3 sits **inside** the R4 span (`NOTES.md` 9b′) |
+| R1 − R1h | **+39.10 / +60.34** on gcc — i.e. **the guard's price is −39.10 / −60.34, NEGATIVE, on these two inputs**; clang flips sign between them, and the gcc sign flips **twice** across p23's own rank band (`NOTES.md` 3a) |
+| harm | SIGSEGV in both directions; **silent on a one-element record, where the eight C cells print seven or eight different wrong numbers and every cell's number moves on every rebuild** (`NOTES.md` 7 — the values are deliberately not transcribed anywhere, because they cannot be); **silent and sanitiser-clean** in the in-bounds middle regime |
 
 ### ⚠ The headline is a domain warning, not a number
 
@@ -52,14 +53,31 @@ The only thing that moves is the **pivot's rank**. The two-term law in
 those points. **p23 is the first pattern here whose safety tax is a function of
 the data's SHAPE rather than its SIZE.**
 
-### ⚠ And the mechanism is a new one
+Measured at all **109** shipped points — every point of all four sweep bands
+plus `small` and `large` — the tax closes exactly:
+
+> **`R3 − R4 = 2 + 30·recs + 2·dn + 2·sw − 3·rounds + Σ τ(m mod 4)`**, `τ = {0,
+> 2, 3, 4}`, **max |residual| 0.0000 `Ir`/call**, with the coefficients fitted on
+> two bands and the other 38 points predicted to 0.0000.
+
+⚠ **Its band-K spelling, `242 + 2·dn + 2·sw − 3·rounds`, is exact on band K and
+wrong by up to 480 `Ir`/call off it.** `NOTES.md` 9c″ is about why, and it is the
+sharper half of the domain lesson.
+
+### ⚠ And the mechanism is a new one — as a PHENOMENON. Its CAUSE is open.
 
 Isolating the two scans: **LLVM already elides the upward scan's bounds check
-and does not elide the downward one's.** `scr[i]` is free because `i` is a
-monotonically increasing induction variable with a proven bound; `scr[j - 1]`
-costs ≈2.00 `Ir` per step because `j` *decreases* from a runtime value and the
-index is an unsigned subtraction. **The whole of p23's scan-side safety tax is
-which way the cursor walks.**
+and does not elide the downward one's** — unchecking the downward read alone
+produces the same disassembly as unchecking both. **An elision asymmetry between
+two scans of the same array under the same bound is new in this tree.**
+⚠ **Why is OPEN.** The explanation this row shipped with — *"`j` decreases from a
+runtime value and the index is an unsigned subtraction"* — **failed both of its
+isolations**: making the cursor ascend costs **+816 / +1614 / +1313**, removing
+the subtraction recovers **16 / 12 / 20** of a **488 / 184 / −14** gap, and —
+the third measurement, and it points the opposite way — giving the *upward* scan
+that same descending, subtracting shape makes it **512 / 262 / 15 probe-`Ir`/call
+CHEAPER** on the same band, and cheaper than the fully unchecked kernel at two of
+the three ranks. See `NOTES.md` 9d.
 
 ## Files
 

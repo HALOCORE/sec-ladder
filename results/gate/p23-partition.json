@@ -113,8 +113,8 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
-    "patterns/p23-partition/NOTES.md": "f3a907d9c7d96917ed651c469a89bb34bf0635b38e204446020f6215a71c5c6b",
-    "patterns/p23-partition/README.md": "4aaf5067267f86d211c42aed50aa35d1a8bcf5ef33451a70b7d6b47a71e18dfa",
+    "patterns/p23-partition/NOTES.md": "ff3c176cf8856f82827c3a40f8920491b47d251f28294b353fa87bd2f500b23f",
+    "patterns/p23-partition/README.md": "3a98f07ee797b56a6e3744f9225c0d36d0fbdf21fe9a6ac479127cd04c6b1467",
     "patterns/p23-partition/c/kernel.c": "1ffddd045414cfce27c58ebdb2e203bbb8a55287f928153735f6a3b1c9330fd8",
     "patterns/p23-partition/c/kernel.h": "2d4cb8223d99cb552eea4cf82d220bb9248c8a22de1dd459e08d98b279618ef4",
     "patterns/p23-partition/c/kernel_hardened.c": "f6177d752a71e0af8ffc6c47554d2fe4174e7ebdc16458e5341f6d09b9328ead",
@@ -1194,12 +1194,11 @@
     "adversarial-single.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "2770019511397632",
+        "stdout": "2769138190658944",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/isolated",
-          "O3/isolated"
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "2705683097473408",
@@ -1212,7 +1211,7 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/whole"
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "2705683097473408",
@@ -1221,11 +1220,24 @@
       },
       {
         "exit": 0,
-        "stdout": "2776188756568448",
+        "stdout": "2772663473613696",
         "stderr": "",
         "signal": null,
         "cells": [
           "O0/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2705683097473408",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "2773544794352384",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "2705683097473408",
@@ -1236,7 +1248,7 @@
     "adversarial-single.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "2762087624749440",
+        "stdout": "2762968945488128",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1249,7 +1261,7 @@
       },
       {
         "exit": 0,
-        "stdout": "2785001963955328",
+        "stdout": "2785883284694016",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1262,7 +1274,7 @@
       },
       {
         "exit": 0,
-        "stdout": "2797397313699423",
+        "stdout": "2798392353243068",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1275,7 +1287,7 @@
       },
       {
         "exit": 0,
-        "stdout": "2812321731838034",
+        "stdout": "2860792827617051",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1546,7 +1558,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:104:23: runtime error: index 18446744073709551615 out of bounds for type 'uint8_t [64]' ================================================================= ==1341486==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7fb57e",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:104:23: runtime error: index 18446744073709551615 out of bounds for type 'uint8_t [64]' ================================================================= ==1381495==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f32be",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1557,7 +1569,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f57cb400060 with insufficient space for an object of t",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7fc0ae400060 with insufficient space for an object of t",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1568,7 +1580,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f010f200060 with insufficient space for an object of t",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f6241200060 with insufficient space for an object of t",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1590,7 +1602,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f17c8600060 with insufficient space for an object of t",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f4db5e00060 with insufficient space for an object of t",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1757,7 +1769,7 @@
   },
   "failures": [],
   "notes": [
-    "adversarial-single.bin/c-gcc: opt/mode variants of this rung disagree (3 distinct behaviours)",
+    "adversarial-single.bin/c-gcc: opt/mode variants of this rung disagree (4 distinct behaviours)",
     "adversarial-single.bin/c-clang: opt/mode variants of this rung disagree (4 distinct behaviours)"
   ],
   "loud": [

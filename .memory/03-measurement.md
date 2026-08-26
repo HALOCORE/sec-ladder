@@ -2702,3 +2702,61 @@ leaves**, which is exactly what happened once: a sweep reported *"95 adversarial
 stayed internally consistent, `95+40+24 = 159 = 155+4`, so nothing downstream was
 wrong). ⚠ **When diffing gate records, compare adversarial entries as a SET keyed
 by input name, not by position.**
+
+## ⚠⚠ THREE MUTUALLY INCONSISTENT "EXACT" LAWS FROM ONE PATTERN — THE RESIDUE-CLASS TRAP, THIRD INSTANCE AND THE SHARPEST
+
+**TASK_106, PROVISIONAL (unreviewed).** `p23` produced **three** closed forms,
+each with **zero in-sample residual**, each wrong outside the band it was fitted
+on:
+
+```
+                                            max |error|, Ir/call
+form                                    K       M       N       X   small/large
+242 + 2dn + 2sw - 3rounds  (band K)   0.00   32.00  480.00  121.00   152.00
+30.25*recs + 2dn + 2sw - 3rounds      0.00   32.00    4.00   30.25    31.00
+2 + 30*recs + 2dn + 2sw - 3rounds + t 0.00    0.00    0.00    0.00     0.00
+```
+
+⚠⚠ **THE BAND-K FORM MISPREDICTS THE TWO SHIPPED MATRIX INPUTS BY UP TO 152.00
+`Ir`/CALL** — it was the headline law, and its holdout inside band K was
+`0.0000`. **A within-band holdout cannot detect a term the band holds constant.**
+
+**The law that survives all 109 shipped points:**
+
+> **`R3 − R4 = 2 + 30·recs + 2·dn + 2·sw − 3·rounds + Σ_records τ(m mod 4)`**,
+> with **`τ = {0→0, 1→2, 2→3, 3→4}`** — **max |residual| `0.0000` over all 109
+> points**, response range `41.75 … 956.40`. `-O3 isolated`, kernel-exclusive
+> `Ir`, debug-assertions **off**.
+> **Holdout: fit all eight coefficients on bands M+N only (71 points) → predict
+> the 38 nobody fitted → max |error| `0.0000`.** Shuffled training: `6050.96`.
+
+⚠⚠ **WHY NEITHER BAND COULD SEE `τ`, AND THIS IS THE TRANSFERABLE PART.**
+Band K sits at `m = 32` and band N at `m = 16` — **both `≡ 0 (mod 4)`, so `τ` is
+identically zero across each.** Band M sweeps `m` but `controls/sweep_fit.py`
+reads it at **`want_m = [2, 4, 8, 16, 24, 32, 40, 48]`** — **seven of those eight
+are multiples of four**, leaving `τ` with **one** non-zero sample. Its residual
+there is exactly `0 / 16 / 24 / 32` as `m mod 4` runs `0 / 1 / 2 / 3`.
+
+⚠ **Band N re-fits to a DIFFERENT exact law** (`2.00 + 5.75·dn + 2·sw −
+3·rounds`, R² `1.0000`) purely because `m = 16` makes `dn ≡ 8·recs` — **two
+regressors collinear inside the band and separable only outside it.**
+
+**The rule, stated generally, third time of asking** (p38's additivity failure
+was the first, p46's underdetermined two-band fit the second):
+
+> ⚠⚠ **A band that holds a regressor fixed cannot give the coefficient of
+> anything collinear with it, AND A WITHIN-BAND HOLDOUT WILL NOT TELL YOU.**
+> **Check the residue class of every parameter your bands hold constant, and fit
+> on one band while predicting another.** ⚠ **`p46` showed a two-band fit can be
+> UNDERDETERMINED with no in-sample residual; `p23` shows a one-band fit can be
+> CONFIDENTLY WRONG with a perfect in-band holdout.** The only test that caught
+> either is **out-of-band prediction.**
+
+✅ **Also landed, and it is what makes the axis clean:** `up + dn == mbytes`
+**exactly at all 109 points** (band K's `up + dn = 256.00` generalised) — total
+cursor work is constant and only its **split** moves. ✅ **The swap-count
+confound is refuted and reproduced:** endpoints `sw = 7.63` vs `7.75` while the
+tax differs `3.11×`; `dn` alone R² `0.9869`, **`sw` alone R² `0.0132`.**
+
+⚠ **`τ`'s MECHANISM IS NOT ESTABLISHED** — per-record, periodic, values
+`0/2/3/4`, not disassembled. **Cite it; do not explain it.**

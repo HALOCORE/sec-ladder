@@ -1805,6 +1805,104 @@ the number.** Two task files have already sent an agent to the wrong finding.
     Evidence: `.tasks/TASK_102_REPORT.md`, `.temp/t102/` (`REBUILD.sh`),
     `.tasks/TASK_105_REPORT.md`.
 
+38. **p23 — THE SAFETY TAX IS A FUNCTION OF THE DATA'S SHAPE, NOT ITS SIZE.**
+    The 25th pattern, and the first here whose cost axis is the *distribution* of
+    the input rather than its extent. ⚠ **PROVISIONAL where it rests on
+    `TASK_106`, which is unreviewed.**
+
+    `R3 − R4` runs **`227.00 → 706.37 Ir`/call, a factor of 3.11**, with the
+    element count, the record count and the bytes copied **all fixed** — only the
+    **pivot's rank** moves. ⚠ **The obvious confound is the swap count, and it is
+    REFUTED at the endpoints: swaps are `7.63` and `7.75`, within 1.6%, while the
+    tax differs 3.11×.** Swaps are symmetric about rank 0.5; the tax is monotone.
+    Fitted, `dn` alone gives R² `0.9869` and **`sw` alone `0.0132`**. ✅ **And
+    `up + dn == mbytes` exactly at all 109 shipped points — total cursor work is
+    CONSTANT and only its SPLIT moves**, which is what makes the axis clean.
+
+    **The law, and getting it right took three attempts:**
+
+    > **`R3 − R4 = 2 + 30·recs + 2·dn + 2·sw − 3·rounds + Σ_records τ(m mod 4)`**,
+    > `τ = {0→0, 1→2, 2→3, 3→4}` — **max |residual| `0.0000` over all 109 shipped
+    > points**, `-O3 isolated`, kernel-exclusive `Ir`, debug-assertions **off**.
+    > **Holdout: fit on bands M+N (71 points), predict the 38 nobody fitted →
+    > max |error| `0.0000`.**
+
+    ⚠⚠ **THE METHOD RESULT IS WORTH MORE THAN THE LAW: p23 produced THREE
+    mutually inconsistent "exact" laws, each with ZERO in-sample residual.** The
+    published four-term form is **band-K-only and mispredicts the two SHIPPED
+    matrix inputs by up to `152.00 Ir`/call**, despite a `0.0000` holdout *inside*
+    band K. **`τ` was invisible to every band**: K sits at `m = 32` and N at
+    `m = 16`, **both `≡ 0 (mod 4)`**, and the control reads band M at
+    `want_m = [2,4,8,16,24,32,40,48]` — **seven of eight multiples of four**,
+    leaving one non-zero sample. ⚠ **This is the residue-class trap for the THIRD
+    time** (p38's additivity failure, p46's underdetermined two-band fit), and it
+    is the sharpest: **p46 showed a two-band fit can be UNDERDETERMINED with no
+    in-sample residual; p23 shows a one-band fit can be CONFIDENTLY WRONG with a
+    PERFECT in-band holdout.** **Only out-of-band prediction caught either.**
+
+    ⚠⚠ **AND A FINDING ABOUT THE GATE ITSELF, not about p23: A `required`
+    SPELLING PIN CAN BE SATISFIED BY A TAUTOLOGICAL CONJUNCT THE COMPILER
+    DELETES.** A cheaper R3 spelling was excluded as out-of-contract; **restoring
+    the pinned conjunct as a redundant leading term makes it in-contract and
+    changes nothing — the two compile to the SAME OBJECT CODE** (`md5_norm
+    da08af26d9b1`, 249 insns, both). **The in-contract R3 floor drops `150.00`
+    `Ir`/call to `2991.00`, which is `59.00` BELOW the in-contract R4 spelling —
+    so the R3 and R4 spans OVERLAP, and ≥150 of the published safe-side figure is
+    SPELLING, NOT SAFETY.** ⚠ **The span's TOP endpoint was wrong too** —
+    `4208.00` was `r3b`, which is **`forbidden`**. ✅ **Clean negative that makes
+    it precise: three *other* in-contract respellings are all DEARER than the
+    shipped shape. Only the tautology recovers the saving.** ⚠⚠ **So an
+    in-contract span endpoint is a statement about WHAT SOMEONE THOUGHT TO WRITE,
+    not about what the declaration permits.**
+
+    **Proof: `16 verified, 0 errors` FIRST ATTEMPT** (twin 19/0), **zero
+    `proof fn`s**, TCB 5 (3 contract-bearing), no `assume`, no
+    `assume_specification`. ⚠ **The manager's named kill risk was backwards:** the
+    task argued the bug might live in the nested-scan Hoare form while only the
+    two-index form verifies. **The Hoare form verifies `6/0` first attempt too,
+    and the bug lives in the form that verifies MOST EASILY** — the spec is
+    written in the shape the code moves in, which is why p06 needs three lemmas
+    for a simpler obligation and p23 needs none. ✅ **Anti-vacuity: 9 of 9 mutants
+    fail, 3 of 3 controls verify — the strongest mutation result in the tree**
+    (p24 7/8, p29 3/4), because the postcondition is an **exact value equality**
+    rather than a property. ⚠ **A multiset clause was dropped as "separable" on
+    an experiment that was itself measuring a VACUOUS postcondition** (the
+    multiset-deleted probe accepts a body that zeroes the prefix and never looks
+    at the pivot); **right conclusion, invalid reason** — the exact fold is
+    strictly stronger than the clause dropped, since a multiset is invariant
+    under permutation and the fold is not.
+
+    ⚠ **The elision PHENOMENON reproduces to the instruction and its CAUSE IS
+    OPEN.** `k_up == k_r3c` and `k_dn == k_r4b` exactly, independently
+    reproduced — **but "the direction of the cursor is the whole tax" failed
+    THREE isolations**: making the induction variable ascend costs `+816…+1614`
+    instead of recovering the elision; removing the unsigned subtraction recovers
+    `12…20` of a `184…488` gap; and the *upward* scan given the blamed shape is
+    **cheaper**, below the unchecked kernel at two of three ranks.
+
+    ⚠ **The hardened-C row is rank-dependent and p23 did not apply its own rule to
+    it.** `R1 − R1h` on gcc is **`+39.10 / +60.34`** — positive, i.e. **the
+    hardened kernel is cheaper**, and also **smaller** (157 vs 160 insns). But the
+    guard's price **flips sign twice across p23's own rank band** (`+168.48` at
+    0.03, `−144.59` at 0.50, `+139.87` at 0.97), and the two shipped inputs sit at
+    ranks 0.44 and 0.28 — **both inside the negative window, which `gen.py`
+    enforces.** ⚠ **p23's own warning is *"any number quoted without its rank is
+    quoted without its domain"*, and its C row was quoted without one.** The
+    stated mechanism is refuted too: scan steps fit R² `0.023`, **exchanges
+    `0.973`**.
+
+    ⚠⚠ **A structural lesson worth more than its occasion: A NUMBER ONLY A
+    REBUILD CAN PRODUCE MUST NOT BE TRANSCRIBED INTO A FILE THE REBUILD
+    RE-HASHES.** A review asked for a corrected count of distinct adversarial
+    checksums; four gate runs gave **7, 7, 8, 8**, because **`NOTES.md` is in the
+    gate record's `source_sha256`** — so recording the count forces a run and the
+    run moves it. **`NOTES.md` now publishes the property (exit 0, silent, all
+    rungs diverge, hardened rungs agree) and no number.** ✅ Nothing was ever
+    pinned on those values, so the gate never depended on one.
+
+    Evidence: `.tasks/TASK_101_REPORT.md`, `.tasks/TASK_105_REPORT.md`,
+    `.tasks/TASK_106_REPORT.md`, `patterns/p23-partition/NOTES.md`.
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds

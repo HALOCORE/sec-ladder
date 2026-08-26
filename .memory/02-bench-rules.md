@@ -1635,3 +1635,74 @@ obligation is CHECKED.**
 carry one today and the three Verus-side detectors would be blind to it.**
 ✅ Bounded: **0 hits across the 24 shipped patterns** — latent, not live, the same
 posture as the `_verus` return-code hole before it was fixed.
+
+## ⚠⚠ A `required` SPELLING PIN CAN BE SATISFIED BY A TAUTOLOGICAL CONJUNCT THE COMPILER DELETES
+
+**TASK_106, PROVISIONAL (unreviewed).** This is a limitation of the declaration
+mechanism itself, not of one pattern's `spec.md`.
+
+`p23`'s `required[0]` pins the guard conjunct `i < j &&` **on both inner scans**,
+in English and by `check.py::spelling_matches`. A candidate R3 spelling (`k_u1`,
+a descending mirror) is **cheaper by 150 `Ir`/call** and is **out of contract**,
+because its upward guard reads `m - g < j &&`. It was therefore excluded.
+
+⚠⚠ **Restoring the pinned conjunct as a REDUNDANT LEADING TERM recovers the
+whole saving, and the two spellings COMPILE TO THE SAME OBJECT CODE:**
+
+```rust
+let mut g: usize = m - i;
+while i < j && m - g < j && scr[m - g] <= pv { g -= 1; }   // `i` does not move here,
+i = m - g;                                                  // and the outer `while i < j`
+while i < j && scr[j - 1] >= pv { j -= 1; }                 // just tested it
+```
+
+```
+k_u1 (out of contract)  md5_norm da08af26d9b1   249 insns
+k_u5 (in contract)      md5_norm da08af26d9b1   249 insns   <- SAME OBJECT CODE
+```
+
+`k_u5` **matches all 8 `required` entries, hits none of the 6 `forbidden`, and
+satisfies `required[0]`'s English literally.**
+
+⚠ **So the operative fact is NOT "the declaration excludes the cheap spelling".
+It is that a SEMANTICALLY-NULL respelling walks around the declaration and the
+gate cannot tell.** The conjunct is a tautology at that point, the optimiser
+deletes it, and the pin is satisfied by text that has no effect on the program.
+
+✅ **The clean negative that makes this precise, and it is the interesting half:**
+three *other* in-contract respellings (`u2`, `u3`, `u4`) are **dearer than or
+equal to the shipped shape** (3432.00 / 3187.00 / 3719.00 against 3187.00).
+**Only the tautological conjunct recovers the saving.**
+
+⚠⚠ **CONSEQUENCE FOR EVERY PUBLISHED SPAN: an in-contract span endpoint is a
+statement about what someone THOUGHT TO WRITE, not about what the declaration
+permits.** `p23`'s R3-side floor moved **150.00 `Ir`/call** on one tautology, and
+that was enough to make **the R3 and R4 spans OVERLAP** (2991.00 against `r4b`'s
+3050.00). **≥150 of the published safe-side figure was spelling, not safety.**
+⚠ **And the same audit found the span's TOP endpoint wrong too** — `4208.00` is
+`r3b`, which is **`forbidden`**. **Audit both endpoints against
+`spelling_matches` AND against `forbidden`, and say how many spellings were
+searched.**
+
+## ⚠⚠ A NUMBER ONLY A REBUILD CAN PRODUCE MUST NOT BE TRANSCRIBED INTO A FILE THE REBUILD RE-HASHES
+
+**TASK_106, PROVISIONAL.** A review asked for a corrected count of p23's distinct
+adversarial checksums. **The correction is impossible as specified, and the
+regress is structural:**
+
+```
+run 3 (committed at TASK_101)  gcc 3 / clang 4 -> 7 distinct
+run 4 (TASK_106)               gcc 3 / clang 4 -> 7
+run 5 (TASK_106)               gcc 4 / clang 4 -> 8
+run 6 (TASK_106)               gcc 4 / clang 4 -> 8
+```
+
+**`NOTES.md` is in the gate record's `source_sha256`.** So editing `NOTES.md` to
+record the count forces a gate run, and the run moves the values being recorded.
+⚠ **"Seven" is a better correction than "eight" and IS NOT A FACT EITHER.**
+
+✅ **The fix that works: publish the INVARIANT, not the number.** For p23 that is
+*exit 0, silent, all rungs diverge, hardened rungs agree*, plus a logged-run
+history table — **with no number on the run-dependent lines.**
+⚠ **Ask of any figure you are about to write into a tracked file: does producing
+it require a build that this file's hash covers? If yes, publish the property.**
