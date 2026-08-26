@@ -194,8 +194,20 @@ Write your report to `.tasks/TASK_101_REPORT.md` as well as returning it.
 
 ---
 
-⚠ **PROTOCOL rule 2's running count is `MANAGER-FILLS-AT-LAUNCH`.** The calls I
-am least sure of, by name:
+⚠ **PROTOCOL rule 2's running count is 332** (299 + 8 `TASK_099` + 12 `TASK_100`
++ 5 `TASK_102` + 8 `TASK_103`; ⚠ **the manager's own +2 was WITHDRAWN when
+`TASK_100` proved the "contradiction" was manufactured**).
+
+⚠⚠ **The last four tasks ran 299 → 332, and the manager was the subject of the
+two biggest findings in the run.** `TASK_099` proved *"the 64-byte control could
+not have fired"* false — the sweep adds **87** bytes, and `87 mod 32 = 23`.
+`TASK_100` proved that a leak "contradiction" the manager had measured **was not
+one at all** — both tables were right, of two different programs. `TASK_103` then
+proved that a sentence the manager **struck out of `.memory/`** was **TRUE**, and
+that the replacement was false. ⚠ **Contradicting this task file is the highest-
+value thing you can do, and the record says so.**
+
+The calls I am least sure of, by name:
 
 1. ⚠⚠ **§2 — that the bug lives in the Hoare form and the verified form may not
    host it.** **This is my reasoning, not a measurement, and `TASK_086`'s probe
