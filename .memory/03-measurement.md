@@ -2422,3 +2422,61 @@ synthesis.md, that zero is MEANINGFUL."* **The acceptance test behind that claim
 is sound, but the byte-identity itself is conditional on the launching shell's
 environment size.** The zero is evidence about the *acceptance test*, not about
 the tree.
+
+### ✅ RESOLVED (TASK_098, reviewed) — the ±7 is ONE libc callee, and `kernel_exclusive_ir` is STRUCTURALLY IMMUNE
+
+✅ **MANAGER-VERIFIED by per-symbol attribution**, `.temp/mgr98/`, p03 `unsafe`
+`-O3 isolated`, marginal `Ir`/call, pad 0 against pad 15:
+
+```
+symbol                                   pad0     pad15    delta
+unsafe::kernel  (the measured symbol)  3002.00   3002.00   +0.00
+0x189480        libc.so.6                43.00     50.00   +7.00
+unsafe::main                             14.00     14.00   +0.00
+TOTAL (whole-program marginal)         3059.00   3066.00   +7.00
+```
+
+**`libc+0x189480` is `__memset_avx2_unaligned_erms`** (`vpbroadcastb` /
+`vmovdqu %ymm0`; a stripped libc mis-names it `__nss_database_lookup+0x1440`).
+**100% of the swing is inside it.** Decomposition of the pair:
+`R5 − R4 = kernel 0 + memset{−7, 0, +7} + main(−1)`.
+
+> ⚠⚠ **SO THE KERNEL-EXCLUSIVE COLUMN CANNOT CONTAIN THE ±7, AND DOES NOT —
+> 0 of 288 triples moved while 14 marginal cells did.** The exposed surface is
+> **exactly one column**: `synthesize.py::derived` prints `k − k2 + c` with
+> `c = (ma−mb) − (ka−kb)`, so the kernel terms cancel and the printed figure is
+> algebraically **`ma − mb`** — the whole-program marginal pair difference, 1:1.
+
+✅ **THE HEADLINES SURVIVE, and they were checked rather than assumed** — over a
+**32-pad sweep**: p01's `+4…+5`/call, p16's *"a single integer per call"* and
+p46's `0.00000` per-MAC tax **all swing `0.00`**. ⚠ **And the SLOPE protection is
+exact:** `d_ir_d_work` moves **`0.000000000000`** on all 8 exposed cells, because
+the term is per-call and identical on both probe blobs. **A slope survives where
+a level does not — that distinction is the general rule.**
+
+⚠ **The exposed set is SMALL and this file's earlier fear was too wide: 2
+patterns, 7 of 144 cells.** `check_marginal_ir`'s four-pattern list is **wrong** —
+p38 and p46's Rust rungs swing `0.00` over 32 pads.
+
+⚠⚠ **WITHDRAWN: 4 CELLS.** p03 and p04's `R5 − R4 = +6.00` takes **`{−8, −1,
++6}`** over 32 pads (support 14 / 4 / 14). ⚠ **The reproducible content is
+`−1.00` — the `main` term — and it is the OPPOSITE SIGN to the published
+`+6.00`.** The `+6` was one draw from a trimodal distribution.
+
+⚠⚠ **AND THE CONTROL ALREADY IN `results/synthesis.md` IS VACUOUS: `64 mod 32
+== 0`.** Its second sweep used a *"64-byte-longer env"*, which is **the same
+alignment phase as pad 0**, so it could not have moved. **The `< 2.00` band's
+claim that *"nothing real hides below the floor"* is false** — p04's `R3 − R4`
+correction is blank at one phase and `±7` at another. **Fifth instance of a
+control that cannot fail.**
+
+**The instrument, decided:** ⚠⚠ **a LAYOUT POPULATION IS THE WRONG TOOL AND FAILS
+IN THE DANGEROUS DIRECTION** — it varies the *program*, measures `ns`, and
+**callgrind is layout-blind, so it would return ≈0 and read as "no effect."**
+✅ **The right axis is `argv` length and `envp` length, and they are ONE axis**
+(measured: same ±7, `kernel_exclusive` `3002.00` in all 9 runs). Same *family* as
+`RECAP.md`'s settled answer 1, **a different variable**. **Cost: a 32-pad sweep
+is ≈2 min/pattern against ~4.8 h for a layout population; only p03/p04 need it,
+≈4 min.** ⚠ **Do NOT "fix" this by pinning the gate's environment** — cheap
+(`check.py` is not measurement-hashed) but it makes the number
+**reproducible-and-wrong.**

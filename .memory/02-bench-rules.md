@@ -1521,3 +1521,33 @@ Miri sizing paragraph carried `:311`/`:4769` **while its own parenthesis says
 > **When you correct a rotted citation, fix the `.memory/` ORIGINAL first and the
 > derived copies second.** A sweep that only touches `patterns/` leaves the
 > authoritative layer contradicting the tree it governs.
+
+## ⚠⚠ `include!()` IS A FIFTH ROUTE PAST `_scan_unsafe_sites`, AND IT RE-OPENS x1
+
+**TASK_098 §4A (reviewer, adversarial).** The manager asked for a fifth route to
+a legal `p35` and said it would rather be wrong. **It was.**
+
+`include!("h.rs")` **outside** `verus!{}` gives `1 verified, 0 errors` with
+**`_scan_unsafe_sites` at 0 failures** and **`_path_includes` returning `[]`**.
+`include!` is a *macro*, not a `#[path] mod`, so the walk that
+`TASK_084`/`TASK_088` built to feed all three Verus-side detectors **never sees
+the file at all.**
+
+> **A gate-clean `p35` therefore EXISTS**: `_is_trusted` is `False`, so there is
+> no twin, no `requires`-strength rule and no shout — the same shape as
+> **TASK_009_REVIEW's blocker x1**, which `_is_trusted` was rewritten to close.
+> **x1 is re-opened by a different spelling.**
+
+⚠ **This does NOT re-open the catalogue** — the reviewer's own judgement, and the
+manager agrees: a `p35` built this way has a **precondition checked by nothing**,
+which is the opposite of what a pattern in this tree is for. ⚠⚠ **But the
+manager's stated REASON for closing the catalogue was incomplete**, and a reason
+is what gets reused: *"`p35` has no legal configuration"* is false as written.
+**The true statement is that `p35` has no configuration in which its safety
+obligation is CHECKED.**
+
+**Owed, and it is a real gate hole independent of `p35`:** `_verus_file_list` /
+`_path_includes` see `#[path]` and do not see `include!`. **Any pattern could
+carry one today and the three Verus-side detectors would be blind to it.**
+✅ Bounded: **0 hits across the 24 shipped patterns** — latent, not live, the same
+posture as the `_verus` return-code hole before it was fixed.
