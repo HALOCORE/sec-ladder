@@ -1,0 +1,237 @@
+--- build (gcc) ---
+--- A: which guard? three spellings, one benign record ---
+=== gv_plain ij 32 128 12 3 0 ===
+ij n=32 pv=128 nlow=12 neq=3 mode=0 -> 47799935612299814
+exit=0
+=== gv_plain mz 32 128 12 3 0 ===
+mz n=32 pv=128 nlow=12 neq=3 mode=0 -> 47799935612299814
+exit=0
+=== gv_plain bug 32 128 12 3 0 ===
+bug n=32 pv=128 nlow=12 neq=3 mode=0 -> 47799935612299814
+exit=0
+--- A: the same three on an ALL-BELOW record (pv=255) ---
+=== gv_plain ij 32 255 32 0 0 ===
+ij n=32 pv=255 nlow=32 neq=0 mode=0 -> 11754359054505381653
+exit=0
+=== gv_asan ij 32 255 32 0 0 ===
+ij n=32 pv=255 nlow=32 neq=0 mode=0 -> 11754359054505381653
+exit=0
+=== gv_ubsan ij 32 255 32 0 0 ===
+ij n=32 pv=255 nlow=32 neq=0 mode=0 -> 11754359054505381653
+exit=0
+=== gv_plain mz 32 255 32 0 0 ===
+mz n=32 pv=255 nlow=32 neq=0 mode=0 -> 11754359054505381653
+exit=0
+=== gv_asan mz 32 255 32 0 0 ===
+mz n=32 pv=255 nlow=32 neq=0 mode=0 -> 11754359054505381653
+exit=0
+=== gv_ubsan mz 32 255 32 0 0 ===
+mz n=32 pv=255 nlow=32 neq=0 mode=0 -> 11754359054505381653
+exit=0
+=== gv_plain bug 32 255 32 0 0 ===
+Segmentation fault
+exit=139
+=== gv_asan bug 32 255 32 0 0 ===
+=================================================================
+==1327684==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7f3319600060 at pc 0x5624f0102167 bp 0x7ffcd82fb370 sp 0x7ffcd82fb360
+READ of size 1 at 0x7f3319600060 thread T0
+    #0 0x5624f0102166 in k_bug /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:149
+    #1 0x5624f0101520 in main /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:229
+    #2 0x7f331b62a1c9  (/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
+    #3 0x7f331b62a28a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2a28a) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
+    #4 0x5624f0101684 in _start (/home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/gv_asan+0x1684) (BuildId: 9405bb665253db28e84cbff20dd66a475148ae08)
+
+Address 0x7f3319600060 is located in stack of thread T0 at offset 96 in frame
+    #0 0x5624f0101caf in k_bug /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:145
+
+  This frame has 1 object(s):
+    [32, 96) 'scr' (line 147) <== Memory access at offset 96 overflows this variable
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:149 in k_bug
+Shadow bytes around the buggy address:
+  0x7f33195ffd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f33195ffe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f33195ffe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f33195fff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f33195fff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+=>0x7f3319600000: f1 f1 f1 f1 00 00 00 00 00 00 00 00[f3]f3 f3 f3
+  0x7f3319600080: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f3319600100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f3319600180: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f3319600200: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f3319600280: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==1327684==ABORTING
+exit=1
+=== gv_ubsan bug 32 255 32 0 0 ===
+guard_variants.c:149:23: runtime error: index 64 out of bounds for type 'uint8_t [64]'
+exit=1
+--- A: the same three on an ALL-ABOVE record (pv=0) ---
+=== gv_plain ij 32 0 0 0 0 ===
+ij n=32 pv=0 nlow=0 neq=0 mode=0 -> 5155610551119793461
+exit=0
+=== gv_asan ij 32 0 0 0 0 ===
+ij n=32 pv=0 nlow=0 neq=0 mode=0 -> 5155610551119793461
+exit=0
+=== gv_ubsan ij 32 0 0 0 0 ===
+ij n=32 pv=0 nlow=0 neq=0 mode=0 -> 5155610551119793461
+exit=0
+=== gv_plain mz 32 0 0 0 0 ===
+mz n=32 pv=0 nlow=0 neq=0 mode=0 -> 5155610551119793461
+exit=0
+=== gv_asan mz 32 0 0 0 0 ===
+mz n=32 pv=0 nlow=0 neq=0 mode=0 -> 5155610551119793461
+exit=0
+=== gv_ubsan mz 32 0 0 0 0 ===
+mz n=32 pv=0 nlow=0 neq=0 mode=0 -> 5155610551119793461
+exit=0
+=== gv_plain bug 32 0 0 0 0 ===
+Segmentation fault
+exit=139
+=== gv_asan bug 32 0 0 0 0 ===
+=================================================================
+==1327704==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f332080001f at pc 0x55e7cc16b162 bp 0x7fffffb601a0 sp 0x7fffffb60190
+READ of size 1 at 0x7f332080001f thread T0
+    #0 0x55e7cc16b161 in k_bug /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:150
+    #1 0x55e7cc16a520 in main /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:229
+    #2 0x7f332282a1c9  (/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
+    #3 0x7f332282a28a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2a28a) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
+    #4 0x55e7cc16a684 in _start (/home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/gv_asan+0x1684) (BuildId: 9405bb665253db28e84cbff20dd66a475148ae08)
+
+Address 0x7f332080001f is located in stack of thread T0 at offset 31 in frame
+    #0 0x55e7cc16acaf in k_bug /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:145
+
+  This frame has 1 object(s):
+    [32, 96) 'scr' (line 147) <== Memory access at offset 31 underflows this variable
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-underflow /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:150 in k_bug
+Shadow bytes around the buggy address:
+  0x7f33207ffd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f33207ffe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f33207ffe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f33207fff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f33207fff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+=>0x7f3320800000: f1 f1 f1[f1]00 00 00 00 00 00 00 00 f3 f3 f3 f3
+  0x7f3320800080: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f3320800100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f3320800180: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f3320800200: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f3320800280: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==1327704==ABORTING
+exit=1
+=== gv_ubsan bug 32 0 0 0 0 ===
+guard_variants.c:150:23: runtime error: index 18446744073709551615 out of bounds for type 'uint8_t [64]'
+exit=1
+--- B: the TEXTBOOK pivot on an ALL-EQUAL record (mode=1) ---
+=== gv_plain selfpivot 32 128 0 0 1 ===
+selfpivot n=32 pv=128 nlow=0 neq=0 mode=1 -> 3910418957284214814
+exit=0
+=== gv_asan selfpivot 32 128 0 0 1 ===
+=================================================================
+==1327710==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7fd615200060 at pc 0x562e467e6c19 bp 0x7fffbb9f0650 sp 0x7fffbb9f0640
+READ of size 1 at 0x7fd615200060 thread T0
+    #0 0x562e467e6c18 in k_selfpivot /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:190
+    #1 0x562e467e65d5 in main /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:230
+    #2 0x7fd61722a1c9  (/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
+    #3 0x7fd61722a28a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2a28a) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
+    #4 0x562e467e6684 in _start (/home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/gv_asan+0x1684) (BuildId: 9405bb665253db28e84cbff20dd66a475148ae08)
+
+Address 0x7fd615200060 is located in stack of thread T0 at offset 96 in frame
+    #0 0x562e467e675f in k_selfpivot /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:159
+
+  This frame has 1 object(s):
+    [32, 96) 'scr' (line 161) <== Memory access at offset 96 overflows this variable
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:190 in k_selfpivot
+Shadow bytes around the buggy address:
+  0x7fd6151ffd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7fd6151ffe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7fd6151ffe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7fd6151fff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7fd6151fff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+=>0x7fd615200000: f1 f1 f1 f1 00 00 00 00 00 00 00 00[f3]f3 f3 f3
+  0x7fd615200080: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7fd615200100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7fd615200180: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7fd615200200: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7fd615200280: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==1327710==ABORTING
+exit=1
+=== gv_ubsan selfpivot 32 128 0 0 1 ===
+guard_variants.c:190:27: runtime error: index 64 out of bounds for type 'uint8_t [64]'
+exit=1
+--- B control: the same kernel on a MIXED record (mode=0) must be clean ---
+=== gv_plain selfpivot 32 128 12 3 0 ===
+selfpivot n=32 pv=128 nlow=12 neq=3 mode=0 -> 7500084040178903629
+exit=0
+=== gv_asan selfpivot 32 128 12 3 0 ===
+selfpivot n=32 pv=128 nlow=12 neq=3 mode=0 -> 7500084040178903629
+exit=0
+=== gv_ubsan selfpivot 32 128 12 3 0 ===
+selfpivot n=32 pv=128 nlow=12 neq=3 mode=0 -> 7500084040178903629
+exit=0
+--- static size of each cell, linked binary, padding stripped ---
+k_bug.constprop.0        size=0000000000000614
+k_ij.constprop.0         size=0000000000000586
+k_mz.constprop.0         size=0000000000000608
+k_selfpivot.constprop.0  size=0000000000000612
+(gcc -O2 may suffix a name with .constprop/.isra; that is the same cell)

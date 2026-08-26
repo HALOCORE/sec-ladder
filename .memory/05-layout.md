@@ -629,3 +629,32 @@ Verus-side detector shares** — `_trusted_items`, `_axiom_items`, the
 `assume(`/`admit(` shout and `_check_included_tcb`. Before that, `_axiom_items`
 had been widened alone and the other three still iterated `verus.obligations`,
 which is how a false `ensures` one hop away shipped green.
+
+## ⚠ `controls/` file types — the p23 deviation, ADJUDICATED
+
+**TASK_101 shipped the first `.c`, `.json` and `.log` into a `controls/`
+directory**, where the other 92 files across 24 patterns are **87 `.py` + 8
+`.sh`**. Manager decision, and the reasoning matters more than the verdict:
+
+- ✅ **`guard_variants.c` — ACCEPTED without qualification.** A control that
+  compares C spellings has to be C. **The convention was never "Python only", it
+  was "a generator, not an artefact"**, and a `.c` a script compiles is a
+  generator's input.
+- ✅ **`controls.log` — ACCEPTED.** `run.sh` regenerates it and `NOTES.md` cites
+  it; it is the evidence, which `CLAUDE.md` constraint 6 keeps.
+- ⚠⚠ **`sweep_fit.json` — ACCEPTED, BUT IT OWES A STALENESS PIN, AND THIS IS THE
+  THIRD INSTANCE OF ONE CLASS IN ONE DAY.** It caches ~30 minutes of callgrind
+  and `sweep_fit.py` regenerates it, so it earns its place. **But it is a tracked
+  file of measured numbers with nothing that detects it going stale** — exactly
+  like `results/tables/` (found stale on p09 after two contract moves, with no
+  detector) and `synthesis/outward_ir.json` (which `results/synthesis.md` itself
+  calls *"the only thing in this file with no staleness pin"*, and which p23 duly
+  left stale). ⚠ **The pattern to copy is `synthesis/licence.json`: carry the
+  gate `source_sha256` you were taken against, and print `STALE` on a mismatch.**
+
+⚠⚠ **THE GENERAL RULE THIS THIRD INSTANCE EARNS: a cached artefact of measured
+numbers must carry the hash of what it was derived from, or it will go stale
+silently and nothing in this repo will notice.** `--check-stale` globs
+`results/*.json` and `results/gate/p*.json` **and nothing else** — not
+`results/tables/`, not `synthesis/*.json`, not `patterns/*/controls/*.json`.
+**Every one of those has now been caught stale at least once.**

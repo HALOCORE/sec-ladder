@@ -470,16 +470,16 @@
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 9010.0,
-     "kernel_inclusive_ir_per_call": 9060.0,
+     "kernel_inclusive_ir_per_call": 9053.0,
      "outward_by_callee_per_call": {
-      "0x0000000000189480": 50.0
+      "0x0000000000189480": 43.0
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000189480": 1.0
      },
-     "outward_ir_per_call": 50.0,
+     "outward_ir_per_call": 43.0,
      "outward_ir_per_callee_call": {
-      "0x0000000000189480": 50.0
+      "0x0000000000189480": 43.0
      }
     },
     "unsafe": {
@@ -520,8 +520,8 @@
     },
     "R3-R4": {
      "kernel_exclusive": 626.0,
-     "kernel_plus_callees": 626.0,
-     "moves_by": 0.0
+     "kernel_plus_callees": 619.0,
+     "moves_by": -7.0
     },
     "R5-R4": {
      "kernel_exclusive": 0.0,
@@ -585,16 +585,16 @@
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 3361.0,
-     "kernel_inclusive_ir_per_call": 3411.0,
+     "kernel_inclusive_ir_per_call": 3404.0,
      "outward_by_callee_per_call": {
-      "0x0000000000189480": 50.0
+      "0x0000000000189480": 43.0
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000189480": 1.0
      },
-     "outward_ir_per_call": 50.0,
+     "outward_ir_per_call": 43.0,
      "outward_ir_per_callee_call": {
-      "0x0000000000189480": 50.0
+      "0x0000000000189480": 43.0
      }
     },
     "unsafe": {
@@ -635,8 +635,8 @@
     },
     "R3-R4": {
      "kernel_exclusive": 359.0,
-     "kernel_plus_callees": 359.0,
-     "moves_by": 0.0
+     "kernel_plus_callees": 352.0,
+     "moves_by": -7.0
     },
     "R5-R4": {
      "kernel_exclusive": 0.0,
@@ -702,16 +702,16 @@
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 11667.0,
-     "kernel_inclusive_ir_per_call": 11717.0,
+     "kernel_inclusive_ir_per_call": 11710.0,
      "outward_by_callee_per_call": {
-      "0x0000000000189480": 50.0
+      "0x0000000000189480": 43.0
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000189480": 1.0
      },
-     "outward_ir_per_call": 50.0,
+     "outward_ir_per_call": 43.0,
      "outward_ir_per_callee_call": {
-      "0x0000000000189480": 50.0
+      "0x0000000000189480": 43.0
      }
     },
     "unsafe": {
@@ -730,16 +730,16 @@
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 11662.0,
-     "kernel_inclusive_ir_per_call": 11705.0,
+     "kernel_inclusive_ir_per_call": 11712.0,
      "outward_by_callee_per_call": {
-      "0x0000000000189480": 43.0
+      "0x0000000000189480": 50.0
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000189480": 1.0
      },
-     "outward_ir_per_call": 43.0,
+     "outward_ir_per_call": 50.0,
      "outward_ir_per_callee_call": {
-      "0x0000000000189480": 43.0
+      "0x0000000000189480": 50.0
      }
     }
    },
@@ -752,13 +752,13 @@
     },
     "R3-R4": {
      "kernel_exclusive": 5.0,
-     "kernel_plus_callees": 5.0,
-     "moves_by": 0.0
+     "kernel_plus_callees": -2.0,
+     "moves_by": -7.0
     },
     "R5-R4": {
      "kernel_exclusive": 0.0,
-     "kernel_plus_callees": -7.0,
-     "moves_by": -7.0
+     "kernel_plus_callees": 0.0,
+     "moves_by": 0.0
     },
     "gcc-clang": {
      "kernel_exclusive": 3357.0,
@@ -817,16 +817,16 @@
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 3368.0,
-     "kernel_inclusive_ir_per_call": 3418.0,
+     "kernel_inclusive_ir_per_call": 3411.0,
      "outward_by_callee_per_call": {
-      "0x0000000000189480": 50.0
+      "0x0000000000189480": 43.0
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000189480": 1.0
      },
-     "outward_ir_per_call": 50.0,
+     "outward_ir_per_call": 43.0,
      "outward_ir_per_callee_call": {
-      "0x0000000000189480": 50.0
+      "0x0000000000189480": 43.0
      }
     },
     "unsafe": {
@@ -845,16 +845,16 @@
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 3363.0,
-     "kernel_inclusive_ir_per_call": 3406.0,
+     "kernel_inclusive_ir_per_call": 3413.0,
      "outward_by_callee_per_call": {
-      "0x0000000000189480": 43.0
+      "0x0000000000189480": 50.0
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000189480": 1.0
      },
-     "outward_ir_per_call": 43.0,
+     "outward_ir_per_call": 50.0,
      "outward_ir_per_callee_call": {
-      "0x0000000000189480": 43.0
+      "0x0000000000189480": 50.0
      }
     }
    },
@@ -867,13 +867,13 @@
     },
     "R3-R4": {
      "kernel_exclusive": 5.0,
-     "kernel_plus_callees": 5.0,
-     "moves_by": 0.0
+     "kernel_plus_callees": -2.0,
+     "moves_by": -7.0
     },
     "R5-R4": {
      "kernel_exclusive": 0.0,
-     "kernel_plus_callees": -7.0,
-     "moves_by": -7.0
+     "kernel_plus_callees": 0.0,
+     "moves_by": 0.0
     },
     "gcc-clang": {
      "kernel_exclusive": 970.0,
@@ -1532,10 +1532,10 @@
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 23615.001,
-     "kernel_inclusive_ir_per_call": 29025.07325,
+     "kernel_inclusive_ir_per_call": 29025.07575,
      "outward_by_callee_per_call": {
       "0x0000000000015220": 0.7365,
-      "0x0000000000188a80": 1296.849875,
+      "0x0000000000188a80": 1296.852375,
       "0x0000000000189480": 4112.485875
      },
      "outward_calls_per_kernel_call": {
@@ -1543,10 +1543,10 @@
       "0x0000000000188a80": 4.999875,
       "0x0000000000189480": 0.999875
      },
-     "outward_ir_per_call": 5410.07225,
+     "outward_ir_per_call": 5410.07475,
      "outward_ir_per_callee_call": {
       "0x0000000000015220": 2946.0,
-      "0x0000000000188a80": 259.3764594114853,
+      "0x0000000000188a80": 259.3769594239856,
       "0x0000000000189480": 4113.0
      }
     },
@@ -1580,35 +1580,35 @@
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 115571.0,
-     "kernel_inclusive_ir_per_call": 120096.8785,
+     "kernel_inclusive_ir_per_call": 120096.87675,
      "outward_by_callee_per_call": {
-      "0x0000000000188a80": 412.8785,
+      "0x0000000000188a80": 412.87675,
       "0x0000000000189480": 4113.0
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000188a80": 1.0,
       "0x0000000000189480": 1.0
      },
-     "outward_ir_per_call": 4525.8785,
+     "outward_ir_per_call": 4525.87675,
      "outward_ir_per_callee_call": {
-      "0x0000000000188a80": 412.8785,
+      "0x0000000000188a80": 412.87675,
       "0x0000000000189480": 4113.0
      }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 23656.0,
-     "kernel_inclusive_ir_per_call": 29065.8785,
+     "kernel_inclusive_ir_per_call": 29065.87675,
      "outward_by_callee_per_call": {
-      "0x0000000000188a80": 1296.8785,
+      "0x0000000000188a80": 1296.87675,
       "0x0000000000189480": 4113.0
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000188a80": 5.0,
       "0x0000000000189480": 1.0
      },
-     "outward_ir_per_call": 5409.8785,
+     "outward_ir_per_call": 5409.87675,
      "outward_ir_per_callee_call": {
-      "0x0000000000188a80": 259.3757,
+      "0x0000000000188a80": 259.37535,
       "0x0000000000189480": 4113.0
      }
     },
@@ -1631,18 +1631,18 @@
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 23630.0,
-     "kernel_inclusive_ir_per_call": 29039.8785,
+     "kernel_inclusive_ir_per_call": 29039.87675,
      "outward_by_callee_per_call": {
-      "0x0000000000188a80": 1296.8785,
+      "0x0000000000188a80": 1296.87675,
       "0x0000000000189480": 4113.0
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000188a80": 5.0,
       "0x0000000000189480": 1.0
      },
-     "outward_ir_per_call": 5409.8785,
+     "outward_ir_per_call": 5409.87675,
      "outward_ir_per_callee_call": {
-      "0x0000000000188a80": 259.3757,
+      "0x0000000000188a80": 259.37535,
       "0x0000000000189480": 4113.0
      }
     }
@@ -1651,18 +1651,18 @@
    "pairs": {
     "R2-R4": {
      "kernel_exclusive": 91941.0,
-     "kernel_plus_callees": 91057.00175000001,
-     "moves_by": -883.9982499999896
+     "kernel_plus_callees": 91057.0,
+     "moves_by": -884.0
     },
     "R3-R4": {
      "kernel_exclusive": 26.0,
-     "kernel_plus_callees": 26.001749999999447,
-     "moves_by": 0.0017499999994470272
+     "kernel_plus_callees": 26.0,
+     "moves_by": 0.0
     },
     "R5-R4": {
      "kernel_exclusive": 0.0,
-     "kernel_plus_callees": 0.0017499999994470272,
-     "moves_by": 0.0017499999994470272
+     "kernel_plus_callees": 0.0,
+     "moves_by": 0.0
     },
     "gcc-clang": {
      "kernel_exclusive": 10255.999500000002,
@@ -3929,6 +3929,190 @@
    }
   }
  },
+ "p19": {
+  "large.bin": {
+   "cells": {
+    "c-clang": {
+     "kernel_exclusive_ir_per_call": 35860.0,
+     "kernel_inclusive_ir_per_call": 35860.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "c-clang-h": {
+     "kernel_exclusive_ir_per_call": 41497.0,
+     "kernel_inclusive_ir_per_call": 41497.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "c-gcc": {
+     "kernel_exclusive_ir_per_call": 45071.0,
+     "kernel_inclusive_ir_per_call": 45071.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "c-gcc-h": {
+     "kernel_exclusive_ir_per_call": 55313.0,
+     "kernel_inclusive_ir_per_call": 55313.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "safe_naive": {
+     "kernel_exclusive_ir_per_call": 67096.0,
+     "kernel_inclusive_ir_per_call": 67096.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "safe_tuned": {
+     "kernel_exclusive_ir_per_call": 45602.0,
+     "kernel_inclusive_ir_per_call": 45602.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "unsafe": {
+     "kernel_exclusive_ir_per_call": 41502.0,
+     "kernel_inclusive_ir_per_call": 41502.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "verus": {
+     "kernel_exclusive_ir_per_call": 41502.0,
+     "kernel_inclusive_ir_per_call": 41502.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    }
+   },
+   "n_iters": 2000,
+   "pairs": {
+    "R2-R4": {
+     "kernel_exclusive": 25594.0,
+     "kernel_plus_callees": 25594.0,
+     "moves_by": 0.0
+    },
+    "R3-R4": {
+     "kernel_exclusive": 4100.0,
+     "kernel_plus_callees": 4100.0,
+     "moves_by": 0.0
+    },
+    "R5-R4": {
+     "kernel_exclusive": 0.0,
+     "kernel_plus_callees": 0.0,
+     "moves_by": 0.0
+    },
+    "gcc-clang": {
+     "kernel_exclusive": 9211.0,
+     "kernel_plus_callees": 9211.0,
+     "moves_by": 0.0
+    }
+   }
+  },
+  "small.bin": {
+   "cells": {
+    "c-clang": {
+     "kernel_exclusive_ir_per_call": 2260.0,
+     "kernel_inclusive_ir_per_call": 2260.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "c-clang-h": {
+     "kernel_exclusive_ir_per_call": 7897.0,
+     "kernel_inclusive_ir_per_call": 7897.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "c-gcc": {
+     "kernel_exclusive_ir_per_call": 2831.0,
+     "kernel_inclusive_ir_per_call": 2831.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "c-gcc-h": {
+     "kernel_exclusive_ir_per_call": 13073.0,
+     "kernel_inclusive_ir_per_call": 13073.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "safe_naive": {
+     "kernel_exclusive_ir_per_call": 9496.0,
+     "kernel_inclusive_ir_per_call": 9496.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "safe_tuned": {
+     "kernel_exclusive_ir_per_call": 8162.0,
+     "kernel_inclusive_ir_per_call": 8162.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "unsafe": {
+     "kernel_exclusive_ir_per_call": 7902.0,
+     "kernel_inclusive_ir_per_call": 7902.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "verus": {
+     "kernel_exclusive_ir_per_call": 7902.0,
+     "kernel_inclusive_ir_per_call": 7902.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    }
+   },
+   "n_iters": 8000,
+   "pairs": {
+    "R2-R4": {
+     "kernel_exclusive": 1594.0,
+     "kernel_plus_callees": 1594.0,
+     "moves_by": 0.0
+    },
+    "R3-R4": {
+     "kernel_exclusive": 260.0,
+     "kernel_plus_callees": 260.0,
+     "moves_by": 0.0
+    },
+    "R5-R4": {
+     "kernel_exclusive": 0.0,
+     "kernel_plus_callees": 0.0,
+     "moves_by": 0.0
+    },
+    "gcc-clang": {
+     "kernel_exclusive": 571.0,
+     "kernel_plus_callees": 571.0,
+     "moves_by": 0.0
+    }
+   }
+  }
+ },
  "p22": {
   "large.bin": {
    "cells": {
@@ -4109,6 +4293,262 @@
      "kernel_exclusive": -313.81550000000016,
      "kernel_plus_callees": -313.81550000000016,
      "moves_by": 0.0
+    }
+   }
+  }
+ },
+ "p23": {
+  "large.bin": {
+   "cells": {
+    "c-clang": {
+     "kernel_exclusive_ir_per_call": 1450.10735,
+     "kernel_inclusive_ir_per_call": 1643.10735,
+     "outward_by_callee_per_call": {
+      "0x0000000000188a80": 193.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 12.0
+     },
+     "outward_ir_per_call": 193.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 16.083333333333332
+     }
+    },
+    "c-clang-h": {
+     "kernel_exclusive_ir_per_call": 1426.971,
+     "kernel_inclusive_ir_per_call": 1619.971,
+     "outward_by_callee_per_call": {
+      "0x0000000000188a80": 193.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 12.0
+     },
+     "outward_ir_per_call": 193.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 16.083333333333332
+     }
+    },
+    "c-gcc": {
+     "kernel_exclusive_ir_per_call": 1650.80565,
+     "kernel_inclusive_ir_per_call": 1650.80565,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "c-gcc-h": {
+     "kernel_exclusive_ir_per_call": 1590.46705,
+     "kernel_inclusive_ir_per_call": 1590.46705,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "safe_naive": {
+     "kernel_exclusive_ir_per_call": 2030.13635,
+     "kernel_inclusive_ir_per_call": 2223.13635,
+     "outward_by_callee_per_call": {
+      "0x0000000000188a80": 193.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 12.0
+     },
+     "outward_ir_per_call": 193.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 16.083333333333332
+     }
+    },
+    "safe_tuned": {
+     "kernel_exclusive_ir_per_call": 1942.51865,
+     "kernel_inclusive_ir_per_call": 2135.51865,
+     "outward_by_callee_per_call": {
+      "0x0000000000188a80": 193.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 12.0
+     },
+     "outward_ir_per_call": 193.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 16.083333333333332
+     }
+    },
+    "unsafe": {
+     "kernel_exclusive_ir_per_call": 1498.971,
+     "kernel_inclusive_ir_per_call": 1691.971,
+     "outward_by_callee_per_call": {
+      "0x0000000000188a80": 193.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 12.0
+     },
+     "outward_ir_per_call": 193.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 16.083333333333332
+     }
+    },
+    "verus": {
+     "kernel_exclusive_ir_per_call": 1498.971,
+     "kernel_inclusive_ir_per_call": 1691.971,
+     "outward_by_callee_per_call": {
+      "0x0000000000188a80": 193.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 12.0
+     },
+     "outward_ir_per_call": 193.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 16.083333333333332
+     }
+    }
+   },
+   "n_iters": 20000,
+   "pairs": {
+    "R2-R4": {
+     "kernel_exclusive": 531.16535,
+     "kernel_plus_callees": 531.1653500000002,
+     "moves_by": 2.2737367544323206e-13
+    },
+    "R3-R4": {
+     "kernel_exclusive": 443.54765,
+     "kernel_plus_callees": 443.54765,
+     "moves_by": 0.0
+    },
+    "R5-R4": {
+     "kernel_exclusive": 0.0,
+     "kernel_plus_callees": 0.0,
+     "moves_by": 0.0
+    },
+    "gcc-clang": {
+     "kernel_exclusive": 200.69830000000002,
+     "kernel_plus_callees": 7.6983000000000175,
+     "moves_by": -193.0
+    }
+   }
+  },
+  "small.bin": {
+   "cells": {
+    "c-clang": {
+     "kernel_exclusive_ir_per_call": 2350.0266833333335,
+     "kernel_inclusive_ir_per_call": 2413.0266833333335,
+     "outward_by_callee_per_call": {
+      "0x0000000000188a80": 63.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 5.0
+     },
+     "outward_ir_per_call": 63.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.6
+     }
+    },
+    "c-clang-h": {
+     "kernel_exclusive_ir_per_call": 2353.150833333333,
+     "kernel_inclusive_ir_per_call": 2416.150833333333,
+     "outward_by_callee_per_call": {
+      "0x0000000000188a80": 63.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 5.0
+     },
+     "outward_ir_per_call": 63.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.6
+     }
+    },
+    "c-gcc": {
+     "kernel_exclusive_ir_per_call": 2816.8054166666666,
+     "kernel_inclusive_ir_per_call": 2816.8054166666666,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "c-gcc-h": {
+     "kernel_exclusive_ir_per_call": 2777.705033333333,
+     "kernel_inclusive_ir_per_call": 2777.705033333333,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "safe_naive": {
+     "kernel_exclusive_ir_per_call": 2737.6251333333335,
+     "kernel_inclusive_ir_per_call": 2800.6251333333335,
+     "outward_by_callee_per_call": {
+      "0x0000000000188a80": 63.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 5.0
+     },
+     "outward_ir_per_call": 63.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.6
+     }
+    },
+    "safe_tuned": {
+     "kernel_exclusive_ir_per_call": 2692.6795333333334,
+     "kernel_inclusive_ir_per_call": 2755.6795333333334,
+     "outward_by_callee_per_call": {
+      "0x0000000000188a80": 63.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 5.0
+     },
+     "outward_ir_per_call": 63.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.6
+     }
+    },
+    "unsafe": {
+     "kernel_exclusive_ir_per_call": 2386.938416666667,
+     "kernel_inclusive_ir_per_call": 2449.938416666667,
+     "outward_by_callee_per_call": {
+      "0x0000000000188a80": 63.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 5.0
+     },
+     "outward_ir_per_call": 63.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.6
+     }
+    },
+    "verus": {
+     "kernel_exclusive_ir_per_call": 2386.938416666667,
+     "kernel_inclusive_ir_per_call": 2449.938416666667,
+     "outward_by_callee_per_call": {
+      "0x0000000000188a80": 63.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000188a80": 5.0
+     },
+     "outward_ir_per_call": 63.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000188a80": 12.6
+     }
+    }
+   },
+   "n_iters": 60000,
+   "pairs": {
+    "R2-R4": {
+     "kernel_exclusive": 350.6867166666666,
+     "kernel_plus_callees": 350.6867166666666,
+     "moves_by": 0.0
+    },
+    "R3-R4": {
+     "kernel_exclusive": 305.7411166666666,
+     "kernel_plus_callees": 305.7411166666666,
+     "moves_by": 0.0
+    },
+    "R5-R4": {
+     "kernel_exclusive": 0.0,
+     "kernel_plus_callees": 0.0,
+     "moves_by": 0.0
+    },
+    "gcc-clang": {
+     "kernel_exclusive": 466.7787333333331,
+     "kernel_plus_callees": 403.7787333333331,
+     "moves_by": -63.0
     }
    }
   }
@@ -5333,6 +5773,286 @@
      "kernel_exclusive": -232.0,
      "kernel_plus_callees": -232.0,
      "moves_by": 0.0
+    }
+   }
+  }
+ },
+ "p46": {
+  "large.bin": {
+   "cells": {
+    "c-clang": {
+     "kernel_exclusive_ir_per_call": 23088.004,
+     "kernel_inclusive_ir_per_call": 23210.589,
+     "outward_by_callee_per_call": {
+      "0x0000000000015220": 0.772,
+      "0x0000000000188a80": 64.87,
+      "0x0000000000189480": 56.943
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 0.001,
+      "0x0000000000188a80": 1.0,
+      "0x0000000000189480": 0.999
+     },
+     "outward_ir_per_call": 122.585,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 772.0,
+      "0x0000000000188a80": 64.87,
+      "0x0000000000189480": 57.0
+     }
+    },
+    "c-clang-h": {
+     "kernel_exclusive_ir_per_call": 23090.004,
+     "kernel_inclusive_ir_per_call": 23212.589,
+     "outward_by_callee_per_call": {
+      "0x0000000000015220": 0.772,
+      "0x0000000000188a80": 64.87,
+      "0x0000000000189480": 56.943
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 0.001,
+      "0x0000000000188a80": 1.0,
+      "0x0000000000189480": 0.999
+     },
+     "outward_ir_per_call": 122.585,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 772.0,
+      "0x0000000000188a80": 64.87,
+      "0x0000000000189480": 57.0
+     }
+    },
+    "c-gcc": {
+     "kernel_exclusive_ir_per_call": 28866.0,
+     "kernel_inclusive_ir_per_call": 28866.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "c-gcc-h": {
+     "kernel_exclusive_ir_per_call": 28869.0,
+     "kernel_inclusive_ir_per_call": 28869.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "safe_naive": {
+     "kernel_exclusive_ir_per_call": 23341.0,
+     "kernel_inclusive_ir_per_call": 23539.0,
+     "outward_by_callee_per_call": {
+      "0x0000000000189480": 198.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 2.0
+     },
+     "outward_ir_per_call": 198.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 99.0
+     }
+    },
+    "safe_tuned": {
+     "kernel_exclusive_ir_per_call": 23435.0,
+     "kernel_inclusive_ir_per_call": 23633.0,
+     "outward_by_callee_per_call": {
+      "0x0000000000189480": 198.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 2.0
+     },
+     "outward_ir_per_call": 198.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 99.0
+     }
+    },
+    "unsafe": {
+     "kernel_exclusive_ir_per_call": 24250.0,
+     "kernel_inclusive_ir_per_call": 24448.0,
+     "outward_by_callee_per_call": {
+      "0x0000000000189480": 198.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 2.0
+     },
+     "outward_ir_per_call": 198.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 99.0
+     }
+    },
+    "verus": {
+     "kernel_exclusive_ir_per_call": 24250.0,
+     "kernel_inclusive_ir_per_call": 24448.0,
+     "outward_by_callee_per_call": {
+      "0x0000000000189480": 198.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 2.0
+     },
+     "outward_ir_per_call": 198.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 99.0
+     }
+    }
+   },
+   "n_iters": 1000,
+   "pairs": {
+    "R2-R4": {
+     "kernel_exclusive": -909.0,
+     "kernel_plus_callees": -909.0,
+     "moves_by": 0.0
+    },
+    "R3-R4": {
+     "kernel_exclusive": -815.0,
+     "kernel_plus_callees": -815.0,
+     "moves_by": 0.0
+    },
+    "R5-R4": {
+     "kernel_exclusive": 0.0,
+     "kernel_plus_callees": 0.0,
+     "moves_by": 0.0
+    },
+    "gcc-clang": {
+     "kernel_exclusive": 5777.995999999999,
+     "kernel_plus_callees": 5655.411,
+     "moves_by": -122.58499999999913
+    }
+   }
+  },
+  "small.bin": {
+   "cells": {
+    "c-clang": {
+     "kernel_exclusive_ir_per_call": 6108.001,
+     "kernel_inclusive_ir_per_call": 6195.17975,
+     "outward_by_callee_per_call": {
+      "0x0000000000015220": 0.193,
+      "0x0000000000188a80": 30.0,
+      "0x0000000000189480": 56.98575
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 0.00025,
+      "0x0000000000188a80": 1.0,
+      "0x0000000000189480": 0.99975
+     },
+     "outward_ir_per_call": 87.17875,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 772.0,
+      "0x0000000000188a80": 30.0,
+      "0x0000000000189480": 57.0
+     }
+    },
+    "c-clang-h": {
+     "kernel_exclusive_ir_per_call": 6110.001,
+     "kernel_inclusive_ir_per_call": 6197.17975,
+     "outward_by_callee_per_call": {
+      "0x0000000000015220": 0.193,
+      "0x0000000000188a80": 30.0,
+      "0x0000000000189480": 56.98575
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 0.00025,
+      "0x0000000000188a80": 1.0,
+      "0x0000000000189480": 0.99975
+     },
+     "outward_ir_per_call": 87.17875,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 772.0,
+      "0x0000000000188a80": 30.0,
+      "0x0000000000189480": 57.0
+     }
+    },
+    "c-gcc": {
+     "kernel_exclusive_ir_per_call": 8271.0,
+     "kernel_inclusive_ir_per_call": 8271.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "c-gcc-h": {
+     "kernel_exclusive_ir_per_call": 8275.0,
+     "kernel_inclusive_ir_per_call": 8275.0,
+     "outward_by_callee_per_call": {},
+     "outward_calls_per_kernel_call": {},
+     "outward_ir_per_call": 0.0,
+     "outward_ir_per_callee_call": {}
+    },
+    "safe_naive": {
+     "kernel_exclusive_ir_per_call": 6241.0,
+     "kernel_inclusive_ir_per_call": 6439.0,
+     "outward_by_callee_per_call": {
+      "0x0000000000189480": 198.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 2.0
+     },
+     "outward_ir_per_call": 198.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 99.0
+     }
+    },
+    "safe_tuned": {
+     "kernel_exclusive_ir_per_call": 6287.0,
+     "kernel_inclusive_ir_per_call": 6485.0,
+     "outward_by_callee_per_call": {
+      "0x0000000000189480": 198.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 2.0
+     },
+     "outward_ir_per_call": 198.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 99.0
+     }
+    },
+    "unsafe": {
+     "kernel_exclusive_ir_per_call": 6406.0,
+     "kernel_inclusive_ir_per_call": 6604.0,
+     "outward_by_callee_per_call": {
+      "0x0000000000189480": 198.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 2.0
+     },
+     "outward_ir_per_call": 198.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 99.0
+     }
+    },
+    "verus": {
+     "kernel_exclusive_ir_per_call": 6406.0,
+     "kernel_inclusive_ir_per_call": 6604.0,
+     "outward_by_callee_per_call": {
+      "0x0000000000189480": 198.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000189480": 2.0
+     },
+     "outward_ir_per_call": 198.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000000189480": 99.0
+     }
+    }
+   },
+   "n_iters": 4000,
+   "pairs": {
+    "R2-R4": {
+     "kernel_exclusive": -165.0,
+     "kernel_plus_callees": -165.0,
+     "moves_by": 0.0
+    },
+    "R3-R4": {
+     "kernel_exclusive": -119.0,
+     "kernel_plus_callees": -119.0,
+     "moves_by": 0.0
+    },
+    "R5-R4": {
+     "kernel_exclusive": 0.0,
+     "kernel_plus_callees": 0.0,
+     "moves_by": 0.0
+    },
+    "gcc-clang": {
+     "kernel_exclusive": 2162.999,
+     "kernel_plus_callees": 2075.8202499999998,
+     "moves_by": -87.17875000000004
     }
    }
   }

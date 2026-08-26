@@ -2419,6 +2419,147 @@
    }
   }
  },
+ "p23": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [
+     "memcpy@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [
+     "memcpy@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking9panic_fmt",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking9panic_fmt",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14"
+    ],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memcpy@GLIBC_2.14"
+    ],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "da3887bb56c1ae44a9b0cd8bcaa98118a77e8dc218d8cc993b4708ef278185f4",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "140a0354d35970059b2948e986fa5744ccb24d50fde19d64e15dde55d4eaa327",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+   "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
+   "patterns/p23-partition/NOTES.md": "f3a907d9c7d96917ed651c469a89bb34bf0635b38e204446020f6215a71c5c6b",
+   "patterns/p23-partition/README.md": "4aaf5067267f86d211c42aed50aa35d1a8bcf5ef33451a70b7d6b47a71e18dfa",
+   "patterns/p23-partition/c/kernel.c": "1ffddd045414cfce27c58ebdb2e203bbb8a55287f928153735f6a3b1c9330fd8",
+   "patterns/p23-partition/c/kernel.h": "2d4cb8223d99cb552eea4cf82d220bb9248c8a22de1dd459e08d98b279618ef4",
+   "patterns/p23-partition/c/kernel_hardened.c": "f6177d752a71e0af8ffc6c47554d2fe4174e7ebdc16458e5341f6d09b9328ead",
+   "patterns/p23-partition/c/main.c": "5b6bc3bb8df0b07df3e31ef04b97a600c9dd4f1e70a877a417c0090302ab6d97",
+   "patterns/p23-partition/controls/guard_equiv.py": "59c739921892031535a51094a9700d398180680b86afc412b0507d4c5b800c89",
+   "patterns/p23-partition/controls/sweep_fit.py": "9d16146d09ffd42107770a1c2b50f12af069943e1b0a9b5435ff1c4e7d293095",
+   "patterns/p23-partition/inputs/gen.py": "14ed489fcc0cac9c7e432d5781a7120ec09bc6c6d33e5d234f4c67fb099e4132",
+   "patterns/p23-partition/model.py": "5295c39d3af0f4336de1afe72182ddbabba9304fff6d8905c66037d146c7d0be",
+   "patterns/p23-partition/safe_naive.rs": "ae42dd20ed9beb37892a601dd44da3c1de8f238c84a0d1da433b6da795a6f240",
+   "patterns/p23-partition/safe_tuned.rs": "a1f8d7440effceed168509512db75bb07d5d3a8d1aa2a57d349ba32fc004caca",
+   "patterns/p23-partition/spec.md": "ec7a03bbd582c351c23787d5d93709c961e4e3f363efbe82f7d4390bbfcd777e",
+   "patterns/p23-partition/unsafe.rs": "b295e98714a8c0f5e590213773a3cd626d42f5e1da28754f51d2200aa4562e64",
+   "patterns/p23-partition/verus.rs": "dba011654ea2e35a3cd8ef55628fbec7963cad5d6256f52c13e6c96ced749182",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memcpy@GLIBC_2.14; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check, NtNt::core::slice::index::slice_index_fail"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memcpy@GLIBC_2.14; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check, Nt::core::panicking::panic_fmt, NtNt::core::slice::index::slice_index_fail"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "identical live set: memcpy@GLIBC_2.14"
+   },
+   "gcc-clang": {
+    "verdict": "NOT-LIC",
+    "why": "only c-clang calls ['memcpy@plt']; \u26a0 UNPRICED: gcc's PLT thunk on 1 live `@plt` site(s)"
+   }
+  }
+ },
  "p27": {
   "cells": {
    "c-clang": {
