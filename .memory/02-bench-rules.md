@@ -282,6 +282,69 @@ Known residuals we are deliberately **not** closing, all measured:
   **accident-reachable**, was named nowhere, and Verus reports `1 verified, 0
   errors` with the leaf unscanned. ⚠ **`macro_rules!` emitting a `#[path] mod`
   was already caught** — a clean negative.
+  ⚠⚠ **NOT CLOSED — TASK_103 FOUND A SEVENTH, EIGHTH AND NINTH ROUTE, ALL
+  `1 verified, 0 errors` WITH `_path_includes` RETURNING `[]`.** `TASK_099`
+  varied the **`include!` spelling** and the **depth**; it never varied the
+  spelling of the **`#[path]` attribute itself**:
+
+  - **R7a — `#[cfg_attr(all(), path = "h.rs")] mod m;`** The attribute does not
+    *start* with `path`. ⚠⚠ **This is THE standard Rust idiom for
+    platform-selected modules**, so it is the most likely of the three to appear
+    by accident in real code.
+  - **R7b — `#[path = r"h.rs"] mod m;`** A raw string is a legal attribute value
+    and `\s*\"` cannot match the leading `r`. `TASK_099` tested raw strings in
+    `include!` but not in `#[path]`.
+  - **R7c — `mod x { mod m; }`** rustc resolves this to `x/m.rs` (its own E0583
+    help says so) while the fallback looks beside the *including* file.
+    ⚠ **No attribute and no macro at all** — the most accident-reachable.
+
+  ⚠⚠ **THE REAL FINDING IS THE METHOD, NOT THE THREE ROUTES: `_path_includes` is
+  a REGEX APPROXIMATION OF RUSTC'S MODULE RESOLUTION AND WILL NOT CONVERGE.**
+  Nine routes have now been found by three separate tasks, each time after the
+  previous one's table read as exhaustive. ✅ **The compiler will hand over the
+  exact set for one flag, on a compiler this project already invokes directly:**
+
+  ```
+  $ rustc --edition 2021 --emit=dep-info main.rs
+  main.d: main.rs h.rs x/y.rs        # on a main.rs containing BOTH R7a and R7c
+  ```
+
+  **Owed:** replace the regex walk with `--emit=dep-info`. ⚠ **Until then the
+  route table must not be presented as exhaustive**, and these three belong on
+  the accepted-residual list rather than in a "closed" claim.
+
+  ⚠⚠ **AND `_check_opaque_includes` FALSE-POSITIVES ON EVERY COMMENT SHAPE —
+  5 of 5, and it turns the gate RED.** It reads the **raw** text.
+  `_path_includes` reads raw text deliberately, because over-approximating a
+  *file set* is safe; **for a check that FAILS the gate, over-approximation is
+  the unsafe direction.**
+
+  ```
+  real   opaque include! in live code (must fire) -> FAIL   [correct]
+  FP-1   line comment quoting the idiom           -> FAIL
+  FP-2   //! doc comment quoting the idiom        -> FAIL
+  FP-3   block comment quoting the idiom          -> FAIL
+  FP-4   the idiom inside a STRING literal        -> FAIL
+  FP-5   a commented-out include! of a REAL path  -> FAIL
+  ```
+
+  ⚠ **The accident route is NEAR:** `include!(concat!(env!("OUT_DIR"),
+  "/gen.rs"))` is now the canonical example sentence in `check.py`'s docstring,
+  in this file, and in two reports — **the first author who quotes it in a rung
+  source's doc comment fails the gate.** ⚠ **And the diagnostic prescribes the
+  one impossible thing for the case it names**: the build-script idiom *has* no
+  literal path, so *"Use a literal path"* is unactionable. ✅ **Cheap fix: run
+  this check on `vparse.blank_noncode(txt)`.** ⚠ **Scope gap (minor):** it never
+  covers the roots, so an opaque `include!` in `safe_tuned.rs` is not refused —
+  pre-existing scope, since no stage scans the safe rungs for `unsafe` tokens.
+
+  ✅ **Clean negatives from the same review, do not re-run:** the transitive fixed
+  point **terminates on a cycle** (`a.rs`↔`b.rs` returns both files, rc=0, under
+  a 60 s clock — `walked` is a realpath set). The `exists`-vs-`isfile` gap now
+  raises `IsADirectoryError` **inside** `_path_includes`, reaching three call
+  sites instead of one; contrived, so minor, but `isfile` should guard the
+  enqueue too.
+
   ⚠⚠ **TWO PROCESS LESSONS, both against the manager.** *(1)* **This line —
   written 2026-08-17 — records the hole as a DELIBERATELY ACCEPTED residual, and
   `TASK_098` re-found it as new and framed it as `TASK_009_REVIEW`'s blocker x1

@@ -98,6 +98,38 @@ context still applies — do not restart from scratch.
    - the **reviewer** attacks the claim;
    - **only then** does the manager write `.memory/`, from the reviewed text.
 
+   ⚠⚠ **THE MANAGER TOOK A DELIBERATE EXCEPTION TO THIS AT TASK_099 AND IT WENT
+   WRONG — AND THE FAILURE IS FINER AND MORE USEFUL THAN "RULE 9 WAS BROKEN".**
+   The argument for the exception was reasonable: an engineer had returned a
+   blocker showing a `.memory/` sentence was false, and **leaving a known-false
+   claim in the authoritative layer seemed worse than landing a PROVISIONAL
+   correction.** `TASK_103` then showed **the struck sentence was TRUE and the
+   replacement was FALSE.**
+
+   **The actual defect was not the timing. It was that the finding had TWO PARTS
+   and the manager landed them as ONE:**
+
+   - a **conclusion** — *"re-run the gate and compare is not a reproduction
+     test"* — which was **true, important, and independent of the mechanism**; and
+   - a **mechanism** — *"the launching method selects the phase"* — which was
+     **false**, and which ⚠ **the engineer's own report had explicitly declined
+     to name** (*"I am deliberately not naming one"*).
+
+   ⚠⚠ **The manager's write-up named a mechanism the engineer had refused to
+   name, and did it in a STRIKETHROUGH, which reads as settled rather than
+   open.** That is rule 9's original cause exactly — *writing the finding from
+   the report rather than from the measurement* — **except sharper, because the
+   manager made the claim STRONGER than the engineer had.**
+
+   **So the rule, refined:** when a result has a conclusion and a mechanism,
+   ⚠ **they have different evidence and they need different treatment. Land the
+   conclusion if it stands on its own; mark the mechanism OPEN.** **Never
+   strike an existing `.memory/` sentence on the strength of an unreviewed
+   mechanism** — a strikethrough is an assertion that the matter is closed, and
+   it is much harder to un-strike than to annotate. ⚠ **If you must record a
+   contradiction pre-review, ANNOTATE the sentence as DISPUTED and name the
+   evidence on both sides. Do not delete, and do not replace.**
+
    `.memory/` is the layer that outlives every task and is described as
    authoritative. A number that has not survived a review does not belong in it.
    If a finding must be recorded before review, mark it **PROVISIONAL — not yet

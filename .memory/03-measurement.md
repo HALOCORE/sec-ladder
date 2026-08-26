@@ -2405,30 +2405,94 @@ on: **`synthesize.py::marginal` DEFAULTS to `O3/isolated` BECAUSE of that rule.*
   RUNG, i.e. up to ±14 on a pair**, and a pair difference smaller than that is
   **not resolvable without a layout population.** ⚠ **Several published pair
   differences in this tree are smaller than 14.**
-- ⚠⚠ **RETRACTED AT TASK_099, AND THIS ONE HAS TEETH — it invalidates a
-  REPRODUCTION METHOD, not just a number.** ⚠ **PROVISIONAL: TASK_099 is
-  unreviewed.**
+- ✅ **REINSTATED AND SHARPENED — REVIEWED at TASK_103.** ⚠⚠ **The manager
+  struck the sentence below at TASK_099 and THE SENTENCE WAS TRUE.** It is
+  restored, with the mechanism made exact:
 
-  > ~~TASK_097 also observed it as a between-RUN difference — a `nohup`'d script
+  > **TASK_097 also observed it as a between-RUN difference — a `nohup`'d script
   > against an interactive shell, which differ in environment size — and that is
-  > the same variable. **It is not a property of the launching method; it is a
-  > property of the environment block's LENGTH.**~~
+  > the same variable. It is not a property of the launching method; it is a
+  > property of the environment block's LENGTH.**
 
-  **Measured: three whole-gate `check.py p03` runs on an UNCHANGED tree, with no
-  environment variable set, give `A = C ≠ B` on 3 of 4 cells** — `unsafe +7` and
-  `verus −7`, moving `R5 − R4` from `+6.00` to `−8.00`. **The environment block
-  was identical down every path, 3672 bytes, and the client stdio was inert.**
-  So length is **not** the only input: **how the gate was launched selects which
-  side of the bistability you land on.**
+  ✅ **The launcher matters EXACTLY AND ONLY through the bytes it puts in the
+  environment block.** `bash -c "cd repo && …"` **exports `OLDPWD=repo`**;
+  `subprocess.run(cwd=repo)` leaves `OLDPWD` at its inherited value. On this box
+  that is an **11-byte** difference — enough to cross a 16-wide window in a
+  32-byte period. **The launcher itself is inert.**
 
-  ⚠⚠ **THE CONSEQUENCE IS A METHOD ONE AND IT IS THE POINT: *"re-run the gate and
-  compare"* IS NOT A REPRODUCTION TEST FOR THESE CELLS.** A second run that
-  agrees may have agreed by landing in the same phase, and a second run that
-  disagrees is not evidence of a change. ⚠ **Byte-identical output across two
-  gate runs has been quoted as evidence at least twice in this project** — it is
-  weaker than it reads wherever an `-O3 isolated` marginal is involved.
-  **`kernel_exclusive_ir` remains structurally immune (0 of 288 triples), so it
-  is the column to reproduce against.**
+  ✅ **Settled by a CROSSED design, 8 whole `check.py p03` runs**, where `A2` =
+  B's launcher with A's environment and `B2` = A's launcher with B's environment,
+  each arm's environment read from `/proc/self/environ` before its run:
+
+  ```
+                                        env  safe_tuned  unsafe   verus
+    A  bash+cd     file  env=short     3269     3418.00  3059.00  3065.00
+    B  subprocess  pipe  env=long      3280     3425.00  3066.00  3058.00
+    A2 subprocess  pipe  env=SHORT     3269     3418.00  3059.00  3065.00
+    B2 bash+cd     file  env=LONG      3280     3425.00  3066.00  3058.00
+  ```
+
+  **`A == A2` and `B == B2` on all 8 keys, each arm run twice.** Not the
+  launching program, not stdout-to-pipe vs stdout-to-file, not the parent.
+
+  ⚠⚠ **AND IT CLOSES TASK_099's OWN LOOSE END:** its `d1_sweep.sh` opens with
+  `cd <repo>` while its `b2_source_to_published.py` uses `subprocess.run(...,
+  cwd=REPO)`. **That is exactly the A/B pair** — the `b2` control failed and the
+  §D sweep did not **because of an 11-byte `OLDPWD`**, i.e. because of the
+  mechanism the retraction had just declared dead.
+
+  ⚠⚠ **THE CONSEQUENCE STANDS UNCHANGED, AND IT IS THE POINT: *"re-run the gate
+  and compare"* IS NOT A REPRODUCTION TEST for an `-O3 isolated` marginal** —
+  **because two equally natural ways of invoking the gate hand it different
+  environments, and nothing in the artefact records which one you got.**
+  ⚠ **Byte-identical output across two gate runs has been quoted as evidence at
+  least twice in this project.**
+
+  ### ✅ THE REPRODUCTION PROTOCOL, decided at TASK_103
+
+  **Record the environment-block byte length in the gate record** — one integer,
+  `len(open("/proc/self/environ","rb").read())`, beside `marginal_ir_per_call`.
+  Then **same recorded length ⇒ the marginal must match EXACTLY, and a mismatch
+  is a real change** (demonstrated: three arms across two launchers agree to
+  `0.00`); **different length ⇒ compare `kernel_exclusive_ir`, or re-run at the
+  recorded length.** ⚠ **This is NOT the forbidden pin** — it does not force an
+  environment and so cannot make the number reproducible-and-wrong; **it records
+  which draw you took, so a disagreement becomes diagnosable.**
+  **Complement for the seven exposed cells: publish the pair at `L` and `L+16`**
+  — the 32-period/16-window result makes a two-point screen complete, ≈2 min per
+  pattern on the two patterns that need it.
+
+  ⚠⚠ **`kernel_exclusive_ir` IS the column to QUOTE but is NOT a reproduction
+  test, and the manager's advice to "reproduce against it" was too strong on two
+  counts:** *(a)* **it is not in the gate record at all** — it lives in
+  `results/pNN-*.json`, which only `measure.py` writes, so reproducing against it
+  is not a `check.py` re-run; *(b)* it is **`None` in 302 of 318 `-O3 whole`
+  pairs**. ✅ **Its immunity itself is upheld**: `0.00` on 4 of 4 p03 cells across
+  both an 11-byte and a 16-byte perturbation, while the marginal moved `±7` in
+  the same runs.
+
+  ⚠ **Not established:** environment **length** alone versus length-plus-content.
+  `A` and `A2` have byte-identical environments, so launcher-vs-environment is
+  settled; length-vs-content still rests on `.temp/r98/p03_sweep.json`.
+  **And everything here is `p03` only** — p04, p38 and p46 are unprobed on this
+  axis.
+
+  ### ✅ THE SEVEN EXPOSED CELLS, ENUMERATED AT LAST
+
+  `7 of 144` = 24 × 6; the 288 below is ×2 blobs. **Must-fire arm (pad0 vs pad0)
+  moved 0 of 288.**
+
+  | # | pattern | cell | `small.bin` | `large.bin` |
+  |---|---|---|---|---|
+  | 1 | p03 | `safe_tuned` | 3418.00 → 3425.00 | 9067.30 → 9074.30 |
+  | 2 | p03 | `unsafe` | 3059.00 → 3066.00 | 8441.30 → 8448.30 |
+  | 3 | p03 | `verus` | 3065.00 → 3058.00 | 8447.30 → 8440.30 |
+  | 4 | p04 | `safe_tuned` | 3425.00 → 3432.00 | 11724.00 → 11731.00 |
+  | 5 | p04 | `unsafe` | 3420.00 → 3427.00 | 11719.00 → 11726.00 |
+  | 6 | p04 | `verus` | 3426.00 → 3419.00 | 11725.00 → 11718.00 |
+  | 7 | **p46** | **`c-clang`** | 6216.00 → 6209.00 | 23230.66 → 23223.66 |
+
+  **`kernel_exclusive` moved on 0 of 288 in the same scan.**
 
 **What is owed, and none of it is done:** the docstring's scope; a decision on
 whether every `-O3 isolated` pair difference now needs the layout harness
@@ -2584,10 +2648,31 @@ already been struck.** Keep the list, not the ordinal.
    never fire. ⚠ **Caught by the reviewer itself, by printing `acc`**, before it
    reached a conclusion; changed to `acc != 0` and re-run.
 
+7. ⚠⚠ **`TASK_099`'s `a3_launcher.py`, AND IT CARRIED A BLOCKER.** It existed to
+   test whether the launching method changes the ±7, and **both of its arms were
+   the same arm**: arm A ran `bash -c "timeout 60 <py> a3_launcher.py --child"`
+   with **no `cd` and no `cwd=`**, so it was byte-identical to arm B. The one
+   variable it existed to vary was **held constant by construction**, so it could
+   only ever print *"identical"* — and C7, a blocker that struck a true sentence
+   out of `.memory/`, was built on it. It also measured the block length from
+   `os.environ` (a Python dict) rather than `/proc/self/environ`.
+   ⚠⚠ **ITS LESSON IS DISTINCT FROM ENTRY 5's AND IS THE MOST TRANSFERABLE ONE
+   HERE: A CONTROL MUST REPRODUCE THE COMMAND, NOT THE IDEA OF THE COMMAND.**
+   The probe modelled *"bash versus python"*; the arms that actually differed
+   were `bash -c "cd X && cmd"` versus `subprocess.run(cmd, cwd=X)`, **and the
+   `cd` was the entire effect** — it exports `OLDPWD`, 11 bytes.
+
 **The reflex, and it is one question:** ⚠⚠ **before believing a check, ask what
 would make it FAIL — and then make that happen.** Every entry above passes that
 question and none of them survived it. **A control with no demonstrated failing
 arm is not evidence.**
+
+⚠ **Entries 5, 6 and 7 all landed within three tasks of each other**, which says
+the reflex is not yet habitual. ✅ **The counter-example worth copying is
+`TASK_103`, which gave EVERY probe an arm that must fire and reported each one
+firing** — `+17` predicted and measured on an env-length probe, a `CONTROL-plain`
+route that must be scanned, a `--selfdiff` over 24 179 leaves returning 0, and a
+pad0-vs-pad0 scan over 288 triples returning 0 movers.
 
 ## ⚠ An allocation counter PERTURBS the measured cell; the LSan hook does not
 
@@ -2606,3 +2691,14 @@ instruction** (kernel disassembly identical modulo one trailing alignment
 `nopl`), blinds no sanitizer (six cells byte-identical), and false-positives on
 none of p01's eight inputs. ⚠ **Its one cost: a pattern legitimately holding an
 allocation on the stack at exit would false-positive. Validated on one pattern.**
+
+## ⚠ A `p13` gate re-run REORDERS its `c-clang` adversarial list
+
+**TASK_103, reviewed.** Between two `check.py` runs on an identical tree, four of
+`p13`'s `c-clang` adversarial entries change **list index without changing
+value**. **A naive JSON leaf-diff therefore overstates the change by four
+leaves**, which is exactly what happened once: a sweep reported *"95 adversarial
+… p13 8"* where the truth is **91 moved + 2 added + 2 removed** (the arithmetic
+stayed internally consistent, `95+40+24 = 159 = 155+4`, so nothing downstream was
+wrong). ⚠ **When diffing gate records, compare adversarial entries as a SET keyed
+by input name, not by position.**
