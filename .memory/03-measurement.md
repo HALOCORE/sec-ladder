@@ -2405,10 +2405,30 @@ on: **`synthesize.py::marginal` DEFAULTS to `O3/isolated` BECAUSE of that rule.*
   RUNG, i.e. up to ±14 on a pair**, and a pair difference smaller than that is
   **not resolvable without a layout population.** ⚠ **Several published pair
   differences in this tree are smaller than 14.**
-- ⚠ **TASK_097 also observed it as a between-RUN difference** — a `nohup`'d
-  script against an interactive shell, which differ in environment size — and
-  that is the same variable. **It is not a property of the launching method; it
-  is a property of the environment block's LENGTH.**
+- ⚠⚠ **RETRACTED AT TASK_099, AND THIS ONE HAS TEETH — it invalidates a
+  REPRODUCTION METHOD, not just a number.** ⚠ **PROVISIONAL: TASK_099 is
+  unreviewed.**
+
+  > ~~TASK_097 also observed it as a between-RUN difference — a `nohup`'d script
+  > against an interactive shell, which differ in environment size — and that is
+  > the same variable. **It is not a property of the launching method; it is a
+  > property of the environment block's LENGTH.**~~
+
+  **Measured: three whole-gate `check.py p03` runs on an UNCHANGED tree, with no
+  environment variable set, give `A = C ≠ B` on 3 of 4 cells** — `unsafe +7` and
+  `verus −7`, moving `R5 − R4` from `+6.00` to `−8.00`. **The environment block
+  was identical down every path, 3672 bytes, and the client stdio was inert.**
+  So length is **not** the only input: **how the gate was launched selects which
+  side of the bistability you land on.**
+
+  ⚠⚠ **THE CONSEQUENCE IS A METHOD ONE AND IT IS THE POINT: *"re-run the gate and
+  compare"* IS NOT A REPRODUCTION TEST FOR THESE CELLS.** A second run that
+  agrees may have agreed by landing in the same phase, and a second run that
+  disagrees is not evidence of a change. ⚠ **Byte-identical output across two
+  gate runs has been quoted as evidence at least twice in this project** — it is
+  weaker than it reads wherever an `-O3 isolated` marginal is involved.
+  **`kernel_exclusive_ir` remains structurally immune (0 of 288 triples), so it
+  is the column to reproduce against.**
 
 **What is owed, and none of it is done:** the docstring's scope; a decision on
 whether every `-O3 isolated` pair difference now needs the layout harness
@@ -2454,21 +2474,47 @@ exact:** `d_ir_d_work` moves **`0.000000000000`** on all 8 exposed cells, becaus
 the term is per-call and identical on both probe blobs. **A slope survives where
 a level does not — that distinction is the general rule.**
 
-⚠ **The exposed set is SMALL and this file's earlier fear was too wide: 2
-patterns, 7 of 144 cells.** `check_marginal_ir`'s four-pattern list is **wrong** —
-p38 and p46's Rust rungs swing `0.00` over 32 pads.
+⚠ **The exposed set is SMALL and this file's earlier fear was too wide: 7 of 144
+cells, across THREE patterns.** ⚠⚠ **This said "2 patterns, 7 of 144 cells" and
+that is ARITHMETICALLY IMPOSSIBLE — corrected at TASK_099 (PROVISIONAL,
+unreviewed). The third is `p46`'s `c-clang` cell, which is the seventh.** The
+manager wrote the pattern count and the cell count from two different passes and
+never checked one against the other; **two numbers in one sentence that cannot
+both be true is a defect any reader can catch, and it survived into
+`.memory/`.** `check_marginal_ir`'s four-pattern list is still **wrong** — p38
+and p46's *Rust* rungs swing `0.00` over 32 pads.
 
 ⚠⚠ **WITHDRAWN: 4 CELLS.** p03 and p04's `R5 − R4 = +6.00` takes **`{−8, −1,
 +6}`** over 32 pads (support 14 / 4 / 14). ⚠ **The reproducible content is
 `−1.00` — the `main` term — and it is the OPPOSITE SIGN to the published
 `+6.00`.** The `+6` was one draw from a trimodal distribution.
 
-⚠⚠ **AND THE CONTROL ALREADY IN `results/synthesis.md` IS VACUOUS: `64 mod 32
-== 0`.** Its second sweep used a *"64-byte-longer env"*, which is **the same
-alignment phase as pad 0**, so it could not have moved. **The `< 2.00` band's
-claim that *"nothing real hides below the floor"* is false** — p04's `R3 − R4`
-correction is blank at one phase and `±7` at another. **Fifth instance of a
-control that cannot fail.**
+⚠⚠ **RETRACTED AT TASK_099 — THE PARAGRAPH BELOW IS FALSE AND IT WAS THE
+MANAGER'S.** ⚠ **PROVISIONAL: TASK_099 is unreviewed. The superseded text is
+kept, per convention, because the refutation matters more than the tidiness.**
+
+> ~~**AND THE CONTROL ALREADY IN `results/synthesis.md` IS VACUOUS: `64 mod 32
+> == 0`.** Its second sweep used a *"64-byte-longer env"*, which is **the same
+> alignment phase as pad 0**, so it could not have moved. **Fifth instance of a
+> control that cannot fail.**~~
+
+**Measured:** the sweep does not add 64 bytes. It sets `SLB_ALIGN_PAD=z*64`,
+which lengthens the environment block by **87 bytes** — the variable name, the
+`=` and the NUL come with it — and **`87 mod 32 = 23`, not 0. THE CONTROL FIRED.**
+It is not the fifth vacuous control; **it is a working one**, and it produced the
+published `50.00 → 43.00` to the instruction: p03 `safe_tuned`'s memset goes
+`300129 → 258129`, i.e. `129 + 50.00×6000` against `129 + 43.00×6000`.
+
+⚠⚠ **THE LESSON IS THE MANAGER'S, NOT THE CONTROL'S: the arithmetic was done on
+the DOCUMENTED intent (*"a 64-byte-longer environment"*) instead of on the
+BYTES THE PROCESS ACTUALLY RECEIVES.** A `mod` argument about alignment must be
+computed from the measured block length, never from the prose describing it.
+**And this was written into a task file as an established fact, which is the
+precise failure `PROTOCOL.md` rule 14 was added to prevent — one task earlier.**
+
+✅ **What survives unchanged:** the `< 2.00` band's claim that *"nothing real
+hides below the floor"* **is still false** — p04's `R3 − R4` correction is blank
+at one phase and `±7` at another. That half never depended on the vacuity claim.
 
 **The instrument, decided:** ⚠⚠ **a LAYOUT POPULATION IS THE WRONG TOOL AND FAILS
 IN THE DANGEROUS DIRECTION** — it varies the *program*, measures `ns`, and

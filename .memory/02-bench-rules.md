@@ -270,7 +270,28 @@ Known residuals we are deliberately **not** closing, all measured:
   *incomplete* with respect to its body's operations is caught only partially, by
   identity plus Miri. Both remain human readings.
 - A width change applied to every rung at once is invisible to the driver diff.
-- `include!()` of a file outside the module graph escapes the `unsafe` scan.
+- ~~`include!()` of a file outside the module graph escapes the `unsafe` scan.~~
+  ✅ **CLOSED at TASK_099** (PROVISIONAL — unreviewed). `check.py::_path_includes`
+  now sees `include!("…")` in any bracket form, raw strings and subdirs, and is a
+  **transitive fixed point** resolving each include against the *including
+  file's* directory; a new `check.py::_check_opaque_includes` refuses an
+  `include!` whose argument is not a resolvable literal. `_scan_unsafe_sites` was
+  **not** touched.
+  ⚠⚠ **AND A SIXTH ROUTE WAS FOUND THAT IS NOT A MACRO AT ALL: transitive
+  `#[path]`-of-`#[path]`.** It was live at HEAD, needs no macro, is
+  **accident-reachable**, was named nowhere, and Verus reports `1 verified, 0
+  errors` with the leaf unscanned. ⚠ **`macro_rules!` emitting a `#[path] mod`
+  was already caught** — a clean negative.
+  ⚠⚠ **TWO PROCESS LESSONS, both against the manager.** *(1)* **This line —
+  written 2026-08-17 — records the hole as a DELIBERATELY ACCEPTED residual, and
+  `TASK_098` re-found it as new and framed it as `TASK_009_REVIEW`'s blocker x1
+  "re-opened by a different spelling". It was never closed; it was documented as
+  open, in this file.** The manager carried that framing into `TASK_099` without
+  checking this list. **Read the accepted-residual list before calling a residual
+  a regression.** *(2)* **"0 hits across the 24 shipped patterns" bounded
+  NOTHING** — the transitive `#[path]` route adds no token, so the `grep` that
+  returned 0 could never have seen it. **A grep bounds only what a grep can
+  see.**
 - `unsafe` anywhere in `common/` is a hard failure with **no hatch**, unlike
   every other structural rule here. Correct today (no rung needs it) and it will
   have to be revisited for the pointer-backed families, p27+.

@@ -24,6 +24,39 @@ context still applies — do not restart from scratch.
 
 1. **Alternate engineer → reviewer.** Every review so far has found real defects
    in work that reported success; four found them past a fully green gate.
+   ⚠⚠ **AND THE LOOP HAS A FOURTH STEP THAT WAS MISSING FROM IT UNTIL TASK_100:
+   build → review → land corrections → WRITE THE FINDING.** `p19` and `p46` — the
+   23rd and 24th patterns, both gate-green, both reviewed, both corrected — were
+   absent from `RECAP.md`'s findings section for **45 and 35 tasks**, while the
+   START HERE box counted them as done. **Nothing in the loop pointed at the
+   gap**: the gate was green, `.memory/` had rows, the reports existed, and the
+   one artefact a reader actually reads had no entry. ⚠ **A pattern is finished
+   when a reader can find its result, not when its gate is green.** The check is
+   one loop, and ⚠ **the obvious spelling of it is WRONG** — `ls -d patterns/p*/
+   | grep -o 'p[0-9]*'` also matches the `p` in `patterns/`, so it reports every
+   pattern missing and reads as a catastrophe. Use `basename`:
+
+   ```sh
+   awk '/^## The findings so far/,/^## Retracted/' RECAP.md > .temp/f.$$
+   for d in patterns/p*/; do id=$(basename "$d" | cut -d- -f1)
+     grep -q "\b$id\b" .temp/f.$$ || echo "MISSING: $id"; done; rm -f .temp/f.$$
+   ```
+   ⚠ **`.temp/`, not `/tmp` — constraint 1, and the manager broke it writing
+   this very check.**
+   ⚠⚠ **THE RUNNING COUNT BREAKS UNDER CONCURRENCY, AND IT BROKE AT TASK_099.**
+   Rule 2 puts the count in **one** place — the newest task file's closing
+   paragraph. **Three agents running at once means three task files, each written
+   before the others reported**, so `TASK_100` pre-committed **301** while
+   `TASK_099` was independently carrying 299 → **307**, and the two cannot both
+   be the newest. ⚠ **The count is a rigour signal, not a ledger, so do not
+   reconstruct it by addition across concurrent branches — that double-counts a
+   manager claim refuted by two agents.** **The rule under concurrency:** every
+   concurrent task file states the count **it was launched from** and says so
+   explicitly; **the manager reconciles once, at the commit that lands them, and
+   writes the reconciled figure into the next task file it launches.** ⚠ **Say in
+   each concurrent task file that reconciliation is the manager's job and not the
+   agent's** — otherwise two agents each try to carry a number forward and
+   neither is right.
 2. **Ask to be corrected, not obeyed.** Say so in every task file, and **name the
    call you are least sure of, by name, and ask for the measurement.** Every
    agent that has contradicted the manager's written instructions with a
@@ -100,6 +133,36 @@ context still applies — do not restart from scratch.
    a zero-parameter derivation of a model the delivery had fitted. "It vanished"
    is not a mechanism, and a finding without one is the finding a reader
    disbelieves.
+
+13. ⚠⚠ **IN A LONG DOC ITEM, ONLY THE BODY GETS MAINTAINED — THE HEADER ROTS.**
+    Found twice in one pass over `RECAP.md`'s owed queue, and the second case is
+    the sharp one. **Item 27's header read *"the authoritative layer cites 34
+    `.temp/` paths, and NONE of them exists in a fresh clone"* while its own next
+    paragraph said all 34 exist and there are ZERO broken citations.** The header
+    was not merely stale, it asserted **the opposite of the body underneath it**,
+    and anyone skimming the queue by header would have scheduled a fix for a
+    problem that did not exist. **Item 12 had the same shape** — *"22 of them
+    across 12 patterns"* over a body that already carried the correct
+    `p12 / p13 ×3 / p16 ×2 / p38` breakdown (**seven, across four patterns**).
+    ⚠ **The mechanism is obvious in hindsight: an update lands where the detail
+    is, and the summary line above it is not where anyone is looking.**
+    **So: when you correct a doc item, re-read its header and make it match, and
+    when you READ one, trust the body over the header.** ⚠ **This is the same
+    class as the `check.py:NNNN` citation rot the project already has a rule for
+    — a pointer that decays away from the thing it points at — and it deserves
+    the same reflex.**
+14. ⚠ **Run the premise before you write it into a task file.** Rule 2 asks to be
+    corrected *after* the fact; this is the cheaper half. Three manager premises
+    were checked against a run before `TASK_100`/`TASK_101` were written, and
+    **two of the three changed what got written**: *"no built pattern has a
+    multiset obligation"* survived only after two false-alarm `grep` hits were
+    chased down (`p07`, `p14`, both comments), and *"valgrind's failure is the
+    `LD_PRELOAD` blindness"* was **refuted** — it is genuinely `libc6-dbg`. ⚠ **A
+    premise stated as fact in a task file is one an engineer has no reason to
+    doubt**, and the *"first termination proof in the project"* sentence shipped
+    into eight places, two of them inside `contract_sha256`, exactly that way.
+    **Cost of checking: about a minute each. Cost of not checking: a review and a
+    re-gate.**
 
 ## Definition of done (engineer)
 

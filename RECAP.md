@@ -8,15 +8,15 @@ this box is reference; this box is what to *do*.
 
 | | |
 |---|---|
-| **Patterns** | **24 exist**, all built AND reviewed. **23 `PASS` + 1 `PASS-WITH-BLOCKED-ROWS` (p01, a real 180 s Miri timeout), 0 failures tree-wide, 0 STALE.** `p19` built at TASK_087, reviewed (4 majors), corrections landed at TASK_088. `p46` built at TASK_089, reviewed (**2 BLOCKERS**, 4 majors), corrections landed at TASK_092. ⚠ **UNREVIEWED and PROVISIONAL: `TASK_088` (the `#[path]` gate work), `TASK_090` (p24's R5), `TASK_091` (p28's R5), `TASK_092` (p46's corrections + the queue re-measure).** Their findings are marked PROVISIONAL in `.memory/` — **treat catalogue rows for `p23`/`p24`/`p26`/`p28` as unreviewed.** ⚠ **Expect `PASS`; a blocked Miri row is worth INVESTIGATING, not shrugging at** — the old advice here was itself the defect (TASK_077). ⚠ **Count both ends rather than trusting either:** `ls -d patterns/p*/ | wc -l` and `grep -c '^| p[0-9]' .memory/06-catalogue.md`. |
-| **Do this next** | **`TASK_099` — WRITTEN and ready to launch.** Withdraw four published cells, close the `include!()` hole, fix `check_marginal_ir`'s exposed-set list, one sweep. **Nothing running; tree green** — 24 patterns, 23 `PASS` + 1 `PASS-WITH-BLOCKED-ROWS`, 0 failures, 48 records 0 STALE. ⚠⚠ **THERE IS A LIVE CONTRADICTION BETWEEN `.memory/` AND THE PUBLISHED TREE, AND `.memory/` WINS: `results/synthesis.md:322-323` still publishes `p03`/`p04` `R5−R4 = +6.00` ×4 as `**?**`, and `.memory/03-measurement.md` has WITHDRAWN them.** Over 32 environment sizes those cells take **`{−8.00, −1.00, +6.00}`** with support **14 / 4 / 14** — **the published value is TIED WITH ITS OWN SIGN-REVERSE**, and the reproducible content is **`−1.00`** (`main`'s exclusive count). ⚠ **`synthesis.md` is GENERATED — fix `synthesize.py`, never the artefact; three tasks in a row shipped an edit the generator reverted.** ✅⚠ **THE REST OF THE ±7 IS RESOLVED AND THE HEADLINES SURVIVE** — 100% of it is `__memset_avx2_unaligned_erms`; **manager-verified per symbol: `unsafe::kernel` is `3002.00` at BOTH pads while `libc+0x189480` goes `43 → 50`.** So **`kernel_exclusive_ir` is STRUCTURALLY IMMUNE (0 of 288 triples)** and the exposed surface is **one column**. **p01's `+4…+5`, p16's single integer and p46's `0.00000` all swing `0.00` over 32 pads; the SLOPE protection is exact (`d_ir_d_work` moves `0.000000000000`). A slope survives where a level does not.** Exposed set: **2 patterns, 7 of 144 cells.** |
+| **Patterns** | **24 exist**, all built AND reviewed. **23 `PASS` + 1 `PASS-WITH-BLOCKED-ROWS` (p01, a real 180 s Miri timeout), 0 failures tree-wide, 0 STALE.** `p19` built at TASK_087, reviewed (4 majors), corrections landed at TASK_088. `p46` built at TASK_089, reviewed (**2 BLOCKERS**, **3 majors** — ⚠ **this said 4; the report has B1, B2, M1, M2, M3. M1 is a compound of four sites and TASK_092 found a fifth, which is the likeliest source of the miscount**), corrections landed at TASK_092. ✅ **Findings 35 (p19) and 36 (p46) now exist.** ⚠ **UNREVIEWED and PROVISIONAL: `TASK_088` (the `#[path]` gate work), `TASK_090` (p24's R5), `TASK_091` (p28's R5), `TASK_092` (p46's corrections + the queue re-measure).** Their findings are marked PROVISIONAL in `.memory/` — **treat catalogue rows for `p23`/`p24`/`p26`/`p28` as unreviewed.** ⚠ **Expect `PASS`; a blocked Miri row is worth INVESTIGATING, not shrugging at** — the old advice here was itself the defect (TASK_077). ⚠ **Count both ends rather than trusting either:** `ls -d patterns/p*/ | wc -l` and `grep -c '^| p[0-9]' .memory/06-catalogue.md`. |
+| **Do this next** | ✅ **`TASK_099` LANDED at `032bfd3` and the `.memory/`-vs-tree contradiction is RESOLVED** — the four `p03`/`p04` `R5 − R4` cells now read `‡ **WITHDRAWN — not a quantity**` with their 32-phase support, fixed in `synthesize.py` rather than in the generated file. **Manager-re-verified: 23 `PASS` + 1 `PASS-WITH-BLOCKED-ROWS`, 0 failures, 48 records 0 STALE, and ZERO `marginal_ir_per_call` keys moved across 24,179 gate leaves.** ⚠⚠ **IT RETURNED TWO BLOCKERS AGAINST THE MANAGER AND BOTH ARE LANDED IN `.memory/` AS PROVISIONAL.** *(1)* ~~*"the 64-byte control could not have fired, `64 mod 32 == 0`"*~~ is **FALSE** — the sweep sets `SLB_ALIGN_PAD=z*64`, which lengthens the env block by **87 bytes** (`87 mod 32 = 23`), **the control DID fire**, and it produced the published `50.00 → 43.00` to the instruction. ⚠ **The arithmetic was done on the PROSE describing the control instead of on the bytes the process receives**, and it was written into a task file as fact one task after `PROTOCOL` rule 14 was added to stop exactly that. *(2)* ⚠⚠ **THE ±7 IS SELECTED BY HOW THE GATE WAS LAUNCHED** — three whole-gate runs, unchanged tree, no env var set, env block identical at 3672 B, give `A = C ≠ B` on 3 of 4 cells (`unsafe +7` / `verus −7`, so `R5 − R4` moves `+6.00 → −8.00`). **So *"re-run the gate and compare"* IS NOT A REPRODUCTION TEST for an `-O3 isolated` marginal, and byte-identical output across two gate runs has been quoted as evidence at least twice.** **`kernel_exclusive_ir` stays structurally immune (0 of 288 triples) — reproduce against that column.** ✅ **A SIXTH `unsafe`-scan route was found and it is NOT A MACRO: transitive `#[path]`-of-`#[path]`**, live at HEAD, accident-reachable, named nowhere; `_path_includes` is now a transitive fixed point and `_check_opaque_includes` is new. ⚠ **`include!` itself was a DELIBERATELY ACCEPTED residual recorded in `.memory/02-bench-rules.md` since 2026-08-17 — `TASK_098` re-found it as new and the manager carried that framing. Read the accepted-residual list before calling a residual a regression.** **Exposed set corrected: 7 of 144 cells across THREE patterns** (⚠ *"2 patterns, 7 of 144"* was arithmetically impossible; `p46`'s `c-clang` is the seventh). **Next: `TASK_101` (build `p23`, the 25th pattern) and `TASK_102` (probe NEW catalogue rows) are both WRITTEN and ready; `TASK_099` and `TASK_100` are UNREVIEWED.** |
 | **⚠⚠ THE CATALOGUE IS CLOSED — 48 rows = 24 BUILT + 15 REFUSED + 9 remaining, and `p23` is the ONLY live build candidate** | `p35` died at `TASK_097` (**REVIEWED-equivalent: the manager verified the mechanism**): `_is_trusted` returns `False` unless the item is `#[verifier::external_body]`, and **a twin may not be `external_body`** by three independent rules, so **a twin is STRUCTURALLY never trusted** and `_scan_unsafe_sites` hard-fails all four routes. **Isolated: delete `unsafe` from `_TWIN_BANNED` and `FAIL [tcb-unsafe]` is UNCHANGED — the twin rule was never what fired.** ⚠ **That refuted two sentences the manager had already committed into `.memory/`.** The other eight remaining rows: `p24` needs a new reason, `p26` needs an input band, `p20`/`p21`/`p25` deferred with measured reasons, `p40`/`p41`/`p42` measured-dead but their triage is unreviewed. |
-| **⚠⚠ THE ENDGAME QUESTION, now live and owed to the USER** | **Wave 7 — cross-pattern analysis and writeup — has NEVER been scheduled**, and the catalogue is measured out (above). The project has **24 patterns, 33 RECAP findings, and a `results/synthesis.md` that already generates.** ⚠ **There is a point where pattern 26 is worth less than the synthesis, and the measurements now say we are at or near it.** **Do not decide this alone** — it is a scope call, and the standing user mandate is *"as many realistic C patterns as possible."* **What the manager should put to the user, with the numbers:** *(i)* build `p23` and stop at 25; *(ii)* spend one task on `_scan_unsafe_sites`, and if it clears, build `p35` (**absent bug class**) and possibly `p15`; *(iii)* **open NEW catalogue rows** — the 48 were written pre-project and 14 are now refused, so breadth may need new realistic C patterns rather than the leftovers (⚠ **probe before writing a row — both manager-proposed axes died on a novelty claim one `grep` would have settled**); *(iv)* start the synthesis. **These are not exclusive and (ii) is already running.** |
+| **⚠⚠ THE ENDGAME QUESTION, now live and owed to the USER** | **Wave 7 — cross-pattern analysis and writeup — has NEVER been scheduled**, and the catalogue is measured out (above). The project has **24 patterns, 36 RECAP findings and a `results/synthesis.md` that already generates** — 604 lines, six sections. ✅ **`p19` and `p46` are no longer missing: this box said "33 findings" while the count was 34, and the 23rd and 24th PATTERNS were each mentioned ZERO times in the findings section — 45 and 35 tasks after they were built and reviewed. Findings 35 and 36 were written at TASK_100-time and every pattern now has one.** ⚠ **Both are marked PROVISIONAL where they rest on `TASK_088` / `TASK_092`, which were never reviewed** — for p46 that includes the ground its headline now stands on. ⚠⚠ **THE LESSON IS A SCHEDULING ONE: the build → review → land-corrections loop has NO STEP THAT WRITES THE FINDING, so the last two patterns fell out of "the actual output" silently. Add the finding when the corrections land, not later.** ⚠ **There is a point where pattern 26 is worth less than the synthesis, and the measurements now say we are at or near it.** **Do not decide this alone** — it is a scope call, and the standing user mandate is *"as many realistic C patterns as possible."* **What the manager should put to the user, with the numbers:** *(i)* build `p23` and stop at 25; *(ii)* spend one task on `_scan_unsafe_sites`, and if it clears, build `p35` (**absent bug class**) and possibly `p15`; *(iii)* **open NEW catalogue rows** — the 48 were written pre-project and 14 are now refused, so breadth may need new realistic C patterns rather than the leftovers (⚠ **probe before writing a row — both manager-proposed axes died on a novelty claim one `grep` would have settled**); *(iv)* start the synthesis. **These are not exclusive and (ii) is already running.** |
 | **⚠⚠ The manager generalisation that was REFUTED, and it is the most useful thing here** | I read `TASK_093`'s `p28` refusal as a **family** result — *"safe Rust's answer to every pointer-backed structure is either an arena that never frees or `p27`'s mechanism, so `p29`–`p34` are ONE finding, not five."* **I wrote it into two task files by name and asked to be corrected. Both agents corrected me.** ✅ **The reviewed replacement is now in `.memory/01-ladder.md` and it is a RULE, not a refusal:** *"safe Rust's temporal guarantee is a guarantee about the **ALLOCATOR**; a structure that **recycles its own storage** gets no guarantee at all."* **There are FOUR outcomes, not two** — and outcome 3 is that **the type system is SILENT** (use-after-recycle *and* slot double-free both writable under `#![forbid(unsafe_code)]`, silently wrong, **Miri-clean**, ✅ manager-re-run), which is `p04`'s finding and kills `p32`/`p33`. ⚠ **A generation tag does NOT rescue it**, so **this file's own p14-cycle `(slot, gen)` proposal yields a `p04`-shaped row, not a temporal one.** Outcome 4 is `p34`: **the safe rung is WORSE than C** (`Rc` cycle leaks, `Weak` does not). And `p29` is the fifth and only good outcome. ⚠⚠ **AND `TASK_093`'s OWN STATED REASON WAS REJECTED BY ITS REVIEW** — *"safe Rust has no owned intrusive DLL (`E0382` + `E0499`)"* is **false**: the `E0382` was a plain double move (reproduced with a control containing no data structure at all), `E0499` is refuted by **four compiling spellings** under `forbid(unsafe_code)` including `split_at_mut` with two `&mut` alive simultaneously, and **the claim was self-contradicted by its own table two rows below it.** **Right verdict, wrong reason — `p31`'s failure mode, and rule 9 is the only thing that kept it out of `.memory/`.** ⚠ **A refusal's REASON is what gets reused on the next row. It needs the same scrutiny as a finding.** |
 | **Selection is OVER — and the three box rows that used to live here are now history, moved below** | ⚠⚠ **The catalogue is closed (row above), so `p15`'s refusal, the `Pattern selection` probes and the `PROBE IN BATCHES` scheduling rule are no longer the next action.** They are preserved: **`p15`** in `.memory/06-catalogue.md`'s refusal block — ⚠ **and its NAMED UNBLOCKING CONDITION IS NOW DEAD**, because that condition was *"the day `_scan_unsafe_sites` admits a Verus-discharged `unsafe`"* and **the manager decided at TASK_096_REVIEW that the rule STAYS** (`.memory/02-bench-rules.md`); ✅ **its reusable artefact survives regardless** — a verified UTF-8 validator, `ensures res == valid_utf8(b@)` bidirectional, **`5 verified, 0 errors`, ZERO trusted items**, embedded verbatim in `.tasks/TASK_085_REPORT.md`. **THE THREE PROBES + probe 4** (the selection instrument) live in `.memory/06-catalogue.md`, ⚠ **and probe 2 is now known BROKEN IN BOTH DIRECTIONS** — the object-file md5 false-POSITIVES on relocations, the linked md5 false-NEGATIVES on any kernel with a branch or a global; **the form that works is normalised-disassembly text.** ⚠ **If a NEW row is ever proposed, the standing rule still binds: RUN ITS NOVELTY CLAIM BEFORE WRITING THE ROW** — both manager-proposed axes were refused, and both died on a claim one `grep` plus one run would have settled. |
 | **Rules for writing that task** | ⚠⚠ **STATE NOVELTY CLAIMS AS QUESTIONS TO BE MEASURED, never as fact.** *"The first termination proof in the project"* was the manager's sentence in `TASK_070.md`; it was **false**, the engineer had no reason to doubt it, and it shipped into **eight places, two inside `contract_sha256`** — a review and a re-gate to remove. **Rule 9 protects `.memory/` from unreviewed findings and protects NOTHING from the task file itself.** p22's §0 counted 73 measures in one command once it was finally asked. ⚠ **Settle the bug class as the FIRST deliverable** — overturned on four patterns, upheld on two. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat). **Additivity extrapolation — the only out-of-sample test here that can fail — HAS now failed once, on p38, and it was 100% attributable to three missing columns, none of them the one named.** The rule that came out of it: ⚠ **check the RESIDUE CLASS of any parameter your bands hold constant** — two of p38's three bands sat at `nw ≡ 0 (mod 8)` and the third did not, which fits in sample and misses out of it with no in-sample residual to warn you. ⚠ **Name the INLINE MODE at every figure** — p10 fitted both and the regressors *swapped*. All three in `.memory/03-measurement.md`. |
 | **The trap that keeps firing** | **A headline can be wrong in the FLATTERING direction and pass a green gate.** p10 published *"safe Rust cheaper than unsafe"*: 60% was an **unsearched R4 side**, the rest **index-expression bookkeeping C pays more of than either Rust rung**. **p27 repeated it one pattern later** — a dead store in R4 that R3 did not have. **p47 is the first pattern to search the R4 side properly** (six levers, each measured *and* run through Verus). ⚠ **p38 made it four** (`+21/+25` published against a true `+24/+32`) and **p22 made it FIVE, and widest yet — `+2.00` published against `+125/+1021`, 510×.** ✅ **The trend is the good news: p38 disclosed after review, p22 disclosed BEFORE being asked, and p36 searched the R4 side FIRST and CHANGED WHICH RUNG SHIPS** — the R2-shaped unsafe rung verifies and is 1022/8190 dearer, so shipping it would have published *"safe beats unsafe by 1007/8175"*. ⚠⚠ **AND THEN p36 FELL INTO THE MIRROR IMAGE, WHICH IS THE NEW LESSON: it searched R4 and left R3 with ONE lever, which moved R3 the wrong way.** Published `R3 − R4 = +15.00 flat`; the review's first in-contract R3 respelling made it **+7**, and **+2** against the cheapest R4. ⚠ **Searching one side is not searching. A difference is only as honest as its WEAKER-searched endpoint** — count the levers on each side and say whether they are comparable. **Before publishing any rung comparison, ask what BOTH rungs' spellings are worth.** |
-| **The loop** | build → review once → land corrections. **Three tasks per pattern is the measured cost.** Per `PROTOCOL.md` rule 9, write `.memory/` **only after** the review. |
+| **The loop** | build → review once → land corrections → ⚠⚠ **WRITE THE FINDING**. **Three tasks per pattern is the measured cost.** Per `PROTOCOL.md` rule 9, write `.memory/` **only after** the review. ⚠⚠ **THE FOURTH STEP WAS MISSING FROM THIS ROW UNTIL TASK_100 AND TWO PATTERNS FELL THROUGH THE GAP** — `p19` and `p46` were built, reviewed and corrected, and were then absent from the findings section for **45 and 35 tasks**, while this box counted them as done. **A pattern is not finished when its gate is green; it is finished when a reader can find its result.** Cross-check with `for id in $(ls -d patterns/p*/ | grep -o 'p[0-9]*'); do grep -q "\b$id\b" <the findings section> || echo "$id has no finding"; done`. |
 | **Git** | Commit at task boundaries; subagents never commit. ⚠ **There is a GitHub remote** (`origin`, `HALOCORE/sec-ladder`). **Do not push unless the user asks.** ⚠⚠ **RULE 11'S HAZARD IS LIVE WHENEVER A REVIEWER PLANTS INTO TRACKED PATTERN FILES, AND THE MANAGER CAME WITHIN THREE MINUTES OF IT.** `TASK_084_REVIEW` plants real axioms into `patterns/p01-array-sum/{verus.rs,spec.md}` and restores them in a `finally:`; the manager committed **`bce8aa8` / `087a0af` / `ae19119` at 15:14:01–15:14:49** and the first plant began at **15:18**. ✅ **Nothing was contaminated** — every HEAD blob equalled the reviewer's pre-plant snapshot — **but that was luck, not sequencing.** ⚠ **Commit BEFORE launching a planting reviewer, never during**, and note the reviewer snapshotted **by bytes** rather than `git show HEAD:` precisely because the tree was dirty when it started. |
 | **Before quoting any number** | `harness/measure.py --check-stale` (exit 1 on STALE). |
 
@@ -1468,6 +1468,274 @@ the number.** Two task files have already sent an agent to the wrong finding.
    declared in a **trait**, and its declaration position is part of the vtable
    ABI. Manager-verified before landing.
 
+35. **p19 — safe Rust's bounds check and the C validation pass are the SAME
+    PREDICATE at DIFFERENT ASYMPTOTICS, and that produces a sign flip with no
+    safety content in it.** ⚠ **This finding is 45 tasks late: p19 was built at
+    TASK_087 and reviewed, and was mentioned ZERO times in this section until
+    TASK_100-time.**
+
+    LLVM proves the identity for us. The `panic_bounds_check` call's length
+    argument is the literal `0x800` = 2048 = `tbl.len()`, so the branch is
+    provably the `tbl[…]` slice check, and it is lowered to **`cmp $0x8`** — a
+    **state-range test, not an index test**, compared on `st` *before* the index
+    `st<<8|b` is built. The C validation pass in the same function emits
+    `cmpb $0x7,…; ja` ×4. **The same predicate, enforced once per access versus
+    once per call.**
+
+    ⚠⚠ **The asymptotics differ, so the sign of "C versus Rust" depends on the
+    input and nothing else.** Validation is `O(table)` once per call; the bounds
+    check is `O(message)`. The *buggy* C rung is **5071 `Ir`/call cheaper than
+    unsafe Rust at `small` (m=256) and 3569 dearer at `large` (m=4096)** —
+    `2.25·m − 5647`, zero at **m ≈ 2509.4**. **A percentage quoted at either
+    input is wrong in SIGN at the other.**
+
+    **Rates, `-O3`, inline mode `isolated`, disassembly `body_len / K`** (⚠ **NOT
+    marginals** — see the caveat below): R2 **15.00000** `Ir`/message byte (**not
+    unrolled**, 15 instrs / 1 byte) · R3 **9.75000** · R4 = R5 **8.75000** ·
+    `c-gcc` 11.00000 · `c-clang` 8.75000. The gate's independent whole-program
+    marginals reproduce them to five decimals (15.0000781 / 9.7500781 /
+    8.7500781 / 11.0001875 / 8.7501875), the excess being the driver's
+    `println!` term ÷ 3840 bytes.
+
+    **The mechanism, which is worth more than the rates:
+    `R2 − R4 = 6.25 = 3.00 check + 3.25 FORECLOSED 4× UNROLL`.** Rolled-vs-rolled
+    (`-C llvm-args=-unroll-count=1`, no source change) gives R2 15 / R3 13 / R4
+    12 instrs per byte, and the three rolled instructions are `cmp $0x8` + `jae`
+    **plus one `mov %rdx,%rax`** — ⚠⚠ **the checked spelling must keep `st` live
+    for the compare and cannot destroy it with the shift. Register pressure
+    created by a bounds check is a per-byte cost this project had not priced
+    before.** And `R3 − R4 = 1.00000` is **exactly one `and $0x7,%edi` per
+    byte**, attributed three independent ways (rolled control; adding the mask to
+    the *unsafe* rung costs `+1.00024`; and R3's fold contains exactly four
+    `and $0x7,%edi` against 39 − 35 = 4).
+
+    **The hardened-C column is a CONSTANT, and it is checked as one:** predicted
+    2048 × 5.00 = 10240 (gcc, rolled) and 2048 × 2.75 = 5632 (clang); measured
+    `+10242` and `+5637`, **identical at both inputs and exactly constant across
+    all 19 sweep lengths m = 64…5001**. That invariance across m *is* the claim
+    "a constant, not a slope" — it is not asserted, it is the measurement.
+
+    **Two exact sweep laws, and ⚠ THE ORIGINALS WERE WRONG AND SHIPPED:**
+    ```
+    R2 − R4 = 6.25·m − 6 − 2.25·(m mod 4) − 4·[m mod 4 ≠ 0]
+    R3 − R4 = 1.00·m + 4                  − 1·[m mod 4 ≠ 0]
+    ```
+    re-fitted at TASK_088 over 19 committed blobs with zero residual, replacing
+    the shipped `6.25m − 8` and `1.00m − 2` — which **contradicted `NOTES.md`'s
+    own printed marginals two sections above them.** ⚠⚠ **The cause was TWO
+    independent things and only one was diagnosed by the review: a fixed
+    per-program offset of exactly `+2`/`+6` at all ten `m ≡ 0 (mod 4)` points,
+    because the probe was A DIFFERENT BINARY and only the SLOPE transfers, PLUS
+    the residue term. The offset is invisible to a residue-covering band** — a
+    second failure mode stacked on the one p38 taught.
+
+    **Both sides searched, and all three spans degenerate:** R2 3 levers span 12,
+    R3 3 span 11, R4 3 span 13 `Ir`/call; the review added two further in-contract
+    R2 spellings measuring exactly the shipped one (**five R2 spellings, all
+    degenerate**). The rejected absolute-indexing R4 was put through Verus
+    **first** (`8 verified, 0 errors`) and rejected **on cost, not
+    admissibility** — the right order.
+
+    **Proof: `12 verified, 0 errors`** (twin `13/0`), **3 TCB items, 1
+    contracted, no `assume`, no `admit`, no hand-written axiom**; Miri 8/8 no UB.
+    ⚠ **The obligation is a LOOP-CARRIED DATA INVARIANT and that is what is new:**
+    `st < NST` holds not from arithmetic on a counter but because 2048 bytes read
+    **at run time** were checked once before the loop. **`c/kernel.c` is this
+    program with the validation pass deleted; the invariant then has no
+    establishing step. There is no Verus spelling of `c/kernel.c` that verifies**
+    — the deleted lines are the premise, not an optimisation Z3 declines.
+
+    ⚠ **The review's own attack landed sideways and the honest reading is better
+    than the claim.** p19's check *is* dead in the sense the attack meant —
+    provably redundant on every input the benchmark presents, and
+    `safe_naive.rs:13-18` says so itself. **What p19 prices is not a live check
+    but the UNLEARNABILITY of a loop-carried data invariant: 6.25 `Ir`/byte for a
+    fact Z3 discharges in ghost code and LLVM cannot.** That is finding 2 **with
+    a mechanism**.
+
+    **Harm — three blobs one byte apart** (byte [769]: 8 → 10 → 255), all three
+    **silent at plain `gcc -O2` on 8 of 8 C cells**: entry 8 is ASan-**clean**
+    (the read is inside the object); entry 10 gives `heap-buffer-overflow`, READ
+    of size 1, naming the allocation site; entry 255 gives `SEGV on unknown
+    address`, *"can not provide additional info"* — too far out for the shadow
+    map. ⚠ **One attacker byte decides between no diagnostic, a diagnostic that
+    names the object, and a diagnostic that can name nothing.**
+
+    **Bug class: the THIRTEENTH `index >= len`**, nearest sibling p36. The
+    framing is **conditional and both conditions are pinned `forbidden`
+    entries**, settled by five runs before any cell existed: the table must be
+    **loaded data** (a program-constant table makes the OOB unreachable) and
+    dispatch must be by **indexing, not `switch`** (the same bad entry through a
+    `switch` falls to `default` with ASan *and* UBSan silent — p31's death).
+    Precedent, source fetched and manager-verified genuine: Linux
+    `security/apparmor/match.c`, `aa_dfa_match_until()` indexing four tables with
+    no test, licensed by `verify_dfa()` at load. **Validate-once-then-index-
+    unchecked IS p19's R4/R5 rung.**
+
+    ⚠⚠ **THREE THINGS THIS FINDING DELIBERATELY DOES NOT CLAIM.** *(1)* p19 is
+    **not** the only pattern forbidding a spelling for being *safe* — **p36 and
+    p03 already did**, and p36 is the sibling p19 names; p19 is the **third**.
+    *(2)* The manager's *"p19 is the only pattern calling a vstd exec trusted
+    function from its kernel"* was **refuted three ways** — the grep behind it
+    was a whitelist of four slice-shaped names, **p27 calls `ptr_mut_write` and
+    `ptr_ref`**, and the framing re-opened a decision `.memory/04-verus.md` had
+    closed by a 402-site census that **named this exact case in advance**. The
+    review's verdict was *"DO NOT LAND AS A FINDING"* and **it is honoured
+    here.** *(3)* **No wall-clock analysis exists.** The fold is a serial
+    dependent-load chain, so `Ir` should *understate* the safe rungs' penalty —
+    ⚠ **that is a prediction, not a measurement.**
+
+    ⚠ **PROVISIONAL where it rests on TASK_088**, which was never reviewed: the
+    re-fitted laws and their two-cause decomposition, the CVE correction, and the
+    harness changes p19 is gated under today. Evidence:
+    `.tasks/TASK_087_REPORT.md`, `.tasks/TASK_087_REVIEW_REPORT.md`,
+    `.tasks/TASK_088_REPORT.md`, `patterns/p19-state-machine/NOTES.md`.
+
+36. **p46 — the safety tax is `0.00000` per MAC, `safe_naive < safe_tuned <
+    unsafe`, and the pre-build probe that predicted `+5.05 Ir/MAC` was WRONG IN
+    SIGN. The rung boundary did not shrink; it VANISHED.** ⚠ **Also 35 tasks
+    late — p46 was the 24th pattern and had no finding until TASK_100-time.**
+
+    In the shipped kernel `n = w[0]` and `m = w[1]` are `u8`-derived and
+    `n + m <= OUTCAP` is tested, which is everything LLVM needs to discharge
+    `i + j < 96` itself. **It deletes all three bounds checks** (`bl[j]`, the
+    `out[i+j]` read, the `out[i+j]` write) and **the safe MAC loop contains no
+    conditional branch but its own `jne`.** Kernel-exclusive `Ir`/call, `-O3
+    isolated`, small (n=m=24) / large (48,48): `safe_naive` **6241 / 23341** ·
+    `safe_tuned` 6287 / 23435 · `unsafe` = `verus` **6406 / 24250**.
+
+    **So "safe beats unsafe" here is 100% AN UNROLL DECISION.** Rolled-vs-rolled,
+    shipped sources unedited, both sides: **`R2 − R4 = +2.00000·n·m` exactly**
+    over 5 shapes, zero residual — *against* safe Rust. Per instruction: safe
+    pays `xor` + `setb` (materialising the carry) plus a separate store where
+    unsafe folds the accumulator update into one `add %rax,(mem)`; unsafe pays
+    one extra `adc $0x0,%rdx`. **Net +2, the measured coefficient exactly, and
+    neither loop contains a bounds check.**
+
+    ⚠⚠ **AND THE MECHANISM THE PROJECT FIRST PUBLISHED FOR THAT WAS ITSELF
+    FALSE — a review blocker, and it was already in `.memory/`.** The build
+    report blamed `black_box`. **Every probe kernel is `#[no_mangle]
+    #[inline(never)] pub fn`, i.e. external linkage, so a caller-side
+    `black_box` cannot reach the callee's codegen at all** — rebuilt with and
+    without it the binaries are **byte-identical**. The real cause is one level
+    up: **a probe whose kernel SIGNATURE differs from the shipped kernel's loses
+    the range facts the shipped kernel derives from its input header.**
+    ⚠ **The retraction cuts both ways** — an author who drops `black_box` *"so as
+    not to hide range facts"* re-enables the constant folding it exists to
+    prevent while the real cause goes unfixed. **`.memory/03-measurement.md`'s
+    rule said a probe's INTERCEPT does not transfer; p46 shows the SLOPE need not
+    either.**
+
+    **Exact cost laws, whole-program marginal, `-O3 isolated`, domain `m >= 2`**
+    (`controls/sweep_ir.py --check` re-derives them and **exits 1 on any
+    residual**): `R5 − R4 = 0` (49 blobs + both matrix inputs) · `R2 − R4 = 3 +
+    5n − n·floor(m/2)` · `R3 − R2 = 2n − 2` (m even) / `−2` (m odd) ·
+    `R1h − R1` clang `+2.00` flat. ⚠ `m = 1` is **off the domain** and is stated
+    as a restriction, not explained.
+
+    ⚠⚠ **THE STRONGEST METHOD RESULT IN THE PATTERN, AND IT IS SHARPER THAN
+    p38's MISSING COLUMN: A TWO-PARAMETER LAW FITTED ON TWO AXIS-ALIGNED BANDS IS
+    NOT MERELY AT RISK OF A MISSING TERM — IT IS UNDERDETERMINED, AND NO
+    IN-SAMPLE RESIDUAL CAN SHOW IT.** Fitting `A + B·n + C·floor(m/2) +
+    D·n·floor(m/2)` on the two axis-aligned bands gives four equations of which
+    only **three** are independent; the family `A = 291 + 288D, B = −7 − 12D,
+    C = −24 − 24D` fits **both bands exactly for every D**. **One off-axis point
+    pins `D = −1`, and the remaining nine band-D blobs then have zero residual
+    out of sample.** ⚠ **Ship one off-axis point in every band, always.**
+
+    **Harm: 6 of 8 plain C cells are SILENT WITH A WRONG ANSWER; 2 fault — and
+    the discriminator is the FRAME ORDER OF TWO AUTOMATIC ARRAYS.** gcc `-O0`/
+    `-O3` and clang `-O3` place `bl − out = +768 bytes = +96 limbs`, so
+    **`out[96]` IS `bl[0]`** and the overflow lands inside the b-operand scratch:
+    no fault, no canary, corrupted intermediate, exit 0. clang `-O0` reverses
+    them. ⚠⚠ **This is p02's "absorbed by glibc chunk rounding" moved from the
+    HEAP to the STACK, and it is why `-fstack-protector-strong` — on by default
+    on this box — does not help: the canary is not what gets written.**
+    Sanitizers see it either way (ASan `stack-buffer-overflow`, **WRITE** of size
+    8, where p05's is a read). **The clamped control is exit 0 with ASan and
+    UBSan both silent at three shapes — p31's death — which is why the clamp is
+    `forbidden` in the hashed block.**
+
+    **Proof: `21 verified, 0 errors`** (twin `24/0`), **5 `external_body` items,
+    3 contracted, no `assume`, no `admit`, no `assume_specification`, no
+    hand-written axiom**; Miri 7/7. Closed **first attempt, before any cell
+    existed**, refuting the manager's *"may not close in one session"*. Deleting
+    the three lines `if n + m > OUTCAP { return REJ; }` — i.e. **writing
+    `c/kernel.c` in Verus** — gives `20 verified, 1 errors`, *"invariant not
+    satisfied before loop"*. **There is no Verus spelling of `c/kernel.c` that
+    verifies**, the second pattern to demonstrate it (see finding 35).
+
+    ⚠ **What is new is the MODE, not the strength:** the **first `by
+    (bit_vector)` and first `by (compute)` in executable position** in the tree
+    (0 hits across the 23 prior `verus.rs`; all 10 other hits are comments, and
+    **ten** patterns carry a comment saying they deliberately avoid
+    `bit_vector`), plus the first kernel-level **nonlinear obligation about DATA
+    rather than an address** — `lemma_mac_fits` proves `a*b + c + d <= u128::MAX`
+    and it is **tight**: `(2^64−1)^2 + 2(2^64−1) == 2^128 − 1` exactly.
+
+    > **p46 separates the proof-burden column from the instruction column inside
+    > one kernel:** the expensive obligation has **no runtime counterpart in
+    > either language at any rung**, while the free obligation (`i + j < OUTCAP`,
+    > purely linear) is the one the rungs are about — **and LLVM deletes even
+    > that.**
+
+    ⚠ **NOT proved, disclosed in four places:** `bn_fold` specifies the
+    schoolbook **algorithm**, not that it computes `a × b`. The gap is closed by
+    **testing** (`model.py::_fold_bigint` does one Python big-integer multiply per
+    window, gate-checked, 0 disagreements) — **not by proof.**
+
+    ⚠⚠ **THE REVIEW'S SHARPEST CONTRIBUTION IS A PROTOCOL FINDING AND IT
+    GENERALISES BEYOND p46:** *"The Rule 6 verification and the stale-contract
+    defect are the same fact seen twice. The `why` really WAS frozen before any
+    cell was built — **which is why it still described the pre-build probe's
+    world. Rule 6 protects against a declaration edited AFTER measuring; it does
+    NOTHING about a declaration that measurement has since FALSIFIED.**"*
+    **p46 is the first pattern where that gap is demonstrated with a matching
+    hash** — deleting the `unsafe_justifications` block and one trailing comma
+    reproduces the recorded pre-build sha256 `e6b12dc6…` exactly.
+
+    **Bug class: the FOURTEENTH `index >= len`**, nearest sibling **p05, of which
+    p46 is the MIRROR** — p05's *index* arithmetic is nonlinear with trivial data
+    arithmetic; p46's index is purely linear and **the nonlinearity is in the
+    VALUE**. p05's OOB is a read; **p46's is a write.** Precedent: OpenSSL's
+    `BN_mul()` calling `bn_wexpand(rr, top)` before `bn_mul_normal()` indexes
+    with no test.
+
+    ⚠⚠ **PROVISIONAL, AND THE HEADLINE'S GROUND MOVED AT TASK_092 (UNREVIEWED).**
+    A review blocker refuted the *reason* p46 excluded the `r4_mutreslice`
+    spelling — *"a mutable sub-slice at this pin is SOUND but VALUELESS"* was
+    **false**, the `copy_from_slice` failure mode recurring: `std_specs/slice.rs`
+    ships a full **value-level** `assume_specification` for `index_mut`, and the
+    engineer had read `vstd/slice.rs`'s **trait declaration** instead. TASK_092
+    then showed **its full R5 verifies, `21 verified, 0 errors`**. ⚠ **The
+    conclusion survives on two different measured grounds** — it costs **two new
+    trusted items** (`get_unchecked` has **0 hits anywhere in the pinned vstd**),
+    taking TCB 5/3 → 7/5; and **its R4/R5 pair is `differ` at `-O3`**,
+    `R5 − R4 = 15n + 1` exactly, against p46's pinned `identity: unsafe == verus,
+    O3 exact`. ⚠⚠ **But the honest consequence must be stated: "both spans
+    degenerate" SURVIVES and "safe beats unsafe" does NOT invert — yet the
+    headline is now contingent on the IDENTITY PIN and the TCB, not on a
+    specification gap. Relax either and it inverts**, since `r4_mutreslice` at
+    5923 and even its R5 at 6284 sit below `safe_naive` 6453 and `safe_tuned`
+    6499 at (24,24). **This is `.memory/01-ladder.md`'s first counterexample to
+    "R4 and R5 compile the same"** — finding 1 itself is untouched, all 24
+    shipped patterns still pin and measure `unsafe ≡ verus`. ⚠ **Why LLVM
+    diverges on two textually identical exec bodies is NOT established.** Cite
+    it; do not explain it.
+
+    ⚠ **A blocker-class defect NO review caught, found by the manager at
+    TASK_092: a ONE-SIDED FLAG MISMATCH.** `controls/mkvariants.py` omitted
+    `-C codegen-units=1`, which `build.py::rust_flags` passes to every measured
+    cell — **so every number in two NOTES sections was one-sided and 1–2
+    `Ir`/call off.** ⚠⚠ **One-sided mismatches do NOT cancel; two-sided ones do**
+    — the rolled control applied it to both sides and was unaffected, which is
+    exactly why a *different* review minor about the same flag was harmless.
+    Corrected, **the conclusion got STRONGER**: R4-side span 2 (published 3),
+    R3-side span 0 (published 2), both still degenerate.
+
+    Evidence: `.tasks/TASK_089_REPORT.md`, `.tasks/TASK_089_REVIEW_REPORT.md`,
+    `.tasks/TASK_092_REPORT.md`, `patterns/p46-bignum-mac/NOTES.md`.
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds
@@ -1682,8 +1950,18 @@ engineer *flagged against itself*, and a mechanism asserted without a control.
 
 ## Immediate queue
 
-**`TASK_055_REVIEW` is the next task, and it is already written.** See the START HERE
-box; this section is the standing backlog, not the next action.
+⚠ **This header said *"`TASK_055_REVIEW` is the next task"* roughly forty-five
+tasks after that stopped being true.** **The next action is ALWAYS the START HERE
+box at the top of this file, never this section** — this is the standing backlog.
+**Do not write a "next task" sentence here again; there is exactly one place for
+it and duplicating it is how this one rotted.**
+
+✅ **Measured at TASK_100-time, because the rule below is what licenses running
+agents in parallel: `harness/check.py` contains NO wall-clock measurement at
+all** — `grep -n 'perf_counter\|time\.time\|best-of' harness/check.py` returns
+one hit and it is a comment. **The gate is `Ir`-only and deterministic, so gate
+sweeps are immune to concurrent load; `harness/measure.py` is the one that is
+not.** That is the line the relaxation below actually turns on.
 
 ⚠ **The concurrency rule, so it is not read as blanket licence.** One agent at a
 time is the default. It is relaxed **only** for work that touches neither
@@ -2144,8 +2422,21 @@ Both retired.
    which makes every natural step basis *singular* — so p13 could not have
    fitted the step law even if one exists. Whoever next hits a size-dispatched
    library routine will need this.
-12. **`check.py:NNNN` citations in the PATTERN docs have decayed — 22 of them
-    across 12 patterns**, audited at TASK_066 and **not yet fixed**. The
+12. **`check.py:NNNN` citations in the PATTERN docs have decayed.** ⚠ **This
+    header said "22 of them across 12 patterns" long after that stopped being
+    true; re-measured at TASK_100-time it is SEVEN across FOUR patterns** —
+    `grep -roh 'check\.py:[0-9]\+' patterns/ | wc -l` → **7** (p12, p13 ×3,
+    p16 ×2, p38), and the body below already had the right breakdown. ⚠ **All
+    four distinct targets spot-checked are rotten**: `:1249` is now `for e in
+    v:`, `:625` a fragment of an error string, `:459` the comment `# helpers`,
+    `:469` a blank line. ✅ **The `.memory/` half is genuinely clean** — its one
+    apparent hit (`06-catalogue.md:830`) is a **quotation of a rotten citation
+    being corrected**, not decay. Audited at TASK_066 and **still not fixed**.
+    ⚠ **Cost, re-derived: all seven sit in `model.py`/`inputs/gen.py`, which
+    `measure.py::measurement_sources` globs PER PATTERN — so this stales FOUR
+    records, not all 24.** It is four single-pattern re-measures, not the
+    43-minute global one, and the old "defer, it is expensive" framing was
+    sizing it against the wrong scope. The
     `.memory/` half *is* fixed (5 of 9 were wrong; the convention and the audit
     aid are at the end of `.memory/02-bench-rules.md`). Spot-checks: p04 and p09
     `spec.md` cite `:929`, now a **blank line**; p05 and p17 `NOTES.md` cite
@@ -2443,6 +2734,32 @@ Both retired.
     no hash set, so `--check-stale` remains blind to it. **This item will
     recur.**
 
+    ⚠⚠ **IT RECURRED, EXACTLY AS PREDICTED, AND IT TOOK 16 TASKS.** Measured at
+    TASK_100-time: **`results/tables/p09-bitset.md` cites `0a37c0cd1418` while
+    `results/gate/p09-bitset.json` says `ea0295eaea6a`.** p09's contract has
+    moved **twice** since this item closed — `0a37c0cd1418` at TASK_096 and
+    `ea0295eaea6a` at TASK_097 — and the published table followed neither.
+    ⚠ **`patterns/p09-bitset/NOTES.md` is CORRECT and complete** (it records all
+    four digests in sequence, TASK_068 through TASK_097) **and it even reported
+    the RECAP half of the problem itself. The pattern doc was maintained; the
+    generated table was not.**
+
+    ✅ **The detector this item said did not exist now does:
+    `.temp/mgr99/tables_stale.py`.** It compares the 12-hex prefix each table
+    cites against its gate record's `contract_sha256` and **exits 1** on any
+    disagreement. Current reading: **24 checked, 1 STALE, 0 skipped.**
+    ⚠ **Both arms fire on real data** — 23 tables pass and p09 fails — so it is
+    not another control that could not have failed.
+    ⚠ **Read the gate records only when no sweep is running**; `check.py`
+    rewrites `results/gate/*.json` in place.
+
+    **Fix is one command, `harness/report.py p09`** — but it renders *from* the
+    record, so it must run **after** any in-flight sweep, not during.
+    ⚠⚠ **The durable fix is the one this item asked for and still has not got:
+    put `results/tables/` in a hash set so `--check-stale` covers it.** Until
+    then this recurs a third time, and the script above is the stopgap, not the
+    answer.
+
     *Original text kept below.*
 
     **Three `results/tables/*.md` are CONTENT-stale and cost nothing to fix**
@@ -2678,8 +2995,18 @@ Both retired.
     record — BATCH IT with the next thing that re-gates**, and do **not** send it
     to an agent mid-sweep, which would invalidate the records already written.
 
-27. **The authoritative layer cites 34 `.temp/` paths, and NONE of them exists in
-    a fresh clone.** Measured, not estimated:
+27. ⚠⚠ **THIS ITEM'S HEADER SAID THE OPPOSITE OF ITS OWN BODY AND IS FIXED HERE.**
+    It read *"the authoritative layer cites 34 `.temp/` paths, and NONE of them
+    exists in a fresh clone"* — while the very next paragraph said all 34 exist
+    and there are **zero** broken citations. **The body was right.** Re-measured
+    at TASK_100-time: **`.memory/` cites 45 distinct `.temp/` paths, 43 exist,
+    and the 2 that do not are the `pNN` PLACEHOLDERS** (`.temp/build/pNN/`,
+    `.temp/pNN/`), which are prose. ⚠ **Item 12 above had the same defect — a
+    stale header over a maintained body. When skimming this queue by header,
+    do not trust the header.** Original text, corrected, follows.
+
+    **The authoritative layer's `.temp/` citations all resolve.** Measured, not
+    estimated:
     `grep -rho '\.temp/[A-Za-z0-9_./-]*' .memory/ RECAP.md | sort -u` gives
     **36**, of which **2 are `pNN` PLACEHOLDERS** (`.temp/build/pNN/`,
     `.temp/pNN/`) and the other **34 all exist on this box**. ✅ **So there are
@@ -2729,6 +3056,31 @@ Both retired.
     ⚠ **The general lesson: `head -N` on a sanitizer's output is a truncation
     that looks like a measurement.** Use `grep` for the banner you want.
 
+    ✅✅ **CLOSED — the re-run this item asked for is DONE, and it is a CLEAN
+    NEGATIVE.** Manager, at TASK_100-time: `bash .temp/mgr99/harms_grep.sh`
+    rebuilds from `.temp/t86/harms.c` **unmodified**, changing only `head -4` →
+    `grep` (and adding `env -u LD_PRELOAD`). **The half-shown claim reproduces
+    exactly** — `p21` (ASan 1 / UBSan 2), `p24` (1/1), `p26` (1/1), `p41` (1/1)
+    all fire both, while `p20` (ASan 2 / UBSan 0) and `p19` (0/2) fire one each
+    and **were shown correctly all along.** ⚠ **`p19ok`, the no-bug row, reads
+    clean on both binaries — so the corrected table has a failing arm and is not
+    another vacuous control.** ⚠ **`-O2` exit codes worth keeping: `p24` exits
+    `0` — SILENT and wrong; `p26` exits `134`, glibc abort; `p19`/`p35p` exit
+    `139`, SIGSEGV.**
+
+    ⚠⚠ **AND THE VERDICTS ALL SURVIVE, WHICH IS WHY IT WAS WORTH CHECKING RATHER
+    THAN ASSUMING.** The corrupted cells are descriptive, not load-bearing:
+    **`p21`'s DEFER** rests on *"p14's bug class verbatim"* plus *"no new
+    bound"*; **`p41`'s REFUSE** rests entirely on probe 3 (`k41_tuned 2387.00`
+    beating `k41_unchecked 2404.00` — the safe rung wins by `17.00 Ir`/call and
+    the apparent 9.6× was **100% R3 spelling**) plus duplication of `p07`;
+    **`p40`'s REFUSE** is a cache-sim result and untouched. **Four harm cells
+    were corrupted and ZERO verdicts were.**
+    ⚠ **Do NOT merge this table with `TASK_090`'s p24 sweep** — that one covered
+    three storage classes on both compilers and concluded *"UBSan alone reports
+    nothing anywhere"*; **`harms.c`'s `p24` row is one synthetic shape and fires
+    both.** Different experiments, both correct.
+
 30. ⚠ **`check.py::check_marginal_ir`'s DOCSTRING IS TOO STRONG ABOUT THE ±7
     BISTABLE TERM, and p46 is the FOURTH pattern to hit it.** (TASK_092.) The
     docstring says *"the term is `whole`-mode only"* and that `isolated` *"is not
@@ -2753,7 +3105,7 @@ Both retired.
     24-pattern sweep (~45 min) for a comment. BATCH IT** with "Owed" 0's sixth
     route, B5's remaining minors, and the `p09/spec.md` citations.
 
-### Deferred with a stated reason### Deferred with a stated reason### Deferred with a stated reason
+### Deferred with a stated reason
 
 - **The mechanical rate-vs-disassembly backstop** (~90 lines, prototype exists).
   Deferred twice, and the second time the engineer's own session was the argument:
