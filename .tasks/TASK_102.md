@@ -156,8 +156,24 @@ Write your report to `.tasks/TASK_102_REPORT.md` as well as returning it.
 
 ---
 
-⚠ **PROTOCOL rule 2's running count is `MANAGER-FILLS-AT-LAUNCH`.** The calls I
-am least sure of:
+⚠ **PROTOCOL rule 2's running count: this task is launched from 309** — 299,
+plus **8** from `TASK_099` (which carried 299 → 307, and **two of its eight were
+BLOCKERS against sentences the manager had already committed into `.memory/`**),
+plus **2** from the manager's own probe in `.temp/mgr99/NOTES.md`.
+⚠⚠ **`TASK_100` IS IN FLIGHT AND WAS LAUNCHED FROM 301. RECONCILING THE TWO IS
+THE MANAGER'S JOB, NOT YOURS — state what you found and what you started from,
+and do not try to compute a global total.** (Rule 2 assumed one task at a time;
+the amendment for concurrency is in `PROTOCOL.md` and exists because this exact
+thing broke at `TASK_099`.)
+
+**Recent evidence that contradicting me is the point:** `TASK_099` proved my
+*"the 64-byte control could not have fired"* **false** — the sweep adds **87**
+bytes, not 64, and `87 mod 32 = 23`, so the control fired and produced the
+published number to the instruction. **I had written it into a task file as
+established fact.** It also found a **sixth** `unsafe`-scan route after I said
+`include!` was the only one, and it is **not a macro at all**.
+
+The calls I am least sure of:
 
 1. ⚠⚠ **That new rows are needed at all.** The alternative is to stop at 25
    patterns and spend the remaining effort on the cross-pattern synthesis, which
