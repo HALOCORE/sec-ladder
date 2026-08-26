@@ -1786,7 +1786,24 @@ the number.** Two task files have already sent an agent to the wrong finding.
     `cmp`/`jbe` in the same place for the same reason" is.** `p36` shipped as the
     twelfth and was worth it; `p45`'s class was genuinely absent and was not.
 
-    Evidence: `.tasks/TASK_102_REPORT.md`, `.temp/t102/` (`REBUILD.sh`).
+    ⚠⚠ **COMPANION RULE, earned by the FIRST row admitted under this bar
+    (`p23`, `TASK_105`): A LIMB THAT CLAIMS A NEW *REASON* OWES AN ISOLATION, NOT
+    JUST A MEASUREMENT.** `p23` cleared limbs 1 and 2 — a new operator (the guard
+    compares **two loop variables**) and a new source of the bound (**each cursor
+    is bounded by the other, and both move**) — and both are true and unique in
+    the tree. **Limb 3, the new elision REASON, shipped a phenomenon with an
+    unverified cause**: the `k_up`/`k_dn` measurement reproduced to the
+    instruction under an independent probe, **but both stated causes failed
+    isolation** — making the induction variable ascend costs `+816…+1614` instead
+    of recovering the elision, and removing the unsigned subtraction recovers
+    `12…20` of a `184…488` gap. ⚠ **A measurement shows THAT; only an isolation
+    shows WHY, and limb 3 is the only one of the three that asserts a why.**
+    **This is `PROTOCOL` rule 12 (*ask for the mechanism, not the number*) meeting
+    rule 9 (*don't land a finding before its review*), and `p23` is the case that
+    shows the two combine.**
+
+    Evidence: `.tasks/TASK_102_REPORT.md`, `.temp/t102/` (`REBUILD.sh`),
+    `.tasks/TASK_105_REPORT.md`.
 
 ## Retracted — do not reinstate
 
