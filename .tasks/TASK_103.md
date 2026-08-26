@@ -149,10 +149,33 @@ Write your report to `.tasks/TASK_103_REPORT.md` as well as returning it.
 
 ---
 
-⚠ **PROTOCOL rule 2: this task is launched from 309**, and ⚠ **`TASK_100` and
-`TASK_102` are in flight from 301 and 309 respectively. Reconciliation is the
-MANAGER'S job — state what you found and what you started from, and do not
-compute a global total.** The calls I am least sure of:
+⚠ **PROTOCOL rule 2 — RECONCILED, and the manager's own contribution was
+WITHDRAWN in the process. The count is 319.**
+
+```
+  299   carried into TASK_099
+  + 8   TASK_099          (299 -> 307; two were BLOCKERS against .memory/)
+  + 2   manager probe     WITHDRAWN -- TASK_100 A1 showed the "contradiction"
+                          was manufactured: I re-ran the claim on a program I
+                          wrote myself, and both tables are correct.
+  +12   TASK_100          (launched from 301, reported 301 -> 313)
+  ----
+    319
+```
+
+⚠ **`TASK_102` is in flight from 309 and will therefore report against a stale
+base. That is expected and is the manager's to fix, not the agent's** — see
+`PROTOCOL.md` rule 1's concurrency amendment, which exists because this broke at
+`TASK_099`.
+
+**Recent evidence that contradicting me is the whole point.** `TASK_099` proved
+my *"the 64-byte control could not have fired"* false — the sweep adds **87**
+bytes and `87 mod 32 = 23`. `TASK_100` then proved that **my own leak finding was
+not a finding at all**, and that the row I told it to *"confirm briefly and move
+on"* (`p37`) is the one whose reason does not survive. **Two for two against me
+in two tasks.**
+
+The calls I am least sure of:
 
 1. ⚠⚠ **That landing TASK_099's retractions into `.memory/` before this review
    was the right call at all.** I broke rule 9 deliberately and said so in the

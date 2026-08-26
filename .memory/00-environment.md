@@ -433,7 +433,100 @@ catalogue rows: **a detector that is not running looks exactly like a detector
 that found nothing.** Always give a harm probe a **positive control that must
 fire**, and `grep` the log — never `head` it.
 
-## ⚠⚠ THERE IS NO WORKING LEAK DETECTOR FOR THE C RUNGS ON THIS BOX
+## ⚠⚠ THE HEADING BELOW WAS FALSE. THERE **IS** A WORKING LEAK DETECTOR FOR THE C RUNGS, AND IT COSTS ONE LINE AND ZERO `Ir`.
+
+> ~~THERE IS NO WORKING LEAK DETECTOR FOR THE C RUNGS ON THIS BOX~~
+
+**Corrected at TASK_100 (reviewer), PROVISIONAL — TASK_100 is itself
+unreviewed.** ⚠ **The TABLE below is correct and reproduces exactly; only the
+CONCLUSION drawn from it was wrong.** Keep reading before using either.
+
+⚠⚠ **AND A MANUFACTURED CONTRADICTION WAS RESOLVED ON THE WAY — this is the
+FOURTH time "you measured a different thing" has settled a dispute here.** The
+manager re-ran the table on **its own** leaked list, got `exit=1 reports=1` at
+`-O1`/`-O2`, and concluded this file was false. **Both tables are correct.**
+`.temp/r93/c/leak3.c` (what TASK_093 measured) and `.temp/mgr99/leak.c` (the
+manager's) differ **three ways**: **doubly** vs **singly** linked, allocated in a
+**callee** vs in `main`, and **with** vs **without** a 16 KiB `volatile` scrub.
+⚠ **Re-measuring a claim on a program you wrote yourself is not a reproduction.**
+
+### The mechanism, which is what was actually missing
+
+**A stale root on the STACK, kept alive by INLINING.** Not registers, not shape:
+
+```
+leak3.c -O1  LSAN_OPTIONS=''                exit=0  NO SUMMARY
+leak3.c -O1  LSAN_OPTIONS='use_stacks=0'    exit=1  120 byte(s) in 5 allocations
+leak3.c -O1  LSAN_OPTIONS='use_registers=0' exit=0  NO SUMMARY      <- not registers
+shape.c -O1  (inlining allowed)             exit=0  NO REPORT
+shape.c -O1  -fno-inline                    exit=1  120B/5          <- the cause
+```
+
+At `-O1` gcc inlines the allocating callee into `main`, so the roots live in
+`main`'s frame — and ⚠ **the `volatile` scrub added to IMPROVE detection sits in
+a DEEPER frame and therefore never overwrites them. The instrument defeated
+itself.** ✅ **Shape is NOT the variable** — singly, doubly and **cyclic** (p34's
+shape) all fire at `-O0`, all go silent at `-O1`/`-O2`, all are restored by
+`use_stacks=0`. Shape only changes the *classification* (`Indirect … 5 objects`
+with no direct leak, vs `Direct 16 + Indirect 64`).
+
+⚠⚠ **AND "ACCOUNTING, NOT DETECTION" IS FALSE — a manager claim, refuted.**
+On `leak3.c` a `--wrap` counter reads `allocs=5 frees=0 outstanding=5` at
+`-O0`/`-O1`/`-O2` while LSan reports **nothing**. **Five blocks genuinely
+leaked, zero reported. The count goes to zero.** It is not constant folding
+either — the allocations are counted.
+
+### ✅ THE FIX: one line, in the pattern's own `c/main.c`, `0.00 Ir`
+
+```c
+const char *__lsan_default_options(void) { return "use_stacks=0"; }
+```
+
+`HOOK=0` is the positive control and it reproduces the old behaviour exactly
+(fires at `-O0`, silent at `-O1`/`-O2`/`-O3`); `HOOK=1` **fires at all four
+levels, and the no-leak arm stays silent at all four.** Three controls were run
+before recommending it:
+
+1. **`Ir`-NEUTRAL, to the instruction.** Measured C config (`-O3 -DSLB_ISOLATED`,
+   real `common/driver.c` + p01's `kernel.c`): base and hook both
+   `257362037 / 209367011`; kernel disassembly identical modulo one trailing
+   alignment `nopl`. ⚠ **By contrast a `--wrap=malloc` counter costs
+   `+2210 / +2250 Ir` — so `--wrap` is HARM-PROBE-ONLY and must never ride in a
+   measured cell.**
+2. **Blinds nothing** — six sanitizer cells byte-identical with `HOOK=0/1`:
+   `heap-use-after-free`, `runtime error: load of address`, `signed integer
+   overflow`.
+3. **No false positives** on all 8 p01 inputs through the unmodified C rung.
+
+⚠ **Its one real cost:** a pattern that legitimately holds an allocation on the
+stack at exit would now false-positive. **Validated against exactly one pattern
+(p01), C rung only.**
+
+⚠ **`LSAN_OPTIONS=use_globals=0` is NOT a substitute** — it adds a 4096-byte
+false leak (stdio's buffer, rooted in a global) at every level.
+
+### What this unblocks
+
+- ✅ **`p42` (`goto cleanup`, leak on error path) is UNBLOCKED, and it needs no
+  hook at all.** Driven through a synthetic pdir at the gate's own stage-7 flags:
+  clean arm `exit=0 fired=no` on both inputs, leak arm `exit=1 fired=YES` with
+  `16000 byte(s)` / `12000000 byte(s)`. **Leak is a bug class the built tree does
+  not have** — a 24-pattern census finds zero leak rows, and `p27` is built *not*
+  to leak **by contract**.
+- ⚠ **`p34` (refcount) — the NAMED KILL IS DEAD but the row stays refused for a
+  DIFFERENT reason.** The detector was never the binding constraint: the safe
+  rung leaks **only** in the `Rc`-both-ways spelling, and `Weak` is equally safe,
+  equally idiomatic and **measured leak-free**. The headline would survive only
+  if that spelling were *pinned*, and no cost axis was ever measured.
+
+⚠ **Clean negative, worth keeping:** the manager's own hypothesis that the table
+was a mid-program `__lsan_do_recoverable_leak_check()` artefact is **FALSE** —
+at `-O0` it fires and prints *two* reports; at `-O1`/`-O2` it returns 0, matching
+the at-exit result exactly.
+
+---
+
+**Original section, preserved because its table is right.**
 
 **TASK_093_REVIEW, reviewed.** This closes a question any leak-shaped row
 (`p34`, `p42`) must answer before it is scheduled.
@@ -457,5 +550,8 @@ fire**, and `grep` the log — never `head` it.
   `libc6-dbg`, which needs root. **callgrind is fine**; it is memcheck
   specifically.
 
-**So on the C side there is no leak detector at the gate's configuration.
-Miri is the only working one, and it covers the Rust rungs only.**
+~~**So on the C side there is no leak detector at the gate's configuration.
+Miri is the only working one, and it covers the Rust rungs only.**~~
+⚠⚠ **THAT CONCLUSION IS WITHDRAWN — see the top of this section.** The `-O`
+dependence is real and reproduces; what does not follow is *"no detector"*. It is
+one stale stack root, and `use_stacks=0` removes it at zero measured cost.

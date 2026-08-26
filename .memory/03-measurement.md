@@ -2543,3 +2543,66 @@ is ≈2 min/pattern against ~4.8 h for a layout population; only p03/p04 need it
 ≈4 min.** ⚠ **Do NOT "fix" this by pinning the gate's environment** — cheap
 (`check.py` is not measurement-hashed) but it makes the number
 **reproducible-and-wrong.**
+
+---
+
+## ⚠⚠ THE CONTROLS THAT COULD NOT HAVE FIRED — the running list, in one place
+
+**Landed at TASK_100. PROVISIONAL where an entry cites an unreviewed task.**
+This project keeps writing checks that pass because they *cannot* fail, and until
+now the count lived as a bare ordinal (*"the fifth instance"*) scattered across
+files — ⚠ **which is how the count itself went wrong: entry 5 below was
+RETRACTED, so anyone quoting "five" was quoting a number one of whose members had
+already been struck.** Keep the list, not the ordinal.
+
+1. **The `axiom_decls` regeneration.** The manager added the field to 22 gate
+   records, regenerated `results/synthesis.md`, got a **byte-identical** file and
+   quoted that as *"the change moved no published number"*. It is byte-identical
+   because **`synthesize.py` reads `tcb_items` and the word *"axiom"* appears
+   ZERO times in `synthesis/`** — the published column cannot see the field.
+2. **`TASK_084`'s limb 3, verified in two halves with the join never run.** One
+   script proved *source → gate log*, a second proved *hand-edited JSON →
+   `synthesis.md`*, and **nobody ran a real axiom through a real gate into the
+   record it wrote and on into the published table.** The review did, on ten
+   routes, and limb 3's own stated failure mode reproduced on three.
+   ⚠ **A test split across two artefacts tests neither seam.**
+3. **`harness/limbs.py::TWIN_BANNED` missing `"external_body"`** — `\bexternal\b`
+   does not match it, so the re-derivation tool under-reported `5ct-cfg`.
+4. **`TASK_086`'s harm table, truncated by `head -4`.** gcc's UBSan report is
+   **exactly four lines** and ASan's banner lands on lines 5–6, so four rows
+   (`p21`, `p24`, `p26`, `p41`) could only ever show their UBSan half.
+   ✅ **Re-run with `grep` at TASK_100: four cells were corrupted and ZERO
+   verdicts were.**
+5. ~~**The `64-byte-longer environment` control, `64 mod 32 == 0`.**~~
+   ⚠⚠ **RETRACTED AT TASK_099 — THIS ENTRY WAS ITSELF A CONTROL-SHAPED ERROR.**
+   The sweep adds **87** bytes, not 64 (`8` envp pointer slot `+ 13` name `+ 1`
+   `=` `+ 64` pad `+ 1` NUL), and `87 mod 32 = 23`. **The control fired.** The
+   manager computed the alignment from **the prose describing the control**
+   instead of from the bytes the process receives.
+6. **`TASK_100`'s own first `p42` leak probe, `if (acc & 1)`** — `acc` is **even
+   for both p01 inputs**, so the leak branch was unreachable and the arm could
+   never fire. ⚠ **Caught by the reviewer itself, by printing `acc`**, before it
+   reached a conclusion; changed to `acc != 0` and re-run.
+
+**The reflex, and it is one question:** ⚠⚠ **before believing a check, ask what
+would make it FAIL — and then make that happen.** Every entry above passes that
+question and none of them survived it. **A control with no demonstrated failing
+arm is not evidence.**
+
+## ⚠ An allocation counter PERTURBS the measured cell; the LSan hook does not
+
+**TASK_100, PROVISIONAL.** Measured in the real C config (`-O3 -DSLB_ISOLATED`,
+`common/driver.c` + p01's `kernel.c`):
+
+```
+base                                     257362037 / 209367011
+__lsan_default_options "use_stacks=0"    257362037 / 209367011   identical
+-Wl,--wrap=malloc,free,calloc,realloc    257364247 / 209369261   +2210 / +2250
+```
+
+⚠ **So a `--wrap` allocation counter is HARM-PROBE-ONLY and must never ride in a
+measured cell.** The `__lsan_default_options` hook is `Ir`-neutral **to the
+instruction** (kernel disassembly identical modulo one trailing alignment
+`nopl`), blinds no sanitizer (six cells byte-identical), and false-positives on
+none of p01's eight inputs. ⚠ **Its one cost: a pattern legitimately holding an
+allocation on the stack at exit would false-positive. Validated on one pattern.**
