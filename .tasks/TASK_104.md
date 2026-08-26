@@ -143,11 +143,52 @@ Write your report to `.tasks/TASK_104_REPORT.md` as well as returning it.
 
 ---
 
-⚠ **PROTOCOL rule 2's running count is 324** (299 + 8 `TASK_099` + 12 `TASK_100`
-+ 5 `TASK_102`; ⚠ **the manager's own +2 was WITHDRAWN when `TASK_100` showed the
-"contradiction" was manufactured**). **If another task is in flight when you
-finish, state what you found and what you started from and leave the
-reconciliation to the manager.** The calls I am least sure of:
+## §5 — four lessons from `p23`, which shipped between this file being written and you reading it
+
+**All four are landed in `.memory/` and all four can bite this row.**
+
+1. ⚠⚠ **A LAW OWES AN OUT-OF-BAND PREDICTION, not a within-band holdout.** `p23`
+   produced **three mutually inconsistent "exact" laws**, each with **zero
+   in-sample residual**; the published one mispredicted the two **shipped** inputs
+   by up to `152 Ir`/call **despite a `0.0000` holdout inside its own band.** The
+   missing term was invisible because two bands sat at `m ≡ 0 (mod 4)` and the
+   control sampled a third at **seven-of-eight multiples of four.** ⚠ **This is
+   the residue-class trap for the third time (p38, p46, p23). Fit on one band and
+   predict another, or do not call it a law.**
+2. ⚠⚠ **A `required` SPELLING PIN CAN BE SATISFIED BY A TAUTOLOGICAL CONJUNCT THE
+   COMPILER DELETES.** `p23`'s cheapest in-contract R3 moved **150 `Ir`/call**
+   when a pinned guard was re-added as a redundant leading term — **same object
+   code, `md5_norm` identical.** It made the R3 and R4 spans **overlap**.
+   ⚠ **When you declare `required` spellings, ask what a tautology lets in; when
+   you publish a span, audit BOTH endpoints against `spelling_matches` AND
+   `forbidden`, and say how many spellings you searched.**
+3. ⚠⚠ **A NUMBER ONLY A REBUILD CAN PRODUCE MUST NOT BE TRANSCRIBED INTO A FILE
+   THE REBUILD RE-HASHES.** `NOTES.md` is in the gate record's `source_sha256`,
+   so recording a run-dependent value forces a run that moves it — four runs gave
+   `7, 7, 8, 8`. **Publish the invariant, not the number.** ⚠ **This is very
+   likely to bite `p42`, whose harm output is a leak REPORT.** ✅ **LSan's byte
+   counts should be stable, but check rather than assume.**
+4. ⚠ **A PHENOMENON AND ITS CAUSE CARRY DIFFERENT EVIDENCE.** `p23` landed an
+   elision phenomenon that reproduced to the instruction while **three separate
+   isolations refuted the stated cause.** **Land what you measured; mark the why
+   OPEN if you did not isolate it.** RECAP finding 37's companion rule: *a limb
+   that claims a new **reason** owes an isolation, not just a measurement.*
+
+---
+
+⚠ **PROTOCOL rule 2's running count is 368** (299 + 8 `TASK_099` + 12 `TASK_100`
++ 5 `TASK_102` + 8 `TASK_103` + 11 `TASK_101` + 13 `TASK_105` + 12 `TASK_106`;
+⚠ **the manager's own +2 was WITHDRAWN when `TASK_100` showed the
+"contradiction" was manufactured**). **You are the only agent running, so no
+reconciliation is owed — carry it forward yourself.**
+
+⚠⚠ **The last seven tasks ran 299 → 368, and the manager was the subject of the
+largest findings in the run: a control asserted to be vacuous that fired, a
+"contradiction" that was two correct measurements of different programs, a TRUE
+`.memory/` sentence struck on an unreviewed mechanism, an inverted sign copied
+from a report's prose instead of its table, and an instruction to edit text that
+did not exist.** **Contradicting this file is the highest-value thing you can
+do.** The calls I am least sure of:
 
 1. ⚠⚠ **That `model.py` and the gate can express a leak expectation at all.**
    `sanitizer_expect` has never been used for a leak in this tree. **If
