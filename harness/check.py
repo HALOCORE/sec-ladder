@@ -361,6 +361,64 @@ NIGHTLY = "nightly-x86_64-unknown-linux-gnu"
 MIRI_BIN = os.path.expanduser(f"~/.rustup/toolchains/{NIGHTLY}/bin/miri")
 CARGO = os.path.expanduser("~/.cargo/bin/cargo")
 
+# ⚠⚠ TASK_107 §C. `check.py` USED TO PASS NO `MIRIFLAGS` AND TO RECORD NOTHING
+# ABOUT IT, so every *"Miri: N of N, no UB"* line in this tree was a statement
+# about a configuration nobody had written down. `miri` takes these only through
+# the environment, not on its command line.
+#
+# ⚠⚠⚠ **AND THE OBVIOUS FIX -- PIN A SEED -- IS THE ONE THING THAT MUST NOT BE
+# DONE HERE, BECAUSE SETTING `MIRIFLAGS` AT ALL COSTS 4.6x ON THIS TREE.**
+# TASK_107 chose `MIRIFLAGS="-Zmiri-seed=0 -Zmiri-symbolic-alignment-check"`,
+# swept with it, and the sweep itself refuted the choice: p42 gained a SECOND
+# blocked Miri row. Measured afterwards on p42's `adversarial-wincap.bin`, the
+# gate's own probe file, `cwd=pdir`, the exact `check_miri` command line:
+#
+#     MIRIFLAGS unset                                   74.6 / 73.4 / 74.0 / 73.8 s
+#     MIRIFLAGS="-Zmiri-seed=0"                        340.4 / 338.3 s
+#     MIRIFLAGS="-Zmiri-seed=0 -Zmiri-symbolic-…"      342.7 / 339.0 s
+#     MIRIFLAGS="-Zmiri-symbolic-alignment-check"      337.8 / 337.0 s
+#     MIRIFLAGS=""      <-- SET BUT EMPTY               339.8 s
+#
+# **The empty string costs the same 4.6x as any flag, so the trigger is the
+# VARIABLE BEING PRESENT, not its content.** `MIRI_TIMEOUT` is 180 s, so a 74 s
+# row becomes a blocked one: **pinning would have traded a genuinely UB-checked
+# row for a configuration string** -- and p42's own `spec.md` calls Miri
+# *"load-bearing for the pattern's own subject on the R4 side"*, because R4 has
+# no proof and Miri's exit-time leak report is the only mechanical check that it
+# does not leak.
+# ⚠ **THE MECHANISM IS OPEN.** I have the effect four ways and no explanation
+# for it; do not write one down until somebody measures it.
+#
+# **What the seed does and does not buy, also measured** (`.temp/t107/c2_miriflags.py
+# --probe`, two families x 12 seeds; `.temp/t107/c1_miri_cost.py`):
+#
+#   * a `Vec<u32>` (alignment 4 by construction) gives clean/UB/UB/clean at byte
+#     offsets 0/1/2/4 under unset, under every seed 0..11, and with the symbolic
+#     check: **0 misses, 0 false positives, 0 nondeterminism**;
+#   * a `Vec<u8>` (alignment 1) + `ptr::read::<u32>` at byte 1 is the only
+#     seed-sensitive class, and there the split is **unset=CLEAN vs every seed
+#     0..11=UB** -- i.e. unseeded-vs-seeded, NOT seed-vs-seed;
+#   * `0 of 40` p01 rows and `0 of 20` p09 rows change UB verdict or timeout
+#     status with the seed, and a 4-seed sweep costs exactly 4.00x
+#     (p01's Miri stage 182.0 s -> 728.0 s, of which 720 s is one row hitting
+#     `MIRI_TIMEOUT` four times).
+#
+# ⚠ `.memory/00-environment.md`'s *"clean under seed 0 and 2 and UB under 1 and
+# 3"* **does not reproduce** at this toolchain; seeds 0..11 agree and
+# 0/1/2/3/7/100/1000/12345/999999 all give the same `base % 4`. Its CONCLUSION
+# -- that a green Miri row was a claim about an unwritten-down configuration --
+# stands, and this is the answer to it.
+#
+# **So: run at Miri's default, and RECORD THE CONFIGURATION instead of pinning
+# it.** The default is deterministic (four timings above agree to 1.6%, and the
+# address probe reproduces `base % 4 == 3`); what actually moved between
+# TASK_102 and TASK_107 is the **miri version**, so that is what the record now
+# carries beside the flags. ⚠ **An ambient `MIRIFLAGS` is REMOVED**, not
+# inherited: leaving it would let the invoking shell silently cost 4.6x and
+# change what the row certifies, which is the same class of defect as the
+# environment block in `_env_block`. What was removed is recorded.
+MIRI_FLAGS = ()          # empty => `MIRIFLAGS` is UNSET in the child, not ""
+
 
 # ==========================================================================
 # the model sandbox
@@ -2475,6 +2533,83 @@ def _probe_input(src, n_iters, out):
     return out
 
 
+# The environment variables that can change a libc code path PER CALL without
+# changing the block's length. Derived from a measurement, not from a list:
+# `.temp/t107/d1_env.py content` holds the block length EXACTLY equal at 3332 B
+# and moves p03's marginal by 486 Ir/call with `GLIBC_TUNABLES`. `LD_*` is here
+# because `LD_PRELOAD` can replace `memcpy` outright and `LD_BIND_NOW` changes
+# the PLT; `MALLOC_*` because it re-tunes the allocator the kernels call.
+_ENV_TUNING_PREFIXES = ("GLIBC_TUNABLES", "LD_", "MALLOC_")
+
+
+def _env_block():
+    """The environment block the MEASURED CHILDREN are handed, measured in a
+    real child rather than computed from a Python dict.
+
+    Returns `{"bytes": int, "tuning_vars": {name: value}}`, or `None` if the
+    probe child could not be run.
+
+    ⚠⚠ **THREE WAYS TO GET THIS WRONG, AND THE PROJECT HAS ALREADY MADE TWO OF
+    THEM.**
+
+    1. **`len(os.environ)`-style arithmetic is wrong** -- that is control entry
+       7 in `.memory/03-measurement.md` (`TASK_099`'s `a3_launcher.py`
+       "measured the block length from `os.environ` (a Python dict)"). A
+       variable does not cost its value: it costs an envp pointer slot, its
+       name, an `=`, its value and a NUL, and the 87-vs-64 decomposition that
+       corrected TASK_099 turns on exactly those four forgotten terms.
+    2. **Reading `check.py`'s OWN `/proc/self/environ` is wrong** for a subtler
+       reason: that block is frozen at *this* process's `execve`, while what a
+       child receives is `environ` as libc holds it now. They agree only while
+       nothing mutates `os.environ` -- true today (`check.py` mutates none;
+       `build.py` only reads three `SLB_*` overrides) and not a property anyone
+       should have to re-verify. So the child reads its own.
+    3. **This is NOT the forbidden pin.** It does not force an environment; it
+       records which draw was taken, so a disagreement becomes diagnosable
+       (`.memory/03-measurement.md`, the reproduction protocol decided at
+       TASK_103). Pinning would make the number reproducible-and-wrong.
+
+    ⚠ **WHAT THE INTEGER IS NOT: it is not the client's block under valgrind.**
+    `_callgrind_total` runs the binary under `valgrind`, which appends its own
+    `vgpreload` entries to `LD_PRELOAD` and synthesises the client's stack
+    itself, so the client's block is this number plus a deterministic function
+    of it. That is fine for the job: the pin's rule is *"same recorded length =>
+    the marginal must match EXACTLY"*, and a deterministic offset preserves it.
+    Verified on the axis that matters (`.temp/t107/d1_env.py length`): four pads
+    give child blocks 3290 / 3298 / 3306 / 3314 B and marginals
+    3066 / 3059 / 3059 / 3066 -- the documented +-7, bistable, period 32, window
+    16 wide, and the recorded integer separates the two states.
+
+    ⚠⚠ **AND ONE INTEGER IS NOT ENOUGH, WHICH IS WHY `tuning_vars` IS HERE.**
+    `TASK_103` settled launcher-vs-environment and explicitly did **not**
+    separate LENGTH from CONTENT; `TASK_107` measured it and the length alone is
+    a **lossy** pin. Two environments of *byte-identical block length* (3332 B,
+    both read from a real child):
+
+        GLIBC_TUNABLES=glibc.cpu.x86_rep_stosb_threshold=64   marginal 3545.00
+        SLB_T107_FILLER=<35 z>                                marginal 3059.00
+
+    **+486.00 Ir/call at the same length -- 69x the +-7 this pin exists to
+    diagnose.** p03 `memset`s a stack array per call and the tunable picks a
+    different `memset` path, so the change lands in the per-call term the
+    marginal measures rather than in the start-up constant that cancels. A
+    length-only record would have read "same length, so the marginal must
+    match", and it does not. `tuning_vars` is the smallest thing that makes that
+    case diagnosable instead of silent."""
+    try:
+        r = subprocess.run(
+            [sys.executable, "-c",
+             "import sys;sys.stdout.write(str(len(open("
+             "'/proc/self/environ','rb').read())))"],
+            capture_output=True, text=True, timeout=60)
+        n = int(r.stdout.strip())
+    except (OSError, ValueError, subprocess.TimeoutExpired):
+        return None
+    return {"bytes": n,
+            "tuning_vars": {k: v for k, v in sorted(os.environ.items())
+                            if k.startswith(_ENV_TUNING_PREFIXES)}}
+
+
 def _callgrind_total(binary, arg, outfile):
     """Whole-program Ir for one run. Only ever used as one half of a
     *difference*: `.memory/03-measurement.md` shows the absolute value moves
@@ -2922,6 +3057,11 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
     out["_rate"] = rate
     out["_bound"] = bound
     out["_work_unit"] = unit_name
+    # TASK_107 §D, decided at TASK_103. Taken HERE rather than in `main()` so it
+    # is the environment the callgrind children above actually ran under, in the
+    # same process and the same session. Popped in `main()` into
+    # `marginal_ir_env`, beside `marginal_ir_per_call`.
+    out["_env_block"] = _env_block()
     # Stage 6's dynamic half reuses these profiles rather than running callgrind
     # again -- `_check_region_runs`. Popped in `main()` before the record is
     # written; a path is not a measurement.
@@ -3343,7 +3483,7 @@ _INCLUDE_LIT_RE = re.compile(
 _INCLUDE_ANY_RE = re.compile(r"\binclude!\s*[(\[{]")
 
 
-def _include_literals(txt):
+def _include_literals(txt, code=None):
     """The string literal argument of every `include!` in `txt`, plus the count
     of `include!`s whose argument is NOT a plain literal.
 
@@ -3351,9 +3491,23 @@ def _include_literals(txt):
     `include!(concat!(...))` or `include!(env!("OUT_DIR"))` resolves to no path
     a static reader can name, so the honest answer is "I cannot see this file",
     which `_check_opaque_includes` turns into a gate failure rather than into
-    the silence that TASK_098 measured."""
+    the silence that TASK_098 measured.
+
+    ⚠ **`code` is an OFFSET-PRESERVING blanked copy used to FIND the sites; the
+    literal is always read back out of the RAW `txt`.** They cannot be the same
+    string and the reason is a trap TASK_107 walked into first:
+    `vparse.blank_noncode` blanks string literals as well as comments, so
+    `include!("h.rs")` becomes `include!(        )` and a check run on the
+    blanked text alone would classify **every legitimate literal include as
+    OPAQUE** -- turning a false positive on comments into a false positive on
+    real code. Offsets survive blanking (`blank_noncode` substitutes spaces of
+    equal length), so finding in one string and matching in the other is exact.
+
+    Default `code=None` means "search the raw text", which is what
+    `_path_includes` wants: over-approximating a *file set* is safe, so it
+    deliberately follows a commented-out include too."""
     lits, n_opaque = [], 0
-    for m in _INCLUDE_ANY_RE.finditer(txt):
+    for m in _INCLUDE_ANY_RE.finditer(code if code is not None else txt):
         lit = _INCLUDE_LIT_RE.match(txt, m.start())
         if lit is None:
             n_opaque += 1
@@ -3363,7 +3517,83 @@ def _include_literals(txt):
     return lits, n_opaque
 
 
-def _path_includes(pdir, srcs):
+# rustc's dep-info runs, memoised on (path, mtime_ns, size). A gate run calls
+# `_path_includes` from four places over the same roots; without this each
+# pattern would re-invoke rustc ~20 times for one answer. 0.075 s per call
+# measured, so this is thrift rather than necessity.
+_DEP_INFO_CACHE = {}
+
+# The cfg sets dep-info is asked under. Two runs, and the pair is chosen rather
+# than exhaustive: `--cfg slb_isolated` is `build.py::rust_flags`'s isolated
+# mode and `--cfg slb_twin` is stage 5c-twin's, so the second run resolves every
+# `#[cfg(slb_*)]` module the tree actually builds, while the first (no flags)
+# resolves the `#[cfg(not(...))]` side. ⚠ It is NOT a complete cover of `cfg`,
+# and it does not need to be -- the regex limb below is cfg-BLIND and therefore
+# over-approximates across every combination at once. See `_path_includes`.
+_DEP_INFO_CFGS = ((), ("slb_isolated", "slb_twin"))
+
+
+def _dep_info_files(path, cfgs=()):
+    """rustc's OWN module resolution for one root, via `--emit=dep-info`.
+
+    Returns `(files, err)`: `files` is the absolute path of every source rustc
+    says the crate reads (the root included), or `None` when rustc wrote no
+    dep-info file at all, in which case `err` says why and the caller must FAIL
+    CLOSED rather than fall back to the regex silently.
+
+    ⚠ **rustc emits the `.d` even when compilation FAILS**, which is what makes
+    this usable here at all: a Verus source does not compile under plain rustc
+    (`error[E0433]: cannot find module or crate 'vstd'`), and the dep-info is
+    written regardless because module resolution happens before name
+    resolution. Measured on all 26 shipped patterns: 0 roots produced no `.d`
+    (`.temp/t107/a2_census.py`)."""
+    try:
+        key = (os.path.realpath(path), os.stat(path).st_mtime_ns,
+               os.stat(path).st_size, cfgs)
+    except OSError as e:
+        return None, str(e)
+    if key in _DEP_INFO_CACHE:
+        return _DEP_INFO_CACHE[key]
+    scratch = os.path.join(REPO, ".temp", "check", "depinfo")
+    os.makedirs(scratch, exist_ok=True)
+    # PID in the name: two `check.py` processes sharing one `.d` would read each
+    # other's answer and the gate would certify the wrong file set. The project
+    # runs one agent at a time, so this is prophylaxis -- but a shared mutable
+    # scratch path is the kind of thing that only bites once somebody
+    # parallelises the sweep, which is exactly when nobody is looking.
+    # ⚠ `line.split()` below assumes no whitespace in any source path; rustc
+    # backslash-escapes those in a `.d` and this does not un-escape them. No
+    # path in this tree has one.
+    dot_d = os.path.join(scratch, f"dep.{os.getpid()}.d")
+    if os.path.exists(dot_d):
+        os.remove(dot_d)
+    cmd = [buildmod.RUSTC, "--edition", "2021", f"--emit=dep-info={dot_d}"]
+    for c in cfgs:
+        cmd += ["--cfg", c]
+    cmd.append(os.path.abspath(path))
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=120,
+                           cwd=REPO)
+    except (OSError, subprocess.TimeoutExpired) as e:
+        res = (None, f"{buildmod.RUSTC} did not run: {e}")
+        _DEP_INFO_CACHE[key] = res
+        return res
+    if not os.path.exists(dot_d):
+        res = (None, f"{buildmod.RUSTC} wrote no dep-info (rc={r.returncode}): "
+                     f"{(r.stdout + r.stderr).strip()[-200:]}")
+        _DEP_INFO_CACHE[key] = res
+        return res
+    files = []
+    for line in open(dot_d):
+        if line.startswith(dot_d + ":"):
+            files = [os.path.abspath(os.path.join(REPO, f))
+                     for f in line.split(":", 1)[1].split()]
+    res = (files, "")
+    _DEP_INFO_CACHE[key] = res
+    return res
+
+
+def _path_includes(pdir, srcs, errors=None):
     """Every file the given sources pull into their crate with
     `#[path = "..."] mod ...` **or `include!("...")`**, TRANSITIVELY. Those
     files are part of the token stream the compiler and Verus see, and no
@@ -3404,13 +3634,88 @@ def _path_includes(pdir, srcs):
     into the emitted set would drop exactly TASK_098 §4A's measured route --
     `verus.rs` `include!`ing a **sibling** `.rs`, which is in `pdir/*.rs` and
     therefore a root -- and this function returned `[]` for it in the first
-    version of this fix."""
+    version of this fix.
+
+    ⚠⚠ **TASK_107: THE REGEX WALK IS NOW ONE OF *TWO* LIMBS, AND THE SECOND IS
+    THE COMPILER. `--emit=dep-info` DOES NOT REPLACE THIS WALK, IT UNIONS WITH
+    IT -- BECAUSE VERUS IS A DIFFERENT FRONT END AND REPLACEMENT WOULD OPEN
+    THREE ROUTES IT CLOSES TWO OF.** `.memory/02-bench-rules.md` proposes
+    replacement, on the (correct) ground that nine routes have been found by
+    three tasks and a regex approximation of rustc's module resolution will not
+    converge. Measured before rewriting (`.temp/t107/a1_routes.py`, 14 routes x
+    3 instruments, every arm run):
+
+        route                       Verus reads it   dep-info   regex walk
+        R1..R4  include! x4              yes            yes         yes
+        R5      #[path] mod              yes            yes         yes
+        R6      #[path]-of-#[path]       yes            yes         yes
+        R7      macro_rules! -> #[path]  yes            yes         yes
+        R7a     #[cfg_attr(all(),path)]  yes            yes         NO
+        R7b     #[path = r"h.rs"]        yes            yes         NO
+        R7c     mod x { mod m; }         yes            yes         NO
+        N1      #[path] INSIDE verus!{}  yes            NO          yes
+        N2      include! INSIDE verus!{} yes            NO          yes
+        N3      #[cfg(slb_twin)] #[path] yes            NO*         yes
+        CONTROL no include at all         -              -           -
+
+    * with `--cfg slb_twin` set, dep-info does list it; without, it does not.
+
+    **N1 and N2 are the finding, and they are new.** rustc cannot expand the
+    `verus!` proc macro (`error: cannot find macro 'verus' in this scope`), so
+    a `mod` declared inside `verus!{}` never becomes a module rustc resolves --
+    while Verus, whose macro it is, splices the file in and reports
+    `1 verified, 0 errors` with the leaf's `unsafe` unscanned. **dep-info
+    answers for RUSTC's module graph; the gate's question is about VERUS's.**
+
+    So the division of labour, and each half is doing what it is good at:
+
+      * **dep-info is EXACT for what rustc resolves**, which is every attribute
+        spelling -- and attribute spellings are where the regex kept losing.
+      * **the regex is CFG-BLIND and MACRO-BLIND, which over-approximates**, and
+        over-approximating a *file set* is the safe direction (this docstring's
+        own rule, unchanged). That is exactly what covers N1/N2/N3.
+
+    Union of the two: 13 of 13 routes. Either alone: 10 of 13.
+    ⚠ **On the 26 shipped patterns the union is a NO-OP** -- dep-info adds 0
+    files and misses 0 (`.temp/t107/a2_census.py`), so this is latent, like
+    every earlier limb of this walk.
+
+    A dep-info run that produces no `.d` at all is **not** silently absorbed:
+    `errors` collects it and `_check_opaque_includes` turns it into a gate
+    failure. Falling back to the regex quietly would reproduce the hole under a
+    new name."""
     out, queue, walked, emitted = [], [], set(), set()
     for src in srcs:
         p = os.path.join(pdir, src)
         if os.path.exists(p):
             queue.append(p)
             walked.add(os.path.realpath(p))
+    # --- limb 2: ask the compiler, once per root, before walking -------------
+    # Seeded into `queue` as well as into `out`, so a file dep-info finds is
+    # then walked by the regex for whatever IT pulls in -- the two limbs
+    # compose rather than sitting side by side.
+    for src in srcs:
+        p = os.path.join(pdir, src)
+        if not os.path.exists(p):
+            continue
+        for cfgs in _DEP_INFO_CFGS:
+            files, err = _dep_info_files(p, cfgs)
+            if files is None:
+                if errors is not None:
+                    errors.append((os.path.relpath(p, REPO), cfgs, err))
+                continue
+            for f in files:
+                real = os.path.realpath(f)
+                if real == os.path.realpath(p) or not os.path.isfile(f):
+                    continue
+                rel = os.path.relpath(f, os.path.dirname(p) or ".")
+                if real not in emitted:
+                    emitted.add(real)
+                    out.append(os.path.normpath(os.path.join(
+                        os.path.dirname(p) or ".", rel)))
+                if real not in walked:
+                    walked.add(real)
+                    queue.append(f)
     while queue:
         path = queue.pop(0)
         base = os.path.dirname(path) or "."
@@ -3454,17 +3759,62 @@ def _check_opaque_includes(rep, pdir, contract):
     24 shipped patterns contain ZERO `include!` of any spelling**, and no
     honest author of a five-rung micro-benchmark reaches for a generated
     include when `harness/build.py` invokes `rustc` directly with no build
-    script and no `OUT_DIR` in the environment."""
+    script and no `OUT_DIR` in the environment.
+
+    ⚠⚠ **TASK_107 FIXES THREE THINGS THAT MADE THIS CHECK FAIL THE GATE ON
+    PROSE, AND THE ACCIDENT ROUTE WAS ONE DOC COMMENT AWAY.**
+
+    1. **It read the RAW text, so 5 of 5 comment/string shapes turned the gate
+       RED**: a line comment, a `//!` doc comment, a block comment, the idiom
+       inside a string literal, and a commented-out `include!` of a real path
+       (`.memory/02-bench-rules.md`). `_path_includes` reads raw text
+       *deliberately* -- over-approximating a **file set** is safe -- but for a
+       check that FAILS the gate over-approximation is the unsafe direction.
+       Fixed by locating sites in `vparse.blank_noncode(txt)`.
+       ⚠ **The literal is still read from the RAW text**, because blanking
+       erases string literals and would make every real include look opaque;
+       `_include_literals`'s docstring has the trap in full.
+       ⚠ **The accident was NEAR**: `include!(concat!(env!("OUT_DIR"),
+       "/gen.rs"))` is the canonical example sentence in this docstring, in
+       `.memory/02-bench-rules.md` and in two task reports -- **the first author
+       who quoted it in a rung source's doc comment failed the gate.**
+    2. **The diagnostic asked for the one impossible thing.** For the
+       build-script idiom there IS no literal path, so *"Use a literal path"*
+       was unactionable. It now says what to do instead.
+    3. **SCOPE: EXTENDED to the pattern's own `*.rs` roots** (TASK_107; the gap
+       was reported at TASK_103 as pre-existing and undecided). It used to
+       cover the `verus.obligations` sources plus everything the walk reached,
+       so an opaque `include!` in `safe_tuned.rs` was not refused. The reason
+       given for leaving it was that no stage scans the safe rungs for `unsafe`
+       tokens -- true, and **not the only thing at stake**: stage 0b's spelling
+       audit, `dloop`'s driver-loop diff and `exec_code` all read rung sources,
+       and an unresolvable `include!` hides tokens from every one of them, so
+       the audit would report on a file set missing the spliced code. Cost of
+       extending: zero rows, the 26 shipped patterns contain no `include!` of
+       any spelling.
+
+    It also adjudicates the dep-info limb of `_path_includes`: **if rustc
+    produced no dep-info for a root the gate must judge, that is a FAILURE, not
+    a silent fallback to the regex.**"""
     vcfg = contract.get("verus") or {}
     srcs = sorted(vcfg.get("obligations") or {})
-    files = [(s, os.path.join(pdir, s)) for s in srcs]
-    files += [(os.path.relpath(p, REPO), p) for p in _path_includes(
-        pdir, srcs + sorted(f for f in os.listdir(pdir) if f.endswith(".rs")))]
+    roots = srcs + sorted(f for f in os.listdir(pdir) if f.endswith(".rs"))
+    files, seen = [], set()
+    for r in roots:                       # scope limb 3: the roots themselves
+        p = os.path.join(pdir, r)
+        if os.path.realpath(p) not in seen:
+            seen.add(os.path.realpath(p))
+            files.append((r, p))
+    dep_errors = []
+    for p in _path_includes(pdir, roots, errors=dep_errors):
+        if os.path.realpath(p) not in seen:
+            seen.add(os.path.realpath(p))
+            files.append((os.path.relpath(p, REPO), p))
     for rel, path in files:
         if not os.path.exists(path):
             continue
         txt = open(path).read()
-        lits, n_opaque = _include_literals(txt)
+        lits, n_opaque = _include_literals(txt, code=vparse.blank_noncode(txt))
         for lit in lits:
             if not os.path.exists(os.path.normpath(
                     os.path.join(os.path.dirname(path) or ".", lit))):
@@ -3481,7 +3831,41 @@ def _check_opaque_includes(rep, pdir, contract):
                      f"path a static reader can follow, so every Verus-side "
                      f"detector would report on a file set that is missing the "
                      f"spliced tokens. That is TASK_098 §4A's route with the "
-                     f"resolution step removed. Use a literal path.")
+                     f"resolution step removed. WHAT TO DO: if the argument is "
+                     f"a literal you can write, write it. If it is the "
+                     f"build-script idiom (`concat!`/`env!(\"OUT_DIR\")`) there "
+                     f"is no literal to write and there is no build script "
+                     f"either -- `build.py` invokes rustc directly and sets no "
+                     f"`OUT_DIR` -- so the generated file cannot be part of a "
+                     f"rung at all: commit the generated code as a real `.rs` "
+                     f"in the pattern directory (its generator belongs in "
+                     f"`controls/`, which the gate hashes) and `include!` THAT "
+                     f"by a literal path. If you are QUOTING the idiom to "
+                     f"explain it, put it in a comment or a string -- since "
+                     f"TASK_107 this check reads code only and will not see "
+                     f"it.")
+    # LAST, so that a root with a concrete include defect is diagnosed by the
+    # message that names the defect and this one reads as the corollary it is:
+    # a root rustc cannot expand produces no `.d`, and a broken `include!`/`mod`
+    # in that root is the commonest cause.
+    for rel, cfgs, err in dep_errors:
+        rep.fail("tcb-unsafe",
+                 f"{rel}: `{buildmod.RUSTC} --emit=dep-info"
+                 + ("".join(f' --cfg {c}' for c in cfgs))
+                 + f"` produced no dep-info file, so the compiler's own module "
+                 f"resolution is unavailable for this root and the gate would "
+                 f"be judging it on the REGEX WALK ALONE. That walk is known "
+                 f"to miss `#[cfg_attr(all(), path=...)]`, `#[path = "
+                 f"r\"...\"]` and `mod x {{ mod m; }}` (TASK_103, re-measured "
+                 f"at TASK_107), so this run cannot certify the file set: "
+                 f"FAILING CLOSED rather than falling back silently. Note "
+                 f"rustc writes the `.d` even when compilation FAILS -- all 26 "
+                 f"patterns' Verus sources produce one despite `E0433: cannot "
+                 f"find module or crate 'vstd'` -- so the causes that reach "
+                 f"here are a root rustc cannot PARSE or EXPAND (a broken "
+                 f"`include!`/`mod` above is the commonest, and will have its "
+                 f"own failure line), or rustc itself being absent. rustc "
+                 f"said: {err}")
 
 
 def _verus_file_list(pdir, srcs):
@@ -6808,6 +7192,24 @@ def _miri_sysroot():
     return r.stdout.strip() if r.returncode == 0 and r.stdout.strip() else None
 
 
+def _miri_version():
+    """`miri --version`, recorded beside the Miri verdicts.
+
+    TASK_107. Miri runs at its DEFAULT configuration (see `MIRI_FLAGS` for the
+    4.6x measurement that forbids setting `MIRIFLAGS` here), and that default's
+    address assignment is deterministic **for a given miri** -- so the version
+    is the thing a future reader needs in order to know whether a green row is
+    reproducible. It is also, concretely, what went stale:
+    `.memory/00-environment.md`'s seed sentence was measured at TASK_102 and
+    does not reproduce now, and the miri build is the only thing that moved."""
+    try:
+        r = subprocess.run([MIRI_BIN, "--version"], capture_output=True,
+                           text=True, timeout=120)
+        return r.stdout.strip() or None
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+
+
 def _trusted_items(pdir, contract):
     """{pinned Verus source: [trusted item names]} -- `_is_trusted` applied to
     every file `verus.obligations` names. Used by the Miri policy, which is now
@@ -6944,6 +7346,178 @@ def _hung_rungs(advtable, input_name):
     return hung, measured
 
 
+# ==========================================================================
+# 9. the PUBLISHED sidecars -- `results/tables/` and `controls/*.json`
+# ==========================================================================
+
+# `harness/report.py::audit_section` writes exactly this line into every table,
+# and this is the only 12-hex string in the file whose meaning is fixed:
+#
+#   Measured by the gate, ... from `results/gate/<pattern>.json`, contract
+#   `<12 hex>`.
+#
+# ⚠ MATCH THAT LINE, NOT "any 12-hex token in the file". A table's `why` block
+# quotes md5 prefixes (`e207ec6c8697`, `da08af26d9b1`, ...), so a loose scan
+# both false-positives and false-negatives -- and computing from the prose
+# instead of from the artefact is the exact failure `.memory/03-measurement.md`
+# records against the manager's own 64-vs-87 arithmetic.
+_TABLE_CONTRACT_RE = (r"from `results/gate/{pat}\.json`, contract "
+                      r"`([0-9a-f]{{12}})`")
+
+
+def check_published_tables(pdir, rep, contract_sha):
+    """Is this pattern's published table present, and does it cite THIS
+    contract?
+
+    RECAP owed-item 23 predicted its own recurrence in those words -- *"nothing
+    will detect the NEXT three: `results/tables/` is still in no hash set, so
+    `--check-stale` remains blind to it. This item will recur."* **It recurred,
+    and it took 16 tasks**: `results/tables/p09-bitset.md` cited `0a37c0cd1418`
+    while its record said `ea0295eaea6a`, two contract moves later. Then `p23`
+    shipped with **no table at all** and nothing noticed.
+
+    ⚠⚠ **WHY THIS IS HERE AND NOT IN `measure.py`.** `measure.py::check_stale`
+    is the natural home -- it already globs `results/*.json` and
+    `results/gate/p*.json` and nothing else -- and it is the WRONG home, because
+    `measure.py` is inside `measure.py::measurement_sources`. An edit there
+    makes every `results/pNN-*.json` stale and costs a full matrix re-measure,
+    which re-takes the wall-clock block and moves published timing prose, for a
+    **bookkeeping** check. `check.py` is not measurement-hashed, so this costs
+    the gate sweep that a `check.py` edit was already going to cost.
+
+    ⚠ **ITERATE OVER PATTERNS, NOT OVER TABLES.** `.temp/mgr99/tables_stale.py`
+    globbed `results/tables/*.md` and so reported *"24 checked, 0 STALE"* on a
+    25-pattern tree: a checker that can only see the files it is checking cannot
+    report an absent one. Living in a per-pattern gate stage makes that
+    structural rather than remembered -- the iteration IS the pattern list, and
+    a pattern with no table fails its own gate.
+
+    **Both failure modes fail, and each names its one-command fix.** The fix is
+    the same command in both cases and it does not need a green run: `check.py`
+    writes `results/gate/<pattern>.json` even when the verdict is FAIL (only a
+    `--skip`/`--no-*` PARTIAL run is diverted to `.temp/`), so the loop is
+    *gate -> `harness/report.py pNN` -> gate*, twice, with no re-measure and no
+    `contract_sha256` move.
+
+    **"Could this happen by accident?"** -- the threat model's first question
+    (`.memory/02-bench-rules.md`). It happened by accident twice, which is the
+    point; and it fires on **nobody** in the tree as it stands: 26 of 26 tables
+    exist and 26 of 26 cite the current contract, verified before landing this.
+    """
+    head("9. the published table cites THIS contract")
+    pat = os.path.basename(pdir)
+    tbl = os.path.join(REPO, "results", "tables", f"{pat}.md")
+    out = {"table": os.path.relpath(tbl, REPO), "contract_sha256": contract_sha}
+    if not os.path.exists(tbl):
+        out["verdict"] = "MISSING"
+        rep.fail("tables",
+                 f"results/tables/{pat}.md does NOT EXIST. The pattern is "
+                 f"built and gated and a reader has nowhere to find its "
+                 f"result -- which is `PROTOCOL.md` rule 1's fourth step, and "
+                 f"`p23` shipped exactly this way with nothing noticing. Fix: "
+                 f"`harness/report.py {pat.split('-')[0]}`. It renders FROM "
+                 f"`results/gate/{pat}.json`, which this run writes even if "
+                 f"the verdict is FAIL, so run it after this run and gate "
+                 f"again.")
+        return out
+    cited = re.findall(_TABLE_CONTRACT_RE.format(pat=re.escape(pat)),
+                       open(tbl).read())
+    out["cited"] = cited
+    if not cited:
+        out["verdict"] = "UNPINNED"
+        rep.fail("tables",
+                 f"results/tables/{pat}.md cites no `contract_sha256` at all, "
+                 f"so nothing can tell whether its numbers describe this "
+                 f"declaration or a superseded one. `report.py::audit_section` "
+                 f"emits that line on every render, so a table without it "
+                 f"predates the mechanism. Fix: `harness/report.py "
+                 f"{pat.split('-')[0]}`.")
+    elif contract_sha[:12] not in cited:
+        out["verdict"] = "STALE"
+        rep.fail("tables",
+                 f"results/tables/{pat}.md is STALE: it cites contract "
+                 f"{cited} and `spec.md`'s `slb-contract` block now hashes to "
+                 f"{contract_sha[:12]}. The declaration above the numbers and "
+                 f"the numbers themselves are describing DIFFERENT "
+                 f"declarations -- `p09` shipped two contract moves stale for "
+                 f"16 tasks. Fix: `harness/report.py {pat.split('-')[0]}` "
+                 f"(no gate re-run needed for the render itself, no "
+                 f"re-measure, and `contract_sha256` does not move).")
+    else:
+        out["verdict"] = "FRESH"
+        rep.ok(f"results/tables/{pat}.md exists and cites contract "
+               f"{contract_sha[:12]}, which is this run's")
+    return out
+
+
+def check_control_json_pins(pdir, rep, source_sha):
+    """`patterns/*/controls/*.json` -- a published sidecar with no staleness pin.
+
+    `synthesis/licence.json` is the shape to copy: it carries the gate
+    `source_sha256` it was taken against, and `synthesize.py` prints
+    `LICENCE STALE` when the record has moved under it. `p23` ships
+    `controls/sweep_fit.json` -- 26 measured rows and two fits, quoted in its
+    `NOTES.md` -- and it carries nothing.
+
+    ⚠ **This stage is the READER. It cannot add the pin**, because the pin has
+    to be written by the generator (`controls/*.py`), and TASK_107's constraints
+    forbid editing anything under `patterns/`. So a sidecar with no
+    `gate_source_sha256` is SHOUTED, not failed: failing would paint `p23` red
+    for a fix this task was not allowed to make, and a red gate nobody can clear
+    is how gates get switched off (`check_miri`'s own "a missing tool blocks a
+    row, it does not fail the pattern").
+
+    A sidecar that DOES carry the key is checked, and a mismatch FAILS -- that
+    half is live the moment a generator starts writing it.
+    ⚠ Note `controls/*.py` is in the GATE record's `source_sha256` and **not**
+    in `measure.py::measurement_sources`, so adding the pin costs one gate
+    re-run and no re-measure. Verified by reading both source lists."""
+    head("9b. controls/*.json staleness pins")
+    cdir = os.path.join(pdir, "controls")
+    out = {}
+    if not os.path.isdir(cdir):
+        print("    no controls/ directory")
+        return out
+    blobs = sorted(f for f in os.listdir(cdir) if f.endswith(".json"))
+    if not blobs:
+        print("    controls/ ships no .json sidecar")
+        return out
+    for f in blobs:
+        rel = os.path.relpath(os.path.join(cdir, f), REPO)
+        try:
+            doc = json.load(open(os.path.join(cdir, f)))
+        except (OSError, ValueError) as e:
+            out[f] = "UNREADABLE"
+            rep.fail("tables", f"{rel}: not readable as JSON ({e})")
+            continue
+        pin = doc.get("gate_source_sha256") if isinstance(doc, dict) else None
+        if pin is None:
+            out[f] = "UNPINNED"
+            rep.shout("tables",
+                      f"{rel} carries NO staleness pin, so nothing can tell "
+                      f"whether its numbers were taken against the sources "
+                      f"that are in the tree now. `synthesis/licence.json` is "
+                      f"the shape to copy: a top-level `gate_source_sha256` "
+                      f"equal to this record's `source_sha256`, written by the "
+                      f"generator that emits the file. Until then treat every "
+                      f"figure quoted from it as UNDATED.")
+        elif pin != source_sha:
+            out[f] = "STALE"
+            moved = sorted(k for k in set(pin) | set(source_sha)
+                           if pin.get(k) != source_sha.get(k)) \
+                if isinstance(pin, dict) else []
+            rep.fail("tables",
+                     f"{rel} is STALE: it was taken against a different "
+                     f"`source_sha256`"
+                     + (f" ({len(moved)} file(s) moved: {moved[:5]})"
+                        if moved else "")
+                     + f". Re-run its generator in `controls/` and re-emit.")
+        else:
+            out[f] = "FRESH"
+            rep.ok(f"{rel} pins this run's `source_sha256`")
+    return out
+
+
 def check_miri(pdir, rep, contract, identity, modmod, indir, names,
                advtable=None):
     """`.memory/02-bench-rules.md`: Miri is mandatory for any pattern that has a
@@ -7004,7 +7578,23 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names,
     axioms = _axiom_items(pdir, contract)
     n_axioms = sum(len(v) for v in axioms.values())
     out = {"pair": pair, "identity_o3": level, "inherits_proof": inherits,
-           "trusted_items": trusted, "axiom_decls": axioms}
+           "trusted_items": trusted, "axiom_decls": axioms,
+           # TASK_107 §C: WHAT RAN. The old defect was not the seed; it was that
+           # nothing recorded which seed answered, so *"no UB"* meant "no UB at
+           # whatever draw miri felt like". `overridden_ambient` is here because
+           # the flags are set, not appended: if the invoking shell exported its
+           # own `MIRIFLAGS` the record must say the gate ignored it, or the
+           # recorded string would be a claim about a run that did not happen.
+           # `null` means the variable is UNSET in the child, which is not the
+           # same configuration as `""` -- measured 74 s against 340 s on p42.
+           "miriflags": " ".join(MIRI_FLAGS) or None,
+           "miriflags_removed_ambient": os.environ.get("MIRIFLAGS"),
+           # The thing that actually moved between TASK_102 and TASK_107. Miri's
+           # unseeded default address assignment is deterministic *for a given
+           # miri*, so the version is what makes a green row reproducible; the
+           # seed sentence in `.memory/00-environment.md` went stale because
+           # this string changed, not because a draw did.
+           "miri_version": _miri_version()}
 
     # DERIVED, and it overrides the declared flag in one direction only: the
     # flag can add Miri, never remove it.
@@ -7104,6 +7694,15 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names,
 
     out["required"] = True
     print(f"    Miri is REQUIRED because: " + "; ".join(why_required))
+    print(f"    MIRIFLAGS = "
+          + (" ".join(MIRI_FLAGS) if MIRI_FLAGS else
+             "<UNSET>  -- deliberately, not by omission: setting it AT ALL, "
+             "even to \"\", costs 4.6x on p42 (74 s -> 340 s, past the "
+             f"{MIRI_TIMEOUT}s budget). See MIRI_FLAGS.")
+          + (f"   (REMOVING the ambient MIRIFLAGS="
+             f"{os.environ['MIRIFLAGS']!r})"
+             if os.environ.get("MIRIFLAGS") else "")
+          + f"\n    miri      = {_miri_version()}")
     srcs = cfg.get("sources") or [buildmod.RUST_SRC.get(a, f"{a}.rs")]
     # source file -> the matrix rung stage 4 measured, so a per-input hang
     # declaration can be tested against the rung Miri is about to interpret
@@ -7256,10 +7855,23 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names,
                       f"{sorted(hung)} and NOT in {rung!r} -- running Miri "
                       f"instead of blocking the row (TASK_077).")
             try:
+                # ⚠ `MIRIFLAGS` is REMOVED when `MIRI_FLAGS` is empty, and SET
+                # (never appended) when it is not. Both halves matter and the
+                # first is the surprising one: `MIRIFLAGS=""` is a DIFFERENT
+                # configuration from `MIRIFLAGS` unset -- 339.8 s against 74.0 s
+                # on p42's `adversarial-wincap.bin` -- so `menv["MIRIFLAGS"] =
+                # " ".join(())` would have quietly cost 4.6x and blocked a row.
+                # An ambient value from the invoking shell is discarded for the
+                # same reason and recorded in `miriflags_removed_ambient`.
+                menv = dict(os.environ)
+                menv.pop("MIRIFLAGS", None)
+                if MIRI_FLAGS:
+                    menv["MIRIFLAGS"] = " ".join(MIRI_FLAGS)
                 r = subprocess.run(
                     [MIRI_BIN, "--sysroot", sysroot, "--edition", "2021",
                      "-Zmiri-disable-isolation", spath, "--", probe],
-                    capture_output=True, text=True, timeout=MIRI_TIMEOUT, cwd=pdir)
+                    capture_output=True, text=True, timeout=MIRI_TIMEOUT,
+                    cwd=pdir, env=menv)
             except subprocess.TimeoutExpired:
                 why = (f"miri did not finish within {MIRI_TIMEOUT}s. `n_iters` "
                        f"is clamped to {MIRI_PROBE_ITERS} but the payload is "
@@ -7521,6 +8133,15 @@ def main():
                   + glob.glob(os.path.join(REPO, "common", "*.py"))
                   + glob.glob(os.path.join(REPO, "common", "layout", "*.py"))
                   + glob.glob(os.path.join(REPO, "verus_run.py")))
+    source_sha = {os.path.relpath(s, REPO): sha256_file(s)
+                  for s in srcs if os.path.isfile(s)}
+    # TASK_107 §E. LAST, and after `source_sha` exists because 9b compares
+    # against it. These are PUBLISHING checks, not correctness ones -- see
+    # `check_published_tables` for why they are in `check.py` rather than in
+    # `measure.py` (measurement-hashed) or in a standalone script (nothing runs
+    # it, which is how item 23 recurred twice).
+    tables = check_published_tables(pdir, rep, contract_sha)
+    ctljson = check_control_json_pins(pdir, rep, source_sha)
     doc = {
         "pattern": os.path.basename(pdir),
         "skipped_inputs": a.skip,
@@ -7548,8 +8169,7 @@ def main():
         # docstring says why `forbidden` carries a verdict and `required`
         # cannot.
         "idiom_audit": audit,
-        "source_sha256": {os.path.relpath(s, REPO): sha256_file(s)
-                          for s in srcs if os.path.isfile(s)},
+        "source_sha256": source_sha,
         "derived_contract": {"requires": reqs, "ensures": enss,
                              # the harness default, and the rate actually used:
                              # a pattern's model.py may declare its own
@@ -7571,6 +8191,21 @@ def main():
                              "collapse_tightest_margin":
                                  slopes.pop("_tightest_margin", None)},
         "identity": identity,
+        # TASK_107 §D (decided TASK_103): WHICH DRAW THIS RUN TOOK on the axis
+        # `marginal_ir_per_call` moves along. `-O3 isolated` is NOT invariant --
+        # it moves +-7 per rung with the length of the environment block, and
+        # the pair swing is 14 -- so "re-run the gate and compare" is not a
+        # reproduction test unless the two runs' environments are known.
+        # The rule this key enables:
+        #   same `bytes` AND same `tuning_vars` => the marginal must match
+        #       EXACTLY, and a mismatch is a real change;
+        #   different `bytes`                   => compare `kernel_exclusive_ir`
+        #       (in `results/pNN-*.json`, structurally immune: 0 of 288 triples
+        #       moved) or re-run at the recorded length;
+        #   same `bytes`, different `tuning_vars` => NOT comparable at all.
+        #       Measured: +486.00 Ir/call at an identical block length.
+        # ⚠ It records; it does not pin. See `_env_block`.
+        "marginal_ir_env": slopes.pop("_env_block", None),
         "marginal_ir_per_call": slopes,
         "verus": verus_res,
         "verified_call_site": callsite,
@@ -7587,6 +8222,10 @@ def main():
         "adversarial": advtable,
         "sanitizer": san,
         "miri": miri,
+        # TASK_107 §E: the two published sidecars nothing had a detector for.
+        # RECAP owed-item 23 predicted its own recurrence and was right twice.
+        "published_table": tables,
+        "controls_json": ctljson,
         "failures": [{"section": s, "message": m} for s, m in rep.failures],
         "notes": rep.notes,
         "loud": [{"section": s, "message": m} for s, m in rep.loud],

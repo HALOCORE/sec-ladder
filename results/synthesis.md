@@ -179,23 +179,23 @@ sweep says the callee moves -- but its MAGNITUDE is a phase, so quote the
 support, never the draw.
 
 
-**Calibration, recomputed on every run of this file** — the derived column scored against `synthesis/outward_ir.json`, a callgrind caller→callee sweep, at the 2.00 `Ir` floor: **208 rows, 194 hit, 0 miss (the dangerous direction), 14 false alarm**; residual median **0.18**, p95 **7.00**, max **15.79**.
+**Calibration, recomputed on every run of this file** — the derived column scored against `synthesis/outward_ir.json`, a callgrind caller→callee sweep, at the 2.00 `Ir` floor: **208 rows, 188 hit, 4 miss (the dangerous direction), 16 false alarm**; residual median **0.30**, p95 **7.00**, max **15.79**. ⚠ Misses: p03 small R3-R4 -7.00, p03 large R3-R4 -7.00, p04 small R3-R4 -7.00, p04 large R3-R4 -7.00.
 
 **So the column has three bands, and they are measured on every run rather than chosen** — each row sorted by `|correction|` against whether the sweep says the row moves at all:
 
 | band | rows | real | spurious | smallest \|correction\| | reading |
 |---|---:|---:|---:|---:|---|
-| `< 2.00` (blank / `<2.00`) | 143 | 0 | 143 | 0.00 | **not safe — this is one environment phase.** ⚠ See `‡` |
-| `2.00 … 16.00` (marked **?**) | 24 | 10 | 14 | 2.00 | **a coin flip — do not quote alone** |
+| `< 2.00` (blank / `<2.00`) | 143 | 4 | 139 | 0.00 | **not safe — this is one environment phase.** ⚠ See `‡` |
+| `2.00 … 16.00` (marked **?**) | 24 | 8 | 16 | 2.00 | **a coin flip — do not quote alone** |
 | `≥ 16.00` (**bold**) | 41 | 41 | 0 | 17.00 | **every one is real** |
 
 ⚠⚠ **THE `< 2.00` BAND'S OWN CLAIM WAS FALSE, AND THIS IS THE CORRECTION.** It read *"safe: nothing real hides below the floor"*, scored `0 real / 120 spurious`. Both numbers are right **about the environment this run was taken in**, and the adjective was not: **p03's and p04's `R3-R4` correction is `0.00` — blank, in this band — at 16 of 32 environment phases and `±7.00` at the other 16**, three and a half times the floor. A band scored at one draw cannot certify the absence of a term that is invisible at that draw. The rows that carry it are marked `‡` below; the band is otherwise unchanged and still means *the derived route cannot resolve this*.
 
 ⚠ **The middle band is where p03, p04, p07 and p22 live.** On p03 and p04 `R5-R4` the derived route was reporting `+6.00`, one draw from `{−8.00, −1.00, +6.00}` — **tied with its own sign-reverse** — and those four cells are now **withdrawn** rather than marked **?**: `?` means *look further*, and there is nothing further to look at. Treat a surviving **?** as *"look with the licence or a callgrind run"*, never as a figure.
 
-⚠ **That sidecar is the only thing in this file with no staleness pin**: `licence.json` carries the gate `source_sha256` it was taken against and prints `LICENCE STALE` on a mismatch, but `outward_ir.json` carries nothing, and re-emitting it costs 352 callgrind runs against a fully built `.temp/build/`. That is precisely why it calibrates a column here and no longer **is** one.
+✅ **`synthesis/outward_ir.json` is FRESH** — all 26 entries carry the gate `source_sha256` they were taken against and every one still matches (TASK_107 §F; the key and the check are copied from `licence.json`, which is why `LICENCE STALE` and this line now mean the same thing). It was once found **three patterns stale, 22 entries against 25**, and this file's own text said the pin did not exist — a warning where a detector was wanted. Re-emitting costs 352 callgrind runs against a fully built `.temp/build/`, which is why it calibrates a column here and no longer **is** one.
 
-**And the LICENCE TAG scored against the same sweep, also recomputed here**: **181 hit, 15 false `LICENSED` (the dangerous direction), 2 false alarm, 10 abstain**. The smallest movement under a `NOT-LIC` verdict is **0.00 `Ir`/call**, so *0 false alarms* is robust to any tolerance below that and is not an artefact of the 5e-3 cut.
+**And the LICENCE TAG scored against the same sweep, also recomputed here**: **179 hit, 17 false `LICENSED` (the dangerous direction), 2 false alarm, 10 abstain**. The smallest movement under a `NOT-LIC` verdict is **0.00 `Ir`/call**, so *0 false alarms* is robust to any tolerance below that and is not an artefact of the 5e-3 cut.
 
 ⚠ **`0 false alarms` is a statement about this sweep, not about the rule** (TASK_075_REVIEW M4) — which is why this line is recomputed rather than quoted. Correcting one thing the rule got right for a contradicted reason (`kernel.cold`, below) moved the score from `156 / 10 / 0 / 10` to `154 / 12 / 0 / 10` **in this task**, by converting p27's `gcc-clang` from a lucky `NOT-LIC` into an honest false `LICENSED`. The false-alarm zero survived; the hit count did not. A second sweep under a **longer environment block** reads `152 / 14 / 0 / 10`, the excess being p03's and p04's `memset` term — **so the published triple is one draw and `0 false alarms` is the part that holds across both of them.**
 
@@ -599,7 +599,7 @@ p18   large        -12.00         0.00       -12.00
 
 **Licence tag and `why`** — `synthesis/licence.json`, emitted by `synthesis/licence.py` from the built `-O3 isolated` matrix. Each entry carries the gate `source_sha256` it was taken against; a mismatch prints `LICENCE STALE` above instead of a verdict. It answers *may this row be differenced*, never *by how much* — a different question from the derived column, not a second route to it.
 
-**Calibration of the derived column** — `synthesis/outward_ir.json`, emitted by `synthesis/outward_ir.py`, one callgrind run per cell, parsing the caller→callee edges the annotation discards. It is scored against the derived column on every run of this file (§2) and supplies **no published figure**. ⚠ It carries **no staleness pin at all**, which is why it is not a column.
+**Calibration of the derived column** — `synthesis/outward_ir.json`, emitted by `synthesis/outward_ir.py`, one callgrind run per cell, parsing the caller→callee edges the annotation discards. It is scored against the derived column on every run of this file (§2) and supplies **no published figure**. ⚠ Until TASK_107 it carried **no staleness pin at all**; it now carries the gate `source_sha256` per pattern, the same key `licence.json` uses, and §2 prints its status on every run. It stays a calibration rather than a column because re-emitting it needs 352 callgrind runs against a fully built `.temp/build/`.
 
 **R3/R4 search state** — two things side by side, because neither alone is honest.
 

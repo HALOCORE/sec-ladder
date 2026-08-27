@@ -68,7 +68,25 @@ import vparse
 
 TWIN_PREFIX = "slb_twin_"
 TWIN_CFG = "slb_twin"
-TWIN_BANNED = ("unsafe", "assume", "admit", "assume_specification", "external")
+# ⚠⚠ **IMPORTED, NOT COPIED -- and it was a COPY, and the copy was WRONG.**
+# This tuple read
+#
+#     ("unsafe", "assume", "admit", "assume_specification", "external")
+#
+# from TASK_056 until TASK_107, while `check.py::_TWIN_BANNED` also carries
+# **`"external_body"`**. The words are matched with `\b<w>\b` and `_` is a word
+# character, so `\bexternal\b` does NOT match `external_body`: this tool
+# under-reported the `5ct-cfg` limb on exactly the twin cheat that limb exists
+# to catch -- a twin that re-declares itself trusted. Reported at TASK_098,
+# unfixed until now, and it is entry 3 on `.memory/03-measurement.md`'s list of
+# controls that could not have fired.
+#
+# The fix is the import rather than the missing string, because this file's own
+# docstring says why: it RE-DERIVES `check.py`'s comparison, so a divergence
+# makes every `NOTES.md` sentence citing it silently wrong. A copy can drift; a
+# name cannot. (`check.py` does not import `limbs.py`, so there is no cycle.)
+import check as _check                                          # noqa: E402
+TWIN_BANNED = _check._TWIN_BANNED
 
 
 def contract(pdir):
@@ -83,8 +101,7 @@ def clauses(it, kw):
 
 def is_trusted(it):
     """`check.py::_is_trusted`, imported rather than copied."""
-    import check as _c
-    return _c._is_trusted(it)
+    return _check._is_trusted(it)
 
 
 def verus(path, *extra):

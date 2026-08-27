@@ -309,9 +309,28 @@ Known residuals we are deliberately **not** closing, all measured:
   main.d: main.rs h.rs x/y.rs        # on a main.rs containing BOTH R7a and R7c
   ```
 
-  **Owed:** replace the regex walk with `--emit=dep-info`. ⚠ **Until then the
-  route table must not be presented as exhaustive**, and these three belong on
-  the accepted-residual list rather than in a "closed" claim.
+  ✅⚠ **DONE AT TASK_107 — AND "REPLACE THE REGEX WITH dep-info" WAS WRONG. IT IS
+  A *UNION*, AND THE MANAGER'S DOUBT WAS THE RIGHT ONE TO NAME.** dep-info
+  answers for **rustc's** module graph, and **Verus is a different front end**:
+
+  ```
+  14 routes x 3 instruments        dep-info alone   regex alone   UNION
+                                       10/13           10/13      13/13
+  ```
+
+  ⚠⚠ **dep-info alone misses a TENTH AND ELEVENTH ROUTE — `#[path] mod` and
+  `include!` placed INSIDE `verus!{}`** — because **rustc cannot expand the
+  `verus!` proc macro**, so the leaf never reaches the dependency file. Verus
+  reports `1 verified, 0 errors` with the leaf's `unsafe` unscanned. **The regex
+  alone misses the three `#[path]`-spelling routes.** ✅ **`_path_includes` is now
+  the UNION of both, fail-closed on a missing `.d`**, and the census over 26
+  patterns reads **dep-info adds 0, misses 0, and 0 roots lack a `.d`.**
+
+  ⚠ **The transferable lesson: when you replace a hand-rolled approximation with
+  "ask the compiler", check WHICH compiler the question is about.** Here the
+  authority for the file set is Verus, and rustc's answer is necessary but not
+  sufficient — the same shape as *"a `vstd/<mod>.rs` trait declaration is not the
+  specification"*.
 
   ⚠⚠ **AND `_check_opaque_includes` FALSE-POSITIVES ON EVERY COMMENT SHAPE —
   5 of 5, and it turns the gate RED.** It reads the **raw** text.

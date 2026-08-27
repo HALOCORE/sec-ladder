@@ -526,6 +526,20 @@ def calibrate(meas, gates, outw):
     if not outw:
         return None
     s = {"rows": 0, "hit": 0, "miss": 0, "false alarm": 0}
+    # TASK_107 §F: the staleness pin `outward_ir.json` did not have. Same
+    # comparison `licence.json` already gets 20 lines below -- the sidecar
+    # carries the gate `source_sha256` it was taken against, and a mismatch
+    # means its rows describe sources that are no longer in the tree. It was
+    # found THREE PATTERNS STALE (22 entries against 25) with nothing able to
+    # say so, and `results/synthesis.md` printed the ABSENCE of the pin as a
+    # caveat in its own text -- a warning is not a detector.
+    s["stale"] = sorted(
+        p for p, d in outw.items()
+        if isinstance(d, dict) and d.get("gate_source_sha256")
+        and p in gates and d["gate_source_sha256"] != gates[p].get("source_sha256"))
+    s["unpinned"] = sorted(
+        p for p, d in outw.items()
+        if isinstance(d, dict) and not d.get("gate_source_sha256"))
     # bands[name] = [rows, real, spurious, smallest |correction| in the band]
     bands = {b: [0, 0, 0, None] for b in ("low", "mid", "high")}
     resid, misses = [], []
@@ -854,12 +868,34 @@ def main():
           "look at. Treat a surviving **?** as *\"look with the licence or a "
           "callgrind run\"*, never as a figure.")
         w("")
-        w("⚠ **That sidecar is the only thing in this file with no staleness "
-          "pin**: `licence.json` carries the gate `source_sha256` it was taken "
-          "against and prints `LICENCE STALE` on a mismatch, but "
-          "`outward_ir.json` carries nothing, and re-emitting it costs 352 "
-          "callgrind runs against a fully built `.temp/build/`. That is "
-          "precisely why it calibrates a column here and no longer **is** one.")
+        # TASK_107 §F. This paragraph used to read "⚠ That sidecar is the only
+        # thing in this file with no staleness pin", which was true and was a
+        # WARNING rather than a DETECTOR -- the sidecar was found three patterns
+        # stale (22 entries against 25) with nothing able to report it. It now
+        # carries `gate_source_sha256` per pattern, the same key
+        # `licence.json` has, and the status is computed on every run.
+        if cal["stale"] or cal["unpinned"]:
+            w(f"⚠⚠ **`synthesis/outward_ir.json` IS STALE against the gate "
+              f"records, so the calibration above is scored partly on rows "
+              f"taken against sources that have since moved.**"
+              + (f" **STALE: {', '.join(cal['stale'])}.**" if cal["stale"]
+                 else "")
+              + (f" **No pin at all (emitted before TASK_107): "
+                 f"{', '.join(cal['unpinned'])}.**" if cal["unpinned"] else "")
+              + f" Re-emit with `synthesis/outward_ir.py --emit "
+              f"synthesis/outward_ir.json` against a fully built `.temp/build/` "
+              f"(352 callgrind runs), then re-run this file.")
+        else:
+            w(f"✅ **`synthesis/outward_ir.json` is FRESH** — all "
+              f"{len(outw)} entries carry the gate `source_sha256` they were "
+              f"taken against and every one still matches (TASK_107 §F; the "
+              f"key and the check are copied from `licence.json`, which is why "
+              f"`LICENCE STALE` and this line now mean the same thing). It was "
+              f"once found **three patterns stale, 22 entries against 25**, "
+              f"and this file's own text said the pin did not exist — a "
+              f"warning where a detector was wanted. Re-emitting costs 352 "
+              f"callgrind runs against a fully built `.temp/build/`, which is "
+              f"why it calibrates a column here and no longer **is** one.")
         w("")
         lc = calibrate_licence(meas, lic, outw)
         if lc:
@@ -1461,8 +1497,11 @@ def main():
       "emitted by `synthesis/outward_ir.py`, one callgrind run per cell, "
       "parsing the caller→callee edges the annotation discards. It is scored "
       "against the derived column on every run of this file (§2) and supplies "
-      "**no published figure**. ⚠ It carries **no staleness pin at all**, "
-      "which is why it is not a column.")
+      "**no published figure**. ⚠ Until TASK_107 it carried **no staleness pin "
+      "at all**; it now carries the gate `source_sha256` per pattern, the same "
+      "key `licence.json` uses, and §2 prints its status on every run. It "
+      "stays a calibration rather than a column because re-emitting it needs "
+      "352 callgrind runs against a fully built `.temp/build/`.")
     w("")
     w("**R3/R4 search state** — two things side by side, because neither alone "
       "is honest.")

@@ -135,10 +135,10 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "da3887bb56c1ae44a9b0cd8bcaa98118a77e8dc218d8cc993b4708ef278185f4",
+    "harness/check.py": "88d1ec48e352e782755381936ea6400842215be69a005650d79114de6a3edb14",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
-    "harness/limbs.py": "140a0354d35970059b2948e986fa5744ccb24d50fde19d64e15dde55d4eaa327",
+    "harness/limbs.py": "0c663d4d14806faa88310f7cf523a9ea7f75f42a051ee03572ab3c88b11c06e9",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
@@ -227,6 +227,12 @@
       ]
     }
   ],
+  "marginal_ir_env": {
+    "bytes": 3269,
+    "tuning_vars": {
+      "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
+    }
+  },
   "marginal_ir_per_call": {
     "c-clang/O0/isolated/small.bin": 799.0,
     "c-clang/O0/isolated/large.bin": 49571.74,
@@ -1670,7 +1676,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==1186736==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x506000000060 at pc 0x560cdd079f13 bp 0x7ffc9bbe1080 sp 0x7ffc9bbe0828 WRITE of size 65 at 0x506000000060 thread T0 #0 0x560cdd079f12 in __interceptor_memcpy (/home/",
+      "diagnostic": "================================================================= ==1794680==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x506000000060 at pc 0x55bea9d84f13 bp 0x7ffd4dc9d2d0 sp 0x7ffd4dc9ca78 WRITE of size 65 at 0x506000000060 thread T0 #0 0x55bea9d84f12 in __interceptor_memcpy (/home/",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1703,7 +1709,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==1186741==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000038 at pc 0x55b9a2b58036 bp 0x7ffc2bae4a70 sp 0x7ffc2bae4218 READ of size 61 at 0x504000000038 thread T0 #0 0x55b9a2b58035 in __interceptor_memcpy (/home/a",
+      "diagnostic": "================================================================= ==1794685==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000038 at pc 0x5593971f2036 bp 0x7fff4a0b91e0 sp 0x7fff4a0b8988 READ of size 61 at 0x504000000038 thread T0 #0 0x5593971f2035 in __interceptor_memcpy (/home/a",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1725,7 +1731,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==1186744==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x527000006a38 at pc 0x5621e0dc6036 bp 0x7ffef6d11730 sp 0x7ffef6d10ed8 READ of size 65535 at 0x527000006a38 thread T0 #0 0x5621e0dc6035 in __interceptor_memcpy (/hom",
+      "diagnostic": "================================================================= ==1794688==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x527000006a38 at pc 0x55f19b3ba036 bp 0x7ffdff6c03f0 sp 0x7ffdff6bfb98 READ of size 65535 at 0x527000006a38 thread T0 #0 0x55f19b3ba035 in __interceptor_memcpy (/hom",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1765,6 +1771,9 @@
       ]
     },
     "axiom_decls": {},
+    "miriflags": null,
+    "miriflags_removed_ambient": null,
+    "miri_version": "rustc 1.99.0-nightly (d453bdd8f 2026-08-14)",
     "required_because": [
       "this pattern has 2 trusted item(s) {'verus.rs': ['copy_bytes', 'get_unchecked']} whose `ensures` need not be COMPLETE with respect to the unchecked operations their bodies perform (TASK_009_REVIEW x4)",
       "spec.md sets miri.required"
@@ -1867,6 +1876,15 @@
       }
     ]
   },
+  "published_table": {
+    "table": "results/tables/p02-buffer-copy.md",
+    "contract_sha256": "5b0a67de468c4c11dab51c13e42b2d9c1766c4362e01f42b1f49e7747230ad78",
+    "cited": [
+      "5b0a67de468c"
+    ],
+    "verdict": "FRESH"
+  },
+  "controls_json": {},
   "failures": [],
   "notes": [
     "adversarial-cap1.bin/c-gcc: opt/mode variants of this rung disagree (2 distinct behaviours)",

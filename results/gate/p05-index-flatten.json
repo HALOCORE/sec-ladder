@@ -73,10 +73,10 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "da3887bb56c1ae44a9b0cd8bcaa98118a77e8dc218d8cc993b4708ef278185f4",
+    "harness/check.py": "88d1ec48e352e782755381936ea6400842215be69a005650d79114de6a3edb14",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
-    "harness/limbs.py": "140a0354d35970059b2948e986fa5744ccb24d50fde19d64e15dde55d4eaa327",
+    "harness/limbs.py": "0c663d4d14806faa88310f7cf523a9ea7f75f42a051ee03572ab3c88b11c06e9",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
@@ -164,6 +164,12 @@
       ]
     }
   ],
+  "marginal_ir_env": {
+    "bytes": 3269,
+    "tuning_vars": {
+      "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
+    }
+  },
   "marginal_ir_per_call": {
     "c-clang/O0/isolated/small.bin": 9263.0,
     "c-clang/O0/isolated/large.bin": 72476.28,
@@ -462,7 +468,7 @@
     "adversarial-dims.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "10863758650581544704",
+        "stdout": "1448785104484935680",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -475,20 +481,7 @@
       },
       {
         "exit": 0,
-        "stdout": "12985145576068374784",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "0",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "16819305193026443264",
+        "stdout": "17774142252707657216",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -501,7 +494,20 @@
       },
       {
         "exit": 0,
-        "stdout": "7241311839747878400",
+        "stdout": "1831988122968602112",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "7461495051049588992",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -516,11 +522,11 @@
     "adversarial-dims.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "1171438489063470336",
+        "stdout": "10480555632097878272",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/whole"
+          "O0/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "0",
@@ -529,7 +535,7 @@
       },
       {
         "exit": 0,
-        "stdout": "13033838575010821120",
+        "stdout": "1171438489063470336",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -542,7 +548,7 @@
       },
       {
         "exit": 0,
-        "stdout": "6735311607847394048",
+        "stdout": "2501008162051042304",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -555,11 +561,11 @@
       },
       {
         "exit": 0,
-        "stdout": "7241311839747878400",
+        "stdout": "8302005302491293440",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/isolated"
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "0",
@@ -1114,7 +1120,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==1194339==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d4 at pc 0x55c9ef0ae7a1 bp 0x7fffe046d660 sp 0x7fffe046d650 READ of size 1 at 0x5070000000d4 thread T0 #0 0x55c9ef0ae7a0 in kernel /home/apt/repos_common/",
+      "diagnostic": "================================================================= ==1802549==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d4 at pc 0x5571eae037a1 bp 0x7ffd45ee76f0 sp 0x7ffd45ee76e0 READ of size 1 at 0x5070000000d4 thread T0 #0 0x5571eae037a0 in kernel /home/apt/repos_common/",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1125,7 +1131,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==1194340==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d8 at pc 0x5647f7b857a1 bp 0x7fff3b230610 sp 0x7fff3b230600 READ of size 1 at 0x5070000000d8 thread T0 #0 0x5647f7b857a0 in kernel /home/apt/repos_common/",
+      "diagnostic": "================================================================= ==1802550==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d8 at pc 0x555de255f7a1 bp 0x7ffec8e3c920 sp 0x7ffec8e3c910 READ of size 1 at 0x5070000000d8 thread T0 #0 0x555de255f7a0 in kernel /home/apt/repos_common/",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1186,6 +1192,9 @@
       ]
     },
     "axiom_decls": {},
+    "miriflags": null,
+    "miriflags_removed_ambient": null,
+    "miri_version": "rustc 1.99.0-nightly (d453bdd8f 2026-08-14)",
     "required_because": [
       "this pattern has 1 trusted item(s) {'verus.rs': ['get_unchecked']} whose `ensures` need not be COMPLETE with respect to the unchecked operations their bodies perform (TASK_009_REVIEW x4)",
       "spec.md sets miri.required"
@@ -1258,6 +1267,15 @@
       }
     ]
   },
+  "published_table": {
+    "table": "results/tables/p05-index-flatten.md",
+    "contract_sha256": "bec4df8251925ce0e76b31a111bf7f22ea0553b7d9432cbb29df482532f6e0bb",
+    "cited": [
+      "bec4df825192"
+    ],
+    "verdict": "FRESH"
+  },
+  "controls_json": {},
   "failures": [],
   "notes": [
     "adversarial-dims.bin/c-gcc: opt/mode variants of this rung disagree (4 distinct behaviours)",

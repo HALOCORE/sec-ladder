@@ -2767,3 +2767,31 @@ tax differs `3.11×`; `dn` alone R² `0.9869`, **`sw` alone R² `0.0132`.**
 
 ⚠ **`τ`'s MECHANISM IS NOT ESTABLISHED** — per-record, periodic, values
 `0/2/3/4`, not disassembled. **Cite it; do not explain it.**
+
+## ⚠⚠ THE ENVIRONMENT-LENGTH PIN IS NECESSARY AND NOT SUFFICIENT — CONTENT MOVES `Ir` TOO
+
+**TASK_107, PROVISIONAL.** `TASK_103` decided to record
+`len(/proc/self/environ)` in the gate record and explicitly left
+**length-versus-content** open. **It is now measured, and content matters more
+than the term the pin was built for:**
+
+```
+child-measured env block = 3332 bytes in BOTH arms
+  GLIBC_TUNABLES=...x86_rep_stosb_threshold=64   ->  3545.00 Ir/call
+  same length of filler                          ->  3059.00 Ir/call
+                                                     +486.00, at IDENTICAL length
+```
+
+⚠⚠ **That is 69× the `±7` the pin was designed to diagnose.** A length-only pin
+would have read *"same draw"* across a 486-instruction difference.
+
+✅ **The shipped field records BOTH**: `marginal_ir_env: {bytes, tuning_vars}`,
+where `tuning_vars` captures the allocator/libc-tuning variables whose *content*
+is known to change codegen paths. ⚠ **`tuning_vars`'s prefix set is derived from
+ONE measurement and is not proved complete** — treat it as a growing list.
+
+✅ **The pin worked on its first live outing:** re-running the chain from an
+interactive shell (`bytes: 3280`) instead of the sweep's (`3269`) — **an 11-byte
+difference, exactly the `OLDPWD` term** — moved p03's published row, **and the
+new field is what says so.** Before it existed, that move was indistinguishable
+from a real change.

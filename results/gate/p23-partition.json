@@ -106,10 +106,10 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "da3887bb56c1ae44a9b0cd8bcaa98118a77e8dc218d8cc993b4708ef278185f4",
+    "harness/check.py": "88d1ec48e352e782755381936ea6400842215be69a005650d79114de6a3edb14",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
-    "harness/limbs.py": "140a0354d35970059b2948e986fa5744ccb24d50fde19d64e15dde55d4eaa327",
+    "harness/limbs.py": "0c663d4d14806faa88310f7cf523a9ea7f75f42a051ee03572ab3c88b11c06e9",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
@@ -199,6 +199,12 @@
       ]
     }
   ],
+  "marginal_ir_env": {
+    "bytes": 3269,
+    "tuning_vars": {
+      "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
+    }
+  },
   "marginal_ir_per_call": {
     "c-clang/O0/isolated/small.bin": 4561.55,
     "c-clang/O0/isolated/large.bin": 2696.18,
@@ -1198,20 +1204,8 @@
         "stderr": "",
         "signal": null,
         "cells": [
+          "O0/isolated",
           "O3/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "2705683097473408",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "2770900832136320",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "2705683097473408",
@@ -1224,20 +1218,8 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "2705683097473408",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "2773544794352384",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/isolated"
+          "O0/whole",
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "2705683097473408",
@@ -1248,7 +1230,7 @@
     "adversarial-single.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "2762968945488128",
+        "stdout": "2764731586965504",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1261,20 +1243,7 @@
       },
       {
         "exit": 0,
-        "stdout": "2785883284694016",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "2705683097473408",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "2798392353243068",
+        "stdout": "2797397313699423",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1287,11 +1256,24 @@
       },
       {
         "exit": 0,
-        "stdout": "2860792827617051",
+        "stdout": "2811440373323180",
         "stderr": "",
         "signal": null,
         "cells": [
           "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2705683097473408",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "2814085003851876",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "2705683097473408",
@@ -1558,7 +1540,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:104:23: runtime error: index 18446744073709551615 out of bounds for type 'uint8_t [64]' ================================================================= ==1381495==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f32be",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:104:23: runtime error: index 18446744073709551615 out of bounds for type 'uint8_t [64]' ================================================================= ==1842108==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f5ca6",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1569,7 +1551,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7fc0ae400060 with insufficient space for an object of t",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f90a1200060 with insufficient space for an object of t",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1580,7 +1562,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f6241200060 with insufficient space for an object of t",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f12b1800060 with insufficient space for an object of t",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1602,7 +1584,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f4db5e00060 with insufficient space for an object of t",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f1fc3a00060 with insufficient space for an object of t",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1665,6 +1647,9 @@
       ]
     },
     "axiom_decls": {},
+    "miriflags": null,
+    "miriflags_removed_ambient": null,
+    "miri_version": "rustc 1.99.0-nightly (d453bdd8f 2026-08-14)",
     "required_because": [
       "this pattern has 3 trusted item(s) {'verus.rs': ['buf_get_unchecked', 'scr_get_unchecked', 'scr_set_unchecked']} whose `ensures` need not be COMPLETE with respect to the unchecked operations their bodies perform (TASK_009_REVIEW x4)",
       "spec.md sets miri.required"
@@ -1767,15 +1752,30 @@
       }
     ]
   },
+  "published_table": {
+    "table": "results/tables/p23-partition.md",
+    "contract_sha256": "8251a6762b1043e4f5b1d7ebeee174a263c3f43467b6befae615e370868816af",
+    "cited": [
+      "8251a6762b10"
+    ],
+    "verdict": "FRESH"
+  },
+  "controls_json": {
+    "sweep_fit.json": "UNPINNED"
+  },
   "failures": [],
   "notes": [
-    "adversarial-single.bin/c-gcc: opt/mode variants of this rung disagree (4 distinct behaviours)",
+    "adversarial-single.bin/c-gcc: opt/mode variants of this rung disagree (2 distinct behaviours)",
     "adversarial-single.bin/c-clang: opt/mode variants of this rung disagree (4 distinct behaviours)"
   ],
   "loud": [
     {
       "section": "tcb-unsafe",
       "message": "verus.rs:325 `scr_set_unchecked`'s `requires` constrains nothing about ['x'], which its trusted body uses. spec.md justifies it: `x` is a pure VALUE parameter: it is stored into the array and is never used as an address, an index or a length, so there is no precondition a caller could usefully be asked for -- every `u8` is a legal thing to store in a `u8` slot. The two parameters that DO decide whether the unchecked store is defined, `v` and `i`, are both constrained by `i < old(v)@.len()`, which for a `&mut [u8; 64]` reads `i < 64`. This is the parameter-coverage false positive `.memory/04-verus.md` names; p03 was the first pattern to exercise it, p12 the second and p06 the third. On p23 the item carries the WRITE half of the bug: it is called twice per exchange, and the store R1 gets wrong is the one it reaches after its DOWNWARD scan has wrapped `j` -- so this `requires` is what excludes an out-of-bounds write that a missing READ guard, one loop earlier, made reachable. A second conjunct `old(v)@.len() == 64` is deliberately NOT written: for a `&mut [u8; 64]` it is a TAUTOLOGY discharged from the parameter type alone by vstd's `array_len_matches_n`, and p03's gate run refused exactly that draft (p03 NOTES.md 5b)."
+    },
+    {
+      "section": "tables",
+      "message": "patterns/p23-partition/controls/sweep_fit.json carries NO staleness pin, so nothing can tell whether its numbers were taken against the sources that are in the tree now. `synthesis/licence.json` is the shape to copy: a top-level `gate_source_sha256` equal to this record's `source_sha256`, written by the generator that emits the file. Until then treat every figure quoted from it as UNDATED."
     }
   ],
   "blocked": [],

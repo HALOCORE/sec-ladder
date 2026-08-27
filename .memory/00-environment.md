@@ -562,7 +562,42 @@ one stale stack root, and `use_stacks=0` removes it at zero measured cost.
 
 ⚠ **All four were found while REFUSING rows, and they outlive the rows.**
 
-### ⚠⚠ `check.py` SETS NO `MIRIFLAGS`, AND MIRI'S ALIGNMENT CHECK IS SEED-DEPENDENT
+### ⚠⚠ SETTING `MIRIFLAGS` AT ALL MAKES MIRI 4.6x SLOWER — AND THE TRIGGER IS THE VARIABLE'S PRESENCE, NOT ITS CONTENT
+
+**TASK_107, PROVISIONAL — and it REVERSED that task's own first decision.**
+Pinning a seed was the obvious fix for the seed-dependence below. **Sweep 1 with
+pinned flags gave `p42` a SECOND blocked Miri row**, reproduced idle. Measured on
+the gate's own probe:
+
+```
+  MIRIFLAGS unset                    74.6 / 73.4 / 74.0 / 73.8 / 73.2 s
+  MIRIFLAGS=""                      339.8 s          <- EMPTY STRING
+  -Zmiri-disable-isolation          342.0 s
+  -Zmiri-provenance-gc=10000        338.2 s
+  -Zmiri-seed=0                     340.4 / 338.3 s
+  symbolic alignment                337.8 / 337.0 s
+  seed + symbolic                   342.7 / 339.0 s
+```
+
+⚠⚠ **SEVEN SETTINGS, ALL ≈4.6×, INCLUDING THE EMPTY STRING. The variable's
+PRESENCE is the trigger; its content is irrelevant. Mechanism OPEN.**
+
+✅ **So the shipped design is `MIRI_FLAGS = ()` — `MIRIFLAGS` deliberately UNSET,
+and any ambient value REMOVED** — with the gate record carrying
+`miri.miriflags`, `miriflags_removed_ambient` and `miri_version` so a reader
+knows what answered. ⚠ **Measured on `p42` and ~0% on 38 rows across five
+patterns; the other 20 patterns are untested.**
+
+⚠ **Consequence for the seed problem below: it is NOT fixed, it is DOCUMENTED.**
+A seed sweep costs 4.6× on the very rows that already time out. **Miri results
+remain one unpinned draw, and now the record says so explicitly rather than
+silently.**
+
+---
+
+**Superseded framing, kept because the seed-dependence itself is real:**
+
+### ⚠ ~~`check.py` SETS NO `MIRIFLAGS`~~, AND MIRI'S ALIGNMENT CHECK IS SEED-DEPENDENT
 
 **This is a live gate defect, not a curiosity.** The **same source** is clean
 under `-Zmiri-seed=0` and `-Zmiri-seed=2` and reports **UB** under

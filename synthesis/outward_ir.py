@@ -203,6 +203,28 @@ def pattern_dir(pat):
     raise KeyError(pat)
 
 
+def _gate_source_sha256(pat):
+    """The gate record's `source_sha256` for `pat`, or `None` if there is no
+    record.
+
+    Copied from `synthesis/licence.py`, deliberately, key name included: the
+    consumer (`synthesize.py::calibrate`) then needs ONE comparison for both
+    sidecars instead of two conventions."""
+    for d in sorted(os.listdir(os.path.join(REPO, "results", "gate"))):
+        # `.partial.json` excluded, exactly as `licence.py` excludes it: a
+        # PARTIAL run certifies strictly less and must not supply the pin. Since
+        # TASK_056 those are written under `.temp/` instead, so this is belt and
+        # braces -- and it is here because the file it copies has it.
+        if (d.startswith(pat + "-") and d.endswith(".json")
+                and not d.endswith(".partial.json")):
+            try:
+                return json.load(open(os.path.join(
+                    REPO, "results", "gate", d))).get("source_sha256")
+            except (OSError, ValueError):
+                return None
+    return None
+
+
 def run_pattern(pat, inp, opt="O3", mode="isolated", cells=None, echo=True):
     rec = record_for(pat)
     if rec is None:
@@ -251,6 +273,20 @@ def main():
     doc = {}
     for pat in pats:
         doc[pat] = {}
+        # ⚠ TASK_107 §F: THE STALENESS PIN THIS FILE'S OWN DOCSTRING SAID IT DID
+        # NOT HAVE. `synthesis/licence.json` is the shape being copied -- carry
+        # the gate `source_sha256` you were taken against, and let the consumer
+        # print STALE on a mismatch (`synthesize.py::calibrate`). Without it the
+        # sidecar was found THREE PATTERNS STALE (22 entries against 25) and
+        # nothing could have said so; `results/synthesis.md` printed the absence
+        # as a caveat in its own text, which is a warning, not a detector.
+        #
+        # Per pattern rather than one top-level key, because the sweep is per
+        # pattern: a re-emit that skips a pattern (no build, no record) leaves
+        # that pattern's OLD entry beside fresh ones, and one global hash cannot
+        # express that. `.get(inp)` is how every consumer reads this level, so
+        # the extra key is inert to all of them.
+        doc[pat]["gate_source_sha256"] = _gate_source_sha256(pat)
         for inp in ("small.bin", "large.bin"):
             r = run_pattern(pat, inp, a.opt, a.mode)
             if r is None:
