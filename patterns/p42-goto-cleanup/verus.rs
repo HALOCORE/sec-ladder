@@ -5,25 +5,44 @@
 //! of every digest byte, the initialisation of every byte read back, and the
 //! legality of the final `dealloc`.
 //!
-//! ⚠⚠ **AND NOT THE ONE THE PATTERN IS ABOUT. READ THIS BEFORE QUOTING THE
-//! ROW.** p42's bug is a heap block that is never released on one path.
+//! ⚠⚠ **AND, SINCE TASK_110, THE PROPERTY THE ROW IS ACTUALLY ABOUT -- WHICH
+//! THIS COMMENT USED TO SAY WAS IMPOSSIBLE. READ THIS BEFORE QUOTING THE ROW.**
+//! Until TASK_110 this paragraph said *"the proof rung of this ladder cannot
+//! state the property the row prices"*, and that claim is RETRACTED: TASK_109
+//! §A built a counterexample on this very file and TASK_110 shipped it. What is
+//! true is narrower and better.
+//!
 //! `vstd::raw_ptr` models the *permission* to release -- `Tracked<Dealloc>` --
 //! and that permission is **AFFINE at the pinned Verus, not linear**: a proof
-//! may simply DROP it. So an R5 that forgot the error path's `dig_free` still
-//! reports `0 errors`. Measured, with a control that fires:
+//! may simply DROP it. So an R5 that holds the token BARE and forgets the error
+//! path's `dig_free` still reports `0 errors`. Measured, with a control that
+//! fires, and the control is committed: `controls/affine_leak.rs`, `2 verified,
+//! 0 errors` for the leaking arm and `error[E0382]: use of moved value` for the
+//! must-fail arm, i.e. the tokens are move-only and the probe is not vacuous.
+//! Move-only plus droppable is exactly affine.
 //!
-//!   `.temp/t104/verus/lin_drop.rs` -- `allocate(64,1)` then `return 0` on one
-//!   path with no `deallocate` -- `2 verified, 0 errors`.
-//!   `.temp/t104/verus/lin_ctl.rs` -- the same tokens USED AFTER `deallocate`
-//!   consumed them -- rejected, `error[E0382]: use of moved value`, i.e. the
-//!   tokens are move-only and the probe was not vacuous.
+//! **What a proof cannot drop is a MAP whose contents a postcondition names.**
+//! So this rung never holds a bare `Tracked<Dealloc>`: `led_alloc` escrows it,
+//! `led_free` withdraws it, and `kbody` ensures the ledger comes back EMPTY on
+//! every exit -- including the early `return 0` that is p42's whole subject.
+//! The price is **+3 obligations (15 -> 18), zero new trusted items and zero
+//! instructions**: neither wrapper is `external_body` and neither contains
+//! `unsafe`, so `check.py::_is_trusted` leaves both out, and the `identity` pin
+//! still reads `exact` against R4. ../NOTES.md 6.
 //!
-//! **So this rung is p42's central negative result: the proof rung of this
-//! ladder cannot state the property the row prices.** What it does state is the
-//! functional postcondition below, which is real and which every mutation stage
-//! attacks; what it does not state is leak-freedom, and ../NOTES.md 6 says so
-//! at length rather than leaving a reader to assume the `identity` pin covers
-//! it. Nothing here is an `assume`.
+//! ⚠ **The residual trust, named rather than left implicit:** the obligation
+//! binds allocations that go through `led_alloc`. A direct call to `dig_alloc`
+//! still drops its token silently. That is a MODULE-LEVEL DISCIPLINE, not a
+//! global guarantee. ⚠ **And the clean negative beside it, so nobody re-runs
+//! the search:** there is NO linear / must-consume / no-drop tracked mode at
+//! the pinned Verus -- **22** distinct `verifier::` attribute names in the
+//! pinned `rust_verify`'s string table and none of them is one (the only match
+//! for "linear" is `verifier::nonlinear`), and `grep -rn affine
+//! ~/tools/verus/vstd/` is 0 hits. ⚠ TASK_109 A1 put that count at 23;
+//! recounted at TASK_110 with `sort -u`, it is 22, and the conclusion is
+//! unchanged. ../NOTES.md 6d.
+//!
+//! Nothing here is an `assume`.
 //!
 //! Two more things this rung is, for the usual reasons:
 //!   * `main` is *inside* `verus!` and is *not* `external_body`, so the call
@@ -44,13 +63,15 @@
 //! header owes anyway.
 //!
 //! TCB tally: ../NOTES.md 7. Five `external_body` items, three of them trusted
-//! by `check.py::_is_trusted`, each with a verified twin.
+//! by `check.py::_is_trusted`, each with a verified twin. The ledger adds
+//! neither: `led_alloc` and `led_free` are ordinary verified functions.
 
 use vstd::prelude::*;
 use vstd::layout::valid_layout;
 use vstd::map::Map;
 use vstd::raw_ptr::{allocate, deallocate, ptr_mut_from_data, ptr_mut_write, ptr_ref, Dealloc,
                     PointsTo, PointsToRaw, Provenance, PtrData};
+use vstd::set::Set;
 use vstd::set_lib::set_int_range;
 
 // Plain-Rust I/O helpers. Outside `verus!`, so Verus treats the whole module as
@@ -190,9 +211,14 @@ fn slb_twin_v_get_unchecked(v: &[u64], i: usize) -> (r: u64)
 // allocates with `align == 1`, `into_typed::<u8>` needs
 // `start % align_of::<u8>() == 0`, and `align_of::<u8>() == 1`, so the clause is
 // discharged by an axiom rather than by this item. Stage 5c deletes each
-// `ensures` conjunct in turn and requires the file to FAIL; this one still gave
-// `15 verified, 0 errors`, i.e. it was a trusted claim carried for free. Every
-// difference from vstd is a WEAKENING or a respelling, never a strengthening.
+// `ensures` conjunct in turn and requires the file to FAIL; this one still
+// verified clean -- `15 verified, 0 errors` at TASK_104, ⚠ which was the base
+// count THEN and is 18 since TASK_110's ledger, so read it as "no error", not
+// as a current figure. It was a trusted claim carried for free. ✅ The four
+// conjuncts that DID survive are load-bearing on the current tree and the gate
+// re-derives it every run: each gives `17 verified, 1 errors` against a base of
+// 18. Every difference from vstd is a WEAKENING or a respelling, never a
+// strengthening.
 #[inline(always)]
 #[verifier::external_body]
 fn dig_alloc(size: usize, align: usize) -> (pt: (
@@ -251,9 +277,11 @@ fn slb_twin_dig_alloc(size: usize, align: usize) -> (pt: (
 // TRUSTED ITEM 3 of 5, and THE REAL `free`. `vstd::raw_ptr::deallocate`
 // (raw_ptr.rs:948), same `requires`, same body with `std::alloc::` for
 // `::alloc::alloc::`. It CONSUMES the `PointsToRaw` and the `Dealloc`, which is
-// what makes a use-after-free unstateable here -- and what does NOT make a
-// LEAK unstateable, because consuming is not the same as being obliged to
-// consume. See the module comment.
+// what makes a use-after-free unstateable here. ⚠ Consuming is NOT the same as
+// being obliged to consume, so this item's contract still says nothing about
+// whether the release HAPPENS -- what says that is `led_free`'s caller-side
+// obligation and `kbody`'s postcondition, one level up, at zero cost to this
+// item's trusted text. See the module comment.
 //
 // ⚠ It is a REAL `free` rather than a freelist push. ../spec.md pins that:
 // pushing the block onto a pattern-local freelist would leave the "leaked"
@@ -363,8 +391,96 @@ fn dig_read(q: *mut u8, Tracked(pt): Tracked<&PointsTo<u8>>) -> (b: u8)
     *ptr_ref(q, Tracked(pt))
 }
 
+// ------------------------------------------------------------- ledger ------
+// THE LEAK-FREEDOM OBLIGATION, and it is the reason this rung covers p42's own
+// bug class. ⚠ **Neither of these two items is trusted**: no `external_body`,
+// no `unsafe`, so `check.py::_is_trusted` leaves both out and the TCB stays at
+// five items. They are ordinary verified wrappers over this file's own
+// `dig_alloc`/`dig_free`.
+//
+// The encoding: never hold a bare `Tracked<Dealloc>`. `led_alloc` ESCROWS the
+// token into a tracked map; `led_free` withdraws it and spends it; and `kbody`
+// below `ensures` the map's domain comes back EMPTY, which Verus checks on
+// every exit, the early `return 0` included. Dropping a `Dealloc` is legal --
+// it is affine, `controls/affine_leak.rs` -- but dropping the MAP that holds it
+// is not, because the postcondition names the map's domain.
+//
+// ⚠ **Key by a ghost `int`, NOT by the address.** `dig_alloc` promises nothing
+// about the returned address being absent from the ledger, so
+// `dom.insert(a).remove(a) =~= dom` is unprovable and the postcondition fails
+// on BOTH exits. A ghost key with `!old(led).dom().contains(k)` is discharged
+// by the caller for free. This was measured, both ways, at TASK_109.
+//
+// ⚠ **What this does NOT buy, and it is the honest limit:** the obligation
+// binds allocations that go through `led_alloc`. A direct call to `dig_alloc`
+// -- or to `vstd::raw_ptr::allocate` -- still drops its token silently. That is
+// a MODULE-LEVEL DISCIPLINE, not a global guarantee. ../NOTES.md 6.
+pub type Ledger = Map<int, Dealloc>;
+
+#[inline(always)]
+fn led_alloc(size: usize, align: usize, Ghost(k): Ghost<int>, Tracked(led): Tracked<&mut Ledger>) -> (r: (
+    *mut u8,
+    Tracked<PointsToRaw>,
+))
+    requires
+        valid_layout(size, align),
+        size != 0,
+        !old(led).dom().contains(k),
+    ensures
+        r.1@.is_range(r.0.addr() as int, size as int),
+        r.0.addr() + size <= usize::MAX + 1,
+        r.0@.provenance == r.1@.provenance(),
+        final(led).dom() =~= old(led).dom().insert(k),
+        final(led)[k]@ == (vstd::raw_ptr::DeallocData {
+            addr: r.0.addr(),
+            size: size as nat,
+            align: align as nat,
+            provenance: r.1@.provenance(),
+        }),
+{
+    let (p, Tracked(pt), Tracked(dl)) = dig_alloc(size, align);
+    proof {
+        led.tracked_insert(k, dl);
+    }
+    (p, Tracked(pt))
+}
+
+#[inline(always)]
+fn led_free(
+    p: *mut u8,
+    size: usize,
+    align: usize,
+    Tracked(pt): Tracked<PointsToRaw>,
+    Ghost(k): Ghost<int>,
+    Tracked(led): Tracked<&mut Ledger>,
+)
+    requires
+        old(led).dom().contains(k),
+        old(led)[k]@ == (vstd::raw_ptr::DeallocData {
+            addr: p.addr(),
+            size: size as nat,
+            align: align as nat,
+            provenance: pt.provenance(),
+        }),
+        pt.is_range(p.addr() as int, size as int),
+        p@.provenance == pt.provenance(),
+    ensures
+        final(led).dom() =~= old(led).dom().remove(k),
+{
+    let tracked dl;
+    proof {
+        dl = led.tracked_remove(k);
+    }
+    dig_free(p, size, align, Tracked(pt), Tracked(dl));
+}
+
 // ---------------------------------------------------------------- kernel ----
 // Same exec code as unsafe.rs. Contract: ../spec.md.
+//
+// ⚠ **The pinned signature does not move, and that is deliberate**: the ledger
+// is a LOCAL of `kernel` and the obligation is pushed onto the
+// `#[inline(always)]` `kbody` below. `spec.md`'s `kernel` string, its
+// `driver.canonical` token sequence and the four other rungs are untouched.
 #[cfg_attr(slb_isolated, inline(never))]
 pub fn kernel(v: &[u64], off: usize, len: usize) -> (r: u64)
     requires
@@ -373,19 +489,38 @@ pub fn kernel(v: &[u64], off: usize, len: usize) -> (r: u64)
     ensures
         r == kspec(v@, off as int, len as int),
 {
+    let tracked mut led: Ledger = Map::tracked_empty();
+    kbody(v, off, len, Tracked(&mut led))
+}
+
+#[inline(always)]
+fn kbody(v: &[u64], off: usize, len: usize, Tracked(led): Tracked<&mut Ledger>) -> (r: u64)
+    requires
+        off + len <= v@.len(),
+        1 <= len <= isize::MAX,
+        old(led).dom() =~= Set::<int>::empty(),
+    ensures
+        r == kspec(v@, off as int, len as int),
+        // ⚠ THE LEAK-FREEDOM OBLIGATION. Checked on EVERY exit, including the
+        // early `return 0` on the error path -- which is the path the C rung
+        // gets wrong. Delete either `led_free` below and this clause fails,
+        // naming the exit: `controls/ledger_leak.py`, the arm that must fire.
+        final(led).dom() =~= Set::<int>::empty(),
+{
     // Ghost only: mentioning `spec_slice_len` fires vstd's `axiom_spec_len`,
     // which is what tells the SMT solver a slice length fits in a `usize`.
     assert(v@.len() == vstd::slice::spec_slice_len(v));
     assert(valid_layout(len, 1));
-    let (p, Tracked(raw), Tracked(dl)) = dig_alloc(len, 1);
+    let (p, Tracked(raw)) = led_alloc(len, 1, Ghost(0int), Tracked(&mut *led));
     let base: usize = p.addr();
     let ghost prov = raw.provenance();
 
     if v_get_unchecked(v, off) & 0xff != TAG {
         // THE ERROR PATH. The release here is hand-written, exactly as R4's is
-        // and exactly as the C rung's is missing; Verus checks that it is
-        // LEGAL, and nothing checks that it is PRESENT.
-        dig_free(p, len, 1, Tracked(raw), Tracked(dl));
+        // and exactly as the C rung's is missing -- and, since TASK_110, it is
+        // also the one Verus CHECKS IS PRESENT: withdrawing the escrowed token
+        // is the only way to empty the ledger this exit's postcondition names.
+        led_free(p, len, 1, Tracked(raw), Ghost(0int), Tracked(&mut *led));
         return 0;
     }
 
@@ -439,32 +574,50 @@ pub fn kernel(v: &[u64], off: usize, len: usize) -> (r: u64)
         i = i + 1;
     }
 
+    // THE FOLD, as a do-while over a DESCENDING CURSOR. `j` is ghost; the only
+    // exec induction variable is `q` itself, which is why this shape is cheaper
+    // than the index fold it replaced (../NOTES.md 11b). It never forms the
+    // one-past-the-end pointer, which is the reason the `r4_endptr` spelling is
+    // inadmissible: `dig_alloc` ensures only `addr + size <= usize::MAX + 1`,
+    // so `dig_at(p, base, len)`'s `base + i <= usize::MAX` is unprovable
+    // (../NOTES.md 9). Four operations, all specified at the pinned vstd:
+    // `with_addr`, `addr`, `ptr_ref` and `<*mut T as PartialEq>::eq`
+    // (`~/tools/verus/vstd/raw_ptr.rs`, `pointer_specs!`).
     let mut acc: u64 = 0;
-    let mut j: usize = 0;
-    while j < len
+    let mut q: *mut u8 = dig_at(p, base, len - 1);
+    let ghost mut j: int = 0;
+    loop
+        invariant_except_break
+            j < len,
+            q == ptr_mut_from_data::<u8>(
+                PtrData { addr: (base + (len - 1 - j)) as usize, provenance: prov, metadata: () },
+            ),
         invariant
             0 <= j <= len,
             p.addr() == base,
             p@.provenance == prov,
             base + len <= usize::MAX + 1,
             rest.provenance() == prov,
-            rest.is_range(base + (len - j), j as int),
-            perms.dom() =~= set_int_range(0, (len - j) as int),
+            rest.is_range(base + (len - j), j),
+            perms.dom() =~= set_int_range(0, len - j),
             forall|t: int|
                 0 <= t < len - j ==> #[trigger] slot_ok(perms, base, prov, v@, off as int, t),
-            acc == rfold(v@, off as int, len as int, j as int),
+            acc == rfold(v@, off as int, len as int, j),
+        ensures
+            rest.provenance() == prov,
+            rest.is_range(base as int, len as int),
+            acc == rfold(v@, off as int, len as int, len as int),
         decreases len - j,
     {
-        let idx: usize = len - 1 - j;
-        let q: *mut u8 = dig_at(p, base, idx);
+        let ghost idx: int = len - 1 - j;
         let ghost perms0 = perms;
-        assert(slot_ok(perms, base, prov, v@, off as int, idx as int));
-        let tracked mut pt: PointsTo<u8> = perms.tracked_remove(idx as int);
-        let b: u8 = dig_read(q, Tracked(&pt));
-        acc = acc.wrapping_mul(31).wrapping_add(b as u64);
+        assert(slot_ok(perms, base, prov, v@, off as int, idx));
+        let tracked mut pt: PointsTo<u8> = perms.tracked_remove(idx);
+        acc = acc.wrapping_mul(31).wrapping_add(dig_read(q, Tracked(&pt)) as u64);
         proof {
-            assert(perms.dom() =~= set_int_range(0, idx as int));
-            assert forall|t: int| 0 <= t < idx as int implies #[trigger] slot_ok(
+            j = j + 1;
+            assert(perms.dom() =~= set_int_range(0, idx));
+            assert forall|t: int| 0 <= t < idx implies #[trigger] slot_ok(
                 perms,
                 base,
                 prov,
@@ -483,10 +636,20 @@ pub fn kernel(v: &[u64], off: usize, len: usize) -> (r: u64)
             assert(joined.dom() =~= set_int_range(base + idx, base + len));
             rest = joined;
         }
-        j = j + 1;
+        // The loop leaves through the base of the allocation, never past its
+        // end. `<*mut T as PartialEq>::eq` ensures `res <==> addr and metadata
+        // agree`, which is what turns this exec test into the ghost `j == len`.
+        if q == p {
+            proof {
+                assert(q@.addr == p@.addr);
+                assert(j == len);
+            }
+            break;
+        }
+        q = q.with_addr(q.addr() - 1);
     }
 
-    dig_free(p, len, 1, Tracked(rest), Tracked(dl));
+    led_free(p, len, 1, Tracked(rest), Ghost(0int), Tracked(&mut *led));
     acc
 }
 

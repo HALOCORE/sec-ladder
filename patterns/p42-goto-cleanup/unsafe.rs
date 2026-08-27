@@ -23,7 +23,21 @@
 //! `#[inline(always)]` over an already-optimised precompiled vstd, becomes a
 //! bare `mov %cl,(%rax)`. Two instructions, and `-O0` identity drops from
 //! `norel` to `differ`. This is p27's finding (p27/NOTES.md 5) and TASK_104
-//! reproduced it by writing it BACKWARDS first: ../NOTES.md 8.
+//! reproduced it by writing it BACKWARDS first: ../NOTES.md 8. ✅ **Re-measured
+//! at TASK_110 against this tree, both arms, and both still fire**
+//! (`.temp/t110/idprobe.py`).
+//!
+//! ⚠ **THE FOLD LOOP MOVED AT TASK_110 AND THE ROW'S COMPARATIVE HEADLINE MOVED
+//! WITH IT.** This rung used to fold by reverse INDEX -- two induction
+//! variables in the fold loop -- and TASK_104 published *"safe-tuned Rust beats
+//! unsafe Rust here"* off an R4 side searched at four spellings. TASK_109 found
+//! a fifth: a do-while over a descending cursor, which uses nothing the pinned
+//! vstd does not already specify, verifies at the same obligation count, and is
+//! cheaper than **every** R3 spelling p42 measured. **The sign of `min(R3 found)
+//! - min(R4 found)` flips, so the published claim was refuted and the cheaper
+//! spelling is what ships.** ../NOTES.md 11b, and read what that section now
+//! says about differencing two minima -- it is the construction ../spec.md's own
+//! hashed `why` retracts.
 //!
 //! SAFETY (1): `off + len <= v.len()` and `1 <= len <= isize::MAX` are the
 //!   caller's structural preconditions -- the driver's `win_len_w > 0 &&
@@ -33,20 +47,33 @@
 //!   so the layout is valid and the size is non-zero, which is what
 //!   `std::alloc::alloc` requires. It aborts rather than returning null, so
 //!   every later use has a live allocation.
-//! SAFETY (3): every store and load is at `base + i` with `i < len`, inside the
-//!   `len` bytes just allocated. `base + i` cannot wrap: the allocator returned
+//! SAFETY (3): every store is at `base + i` with `i < len`, inside the `len`
+//!   bytes just allocated. `base + i` cannot wrap: the allocator returned
 //!   `base` for a `len`-byte block, so `base + len <= usize::MAX + 1`.
-//! SAFETY (4): every byte read back at `base + len - 1 - i` was written by the
-//!   first loop, which wrote every `i < len`. Nothing reads uninitialised
-//!   memory.
+//!   ⚠ **The loads are a DESCENDING CURSOR since TASK_110**, not an index: `q`
+//!   starts at `base + len - 1` (in range, because `len >= 1`) and is
+//!   decremented only after the `q == p` test fails, so it is never moved below
+//!   `base` and never reaches one past the end. That last part is why this
+//!   shape is the one that has a verifiable twin at all -- `../NOTES.md` 9a.
+//! SAFETY (4): every byte the cursor reads was written by the first loop, which
+//!   wrote every `i < len`. The cursor visits exactly `base + len - 1` down to
+//!   `base`, so nothing reads uninitialised memory.
 //! SAFETY (5): `dig_free` is called exactly once on every path that reaches
 //!   `dig_alloc` -- once on the error path and once on the success path -- and
 //!   nothing dereferences `p` afterwards. ⚠ **THIS IS THE PATTERN'S OWN
-//!   OBLIGATION AND VERUS DOES NOT DISCHARGE IT.** A `Tracked<Dealloc>` is
-//!   AFFINE at the pinned Verus, not linear: dropping one verifies clean, so an
-//!   R5 that forgot the error path's `deallocate` would report `0 errors`.
-//!   Measured, with a control -- ../NOTES.md 6. So (5) is a comment here and a
-//!   comment in R5 too, and that is this pattern's central result.
+//!   OBLIGATION, AND ON THIS RUNG NOTHING MECHANICAL DISCHARGES IT.** The
+//!   backstop here is Miri's leak report at process exit, which is why
+//!   `../spec.md` sets `miri.required` and why `controls/miri_seeds.sh` ships a
+//!   positive control that deletes this file's error-path release.
+//!   ⚠ **RETRACTED AT TASK_110: this note used to add *"AND VERUS DOES NOT
+//!   DISCHARGE IT"*, which is false.** A `Tracked<Dealloc>` is indeed AFFINE
+//!   and not linear -- dropping one verifies clean -- but R5 does not hold one
+//!   bare: it escrows the token in a ghost ledger whose emptiness is a
+//!   postcondition, so an R5 that forgets the error path's release now reports
+//!   an error naming that exit. ../NOTES.md 6. ⚠ **That is a fact about R5 and
+//!   not about this file**: the ledger is erased before codegen, the `identity`
+//!   pin compares machine code, and a byte-identical twin carrying a proof is
+//!   not a proof about the twin that does not.
 
 #[path = "../../common/driver.rs"]
 mod driver;
@@ -133,23 +160,30 @@ pub fn kernel(v: &[u64], off: usize, len: usize) -> u64 {
         // the permission split that licenses the store happens between them.
         // The two are the same program either way, but not the same OBJECT
         // code: folding `dig_at` into the `dig_write` argument list changes
-        // LLVM's induction-variable strength reduction, R5 keeps `%r8` as a
-        // byte cursor where R4 kept an index, and the `identity` pin drops from
-        // `exact` to `differ` on two instructions. Measured, ../NOTES.md 8.
+        // LLVM's induction-variable strength reduction, R5 keeps `%r9` as a
+        // byte cursor where R4 keeps an index, and the `identity` pin drops
+        // from `exact` to `differ`. Re-measured at TASK_110, since the fold
+        // loop below moved underneath this note: 127 against 128 instructions,
+        // in `%r9`. It read `%r8` and `two instructions` before that, which was
+        // right for the pre-TASK_110 fold. Both figures: ../NOTES.md 8.
         let q: *mut u8 = dig_at(p, base, i);
         run = run.wrapping_add(v_get_unchecked(v, off + i) ^ MIX);
         let b: u8 = (run >> 24) as u8;
         dig_write(q, b);
         i = i + 1;
     }
+    // THE FOLD, as a do-while over a DESCENDING CURSOR: one induction variable
+    // per loop instead of two, and it never forms the one-past-the-end pointer
+    // that would put R5 out of reach. R5's is the same loop with the ghost
+    // bookkeeping added; see verus.rs.
     let mut acc: u64 = 0;
-    let mut j: usize = 0;
-    while j < len {
-        let idx: usize = len - 1 - j;
-        let q: *mut u8 = dig_at(p, base, idx);
-        let b: u8 = dig_read(q);
-        acc = acc.wrapping_mul(31).wrapping_add(b as u64);
-        j = j + 1;
+    let mut q: *mut u8 = dig_at(p, base, len - 1);
+    loop {
+        acc = acc.wrapping_mul(31).wrapping_add(dig_read(q) as u64);
+        if q == p {
+            break;
+        }
+        q = q.with_addr(q.addr() - 1);
     }
     dig_free(p, len, 1);
     acc

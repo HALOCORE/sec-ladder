@@ -23,7 +23,16 @@
 # is not running -- and a detector that is not running looks exactly like a
 # detector that found nothing (`.memory/00-environment.md`).
 #
-# The control has 88 points, not one: 2 kernels x 4 levels x 11 inputs.
+# The control has 352 points, not one: 2 kernels x 4 levels x 44 inputs.
+#
+# /!\ CORRECTED AT TASK_110, from TASK_109 C5.  This line used to say `88
+#     points ... x 11 inputs` and the success message below used to say `ALL 88
+#     POINTS`, and 88 was never right for ANY input set.  The glob below is
+#     "$PDIR"/inputs/*.bin, which takes the 32 sweep-w*.bin as well as the 12
+#     matrix inputs: 2 x 4 x 44 = 352.  Without the sweeps it would be 96.  The
+#     review ran this script byte-identically, counted 352 rows, and watched it
+#     print `ALL 88 POINTS`.  The count is now DERIVED from the loop rather than
+#     written down, so it cannot go stale again.
 #
 #   sh patterns/p42-goto-cleanup/controls/leak.sh
 #
@@ -49,6 +58,7 @@ FLAGS="-std=c99 -Wall -Wextra -g -fsanitize=address,undefined -fstrict-aliasing
        -static-libasan -static-libubsan -DSLB_ISOLATED"
 
 fail=0
+points=0
 for O in O0 O1 O2 O3; do
   for K in kernel kernel_hardened; do
     bin="$OUT/$K-$O"
@@ -77,6 +87,7 @@ for O in O0 O1 O2 O3; do
         status="*** BYTES ${bytes:-none} != model's $want ***"; fail=1
       fi
       [ "$other" = no ] || { status="$status  *** a NON-leak sanitizer fired ***"; fail=1; }
+      points=$((points + 1))
       printf '%-16s %-3s %-28s exit=%-3s LSan=%-3s bytes=%-8s model=%-8s %s\n' \
              "$K" "$O" "$n" "$rc" "$lsan" "${bytes:-.}" "$want" "$status"
     done
@@ -84,7 +95,7 @@ for O in O0 O1 O2 O3; do
 done
 echo
 if [ "$fail" -eq 0 ]; then
-  echo "ALL 88 POINTS AS DECLARED: the buggy rung reports a LeakSanitizer leak of"
+  echo "ALL $points POINTS AS DECLARED: the buggy rung reports a LeakSanitizer leak of"
   echo "exactly n_err * win_len bytes on every input that reaches the error path"
   echo "and is silent on every input that does not; the hardened rung is silent on"
   echo "all of them, at every optimisation level.  No other sanitizer fired."

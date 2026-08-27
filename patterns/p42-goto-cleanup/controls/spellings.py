@@ -4,20 +4,35 @@
 `.memory/01-ladder.md` asks every pattern for an in-contract spread beside its
 headline, and `.memory/06-catalogue.md`'s probe-3 note asks that when the
 flattering direction shows up -- safe Rust beating unsafe Rust -- BOTH sides are
-searched and the lever count on each is stated.  p42 is in the flattering
+searched and the lever count on each is stated.  p42 landed in the flattering
 direction, so this script exists to make the search reproducible rather than
 asserted.
 
-**Four spellings per side.**  Each variant is derived from a SHIPPED rung by
+⚠⚠ **AND AT TASK_104 IT WAS NOT DEEP ENOUGH, WHICH IS WHY THE R4 SIDE NOW HAS
+FIVE ENTRIES AND NOT FOUR.**  TASK_104 published *"cheapest R3 found is below
+cheapest R4 found, so 'safe-tuned beats unsafe' is not an artefact of an
+unsearched R4 side"*.  TASK_109 §B searched one spelling further and found a
+do-while fold over a descending cursor that is cheaper than **every** R3
+spelling p42 had measured -- so the R4 side WAS unsearched, the sign of that
+difference flips, and the do-while is what ships as of TASK_110.  Read
+../NOTES.md 11b for what survives, and read it before quoting any figure here:
+differencing two minima over two searched sets is the construction ../spec.md's
+own hashed `why` retracts.
+
+**Five R4 spellings, four R3.**  Each variant is derived from a SHIPPED rung by
 textual substitution, here, in this file: nothing is a hand-copied fork, so a
 variant cannot silently drift away from the rung it is a variant of.
 
-R4 side (all four release the digest on both paths, all four are `unsafe`):
-  ship      the shipped rung: index `i`, address via `dig_at` -> `with_addr`
+R4 side (all five release the digest on both paths, all five are `unsafe`):
+  ship      the SHIPPED rung since TASK_110: a do-while over a descending
+            cursor, `dig_at(p, base, len - 1)` then `q.with_addr(q.addr() - 1)`,
+            one induction variable in the fold loop
+  idxfold   the rung TASK_104 shipped: the fold by reverse INDEX, two induction
+            variables.  Admissible -- it was verified as R5 at 15/0 -- and it is
+            here as the endpoint the row used to publish
   add       `p.add(i)` instead of `p.with_addr(base + i)`
   movptr    a moving cursor plus the counter, `w.add(1)` / `q.sub(1)`
-  endptr    a cursor compared against an end pointer, `with_addr` only,
-            i.e. ONE induction variable per loop
+  endptr    a cursor compared against an END pointer, `with_addr` only
 
 R3 side (all four are safe, all four keep the pinned allocation-before-test
 order):
@@ -26,16 +41,24 @@ order):
   zeroed    `vec![0u8; len]` + `clear` + `extend` + `rev().fold`
   push      `Vec::with_capacity` + `push` per element + index fold
 
-⚠ **ADMISSIBILITY IS NOT THE SAME AS BEING CHEAPEST, and two of the R4 variants
-are NOT admissible rungs.**  R4 must have a byte-identical R5 twin that Verus
-verifies, and the pinned vstd specifies `<*mut T>::addr` and `<*mut T>::with_addr`
-and NOT `<*mut T>::add`/`offset` (`grep -n assume_specification
-~/tools/verus/vstd/raw_ptr.rs`).  So `add` and `movptr` cannot be rungs at all;
-`endptr` uses only `with_addr` and `<*mut T as PartialEq>::eq`, both specified,
-so it is admissible IN PRINCIPLE and nobody has built its R5.  p42 therefore
-holds its R4 endpoint FIXED BY FIAT at the shipped, verified spelling and
-publishes the span, which is what `.memory/01-ladder.md` asks for instead of a
-pair interval.
+⚠ **ADMISSIBILITY IS NOT THE SAME AS BEING CHEAPEST, and three of the five R4
+variants are NOT admissible rungs.**  R4 must have a byte-identical R5 twin that
+Verus verifies, and the pinned vstd specifies `<*mut T>::addr` and
+`<*mut T>::with_addr` and NOT `<*mut T>::add`/`offset` (`grep -n
+assume_specification ~/tools/verus/vstd/raw_ptr.rs`).  So `add` and `movptr`
+cannot be rungs at all.
+
+⚠ **`endptr` is the interesting refusal, and TASK_109 §B2 settled it with a
+probe rather than by inspection.**  It uses only `with_addr` and
+`<*mut T as PartialEq>::eq`, both specified, so TASK_104 recorded it as
+"admissible in principle, R5 unbuilt".  It is NOT admissible: it needs the
+ONE-PAST-THE-END pointer `dig_at(p, base, len)`, whose `requires` is
+`base + i <= usize::MAX`, and `vstd::raw_ptr::allocate` ensures only
+`addr + size <= usize::MAX + 1` -- one hit for `usize::MAX` in the whole of
+`raw_ptr.rs`, and `PointsToRaw::is_range` carries no address bound.  Building it
+would cost a STRENGTHENED trusted `ensures` on `dig_alloc`, which p42's own
+trusted argument forbids and which is what disqualified p16's `r4_hdr`.  The
+shipped do-while exists precisely because it never forms that pointer.
 
 Every variant is checked to print the shipped checksum before it is measured; a
 variant that computes something else is not a spelling of this kernel.
@@ -47,7 +70,6 @@ Sources and binaries land in .temp/t104/spell/ and are re-derivable from here.
 """
 
 import os
-import re
 import struct
 import subprocess
 import sys
@@ -61,12 +83,32 @@ VALGRIND = os.path.expanduser("~/tools/valgrind/bin/valgrind")
 RFLAGS = ["--edition", "2021", "-C", "codegen-units=1", "-C", "opt-level=3",
           "-C", "debug-assertions=off", "--cfg", "slb_isolated"]
 
-# The two loops of the shipped R4, anchored on their FIRST and LAST statements
-# so the doc comment between them does not have to be duplicated here. `sub`
-# asserts the anchor is present, which is what stopped this control from
-# silently measuring a stale variant when unsafe.rs grew a comment.
-U_LOOPS_HEAD = "    let mut run: u64 = 0;\n    let mut i: usize = 0;\n    while i < len {"
-U_LOOPS_TAIL = """        i = i + 1;
+# ⚠ TASK_109 m1: the variants are written to `.temp/t104/spell/`, from which the
+# rungs' own `#[path = "../../common/driver.rs"]` resolves to
+# `.temp/common/driver.rs` -- a gitignored copy that happens to exist on the box
+# this was written on and does NOT exist in a fresh clone, where every variant
+# died with "couldn't read ...: No such file".  Rewriting the attribute to an
+# absolute path is the whole fix, and it is the only difference between a
+# variant and the rung it varies apart from the substitution named in its row.
+PATH_ATTR = '#[path = "../../common/driver.rs"]'
+ABS_PATH_ATTR = f'#[path = "{os.path.join(REPO, "common", "driver.rs")}"]'
+
+# The shipped R4's two loops, spliced out between the FIRST statement of the
+# write loop and the epilogue that follows the fold loop, so that no doc comment
+# between them has to be duplicated here.  Both anchors are asserted.
+U_LOOPS_HEAD = ("    let mut run: u64 = 0;\n"
+                "    let mut i: usize = 0;\n"
+                "    while i < len {")
+U_EPILOGUE = "    dig_free(p, len, 1);\n    acc\n}"
+
+U_IDXFOLD = """    let mut run: u64 = 0;
+    let mut i: usize = 0;
+    while i < len {
+        let q: *mut u8 = dig_at(p, base, i);
+        run = run.wrapping_add(v_get_unchecked(v, off + i) ^ MIX);
+        let b: u8 = (run >> 24) as u8;
+        dig_write(q, b);
+        i = i + 1;
     }
     let mut acc: u64 = 0;
     let mut j: usize = 0;
@@ -76,7 +118,8 @@ U_LOOPS_TAIL = """        i = i + 1;
         let b: u8 = dig_read(q);
         acc = acc.wrapping_mul(31).wrapping_add(b as u64);
         j = j + 1;
-    }"""
+    }
+"""
 
 U_MOVPTR = """    let mut run: u64 = 0;
     let mut i: usize = 0;
@@ -94,7 +137,8 @@ U_MOVPTR = """    let mut run: u64 = 0;
         q = unsafe { q.sub(1) };
         acc = acc.wrapping_mul(31).wrapping_add(dig_read(q) as u64);
         j = j + 1;
-    }"""
+    }
+"""
 
 U_ENDPTR = """    let mut run: u64 = 0;
     let mut i: usize = 0;
@@ -111,7 +155,8 @@ U_ENDPTR = """    let mut run: u64 = 0;
     while q != p {
         q = q.with_addr(q.addr() - 1);
         acc = acc.wrapping_mul(31).wrapping_add(dig_read(q) as u64);
-    }"""
+    }
+"""
 
 T_SHIP_BODY = """    let mut run: u64 = 0;
     dig.extend(v[off..off + len].iter().map(|&x| {
@@ -143,6 +188,20 @@ T_PUSH = """    let mut run: u64 = 0;
     }
     acc"""
 
+#: What each R4 variant is, for the printed table. The refusals carry their
+#: reason so a reader does not have to reconstruct it from the docstring.
+ADMISSIBLE = {
+    "r4_ship": "SHIPPED, Verus-verified 18/0",
+    "r4_idxfold": "admissible (was the shipped rung to TASK_109)",
+    "r4_add": "NO -- vstd has no spec for `<*mut T>::add`",
+    "r4_movptr": "NO -- same",
+    "r4_endptr": "NO -- needs the one-past-the-end pointer; TASK_109 B2",
+    "r3_ship": "SHIPPED",
+    "r3_revidx": "admissible",
+    "r3_zeroed": "admissible",
+    "r3_push": "admissible",
+}
+
 
 def sub(src, old, new, tag):
     assert old in src, (f"{tag}: the shipped rung no longer contains the text this "
@@ -152,17 +211,20 @@ def sub(src, old, new, tag):
 
 def replace_loops(src, new, tag):
     """Swap out both of the shipped R4's loops, from the first statement of the
-    write loop to the last statement of the fold loop."""
+    write loop to the epilogue that releases the digest."""
     i = src.find(U_LOOPS_HEAD)
-    j = src.find(U_LOOPS_TAIL)
-    assert i >= 0 and j > i, f"{tag}: cannot find the shipped R4's two loops"
-    return src[:i] + new + src[j + len(U_LOOPS_TAIL):]
+    j = src.find(U_EPILOGUE)
+    assert i >= 0, f"{tag}: cannot find the shipped R4's write loop"
+    assert j > i, f"{tag}: cannot find the shipped R4's epilogue"
+    return src[:i] + new + src[j:]
 
 
 def variants():
     u = open(os.path.join(PDIR, "unsafe.rs")).read()
     t = open(os.path.join(PDIR, "safe_tuned.rs")).read()
+    assert PATH_ATTR in u and PATH_ATTR in t, "the rungs' #[path] attribute moved"
     yield "r4_ship", u
+    yield "r4_idxfold", replace_loops(u, U_IDXFOLD, "r4_idxfold")
     yield "r4_add", sub(u, "    p.with_addr(base + i)", "    unsafe { p.add(i) }", "r4_add")
     yield "r4_movptr", replace_loops(u, U_MOVPTR, "r4_movptr")
     yield "r4_endptr", replace_loops(u, U_ENDPTR, "r4_endptr")
@@ -204,7 +266,7 @@ def main():
     rows = []
     for name, src in variants():
         p = os.path.join(OUT, f"{name}.rs")
-        open(p, "w").write(src)
+        open(p, "w").write(src.replace(PATH_ATTR, ABS_PATH_ATTR))
         b = os.path.join(OUT, name)
         r = subprocess.run([RUSTC] + RFLAGS + [p, "-o", b],
                            capture_output=True, text=True)
@@ -227,10 +289,11 @@ def main():
         print("\n(pass --measure for the callgrind marginals)")
         return 0
     print("\nmarginal Ir/call, -O3, inline mode `isolated`, whole-program")
-    print(f"{'variant':12s} {'small (win=97)':>16s} {'large (win=4096)':>18s}")
+    print(f"{'variant':12s} {'small (win=97)':>16s} {'large (win=4096)':>18s}   "
+          f"admissible as a p42 rung?")
     for name, b in rows:
         vals = [marginal(b, f) for _, f in inputs]
-        print(f"{name:12s} {vals[0]:16.2f} {vals[1]:18.2f}")
+        print(f"{name:12s} {vals[0]:16.2f} {vals[1]:18.2f}   {ADMISSIBLE[name]}")
     return 0
 
 

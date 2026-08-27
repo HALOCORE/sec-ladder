@@ -1707,6 +1707,21 @@ history table — **with no number on the run-dependent lines.**
 ⚠ **Ask of any figure you are about to write into a tracked file: does producing
 it require a build that this file's hash covers? If yes, publish the property.**
 
+⚠⚠ **THIRD INSTANCE, ONE PATTERN LATER (TASK_110): `p42`'s `NOTES` TRANSCRIBED
+RUN-DEPENDENT MIRI ALLOCATION IDs.** Same class as the checksum count, same
+file, same hash. **The rule is not learned until the reflex is: before writing
+any figure into a tracked file, ask whether producing it required a build that
+this file's hash covers.**
+
+⚠ **AND A NEW ONE FROM THE SAME TASK: EVERY BACKTICK IN AN `idiom` ENTRY IS A
+PIN — INCLUDING IN EXPLANATORY PROSE.** A backticked word inside a `forbidden`
+entry's *explanation* is read as a forbidden **spelling**, which failed `p42`'s
+first gate run on `len`, `free` and `n_iters`. ⚠ **Conversely, a `required`
+entry with NO backticks pins NOTHING** — `p42` shipped two such entries and
+`spec.md` claimed three things were pinned when **none of the three was
+enforced, including the idiom the pattern is named for.** **Write the pin in
+backticks and the explanation without them.**
+
 ## ⚠⚠ `vparse.params` SILENTLY DISABLES STAGE 5c-req ON A DESTRUCTURED `Tracked(pt)` PARAMETER
 
 **TASK_104 (p42), PROVISIONAL.** It cannot parse a destructured `Tracked(pt)`

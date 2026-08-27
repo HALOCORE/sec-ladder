@@ -1,6 +1,20 @@
-// p42 control 3 -- VERUS CANNOT STATE LEAK-FREEDOM AT THE PINNED VERSION.
+// p42 control 3 -- A BARE `Tracked<Dealloc>` IS AFFINE, SO THE NATURAL ENCODING
+// CANNOT STATE LEAK-FREEDOM.
 //
-// This file is p42's central negative result, in a form anyone can re-run:
+// /!\ RETRACTED HEADING, TASK_110.  This file used to be headed "VERUS CANNOT
+//     STATE LEAK-FREEDOM AT THE PINNED VERSION", and that generalisation is
+//     FALSE (TASK_109 §A).  What this file measures -- that a bare token may be
+//     dropped -- is true and is unchanged; what was inferred from it was not.
+//     The POSITIVE half now ships in `verus.rs` itself: escrow the token in a
+//     ghost ledger whose emptiness is a postcondition, and Verus checks the
+//     release on every exit.  See `controls/ledger_leak.py`, which is this
+//     file's counterpart and carries two arms that must fire, and ../NOTES.md 6.
+//
+//     THIS FILE IS KEPT, DELIBERATELY: its premise is true, its two arms are the
+//     evidence for the ENCODING half of the finding, and without it "the natural
+//     encoding does not state leak-freedom" would be an assertion.
+//
+// The measurement, in a form anyone can re-run:
 //
 //     ./verus_run.py patterns/p42-goto-cleanup/controls/affine_leak.rs
 //     -> verification results:: 2 verified, 0 errors
@@ -8,8 +22,9 @@
 // `leaky` allocates, takes an error path, and NEVER deallocates.  Both tracked
 // tokens -- the `PointsToRaw` and the `Dealloc` -- go out of scope on that path.
 // Verus accepts it.  So `Tracked<Dealloc>` is AFFINE (droppable), not LINEAR
-// (must be consumed), and an R5 that forgot the error path's `dig_free` would
-// report `0 errors` exactly as verus.rs does.
+// (must be consumed), and an R5 that HELD THE TOKEN BARE and forgot the error
+// path's `dig_free` would report `0 errors`.  /!\ The shipped verus.rs does NOT
+// hold it bare, which is why that sentence is in the conditional.
 //
 // THE POSITIVE CONTROL is `moved_twice` below, and it must FAIL, because
 // otherwise this file would prove nothing: a token that could be used freely

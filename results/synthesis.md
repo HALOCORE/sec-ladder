@@ -111,8 +111,8 @@ Three standing rules govern every figure: **never the word "minimum"** -- write 
 | p36-vtable-dispatch | large | 10279.00 | 12326.00 | 11295.00 | 15391.00 | 27690.00 | 13358.00 | 13343.00 | 13343.00 |
 | p38-alias-pun | small | 1028.00 | 1040.00 | 1260.00 | 1292.00 | 1563.00 | 1327.00 | 1306.00 | 1306.00 |
 | p38-alias-pun | large | 2558.00 | 2582.00 | 3175.00 | 3239.00 | 3972.00 | 3286.00 | 3261.00 | 3261.00 |
-| p42-goto-cleanup | small | 1873.00 | 1873.00 | 1506.00 | 1510.00 | 1850.00 | 1263.00 | 1461.00 | 1461.00 |
-| p42-goto-cleanup | large | 77854.00 | 77854.00 | 61487.00 | 61492.00 | 75826.00 | 50745.00 | 59441.00 | 59441.00 |
+| p42-goto-cleanup | small | 1873.00 | 1873.00 | 1506.00 | 1510.00 | 1850.00 | 1263.00 | 1251.00 | 1251.00 |
+| p42-goto-cleanup | large | 77854.00 | 77854.00 | 61487.00 | 61492.00 | 75826.00 | 50745.00 | 50734.00 | 50734.00 |
 | p46-bignum-mac | small | 8271.00 | 8275.00 | 6108.00 | 6110.00 | 6241.00 | 6287.00 | 6406.00 | 6406.00 |
 | p46-bignum-mac | large | 28866.00 | 28869.00 | 23088.00 | 23090.00 | 23341.00 | 23435.00 | 24250.00 | 24250.00 |
 | p47-ct-compare | small | 142.00 | 407.00 | 127.00 | 428.00 | 254.00 | 510.00 | 420.00 | 420.00 |
@@ -179,15 +179,15 @@ sweep says the callee moves -- but its MAGNITUDE is a phase, so quote the
 support, never the draw.
 
 
-**Calibration, recomputed on every run of this file** — the derived column scored against `synthesis/outward_ir.json`, a callgrind caller→callee sweep, at the 2.00 `Ir` floor: **200 rows, 180 hit, 4 miss (the dangerous direction), 16 false alarm**; residual median **0.50**, p95 **7.00**, max **15.79**. ⚠ Misses: p03 small R3-R4 -7.00, p03 large R3-R4 -7.00, p04 small R3-R4 -7.00, p04 large R3-R4 -7.00.
+**Calibration, recomputed on every run of this file** — the derived column scored against `synthesis/outward_ir.json`, a callgrind caller→callee sweep, at the 2.00 `Ir` floor: **208 rows, 194 hit, 0 miss (the dangerous direction), 14 false alarm**; residual median **0.18**, p95 **7.00**, max **15.79**.
 
 **So the column has three bands, and they are measured on every run rather than chosen** — each row sorted by `|correction|` against whether the sweep says the row moves at all:
 
 | band | rows | real | spurious | smallest \|correction\| | reading |
 |---|---:|---:|---:|---:|---|
-| `< 2.00` (blank / `<2.00`) | 140 | 4 | 136 | 0.00 | **not safe — this is one environment phase.** ⚠ See `‡` |
-| `2.00 … 16.00` (marked **?**) | 22 | 6 | 16 | 2.00 | **a coin flip — do not quote alone** |
-| `≥ 16.00` (**bold**) | 38 | 38 | 0 | 17.00 | **every one is real** |
+| `< 2.00` (blank / `<2.00`) | 143 | 0 | 143 | 0.00 | **not safe — this is one environment phase.** ⚠ See `‡` |
+| `2.00 … 16.00` (marked **?**) | 24 | 10 | 14 | 2.00 | **a coin flip — do not quote alone** |
+| `≥ 16.00` (**bold**) | 41 | 41 | 0 | 17.00 | **every one is real** |
 
 ⚠⚠ **THE `< 2.00` BAND'S OWN CLAIM WAS FALSE, AND THIS IS THE CORRECTION.** It read *"safe: nothing real hides below the floor"*, scored `0 real / 120 spurious`. Both numbers are right **about the environment this run was taken in**, and the adjective was not: **p03's and p04's `R3-R4` correction is `0.00` — blank, in this band — at 16 of 32 environment phases and `±7.00` at the other 16**, three and a half times the floor. A band scored at one draw cannot certify the absence of a term that is invisible at that draw. The rows that carry it are marked `‡` below; the band is otherwise unchanged and still means *the derived route cannot resolve this*.
 
@@ -195,7 +195,7 @@ support, never the draw.
 
 ⚠ **That sidecar is the only thing in this file with no staleness pin**: `licence.json` carries the gate `source_sha256` it was taken against and prints `LICENCE STALE` on a mismatch, but `outward_ir.json` carries nothing, and re-emitting it costs 352 callgrind runs against a fully built `.temp/build/`. That is precisely why it calibrates a column here and no longer **is** one.
 
-**And the LICENCE TAG scored against the same sweep, also recomputed here**: **176 hit, 14 false `LICENSED` (the dangerous direction), 0 false alarm, 10 abstain**. The smallest movement under a `NOT-LIC` verdict is **7.96 `Ir`/call**, so *0 false alarms* is robust to any tolerance below that and is not an artefact of the 5e-3 cut.
+**And the LICENCE TAG scored against the same sweep, also recomputed here**: **181 hit, 15 false `LICENSED` (the dangerous direction), 2 false alarm, 10 abstain**. The smallest movement under a `NOT-LIC` verdict is **0.00 `Ir`/call**, so *0 false alarms* is robust to any tolerance below that and is not an artefact of the 5e-3 cut.
 
 ⚠ **`0 false alarms` is a statement about this sweep, not about the rule** (TASK_075_REVIEW M4) — which is why this line is recomputed rather than quoted. Correcting one thing the rule got right for a contradicted reason (`kernel.cold`, below) moved the score from `156 / 10 / 0 / 10` to `154 / 12 / 0 / 10` **in this task**, by converting p27's `gcc-clang` from a lucky `NOT-LIC` into an honest false `LICENSED`. The false-alarm zero survived; the hit count did not. A second sweep under a **longer environment block** reads `152 / 14 / 0 / 10`, the excess being p03's and p04's `memset` term — **so the published triple is one draw and `0 false alarms` is the part that holds across both of them.**
 
@@ -275,7 +275,7 @@ answer* (`.memory/03-measurement.md`).
 | p27-handle-table | 119.49 | 693.82 | NOT-LIC | **small +238.67** (+119.18) / **large +824.47** (+130.65) | undeclared |
 | p36-vtable-dispatch | 1803.00 | 14347.00 | UNDEC |  | BOTH sides searched (4 R3 levers, 3 R4) |
 | p38-alias-pun | 257.00 | 711.00 | LICENSED |  | undeclared |
-| p42-goto-cleanup | 389.00 | 16385.00 | NOT-LIC | **small +542.00** (+153.00) / **large +20545.00** (+4160.00) | undeclared |
+| p42-goto-cleanup | 599.00 | 25092.00 | NOT-LIC | **small +752.00** (+153.00) / **large +29252.00** (+4160.00) | undeclared |
 | p46-bignum-mac | -165.00 | -909.00 | LICENSED |  | undeclared |
 | p47-ct-compare | -166.00 | -194.00 | NOT-LIC | **small -77.63** (+88.37) / **large -28.00** (+166.00) | R4 searched, six levers |
 
@@ -328,7 +328,7 @@ answer* (`.memory/03-measurement.md`).
 | p27-handle-table | 109.98 | 661.82 | NOT-LIC | **small +229.12** (+119.14) / **large +792.47** (+130.65) | undeclared |
 | p36-vtable-dispatch | 15.00 | 15.00 | UNDEC |  | BOTH sides searched (4 R3 levers, 3 R4) |
 | p38-alias-pun | 21.00 | 25.00 | LICENSED |  | undeclared |
-| p42-goto-cleanup | -198.00 | -8696.00 | NOT-LIC |  | undeclared |
+| p42-goto-cleanup | 12.00 | 11.00 | NOT-LIC |  | undeclared |
 | p46-bignum-mac | -119.00 | -815.00 | LICENSED |  | undeclared |
 | p47-ct-compare | 90.00 | 142.00 | LICENSED |  | R4 searched, six levers |
 
@@ -492,10 +492,10 @@ From `results/gate/*.json` (`verus`, `identity`, `verdict`). `obligations` is wh
 | p27-handle-table | 15 | 0 | 7 | 20 | 0 | exact | PASS |
 | p36-vtable-dispatch | 12 | 0 | 4 | 7 | 0 | norel | PASS |
 | p38-alias-pun | 13 | 0 | 5 | 10 | 0 | exact | PASS |
-| p42-goto-cleanup | 15 | 0 | 5 | 16 | 0 | exact | PASS-WITH-BLOCKED-ROWS |
+| p42-goto-cleanup | 18 | 0 | 5 | 16 | 0 | exact | PASS-WITH-BLOCKED-ROWS |
 | p46-bignum-mac | 21 | 0 | 5 | 10 | 0 | exact | PASS |
 | p47-ct-compare | 12 | 0 | 3 | 6 | 0 | exact | PASS |
-| **total** | **347** | | **108** | **230** | **0** | | |
+| **total** | **350** | | **108** | **230** | **0** | | |
 
 **Trusted base, all 26 rows: 108 items (230 lines) and 0 axioms.** Quote both numbers; there is no single one.
 
@@ -538,7 +538,7 @@ From `results/gate/*.json` (`verus`, `identity`, `verdict`). `obligations` is wh
 | p27-handle-table | 146/x | 149/x | 141/x | 142/x | 206/x | 209/x | 150/x | 150/x |
 | p36-vtable-dispatch | 64 | 73 | 47 | 56 | 98 | 87 | 54 | 54 |
 | p38-alias-pun | 237/x | 243/x | 175/x | 185/x | 229/x | 226/x | 185/x | 185/x |
-| p42-goto-cleanup | 50 | 50 | 117 | 118 | 126 | 156 | 119 | 119 |
+| p42-goto-cleanup | 50 | 50 | 117 | 118 | 126 | 156 | 125 | 125 |
 | p46-bignum-mac | 521/x | 524/x | 150 | 154 | 174 | 172 | 147 | 147 |
 | p47-ct-compare | 86 | 212/x | 67 | 170/x | 193 | 265/x | 156/x | 156/x |
 
@@ -556,7 +556,7 @@ Two consequences: the evidence for *"a proof costs zero instructions"* is the ra
 
 **Every one of those rows is in the uncertain 2.00–16.00 band, and the two halves resolve differently.** On **p03** and **p04** there is a real term — glibc `memset`'s alignment-dependent path length between two byte-identical kernels — but **it has no value**: over 32 environment phases the correction takes `{−8.00, −1.00, +6.00}` with support 14 / 4 / 14, so the `+6.00` this file used to print was one draw **tied with its own sign-reverse**, and the four cells are withdrawn in §2 (`‡`). The part that reproduces is `main`'s **−1.00**. On **p02** the sweep measures **0.00**: the derived `−2.00` is the driver residual and nothing else. **The kernel-exclusive zero is the correct reading on all six**, and on p03/p04 it is the only one of the two columns that reproduces at all.
 
-**Claim 2 -- `R3 - R4` is negative on 7 of 26 patterns. CONFIRMED as arithmetic, and the reason it was doubted is the WRONG reason.**
+**Claim 2 -- `R3 - R4` is negative on 6 of 26 patterns. CONFIRMED as arithmetic, and the reason it was doubted is the WRONG reason.**
 
 | pattern | negative on | licence for `R3-R4` | callee correction (derived) | search state |
 |---|---|---|---|---|
@@ -565,7 +565,6 @@ Two consequences: the evidence for *"a proof costs zero instructions"* is the ra
 | p12-strcat-fixed | large -26.00 | LICENSED | inside the ±2.00 floor | undeclared |
 | p13-strncpy-trunc | small -177.00, large -1054.00 | LICENSED | inside the ±2.00 floor | R4 searched: the SIGN FLIPS to +44/+77 |
 | p18-varint-shift | small -25.00, large -12.00 | LICENSED | inside the ±2.00 floor | undeclared |
-| p42-goto-cleanup | small -198.00, large -8696.00 | NOT-LIC | inside the ±2.00 floor | undeclared |
 | p46-bignum-mac | small -119.00, large -815.00 | LICENSED | inside the ±2.00 floor | undeclared |
 
 The argument that scheduled this work said the claim rests *"at its two biggest numbers, on the column the tree has caught reversing a comparison three times"*, naming **p11 and p13** as *"precisely the two patterns whose `.memory/` entries already say their rungs dispatch different work outward"*.

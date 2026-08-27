@@ -1998,16 +1998,38 @@ the number.** Two task files have already sent an agent to the wrong finding.
     harder — there the floor moved 150 `Ir`/call; here it moves 210 / 8707 and
     reverses the sign.**
 
+    ✅⚠ **BOTH RUNGS NOW SHIP (`TASK_110`), every stop condition cleared** — the
+    ledger passes `--cfg slb_twin` at **`21 verified, 0 errors`** matching the
+    pin, `_is_trusted` returns `False` ×3 with **TCB unchanged at 5/3**, and
+    `r4_foldonly` is Miri-clean on **seeds 0–7** with its positive control
+    firing. **The published table moved as predicted: R4 `1461`/`59441` →
+    `1251`/`50734` against R3's `1263`/`50745`, and the R4/R5 identity held.**
+    ⚠⚠ **BUT THE ENGINEER TEMPERED THE MANAGER'S FRAMING AND IS RIGHT: SHIPPING
+    THE NEW R4 *REMOVES* A HEADLINE RATHER THAN IMPROVING ONE.** `p42` now
+    publishes **"the R3 and R4 admissible classes are not separated"**, and its
+    own `NOTES` refuses `+12`/`+11` as a headline too — **two overlapping spans
+    do not become a difference by changing which endpoint you quote.**
+    ⚠⚠ **AND A REAL CAVEAT ON THE LEDGER, measured rather than argued: DELETING
+    ITS LEAK-FREEDOM `ensures` STILL GIVES `18 verified, 0 errors`.** No count
+    moves. **Only the `spec.md` textual pin catches its removal** — so the
+    obligation is load-bearing for the *program* and not for the *count*, which
+    is exactly the gap a reader would assume the count closes. ⚠ **The
+    declaration also never constrained the fold loop at all, which is why a
+    fifth spelling could move the endpoint in the first place.**
+
     ⚠ **`R1 − R1h` is `0.00` on gcc — and the two kernels ARE two rungs**, a hand
     `objdump` diff showing **exactly one field** (`jne <kernel+0x91>` against
     `jne <kernel+0x8c>`). **The C side's boundary is one branch-target field
     wide, and that is what `0.00` means.** ⚠⚠ **On clang the mechanism is WINDOW
     PARITY, NOT WINDOW SIZE** — `−5.00` on even windows and `−4.00` on odd, with
     **zero size dependence over a 32× range**; the build read its own two inputs
-    (97 odd, 4096 even) as a small-vs-large effect. **Three terms, isolated where
-    the report named one:** `+3` the `setne`/`sete`/`or` merge, `+1` an alignment
-    `nopw` executed once per call, and `+1` **on even windows only** from the
-    odd-remainder guard. `3+1 = 4` odd, `3+1+1 = 5` even, exact.
+    (97 odd, 4096 even) as a small-vs-large effect. ⚠ **FOUR terms, not three —
+    and the correction is against the REVIEW, by the task that landed it**: the
+    `setne`/`sete`/`or` merge is **`+1` NET, not `+3`**, because the review's
+    count did not subtract the `jne`+`cmp` the merge replaces. **The totals
+    agreed; the split did not.** ⚠ **Two successive tasks each isolated this
+    mechanism and each got the decomposition wrong in a different way — a
+    reminder that "totals agree" is not "mechanism established".**
 
     ✅⚠ **AND A METHOD LESSON FROM THE PREVIOUS PATTERN STOPPED A WRONG NUMBER
     HERE — the first time that has happened.** `p23` taught that a within-band

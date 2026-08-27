@@ -11,14 +11,22 @@
 #     that entry warns against.  This sweeps seeds 0..7 explicitly and prints
 #     which ran.
 #
-# (2) THE LEAK CHECK, WHICH IS THE ONE MECHANICAL CHECK p42 HAS ON THE RUST
-#     SIDE.  Verus cannot state leak-freedom at the pinned version
-#     (controls/affine_leak.rs), so what stands behind "R4 does not leak" is
-#     Miri's own report at process exit -- and an unexercised checker is
-#     indistinguishable from a satisfied one.  The POSITIVE CONTROL is the
-#     shipped `unsafe.rs` with the ERROR PATH's `dig_free` deleted, generated
-#     here by substitution so it cannot drift: Miri MUST report a leak on it,
-#     and MUST NOT on the shipped rung.
+# (2) THE LEAK CHECK, WHICH IS THE ONE MECHANICAL CHECK p42 HAS ON R4.
+#     What stands behind "R4 does not leak" is Miri's own report at process exit
+#     -- and an unexercised checker is indistinguishable from a satisfied one.
+#     The POSITIVE CONTROL is the shipped `unsafe.rs` with the ERROR PATH's
+#     `dig_free` deleted, generated here by substitution so it cannot drift:
+#     Miri MUST report a leak on it, and MUST NOT on the shipped rung.
+#
+#     /!\ AMENDED AT TASK_110.  This paragraph used to say "Verus cannot state
+#         leak-freedom at the pinned version (controls/affine_leak.rs), so what
+#         stands behind `R4 does not leak` is Miri".  The first clause is
+#         RETRACTED: R5 states leak-freedom and Verus checks it on every exit
+#         (controls/ledger_leak.py, ../NOTES.md 6).  This control is NOT
+#         weakened by that, because the ledger is a fact about R5 and this is
+#         the check on R4: the two are byte-identical machine code, the ledger
+#         is erased before codegen, and a proof carried by one rung is not a
+#         proof about the other.
 #
 #   sh patterns/p42-goto-cleanup/controls/miri_seeds.sh
 #

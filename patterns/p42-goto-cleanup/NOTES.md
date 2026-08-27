@@ -8,14 +8,42 @@
 50697e33b2971fc4c965a710fc1d6fad19000d81ecb7744fa8ddc07471e9fb8d
 ```
 
-**As shipped**, after the three edits below:
+**As TASK_104 shipped it**, after the three edits below:
 
 ```
 4a252569067081a55c55c8e6177bc8f6a4f897a57cd59a00c7c000a3da8d29a4
 ```
 
-⚠ **The hash MOVED TWICE, and here is exactly what moved it. All three edits are
-the gate's own findings, none weakens anything, and the intermediate value was
+**As shipped now**, after TASK_110's edits 4-9:
+
+```
+437ae31512cf250acac91e64e289b8cd200dfd83b78797aa3467945b86718d76
+```
+
+⚠ **The hash moved TWICE inside TASK_110, and the second move is disclosed
+rather than smoothed over.** Edits 4-8 took it to
+`2be2bf3f04df0d95890cb59c85c78edc4b98082f5efaecb64a9cffb94438dd6c`, and that
+value was gate-green with 0 failures. **Edit 9 then landed on top of it**,
+because re-deriving TASK_109 A1's attribute count for `idiom.why` gave **22**
+where the review had written 23 (section 6d) — a wrong number inside the hashed
+block is worse than a second hash move, and this pattern has now been corrected
+twice for exactly that class of thing.
+
+⚠ **AND THERE WAS A THIRD MEASURE AND A THIRD GATE, WHICH MOVED NO HASH IN THIS
+SECTION AND IS DISCLOSED ANYWAY.** A final sweep of the rung sources against the
+measured numbers — `.tasks/PROTOCOL.md` rule 6's added step — found two more
+stale comments, both in **measurement-hashed** files and neither inside the
+fence: trusted item 2's *"still gave `15 verified, 0 errors`"* (a TASK_104-era
+base count that now reads as current), and `unsafe.rs`'s SAFETY (3) and (4),
+which described the fold as an index after the do-while replaced it.
+`contract_sha256` did not move; `source_sha256` did, and the record was
+regenerated. ⚠ **The transferable part: there is NO comment-only escape in a
+rung source (`measure.py::measurement_sources` globs `pdir/*.rs`), so the sweep
+belongs BEFORE the first measurement. TASK_110 paid for it twice.**
+
+⚠ **The hash MOVED TWICE BEFORE TASK_104 SHIPPED, and here is exactly what moved
+it. All three edits are the gate's own findings, none weakens anything, and the
+intermediate value was
 `22cced7d398a9837624615e11f53fdecc967fb35c18c01590a50e6d8d8e6a5b6`. Edits 1 and
 2 were made BEFORE any `harness/measure.py` run; edit 3 was made AFTER, and it
 touches `idiom` only -- no `requires`, no `ensures`, no `identity`, no
@@ -53,10 +81,92 @@ touches `idiom` only -- no `requires`, no `ensures`, no `identity`, no
    first four entries forbid a STRUCTURE rather than a token and that their
    shout is permanent and correct.
 
-⚠ **The `git show HEAD:… | diff -` command PROTOCOL rule 6 quotes is VACUOUS on
-a new pattern** and is deliberately not run here: p42 lands in one commit, so on
-a clean tree it always prints nothing and always looks like it passed. The two
-hashes above are the only evidence.
+### ⚠⚠ TASK_110's edits, 4-9, and they MOVE the hash to `437ae31512cf`
+
+**All six are corrections, five of them TASK_109's findings and the sixth a
+correction to TASK_109 itself. Every one either STRENGTHENS a pin or retracts a
+false claim. None weakens anything.**
+
+4. **`verus.obligations` 15 → 18 and `twin_obligations` 18 → 21**, with three
+   items added to the item set: `led_alloc`, `led_free`, `kbody` — the ghost
+   ledger (section 6b). ⚠ **A pin going UP is the direction
+   `.memory/01-ladder.md`'s direction test permits**; the three items are pinned
+   with every clause, `kbody`'s leak-freedom `ensures` included, because
+   deleting that clause costs nothing any count would notice (section 6c).
+5. **`required[1]` and `required[2]` gained BACKTICKS, and `required[3]` gained
+   one on the C side.** TASK_109 M3: the two per-language entries carried no
+   backticks at all, so `check.py::_TICK` yielded **zero** spellings from them —
+   *the idiom this pattern is named for was pinned by nothing* — and
+   `required[3]`'s `dig[len-1]` matched **0 of 6** rungs. Measured before and
+   after, by driving the real `check.py::idiom_audit`:
+
+   | | before | after |
+   |---|---|---|
+   | backticked spellings | 16 | **18** |
+   | (spelling, rung) pairs | 52 | **56** |
+   | **pairs PRESENT** | **7** | **17** |
+   | `required_pins_nothing` | 7 | **5** — and all five are now the correct C-side scoping of a Rust-only entry |
+
+   ⚠ **This is a STRENGTHENING and it is measured as one**: `goto cleanup` now
+   pins both C rungs, `(uint8_t)(run >> 24)` / `(run >> 24) as u8` pins all six,
+   and `dig[len - 1 - i]` pins both C rungs. The Rust half of `required[3]`
+   quotes no spelling deliberately — the four Rust rungs spell the backwards
+   fold four different ways and a per-language key cannot name a rung — and the
+   entry says so and names what enforces it instead, exactly as
+   `forbidden[0..3]` do. ⚠ **A trap worth recording: the first draft of these
+   entries put file names and the retracted span in backticks inside the
+   explanatory prose, and the audit dutifully pinned all of them** — 27
+   spellings, 11 pinning nothing. **Every backtick in an entry is a pin.**
+6. **`idiom.why`'s *"WHAT THIS DECLARATION DOES NOT CLAIM"* clause is RETRACTED
+   and replaced** (section 6). The shared NAMED-SPELLING STANDARD paragraph is
+   **untouched** — `check.py::named_spelling_problem` returns `None`, so its
+   sha256 still matches the constant in all patterns.
+7. **`identity[0].why`'s closing sentence is RETRACTED** (it said Verus cannot
+   state leak-freedom) and its `O3` instruction counts are **re-measured**:
+   `127` against `128`, in `%r9`, where the pre-TASK_110 fold gave `120` against
+   `122` in `%r8` (section 8).
+8. **`miri.reason`'s *"Verus does NOT prove that `dig_free` is reached on every
+   path"* is amended** — it does, on R5. Miri's role on R4 is unchanged and the
+   `required: true` flag does not move.
+9. ⚠ **`idiom.why`'s attribute count 23 → 22**, and this one is a correction to
+   TASK_109 rather than to TASK_104: the review's clean negative (section 6d)
+   quoted *"23 `verifier::` attributes"*, and
+   `strings … | grep -oE 'verifier::[a-z_0-9]+' | sort -u` returns **22**. The
+   negative itself is unaffected — none of the 22 is a linear mode — but a
+   published count belongs to whoever re-runs it. **This edit landed AFTER the
+   first `measure.py`/`check.py` pass**, which cost a second re-measure and a
+   second gate run; both were re-run and the disclosure above says so.
+
+⚠ **The `git show HEAD:… | diff -` command PROTOCOL rule 6 quotes was VACUOUS on
+this pattern when it landed** — p42 landed in one commit, so on a clean tree it
+always printed nothing and always looked like it passed. ✅ **It is NOT vacuous
+any more, and it is the check to run from here on**, because p42 now has a
+shipped commit to diff against:
+
+```
+git show 096d870:patterns/p42-goto-cleanup/spec.md | diff - patterns/p42-goto-cleanup/spec.md
+```
+
+`096d870` is the commit p42 landed in. Before TASK_110 that diff was empty. It
+is now **eleven hunks**, and here is every one of them, so that a reviewer can
+read the disclosure instead of re-deriving it:
+
+| hunk (old line) | what | inside the fence? |
+|---|---|---|
+| 13, 21 | the `0.00`-on-the-success-path prose now names gcc, and the three-results table's middle row names the clang parity effect | no |
+| 63 | *"three things … are pinned in the block below"* → the table that says which of the three is pinned by a spelling and which is prose (TASK_109 M3) | no |
+| 147 | one row added to the pin table, for `kbody`'s leak-freedom `ensures` | no |
+| 161, 162, 163 | **edit 5** — the three `required` entries | **yes** |
+| 176 | **edits 6 and 9** — `idiom.why`'s retraction, and the 23 → 22 attribute recount inside it | **yes** |
+| 190, 191, 192 | **edit 4** — `obligations`, `twin_obligations` and its note | **yes** |
+| 248, 251 | **edit 4** — `led_alloc`, `led_free`, `kbody` added to `verus.items` | **yes** |
+| 294 | **edit 7** — `identity[0].why` | **yes** |
+| 301 | **edit 8** — `miri.reason` | **yes** |
+
+**Four** of the eleven hunks (old lines 13, 14, 21, 63, 147 — the first table row
+covers three of them) are prose **above** the fence and therefore move the gate's
+`source_sha256` and not `contract_sha256`; the other **seven** are inside it and
+are what `4a252569…` → `2be2bf3f…` is made of.
 
 **Honest scope of the claim.** The block was first written *after* the six rungs
 existed and after the exploratory probes in `.temp/t104/`, and *before* any
@@ -167,12 +277,37 @@ root stays live in `main`'s frame, and it offers
 `__lsan_default_options() -> "use_stacks=0"` as a zero-`Ir` fix. **p42 does not
 need it, and `c/main.c` deliberately defines no hook.**
 
-`controls/leak.sh` is the evidence and it is **88 points, not one**: 2 kernels ×
-4 optimisation levels × 11 inputs, at the gate's own stage-7 flag string except
-for `-O`, which it sweeps. Verbatim tail:
+`controls/leak.sh` is the evidence and it is **352 points, not one**: 2 kernels ×
+4 optimisation levels × **44 inputs**, at the gate's own stage-7 flag string
+except for `-O`, which it sweeps.
+
+⚠ **CORRECTED AT TASK_110, from TASK_109 C5. The number used to read `88`
+here, in the script's header comment, in the script's own success message and
+in `README.md`, and 88 was never right for any input set.** The glob is
+`"$PDIR"/inputs/*.bin`, which takes the 32 `sweep-w*.bin` as well as the 12
+matrix inputs: `2 × 4 × 44 = 352`. Excluding the sweeps it would be `2 × 4 × 12
+= 96`. The review ran the byte-identical shipped script and counted **352 rows**
+while it printed *"ALL 88 POINTS"*. ✅ **The count is now DERIVED from the loop
+that prints the rows, so it cannot go stale again.**
+
+✅ **THE TEETH WERE NEVER IN QUESTION AND WERE RE-MEASURED AT TASK_110, both
+arms, on a scratch replica so that no repo file was touched**
+(`.temp/t110/leakteeth.sh`; the copied script's md5 is checked against the
+shipped one first):
 
 ```
-ALL 88 POINTS AS DECLARED: the buggy rung reports a LeakSanitizer leak of
+ARM 1  unplanted                                   exit=0   352 rows, 0 flagged
+ARM 2  the missing `goto cleanup` PLANTED BACK     exit=1   12 rows flagged
+       -- i.e. the buggy rung made NOT to leak
+```
+
+The twelve are `kernel` × {`-O0`,`-O1`,`-O2`,`-O3`} × the three inputs that
+reach the error path (`-notag`, `-mixed`, `-win1`) — **exactly the rows the
+model says must leak** — and the hardened rung stays silent throughout. Verbatim
+tail of arm 1, as it now reads:
+
+```
+ALL 352 POINTS AS DECLARED: the buggy rung reports a LeakSanitizer leak of
 exactly n_err * win_len bytes on every input that reaches the error path
 and is silent on every input that does not; the hardened rung is silent on
 all of them, at every optimisation level.  No other sanitizer fired.
@@ -252,32 +387,81 @@ Kernel-**exclusive** `Ir` per call, `-O3`, inline mode **`isolated`**, from
 |---|---|---|---|---|
 | R1 c-gcc | 1873.00 | 77854.00 | 19.309 | 19.007 |
 | R1h c-gcc-h | **1873.00** | **77854.00** | 19.309 | 19.007 |
-| R1 c-clang | 1506.00 | 61487.00 | 15.526 | 15.012 |
+| R1 c-clang | 1506.00 | 61487.00 | 15.526 | 15.011 |
 | R1h c-clang-h | 1510.00 | 61492.00 | 15.567 | 15.013 |
 | R2 safe_naive | 1850.00 | 75826.00 | 19.072 | 18.512 |
-| R3 safe_tuned | **1263.00** | **50745.00** | 13.021 | 12.389 |
-| R4 unsafe | 1461.00 | 59441.00 | 15.062 | 14.512 |
-| R5 verus | 1461.00 | 59441.00 | 15.062 | 14.512 |
+| R3 safe_tuned | 1263.00 | 50745.00 | 13.021 | 12.389 |
+| R4 unsafe | **1251.00** | **50734.00** | 12.897 | 12.386 |
+| R5 verus | **1251.00** | **50734.00** | 12.897 | 12.386 |
+
+⚠⚠ **THE R4/R5 ROWS MOVED AT TASK_110 AND THE BOLD MOVED WITH THEM.** They read
+`1461.00 / 59441.00` while the fold loop was an index loop; the shipped R4 is
+now a do-while over a descending cursor, which is one induction variable instead
+of two. **The cheapest rung in the table is no longer `safe_tuned`.** Section 9
+has the search that found it and section 11b has what survives of the claim it
+refutes.
 
 **What each difference is, and what kind of thing it is:**
 
 | | small | large | |
 |---|---|---|---|
 | **R1 − R1h, gcc** | **+0.00** | **+0.00** | the leak is FREE on the success path, exactly |
-| **R1 − R1h, clang** | **−4.00** | **−5.00** | ⚠ the LEAKING rung is CHEAPER; mechanism below |
-| R3 − R4 | −198.00 | −8696.00 | safe-tuned beats unsafe -- the flattering direction, section 9 |
-| R2 − R4 | +389.00 | +16385.00 | `vec![0u8; len]` + indexing against raw |
+| **R1 − R1h, clang** | **−4.00** | **−5.00** | ⚠ the LEAKING rung is CHEAPER; it is a PARITY effect, mechanism below |
+| **R3 − R4** | **+12.00** | **+11.00** | ⚠⚠ **the sign FLIPPED at TASK_110**; it read `−198.00 / −8696.00` |
+| R2 − R4 | +599.00 | +25092.00 | `vec![0u8; len]` + indexing against raw |
 | **R5 − R4** | **+0.00** | **+0.00** | the `identity` pin's tautology, kernel-exclusive |
-| R1(gcc) − R4 | +412.00 | +18413.00 | |
-| R1(clang) − R4 | +45.00 | +2046.00 | same backend, and it shows |
+| R1(gcc) − R4 | +622.00 | +27120.00 | |
+| R1(clang) − R4 | +255.00 | +10753.00 | same backend, and it shows |
 
-### ⚠ R1 − R1h is `0.00` on gcc and NOT on clang, and the mechanism is a branch merge
+### ⚠ R1 − R1h is `0.00` on gcc and NOT on clang, and on clang the variable is PARITY
+
+⚠⚠ **CORRECTED AT TASK_110, from TASK_109 C2. This section used to present
+`−4.00` and `−5.00` as a `small`-vs-`large` pair, i.e. as a size effect. It is
+not one. The variable is the WINDOW'S PARITY, the size term is exactly zero over
+a 32× range, and the shipped inputs happen to be 97 (odd) and 4096 (even) —
+which is how a parity effect got read as a size effect off two points.**
 
 Both rungs execute the same success path, so a difference there is a code-layout
-effect and not work. It is: at `-O3` clang's **hardened** kernel is 121
-instructions to the buggy one's 119, because once the tag test's failure branch
-targets the same label as the `len == 0` early exit, clang **merges the two
-conditions branchlessly**:
+effect and not work. Measured on `harness/build.py`'s own binaries, whole-program
+marginal, `.temp/t110/parity.py`:
+
+```
+  window  parity        buggy     hardened    R1-R1h   parity model
+      64    even      1151.44      1156.44     -5.00     -5.00 OK
+      65     odd      1169.72      1173.72     -4.00     -4.00 OK
+      66    even      1186.72      1191.72     -5.00     -5.00 OK
+      67     odd      1200.72      1204.72     -4.00     -4.00 OK
+      78    even      1366.00      1371.00     -5.00     -5.00 OK
+      79     odd      1379.28      1383.28     -4.00     -4.00 OK
+     512    even      7870.00      7875.00     -5.00     -5.00 OK
+     513     odd      7889.72      7893.72     -4.00     -4.00 OK
+     526    even      8086.00      8091.00     -5.00     -5.00 OK
+     527     odd      8100.00      8104.00     -4.00     -4.00 OK
+ small.bin win=   97   odd      1649.00      1653.00     -4.00 predicted -4.00 OK
+ large.bin win= 4096  even     61867.00     61872.00     -5.00 predicted -5.00 OK
+```
+
+⚠ **The arm that must fire here is the SIZE arm**, and it is refutable by its own
+measurement: a size term would have made the 64..79 band and the 512..527 band
+disagree, and would have shown up as a miss on one of the twelve rows. It did
+not, over a 32× range, and the two shipped windows are then PREDICTED from
+parity alone rather than fitted.
+
+### ⚠ FOUR terms, not one, and they are attributed by callgrind rather than read
+
+`.temp/t110/terms.py` runs callgrind with `--dump-instr=yes` and takes the
+per-instruction marginal inside the `kernel` symbol, so every `Ir` is attributed
+to an address and a register rename cancels. `R1h − R1` decomposes exactly:
+
+| term | even | odd |
+|---|---|---|
+| the tag test goes BRANCHLESS: `setne` + `sete` + `or` replace one `jne` and one `cmp` | **+1** | **+1** |
+| one extra **alignment NOP** executed once per call (`data16 cs nopw` → `nopw` + `nopl`) | +1 | +1 |
+| the fold-loop preheader's address arithmetic respelled: one `lea` becomes two `mov` and one `add` | +2 | +2 |
+| the **odd-remainder guard**: `je <skip>` becomes `jne <do>; jmp <skip>`, so the extra `jmp` runs only when the remainder is ABSENT — **even windows only** | **+1** | **0** |
+| **total `R1h − R1`** | **+5** | **+4** |
+
+The merge itself is the instruction sequence TASK_104 quoted, and it is real:
 
 ```
    buggy                          hardened
@@ -289,31 +473,63 @@ conditions branchlessly**:
                                   je     <kernel+0x35>
 ```
 
-and the merged form is on the path every successful call takes. gcc does not
-merge them and pays nothing. **So "what the leak costs" is `0.00` on one
-compiler and `−4.00`/`−5.00` on the other, and neither number is about
-memory safety.** This is why the axis was declared as a behaviour matrix in
-`spec.md` before anything was measured.
+⚠ **But it is worth `+1`, not `+3`**, because the two branchless instructions it
+adds pay for a `jne` and a `cmp` they delete — TASK_109 C2 counted the three
+`setcc`/`or` without the two they replace, and the totals agreed only because
+its third term was mis-signed by the same amount. Statically, clang's hardened
+kernel is **121** instructions to the buggy one's **119**; dynamically, on the
+success path, the difference is the table above.
+
+gcc merges nothing and pays nothing. **So "what the leak costs" is `0.00` on one
+compiler and `−4.00`/`−5.00` on the other, the leaking rung being the CHEAPER
+one, and neither number is about memory safety.** This is why the axis was
+declared as a behaviour matrix in `spec.md` before anything was measured.
 
 ### ⚠ `R5 − R4 = 0.00` is convention-dependent, and the two conventions disagree
 
 Kernel-exclusive `Ir` gives **exactly `+0.00` on both inputs**, which is the
 tautology the `identity` pin forces. The **whole-program marginal** — the other
-convention this project uses — gives `1617.00 / 59834.00` for R4 and
-`1617.00 / 59803.00` for R5: **`0.00` on `small` and `−31.00` on `large`**, from
-two binaries whose kernels are byte-identical (`md5_fn 1ab63fde449d` both). The
-31 instructions are outside the kernel symbol; they are the binary-layout term
-`patterns/p01-array-sum/spec.md`'s `collapse.note` documents (p02's `0.02` from
-a differently-aligned destination buffer). **Quote `R5 − R4` in the
-kernel-exclusive convention, or say which one you meant.**
+convention this project uses — gives `1407.00 / 51127.00` for R4 and
+`1407.00 / 51096.00` for R5: **`0.00` on `small` and `−31.00` on `large`**, from
+two binaries whose kernels are byte-identical (`md5_fn 28432cb84883` both,
+`n_fn 128`). The 31 instructions are outside the kernel symbol; they are the
+binary-layout term `patterns/p01-array-sum/spec.md`'s `collapse.note` documents
+(p02's `0.02` from a differently-aligned destination buffer). **Quote `R5 − R4`
+in the kernel-exclusive convention, or say which one you meant.**
+
+⚠ **Re-measured at TASK_110 (`.temp/t110/wpmarg.py`), and the `−31.00` did not
+move even though both rungs did** — it read `1617.00 / 59834.00` against
+`1617.00 / 59803.00` on the pre-TASK_110 fold, i.e. the same 31 instructions
+outside the same symbol. That is what "binary-layout term" means, and it is a
+better piece of evidence for the claim than the original pair was.
 
 ---
 
-## 6. ⚠⚠ VERUS AT THE PINNED VERSION CANNOT STATE LEAK-FREEDOM. This is p42's central result.
+## 6. ⚠⚠ THE NATURAL ENCODING CANNOT STATE LEAK-FREEDOM. ESCROWING THE TOKEN CAN. This is p42's central result, and it is the OPPOSITE of what this section used to say.
+
+> ⚠⚠ **RETRACTION, TASK_110.** Until TASK_110 this section was headed *"VERUS AT
+> THE PINNED VERSION CANNOT STATE LEAK-FREEDOM"* and concluded that *"p42 is the
+> first pattern in this tree whose R5 proof does not cover the pattern's own bug
+> class"*. **Both sentences are false.** TASK_109 §A attacked the claim the way
+> `.tasks/PROTOCOL.md` rule 2 asks a review to, built a counterexample on this
+> very `verus.rs`, and TASK_110 shipped it. **The half of the old finding that
+> survives is the half that was actually measured — a bare `Tracked<Dealloc>` is
+> affine and a proof may drop it. The half that did not survive is the
+> generalisation from that measurement to "no encoding can".**
+>
+> ⚠ **The retracted claim is in the history of this file for a reason, and the
+> reason is the shape of the mistake, not the mistake:** what was measured was
+> *one encoding fails*; what was published was *the property is unstateable*.
+> `.tasks/PROTOCOL.md` rule 9's refinement is exactly this — a conclusion and a
+> mechanism carry different evidence — and here the CONCLUSION was the weaker
+> statement and the pattern published the stronger one.
 
 `.tasks/TASK_104.md` §2 asked *"Can Verus state 'this allocation is released on
 every path, including the error path'?"* and offered `p27`'s `Tracked<Dealloc>`
-as a precedent. **The answer is no, and the precedent does not transfer.**
+as a precedent. **The answer is yes, at +3 obligations and nothing else — but
+not by the route p27 suggests, and not with a bare token.**
+
+### 6a. What is true about the bare token, and it is what was measured
 
 `controls/affine_leak.rs` is the experiment, committed so it can be re-run:
 
@@ -343,30 +559,113 @@ vacuous. Move-only plus droppable is exactly **affine**, not linear.
 deallocation *legal* — no double free, no use-after-free, right size and
 alignment and provenance. Nothing makes it *happen*. p27's own leak-freedom
 claim rests on a `required` **spelling pin** in its `spec.md` and on reading the
-epilogue, not on its proof. So:
+epilogue, not on its proof. **All of that is still true, and none of it implies
+that leak-freedom is unstateable.**
 
-> **p42 is the first pattern in this tree whose R5 proof does not cover the
-> pattern's own bug class.** The `identity` pin certifies that R4 and R5 are the
-> same machine code; it does not certify that either is leak-free. What stands
-> behind leak-freedom on the Rust side is **Miri** (section 10) and the reader.
+### 6b. ⚠⚠ THE GHOST LEDGER, WHICH IS WHAT SHIPS
 
-⚠ **This is a CONCLUSION, and the MECHANISM is only half-isolated.** What is
-measured is that a dropped `Dealloc` verifies. What is *not* established is that
-no encoding could express the obligation. Two routes were considered and not
-built, and they are named here so nobody re-derives them:
+**Never hold a bare `Tracked<Dealloc>`.** A proof may drop an affine token; it
+may not drop a MAP whose contents a postcondition names. So `verus.rs` carries
+two ordinary verified wrappers:
 
-- a **ghost conservation ledger** threaded through the kernel as a
-  `Tracked(&mut …)` parameter, with the trusted `dig_alloc`/`dig_free`
-  contracts incrementing and decrementing it and the kernel ensuring it is
-  balanced. This would be a genuine obligation — a path that skips `dig_free`
-  leaves the counter at +1 and the postcondition fails — but it changes the
-  kernel's **signature**, and the kernel signature is pinned across all six
-  rungs. **Not built. OPEN.**
-- **a linear (rather than affine) tracked mode**, which the pinned Verus does
-  not appear to have. `../LearnVeri/_VERUS_DOC_/` calls `tracked` *"linear ghost
-  state"* in one line of `state_machines/src/intro.md`, and the measurement
-  above says that is loose language: it is affine. **Not exhaustively searched.
-  OPEN.**
+- `led_alloc` calls the trusted `dig_alloc` and **escrows** the returned
+  `Dealloc` into a tracked `Map<int, Dealloc>` under a ghost key, handing back
+  only the pointer and the `PointsToRaw`;
+- `led_free` **withdraws** the token from the map and spends it on the trusted
+  `dig_free`;
+- `kbody` — the `#[inline(always)]` body of `kernel` — `ensures` that the map's
+  domain comes back `Set::<int>::empty()`.
+
+Verus checks a postcondition on **every** exit, so the early `return 0` on the
+error path is checked too, and that path is p42's whole subject.
+
+**The price, measured rather than argued:**
+
+| | shipped R5 before | shipped R5 now |
+|---|---|---|
+| verification | `15 verified, 0 errors` | **`18 verified, 0 errors`** |
+| `--cfg slb_twin` | `18 verified, 0 errors` | **`21 verified, 0 errors`** |
+| `#[verifier::external_body]` items | 5 | **5** |
+| items `check.py::_is_trusted` calls trusted | 3 | **3** |
+| hand-written axioms | 0 | **0** |
+| kernel `n_fn` at `-O3` | 122 | 128 (the fold loop moved too, section 9) |
+| `identity unsafe ≡ verus` at `-O3` | `exact` | **`exact`, `md5_raw_equal: True`** |
+| pinned kernel signature, `driver.canonical` | — | **unchanged** |
+
+**+3 obligations, 0 trusted items, 0 instructions.** The ledger is ghost and is
+erased before codegen; R5's kernel is byte-identical to R4's.
+
+⚠ **THE ONE NON-OBVIOUS STEP, so nobody rediscovers it: key the map by a ghost
+`int`, NOT by the address.** `dig_alloc` promises nothing about the returned
+address being absent from the ledger, so `dom.insert(a).remove(a) =~= dom` is
+unprovable and the postcondition fails on **both** exits — the arms then fire
+for the wrong reason and the base does not verify at all. A ghost key with
+`requires !old(led).dom().contains(k)` is discharged by the caller for free.
+Measured both ways at TASK_109 A2.
+
+### 6c. THE ARMS THAT MUST FIRE — `controls/ledger_leak.py`, and there are two
+
+An obligation nobody has seen fail is indistinguishable from a decoration. The
+control deletes each of the two `led_free` calls in turn, from the shipped
+`verus.rs`, by substitution, and requires Verus to reject each and to **name the
+exit**:
+
+```
+  base       18 verified,  0 errors  OK
+  leak_err   17 verified,  1 errors  OK
+            Verus names the exit: return 0; [at this exit]
+  leak_ok    17 verified,  1 errors  OK
+            Verus names the exit: acc [at the end of the function body]
+```
+
+The failing clause is `final(led).dom() =~= Set::<int>::empty()` in both arms.
+`leak_err` is **exactly the C rung's bug**, transplanted into R5, and R5 catches
+it by file and line.
+
+⚠ **AND THE OTHER DIRECTION, WHICH IS WHY THE CLAUSE IS PINNED IN `spec.md`
+RATHER THAN MERELY WRITTEN.** Deleting the *clause* instead of the *release*
+gives **`18 verified, 0 errors`** — the same count as the shipped file, because
+a tracked `Map` is as droppable as the token inside it. **The obligation
+vanishes and no number moves.** That is `spec.md`'s `verus.items[*].ensures` pin
+doing the job it exists for: only a textual diff against the declaration catches
+it, and `contract_sha256` is where that diff shows up.
+
+### 6d. ⚠ THE RESIDUAL TRUST, AND A CLEAN NEGATIVE
+
+**The obligation binds allocations that go through `led_alloc`.** A direct call
+to `dig_alloc` — or to `vstd::raw_ptr::allocate` — still drops its token
+silently. **That is a module-level discipline, not a global guarantee**, and it
+is the honest form of the claim: *p42's R5 states leak-freedom for the
+allocations its own wrapper makes, and the residual trust is that nothing
+bypasses the wrapper.* That is a smaller claim than "Verus proves this program
+does not leak" and a much larger one than "Verus cannot say".
+
+✅ **CLEAN NEGATIVE, so nobody re-runs the search: there is no linear
+(must-consume, non-droppable) tracked mode at the pinned Verus.** TASK_109 A1's
+finding, **re-derived at TASK_110** on `0.2026.08.09.92f466f`:
+
+- `strings ~/tools/verus/rust_verify | grep -oE 'verifier::[a-z_0-9]+' | sort -u`
+  → **22 distinct attribute names** (`.temp/t110/verus_attrs.txt`), none of them
+  a linear / must-consume / no-drop mode. **The only one matching `linear` at all
+  is `verifier::nonlinear`.** ⚠ **TASK_109 said 23 and it is 22** — the
+  conclusion does not depend on the count, but the count is published, so it is
+  recounted here rather than copied;
+- `grep -rn affine ~/tools/verus/vstd/ -i` → **0 hits**. `grep` for a bare
+  `linear` token (excluding `nonlinear*` and `lineariz*`) finds **one** hit in
+  the whole of vstd, and it is the phrase *"non-linear arithmetic"* in a doc
+  comment (`arithmetic/internals/general_internals.rs:14`);
+- `../LearnVeri/_VERUS_DOC_/`'s *"linear ghost state"*
+  (`state_machines/src/intro.md:41`) is a **name, not a drop check**.
+
+⚠ **Read the first bullet narrowly and it is still decisive**: `strings` over a
+binary is a lower bound on the attribute set, so "22" is *"22 that the binary
+spells literally"* and not *"22 that exist"*. What the bullet rules out is a
+linear mode among them, and the second bullet rules out any linear/affine
+machinery in vstd, which is where such a mode would have to be used.
+
+**This route genuinely does not exist**, and that is now measured rather than
+"does not appear to have". The ledger is what stands in for it, and it costs
+three verification conditions.
 
 ---
 
@@ -386,13 +685,34 @@ The other two — `load_input` and `emit` — are `external_body` with **no**
 `ensures` and no `unsafe`, exactly as every pattern's are: an `ensures` on
 `load_input` would be an axiom about the contents of a file.
 
+⚠ **THE GHOST LEDGER ADDS NOTHING TO THIS TABLE, and that is the point of it.**
+`led_alloc` and `led_free` (section 6b) are ordinary verified functions: no
+`external_body`, no `unsafe`, so `_is_trusted` returns `False` for both and
+`_scan_unsafe_sites` finds every `unsafe` token still inside a trusted body.
+Driven for real rather than argued — `check.py` imported and its own predicates
+called over the shipped `verus.rs`:
+
+```
+led_alloc  fn  external=None  trusted=False
+led_free   fn  external=None  trusted=False
+kbody      fn  external=None  trusted=False
+external_body items: 5     _is_trusted: 3        <- both UNCHANGED
+_scan_unsafe_sites -> 0 failures; 5 `unsafe` tokens, all inside a trusted body
+```
+
 **Hand-written axioms: 0.** `vparse.axiom_decls(verus.rs)` returns `[]`; the
 contract declares `verus.axioms = {"verus.rs": 0}` and the gate re-derives it.
 p42 uses vstd's `assume_specification`s for `<*mut T>::addr` and
 `<*mut T>::with_addr`, but those are vstd's, not this pattern's.
 
-**Verus itself: `15 verified, 0 errors` shipped, `18 verified, 0 errors` under
-`--cfg slb_twin`** (15 + the three twins).
+**Verus itself: `18 verified, 0 errors` shipped, `21 verified, 0 errors` under
+`--cfg slb_twin`** (18 + the three twins). ⚠ **Both counts rose by 3 at
+TASK_110** — they read 15 and 18 — and the three are `led_alloc`, `led_free` and
+`kbody`. **The twin run was the review's own untested item** (TASK_109_REPORT,
+"WHAT I DID NOT DO" 5: *"I did not test whether the ledger encoding survives
+`--cfg slb_twin`"*) and it passes: the token `slb_twin` still occurs nowhere but
+on the three twins' own `#[cfg]` attributes, so the two configurations differ in
+nothing but the twin items.
 
 ## SLB-TRUSTED-ARGUMENT verus.rs v_get_unchecked
 
@@ -471,10 +791,21 @@ provenance equalities.
 means a caller cannot *use* the block afterwards. It does **not** mean the
 caller is obliged to call this item at all. `Tracked<Dealloc>` is affine at the
 pinned Verus, so a path that simply drops it verifies — measured, with a
-control, in section 6. **This item's contract is about the legality of a
+control, in section 6a. **This item's contract is about the legality of a
 release, never about its occurrence, and no clause of it could be strengthened
-to say otherwise.** That is why p42's leak claim on the Rust side rests on Miri
-and not on this contract.
+to say otherwise.**
+
+⚠ **CORRECTED AT TASK_110, from TASK_109 m3. The sentence that used to close
+this paragraph — *"That is why p42's leak claim on the Rust side rests on Miri
+and not on this contract"* — is now wrong, and it was wrong in an instructive
+way: the statement about `dig_free` ITSELF is still exactly right, and the
+inference drawn from it was not.** Nothing this trusted item says can be
+strengthened into *"the release happens"*; but a **verified wrapper over this
+same item** can say it, at zero addition to the trusted text, and section 6b is
+that wrapper. So the correct closing sentence is: **p42's leak claim rests on
+Miri for R4 and on `kbody`'s ledger postcondition for R5, and on this contract
+for neither** — which is the same thing this paragraph always said about
+`dig_free`, with the false corollary removed.
 
 **(c) Does each clause mean the same in both configurations?** As for
 `dig_alloc`: vstd's own spec functions, one pinned vstd, and `slb_twin` appears
@@ -488,23 +819,43 @@ nowhere but on the twin's `#[cfg]`.
 pattern in the tree pins. It took two edits to `unsafe.rs`, and **both were
 found by the pin dropping, not by reading**:
 
-**(1) `O3` read `differ` (120 vs 122 instructions) until `unsafe.rs` bound `q`
-and `b` in verus.rs's order.** R4 first wrote `dig_write(dig_at(p, base, i),
-(run >> 24) as u8)` as one expression; R5 *must* bind `q` before `run` is
-updated, because the permission split that licenses the store happens between
-them. The two are the same program and not the same object code — the complete
-difference:
+⚠ **RE-MEASURED AT TASK_110 AGAINST THE SHIPPED TREE, because the fold loop
+moved underneath both of them.** `.tasks/PROTOCOL.md` rule 6's added step says a
+frozen declaration is evidence about *when* it was written and not about whether
+it is still true, so both edits were put back one at a time and the pin watched
+(`.temp/t110/idprobe.py`, three arms, **two of which must fail**):
 
 ```
-R4  lea    0x1(%r14),%r8            R5  lea    (%r15,%r14,8),%r8
-                                        add    $0x8,%r8
-    mov    -0x8(%r15,%r8,8),%r9         mov    -0x8(%r8,%rdx,8),%r9
-    mov    (%r15,%r8,8),%rcx            mov    (%r8,%rdx,8),%rcx
-    add    $0x2,%r8                     (absent)
+  O0  base  identity=norel  n_fn R4= 104 R5= 104  want=norel   OK
+  O0  P2    identity=differ n_fn R4= 106 R5= 104  want=!norel  OK -- FIRED
+  O3  base  identity=exact  n_fn R4= 128 R5= 128  want=exact   OK
+  O3  P1    identity=differ n_fn R4= 127 R5= 128  want=!exact  OK -- FIRED
 ```
 
-LLVM strength-reduces the write loop differently: R5 keeps a byte cursor in
-`%r8`, R4 keeps an index. Two instructions.
+**Both mechanisms reproduce; one of the two COUNTS moved and is corrected
+below.**
+
+**(1) `O3` read `differ` until `unsafe.rs` bound `q` and `b` in verus.rs's
+order.** R4 first wrote `dig_write(dig_at(p, base, i), (run >> 24) as u8)` as
+one expression; R5 *must* bind `q` before `run` is updated, because the
+permission split that licenses the store happens between them. The two are the
+same program and not the same object code — the complete difference, on the
+shipped tree:
+
+```
+R4  lea    0x1(%r14),%r9            R5  lea    (%r15,%r14,8),%r9
+                                        add    $0x8,%r9
+    mov    -0x8(%r15,%r9,8),%r10        mov    -0x8(%r9,%rdx,8),%r10
+    mov    (%r15,%r9,8),%rcx            mov    (%r9,%rdx,8),%rcx
+    add    $0x2,%r9                     (absent)
+    data16 cs nopw 0x0(%rax,%rax,1)     nopl   0x0(%rax)
+```
+
+LLVM strength-reduces the write loop differently: R5 keeps a byte cursor, R4
+keeps an index. ⚠ **`127` against `128` — ONE instruction net, in `%r9`.** This
+read *"120 vs 122 instructions … in `%r8` … two instructions"* before TASK_110,
+which was correct for the index fold and is not correct for the do-while. Both
+figures are recorded; only the second is a fact about the shipped tree.
 
 **(2) `O0` read `differ` (106 vs 104) until `dig_write` spelled the store
 `*q = b` instead of `core::ptr::write(q, b)`.** The complete difference:
@@ -520,7 +871,8 @@ R4  mov    %rax,0x48(%rsp)          R5  mov    %rcx,0x48(%rsp)
 
 `core::ptr::write` is `#[inline]`, not `#[inline(always)]`, and survives as a
 CALL at `-O0`; vstd's `ptr_mut_write` is `#[inline(always)]` over an
-already-optimised precompiled vstd and becomes a bare store.
+already-optimised precompiled vstd and becomes a bare store. ✅ **`106` against
+`104` re-measured EXACTLY at TASK_110, count, mechanism and disassembly alike.**
 
 ⚠ **This is p27's finding and TASK_104 reproduced it by writing it BACKWARDS.**
 p27's note says `*base = v` is the spelling to use *because* `core::ptr::write`
@@ -569,34 +921,63 @@ negative manufactures a refusal.
 
 ---
 
-## 9. Both sides searched: the R3 and R4 spelling spans
+## 9. Both sides searched — and ⚠⚠ THE FIRST SEARCH WAS NOT DEEP ENOUGH, WHICH IS THE ROW'S SHARPEST FINDING
 
-⚠ p42 lands in the **flattering direction** — safe-tuned Rust is cheaper than
-unsafe Rust here — which is the trap that has caught this project's patterns
-repeatedly, so both sides were searched to the same depth and the count is
-stated: **four spellings per side**, all generated from a shipped rung by textual
-substitution in `controls/spellings.py` so that no variant can drift from the
-rung it varies. Every variant is checked to print the shipped checksum before it
-is measured. Numbers in section 11.
+⚠⚠ **TASK_104 searched four spellings per side and published a comparative
+headline off them. TASK_109 §B searched ONE more on the R4 side and the headline
+reversed.** That is the finding, and it is worth more than the number: *an
+in-contract spread is only as good as the search behind it, and the number of
+spellings is not the measure of the search — whether the search reached the
+SHAPE the pin permits is.* p42's first four R4 spellings were four ways of
+writing a two-induction-variable fold; the fifth was a different shape.
 
-⚠ **Two of the four R4 variants are NOT admissible rungs**, and the reason is
+p42 landed in the **flattering direction** — safe-tuned Rust cheaper than unsafe
+Rust — which is the trap that has caught this project's patterns repeatedly, and
+the trap sprang anyway. **The R4 side now carries five spellings and the R3 side
+four**, all generated from a shipped rung by textual substitution in
+`controls/spellings.py` so that no variant can drift from the rung it varies.
+Every variant is checked to print the shipped checksum before it is measured.
+Numbers in section 11b.
+
+### 9a. Which R4 spellings are admissible, and why the refusals are refusals
+
 `.memory/01-ladder.md`'s "R4 is chained to the prover": R4 must have a
-byte-identical R5 twin that Verus verifies, and the pinned vstd specifies
-`<*mut T>::addr` and `<*mut T>::with_addr` and **not** `<*mut T>::add` or
-`offset` (`grep -n assume_specification ~/tools/verus/vstd/raw_ptr.rs` — two
-pointer-method entries, both in the `pointer_specs!` macro). So `r4_add` and
-`r4_movptr` cannot be p42 rungs at all. `r4_endptr` uses only `with_addr` and
-`<*mut T as PartialEq>::eq`, both specified, so it is admissible **in
-principle** and **nobody has built its R5** — that is p42's open question and it
-is stated as one rather than assumed away. p42 therefore holds its R4 endpoint
-**fixed by fiat** at the shipped, verified spelling and publishes the span,
-which is what `.memory/01-ladder.md` asks for instead of a pair interval.
+byte-identical R5 twin that Verus verifies.
+
+| spelling | admissible? | why |
+|---|---|---|
+| **`r4_ship`** — do-while over a descending cursor | ✅ **SHIPPED**, `18 verified, 0 errors`, identity `exact` | `with_addr`, `addr`, `ptr_ref` and `<*mut T as PartialEq>::eq`, all four specified at the pin (`~/tools/verus/vstd/raw_ptr.rs`, `pointer_specs!`) |
+| `r4_idxfold` — the fold by reverse INDEX | ✅ yes — **it was the shipped rung until TASK_110** and verified 15/0 | same operations |
+| `r4_add` — `p.add(i)` | ❌ | the pinned vstd specifies `<*mut T>::addr` and `<*mut T>::with_addr` and **not** `<*mut T>::add` or `offset` (`grep -n assume_specification ~/tools/verus/vstd/raw_ptr.rs` — two pointer-method entries, both in `pointer_specs!`) |
+| `r4_movptr` — cursor plus counter, `w.add(1)`/`q.sub(1)` | ❌ | same |
+| `r4_endptr` — cursor against an END pointer | ❌ **and this answer is NEW** | below |
+
+⚠⚠ **`r4_endptr` was p42's disclosed open question — *"admissible in principle,
+R5 unbuilt"* — and TASK_109 B2 answered it: it is INADMISSIBLE, for a reason
+nobody had identified.** It uses only specified operations, so the refusal is
+not about the operation set at all. It needs the **one-past-the-end pointer**
+`dig_at(p, base, len)`, whose `requires` is `base + i <= usize::MAX`; and
+`vstd::raw_ptr::allocate` ensures only `addr + size <= usize::MAX + 1` (`grep -n
+'usize::MAX' ~/tools/verus/vstd/raw_ptr.rs` → **one hit, that one**), while
+`PointsToRaw::is_range` carries no address bound. So the pointer is **not
+computable in verified exec code**, and building it would cost a *strengthened*
+trusted `ensures` on `dig_alloc` — which this pattern's own trusted argument
+forbids (*"Every difference from vstd is a WEAKENING or a respelling, never a
+strengthening"*, section 7) and which is exactly what disqualified p16's
+`r4_hdr`. The probe carried a control that verifies, so it was not vacuous:
+`dig_at(p, base, len - 1)` verifies and `dig_at(p, base, len)` does not, in the
+same file, `3 verified, 1 errors`.
+
+✅ **The shipped do-while exists precisely because it never forms that pointer**:
+it starts at `len - 1` and leaves through `q == p`, so every address it computes
+is inside the allocation.
 
 **A clean negative worth keeping:** `with_addr` is **not** the pessimisation.
 `r4_add` — the same rung with `p.add(i)` instead of `p.with_addr(base + i)` — is
-identical to the shipped rung to the instruction on `small`. The gap between R4
-and R3 is the number of induction variables per loop, not the addressing
-spelling.
+identical to the shipped rung **to the instruction on both inputs**
+(1407.00 / 51127.00, section 11b). The gap between R4 and R3 was the number of
+induction variables per loop, not the addressing spelling — and closing that gap
+is what moved the row.
 
 ---
 
@@ -612,10 +993,18 @@ it were seed-independent.
 `controls/miri_seeds.sh` sweeps **seeds 0 through 7** over every input with
 `n_iters` clamped to 4 (the gate's own `MIRI_PROBE_ITERS`), and it carries a
 **positive control that must fire**: the shipped `unsafe.rs` with the ERROR
-PATH's `dig_free` deleted, generated by substitution so it cannot drift. Since
-Verus cannot state leak-freedom (section 6), **Miri's own leak report is the
-only mechanical check p42 has that R4 does not leak** — and an unexercised
-checker is indistinguishable from a satisfied one. Results in section 11.
+PATH's `dig_free` deleted, generated by substitution so it cannot drift.
+**Miri's own leak report is the only mechanical check p42 has that R4 does not
+leak** — and an unexercised checker is indistinguishable from a satisfied one.
+Results in section 11c.
+
+⚠ **AMENDED AT TASK_110. This paragraph used to open *"Since Verus cannot state
+leak-freedom (section 6)"*, which is retracted** — R5 states it and checks it on
+every exit (section 6b). **Miri is still load-bearing and the row is not
+weakened**, because the ledger is a fact about R5 and Miri is the check on R4:
+the two rungs are byte-identical machine code, and a proof carried by one is not
+a proof about the other. `identity` compares object code; the ledger is erased
+before codegen.
 
 ⚠ One trap this control fell into and climbed out of: `adversarial-shortlen.bin`
 exits **5** by design, and the first version read `rc != 0` as UB, so every seed
@@ -638,79 +1027,168 @@ only a rebuild can produce must not live in a file the rebuild re-hashes, and
 `miri.blocked_reason` declares that row in advance, and a timeout is recorded as
 BLOCKED, never as a pattern failure.
 
-**Five shouts, all expected and all permanent:** four are stage 0b saying that
-`idiom.forbidden[0..3]` backtick no spelling — correct, they forbid a STRUCTURE,
-and the `why` says so in the gate's own words — and one is the Miri block above.
+**Four shouts and one BLOCKED row, all expected and all permanent.** The four
+shouts are stage 0b saying that `idiom.forbidden[0..3]` backtick no spelling —
+correct, they forbid a STRUCTURE, and the `why` says so in the gate's own words.
+The blocked row is Miri on `large.bin`, above. ⚠ **This paragraph used to say
+*"five shouts … and one is the Miri block"*, which folded a `rep.block` into the
+`rep.shout` count**; the gate record keeps them in two different lists
+(`loud: 4`, `blocked: 1`) and so does this line now.
+
+⚠ **The four shouts did NOT change when TASK_110 backticked `required[1..3]`,
+and that is the right behaviour**: stage 0b's shout is about `forbidden` entries
+only, and p42's four prose `forbidden` entries still deliberately quote nothing.
+What TASK_110 moved is the `required` audit — 7 present pairs to 17 — which the
+gate reports and never fails on.
 
 ### 11a. The ladder
 
 Section 5 has the table. Wall clock, `-O3 isolated`, min of 30 interleaved reps
-on cpu 3, **secondary to `Ir` and quoted only as a sanity check**: `small`
-10.86–12.44 ms, `large` 14.05–15.80 ms across the eight cells, with `safe_naive`
-slowest and `c-clang`/`c-clang-h` fastest on both — the same ordering the `Ir`
-column gives except that `safe_tuned`'s `Ir` win does not show up in wall clock
-(10.93 ms against `unsafe`'s 10.91 ms on `small`), which is what a
-1.3 %-of-`Ir` difference under a 10 ms process looks like.
+on cpu 3, **secondary to `Ir` and quoted only as a sanity check**: about
+**11–13 ms** on `small` and **14–16 ms** on `large` across the eight cells, with
+`safe_naive` slowest and the two clang cells fastest on both — the same ordering
+the `Ir` column gives **at the ends**.
 
-### 11b. The spelling spans -- four per side, whole-program marginal `Ir`/call, `-O3 isolated`
+⚠ **In the MIDDLE it resolves nothing, and TASK_110 has direct evidence rather
+than an argument.** `measure.py p42` ran **three times** during TASK_110, on
+trees differing only in comments. The `unsafe`-vs-`safe_tuned` order on `large`
+came out **unsafe cheaper, safe_tuned cheaper, unsafe cheaper** — it flipped and
+flipped back on binaries whose `Ir` never moved. The kernel-exclusive difference
+is `11.00 Ir`/call out of ~50 700, **0.02 %**. **So the `+12.00 / +11.00` in
+section 5 is an `Ir` result, and wall clock neither corroborates nor contradicts
+it.** ⚠ Ranges are quoted to the nearest millisecond here deliberately: a
+min-of-30 wall figure is a number only a rebuild can produce, and `NOTES.md` is
+inside the gate record's `source_sha256` (the same rule section 3 applies to the
+leaked byte count and section 11c to Miri's allocation IDs).
+
+### 11b. The spelling spans -- five R4, four R3, whole-program marginal `Ir`/call, `-O3 isolated`
+
+Measured in ONE session by `controls/spellings.py --measure` at TASK_110, from
+the shipped rungs:
 
 | variant | small (97) | large (4096) | admissible as a p42 rung? |
 |---|---|---|---|
-| **r4_ship** (index + `with_addr`) | **1617.00** | **59834.00** | ✅ shipped, Verus-verified |
-| r4_add (`p.add(i)`) | 1617.00 | 59834.00 | ❌ no vstd spec for `<*mut T>::add` |
+| **r4_ship** (do-while, descending cursor) | **1407.00** | **51127.00** | ✅ **SHIPPED**, Verus-verified 18/0 |
+| r4_idxfold (the fold by reverse INDEX) | 1617.00 | 59834.00 | ✅ — was the shipped rung to TASK_109 |
+| r4_add (`p.add(i)`) | 1407.00 | 51127.00 | ❌ no vstd spec for `<*mut T>::add` |
 | r4_movptr (cursor + counter) | 1491.00 | 54710.00 | ❌ same |
-| **r4_endptr** (cursor vs end ptr) | **1455.00** | **53174.00** | ⚠ in principle YES; **R5 unbuilt** |
+| r4_endptr (cursor vs end ptr) | 1455.00 | 53174.00 | ❌ needs the one-past-the-end pointer (section 9a) |
 | **r3_ship** (`with_capacity`+`extend`+`rev().fold`) | **1419.00** | **51138.00** | ✅ shipped |
 | r3_revidx (`extend` + index fold) | 1627.00 | 59845.00 | ✅ |
 | r3_zeroed (`vec![0;len]`+`clear`+`extend`) | 1572.00 | 55298.00 | ✅ |
 | r3_push (`with_capacity`+`push`+index fold) | 2634.00 | 102846.00 | ✅ |
 
-**R4 span 1455 … 1617 (small), 53174 … 59834 (large). R3 span 1419 … 2634
-(small), 51138 … 102846 (large).**
+**Both spans are over the ADMISSIBLE spellings only** — the three refusals are
+listed for the search's sake and are not endpoints of anything. **R4 span
+`1407 … 1617` (small), `51127 … 59834` (large), from `r4_ship` and
+`r4_idxfold`. R3 span `1419 … 2634` (small), `51138 … 102846` (large).**
+(The inadmissible `r4_add` happens to tie `r4_ship` to the instruction, so
+including it would not move the endpoint — but it is excluded on principle, not
+because it is free to exclude.)
 
-⚠⚠ **THE TWO SPANS OVERLAP, and saying so is the point.** `r3_revidx` at
-1627.00 is *dearer* than every R4 spelling measured, and `r3_push` is dearer by
-63 %. What survives the search is the narrower claim:
+### ⚠⚠ THE HEADLINE THIS SECTION USED TO CARRY IS RETRACTED, AND SO IS THE CONSTRUCTION THAT PRODUCED IT
 
-> **cheapest R3 found (1419.00 / 51138.00) is below cheapest R4 found
-> (1455.00 / 53174.00), by 36.00 and 2036.00** — so "safe-tuned Rust beats
-> unsafe Rust here" is not an artefact of an unsearched R4 side. It is a
-> statement about the two INFIMA, on eight spellings, and it is 2.5 % on `small`
-> and 3.8 % on `large`.
+Until TASK_110 this section read:
+
+> ~~*cheapest R3 found (1419.00 / 51138.00) is below cheapest R4 found
+> (1455.00 / 53174.00), by 36.00 and 2036.00 — so "safe-tuned Rust beats unsafe
+> Rust here" is not an artefact of an unsearched R4 side. It is a statement
+> about the two INFIMA, on eight spellings.*~~
+
+**It is refuted twice over.**
+
+1. **On the numbers.** One further R4 spelling — `r4_ship`, using nothing the
+   pinned vstd does not already specify — is **below every R3 spelling p42
+   measured**. `min(R3 found) − min(R4 found)` goes `−36.00 / −2036.00` →
+   **`+12.00 / +11.00`. The sign flips.** The R4 side *was* unsearched, which is
+   the very thing the retracted sentence denied.
+2. ⚠⚠ **On the form, and this is the part worth keeping.** `min − min` was
+   never a licensed construction here, and **p42's own hashed `why` says so, in
+   words this pattern carries byte-identically with five others**: *"`min(R3
+   found) − min(R4 found)` is **NOT the repair** — two upper bounds differenced
+   bound nothing in either direction."* Calling the two minima *"the two
+   INFIMA"* is the error in one word: **they are upper bounds on the infima over
+   the spellings someone happened to try**, and `r4_ship` is the counterexample
+   the paragraph predicted. **A pattern can quote its own declaration's
+   retraction and then commit the retracted move four sections later; p42 did.**
+
+### What ships instead
+
+✅ **`R3ship − R4ship` — two SHIPPED cells, which is the only form that
+paragraph licenses:** **`+12.00` on `small` and `+11.00` on `large`**,
+kernel-exclusive (section 5), and `+12.00 / +11.00` whole-program as well. With
+R4 held fixed by fiat at the shipped verified spelling, that bounds
+`inf(in-contract R3) − R4ship` from above and nothing else.
+
+✅ **And beside it, both spans — which is what `.memory/01-ladder.md` asks for
+instead of a pair interval.** ⚠⚠ **They OVERLAP, at both ends: the R3 span's
+lower endpoint (1419) lies inside the R4 span, and the R4 span's upper endpoint
+(1617) lies inside the R3 span.** `r3_revidx` at 1627.00 is dearer than every R4
+spelling measured; `r3_push` is dearer than the dearest R4 by 63 %; and
+`r4_idxfold` at 1617.00 is dearer than two of the four R3 spellings.
+
+> ⚠ **A difference whose endpoints overlap is not a difference.** p42 publishes
+> two spans that overlap and one bounded quantity between two named cells. It
+> does **not** publish "safe Rust beats unsafe Rust here", and it does not
+> publish the mirror claim either — **"unsafe beats safe-tuned by 12"** would be
+> the same mistake with the sign turned round, made off a search that has now
+> been wrong once. **The row's honest statement is that on this kernel the R3
+> and R4 admissible classes are not separated by the measurement.**
 
 ✅ **Clean negative: `with_addr` is not the pessimisation.** `r4_add` measures
-identically to the shipped rung at both inputs. The gap between R4 and R3 is the
-number of induction variables per loop, not the addressing spelling — and the
-one R4 spelling that gets to one induction variable per loop (`r4_endptr`)
-closes 162 of the shipped 198.
+identically to the shipped rung at both inputs (1407.00 / 51127.00). What moved
+the R4 endpoint was the number of induction variables in the fold loop — two
+down to one — and not the addressing spelling.
 
 ### 11c. Miri
 
-`controls/miri_seeds.sh`. **Seeds 0,1,2,3,4,5,6,7 over the nine small inputs:
-no UB, no leak, at every seed.** `adversarial-wincap.bin` (200 000 words) is
-clean at the default seed; **`large.bin` is BLOCKED — it exceeds 180 s under
-interpretation**, which is `check.py`'s own `MIRI_TIMEOUT`, so that one input is
-unchecked and the others are not.
+`controls/miri_seeds.sh`, **re-run at TASK_110 on the do-while fold**. **Seeds
+0,1,2,3,4,5,6,7 over the nine small inputs: no UB, no leak, at every seed.**
+`adversarial-wincap.bin` (200 000 words) is clean at the default seed;
+**`large.bin` is BLOCKED — it exceeds 180 s under interpretation**, which is
+`check.py`'s own `MIRI_TIMEOUT`, so that one input is unchecked and the others
+are not.
+
+⚠ `adversarial-win1.bin` is the sharp input for this rung: `win_len == 1`, so the
+do-while executes its body once and breaks on the first `q == p`, with no
+address ever computed outside the one-byte allocation.
 
 **THE POSITIVE CONTROL FIRES**, and this is the row that matters, because it is
-the only mechanical check p42 has that R4 does not leak (section 6):
+the only mechanical check p42 has that **R4** does not leak (section 10):
 
 ```
-adversarial-notag        rc=1  error: memory leaked: alloc7447  (Rust heap, size: 32, align: 1)   4 leaked
-adversarial-mixed        rc=1  error: memory leaked: alloc13213 (Rust heap, size: 24, align: 1)   2 leaked
-adversarial-win1         rc=1  error: memory leaked: alloc3233  (Rust heap, size: 1,  align: 1)   4 leaked
-small.bin                rc=0  no leak
+adversarial-notag.bin   rc=1  miri-leak=YES want=YES OK  size: 32, align: 1
+adversarial-mixed.bin   rc=1  miri-leak=YES want=YES OK  size: 24, align: 1
+adversarial-win1.bin    rc=1  miri-leak=YES want=YES OK  size:  1, align: 1
+small.bin               rc=0  miri-leak=no  want=no  OK
+ALL AS DECLARED
 ```
 
 on the shipped `unsafe.rs` **with the error path's `dig_free` deleted**. The
-leaked counts are what `n_iters = 4` predicts: 4 of 4 calls error on `-notag`
-and `-win1`, 2 of 4 on `-mixed`, 0 of 4 on `small`.
+leaked block sizes are `win_len` and are a property of the input; the counts are
+what `n_iters = 4` predicts — 4 of 4 calls error on `-notag` and `-win1`, 2 of 4
+on `-mixed`, 0 of 4 on `small`.
+
+⚠ **CORRECTED AT TASK_110, and it is this file's own rule turned on itself.**
+This block used to transcribe Miri's **allocation IDs** — `alloc7447`,
+`alloc13213`, `alloc3233` — and on the re-run they came back `alloc7533`,
+`alloc13345`, `alloc3279`. An allocation ID is a number only a rebuild can
+produce, `NOTES.md` is inside the gate record's `source_sha256`, and section 3
+of this very file quotes `.tasks/PROTOCOL.md` rule 6's lesson against doing
+exactly that. **Sizes and counts are derived from the input and stay; the IDs are
+gone.**
 
 ### 11d. ⚠⚠ The per-element rate is BAND-LOCAL. Do not publish it as a law.
 
 `controls/sweep.py` fits `Ir/call = a + b·win_len` on **band A, win 64..79**, and
 then predicts band B (512..527) and both shipped inputs. All four residue
 classes mod 4 are in each band.
+
+**Re-run in one session at TASK_110, all seven cells.** ⚠ **The five cells whose
+rungs did not change reproduced their TASK_104 rows EXACTLY — fit, in-sample
+residual, worst band-B residual and both shipped residuals — which is what makes
+the two rows that DID move readable as a change in the rung rather than in the
+session.**
 
 | cell | band-A fit | max in-sample resid | worst band-B resid | `small` (97) | `large` (4096) |
 |---|---|---|---|---|---|
@@ -719,14 +1197,26 @@ classes mod 4 are in each band.
 | c-clang | `192.777 + 15.01424·w` | 3.86 | +10.96 | −0.16 | +175.92 |
 | safe_naive | `285.464 + 19.51332·w` | 9.42 | +312.75 | −19.26 | +166.96 |
 | safe_tuned | `176.014 + 13.06332·w` | 12.57 | +320.94 | −24.16 | **−2545.39** |
-| unsafe | `203.161 + 14.59274·w` | 5.21 | +47.05 | −1.66 | −141.00 |
-| verus | `203.161 + 14.59274·w` | 5.21 | +47.05 | −1.66 | −172.00 |
+| **unsafe** | **`165.611 + 13.04274·w`** | **11.69** | **−310.83** | −23.76 | **−2461.65** |
+| **verus** | **`165.611 + 13.04274·w`** | **11.69** | **−310.83** | −23.76 | **−2492.65** |
 
-**Every cell's out-of-band residual is 3× to 25× its in-sample residual**, and
-`safe_tuned` — the cheapest rung, the one a headline would quote — mispredicts
-its own SHIPPED `large.bin` by **−2545 `Ir`/call**. That is p23's lesson
-reproduced on a new row: an in-sample residual of 12.57 said nothing at all.
-**p42 therefore publishes two measured points per rung and no rate.**
+⚠ **The R4/R5 rows read `203.161 + 14.59274·w`, in-sample 5.21, band-B +47.05,
+`large` −141.00/−172.00 before TASK_110.** The do-while fold does not merely
+make the rung cheaper: it makes it MISPREDICT ITS OWN OUT-OF-BAND POINTS THE WAY
+`safe_tuned` does, sign included. **The rung that used to be the best-behaved
+under extrapolation is now among the worst**, which is a second reason not to
+publish a rate: the residual structure is a property of the loop shape, and the
+loop shape is exactly what an in-contract respelling is free to change.
+
+**Every cell's out-of-band residual is 2.8× to 33× its in-sample residual** —
+c-clang 2.8×, safe_tuned 25.5×, unsafe 26.6×, c-gcc 28.9×, safe_naive 33.2× —
+and `unsafe`, now the cheapest rung and the one a headline would quote,
+mispredicts its own SHIPPED `large.bin` by **−2462 `Ir`/call** off an in-sample
+residual of 11.69. ⚠ **That range read *"3× to 25×"* before TASK_110 and was
+wrong at both ends on its own table's numbers** (c-clang was already 2.8× and
+safe_naive already 33.2×); it is recomputed here rather than copied. That is
+p23's lesson reproduced on a new row: an in-sample residual of 12 says nothing
+at all. **p42 therefore publishes two measured points per rung and no rate.**
 
 ⚠ **`large.bin`'s residual is not comparable to band B's**: it is a different
 array (1 000 000 words against 4 096), so it moves the memory system as well as
@@ -747,6 +1237,16 @@ checksum is unchanged (checked).
 var   malloc(len)    fit = 184.177 + 18.91424*w   in-sample 1.356   band-B resid +37.61 .. +39.23
 fixed malloc(4096)   fit = 377.177 + 18.91424*w   in-sample 1.356   band-B resid +37.61 .. +39.23
 ```
+
+⚠ **Re-run at TASK_110 and reproduced to the digit** — and it took a repair
+first: `.temp/t104/allocclass/iso.py` consumes two binaries that were correctly
+deleted as artefacts and **nothing rebuilt them** (TASK_109 m2, CLAUDE.md
+constraint 6). `.temp/t104/allocclass/rebuild.sh` is now that script; it carries
+the two compile lines and **asserts the two arms agree on the checksum before
+fitting**, because a `fixed` arm that computed something else would make the
+isolation say nothing. (The zero-byte `main_shim.c` that sat beside it was
+referenced by nothing and is deleted.) The C rungs did not change at TASK_110,
+so this row is a reproduction and not a re-measurement.
 
 **Identical band-B residuals and an identical slope.** Fixing the request size
 moves the INTERCEPT by +193 `Ir` (that part *is* the size class: 4 096 bytes is
