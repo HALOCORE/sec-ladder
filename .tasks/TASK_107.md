@@ -141,8 +141,18 @@ Full **26-pattern** (or 25, if `p42` has not landed — **say which**)
 `LICENCE STALE`** — then `synthesis/outward_ir.py`, then
 `harness/measure.py --check-stale`.
 
-**Expect all `PASS` except p01's `PASS-WITH-BLOCKED-ROWS`, 0 failures.**
-**If anything turns red, STOP AND REPORT.**
+**Expect 24 `PASS` + 2 `PASS-WITH-BLOCKED-ROWS`, 0 failures.** ⚠ **The two are
+`p01` (a real 180 s Miri timeout) and `p42` (Miri on `large.bin`, declared in
+advance in its `miri.blocked_reason`). This line said "except p01's" before
+`p42` shipped — do not read the second as a regression.**
+**If anything else turns red, STOP AND REPORT.**
+
+⚠⚠ **§C INTERACTS WITH THOSE TWO BLOCKED ROWS AND YOU MUST CHECK IT.** If you
+pin or sweep `MIRIFLAGS`, **a seed sweep multiplies Miri's runtime by the number
+of seeds**, and Miri is already the thing timing out on two patterns.
+**Measure the cost before choosing design (a) or (b), and say what the sweep does
+to those two budgets.** ✅ `p42` was measured clean on **seeds 0–7** at
+`TASK_110`, so the data for at least one pattern already exists.
 
 ⚠ **`results/synthesis.md` will move and that is expected** — §D adds a field.
 **Diff it and state exactly which lines moved.**
