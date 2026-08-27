@@ -2654,8 +2654,16 @@ reused on the next row; it needs the same scrutiny as a finding.**
   which is refused. ⚠ **PROVISIONAL corroboration (TASK_094, unreviewed): probe 1
   kills them independently** — the bug compiles identically at C, safe naive,
   safe tuned and unsafe, i.e. **no boundary anywhere, which is p31's death.**
-- **p34** — outcome 4. The leak is real and belongs to a leak-shaped row; see
-  `.memory/00-environment.md` for why the C side has no detector for it here.
+- **p34** — outcome 4. The leak is real and belongs to a leak-shaped row.
+  ⚠⚠ **THIS USED TO POINT AT `.memory/00-environment.md` *"for why the C side
+  has no detector for it here"* — A STALE CROSS-REFERENCE INTO A CLAIM THAT FILE
+  HAS SINCE RETRACTED.** `TASK_100` found a detector: the `-O1`/`-O2` silence is
+  a **stale STACK root kept alive by inlining**, and a one-line
+  `__lsan_default_options` returning `"use_stacks=0"` restores it at **zero
+  measured `Ir`**. ✅ **`p42` then shipped as the leak-shaped row this bullet
+  anticipated, and needed no hook at all.** ⚠ **`p34` stays refused, on a
+  DIFFERENT reason** — the safe rung leaks only in the `Rc`-both-ways spelling,
+  while `Weak` is equally idiomatic and measured leak-free.
 - ⚠⚠ **p29 — REFUSED at TASK_095, and ~~the fifth outcome~~ IS STRUCK.** The
   half that survives is that **its safe representation really frees**
   (`allocs=2001 frees=2000`, `remove_leaf` releases one 24-byte block, against
