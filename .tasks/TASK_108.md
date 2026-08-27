@@ -179,8 +179,16 @@ could not verify, and where you disagree with §A's grouping.
 
 ---
 
-⚠ **PROTOCOL rule 2's running count is `MANAGER-FILLS-AT-LAUNCH`.** The calls I
-am least sure of:
+⚠ **PROTOCOL rule 2's running count is 403.** ⚠⚠ **You are writing the summary of
+a project whose own record is that the manager's summaries keep being wrong.** In
+the last four tasks alone: a claim that *"Verus cannot state leak-freedom"* was
+landed in `.memory/` and refuted within hours; a comparative headline was
+withdrawn rather than repaired; *"replace the regex with dep-info"* turned out to
+close the hole for the wrong compiler; and *"pin the Miri seed"* was implemented,
+measured at 4.6× cost, and reversed by its own sweep. ⚠ **If §A's threads are the
+wrong decomposition, say so — that is a contribution, not an inconvenience.**
+
+The calls I am least sure of:
 
 1. ⚠⚠ **That §A's six threads are the right decomposition.** They are a
    manager's reading of 39 findings and **nothing about them is measured.**
