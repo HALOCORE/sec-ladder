@@ -290,7 +290,7 @@ the number.** Two task files have already sent an agent to the wrong finding.
    23% slower (p02).
 7. **The same-backend comparison, which is the one that counts.** clang 22.1.6 is
    bit-for-bit rustc 1.97.1's LLVM. On p01 `large`, C-clang and unsafe Rust execute
-   **exactly 143,740,000** kernel instructions. Static gap +2, an
+   **exactly 143,740,000** kernel instructions. Static gap ⚠ **`+1`, not the `+2` this line published** — from the record, `n_fn` 37 vs 36 and `n_fn_nopad` 35 vs 34, i.e. **+1 padded AND unpadded** (corrected at TASK_112, which found it while restoring this finding into the synthesis and quoted only the `Ir` equality rather than inherit it) — an
    induction-variable choice, not an ABI cost. **Every C-vs-Rust claim needs the
    clang column**; gcc stays as the "what a distro ships" baseline.
 8. **p02's residue curve predicts.** R2−R4 is a sawtooth, amplitude 179 Ir,

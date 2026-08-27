@@ -125,12 +125,44 @@ TCB_SRC = "verus.rs"
 # keep the reviewed verdict beside it with every entry cited to a REVIEWED
 # artefact.  A pattern with no entry prints `undeclared`, which is its true
 # state and not a default.
+#
+# ⚠⚠ AND `undeclared` HAS NEVER MEANT "NOBODY SEARCHED" -- it means nobody
+# wrote an entry, and at TASK_112 four patterns with REVIEWED search results in
+# `.memory/01-ladder.md` were printing `undeclared` (TASK_111 adjacent work 1,
+# which named p22, p17 and p06; p12 was found while landing it).  Two of the
+# four were being quoted in `results/SYNTHESIS.md` §2 inside a bucket labelled
+# "flat in the size of the data" -- one of them (p22) at a value this project's
+# retraction record puts 510x off.  So: when a pattern's `.memory/` entry gains
+# a searched R3 or R4 spelling, ADD IT HERE IN THE SAME PASS.
+#
+# One entry, `p06`, is marked ⊘ because the authoritative layer marks it ⊘: it
+# landed at TASK_048 and has not been through a second review.  Label, do not
+# omit and do not silently promote.
 # --------------------------------------------------------------------------
 SEARCH_REVIEWED = {
     "p01": ("R3 span OWED",
             "RECAP 'Owed' 3: p01 and p08 owe an in-contract R3-side span"),
     "p03": ("R3 span 1 unreviewed measurement; the +5 constant NEVER searched",
             "RECAP 'Owed' 2"),
+    "p06": ("⊘ PROVISIONAL -- R3 searched at review: `c_idx` is 0.00000 "
+            "Ir/BYTE, and on `small` it is +80.00 against a shipped +334.00. "
+            "⚠ On `large` the SHIPPED R3 (+172) is the CHEAPER of the two",
+            ".memory/01-ladder.md p06, where this bullet is marked ⊘ -- it "
+            "landed at TASK_048 and HAS NOT been through a second review, so "
+            "it is the one entry in this table that is not twice-checked. The "
+            "measurement is TASK_047_REVIEW_REPORT.md B2: `c_idx` (R3's "
+            "two-step reslice and iterator fold with R2's indexed swap) is in "
+            "contract, contains no `unsafe`, agrees with the model on four "
+            "inputs, and its `c_idx - unsafe` is 105.00 at BOTH ends of band M "
+            "(sum_m 64 and 384) -- 0.00000 Ir per byte against the shipped "
+            "R3's 2.00000. ⚠ `105 flat` is a BAND-M figure and not a shipped-"
+            "blob one: out of sample the parameter-free law predicts +80.00 "
+            "(small) and +187.00 (large), both measured exactly, and p06's "
+            "cheapest-found in-contract R3 therefore DIFFERS BY BLOB. None of "
+            "the shipped R3's 2.00 Ir/byte is a bounds check -- it is the "
+            "zip/Rev adaptor's two exhaustion tests per item, and `pads.py` "
+            "gives both spellings identical 11 panic pads at identical "
+            "line:col"),
     "p08": ("R3 span OWED",
             "RECAP 'Owed' 3"),
     "p10": ("R4 searched at review: -323/-603 becomes -129/-241",
@@ -141,10 +173,42 @@ SEARCH_REVIEWED = {
             ".memory/01-ladder.md finding 9 (p11): `r4_cstr` would be "
             "-17 526 Ir/call and its twin is rejected with four "
             "`is not supported`"),
+    "p12": ("R4 searched at review: the SIGN FLIPS on `large` to +66.00",
+            ".memory/01-ladder.md p12: p12 called its pair interval degenerate "
+            "on an INFERENCE; TASK_040_REVIEW BUILT the cheaper R4 (route A), "
+            "which verifies 15/0, twin 18/0, holds `R4 = R5 exact` and is "
+            "17.00/92.00 cheaper -- so the shipped R3 is +66.00 DEARER than "
+            "the cheapest-found verifying R4 on `large`, and the published "
+            "-26.00 is a fixed-R4 figure. ⚠ Added at TASK_112: this row printed "
+            "`undeclared` although the search is reviewed and moved the sign"),
     "p13": ("R4 searched: the SIGN FLIPS to +44/+77",
             ".memory/01-ladder.md finding 14 (p13): a bounded unchecked "
             "consumer verifies 19/0 with no new trusted item and is excluded "
             "by nothing but spec.md's English"),
+    "p17": ("R3 searched: an in-contract respelling is -19.00 flat; "
+            "`+32` is NOT a law (swept 18...63)",
+            ".memory/01-ladder.md p17 (TASK_018, reviewed at "
+            "TASK_018_REVIEW): an in-contract respelling keeping `let start: "
+            "i64`, `let end: i64` and the literal `if start < end && start >= "
+            "0` measures -19.00 flat against the shipped R4 on both bands and "
+            "is BYTE-IDENTICAL (md5_fn 532201c70eeb.., 135 instructions) to a "
+            "row an earlier task had declared out of contract. ⚠ It is an "
+            "R3-SIDE bound with R4 held by fiat, emphatically not 'safe beats "
+            "unsafe'. And the published `+32 flat` is retracted AS A LAW: both "
+            "shipped bands sit at nsuf = 3, and swept over nsuf 1-8 "
+            "`R3ship - R4` runs 18...63. p17 ships no sweep inputs"),
+    "p22": ("R4 searched: `+2.00` is a fixed-R4 bound; against `r4_reslice` "
+            "the gap is +125/+1021 -- 510x on `large`",
+            ".memory/01-ladder.md finding 22 (p22), reviewed at "
+            "TASK_070_REVIEW which re-measured it end to end: `r4_reslice` is "
+            "R4 plus R3's one reslice, in contract, same checksum on all 8 "
+            "inputs, `20 verified, 0 errors`, and its R4/R5 pair is "
+            "byte-identical at -O3 (md5_fn ea06db04c435 both sides, built and "
+            "diffed). It is 1*nkw - 5 cheaper than the shipped R4, so "
+            "`R3ship - r4_reslice = 1*nkw - 3` = +125.00 / +1021.00. The R4 "
+            "was NOT re-shipped (.memory/02-bench-rules.md), so both numbers "
+            "publish. ⚠ Added at TASK_112: this row printed `undeclared` while "
+            "§6 of results/SYNTHESIS.md reported the 510x retraction"),
     "p36": ("BOTH sides searched (4 R3 levers, 3 R4)",
             ".memory/01-ladder.md finding 23 (p36): publishes +7.00 flat "
             "(fixed-R4 bound, cheapest R3 found) and +10.00 flat (matched "
@@ -614,7 +678,14 @@ def calibrate_licence(meas, lic, outw):
 
 
 def whole_mode_census(meas):
-    """Every -O3 `whole` cell/input pair, and what its kernel column is."""
+    """Every -O3 `whole` cell/input pair, and what its kernel column is.
+
+    ⚠ The surviving symbol is NOT uniform, and this file asserted that it was
+    until TASK_112 (TASK_111 M3).  It printed the four p46 rows carrying the
+    WHOLE `kernel` symbol four lines above a sentence saying all twenty were
+    `kernel.part.0` — PROTOCOL rule 13, the summary above the detail.  So the
+    breakdown is DERIVED here and the prose is generated from it.
+    """
     none_, kept = 0, []
     for pat, d in meas.items():
         for c in d["cells"]:
@@ -627,6 +698,29 @@ def whole_mode_census(meas):
                     kept.append((pat, c["cell"], inp,
                                  (v.get("kernel_functions") or ["?"])[0]))
     return none_, kept
+
+
+def whole_mode_symbols(kept):
+    """`{symbol: [(pat, cell, input), ...]}` over the surviving rows."""
+    by_sym = {}
+    for pat, cell, inp, sym in kept:
+        by_sym.setdefault(sym, []).append((pat, cell, inp))
+    return by_sym
+
+
+def whole_mode_sentence(kept):
+    """One sentence describing the survivors, true whatever the records say."""
+    by_sym = whole_mode_symbols(kept)
+    if not kept:
+        return "there are no survivors at all"
+    parts = ", ".join(
+        f"{len(v)} are `{s}`"
+        for s, v in sorted(by_sym.items(), key=lambda kv: -len(kv[1])))
+    if len(by_sym) == 1:
+        return (f"all {len(kept)} that DID keep a symbol are "
+                f"`{next(iter(by_sym))}`")
+    return (f"the {len(kept)} that DID keep a symbol carry "
+            f"{len(by_sym)} DIFFERENT symbols — {parts}")
 
 
 def main():
@@ -665,25 +759,47 @@ def main():
     w("## Read these four limits BEFORE the first number")
     w("")
     none_, kept = whole_mode_census(meas)
+    by_sym = whole_mode_symbols(kept)
+    gcc_only = all(c.startswith("c-gcc") for _, c, _, _ in kept)
     w(f"**1. Every number below is `-O3 isolated`, and there is no `whole` "
       f"column to compare it with.** Of the {none_ + len(kept)} `-O3` "
       f"`whole`-mode cell/input pairs in the tree, **{none_} have "
       f"`kernel_exclusive_ir = None`** -- the kernel inlined into `main` and "
       f"left no symbol. That much was already known (RECAP \"Owed\" 13). "
-      f"⚠ **What is sharper: all {len(kept)} that DID keep a symbol are "
-      f"`kernel.part.0`**, gcc's partial-inlining remnant, and every one of "
-      f"them is a `c-gcc` or `c-gcc-h` cell:")
+      f"⚠ **What is sharper: {whole_mode_sentence(kept)}**, and every one of "
+      f"them is a `c-gcc` or `c-gcc-h` cell"
+      f"{'' if gcc_only else ' -- EXCEPT that this run says otherwise, see the listing'}:")
     w("")
     w("```")
     for r in kept:
         w(f"  {r[0]:5s} {r[1]:9s} {r[2]:10s} {r[3]}")
     w("```")
     w("")
-    w("So there is **not one `whole`-mode row in the tree** where the kernel "
-      "column means what it means in `isolated`: it is a gcc-only column of "
-      "*outlined function remainders*. Since p10 showed regressors SWAP "
-      "between modes (`.memory/01-ladder.md` finding 18), everything here "
-      "speaks for `isolated` and for nothing else.")
+    part = by_sym.get("kernel.part.0", [])
+    whole = [(s, v) for s, v in sorted(by_sym.items()) if s != "kernel.part.0"]
+    w(f"⚠⚠ **THE SURVIVORS ARE NOT UNIFORM, AND THIS FILE ASSERTED THAT THEY "
+      f"WERE UNTIL TASK_112** (TASK_111 M3). {len(part)} of the {len(kept)} "
+      f"are `kernel.part.0`, gcc's partial-inlining remnant -- an *outlined "
+      f"function remainder*, which is genuinely not the thing `isolated`'s "
+      f"kernel column measures. But "
+      + "; ".join(
+          f"**{len(v)} carry the `{s}` symbol** ("
+          + ", ".join(sorted({p for p, _, _ in v})) + "; "
+          + ", ".join(sorted({c for _, c, _ in v})) + "; both blobs)"
+          for s, v in whole)
+      + " -- the whole symbol. **So the previous sentence here, *\"there is "
+        "not one `whole`-mode row in the tree where the kernel column means "
+        "what it means in `isolated`\"*, was FALSE for those rows, and the "
+        "listing printed four lines above it said so.** (PROTOCOL rule 13: the "
+        "summary line above the detail is not where anyone is looking.)")
+    w("")
+    w("**The isolated-only decision survives the correction and its "
+      "justification changes.** The rows that do keep a whole `kernel` symbol "
+      "are one pattern's C cells only, so they license no rung comparison and "
+      "no cross-pattern column: there is nothing to compare them with in the "
+      "same mode. Since p10 showed regressors SWAP between modes "
+      "(`.memory/01-ladder.md` finding 18), everything here speaks for "
+      "`isolated` and for nothing else.")
     w("")
     w("**2. The column is kernel-EXCLUSIVE, and its licence is stated per "
       "row.** `.memory/03-measurement.md`: the column is comparable only when "
@@ -1463,21 +1579,28 @@ def main():
       "moved a long way: p10's -323/-603 becomes **-129/-241** against a "
       "verifying R4 candidate (60% of the margin was R4 spelling); p13's "
       "-177/-1054 becomes **+44/+77** -- *sign flip* -- against a bounded "
-      "unchecked consumer that verifies 19/0 with no new trusted item; p36 "
-      "refuses to publish a single number at all. **On this table two of the "
-      "five negatives are known to move and three have an undeclared search "
-      "state, so the honest reading is that the column is partly measuring "
-      "search effort.** That is what the aggregate genuinely adds: it makes an "
-      "unsearched R4 side a *systematic* problem instead of a per-pattern "
-      "footnote.")
+      "unchecked consumer that verifies 19/0 with no new trusted item; p12's "
+      "-26.00 becomes **+66.00** -- *sign flip* -- against route A, which "
+      "verifies 15/0 with twin 18/0 and holds `R4 = R5 exact`; p36 "
+      "refuses to publish a single number at all. **THREE of the six negatives "
+      "in this table are known to move and every one of the three moves "
+      "AGAINST the safe rung; p11's cheaper R4 exists and is inadmissible at "
+      "the pin; only p18 and p46 have an undeclared search state.** So the "
+      "honest reading is that the column is partly measuring search effort. "
+      "That is what the aggregate genuinely adds: it makes an unsearched R4 "
+      "side a *systematic* problem instead of a per-pattern footnote. "
+      "⚠ **p12 was in this list printing `undeclared` until TASK_112**, "
+      "although TASK_040_REVIEW had built its cheaper R4 and `.memory/` "
+      "records it -- so the sentence above understated its own case by one "
+      "row for as long as the column existed.")
     w("")
     w("**Claim 3 -- a cross-pattern `Ir` comparison is available in "
       "`isolated` mode ONLY. CONFIRMED and SHARPENED** -- see limit 1 above. "
       "The count in RECAP (*\"of 318 `-O3` cell/input pairs, `whole` has "
       "`kernel_exclusive_ir = None` in 302\"*) reads as if 318 were the total; "
       f"it is the `whole`-mode subtotal. Today: {none_ + len(kept)} "
-      f"`whole`-mode pairs, {none_} `None`, and the {len(kept)} survivors are "
-      "all gcc `kernel.part.0`.")
+      f"`whole`-mode pairs, {none_} `None`, and "
+      f"{whole_mode_sentence(kept)} (limit 1).")
     w("")
 
     # ------------------------------------------------------- provenance
@@ -1529,13 +1652,33 @@ def main():
       "hand table does and less visibly. The census above is therefore built "
       "to degrade to *\"no source attribution\"* rather than to a wrong count.")
     w("")
+    n_undecl = len(meas) - len(SEARCH_REVIEWED)
     w("*Declared*, in `synthesize.py::SEARCH_REVIEWED`, every entry cited to a "
-      "**reviewed** artefact. A pattern with no entry prints `undeclared`, "
-      "which is its true state:")
+      "**reviewed** artefact — except one, `p06`, which is marked `⊘` because "
+      "`.memory/01-ladder.md` marks it `⊘`: it landed at TASK_048 and has not "
+      "been through a second review, and it is labelled here rather than "
+      "omitted or silently promoted. A pattern with no entry prints "
+      f"`undeclared`, which is its true state — **{n_undecl} of {len(meas)}** "
+      "today:")
     w("")
     for pat in sorted(SEARCH_REVIEWED):
         w(f"- **{pat}** — {SEARCH_REVIEWED[pat][0]}  \n  "
           f"*{SEARCH_REVIEWED[pat][1]}*")
+    w("")
+    w("⚠⚠ **FOUR ENTRIES WERE ADDED AT TASK_112 AND THE COLUMN UNDERSTATED THE "
+      "RECORD BY THAT MUCH** (TASK_111, adjacent work 1, which named three of "
+      "the four; `p12` was found while landing it). `p22`, `p17`, `p06` and "
+      "`p12` each have a **reviewed** search result in "
+      "`.memory/01-ladder.md`, and each printed `undeclared` here. ⚠ **The "
+      "consequence was not cosmetic**: `results/SYNTHESIS.md` §2 was quoting "
+      "p22's `+2.00` and p12's `-26.00` inside a bucket labelled *\"flat in "
+      "the size of the data\"* while RECAP finding 33 and "
+      "`.memory/01-ladder.md` finding 22 carried the 510× correction for one "
+      "of them (⚠ it is recorded there and in RECAP's standing trap box, "
+      "**not** on the *\"Retracted -- do not reinstate\"* list, where p17's "
+      "`+32 flat` does sit). **An `undeclared` in this "
+      "column means *nobody wrote an entry*, and it has never meant *nobody "
+      "searched*.**")
     w("")
     w("⚠ **Three corrections to this section's own provenance, and the "
       "paragraph that carried them predicted exactly this rot** "

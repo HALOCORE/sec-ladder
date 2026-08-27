@@ -8,7 +8,7 @@ Patterns: **26**. Gate records: **26**.
 
 ## Read these four limits BEFORE the first number
 
-**1. Every number below is `-O3 isolated`, and there is no `whole` column to compare it with.** Of the 414 `-O3` `whole`-mode cell/input pairs in the tree, **394 have `kernel_exclusive_ir = None`** -- the kernel inlined into `main` and left no symbol. That much was already known (RECAP "Owed" 13). ⚠ **What is sharper: all 20 that DID keep a symbol are `kernel.part.0`**, gcc's partial-inlining remnant, and every one of them is a `c-gcc` or `c-gcc-h` cell:
+**1. Every number below is `-O3 isolated`, and there is no `whole` column to compare it with.** Of the 414 `-O3` `whole`-mode cell/input pairs in the tree, **394 have `kernel_exclusive_ir = None`** -- the kernel inlined into `main` and left no symbol. That much was already known (RECAP "Owed" 13). ⚠ **What is sharper: the 20 that DID keep a symbol carry 2 DIFFERENT symbols — 16 are `kernel.part.0`, 4 are `kernel`**, and every one of them is a `c-gcc` or `c-gcc-h` cell:
 
 ```
   p03   c-gcc     small.bin  kernel.part.0
@@ -33,7 +33,9 @@ Patterns: **26**. Gate records: **26**.
   p46   c-gcc-h   large.bin  kernel
 ```
 
-So there is **not one `whole`-mode row in the tree** where the kernel column means what it means in `isolated`: it is a gcc-only column of *outlined function remainders*. Since p10 showed regressors SWAP between modes (`.memory/01-ladder.md` finding 18), everything here speaks for `isolated` and for nothing else.
+⚠⚠ **THE SURVIVORS ARE NOT UNIFORM, AND THIS FILE ASSERTED THAT THEY WERE UNTIL TASK_112** (TASK_111 M3). 16 of the 20 are `kernel.part.0`, gcc's partial-inlining remnant -- an *outlined function remainder*, which is genuinely not the thing `isolated`'s kernel column measures. But **4 carry the `kernel` symbol** (p46; c-gcc, c-gcc-h; both blobs) -- the whole symbol. **So the previous sentence here, *"there is not one `whole`-mode row in the tree where the kernel column means what it means in `isolated`"*, was FALSE for those rows, and the listing printed four lines above it said so.** (PROTOCOL rule 13: the summary line above the detail is not where anyone is looking.)
+
+**The isolated-only decision survives the correction and its justification changes.** The rows that do keep a whole `kernel` symbol are one pattern's C cells only, so they license no rung comparison and no cross-pattern column: there is nothing to compare them with in the same mode. Since p10 showed regressors SWAP between modes (`.memory/01-ladder.md` finding 18), everything here speaks for `isolated` and for nothing else.
 
 **2. The column is kernel-EXCLUSIVE, and its licence is stated per row.** `.memory/03-measurement.md`: the column is comparable only when the cells being differenced dispatch the *same* work outside the kernel symbol. The licence tag answers **only** that question — *may this row be differenced* — and never *by how much*; the magnitude is §2's derived column. Five tags, and **each is a distinct condition**:
 
@@ -257,20 +259,20 @@ answer* (`.memory/03-measurement.md`).
 | p03-bounded-stack | 5110.00 | 17237.00 | LICENSED | small +5117.00 (+7.00) **?** / large +17244.00 (+7.00) **?** ‡ | R3 span 1 unreviewed measurement; the +5 constant NEVER searched |
 | p04-ring-buffer | 4756.00 | 16616.00 | LICENSED | small +4763.00 (+7.00) **?** / large +16623.00 (+7.00) **?** ‡ | undeclared |
 | p05-index-flatten | 700.00 | 2895.00 | LICENSED |  | undeclared |
-| p06-rotate | 173.00 | 395.00 | LICENSED |  | undeclared |
+| p06-rotate | 173.00 | 395.00 | LICENSED |  | ⊘ PROVISIONAL -- R3 searched at review: `c_idx` is 0.00000 Ir/BYTE, and on `small` it is +80.00 against a shipped +334.00. ⚠ On `large` the SHIPPED R3 (+172) is the CHEAPER of the two |
 | p07-binary-search | 5758.94 | 18735.88 | LICENSED | small +5763.59 (+4.65) **?** / large +18725.77 (-10.11) **?** | undeclared |
 | p08-overlap-move | 11076.00 | 91941.00 | NOT-LIC | **small +10956.02** (-119.98) / **large +91057.00** (-884.00) | R3 span OWED |
 | p09-bitset | 9936.00 | 36409.00 | LICENSED |  | undeclared |
 | p10-fir-stencil | 2881.00 | 5345.00 | LICENSED |  | R4 searched at review: -323/-603 becomes -129/-241 |
 | p11-nul-scan | 5488.00 | 29088.00 | LICENSED |  | R4 chained to the prover; `r4_cstr` inadmissible |
-| p12-strcat-fixed | 836.00 | 2120.00 | NOT-LIC | **small +759.00** (-77.00) / **large +1626.00** (-494.00) | undeclared |
+| p12-strcat-fixed | 836.00 | 2120.00 | NOT-LIC | **small +759.00** (-77.00) / **large +1626.00** (-494.00) | R4 searched at review: the SIGN FLIPS on `large` to +66.00 |
 | p13-strncpy-trunc | 1198.00 | 2961.00 | NOT-LIC | **small +1008.00** (-190.00) / **large +2697.00** (-264.00) | R4 searched: the SIGN FLIPS to +44/+77 |
 | p14-field-split | 908.00 | 364.00 | LICENSED |  | undeclared |
 | p16-tlv-walk | 2085.00 | 17123.00 | LICENSED |  | undeclared |
-| p17-http-range | 3624.00 | 30293.00 | LICENSED |  | undeclared |
+| p17-http-range | 3624.00 | 30293.00 | LICENSED |  | R3 searched: an in-contract respelling is -19.00 flat; `+32` is NOT a law (swept 18...63) |
 | p18-varint-shift | 363.00 | 151.00 | LICENSED |  | undeclared |
 | p19-state-machine | 1594.00 | 25594.00 | LICENSED |  | undeclared |
-| p22-hash-probe | 275.00 | 2067.00 | LICENSED |  | undeclared |
+| p22-hash-probe | 275.00 | 2067.00 | LICENSED |  | R4 searched: `+2.00` is a fixed-R4 bound; against `r4_reslice` the gap is +125/+1021 -- 510x on `large` |
 | p23-partition | 350.69 | 531.17 | LICENSED |  | undeclared |
 | p27-handle-table | 119.49 | 693.82 | NOT-LIC | **small +238.67** (+119.18) / **large +824.47** (+130.65) | undeclared |
 | p36-vtable-dispatch | 1803.00 | 14347.00 | UNDEC |  | BOTH sides searched (4 R3 levers, 3 R4) |
@@ -310,20 +312,20 @@ answer* (`.memory/03-measurement.md`).
 | p03-bounded-stack | 359.00 | 626.00 | LICENSED | ‡ | R3 span 1 unreviewed measurement; the +5 constant NEVER searched |
 | p04-ring-buffer | 5.00 | 5.00 | LICENSED | ‡ | undeclared |
 | p05-index-flatten | 123.00 | 399.00 | LICENSED |  | undeclared |
-| p06-rotate | 334.00 | 172.00 | LICENSED |  | undeclared |
+| p06-rotate | 334.00 | 172.00 | LICENSED |  | ⊘ PROVISIONAL -- R3 searched at review: `c_idx` is 0.00000 Ir/BYTE, and on `small` it is +80.00 against a shipped +334.00. ⚠ On `large` the SHIPPED R3 (+172) is the CHEAPER of the two |
 | p07-binary-search | 3014.60 | 10024.93 | LICENSED | small +3017.14 (+2.54) **?** / large +10019.42 (-5.51) **?** | undeclared |
 | p08-overlap-move | 26.00 | 26.00 | LICENSED |  | R3 span OWED |
 | p09-bitset | 13756.00 | 48885.00 | LICENSED |  | undeclared |
 | p10-fir-stencil | -323.00 | -603.00 | LICENSED |  | R4 searched at review: -323/-603 becomes -129/-241 |
 | p11-nul-scan | -5768.00 | -24503.00 | NOT-LIC | **small +4047.56** (+9815.56) / **large -17386.22** (+7116.78) | R4 chained to the prover; `r4_cstr` inadmissible |
-| p12-strcat-fixed | 3.00 | -26.00 | LICENSED |  | undeclared |
+| p12-strcat-fixed | 3.00 | -26.00 | LICENSED |  | R4 searched at review: the SIGN FLIPS on `large` to +66.00 |
 | p13-strncpy-trunc | -177.00 | -1054.00 | LICENSED |  | R4 searched: the SIGN FLIPS to +44/+77 |
 | p14-field-split | 638.00 | 425.00 | LICENSED |  | undeclared |
 | p16-tlv-walk | 27.00 | 77.00 | LICENSED |  | undeclared |
-| p17-http-range | 32.00 | 32.00 | LICENSED |  | undeclared |
+| p17-http-range | 32.00 | 32.00 | LICENSED |  | R3 searched: an in-contract respelling is -19.00 flat; `+32` is NOT a law (swept 18...63) |
 | p18-varint-shift | -25.00 | -12.00 | LICENSED |  | undeclared |
 | p19-state-machine | 260.00 | 4100.00 | LICENSED |  | undeclared |
-| p22-hash-probe | 2.00 | 2.00 | LICENSED |  | undeclared |
+| p22-hash-probe | 2.00 | 2.00 | LICENSED |  | R4 searched: `+2.00` is a fixed-R4 bound; against `r4_reslice` the gap is +125/+1021 -- 510x on `large` |
 | p23-partition | 305.74 | 443.55 | LICENSED |  | undeclared |
 | p27-handle-table | 109.98 | 661.82 | NOT-LIC | **small +229.12** (+119.14) / **large +792.47** (+130.65) | undeclared |
 | p36-vtable-dispatch | 15.00 | 15.00 | UNDEC |  | BOTH sides searched (4 R3 levers, 3 R4) |
@@ -562,7 +564,7 @@ Two consequences: the evidence for *"a proof costs zero instructions"* is the ra
 |---|---|---|---|---|
 | p10-fir-stencil | small -323.00, large -603.00 | LICENSED | inside the ±2.00 floor | R4 searched at review: -323/-603 becomes -129/-241 |
 | p11-nul-scan | small -5768.00, large -24503.00 | NOT-LIC | **small +4047.56** (+9815.56) / **large -17386.22** (+7116.78) | R4 chained to the prover; `r4_cstr` inadmissible |
-| p12-strcat-fixed | large -26.00 | LICENSED | inside the ±2.00 floor | undeclared |
+| p12-strcat-fixed | large -26.00 | LICENSED | inside the ±2.00 floor | R4 searched at review: the SIGN FLIPS on `large` to +66.00 |
 | p13-strncpy-trunc | small -177.00, large -1054.00 | LICENSED | inside the ±2.00 floor | R4 searched: the SIGN FLIPS to +44/+77 |
 | p18-varint-shift | small -25.00, large -12.00 | LICENSED | inside the ±2.00 floor | undeclared |
 | p46-bignum-mac | small -119.00, large -815.00 | LICENSED | inside the ±2.00 floor | undeclared |
@@ -589,9 +591,9 @@ p18   large        -12.00         0.00       -12.00
 
 **Four of the five named patterns are unaffected, exactly.** Only **p11** moves, and only its `small` row reverses. The independent callgrind sweep puts p11's correction at `+9821.15 / +7124.34` against the derived `+9815.56 / +7116.78` — 0.06% and 0.11% apart, which is the one-off resolver term (limit 4) that the marginal construction cancels and the single-run figure does not. **So the defect is real and it is ONE pattern, not five**, and the pattern the argument called *"the one that established the rule"* (p13) is a clean 0.00 on both blobs by both routes.
 
-⚠ **What the claim does NOT survive is the SEARCH objection, which nobody raised.** `R3 - R4` differences two rungs searched to wildly different depths, and every time a side has been searched the number moved a long way: p10's -323/-603 becomes **-129/-241** against a verifying R4 candidate (60% of the margin was R4 spelling); p13's -177/-1054 becomes **+44/+77** -- *sign flip* -- against a bounded unchecked consumer that verifies 19/0 with no new trusted item; p36 refuses to publish a single number at all. **On this table two of the five negatives are known to move and three have an undeclared search state, so the honest reading is that the column is partly measuring search effort.** That is what the aggregate genuinely adds: it makes an unsearched R4 side a *systematic* problem instead of a per-pattern footnote.
+⚠ **What the claim does NOT survive is the SEARCH objection, which nobody raised.** `R3 - R4` differences two rungs searched to wildly different depths, and every time a side has been searched the number moved a long way: p10's -323/-603 becomes **-129/-241** against a verifying R4 candidate (60% of the margin was R4 spelling); p13's -177/-1054 becomes **+44/+77** -- *sign flip* -- against a bounded unchecked consumer that verifies 19/0 with no new trusted item; p12's -26.00 becomes **+66.00** -- *sign flip* -- against route A, which verifies 15/0 with twin 18/0 and holds `R4 = R5 exact`; p36 refuses to publish a single number at all. **THREE of the six negatives in this table are known to move and every one of the three moves AGAINST the safe rung; p11's cheaper R4 exists and is inadmissible at the pin; only p18 and p46 have an undeclared search state.** So the honest reading is that the column is partly measuring search effort. That is what the aggregate genuinely adds: it makes an unsearched R4 side a *systematic* problem instead of a per-pattern footnote. ⚠ **p12 was in this list printing `undeclared` until TASK_112**, although TASK_040_REVIEW had built its cheaper R4 and `.memory/` records it -- so the sentence above understated its own case by one row for as long as the column existed.
 
-**Claim 3 -- a cross-pattern `Ir` comparison is available in `isolated` mode ONLY. CONFIRMED and SHARPENED** -- see limit 1 above. The count in RECAP (*"of 318 `-O3` cell/input pairs, `whole` has `kernel_exclusive_ir = None` in 302"*) reads as if 318 were the total; it is the `whole`-mode subtotal. Today: 414 `whole`-mode pairs, 394 `None`, and the 20 survivors are all gcc `kernel.part.0`.
+**Claim 3 -- a cross-pattern `Ir` comparison is available in `isolated` mode ONLY. CONFIRMED and SHARPENED** -- see limit 1 above. The count in RECAP (*"of 318 `-O3` cell/input pairs, `whole` has `kernel_exclusive_ir = None` in 302"*) reads as if 318 were the total; it is the `whole`-mode subtotal. Today: 414 `whole`-mode pairs, 394 `None`, and the 20 that DID keep a symbol carry 2 DIFFERENT symbols — 16 are `kernel.part.0`, 4 are `kernel` (limit 1).
 
 ## 6. Where the non-derived columns come from
 
@@ -636,24 +638,34 @@ p18   large        -12.00         0.00       -12.00
 
 ⚠ **TASK_075_REVIEW M6 prescribed deriving the lever count this way for "the 10 patterns that expose a `--list`" and deleting the declared table. Measured, that cannot be done.** Ten patterns expose a `--list` and **five of them print no source file at all** (p06 p09 p22 p36 p38); the other five split two ways (`from x.rs` on p10 and p47, `<- x.rs` on p03, p04 and p12). **p36 — the review's own worked example — is in the first group**: its `--list` prints `r3_hdr4  rust`, the *language*. Deriving p36's split from the `r3_`/`r4_` **name prefix** instead gives 4 R3 and **2** R4, while `.memory/01-ladder.md` finding 23 says **3** R4 — so the derivation-by-convention rots in the same direction the hand table does and less visibly. The census above is therefore built to degrade to *"no source attribution"* rather than to a wrong count.
 
-*Declared*, in `synthesize.py::SEARCH_REVIEWED`, every entry cited to a **reviewed** artefact. A pattern with no entry prints `undeclared`, which is its true state:
+*Declared*, in `synthesize.py::SEARCH_REVIEWED`, every entry cited to a **reviewed** artefact — except one, `p06`, which is marked `⊘` because `.memory/01-ladder.md` marks it `⊘`: it landed at TASK_048 and has not been through a second review, and it is labelled here rather than omitted or silently promoted. A pattern with no entry prints `undeclared`, which is its true state — **14 of 26** today:
 
 - **p01** — R3 span OWED  
   *RECAP 'Owed' 3: p01 and p08 owe an in-contract R3-side span*
 - **p03** — R3 span 1 unreviewed measurement; the +5 constant NEVER searched  
   *RECAP 'Owed' 2*
+- **p06** — ⊘ PROVISIONAL -- R3 searched at review: `c_idx` is 0.00000 Ir/BYTE, and on `small` it is +80.00 against a shipped +334.00. ⚠ On `large` the SHIPPED R3 (+172) is the CHEAPER of the two  
+  *.memory/01-ladder.md p06, where this bullet is marked ⊘ -- it landed at TASK_048 and HAS NOT been through a second review, so it is the one entry in this table that is not twice-checked. The measurement is TASK_047_REVIEW_REPORT.md B2: `c_idx` (R3's two-step reslice and iterator fold with R2's indexed swap) is in contract, contains no `unsafe`, agrees with the model on four inputs, and its `c_idx - unsafe` is 105.00 at BOTH ends of band M (sum_m 64 and 384) -- 0.00000 Ir per byte against the shipped R3's 2.00000. ⚠ `105 flat` is a BAND-M figure and not a shipped-blob one: out of sample the parameter-free law predicts +80.00 (small) and +187.00 (large), both measured exactly, and p06's cheapest-found in-contract R3 therefore DIFFERS BY BLOB. None of the shipped R3's 2.00 Ir/byte is a bounds check -- it is the zip/Rev adaptor's two exhaustion tests per item, and `pads.py` gives both spellings identical 11 panic pads at identical line:col*
 - **p08** — R3 span OWED  
   *RECAP 'Owed' 3*
 - **p10** — R4 searched at review: -323/-603 becomes -129/-241  
   *.memory/01-ladder.md finding 18 (p10): the rejected R4 candidate `u_win` verifies 10/0; `R3ship - u_win` is -129.00/-241.00, i.e. 60% of the published margin was R4 SPELLING*
 - **p11** — R4 chained to the prover; `r4_cstr` inadmissible  
   *.memory/01-ladder.md finding 9 (p11): `r4_cstr` would be -17 526 Ir/call and its twin is rejected with four `is not supported`*
+- **p12** — R4 searched at review: the SIGN FLIPS on `large` to +66.00  
+  *.memory/01-ladder.md p12: p12 called its pair interval degenerate on an INFERENCE; TASK_040_REVIEW BUILT the cheaper R4 (route A), which verifies 15/0, twin 18/0, holds `R4 = R5 exact` and is 17.00/92.00 cheaper -- so the shipped R3 is +66.00 DEARER than the cheapest-found verifying R4 on `large`, and the published -26.00 is a fixed-R4 figure. ⚠ Added at TASK_112: this row printed `undeclared` although the search is reviewed and moved the sign*
 - **p13** — R4 searched: the SIGN FLIPS to +44/+77  
   *.memory/01-ladder.md finding 14 (p13): a bounded unchecked consumer verifies 19/0 with no new trusted item and is excluded by nothing but spec.md's English*
+- **p17** — R3 searched: an in-contract respelling is -19.00 flat; `+32` is NOT a law (swept 18...63)  
+  *.memory/01-ladder.md p17 (TASK_018, reviewed at TASK_018_REVIEW): an in-contract respelling keeping `let start: i64`, `let end: i64` and the literal `if start < end && start >= 0` measures -19.00 flat against the shipped R4 on both bands and is BYTE-IDENTICAL (md5_fn 532201c70eeb.., 135 instructions) to a row an earlier task had declared out of contract. ⚠ It is an R3-SIDE bound with R4 held by fiat, emphatically not 'safe beats unsafe'. And the published `+32 flat` is retracted AS A LAW: both shipped bands sit at nsuf = 3, and swept over nsuf 1-8 `R3ship - R4` runs 18...63. p17 ships no sweep inputs*
+- **p22** — R4 searched: `+2.00` is a fixed-R4 bound; against `r4_reslice` the gap is +125/+1021 -- 510x on `large`  
+  *.memory/01-ladder.md finding 22 (p22), reviewed at TASK_070_REVIEW which re-measured it end to end: `r4_reslice` is R4 plus R3's one reslice, in contract, same checksum on all 8 inputs, `20 verified, 0 errors`, and its R4/R5 pair is byte-identical at -O3 (md5_fn ea06db04c435 both sides, built and diffed). It is 1*nkw - 5 cheaper than the shipped R4, so `R3ship - r4_reslice = 1*nkw - 3` = +125.00 / +1021.00. The R4 was NOT re-shipped (.memory/02-bench-rules.md), so both numbers publish. ⚠ Added at TASK_112: this row printed `undeclared` while §6 of results/SYNTHESIS.md reported the 510x retraction*
 - **p36** — BOTH sides searched (4 R3 levers, 3 R4)  
   *.memory/01-ladder.md finding 23 (p36): publishes +7.00 flat (fixed-R4 bound, cheapest R3 found) and +10.00 flat (matched pair), never a single number, and NO pair interval*
 - **p47** — R4 searched, six levers  
   *`patterns/p47-ct-compare/NOTES.md` §8e, REVIEWED — "Six R4 levers were built, each measured and put through `./verus_run.py`" — and §8e's table has six rows: `unsafe` shipped, `u_base`, `u_winu`, `u_end`, `u_win`, `u_ptr`. `gen_controls.py --list` registers five `from unsafe.rs`; the sixth is the shipped rung. ⚠ TASK_075_REVIEW M6.3 read this as four and called the number unsupported; it is supported, and the citation — not the figure — was what was wrong*
+
+⚠⚠ **FOUR ENTRIES WERE ADDED AT TASK_112 AND THE COLUMN UNDERSTATED THE RECORD BY THAT MUCH** (TASK_111, adjacent work 1, which named three of the four; `p12` was found while landing it). `p22`, `p17`, `p06` and `p12` each have a **reviewed** search result in `.memory/01-ladder.md`, and each printed `undeclared` here. ⚠ **The consequence was not cosmetic**: `results/SYNTHESIS.md` §2 was quoting p22's `+2.00` and p12's `-26.00` inside a bucket labelled *"flat in the size of the data"* while RECAP finding 33 and `.memory/01-ladder.md` finding 22 carried the 510× correction for one of them (⚠ it is recorded there and in RECAP's standing trap box, **not** on the *"Retracted -- do not reinstate"* list, where p17's `+32 flat` does sit). **An `undeclared` in this column means *nobody wrote an entry*, and it has never meant *nobody searched*.**
 
 ⚠ **Three corrections to this section's own provenance, and the paragraph that carried them predicted exactly this rot** (TASK_075_REVIEW M6, two of whose three items do not survive re-checking):
 

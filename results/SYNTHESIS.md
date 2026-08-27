@@ -1,7 +1,10 @@
 # What 26 kernels say about the cost of memory safety
 
-*A cross-pattern synthesis of `sec-ladder`. Written at TASK_108, against 26 built
-patterns and 39 recorded findings.*
+*A cross-pattern synthesis of `sec-ladder`. Written at TASK_108 against 26 built
+patterns and 39 recorded findings; reviewed at TASK_111 and corrected at
+TASK_112, which restored nine reviewed results the first pass had dropped and
+fixed two blockers, nine majors and twelve minors. §7 says which, and which way
+they pointed.*
 
 > **This file is the argument. `results/synthesis.md` (lower case) is the
 > numbers** — the kernel-exclusive `Ir` matrix, every pair difference with its
@@ -30,6 +33,9 @@ thing the project produced** (§6).
 **Four results and a method.** That compression is itself a finding: twenty-six
 patterns do not give twenty-six independent lessons about safety cost. The
 headlines collapse; what varies pattern to pattern is the *exception*.
+⚠ **It also cost this document nine reviewed results on its first pass, and the
+five largest all pointed the same way — see §7.** Compression is where coverage
+bias enters, and it leaves no trace in the arithmetic.
 
 ---
 
@@ -45,8 +51,22 @@ in what enforces memory safety:
 | **R1** | C | idiomatic C99, no bounds checks, *including* the bug class the pattern models |
 | **R2** | safe Rust, naive | the mechanical port: `for i in 0..n { v[i] }`. Zero `unsafe` |
 | **R3** | safe Rust, tuned | same semantics, rewritten to help LLVM elide checks: iterators, reslicing, `chunks_exact`, hoisted assertions. Still zero `unsafe` |
-| **R4** | unsafe Rust | `get_unchecked`, raw pointers — whatever reaches C's codegen. Correct, just unverified |
+| **R4** | unsafe Rust | `get_unchecked`, raw pointers. ⚠ **Not "correct, just unverified": at this pin an R4 must have a byte-identical R5 twin that Verus verifies** — `identity: exact` on 25 of 26 patterns and `norel` on the 26th |
 | **R5** | unsafe Rust + Verus | R4's executable code, plus specifications and proofs discharging every unsafe precondition |
+
+⚠⚠ **That R4 row is a constraint, not a definition, and it governs every
+`R3 − R4` below.** Because the gate pins R4 ≡ R5, **R4 is bounded by what the
+pinned vstd can express and R3 is bounded by nothing: the two classes are
+incomparable, not nested.** The measured instance is p11, where the R4-side
+candidate `r4_cstr` would be **−17 526 `Ir` per call (−35%)** and is rejected
+with four `is not supported` errors, so the safe class reaches
+`core::slice::memchr` at zero trusted items and the unsafe class cannot reach it
+at all; on p16 the same mechanism runs the other way — `chunks_exact(32)` is
+admissible as R3 at **zero** trusted items and needs **five** as R4. ⚠ **The
+constraint holds R4 above its true floor, so every `R3 − R4` printed here is
+measured against an inflated unsafe rung and reads more favourably to safe Rust
+than the pattern warrants.** This is not a claim that safe Rust is cheaper; it
+is a statement that the comparison is not a language fact in either direction.
 
 Most patterns also ship **R1h**, C plus the bounds check a careful C programmer
 writes, which is what separates *"C is faster"* from *"C skipped the check"*.
@@ -64,12 +84,32 @@ kernel-exclusive `Ir` per call, unless it says otherwise.
 **The two `Ir` conventions.** *Kernel-exclusive* counts instructions inside the
 kernel symbol only. *Whole-program marginal* is a difference of two run lengths
 and therefore includes the callees. They answer different questions and disagree
-where the rungs call different library routines; `results/synthesis.md` §2 prints
+whenever the rungs dispatch different work outside the kernel symbol — ⚠ **which
+is broader than "different library routines", and the two largest measured
+disagreements in the tree are neither.** On p27 the `+120.33 / +130.95` gap is
+the **safe side's out-of-line `drop_glue::<[Option<Box<u8>>; 32]>`**, Rust drop
+glue and not a library call. On p36 the *kernel's own indirect callees* run
+**512 (gcc) / 384 (clang, rustc) / 0** `Ir` per call, which **reverses** the
+`match` control from dearer to cheaper and vanishes the gcc-vs-clang C gap — on
+the one pattern whose kernel *is* a call. A pattern with no libc calls is not
+therefore safe to difference. `results/synthesis.md` §2 prints
 both and tags every row with a **licence** saying whether the two cells dispatch
 the same work outside the kernel. A row tagged `NOT-LIC` is *known* to be wrong
 as a kernel-exclusive difference. Four of the 26 `R3−R4` rows are not licensed.
 
-**The gate.** `harness/check.py` is a ~5 400-line adversarial checker each pattern
+**gcc's column carries a mitigation clang's does not.** gcc on this box defaults
+to `-fcf-protection=full`, so every gcc-compiled function opens with an
+`endbr64` IBT landing pad and clang and rustc emit none. It is measured, on p36,
+by rebuilding with `-fcf-protection=none`: **`1.00000·nrw + 1` `Ir` per call**,
+gcc's column only. **This project has been pricing a CFI mitigation all along
+and did not say so.** It is one pad per call where the kernel is a single
+function and `O(dispatches)` wherever control leaves the kernel, so it is small
+against most of the figures below and it is never zero. ⚠ **Name it before
+attributing any gcc-vs-clang gap to codegen** — including the `+5` (gcc) versus
+`+12` (clang) hardening figures below, which are safe only because each is a
+difference taken *within* one compiler.
+
+**The gate.** `harness/check.py` is an 8 434-line adversarial checker each pattern
 must pass: rung equivalence on committed inputs against an independent Python
 model, sanitizer and Miri rows, Verus obligation counts, byte-level identity
 between R4 and R5, and a hashed contract in the pattern's `spec.md` naming the
@@ -83,7 +123,8 @@ idiom, hashed into the record; what it buys is **decidability, not
 singularity** — the admissible class is settleable by `grep`, and it is still a
 class. Hence *"cheapest found"* below, and never *"minimum"*.
 
-**One box.** Everything here is one containerised Xeon Gold 6230, glibc 2.39
+**One box.** Everything here is one container on a 2× Xeon Gold 6230 host (80
+logical CPUs), glibc 2.39
 (`_FORTIFY_SOURCE=3` by gcc default), gcc 13.3.0, clang/LLVM 22.1.6, rustc
 1.97.1 (whose LLVM is bit-for-bit that clang), Verus `0.2026.08.09.92f466f` with
 a pinned vstd. §7 says what that costs you.
@@ -95,8 +136,9 @@ a pinned vstd. §7 says what that costs you.
 ### The distribution
 
 Over the 22 patterns whose `R3−R4` row is licensed for differencing
-(`results/synthesis.md` §2; re-derivable with `.temp/t108/census.py`), shipped
-spellings, `-O3 isolated`, kernel-exclusive `Ir` per call:
+(`results/synthesis.md` §2; re-derivable with `python3 synthesis/census.py`,
+which reads that one committed file), **shipped spellings**, `-O3 isolated`,
+kernel-exclusive `Ir` per call:
 
 - **9 of 22** sit within **±32 `Ir` per call on both blobs** — p01, p02, p04,
   p08, p12, p17, p18, p22, p38. Flat in the size of the data, not a percentage.
@@ -108,14 +150,69 @@ spellings, `-O3 isolated`, kernel-exclusive `Ir` per call:
   p07, p09, p14, p19, p23, p47. These are the interesting ones, and the table
   below says what each is actually paying for.
 
-**Always quote R3.** The naive rung R2 overstates safe Rust's cost against R4 by
-between 1.05× and 3 536× on the `large` blob, median about **7.3×** — 3 536× on
-p08 (a `memmove` idiom R2's indexing defeats), 3 323× on p04, 1 033× on p22.
-Two patterns invert (p09 and p14: R3 is *dearer* than R2, and on p09 that is the
-documented reslice/load-merge hazard, not noise). A benchmark that ships R2 as
-"safe Rust" is not measuring safety; it is measuring whether anyone tuned it.
+⚠ **`9 + 4 + 9 = 22` is a coincidence, not a partition.** **p18** is in two
+buckets (within ±32 *and* negative on both) and **p16** (`27 / 77`) is in none.
+The sum landing exactly on the row count is what makes that easy to miss.
+
+⚠⚠ **AND THE WORD "SHIPPED" IN THAT HEADER IS DOING MORE WORK THAN A READER
+WILL GIVE IT. Four of the 22 rows have a measured, verifying, in-contract
+counterpart on the R4 side, and applying the record moves three of them out of
+their buckets — every one of the four against safe Rust:**
+
+| row | shipped | against the cheapest admissible R4 found | bucket |
+|---|---|---|---|
+| **p22** | `+2.00 / +2.00` | **`+125.00 / +1021.00`** — `r4_reslice`, in contract, `20 verified, 0 errors`, byte-identical to its own R5 at `-O3`. **510× on the large band** | flat → **>100** |
+| **p13** | `−177 / −1054` | **`+44.00 / +77.00`** — a bounded unchecked consumer, `19 verified, 0 errors`, no new trusted item. **Sign flip** | negative → **no bucket** |
+| **p12** | `+3.00 / −26.00` | **`+20.00 / +66.00`** — route A, `15/0`, twin `18/0`, `identity exact`, 17.00 / 92.00 cheaper. **Sign flip on `large`** | flat → **no bucket** |
+| **p10** | `−323 / −603` | **`−129.00 / −241.00`** — `u_win`, `10/0`, no new trusted item: **60% of the margin was R4 spelling** | negative (unchanged) |
+
+**So the distribution at the searched values is `7 / 3 / 10`, with p12 and p13
+joining p16 in no bucket at all** (`synthesis/census.py` arm C). ⚠ **p22's is
+the sharpest, and this document already carried it 400 lines away without
+noticing**: §6, trap 1 gives the 510× as one of five headlines published in the
+flattering direction, while §2 went on quoting the figure it corrects.
+⚠ **Neither number is the "true" one.**
+The project's rule is *never re-ship a rung because a cheaper in-contract
+spelling was found*, so the shipped cell is published as a **fixed-R4 bound**
+and the counterpart beside it; a reader who wants one number is asking a
+question the record declines to answer.
+
+⚠ **The two rows that move the other way are both R3-side, and that asymmetry is
+the point.** p17's in-contract R3 respelling is **−19.00** flat against the
+shipped R4 (byte-identical to a row an earlier task had excluded), and p06's
+`c_idx` is `+80 / +187` against a shipped `+334 / +172`. **The R3-side levers
+cost zero trusted items and are easy to find; the R4-side levers have to clear
+the prover** (§1). That is why the unsearched side is systematically the unsafe
+one, and why the errors run systematically one way.
+
+⚠ **p17 stays in the flat bucket and its label still needs one qualification.**
+`+32 / +32` is literally what p17's two shipped blobs measure. What is retracted
+is `+32` **as a law**: both shipped bands happen to sit at `nsuf = 3`, and swept
+over `nsuf` 1–8 the same difference runs **18…63**. "Flat across p17's two
+blobs" is true; "flat in the size of the data" is what a reader takes from the
+bucket, and for p17 that is the retracted sentence.
+
+**Always quote R3.** The naive rung R2 is dearer than the tuned one by a median
+of **7.26×** across the 17 licensed rows whose `R3 − R4` is positive on `large`
+(p05 is the 9th of 17), running from **−1.37×** (p47) to **3 536×** (p08, a
+`memmove` idiom R2's indexing defeats) with 3 323× on p04. ⚠ **Three of the
+seventeen are not overstatements at all** — p47 (−1.37×), p09 (0.74×) and p14
+(0.86×) have R2 *cheaper* than R3, and on p09 that is the documented
+reslice/load-merge hazard rather than noise. ⚠ **The `1.05×` low this document
+used to print is p27**, a `NOT-LIC` row this section's own licence rule
+excludes — the range and the median were being taken over two different
+populations. ✅ **And the median is the robust half of this, measured**: apply
+all four searched R4s from the table above and p22's own ratio collapses from
+1 033× to **2.02×** while p12 and p13 enter the population, and the median does
+not move — still **7.26×**, now the 10th of 19. **Quote the median, not the
+range**, and do not quote any single row's ratio without its search state. What
+survives: a benchmark that ships R2 as "safe Rust" is not measuring safety, it
+is measuring whether anyone tuned it.
 
 ### Where the number is ~0, the mechanism is always visible
+
+That claim is stronger than it sounds, so here are the mechanisms, including for
+two rows this document previously listed in the flat bucket and left unexplained.
 
 - **p16** (TLV walker, data-dependent bound, nothing hoistable): the per-byte
   safety tax is **0.00000 `Ir`/folded byte** — a *matched-spelling* difference
@@ -138,15 +235,51 @@ documented reslice/load-merge hazard, not noise). A benchmark that ships R2 as
   ⚠ PROVISIONAL (TASK_092, unreviewed), and contingent on p46's byte-identity pin
   and trusted-base count: relax either and it inverts.
 - **p01 / p02**, the calibration pair: tuned safe Rust is **+4…+5** instructions
-  per call on p01 and **+10** on p02 against unsafe, flat in the size of the
+  per call on p01 and **+11** on p02 against unsafe, flat in the size of the
   data. Hardened C's own check is **+5** (gcc) / **+12** (clang), also flat —
   which is the comparison that matters, and it says safety costs about the same
-  in both languages, with Rust making it non-optional.
+  in both languages, with Rust making it non-optional. (⚠ p02's figure reads
+  `+10` in `RECAP.md`. That is a **whole-program marginal at 61 B / 4092 B**, a
+  different convention *and* a different input pair; kernel-exclusive on the
+  shipped blobs it is `11.00 / 11.00`.)
+- **And on p01 `large` the two backends land on the same instruction count
+  exactly.** `c-clang` and `unsafe` Rust both execute **143 740 000** kernel
+  instructions — not approximately, the same integer, from
+  `results/p01-array-sum.json` — which is the cleanest *"Rust codegen is C
+  codegen"* datapoint in the tree and the reason every C-vs-Rust claim here
+  needs a clang column. ⚠ **Two conditions.** It is `large`-only: on `small` the
+  same pair reads 180 000 000 against 180 200 000. And it is a statement about
+  *one backend*, because rustc 1.97.1's LLVM is bit-for-bit clang 22.1.6's;
+  `c-gcc` on the same row is 205 180 000, and gcc's column additionally carries
+  the `endbr64` term §1 names, which neither of the other two pays.
+- **p04** (ring buffer, `+5.00 / +5.00`) is flat for a reason that is an
+  *operator* property and not a safe-Rust one: `urem x, C` gives LLVM
+  `x < next_pow2(C)`, and **`next_pow2(CAP) ≤ ARR_LEN` is necessary for elision**
+  — sufficient too, absent a cursor-relating guard. Zero fitted parameters, and
+  it reproduces on capacities p04 never built (`% 32` into `[u64;64]`, `% 64`
+  into `[u64;96]`: both elide). ⚠ **Turn the dial and the row stops being flat:**
+  at `RING_CAP = 60` the same `R3 − R4` goes **+5 → +479**, p03's dead clamp
+  takes it back exactly, and three middle-ends agree in both directions. **The
+  operator, not the language** — and the qualifier is load-bearing, because
+  `% 60` into `[u64;64]` *with* p04's two guards keeps the load check.
+- **p12** (fixed-size `strcat`, `+3.00 / −26.00`) is flat because the bulk-copy
+  lowering survives, and the rule is sharper than "use `copy_from_slice`": a safe
+  byte loop with **no bulk call anywhere in its source** also lowers to `memcpy`,
+  and checking only the *source* per byte kills it just as dead as checking the
+  destination. **Both ends of the copy must be free of a per-iteration check.** A
+  consequence worth carrying: `R2 − R4` has no per-byte law here at all — R2
+  alone is exactly linear at 24.75 `Ir` per copied byte, and the non-law is
+  entirely R4's `memcpy` size dispatch. ⚠ **And p12's `−26.00` is a fixed-R4
+  figure**: the review built a cheaper admissible R4 (verifies 15/0, twin 18/0,
+  `identity exact`) that is 17.00 / 92.00 cheaper, which **flips the sign on
+  `large`** to R3 being +66.00 dearer.
 
 ### Where the number is large, name what you are paying for
 
 **"The bounds check costs X" is almost never the right sentence.** Pattern by
-pattern, for the nine licensed rows above 100 `Ir`/call:
+pattern, for the nine licensed rows above 100 `Ir`/call — plus **p22**, which
+joins them at the searched value above and would otherwise never get a mechanism
+at all:
 
 | pattern | `R3−R4`, small / large | what it is actually paying for |
 |---|---|---|
@@ -154,13 +287,34 @@ pattern, for the nine licensed rows above 100 `Ir`/call:
 | p05 index flatten | 123 / 399 | a hoisted per-row trip count and a scalar epilogue; blocked by **nonlinearity** |
 | p06 rotate | 334 / 172 | **none of it is a bounds check** — `zip`/`Rev` adaptor exhaustion tests |
 | p07 binary search | 3 015 / 10 025 | the check, genuinely, with **no axis along which it amortises** |
-| p09 bitset | 13 756 / 48 885 | **half is a lost 8-byte load-merge idiom**, not deleted checks |
+| p09 bitset | 13 756 / 48 885 | **the checks, and it is the one row where that is established rather than assumed** — see below |
 | p14 field split | 638 / 425 | R4's foreclosed unroll: the tax moves 6.456 → 3.506 `Ir`/line byte at constant input size |
 | p19 state machine | 260 / 4 100 | `1.00 Ir`/byte is **one `and $0x7,%edi`** — a mask, not a check |
-| p23 partition | 306 / 444 | the **data's shape**, and ≥150 `Ir`/call of the safe side is spelling |
+| p22 hash probe | 125 / 1 021 | **the unsafe rung's missing reslice.** `R3 − R4ship` is `+2.00` flat; the whole `1·nkw` term appears only because the shipped R4 addresses keys off `buf` at `off + p` where both R3 and the admissible `r4_reslice` address them off `w`. **None of it is a bounds check** |
+| p23 partition | 306 / 444 | the **data's shape** — see the rank note below — and ≥150 `Ir`/call of the safe side is spelling |
 | p47 constant-time compare | 90 / 142 | the constant-time discipline; R2 is *cheaper* precisely because it leaks |
 
-Three of these deserve their mechanism spelled out, because they generalise.
+⚠ **p23's two numbers ship without their domain, which is p23's own rule.** Band
+K holds *every* size regressor fixed — `m = 32`, `nrec = 8`, 256 copied bytes
+per call — and sweeps only the pivot's rank: `R3 − R4` runs **706.37** at rank
+0.03 down to **227.00** at rank 0.97, a **3.11×** swing, while the size-based law
+predicts 416.32 for all seven points. `306 / 444` are two draws from that curve.
+
+**p09 is the counter-case, and it is the one to lean on.** Its `R3 − R4`
+decomposes over **three checks with zero free parameters** — every coefficient is
+a loop-body instruction count read off the listing — and out of sample it
+predicts `large` to within 1.13 `Ir` of 73 404, with `R3 − R4` **predicted
+48 885.00 against measured 48 885.00**. ⚠ **This document previously said *"half
+is a lost 8-byte load-merge idiom, not deleted checks"* and that attached a real
+number to the wrong quantity.** p09 has two "half" statements and neither is
+`R3 − R4`: one is half of the *`m_clampb` control's* win (the p03-style seeding
+probe, 49% on `small` and 47% on `large`), and the other is the `+21 lost merge
+/ +1 spill / −5 cheaper query checks = +17 net` decomposition of the **R3-vs-R2
+inversion**. p09 is the largest `R3 − R4` in the tree and it is the row where the
+checks *do* account for it.
+
+Four mechanisms in this neighbourhood generalise past their own pattern, and
+p11's is here even though its row is `NOT-LIC` and negative.
 
 **p03 — the tax is the price of the optimiser failing the invariant the proof
 proves.** Take the tuned safe rung and add a *dead* `if sp > STACK_CAP { return
@@ -178,9 +332,16 @@ already holds.** A NUL scan decomposes three ways off the listing: **12.0× is t
 library** (C's `strlen` reaches an IFUNC-dispatched AVX2 routine at 0.078125
 `Ir`/byte against `core::slice::memchr`'s SWAR 0.937500), **5.3× is which Rust
 spelling**, and **3.00000 `Ir`/byte is the bounds check** — where the naive report
-would have been one ratio. The 3.00000 is the finding: the *same* check costs one
-instruction more here than in p16's fold, because the scan's induction variable is
-window-relative where the fold's was hoisted to blob-absolute.
+would have been one ratio. The 3.00000 is the finding, and the control that
+isolates it is **inside p11**, one loop at a time: p11's own fold measures
+4.25000 and p11's own scan 3.00000, both exact, residual a constant. A bounds
+check costs **2.00 `Ir`/byte when the loop's induction variable already holds the
+address being checked and 3.00 when it does not**, and which one you get is
+decided by the loop's *other* exit test — the fold hoists `add %rdx,%rax` out, so
+its bound test is `cmp; jae`; the scan must keep `%rbx` window-relative because
+its own exit test is `q < len`, so the check has to `lea` first. (p16 and p17
+reproduce the 4.25 and its 2.00 + 2.25 split; they are not what separates 2 from
+3.)
 
 **The check's second half, on five kernels.** Where a per-element check does
 cost, the split is stable: **4.25 `Ir`/element = 2.00 check + 2.25 foreclosed
@@ -203,10 +364,28 @@ amortises along *some* axis. p07's amortises along nothing. If you want one
 number for "safe indexing where the optimiser cannot help you", it is this one,
 and it is roughly half the kernel.
 
-### The two results that are easy to get backwards
+### The three results that are easy to get backwards
+
+**A percentage can be wrong in SIGN at the other input (p19).** Safe Rust's
+bounds check and C's validation pass are the *same predicate at different
+asymptotics*: LLVM lowers the `tbl[…]` slice check to `cmp $0x8`, a state-range
+test on `st` before the index is even built, while the C rung emits
+`cmpb $0x7,…; ja` four times in a validation loop. Validation is `O(table)`
+**once per call**; the bounds check is `O(message)`. So the buggy C rung is
+**5 071 `Ir`/call cheaper than unsafe Rust at `small` (m = 256)** and **3 569
+dearer at `large` (m = 4096)** — `2.25·m − 5647`, crossing zero at
+m ≈ 2 510, between the two shipped blobs. ⚠ **Any percentage quoted at either
+input is wrong in sign at the other, and nothing in that reversal is safety.**
+(Both figures are `c-gcc` minus `unsafe` off `results/synthesis.md` §1:
+`2831 − 7902` and `45071 − 41502`. gcc's side additionally carries the `endbr64`
+term of §1, which is small here and not zero.)
+
+⚠ **This is the trap a decision-maker walks into**, because a benchmark
+publishes the input it happened to build and a reader generalises the ratio.
+Ask for the crossing point, or for two inputs on opposite sides of it.
 
 **A bound is worth more than the check costs (p13).** `strncpy` truncation:
-72% (`small`) and 91% (`large`) of the published safe-beats-unsafe gap is the
+72% (`small`) and 90% (`large`) of the published safe-beats-unsafe gap is the
 downstream *consumer scan*, and its direction is the reverse of the obvious one —
 **a consumer whose bound LLVM can see fully unrolls to 2 `Ir`/byte; an unbounded
 walk stays a 4-instruction loop at 4**. ⚠ **The discriminator is the BOUND, not
@@ -219,7 +398,12 @@ the shipped difference becomes **+44.00 / +77.00**.
 
 **The lifetime guarantee costs zero (p27).** The first temporal bug here: a
 handle table over per-record `malloc`/`free`, with C omitting one conjunct on the
-read path. `R3 − R4 = +230.07 / +792.75` and **none of it is temporal safety** —
+read path. ⚠ **This one pair is quoted in the other convention and the document
+says so here rather than letting the reader assume:**
+`R3 − R4 = +230.07 / +792.75` is a **whole-program marginal**, because the
+decomposition below is a whole-program one; **kernel-exclusive, the same pair
+reads `+109.98 / +661.82`**, so the marginal is 2.09× the figure §1's banner
+otherwise promises. **None of it is temporal safety** either way —
 a decomposition closed over *every* function gives `230.07 = 109.65 kernel +
 120.42 drop glue + 0.00 allocator`, with `malloc`, `free`, `_int_malloc`,
 `_int_free` and all three `__rust_*` equal to the last digit between the rungs.
@@ -236,15 +420,25 @@ callgrind's caller→callee edges, not read off that column.
 
 ### The caveat that governs this whole section
 
+**Two caveats, and they are different things.** The first is *search depth*:
 `R3 − R4` differences two rungs **searched to wildly different depths**, and
 every time a side has been searched properly the number moved a long way. In
-`results/synthesis.md` §2's own search-state column, **18 of 26 patterns print
-`undeclared`**, three more owe a span, and only **five** report a real
-two-sided or R4-side search. Of the five: p10's −323/−603 became −129/−241
-against a verifying R4 candidate; p13's −177/−1054 became +44/+77, a sign flip;
-p36 refuses to publish a single number at all. **So part of what that column
-measures is search effort**, and any single row should be read as a bound with
-one endpoint held fixed by fiat, not as a property of the pattern.
+`results/synthesis.md` §2's own search-state column, **14 of 26 patterns print
+`undeclared`**, three more owe a span, and **nine** report a real search on at
+least one side. Of the nine: p10's −323/−603 became −129/−241 against a
+verifying R4 candidate; p13's −177/−1054 became +44/+77, a sign flip; p12's
+−26.00 became +66.00, another; p22's `+2.00` became `+125/+1021`; p17's
+`+32/+32` has an in-contract R3 respelling at **−19.00** flat; p36 refuses to
+publish a single number at all. **So part of
+what that column measures is search effort**, and any single row should be read
+as a bound with one endpoint held fixed by fiat, not as a property of the
+pattern.
+
+The second is **§1's R4 constraint, and it is stronger**. Search depth says
+nobody looked hard enough; the R4 ≡ R5 pin says **one side is not allowed to
+look** — p11's `r4_cstr` was found, measured at −17 526 `Ir`/call, and refused
+because the prover cannot type it. A reader who corrects for search effort has
+still not corrected for that.
 
 ---
 
@@ -315,21 +509,82 @@ double-free yields two aliased handles — both silently wrong, both **Miri-clea
 in all three modes**. A generation tag does **not** rescue it, because the bump
 is a hand-written second store: exactly the one C omits.
 
-**Safe Rust can be worse than C.** ⚠ PROVISIONAL, from a refused row: `Rc` in
-both directions of a doubly linked list is a cycle and leaks (Miri: five
+**One safe spelling leaks where an equally safe one does not, and there is no C
+side to compare it against.** ⚠ PROVISIONAL, from a refused row: `Rc` in both
+directions of a doubly linked list is a cycle and leaks (Miri: five
 `memory leaked` lines); `Weak` for the back pointer does not (zero). Both are
 safe, both compile, and the leaking one is the spelling a hurried programmer
-reaches for. The row was refused as a *headline* precisely because `Weak` is
-equally idiomatic and measured leak-free — so read this as a warning about a
-spelling, not a claim about the language.
+reaches for. ⚠⚠ **The obvious headline — *"safe Rust can be worse than C"* —
+is a refused claim and is not made here.** It was refused because `Weak` is
+equally idiomatic and measured leak-free, so the headline would survive only if
+`Rc`-both-ways were pinned as *the* safe spelling, and it is not; and because
+**no C rung was ever built and no cost axis was ever measured** — the entire
+evidence base is two *Rust* spellings under Miri. Read it as a warning about a
+spelling.
 
-**And two for the other side of the ledger, because a reader who stops here will
-have the wrong impression.** p08's overlapping `memcpy` is a bug safe Rust
-**cannot express** — the borrow checker rejects it at compile time, so there is
-no runtime check and nothing to measure. And p38's strict-aliasing miscompile is
-the first bug class in the tree that **unsafe Rust does not reintroduce either**:
-Rust has no type-based aliasing rule at any rung. Both are unambiguous wins, and
-**neither is visible in any `Ir` column** — which is §5's point arriving early.
+### The other side of the ledger, and one of the three is measured
+
+A reader who stops at the paragraphs above has the wrong impression, and the
+correction is owed in the same units.
+
+**The measured one: p02, the one-byte heap overflow.** The kernel copies a
+record into a fixed destination; `adversarial-cap1.bin` sets `len = cap + 1 =
+65`, so the destination bound is the only thing violated, by one byte. Idiomatic
+C prints `198979479034752` and exits 0 in **seven of eight builds** — the
+overflow lands inside glibc's chunk rounding, a 64-byte request having 72 usable
+bytes, so nothing is corrupted and nothing is detected. The eighth build aborts,
+and **that abort is the distribution's `_FORTIFY_SOURCE 3` default rather than
+the program**: as hardening it catches *1 of 8 builds of 1 of 3 attacks* here.
+Every Rust rung and hardened C returns `0`. **The control is what makes it a
+measurement rather than an assertion**: delete the bound test from
+`patterns/p02-buffer-copy/safe_naive.rs`
+and nothing else, and the rung prints C's checksum bit-for-bit on well-formed
+input — the same program — while on the adversarial blob it exits 101 with
+`index out of bounds: the len is 64 but the index is 64`. So *"Rust makes the
+check non-optional"* is measured, not assumed.
+
+⚠ **Its scope, which the sentence above needs.** R2–R5 all carry the same
+three-term rejection test hardened C does, so **no shipped Rust rung ever
+reaches its own bounds check on any p02 input** — the panic belongs to the
+deleted-check control, not to the matrix. And of p02's three adversarial blobs
+this is the one that behaves this way: the 65 535-byte overflow aborts loudly
+because it destroys the next chunk header, and a third blob is silently wrong on
+**eight** of eight builds in C. The one-byte case is the realistic one and it is
+the invisible one; that is the whole of the result.
+
+**And two that are real and unpriceable.** p08's overlapping `memcpy` is a bug
+safe Rust **cannot express** — the borrow checker rejects it at compile time, so
+there is no runtime check and nothing to measure. And p38's strict-aliasing
+miscompile is the first bug class in the tree that **unsafe Rust does not
+reintroduce either**: Rust has no type-based aliasing rule at any rung. Both are
+unambiguous wins, and **neither is visible in any `Ir` column** — which is §5's
+point arriving early.
+
+**p38 does have a price, and it runs the opposite way to the usual story.** Seven
+one-line neighbours of the shipped C kernel were built and measured beside it in
+one invocation, at `-O3 isolated`, whole-program marginal `Ir` per call on
+`small.bin`: **the undefined spelling is the dearest of its defined neighbours on
+gcc.** Six defined spellings are cheaper — **five by exactly 6.00 `Ir`/call**
+(`c_symset`, `c_once`, `c_nosa`, `c_memcpy`, `c_union`, all at 1037.72 against
+the shipped 1043.72) and one by 2.00 (`c_noback`) — and three of them
+(`c_symset`, `c_once`, `c_noback`) each remove a *different* one of the four
+conjunctive conditions the miscompile needs. On clang it is not a win
+either: `c_once` is 8.00 cheaper, `c_noback` 7.00, and the other four are
+**byte-identical** to it. **The undefined behaviour buys nothing and costs 6, so
+no optimising programmer arrives here by optimising** — which is also why p38
+ships labelled a *demonstration kernel* rather than a claim about prevalent code.
+⚠ **The one defined spelling that costs more is `c_halves` at `+12.00` (gcc) /
+`+32.00` (clang) — the two-half read the Rust rungs are forced into.** So the
+sentence is *"the UB is not a speed win"*, not *"safety is free here"*.
+
+⚠ **The count, said plainly, because the shape of this section is itself a
+finding.** Seven entries above where the safe rungs buy nothing, one measured
+case where they buy the whole bug, and two wins with no cost axis at all. That
+ratio is a property of *which patterns were built* — the catalogue was written
+around bug classes a five-rung ladder can price, and a bug class safety prevents
+outright has nothing to price — so it is not a score. Read the entries, not the
+tally. **This document dropped the p02 entry entirely in its first version**, and
+that omission ran the same way as every other one it made (§7).
 
 ---
 
@@ -358,6 +613,27 @@ learns what the solver knew. The payoff arrives only when the proof licenses
 `unsafe`, which is what R5 is: R4's machine code with the obligations
 discharged. This is the whole reason the ladder has five rungs and not four.
 
+### What a proof forbids, and it is priced
+
+§1's R4 constraint has a cost, and on p36 it is measured to five decimals.
+**Verus at this pin cannot type `fn(u64) -> u64` at all** — the error is on the
+*declaration*, not on the call — so C's own dispatch mechanism has no admissible
+Rust rung, and all four Rust rungs use `[&'static dyn Op; NOPS]` instead. The
+difference is **exactly `3.00000` `Ir` per dispatch**, same intercept, zero
+residual over twelve swept points, with a mechanism read off the two listings and
+no fitted parameter. ⚠ **Finding 14's other instances exclude a *spelling*; this
+one excludes a *mechanism***, and it is the reason p36's `R3 − R4` is not a
+statement about bounds checking at all. A second, smaller instance sits on p47:
+`u_win` is 24.000 `Ir` cheaper on both blobs, verifies with no new trusted item
+and no lemma, and is excluded **by the identity level alone** — `md5_raw`
+differs where `md5_raw_norel` matches.
+
+**So the honest form of "what a proof costs" is two numbers, not one:** zero
+instructions for the proof itself, and whatever the pin's expressiveness costs
+you in the rung you are then allowed to write. This document can only price the
+second where somebody built the excluded rung and measured it, which has happened
+on three patterns.
+
 ### What a proof does not buy: a family of three
 
 > **The proof discharges exactly what it says, and the program is still broken.**
@@ -373,7 +649,10 @@ discharged. This is the whole reason the ladder has five rungs and not four.
    `Tracked<Dealloc>` is **affine, not linear**: a proof may simply drop it.
 
 ⚠⚠ **p42's membership is conditional, and that makes it the most instructive of
-the three.** It was published as *"the first pattern whose R5 does not cover its
+the three.** ⚠ **PROVISIONAL — it rests entirely on `TASK_109` (the review) and
+`TASK_110` (the landing), both of which §7 lists as unreviewed, and `RECAP.md`
+finding 39 marks it so.** This is the sharpest claim in the section and it is the
+one with the thinnest chain behind it. It was published as *"the first pattern whose R5 does not cover its
 own bug class — Verus at the pin cannot state leak-freedom"*, landed in the
 authoritative layer, and was **refuted by its own review within hours**. Escrow
 the token into a tracked `Map<int, Dealloc>` whose domain must return empty and
@@ -442,13 +721,31 @@ deciding whether to build one of these needs first.
 > machine-code footprint at all**.
 
 This is measured, not argued. The 48-row catalogue was written before the project
-started; **15 rows are refused, each on a measurement**, and eight further
-candidates proposed later were probed and **all eight refused** — two independent
-lists, both at a hit rate of zero, which is what makes it structural rather than
-unlucky. Recursion depth: three rungs `call` the same ICF-merged symbol, so there
-is one rung, not three. Unaligned load: the cast and the `memcpy` spelling compile
-to the same 19 instructions. `qsort` comparator: 80 cells, zero ASan reports,
-because glibc's `qsort` is mergesort plus heapsort and all its bounds are counts.
+started — ⚠ **with one exception that weakens the "so the refusals are not
+selection bias" argument by exactly one row: `p48` was added mid-project by the
+manager at TASK_066 and refused at TASK_074.** **15 rows are refused, each on a
+measurement**, and eight further candidates proposed later were probed and **all
+eight refused** — two independent lists, both at a hit rate of zero, which is what
+makes it structural rather than unlucky. Recursion depth: three rungs `call` the
+same ICF-merged symbol, so there is one rung, not three. Unaligned load: the cast
+and the `memcpy` spelling compile to the same 19 instructions. `qsort`
+comparator: 80 cells, zero ASan reports, because glibc's `qsort` is mergesort plus
+heapsort and all its bounds are counts.
+
+⚠ **One of the fifteen does not survive its own reason, and a hit rate of zero is
+exactly the claim a skeptic will test at its weakest row.** `p37` (callback with
+`void*` userdata) is recorded in the catalogue as **REFUSED-REASON-REFUTED at
+TASK_100**: the first limb reproduces (`the verifier does not yet support …
+function pointer types`), but the second — *"R5 must use `dyn Trait`, so the
+erasure that is the bug disappears"* — was an argument with nothing run, and it
+is measurably false. A `dyn Op` with an **erased** `u64` userdata verifies
+`4 verified, 0 errors`, and with a raw-pointer userdata read through
+`vstd::raw_ptr::ptr_ref` it verifies `3 verified, 0 errors`, both at **zero
+`unsafe`, zero `external_body`, zero `assume`**, with the anti-vacuity control
+firing. ⚠ **That does not overturn the refusal** — no C rung, no cost axis, no
+harm matrix and no full R5 were ever established — **but the row is flagged
+"re-triage, do not rubber-stamp", and the count of fifteen should be read with it
+named.**
 
 Two consequences, and they are the ones to carry away.
 
@@ -509,10 +806,19 @@ linear combination of the fit set's own extremes for all 17 of its values, with
 residuals *smaller* than in-sample. **Ship one off-axis point in every band,
 report the post-drop rank beside any hold-out, and treat a residual of exactly
 zero as the signature of a test that could not fail.**
+✅ **And the positive control, because a trap list with no worked success is not
+a method.** p02's `R2 − R4` is a **sawtooth**: amplitude 179 `Ir`, resetting at
+`len ≡ 1 (mod 16)`, riding a 0.21 `Ir`/byte linear term. It was fitted, then
+**re-derived at seven unsampled lengths and at 8× the scale** — 178.9 and 0.2125
+— which is the one model in this project tested by *prediction* rather than by
+re-measurement. That is what the traps above are asking for, and it is one
+pattern out of twenty-six.
 
 **3. Before believing a check, ask what would make it FAIL — then make that
-happen.** Six controls here could not have fired, three of them within three
-tasks of each other. The sharpest: after adding a field to 22 gate records, the
+happen.** Six controls here could not have fired (`.memory/03-measurement.md`
+entries 1, 2, 3, 4, 6 and 7 — entry 5 is struck, having been a control-shaped
+error *about* a control, and the "three within three tasks" cluster the record
+names includes that struck member). The sharpest: after adding a field to 22 gate records, the
 manager regenerated the published tables, got a byte-identical file, and quoted
 that as *"the change moved no published number"* — it is byte-identical because
 the generator reads a different key and the new field's name appears **zero
@@ -586,12 +892,19 @@ until a different agent has attacked it. As of TASK_108 the following have not
 been through a review, and anything resting on them is PROVISIONAL: **TASK_088**
 (p19's re-fitted laws, its CVE correction, and the harness changes p19 is gated
 under), **090**, **091**, **092** (p46's corrections, on which p46's headline
-ground now stands), **095**, **097**, **102** (the instrument-domain result in
-§5), **106** (p23's corrections), **107** (three results that changed how this
-project measures), and the two most recent reviews and their landings, **109**
-and **110**. Four tasks on the list in circulation have since been reviewed —
-TASK_094 by TASK_100, TASK_099 by TASK_103, TASK_101 by TASK_105 and TASK_104 by
-TASK_109 — and that correction was made while writing this file.
+ground now stands), **095**, **097**, **098** and **100** (both
+`Role: research reviewer` with no `_REVIEW*` file of their own — ⚠ **`TASK_100`
+is the source of the `p34` correction §3 rests on and of the `p37`
+refusal-reason refutation in §5**), **102** (the instrument-domain result in
+§5), **106** (p23's
+corrections), **107** (three results that changed how this project measures), and
+the two most recent reviews and their landings, **109** and **110**. Four tasks
+on the list in circulation have since been reviewed — TASK_094 by TASK_100,
+TASK_099 by TASK_103, TASK_101 by TASK_105 and TASK_104 by TASK_109 — and that
+correction was made while writing this file. ⚠ **A review is not self-certifying:
+`TASK_098`, `TASK_100` and `TASK_109` are unreviewed by exactly the criterion
+that puts the engineering tasks on this list, and this document included one of
+the three and missed the other two until TASK_111 found them.**
 
 **Mechanisms that are recorded and not explained.** Cite these; do not explain
 them. (a) **p23's elision cause failed three isolations**: the phenomenon
@@ -607,13 +920,38 @@ the pass-level cause is not, and no compiler flag was bisected. (d) The
 list of variables whose *content* changes codegen paths was derived from a single
 measurement and is not proved complete.
 
-**Structural gaps.** The unsafe side is unsearched on most patterns: 18 of 26
-print `undeclared` in the search-state column and only five report a real search.
-There is **no cross-pattern wall-clock column**, because the timing floor is a
-per-session property and these measurements span 22 sessions. And the whole
-kernel-exclusive matrix speaks for one inline mode: of 414 `-O3` whole-mode
-cell/input pairs, 394 have no kernel symbol at all — the kernel inlined into
-`main` — and all 20 survivors are gcc partial-inlining remnants.
+**Structural gaps.** The unsafe side is unsearched on most patterns: **14 of 26**
+print `undeclared` in the search-state column and **nine** report a real search on
+at least one side. There is **no cross-pattern wall-clock column**, because the
+timing floor is a per-session property and these measurements span 22 sessions.
+And the whole kernel-exclusive matrix speaks for one inline mode: of 414 `-O3`
+whole-mode cell/input pairs, 394 have no kernel symbol at all — the kernel
+inlined into `main`. ⚠ **The 20 survivors are gcc-only but they are not all
+partial-inlining remnants**: 16 are `kernel.part.0` and **four are the whole
+`kernel` symbol**, p46's `c-gcc` and `c-gcc-h` cells on both blobs. So *"there is
+not one `whole`-mode row where the kernel column means what it means in
+`isolated`"* is false for those four. The isolated-only decision survives —
+p46 is one pattern, gcc-only, C-only, so no rung comparison is available from
+those rows — but the justification needed correcting, and
+`results/synthesis.md` printed the four `kernel` rows four lines above the
+sentence that denied them.
+
+**A gap in this document rather than in the project, disclosed because it is the
+kind that repeats.** The first version of this file compressed twenty-six
+patterns into four results, and **every significant omission ran one way**: it
+dropped p02's security result (now §3), the R4-chained-to-the-prover constraint
+(§1), p01's exact C/Rust instruction match (§2), p38's price for the undefined
+spelling (§3) and p19's sign flip (§2) — five reviewed, quotable results, all of
+them flattering to safe Rust, none of them awkward. Four smaller ones went with
+them: p36's `3.00000 Ir`/dispatch (§4), p02's predicted sawtooth (§6), p04's
+`next_pow2(CAP) ≤ ARR_LEN` and p12's both-ends rule (both §2). Nineteen
+retractions had trained this project to distrust *"safety is cheap"*, and the
+reflex removed the evidence for it; the brief that commissioned the compression
+asked for *"where safe Rust does not help"* and had no counterpart item. All nine
+were restored at TASK_112 after `TASK_111` found them. ⚠ **A coverage bias has no
+arithmetic signature — every figure in the first version reproduced against the
+record on the pass that found this — so the only check for it is to ask, of a
+finished document, which way its gaps point.**
 
 **And the scope that bounds every number above.** One box, one libc, one gcc, one
 clang, one rustc, one Verus and one vstd pin, `-O3 isolated`, two blobs per
@@ -632,5 +970,6 @@ say which pair.**
 findings 1–39, `.memory/01-ladder.md` (rung definitions and per-pattern
 findings, authoritative), `.memory/03-measurement.md` (measurement rules),
 `.memory/04-verus.md` (proof burden and trusted base), `.memory/06-catalogue.md`
-(the pattern catalogue and its refusals). Census counts in §2 are re-derivable
-with `.temp/t108/census.py` against `results/synthesis.md` §1.*
+(the pattern catalogue and its refusals). Census counts and bucket lists in §2
+are re-derivable from a clone with `python3 synthesis/census.py`, which reads
+`results/synthesis.md` and nothing else.*
