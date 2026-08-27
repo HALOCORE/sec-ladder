@@ -606,10 +606,7 @@ Miri runs at its default and **a `miri.required: true` row can pass or fail on
 which seed the default happens to be.**
 
 ⚠ **Consequence: "Miri: N of N, no UB" is a statement about one unpinned draw.**
-Every pattern in the tree carries such a line. **Owed:** pin the seed in
-`check.py` (⚠ a `check.py` edit stales every gate record — batch it), or sweep
-several seeds and record which were run. ⚠ **Until then, do not read a green
-Miri row as "no UB"; read it as "no UB at whatever seed ran".**
+Every pattern in the tree carries such a line. ⚠⚠ **~~Owed: pin the seed~~ — THAT IS NO LONGER THE PLAN AND THE PARAGRAPH BELOW IS SUPERSEDED. Pinning was TRIED at TASK_107 and COST 4.6x, giving `p42` a second blocked row; the shipped design is `MIRIFLAGS` deliberately UNSET. See the top of this section.** The seed-dependence itself is unchanged and unfixed; what changed is that the gate record now SAYS SO (`miri.miriflags`, `miriflags_removed_ambient`, `miri_version`) instead of being silent about it. **Do not read a green Miri row as "no UB"; read it as "no UB at whatever seed the unpinned default chose".**
 
 ### `unchecked_div` / `unchecked_rem` DO NOT EXIST at the pinned rustc
 
