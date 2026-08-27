@@ -1035,7 +1035,7 @@ the number.** Two task files have already sent an agent to the wrong finding.
    **The corrected mechanism, and it is a better result than the published one.**
    p13 shipped the safe-beats-unsafe gap as *"R3 gets `memcpy`/`memset`, R4 has
    byte loops"*. **R4 makes the same two library calls at the same cost.** 72%
-   (`small`) and 91% (`large`) of the gap is the **consumer scan**, and its
+   (`small`) and 90% (`large`)  ⚠ *(this read `91%`; `.memory/01-ladder.md` is the authoritative file and says `90%` — corrected at TASK_111, which found the two disagreeing)* of the gap is the **consumer scan**, and its
    direction is the reverse of the published one: **a consumer whose bound LLVM
    can see fully unrolls to 2 Ir/byte; an unbounded walk stays a 4-instruction
    loop at 4** — `+2.00000` Ir per consumed byte at matched spelling.
