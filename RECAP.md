@@ -1906,10 +1906,24 @@ the number.** Two task files have already sent an agent to the wrong finding.
     Evidence: `.tasks/TASK_101_REPORT.md`, `.tasks/TASK_105_REPORT.md`,
     `.tasks/TASK_106_REPORT.md`, `patterns/p23-partition/NOTES.md`.
 
-39. ⚠⚠ **p42 — THE FIRST PATTERN WHOSE R5 PROOF DOES NOT COVER ITS OWN BUG
-    CLASS. Verus at the pin CANNOT STATE LEAK-FREEDOM.** The 26th pattern, and
-    the headline is a negative result that **refutes the manager's task file**.
-    ⚠ **PROVISIONAL — `TASK_104` is unreviewed.**
+39. ⚠⚠ **p42 — THE SHIPPED R5 DOES NOT COVER ITS OWN BUG CLASS, AND THAT IS A
+    PROPERTY OF THE ENCODING, NOT OF THE PROVER.** The 26th pattern.
+    ⚠⚠ **THIS FINDING'S FIRST HEADLINE — *"Verus at the pin CANNOT state
+    leak-freedom"* — WAS FALSE AND IS RETRACTED (`TASK_109`, review). A GHOST
+    LEDGER STATES IT, catches exactly p42's bug, and costs ZERO object code,
+    ZERO new trusted items and ZERO interface change** — `18 verified, 0 errors`,
+    the leak arm `17 verified, 1 errors` at exactly the dropped release, and
+    `md5_fn`/`md5_raw` **identical to the shipped R5 and to the shipped R4**. The
+    only pin that moves is `verus.obligations`, 15 → 18. ✅ **The honest claim is
+    better than the retracted one: the natural encoding does not state
+    leak-freedom; escrowing the token into a tracked `Map<int, Dealloc>` whose
+    domain must return empty does — and the residual trust is that nobody
+    bypasses the wrapper, which is a MODULE-LEVEL DISCIPLINE rather than a global
+    guarantee.** ⚠ **Keying by ADDRESS fails** — `vstd`'s `allocate` never
+    promises the address is not already escrowed; a ghost `int` key works.
+    ✅ **Clean negative, measured: there is NO linear must-consume tracked mode at
+    the pin** (23 verifier attributes, none is one; `grep -rn affine vstd/` → 0
+    hits). ⚠ **PROVISIONAL — `TASK_104` and `TASK_109` both unreviewed as a pair.**
 
     **`Tracked<Dealloc>` is AFFINE, not linear — a proof may simply drop it.** An
     R5 that forgets the error path's `deallocate` verifies **`2 verified, 0
@@ -1933,9 +1947,14 @@ the number.** Two task files have already sent an agent to the wrong finding.
     > binary dies of `fatal runtime error: stack overflow` at depth 1e6 —
     > **a termination proof does not bound the STACK** (`TASK_102`).
     > **(3)** `p42` — an affine deallocation token does not force deallocation.
-    > **Each is a resource the obligation's type simply does not mention. Before
-    > claiming a proof covers a bug class, ask which resource it quantifies
-    > over.**
+    > ⚠⚠ **BUT p42's MEMBERSHIP IS NOW CONDITIONAL AND MUST BE CITED THAT WAY:
+    > its SHIPPED encoding does not state the property, and a ghost ledger DOES.
+    > So p42 is evidence about an ENCODING CHOICE, not about the prover.** `p47`
+    > and the stack-overflow case are untouched. ⚠ **Do NOT cite p42 as evidence
+    > that a prover cannot express a resource property.**
+    > **The two survivors are still a resource the obligation's type does not
+    > mention. Before claiming a proof covers a bug class, ask which resource it
+    > quantifies over — and then ask whether a different encoding would.**
 
     **Gate `PASS-WITH-BLOCKED-ROWS`, 0 failures** — the one blocked row is Miri on
     `large.bin` at the 180 s budget, **declared in advance**. Verus **15/0**, twin
@@ -1950,12 +1969,45 @@ the number.** Two task files have already sent an agent to the wrong finding.
     specifically, byte counts against `model.py::leak_bytes = n_err × win_len`,
     hardened rung silent at all four `-O` levels.
 
-    **The behaviour matrix is a finding AND there is a real cost axis:** R3
-    `1263`, R4 `1461`, R2 `1850`, `c-gcc` `1873` kernel-exclusive `Ir`/call.
-    ⚠ **`R1 − R1h` is `0.00` on gcc** — the two kernels differ in exactly one
-    branch-target field — **but `−4.00`/`−5.00` on clang**, mechanism isolated:
-    **clang merges two early exits into `setne`/`sete`/`or` once both target
-    `cleanup`**, so the hardened rung is *cheaper*.
+    ⚠⚠ **AND THE COMPARATIVE HEADLINE IS REFUTED — *"safe-tuned Rust beats
+    unsafe Rust here"* DOES NOT STAND (`TASK_109`, blocker 2).** The disclosed
+    `r4_endptr` is genuinely **inadmissible**, for a reason nobody had found —
+    `vstd::raw_ptr::allocate` ensures only `addr + size <= usize::MAX + 1`, so
+    **the one-past-the-end pointer is not computable in verified exec code**.
+    ⚠ **But the four-spelling search missed one that IS admissible**: a
+    **do-while fold that never leaves the allocation** (`r4_foldonly`) verifies
+    `15 verified, 0 errors`, is `identity exact` against its own R4, and agrees
+    with the shipped rung on **all 12 committed inputs**. Same-session marginals,
+    with `TASK_104`'s four published figures reproduced **to the hundredth**:
+
+    ```
+    cheapest R3 − cheapest R4 (as published):  −36.00   −2036.00
+    cheapest R3 − r4_foldonly       (NEW):     +12.00      +11.00   <- SIGN FLIPS
+    ```
+
+    ⚠⚠ **AND THE PATTERN'S OWN HASHED DECLARATION PREDICTED THIS FAILURE
+    VERBATIM**: the shared paragraph says *"`min(R3 found) − min(R4 found)` is
+    NOT the repair — two upper bounds differenced bound nothing in either
+    direction"*, and `NOTES` 11b is exactly that construction, calling the two
+    minima **"the two INFIMA"**, which they are not. **What survives is
+    `R3ship − R4ship` = `−198.00` / `−8696.00`, two shipped cells — the only form
+    that paragraph licenses — and an R4 span of `1407…1617` / `51127…59834` that
+    OVERLAPS R3 at both ends.** ⚠ **A difference whose endpoints overlap is not a
+    difference, and p42 should say that rather than narrow the claim twice.**
+    ✅ **This is `p23`'s span lesson recurring one pattern later and landing
+    harder — there the floor moved 150 `Ir`/call; here it moves 210 / 8707 and
+    reverses the sign.**
+
+    ⚠ **`R1 − R1h` is `0.00` on gcc — and the two kernels ARE two rungs**, a hand
+    `objdump` diff showing **exactly one field** (`jne <kernel+0x91>` against
+    `jne <kernel+0x8c>`). **The C side's boundary is one branch-target field
+    wide, and that is what `0.00` means.** ⚠⚠ **On clang the mechanism is WINDOW
+    PARITY, NOT WINDOW SIZE** — `−5.00` on even windows and `−4.00` on odd, with
+    **zero size dependence over a 32× range**; the build read its own two inputs
+    (97 odd, 4096 even) as a small-vs-large effect. **Three terms, isolated where
+    the report named one:** `+3` the `setne`/`sete`/`or` merge, `+1` an alignment
+    `nopw` executed once per call, and `+1` **on even windows only** from the
+    odd-remainder guard. `3+1 = 4` odd, `3+1+1 = 5` even, exact.
 
     ✅⚠ **AND A METHOD LESSON FROM THE PREVIOUS PATTERN STOPPED A WRONG NUMBER
     HERE — the first time that has happened.** `p23` taught that a within-band

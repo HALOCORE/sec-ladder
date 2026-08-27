@@ -1724,7 +1724,73 @@ a specification gap:** it needs **`get_unchecked`, which has 0 hits anywhere in
 the pinned vstd**, so R5 must add two new trusted items (TCB 5/3 → 7/5); **and**
 its R4/R5 pair measures **`differ` at `-O3`** against an `identity: exact` pin.
 
-## ⚠⚠ VERUS AT THE PIN CANNOT STATE LEAK-FREEDOM — `Tracked<Dealloc>` IS AFFINE, NOT LINEAR
+## ⚠⚠ RETRACTED AT TASK_109 (REVIEW): VERUS **CAN** STATE LEAK-FREEDOM — A GHOST LEDGER DOES IT AT ZERO COST
+
+> ~~**VERUS AT THE PIN CANNOT STATE LEAK-FREEDOM**~~ — **FALSE.** The heading
+> below is kept because its *premise* is true and its *conclusion* is not.
+
+**The affine premise holds and reproduces**: `Tracked<Dealloc>` really is
+affine, a proof really may drop it, and the committed control's two arms behave
+exactly as published. ⚠⚠ **What does not follow is "Verus cannot".**
+
+✅ **THE ENCODING THAT WORKS, and it is the better finding: NEVER HOLD A BARE
+`Tracked<Dealloc>`.** Escrow it into a **tracked `Map<int, Dealloc>`** —
+`led_alloc` deposits, `led_free` withdraws — and the function's `ensures` says
+**the ledger's domain comes back empty**, checked on every exit including early
+returns.
+
+```
+verus_ledger_nosig.rs                        -> 18 verified, 0 errors
+verus_ledger_nosig.rs --cfg p42_ledger_leak  -> 17 verified, 1 errors
+    postcondition not satisfied: final(led).dom() =~= Set::<int>::empty()
+    at this exit:  return 0;          <- exactly the error path's dropped release
+```
+
+⚠ **The non-obvious step: KEYING BY ADDRESS FAILS.** `vstd`'s `allocate` never
+promises the address is not already escrowed, so both exits fail. **A ghost `int`
+key works**, and `!old(led).dom().contains(k)` is discharged by the caller for
+free. ⚠ **Neither wrapper is `external_body`** — both are verified functions over
+the pattern's existing trusted `dig_alloc`/`dig_free`.
+
+**It costs nothing measurable:**
+
+| | shipped R5 | ledger R5 |
+|---|---|---|
+| verification | 15 verified, 0 errors | **18 verified, 0 errors** |
+| `external_body` / axioms | 5 / 0 | **5 / 0 — unchanged** |
+| `md5_fn`, `md5_raw` | — | **IDENTICAL to the shipped R5, and to the shipped R4** |
+| identity | — | **`exact`, `md5_raw_equal: True`** |
+
+**The only pin that moves is `verus.obligations`, 15 → 18.** ⚠ **And the stated
+obstacle — *"it changes the kernel's signature"* — is avoidable in three lines**:
+keep the ledger a local inside `kernel` and push the obligation onto an
+`#[inline(always)]` body, leaving the pinned signature and `driver.canonical`
+untouched.
+
+✅⚠ **THE HONEST CLAIM, and it is more interesting than the retracted one:**
+
+> **The natural encoding does not state leak-freedom; escrowing the token does —
+> and the residual trust is that nobody bypasses the wrapper. That is a
+> MODULE-LEVEL DISCIPLINE, not a global guarantee.**
+
+✅ **CLEAN NEGATIVE, now measured so nobody re-runs it: THERE IS NO LINEAR
+(must-consume) TRACKED MODE AT THE PIN.** `strings ~/tools/verus/rust_verify |
+grep -oE 'verifier::[a-z_0-9]+'` gives **23 attributes and none is one**;
+`grep -rn affine ~/tools/verus/vstd/` → **0 hits**; the guide's *"linear ghost
+state"* is a name, not a mode. **That was the second route named at TASK_104 and
+it genuinely does not exist.**
+
+⚠⚠ **THE FAMILY OF THREE SURVIVES WITH `p42`'s MEMBERSHIP RESTATED.** `p47` and
+the stack-overflow case are untouched. **`p42`'s membership is now conditional:
+its SHIPPED R5 does not cover its bug class, and that is a property of the
+encoding chosen, not of the prover.** ⚠ **Do not cite `p42` as evidence that a
+prover cannot express a resource property.**
+
+---
+
+**Superseded text, kept because its premise is right:**
+
+## ~~VERUS AT THE PIN CANNOT STATE LEAK-FREEDOM~~ — `Tracked<Dealloc>` IS AFFINE, NOT LINEAR
 
 **TASK_104 (p42), PROVISIONAL — unreviewed.** ⚠ **This contradicts the manager's
 task file, which asserted the route was "precedented" because `p27` already
