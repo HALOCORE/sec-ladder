@@ -169,8 +169,14 @@ Write your report to `.tasks/TASK_107_REPORT.md` as well as returning it.
 
 ---
 
-⚠ **PROTOCOL rule 2's running count is `MANAGER-FILLS-AT-LAUNCH`.** The calls I
-am least sure of:
+⚠ **PROTOCOL rule 2's running count is 399.** ⚠⚠ **The last two patterns ran
+368 → 399, and the manager was the subject of the largest findings in both:** a
+claim that *"Verus cannot state leak-freedom"* landed in `.memory/` and refuted
+within hours by a ghost ledger that costs zero object code; a comparative
+headline refuted by a spelling the search missed; a task file carrying two
+different running counts; and an instruction to edit `spec.md` text that did not
+exist. ⚠ **Contradicting this file is the highest-value thing you can do, and the
+record says so.** The calls I am least sure of:
 
 1. ⚠⚠ **That `--emit=dep-info` is the right instrument at all.** It is rustc's
    answer for *rustc's* module graph — **Verus is a different front end**, and if
