@@ -1706,3 +1706,42 @@ record the count forces a gate run, and the run moves the values being recorded.
 history table — **with no number on the run-dependent lines.**
 ⚠ **Ask of any figure you are about to write into a tracked file: does producing
 it require a build that this file's hash covers? If yes, publish the property.**
+
+## ⚠⚠ `vparse.params` SILENTLY DISABLES STAGE 5c-req ON A DESTRUCTURED `Tracked(pt)` PARAMETER
+
+**TASK_104 (p42), PROVISIONAL.** It cannot parse a destructured `Tracked(pt)`
+parameter, and **rather than failing it turns 5c-req off for every conjunct of
+that item** — six, on p42.
+
+⚠ **A gate stage that silently stops checking is worse than one that fails**, and
+this is the second instrument in the project found degrading quietly rather than
+loudly (`harness/limbs.py::TWIN_BANNED` missing `external_body` is the first).
+**Queued into `TASK_107`.** ⚠ **`vparse.params_text` was already documented as
+hard-failing on generic or method-shaped trusted accessors and "nobody has
+re-measured since TASK_008_REVIEW" — this is that warning coming true in a third
+shape.**
+
+## ⚠ `check_sanitizers`'s `fired` CANNOT NAME THE SANITIZER
+
+**TASK_104.** It is a **4-way substring OR**, so a declared `"fires"` is
+discharged by **any** diagnostic — an ASan report satisfies a row that means to
+assert a LeakSanitizer one. ✅ **p42 works around it in-pattern**:
+`controls/leak.sh` checks LSan specifically over **88 points**, with byte counts
+against a derived invariant (`model.py::leak_bytes = n_err × win_len`) and the
+hardened rung silent at all four `-O` levels. ⚠ **Any future leak-shaped row
+needs the same workaround until the gate can name the sanitizer.**
+
+## ✅ THE OUT-OF-BAND RULE WORKED PROSPECTIVELY, ONE PATTERN AFTER IT WAS WRITTEN
+
+**TASK_104.** `p23` taught that a within-band holdout proves nothing. `p42`
+applied it **before publishing**: fit on windows 64..79, predict 512..527 →
+**every rung's out-of-band residual is 3×–25× its in-sample one**, and the
+cheapest rung mispredicts **its own shipped `large.bin` by `−2545 Ir`/call** off
+an in-sample residual of `12.57`.
+
+> **So `p42` publishes TWO POINTS AND NO RATE.**
+
+⚠ **One candidate mechanism (allocator size class) was REFUTED by isolation — it
+is smooth curvature, not a step — and the real one is OPEN.** ⚠ **This is the
+first time a method lesson from one pattern stopped a wrong number in the next,
+which is the whole point of writing them down.**

@@ -1723,3 +1723,47 @@ pin cannot specify a mutable sub-slice — frame provable, value not"* is the
 a specification gap:** it needs **`get_unchecked`, which has 0 hits anywhere in
 the pinned vstd**, so R5 must add two new trusted items (TCB 5/3 → 7/5); **and**
 its R4/R5 pair measures **`differ` at `-O3`** against an `identity: exact` pin.
+
+## ⚠⚠ VERUS AT THE PIN CANNOT STATE LEAK-FREEDOM — `Tracked<Dealloc>` IS AFFINE, NOT LINEAR
+
+**TASK_104 (p42), PROVISIONAL — unreviewed.** ⚠ **This contradicts the manager's
+task file, which asserted the route was "precedented" because `p27` already
+proves a deallocation obligation.**
+
+**Measured, with a committed must-fail control (`controls/affine_leak.rs`): an
+R5 that FORGETS the error path's `deallocate` verifies with `0 errors`.** The
+ownership tokens are **move-only (affine)**, so **dropping one is legal**.
+⚠ **`p27` proves deallocation is LEGAL — that there is no double-free and no
+use-after-free. It never proves deallocation HAPPENS.**
+
+> ⚠⚠ **`p42` IS THE FIRST PATTERN IN THIS TREE WHOSE R5 PROOF DOES NOT COVER ITS
+> OWN BUG CLASS.** The proof is sound and says nothing about the defect the
+> pattern exists to exhibit. **Miri is what stands behind the Rust side**, so the
+> deleted-`dig_free` positive control ships with the pattern and fires.
+
+⚠⚠ **THIS COMPLETES A FAMILY OF THREE, AND THE FAMILY IS THE RESULT — the proof
+discharges exactly what it says and the program is still broken:**
+
+1. **`p47`** — the proof certifies a **leaking** kernel (finding 31).
+2. **A termination proof does not bound the STACK** — `decreases` verifies
+   `3 verified, 0 errors` and the binary dies of `fatal runtime error: stack
+   overflow` at depth 1e6 (`TASK_102`).
+3. **`p42`** — an affine deallocation token does not force deallocation.
+
+**Each is a resource the type of the obligation simply does not mention.**
+⚠ **Before claiming a proof covers a bug class, ask which resource the
+obligation quantifies over.**
+
+⚠⚠ **SCOPE, AND IT IS THE ENGINEER'S OWN CAVEAT — DO NOT OVERSTATE THIS.** The
+claim is about **the default encoding**, not about Verus. **A ghost ledger and
+Verus's linear mode were both NAMED AND NOT BUILT.** The measured statement is:
+*at the pin, with `Tracked<Dealloc>` as `p27` uses it, a dropped token verifies.*
+**Whether leak-freedom is expressible by some other encoding is OPEN.**
+
+## Pinned-vstd gaps found while building `p42` (TASK_104, PROVISIONAL)
+
+- **`from_raw_parts` — 0 hits anywhere**, including `std_specs/slice.rs`. **There
+  is no route from a raw allocation to a `&mut [T]`**, so R4/R5 must use
+  `PointsToRaw` / `PointsTo` directly — `p27`'s route, with no slice shortcut.
+- **No `size_of::<[T; N]>()` axiom**, which closes the cheap R5 route.
+- **`with_addr` and `addr` ARE specified; `add` and `offset` are NOT.**

@@ -207,4 +207,9 @@ do.** The calls I am least sure of:
    allocation or an I/O error rather than a malformed input, the row may not be
    hostable** — settle that in §0, not after building.
 
-Carry **324** forward, incremented by what you find.
+Carry **368** forward, incremented by what you find. ⚠ **This line said `324`
+while line 179 said `368` — the manager updated the header block and left the
+closing line stale. Caught and reported by the engineer. `368` is correct.**
+⚠⚠ **This is `PROTOCOL` rule 13's shape a third time: the summary line rotted
+while the body was maintained.** **When you edit a running count, `grep` the
+whole file for the old number.**

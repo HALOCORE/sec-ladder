@@ -1906,6 +1906,76 @@ the number.** Two task files have already sent an agent to the wrong finding.
     Evidence: `.tasks/TASK_101_REPORT.md`, `.tasks/TASK_105_REPORT.md`,
     `.tasks/TASK_106_REPORT.md`, `patterns/p23-partition/NOTES.md`.
 
+39. ⚠⚠ **p42 — THE FIRST PATTERN WHOSE R5 PROOF DOES NOT COVER ITS OWN BUG
+    CLASS. Verus at the pin CANNOT STATE LEAK-FREEDOM.** The 26th pattern, and
+    the headline is a negative result that **refutes the manager's task file**.
+    ⚠ **PROVISIONAL — `TASK_104` is unreviewed.**
+
+    **`Tracked<Dealloc>` is AFFINE, not linear — a proof may simply drop it.** An
+    R5 that forgets the error path's `deallocate` verifies **`2 verified, 0
+    errors`**, with the must-fail arm (use-after-move) correctly rejected
+    (`controls/affine_leak.rs`, both arms committed). ⚠ **`p27` proves
+    deallocation is LEGAL — no double-free, no use-after-free. It never proves
+    deallocation HAPPENS**, and the manager asserted the route was "precedented"
+    on exactly that confusion. **Miri is what stands behind the Rust side
+    instead**, so the deleted-`dig_free` positive control ships with the pattern
+    and fires.
+
+    ⚠ **SCOPE, and it is the engineer's own caveat: this is the DEFAULT
+    ENCODING, not an exhaustive search.** A ghost ledger and Verus's linear mode
+    were **named and not built**. The measured claim is *at the pin, with
+    `Tracked<Dealloc>` as `p27` uses it, a dropped token verifies.*
+
+    > ⚠⚠ **THIS COMPLETES A FAMILY OF THREE, AND THE FAMILY IS THE RESULT: THE
+    > PROOF DISCHARGES EXACTLY WHAT IT SAYS AND THE PROGRAM IS STILL BROKEN.**
+    > **(1)** `p47` — the proof certifies a **leaking** kernel (finding 31).
+    > **(2)** A `decreases` clause verifies `3 verified, 0 errors` while the
+    > binary dies of `fatal runtime error: stack overflow` at depth 1e6 —
+    > **a termination proof does not bound the STACK** (`TASK_102`).
+    > **(3)** `p42` — an affine deallocation token does not force deallocation.
+    > **Each is a resource the obligation's type simply does not mention. Before
+    > claiming a proof covers a bug class, ask which resource it quantifies
+    > over.**
+
+    **Gate `PASS-WITH-BLOCKED-ROWS`, 0 failures** — the one blocked row is Miri on
+    `large.bin` at the 180 s budget, **declared in advance**. Verus **15/0**, twin
+    **18/0**, axioms **0**, `identity unsafe ≡ verus` **`exact` at `-O3`**.
+
+    ✅ **All three of the manager's least-sure calls came back yes, and the first
+    was settled BEFORE the rungs existed** — by importing `check.py` and driving
+    `check_sanitizers` itself on a synthetic pdir, 4 arms, **2 of them controls
+    that must fail.** ⚠ **But the gate's `fired` is a 4-way substring OR and
+    CANNOT NAME THE SANITIZER**, so a declared `"fires"` is discharged by any
+    diagnostic; `controls/leak.sh` carries the finer check — 88 points, LSan
+    specifically, byte counts against `model.py::leak_bytes = n_err × win_len`,
+    hardened rung silent at all four `-O` levels.
+
+    **The behaviour matrix is a finding AND there is a real cost axis:** R3
+    `1263`, R4 `1461`, R2 `1850`, `c-gcc` `1873` kernel-exclusive `Ir`/call.
+    ⚠ **`R1 − R1h` is `0.00` on gcc** — the two kernels differ in exactly one
+    branch-target field — **but `−4.00`/`−5.00` on clang**, mechanism isolated:
+    **clang merges two early exits into `setne`/`sete`/`or` once both target
+    `cleanup`**, so the hardened rung is *cheaper*.
+
+    ✅⚠ **AND A METHOD LESSON FROM THE PREVIOUS PATTERN STOPPED A WRONG NUMBER
+    HERE — the first time that has happened.** `p23` taught that a within-band
+    holdout proves nothing; `p42` fitted on windows 64..79 and predicted
+    512..527 **before publishing**, and **every rung's out-of-band residual is
+    3×–25× its in-sample one**, the cheapest rung mispredicting **its own shipped
+    `large.bin` by `−2545 Ir`/call** off an in-sample residual of `12.57`.
+    **So `p42` publishes TWO POINTS AND NO RATE.** ⚠ The allocator size class is
+    **refuted** as the mechanism — it is smooth curvature, not a step — and the
+    real one is **OPEN**.
+
+    ⚠ **Two disclosures that matter.** The **first gate run FAILED and all four
+    causes were the engineer's own**, including that **backticked words inside a
+    prose `forbidden` entry are read as forbidden SPELLINGS**. And **`r4_endptr`
+    is `162 Ir`/call cheaper and admissible in principle, its R5 was never built,
+    R4 was held fixed by fiat — and the published spans OVERLAP**, which is
+    `p23`'s span lesson recurring one pattern later.
+
+    Evidence: `.tasks/TASK_104_REPORT.md`, `patterns/p42-goto-cleanup/NOTES.md`.
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds
