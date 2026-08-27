@@ -2620,6 +2620,8 @@ is ≈2 min/pattern against ~4.8 h for a layout population; only p03/p04 need it
 ## ⚠⚠ THE CONTROLS THAT COULD NOT HAVE FIRED — the running list, in one place
 
 **Landed at TASK_100. PROVISIONAL where an entry cites an unreviewed task.**
+
+⚠⚠ **THE COUNT IS SIX LIVE ENTRIES, NOT SEVEN. Entry 5 is RETRACTED, so the list numbers 1–7 and contains six.** ⚠ **And the manager then quoted *"seven"* into FIVE task files — after writing the sentence two paragraphs below that says *keep the list, not the ordinal*, and after the ordinal had ALREADY gone wrong once the same way.** Caught by `TASK_108`. **The failure is not arithmetic: a count is a cached derivation of a list, and it goes stale exactly like every other cached number in this repo. Cite the list; if you must give a number, derive it at the point of writing.**
 This project keeps writing checks that pass because they *cannot* fail, and until
 now the count lived as a bare ordinal (*"the fifth instance"*) scattered across
 files — ⚠ **which is how the count itself went wrong: entry 5 below was
