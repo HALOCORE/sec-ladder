@@ -2494,6 +2494,13 @@ on: **`synthesize.py::marginal` DEFAULTS to `O3/isolated` BECAUSE of that rule.*
 
   **`kernel_exclusive` moved on 0 of 288 in the same scan.**
 
+  ✅ **INDEPENDENTLY CONFIRMED TWICE MORE, on a different axis, by whole-tree
+  regenerations of `synthesis/outward_ir.json` months of tasks later:**
+  **0 of 58 leaves at the p23 regeneration and 0 of 72 at the p42 one**, while
+  `kernel_inclusive` moved 10 in the first — and the movers land exactly at
+  `libc+0x189480` in the CALLEE column, which is the known memset term.
+  ⚠ **So the immunity is not an artefact of the sweep that first measured it.**
+
 **What is owed, and none of it is done:** the docstring's scope; a decision on
 whether every `-O3 isolated` pair difference now needs the layout harness
 (`common/layout/`) the way p06's did; and a re-read of every published pair

@@ -470,16 +470,16 @@
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 9010.0,
-     "kernel_inclusive_ir_per_call": 9053.0,
+     "kernel_inclusive_ir_per_call": 9060.0,
      "outward_by_callee_per_call": {
-      "0x0000000000189480": 43.0
+      "0x0000000000189480": 50.0
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000189480": 1.0
      },
-     "outward_ir_per_call": 43.0,
+     "outward_ir_per_call": 50.0,
      "outward_ir_per_callee_call": {
-      "0x0000000000189480": 43.0
+      "0x0000000000189480": 50.0
      }
     },
     "unsafe": {
@@ -520,8 +520,8 @@
     },
     "R3-R4": {
      "kernel_exclusive": 626.0,
-     "kernel_plus_callees": 619.0,
-     "moves_by": -7.0
+     "kernel_plus_callees": 626.0,
+     "moves_by": 0.0
     },
     "R5-R4": {
      "kernel_exclusive": 0.0,
@@ -585,16 +585,16 @@
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 3361.0,
-     "kernel_inclusive_ir_per_call": 3404.0,
+     "kernel_inclusive_ir_per_call": 3411.0,
      "outward_by_callee_per_call": {
-      "0x0000000000189480": 43.0
+      "0x0000000000189480": 50.0
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000189480": 1.0
      },
-     "outward_ir_per_call": 43.0,
+     "outward_ir_per_call": 50.0,
      "outward_ir_per_callee_call": {
-      "0x0000000000189480": 43.0
+      "0x0000000000189480": 50.0
      }
     },
     "unsafe": {
@@ -635,8 +635,8 @@
     },
     "R3-R4": {
      "kernel_exclusive": 359.0,
-     "kernel_plus_callees": 352.0,
-     "moves_by": -7.0
+     "kernel_plus_callees": 359.0,
+     "moves_by": 0.0
     },
     "R5-R4": {
      "kernel_exclusive": 0.0,
@@ -702,16 +702,16 @@
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 11667.0,
-     "kernel_inclusive_ir_per_call": 11710.0,
+     "kernel_inclusive_ir_per_call": 11717.0,
      "outward_by_callee_per_call": {
-      "0x0000000000189480": 43.0
+      "0x0000000000189480": 50.0
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000189480": 1.0
      },
-     "outward_ir_per_call": 43.0,
+     "outward_ir_per_call": 50.0,
      "outward_ir_per_callee_call": {
-      "0x0000000000189480": 43.0
+      "0x0000000000189480": 50.0
      }
     },
     "unsafe": {
@@ -730,16 +730,16 @@
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 11662.0,
-     "kernel_inclusive_ir_per_call": 11712.0,
+     "kernel_inclusive_ir_per_call": 11705.0,
      "outward_by_callee_per_call": {
-      "0x0000000000189480": 50.0
+      "0x0000000000189480": 43.0
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000189480": 1.0
      },
-     "outward_ir_per_call": 50.0,
+     "outward_ir_per_call": 43.0,
      "outward_ir_per_callee_call": {
-      "0x0000000000189480": 50.0
+      "0x0000000000189480": 43.0
      }
     }
    },
@@ -752,13 +752,13 @@
     },
     "R3-R4": {
      "kernel_exclusive": 5.0,
-     "kernel_plus_callees": -2.0,
-     "moves_by": -7.0
+     "kernel_plus_callees": 5.0,
+     "moves_by": 0.0
     },
     "R5-R4": {
      "kernel_exclusive": 0.0,
-     "kernel_plus_callees": 0.0,
-     "moves_by": 0.0
+     "kernel_plus_callees": -7.0,
+     "moves_by": -7.0
     },
     "gcc-clang": {
      "kernel_exclusive": 3357.0,
@@ -817,16 +817,16 @@
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 3368.0,
-     "kernel_inclusive_ir_per_call": 3411.0,
+     "kernel_inclusive_ir_per_call": 3418.0,
      "outward_by_callee_per_call": {
-      "0x0000000000189480": 43.0
+      "0x0000000000189480": 50.0
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000189480": 1.0
      },
-     "outward_ir_per_call": 43.0,
+     "outward_ir_per_call": 50.0,
      "outward_ir_per_callee_call": {
-      "0x0000000000189480": 43.0
+      "0x0000000000189480": 50.0
      }
     },
     "unsafe": {
@@ -845,16 +845,16 @@
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 3363.0,
-     "kernel_inclusive_ir_per_call": 3413.0,
+     "kernel_inclusive_ir_per_call": 3406.0,
      "outward_by_callee_per_call": {
-      "0x0000000000189480": 50.0
+      "0x0000000000189480": 43.0
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000189480": 1.0
      },
-     "outward_ir_per_call": 50.0,
+     "outward_ir_per_call": 43.0,
      "outward_ir_per_callee_call": {
-      "0x0000000000189480": 50.0
+      "0x0000000000189480": 43.0
      }
     }
    },
@@ -867,13 +867,13 @@
     },
     "R3-R4": {
      "kernel_exclusive": 5.0,
-     "kernel_plus_callees": -2.0,
-     "moves_by": -7.0
+     "kernel_plus_callees": 5.0,
+     "moves_by": 0.0
     },
     "R5-R4": {
      "kernel_exclusive": 0.0,
-     "kernel_plus_callees": 0.0,
-     "moves_by": 0.0
+     "kernel_plus_callees": -7.0,
+     "moves_by": -7.0
     },
     "gcc-clang": {
      "kernel_exclusive": 970.0,
@@ -1532,10 +1532,10 @@
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 23615.001,
-     "kernel_inclusive_ir_per_call": 29025.07575,
+     "kernel_inclusive_ir_per_call": 29025.07325,
      "outward_by_callee_per_call": {
       "0x0000000000015220": 0.7365,
-      "0x0000000000188a80": 1296.852375,
+      "0x0000000000188a80": 1296.849875,
       "0x0000000000189480": 4112.485875
      },
      "outward_calls_per_kernel_call": {
@@ -1543,10 +1543,10 @@
       "0x0000000000188a80": 4.999875,
       "0x0000000000189480": 0.999875
      },
-     "outward_ir_per_call": 5410.07475,
+     "outward_ir_per_call": 5410.07225,
      "outward_ir_per_callee_call": {
       "0x0000000000015220": 2946.0,
-      "0x0000000000188a80": 259.3769594239856,
+      "0x0000000000188a80": 259.3764594114853,
       "0x0000000000189480": 4113.0
      }
     },
@@ -1580,35 +1580,35 @@
     },
     "safe_naive": {
      "kernel_exclusive_ir_per_call": 115571.0,
-     "kernel_inclusive_ir_per_call": 120096.87675,
+     "kernel_inclusive_ir_per_call": 120096.8785,
      "outward_by_callee_per_call": {
-      "0x0000000000188a80": 412.87675,
+      "0x0000000000188a80": 412.8785,
       "0x0000000000189480": 4113.0
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000188a80": 1.0,
       "0x0000000000189480": 1.0
      },
-     "outward_ir_per_call": 4525.87675,
+     "outward_ir_per_call": 4525.8785,
      "outward_ir_per_callee_call": {
-      "0x0000000000188a80": 412.87675,
+      "0x0000000000188a80": 412.8785,
       "0x0000000000189480": 4113.0
      }
     },
     "safe_tuned": {
      "kernel_exclusive_ir_per_call": 23656.0,
-     "kernel_inclusive_ir_per_call": 29065.87675,
+     "kernel_inclusive_ir_per_call": 29065.8785,
      "outward_by_callee_per_call": {
-      "0x0000000000188a80": 1296.87675,
+      "0x0000000000188a80": 1296.8785,
       "0x0000000000189480": 4113.0
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000188a80": 5.0,
       "0x0000000000189480": 1.0
      },
-     "outward_ir_per_call": 5409.87675,
+     "outward_ir_per_call": 5409.8785,
      "outward_ir_per_callee_call": {
-      "0x0000000000188a80": 259.37535,
+      "0x0000000000188a80": 259.3757,
       "0x0000000000189480": 4113.0
      }
     },
@@ -1631,18 +1631,18 @@
     },
     "verus": {
      "kernel_exclusive_ir_per_call": 23630.0,
-     "kernel_inclusive_ir_per_call": 29039.87675,
+     "kernel_inclusive_ir_per_call": 29039.8785,
      "outward_by_callee_per_call": {
-      "0x0000000000188a80": 1296.87675,
+      "0x0000000000188a80": 1296.8785,
       "0x0000000000189480": 4113.0
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000188a80": 5.0,
       "0x0000000000189480": 1.0
      },
-     "outward_ir_per_call": 5409.87675,
+     "outward_ir_per_call": 5409.8785,
      "outward_ir_per_callee_call": {
-      "0x0000000000188a80": 259.37535,
+      "0x0000000000188a80": 259.3757,
       "0x0000000000189480": 4113.0
      }
     }
@@ -1651,18 +1651,18 @@
    "pairs": {
     "R2-R4": {
      "kernel_exclusive": 91941.0,
-     "kernel_plus_callees": 91057.0,
-     "moves_by": -884.0
+     "kernel_plus_callees": 91057.00175000001,
+     "moves_by": -883.9982499999896
     },
     "R3-R4": {
      "kernel_exclusive": 26.0,
-     "kernel_plus_callees": 26.0,
-     "moves_by": 0.0
+     "kernel_plus_callees": 26.001749999999447,
+     "moves_by": 0.0017499999994470272
     },
     "R5-R4": {
      "kernel_exclusive": 0.0,
-     "kernel_plus_callees": 0.0,
-     "moves_by": 0.0
+     "kernel_plus_callees": 0.0017499999994470272,
+     "moves_by": 0.0017499999994470272
     },
     "gcc-clang": {
      "kernel_exclusive": 10255.999500000002,
@@ -5777,6 +5777,370 @@
    }
   }
  },
+ "p42": {
+  "large.bin": {
+   "cells": {
+    "c-clang": {
+     "kernel_exclusive_ir_per_call": 61487.00266666667,
+     "kernel_inclusive_ir_per_call": 61854.475333333336,
+     "outward_by_callee_per_call": {
+      "0x0000000000015220": 0.6026666666666667,
+      "free": 194.87,
+      "malloc": 172.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 0.0006666666666666666,
+      "free": 0.9993333333333333,
+      "malloc": 1.0
+     },
+     "outward_ir_per_call": 367.47266666666667,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 904.0,
+      "free": 195.0,
+      "malloc": 172.0
+     }
+    },
+    "c-clang-h": {
+     "kernel_exclusive_ir_per_call": 61492.00266666667,
+     "kernel_inclusive_ir_per_call": 61859.475333333336,
+     "outward_by_callee_per_call": {
+      "0x0000000000015220": 0.6026666666666667,
+      "free": 194.87,
+      "malloc": 172.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 0.0006666666666666666,
+      "free": 0.9993333333333333,
+      "malloc": 1.0
+     },
+     "outward_ir_per_call": 367.47266666666667,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 904.0,
+      "free": 195.0,
+      "malloc": 172.0
+     }
+    },
+    "c-gcc": {
+     "kernel_exclusive_ir_per_call": 77854.0,
+     "kernel_inclusive_ir_per_call": 78225.0,
+     "outward_by_callee_per_call": {
+      "0x0000000004001110": 197.0,
+      "0x0000000004001180": 174.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001110": 1.0,
+      "0x0000000004001180": 1.0
+     },
+     "outward_ir_per_call": 371.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001110": 197.0,
+      "0x0000000004001180": 174.0
+     }
+    },
+    "c-gcc-h": {
+     "kernel_exclusive_ir_per_call": 77854.0,
+     "kernel_inclusive_ir_per_call": 78225.0,
+     "outward_by_callee_per_call": {
+      "0x0000000004001110": 197.0,
+      "0x0000000004001180": 174.0
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001110": 1.0,
+      "0x0000000004001180": 1.0
+     },
+     "outward_ir_per_call": 371.0,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001110": 197.0,
+      "0x0000000004001180": 174.0
+     }
+    },
+    "safe_naive": {
+     "kernel_exclusive_ir_per_call": 75826.0,
+     "kernel_inclusive_ir_per_call": 80366.0,
+     "outward_by_callee_per_call": {
+      "__rustc::__rust_alloc_zeroed": 4342.0,
+      "__rustc::__rust_dealloc": 197.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     },
+     "outward_calls_per_kernel_call": {
+      "__rustc::__rust_alloc_zeroed": 1.0,
+      "__rustc::__rust_dealloc": 1.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     },
+     "outward_ir_per_call": 4540.0,
+     "outward_ir_per_callee_call": {
+      "__rustc::__rust_alloc_zeroed": 4342.0,
+      "__rustc::__rust_dealloc": 197.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     }
+    },
+    "safe_tuned": {
+     "kernel_exclusive_ir_per_call": 50745.0,
+     "kernel_inclusive_ir_per_call": 51125.0,
+     "outward_by_callee_per_call": {
+      "__rustc::__rust_alloc": 182.0,
+      "__rustc::__rust_dealloc": 197.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     },
+     "outward_calls_per_kernel_call": {
+      "__rustc::__rust_alloc": 1.0,
+      "__rustc::__rust_dealloc": 1.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     },
+     "outward_ir_per_call": 380.0,
+     "outward_ir_per_callee_call": {
+      "__rustc::__rust_alloc": 182.0,
+      "__rustc::__rust_dealloc": 197.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     }
+    },
+    "unsafe": {
+     "kernel_exclusive_ir_per_call": 59441.0,
+     "kernel_inclusive_ir_per_call": 59821.0,
+     "outward_by_callee_per_call": {
+      "__rustc::__rust_alloc": 182.0,
+      "__rustc::__rust_dealloc": 197.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     },
+     "outward_calls_per_kernel_call": {
+      "__rustc::__rust_alloc": 1.0,
+      "__rustc::__rust_dealloc": 1.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     },
+     "outward_ir_per_call": 380.0,
+     "outward_ir_per_callee_call": {
+      "__rustc::__rust_alloc": 182.0,
+      "__rustc::__rust_dealloc": 197.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     }
+    },
+    "verus": {
+     "kernel_exclusive_ir_per_call": 59441.0,
+     "kernel_inclusive_ir_per_call": 59790.0,
+     "outward_by_callee_per_call": {
+      "__rustc::__rust_alloc": 182.0,
+      "__rustc::__rust_dealloc": 166.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     },
+     "outward_calls_per_kernel_call": {
+      "__rustc::__rust_alloc": 1.0,
+      "__rustc::__rust_dealloc": 1.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     },
+     "outward_ir_per_call": 349.0,
+     "outward_ir_per_callee_call": {
+      "__rustc::__rust_alloc": 182.0,
+      "__rustc::__rust_dealloc": 166.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     }
+    }
+   },
+   "n_iters": 1500,
+   "pairs": {
+    "R2-R4": {
+     "kernel_exclusive": 16385.0,
+     "kernel_plus_callees": 20545.0,
+     "moves_by": 4160.0
+    },
+    "R3-R4": {
+     "kernel_exclusive": -8696.0,
+     "kernel_plus_callees": -8696.0,
+     "moves_by": 0.0
+    },
+    "R5-R4": {
+     "kernel_exclusive": 0.0,
+     "kernel_plus_callees": -31.0,
+     "moves_by": -31.0
+    },
+    "gcc-clang": {
+     "kernel_exclusive": 16366.997333333333,
+     "kernel_plus_callees": 16370.524666666664,
+     "moves_by": 3.527333333331626
+    }
+   }
+  },
+  "small.bin": {
+   "cells": {
+    "c-clang": {
+     "kernel_exclusive_ir_per_call": 1506.0000666666667,
+     "kernel_inclusive_ir_per_call": 1636.01555,
+     "outward_by_callee_per_call": {
+      "0x0000000000015220": 0.013233333333333333,
+      "free": 84.99858333333333,
+      "malloc": 45.00366666666667
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 1.6666666666666667e-05,
+      "free": 0.9999833333333333,
+      "malloc": 1.0
+     },
+     "outward_ir_per_call": 130.01548333333332,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 794.0,
+      "free": 85.0,
+      "malloc": 45.00366666666667
+     }
+    },
+    "c-clang-h": {
+     "kernel_exclusive_ir_per_call": 1510.0000666666667,
+     "kernel_inclusive_ir_per_call": 1640.01555,
+     "outward_by_callee_per_call": {
+      "0x0000000000015220": 0.013233333333333333,
+      "free": 84.99858333333333,
+      "malloc": 45.00366666666667
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000000015220": 1.6666666666666667e-05,
+      "free": 0.9999833333333333,
+      "malloc": 1.0
+     },
+     "outward_ir_per_call": 130.01548333333332,
+     "outward_ir_per_callee_call": {
+      "0x0000000000015220": 794.0,
+      "free": 85.0,
+      "malloc": 45.00366666666667
+     }
+    },
+    "c-gcc": {
+     "kernel_exclusive_ir_per_call": 1873.0,
+     "kernel_inclusive_ir_per_call": 2007.0036666666667,
+     "outward_by_callee_per_call": {
+      "0x0000000004001110": 87.0,
+      "0x0000000004001180": 47.00366666666667
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001110": 1.0,
+      "0x0000000004001180": 1.0
+     },
+     "outward_ir_per_call": 134.00366666666667,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001110": 87.0,
+      "0x0000000004001180": 47.00366666666667
+     }
+    },
+    "c-gcc-h": {
+     "kernel_exclusive_ir_per_call": 1873.0,
+     "kernel_inclusive_ir_per_call": 2007.0036666666667,
+     "outward_by_callee_per_call": {
+      "0x0000000004001110": 87.0,
+      "0x0000000004001180": 47.00366666666667
+     },
+     "outward_calls_per_kernel_call": {
+      "0x0000000004001110": 1.0,
+      "0x0000000004001180": 1.0
+     },
+     "outward_ir_per_call": 134.00366666666667,
+     "outward_ir_per_callee_call": {
+      "0x0000000004001110": 87.0,
+      "0x0000000004001180": 47.00366666666667
+     }
+    },
+    "safe_naive": {
+     "kernel_exclusive_ir_per_call": 1850.0,
+     "kernel_inclusive_ir_per_call": 2146.0058,
+     "outward_by_callee_per_call": {
+      "__rustc::__rust_alloc_zeroed": 189.0077,
+      "__rustc::__rust_dealloc": 105.9981,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     },
+     "outward_calls_per_kernel_call": {
+      "__rustc::__rust_alloc_zeroed": 1.0,
+      "__rustc::__rust_dealloc": 1.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     },
+     "outward_ir_per_call": 296.0058,
+     "outward_ir_per_callee_call": {
+      "__rustc::__rust_alloc_zeroed": 189.0077,
+      "__rustc::__rust_dealloc": 105.9981,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     }
+    },
+    "safe_tuned": {
+     "kernel_exclusive_ir_per_call": 1263.0,
+     "kernel_inclusive_ir_per_call": 1406.0,
+     "outward_by_callee_per_call": {
+      "__rustc::__rust_alloc": 55.0,
+      "__rustc::__rust_dealloc": 87.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     },
+     "outward_calls_per_kernel_call": {
+      "__rustc::__rust_alloc": 1.0,
+      "__rustc::__rust_dealloc": 1.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     },
+     "outward_ir_per_call": 143.0,
+     "outward_ir_per_callee_call": {
+      "__rustc::__rust_alloc": 55.0,
+      "__rustc::__rust_dealloc": 87.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     }
+    },
+    "unsafe": {
+     "kernel_exclusive_ir_per_call": 1461.0,
+     "kernel_inclusive_ir_per_call": 1604.0,
+     "outward_by_callee_per_call": {
+      "__rustc::__rust_alloc": 55.0,
+      "__rustc::__rust_dealloc": 87.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     },
+     "outward_calls_per_kernel_call": {
+      "__rustc::__rust_alloc": 1.0,
+      "__rustc::__rust_dealloc": 1.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     },
+     "outward_ir_per_call": 143.0,
+     "outward_ir_per_callee_call": {
+      "__rustc::__rust_alloc": 55.0,
+      "__rustc::__rust_dealloc": 87.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     }
+    },
+    "verus": {
+     "kernel_exclusive_ir_per_call": 1461.0,
+     "kernel_inclusive_ir_per_call": 1604.0,
+     "outward_by_callee_per_call": {
+      "__rustc::__rust_alloc": 55.0,
+      "__rustc::__rust_dealloc": 87.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     },
+     "outward_calls_per_kernel_call": {
+      "__rustc::__rust_alloc": 1.0,
+      "__rustc::__rust_dealloc": 1.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     },
+     "outward_ir_per_call": 143.0,
+     "outward_ir_per_callee_call": {
+      "__rustc::__rust_alloc": 55.0,
+      "__rustc::__rust_dealloc": 87.0,
+      "__rustc::__rust_no_alloc_shim_is_unstable_v2": 1.0
+     }
+    }
+   },
+   "n_iters": 60000,
+   "pairs": {
+    "R2-R4": {
+     "kernel_exclusive": 389.0,
+     "kernel_plus_callees": 542.0057999999999,
+     "moves_by": 153.0057999999999
+    },
+    "R3-R4": {
+     "kernel_exclusive": -198.0,
+     "kernel_plus_callees": -198.0,
+     "moves_by": 0.0
+    },
+    "R5-R4": {
+     "kernel_exclusive": 0.0,
+     "kernel_plus_callees": 0.0,
+     "moves_by": 0.0
+    },
+    "gcc-clang": {
+     "kernel_exclusive": 366.9999333333333,
+     "kernel_plus_callees": 370.98811666666666,
+     "moves_by": 3.9881833333333816
+    }
+   }
+  }
+ },
  "p46": {
   "large.bin": {
    "cells": {
@@ -5802,22 +6166,22 @@
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 23090.004,
-     "kernel_inclusive_ir_per_call": 23212.589,
+     "kernel_inclusive_ir_per_call": 23219.425,
      "outward_by_callee_per_call": {
-      "0x0000000000015220": 0.772,
-      "0x0000000000188a80": 64.87,
-      "0x0000000000189480": 56.943
+      "0x0000000000015220": 0.779,
+      "0x0000000000188a80": 64.706,
+      "0x0000000000189480": 63.936
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000015220": 0.001,
       "0x0000000000188a80": 1.0,
       "0x0000000000189480": 0.999
      },
-     "outward_ir_per_call": 122.585,
+     "outward_ir_per_call": 129.421,
      "outward_ir_per_callee_call": {
-      "0x0000000000015220": 772.0,
-      "0x0000000000188a80": 64.87,
-      "0x0000000000189480": 57.0
+      "0x0000000000015220": 779.0,
+      "0x0000000000188a80": 64.706,
+      "0x0000000000189480": 64.0
      }
     },
     "c-gcc": {
@@ -5941,22 +6305,22 @@
     },
     "c-clang-h": {
      "kernel_exclusive_ir_per_call": 6110.001,
-     "kernel_inclusive_ir_per_call": 6197.17975,
+     "kernel_inclusive_ir_per_call": 6204.17975,
      "outward_by_callee_per_call": {
-      "0x0000000000015220": 0.193,
+      "0x0000000000015220": 0.19475,
       "0x0000000000188a80": 30.0,
-      "0x0000000000189480": 56.98575
+      "0x0000000000189480": 63.984
      },
      "outward_calls_per_kernel_call": {
       "0x0000000000015220": 0.00025,
       "0x0000000000188a80": 1.0,
       "0x0000000000189480": 0.99975
      },
-     "outward_ir_per_call": 87.17875,
+     "outward_ir_per_call": 94.17875,
      "outward_ir_per_callee_call": {
-      "0x0000000000015220": 772.0,
+      "0x0000000000015220": 779.0,
       "0x0000000000188a80": 30.0,
-      "0x0000000000189480": 57.0
+      "0x0000000000189480": 64.0
      }
     },
     "c-gcc": {
