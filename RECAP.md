@@ -2146,6 +2146,31 @@ and both copies went stale (13 and 7 against the task files' 55).
 
 ## The recurring traps
 
+- ⚠⚠ **THE NEWEST AND THE ONLY ONE FOUND BY LOOKING AT THE PROJECT RATHER THAN AT
+  A PATTERN: A CORRECTION REFLEX BECOMES A BIAS IN THE OPPOSITE DIRECTION.**
+  (`TASK_111`, reviewing the synthesis. **PROVISIONAL — that review is
+  unreviewed.**) Nineteen retractions trained this project to distrust any
+  headline saying *safety is cheap*. **So when the synthesis compressed 39
+  findings to four results, what it dropped was not the awkward result — it was
+  the PRO-SAFETY half of the ledger, four to six times running**: finding **4**
+  (*"the strongest thing here"* — C prints a plausible answer and exits 0 in
+  **seven of eight builds** on a one-byte overflow, and deleting safe Rust's check
+  makes it **panic rather than corrupt**), finding **14** (the R3/R4 classes are
+  **incomparable, not nested**, so every `R3 − R4` here is measured against an
+  inflated R4), finding **7** (C-clang and unsafe Rust executing **exactly
+  143 740 000** kernel instructions), and finding **32**'s price half (**the
+  undefined spelling is the DEAREST of its six neighbours** — the UB buys nothing
+  and costs `6.00 Ir`/call).
+  ⚠⚠ **AND THE MANAGER BUILT THE ASYMMETRY IN: the brief asked for a section on
+  *where safe Rust does not help* AND HAD NO COUNTERPART ITEM.** The result was a
+  document with **eight measured places where safety buys nothing, two
+  unmeasurable places where it buys something, and ZERO measured places where it
+  demonstrably buys everything.**
+  **The transferable form: when you have a well-drilled reflex against
+  overclaiming in one direction, audit your COVERAGE in the other. Twenty-six
+  individually-reviewed pattern cycles did not surface this; one review of the
+  aggregate did.**
+
 - **A green gate is evidence about the gate.** Four reviews found defects past a
   fully green run, twice with an unchanged contract hash.
 - **A vacuous truth in a log reads like a discharged obligation.** Six instances of
