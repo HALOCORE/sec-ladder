@@ -2934,10 +2934,26 @@ NEVER CALLED.** ⚠ **A harness that prints which variant it is running has put 
 variant's NAME LENGTH on the measured axis.** **Give every variant a name of the
 same length, or measure against a zero-iteration control.**
 
-⚠⚠⚠ **AND THE BOX IS NOT AS STABLE AS THIS FILE ASSUMES — OPEN.** `p40`'s
-absolute total moved **`360,114,293` → `378,984,676`** (18.9 M, ~5.2%) between
-`TASK_086` and `TASK_120`, under a byte-identical pipeline, with `rustc 1.97.1 /
-LLVM 22.1.6` and `valgrind 3.27.1` **both unchanged**. **Unattributed.**
+⚠⚠ ~~**AND THE BOX IS NOT AS STABLE AS THIS FILE ASSUMES.**~~ **STRUCK AT
+`TASK_122`, WHICH MEASURED IT OUT. IT IS NOT THE BOX.** `p40`'s absolute total
+moved **`360,114,293` → `378,984,676`** (18.9 M, ~5.2%). ✅ **Not the BUILD**
+(identical flags, binary bit-reproducible across paths); ✅ **not the BOX**
+(`dpkg` untouched since Aug 15; `libc`/`valgrind`/`rustc` binaries all Aug 15,
+**all predating `TASK_086`**); ✅ **not the ENVIRONMENT** (measured at
+**61,877 `Ir`**, 300× too small — ⚠ **though four orders ABOVE the ±7 recorded
+above, because that ±7 is a MARGINAL where the term cancels**).
+✅ **MEASURED MECHANISM: deleting ONE SETUP ARRAY (`tagged`) drops the total by
+`18,874,783` against a drift of `18,870,383` — `0.023%`.**
+⚠ **SUFFICIENCY, NOT ACTUALITY** — and ⚠⚠ **it can never be raised to actuality,
+which is itself the finding: `.temp/` IS GITIGNORED, SO THE `p40`-ERA `cost.rs`
+IS GONE, and *"byte-identical pipeline"* was checked against TODAY'S copy.**
+
+> ✅ **THE RULE THAT REPLACES IT: WHOLE-PROGRAM TOTALS FROM `.temp/` PROBES ARE
+> UNREPRODUCIBLE IN PRINCIPLE.**
+
+✅ **BLAST RADIUS IS ONE FIGURE.** **The drift sits in a term COMMON TO BOTH ARMS
+of every published difference, so it hits DENOMINATORS and not DIFFERENCES** —
+`5.8e-8` is the whole list and it is already corrected.
 ⚠ **Separately and NARROWLY, two checked rungs (`k20_checked`, `k21_checked`)
 each re-measure exactly `−4 Ir` while their unchecked twins are EXACT, and
 `k39`/`k41`/`k43` all reproduce exactly** — so the `−4` is **not** the 18.9 M
