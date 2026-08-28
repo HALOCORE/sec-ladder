@@ -2937,8 +2937,25 @@ plain `callgrind` ON THE SAME BINARY AND THE SAME ARGV.** ✅ **Marginal
 **Known instances**: `p40`'s `21`, `p40`'s `193`, `p43`'s `+3.00`.
 ✅ **`p40`'s `21` SURVIVES ANYWAY**, because `TASK_120` re-derived it as a
 difference against a **zero-iteration control** that makes the two kernels
-byte-equal — ⚠ **which is the technique, and it is cheap: run the probe with the
-iteration count set to zero and subtract.**
+byte-equal.
+
+⚠⚠ **BUT THE ZERO-ITERATION CONTROL IS NOT UNIVERSAL, AND THIS BLOCK RECOMMENDED
+IT AS IF IT WERE — CORRECTED AT `TASK_124`, ONE TASK AFTER IT WAS WRITTEN.**
+**It is WRONG for a kernel that ALLOCATES**, because `n = 0` never pays glibc's
+arena setup and prints a shorter line. **Measured error:**
+
+```
+C-gcc   +0.82   C-clang  +1.51   Rust  +0.42     Ir/call
+```
+
+✅ **`p40`'s `21` is unaffected — a different construction, and its two arms are
+byte-equal at zero iterations.** ⚠ **The rule is therefore: subtract a
+zero-iteration control ONLY when you have checked that the arms are byte-equal
+there. If the kernel allocates or prints a variable-length line, USE A
+PERTURBATION CONTRAST INSTEAD** — hold everything fixed, perturb the one term you
+are pricing, and ask whose behaviour moves. ⚠⚠ **That is also the shape that
+killed `CVE-2021-23017`: six of eight arms had to change and did, and the two
+`Vec::push` arms did not** (RECAP finding 42).
 
 ⚠⚠ **THE `println!` TRAP, and it is the reason `p40`'s `+193` was 60% artefact:
 formatting a kernel NAME six characters longer cost `115 Ir` with the kernels

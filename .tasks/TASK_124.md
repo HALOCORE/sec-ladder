@@ -140,7 +140,7 @@ Write your report to `.tasks/TASK_124_REPORT.md` as well as returning it.
 
 ---
 
-⚠ **PROTOCOL rule 2's running count is 526** (⚠ **a rigour signal, not a ledger —
+⚠ **PROTOCOL rule 2's running count is 536** (⚠ **a rigour signal, not a ledger —
 do not re-add it**). The calls I am least sure of:
 
 1. ⚠⚠ **That `R3 = CORRECT` is real.** **It is the cell that would make this row
@@ -162,4 +162,4 @@ do not re-add it**). The calls I am least sure of:
    enumeration instead, which is the question `TASK_113` actually asked and which
    no corpus in this repo answers.**
 
-Carry **526** forward, incremented by what you find.
+Carry **536** forward, incremented by what you find.
