@@ -1,7 +1,7 @@
 # What 26 kernels say about the cost of memory safety
 
 *A cross-pattern synthesis of `sec-ladder`. Written at TASK_108 against 26 built
-patterns and 39 recorded findings; reviewed at TASK_111 and corrected at
+patterns and (at the time) 39 recorded findings; reviewed at TASK_111 and corrected at
 TASK_112, which restored nine reviewed results the first pass had dropped and
 fixed two blockers, nine majors and twelve minors. §7 says which, and which way
 they pointed.*
@@ -655,7 +655,8 @@ on three patterns.
 2. **A termination proof does not bound the stack.** A recursive kernel with
    `decreases buf.len() - i` verifies `3 verified, 0 errors`; the compiled binary
    at depth 10⁶ prints `fatal runtime error: stack overflow, aborting`, `rc=134`.
-   ⚠ PROVISIONAL — TASK_102, unreviewed.
+   ✅ TASK_102 has since been reviewed (TASK_113), which disputed Result 4's
+   criterion but did NOT attack this limb; it stands.
 3. **p42** — an affine deallocation token does not force deallocation. An R5 that
    forgets the error path's `deallocate` verifies with 0 errors, because
    `Tracked<Dealloc>` is **affine, not linear**: a proof may simply drop it.
@@ -958,23 +959,37 @@ recording the count forces a run and the run moves it.
 ## 7. What this project does not know
 
 **Unreviewed work.** The project's own rule is that a finding is not authoritative
-until a different agent has attacked it. As of TASK_108 the following have not
-been through a review, and anything resting on them is PROVISIONAL: **TASK_088**
-(p19's re-fitted laws, its CVE correction, and the harness changes p19 is gated
-under), **090**, **091**, **092** (p46's corrections, on which p46's headline
-ground now stands), **095**, **097**, **098** and **100** (both
-`Role: research reviewer` with no `_REVIEW*` file of their own — ⚠ **`TASK_100`
-is the source of the `p34` correction §3 rests on and of the `p37`
-refusal-reason refutation in §5**), **102** (the instrument-domain result in
-§5), **106** (p23's
-corrections), **107** (three results that changed how this project measures), and
-the two most recent reviews and their landings, **109** and **110**. Four tasks
-on the list in circulation have since been reviewed — TASK_094 by TASK_100,
-TASK_099 by TASK_103, TASK_101 by TASK_105 and TASK_104 by TASK_109 — and that
-correction was made while writing this file. ⚠ **A review is not self-certifying:
-`TASK_098`, `TASK_100` and `TASK_109` are unreviewed by exactly the criterion
-that puts the engineering tasks on this list, and this document included one of
-the three and missed the other two until TASK_111 found them.**
+until a different agent has attacked it. ⚠⚠ **THIS SECTION LISTED FIFTEEN
+UNREVIEWED TASKS AS OF TASK_108. THE DEBT HAS SINCE BEEN TRIAGED AND CLEARED, AND
+CLEARING IT COST THIS DOCUMENT FOUR PUBLISHED CLAIMS** — which is the strongest
+available argument for the rule.
+
+**TASK_113 triaged the fifteen** (⚠ *fifteen, not fourteen — one was missing from
+the manager's own list*) **to three worth reviewing, closing nine as superseded
+or self-checking with a stated reason for each.** All three were then reviewed:
+
+- **TASK_102** → reviewed by **TASK_113**: ⚠⚠ **Result 4's "if and only if" does
+  not survive. See §5, which now carries the dispute.**
+- **TASK_107** → reviewed by **TASK_114**: the environment pin's rule is false
+  (the lossy term is the byte count, which omits the `envp` pointer array), and
+  `MIRIFLAGS` was never the variable behind the Miri slowdown. ⚠ **No published
+  `Ir` in this document is affected; the defects are in reproducibility metadata
+  and in latent detectors.**
+- **TASK_106** → reviewed by **TASK_117**: §2's `p23` swing was overstated 9×.
+  **Corrected in place.** ✅ **The exact law itself survived a serious attack —
+  design matrix rank 8 of 8, and twelve out-of-band predictions registered before
+  measurement at max error 0.00.**
+- **TASK_109 + TASK_110** → reviewed by **TASK_116**: ⚠⚠ **§4's ghost-ledger
+  claim is refuted — the `ensures` is satisfied by a leaking program. Corrected
+  in place.**
+
+⚠ **What remains PROVISIONAL is now narrower and is marked where it is used**:
+`p46`'s headline ground (TASK_092), `p19`'s re-fitted laws (TASK_088), and the
+`p42` retraction's own landing, which has not yet reached that pattern's files.
+⚠ **And RECAP finding 40 — the replacement for the disputed Result 4 — is a
+manager's generalisation that has NOT been attacked.** ⚠ **A review is not
+self-certifying, and this list has twice omitted reviewers who were themselves
+unreviewed.**
 
 **Mechanisms that are recorded and not explained.** Cite these; do not explain
 them. (a) **p23's elision cause failed three isolations**: the phenomenon
