@@ -1393,6 +1393,8 @@ resolve, sitting exactly on the boundary.
 
 ```
 |corr| <  2.00    120 rows    0 real / 120 spurious   <- SUPERSEDED, see below
+                                                     ⚠ AND IT READS `0 real` AGAIN TODAY.
+                                                       THAT IS A COINCIDENCE, NOT A VINDICATION.
 2.00 .. 16.00      22 rows    8 real /  14 spurious   <- print these with a "?"
 |corr| >= 16.00    34 rows   34 real /   0 spurious   <- smallest is 17.00
 ```
@@ -1410,6 +1412,16 @@ ONE DRAW of the ±7 environment term, not a discovery** — and equally, **`0 re
 was one draw too.** ⚠⚠ **Neither number is a property of the tree. The band's
 honest statement is: below the floor, whether a correction reads "real" is
 decided by the environment phase, so do not quote either count.**
+
+⚠⚠⚠ **AND AT `TASK_119` IT SWUNG BACK: the generated `results/synthesis.md` now
+prints `0 real / 143 spurious` again.** ⚠ **DO NOT READ THAT AS THE TABLE ROW
+ABOVE BEING VINDICATED AND DO NOT DELETE ITS `SUPERSEDED` MARKER.** **It is the
+THIRD draw of the same ±7 term, and `TASK_119` read the cause straight out of the
+sidecar rather than asserting it: `outward_by_callee 0x189480`
+(`__memset_avx2_unaligned_erms`) moved `43.0 → 50.0`, so `p03`'s `R3−R4 moves_by`
+went `−7.0 → 0.0`.** ⚠⚠ **A superseded number that COMES BACK is more dangerous
+than one that stays wrong, because it looks like confirmation. `0 real` has now
+been printed by two different draws with a `4 real` draw between them.**
 
 ⚠ **And the floor is ±2 Ir with a measured max residual of 15.79** (p22) and
 **10.11** (p07) — ~~"±16 on p07 and p22"~~ was this block's own guess and
