@@ -139,7 +139,7 @@ Write your report to `.tasks/TASK_122_REPORT.md` as well as returning it.
 
 ---
 
-⚠ **PROTOCOL rule 2's running count is 488** (`TASK_120` carried 466 → 488;
+⚠ **PROTOCOL rule 2's running count is 502** (`TASK_120` carried 466 → 488, then `TASK_118` added 14 off the same branch → 502;
 ⚠ **a rigour signal, not a ledger — do not re-add it**). The calls I am least
 sure of:
 
@@ -161,4 +161,4 @@ sure of:
    in `TASK_123` becomes the main line rather than an option.** **Tell me if I
    have the dependency backwards.**
 
-Carry **488** forward, incremented by what you find.
+Carry **502** forward, incremented by what you find.

@@ -141,7 +141,7 @@ Write your report to `.tasks/TASK_123_REPORT.md` as well as returning it.
 
 ---
 
-⚠ **PROTOCOL rule 2's running count is 488** (⚠ **a rigour signal, not a ledger —
+⚠ **PROTOCOL rule 2's running count is 502** (⚠ **a rigour signal, not a ledger —
 do not re-add it**). The calls I am least sure of:
 
 1. ⚠⚠ **That this corpus is the right domain at all.** **It is 20 CVEs chosen by
@@ -162,4 +162,4 @@ do not re-add it**). The calls I am least sure of:
    `p28`'s precedent — RIGHT VERDICT, WRONG REASON — and against `TASK_120`'s
    finding that TWO OF THREE spot-checked refusal reasons were broken.**
 
-Carry **488** forward, incremented by what you find.
+Carry **502** forward, incremented by what you find.
