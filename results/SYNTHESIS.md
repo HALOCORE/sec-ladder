@@ -754,6 +754,10 @@ triples, not as a column sum). Four things a reader must know before using that:
 (TASK_113) and **both halves of the "if and only if" fail.** The sentence is
 preserved rather than struck, and the evidence against it is stated immediately
 after it. **RECAP finding 37 carries the same dispute.**
+⚠⚠ **AND BOTH REPLACEMENTS WRITTEN FOR IT HAVE SINCE DIED TOO — see §7. Three
+generalisations over this refusal set, three failures. The standing conclusion is
+to keep the classification and publish no generalisation, so DO NOT read the
+dispute below as a gap somebody still needs to fill with a better law.**
 
 > **This benchmark can price a safety property IF AND ONLY IF some rung emits it
 > as a compare-and-branch and another rung omits it.** A property enforced by
@@ -1013,12 +1017,59 @@ or self-checking with a stated reason for each.** All three were then reviewed:
   in place.**
 
 ⚠ **What remains PROVISIONAL is now narrower and is marked where it is used**:
-`p46`'s headline ground (TASK_092), `p19`'s re-fitted laws (TASK_088), and the
-`p42` retraction's own landing, which has not yet reached that pattern's files.
-⚠ **And RECAP finding 40 — the replacement for the disputed Result 4 — is a
-manager's generalisation that has NOT been attacked.** ⚠ **A review is not
-self-certifying, and this list has twice omitted reviewers who were themselves
-unreviewed.**
+`p46`'s headline ground (TASK_092) and `p19`'s re-fitted laws (TASK_088).
+✅ **The `p42` retraction has since reached that pattern's files (TASK_118), and
+a THIRD encoding was built and also admits a verifying leaker — so `p42`'s R5
+still does not cover its own bug class, and expressibility at the pin remains
+OPEN rather than refuted.** ⚠ **A review is not self-certifying, and this list
+has twice omitted reviewers who were themselves unreviewed.**
+
+⚠⚠ **AND THE REPLACEMENT FOR THE DISPUTED RESULT 4 HAS NOW BEEN ATTACKED TWICE
+AND DIED TWICE, WHICH IS ITSELF THE RESULT.** RECAP finding 40 (*"the remaining
+rows fail because they RE-DERIVE A MECHANISM"*) was reviewed at TASK_120: the
+tally is **6 of 22, not 7**, its membership was wrong three ways, and
+*"duplication"* turned out to be **four different relations wearing one word**.
+Its own replacement, finding 41 (*"the five-rung ladder has nothing to price on
+them"*), was reviewed at TASK_122 and **failed harder** — it merged four
+categories, and it had **no control arm**: run its criterion against the BUILT
+tree and **8 of the 26 built patterns publish a zero on their own headline
+axis**, `p46` most sharply, which ships `0.00000` *and* *"the boundary vanished"*
+**as its published result**.
+
+> ⚠⚠ **THREE GENERALISATIONS HAVE NOW BEEN OFFERED OVER THIS REFUSAL SET AND ALL
+> THREE HAVE DIED. THE STANDING CONCLUSION IS TO KEEP THE 22-ROW CLASSIFICATION
+> AND PUBLISH NO GENERALISATION OVER IT.** **The rows fail for many individually
+> sound reasons, and that is the honest answer.**
+
+**Which leaves the question this document cannot dodge: is the DOMAIN worked
+out, or only this CATALOGUE?** ⚠ **The 47 rows are `git`-verified pre-project —
+first commit, empty `patterns/` — so a pre-project list running out after 26
+builds says little.** **TASK_123 therefore ran the enumeration nobody had run:
+20 worked CVEs from nginx, OpenSSL, libxml2 and PHP, against the reviewed
+admission bar, probe 1 first.** **Nineteen die on a `grep`, a run, or a
+load-bearing citation.** ✅ **The logical seven die MEASURED, not assumed — strip
+the incidental array index from CVE-2021-3450's decision and safe-naive,
+safe-tuned and unsafe are byte-identical at 108 B and `37.00 Ir`/call each.**
+**One survives: CVE-2021-23017, where a *sizing* pass under-counts a separator
+the *writing* pass emits, so the bound comes from an earlier pass over the same
+input — and a census of all 26 built kernels finds 14 destination buffers,
+13 `#define` capacities plus one input extent, and ZERO prior-pass counts.**
+⚠ **It is not built and not scheduled: only limb 2 of the bar is met, and its own
+engineer disclosed that the row's spatial character depends on an allocation
+choice that is the porter's and not the CVE's.**
+
+⚠⚠ **AND THE RESULT THAT OUTRANKS THE SURVIVOR: A CVE CORPUS ANSWERS *"which
+mechanisms are missing"* AND CANNOT ANSWER *"which idioms matter"*.** Eight of
+the twenty are pure decision bugs — a distribution no idiom census would produce
+— **because CVEs select for exploitability, not for frequency.** ⚠ **And the
+idiom census that would answer it CANNOT BE RUN ON THE MACHINE THIS PROJECT LIVES
+ON: there is no independent C corpus present** (the largest non-project C
+directory holds thirteen zlib examples; the only other C is the CVE ports, which
+carry the same selection bias, and this project's own kernels, which are
+circular). ✅ **So the admission bar stays MECHANISM-based — not by preference,
+but because the frequency-based alternative has no instrument here.** ⚠ **That is
+a limitation of the setting, and it is the honest reason this project's
+generality claims stop where they do.**
 
 **Mechanisms that are recorded and not explained.** Cite these; do not explain
 them. (a) **p23's elision cause failed three isolations**: the phenomenon
