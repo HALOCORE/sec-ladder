@@ -598,6 +598,27 @@ outright has nothing to price — so it is not a score. Read the entries, not th
 tally. **This document dropped the p02 entry entirely in its first version**, and
 that omission ran the same way as every other one it made (§7).
 
+⚠⚠ **AND ONE MORE PLACE, MEASURED LATE AND ARRIVING FROM OUTSIDE THE CATALOGUE:
+SAFE RUST'S IDIOMATIC ESCAPE IS OFTEN `Vec::push`, WHICH DELETES THE BOUND
+RATHER THAN CHECKING IT.** **Found while triaging a CVE candidate whose safe
+rung appeared to come out not merely *safe* but *CORRECT* where C was
+exploitable.** ⚠ **It was an artefact, and the arm that proved it is worth
+copying: perturb the term you are pricing and ask whose behaviour MOVES.**
+**Six of eight arms changed — C from an ASan heap write to silent, the panicking
+safe rung to correct, the unsafe rung from Miri UB to clean — and BOTH
+`Vec::push` arms were UNCHANGED, because the `Vec` simply reallocated from
+capacity 4 to 8.** ✅ **A fill-controlled variant grows too, so it is the idiom
+and not `with_capacity`.**
+
+⚠ **The consequence for a reader is not that `Vec::push` is wrong — it is
+usually right, and it is genuinely why the bug cannot occur.** **It is that a
+rung which grows its destination IS NO LONGER RUNNING THE SAME PROGRAM, so any
+number taken across that boundary prices a REPRESENTATION CHANGE and not a
+safety property.** **This is the same trap as `p27`'s forced `(slot, gen)`
+handles, where it was the pattern's whole point rather than a defect** — ⚠ **the
+difference is whether the representation change is FORCED by the language or
+CHOSEN by the porter, and only the first is a result.**
+
 ---
 
 ## 4. Result 3 — a proof discharges exactly what it says, and the numbers beside it say less than you think
@@ -1084,6 +1105,28 @@ the pass-level cause is not, and no compiler flag was bisected. (d) The
 **environment-length-versus-content** question is open in one specific way: the
 list of variables whose *content* changes codegen paths was derived from a single
 measurement and is not proved complete.
+
+⚠⚠ **AND THE CONTROL ARM THIS DOCUMENT NEVER HAD, FOUND LATE AND WORTH STATING
+PLAINLY: ACROSS ALL 26 PATTERNS AND EVERY ADVERSARIAL INPUT, THE FOUR RUST RUNGS
+HAVE NEVER ONCE DISAGREED WITH EACH OTHER.**
+
+```
+129  adversarial (pattern, input) pairs in results/gate/*.json
+ 58  with ANY cell divergence
+  0  where safe_naive / safe_tuned / unsafe / verus differ from one another
+```
+
+**Every behavioural divergence in this tree is among the C variants.** ✅ **It is
+the cheapest check in the project — one pass over committed gate records, no
+build and no callgrind — and it took 124 tasks to run.** ⚠ **Its immediate use
+is defensive: a proposed pattern whose headline is *"the safe rung panics, the
+tuned rung is correct, the unsafe rung is silently wrong"* is claiming something
+that has never happened here, which is a reason to distrust the port rather than
+to celebrate the row.** **That is exactly how the one surviving CVE candidate
+was refused.** ⚠⚠ **But read the other way it is a caveat on this whole
+document: a tree with 129 adversarial pairs and ZERO Rust-rung divergences may
+be telling you the harm inputs are not adversarial ENOUGH. Nobody has tested
+that reading, and it would be the first thing this author would test next.**
 
 **Structural gaps.** The unsafe side is unsearched on most patterns: **14 of 26**
 print `undeclared` in the search-state column and **nine** report a real search on
