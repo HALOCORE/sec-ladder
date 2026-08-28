@@ -296,9 +296,21 @@ at all:
 
 ⚠ **p23's two numbers ship without their domain, which is p23's own rule.** Band
 K holds *every* size regressor fixed — `m = 32`, `nrec = 8`, 256 copied bytes
-per call — and sweeps only the pivot's rank: `R3 − R4` runs **706.37** at rank
-0.03 down to **227.00** at rank 0.97, a **3.11×** swing, while the size-based law
-predicts 416.32 for all seven points. `306 / 444` are two draws from that curve.
+per call — and sweeps only the pivot's rank, while the size-based law predicts
+416.32 for all seven points. `306 / 444` are two draws from that curve.
+
+⚠⚠ **AND THE SWING ITSELF WAS OVERSTATED BY 9×, CORRECTED AT TASK_117 AND
+RE-MEASURED BY THE MANAGER.** Between the **shipped** spellings `R3 − R4` runs
+`706.37` at rank 0.03 down to `227.00` at rank 0.97 — a `3.11×` swing — **but
+against the cheapest IN-CONTRACT safe rung the same shipped unsafe rung gives
+`172.64 … 227.00`, a `1.315×` swing.** The difference is a spelling term of
+**exactly `2·dn − 2·recs`**, which runs `480.00 → 0.00` across the band and is
+therefore **collinear with the very axis being measured**. ⚠ **Quote `1.315×`
+and a `54.36 Ir`/call swing.** ⚠⚠ **The mechanism attribution inverts with it:
+regressed against the shipped pair the swing tracks the cursor split (`R² 0.987`)
+and not the swap count (`0.013`); against the in-contract pair the two SWAP
+PLACES (`0.0001` and `0.993`).** **The shape effect is real at fixed size; its
+size and its cause were both properties of one spelling.**
 
 **p09 is the counter-case, and it is the one to lean on.** Its `R3 − R4`
 decomposes over **three checks with zero free parameters** — every coefficient is
@@ -783,7 +795,7 @@ REFUSE "with measurements that never reached the catalogue".** Eight further
 candidates proposed later were probed and **all eight refused** — ⚠ **but they
 were all selected for BUG-CLASS NOVELTY, the criterion this project's own
 admission bar says "predicts neither way", and none was an `index >= len`
-row; `p23`, the fifteenth `index >= len`, shipped a `3.11×` result.** ⚠ **So
+row; `p23`, the fifteenth `index >= len`, shipped a real result (⚠ **published as `3.11×`, corrected to `1.315×` at TASK_117**).** ⚠ **So
 "two independent lists, both at a hit rate of zero" is one list plus a
 differently-selected second list, and the zero is not evidence of structure.** Recursion depth: three rungs `call` the
 same ICF-merged symbol, so there is one rung, not three. Unaligned load: the cast

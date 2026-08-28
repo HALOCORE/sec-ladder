@@ -2763,9 +2763,26 @@ was the first, p46's underdetermined two-band fit the second):
 
 ✅ **Also landed, and it is what makes the axis clean:** `up + dn == mbytes`
 **exactly at all 109 points** (band K's `up + dn = 256.00` generalised) — total
-cursor work is constant and only its **split** moves. ✅ **The swap-count
+cursor work is constant and only its **split** moves. ⚠⚠ ~~**The swap-count
 confound is refuted and reproduced:** endpoints `sw = 7.63` vs `7.75` while the
-tax differs `3.11×`; `dn` alone R² `0.9869`, **`sw` alone R² `0.0132`.**
+tax differs `3.11×`; `dn` alone R² `0.9869`, **`sw` alone R² `0.0132`.**~~
+**RETRACTED AT `TASK_117`, MANAGER-RE-MEASURED — AND IT IS A METHOD FINDING, NOT
+A `p23` FINDING.** Those R² values are real **for the shipped spelling pair**.
+**Against the cheapest IN-CONTRACT safe rung the two regressors SWAP: `dn` →
+`0.0001`, `sw` → `0.9930`**, and the headline ratio falls `3.11× → 1.315×`.
+
+⚠⚠ **THE TRANSFERABLE RULE, and it is new: A SPELLING DIFFERENCE CAN BE
+COLLINEAR WITH THE AXIS YOU ARE MEASURING, AND THEN IT FORGES BOTH THE
+MAGNITUDE AND THE MECHANISM.** `p23`'s spelling term is **exactly
+`2·dn − 2·recs`** — it *is* a function of the swept variable — so it inflated
+one endpoint, left the other untouched, and made `dn` look like the cause.
+⚠ **A control that varies the axis while holding the spelling fixed cannot see
+this; you have to vary the SPELLING at each point of the axis.** ⚠ **This is
+strictly worse than the known "an endpoint is what someone thought to write"
+trap, because here the spelling error is not a constant offset and does not
+cancel in a ratio.** ✅ **Check for it the cheap way: regress the spelling term
+itself on the swept variable. If R² is high, no number on that axis is
+publishable until the spelling is held at its in-contract floor.**
 
 ⚠ **`τ`'s MECHANISM IS NOT ESTABLISHED** — per-record, periodic, values
 `0/2/3/4`, not disassembled. **Cite it; do not explain it.**

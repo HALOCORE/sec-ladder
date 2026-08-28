@@ -1785,7 +1785,7 @@ the number.** Two task files have already sent an agent to the wrong finding.
       selection `TASK_111` found in the synthesis.** All eight candidates were
       chosen for **bug-class novelty** — the criterion this file's own admission
       bar says *"predicts neither way"*. **Zero were `index >= len`**, and
-      **`p23`, the fifteenth `index >= len`, shipped finding 38 at `3.11×`.**
+      **`p23`, the fifteenth `index >= len`, shipped finding 38** (⚠ **published at `3.11×`, corrected to `1.315×` at `TASK_117`; the result stands, the magnitude does not**).
 
     ✅ **CLEAN NEGATIVES — the refusals themselves mostly hold.** All three
     probe-2-based kills **reproduce** under `.temp/t104/probe2.py` (the form that
@@ -1883,14 +1883,48 @@ the number.** Two task files have already sent an agent to the wrong finding.
     the input rather than its extent. ⚠ **PROVISIONAL where it rests on
     `TASK_106`, which is unreviewed.**
 
-    `R3 − R4` runs **`227.00 → 706.37 Ir`/call, a factor of 3.11**, with the
-    element count, the record count and the bytes copied **all fixed** — only the
-    **pivot's rank** moves. ⚠ **The obvious confound is the swap count, and it is
-    REFUTED at the endpoints: swaps are `7.63` and `7.75`, within 1.6%, while the
-    tax differs 3.11×.** Swaps are symmetric about rank 0.5; the tax is monotone.
-    Fitted, `dn` alone gives R² `0.9869` and **`sw` alone `0.0132`**. ✅ **And
-    `up + dn == mbytes` exactly at all 109 shipped points — total cursor work is
-    CONSTANT and only its SPLIT moves**, which is what makes the axis clean.
+    ⚠⚠ **THE HEADLINE NUMBER AND ITS MECHANISM ARE BOTH CORRECTED (`TASK_117`,
+    MANAGER-RE-MEASURED). THE AXIS SURVIVES; ITS MAGNITUDE FALLS BY 9× AND ITS
+    REGRESSOR INVERTS.**
+
+    ~~`R3 − R4` runs **`227.00 → 706.37 Ir`/call, a factor of 3.11**~~ — that is
+    the **shipped spelling pair**, and it reproduces exactly (all seven published
+    band-K rows to ±0.00). ⚠ **But `TASK_106` itself found a cheaper in-contract
+    R3 (`k_u5`, the tautological conjunct), and against that R3 the same shipped
+    R4 gives `172.64 … 227.00`, a factor of `1.3148`.**
+
+    | quantity | min | max | ratio |
+    |---|---|---|---|
+    | published, shipped R3 − shipped R4 | `227.00` | `706.37` | **`3.112`** |
+    | cheapest in-contract R3 − shipped R4 | `172.64` | `227.00` | **`1.315`** |
+    | ⚠ the SPELLING term (shipped R3 − `u5`) | **`0.00`** | **`480.00`** | — |
+
+    ⚠⚠ **THE SPELLING TERM IS NOT A CONSTANT — IT IS EXACTLY `2·dn − 2·recs`**,
+    `480.00` at `nlow=1` and `0.00` at `nlow=31`, residual `0.0000` over 41
+    points. **So it is COLLINEAR WITH THE VERY AXIS THE FINDING IS ABOUT**, which
+    is why it inflates one endpoint and not the other. ✅ **Manager re-ran the
+    whole band-K sweep; `.temp/r117/measure_bandk.py`, with `un_base`'s `md5_fn
+    43acbc727fc6…` matching the shipped R4 cell as the reproduction arm.**
+
+    ⚠⚠ **AND THE MECHANISM CLAIM INVERTS, WHICH IS THE SHARPER HALF.**
+    ~~*"The obvious confound is the swap count, and it is REFUTED — `dn` alone
+    gives R² `0.9869`, `sw` alone `0.0132`."*~~ **Against the cheapest
+    in-contract R3 the two SWAP PLACES: `dn`/rank falls to R² `0.0001` and `sw`
+    rises to `0.9930`.** ⚠ **So the swap-count refutation — celebrated as making
+    the result stronger — is TRUE OF THE SHIPPED PAIR AND FALSE OF THE PATTERN.**
+    **`sw` was the right regressor all along and the shipped R3's spelling was
+    hiding it.**
+
+    ✅ **What survives, and it is still a real result: the shape axis is real at
+    fixed size** — a `54.36 Ir`/call swing with element count, record count and
+    bytes copied all fixed — **and `up + dn == mbytes` exactly at all 109 shipped
+    points**, so total cursor work is constant and only its split moves.
+    ⚠ **Quote `1.3148×` and `54.36 Ir`/call, not `3.11×` and not `479`.**
+
+    ⚠ **Mechanism, measured on the shipped rung for the first time:** unchecking
+    the downward read **alone** gives `258.00 = 2 + 32·recs` **flat at all 31
+    ranks**, and both-scans-unchecked equals it exactly — **and a fully safe
+    in-contract R3 is CHEAPER than that at 8 of 8 ranks.**
 
     **The law, and getting it right took three attempts:**
 
@@ -1899,6 +1933,27 @@ the number.** Two task files have already sent an agent to the wrong finding.
     > points**, `-O3 isolated`, kernel-exclusive `Ir`, debug-assertions **off**.
     > **Holdout: fit on bands M+N (71 points), predict the 38 nobody fitted →
     > max |error| `0.0000`.**
+
+    ✅✅ **THE LAW SURVIVED A SERIOUS ATTACK — `TASK_117`, and this is the
+    strongest clean negative in the project.** The manager's suspicion was that a
+    law repaired for ONE residue blindness would be blind in another parameter,
+    or that `rounds` was a linear combination absorbing the error. **Both
+    refuted:** the 8-column design matrix has **rank 8/8 in EXACT arithmetic**
+    over all 109 points *and* over the 71 M+N training points — **so `0.0000` is
+    not collinearity** — and **twelve NEW out-of-band points**, with predictions
+    **registered before measurement**, came back at **max |error| `0.00`** on a
+    set that discriminates (it rejects three superseded law forms by `720`, `60`
+    and `54.5`). ⚠ **Attack the law again only with new evidence; this one is
+    settled.**
+
+    ✅ **AND THE LAW AND THE §A CORRECTION ARE CONSISTENT, WHICH IS THE CHECK
+    THAT MAKES BOTH BELIEVABLE.** The spelling term is `2·dn − 2·recs`, so
+    subtracting it from the law leaves the in-contract tax as
+    **`2 + 32·recs + 2·sw − 3·rounds + Σ τ(m mod 4)`** — **with no `dn` term at
+    all.** That is exactly why the regressor inverts to `sw`, and at `recs = 8`
+    its leading part is `2 + 32·8 = 258.00`, **which is the flat value the
+    unchecked-downward-read arm measures at all 31 ranks.** **Three independent
+    routes to the same number.**
 
     ⚠⚠ **THE METHOD RESULT IS WORTH MORE THAN THE LAW: p23 produced THREE
     mutually inconsistent "exact" laws, each with ZERO in-sample residual.** The
