@@ -2631,6 +2631,33 @@ is ≈2 min/pattern against ~4.8 h for a layout population; only p03/p04 need it
 
 ---
 
+## ⚠⚠ A PANIC EDGE CAN BE INVISIBLE IN DISASSEMBLY TEXT — PIE + GOT-INDIRECT CALLS
+
+**TASK_115, PROVISIONAL. It produced a published false claim, so it is not a
+curiosity.** Under PIE the call to the panic handler goes through the GOT, and
+`objdump` prints the target as something like **`_DYNAMIC+0x2c8`** rather than as
+a panic symbol. ⚠⚠ **So *"grep the disassembly for a panic edge"* is a FALSE
+NEGATIVE, and `TASK_092` used it to report that `p26`'s two rungs had NO panic
+edge when BOTH HAVE ONE.** That single wrong reading is what made `p26` look like
+a large safe-vs-unsafe difference with no compare-and-branch anywhere — the
+apparent counterexample to finding 37 that motivated a whole task.
+
+✅ **The fix: resolve through `.rela.dyn` instead of reading the mnemonic text**
+(`.temp/t115/resolve_calls.py`). ⚠ **Anything in this repo that decides "is there
+a check here?" from disassembly TEXT is suspect on a PIE binary.**
+
+## ⚠ `memset` CROSSES TO `rep stosb` AND CALLGRIND THEN CHARGES ~1 `Ir`/BYTE
+
+**TASK_115, PROVISIONAL — and it is the SECOND instance of one effect.** glibc's
+`memset` switches implementation between **2000 and 4000 bytes**; below the
+crossover a call costs `36…152 Ir`, above it callgrind charges **≈`1.011
+Ir`/byte**. ⚠⚠ **So a "cost per element" that spans the crossover is measuring
+the LIBC's dispatch decision, not the kernel** — and the denominator moves under
+you. **`p24`'s row already records the same effect for `memcpy` at 8192 bytes**
+(`rep movsb`, ≈1 `Ir`/byte), where it turned a `27.5% → 22.2%` "step" into an
+artefact of the DENOMINATOR. ⚠ **Two libc routines, same trap: check whether any
+swept band crosses a bulk-routine threshold before quoting a rate.**
+
 ## ⚠⚠ THE CONTROLS THAT COULD NOT HAVE FIRED — the running list, in one place
 
 **Landed at TASK_100. PROVISIONAL where an entry cites an unreviewed task.**

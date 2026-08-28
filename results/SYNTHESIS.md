@@ -784,14 +784,13 @@ This is measured, not argued. The 48-row catalogue was written before the projec
 started — ⚠ **with one exception that weakens the "so the refusals are not
 selection bias" argument by exactly one row: `p48` was added mid-project by the
 manager at TASK_066 and refused at TASK_074.** ⚠⚠ ~~**15 rows are refused, each
-on a measurement**~~ — **CORRECTED at TASK_113: the true figure is 13, and
-"each on a measurement" fails for every way of reaching fifteen.** The catalogue
-decomposes as **26 built + 6 still `planned` + 13 refused + 3 that are none of
-those** — `p24` (probed, live, needs a new reason), `p35` (blocked, not refused)
-and `p37` (**refusal reason refuted, never re-triaged**). ⚠ **Reaching fifteen
-requires counting two of those three, or counting `p40`/`p41`, whose catalogue
-cells still read the bare word `planned` while RECAP says they were adjudicated
-REFUSE "with measurements that never reached the catalogue".** Eight further
+on a measurement**~~ — **CORRECTED TWICE. At TASK_113 the true figure was 13; at TASK_115 it became
+17, because the six rows that still read the bare word `planned` were finally
+adjudicated and landed.** ✅ **The catalogue now decomposes as `48 = 26 BUILT +
+17 REFUSED + 3 DEFERRED + 2 OTHER`, with ZERO rows left unadjudicated** —
+`p24` (probed, live, needs a new reason) and `p35` (blocked, not refused) are the
+two; `p20`/`p21`/`p25` are the deferrals. ⚠ **`p25` is the one row in the whole
+catalogue on which this project has run NOTHING, and its cell now says so.** Eight further
 candidates proposed later were probed and **all eight refused** — ⚠ **but they
 were all selected for BUG-CLASS NOVELTY, the criterion this project's own
 admission bar says "predicts neither way", and none was an `index >= len`

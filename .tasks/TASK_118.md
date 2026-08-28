@@ -203,9 +203,13 @@ Write your report to `.tasks/TASK_118_REPORT.md` as well as returning it.
 
 ---
 
-⚠ **PROTOCOL rule 2's running count will be set by the manager when it launches
-this** — three branches were open when it was written and reconciliation is the
-manager's job.
+⚠ **PROTOCOL rule 2's running count is 466, reconciled by the manager across
+five concurrent branches.** Derivation, stated so it can be checked rather than
+trusted: base **414**; `TASK_113` **+11** (→425); then `TASK_114` **+6** and
+`TASK_115` **+12** off the 414 branch, and `TASK_116` **+9** and `TASK_117`
+**+14** off the 425 branch. ⚠ **PROTOCOL rule 1 says this is a RIGOUR SIGNAL AND
+NOT A LEDGER — do not re-add it, and do not treat 466 as an audited total.**
+**Carry it forward; increment it by what you find.**
 
 The calls I am least sure of:
 
