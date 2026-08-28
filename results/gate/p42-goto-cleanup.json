@@ -220,12 +220,12 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "88d1ec48e352e782755381936ea6400842215be69a005650d79114de6a3edb14",
+    "harness/check.py": "63b72bdd4aa7f3e4bd24867b5417056e4dac9321a3ba6df32ade745a3aa3eaee",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
-    "harness/limbs.py": "0c663d4d14806faa88310f7cf523a9ea7f75f42a051ee03572ab3c88b11c06e9",
+    "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
-    "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+    "harness/report.py": "1da5d38446d378f3da3d7d3c30bdb303d240fe32aefb66335f0adc8d6552df4f",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
     "patterns/p42-goto-cleanup/NOTES.md": "6b57986018d0567342dfc21d1e6a9d2c15b10cfe980bd282a388b68611bee370",
     "patterns/p42-goto-cleanup/README.md": "bb726b2a14379a9434f7cd20b3c6b4912842bc5030255f4a3f747169e628eada",
@@ -316,10 +316,14 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3269,
+    "bytes": 3264,
+    "nvars": 48,
+    "envp_stack_bytes": 3648,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
-    }
+    },
+    "repo_path_bytes": 33,
+    "domain": "Comparable ONLY against a record with the same `envp_stack_bytes` (= bytes + 8*nvars), the same `tuning_vars` and the same `repo_path_bytes`. That is a NECESSARY condition, not a proved sufficient one: `bytes` alone was believed sufficient and TASK_114 falsified it at +-7 Ir/call. argv beyond the repo prefix, and anything else on the initial stack, are not recorded here. When the three differ, compare `kernel_exclusive_ir` in results/pNN-*.json instead -- structurally immune, 0 of 288 triples moved."
   },
   "marginal_ir_per_call": {
     "c-clang/O0/isolated/small.bin": 3583.0,
@@ -2398,7 +2402,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2155586==ERROR: LeakSanitizer: detected memory leaks Direct leak of 624 byte(s) in 26 object(s) allocated from: #0 0x55a17772b77f in malloc (/home/apt/repos_common/sec-ladder/.temp/build/p42/c-gcc-asan+0xc477f) (BuildId: 9d32e599b53",
+      "diagnostic": "================================================================= ==2283420==ERROR: LeakSanitizer: detected memory leaks Direct leak of 624 byte(s) in 26 object(s) allocated from: #0 0x560cae42c77f in malloc (/home/apt/repos_common/sec-ladder/.temp/build/p42/c-gcc-asan+0xc477f) (BuildId: 9d32e599b53",
       "declared_hang": false,
       "hung": false,
       "stdout": "9073041678996835380",
@@ -2409,7 +2413,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2155588==ERROR: LeakSanitizer: detected memory leaks Direct leak of 256 byte(s) in 8 object(s) allocated from: #0 0x56189c38477f in malloc (/home/apt/repos_common/sec-ladder/.temp/build/p42/c-gcc-asan+0xc477f) (BuildId: 9d32e599b532",
+      "diagnostic": "================================================================= ==2283422==ERROR: LeakSanitizer: detected memory leaks Direct leak of 256 byte(s) in 8 object(s) allocated from: #0 0x557d23ae777f in malloc (/home/apt/repos_common/sec-ladder/.temp/build/p42/c-gcc-asan+0xc477f) (BuildId: 9d32e599b532",
       "declared_hang": false,
       "hung": false,
       "stdout": "0",
@@ -2442,7 +2446,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2155594==ERROR: LeakSanitizer: detected memory leaks Direct leak of 16 byte(s) in 16 object(s) allocated from: #0 0x55dafed1977f in malloc (/home/apt/repos_common/sec-ladder/.temp/build/p42/c-gcc-asan+0xc477f) (BuildId: 9d32e599b532",
+      "diagnostic": "================================================================= ==2283428==ERROR: LeakSanitizer: detected memory leaks Direct leak of 16 byte(s) in 16 object(s) allocated from: #0 0x556af935b77f in malloc (/home/apt/repos_common/sec-ladder/.temp/build/p42/c-gcc-asan+0xc477f) (BuildId: 9d32e599b532",
       "declared_hang": false,
       "hung": false,
       "stdout": "0",
@@ -2535,6 +2539,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.1,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -2545,6 +2551,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.1,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -2555,6 +2563,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.3,
         "stdout": "3217283052457457820",
         "model_stdout": "3217283052457457820",
         "stderr": ""
@@ -2565,6 +2575,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -2575,6 +2587,8 @@
         "exit": 5,
         "expected_exit": 5,
         "ub": false,
+        "leak": false,
+        "seconds": 0.1,
         "stdout": "",
         "model_stdout": "",
         "stderr": "slb: /home/apt/repos_common/sec-ladder/.temp/check/p42/miri/miri.adversarial-shortlen.bin: payload_len 4096 exceeds file size"
@@ -2585,6 +2599,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -2595,6 +2611,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.1,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -2605,6 +2623,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -2615,6 +2635,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 74.3,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -2625,6 +2647,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "58827459521287808",
         "model_stdout": "58827459521287808",
         "stderr": ""
@@ -2632,7 +2656,8 @@
       {
         "source": "unsafe.rs",
         "input": "large.bin",
-        "blocked": "miri did not finish within 180s. `n_iters` is clamped to 4 but the payload is not, and the driver decodes it element by element under interpretation. This input is unchecked; the others are not."
+        "blocked": "miri did not finish within 180s. `n_iters` is clamped to 4 but the payload is not, and the driver decodes it element by element under interpretation. This input is unchecked; the others are not.",
+        "seconds": 180.0
       },
       {
         "source": "unsafe.rs",
@@ -2640,6 +2665,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 1.6,
         "stdout": "1182041291514003593",
         "model_stdout": "1182041291514003593",
         "stderr": ""

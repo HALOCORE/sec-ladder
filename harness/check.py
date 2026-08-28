@@ -183,6 +183,7 @@ import struct
 import subprocess
 import sys
 import textwrap
+import time
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(REPO, "common"))
@@ -366,9 +367,11 @@ CARGO = os.path.expanduser("~/.cargo/bin/cargo")
 # about a configuration nobody had written down. `miri` takes these only through
 # the environment, not on its command line.
 #
-# ⚠⚠⚠ **AND THE OBVIOUS FIX -- PIN A SEED -- IS THE ONE THING THAT MUST NOT BE
-# DONE HERE, BECAUSE SETTING `MIRIFLAGS` AT ALL COSTS 4.6x ON THIS TREE.**
-# TASK_107 chose `MIRIFLAGS="-Zmiri-seed=0 -Zmiri-symbolic-alignment-check"`,
+# ⚠⚠⚠ **AND THE OBVIOUS FIX -- PIN A SEED -- IS STILL THE ONE THING THAT MUST
+# NOT BE DONE HERE, BUT ~~BECAUSE SETTING `MIRIFLAGS` AT ALL COSTS 4.6x ON THIS
+# TREE~~ IS THE WRONG REASON AND IS RETRACTED. The right reason is below: the
+# driver never reads the variable, so a pinned seed would not arrive anyway.**
+# ~~TASK_107 chose `MIRIFLAGS="-Zmiri-seed=0 -Zmiri-symbolic-alignment-check"`,
 # swept with it, and the sweep itself refuted the choice: p42 gained a SECOND
 # blocked Miri row. Measured afterwards on p42's `adversarial-wincap.bin`, the
 # gate's own probe file, `cwd=pdir`, the exact `check_miri` command line:
@@ -380,14 +383,42 @@ CARGO = os.path.expanduser("~/.cargo/bin/cargo")
 #     MIRIFLAGS=""      <-- SET BUT EMPTY               339.8 s
 #
 # **The empty string costs the same 4.6x as any flag, so the trigger is the
-# VARIABLE BEING PRESENT, not its content.** `MIRI_TIMEOUT` is 180 s, so a 74 s
-# row becomes a blocked one: **pinning would have traded a genuinely UB-checked
-# row for a configuration string** -- and p42's own `spec.md` calls Miri
-# *"load-bearing for the pattern's own subject on the R4 side"*, because R4 has
-# no proof and Miri's exit-time leak report is the only mechanical check that it
-# does not leak.
-# ⚠ **THE MECHANISM IS OPEN.** I have the effect four ways and no explanation
-# for it; do not write one down until somebody measures it.
+# VARIABLE BEING PRESENT, not its content.**~~
+#
+# ⚠⚠⚠ **THE STRUCK PARAGRAPH IS RETRACTED (`TASK_114` B2, landed here at
+# `TASK_119`), AND THIS IS THE SECOND WRONG MECHANISM ON THIS AXIS.** `MIRIFLAGS`
+# is not the variable at all:
+#
+#   * the `miri` **rustc driver** -- which is what the `subprocess.run` in
+#     `check_miri` invokes -- **never parses `MIRIFLAGS`.** A bogus value in the
+#     environment gives `rc=0` and is ignored; the same flag on the command line
+#     gives `rc=1 unknown unstable option`. `MIRIFLAGS` is `cargo-miri`'s.
+#   * re-measured on the same probe, **the direction REVERSES**, three repeats
+#     each way plus two more of the ambient block:
+#
+#         MIRIFLAGS unset              338.1 / 347.4 / 345.4 / 343.1 s  <- SLOW
+#         MIRIFLAGS=""                  75.1 / 75.4 s                   <- fast
+#         SLB_R114_DECOY=""             74.4 / 75.9 s   <- A DECOY, NOT MIRI'S
+#         $OLDPWD removed               75.3 s
+#
+#   * so the 4.6x is an **environment-block** effect -- the same axis as
+#     `_env_block`'s +-7 -- and a variable with no relation to Miri selects it.
+#
+# ⚠⚠ **THE MECHANISM IS OPEN AND MUST STAY OPEN.** Two have been published and
+# both were wrong ("seed-vs-seed", then "`MIRIFLAGS` presence"). `TASK_114`
+# killed its own only surviving correlation rather than report it -- a second
+# `miri base % 4 == 3` draw timed FAST -- so **do not chase the address
+# residue**, and do not write a third mechanism without measuring it.
+# ✅ `TASK_119` asked whether `marginal_ir_env`'s new `envp_stack_bytes`
+# separates the two states, precisely so the record could answer; the arms and
+# the answer are in `.temp/t119/b1_miri_state.py` and `TASK_119_REPORT.md`.
+# **What the record does now carry either way is `miri.runs[].seconds`.**
+#
+# `MIRI_TIMEOUT` is 180 s and the two states are ~75 s and ~340 s, i.e. **the
+# timeout sits between them**, so the same row can be green or BLOCKED on the
+# invoking shell alone -- and p42's own `spec.md` calls Miri *"load-bearing for
+# the pattern's own subject on the R4 side"*, because R4 has no proof and Miri's
+# exit-time leak report is the only mechanical check that it does not leak.
 #
 # **What the seed does and does not buy, also measured** (`.temp/t107/c2_miriflags.py
 # --probe`, two families x 12 seeds; `.temp/t107/c1_miri_cost.py`):
@@ -413,10 +444,26 @@ CARGO = os.path.expanduser("~/.cargo/bin/cargo")
 # it.** The default is deterministic (four timings above agree to 1.6%, and the
 # address probe reproduces `base % 4 == 3`); what actually moved between
 # TASK_102 and TASK_107 is the **miri version**, so that is what the record now
-# carries beside the flags. ⚠ **An ambient `MIRIFLAGS` is REMOVED**, not
-# inherited: leaving it would let the invoking shell silently cost 4.6x and
-# change what the row certifies, which is the same class of defect as the
-# environment block in `_env_block`. What was removed is recorded.
+# carries beside the flags.
+#
+# ⚠⚠ **WHY `MIRI_FLAGS` IS EMPTY, RE-JUSTIFIED AT `TASK_119` BECAUSE THE
+# ORIGINAL JUSTIFICATION WAS RETRACTED.** ~~An ambient `MIRIFLAGS` is REMOVED,
+# not inherited: leaving it would let the invoking shell silently cost 4.6x~~ --
+# **false**, and the reverse of what was measured next: it is the *removal* that
+# sat in the slow state when `TASK_114` re-ran it. **Emptying `MIRI_FLAGS` does
+# not CONTROL the fast/slow state; it CHANGES it, in a direction nobody can
+# predict.**
+#
+# ✅ **It stays anyway, on a DIFFERENT and much duller argument that survives
+# the retraction:** the gate must not inherit a flag set from the invoking
+# shell, because `MIRIFLAGS` *is* read by `cargo miri` and by any future call
+# site that uses it, and a row certified under an ambient
+# `-Zmiri-ignore-leaks` would be a silently weaker check than the record claims.
+# **Stripping it makes the configuration a property of `check.py` rather than of
+# whoever ran it.** That argument is about REPRODUCIBILITY, not about speed, and
+# it does not depend on any mechanism for the 4.6x. What was removed is
+# recorded (`miriflags_removed_ambient`), and how long each row actually took is
+# recorded too (`miri.runs[].seconds`), which is the part that was missing.
 MIRI_FLAGS = ()          # empty => `MIRIFLAGS` is UNSET in the child, not ""
 
 
@@ -2546,8 +2593,9 @@ def _env_block():
     """The environment block the MEASURED CHILDREN are handed, measured in a
     real child rather than computed from a Python dict.
 
-    Returns `{"bytes": int, "tuning_vars": {name: value}}`, or `None` if the
-    probe child could not be run.
+    Returns `{"bytes", "nvars", "envp_stack_bytes", "tuning_vars",
+    "repo_path_bytes", "domain"}`, or `None` if the probe child could not be
+    run.
 
     ⚠⚠ **THREE WAYS TO GET THIS WRONG, AND THE PROJECT HAS ALREADY MADE TWO OF
     THEM.**
@@ -2595,19 +2643,85 @@ def _env_block():
     marginal measures rather than in the start-up constant that cancels. A
     length-only record would have read "same length, so the marginal must
     match", and it does not. `tuning_vars` is the smallest thing that makes that
-    case diagnosable instead of silent."""
+    case diagnosable instead of silent.
+
+    ⚠⚠ **AND `bytes` WAS ITSELF LOSSY BY EXACTLY THE TERM THIS PROJECT HAD
+    ALREADY WRITTEN DOWN AS FORGOTTEN -- `TASK_114` B1, fixed here at
+    `TASK_119`.** The rule the field licensed was *same `bytes` and same
+    `tuning_vars` => the marginal must match EXACTLY*, and it is **false**:
+
+        1 filler var(s)   bytes=3520  nvars=49  marginal=3059.00
+        2 filler var(s)   bytes=3520  nvars=50  marginal=3059.00
+        3 filler var(s)   bytes=3520  nvars=51  marginal=3066.00
+        4 filler var(s)   bytes=3520  nvars=52  marginal=3066.00
+            byte-identical `bytes`, identical (empty) `tuning_vars`
+
+    A nine-rung sweep at a constant `bytes = 3680` is **period 4 in the
+    variable count**, which is the +-7's 32-byte period divided by the **8
+    bytes of one envp POINTER SLOT**. `/proc/self/environ` is `NAME=VALUE\\0`
+    concatenated and **contains no pointer array at all**, so `bytes` captures
+    four of the five terms in this file's own 87-byte decomposition
+    (`.memory/03-measurement.md`) and drops the one it calls *"the part the
+    manager forgot entirely"*. **The pin repeated the arithmetic error it was
+    written to prevent.**
+
+    So the child now returns the **count** as well, read from the same blob in
+    the same child, and `envp_stack_bytes = bytes + 8*nvars` is the single
+    integer the comparison rule uses. ⚠ **`envp_stack_bytes` is the envp
+    contribution ONLY** -- `argv`, `auxv` and the `AT_EXECFN` path string sit
+    on the same initial stack and are **not** in it, which is what
+    `repo_path_bytes` and the `domain` string below exist to say.
+
+    ⚠⚠ **DOMAIN, AND IT IS RECORDED RATHER THAN LEFT IN PROSE BECAUSE THAT IS
+    THE DEFECT `TASK_114` §A.3 FOUND.** `TASK_107` established the pin as
+    *"valid within one clone location"* and that sentence existed **only in a
+    task report** -- zero hits in this file, in `.memory/` and in the record
+    itself. Measured, environment held byte-identical and only `argv[1]`'s
+    length varied:
+
+        argv[1] len=57 -> 3066.00   len=58 -> 3066.00
+        argv[1] len=59 -> 3059.00        <- +2 characters, -7.00 Ir/call
+
+    `repo_path_bytes` is `len(REPO)`, the term every measured child's `argv`
+    and `AT_EXECFN` carry, so *"same clone location"* becomes checkable from
+    the record instead of assumed.
+
+    ⚠⚠ **AND THE RULE IS STATED AS NECESSARY, NOT SUFFICIENT, ON PURPOSE.**
+    `bytes` also explained a measured period, was believed sufficient, and was
+    not. Three equal fields mean *"this record cannot tell the two draws
+    apart"*, which is what licenses a comparison; they do **not** prove the two
+    draws are the same. **Sufficiency is OPEN.** ✅ What is measured
+    (`.temp/t119/a1_nvars_pin.py`, arm `split`): at fixed `bytes` **and** fixed
+    `nvars`, redistributing the same byte budget over the same number of
+    variables does **not** move the marginal -- so the count is not merely one
+    more thing that happens to vary."""
     try:
         r = subprocess.run(
             [sys.executable, "-c",
-             "import sys;sys.stdout.write(str(len(open("
-             "'/proc/self/environ','rb').read())))"],
+             "import sys;b=open('/proc/self/environ','rb').read();"
+             "sys.stdout.write('%d %d' % (len(b), b.count(b'\\x00')))"],
             capture_output=True, text=True, timeout=60)
-        n = int(r.stdout.strip())
+        n, nvars = (int(x) for x in r.stdout.split())
     except (OSError, ValueError, subprocess.TimeoutExpired):
         return None
     return {"bytes": n,
+            # ⚠ the term `bytes` drops: one envp POINTER SLOT per variable.
+            "nvars": nvars,
+            "envp_stack_bytes": n + 8 * nvars,
             "tuning_vars": {k: v for k, v in sorted(os.environ.items())
-                            if k.startswith(_ENV_TUNING_PREFIXES)}}
+                            if k.startswith(_ENV_TUNING_PREFIXES)},
+            # the clone-location term, so the domain below is checkable.
+            "repo_path_bytes": len(REPO),
+            "domain": (
+                "Comparable ONLY against a record with the same "
+                "`envp_stack_bytes` (= bytes + 8*nvars), the same "
+                "`tuning_vars` and the same `repo_path_bytes`. That is a "
+                "NECESSARY condition, not a proved sufficient one: `bytes` "
+                "alone was believed sufficient and TASK_114 falsified it at "
+                "+-7 Ir/call. argv beyond the repo prefix, and anything else "
+                "on the initial stack, are not recorded here. When the three "
+                "differ, compare `kernel_exclusive_ir` in results/pNN-*.json "
+                "instead -- structurally immune, 0 of 288 triples moved.")}
 
 
 def _callgrind_total(binary, arg, outfile):
@@ -3482,6 +3596,37 @@ _INCLUDE_LIT_RE = re.compile(
     re.S)
 _INCLUDE_ANY_RE = re.compile(r"\binclude!\s*[(\[{]")
 
+# `#[path = "..."]`, and the two other spellings rustc accepts for the SAME
+# attribute (TASK_114 M4, closed at TASK_119):
+#
+#     #[path = "h.rs"]                       the template's spelling
+#     #[path = r"h.rs"]                      a RAW string literal
+#     #[cfg_attr(all(), path = "h.rs")]      `path` nested in another attribute
+#
+# ⚠⚠ **WHY THIS HAD TO BE GENERALISED RATHER THAN LEFT AS A RESIDUAL, AND IT IS
+# A DESIGN ARGUMENT, NOT WHACK-A-MOLE.** `_path_includes`'s two limbs divide the
+# work as *"dep-info is EXACT for what rustc resolves, which is every attribute
+# spelling -- and attribute spellings are where the regex kept losing"*.
+# **That division FAILS INSIDE `verus!{}`**, where rustc cannot expand the macro
+# and dep-info returns nothing, so the regex stands alone. TASK_114 composed the
+# two failure families TASK_107 had measured separately and got four routes the
+# UNION misses -- and three of them are just these spellings written one
+# construct deeper. So the regex must be spelling-insensitive **wherever** the
+# other limb can go blind, which is exactly what this covers.
+#
+# ⚠ **ANCHORED TO AN ATTRIBUTE ON PURPOSE.** The obvious broadening -- match
+# `path = "..."` anywhere in the raw text -- is UNSAFE here, because
+# `_path_includes` reads RAW text (comments included, deliberately) and the
+# emitted file set is then SCANNED by stages that FAIL the gate. A doc comment
+# reading `path = "spec.md"` would pull `spec.md` into `_scan_unsafe_sites`,
+# which would find the word `unsafe` in prose and turn the gate red. The `#[`
+# anchor keeps the over-approximation inside a construct that is at least
+# attribute-shaped.
+_PATH_ATTR_RE = re.compile(
+    r"#!?\[[^\]]*?\bpath\s*=\s*"
+    r"(?:r(?P<hashes>\#*)\"(?P<raw>.*?)\"(?P=hashes)|\"(?P<plain>[^\"]*)\")",
+    re.S)
+
 
 def _include_literals(txt, code=None):
     """The string literal argument of every `include!` in `txt`, plus the count
@@ -3650,15 +3795,17 @@ def _path_includes(pdir, srcs, errors=None):
         R5      #[path] mod              yes            yes         yes
         R6      #[path]-of-#[path]       yes            yes         yes
         R7      macro_rules! -> #[path]  yes            yes         yes
-        R7a     #[cfg_attr(all(),path)]  yes            yes         NO
-        R7b     #[path = r"h.rs"]        yes            yes         NO
-        R7c     mod x { mod m; }         yes            yes         NO
+        R7a     #[cfg_attr(all(),path)]  yes            yes         NO -> yes
+        R7b     #[path = r"h.rs"]        yes            yes         NO -> yes
+        R7c     mod x { mod m; }         yes            yes         NO -> yes
         N1      #[path] INSIDE verus!{}  yes            NO          yes
         N2      include! INSIDE verus!{} yes            NO          yes
         N3      #[cfg(slb_twin)] #[path] yes            NO*         yes
         CONTROL no include at all         -              -           -
 
     * with `--cfg slb_twin` set, dep-info does list it; without, it does not.
+    ⚠ The `NO -> yes` cells are TASK_119's; the table as TASK_107 measured it
+    read `NO`. See the residuals below for what is still `NO`.
 
     **N1 and N2 are the finding, and they are new.** rustc cannot expand the
     `verus!` proc macro (`error: cannot find macro 'verus' in this scope`), so
@@ -3675,10 +3822,70 @@ def _path_includes(pdir, srcs, errors=None):
         over-approximating a *file set* is the safe direction (this docstring's
         own rule, unchanged). That is exactly what covers N1/N2/N3.
 
-    Union of the two: 13 of 13 routes. Either alone: 10 of 13.
+    ~~Union of the two: 13 of 13 routes. Either alone: 10 of 13.~~
     ⚠ **On the 26 shipped patterns the union is a NO-OP** -- dep-info adds 0
     files and misses 0 (`.temp/t107/a2_census.py`), so this is latent, like
     every earlier limb of this walk.
+
+    ⚠⚠ **`13 OF 13` WAS TRUE OF THE TABLE AND FALSE OF THE PROBLEM (TASK_114
+    M4).** The table has two failure families -- the regex loses on attribute
+    spellings, dep-info loses on anything inside `verus!{}` -- and **no row
+    composes them**. Compose them and the union misses four:
+
+        N7aV  #[cfg_attr(all(), path = "h.rs")] mod m;   inside verus!{}
+        N7bV  #[path = r"h.rs"] mod m;                   inside verus!{}
+        N7cV  mod x { mod m; }   (leaf x/m.rs)           inside verus!{}
+        N8V   macro_rules! taking the path as an ARGUMENT (`#[path = $p]`,
+              so no literal ever sits beside `path` in the raw text),
+                                                         inside verus!{}
+
+    Each reaches `1 verified, 0 errors` with the leaf's `unsafe` unscanned --
+    TASK_098 §4A's shape at a fourteenth, fifteenth, sixteenth and seventeenth
+    spelling. ⚠ **N8 and N9 (the same macro, and a SYMLINKED leaf, at TOP
+    level) are both CAUGHT, by dep-info** -- which is the division of labour
+    working, and the reason only the `verus!{}` column matters.
+
+    **TASK_119 closed the first three, and the argument is a design one rather
+    than another round of whack-a-mole:** the division of labour above says the
+    regex may lose on attribute spellings *because dep-info is exact for them*,
+    and **that premise is void inside `verus!{}`, where the regex stands
+    alone.** So the regex is now spelling-insensitive (`_PATH_ATTR_RE`, raw
+    strings and nested attributes) and resolves one level of inline `mod`
+    nesting. ✅ Two measurements, because the change has two claims:
+    `.temp/t119/c1_union_routes.py` shows the three routes are now FOUND and
+    N8V still is not, with both controls holding; `.temp/t119/c2_census.py`
+    shows the widening is a **strict no-op on the shipped tree** -- all 26
+    patterns' union byte-identical to what `git show HEAD:harness/check.py`
+    computes, still exactly `['common/driver.rs']`, and its own must-fire arm
+    proves the two implementations really differ.
+
+    ⚠⚠ **NAMED RESIDUALS -- WHAT IS STILL UNCOVERED, SO THE NEXT READER DOES
+    NOT HAVE TO REDISCOVER IT.** This project has found nine routes across
+    three tasks plus four more at TASK_114, **each after the previous table
+    read as exhaustive**, so the honest posture is a named list, not a claim of
+    completeness:
+
+    1. **N8V -- a `#[path]` whose value arrives as a MACRO ARGUMENT, inside
+       `verus!{}`.** Structurally different from the other three: there is no
+       literal in the text to resolve, so no regex can see it and the fix is
+       not a spelling. It is the `include!(concat!(...))` class, which
+       `_check_opaque_includes` refuses outright -- and the same refusal cannot
+       be applied here without failing the gate on every `macro_rules!` in the
+       tree. **Open.**
+    2. **Inline `mod` nesting DEEPER THAN ONE LEVEL** (`mod a { mod b { mod m;
+       } }` -> `a/b/m.rs`), inside `verus!{}`. One level is covered above; two
+       is not, and the correct fix is brace tracking rather than a wider
+       over-approximation.
+    3. **Anything requiring `cfg` evaluation that `_DEP_INFO_CFGS` does not
+       enumerate**, when the construct also sits inside `verus!{}`. The regex
+       limb is cfg-BLIND, which is what covers N3 today; the residual is any
+       route where BOTH limbs need the cfg.
+
+    ⚠ **All three are DELIBERATE-AUTHOR routes, and `.memory/02-bench-rules.md`
+    settles the posture: the gate's threat is an honest mistake.** All 26
+    patterns spell this one way -- `#[path = "../../common/driver.rs"] mod
+    driver;`, at top level, copied from the p01 template -- and nobody reaches
+    for a macro-argument module path by accident.
 
     A dep-info run that produces no `.d` at all is **not** silently absorbed:
     `errors` collects it and `_check_opaque_includes` turns it into a gate
@@ -3723,16 +3930,35 @@ def _path_includes(pdir, srcs, errors=None):
         # blanking erases. A commented-out `#[path]` therefore gets scanned too,
         # which is the safe direction.
         txt = open(path).read()
-        cand = re.findall(r"#\[\s*path\s*=\s*\"([^\"]+)\"\s*\]", txt)
+        cand = [m.group("raw") if m.group("raw") is not None else m.group("plain")
+                for m in _PATH_ATTR_RE.finditer(txt)]
         cand += _include_literals(txt)[0]
         # ...and a plain `mod foo;`, which resolves to a sibling file rather than
         # to a declared path. No pattern uses that today; leaving it out would
         # mean an `unsafe` helper or a `#[cfg(slb_twin)]` item in `foo.rs` was
         # outside both scans, which is the whole shape of the bug this exists to
         # close.
-        for m in re.finditer(r"\bmod\s+([A-Za-z_][A-Za-z0-9_]*)\s*;",
-                             vparse.blank_noncode(txt)):
-            cand += [m.group(1) + ".rs", os.path.join(m.group(1), "mod.rs")]
+        code = vparse.blank_noncode(txt)
+        # ⚠ `mod x { mod m; }` resolves to `x/m.rs`, NOT to `m.rs` beside the
+        # file -- route N7cV (TASK_114 M4), closed at TASK_119. The declaration
+        # was always FOUND; it was RESOLVED to the wrong path and then dropped
+        # by the `os.path.exists` filter below, which is a miss that looks
+        # exactly like a clean scan. Rather than track brace nesting (a parser),
+        # every inline `mod NAME {` in the file is offered as a candidate
+        # PREFIX, which over-approximates -- the safe direction for a file set,
+        # and the `os.path.exists` filter throws the rest away.
+        # ⚠ ONE LEVEL of nesting. `mod a { mod b { mod m; } }` -> `a/b/m.rs`
+        # is still uncovered; see this function's residuals.
+        # ✅ Strictly a no-op on the shipped tree: `grep -E '\bmod\s+\w+\s*\{'`
+        # over `patterns/**/*.rs` and `common/*.rs` returns NOTHING, so no
+        # prefix is ever generated and the 26-pattern census is unchanged.
+        prefixes = [""] + [m.group(1) for m in
+                           re.finditer(r"\bmod\s+([A-Za-z_][A-Za-z0-9_]*)\s*\{",
+                                       code)]
+        for m in re.finditer(r"\bmod\s+([A-Za-z_][A-Za-z0-9_]*)\s*;", code):
+            for pre in prefixes:
+                cand += [os.path.join(pre, m.group(1) + ".rs"),
+                         os.path.join(pre, m.group(1), "mod.rs")]
         for inc in cand:
             p = os.path.normpath(os.path.join(base, inc))
             if not os.path.exists(p):
@@ -7195,8 +7421,10 @@ def _miri_sysroot():
 def _miri_version():
     """`miri --version`, recorded beside the Miri verdicts.
 
-    TASK_107. Miri runs at its DEFAULT configuration (see `MIRI_FLAGS` for the
-    4.6x measurement that forbids setting `MIRIFLAGS` here), and that default's
+    TASK_107. Miri runs at its DEFAULT configuration (see `MIRI_FLAGS`; the
+    4.6x measurement that was read as forbidding `MIRIFLAGS` here is retracted,
+    and the reason the variable stays unset is now reproducibility rather than
+    speed), and that default's
     address assignment is deterministic **for a given miri** -- so the version
     is the thing a future reader needs in order to know whether a green row is
     reproducible. It is also, concretely, what went stale:
@@ -7392,12 +7620,29 @@ def check_published_tables(pdir, rep, contract_sha):
     structural rather than remembered -- the iteration IS the pattern list, and
     a pattern with no table fails its own gate.
 
-    **Both failure modes fail, and each names its one-command fix.** The fix is
-    the same command in both cases and it does not need a green run: `check.py`
-    writes `results/gate/<pattern>.json` even when the verdict is FAIL (only a
-    `--skip`/`--no-*` PARTIAL run is diverted to `.temp/`), so the loop is
-    *gate -> `harness/report.py pNN` -> gate*, twice, with no re-measure and no
-    `contract_sha256` move.
+    **Each failure mode names its own fix, and ⚠ THEY ARE NOT THE SAME FIX --
+    this docstring said they were, and the `MISSING` half was wrong** (TASK_114
+    m8, fixed at TASK_119; `PROTOCOL.md` rule 13's shape again, a summary line
+    above a body that had moved on).
+
+      * `STALE` / `UNPINNED` -- the measurement record already exists, so the
+        loop really is *gate -> `harness/report.py pNN` -> gate*, twice, with
+        no re-measure and no `contract_sha256` move. `check.py` writes
+        `results/gate/<pattern>.json` even when the verdict is FAIL (only a
+        `--skip`/`--no-*` PARTIAL run is diverted to `.temp/`), so the middle
+        step does not need a green run.
+      * `MISSING` -- ⚠ **the two-command loop DEADLOCKS on exactly the case
+        this verdict is about.** `report.py::main` calls `load(pid)` first and
+        `load` requires `results/pNN-*.json`, **`measure.py`'s** record,
+        discriminated by carrying a `cells` list. The gate record is read only
+        by `report.py::read_gate_audit`, for the audit section. On a brand-new
+        pattern there is no measurement record, so:
+
+            $ python3 harness/report.py p99
+            report.py: p99 matches [] in results/
+
+        The working loop is three commands: `harness/measure.py pNN` (the full
+        matrix), `harness/report.py pNN`, gate.
 
     **"Could this happen by accident?"** -- the threat model's first question
     (`.memory/02-bench-rules.md`). It happened by accident twice, which is the
@@ -7414,11 +7659,17 @@ def check_published_tables(pdir, rep, contract_sha):
                  f"results/tables/{pat}.md does NOT EXIST. The pattern is "
                  f"built and gated and a reader has nowhere to find its "
                  f"result -- which is `PROTOCOL.md` rule 1's fourth step, and "
-                 f"`p23` shipped exactly this way with nothing noticing. Fix: "
-                 f"`harness/report.py {pat.split('-')[0]}`. It renders FROM "
-                 f"`results/gate/{pat}.json`, which this run writes even if "
-                 f"the verdict is FAIL, so run it after this run and gate "
-                 f"again.")
+                 f"`p23` shipped exactly this way with nothing noticing. "
+                 f"Fix, and it is THREE commands here, not two: "
+                 f"`harness/measure.py {pat.split('-')[0]}` (the full matrix), "
+                 f"then `harness/report.py {pat.split('-')[0]}`, then gate "
+                 f"again. ⚠ `report.py` renders from `results/"
+                 f"{pat.split('-')[0]}-*.json` -- MEASURE.PY's record, which "
+                 f"it loads FIRST and exits without if it is absent -- and NOT "
+                 f"from `results/gate/{pat}.json`, which it reads only for the "
+                 f"stage-0b audit section. On a brand-new pattern, which is "
+                 f"the case this message is about, there is no measurement "
+                 f"record yet and `report.py` cannot run at all.")
         return out
     cited = re.findall(_TABLE_CONTRACT_RE.format(pat=re.escape(pat)),
                        open(tbl).read())
@@ -7586,7 +7837,10 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names,
            # own `MIRIFLAGS` the record must say the gate ignored it, or the
            # recorded string would be a claim about a run that did not happen.
            # `null` means the variable is UNSET in the child, which is not the
-           # same configuration as `""` -- measured 74 s against 340 s on p42.
+           # same configuration as `""` -- the two time ~4.6x apart on p42.
+           # ⚠ WHICH of the two is slower is not a property of `MIRIFLAGS`;
+           # TASK_114 measured it the other way round from TASK_107 and a decoy
+           # variable behaves the same. See `MIRI_FLAGS` and `runs[].seconds`.
            "miriflags": " ".join(MIRI_FLAGS) or None,
            "miriflags_removed_ambient": os.environ.get("MIRIFLAGS"),
            # The thing that actually moved between TASK_102 and TASK_107. Miri's
@@ -7696,9 +7950,14 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names,
     print(f"    Miri is REQUIRED because: " + "; ".join(why_required))
     print(f"    MIRIFLAGS = "
           + (" ".join(MIRI_FLAGS) if MIRI_FLAGS else
-             "<UNSET>  -- deliberately, not by omission: setting it AT ALL, "
-             "even to \"\", costs 4.6x on p42 (74 s -> 340 s, past the "
-             f"{MIRI_TIMEOUT}s budget). See MIRI_FLAGS.")
+             "<UNSET>  -- deliberately, not by omission: the gate must not "
+             "inherit the invoking shell's flag set. ⚠ It does NOT pin the "
+             "run: p42's Miri row is a two-state function of the environment "
+             f"block, ~75 s vs ~340 s with a {MIRI_TIMEOUT}s budget between "
+             "them, and setting or unsetting this variable CHANGES that state "
+             "without controlling it (mechanism OPEN, and two published ones "
+             "were wrong). Read `miri.runs[].seconds` in the gate record for "
+             "which state this run got. See MIRI_FLAGS.")
           + (f"   (REMOVING the ambient MIRIFLAGS="
              f"{os.environ['MIRIFLAGS']!r})"
              if os.environ.get("MIRIFLAGS") else "")
@@ -7858,20 +8117,29 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names,
                 # ⚠ `MIRIFLAGS` is REMOVED when `MIRI_FLAGS` is empty, and SET
                 # (never appended) when it is not. Both halves matter and the
                 # first is the surprising one: `MIRIFLAGS=""` is a DIFFERENT
-                # configuration from `MIRIFLAGS` unset -- 339.8 s against 74.0 s
-                # on p42's `adversarial-wincap.bin` -- so `menv["MIRIFLAGS"] =
-                # " ".join(())` would have quietly cost 4.6x and blocked a row.
-                # An ambient value from the invoking shell is discarded for the
-                # same reason and recorded in `miriflags_removed_ambient`.
+                # configuration from `MIRIFLAGS` unset -- the two time ~4.6x
+                # apart on p42's `adversarial-wincap.bin` -- so
+                # `menv["MIRIFLAGS"] = " ".join(())` would NOT be equivalent to
+                # popping the key. ⚠⚠ **WHICH of the two is the slow one is
+                # NOT a property of `MIRIFLAGS`**: `TASK_114` measured the
+                # assignment the other way round from `TASK_107`, three repeats
+                # each way, and a DECOY variable unrelated to Miri behaves
+                # identically. See `MIRI_FLAGS`; the mechanism is OPEN and the
+                # per-row wall time is recorded so the state is at least
+                # visible. An ambient value from the invoking shell is
+                # discarded so the configuration belongs to `check.py` and not
+                # to the shell, and is recorded in `miriflags_removed_ambient`.
                 menv = dict(os.environ)
                 menv.pop("MIRIFLAGS", None)
                 if MIRI_FLAGS:
                     menv["MIRIFLAGS"] = " ".join(MIRI_FLAGS)
+                t0 = time.time()
                 r = subprocess.run(
                     [MIRI_BIN, "--sysroot", sysroot, "--edition", "2021",
                      "-Zmiri-disable-isolation", spath, "--", probe],
                     capture_output=True, text=True, timeout=MIRI_TIMEOUT,
                     cwd=pdir, env=menv)
+                secs = round(time.time() - t0, 1)
             except subprocess.TimeoutExpired:
                 why = (f"miri did not finish within {MIRI_TIMEOUT}s. `n_iters` "
                        f"is clamped to {MIRI_PROBE_ITERS} but the payload is "
@@ -7879,14 +8147,76 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names,
                        f"under interpretation. This input is unchecked; the "
                        f"others are not.")
                 rep.block("miri", f"{s} on {nm}", why)
-                runs.append(dict(source=s, input=nm, blocked=why))
+                # `seconds` here is the CAP, not a measurement -- see the key's
+                # comment below for why a Miri wall time is recorded at all.
+                runs.append(dict(source=s, input=nm, blocked=why,
+                                 seconds=float(MIRI_TIMEOUT)))
                 continue
             ub = "Undefined Behavior" in r.stderr or "error: unsupported" in r.stderr
+            # ⚠ TASK_118 §E, from TASK_116 MINOR 6. A Miri LEAK is neither
+            # "Undefined Behavior" nor "error: unsupported", so `ub` read
+            # `False` for one and the leak was caught only by the NEXT branch,
+            # on the exit code. The VERDICT was right; the RECORD showed
+            # nothing. A reader auditing `results/gate/*.json` by the `ub` key
+            # -- the key you would search -- could not tell a leaking tree from
+            # a clean one, and the pattern where that matters most is p42,
+            # whose entire subject is a leak and whose Miri run is the only
+            # mechanical leak check either of its top two rungs has.
+            #
+            # `leak` is recorded UNCONDITIONALLY, so the record answers the
+            # question on every row rather than only on the failing ones, and
+            # it gets its own failure branch ABOVE the exit-code branch so the
+            # message names what happened instead of saying "miri exited 1,
+            # model expects 0".
+            #
+            # ⚠ It also closes a small hole rather than only improving prose,
+            # and the hole passes `.memory/02-bench-rules.md`'s "could this
+            # happen by accident?" test: on an input whose model declares a
+            # NON-ZERO expected exit, a leaking rung whose exit happened to
+            # equal that code used to reach `got != want` and PASS. No
+            # committed row is in that position today -- 186 rows expect 0,
+            # five expect 5, one expects 7, and no committed stderr contains
+            # `memory leaked` -- so this changes no shipped verdict. It is a
+            # trap laid for the next pattern, not a repair of this one.
+            #
+            # Regression control, with an arm that MUST FIRE (it runs THIS
+            # `check_miri` and `git show <pre-fix>:harness/check.py`'s side by
+            # side on a mutant of p42's `unsafe.rs` and shows the old record
+            # had no `leak` key at all while its `ub` read False):
+            # `.temp/t119/miri_leak_key.py`.
+            # ⚠ It is written to run from EITHER `.temp/` or a pattern's
+            # `controls/`, and `TASK_118` intended it for
+            # `patterns/p42-goto-cleanup/controls/`. TASK_119 was forbidden to
+            # add files under `patterns/`, so promoting it is one `git mv` and
+            # one `check.py p42` -- `controls/*.py` is in the gate record's
+            # `source_sha256` and NOT in `measure.py::measurement_sources`.
+            leak = "memory leaked" in r.stderr
             got = r.stdout.strip()
             want = (sbg(mod, "expected_stdout") or "").strip()
             want_exit = sbg(mod, "expected_exit")
             rec = dict(source=s, input=nm, exit=r.returncode,
-                       expected_exit=want_exit, ub=ub,
+                       expected_exit=want_exit, ub=ub, leak=leak,
+                       # ⚠⚠ TASK_119 §B, from TASK_114 B2.3. WALL CLOCK, AND
+                       # IT IS HERE FOR ONE REASON: p42's Miri row is a
+                       # TWO-STATE function of the environment block -- ~75 s
+                       # against ~340 s, 4.6x, reproduced four times each way
+                       # -- and `MIRI_TIMEOUT` sits at 180 s BETWEEN the two
+                       # states. So the same source, the same input and the
+                       # same interpreter can be a green row or a BLOCKED one
+                       # depending on the invoking shell, and `miriflags`,
+                       # `miriflags_removed_ambient` and `miri_version` are
+                       # IDENTICAL in both states: the record could not say
+                       # which one you got. The mechanism is OPEN and this
+                       # project has already published TWO wrong ones for it
+                       # ("seed-vs-seed", then "`MIRIFLAGS` presence"), so
+                       # this key does not explain the state -- it makes the
+                       # state VISIBLE, which is the whole claim.
+                       # ⚠ It is deliberately the only wall-clock number in
+                       # the gate record, so it will differ on every re-gate.
+                       # That churn is the price of the row above being
+                       # readable at all; nothing compares it, nothing hashes
+                       # it, and no verdict depends on it.
+                       seconds=secs,
                        stdout=got, model_stdout=want,
                        stderr=re.sub(r"\s+", " ", r.stderr.strip())[:400])
             # TASK_078, from TASK_077_REVIEW m4: the record has to show what
@@ -7926,6 +8256,11 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names,
             if ub:
                 rep.fail("miri", f"{s} on {nm} (n_iters={MIRI_PROBE_ITERS}): "
                                  f"Miri reports UB -- {rec['stderr'][:300]}")
+            elif leak:
+                rep.fail("miri", f"{s} on {nm} (n_iters={MIRI_PROBE_ITERS}): "
+                                 f"Miri reports a MEMORY LEAK at process exit "
+                                 f"(miri exited {r.returncode}, model expects "
+                                 f"{want_exit}) -- {rec['stderr'][:300]}")
             elif r.returncode != want_exit:
                 rep.fail("miri", f"{s} on {nm}: miri exited {r.returncode}, "
                                  f"model expects {want_exit} -- "
@@ -8191,20 +8526,36 @@ def main():
                              "collapse_tightest_margin":
                                  slopes.pop("_tightest_margin", None)},
         "identity": identity,
-        # TASK_107 §D (decided TASK_103): WHICH DRAW THIS RUN TOOK on the axis
-        # `marginal_ir_per_call` moves along. `-O3 isolated` is NOT invariant --
-        # it moves +-7 per rung with the length of the environment block, and
-        # the pair swing is 14 -- so "re-run the gate and compare" is not a
-        # reproduction test unless the two runs' environments are known.
-        # The rule this key enables:
-        #   same `bytes` AND same `tuning_vars` => the marginal must match
-        #       EXACTLY, and a mismatch is a real change;
-        #   different `bytes`                   => compare `kernel_exclusive_ir`
-        #       (in `results/pNN-*.json`, structurally immune: 0 of 288 triples
-        #       moved) or re-run at the recorded length;
-        #   same `bytes`, different `tuning_vars` => NOT comparable at all.
-        #       Measured: +486.00 Ir/call at an identical block length.
-        # ⚠ It records; it does not pin. See `_env_block`.
+        # TASK_107 §D (decided TASK_103), CORRECTED AT TASK_119 from TASK_114
+        # B1: WHICH DRAW THIS RUN TOOK on the axis `marginal_ir_per_call` moves
+        # along. `-O3 isolated` is NOT invariant -- it moves +-7 per rung with
+        # the initial stack layout, and the pair swing is 14 -- so "re-run the
+        # gate and compare" is not a reproduction test unless the two runs'
+        # environments are known.
+        #
+        # ⚠⚠ THIS COMMENT USED TO SAY `same bytes AND same tuning_vars => the
+        # marginal must match EXACTLY`, AND THAT RULE IS FALSE. It is now in 26
+        # committed records. TASK_114 measured 3059/3059/3066/3066 at a
+        # byte-identical `bytes = 3520` with identical (empty) `tuning_vars`,
+        # varying only the NUMBER of variables -- period 4 in the count, being
+        # the 32-byte period over the 8 bytes of one envp POINTER SLOT, which
+        # `len(/proc/self/environ)` does not contain. See `_env_block`.
+        #
+        # The rule the key enables, restated on `envp_stack_bytes`
+        # (= `bytes + 8*nvars`) and as a NECESSARY condition only:
+        #   any of `envp_stack_bytes` / `tuning_vars` / `repo_path_bytes`
+        #       differs  => the two runs took DIFFERENT draws and the marginals
+        #       are NOT comparable. Compare `kernel_exclusive_ir` (in
+        #       `results/pNN-*.json`, structurally immune: 0 of 288 triples
+        #       moved) or re-run at the recorded layout. Measured sizes:
+        #       +-7 Ir/call for the layout terms, +486.00 Ir/call for
+        #       `tuning_vars` at an identical block length.
+        #   all three equal => this record CANNOT TELL THE TWO DRAWS APART, so
+        #       a mismatch is worth investigating as a real change. ⚠ That is
+        #       NOT a proof that the draws are identical: `bytes` alone was
+        #       believed sufficient and was falsified. SUFFICIENCY IS OPEN.
+        # ⚠ It records; it does not pin. See `_env_block` for the domain, which
+        #   the record now also carries as `marginal_ir_env.domain`.
         "marginal_ir_env": slopes.pop("_env_block", None),
         "marginal_ir_per_call": slopes,
         "verus": verus_res,

@@ -174,12 +174,12 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "88d1ec48e352e782755381936ea6400842215be69a005650d79114de6a3edb14",
+    "harness/check.py": "63b72bdd4aa7f3e4bd24867b5417056e4dac9321a3ba6df32ade745a3aa3eaee",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
-    "harness/limbs.py": "0c663d4d14806faa88310f7cf523a9ea7f75f42a051ee03572ab3c88b11c06e9",
+    "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
-    "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+    "harness/report.py": "1da5d38446d378f3da3d7d3c30bdb303d240fe32aefb66335f0adc8d6552df4f",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
     "patterns/p11-nul-scan/NOTES.md": "33505806da6d92e4f621d2a0e51eb2c022fcff356ec63f7ee3021ca85ed367e0",
     "patterns/p11-nul-scan/README.md": "1ee4371f8cac420d963d490645f39321b8193ae16e309334d01ab6191bcd9d44",
@@ -267,10 +267,14 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3269,
+    "bytes": 3264,
+    "nvars": 48,
+    "envp_stack_bytes": 3648,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
-    }
+    },
+    "repo_path_bytes": 33,
+    "domain": "Comparable ONLY against a record with the same `envp_stack_bytes` (= bytes + 8*nvars), the same `tuning_vars` and the same `repo_path_bytes`. That is a NECESSARY condition, not a proved sufficient one: `bytes` alone was believed sufficient and TASK_114 falsified it at +-7 Ir/call. argv beyond the repo prefix, and anything else on the initial stack, are not recorded here. When the three differ, compare `kernel_exclusive_ir` in results/pNN-*.json instead -- structurally immune, 0 of 288 triples moved."
   },
   "marginal_ir_per_call": {
     "c-clang/O0/isolated/small.bin": 22994.13,
@@ -1299,7 +1303,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==1817571==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000078 at pc 0x5645db0d1472 bp 0x7ffda0d92670 sp 0x7ffda0d91e18 READ of size 21 at 0x504000000078 thread T0 #0 0x5645db0d1471 in __interceptor_strlen.part.0 (",
+      "diagnostic": "================================================================= ==2243347==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000078 at pc 0x55c6f6646472 bp 0x7ffd9b7ab800 sp 0x7ffd9b7aafa8 READ of size 21 at 0x504000000078 thread T0 #0 0x55c6f6646471 in __interceptor_strlen.part.0 (",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1321,7 +1325,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==1817575==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d2 at pc 0x55563b7e6472 bp 0x7ffe6245de30 sp 0x7ffe6245d5d8 READ of size 13 at 0x5070000000d2 thread T0 #0 0x55563b7e6471 in __interceptor_strlen.part.0 (",
+      "diagnostic": "================================================================= ==2243350==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d2 at pc 0x5579dbd15472 bp 0x7ffea7d44b20 sp 0x7ffea7d442c8 READ of size 13 at 0x5070000000d2 thread T0 #0 0x5579dbd15471 in __interceptor_strlen.part.0 (",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1401,6 +1405,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "1140207705793675520",
         "model_stdout": "1140207705793675520",
         "stderr": ""
@@ -1411,6 +1417,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.1,
         "stdout": "246272",
         "model_stdout": "246272",
         "stderr": ""
@@ -1421,6 +1429,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "17999038720264241280",
         "model_stdout": "17999038720264241280",
         "stderr": ""
@@ -1431,6 +1441,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.1,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -1441,6 +1453,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "17350591509089579584",
         "model_stdout": "17350591509089579584",
         "stderr": ""
@@ -1451,6 +1465,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 1.8,
         "stdout": "9042906315172504004",
         "model_stdout": "9042906315172504004",
         "stderr": ""
@@ -1461,6 +1477,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.6,
         "stdout": "15741712355948218700",
         "model_stdout": "15741712355948218700",
         "stderr": ""

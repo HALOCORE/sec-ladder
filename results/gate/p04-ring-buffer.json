@@ -98,12 +98,12 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "88d1ec48e352e782755381936ea6400842215be69a005650d79114de6a3edb14",
+    "harness/check.py": "63b72bdd4aa7f3e4bd24867b5417056e4dac9321a3ba6df32ade745a3aa3eaee",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
-    "harness/limbs.py": "0c663d4d14806faa88310f7cf523a9ea7f75f42a051ee03572ab3c88b11c06e9",
+    "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
-    "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+    "harness/report.py": "1da5d38446d378f3da3d7d3c30bdb303d240fe32aefb66335f0adc8d6552df4f",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
     "patterns/p04-ring-buffer/NOTES.md": "8d6932ec83fbb2dda714999e9b52161ae9154613b9f029059086fc6c91de9500",
     "patterns/p04-ring-buffer/README.md": "7f8b543db59dd3f5b8470babbf661d8105ff6b7503fb2fb6eb857acc0f28727e",
@@ -192,10 +192,14 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3269,
+    "bytes": 3264,
+    "nvars": 48,
+    "envp_stack_bytes": 3648,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
-    }
+    },
+    "repo_path_bytes": 33,
+    "domain": "Comparable ONLY against a record with the same `envp_stack_bytes` (= bytes + 8*nvars), the same `tuning_vars` and the same `repo_path_bytes`. That is a NECESSARY condition, not a proved sufficient one: `bytes` alone was believed sufficient and TASK_114 falsified it at +-7 Ir/call. argv beyond the repo prefix, and anything else on the initial stack, are not recorded here. When the three differ, compare `kernel_exclusive_ir` in results/pNN-*.json instead -- structurally immune, 0 of 288 triples moved."
   },
   "marginal_ir_per_call": {
     "c-clang/O0/isolated/small.bin": 14055.0,
@@ -255,8 +259,8 @@
     "safe_naive/O3/isolated/small.bin": 8183.0,
     "safe_naive/O3/isolated/large.bin": 28342.0,
     "safe_naive/O3/isolated/d_ir_d_work": 6.7989881956155145,
-    "safe_naive/O3/whole/small.bin": 9596.0,
-    "safe_naive/O3/whole/large.bin": 33328.0,
+    "safe_naive/O3/whole/small.bin": 9603.0,
+    "safe_naive/O3/whole/large.bin": 33335.0,
     "safe_naive/O3/whole/d_ir_d_work": 8.004047217537943,
     "safe_tuned/O0/isolated/small.bin": 20793.0,
     "safe_tuned/O0/isolated/large.bin": 72381.0,
@@ -267,8 +271,8 @@
     "safe_tuned/O3/isolated/small.bin": 3425.0,
     "safe_tuned/O3/isolated/large.bin": 11724.0,
     "safe_tuned/O3/isolated/d_ir_d_work": 2.7989881956155145,
-    "safe_tuned/O3/whole/small.bin": 3651.0,
-    "safe_tuned/O3/whole/large.bin": 12543.0,
+    "safe_tuned/O3/whole/small.bin": 3658.0,
+    "safe_tuned/O3/whole/large.bin": 12550.0,
     "safe_tuned/O3/whole/d_ir_d_work": 2.998988195615514,
     "unsafe/O0/isolated/small.bin": 43234.0,
     "unsafe/O0/isolated/large.bin": 150859.0,
@@ -1114,6 +1118,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.1,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -1124,6 +1130,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.4,
         "stdout": "66277952",
         "model_stdout": "66277952",
         "stderr": ""
@@ -1134,6 +1142,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.8,
         "stdout": "7455164802910147328",
         "model_stdout": "7455164802910147328",
         "stderr": ""
@@ -1144,6 +1154,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 1.2,
         "stdout": "1412079219607546856",
         "model_stdout": "1412079219607546856",
         "stderr": ""
@@ -1154,6 +1166,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.4,
         "stdout": "12975787801841186814",
         "model_stdout": "12975787801841186814",
         "stderr": ""

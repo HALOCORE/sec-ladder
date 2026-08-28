@@ -79,6 +79,14 @@ Measured by the gate, not by this file — from `results/gate/p23-partition.json
 - **no rung — 0 per-language entry/entries** name a language this pattern ships no rung for; rungs here are `c`, `rust`. Such a key used to be dropped silently, so the declaration read as constraining rungs that do not exist.
 
 
+## What the gate said out loud (reporting only)
+
+From `results/gate/p23-partition.json` — the `loud` and `controls_json` keys, at contract `8251a6762b10`, verdict `PASS`. **These did not fail the gate and are not defects**; they are the conditions `check.py` refuses to be silent about. Each one is a caveat on a number below or on the declaration above.
+
+- **`tcb-unsafe`** — verus.rs:325 `scr_set_unchecked`'s `requires` constrains nothing about ['x'], which its trusted body uses. spec.md justifies it: `x` is a pure VALUE parameter: it is stored into the array and is never used as an address, an index or a length, so there is no precondition a caller could usefully be asked for -- every `u8` is a legal thing to store in a `u8` slot. The two parameters that DO decide whether the unchecked store is defined, `v` and `i`, are both constrained by `i < old(v)@.len()`, which for a `&mut [u8; 64]` reads `i < 64`. This is the parameter-coverage false positive `.memory/04-verus.md` names; p03 was the first pattern to exercise it, p12 the second and p06 the third. On p23 the item carries the WRITE half of the bug: it is called twice per exchange, and the store R1 gets wrong is the one it reaches after its DOWNWARD scan has wrapped `j` -- so this `requires` is what excludes an out-of-bounds write that a missing READ guard, one loop earlier, made reachable. A second conjunct `old(v)@.len() == 64` is deliberately NOT written: for a `&mut [u8; 64]` it is a TAUTOLOGY discharged from the parameter type alone by vstd's `array_len_matches_n`, and p03's gate run refused exactly that draft (p03 NOTES.md 5b).
+- **`tables`** — patterns/p23-partition/controls/sweep_fit.json carries NO staleness pin, so nothing can tell whether its numbers were taken against the sources that are in the tree now. `synthesis/licence.json` is the shape to copy: a top-level `gate_source_sha256` equal to this record's `source_sha256`, written by the generator that emits the file. Until then treat every figure quoted from it as UNDATED.
+
+
 ## Static + executed instructions
 
 `Ir` is **callgrind per-function exclusive** for the kernel symbol. The whole-program total is deliberately absent: it moves with the size of the environment block and does not reproduce across shells (`.memory/03-measurement.md`). Static counts are given raw and padding-excluded; quote the padding-excluded one, and never quote either without the `Ir` beside it.

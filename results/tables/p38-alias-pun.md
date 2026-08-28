@@ -88,6 +88,13 @@ Measured by the gate, not by this file — from `results/gate/p38-alias-pun.json
 - **no rung — 0 per-language entry/entries** name a language this pattern ships no rung for; rungs here are `c`, `rust`. Such a key used to be dropped silently, so the declaration read as constraining rungs that do not exist.
 
 
+## What the gate said out loud (reporting only)
+
+From `results/gate/p38-alias-pun.json` — the `loud` and `controls_json` keys, at contract `314bf2e385d4`, verdict `PASS`. **These did not fail the gate and are not defects**; they are the conditions `check.py` refuses to be silent about. Each one is a caveat on a number below or on the declaration above.
+
+- **`tcb-unsafe`** — verus.rs:271 `sc_set_unchecked`'s `requires` constrains nothing about ['x'], which its trusted body uses. spec.md justifies it: `x` is a pure VALUE parameter -- written into the scratch, never used as an address or a length -- so it needs no precondition. This is the false positive of the parameter-coverage rule that `.memory/04-verus.md` names and that p03 was the first pattern to exercise; p38 is the second.
+
+
 ## Static + executed instructions
 
 `Ir` is **callgrind per-function exclusive** for the kernel symbol. The whole-program total is deliberately absent: it moves with the size of the environment block and does not reproduce across shells (`.memory/03-measurement.md`). Static counts are given raw and padding-excluded; quote the padding-excluded one, and never quote either without the `Ir` beside it.

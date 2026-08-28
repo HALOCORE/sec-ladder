@@ -126,12 +126,12 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "88d1ec48e352e782755381936ea6400842215be69a005650d79114de6a3edb14",
+    "harness/check.py": "63b72bdd4aa7f3e4bd24867b5417056e4dac9321a3ba6df32ade745a3aa3eaee",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
-    "harness/limbs.py": "0c663d4d14806faa88310f7cf523a9ea7f75f42a051ee03572ab3c88b11c06e9",
+    "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
-    "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+    "harness/report.py": "1da5d38446d378f3da3d7d3c30bdb303d240fe32aefb66335f0adc8d6552df4f",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
     "patterns/p36-vtable-dispatch/NOTES.md": "74bcf8415d45da28e457d85a820d0f94af15341b6b41c18e7f75b7acd7a7ab20",
     "patterns/p36-vtable-dispatch/README.md": "e397f6a8022224b1b5abc2e4269ce8bcb2eeed0e974d27e0f7bfe49a45f0e9d5",
@@ -226,10 +226,14 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3269,
+    "bytes": 3264,
+    "nvars": 48,
+    "envp_stack_bytes": 3648,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
-    }
+    },
+    "repo_path_bytes": 33,
+    "domain": "Comparable ONLY against a record with the same `envp_stack_bytes` (= bytes + 8*nvars), the same `tuning_vars` and the same `repo_path_bytes`. That is a NECESSARY condition, not a proved sufficient one: `bytes` alone was believed sufficient and TASK_114 falsified it at +-7 Ir/call. argv beyond the repo prefix, and anything else on the initial stack, are not recorded here. When the three differ, compare `kernel_exclusive_ir` in results/pNN-*.json instead -- structurally immune, 0 of 288 triples moved."
   },
   "marginal_ir_per_call": {
     "c-clang/O0/isolated/small.bin": 5214.93,
@@ -1177,7 +1181,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: index 8 out of bounds for type '<unknown> *[8]' /home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: load of address 0x55a39c87ba80 with insufficient space for a",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: index 8 out of bounds for type '<unknown> *[8]' /home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: load of address 0x56418a9bca80 with insufficient space for a",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1188,7 +1192,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: index 255 out of bounds for type '<unknown> *[8]' /home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: load of address 0x5643fb0c0238 with insufficient space for",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: index 255 out of bounds for type '<unknown> *[8]' /home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: load of address 0x5639da3e0238 with insufficient space for",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1269,6 +1273,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "6285853035030737280",
         "model_stdout": "6285853035030737280",
         "stderr": ""
@@ -1279,6 +1285,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "3304010021055327040",
         "model_stdout": "3304010021055327040",
         "stderr": ""
@@ -1289,6 +1297,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "5837448389729117248",
         "model_stdout": "5837448389729117248",
         "stderr": ""
@@ -1299,6 +1309,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.1,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -1309,6 +1321,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "5701043178212395665",
         "model_stdout": "5701043178212395665",
         "stderr": ""
@@ -1319,6 +1333,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.8,
         "stdout": "1092665795224792872",
         "model_stdout": "1092665795224792872",
         "stderr": ""
@@ -1329,6 +1345,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "17779415044340238852",
         "model_stdout": "17779415044340238852",
         "stderr": ""

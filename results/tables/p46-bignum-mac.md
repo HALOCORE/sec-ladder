@@ -83,6 +83,13 @@ Measured by the gate, not by this file — from `results/gate/p46-bignum-mac.jso
 - **no rung — 0 per-language entry/entries** name a language this pattern ships no rung for; rungs here are `c`, `rust`. Such a key used to be dropped silently, so the declaration read as constraining rungs that do not exist.
 
 
+## What the gate said out loud (reporting only)
+
+From `results/gate/p46-bignum-mac.json` — the `loud` and `controls_json` keys, at contract `43925b2955e0`, verdict `PASS`. **These did not fail the gate and are not defects**; they are the conditions `check.py` refuses to be silent about. Each one is a caveat on a number below or on the declaration above.
+
+- **`tcb-unsafe`** — verus.rs:285 `arr_set_unchecked`'s `requires` constrains nothing about ['x'], which its trusted body uses. spec.md justifies it: `x` is a pure VALUE parameter: it is stored into the scratch and is never used as an address, an index or a length, so there is no precondition a caller could usefully be asked for -- every `T` is a legal thing to store in a `T` slot. The two parameters that DO decide whether the unchecked store is defined, `v` and `i`, are both constrained by `i < old(v)@.len()`, which for a `&mut [T; N]` reads `i < N`. This is the parameter-coverage false positive `.memory/04-verus.md` names; p03 was the first pattern to exercise it, then p12, p06, p14, p27, p38 and p22, and p46 is the eighth. It is the SAME generic item as p22's, character for character.
+
+
 ## Static + executed instructions
 
 `Ir` is **callgrind per-function exclusive** for the kernel symbol. The whole-program total is deliberately absent: it moves with the size of the environment block and does not reproduce across shells (`.memory/03-measurement.md`). Static counts are given raw and padding-excluded; quote the padding-excluded one, and never quote either without the `Ir` beside it.

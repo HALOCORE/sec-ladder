@@ -75,6 +75,13 @@ Measured by the gate, not by this file — from `results/gate/p09-bitset.json`, 
 - **no rung — 0 per-language entry/entries** name a language this pattern ships no rung for; rungs here are `c`, `rust`. Such a key used to be dropped silently, so the declaration read as constraining rungs that do not exist.
 
 
+## What the gate said out loud (reporting only)
+
+From `results/gate/p09-bitset.json` — the `loud` and `controls_json` keys, at contract `ea0295eaea6a`, verdict `PASS`. **These did not fail the gate and are not defects**; they are the conditions `check.py` refuses to be silent about. Each one is a caveat on a number below or on the declaration above.
+
+- **`tcb-unsafe`** — verus.rs:350 `popcount64` is a trusted item with NO precondition. spec.md justifies it: `popcount64` has NO parameter a caller could usefully be constrained on: it takes one `u64` by value and returns the number of its set bits, which is defined for all 2^64 of them. There is no index, no length, no address and no partiality -- so a `requires` here could only be a tautology, and `.memory/04-verus.md` records that a tautological conjunct on a TRUSTED item is exactly the shape that reads as strength and is not (stage 5c-req's probe exists for it). **And note what this item is NOT: it contains no `unsafe`.** It is `external_body` because vstd ships no specification for `u64::count_ones` (`vstd/std_specs/bits.rs` has `trailing_zeros` and `leading_zeros` and nothing else), which is p08's `copy_in` situation -- 'trusted means unchecked by the verifier, not unsafe'. p09 is the first pattern in this project whose trusted item models a **CPU instruction** rather than a memory operation, and the gate's own message ('it is therefore an axiom that the unchecked operation is always defined') is written for the memory case; here the axiom is 'count_ones returns the population count', which is the function's documented contract and is what `slb_twin_popcount64` DISCHARGES by implementing it in checked code with `/ 2` and `% 2` and verifying against the same `ensures`. That twin is the real defence and it is not optional: `verus.twin_obligations` pins it at 2 of the 3 obligations `--cfg slb_twin` adds. NOTES.md 5b's SLB-TRUSTED-ARGUMENT is the human reading of the same three questions.
+
+
 ## Static + executed instructions
 
 `Ir` is **callgrind per-function exclusive** for the kernel symbol. The whole-program total is deliberately absent: it moves with the size of the environment block and does not reproduce across shells (`.memory/03-measurement.md`). Static counts are given raw and padding-excluded; quote the padding-excluded one, and never quote either without the `Ir` beside it.

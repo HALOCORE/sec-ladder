@@ -73,12 +73,12 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "88d1ec48e352e782755381936ea6400842215be69a005650d79114de6a3edb14",
+    "harness/check.py": "63b72bdd4aa7f3e4bd24867b5417056e4dac9321a3ba6df32ade745a3aa3eaee",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
-    "harness/limbs.py": "0c663d4d14806faa88310f7cf523a9ea7f75f42a051ee03572ab3c88b11c06e9",
+    "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
-    "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+    "harness/report.py": "1da5d38446d378f3da3d7d3c30bdb303d240fe32aefb66335f0adc8d6552df4f",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
     "patterns/p05-index-flatten/NOTES.md": "014901768a70174b1d1bb03a65c772ad8df747064679d473144986fb0f4762bd",
     "patterns/p05-index-flatten/README.md": "1d63da6e199fa8b5a981fbbb6fd9c13dbde52530f69632b44e5cea69a05c49c7",
@@ -165,10 +165,14 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3269,
+    "bytes": 3264,
+    "nvars": 48,
+    "envp_stack_bytes": 3648,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
-    }
+    },
+    "repo_path_bytes": 33,
+    "domain": "Comparable ONLY against a record with the same `envp_stack_bytes` (= bytes + 8*nvars), the same `tuning_vars` and the same `repo_path_bytes`. That is a NECESSARY condition, not a proved sufficient one: `bytes` alone was believed sufficient and TASK_114 falsified it at +-7 Ir/call. argv beyond the repo prefix, and anything else on the initial stack, are not recorded here. When the three differ, compare `kernel_exclusive_ir` in results/pNN-*.json instead -- structurally immune, 0 of 288 triples moved."
   },
   "marginal_ir_per_call": {
     "c-clang/O0/isolated/small.bin": 9263.0,
@@ -468,11 +472,11 @@
     "adversarial-dims.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "1448785104484935680",
+        "stdout": "1611804911666891520",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole"
+          "O0/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "0",
@@ -481,7 +485,7 @@
       },
       {
         "exit": 0,
-        "stdout": "17774142252707657216",
+        "stdout": "2280824950749331712",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -494,11 +498,11 @@
       },
       {
         "exit": 0,
-        "stdout": "1831988122968602112",
+        "stdout": "3064171798071281408",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/whole"
+          "O0/whole"
         ],
         "model_exit": 0,
         "model_stdout": "0",
@@ -507,11 +511,11 @@
       },
       {
         "exit": 0,
-        "stdout": "7461495051049588992",
+        "stdout": "9305535361114953728",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/isolated"
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "0",
@@ -522,33 +526,7 @@
     "adversarial-dims.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "10480555632097878272",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "0",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "1171438489063470336",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "0",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "2501008162051042304",
+        "stdout": "16215918963241066240",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -561,7 +539,33 @@
       },
       {
         "exit": 0,
-        "stdout": "8302005302491293440",
+        "stdout": "2835518181592262400",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "7910331878830318592",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "8636515322032513536",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1120,7 +1124,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==1802549==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d4 at pc 0x5571eae037a1 bp 0x7ffd45ee76f0 sp 0x7ffd45ee76e0 READ of size 1 at 0x5070000000d4 thread T0 #0 0x5571eae037a0 in kernel /home/apt/repos_common/",
+      "diagnostic": "================================================================= ==2226854==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d4 at pc 0x55f1050297a1 bp 0x7fff689b4bc0 sp 0x7fff689b4bb0 READ of size 1 at 0x5070000000d4 thread T0 #0 0x55f1050297a0 in kernel /home/apt/repos_common/",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1131,7 +1135,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==1802550==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d8 at pc 0x555de255f7a1 bp 0x7ffec8e3c920 sp 0x7ffec8e3c910 READ of size 1 at 0x5070000000d8 thread T0 #0 0x555de255f7a0 in kernel /home/apt/repos_common/",
+      "diagnostic": "================================================================= ==2226855==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d8 at pc 0x55d84e7247a1 bp 0x7ffdd0c06d10 sp 0x7ffdd0c06d00 READ of size 1 at 0x5070000000d8 thread T0 #0 0x55d84e7247a0 in kernel /home/apt/repos_common/",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1211,6 +1215,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -1221,6 +1227,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.1,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -1231,6 +1239,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.1,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -1241,6 +1251,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.1,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -1251,6 +1263,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 1.1,
         "stdout": "12411506697557515452",
         "model_stdout": "12411506697557515452",
         "stderr": ""
@@ -1261,6 +1275,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.3,
         "stdout": "16632492000719087516",
         "model_stdout": "16632492000719087516",
         "stderr": ""

@@ -106,12 +106,12 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "88d1ec48e352e782755381936ea6400842215be69a005650d79114de6a3edb14",
+    "harness/check.py": "63b72bdd4aa7f3e4bd24867b5417056e4dac9321a3ba6df32ade745a3aa3eaee",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
-    "harness/limbs.py": "0c663d4d14806faa88310f7cf523a9ea7f75f42a051ee03572ab3c88b11c06e9",
+    "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
-    "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+    "harness/report.py": "1da5d38446d378f3da3d7d3c30bdb303d240fe32aefb66335f0adc8d6552df4f",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
     "patterns/p23-partition/NOTES.md": "ff3c176cf8856f82827c3a40f8920491b47d251f28294b353fa87bd2f500b23f",
     "patterns/p23-partition/README.md": "3a98f07ee797b56a6e3744f9225c0d36d0fbdf21fe9a6ac479127cd04c6b1467",
@@ -200,10 +200,14 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3269,
+    "bytes": 3264,
+    "nvars": 48,
+    "envp_stack_bytes": 3648,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
-    }
+    },
+    "repo_path_bytes": 33,
+    "domain": "Comparable ONLY against a record with the same `envp_stack_bytes` (= bytes + 8*nvars), the same `tuning_vars` and the same `repo_path_bytes`. That is a NECESSARY condition, not a proved sufficient one: `bytes` alone was believed sufficient and TASK_114 falsified it at +-7 Ir/call. argv beyond the repo prefix, and anything else on the initial stack, are not recorded here. When the three differ, compare `kernel_exclusive_ir` in results/pNN-*.json instead -- structurally immune, 0 of 288 triples moved."
   },
   "marginal_ir_per_call": {
     "c-clang/O0/isolated/small.bin": 4561.55,
@@ -1200,21 +1204,7 @@
     "adversarial-single.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "2769138190658944",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/isolated",
-          "O3/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "2705683097473408",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "2772663473613696",
+        "stdout": "2770019511397632",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1225,12 +1215,23 @@
         "model_stdout": "2705683097473408",
         "hung": false,
         "diverges": true
-      }
-    ],
-    "adversarial-single.bin/c-clang": [
+      },
       {
         "exit": 0,
-        "stdout": "2764731586965504",
+        "stdout": "2770900832136320",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2705683097473408",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "2773544794352384",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1240,14 +1241,29 @@
         "model_stdout": "2705683097473408",
         "hung": false,
         "diverges": true
-      },
+      }
+    ],
+    "adversarial-single.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "2797397313699423",
+        "stdout": "2797454173101917",
         "stderr": "",
         "signal": null,
         "cells": [
           "O0/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2705683097473408",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "2807034982422528",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "2705683097473408",
@@ -1269,7 +1285,7 @@
       },
       {
         "exit": 0,
-        "stdout": "2814085003851876",
+        "stdout": "2812322419711666",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1540,7 +1556,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:104:23: runtime error: index 18446744073709551615 out of bounds for type 'uint8_t [64]' ================================================================= ==1842108==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f5ca6",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:104:23: runtime error: index 18446744073709551615 out of bounds for type 'uint8_t [64]' ================================================================= ==2269456==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f9f48",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1551,7 +1567,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f90a1200060 with insufficient space for an object of t",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f4ad6400060 with insufficient space for an object of t",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1562,7 +1578,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f12b1800060 with insufficient space for an object of t",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f2ccae00060 with insufficient space for an object of t",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1584,7 +1600,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f1fc3a00060 with insufficient space for an object of t",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f954fe00060 with insufficient space for an object of t",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1666,6 +1682,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.1,
         "stdout": "173125129098254336",
         "model_stdout": "173125129098254336",
         "stderr": ""
@@ -1676,6 +1694,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "629060604746014976",
         "model_stdout": "629060604746014976",
         "stderr": ""
@@ -1686,6 +1706,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "11510318868570833856",
         "model_stdout": "11510318868570833856",
         "stderr": ""
@@ -1696,6 +1718,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "1004594102043967360",
         "model_stdout": "1004594102043967360",
         "stderr": ""
@@ -1706,6 +1730,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.1,
         "stdout": "2929744064",
         "model_stdout": "2929744064",
         "stderr": ""
@@ -1716,6 +1742,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.1,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -1726,6 +1754,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "2542377539464358400",
         "model_stdout": "2542377539464358400",
         "stderr": ""
@@ -1736,6 +1766,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "11920977481274144434",
         "model_stdout": "11920977481274144434",
         "stderr": ""
@@ -1746,6 +1778,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "1266298341757877108",
         "model_stdout": "1266298341757877108",
         "stderr": ""
@@ -1765,7 +1799,7 @@
   },
   "failures": [],
   "notes": [
-    "adversarial-single.bin/c-gcc: opt/mode variants of this rung disagree (2 distinct behaviours)",
+    "adversarial-single.bin/c-gcc: opt/mode variants of this rung disagree (3 distinct behaviours)",
     "adversarial-single.bin/c-clang: opt/mode variants of this rung disagree (4 distinct behaviours)"
   ],
   "loud": [

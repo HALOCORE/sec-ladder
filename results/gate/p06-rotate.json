@@ -149,12 +149,12 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "88d1ec48e352e782755381936ea6400842215be69a005650d79114de6a3edb14",
+    "harness/check.py": "63b72bdd4aa7f3e4bd24867b5417056e4dac9321a3ba6df32ade745a3aa3eaee",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
-    "harness/limbs.py": "0c663d4d14806faa88310f7cf523a9ea7f75f42a051ee03572ab3c88b11c06e9",
+    "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
-    "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+    "harness/report.py": "1da5d38446d378f3da3d7d3c30bdb303d240fe32aefb66335f0adc8d6552df4f",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
     "patterns/p06-rotate/NOTES.md": "74dc7a93c736e599fde01716f37e2922fef4ec66425e6be821f469d80de933fb",
     "patterns/p06-rotate/README.md": "e11771fa40c70b79fc56c482e93a9705c932c45ad1be8f5889e7f8c1a905344d",
@@ -246,10 +246,14 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3269,
+    "bytes": 3264,
+    "nvars": 48,
+    "envp_stack_bytes": 3648,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
-    }
+    },
+    "repo_path_bytes": 33,
+    "domain": "Comparable ONLY against a record with the same `envp_stack_bytes` (= bytes + 8*nvars), the same `tuning_vars` and the same `repo_path_bytes`. That is a NECESSARY condition, not a proved sufficient one: `bytes` alone was believed sufficient and TASK_114 falsified it at +-7 Ir/call. argv beyond the repo prefix, and anything else on the initial stack, are not recorded here. When the three differ, compare `kernel_exclusive_ir` in results/pNN-*.json instead -- structurally immune, 0 of 288 triples moved."
   },
   "marginal_ir_per_call": {
     "c-clang/O0/isolated/small.bin": 6450.28,
@@ -852,19 +856,6 @@
       },
       {
         "exit": 0,
-        "stdout": "231815783968535",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "9876901382056522496",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
         "stdout": "3511210252634240",
         "stderr": "",
         "signal": null,
@@ -883,6 +874,19 @@
         "signal": null,
         "cells": [
           "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "9876901382056522496",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "5308223238817367",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/whole"
         ],
         "model_exit": 0,
         "model_stdout": "9876901382056522496",
@@ -1016,7 +1020,7 @@
       },
       {
         "exit": -6,
-        "stdout": "10496112131661938484",
+        "stdout": "2555547377956327728",
         "stderr": "*** stack smashing detected ***: terminated",
         "signal": 6,
         "cells": [
@@ -1044,6 +1048,19 @@
       },
       {
         "exit": 0,
+        "stdout": "11100670671647842098",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "10384349632315276160",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
         "stdout": "3987011862919846528",
         "stderr": "",
         "signal": null,
@@ -1062,19 +1079,6 @@
         "signal": null,
         "cells": [
           "O3/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "10384349632315276160",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "9012291782166261458",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "10384349632315276160",
@@ -1496,7 +1500,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7fd7cce00060 with insufficient space for an object of type 'u",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7f9c3ae00060 with insufficient space for an object of type 'u",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1507,7 +1511,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 111 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7f980e60008f with insufficient space for an object of type '",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 111 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7f8403e0008f with insufficient space for an object of type '",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1518,7 +1522,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 99999 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7f52212186bf with insufficient space for an object of type",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 99999 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7fe4b90186bf with insufficient space for an object of type",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1600,6 +1604,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "2740765238424441280",
         "model_stdout": "2740765238424441280",
         "stderr": ""
@@ -1610,6 +1616,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.1,
         "stdout": "9445956822181738880",
         "model_stdout": "9445956822181738880",
         "stderr": ""
@@ -1620,6 +1628,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "386494783483055552",
         "model_stdout": "386494783483055552",
         "stderr": ""
@@ -1630,6 +1640,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.1,
         "stdout": "625440272948899648",
         "model_stdout": "625440272948899648",
         "stderr": ""
@@ -1640,6 +1652,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.1,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -1650,6 +1664,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "6027920153752561856",
         "model_stdout": "6027920153752561856",
         "stderr": ""
@@ -1660,6 +1676,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "13843138496235955723",
         "model_stdout": "13843138496235955723",
         "stderr": ""
@@ -1670,6 +1688,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "3896317659393609736",
         "model_stdout": "3896317659393609736",
         "stderr": ""

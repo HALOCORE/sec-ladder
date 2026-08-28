@@ -125,12 +125,12 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "88d1ec48e352e782755381936ea6400842215be69a005650d79114de6a3edb14",
+    "harness/check.py": "63b72bdd4aa7f3e4bd24867b5417056e4dac9321a3ba6df32ade745a3aa3eaee",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
-    "harness/limbs.py": "0c663d4d14806faa88310f7cf523a9ea7f75f42a051ee03572ab3c88b11c06e9",
+    "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
-    "harness/report.py": "d5e8aec61514922aa72634e6282338ab36b186e28825fb1e9c4cc1995347e559",
+    "harness/report.py": "1da5d38446d378f3da3d7d3c30bdb303d240fe32aefb66335f0adc8d6552df4f",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
     "patterns/p38-alias-pun/NOTES.md": "7cdccdd61c2508f6547c9a5f92506b3cb7981760333388a98197f99ceb049e0d",
     "patterns/p38-alias-pun/README.md": "486d16a4d87c1ffb0afe49d2259036f2ac6ddca8e53905302ac1cdb6aba5d7e9",
@@ -163,7 +163,7 @@
     "collapse_rate_ir_per_work": 0.25,
     "collapse_work_unit": "window byte",
     "collapse_floor_min_declarable": 0.015625,
-    "collapse_tightest_margin": 15.169457364341085
+    "collapse_tightest_margin": 15.223565891472868
   },
   "identity": [
     {
@@ -222,10 +222,14 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3269,
+    "bytes": 3264,
+    "nvars": 48,
+    "envp_stack_bytes": 3648,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
-    }
+    },
+    "repo_path_bytes": 33,
+    "domain": "Comparable ONLY against a record with the same `envp_stack_bytes` (= bytes + 8*nvars), the same `tuning_vars` and the same `repo_path_bytes`. That is a NECESSARY condition, not a proved sufficient one: `bytes` alone was believed sufficient and TASK_114 falsified it at +-7 Ir/call. argv beyond the repo prefix, and anything else on the initial stack, are not recorded here. When the three differ, compare `kernel_exclusive_ir` in results/pNN-*.json instead -- structurally immune, 0 of 288 triples moved."
   },
   "marginal_ir_per_call": {
     "c-clang/O0/isolated/small.bin": 4484.72,
@@ -285,8 +289,8 @@
     "safe_naive/O3/isolated/small.bin": 1627.3,
     "safe_naive/O3/isolated/large.bin": 4036.0,
     "safe_naive/O3/isolated/d_ir_d_work": 7.622468354430379,
-    "safe_naive/O3/whole/small.bin": 2464.3,
-    "safe_naive/O3/whole/large.bin": 6314.0,
+    "safe_naive/O3/whole/small.bin": 2471.3,
+    "safe_naive/O3/whole/large.bin": 6321.0,
     "safe_naive/O3/whole/d_ir_d_work": 12.18259493670886,
     "safe_tuned/O0/isolated/small.bin": 6073.3,
     "safe_tuned/O0/isolated/large.bin": 15517.0,
@@ -297,9 +301,9 @@
     "safe_tuned/O3/isolated/small.bin": 1391.3,
     "safe_tuned/O3/isolated/large.bin": 3350.0,
     "safe_tuned/O3/isolated/d_ir_d_work": 6.198417721518988,
-    "safe_tuned/O3/whole/small.bin": 838.3,
-    "safe_tuned/O3/whole/large.bin": 1956.86,
-    "safe_tuned/O3/whole/d_ir_d_work": 3.539746835443038,
+    "safe_tuned/O3/whole/small.bin": 845.3,
+    "safe_tuned/O3/whole/large.bin": 1963.84,
+    "safe_tuned/O3/whole/d_ir_d_work": 3.5396835443037973,
     "unsafe/O0/isolated/small.bin": 12615.3,
     "unsafe/O0/isolated/large.bin": 32667.0,
     "unsafe/O0/isolated/d_ir_d_work": 63.45474683544304,
@@ -941,11 +945,11 @@
     "adversarial-oob.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "17419995405950058309",
+        "stdout": "1982327192679384777",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/isolated"
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "8516071857945885891",
@@ -954,11 +958,11 @@
       },
       {
         "exit": 0,
-        "stdout": "5744869586338451779",
+        "stdout": "3071543001371824714",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/whole"
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "8516071857945885891",
@@ -1109,6 +1113,19 @@
     "adversarial-stale.bin/c-gcc": [
       {
         "exit": 0,
+        "stdout": "10267404686224950985",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "10509230270850152637",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
         "stdout": "10509230270850152637",
         "stderr": "",
         "signal": null,
@@ -1123,24 +1140,11 @@
       },
       {
         "exit": 0,
-        "stdout": "13781830432448902571",
+        "stdout": "9607494399120011611",
         "stderr": "",
         "signal": null,
         "cells": [
           "O3/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "10509230270850152637",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "308349221382915945",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "10509230270850152637",
@@ -1425,7 +1429,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7f1285d00220 with insufficient space for an object",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7f2c9a900220 with insufficient space for an object",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1447,7 +1451,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7fc441d00220 with insufficient space for an object",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7f9683100220 with insufficient space for an object",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1540,6 +1544,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "6581868491597916352",
         "model_stdout": "6581868491597916352",
         "stderr": ""
@@ -1550,6 +1556,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "11326724325740216384",
         "model_stdout": "11326724325740216384",
         "stderr": ""
@@ -1560,6 +1568,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "12076043519713253568",
         "model_stdout": "12076043519713253568",
         "stderr": ""
@@ -1570,6 +1580,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "15593837206692087616",
         "model_stdout": "15593837206692087616",
         "stderr": ""
@@ -1580,6 +1592,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.1,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -1590,6 +1604,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "3736053323538472396",
         "model_stdout": "3736053323538472396",
         "stderr": ""
@@ -1600,6 +1616,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.3,
         "stdout": "14630675597461656064",
         "model_stdout": "14630675597461656064",
         "stderr": ""
@@ -1610,6 +1628,8 @@
         "exit": 0,
         "expected_exit": 0,
         "ub": false,
+        "leak": false,
+        "seconds": 0.2,
         "stdout": "10006549040005309440",
         "model_stdout": "10006549040005309440",
         "stderr": ""

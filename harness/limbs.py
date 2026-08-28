@@ -66,8 +66,6 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(REPO, 'harness'))
 import vparse
 
-TWIN_PREFIX = "slb_twin_"
-TWIN_CFG = "slb_twin"
 # ⚠⚠ **IMPORTED, NOT COPIED -- and it was a COPY, and the copy was WRONG.**
 # This tuple read
 #
@@ -87,6 +85,13 @@ TWIN_CFG = "slb_twin"
 # name cannot. (`check.py` does not import `limbs.py`, so there is no cycle.)
 import check as _check                                          # noqa: E402
 TWIN_BANNED = _check._TWIN_BANNED
+# ⚠ **AND `TWIN_PREFIX`/`TWIN_CFG` WERE STILL COPIES, TWO LINES ABOVE THE
+# COMMENT SAYING WHY COPIES DRIFT** (TASK_114 m9, imported at TASK_119). They
+# agreed with `check.py:TWIN_PREFIX`/`TWIN_CFG` at the time -- so this was
+# latent, not a live defect -- but that is exactly what `TWIN_BANNED` was for
+# 51 tasks. TASK_107 fixed one of three copies in this block and left two.
+TWIN_PREFIX = _check.TWIN_PREFIX
+TWIN_CFG = _check.TWIN_CFG
 
 
 def contract(pdir):

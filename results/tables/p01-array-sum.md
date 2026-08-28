@@ -47,6 +47,14 @@ Measured by the gate, not by this file — from `results/gate/p01-array-sum.json
 This declaration backticks **no spelling at all**, so the named-spelling standard's own trigger never fires on this pattern and there is nothing to audit. Its rungs are matched by the entries' English alone.
 
 
+## What the gate said out loud (reporting only)
+
+From `results/gate/p01-array-sum.json` — the `loud` and `controls_json` keys, at contract `5360d6f3dd7a`, verdict `PASS-WITH-BLOCKED-ROWS`. **These did not fail the gate and are not defects**; they are the conditions `check.py` refuses to be silent about. Each one is a caveat on a number below or on the declaration above.
+
+- **`idiom-forbidden`** — idiom.forbidden[0] has NOT ONE backticked spelling, so the enforced audit never ranges over it and its share of the 0 hits above is vacuous: a dead v_len parameter on the C kernel. Backtick the spelling if it has one (p09 shipped 5 entries and 0 audited spellings; TASK_038_REVIEW) -- and if it has none, because the entry forbids a STRUCTURE rather than a token (p05's 'a running row pointer'), say so in `why`: this line is then permanent and correct, and it is what stops the pattern's `ok` above from reading as enforcement it does not have.
+- **`twin`** — safe_naive_verus.rs: no trusted item with an `ensures` or an `unsafe` body (`_is_trusted`), so no twin is required and NOTHING in this stage checked this file. external_body items: ['emit', 'load_input']
+
+
 ## Static + executed instructions
 
 `Ir` is **callgrind per-function exclusive** for the kernel symbol. The whole-program total is deliberately absent: it moves with the size of the environment block and does not reproduce across shells (`.memory/03-measurement.md`). Static counts are given raw and padding-excluded; quote the padding-excluded one, and never quote either without the `Ir` beside it.

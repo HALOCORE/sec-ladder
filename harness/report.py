@@ -288,6 +288,80 @@ def audit_section(doc, out):
     out.append("")
 
 
+def read_gate_loud(pattern):
+    """`loud` and `controls_json` out of `results/gate/<pattern>.json`.
+
+    Same rule as `read_gate_audit` above and for the same reason: this is a
+    MEASUREMENT, so it is read from the artefact rather than recomputed."""
+    try:
+        rec = json.load(open(os.path.join(RESULTS, "gate", f"{pattern}.json")))
+    except (OSError, ValueError):
+        return None
+    return {"loud": rec.get("loud") or [],
+            "controls_json": rec.get("controls_json") or {},
+            "verdict": rec.get("verdict"),
+            "sha": rec.get("contract_sha256")}
+
+
+def shout_section(doc, out):
+    """`check.py`'s `rep.shout` output — the things the gate says out loud and
+    does **not** fail on.
+
+    ⚠⚠ **THIS EXISTS BECAUSE 33 SHOUTS ACROSS 26 GATE RECORDS RENDERED
+    NOWHERE** (TASK_114 m8b, landed at TASK_119). `rep.shout` is documented as
+    *"things the verdict must shout, pass or fail"*, and it wrote them into
+    `results/gate/<pattern>.json`'s `loud` list and into the run's transcript —
+    a transcript nobody keeps. **`report.py` read neither `loud` nor
+    `controls_json`**, so the one artefact a reader of `results/` actually
+    opens carried no trace of them. `p23`'s `controls/sweep_fit.json` shout —
+    *"carries NO staleness pin … treat every figure quoted from it as
+    UNDATED"* — existed in exactly two places, both inside one JSON file.
+
+    ⚠ **A shout nobody reads is a check that cannot fail**, which is a named
+    class on this project (`check_published_tables`'s own docstring, and
+    `PROTOCOL.md` rule 1's fourth step: *"a pattern is finished when a reader
+    can find its result, not when its gate is green"*).
+
+    **Reporting only, and the section says so**, exactly like `audit_section`:
+    a shout is by construction something the gate decided not to fail on, so
+    printing it must not read as a defect. The three biggest families on the
+    shipped tree are a `forbidden` entry with no backticked spelling (13), a
+    trusted item whose `requires` constrains nothing about a parameter its body
+    uses (12), and an anti-collapse floor far below the tightest measured cell
+    (3) — all of them things a reader of the numbers below should know."""
+    g = read_gate_loud(doc["pattern"])
+    if g is None:
+        return
+    loud, ctl = g["loud"], g["controls_json"]
+    unpinned = {k: v for k, v in ctl.items() if v != "FRESH"}
+    if not loud and not unpinned:
+        return
+    out.append("\n## What the gate said out loud (reporting only)\n")
+    out.append(f"From `results/gate/{doc['pattern']}.json` — the `loud` and "
+               f"`controls_json` keys, at contract `{str(g['sha'])[:12]}`, "
+               f"verdict `{g['verdict']}`. **These did not fail the gate and "
+               f"are not defects**; they are the conditions `check.py` refuses "
+               f"to be silent about. Each one is a caveat on a number below or "
+               f"on the declaration above.\n")
+    for e in loud:
+        out.append(f"- **`{e.get('section')}`** — {e.get('message')}")
+    # ⚠ Do NOT print a `controls_json` entry the `loud` list already carries:
+    # `check_control_json_pins` shouts the full message AND records the
+    # verdict, so an unconditional loop prints p23's sidecar twice, once in
+    # each spelling. Only a verdict with no matching shout needs a line here --
+    # `STALE` and `UNREADABLE` both `rep.fail`, so in practice this is the
+    # case where a future stage records a verdict without shouting it.
+    said = " ".join(e.get("message") or "" for e in loud)
+    for f, verdict in sorted(unpinned.items()):
+        if f in said:
+            continue
+        out.append(f"- **`controls/{f}`** — `{verdict}`: this published "
+                   f"sidecar's staleness pin does not agree with this run, so "
+                   f"nothing can date its numbers against the sources in the "
+                   f"tree. Treat every figure quoted from it as **UNDATED**.")
+    out.append("")
+
+
 def main_table(doc, opt, mode, out):
     rows = cell_rows(doc, opt, mode)
     if not rows:
@@ -456,6 +530,7 @@ def build(doc, name):
                    f"{v.get('model', '')} |")
 
     idiom_section(doc, out)
+    shout_section(doc, out)
 
     out.append("\n## Static + executed instructions\n")
     out.append("`Ir` is **callgrind per-function exclusive** for the kernel symbol. "
