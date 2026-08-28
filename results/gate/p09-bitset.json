@@ -101,7 +101,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "63b72bdd4aa7f3e4bd24867b5417056e4dac9321a3ba6df32ade745a3aa3eaee",
+    "harness/check.py": "b1aa0ebf5be6967353d5d8b0b67a64212ce8af0c782325dd6d08dfd1a4621e38",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
@@ -194,9 +194,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3264,
+    "bytes": 3267,
     "nvars": 48,
-    "envp_stack_bytes": 3648,
+    "envp_stack_bytes": 3651,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -977,7 +977,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==2238154==ERROR: AddressSanitizer: SEGV on unknown address 0x50b0002000f0 (pc 0x555dd0ed3b74 bp 0x00000000ff00 sp 0x7fff741b24e0 T0) ==2238154==The signal is caused by a READ memory access. #0 0x555dd0ed",
+      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==2361585==ERROR: AddressSanitizer: SEGV on unknown address 0x50b0002000f0 (pc 0x5598c8724b74 bp 0x00000000ff00 sp 0x7fff1d50b3d0 T0) ==2361585==The signal is caused by a READ memory access. #0 0x5598c872",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1073,7 +1073,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 3.7,
+        "seconds": 3.6,
         "stdout": "5457833412554140714",
         "model_stdout": "5457833412554140714",
         "stderr": ""

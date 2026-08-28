@@ -7702,27 +7702,47 @@ def check_published_tables(pdir, rep, contract_sha):
 
 
 def check_control_json_pins(pdir, rep, source_sha):
-    """`patterns/*/controls/*.json` -- a published sidecar with no staleness pin.
+    """`patterns/*/controls/*.json` -- does a published sidecar say what it was
+    taken against?
 
-    `synthesis/licence.json` is the shape to copy: it carries the gate
-    `source_sha256` it was taken against, and `synthesize.py` prints
-    `LICENCE STALE` when the record has moved under it. `p23` ships
-    `controls/sweep_fit.json` -- 26 measured rows and two fits, quoted in its
-    `NOTES.md` -- and it carries nothing.
+    `harness/measure.py --check-stale` globs `results/*.json` and
+    `results/gate/p*.json` **and nothing else**, so a tracked cache of measured
+    numbers under `patterns/*/controls/` is invisible to it. `p23` ships
+    `controls/sweep_fit.json` -- 15 measured rows and two fits, quoted in its
+    `NOTES.md` 9c -- and until TASK_121 it carried nothing.
 
-    ⚠ **This stage is the READER. It cannot add the pin**, because the pin has
-    to be written by the generator (`controls/*.py`), and TASK_107's constraints
-    forbid editing anything under `patterns/`. So a sidecar with no
-    `gate_source_sha256` is SHOUTED, not failed: failing would paint `p23` red
-    for a fix this task was not allowed to make, and a red gate nobody can clear
-    is how gates get switched off (`check_miri`'s own "a missing tool blocks a
-    row, it does not fail the pattern").
+    **Two accepted keys, and a sidecar needs exactly one of them:**
 
-    A sidecar that DOES carry the key is checked, and a mismatch FAILS -- that
-    half is live the moment a generator starts writing it.
-    ⚠ Note `controls/*.py` is in the GATE record's `source_sha256` and **not**
-    in `measure.py::measurement_sources`, so adding the pin costs one gate
-    re-run and no re-measure. Verified by reading both source lists."""
+    * ⚠⚠ **`derived_from_sha256`** -- a `{repo-relative path: sha256}` dict the
+      sidecar writes for ITSELF. This stage just re-hashes the named paths, so
+      it needs no knowledge of what any generator does and it generalises to
+      any future sidecar in any pattern. **This is the key to prefer.**
+    * **`gate_source_sha256`** -- equal to this run's gate `source_sha256`, the
+      `synthesis/licence.json` shape. Kept for a sidecar that genuinely derives
+      from the whole gate record. ⚠ **It is the WRONG key for anything that
+      derives from a narrower set**, because the gate digest covers
+      `patterns/*/*.md`: pinning against it reports `STALE` on a prose fix, and
+      a pin whose `STALE` does not mean "the numbers are wrong" is a pin that
+      gets switched off. That is why `sweep_fit.json` does not use it.
+      ⚠ The cost argument this used to be justified by -- "~30 minutes of
+      callgrind to clear it" (`.memory/05-layout.md`) -- is FALSE: TASK_121
+      timed a full `sweep_fit.py` regeneration at **47 s**, byte-identical
+      output. The reason to pin narrowly is the SIGNAL, not the price.
+
+    **Verdicts.** A sidecar with neither key is SHOUTED, not failed, because a
+    red gate nobody can clear is how gates get switched off (`check_miri`'s own
+    "a missing tool blocks a row, it does not fail the pattern"). A hash that
+    MOVED is a FAIL. A hashed path that is ABSENT is a SHOUT, not a fail, and
+    for the same reason `measure.py::check_stale` separates MISSING from STALE:
+    `sweep_fit.json` pins gitignored `inputs/sweep-*.bin`, so a fresh clone
+    that has not run `gen.py --sweep` must not be painted red for it. ⚠ **The
+    hole that leaves is real and is named here rather than hidden: deleting a
+    hashed blob downgrades the check from FAIL to SHOUT.** It is loud, it
+    survives to the verdict, and it reaches `results/tables/`.
+
+    ⚠ `controls/*.py` is in the GATE record's `source_sha256` and **not** in
+    `measure.py::measurement_sources`, so writing the pin costs one gate re-run
+    and no re-measure. Verified by reading both source lists."""
     head("9b. controls/*.json staleness pins")
     cdir = os.path.join(pdir, "controls")
     out = {}
@@ -7741,31 +7761,60 @@ def check_control_json_pins(pdir, rep, source_sha):
             out[f] = "UNREADABLE"
             rep.fail("tables", f"{rel}: not readable as JSON ({e})")
             continue
-        pin = doc.get("gate_source_sha256") if isinstance(doc, dict) else None
-        if pin is None:
+        doc = doc if isinstance(doc, dict) else {}
+        meta = doc.get("pin") if isinstance(doc.get("pin"), dict) else {}
+        fix = meta.get("regenerate") or "re-run its generator in `controls/`"
+        pin = doc.get("derived_from_sha256")
+        gpin = doc.get("gate_source_sha256")
+        if isinstance(pin, dict):
+            moved = sorted(k for k, v in pin.items()
+                           if os.path.exists(os.path.join(REPO, k))
+                           and sha256_file(os.path.join(REPO, k)) != v)
+            gone = sorted(k for k in pin
+                          if not os.path.exists(os.path.join(REPO, k)))
+            if moved:
+                out[f] = "STALE"
+                rep.fail("tables",
+                         f"{rel} is STALE: {len(moved)} of "
+                         f"{len(pin)} pinned source(s) moved under it "
+                         f"({moved[:5]}), so its numbers were NOT taken "
+                         f"against this tree. Fix: {fix}")
+            elif gone:
+                out[f] = "MISSING-SOURCES"
+                rep.shout("tables",
+                          f"{rel} pins {len(gone)} of {len(pin)} source(s) "
+                          f"that are ABSENT, so its pin cannot be checked and "
+                          f"its numbers are UNDATED: {gone[:5]}"
+                          + (f". Restore with: {meta['restore_missing']}"
+                             if meta.get("restore_missing") else ""))
+            else:
+                out[f] = "FRESH"
+                rep.ok(f"{rel} pins {len(pin)} source(s) by "
+                       f"`derived_from_sha256`, all matching this tree")
+        elif isinstance(gpin, dict):
+            if gpin != source_sha:
+                out[f] = "STALE"
+                moved = sorted(k for k in set(gpin) | set(source_sha)
+                               if gpin.get(k) != source_sha.get(k))
+                rep.fail("tables",
+                         f"{rel} is STALE: it was taken against a different "
+                         f"gate `source_sha256` ({len(moved)} file(s) moved: "
+                         f"{moved[:5]}). Fix: {fix}")
+            else:
+                out[f] = "FRESH"
+                rep.ok(f"{rel} pins this run's gate `source_sha256`")
+        else:
             out[f] = "UNPINNED"
             rep.shout("tables",
                       f"{rel} carries NO staleness pin, so nothing can tell "
                       f"whether its numbers were taken against the sources "
-                      f"that are in the tree now. `synthesis/licence.json` is "
-                      f"the shape to copy: a top-level `gate_source_sha256` "
-                      f"equal to this record's `source_sha256`, written by the "
-                      f"generator that emits the file. Until then treat every "
-                      f"figure quoted from it as UNDATED.")
-        elif pin != source_sha:
-            out[f] = "STALE"
-            moved = sorted(k for k in set(pin) | set(source_sha)
-                           if pin.get(k) != source_sha.get(k)) \
-                if isinstance(pin, dict) else []
-            rep.fail("tables",
-                     f"{rel} is STALE: it was taken against a different "
-                     f"`source_sha256`"
-                     + (f" ({len(moved)} file(s) moved: {moved[:5]})"
-                        if moved else "")
-                     + f". Re-run its generator in `controls/` and re-emit.")
-        else:
-            out[f] = "FRESH"
-            rep.ok(f"{rel} pins this run's `source_sha256`")
+                      f"that are in the tree now. Write a top-level "
+                      f"`derived_from_sha256` -- a `{{repo-relative path: "
+                      f"sha256}}` dict naming everything the numbers derive "
+                      f"from -- from the generator that emits the file; "
+                      f"`patterns/p23-partition/controls/sweep_fit.py::"
+                      f"derived_from` is the shape to copy. Until then treat "
+                      f"every figure quoted from it as UNDATED.")
     return out
 
 
@@ -8183,13 +8232,15 @@ def check_miri(pdir, rep, contract, identity, modmod, indir, names,
             # `check_miri` and `git show <pre-fix>:harness/check.py`'s side by
             # side on a mutant of p42's `unsafe.rs` and shows the old record
             # had no `leak` key at all while its `ub` read False):
-            # `.temp/t119/miri_leak_key.py`.
-            # ⚠ It is written to run from EITHER `.temp/` or a pattern's
-            # `controls/`, and `TASK_118` intended it for
-            # `patterns/p42-goto-cleanup/controls/`. TASK_119 was forbidden to
-            # add files under `patterns/`, so promoting it is one `git mv` and
-            # one `check.py p42` -- `controls/*.py` is in the gate record's
-            # `source_sha256` and NOT in `measure.py::measurement_sources`.
+            # `patterns/p42-goto-cleanup/controls/miri_leak_key.py`.
+            # ⚠ This comment cited `.temp/t119/miri_leak_key.py` until
+            # TASK_121. TASK_123 promoted the probe into p42's `controls/`; the
+            # old path was gitignored, so the citation pointed at nothing a
+            # fresh clone has. Corrected here rather than in its own task
+            # because ANY `check.py` edit stales all 26 gate records
+            # (TASK_119 measured 0 -> 25 from a one-line docstring edit), so a
+            # comment fix is batched into a change that is already paying for
+            # the sweep.
             leak = "memory leaked" in r.stderr
             got = r.stdout.strip()
             want = (sbg(mod, "expected_stdout") or "").strip()

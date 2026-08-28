@@ -125,7 +125,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "63b72bdd4aa7f3e4bd24867b5417056e4dac9321a3ba6df32ade745a3aa3eaee",
+    "harness/check.py": "b1aa0ebf5be6967353d5d8b0b67a64212ce8af0c782325dd6d08dfd1a4621e38",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
@@ -222,9 +222,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3264,
+    "bytes": 3267,
     "nvars": 48,
-    "envp_stack_bytes": 3648,
+    "envp_stack_bytes": 3651,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -945,7 +945,7 @@
     "adversarial-oob.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "1982327192679384777",
+        "stdout": "11828690527578060667",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -958,7 +958,7 @@
       },
       {
         "exit": 0,
-        "stdout": "3071543001371824714",
+        "stdout": "15340398885837223334",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1113,19 +1113,6 @@
     "adversarial-stale.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "10267404686224950985",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "10509230270850152637",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
         "stdout": "10509230270850152637",
         "stderr": "",
         "signal": null,
@@ -1140,7 +1127,20 @@
       },
       {
         "exit": 0,
-        "stdout": "9607494399120011611",
+        "stdout": "15477882781008247156",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "10509230270850152637",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "589652015274966304",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1429,7 +1429,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7f2c9a900220 with insufficient space for an object",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7fad42d00220 with insufficient space for an object",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1451,7 +1451,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7f9683100220 with insufficient space for an object",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7f77e7700220 with insufficient space for an object",
       "declared_hang": false,
       "hung": false,
       "stdout": "",

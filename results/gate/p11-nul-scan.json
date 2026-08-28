@@ -174,7 +174,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "63b72bdd4aa7f3e4bd24867b5417056e4dac9321a3ba6df32ade745a3aa3eaee",
+    "harness/check.py": "b1aa0ebf5be6967353d5d8b0b67a64212ce8af0c782325dd6d08dfd1a4621e38",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
@@ -267,9 +267,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3264,
+    "bytes": 3267,
     "nvars": 48,
-    "envp_stack_bytes": 3648,
+    "envp_stack_bytes": 3651,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -1303,7 +1303,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2243347==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000078 at pc 0x55c6f6646472 bp 0x7ffd9b7ab800 sp 0x7ffd9b7aafa8 READ of size 21 at 0x504000000078 thread T0 #0 0x55c6f6646471 in __interceptor_strlen.part.0 (",
+      "diagnostic": "================================================================= ==2366356==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000078 at pc 0x56321285a472 bp 0x7fff787ff620 sp 0x7fff787fedc8 READ of size 21 at 0x504000000078 thread T0 #0 0x56321285a471 in __interceptor_strlen.part.0 (",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1325,7 +1325,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2243350==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d2 at pc 0x5579dbd15472 bp 0x7ffea7d44b20 sp 0x7ffea7d442c8 READ of size 13 at 0x5070000000d2 thread T0 #0 0x5579dbd15471 in __interceptor_strlen.part.0 (",
+      "diagnostic": "================================================================= ==2366361==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d2 at pc 0x5630008b1472 bp 0x7ffe1cbf1bd0 sp 0x7ffe1cbf1378 READ of size 13 at 0x5070000000d2 thread T0 #0 0x5630008b1471 in __interceptor_strlen.part.0 (",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1406,7 +1406,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.2,
+        "seconds": 0.1,
         "stdout": "1140207705793675520",
         "model_stdout": "1140207705793675520",
         "stderr": ""
@@ -1454,7 +1454,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.2,
+        "seconds": 0.1,
         "stdout": "17350591509089579584",
         "model_stdout": "17350591509089579584",
         "stderr": ""
@@ -1466,7 +1466,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 1.8,
+        "seconds": 1.7,
         "stdout": "9042906315172504004",
         "model_stdout": "9042906315172504004",
         "stderr": ""
@@ -1478,7 +1478,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.6,
+        "seconds": 0.5,
         "stdout": "15741712355948218700",
         "model_stdout": "15741712355948218700",
         "stderr": ""
