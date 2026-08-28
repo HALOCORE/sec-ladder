@@ -343,6 +343,31 @@ compiler flag produced, and it is available on any data-dependent kernel.
    variant, the `.rs`/`.c` source you measured, the `.json` results and the
    `.log` of the run that produced them. Two rules follow:
 
+   ⚠⚠⚠ **AND A THIRD, ADOPTED AT `TASK_121`: *PROMOTE, DON'T PUBLISH.***
+   **`.temp/` IS GITIGNORED, SO ANY `.temp/` PATH CITED FROM A *COMMITTED* FILE
+   IS A CLAIM NOBODY CAN CHECK — AND THIS IS NOT HYPOTHETICAL.**
+   ✅ **Manager-measured over `git ls-files`: 2454 distinct `.temp/` paths are
+   cited from committed files and 88 ARE ALREADY DANGLING, across 59 files.**
+   ⚠ **The loss needed an `rm`, not a clone.** **`TASK_122` could not raise an
+   18.9 M `Ir` drift from *sufficiency* to *actuality* because the probe source
+   it needed was one of them.**
+
+   > **Do NOT commit `.temp/`** (tree-wide it is ~5.1 GB). **Instead, a `.temp/`
+   > path you cite from a committed file must be PROMOTED into the tree first**
+   > — kilobytes, not gigabytes. **Precedents that worked:
+   > `miri_leak_key.py` → `patterns/p42-goto-cleanup/controls/`, and the layout
+   > populations → `common/layout/data/`.**
+
+   ⚠ **`.tasks/*_REPORT.md` IS EXEMPT**: a report is a **dated record of what was
+   true when it was written**, and rewriting one to keep its citations alive
+   would falsify it.
+   ⚠⚠ **This is the MANAGER'S adopted convention on `TASK_121`'s recommendation,
+   not a reviewed finding — it makes the EXISTING rule checkable rather than
+   reversing it, which is why it did not need a repo-policy decision. Challenge
+   it if it is wrong.** ⚠ **`TASK_125` implements it, and the OPEN question it
+   carries is a SIZE BOUND: nobody has measured how much a strict forward rule
+   would force into the tree.**
+
    - **A binary you cannot regenerate from a file in the tree is a defect, not
      an asset.** If a probe's inputs came from an ad-hoc shell command, write the
      command into a `.py` beside the blob *before* you finish the task. This is
