@@ -147,8 +147,10 @@ Write your report to `.tasks/TASK_121_REPORT.md` as well as returning it.
 
 ---
 
-⚠ **PROTOCOL rule 2's running count is 466** (⚠ **a rigour signal, not a ledger —
-do not re-add it**). The calls I am least sure of:
+⚠ **PROTOCOL rule 2's running count is 488** (⚠ **a rigour signal, not a ledger —
+do not re-add it**). ⚠ **This file was written carrying 466 and was updated to 488
+when `TASK_120` landed, BEFORE it ran** — rule 2 says the count lives in one place
+and stale copies are the failure mode. The calls I am least sure of:
 
 1. ⚠⚠ **That option (a) is right.** **Hashing the blobs is the complete answer and
    it is also the one that makes the sidecar stale whenever somebody adds a sweep
@@ -167,4 +169,4 @@ do not re-add it**). The calls I am least sure of:
    document citing a gitignored path is either a real hole or a deliberate
    convention I have not found written down. `grep` before you agree with me.**
 
-Carry **466** forward, incremented by what you find.
+Carry **488** forward, incremented by what you find.
