@@ -23,12 +23,21 @@
 > leak-freedom*.** ⚠⚠ **Do not write the second sentence. It would be the third
 > confident false claim on this axis.**
 >
-> ⚠⚠ **WHERE ATTEMPT 1 DIED, VERBATIM: *"Let me check what the gate's parser sees
-> in the repaired file."* THAT IS YOUR FIRST STEP.** The gate has never seen the
-> repaired file; `vparse` must be shown to handle a child module, and
-> ⚠ **"the trusted base does not move" is the dead engineer's claim from READING
-> and is UNVERIFIED — recount the TCB with the gate.** Note `verus.obligations`
-> is pinned at **18** and the repair is **19**, so the contract moves.
+> ✅✅ **THE MANAGER RAN THE STEP ATTEMPT 1 DIED ON, AND THREE BLOCKERS ARE
+> CLEARED** (details and commands in `.temp/t118/NOTES.md`):
+> **(1) `vparse` handles the child module** — `items 21 → 25`, `module_spans
+> 0 → 1`, the four new items are exactly `live`/`dat`/`tag`/`led_new`, no
+> duplicate names. **(2) THE TRUSTED BASE DOES NOT MOVE, BY THE GATE'S OWN
+> `_is_trusted`** — both files give exactly
+> `['v_get_unchecked', 'dig_alloc', 'dig_free']`, and none of the four new items
+> is trusted. ⚠ **That replaces the dead engineer's read-only claim.**
+> **(3) The `unsafe` surface SHRINKS** — 12 → 11 tokens, `external_body`
+> unchanged at 10, `assume` 1, `admit` 0.
+>
+> ⚠ **STILL UNRUN, and it is your first step: THE GATE END-TO-END.**
+> `_scan_unsafe_sites` needs a real pdir; obligation counting must be checked
+> against the `spec.md` pin — ⚠ **`verus.obligations` is pinned at 18 and the
+> repair is 19, so the contract MOVES**; and the twin regime is untested.
 >
 > **§A, §C, §C2, §D, §E and §F are ALL UNSTARTED.** ⚠ **The three-encoding limit
 > still binds and ONE is now spent: if the gate rejects this encoding, RETRACT
