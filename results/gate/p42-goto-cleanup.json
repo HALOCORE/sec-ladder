@@ -234,6 +234,7 @@
     "patterns/p42-goto-cleanup/c/kernel_hardened.c": "b6dbcb4956d3b967ec7fa4758afac7be8f7f59b246ac047d282122444a748f44",
     "patterns/p42-goto-cleanup/c/main.c": "606f0d60055a38bab258ebd0489c736ba5cfc7053ce3f4bf06ac6d9136a1fd28",
     "patterns/p42-goto-cleanup/controls/ledger_leak.py": "05bfbcdca86407546163070c5596e285ea501f8b509a4f96492ca4f23c610578",
+    "patterns/p42-goto-cleanup/controls/miri_leak_key.py": "43a05265f04feb8af935b4030dfd76fc8597aacee080a89efef0ba48f7466150",
     "patterns/p42-goto-cleanup/controls/spellings.py": "2005001809023a6eae3ff63e520fdd7e0b0926c8db84e52cfa344c3745c92692",
     "patterns/p42-goto-cleanup/controls/sweep.py": "058ad4aa816f65d0c6a573955e38e2501d37e53c438a676db7e4dbfcc22e1d80",
     "patterns/p42-goto-cleanup/inputs/gen.py": "241f5d474b44577a0b4fd44dd77950db48d6a25cabe6a364c78a590fe3999d18",
@@ -316,9 +317,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3264,
+    "bytes": 3280,
     "nvars": 48,
-    "envp_stack_bytes": 3648,
+    "envp_stack_bytes": 3664,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -2402,7 +2403,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2283420==ERROR: LeakSanitizer: detected memory leaks Direct leak of 624 byte(s) in 26 object(s) allocated from: #0 0x560cae42c77f in malloc (/home/apt/repos_common/sec-ladder/.temp/build/p42/c-gcc-asan+0xc477f) (BuildId: 9d32e599b53",
+      "diagnostic": "================================================================= ==2313397==ERROR: LeakSanitizer: detected memory leaks Direct leak of 624 byte(s) in 26 object(s) allocated from: #0 0x5601bd84d77f in malloc (/home/apt/repos_common/sec-ladder/.temp/build/p42/c-gcc-asan+0xc477f) (BuildId: 9d32e599b53",
       "declared_hang": false,
       "hung": false,
       "stdout": "9073041678996835380",
@@ -2413,7 +2414,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2283422==ERROR: LeakSanitizer: detected memory leaks Direct leak of 256 byte(s) in 8 object(s) allocated from: #0 0x557d23ae777f in malloc (/home/apt/repos_common/sec-ladder/.temp/build/p42/c-gcc-asan+0xc477f) (BuildId: 9d32e599b532",
+      "diagnostic": "================================================================= ==2313399==ERROR: LeakSanitizer: detected memory leaks Direct leak of 256 byte(s) in 8 object(s) allocated from: #0 0x563666ac077f in malloc (/home/apt/repos_common/sec-ladder/.temp/build/p42/c-gcc-asan+0xc477f) (BuildId: 9d32e599b532",
       "declared_hang": false,
       "hung": false,
       "stdout": "0",
@@ -2446,7 +2447,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2283428==ERROR: LeakSanitizer: detected memory leaks Direct leak of 16 byte(s) in 16 object(s) allocated from: #0 0x556af935b77f in malloc (/home/apt/repos_common/sec-ladder/.temp/build/p42/c-gcc-asan+0xc477f) (BuildId: 9d32e599b532",
+      "diagnostic": "================================================================= ==2313405==ERROR: LeakSanitizer: detected memory leaks Direct leak of 16 byte(s) in 16 object(s) allocated from: #0 0x55d2a2b2477f in malloc (/home/apt/repos_common/sec-ladder/.temp/build/p42/c-gcc-asan+0xc477f) (BuildId: 9d32e599b532",
       "declared_hang": false,
       "hung": false,
       "stdout": "0",
