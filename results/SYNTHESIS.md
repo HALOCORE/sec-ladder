@@ -711,8 +711,10 @@ triples, not as a column sum). Four things a reader must know before using that:
 
 ## 5. Result 4 — what this instrument can and cannot price
 
-⚠ PROVISIONAL — TASK_102, unreviewed. It is nevertheless the finding a reader
-deciding whether to build one of these needs first.
+⚠⚠ **DISPUTED — DO NOT QUOTE THE CLAIM BELOW.** TASK_102 has now been reviewed
+(TASK_113) and **both halves of the "if and only if" fail.** The sentence is
+preserved rather than struck, and the evidence against it is stated immediately
+after it. **RECAP finding 37 carries the same dispute.**
 
 > **This benchmark can price a safety property IF AND ONLY IF some rung emits it
 > as a compare-and-branch and another rung omits it.** A property enforced by
@@ -720,13 +722,44 @@ deciding whether to build one of these needs first.
 > **a resource limit no rung emits**, or by **a compiler diagnostic** has **no
 > machine-code footprint at all**.
 
+⚠⚠ **The ONLY-IF half is refuted by a pattern this document already cites.**
+**`p38` prices a type-based aliasing property at exactly `6.00 Ir`/call** — five
+independent one-line fixes agreeing to the unit, **none of them a compare or a
+branch, and one of them a compiler flag** (`patterns/p38-alias-pun/NOTES.md`).
+⚠ **And the counterexample is inside TASK_102's own report, which lists
+*"`p06`'s division instead of a compare"* sixty-four lines after asserting the
+fourteen are "all compare-and-branch".** **The IF half is unsupported:** two of
+the eight candidates satisfy the antecedent (division-by-zero, and gcc's default
+stack-clash probe) and **were refused anyway**, so nothing in the evidence shows
+a compare-and-branch is *sufficient*. **Two of the quote's quantifiers are also
+false** — probe 2 was the kill in **three of eight**, not "every single time",
+and "no machine-code footprint at all" fails on the clang column and on the
+format-string candidate's `+162 Ir`/call.
+
+✅ **What survives: the eight refusals themselves.** Every load-bearing kill
+re-ran and reproduced, and **no refused row comes back.** ⚠ **So this is *right
+verdict, wrong reason*** — and in this project a refusal's reason is what gets
+reused on the next row, which is why the generalisation mattered more than the
+verdicts did.
+
 This is measured, not argued. The 48-row catalogue was written before the project
 started — ⚠ **with one exception that weakens the "so the refusals are not
 selection bias" argument by exactly one row: `p48` was added mid-project by the
-manager at TASK_066 and refused at TASK_074.** **15 rows are refused, each on a
-measurement**, and eight further candidates proposed later were probed and **all
-eight refused** — two independent lists, both at a hit rate of zero, which is what
-makes it structural rather than unlucky. Recursion depth: three rungs `call` the
+manager at TASK_066 and refused at TASK_074.** ⚠⚠ ~~**15 rows are refused, each
+on a measurement**~~ — **CORRECTED at TASK_113: the true figure is 13, and
+"each on a measurement" fails for every way of reaching fifteen.** The catalogue
+decomposes as **26 built + 6 still `planned` + 13 refused + 3 that are none of
+those** — `p24` (probed, live, needs a new reason), `p35` (blocked, not refused)
+and `p37` (**refusal reason refuted, never re-triaged**). ⚠ **Reaching fifteen
+requires counting two of those three, or counting `p40`/`p41`, whose catalogue
+cells still read the bare word `planned` while RECAP says they were adjudicated
+REFUSE "with measurements that never reached the catalogue".** Eight further
+candidates proposed later were probed and **all eight refused** — ⚠ **but they
+were all selected for BUG-CLASS NOVELTY, the criterion this project's own
+admission bar says "predicts neither way", and none was an `index >= len`
+row; `p23`, the fifteenth `index >= len`, shipped a `3.11×` result.** ⚠ **So
+"two independent lists, both at a hit rate of zero" is one list plus a
+differently-selected second list, and the zero is not evidence of structure.** Recursion depth: three rungs `call` the
 same ICF-merged symbol, so there is one rung, not three. Unaligned load: the cast
 and the `memcpy` spelling compile to the same 19 instructions. `qsort`
 comparator: 80 cells, zero ASan reports, because glibc's `qsort` is mergesort plus

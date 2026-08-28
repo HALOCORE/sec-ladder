@@ -1161,13 +1161,30 @@ branch targets normalise identically** — which is exactly `p42`'s leaking-vs-
 hardened C pair, reported as **one rung** when they are two. ✅ **Fix: keep
 `<SELF+0xNN>`** (`.temp/t104/probe2.py`).
 
-⚠⚠ **PROBE 2 HAS NOW BEEN WRONG FOUR TIMES, AND THREE OF THE FOUR WERE
+⚠⚠ **AND A FIFTH DEFECT — FOUND AT `TASK_113`, PROVISIONAL, AND IT IS A
+REGRESSION THE TWO SUCCESSOR TOOLS BOTH INTRODUCED.** **A pure
+instruction-SCHEDULING permutation reports `!=`**: clang's `k_cast_sum` and
+`k_memcpy_sum` are **40 instructions with the same mnemonic multiset and one
+`xor` moved**, and normalised-disassembly text calls them different. ⚠ **The
+column that catches this — the MNEMONIC MULTISET — existed in `.temp/t94/knorm.py`
+and was DROPPED by BOTH `.temp/t102/b4_norm.py` and `.temp/t104/probe2.py`.**
+⚠⚠ **So the fix for defect 3 and the fix for defect 4 each silently removed the
+check that would have caught defect 5** — the same shape as defect 4, which was
+found *inside* the fix for defect 3. **Compare the multiset as well as the text.**
+
+⚠⚠ **PROBE 2 HAS NOW BEEN WRONG FIVE TIMES, AND FOUR OF THE FIVE WERE
 FALSE-NEGATIVES ON THE KILL CRITERION** — object-file md5 false-**positives** on
 relocations; linked md5 false-**negatives** on any kernel with a branch or a
-global; `knorm.py` counting inter-function padding; and now `<SELF>` discarding
-the offset. ⚠ **A false negative here KEEPS A ROW ALIVE that has no rung
-boundary, or MERGES two rungs that are genuinely different. Before trusting any
-probe-2 "these are the same", disassemble both and look.**
+global; `knorm.py` counting inter-function padding; `<SELF>` discarding the
+offset; and now a scheduling permutation reading as a real difference. ⚠ **A
+false negative here KEEPS A ROW ALIVE that has no rung boundary, or MERGES two
+rungs that are genuinely different. Before trusting any probe-2 "these are the
+same", disassemble both and look.**
+⚠⚠ **AND THE META-FINDING IS NOW THE MORE USEFUL ONE: THREE CONSECUTIVE FIXES TO
+THIS PROBE EACH INTRODUCED OR EXPOSED THE NEXT DEFECT.** **A probe that has been
+wrong five times, twice inside its own repairs, is not a thing to trust on a
+single reading** — and probe 2 is the instrument that decides whether a
+candidate row has two rungs or one, i.e. whether it gets built at all.
 
 **4. DOES THE ROW'S UNSAFE OPERATION HAVE A `vstd` SPEC — AND THE GREP IS
 NECESSARY, NOT SUFFICIENT.** (Added TASK_086; the caveat is its finding #239,
