@@ -65,9 +65,7 @@ exhaustion.** ⚠⚠ **AND THE MANAGER'S NOTES CARRY THE DECISIVE CITATION, WHIC
 `p27`'s OWN SOURCE:** a freelist push into a slab leaves the stale read **in
 bounds of a live allocation** — Miri-clean, `PointsTo`-licensed — *"`p17`'s
 LOGICAL class rather than this one"* (`patterns/p27-handle-table/verus.rs`, on
-`rec_free` and `rec_close`; `TASK_055` §2.8 caveat 1, **which also records that
-the manager offered the `(slot, gen)` formulation AT THE TIME and the engineer
-rejected it for this reason**).
+`rec_free` and `rec_close`; `TASK_055` §2.8 caveat 1, **which also records that the manager offered the `(slot, gen)` formulation AT THE TIME and the engineer ADOPTED IT FOR R1h/R2/R3 AND REJECTED IT ONLY AS THE R4/R5 REPRESENTATION** — ⚠⚠ **the manager wrote *"the engineer rejected it"* in TWO FILES; `TASK_123` caught it. The VERDICT is unaffected and the REASON was wrong.**).
 
 ✅ **So this family is expected to close on a CITATION rather than a
 measurement.** ⚠ **Confirm the citation is load-bearing and say so. Do not spend
@@ -151,7 +149,7 @@ Write your report to `.tasks/TASK_123_REPORT.md` as well as returning it.
 
 ---
 
-⚠ **PROTOCOL rule 2's running count is 520** (⚠ **a rigour signal, not a ledger —
+⚠ **PROTOCOL rule 2's running count is 526** (⚠ **a rigour signal, not a ledger —
 do not re-add it**). The calls I am least sure of:
 
 1. ⚠⚠ **That this corpus is the right domain at all.** **It is 20 CVEs chosen by
@@ -172,4 +170,4 @@ do not re-add it**). The calls I am least sure of:
    `p28`'s precedent — RIGHT VERDICT, WRONG REASON — and against `TASK_120`'s
    finding that TWO OF THREE spot-checked refusal reasons were broken.**
 
-Carry **520** forward, incremented by what you find.
+Carry **526** forward, incremented by what you find.
