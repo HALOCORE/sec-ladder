@@ -1,5 +1,39 @@
 # TASK_118 — `p42`: try the repair FIRST, then retract what does not survive it
 
+> ⚠⚠ **ATTEMPT 1 DIED MID-TASK (account session limit) HAVING LANDED NOTHING —
+> `git status` was clean and no tracked file was touched. READ
+> `.temp/t118/NOTES.md` FIRST: the manager wrote it from the surviving artefacts,
+> because the engineer never wrote its own.**
+>
+> ✅ **§B IS SUBSTANTIALLY DONE AND THE REPAIR LOOKS GOOD.** A privacy-scoped
+> ledger — `pub tracked struct Ledger` in a child `mod res`, **both fields
+> private**, plus an **opaque `closed` `tag()`** — gives **`19 verified, 0
+> errors`** (twin `22/0`), and ⚠⚠ **the attack that killed the shipped ledger is
+> blocked by RUSTC, not by Verus: `atk_remove` is `error[E0616]: field `m` of
+> struct `res::Ledger` is private`.** `atk_assign`, `atk_dummy`, `atk_dummy_k0`
+> and `atk_forge_out` are all blocked too, and the must-fire arm fires.
+> ✅ **The `identity` pin HOLDS at both levels** — `exact` at `-O3`
+> (`md5_fn 28432cb8…`, `n_fn 128`, equal to R4) and `norel` at `-O0` — **so the
+> repair is free.** ✅ **Manager independently re-ran the four decisive arms.**
+>
+> ⚠ **THE RESIDUAL, and it must be stated this way: `atk_forge_in` VERIFIES at
+> `20/0`.** Code **inside `mod res`** can still mint a receipt without freeing;
+> **`kbody`, at crate root, cannot.** **So the claim is *the residual trust is
+> confined to a named, small, rustc-enforced scope*, NOT *Verus now proves
+> leak-freedom*.** ⚠⚠ **Do not write the second sentence. It would be the third
+> confident false claim on this axis.**
+>
+> ⚠⚠ **WHERE ATTEMPT 1 DIED, VERBATIM: *"Let me check what the gate's parser sees
+> in the repaired file."* THAT IS YOUR FIRST STEP.** The gate has never seen the
+> repaired file; `vparse` must be shown to handle a child module, and
+> ⚠ **"the trusted base does not move" is the dead engineer's claim from READING
+> and is UNVERIFIED — recount the TCB with the gate.** Note `verus.obligations`
+> is pinned at **18** and the repair is **19**, so the contract moves.
+>
+> **§A, §C, §C2, §D, §E and §F are ALL UNSTARTED.** ⚠ **The three-encoding limit
+> still binds and ONE is now spent: if the gate rejects this encoding, RETRACT
+> AND LEAVE THE QUESTION OPEN rather than iterating.**
+
 **Role: research engineer.** Read `.tasks/PROTOCOL.md`, then this file, then
 **`.tasks/TASK_116_REPORT.md` in full** (it is the review you are landing), then
 `patterns/p42-goto-cleanup/{spec.md,verus.rs,unsafe.rs,NOTES.md,README.md}` and
