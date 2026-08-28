@@ -2887,3 +2887,43 @@ interactive shell (`bytes: 3280`) instead of the sweep's (`3269`) — **an 11-by
 difference, exactly the `OLDPWD` term** — moved p03's published row, **and the
 new field is what says so.** Before it existed, that move was indistinguishable
 from a real change.
+
+---
+
+## ⚠⚠ A WHOLE-PROGRAM TOTAL IS NOT A MEASUREMENT BELOW ~100 `Ir`
+
+⚠⚠ **PROVISIONAL AND UNREVIEWED — `TASK_120`'s own result, produced while
+reviewing finding 40. `TASK_122` §A/§B is its review. Rule 9: this is landed as a
+conclusion with its mechanism OPEN, and it must not be treated as settled.**
+
+**Measured: whole-program `Ir` totals moved by `60` between `--cache-sim=yes` and
+plain `callgrind` ON THE SAME BINARY AND THE SAME ARGV.** ✅ **Marginal
+(differenced) numbers did not move AT ALL.**
+
+> ⚠ **So any published figure below ~100 `Ir` taken from a WHOLE-PROGRAM TOTAL
+> rather than from a DIFFERENCE is at the noise floor.**
+
+**Known instances**: `p40`'s `21`, `p40`'s `193`, `p43`'s `+3.00`.
+✅ **`p40`'s `21` SURVIVES ANYWAY**, because `TASK_120` re-derived it as a
+difference against a **zero-iteration control** that makes the two kernels
+byte-equal — ⚠ **which is the technique, and it is cheap: run the probe with the
+iteration count set to zero and subtract.**
+
+⚠⚠ **THE `println!` TRAP, and it is the reason `p40`'s `+193` was 60% artefact:
+formatting a kernel NAME six characters longer cost `115 Ir` with the kernels
+NEVER CALLED.** ⚠ **A harness that prints which variant it is running has put the
+variant's NAME LENGTH on the measured axis.** **Give every variant a name of the
+same length, or measure against a zero-iteration control.**
+
+⚠⚠⚠ **AND THE BOX IS NOT AS STABLE AS THIS FILE ASSUMES — OPEN.** `p40`'s
+absolute total moved **`360,114,293` → `378,984,676`** (18.9 M, ~5.2%) between
+`TASK_086` and `TASK_120`, under a byte-identical pipeline, with `rustc 1.97.1 /
+LLVM 22.1.6` and `valgrind 3.27.1` **both unchanged**. **Unattributed.**
+⚠ **Separately and NARROWLY, two checked rungs (`k20_checked`, `k21_checked`)
+each re-measure exactly `−4 Ir` while their unchecked twins are EXACT, and
+`k39`/`k41`/`k43` all reproduce exactly** — so the `−4` is **not** the 18.9 M
+drift. ✅ **The `.rodata`-alignment hypothesis for the `−4` was RUN AND KILLED**
+(`--remap-path-prefix` to the old build path gives identical numbers).
+⚠ **Two open instrument questions, both narrow, neither guessed at. Do not
+publish a mechanism for either without a measurement** — this axis is where
+`MIRIFLAGS` produced two confident wrong mechanisms.

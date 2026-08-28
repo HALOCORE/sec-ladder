@@ -9,9 +9,9 @@ this box is reference; this box is what to *do*.
 | | |
 |---|---|
 | **Patterns** | **26 exist, all built, all reviewed.** **Committed state: `24 PASS + 2 PASS-WITH-BLOCKED-ROWS`, 0 failures; 26 gate records, 26 published tables, 52 measurement records `0 STALE`.** ⚠ **The two blocked rows are `p01`** (a real 180 s Miri timeout) **and `p42`** (Miri on `large.bin`, declared in advance in its `miri.blocked_reason`) — ⚠⚠ **and `p42`'s blocked-row COUNT may legitimately be 1 or 2 on any given run, because the Miri slowdown is selected by the ENVIRONMENT and not by anything the gate controls (`.memory/00-environment.md`). Do NOT read a second `p42` block as a regression.** ⚠ **Otherwise a blocked Miri row is worth INVESTIGATING, not shrugging at** — the old advice here was itself the defect (TASK_077). ⚠⚠ **DERIVE THESE NUMBERS, DO NOT TRUST THIS ROW: it said *"`p23` is BUILT but NOT YET REVIEWED, `TASK_105` is the next thing to run"* for about fifteen tasks after `p23` was reviewed, corrected AND its corrections re-reviewed.** `ls -d patterns/p*/ | wc -l`; `grep -c '^| p[0-9]' .memory/06-catalogue.md`; and for the gate, read the `verdict` key out of `results/gate/p*.json` rather than re-running a 30-minute sweep. ⚠⚠ **Still PROVISIONAL: `TASK_088`** (`p19`'s re-fitted laws) **and `TASK_092`** (`p46`'s corrections, on which its headline ground stands) — **AND THIS ROW AND THE `Do this next` ROW LOOK LIKE THEY CONTRADICT EACH OTHER. THEY DO NOT, AND THE DISTINCTION IS LOAD-BEARING: `TASK_113` closed the TASKS as superseded; the FINDINGS that rest on them still carry PROVISIONAL markers** (RECAP's own findings section, in the `p19` and `p46` entries). ***"The debt is CLEAR"* is TRUE OF TASKS AND FALSE OF FINDINGS.** ⚠ **AND THERE IS A LIVE GAP IN THAT CLOSURE, FOUND WHILE RECONCILING THE TWO ROWS AND NOT YET ATTACKED: `TASK_113`'s stated reason was *"both are corrections-landing tasks for patterns that ALREADY HAD A REVIEW; the reviewed content is the reviewer's"* — but both markers flag NEW RESULTS LANDED IN THE CORRECTIONS TASK, not the reviewer's content.** `TASK_088`'s re-fitted laws and two-cause decomposition are a **re-fit**; `TASK_092` showed **`r4_mutreslice`'s full R5 verifies, `21 verified, 0 errors`**, against a refuted exclusion reason. ⚠ **So the closure reason may not cover what the markers flag. The manager commissioned `TASK_113` and will not clear the gap in its own commissioned review (rule 3) — WHOEVER PICKS THIS UP SHOULD DECIDE IT ON THE EVIDENCE, and *"the markers are right and the closure was too broad"* and *"the markers are stale"* are both live.** **`TASK_113` closed `090`/`091` as superseded.** |
-| **Do this next** | ⚠ **THE BOX IS THE QUEUE. The NARRATIVE for everything below now lives in the findings — finding 37 (DISPUTED), finding 39 (`p42`, two retractions), finding 40 (why the catalogue is exhausted). Do not re-summarise them here; this row went to 8 000 characters once and was trimmed for exactly that.** ⚠⚠ **OPERATIONAL, NEVER DELETE: `results/SYNTHESIS.md` is HAND-WRITTEN; `results/synthesis.md` (lower case) is GENERATED. Never regenerate over the capitalised one.** **THE QUEUE, in order:** *(1)* ⚠⚠ **`TASK_118` — RESUME IT. Attempt 1 died mid-task to an account session limit having landed NOTHING. ITS TASK FILE OPENS WITH A STATE BLOCK; read that and `.temp/t118/NOTES.md` before anything else.** ✅ **The privacy-scoped repair VERIFIES (`19/0`, twin `22/0`), the attack that killed the ledger is blocked BY RUSTC (`E0616` private field), the `identity` pin HOLDS at both levels, and the manager has cleared three resume-blockers (vparse handles the child module; the trusted set is IDENTICAL by the gate's own `_is_trusted`; the `unsafe` surface shrinks 12→11).** ⚠ **Unrun: the gate END-TO-END. `verus.obligations` is pinned at 18 and the repair is 19, so the contract MOVES.** ⚠ **Three-encoding limit, ONE spent.** *(2)* **`TASK_119` — the instrument corrections, WRITTEN AND QUEUED. Must run AFTER `TASK_118`** (it edits `check.py`, which stales every gate record; `TASK_096` did this mid-pattern and went 8 STALE). **One 26-pattern sweep, no re-measure.** *(3)* ⚠⚠ **FINDING 40's GENERALISATION IS THE MANAGER'S READING AND IS UNREVIEWED — SOMEBODY MUST ATTACK IT.** PROTOCOL rule 3: the manager may not clear its own design, **and finding 37 is what happens when a manager's reading of a refusal set gets published as a law.** ✅ **`TASK_120` IS NOW WRITTEN for exactly this** — it attacks the seven-of-twenty-two tally, asks whether "duplication" is one category or three wearing one word, and ⚠⚠ **presses the question with real consequences: *"the 48-row catalogue is spent"* and *"there is nothing left worth building"* are DIFFERENT CLAIMS, and the 48 rows were written PRE-PROJECT.** *(4)* **Optional: split `SYNTHESIS.md`** into argument (≈330 lines) + evidence appendix (≈610) — ⚠ **only as a PURE MOVE, `diff`-verified to contain no deletions, because a split IS a compression and compression is where this document's bias entered with no arithmetic signature.** *(5)* ✅ **`TASK_121` IS NOW WRITTEN — the LAST owed item** (the `controls/*.json` pin, characterised below), **and it carries a measured question the manager will NOT decide alone: `.temp/` is GITIGNORED and the authoritative layer cites it 105 times** (`RECAP.md` 31, `06-catalogue.md` 28, `00-environment.md` 17, …); **67 distinct paths, 65 exist, 1.2 MB total, and the 2 that do not exist are `pNN` doc PLACEHOLDERS — so ZERO dangling citations on this box.** ✅ **`results/SYNTHESIS.md` cites `.temp/` ZERO times, so the OUTWARD document is already clean.** ⚠⚠ **But a fresh clone can check NONE of the evidence behind `RECAP.md` and `.memory/`, and there IS a remote. Committing previously-gitignored evidence is a REPO-POLICY call that belongs to the USER — `CLAUDE.md` rule 1 puts evidence in `.temp/` on purpose and rule 3 says checks run locally, so *"local artefact by design"* is a coherent reading. SURFACE IT; DO NOT ACT ON IT.** ⚠ **Owed items, both CHARACTERISED (do not re-scope them from the one-line summary):** ⚠ **`controls/*.json`: THE SUMMARY *"a reader and no writer"* WAS WRONG AND IS CORRECTED — `patterns/p23-partition/controls/sweep_fit.py` DOES write `sweep_fit.json` (its `json.dump`, and it is the only `.json` sidecar in any `controls/`). What is missing is only the PIN, so the fix is a few lines in an existing generator, not a new tool.** ⚠⚠ **The obvious fix is still WRONG — pinning against the gate `source_sha256` would stale the sidecar on every later `NOTES.md` edit and cost ~30 min of callgrind for a prose fix; pin against a NARROWER digest** (`.memory/05-layout.md`). ⚠⚠ **AND THE NARROWER DIGEST IS *`measurement_sources` PLUS A TERM*, NOT `measurement_sources` — THE MANAGER WROTE THE INCOMPLETE VERSION INTO THIS BOX FIRST AND CAUGHT IT BEFORE ANYONE BUILT IT. `harness/measure.py::measurement_sources` is the right starting set (it covers p23's `*.rs`, `c/*`, `build.py`, `asm.py`, and is NON-RECURSIVE so `controls/*.py` is excluded — VERIFIED by reading the glob, not the docstring, so the edit costs ONE gate re-run and NO re-measure). ⚠⚠ BUT `sweep_fit.py`'s 26 rows are measured over `inputs/sweep-*.bin`, and `SKIP_INPUT_PREFIX = "sweep-"` means those blobs are hashed by NEITHER `source_sha256` NOR `input_sha256` — they are unhashed BY DESIGN, because `measure.py` correctly never measures them. So a pin naming only `measurement_sources` would MISS THE ONE TERM THE SIDECAR ACTUALLY VARIES OVER, which is `TASK_114`'s env-pin failure repeating one task later.** ⚠ **The design call — hash the blobs the script opened, or hash `gen.py` and accept the gap `measure.py`'s own comment calls insufficient (*"the generator hash cannot tell 'the inputs changed' from 'a comment changed'"*) — and WHICH KEY (stage `9b` currently keys on `gate_source_sha256`) belong in a task file, not in this box.** **The current SHOUT-not-fail is the right interim.** `p42`'s `spec.md::miri.blocked_reason` is costed and folded into `TASK_118`. ⚠ **Review debt: `TASK_113` cut fifteen to three; all three are now REVIEWED (`114`, `116`, `117`) and nine closed as superseded. The debt is CLEAR.** |
-| **THE CATALOGUE IS CLOSED, AND THIS TIME EVERY ROW HAS A MEASUREMENT** | ⚠⚠ **THIS ROW'S HEADER READ *"THE CATALOGUE IS RE-OPENED, and it was closed on a reason that did not hold"* WHILE ITS OWN BODY ALREADY SAID THE OPPOSITE — PROTOCOL RULE 13, COMMITTED BY THE MANAGER IN THE SAME SESSION THAT CITED RULE 13. Trust the body; fix the header.** ✅ **State: `48 = 26 BUILT + 17 REFUSED + 3 DEFERRED + 2 OTHER`, ZERO unadjudicated rows.** **Recount with `python3 .temp/mgr115/census.py`** — ⚠ **its `--naive` arm reproduces the trap that a keyword classifier reads 10 BUILT against a true 26, because `p24`'s and `p35`'s adjudication prose contains the word "BUILD".** **The two OTHER are `p24`** (probed, live, needs a new reason) **and `p35`** (blocked, not refused); **the deferrals are `p20`/`p21`/`p25`**, and ⚠ **`p25` is the ONE ROW ON WHICH THIS PROJECT HAS RUN NOTHING.** ⚠ **Every per-row reason is in `.memory/06-catalogue.md`'s status cell — READ THE CELL, not this box. The reasons are what get reused on the next row, and `p28` shows a right verdict can carry a wrong reason.** **Why it is closed: FINDING 40** (duplication, not the absence of a compare-and-branch) — ⚠⚠ **whose generalisation is the MANAGER'S READING and is UNREVIEWED. Attack it.** |
-| **THE ENDGAME QUESTION — ANSWERED. Kept as one row so nobody re-opens it from memory.** | ✅ **Wave 7 is DONE** (`results/SYNTHESIS.md`, hand-written, reviewed at `TASK_111`, corrected at `TASK_112`). ✅ **The catalogue is fully adjudicated** (row above). **So the two things this row used to hold open are both closed.** ⚠⚠ **WHAT REPLACES IT IS A QUESTION, NOT AN ANSWER: *"the 48-row catalogue is spent"* and *"there is nothing left worth building"* ARE DIFFERENT CLAIMS, and only the first is measured.** **The 48 rows were written PRE-PROJECT, before any of the 26 patterns existed, so a pre-project list being exhausted may say nothing about the domain.** ⚠ **The standing user mandate is *"as many realistic C patterns as possible"*, and the user has said to proceed autonomously — so this is NOT a scope call to hold for them; it is a question for measurement.** **`TASK_120` §B is written to answer it and is queued.** ⚠ **DO NOT print counts in this row.** It carried *"1008 lines"*, *"39 findings"* and *"p26/p37 are the two live rows"* after all three had moved. **Derive counts at the point of writing; the commands are in the row above and in `.memory/01-ladder.md`'s numbering warning.** |
+| **Do this next** | ⚠ **THE BOX IS THE QUEUE. The NARRATIVE for everything below now lives in the findings — finding 37 (DISPUTED), finding 39 (`p42`, two retractions), finding 40 (why the catalogue is exhausted). Do not re-summarise them here; this row went to 8 000 characters once and was trimmed for exactly that.** ⚠⚠ **OPERATIONAL, NEVER DELETE: `results/SYNTHESIS.md` is HAND-WRITTEN; `results/synthesis.md` (lower case) is GENERATED. Never regenerate over the capitalised one.** **THE QUEUE, in order:** *(1)* ⚠⚠ **`TASK_118` — RESUME IT. Attempt 1 died mid-task to an account session limit having landed NOTHING. ITS TASK FILE OPENS WITH A STATE BLOCK; read that and `.temp/t118/NOTES.md` before anything else.** ✅ **The privacy-scoped repair VERIFIES (`19/0`, twin `22/0`), the attack that killed the ledger is blocked BY RUSTC (`E0616` private field), the `identity` pin HOLDS at both levels, and the manager has cleared three resume-blockers (vparse handles the child module; the trusted set is IDENTICAL by the gate's own `_is_trusted`; the `unsafe` surface shrinks 12→11).** ⚠ **Unrun: the gate END-TO-END. `verus.obligations` is pinned at 18 and the repair is 19, so the contract MOVES.** ⚠ **Three-encoding limit, ONE spent.** *(2)* **`TASK_119` — the instrument corrections, WRITTEN AND QUEUED. Must run AFTER `TASK_118`** (it edits `check.py`, which stales every gate record; `TASK_096` did this mid-pattern and went 8 STALE). **One 26-pattern sweep, no re-measure.** *(3)* ✅✅ **`TASK_120` IS DONE AND FINDING 40 DID NOT SURVIVE AS WRITTEN** — the seven-of-twenty-two tally is **6 of 22**, its membership was wrong three ways, *"duplication"* is **four relations wearing one word**, two of three spot-checked refusal REASONS broke (`p20`, `p43` — verdicts survive), three of `p40`'s four figures were refuted, and ⚠⚠ **the endgame question is ANSWERED and REVERSED: finding 40 does NOT license "stop".** ✅ **Corrections landed in findings 40 and 41 and in the two rows below; catalogue cells corrected.** ⚠ **NEW AND OPEN — `TASK_122` is written for it: FINDING 41 is `TASK_120`'s own and is PROVISIONAL, and `p40`'s total moved 18.9 M `Ir` under a byte-identical pipeline with the pins unchanged.** *(4)* **Optional: split `SYNTHESIS.md`** into argument (≈330 lines) + evidence appendix (≈610) — ⚠ **only as a PURE MOVE, `diff`-verified to contain no deletions, because a split IS a compression and compression is where this document's bias entered with no arithmetic signature.** *(5)* ✅ **`TASK_121` IS NOW WRITTEN — the LAST owed item** (the `controls/*.json` pin, characterised below), **and it carries a measured question the manager will NOT decide alone: `.temp/` is GITIGNORED and the authoritative layer cites it 105 times** (`RECAP.md` 31, `06-catalogue.md` 28, `00-environment.md` 17, …); **67 distinct paths, 65 exist, 1.2 MB total, and the 2 that do not exist are `pNN` doc PLACEHOLDERS — so ZERO dangling citations on this box.** ✅ **`results/SYNTHESIS.md` cites `.temp/` ZERO times, so the OUTWARD document is already clean.** ⚠⚠ **But a fresh clone can check NONE of the evidence behind `RECAP.md` and `.memory/`, and there IS a remote. Committing previously-gitignored evidence is a REPO-POLICY call that belongs to the USER — `CLAUDE.md` rule 1 puts evidence in `.temp/` on purpose and rule 3 says checks run locally, so *"local artefact by design"* is a coherent reading. SURFACE IT; DO NOT ACT ON IT.** *(6)* ⚠⚠ **`TASK_122` — WRITTEN, AND IT IS NOW THE ONE THE ENDGAME DECISION RESTS ON. It attacks FINDING 41** (the manager landed it from one task, marked PROVISIONAL — **which is exactly what it did with finding 40, and finding 40 lasted one review**) **and it characterises the 18.9 M `Ir` drift.** ⚠ **Its §A.2 is the attack to run first: finding 41 ADDS `COST` to `LADDER`, and a row whose cost axis was FALSE died of a bad claim, not of an instrument limit.** *(7)* **`TASK_123` — WRITTEN: the enumeration nobody has run.** **20 worked CVEs against the reviewed three-limb bar, probe 1 FIRST.** ✅ **A rigorous *"all 20 die, here is why"* is a COMPLETE SUCCESS and is the expected outcome** — ⚠ **the point is that the project has been deciding *"the domain is worked out"* WITHOUT EVER ENUMERATING A DOMAIN.** ⚠ **Run it AFTER `122`: if finding 41 stands, the answer is probably *"and none survives the ladder either"*, which is cheaper than building.** ⚠ **Owed items, both CHARACTERISED (do not re-scope them from the one-line summary):** ⚠ **`controls/*.json`: THE SUMMARY *"a reader and no writer"* WAS WRONG AND IS CORRECTED — `patterns/p23-partition/controls/sweep_fit.py` DOES write `sweep_fit.json` (its `json.dump`, and it is the only `.json` sidecar in any `controls/`). What is missing is only the PIN, so the fix is a few lines in an existing generator, not a new tool.** ⚠⚠ **The obvious fix is still WRONG — pinning against the gate `source_sha256` would stale the sidecar on every later `NOTES.md` edit and cost ~30 min of callgrind for a prose fix; pin against a NARROWER digest** (`.memory/05-layout.md`). ⚠⚠ **AND THE NARROWER DIGEST IS *`measurement_sources` PLUS A TERM*, NOT `measurement_sources` — THE MANAGER WROTE THE INCOMPLETE VERSION INTO THIS BOX FIRST AND CAUGHT IT BEFORE ANYONE BUILT IT. `harness/measure.py::measurement_sources` is the right starting set (it covers p23's `*.rs`, `c/*`, `build.py`, `asm.py`, and is NON-RECURSIVE so `controls/*.py` is excluded — VERIFIED by reading the glob, not the docstring, so the edit costs ONE gate re-run and NO re-measure). ⚠⚠ BUT `sweep_fit.py`'s 26 rows are measured over `inputs/sweep-*.bin`, and `SKIP_INPUT_PREFIX = "sweep-"` means those blobs are hashed by NEITHER `source_sha256` NOR `input_sha256` — they are unhashed BY DESIGN, because `measure.py` correctly never measures them. So a pin naming only `measurement_sources` would MISS THE ONE TERM THE SIDECAR ACTUALLY VARIES OVER, which is `TASK_114`'s env-pin failure repeating one task later.** ⚠ **The design call — hash the blobs the script opened, or hash `gen.py` and accept the gap `measure.py`'s own comment calls insufficient (*"the generator hash cannot tell 'the inputs changed' from 'a comment changed'"*) — and WHICH KEY (stage `9b` currently keys on `gate_source_sha256`) belong in a task file, not in this box.** **The current SHOUT-not-fail is the right interim.** `p42`'s `spec.md::miri.blocked_reason` is costed and folded into `TASK_118`. ⚠ **Review debt: `TASK_113` cut fifteen to three; all three are now REVIEWED (`114`, `116`, `117`) and nine closed as superseded. The debt is CLEAR.** |
+| **THE CATALOGUE IS CLOSED, AND THIS TIME EVERY ROW HAS A MEASUREMENT** | ⚠⚠ **THIS ROW'S HEADER READ *"THE CATALOGUE IS RE-OPENED, and it was closed on a reason that did not hold"* WHILE ITS OWN BODY ALREADY SAID THE OPPOSITE — PROTOCOL RULE 13, COMMITTED BY THE MANAGER IN THE SAME SESSION THAT CITED RULE 13. Trust the body; fix the header.** ✅ **State: `48 = 26 BUILT + 17 REFUSED + 3 DEFERRED + 2 OTHER`, ZERO unadjudicated rows.** **Recount with `python3 .temp/mgr115/census.py`** — ⚠ **its `--naive` arm reproduces the trap that a keyword classifier reads 10 BUILT against a true 26, because `p24`'s and `p35`'s adjudication prose contains the word "BUILD".** **The two OTHER are `p24`** (probed, live, needs a new reason) **and `p35`** (blocked, not refused); **the deferrals are `p20`/`p21`/`p25`**, and ⚠ **`p25` is the ONE ROW ON WHICH THIS PROJECT HAS RUN NOTHING.** ⚠ **Every per-row reason is in `.memory/06-catalogue.md`'s status cell — READ THE CELL, not this box. The reasons are what get reused on the next row, and `p28` shows a right verdict can carry a wrong reason.** ⚠⚠ **WHY IT IS CLOSED — AND THE ANSWER CHANGED AT `TASK_120`. ~~FINDING 40 (duplication)~~ IS NOT THE REASON: duplication is the PRIMARY stated kill on 6 of 22 rows, 27%, so it is THE LARGEST FAMILY AND NOT A LAW — and the word covers FOUR different relations** (same predicate, strict subset, same conclusion, same detector). **The reviewed reason is FINDING 41: `LADDER`+`COST` kills 7 of 22, i.e. THE FIVE-RUNG LADDER HAS NOTHING TO PRICE ON THEM** — ⚠ **itself PROVISIONAL and unreviewed.** ⚠⚠ **AND "CLOSED" NO LONGER MEANS "STOP": finding 40 does not license it, the 47 rows are `git`-verified pre-project, and the enumeration against `../LearnVeri/microbench/`'s 20 worked CVEs has never been run. See the endgame row.** |
+| **THE ENDGAME QUESTION — ANSWERED. Kept as one row so nobody re-opens it from memory.** | ✅ **Wave 7 is DONE** (`results/SYNTHESIS.md`, hand-written, reviewed at `TASK_111`, corrected at `TASK_112`). ✅ **The catalogue is fully adjudicated** (row above). **So the two things this row used to hold open are both closed.** ✅✅ **AND THE QUESTION THAT REPLACED IT IS NOW ANSWERED — `TASK_120` §B, and it REVERSES the direction this box was pointing.** ⚠⚠ ***"The 48-row catalogue is spent"* and *"there is nothing left worth building"* ARE DIFFERENT CLAIMS, ONLY THE FIRST IS MEASURED, AND FINDING 40 DOES NOT LICENSE THE SECOND — it disclaims it in its own last paragraph. THE BOX ROW THAT CITED IT FOR *"STOP"* WAS THE MANAGER CITING ITS OWN FINDING WRONGLY.** **The 47 rows are pre-project — ✅ verified in `git`, not inferred: `git show d5e0ccd:.memory/06-catalogue.md` has 47 rows in the FIRST commit against an empty `patterns/`.** ⚠ **The counter-evidence is real and is stated at full strength in finding 40 (9 proposals, 0 admissions) — but all nine were selected on the criterion `TASK_113` says predicts neither way, so THE SEARCH HAS NEVER BEEN RUN UNDER THE REVIEWED BAR.** ⚠⚠ **THE HONEST GROUND FOR STOPPING IS FINDING 41 — an INSTRUMENT property, `LADDER`+`COST` = 7 of 22, which will keep killing NEW rows too — AND IT IS PROVISIONAL AND UNREVIEWED. If the project stops, stop on THAT, not on finding 40.** ⚠ **If it continues: the enumeration nobody has run — `../LearnVeri/microbench/`'s 20 worked CVEs against the reviewed three-limb bar, probe 1 FIRST. One candidate already survives two independent censuses: `CVE-2021-23017`'s *bound computed by a previous pass*.** ⚠ **DO NOT print counts in this row.** It carried *"1008 lines"*, *"39 findings"* and *"p26/p37 are the two live rows"* after all three had moved. **Derive counts at the point of writing; the commands are in the row above and in `.memory/01-ladder.md`'s numbering warning.** |
 | **⚠⚠ The manager generalisation that was REFUTED, and it is the most useful thing here** | I read `TASK_093`'s `p28` refusal as a **family** result — *"safe Rust's answer to every pointer-backed structure is either an arena that never frees or `p27`'s mechanism, so `p29`–`p34` are ONE finding, not five."* **I wrote it into two task files by name and asked to be corrected. Both agents corrected me.** ✅ **The reviewed replacement is now in `.memory/01-ladder.md` and it is a RULE, not a refusal:** *"safe Rust's temporal guarantee is a guarantee about the **ALLOCATOR**; a structure that **recycles its own storage** gets no guarantee at all."* **There are FOUR outcomes, not two** — and outcome 3 is that **the type system is SILENT** (use-after-recycle *and* slot double-free both writable under `#![forbid(unsafe_code)]`, silently wrong, **Miri-clean**, ✅ manager-re-run), which is `p04`'s finding and kills `p32`/`p33`. ⚠ **A generation tag does NOT rescue it**, so **this file's own p14-cycle `(slot, gen)` proposal yields a `p04`-shaped row, not a temporal one.** Outcome 4 is `p34`: **the safe rung is WORSE than C** (`Rc` cycle leaks, `Weak` does not). And `p29` is the fifth and only good outcome. ⚠⚠ **AND `TASK_093`'s OWN STATED REASON WAS REJECTED BY ITS REVIEW** — *"safe Rust has no owned intrusive DLL (`E0382` + `E0499`)"* is **false**: the `E0382` was a plain double move (reproduced with a control containing no data structure at all), `E0499` is refuted by **four compiling spellings** under `forbid(unsafe_code)` including `split_at_mut` with two `&mut` alive simultaneously, and **the claim was self-contradicted by its own table two rows below it.** **Right verdict, wrong reason — `p31`'s failure mode, and rule 9 is the only thing that kept it out of `.memory/`.** ⚠ **A refusal's REASON is what gets reused on the next row. It needs the same scrutiny as a finding.** |
 | **Selection is OVER — and the three box rows that used to live here are now history, moved below** | ⚠⚠ **The catalogue is closed (row above), so `p15`'s refusal, the `Pattern selection` probes and the `PROBE IN BATCHES` scheduling rule are no longer the next action.** They are preserved: **`p15`** in `.memory/06-catalogue.md`'s refusal block — ⚠ **and its NAMED UNBLOCKING CONDITION IS NOW DEAD**, because that condition was *"the day `_scan_unsafe_sites` admits a Verus-discharged `unsafe`"* and **the manager decided at TASK_096_REVIEW that the rule STAYS** (`.memory/02-bench-rules.md`); ✅ **its reusable artefact survives regardless** — a verified UTF-8 validator, `ensures res == valid_utf8(b@)` bidirectional, **`5 verified, 0 errors`, ZERO trusted items**, embedded verbatim in `.tasks/TASK_085_REPORT.md`. **THE THREE PROBES + probe 4** (the selection instrument) live in `.memory/06-catalogue.md`, ⚠ **and probe 2 is now known BROKEN IN BOTH DIRECTIONS** — the object-file md5 false-POSITIVES on relocations, the linked md5 false-NEGATIVES on any kernel with a branch or a global; **the form that works is normalised-disassembly text.** ⚠ **If a NEW row is ever proposed, the standing rule still binds: RUN ITS NOVELTY CLAIM BEFORE WRITING THE ROW** — both manager-proposed axes were refused, and both died on a claim one `grep` plus one run would have settled. |
 | **Rules for writing that task** | ⚠⚠ **STATE NOVELTY CLAIMS AS QUESTIONS TO BE MEASURED, never as fact.** *"The first termination proof in the project"* was the manager's sentence in `TASK_070.md`; it was **false**, the engineer had no reason to doubt it, and it shipped into **eight places, two inside `contract_sha256`** — a review and a re-gate to remove. **Rule 9 protects `.memory/` from unreviewed findings and protects NOTHING from the task file itself.** p22's §0 counted 73 measures in one command once it was finally asked. ⚠ **Settle the bug class as the FIRST deliverable** — overturned on four patterns, upheld on two. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat). **Additivity extrapolation — the only out-of-sample test here that can fail — HAS now failed once, on p38, and it was 100% attributable to three missing columns, none of them the one named.** The rule that came out of it: ⚠ **check the RESIDUE CLASS of any parameter your bands hold constant** — two of p38's three bands sat at `nw ≡ 0 (mod 8)` and the third did not, which fits in sample and misses out of it with no in-sample residual to warn you. ⚠ **Name the INLINE MODE at every figure** — p10 fitted both and the regressors *swapped*. All three in `.memory/03-measurement.md`. |
@@ -2220,9 +2220,14 @@ the number.** Two task files have already sent an agent to the wrong finding.
 
     Evidence: `.tasks/TASK_104_REPORT.md`, `patterns/p42-goto-cleanup/NOTES.md`.
 
-40. ⚠⚠ **THE CATALOGUE IS EXHAUSTED, AND THE REASON IS DUPLICATION — NOT THE
-    ABSENCE OF A COMPARE-AND-BRANCH.** **This is the honest replacement for
-    finding 37, which did not survive its review.**
+40. ⚠⚠ **THE CATALOGUE IS FULLY ADJUDICATED — AND ITS ROWS DIE FOR MANY REASONS,
+    OF WHICH DUPLICATION IS THE LARGEST AT 27%. IT IS A LIST, NOT A LAW, AND IT
+    DOES NOT LICENSE "STOP".** **This was written as the honest replacement for
+    finding 37, and ⚠⚠ IT DID NOT SURVIVE ITS OWN REVIEW EITHER** (`TASK_120`).
+    ⚠ **Its header read *"THE CATALOGUE IS EXHAUSTED, AND THE REASON IS
+    DUPLICATION"* after the body had already been corrected to say otherwise —
+    PROTOCOL rule 13, committed by the manager in the same session it enforced
+    rule 13 on two other rows. Trust the body.**
 
     ✅ **THE MEASURED PART, and it is settled:** at `TASK_115` the last seven
     rows were adjudicated and **every one of the 48 catalogue rows now carries a
@@ -2232,40 +2237,180 @@ the number.** Two task files have already sent an agent to the wrong finding.
     ⚠ **`p25` is the ONE row on which this project has run nothing, and its cell
     says so.** **Recount with `.temp/mgr115/census.py`.**
 
-    ⚠ **THE GENERALISATION IS THE MANAGER'S READING AND IS PROVISIONAL — it has
-    not been reviewed, and finding 37 is what happens when a manager's reading of
-    a refusal set gets published as a law.** **Stated so it can be attacked:**
+    ⚠⚠ **THE GENERALISATION WAS THE MANAGER'S READING, IT WAS REVIEWED AT
+    `TASK_120`, AND IT DID NOT SURVIVE IN THE FORM IT WAS WRITTEN.** **It was
+    published as:**
 
-    > **The remaining rows fail because they RE-DERIVE A MECHANISM ONE OF THE
-    > BUILT 26 ALREADY CARRIES, not because they have nothing to measure.**
+    > ~~**The remaining rows fail because they RE-DERIVE A MECHANISM ONE OF THE
+    > BUILT 26 ALREADY CARRIES, not because they have nothing to measure.**~~
 
-    **The refusal reasons, tallied from the cells themselves:** `p20` duplicates
-    **three** built rows (`p16`, `p02`, and — the correction `TASK_086` missed —
-    `p17`, which is itself a trusted-length-field OOB); `p21` is `p14` with a
-    different delimiter rule; `p26` is `p13`'s finding **including `p13`'s own
-    retraction**; `p37` is `p08`'s shape (unrepresentable, not checked); `p39` is
-    `p09` with the mask on the other side; `p41` is `p07` verbatim **plus**
-    `p10`'s spelling error at 100%; `p43` is `p16` verbatim. ⚠ **Seven rows, one
-    reason.** The rest divide into the allocator/recycling family (one finding,
-    not five), gate-policy blocks (`p15`, `p35`), false novelty claims caught too
-    late (`p48`, `p31`), and one-rung kills (`p44`, `p45`).
+    ⚠ **`TASK_120` classified ALL 22 non-built rows by each cell's OWN stated
+    kill** (`.temp/r120/classify22.py`, which pins a verbatim quote per row and
+    asserts it — ✅ **the assert FIRED on `p31`, so the instrument works**):
+
+    ```
+    DUP     6  p21 p26 p28 p37 p39 p43     NOVELTY 5  p15 p29 p30 p31 p48
+    COST    4  p20 p24 p40 p41             LADDER  3  p33 p44 p45
+    NONE 1 p25 · ADMIN 1 p32 · PIN 1 p34 · GATE 1 p35
+    duplication as PRIMARY reason: 6/22 = 27%   ·   mentioned at all: 11/22
+    ```
+
+    ✅ **So the honest sentence is *"the largest single family of stated reasons,
+    at about a quarter, is duplication"* — A LIST, NOT A LAW.** ⚠ **The manager's
+    own "least sure #2" guessed exactly this and was right.**
+
+    ⚠ **The seven's MEMBERSHIP was wrong three ways**, and one of them is the
+    selection effect **caught in the act with a timestamp in the cell**:
+
+    - **`p20` is not a duplication refusal.** Its kill is the measurement —
+      *"a length/offset check is O(1) and does not scale"*. ⚠⚠ **The duplication
+      clause was APPENDED AT `TASK_115` and is explicitly *"the deferral holds
+      A FORTIORI"* — a reinforcing reason written by an agent who already knew
+      the built tree. That is the `TASK_120` §A.3 selection effect, dated.**
+    - **`p41` is a two-kill row and its cell says so** — *"dies on probe 3 AND on
+      duplication"*. **Probe 3 came first and is sufficient**; the apparent
+      `9.6×` was 100% R3 spelling.
+    - **`p28` is MISSING**, and its cell says *"it is still `p27`'s MECHANISM,
+      which is why the row is refused"*. Finding 40 filed it under *"the
+      allocator/recycling family"* — ⚠ **a LOCATION, not a reason.**
+
+    ⚠⚠ **AND "DUPLICATION" IS AT LEAST FOUR DIFFERENT RELATIONS WEARING ONE WORD
+    — the category error the review was asked about, CONFIRMED:** `p21`→`p14` is
+    **same predicate**; `p39`→`p09` is a **strict subset** (`p09` ships both
+    halves); `p26`→`p13` is the **same published conclusion**, i.e. a *result*
+    and not a mechanism; `p28`→`p27` is the **same runtime detector**;
+    `p43`→`p16` is a **same-kernel-shape claim the numbers contradict** (below).
+    ⚠⚠ **`p37`→`p08` IS THE SHARPEST AND IT IS BACKWARDS: it is a shared
+    structural ABSENCE — `p08` does not CARRY the mechanism, it LACKS one. `p37`
+    has a NOVEL bug class (type confusion, absent from all 26 by census), a
+    MEASURED cost axis (`21/20/18 Ir` per record, tag check `+2.00`) and a FIRING
+    harm (ASan 2/2), and what actually killed it is a VERUS REPRESENTABILITY
+    LIMIT. A row like that was being counted as evidence that the rows have
+    nothing new.**
 
     ⚠⚠ **AND ONE ROW FAILS FOR A REASON WORTH ITS OWN SENTENCE, because it is
     about the INSTRUMENT rather than the row:** `p40` (SoA vs AoS) differs by
-    **21 `Ir` out of 360 million — `5.8e-8`** — while its **LLd read misses
-    differ `4.20×`**. **The row's entire axis is invisible in this project's
+    **21 `Ir`** while its cache behaviour differs by a large factor. ✅ **THE
+    CONCLUSION SURVIVES — the row's entire axis is invisible in this project's
     primary metric, and wall clock cannot rescue it** (best-of-7 spreads
     `2.8%–32.7%`, over the project's own 10% discard threshold on 3 of 4 rungs).
-    ✅ **THAT is a real statement about what this benchmark cannot price, and
-    unlike finding 37's it is a single measured row rather than a generalisation
-    over eight.**
+    ⚠⚠ **BUT THREE OF ITS FOUR PUBLISHED FIGURES DID NOT SURVIVE `TASK_120`, AND
+    THE ONE THAT DID IS NOW CONFIRMED TWICE:**
 
-    ⚠ **What this finding does NOT license.** It does **not** say new patterns
-    are impossible — it says **these 22 rows** are spent. ⚠⚠ **The admission bar
-    from finding 37's second limb still stands and is untouched: *a row is
-    admissible whenever it brings a new mechanism — a new operator on the safety
-    line, a new source of the bound, or a new reason the check is or is not
-    elided.* A NEW row meeting that bar would still be worth building.**
+    - ✅ **`21 Ir` — CONFIRMED by two independent routes**, including a
+      **zero-iteration control the original lacked** that makes `k40_aos` and
+      `k40_soa` byte-equal at `374,658,547`, so all 21 belong to the kernel.
+    - ⚠ ~~`5.8e-8`~~ → **`4.9e-6`, 84× larger.** **The 360 M denominator is
+      98.86% program SETUP**; the kernel's own marginal is `1,442,043 Ir`/call.
+      ⚠ **`5.8e-8` is the figure a reader quotes — do not quote it.**
+    - ⚠ ~~`+193 Ir`~~ → **`+114` over 3 calls = `38 Ir`/call.** **115 `Ir` of it
+      was `println!` formatting a kernel name six characters longer**, visible
+      with the kernels never called.
+    - ⚠⚠ ~~`LLd read misses differ 4.20×`~~ → **DOES NOT REPRODUCE; re-runs at
+      `3.68×`.** ✅ **The `D1` miss delta reproduces EXACTLY (`1,179,645`), so the
+      kernels are identical and the LLd figures moved with the ENVIRONMENT** —
+      and both are **whole-program** counts dominated by the 67 MB + 16 MB setup
+      allocations, ⚠ **so neither `4.20×` nor `3.68×` is a property of the
+      kernel at all.**
+
+    ⚠⚠ **OPEN, AND NOBODY HAS CHARACTERISED IT: `p40`'s absolute `Ir` total moved
+    `360,114,293` → `378,984,676` — 18.9 M — under a byte-identical pipeline,
+    with `rustc` still the pinned `1.97.1 / LLVM 22.1.6` and `valgrind` `3.27.1`.
+    Something in the box changed since `TASK_086` and the reviewer could not
+    attribute it.** ⚠ **This is not a claim that the old number was wrong when
+    written. It is a claim that the box is not as stable as the record assumes.**
+
+    ⚠⚠ **WHAT THIS FINDING DOES NOT LICENSE — AND `TASK_120` §B IS THE ANSWER TO
+    THE ENDGAME QUESTION, SO READ IT BEFORE ACTING ON THIS FINDING AT ALL.**
+    **It does not say new patterns are impossible — it says THESE 22 ROWS are
+    spent.** ⚠ **The admission bar from finding 37's second limb still stands and
+    is untouched: *a row is admissible whenever it brings a new mechanism — a new
+    operator on the safety line, a new source of the bound, or a new reason the
+    check is or is not elided.*** ⚠⚠ **SO: FINDING 40 SUPPORTS *"GO FIND NEW
+    ROWS"*, WEAKLY BUT GENUINELY, AND DOES NOT SUPPORT *"STOP"*. WHOEVER CITES IT
+    FOR *"STOP"* IS CITING IT WRONGLY — including the manager, who wrote the box
+    row that did exactly that.** **The reviewed grounds, all four measured:**
+
+    - ✅ **The 47 rows ARE pre-project — verified in `git`, not inferred:**
+      `git show d5e0ccd:.memory/06-catalogue.md` has **47 rows in the repo's
+      FIRST commit**, with an empty `patterns/`. **A pre-project list running out
+      after 26 builds says little about the domain.**
+    - ⚠ **The honest counter-evidence, at full strength: 9 post-project proposals,
+      0 admissions** (`p48` + `TASK_102`'s eight). ⚠⚠ **BUT ALL NINE WERE
+      SELECTED ON BUG-CLASS NOVELTY — the criterion `TASK_113` says *"predicts
+      neither way"*. NO SEARCH HAS EVER BEEN RUN UNDER THE BAR THAT SURVIVED
+      REVIEW.** **The one row admitted under that bar (`p23`, chosen BECAUSE it
+      was the 15th `index >= len`) shipped finding 38; the one admitted on
+      bug-class absence (`p42`) shipped with BOTH headlines retracted.**
+    - ⚠⚠ **THE ARGUMENT THE MANAGER ASKED FOR AT `TASK_113` — argue the bar from
+      the CVE DISTRIBUTION rather than from taste — WAS NEVER DELIVERED, AND THE
+      CORPUS FOR IT HAS BEEN IN THE REPO THE WHOLE TIME.**
+      `../LearnVeri/microbench/` is **20 worked CVEs with completed proofs**, and
+      sec-ladder has cited it **twice in its entire history, never as a row
+      source** (`.memory/04-verus.md:5` for proof idioms; `TASK_011.md:13`, which
+      became `p17`).
+    - ✅ **The census of it, run INDEPENDENTLY BY THE REVIEWER AND BY THE MANAGER
+      (`.temp/mgr121/NOTES.md`), CONVERGED on 15 of 20 and DIVERGED on one row —
+      and the divergence is exactly where the manager had flagged its own mapping
+      as untrustworthy.** **Both readings: the 8 TEMPORAL map onto the exhausted
+      `p27` family** (all eight are fixed by a generational index; ⚠ **and `p27`'s
+      own source says a freelist push into a slab makes the stale read *in bounds
+      of a live allocation* — `p17`'s LOGICAL class, `TASK_055` §2.8, which also
+      records that the manager offered the `(slot, gen)` shape THEN and the
+      engineer rejected it**); **the 7 LOGICAL should die on probe 1** — no
+      boundary between the rungs, which is `p31`'s and `p33`'s death — ⚠ **and
+      that is a real prediction somebody can cheaply falsify.**
+      ⚠⚠ **THE DIVERGENCE, AND IT IS THE ONE CANDIDATE: `CVE-2021-23017` — a
+      SIZING pass under-counts a separator the WRITING pass emits, so THE BOUND
+      COMES FROM AN EARLIER PASS OVER THE SAME INPUT AND THE TWO PASSES
+      DISAGREE.** **Against the built tree's sources of the bound — attacker
+      length field (`p02`, `p16`), byte-value count (`p14`), buffer extent
+      (`p01`), carry width (`p46`), two moving cursors (`p23`) — *a bound
+      computed by a previous pass* IS NOT PRESENT.** ⚠ **That is limb 2 of the
+      reviewed bar verbatim. The reviewer explicitly does NOT claim it would
+      survive probing — only that the enumeration has never been done.**
+
+41. ⚠⚠ **THE REAL REASON TO STOP IS THE INSTRUMENT, NOT THE CATALOGUE — AND IT
+    IS THE ONLY REASON-FAMILY THAT PREDICTS ANYTHING ABOUT A ROW NOBODY HAS
+    WRITTEN YET.** ⚠ **PROVISIONAL: this is `TASK_120`'s own finding, produced
+    while reviewing finding 40, and it has NOT itself been reviewed. Rule 9 —
+    land the conclusion, attack it before it becomes a law. It is finding 40's
+    shape all over again (one reader, one refusal set) and it deserves the same
+    suspicion.**
+
+    **From the same 22-row classification that cut duplication to 27%:**
+
+    > **`LADDER` + `COST` is 7 of 22 as a PRIMARY reason** — `p20 p24 p33 p40
+    > p41 p44 p45` — **plus `p31` and `p35` as a secondary, and `p39`/`p43`
+    > carrying a zero-or-flat cost alongside their duplication. THE MOST COMMON
+    > THING WRONG WITH A REMAINING ROW IS THAT THE FIVE-RUNG LADDER HAS NOTHING
+    > TO PRICE ON IT.**
+
+    ⚠⚠ **That is a statement about THIS BENCHMARK, not about C — which is
+    precisely what makes it useful: it will keep killing NEW rows too.** ✅ **So
+    a 27th pattern is a bet on the INSTRUMENT, not on the catalogue** — and
+    ⚠ **that is the *"different reason"* this file has been saying nobody has
+    supplied.** **It points at "stop" for a completely different reason than
+    duplication does, and unlike duplication it is measurable rather than a
+    matter of taste.**
+
+    ⚠ **The decision this leaves, stated so nobody re-derives it:** *if the
+    project stops, stop on THIS, which is measured; not on finding 40, which
+    disclaims it.* **If it continues, the cheapest next move is the enumeration
+    nobody has run — 20 worked CVEs against the reviewed three-limb bar, with
+    probe 1 applied FIRST** (probe 1 is what kills the logical seven, and running
+    it first is what makes the enumeration cheap).
+
+    ⚠ **AND A SECOND INSTRUMENT RESULT CAME OUT OF THE SAME TASK, WITH TEETH:**
+    whole-program `Ir` totals moved by **60** between `--cache-sim=yes` and plain
+    `callgrind` **on the same binary and the same argv**, while **marginal
+    (differenced) numbers did not move at all**. ⚠⚠ **So any published figure
+    below ~100 `Ir` taken from a WHOLE-PROGRAM TOTAL rather than a DIFFERENCE is
+    at the noise floor. That covers `p40`'s `21`, `p40`'s `193` and `p43`'s
+    `+3.00`** — ✅ **`p40`'s `21` survives anyway, because `TASK_120` re-derived
+    it as a difference against a zero-iteration control.**
+
+    Evidence: `.tasks/TASK_120_REPORT.md`, `.temp/r120/classify22.py`.
 
 ## Retracted — do not reinstate
 
