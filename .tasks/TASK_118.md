@@ -113,6 +113,18 @@ refuted that in its own words** (`Map::tracked_empty()` assigned over the ledger
 verifies). **Rule 6 is necessary and not sufficient: a frozen declaration is
 evidence about WHEN it was written, not about whether it is still true.**
 
+## §C2 — the OWED ITEM, and `TASK_114` has already costed it for you
+
+**`p42`'s `spec.md::miri.blocked_reason` final sentence states something that no
+longer holds** — it was flagged at `TASK_107`, flagged again at `TASK_114`, and
+has never been fixed. ⚠ **It is INSIDE the contract fence**, so the edit moves
+`contract_sha256` (currently `437ae31512cf`) and thereby makes
+`results/tables/p42-goto-cleanup.md:67` **STALE**, which stage 9 will fail on.
+
+✅ **The loop is THREE commands and needs NO re-measure:** edit → `harness/report.py p42`
+→ `harness/check.py p42`. ⚠ **You are moving `contract_sha256` anyway for §C, so
+fold this into the same move and disclose ONE before/after pair, not two.**
+
 ## §D — the three smaller ones, all confirmed by the review
 
 1. ⚠ **The published R3 span `1419…2634` is 4.5× too wide.** `r3_zeroed` and
