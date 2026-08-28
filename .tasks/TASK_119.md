@@ -126,6 +126,28 @@ an undocumented hole is how the tenth and eleventh were found.
    them.** ⚠ **Then `grep` for any OTHER copied `check.py` constant and say what
    you found — that is the general form and it has now bitten twice.**
 
+## §D2 — ⚠⚠ `TASK_118` ALREADY BUILT ONE OF YOUR ITEMS. APPLY IT, DO NOT RE-DERIVE IT.
+
+**`TASK_118` §E was the Miri `ub`-key fix** (`check.py`'s Miri `ub` reads `False`
+for a LEAK, so a reader of `results/gate/p42-*.json` cannot see that Miri caught
+one). ⚠⚠ **The engineer correctly WITHDREW it mid-task rather than land it — it
+found that `TASK_118`'s budget line was WRONG (`check.py` is not
+measurement-hashed but IS GATE-RECORD-hashed, and the one-line edit took
+`--check-stale` from 0 to 25 STALE) and that THIS TASK exists to batch exactly
+that.** ✅ **That is the judgement call this project wants, and it means the work
+is done and tested and is waiting for you:**
+
+```
+.temp/t118/E-check-py.diff     58 lines   -- verified by the manager to `git apply --check` CLEAN
+.temp/t118/miri_leak_key.py   235 lines   -- its test, green INCLUDING THE OLD-CODE ARM
+                                             (old code: ub=False, leak=<KEY ABSENT>)
+```
+
+⚠ **Read the diff before applying it — you own it once it is in your sweep.**
+✅ **It already has the arm that MUST FIRE, which is why it is worth taking.**
+⚠ **`patterns/p42-goto-cleanup/NOTES.md` 10a already records the FINDING without
+the code, so do not re-land the prose.**
+
 ## §E — the sweep, last
 
 Full **26-pattern** `harness/check.py`, then
@@ -169,9 +191,14 @@ Write your report to `.tasks/TASK_119_REPORT.md` as well as returning it.
 
 ---
 
-⚠ **PROTOCOL rule 2's running count is 466** (reconciled across five branches at
-`TASK_118`'s launch; ⚠ **it is a rigour signal, not a ledger — do not re-add
-it**). The calls I am least sure of:
+⚠ **PROTOCOL rule 2's running count is 502.** **Derivation, stated so it can be
+checked rather than trusted: base 466 at `TASK_118`'s launch; `TASK_120` +22 and
+`TASK_118` +14, BOTH off that same 466 branch.** ⚠ **I have ADDED them here
+because their subjects are disjoint — `TASK_120` attacked finding 40 and the
+catalogue, `TASK_118` attacked `p42` — and the only overlap I can find is that
+both caught an error in a MANAGER-WRITTEN TASK FILE, which is one theme and two
+distinct errors.** ⚠⚠ **PROTOCOL rule 1 says this is a RIGOUR SIGNAL AND NOT A
+LEDGER — do not re-add it, and do not treat 502 as an audited total.** The calls I am least sure of:
 
 1. ⚠⚠ **That §A's variable count is the right second integer.** It is `TASK_114`'s
    proposal and it explains the measured period exactly — **but the same was true
@@ -190,4 +217,4 @@ it**). The calls I am least sure of:
    down, SAY SO** — that is a legitimate answer and cheaper than a fourth regex
    round.
 
-Carry **466** forward, incremented by what you find.
+Carry **502** forward, incremented by what you find.
