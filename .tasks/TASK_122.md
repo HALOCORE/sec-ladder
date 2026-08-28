@@ -123,9 +123,12 @@ and cross-file citations are exactly what rots.**
 - ⚠ **Callgrind `Ir` is deterministic and immune to concurrent load; wall clock
   is not.** ⚠⚠ **§B is precisely a claim that "deterministic" has limits —
   measure them, do not assume them in either direction.**
-- ⚠ **Every probe needs an arm that MUST FIRE.** The list at the end of
-  `.memory/03-measurement.md` holds **six live entries numbered 1–7** (entry 5 is
-  retracted). ⚠ **Do not quote its ordinal.**
+- ⚠ **Every probe needs an arm that MUST FIRE.** **The list at the end of `.memory/03-measurement.md` is the catalogue of
+  named failure classes — ⚠ **READ THE LIST; IT CARRIES NO USABLE COUNT.**
+  ⚠⚠ **Its own entry says a count is a cached derivation that goes stale like
+  any other cached number, and that count has now rotted THREE times — most
+  recently because this manager added an entry after writing the old figure
+  into three task files. If you need a number, derive it where you write it.**
 - ⚠⚠ **Probe 2 has SIX known defects and `.temp/t104/probe2.py` carries the
   sixth.** **Take the symbol extent from the ELF symbol table.**
 - Hand-run ASan needs `env -u LD_PRELOAD`; never truncate a sanitiser log with

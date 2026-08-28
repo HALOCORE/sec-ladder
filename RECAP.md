@@ -2034,9 +2034,13 @@ the number.** Two task files have already sent an agent to the wrong finding.
     Evidence: `.tasks/TASK_101_REPORT.md`, `.tasks/TASK_105_REPORT.md`,
     `.tasks/TASK_106_REPORT.md`, `patterns/p23-partition/NOTES.md`.
 
-39. ⚠⚠ **p42 — TWO HEADLINES PUBLISHED, TWO RETRACTED. THE QUESTION IS OPEN, AND
-    THE SHIPPED TREE IS PROTECTED BY THE IDENTITY PIN RATHER THAN BY ITS PROOF.**
+39. ⚠⚠ **p42 — TWO HEADLINES PUBLISHED AND RETRACTED, THREE ENCODINGS BUILT AND
+    ALL THREE ADMIT A VERIFYING LEAKER. THE QUESTION IS OPEN, AND THE SHIPPED
+    TREE IS PROTECTED BY THE IDENTITY PIN RATHER THAN BY ITS PROOF.**
     The 26th pattern, and **the most-corrected result in the project.**
+    ⚠ **Encoding 3 was correctly NOT PUBLISHED — it was built, attacked, found
+    leaking, and reported as a failure. That is why the retraction count is two
+    and the encoding count is three.**
 
     ⚠⚠ **HEADLINE 1, RETRACTED (`TASK_109`, review): *"Verus at the pin CANNOT
     state leak-freedom."*** False as stated.
@@ -2077,7 +2081,47 @@ the number.** Two task files have already sent an agent to the wrong finding.
     refuted; INEXPRESSIBILITY IS NOT PROVEN and is OPEN.** ✅ **Repair direction,
     measured and unbuilt: a module-local `Tracked<Freed>` receipt is FORGEABLE in
     proof mode (`3 verified, 0 errors`); a PRIVACY-SCOPED one is NOT — rustc
-    rejects the forgery.** **That is the live lead.**
+    rejects the forgery.** ~~**That is the live lead.**~~
+
+    ⚠⚠ **ENCODING 3 WAS BUILT AT `TASK_118` AND IT FAILS TOO. THREE ENCODINGS,
+    THREE VERIFYING LEAKERS.** ✅ **MANAGER RE-RAN THE DECISIVE ARM; it
+    reproduces (`.temp/t118/decoy_err.py`).** **The privacy-scoped ledger blocks
+    every attack that killed encoding 2 — `atk_remove` is `error[E0616]: field
+    `m` … is private`, i.e. blocked BY RUSTC — and then loses to a different
+    one:**
+
+    ```
+    mustfire_err2        18 verified, 1 errors   escrow in a ledger kbody WAS HANDED   -> REJECTED
+    atk_decoy_err        19 verified, 0 errors   escrow in a ledger kbody MINTS ITSELF -> ACCEPTED
+    atk_decoy_err_freed  19 verified, 0 errors   same local ledger, BOTH paths free    -> floor
+    leaked  1284 / 1652 / 1028 / 1044  against a constant 1028 floor
+            == model.py::leak_bytes on ALL FOUR inputs
+    -O3     r5decoyerr md5_fn d3f1194c… == the shipped R4 WITH p42's BUG PLANTED
+    ```
+
+    ⚠ **Two arms differing in exactly ONE respect — WHICH LEDGER — and the one
+    that mints its own verifies while leaking.** ⚠⚠ **THE REUSABLE RULE, and it
+    is the shape of all three failures: PRIVACY MAKES A LEDGER'S *CONTENTS*
+    UNFORGEABLE (by rustc) AND CANNOT MAKE THE LEDGER *UNIQUE*.** **The
+    postcondition certifies only that the author wrote *something* on each exit
+    that empties a map the author controls — so the gap is one proof line wide,
+    in three places.** ⚠ **PROVISIONAL: this rule is `TASK_118`'s reading and is
+    UNREVIEWED (rule 9). The CONCLUSION — encoding 3 fails — is manager-verified;
+    the RULE is not.**
+
+    ⚠⚠ **AND THE ARM THAT DECIDED IT WAS ONE THE MANAGER COULD NOT PLACE.**
+    Attempt 1 left a verifying leaker labelled `atk_decoy`; **the manager's
+    reconstruction of that dead agent's state recorded it as *"PURPOSE UNKNOWN —
+    establish before citing"* and moved on.** ⚠ **The one row a summary cannot
+    place is worth more attention than the twenty it can, not less.**
+
+    ✅ **The price was always right and the PRODUCT is nothing:** the ledger costs
+    **+3 obligations, 0 TCB, 0 `Ir`** — ⚠ **and buys no leak-freedom.**
+    ⚠⚠ **STILL NOT SAID, AND STILL THE THING THAT WOULD BE THE FOURTH
+    RETRACTION: this does NOT show Verus cannot state leak-freedom. THREE DATA
+    POINTS ARE NOT AN IMPOSSIBILITY PROOF. Expressibility at this pin is OPEN.**
+    ⚠ **One unbuilt lead remains and is recorded rather than pursued:
+    `dig_alloc` + `led_new` private to `mod res`, with `res::run`.**
 
     ⚠⚠ **THE STRUCTURAL POINT, and it is the transferable one: NOTHING IN THE
     GATE CHECKS THAT AN `ensures` MEANS WHAT ITS PROSE SAYS.** The gate was

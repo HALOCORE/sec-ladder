@@ -126,9 +126,12 @@ suppress one to agree with finding 41.**
 - ⚠⚠ **DO NOT RUN `harness/check.py`, `build.py` or `measure.py`** unless the
   manager says the tree is free. **Build probes with direct `clang`/`gcc`/`rustc`
   under `.temp/t123/`.**
-- ⚠ **Every probe needs an arm that MUST FIRE.** The list at the end of
-  `.memory/03-measurement.md` holds **six live entries numbered 1–7** (entry 5 is
-  retracted). ⚠ **Do not quote its ordinal.**
+- ⚠ **Every probe needs an arm that MUST FIRE.** **The list at the end of `.memory/03-measurement.md` is the catalogue of
+  named failure classes — ⚠ **READ THE LIST; IT CARRIES NO USABLE COUNT.**
+  ⚠⚠ **Its own entry says a count is a cached derivation that goes stale like
+  any other cached number, and that count has now rotted THREE times — most
+  recently because this manager added an entry after writing the old figure
+  into three task files. If you need a number, derive it where you write it.**
 - Verus via `./verus_run.py` only, **single-file mode, never `--cargo`.** Do not
   bump the pin. ⚠ **You probably need no Verus at all — the corpus ships proofs
   and you are triaging, not proving.**

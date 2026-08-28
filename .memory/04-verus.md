@@ -1818,9 +1818,36 @@ UNCONDITIONAL.** `p47` and the stack-overflow case are untouched. **`p42`'s
 shipped R5 does not cover its own bug class — that was true when the sentence
 was hedged and it is true now**, ⚠ **but the REASON has been retracted twice and
 must NOT be restated as either *"the prover cannot"* or *"the encoding chosen"*.
-Both were asserted and both fell.** ✅ **The supportable form: TWO encodings have
-been tried and BOTH admit a leaking program that verifies. Whether a third
-works is OPEN, with privacy-scoping the live lead.**
+Both were asserted and both fell.** ✅ **The supportable form, UPDATED AT `TASK_118`: ~~TWO~~ **THREE** encodings have
+been tried and **ALL THREE** admit a leaking program that verifies.** ⚠⚠ **THE
+PRIVACY-SCOPED LEAD WAS BUILT AND IT FAILS.** It blocks every attack that killed
+encoding 2 — `atk_remove` is `error[E0616]: field `m` … is private`, **blocked by
+RUSTC and not by Verus** — and then loses to a different one:
+
+```
+mustfire_err2        18 verified, 1 errors   escrow in a ledger kbody WAS HANDED   -> REJECTED
+atk_decoy_err        19 verified, 0 errors   escrow in a ledger kbody MINTS ITSELF -> ACCEPTED
+atk_decoy_err_freed  19 verified, 0 errors   same local ledger, BOTH paths free    -> floor
+leaked 1284 / 1652 / 1028 / 1044 vs a constant 1028 floor == model.py::leak_bytes, all four inputs
+```
+
+✅ **Manager re-ran this; `.temp/t118/decoy_err.py` regenerates it.** ⚠ **Two arms
+differ in exactly ONE respect — WHICH LEDGER — and the one that mints its own
+verifies while leaking.**
+
+⚠⚠ **THE RULE, and it is the shape of all three failures — PROVISIONAL,
+`TASK_118`'s reading, UNREVIEWED (rule 9; the CONCLUSION is manager-verified, the
+RULE is not): PRIVACY MAKES A LEDGER'S *CONTENTS* UNFORGEABLE AND CANNOT MAKE THE
+LEDGER *UNIQUE*.** **The postcondition certifies only that the author wrote
+*something* on each exit that empties a map the author controls — the gap is one
+proof line wide, in three places.** ⚠ **The ledger's PRICE was always right (+3
+obligations, 0 TCB, 0 `Ir`); its PRODUCT is nothing.**
+
+⚠⚠ **WHETHER A FOURTH WORKS IS STILL OPEN, AND THREE DATA POINTS ARE NOT AN
+IMPOSSIBILITY PROOF.** ⚠ **Do NOT write that Verus cannot state it — that exact
+sentence is retraction 1 and restating it would be the fourth.** **One unbuilt
+lead is recorded rather than pursued: `dig_alloc` + `led_new` private to
+`mod res`, with `res::run`.**
 
 ⚠ **Do not cite `p42` as evidence that a prover cannot express a resource
 property** — and equally, ⚠⚠ **do not cite it as evidence that a ghost ledger

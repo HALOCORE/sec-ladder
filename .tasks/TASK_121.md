@@ -138,9 +138,12 @@ this project found routes ten and eleven** (`TASK_119` §C).
   outside `controls/`** — `*.rs`, `c/*`, `model.py` and `inputs/gen.py` are all
   measurement-hashed.
 - ⚠ **Cite `check.py` by FUNCTION NAME, never a line number.**
-- ⚠ **Every acceptance test needs an arm that FAILS.** The list at the end of
-  `.memory/03-measurement.md` holds **six live entries numbered 1–7** (entry 5 is
-  retracted). ⚠ **Do not quote its ordinal.**
+- ⚠ **Every acceptance test needs an arm that FAILS.** **The list at the end of `.memory/03-measurement.md` is the catalogue of
+  named failure classes — ⚠ **READ THE LIST; IT CARRIES NO USABLE COUNT.**
+  ⚠⚠ **Its own entry says a count is a cached derivation that goes stale like
+  any other cached number, and that count has now rotted THREE times — most
+  recently because this manager added an entry after writing the old figure
+  into three task files. If you need a number, derive it where you write it.**
 - `timeout <N> <cmd>`; never `pkill`/`killall`.
 
 Write your report to `.tasks/TASK_121_REPORT.md` as well as returning it.

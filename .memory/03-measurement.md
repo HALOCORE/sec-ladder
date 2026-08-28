@@ -2662,7 +2662,7 @@ swept band crosses a bulk-routine threshold before quoting a rate.**
 
 **Landed at TASK_100. PROVISIONAL where an entry cites an unreviewed task.**
 
-⚠⚠ **THE COUNT IS SIX LIVE ENTRIES, NOT SEVEN. Entry 5 is RETRACTED, so the list numbers 1–7 and contains six.** ⚠ **And the manager then quoted *"seven"* into FIVE task files — after writing the sentence two paragraphs below that says *keep the list, not the ordinal*, and after the ordinal had ALREADY gone wrong once the same way.** Caught by `TASK_108`. **The failure is not arithmetic: a count is a cached derivation of a list, and it goes stale exactly like every other cached number in this repo. Cite the list; if you must give a number, derive it at the point of writing.**
+⚠⚠ **THE COUNT IS SEVEN LIVE ENTRIES. Entry 5 is RETRACTED, so the list numbers 1–8 and contains seven.** ⚠⚠ **AND IT WENT STALE AGAIN THE MOMENT `TASK_118` ADDED ENTRY 8 — the manager updated this line in the same edit that added the entry, having ALREADY quoted the old figure into THREE queued task files. That is the third time this exact count has rotted. THE FIX IS NOT A BETTER NUMBER: task files now say *derive it*, and carry no ordinal at all.** ⚠ **And the manager then quoted *"seven"* into FIVE task files — after writing the sentence two paragraphs below that says *keep the list, not the ordinal*, and after the ordinal had ALREADY gone wrong once the same way.** Caught by `TASK_108`. **The failure is not arithmetic: a count is a cached derivation of a list, and it goes stale exactly like every other cached number in this repo. Cite the list; if you must give a number, derive it at the point of writing.**
 This project keeps writing checks that pass because they *cannot* fail, and until
 now the count lived as a bare ordinal (*"the fifth instance"*) scattered across
 files — ⚠ **which is how the count itself went wrong: entry 5 below was
@@ -2711,6 +2711,25 @@ already been struck.** Keep the list, not the ordinal.
    The probe modelled *"bash versus python"*; the arms that actually differed
    were `bash -c "cd X && cmd"` versus `subprocess.run(cmd, cwd=X)`, **and the
    `cd` was the entire effect** — it exports `OLDPWD`, 11 bytes.
+
+8. ⚠⚠ **`p42`'s `controls/ledger_leak.py` — AND IT IS A DIFFERENT SHAPE FROM
+   EVERY ENTRY ABOVE. `TASK_118`.** ⚠ **Entries 1–7 are all *a control that
+   COULD NOT HAVE FIRED*. This one FIRED, on both arms, and its firing did not
+   support the sentence it printed.** Its two arms were **DELETIONS** — remove
+   the exit-emptying statement, Verus rejects — so together they distinguish
+   *no exit-emptying statement* from **SOME** *exit-emptying statement*.
+   ⚠⚠ **The script concluded *"states leak-freedom"*, which is a claim about
+   WHICH statement, and no deletion arm can reach it.** **A program that empties
+   the ledger WITHOUT FREEING passes both arms and leaks** — that is exactly the
+   `atk_decoy_err` leaker, `19 verified, 0 errors`.
+   ⚠⚠⚠ **THE LESSON, AND IT SHARPENS THIS FILE'S OWN RULE RATHER THAN REPEATING
+   IT: *"before believing a check, ask what would make it FAIL"* IS NECESSARY AND
+   NOT SUFFICIENT. YOU MUST ALSO ASK: *"and would its FAILING mean what the
+   script says its PASSING means?"*** ⚠ **A deletion arm proves NECESSITY. A
+   claim about sufficiency needs an ATTACK arm** — `TASK_118` rewrote the control
+   to five arms, with **two attacks pinned as ACCEPTANCE arms** (they must
+   VERIFY, because they are the known hole) so that a future encoding which
+   rejects them makes the script FAIL rather than silently pass.
 
 **The reflex, and it is one question:** ⚠⚠ **before believing a check, ask what
 would make it FAIL — and then make that happen.** Every entry above passes that
