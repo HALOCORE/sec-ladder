@@ -1767,24 +1767,76 @@ keep the ledger a local inside `kernel` and push the obligation onto an
 `#[inline(always)]` body, leaving the pinned signature and `driver.canonical`
 untouched.
 
-✅⚠ **THE HONEST CLAIM, and it is more interesting than the retracted one:**
+⚠⚠ ~~**THE HONEST CLAIM, and it is more interesting than the retracted one:**~~
+**RETRACTED AT `TASK_116`, MANAGER-VERIFIED. THE SENTENCE BELOW IS FALSE.**
 
-> **The natural encoding does not state leak-freedom; escrowing the token does —
+> ~~**The natural encoding does not state leak-freedom; escrowing the token does —
 > and the residual trust is that nobody bypasses the wrapper. That is a
-> MODULE-LEVEL DISCIPLINE, not a global guarantee.**
+> MODULE-LEVEL DISCIPLINE, not a global guarantee.**~~
 
-✅ **CLEAN NEGATIVE, now measured so nobody re-runs it: THERE IS NO LINEAR
-(must-consume) TRACKED MODE AT THE PIN.** `strings ~/tools/verus/rust_verify |
-grep -oE 'verifier::[a-z_0-9]+'` gives **23 attributes and none is one**;
-`grep -rn affine ~/tools/verus/vstd/` → **0 hits**; the guide's *"linear ghost
-state"* is a name, not a mode. **That was the second route named at TASK_104 and
-it genuinely does not exist.**
+⚠⚠ **ESCROWING DOES NOT STATE IT EITHER. THE LEDGER'S `ensures` IS SATISFIED BY
+A LEAKING PROGRAM**, and the substitution is one line in place of `led_free`:
 
-⚠⚠ **THE FAMILY OF THREE SURVIVES WITH `p42`'s MEMBERSHIP RESTATED.** `p47` and
-the stack-overflow case are untouched. **`p42`'s membership is now conditional:
-its SHIPPED R5 does not cover its bug class, and that is a property of the
-encoding chosen, not of the prover.** ⚠ **Do not cite `p42` as evidence that a
-prover cannot express a resource property.**
+```rust
+proof { let tracked _dl = led.tracked_remove(0int); }   // drop the token, never free
+```
+
+`18 verified, 0 errors`; `21 verified, 0 errors` under `--cfg slb_twin`;
+**obligations, twin count and axioms all UNCHANGED**; leaks exactly
+`n_err × win_len` = `model.py::leak_bytes`. ⚠⚠ **And its `-O3` kernel is
+BYTE-IDENTICAL to the shipped R4 with p42's bug planted — `md5_fn
+d3f1194cb10bce2057e0e1f3e28c1e21`, `n_fn 128`, both.** ✅ **Manager re-ran all
+four; `.temp/mgr115/p42/REBUILD.sh` regenerates them.**
+
+**The mechanism:** `Map::tracked_remove` is the call `led_free` itself makes.
+⚠⚠ **WRAPPING AN AFFINE RESOURCE IN A MAP DOES NOT MAKE IT LINEAR — IT MAKES THE
+DROP TAKE ONE MORE LINE.** Assigning `Map::tracked_empty()` over the ledger
+verifies as well, which refutes *"a proof cannot drop the MAP that holds it"* in
+its own words.
+
+⚠ **WHAT IS NOW TRUE, stated carefully so this is not retracted a third time:**
+**one ENCODING is refuted; INEXPRESSIBILITY IS NOT PROVEN and is OPEN.** ✅ **The
+live repair lead, measured: a module-local `Tracked<Freed>` receipt is FORGEABLE
+in proof mode (`3 verified, 0 errors`); a PRIVACY-SCOPED one is NOT — rustc
+rejects the forgery. Unbuilt.** ⚠ **A `Tracked<T>` obligation is only as strong
+as the smallest scope that can construct a `T`** — that is the reusable rule, and
+it is what both failed encodings missed.
+
+✅ **CLEAN NEGATIVE, and it SURVIVED the review on stronger evidence: THERE IS NO
+LINEAR (must-consume) TRACKED MODE AT THE PIN.** `strings ~/tools/verus/rust_verify |
+grep -oE 'verifier::[a-z_0-9]+'` gives **22 attributes and none is one** (⚠ **this
+said 23; corrected at `TASK_110`, and the correction did not reach this file
+until `TASK_116` caught it**); `grep -rn affine ~/tools/verus/vstd/` → **0 hits**,
+confirmed against `vstd/std_specs/` as well; the guide's *"linear ghost state"* is
+a name, not a mode. **That was the second route named at TASK_104 and it genuinely
+does not exist.** ⚠ **But note what the negative does and does not buy: no linear
+mode means the ledger CANNOT be repaired by an attribute — the repair has to come
+from PRIVACY, which is a Rust-level mechanism, not a Verus-level one.**
+
+⚠⚠ **THE FAMILY OF THREE SURVIVES, AND `p42`'s MEMBERSHIP IS NOW
+UNCONDITIONAL.** `p47` and the stack-overflow case are untouched. **`p42`'s
+shipped R5 does not cover its own bug class — that was true when the sentence
+was hedged and it is true now**, ⚠ **but the REASON has been retracted twice and
+must NOT be restated as either *"the prover cannot"* or *"the encoding chosen"*.
+Both were asserted and both fell.** ✅ **The supportable form: TWO encodings have
+been tried and BOTH admit a leaking program that verifies. Whether a third
+works is OPEN, with privacy-scoping the live lead.**
+
+⚠ **Do not cite `p42` as evidence that a prover cannot express a resource
+property** — and equally, ⚠⚠ **do not cite it as evidence that a ghost ledger
+CAN. That is the claim that just failed.**
+
+⚠⚠ **AND THE STRUCTURAL LESSON IS THE ONE TO CARRY, because it is not about
+`p42`: NOTHING IN THE GATE CHECKS THAT AN `ensures` MEANS WHAT ITS PROSE SAYS.**
+The gate was green, the record reproduced, `verus.obligations` was pinned and
+matched, the twin count matched, the identity pin held — **and the central
+positive claim was false.** ✅ **The shipped tree was safe anyway, and it is
+worth knowing why: the `identity` pin catches the attacked R5 at both pinned
+levels. THE PIN PROTECTED `p42`, NOT THE PROOF.** ⚠ **An obligation count tells
+a reader how many things were proved and nothing at all about what they say** —
+which is exactly what a reader assumes it tells them, and is the same lesson
+`p42` already carried in the other direction (deleting the ledger's
+leak-freedom `ensures` still gave `18 verified, 0 errors`).
 
 ---
 

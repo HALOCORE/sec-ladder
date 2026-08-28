@@ -1979,24 +1979,66 @@ the number.** Two task files have already sent an agent to the wrong finding.
     Evidence: `.tasks/TASK_101_REPORT.md`, `.tasks/TASK_105_REPORT.md`,
     `.tasks/TASK_106_REPORT.md`, `patterns/p23-partition/NOTES.md`.
 
-39. ⚠⚠ **p42 — THE SHIPPED R5 DOES NOT COVER ITS OWN BUG CLASS, AND THAT IS A
-    PROPERTY OF THE ENCODING, NOT OF THE PROVER.** The 26th pattern.
-    ⚠⚠ **THIS FINDING'S FIRST HEADLINE — *"Verus at the pin CANNOT state
-    leak-freedom"* — WAS FALSE AND IS RETRACTED (`TASK_109`, review). A GHOST
-    LEDGER STATES IT, catches exactly p42's bug, and costs ZERO object code,
-    ZERO new trusted items and ZERO interface change** — `18 verified, 0 errors`,
-    the leak arm `17 verified, 1 errors` at exactly the dropped release, and
-    `md5_fn`/`md5_raw` **identical to the shipped R5 and to the shipped R4**. The
-    only pin that moves is `verus.obligations`, 15 → 18. ✅ **The honest claim is
-    better than the retracted one: the natural encoding does not state
-    leak-freedom; escrowing the token into a tracked `Map<int, Dealloc>` whose
-    domain must return empty does — and the residual trust is that nobody
-    bypasses the wrapper, which is a MODULE-LEVEL DISCIPLINE rather than a global
-    guarantee.** ⚠ **Keying by ADDRESS fails** — `vstd`'s `allocate` never
-    promises the address is not already escrowed; a ghost `int` key works.
-    ✅ **Clean negative, measured: there is NO linear must-consume tracked mode at
-    the pin** (23 verifier attributes, none is one; `grep -rn affine vstd/` → 0
-    hits). ⚠ **PROVISIONAL — `TASK_104` and `TASK_109` both unreviewed as a pair.**
+39. ⚠⚠ **p42 — TWO HEADLINES PUBLISHED, TWO RETRACTED. THE QUESTION IS OPEN, AND
+    THE SHIPPED TREE IS PROTECTED BY THE IDENTITY PIN RATHER THAN BY ITS PROOF.**
+    The 26th pattern, and **the most-corrected result in the project.**
+
+    ⚠⚠ **HEADLINE 1, RETRACTED (`TASK_109`, review): *"Verus at the pin CANNOT
+    state leak-freedom."*** False as stated.
+
+    ⚠⚠ **HEADLINE 2, RETRACTED (`TASK_116`, review — AND MANAGER-VERIFIED
+    INDEPENDENTLY): *"a ghost ledger states it exactly."*** **IT DOES NOT. THE
+    LEDGER'S `ensures` IS SATISFIED BY A LEAKING PROGRAM.** One line, substituted
+    for the error path's `led_free`:
+
+    ```rust
+    proof { let tracked _dl = led.tracked_remove(0int); }   // drop the token, never free
+    return 0;
+    ```
+
+    | | shipped | leaking variant |
+    |---|---|---|
+    | `./verus_run.py` | `18 verified, 0 errors` | **`18 verified, 0 errors`** |
+    | `--cfg slb_twin` | `21 verified, 0 errors` | **`21 verified, 0 errors`** |
+    | obligations / twin / axioms | 18 / 21 / 0 | **18 / 21 / 0 — nothing moves** |
+    | bytes leaked | 0 | **`n_err × win_len`, exactly `model.py::leak_bytes`** |
+
+    ⚠⚠ **AND THE SHARPEST FORM: the leaking R5's `-O3` kernel is BYTE-IDENTICAL
+    to the shipped R4 with p42's own bug planted in it** — `md5_fn
+    d3f1194cb10bce2057e0e1f3e28c1e21`, `n_fn 128`, **both**. ✅ **Manager
+    re-ran all four numbers; regenerate with `.temp/mgr115/p42/REBUILD.sh`.**
+
+    **The mechanism, and it is one sentence:** `Map::tracked_remove` is the very
+    call `led_free` makes, so ⚠⚠ **WRAPPING AN AFFINE RESOURCE IN A MAP DOES NOT
+    MAKE IT LINEAR — IT MAKES THE DROP TAKE ONE MORE LINE.** Assigning
+    `Map::tracked_empty()` over the whole ledger verifies too, which refutes
+    `idiom.why`'s *"a proof cannot drop the MAP that holds it"* in its own words.
+    ⚠ **The refutation was already in p42's own `NOTES.md` 6c, ONE PARAGRAPH
+    BELOW THE CLAIM** — *"a tracked `Map` is as droppable as the token inside
+    it."* **Nobody read the two sentences against each other.**
+
+    ⚠⚠ **WHAT THIS DOES *NOT* SAY — and getting this wrong would be the third
+    retraction.** It does **NOT** reinstate headline 1. **One ENCODING is
+    refuted; INEXPRESSIBILITY IS NOT PROVEN and is OPEN.** ✅ **Repair direction,
+    measured and unbuilt: a module-local `Tracked<Freed>` receipt is FORGEABLE in
+    proof mode (`3 verified, 0 errors`); a PRIVACY-SCOPED one is NOT — rustc
+    rejects the forgery.** **That is the live lead.**
+
+    ⚠⚠ **THE STRUCTURAL POINT, and it is the transferable one: NOTHING IN THE
+    GATE CHECKS THAT AN `ensures` MEANS WHAT ITS PROSE SAYS.** The gate was
+    green, the record reproduced, the corrections landed, the obligation count
+    was pinned — **and the central positive claim was false.** ✅ **The shipped
+    tree is safe anyway, and it is worth knowing why: the `identity` pin catches
+    the attacked R5 at both pinned levels. It is the PIN that protects p42, not
+    the PROOF.**
+
+    ✅ **Clean negative that SURVIVES the review, on better evidence: there is NO
+    linear must-consume tracked mode at the pin** — **22** `verifier::`
+    attributes (⚠ **this said 23; corrected at `TASK_110` and the correction
+    never reached the authoritative layer until now**), none is one; full
+    attribute enumeration, a 10-name binary sweep, `vstd/` **and**
+    `vstd/std_specs/`. ⚠ **PROVISIONAL markers on this finding STAY — `TASK_116`
+    says explicitly: do NOT clear them.**
 
     **`Tracked<Dealloc>` is AFFINE, not linear — a proof may simply drop it.** An
     R5 that forgets the error path's `deallocate` verifies **`2 verified, 0

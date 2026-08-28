@@ -648,20 +648,46 @@ on three patterns.
    forgets the error path's `deallocate` verifies with 0 errors, because
    `Tracked<Dealloc>` is **affine, not linear**: a proof may simply drop it.
 
-⚠⚠ **p42's membership is conditional, and that makes it the most instructive of
-the three.** ⚠ **PROVISIONAL — it rests entirely on `TASK_109` (the review) and
-`TASK_110` (the landing), both of which §7 lists as unreviewed, and `RECAP.md`
-finding 39 marks it so.** This is the sharpest claim in the section and it is the
-one with the thinnest chain behind it. It was published as *"the first pattern whose R5 does not cover its
-own bug class — Verus at the pin cannot state leak-freedom"*, landed in the
-authoritative layer, and was **refuted by its own review within hours**. Escrow
-the token into a tracked `Map<int, Dealloc>` whose domain must return empty and
-the property is stated exactly: `18 verified, 0 errors`, the leak arm
-`17 verified, 1 errors` at precisely the dropped release, **zero new trusted
-items, and machine code identical to the shipped rung**. ⚠ **So p42 is evidence
-about an encoding choice, not about the prover — do not cite it as "a prover
-cannot express a resource property."** (Clean negative, since it was the other
-route named: there is **no linear must-consume tracked mode at this pin.**)
+⚠⚠ **p42's membership is UNCONDITIONAL, and its REASON has now been retracted
+TWICE. It is the most instructive item in this document and the least safe to
+paraphrase.**
+
+**The sequence, because the sequence is the result:**
+
+1. Published: *"the first pattern whose R5 does not cover its own bug class —
+   Verus at the pin cannot state leak-freedom."* Landed in the authoritative
+   layer. **Refuted by its own review within hours.**
+2. Replaced by: *"escrow the token into a tracked `Map<int, Dealloc>` whose
+   domain must return empty and the property is stated exactly"* — `18 verified,
+   0 errors`, zero new trusted items, machine code identical to the shipped rung.
+3. ⚠⚠ **REFUTED IN TURN (TASK_116, and re-run independently by the manager). THE
+   LEDGER'S `ensures` IS SATISFIED BY A LEAKING PROGRAM.** Substitute
+   `proof { let tracked _dl = led.tracked_remove(0int); }` for the error path's
+   release and it still verifies **`18 verified, 0 errors`** (`21/0` under the
+   twin) with **obligations, twin count and axioms all unchanged**, while leaking
+   exactly `n_err × win_len`. ⚠⚠ **Its `-O3` kernel is byte-identical to the
+   shipped unsafe rung with p42's own bug planted in it.**
+
+**The mechanism is one sentence: `Map::tracked_remove` is the call the release
+itself makes, so wrapping an affine resource in a map does not make it linear —
+it makes the drop take one more line.**
+
+⚠ **What this does NOT say.** It does **not** reinstate (1). **One encoding is
+refuted; inexpressibility is not proven and remains open**, with privacy-scoping
+the live lead — a module-local receipt is forgeable in proof mode, a
+privacy-scoped one is not. ⚠ **Do not cite p42 as evidence that a prover cannot
+express a resource property, and do not cite it as evidence that a ghost ledger
+can.** (Clean negative that survived: there is **no linear must-consume tracked
+mode at this pin** — 22 verifier attributes, none of them one. So the repair
+cannot come from an attribute; it has to come from Rust-level privacy.)
+
+⚠⚠ **AND THE PART THAT GENERALISES BEYOND p42: NOTHING IN THIS PROJECT'S GATE
+CHECKS THAT AN `ensures` MEANS WHAT ITS PROSE SAYS.** The gate was green, the
+record reproduced, the obligation count was pinned and matched, the twin count
+matched, the byte-identity pin held — **and the central positive claim was
+false.** ✅ **The shipped tree was safe regardless, and the reason is worth
+stating plainly: the identity pin catches the attacked R5. The pin protected the
+pattern, not the proof.**
 
 The rule that survives all three: **before claiming a proof covers a bug class,
 ask which resource its obligations quantify over — and then ask whether a
