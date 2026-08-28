@@ -651,6 +651,18 @@ directory**, where the other 92 files across 24 patterns are **87 `.py` + 8
   calls *"the only thing in this file with no staleness pin"*, and which p23 duly
   left stale). ⚠ **The pattern to copy is `synthesis/licence.json`: carry the
   gate `source_sha256` you were taken against, and print `STALE` on a mismatch.**
+  ⚠⚠ **BUT THAT PRESCRIPTION IS WRONG HERE, AND `TASK_117` FOUND WHY BEFORE
+  ANYONE BUILT IT.** The **gate** `source_sha256` covers `NOTES.md`. So the
+  moment `sweep_fit.json` carries it, **every subsequent `NOTES.md` edit makes
+  the sidecar STALE and stage 9b FAILS the gate** — and regenerating the sidecar
+  costs **~30 minutes of callgrind** for a prose fix. ⚠ **That is the `p23`
+  distinct-checksum regress in a new place: pinning a number against a hash that
+  covers the prose which describes it.** ✅ **The fix is to pin against a
+  NARROWER digest — the `slb-contract` block plus the measurement sources the
+  sidecar actually derives from — NOT the whole gate `source_sha256`.**
+  ⚠ **Decide that before writing the writer; the reader (stage 9b) already ships
+  and currently SHOUTS `UNPINNED` rather than failing, which is the right
+  interim state.**
 
 ⚠⚠ **THE GENERAL RULE THIS THIRD INSTANCE EARNS: a cached artefact of measured
 numbers must carry the hash of what it was derived from, or it will go stale
