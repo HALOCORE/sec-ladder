@@ -11,10 +11,19 @@ then `.memory/06-catalogue.md`'s probe descriptions.
 
 Scratch in **`.temp/t123/`**.
 
-⚠ **RUN AFTER `TASK_122`.** ⚠⚠ **If `TASK_122` upholds finding 41, this task's
-answer is probably *"and none of them survives the ladder either"*, which is a
-CHEAPER and BETTER outcome than building. If finding 41 falls, this becomes the
-project's main line.** **Either way the enumeration is the same work.**
+⚠⚠ **`TASK_122` HAS LANDED AND FINDING 41 FELL, SO THIS TASK IS NOW THE PROJECT'S
+MAIN LINE, NOT AN OPTION.** **Three generalisations have been offered over the
+refusal set and all three died; the standing conclusion is *keep the
+classification, publish no generalisation*. ⚠⚠ THERE IS THEREFORE NO MEASURED
+REASON TO STOP, and `TASK_122`'s result closes the CATALOGUE, not the DOMAIN.**
+
+⚠⚠⚠ **AND ONE KILL CRITERION IS NOW BANNED IN THIS TASK: DO NOT REFUSE ANYTHING
+ON *"the five-rung ladder has nothing to price on it"*.** **That was finding 41
+and it died because it has NO CONTROL ARM — 8 of the 26 BUILT patterns publish a
+ZERO on their own headline axis, and `p46` ships `0.00000` AND *"the boundary
+vanished"* AS ITS PUBLISHED RESULT.** ✅ **Use the catalogue's OWN probe-3
+distinction instead, which survived: *a zero with a NAMED AXIS and a MECHANISM is
+a FINDING; a zero because two rungs compiled to the SAME BYTES is an ARTEFACT.***
 
 ---
 
@@ -108,8 +117,9 @@ verdict cites a `grep`, a run, or a load-bearing citation — not a reading.**
 
 ⚠⚠ **AND THE HONEST HEADLINE, WHICHEVER IT IS:** *"the domain really does look
 worked out, and here is the enumeration that shows it"* **or** *"N candidates
-survive"*. ⚠ **Do not manufacture a candidate to justify the task, and do not
-suppress one to agree with finding 41.**
+survive"*. ⚠ **Do not manufacture a candidate to justify the task** — and
+⚠⚠ **do not suppress one to agree with a finding that no longer exists. Finding
+41 is DEAD; there is nothing left to agree with.**
 
 ---
 
