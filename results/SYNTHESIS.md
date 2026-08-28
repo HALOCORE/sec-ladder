@@ -818,6 +818,35 @@ harm matrix and no full R5 were ever established — **but the row is flagged
 "re-triage, do not rubber-stamp", and the count of fifteen should be read with it
 named.**
 
+⚠⚠ **AND `TASK_120` SPOT-CHECKED THREE MORE REFUSAL REASONS AGAINST THEIR
+ARTEFACTS AND BROKE TWO OF THEM, SO *"one of the fifteen"* IS AN UNDERSTATEMENT
+AND THE PARAGRAPH ABOVE IS THE WEAKER FORM OF ITS OWN ARGUMENT.** ✅ **Both
+verdicts survive; both REASONS do not** — and a reason is what the next row gets
+judged against.
+
+- **`p20`** — the cell says the check is *"six instructions"* and costs
+  **`+10.00 Ir`/call**. ⚠ **It is SEVEN** (the list omits the leading
+  `mov %rcx,%rax` computing `off+len`; the disassembly diff is a clean 7-line
+  insertion) **and it costs `+6.00` marginal / `+7.00` kernel-exclusive.**
+  ✅ **The corrected mechanism predicts the corrected number to the instruction;
+  the published pair did not.**
+- **`p43`** — the cell says *"`+3.00 Ir`/call flat … i.e. `p16` verbatim"*.
+  ⚠⚠ **`p43` is FLAT and `p16` is `O(nrec)` — they differ in ORDER, and `p16`'s
+  own `NOTES.md` opens with a BOLD WARNING against exactly this conflation. The
+  measurement offered as CONFIRMATION of p16-likeness is the measurement that
+  DISTINGUISHES them.** ⚠ **The `+3.00` is `lea; cmp; jbe` hoisted — `p20`'s
+  phenomenon, and `p20` is the citation this cell had already STRUCK as
+  circular.**
+- ✅ **`p39` survives, and better than written** — its `0.00 Ir` reproduces in the
+  never-measured `k39_unpack_*` wire-format spelling too.
+
+⚠ **So the honest figure is that OF FOUR REFUSAL REASONS EVER CHECKED AGAINST
+THEIR ARTEFACTS, THREE DID NOT SURVIVE.** ⚠⚠ **That is a small sample and it is
+the sample that exists; it should not be read as *"the refusals are wrong"* —
+every verdict has held — but it is strong evidence that this project's REASONS
+were held to a lower standard than its FINDINGS, which is exactly the asymmetry
+`p28` predicted.**
+
 Two consequences, and they are the ones to carry away.
 
 **For a reader.** What this project measured is the **bounds-check family** —
