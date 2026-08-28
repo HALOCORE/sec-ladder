@@ -1392,10 +1392,24 @@ resolve, sitting exactly on the boundary.
 **The useful form is three bands, measured, not a single threshold:**
 
 ```
-|corr| <  2.00    120 rows    0 real / 120 spurious   <- nothing real hides below the floor
+|corr| <  2.00    120 rows    0 real / 120 spurious   <- SUPERSEDED, see below
 2.00 .. 16.00      22 rows    8 real /  14 spurious   <- print these with a "?"
 |corr| >= 16.00    34 rows   34 real /   0 spurious   <- smallest is 17.00
 ```
+
+⚠⚠ **THE FIRST ROW'S GLOSS — *"nothing real hides below the floor"* — NO LONGER
+HOLDS, AND THIS FILE CONTRADICTED ITSELF FOR SEVERAL TASKS (found at
+`TASK_114`).** After `TASK_107` re-emitted `synthesis/outward_ir.json`, the
+generated `results/synthesis.md` prints the `< 2.00` band as **`4 real / 139
+spurious`** where it printed `0 real`. ✅ **The four are fully attributed and the
+attribution is CONFIRMED**: they are `p03`/`p04`'s `R3−R4` cells, each **one
+callee** (`0x189480`, `__memset_avx2_unaligned_erms`), and an 8-pad sweep shows
+each rung takes its term independently with boundaries offset by 8 bytes, so
+**`R3−R4` takes `{−7, 0, +7}`**. ⚠ **So the published `4 real / 139 spurious` is
+ONE DRAW of the ±7 environment term, not a discovery** — and equally, **`0 real`
+was one draw too.** ⚠⚠ **Neither number is a property of the tree. The band's
+honest statement is: below the floor, whether a correction reads "real" is
+decided by the environment phase, so do not quote either count.**
 
 ⚠ **And the floor is ±2 Ir with a measured max residual of 15.79** (p22) and
 **10.11** (p07) — ~~"±16 on p07 and p22"~~ was this block's own guess and
@@ -2806,8 +2820,40 @@ would have read *"same draw"* across a 486-instruction difference.
 
 ✅ **The shipped field records BOTH**: `marginal_ir_env: {bytes, tuning_vars}`,
 where `tuning_vars` captures the allocator/libc-tuning variables whose *content*
-is known to change codegen paths. ⚠ **`tuning_vars`'s prefix set is derived from
-ONE measurement and is not proved complete** — treat it as a growing list.
+is known to change codegen paths. ~~⚠ **`tuning_vars`'s prefix set is derived from
+ONE measurement and is not proved complete** — treat it as a growing list.~~
+
+⚠⚠ **THE RULE THIS FIELD LICENSES IS FALSE, AND THE LOSSY TERM IS `bytes`, NOT
+`tuning_vars` (`TASK_114`, and the manager's own suspicion pointed at the wrong
+half).** The rule written beside the field is *same `bytes` and same
+`tuning_vars` ⇒ the marginal must match exactly.* **Measured counterexample, at
+byte-identical `bytes = 3520` and identical (empty) `tuning_vars`, varying only
+the NUMBER of variables:**
+
+```
+3059.00, 3059.00, 3066.00, 3066.00      <- period 4 in the VARIABLE COUNT
+```
+
+⚠⚠ **MECHANISM, MEASURED NOT ARGUED: a 9-rung sweep at constant `bytes = 3680`
+is period 4 in the variable count, which is the 32-byte stack-alignment period
+divided by the 8 bytes of ONE `envp` POINTER SLOT.** **`_env_block` records
+`len(/proc/self/environ)`, which is `NAME=VALUE\0` concatenated and contains NO
+POINTER ARRAY AT ALL.**
+
+⚠⚠⚠ **AND THIS FILE ALREADY CONTAINED THE ARITHMETIC. The 87-byte decomposition
+above is `8 (envp pointer slot) + 13 + 1 + 64 + 1`, and this file calls that
+leading `8` "the part the manager forgot entirely". THE PIN REPEATS THE EXACT
+ERROR IT WAS WRITTEN TO PREVENT.** ✅ **Fix is one integer: record `nvars`, or
+record `bytes + 8·nvars`.**
+
+✅ **CLEAN NEGATIVES that redirect the search — `tuning_vars` is FINE.** A pure
+**permutation** of the environment does not move it; neither does value content
+outside the prefix set (`LANG`, `TZ`). ⚠ **So the growing-list worry was
+misplaced and the manager sent a reviewer at the wrong term.** ⚠ **`argv` DOES
+move it ±7, and the "valid within one clone location" domain that makes the pin
+sound exists ONLY in `.tasks/TASK_107_REPORT.md` — 0 hits in `check.py`, in
+`.memory/`, and in the record itself.** **A pin whose domain is not written down
+where the pin is read is not a pin.**
 
 ✅ **The pin worked on its first live outing:** re-running the chain from an
 interactive shell (`bytes: 3280`) instead of the sweep's (`3269`) — **an 11-byte

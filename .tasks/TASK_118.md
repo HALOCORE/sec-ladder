@@ -138,6 +138,38 @@ are already paying for.** ⚠ **Give it an arm that MUST FIRE.**
 
 ## §F — the gate, last
 
+⚠⚠⚠ **READ THIS BEFORE YOU RUN THE GATE — `TASK_114` FOUND A LANDMINE THAT WILL
+LOOK LIKE A REGRESSION YOU CAUSED, AND IT IS NOT.**
+
+**`MIRIFLAGS` was never the variable.** The `miri` **driver** does not parse it
+at all — it is `cargo-miri`'s variable, and the gate invokes the driver. **The
+4.6× is an ENVIRONMENT-BLOCK effect**, the same axis as `TASK_107`'s ±7:
+
+```
+MIRIFLAGS unset          338.1 / 347.4 / 345.4 / 343.1 s     <- SLOW
+MIRIFLAGS=""              75.1 / 75.4 s                      <- fast
+SLB_R114_DECOY=""  (a DECOY, nothing to do with Miri)  74.4 / 75.9 s
+$OLDPWD removed           75.3 s
+                          10-rung ladder: 1 slow, 10 fast
+```
+
+⚠⚠ **`MIRI_TIMEOUT` is 180 s, and `results/gate/p42-goto-cleanup.json` currently
+records `adversarial-wincap.bin` as GREEN. In the shipped `MIRI_FLAGS = ()`
+configuration, from a shell like this one, that row lands in the 340 s state and
+goes BLOCKED.** **`TASK_107`'s landed fix does not CONTROL the state — it
+CHANGES it, and here it selects the slow one.**
+
+**So `p42` may come out with TWO blocked Miri rows instead of one.**
+⚠ **THAT IS NOT A REGRESSION YOU INTRODUCED. Do not "fix" it, do not chase it,
+and do NOT let it stop your gate.** ✅ **Report which rows blocked and what
+`marginal_ir_env` recorded, and move on** — the fix is `TASK_119`'s and the
+mechanism is OPEN. ⚠ **`miriflags`, `miriflags_removed_ambient` and
+`miri_version` are IDENTICAL in both states, so the record cannot currently tell
+you which one you got.**
+
+⚠ **If a Miri row you need blocks, you may re-run that one row by hand** and say
+so explicitly, rather than editing anything to make it pass.
+
 Full `harness/check.py p42`, then a re-measure of `p42` only, then
 `synthesis/licence.py --emit` **BEFORE** `synthesis/synthesize.py`, then
 `synthesis/outward_ir.py`, then **`synthesize.py` AGAIN** (its sidecar pin makes

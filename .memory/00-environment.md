@@ -579,19 +579,53 @@ the gate's own probe:
   seed + symbolic                   342.7 / 339.0 s
 ```
 
-⚠⚠ **SEVEN SETTINGS, ALL ≈4.6×, INCLUDING THE EMPTY STRING. The variable's
-PRESENCE is the trigger; its content is irrelevant. Mechanism OPEN.**
+~~⚠⚠ **SEVEN SETTINGS, ALL ≈4.6×, INCLUDING THE EMPTY STRING. The variable's
+PRESENCE is the trigger; its content is irrelevant.**~~
 
-✅ **So the shipped design is `MIRI_FLAGS = ()` — `MIRIFLAGS` deliberately UNSET,
-and any ambient value REMOVED** — with the gate record carrying
-`miri.miriflags`, `miriflags_removed_ambient` and `miri_version` so a reader
-knows what answered. ⚠ **Measured on `p42` and ~0% on 38 rows across five
-patterns; the other 20 patterns are untested.**
+⚠⚠⚠ **RETRACTED AT `TASK_114`: `MIRIFLAGS` IS NOT THE VARIABLE AT ALL, AND THE
+DIRECTION REVERSES.** **The `miri` DRIVER never parses `MIRIFLAGS`** — a bogus
+value passed through the environment gives `rc=0` and is ignored, while the same
+flag on the command line gives `rc=1 unknown unstable option`. **It is
+`cargo-miri`'s variable, and `check.py` invokes the DRIVER.** Re-measured on the
+same `p42` probe:
 
-⚠ **Consequence for the seed problem below: it is NOT fixed, it is DOCUMENTED.**
-A seed sweep costs 4.6× on the very rows that already time out. **Miri results
-remain one unpinned draw, and now the record says so explicitly rather than
-silently.**
+```
+  MIRIFLAGS unset                338.1 / 347.4 / 345.4 / 343.1 s   <- SLOW
+  MIRIFLAGS=""                    75.1 / 75.4 s                   <- fast
+  SLB_R114_DECOY=""  (A DECOY, NOTHING TO DO WITH MIRI)  74.4 / 75.9 s
+  $OLDPWD removed                 75.3 s
+                                  10-rung ladder: 1 slow, 10 fast
+```
+
+⚠⚠ **SO THE 4.6× IS AN ENVIRONMENT-BLOCK EFFECT — THE SAME AXIS AS THE `±7` —
+AND A VARIABLE WITH NO RELATION TO MIRI SELECTS IT.** **Mechanism OPEN**, and
+⚠ **`TASK_114` killed its own only correlation rather than reporting it: a second
+`base % 4 == 3` draw timed FAST. Do not chase the address residue.**
+
+⚠⚠ **AND THE LANDED FIX IS NOW A LIABILITY, WHICH IS THE PART THAT MATTERS.**
+`MIRI_FLAGS = ()` **does not CONTROL the state — it CHANGES it, and in a shell
+like this one it SELECTS THE SLOW STATE.** **`MIRI_TIMEOUT` is 180 s and
+`results/gate/p42-goto-cleanup.json` records `adversarial-wincap.bin` as GREEN**,
+so **re-running p42's gate can legitimately produce a SECOND blocked row that is
+not a regression.** ⚠⚠ **`miriflags`, `miriflags_removed_ambient` and
+`miri_version` are IDENTICAL in both states, so the record CANNOT TELL YOU WHICH
+ONE YOU GOT.** ✅ **That is the thing to fix, and it is the same one integer as
+the env pin: record the variable COUNT.**
+
+✅ **What survives:** the gate record should say what answered, and
+`miri_version` is the right pin for the interpreter. ⚠ **Measured on `p42` and
+~0% on 38 rows across five patterns; the other 20 are untested.**
+
+⚠ **Consequence for the seed problem below: it is NOT fixed, it is DOCUMENTED**,
+and ⚠⚠ **`TASK_114` showed the seed framing is CONFOUNDED by this same variable
+— a decoy environment variable flips the family-2 UB verdict exactly as
+`-Zmiri-seed=0` does, with both must-fire controls holding in all five arms. So
+*"the live variable is unseeded-versus-seeded"* is NOT ESTABLISHED.**
+✅ **The conclusion survives and strengthens: `miri_version` pins the
+interpreter, and NOTHING pins the draw.** ✅ **Clean negative upholding
+`TASK_107` against the manager's doubt: Miri's address draw IS deterministic
+across six launches at fixed environment — the FULL address, not two bits — but
+it MOVES WITH THE ENVIRONMENT.**
 
 ---
 
@@ -599,11 +633,22 @@ silently.**
 
 ### ⚠ ~~`check.py` SETS NO `MIRIFLAGS`~~, AND MIRI'S ALIGNMENT CHECK IS SEED-DEPENDENT
 
-**This is a live gate defect, not a curiosity.** The **same source** is clean
+**This is a live gate defect, not a curiosity.** ⚠⚠ ~~The **same source** is clean
 under `-Zmiri-seed=0` and `-Zmiri-seed=2` and reports **UB** under
-`-Zmiri-seed=1` and `-Zmiri-seed=3`. `harness/check.py` passes **no** seed, so
-Miri runs at its default and **a `miri.required: true` row can pass or fail on
-which seed the default happens to be.**
+`-Zmiri-seed=1` and `-Zmiri-seed=3`.~~ **THAT PREMISE DOES NOT REPRODUCE AT THIS
+TOOLCHAIN AND IS RETRACTED (`TASK_107`, measured over two families × 12 seeds;
+the correction is landed here only now — `TASK_114` found that an earlier commit
+struck the REMEDY and kept the PREMISE).** **Measured: seed 0…11 give
+IDENTICAL verdicts; the split that exists is UNSEEDED-vs-SEEDED, not
+seed-vs-seed** — and ⚠⚠ **even that is CONFOUNDED (`TASK_114`): a DECOY
+environment variable flips the same verdict exactly as `-Zmiri-seed=0` does, so
+what moves the draw is the ENVIRONMENT, not the seed.**
+
+✅ **THE CONCLUSION SURVIVES ALL OF THAT AND IS THE REASON THIS SECTION STAYS.**
+`harness/check.py` passes **no** seed, Miri runs at its default, and **a
+`miri.required: true` row can pass or fail on a draw nothing records.**
+⚠ **The mechanism has now been wrong twice — first "seed-vs-seed", then
+"`MIRIFLAGS` presence". Do not write a third one without measuring it.**
 
 ⚠ **Consequence: "Miri: N of N, no UB" is a statement about one unpinned draw.**
 Every pattern in the tree carries such a line. ⚠⚠ **~~Owed: pin the seed~~ — THAT IS NO LONGER THE PLAN AND THE PARAGRAPH BELOW IS SUPERSEDED. Pinning was TRIED at TASK_107 and COST 4.6x, giving `p42` a second blocked row; the shipped design is `MIRIFLAGS` deliberately UNSET. See the top of this section.** The seed-dependence itself is unchanged and unfixed; what changed is that the gate record now SAYS SO (`miri.miriflags`, `miriflags_removed_ambient`, `miri_version`) instead of being silent about it. **Do not read a green Miri row as "no UB"; read it as "no UB at whatever seed the unpinned default chose".**
