@@ -643,7 +643,7 @@ directory**, where the other 92 files across 24 patterns are **87 `.py` + 8
 - ✅ **`controls.log` — ACCEPTED.** `run.sh` regenerates it and `NOTES.md` cites
   it; it is the evidence, which `CLAUDE.md` constraint 6 keeps.
 - ⚠⚠ **`sweep_fit.json` — ACCEPTED, BUT IT OWES A STALENESS PIN, AND THIS IS THE
-  THIRD INSTANCE OF ONE CLASS IN ONE DAY.** It caches ~30 minutes of callgrind
+  THIRD INSTANCE OF ONE CLASS IN ONE DAY.** ⚠⚠ **BUILT AND LANDED AT `TASK_121`; read the correction at the end of this bullet BEFORE the argument, because the argument's COST PREMISE WAS FALSE.** It caches what this file called ~30 minutes of callgrind
   and `sweep_fit.py` regenerates it, so it earns its place. **But it is a tracked
   file of measured numbers with nothing that detects it going stale** — exactly
   like `results/tables/` (found stale on p09 after two contract moves, with no
@@ -655,11 +655,38 @@ directory**, where the other 92 files across 24 patterns are **87 `.py` + 8
   ANYONE BUILT IT.** The **gate** `source_sha256` covers `NOTES.md`. So the
   moment `sweep_fit.json` carries it, **every subsequent `NOTES.md` edit makes
   the sidecar STALE and stage 9b FAILS the gate** — and regenerating the sidecar
-  costs **~30 minutes of callgrind** for a prose fix. ⚠ **That is the `p23`
+  costs ~~**~30 minutes of callgrind**~~ for a prose fix. ⚠ **That is the `p23`
   distinct-checksum regress in a new place: pinning a number against a hash that
   covers the prose which describes it.** ✅ **The fix is to pin against a
   NARROWER digest — the `slb-contract` block plus the measurement sources the
   sidecar actually derives from — NOT the whole gate `source_sha256`.**
+
+  ⚠⚠⚠ **CORRECTION, `TASK_121`, AND IT UNDERCUTS THE ARGUMENT ABOVE WITHOUT
+  CHANGING ITS CONCLUSION: REGENERATING `sweep_fit.json` COSTS 47 SECONDS, NOT
+  ~30 MINUTES.** **Timed twice, output byte-identical.** ⚠ **The `~30 minutes`
+  figure was never measured — it was written here, then repeated by the manager
+  into `RECAP.md` and into `TASK_121.md` as the reason the narrow pin mattered.**
+  ✅ **THE NARROW PIN IS STILL RIGHT, BUT FOR A DIFFERENT REASON: a pin that
+  fires on prose is NOISE, and a pin nobody can distinguish from noise gets
+  switched off. The case is the SIGNAL, not the PRICE.** ⚠ **This is the
+  project's own rule — *before quoting a cost, measure it* — broken in the file
+  that states it, and the number stood long enough to shape a task file.**
+
+  ✅ **WHAT SHIPPED** (`check.py::check_control_json_pins` — ⚠ **note the name;
+  `_check_controls_json` appears in `TASK_121.md` and resolves NOWHERE in the
+  repo**): `derived_from_sha256`, a `{path: sha256}` map over **34 paths** =
+  `measure.py::measurement_sources` **reused rather than re-listed**, ∪ the **15
+  sweep blobs actually opened**, ∪ the script. **Either key is accepted; absent
+  path SHOUTS, moved hash FAILS.** ⚠ **And `sweep_fit.json` holds 15 rows, not
+  the 26 the manager wrote — `p23/NOTES.md` §9c′ had it right.**
+
+  ⚠⚠ **AND THE FIRST DESIGN OVERCLAIMED, CAUGHT BY `.memory/03-measurement.md`
+  ENTRY 8'S QUESTION ONE TASK AFTER IT WAS WRITTEN:** the script reads
+  **pre-built binaries out of gitignored `.temp/build/p23/`**, so a source edited
+  **without a rebuild** yields rows from the OLD binary under the NEW source
+  hash — **a green pin over a stale number**. ✅ **Closed by RE-DERIVING rather
+  than hashing: it rebuilds the six cells first (~3 s, bit-reproducible).**
+  ⚠ **Hashing an input is not the same as having USED that input.**
   ⚠ **Decide that before writing the writer; the reader (stage 9b) already ships
   and currently SHOUTS `UNPINNED` rather than failing, which is the right
   interim state.**
