@@ -5,10 +5,22 @@
 //     STATE LEAK-FREEDOM AT THE PINNED VERSION", and that generalisation is
 //     FALSE (TASK_109 §A).  What this file measures -- that a bare token may be
 //     dropped -- is true and is unchanged; what was inferred from it was not.
-//     The POSITIVE half now ships in `verus.rs` itself: escrow the token in a
-//     ghost ledger whose emptiness is a postcondition, and Verus checks the
-//     release on every exit.  See `controls/ledger_leak.py`, which is this
-//     file's counterpart and carries two arms that must fire, and ../NOTES.md 6.
+//
+// /!\/!\ AND THE POSITIVE HALF THAT REPLACED IT IS ALSO RETRACTED, AT
+//     TASK_118.  This note used to continue "The POSITIVE half now ships in
+//     verus.rs itself: escrow the token in a ghost ledger whose emptiness is a
+//     postcondition, and Verus checks the release on every exit."  IT DOES NOT.
+//     A proof can empty the ledger without freeing -- `led.tracked_remove(0int)`
+//     or `*led = Map::tracked_empty()`, both `18 verified, 0 errors`, both
+//     leaking exactly `model.py::leak_bytes` (TASK_116, reproduced at TASK_118;
+//     a privacy-scoped third encoding fails the same way at 19/0).
+//     `controls/ledger_leak.py` now runs those two attacks as ACCEPTANCE arms
+//     beside its two deletion arms.  ../NOTES.md 6.
+//
+//     /!\ THE ORIGINAL HEADING IS NOT RESTORED EITHER.  Three encodings have
+//     admitted a verifying leaker; that is three data points, not an
+//     impossibility proof.  WHETHER LEAK-FREEDOM IS EXPRESSIBLE AT THIS PIN IS
+//     OPEN, and this file measures ONE encoding.
 //
 //     THIS FILE IS KEPT, DELIBERATELY: its premise is true, its two arms are the
 //     evidence for the ENCODING half of the finding, and without it "the natural

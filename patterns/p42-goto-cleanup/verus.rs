@@ -5,12 +5,25 @@
 //! of every digest byte, the initialisation of every byte read back, and the
 //! legality of the final `dealloc`.
 //!
-//! ⚠⚠ **AND, SINCE TASK_110, THE PROPERTY THE ROW IS ACTUALLY ABOUT -- WHICH
-//! THIS COMMENT USED TO SAY WAS IMPOSSIBLE. READ THIS BEFORE QUOTING THE ROW.**
+//! ⚠⚠⚠ **THIS RUNG DOES NOT PROVE LEAK-FREEDOM, AND THE PARAGRAPHS THAT SAID
+//! IT DID ARE RETRACTED AT TASK_118. READ THIS BEFORE QUOTING THE ROW.**
+//! From TASK_110 to TASK_118 this comment claimed that the GHOST LEDGER below
+//! states leak-freedom and that Verus checks it on every exit. **It does not.**
+//! One proof line on the error path, `proof { let tracked _dl =
+//! led.tracked_remove(0int); }`, replaces the release and the file still
+//! reports **`18 verified, 0 errors`** -- `21/0` under `--cfg slb_twin`, every
+//! obligation count, axiom count and clause pin unmoved -- while leaking
+//! exactly `model.py::leak_bytes`. `Map::tracked_remove` is the same call
+//! `led_free` itself makes. **Wrapping an affine resource in a map does not
+//! make it linear; it makes the drop take one more line.** (TASK_116 found it;
+//! TASK_118 re-derived it independently. `../spec.md`'s `idiom.why` carries the
+//! arms and the figures.)
+//!
+//! ⚠ **And the sentence THAT retraction replaced is not restored either.**
 //! Until TASK_110 this paragraph said *"the proof rung of this ladder cannot
-//! state the property the row prices"*, and that claim is RETRACTED: TASK_109
-//! §A built a counterexample on this very file and TASK_110 shipped it. What is
-//! true is narrower and better.
+//! state the property the row prices"*. Three encodings have now admitted a
+//! verifying leaker; that is three data points and not an impossibility proof.
+//! **Whether leak-freedom is expressible at this pin is OPEN.**
 //!
 //! `vstd::raw_ptr` models the *permission* to release -- `Tracked<Dealloc>` --
 //! and that permission is **AFFINE at the pinned Verus, not linear**: a proof
@@ -19,28 +32,43 @@
 //! fires, and the control is committed: `controls/affine_leak.rs`, `2 verified,
 //! 0 errors` for the leaking arm and `error[E0382]: use of moved value` for the
 //! must-fail arm, i.e. the tokens are move-only and the probe is not vacuous.
-//! Move-only plus droppable is exactly affine.
+//! Move-only plus droppable is exactly affine. **That much stands.** What does
+//! not stand is the step this comment took next -- *"what a proof cannot drop
+//! is a MAP whose contents a postcondition names"*. A proof can: it can
+//! withdraw the token from the map, and it can assign a fresh
+//! `Map::tracked_empty()` over the whole ledger without mentioning the key.
 //!
-//! **What a proof cannot drop is a MAP whose contents a postcondition names.**
-//! So this rung never holds a bare `Tracked<Dealloc>`: `led_alloc` escrows it,
-//! `led_free` withdraws it, and `kbody` ensures the ledger comes back EMPTY on
-//! every exit -- including the early `return 0` that is p42's whole subject.
-//! The price is **+3 obligations (15 -> 18), zero new trusted items and zero
-//! instructions**: neither wrapper is `external_body` and neither contains
-//! `unsafe`, so `check.py::_is_trusted` leaves both out, and the `identity` pin
-//! still reads `exact` against R4. ../NOTES.md 6.
+//! **So what the ledger below actually buys is a DISCIPLINE, not a proof.**
+//! `led_alloc` escrows the token, `led_free` withdraws and spends it, and
+//! `kbody` ensures the ledger comes back empty on every exit -- which certifies
+//! that the author wrote *something* on each exit that empties a map the author
+//! controls. The price is still **+3 obligations (15 -> 18), zero new trusted
+//! items and zero instructions**: neither wrapper is `external_body` and
+//! neither contains `unsafe`, so `check.py::_is_trusted` leaves both out, and
+//! the `identity` pin still reads `exact` against R4. **The price was always
+//! right; it is the product that was wrong.** ../NOTES.md 6.
 //!
-//! ⚠ **The residual trust, named rather than left implicit:** the obligation
-//! binds allocations that go through `led_alloc`. A direct call to `dig_alloc`
-//! still drops its token silently. That is a MODULE-LEVEL DISCIPLINE, not a
-//! global guarantee. ⚠ **And the clean negative beside it, so nobody re-runs
+//! ⚠ **The residual trust, and it is WIDER than this comment used to say:** the
+//! obligation binds only what is escrowed in the ledger the caller handed in.
+//! A direct call to `dig_alloc` still drops its token silently; a proof may
+//! empty the ledger without freeing; and a body may escrow into a ledger it
+//! mints for itself. **TASK_118 built the privacy-scoped encoding that closes
+//! the middle one** -- map in a private field of a `pub tracked struct` in a
+//! child module, opaque `closed` tag -- **and the third route still verifies at
+//! `19 verified, 0 errors` while leaking `model.py::leak_bytes` exactly.**
+//! Privacy can make a ledger's CONTENTS unforgeable; it cannot make the ledger
+//! UNIQUE. So this is a MODULE-LEVEL DISCIPLINE, not a global guarantee.
+//! ⚠ **And the clean negative beside it, so nobody re-runs
 //! the search:** there is NO linear / must-consume / no-drop tracked mode at
 //! the pinned Verus -- **22** distinct `verifier::` attribute names in the
 //! pinned `rust_verify`'s string table and none of them is one (the only match
 //! for "linear" is `verifier::nonlinear`), and `grep -rn affine
 //! ~/tools/verus/vstd/` is 0 hits. ⚠ TASK_109 A1 put that count at 23;
 //! recounted at TASK_110 with `sort -u`, it is 22, and the conclusion is
-//! unchanged. ../NOTES.md 6d.
+//! unchanged. TASK_116 widened it to the whole attribute enumeration, ten
+//! candidate names in the binary, all of vstd and `std_specs/`, and it held --
+//! **but it is an ABSENCE argument and it is not a proof of inexpressibility.**
+//! ../NOTES.md 6d.
 //!
 //! Nothing here is an `assume`.
 //!
@@ -392,18 +420,39 @@ fn dig_read(q: *mut u8, Tracked(pt): Tracked<&PointsTo<u8>>) -> (b: u8)
 }
 
 // ------------------------------------------------------------- ledger ------
-// THE LEAK-FREEDOM OBLIGATION, and it is the reason this rung covers p42's own
-// bug class. ⚠ **Neither of these two items is trusted**: no `external_body`,
+// ⚠⚠⚠ THIS IS NOT A LEAK-FREEDOM OBLIGATION AND THIS RUNG DOES NOT COVER p42's
+// OWN BUG CLASS. THE HEADING HERE READ "THE LEAK-FREEDOM OBLIGATION, and it is
+// the reason this rung covers p42's own bug class" FROM TASK_110 TO TASK_118,
+// AND IT IS RETRACTED. See the module comment, `../spec.md`'s `idiom.why` and
+// `controls/ledger_leak.py`, which since TASK_118 pins the attacks that VERIFY
+// as well as the deletions that fail.
+//
+// ⚠ **Neither of these two items is trusted**: no `external_body`,
 // no `unsafe`, so `check.py::_is_trusted` leaves both out and the TCB stays at
 // five items. They are ordinary verified wrappers over this file's own
-// `dig_alloc`/`dig_free`.
+// `dig_alloc`/`dig_free`. That part was never in doubt, and the ledger's PRICE
+// -- +3 obligations, 0 trusted items, 0 instructions -- was always accurate.
 //
 // The encoding: never hold a bare `Tracked<Dealloc>`. `led_alloc` ESCROWS the
 // token into a tracked map; `led_free` withdraws it and spends it; and `kbody`
 // below `ensures` the map's domain comes back EMPTY, which Verus checks on
 // every exit, the early `return 0` included. Dropping a `Dealloc` is legal --
-// it is affine, `controls/affine_leak.rs` -- but dropping the MAP that holds it
-// is not, because the postcondition names the map's domain.
+// it is affine, `controls/affine_leak.rs`.
+//
+// ⚠⚠ THE NEXT SENTENCE USED TO READ "but dropping the MAP that holds it is
+// not, because the postcondition names the map's domain". THAT IS FALSE, and it
+// is false in TWO ways, both measured:
+//
+//   proof { let tracked _dl = led.tracked_remove(0int); }   -> 18 verified, 0 errors
+//   proof { *led = Map::<int, Dealloc>::tracked_empty(); }  -> 18 verified, 0 errors
+//
+// The first is the same call `led_free` makes in its own body below, and the
+// one `kbody`'s fold makes on `perms`. The second
+// discards the whole map without naming the key at all. Both leak exactly
+// `model.py::leak_bytes` at run time and both compile to `md5_fn
+// d3f1194cb10bce2057e0e1f3e28c1e21` at -O3 -- byte-identical to R4 with p42's
+// bug planted in it. So what this postcondition certifies is that the author
+// wrote SOMETHING on every exit that empties a map the author controls.
 //
 // ⚠ **Key by a ghost `int`, NOT by the address.** `dig_alloc` promises nothing
 // about the returned address being absent from the ledger, so
@@ -411,10 +460,17 @@ fn dig_read(q: *mut u8, Tracked(pt): Tracked<&PointsTo<u8>>) -> (b: u8)
 // on BOTH exits. A ghost key with `!old(led).dom().contains(k)` is discharged
 // by the caller for free. This was measured, both ways, at TASK_109.
 //
-// ⚠ **What this does NOT buy, and it is the honest limit:** the obligation
-// binds allocations that go through `led_alloc`. A direct call to `dig_alloc`
-// -- or to `vstd::raw_ptr::allocate` -- still drops its token silently. That is
-// a MODULE-LEVEL DISCIPLINE, not a global guarantee. ../NOTES.md 6.
+// ⚠ **What this does NOT buy, and the limit is WIDER than this comment used to
+// admit:** the obligation binds only what is escrowed in the ledger the caller
+// handed in. A direct call to `dig_alloc` -- or to `vstd::raw_ptr::allocate` --
+// still drops its token silently; a proof may empty the ledger without freeing;
+// and a body may escrow into a ledger it mints for itself. TASK_118 built the
+// encoding that closes the middle route (map in a PRIVATE field of a `pub
+// tracked struct Ledger` in a child module, with an opaque `closed` tag), and
+// the third route still gives `19 verified, 0 errors` while leaking
+// `model.py::leak_bytes` exactly. Privacy makes a ledger's CONTENTS
+// unforgeable; it cannot make the ledger UNIQUE. MODULE-LEVEL DISCIPLINE, not a
+// global guarantee. ../NOTES.md 6.
 pub type Ledger = Map<int, Dealloc>;
 
 #[inline(always)]
@@ -501,10 +557,15 @@ fn kbody(v: &[u64], off: usize, len: usize, Tracked(led): Tracked<&mut Ledger>) 
         old(led).dom() =~= Set::<int>::empty(),
     ensures
         r == kspec(v@, off as int, len as int),
-        // ⚠ THE LEAK-FREEDOM OBLIGATION. Checked on EVERY exit, including the
-        // early `return 0` on the error path -- which is the path the C rung
-        // gets wrong. Delete either `led_free` below and this clause fails,
-        // naming the exit: `controls/ledger_leak.py`, the arm that must fire.
+        // ⚠⚠ NOT A LEAK-FREEDOM OBLIGATION -- this comment called it one from
+        // TASK_110 to TASK_118 and that is RETRACTED. It says the LEDGER comes
+        // back empty, which is checked on EVERY exit (the early `return 0`
+        // included) and which a proof can arrange WITHOUT FREEING ANYTHING:
+        // `led.tracked_remove(0int)` or `*led = Map::tracked_empty()` both
+        // discharge it at `18 verified, 0 errors` while leaking exactly
+        // `model.py::leak_bytes`. What it does catch is a DELETED release:
+        // delete either `led_free` below and this clause fails, naming the
+        // exit. `controls/ledger_leak.py` runs both deletions AND both attacks.
         final(led).dom() =~= Set::<int>::empty(),
 {
     // Ghost only: mentioning `spec_slice_len` fires vstd's `axiom_spec_len`,
@@ -517,9 +578,12 @@ fn kbody(v: &[u64], off: usize, len: usize, Tracked(led): Tracked<&mut Ledger>) 
 
     if v_get_unchecked(v, off) & 0xff != TAG {
         // THE ERROR PATH. The release here is hand-written, exactly as R4's is
-        // and exactly as the C rung's is missing -- and, since TASK_110, it is
-        // also the one Verus CHECKS IS PRESENT: withdrawing the escrowed token
-        // is the only way to empty the ledger this exit's postcondition names.
+        // and exactly as the C rung's is missing. ⚠⚠ THIS COMMENT USED TO ADD
+        // "and, since TASK_110, it is also the one Verus CHECKS IS PRESENT:
+        // withdrawing the escrowed token is the only way to empty the ledger
+        // this exit's postcondition names". RETRACTED AT TASK_118: it is not
+        // the only way. Verus checks that the ledger is empty here, and a proof
+        // line can empty it without releasing anything.
         led_free(p, len, 1, Tracked(raw), Ghost(0int), Tracked(&mut *led));
         return 0;
     }

@@ -65,15 +65,26 @@
 //!   backstop here is Miri's leak report at process exit, which is why
 //!   `../spec.md` sets `miri.required` and why `controls/miri_seeds.sh` ships a
 //!   positive control that deletes this file's error-path release.
-//!   ⚠ **RETRACTED AT TASK_110: this note used to add *"AND VERUS DOES NOT
-//!   DISCHARGE IT"*, which is false.** A `Tracked<Dealloc>` is indeed AFFINE
-//!   and not linear -- dropping one verifies clean -- but R5 does not hold one
-//!   bare: it escrows the token in a ghost ledger whose emptiness is a
-//!   postcondition, so an R5 that forgets the error path's release now reports
-//!   an error naming that exit. ../NOTES.md 6. ⚠ **That is a fact about R5 and
-//!   not about this file**: the ledger is erased before codegen, the `identity`
-//!   pin compares machine code, and a byte-identical twin carrying a proof is
-//!   not a proof about the twin that does not.
+//!   ⚠⚠ **AND NOTHING MECHANICAL DISCHARGES IT ON R5 EITHER. THE TASK_110
+//!   RETRACTION PRINTED HERE IS ITSELF RETRACTED, AT TASK_118.** From TASK_110
+//!   to TASK_118 this note said the sentence *"AND VERUS DOES NOT DISCHARGE
+//!   IT"* was false, on the ground that R5 escrows the token in a ghost ledger
+//!   whose emptiness is a postcondition. **A leaking R5 satisfies that
+//!   postcondition**: one proof line on the error path, `18 verified, 0
+//!   errors`, `model.py::leak_bytes` leaked, and the resulting binary is
+//!   byte-identical to THIS file with its error-path release deleted
+//!   (`md5_fn d3f1194cb10bce2057e0e1f3e28c1e21` at -O3). A privacy-scoped third
+//!   encoding, built at TASK_118, fails the same way at `19 verified, 0
+//!   errors`. ../NOTES.md 6, ../spec.md `idiom.why`.
+//!   ⚠ **The affineness half stands**: a `Tracked<Dealloc>` is AFFINE and not
+//!   linear, so dropping one verifies clean (`controls/affine_leak.rs`). What
+//!   does not stand is that a MAP fixes it.
+//!   ⚠ **So the backstop for this obligation is Miri, on this rung AND on R5**,
+//!   which is where it stood before TASK_110. And the `identity` pin is what
+//!   protects the tree: a byte-identical twin carrying a proof is not a proof
+//!   about the twin that does not, but a planted leak DOES move `md5_fn`, so
+//!   the pin catches an R5-only leak at both pinned levels. ⚠ **A leak planted
+//!   in BOTH rungs passes the pin and is caught only by Miri.**
 
 #[path = "../../common/driver.rs"]
 mod driver;

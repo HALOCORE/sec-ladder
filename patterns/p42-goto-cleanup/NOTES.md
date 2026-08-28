@@ -14,11 +14,42 @@
 4a252569067081a55c55c8e6177bc8f6a4f897a57cd59a00c7c000a3da8d29a4
 ```
 
-**As shipped now**, after TASK_110's edits 4-9:
+**As TASK_110 shipped it**, after its edits 4-9:
 
 ```
 437ae31512cf250acac91e64e289b8cd200dfd83b78797aa3467945b86718d76
 ```
+
+**As shipped now**, after TASK_118's retraction:
+
+```
+1af5c4568295ebb2547069e714df5205ca2fcbf8b3e7f289f792b1e1b8a997fe
+```
+
+⚠ **TASK_118 moved it ONCE, and everything that moved it is a RETRACTION or a
+correction — nothing was strengthened, nothing was added, and no measured
+number depends on any of it.** Five fields inside the fence changed:
+
+| field | what moved |
+|---|---|
+| `idiom.why` | the TASK_110 clause claiming the ghost ledger states leak-freedom is **withdrawn in full**; the sentence TASK_110 struck is **not restored** (section 6) |
+| `identity[0].why` | same withdrawal in its closing sentence, plus what the pin **did** do — it catches every planted leak at both levels |
+| `verus.twin_obligations_note` | *"the GHOST LEDGER that states leak-freedom"* → *"the GHOST LEDGER, WHICH DOES NOT STATE LEAK-FREEDOM"* |
+| `miri.reason` | ⚠ **the TASK_110 amendment is REVERSED and the struck sentence RESTORED VERBATIM** — *"Verus does NOT prove that `dig_free` is reached on every path"* — re-derived at TASK_118 rather than taken from the review |
+| `miri.blocked_reason` | the OWED item from TASK_107 and TASK_114: `check.py` now **removes** an ambient `MIRIFLAGS` and records it, and the seed-dependence premise does not reproduce |
+
+⚠⚠ **`miri.reason` is the one to read twice. A TRUE sentence was struck inside
+this hashed block at TASK_110 and replaced with a FALSE one** — `PROTOCOL.md`
+rule 9's `TASK_099` shape, second occurrence, and the first time inside a hash.
+✅ **The hash matching is evidence about WHEN a sentence was written, not about
+whether it is true**, and this is the pattern that demonstrates it: TASK_110's
+`437ae315…` verified perfectly for eight tasks while carrying two false claims.
+
+⚠ **What did NOT move:** every `requires`, every `ensures`, `obligations` (18),
+`twin_obligations` (21), `axioms` (0), `identity`'s levels, `driver`,
+`collapse`, and every `required`/`forbidden` entry. **The measured numbers are
+untouched by this task** — it retracts prose about what a measurement means,
+not a measurement.
 
 ⚠ **The hash moved TWICE inside TASK_110, and the second move is disclosed
 rather than smoothed over.** Edits 4-8 took it to
@@ -91,8 +122,10 @@ false claim. None weakens anything.**
    items added to the item set: `led_alloc`, `led_free`, `kbody` — the ghost
    ledger (section 6b). ⚠ **A pin going UP is the direction
    `.memory/01-ladder.md`'s direction test permits**; the three items are pinned
-   with every clause, `kbody`'s leak-freedom `ensures` included, because
+   with every clause, `kbody`'s ledger-emptiness `ensures` included, because
    deleting that clause costs nothing any count would notice (section 6c).
+   ⚠ **TASK_118: that clause was called the *leak-freedom* `ensures` here and is
+   not one** — section 6. The pin still earns its line for the reason given.
 5. **`required[1]` and `required[2]` gained BACKTICKS, and `required[3]` gained
    one on the C side.** TASK_109 M3: the two per-language entries carried no
    backticks at all, so `check.py::_TICK` yielded **zero** spellings from them —
@@ -122,7 +155,9 @@ false claim. None weakens anything.**
    **untouched** — `check.py::named_spelling_problem` returns `None`, so its
    sha256 still matches the constant in all patterns.
 7. **`identity[0].why`'s closing sentence is RETRACTED** (it said Verus cannot
-   state leak-freedom) and its `O3` instruction counts are **re-measured**:
+   state leak-freedom) and its `O3` instruction counts are **re-measured**.
+   ⚠⚠ **THE REPLACEMENT IS ITSELF RETRACTED AT TASK_118 and the original is
+   NOT restored — expressibility is OPEN (section 6).** The counts stand:
    `127` against `128`, in `%r9`, where the pre-TASK_110 fold gave `120` against
    `122` in `%r8` (section 8).
 8. **`miri.reason`'s *"Verus does NOT prove that `dig_free` is reached on every
@@ -155,7 +190,7 @@ read the disclosure instead of re-deriving it:
 |---|---|---|
 | 13, 21 | the `0.00`-on-the-success-path prose now names gcc, and the three-results table's middle row names the clang parity effect | no |
 | 63 | *"three things … are pinned in the block below"* → the table that says which of the three is pinned by a spelling and which is prose (TASK_109 M3) | no |
-| 147 | one row added to the pin table, for `kbody`'s leak-freedom `ensures` | no |
+| 147 | one row added to the pin table, for `kbody`'s ledger-emptiness `ensures` (called the *leak-freedom* one until TASK_118) | no |
 | 161, 162, 163 | **edit 5** — the three `required` entries | **yes** |
 | 176 | **edits 6 and 9** — `idiom.why`'s retraction, and the 23 → 22 attribute recount inside it | **yes** |
 | 190, 191, 192 | **edit 4** — `obligations`, `twin_obligations` and its note | **yes** |
@@ -505,29 +540,56 @@ better piece of evidence for the claim than the original pair was.
 
 ---
 
-## 6. ⚠⚠ THE NATURAL ENCODING CANNOT STATE LEAK-FREEDOM. ESCROWING THE TOKEN CAN. This is p42's central result, and it is the OPPOSITE of what this section used to say.
+## 6. ⚠⚠ THREE ENCODINGS, THREE VERIFYING LEAKERS. p42's R5 DOES NOT COVER ITS OWN BUG CLASS, AND WHETHER SOME ENCODING COULD IS **OPEN**.
 
-> ⚠⚠ **RETRACTION, TASK_110.** Until TASK_110 this section was headed *"VERUS AT
-> THE PINNED VERSION CANNOT STATE LEAK-FREEDOM"* and concluded that *"p42 is the
-> first pattern in this tree whose R5 proof does not cover the pattern's own bug
-> class"*. **Both sentences are false.** TASK_109 §A attacked the claim the way
-> `.tasks/PROTOCOL.md` rule 2 asks a review to, built a counterexample on this
-> very `verus.rs`, and TASK_110 shipped it. **The half of the old finding that
-> survives is the half that was actually measured — a bare `Tracked<Dealloc>` is
-> affine and a proof may drop it. The half that did not survive is the
-> generalisation from that measurement to "no encoding can".**
+> ⚠⚠⚠ **THIS SECTION HAS NOW BEEN RETRACTED TWICE, IN OPPOSITE DIRECTIONS, AND
+> THE SECOND RETRACTION IS THE ONE THAT LANDS. TASK_118.**
 >
-> ⚠ **The retracted claim is in the history of this file for a reason, and the
-> reason is the shape of the mistake, not the mistake:** what was measured was
-> *one encoding fails*; what was published was *the property is unstateable*.
-> `.tasks/PROTOCOL.md` rule 9's refinement is exactly this — a conclusion and a
-> mechanism carry different evidence — and here the CONCLUSION was the weaker
-> statement and the pattern published the stronger one.
+> | task | this section's headline | status |
+> |---|---|---|
+> | TASK_104→109 | *"VERUS AT THE PINNED VERSION CANNOT STATE LEAK-FREEDOM"* | struck at TASK_110 |
+> | TASK_110→118 | *"THE NATURAL ENCODING CANNOT STATE LEAK-FREEDOM. ESCROWING THE TOKEN CAN."* | **FALSE — struck at TASK_118** |
+> | now | *three encodings admit a verifying leaker; expressibility is **OPEN*** | measured, and stated as an open question on purpose |
+>
+> **What killed the second headline.** `TASK_116` substituted **one line** into
+> the shipped `verus.rs`, in place of the error path's `led_free`:
+>
+> ```rust
+>         proof { let tracked _dl = led.tracked_remove(0int); }
+>         return 0;
+> ```
+>
+> `18 verified, 0 errors`. `21 verified, 0 errors` under `--cfg slb_twin`. Every
+> obligation count, axiom count and `spec.md` clause pin **unmoved**. And it
+> leaks **exactly `model.py::leak_bytes`** — `n_err × win_len`, the same quantity
+> `controls/leak.sh` asserts against LeakSanitizer for the buggy C rung.
+> `Map::tracked_remove` is **the call `led_free` itself makes**. ⚠ **Wrapping an
+> affine resource in a map does not make it linear — it makes the drop take one
+> more line.** `TASK_118` re-derived the whole thing independently
+> (`.tasks/TASK_118_REPORT.md`) rather than take it on report.
+>
+> ⚠ **AND THE FIRST HEADLINE IS NOT RESTORED.** *"Verus cannot state
+> leak-freedom"* is **not re-established** by any of this — only **no longer
+> refuted**. Three refuted encodings are three data points, not an impossibility
+> proof. **The governing sentence is that expressibility at this pin is OPEN**,
+> and writing anything stronger would be the third confident false claim on this
+> axis.
+>
+> ⚠ **The shape of the mistake is the durable part, and it is the same shape
+> twice.** In 2026-08 this section published *the property is unstateable* off a
+> measurement of *one encoding fails*. TASK_110 then published *escrowing states
+> it* off a measurement of *this encoding rejects the two edits I tried*. **Both
+> are the same generalisation error with the sign flipped.** `PROTOCOL.md` rule
+> 9's refinement covers it: a conclusion and a mechanism carry different
+> evidence. **An `ensures` is a claim about a formula; that it MEANS the English
+> beside it is a claim about the encoding, and nothing in the gate checks it.**
 
 `.tasks/TASK_104.md` §2 asked *"Can Verus state 'this allocation is released on
 every path, including the error path'?"* and offered `p27`'s `Tracked<Dealloc>`
-as a precedent. **The answer is yes, at +3 obligations and nothing else — but
-not by the route p27 suggests, and not with a bare token.**
+as a precedent. **After three attempts the answer is: not by any route tried, and
+the question is open.** What ships is a ledger that costs +3 obligations, 0
+trusted items and 0 instructions, and that buys **a named, greppable discipline
+for a reader** rather than a guarantee from the verifier.
 
 ### 6a. What is true about the bare token, and it is what was measured
 
@@ -560,12 +622,22 @@ deallocation *legal* — no double free, no use-after-free, right size and
 alignment and provenance. Nothing makes it *happen*. p27's own leak-freedom
 claim rests on a `required` **spelling pin** in its `spec.md` and on reading the
 epilogue, not on its proof. **All of that is still true, and none of it implies
-that leak-freedom is unstateable.**
+that leak-freedom is unstateable** — nor, after three failed encodings, that it
+is stateable. ⚠ **p27 is untouched by any of this**: a spelling pin plus a
+reader is exactly what p42 is left with too, which if anything makes the two
+rungs the same kind of claim rather than different kinds.
 
-### 6b. ⚠⚠ THE GHOST LEDGER, WHICH IS WHAT SHIPS
+### 6b. ⚠⚠ THE GHOST LEDGER, WHICH IS WHAT SHIPS — AND WHAT IT DOES NOT DO
 
-**Never hold a bare `Tracked<Dealloc>`.** A proof may drop an affine token; it
-may not drop a MAP whose contents a postcondition names. So `verus.rs` carries
+⚠⚠ **THE SECOND SENTENCE OF THIS SUBSECTION READ *"A proof may drop an affine
+token; it may not drop a MAP whose contents a postcondition names"* FROM
+TASK_110 TO TASK_118. IT IS FALSE, TWICE OVER, AND THE REFUTATION WAS ALREADY
+WRITTEN ONE PARAGRAPH BELOW IT IN 6c** (*"a tracked `Map` is as droppable as the
+token inside it"* — written about deleting the *clause*, and it licenses
+emptying the *map* just as much). **The price table below is accurate; the
+product claim above it was not.**
+
+**Never hold a bare `Tracked<Dealloc>`.** So `verus.rs` carries
 two ordinary verified wrappers:
 
 - `led_alloc` calls the trusted `dig_alloc` and **escrows** the returned
@@ -577,9 +649,14 @@ two ordinary verified wrappers:
   domain comes back `Set::<int>::empty()`.
 
 Verus checks a postcondition on **every** exit, so the early `return 0` on the
-error path is checked too, and that path is p42's whole subject.
+error path is checked too, and that path is p42's whole subject. ⚠ **What is
+checked on that exit is that the LEDGER IS EMPTY, which is not the same as
+"the block was freed", and the gap is one proof line wide** — section 6c's
+attack table.
 
-**The price, measured rather than argued:**
+**The price, measured rather than argued** (⚠ **the price is right and the
+PRODUCT is not** — three verification conditions bought at zero cost still buy
+nothing if the property they state is weaker than the one claimed)**:**
 
 | | shipped R5 before | shipped R5 now |
 |---|---|---|
@@ -603,24 +680,53 @@ for the wrong reason and the base does not verify at all. A ghost key with
 `requires !old(led).dom().contains(k)` is discharged by the caller for free.
 Measured both ways at TASK_109 A2.
 
-### 6c. THE ARMS THAT MUST FIRE — `controls/ledger_leak.py`, and there are two
+### 6c. `controls/ledger_leak.py` — FIVE arms since TASK_118: two deletions that FAIL and two attacks that VERIFY
 
-An obligation nobody has seen fail is indistinguishable from a decoration. The
-control deletes each of the two `led_free` calls in turn, from the shipped
-`verus.rs`, by substitution, and requires Verus to reject each and to **name the
-exit**:
+An obligation nobody has seen fail is indistinguishable from a decoration —
+and, it turns out, **an obligation whose failures you have seen is still not the
+obligation you think it is**. The control deletes each of the two `led_free`
+calls in turn, and then **replaces the error path's release with each of two
+proof lines**, from the shipped `verus.rs`, by substitution. Actual output:
 
 ```
-  base       18 verified,  0 errors  OK
-  leak_err   17 verified,  1 errors  OK
-            Verus names the exit: return 0; [at this exit]
-  leak_ok    17 verified,  1 errors  OK
-            Verus names the exit: acc [at the end of the function body]
+  base             18 verified,  0 errors  OK           must verify
+  leak_err         17 verified,  1 errors  OK           DELETION -- must fail, naming the exit
+                  Verus names the exit: return 0; [at this exit]
+  leak_ok          17 verified,  1 errors  OK           DELETION -- must fail, naming the exit
+                  Verus names the exit: acc [at the end of the function body]
+  atk_remove_err   18 verified,  0 errors  OK           ATTACK -- must VERIFY (the hole, pinned)
+  atk_assign_err   18 verified,  0 errors  OK           ATTACK -- must VERIFY (the hole, pinned)
 ```
 
-The failing clause is `final(led).dom() =~= Set::<int>::empty()` in both arms.
-`leak_err` is **exactly the C rung's bug**, transplanted into R5, and R5 catches
-it by file and line.
+**The two deletion arms are what the ledger really buys.** The failing clause is
+`final(led).dom() =~= Set::<int>::empty()` in both, and Verus names the exit.
+
+⚠⚠ **The two attack arms are what it does not.** They replace the SAME release
+`leak_err` deletes — so they are p42's own bug class, not a contrived leak — and
+they verify:
+
+```rust
+        proof { let tracked _dl = led.tracked_remove(0int); }   // 18 verified, 0 errors
+        proof { *led = Map::<int, Dealloc>::tracked_empty(); }  // 18 verified, 0 errors
+```
+
+`Map::tracked_remove` is **the call `led_free` itself makes**. The second
+discards the whole map **without mentioning the key**, which is precisely what
+`spec.md`'s `idiom.why` asserted was impossible. Both leak
+`model.py::leak_bytes` exactly, and both compile at `-O3` to `md5_fn
+d3f1194cb10bce2057e0e1f3e28c1e21` — **byte-identical to R4 with p42's bug
+planted in it.**
+
+⚠ **They are pinned as ACCEPTANCE arms deliberately.** If a future encoding
+rejects one, the control FAILS and prints *"the encoding has CHANGED … do not
+just edit the expected numbers"*. **A hole that nothing measures rots back into
+a claim; this one cannot.**
+
+⚠ **The anchor asserts used to be half a tripwire** (TASK_116 MINOR 7): each
+substitution asserted only its own anchor, so a tree whose *error*-path release
+had already been tampered with tripped `leak_err`'s assert and sailed past
+`leak_ok`'s. `check_anchors` now asserts **both** releases are present, exactly
+once each, **before any arm runs**.
 
 ⚠ **AND THE OTHER DIRECTION, WHICH IS WHY THE CLAUSE IS PINNED IN `spec.md`
 RATHER THAN MERELY WRITTEN.** Deleting the *clause* instead of the *release*
@@ -628,17 +734,75 @@ gives **`18 verified, 0 errors`** — the same count as the shipped file, becaus
 a tracked `Map` is as droppable as the token inside it. **The obligation
 vanishes and no number moves.** That is `spec.md`'s `verus.items[*].ensures` pin
 doing the job it exists for: only a textual diff against the declaration catches
-it, and `contract_sha256` is where that diff shows up.
+it, and `contract_sha256` is where that diff shows up. ⚠⚠ **AND THAT SENTENCE —
+*"a tracked `Map` is as droppable as the token inside it"* — WAS ALREADY THE
+REFUTATION OF 6b's HEADLINE, ONE PARAGRAPH BELOW IT, FROM THE DAY BOTH WERE
+WRITTEN.** It was written about deleting the clause; it licenses emptying the
+map just as much. **The counterexample to a pattern's central claim sat inside
+the pattern for six tasks.** That is `PROTOCOL.md` rule 9's documented shape and
+it is the single most useful thing in this section.
 
-### 6d. ⚠ THE RESIDUAL TRUST, AND A CLEAN NEGATIVE
+### 6d. ⚠ THE RESIDUAL TRUST — THREE ROUTES, NOT ONE — AND A CLEAN NEGATIVE
 
-**The obligation binds allocations that go through `led_alloc`.** A direct call
-to `dig_alloc` — or to `vstd::raw_ptr::allocate` — still drops its token
-silently. **That is a module-level discipline, not a global guarantee**, and it
-is the honest form of the claim: *p42's R5 states leak-freedom for the
-allocations its own wrapper makes, and the residual trust is that nothing
-bypasses the wrapper.* That is a smaller claim than "Verus proves this program
-does not leak" and a much larger one than "Verus cannot say".
+⚠⚠ **THIS SUBSECTION USED TO NAME ONE ROUTE AND CALL IT *"the honest form of the
+claim"*: *p42's R5 states leak-freedom for the allocations its own wrapper
+makes, and the residual trust is that nothing bypasses the wrapper.* RETRACTED
+AT TASK_118 — THERE ARE THREE ROUTES AND THE MIDDLE ONE GOES THROUGH THE
+WRAPPER.**
+
+| # | route | closed by the shipped ledger? | measured |
+|---|---|---|---|
+| 1 | acquire outside the wrapper — `dig_alloc`, `vstd::raw_ptr::allocate` — and drop the token | ❌ no | disclosed since TASK_110 |
+| 2 | acquire through `led_alloc`, then **empty the ledger without freeing** | ❌ no | 6c's two attack arms, `18 verified, 0 errors` |
+| 3 | acquire through `led_alloc` **into a ledger the body mints for itself** | ❌ no | TASK_118, on the privacy-scoped encoding |
+
+**Route 2 is the one that killed the claim**, because the disclosure implied the
+guarantee *held* for allocations that do go through `led_alloc`. It does not.
+
+**Route 3 is what killed the repair.** TASK_118 built the encoding that closes
+route 2 — the map in a **private** field of a `pub tracked struct Ledger` in a
+child `mod res`, plus an opaque `closed` tag the kernel must preserve — and it
+works as designed: reaching into the map becomes `error[E0616]: field m of
+struct res::Ledger is private`, **from rustc, not from Verus**; overwriting the
+ledger fails the tag conjunct; forging a `Ledger` from outside the module is
+`error: disallowed: constructor for an opaque datatype`. **And then the body
+mints its own ledger and leaks anyway:**
+
+```
+mustfire_err2        18 verified, 1 errors   escrow in the ledger kbody WAS HANDED, release deleted -> REJECTED
+atk_decoy_err        19 verified, 0 errors   escrow in a ledger kbody MINTS ITSELF, release deleted -> ACCEPTED
+atk_decoy_err_freed  19 verified, 0 errors   the same local ledger, both paths free -> ACCEPTED, leaks 0
+```
+
+The two top rows differ in **one respect only — which ledger the block goes
+into** — and `atk_decoy_err` leaks `256 / 624 / 0 / 16` bytes on
+`adversarial-notag` / `adversarial-mixed` / `small` / `adversarial-win1`, which
+is `model.py::leak_bytes` **exactly**, against a constant instrument floor of
+1028 on all four. At `-O3` it is `md5_fn d3f1194c…`, byte-identical to R4 with
+p42's bug planted; `atk_decoy_err_freed` is `28432cb8…`, byte-identical to
+shipped R4. ⚠ **So the `identity` pin still catches it and the proof still does
+not.**
+
+⚠⚠ **THE GENERAL RULE, AND IT IS THE REUSABLE PART OF ALL THIS:** a
+`Tracked<T>` obligation is only as strong as the smallest scope that can
+construct a `T` — **and privacy fixes the CONTENTS of a ledger, not the
+UNIQUENESS of the ledger.** `res::led_new()` has to be public because `kernel`
+calls it, and `dig_alloc` sits at crate root beside `kbody`, so the body always
+has a second place to put a block. **Nothing at this pin makes a ledger unique;
+that is what a linear mode would be for, and there isn't one.**
+
+⚠ **NOT BUILT, and recorded so nobody re-derives it:** close both routes by
+moving `dig_alloc` **and** `led_new` inside `mod res` (private) and exporting a
+`res::run(...)` that mints the one ledger, calls `kbody`, and drops it. Then
+`kbody`'s only acquisition is `led_alloc` on the `&mut Ledger` it was handed.
+**UNBUILT AND OPEN.** It moves the trusted items into a child module, which
+`_is_trusted` and the twin naming both key on, and it would still prove nothing
+about the *program* — only about `kbody`.
+
+⚠⚠ **AND DO NOT WRITE THAT VERUS CANNOT STATE LEAK-FREEDOM.** Three encodings
+have admitted a verifying leaker. **That is three data points and not an
+impossibility proof**, and that exact sentence has already been retracted once
+(section 6's table).
 
 ✅ **CLEAN NEGATIVE, so nobody re-runs the search: there is no linear
 (must-consume, non-droppable) tracked mode at the pinned Verus.** TASK_109 A1's
@@ -685,7 +849,9 @@ The other two — `load_input` and `emit` — are `external_body` with **no**
 `ensures` and no `unsafe`, exactly as every pattern's are: an `ensures` on
 `load_input` would be an axiom about the contents of a file.
 
-⚠ **THE GHOST LEDGER ADDS NOTHING TO THIS TABLE, and that is the point of it.**
+⚠ **THE GHOST LEDGER ADDS NOTHING TO THIS TABLE.** ⚠⚠ **That was published as
+*the point of it*; after TASK_118 it is better read as the whole of it — the
+ledger's PRICE is zero and so is its PRODUCT (section 6).**
 `led_alloc` and `led_free` (section 6b) are ordinary verified functions: no
 `external_body`, no `unsafe`, so `_is_trusted` returns `False` for both and
 `_scan_unsafe_sites` finds every `unsafe` token still inside a trusted body.
@@ -983,12 +1149,32 @@ is what moved the row.
 
 ## 10. Miri, and how narrowly to read the row
 
-⚠ **`harness/check.py` passes no `MIRIFLAGS` and no `-Zmiri-seed`**, and
-`.memory/00-environment.md` records that Miri's alignment check is
-**seed-dependent** — the same source clean on seeds 0 and 2 and reporting UB on
-1 and 3. So a green gate row means *"no UB at whatever seed the default
-happened to be"*, and this file does not write "Miri: N of N, no UB" as though
-it were seed-independent.
+⚠⚠ **THIS PARAGRAPH'S PREMISE IS RETRACTED AT TASK_118 — flagged at TASK_107,
+flagged again at TASK_114, and it is the same sentence `spec.md`'s
+`miri.blocked_reason` carried.** It read: *"`harness/check.py` passes no
+`MIRIFLAGS` and no `-Zmiri-seed`, and `.memory/00-environment.md` records that
+Miri's alignment check is seed-dependent — the same source clean on seeds 0 and
+2 and reporting UB on 1 and 3."*
+
+**Both halves are stale.**
+
+1. Since TASK_107 `check.py` does not merely fail to set `MIRIFLAGS` — it
+   **removes an ambient one** and records what it did, in
+   `miri.miriflags`, `miri.miriflags_removed_ambient` and `miri.miri_version`.
+   ⚠ `MIRIFLAGS=""` is a **different configuration** from `MIRIFLAGS` unset:
+   setting it at all costs **4.6×** on this pattern, 74 s → 340 s, past the
+   180 s budget.
+2. **The seed split does not reproduce.** TASK_107 measured seeds 0..11
+   agreeing; TASK_114 measured that **the seed is not the variable at all** —
+   the swing is an ENVIRONMENT-BLOCK effect that the mere presence of
+   `MIRIFLAGS` selects, and a decoy variable with nothing to do with Miri
+   reproduced it. ⚠ **THE MECHANISM IS OPEN** (TASK_119's), and the record
+   cannot tell you which state a run landed in, because those three keys are
+   **identical in both**.
+
+**So a green gate row means *"no UB at Miri's default seed, in whichever
+environment state this run landed in"***, and a p42 run that comes back with a
+second BLOCKED Miri row is most likely that state rather than a regression.
 
 `controls/miri_seeds.sh` sweeps **seeds 0 through 7** over every input with
 `n_iters` clamped to 4 (the gate's own `MIRI_PROBE_ITERS`), and it carries a
@@ -998,19 +1184,79 @@ PATH's `dig_free` deleted, generated by substitution so it cannot drift.
 leak** — and an unexercised checker is indistinguishable from a satisfied one.
 Results in section 11c.
 
-⚠ **AMENDED AT TASK_110. This paragraph used to open *"Since Verus cannot state
-leak-freedom (section 6)"*, which is retracted** — R5 states it and checks it on
-every exit (section 6b). **Miri is still load-bearing and the row is not
-weakened**, because the ledger is a fact about R5 and Miri is the check on R4:
-the two rungs are byte-identical machine code, and a proof carried by one is not
-a proof about the other. `identity` compares object code; the ledger is erased
-before codegen.
+⚠⚠ **AMENDED AT TASK_110 AND AMENDED BACK AT TASK_118.** This paragraph
+originally opened *"Since Verus cannot state leak-freedom (section 6)"*;
+TASK_110 struck that on the ground that R5 states it and checks it on every
+exit, and **that ground is false** (section 6). **The original is not restored
+either — expressibility is OPEN.** What is true, and is what this control rests
+on: **Miri is load-bearing for BOTH rungs, not just R4.** The ledger is erased
+before codegen, `identity` compares object code, and a leak planted in both
+rungs is byte-identical and passes every pin — so Miri's leak report is the only
+mechanical check either rung has. ⚠ **TASK_116 re-ran this in the gate's own
+post-TASK_107 configuration and it still fires** (`rc=1`, `memory leaked:
+alloc… (Rust heap, size: 32)`) with the shipped rung silent. ⚠ **And note the
+hole it leaves: `miri.sources` is `["unsafe.rs"]`, so R5 is never Miri-checked
+at all** — R5's leak-freedom is inferred from R4's Miri result plus the
+`identity` pin, and `large.bin` is outside Miri entirely.
 
 ⚠ One trap this control fell into and climbed out of: `adversarial-shortlen.bin`
 exits **5** by design, and the first version read `rc != 0` as UB, so every seed
 looked like a failure. The script now reads Miri's **stderr**, which is where
 `Undefined Behavior` and `memory leaked` are reported, and treats the exit code
 as information only.
+
+### 10a. ⚠⚠ AND THE GATE'S OWN RECORD SHOWS NOTHING — MEASURED, FIXED, AND THE FIX DELIBERATELY NOT LANDED HERE
+
+**A Miri LEAK is neither `Undefined Behavior` nor `error: unsupported`**, and
+until TASK_118 those two strings were the whole of `check.py`'s `ub` key. So a
+leaking rung was recorded with **`ub: False`** and caught only by the next
+branch, on the exit code, with the message *"miri exited 1, model expects 0"*.
+**The verdict was right; the record was blind** — and a reader auditing
+`results/gate/*.json` by the key they would search saw nothing, on the one
+pattern in the tree whose entire subject is a leak (TASK_116 MINOR 6).
+
+**The fix is written, tested and HELD.** It records **`leak`** on every Miri row,
+unconditionally, with its own failure branch above the exit-code branch, plus a
+regression control in the shape `p18-varint-shift/controls/miri_exit_hole.py`
+established. ⚠⚠ **It is NOT landed in this task, and the reason is arithmetic:**
+`check.py::main` hashes `harness/*.py` into every gate record's
+`source_sha256`, so a one-line edit takes `harness/measure.py --check-stale`
+from **0 STALE to 25 STALE** — every gate record but this one — and costs a full
+26-pattern gate sweep to clear. **`TASK_119` is already written to edit
+`check.py` and already budgets exactly that one sweep, and says so in its own
+opening: *"EVERY ITEM HERE EDITS `harness/check.py` … the whole task costs ONE
+26-pattern gate sweep … That is why they are batched."*** **Landing it here
+would have bought a second sweep and nothing else.** The diff and the control
+are held as a rider (`.tasks/TASK_118_REPORT.md` §E). ⚠ **`check.py` is not
+MEASUREMENT-hashed — that part of the budget was right — but it is
+GATE-RECORD-hashed, and `--check-stale` reads gate records too.**
+
+**Measured, on the real `check.py` with the fix applied and on the shipped one
+out of `git`, before the edit was withdrawn:**
+
+```
+  MUTANT-A   exit=1  ub=False  leak=True      <- error-path dig_free deleted
+  CONTROL-B  exit=0  ub=False  leak=False     <- shipped rung
+  ok    the RECORD says leak=True on the leaking rung
+  ok    ub=False on the same row, so the `leak` key is NEEDED and not redundant with `ub`
+  ok    the gate FAILS the mutant: ... Miri reports a MEMORY LEAK at process exit
+  ok    the shipped rung passes with leak=False ...
+  OLD-CODE   exit=1  ub=False  leak=<KEY ABSENT>
+  ok    the old record has NO leak key and ub=False: a reader auditing results/gate/*.json by `ub` saw nothing
+  ok    ...and the old gate still FAILED, on the exit code
+```
+
+⚠ **`ub=False` on the mutant is asserted deliberately**: without it the script
+would only show the new key works, not that it was needed. And the OLD-CODE arm
+loads the pre-fix `check.py` out of `git` and runs it on the same mutant, so
+*"the record showed nothing"* is measured rather than remembered.
+
+⚠ **It also closes a small hole, and it is a trap for the next pattern rather
+than a repair of this one:** on an input whose model declares a **non-zero**
+`expected_exit`, a leaking rung whose exit happened to equal that code used to
+pass. No committed row is in that position — 186 Miri rows expect 0, five expect
+5, one expects 7, and no committed stderr contains `memory leaked` — so **no
+shipped verdict changes.**
 
 ---
 
@@ -1075,13 +1321,53 @@ the shipped rungs:
 | r4_endptr (cursor vs end ptr) | 1455.00 | 53174.00 | ❌ needs the one-past-the-end pointer (section 9a) |
 | **r3_ship** (`with_capacity`+`extend`+`rev().fold`) | **1419.00** | **51138.00** | ✅ shipped |
 | r3_revidx (`extend` + index fold) | 1627.00 | 59845.00 | ✅ |
-| r3_zeroed (`vec![0;len]`+`clear`+`extend`) | 1572.00 | 55298.00 | ✅ |
-| r3_push (`with_capacity`+`push`+index fold) | 2634.00 | 102846.00 | ✅ |
+| r3_zeroed (`vec![0;len]`+`clear`+`extend`) | 1572.00 | 55298.00 | ❌ **NOT R3** — see below |
+| r3_push (`with_capacity`+`push`+index fold) | 2634.00 | 102846.00 | ❌ **NOT R3** — see below |
 
 **Both spans are over the ADMISSIBLE spellings only** — the three refusals are
 listed for the search's sake and are not endpoints of anything. **R4 span
 `1407 … 1617` (small), `51127 … 59834` (large), from `r4_ship` and
-`r4_idxfold`. R3 span `1419 … 2634` (small), `51138 … 102846` (large).**
+`r4_idxfold`.**
+
+⚠⚠ **AND THE PUBLISHED R3 SPAN WAS 4.5× TOO WIDE. CORRECTED AT TASK_118, FROM
+TASK_116 §B4.** It read **`1419 … 2634` (small), `51138 … 102846` (large)** and
+both top endpoints came from a spelling that is **not an R3 rung**.
+`required[4]` reads *"R2 acquires with `vec![0u8; len]` and indexes; R3 acquires
+with `Vec::with_capacity` and fills with `extend`"* — and under this pattern's
+own named-spelling standard a backticked span in a `required` entry pins THAT
+SPELLING. **Driven through the gate's own `check.py::spelling_matches` rather
+than read off by eye:**
+
+| variant | `vec![0u8; len]` | `Vec::with_capacity` | `extend` | verdict |
+|---|---|---|---|---|
+| `r3_ship` | no | **YES** | **YES** | ✅ in contract |
+| `r3_revidx` | no | **YES** | **YES** | ✅ in contract |
+| `r3_zeroed` | **YES** | no | **YES** | ❌ — it spells **R2's** acquisition |
+| `r3_push` | no | **YES** | no | ❌ — no `extend` |
+| shipped `safe_tuned.rs` | no | **YES** | **YES** | ✅ (the control that says the probe is right) |
+
+**`r3_zeroed` is not a near-miss: it matches the entry's R2 clause.** ✅ **THE
+IN-CONTRACT R3 SPAN IS `1419 … 1627` (small), `51138 … 59845` (large)**, from
+`r3_ship` and `r3_revidx`. ✅ **The conclusion below survives unchanged** — the
+narrowed span still overlaps R4's `1407 … 1617` at both ends. **Only the
+published width was wrong**, and this is `p05`'s two-task detour and `p23`'s
+span lesson for the third time: *an endpoint is what someone thought to write,
+not what the declaration permits.*
+
+⚠ **CAN THE PIN BE MADE TO CARRY THIS? NO, not today, and the answer is in the
+gate's own record.** `spelling_matches` is keyed by **language** (`c` / `rust`),
+never by rung, which is why `required[4]` states its per-rung scoping in
+English. The audit applies all five of the entry's spellings to all six rungs
+and files the misses: `results/gate/p42-goto-cleanup.json`'s
+`idiom_audit.required_absent` is **13** and `required_pins_nothing` is **5**, and
+those 13 rows are *exactly* the per-rung scoping the prose describes. So the
+record already contains the evidence; **nothing compares it to a pin.** Two
+repairs exist and both are gate changes — a per-RUNG key alongside `c`/`rust`,
+or pinning the `absent` set in the contract — and neither passes
+`.memory/02-bench-rules.md`'s *"could this happen by accident?"* test very well:
+no shipped rung is at risk, only an ANALYSIS that quotes a variant. **Reported,
+not wired up** (`PROTOCOL.md` rule 5).
+
 (The inadmissible `r4_add` happens to tie `r4_ship` to the instruction, so
 including it would not move the endpoint — but it is excluded on principle, not
 because it is free to exclude.)
@@ -1124,7 +1410,7 @@ R4 held fixed by fiat at the shipped verified spelling, that bounds
 instead of a pair interval.** ⚠⚠ **They OVERLAP, at both ends: the R3 span's
 lower endpoint (1419) lies inside the R4 span, and the R4 span's upper endpoint
 (1617) lies inside the R3 span.** `r3_revidx` at 1627.00 is dearer than every R4
-spelling measured; `r3_push` is dearer than the dearest R4 by 63 %; and
+spelling measured; and
 `r4_idxfold` at 1617.00 is dearer than two of the four R3 spellings.
 
 > ⚠ **A difference whose endpoints overlap is not a difference.** p42 publishes

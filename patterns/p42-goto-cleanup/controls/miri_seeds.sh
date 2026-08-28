@@ -18,15 +18,25 @@
 #     `dig_free` deleted, generated here by substitution so it cannot drift:
 #     Miri MUST report a leak on it, and MUST NOT on the shipped rung.
 #
-#     /!\ AMENDED AT TASK_110.  This paragraph used to say "Verus cannot state
-#         leak-freedom at the pinned version (controls/affine_leak.rs), so what
-#         stands behind `R4 does not leak` is Miri".  The first clause is
-#         RETRACTED: R5 states leak-freedom and Verus checks it on every exit
-#         (controls/ledger_leak.py, ../NOTES.md 6).  This control is NOT
-#         weakened by that, because the ledger is a fact about R5 and this is
-#         the check on R4: the two are byte-identical machine code, the ledger
-#         is erased before codegen, and a proof carried by one rung is not a
-#         proof about the other.
+#     /!\ AMENDED AT TASK_110 AND AMENDED BACK AT TASK_118.  This paragraph
+#         originally said "Verus cannot state leak-freedom at the pinned version
+#         (controls/affine_leak.rs), so what stands behind `R4 does not leak` is
+#         Miri".  TASK_110 struck the first clause on the ground that R5 states
+#         leak-freedom and Verus checks it on every exit.  THAT GROUND IS FALSE
+#         (TASK_116, reproduced at TASK_118): a one-line proof empties the
+#         ledger without freeing and the file still reports 18 verified, 0
+#         errors.  THE ORIGINAL IS NOT RESTORED EITHER -- expressibility at this
+#         pin is OPEN.  See controls/ledger_leak.py, which now runs the attacks
+#         as acceptance arms, and ../NOTES.md 6.
+#
+#     /!\/!\ SO THIS CONTROL IS LOAD-BEARING FOR BOTH RUNGS, NOT JUST R4, AND
+#         THAT IS A STRENGTHENING OF ITS OWN CLAIM.  The two rungs are
+#         byte-identical machine code, every encoding tried is erased before
+#         codegen, and a leak planted in BOTH rungs passes the `identity` pin
+#         and every spec.md pin.  Miri's leak report is the only mechanical
+#         check either rung has.  /!\ Note the hole that leaves: spec.md's
+#         `miri.sources` is ["unsafe.rs"], so R5 is never Miri-checked directly,
+#         and `large.bin` is outside Miri entirely.
 #
 #   sh patterns/p42-goto-cleanup/controls/miri_seeds.sh
 #

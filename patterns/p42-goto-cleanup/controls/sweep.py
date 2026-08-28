@@ -24,7 +24,10 @@ window length, so the allocator's size class changes underneath the fit.
 
   python3 patterns/p42-goto-cleanup/controls/sweep.py [cell ...]
 
-Cells default to the six measured ones.  Binaries come from `.temp/build/p42`,
+Cells default to the seven listed in `CELLS` below.  ⚠ THIS LINE SAID `the
+six measured ones` UNTIL TASK_118; `CELLS` has always listed SEVEN, because
+`c-gcc-h` is in it (TASK_110 disclosed the mismatch, TASK_116 reproduced it).
+Binaries come from `.temp/build/p42`,
 so run `harness/build.py p42` first.
 """
 
