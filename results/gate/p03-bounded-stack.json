@@ -191,9 +191,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3267,
+    "bytes": 3280,
     "nvars": 48,
-    "envp_stack_bytes": 3651,
+    "envp_stack_bytes": 3664,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -249,53 +249,53 @@
     "c-gcc-h/O3/whole/small.bin": 3849.0,
     "c-gcc-h/O3/whole/large.bin": 10358.72,
     "c-gcc-h/O3/whole/d_ir_d_work": 2.1955210792580098,
-    "safe_naive/O0/isolated/small.bin": 22429.0,
-    "safe_naive/O0/isolated/large.bin": 73469.3,
+    "safe_naive/O0/isolated/small.bin": 22436.0,
+    "safe_naive/O0/isolated/large.bin": 73476.3,
     "safe_naive/O0/isolated/d_ir_d_work": 17.21426644182125,
-    "safe_naive/O0/whole/small.bin": 22436.0,
-    "safe_naive/O0/whole/large.bin": 73476.3,
+    "safe_naive/O0/whole/small.bin": 22429.0,
+    "safe_naive/O0/whole/large.bin": 73469.3,
     "safe_naive/O0/whole/d_ir_d_work": 17.21426644182125,
     "safe_naive/O3/isolated/small.bin": 8176.0,
     "safe_naive/O3/isolated/large.bin": 25685.3,
     "safe_naive/O3/isolated/d_ir_d_work": 5.905328836424958,
-    "safe_naive/O3/whole/small.bin": 8885.0,
-    "safe_naive/O3/whole/large.bin": 26728.3,
+    "safe_naive/O3/whole/small.bin": 8878.0,
+    "safe_naive/O3/whole/large.bin": 26721.3,
     "safe_naive/O3/whole/d_ir_d_work": 6.017976391231028,
-    "safe_tuned/O0/isolated/small.bin": 20078.0,
-    "safe_tuned/O0/isolated/large.bin": 65188.3,
+    "safe_tuned/O0/isolated/small.bin": 20071.0,
+    "safe_tuned/O0/isolated/large.bin": 65181.3,
     "safe_tuned/O0/isolated/d_ir_d_work": 15.214266441821248,
-    "safe_tuned/O0/whole/small.bin": 20071.0,
-    "safe_tuned/O0/whole/large.bin": 65181.3,
+    "safe_tuned/O0/whole/small.bin": 20078.0,
+    "safe_tuned/O0/whole/large.bin": 65188.3,
     "safe_tuned/O0/whole/d_ir_d_work": 15.214266441821248,
-    "safe_tuned/O3/isolated/small.bin": 3418.0,
-    "safe_tuned/O3/isolated/large.bin": 9067.3,
+    "safe_tuned/O3/isolated/small.bin": 3425.0,
+    "safe_tuned/O3/isolated/large.bin": 9074.3,
     "safe_tuned/O3/isolated/d_ir_d_work": 1.9053288364249577,
-    "safe_tuned/O3/whole/small.bin": 3649.0,
-    "safe_tuned/O3/whole/large.bin": 9891.3,
+    "safe_tuned/O3/whole/small.bin": 3642.0,
+    "safe_tuned/O3/whole/large.bin": 9884.3,
     "safe_tuned/O3/whole/d_ir_d_work": 2.1053288364249574,
-    "unsafe/O0/isolated/small.bin": 42519.0,
-    "unsafe/O0/isolated/large.bin": 137828.3,
+    "unsafe/O0/isolated/small.bin": 42512.0,
+    "unsafe/O0/isolated/large.bin": 137821.3,
     "unsafe/O0/isolated/d_ir_d_work": 32.1447892074199,
-    "unsafe/O0/whole/small.bin": 42519.0,
-    "unsafe/O0/whole/large.bin": 137828.3,
+    "unsafe/O0/whole/small.bin": 42512.0,
+    "unsafe/O0/whole/large.bin": 137821.3,
     "unsafe/O0/whole/d_ir_d_work": 32.1447892074199,
-    "unsafe/O3/isolated/small.bin": 3059.0,
-    "unsafe/O3/isolated/large.bin": 8441.3,
+    "unsafe/O3/isolated/small.bin": 3066.0,
+    "unsafe/O3/isolated/large.bin": 8448.3,
     "unsafe/O3/isolated/d_ir_d_work": 1.8152782462057333,
-    "unsafe/O3/whole/small.bin": 5076.0,
-    "unsafe/O3/whole/large.bin": 13620.3,
+    "unsafe/O3/whole/small.bin": 5069.0,
+    "unsafe/O3/whole/large.bin": 13613.3,
     "unsafe/O3/whole/d_ir_d_work": 2.8817200674536254,
-    "verus/O0/isolated/small.bin": 42519.0,
-    "verus/O0/isolated/large.bin": 137828.3,
+    "verus/O0/isolated/small.bin": 42512.0,
+    "verus/O0/isolated/large.bin": 137821.3,
     "verus/O0/isolated/d_ir_d_work": 32.1447892074199,
-    "verus/O0/whole/small.bin": 42519.0,
-    "verus/O0/whole/large.bin": 137828.3,
+    "verus/O0/whole/small.bin": 42512.0,
+    "verus/O0/whole/large.bin": 137821.3,
     "verus/O0/whole/d_ir_d_work": 32.1447892074199,
-    "verus/O3/isolated/small.bin": 3065.0,
-    "verus/O3/isolated/large.bin": 8447.3,
+    "verus/O3/isolated/small.bin": 3058.0,
+    "verus/O3/isolated/large.bin": 8440.3,
     "verus/O3/isolated/d_ir_d_work": 1.8152782462057333,
-    "verus/O3/whole/small.bin": 5076.0,
-    "verus/O3/whole/large.bin": 13620.3,
+    "verus/O3/whole/small.bin": 5069.0,
+    "verus/O3/whole/large.bin": 13613.3,
     "verus/O3/whole/d_ir_d_work": 2.8817200674536254
   },
   "verus": {
@@ -604,20 +604,7 @@
     "adversarial-allpop.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "13802131020466559104",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "5685940249600",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "272441309286601856",
+        "stdout": "10063304773578788480",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -630,7 +617,20 @@
       },
       {
         "exit": 0,
-        "stdout": "3133450103314730112",
+        "stdout": "17572042367334718720",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "5118499357395253120",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -643,11 +643,11 @@
       },
       {
         "exit": 0,
-        "stdout": "9477474785746765440",
+        "stdout": "5897326888001008896",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/whole"
+          "O0/whole"
         ],
         "model_exit": 0,
         "model_stdout": "5685940249600",
@@ -658,33 +658,7 @@
     "adversarial-allpop.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "16946891641505406848",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "5685940249600",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "17636038064902672256",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "5685940249600",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "9020371456575527808",
+        "stdout": "4645136985932344960",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -697,11 +671,37 @@
       },
       {
         "exit": 0,
-        "stdout": "9509042945233061248",
+        "stdout": "7344054904563223040",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "8290973073341803392",
         "stderr": "",
         "signal": null,
         "cells": [
           "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "5685940249600",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "9353627688953151232",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "5685940249600",
@@ -1108,7 +1108,20 @@
     "adversarial-underflow.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "10117362466461559680",
+        "stdout": "1088679941117625856",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "7473563764999086208",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "13021344128218246016",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1121,20 +1134,7 @@
       },
       {
         "exit": 0,
-        "stdout": "10567832333768212608",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "7473563764999086208",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "11963870565706931712",
+        "stdout": "7014365708119344512",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1147,11 +1147,11 @@
       },
       {
         "exit": 0,
-        "stdout": "16480930309352685056",
+        "stdout": "7253596510550245504",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/isolated"
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "7473563764999086208",
@@ -1162,11 +1162,11 @@
     "adversarial-underflow.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "1845309233756806912",
+        "stdout": "1131962032388032512",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole"
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "7473563764999086208",
@@ -1188,11 +1188,11 @@
       },
       {
         "exit": 0,
-        "stdout": "6517443921727162368",
+        "stdout": "4660071466859831040",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/whole"
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "7473563764999086208",
@@ -1201,11 +1201,11 @@
       },
       {
         "exit": 0,
-        "stdout": "6802454464588414464",
+        "stdout": "4858349602058931712",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/isolated"
+          "O0/whole"
         ],
         "model_exit": 0,
         "model_stdout": "7473563764999086208",
@@ -1328,7 +1328,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==3453111==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==3549458==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1361,7 +1361,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==3453116==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p03-bounded-stack/c/kernel.c:79:35: runtime error: index 18446744073709551615 out of bounds for type 'uint64_t [64]' ================================================================= ==3549463==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1446,7 +1446,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.3,
+        "seconds": 0.4,
         "stdout": "17534858048539192960",
         "model_stdout": "17534858048539192960",
         "stderr": ""
@@ -1470,7 +1470,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 1.1,
+        "seconds": 1.2,
         "stdout": "13026927928058472795",
         "model_stdout": "13026927928058472795",
         "stderr": ""
