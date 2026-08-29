@@ -2856,6 +2856,77 @@ already been struck.** Keep the list, not the ordinal.
       `spec.md` against the table, so its DETECTION has no lag; 9c's lag is in
       the detection. Bound: 26 `rep.shout(` sites, 5 firing, 7 latent.**
 
+12. ⚠⚠⚠ **EVERY NUMBER IN A RETRACTED SENTENCE CAN BE ARITHMETICALLY CORRECT,
+    SO A READER WHO CHECKS THE ARITHMETIC FINDS NOTHING WRONG.** `TASK_135`,
+    reviewer work, ✅ **manager-verified against `p17`'s own NOTES and fixed in
+    place.**
+
+    `RECAP.md` published ~~*"lag-4 differencing gives 26, 26, 26, 26 with ZERO
+    residual = `6.50 Ir` per request — a mod-4 sawtooth from the 4×-unrolled
+    table walk"*~~ for about **fifty tasks** after `TASK_083_REVIEW` majors 6
+    and 7 retracted **both halves**. ⚠ **The staircase reproduces. The residual
+    reproduces. The four 26s reproduce.** **What was retracted is the
+    CONCLUSION**: `6.50` is the mean of a band that samples each residue once
+    per four (both shipped inputs pay `7.00`, so a 20-range extrapolation is
+    ELEVEN LOW), and **neither rung's suffix-table walk is unrolled at all**.
+
+    > ⚠⚠ **A VERIFICATION PASS THAT RE-DERIVES THE FIGURES CANNOT SEE THIS
+    > CLASS.** The figures are the part that survived. **Ask separately what the
+    > figures were said to MEAN, and whether that reading was ever attacked.**
+
+    ⚠ **`.memory/03-measurement.md` already carries the governing rule — *"an
+    out-of-sample test validates the LAW, not the STORY"* — and it was violated
+    by a document that quotes it. **Any 8-point sequence can be lag-4
+    differenced; four equal differences are a fact about the numbers, not
+    evidence of which loop.**
+
+13. ⚠⚠⚠ **A STALE `PROVISIONAL` MARKER IS NOT INERT — IT TELLS EVERY READER
+    WHICH ITEM NOT TO TRUST, WHILE THE LIVE DEFECT SITS IN THE PARAGRAPH ABOVE
+    IT.** `TASK_135`.
+
+    `p17` §10b's marker said *"awaiting review"*. **§10b had been reviewed
+    TWICE** — attacked at `TASK_083_REVIEW` (the attack WON), replacement landed
+    at `TASK_084`, upheld at `TASK_084_REVIEW` item 12. ⚠⚠ **So the marker was
+    stale AND it was guarding the wrong thing: the defect was the paragraph
+    carrying it, which was still publishing the retracted claims.**
+
+    > ⚠ **A marker spends a reader's scepticism. Point it at a live claim or
+    > remove it** — and when triaging markers, **read what they GUARD, not only
+    > whether their stated ground still holds.**
+
+    ⚠⚠ **AND MARKERS HIDE INSIDE HASHED FENCES, WHERE NO TRIAGE HAS EVER LOOKED:**
+    `p09-bitset/spec.md` and `p16-tlv-walk/spec.md` each carry a `PROVISIONAL`
+    **inside the `slb-contract` block**, calling a repair *"unattacked"* that
+    `TASK_045_REVIEW` blocker 1 attacked — **and it FIRED, forty lines below the
+    header that denies it.** ✅ **They propagated into two gate records and two
+    published tables.** ⚠ **`grep PROVISIONAL RECAP.md` is not the census; the
+    real figure is 13 lines in `RECAP.md`, 65 in `.memory/`, 3 in
+    `SYNTHESIS.md`, and 2 inside hashed contracts.**
+
+14. ⚠⚠⚠ **A CONTROL THAT FIRES IS NOT A CONTROL THAT TESTED WHAT YOU SAID IT
+    DID.** ✅ **The manager's own, this session, caught on inspection rather than
+    by an agent.**
+
+    Five negative controls were run against `harness/tools/composition.py` and
+    **all five "fired"**. ⚠ **Three fired for the wrong reason.** Two were run by
+    copying the script to `.temp/` and editing the copy — **the copy computed
+    the repo root from its own path, so it TRACEBACKED** and the non-zero exit
+    was read as the control working. The third planted a 27th pattern directory
+    to test the *"built but unclassified"* arm, but tripped the
+    *"`patterns/` and `results/gate/` disagree"* arm first, **leaving the arm it
+    was aimed at untested.**
+
+    ✅ **Re-run in place with a byte-identical restore (`sha256` checked before
+    and after), all five now fire on their OWN reason.**
+
+    > ⚠⚠ **CHECK THE REASON, NOT THE EXIT CODE. `rc != 0` is what a broken
+    > control and a working one have in common** — the same shape as this box's
+    > ASan-behind-`LD_PRELOAD` trap, where both cases exit 1.
+
+    ⚠ **And the control that matters most here compares MEMBERSHIP, not totals:**
+    moving `p23` from spatial to logical still sums to 26, and only a set
+    comparison catches it.
+
 ## ⚠ A number GREPPED OUT OF A LOG is not a number READ OUT OF A RECORD
 
 **`TASK_127`, swept at `TASK_132`.** **The gate writes structured JSON and also

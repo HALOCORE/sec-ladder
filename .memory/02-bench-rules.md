@@ -1892,3 +1892,34 @@ with the gap as the finding.** ⚠ **What is NOT acceptable is an R5 that appear
 to state it and does not — `p42`'s ghost ledger verified `18/0` while leaking.
 Every temporal R5 owes an ATTACK arm that must FAIL to verify, not just a
 deletion arm.** (`.memory/03-measurement.md` failure-class entry 8.)
+
+### ✅ THE FOURTH LIMB HAS NOW BEEN USED, AND IT IS NOT A RUBBER STAMP
+
+⚠ **A limb added to make a priority implementable is exactly the kind of rule
+that quietly admits everything.** It was applied to **NINE candidates across
+`TASK_133` and `TASK_134`** — `p25`, a stack-lifetime row, iterator invalidation,
+`p35`, `p29`, `p30`, `p32`/`p33`, `p34` — **and it admitted ONE.**
+
+```
+p29        ADMITTED   limb 4 clause 3, the safe rung is SILENTLY WRONG
+p25        refused    UB executes and is unobservable; no conjunct to omit;
+                      R1 has no reproducible checksum -> ungatable
+stack      refused    C is not silently wrong (both compilers warn by default)
+iterator   refused    no independent bug: resolves to p25, to spatial, or to p27
+p35        blocked    a trusted item owes a twin; a union read has no safe twin
+p30        refused    p27's half alone, now measured rather than argued
+p32/p33    refused    the silence is WHERE THE STORAGE LIVES, and both choices
+                      already ship bit-identically as p04 and p27
+p34        refused    no inversion: C's own refcount rung leaks identically
+```
+
+✅ **One admission in nine is evidence the limb discriminates.** ⚠ **And the
+admitted row was NOT admitted on the reason the manager predicted** — the
+manager's stated basis for `p29` (*"outcome 5, the only good outcome"*) was
+already struck in `.memory/01-ladder.md` before the task was written. **The limb
+did the work; the manager's intuition did not.**
+
+⚠⚠ **THE SPATIAL BAN NEVER HAD TO FIRE.** No candidate was refused *by* it —
+`p25`'s growth-overflow half was the only spatial thing proposed, and it died on
+its own measurement (`heap-buffer-overflow WRITE`) before the ban was needed.
+**Do not cite the ban as having done work it did not do.**
