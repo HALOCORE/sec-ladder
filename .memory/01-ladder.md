@@ -2654,6 +2654,34 @@ exactly one of these, and *which one* decides whether the row is worth building:
    leaks; `Weak` for `prev` does not. ✅ Manager-re-run: **`miri cycle` → 5
    `memory leaked` lines, `miri weak` → 0**, same checksum both.
 
+   ⚠⚠⚠ **SCOPED AT `TASK_133`, AND THE GENERALISATION DOES NOT SURVIVE. This
+   outcome holds for the STATICALLY-ASYMMETRIC case it was measured on — a
+   doubly linked list, where `prev` is structurally the back edge. IT IS NOT A
+   LANGUAGE RESULT.** ⚠ **The measurement above never varied the C side.**
+
+   ✅ **Manager-re-run, one op stream, LSan with the `use_stacks=0` hook, and a
+   positive control that FIRES (4096 B):**
+
+   ```
+   C   manual refcount   LEAKS   LSan 2160 B, 2 records   checksum 6435204519055678286
+   C   arena             clean                            checksum 6435204519055678286
+   Rust safe  Rc         LEAKS   miri 30 x memory leaked  checksum 6435204519055678286
+   Rust safe  index arena clean                           checksum 6435204519055678286
+   Rust safe  Weak       clean   checksum 749491243298922113  <- A DIFFERENT PROGRAM
+   ```
+
+   > ⚠⚠ **LEAKING IS SELECTED BY THE OWNERSHIP DISCIPLINE, NOT BY THE LANGUAGE.**
+   > **C's own refcount rung leaks identically to Rust's `Rc` rung, at the same
+   > checksum; C's arena and Rust's index arena are both clean, at that same
+   > checksum. THERE IS NO INVERSION, so a shipped `p34` has no outcome 4.**
+
+   ⚠ **AND `Weak` IS NOT AN ALTERNATIVE SPELLING OF THE SAME RUNG** — a `Weak`
+   edge can be gone, `upgrade()` needs an answer for that, and the answer
+   **changes the published checksum**, which `.memory/02-bench-rules.md`'s
+   checksum contract excludes. ⚠ **Once the edge set comes out of a FILE, as a
+   shipped kernel's does, no edge is statically the back edge — which is why the
+   DLL result does not transfer.**
+
 ### ⚠⚠ The sentence this REPLACES was false, and it is p31's failure mode
 
 TASK_093 offered *"Safe Rust has no owned intrusive DLL (`E0382` + `E0499`), so
