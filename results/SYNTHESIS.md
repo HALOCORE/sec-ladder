@@ -1082,15 +1082,33 @@ choice that is the porter's and not the CVE's.**
 ⚠⚠ **AND THE RESULT THAT OUTRANKS THE SURVIVOR: A CVE CORPUS ANSWERS *"which
 mechanisms are missing"* AND CANNOT ANSWER *"which idioms matter"*.** Eight of
 the twenty are pure decision bugs — a distribution no idiom census would produce
-— **because CVEs select for exploitability, not for frequency.** ⚠ **And the
-idiom census that would answer it CANNOT BE RUN ON THE MACHINE THIS PROJECT LIVES
-ON: there is no independent C corpus present** (the largest non-project C
-directory holds thirteen zlib examples; the only other C is the CVE ports, which
-carry the same selection bias, and this project's own kernels, which are
-circular). ✅ **So the admission bar stays MECHANISM-based — not by preference,
-but because the frequency-based alternative has no instrument here.** ⚠ **That is
-a limitation of the setting, and it is the honest reason this project's
-generality claims stop where they do.**
+— **because CVEs select for exploitability, not for frequency.** **That half
+stands and is this section's result.**
+
+⚠⚠⚠ **WHAT FOLLOWED IT HERE IS RETRACTED. This paragraph published:**
+
+> ~~*"the idiom census that would answer it CANNOT BE RUN ON THE MACHINE THIS
+> PROJECT LIVES ON: there is no independent C corpus present"*~~ — ~~*"so the
+> admission bar stays MECHANISM-based, not by preference but because the
+> frequency-based alternative has no instrument here … the honest reason this
+> project's generality claims stop where they do."*~~
+
+**It rested on one command carrying `-maxdepth 6`. Without the depth limit the
+same machine holds an upstream PHP 4.0.2 tree entire — 301 `.c` files, 186 805
+lines, with 324 `goto`s, 145 `strcat`s, 235 `memcpy`s and 579 counted index
+loops — and a GNU coreutils tree beside it.** ⚠ **Both live in other projects'
+directories and one is under a `.temp/`, so a census over them must record a
+sha256 manifest of what it read; neither is a reason it cannot be run.**
+
+✅ **The corrected statement is weaker and truer: THE FREQUENCY-BASED ALTERNATIVE
+HAS AN INSTRUMENT AND NOBODY HAS RUN IT.** ⚠ **So this project's generality
+claims stop where they do because the census is UNRUN, not because it is
+unrunnable — and the mechanism-based bar is a choice this project has not yet
+tested against frequency, rather than the only choice available.** ⚠⚠ **That is a
+weaker position than the one this document held, and it is stated here because
+the failure was the instrument's: a depth-limited `find` reports an empty world
+exactly as an empty world does, which is the same class as this project's
+`head -4` and its whitelist-grep-called-a-census.**
 
 **Mechanisms that are recorded and not explained.** Cite these; do not explain
 them. (a) **p23's elision cause failed three isolations**: the phenomenon
