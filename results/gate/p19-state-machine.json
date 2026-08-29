@@ -150,12 +150,12 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "b1aa0ebf5be6967353d5d8b0b67a64212ce8af0c782325dd6d08dfd1a4621e38",
+    "harness/check.py": "14bf218f1a146989e98575e8fd5ab7e201c0fe1c4f27e521d71482102de96d40",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
-    "harness/report.py": "1da5d38446d378f3da3d7d3c30bdb303d240fe32aefb66335f0adc8d6552df4f",
+    "harness/report.py": "399df91333d007742f24c94ad719a1fd7cc6fd5befc509261f1c368803f2a927",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
     "patterns/p19-state-machine/NOTES.md": "14540d0730b258fb2930fe3c3f1a8bf2f1f34f0b0323cdae7ab70cb888327118",
     "patterns/p19-state-machine/README.md": "9937d7599c55c8b43fa632f79cbd9f35e4d9f860c415ca94a22e20851bb68003",
@@ -1294,7 +1294,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==2384810==ERROR: AddressSanitizer: SEGV on unknown address 0x51e000010b85 (pc 0x55f016afb5ed bp 0x51e000010b85 sp 0x7fff2752ed50 T0) ==2384810==The signal is caused by a READ memory access. #0 0x55f016af",
+      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==3500878==ERROR: AddressSanitizer: SEGV on unknown address 0x51e000010b85 (pc 0x55ff02ee05ed bp 0x51e000010b85 sp 0x7ffd372821f0 T0) ==3500878==The signal is caused by a READ memory access. #0 0x55ff02ee",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1305,7 +1305,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2384811==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51e000001685 at pc 0x558ed794068d bp 0x7ffeff7da980 sp 0x7ffeff7da970 READ of size 1 at 0x51e000001685 thread T0 #0 0x558ed794068c in kernel /home/apt/repos_common/",
+      "diagnostic": "================================================================= ==3500879==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51e000001685 at pc 0x5604501e268d bp 0x7ffe170e00d0 sp 0x7ffe170e00c0 READ of size 1 at 0x51e000001685 thread T0 #0 0x5604501e268c in kernel /home/apt/repos_common/",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1469,7 +1469,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 4.3,
+        "seconds": 4.4,
         "stdout": "9293610825097060496",
         "model_stdout": "9293610825097060496",
         "stderr": ""
@@ -1494,6 +1494,13 @@
     "cited": [
       "db6e6c5184e9"
     ],
+    "verdict": "FRESH"
+  },
+  "table_render": {
+    "table": "results/tables/p19-state-machine.md",
+    "renders_to": "results/tables/p19-state-machine.md",
+    "render_sha256": "5f722462d40fdb7e92c71e03e95ed39d242d60d64fc6ef88c0e7758d914448a5",
+    "published_sha256": "5f722462d40fdb7e92c71e03e95ed39d242d60d64fc6ef88c0e7758d914448a5",
     "verdict": "FRESH"
   },
   "controls_json": {},

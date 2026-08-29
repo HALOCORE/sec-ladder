@@ -337,12 +337,12 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "b1aa0ebf5be6967353d5d8b0b67a64212ce8af0c782325dd6d08dfd1a4621e38",
+    "harness/check.py": "14bf218f1a146989e98575e8fd5ab7e201c0fe1c4f27e521d71482102de96d40",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
-    "harness/report.py": "1da5d38446d378f3da3d7d3c30bdb303d240fe32aefb66335f0adc8d6552df4f",
+    "harness/report.py": "399df91333d007742f24c94ad719a1fd7cc6fd5befc509261f1c368803f2a927",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
     "patterns/p27-handle-table/NOTES.md": "52bf62033deae60fee4f878e0dd33c49b1a018b1a661106f78c45f71c4cd3a74",
     "patterns/p27-handle-table/README.md": "dd34cd576615d771d74c9ff8fd4d463096aac5b8a07665a87062be309d3631c5",
@@ -1105,7 +1105,7 @@
     "adversarial-many.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "10630927615167336237",
+        "stdout": "16085667612340683800",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1118,11 +1118,11 @@
       },
       {
         "exit": 0,
-        "stdout": "1238356003631568208",
+        "stdout": "5132410425482378521",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/whole"
+          "O0/whole"
         ],
         "model_exit": 0,
         "model_stdout": "6582356636790626304",
@@ -1131,7 +1131,7 @@
       },
       {
         "exit": 0,
-        "stdout": "2494511840871988008",
+        "stdout": "6946204427529335997",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1144,11 +1144,11 @@
       },
       {
         "exit": 0,
-        "stdout": "9415738852198268800",
+        "stdout": "9506924980426996034",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole"
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "6582356636790626304",
@@ -1159,7 +1159,7 @@
     "adversarial-many.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "10773602213101590106",
+        "stdout": "1557507452432113527",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1172,11 +1172,11 @@
       },
       {
         "exit": 0,
-        "stdout": "16840299744323103813",
+        "stdout": "3390549155040510126",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/whole"
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "6582356636790626304",
@@ -1185,7 +1185,7 @@
       },
       {
         "exit": 0,
-        "stdout": "1992988135613988221",
+        "stdout": "5223596553711105755",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1198,11 +1198,11 @@
       },
       {
         "exit": 0,
-        "stdout": "7128576683986790465",
+        "stdout": "6621157573137627660",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/isolated"
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "6582356636790626304",
@@ -1321,20 +1321,7 @@
     "adversarial-noreuse.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "1320235993183528960",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "3390747988282288128",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "17731414354072283136",
+        "stdout": "11043762887674013696",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1347,11 +1334,11 @@
       },
       {
         "exit": 0,
-        "stdout": "3320855423726364672",
+        "stdout": "1285289710905567232",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole"
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "3390747988282288128",
@@ -1360,11 +1347,24 @@
       },
       {
         "exit": 0,
-        "stdout": "8217565153249568768",
+        "stdout": "1337709134322509824",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/whole"
+          "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "3390747988282288128",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "9025670315992197120",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/whole"
         ],
         "model_exit": 0,
         "model_stdout": "3390747988282288128",
@@ -1375,20 +1375,7 @@
     "adversarial-noreuse.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "459711407023958016",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "3390747988282288128",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "7164836014561208320",
+        "stdout": "10130818878097500160",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1401,11 +1388,11 @@
       },
       {
         "exit": 0,
-        "stdout": "8165145729832626176",
+        "stdout": "11148601734507898880",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/whole"
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "3390747988282288128",
@@ -1414,11 +1401,24 @@
       },
       {
         "exit": 0,
-        "stdout": "9973560607846672384",
+        "stdout": "6269365146123675648",
         "stderr": "",
         "signal": null,
         "cells": [
           "O0/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "3390747988282288128",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "8130199447554664448",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "3390747988282288128",
@@ -1829,7 +1829,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2395176==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x56502257dfbd bp 0x7fff41a534b0 sp 0x7fff41a534a0 READ of size 1 at 0x502000000010 thread T0 #0 0x56502257dfbc in kernel /home/apt/repos_common/s",
+      "diagnostic": "================================================================= ==3512546==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x5608209e2fbd bp 0x7ffecb0248c0 sp 0x7ffecb0248b0 READ of size 1 at 0x502000000010 thread T0 #0 0x5608209e2fbc in kernel /home/apt/repos_common/s",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1840,7 +1840,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2395177==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x5634c1ab8fbd bp 0x7ffd9f62bbd0 sp 0x7ffd9f62bbc0 READ of size 1 at 0x502000000010 thread T0 #0 0x5634c1ab8fbc in kernel /home/apt/repos_common/s",
+      "diagnostic": "================================================================= ==3512547==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x557726993fbd bp 0x7ffe215dd380 sp 0x7ffe215dd370 READ of size 1 at 0x502000000010 thread T0 #0 0x557726993fbc in kernel /home/apt/repos_common/s",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1862,7 +1862,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2395180==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x55a8c7745fbd bp 0x7ffd675bd270 sp 0x7ffd675bd260 READ of size 1 at 0x502000000010 thread T0 #0 0x55a8c7745fbc in kernel /home/apt/repos_common/s",
+      "diagnostic": "================================================================= ==3512550==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x55790ad78fbd bp 0x7ffdf0d7c600 sp 0x7ffdf0d7c5f0 READ of size 1 at 0x502000000010 thread T0 #0 0x55790ad78fbc in kernel /home/apt/repos_common/s",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1936,7 +1936,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.3,
+        "seconds": 0.2,
         "stdout": "18155489253743655808",
         "model_stdout": "18155489253743655808",
         "stderr": ""
@@ -2021,6 +2021,13 @@
     "cited": [
       "397de62b01ea"
     ],
+    "verdict": "FRESH"
+  },
+  "table_render": {
+    "table": "results/tables/p27-handle-table.md",
+    "renders_to": "results/tables/p27-handle-table.md",
+    "render_sha256": "fa9125d30c9838f9827a823aebc6f9f43086f5f425571f28895d7d5ac51e970c",
+    "published_sha256": "fa9125d30c9838f9827a823aebc6f9f43086f5f425571f28895d7d5ac51e970c",
     "verdict": "FRESH"
   },
   "controls_json": {},

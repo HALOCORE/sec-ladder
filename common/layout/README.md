@@ -76,6 +76,40 @@ Only p01 is here. The other six populations in `.temp/r30/` were produced by the
 **blocked** builder and their cross-rung columns inherit an error measured at up
 to 22 points; they are not evidence and must not be committed as such.
 
+### ⚠ Staleness pins for `data/`: **ACCEPTED WITHOUT ONE.** Decided TASK_127, from TASK_121's survey.
+
+`TASK_121` surveyed every committed artefact carrying numbers and listed
+`data/layout_p01.json` and `data/predtimes_p01oos.json` as having **no staleness
+pin** — nothing detects them going stale against the generators that produced
+them. That is true, it is **accepted**, and the reasons are written here rather
+than only in a task report, because an acceptance that lives in a report is the
+same unwatched claim it is an acceptance *about*:
+
+1. **The generators are already covered.** `common/layout/*.py` is in every gate
+   record's `source_sha256` (`check.py`'s `srcs` list names it explicitly), so
+   an edit to `layout_gen.py` / `predict_then_time.py` / `loopfit.py` **does**
+   move something the tree watches. What is unwatched is only the *cached
+   output*, and only against *those same generators*.
+2. **The price is a 26-pattern gate sweep, ~57 min.** A `derived_from_sha256`
+   here would have to name `common/layout/*.py`, and clearing it after any prose
+   or refactor there means re-running a ~10-minute population build. Pinning
+   narrowly instead (TASK_121's own conclusion) does not help: the population is
+   a *timing* draw, so a re-run does not reproduce it byte-for-byte and the pin
+   could never be cleared by regeneration.
+3. **The finding these files support has already been withdrawn to the safe
+   side.** RECAP finding 16 withdrew the wall-clock rows they speak to. A pin
+   protecting a withdrawn number buys nothing.
+4. ⚠⚠ **`data/predictions_p01oos.json` MUST NOT BE "UPGRADED" TO A STALENESS
+   PIN.** Its own file sha256 **is a pre-registration commitment** — the hash
+   printed *before* any timing — which is a **different and stronger** claim
+   than "this is current". Replacing or wrapping it would destroy the property
+   it exists for. Verify it with the `sha256sum` line above; that is the check.
+
+**What would reverse this:** a *new* claim resting on `data/` that is not
+withdrawn, or a generator change that silently alters the population's meaning
+rather than its numbers. Then pin the generators, not the data, and accept the
+sweep.
+
 ```bash
 # the published p01 table, from committed data, with no measurement at all
 python3 common/layout/survives.py --dir common/layout/data p01

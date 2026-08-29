@@ -1,0 +1,17 @@
+{
+  "note": "Staleness pin for controls.log, which cannot pin itself. TASK_127.",
+  "pins": "patterns/p23-partition/controls/controls.log",
+  "derived_from_sha256": {
+    "patterns/p23-partition/controls/guard_variants.c": "bd6315ca68e9b9a8d5b651e44b48dde30b82aee0b279e9d8f66fadb3a248aab2",
+    "patterns/p23-partition/controls/run.sh": "58717b8fe74ac6981a95c797990d79c1f1f835a35696d2b3593fa0d9935bf5be"
+  },
+  "pin": {
+    "regenerate": "sh patterns/p23-partition/controls/run.sh",
+    "read_by": "harness/check.py::check_control_json_pins (gate stage 9b)",
+    "not_covered": [
+      "the C toolchain: $CC defaults to gcc and is not pinned, so a compiler bump moves the four static sizes and nothing here fires",
+      "the log itself: it embeds ASLR addresses, PIDs, BuildIds and absolute repo paths, so it is not byte-reproducible and is deliberately NOT hashed",
+      "ONE DATA LINE IS A DRAW, not just cosmetics: 'selfpivot ... mode=1' reads uninitialised stack by construction and printed ...783/...752/...783/...783/...752 over five runs of one binary (TASK_127). A green pin does NOT make that number reproducible, and NOTES.md must not quote it as a figure."
+    ]
+  }
+}

@@ -33,16 +33,16 @@ Segmentation fault
 exit=139
 === gv_asan bug 32 255 32 0 0 ===
 =================================================================
-==1327684==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7f3319600060 at pc 0x5624f0102167 bp 0x7ffcd82fb370 sp 0x7ffcd82fb360
-READ of size 1 at 0x7f3319600060 thread T0
-    #0 0x5624f0102166 in k_bug /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:149
-    #1 0x5624f0101520 in main /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:229
-    #2 0x7f331b62a1c9  (/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
-    #3 0x7f331b62a28a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2a28a) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
-    #4 0x5624f0101684 in _start (/home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/gv_asan+0x1684) (BuildId: 9405bb665253db28e84cbff20dd66a475148ae08)
+==3538856==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7f01cce00060 at pc 0x556d55a39167 bp 0x7fff3cc48c00 sp 0x7fff3cc48bf0
+READ of size 1 at 0x7f01cce00060 thread T0
+    #0 0x556d55a39166 in k_bug /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:149
+    #1 0x556d55a38520 in main /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:229
+    #2 0x7f01cee2a1c9  (/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
+    #3 0x7f01cee2a28a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2a28a) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
+    #4 0x556d55a38684 in _start (/home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/gv_asan+0x1684) (BuildId: 9405bb665253db28e84cbff20dd66a475148ae08)
 
-Address 0x7f3319600060 is located in stack of thread T0 at offset 96 in frame
-    #0 0x5624f0101caf in k_bug /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:145
+Address 0x7f01cce00060 is located in stack of thread T0 at offset 96 in frame
+    #0 0x556d55a38caf in k_bug /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:145
 
   This frame has 1 object(s):
     [32, 96) 'scr' (line 147) <== Memory access at offset 96 overflows this variable
@@ -50,17 +50,17 @@ HINT: this may be a false positive if your program uses some custom stack unwind
       (longjmp and C++ exceptions *are* supported)
 SUMMARY: AddressSanitizer: stack-buffer-overflow /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:149 in k_bug
 Shadow bytes around the buggy address:
-  0x7f33195ffd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7f33195ffe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7f33195ffe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7f33195fff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7f33195fff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-=>0x7f3319600000: f1 f1 f1 f1 00 00 00 00 00 00 00 00[f3]f3 f3 f3
-  0x7f3319600080: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7f3319600100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7f3319600180: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7f3319600200: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7f3319600280: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f01ccdffd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f01ccdffe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f01ccdffe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f01ccdfff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f01ccdfff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+=>0x7f01cce00000: f1 f1 f1 f1 00 00 00 00 00 00 00 00[f3]f3 f3 f3
+  0x7f01cce00080: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f01cce00100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f01cce00180: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f01cce00200: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f01cce00280: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 Shadow byte legend (one shadow byte represents 8 application bytes):
   Addressable:           00
   Partially addressable: 01 02 03 04 05 06 07 
@@ -80,7 +80,7 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
   ASan internal:           fe
   Left alloca redzone:     ca
   Right alloca redzone:    cb
-==1327684==ABORTING
+==3538856==ABORTING
 exit=1
 === gv_ubsan bug 32 255 32 0 0 ===
 guard_variants.c:149:23: runtime error: index 64 out of bounds for type 'uint8_t [64]'
@@ -109,16 +109,16 @@ Segmentation fault
 exit=139
 === gv_asan bug 32 0 0 0 0 ===
 =================================================================
-==1327704==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f332080001f at pc 0x55e7cc16b162 bp 0x7fffffb601a0 sp 0x7fffffb60190
-READ of size 1 at 0x7f332080001f thread T0
-    #0 0x55e7cc16b161 in k_bug /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:150
-    #1 0x55e7cc16a520 in main /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:229
-    #2 0x7f332282a1c9  (/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
-    #3 0x7f332282a28a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2a28a) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
-    #4 0x55e7cc16a684 in _start (/home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/gv_asan+0x1684) (BuildId: 9405bb665253db28e84cbff20dd66a475148ae08)
+==3538876==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f4dde00001f at pc 0x561674236162 bp 0x7ffca5ce1130 sp 0x7ffca5ce1120
+READ of size 1 at 0x7f4dde00001f thread T0
+    #0 0x561674236161 in k_bug /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:150
+    #1 0x561674235520 in main /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:229
+    #2 0x7f4de002a1c9  (/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
+    #3 0x7f4de002a28a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2a28a) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
+    #4 0x561674235684 in _start (/home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/gv_asan+0x1684) (BuildId: 9405bb665253db28e84cbff20dd66a475148ae08)
 
-Address 0x7f332080001f is located in stack of thread T0 at offset 31 in frame
-    #0 0x55e7cc16acaf in k_bug /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:145
+Address 0x7f4dde00001f is located in stack of thread T0 at offset 31 in frame
+    #0 0x561674235caf in k_bug /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:145
 
   This frame has 1 object(s):
     [32, 96) 'scr' (line 147) <== Memory access at offset 31 underflows this variable
@@ -126,17 +126,17 @@ HINT: this may be a false positive if your program uses some custom stack unwind
       (longjmp and C++ exceptions *are* supported)
 SUMMARY: AddressSanitizer: stack-buffer-underflow /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:150 in k_bug
 Shadow bytes around the buggy address:
-  0x7f33207ffd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7f33207ffe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7f33207ffe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7f33207fff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7f33207fff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-=>0x7f3320800000: f1 f1 f1[f1]00 00 00 00 00 00 00 00 f3 f3 f3 f3
-  0x7f3320800080: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7f3320800100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7f3320800180: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7f3320800200: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7f3320800280: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f4dddfffd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f4dddfffe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f4dddfffe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f4dddffff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f4dddffff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+=>0x7f4dde000000: f1 f1 f1[f1]00 00 00 00 00 00 00 00 f3 f3 f3 f3
+  0x7f4dde000080: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f4dde000100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f4dde000180: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f4dde000200: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f4dde000280: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 Shadow byte legend (one shadow byte represents 8 application bytes):
   Addressable:           00
   Partially addressable: 01 02 03 04 05 06 07 
@@ -156,27 +156,27 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
   ASan internal:           fe
   Left alloca redzone:     ca
   Right alloca redzone:    cb
-==1327704==ABORTING
+==3538876==ABORTING
 exit=1
 === gv_ubsan bug 32 0 0 0 0 ===
 guard_variants.c:150:23: runtime error: index 18446744073709551615 out of bounds for type 'uint8_t [64]'
 exit=1
 --- B: the TEXTBOOK pivot on an ALL-EQUAL record (mode=1) ---
 === gv_plain selfpivot 32 128 0 0 1 ===
-selfpivot n=32 pv=128 nlow=0 neq=0 mode=1 -> 3910418957284214814
+selfpivot n=32 pv=128 nlow=0 neq=0 mode=1 -> 3910418957284214783
 exit=0
 === gv_asan selfpivot 32 128 0 0 1 ===
 =================================================================
-==1327710==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7fd615200060 at pc 0x562e467e6c19 bp 0x7fffbb9f0650 sp 0x7fffbb9f0640
-READ of size 1 at 0x7fd615200060 thread T0
-    #0 0x562e467e6c18 in k_selfpivot /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:190
-    #1 0x562e467e65d5 in main /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:230
-    #2 0x7fd61722a1c9  (/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
-    #3 0x7fd61722a28a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2a28a) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
-    #4 0x562e467e6684 in _start (/home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/gv_asan+0x1684) (BuildId: 9405bb665253db28e84cbff20dd66a475148ae08)
+==3538882==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7f3b29000060 at pc 0x557a29cd8c19 bp 0x7ffffa42e200 sp 0x7ffffa42e1f0
+READ of size 1 at 0x7f3b29000060 thread T0
+    #0 0x557a29cd8c18 in k_selfpivot /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:190
+    #1 0x557a29cd85d5 in main /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:230
+    #2 0x7f3b2b02a1c9  (/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
+    #3 0x7f3b2b02a28a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2a28a) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
+    #4 0x557a29cd8684 in _start (/home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/gv_asan+0x1684) (BuildId: 9405bb665253db28e84cbff20dd66a475148ae08)
 
-Address 0x7fd615200060 is located in stack of thread T0 at offset 96 in frame
-    #0 0x562e467e675f in k_selfpivot /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:159
+Address 0x7f3b29000060 is located in stack of thread T0 at offset 96 in frame
+    #0 0x557a29cd875f in k_selfpivot /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:159
 
   This frame has 1 object(s):
     [32, 96) 'scr' (line 161) <== Memory access at offset 96 overflows this variable
@@ -184,17 +184,17 @@ HINT: this may be a false positive if your program uses some custom stack unwind
       (longjmp and C++ exceptions *are* supported)
 SUMMARY: AddressSanitizer: stack-buffer-overflow /home/apt/repos_common/sec-ladder/patterns/p23-partition/controls/guard_variants.c:190 in k_selfpivot
 Shadow bytes around the buggy address:
-  0x7fd6151ffd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7fd6151ffe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7fd6151ffe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7fd6151fff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7fd6151fff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-=>0x7fd615200000: f1 f1 f1 f1 00 00 00 00 00 00 00 00[f3]f3 f3 f3
-  0x7fd615200080: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7fd615200100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7fd615200180: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7fd615200200: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  0x7fd615200280: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f3b28fffd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f3b28fffe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f3b28fffe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f3b28ffff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f3b28ffff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+=>0x7f3b29000000: f1 f1 f1 f1 00 00 00 00 00 00 00 00[f3]f3 f3 f3
+  0x7f3b29000080: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f3b29000100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f3b29000180: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f3b29000200: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7f3b29000280: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 Shadow byte legend (one shadow byte represents 8 application bytes):
   Addressable:           00
   Partially addressable: 01 02 03 04 05 06 07 
@@ -214,7 +214,7 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
   ASan internal:           fe
   Left alloca redzone:     ca
   Right alloca redzone:    cb
-==1327710==ABORTING
+==3538882==ABORTING
 exit=1
 === gv_ubsan selfpivot 32 128 0 0 1 ===
 guard_variants.c:190:27: runtime error: index 64 out of bounds for type 'uint8_t [64]'

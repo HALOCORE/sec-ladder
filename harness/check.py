@@ -193,6 +193,12 @@ import build as buildmod  # noqa: E402
 import vparse  # noqa: E402
 import dloop  # noqa: E402
 import fixture  # noqa: E402
+# TASK_127, stage 9c. ⚠ The gate importing the REPORTER is deliberate and it is
+# FREE: `source_sha` below globs `harness/*.py`, so `report.py` is already in
+# every gate record's digest and this adds no file to it. ⚠ The thing that would
+# NOT be free is importing from `harness/tools/`, which the non-recursive glob
+# does not reach and which is outside the digest by design (TASK_125).
+import report as reportmod  # noqa: E402
 
 RUN_TIMEOUT = 900
 
@@ -7630,7 +7636,25 @@ def check_published_tables(pdir, rep, contract_sha):
         no re-measure and no `contract_sha256` move. `check.py` writes
         `results/gate/<pattern>.json` even when the verdict is FAIL (only a
         `--skip`/`--no-*` PARTIAL run is diverted to `.temp/`), so the middle
-        step does not need a green run.
+        step does not need a green run. ⚠ **That last sentence is true of THIS
+        stage and was ALMOST false of stage `9c`**: `9c` compares the whole
+        rendered table, and until TASK_127 the render contained the record's
+        `verdict`, so re-rendering from a FAIL record baked `FAIL` into the
+        table. Fixed at the source -- `report.py::read_gate_loud` no longer
+        reads `verdict` -- rather than by adding an ordering rule nobody would
+        remember.
+
+    ⚠ **THIS STAGE PINS THE DECLARATION, NOT THE CONTENT, AND TASK_121 CAUGHT
+    IT IN THE ACT**: `results/tables/p23-partition.md` published a sentence that
+    had become false while this stage reported `FRESH`, because
+    `contract_sha256` had not moved. Stage `9c` (`check_table_render`) is the
+    content pin and it **subsumes all three verdicts below** -- a fresh render
+    always carries the current contract line, so `UNPINNED` and `STALE` both
+    show up as a byte difference, and `MISSING` is handled by 9c deferring to
+    this stage. It is kept anyway, deliberately: it needs no import, it survives
+    a broken `report.py`, and its three messages each name a *different* fix
+    (`MISSING` in particular needs three commands, not two). ⚠ **Two pins, ONE
+    property: do not read a green 9 as independent evidence about content.**
       * `MISSING` -- ⚠ **the two-command loop DEADLOCKS on exactly the case
         this verdict is about.** `report.py::main` calls `load(pid)` first and
         `load` requires `results/pNN-*.json`, **`measure.py`'s** record,
@@ -7698,6 +7722,181 @@ def check_published_tables(pdir, rep, contract_sha):
         out["verdict"] = "FRESH"
         rep.ok(f"results/tables/{pat}.md exists and cites contract "
                f"{contract_sha[:12]}, which is this run's")
+    return out
+
+
+def check_table_render(pdir, rep, tables):
+    """9c. Is `results/tables/<pattern>.md` byte-identical to what
+    `harness/report.py` renders from this tree TODAY?
+
+    **The gap this closes.** Stage 9 above pins the table on `contract_sha256`
+    -- the *declaration*. `TASK_121` caught the consequence live:
+    `results/tables/p23-partition.md` was publishing *"`sweep_fit.json` carries
+    NO staleness pin ... treat every figure quoted from it as UNDATED"* **after
+    that sentence had become false**, and stage 9 said `FRESH` on every run,
+    correctly, because the contract had not moved. `TASK_125` §D had already
+    named the shape of the fix: this is not a missing KIND of instrument, it is
+    the known instrument pointed at the wrong input.
+
+    **Why recompute rather than hash.** `report.py` reads exactly three things
+    (verified by reading it, not by assuming):
+
+      * `results/pNN-<slug>.json` -- `load()`, the measurement record
+      * `patterns/<pattern>/spec.md` -- `read_idiom()`, re-read LIVE on purpose
+      * `results/gate/<pattern>.json` -- `read_gate_audit` / `read_gate_loud`,
+        deliberately NOT recomputed
+
+    ⚠⚠ **A `derived_from_sha256` over those three paths -- the obvious spelling,
+    and the one this stage was first designed as -- IS DEAD, AND IT IS DEAD BY
+    MEASUREMENT.** A gate record is not byte-reproducible
+    (`.memory/03-measurement.md`); comparing the committed records against
+    `TASK_125`'s second sweep of the same tree, **21 of 26 differ**, so a
+    whole-file pin on the gate record would report `STALE` on 21 of 26
+    patterns' own gate run. A pin that fires on its own gate run is strictly
+    worse than no pin. Everything that moves -- sanitizer `diagnostic` strings
+    (20 patterns), `miri.runs[].seconds` (14), `adversarial` group order (7),
+    the `N distinct behaviours` `notes` line (2) -- is **outside** the set
+    `report.py` reads, which is why re-rendering works where hashing does not:
+    over the same two draws the rendered table is **identical in 26 of 26**.
+    ⚠ **Re-derive both figures rather than trusting this paragraph** --
+    `python3 harness/tools/table_render_inputs.py --against <second-sweep-gate-dir>`,
+    and `--reads` for the read set, which is MEASURED by mutation rather than
+    read off `report.py`'s source (it is
+    `{contract_sha256, controls_json, idiom_audit, loud}`, 26 of 26).
+
+    Recomputing also needs no projection function, no path list to rot, and it
+    answers the actual question (*would a fresh render differ?*) instead of a
+    proxy for it. It is the only spelling that also notices a `report.py`
+    change that alters the output.
+
+    ⚠⚠ **THE TRAP, AND IT IS SELF-REFERENCE, NOT VOLATILITY.** Until TASK_127
+    `report.py::shout_section` printed the record's `verdict` into the table.
+    `verdict` is an **output of the gate run this stage runs in**, so the
+    naive design writes its own input and oscillates with period 2, starting
+    the first time it fires:
+
+        run N    fires -> `rep.fail` -> verdict FAIL -> record says FAIL
+        report.py      -> table prints ``verdict `FAIL```
+        run N+1  render(FAIL record) == table -> FRESH -> verdict PASS
+        run N+2  render(PASS record) != table -> FIRES AGAIN -> ...
+
+    Measured before the fix: **19 of 26 tables changed bytes when the record's
+    `verdict` changed.** Fixed in `report.py` by not rendering `verdict` at
+    all, and the regression detector is
+    `python3 harness/tools/table_render_inputs.py --selfref`, which exits 1 if
+    ANY run-scoped key reaches the render. ⚠ **The rule that generalises: this
+    stage may never `rep.shout`** -- `loud` IS rendered, so a shout here is the
+    same defect wearing a milder verb. `rep.fail` only, and `failures` is not
+    rendered (measured, not assumed: `--reads`).
+
+    ⚠ **The one-run lag is real and it is the STATUS QUO, not a new defect.**
+    This stage runs before the record is written, so it compares against the
+    PREVIOUS run's gate record; a change this run makes to `loud`,
+    `idiom_audit` or `controls_json` surfaces on the NEXT run. Stage 9 has
+    exactly the same shape (`report.py` prints the RECORD's `contract_sha256`,
+    not `spec.md`'s), which is why `TASK_121` documented the loop as *gate ->
+    `report.py` -> gate, twice*. Moving this stage after the record write would
+    remove the lag and reintroduce the self-reference through `verdict`, since
+    the failure would then have to change a record already on disk.
+
+    ⚠ **What still reaches the render and is a function of the RUN**: nothing,
+    after the `verdict` removal. `blocked` is not read; `loud`, `controls_json`,
+    `idiom_audit` and `contract_sha256` are deterministic functions of the
+    committed sources. The residual to watch is a future `report.py` that
+    starts rendering a run-scoped field -- `read_gate_loud`'s docstring carries
+    the rule.
+
+    ⚠ **Do not "improve" this into a `--stdout` diff.** `report.py --stdout`
+    uses `print(md)` and the file writer uses `write(md)`, so a `--stdout`
+    capture carries one extra trailing newline and reports 26 of 26 tables
+    moved. That artefact has now misled twice (`.memory/05-layout.md`, RECAP).
+    This stage compares `build()`'s return value against the file's bytes, so
+    it cannot see it."""
+    head("9c. the published table is a fresh render of THIS tree")
+    pat = os.path.basename(pdir)
+    pid = pat.split("-")[0]
+    out = {"table": os.path.join("results", "tables", f"{pat}.md")}
+    if tables.get("verdict") == "MISSING":
+        out["verdict"] = "SKIPPED-NO-TABLE"
+        print("    stage 9 already failed MISSING; there is no table to "
+              "compare a render against, and its fix is the three-command one.")
+        return out
+    try:
+        doc, name = reportmod.load(pid)
+        fresh = reportmod.build(doc, name)
+    except SystemExit as e:
+        # `report.load` exits when there is no `results/pNN-*.json`, or when it
+        # is ambiguous. Stage 9 cannot see either: a table can exist and cite a
+        # current contract while the record it was rendered from is gone.
+        out["verdict"] = "NO-RECORD"
+        rep.fail("tables",
+                 f"`harness/report.py {pid}` cannot render at all: {e}. The "
+                 f"published table cannot be checked against anything. Fix: "
+                 f"`harness/measure.py {pid}` (the full matrix), then "
+                 f"`harness/report.py {pid}`, then gate again.")
+        return out
+    except Exception as e:                      # noqa: BLE001 - see below
+        # A reporting stage must not crash the gate: a malformed record is a
+        # reporting failure, and the run's correctness stages have already
+        # decided everything they decide.
+        out["verdict"] = "RENDER-ERROR"
+        rep.fail("tables",
+                 f"`harness/report.py {pid}` raised {type(e).__name__}: {e}. "
+                 f"The table cannot be checked. Fix the record or the reporter, "
+                 f"then re-run `harness/report.py {pid}` and gate again.")
+        return out
+    want = name.replace(".json", ".md")
+    out["renders_to"] = os.path.join("results", "tables", want)
+    if want != f"{pat}.md":
+        # Cannot happen on this tree (26 of 26 record stems equal the pattern
+        # directory name) and is checked rather than assumed, because stage 9
+        # would then be watching a file `report.py` never writes.
+        rep.fail("tables",
+                 f"`report.py` renders {pat} to results/tables/{want}, but "
+                 f"stage 9 checks results/tables/{pat}.md. One of them is "
+                 f"watching a file nothing writes.")
+    tbl = os.path.join(REPO, "results", "tables", want)
+    if not os.path.exists(tbl):
+        out["verdict"] = "MISSING"
+        rep.fail("tables",
+                 f"results/tables/{want} does not exist"
+                 + ("" if want == f"{pat}.md" else
+                    f" (stage 9 was checking results/tables/{pat}.md, which is "
+                    f"a different file)")
+                 + f", and stage 9 did not report MISSING for this pattern, so "
+                 f"the two stages disagree about which file is the published "
+                 f"table. Fix: `harness/report.py {pid}`, then gate again.")
+        return out
+    cur = open(tbl, encoding="utf-8").read()
+    out["render_sha256"] = hashlib.sha256(fresh.encode()).hexdigest()
+    out["published_sha256"] = hashlib.sha256(cur.encode()).hexdigest()
+    if fresh == cur:
+        out["verdict"] = "FRESH"
+        rep.ok(f"results/tables/{want} is byte-identical to a fresh render "
+               f"({out['render_sha256'][:12]}) of the measurement record, "
+               f"spec.md and the gate record")
+        return out
+    out["verdict"] = "STALE-CONTENT"
+    d = list(difflib.unified_diff(cur.splitlines(), fresh.splitlines(),
+                                  "results/tables/" + want, "fresh render",
+                                  n=0, lineterm=""))
+    moved = [ln for ln in d
+             if ln[:1] in "+-" and ln[:3] not in ("+++", "---")]
+    out["lines_moved"] = len(moved)
+    rep.fail("tables",
+             f"results/tables/{want} is STALE IN ITS CONTENT: "
+             f"{len(moved)} line(s) differ from what `harness/report.py {pid}` "
+             f"renders from this tree. Stage 9 above can be GREEN while this "
+             f"is red -- it pins the DECLARATION (`contract_sha256`), this "
+             f"pins what the table SAYS, and `p23` published a sentence that "
+             f"had become false in exactly that gap (TASK_121). Fix, and it is "
+             f"the same two commands as stage 9: `harness/report.py {pid}`, "
+             f"then gate again. ⚠ This stage reads the PREVIOUS run's "
+             f"`results/gate/{pat}.json`, so if THIS run changed `loud`, "
+             f"`idiom_audit` or `controls_json` the render you want is the one "
+             f"taken after this run wrote its record -- which is what that "
+             f"two-command loop does. First differing lines:\n      "
+             + "\n      ".join(ln[:200] for ln in d[2:14]))
     return out
 
 
@@ -8527,6 +8726,10 @@ def main():
     # `measure.py` (measurement-hashed) or in a standalone script (nothing runs
     # it, which is how item 23 recurred twice).
     tables = check_published_tables(pdir, rep, contract_sha)
+    # TASK_127. The CONTENT half of stage 9, and it must stay BEFORE the record
+    # is written: see `check_table_render`'s docstring for why moving it after
+    # the write reintroduces the self-reference it exists without.
+    tabrender = check_table_render(pdir, rep, tables)
     ctljson = check_control_json_pins(pdir, rep, source_sha)
     doc = {
         "pattern": os.path.basename(pdir),
@@ -8627,6 +8830,15 @@ def main():
         # TASK_107 §E: the two published sidecars nothing had a detector for.
         # RECAP owed-item 23 predicted its own recurrence and was right twice.
         "published_table": tables,
+        # TASK_127, stage 9c. ⚠ Its OWN key, not a field of `published_table`,
+        # because the two verdicts mean different things and merging them would
+        # make a reader think one `verdict` covered both. ⚠⚠ AND NOTE WHAT IS
+        # SAFE ABOUT IT: `report.py` does not read this key, or `published_table`,
+        # or `failures`, so recording the content verdict here cannot change the
+        # render it is a verdict ABOUT. Anything added to `report.py` that reads
+        # a key `check.py` writes recreates the oscillation this stage was fixed
+        # for -- `report.py::read_gate_loud` carries the rule.
+        "table_render": tabrender,
         "controls_json": ctljson,
         "failures": [{"section": s, "message": m} for s, m in rep.failures],
         "notes": rep.notes,

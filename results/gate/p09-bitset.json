@@ -101,12 +101,12 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "b1aa0ebf5be6967353d5d8b0b67a64212ce8af0c782325dd6d08dfd1a4621e38",
+    "harness/check.py": "14bf218f1a146989e98575e8fd5ab7e201c0fe1c4f27e521d71482102de96d40",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
-    "harness/report.py": "1da5d38446d378f3da3d7d3c30bdb303d240fe32aefb66335f0adc8d6552df4f",
+    "harness/report.py": "399df91333d007742f24c94ad719a1fd7cc6fd5befc509261f1c368803f2a927",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
     "patterns/p09-bitset/NOTES.md": "766def13a2644ba4d79de8804c97f97a15c1caa91933fa4524c7fcf7e617ac68",
     "patterns/p09-bitset/README.md": "86f16831041b13e094ac308164db2a233be5ccc32455e410b8f4a4a52b66e840",
@@ -977,7 +977,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==2361585==ERROR: AddressSanitizer: SEGV on unknown address 0x50b0002000f0 (pc 0x5598c8724b74 bp 0x00000000ff00 sp 0x7fff1d50b3d0 T0) ==2361585==The signal is caused by a READ memory access. #0 0x5598c872",
+      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==3473903==ERROR: AddressSanitizer: SEGV on unknown address 0x50b0002000f0 (pc 0x563d77727b74 bp 0x00000000ff00 sp 0x7ffce0914d30 T0) ==3473903==The signal is caused by a READ memory access. #0 0x563d7772",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1073,7 +1073,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 3.6,
+        "seconds": 3.7,
         "stdout": "5457833412554140714",
         "model_stdout": "5457833412554140714",
         "stderr": ""
@@ -1098,6 +1098,13 @@
     "cited": [
       "ea0295eaea6a"
     ],
+    "verdict": "FRESH"
+  },
+  "table_render": {
+    "table": "results/tables/p09-bitset.md",
+    "renders_to": "results/tables/p09-bitset.md",
+    "render_sha256": "b131c5e59c9e0a537775ec9b3a3d15f7347e85a43d457d3ac84bea2014187d0f",
+    "published_sha256": "b131c5e59c9e0a537775ec9b3a3d15f7347e85a43d457d3ac84bea2014187d0f",
     "verdict": "FRESH"
   },
   "controls_json": {},

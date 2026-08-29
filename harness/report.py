@@ -292,14 +292,41 @@ def read_gate_loud(pattern):
     """`loud` and `controls_json` out of `results/gate/<pattern>.json`.
 
     Same rule as `read_gate_audit` above and for the same reason: this is a
-    MEASUREMENT, so it is read from the artefact rather than recomputed."""
+    MEASUREMENT, so it is read from the artefact rather than recomputed.
+
+    ⚠⚠ **`verdict` USED TO BE READ HERE AND RENDERED, AND TASK_127 REMOVED IT
+    BECAUSE IT MADE THE TABLE DEPEND ON ITS OWN CHECKER.** `check.py` stage
+    `9c` (`check_table_render`) re-renders this file's output and fails when the
+    committed table differs. `verdict` is an **output** of the very gate run
+    that stage runs in, so with it in the render the loop is:
+
+        run N    9c fires  -> `rep.fail` -> this run's verdict is FAIL
+        report.py          -> the table now prints ``verdict `FAIL```
+        run N+1  render(FAIL record) == table -> FRESH -> verdict PASS
+        run N+2  render(PASS record) != table -> FIRES AGAIN -> ...
+
+    a period-2 oscillation that starts the **first time the check does its
+    job** and never settles. Measured before removing it: **19 of the 26
+    tables changed bytes when the record's `verdict` changed**; the standing
+    regression detector is `python3 harness/tools/table_render_inputs.py
+    --selfref`, which exits 1 if any run-scoped key reaches the render again.
+    ⚠ `rep.shout` would be worse, not better:
+    `loud` is rendered by `shout_section` below, so a shout is self-referential
+    too.
+
+    ⚠ **So the rule for this function, and for anything added to it: a field
+    that a gate run WRITES must not be rendered into an artefact that same gate
+    run CHECKS.** `loud`, `controls_json`, `idiom_audit` and `contract_sha256`
+    are all deterministic functions of the committed sources, so they are safe;
+    `verdict` and `blocked` are functions of the run. The gate verdict is still
+    in `results/gate/<pattern>.json`, one hop away, and stage 9c's own record
+    key `table_render` says whether this table is current."""
     try:
         rec = json.load(open(os.path.join(RESULTS, "gate", f"{pattern}.json")))
     except (OSError, ValueError):
         return None
     return {"loud": rec.get("loud") or [],
             "controls_json": rec.get("controls_json") or {},
-            "verdict": rec.get("verdict"),
             "sha": rec.get("contract_sha256")}
 
 
@@ -338,11 +365,15 @@ def shout_section(doc, out):
         return
     out.append("\n## What the gate said out loud (reporting only)\n")
     out.append(f"From `results/gate/{doc['pattern']}.json` — the `loud` and "
-               f"`controls_json` keys, at contract `{str(g['sha'])[:12]}`, "
-               f"verdict `{g['verdict']}`. **These did not fail the gate and "
-               f"are not defects**; they are the conditions `check.py` refuses "
-               f"to be silent about. Each one is a caveat on a number below or "
-               f"on the declaration above.\n")
+               f"`controls_json` keys, at contract `{str(g['sha'])[:12]}`. "
+               f"**These did not fail the gate and are not defects**; they are "
+               f"the conditions `check.py` refuses to be silent about. Each "
+               f"one is a caveat on a number below or on the declaration "
+               f"above. The run's **verdict** is deliberately not printed "
+               f"here: it is an output of the same gate run that checks this "
+               f"table is current (stage `9c`), and rendering it made the "
+               f"table an input to its own checker — see `read_gate_loud`. "
+               f"Read the verdict from `results/gate/{doc['pattern']}.json`.\n")
     for e in loud:
         out.append(f"- **`{e.get('section')}`** — {e.get('message')}")
     # ⚠ Do NOT print a `controls_json` entry the `loud` list already carries:

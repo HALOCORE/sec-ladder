@@ -70,7 +70,7 @@ Measured by the gate, not by this file — from `results/gate/p02-buffer-copy.js
 
 ## What the gate said out loud (reporting only)
 
-From `results/gate/p02-buffer-copy.json` — the `loud` and `controls_json` keys, at contract `5b0a67de468c`, verdict `PASS`. **These did not fail the gate and are not defects**; they are the conditions `check.py` refuses to be silent about. Each one is a caveat on a number below or on the declaration above.
+From `results/gate/p02-buffer-copy.json` — the `loud` and `controls_json` keys, at contract `5b0a67de468c`. **These did not fail the gate and are not defects**; they are the conditions `check.py` refuses to be silent about. Each one is a caveat on a number below or on the declaration above. The run's **verdict** is deliberately not printed here: it is an output of the same gate run that checks this table is current (stage `9c`), and rendering it made the table an input to its own checker — see `read_gate_loud`. Read the verdict from `results/gate/p02-buffer-copy.json`.
 
 - **`collapse-ir`** — this pattern's anti-collapse floor is 0.0625 Ir per byte, BELOW the harness default 0.25 (absolute bound 0.015625). Declared floor 3.8...255.8 Ir/call; tightest measured margin over it 35.9x, i.e. this stage tolerates a 97.2% loss of work before it objects. model.py's argument for the rate: work is BYTES COPIED. Cheapest correct implementation of copy-then-fold-every-byte on this box: a fused AVX-512 loop needs at least a 64-byte load, a 64-byte store, a vpsadbw and a vpaddq per lane = 4 instructions / 64 bytes = 0.0625 Ir per byte. glibc memcpy alone measures 0.104 Ir/byte here, so the harness default of 0.25 would forbid a bulk-copy kernel outright.
 

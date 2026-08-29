@@ -90,7 +90,7 @@ Measured by the gate, not by this file — from `results/gate/p38-alias-pun.json
 
 ## What the gate said out loud (reporting only)
 
-From `results/gate/p38-alias-pun.json` — the `loud` and `controls_json` keys, at contract `314bf2e385d4`, verdict `PASS`. **These did not fail the gate and are not defects**; they are the conditions `check.py` refuses to be silent about. Each one is a caveat on a number below or on the declaration above.
+From `results/gate/p38-alias-pun.json` — the `loud` and `controls_json` keys, at contract `314bf2e385d4`. **These did not fail the gate and are not defects**; they are the conditions `check.py` refuses to be silent about. Each one is a caveat on a number below or on the declaration above. The run's **verdict** is deliberately not printed here: it is an output of the same gate run that checks this table is current (stage `9c`), and rendering it made the table an input to its own checker — see `read_gate_loud`. Read the verdict from `results/gate/p38-alias-pun.json`.
 
 - **`tcb-unsafe`** — verus.rs:271 `sc_set_unchecked`'s `requires` constrains nothing about ['x'], which its trusted body uses. spec.md justifies it: `x` is a pure VALUE parameter -- written into the scratch, never used as an address or a length -- so it needs no precondition. This is the false positive of the parameter-coverage rule that `.memory/04-verus.md` names and that p03 was the first pattern to exercise; p38 is the second.
 

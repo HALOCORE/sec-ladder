@@ -166,12 +166,12 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "b1aa0ebf5be6967353d5d8b0b67a64212ce8af0c782325dd6d08dfd1a4621e38",
+    "harness/check.py": "14bf218f1a146989e98575e8fd5ab7e201c0fe1c4f27e521d71482102de96d40",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
-    "harness/report.py": "1da5d38446d378f3da3d7d3c30bdb303d240fe32aefb66335f0adc8d6552df4f",
+    "harness/report.py": "399df91333d007742f24c94ad719a1fd7cc6fd5befc509261f1c368803f2a927",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
     "patterns/p46-bignum-mac/NOTES.md": "0d17868472bd145df76b75b52c7b5b1828355167fed1e02d2bad6ba1a56ce44d",
     "patterns/p46-bignum-mac/README.md": "00910403c75e606f58418e6463923ef9f41a7254f774e1eedf1c3bc8076f87b3",
@@ -1272,7 +1272,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p46-bignum-mac/c/kernel.c:97:12: runtime error: index 96 out of bounds for type 'uint64_t [96]' /home/apt/repos_common/sec-ladder/patterns/p46-bignum-mac/c/kernel.c:97:20: runtime error: store to address 0x7f4c0d700320 with insufficient space for an object ",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p46-bignum-mac/c/kernel.c:97:12: runtime error: index 96 out of bounds for type 'uint64_t [96]' /home/apt/repos_common/sec-ladder/patterns/p46-bignum-mac/c/kernel.c:97:20: runtime error: store to address 0x7fb030300320 with insufficient space for an object ",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1283,7 +1283,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p46-bignum-mac/c/kernel.c:97:12: runtime error: index 96 out of bounds for type 'uint64_t [96]' /home/apt/repos_common/sec-ladder/patterns/p46-bignum-mac/c/kernel.c:97:20: runtime error: store to address 0x7f9401100320 with insufficient space for an object ",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p46-bignum-mac/c/kernel.c:97:12: runtime error: index 96 out of bounds for type 'uint64_t [96]' /home/apt/repos_common/sec-ladder/patterns/p46-bignum-mac/c/kernel.c:97:20: runtime error: store to address 0x7fb309700320 with insufficient space for an object ",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1377,7 +1377,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.1,
+        "seconds": 0.2,
         "stdout": "10298995721122667840",
         "model_stdout": "10298995721122667840",
         "stderr": ""
@@ -1389,7 +1389,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.1,
+        "seconds": 0.2,
         "stdout": "10298995721122667840",
         "model_stdout": "10298995721122667840",
         "stderr": ""
@@ -1437,7 +1437,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 1.6,
+        "seconds": 1.5,
         "stdout": "17424586469649110698",
         "model_stdout": "17424586469649110698",
         "stderr": ""
@@ -1462,6 +1462,13 @@
     "cited": [
       "43925b2955e0"
     ],
+    "verdict": "FRESH"
+  },
+  "table_render": {
+    "table": "results/tables/p46-bignum-mac.md",
+    "renders_to": "results/tables/p46-bignum-mac.md",
+    "render_sha256": "ceef34ce113c3797e82cec3306be5d10fca4e8d378c1c188e577c48230b1c3a5",
+    "published_sha256": "ceef34ce113c3797e82cec3306be5d10fca4e8d378c1c188e577c48230b1c3a5",
     "verdict": "FRESH"
   },
   "controls_json": {},

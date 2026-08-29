@@ -567,12 +567,33 @@ self-terminating, and keeps the `<=`/`>=` this pattern pins:
 
 ```
 selfpivot, ALL-EQUAL record (mode=1):
-  plain gcc -O2   exit 0, prints 3910418957284214752
+  plain gcc -O2   exit 0, prints a DIFFERENT NUMBER EACH RUN (see below)
   ASan            stack-buffer-overflow at guard_variants.c:186 in k_selfpivot
   UBSan           index 64 out of bounds for type 'uint8_t [64]'
 selfpivot, MIXED record (mode=0)  -- the must-be-clean arm:
-  plain/ASan/UBSan  all exit 0, all print 7500084040178903629
+  plain/ASan/UBSan  all exit 0, all print 7500084040178903629  (stable, 5/5)
 ```
+
+⚠⚠ **THIS BLOCK USED TO PUBLISH `3910418957284214752` AS THE ALL-EQUAL RECORD'S
+CHECKSUM, AND THAT WAS A DRAW QUOTED AS A FIGURE (corrected at TASK_127).** The
+whole point of this row is that `k_selfpivot` reads uninitialised stack, so its
+checksum is *whatever was in that stack slot*. Five runs of one binary in one
+directory printed
+
+```
+3910418957284214783 / ...752 / ...783 / ...783 / ...752
+```
+
+and the `controls.log` this paragraph was quoting from **already carried a sixth
+value, `...814`** — so the artefact and the prose taken from it had disagreed
+since the day it was written, and nothing could have said so. ⚠ **The MIXED arm
+is the one with a stable number (5/5), and it is the arm that matters**: it is
+the must-be-clean control. **Do not quote the ALL-EQUAL checksum at all**; the
+row's content is `exit 0 + no sanitizer complaint unsanitised`, i.e. that the UB
+is *silent* without a sanitizer, which is what the ASan and UBSan lines then
+falsify. This is the `N distinct behaviours` lesson
+(`.memory/03-measurement.md`) in a hand-written figure: **a value produced by
+reading uninitialised memory is a draw, not a property.**
 
 **Positive control, same binary and same command line:** `bug` on the all-below
 record fires ASan (`stack-buffer-overflow`, exit 1) and UBSan (`index 64`, exit

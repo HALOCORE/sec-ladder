@@ -106,12 +106,12 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "b1aa0ebf5be6967353d5d8b0b67a64212ce8af0c782325dd6d08dfd1a4621e38",
+    "harness/check.py": "14bf218f1a146989e98575e8fd5ab7e201c0fe1c4f27e521d71482102de96d40",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
-    "harness/report.py": "1da5d38446d378f3da3d7d3c30bdb303d240fe32aefb66335f0adc8d6552df4f",
+    "harness/report.py": "399df91333d007742f24c94ad719a1fd7cc6fd5befc509261f1c368803f2a927",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
     "patterns/p10-fir-stencil/NOTES.md": "1608b2d29d970a452db34c7088ccd0eb3c02f45d50af32d2b9c2286790158507",
     "patterns/p10-fir-stencil/README.md": "01e25ff4b42fbf154125e18d282445f6553ad5b511892960f66bc6120fe32279",
@@ -1109,7 +1109,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2363969==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5060000000b6 at pc 0x55c2c471f9b5 bp 0x7ffe321e3a30 sp 0x7ffe321e3a20 READ of size 1 at 0x5060000000b6 thread T0 #0 0x55c2c471f9b4 in kernel /home/apt/repos_common/",
+      "diagnostic": "================================================================= ==3476882==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5060000000b6 at pc 0x556ee91b19b5 bp 0x7fff5bf53a20 sp 0x7fff5bf53a10 READ of size 1 at 0x5060000000b6 thread T0 #0 0x556ee91b19b4 in kernel /home/apt/repos_common/",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1201,7 +1201,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.1,
+        "seconds": 0.2,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -1249,7 +1249,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.1,
+        "seconds": 0.2,
         "stdout": "8127056573439834368",
         "model_stdout": "8127056573439834368",
         "stderr": ""
@@ -1286,6 +1286,13 @@
     "cited": [
       "cb1c3c9f9c05"
     ],
+    "verdict": "FRESH"
+  },
+  "table_render": {
+    "table": "results/tables/p10-fir-stencil.md",
+    "renders_to": "results/tables/p10-fir-stencil.md",
+    "render_sha256": "055bda96a23558234d4b227a88332212f9cb95909069ef1a4356e31e29a15134",
+    "published_sha256": "055bda96a23558234d4b227a88332212f9cb95909069ef1a4356e31e29a15134",
     "verdict": "FRESH"
   },
   "controls_json": {},
