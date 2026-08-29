@@ -2867,6 +2867,19 @@ the number.** Two task files have already sent an agent to the wrong finding.
     it is not that *the ladder cannot price it* (`TASK_124`, overstated) and not
     that *`obligations` prices it* (`TASK_128`, unsupported) — it is that THE ONLY
     COLUMN THAT MOVES MOVES FOR A REASON THAT IS NOT SPECIFIC TO THE MECHANISM.**
+    ⚠⚠ **AND THE DEFENCE OF THE ENGINEER'S HEADLINE, STATED AT FULL STRENGTH
+    BECAUSE THE MANAGER MAY BE APPLYING TOO STRICT A STANDARD:** *"`_calib2`'s
+    loop is DEAD CODE no real pattern would contain. A prior-pass bound
+    INHERENTLY costs one proved pass — you cannot equalise the code without
+    deleting the mechanism. `Ir` is accepted as PRICING a bounds check even
+    though an unrelated `add` costs instructions too; by that same standard,
+    `obligations` prices limb 2."*** ⚠ **The crux is whether *pricing a
+    mechanism* requires distinguishing it from ANY change of the same size, or
+    only from ITS OWN ABSENCE. For `Ir` this project has always accepted the
+    latter.** ⚠⚠ **THE MANAGER DOES NOT GET TO SETTLE THIS — IT IS THE MANAGER'S
+    OWN OBJECTION (rule 3). WHOEVER REVIEWS FINDING 44 DECIDES IT, WITH
+    EVIDENCE, AND BOTH ANSWERS ARE RESPECTABLE.**
+
     ⚠ **OPEN: whether ANY column can distinguish `armP` from `_calib2`. Nobody
     has looked, and the arms already exist.**
 
