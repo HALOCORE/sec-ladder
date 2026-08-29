@@ -3954,8 +3954,56 @@ the number.** Two task files have already sent an agent to the wrong finding.
     each carry a `PROVISIONAL` **inside the `slb-contract` fence**, calling
     `.memory/01-ladder.md`'s direction-test repair *"unattacked"* — **and
     `TASK_045_REVIEW` blocker 1 attacked it and it FIRED, forty lines below the
-    header that denies it.** ⚠ **Cost: two `contract_sha256` moves + gate
-    re-runs, NO re-measure. BATCH THEM with the next pattern work.**
+    header that denies it.**
+
+    ⚠⚠⚠ **BOTH HALVES OF THAT ARE WRONG, CORRECTED AND LANDED AT `TASK_138` —
+    AND THE MANAGER'S OWN TASK FILE REPEATED THE ERROR.** ✅ **`p09`'s fence
+    contains the word *"unattacked"* ZERO TIMES** (manager-verified, `grep -c`):
+    its `PROVISIONAL` is an **adjective inside a CITATION of another document**,
+    it makes no unattackedness claim and carries no prohibition, and all four of
+    its clauses are still true. **`p09` MARKERS STAND and licensed no edit.**
+    ⚠ **Only `p16` was STALE AS WORDED — so the bill was ONE `contract_sha256`
+    move and ONE gate re-run. THE PUBLISHED BILL WAS DOUBLE THE REAL ONE.**
+
+    ⚠⚠⚠ **AND THE MANAGER'S DOUBT WAS RIGHT: *"a reviewer APPLIED the test and
+    it FIRED"* IS NOT *"a reviewer ATTACKED the repair"*.** ✅ **`TASK_045_REVIEW`
+    says *"Apply the direction test"* — an instruction to USE it — and its report
+    files the result under *Clean negatives*, reporting a MAGNITUDE while the
+    repair's criterion is DIRECTION OF FLATTERY. What was attacked there is
+    p13's DECLARATION; the test was the INSTRUMENT.** **The true status is
+    EXERCISED, NOT ATTACKED** — applied by name by reviewers on **nine patterns**
+    (`p04 p06 p10 p13 p14 p18 p27 p36 p47`), fired once decisively, with a
+    blocker and a pin relaxation resting on it, **and never itself the object of
+    a review.** ⚠ **The only successful attack on a direction test was on the
+    VERSION THIS REPAIR REPLACED.**
+
+    ⚠⚠ **AND `.memory/01-ladder.md` SAID BOTH THINGS AT ONCE — RULE 13 INSIDE
+    THE AUTHORITATIVE LAYER, ONE LEVEL BELOW THE INSTANCE ABOVE.** `:262` read
+    *"not yet attacked by anyone"* while `:285`'s header read *"THE REPAIR HAS
+    NOW BEEN ATTACKED"* — **and that header's own body argues only NON-VACUITY**
+    (*"what a test that cannot fire looks like. It can fire."*). ✅ **Both
+    corrected; the PROVISIONAL STAYS.**
+
+    ✅ **LANDED BY THE MANAGER: `p16`'s fence re-worded, `harness/check.py p16`
+    → `PASS`, `blocked []`, `contract_sha256 a0d431d9… → 7d7683e1…`.**
+    ⚠⚠ **THE FIRST RE-GATE FAILED, AND IT IS FINDING 46's ONE-RUN LAG IN THE
+    WILD: the record took the new hash while `results/tables/p16-tlv-walk.md`
+    still carried the old one, so stage 9 read STALE. `harness/report.py p16`
+    then a second `check.py p16` clears it — 3 lines of table moved.**
+    ✅ **NO RE-MEASURE, VERIFIED BOTH SIDES OF THE EDIT: `52 records, 0 STALE`
+    before AND after** — `spec.md` is absent from `measure.py`'s
+    `measurement_sources`.
+
+    ⚠⚠⚠ **A THIRD IN-FENCE MARKER WAS HIDDEN BY ONE LETTER: `p42`'s
+    `slb-contract` carries `unreviewed` in LOWER CASE, and every sweep — both
+    `TASK_135`'s and the manager's brief — used a CASE-SENSITIVE token list.**
+    ✅ **Manager-verified, and it is NARRATIVE, not a marker** (it describes a
+    past defect and cites its resolution), **so it is not live debt.**
+    ⚠ **Corrected in-fence census: 3 sites in 3 patterns, exactly ONE of which
+    was live. Repeatable sweep: `python3 .temp/t138/sweep_markers.py`, which
+    reads its tiers out of the records so they cannot drift from what the
+    harness hashes. Named-token totals: contract 3, gate 12, measure 0 — NO
+    marker anywhere costs a re-measure.**
 
     ✅ **SITE 9's THREE CLAIMS ARE CLEARED, AND ONE IS A TAUTOLOGY WORTH KNOWING:
     `R5 − R4 = 0.00` on 52/52 IS NOT A MEASUREMENT** — 25 of 26 patterns pin

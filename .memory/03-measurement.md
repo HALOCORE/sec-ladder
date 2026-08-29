@@ -2895,11 +2895,31 @@ already been struck.** Keep the list, not the ordinal.
     > whether their stated ground still holds.**
 
     ⚠⚠ **AND MARKERS HIDE INSIDE HASHED FENCES, WHERE NO TRIAGE HAS EVER LOOKED:**
-    `p09-bitset/spec.md` and `p16-tlv-walk/spec.md` each carry a `PROVISIONAL`
-    **inside the `slb-contract` block**, calling a repair *"unattacked"* that
-    `TASK_045_REVIEW` blocker 1 attacked — **and it FIRED, forty lines below the
-    header that denies it.** ✅ **They propagated into two gate records and two
-    published tables.** ⚠ **`grep PROVISIONAL RECAP.md` is not the census; the
+    `p09-bitset/spec.md`, `p16-tlv-walk/spec.md` and `p42-goto-cleanup/spec.md`
+    each carry one **inside the `slb-contract` block**. ⚠⚠⚠ **BUT ADJUDICATED AT
+    `TASK_138` ONLY ONE WAS LIVE DEBT, AND THE FIRST TELLING OF THIS ENTRY
+    OVERSTATED IT TWO WAYS.** ✅ **`p09`'s fence contains *"unattacked"* ZERO
+    TIMES — its `PROVISIONAL` is an adjective inside a CITATION of another
+    document, so it spends no scepticism about `p09` at all, and it STANDS.**
+    ⚠ **`p42`'s is NARRATIVE about a past defect.** **Only `p16` was stale, so
+    the bill was ONE `contract_sha256` move and ONE gate re-run, not two.**
+
+    ⚠⚠⚠ **AND THE UNDERLYING CLAIM WAS WRONG IN THE WAY THIS WHOLE ENTRY IS
+    ABOUT: *"a reviewer APPLIED the test and it FIRED"* IS NOT *"a reviewer
+    ATTACKED the repair"*.** `TASK_045_REVIEW` says *"Apply the direction
+    test"* and files the result under *Clean negatives*, **reporting a MAGNITUDE
+    where the repair's criterion is DIRECTION OF FLATTERY.** ✅ **The true status
+    is EXERCISED, NOT ATTACKED** — applied by name on nine patterns, fired once,
+    **never itself the object of a review** — and `.memory/01-ladder.md` carried
+    BOTH readings at once, forty lines apart. ⚠ **An instrument that WORKS is
+    not an instrument that has been AUDITED.**
+
+    ⚠⚠ **AND A MARKER SWEEP MISSED ONE BY A SINGLE LETTER: `p42`'s is
+    `unreviewed`, lower case, and every token list used was CASE-SENSITIVE.**
+    ✅ **Sweep case-insensitively, and read the tier out of the RECORDS rather
+    than hard-coding it** (`.temp/t138/sweep_markers.py`).
+    **Named-token totals: contract 3, gate 12, measure 0 — no marker anywhere
+    costs a re-measure.** ⚠ **`grep PROVISIONAL RECAP.md` is not the census; the
     real figure is 13 lines in `RECAP.md`, 65 in `.memory/`, 3 in
     `SYNTHESIS.md`, and 2 inside hashed contracts.**
 

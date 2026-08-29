@@ -259,8 +259,18 @@ figure is not self-certification"* — and then offered as a **passing** example
 opposite directions, so the rule decided nothing, and TASK_024 read it the other
 way round and made it the load-bearing reason not to pin p16's unroll factor.
 
-**The repair, and it is PROVISIONAL — proposed by the manager at TASK_026, not
-yet attacked by anyone.** The quantity that matters is not up-or-down, it is
+**The repair, and it is PROVISIONAL — proposed by the manager at TASK_026.**
+⚠⚠⚠ **PRECISE STATUS, SETTLED AT `TASK_138`: IT HAS BEEN *EXERCISED*, NOT
+*ATTACKED*, AND THIS FILE USED TO SAY BOTH THINGS IN TWO PLACES.**
+~~*"not yet attacked by anyone"*~~ **understated it and the header below
+OVERSTATED it.** ✅ **What is true: reviewers have APPLIED it BY NAME on NINE
+patterns** (`p04 p06 p10 p13 p14 p18 p27 p36 p47`), **it FIRED once decisively
+(p13), and a blocker and a pin relaxation rest on it — but NO TASK HAS EVER
+ASKED A REVIEWER TO ATTACK THE RULE ITSELF.** ⚠ **The only successful attack on
+a direction test (`TASK_025_REVIEW` major 5) was on the VERSION THIS REPAIR
+REPLACED.** ⚠⚠ **So the PROVISIONAL stands, and *"applied and it fired"* is not
+*"attacked"* — an instrument that works is not an instrument that has been
+audited.** The quantity that matters is not up-or-down, it is
 *whose interest*: this project's thesis is "safety is cheap", so the flattering
 direction for a safety-tax number is **smaller**.
 
@@ -282,8 +292,17 @@ was an argument from a broken rule about an exclusion that would not have worked
 it has been withdrawn.** Do not cite this test again until a reviewer has
 attacked the repair.
 
-⚠ **THE REPAIR HAS NOW BEEN ATTACKED, AND IT FIRED — on p13, on shipped code,
-with a measured number** (TASK_045_REVIEW blocker 1). Until then every direction
+⚠⚠⚠ **THIS HEADER READ *"THE REPAIR HAS NOW BEEN ATTACKED"* AND THAT IS FALSE —
+CORRECTED AT `TASK_138`, AND ITS OWN BODY NEVER SUPPORTED IT: everything below
+argues NON-VACUITY (*"what a test that cannot fire looks like. It can fire."*),
+which is a different claim. PROTOCOL RULE 13, ONE LEVEL BELOW THE INSTANCE
+`TASK_135` FOUND, AND INSIDE THE AUTHORITATIVE LAYER.**
+⚠ **THE REPAIR HAS NOW FIRED — on p13, on shipped code, with a measured number**
+(TASK_045_REVIEW blocker 1). ⚠ **`TASK_045_REVIEW.md:161-164` says *"Apply the
+direction test"* — an instruction to USE it — and the report files the result
+under *Clean negatives*, reporting a MAGNITUDE while the repair's criterion is
+DIRECTION OF FLATTERY. What was attacked there is p13's DECLARATION; the test
+was the instrument.** Until then every direction
 test on this project had come out at or near **0.00**, which is what a clean
 declaration looks like and also what a test that cannot fire looks like. It can
 fire.
