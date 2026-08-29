@@ -3641,6 +3641,22 @@ the number.** Two task files have already sent an agent to the wrong finding.
     THAT LOOKS COMPLETELY HEALTHY, which is exactly the case the attack-arm rule
     exists for.**
 
+    ⚠⚠⚠ **`TASK_137` KILLED THAT LAST CLAUSE, ✅ MANAGER-RE-RUN.** ~~*"`p42`'s
+    failure mode is available in an R5 that looks completely healthy"*~~ **is
+    FALSE as applied to anything `p29` could ship.** ✅ **ARM_C is NOT vacuous by
+    the standing battery — four clean negatives (reachable, axioms consistent,
+    body-sensitive, reproduces through `p27`'s permission `Map`).** ⚠⚠ **BUT ITS
+    POSTCONDITION IS `r == 9u8`, AND `fn arm_c() -> u8 { 9 }` — no allocation, no
+    pointer, no permission, no read — DISCHARGES IT AT THE SAME `6 verified, 0
+    errors`. So *"Verus PROVES the recycled value"* does not mean what it
+    appears to.** ⚠⚠ **AND THE PROJECT'S OWN CONVENTION REJECTS THE BUG: 26/26
+    fences pin a value-equality `ensures`, and an R5 of that shape (ARM_D) FAILS
+    on the recycle program while its must-fire control verifies `6/0`. A stale
+    permission is `E0502` — not even writable.** ✅ **WHAT SURVIVES IS NARROWER
+    AND STILL WORTH HAVING: linearity states *no use after DEALLOCATION* and
+    cannot state *no use after the OCCUPANT CHANGED*. The real `p42`-shaped risk
+    in a `p29` is a TRANSLITERATED FOLD, not a linearity gap.**
+
     ⚠⚠ **A TENSION BETWEEN TWO COMMITTED DOCUMENTS, FOUND HERE AND NOT RESOLVED
     — DO NOT PICK A SIDE WITHOUT MEASURING:** `.memory/06-catalogue.md`'s `p42`
     cell says ***"`p27` proves deallocation is LEGAL, never that it HAPPENS"***,
@@ -3865,10 +3881,23 @@ the number.** Two task files have already sent an agent to the wrong finding.
     sees is the half that reproduces.**
 
     ⚠ **`TASK_133`'s reading is not simply wrong — it measured a DIFFERENT
-    SPELLING.** Its index arena RECYCLES SLOTS. ✅ **Four builds of one safe
-    source: recycling takes the fuzz failures `17 → 36` and adds a hand input.
-    So the variable is SLOT RECYCLING, not the language** — which is outcome 3
-    again. ⚠ **That reconciliation is `TASK_136`'s and is UNREVIEWED.** Miri clean, positive controls fire. **The R5 artefact re-verifies
+    SPELLING.** ⚠⚠⚠ **BUT THE MANAGER NAMED THE WRONG VARIABLE, AND `TASK_137`
+    CORRECTED IT — ✅ MANAGER-RE-RUN.** ~~*"the variable is SLOT RECYCLING"*~~
+    **explains 19 of 71 and NONE of `TASK_133`'s published inputs — `TASK_136`'s
+    own table prints `OK` on `v5`/`v15`/`v25`, which is exactly where `TASK_133`
+    measured the safe rung wrong.**
+
+    ```
+    build                wrong TOTAL   wrong ON THE 71 INPUTS WHERE C ABORTS
+    t136 default               17                  0 / 71
+    t136 + recycle             36                 19 / 71
+    KEEPDEAD                   88                 71 / 71   <- the variable
+    KEEPDEAD + recycle         88                 71 / 71   <- recycling adds NOTHING
+    ```
+
+    ✅ **THE VARIABLE IS WHETHER THE RELEASE DESTROYS THE RECORD.** `TASK_133`'s
+    `Vec<Node>` arena **keeps the dead record**, and that explains **71/71**
+    plus the other half — 88 total — **with recycling adding nothing on top.** Miri clean, positive controls fire. **The R5 artefact re-verifies
     `9 verified, 0 errors`, TCB 0, sha256 matching, plus a new mutant M5 that
     fails.**
 
@@ -4041,11 +4070,33 @@ the number.** Two task files have already sent an agent to the wrong finding.
     blind spots, and the deletion's second phase routes the successor through
     `H2`'s site.**
 
-    ⚠⚠ **AND THE READ-PATH ANALOGUE OF `p27`'s `live[h] == 1` CANNOT BE USED,
-    BECAUSE EVALUATING IT IS THE BUG:** `&& g_saved->key == g_key` is itself a
-    `heap-use-after-free` on **5 of 11** inputs. ✅ **`p27`'s bug is *the READ
-    does not ask*; `p29`'s is *the MUTATION does not tell* — so `p29`'s safety
-    line is on the WRITE path, and the two temporal rows are not the same shape.**
+    ⚠⚠⚠ **THAT WAS PUBLISHED AND IT IS FALSE IN THE SHIPPED SHAPE — `TASK_137`
+    REFUTED IT, ✅ MANAGER-RE-RUN.** ~~*"the read-path analogue of `p27`'s
+    `live[h] == 1` CANNOT BE USED, because evaluating it IS the bug"*~~ **was
+    measured on a kernel whose only handle is a BARE POINTER.** ⚠ **The shipped
+    shape is `p27`'s SLOT TABLE, which carries `live[]` — and there the read-path
+    conjunct is both exact and safe:**
+
+    ```
+    T3   if (g_saved && live[g_slot] == 1 && tab[g_slot][0] == g_key)  <- p27's spelling
+             exact 614/614        ASan lines 0, aborts 0  / 400 windows
+    H4   if (g_saved && g_saved[0] == g_key)         <- what TASK_136 measured
+             NOT exact either (1/600)   ASan lines 82, aborts 41   <- the control
+    ```
+
+    ✅ **The check that answers the question DOES NOT have to dereference the
+    pointer whose validity IS the question — it has to stop asking the POINTER
+    and ask the TABLE, which is exactly what `p27` does.** ⚠⚠ **So *"`p29`'s
+    safety line is on the WRITE path"* rested on a premise that does not hold,
+    and the `H2`-vs-`H3` comparison NEVER CONTAINED THE WINNING CANDIDATE.**
+    ✅ **`H2` ITSELF SURVIVES** — 14 hand inputs, five written specifically to
+    break it, plus 600 fresh windows, **0 disagreements**, and it now has an
+    argument rather than a fuzz count.
+
+    ✅✅ **THE BETTER SENTENCE, AND IT ADMITS THE ROW ON LIMB 1 (a new operator on
+    the safety line) RATHER THAN LIMB 4: `p27`'s read-path line needs ONE
+    conjunct (LIVENESS); `p29`'s needs TWO (LIVENESS *and* OCCUPANT IDENTITY).
+    The row clears the bar on a STRONGER claim than the one committed.**
 
     ⚠⚠⚠ **THE MANAGER'S PREMISE IN THE TASK FILE WAS FALSE AND `.memory/` CARRIED
     THE SAME GLOSS. ✅ Manager-re-run (`.temp/t136/convention.py`): of the 25
@@ -4082,13 +4133,44 @@ the number.** Two task files have already sent an agent to the wrong finding.
     `.memory/02-bench-rules.md`'s attack-arm rule exists for, and the strongest
     vindication that rule has had.**
 
+    ⚠⚠⚠ **`TASK_137` KILLED THAT LAST CLAUSE, ✅ MANAGER-RE-RUN.** ~~*"`p42`'s
+    failure mode is available in an R5 that looks completely healthy"*~~ **is
+    FALSE as applied to anything `p29` could ship.** ✅ **ARM_C is NOT vacuous by
+    the standing battery — four clean negatives (reachable, axioms consistent,
+    body-sensitive, reproduces through `p27`'s permission `Map`).** ⚠⚠ **BUT ITS
+    POSTCONDITION IS `r == 9u8`, AND `fn arm_c() -> u8 { 9 }` — no allocation, no
+    pointer, no permission, no read — DISCHARGES IT AT THE SAME `6 verified, 0
+    errors`. So *"Verus PROVES the recycled value"* does not mean what it
+    appears to.** ⚠⚠ **AND THE PROJECT'S OWN CONVENTION REJECTS THE BUG: 26/26
+    fences pin a value-equality `ensures`, and an R5 of that shape (ARM_D) FAILS
+    on the recycle program while its must-fire control verifies `6/0`. A stale
+    permission is `E0502` — not even writable.** ✅ **WHAT SURVIVES IS NARROWER
+    AND STILL WORTH HAVING: linearity states *no use after DEALLOCATION* and
+    cannot state *no use after the OCCUPANT CHANGED*. The real `p42`-shaped risk
+    in a `p29` is a TRANSLITERATED FOLD, not a linearity gap.**
+
     ⚠⚠ **THE ROW IS NOT BUILT, DELIBERATELY.** A half-built `patterns/p29-*/`
     moves the pattern count the box tells you to derive and breaks
     `composition.py --check`; and the dominant cost is unshortened — **all 26/26
     contracts pin `ensures result == <fold>(...)`, so `p29`'s R5 owes a FULL
     FUNCTIONAL REFINEMENT with THREE WALKS where `p27` has none.**
-    ⚠ **Read this as scope, not failure: the design questions that would have
-    sunk the build are all answered.**
+    ⚠⚠⚠ **AND *"the design questions that would have sunk the build are all
+    answered"* — the manager's sentence — DID NOT SURVIVE ITS REVIEW.**
+    ✅ **`TASK_137`'s verdict: BUILD `p29`, on a BETTER sentence than the one
+    committed, but NOT on `TASK_136`'s design as written and NOT from a task file
+    that quotes findings 47/49/51 as they stood.** ⚠⚠ **FOUR THINGS TO RE-SETTLE
+    FIRST:** *(1)* **the SAFETY-LINE SITE, on a stated criterion** — the winning
+    read-path candidate was never in the comparison; *(2)* **the SAFE RUNG is a
+    THREE-WAY choice whose third option REPRODUCES `p32`/`p33`'s REFUSED
+    RESULT**, so choosing it wrong retires the row; *(3)* **whether `tab[]` is
+    nulled on free — `p27`'s own `c/kernel.c` argues BY NAME that nulling turns
+    the bug into a different class**; *(4)* **`model.py` must be written FROM THE
+    CONTRACT.** ⚠⚠ **`TASK_136`'s `p29c/model.py` REMOVE is a LINE-BY-LINE
+    TRANSLITERATION of `kernel.c`'s — same variable names, same
+    `guard < CAP + 1`, same cursor move — which satisfies the model-sandbox rule
+    MECHANICALLY AND DEFEATS IT IN SUBSTANCE. No published number inherits it;
+    the CLASS is live in the artefact a build would inherit, and it is `p23`'s
+    hazard.**
 
     ⚠⚠ **`p25`'s *"nondeterministic R1"* KILL IS INPUT-CLASS-SPECIFIC AND MUST
     NOT BE REUSED BY NAME** — the UAF inputs give 19 distinct values in 20 runs,
