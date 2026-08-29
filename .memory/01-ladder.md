@@ -2588,6 +2588,28 @@ file.
 > **Safe Rust's temporal guarantee is a guarantee about the ALLOCATOR. A
 > structure that RECYCLES ITS OWN STORAGE gets no guarantee at all.**
 
+⚠⚠⚠ **READ THE SCOPE BEFORE USING THIS LAW TO REFUSE ANYTHING. IT SAYS
+*"POINTER-BACKED STRUCTURE"* AND IT MEANS IT: linked lists, trees, handle
+tables, arenas, free lists, refcounted graphs. IT MAKES NO CLAIM ABOUT — and
+must not be cited against —**
+
+- **a temporal bug in a FLAT GROWABLE BUFFER** (`realloc` invalidating a saved
+  pointer — **`p25`, the one catalogue row on which this project has run
+  NOTHING**);
+- **a STACK-LIFETIME bug** (a pointer to a local outliving its frame);
+- **ITERATOR INVALIDATION** (mutating a container while a cursor into it is
+  live).
+
+⚠⚠ **AND THE MECHANISM IT NAMES IS A RUNTIME ONE — an allocator, a discriminant
+test, a refcount. ALL FOUR OUTCOMES ARE RUNTIME OUTCOMES. The BORROW CHECKER is
+a SECOND temporal mechanism, it acts at COMPILE TIME, and it costs ZERO
+INSTRUCTIONS — and this law does not contain it.** ✅ **`p08` is the spatial
+precedent for what that shape ships as: *a tooling-and-expressiveness result, not
+a performance one*, `R4 == R5 exact` at both opt levels.** ⚠ **So *"safe Rust's
+temporal guarantee is a guarantee about the ALLOCATOR"* may be INCOMPLETE rather
+than wrong. Nobody has tested it. Marked OPEN, and it is the first thing the
+temporal programme should attack.**
+
 **Four outcomes, not two.** A safe rung for a pointer-backed structure lands in
 exactly one of these, and *which one* decides whether the row is worth building:
 

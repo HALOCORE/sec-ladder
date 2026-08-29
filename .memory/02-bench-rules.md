@@ -1779,3 +1779,76 @@ an in-sample residual of `12.57`.
 is smooth curvature, not a step — and the real one is OPEN.** ⚠ **This is the
 first time a method lesson from one pattern stopped a wrong number in the next,
 which is the whole point of writing them down.**
+
+## ⚠⚠⚠ DECISION (user, this session): NO NEW SPATIAL ROWS. THE REMAINING BUILD BUDGET GOES TO TEMPORAL AND TYPE.
+
+**This is a USER PRIORITY, not a measurement, and it overrides the manager's
+default of *"build whatever the bar admits"*.** ⚠ **It is recorded here because
+the ADMISSION BAR AS IT STOOD WOULD HAVE REFUSED EVERY TEMPORAL CANDIDATE, so
+the priority and the bar had to move together.**
+
+### The measured reason the priority is right
+
+✅ **Manager-audited composition of the 26 BUILT patterns, by the bug each
+`spec.md` actually ships** (⚠ read off `.memory/06-catalogue.md`'s bug column —
+**re-derive it, it has never been published as a table**):
+
+```
+spatial (OOB read/write, index/bound)  15   p02 p03 p05 p07 p09 p10 p11 p12 p13
+                                            p14 p16 p17 p23 p36 p46
+logical, memory-safe                    3   p04 p06 p19
+TEMPORAL                                1   p27
+TYPE                                    1   p38
+resource / leak                         1   p42
+side channel                            1   p47
+UB that is not memory-unsafety          1   p18
+non-termination                         1   p22
+aliasing UB                             1   p08
+calibration, no bug                     1   p01
+```
+
+⚠ **15 of 26 spatial against ONE temporal and ONE type. A 16th spatial row makes
+the corpus worse, not better, whatever it measures.**
+
+### THE RULE
+
+> ⚠⚠⚠ **A NEW ROW MAY NOT BE SPATIAL.** **If its bug is *an access outside the
+> object* — OOB read, OOB write, index ≥ len, a length/offset check — it is
+> REFUSED ON SIGHT, regardless of what it would measure.**
+
+✅ **This refuses the `ptr_offset` candidate (`RECAP` finding 45) BY
+CONSTRUCTION** — it is the frequency-measured coverage gap, it survived a hostile
+review, and it is spatial. ⚠ **Record it as a stated limitation of the corpus,
+do NOT probe it, and do NOT let a later session re-open it as *"but the census
+found it"*. The census is a SPATIAL instrument; that it points at a spatial gap
+is what it is for.**
+
+### THE BAR AMENDMENT, AND WITHOUT IT THE PRIORITY IS UNIMPLEMENTABLE
+
+**The reviewed bar admits a row that brings a new MECHANISM — a new operator on
+the safety line, a new source of the bound, or a new reason the check is or is
+not elided.** ⚠⚠ **All three limbs presuppose A COST GRADIENT TO PRICE. Most
+temporal candidates have no gradient, which is exactly how `p28`–`p34` died —
+and dying that way is the RIGHT verdict under the OLD bar.**
+
+> ✅ **FOURTH LIMB, ADDED HERE: a row is admissible if it MAPS A BOUNDARY OF THE
+> INSTRUMENT — a rung that cannot EXPRESS the program, a proof that cannot STATE
+> the obligation, or a safe rung that is SILENTLY WRONG.**
+
+⚠ **This is not a loosening invented for convenience: the project's three most
+cited results are already of exactly this shape and NONE of them is a cost
+result.** **`p17`** — provably memory-safe and still leaking. **`p36`** — Verus
+at the pin cannot type `fn(u64) -> u64` *at all*, so C's own dispatch mechanism
+is not an admissible rung. **`p42`** — the first pattern whose R5 proof does not
+cover its own bug class. ⚠ **`p08` is a fourth: *"a tooling-and-expressiveness
+result, not a performance one"*, `R4 == R5 exact` at both levels.**
+
+### ✅ AND *"R5 IS OPEN"* IS A SHIPPABLE ROW PROPERTY — DECIDE IT NOW, NOT LATER
+
+**`p42` already ships that way.** ⚠⚠ **Temporal obligations are where Verus is
+hardest, so the first hard proof WILL look like failure unless this is settled in
+advance. IT IS SETTLED: a row whose R5 cannot state its obligation still ships,
+with the gap as the finding.** ⚠ **What is NOT acceptable is an R5 that appears
+to state it and does not — `p42`'s ghost ledger verified `18/0` while leaking.
+Every temporal R5 owes an ATTACK arm that must FAIL to verify, not just a
+deletion arm.** (`.memory/03-measurement.md` failure-class entry 8.)
