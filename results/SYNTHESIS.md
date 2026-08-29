@@ -1297,15 +1297,27 @@ agrees with it, and **§5's `6.00 Ir`/call for a type-based aliasing property is
 in exactly that position** — a one-row result stated as a law.
 
 ✅ **The temporal axis is the one place this improved: `p29` (BST delete) joined
-`p27` at TASK_139**, and the two are **not** the same shape — `p27`'s read-path
-safety line needs ONE conjunct (liveness), `p29`'s needs TWO (liveness **and
-occupant identity**), because `p29`'s in-order-successor splice overwrites its
-victim in place and frees the *successor*. ⚠ **That second conjunct is what four
-independent mechanisms miss**: ASan is silent on it, Verus's linear `PointsTo`
-does not object to it (only the functional postcondition rejects it), and the
-buggy rung's checksum is *reproducible* there while it is not on the
-use-after-free half. **§3's *"safe Rust's temporal guarantee is a guarantee about
-the allocator"* now has a second row under it rather than one.**
+`p27` at TASK_139**, and the two are **not** the same shape. `p29`'s
+in-order-successor splice **overwrites its victim in place and frees the
+successor**, so one source line carries **two bug classes selected by the
+input** — a use-after-*free* on leaf victims and an in-bounds
+use-after-*recycle* on two-child ones.
+
+⚠⚠ **The recycle half is what four independent mechanisms miss**: ASan is silent
+on it; Verus's linear `PointsTo` does not object to it (only the *functional*
+postcondition rejects it); safe Rust's `Option<Box<_>>` reproduces it; and the
+buggy rung's checksum is *reproducible* there while it is **not** on the
+use-after-free half — so the half every detector sees is the half that cannot be
+gated.
+
+⚠ **A sharper claim was published here and retracted at TASK_140:**
+~~*"`p27`'s safety line needs ONE conjunct, `p29`'s needs TWO"*~~. **One
+conjunct suffices** — widening the liveness array from a bit to the occupant tag
+is exact and adds no state. **The row stands on the two-bug-class mechanism, not
+on a conjunct count.**
+
+**§3's *"safe Rust's temporal guarantee is a guarantee about the allocator"* now
+has a second row under it rather than one.**
 ⚠ **This does not weaken the spatial results — those are the fifteen — it says
 where the document's confidence should stop.**
 
