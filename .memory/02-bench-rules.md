@@ -1789,9 +1789,49 @@ the priority and the bar had to move together.**
 
 ### The measured reason the priority is right
 
-✅ **Manager-audited composition of the 26 BUILT patterns, by the bug each
-`spec.md` actually ships** (⚠ read off `.memory/06-catalogue.md`'s bug column —
-**re-derive it, it has never been published as a table**):
+✅ **Composition of the 26 BUILT patterns, by the bug each `spec.md` actually
+ships.** ⚠⚠ **THIS TABLE IS NOW DERIVED AND CHECKED — `harness/tools/composition.py`.**
+`--check` **exits 1 if the copy below drifts from the tree** and is the anti-rot
+mechanism for the whole priority; `--evidence` prints each pattern's catalogue
+bug text next to its class so the judgement is auditable in one command.
+✅ **The hand audit was RIGHT: the derived table reproduces it exactly.**
+
+⚠⚠ **BE PRECISE ABOUT WHAT IS MEASURED HERE, because the priority rests on it
+and it would be easy to overclaim.** **MEASURED:** the population, from
+`patterns/*/` **and** `results/gate/*.json`, which must agree; the join to the
+catalogue's bug column; and completeness in both directions. **DECLARED:** the
+CATEGORY per pattern, hand-written in the script's `CLASSES`. ⚠ **There is no
+machine-readable bug-class field to derive the category from, and there will not
+be one cheaply**: `spec.md`'s hashed `slb-contract` carries `requires`/`ensures`,
+and `TASK_126` established `requires` is a LENGTH bound in **26 of 26** and never
+mentions buffer contents — **so the contract cannot tell spatial from temporal.**
+Adding a field to `spec.md` moves `contract_sha256` and costs a full 26-pattern
+re-gate. ✅ **So the judgement is written down once and mechanically prevented
+from going stale, which is the honest artefact; it is not laundered into a
+measurement.**
+
+⚠⚠ **AND THE TABLE COUNTS SAFETY LINES, NOT BUGS** — the one conjunct
+`c/kernel.c` omits and `c/kernel_hardened.c` spells. **`p09` ships TWO** (the
+omitted `q < nbits`, spatial; and `q & 31`, which is not), and is counted spatial
+on its safety line. ⚠ **`--evidence` is what surfaced that; run it before
+quoting the table.** ✅ **`p46` was checked the same way and is genuinely
+spatial — its safety line is `n + m > SLB_P46_OUTCAP`, an output-capacity check.**
+
+⚠ **Five negative controls were run and each fires on its OWN reason** (an
+unclassified 27th pattern; a class naming a pattern that is not built; a pattern
+classified twice; `patterns/` disagreeing with `results/gate/`; and a pattern
+silently reclassified with the published table untouched). ⚠⚠ **The last one is
+the one that matters and it is caught on MEMBERSHIP, not on totals — moving
+`p23` from spatial to logical still sums to 26 and `--check` still exits 1.**
+⚠ **The manager's FIRST three controls all fired for the WRONG REASON** — two
+tracebacked because the copied script computed the repo root from its own path,
+and the third hit the population arm instead of the unclassified arm, leaving
+that arm untested. **A control that fires is not a control that tested what you
+said it did.**
+
+⚠ **It is NOT wired into `harness/check.py`** — that would move the gate digest
+and cost a sweep, and `CLAUDE.md`'s rule 3 forbids CI. It is an on-request check;
+run it whenever a pattern is added or a class is argued about.
 
 ```
 spatial (OOB read/write, index/bound)  15   p02 p03 p05 p07 p09 p10 p11 p12 p13

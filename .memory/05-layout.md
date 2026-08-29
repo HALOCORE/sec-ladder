@@ -745,3 +745,14 @@ ANOTHER repository's `.temp/` false-positived; and it could not see a path a
 committed Python file ASSEMBLES with `os.path.join(REPO, ".temp", …)`.**
 ✅ **The second fix found 14 citations nothing had ever seen; the baseline is now
 81 entries, up from 66.**
+
+✅ **`harness/tools/composition.py` (TASK_133/134 session, manager-built).** Derives
+the corpus composition table — the one the *no new spatial rows* priority rests
+on — and `--check`s the copy published in `.memory/02-bench-rules.md`, exiting 1
+on drift. ⚠ **Population from `patterns/*/` AND `results/gate/*.json`, which must
+agree; category DECLARED in `CLASSES`, because `spec.md`'s hashed contract cannot
+tell spatial from temporal** (`requires` is a length bound in 26/26, `TASK_126`)
+**and adding a field to `spec.md` would cost a 26-pattern re-gate.** ⚠ **It counts
+SAFETY LINES, not bugs** — `--evidence` is the arm that shows this, and it is what
+surfaced `p09`'s second, non-spatial bug. **Not wired into `check.py`, and it must
+not be**: that would move the gate digest and `CLAUDE.md` rule 3 forbids CI.
