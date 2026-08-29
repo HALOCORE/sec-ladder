@@ -2610,6 +2610,16 @@ temporal guarantee is a guarantee about the ALLOCATOR"* may be INCOMPLETE rather
 than wrong. Nobody has tested it. Marked OPEN, and it is the first thing the
 temporal programme should attack.**
 
+> ⚠⚠ **STATUS: IT HAS NOW BEEN ATTACKED — `TASK_134`, in BOTH directions, and
+> the answer is RECAP finding 48. IT IS DELIBERATELY NOT WRITTEN HERE, because
+> that task is ENGINEER work and its review has not landed (rule 9).**
+> ⚠ **Do not re-run the probe.** Read finding 48 and the artefacts promoted to
+> `.tasks/TASK_134_ARTEFACTS/`. **This note stays OPEN until the review lands;
+> whoever lands it replaces this block with the reviewed result.**
+> ⚠ **The manager re-ran both directions, including a Miri positive control that
+> must fire — so the EVIDENCE is strong. What is missing is an ADVERSARIAL read
+> of it, which is a different thing and is what rule 9 is protecting.**
+
 **Four outcomes, not two.** A safe rung for a pointer-backed structure lands in
 exactly one of these, and *which one* decides whether the row is worth building:
 

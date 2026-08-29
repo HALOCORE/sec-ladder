@@ -3671,6 +3671,142 @@ the number.** Two task files have already sent an agent to the wrong finding.
     `patterns/p27-handle-table/verus.rs` (header + SAFETY 4/5),
     `.memory/01-ladder.md` (the four outcomes and the new scope note).
 
+48. ⚠⚠⚠ **THE BORROW CHECKER IS AN *ALIASING* MECHANISM, NOT A TEMPORAL ONE —
+    AND THAT ANSWERS THE SCOPE NOTE `TASK_133`'s SESSION LEFT OPEN. ALL FOUR
+    NON-SPATIAL CANDIDATES DIED.** ⚠ **Engineer work (`TASK_134`), NOT YET
+    REVIEWED (rule 9). The manager re-ran the load-bearing arms — see the
+    verification note at the end.**
+
+    ⚠⚠ **THE RESULT IS TWO-DIRECTIONAL, WHICH IS WHY IT SETTLES ANYTHING.**
+    `.memory/01-ladder.md`'s scope note said the borrow checker *"is a second
+    temporal mechanism, acting at COMPILE TIME at ZERO INSTRUCTIONS, so the law
+    may be INCOMPLETE"*, and marked it untested.
+
+    - **It REJECTS programs that cannot have the bug.** Seven controls, all
+      `#![forbid(unsafe_code)]`, ✅ **manager-recompiled**: a `struct S { v: u32 }`
+      with no heap and no container prints **`E0502`, the message identical to
+      `p25`'s safe rung**; a `Vec` with capacity 64 reserved and length 1 —
+      which provably cannot reallocate — prints **`E0502`**; a stack `[u8; 16]`
+      prints `E0506`; a single integer local prints `E0597`/`E0515`.
+    - **It ACCEPTS a real use-after-recycle in the same data structure.**
+      `pop` ends the element's lifetime, `push` recycles the slot, the read gets
+      the new occupant: **`v[2] = 9999` where 30 was marked, `buffer moved:
+      false`, ZERO `unsafe` blocks, `forbid(unsafe_code)`, and MIRI-CLEAN.**
+      ✅ **Manager-re-run WITH A POSITIVE CONTROL that must fire** — a genuine
+      use-after-free scores `rc=1` and *"alloc245 has been freed, so this
+      pointer is dangling"*, while the subject scores `rc=0` and zero UB lines.
+
+    > ✅ **So the borrow checker is neither SOUND nor COMPLETE for the temporal
+    > property. It is a FIFTH mechanism and it is not a temporal one — the four
+    > runtime outcomes STAND, and OUTCOME 3 (*"the type system is SILENT"*)
+    > EXTENDS VERBATIM from pointer-backed structures to FLAT GROWABLE BUFFERS**,
+    > which was the scope note's own first exclusion and is `p25`'s structure.
+
+    ⚠⚠ **AND IT RETIRES *"SAFE RUST CANNOT EXPRESS THE BUG"* AS A DISTINGUISHING
+    CLAIM FOR THREE CANDIDATES AT ONCE. THIRD INSTANCE OF THE FAILURE MODE**
+    (`TASK_093`'s `E0382`, `TASK_094`'s `E0502`, now these) — **the compile error
+    is real and is not about the row's bug.** ⚠ **It cost about ten minutes to
+    check, and the project's own method rule is what caught it.**
+
+    ⚠⚠⚠ **`p25` IS REFUSED, AND THE MANAGER'S OWN PREDICTION ABOUT IT WAS WRONG
+    IN AN INTERESTING WAY.** The catalogue cell said *"a stale INDEX is not a
+    stale POINTER: if the port uses indices the bug vanishes into `p04`'s
+    class"*. ✅ **Manager-re-run: the index port has NO BUG AT ALL** — `realloc`
+    **copies**, so `v[k]` names the same element afterwards and the answer is
+    simply correct. **Not a different bug class; no bug.** The three addressing
+    modes are `&T` across a `push` → `E0502`, `as_ptr()` + deref → `E0133`,
+    index → compiles and is correct. **So `p25` is a row only if
+    pointer-addressed.**
+
+    ⚠⚠ **AND THEN THE KILL, WHICH NOBODY PREDICTED: IN `p25`'s SHIPPED HEAP
+    TOPOLOGY `realloc` NEVER MOVES.** The driver `malloc`s the blob before the
+    kernel runs, so the kernel's vector is the newest allocation and glibc
+    extends it in place. ✅ **Manager-re-run, both compilers:**
+
+    ```
+    A  vector alone at the top of the heap   gcc moved=0/12   clang moved=0/12   <- SHIPPED
+    B  a pin malloc'd after it               gcc moved=2/12   clang moved=0/12
+    C  two vectors grown alternately         9/12 and 10/12, both compilers
+    D  alone, past the 128 KiB mmap threshold          8/20, both compilers
+    ```
+
+    **In regime A the stale pointer is never stale**, the buggy rung's answer
+    EQUALS the correct one in 6 of 6 compiler × `-O` cells, and **ASan fires only
+    because ASan's own allocator moves on every `realloc`.** ⚠ **So the UB
+    executes and is unobservable — `p08`'s published sentence verbatim, and
+    `p08` is built.**
+
+    ✅ **Three further kills, each independently sufficient, and they do NOT
+    depend on the topology inference:** *(1)* **there is no safety conjunct to
+    omit** — C cannot ask *"did my block move"* without comparing the base
+    pointer, and a rung that saves `(base, k)` and re-derives on mismatch **IS
+    the index port**; `p27`'s *"R1 omits exactly `&& live[h] == 1`"* has **no
+    analogue**, because the safety line here is an ADDRESSING MODE, not a check.
+    *(2)* the gradient is **`+1.00 Ir` per read, ONE instruction** of register
+    allocation (122 → 123 in the symbol; the delta reproduced exactly at `+3052`
+    across two runs while the level moved by 34). *(3)* **R1 has no reproducible
+    checksum** — same binary, same input, `3196606969367904911` then
+    `4868875711876342483` — **and a nondeterministic R1 cannot be gated against
+    `model.py` at all.** ⚠ **The growth-overflow half is a measured
+    `heap-buffer-overflow WRITE`, i.e. SPATIAL, refused on sight.**
+
+    ⚠ **The OTHER two candidates died too.** **Stack lifetime**: both compilers
+    warn at DEFAULT flags (`-Wreturn-local-addr` / `-Wreturn-stack-address`), so
+    C is not silently wrong; the bug fires on `benign.bin` too, violating
+    adversarial-only — **the exact constraint that made `p27` retract its
+    original shape**; and **the gate's gcc-only ASan is BLIND to it** (0 hits
+    even with `--param asan-use-after-return=1`; gcc's own positive control
+    degrades to `SEGV on unknown address 0x0`). **Iterator invalidation**: the C
+    rung's bug is one of exactly three things and the detector says which —
+    `heap-use-after-free` (= `p25`), `heap-buffer-overflow` (= spatial), or
+    `free(node); node->next` (= `p27`, built). **There is no fourth spelling.**
+
+    ⚠⚠ **`p35` STAYS BLOCKED, ON A SHARPER REASON, AND TWO CATALOGUE STATEMENTS
+    ABOUT IT WERE WRONG.** The `unsafe` can only live in an
+    `#[verifier::external_body]` body (`check.py:4178-4180` is the ONE allowed
+    branch), which makes it a trusted item, **which owes a TWIN — and a twin must
+    be a SAFE SPELLING OF THE SAME OPERATION.** `p01`'s twin for `get_unchecked`
+    is literally `v[i]`. **Rust has a safe spelling for indexing and NONE for a
+    union read**, so the twin is `error[E0133]`. ✅ **The remaining hatch,
+    `verus.twin_justifications`, appears in 0 of 26 shipped contracts —
+    manager-verified — and its only occurrence under `patterns/` is
+    `p17`'s NOTES REJECTING an axiom for this very reason.**
+
+    ⚠ **Correction 1 — the cell's *"no configuration in which its safety
+    obligation is CHECKED"* is TOO STRONG for the `external_body` route.** Verus
+    **does** check the correct-variant obligation at the call site and the
+    wrapper **can** carry a full functional `ensures` via
+    `get_union_field::<U, u32>(v, "i")`. ⚠ **Union support is a LANGUAGE BUILTIN
+    (`~/tools/verus/builtin/src/lib.rs`), not a vstd spec — which is why probe
+    4's `std_specs/` grep missed it. NOT re-run by the manager; it rests on the
+    engineer's six Verus runs.**
+    ✅ **Correction 2 — the *"a GATE-CLEAN `p35` DOES EXIST"* `include!` route is
+    CLOSED AT HEAD, and the catalogue still advertised it. Manager-verified at
+    `harness/check.py:3941`: `cand += _include_literals(txt)[0]`, so
+    `_path_includes` DOES resolve `include!`.**
+
+    ⚠⚠ **WHAT THE MANAGER DID *NOT* VERIFY, AND THE ENGINEER FLAGGED IT FIRST:
+    NOTHING HERE IS GATE-CERTIFIED.** The engineer was barred from `check.py`
+    (concurrent agents), so the `p35` twin/`n_twins` interaction rests on reading
+    predicates plus running Verus, **not on executing the gate against a
+    synthetic pdir the way `TASK_096`/`097` did.** ⚠ **That is the weakest link
+    and it is the first thing a review should execute.** ⚠ **`TOPO=0` being the
+    shipped topology is an INFERENCE from the driver's allocation order — the
+    manager checked `common/driver.c` `malloc`s the payload and body before the
+    call, which supports it, but no real pattern driver was built.** ✅ **The
+    `p25` verdict does not depend on it: kills (1), (2) and (3) above are
+    topology-independent, and (3) alone makes the row ungatable.**
+
+    ⚠ **The one revival route the engineer declined to measure, recorded so it is
+    not rediscovered as new: a deliberately TWO-VECTOR kernel (regime C) moves
+    reliably — but it is a kernel designed to produce its own bug, which is
+    contrived rather than idiomatic.**
+
+    Evidence: `.tasks/TASK_134_REPORT.md`, `.temp/t134/NOTES.md` and its
+    `p25/ stack/ iter/ p35/` trees (all re-runnable from the committed `run.sh`
+    scripts), `.temp/mgr134/` (the manager's re-runs and the Miri positive
+    control).
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds
