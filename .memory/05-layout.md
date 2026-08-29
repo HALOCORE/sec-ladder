@@ -697,3 +697,51 @@ silently and nothing in this repo will notice.** `--check-stale` globs
 `results/*.json` and `results/gate/p*.json` **and nothing else** — not
 `results/tables/`, not `synthesis/*.json`, not `patterns/*/controls/*.json`.
 **Every one of those has now been caught stale at least once.**
+
+## ⚠ What is pinned now, and the two free places to put tooling
+
+**`TASK_127`, reviewed `TASK_132`. State, not history:**
+
+- ✅ **`results/tables/*.md` are CONTENT-pinned.** `check.py::check_table_render`
+  (stage `9c`) re-renders with `report.build` and compares BYTES; the verdict is
+  in every gate record under the key `table_render`, `FRESH` 26/26.
+  ⚠⚠ **Stage 9 (`check_published_tables`, the CONTRACT pin) DOES NOT SUBSUME
+  IT AND IS NOT SUBSUMED BY IT** — a docstring in both files claimed subsumption
+  and it is FALSE: with no gate record, stage 9 fires `UNPINNED` while 9c says
+  `FRESH`. **Keep both.**
+  ⚠⚠ **KNOWN AND OPEN: 9c reads the PREVIOUS run's gate record, so a tree can be
+  `PASS` when committed and `FAIL` on the next run with nothing changed** — see
+  `.memory/03-measurement.md` entry 11.
+- ✅ **`patterns/p23-partition/controls/controls.log`** carries a
+  `controls_pin.json` emitted by the run that rewrites the log; stage `9b`
+  covers it with zero new gate code.
+- ✅ **`common/layout/data/` is ACCEPTED, NOT PINNED**, and the acceptance is
+  written into `common/layout/README.md` — the file that would need the pin, not
+  a report. ⚠ **`predictions_p01oos.json`'s own sha256 is a PRE-REGISTRATION
+  COMMITMENT, a different and stronger thing; do not "upgrade" it.**
+- ⚠ **STILL UNPINNED: 21 `controls/*.py` sidecars across 12 patterns that
+  `json.dump` into gitignored `.temp/`.** ⚠ **The old figure `31 / 14` was
+  wrong — `grep -l json.dump` also matches `json.dumps`, and six of the hits
+  render `spec.md` into the tree.** **Cost: 21 pins + 12 gate re-runs, NOT a
+  sweep, because the glob is `controls/*.py`.**
+
+⚠⚠ **THE TWO FREE DIRECTORIES, AND THE PRICE IS THE SAME IN BOTH.**
+**`check.py`'s gate digest globs are NON-RECURSIVE — `harness/*.py`,
+`common/*.py`, `common/layout/*.py` — so `harness/tools/` and `common/census/`
+are OUTSIDE IT: tooling and evidence there cost NO SWEEP, EVER.**
+⚠ **Price, and it is written in both directories: nothing under them may be
+imported by `check.py`/`measure.py`/`build.py`, or it silently rejoins the
+digest.** ✅ **`common/census/` holds the three corpus sha256 manifests that make
+the idiom census re-identifiable after another project deletes its `.temp/`, and
+`ptr_cursor_regex.py`, whose own README says the count is A PROPERTY OF THE
+GUARD.** ✅ **The manifests are 506 K, not the 956 K first estimated — the saving
+was pure path prefix with ZERO content lost (5342/5342 pairs identical), and
+they re-derive the census's deduplicated population `299 / 94 / 2162` exactly,
+which a digest-of-digests could not.**
+
+⚠ **`harness/tools/temp_citations.py` had TWO defects and both are fixed
+(`TASK_132`): it matched `.temp/` ANYWHERE in a line, so an absolute path into
+ANOTHER repository's `.temp/` false-positived; and it could not see a path a
+committed Python file ASSEMBLES with `os.path.join(REPO, ".temp", …)`.**
+✅ **The second fix found 14 citations nothing had ever seen; the baseline is now
+81 entries, up from 66.**

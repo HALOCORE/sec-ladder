@@ -2808,6 +2808,85 @@ already been struck.** Keep the list, not the ordinal.
     a number quoted from a terminal is undated. Write arms to files and
     regenerate them from a `REBUILD.sh` at the end.**
 
+11. ⚠⚠⚠ **A CHECK WHOSE OWN OUTPUT IS AN INPUT TO THE ARTEFACT IT CHECKS.
+    `TASK_127`, reviewed and sharpened at `TASK_132`.** ⚠ **It PASSES the
+    must-not-fire arm and still oscillates forever, because the oscillation
+    begins THE FIRST TIME THE CHECK FIRES.**
+
+    **`harness/report.py` rendered the gate record's `verdict` into
+    `results/tables/*.md`, and `check.py` stage `9c` re-renders that table and
+    fails on a difference — inside the run that WRITES `verdict`:**
+
+    ```
+    run N    9c fires -> rep.fail -> this run's verdict is FAIL
+    report.py         -> the table now prints  verdict `FAIL`
+    run N+1  render(FAIL record) == table -> FRESH -> verdict PASS
+    run N+2  render(PASS record) != table -> FIRES AGAIN -> forever
+    ```
+
+    **Measured before the fix: 19 of 26 tables changed bytes when `verdict`
+    changed.** ✅ **Fixed at the source — `verdict` is no longer rendered.**
+
+    ⚠⚠⚠ **THE QUESTION IT ADDS, AND NO OTHER ENTRY ASKS IT: *DOES THIS CHECK
+    WRITE ANYTHING THE THING IT CHECKS READS?*** **The list's standing question —
+    *what would make it FAIL?* — is satisfied here and does not help.**
+
+    ⚠ **THE RULE: a field a gate run WRITES must not be rendered into an artefact
+    that same gate run CHECKS.** **`loud`, `controls_json`, `idiom_audit` and
+    `contract_sha256` are deterministic functions of the committed sources and
+    are safe; `verdict` and `blocked` are functions of the RUN.**
+
+    ⚠⚠ **AND THE TWO THINGS THE REVIEW ADDED, BOTH OF WHICH GENERALISE:**
+
+    - ⚠⚠ **THE DETECTOR BUILT FOR THIS IS A DENY-LIST, NOT A CENSUS**
+      (`harness/tools/table_render_inputs.py --selfref`): its run-scoped key list
+      is HAND-WRITTEN and 25 of the record's 34 keys are unclassified, so a
+      `report.py` rendering `table_render` — **stage 9c's own verdict** —
+      measures `26/26 READ` while the detector prints `0` and passes.
+      ✅ **Invert to an ALLOW-LIST over the measured read set.** ⚠ **A detector
+      for a self-reference that is itself enumerated by hand can only find the
+      self-references you already thought of.**
+    - ⚠⚠ **REMOVING THE SELF-REFERENCE LEAVES A ONE-RUN LAG, AND THE LAG IS NOT
+      FREE.** **Stage 9c runs MID-GATE against the PREVIOUS run's record, so:
+      add one unpinned `patterns/*/controls/*.json`, stage 9b shouts (and does
+      not fail), and `run 3 = PASS / 9c FRESH` — where a user commits — then
+      `run 4 = FAIL / 9c STALE-CONTENT` with nothing changed.** ⚠ **The trigger
+      is in NEITHER digest, so `--check-stale` cannot see it.** ⚠⚠ **Do not
+      accept *"the older check has the same shape"*: stage 9 compares LIVE
+      `spec.md` against the table, so its DETECTION has no lag; 9c's lag is in
+      the detection. Bound: 26 `rep.shout(` sites, 5 firing, 7 latent.**
+
+## ⚠ A number GREPPED OUT OF A LOG is not a number READ OUT OF A RECORD
+
+**`TASK_127`, swept at `TASK_132`.** **The gate writes structured JSON and also
+prints a log. Two published numbers came from the log and were wrong.**
+
+```
+grep -c BLOCKED  matches the VERDICT STRING `PASS-WITH-BLOCKED-ROWS`
+decoder:  grep -c BLOCKED == 2N + 1      (N = real blocked rows)
+          ✅ validated 130/130 against the records over 130 sweep logs
+```
+
+✅ **The sweep is bounded and it came out well: 29 transcript-greps, and ONLY the
+`blocked` family is defective. Grepped `verdict` and grepped FAIL-count agree
+with the record `130/130`.** ⚠ **534 source-greps are a different class and were
+NOT swept — stated, not silently capped.** ⚠ **So the rule is *READ THE RECORD*,
+not *never grep*.** ⚠⚠ **The defect ORIGINATES AT `TASK_121`, four tasks before
+the finding that names it; `TASK_125` was merely the first to PUBLISH from it.**
+
+⚠⚠ **AND THE CORRECTION TO THIS RULE WAS ITSELF MADE BY OVER-GENERALISING, WHICH
+IS THE PART WORTH REMEMBERING.** **The manager wrote *"EVERY `p42 saw 2` / `p42
+saw 3` / `p22 shows one` is a grep artefact."* **`p42 saw 2` WAS A
+MEASUREMENT** — `.temp/t107/gate-p42-rerun.log` carries two genuinely distinct
+blocked rows (`adversarial-wincap.bin` and `large.bin`, both real 180 s Miri
+timeouts) and that sweep used `tail -1`, not `grep -c`. ⚠ **Two true instances
+were generalised to a universal, and the universal destroyed the support for the
+sentence beside it.**
+
+✅ **THE RULE: read `blocked` out of `results/gate/*.json`. If you must grep a
+log, VALIDATE THE DECODER against the records first — it is one pass and it is
+what turned this from a suspicion into a number.**
+
 **The reflex, and it is one question:** ⚠⚠ **before believing a check, ask what
 would make it FAIL — and then make that happen.** Every entry above passes that
 question and none of them survived it. **A control with no demonstrated failing
@@ -2816,6 +2895,9 @@ to EXPLAIN a movement: *would this same arm show the column moving WITHOUT the
 mechanism?*** ⚠ **Entry 10 adds a third, and it is the cheapest of the three:
 *were these numbers produced by the code that is committed?* — answered by
 regenerating every arm from a `REBUILD.sh` before you write the report.**
+⚠⚠ **Entry 11 adds a fourth that none of the others reaches: *does this check
+WRITE anything the thing it checks READS?* — and its corollary, *is my detector
+for that an allow-list or a hand-written deny-list?***
 
 ⚠ **Entries 5, 6 and 7 all landed within three tasks of each other**, which says
 the reflex is not yet habitual. ✅ **The counter-example worth copying is

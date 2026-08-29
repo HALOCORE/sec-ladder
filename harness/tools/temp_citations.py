@@ -118,6 +118,65 @@ PAT = re.compile(r"\.temp/[A-Za-z0-9_](?:\{[^}\s]*\}|<[^>\s]*>"
                  r"|[A-Za-z0-9_./+*?$\[\]-])*")
 META = re.compile(r"[*?{}<>$\[\]]")
 
+#: ⚠⚠ DEFECT 1, FIXED AT TASK_132. `PAT` above matches `.temp/` ANYWHERE in a
+#: line, and `resolve` then joins the hit to THIS repo -- so an absolute path
+#: into ANOTHER project's `.temp/` (the C corpora live in two of them) was
+#: reported as a dangling citation of a path this repo never had. This
+#: expression eats the path characters to the LEFT of the hit so the caller can
+#: see whether the citation is absolute and, if it is, whose it is.
+LEFT = re.compile(r"[A-Za-z0-9_./+-]*$")
+
+
+def owner(line, start):
+    """`"self"`, or the foreign root the `.temp/` at `line[start]` belongs to.
+
+    A hit is FOREIGN when the path characters to its left form an ABSOLUTE path
+    that is not under this repo. Anything else -- a bare backticked
+    `.temp/<dir>`, a relative `sec-ladder/.temp/<dir>`, a hit after a backtick
+    or a space -- is this repo's, which is the conservative direction: a false
+    "self" is a citation that gets checked, a false "foreign" is a citation that
+    stops being. Must-fire arm: `--selftest`."""
+    pre = LEFT.search(line[:start]).group(0)
+    if not pre.startswith("/"):
+        return "self"
+    if (pre + ".temp").startswith(REPO + "/"):
+        return "self"
+    return pre.rstrip("/") or "/"
+
+
+#: ⚠⚠ DEFECT 2, FIXED AT TASK_132. A committed *Python* file that ASSEMBLES a
+#: path with `os.path.join(REPO, ".temp", ...)` carries no literal `.temp/`, so
+#: `PAT` could not see it and the checker silently covered less than it claimed.
+#: `TASK_127` found it by ordinary use and reported it unfixed (the example is
+#: `harness/tools/table_render_inputs.py`'s own `SCRATCH`). This matches a
+#: `join` whose argument list contains a `".temp"` literal and reconstructs the
+#: path from the string literals that follow it, stopping at the first
+#: non-literal (a variable makes the rest unknowable, and half a path is not a
+#: citation).
+JOINED = re.compile(r"""(?:os\.path\.)?join\(([^()]*)\)""")
+_STRLIT = re.compile(r"""['"]([^'"]*)['"]""")
+
+
+def joined_paths(line):
+    """`.temp/...` paths a Python source line BUILDS rather than spells."""
+    out = []
+    for m in JOINED.finditer(line):
+        parts = [a.strip() for a in m.group(1).split(",")]
+        try:
+            i = next(k for k, a in enumerate(parts)
+                     if _STRLIT.fullmatch(a) and _STRLIT.fullmatch(a).group(1) == ".temp")
+        except StopIteration:
+            continue
+        comps = [".temp"]
+        for a in parts[i + 1:]:
+            lit = _STRLIT.fullmatch(a)
+            if not lit:
+                break
+            comps.append(lit.group(1))
+        if len(comps) > 1:
+            out.append("/".join(comps))
+    return out
+
 #: Narrow and explicit, because the manager's first count called two of these
 #: "missing" and they are template text. A component that IS or ENDS IN a run of
 #: capital `N`s is a stand-in, not a path: `.temp/pNN/`, `.temp/build/pNN/`,
@@ -200,10 +259,22 @@ def scan(include_tasks):
     """-> (all citations {path: {file}}, dangling [(file, line, path, text)])"""
     cites = collections.defaultdict(set)
     dangling = []
+    foreign = 0
     for rel in tracked(include_tasks):
         with open(os.path.join(REPO, rel), errors="replace") as fh:
             for n, line in enumerate(fh, 1):
-                for hit in PAT.findall(line):
+                # DEFECT 2 (TASK_132): paths a committed .py ASSEMBLES.
+                if rel.endswith(".py"):
+                    for p in joined_paths(line):
+                        cites[p].add(rel)
+                        if not resolve(p):
+                            dangling.append((rel, n, p, line.strip()[:160]))
+                for m in PAT.finditer(line):
+                    hit = m.group(0)
+                    # DEFECT 1 (TASK_132): another project's `.temp/`.
+                    if owner(line, m.start()) != "self":
+                        foreign += 1
+                        continue
                     # Trailing prose punctuation is not part of the path.
                     # ⚠ `*` IS NOT STRIPPED, and stripping it was a real bug in
                     # the first draft: `` `.temp/review021/v05/z3_*` `` became
@@ -217,6 +288,9 @@ def scan(include_tasks):
                     cites[p].add(rel)
                     if not resolve(p):
                         dangling.append((rel, n, p, line.strip()[:160]))
+    if foreign:
+        print(f"note             : {foreign} `.temp/` hit(s) skipped as "
+              f"ANOTHER PROJECT's absolute path (TASK_132 defect 1)")
     return cites, dangling
 
 
