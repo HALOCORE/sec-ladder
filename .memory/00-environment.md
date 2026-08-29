@@ -346,11 +346,30 @@ compiler flag produced, and it is available on any data-dependent kernel.
    ⚠⚠⚠ **AND A THIRD, ADOPTED AT `TASK_121`: *PROMOTE, DON'T PUBLISH.***
    **`.temp/` IS GITIGNORED, SO ANY `.temp/` PATH CITED FROM A *COMMITTED* FILE
    IS A CLAIM NOBODY CAN CHECK — AND THIS IS NOT HYPOTHETICAL.**
-   ✅ **Manager-measured over `git ls-files`: 2454 distinct `.temp/` paths are
-   cited from committed files and 88 ARE ALREADY DANGLING, across 59 files.**
-   ⚠ **The loss needed an `rm`, not a clone.** **`TASK_122` could not raise an
-   18.9 M `Ir` drift from *sufficiency* to *actuality* because the probe source
-   it needed was one of them.**
+   ⚠⚠ **THE MANAGER'S FIRST NUMBERS AND FIRST REASON WERE BOTH WRONG. `TASK_125`
+   CORRECTED THEM AND THE CORRECTED VERSION IS A BETTER ARGUMENT.**
+
+   ~~*2454 paths / 88 dangling / 59 files*~~ → **1441 paths, 77 dangling
+   citations, 43 files** (`harness/tools/temp_citations.py`; the manager's regex
+   over-counted, and five variants were tried before settling the definition).
+
+   ⚠⚠ **AND THE DANGLING COUNT IS NOT THE DAMAGE, WHICH IS THE PART THE MANAGER
+   HAD WRONG. OF 66 CLASSIFIED ENTRIES ONLY *NINE* ARE GENUINELY LOST**:
+   **25 are DESTINATIONS the citing script CREATES**, **15 are REGENERABLE**
+   (constraint 6 working exactly as intended — the generator survived, the binary
+   did not), **7 are sentences saying the path is WRONG**, and the remainder are
+   promoted, transient or quoted. ⚠ **Run `--list --kind lost` for the real
+   inventory. Do NOT quote the raw dangling count as damage** — the manager did,
+   twice.
+
+   ⚠⚠⚠ **AND THE SHARPEST CORRECTION: `TASK_122`'s LOSS WAS NOT A DANGLING
+   CITATION AT ALL.** ✅ **Manager-verified: `.temp/t86/cost.rs` IS ON DISK
+   (6743 B).** **What is gone is the STATE that produced `360,114,293` — the file
+   is UNVERSIONED, not ABSENT.** ⚠⚠ **So the failure this rule exists for is
+   *A CITATION THAT RESOLVES TO THE WRONG CONTENT*, which is strictly worse than
+   one resolving to nothing — and which `temp_citations.py` CALLS GREEN.**
+   **The checker bounds the cheap half of the problem, and its own first
+   paragraph says so.**
 
    > **Do NOT commit `.temp/`** (tree-wide it is ~5.1 GB). **Instead, a `.temp/`
    > path you cite from a committed file must be PROMOTED into the tree first**
@@ -365,8 +384,22 @@ compiler flag produced, and it is available on any data-dependent kernel.
    not a reviewed finding — it makes the EXISTING rule checkable rather than
    reversing it, which is why it did not need a repo-policy decision. Challenge
    it if it is wrong.** ⚠ **`TASK_125` implements it, and the OPEN question it
-   carries is a SIZE BOUND: nobody has measured how much a strict forward rule
-   would force into the tree.**
+   carries is a SIZE BOUND.**
+   ✅ **`TASK_125` IMPLEMENTED IT AND MEASURED THE BOUND: a STRICT forward rule
+   is 10 563 files / 3.10 GB.** ⚠ **But 833 of the 1234 cited files — 99.3% OF
+   THE BYTES — sit under `.temp/{build,check,clausemut}`, which committed scripts
+   REBUILD; exempting those gives 13 MB, and the tightest sensible bound is
+   315 files / 2.13 MB.** ⚠⚠ **THE BINDING CONSTRAINT IS FILE COUNT, NOT BYTES —
+   315 files into a tree that tracks 838 — so the rule is ON-DEMAND AND NEVER
+   RETROACTIVE.**
+   ✅ **The existing 77 are a BASELINE-AND-FREEZE**
+   (`harness/tools/temp_citations_baseline.json`, 66 entries, each with a `kind`
+   and a `note`): **`harness/tools/temp_citations.py` fails only on a NEW one.**
+   ⚠ **`harness/tools/` is OUTSIDE the gate digest — `check.py` globs
+   `harness/*.py` NON-RECURSIVELY, ✅ manager-verified across 26/26 records — so
+   tooling placed there costs no sweep, ever.** ⚠⚠ **The price, and it must stay
+   written down: NOTHING under `harness/tools/` may be imported by `check.py`,
+   `measure.py` or `build.py`, or it silently leaves the digest.**
 
    - **A binary you cannot regenerate from a file in the tree is a defect, not
      an asset.** If a probe's inputs came from an ad-hoc shell command, write the
