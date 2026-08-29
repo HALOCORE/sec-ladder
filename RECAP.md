@@ -3136,11 +3136,45 @@ the number.** Two task files have already sent an agent to the wrong finding.
     mem_call                 present               5.5%        7.2%         5.1%
     ```
 
-    ✅ **`ptr_offset` IS A TOP-3 OPERATOR IN EVERY ONE OF THE 22 PROGRAMS AND
-    ZERO IN ALL 26 KERNELS. NO BUILT KERNEL WALKS MEMORY WITH A POINTER CURSOR;
-    EVERY ONE INDEXES.** ⚠ **Confirmed independently of the classifier: a raw
-    regex for `*p++`, `*++p`, `*(p ±` returns `0` across the 26 kernel bytes and
-    `845` over PHP — ✅ manager-re-run, both numbers exact.**
+    ✅✅ **REVIEWED AT `TASK_131`. THE ZERO SURVIVES; TWO OF THE SENTENCES THE
+    MANAGER WROTE AROUND IT DO NOT.** ⚠⚠⚠ **THIS TABLE IS THE
+    GENERATED-INCLUDED POPULATION (49 898 sites); the report's own tables exclude
+    generated files (46 948). Deltas ≤ 0.6 pp and no ranking moves — but the
+    included population is the one whose measured recall is `0/5`.**
+
+    ⚠⚠⚠ **B1, A BLOCKER AND IT WAS PUBLISHED IN TWO DOCUMENTS: ~~*"`ptr_offset`
+    is a TOP-3 OPERATOR IN EVERY ONE OF THE 22 PROGRAMS"*~~ IS **15 OF 22**.**
+    **Seven put it FOURTH — glpk 0.9%, pexec 0.4%, findutils 1.3%, grep 2.3%,
+    libosip2 2.5%, depregawk 3.7%, sed 5.3%.** ✅ **Manager-recounted from the
+    committed census: 15/22, and robust at 15/22 · 17/25 · 17/25 across
+    generated-in/out × site-floor.** ✅ **THE TRUE STATEMENT IS NEARLY AS STRONG
+    AND IS THE ONE TO QUOTE: *`ptr_offset` OCCURS IN ALL 22 PROGRAMS, RANKS
+    SECOND OR THIRD IN 15, SHARE `0.4%`–`26.1%`, MEDIAN `6.9%` — AND IS ZERO IN
+    ALL 26 KERNELS.***
+
+    ⚠⚠ **B2 — `0 of 255` IS NOT 255 DRAWS AND THE FRAMING OVERSTATED THE
+    EVIDENCE BY ~5000× IN p-VALUE.** **The 255 sites sit in **30 site-carrying
+    functions in 26 files cloned from one template**, so the FUNCTION unit is the
+    honest one — and even it is generous.** ✅ **Size-matched to the ladder's own
+    function-size distribution (the walking fraction rises `6.7% → 27.1%` with
+    length, so this matters):**
+
+    ```
+    cgnu       FUNCTION unit  expected 2.66 walkers   P(zero) = 0.061
+    coreutils  FUNCTION unit  expected 2.81           P(zero) = 0.050
+    php        FUNCTION unit  expected 4.86           P(zero) = 0.0047
+    ```
+
+    ⚠ **Against the corpus carrying the replication weight the honest figure is
+    `p ≈ 0.06` — SUGGESTIVE, NOT DECISIVE. Quote it that way.**
+
+    ⚠ **B4 — the classifier-independent raw regex EXISTS IN NO ARTEFACT.** **The
+    manager's *"`845` over PHP, `0` over the kernels, both numbers exact"* cannot
+    be re-derived: the reviewer's reconstruction gives **854 / 0**, and ⚠⚠ **its
+    FIRST attempt, without a unary guard, returned `ladder = 2` — INDEPENDENTLY
+    RE-DERIVING THE MANAGER'S OWN KNOWN-DEFECTIVE PROBE, which matched `8 * (n +
+    m)` in `p46`.** **The zero is confirmed by three independent instruments; the
+    `845` is not reproducible and must ship as a script or not be quoted.**
 
     ⚠ **`str_call` at 1 of 255 is a DISCLOSED DESIGN CHOICE whose coverage
     consequence had not been measured: `p12` and `p13` call no `str*` function
@@ -3167,6 +3201,28 @@ the number.** Two task files have already sent an agent to the wrong finding.
     had done** — and it is the *disagreement* outcome the task named as the
     stronger one, arriving in a partial form nobody predicted.
 
+    ✅ **REVIEWED (`TASK_131`), AND THE REPLICATION ARM CAME OUT STRONGER THAN
+    THE ENGINEER ARGUED ON ONE AXIS AND WEAKER ON ANOTHER:**
+
+    - ✅ **B8 — PHP IS *INSIDE* THE GNU SPREAD ON ALL 15 HEADLINE FIELDS**, ranks
+      4th–15th of 22, `|z| ≤ 0.72`, never an extreme. ⚠ **The manager's worry
+      that *"21 of 22 are GNU packages in one house style and PHP is the lone
+      outsider"* does not bite: the informative statistic is the RANK, not the
+      range, because two of any 21 are outside by construction.** ⚠ **And the
+      report's own §E caveat *"PHP's 23% `str_call` share is the highest of the
+      22"* is FALSE — it is 8th, behind units 56.5, libosip2 44.9, wget 32.7,
+      make 31.2 — and it contradicts the report's own §C table.**
+    - ⚠⚠ **B7 — CONTENT-HASH DEDUP DOES *NOT* REMOVE GNULIB, and the engineer's
+      dedup defence is refuted: 1223 repeated-basename pairs survive, 197 are
+      ≥99% line-identical and 611 ≥90%; `150 451 of 861 940` non-blank lines —
+      **17.5%** — are redundant.** ✅ **Arm that must fire, a greedy re-dedup at
+      0.90 dropping 657 files and 15.6% of lines: the OPERATOR headline HOLDS
+      (`index` tops 20 of 21) but the BOUND-SOURCE headline WEAKENS — `const`
+      tops `19/22 → 16/21`, second place goes from four categories to SIX, and
+      the `const` spread widens `42.0 → 50.2` points.** ⚠⚠ **Which makes the
+      engineer's own conclusion STRONGER: *the distribution is a property of the
+      program* survives its own strongest attack.**
+
     ⚠⚠ **THE FIELD THE ENGINEER DECLARED UNUSABLE RATHER THAN PUBLISHING, WHICH
     IS THE BEHAVIOUR TO COPY:** 60 hand-classified sites give **operator
     `60/60`**, **bound source `54/60`**, **check `45/60` — and `check`'s
@@ -3184,29 +3240,66 @@ the number.** Two task files have already sent an agent to the wrong finding.
     are leaf kernels taking `(buf, len)` from a shared driver. That is a HARNESS
     ARTEFACT, not a mechanism gap.** ⚠⚠ **A weaker engineer ships that number.**
 
-    ⚠⚠⚠ **AND THE MANAGER'S OWN OBJECTION, RAISED IMMEDIATELY AND NOT YET
-    SETTLED — IT IS THE SAME ARTEFACT ARGUMENT POINTED AT THE HEADLINE:**
-    ✅ **manager-verified, every C rung has the signature
-    `kernel(const T *v, size_t off, size_t len)` — the driver hands a POINTER, an
-    OFFSET AND AN EXPLICIT LENGTH.** ⚠⚠ **A kernel given an explicit length has
-    little reason to walk with a cursor. SO IF `param 51.4%` IS A HARNESS
-    ARTEFACT, WHY IS `ptr_offset 0` NOT ONE? The engineer applied that test to
-    one number and not to the other, and the manager landed the finding before
-    noticing.** ⚠ **It is NOT obviously fatal — `const T *p = v + off; while (p <
-    v + off + len) *p++;` is perfectly natural C under that same signature, and
-    plenty of real C with an explicit length still walks.**
+    ⚠⚠⚠ **THE MANAGER'S OBJECTION — *"if `param 51.4%` is a harness artefact,
+    why is `ptr_offset 0` not one?"* — IS SETTLED AND DISMISSED, MEASURED, AND
+    THE MEASUREMENT RUNS THE OTHER WAY.** **The objection's premise was *a kernel
+    handed an explicit length has little reason to walk*, which predicts a large
+    depression among functions taking a pointer AND a length. ✅ `TASK_131`
+    bucketed every corpus site by its enclosing function's signature shape:**
 
-    ⚠⚠ **AND THERE IS A THIRD READING WHICH WOULD BE THE MOST INTERESTING OF THE
-    THREE AND WHICH NOBODY HAS TESTED: that the zero is forced by THE LADDER'S
-    OWN COMPARABILITY REQUIREMENT. Safe Rust cannot express a raw pointer cursor
-    AT ALL, so a pattern whose C rung walked would have no R2 — and the `identity`
-    pin plus the per-pattern `required` idiom would then be pinning every C rung
-    to an INDEXED spelling to keep the rungs comparable.** ⚠⚠⚠ **IF THAT IS THE
-    MECHANISM, THE FINDING IS NOT *"the corpus has a gap"* BUT *"THE FIVE-RUNG
-    LADDER STRUCTURALLY CANNOT HOST C's SECOND-MOST-COMMON MEMORY OPERATOR,
-    BECAUSE RUNG 2 CANNOT EXPRESS IT"* — which is a statement about the
-    INSTRUMENT and is a far better result than a coverage gap.** ⚠ **All three
-    readings are live. `TASK_131` decides.**
+    ```
+    fraction of site-carrying FUNCTIONS that walk:   ALL   PTR+LEN  LADDER-shape
+      cgnu                                           9.8%    9.2%      8.7%    flat
+      php                                           15.6%   22.4%     18.2%    HIGHER
+      coreutils                                     10.8%    9.1%      4.5%
+      the built tree                                  0/30    0/28      0/7
+    ```
+
+    ⚠ **`PTR+LEN` walks at the SAME rate or a HIGHER one. The rates would have to
+    fall to ≈0 for the objection to hold and they are 3–18%.** ✅ **So the zero is
+    NOT an artefact of the kernel signature, and neither published document
+    needed retracting on that ground.**
+
+    ⚠⚠ **BUT ONE MANAGER PREMISE INSIDE THE OBJECTION WAS WRONG IN DETAIL AND WAS
+    MARKED ✅ IN TWO PLACES — THE ✅ IS STRUCK: ~~*"every C rung has the
+    signature `kernel(const T *v, size_t off, size_t len)`"*~~. **21 OF 26 TAKE
+    FOUR PARAMETERS** (`buf, buf_len, off, len`); only `p01`/`p19`/`p42`/`p46`
+    are three-param and `p02` is five.** ⚠ **Manager-re-verified. The manager
+    sampled six patterns, three of the six happened to be three-param, and for
+    the other three the grep PRINTED NOTHING AND THE BLANK WAS READ AS
+    AGREEMENT — the failure class this project names most often, committed inside
+    the check that was supposed to catch a finding.**
+
+    ⚠⚠⚠ **AND THE THIRD READING — THE MANAGER'S OWN, THE ONE IT CALLED *"the
+    most interesting of the three"* — IS DEAD. ~~*"the zero is forced by the
+    ladder's comparability requirement: safe Rust cannot express a pointer
+    cursor, so the `identity` pin plus each pattern's `required` idiom pins every
+    C rung to an indexed spelling."*~~ ✅ NOTHING FORCES IT. THE RUNGS SIMPLY WERE
+    NOT WRITTEN THAT WAY. Four independent grounds, three of them one `grep`
+    each:**
+
+    1. ⚠⚠ **THE PREMISE IS HALF FALSE — NO `identity` PIN TOUCHES THE C RUNG AT
+       ALL.** ✅ **Manager-recounted from all 26 records: the pins are
+       `unsafe vs verus` (52) and `safe_naive vs safe_naive_verus` (2). C is not
+       in any of them.**
+    2. **`.memory/01-ladder.md` requires rungs to be *"semantically equivalent on
+       well-formed input (same checksum)"* and R1 to be *"idiomatic C99"* —
+       comparability is SEMANTIC, NOT SYNTACTIC. A walking R1 leaves R2
+       untouched.**
+    3. **`forbidden` is the only idiom key with a gate verdict, and NOT ONE
+       `forbidden` ENTRY IN 26 PATTERNS EXCLUDES A C POINTER CURSOR.**
+    4. ✅ **The decisive experiment: a pointer-cursor respelling of `p11` — the
+       walkiest pattern — checksum-equivalent over 2000 windows with a
+       must-differ arm that fires, scored through imported
+       `check.py::spelling_matches`: 5 `required` broken, 0 `forbidden`
+       violated; for `p01`, 0 and 0. The five are the C HALF of per-language
+       entries whose Rust half already differs, and twelve patterns already use
+       that `{"c":…,"rust":…}` mechanism.**
+
+    ⚠ **OPEN, and the one genuinely structural constraint the review found — it
+    runs through R5, NOT R2: several patterns pin subtraction-first C guards
+    because *"the additive form overflows `usize` and Verus rejects it"*. That
+    constrains ARITHMETIC FORM, not cursor type. Nobody has pushed on it.**
 
     ⚠⚠⚠ **WHAT THIS DOES AND DOES NOT LICENSE. IT IS A MEASURED COVERAGE GAP AND
     IT IS THE FIRST FREQUENCY EVIDENCE THIS PROJECT HAS EVER HAD — AND IT IS NOT
@@ -3246,11 +3339,48 @@ the number.** Two task files have already sent an agent to the wrong finding.
     checking WHAT the probe had matched rather than trusting the count.**
     ⚠ **A one-line verification grep is an instrument and gets no exemption.**
 
-    Evidence: `.tasks/TASK_129_REPORT.md`, `.temp/t129/` (`REBUILD.sh`
-    regenerates everything in ~1 min; three sha256 manifests keep the corpora
-    checkable after another project deletes its `.temp/`). ⚠ **The manifests are
-    956 K in gitignored scratch and PROMOTING THEM IS OWED — a census whose
-    corpus cannot be re-identified is a census nobody can check.**
+    ✅ **CLEAN NEGATIVES THE REVIEW LOOKED FOR AND DID NOT FIND** — the detector
+    is alive (a PLANTED walking kernel carrying `p01`'s exact signature,
+    checksum-equivalent over 4096 random windows with its must-differ arm firing,
+    is labelled `ptr_offset` by BOTH instruments); ✅ **`REBUILD.sh` reproduces
+    every artefact BYTE-IDENTICALLY** (three corpus JSONs, `agree.txt`,
+    `perprog.txt`, `hand_labels.tsv`, the manifests, coverage
+    `78.274 / 83.164 / 81.999 %`); ✅ **`check` was GENUINELY withheld** — it
+    appears only as its own error rate and in `rank.txt` marked *"NOT limb 3"*,
+    and `perprog.py` never reads it; ✅ **the generated-file exclusion is ONE
+    code path over all four populations**, not an arm-specific bias (coreutils
+    simply has zero generated files); ✅ **function size is not a hidden
+    confound**; ✅ **no `forbidden` entry anywhere excludes C pointer
+    arithmetic.**
+
+    ⚠ **B10 — BOTH READINGS OF THE HAND-LABEL SCORE RECOMPUTED, AND THE
+    ENGINEER'S SELF-CRITICISM WAS ONE POINT TOO HARSH: adjudicating all six
+    disagreements against the classifier's OWN rule, five are definitional and
+    ONE IS A GENUINE RULE VIOLATION. So SEMANTIC `54/60 = 90.0%` and SYNTACTIC
+    `59/60 = 98.3%` — not `60/60`.** ✅ **Publish the SEMANTIC number: it bounds
+    the ranking, which is what the census is for.**
+
+    ⚠ **B9 — a FIFTH, UNDISCLOSED instrument defect with a MEASURED NULL EFFECT:
+    `scan_locals` scans a declaration's INITIALISER, so `int errind =
+    ap_php_optind;` registers a file-scope GLOBAL as a LOCAL. With the
+    initialiser skipped, 19 of 7697 sites move (`0.25%`, `local −14 / global
+    +13`) and NO RANKING MOVES.**
+
+    ⚠⚠ **B3 — AND THE ONE ARM THAT DOES NOT REPRODUCE IS THE ONE THAT LICENSES
+    *"the pipeline is not lossy by construction"*: re-running the engineer's own
+    `crosscheck.py` against its own byte-identical inputs differs in 18 OF 27
+    CELLS (php `strlen` 586→633, cgnu `sprintf` 646→561), and *"coreutils is 0 on
+    eight of nine"* is FIVE of nine — two of them trivial `0`-vs-`0`, so **3 of 7
+    non-trivial**. ✅ **Cause identified from mtimes: the table was captured
+    BEFORE the last instrument fix.** ⚠ **Report-only — it is in no published
+    document — but it is a new control shape and it is landed in
+    `.memory/03-measurement.md` as entry 10.**
+
+    Evidence: `.tasks/TASK_129_REPORT.md`, `.tasks/TASK_131_REPORT.md`,
+    `.temp/t129/` and `.temp/t131/` (`REBUILD.sh` in each). ⚠ **The three sha256
+    manifests are 956 K in gitignored scratch and PROMOTING THEM IS OWED — a
+    census whose corpus cannot be re-identified is a census nobody can check.**
+    ⚠ **So is B4's raw-regex script, which currently exists nowhere.**
 
 46. ⚠⚠⚠ **A CHECK WHOSE OWN OUTPUT IS AN INPUT TO THE ARTEFACT IT CHECKS — A
     NEW FAILURE SHAPE, AND IT PASSES THE MUST-NOT-FIRE ARM AND STILL OSCILLATES

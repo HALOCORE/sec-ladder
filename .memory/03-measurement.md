@@ -2790,12 +2790,32 @@ already been struck.** Keep the list, not the ordinal.
    `1 : 1`, and NEGATIVE at the kernel convention. A column whose ratio is near
    1 is not measuring the mechanism.**
 
+10. ⚠⚠ **A CONTROL WHOSE PUBLISHED NUMBERS ARE NOT THE ONES ITS OWN COMMITTED
+    SCRIPT AND INPUTS PRODUCE. `TASK_131` on `TASK_129`'s `crosscheck.py`.**
+    ⚠ **Distinct from entries 1–7 (*could not have fired*) and from entry 9
+    (*fired, and pointed the other way*): this one fired, was read correctly, and
+    its TABLE was captured from an EARLIER version of the instrument.**
+    **Re-running the script against its own byte-identical inputs differs in
+    **18 of 27 cells** (`strlen` 586→633, `sprintf` 646→561), and the sentence
+    it licensed — *"coreutils is 0 on eight of nine, so the pipeline is not
+    lossy by construction"* — is **five of nine, of which two are trivial
+    `0`-vs-`0` rows, i.e. 3 of 7 non-trivial.** ✅ **Diagnosed from mtimes
+    alone: the table predates the last instrument fix by three minutes.**
+    ⚠⚠⚠ **THE QUESTION IT ADDS: *were these numbers produced by the code that is
+    committed, or by an earlier one?*** ✅ **The cheap defence, and it worked in
+    the same task: EVERY OTHER ARM THAT WAS WRITTEN TO A FILE REPRODUCED
+    BYTE-EXACTLY. The one that lived only in a terminal did not.** ⚠ **So:
+    a number quoted from a terminal is undated. Write arms to files and
+    regenerate them from a `REBUILD.sh` at the end.**
+
 **The reflex, and it is one question:** ⚠⚠ **before believing a check, ask what
 would make it FAIL — and then make that happen.** Every entry above passes that
 question and none of them survived it. **A control with no demonstrated failing
 arm is not evidence.** ⚠ **Entry 9 adds a second question for any arm you build
 to EXPLAIN a movement: *would this same arm show the column moving WITHOUT the
-mechanism?***
+mechanism?*** ⚠ **Entry 10 adds a third, and it is the cheapest of the three:
+*were these numbers produced by the code that is committed?* — answered by
+regenerating every arm from a `REBUILD.sh` before you write the report.**
 
 ⚠ **Entries 5, 6 and 7 all landed within three tasks of each other**, which says
 the reflex is not yet habitual. ✅ **The counter-example worth copying is

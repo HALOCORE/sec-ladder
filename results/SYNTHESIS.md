@@ -1138,13 +1138,31 @@ measured reason rather than for want of an instrument.**
 
 ⚠⚠⚠ **AND THE CENSUS FOUND A COVERAGE GAP IN THIS PROJECT'S OWN CORPUS, STATED
 AS COVERAGE AND NOT AS QUALITY: `ptr_offset` — a pointer cursor walking memory —
-is `0` of the built tree's 255 bound sites, against 5.7–8.8 % of the corpora and
-a TOP-3 OPERATOR IN EVERY ONE OF THE 22 PROGRAMS.** **Every built kernel indexes;
-none walks.** ⚠ **Confirmed independently of the classifier by a raw regex: `0`
-across all 26 kernels, `845` over PHP.** ⚠⚠ **This is not a proposal. Safe Rust's
-answer to a pointer walk is an ITERATOR — a different representation, not "R4
-plus a check" — which is the trap that killed CVE-2021-23017 when `Vec::push`
-deleted the bound rather than checking it.**
+is `0` of the built tree's 255 bound sites. It occurs in all 22 programs, ranks
+second or third in 15 of them, and its share runs 0.4 %–26.1 % with a median of
+6.9 %.** **Every built kernel indexes; none walks.** ⚠ **Confirmed by three
+independent instruments, including a classifier-free regex that returns `0`
+across all 26 kernels.**
+
+⚠⚠ **TWO CAVEATS THAT BELONG WITH THE NUMBER, both from the review (TASK_131).**
+*(1)* **`0 of 255` is not 255 independent draws: the sites sit in 30
+site-carrying functions across 26 files cloned from one template. Size-matched
+to the ladder's own function-size distribution, the honest figure at the function
+unit is `p ≈ 0.06` against the largest corpus — suggestive, not decisive.**
+*(2)* ⚠ **An earlier draft of this paragraph said `ptr_offset` was a top-3
+operator in *every* one of the 22 programs. It is 15 of 22; seven put it fourth.**
+
+✅ **The obvious deflationary explanation was tested and refuted: this is not an
+artefact of the harness handing every kernel an explicit length. In real C,
+functions that receive a pointer *and* a length walk with a cursor at the same
+rate as those that do not (9.2 % vs 9.8 %) or a higher rate (22.4 % vs 15.6 %).**
+✅ **And nothing in the ladder forbids a walking C rung: no `identity` pin
+involves the C rung, rung equivalence is defined semantically, no `forbidden`
+entry in 26 patterns excludes a pointer cursor, and a checksum-equivalent
+pointer-cursor respelling of `p11` violates none of them.** ⚠⚠ **This is still
+not a proposal. Safe Rust's answer to a pointer walk is an ITERATOR — a different
+representation, not "R4 plus a check" — which is the trap that killed
+CVE-2021-23017 when `Vec::push` deleted the bound rather than checking it.**
 
 ⚠ **One field was measured and WITHHELD rather than published: *where the bound
 is checked* scored 45/60 against hand labels, with its `earlier` label right 3 of
