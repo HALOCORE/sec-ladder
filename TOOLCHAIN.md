@@ -276,6 +276,41 @@ a clean rebuild reproduces all six kernels bit-exactly under **both** digest
 conventions (`md5_raw`, objdump grouping; `md5_fn`, the `nm --print-size`
 extent). `harness/check.py` builds it automatically and fails if it cannot.
 
+## The `.temp/` citation check
+
+`CLAUDE.md` rule 1 puts every agent's evidence under gitignored `.temp/`, and
+`.memory/00-environment.md` constraint 6 then deletes the re-derivable half of
+it. Both are deliberate. The gap they leave is that a committed file can name a
+`.temp/` path and **nothing notices when that path goes away** — the loss needs
+an `rm`, not a clone.
+
+```bash
+python3 harness/tools/temp_citations.py            # exit 1 on a NEW dangling citation
+python3 harness/tools/temp_citations.py --list     # the classified baseline, with its notes
+python3 harness/tools/temp_citations.py --census   # what a strict "promote" rule would cost
+python3 harness/tools/temp_citations.py --update   # re-skeleton the baseline after a fix
+```
+
+Run it before a commit that adds or moves prose. ⚠ **It is a THIS-BOX check**:
+`.temp/` is gitignored, so in a fresh clone every citation dangles and the output
+means nothing. And it is blind to the failure that motivated it — a probe source
+that is still on disk but has been *edited* since the number was taken resolves
+fine (TASK_122's `Ir` drift). Existence is the cheap half; the expensive half
+needs a content pin, which is what promoting a file into the tree buys for free.
+
+⚠ **It lives in `harness/tools/`, not `harness/`, on purpose.** `check.py`'s gate
+digest globs `harness/*.py` — non-recursively — into every pattern's
+`source_sha256`, so a file in `harness/` costs a **26-pattern gate sweep** every
+time it is edited, and this tool decides no pattern's verdict. Nothing under
+`harness/tools/` may be imported by `check.py`, `measure.py` or `build.py`; if it
+were, the digest would silently stop covering a file that does decide one.
+
+The policy (TASK_121 §B, implemented at TASK_125): **promote, don't publish** —
+if a reader is meant to be able to check a `.temp/` artefact, promote it into the
+tree (`patterns/pNN/controls/` for a pattern probe, `common/` for cross-pattern
+data); otherwise make the citation say what rebuilds it. `.tasks/*_REPORT.md` is
+exempt, because a report is a dated record of what was true when it was written.
+
 ## Verus conventions
 
 - Files start with `use vstd::prelude::*;` and wrap verified code in `verus! { ... }`.
