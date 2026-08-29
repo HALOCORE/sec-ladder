@@ -2424,6 +2424,18 @@ on: **`synthesize.py::marginal` DEFAULTS to `O3/isolated` BECAUSE of that rule.*
   artefact** (it moves if you clone elsewhere), so the pair is a **biased draw of
   size one**"*, and p06's own floor is **±4.6%**. **This is the KNOWN layout
   population reaching the one class that was declared immune to it.**
+  ⚠⚠⚠ **AND `±4.6%` IS AN `ns` FLOOR. DO NOT APPLY IT TO AN `Ir` COLUMN — that
+  is a category error and `TASK_130` caught the manager committing it across a
+  100-row census.** `p06/NOTES.md` says verbatim *"Take `±4.6%` as the honest
+  inter-binary floor for **every `ns` figure** in this file"*, and this file says
+  of the same instrument *"a LAYOUT POPULATION IS THE WRONG TOOL … **callgrind is
+  layout-blind**"* — which is why the `Ir` side of that very axis measures
+  `kernel_exclusive 3002.00` **in all nine runs, a measured ZERO**.
+  ✅ **So the honest `Ir` floor on a layout axis is ≈0 (documented ±7 `Ir`, i.e.
+  0.002% of a 310 504-`Ir` row), and a `>4.6%` cut applied to `Ir` discards real
+  movement: on the hardened-twin census 94 of 100 rows move, median 1.77%, and
+  only 35 clear 4.6%.** ⚠ **The `±4.6%` cut IS correct for the wall-clock half —
+  that is the floor's home instrument.**
 - ⚠ **Binaries are byte-reproducible** (`unsafe e7ea55fa488df703`,
   `verus 75a48f319f14e689`, twice), so this is **not** a build nondeterminism.
   The *program* is fixed; the *process image* is not.
@@ -2743,10 +2755,47 @@ already been struck.** Keep the list, not the ordinal.
    VERIFY, because they are the known hole) so that a future encoding which
    rejects them makes the script FAIL rather than silently pass.
 
+9. ⚠⚠⚠ **`TASK_128`'s TWO `_calib` ARMS — AND THIS IS ENTRY 8's SHAPE WITH THE
+   SIGN REVERSED, WHICH IS WORSE. `TASK_130`.** ⚠ **Entry 8 is *a control that
+   fired and whose firing did not support its printed sentence.* These two
+   fired, supported the OPPOSITE of the sentence they were printed under, and
+   were FILED AS CALIBRATION.**
+
+   - **Limb 2: `_calib2.rs` is arm E — bound still the INPUT EXTENT — plus a
+     proved counting function OF THE SAME SHAPE AS THE MECHANISM'S, whose result
+     is DISCARDED. It reads `5 verified`, exactly as the mechanism arm does.**
+   - **Limb 3: `_calibRANGE_bv.rs` is the same trick** — arm RANGE plus one
+     *unrelated* `assert … by (bit_vector)`, also `4 verified`.
+
+   **Both were used to DECOMPOSE a `+2` (*"1 function + 1 loop"*), and read that
+   way they support the finding. Read as SPECIFICITY controls — which is what
+   they structurally are — they refute it.** ⚠⚠ **THE HEADLINE THEY WERE PRINTED
+   UNDER (*"the ladder can price a mechanism on `obligations`"*) IS NOT MERELY
+   UNSUPPORTED BUT INVERTED: at the project's own kernel convention the
+   `obligations` column RANKS THE DEAD-CODE ARM (`5`) ABOVE THE MECHANISM ARM
+   (`4`), while assembly and `Ir` separate them at `+208` bytes and
+   `+329.00 Ir`/call.**
+
+   ⚠⚠⚠ **THE LESSON, AND IT IS NEW: A CALIBRATION ARM AND A SPECIFICITY CONTROL
+   CAN BE THE SAME PROGRAM. Whenever you build an arm to explain HOW MUCH a
+   column moved, ASK WHETHER IT ALSO SHOWS THE COLUMN WOULD MOVE WITHOUT THE
+   MECHANISM — because if it does, that is the stronger reading and it points
+   the other way.** ⚠ **Neither the engineer nor the manager saw the second arm;
+   the manager saw the first only by RE-RUNNING the artefacts instead of reading
+   the report, and even then got the SCOPE wrong** (see `RECAP.md` finding 44).
+
+   ✅ **The operational test that settles this class, and it is cheap: measure a
+   column's SPELLING SPREAD against its PRESENCE GAP. `Ir` came out `8519 : 1`
+   — invariant under re-spelling, moving under presence. `obligations` came out
+   `1 : 1`, and NEGATIVE at the kernel convention. A column whose ratio is near
+   1 is not measuring the mechanism.**
+
 **The reflex, and it is one question:** ⚠⚠ **before believing a check, ask what
 would make it FAIL — and then make that happen.** Every entry above passes that
 question and none of them survived it. **A control with no demonstrated failing
-arm is not evidence.**
+arm is not evidence.** ⚠ **Entry 9 adds a second question for any arm you build
+to EXPLAIN a movement: *would this same arm show the column moving WITHOUT the
+mechanism?***
 
 ⚠ **Entries 5, 6 and 7 all landed within three tasks of each other**, which says
 the reflex is not yet habitual. ✅ **The counter-example worth copying is

@@ -806,6 +806,23 @@ verdict, wrong reason*** — and in this project a refusal's reason is what gets
 reused on the next row, which is why the generalisation mattered more than the
 verdicts did.
 
+⚠⚠ **AND THE SECTION'S TITLE QUESTION NOW HAS A MEASURED ANSWER FOR ONE COLUMN
+NOBODY HAD TESTED — THE PROOF COLUMN, WHICH DOES NOT PRICE MECHANISMS AT ALL.**
+**TASK_128 and TASK_130 held a kernel fixed and changed only where a bound comes
+from. At the kernel boundary a real pattern would draw, the mechanism costs
+`+208` bytes and `+329.00 Ir`/call — while `obligations` reads `5` for a
+DEAD-CODE arm against `4` for the MECHANISM arm.** ⚠ **`obligations` is
+`verified` out of the gate record, i.e. a count of SMT query units — one per
+function body, one per loop — and across the built tree it correlates `0.894`
+with syntactic size and `0.795` with `verus.rs` source lines.** ⚠⚠ **The
+operational test, and it is cheap enough to apply to any column before quoting
+it: a column's SPELLING SPREAD against its PRESENCE GAP. `Ir` measures
+`8519 : 1` — invariant under re-spelling, moving under presence.
+`obligations` measures `1 : 1`.** ✅ **So the proof-burden column is a size proxy
+and must not be read as evidence that a mechanism is or is not present** — which
+synthesize.py's own note half-said already, warning that a seven-line reviewed
+wrapper trades against a zero-line axiom *"at par"*.
+
 This is measured, not argued. The 48-row catalogue was written before the project
 started — ⚠ **with one exception that weakens the "so the refusals are not
 selection bias" argument by exactly one row: `p48` was added mid-project by the

@@ -9,9 +9,9 @@ this box is reference; this box is what to *do*.
 | | |
 |---|---|
 | **Patterns** | **26 exist, all built, all reviewed.** **Committed state: `24 PASS + 2 PASS-WITH-BLOCKED-ROWS`, 0 failures; 26 gate records, 26 published tables, 52 measurement records `0 STALE`.** ⚠ **The two blocked rows are `p01`** (a real 180 s Miri timeout) **and `p42`** (Miri on `large.bin`, declared in advance in its `miri.blocked_reason`) — ⚠⚠ **and `p42`'s blocked-row COUNT may legitimately be 1 or 2 on any given run, because the Miri slowdown is selected by the ENVIRONMENT and not by anything the gate controls (`.memory/00-environment.md`). Do NOT read a second `p42` block as a regression.** ⚠ **Otherwise a blocked Miri row is worth INVESTIGATING, not shrugging at** — the old advice here was itself the defect (TASK_077). ⚠⚠ **DERIVE THESE NUMBERS, DO NOT TRUST THIS ROW: it said *"`p23` is BUILT but NOT YET REVIEWED, `TASK_105` is the next thing to run"* for about fifteen tasks after `p23` was reviewed, corrected AND its corrections re-reviewed.** `ls -d patterns/p*/ | wc -l`; `grep -c '^| p[0-9]' .memory/06-catalogue.md`; and for the gate, read the `verdict` key out of `results/gate/p*.json` rather than re-running a 30-minute sweep. ⚠⚠ **Still PROVISIONAL: `TASK_088`** (`p19`'s re-fitted laws) **and `TASK_092`** (`p46`'s corrections, on which its headline ground stands) — **AND THE DISTINCTION IS LOAD-BEARING: `TASK_113` closed the TASKS as superseded; the FINDINGS that rest on them still carry PROVISIONAL markers** (RECAP's own findings section, in the `p19` and `p46` entries). ***The review debt being CLEAR is TRUE OF TASKS AND FALSE OF FINDINGS.*** ⚠ **This clause used to say *"this row and the `Do this next` row look like they contradict each other"* and quoted that row's wording — which the manager then DELETED in a trim. A cross-row citation rots the moment either row moves; state the distinction, do not point at neighbouring prose.** ⚠ **AND THERE IS A LIVE GAP IN THAT CLOSURE, FOUND WHILE RECONCILING THE TWO ROWS AND NOT YET ATTACKED: `TASK_113`'s stated reason was *"both are corrections-landing tasks for patterns that ALREADY HAD A REVIEW; the reviewed content is the reviewer's"* — but both markers flag NEW RESULTS LANDED IN THE CORRECTIONS TASK, not the reviewer's content.** `TASK_088`'s re-fitted laws and two-cause decomposition are a **re-fit**; `TASK_092` showed **`r4_mutreslice`'s full R5 verifies, `21 verified, 0 errors`**, against a refuted exclusion reason. ⚠ **So the closure reason may not cover what the markers flag. The manager commissioned `TASK_113` and will not clear the gap in its own commissioned review (rule 3) — WHOEVER PICKS THIS UP SHOULD DECIDE IT ON THE EVIDENCE, and *"the markers are right and the closure was too broad"* and *"the markers are stale"* are both live.** **`TASK_113` closed `090`/`091` as superseded.** |
-| **Do this next** | ⚠⚠ **TWO TASKS ARE WRITTEN AND IN FLIGHT: `TASK_127`** (item (c), the tables content-pin — it edits `harness/` and regenerates `results/tables/`, so it OWNS THE TREE) **and `TASK_128`** (item (a), the admission bar's three limbs — read-only, `git show HEAD:` for every `results/` artefact, barred from `check.py`/`build.py`/`measure.py`). ⚠ **THAT IS THE CONCURRENCY RELAXATION BEING USED DELIBERATELY, NOT A LAPSE: `.memory/00-environment.md`'s rule permits it only for work touching neither MEASUREMENT nor GATE JSONs, and `TASK_128` is confined to `.temp/t128/` and its own report.** ⚠⚠ **AND A THIRD, `TASK_129` — THE IDIOM CENSUS THIS PROJECT SPENT TWO TASKS CALLING IMPOSSIBLE. It is the most isolated of the three (reads two OTHER repositories' C trees, writes only `.temp/t129/` and its report).** ⚠ **This row said *"DO NOT START A THIRD"* and the manager then started one — so here is the actual rule instead of the blunt one: THE LIMIT IS TREE COLLISION AND MANAGER ATTENTION, NOT A COUNT. One task may own `harness/`+`results/`; the rest must be read-only and confined to their own `.temp/`. ⚠⚠ A FOURTH would be about attention, not collision, and the manager judges three the ceiling for landing reports carefully.** ⚠ **If all three are still running when you read this, LAND THEM BEFORE WRITING ANYTHING NEW — every falling claim gets manager-re-verified, and that is the step that does not parallelise.** ⚠ **This header said *"THE QUEUE IS NOW ONE ITEM"* while its own body said *"empty"* — PROTOCOL rule 13, in the row that warns about rule 13, for the third time. Trust the body.** ⚠ **The NARRATIVE lives in the findings — do not re-summarise it here; this row hit 11 316 characters carrying SEVEN COMPLETED tasks as if they were pending.** ⚠⚠ **NONE OF THE FOUR IS URGENT AND NONE BLOCKS THE OTHERS — the project is at a COHERENT STOPPING POINT: 26 patterns built/reviewed/found, the catalogue closed, the domain enumerated, the endgame answered. Pick on value, not on order. THE MANAGER'S RANKING, stated so it can be disagreed with: (c) the tables-pinned-on-contract class is the only one that can silently publish a FALSE NUMBER, so it goes first; (b2) is bounded and costed; (a) matters only if somebody proposes a row; the *resolves-to-wrong-content* half is real but unscoped and may not be worth scoping.** ⚠⚠ **OPERATIONAL, NEVER DELETE: `results/SYNTHESIS.md` is HAND-WRITTEN; `results/synthesis.md` (lower case) is GENERATED. Never regenerate over the capitalised one.** **THE QUEUE IS EMPTY — EVERY WRITTEN TASK IS DONE.** ✅ **`TASK_125` LANDED: `harness/tools/temp_citations.py` plus a 66-entry BASELINE-AND-FREEZE; `rc 0 → 1 → 0` on a planted citation, ✅ manager-re-run.** ⚠⚠ **AND IT FOUND A FREE HOME FOR TOOLING, WHICH CHANGES WHAT IS CHEAP IN THIS REPO: `check.py`'s gate digest globs `harness/*.py` NON-RECURSIVELY, so `harness/tools/` IS OUTSIDE IT — ✅ verified, `source_sha256` byte-identical in 26/26 records with zero `harness/tools/` keys. Tooling there costs NO SWEEP, EVER.** ⚠ **Price, keep it written down: nothing under `harness/tools/` may be imported by `check.py`/`measure.py`/`build.py`, or it silently leaves the digest.** ⚠⚠ **THE MANAGER'S FIGURES FOR THE `.temp/` DEBT WERE WRONG TWICE — `.memory/00-environment.md` constraint 6 carries the corrected version (1441 paths / 77 dangling / 43 files, NOT 2454/88/59) AND the corrected REASON: of 66 classified entries only NINE are genuinely LOST, 25 are DESTINATIONS the citing script creates and 15 are REGENERABLE. DO NOT QUOTE THE RAW DANGLING COUNT AS DAMAGE.** ⚠⚠⚠ **AND `TASK_122`'s LOSS WAS NOT A DANGLING CITATION: `.temp/t86/cost.rs` IS ON DISK. It is UNVERSIONED, not absent — so the real failure is A CITATION THAT RESOLVES TO THE WRONG CONTENT, worse than one resolving to nothing, AND THE NEW CHECKER CALLS IT GREEN. That half is unbounded and nobody has scoped it.** **AND THAT IS ALL THAT IS WRITTEN BESIDES THE TWO IN FLIGHT.** ✅ **`TASK_118`–`126` are ALL DONE — NINE task arcs: `p42`'s third encoding (finding 39); the instrument corrections; findings 40 AND 41 both attacked and both DEAD; the CVE enumeration and its refused survivor (42); the Rust-rung theorem (43); the sidecar pin; and the `.temp/` checker.** ⚠⚠ **WHAT IS OPEN AND HAS NO TASK — read the findings before inventing one:** ✅✅ **(a) DONE — `TASK_128`, AND IT INVERTED ITS OWN PREMISE. FINDING 44.** ⚠⚠ **THE OBJECTION THE TASK LED WITH WAS RIGHT: `TASK_124` MEASURED 2 OF 6 PUBLISHED COLUMNS** (its §B2 is headed *"Verus. NOT SPENT, deliberately"*), **so *"every published difference"* — a phrase the manager copied out of THIS ROW into two more files — was wrong by four columns.** ✅ **The instrument was then pointed at the question: kernel byte-identical by construction (243 B, one sha256, both arms), `Ir` `+0.00`, and the PUBLISHED `obligations` column moves `3 → 5`.** ⚠⚠⚠ **BUT THE ENGINEER'S HEADLINE — *"so the ladder CAN price limb 2, on `obligations`"* — DID NOT SURVIVE THE MANAGER'S RE-RUN, AND THE REFUTATION IS THE ENGINEER'S OWN `_calib2` ARM FILED UNDER THE WRONG HEADING: arm E plus an UNRELATED proved counting loop ALSO reads `5`. The column moves with ADDED PROVED CODE, not with the bound's PROVENANCE. READ FINDING 44'S `_calib2` BLOCK BEFORE CITING ANY OF THIS.** ✅ **What survives: LIMB 1 prices on the machine columns about a third of the time (35 of 100 hardened-twin rows above the `±4.6%` floor); LIMBS 2 AND 3 price on nothing anyone has shown to be SPECIFIC to them. Keep all three limbs; stop citing 2 and 3 as if they had a measurement behind them.** ⚠⚠ **AND THE CLEAN NEGATIVE IS THE SHARPER HALF: `p23`, the only row ever admitted under this bar, CLAIMS ALL THREE LIMBS AND EXHIBITS AT MOST ONE — so the bar's problem was never its text.** ✅✅ **(b) DONE — `TASK_126`, and it CORRECTED finding 43 rather than confirming it. THE QUEUE IS EMPTY AGAIN.** ⚠⚠ **THE SECOND READING WAS MIS-STATED, NOT UNTESTED: no input CAN be adversarial to a Rust rung here, because `requires` is a LENGTH bound in 26/26 and NEVER MENTIONS BUFFER CONTENTS (✅ manager-verified), `ensures` is a single TOTAL clause, and the pinned driver makes the window bound a THEOREM. MORE ADVERSARIAL INPUTS IS NOT THE FIX.** **13 449 fresh inputs, 600 rung splits, 0 Rust-rung splits; and NO RUST RUNG HAS EVER PANICKED in 107 592 fuzz runs (the C side: 29 SIGSEGVs, 8 aborts, 2 hangs).** ⚠ **My own guess was half right and the wrong half mattered: `unsafe`==`verus` holds 52/52 but `safe_naive` vs `safe_tuned` DIFFER 52/52 — so the tree has THREE behavioural Rust rungs, not two, and the R2/R3 zero is a MEASUREMENT.** ⚠⚠ **AND THE REAL QUALITY GAP IS NEW AND ELSEWHERE: 36 of 129 adversarial inputs (27.9%) MAKE ZERO KERNEL CALLS, the `adversarial-strideN.bin` template is 0-call in 22 of 26 patterns, and `p42` has 7 zero-call inputs out of 10. THAT is where the inputs are weak, and it has no task.** ⚠⚠ **(b2) NEW AND UNCOSTED UNTIL NOW — THE ZERO-CALL ADVERSARIAL INPUTS. 36 of 129 (27.9%) make NO kernel call at all; the `adversarial-strideN.bin` TEMPLATE is 0-call in 22 of 26 patterns; `p42` is 7-of-10 and `p01` is 6-of-6.** ⚠ **COST, so nobody re-scopes it from the one-liner: the fix is in `inputs/gen.py`, which is MEASUREMENT-HASHED — so it is a RE-MEASURE per pattern touched, not a gate run.** ⚠⚠ **AND WEIGH THE VALUE HONESTLY BEFORE SPENDING THAT: `TASK_126` proved no input can be adversarial to a RUST rung at all, so better inputs can only improve the C-SIDE harm matrix. That is still where all the harm is — 29 SIGSEGVs, 8 aborts, 2 hangs — but the ceiling is lower than it looks.** ✅ **The cheap, targeted version is `p42` and `p01` alone, bundled with the next re-measure either pattern needs for another reason. DO NOT sweep 26 patterns for this.** **(c) TAKEN — `TASK_127`. `TASK_121` found `results/tables/*.md` is pinned on the CONTRACT, not the CONTENT — stage 9 read `FRESH` while a table published a false sentence. THIRD instance of that class.** ✅ **THE FAMILY QUESTION IS ALREADY ANSWERED and `TASK_127` does not re-derive it: `TASK_125` §D split it — claims about CONTENT have ONE common fix (a content pin: `source_sha256`, `contract_sha256`, `derived_from_sha256`, `gate_source_sha256` are all the same mechanism), and this case is *"the known instrument pointed at the WRONG INPUT"*; claims about the OUTSIDE WORLD have none and are always a probe with a must-fire arm.** ⚠⚠ **MANAGER-MEASURED BEFORE WRITING THE TASK, AND IT REFRAMES THE ITEM: THERE IS NO LIVE INSTANCE TODAY — all 26 tables are BYTE-IDENTICAL to a fresh `report.py --stdout` render. So `TASK_127` is FORWARD protection, not a repair, and a forward-only task is one somebody later "confirms" by finding nothing.** ⚠ **The naive comparison reports 26/26 MOVED BY ONE LINE and that is an ARTEFACT of `print(md)` vs `write(md)`, not a finding.** ⚠ **Optional, and now safer than it was because the content has settled: split `SYNTHESIS.md`** (≈1 183 lines) **into argument + evidence appendix — ONLY as a PURE MOVE, `diff`-verified to contain no deletions, because a split IS a compression and compression is where this document's bias entered with no arithmetic signature.** |
+| **Do this next** | ⚠⚠ **TWO TASKS ARE WRITTEN AND IN FLIGHT: `TASK_127`** (item (c), the tables content-pin — it edits `harness/` and regenerates `results/tables/`, so it OWNS THE TREE) **and `TASK_128`** (item (a), the admission bar's three limbs — read-only, `git show HEAD:` for every `results/` artefact, barred from `check.py`/`build.py`/`measure.py`). ⚠ **THAT IS THE CONCURRENCY RELAXATION BEING USED DELIBERATELY, NOT A LAPSE: `.memory/00-environment.md`'s rule permits it only for work touching neither MEASUREMENT nor GATE JSONs, and `TASK_128` is confined to `.temp/t128/` and its own report.** ⚠⚠ **AND A THIRD, `TASK_129` — THE IDIOM CENSUS THIS PROJECT SPENT TWO TASKS CALLING IMPOSSIBLE. It is the most isolated of the three (reads two OTHER repositories' C trees, writes only `.temp/t129/` and its report).** ⚠ **This row said *"DO NOT START A THIRD"* and the manager then started one — so here is the actual rule instead of the blunt one: THE LIMIT IS TREE COLLISION AND MANAGER ATTENTION, NOT A COUNT. One task may own `harness/`+`results/`; the rest must be read-only and confined to their own `.temp/`. ⚠⚠ A FOURTH would be about attention, not collision, and the manager judges three the ceiling for landing reports carefully.** ⚠ **If all three are still running when you read this, LAND THEM BEFORE WRITING ANYTHING NEW — every falling claim gets manager-re-verified, and that is the step that does not parallelise.** ⚠ **This header said *"THE QUEUE IS NOW ONE ITEM"* while its own body said *"empty"* — PROTOCOL rule 13, in the row that warns about rule 13, for the third time. Trust the body.** ⚠ **The NARRATIVE lives in the findings — do not re-summarise it here; this row hit 11 316 characters carrying SEVEN COMPLETED tasks as if they were pending.** ⚠⚠ **NONE OF THE FOUR IS URGENT AND NONE BLOCKS THE OTHERS — the project is at a COHERENT STOPPING POINT: 26 patterns built/reviewed/found, the catalogue closed, the domain enumerated, the endgame answered. Pick on value, not on order. THE MANAGER'S RANKING, stated so it can be disagreed with: (c) the tables-pinned-on-contract class is the only one that can silently publish a FALSE NUMBER, so it goes first; (b2) is bounded and costed; (a) matters only if somebody proposes a row; the *resolves-to-wrong-content* half is real but unscoped and may not be worth scoping.** ⚠⚠ **OPERATIONAL, NEVER DELETE: `results/SYNTHESIS.md` is HAND-WRITTEN; `results/synthesis.md` (lower case) is GENERATED. Never regenerate over the capitalised one.** **THE QUEUE IS EMPTY — EVERY WRITTEN TASK IS DONE.** ✅ **`TASK_125` LANDED: `harness/tools/temp_citations.py` plus a 66-entry BASELINE-AND-FREEZE; `rc 0 → 1 → 0` on a planted citation, ✅ manager-re-run.** ⚠⚠ **AND IT FOUND A FREE HOME FOR TOOLING, WHICH CHANGES WHAT IS CHEAP IN THIS REPO: `check.py`'s gate digest globs `harness/*.py` NON-RECURSIVELY, so `harness/tools/` IS OUTSIDE IT — ✅ verified, `source_sha256` byte-identical in 26/26 records with zero `harness/tools/` keys. Tooling there costs NO SWEEP, EVER.** ⚠ **Price, keep it written down: nothing under `harness/tools/` may be imported by `check.py`/`measure.py`/`build.py`, or it silently leaves the digest.** ⚠⚠ **THE MANAGER'S FIGURES FOR THE `.temp/` DEBT WERE WRONG TWICE — `.memory/00-environment.md` constraint 6 carries the corrected version (1441 paths / 77 dangling / 43 files, NOT 2454/88/59) AND the corrected REASON: of 66 classified entries only NINE are genuinely LOST, 25 are DESTINATIONS the citing script creates and 15 are REGENERABLE. DO NOT QUOTE THE RAW DANGLING COUNT AS DAMAGE.** ⚠⚠⚠ **AND `TASK_122`'s LOSS WAS NOT A DANGLING CITATION: `.temp/t86/cost.rs` IS ON DISK. It is UNVERSIONED, not absent — so the real failure is A CITATION THAT RESOLVES TO THE WRONG CONTENT, worse than one resolving to nothing, AND THE NEW CHECKER CALLS IT GREEN. That half is unbounded and nobody has scoped it.** **AND THAT IS ALL THAT IS WRITTEN BESIDES THE TWO IN FLIGHT.** ✅ **`TASK_118`–`126` are ALL DONE — NINE task arcs: `p42`'s third encoding (finding 39); the instrument corrections; findings 40 AND 41 both attacked and both DEAD; the CVE enumeration and its refused survivor (42); the Rust-rung theorem (43); the sidecar pin; and the `.temp/` checker.** ⚠⚠ **WHAT IS OPEN AND HAS NO TASK — read the findings before inventing one:** ✅✅ **(a) DONE — `TASK_128`, AND IT INVERTED ITS OWN PREMISE. FINDING 44.** ⚠⚠ **THE OBJECTION THE TASK LED WITH WAS RIGHT: `TASK_124` MEASURED 2 OF 6 PUBLISHED COLUMNS** (its §B2 is headed *"Verus. NOT SPENT, deliberately"*), **so *"every published difference"* — a phrase the manager copied out of THIS ROW into two more files — was wrong by four columns.** ✅ **The instrument was then pointed at the question: kernel byte-identical by construction (243 B, one sha256, both arms), `Ir` `+0.00`, and the PUBLISHED `obligations` column moves `3 → 5`.** ⚠⚠⚠ **BUT THE ENGINEER'S HEADLINE — *"so the ladder CAN price limb 2, on `obligations`"* — IS NOT MERELY UNSUPPORTED, IT IS INVERTED. ✅ REVIEWED AND DECIDED AT `TASK_130`: the columns that SEE limb 2 are ASSEMBLY and `Ir`; `obligations` is the one column that CANNOT, and it ranks a dead-code arm (`5`) ABOVE the mechanism arm (`4`).** ⚠ **The manager's own reason for doubting the headline — `_calib2` — was the WEAKEST of the three arguments available and would have LOST on its own; the reviewer's kernel-convention arms, the `8519 : 1` spelling-vs-presence ratio, and this project's own `p23`/`k_u5` and `p46` §8a precedents are what decided it.** ✅ **What survives: LIMB 2 HAS A MEASUREMENT AFTER ALL — at the LEVEL, on assembly and `Ir`. LIMB 1's census is REAL BUT OVERSTATED (see finding 44's M5/M6). LIMB 3 alone still prices on nothing shown specific to it.** ⚠⚠ **AND THE CLEAN NEGATIVE IS TWO-THIRDS RHETORIC: `p23` was scored against a DETECTABILITY test THE BAR DOES NOT STATE — the bar says *brings a new MECHANISM*, a NOVELTY criterion naming no column and no floor. It survives on LIMB 3 ONLY, and the transferable finding is better than the one reported: THE PROJECT READS ITS OWN NOVELTY BAR AS A DETECTABILITY BAR.** ✅✅ **(b) DONE — `TASK_126`, and it CORRECTED finding 43 rather than confirming it. THE QUEUE IS EMPTY AGAIN.** ⚠⚠ **THE SECOND READING WAS MIS-STATED, NOT UNTESTED: no input CAN be adversarial to a Rust rung here, because `requires` is a LENGTH bound in 26/26 and NEVER MENTIONS BUFFER CONTENTS (✅ manager-verified), `ensures` is a single TOTAL clause, and the pinned driver makes the window bound a THEOREM. MORE ADVERSARIAL INPUTS IS NOT THE FIX.** **13 449 fresh inputs, 600 rung splits, 0 Rust-rung splits; and NO RUST RUNG HAS EVER PANICKED in 107 592 fuzz runs (the C side: 29 SIGSEGVs, 8 aborts, 2 hangs).** ⚠ **My own guess was half right and the wrong half mattered: `unsafe`==`verus` holds 52/52 but `safe_naive` vs `safe_tuned` DIFFER 52/52 — so the tree has THREE behavioural Rust rungs, not two, and the R2/R3 zero is a MEASUREMENT.** ⚠⚠ **AND THE REAL QUALITY GAP IS NEW AND ELSEWHERE: 36 of 129 adversarial inputs (27.9%) MAKE ZERO KERNEL CALLS, the `adversarial-strideN.bin` template is 0-call in 22 of 26 patterns, and `p42` has 7 zero-call inputs out of 10. THAT is where the inputs are weak, and it has no task.** ⚠⚠ **(b2) NEW AND UNCOSTED UNTIL NOW — THE ZERO-CALL ADVERSARIAL INPUTS. 36 of 129 (27.9%) make NO kernel call at all; the `adversarial-strideN.bin` TEMPLATE is 0-call in 22 of 26 patterns; `p42` is 7-of-10 and `p01` is 6-of-6.** ⚠ **COST, so nobody re-scopes it from the one-liner: the fix is in `inputs/gen.py`, which is MEASUREMENT-HASHED — so it is a RE-MEASURE per pattern touched, not a gate run.** ⚠⚠ **AND WEIGH THE VALUE HONESTLY BEFORE SPENDING THAT: `TASK_126` proved no input can be adversarial to a RUST rung at all, so better inputs can only improve the C-SIDE harm matrix. That is still where all the harm is — 29 SIGSEGVs, 8 aborts, 2 hangs — but the ceiling is lower than it looks.** ✅ **The cheap, targeted version is `p42` and `p01` alone, bundled with the next re-measure either pattern needs for another reason. DO NOT sweep 26 patterns for this.** **(c) TAKEN — `TASK_127`. `TASK_121` found `results/tables/*.md` is pinned on the CONTRACT, not the CONTENT — stage 9 read `FRESH` while a table published a false sentence. THIRD instance of that class.** ✅ **THE FAMILY QUESTION IS ALREADY ANSWERED and `TASK_127` does not re-derive it: `TASK_125` §D split it — claims about CONTENT have ONE common fix (a content pin: `source_sha256`, `contract_sha256`, `derived_from_sha256`, `gate_source_sha256` are all the same mechanism), and this case is *"the known instrument pointed at the WRONG INPUT"*; claims about the OUTSIDE WORLD have none and are always a probe with a must-fire arm.** ⚠⚠ **MANAGER-MEASURED BEFORE WRITING THE TASK, AND IT REFRAMES THE ITEM: THERE IS NO LIVE INSTANCE TODAY — all 26 tables are BYTE-IDENTICAL to a fresh `report.py --stdout` render. So `TASK_127` is FORWARD protection, not a repair, and a forward-only task is one somebody later "confirms" by finding nothing.** ⚠ **The naive comparison reports 26/26 MOVED BY ONE LINE and that is an ARTEFACT of `print(md)` vs `write(md)`, not a finding.** ⚠ **Optional, and now safer than it was because the content has settled: split `SYNTHESIS.md`** (≈1 183 lines) **into argument + evidence appendix — ONLY as a PURE MOVE, `diff`-verified to contain no deletions, because a split IS a compression and compression is where this document's bias entered with no arithmetic signature.** |
 | **THE CATALOGUE IS CLOSED, AND THIS TIME EVERY ROW HAS A MEASUREMENT** | ⚠⚠ **THIS ROW'S HEADER READ *"THE CATALOGUE IS RE-OPENED, and it was closed on a reason that did not hold"* WHILE ITS OWN BODY ALREADY SAID THE OPPOSITE — PROTOCOL RULE 13, COMMITTED BY THE MANAGER IN THE SAME SESSION THAT CITED RULE 13. Trust the body; fix the header.** ✅ **State: `48 = 26 BUILT + 17 REFUSED + 3 DEFERRED + 2 OTHER`, ZERO unadjudicated rows.** ⚠⚠ **RECOUNT CAREFULLY: `python3 .temp/mgr115/census.py` emits `26 + 22 + 0 = 48` and EXPLICITLY WARNS AGAINST publishing its adjudicated count as REFUSED — so it does NOT reproduce the `17/3/2` split above, which `TASK_120` verified SEPARATELY against the cells' own verbs. Two different questions; do not treat the script as the checker for the split.** ⚠ **Its `--naive` arm reproduces the trap that a keyword classifier reads 10 BUILT against a true 26, because `p24`'s and `p35`'s adjudication prose contains the word "BUILD".** **The two OTHER are `p24`** (probed, live, needs a new reason) **and `p35`** (blocked, not refused); **the deferrals are `p20`/`p21`/`p25`**, and ⚠ **`p25` is the ONE ROW ON WHICH THIS PROJECT HAS RUN NOTHING.** ⚠ **Every per-row reason is in `.memory/06-catalogue.md`'s status cell — READ THE CELL, not this box. The reasons are what get reused on the next row, and `p28` shows a right verdict can carry a wrong reason.** ⚠⚠ **WHY IT IS CLOSED — AND THE ANSWER CHANGED AT `TASK_120`. ~~FINDING 40 (duplication)~~ IS NOT THE REASON: duplication is the PRIMARY stated kill on 6 of 22 rows, 27%, so it is THE LARGEST FAMILY AND NOT A LAW — and the word covers FOUR different relations** (same predicate, strict subset, same conclusion, same detector). ⚠⚠ **AND ITS REPLACEMENT DIED TOO: ~~FINDING 41 (`LADDER`+`COST` kills 7 of 22)~~ FELL AT `TASK_122` — four categories merged into one, and NO CONTROL ARM (8 of 26 BUILT patterns publish a zero on their own headline axis).** ✅ **THE ANSWER IS THAT THERE IS NO SINGLE REASON: the 22 rows die for many individually sound reasons, and the classification is the result. PUBLISH NO GENERALISATION OVER IT.** ⚠⚠ **AND "CLOSED" NO LONGER MEANS "STOP" — BUT THE REASON HAS MOVED AGAIN, SO READ THE ENDGAME ROW AND NOT THIS SENTENCE'S EARLIER VERSION.** ~~*"the enumeration against `../LearnVeri/microbench/`'s 20 worked CVEs has never been run"*~~ ✅ **IT HAS: `TASK_123` ran it, 19 of 20 died, and `TASK_124` REFUSED the survivor. See the endgame row.** |
-| **THE ENDGAME QUESTION — ANSWERED, AND THE ANSWER IS *STOP BUILDING, FOR A REASON NOBODY EXPECTED*. Kept as one row so nobody re-opens it from memory.** | ✅ **Wave 7 DONE** (`results/SYNTHESIS.md`, reviewed `TASK_111`, corrected `TASK_112`). ✅ **The catalogue is fully adjudicated** (row above). ⚠⚠ **THE 47 ROWS ARE PRE-PROJECT — ✅ `git`-verified, not inferred: `git show d5e0ccd:.memory/06-catalogue.md` has 47 rows in the FIRST commit against an empty `patterns/`. So the catalogue running out said little about the domain, and *"the catalogue is spent"* and *"there is nothing left worth building"* WERE DIFFERENT CLAIMS.** ✅✅ **SO THE DOMAIN WAS ENUMERATED AT LAST (`TASK_123`, finding 42): 20 worked CVEs against the reviewed bar, probe 1 first. NINETEEN DIED. The logical seven died MEASURED — strip the incidental index from `CVE-2021-3450` and three rungs are byte-identical at 108 B and `37.00 Ir`/call.** ⚠⚠⚠ **AND THE ONE SURVIVOR WAS THEN REFUSED — `TASK_124`, finding 42. DO NOT GO BUILD `CVE-2021-23017`; THIS ROW ADVERTISED IT AS LIVE FOR ONE TASK TOO LONG AND THAT IS THE `p23` ROT AGAIN.** **Its four-way split was a PROPERTY OF THE PORT: a perturbation contrast moved six of eight arms and left BOTH `Vec::push` arms unchanged, because `Vec::push` DELETES the bound rather than checking it. Its `R4 = Miri UB` was not an admissible R4 at all. Its `+63.00` was `+71.00`.** ⚠⚠ **AND IT DIED A SECOND TIME ON THE BAR ITSELF — BUT THAT KILL IS NOW CORRECTED AND NARROWED BY `TASK_128`, SO READ FINDING 44 BEFORE QUOTING IT.** ~~*"changing ONLY the bound's PROVENANCE moves every published difference by `+0.00`; a new source of the bound is a distinction THIS LADDER CANNOT PRICE"*~~ **overstated its evidence by FOUR COLUMNS: `TASK_124` measured 2 of 6 and its own §B2 is headed *"Verus. NOT SPENT, deliberately."* The true statement is *cannot be priced ON ASSEMBLY OR `Ir`, AND HAS NOT BEEN SHOWN PRICEABLE ON ANYTHING ELSE* — the contrast DOES move the published `obligations` column `3 → 5`, `+2`, which is exactly the `p01`→`p03` gap in a column that runs `7…21` — ⚠⚠ **BUT A CONTROL ARM WITH THE SAME ADDED PROVED CODE AND NO CHANGE OF PROVENANCE MOVES IT IDENTICALLY, so that column is seeing CODE, not PROVENANCE. Manager-found by re-running the engineer's own `_calib2`.** ⚠ **THE ROW STAYS REFUSED on its other independent grounds; finding 44 does NOT re-open it.** ⚠⚠ **THE OTHER HALF OF THE ANSWER, AND IT IS A LIMITATION OF THE SETTING: a CVE corpus answers *which mechanisms are missing* and CANNOT answer *which idioms matter* — 8 of 20 are pure decision bugs, a distribution no idiom census would produce, because CVEs select for EXPLOITABILITY not FREQUENCY. THAT HALF STANDS.** ⚠⚠⚠ **WHAT FOLLOWED IT HERE IS STRUCK, AND IT WAS THE MANAGER'S:** ~~*"AND THE IDIOM CENSUS CANNOT BE RUN HERE: there is no independent C corpus on this box"*~~ **and its consequence** ~~*"so the admission bar stays MECHANISM-based because the frequency-based alternative HAS NO INSTRUMENT — the honest reason this project's generality claims stop where they do"*~~. **The defect was a `-maxdepth 6` in the manager's own one-liner. Drop it and there is UPSTREAM PHP 4.0.2 whole, plus GNU coreutils, both on this box — with real density on this project's own axes, `goto` and `strcat` and `memcpy` included.** ✅ **So the census is RUNNABLE AND UNRUN, which is weaker and truer than *unanswerable*.** ⚠ **Figures, corpus paths, the two caveats and the rule-9 boundary are in finding 42's coda — READ IT THERE, and note `SYNTHESIS.md` §7 published the struck sentence and is corrected.** ⚠ **DO NOT print counts in this row.** It once carried *"1008 lines"*, *"39 findings"* and *"p26/p37 are the two live rows"* after all three had moved. **Derive them; the commands are in the `Patterns` row.** |
+| **THE ENDGAME QUESTION — ANSWERED, AND THE ANSWER IS *STOP BUILDING, FOR A REASON NOBODY EXPECTED*. Kept as one row so nobody re-opens it from memory.** | ✅ **Wave 7 DONE** (`results/SYNTHESIS.md`, reviewed `TASK_111`, corrected `TASK_112`). ✅ **The catalogue is fully adjudicated** (row above). ⚠⚠ **THE 47 ROWS ARE PRE-PROJECT — ✅ `git`-verified, not inferred: `git show d5e0ccd:.memory/06-catalogue.md` has 47 rows in the FIRST commit against an empty `patterns/`. So the catalogue running out said little about the domain, and *"the catalogue is spent"* and *"there is nothing left worth building"* WERE DIFFERENT CLAIMS.** ✅✅ **SO THE DOMAIN WAS ENUMERATED AT LAST (`TASK_123`, finding 42): 20 worked CVEs against the reviewed bar, probe 1 first. NINETEEN DIED. The logical seven died MEASURED — strip the incidental index from `CVE-2021-3450` and three rungs are byte-identical at 108 B and `37.00 Ir`/call.** ⚠⚠⚠ **AND THE ONE SURVIVOR WAS THEN REFUSED — `TASK_124`, finding 42. DO NOT GO BUILD `CVE-2021-23017`; THIS ROW ADVERTISED IT AS LIVE FOR ONE TASK TOO LONG AND THAT IS THE `p23` ROT AGAIN.** **Its four-way split was a PROPERTY OF THE PORT: a perturbation contrast moved six of eight arms and left BOTH `Vec::push` arms unchanged, because `Vec::push` DELETES the bound rather than checking it. Its `R4 = Miri UB` was not an admissible R4 at all. Its `+63.00` was `+71.00`.** ⚠⚠ **AND IT DIED A SECOND TIME ON THE BAR ITSELF — BUT THAT KILL IS NOW CORRECTED AND NARROWED BY `TASK_128`, SO READ FINDING 44 BEFORE QUOTING IT.** ~~*"changing ONLY the bound's PROVENANCE moves every published difference by `+0.00`; a new source of the bound is a distinction THIS LADDER CANNOT PRICE"*~~ **overstated its evidence by FOUR COLUMNS: `TASK_124` measured 2 of 6 and its own §B2 is headed *"Verus. NOT SPENT, deliberately."* ⚠⚠⚠ **AND THE MANAGER'S FIRST REPLACEMENT SENTENCE WAS ALSO WRONG — *"cannot be priced ON ASSEMBLY OR `Ir`"* IS FALSE, CAUGHT BY `TASK_130`. SECOND TIME IN THIS THREAD A STRIKETHROUGH REPLACED ONE OVERSTATEMENT WITH A STRONGER ONE.** ✅ **THE TRUE SCOPE, and the evidence was PRINTED IN `TASK_124`'s OWN TABLE: no published rung-to-rung DIFFERENCE moves, because the sizing pass is a term COMMON TO BOTH ARMS — but every LEVEL moves, `−63.00 Ir`/call in all SEVEN of its own cells. And when both passes sit inside the kernel symbol, as a real pattern's would, the mechanism costs `+329.00 Ir`/call and `+208` kernel bytes** (`121.00 → 450.00`, `199 B → 407 B`; ✅ manager-re-run). ⚠⚠ **SO ASSEMBLY AND `Ir` DO SEE LIMB 2. What does NOT see it is `obligations`: a DEAD-CODE arm reads `5` against the MECHANISM arm's `4`, i.e. the proof column RANKS DEAD CODE ABOVE THE MECHANISM.** ⚠ **THE ROW STAYS REFUSED on its other independent grounds; finding 44 does NOT re-open it.** ⚠⚠ **THE OTHER HALF OF THE ANSWER, AND IT IS A LIMITATION OF THE SETTING: a CVE corpus answers *which mechanisms are missing* and CANNOT answer *which idioms matter* — 8 of 20 are pure decision bugs, a distribution no idiom census would produce, because CVEs select for EXPLOITABILITY not FREQUENCY. THAT HALF STANDS.** ⚠⚠⚠ **WHAT FOLLOWED IT HERE IS STRUCK, AND IT WAS THE MANAGER'S:** ~~*"AND THE IDIOM CENSUS CANNOT BE RUN HERE: there is no independent C corpus on this box"*~~ **and its consequence** ~~*"so the admission bar stays MECHANISM-based because the frequency-based alternative HAS NO INSTRUMENT — the honest reason this project's generality claims stop where they do"*~~. **The defect was a `-maxdepth 6` in the manager's own one-liner. Drop it and there is UPSTREAM PHP 4.0.2 whole, plus GNU coreutils, both on this box — with real density on this project's own axes, `goto` and `strcat` and `memcpy` included.** ✅ **So the census is RUNNABLE AND UNRUN, which is weaker and truer than *unanswerable*.** ⚠ **Figures, corpus paths, the two caveats and the rule-9 boundary are in finding 42's coda — READ IT THERE, and note `SYNTHESIS.md` §7 published the struck sentence and is corrected.** ⚠ **DO NOT print counts in this row.** It once carried *"1008 lines"*, *"39 findings"* and *"p26/p37 are the two live rows"* after all three had moved. **Derive them; the commands are in the `Patterns` row.** |
 | **⚠⚠ The manager generalisation that was REFUTED, and it is the most useful thing here** | I read `TASK_093`'s `p28` refusal as a **family** result — *"safe Rust's answer to every pointer-backed structure is either an arena that never frees or `p27`'s mechanism, so `p29`–`p34` are ONE finding, not five."* **I wrote it into two task files by name and asked to be corrected. Both agents corrected me.** ✅ **The reviewed replacement is now in `.memory/01-ladder.md` and it is a RULE, not a refusal:** *"safe Rust's temporal guarantee is a guarantee about the **ALLOCATOR**; a structure that **recycles its own storage** gets no guarantee at all."* **There are FOUR outcomes, not two** — and outcome 3 is that **the type system is SILENT** (use-after-recycle *and* slot double-free both writable under `#![forbid(unsafe_code)]`, silently wrong, **Miri-clean**, ✅ manager-re-run), which is `p04`'s finding and kills `p32`/`p33`. ⚠ **A generation tag does NOT rescue it**, so **this file's own p14-cycle `(slot, gen)` proposal yields a `p04`-shaped row, not a temporal one.** Outcome 4 is `p34`: **the safe rung is WORSE than C** (`Rc` cycle leaks, `Weak` does not). And `p29` is the fifth and only good outcome. ⚠⚠ **AND `TASK_093`'s OWN STATED REASON WAS REJECTED BY ITS REVIEW** — *"safe Rust has no owned intrusive DLL (`E0382` + `E0499`)"* is **false**: the `E0382` was a plain double move (reproduced with a control containing no data structure at all), `E0499` is refuted by **four compiling spellings** under `forbid(unsafe_code)` including `split_at_mut` with two `&mut` alive simultaneously, and **the claim was self-contradicted by its own table two rows below it.** **Right verdict, wrong reason — `p31`'s failure mode, and rule 9 is the only thing that kept it out of `.memory/`.** ⚠ **A refusal's REASON is what gets reused on the next row. It needs the same scrutiny as a finding.** |
 | **Selection is OVER — and the three box rows that used to live here are now history, moved below** | ⚠⚠ **The catalogue is closed (row above), so `p15`'s refusal, the `Pattern selection` probes and the `PROBE IN BATCHES` scheduling rule are no longer the next action.** They are preserved: **`p15`** in `.memory/06-catalogue.md`'s refusal block — ⚠ **and its NAMED UNBLOCKING CONDITION IS NOW DEAD**, because that condition was *"the day `_scan_unsafe_sites` admits a Verus-discharged `unsafe`"* and **the manager decided at TASK_096_REVIEW that the rule STAYS** (`.memory/02-bench-rules.md`); ✅ **its reusable artefact survives regardless** — a verified UTF-8 validator, `ensures res == valid_utf8(b@)` bidirectional, **`5 verified, 0 errors`, ZERO trusted items**, embedded verbatim in `.tasks/TASK_085_REPORT.md`. **THE THREE PROBES + probe 4** (the selection instrument) live in `.memory/06-catalogue.md`, ⚠ **and probe 2 is now known BROKEN IN BOTH DIRECTIONS** — the object-file md5 false-POSITIVES on relocations, the linked md5 false-NEGATIVES on any kernel with a branch or a global; **the form that works is normalised-disassembly text.** ⚠ **If a NEW row is ever proposed, the standing rule still binds: RUN ITS NOVELTY CLAIM BEFORE WRITING THE ROW** — both manager-proposed axes were refused, and both died on a claim one `grep` plus one run would have settled. |
 | **Rules for writing that task** | ⚠⚠ **STATE NOVELTY CLAIMS AS QUESTIONS TO BE MEASURED, never as fact.** *"The first termination proof in the project"* was the manager's sentence in `TASK_070.md`; it was **false**, the engineer had no reason to doubt it, and it shipped into **eight places, two inside `contract_sha256`** — a review and a re-gate to remove. **Rule 9 protects `.memory/` from unreviewed findings and protects NOTHING from the task file itself.** p22's §0 counted 73 measures in one command once it was finally asked. ⚠ **Settle the bug class as the FIRST deliverable** — overturned on four patterns, upheld on two. ⚠ **A law owes its DOMAIN** (usually *missing columns*, not a caveat). **Additivity extrapolation — the only out-of-sample test here that can fail — HAS now failed once, on p38, and it was 100% attributable to three missing columns, none of them the one named.** The rule that came out of it: ⚠ **check the RESIDUE CLASS of any parameter your bands hold constant** — two of p38's three bands sat at `nw ≡ 0 (mod 8)` and the third did not, which fits in sample and misses out of it with no in-sample residual to warn you. ⚠ **Name the INLINE MODE at every figure** — p10 fitted both and the regressors *swapped*. All three in `.memory/03-measurement.md`. |
@@ -2802,10 +2802,15 @@ the number.** Two task files have already sent an agent to the wrong finding.
     figure below reproduced exactly, ⚠⚠ AND ONE OF THE ENGINEER'S OWN
     CALIBRATION ARMS TURNS OUT TO REFUTE THE HEADLINE IT WAS BUILT TO SUPPORT.**
 
+    ✅✅ **REVIEWED AT `TASK_130` — the review DECIDED the manager-vs-engineer
+    dispute (rule 3 forbade the manager clearing its own objection) and then
+    corrected the manager's replacement sentence too.**
+
     > ⚠⚠⚠ **THE HEADLINE `TASK_128` RETURNED — ~~*"the ladder CAN price a
     > mechanism it cannot price in instructions; the column is `obligations`"*~~
-    > — IS NOT ESTABLISHED. SEE *"THE CONTROL THE ENGINEER RAN AND READ AS
-    > CALIBRATION"* BELOW BEFORE QUOTING ANY OF THIS FINDING.**
+    > — IS NOT MERELY UNSUPPORTED. IT IS INVERTED. The columns that SEE limb 2
+    > are ASSEMBLY and `Ir`; `obligations` is the ONE COLUMN THAT CANNOT, and it
+    > ranks the DEAD-CODE arm ABOVE the MECHANISM arm.**
 
     ⚠⚠ **THE MANAGER'S OWN STATED "LEAST SURE #1" WAS RIGHT AND THE TASK'S
     PREMISE INVERTED: `TASK_124` MEASURED 2 OF 6 PUBLISHED COLUMNS.** **This
@@ -2832,14 +2837,17 @@ the number.** Two task files have already sent an agent to the wrong finding.
     `git show HEAD:results/gate/p*.json`, `verus["verus.rs"]["verified"]` runs
     `7 … 21` over 26 patterns, and `+2` IS EXACTLY THE `p01`→`p03` GAP.**
 
-    ⚠ **WHY THE CANCELLATION ARGUMENT HAS NO PURCHASE ON A LEVEL COLUMN, AND
-    THIS PART IS STRUCTURAL AND SURVIVES:** `obligations`, `TCB items` and `TCB
-    lines` are published **PER PATTERN**, not as an `R_x − R_y` difference.
-    **There is no second arm for the common sizing-pass term to cancel against.**
-    ⚠ **Worth carrying as a HYPOTHESIS and not as a law — *a contrast that
-    cancels in a DIFFERENCE column need not cancel in a LEVEL column*, and this
-    project reflexively reaches for differences. ⚠⚠ It is NOT what this probe
-    established; see the next block.**
+    ⚠⚠⚠ **THE MANAGER WROTE A "STRUCTURAL AND SURVIVES" PARAGRAPH HERE AND IT IS
+    STRUCK — `TASK_130` M3: IT PROVES TOO MUCH.** ~~*"`obligations`/`TCB` are
+    published PER PATTERN, not as an `R_x − R_y` difference, so there is no
+    second arm for the common sizing-pass term to cancel against."*~~ ⚠ **Applied
+    evenly that gives `Ir` the same property, and `TASK_124` MEASURED IT: a level
+    move of `−63.00 Ir`/call in EVERY ONE of its seven cells, printed in its own
+    table two columns left of the `+0.00`s everybody quoted.** ✅ **`Ir` is
+    published per cell as a LEVEL exactly as `obligations` is published per
+    pattern. The asymmetry does not exist.** ✅ **WHAT SURVIVES IS THE SMALLER,
+    TRUER STATEMENT: *the `+0.00` was a property of the COMPARISON CHOSEN — a
+    rung-to-rung difference — and not of the columns.***
 
     ⚠⚠⚠ **THE CONTROL THE ENGINEER RAN AND READ AS CALIBRATION — AND IT REFUTES
     THE HEADLINE. ✅ MANAGER-FOUND BY RE-RUNNING THE ARTEFACTS, NOT BY READING
@@ -2863,25 +2871,101 @@ the number.** Two task files have already sent an agent to the wrong finding.
     strongest arm was filed under the wrong heading, and it is the reason the
     manager re-runs falling claims rather than reading reports.**
 
-    ✅ **SO THE CORRECTED VERDICT ON LIMB 2 IS SHARPER THAN EITHER PREDECESSOR:
-    it is not that *the ladder cannot price it* (`TASK_124`, overstated) and not
-    that *`obligations` prices it* (`TASK_128`, unsupported) — it is that THE ONLY
-    COLUMN THAT MOVES MOVES FOR A REASON THAT IS NOT SPECIFIC TO THE MECHANISM.**
+    ⚠⚠ **AND THE MANAGER'S OWN VERDICT ON THAT EVIDENCE — *"the only column that
+    moves moves for a reason not specific to the mechanism"* — WAS RIGHT IN
+    DIRECTION AND WRONG IN SCOPE, AND `_calib2` ALONE WOULD HAVE LOST THE
+    ARGUMENT. `TASK_130` says so in terms: the §A defence genuinely blunts
+    `_calib2`, and THREE STRONGER ARGUMENTS carried it instead —**
+
+    ✅ **(i) THE DECIDING ARMS, at the PROJECT's kernel convention rather than
+    `TASK_124`'s. Both `TASK_124` and `TASK_128` put the sizing pass OUTSIDE the
+    measured symbol; `TASK_124` §B4 had already established a two-pass structure
+    needs no second call (`p42` mallocs inside `kernel()`). Rebuild it with the
+    whole two-pass function inside the kernel and ✅ manager-re-run:**
+
+    ```
+    arm  mechanism           kernel   sha256            Ir/call   obligations
+    kE   input extent        199 B    ffd9c4e2186777aa   121.00        3
+    kC   extent + DEAD loop  199 B    ffd9c4e2186777aa   121.00        5   <- dead code
+    kP   PRIOR-PASS COUNT    407 B    f6040ef542cf2f58   450.00        4   <- the mechanism
+    ```
+
+    ⚠⚠⚠ **`kE` AND `kC` ARE BYTE-IDENTICAL WHILE `obligations` DIFFERS BY `+2`,
+    AND `obligations` RANKS DEAD CODE (`5`) ABOVE THE MECHANISM (`4`). Assembly
+    and `Ir` separate the mechanism cleanly and agree: `+329.00 Ir`/call,
+    `+208` bytes, `3.72×`.**
+
+    ✅ **(ii) THE RATIO, WHICH DISSOLVES THE CRUX INSTEAD OF ANSWERING IT.**
+    **The right question is not *"does it differ from any change of the same
+    size?"* but *"how big is a column's variation across SPELLINGS of the
+    mechanism against its variation between PRESENCE and ABSENCE?"***
+
+    ```
+    Ir           spelling spread  77 total (0.039/call)   presence gap +327.99/call
+                                                          at MATCHED kernel work   ->  8519 : 1
+    obligations  spelling spread   2 (armP 5/armPinline 4/armPext 3)
+                 presence gap    <= 2, and NEGATIVE at the kernel convention  ->     1 : 1
+    ```
+
+    ⚠⚠ **`Ir` IS INVARIANT UNDER RE-SPELLING AND MOVES UNDER PRESENCE.
+    `obligations` IS THE EXACT REVERSE.** ✅ **And `obligations` is neither
+    NECESSARY nor SUFFICIENT: over seven arms, presence gives `{3,4,5,7}` and
+    absence gives `{3,5}` — the sets OVERLAP AT 3 AND 5.** ⚠ **`armEhard` is the
+    sharpest single arm: a strictly HARDER proof (value-level `ensures`), same
+    exec code, no new function or loop — `obligations` UNCHANGED at 3 while
+    `ghost` jumps to 13.**
+
+    ✅ **(iii) THIS PROJECT'S OWN PRECEDENTS, AND BOTH POINT THE SAME WAY —
+    AGAINST THE ENGINEER.** ⚠ **The task file guessed they pointed in opposite
+    directions; they do not.** **The project has TWICE required an `Ir` figure to
+    be distinguished from *the same work spelled differently*, and BOTH TIMES
+    STRUCK A PUBLISHED NUMBER when it failed: `p23`/`TASK_106`'s `k_u5`
+    (tautological conjunct, same normalised disassembly, 249 instructions →
+    *"the published floor was `150.00 Ir`/call too high"*), and `p46` §8a's
+    rolled-vs-rolled control (→ *"p46's per-MAC safety tax is `0.00000` and that
+    is the sentence to quote"*).**
+
+    ✅ **SO THE CORRECTED VERDICT ON LIMB 2, THIRD AND REVIEWED VERSION:
+    IT IS NOT UNPRICEABLE. IT PRICES ON ASSEMBLY AND `Ir`, AT THE LEVEL, ONCE THE
+    KERNEL BOUNDARY IS DRAWN WHERE A REAL PATTERN WOULD DRAW IT.** ⚠ **Three
+    successive statements about limb 2, each overturning the last: *cannot be
+    priced* (`TASK_124`) → *prices on `obligations`* (`TASK_128`) → *prices on
+    assembly and `Ir`, and `obligations` is the blind column* (`TASK_130`).
+    ⚠⚠ EVERY ONE OF THE FIRST TWO WAS PUBLISHED BEFORE ITS CONTROL WAS RUN.**
     ⚠⚠ **AND THE DEFENCE OF THE ENGINEER'S HEADLINE, STATED AT FULL STRENGTH
     BECAUSE THE MANAGER MAY BE APPLYING TOO STRICT A STANDARD:** *"`_calib2`'s
     loop is DEAD CODE no real pattern would contain. A prior-pass bound
     INHERENTLY costs one proved pass — you cannot equalise the code without
     deleting the mechanism. `Ir` is accepted as PRICING a bounds check even
     though an unrelated `add` costs instructions too; by that same standard,
-    `obligations` prices limb 2."*** ⚠ **The crux is whether *pricing a
-    mechanism* requires distinguishing it from ANY change of the same size, or
-    only from ITS OWN ABSENCE. For `Ir` this project has always accepted the
-    latter.** ⚠⚠ **THE MANAGER DOES NOT GET TO SETTLE THIS — IT IS THE MANAGER'S
-    OWN OBJECTION (rule 3). WHOEVER REVIEWS FINDING 44 DECIDES IT, WITH
-    EVIDENCE, AND BOTH ANSWERS ARE RESPECTABLE.**
+    `obligations` prices limb 2."***
 
-    ⚠ **OPEN: whether ANY column can distinguish `armP` from `_calib2`. Nobody
-    has looked, and the arms already exist.**
+    ✅✅ **THAT DEFENCE IS SETTLED AND IT LOST — ON FACT, NOT ON TASTE.** ⚠ **Its
+    load-bearing claim was *"this project has always accepted `Ir` as pricing a
+    bounds check even though an unrelated `add` also costs instructions."* THAT
+    IS FALSE ABOUT THIS PROJECT'S PRACTICE: `p23`/`k_u5` and `p46` §8a are two
+    occasions on which the project demanded exactly that distinction AND STRUCK
+    A PUBLISHED NUMBER when it failed.** ⚠⚠ **And the crux the manager posed —
+    *ANY change of the same size* vs *ITS OWN ABSENCE* — WAS A FALSE DILEMMA.
+    The ratio in (ii) dissolves it by MEASURING the thing both horns argued
+    about.**
+
+    ✅ **AND THE QUESTION FINDING 44 LEFT OPEN IS ANSWERED — YES: assembly and
+    `Ir` distinguish `armP` from `_calib2` decisively, and NOTHING in the proof
+    columns does.** ⚠ **`ghost_clauses_total` and `proof_fn` separate NOTHING,
+    and `ghost` gives `armEhard` the same `13` as `armP`; verification wall time
+    separates nothing either (0.93–0.97 s, startup-dominated).**
+
+    ⚠⚠ **AND THE COLUMN'S OWN NATURE, WHICH `synthesize.py` ALREADY DOCUMENTS
+    AND NOBODY CONNECTED: `obligations` IS A CODE-SIZE PROXY.** **`verified`
+    counts SMT query units — one per function body, one per loop, two per
+    `assert … by (bit_vector)`.** ✅ **Over the built tree: `corr(verified,
+    syntactic units) = 0.894`, `corr(verified, ghost clauses) = 0.820`,
+    `corr(verified, verus.rs SOURCE LINES) = 0.795`** (✅ manager-re-run).
+    ⚠ **`synthesize.py`'s own paragraph already said an axiom *"adds no verified
+    function, so `obligations` does not move"* and warned that a 7-line reviewed
+    wrapper trades against a zero-line axiom *"at par"*. The warning was about
+    the TCB column; it is the same insensitivity.**
 
     ✅ **The other must-fire arms all fired and all reproduce:** deleting the
     sizing pass's `ensures` gives *"precondition not satisfied … `n <=
@@ -2906,35 +2990,79 @@ the number.** Two task files have already sent an agent to the wrong finding.
     code.**
 
     ⚠ **LIMB 1 — the tree runs its control 100 times already and nobody had
-    counted it.** The hardened-C twin IS *plain rung + the safety-line operator
-    and nothing else*. ✅ **Manager-re-run: `rows 100`, `|dIr| > 4.6%` floor in
-    **35**, wall clock in **26**; of 25 patterns with a hardened twin (`p01` has
-    none), **12 have any row above the floor and 13 never clear it**.**
-    ✅ **So limb 1 is the ONLY limb that prices on the machine columns — and it
-    does so about a third of the time.**
+    counted it.** ✅ **The count reproduces THREE times — engineer, manager, and
+    a reviewer's independently written census: `rows 100`, `|dIr| > 4.6%` in
+    **35**, wall in **26**, 25 twins (`p01` has none), **12 patterns with any row
+    above the floor**.** ⚠⚠ **BUT THE NUMBER DOES NOT MEAN WHAT IT WAS PUBLISHED
+    TO MEAN, AND `TASK_130` FOUND BOTH REASONS:**
+
+    - ✅ **M6 — the TWIN premise is BUILD-true and SOURCE-false.** `build.py`'s
+      `c_flags()` never sees the kernel name and `-h` swaps ONE file, so ⚠ **the
+      flag / libc-entry / stack-protector confound the review went looking for
+      IS NOT THERE — a clean negative.** ⚠⚠ **The SOURCE is another matter, and
+      it fails on the census's own two extremes: `p19`'s twin adds A WHOLE
+      `O(TBL)` VALIDATION PASS (`361.78%`, the census maximum), `p47`'s is an
+      ALGORITHM SWAP (`237.01%`, second), `p11`'s is a LIBC SWAP
+      (`strlen → memchr`). 10 of the 35 above-floor rows are those three.**
+      ✅ **Clean-operator twins only: `25 of 90` rows, `9 of 22` patterns.**
+      ⚠ **Each PATTERN's own file is honest — `p19`'s `why` says *"THE VALIDATION
+      PASS"* — the overreach is the CENSUS'S AGGREGATION.**
+    - ⚠⚠ **M5 — the `±4.6%` FLOOR IS AN `ns` FLOOR APPLIED TO A CALLGRIND
+      COLUMN, AND THAT IS A CATEGORY ERROR THE MANAGER PROPAGATED.**
+      `p06/NOTES.md` says verbatim *"Take `±4.6%` as the honest inter-binary
+      floor for **every `ns` figure** in this file"*, and `.memory/03-measurement.md`
+      says of that same instrument *"a LAYOUT POPULATION IS THE WRONG TOOL …
+      **callgrind is layout-blind**"* — measuring the `Ir` side of that axis at
+      `kernel_exclusive 3002.00` **in all nine runs, a measured ZERO**.
+      ✅ **Manager-verified both quotations.** ✅ **The honest `Ir` statement:
+      **94 of 100 rows move**, 56 above 1%, **median 1.77%** (35 > 4.6%,
+      27 > 10%, 8 > 25%, 6 > 100%).** ✅ **The WALL half (26/100) is sound — that
+      is the floor's home instrument.**
+
+    ⚠ **So *"limb 1 prices about a third of the time"* survives QUALITATIVELY and
+    `35/100` and `12 of 25` DO NOT survive as limb-1 numbers.**
 
     ⚠⚠ **THE VERDICT — AND IT IS NOT THE ONE `TASK_128` RETURNED.** **The
     engineer returned SHAPE 1 (*"the bar keeps all three limbs; what it lacks is
     a statement of which column each prices on"*) and refused SHAPE 3 on the
     ground that *"the project owns a column that sees REASONS, publishes it, and
-    nobody pointed it at the question."*** ⚠⚠ **`_calib2` withdraws that ground:
-    the column does not see reasons, it sees ADDED PROVED CODE.** ✅ **What the
-    task DID establish, and it is enough to keep the bar's text: LIMB 1 PRICES ON
-    THE MACHINE COLUMNS about a third of the time; LIMBS 2 AND 3 PRICE ON NOTHING
-    ANYONE HAS SHOWN TO BE SPECIFIC TO THEM.** ⚠ **Keep all three limbs — nothing
-    here shows limbs 2 and 3 name nothing real, only that this instrument has not
-    been shown to see them — and STOP CITING EITHER AS IF IT HAD A MEASUREMENT
-    BEHIND IT.** ⚠⚠ **SHAPE 3 IS THEREFORE STILL LIVE AND IS NOT REFUSED. It was
-    the manager's own most-interesting hypothesis, so the manager will not clear
-    it (rule 3): whoever reviews this decides it.**
+    nobody pointed it at the question."*** ⚠⚠ **`_calib2` withdrew that ground, and
+    `TASK_130` went further: the column does not merely fail to see reasons —
+    IT RANKS DEAD CODE ABOVE THE MECHANISM.** ✅✅ **THE REVIEWED VERDICT: KEEP ALL
+    THREE LIMBS; THE BAR'S TEXT NEEDS NO CHANGE. LIMB 1 prices on the machine
+    columns — qualitatively *about a third of the time*, ⚠ NOT `35/100`. LIMB 2
+    prices on ASSEMBLY and `Ir` AT THE LEVEL, once the kernel boundary is drawn
+    where a real pattern would draw it. LIMB 3 ALONE still prices on nothing
+    shown specific to it.** ⚠⚠ **SHAPE 3 — *"the project writes its bar in terms
+    of what the programmer MEANS while its instrument sees only what the machine
+    DOES"* — IS REFUSED, but NOT on the engineer's ground and NOT for the
+    manager's reason: it is refused because the MACHINE columns DO see limbs 1
+    and 2, and the column that sees neither is the PROOF column.** ⚠ **The
+    nearest true statement is the INVERSE of what the manager suspected, and it
+    is `TASK_130`'s: THE PROJECT READS ITS OWN NOVELTY BAR AS A DETECTABILITY
+    BAR.**
 
-    ⚠ **CLEAN NEGATIVE, and it is the sharper half: `p23` — the ONLY row ever
-    admitted under this bar — CLAIMS ALL THREE LIMBS AND EXHIBITS AT MOST ONE.**
-    **Limb 1: `−1.39 / −3.66 / +0.13 / −1.60 %`, every one BELOW the floor and
-    the sign flips. Limb 2: `obligations 16`, mid-tree, `proof_fn 0` — no
-    signature. Limb 3: its own `NOTES` says *"⚠ The CAUSE is OPEN … the
-    phenomenon is what ships, and it is enough."*** ⚠⚠ **So the bar's problem was
-    never its TEXT: a row can satisfy it on paper and demonstrate none of it.**
+    ⚠⚠ **THE "CLEAN NEGATIVE" — `p23` CLAIMS ALL THREE LIMBS AND EXHIBITS AT
+    MOST ONE — IS TWO-THIRDS RHETORIC, AND `TASK_130` M7 IS THE BETTER FINDING.**
+    ✅ **All three cells verify from the committed record** (limb 1
+    `−1.39 / −3.66 / +0.13 / −1.60 %`, below floor, sign flips; limb 2
+    `verified 16`, `errors 0`, `tcb_items 5`, `proof_fn 0`; limb 3's own `NOTES`
+    says *"⚠ The CAUSE is OPEN"* verbatim) — ⚠ **and *"mid-tree"* understates it:
+    ✅ manager-recomputed, the range is `7…21` with MEDIAN 12, so `16` is
+    **19th of 26**.**
+
+    ⚠⚠⚠ **BUT *"EXHIBITS A LIMB"* HAS NO OPERATIONAL DEFINITION AND THE BAR DOES
+    NOT ASK FOR ONE. The bar says *brings a new MECHANISM* — a NOVELTY criterion
+    naming no column, no floor and no delta. *"Exhibits"* is the engineer's word,
+    and `p23` states each limb as a NOVELTY claim WITH THE BUILT SET ENUMERATED**
+    (*"a header field (p05, p07, p16, p17, p19, p36), a compile-time capacity
+    (p03, p06, p12), a live length (p04, p14)"*) — **and its limb-1 claim, *a
+    comparison of two loop variables*, is CHECKABLY TRUE: on the reviewer's own
+    twin census `p23` is the only one of 25 whose added guard compares two moving
+    cursors.** ✅ **So the clean negative survives on LIMB 3 ONLY.**
+    ⚠⚠ **THE TRANSFERABLE FINDING, AND IT IS BIGGER THAN `p23`: THE PROJECT READS
+    ITS OWN NOVELTY BAR AS A DETECTABILITY BAR — the same conflation the engineer
+    flagged as systemic, landing on the engineer's own clean negative.**
 
     ⚠ **OPEN, and NOT to be filled in by inference:** the harm matrix under the
     provenance control; limb 2's *mechanism* (one probe only); and **timing,
@@ -2945,10 +3073,37 @@ the number.** Two task files have already sent an agent to the wrong finding.
     must-fire arm and disclosed:** a callgrind `fn=`/`cfn=` name-compression
     **silent zero**; an LLVM-hoisted `calls=1` printing `0.42 Ir`/call; and a
     `git ls-tree` resolving its pathspec against the wrong directory, printing
-    **`rows: 0`** — *a detector that was not running.*
+    **`rows: 0`** — *a detector that was not running.* ✅ **The third is
+    GENUINELY FIXED: a from-scratch, deliberately different reviewer census
+    reproduces `100 / 35 / 26 / 25 / 12` EXACTLY.**
 
-    Evidence: `.tasks/TASK_128_REPORT.md`, `.temp/t128/` (`BUILD.sh` regenerates
-    every source, binary and log, and deletes the binaries).
+    ⚠⚠ **AND FAILURE-CLASS ENTRY 8 HAS A SECOND INSTANCE IN THE SAME TASK, WHICH
+    FINDING 44 MISSED UNTIL THE REVIEW: `TASK_128`'s LIMB-3 `_calibRANGE_bv` IS
+    `_calib2` AGAIN** — arm RANGE plus one *unrelated* `by (bit_vector)` assert
+    also reads `4 verified`, reported as *"calibration"*. **Both `_calib` arms are
+    non-specificity refutations filed as calibrations.** ⚠ **So limb 3's
+    `obligations` claim is unsupported for a STRONGER reason than this finding
+    first gave.**
+
+    ⚠ **STILL OPEN, and NOT to be filled in by inference:** the harm matrix
+    under the provenance control (every arm is Verus-proved memory-safe, so
+    nothing has been shown either way); **timing, deliberately unmeasured in BOTH
+    tasks because `TASK_127`/`TASK_129` were running and concurrent load corrupts
+    a wall-clock block** — ✅ **the right call, twice, and worth copying**; and
+    ⚠ **the reviewer's `KIND` classification of the 25 twins is a JUDGEMENT it
+    printed for checking: call `p19`'s validation pass *an operator* and the
+    clean-operator count goes from 9 patterns back to 12.**
+
+    ⚠ **Contested and disclosed by the reviewer itself: `armPext` — spelling the
+    sizing pass `external_body`, which is how 26 patterns spell an unverified
+    pass — moves the burden to the TCB column (`2 items / 6 lines`) rather than
+    zeroing it. A partial defence of the engineer, which is why the verdict does
+    NOT rest on that arm. But `+1 item` is again a COUNT, and moves identically
+    for any unrelated trusted item.**
+
+    Evidence: `.tasks/TASK_128_REPORT.md`, `.tasks/TASK_130_REPORT.md`,
+    `.temp/t128/` and `.temp/t130/` (`BUILD.sh` / `RUN.sh` regenerate every
+    source, binary and log, and delete the binaries).
 
 ## Retracted — do not reinstate
 
