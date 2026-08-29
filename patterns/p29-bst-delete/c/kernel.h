@@ -54,23 +54,40 @@
  *   for j in 0 .. TABCAP: if live[j]: free(tab[j]) ; live[j] = 0
  *   return acc*31 + ntab
  *
- * **THE SAFETY LINE HAS TWO CONJUNCTS AND `p27`'s HAS ONE. THAT IS THE ROW.**
- * `p27`'s READ path asks one question -- *is the allocation still there?* --
- * and `live[h] == 1` answers it. `p29`'s READ path has to ask **two**:
+ * **ONE OMITTED SOURCE LINE CARRIES TWO BUG CLASSES, SELECTED BY THE INPUT.
+ * THAT IS THE ROW.**
  *
- *   live[g_slot] == 1          is the ALLOCATION still there?      p27's conjunct
- *   tab[g_slot][0] == g_key    is the OCCUPANT still the same one? NEW
+ *   victim with 0 or 1 child   unlinked and FREED         use-after-FREE
+ *   victim with 2 children     successor's key/val copied  in-bounds
+ *                              INTO it, the SUCCESSOR      use-after-RECYCLE
+ *                              freed
  *
- * The second conjunct exists because **`p29`'s second bug class never touches
- * the allocation.** Deleting a node with two children copies the in-order
- * successor's key and val *into the victim's record* and frees the SUCCESSOR --
- * so the victim's allocation stays live, at the same address, holding somebody
- * else's data. A liveness bit cannot see that, and neither can ASan, neither can
- * safe Rust's `Option` discriminant, and neither can a linear `PointsTo`.
- * ../NOTES.md 2 measures all four.
+ * The recycle half never touches the allocation: the victim's record stays
+ * live, at the same address, holding somebody else's data. A liveness bit
+ * cannot see that, and neither can ASan, neither can Miri, neither can safe
+ * Rust's `Option` discriminant, and neither can a linear `PointsTo`.
+ * ../NOTES.md 2 measures all of them.
  *
- * **AND THE ORDER IS LOAD-BEARING, WHICH IS WHY THE TWO CONJUNCTS ARE NOT
- * INTERCHANGEABLE.** `tab[g_slot]` is never reset (see below), so
+ * ⚠⚠ **AND THE HALF EVERY DETECTOR SEES IS THE HALF THAT CANNOT BE GATED.**
+ * R1's checksum is NOT reproducible on the use-after-free windows and IS
+ * reproducible on the recycle one (../controls/repro.json, which publishes the
+ * invariant and no pinned count). So the class the instruments catch is the
+ * class a gate cannot pin, and the class the gate pins is the class no
+ * instrument sees.
+ *
+ * ⚠⚠⚠ **WHAT THIS FILE SAID HERE AND IT WAS FALSE -- MEASURED AND RETRACTED
+ * AT TASK_140:** ~~*"the safety line has TWO conjuncts and `p27`'s has ONE,
+ * and that is the row"*~~. **ONE CONJUNCT IS ENOUGH.** Two single-conjunct
+ * spellings built from c/kernel.c by substitution score `0 wrong / 0 ASan
+ * lines` with the ASan positive control firing, and one of them adds **no
+ * state**: it widens `live[]` from a bit to the occupant tag, which `p27`'s
+ * own kernel calls a generation counter with slot reuse removed. The
+ * two-conjunct line below is a CHOICE -- it buys a free `wf` at R5
+ * (../NOTES.md 6c) -- and the row stands on the two bug classes above, which
+ * the conjunct count was never evidence for.
+ *
+ * **GIVEN THIS SPELLING THE ORDER IS LOAD-BEARING, WHICH IS WHY THESE TWO
+ * CONJUNCTS ARE NOT INTERCHANGEABLE.** `tab[g_slot]` is never reset (see below), so
  * `tab[g_slot][0]` and `g_saved[0]` are *the same load from the same address*.
  * With the liveness conjunct in front of it, that load is short-circuited away
  * on exactly the inputs where the record has been freed; without it, the
@@ -113,8 +130,10 @@
  * spelling would put that read inside a live allocation, which is p17's LOGICAL
  * class and not this one; `p27`'s `spec.md` pins the same thing for the same
  * reason. ⚠⚠ **After a TWO-CHILD splice it points into a live allocation
- * ANYWAY** -- nothing was freed -- **and that is the other half of this row and
- * the whole reason the safety line needs a second conjunct.**
+ * ANYWAY** -- nothing was freed -- **and that is the other half of this row,
+ * and the reason the safety line has to notice something the ALLOCATOR does
+ * not know.** ⚠ It is not a reason the line needs a SECOND conjunct: one
+ * conjunct over a wider `live[]` notices it too (TASK_140, measured).
  *
  * **THE HANDLE THE FILE NAMES IS A KEY, AND THE POINTER IS THE KERNEL'S OWN.**
  * A file cannot name a pointer -- but it can name an operation that saves one,

@@ -183,21 +183,21 @@ sweep says the callee moves -- but its MAGNITUDE is a phase, so quote the
 support, never the draw.
 
 
-**Calibration, recomputed on every run of this file** — the derived column scored against `synthesis/outward_ir.json`, a callgrind caller→callee sweep, at the 2.00 `Ir` floor: **208 rows, 190 hit, 4 miss (the dangerous direction), 14 false alarm**; residual median **0.27**, p95 **6.82**, max **15.79**. ⚠ Misses: p03 small R3-R4 -7.00, p03 large R3-R4 -7.00, p04 small R3-R4 -7.00, p04 large R3-R4 -7.00.
+**Calibration, recomputed on every run of this file** — the derived column scored against `synthesis/outward_ir.json`, a callgrind caller→callee sweep, at the 2.00 `Ir` floor: **208 rows, 188 hit, 4 miss (the dangerous direction), 16 false alarm**; residual median **0.30**, p95 **7.00**, max **15.79**. ⚠ Misses: p03 small R3-R4 -7.00, p03 large R3-R4 -7.00, p04 small R3-R4 -7.00, p04 large R3-R4 -7.00.
 
 **So the column has three bands, and they are measured on every run rather than chosen** — each row sorted by `|correction|` against whether the sweep says the row moves at all:
 
 | band | rows | real | spurious | smallest \|correction\| | reading |
 |---|---:|---:|---:|---:|---|
-| `< 2.00` (blank / `<2.00`) | 145 | 4 | 141 | 0.00 | **not safe — this is one environment phase.** ⚠ See `‡` |
-| `2.00 … 16.00` (marked **?**) | 22 | 8 | 14 | 2.00 | **a coin flip — do not quote alone** |
+| `< 2.00` (blank / `<2.00`) | 143 | 4 | 139 | 0.00 | **not safe — this is one environment phase.** ⚠ See `‡` |
+| `2.00 … 16.00` (marked **?**) | 24 | 8 | 16 | 2.00 | **a coin flip — do not quote alone** |
 | `≥ 16.00` (**bold**) | 41 | 41 | 0 | 17.00 | **every one is real** |
 
 ⚠⚠ **THE `< 2.00` BAND'S OWN CLAIM WAS FALSE, AND THIS IS THE CORRECTION.** It read *"safe: nothing real hides below the floor"*, scored `0 real / 120 spurious`. Both numbers are right **about the environment this run was taken in**, and the adjective was not: **p03's and p04's `R3-R4` correction is `0.00` — blank, in this band — at 16 of 32 environment phases and `±7.00` at the other 16**, three and a half times the floor. A band scored at one draw cannot certify the absence of a term that is invisible at that draw. The rows that carry it are marked `‡` below; the band is otherwise unchanged and still means *the derived route cannot resolve this*.
 
 ⚠ **The middle band is where p03, p04, p07 and p22 live.** On p03 and p04 `R5-R4` the derived route was reporting `+6.00`, one draw from `{−8.00, −1.00, +6.00}` — **tied with its own sign-reverse** — and those four cells are now **withdrawn** rather than marked **?**: `?` means *look further*, and there is nothing further to look at. Treat a surviving **?** as *"look with the licence or a callgrind run"*, never as a figure.
 
-⚠⚠ **`synthesis/outward_ir.json` IS STALE against the gate records, so the calibration above is scored partly on rows taken against sources that have since moved.** **STALE: p16.** Re-emit with `synthesis/outward_ir.py --emit synthesis/outward_ir.json` against a fully built `.temp/build/` (352 callgrind runs), then re-run this file.
+⚠⚠ **`synthesis/outward_ir.json` IS STALE against the gate records, so the calibration above is scored partly on rows taken against sources that have since moved.** **STALE: p01, p02, p03, p04, p05, p06, p07, p08, p09, p10, p11, p12, p13, p14, p16, p17, p18, p19, p22, p23, p27, p36, p38, p42, p46, p47.** Re-emit with `synthesis/outward_ir.py --emit synthesis/outward_ir.json` against a fully built `.temp/build/` (352 callgrind runs), then re-run this file.
 
 **And the LICENCE TAG scored against the same sweep, also recomputed here**: **179 hit, 17 false `LICENSED` (the dangerous direction), 2 false alarm, 10 abstain**. The smallest movement under a `NOT-LIC` verdict is **0.00 `Ir`/call**, so *0 false alarms* is robust to any tolerance below that and is not an artefact of the 5e-3 cut.
 
@@ -258,7 +258,7 @@ answer* (`.memory/03-measurement.md`).
 |---|---:|---:|---|---|---|
 | p01-array-sum | 11.00 | 29.00 | LICENSED |  | R3 span OWED |
 | p02-buffer-copy | 191.00 | 1439.00 | NOT-LIC | small +178.00 (-13.00) **?** / **large +1025.16** (-413.84) | undeclared |
-| p03-bounded-stack | 5110.00 | 17237.00 | LICENSED | ‡ | R3 span 1 unreviewed measurement; the +5 constant NEVER searched |
+| p03-bounded-stack | 5110.00 | 17237.00 | LICENSED | small +5117.00 (+7.00) **?** / large +17244.00 (+7.00) **?** ‡ | R3 span 1 unreviewed measurement; the +5 constant NEVER searched |
 | p04-ring-buffer | 4756.00 | 16616.00 | LICENSED | small +4763.00 (+7.00) **?** / large +16623.00 (+7.00) **?** ‡ | undeclared |
 | p05-index-flatten | 700.00 | 2895.00 | LICENSED |  | undeclared |
 | p06-rotate | 173.00 | 395.00 | LICENSED |  | ⊘ PROVISIONAL -- R3 searched at review: `c_idx` is 0.00000 Ir/BYTE, and on `small` it is +80.00 against a shipped +334.00. ⚠ On `large` the SHIPPED R3 (+172) is the CHEAPER of the two |
@@ -270,14 +270,14 @@ answer* (`.memory/03-measurement.md`).
 | p12-strcat-fixed | 836.00 | 2120.00 | NOT-LIC | **small +759.00** (-77.00) / **large +1626.00** (-494.00) | R4 searched at review: the SIGN FLIPS on `large` to +66.00 |
 | p13-strncpy-trunc | 1198.00 | 2961.00 | NOT-LIC | **small +1008.00** (-190.00) / **large +2697.00** (-264.00) | R4 searched: the SIGN FLIPS to +44/+77 |
 | p14-field-split | 908.00 | 364.00 | LICENSED |  | undeclared |
-| p16-tlv-walk | 2085.00 | 17123.00 | LICENCE STALE |  | undeclared |
+| p16-tlv-walk | 2085.00 | 17123.00 | LICENSED |  | undeclared |
 | p17-http-range | 3624.00 | 30293.00 | LICENSED |  | R3 searched: an in-contract respelling is -19.00 flat; `+32` is NOT a law (swept 18...63) |
 | p18-varint-shift | 363.00 | 151.00 | LICENSED |  | undeclared |
 | p19-state-machine | 1594.00 | 25594.00 | LICENSED |  | undeclared |
 | p22-hash-probe | 275.00 | 2067.00 | LICENSED |  | R4 searched: `+2.00` is a fixed-R4 bound; against `r4_reslice` the gap is +125/+1021 -- 510x on `large` |
 | p23-partition | 350.69 | 531.17 | LICENSED |  | undeclared |
 | p27-handle-table | 119.49 | 693.82 | NOT-LIC | **small +238.67** (+119.18) / **large +824.47** (+130.65) | undeclared |
-| p29-bst-delete | 96.00 | 991.80 | no licence recorded | **small +220.35** (+124.35) / **large +1190.87** (+199.07) | undeclared |
+| p29-bst-delete | 96.00 | 991.80 | NOT-LIC | **small +220.35** (+124.35) / **large +1190.87** (+199.07) | undeclared |
 | p36-vtable-dispatch | 1803.00 | 14347.00 | UNDEC |  | BOTH sides searched (4 R3 levers, 3 R4) |
 | p38-alias-pun | 257.00 | 711.00 | LICENSED |  | undeclared |
 | p42-goto-cleanup | 599.00 | 25092.00 | NOT-LIC | **small +752.00** (+153.00) / **large +29252.00** (+4160.00) | undeclared |
@@ -297,8 +297,8 @@ answer* (`.memory/03-measurement.md`).
 - **p08** `NOT-LIC` — only unsafe calls ['memmove@GLIBC_2.2.5']
 - **p12** `NOT-LIC` — only unsafe calls ['memcpy@GLIBC_2.14']
 - **p13** `NOT-LIC` — only unsafe calls ['memcpy@GLIBC_2.14']
-- **p16** `LICENCE STALE` — 0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check
 - **p27** `NOT-LIC` — ASYMMETRIC INDIRECT dispatch (safe_naive: 0, unsafe: 1); e.g. `call *%r12`
+- **p29** `NOT-LIC` — ASYMMETRIC INDIRECT dispatch (safe_naive: 1, unsafe: 3); e.g. `jmp *%rax`
 - **p36** `UNDEC` — both sides dispatch through an unresolvable pointer (1 each); e.g. `call *0x18(%rcx)`
 - **p42** `NOT-LIC` — only safe_naive calls ['___rustc::___rust_dealloc', '___rustc::___rust_alloc_zeroed', 'Nt::alloc::raw_vec::handle_error']; only unsafe calls ['___rustc::___rust_alloc']
 - **p47** `NOT-LIC` — only safe_naive calls ['bcmp@GLIBC_2.2.5']
@@ -325,14 +325,14 @@ answer* (`.memory/03-measurement.md`).
 | p12-strcat-fixed | 3.00 | -26.00 | LICENSED |  | R4 searched at review: the SIGN FLIPS on `large` to +66.00 |
 | p13-strncpy-trunc | -177.00 | -1054.00 | LICENSED |  | R4 searched: the SIGN FLIPS to +44/+77 |
 | p14-field-split | 638.00 | 425.00 | LICENSED |  | undeclared |
-| p16-tlv-walk | 27.00 | 77.00 | LICENCE STALE |  | undeclared |
+| p16-tlv-walk | 27.00 | 77.00 | LICENSED |  | undeclared |
 | p17-http-range | 32.00 | 32.00 | LICENSED |  | R3 searched: an in-contract respelling is -19.00 flat; `+32` is NOT a law (swept 18...63) |
 | p18-varint-shift | -25.00 | -12.00 | LICENSED |  | undeclared |
 | p19-state-machine | 260.00 | 4100.00 | LICENSED |  | undeclared |
 | p22-hash-probe | 2.00 | 2.00 | LICENSED |  | R4 searched: `+2.00` is a fixed-R4 bound; against `r4_reslice` the gap is +125/+1021 -- 510x on `large` |
 | p23-partition | 305.74 | 443.55 | LICENSED |  | undeclared |
 | p27-handle-table | 109.98 | 661.82 | NOT-LIC | **small +229.12** (+119.14) / **large +792.47** (+130.65) | undeclared |
-| p29-bst-delete | 67.05 | 897.60 | no licence recorded | **small +193.53** (+126.48) / **large +1092.51** (+194.91) | undeclared |
+| p29-bst-delete | 67.05 | 897.60 | NOT-LIC | **small +193.53** (+126.48) / **large +1092.51** (+194.91) | undeclared |
 | p36-vtable-dispatch | 15.00 | 15.00 | UNDEC |  | BOTH sides searched (4 R3 levers, 3 R4) |
 | p38-alias-pun | 21.00 | 25.00 | LICENSED |  | undeclared |
 | p42-goto-cleanup | 12.00 | 11.00 | NOT-LIC |  | undeclared |
@@ -349,8 +349,8 @@ answer* (`.memory/03-measurement.md`).
 ⚠ **Why each non-`LICENSED` row is not licensed, plus every `LICENSED` row carrying an unpriced term** — the `why` string `licence.py` recorded. An earlier version of this file printed the tag and dropped this, which is how three different conditions came to share one tag (limit 2). `⚠ UNPRICED` counts **live** `@plt` sites and means the row carries gcc's 2-instruction PLT thunk at `+2.00 Ir` per *dynamic* libc call — a count no static check can have:
 
 - **p11** `NOT-LIC` — only safe_tuned calls ['Ms::_NtNt::core::ffi::c_strNtB::_::CStr::from_bytes_until_nul']
-- **p16** `LICENCE STALE` — 0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: NtNt::core::slice::index::slice_index_fail
 - **p27** `NOT-LIC` — ASYMMETRIC INDIRECT dispatch (safe_tuned: 0, unsafe: 1); e.g. `call *%r12`
+- **p29** `NOT-LIC` — ASYMMETRIC INDIRECT dispatch (safe_tuned: 1, unsafe: 3); e.g. `jmp *%rcx`
 - **p36** `UNDEC` — both sides dispatch through an unresolvable pointer (1 each); e.g. `call *0x18(%rcx)`
 - **p42** `NOT-LIC` — only safe_tuned calls ['___rustc::___rust_dealloc', 'Nt::alloc::raw_vec::handle_error']
 
@@ -374,14 +374,14 @@ answer* (`.memory/03-measurement.md`).
 | p12-strcat-fixed | 0.00 | 0.00 | LICENSED |  |
 | p13-strncpy-trunc | 0.00 | 0.00 | LICENSED |  |
 | p14-field-split | 0.00 | 0.00 | LICENSED |  |
-| p16-tlv-walk | 0.00 | 0.00 | LICENCE STALE |  |
+| p16-tlv-walk | 0.00 | 0.00 | LICENSED |  |
 | p17-http-range | 0.00 | 0.00 | LICENSED |  |
 | p18-varint-shift | 0.00 | 0.00 | LICENSED |  |
 | p19-state-machine | 0.00 | 0.00 | LICENSED |  |
 | p22-hash-probe | 0.00 | 0.00 | LICENSED |  |
 | p23-partition | 0.00 | 0.00 | LICENSED |  |
 | p27-handle-table | 0.00 | 0.00 | UNDEC |  |
-| p29-bst-delete | 0.00 | 0.00 | no licence recorded |  |
+| p29-bst-delete | 0.00 | 0.00 | UNDEC |  |
 | p36-vtable-dispatch | 0.00 | 0.00 | UNDEC |  |
 | p38-alias-pun | 0.00 | 0.00 | LICENSED |  |
 | p42-goto-cleanup | 0.00 | 0.00 | LICENSED | small <2.00 / **large -31.00** (-31.00) |
@@ -397,8 +397,8 @@ answer* (`.memory/03-measurement.md`).
 
 ⚠ **Why each non-`LICENSED` row is not licensed, plus every `LICENSED` row carrying an unpriced term** — the `why` string `licence.py` recorded. An earlier version of this file printed the tag and dropped this, which is how three different conditions came to share one tag (limit 2). `⚠ UNPRICED` counts **live** `@plt` sites and means the row carries gcc's 2-instruction PLT thunk at `+2.00 Ir` per *dynamic* libc call — a count no static check can have:
 
-- **p16** `LICENCE STALE` — 0 outward transfers
 - **p27** `UNDEC` — both sides dispatch through an unresolvable pointer (1 each); e.g. `call *%r12`
+- **p29** `UNDEC` — both sides dispatch through an unresolvable pointer (3 each); e.g. `jmp *%rax`
 - **p36** `UNDEC` — both sides dispatch through an unresolvable pointer (1 each); e.g. `call *0x18(%rcx)`
 
 ### `gcc-clang`  (`c-gcc` - `c-clang`)
@@ -421,18 +421,18 @@ answer* (`.memory/03-measurement.md`).
 | p12-strcat-fixed | 333.00 | 621.00 | LICENSED | **small +358.00** (+25.00) / **large +746.00** (+125.00) |
 | p13-strncpy-trunc | 1769.00 | 2940.00 | NOT-LIC | **small +1463.00** (-306.00) / **large +2401.00** (-539.00) |
 | p14-field-split | 965.00 | 331.00 | NOT-LIC | **small +892.00** (-73.00) / **large +143.00** (-188.00) |
-| p16-tlv-walk | 1069.00 | 8933.00 | LICENCE STALE |  |
+| p16-tlv-walk | 1069.00 | 8933.00 | LICENSED |  |
 | p17-http-range | 1901.00 | 16022.00 | LICENSED |  |
 | p18-varint-shift | -136.00 | -52.00 | LICENSED |  |
 | p19-state-machine | 571.00 | 9211.00 | LICENSED |  |
 | p22-hash-probe | -313.82 | -3468.87 | LICENSED | small -310.86 (+2.96) **?** / large -3484.66 (-15.79) **?** |
 | p23-partition | 466.78 | 200.70 | NOT-LIC | **small +406.10** (-60.68) / **large +9.16** (-191.54) |
 | p27-handle-table | -25.02 | -201.73 | LICENSED | **small +15.65** (+40.67) / **large -75.88** (+125.85) |
-| p29-bst-delete | -101.91 | -779.53 | no licence recorded | **small -56.09** (+45.82) / **large -645.13** (+134.40) |
+| p29-bst-delete | -101.91 | -779.53 | NOT-LIC | **small -56.09** (+45.82) / **large -645.13** (+134.40) |
 | p36-vtable-dispatch | -120.00 | -1016.00 | UNDEC | **small +9.00** (+129.00) / **large +9.00** (+1025.00) |
 | p38-alias-pun | -232.00 | -617.00 | LICENSED |  |
 | p42-goto-cleanup | 367.00 | 16367.00 | LICENSED | small +372.00 (+5.00) **?** / large +16372.00 (+5.00) **?** |
-| p46-bignum-mac | 2163.00 | 5778.00 | NOT-LIC | **small +2069.00** (-94.00) / **large +5649.10** (-128.90) ‡ |
+| p46-bignum-mac | 2163.00 | 5778.00 | NOT-LIC | **small +2076.00** (-87.00) / **large +5656.10** (-121.90) ‡ |
 | p47-ct-compare | 15.00 | 23.00 | NOT-LIC | small +24.00 (+9.00) **?** / **large +40.00** (+17.00) |
 
 ⚠ **`‡` — the environment-phase term, and it is not noise.** The derived correction is a **whole-program** figure, so it contains the callees; a per-call `memset` of a **stack** array takes an alignment-dependent tail in `__memset_avx2_unaligned_erms`, and the initial stack pointer moves with the **length of the environment block**. The effect is bistable, period **32 bytes**, window exactly **16 wide**, and the phase differs per binary — so one rung can sit high while another sits low and **a pair swings by 14, not 7**. Per row, with its instrument:
@@ -451,15 +451,15 @@ answer* (`.memory/03-measurement.md`).
 - **p12** `LICENSED` — identical live set: memchr@plt, memcpy@plt; differs only in DIVERGING callees, which execute 0 times in any accepted run: __stack_chk_fail@plt; ⚠ UNPRICED: gcc's PLT thunk on 4 live `@plt` site(s)
 - **p13** `NOT-LIC` — only c-clang calls ['memcpy@plt', 'memset@plt']; ⚠ UNPRICED: gcc's PLT thunk on 4 live `@plt` site(s)
 - **p14** `NOT-LIC` — only c-clang calls ['memcpy@plt']; ⚠ UNPRICED: gcc's PLT thunk on 1 live `@plt` site(s)
-- **p16** `LICENCE STALE` — 0 outward transfers
 - **p23** `NOT-LIC` — only c-clang calls ['memcpy@plt']; ⚠ UNPRICED: gcc's PLT thunk on 1 live `@plt` site(s)
 - **p27** `LICENSED` — identical live set: free@plt, free@plt, malloc@plt; differs only in DIVERGING callees, which execute 0 times in any accepted run: __stack_chk_fail@plt, abort@plt; ⚠ UNPRICED: gcc's PLT thunk on 6 live `@plt` site(s)
+- **p29** `NOT-LIC` — ASYMMETRIC INDIRECT dispatch (c-gcc: 0, c-clang: 2); e.g. `jmp *%rax`
 - **p36** `UNDEC` — both sides dispatch through an unresolvable pointer (1 each); e.g. `call *0x0(%r13,%rax,8)`
 - **p42** `LICENSED` — identical live set: free@plt, malloc@plt; ⚠ UNPRICED: gcc's PLT thunk on 4 live `@plt` site(s)
 - **p46** `NOT-LIC` — only c-clang calls ['memcpy@plt', 'memset@plt']; ⚠ UNPRICED: gcc's PLT thunk on 2 live `@plt` site(s)
 - **p47** `NOT-LIC` — only c-gcc calls ['memcmp@plt']; only c-clang calls ['bcmp@plt']; ⚠ UNPRICED: gcc's PLT thunk on 2 live `@plt` site(s)
 
-⚠ **This is the pair in trouble, not `R3-R4`.** 8 of 27 are `NOT-LIC` and 1 more is undecidable — every C-vs-C statement in the tree runs through this column. Two gcc-only terms, both measured here and neither previously recorded:
+⚠ **This is the pair in trouble, not `R3-R4`.** 9 of 27 are `NOT-LIC` and 1 more is undecidable — every C-vs-C statement in the tree runs through this column. Two gcc-only terms, both measured here and neither previously recorded:
 
 * **`__popcountdi2`, p09** — gcc emits a call to libgcc's software popcount that clang inlines; **378.00 / 2625.00 `Ir` per call**, against a published gap of 7322 / 25908. It is not a bulk routine, so it appears in no record.
 * **a 2-instruction PLT thunk on every gcc libc call.** gcc's `memcpy@plt` is `endbr64 ; jmp *GOT`, which callgrind attributes as its own function; clang's is a bare `jmp` and is folded into the callee. Measured: **+2.00 `Ir` per libc call, gcc's column only** — p02 `+2.00` (1 call/kernel-call), p12 `+23.99` (6 × 2.00 + resolution), p11 `+299.87` (150 `strlen` calls × 2.00), with the libc work itself *identical* (`strlen` inclusive 2105.0288 gcc / 2105.0265 clang). **One of the two instructions is the `endbr64` of gcc's default `-fcf-protection=full`**, so the corrected column carries an IBT term the kernel-exclusive column never had. It is an argument for publishing both columns, not for replacing one with the other.

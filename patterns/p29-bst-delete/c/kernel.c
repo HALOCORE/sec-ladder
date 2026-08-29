@@ -13,7 +13,11 @@
  *
  *     if (g_saved != NULL && live[g_slot] == 1 && tab[g_slot][0] == g_key)
  *
- * there. TWO conjuncts, where p27's hardened cell adds ONE -- see c/kernel.h.
+ * there. One line, and it is the whole difference between the two cells.
+ * ⚠ This line used to add *"TWO conjuncts, where p27's hardened cell adds
+ * ONE"* and invite the reader to draw the row from that count. The count is
+ * accurate about what the two files SPELL and it is not the row: p29's line
+ * can be spelled with one conjunct too (TASK_140, measured). See c/kernel.h.
  *
  * **ONE OMISSION, TWO BUG CLASSES, SELECTED BY THE INPUT.**
  *
@@ -27,8 +31,8 @@
  *                                         -> the read is in bounds of a LIVE
  *                                            allocation whose occupant changed:
  *                                            ASan is silent, the wrong answer
- *                                            is stable, and only the second
- *                                            conjunct sees it
+ *                                            is stable, and no allocation-
+ *                                            shaped instrument sees it
  *
  * **What this rung KEEPS.** The `live[cur] == 1` conjunct and the `steps`
  * bound on every walk, so no walk can follow a link into a retired slot and

@@ -250,7 +250,32 @@ def main():
 
     doc = {
         "pin": {"regenerate":
-                "python3 patterns/p29-bst-delete/controls/arms.py"},
+                "python3 patterns/p29-bst-delete/controls/arms.py",
+                # ⚠⚠ TASK_141, and it is `p23`'s `k_selfpivot` class in this
+                # pattern: a green pin does NOT make every cell below
+                # reproducible. Four draws of this script over the same corpus
+                # and seed, three of them on one tree state:
+                #   keyonly / deref  wrong_total, wrong_on_uaf: 7, 8, 7, 7
+                #   EVERY OTHER CELL, all six arms:              constant 4/4
+                # The reason is structural, not environmental: `keyonly` and
+                # `deref` are the two arms that DELETE THE LIVENESS CONJUNCT,
+                # so their identity test reads FREED memory by construction and
+                # whether the stale bytes still spell the old key is a draw.
+                # The arms that do not read freed memory do not move.
+                "not_covered": [
+                    "keyonly.wrong_total / keyonly.wrong_on_uaf and the same "
+                    "two cells of deref: measured 7, 8, 7, 7 over four draws "
+                    "(TASK_139 + TASK_141 x3). They are a DRAW, not a figure, "
+                    "because both arms read freed memory by construction. "
+                    "../NOTES.md 2b publishes the INVARIANT -- deleting the "
+                    "liveness conjunct costs ASan lines and few wrong answers, "
+                    "deleting the identity conjunct costs every recycle window "
+                    "and zero ASan lines -- and marks these two cells as a "
+                    "draw. Do not quote either as a fixed number.",
+                    "the C toolchain: SLB_GCC defaults to /usr/bin/gcc and is "
+                    "not hashed, so a compiler bump moves these counts and "
+                    "nothing here fires.",
+                ]},
         "derived_from_sha256": derived_from(),
         "windows": a.windows,
         "seed": a.seed,

@@ -66,16 +66,29 @@ WHY = (
     "named-spelling standard -- the tokens above must appear literally, uniform "
     "across all seven rungs, with ONE measured clause: a rung spells the same "
     "operands the way its language forces. "
-    "THE SAFETY LINE HAS TWO CONJUNCTS AND p27's HAS ONE, AND THAT IS THE ROW. "
-    "p27's READ path asks one question -- is the ALLOCATION still there? -- and "
-    "`live[h] == 1` answers it. p29's USE path has to ask two: `live[g_slot] == "
-    "1` (the same conjunct, the same array, the same meaning) and `tab[g_slot]"
-    "[0] == g_key` (is the OCCUPANT still the one FIND returned?). The second "
-    "exists because deleting a node with two children copies the in-order "
-    "successor's key and val INTO the victim's record and frees the SUCCESSOR, "
-    "so the victim's allocation stays live at the same address holding somebody "
-    "else's data -- and no allocation-shaped mechanism can see that. "
-    "AND THE ORDER IS LOAD-BEARING, WHICH IS WHY THE TWO ARE NOT "
+    "ONE OMITTED SOURCE LINE CARRIES TWO BUG CLASSES SELECTED BY THE INPUT, "
+    "AND THAT IS THE ROW. A victim with 0 or 1 child is unlinked and FREED, so "
+    "R1's cached read is a genuine use-after-FREE; a victim with 2 children has "
+    "the in-order successor's key and val copied INTO its record and the "
+    "SUCCESSOR freed, so the record stays live at the same address holding "
+    "somebody else's data and R1's read is an IN-BOUNDS use-after-RECYCLE. "
+    "AND THE HALF EVERY DETECTOR SEES IS THE HALF THAT CANNOT BE GATED: ASan, "
+    "Miri, safe Rust's `Option` discriminant and a linear `PointsTo` are all "
+    "mechanisms about the ALLOCATION and see the FREE half only -- whose "
+    "checksum is not reproducible run to run -- while the RECYCLE half is "
+    "silent, stable and wrong (../controls/repro.json publishes the invariant "
+    "and no pinned count). "
+    "WHAT THIS FENCE CLAIMED HERE UNTIL TASK_141 AND IT IS FALSE, MEASURED AND "
+    "RETRACTED AT TASK_140: ~~p29's safety line NEEDS two conjuncts where "
+    "p27's needs one~~. ONE CONJUNCT IS ENOUGH -- two single-conjunct "
+    "spellings built from c/kernel.c by substitution score 0 wrong and 0 ASan "
+    "lines with the positive control firing, and one of them adds NO STATE, "
+    "widening `live[]` from a bit to the occupant tag (which p27's own kernel "
+    "calls a generation counter with slot reuse removed). The two-conjunct "
+    "spelling is a CHOICE -- it buys a free `wf` at R5, ../NOTES.md 6c -- and "
+    "the row is not a duplicate of p27 for the TWO-BUG-CLASS reason above, "
+    "which is a reason the conjunct count was never evidence for. "
+    "GIVEN THIS SPELLING THE ORDER IS FORCED, WHICH IS WHY THESE TWO ARE NOT "
     "INTERCHANGEABLE: `tab[g_slot]` is never reset, so `tab[g_slot][0]` is the "
     "same load from the same address as `g_saved[0]`; C's `&&` short-circuits, "
     "so with the liveness conjunct in front the identity test is not evaluated "
@@ -87,7 +100,8 @@ WHY = (
     "is not even a choice: `perms.tracked_borrow(g_slot)` has "
     "`dom().contains(g_slot)` as a precondition and `live[g_slot] == 1` is the "
     "only thing that discharges it, so the identity test cannot be written "
-    "first. "
+    "first -- a fact about the TWO-CONJUNCT spelling and not about the "
+    "pattern, since a single-conjunct spelling has no ordering to force. "
     "WHY `tab[h]` IS NOT NULLED ON THE FREE, and it is p27's reason with a "
     "measurement behind it: nulling the table slot would turn a stale read into "
     "a NULL dereference -- a crash, not a use-after-free, and a different bug "
@@ -145,8 +159,11 @@ NOTE = (
     "rungs, `tab[g_slot].is_some() && rec.key == g_key` in the safe rungs -- and "
     "at R5 the FIRST becomes `perms.dom().contains(g_slot)`, the precondition "
     "`tracked_borrow` cannot be called without, while the SECOND is an ordinary "
-    "value equality that linearity has nothing to say about. That split is the "
-    "row: `p27` needs only the first. "
+    "value equality that linearity has nothing to say about. ⚠ That SPLIT is "
+    "real and it is not the row, and this entry said it was: p27 spells only "
+    "the first conjunct, but p29's line can also be spelled with one "
+    "(TASK_140, measured), so the row rests on its two BUG CLASSES and not on "
+    "a conjunct count. "
     "**The `ensures` is the FUNCTIONAL one**: `run` is an abstract machine "
     "carrying five parallel slot sequences (`ky`, `vl`, `lt`, `rt`, `lv`), a "
     "root link and the cached lookup result, and it says the accumulator is what "
@@ -166,7 +183,7 @@ NOTE = (
 )
 
 OBLIG_NOTE = (
-    "25 = TABCAP 1 + RECSZ 1 + NIL 1 + SENT 1 + **struct Rec 1** + descend 1 + "
+    "25 = TABCAP 1 + RECSZ 1 + NIL 1 + SENT 1 + **the `#[derive(Clone, Copy)]` on struct Rec 1** + descend 1 + "
     "succ_walk 1 + del_walk 1 + run 1 + rec_open 1 + rec_close 1 + rec_read 1 + "
     "rec_write 1 + walk 2 + kernel 5 + main 5. Every FUNCTION term was measured "
     "with `./verus_run.py verus.rs --verify-function <name> --verify-root` "
@@ -179,12 +196,20 @@ OBLIG_NOTE = (
     "each; buf_get_unchecked, arr_get_unchecked, arr_set_unchecked, rec_alloc, "
     "rec_free, load_input and emit are external_body and report 0. FOUR `const`s "
     "carry one query each (`.memory/04-verus.md`: a const inside verus! is its "
-    "own obligation). ⚠ **AND SO DOES A `struct`, WHICH IS NEW HERE AND WAS "
-    "MEASURED, NOT ASSUMED**: the per-function census sums to 24 against a "
-    "measured total of 25, and adding one further bare `#[repr(C)] struct Rec2 "
-    "{ a: u8 }` to a copy of this file takes the total to 26 "
-    "(`.temp/t139/verus/probe_ob.rs`). The `global layout Rec` directive "
-    "therefore carries ZERO. kernel's 5 = body + FOUR loop bodies (the op walk, "
+    "own obligation). ⚠⚠ **THE 25th TERM IS THE `#[derive(Clone, Copy)]` ON "
+    "`Rec`, NOT THE `struct`, AND THIS NOTE SAID OTHERWISE UNTIL "
+    "TASK_141**: a BARE `struct` carries ZERO -- adding one to a copy of this "
+    "file gives 25 and adding three still gives 25 -- while `#[derive(Clone)]` "
+    "carries one, the derived `clone` body being its own query; "
+    "`#[derive(Debug)]` and `#[derive(PartialEq)]` carry zero. TASK_139's "
+    "probe (`.temp/t139/verus/probe_ob.rs`) added its `Rec2` WITH "
+    "`#[derive(Clone, Copy)]` while describing it as *bare*, so it measured the "
+    "derive and attributed the result to the struct; TASK_140 re-measured it "
+    "eleven ways in minimal files and four ways on this file, and p36's bare "
+    "`pub struct OpTag<const K: u8>` counts ZERO while its own census sums "
+    "exactly to its pinned 12. **The NUMBER 25 is unchanged and was never in "
+    "doubt; only the stated CAUSE was wrong.** The `global layout Rec` "
+    "directive also carries ZERO. kernel's 5 = body + FOUR loop bodies (the op walk, "
     "the deletion guard loop, the successor descent and the epilogue); walk's "
     "2 = body + its one loop. main's 5 is quoted AS MEASURED."
 )
@@ -422,7 +447,7 @@ MIRI_REASON = (
     "`-O0` shape at all. ASan checks the temporal half on the C rungs; the "
     "proof covers R5. ⚠ **And note what Miri CANNOT see here, which is the "
     "pattern's headline**: the two-child splice frees nothing, so Miri is "
-    "silent on `adversarial-recycle.bin` in every rung -- the second conjunct's "
+    "silent on `adversarial-recycle.bin` in every rung -- the use-after-RECYCLE "
     "bug class is invisible to every allocation-shaped instrument. Cost: "
     "check.py rewrites n_iters to 4, so each row performs at most 4 x nops "
     "allocator operations."
@@ -476,21 +501,35 @@ a binary search tree does one of two things to the record that held it, and
 
 One omitted line, two bug classes, selected by the input.
 
-## Why the safety line needs TWO conjuncts, and `p27`'s needs one
+## What the safety line has to notice, and why no detector notices it
 
 ```
-p27   if (h < ntab && live[h] == 1)                                  ONE conjunct
-p29   if (g_saved != NULL && live[g_slot] == 1 && tab[g_slot][0] == g_key)   TWO
+p27   if (h < ntab && live[h] == 1)                     is the ALLOCATION there?
+p29   if (g_saved != NULL && live[g_slot] == 1 && tab[g_slot][0] == g_key)
                              ^^^^^^^^^^^^^^^^^    ^^^^^^^^^^^^^^^^^^^^^^^
                              is the ALLOCATION     is the OCCUPANT still the
                              still there?          one FIND returned?
                              (p27's whole line)    (p27 has no analogue)
 ```
 
-The second conjunct exists because **`p29`'s second bug class never touches the
-allocation.** A liveness bit cannot see it, and neither can ASan, safe Rust's
-`Option` discriminant, Miri, or a linear `PointsTo` -- all four are mechanisms
-about the ALLOCATION. `../NOTES.md` 2 measures all of them.
+The occupant-identity test exists because **`p29`'s second bug class never
+touches the allocation.** A liveness bit cannot see it, and neither can ASan,
+safe Rust's `Option` discriminant, Miri, or a linear `PointsTo` -- all four are
+mechanisms about the ALLOCATION. `../NOTES.md` 2 measures all of them.
+
+⚠⚠⚠ **AND THIS SECTION USED TO BE HEADED *"why the safety line needs TWO
+conjuncts, and `p27`'s needs one"*, WHICH IS FALSE.** `TASK_140` built **two**
+single-conjunct spellings out of the shipped `c/kernel.c` by substitution and
+both score `0 wrong / 0 ASan lines` with the positive control firing; one of
+them adds **no state at all**, widening `live[]` from a bit to the occupant tag
+-- which `p27`'s own kernel calls a generation counter with slot reuse removed.
+**ONE CONJUNCT IS ENOUGH.** What ships here is a two-conjunct spelling because
+it buys a free `wf` at R5 (`../NOTES.md` 6c); that is a CHOICE. ⚠ **The row is
+still not a duplicate of `p27`** -- one source line carrying two bug classes
+selected by the input is what makes it a row, and the ⚠ **half every detector
+sees is the half that cannot be gated**, R1's checksum being irreproducible on
+the use-after-free windows and stable on the recycle one. **The conjunct count
+was never evidence for any of that.**
 
 **Neither conjunct subsumes the other, and they fail in different currencies.**
 Measured on one 500-window corpus (`../NOTES.md` 2b, `controls/arms.json`): drop
@@ -501,12 +540,14 @@ checksum survives; drop the identity conjunct and the harm is a wrong answer,
 `NOTES.md` and in the control's JSON, not here: a number only a rebuild can
 produce must not sit inside a fence the rebuild re-hashes.
 
-**The order is load-bearing.** `tab[g_slot]` is never reset, so `tab[g_slot][0]`
-is the same load from the same address as `g_saved[0]`. `&&` short-circuits, so
-the identity test is not evaluated on the inputs where the record has been
-freed. At R5 the ordering is not even a choice: the record read needs
-`perms.tracked_borrow(g_slot)` and only the liveness test discharges its
-precondition.
+**Given this spelling, the order is load-bearing.** `tab[g_slot]` is never
+reset, so `tab[g_slot][0]` is the same load from the same address as
+`g_saved[0]`. `&&` short-circuits, so the identity test is not evaluated on the
+inputs where the record has been freed. At R5 the ordering is not even a
+choice: the record read needs `perms.tracked_borrow(g_slot)` and only the
+liveness test discharges its precondition. ⚠ **That is a fact about the
+two-conjunct spelling, not about the pattern** -- a one-conjunct spelling has
+no ordering to force.
 
 ## What every rung carries that a textbook BST would not
 
@@ -554,7 +595,7 @@ the price of the identity pin.
 
 | pin | why |
 |---|---|
-| `verus.obligations` = 25 | **4 consts + 1 struct + 4 recursive spec fns + 4 record ops + walk 2 + kernel 5 + main 5.** Every function term was measured with `--verify-function <name> --verify-root`; the `struct` term was measured too, and it is a fact this tree did not have -- see `obligations_note`. |
+| `verus.obligations` = 25 | **4 consts + 1 derive + 4 recursive spec fns + 4 record ops + walk 2 + kernel 5 + main 5.** Every function term was measured with `--verify-function <name> --verify-root`. ⚠ The 25th term is the `#[derive(Clone, Copy)]` on `Rec`, **not** the `struct`: a bare `struct` carries ZERO (TASK_140, measured eleven ways; the number 25 never moved, only its stated cause) -- see `obligations_note`. |
 | `verus.twin_obligations` = 30 | the count under `--cfg slb_twin`. **25 shipped + 5**, one per trusted item inside the twin regime. Two of the five are `vstd::raw_ptr::allocate` and `deallocate` themselves. |
 | `identity` `O3: norel`, `O0: differ` | ⚠ **the first `differ` row in the tree**, and it is measured rather than conceded: p27's one-line `-O0` fix does not transfer once the record is a struct. See the pin's `why`. |
 | `miri.required: true` | on p29 Miri is the only instrument that checks the temporal property on the unsafe rung **and** the only one that sees R4's `-O0` shape at all, because R4 and R5 are not byte-identical there. ⚠ And it is **silent on the recycle half**, which is the row's point. |

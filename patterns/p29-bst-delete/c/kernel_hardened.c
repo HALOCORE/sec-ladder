@@ -11,7 +11,16 @@
  * That is the whole difference between the two cells, so R1h-vs-R1 is the price
  * of THIS LINE and of nothing else.
  *
- * **THE ORDER IS LOAD-BEARING AND IS NOT A STYLE CHOICE.** `tab[g_slot]` is
+ * ⚠⚠ **TWO CONJUNCTS IS WHAT THIS FILE SPELLS, NOT WHAT THE PROPERTY NEEDS,
+ * AND THE DIFFERENCE WAS PUBLISHED THE WRONG WAY ROUND UNTIL TASK_140.** One
+ * conjunct is enough: `live[]` widened from a bit to the occupant tag scores
+ * `0 wrong / 0 ASan lines` on the same corpus, with the positive control
+ * firing, adding no state. The two-conjunct spelling ships because it buys a
+ * free `wf` at R5 (../NOTES.md 6c). ⚠ Everything below is therefore a fact
+ * about THIS SPELLING, and `p29`'s row rests on its two bug classes
+ * (c/kernel.h), never on a conjunct count.
+ *
+ * **GIVEN THIS SPELLING THE ORDER IS LOAD-BEARING AND IS NOT A STYLE CHOICE.** `tab[g_slot]` is
  * never reset, so `tab[g_slot][0]` is the same load from the same address as
  * `g_saved[0]`. C's `&&` short-circuits, so on exactly the inputs where the
  * record has been freed the second conjunct is not evaluated. Deleting the

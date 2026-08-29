@@ -150,12 +150,12 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "14bf218f1a146989e98575e8fd5ab7e201c0fe1c4f27e521d71482102de96d40",
+    "harness/check.py": "30c0a2ed12991124c876d3b071e1c3856d530147caa53ec184c64f60d1013647",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
-    "harness/report.py": "399df91333d007742f24c94ad719a1fd7cc6fd5befc509261f1c368803f2a927",
+    "harness/report.py": "d82747da107a031842a8fc441961553c1f43277d55ee91219beafbd97ae57076",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
     "patterns/p19-state-machine/NOTES.md": "14540d0730b258fb2930fe3c3f1a8bf2f1f34f0b0323cdae7ab70cb888327118",
     "patterns/p19-state-machine/README.md": "9937d7599c55c8b43fa632f79cbd9f35e4d9f860c415ca94a22e20851bb68003",
@@ -242,9 +242,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3267,
+    "bytes": 3264,
     "nvars": 48,
-    "envp_stack_bytes": 3651,
+    "envp_stack_bytes": 3648,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -1294,7 +1294,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==3500878==ERROR: AddressSanitizer: SEGV on unknown address 0x51e000010b85 (pc 0x55ff02ee05ed bp 0x51e000010b85 sp 0x7ffd372821f0 T0) ==3500878==The signal is caused by a READ memory access. #0 0x55ff02ee",
+      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==4157581==ERROR: AddressSanitizer: SEGV on unknown address 0x51e000010b85 (pc 0x563722d4b5ed bp 0x51e000010b85 sp 0x7fffd988b250 T0) ==4157581==The signal is caused by a READ memory access. #0 0x563722d4",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1305,7 +1305,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==3500879==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51e000001685 at pc 0x5604501e268d bp 0x7ffe170e00d0 sp 0x7ffe170e00c0 READ of size 1 at 0x51e000001685 thread T0 #0 0x5604501e268c in kernel /home/apt/repos_common/",
+      "diagnostic": "================================================================= ==4157582==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51e000001685 at pc 0x556b15a6168d bp 0x7ffcf654ef30 sp 0x7ffcf654ef20 READ of size 1 at 0x51e000001685 thread T0 #0 0x556b15a6168c in kernel /home/apt/repos_common/",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1469,7 +1469,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 4.4,
+        "seconds": 4.3,
         "stdout": "9293610825097060496",
         "model_stdout": "9293610825097060496",
         "stderr": ""

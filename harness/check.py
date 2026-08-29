@@ -7725,9 +7725,10 @@ def check_published_tables(pdir, rep, contract_sha):
     return out
 
 
-def check_table_render(pdir, rep, tables):
+def check_table_render(pdir, rep, tables, gate_now):
     """9c. Is `results/tables/<pattern>.md` byte-identical to what
-    `harness/report.py` renders from this tree TODAY?
+    `harness/report.py` renders from this tree TODAY, **against the record THIS
+    RUN IS ABOUT TO WRITE**?
 
     **The gap this closes.** Stage 9 above pins the table on `contract_sha256`
     -- the *declaration*. `TASK_121` caught the consequence live:
@@ -7789,15 +7790,40 @@ def check_table_render(pdir, rep, tables):
     same defect wearing a milder verb. `rep.fail` only, and `failures` is not
     rendered (measured, not assumed: `--reads`).
 
-    ⚠ **The one-run lag is real and it is the STATUS QUO, not a new defect.**
-    This stage runs before the record is written, so it compares against the
-    PREVIOUS run's gate record; a change this run makes to `loud`,
-    `idiom_audit` or `controls_json` surfaces on the NEXT run. Stage 9 has
-    exactly the same shape (`report.py` prints the RECORD's `contract_sha256`,
-    not `spec.md`'s), which is why `TASK_121` documented the loop as *gate ->
-    `report.py` -> gate, twice*. Moving this stage after the record write would
-    remove the lag and reintroduce the self-reference through `verdict`, since
-    the failure would then have to change a record already on disk.
+    ⚠⚠⚠ **THE ONE-RUN LAG. IT WAS REAL, THIS DOCSTRING CALLED IT *"THE STATUS
+    QUO, NOT A NEW DEFECT"*, AND THAT DEFENCE WAS WRONG -- IT THEN COST TWO
+    PATTERNS A RUN EACH IN ONE SESSION.** Until TASK_141 this stage rendered
+    from whatever `results/gate/<pattern>.json` was on disk, which is the
+    PREVIOUS run's record. So a run that changed `loud`, `idiom_audit` or
+    `controls_json` **compared the table against a record it was about to
+    overwrite**: it went green on the agreement between two stale things, wrote
+    the new values, and the NEXT run failed. `p16` hit it at TASK_138 and `p29`
+    at TASK_139 -- `p29` shipped a record saying all four control sidecars were
+    `FRESH` beside a published table saying all four were `STALE`, under a
+    heading reading *"these are not defects"*, and the manager published
+    *"green"* off that record (`RECAP` 52, `.memory/03-measurement.md` 15).
+    ⚠ **A GREEN 9c WAS NOT EVIDENCE THAT THE TABLE MATCHED THE RECORD THAT RUN
+    WROTE**, which is the only thing it was ever asked.
+
+    ✅ **CLOSED at TASK_141 by passing the run's own values in**, not by moving
+    the stage: `main` snapshots `{contract_sha256, controls_json, idiom_audit,
+    loud}` as `gate_now` -- after stage 9b, which had to move above 9c for
+    `controls_json` to exist yet -- and `report.py::gate_record` prefers them
+    over the file. `_check_render_inputs_final` then re-compares the snapshot
+    against the record actually written, so an ordering change fails loudly
+    instead of silently reopening the lag.
+
+    ⚠ **Why NOT "just move the stage after the record write", which is the
+    obvious spelling.** The failure would then have to change a record already
+    on disk, so either the record's `verdict` lies about the run or the stage
+    has to rewrite it -- and rewriting it is the `verdict` self-reference this
+    stage was fixed for. Passing the values forward has neither problem: the
+    four keys are deterministic functions of the committed sources, and nothing
+    run-scoped reaches the render.
+
+    ⚠ **Stage 9 does NOT have the same shape, and this docstring used to claim
+    it did.** Stage 9 compares LIVE `spec.md` against the table, so its
+    detection never lagged; 9c's lag was in the detection itself (TASK_132).
 
     ⚠ **What still reaches the render and is a function of the RUN**: nothing,
     after the `verdict` removal. `blocked` is not read; `loud`, `controls_json`,
@@ -7823,7 +7849,16 @@ def check_table_render(pdir, rep, tables):
         return out
     try:
         doc, name = reportmod.load(pid)
-        fresh = reportmod.build(doc, name)
+        # ⚠ `gate_now`, NOT the file: see the one-run-lag paragraph above. A
+        # `None` here silently restores the lag, so it is asserted rather than
+        # defaulted.
+        if not isinstance(gate_now, dict) or set(gate_now) != set(
+                RENDER_INPUT_KEYS):
+            raise ValueError(
+                f"stage 9c was handed {sorted(gate_now) if isinstance(gate_now, dict) else type(gate_now).__name__} "
+                f"instead of this run's {list(RENDER_INPUT_KEYS)}; it cannot "
+                f"compare the table against the record this run writes")
+        fresh = reportmod.build(doc, name, gate_now)
     except SystemExit as e:
         # `report.load` exits when there is no `results/pNN-*.json`, or when it
         # is ambiguous. Stage 9 cannot see either: a table can exist and cite a
@@ -7891,13 +7926,53 @@ def check_table_render(pdir, rep, tables):
              f"pins what the table SAYS, and `p23` published a sentence that "
              f"had become false in exactly that gap (TASK_121). Fix, and it is "
              f"the same two commands as stage 9: `harness/report.py {pid}`, "
-             f"then gate again. ⚠ This stage reads the PREVIOUS run's "
-             f"`results/gate/{pat}.json`, so if THIS run changed `loud`, "
-             f"`idiom_audit` or `controls_json` the render you want is the one "
-             f"taken after this run wrote its record -- which is what that "
-             f"two-command loop does. First differing lines:\n      "
+             f"then gate again. ⚠ Since TASK_141 this stage renders against "
+             f"THIS run's `contract_sha256`, `controls_json`, `idiom_audit` "
+             f"and `loud`, not the previous run's, so a red 9c means the "
+             f"committed table really does disagree with the record being "
+             f"written now -- and `harness/report.py {pid}` reads that record "
+             f"only after this run has written it, which is why `report.py` "
+             f"comes after the gate and not before. First differing lines:\n      "
              + "\n      ".join(ln[:200] for ln in d[2:14]))
     return out
+
+
+#: The gate-record keys `harness/report.py` renders into `results/tables/*.md`.
+#: MEASURED BY MUTATION, not read off `report.py`'s source:
+#: `python3 harness/tools/table_render_inputs.py --reads` flips each key of each
+#: record and re-renders, and these four are the ones that move the bytes, on
+#: 26 of 26 patterns. Stage 9c must supply all four from THIS run or its verdict
+#: is a statement about the previous run (TASK_141).
+RENDER_INPUT_KEYS = ("contract_sha256", "controls_json", "idiom_audit", "loud")
+
+
+def _check_render_inputs_final(doc, gate_now, rep):
+    """Did the record being written really carry what stage 9c rendered from?
+
+    ⚠⚠ **This is the must-not-drift half of the TASK_141 repair, and it exists
+    because the repair is an ORDERING invariant that nothing else enforces.**
+    Stage 9c compares the published table against a render built from
+    `gate_now` -- four keys snapshotted between stage 9b and stage 9c. That is
+    only the record THIS run writes if no stage after 9c touches any of them.
+    `contract_sha256`, `idiom_audit` and `controls_json` are handed to their
+    keys unchanged, so the reachable one is `loud`: **every `rep.shout` in the
+    file appends to it**, there are ~26 shout sites over 12 sections, and a
+    stage added below 9c would silently put the one-run lag back.
+
+    So this compares, and `rep.fail`s on a mismatch rather than trusting the
+    ordering to be remembered. ⚠ It may never `rep.shout`: `loud` is rendered,
+    so a shout here would itself falsify the thing it is checking."""
+    drift = [k for k in RENDER_INPUT_KEYS if doc.get(k) != gate_now.get(k)]
+    if not drift:
+        return
+    rep.fail("tables",
+             f"THE STAGE-9c RENDER IS NOT A RENDER OF THIS RUN'S RECORD: "
+             f"{drift} changed between stage 9c and the record write, so 9c's "
+             f"verdict describes a record that is not the one on disk. This is "
+             f"the one-run lag TASK_141 closed, reopened by a stage running "
+             f"after 9c -- `loud` is the reachable key, because every "
+             f"`rep.shout` appends to it. Fix: move that stage ABOVE the "
+             f"`gate_now` snapshot in `main`, the way stage 9b was moved.")
 
 
 def check_control_json_pins(pdir, rep, source_sha):
@@ -8726,11 +8801,32 @@ def main():
     # `measure.py` (measurement-hashed) or in a standalone script (nothing runs
     # it, which is how item 23 recurred twice).
     tables = check_published_tables(pdir, rep, contract_sha)
+    # ⚠⚠ TASK_141: 9b MOVED ABOVE 9c, AND THE ORDER IS NOW LOAD-BEARING, NOT
+    # COSMETIC. `controls_json` is one of the four keys `report.py` renders, so
+    # 9c cannot compare the published table against THIS run's record until 9b
+    # has decided them. With 9b after 9c -- the order until TASK_141 -- stage 9c
+    # rendered from the PREVIOUS run's `controls_json` and a run that moved it
+    # passed itself and poisoned the next. `p29` is the instance and it also
+    # cost `p16` a run. See `check_table_render`.
+    ctljson = check_control_json_pins(pdir, rep, source_sha)
+    # THE FOUR KEYS `report.py` READS, as THIS run computes them -- measured by
+    # mutation, not read off the source: `harness/tools/table_render_inputs.py
+    # --reads` gives `{contract_sha256, controls_json, idiom_audit, loud}` on
+    # 26 of 26. Everything here is a deterministic function of the committed
+    # sources; `verdict`, `blocked` and `failures` are functions of the RUN and
+    # are deliberately absent, because rendering one of those would make the
+    # table an input to its own checker (`report.py::read_gate_loud`).
+    # ⚠ `loud` is a SNAPSHOT taken here. `_check_render_inputs_final` below
+    # re-compares it against the record actually written, so a future stage that
+    # shouts after this point fails loudly instead of silently reopening the lag.
+    gate_now = {"contract_sha256": contract_sha,
+                "idiom_audit": audit,
+                "controls_json": ctljson,
+                "loud": [{"section": s, "message": m} for s, m in rep.loud]}
     # TASK_127. The CONTENT half of stage 9, and it must stay BEFORE the record
     # is written: see `check_table_render`'s docstring for why moving it after
     # the write reintroduces the self-reference it exists without.
-    tabrender = check_table_render(pdir, rep, tables)
-    ctljson = check_control_json_pins(pdir, rep, source_sha)
+    tabrender = check_table_render(pdir, rep, tables, gate_now)
     doc = {
         "pattern": os.path.basename(pdir),
         "skipped_inputs": a.skip,
@@ -8845,6 +8941,21 @@ def main():
         "loud": [{"section": s, "message": m} for s, m in rep.loud],
         "blocked": rep.blocked,
     }
+    # ⚠⚠ THE "OR FAIL LOUDLY WHEN IT CANNOT" HALF OF THE TASK_141 REPAIR.
+    # Stage 9c rendered against `gate_now`, a snapshot of four keys taken at
+    # 9b/9c time. This asserts that the record now being written carries exactly
+    # those four values, i.e. that the comparison 9c made really was against
+    # THIS run's record. It can only fire if a future stage is inserted after
+    # 9c and moves one of them -- `loud` is the reachable one, since any
+    # `rep.shout` appends to it -- and if it ever does, the one-run lag is back
+    # and this says so instead of the next run finding out.
+    _check_render_inputs_final(doc, gate_now, rep)
+    # Re-derived, because the guard above may have appended to `rep.failures`
+    # after the dict literal read it. ⚠ `failures` is NOT rendered by
+    # `report.py` (measured, `--reads`), so re-deriving it cannot invalidate the
+    # comparison stage 9c just made; `loud` would, which is why the guard is
+    # allowed to `rep.fail` and forbidden to `rep.shout`.
+    doc["failures"] = [{"section": s, "message": m} for s, m in rep.failures]
     # A diagnostic run must never overwrite the record of a full one. `--skip`
     # and `--no-callgrind` both make the run certify strictly less, so they get
     # their own file; only a complete run writes `<pattern>.json`. (Learned the

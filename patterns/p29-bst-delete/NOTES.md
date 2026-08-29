@@ -63,8 +63,18 @@ A `FIND` caches the address of the record it found. A later `USE` reads through
 that address. **Deleting a key from a binary search tree does one of two things
 to the record that held it, and which one is chosen by the DEGREE of the
 victim** — and `c/kernel.c` omits the line that would notice either. The whole
-of the row is that the two need *different* conjuncts, and that the second
-conjunct is invisible to every mechanism this project owns.
+of the row is that **one source line carries both classes**, that the recycle
+class is invisible to every allocation-shaped mechanism this project owns, and
+that ⚠ **the half every detector sees is the half that cannot be gated** —
+R1's checksum is irreproducible exactly where ASan and Miri fire, and stable
+exactly where they are silent.
+
+⚠⚠⚠ **WHAT THIS SECTION SAID UNTIL TASK_141 AND IT IS FALSE:** ~~*"the two
+need different conjuncts, and that is the row"*~~, in the form *"`p27`'s line
+needs ONE conjunct and `p29`'s needs TWO"*. **`TASK_140` measured two
+single-conjunct spellings, both `0 wrong / 0 ASan lines`, one of them adding no
+state.** The row survives on the two bug classes; the counting claim does not.
+See §2b's coda and §6c.
 
 ---
 
@@ -91,7 +101,7 @@ failure class for publishing a *reading* instead of the measured object
 
 | | read path (`R1h`, SHIPPED) | write path (`H2`) |
 |---|---|---|
-| **the row's headline** — *`p27`'s read-path line needs ONE conjunct, `p29`'s needs TWO* | **is the shipped diff.** `p27`'s `&& live[h] == 1` and `p29`'s `&& live[g_slot] == 1 && tab[g_slot][0] == g_key` sit in two shipped files and can be diffed | describes an arm the tree does not contain; `p29`'s shipped diff would be a pointer-nulling statement inside `REMOVE`, which has no `p27` counterpart at all |
+| **the row's headline** — ⚠ *as written at `TASK_139`: "`p27`'s read-path line needs ONE conjunct, `p29`'s needs TWO". **That headline is FALSE** (`TASK_140`) and the row's headline is now the two bug classes; the criterion this row scored still applies, reading "the shipped diff" for "the headline"* | **is the shipped diff.** `p27`'s `&& live[h] == 1` and `p29`'s `&& live[g_slot] == 1 && tab[g_slot][0] == g_key` sit in two shipped files and can be diffed | describes an arm the tree does not contain; `p29`'s shipped diff would be a pointer-nulling statement inside `REMOVE`, which has no `p27` counterpart at all |
 | **legibility across rungs** | every rung has the line and they differ in exactly the interesting way: C spells both conjuncts, **safe Rust gets the first from `Option` and must write the second by hand**, R5 turns the first into `perms.dom().contains(g_slot)` and the second into a value equality | the safe rungs would null a cached *index*, which is neither what the language gives them nor what C does |
 | **R5 tractability** | the check discharges its own precondition **locally**: `live[g_slot] == 1` is what `tracked_borrow` needs, and nothing else is required | the read is licensed only by `g_saved != NULL`, which needs a global existential — *some live slot's record is this address* — re-established by every mutation. ⚠ **Argued, not measured: no `H2` R5 was built** (§8) |
 | **exactness** | exact | exact — **not a discriminator** |
@@ -175,9 +185,10 @@ the kernel.
 
 **All four are mechanisms about the ALLOCATION, and the two-child splice never
 touches the allocation** — it copies the in-order successor's key and val *into
-the victim's record* and frees the *successor*. That is why the safety line
-needs a second, non-linear conjunct, and it is `p29`'s whole contribution over
-`p27`.
+the victim's record* and frees the *successor*. That is why the safety line has
+to ask a **non-linear** question, and it is `p29`'s whole contribution over
+`p27`. ⚠ **It is not why it needs a SECOND conjunct** — `TASK_140` built two
+single-conjunct spellings that ask it, one adding no state at all (§2b coda).
 
 ### 2b. Dropping either conjunct is measurable harm, and the two harms are not the same kind
 
@@ -210,12 +221,49 @@ ASan POSITIVE CONTROL: rc=1 hits=2 heap-use-after-free
 contain a recycle event *as well as* a use-after-free; the classification takes
 ASan first.
 
+> ⚠⚠ **TWO CELLS OF THIS TABLE ARE A DRAW AND NOT A FIGURE, FOUND AT `TASK_141`
+> WHEN THE SIDECAR WAS REGENERATED AFTER A COMMENT-ONLY EDIT.** `keyonly`'s and
+> `deref`'s **`wrong, total`** and **`on the 104 UAF windows`** measured
+> **7, 8, 7, 7** over four draws of `controls/arms.py` on the same corpus and
+> the same seed. ⚠ **Every other cell of every arm was constant 4 of 4** —
+> including all six `asan_lines`, all three recycle columns and every `nulltab`
+> column but `keyonly`'s, which was also constant.
+>
+> **The reason is structural, not environmental**: `keyonly` and `deref` are the
+> two arms that delete the **liveness** conjunct, so their identity test reads
+> **freed memory by construction**, and whether the stale bytes still spell the
+> old key is a draw. That is why their ASan column is 208 and their answer
+> column wobbles. It is `p23`'s `k_selfpivot` class in this pattern, and
+> `controls/arms.json`'s `pin.not_covered` now names it — **a green staleness
+> pin does not make a number reproducible.**
+>
+> ✅ **What is a fact, and it is what this section argues**: the two conjuncts
+> fail in different currencies. `keyonly`/`deref` pay **208 ASan lines and a
+> handful of wrong answers**; `liveonly` pays **zero ASan lines and every single
+> recycle window**. That contrast survives the draw by two orders of magnitude.
+
 > ⚠⚠ **THE TWO CONJUNCTS FAIL IN DIFFERENT CURRENCIES, AND NEITHER SUBSUMES THE
 > OTHER.** Drop the **liveness** conjunct and the harm is *memory-unsafety and
 > usually not a wrong answer* — the freed bytes still hold the old record often
 > enough that the checksum survives. Drop the **occupant-identity** conjunct and
 > the harm is *a wrong answer and never a memory error* — every recycle window
 > diverges and ASan says nothing at all.
+
+> ⚠⚠⚠ **CODA, `TASK_140`, AND IT RETRACTS THIS ROW'S PUBLISHED HEADLINE:
+> ~~*"`p27`'s read-path line needs ONE conjunct, `p29`'s needs TWO"*~~ IS
+> FALSE.** Two single-conjunct arms built from the shipped `c/kernel.c` by the
+> same substitution, scored on **this** corpus and seed, are `wrong_total 0`,
+> `wrong_on_uaf 0`, `wrong_on_recycle 0`, `asan_lines 0`, with the ASan
+> positive control firing — `livetag` (`live[]` widened from a bit to the
+> occupant tag, **no new state**, `USE: live[g_slot] == (uint16_t)(g_key + 1)`)
+> and `gentag` (a separate `gen[]` counter). Both agree with `R1h` on all eight
+> committed inputs. **What survives is the two-bug-class mechanism and the
+> currencies result above — dropping the single conjunct produces *both* harms
+> at once, which is sharper.** ⚠ What the shipped spelling does buy, and it was
+> never weighed at build time: a free `wf` (§6c). ⚠ Evidence:
+> `.tasks/TASK_140_REPORT.md` §1, `.temp/t140/probes/onecon.py`,
+> `.temp/t140/onecon.json`. **These arms are NOT in `controls/arms.json`** —
+> they were built by the review, out of tree, and the sidecar is the build's.
 
 ✅ **And with `tab[]` write-once, `tab[g_slot][0]` and `g_saved[0]` are the same
 load from the same address** — which is why the `keyonly` and `deref` arms
@@ -432,7 +480,22 @@ axioms **and emits a static check at codegen**, so it is checked by the compiler
 on this platform rather than assumed — but it is still an axiom for the
 verifier, and it is counted as one here.
 
-### 6c. ⚠⚠ THE ORDER OF THE TWO CONJUNCTS IS FORCED AT R5
+### 6c. ⚠⚠ GIVEN THE TWO-CONJUNCT SPELLING, THE ORDER IS FORCED AT R5
+
+⚠⚠⚠ **THIS SECTION WAS HEADED *"THE ORDER OF THE TWO CONJUNCTS IS FORCED AT
+R5"* AND READ AS A FACT ABOUT THE PATTERN. IT IS A FACT ABOUT THIS SPELLING**
+(`TASK_140`): with one conjunct there is no ordering to force, and a
+single-conjunct spelling is available and was measured (§2b coda). The `M2b`
+measurement below is real and reproduces; its scope is what narrows.
+
+⚠ **And this is the one thing that does prefer the shipped spelling, weighed
+here because it was not weighed at build time**: `base`'s tie between exec and
+ghost state is `forall j. st.lv[j] <==> live[j] == 1u8`. Under the occupant-tag
+spelling that becomes `st.lv[j] <==> live[j] != 0` **plus** a new conjunct
+`st.lv[j] ==> live[j] == st.ky[j] + 1`, which the insert and the two-child
+splice would have to re-establish. **So the shipped line buys a free `wf` at
+the price of a second conjunct** — argued, not measured: no occupant-tag R5 was
+built.
 
 In C the safety line is one `if` with `&&`, and the short-circuit is what keeps
 the identity test from being a use-after-free. **At R5 the identity test cannot

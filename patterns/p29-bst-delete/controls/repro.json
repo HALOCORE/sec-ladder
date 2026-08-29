@@ -3,15 +3,15 @@
     "regenerate": "python3 patterns/p29-bst-delete/controls/repro.py"
   },
   "derived_from_sha256": {
-    "patterns/p29-bst-delete/c/kernel.c": "23a8ba59b61e0168e36c3d7fa7ea7c354dc170511172875ca29cf08b05fc8290",
-    "patterns/p29-bst-delete/c/kernel_hardened.c": "f1036f89533aa83dd2a7af9b31fdccf2c9e13652415991369bcd9489182a73c2",
+    "patterns/p29-bst-delete/c/kernel.c": "643952706b4565418260741178b49e89e7e7c6dd243e3bc0047c4154246cc7c3",
+    "patterns/p29-bst-delete/c/kernel_hardened.c": "9f61f5b340954c00d628fd25517c0611395d604e4e17ed9df726b4a683040d70",
     "patterns/p29-bst-delete/c/main.c": "e49eaf71150a23a385a2047effd4fbdab8f5dc32f2582c60a22d2407941881ab",
     "patterns/p29-bst-delete/inputs/gen.py": "d2abbb4cf9141d1ef42a457d2d65b5ca652cf15c46b4c7aeff351791632d4dbf",
     "patterns/p29-bst-delete/controls/repro.py": "3df11b4715df25621067d6d2397a073ecf1a6e7e037e820991ed8d1716be4473",
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3"
   },
   "runs": 20,
-  "measured_utc": "2026-08-29T14:09:32Z",
+  "measured_utc": "2026-08-29T15:43:38Z",
   "rows": [
     {
       "input": "adversarial-uaf.bin",

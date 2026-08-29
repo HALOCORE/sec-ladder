@@ -407,6 +407,19 @@ does. Every pattern's `spec.md` now carries, and `harness/check.py` diffs:
    nothing. It also explains why `--verify-function main --verify-root` reports
    2 for one function: the second query is the driver's loop body.
 
+   ⚠⚠⚠ **A THIRD TERM, MEASURED AT `TASK_140`/`TASK_141` AND CORRECTED THERE
+   BEFORE IT LANDED: `#[derive(Clone)]` CARRIES AN OBLIGATION; A BARE `struct`
+   CARRIES ZERO.** ✅ **Adding a bare `#[repr(C)] struct` to a copy of `p29`'s
+   `verus.rs` gives **25, not 26**; adding three still gives 25 — and `p36`'s
+   bare `pub struct OpTag<const K: u8>` counts ZERO and sums exactly to its
+   pinned 12.** ⚠⚠ **`TASK_139` proposed the opposite rule — *"a `struct` inside
+   `verus!` is its own obligation, exactly as a `const` is"* — from a probe whose
+   struct carried `#[derive(Clone, Copy)]` while the report called it *"bare"*.
+   ✅ **REJECTED before it reached this file.** ⚠ **The shipped count was right
+   and its stated CAUSE was wrong, which is `p31`'s failure mode; the general
+   lesson is `.memory/03-measurement.md` entry 17 — a probe that adds a feature
+   PLUS an attribute cannot attribute the result to the feature.**
+
    **The rule of thumb is incomplete — corrected at TASK_007.** "One query per
    function plus one per loop body" predicts **7** for p16; the true count is
    **10**. It does not account for `by (nonlinear_arith)` / `by { .. }`

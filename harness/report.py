@@ -120,7 +120,7 @@ def _entry_lines(tag, entry):
     return lines
 
 
-def idiom_section(doc, out):
+def idiom_section(doc, out, gate=None):
     """What the numbers below are numbers *of*.
 
     TASK_017 Part 2, from TASK_016_REVIEW B1.
@@ -173,10 +173,43 @@ def idiom_section(doc, out):
                "unchanged `contract_sha256`. So this section is a claim about intent "
                "that a reader must check against the rung sources, not a verified "
                "property of the numbers below.\n")
-    audit_section(doc, out)
+    audit_section(doc, out, gate)
 
 
-def read_gate_audit(pattern):
+def gate_record(pattern, gate=None):
+    """The gate record this render should describe.
+
+    ⚠⚠ **`gate` is the ONE-RUN-LAG REPAIR (TASK_141), and it is the whole of
+    it.** `check.py`'s stage `9c` re-renders this file's output and fails when
+    the committed table differs -- but it runs BEFORE the record is written, so
+    with `gate=None` it renders from the record the PREVIOUS run wrote. A run
+    that changes `controls_json`, `loud` or `idiom_audit` therefore **passed
+    itself and poisoned the next one**: `p29` shipped a record saying all four
+    sidecars were `FRESH` beside a published table saying all four were
+    `STALE`, and `check.py p29` returned `FAIL [tables]` on the very next run
+    (`RECAP` 52, `.memory/03-measurement.md` entry 15). It had already cost
+    `p16` a run two tasks earlier.
+
+    So `check.py::check_table_render` now passes the four keys **this run has
+    already computed** as `gate`, and this function prefers them. Nothing else
+    about the render changes: with `gate=None` -- every standalone
+    `harness/report.py pNN` -- the behaviour is exactly what it was.
+
+    ⚠ **Only these four keys may ever appear in a `gate` dict**, and the reason
+    is `read_gate_loud`'s rule: `contract_sha256`, `controls_json`,
+    `idiom_audit` and `loud` are deterministic functions of the committed
+    sources, while `verdict`, `blocked` and `failures` are functions of the RUN
+    and rendering one of those would make the table an input to its own
+    checker."""
+    if gate is not None:
+        return gate
+    try:
+        return json.load(open(os.path.join(RESULTS, "gate", f"{pattern}.json")))
+    except (OSError, ValueError):
+        return None
+
+
+def read_gate_audit(pattern, gate=None):
     """The stage-0b spelling audit out of `results/gate/<pattern>.json`.
 
     Deliberately NOT recomputed here, unlike `read_idiom` above, and the two
@@ -191,11 +224,13 @@ def read_gate_audit(pattern):
     `contract_sha256` no longer matches the block in `spec.md`, i.e. the
     declaration moved since the last gate run and the audit below describes the
     old one. Returns `(None, False)` when there is no record or no audit in it
-    -- a record written before TASK_020 has neither, and that is not an error."""
-    path = os.path.join(RESULTS, "gate", f"{pattern}.json")
-    try:
-        rec = json.load(open(path))
-    except (OSError, ValueError):
+    -- a record written before TASK_020 has neither, and that is not an error.
+
+    `gate`: see `gate_record` -- the four keys this run has already computed,
+    passed by `check.py` stage 9c so that it compares against the record THIS
+    run writes rather than the previous one's."""
+    rec = gate_record(pattern, gate)
+    if rec is None:
         return None, False
     au = rec.get("idiom_audit")
     if not isinstance(au, dict):
@@ -210,7 +245,7 @@ def read_gate_audit(pattern):
     return dict(au, _sha=rec.get("contract_sha256")), stale
 
 
-def audit_section(doc, out):
+def audit_section(doc, out, gate=None):
     """The stage-0b spelling audit, out of the gate record (TASK_020).
 
     Reporting only — it cannot fail the gate, and this section must not read as
@@ -224,7 +259,7 @@ def audit_section(doc, out):
     compliance: which rungs an entry applies to lives in its English, and
     asserting otherwise was measured to give 41 misses of which 41 were
     non-defects (`check.idiom_audit`)."""
-    au, stale = read_gate_audit(doc["pattern"])
+    au, stale = read_gate_audit(doc["pattern"], gate)
     if not isinstance(au, dict):
         return
     out.append("\n### Spelling audit (stage `0b`, reporting only)\n")
@@ -288,7 +323,7 @@ def audit_section(doc, out):
     out.append("")
 
 
-def read_gate_loud(pattern):
+def read_gate_loud(pattern, gate=None):
     """`loud` and `controls_json` out of `results/gate/<pattern>.json`.
 
     Same rule as `read_gate_audit` above and for the same reason: this is a
@@ -320,17 +355,20 @@ def read_gate_loud(pattern):
     are all deterministic functions of the committed sources, so they are safe;
     `verdict` and `blocked` are functions of the run. The gate verdict is still
     in `results/gate/<pattern>.json`, one hop away, and stage 9c's own record
-    key `table_render` says whether this table is current."""
-    try:
-        rec = json.load(open(os.path.join(RESULTS, "gate", f"{pattern}.json")))
-    except (OSError, ValueError):
+    key `table_render` says whether this table is current.
+
+    `gate`: see `gate_record`. The one-run lag this docstring's oscillation
+    argument is a cousin of was closed at TASK_141 by passing the run's own
+    values in, NOT by moving stage 9c after the record write."""
+    rec = gate_record(pattern, gate)
+    if rec is None:
         return None
     return {"loud": rec.get("loud") or [],
             "controls_json": rec.get("controls_json") or {},
             "sha": rec.get("contract_sha256")}
 
 
-def shout_section(doc, out):
+def shout_section(doc, out, gate=None):
     """`check.py`'s `rep.shout` output — the things the gate says out loud and
     does **not** fail on.
 
@@ -356,7 +394,7 @@ def shout_section(doc, out):
     trusted item whose `requires` constrains nothing about a parameter its body
     uses (12), and an anti-collapse floor far below the tightest measured cell
     (3) — all of them things a reader of the numbers below should know."""
-    g = read_gate_loud(doc["pattern"])
+    g = read_gate_loud(doc["pattern"], gate)
     if g is None:
         return
     loud, ctl = g["loud"], g["controls_json"]
@@ -536,7 +574,7 @@ def identity_table(doc, out):
                        f"{eq('md5_fn_norel')} | {eq('md5_raw')} | {cnt} | {pad} |")
 
 
-def build(doc, name):
+def build(doc, name, gate=None):
     out = [f"# {doc['pattern']} — results", ""]
     out.append(f"Generated {doc['generated_utc']} from `results/{name}` "
                f"(git `{doc['git']['commit'][:12]}`"
@@ -560,8 +598,8 @@ def build(doc, name):
                    f"{fmt(v['present'])} | {v['truncated']} | "
                    f"{v.get('model', '')} |")
 
-    idiom_section(doc, out)
-    shout_section(doc, out)
+    idiom_section(doc, out, gate)
+    shout_section(doc, out, gate)
 
     out.append("\n## Static + executed instructions\n")
     out.append("`Ir` is **callgrind per-function exclusive** for the kernel symbol. "

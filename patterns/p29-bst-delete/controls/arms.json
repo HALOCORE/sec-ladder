@@ -1,13 +1,17 @@
 {
   "pin": {
-    "regenerate": "python3 patterns/p29-bst-delete/controls/arms.py"
+    "regenerate": "python3 patterns/p29-bst-delete/controls/arms.py",
+    "not_covered": [
+      "keyonly.wrong_total / keyonly.wrong_on_uaf and the same two cells of deref: measured 7, 8, 7, 7 over four draws (TASK_139 + TASK_141 x3). They are a DRAW, not a figure, because both arms read freed memory by construction. ../NOTES.md 2b publishes the INVARIANT -- deleting the liveness conjunct costs ASan lines and few wrong answers, deleting the identity conjunct costs every recycle window and zero ASan lines -- and marks these two cells as a draw. Do not quote either as a fixed number.",
+      "the C toolchain: SLB_GCC defaults to /usr/bin/gcc and is not hashed, so a compiler bump moves these counts and nothing here fires."
+    ]
   },
   "derived_from_sha256": {
-    "patterns/p29-bst-delete/c/kernel.c": "23a8ba59b61e0168e36c3d7fa7ea7c354dc170511172875ca29cf08b05fc8290",
-    "patterns/p29-bst-delete/c/kernel.h": "31352ed2b17f7773ef0429b5db06ae3a2424869a82289af0e23d5eed72599196",
+    "patterns/p29-bst-delete/c/kernel.c": "643952706b4565418260741178b49e89e7e7c6dd243e3bc0047c4154246cc7c3",
+    "patterns/p29-bst-delete/c/kernel.h": "c12a89f8c8e2655616b133fb3ec3c3edc355cf58373d4e0f993a8a73deacd7c5",
     "patterns/p29-bst-delete/c/main.c": "e49eaf71150a23a385a2047effd4fbdab8f5dc32f2582c60a22d2407941881ab",
     "patterns/p29-bst-delete/inputs/gen.py": "d2abbb4cf9141d1ef42a457d2d65b5ca652cf15c46b4c7aeff351791632d4dbf",
-    "patterns/p29-bst-delete/controls/arms.py": "2c067e339e82ac081754cd28a54ceee6da65ef06c2c4c86319d1f859b57c3c6b",
+    "patterns/p29-bst-delete/controls/arms.py": "abc51014e0cf7eb2d93e04056a4f6a3eb0eb796984a3f16e620fb86fa7dd933d",
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3"
   },
   "windows": 500,

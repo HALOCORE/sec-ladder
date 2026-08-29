@@ -2972,6 +2972,29 @@ already been struck.** Keep the list, not the ordinal.
     ⚠ **This is finding 46's one-run lag, and the manager hit it on `p16` TWO
     TASKS EARLIER, fixed it there, and did not think to check `p29`.**
 
+    ✅✅ **CLOSED IN CODE AT `TASK_141`, AND PROVED ON THE REAL HISTORICAL STATE
+    RATHER THAN A MOCK.** **`check.py` now moves stage `9b` above `9c`, hands
+    `9c` a `gate_now` snapshot of `{contract_sha256, controls_json, idiom_audit,
+    loud}`, and re-compares that snapshot against the record actually written,
+    failing loudly on drift.** ⚠ **The obvious fix — moving `9c` after the write
+    — was REJECTED because it reintroduces the `verdict` self-reference
+    `TASK_127` removed (entry 11).**
+
+    ✅ **The must-fire arm rebuilds `d41ba6c`'s exact state in two repo-shaped
+    sandboxes differing only in `check.py`/`report.py`
+    (`.temp/t141/probe_9c/build_sandbox.py`, `arm.py`) — ✅ manager-re-run:**
+
+    ```
+    old code, d41ba6c state   render == published == b1398ea3ae68df9a   0 failures   <- the BUG
+    new code, same state      render b0d5af3b != published b1398ea3    1 failure, 4 lines
+    new code, repaired state  render == published == b0d5af3b533f5826   0 failures   <- silent
+    ```
+
+    ⚠⚠ **`b1398ea3ae68df9a` is the `render_sha256` `d41ba6c`'s COMMITTED RECORD
+    ACTUALLY CARRIES**, so the sandbox reproduces the historical defect rather
+    than approximating it. ✅ **`gate=None` renders 27/27 tables byte-identically,
+    so the report change is inert where it is not wanted.**
+
 16. ⚠⚠⚠ **THE GATE'S MIRI STAGE RUNS THE *CORRECT* RUNG, SO IT CAN NEVER
     SUBSTANTIATE A *"MIRI SEES / DOES NOT SEE"* CLAIM.** `TASK_139`, scope
     corrected by `TASK_140`.
@@ -3010,6 +3033,26 @@ already been struck.** Keep the list, not the ordinal.
     ⚠ **The published NUMBER was right and its stated CAUSE was wrong** — `p31`'s
     failure mode — **and it reached a hashed block, so correcting it costs a
     contract move.**
+
+
+18. ⚠⚠⚠ **A `derived_from_sha256` THAT RE-HASHES CLEAN DOES NOT MAKE THE
+    SIDECAR'S NUMBERS REPRODUCIBLE.** `TASK_141`; second instance after `p23`'s
+    `controls.log`.
+
+    `p29`'s `controls/arms.json` re-hashed clean and was **publishing a DRAW as a
+    figure**: regenerating it gave `keyonly`/`deref` `wrong_total` = **7, 8, 7,
+    7** across four draws, while every other cell was constant. ⚠ **The two cells
+    that move are exactly the arms that DELETE THE LIVENESS CONJUNCT and so read
+    freed memory by construction.**
+
+    > ⚠⚠ **THE RULE THAT GENERALISES: any control arm built by DELETING a safety
+    > check produces DRAWS, NOT FIGURES, in exactly the columns the deletion
+    > makes undefined.** **Pin those columns as not-covered, or publish a range
+    > and say it is one.**
+
+    ✅ **The pin proves the sidecar was generated from THESE sources; it says
+    nothing about whether re-running them yields the same numbers.** Those are
+    different properties and this project has now conflated them twice.
 
 
 ## ⚠ A number GREPPED OUT OF A LOG is not a number READ OUT OF A RECORD
