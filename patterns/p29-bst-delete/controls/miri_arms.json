@@ -3,7 +3,7 @@
     "regenerate": "python3 patterns/p29-bst-delete/controls/miri_arms.py"
   },
   "derived_from_sha256": {
-    "patterns/p29-bst-delete/unsafe.rs": "e1f1669c2a182b727004f606b7fe435c59f076c9d1f88cd73dc6c513fc434d65",
+    "patterns/p29-bst-delete/unsafe.rs": "3fb708192d174e52ea37267b5bfe2a850eecce8bc72aab87be70db0830a24378",
     "patterns/p29-bst-delete/inputs/gen.py": "d2abbb4cf9141d1ef42a457d2d65b5ca652cf15c46b4c7aeff351791632d4dbf",
     "patterns/p29-bst-delete/controls/miri_arms.py": "51183862dc2c09cf7593340e26e7ba3056509ef1bff7fe268c27d69bf653358b",
     "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e"

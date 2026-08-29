@@ -2968,6 +2968,17 @@ already been struck.** Keep the list, not the ordinal.
     > **Ask WHICH RUN wrote the record you are reading, and whether anything it
     > changed feeds the table.**
 
+    ⚠⚠⚠ **A SECOND INSTANCE, FROM THE READER'S SIDE, AND IT IS THE SAME MISTAKE
+    IN A DIFFERENT COSTUME (`TASK_142`, self-disclosed): an agent waited for a
+    gate run with `until grep -qE 'real\s' <gate.log>`, which matched the
+    UNRELATED line `ok f: real call site found`, and so read the record
+    MID-RUN — reporting `PASS` off the PREVIOUS record.** ✅ **Caught by
+    checking the record's own `unsafe.rs` hash.**
+
+    > ⚠⚠ **WAIT ON THE PROCESS, NEVER ON LOG TEXT.** A log line is not a
+    > completion signal, and a `grep` pattern loose enough to match early is the
+    > same defect as one loose enough to match the wrong thing.
+
     ✅ **Repair is two commands — `harness/report.py pNN` then `check.py pNN`.**
     ⚠ **This is finding 46's one-run lag, and the manager hit it on `p16` TWO
     TASKS EARLIER, fixed it there, and did not think to check `p29`.**

@@ -211,7 +211,7 @@ Known residuals we are deliberately **not** closing, all measured:
 - ~~`source_sha256` omits `patterns/*/inputs/gen.py` and `common/slb.py`~~ —
   **CLOSED at TASK_021**, with a demonstrated record move (a comment-only
   `gen.py` edit now changes `source_sha256`; before the fix it changed nothing).
-  The glob also gained `patterns/*/controls/*.py` and **`verus_run.py`**, a
+  The glob also gained `patterns/*/controls/*.py` ⚠ **(→ widened to `controls/*` minus `.json`/`.log` at `TASK_142`, which took orphan control sources from 10 to 0)** and **`verus_run.py`**, a
   fourth uncovered file nobody had named: it is R5's compiler driver *and* the
   process every proof stage asks for a verdict, so it decides both what R5's
   machine code is and what "verified" meant in that run — and it sits at the repo

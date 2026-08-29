@@ -1,6 +1,6 @@
 # p29-bst-delete — results
 
-Generated 2026-08-29T15:43:59Z from `results/p29-bst-delete.json` (git `55fa003d1681`, working tree dirty).
+Generated 2026-08-29T17:28:13Z from `results/p29-bst-delete.json` (git `0f606bb03bdb`, working tree dirty).
 
 ## Toolchain
 
@@ -149,7 +149,7 @@ Measured by the gate, not by this file — from `results/gate/p29-bst-delete.jso
 From `results/gate/p29-bst-delete.json` — the `loud` and `controls_json` keys, at contract `a7249f0d60f3`. **These did not fail the gate and are not defects**; they are the conditions `check.py` refuses to be silent about. Each one is a caveat on a number below or on the declaration above. The run's **verdict** is deliberately not printed here: it is an output of the same gate run that checks this table is current (stage `9c`), and rendering it made the table an input to its own checker — see `read_gate_loud`. Read the verdict from `results/gate/p29-bst-delete.json`.
 
 - **`collapse-ir`** — the derived floor is 277x below the tightest cell actually measured, so it rules out total collapse and essentially nothing else -- a cell could lose 99.64% of its work and still pass this stage. Read it as a smoke test, not as evidence that the work happened.
-- **`tcb-unsafe`** — verus.rs:504 `arr_set_unchecked`'s `requires` constrains nothing about ['x'], which its trusted body uses. spec.md justifies it: `x` is a pure VALUE parameter: it is stored into the array and is never used as an address, an index or a length, so there is no precondition a caller could usefully be asked for -- every `T` is a legal thing to store in a `T` slot. The two parameters that DO decide whether the unchecked store is defined, `v` and `i`, are both constrained by `i < old(v)@.len()`, which for a `&mut [T; N]` reads `i < N`. This is the parameter-coverage false positive `.memory/04-verus.md` names; p03 was the first pattern to exercise it, p12 the second, p06 the third, p14 the fourth, p27 the fifth and p29 the sixth.
+- **`tcb-unsafe`** — verus.rs:510 `arr_set_unchecked`'s `requires` constrains nothing about ['x'], which its trusted body uses. spec.md justifies it: `x` is a pure VALUE parameter: it is stored into the array and is never used as an address, an index or a length, so there is no precondition a caller could usefully be asked for -- every `T` is a legal thing to store in a `T` slot. The two parameters that DO decide whether the unchecked store is defined, `v` and `i`, are both constrained by `i < old(v)@.len()`, which for a `&mut [T; N]` reads `i < N`. This is the parameter-coverage false positive `.memory/04-verus.md` names; p03 was the first pattern to exercise it, p12 the second, p06 the third, p14 the fourth, p27 the fifth and p29 the sixth.
 
 
 ## Static + executed instructions
@@ -235,22 +235,22 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 86.17 | 87.65 | 1.7% | 57.34 | 58.46 | 2.0% |
-| c-gcc | whole | 86.59 | 87.68 | 1.3% | 57.59 | 58.38 | 1.4% |
-| c-clang | isolated | 90.73 | 91.98 | 1.4% | 58.54 | 59.40 | 1.5% |
-| c-clang | whole | 89.60 | 91.15 | 1.7% | 57.34 | 58.66 | 2.3% |
-| safe_naive | isolated | 93.93 | 95.64 | 1.8% | 63.57 | 65.21 | 2.6% |
-| safe_naive | whole | 95.64 | 97.04 | 1.5% | 63.60 | 65.16 | 2.5% |
-| safe_tuned | isolated | 95.66 | 97.00 | 1.4% | 65.10 | 66.59 | 2.3% |
-| safe_tuned | whole | 95.91 | 97.43 | 1.6% | 62.16 | 63.88 | 2.8% |
-| unsafe | isolated | 94.83 | 96.02 | 1.3% | 63.44 | 64.76 | 2.1% |
-| unsafe | whole | 95.37 | 96.44 | 1.1% | 61.50 | 63.16 | 2.7% |
-| verus | isolated | 95.06 | 96.31 | 1.3% | 62.71 | 64.55 | 2.9% |
-| verus | whole | 94.45 | 95.65 | 1.3% | 61.63 | 63.04 | 2.3% |
-| c-gcc-h | isolated | 85.55 | 87.03 | 1.7% | 55.35 | 56.14 | 1.4% |
-| c-gcc-h | whole | 86.01 | 87.06 | 1.2% | 57.38 | 58.26 | 1.5% |
-| c-clang-h | isolated | 88.12 | 88.99 | 1.0% | 57.09 | 58.08 | 1.7% |
-| c-clang-h | whole | 89.02 | 90.48 | 1.6% | 56.56 | 57.80 | 2.2% |
+| c-gcc | isolated | 85.79 | 87.05 | 1.5% | 58.17 | 59.01 | 1.4% |
+| c-gcc | whole | 86.27 | 87.61 | 1.6% | 58.18 | 58.76 | 1.0% |
+| c-clang | isolated | 90.67 | 91.89 | 1.3% | 58.98 | 60.44 | 2.5% |
+| c-clang | whole | 89.31 | 90.52 | 1.3% | 58.02 | 59.13 | 1.9% |
+| safe_naive | isolated | 94.25 | 95.28 | 1.1% | 64.46 | 65.47 | 1.6% |
+| safe_naive | whole | 95.41 | 96.73 | 1.4% | 63.75 | 65.18 | 2.2% |
+| safe_tuned | isolated | 95.14 | 96.68 | 1.6% | 65.98 | 66.90 | 1.4% |
+| safe_tuned | whole | 96.04 | 97.36 | 1.4% | 62.85 | 64.43 | 2.5% |
+| unsafe | isolated | 94.55 | 95.90 | 1.4% | 63.82 | 65.32 | 2.3% |
+| unsafe | whole | 95.32 | 96.69 | 1.4% | 62.21 | 63.82 | 2.6% |
+| verus | isolated | 95.35 | 96.84 | 1.6% | 63.31 | 65.21 | 3.0% |
+| verus | whole | 94.36 | 95.95 | 1.7% | 62.64 | 63.73 | 1.7% |
+| c-gcc-h | isolated | 85.93 | 87.35 | 1.7% | 55.91 | 56.63 | 1.3% |
+| c-gcc-h | whole | 86.51 | 87.43 | 1.1% | 57.82 | 58.92 | 1.9% |
+| c-clang-h | isolated | 87.71 | 89.24 | 1.7% | 57.16 | 58.52 | 2.4% |
+| c-clang-h | whole | 88.71 | 90.15 | 1.6% | 56.40 | 58.44 | 3.6% |
 
 Every wall-clock cell is within the 10% min-to-median spread threshold.
 

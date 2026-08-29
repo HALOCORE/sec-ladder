@@ -8014,9 +8014,17 @@ def check_control_json_pins(pdir, rep, source_sha):
     hashed blob downgrades the check from FAIL to SHOUT.** It is loud, it
     survives to the verdict, and it reaches `results/tables/`.
 
-    ⚠ `controls/*.py` is in the GATE record's `source_sha256` and **not** in
+    ⚠ Every committed `controls/` file EXCEPT `.json` and `.log` is in the GATE
+    record's `source_sha256` (`main`'s `srcs` list; it read `controls/*.py`
+    until TASK_142) and **none** of `controls/` is in
     `measure.py::measurement_sources`, so writing the pin costs one gate re-run
-    and no re-measure. Verified by reading both source lists."""
+    and no re-measure. ✅ Measured, not read: `controls/*` appears in **0 of 27**
+    measurement records and `controls/*.py` in **96 entries over 27 of 27** gate
+    records, set equal to the disk (TASK_141 §3, re-derived at TASK_142).
+    ⚠⚠ The two excluded extensions are excluded so that the files THIS STAGE
+    evaluates stay out of the digest that certifies the run evaluating them --
+    see `main`'s `srcs` comment for the `gate_source_sha256` fixpoint that
+    would otherwise be one sidecar away."""
     head("9b. controls/*.json staleness pins")
     cdir = os.path.join(pdir, "controls")
     out = {}
@@ -8763,9 +8771,38 @@ def main():
     #   * `common/*.py` -- `slb.py`, imported by all six `model.py`s to decode
     #     the payload. Step 2 (the model checksum) is the gate's only
     #     load-bearing correctness check and this file sits inside it.
-    #   * `controls/*.py` -- committed control generators
+    #   * `controls/*` MINUS `.json` and `.log` -- committed control GENERATORS
     #     (`patterns/p08-overlap-move/controls/gen_controls.py`); same argument
     #     as `inputs/gen.py`, for cells that are not p05-style rungs.
+    #     ⚠⚠ THIS GLOB READ `controls/*.py` UNTIL TASK_142, AND THE EXTENSION
+    #     WHITELIST LEFT **TEN** COMMITTED CONTROL SOURCES IN NO DIGEST AT ALL:
+    #     `build_controls.sh` (p06, p14, p18, p27), `verify_controls.sh` (p06,
+    #     p14, p18) and p42's `affine_leak.rs`, `leak.sh`, `miri_seeds.sh`.
+    #     They are not hygiene: those scripts carry the FLAG STRINGS the
+    #     published control numbers were taken at, and `p42/NOTES.md` publishes
+    #     two tables straight out of two of them -- the 352-point LSan sweep
+    #     (section 3) and the seeds-0..7 Miri table with its must-fire arm
+    #     (section 11c) -- so editing one without re-running it silently undates
+    #     a published number and nothing fires. `.memory/05-layout.md`'s own
+    #     adjudication of the p23 deviation already settled the principle in as
+    #     many words: *"the convention was never Python only, it was a
+    #     GENERATOR, not an ARTEFACT"*. The `.py` filter was the accident, and
+    #     it under-delivered against that rule the moment a `.sh` arrived.
+    #     ⚠⚠ `.json` AND `.log` ARE EXCLUDED ON PURPOSE, and the reason is not
+    #     tidiness. They are control OUTPUTS, and stage 9b
+    #     (`check_control_json_pins`) is the mechanism built for outputs: it
+    #     re-hashes each sidecar's own `derived_from_sha256`. Hashing a
+    #     GENERATED sidecar into the same run's `source_sha256` would put a file
+    #     that this run's own stage 9b evaluates inside the digest certifying
+    #     the run -- and for any sidecar using 9b's OTHER accepted key,
+    #     `gate_source_sha256`, it is an unreachable fixpoint: writing the
+    #     sidecar moves `source_sha256`, so the value it must record can never
+    #     equal the value the next run computes. (No sidecar uses that key
+    #     today -- all six use `derived_from_sha256` -- but 9b still accepts it,
+    #     so the hazard is one sidecar away.) `p23/controls/controls.log` is out
+    #     for the same reason plus its own: its `controls_pin.json` declares it
+    #     deliberately un-hashable, because it embeds ASLR addresses, PIDs,
+    #     BuildIds and absolute repo paths.
     #   * `common/layout/*.py` -- TASK_032. The code-layout control
     #     (`common/layout/README.md`): the population builder, the
     #     interleaved-schedule rule, the identical-copy noise floor, the
@@ -8789,7 +8826,8 @@ def main():
                   + glob.glob(os.path.join(REPO, "common", "driver.*"))
                   + glob.glob(os.path.join(REPO, "harness", "*.py"))
                   + glob.glob(os.path.join(pdir, "inputs", "gen.py"))
-                  + glob.glob(os.path.join(pdir, "controls", "*.py"))
+                  + [p for p in glob.glob(os.path.join(pdir, "controls", "*"))
+                     if not p.endswith((".json", ".log"))]
                   + glob.glob(os.path.join(REPO, "common", "*.py"))
                   + glob.glob(os.path.join(REPO, "common", "layout", "*.py"))
                   + glob.glob(os.path.join(REPO, "verus_run.py")))

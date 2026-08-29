@@ -195,7 +195,10 @@ pub fn kernel(buf: &[u8], off: usize, len: usize) -> u64 {
                         // THE SUBSTITUTION: the successor's key and val are
                         // copied INTO the victim's record. Nothing is freed and
                         // no `Option` discriminant changes -- which is why the
-                        // safety line below needs its second conjunct.
+                        // safety line below cannot be the discriminant alone.
+                        // ⚠ What is needed is an OCCUPANT test; TWO CONJUNCTS
+                        // is this rung's spelling and not a requirement -- one
+                        // is enough (`TASK_140`, ../NOTES.md 2b).
                         let (sk, sv) = match tab[s].as_ref() {
                             Some(rec) => (rec.key, rec.val),
                             None => break,

@@ -183,14 +183,14 @@ sweep says the callee moves -- but its MAGNITUDE is a phase, so quote the
 support, never the draw.
 
 
-**Calibration, recomputed on every run of this file** — the derived column scored against `synthesis/outward_ir.json`, a callgrind caller→callee sweep, at the 2.00 `Ir` floor: **208 rows, 188 hit, 4 miss (the dangerous direction), 16 false alarm**; residual median **0.30**, p95 **7.00**, max **15.79**. ⚠ Misses: p03 small R3-R4 -7.00, p03 large R3-R4 -7.00, p04 small R3-R4 -7.00, p04 large R3-R4 -7.00.
+**Calibration, recomputed on every run of this file** — the derived column scored against `synthesis/outward_ir.json`, a callgrind caller→callee sweep, at the 2.00 `Ir` floor: **208 rows, 192 hit, 4 miss (the dangerous direction), 12 false alarm**; residual median **0.18**, p95 **5.59**, max **15.79**. ⚠ Misses: p03 small R3-R4 -7.00, p03 large R3-R4 -7.00, p04 small R3-R4 -7.00, p04 large R3-R4 -7.00.
 
 **So the column has three bands, and they are measured on every run rather than chosen** — each row sorted by `|correction|` against whether the sweep says the row moves at all:
 
 | band | rows | real | spurious | smallest \|correction\| | reading |
 |---|---:|---:|---:|---:|---|
-| `< 2.00` (blank / `<2.00`) | 143 | 4 | 139 | 0.00 | **not safe — this is one environment phase.** ⚠ See `‡` |
-| `2.00 … 16.00` (marked **?**) | 24 | 8 | 16 | 2.00 | **a coin flip — do not quote alone** |
+| `< 2.00` (blank / `<2.00`) | 147 | 4 | 143 | 0.00 | **not safe — this is one environment phase.** ⚠ See `‡` |
+| `2.00 … 16.00` (marked **?**) | 20 | 8 | 12 | 2.00 | **a coin flip — do not quote alone** |
 | `≥ 16.00` (**bold**) | 41 | 41 | 0 | 17.00 | **every one is real** |
 
 ⚠⚠ **THE `< 2.00` BAND'S OWN CLAIM WAS FALSE, AND THIS IS THE CORRECTION.** It read *"safe: nothing real hides below the floor"*, scored `0 real / 120 spurious`. Both numbers are right **about the environment this run was taken in**, and the adjective was not: **p03's and p04's `R3-R4` correction is `0.00` — blank, in this band — at 16 of 32 environment phases and `±7.00` at the other 16**, three and a half times the floor. A band scored at one draw cannot certify the absence of a term that is invisible at that draw. The rows that carry it are marked `‡` below; the band is otherwise unchanged and still means *the derived route cannot resolve this*.
@@ -258,12 +258,12 @@ answer* (`.memory/03-measurement.md`).
 |---|---:|---:|---|---|---|
 | p01-array-sum | 11.00 | 29.00 | LICENSED |  | R3 span OWED |
 | p02-buffer-copy | 191.00 | 1439.00 | NOT-LIC | small +178.00 (-13.00) **?** / **large +1025.16** (-413.84) | undeclared |
-| p03-bounded-stack | 5110.00 | 17237.00 | LICENSED | small +5117.00 (+7.00) **?** / large +17244.00 (+7.00) **?** ‡ | R3 span 1 unreviewed measurement; the +5 constant NEVER searched |
-| p04-ring-buffer | 4756.00 | 16616.00 | LICENSED | small +4763.00 (+7.00) **?** / large +16623.00 (+7.00) **?** ‡ | undeclared |
+| p03-bounded-stack | 5110.00 | 17237.00 | LICENSED | ‡ | R3 span 1 unreviewed measurement; the +5 constant NEVER searched |
+| p04-ring-buffer | 4756.00 | 16616.00 | LICENSED | ‡ | undeclared |
 | p05-index-flatten | 700.00 | 2895.00 | LICENSED |  | undeclared |
 | p06-rotate | 173.00 | 395.00 | LICENSED |  | ⊘ PROVISIONAL -- R3 searched at review: `c_idx` is 0.00000 Ir/BYTE, and on `small` it is +80.00 against a shipped +334.00. ⚠ On `large` the SHIPPED R3 (+172) is the CHEAPER of the two |
 | p07-binary-search | 5758.94 | 18735.88 | LICENSED | small +5763.59 (+4.65) **?** / large +18725.77 (-10.11) **?** | undeclared |
-| p08-overlap-move | 11076.00 | 91941.00 | NOT-LIC | **small +10956.02** (-119.98) / **large +91057.00** (-884.00) | R3 span OWED |
+| p08-overlap-move | 11076.00 | 91941.00 | NOT-LIC | **small +10956.00** (-120.00) / **large +91057.02** (-883.98) | R3 span OWED |
 | p09-bitset | 9936.00 | 36409.00 | LICENSED |  | undeclared |
 | p10-fir-stencil | 2881.00 | 5345.00 | LICENSED |  | R4 searched at review: -323/-603 becomes -129/-241 |
 | p11-nul-scan | 5488.00 | 29088.00 | LICENSED |  | R4 chained to the prover; `r4_cstr` inadmissible |

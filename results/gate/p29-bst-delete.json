@@ -440,7 +440,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "30c0a2ed12991124c876d3b071e1c3856d530147caa53ec184c64f60d1013647",
+    "harness/check.py": "c3014dbe0dcc130007a7d83c1ed3c9fdf715fb457b5dcfa25ace2ef70e2639bf",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
@@ -460,11 +460,11 @@
     "patterns/p29-bst-delete/controls/repro.py": "3df11b4715df25621067d6d2397a073ecf1a6e7e037e820991ed8d1716be4473",
     "patterns/p29-bst-delete/inputs/gen.py": "d2abbb4cf9141d1ef42a457d2d65b5ca652cf15c46b4c7aeff351791632d4dbf",
     "patterns/p29-bst-delete/model.py": "46c3d859719c386c29430f05092133a4093af3f6ed83b44f6982924a0bd93988",
-    "patterns/p29-bst-delete/safe_naive.rs": "d9a7ee6faa7aaac9cb069866d441a008a4c1e722a62a55bb032efd5ffb1e1d19",
-    "patterns/p29-bst-delete/safe_tuned.rs": "84239e8e9a191968889a3258733cd465d0466a1572932717c5ed9f7a5b21bc14",
+    "patterns/p29-bst-delete/safe_naive.rs": "61e9a417ca04af85152e7cc93ca9cd5e3d1ba17c17834bc2b0347c9ef4d7e54a",
+    "patterns/p29-bst-delete/safe_tuned.rs": "ea8364c761e949ed3704e1077a301a7b0017f26ee49e629f8dd6f1b6605ee235",
     "patterns/p29-bst-delete/spec.md": "0360260571e7049f4adbbdd2afa548bcc0ce0de6cf367d66c9a4002e4a77c62e",
-    "patterns/p29-bst-delete/unsafe.rs": "e1f1669c2a182b727004f606b7fe435c59f076c9d1f88cd73dc6c513fc434d65",
-    "patterns/p29-bst-delete/verus.rs": "de2582f6eed4aa6aff6ba39ee37a78a607b6428480b339ebd56bf70504331125",
+    "patterns/p29-bst-delete/unsafe.rs": "3fb708192d174e52ea37267b5bfe2a850eecce8bc72aab87be70db0830a24378",
+    "patterns/p29-bst-delete/verus.rs": "35f3201b471d0075cb264c7b891fc79c26ab2d4ee1ed6f2f3dc162370f673100",
     "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
   },
   "derived_contract": {
@@ -537,9 +537,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3264,
+    "bytes": 3280,
     "nvars": 48,
-    "envp_stack_bytes": 3648,
+    "envp_stack_bytes": 3664,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -654,43 +654,43 @@
           "name": "buf_get_unchecked",
           "attr": "verifier::external_body",
           "body_lines": 1,
-          "line": 442
+          "line": 448
         },
         {
           "name": "load_input",
           "attr": "verifier::external_body",
           "body_lines": 4,
-          "line": 466
+          "line": 472
         },
         {
           "name": "emit",
           "attr": "verifier::external_body",
           "body_lines": 1,
-          "line": 475
+          "line": 481
         },
         {
           "name": "arr_get_unchecked",
           "attr": "verifier::external_body",
           "body_lines": 1,
-          "line": 483
+          "line": 489
         },
         {
           "name": "arr_set_unchecked",
           "attr": "verifier::external_body",
           "body_lines": 3,
-          "line": 504
+          "line": 510
         },
         {
           "name": "rec_alloc",
           "attr": "verifier::external_body",
           "body_lines": 6,
-          "line": 537
+          "line": 543
         },
         {
           "name": "rec_free",
           "attr": "verifier::external_body",
           "body_lines": 4,
-          "line": 595
+          "line": 603
         }
       ],
       "axiom_decls": []
@@ -1210,7 +1210,7 @@
     "adversarial-many.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "12483905980163998720",
+        "stdout": "13664555844132076544",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1223,7 +1223,7 @@
       },
       {
         "exit": 0,
-        "stdout": "15811842716154737664",
+        "stdout": "5042488449080531968",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1236,7 +1236,7 @@
       },
       {
         "exit": 0,
-        "stdout": "16264971823803419648",
+        "stdout": "6496951946555432960",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1249,7 +1249,7 @@
       },
       {
         "exit": 0,
-        "stdout": "493332472747335680",
+        "stdout": "8734393542112905216",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1264,7 +1264,7 @@
     "adversarial-many.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "2082242061478626304",
+        "stdout": "10279589778286508032",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1277,7 +1277,7 @@
       },
       {
         "exit": 0,
-        "stdout": "3940249319441777664",
+        "stdout": "1074041704121900032",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1290,11 +1290,11 @@
       },
       {
         "exit": 0,
-        "stdout": "8331427796788545536",
+        "stdout": "16614630230620148736",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/whole"
+          "O0/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "12727551634606393344",
@@ -1303,11 +1303,11 @@
       },
       {
         "exit": 0,
-        "stdout": "8334571772971853824",
+        "stdout": "5003491060797806592",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/isolated"
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "12727551634606393344",
@@ -1714,11 +1714,11 @@
     "adversarial-succ.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "2317664489097383936",
+        "stdout": "10832442853045243904",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole"
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "3300925633855656960",
@@ -1727,7 +1727,7 @@
       },
       {
         "exit": 0,
-        "stdout": "4391731654047250432",
+        "stdout": "15022594806493106176",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1740,7 +1740,7 @@
       },
       {
         "exit": 0,
-        "stdout": "7556565149339932672",
+        "stdout": "16392609870460434432",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1753,11 +1753,11 @@
       },
       {
         "exit": 0,
-        "stdout": "9402144072265160704",
+        "stdout": "4148253743943866368",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/isolated"
+          "O0/whole"
         ],
         "model_exit": 0,
         "model_stdout": "3300925633855656960",
@@ -1768,33 +1768,7 @@
     "adversarial-succ.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "12490612040937715712",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "3300925633855656960",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "13457831065737394176",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "3300925633855656960",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "17348901743751114752",
+        "stdout": "10159615255121203200",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1807,11 +1781,37 @@
       },
       {
         "exit": 0,
-        "stdout": "17763242769340012544",
+        "stdout": "15753521837772648448",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "3300925633855656960",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "18352983733800548352",
         "stderr": "",
         "signal": null,
         "cells": [
           "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "3300925633855656960",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "444118494146525184",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "3300925633855656960",
@@ -1930,11 +1930,11 @@
     "adversarial-uaf.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "11808259950219442176",
+        "stdout": "16343176402183933952",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole"
+          "O0/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "17864705736200262656",
@@ -1943,7 +1943,7 @@
       },
       {
         "exit": 0,
-        "stdout": "13842769599645552640",
+        "stdout": "6650789944037396480",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1956,7 +1956,7 @@
       },
       {
         "exit": 0,
-        "stdout": "4379757991387133952",
+        "stdout": "7840911308017045504",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1969,11 +1969,11 @@
       },
       {
         "exit": 0,
-        "stdout": "7644370613617514496",
+        "stdout": "9396631795489421312",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/isolated"
+          "O0/whole"
         ],
         "model_exit": 0,
         "model_stdout": "17864705736200262656",
@@ -1984,33 +1984,7 @@
     "adversarial-uaf.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "12331647639899723776",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "17864705736200262656",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "17762279950728523776",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "17864705736200262656",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "2498491562455470080",
+        "stdout": "12307481239673851904",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -2023,11 +1997,37 @@
       },
       {
         "exit": 0,
-        "stdout": "5727912911981113344",
+        "stdout": "13029521750543038464",
         "stderr": "",
         "signal": null,
         "cells": [
           "O0/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "17864705736200262656",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "1557539520114661376",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "17864705736200262656",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "2782607166372272128",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "17864705736200262656",
@@ -2150,7 +2150,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==4177648==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000131 at pc 0x556cf49aaa29 bp 0x7ffe0d526110 sp 0x7ffe0d526100 READ of size 1 at 0x502000000131 thread T0 #0 0x556cf49aaa28 in kernel /home/apt/repos_common/s",
+      "diagnostic": "================================================================= ==123362==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000131 at pc 0x55bbc4499a29 bp 0x7ffdeabcde80 sp 0x7ffdeabcde70 READ of size 1 at 0x502000000131 thread T0 #0 0x55bbc4499a28 in kernel /home/apt/repos_common/se",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -2183,7 +2183,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==4177653==ERROR: AddressSanitizer: heap-use-after-free on address 0x5020000000d1 at pc 0x55d98081ba29 bp 0x7ffe08768160 sp 0x7ffe08768150 READ of size 1 at 0x5020000000d1 thread T0 #0 0x55d98081ba28 in kernel /home/apt/repos_common/s",
+      "diagnostic": "================================================================= ==123367==ERROR: AddressSanitizer: heap-use-after-free on address 0x5020000000d1 at pc 0x56039a84fa29 bp 0x7ffe86490380 sp 0x7ffe86490370 READ of size 1 at 0x5020000000d1 thread T0 #0 0x56039a84fa28 in kernel /home/apt/repos_common/se",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -2194,7 +2194,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==4177654==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000071 at pc 0x5641ce5daa29 bp 0x7ffc6243b3b0 sp 0x7ffc6243b3a0 READ of size 1 at 0x502000000071 thread T0 #0 0x5641ce5daa28 in kernel /home/apt/repos_common/s",
+      "diagnostic": "================================================================= ==123368==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000071 at pc 0x559f413d3a29 bp 0x7ffcbe85a180 sp 0x7ffcbe85a170 READ of size 1 at 0x502000000071 thread T0 #0 0x559f413d3a28 in kernel /home/apt/repos_common/se",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -2370,8 +2370,8 @@
   "table_render": {
     "table": "results/tables/p29-bst-delete.md",
     "renders_to": "results/tables/p29-bst-delete.md",
-    "render_sha256": "7dd97b03a94a45970878117936ef74a1094d68185b7eae19e623a7a16a3a63b4",
-    "published_sha256": "7dd97b03a94a45970878117936ef74a1094d68185b7eae19e623a7a16a3a63b4",
+    "render_sha256": "0d005a5fcb18e3ea3c669cd60f92a6fdbcffd97b6f5424c8d621cdc50d689e33",
+    "published_sha256": "0d005a5fcb18e3ea3c669cd60f92a6fdbcffd97b6f5424c8d621cdc50d689e33",
     "verdict": "FRESH"
   },
   "controls_json": {
@@ -2396,7 +2396,7 @@
     },
     {
       "section": "tcb-unsafe",
-      "message": "verus.rs:504 `arr_set_unchecked`'s `requires` constrains nothing about ['x'], which its trusted body uses. spec.md justifies it: `x` is a pure VALUE parameter: it is stored into the array and is never used as an address, an index or a length, so there is no precondition a caller could usefully be asked for -- every `T` is a legal thing to store in a `T` slot. The two parameters that DO decide whether the unchecked store is defined, `v` and `i`, are both constrained by `i < old(v)@.len()`, which for a `&mut [T; N]` reads `i < N`. This is the parameter-coverage false positive `.memory/04-verus.md` names; p03 was the first pattern to exercise it, p12 the second, p06 the third, p14 the fourth, p27 the fifth and p29 the sixth."
+      "message": "verus.rs:510 `arr_set_unchecked`'s `requires` constrains nothing about ['x'], which its trusted body uses. spec.md justifies it: `x` is a pure VALUE parameter: it is stored into the array and is never used as an address, an index or a length, so there is no precondition a caller could usefully be asked for -- every `T` is a legal thing to store in a `T` slot. The two parameters that DO decide whether the unchecked store is defined, `v` and `i`, are both constrained by `i < old(v)@.len()`, which for a `&mut [T; N]` reads `i < N`. This is the parameter-coverage false positive `.memory/04-verus.md` names; p03 was the first pattern to exercise it, p12 the second, p06 the third, p14 the fourth, p27 the fifth and p29 the sixth."
     }
   ],
   "blocked": [],

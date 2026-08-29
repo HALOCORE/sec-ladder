@@ -197,7 +197,10 @@ pub fn kernel(buf: &[u8], off: usize, len: usize) -> u64 {
                         // copied INTO the victim's record. The victim's
                         // allocation is NOT freed, so no `Option` discriminant
                         // anywhere changes -- which is exactly why the safety
-                        // line below needs a second conjunct.
+                        // line below cannot be the discriminant alone. ⚠ What
+                        // is needed is an OCCUPANT test; TWO CONJUNCTS is this
+                        // rung's spelling and not a requirement -- one is
+                        // enough (`TASK_140`, ../NOTES.md 2b).
                         let sk: u8 = tab[s].as_ref().unwrap().key;
                         let sv: u8 = tab[s].as_ref().unwrap().val;
                         tab[cur].as_mut().unwrap().key = sk;

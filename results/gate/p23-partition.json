@@ -106,7 +106,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "30c0a2ed12991124c876d3b071e1c3856d530147caa53ec184c64f60d1013647",
+    "harness/check.py": "c3014dbe0dcc130007a7d83c1ed3c9fdf715fb457b5dcfa25ace2ef70e2639bf",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
@@ -120,6 +120,8 @@
     "patterns/p23-partition/c/kernel_hardened.c": "f6177d752a71e0af8ffc6c47554d2fe4174e7ebdc16458e5341f6d09b9328ead",
     "patterns/p23-partition/c/main.c": "5b6bc3bb8df0b07df3e31ef04b97a600c9dd4f1e70a877a417c0090302ab6d97",
     "patterns/p23-partition/controls/guard_equiv.py": "59c739921892031535a51094a9700d398180680b86afc412b0507d4c5b800c89",
+    "patterns/p23-partition/controls/guard_variants.c": "bd6315ca68e9b9a8d5b651e44b48dde30b82aee0b279e9d8f66fadb3a248aab2",
+    "patterns/p23-partition/controls/run.sh": "58717b8fe74ac6981a95c797990d79c1f1f835a35696d2b3593fa0d9935bf5be",
     "patterns/p23-partition/controls/sweep_fit.py": "32ab802490d9983cc0cd32854875b1b93dc577775b60f6e14e09272b7d9a95a2",
     "patterns/p23-partition/inputs/gen.py": "14ed489fcc0cac9c7e432d5781a7120ec09bc6c6d33e5d234f4c67fb099e4132",
     "patterns/p23-partition/model.py": "5295c39d3af0f4336de1afe72182ddbabba9304fff6d8905c66037d146c7d0be",
@@ -200,9 +202,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3264,
+    "bytes": 3280,
     "nvars": 48,
-    "envp_stack_bytes": 3648,
+    "envp_stack_bytes": 3664,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -1208,7 +1210,6 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole",
           "O3/isolated"
         ],
         "model_exit": 0,
@@ -1218,7 +1219,7 @@
       },
       {
         "exit": 0,
-        "stdout": "2771782152875008",
+        "stdout": "2770019511397632",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1231,11 +1232,24 @@
       },
       {
         "exit": 0,
-        "stdout": "2778832718784512",
+        "stdout": "2772663473613696",
         "stderr": "",
         "signal": null,
         "cells": [
           "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2705683097473408",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "2777070077307136",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/whole"
         ],
         "model_exit": 0,
         "model_stdout": "2705683097473408",
@@ -1246,7 +1260,7 @@
     "adversarial-single.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "2762087624749440",
+        "stdout": "2762968945488128",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1259,20 +1273,7 @@
       },
       {
         "exit": 0,
-        "stdout": "2784120643216640",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "2705683097473408",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "2798363923541821",
+        "stdout": "2797482602803164",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1285,7 +1286,20 @@
       },
       {
         "exit": 0,
-        "stdout": "2813203013777897",
+        "stdout": "2810559835447983",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2705683097473408",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "2827303645301793",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1556,7 +1570,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:104:23: runtime error: index 18446744073709551615 out of bounds for type 'uint8_t [64]' ================================================================= ==4165625==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f3287",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:104:23: runtime error: index 18446744073709551615 out of bounds for type 'uint8_t [64]' ================================================================= ==113011==ERROR: AddressSanitizer: stack-buffer-underflow on address 0x7f34d1c",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1567,7 +1581,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f30b4400060 with insufficient space for an object of t",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7fc81ca00060 with insufficient space for an object of t",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1578,7 +1592,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f7b17c00060 with insufficient space for an object of t",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f1c5e400060 with insufficient space for an object of t",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1600,7 +1614,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f51a7400060 with insufficient space for an object of t",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p23-partition/c/kernel.c:99:23: runtime error: load of address 0x7f739ae00060 with insufficient space for an object of t",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1807,7 +1821,7 @@
   },
   "failures": [],
   "notes": [
-    "adversarial-single.bin/c-gcc: opt/mode variants of this rung disagree (3 distinct behaviours)",
+    "adversarial-single.bin/c-gcc: opt/mode variants of this rung disagree (4 distinct behaviours)",
     "adversarial-single.bin/c-clang: opt/mode variants of this rung disagree (4 distinct behaviours)"
   ],
   "loud": [

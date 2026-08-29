@@ -39,9 +39,11 @@
 //!
 //! **TCB: seven items** -- `buf_get_unchecked`, `arr_get_unchecked`,
 //! `arr_set_unchecked`, `rec_alloc`, `rec_free`, `load_input`, `emit`. The same
-//! seven `p27` ships, and **the second obligation costs none of them**: the
-//! occupant-identity conjunct is discharged by the functional postcondition, not
-//! by a new axiom. Two of the seven are the allocation API, and they are here
+//! seven `p27` ships, and **the OCCUPANT-IDENTITY TEST costs none of them**: it
+//! is discharged by the functional postcondition, not by a new axiom.
+//! ⚠ This sentence read *"the second obligation costs none of them"* until
+//! `TASK_142`; the number was never the point and the count it implied is
+//! retracted (`TASK_140` -- one conjunct is enough, ../NOTES.md 2b). Two of the seven are the allocation API, and they are here
 //! for a CODEGEN reason rather than a trust reason -- they are
 //! `vstd::raw_ptr::allocate` / `deallocate` copied into this crate so the call
 //! is direct and `#[inline(always)]`, because vstd carries no `#[inline]` and R4
@@ -213,7 +215,11 @@ pub open spec fn succ_walk(st: St, s: u8, sp: u8, sgl: bool, fuel: nat) -> (u8, 
 /// Two children: the successor's key and val are copied INTO the victim's
 /// record and the cursor moves to the successor. **`lv` does not change here**
 /// -- nothing is deallocated -- and that is the whole reason `p29`'s safety
-/// line needs a second conjunct.
+/// line cannot be a LIVENESS TEST ALONE. This is the use-after-RECYCLE half of
+/// the two bug classes the one omitted source line carries, and no
+/// allocation-shaped mechanism can see it. ⚠ **How many conjuncts it takes to
+/// test for is a SPELLING question, and the answer is ONE** -- ../NOTES.md 2b;
+/// this rung ships two because the second is free in `wf`.
 ///
 /// Zero or one child: the node is unlinked and its record is freed, which is
 /// the `lv.update(cur, false)`.
@@ -590,8 +596,10 @@ fn slb_twin_rec_alloc(size: usize, align: usize) -> (pt: (*mut u8, Tracked<Point
 // a later read of the same address is unprovable. ⚠ **It is only half.** The
 // two-child splice calls this on the SUCCESSOR and not on the victim, so the
 // victim's permission survives and a stale read of the victim IS provable --
-// which is exactly why the safety line has a second conjunct that has nothing to
-// do with linearity. ../NOTES.md 2.
+// which is exactly why the safety line carries an OCCUPANT-IDENTITY TEST that
+// has nothing to do with linearity. ⚠ Whether that test is spelled as a second
+// conjunct or as a widened `live[]` value is a CHOICE, not a requirement
+// (`TASK_140`). ../NOTES.md 2, 2b.
 #[inline(always)]
 #[verifier::external_body]
 fn rec_free(

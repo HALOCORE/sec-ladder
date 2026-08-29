@@ -57,10 +57,22 @@
 //!   allocated and not yet freed.
 //! SAFETY (5): `rec_read(g_saved)` runs under `live[g_slot] == 1u8`, and
 //!   `tab[g_slot]` is written once per slot and never reset, so `g_saved` is
-//!   that slot's record. **This is the obligation p29 is about and it takes TWO
-//!   conjuncts**: the liveness test above keeps the read in bounds of a live
-//!   allocation, and `rr.key == g_key` is what makes the ANSWER right when the
-//!   two-child splice has re-occupied that allocation.
+//!   that slot's record. **This is the obligation p29 is about, and ONE SOURCE
+//!   LINE CARRIES TWO BUG CLASSES SELECTED BY THE INPUT**: the liveness test
+//!   above keeps the read in bounds of a live allocation, which is the
+//!   use-after-FREE half on a 0/1-child victim, and `rr.key == g_key` is what
+//!   makes the ANSWER right when the two-child splice has re-occupied that
+//!   allocation, which is the in-bounds use-after-RECYCLE half. ⚠ **The half
+//!   every detector sees is the half that CANNOT BE GATED.**
+//!   ⚠⚠ **TWO CONJUNCTS IS WHAT THIS RUNG SPELLS, NOT WHAT THE PROPERTY NEEDS,
+//!   and the sentence that used to stand here -- *"it takes TWO conjuncts"* --
+//!   IS RETRACTED.** `TASK_140` built two ONE-conjunct spellings out of the
+//!   shipped c/kernel.c by substitution; both score `wrong_total 0` and
+//!   `asan_lines 0` with the ASan positive control firing, and one of them adds
+//!   NO STATE -- it widens `live[]` from a bit to the occupant tag. The
+//!   two-conjunct spelling ships because it buys a free `wf` at R5
+//!   (../NOTES.md 6c), and the row stands on the two bug classes, which the
+//!   conjunct count was never evidence for.
 //! SAFETY (6): `rec_close` is called at most once per record -- the splice
 //!   clears `live[cur]` before anything can reach the slot again, and the
 //!   epilogue frees only slots still marked alive -- so there is no double free,

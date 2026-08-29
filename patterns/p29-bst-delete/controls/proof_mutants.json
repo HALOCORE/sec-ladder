@@ -3,7 +3,7 @@
     "regenerate": "python3 patterns/p29-bst-delete/controls/proof_mutants.py"
   },
   "derived_from_sha256": {
-    "patterns/p29-bst-delete/verus.rs": "de2582f6eed4aa6aff6ba39ee37a78a607b6428480b339ebd56bf70504331125",
+    "patterns/p29-bst-delete/verus.rs": "35f3201b471d0075cb264c7b891fc79c26ab2d4ee1ed6f2f3dc162370f673100",
     "patterns/p29-bst-delete/controls/proof_mutants.py": "07f2e09930359956d8475df7a62b9a246ae96217de9bf065f4feed18c2fd8fed"
   },
   "mutants": [

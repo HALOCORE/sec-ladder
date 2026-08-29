@@ -119,7 +119,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "30c0a2ed12991124c876d3b071e1c3856d530147caa53ec184c64f60d1013647",
+    "harness/check.py": "c3014dbe0dcc130007a7d83c1ed3c9fdf715fb457b5dcfa25ace2ef70e2639bf",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
@@ -132,6 +132,7 @@
     "patterns/p18-varint-shift/c/kernel.h": "3d33b0217d5a9ded582ea48cc9995fae80f659c548bbff2aa8c530da4c6e74a9",
     "patterns/p18-varint-shift/c/kernel_hardened.c": "e0b9b1c66a80b3e61707ea529b0c9c9586237d4fe7057d2ce857379609c387f5",
     "patterns/p18-varint-shift/c/main.c": "c834d3e6b43c56b07901bdffd8104fd5e829ea0cae63bcfe65a1ac4434c7761d",
+    "patterns/p18-varint-shift/controls/build_controls.sh": "3de1d97c54ef9ff31146e2ed78d9628f89f3866c4475a71aacbc945f4850f655",
     "patterns/p18-varint-shift/controls/clayout.py": "1aef3543aa07bce54711c197adc4ac0095918c1a2129083982a7afeee00c4199",
     "patterns/p18-varint-shift/controls/fit.py": "0218af36fa0233153daa6fe3ef941d94ac603f4ad730dafdd33520dcb0b502bf",
     "patterns/p18-varint-shift/controls/gen_controls.py": "c04c0c1c6f27d7bcaf875ee7d7d0e0035b083e7e1119ffc386adfba75f440546",
@@ -139,6 +140,7 @@
     "patterns/p18-varint-shift/controls/mkcontract.py": "493a857a6efb782d006c83b027c8af527182a56f3bee8c16270df3def3693d0b",
     "patterns/p18-varint-shift/controls/predict.py": "e14378a5f4f66f516d19a39178f5f187e7ebf95c8964a0fd892ce7cfb88f889c",
     "patterns/p18-varint-shift/controls/sweep_ir.py": "f714bdf3019930cde10a0ce39dfd1cdb1adafc3b18cd56ef636b5f6ab1ce0317",
+    "patterns/p18-varint-shift/controls/verify_controls.sh": "113aa059c9391ba6d8723f02c80ee877660efdb8803d7eb1919e2ac1cb60f692",
     "patterns/p18-varint-shift/inputs/gen.py": "1d5bd763d82d9b03544ff3edbb072e8a724f4cc6e917c13d4f6f79d130793436",
     "patterns/p18-varint-shift/model.py": "aa1e09d4bd76f536f0cbf61fffe55a0f77ec8e6de0228228ec3e4f0f8b1f592d",
     "patterns/p18-varint-shift/safe_naive.rs": "afce0114f361de09282a17a8686331020cf7b02a61415d504d417654118711b3",
@@ -218,9 +220,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3264,
+    "bytes": 3280,
     "nvars": 48,
-    "envp_stack_bytes": 3648,
+    "envp_stack_bytes": 3664,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -1389,7 +1391,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.1,
+        "seconds": 0.2,
         "stdout": "16699758970130477312",
         "model_stdout": "16699758970130477312",
         "stderr": ""

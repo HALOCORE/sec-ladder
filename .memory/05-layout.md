@@ -633,8 +633,14 @@ which is how a false `ensures` one hop away shipped green.
 ## ⚠ `controls/` file types — the p23 deviation, ADJUDICATED
 
 **TASK_101 shipped the first `.c`, `.json` and `.log` into a `controls/`
-directory**, where the other 92 files across 24 patterns are **87 `.py` + 8
-`.sh`**. Manager decision, and the reasoning matters more than the verdict:
+directory**. ⚠⚠ **THAT SENTENCE USED TO SAY *"the other 92 files across 24
+patterns are 87 `.py` + 8 `.sh`"* AND IT WAS STALE — corrected at `TASK_142`,
+✅ manager-re-derived with
+`git ls-files 'patterns/*/controls/*' | sed 's/.*\.//' | sort | uniq -c`:**
+**115 files across 22 patterns — 96 `.py`, 10 `.sh`, 6 `.json`, 1 `.rs`,
+1 `.log`, 1 `.c`.** ⚠ **The stale `8 .sh` is the likely origin of `TASK_141`'s
+and `RECAP`'s *"EIGHT undigested control files"*, which was really TEN.
+DERIVE THIS; DO NOT MAINTAIN IT BY HAND.** Manager decision, and the reasoning matters more than the verdict:
 
 - ✅ **`guard_variants.c` — ACCEPTED without qualification.** A control that
   compares C spellings has to be C. **The convention was never "Python only", it
@@ -719,11 +725,27 @@ silently and nothing in this repo will notice.** `--check-stale` globs
   written into `common/layout/README.md` — the file that would need the pin, not
   a report. ⚠ **`predictions_p01oos.json`'s own sha256 is a PRE-REGISTRATION
   COMMITMENT, a different and stronger thing; do not "upgrade" it.**
-- ⚠ **STILL UNPINNED: 21 `controls/*.py` sidecars across 12 patterns that
-  `json.dump` into gitignored `.temp/`.** ⚠ **The old figure `31 / 14` was
-  wrong — `grep -l json.dump` also matches `json.dumps`, and six of the hits
-  render `spec.md` into the tree.** **Cost: 21 pins + 12 gate re-runs, NOT a
-  sweep, because the glob is `controls/*.py`.**
+- ⚠⚠⚠ **RETIRED, AND IT WAS WRONG IN KIND RATHER THAN IN COUNT.**
+  ~~*"STILL UNPINNED: 21 `controls/*.py` sidecars across 12 patterns"*~~ —
+  ✅ **`TASK_141`: 6 of 6 committed `controls/*.json` ALREADY carry a pin; ZERO
+  outstanding. The 21 are GENERATORS, and they all `json.dump` into gitignored
+  `.temp/` — outside stage 9b's only glob — so a `derived_from_sha256` from any
+  of them would be read by NOTHING.** ⚠ **And the parenthetical reason
+  *"because the glob is `controls/*.py`"* is ALSO false now: `TASK_142` widened
+  it to `controls/*` minus `.json`/`.log`.**
+
+  ⚠⚠ **WHY THOSE TWO EXTENSIONS ARE EXCLUDED, and it is a design constraint, not
+  tidiness: stage 9b accepts `gate_source_sha256` as well as
+  `derived_from_sha256`, so a sidecar using the former AND sitting inside
+  `source_sha256` would be an UNREACHABLE FIXPOINT — writing it moves the digest
+  it must equal.** ✅ **No sidecar uses that key today (6 of 6 use
+  `derived_from_sha256`), so the hazard was one sidecar away and is now designed
+  out.**
+
+  > ⚠⚠⚠ **THE GENERAL RULE, and it is the third member of the self-reference
+  > family (`.memory/03-measurement.md` entry 11 and the `9c` lag):
+  > A DIGEST OF *INPUTS* MUST NOT CONTAIN A FILE THE SAME RUN'S OWN STAGES
+  > *EVALUATE*.**
 
 ⚠⚠ **THE TWO FREE DIRECTORIES, AND THE PRICE IS THE SAME IN BOTH.**
 **`check.py`'s gate digest globs are NON-RECURSIVE — `harness/*.py`,
