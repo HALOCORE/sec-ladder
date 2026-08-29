@@ -3184,6 +3184,30 @@ the number.** Two task files have already sent an agent to the wrong finding.
     are leaf kernels taking `(buf, len)` from a shared driver. That is a HARNESS
     ARTEFACT, not a mechanism gap.** ⚠⚠ **A weaker engineer ships that number.**
 
+    ⚠⚠⚠ **AND THE MANAGER'S OWN OBJECTION, RAISED IMMEDIATELY AND NOT YET
+    SETTLED — IT IS THE SAME ARTEFACT ARGUMENT POINTED AT THE HEADLINE:**
+    ✅ **manager-verified, every C rung has the signature
+    `kernel(const T *v, size_t off, size_t len)` — the driver hands a POINTER, an
+    OFFSET AND AN EXPLICIT LENGTH.** ⚠⚠ **A kernel given an explicit length has
+    little reason to walk with a cursor. SO IF `param 51.4%` IS A HARNESS
+    ARTEFACT, WHY IS `ptr_offset 0` NOT ONE? The engineer applied that test to
+    one number and not to the other, and the manager landed the finding before
+    noticing.** ⚠ **It is NOT obviously fatal — `const T *p = v + off; while (p <
+    v + off + len) *p++;` is perfectly natural C under that same signature, and
+    plenty of real C with an explicit length still walks.**
+
+    ⚠⚠ **AND THERE IS A THIRD READING WHICH WOULD BE THE MOST INTERESTING OF THE
+    THREE AND WHICH NOBODY HAS TESTED: that the zero is forced by THE LADDER'S
+    OWN COMPARABILITY REQUIREMENT. Safe Rust cannot express a raw pointer cursor
+    AT ALL, so a pattern whose C rung walked would have no R2 — and the `identity`
+    pin plus the per-pattern `required` idiom would then be pinning every C rung
+    to an INDEXED spelling to keep the rungs comparable.** ⚠⚠⚠ **IF THAT IS THE
+    MECHANISM, THE FINDING IS NOT *"the corpus has a gap"* BUT *"THE FIVE-RUNG
+    LADDER STRUCTURALLY CANNOT HOST C's SECOND-MOST-COMMON MEMORY OPERATOR,
+    BECAUSE RUNG 2 CANNOT EXPRESS IT"* — which is a statement about the
+    INSTRUMENT and is a far better result than a coverage gap.** ⚠ **All three
+    readings are live. `TASK_131` decides.**
+
     ⚠⚠⚠ **WHAT THIS DOES AND DOES NOT LICENSE. IT IS A MEASURED COVERAGE GAP AND
     IT IS THE FIRST FREQUENCY EVIDENCE THIS PROJECT HAS EVER HAD — AND IT IS NOT
     A ROW.** **RECAP's standing rule binds: RUN A PROPOSED AXIS'S NOVELTY CLAIM
