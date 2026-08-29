@@ -1117,15 +1117,40 @@ loops — and a GNU coreutils tree beside it.** ⚠ **Both live in other project
 directories and one is under a `.temp/`, so a census over them must record a
 sha256 manifest of what it read; neither is a reason it cannot be run.**
 
-✅ **The corrected statement is weaker and truer: THE FREQUENCY-BASED ALTERNATIVE
-HAS AN INSTRUMENT AND NOBODY HAS RUN IT.** ⚠ **So this project's generality
-claims stop where they do because the census is UNRUN, not because it is
-unrunnable — and the mechanism-based bar is a choice this project has not yet
-tested against frequency, rather than the only choice available.** ⚠⚠ **That is a
-weaker position than the one this document held, and it is stated here because
-the failure was the instrument's: a depth-limited `find` reports an empty world
-exactly as an empty world does, which is the same class as this project's
-`head -4` and its whitelist-grep-called-a-census.**
+⚠⚠ **The failure was the instrument's: a depth-limited `find` reports an empty
+world exactly as an empty world does — the same class as this project's `head -4`
+and its whitelist-grep-called-a-census.**
+
+✅✅ **AND THE CENSUS HAS SINCE BEEN RUN.** ⚠ **UNREVIEWED engineer work
+(TASK_129) at the time of writing; the corpus figures, the coverage zero and the
+per-category precision table were re-derived by the manager.**
+**49 898 bound sites over 991 147 deduplicated lines of C in 22 programs — PHP
+4.0.2, GNU coreutils, and 24 upstream GNU packages — each site classified by
+operator, by the source of its bound, and by where it is checked.**
+
+⚠⚠ **THE ANSWER IS PARTIAL, AND THE PARTIALITY IS THE RESULT: THE ORDINAL TOP IS
+A PROPERTY OF C AND THE DISTRIBUTION IS A PROPERTY OF THE PROGRAM.** `index` is
+the top operator in **21 of 22** programs and `const` the top bound source in
+**19 of 22** — but the shares swing **42–50 percentage points** and second place
+flips between four categories. ✅ **So a frequency-argued admission bar gets a
+first place and nothing below it. The mechanism-based bar stands, and now for a
+measured reason rather than for want of an instrument.**
+
+⚠⚠⚠ **AND THE CENSUS FOUND A COVERAGE GAP IN THIS PROJECT'S OWN CORPUS, STATED
+AS COVERAGE AND NOT AS QUALITY: `ptr_offset` — a pointer cursor walking memory —
+is `0` of the built tree's 255 bound sites, against 5.7–8.8 % of the corpora and
+a TOP-3 OPERATOR IN EVERY ONE OF THE 22 PROGRAMS.** **Every built kernel indexes;
+none walks.** ⚠ **Confirmed independently of the classifier by a raw regex: `0`
+across all 26 kernels, `845` over PHP.** ⚠⚠ **This is not a proposal. Safe Rust's
+answer to a pointer walk is an ITERATOR — a different representation, not "R4
+plus a check" — which is the trap that killed CVE-2021-23017 when `Vec::push`
+deleted the bound rather than checking it.**
+
+⚠ **One field was measured and WITHHELD rather than published: *where the bound
+is checked* scored 45/60 against hand labels, with its `earlier` label right 3 of
+10 and its errors directional. The bound-source field's top categories carry the
+headline — `const` 25/25, `none` 11/11, `field` 9/9 — and no disagreement moved
+a site into or out of either.**
 
 **Mechanisms that are recorded and not explained.** Cite these; do not explain
 them. (a) **p23's elision cause failed three isolations**: the phenomenon
