@@ -2991,3 +2991,37 @@ drift. ✅ **The `.rodata`-alignment hypothesis for the `−4` was RUN AND KILLE
 ⚠ **Two open instrument questions, both narrow, neither guessed at. Do not
 publish a mechanism for either without a measurement** — this axis is where
 `MIRIFLAGS` produced two confident wrong mechanisms.
+
+---
+
+## ⚠⚠ A GATE RECORD IS NOT BYTE-REPRODUCIBLE — 17 OF 26 MOVE ON A RE-RUN
+
+**`TASK_125`, as a by-product of running the sweep twice on the same tree.**
+⚠ **Engineer work, not yet reviewed (rule 9). The CONCLUSION is cheap to
+re-derive: run `check.py` twice and diff.**
+
+**Everything that moves is RUN-SCOPED, and the `source_sha256` is IDENTICAL
+throughout — so this is not staleness and `--check-stale` is right to say
+nothing:**
+
+| field | why it moves |
+|---|---|
+| sanitizer `diagnostic` strings | PID and ASLR addresses |
+| `miri.runs[].seconds` | wall clock (⚠ landed deliberately at `TASK_119` to make the two-state Miri slowdown VISIBLE — see `00-environment.md`) |
+| order of equal-behaviour cell groups in `adversarial` | grouping is unordered |
+| ⚠⚠ `notes`: *"opt/mode variants of this rung disagree (**N** distinct behaviours)"* | **N MOVED `3→4` ON `p03` AND `3→2` ON `p23`** |
+
+⚠⚠⚠ **THE LAST ROW IS THE ONE WITH PROSE CONSEQUENCES, AND ITS CAUSE IS THE
+POINT: `N` MOVES BECAUSE THOSE CELLS READ UNINITIALISED MEMORY AND PRINT
+GARBAGE.** ✅ **That is the pattern behaving as designed — it is what those
+adversarial inputs EXIST to demonstrate** — **but it means the count is a draw,
+not a property.**
+
+> ⚠ **DIFF GATE RECORDS MODULO THOSE FOUR FIELDS.** **A reviewer who reads a
+> moved `notes` line as a regression is chasing UB, not a defect** — and will
+> "fix" a pattern whose whole subject is that the UB is there.
+
+⚠ **Do not quote an `N distinct behaviours` figure as a stable number.** ⚠ **And
+note the shape: this is a COUNT that is a CACHED DERIVATION of a nondeterministic
+run, which is the same class as the failure-class list's own rotting ordinal —
+`a count is a cached derivation` keeps being the lesson.**
