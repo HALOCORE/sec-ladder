@@ -1263,6 +1263,53 @@ arithmetic signature — every figure in the first version reproduced against th
 record on the pass that found this — so the only check for it is to ask, of a
 finished document, which way its gaps point.**
 
+**What the corpus is made of, and it bounds the generality more than the
+toolchain pin does.** The 26 kernels classify, by the safety line each one's
+`c/kernel.c` omits, like this — derived and drift-checked by
+`harness/tools/composition.py`:
+
+```
+spatial          15   p02 p03 p05 p07 p09 p10 p11 p12 p13 p14 p16 p17 p23 p36 p46
+logical           3   p04 p06 p19
+temporal          1   p27
+type              1   p38
+resource          1   p42
+side-channel      1   p47
+UB, not memory    1   p18
+non-termination   1   p22
+aliasing          1   p08
+calibration       1   p01
+```
+
+⚠⚠ **Fifteen of twenty-six are spatial, and every claim this document makes
+about the temporal axis rests on ONE pattern and every claim about the type axis
+on ONE.** `p27` is the only use-after-free here; `p38` is the only type-confusion.
+A result drawn from a single row is a result about that row until a second one
+agrees with it. **§3's *"safe Rust's temporal guarantee is a guarantee about the
+allocator"* and §5's `6.00 Ir`/call for a type-based aliasing property are both
+in exactly that position** — each is a one-row result stated as a law.
+⚠ **This does not weaken the spatial results — those are the fifteen — it says
+where the document's confidence should stop.**
+
+⚠ **The table counts safety lines, not bugs.** `p09` ships two and only the
+omitted `q < nbits` is spatial.
+
+⚠⚠ **And there is a measured coverage gap inside the spatial fifteen.** An idiom
+census over 49,898 bound sites in 991,147 deduplicated lines of real C in 22
+programs (PHP 4.0.2, GNU coreutils, and upstream GNU packages) found
+`ptr_offset` — walking memory with a pointer cursor rather than an index — in
+**all 22 programs, ranking second or third in 15 of them**, share 0.4%–26.1%,
+median 6.9%. **It is zero in all 26 kernels here.** No kernel in this tree walks
+memory with a pointer cursor.
+
+⚠ **Do not quote that zero as `0 of 255` and call it decisive.** The 255 sites
+sit in 30 site-carrying functions across 26 files cloned from one template, so
+the draws are not independent; size-matched against the ladder's own function
+length distribution, the honest figure is **p ≈ 0.06 — suggestive, not
+decisive**, and the `0 of 255` framing overstated it by roughly 5000× in
+p-value. ⚠ **The zero is also a property of the regex guard that measured it.**
+Figures and caveats are finding 45's.
+
 **And the scope that bounds every number above.** One box, one libc, one gcc, one
 clang, one rustc, one Verus and one vstd pin, `-O3 isolated`, two blobs per
 pattern out of a committed sweep. Where a claim is about the *verifier* rather
