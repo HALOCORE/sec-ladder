@@ -2947,6 +2947,71 @@ already been struck.** Keep the list, not the ordinal.
     moving `p23` from spatial to logical still sums to 26, and only a set
     comparison catches it.
 
+15. ⚠⚠⚠ **A GREEN STAGE `9c` IS NOT EVIDENCE THAT THE PUBLISHED TABLE MATCHES
+    THE RECORD THAT RUN WROTE.** `TASK_140`, ✅ manager-reproduced and repaired.
+
+    **Stage 9c compares `results/tables/pNN.md` against a render built from the
+    PREVIOUS run's record.** So a run that changes `controls_json`, `loud` or
+    `idiom_audit` **passes itself and poisons the next run.**
+
+    ✅ **`p29` is the first row to exhibit it, and it was DECIDABLE FROM THE
+    COMMITTED TREE WITH NOTHING RUN:** the gate record said
+    `controls_json: all four FRESH` while the committed table carried **four
+    lines saying those same sidecars were STALE**, under a heading reading
+    *"these are not defects"*. **`check.py p29` then returned `FAIL [tables]`.**
+    ⚠ **A 27-pattern sweep found 26 render byte-identically; only `p29` drifted.**
+
+    > ⚠⚠ **THE MANAGER READ `verdict: PASS` OUT OF THE RECORD — WHICH IS THIS
+    > FILE'S OWN RULE — AND WAS STILL WRONG.** *"Read the record, not the log"*
+    > protects against grep artefacts. **It does not protect against a record
+    > that is one run behind the artefact it certifies.**
+    > **Ask WHICH RUN wrote the record you are reading, and whether anything it
+    > changed feeds the table.**
+
+    ✅ **Repair is two commands — `harness/report.py pNN` then `check.py pNN`.**
+    ⚠ **This is finding 46's one-run lag, and the manager hit it on `p16` TWO
+    TASKS EARLIER, fixed it there, and did not think to check `p29`.**
+
+16. ⚠⚠⚠ **THE GATE'S MIRI STAGE RUNS THE *CORRECT* RUNG, SO IT CAN NEVER
+    SUBSTANTIATE A *"MIRI SEES / DOES NOT SEE"* CLAIM.** `TASK_139`, scope
+    corrected by `TASK_140`.
+
+    ✅ **Structural, not a sampling accident: `miri.sources == ["unsafe.rs"]` in
+    27 of 27 records, and 202 of 202 rows read `ub: false`.** **`unsafe.rs` is
+    the rung that does NOT have the bug**, so every row is a statement about a
+    correct program.
+
+    > ⚠ **Any pattern publishing a mechanism table with a Miri row owes a
+    > DEDICATED arm that runs Miri over the BUGGY spelling.**
+
+    ⚠ **`TASK_139` also claimed *"no other pattern has one"* and that is FALSE —
+    `p18`, `p22` and `p42` ship dedicated Miri arms, and
+    `p42/controls/miri_seeds.sh` states this same hole in writing.**
+    ✅ **`p29` ships one too, and its result is the interesting one: Miri reports
+    UB on both use-after-FREE inputs, and on the use-after-RECYCLE input it runs
+    the buggy program to completion, says nothing, and prints a different
+    number.**
+
+17. ⚠⚠ **A PROBE THAT ADDS A FEATURE *PLUS* AN ATTRIBUTE CANNOT ATTRIBUTE THE
+    RESULT TO THE FEATURE.** `TASK_140`.
+
+    `TASK_139` proposed the rule *"a `struct` inside `verus!` is its own
+    obligation, exactly as a `const` is"*, measured by adding *"one further BARE
+    `#[repr(C)] struct Rec2 { a: u8 }"*. ⚠⚠ **The probe's struct carries
+    `#[derive(Clone, Copy)]`, and the word *"bare"* appears in the report AND in
+    `p29`'s HASHED `obligations_note`.**
+
+    ✅ **The measured rule is the opposite: a bare `struct` carries ZERO** (adding
+    one gives 25, not 26; adding three still gives 25). **`#[derive(Clone)]`
+    carries the obligation.** ✅ **Cross-checked against the tree: `p36`'s bare
+    `pub struct OpTag<const K: u8>` counts ZERO and sums exactly to its pinned
+    12.**
+
+    ⚠ **The published NUMBER was right and its stated CAUSE was wrong** — `p31`'s
+    failure mode — **and it reached a hashed block, so correcting it costs a
+    contract move.**
+
+
 ## ⚠ A number GREPPED OUT OF A LOG is not a number READ OUT OF A RECORD
 
 **`TASK_127`, swept at `TASK_132`.** **The gate writes structured JSON and also

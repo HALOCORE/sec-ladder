@@ -150,10 +150,6 @@ From `results/gate/p29-bst-delete.json` — the `loud` and `controls_json` keys,
 
 - **`collapse-ir`** — the derived floor is 277x below the tightest cell actually measured, so it rules out total collapse and essentially nothing else -- a cell could lose 99.64% of its work and still pass this stage. Read it as a smoke test, not as evidence that the work happened.
 - **`tcb-unsafe`** — verus.rs:504 `arr_set_unchecked`'s `requires` constrains nothing about ['x'], which its trusted body uses. spec.md justifies it: `x` is a pure VALUE parameter: it is stored into the array and is never used as an address, an index or a length, so there is no precondition a caller could usefully be asked for -- every `T` is a legal thing to store in a `T` slot. The two parameters that DO decide whether the unchecked store is defined, `v` and `i`, are both constrained by `i < old(v)@.len()`, which for a `&mut [T; N]` reads `i < N`. This is the parameter-coverage false positive `.memory/04-verus.md` names; p03 was the first pattern to exercise it, p12 the second, p06 the third, p14 the fourth, p27 the fifth and p29 the sixth.
-- **`controls/arms.json`** — `STALE`: this published sidecar's staleness pin does not agree with this run, so nothing can date its numbers against the sources in the tree. Treat every figure quoted from it as **UNDATED**.
-- **`controls/miri_arms.json`** — `STALE`: this published sidecar's staleness pin does not agree with this run, so nothing can date its numbers against the sources in the tree. Treat every figure quoted from it as **UNDATED**.
-- **`controls/proof_mutants.json`** — `STALE`: this published sidecar's staleness pin does not agree with this run, so nothing can date its numbers against the sources in the tree. Treat every figure quoted from it as **UNDATED**.
-- **`controls/repro.json`** — `STALE`: this published sidecar's staleness pin does not agree with this run, so nothing can date its numbers against the sources in the tree. Treat every figure quoted from it as **UNDATED**.
 
 
 ## Static + executed instructions

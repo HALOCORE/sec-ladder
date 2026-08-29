@@ -1,761 +1,799 @@
 {
-  "_": "Known-dangling `.temp/` citations from COMMITTED files, on THIS BOX.",
-  "generated_by": "harness/tools/temp_citations.py --update  (classification: .temp/t125/classify.py)",
-  "policy": "TASK_121 §B / TASK_125: PROMOTE, DON'T PUBLISH. A `.temp/` path cited from a committed file should be promoted into the tree if a reader is meant to check it. `.tasks/*_REPORT.md` is exempt: a report is a dated record.",
-  "why_a_file_and_not_a_count": "A count is a cached derivation and this project has watched one rot three times (PROTOCOL rule 13). Each entry carries the `kind` and the `note` that make the citation honest, which is the half of the fix that would otherwise live in 43 files of prose.",
-  "read_this_first": "57 of these 66 entries are NOT broken references: `destination` 25 (the citing script CREATES the path), `regenerable` 15 (constraint 6 working -- keep the generator, delete the artefact), `negative` 7 (the sentence says the path is wrong), `promoted` 4, `transient` 3, `quote`/`example`/`generated-record` 1 each. Only `lost` 9 are gone for good, and each of those notes says what the artefact showed and where the surviving evidence for it is. Counts as of TASK_125; re-derive with `harness/tools/temp_citations.py`, which prints the histogram.",
-  "kinds": {
-    "destination": "the citing file CREATES this path when it runs",
-    "regenerable": "gone, but a surviving generator or an inline recipe rebuilds it",
-    "negative": "the sentence asserts the path is WRONG or never existed",
-    "transient": "per-PID / per-run scratch that never persists by design",
-    "promoted": "the artefact is in the tree; note names the path and the repoint cost",
-    "quote": "a quoted tool diagnostic reproduced as evidence of what a run printed",
-    "example": "an illustrative path in a usage line, never a real one",
-    "generated-record": "the string is inside a GENERATED artefact; not a citation",
-    "lost": "gone and not regenerable; the note says what it showed"
+ "_": "Known-dangling `.temp/` citations from COMMITTED files, on THIS BOX.",
+ "generated_by": "harness/tools/temp_citations.py --update  (classification: .temp/t125/classify.py)",
+ "policy": "TASK_121 §B / TASK_125: PROMOTE, DON'T PUBLISH. A `.temp/` path cited from a committed file should be promoted into the tree if a reader is meant to check it. `.tasks/*_REPORT.md` is exempt: a report is a dated record.",
+ "why_a_file_and_not_a_count": "A count is a cached derivation and this project has watched one rot three times (PROTOCOL rule 13). Each entry carries the `kind` and the `note` that make the citation honest, which is the half of the fix that would otherwise live in 43 files of prose.",
+ "read_this_first": "57 of these 66 entries are NOT broken references: `destination` 25 (the citing script CREATES the path), `regenerable` 15 (constraint 6 working -- keep the generator, delete the artefact), `negative` 7 (the sentence says the path is wrong), `promoted` 4, `transient` 3, `quote`/`example`/`generated-record` 1 each. Only `lost` 9 are gone for good, and each of those notes says what the artefact showed and where the surviving evidence for it is. Counts as of TASK_125; re-derive with `harness/tools/temp_citations.py`, which prints the histogram.",
+ "kinds": {
+  "destination": "the citing file CREATES this path when it runs",
+  "regenerable": "gone, but a surviving generator or an inline recipe rebuilds it",
+  "negative": "the sentence asserts the path is WRONG or never existed",
+  "transient": "per-PID / per-run scratch that never persists by design",
+  "promoted": "the artefact is in the tree; note names the path and the repoint cost",
+  "quote": "a quoted tool diagnostic reproduced as evidence of what a run printed",
+  "example": "an illustrative path in a usage line, never a real one",
+  "generated-record": "the string is inside a GENERATED artefact; not a citation",
+  "lost": "gone and not regenerable; the note says what it showed"
+ },
+ "count": 85,
+ "entries": [
+  {
+   "file": "TOOLCHAIN.md",
+   "lines": [
+    115
+   ],
+   "path": ".temp/build/cg",
+   "kind": "destination",
+   "note": "the callgrind recipe's own output directory -- the cited line IS `mkdir -p .temp/build/cg`."
   },
-  "count": 81,
-  "entries": [
-    {
-      "file": "TOOLCHAIN.md",
-      "lines": [
-        115
-      ],
-      "path": ".temp/build/cg",
-      "kind": "destination",
-      "note": "the callgrind recipe's own output directory -- the cited line IS `mkdir -p .temp/build/cg`."
-    },
-    {
-      "file": "TOOLCHAIN.md",
-      "lines": [
-        117,
-        118
-      ],
-      "path": ".temp/build/cg/x.out",
-      "kind": "destination",
-      "note": "callgrind writes it (`--callgrind-out-file=`); the next line annotates what the previous line produced."
-    },
-    {
-      "file": "TOOLCHAIN.md",
-      "lines": [
-        230
-      ],
-      "path": ".temp/build/pilot/bin",
-      "kind": "destination",
-      "note": "the pilot build recipe's own output directory (`O=...; mkdir -p $O`)."
-    },
-    {
-      "file": "TOOLCHAIN.md",
-      "lines": [
-        226
-      ],
-      "path": ".temp/build/pilot/bin/",
-      "kind": "destination",
-      "note": "same recipe, prose spelling: 'binaries go to ...'. `pilot/` stays source-only, which is the point of the sentence."
-    },
-    {
-      "file": "common/census/census_filelists.py",
-      "lines": [
-        21
-      ],
-      "path": ".temp/census-filelists",
-      "kind": "destination",
-      "note": "the citing line is the assignment that CREATES this scratch directory when the script runs -- an ASSEMBLED path, visible only since TASK_132 fixed defect 2. The lists it writes name absolute paths into OTHER projects' trees and are deliberately not committed."
-    },
-    {
-      "file": "common/layout/README.md",
-      "lines": [
-        97,
-        98
-      ],
-      "path": ".temp/layout/layout_p01.json",
-      "kind": "promoted",
-      "note": "the layout population. Step 1 of the same recipe (`common/layout/layout_gen.py`) rebuilds it, AND a committed copy of the artefact is in the tree at `common/layout/data/layout_p01.json` (TASK_032). ⚠ OWED-AND-COSTED: repointing the three `common/layout/*.py` usage lines costs a 26-pattern gate sweep, because `check.py`'s `srcs` globs `common/layout/*.py` into every pattern's `source_sha256`. Bundle it with the next edit to those files."
-    },
-    {
-      "file": "common/layout/analyze.py",
-      "lines": [
-        16
-      ],
-      "path": ".temp/layout/layout_p01.json",
-      "kind": "promoted",
-      "note": "the layout population. Step 1 of the same recipe (`common/layout/layout_gen.py`) rebuilds it, AND a committed copy of the artefact is in the tree at `common/layout/data/layout_p01.json` (TASK_032). ⚠ OWED-AND-COSTED: repointing the three `common/layout/*.py` usage lines costs a 26-pattern gate sweep, because `check.py`'s `srcs` globs `common/layout/*.py` into every pattern's `source_sha256`. Bundle it with the next edit to those files."
-    },
-    {
-      "file": "common/layout/loopfit.py",
-      "lines": [
-        36
-      ],
-      "path": ".temp/layout/layout_p01.json",
-      "kind": "promoted",
-      "note": "the layout population. Step 1 of the same recipe (`common/layout/layout_gen.py`) rebuilds it, AND a committed copy of the artefact is in the tree at `common/layout/data/layout_p01.json` (TASK_032). ⚠ OWED-AND-COSTED: repointing the three `common/layout/*.py` usage lines costs a 26-pattern gate sweep, because `check.py`'s `srcs` globs `common/layout/*.py` into every pattern's `source_sha256`. Bundle it with the next edit to those files."
-    },
-    {
-      "file": "common/layout/q3_convergence.py",
-      "lines": [
-        15
-      ],
-      "path": ".temp/layout/layout_p01.json",
-      "kind": "promoted",
-      "note": "the layout population. Step 1 of the same recipe (`common/layout/layout_gen.py`) rebuilds it, AND a committed copy of the artefact is in the tree at `common/layout/data/layout_p01.json` (TASK_032). ⚠ OWED-AND-COSTED: repointing the three `common/layout/*.py` usage lines costs a 26-pattern gate sweep, because `check.py`'s `srcs` globs `common/layout/*.py` into every pattern's `source_sha256`. Bundle it with the next edit to those files."
-    },
-    {
-      "file": "harness/check.py",
-      "lines": [
-        9006
-      ],
-      "path": ".temp/check/probe-selftest",
-      "kind": "destination",
-      "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
-    },
-    {
-      "file": "harness/check.py",
-      "lines": [
-        4482
-      ],
-      "path": ".temp/r84/plant/ax_mod.rs",
-      "kind": "quote",
-      "note": "a quoted `check.py` diagnostic from TASK_084's planted-mutant run (`[tcb-unsafe] ...:9`). The string is the tool's OUTPUT being reproduced, not a reference to evidence."
-    },
-    {
-      "file": "harness/tools/table_render_inputs.py",
-      "lines": [
-        70
-      ],
-      "path": ".temp/table_render_inputs",
-      "kind": "destination",
-      "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
-    },
-    {
-      "file": "patterns/p02-buffer-copy/NOTES.md",
-      "lines": [
-        1535
-      ],
-      "path": ".temp/p19/v02/bin-r3_shipped-O3-isolated",
-      "kind": "lost",
-      "note": "one of the two builds in §10b's table. The point of the row is that the SAME source in a DIFFERENT build directory gives 10210.84 vs 10210.82 Ir/call; the row records `md5_fn e207ec6c8697d244...` and `n_fn 95` for both, which is the identity evidence. The binary is gone."
-    },
-    {
-      "file": "patterns/p05-index-flatten/NOTES.md",
-      "lines": [
-        755
-      ],
-      "path": ".temp/p05/cvar/clang-intcheck",
-      "kind": "regenerable",
-      "note": "same, clang build of `.temp/p05/cvar/kernel_intcheck.c` (present)."
-    },
-    {
-      "file": "patterns/p05-index-flatten/NOTES.md",
-      "lines": [
-        763
-      ],
-      "path": ".temp/p05/cvar/gcc-h-san",
-      "kind": "regenerable",
-      "note": "the SHIPPED 64-bit check, i.e. the pattern's own committed `c/kernel.c` built with sanitizers; nothing about it is scratch-only."
-    },
-    {
-      "file": "patterns/p05-index-flatten/NOTES.md",
-      "lines": [
-        753
-      ],
-      "path": ".temp/p05/cvar/gcc-intcheck",
-      "kind": "regenerable",
-      "note": "a compiled variant. Its source `.temp/p05/cvar/kernel_intcheck.c` SURVIVES beside it -- constraint 6 exactly: keep the generator, delete the artefact."
-    },
-    {
-      "file": "patterns/p05-index-flatten/NOTES.md",
-      "lines": [
-        756
-      ],
-      "path": ".temp/p05/cvar/gcc-intcheck-san",
-      "kind": "regenerable",
-      "note": "same source, `-O1 -fsanitize=address,undefined`. The UBSan and ASan text the transcript quotes names `.temp/p05/cvar/kernel_intcheck.c:53` and `:59`, which is present."
-    },
-    {
-      "file": "patterns/p06-rotate/NOTES.md",
-      "lines": [
-        602
-      ],
-      "path": ".temp/p48/cg/*.m48.out",
-      "kind": "regenerable",
-      "note": "same, on `sweep-m48n08`."
-    },
-    {
-      "file": "patterns/p06-rotate/NOTES.md",
-      "lines": [
-        261
-      ],
-      "path": ".temp/p48/cg/al.*.out",
-      "kind": "regenerable",
-      "note": "per-instruction callgrind dumps (`--dump-instr=yes`) on `large`. `.temp/p48/cg/` survives and is empty; re-running callgrind with that flag on the cited cell reproduces them, and the derived per-mnemonic table is in the same section."
-    },
-    {
-      "file": "patterns/p07-binary-search/NOTES.md",
-      "lines": [
-        942
-      ],
-      "path": ".temp/p07/twin/r4_ptr_twin.rs",
-      "kind": "negative",
-      "note": "the sentence around it reads '...a path that never existed; the generator writes ...'. The citation IS the correction; making it resolve would destroy the point."
-    },
-    {
-      "file": "patterns/p08-overlap-move/NOTES.md",
-      "lines": [
-        80
-      ],
-      "path": ".temp/p08/probe/which_impl",
-      "kind": "lost",
-      "note": "the `dlsym` probe binary, and its `which_impl.c` is gone too; `which_impl2.c` survives in the same directory. What it showed is in the transcript (memcpy and memmove resolve to ONE address, libc+0x198940) and is independently supported by the disassembly argument below it."
-    },
-    {
-      "file": "patterns/p10-fir-stencil/NOTES.md",
-      "lines": [
-        737
-      ],
-      "path": ".temp/p10/domain/",
-      "kind": "regenerable",
-      "note": "the band-`d` input directory, deliberately outside `inputs/`; `patterns/p10-fir-stencil/controls/gen_domain.py` is committed and rebuilds it."
-    },
-    {
-      "file": "patterns/p10-fir-stencil/NOTES.md",
-      "lines": [
-        1210,
-        1214
-      ],
-      "path": ".temp/p10c/idty/u_win-O3-isolated",
-      "kind": "regenerable",
-      "note": "built by the `rustc` line it appears on, from `.temp/p10c/idty/unsafe.rs`, which SURVIVES; the two lines below then `asm.py diff` the pair."
-    },
-    {
-      "file": "patterns/p10-fir-stencil/NOTES.md",
-      "lines": [
-        1212,
-        1215
-      ],
-      "path": ".temp/p10c/idty/u_win_verus-O3-isolated",
-      "kind": "regenerable",
-      "note": "same, from `.temp/p10c/idty/verus.rs`, which survives."
-    },
-    {
-      "file": "patterns/p10-fir-stencil/README.md",
-      "lines": [
-        209
-      ],
-      "path": ".temp/p10/domain",
-      "kind": "destination",
-      "note": "the `--inputs` directory `controls/gen_domain.py` writes in the line above."
-    },
-    {
-      "file": "patterns/p10-fir-stencil/controls/gen_controls.py",
-      "lines": [
-        98
-      ],
-      "path": ".temp/p10/ctlbin",
-      "kind": "destination",
-      "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
-    },
-    {
-      "file": "patterns/p10-fir-stencil/controls/gen_controls.py",
-      "lines": [
-        12
-      ],
-      "path": ".temp/p10/ctlbin/",
-      "kind": "destination",
-      "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
-    },
-    {
-      "file": "patterns/p10-fir-stencil/controls/gen_domain.py",
-      "lines": [
-        6
-      ],
-      "path": ".temp/p10/domain",
-      "kind": "destination",
-      "note": "this script's own output directory."
-    },
-    {
-      "file": "patterns/p10-fir-stencil/controls/sweep_ir.py",
-      "lines": [
-        266
-      ],
-      "path": ".temp/p10/ctlbin",
-      "kind": "destination",
-      "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
-    },
-    {
-      "file": "patterns/p12-strcat-fixed/NOTES.md",
-      "lines": [
-        375
-      ],
-      "path": ".temp/p12/controls/d2_unsafe_nocheck",
-      "kind": "regenerable",
-      "note": "the binary; `.temp/p12/controls/d2_unsafe_nocheck.rs` is present in the same directory, together with the other eight control sources."
-    },
-    {
-      "file": "patterns/p14-field-split/controls/attr.py",
-      "lines": [
-        46
-      ],
-      "path": ".temp/p14/attr",
-      "kind": "destination",
-      "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
-    },
-    {
-      "file": "patterns/p14-field-split/controls/build_controls.sh",
-      "lines": [
-        21
-      ],
-      "path": ".temp/p14/ctlbin",
-      "kind": "destination",
-      "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
-    },
-    {
-      "file": "patterns/p14-field-split/controls/build_controls.sh",
-      "lines": [
-        7
-      ],
-      "path": ".temp/p14/ctlbin/",
-      "kind": "destination",
-      "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
-    },
-    {
-      "file": "patterns/p14-field-split/controls/clayout.py",
-      "lines": [
-        59
-      ],
-      "path": ".temp/p14/clay",
-      "kind": "destination",
-      "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
-    },
-    {
-      "file": "patterns/p14-field-split/controls/sweep_ir.py",
-      "lines": [
-        172
-      ],
-      "path": ".temp/p14/ctlbin",
-      "kind": "destination",
-      "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
-    },
-    {
-      "file": "patterns/p14-field-split/controls/verify_controls.sh",
-      "lines": [
-        28
-      ],
-      "path": ".temp/p14/ctlbin",
-      "kind": "destination",
-      "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
-    },
-    {
-      "file": "patterns/p14-field-split/controls/wall_span.py",
-      "lines": [
-        54
-      ],
-      "path": ".temp/p14/wall",
-      "kind": "destination",
-      "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
-    },
-    {
-      "file": "patterns/p16-tlv-walk/NOTES.md",
-      "lines": [
-        1281
-      ],
-      "path": ".temp/review018/in16/",
-      "kind": "lost",
-      "note": "22 review inputs. ⚠ The sentence citing them SAYS they were not in the tree, and the paragraph continues that the `nrec` axis now ships and the laws were re-derived from committed blobs at TASK_020. Nothing published still rests on them."
-    },
-    {
-      "file": "patterns/p16-tlv-walk/controls/gen_controls.py",
-      "lines": [
-        436
-      ],
-      "path": ".temp/p16/controls/r3_endslice",
-      "kind": "destination",
-      "note": "the `-o` target of the `rustc` line it is on; the source `.temp/p16/controls/r3_endslice.rs` is present."
-    },
-    {
-      "file": "patterns/p17-http-range/NOTES.md",
-      "lines": [
-        1564
-      ],
-      "path": ".temp/p05r3/bin/v17-tuned_suffix-O3-isolated",
-      "kind": "lost",
-      "note": "the twin of the entry above; same md5 pair recorded on the line."
-    },
-    {
-      "file": "patterns/p17-http-range/NOTES.md",
-      "lines": [
-        758,
-        1414
-      ],
-      "path": ".temp/p17/sweep/",
-      "kind": "lost",
-      "note": "340 callgrind runs behind the one-iteration hold. The band ships and §10b supersedes the paragraph (the second citation is inside a struck-through sentence marked CLOSED at TASK_082)."
-    },
-    {
-      "file": "patterns/p17-http-range/NOTES.md",
-      "lines": [
-        362,
-        369
-      ],
-      "path": ".temp/p17b/mirror/patterns/p17-http-range/verus_leak.rs",
-      "kind": "regenerable",
-      "note": "the inline `python3 - <<'PY'` block printed immediately above regenerates it from the shipped `verus.rs` by exact-string substitution WITH a hit-count assertion, so it cannot silently drift. `.temp/p17b/mkvariants.py` and `.temp/p17b/demo.sh` also survive."
-    },
-    {
-      "file": "patterns/p17-http-range/NOTES.md",
-      "lines": [
-        1563
-      ],
-      "path": ".temp/p18/bin17-r3_incontract-O3-isolated",
-      "kind": "lost",
-      "note": "a cross-task build. The line quotes `n_fn=135 md5_fn=532201c7... md5_raw=12fd8fac...` for it and for its twin, and the identity claim is that the two hashes MATCH -- which the quoted line records."
-    },
-    {
-      "file": "patterns/p17-http-range/NOTES.md",
-      "lines": [
-        1584
-      ],
-      "path": ".temp/review015/in17/",
-      "kind": "lost",
-      "note": "the `nsuf` 1..8 review inputs, zero residual. The conclusion they support (the in-contract band) ships in `inputs/gen.py`."
-    },
-    {
-      "file": "patterns/p18-varint-shift/NOTES.md",
-      "lines": [
-        868
-      ],
-      "path": ".temp/p18/ctlbin/{n,u}_wrapall-{O0,O0d}",
-      "kind": "regenerable",
-      "note": "four control binaries; `controls/build_controls.sh` is committed and rebuilds the whole `ctlbin` set."
-    },
-    {
-      "file": "patterns/p18-varint-shift/NOTES.md",
-      "lines": [
-        162
-      ],
-      "path": ".temp/p18/miri/adversarial-shift11.bin",
-      "kind": "regenerable",
-      "note": "`.temp/p18/miri/gen_miri_inputs.py` survives in that directory and rebuilds it; `.temp/p18/ctl/n_noguard.rs`, the other half of the command, is present too."
-    },
-    {
-      "file": "patterns/p18-varint-shift/controls/build_controls.sh",
-      "lines": [
-        33
-      ],
-      "path": ".temp/p18/ctlbin",
-      "kind": "destination",
-      "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
-    },
-    {
-      "file": "patterns/p18-varint-shift/controls/build_controls.sh",
-      "lines": [
-        7
-      ],
-      "path": ".temp/p18/ctlbin/",
-      "kind": "destination",
-      "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
-    },
-    {
-      "file": "patterns/p18-varint-shift/controls/sweep_ir.py",
-      "lines": [
-        205
-      ],
-      "path": ".temp/p18/ctlbin",
-      "kind": "destination",
-      "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
-    },
-    {
-      "file": "patterns/p18-varint-shift/controls/verify_controls.sh",
-      "lines": [
-        17
-      ],
-      "path": ".temp/p18/ctlbin",
-      "kind": "destination",
-      "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
-    },
-    {
-      "file": "patterns/p18-varint-shift/controls/verify_controls.sh",
-      "lines": [
-        45
-      ],
-      "path": ".temp/p18/miri/$f.bin",
-      "kind": "destination",
-      "note": "the per-input blob this script copies out before running Miri."
-    },
-    {
-      "file": "patterns/p22-hash-probe/controls/clayout.py",
-      "lines": [
-        64
-      ],
-      "path": ".temp/p14/clay",
-      "kind": "negative",
-      "note": "the comment exists to warn that this WAS the wrong default -- p14's own scratch directory, overwritten once (TASK_064_REVIEW). Repointing the path would delete the warning."
-    },
-    {
-      "file": "patterns/p22-hash-probe/controls/clayout.py",
-      "lines": [
-        70
-      ],
-      "path": ".temp/p22/clay",
-      "kind": "destination",
-      "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
-    },
-    {
-      "file": "patterns/p27-handle-table/NOTES.md",
-      "lines": [
-        492
-      ],
-      "path": ".temp/p27/irt<pid>",
-      "kind": "transient",
-      "note": "per-PID probe scratch; `<pid>` is in the citation. It never persists by design, and the two Ir figures either side of it are the evidence."
-    },
-    {
-      "file": "patterns/p27-handle-table/NOTES.md",
-      "lines": [
-        493
-      ],
-      "path": ".temp/p27c/av<pid>",
-      "kind": "transient",
-      "note": "same, the `argvlen` arm."
-    },
-    {
-      "file": "patterns/p27-handle-table/controls/clayout.py",
-      "lines": [
-        67
-      ],
-      "path": ".temp/p14/clay",
-      "kind": "negative",
-      "note": "the comment exists to warn that this WAS the wrong default -- p14's own scratch directory, overwritten once (TASK_064_REVIEW). Repointing the path would delete the warning."
-    },
-    {
-      "file": "patterns/p27-handle-table/controls/clayout.py",
-      "lines": [
-        73
-      ],
-      "path": ".temp/p27/clay",
-      "kind": "destination",
-      "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
-    },
-    {
-      "file": "patterns/p36-vtable-dispatch/NOTES.md",
-      "lines": [
-        731
-      ],
-      "path": ".temp/p36/bin/k_gcc",
-      "kind": "lost",
-      "note": "the `-O3` C binary the `nm --print-size` transcript reads. `.temp/p36/bin/` is gone; `.temp/p36/` and its 14 `probe_a*.rs` survive. What it showed is in the transcript: eight `op` symbols, every one 0x12 = 18 bytes."
-    },
-    {
-      "file": "patterns/p36-vtable-dispatch/NOTES.md",
-      "lines": [
-        735
-      ],
-      "path": ".temp/p36/bin/k_unsafe",
-      "kind": "lost",
-      "note": "the Rust half of the same transcript: eight `OpTag` symbols, every one 0x0e = 14 bytes."
-    },
-    {
-      "file": "patterns/p36-vtable-dispatch/controls/cfi_probe.py",
-      "lines": [
-        41
-      ],
-      "path": ".temp/p36/cfi",
-      "kind": "destination",
-      "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
-    },
-    {
-      "file": "patterns/p36-vtable-dispatch/controls/clayout.py",
-      "lines": [
-        72
-      ],
-      "path": ".temp/p14/clay",
-      "kind": "negative",
-      "note": "the comment exists to warn that this WAS the wrong default -- p14's own scratch directory, overwritten once (TASK_064_REVIEW). Repointing the path would delete the warning."
-    },
-    {
-      "file": "patterns/p36-vtable-dispatch/controls/clayout.py",
-      "lines": [
-        78
-      ],
-      "path": ".temp/p36/clay",
-      "kind": "destination",
-      "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
-    },
-    {
-      "file": "patterns/p36-vtable-dispatch/controls/gen_controls.py",
-      "lines": [
-        8
-      ],
-      "path": ".temp/p36/controls/bin/",
-      "kind": "destination",
-      "note": "this script's own binary output directory."
-    },
-    {
-      "file": "patterns/p36-vtable-dispatch/controls/sweep_ir.py",
-      "lines": [
-        43
-      ],
-      "path": ".temp/xxx",
-      "kind": "example",
-      "note": "an illustrative value for `SLB_P36_SCRATCH=` in a usage line. It was never meant to exist."
-    },
-    {
-      "file": "patterns/p38-alias-pun/controls/gen_controls.py",
-      "lines": [
-        470
-      ],
-      "path": ".temp/p38/controls",
-      "kind": "destination",
-      "note": "the same path in the `--help` string."
-    },
-    {
-      "file": "patterns/p38-alias-pun/controls/gen_controls.py",
-      "lines": [
-        5
-      ],
-      "path": ".temp/p38/controls/",
-      "kind": "destination",
-      "note": "this script's own scratch subdirectory; the sentence exists to say it is p38's OWN dir and not another pattern's."
-    },
-    {
-      "file": "patterns/p38-alias-pun/controls/span.py",
-      "lines": [
-        28
-      ],
-      "path": ".temp/p38/span",
-      "kind": "destination",
-      "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
-    },
-    {
-      "file": "patterns/p42-goto-cleanup/controls/miri_leak_key.py",
-      "lines": [
-        50
-      ],
-      "path": ".temp/p42-leakkey/pid<PID>/",
-      "kind": "transient",
-      "note": "this committed script's own per-PID working directory, named so two concurrent runs cannot collide."
-    },
-    {
-      "file": "patterns/p46-bignum-mac/NOTES.md",
-      "lines": [
-        415
-      ],
-      "path": ".temp/t89/genvar",
-      "kind": "regenerable",
-      "note": "the cited line IS the rebuild command: `controls/mkvariants.py --write .temp/t89/genvar`, and `patterns/p46-bignum-mac/controls/mkvariants.py` is committed."
-    },
-    {
-      "file": "patterns/p46-bignum-mac/NOTES.md",
-      "lines": [
-        416
-      ],
-      "path": ".temp/t89/genvar/v46_nosafety.rs",
-      "kind": "regenerable",
-      "note": "written by the command on the line above; the Verus verdict it produces (`20 verified, 1 errors`) is quoted underneath."
-    },
-    {
-      "file": "patterns/p46-bignum-mac/controls/census.py",
-      "lines": [
-        58
-      ],
-      "path": ".temp/check/p46-controls",
-      "kind": "destination",
-      "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
-    },
-    {
-      "file": "patterns/p46-bignum-mac/controls/harm_layout.py",
-      "lines": [
-        47
-      ],
-      "path": ".temp/check/p46-controls",
-      "kind": "destination",
-      "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
-    },
-    {
-      "file": "patterns/p47-ct-compare/NOTES.md",
-      "lines": [
-        1330
-      ],
-      "path": ".temp/p14/clay",
-      "kind": "negative",
-      "note": "the TASK_064_REVIEW narrative: p47's unchanged port wrote its population into p14's scratch directory. The sentence is about the collision."
-    },
-    {
-      "file": "patterns/p47-ct-compare/NOTES.md",
-      "lines": [
-        1332
-      ],
-      "path": ".temp/p14/clay/meta.json",
-      "kind": "negative",
-      "note": "same narrative -- the file p47's port OVERWROTE. Making the path resolve would be making the incident disappear."
-    },
-    {
-      "file": "patterns/p47-ct-compare/NOTES.md",
-      "lines": [
-        1338
-      ],
-      "path": ".temp/p47/clay",
-      "kind": "destination",
-      "note": "p47's corrected `clayout.py` OUT default; it is created when that script runs, and the sentence exists to say p27's and p14's are not touched."
-    },
-    {
-      "file": "patterns/p47-ct-compare/controls/clayout.py",
-      "lines": [
-        55
-      ],
-      "path": ".temp/p14/clay",
-      "kind": "negative",
-      "note": "the comment exists to warn that this WAS the wrong default -- p14's own scratch directory, overwritten once (TASK_064_REVIEW). Repointing the path would delete the warning."
-    },
-    {
-      "file": "patterns/p47-ct-compare/controls/clayout.py",
-      "lines": [
-        63
-      ],
-      "path": ".temp/p47/clay",
-      "kind": "destination",
-      "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
-    },
-    {
-      "file": "patterns/p47-ct-compare/controls/sweep_ir.py",
-      "lines": [
-        6,
-        7,
-        8
-      ],
-      "path": ".temp/p47/sweep.json",
-      "kind": "destination",
-      "note": "this script's own `--out` target, in its usage block."
-    },
-    {
-      "file": "patterns/p47-ct-compare/inputs/gen.py",
-      "lines": [
-        9,
-        11
-      ],
-      "path": ".temp/p47/a",
-      "kind": "destination",
-      "note": "a `sha256sum ... > .temp/p47/a` / `sha256sum -c` pair in the docstring's determinism recipe. ⚠ This file is MEASUREMENT-HASHED (`measure.py::measurement_sources` globs `inputs/gen.py`), so it must not be edited for a documentation reason -- and it does not need to be."
-    },
-    {
-      "file": "pilot/README.md",
-      "lines": [
-        90
-      ],
-      "path": ".temp/build/pilot/bin/",
-      "kind": "destination",
-      "note": "where `TOOLCHAIN.md`'s pilot recipe puts its binaries; the sentence exists to say they do NOT go in `pilot/`."
-    },
-    {
-      "file": "results/gate/p42-goto-cleanup.json",
-      "lines": [
-        2406,
-        2417,
-        2450
-      ],
-      "path": ".temp/build/p42/c-gcc-asan+0xc477f",
-      "kind": "generated-record",
-      "note": "inside a LeakSanitizer diagnostic captured by the gate. `results/gate/*.json` is GENERATED by `harness/check.py`; the string is a sanitizer frame, not a citation, and hand-editing the record is forbidden."
-    }
-  ]
+  {
+   "file": "TOOLCHAIN.md",
+   "lines": [
+    117,
+    118
+   ],
+   "path": ".temp/build/cg/x.out",
+   "kind": "destination",
+   "note": "callgrind writes it (`--callgrind-out-file=`); the next line annotates what the previous line produced."
+  },
+  {
+   "file": "TOOLCHAIN.md",
+   "lines": [
+    230
+   ],
+   "path": ".temp/build/pilot/bin",
+   "kind": "destination",
+   "note": "the pilot build recipe's own output directory (`O=...; mkdir -p $O`)."
+  },
+  {
+   "file": "TOOLCHAIN.md",
+   "lines": [
+    226
+   ],
+   "path": ".temp/build/pilot/bin/",
+   "kind": "destination",
+   "note": "same recipe, prose spelling: 'binaries go to ...'. `pilot/` stays source-only, which is the point of the sentence."
+  },
+  {
+   "file": "common/census/census_filelists.py",
+   "lines": [
+    20
+   ],
+   "path": ".temp/census-filelists",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this scratch directory when the script runs -- an ASSEMBLED path, visible only since TASK_132 fixed defect 2. The lists it writes name absolute paths into OTHER projects' trees and are deliberately not committed."
+  },
+  {
+   "file": "common/layout/README.md",
+   "lines": [
+    131,
+    132
+   ],
+   "path": ".temp/layout/layout_p01.json",
+   "kind": "promoted",
+   "note": "the layout population. Step 1 of the same recipe (`common/layout/layout_gen.py`) rebuilds it, AND a committed copy of the artefact is in the tree at `common/layout/data/layout_p01.json` (TASK_032). ⚠ OWED-AND-COSTED: repointing the three `common/layout/*.py` usage lines costs a 26-pattern gate sweep, because `check.py`'s `srcs` globs `common/layout/*.py` into every pattern's `source_sha256`. Bundle it with the next edit to those files."
+  },
+  {
+   "file": "common/layout/analyze.py",
+   "lines": [
+    16
+   ],
+   "path": ".temp/layout/layout_p01.json",
+   "kind": "promoted",
+   "note": "the layout population. Step 1 of the same recipe (`common/layout/layout_gen.py`) rebuilds it, AND a committed copy of the artefact is in the tree at `common/layout/data/layout_p01.json` (TASK_032). ⚠ OWED-AND-COSTED: repointing the three `common/layout/*.py` usage lines costs a 26-pattern gate sweep, because `check.py`'s `srcs` globs `common/layout/*.py` into every pattern's `source_sha256`. Bundle it with the next edit to those files."
+  },
+  {
+   "file": "common/layout/loopfit.py",
+   "lines": [
+    36
+   ],
+   "path": ".temp/layout/layout_p01.json",
+   "kind": "promoted",
+   "note": "the layout population. Step 1 of the same recipe (`common/layout/layout_gen.py`) rebuilds it, AND a committed copy of the artefact is in the tree at `common/layout/data/layout_p01.json` (TASK_032). ⚠ OWED-AND-COSTED: repointing the three `common/layout/*.py` usage lines costs a 26-pattern gate sweep, because `check.py`'s `srcs` globs `common/layout/*.py` into every pattern's `source_sha256`. Bundle it with the next edit to those files."
+  },
+  {
+   "file": "common/layout/q3_convergence.py",
+   "lines": [
+    15
+   ],
+   "path": ".temp/layout/layout_p01.json",
+   "kind": "promoted",
+   "note": "the layout population. Step 1 of the same recipe (`common/layout/layout_gen.py`) rebuilds it, AND a committed copy of the artefact is in the tree at `common/layout/data/layout_p01.json` (TASK_032). ⚠ OWED-AND-COSTED: repointing the three `common/layout/*.py` usage lines costs a 26-pattern gate sweep, because `check.py`'s `srcs` globs `common/layout/*.py` into every pattern's `source_sha256`. Bundle it with the next edit to those files."
+  },
+  {
+   "file": "harness/check.py",
+   "lines": [
+    9006
+   ],
+   "path": ".temp/check/probe-selftest",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
+  },
+  {
+   "file": "harness/check.py",
+   "lines": [
+    4488
+   ],
+   "path": ".temp/r84/plant/ax_mod.rs",
+   "kind": "quote",
+   "note": "a quoted `check.py` diagnostic from TASK_084's planted-mutant run (`[tcb-unsafe] ...:9`). The string is the tool's OUTPUT being reproduced, not a reference to evidence."
+  },
+  {
+   "file": "harness/tools/table_render_inputs.py",
+   "lines": [
+    70
+   ],
+   "path": ".temp/table_render_inputs",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
+  },
+  {
+   "file": "patterns/p02-buffer-copy/NOTES.md",
+   "lines": [
+    1535
+   ],
+   "path": ".temp/p19/v02/bin-r3_shipped-O3-isolated",
+   "kind": "lost",
+   "note": "one of the two builds in §10b's table. The point of the row is that the SAME source in a DIFFERENT build directory gives 10210.84 vs 10210.82 Ir/call; the row records `md5_fn e207ec6c8697d244...` and `n_fn 95` for both, which is the identity evidence. The binary is gone."
+  },
+  {
+   "file": "patterns/p05-index-flatten/NOTES.md",
+   "lines": [
+    755
+   ],
+   "path": ".temp/p05/cvar/clang-intcheck",
+   "kind": "regenerable",
+   "note": "same, clang build of `.temp/p05/cvar/kernel_intcheck.c` (present)."
+  },
+  {
+   "file": "patterns/p05-index-flatten/NOTES.md",
+   "lines": [
+    763
+   ],
+   "path": ".temp/p05/cvar/gcc-h-san",
+   "kind": "regenerable",
+   "note": "the SHIPPED 64-bit check, i.e. the pattern's own committed `c/kernel.c` built with sanitizers; nothing about it is scratch-only."
+  },
+  {
+   "file": "patterns/p05-index-flatten/NOTES.md",
+   "lines": [
+    753
+   ],
+   "path": ".temp/p05/cvar/gcc-intcheck",
+   "kind": "regenerable",
+   "note": "a compiled variant. Its source `.temp/p05/cvar/kernel_intcheck.c` SURVIVES beside it -- constraint 6 exactly: keep the generator, delete the artefact."
+  },
+  {
+   "file": "patterns/p05-index-flatten/NOTES.md",
+   "lines": [
+    756
+   ],
+   "path": ".temp/p05/cvar/gcc-intcheck-san",
+   "kind": "regenerable",
+   "note": "same source, `-O1 -fsanitize=address,undefined`. The UBSan and ASan text the transcript quotes names `.temp/p05/cvar/kernel_intcheck.c:53` and `:59`, which is present."
+  },
+  {
+   "file": "patterns/p06-rotate/NOTES.md",
+   "lines": [
+    602
+   ],
+   "path": ".temp/p48/cg/*.m48.out",
+   "kind": "regenerable",
+   "note": "same, on `sweep-m48n08`."
+  },
+  {
+   "file": "patterns/p06-rotate/NOTES.md",
+   "lines": [
+    261
+   ],
+   "path": ".temp/p48/cg/al.*.out",
+   "kind": "regenerable",
+   "note": "per-instruction callgrind dumps (`--dump-instr=yes`) on `large`. `.temp/p48/cg/` survives and is empty; re-running callgrind with that flag on the cited cell reproduces them, and the derived per-mnemonic table is in the same section."
+  },
+  {
+   "file": "patterns/p07-binary-search/NOTES.md",
+   "lines": [
+    942
+   ],
+   "path": ".temp/p07/twin/r4_ptr_twin.rs",
+   "kind": "negative",
+   "note": "the sentence around it reads '...a path that never existed; the generator writes ...'. The citation IS the correction; making it resolve would destroy the point."
+  },
+  {
+   "file": "patterns/p08-overlap-move/NOTES.md",
+   "lines": [
+    80
+   ],
+   "path": ".temp/p08/probe/which_impl",
+   "kind": "lost",
+   "note": "the `dlsym` probe binary, and its `which_impl.c` is gone too; `which_impl2.c` survives in the same directory. What it showed is in the transcript (memcpy and memmove resolve to ONE address, libc+0x198940) and is independently supported by the disassembly argument below it."
+  },
+  {
+   "file": "patterns/p10-fir-stencil/NOTES.md",
+   "lines": [
+    737
+   ],
+   "path": ".temp/p10/domain/",
+   "kind": "regenerable",
+   "note": "the band-`d` input directory, deliberately outside `inputs/`; `patterns/p10-fir-stencil/controls/gen_domain.py` is committed and rebuilds it."
+  },
+  {
+   "file": "patterns/p10-fir-stencil/NOTES.md",
+   "lines": [
+    1210,
+    1214
+   ],
+   "path": ".temp/p10c/idty/u_win-O3-isolated",
+   "kind": "regenerable",
+   "note": "built by the `rustc` line it appears on, from `.temp/p10c/idty/unsafe.rs`, which SURVIVES; the two lines below then `asm.py diff` the pair."
+  },
+  {
+   "file": "patterns/p10-fir-stencil/NOTES.md",
+   "lines": [
+    1212,
+    1215
+   ],
+   "path": ".temp/p10c/idty/u_win_verus-O3-isolated",
+   "kind": "regenerable",
+   "note": "same, from `.temp/p10c/idty/verus.rs`, which survives."
+  },
+  {
+   "file": "patterns/p10-fir-stencil/README.md",
+   "lines": [
+    209
+   ],
+   "path": ".temp/p10/domain",
+   "kind": "destination",
+   "note": "the `--inputs` directory `controls/gen_domain.py` writes in the line above."
+  },
+  {
+   "file": "patterns/p10-fir-stencil/controls/gen_controls.py",
+   "lines": [
+    98
+   ],
+   "path": ".temp/p10/ctlbin",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
+  },
+  {
+   "file": "patterns/p10-fir-stencil/controls/gen_controls.py",
+   "lines": [
+    12
+   ],
+   "path": ".temp/p10/ctlbin/",
+   "kind": "destination",
+   "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
+  },
+  {
+   "file": "patterns/p10-fir-stencil/controls/gen_domain.py",
+   "lines": [
+    6,
+    123
+   ],
+   "path": ".temp/p10/domain",
+   "kind": "destination",
+   "note": "this script's own output directory."
+  },
+  {
+   "file": "patterns/p10-fir-stencil/controls/sweep_ir.py",
+   "lines": [
+    266
+   ],
+   "path": ".temp/p10/ctlbin",
+   "kind": "destination",
+   "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
+  },
+  {
+   "file": "patterns/p12-strcat-fixed/NOTES.md",
+   "lines": [
+    375
+   ],
+   "path": ".temp/p12/controls/d2_unsafe_nocheck",
+   "kind": "regenerable",
+   "note": "the binary; `.temp/p12/controls/d2_unsafe_nocheck.rs` is present in the same directory, together with the other eight control sources."
+  },
+  {
+   "file": "patterns/p14-field-split/controls/attr.py",
+   "lines": [
+    46
+   ],
+   "path": ".temp/p14/attr",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
+  },
+  {
+   "file": "patterns/p14-field-split/controls/build_controls.sh",
+   "lines": [
+    21
+   ],
+   "path": ".temp/p14/ctlbin",
+   "kind": "destination",
+   "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
+  },
+  {
+   "file": "patterns/p14-field-split/controls/build_controls.sh",
+   "lines": [
+    7
+   ],
+   "path": ".temp/p14/ctlbin/",
+   "kind": "destination",
+   "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
+  },
+  {
+   "file": "patterns/p14-field-split/controls/clayout.py",
+   "lines": [
+    59
+   ],
+   "path": ".temp/p14/clay",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
+  },
+  {
+   "file": "patterns/p14-field-split/controls/sweep_ir.py",
+   "lines": [
+    172
+   ],
+   "path": ".temp/p14/ctlbin",
+   "kind": "destination",
+   "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
+  },
+  {
+   "file": "patterns/p14-field-split/controls/verify_controls.sh",
+   "lines": [
+    28
+   ],
+   "path": ".temp/p14/ctlbin",
+   "kind": "destination",
+   "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
+  },
+  {
+   "file": "patterns/p14-field-split/controls/wall_span.py",
+   "lines": [
+    54
+   ],
+   "path": ".temp/p14/wall",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
+  },
+  {
+   "file": "patterns/p16-tlv-walk/NOTES.md",
+   "lines": [
+    1281
+   ],
+   "path": ".temp/review018/in16/",
+   "kind": "lost",
+   "note": "22 review inputs. ⚠ The sentence citing them SAYS they were not in the tree, and the paragraph continues that the `nrec` axis now ships and the laws were re-derived from committed blobs at TASK_020. Nothing published still rests on them."
+  },
+  {
+   "file": "patterns/p16-tlv-walk/controls/gen_controls.py",
+   "lines": [
+    436
+   ],
+   "path": ".temp/p16/controls/r3_endslice",
+   "kind": "destination",
+   "note": "the `-o` target of the `rustc` line it is on; the source `.temp/p16/controls/r3_endslice.rs` is present."
+  },
+  {
+   "file": "patterns/p17-http-range/NOTES.md",
+   "lines": [
+    1564
+   ],
+   "path": ".temp/p05r3/bin/v17-tuned_suffix-O3-isolated",
+   "kind": "lost",
+   "note": "the twin of the entry above; same md5 pair recorded on the line."
+  },
+  {
+   "file": "patterns/p17-http-range/NOTES.md",
+   "lines": [
+    758,
+    1414
+   ],
+   "path": ".temp/p17/sweep/",
+   "kind": "lost",
+   "note": "340 callgrind runs behind the one-iteration hold. The band ships and §10b supersedes the paragraph (the second citation is inside a struck-through sentence marked CLOSED at TASK_082)."
+  },
+  {
+   "file": "patterns/p17-http-range/NOTES.md",
+   "lines": [
+    362,
+    369
+   ],
+   "path": ".temp/p17b/mirror/patterns/p17-http-range/verus_leak.rs",
+   "kind": "regenerable",
+   "note": "the inline `python3 - <<'PY'` block printed immediately above regenerates it from the shipped `verus.rs` by exact-string substitution WITH a hit-count assertion, so it cannot silently drift. `.temp/p17b/mkvariants.py` and `.temp/p17b/demo.sh` also survive."
+  },
+  {
+   "file": "patterns/p17-http-range/NOTES.md",
+   "lines": [
+    1563
+   ],
+   "path": ".temp/p18/bin17-r3_incontract-O3-isolated",
+   "kind": "lost",
+   "note": "a cross-task build. The line quotes `n_fn=135 md5_fn=532201c7... md5_raw=12fd8fac...` for it and for its twin, and the identity claim is that the two hashes MATCH -- which the quoted line records."
+  },
+  {
+   "file": "patterns/p17-http-range/NOTES.md",
+   "lines": [
+    1584
+   ],
+   "path": ".temp/review015/in17/",
+   "kind": "lost",
+   "note": "the `nsuf` 1..8 review inputs, zero residual. The conclusion they support (the in-contract band) ships in `inputs/gen.py`."
+  },
+  {
+   "file": "patterns/p18-varint-shift/NOTES.md",
+   "lines": [
+    868
+   ],
+   "path": ".temp/p18/ctlbin/{n,u}_wrapall-{O0,O0d}",
+   "kind": "regenerable",
+   "note": "four control binaries; `controls/build_controls.sh` is committed and rebuilds the whole `ctlbin` set."
+  },
+  {
+   "file": "patterns/p18-varint-shift/NOTES.md",
+   "lines": [
+    162
+   ],
+   "path": ".temp/p18/miri/adversarial-shift11.bin",
+   "kind": "regenerable",
+   "note": "`.temp/p18/miri/gen_miri_inputs.py` survives in that directory and rebuilds it; `.temp/p18/ctl/n_noguard.rs`, the other half of the command, is present too."
+  },
+  {
+   "file": "patterns/p18-varint-shift/controls/build_controls.sh",
+   "lines": [
+    33
+   ],
+   "path": ".temp/p18/ctlbin",
+   "kind": "destination",
+   "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
+  },
+  {
+   "file": "patterns/p18-varint-shift/controls/build_controls.sh",
+   "lines": [
+    7
+   ],
+   "path": ".temp/p18/ctlbin/",
+   "kind": "destination",
+   "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
+  },
+  {
+   "file": "patterns/p18-varint-shift/controls/sweep_ir.py",
+   "lines": [
+    205
+   ],
+   "path": ".temp/p18/ctlbin",
+   "kind": "destination",
+   "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
+  },
+  {
+   "file": "patterns/p18-varint-shift/controls/verify_controls.sh",
+   "lines": [
+    17
+   ],
+   "path": ".temp/p18/ctlbin",
+   "kind": "destination",
+   "note": "the controls' own build output directory; this file creates it (`build_controls.sh` does `mkdir -p`) and constraint 6 deletes the binaries once the gates are green."
+  },
+  {
+   "file": "patterns/p18-varint-shift/controls/verify_controls.sh",
+   "lines": [
+    45
+   ],
+   "path": ".temp/p18/miri/$f.bin",
+   "kind": "destination",
+   "note": "the per-input blob this script copies out before running Miri."
+  },
+  {
+   "file": "patterns/p22-hash-probe/controls/clayout.py",
+   "lines": [
+    64
+   ],
+   "path": ".temp/p14/clay",
+   "kind": "negative",
+   "note": "the comment exists to warn that this WAS the wrong default -- p14's own scratch directory, overwritten once (TASK_064_REVIEW). Repointing the path would delete the warning."
+  },
+  {
+   "file": "patterns/p22-hash-probe/controls/clayout.py",
+   "lines": [
+    70
+   ],
+   "path": ".temp/p22/clay",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
+  },
+  {
+   "file": "patterns/p27-handle-table/NOTES.md",
+   "lines": [
+    492
+   ],
+   "path": ".temp/p27/irt<pid>",
+   "kind": "transient",
+   "note": "per-PID probe scratch; `<pid>` is in the citation. It never persists by design, and the two Ir figures either side of it are the evidence."
+  },
+  {
+   "file": "patterns/p27-handle-table/NOTES.md",
+   "lines": [
+    493
+   ],
+   "path": ".temp/p27c/av<pid>",
+   "kind": "transient",
+   "note": "same, the `argvlen` arm."
+  },
+  {
+   "file": "patterns/p27-handle-table/controls/clayout.py",
+   "lines": [
+    67
+   ],
+   "path": ".temp/p14/clay",
+   "kind": "negative",
+   "note": "the comment exists to warn that this WAS the wrong default -- p14's own scratch directory, overwritten once (TASK_064_REVIEW). Repointing the path would delete the warning."
+  },
+  {
+   "file": "patterns/p27-handle-table/controls/clayout.py",
+   "lines": [
+    73
+   ],
+   "path": ".temp/p27/clay",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
+  },
+  {
+   "file": "patterns/p29-bst-delete/controls/arms.py",
+   "lines": [
+    48
+   ],
+   "path": ".temp/p29ctl",
+   "kind": "destination",
+   "note": "scratch directory the citing script CREATES with `mkdir -p` and deletes on success (`.memory/00-environment.md` constraint 6). p29's controls, landed at TASK_139. Dangling is the CORRECT steady state: the blobs are re-derivable by re-running the script."
+  },
+  {
+   "file": "patterns/p29-bst-delete/controls/miri_arms.py",
+   "lines": [
+    44
+   ],
+   "path": ".temp/p29miri",
+   "kind": "destination",
+   "note": "scratch directory the citing script CREATES with `mkdir -p` and deletes on success (`.memory/00-environment.md` constraint 6). p29's controls, landed at TASK_139. Dangling is the CORRECT steady state: the blobs are re-derivable by re-running the script."
+  },
+  {
+   "file": "patterns/p29-bst-delete/controls/proof_mutants.py",
+   "lines": [
+    39
+   ],
+   "path": ".temp/p29mut",
+   "kind": "destination",
+   "note": "scratch directory the citing script CREATES with `mkdir -p` and deletes on success (`.memory/00-environment.md` constraint 6). p29's controls, landed at TASK_139. Dangling is the CORRECT steady state: the blobs are re-derivable by re-running the script."
+  },
+  {
+   "file": "patterns/p29-bst-delete/controls/proof_mutants.py",
+   "lines": [
+    22
+   ],
+   "path": ".temp/p29mut/",
+   "kind": "destination",
+   "note": "scratch directory the citing script CREATES with `mkdir -p` and deletes on success (`.memory/00-environment.md` constraint 6). p29's controls, landed at TASK_139. Dangling is the CORRECT steady state: the blobs are re-derivable by re-running the script."
+  },
+  {
+   "file": "patterns/p36-vtable-dispatch/NOTES.md",
+   "lines": [
+    731
+   ],
+   "path": ".temp/p36/bin/k_gcc",
+   "kind": "lost",
+   "note": "the `-O3` C binary the `nm --print-size` transcript reads. `.temp/p36/bin/` is gone; `.temp/p36/` and its 14 `probe_a*.rs` survive. What it showed is in the transcript: eight `op` symbols, every one 0x12 = 18 bytes."
+  },
+  {
+   "file": "patterns/p36-vtable-dispatch/NOTES.md",
+   "lines": [
+    735
+   ],
+   "path": ".temp/p36/bin/k_unsafe",
+   "kind": "lost",
+   "note": "the Rust half of the same transcript: eight `OpTag` symbols, every one 0x0e = 14 bytes."
+  },
+  {
+   "file": "patterns/p36-vtable-dispatch/controls/cfi_probe.py",
+   "lines": [
+    41
+   ],
+   "path": ".temp/p36/cfi",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
+  },
+  {
+   "file": "patterns/p36-vtable-dispatch/controls/clayout.py",
+   "lines": [
+    72
+   ],
+   "path": ".temp/p14/clay",
+   "kind": "negative",
+   "note": "the comment exists to warn that this WAS the wrong default -- p14's own scratch directory, overwritten once (TASK_064_REVIEW). Repointing the path would delete the warning."
+  },
+  {
+   "file": "patterns/p36-vtable-dispatch/controls/clayout.py",
+   "lines": [
+    78
+   ],
+   "path": ".temp/p36/clay",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
+  },
+  {
+   "file": "patterns/p36-vtable-dispatch/controls/gen_controls.py",
+   "lines": [
+    8
+   ],
+   "path": ".temp/p36/controls/bin/",
+   "kind": "destination",
+   "note": "this script's own binary output directory."
+  },
+  {
+   "file": "patterns/p36-vtable-dispatch/controls/sweep_ir.py",
+   "lines": [
+    43
+   ],
+   "path": ".temp/xxx",
+   "kind": "example",
+   "note": "an illustrative value for `SLB_P36_SCRATCH=` in a usage line. It was never meant to exist."
+  },
+  {
+   "file": "patterns/p38-alias-pun/controls/gen_controls.py",
+   "lines": [
+    32,
+    470
+   ],
+   "path": ".temp/p38/controls",
+   "kind": "destination",
+   "note": "the same path in the `--help` string."
+  },
+  {
+   "file": "patterns/p38-alias-pun/controls/gen_controls.py",
+   "lines": [
+    5
+   ],
+   "path": ".temp/p38/controls/",
+   "kind": "destination",
+   "note": "this script's own scratch subdirectory; the sentence exists to say it is p38's OWN dir and not another pattern's."
+  },
+  {
+   "file": "patterns/p38-alias-pun/controls/span.py",
+   "lines": [
+    28
+   ],
+   "path": ".temp/p38/span",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
+  },
+  {
+   "file": "patterns/p42-goto-cleanup/controls/miri_leak_key.py",
+   "lines": [
+    50
+   ],
+   "path": ".temp/p42-leakkey/pid<PID>/",
+   "kind": "transient",
+   "note": "this committed script's own per-PID working directory, named so two concurrent runs cannot collide."
+  },
+  {
+   "file": "patterns/p46-bignum-mac/NOTES.md",
+   "lines": [
+    415
+   ],
+   "path": ".temp/t89/genvar",
+   "kind": "regenerable",
+   "note": "the cited line IS the rebuild command: `controls/mkvariants.py --write .temp/t89/genvar`, and `patterns/p46-bignum-mac/controls/mkvariants.py` is committed."
+  },
+  {
+   "file": "patterns/p46-bignum-mac/NOTES.md",
+   "lines": [
+    416
+   ],
+   "path": ".temp/t89/genvar/v46_nosafety.rs",
+   "kind": "regenerable",
+   "note": "written by the command on the line above; the Verus verdict it produces (`20 verified, 1 errors`) is quoted underneath."
+  },
+  {
+   "file": "patterns/p46-bignum-mac/controls/census.py",
+   "lines": [
+    58
+   ],
+   "path": ".temp/check/p46-controls",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
+  },
+  {
+   "file": "patterns/p46-bignum-mac/controls/harm_layout.py",
+   "lines": [
+    47
+   ],
+   "path": ".temp/check/p46-controls",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
+  },
+  {
+   "file": "patterns/p47-ct-compare/NOTES.md",
+   "lines": [
+    1330
+   ],
+   "path": ".temp/p14/clay",
+   "kind": "negative",
+   "note": "the TASK_064_REVIEW narrative: p47's unchanged port wrote its population into p14's scratch directory. The sentence is about the collision."
+  },
+  {
+   "file": "patterns/p47-ct-compare/NOTES.md",
+   "lines": [
+    1332
+   ],
+   "path": ".temp/p14/clay/meta.json",
+   "kind": "negative",
+   "note": "same narrative -- the file p47's port OVERWROTE. Making the path resolve would be making the incident disappear."
+  },
+  {
+   "file": "patterns/p47-ct-compare/NOTES.md",
+   "lines": [
+    1338
+   ],
+   "path": ".temp/p47/clay",
+   "kind": "destination",
+   "note": "p47's corrected `clayout.py` OUT default; it is created when that script runs, and the sentence exists to say p27's and p14's are not touched."
+  },
+  {
+   "file": "patterns/p47-ct-compare/controls/clayout.py",
+   "lines": [
+    55
+   ],
+   "path": ".temp/p14/clay",
+   "kind": "negative",
+   "note": "the comment exists to warn that this WAS the wrong default -- p14's own scratch directory, overwritten once (TASK_064_REVIEW). Repointing the path would delete the warning."
+  },
+  {
+   "file": "patterns/p47-ct-compare/controls/clayout.py",
+   "lines": [
+    63
+   ],
+   "path": ".temp/p47/clay",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
+  },
+  {
+   "file": "patterns/p47-ct-compare/controls/sweep_ir.py",
+   "lines": [
+    6,
+    7,
+    8
+   ],
+   "path": ".temp/p47/sweep.json",
+   "kind": "destination",
+   "note": "this script's own `--out` target, in its usage block."
+  },
+  {
+   "file": "patterns/p47-ct-compare/inputs/gen.py",
+   "lines": [
+    9,
+    11
+   ],
+   "path": ".temp/p47/a",
+   "kind": "destination",
+   "note": "a `sha256sum ... > .temp/p47/a` / `sha256sum -c` pair in the docstring's determinism recipe. ⚠ This file is MEASUREMENT-HASHED (`measure.py::measurement_sources` globs `inputs/gen.py`), so it must not be edited for a documentation reason -- and it does not need to be."
+  },
+  {
+   "file": "pilot/README.md",
+   "lines": [
+    90
+   ],
+   "path": ".temp/build/pilot/bin/",
+   "kind": "destination",
+   "note": "where `TOOLCHAIN.md`'s pilot recipe puts its binaries; the sentence exists to say they do NOT go in `pilot/`."
+  },
+  {
+   "file": "results/gate/p42-goto-cleanup.json",
+   "lines": [
+    2406,
+    2417,
+    2450
+   ],
+   "path": ".temp/build/p42/c-gcc-asan+0xc477f",
+   "kind": "generated-record",
+   "note": "inside a LeakSanitizer diagnostic captured by the gate. `results/gate/*.json` is GENERATED by `harness/check.py`; the string is a sanitizer frame, not a citation, and hand-editing the record is forbidden."
+  }
+ ]
 }

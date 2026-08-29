@@ -1909,7 +1909,7 @@ that quietly admits everything.** It was applied to **NINE candidates across
 `p35`, `p29`, `p30`, `p32`/`p33`, `p34` — **and it admitted ONE.**
 
 ```
-p29        ADMITTED   limb 4 clause 3, the safe rung is SILENTLY WRONG
+p29        ADMITTED   limb 1 -- see below; the limb-4 reading is SUPERSEDED
 p25        refused    UB executes and is unobservable; no conjunct to omit;
                       R1 has no reproducible checksum -> ungatable
 stack      refused    C is not silently wrong (both compilers warn by default)
@@ -1920,6 +1920,18 @@ p32/p33    refused    the silence is WHERE THE STORAGE LIVES, and both choices
                       already ship bit-identically as p04 and p27
 p34        refused    no inversion: C's own refcount rung leaks identically
 ```
+
+⚠⚠⚠ **AND THE ADMITTED ROW MOVED LIMBS ONCE IT WAS BUILT: `p29` SHIPPED ON
+LIMB 1, NOT LIMB 4.** Its safe rungs are **CORRECT** by design, with the
+wrong-by-one-conjunct arm shipped as a **control** — so *"the safe rung is
+SILENTLY WRONG"* is not what the built row shows. ⚠ **Two committed documents
+disagreed about why the row exists until `TASK_140` caught it; this table is the
+one that was stale.** ⚠⚠ **AND THE LIMB-1 SENTENCE IT MOVED TO IS ITSELF FALSE
+AS FIRST PUBLISHED** (*"`p29` needs TWO conjuncts"* — one is enough, `TASK_140`);
+**what admits the row is the TWO-BUG-CLASS mechanism, one source line with two
+bug classes selected by the input.** ⚠ **So the row is admissible and has now
+been argued THREE different ways. Read RECAP finding 52 before quoting any of
+them.**
 
 ✅ **One admission in nine is evidence the limb discriminates.** ⚠ **And the
 admitted row was NOT admitted on the reason the manager predicted** — the
