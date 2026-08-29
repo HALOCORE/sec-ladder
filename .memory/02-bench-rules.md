@@ -1845,7 +1845,7 @@ run it whenever a pattern is added or a class is argued about.
 spatial (OOB read/write, index/bound)  15   p02 p03 p05 p07 p09 p10 p11 p12 p13
                                             p14 p16 p17 p23 p36 p46
 logical, memory-safe                    3   p04 p06 p19
-TEMPORAL                                1   p27
+TEMPORAL                                2   p27 p29
 TYPE                                    1   p38
 resource / leak                         1   p42
 side channel                            1   p47

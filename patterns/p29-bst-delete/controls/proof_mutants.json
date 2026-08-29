@@ -1,0 +1,163 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p29-bst-delete/controls/proof_mutants.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p29-bst-delete/verus.rs": "de2582f6eed4aa6aff6ba39ee37a78a607b6428480b339ebd56bf70504331125",
+    "patterns/p29-bst-delete/controls/proof_mutants.py": "07f2e09930359956d8475df7a62b9a246ae96217de9bf065f4feed18c2fd8fed"
+  },
+  "mutants": [
+    {
+      "mutant": "M0-control",
+      "kind": "control",
+      "expected": "verify",
+      "got": "verify",
+      "ok": true,
+      "verified": 25,
+      "errors": 0,
+      "rc": 0,
+      "error_kinds": [],
+      "why": "the shipped file, run through the same harness. If this does not verify, nothing below means anything."
+    },
+    {
+      "mutant": "M1-live-store",
+      "kind": "deletion",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 24,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 1 previous error",
+        "loop invariant not satisfied"
+      ],
+      "why": "delete `live[cur] = 0` after the free. `rec_free` has consumed slot `cur`'s permission and the liveness array would still claim it exists, so `wf` cannot be re-established. This is p27's M2 and it is the line c/kernel.c does NOT forget."
+    },
+    {
+      "mutant": "M2-liveness-conjunct",
+      "kind": "attack",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 24,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 1 previous error",
+        "assertion failed"
+      ],
+      "why": "THE ATTACK ARM, half one: delete the LIVENESS conjunct from the safety line, leaving the occupant-identity test alone. Its C twin is `controls/arms.py`'s `keyonly`, which fires ASan on every use-after-free window. \u26a0 **The diagnostic here names the localising ghost assert (`assert(alive(st, g_slot))`), not the real obligation** -- `M2b` deletes the hint and shows what actually fails."
+    },
+    {
+      "mutant": "M3-identity-conjunct",
+      "kind": "attack",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 24,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 1 previous error",
+        "assertion failed"
+      ],
+      "why": "THE ATTACK ARM the row is about: delete the OCCUPANT-IDENTITY conjunct and nothing else. What survives is EXACTLY p27's safety line -- a liveness test on the read path -- applied to p29's kernel, and it is c/kernel.c's second bug class written into the R5. Linearity is satisfied -- nothing was deallocated -- and the FUNCTIONAL refinement is what rejects it. \u26a0 **The diagnostic names the localising refinement assert**; `M3b` deletes the hint and shows the `run(..) == run(..)` equality failing instead."
+    },
+    {
+      "mutant": "M2b-liveness-no-hint",
+      "kind": "attack",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 24,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 2 previous errors",
+        "precondition not satisfied"
+      ],
+      "why": "`M2` with the two localising ghost asserts deleted, so the diagnostic names the real obligation rather than a hint. Measured: `precondition not satisfied` at `perms.tracked_borrow(g_slot as int)`. **The identity test cannot be EVALUATED without the liveness test** -- C's `&&` ordering, as a type-system fact."
+    },
+    {
+      "mutant": "M3b-identity-no-hint",
+      "kind": "attack",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 24,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 1 previous error",
+        "assertion failed"
+      ],
+      "why": "`M3` with the localising refinement asserts deleted. Measured: the `run(..) == run(..)` refinement equality fails. **Nothing linear objects** -- the splice deallocated nothing and every permission is where the invariant says it is; what rejects the program is the FUNCTIONAL postcondition alone."
+    },
+    {
+      "mutant": "M4-r1-line",
+      "kind": "attack",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 24,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 2 previous errors",
+        "assertion failed"
+      ],
+      "why": "c/kernel.c's line verbatim: both conjuncts gone. Fails for M2's reason before it can fail for M3's."
+    },
+    {
+      "mutant": "M5-fold-multiplier",
+      "kind": "deletion",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 24,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 1 previous error",
+        "postcondition not satisfied"
+      ],
+      "why": "change the fold's multiplier in the exec code only. The postcondition READS THE BODY -- a `run` that were vacuous would not notice."
+    },
+    {
+      "mutant": "M6-constant-body",
+      "kind": "vacuity",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 20,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 1 previous error; 1 warning emitted",
+        "postcondition not satisfied"
+      ],
+      "why": "`.memory/04-verus.md`'s vacuity probe in its sharp form -- **what is the CHEAPEST body that satisfies the postcondition?** `TASK_137` discharged `TASK_136`'s ARM_C with `fn arm_c() -> u8 { 9 }`. Here the cheapest body is `return 0;` and it must FAIL, because `bst_fold` is a function of the window bytes and no constant equals it."
+    },
+    {
+      "mutant": "M7-drop-walk-fuel",
+      "kind": "deletion",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 24,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 3 previous errors",
+        "invariant not satisfied at end of loop body",
+        "loop invariant not satisfied"
+      ],
+      "why": "delete the walk's step bound. It never fires at run time; it is the `decreases` measure, and without it the loop has no termination proof. This is the measured price of NOT proving the link structure is a tree."
+    }
+  ],
+  "summary": {
+    "n": 10,
+    "as_expected": 10
+  }
+}

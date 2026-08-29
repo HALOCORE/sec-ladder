@@ -4,9 +4,10 @@
 WHY THIS EXISTS
 ---------------
 The user's priority shift (`.memory/02-bench-rules.md`, last section) rests on
-one table: **15 of the 26 built patterns are spatial, against ONE temporal and
-ONE type.** That table was hand-audited by the manager and published in three
-places, and it had no derivation. A hand-audited table over a growing tree is
+one table. It was **15 of 26 spatial against ONE temporal and ONE type** when
+that priority was set; `p29` landed at TASK_139 and the temporal count is now 2.
+⚠ **Do not maintain a count in this docstring -- run the script.** That table was
+hand-audited by the manager and published in three places with no derivation. A hand-audited table over a growing tree is
 the exact shape that rots -- RECAP's `p23` row sat wrong for about fifteen
 tasks -- and this one is load-bearing for what gets built next.
 
@@ -30,7 +31,7 @@ measurement.** There is no machine-readable bug-class field to derive it from:
 established that `requires` is a LENGTH bound in 26 of 26 and never mentions
 buffer contents -- so the contract cannot discriminate spatial from temporal.
 Adding a field to `spec.md` would change `contract_sha256` and cost a full
-re-gate on 26 patterns.
+re-gate of every pattern.
 
 So the honest artefact is this one: the judgement is written down once, printed
 next to the catalogue's own bug text so a reader can audit it in one command,
@@ -38,7 +39,8 @@ and mechanically prevented from going stale as the tree grows.
 
 WHAT WOULD MAKE THIS FAIL -- ask this before believing any check here
 --------------------------------------------------------------------
-  * a 27th pattern directory, unclassified               -> exit 1
+  * a newly built pattern directory, unclassified        -> exit 1
+    (this FIRED as designed when `p29` landed at TASK_139)
   * a classification naming a pattern that is not built  -> exit 1
   * `patterns/` and `results/gate/` disagreeing           -> exit 1
   * a pattern with no catalogue row                       -> exit 1
@@ -92,7 +94,7 @@ CLASSES = {
     ),
     "temporal": (
         "the object is gone, or not yet there, at the moment of the access",
-        ["p27"],
+        ["p27", "p29"],
     ),
     "type": (
         "the bytes are read at a type they were not written at",

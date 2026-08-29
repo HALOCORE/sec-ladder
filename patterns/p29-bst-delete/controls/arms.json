@@ -1,0 +1,101 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p29-bst-delete/controls/arms.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p29-bst-delete/c/kernel.c": "23a8ba59b61e0168e36c3d7fa7ea7c354dc170511172875ca29cf08b05fc8290",
+    "patterns/p29-bst-delete/c/kernel.h": "31352ed2b17f7773ef0429b5db06ae3a2424869a82289af0e23d5eed72599196",
+    "patterns/p29-bst-delete/c/main.c": "e49eaf71150a23a385a2047effd4fbdab8f5dc32f2582c60a22d2407941881ab",
+    "patterns/p29-bst-delete/inputs/gen.py": "d2abbb4cf9141d1ef42a457d2d65b5ca652cf15c46b4c7aeff351791632d4dbf",
+    "patterns/p29-bst-delete/controls/arms.py": "2c067e339e82ac081754cd28a54ceee6da65ef06c2c4c86319d1f859b57c3c6b",
+    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3"
+  },
+  "windows": 500,
+  "seed": 20260830,
+  "classes": {
+    "UAF": 104,
+    "RECYCLE": 18,
+    "benign": 378
+  },
+  "arms": {
+    "R1": {
+      "wrong_total": 122,
+      "wrong_on_uaf": 104,
+      "wrong_on_recycle": 18,
+      "asan_lines": 208,
+      "asan_classes": [
+        "heap-use-after-free"
+      ],
+      "nulltab_wrong_total": 122,
+      "nulltab_asan_lines": 208,
+      "nulltab_asan_classes": [
+        "heap-use-after-free"
+      ]
+    },
+    "R1h": {
+      "wrong_total": 0,
+      "wrong_on_uaf": 0,
+      "wrong_on_recycle": 0,
+      "asan_lines": 0,
+      "asan_classes": [],
+      "nulltab_wrong_total": 0,
+      "nulltab_asan_lines": 0,
+      "nulltab_asan_classes": []
+    },
+    "liveonly": {
+      "wrong_total": 24,
+      "wrong_on_uaf": 6,
+      "wrong_on_recycle": 18,
+      "asan_lines": 0,
+      "asan_classes": [],
+      "nulltab_wrong_total": 24,
+      "nulltab_asan_lines": 0,
+      "nulltab_asan_classes": []
+    },
+    "keyonly": {
+      "wrong_total": 7,
+      "wrong_on_uaf": 7,
+      "wrong_on_recycle": 0,
+      "asan_lines": 208,
+      "asan_classes": [
+        "heap-use-after-free"
+      ],
+      "nulltab_wrong_total": 104,
+      "nulltab_asan_lines": 416,
+      "nulltab_asan_classes": [
+        "SEGV"
+      ]
+    },
+    "deref": {
+      "wrong_total": 7,
+      "wrong_on_uaf": 7,
+      "wrong_on_recycle": 0,
+      "asan_lines": 208,
+      "asan_classes": [
+        "heap-use-after-free"
+      ],
+      "nulltab_wrong_total": 7,
+      "nulltab_asan_lines": 208,
+      "nulltab_asan_classes": [
+        "heap-use-after-free"
+      ]
+    },
+    "H2": {
+      "wrong_total": 0,
+      "wrong_on_uaf": 0,
+      "wrong_on_recycle": 0,
+      "asan_lines": 0,
+      "asan_classes": [],
+      "nulltab_wrong_total": 0,
+      "nulltab_asan_lines": 0,
+      "nulltab_asan_classes": []
+    }
+  },
+  "asan_positive_control": {
+    "rc": 1,
+    "hits": 2,
+    "class": "heap-use-after-free"
+  },
+  "compiler_warnings": [],
+  "note": "Every arm is c/kernel.c with ONE line substituted; `H2` also splices the write-path line into the deletion loop. `wrong_*` is measured on the PLAIN build against the generator's checked semantics; `asan_lines` on the `-fsanitize=address` build over the same corpus. `nulltab_*` is the same source with `tab[cur] = NULL;` restored after the free -- ../spec.md refuses that spelling and this is the measurement behind the refusal."
+}

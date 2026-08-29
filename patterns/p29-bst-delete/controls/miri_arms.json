@@ -1,0 +1,88 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p29-bst-delete/controls/miri_arms.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p29-bst-delete/unsafe.rs": "e1f1669c2a182b727004f606b7fe435c59f076c9d1f88cd73dc6c513fc434d65",
+    "patterns/p29-bst-delete/inputs/gen.py": "d2abbb4cf9141d1ef42a457d2d65b5ca652cf15c46b4c7aeff351791632d4dbf",
+    "patterns/p29-bst-delete/controls/miri_arms.py": "51183862dc2c09cf7593340e26e7ba3056509ef1bff7fe268c27d69bf653358b",
+    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e"
+  },
+  "miri_version": "rustc 1.99.0-nightly (d453bdd8f 2026-08-14)",
+  "n_iters": 4,
+  "rows": [
+    {
+      "variant": "shipped",
+      "why": "the shipped R4. MUST be clean on every input -- the control.",
+      "input": "adversarial-uaf.bin",
+      "rc": 0,
+      "ub": false,
+      "ub_kind": "",
+      "stdout": "5933090192955198528"
+    },
+    {
+      "variant": "shipped",
+      "why": "the shipped R4. MUST be clean on every input -- the control.",
+      "input": "adversarial-succ.bin",
+      "rc": 0,
+      "ub": false,
+      "ub_kind": "",
+      "stdout": "9600548768877911104"
+    },
+    {
+      "variant": "shipped",
+      "why": "the shipped R4. MUST be clean on every input -- the control.",
+      "input": "adversarial-recycle.bin",
+      "rc": 0,
+      "ub": false,
+      "ub_kind": "",
+      "stdout": "2755550117516839872"
+    },
+    {
+      "variant": "shipped",
+      "why": "the shipped R4. MUST be clean on every input -- the control.",
+      "input": "small.bin",
+      "rc": 0,
+      "ub": false,
+      "ub_kind": "",
+      "stdout": "14724091388107228810"
+    },
+    {
+      "variant": "r1line",
+      "why": "c/kernel.c's USE path written in Rust: both conjuncts deleted.",
+      "input": "adversarial-uaf.bin",
+      "rc": 1,
+      "ub": true,
+      "ub_kind": "memory access failed: alloc1954 has been freed, so this pointer is dangling",
+      "stdout": ""
+    },
+    {
+      "variant": "r1line",
+      "why": "c/kernel.c's USE path written in Rust: both conjuncts deleted.",
+      "input": "adversarial-succ.bin",
+      "rc": 1,
+      "ub": true,
+      "ub_kind": "memory access failed: alloc1994 has been freed, so this pointer is dangling",
+      "stdout": ""
+    },
+    {
+      "variant": "r1line",
+      "why": "c/kernel.c's USE path written in Rust: both conjuncts deleted.",
+      "input": "adversarial-recycle.bin",
+      "rc": 0,
+      "ub": false,
+      "ub_kind": "",
+      "stdout": "2751827421526092736"
+    },
+    {
+      "variant": "r1line",
+      "why": "c/kernel.c's USE path written in Rust: both conjuncts deleted.",
+      "input": "small.bin",
+      "rc": 0,
+      "ub": false,
+      "ub_kind": "",
+      "stdout": "14724091388107228810"
+    }
+  ],
+  "note": "The gate runs Miri over the SHIPPED unsafe.rs, which is correct on every input, so it cannot substantiate the Miri row of NOTES.md 2a. This does: the `r1line` variant is c/kernel.c's bug in Rust, and Miri reports UB on the use-after-FREE inputs and is SILENT on the use-after-RECYCLE input while the answer is wrong."
+}

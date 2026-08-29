@@ -30,6 +30,15 @@ inline modes, gated, and reviewed adversarially; nineteen published claims were
 retracted along the way, and **the retraction list is the most transferable
 thing the project produced** (§6).
 
+⚠ **A NOTE ON THE COUNT, so the title and the corpus can be reconciled.** The
+four Results below were drawn from **26** kernels. A twenty-seventh, `p29`
+(BST delete), landed afterwards and is **not** folded into Results 1–4 or into
+the idiom census, which genuinely ran over 26. It appears in §7, where it
+changes the corpus composition — the temporal axis goes from one row to two.
+**Where this document says "26 kernels" it means the analysed set, and that is
+the honest scope; the tree has 27.** Run `harness/tools/composition.py` for the
+current composition rather than trusting any count printed here.
+
 **Four results and a method.** That compression is itself a finding: twenty-six
 patterns do not give twenty-six independent lessons about safety cost. The
 headlines collapse; what varies pattern to pattern is the *exception*.
@@ -1264,14 +1273,14 @@ record on the pass that found this — so the only check for it is to ask, of a
 finished document, which way its gaps point.**
 
 **What the corpus is made of, and it bounds the generality more than the
-toolchain pin does.** The 26 kernels classify, by the safety line each one's
+toolchain pin does.** The 27 kernels classify, by the safety line each one's
 `c/kernel.c` omits, like this — derived and drift-checked by
 `harness/tools/composition.py`:
 
 ```
 spatial          15   p02 p03 p05 p07 p09 p10 p11 p12 p13 p14 p16 p17 p23 p36 p46
 logical           3   p04 p06 p19
-temporal          1   p27
+temporal          2   p27 p29
 type              1   p38
 resource          1   p42
 side-channel      1   p47
@@ -1281,13 +1290,22 @@ aliasing          1   p08
 calibration       1   p01
 ```
 
-⚠⚠ **Fifteen of twenty-six are spatial, and every claim this document makes
-about the temporal axis rests on ONE pattern and every claim about the type axis
-on ONE.** `p27` is the only use-after-free here; `p38` is the only type-confusion.
+⚠⚠ **Fifteen of twenty-seven are spatial, and every claim this document makes
+about the type axis rests on ONE pattern.** `p38` is the only type-confusion.
 A result drawn from a single row is a result about that row until a second one
-agrees with it. **§3's *"safe Rust's temporal guarantee is a guarantee about the
-allocator"* and §5's `6.00 Ir`/call for a type-based aliasing property are both
-in exactly that position** — each is a one-row result stated as a law.
+agrees with it, and **§5's `6.00 Ir`/call for a type-based aliasing property is
+in exactly that position** — a one-row result stated as a law.
+
+✅ **The temporal axis is the one place this improved: `p29` (BST delete) joined
+`p27` at TASK_139**, and the two are **not** the same shape — `p27`'s read-path
+safety line needs ONE conjunct (liveness), `p29`'s needs TWO (liveness **and
+occupant identity**), because `p29`'s in-order-successor splice overwrites its
+victim in place and frees the *successor*. ⚠ **That second conjunct is what four
+independent mechanisms miss**: ASan is silent on it, Verus's linear `PointsTo`
+does not object to it (only the functional postcondition rejects it), and the
+buggy rung's checksum is *reproducible* there while it is not on the
+use-after-free half. **§3's *"safe Rust's temporal guarantee is a guarantee about
+the allocator"* now has a second row under it rather than one.**
 ⚠ **This does not weaken the spatial results — those are the fifteen — it says
 where the document's confidence should stop.**
 
