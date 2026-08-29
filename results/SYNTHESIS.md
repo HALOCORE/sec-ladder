@@ -1123,10 +1123,34 @@ is defensive: a proposed pattern whose headline is *"the safe rung panics, the
 tuned rung is correct, the unsafe rung is silently wrong"* is claiming something
 that has never happened here, which is a reason to distrust the port rather than
 to celebrate the row.** **That is exactly how the one surviving CVE candidate
-was refused.** ⚠⚠ **But read the other way it is a caveat on this whole
-document: a tree with 129 adversarial pairs and ZERO Rust-rung divergences may
-be telling you the harm inputs are not adversarial ENOUGH. Nobody has tested
-that reading, and it would be the first thing this author would test next.**
+was refused.**
+
+⚠⚠ **The obvious second reading — *"then the harm inputs are not adversarial
+enough"* — WAS TESTED AND IS WRONG, and the reason is worth more than the
+census.** **13 449 fresh candidate inputs across all 26 patterns produced 600
+rung splits and STILL ZERO Rust-rung splits, and so did the same corpus built
+with `debug-assertions=ON`.** **The cause is in the contracts:** `requires` is a
+**length** bound in **26 of 26 patterns and never mentions buffer CONTENTS**,
+`ensures` is a single **total** value clause, and the pinned driver loop makes
+the window bound a **theorem**. **So an adversarial input can only change bytes
+inside a window every Rust rung is contractually total on.**
+
+> ⚠⚠ **NO INPUT CAN BE ADVERSARIAL TO A RUST RUNG IN THIS TREE. MORE ADVERSARIAL
+> INPUTS IS NOT THE FIX — THERE IS NOTHING FOR THEM TO BE ADVERSARIAL TO.**
+
+✅ **Blunt corroboration: NO RUST RUNG HAS EVER PANICKED** — 107 592 fuzz runs
+plus 516 gate rows, zero exits outside `{0, EXIT_TRUNCATED, EXIT_CAP}`, and five
+of the seven are the *shared driver* refusing a malformed file rather than a
+kernel. **The C rungs on the same inputs: 29 SIGSEGVs, 8 aborts, 2 hangs.**
+⚠ **That is the single most direct statement of the safety half of this
+project's subject, and it went unmeasured for 125 tasks.**
+
+⚠ **A real weakness DOES exist and it is elsewhere: 36 of the 129 adversarial
+inputs (27.9%) make ZERO kernel calls**, and the `adversarial-strideN.bin`
+template is 0-call in **22 of 26 patterns** — a template copied forward without
+being re-aimed. **`p42` carries 10 adversarial inputs of which 7 are zero-call.**
+**Those inputs are doing no work, and no per-pattern number in this document
+would have shown it.**
 
 **Structural gaps.** The unsafe side is unsearched on most patterns: **14 of 26**
 print `undeclared` in the search-state column and **nine** report a real search on

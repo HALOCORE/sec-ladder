@@ -131,7 +131,7 @@ Write your report to `.tasks/TASK_126_REPORT.md` as well as returning it.
 
 ---
 
-⚠ **PROTOCOL rule 2's running count is 566** (`TASK_125` carried 551 → 566;
+⚠ **PROTOCOL rule 2's running count is 583** (`TASK_125` carried 551 → 566;
 ⚠ **a rigour signal, not a ledger — do not re-add it**). The calls I am least
 sure of:
 
@@ -152,4 +152,4 @@ sure of:
    that killed findings 37, 40 and 41.** **If you think that argument is thin,
    say so and close it in one page.**
 
-Carry **566** forward, incremented by what you find.
+Carry **583** forward, incremented by what you find.
