@@ -1810,8 +1810,16 @@ re-gate. ✅ **So the judgement is written down once and mechanically prevented
 from going stale, which is the honest artefact; it is not laundered into a
 measurement.**
 
-⚠⚠ **AND THE TABLE COUNTS SAFETY LINES, NOT BUGS** — the one conjunct
-`c/kernel.c` omits and `c/kernel_hardened.c` spells. **`p09` ships TWO** (the
+⚠⚠ **AND THE TABLE COUNTS SAFETY LINES, NOT BUGS** — what `c/kernel.c` omits
+and `c/kernel_hardened.c` spells. ⚠⚠⚠ **THAT USED TO READ *"the one CONJUNCT"*
+AND THAT GLOSS IS FALSE — `TASK_136`, ✅ manager-re-run: of the 25 patterns
+shipping a hardened cell, only **FOUR** add one conjunct to an existing test
+(`p17 p22 p23 p27`).** **The rest add whole statements, declarations, loops or a
+control-flow edge — `p19` adds a 2048-iteration validation loop, `p47` two
+declarations plus a loop, `p42` a control-flow edge.** ⚠ **The convention is
+*R1h differs from R1 by the SAFETY LINE and nothing else*, and a safety line is
+not always a conjunct. Re-derive it with `.temp/t136/convention.py` rather than
+trusting a count here.** **`p09` ships TWO** (the
 omitted `q < nbits`, spatial; and `q & 31`, which is not), and is counted spatial
 on its safety line. ⚠ **`--evidence` is what surfaced that; run it before
 quoting the table.** ✅ **`p46` was checked the same way and is genuinely

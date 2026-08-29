@@ -3630,6 +3630,16 @@ the number.** Two task files have already sent an agent to the wrong finding.
     *"MUST EVENTUALLY FREE"* — `Tracked<Dealloc>` is AFFINE, a proof may simply
     DROP it, three encodings burned and an attack that verifies `19/0` AND LEAKS
     (`p42`).** ✅ **LINEARITY IS THE LINE, and that is a publishable sentence.**
+    ⚠⚠⚠ **SCOPED AT `TASK_136`, AND IT IS NARROWER THAN IT READS: WHAT LINEARITY
+    STATES IS *"NO USE AFTER DEALLOCATION"*. IT CANNOT STATE *"NO USE AFTER THE
+    OCCUPANT CHANGED"*.** ✅ **Manager-re-run, four `p29` R5 arms: the correct
+    program `6 verified, 0 errors`; the use-after-FREE arm is rejected
+    `precondition not satisfied` (linearity working); and THE
+    USE-AFTER-RECYCLE ARM VERIFIES `6 verified, 0 errors` AND PROVES IT RETURNS
+    THE RECYCLED VALUE.** ⚠⚠ **Only the FUNCTIONAL postcondition rejects it —
+    nothing about linearity. So `p42`'s failure mode is available here IN AN R5
+    THAT LOOKS COMPLETELY HEALTHY, which is exactly the case the attack-arm rule
+    exists for.**
 
     ⚠⚠ **A TENSION BETWEEN TWO COMMITTED DOCUMENTS, FOUND HERE AND NOT RESOLVED
     — DO NOT PICK A SIDE WITHOUT MEASURING:** `.memory/06-catalogue.md`'s `p42`
@@ -3831,13 +3841,40 @@ the number.** Two task files have already sent an agent to the wrong finding.
     ⚠⚠ **Two independent safe Rust spellings (index arena, `Rc<RefCell>`) agree
     on all five inputs: BIT-IDENTICAL to buggy C on the silent inputs, and
     SILENTLY WRONG where C aborts.** ✅ **So safe Rust removes the DETECTOR, not
-    the bug.** Miri clean, positive controls fire. **The R5 artefact re-verifies
+    the bug.**
+
+    ⚠⚠⚠ **THE SECOND HALF OF THAT SENTENCE IS WRONG IN THE PINNED SHAPE AND THE
+    MANAGER PUBLISHED IT — CORRECTED AT `TASK_136`, ✅ MANAGER-RE-RUN.**
+    ~~*"SILENTLY WRONG where C aborts"*~~ **is FALSE of `p27`'s
+    `Option<Box<Rec>>` representation: safe Rust is CORRECT there, 71/71 fuzz
+    windows and 4/4 hand inputs.** ✅ **The measured split is the OTHER way
+    round — and it is sharper:**
+
+    ```
+    mechanism                   use-after-FREE (leaf)      use-after-RECYCLE (two-child)
+    ASan                        aborts                     SILENT
+    safe Rust Option<Box<Rec>>  CORRECT 71/71              WRONG, bit-identical to buggy C
+    Verus linear PointsTo       unprovable                 VERIFIES 6/0, and PROVES the value
+    R1's own checksum           19 of 20 distinct          reproducible, 1 of 20
+    ```
+
+    ⚠⚠ **FOUR INDEPENDENT MECHANISMS SPLIT ON ONE FAULT LINE, because all four
+    are mechanisms about the ALLOCATION and the splice never touches it.**
+    ✅ **And the fourth row INVERTS the convenience of the other three: the half
+    every detector sees is the half that CANNOT BE GATED, and the half nothing
+    sees is the half that reproduces.**
+
+    ⚠ **`TASK_133`'s reading is not simply wrong — it measured a DIFFERENT
+    SPELLING.** Its index arena RECYCLES SLOTS. ✅ **Four builds of one safe
+    source: recycling takes the fuzz failures `17 → 36` and adds a hand input.
+    So the variable is SLOT RECYCLING, not the language** — which is outcome 3
+    again. ⚠ **That reconciliation is `TASK_136`'s and is UNREVIEWED.** Miri clean, positive controls fire. **The R5 artefact re-verifies
     `9 verified, 0 errors`, TCB 0, sha256 matching, plus a new mutant M5 that
     fails.**
 
     ⚠⚠⚠ **FIRST DELIVERABLE IF `p29` IS BUILT, AND IT IS A TRAP THE GATE WOULD
     NOT CATCH: SETTLE THE DEGREE SPLIT.** The R1/R1h convention every pattern
-    uses — R1 plus one conjunct — **silently fails here.**
+    uses — **R1h differs from R1 by the safety line and nothing else** — **silently fails here.**
     `if (t == g_saved) g_saved = NULL;` **fixes 3 of 5 inputs and reproduces the
     BUGGY checksum on the other 2**, because a two-child victim is never freed.
     **A `p29` built on that convention ships an R1h THAT STILL HAS THE BUG, past
@@ -3941,6 +3978,90 @@ the number.** Two task files have already sent an agent to the wrong finding.
     and `TASK_116`'s own unattacked items 5–6.
 
     Evidence: `.tasks/TASK_135_REPORT.md`, `.temp/t135/NOTES.md`.
+
+51. ⚠⚠⚠ **`p29`'s DEGREE SPLIT SETTLES, AND FOUR INDEPENDENT MECHANISMS TURN
+    OUT TO SPLIT ON ONE FAULT LINE — INCLUDING VERUS, WHICH VERIFIES THE BUG.**
+    `TASK_136`, engineer work, **NOT YET REVIEWED** (rule 9). ⚠ **The manager
+    re-ran the WHOLE pipeline in place (`sh .temp/t136/run.sh`, `EXIT=0`) — the
+    degree table, the convention census, all four R5 arms, the safe-rung
+    reconciliation and the reproducibility sweep all reproduce.**
+
+    ✅ **THE SPLIT SETTLES.** `H2` — `TASK_133`'s own line moved from the `free`
+    to the **located victim** — is **exact on 1511/1511** measured inputs and
+    agrees with the re-derive arm on all 11 hand inputs. ⚠ **`TASK_133`'s
+    candidate failed on its SITE, not its mechanism: `H1` and `H2` have DISJOINT
+    blind spots, and the deletion's second phase routes the successor through
+    `H2`'s site.**
+
+    ⚠⚠ **AND THE READ-PATH ANALOGUE OF `p27`'s `live[h] == 1` CANNOT BE USED,
+    BECAUSE EVALUATING IT IS THE BUG:** `&& g_saved->key == g_key` is itself a
+    `heap-use-after-free` on **5 of 11** inputs. ✅ **`p27`'s bug is *the READ
+    does not ask*; `p29`'s is *the MUTATION does not tell* — so `p29`'s safety
+    line is on the WRITE path, and the two temporal rows are not the same shape.**
+
+    ⚠⚠⚠ **THE MANAGER'S PREMISE IN THE TASK FILE WAS FALSE AND `.memory/` CARRIED
+    THE SAME GLOSS. ✅ Manager-re-run (`.temp/t136/convention.py`): of the 25
+    patterns shipping a hardened cell, *"differs by exactly ONE CONJUNCT"* is
+    TRUE OF FOUR** — `p17 p22 p23 p27`. **`p19` adds a 2048-iteration validation
+    loop, `p47` two declarations plus a loop, `p42` a control-flow edge.**
+    ✅ **The convention is *R1h differs from R1 by the SAFETY LINE and nothing
+    else*; a safety line is not always a conjunct — and that widening is exactly
+    what makes `H2` admissible.** ⚠ **Both glosses are now corrected.**
+
+    ⚠⚠⚠ **THE RESULT WORTH PUBLISHING — FOUR MECHANISMS, ONE FAULT LINE, AND THE
+    FOURTH ROW INVERTS THE OTHER THREE.** ✅ **All manager-re-run:**
+
+    ```
+    mechanism                   use-after-FREE (leaf)   use-after-RECYCLE (two-child)
+    ASan                        aborts                  SILENT
+    safe Rust Option<Box<Rec>>  CORRECT 71/71           WRONG, bit-identical to buggy C
+    Verus linear PointsTo       unprovable              VERIFIES 6/0, PROVES the value
+    R1's own checksum           19 of 20 distinct       reproducible, 1 of 20
+    ```
+
+    **All four are mechanisms about the ALLOCATION, and the splice never touches
+    it — it overwrites the victim IN PLACE and frees the SUCCESSOR.**
+    ⚠⚠ **The half every detector sees is the half that CANNOT BE GATED; the half
+    nothing sees is the half that reproduces.**
+
+    ⚠⚠⚠ **AND IT SCOPES FINDING 47, WHICH WAS THE MANAGER'S: *"LINEARITY IS THE
+    LINE"* IS TRUE AND NARROWER THAN IT READS.** **What linearity states is
+    *"no use after DEALLOCATION"*. It CANNOT state *"no use after the OCCUPANT
+    CHANGED"*.** ✅ **The use-after-recycle R5 arm verifies `6 verified, 0
+    errors` AND PROVES IT RETURNS THE RECYCLED VALUE; only the FUNCTIONAL
+    postcondition rejects it.** ⚠⚠ **So `p42`'s failure mode is available in an
+    R5 THAT LOOKS COMPLETELY HEALTHY — which is exactly the case
+    `.memory/02-bench-rules.md`'s attack-arm rule exists for, and the strongest
+    vindication that rule has had.**
+
+    ⚠⚠ **THE ROW IS NOT BUILT, DELIBERATELY.** A half-built `patterns/p29-*/`
+    moves the pattern count the box tells you to derive and breaks
+    `composition.py --check`; and the dominant cost is unshortened — **all 26/26
+    contracts pin `ensures result == <fold>(...)`, so `p29`'s R5 owes a FULL
+    FUNCTIONAL REFINEMENT with THREE WALKS where `p27` has none.**
+    ⚠ **Read this as scope, not failure: the design questions that would have
+    sunk the build are all answered.**
+
+    ⚠⚠ **`p25`'s *"nondeterministic R1"* KILL IS INPUT-CLASS-SPECIFIC AND MUST
+    NOT BE REUSED BY NAME** — the UAF inputs give 19 distinct values in 20 runs,
+    the RECYCLE input gives 1. **A `p29` on recycle-class inputs has a
+    reproducible R1.**
+
+    ⚠ **DISCLOSED BY THE ENGINEER, UNPROMPTED, AND IT IS THE `p23`/`model.py`
+    HAZARD AGAIN: their first delete-by-substitution re-searched by key AND THE
+    PYTHON MODEL MIRRORED THE SAME ERROR, so the two agreed.** **Caught only by
+    the one input designed to differ.** ✅ **A model is an INDEPENDENT reference
+    only if it was written independently.** ⚠ **They also corrupted a run by
+    editing `run.sh` while `sh` was executing it — the manager hit the mirror
+    image, running it from a copy whose `dirname` anchor no longer resolved.**
+
+    ⚠ **Open, and the engineer named it as the call it would most like attacked:
+    `H2` over `H3` is a RECOMMENDATION, not a certainty** (`H3`, `&& g_fresh`,
+    is exact on the five and conservative elsewhere). **No cost axis was
+    measured and no rung-to-rung difference is published, deliberately.**
+
+    Evidence: `.tasks/TASK_136_REPORT.md`, `.temp/t136/` + `sh .temp/t136/run.sh`,
+    `.temp/mgr136.log` (the manager's full re-run).
 
 ## Retracted — do not reinstate
 
