@@ -1,0 +1,145 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p32-free-list-pool/controls/repro.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p32-free-list-pool/c/kernel.c": "9676b36aa28f42299add3275f7ff715aac699f6a1a2cd8fbb53ff15f5eec7e63",
+    "patterns/p32-free-list-pool/c/kernel_hardened.c": "20be02f6225dfe7958fe03d2b69edc5fbdd76e8c8855cb2d1d18ab08932bcb15",
+    "patterns/p32-free-list-pool/c/main.c": "9b5259192ddba59a91fbf1b736c6c007726216ea35b60542a79a6f9c852b1911",
+    "patterns/p32-free-list-pool/inputs/gen.py": "6657c70befe08ca62109783e9ff92c66c302c549ff3cdce6f0333ed60ad6de45",
+    "patterns/p32-free-list-pool/controls/repro.py": "0d2e892baf1a372f16fb46a75399d3756a7f37d01c16bd0b68e91a73ad12a3b1",
+    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3"
+  },
+  "runs": 20,
+  "measured_utc": "2026-08-30T05:21:02Z",
+  "rows": [
+    {
+      "input": "adversarial-stale-read.bin",
+      "R1": {
+        "distinct": 1,
+        "exit_codes": [
+          0
+        ],
+        "value": "3149539478886544384"
+      },
+      "R1h": {
+        "distinct": 1,
+        "exit_codes": [
+          0
+        ],
+        "value": "16295453347298233344"
+      },
+      "R1_diverges": true
+    },
+    {
+      "input": "adversarial-recycle.bin",
+      "R1": {
+        "distinct": 1,
+        "exit_codes": [
+          0
+        ],
+        "value": "3411532910145854464"
+      },
+      "R1h": {
+        "distinct": 1,
+        "exit_codes": [
+          0
+        ],
+        "value": "408677925675887616"
+      },
+      "R1_diverges": true
+    },
+    {
+      "input": "adversarial-doublefree.bin",
+      "R1": {
+        "distinct": 1,
+        "exit_codes": [
+          0
+        ],
+        "value": "2953773168956931072"
+      },
+      "R1h": {
+        "distinct": 1,
+        "exit_codes": [
+          0
+        ],
+        "value": "7694399416035917824"
+      },
+      "R1_diverges": true
+    },
+    {
+      "input": "adversarial-alias.bin",
+      "R1": {
+        "distinct": 1,
+        "exit_codes": [
+          0
+        ],
+        "value": "4541033225001543680"
+      },
+      "R1h": {
+        "distinct": 1,
+        "exit_codes": [
+          0
+        ],
+        "value": "8618832246808763392"
+      },
+      "R1_diverges": true
+    },
+    {
+      "input": "adversarial-many.bin",
+      "R1": {
+        "distinct": 1,
+        "exit_codes": [
+          0
+        ],
+        "value": "18212399140656900096"
+      },
+      "R1h": {
+        "distinct": 1,
+        "exit_codes": [
+          0
+        ],
+        "value": "15810558800354073600"
+      },
+      "R1_diverges": true
+    },
+    {
+      "input": "degenerate.bin",
+      "R1": {
+        "distinct": 1,
+        "exit_codes": [
+          0
+        ],
+        "value": "9306778758387801088"
+      },
+      "R1h": {
+        "distinct": 1,
+        "exit_codes": [
+          0
+        ],
+        "value": "9306778758387801088"
+      },
+      "R1_diverges": false
+    },
+    {
+      "input": "small.bin",
+      "R1": {
+        "distinct": 1,
+        "exit_codes": [
+          0
+        ],
+        "value": "7818319352111584483"
+      },
+      "R1h": {
+        "distinct": 1,
+        "exit_codes": [
+          0
+        ],
+        "value": "7818319352111584483"
+      },
+      "R1_diverges": false
+    }
+  ],
+  "unstable_cells": [],
+  "invariant": "EVERY cell is stable at 1 distinct value in N runs, R1 and R1h alike, on every input including the five adversarial ones -- because p32's storage is a local array and no heap address reaches the answer. R1 nevertheless DIVERGES from R1h on all five adversarial inputs. \u26a0 The COUNTS above are one draw and are not pinned anywhere; what ../NOTES.md publishes is this invariant. The CONTRAST is controls/storage_arms.py's `malloc` arm, whose adv-stale-read cell reads freed heap and is NOT stable."
+}

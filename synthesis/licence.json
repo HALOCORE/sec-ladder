@@ -2902,7 +2902,7 @@
    "patterns/p29-bst-delete/model.py": "46c3d859719c386c29430f05092133a4093af3f6ed83b44f6982924a0bd93988",
    "patterns/p29-bst-delete/safe_naive.rs": "61e9a417ca04af85152e7cc93ca9cd5e3d1ba17c17834bc2b0347c9ef4d7e54a",
    "patterns/p29-bst-delete/safe_tuned.rs": "ea8364c761e949ed3704e1077a301a7b0017f26ee49e629f8dd6f1b6605ee235",
-   "patterns/p29-bst-delete/spec.md": "0360260571e7049f4adbbdd2afa548bcc0ce0de6cf367d66c9a4002e4a77c62e",
+   "patterns/p29-bst-delete/spec.md": "45c11600a26038efb22b15dc93785d94c6dcc6dbe84e7fa1d871e7157df84b38",
    "patterns/p29-bst-delete/unsafe.rs": "3fb708192d174e52ea37267b5bfe2a850eecce8bc72aab87be70db0830a24378",
    "patterns/p29-bst-delete/verus.rs": "35f3201b471d0075cb264c7b891fc79c26ab2d4ee1ed6f2f3dc162370f673100",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
@@ -2925,6 +2925,138 @@
    "gcc-clang": {
     "verdict": "NOT-LIC",
     "why": "ASYMMETRIC INDIRECT dispatch (c-gcc: 0, c-clang: 2); e.g. `jmp *%rax`"
+   }
+  }
+ },
+ "p32": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "c3014dbe0dcc130007a7d83c1ed3c9fdf715fb457b5dcfa25ace2ef70e2639bf",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "d82747da107a031842a8fc441961553c1f43277d55ee91219beafbd97ae57076",
+   "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
+   "patterns/p32-free-list-pool/NOTES.md": "7ce6f8b9bada23d5f364118377db61b1a5ce3e8bf62643059fd9512493019a47",
+   "patterns/p32-free-list-pool/README.md": "3892c59133660b58fb3f49f18178ba42db30dabeca9611a1e3500a741c2bb9e1",
+   "patterns/p32-free-list-pool/c/kernel.c": "9676b36aa28f42299add3275f7ff715aac699f6a1a2cd8fbb53ff15f5eec7e63",
+   "patterns/p32-free-list-pool/c/kernel.h": "421804020f14152d3d4cc207fb17afd9177d7c54d5a9a44fb2f77f2056b377f3",
+   "patterns/p32-free-list-pool/c/kernel_hardened.c": "20be02f6225dfe7958fe03d2b69edc5fbdd76e8c8855cb2d1d18ab08932bcb15",
+   "patterns/p32-free-list-pool/c/main.c": "9b5259192ddba59a91fbf1b736c6c007726216ea35b60542a79a6f9c852b1911",
+   "patterns/p32-free-list-pool/controls/arm_body.inc": "be41236d7eafb37e80589cced6cd6dd7e0d539c399f5ac50715f85796d6ab4f5",
+   "patterns/p32-free-list-pool/controls/arm_forgeable.c": "77dc9ca8020c6f350cf54f96fe27c3b0752f3a4640a7aa5c6f85f93a3e074f90",
+   "patterns/p32-free-list-pool/controls/arm_malloc.c": "17f8fd2bb8780664b8bd0b6c38bb0737927789b34f7edd4550da0d703a4ab950",
+   "patterns/p32-free-list-pool/controls/arm_safe_bug.rs": "0a1e94533359f2372e8fa1c7adb7b856d6ae6b6c69315bf7e6e7af8675e70cba",
+   "patterns/p32-free-list-pool/controls/forgeable.py": "8f7bf1163cda67fe26ab61f370ab3009f100f24acecd44f6ec71d38c5932f4c4",
+   "patterns/p32-free-list-pool/controls/proof_mutants.py": "db8fecc246000d7c59fc3f98f2f2fa58acf27c99321e2ba9add870e73ff6cff3",
+   "patterns/p32-free-list-pool/controls/repro.py": "0d2e892baf1a372f16fb46a75399d3756a7f37d01c16bd0b68e91a73ad12a3b1",
+   "patterns/p32-free-list-pool/controls/safety_line.py": "433c68fa8fb8bff69b07868a53b13a03c14508afa47d81b552c28e37392f96b1",
+   "patterns/p32-free-list-pool/controls/storage_arms.py": "f7b02b64215f7b1bf3646c4cd75282fd6ad70c8f54051f115597532df5990576",
+   "patterns/p32-free-list-pool/inputs/gen.py": "6657c70befe08ca62109783e9ff92c66c302c549ff3cdce6f0333ed60ad6de45",
+   "patterns/p32-free-list-pool/model.py": "e22e29950beeae31b905681a57b519a26d2b88d616c615e834d37c73467fb755",
+   "patterns/p32-free-list-pool/safe_naive.rs": "ef5e81cdb73cf4da1cca47ca2d638feaa858b46d238d5be15699dcf7ce91c4bf",
+   "patterns/p32-free-list-pool/safe_tuned.rs": "31155074cf8b9d01f771fdd2b52c88247b6201104b6d8d8416f60713838bda21",
+   "patterns/p32-free-list-pool/spec.md": "938bbe8f394499117e3d658320c94328295ab59a92b726af969b9a215cd1e87b",
+   "patterns/p32-free-list-pool/unsafe.rs": "751723f8711ca10d42876d34d6d624aa072c68c39e7f65ef86f8b1c6bffb8823",
+   "patterns/p32-free-list-pool/verus.rs": "0ac30864cd7abc2993e627fec8a5747667da9e7d36400aef652801509825be49",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check"
+   },
+   "R3-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   },
+   "gcc-clang": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: __stack_chk_fail@plt"
    }
   }
  },

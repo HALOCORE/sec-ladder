@@ -1273,14 +1273,14 @@ record on the pass that found this — so the only check for it is to ask, of a
 finished document, which way its gaps point.**
 
 **What the corpus is made of, and it bounds the generality more than the
-toolchain pin does.** The 27 kernels classify, by the safety line each one's
+toolchain pin does.** The 28 kernels classify, by the safety line each one's
 `c/kernel.c` omits, like this — derived and drift-checked by
 `harness/tools/composition.py`:
 
 ```
 spatial          15   p02 p03 p05 p07 p09 p10 p11 p12 p13 p14 p16 p17 p23 p36 p46
 logical           3   p04 p06 p19
-temporal          2   p27 p29
+temporal          3   p27 p29 p32
 type              1   p38
 resource          1   p42
 side-channel      1   p47
@@ -1290,7 +1290,7 @@ aliasing          1   p08
 calibration       1   p01
 ```
 
-⚠⚠ **Fifteen of twenty-seven are spatial, and every claim this document makes
+⚠⚠ **Fifteen of twenty-eight are spatial, and every claim this document makes
 about the type axis rests on ONE pattern.** `p38` is the only type-confusion.
 A result drawn from a single row is a result about that row until a second one
 agrees with it, and **§5's `6.00 Ir`/call for a type-based aliasing property is

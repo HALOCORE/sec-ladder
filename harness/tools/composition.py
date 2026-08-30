@@ -93,8 +93,11 @@ CLASSES = {
         ["p04", "p06", "p19"],
     ),
     "temporal": (
-        "the object is gone, or not yet there, at the moment of the access",
-        ["p27", "p29"],
+        "the ACCESS OUTLIVES THE OBJECT'S LIFETIME. ⚠ Not necessarily its "
+        "STORAGE: the block may still be live and merely RECYCLED, or "
+        "program-owned throughout. The test is what the SAFETY LINE asks -- "
+        "'is this still the object I was given?' -- not whether free() ran",
+        ["p27", "p29", "p32"],
     ),
     "type": (
         "the bytes are read at a type they were not written at",
@@ -139,6 +142,13 @@ ORDER = ["spatial", "logical", "temporal", "type", "resource", "side-channel",
 # that the safety line does not name, and `p09` does.
 # ---------------------------------------------------------------------------
 CAVEATS = {
+    "p32": "the storage is NEVER deallocated -- a fixed pool with a LIFO free "
+           "list, owned by the program from start to finish -- so 'temporal' "
+           "here is about the OBJECT's lifetime, not the allocation's. Counted "
+           "temporal because its SAFETY LINE is a generation test (`gen[h] != "
+           "g`), which asks a lifetime question. ⚠ Its stale-FREE consequence "
+           "is ALIASING (two live handles naming one block), overlapping p08's "
+           "class; the aliasing is the HARM, the stale generation is the BUG.",
     "p09": "ships TWO bugs. The safety line is the omitted `q < nbits`, which "
            "is spatial and caught everywhere; the second is `q & 31`, which is "
            "invisible to a memory-safety proof and is NOT spatial. Counted "

@@ -1,0 +1,1403 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p32-free-list-pool/controls/storage_arms.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p32-free-list-pool/c/kernel.c": "9676b36aa28f42299add3275f7ff715aac699f6a1a2cd8fbb53ff15f5eec7e63",
+    "patterns/p32-free-list-pool/c/kernel_hardened.c": "20be02f6225dfe7958fe03d2b69edc5fbdd76e8c8855cb2d1d18ab08932bcb15",
+    "patterns/p32-free-list-pool/controls/storage_arms.py": "f7b02b64215f7b1bf3646c4cd75282fd6ad70c8f54051f115597532df5990576",
+    "patterns/p32-free-list-pool/controls/arm_body.inc": "be41236d7eafb37e80589cced6cd6dd7e0d539c399f5ac50715f85796d6ab4f5",
+    "patterns/p32-free-list-pool/controls/arm_malloc.c": "17f8fd2bb8780664b8bd0b6c38bb0737927789b34f7edd4550da0d703a4ab950",
+    "patterns/p32-free-list-pool/controls/arm_safe_bug.rs": "0a1e94533359f2372e8fa1c7adb7b856d6ae6b6c69315bf7e6e7af8675e70cba"
+  },
+  "measured_utc": "2026-08-30T05:42:09Z",
+  "inputs": {
+    "benign": "0c000000000800110218032102290130003a024201490152005b0263",
+    "adv-stale-read": "040000000008001101180220",
+    "adv-recycle": "06000000000800110118004a0220022a",
+    "adv-doublefree": "080000000008001101180120002a0033023a0243",
+    "adv-alias": "09000000000801100118002a0033033a0243034b0252"
+  },
+  "positive_control": [
+    {
+      "build": "arena-asan",
+      "rc": 1,
+      "out": "",
+      "fired": [
+        "ERROR: AddressSanitizer"
+      ],
+      "diagnostic": "attempting double-free"
+    },
+    {
+      "build": "arena-asan-clang",
+      "rc": 1,
+      "out": "",
+      "fired": [
+        "ERROR: AddressSanitizer"
+      ],
+      "diagnostic": "attempting double-free"
+    },
+    {
+      "build": "arena-plain",
+      "rc": -6,
+      "out": "",
+      "fired": [
+        "free(): "
+      ],
+      "diagnostic": "free(): double free detected in tcache 2"
+    },
+    {
+      "build": "arena-plain-clang",
+      "rc": -6,
+      "out": "",
+      "fired": [
+        "free(): "
+      ],
+      "diagnostic": "free(): double free detected in tcache 2"
+    },
+    {
+      "build": "arena-ubsan",
+      "rc": -6,
+      "out": "",
+      "fired": [
+        "free(): "
+      ],
+      "diagnostic": "free(): double free detected in tcache 2"
+    },
+    {
+      "build": "malloc-asan",
+      "rc": 1,
+      "out": "",
+      "fired": [
+        "ERROR: AddressSanitizer"
+      ],
+      "diagnostic": "attempting double-free"
+    },
+    {
+      "build": "malloc-asan-clang",
+      "rc": 1,
+      "out": "",
+      "fired": [
+        "ERROR: AddressSanitizer"
+      ],
+      "diagnostic": "attempting double-free"
+    },
+    {
+      "build": "malloc-plain",
+      "rc": -6,
+      "out": "",
+      "fired": [
+        "free(): "
+      ],
+      "diagnostic": "free(): double free detected in tcache 2"
+    },
+    {
+      "build": "malloc-plain-clang",
+      "rc": -6,
+      "out": "",
+      "fired": [
+        "free(): "
+      ],
+      "diagnostic": "free(): double free detected in tcache 2"
+    },
+    {
+      "build": "malloc-ubsan",
+      "rc": -6,
+      "out": "",
+      "fired": [
+        "free(): "
+      ],
+      "diagnostic": "free(): double free detected in tcache 2"
+    }
+  ],
+  "positive_control_dead_builds": [],
+  "rows": [
+    {
+      "input": "benign",
+      "arm": "bug",
+      "c_arena_plain": {
+        "rc": 0,
+        "out": "72356755880000075",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_plain": {
+        "rc": 0,
+        "out": "72356755880000075",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "safe_rust": {
+        "rc": 0,
+        "out": "72356755880000075",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_asan": {
+        "rc": 0,
+        "out": "72356755880000075",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_arena_asan": {
+        "rc": 0,
+        "out": "72356755880000075",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "arena_equals_safe_rust": true
+    },
+    {
+      "input": "benign",
+      "arm": "fix",
+      "c_arena_plain": {
+        "rc": 0,
+        "out": "72356755880000075",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_plain": {
+        "rc": 0,
+        "out": "72356755880000075",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "safe_rust": {
+        "rc": 0,
+        "out": "72356755880000075",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_asan": {
+        "rc": 0,
+        "out": "72356755880000075",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_arena_asan": {
+        "rc": 0,
+        "out": "72356755880000075",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "arena_equals_safe_rust": true
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "bug",
+      "c_arena_plain": {
+        "rc": 0,
+        "out": "32521",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_plain": {
+        "rc": 0,
+        "out": "35094",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "safe_rust": {
+        "rc": 0,
+        "out": "32521",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_asan": {
+        "rc": 1,
+        "out": "",
+        "fired": [
+          "ERROR: AddressSanitizer"
+        ],
+        "diagnostic": "heap-use-after-free"
+      },
+      "c_arena_asan": {
+        "rc": 0,
+        "out": "32521",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "arena_equals_safe_rust": true
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "fix",
+      "c_arena_plain": {
+        "rc": 0,
+        "out": "38535",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_plain": {
+        "rc": 0,
+        "out": "38535",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "safe_rust": {
+        "rc": 0,
+        "out": "38535",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_asan": {
+        "rc": 0,
+        "out": "38535",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_arena_asan": {
+        "rc": 0,
+        "out": "38535",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "arena_equals_safe_rust": true
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "bug",
+      "c_arena_plain": {
+        "rc": 0,
+        "out": "29797947",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_plain": {
+        "rc": 0,
+        "out": "29797947",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "safe_rust": {
+        "rc": 0,
+        "out": "29797947",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_asan": {
+        "rc": 0,
+        "out": "29797947",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_arena_asan": {
+        "rc": 0,
+        "out": "29797947",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "arena_equals_safe_rust": true
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "fix",
+      "c_arena_plain": {
+        "rc": 0,
+        "out": "30032431",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_plain": {
+        "rc": 0,
+        "out": "30032431",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "safe_rust": {
+        "rc": 0,
+        "out": "30032431",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_asan": {
+        "rc": 0,
+        "out": "30032431",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_arena_asan": {
+        "rc": 0,
+        "out": "30032431",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "arena_equals_safe_rust": true
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "bug",
+      "c_arena_plain": {
+        "rc": 0,
+        "out": "28444101123",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_plain": {
+        "rc": -6,
+        "out": "",
+        "fired": [
+          "free(): "
+        ],
+        "diagnostic": "free(): double free detected in tcache 2"
+      },
+      "safe_rust": {
+        "rc": 0,
+        "out": "28444101123",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_asan": {
+        "rc": 1,
+        "out": "",
+        "fired": [
+          "ERROR: AddressSanitizer"
+        ],
+        "diagnostic": "attempting double-free"
+      },
+      "c_arena_asan": {
+        "rc": 0,
+        "out": "28444101123",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "arena_equals_safe_rust": true
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "fix",
+      "c_arena_plain": {
+        "rc": 0,
+        "out": "35593523088",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_plain": {
+        "rc": 0,
+        "out": "35593523088",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "safe_rust": {
+        "rc": 0,
+        "out": "35593523088",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_asan": {
+        "rc": 0,
+        "out": "35593523088",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_arena_asan": {
+        "rc": 0,
+        "out": "35593523088",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "arena_equals_safe_rust": true
+    },
+    {
+      "input": "adv-alias",
+      "arm": "bug",
+      "c_arena_plain": {
+        "rc": 0,
+        "out": "895071855618",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_plain": {
+        "rc": -6,
+        "out": "",
+        "fired": [
+          "free(): "
+        ],
+        "diagnostic": "free(): double free detected in tcache 2"
+      },
+      "safe_rust": {
+        "rc": 0,
+        "out": "895071855618",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_asan": {
+        "rc": 1,
+        "out": "",
+        "fired": [
+          "ERROR: AddressSanitizer"
+        ],
+        "diagnostic": "attempting double-free"
+      },
+      "c_arena_asan": {
+        "rc": 0,
+        "out": "895071855618",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "arena_equals_safe_rust": true
+    },
+    {
+      "input": "adv-alias",
+      "arm": "fix",
+      "c_arena_plain": {
+        "rc": 0,
+        "out": "7765691657627",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_plain": {
+        "rc": 0,
+        "out": "7765691657627",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "safe_rust": {
+        "rc": 0,
+        "out": "7765691657627",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_malloc_asan": {
+        "rc": 0,
+        "out": "7765691657627",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "c_arena_asan": {
+        "rc": 0,
+        "out": "7765691657627",
+        "fired": [],
+        "diagnostic": ""
+      },
+      "arena_equals_safe_rust": true
+    }
+  ],
+  "matrix": [
+    {
+      "input": "benign",
+      "arm": "bug",
+      "build": "arena-asan",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "bug",
+      "build": "arena-asan-clang",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "bug",
+      "build": "arena-plain",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "bug",
+      "build": "arena-plain-clang",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "bug",
+      "build": "arena-ubsan",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "bug",
+      "build": "malloc-asan",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "bug",
+      "build": "malloc-asan-clang",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "bug",
+      "build": "malloc-plain",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "bug",
+      "build": "malloc-plain-clang",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "bug",
+      "build": "malloc-ubsan",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "fix",
+      "build": "arena-asan",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "fix",
+      "build": "arena-asan-clang",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "fix",
+      "build": "arena-plain",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "fix",
+      "build": "arena-plain-clang",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "fix",
+      "build": "arena-ubsan",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "fix",
+      "build": "malloc-asan",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "fix",
+      "build": "malloc-asan-clang",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "fix",
+      "build": "malloc-plain",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "fix",
+      "build": "malloc-plain-clang",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "benign",
+      "arm": "fix",
+      "build": "malloc-ubsan",
+      "rc": 0,
+      "out": "72356755880000075",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "bug",
+      "build": "arena-asan",
+      "rc": 0,
+      "out": "32521",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "bug",
+      "build": "arena-asan-clang",
+      "rc": 0,
+      "out": "32521",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "bug",
+      "build": "arena-plain",
+      "rc": 0,
+      "out": "32521",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "bug",
+      "build": "arena-plain-clang",
+      "rc": 0,
+      "out": "32521",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "bug",
+      "build": "arena-ubsan",
+      "rc": 0,
+      "out": "32521",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "bug",
+      "build": "malloc-asan",
+      "rc": 1,
+      "out": "",
+      "fired": [
+        "ERROR: AddressSanitizer"
+      ],
+      "diagnostic": "heap-use-after-free"
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "bug",
+      "build": "malloc-asan-clang",
+      "rc": 1,
+      "out": "",
+      "fired": [
+        "ERROR: AddressSanitizer"
+      ],
+      "diagnostic": "heap-use-after-free"
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "bug",
+      "build": "malloc-plain",
+      "rc": 0,
+      "out": "31002",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "bug",
+      "build": "malloc-plain-clang",
+      "rc": 0,
+      "out": "31653",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "bug",
+      "build": "malloc-ubsan",
+      "rc": 0,
+      "out": "37078",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "fix",
+      "build": "arena-asan",
+      "rc": 0,
+      "out": "38535",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "fix",
+      "build": "arena-asan-clang",
+      "rc": 0,
+      "out": "38535",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "fix",
+      "build": "arena-plain",
+      "rc": 0,
+      "out": "38535",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "fix",
+      "build": "arena-plain-clang",
+      "rc": 0,
+      "out": "38535",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "fix",
+      "build": "arena-ubsan",
+      "rc": 0,
+      "out": "38535",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "fix",
+      "build": "malloc-asan",
+      "rc": 0,
+      "out": "38535",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "fix",
+      "build": "malloc-asan-clang",
+      "rc": 0,
+      "out": "38535",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "fix",
+      "build": "malloc-plain",
+      "rc": 0,
+      "out": "38535",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "fix",
+      "build": "malloc-plain-clang",
+      "rc": 0,
+      "out": "38535",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-stale-read",
+      "arm": "fix",
+      "build": "malloc-ubsan",
+      "rc": 0,
+      "out": "38535",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "bug",
+      "build": "arena-asan",
+      "rc": 0,
+      "out": "29797947",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "bug",
+      "build": "arena-asan-clang",
+      "rc": 0,
+      "out": "29797947",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "bug",
+      "build": "arena-plain",
+      "rc": 0,
+      "out": "29797947",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "bug",
+      "build": "arena-plain-clang",
+      "rc": 0,
+      "out": "29797947",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "bug",
+      "build": "arena-ubsan",
+      "rc": 0,
+      "out": "29797947",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "bug",
+      "build": "malloc-asan",
+      "rc": 0,
+      "out": "29797947",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "bug",
+      "build": "malloc-asan-clang",
+      "rc": 0,
+      "out": "29797947",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "bug",
+      "build": "malloc-plain",
+      "rc": 0,
+      "out": "29797947",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "bug",
+      "build": "malloc-plain-clang",
+      "rc": 0,
+      "out": "29797947",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "bug",
+      "build": "malloc-ubsan",
+      "rc": 0,
+      "out": "29797947",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "fix",
+      "build": "arena-asan",
+      "rc": 0,
+      "out": "30032431",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "fix",
+      "build": "arena-asan-clang",
+      "rc": 0,
+      "out": "30032431",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "fix",
+      "build": "arena-plain",
+      "rc": 0,
+      "out": "30032431",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "fix",
+      "build": "arena-plain-clang",
+      "rc": 0,
+      "out": "30032431",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "fix",
+      "build": "arena-ubsan",
+      "rc": 0,
+      "out": "30032431",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "fix",
+      "build": "malloc-asan",
+      "rc": 0,
+      "out": "30032431",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "fix",
+      "build": "malloc-asan-clang",
+      "rc": 0,
+      "out": "30032431",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "fix",
+      "build": "malloc-plain",
+      "rc": 0,
+      "out": "30032431",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "fix",
+      "build": "malloc-plain-clang",
+      "rc": 0,
+      "out": "30032431",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-recycle",
+      "arm": "fix",
+      "build": "malloc-ubsan",
+      "rc": 0,
+      "out": "30032431",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "bug",
+      "build": "arena-asan",
+      "rc": 0,
+      "out": "28444101123",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "bug",
+      "build": "arena-asan-clang",
+      "rc": 0,
+      "out": "28444101123",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "bug",
+      "build": "arena-plain",
+      "rc": 0,
+      "out": "28444101123",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "bug",
+      "build": "arena-plain-clang",
+      "rc": 0,
+      "out": "28444101123",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "bug",
+      "build": "arena-ubsan",
+      "rc": 0,
+      "out": "28444101123",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "bug",
+      "build": "malloc-asan",
+      "rc": 1,
+      "out": "",
+      "fired": [
+        "ERROR: AddressSanitizer"
+      ],
+      "diagnostic": "attempting double-free"
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "bug",
+      "build": "malloc-asan-clang",
+      "rc": 1,
+      "out": "",
+      "fired": [
+        "ERROR: AddressSanitizer"
+      ],
+      "diagnostic": "attempting double-free"
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "bug",
+      "build": "malloc-plain",
+      "rc": -6,
+      "out": "",
+      "fired": [
+        "free(): "
+      ],
+      "diagnostic": "free(): double free detected in tcache 2"
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "bug",
+      "build": "malloc-plain-clang",
+      "rc": -6,
+      "out": "",
+      "fired": [
+        "free(): "
+      ],
+      "diagnostic": "free(): double free detected in tcache 2"
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "bug",
+      "build": "malloc-ubsan",
+      "rc": -6,
+      "out": "",
+      "fired": [
+        "free(): "
+      ],
+      "diagnostic": "free(): double free detected in tcache 2"
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "fix",
+      "build": "arena-asan",
+      "rc": 0,
+      "out": "35593523088",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "fix",
+      "build": "arena-asan-clang",
+      "rc": 0,
+      "out": "35593523088",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "fix",
+      "build": "arena-plain",
+      "rc": 0,
+      "out": "35593523088",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "fix",
+      "build": "arena-plain-clang",
+      "rc": 0,
+      "out": "35593523088",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "fix",
+      "build": "arena-ubsan",
+      "rc": 0,
+      "out": "35593523088",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "fix",
+      "build": "malloc-asan",
+      "rc": 0,
+      "out": "35593523088",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "fix",
+      "build": "malloc-asan-clang",
+      "rc": 0,
+      "out": "35593523088",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "fix",
+      "build": "malloc-plain",
+      "rc": 0,
+      "out": "35593523088",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "fix",
+      "build": "malloc-plain-clang",
+      "rc": 0,
+      "out": "35593523088",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-doublefree",
+      "arm": "fix",
+      "build": "malloc-ubsan",
+      "rc": 0,
+      "out": "35593523088",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-alias",
+      "arm": "bug",
+      "build": "arena-asan",
+      "rc": 0,
+      "out": "895071855618",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-alias",
+      "arm": "bug",
+      "build": "arena-asan-clang",
+      "rc": 0,
+      "out": "895071855618",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-alias",
+      "arm": "bug",
+      "build": "arena-plain",
+      "rc": 0,
+      "out": "895071855618",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-alias",
+      "arm": "bug",
+      "build": "arena-plain-clang",
+      "rc": 0,
+      "out": "895071855618",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-alias",
+      "arm": "bug",
+      "build": "arena-ubsan",
+      "rc": 0,
+      "out": "895071855618",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-alias",
+      "arm": "bug",
+      "build": "malloc-asan",
+      "rc": 1,
+      "out": "",
+      "fired": [
+        "ERROR: AddressSanitizer"
+      ],
+      "diagnostic": "attempting double-free"
+    },
+    {
+      "input": "adv-alias",
+      "arm": "bug",
+      "build": "malloc-asan-clang",
+      "rc": 1,
+      "out": "",
+      "fired": [
+        "ERROR: AddressSanitizer"
+      ],
+      "diagnostic": "attempting double-free"
+    },
+    {
+      "input": "adv-alias",
+      "arm": "bug",
+      "build": "malloc-plain",
+      "rc": -6,
+      "out": "",
+      "fired": [
+        "free(): "
+      ],
+      "diagnostic": "free(): double free detected in tcache 2"
+    },
+    {
+      "input": "adv-alias",
+      "arm": "bug",
+      "build": "malloc-plain-clang",
+      "rc": -6,
+      "out": "",
+      "fired": [
+        "free(): "
+      ],
+      "diagnostic": "free(): double free detected in tcache 2"
+    },
+    {
+      "input": "adv-alias",
+      "arm": "bug",
+      "build": "malloc-ubsan",
+      "rc": -6,
+      "out": "",
+      "fired": [
+        "free(): "
+      ],
+      "diagnostic": "free(): double free detected in tcache 2"
+    },
+    {
+      "input": "adv-alias",
+      "arm": "fix",
+      "build": "arena-asan",
+      "rc": 0,
+      "out": "7765691657627",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-alias",
+      "arm": "fix",
+      "build": "arena-asan-clang",
+      "rc": 0,
+      "out": "7765691657627",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-alias",
+      "arm": "fix",
+      "build": "arena-plain",
+      "rc": 0,
+      "out": "7765691657627",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-alias",
+      "arm": "fix",
+      "build": "arena-plain-clang",
+      "rc": 0,
+      "out": "7765691657627",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-alias",
+      "arm": "fix",
+      "build": "arena-ubsan",
+      "rc": 0,
+      "out": "7765691657627",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-alias",
+      "arm": "fix",
+      "build": "malloc-asan",
+      "rc": 0,
+      "out": "7765691657627",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-alias",
+      "arm": "fix",
+      "build": "malloc-asan-clang",
+      "rc": 0,
+      "out": "7765691657627",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-alias",
+      "arm": "fix",
+      "build": "malloc-plain",
+      "rc": 0,
+      "out": "7765691657627",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-alias",
+      "arm": "fix",
+      "build": "malloc-plain-clang",
+      "rc": 0,
+      "out": "7765691657627",
+      "fired": [],
+      "diagnostic": ""
+    },
+    {
+      "input": "adv-alias",
+      "arm": "fix",
+      "build": "malloc-ubsan",
+      "rc": 0,
+      "out": "7765691657627",
+      "fired": [],
+      "diagnostic": ""
+    }
+  ],
+  "invariant": "(1) `#![forbid(unsafe_code)]` safe Rust reproduces the C ARENA rung EXACTLY on every (input, arm) cell, buggy arm included. (2) The SAME algorithm on `malloc` storage aborts under ASan on the stale-read and double-free inputs and is silent on the use-after-RECYCLE one. (3) The arena arm is silent under ASan and UBSan on EVERY input while its answer is wrong on four of them. \u26a0 The CHECKSUMS of the `malloc` PLAIN build on adv-stale-read are NOT reproducible -- it reads freed heap -- so no number from that cell is a fact; the DETECTOR verdicts and the arena checksums are."
+}

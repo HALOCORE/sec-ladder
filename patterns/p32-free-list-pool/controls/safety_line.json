@@ -1,0 +1,24 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p32-free-list-pool/controls/safety_line.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p32-free-list-pool/c/kernel.c": "9676b36aa28f42299add3275f7ff715aac699f6a1a2cd8fbb53ff15f5eec7e63",
+    "patterns/p32-free-list-pool/c/kernel_hardened.c": "20be02f6225dfe7958fe03d2b69edc5fbdd76e8c8855cb2d1d18ab08932bcb15",
+    "patterns/p32-free-list-pool/c/kernel.h": "421804020f14152d3d4cc207fb17afd9177d7c54d5a9a44fb2f77f2056b377f3",
+    "patterns/p32-free-list-pool/controls/safety_line.py": "433c68fa8fb8bff69b07868a53b13a03c14508afa47d81b552c28e37392f96b1"
+  },
+  "measured_utc": "2026-08-30T05:17:27Z",
+  "preprocessed_lines": {
+    "kernel.c": 235,
+    "kernel_hardened.c": 237
+  },
+  "added": [
+    "} else if (gen[h] != g) {",
+    "v = 251;"
+  ],
+  "removed": [],
+  "gen_conjunct_sites": 1,
+  "problems": [],
+  "invariant": "The preprocessed difference between the two C rungs is a pure ADDITION consisting of the safety line alone, and it adds `gen[h] != g` at exactly ONE site. The line COUNT is printed and recorded, never pinned in spec.md."
+}

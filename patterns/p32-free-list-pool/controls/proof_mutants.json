@@ -1,0 +1,116 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p32-free-list-pool/controls/proof_mutants.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p32-free-list-pool/verus.rs": "0ac30864cd7abc2993e627fec8a5747667da9e7d36400aef652801509825be49",
+    "patterns/p32-free-list-pool/controls/proof_mutants.py": "db8fecc246000d7c59fc3f98f2f2fa58acf27c99321e2ba9add870e73ff6cff3"
+  },
+  "measured_utc": "2026-08-30T05:41:56Z",
+  "mutants": [
+    {
+      "mutant": "M0-control",
+      "kind": "control",
+      "expected": "verify",
+      "got": "verify",
+      "ok": true,
+      "verified": 15,
+      "errors": 0,
+      "rc": 0,
+      "error_kinds": [],
+      "why": "the shipped file, run through the same harness. If this does not verify, nothing below means anything."
+    },
+    {
+      "mutant": "M1-generation-conjunct",
+      "kind": "attack",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 14,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 2 previous errors",
+        "assertion failed"
+      ],
+      "why": "THE ATTACK ARM, and it is the row's bug exactly: delete `gen[h] != g` from the exec code and nothing else. What survives is `c/kernel.c` -- a kernel that double-frees a recycled block, self-loops its own free list and hands out two aliased handles. It must FAIL, and it fails on the POSTCONDITION: the loop stops computing `run`."
+    },
+    {
+      "mutant": "M2-constant-body",
+      "kind": "vacuity",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 12,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 1 previous error; 1 warning emitted",
+        "postcondition not satisfied"
+      ],
+      "why": "`.memory/04-verus.md`'s vacuity probe in its sharp form -- **what is the CHEAPEST body that satisfies the postcondition?** `TASK_137` discharged `TASK_136`'s ARM_C with `fn arm_c() -> u8 { 9 }`. Here the cheapest body is `return 0;` and it must FAIL, because `pool_fold` is a function of the window bytes and no constant equals it."
+    },
+    {
+      "mutant": "M3-nil-test",
+      "kind": "attack",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 14,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 2 previous errors",
+        "precondition not satisfied"
+      ],
+      "why": "the OTHER half of the guard: make `h == NIL` unreachable, so an empty handle register is decoded as slot 255. It must FAIL, and \u26a0 **it is the one arm here that fails for a MEMORY-SAFETY reason** -- `gen[255]` is out of an 8-element array and `wf_ranges` is what the unchecked read needs. Kept precisely to show the contrast with M1, which fails for a functional one."
+    },
+    {
+      "mutant": "M4-spec-weaken",
+      "kind": "must-verify",
+      "expected": "verify",
+      "got": "verify",
+      "ok": true,
+      "verified": 15,
+      "errors": 0,
+      "rc": 0,
+      "error_kinds": [],
+      "why": "\u26a0\u26a0\u26a0 **THE ARM THAT IS SUPPOSED TO VERIFY.** Delete the generation conjunct from the exec code AND from `step`, so the specification describes the BUGGY kernel. It verifies. **That is the honest statement of what this R5 buys**: the safety line is load-bearing against the SPECIFICATION and against nothing else, because p32 allocates nothing and therefore has no linear resource whose consumption could force it. Compare p29, whose `live[cur] = 0` cannot be deleted at any price -- `rec_free` has consumed the permission and no spec change brings it back. `p42` is the precedent for shipping this as a finding."
+    },
+    {
+      "mutant": "M5-freehead-range",
+      "kind": "deletion",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 14,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 2 previous errors",
+        "precondition not satisfied"
+      ],
+      "why": "delete the whole range invariant from the loop. `freehead`, `nx[]` and `regs[]` are then unconstrained and every unchecked index loses its licence. This is the invariant that makes R1 memory-safe too, which is why ASan says nothing about the shipped bug."
+    },
+    {
+      "mutant": "M6-nx-init",
+      "kind": "deletion",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 14,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 1 previous error",
+        "invariant not satisfied at end of loop body"
+      ],
+      "why": "delete the free-list initialisation. `nx` stays all-zero, so the list self-loops at slot 0 from the start -- and note WHAT FAILS: not memory safety (0 is a real slot) but the postcondition and the loop invariant that `nx@` equals `st0().nx`. The free list's SHAPE is only ever a functional property here."
+    }
+  ],
+  "invariant": "The ATTACK arm (M1, the shipped bug) and the VACUITY arm (M2, a constant body) both FAIL. The SPEC-WEAKEN arm (M4) VERIFIES, and that is the finding rather than a defect: p32's safety line is load-bearing against the specification alone, because the pattern allocates nothing and has no linear resource to consume. M3 is the contrast case -- the one arm that fails for a memory-safety reason.",
+  "summary": {
+    "n": 7,
+    "as_expected": 7
+  }
+}
