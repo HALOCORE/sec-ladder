@@ -4520,10 +4520,15 @@ the number.** Two task files have already sent an agent to the wrong finding.
 
 55. ✅✅✅ **`p32`/`p33` IS BUILT AND GREEN — 28 PATTERNS, THE THIRD TEMPORAL
     ROW, AND THE FIRST ROW THIS PROJECT BUILT *BECAUSE* A KILL WAS RETRACTED.**
-    `TASK_144`, engineer work, **NOT YET REVIEWED** (rule 9). ⚠ **Manager-verified
-    from the record — `PASS`, `failures []`, `blocked []`, `complete_run true`,
-    all five control JSONs FRESH — and the mutant battery and the headline
-    control both RE-RUN.**
+    `TASK_144`, engineer work, ✅ **REVIEWED AT `TASK_145` — VERDICT: `p32`
+    STANDS. No blocker; six review items came back
+    `SURVIVES` ×3 / `SURVIVES, NARROWED` ×3; four majors, and TWO OF THE FOUR ARE
+    THE MANAGER'S, IN THIS ENTRY.** ⚠ **Manager-verified from the record —
+    `PASS`, `failures []`, `blocked []`, `complete_run true`, all five control
+    JSONs FRESH — and the mutant battery and the headline control both RE-RUN.**
+    ✅ **The reviewer re-derived the row a THIRD way** — its own from-the-C kernel
+    replaying `spec.md`'s driver loop over all nine inputs — **and every R1 and
+    R1h value matches the gate record exactly.**
 
     ⚠⚠ **THE SENTENCE THAT KILLED THIS ROW IS ITS HEADLINE, AND IT NOW HAS A
     CONTROL. ✅ MANAGER-RE-RUN, one C source, storage the only variable:**
@@ -4531,11 +4536,24 @@ the number.** Two task files have already sent an agent to the wrong finding.
     ```
     input           arm     c-arena          c-malloc         safe-rust    malloc detector
     benign          bug   72356755880000075  72356755880000075  ==same==    -
-    adv-stale-read  bug              32521              35094      32521    heap-use-after-free
+    adv-stale-read  bug              32521          NOT REPRO        32521    heap-use-after-free
     adv-recycle     bug           29797947           29797947   29797947    -           <-- SILENT
     adv-doublefree  bug        28444101123              rc=-6  28444101123  attempting double-free
     adv-alias       bug       895071855618              rc=-6  895071855618 attempting double-free
     ```
+
+    ⚠⚠⚠ **MAJOR M4, AND IT IS THE MANAGER'S: THIS TABLE PUBLISHED `35094` IN THE
+    `NOT REPRO` CELL, WITH THE SAME TYPOGRAPHIC STATUS AS EVERY REPRODUCIBLE CELL
+    BESIDE IT.** The engineer's report prints `NOT REPRO` there and says *"no
+    number from that cell is a fact"*; `NOTES.md` 2 and `README.md` say it twice
+    more. **The manager re-ran the control, got a DIFFERENT number, and wrote the
+    number down.** The reviewer's re-run gives a fifth:
+    `33172 / 33203 / 34629 / 35094 / 35962`. ⚠⚠ **THE RE-RUN CONFIRMED THE
+    NON-REPRODUCIBILITY AND WAS PUBLISHED AS A MEASUREMENT OF IT** — a draw
+    published as a figure, and the FOURTH instance of that class in this project
+    (`p23`'s `k_selfpivot`, `TASK_144`'s engineer self-report #7, `TASK_143`'s
+    `p25` cell, and this). **Everything else in the table is reproducible and was
+    checked.**
 
     ✅ **`#![forbid(unsafe_code)]` SAFE RUST == THE C ARENA RUNG ON 10 OF 10
     (input, arm) CELLS**, including the four where the arena rung is WRONG.
@@ -4545,8 +4563,34 @@ the number.** Two task files have already sent an agent to the wrong finding.
     storage is a real heap — this generalises `p29`'s result off the arena.**
     ✅ **Positive control fired in 10 of 10 C builds.** ✅ **On the shipped pool
     storage ASan/UBSan/Miri are silent on all nine inputs while four return a
-    wrong answer, and `model.py` DERIVES that silence by checking every index the
-    buggy rung computes rather than declaring it.**
+    wrong answer.**
+
+    ⚠⚠⚠ **MAJOR M1, THE SHARPEST OF THE REVIEW, AND THIS ENTRY CARRIED IT: ~~*"and
+    `model.py` DERIVES that silence by checking every index the buggy rung
+    computes rather than declaring it"*~~ IS FALSE, AND THE CHECK CANNOT FIRE.**
+    `Pool.oob` is set only from `_touch(blk.slot)`; a `Block` is constructed at
+    **exactly one site**, from `pop()`, which draws from a successor map over
+    `0..SLOTS-1` — **so the guard `0 <= s < SLOTS` is a tautology of the
+    simulation's own representation.** Measured: **0 firings in 20 000 fuzzed
+    buggy windows.** The one case that *would* set it — `Pool().read(Block(255))`
+    — **crashes the model** with `IndexError` on the very next line, before
+    `sanitizer_expect` is ever read. It never touches `gen[h]`, `nx[h]` or
+    `regs[r]` at all, so *"every index the buggy rung would compute"* is false
+    three times over; and **`M3-nil-test`'s failure mode — the one memory-safety
+    failure this row's own R5 battery finds — is unrepresentable**, because an
+    empty register is `None`, never slot 255.
+    ✅ **THE CONCLUSION IS STILL TRUE** — ASan/UBSan/Miri really are silent on
+    all nine inputs, the gate ran them, and `p27`/`p29` fire on the same
+    machinery. **What is false is that `model.py` ESTABLISHES it.**
+    ⚠⚠ **This is *"a control that cannot fire proves nothing"* — the rule
+    `controls/storage_arms.py` states two files away, about clang eliminating
+    `p31`'s malloc pair.** ⚠ **And it is the manager's own rule-9 failure mode:
+    the claim WAS re-run (the gate agrees the answer is `clean`) but the DESIGN
+    was not attacked, and the design is where it fails.** ⚠ **The sentence is
+    inside `contract_sha256`, and also in `README.md`, `NOTES.md` 2a and
+    `TASK_144_REPORT` §4 — repair costs a hash move, `report.py` and a re-gate;
+    `model.py` is ALSO in `measurement_sources`, so making the check REAL costs a
+    `p32` re-measure. Bundled into `TASK_147`.**
 
     ⚠⚠⚠ **THE PROOF-SIDE FINDING, AND IT IS NEW: WHEN THE PROGRAM OWNS ITS
     STORAGE THROUGHOUT, VERUS HAS NO LINEAR RESOURCE TO ATTACH THE SAFETY LINE
@@ -4590,8 +4634,77 @@ the number.** Two task files have already sent an agent to the wrong finding.
     including fourteen vacuous `forbidden` entries and a false disclosure it had
     written into `NOTES.md`, both caught and reported.**
 
-    Evidence: `.tasks/TASK_144_REPORT.md`, `patterns/p32-free-list-pool/`,
-    `results/gate/p32-free-list-pool.json`, `.temp/mgr144-*.log`.
+    ### What the review added, beyond the four majors
+
+    ✅✅ **A NEW MUTANT CELL THE BATTERY LACKED, AND IT CONVERTS THE R5 HEADLINE
+    FROM AN ASSERTION INTO A THREE-CELL RESULT.** `M4-spec-weaken` verifies
+    `15/0` and is the shipped must-verify arm; the reviewer built
+    **`X3-spec-only-weaken` and it FAILS.** The three cells are
+    **exec-only → fail, spec-only → fail, both → verify** — so *"nothing linear
+    forces the conjunct"* is now bracketed on both sides rather than shown once.
+    ⚠ **Recommended for `controls/proof_mutants.py`; it is in `TASK_147`.**
+
+    ⚠⚠ **A GATE FINDING, NOT A `p32` DEFECT, AND IT IS THE *"vacuity is a SHOUT,
+    not a FAILURE"* FAMILY AGAIN: `assume(false)` verifies `15/0` and
+    `check.py` only SHOUTS `[tcb-axiom]`.** `p32`'s own `assume(` count is **0**,
+    so nothing here is wrong — **the gate is what a later row could walk through.**
+    Same family as `TASK_144_REPORT`'s finding 4.
+
+    ⚠ **`storage_arms.py` — TWO NARROWINGS, both closed by measurement rather
+    than argued.** (i) Its docstring calls the `c-arena` arm *"the SHIPPED C
+    kernels"*, and **`build()` never compiles `c/kernel.c`** — the reviewer
+    closed it by driving the shipped rungs on the control's own op streams,
+    **10/10 match**, so the conclusion is unharmed and the description is wrong
+    (**M3**). (ii) ⚠⚠ **The two storage cells do NOT differ only in storage: a
+    17-line teardown differs as well** — so *"one C source, storage the only
+    variable"* is narrowed. ✅ **But the `malloc` arm's aborts ARE the bug**:
+    ASan frames put `attempting double-free` at `arm_body.inc:112` (the op loop's
+    stale FREE) and `heap-use-after-free` at `:119` (the stale READ), and **the
+    teardown's `free` at `:148` appears in no trace.**
+
+    ⚠ **`controls/repro.py` ships with NO NEGATIVE CONTROL.** The reviewer
+    supplied one — `p29`'s R1, 20/20 distinct at `randomize_va_space=2` — and
+    **`p32`'s 1-of-20 reproducibility claim SURVIVES.** ⚠ Same shape as the
+    manager's own `.temp/mgr146/aslr/k.c`: *a reproducibility test is evidence
+    only once it has been shown capable of failing.*
+
+    ⚠ **M2 — `c/kernel.h:73` and `:143` say the safety line is at THREE SITES**,
+    against six other places including the hashed contract twice, and against a
+    control that fails at ≠1. **Stale text from `TASK_143`'s three-site
+    demonstration; `c/*` is in `measurement_sources`, so it rides the same
+    re-measure as M1.**
+
+    ⚠ **Minors:** `Pool`'s docstring says *"no generation counter anywhere"* over
+    an `__init__` that declares one (`rel[]` is bumped by every FREE and folded
+    as `8 * rel[s]`) — **the true and sufficient claim is narrower: no counter in
+    the STALENESS TEST**; `arm_forgeable.c`'s `alias` flag is true of a *correct*
+    allocator; `spec.md` says *"four operations"* where everything else says
+    five; `NOTES.md` §10 compares twinned-item count against total-trusted count
+    (the gate required **3** twin sections for `p32`'s **5** trusted items;
+    `p27` and `p29` have **7** each, and §4's TCB sentence is correct); and
+    **finding 54 still carries `p32 +9/−0` with no forward pointer to `+2/−0`.**
+
+    ✅ **CLEAN NEGATIVES — named attacks that did NOT land; do not re-run.**
+    *"`p32` is `p29`'s mechanism"* (only `p32` has a free list — 1 of 28 by grep;
+    `p29` cannot double-free, `live[cur]==1` guards every walk to its `free`);
+    *"`p32` is `p27`'s mechanism with a counter"* (the closest attack — `p27`
+    mallocs per record, never recycles, cannot double-free, has no list);
+    *"the aliasing is asserted, not exhibited"* (independently replayed: cyclic
+    list + two current registers on slot 0 + a WRITE/READ round trip, on three
+    adversarial inputs and **no benign input**); *"the malloc arm's abort is the
+    teardown"*; *"the R5 is vacuous"*.
+
+    ⚠ **PROCESS, AND IT IS THE MANAGER'S:** the reviewer reports that
+    `results/SYNTHESIS.md` **changed under it mid-review**. It did — the manager
+    edited it at 07:03:57 UTC while the review was running. **No result of the
+    review depended on it** (its freshness check is the *generated* lower-case
+    file) **and the reviewer correctly did not revert it**, but the file was one
+    the review had been asked to inspect. ⚠ **Rule 11's hazard is not only
+    `git add`: it is EDITING ANY FILE A RUNNING REVIEWER WAS POINTED AT.**
+
+    Evidence: `.tasks/TASK_144_REPORT.md`, `.tasks/TASK_145_REPORT.md`,
+    `patterns/p32-free-list-pool/`, `results/gate/p32-free-list-pool.json`,
+    `.temp/mgr144-*.log`, `.temp/t145/`.
 
 ## Retracted — do not reinstate
 
