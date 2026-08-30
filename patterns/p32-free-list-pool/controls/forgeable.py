@@ -20,6 +20,16 @@ hardened guard present**, and on a five-operation input it
 non-zero if the list is still simple**, so this control cannot silently stop
 demonstrating its point.
 
+⚠⚠ **The aliasing line it prints is a LIVENESS test as of `TASK_147`, and it was
+not one before.** It read *"two ALLOCs returned the same slot"*, set from
+`allocs[i] == allocs[i-1]` -- **true of a CORRECT LIFO free list with an
+intervening FREE** -- so the sentence quoted as evidence in `../NOTES.md` 1b
+decided nothing and the C-side self-check `simple && !alias` was decided by
+`simple` alone (`TASK_145_REPORT` §6b). `arm_forgeable.c` now carries a
+`checked_out[]` bit, set at ALLOC and cleared at an accepted FREE, so `alias`
+means what its label says. The conclusion is unchanged and is now DECIDED:
+`op3` and `op4` both take slot 0 with no FREE between them.
+
 ⚠ It is the same failure `.memory/02-bench-rules.md`'s admission question 1
 forbids -- *the C kernel is CORRECT on normal inputs* -- so the variant is not a
 harder version of this row, it is a broken R1h. `../c/kernel.h`, `../spec.md`

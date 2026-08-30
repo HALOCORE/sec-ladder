@@ -13,8 +13,30 @@ C mechanism, one omitted conjunct, and the input picks the harm.
 `spec.md`'s `slb-contract` block, as `harness/check.py` hashes it:
 
 ```
-contract_sha256  80059fefdd89a443f1393e5e5ae2cbc18ce969c13d3ad80e61fea091bb365f26
+contract_sha256  4611eff514dcbd21ee3822eca242a8bff2e79e110a2340e307b4b63fba0c4aed
 ```
+
+⚠⚠ **THE HASH MOVED AT `TASK_147`, AND THIS IS THE DISCLOSURE `PROTOCOL.md`
+definition-of-done item 6 asks for** (*"if the hash changes later, say so and say
+why"*). `TASK_144` shipped
+`80059fefdd89a443f1393e5e5ae2cbc18ce969c13d3ad80e61fea091bb365f26`. **Two
+strings inside `idiom.why` moved, both of them corrections a review measured, and
+nothing else in the fenced block did:**
+
+1. the `model.py` **DERIVES** sentence, replaced with one that says what the file
+   now actually does and **retracts the old claim in the same breath** rather
+   than overwriting it — section 11;
+2. *"an input of **four** operations"* → **five**, which is what
+   `controls/arm_forgeable.c` runs (`op0..op4`) and what `NOTES.md` 1b,
+   `README.md` and `c/kernel.h` already said (`TASK_145_REPORT` §8).
+
+⚠ **The check that the move is only those two, and nothing about `required`,
+`forbidden`, `verus`, `driver`, `collapse`, `identity` or `miri`:**
+`.temp/t147/contract_diff.py` parses the `slb-contract` JSON out of `git show
+HEAD:patterns/p32-free-list-pool/spec.md` and out of the working tree and diffs
+the two dicts key by key. Its output is in `.temp/t147/contract_diff.log`, and
+unlike `TASK_144`'s disclosure it does **not** need a gitignored pre-edit
+artefact: the pre-edit `spec.md` is in `git`.
 
 ⚠⚠ **DISCLOSURE, and it is a deviation from `PROTOCOL.md`'s definition
 of done item 6.** That rule asks for the hash to be recorded *"the moment you
@@ -84,14 +106,14 @@ The reason is not taste. `controls/arm_forgeable.c` is the file-supplied-handle
 variant **with the hardened guard present**, and `controls/forgeable.py` runs it:
 
 ```
-op0 ALLOC   -> slot 0  (handle 0 | gen 0)
+op0 ALLOC   -> slot 0  (handle would be 0|gen 0)
 op1 FREE  a=0x00 -> ACCEPTED: push slot 0, nx[0]=1, freehead=0
 op2 FREE  a=0x08 -> ACCEPTED: push slot 0, nx[0]=0, freehead=0   <<< SELF-LOOP
-op3 ALLOC   -> slot 0
-op4 ALLOC   -> slot 0
+op3 ALLOC   -> slot 0  (handle would be 0|gen 2)
+op4 ALLOC   -> slot 0  (handle would be 0|gen 2)   <<< STILL LIVE ELSEWHERE
 
 free list simple: NO  <<< CYCLIC
-two ALLOCs returned the same slot: YES <<< TWO LIVE HANDLES ALIAS ONE BLOCK
+a slot was handed out while ALREADY CHECKED OUT: YES <<< TWO LIVE HANDLES ALIAS ONE BLOCK
 ```
 
 With a file-supplied handle the attacker can always spell the CURRENT
@@ -102,15 +124,38 @@ and admission question 1 requires the C kernel to be correct. The control exits
 non-zero if the variant ever stops breaking, so this paragraph cannot go stale
 quietly.
 
+⚠⚠ **THE ALIASING LINE ABOVE IS A LIVENESS TEST AS OF `TASK_147`, AND IT WAS NOT
+ONE BEFORE.** It read *"two ALLOCs returned the same slot"*, set from
+`allocs[i] == allocs[i-1]`, which is **true of a CORRECT LIFO free list with an
+intervening FREE** — so the line this paragraph quotes as evidence decided
+nothing about aliasing, and the C-side self-check `simple && !alias` was decided
+by `simple` alone (`TASK_145_REPORT` §6b: the reviewer's fixed variant printed
+`free list simple: YES` and `ALIAS ONE BLOCK` in the same breath).
+`arm_forgeable.c` now carries a `checked_out[]` bit, set at ALLOC and cleared at
+an accepted FREE. ✅ **The conclusion is unchanged and is now DECIDED rather than
+coincident**, and the pair was measured both ways at `TASK_147`:
+
+| variant | free list simple | handed out while already checked out | exit |
+|---|---|---|---|
+| shipped `arm_forgeable.c` | **NO — cyclic** | **YES** | 0 (it broke, as it must) |
+| + the reviewer's fix (refuse a FREE of a slot already free) | YES | **no** | **1 — *"did NOT break"*** |
+
+The second row is `.temp/t147/forge_neg/arm_fixed.c`; under the OLD flag it would
+have printed `simple: YES` **and** `ALIAS ONE BLOCK: YES` together, which is the
+self-contradiction that made the flag detectable.
+
 ⚠ The second deviation is smaller and is in section 9.
 
 ---
 
 ## 2. Detector coverage — the two-cell storage experiment
 
-`controls/storage_arms.py`. **One algorithm, storage the only variable**, every
-run with `LD_PRELOAD` unset, every sanitiser log read whole, and the positive
-control (a real double free of a real heap block) firing in all ten C builds.
+`controls/storage_arms.py`. **One algorithm, and storage is the only variable IN
+THE KERNEL** — ⚠ *not* the only variable in the file: section 2e enumerates the
+complete difference, which includes a 17-line teardown, and measures why the
+result does not rest on it. Every run with `LD_PRELOAD` unset, every sanitiser
+log read whole, and the positive control (a real double free of a real heap
+block) firing in all ten C builds.
 
 ```
 input            arm    C arena           C malloc            safe Rust     malloc detector
@@ -144,11 +189,21 @@ Three things at once, and each is a separate result:
 
 ⚠ **`NOT REPRO` is not a missing number, it is the result.** The
 `malloc` arm's `adv-stale-read` cell reads FREED HEAP, so its plain-build
-checksum is a function of the allocator rather than of the input: measured in one
-run of `storage_arms.py`, `malloc-plain` `33172`, `malloc-plain-clang` `33203`,
-`malloc-ubsan` `34629`, and a different value again in the run before. The ARENA
-arm is `32521` in all five of its builds and 1 distinct value in 20 runs. **No
-number from that one cell is a fact; the detector verdict is.**
+checksum is a function of the allocator rather than of the input. The ARENA arm
+is `32521` in all five of its builds and 1 distinct value in 20 runs. **No number
+from that one cell is a fact; the detector verdict is.**
+
+⚠⚠ **AND THE RECORD OF THAT CELL IS NOW EIGHT DIFFERENT NUMBERS, WHICH IS
+STRONGER THAN THE ADJECTIVE.** `TASK_144` measured `33172` / `33203` / `34629`
+(and a different set in the run before); `TASK_145`'s independent re-run gave
+`35962`; `TASK_147`'s regeneration gives `malloc-plain` **`35776`**,
+`malloc-plain-clang` **`31901`**, `malloc-ubsan` **`33017`** — ⚠ and, in the same
+script invocation, **the summary row's `malloc-plain` reads `33234` while the
+per-build matrix's `malloc-plain` reads `35776`: two runs of the SAME binary,
+seconds apart, disagree.** ⚠⚠ **None of the eight is quoted anywhere as a value.**
+They are listed here only as measurements OF the non-reproducibility, which is
+the distinction `TASK_145_REPORT` §9 found `RECAP` 55 had lost when it published
+`35094` with the same typographic status as a reproducible cell.
 
 ### 2a. What the gate's own instruments say about the SHIPPED storage
 
@@ -168,11 +223,18 @@ adversarial-stride3            clean      no UB    identical (0 kernel calls)
 
 **Every detector is silent on every input, and four of the five adversarial
 inputs return a wrong answer.** That is not an oversight and `model.py` does not
-merely assert it: its simulation computes every index the BUGGY rung would
-compute and records whether one escapes its array (`Pool._touch`), so
-`sanitizer_expect` is a derivation. None escapes, and the reason is structural —
-`regs[r]` is `NIL` or a real slot, `freehead` is `NIL` or a real slot, and `nx[]`
-only ever holds values drawn from those two.
+merely assert it: its simulation carries a handle through the index path **as
+the rungs carry it** — a slot number, or the `NIL` sentinel 255 — and touches
+every index R1 forms from one (`gen[h]`, `nx[h]`, `pool[h*BLK]`,
+`pool[h*BLK+1]`, on ALLOC's `freehead` side as well), so `sanitizer_expect` is a
+derivation. None escapes, and the reason is structural — `regs[r]` is `NIL` or a
+real slot, `freehead` is `NIL` or a real slot, and `nx[]` only ever holds values
+drawn from those two.
+
+⚠⚠ **That sentence was FALSE as shipped at `TASK_144` and section 11 is the
+repair, the must-fire arm and the retraction.** Read it before quoting this
+paragraph: the old check could not fire at all, so *"none escapes"* was a
+tautology of the model's own representation rather than a measurement.
 
 ### 2b. Why the `malloc` arm does not null the freed pointer
 
@@ -214,14 +276,76 @@ adversarial rows are excluded from the gate's agreement set because they
 *disagree*, not because they are unstable.
 
 ⚠ The contrast lives inside this pattern: the `malloc` arm's
-`adv-stale-read` cell reads freed heap and is **not** stable — one run of
-`storage_arms.py` gave `33172` / `33203` / `34629` across gcc-plain,
-clang-plain and gcc-ubsan, and the run before gave different values again, while
-the arena arm is `32521` in all five of its builds. So *"what the stale read
-returns is not reproducible"* is a property of the STORAGE, not of the bug class,
-and **p32 contains both cells**. ⚠ No count in `repro.json` is pinned
-anywhere: `p23`'s lesson is that the distinct-value count of a nondeterministic
-checksum is itself nondeterministic, so what is published is the invariant.
+`adv-stale-read` cell reads freed heap and is **not** stable — see the
+eight-value record in section 2 — while the arena arm is `32521` in all five of
+its builds. So *"what the stale read returns is not reproducible"* is a property
+of the STORAGE, not of the bug class, and **p32 contains both cells**. ⚠ No count
+in `repro.json` is pinned anywhere: `p23`'s lesson is that the distinct-value
+count of a nondeterministic checksum is itself nondeterministic, so what is
+published is the invariant.
+
+⚠⚠ **AND THE INVARIANT IS ONLY EVIDENCE BESIDE A NEGATIVE CONTROL, WHICH
+`repro.py` SHIPPED WITHOUT UNTIL `TASK_147`.** *"1 distinct in 20"* is vacuous if
+this box cannot report more than one — and nothing checked
+(`TASK_145_REPORT` §6a; the manager had demanded exactly this arm for `p28` in
+`.memory/06-catalogue.md`). `controls/arm_aslr.c` is now that arm, run through
+**the same twenty-run counter as every cell above**, and `repro.py` exits
+non-zero if it does not fire:
+
+```
+  adversarial-stale-read.bin   R1= 1/20  R1h= 1/20   R1 DIVERGES
+  ... (all seven inputs, R1 and R1h, 1/20)
+  NEGATIVE CONTROL  arm_aslr.c   20/20 distinct   randomize_va_space=2   FIRED
+```
+
+**20 of 20 on the same box in the same minute**, so the instrument is not blind
+and `p32`'s 1-of-20 is a real property. ⚠ It is deliberately *p32's own*
+`c-malloc` failure mode — free a chunk, read user offset 0, get glibc's
+safe-linked `next` derived from the heap base — so the negative control and the
+contrast in the paragraph above are **the same mechanism**, which is why it was
+chosen over an unrelated source of entropy. `TASK_145` reached the same verdict
+by a different route, using `p29`'s R1 (20/20); that route is not reproduced
+here because it couples this control to another pattern's sources.
+
+### 2e. ⚠⚠ The two storage cells do NOT differ only in storage — and the aborts are still the bug
+
+**Narrowed at `TASK_147`, on `TASK_145_REPORT` §2a's measurement.** `cc -E -P` of
+`arm_malloc.c` with and without `-DP32_ARENA` (592 vs 628 lines) gives the
+**complete** difference as six items, not five:
+
+1. `uint8_t pool[8*4]` → `uint8_t *blk[8]`;
+2. init: zero the pool → `blk[j] = NULL`;
+3. ALLOC: `+ blk[s] = malloc(4); if (blk[s] == NULL) abort();`
+4. the payload accessor, `&pool[s*4]` → `blk[s]`;
+5. FREE: `+ free(blk[h]);`
+6. ⚠ **a 17-line TEARDOWN BLOCK with no arena counterpart, which itself calls
+   `free`** — and whose own comment says it frees the lost blocks *"a SECOND
+   time"* under the buggy arm.
+
+The free list, the generations, the handle registers, the guard chain, the fold
+and the safety line are byte-identical, so **the enumerated claim in section 2 is
+exactly true**. The shorthand *"storage the only variable"*, full stop, is not,
+and it has been narrowed to *"the only variable in the kernel"* in
+`controls/storage_arms.py`, `README.md` and section 2 above.
+
+✅ **Item 6 is the one that could have mattered, and it does not: the aborts are
+the BUG, measured on the ASan frames read whole** (`TASK_145_REPORT` §2b,
+`.temp/t145/asan_traces.log`):
+
+```
+adv-doublefree / adv-alias
+  ERROR: AddressSanitizer: attempting double-free
+    #1 k_bug .../arm_body.inc:112      <- free(blk[h]) IN THE OP LOOP, the stale FREE
+  freed by thread T0 here:
+    #1 k_bug .../arm_body.inc:112      <- the same line, the first FREE
+adv-stale-read
+  ERROR: AddressSanitizer: heap-use-after-free
+    #0 k_bug .../arm_body.inc:119      <- v = P32_PAY(h)[1], the stale READ
+```
+
+**The teardown's own `free` is `arm_body.inc:148` and it appears in no trace** —
+an aborting run never reaches it. Line numbers re-verified against the shipped
+`arm_body.inc` at `TASK_147`.
 
 ---
 
@@ -330,7 +454,7 @@ property, and **no rung and no proof ever computes it.**
 
 ### 6b. The mutation battery, including an arm that MUST VERIFY
 
-`controls/proof_mutants.py`, seven arms, **7 of 7 as expected**. Run with
+`controls/proof_mutants.py`, eight arms, **8 of 8 as expected**. Run with
 `--rlimit 200`: ⚠ at the default limit a mutant whose real failure is a
 precondition reports only `Resource limit (rlimit) exceeded` on the enclosing
 loop, which cannot distinguish a memory-safety failure from a functional one —
@@ -343,8 +467,26 @@ measured on M3, and that distinction is what this whole section turns on.
 | `M2-constant-body` | **VACUITY** | fail | **fail** `12/1` | `postcondition not satisfied` |
 | `M3-nil-test` | attack | fail | **fail** `14/1` | `precondition not satisfied`, `i < v@.len()` |
 | `M4-spec-weaken` | **must-verify** | **verify** | **verify** `15/0` | — |
+| `X3-spec-only-weaken` | **ATTACK** | fail | **fail** `14/1` | `assertion failed` |
 | `M5-freehead-range` | deletion | fail | **fail** `14/1` | `precondition not satisfied` |
 | `M6-nx-init` | deletion | fail | **fail** `14/1` | `invariant not satisfied at end of loop body` |
+
+⚠⚠ **`M1`, `X3` AND `M4` ARE THREE CELLS OF ONE EXPERIMENT, AND UNTIL `TASK_147`
+THE BATTERY SHIPPED TWO OF THEM AND ASSERTED THE CONCLUSION.**
+
+| the conjunct is deleted from | verdict |
+|---|---|
+| the **exec code** only (`M1`) | **fail** `14/1` |
+| the **specification** (`step`) only (`X3`) | **fail** `14/1` |
+| **both** (`M4`) | **verify** `15/0` |
+
+`X3` is what rules out *"`step`'s conjunct is inert and the proof does not care
+about the safety line"* — it is not inert, and the two sides are tied to each
+other and to nothing outside. **So the headline is a three-cell result rather
+than a must-verify arm asserted alone.** ⚠ The arm was built by
+`TASK_145`'s review (§3, where it is `X3`) and is kept under that name so the
+citation resolves; **its verdict here was re-derived by this battery, not quoted
+from that report.**
 
 * **`M1` is the ATTACK arm the bar asks for**: it deletes `gen[h] != g` from the
   exec code and nothing else, so what survives IS `c/kernel.c`. It fails.
@@ -356,7 +498,13 @@ measured on M3, and that distinction is what this whole section turns on.
   honest statement of what this R5 buys: the safety line is load-bearing against
   the SPECIFICATION and against nothing else.** Compare `p29`, whose
   `live[cur] = 0` cannot be deleted at any price. `p42` is the precedent for
-  shipping a gap like this as the finding.
+  shipping a gap like this as the finding. ⚠ **Read it with `X3` above; alone it
+  is an assertion.**
+* **`X3-spec-only-weaken` is the middle cell.** Delete `st.gen[h] != g` from
+  `step` and leave the exec code intact — a postcondition true of the WRONG
+  program — and it **fails** `14/1` on the same `assertion failed` `M1` fails on,
+  which is what makes *"load-bearing against the specification"* a measurement
+  instead of a slogan.
 * **`M3` versus `M1` is the contrast worth reading.** `M3` disables `h == NIL`,
   so slot 255 is indexed into an 8-element array, and Verus reports a
   **precondition** failure — a memory-safety obligation. `M1` disables the
@@ -468,10 +616,29 @@ longer a refusal**; p32 is that spelling, built, and the bit-identity is section
 
 ## 10. SLB-TRUSTED-ARGUMENT sections
 
-The gate requires one per trusted item and prints it in full on every run. Three
-items here, against `p27`'s and `p29`'s seven; the four differences are that p32
-has no allocation API to borrow and therefore no `rec_alloc`/`rec_free`, and that
-`load_input`/`emit` are outside the twin regime.
+The gate requires one section per trusted item **as
+`harness/check.py::_is_trusted` defines one** — `#[verifier::external_body]`
+**with a non-empty `ensures`**, or `unsafe` in the body — and prints it in full on
+every run. **It required THREE for p32**, and there are three below.
+
+⚠⚠ **THREE IS NOT THE SAME DENOMINATOR AS SECTION 4's TCB TALLY, AND THIS
+PARAGRAPH USED TO MIX THEM.** It read *"one per trusted item … **Three** items
+here, against `p27`'s and `p29`'s **seven**"*, which both misstates the rule and
+compares p32's **section** count against p27's and p29's **item** count
+(`TASK_145_REPORT` §8). Counted:
+
+| | `#[verifier::external_body]` items | sections the gate required |
+|---|---|---|
+| `p32` | **5** | **3** |
+| `p27` | 7 | 5 |
+| `p29` | 7 | 7 |
+
+The two p32 items the gate does **not** govern are `load_input` and `emit`: they
+carry no `ensures`, so they cannot axiomatise a falsehood, which is the property
+`_is_trusted` is keyed on. **Section 4's sentence — *"TCB: FIVE items … `p27` and
+`p29` ship SEVEN"* — is the item count and is correct**; the four differences it
+names are that p32 has no allocation API to borrow and therefore no
+`rec_alloc`/`rec_free`.
 
 ## SLB-TRUSTED-ARGUMENT verus.rs buf_get_unchecked
 
@@ -555,3 +722,144 @@ and the `update` equality mention only `i`, `v` and `x`; `old`/`final` and
 `Seq::update` are Verus builtins with one meaning, and `v@` for `[T; N]` is
 `vstd::array`'s view in both configurations. Nothing is `cfg`-dependent and the
 twin differs only in its body.
+
+---
+
+## 11. ⚠⚠⚠ THE DERIVATION THAT COULD NOT FIRE — what was false, and what it is now
+
+**This is `TASK_145_REPORT` §4b landed, and it is the sharpest correction the
+review found.** It is written out at length because a forward-only fix is one
+somebody later "confirms" by finding nothing (`TASK_141` repair 2).
+
+### 11a. The claim, and where it was
+
+Shipped at `TASK_144` in **six** places — inside the HASHED `idiom.why`, in
+`README.md`, in `NOTES.md` 2a, in `model.py`'s module docstring, in
+`sanitizer_expect`'s own docstring, and in `TASK_144_REPORT` §4 — and repeated
+in `RECAP` finding 55:
+
+> ~~*"`model.py` **DERIVES** that silence rather than declaring it: its
+> simulation computes **every index the buggy rung would compute** and reports
+> whether one escapes."*~~
+
+### 11b. Why it was false — four ways, all measured
+
+`Pool.oob` was set only from `_touch(blk.slot)`. A `Block` was constructed at
+**exactly one site**, from `pop()`, which draws from a successor map over
+`0 .. SLOTS-1`. So:
+
+1. **the guard `0 <= s < SLOTS` was a TAUTOLOGY of the simulation's own
+   representation** — `TASK_145`'s 20 000 fuzzed buggy windows fired it **0**
+   times;
+2. **the one case that would have set it crashed the model.**
+   `Pool().read(Block(255))` set `oob` and then raised `IndexError` on the very
+   next line, before `sanitizer_expect` could be read — so a firing detector and
+   a broken model were indistinguishable;
+3. `gen[h]`, `nx[h]` and `regs[r]` were **not indexes that simulation computed at
+   all**, and neither was ALLOC's own `pool[s*BLK]` write, so *"every index the
+   buggy rung would compute"* was false three times over;
+4. ⚠ **`M3-nil-test`'s failure mode — the ONE memory-safety failure this row's
+   own R5 battery finds — was UNREPRESENTABLE**, because an empty register was
+   `None`, never slot 255.
+
+✅ **THE CONCLUSION WAS AND IS TRUE.** ASan, UBSan and Miri really are silent on
+all nine inputs: the gate ran them, `p27` and `p29` fire `heap-use-after-free`
+×3 each on the same machinery, and `c/kernel.c`'s own argument holds. **What was
+false was that `model.py` ESTABLISHED it.**
+
+### 11c. The repair — option (a), MAKE THE CHECK REAL
+
+The task file offered *make it real* or *retract it and declare*. **(a) was
+taken, and the reason it is reachable is the review's own diagnosis: the
+simulation was erasing the rungs' `NIL` sentinel.** A handle was a `Block` or
+`None`, and `None` is not an index — so no index the simulation could form was
+ever out of range, *by construction*. Every rung carries **255** in that slot
+instead, and 255 **is** an index.
+
+So `model.py` now carries a handle through the **index path** exactly as the
+rungs do, while the **staleness decision** stays object identity — the
+independence the row rests on is untouched:
+
+* `Pool.head_index()` — `freehead` as the rungs spell it: a slot, or `NIL`;
+* `h = NIL if blk is None else blk.slot` in `_sim_window` — the rungs' `regs[r]`;
+* `Pool.touch(name, i, limit)` — **a check about a VALUE, not a representation**:
+  the caller hands it the integer a rung would form and the extent of the array
+  it would form it into. It raises `_Escape`, which the window catches, **so a
+  firing is REPORTED instead of crashing** — defect 2 above, closed;
+* `Pool.touch_slot(h)` — the four indexes a rung derives from a slot with no
+  further test: `gen[h]`, `nx[h]`, `pool[h*BLK]`, `pool[h*BLK+1]`. Called on
+  **ALLOC's `freehead` side as well as** on FREE/READ/WRITE's — defect 3, closed;
+* plus `buf[off+p+1]` and `regs[r]` at the top of the loop.
+
+⚠ **What it derives, stated narrowly so nobody reads it as more:** the SPATIAL
+half — no index leaves an array, which is what ASan and UBSan look for. **Miri's
+silence is not derived here and does not need to be**: Miri is an instrument
+about allocations and this kernel makes no allocator call in any rung
+(`spec.md`'s `miri.reason`).
+
+### 11d. The MUST-FIRE ARM, and the gate runs it
+
+`model.py::detector_selftest()`, called from `selfcheck()`, which
+`harness/check.py::build_models` calls **once per input on every gate run** and
+fails the pattern on. Four cells, two probes written out as bytes so they depend
+on nothing in `inputs/`:
+
+| probe | guard | detector |
+|---|---|---|
+| `_PROBE_NIL` — READ/FREE a register never ALLOC'd | `h == NIL` **kept** | silent |
+| `_PROBE_NIL` | `h == NIL` **deleted** | ⚠ **fires**, `gen[h] = 255, outside [0, 8)` |
+| `_PROBE_HEAD` — 9 ALLOCs into a pool of 8 | `freehead == NIL` **kept** | silent |
+| `_PROBE_HEAD` | `freehead == NIL` **deleted** | ⚠ **fires** |
+
+The first mutation is `controls/proof_mutants.py`'s **`M3-nil-test` written in
+Python**, and `M3` is the one arm of that battery whose Verus failure is a
+memory-safety *precondition* rather than a refinement — so the two instruments
+are pointed at the same shape from opposite ends. **That is `TASK_145_REPORT`
+§4b's fourth defect closed by construction**: the shape it called
+unrepresentable is now the arm that proves the detector alive.
+
+### 11e. `TASK_145`'s own falsifier, re-run against the repair
+
+`.temp/t147/mustfire_probe.py` runs the review's 20 000-fuzzed-buggy-window sweep
+again — the sweep that gave **0 firings** against the old detector:
+
+```
+1. the four cells of detector_selftest(), re-derived      4 of 4 OK
+2. Pool().touch_slot(255)   -> _Escape('gen[h] = 255, outside [0, 8)'), oob=True
+                               (NOT IndexError -- the TASK_145 failure mode)
+3. 20 000 fuzzed buggy windows, `h == NIL` DELETED   19622 / 20000 FIRED
+4. the same 20 000 with both guards PRESENT              0 / 20000
+```
+
+**19 622 against 0, on the same sweep, with the guard as the only difference.**
+That is the two-cell form the whole pattern is built on, applied to its own
+instrument.
+
+### 11f. What did NOT move, and how that was checked
+
+⚠ `model.py` is in `harness/measure.py::measurement_sources`, so this is a
+behaviour change inside a measurement-hashed file and the burden is to show the
+answers did not move. `.temp/t147/model_before.txt` and `model_after.txt` record
+`checksum`, `sanitizer_expect`, `expected_exit`, `n_calls`, `work_per_call`,
+`nwin`, `selfcheck()` and eight `pool_fold` samples for **all nine inputs**,
+before any edit and after all of them. **`diff` is empty.** The checked path
+never touches `touch_slot` with anything but a real slot, so `_Escape` cannot be
+raised on it, and the buggy path's *result* was already discarded — only its
+`oob` is read.
+
+### 11g. The honest sentence the manager asked for
+
+`p04` is this project's exemplar of a `"clean"` `sanitizer_expect` that is
+derived and never fires, and it does the three things p32 did not: it names the
+predicate, gives the **arithmetic** reason it is always false, and says the
+derivation is the headline. ⚠ **p32 could not have copied `p04`'s reason.**
+`p04`'s predicate is false by modular arithmetic — every index is `head` or
+`tail` and every update is `(x + 1) % RING_CAP` — **a fact about the PROGRAM**.
+p32's was false because **the simulation could not represent an out-of-range slot
+at all** — a fact about the MODEL. ⚠⚠ **Those are different failures, and only
+the second is a defect**: the first is a derivation whose answer happens to be
+constant, the second is a constant wearing a derivation's clothes. The repair
+above is exactly the move from the second to the first — p32's predicate is now
+false for a reason about the program (`regs[r]` and `freehead` are `NIL` or a
+real slot, and both rungs test for `NIL`), and the must-fire arm is what
+distinguishes the two cases from the outside.

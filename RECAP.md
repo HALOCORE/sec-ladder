@@ -4599,11 +4599,43 @@ the number.** Two task files have already sent an agent to the wrong finding.
     `controls/storage_arms.py` states two files away, about clang eliminating
     `p31`'s malloc pair.** ⚠ **And it is the manager's own rule-9 failure mode:
     the claim WAS re-run (the gate agrees the answer is `clean`) but the DESIGN
-    was not attacked, and the design is where it fails.** ⚠ **The sentence is
+    was not attacked, and the design is where it fails.** ⚠ **The sentence was
     inside `contract_sha256`, and also in `README.md`, `NOTES.md` 2a and
-    `TASK_144_REPORT` §4 — repair costs a hash move, `report.py` and a re-gate;
-    `model.py` is ALSO in `measurement_sources`, so making the check REAL costs a
-    `p32` re-measure. Bundled into `TASK_147`.**
+    `TASK_144_REPORT` §4.**
+
+    ✅✅✅ **REPAIRED AT `TASK_147`, AND THE ENGINEER TOOK THE HARDER OPTION —
+    IT MADE THE CHECK REAL RATHER THAN RETRACTING THE CLAIM.** `touch(name, i,
+    limit)` is now a check about a **VALUE**: the caller hands it the integer the
+    rung would form and the extent of the array, so **nothing in it knows how the
+    simulation stores a handle.** The rungs' `NIL = 255` is now representable and
+    `touch_slot` covers `gen[h]`, `nx[h]`, `pool[h*BLK]` and `pool[h*BLK+1]` on
+    ALLOC's side too. **`TASK_145`'s own 20 000-window falsifier — `0` firings
+    against the old detector — now gives `19 622/20 000` with `h == NIL` deleted
+    and `0/20 000` with both guards present.** The claim is **retracted, not
+    overwritten**, in all six places including the hashed `why`.
+    ✅ **THE MUST-FIRE ARM IS `detector_selftest()`, AND IT RUNS FOUR CELLS, TWO
+    PER GUARD** — silent with the guard present, **fires** with it deleted — from
+    `selfcheck()`, which the gate runs **once per input on every invocation**.
+    **A detector stuck permanently ON fails it just as one stuck OFF does.**
+    ⚠ **Manager-verified ADVERSARIALLY, because a repair for *"a check that
+    cannot fire"* owes the same test as the thing it repaired**
+    (`.temp/mgr151/`): four mutations planted into a *copy* — `touch` neutered,
+    `touch` always raising, the upper bound dropped, the predicate made
+    constant-`True` — and **all four make the gate FAIL** (`check.py:2387` calls
+    `sb(m.selfcheck)`, and `sb` propagates).
+    ⚠ **MINOR, recorded and deliberately NOT repaired: three of the four fail by
+    CRASHING inside the simulation rather than returning the designed message, so
+    the failure is loud and the DIAGNOSTIC is lost.** Fixing it costs a
+    re-measure for a diagnostic; **it is free to get right in the next pattern
+    that builds one, and `TASK_146` is that pattern.**
+    ✅ **The class was then SWEPT: across all 28 patterns exactly TWO derive a
+    `sanitizer_expect` that never fires — `p32` and `p04` — and `p04` is the
+    EXEMPLAR, not a defect** (`.temp/mgr150/audit_derived_checks.py`; four more
+    patterns `return "clean"` outright, which is an honest declaration, and the
+    other 22 derive and fire). ⚠⚠ **`p04`'s predicate is false by a fact about
+    the PROGRAM; `p32`'s was false by a fact about the MODEL. Only the second is
+    a defect — and the two are indistinguishable from outside WITHOUT A MUST-FIRE
+    ARM.** **Full rule: `.memory/03-measurement.md` entry 19.**
 
     ⚠⚠⚠ **THE PROOF-SIDE FINDING, AND IT IS NEW: WHEN THE PROGRAM OWNS ITS
     STORAGE THROUGHOUT, VERUS HAS NO LINEAR RESOURCE TO ATTACH THE SAFETY LINE

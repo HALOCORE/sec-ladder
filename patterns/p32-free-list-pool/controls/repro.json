@@ -6,12 +6,13 @@
     "patterns/p32-free-list-pool/c/kernel.c": "9676b36aa28f42299add3275f7ff715aac699f6a1a2cd8fbb53ff15f5eec7e63",
     "patterns/p32-free-list-pool/c/kernel_hardened.c": "20be02f6225dfe7958fe03d2b69edc5fbdd76e8c8855cb2d1d18ab08932bcb15",
     "patterns/p32-free-list-pool/c/main.c": "9b5259192ddba59a91fbf1b736c6c007726216ea35b60542a79a6f9c852b1911",
-    "patterns/p32-free-list-pool/inputs/gen.py": "6657c70befe08ca62109783e9ff92c66c302c549ff3cdce6f0333ed60ad6de45",
-    "patterns/p32-free-list-pool/controls/repro.py": "0d2e892baf1a372f16fb46a75399d3756a7f37d01c16bd0b68e91a73ad12a3b1",
+    "patterns/p32-free-list-pool/inputs/gen.py": "6115e8cf4c54ac02285f51fbb3553f2e1963ed8bcf07762e69cea459b4c1df58",
+    "patterns/p32-free-list-pool/controls/repro.py": "f4b9edd54b83e0bb10c744d2a461151c5574bd400ce356156942260e2b83ce7a",
+    "patterns/p32-free-list-pool/controls/arm_aslr.c": "4c3109613459a8b0ff382f27a5c98b7fef6f1a1d06c1dd2564864453897b6b96",
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3"
   },
   "runs": 20,
-  "measured_utc": "2026-08-30T05:21:02Z",
+  "measured_utc": "2026-08-30T12:06:13Z",
   "rows": [
     {
       "input": "adversarial-stale-read.bin",
@@ -140,6 +141,17 @@
       "R1_diverges": false
     }
   ],
+  "negative_control": {
+    "arm": "controls/arm_aslr.c",
+    "distinct": 20,
+    "runs": 20,
+    "exit_codes": [
+      0
+    ],
+    "randomize_va_space": "2",
+    "fired": true,
+    "what": "reads user offset 0 of a freed tcache chunk, which holds a safe-linked next pointer derived from the heap base. It MUST give more than one distinct value in N runs; if it gives one, the 20-run instrument above is blind and p32's 1-of-20 claim proves nothing."
+  },
   "unstable_cells": [],
-  "invariant": "EVERY cell is stable at 1 distinct value in N runs, R1 and R1h alike, on every input including the five adversarial ones -- because p32's storage is a local array and no heap address reaches the answer. R1 nevertheless DIVERGES from R1h on all five adversarial inputs. \u26a0 The COUNTS above are one draw and are not pinned anywhere; what ../NOTES.md publishes is this invariant. The CONTRAST is controls/storage_arms.py's `malloc` arm, whose adv-stale-read cell reads freed heap and is NOT stable."
+  "invariant": "EVERY cell is stable at 1 distinct value in N runs, R1 and R1h alike, on every input including the five adversarial ones -- because p32's storage is a local array and no heap address reaches the answer. R1 nevertheless DIVERGES from R1h on all five adversarial inputs. \u26a0 The COUNTS above are one draw and are not pinned anywhere; what ../NOTES.md publishes is this invariant. The CONTRAST is controls/storage_arms.py's `malloc` arm, whose adv-stale-read cell reads freed heap and is NOT stable. \u26a0\u26a0 AND THE INVARIANT IS ONLY EVIDENCE BESIDE THE NEGATIVE CONTROL: `negative_control` above runs arm_aslr.c through the SAME counter and must report MORE than one distinct value, or this instrument is blind and nothing here means anything. Added at TASK_147; TASK_145_REPORT 6a is where the gap was found."
 }

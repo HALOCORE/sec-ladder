@@ -27,7 +27,11 @@ pointer, but it can name an operation that saves one* -- applied to a pool.
 `../c/kernel.h` and `../NOTES.md` 1b argue it and measure the alternative.
 
 The safety line R1 omits, and the only thing it omits, is `gen[h] != g` at the
-three handle-consuming sites:
+ONE site the three handle-consuming opcodes share (⚠ this line said *"at the
+three handle-consuming sites"* until `TASK_147`, which is `TASK_145_REPORT` M2's
+wording one file over: FREE, READ and WRITE share the handle decode, so they
+share the guard and the omission is ONE source line -- `../controls/
+safety_line.py` fails if `gen[h] != g` appears at other than exactly one site):
 
     R1   if (h == NIL) { ... } else { ... }
     R1h  if (h == NIL) { ... } else if (gen[h] != g) { ... } else { ... }

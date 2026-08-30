@@ -20,7 +20,9 @@ it is the row's headline rather than a defect.**
 
 ## The row in one table
 
-`controls/storage_arms.py`, one algorithm, storage the only variable:
+`controls/storage_arms.py`, one algorithm, **storage the only variable in the
+kernel** — ⚠ the two cells also differ by a 17-line teardown that has no arena
+counterpart, and `NOTES.md` 2a2 measures why that does not touch the result:
 
 | input | C arena (bug) | C malloc (bug) | safe Rust (bug) | C fix | malloc detector |
 |---|---|---|---|---|---|
@@ -48,9 +50,15 @@ Three results, and each is separate:
 
 ⚠ And on the SHIPPED storage: **ASan, UBSan and Miri are silent on all
 nine inputs**, while four of them return a wrong answer and two of them produce
-two live handles naming one block. `model.py` *derives* that silence — its
-simulation computes every index the buggy rung would compute and checks whether
-one escapes — rather than declaring it.
+two live handles naming one block. `model.py` *derives* the spatial half of that
+silence rather than declaring it: it carries a handle through the index path as
+the **rungs** carry it — a slot number, or the `NIL` sentinel 255 — and touches
+`gen[h]`, `nx[h]`, `pool[h*BLK]` and `pool[h*BLK+1]` on both the ALLOC side and
+the FREE/READ/WRITE side. **And the check can fire**: delete either `NIL` guard
+and it reports `fires`, which `model.py::detector_selftest()` does on every gate
+run. ⚠⚠ **Until `TASK_147` it could not** — the guard was a tautology of the
+simulation's own representation (`TASK_145_REPORT` §4b). The verdict did not
+move; the evidence for it did. `NOTES.md` 11.
 
 ## Why it is not `p27` and not `p29`
 
@@ -76,10 +84,17 @@ C-mechanism distinction this row rests on.**
   the conjunct's presence; the safety line is load-bearing against the
   specification and against nothing else. `p42` is the precedent for shipping
   that as the finding. `NOTES.md` 6.
+  ⚠⚠ **And it is a THREE-CELL result, not one arm**: exec-only → **fail**
+  (`M1`), spec-only → **fail** (`X3-spec-only-weaken`), both → **verify**
+  (`M4`). `X3` is what rules out *"`step`'s conjunct is inert"*; it was found
+  by `TASK_145`'s review and added at `TASK_147`.
 * ⚠ **R1's checksum is REPRODUCIBLE**, 1 distinct value in 20 runs on
   every input — a property neither built temporal row has, because p32's answer
   contains no heap address. Its adversarial rows are excluded from the gate's
   agreement set because they *disagree*, not because they are unstable.
+  ⚠ **Against a NEGATIVE CONTROL that gives 20 distinct in 20** on the same box
+  in the same minute (`controls/arm_aslr.c`, `randomize_va_space = 2`), so the
+  instrument is not blind. It shipped without one until `TASK_147`.
 
 ## Where to look
 
@@ -96,6 +111,9 @@ C-mechanism distinction this row rests on.**
 - `controls/forgeable.py` — why the file names a handle REGISTER: the
   file-supplied-handle variant's **hardened** kernel self-loops its own free list
   in five operations.
-- `controls/proof_mutants.py` — the R5 battery: an ATTACK arm that must fail, a
-  VACUITY arm that must fail, and the spec-weakening arm that must verify.
-- `controls/repro.py` — 20-run reproducibility, R1 and R1h, every input.
+- `controls/proof_mutants.py` — the R5 battery, **eight arms, 8 of 8 as
+  expected**: an ATTACK arm that must fail, a VACUITY arm that must fail, and the
+  exec-only / spec-only / both triple whose third cell must verify.
+- `controls/repro.py` — 20-run reproducibility, R1 and R1h, every input,
+  **plus `controls/arm_aslr.c`, the negative control that must give more than
+  one value or every count above it is vacuous**.

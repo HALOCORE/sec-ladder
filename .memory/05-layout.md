@@ -761,6 +761,37 @@ was pure path prefix with ZERO content lost (5342/5342 pairs identical), and
 they re-derive the census's deduplicated population `299 / 94 / 2162` exactly,
 which a digest-of-digests could not.**
 
+✅ **`harness/tools/contract_diff.py` (`TASK_147` session, promoted by the
+manager from `.temp/t147/contract_diff.py` and generalised from one hardcoded
+pattern to any).** `PROTOCOL.md`'s definition-of-done item 6 asks a task that
+moves a `contract_sha256` to say **what** moved; until now each task answered
+that its own way and **the answers were not reproducible**. ⚠⚠ **`TASK_144`'s
+disclosure needed the output of a generator living in a gitignored `.temp/`
+directory, and `TASK_145_REPORT` §11 recorded that the reviewer COULD NOT
+REPRODUCE IT — *"a real gap in the evidence chain"*.** ✅ **This needs nothing
+but `git`**: a committed pattern's pre-edit `spec.md` is
+`git show <ref>:patterns/<p>/spec.md`, so the comparison is available to anyone
+with the repository forever. It parses the `slb-contract` JSON from both sides,
+walks the dicts key by key recursing into `idiom`, prints the **minimal changed
+span** of a long string rather than the whole thing, and recomputes the block
+sha256 **with `check.py::read_contract`'s own regex** so the number it prints is
+the number the gate prints. `--all` sweeps every pattern and exits 1 if any
+moved. ✅ **First use confirmed `TASK_147`'s disclosure independently: only
+`idiom.why` moved, and `1 of 28` patterns' contract blocks moved at all.**
+
+⚠⚠ **AND IT REPLACES A GENERATOR THAT IS NOW SKEWED FROM ITS ARTEFACT.**
+`p32`'s `spec.md` was generated once by `.temp/t144/spec/mkspec.py` and has since
+been **hand-edited twice** (`TASK_144`, `TASK_147`), so **re-running that script
+today would revert both edits.** ✅ **DECISION: `p32`'s `spec.md` is
+HAND-MAINTAINED, and `.temp/t144/spec/mkspec.py` is SUPERSEDED — do not re-run
+it.** ⚠ **`p27` and `p29` promoted their generators into
+`patterns/*/controls/mkspec.py`; `p32` did not, and the replacement is better
+for the purpose that mattered** — a generator proves how a file was first
+written, `contract_diff.py` proves what changed since, and only the second
+survives hand-editing. ⚠ **A new pattern should still promote its generator if
+it has one; the point is that `spec.md` being hand-maintained is now a RECORDED
+state rather than an undisclosed skew.**
+
 ⚠ **`harness/tools/temp_citations.py` had TWO defects and both are fixed
 (`TASK_132`): it matched `.temp/` ANYWHERE in a line, so an absolute path into
 ANOTHER repository's `.temp/` false-positived; and it could not see a path a

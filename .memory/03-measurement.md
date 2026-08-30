@@ -3089,6 +3089,67 @@ already been struck.** Keep the list, not the ordinal.
     nothing about whether re-running them yields the same numbers.** Those are
     different properties and this project has now conflated them twice.
 
+19. ⚠⚠⚠ **A CHECK CAN BE A TAUTOLOGY OF THE REPRESENTATION IT IS WRITTEN
+    OVER — AND THEN IT CANNOT FIRE, WHILE READING EXACTLY LIKE A DERIVATION.**
+    `TASK_145` M1 on `p32`, repaired at `TASK_147`.
+
+    `model.py` claimed — **in six places, two of them inside
+    `contract_sha256`** — to *"compute every index the buggy rung would compute
+    and report whether one escapes"*. Its guard was `0 <= s < SLOTS` over a slot
+    drawn, by construction, **from a successor map over `0..SLOTS-1`**.
+
+    ```
+    firings in 20 000 fuzzed BUGGY windows, old detector:        0
+    the one input that would have set it (`read(Block(255))`):   crashes the
+                                                                 model first
+    indexes the rungs form that it never touched:  gen[h], nx[h], regs[r]
+    the R5 battery's own memory-safety failure (M3-nil-test):    unrepresentable
+    ```
+
+    ⚠⚠ **The CONCLUSION was true — the sanitisers really are silent — and the
+    EVIDENCE CLAIM was false.** That combination is what makes this class hard to
+    see: nothing downstream is wrong, so nothing downstream complains.
+
+    > ⚠⚠⚠ **THE RULE: whatever a model DERIVES rather than DECLARES owes an arm
+    > that SHOWS IT FIRING. A predicate written over the model's own
+    > representation cannot see anything that representation cannot express, and
+    > "it never fires" is indistinguishable from "it cannot fire" from outside.**
+    > ✅ **DECLARING IS HONEST. A derivation that cannot fire is not.**
+
+    ✅ **The tree contains the exemplar, and it is `p04`** — measured across all
+    28 patterns (`.temp/mgr150/audit_derived_checks.py`): six declare `fires` on
+    no input; **four (`p01`, `p08`, `p22`, `p47`) `return "clean"` outright,
+    which is an honest declaration**; **two derive and never fire, `p04` and
+    `p32`**; the other 22 derive and fire. **`p04` is not a defect**: it names
+    its predicate, gives the **arithmetic** reason it is always false (*"that is
+    arithmetic and not luck"* — every index is `head` or `tail`, every update is
+    `(x + 1) % RING_CAP`), and says the `"clean"` derivation **is the headline
+    rather than a gap**. ⚠ **`p04`'s predicate is false by a fact about the
+    PROGRAM; `p32`'s was false by a fact about the MODEL. Only the second is a
+    defect — and the two are indistinguishable from outside WITHOUT A MUST-FIRE
+    ARM.**
+
+    ✅ **What the repair looks like** (`p32`'s, and it is the shape to copy):
+    `touch(name, i, limit)` became a check about a **VALUE** — the caller hands
+    it the integer the rung would form and the extent of the array — so
+    **nothing in it knows how the simulation stores a handle**; the sentinel
+    `NIL = 255` became representable; and `detector_selftest()` runs **four
+    cells, two per guard** — silent with the guard present, **fires** with it
+    deleted — from `selfcheck()`, which the gate runs once per input on **every**
+    invocation. The same 20 000-window sweep now fires **19 622** times with
+    `h == NIL` deleted and **0** with both guards present.
+
+    ⚠ **AND THE ARM OWES THE SAME TEST AS THE THING IT REPAIRS.**
+    ✅ Manager-verified adversarially (`.temp/mgr151/`): four mutations planted
+    into a copy — `touch` neutered, `touch` always raising, the upper bound
+    dropped, the predicate made constant-`True` — and **all four make the gate
+    FAIL**, because `check.py:2387` calls `sb(m.selfcheck)` and `sb` propagates.
+    ⚠ **But three of the four fail by CRASHING inside the simulation rather than
+    returning the designed message, so the failure is loud and the DIAGNOSTIC is
+    lost.** **Next time, wrap the mutation run so an exception becomes the
+    designed problem string** — a crash and a firing are different failure modes
+    and only one of them says what happened.
+
 
 ## ⚠ A number GREPPED OUT OF A LOG is not a number READ OUT OF A RECORD
 

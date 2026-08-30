@@ -70,9 +70,16 @@
  *         3 WRITE: same guard; pool[h*BLK+1] = a*13+3 ; acc = acc*31 + 3
  *   return acc*31 + nalloc
  *
- * **ONE OMITTED CONJUNCT, `gen[h] == g`, AT THREE SITES, AND IT CARRIES TWO BUG
- * CLASSES SELECTED BY THE INPUT.** That is `p29`'s shipped shape on unrelated
- * code:
+ * **ONE OMITTED CONJUNCT, `gen[h] == g`, AT ONE SITE, AND IT CARRIES TWO BUG
+ * CLASSES SELECTED BY THE INPUT.** FREE, READ and WRITE all consume the handle
+ * in register `r`, so they share its decode and they share the one guard above;
+ * the omission is ONE source line, not three. ⚠ **This sentence said THREE
+ * SITES until `TASK_147`** -- stale text from `TASK_143`'s demonstration, which
+ * had three handle-consuming sites and a `+9/-0` diff. The shipped row has one
+ * and diffs `+2/-0`, `../controls/safety_line.py` FAILS if `gen[h] != g` appears
+ * at other than exactly one site, and `TASK_145_REPORT` M2 found that the one
+ * file the gate prints as the kernel contract was the one file wrong about the
+ * row's central number. That is `p29`'s shipped shape on unrelated code:
  *
  *   FREE with a stale handle   the block is pushed onto the free list a SECOND
  *                              time.  `nx[h] = freehead` with `freehead == h`
@@ -140,7 +147,8 @@
  *
  * Two C rungs share this declaration:
  *
- *   c/kernel.c           R1  -- `if (h == NIL)` alone at all three sites. THE BUG.
+ *   c/kernel.c           R1  -- `if (h == NIL)` alone at the ONE shared site.
+ *                               THE BUG.
  *   c/kernel_hardened.c  R1h -- the same, plus `else if (gen[h] != g)`, and that
  *                               is the whole difference between the two cells.
  *                               ../controls/safety_line.py PREPROCESSES both and

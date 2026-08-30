@@ -25,6 +25,12 @@ history say why: `p42`'s ghost ledger verified `18/0` while leaking, and
     `PointsTo` to consume and no precondition to discharge -- which is the
     opposite of `p29`, where deleting `live[cur] = 0` makes the invariant
     unprovable no matter what the spec says. ../NOTES.md 6b.
+  * ⚠⚠⚠ **AND `M4` IS ONLY A RESULT BESIDE `M1` AND `X3-spec-only-weaken`.**
+    Three cells of one experiment: **exec-only -> FAIL** (`M1`), **spec-only ->
+    FAIL** (`X3`), **both -> VERIFY** (`M4`). Until `TASK_147` the battery
+    shipped the first and the third and asserted the conclusion; `X3` is the one
+    that rules out *"`step`'s conjunct is inert"*, and it was found by
+    `TASK_145`'s review, not by this file.
   * **MUST-VERIFY controls** (`M0`) make sure a failure is caused by the
     mutation and not by an unachievable postcondition or a broken harness.
 
@@ -129,7 +135,23 @@ MUTANTS = [
      "nothing and therefore has no linear resource whose consumption could "
      "force it. Compare p29, whose `live[cur] = 0` cannot be deleted at any "
      "price -- `rec_free` has consumed the permission and no spec change brings "
-     "it back. `p42` is the precedent for shipping this as a finding."),
+     "it back. `p42` is the precedent for shipping this as a finding. ⚠ Read "
+     "it with X3-spec-only-weaken below: M1, X3 and M4 are three cells of ONE "
+     "experiment and M4 alone is an assertion."),
+    ("X3-spec-only-weaken", "attack", "fail", [(SPEC_GUARD, SPEC_NOGUARD)],
+     "⚠⚠ **THE THIRD CELL, and it is what turns M4 from an assertion into a "
+     "result.** Delete `st.gen[h] != g` from the abstract machine `step` ONLY, "
+     "leaving the exec code intact -- a postcondition true of the WRONG "
+     "program. It must FAIL, and it does. With M1 (exec only -> fail) and M4 "
+     "(both -> verify) that gives EXEC-ONLY FAIL / SPEC-ONLY FAIL / BOTH "
+     "VERIFY, which is the difference between *the proof does not care about "
+     "the safety line* -- false -- and *the safety line is load-bearing "
+     "against the specification and against nothing else* -- true. `step`'s "
+     "conjunct is NOT inert; the two sides are tied to each other and to "
+     "nothing outside. ⚠ This arm is `TASK_145_REPORT` §3's `X3`, kept under "
+     "the reviewer's name so that citation resolves; the shipped battery "
+     "lacked it, and its verdict here is RE-DERIVED by this script rather "
+     "than quoted from that report."),
     ("M5-freehead-range", "deletion", "fail", [(FREEHEAD_INV, "")],
      "delete the whole range invariant from the loop. `freehead`, `nx[]` and "
      "`regs[]` are then unconstrained and every unchecked index loses its "
@@ -218,8 +240,11 @@ def main():
                "and that is the finding rather than a defect: p32's safety line "
                "is load-bearing against the specification alone, because the "
                "pattern allocates nothing and has no linear resource to "
-               "consume. M3 is the contrast case -- the one arm that fails for "
-               "a memory-safety reason.",
+               "consume. THE THREE-CELL FORM IS WHAT MAKES THAT A RESULT: "
+               "M1 exec-only FAIL, X3-spec-only-weaken spec-only FAIL, M4 both "
+               "VERIFY -- so `step`'s conjunct is not inert and the two sides "
+               "are tied to each other. M3 is the contrast case -- the one arm "
+               "that fails for a memory-safety reason.",
            "summary": {"n": len(rows), "as_expected": sum(r["ok"] for r in rows)}}
     out = os.path.join(HERE, "proof_mutants.json")
     json.dump(doc, open(out, "w"), indent=2)

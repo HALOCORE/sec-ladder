@@ -7,9 +7,12 @@
  * ../c/kernel.h and ../spec.md say why, and this file is the evidence:
  *
  *   **with a file-supplied handle the HARDENED kernel self-loops its own free
- *   list on an input of four operations**, because the attacker can always
+ *   list on an input of five operations**, because the attacker can always
  *   spell the CURRENT incarnation of a block that is already free, and
  *   `gen[h] == g` then passes on a block that is on the list.
+ *
+ * (⚠ *five*, corrected at TASK_147 from *four*, against `ops[]` below, which
+ * runs `op0..op4`. TASK_145_REPORT 8.)
  *
  * That is not a harder version of this row. It is a broken R1h, and the
  * admission bar's question 1 asks the C kernel to be correct on benign inputs
@@ -44,8 +47,21 @@ int main(void)
     uint8_t freehead = 0;
     size_t j;
     uint64_t acc = 0;
-    int allocs[8];
-    int nal = 0;
+    /* ⚠ `checked_out[s]` is a LIVENESS bit, and it exists because the flag it
+     * replaced was not one. Until TASK_147 this file set `alias` from
+     * `allocs[i] == allocs[i - 1]` -- *"two consecutive ALLOCs returned the same
+     * slot"* -- which is TRUE OF A CORRECT LIFO FREE LIST with an intervening
+     * FREE, so the printed line quoted as evidence in ../NOTES.md 1b decided
+     * nothing about aliasing and the C-side self-check `simple && !alias` was
+     * decided by `simple` alone (TASK_145_REPORT 6b; the reviewer's fixed
+     * variant printed `free list simple: YES` and `ALIAS ONE BLOCK` in the same
+     * breath). The bit below is set at ALLOC and CLEARED at an accepted FREE, so
+     * `alias` now means what its label says: a slot handed out twice while the
+     * first handle was still live. On the real transcript op3 and op4 both take
+     * slot 0 with no FREE between them, so the conclusion is unchanged -- it is
+     * now DECIDED rather than coincident. */
+    int checked_out[SLOTS];
+    int alias = 0;
     /* (opcode, operand). Opcodes: 0 ALLOC, 1 FREE, 2 READ, 3 WRITE.
      * The operand IS the handle for 1/2/3: slot in the low 3 bits, generation
      * above. Four operations:
@@ -63,6 +79,7 @@ int main(void)
     for (j = 0; j < SLOTS; j++) {
         nx[j] = (uint8_t)((j + 1 < SLOTS) ? (j + 1) : NIL);
         gen[j] = 0;
+        checked_out[j] = 0;
         pool[j * BLK] = 0;
         pool[j * BLK + 1] = 0;
         pool[j * BLK + 2] = 0;
@@ -82,10 +99,13 @@ int main(void)
                 freehead = nx[s];
                 pool[(size_t)s * BLK + 1] = (uint8_t)(a * 7u + 1u);
                 acc = acc * 31 + (uint64_t)s;
-                if (nal < 8)
-                    allocs[nal++] = s;
+                /* THE LIVENESS TEST: was this slot already checked out? */
+                if (checked_out[s])
+                    alias = 1;
+                checked_out[s] = 1;
                 printf("  op%zu ALLOC   -> slot %u  (handle would be "
-                       "%u|gen %u)\n", j, s, s, gen[s]);
+                       "%u|gen %u)%s\n", j, s, s, gen[s],
+                       alias ? "   <<< STILL LIVE ELSEWHERE" : "");
             }
         } else {
             /* THE HARDENED GUARD, present. */
@@ -97,6 +117,7 @@ int main(void)
                 gen[h] = gen[h] + 1;
                 nx[h] = freehead;
                 freehead = h;
+                checked_out[h] = 0;      /* the handle is released */
                 acc = acc * 31 + 1;
                 printf("  op%zu FREE  a=0x%02x -> ACCEPTED: push slot %u, "
                        "nx[%u]=%u, freehead=%u%s\n", j, a, h, h, nx[h], freehead,
@@ -113,8 +134,7 @@ int main(void)
          * computes, and the one the shipped design keeps true. */
         uint8_t seen[SLOTS];
         uint8_t t = freehead;
-        int simple = 1, alias = 0;
-        int i;
+        int simple = 1;
         for (j = 0; j < SLOTS; j++)
             seen[j] = 0;
         while (t != NIL) {
@@ -122,11 +142,8 @@ int main(void)
             seen[t] = 1;
             t = nx[t];
         }
-        for (i = 1; i < nal; i++)
-            if (allocs[i] == allocs[i - 1])
-                alias = 1;
         printf("\n  free list simple: %s\n", simple ? "YES" : "NO  <<< CYCLIC");
-        printf("  two ALLOCs returned the same slot: %s\n",
+        printf("  a slot was handed out while ALREADY CHECKED OUT: %s\n",
                alias ? "YES <<< TWO LIVE HANDLES ALIAS ONE BLOCK" : "no");
         printf("  checksum %llu\n", (unsigned long long)acc);
         if (simple && !alias) {

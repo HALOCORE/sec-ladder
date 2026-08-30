@@ -4,20 +4,54 @@ headline.**
 
     python3 patterns/p32-free-list-pool/controls/storage_arms.py
 
-ONE ALGORITHM, FOUR ARMS, STORAGE THE ONLY VARIABLE
----------------------------------------------------
-  `c-arena`      the SHIPPED C kernels, R1 and R1h, exactly as `harness/
-                 build.py` builds them: the pool is `uint8_t pool[SLOTS*BLK]`.
-  `c-malloc`     `arm_malloc.c`, which is `c/kernel.c` with the pool
-                 replaced by `uint8_t *blk[SLOTS]`, one `malloc` per ALLOC and
-                 one `free` per FREE. The free list, the generations, the handle
-                 registers, the fold and the safety line are byte-identical;
-                 `arm_body.inc` is included TWICE, with `P32_HARDEN` 0 and 1,
-                 so the two arms of THAT file also differ by the safety line
-                 alone.
+ONE ALGORITHM, FOUR ARMS, STORAGE THE ONLY VARIABLE **IN THE KERNEL**
+---------------------------------------------------------------------
+  `c-arena`      ⚠ **`arm_malloc.c` compiled with `-DP32_ARENA`, NOT the shipped
+                 `c/kernel.c`.** `build()` below never compiles a file out of
+                 `../c/`, and `harness/build.py` is not called from this script
+                 at all. The kernel body is `arm_body.inc`, transcribed from
+                 `c/kernel.c`, with the pool as `uint8_t pool[SLOTS*BLK]`.
+                 ⚠⚠ **This entry claimed to be *"the SHIPPED C kernels, R1 and
+                 R1h, exactly as `harness/build.py` builds them"* until
+                 `TASK_147`** -- `TASK_145_REPORT` M3, and `PROTOCOL` rule 13's
+                 *"only the body gets maintained"* shape exactly, because the
+                 inline comment in `build()` 100 lines below already said the
+                 truth. ✅ **The gap was then CLOSED BY MEASUREMENT rather than
+                 by argument, and the headline is unharmed**: the reviewer drove
+                 the SHIPPED `c/kernel.c` and `c/kernel_hardened.c` on this
+                 control's own five op streams and got this control's `c-arena`
+                 numbers on **10 of 10 (input, arm) cells, 0 mismatches**
+                 (`TASK_145_REPORT` §2c; `.temp/t145/shipdrv/main_hex.c` is the
+                 driver and its own header records the one `gcc` line that
+                 rebuilds it). So the transitive claim -- safe Rust reproduces
+                 THE SHIPPED RUNG bit for bit -- holds; only this description
+                 was wrong.
+  `c-malloc`     `arm_malloc.c` with no `-DP32_ARENA`: the same file with the
+                 pool replaced by `uint8_t *blk[SLOTS]`, one `malloc` per ALLOC
+                 and one `free` per FREE. The free list, the generations, the
+                 handle registers, the guard chain, the fold and the safety line
+                 are byte-identical; `arm_body.inc` is included TWICE, with
+                 `P32_HARDEN` 0 and 1, so the two arms of THAT file also differ
+                 by the safety line alone.
   `safe-rust`    `arm_safe_bug.rs`, a `#![forbid(unsafe_code)]` port of the
                  same kernel with the same omitted conjunct.
   and the `ctl` POSITIVE CONTROL, a real double free of a real heap block.
+
+⚠⚠ **THE TWO STORAGE CELLS DO NOT DIFFER ONLY IN STORAGE, AND THE SHORTHAND IS
+NARROWED HERE RATHER THAN REPEATED.** `cc -E -P` of `arm_malloc.c` with and
+without `-DP32_ARENA` (`TASK_145_REPORT` §2a, 592 vs 628 lines) gives the
+COMPLETE difference as six items: the pool declaration, its initialisation,
+ALLOC's `malloc`, the payload accessor, FREE's `free` -- **and a 17-line
+TEARDOWN BLOCK with no arena counterpart, which itself calls `free`.** The
+enumerated claim above is exactly true; *"storage the only variable"* full stop
+is not.
+
+✅ **The aborts are nevertheless THE BUG and not the teardown, measured on the
+ASan frames read whole** (`TASK_145_REPORT` §2b, `.temp/t145/asan_traces.log`):
+`attempting double-free` is reported at `arm_body.inc:112`, the stale `free` in
+the OP LOOP, and `heap-use-after-free` at `:119`, the stale payload read --
+while **the teardown's own `free` at `:148` appears in no trace**, because an
+aborting run never reaches it.
 
 WHY IT EXISTS
 -------------
@@ -129,7 +163,17 @@ def sh(cmd):
 
 
 def build():
+    """Compile every arm and RETURN THE NAMES IT MADE.
+
+    ⚠ It used to return nothing and `main` used `os.listdir(BIN)` instead, which
+    made this control depend on nothing else ever having written to
+    `.temp/build/p32-arms` -- and `forgeable.py` writes its binary there. Any
+    stray executable would then be enumerated as a "build", run with `ctl`,
+    fail to fire the positive control, and land in `positive_control_dead_builds`
+    -- a red control caused by a neighbour. Found at TASK_147 while giving
+    `repro.py` a negative control that would have been the second one."""
     os.makedirs(BIN, exist_ok=True)
+    made = []
     src = os.path.join(HERE, "arm_malloc.c")
     sh([GCC] + CFLAGS + ["-o", os.path.join(BIN, "malloc-plain"), src])
     sh([GCC] + CFLAGS + ["-fsanitize=address", "-o",
@@ -143,7 +187,11 @@ def build():
                                os.path.join(BIN, "malloc-asan-clang"), src])
     # The ARENA arm is the same source with -DP32_ARENA, so that "the storage is
     # the only variable" is true of ONE file rather than of two files a reader
-    # has to diff.
+    # has to diff. ⚠ It is NOT ../c/kernel.c -- nothing in this function
+    # compiles anything out of ../c/, and the docstring's `c-arena` entry now
+    # says so and cites the measurement that closes the gap (TASK_145_REPORT
+    # 2c, 10/10). ⚠⚠ And the two -D arms differ by a 17-line TEARDOWN as well
+    # as by the storage; see the docstring.
     sh([GCC] + CFLAGS + ["-DP32_ARENA", "-o",
                          os.path.join(BIN, "arena-plain"), src])
     sh([GCC] + CFLAGS + ["-DP32_ARENA", "-fsanitize=address", "-o",
@@ -157,6 +205,12 @@ def build():
                                os.path.join(BIN, "arena-asan-clang"), src])
     sh([RUSTC, "-O", "--edition", "2021", "-o", os.path.join(BIN, "safe"),
         os.path.join(HERE, "arm_safe_bug.rs")])
+    made += ["malloc-plain", "malloc-asan", "malloc-ubsan",
+             "arena-plain", "arena-asan", "arena-ubsan", "safe"]
+    if os.path.exists(CLANG):
+        made += ["malloc-plain-clang", "malloc-asan-clang",
+                 "arena-plain-clang", "arena-asan-clang"]
+    return sorted(made)
 
 
 def run(binname, arm, hexin):
@@ -193,8 +247,7 @@ def derived_from():
 
 
 def main():
-    build()
-    builds = sorted(os.listdir(BIN))
+    builds = build()
     cbuilds = [b for b in builds if b != "safe"]
     rows = []
 

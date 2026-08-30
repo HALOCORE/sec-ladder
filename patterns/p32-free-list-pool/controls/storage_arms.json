@@ -5,12 +5,12 @@
   "derived_from_sha256": {
     "patterns/p32-free-list-pool/c/kernel.c": "9676b36aa28f42299add3275f7ff715aac699f6a1a2cd8fbb53ff15f5eec7e63",
     "patterns/p32-free-list-pool/c/kernel_hardened.c": "20be02f6225dfe7958fe03d2b69edc5fbdd76e8c8855cb2d1d18ab08932bcb15",
-    "patterns/p32-free-list-pool/controls/storage_arms.py": "f7b02b64215f7b1bf3646c4cd75282fd6ad70c8f54051f115597532df5990576",
+    "patterns/p32-free-list-pool/controls/storage_arms.py": "021896f67111482b3e0ea28eeacceff58d59c95db9861b04bd29ecffbd7fe2e4",
     "patterns/p32-free-list-pool/controls/arm_body.inc": "be41236d7eafb37e80589cced6cd6dd7e0d539c399f5ac50715f85796d6ab4f5",
     "patterns/p32-free-list-pool/controls/arm_malloc.c": "17f8fd2bb8780664b8bd0b6c38bb0737927789b34f7edd4550da0d703a4ab950",
     "patterns/p32-free-list-pool/controls/arm_safe_bug.rs": "0a1e94533359f2372e8fa1c7adb7b856d6ae6b6c69315bf7e6e7af8675e70cba"
   },
-  "measured_utc": "2026-08-30T05:42:09Z",
+  "measured_utc": "2026-08-30T12:06:05Z",
   "inputs": {
     "benign": "0c000000000800110218032102290130003a024201490152005b0263",
     "adv-stale-read": "040000000008001101180220",
@@ -193,7 +193,7 @@
       },
       "c_malloc_plain": {
         "rc": 0,
-        "out": "35094",
+        "out": "33234",
         "fired": [],
         "diagnostic": ""
       },
@@ -726,7 +726,7 @@
       "arm": "bug",
       "build": "malloc-plain",
       "rc": 0,
-      "out": "31002",
+      "out": "35776",
       "fired": [],
       "diagnostic": ""
     },
@@ -735,7 +735,7 @@
       "arm": "bug",
       "build": "malloc-plain-clang",
       "rc": 0,
-      "out": "31653",
+      "out": "31901",
       "fired": [],
       "diagnostic": ""
     },
@@ -744,7 +744,7 @@
       "arm": "bug",
       "build": "malloc-ubsan",
       "rc": 0,
-      "out": "37078",
+      "out": "33017",
       "fired": [],
       "diagnostic": ""
     },

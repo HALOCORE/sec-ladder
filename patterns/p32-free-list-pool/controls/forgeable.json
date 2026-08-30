@@ -3,11 +3,11 @@
     "regenerate": "python3 patterns/p32-free-list-pool/controls/forgeable.py"
   },
   "derived_from_sha256": {
-    "patterns/p32-free-list-pool/controls/arm_forgeable.c": "77dc9ca8020c6f350cf54f96fe27c3b0752f3a4640a7aa5c6f85f93a3e074f90",
-    "patterns/p32-free-list-pool/controls/forgeable.py": "8f7bf1163cda67fe26ab61f370ab3009f100f24acecd44f6ec71d38c5932f4c4",
+    "patterns/p32-free-list-pool/controls/arm_forgeable.c": "37ce6c47644b102221f8251aa6975701b9f0d426b291cc379c4523c0df3ef8db",
+    "patterns/p32-free-list-pool/controls/forgeable.py": "7cc62715137b6624bb4bfeb8029a94237b4159a7bf876ef9402d85b207afd4b7",
     "patterns/p32-free-list-pool/c/kernel_hardened.c": "20be02f6225dfe7958fe03d2b69edc5fbdd76e8c8855cb2d1d18ab08932bcb15"
   },
-  "measured_utc": "2026-08-30T05:22:07Z",
+  "measured_utc": "2026-08-30T12:06:05Z",
   "exit_code": 0,
   "hardened_kernel_broke": true,
   "transcript": [
@@ -15,10 +15,10 @@
     "  op1 FREE  a=0x00 -> ACCEPTED: push slot 0, nx[0]=1, freehead=0",
     "  op2 FREE  a=0x08 -> ACCEPTED: push slot 0, nx[0]=0, freehead=0   <<< SELF-LOOP",
     "  op3 ALLOC   -> slot 0  (handle would be 0|gen 2)",
-    "  op4 ALLOC   -> slot 0  (handle would be 0|gen 2)",
+    "  op4 ALLOC   -> slot 0  (handle would be 0|gen 2)   <<< STILL LIVE ELSEWHERE",
     "",
     "  free list simple: NO  <<< CYCLIC",
-    "  two ALLOCs returned the same slot: YES <<< TWO LIVE HANDLES ALIAS ONE BLOCK",
+    "  a slot was handed out while ALREADY CHECKED OUT: YES <<< TWO LIVE HANDLES ALIAS ONE BLOCK",
     "  checksum 30752"
   ],
   "invariant": "With a FILE-SUPPLIED (slot, generation) handle the HARDENED kernel self-loops its own free list on a five-operation input and hands two ALLOCs the same slot. That is why the shipped rungs make ALLOC issue the handle into a REGISTER and let the file name the register instead."

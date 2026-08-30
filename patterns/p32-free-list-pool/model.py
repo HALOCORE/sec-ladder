@@ -12,15 +12,48 @@ notes only where p32 differs.
     work_per_call **bytes of the window** -- `stride`, p27's and p29's
                   denomination. See the property's docstring for which way it
                   errs.
-    sanitizer     **DERIVED, and it is derived by CHECKING rather than by
-                  tabulating.** The simulation computes every index the buggy
-                  rung would compute and records whether any of them escapes its
-                  array. It never does -- see `sanitizer_expect` -- so every
-                  input this pattern ships is `clean`, adversarial ones
-                  included, and that is the row's detector-coverage result
-                  rather than a concession. `controls/storage_arms.py` rebuilds
-                  the same algorithm on `malloc` storage and measures which
-                  harms become visible when the storage changes.
+    sanitizer     **DERIVED, by CHECKING rather than by tabulating, and the
+                  check is one that CAN FIRE.** The simulation runs each window
+                  under the BUGGY semantics and touches every index R1 derives
+                  from attacker data: the window read `buf[off+p+1]`, the handle
+                  register `regs[r]`, and the four arrays a slot indexes --
+                  `gen[h]`, `nx[h]`, `pool[h*BLK]`, `pool[h*BLK+1]` -- on
+                  ALLOC's `freehead` side as well as on the FREE/READ/WRITE
+                  side. ⚠ **The handle travels that path AS THE RUNGS CARRY IT**
+                  -- a slot number, or the NIL sentinel 255 -- so an escape is
+                  REPRESENTABLE and the guard is not a tautology of the
+                  simulation's own state. None escapes on any input this pattern
+                  ships, so every one is `clean`, adversarial ones included, and
+                  that is the row's detector-coverage result rather than a
+                  concession. `controls/storage_arms.py` rebuilds the same
+                  algorithm on `malloc` storage and measures which harms become
+                  visible when the storage changes.
+
+                  ⚠⚠ **THE MUST-FIRE ARM IS `detector_selftest()`, AND
+                  `selfcheck()` RUNS IT ON EVERY GATE INVOCATION.** Disable the
+                  `h == NIL` test -- `controls/proof_mutants.py`'s `M3-nil-test`
+                  transposed into Python -- and the detector reports `fires`;
+                  disable the `freehead == NIL` test and it reports `fires`.
+                  A control that has never been shown capable of failing proves
+                  nothing, which is the rule `controls/storage_arms.py` states
+                  two files away about clang eliminating `p31`'s malloc pair.
+
+                  ⚠⚠⚠ **WHAT THIS ENTRY SAID BEFORE TASK_147, AND WHY IT WAS
+                  FALSE.** It read *"the simulation computes every index the
+                  buggy rung would compute and records whether any of them
+                  escapes its array"*, and `TASK_145_REPORT` §4b measured that
+                  claim false four ways: `Pool.oob` was set only from
+                  `_touch(blk.slot)`; a `Block` was constructed at exactly one
+                  site, from a successor map over `0..SLOTS-1`, so the guard
+                  `0 <= s < SLOTS` was **a tautology of the simulation's own
+                  representation** (0 firings in 20 000 fuzzed buggy windows);
+                  the one case that would have set it -- `Pool().read(Block(255))`
+                  -- **crashed the model** with `IndexError` before
+                  `sanitizer_expect` could be read; and `gen[h]`, `nx[h]` and
+                  `regs[r]` were not indexes the simulation computed at all.
+                  ⚠ **The CONCLUSION was true and is unchanged** -- ASan, UBSan
+                  and Miri really are silent on all nine inputs -- **what was
+                  false was that this file established it.** ../NOTES.md 11.
 
 TWO INDEPENDENT IMPLEMENTATIONS, AND THEY ARE OF DIFFERENT SHAPES ON PURPOSE.
 `TASK_136`'s model was a line-by-line transliteration of its own kernel -- same
@@ -30,7 +63,13 @@ undetected. `p29`'s model is the good example: its simulation is a purely
 functional BST whose USE test is a REACHABILITY WALK, not a liveness bit. p32
 does the same thing one axis over:
 
-  * the **simulation** (`_window`) has **NO GENERATION COUNTER AT ALL**. A block
+  * the **simulation** (`_window`) has **NO GENERATION COUNTER IN ITS STALENESS
+    TEST**. ⚠ It is not counter-free: `Pool.rel[]` counts releases per slot and
+    ALLOC folds `8 * rel[s]`, which is what makes the two implementations agree
+    on the fold. What carries no counter is the question this row is about --
+    *is this handle still current?* -- and that is the axis the independence
+    claim rests on. (`TASK_145_REPORT` §4c: the docstring used to say *"no
+    generation counter anywhere"* over an `__init__` that declares one.) A block
     is a Python object with identity (`Block`); a HANDLE is a direct reference
     to that object; a slot's current tenant is `pool.live[slot]`, which ALLOC
     sets to a *newly constructed* `Block` and FREE sets to `None`. **A handle is
@@ -125,8 +164,25 @@ class Block:
         self.slot = slot
 
 
+class _Escape(Exception):
+    """Raised the instant the simulated BUGGY rung computes an index outside one
+    of its arrays.
+
+    ⚠ **It exists so that the detector can REPORT an escape instead of crashing
+    on it.** `TASK_145_REPORT` §4b's third finding was that the one case which
+    could set the old `oob` flag -- a handle naming slot 255 -- raised
+    `IndexError` on the very next line, before `sanitizer_expect` was ever read,
+    so a firing detector and a broken model were indistinguishable. The buggy
+    run's RESULT is discarded (`Model._window` keeps only its `oob`), so
+    abandoning the window at the first escape costs nothing and is what a
+    detector, rather than an interpreter, should do."""
+
+
 class Pool:
-    """The pool, with no generation counter anywhere.
+    """The pool. **No generation counter decides staleness here** -- see the
+    module docstring; `rel[]` below is a release count that exists only so that
+    ALLOC's fold agrees with the rungs', and nothing reads it to answer *is this
+    handle still current?*
 
     `mem` is the storage and it is never cleared -- that is the pattern. `live`
     maps a slot to the `Block` currently checked out of it, or `None` while the
@@ -143,8 +199,19 @@ class Pool:
         self.nalloc = 0
         self.rel = [0] * SLOTS    # releases so far: the incarnation, counted
         self.oob = False          # did any index the BUGGY rung computes escape?
+        self.oob_sites = []       # and which one, so a firing says WHERE
 
     # -- the free list, as a map ------------------------------------------
+    def head_index(self):
+        """`freehead` AS THE RUNGS SPELL IT: a slot number, or `NIL`.
+
+        ⚠ This one-line translation is what makes the detector able to fire at
+        all. The simulation's own `head` is `None` when the list is empty, and
+        `None` is not an index -- so as long as the index path spoke the
+        simulation's language, `0 <= s < SLOTS` could never be false. Every rung
+        carries 255 in that slot instead, and 255 IS an index."""
+        return NIL if self.head is None else self.head
+
     def pop(self):
         s = self.head
         self.head = self.succ[s]
@@ -168,11 +235,20 @@ class Pool:
         return True
 
     # -- the operations ----------------------------------------------------
-    def alloc(self, a):
+    def alloc(self, a, head_test=True):
         """Take a block. Returns `(handle, fold)`; `handle` is None when the
-        pool is empty."""
-        if self.head is None:
+        pool is empty.
+
+        `head_test` is ALLOC's own guard, `freehead == NIL`. Setting it False is
+        the ALLOC-side mutation the detector self-test uses: without it `s` is
+        255 and every index below leaves its array."""
+        s = self.head_index()
+        if head_test and s == NIL:
             return None, SENT
+        # ALLOC's indexes, all derived from `freehead` and none of them checked
+        # again by any rung: `nx[s]` (the unlink), `gen[s]` (the issued
+        # generation) and the two payload bytes it writes.
+        self.touch_slot(s)
         s = self.pop()
         # the OWNER TAG and the PAYLOAD; the rest of the block is whatever the
         # previous tenant left, which is what makes the storage an arena
@@ -197,30 +273,62 @@ class Pool:
         return 1
 
     def read(self, blk):
-        self._touch(blk.slot)
         return self.mem[blk.slot][1]
 
     def write(self, blk, a):
-        self._touch(blk.slot)
         self.mem[blk.slot][1] = _written(a)
         return 3
 
     # -- the out-of-range detector ----------------------------------------
-    def _touch(self, s):
-        """Record whether the index the BUGGY rung would compute escapes the
-        pool. It never does -- `regs[r]` is NIL or a real slot in both rungs --
-        and this is what makes `sanitizer_expect` a derivation rather than a
-        tabulation."""
-        if not (0 <= s < SLOTS and 0 <= s * BLK + 1 < SLOTS * BLK):
-            self.oob = True
+    def touch(self, name, i, limit):
+        """Record whether ONE index the BUGGY rung computes escapes ONE array.
+
+        ⚠ **This is a check about a VALUE, not about a representation.** The
+        caller hands it the integer the rung would form and the extent of the
+        array the rung would form it into; nothing here knows or cares how the
+        simulation stores a handle. That is the whole of the repair
+        `TASK_145_REPORT` §4b asked for: the predecessor asked `0 <= s < SLOTS`
+        of a number drawn, by construction, from `range(SLOTS)`.
+
+        Raises `_Escape` on a firing so the caller stops rather than crashing on
+        the access it just predicted."""
+        if 0 <= i < limit:
+            return
+        self.oob = True
+        self.oob_sites.append(f"{name} = {i}, outside [0, {limit})")
+        raise _Escape(self.oob_sites[-1])
+
+    def touch_slot(self, h):
+        """Every index a rung derives from a slot number `h`, in one call.
+
+        `c/kernel.c` forms exactly these from a handle it has not re-checked --
+        `gen[h]` (read and written), `nx[h]` (written), `pool[h*BLK]` (ALLOC's
+        owner tag) and `pool[h*BLK+1]` (the payload READ and WRITE touch) -- and
+        `arr_get_unchecked`/`arr_set_unchecked` in `../unsafe.rs` and
+        `../verus.rs` do the same with no bounds test at all. `h` here is the
+        rungs' `h`: a slot, or `NIL`."""
+        self.touch("gen[h]", h, SLOTS)
+        self.touch("nx[h]", h, SLOTS)
+        self.touch("pool[h*BLK]", h * BLK, SLOTS * BLK)
+        self.touch("pool[h*BLK+1]", h * BLK + 1, SLOTS * BLK)
 
 
-def _sim_window(buf, off, ln, harden):
+def _sim_window(buf, off, ln, harden, nil_test=True, head_test=True):
     """`(result, out_of_range)` for one window, simulated with objects.
 
     `harden` selects the CHECKED semantics (R1h and R2-R5) or the BUGGY one
     (R1). The model's own answer is the checked one; the buggy one exists so
-    `inputs/gen.py` can ask whether a stream would make the two disagree."""
+    `inputs/gen.py` can ask whether a stream would make the two disagree, and so
+    that the out-of-range detector has a buggy rung to watch.
+
+    ⚠ `nil_test` and `head_test` are the two guards **both** C rungs keep --
+    `h == NIL` and `freehead == NIL`. They are knobs and not options: the
+    shipped semantics is both True, and `detector_selftest()` turns each off in
+    turn to prove the detector can fire. `nil_test=False` is
+    `controls/proof_mutants.py`'s `M3-nil-test` written in Python, and `M3` is
+    the ONE arm of that battery whose Verus failure is a memory-safety
+    precondition rather than a refinement -- so the two instruments are pointed
+    at the same shape from opposite ends."""
     if ln < HDR:
         return 0, False
     nops = int.from_bytes(buf[off:off + 4], "little")
@@ -229,35 +337,106 @@ def _sim_window(buf, off, ln, harden):
     pool = Pool()
     reg = [None] * NREG          # a handle register holds a Block, or nothing
     acc, p = 0, HDR
-    for _ in range(nops):
-        if ln - p < OPSZ:
-            break
-        c = buf[off + p]
-        a = buf[off + p + 1]
-        p += OPSZ
-        r = a % NREG
-        op = c % 4
-        if op == 0:
-            blk, fold = pool.alloc(a)
-            if blk is not None:
-                reg[r] = blk
-            acc = (acc * 31 + fold) & MASK
-        else:
-            blk = reg[r]
-            # THE SAFETY LINE, expressed WITHOUT A COUNTER: is the object this
-            # register holds still the slot's tenant?
-            current = blk is not None and pool.live[blk.slot] is blk
-            if blk is None:
-                acc = (acc * 31 + SENT) & MASK
-            elif harden and not current:
-                acc = (acc * 31 + SENT) & MASK
-            elif op == 1:
-                acc = (acc * 31 + pool.free(blk)) & MASK
-            elif op == 2:
-                acc = (acc * 31 + pool.read(blk)) & MASK
+    try:
+        for _ in range(nops):
+            if ln - p < OPSZ:
+                break
+            # the window read. Its bound is the caller's `off + len <= buf_len`
+            # plus the loop's own `len - p >= 2`, so it is not tautological --
+            # it is the one index here a DRIVER bug rather than a KERNEL bug
+            # would move.
+            pool.touch("buf[off+p+1]", off + p + 1, len(buf))
+            c = buf[off + p]
+            a = buf[off + p + 1]
+            p += OPSZ
+            r = a % NREG
+            pool.touch("regs[r]", r, NREG)
+            op = c % 4
+            if op == 0:
+                blk, fold = pool.alloc(a, head_test)
+                if blk is not None:
+                    reg[r] = blk
+                acc = (acc * 31 + fold) & MASK
             else:
-                acc = (acc * 31 + pool.write(blk, a)) & MASK
+                blk = reg[r]
+                # `h = regs[r]` AS THE RUNGS FORM IT: the slot the register
+                # names, or the NIL sentinel when it names nothing. Carrying the
+                # sentinel is what makes an escape representable at all.
+                h = NIL if blk is None else blk.slot
+                # THE SAFETY LINE, expressed WITHOUT A COUNTER: is the object
+                # this register holds still the slot's tenant?
+                current = blk is not None and pool.live[blk.slot] is blk
+                if nil_test and h == NIL:
+                    acc = (acc * 31 + SENT) & MASK
+                elif harden and not current:
+                    acc = (acc * 31 + SENT) & MASK
+                else:
+                    # R1 forms every one of these from `h` with no further test.
+                    pool.touch_slot(h)
+                    if op == 1:
+                        acc = (acc * 31 + pool.free(blk)) & MASK
+                    elif op == 2:
+                        acc = (acc * 31 + pool.read(blk)) & MASK
+                    else:
+                        acc = (acc * 31 + pool.write(blk, a)) & MASK
+    except _Escape:
+        # the buggy rung has left one of its arrays; its answer past this point
+        # is not a thing this simulation can compute, and nobody reads it.
+        return (acc * 31 + pool.nalloc) & MASK, True
     return (acc * 31 + pool.nalloc) & MASK, pool.oob
+
+
+# --------------------------------------------------------------------------
+# THE MUST-FIRE ARM. `selfcheck()` runs it, so the gate re-derives it once per
+# input on every run -- not once, by whoever wrote it.
+# --------------------------------------------------------------------------
+# Two windows, each four operations wide or fewer, written out as bytes so they
+# depend on nothing in `inputs/`. Neither is ever fed to a rung.
+_PROBE_NIL = bytes([2, 0, 0, 0,      # nops = 2
+                    2, 0,            # READ  register 0 -- never ALLOC'd
+                    1, 0])           # FREE  register 0 -- never ALLOC'd
+_PROBE_HEAD = bytes([9, 0, 0, 0] + [0, 0] * 9)   # 9 ALLOCs into a pool of 8
+
+
+def detector_selftest():
+    """Show that `Pool.touch` CAN FIRE, and that the two guards are what stop it.
+
+    ⚠⚠ **This is the arm `TASK_145_REPORT` §4b found missing, and the reason it
+    is here rather than in a report is `TASK_141` repair 2: a forward-only fix
+    is one somebody later "confirms" by finding nothing.** Four cells:
+
+      * `_PROBE_NIL` with `h == NIL` kept        -> silent (the guard folds SENT)
+      * `_PROBE_NIL` with `h == NIL` deleted     -> **fires**, `gen[h] = 255`
+      * `_PROBE_HEAD` with `freehead == NIL` kept    -> silent
+      * `_PROBE_HEAD` with `freehead == NIL` deleted -> **fires**, `gen[h] = 255`
+        (both firings are reported against `touch_slot`'s first index)
+
+    Both mutations are run under the BUGGY semantics, which is the arm
+    `sanitizer_expect` reads. The first is `controls/proof_mutants.py`'s
+    `M3-nil-test`; the second has no Verus counterpart in the shipped battery and
+    is here because ALLOC's index derivation deserves its own arm rather than
+    riding on FREE/READ/WRITE's."""
+    problems = []
+    arms = (("h == NIL", _PROBE_NIL, {"nil_test": False}, "gen[h] = 255"),
+            ("freehead == NIL", _PROBE_HEAD, {"head_test": False},
+             "gen[h] = 255"))
+    for guard, blob, mutate, want in arms:
+        _, quiet = _sim_window(blob, 0, len(blob), False)
+        if quiet:
+            problems.append(
+                f"the out-of-range detector FIRED on the `{guard}` probe with "
+                f"the guard PRESENT, which no shipped rung can do -- the probe "
+                f"or `Pool.touch` is wrong")
+        _, loud = _sim_window(blob, 0, len(blob), False, **mutate)
+        if not loud:
+            problems.append(
+                f"MUST-FIRE ARM DEAD: deleting `{guard}` from the simulated "
+                f"buggy rung did NOT make the out-of-range detector fire "
+                f"(expected {want}). `sanitizer_expect` is then a declaration "
+                f"wearing a derivation's clothes, which is exactly what "
+                f"TASK_145_REPORT 4b measured and TASK_147 repaired -- do not "
+                f"quote this pattern's `clean` as DERIVED until it fires again")
+    return problems
 
 
 class Model:
@@ -452,15 +631,35 @@ class Model:
     @property
     def sanitizer_expect(self):
         """**`clean` on every input, adversarial ones included, and it is
-        DERIVED.**
+        DERIVED BY A CHECK THAT CAN FIRE.**
 
         The simulation runs each window under the BUGGY semantics and records
         whether any index the buggy rung computes escapes its array
-        (`Pool._touch`). None ever does, and the reason is structural: `regs[r]`
-        is `NIL` or a real slot in both rungs, `freehead` is `NIL` or a real
-        slot, and `nx[]` only ever holds values drawn from those two -- so
-        `pool[h * BLK + 1]`, `gen[h]` and `nx[h]` are in bounds in every run of
-        every rung. **R1 executes no undefined behaviour at all.**
+        (`Pool.touch`, called from `Pool.touch_slot` and from `_sim_window`).
+        None ever does, and the reason is structural: `regs[r]` is `NIL` or a
+        real slot in both rungs, `freehead` is `NIL` or a real slot, and `nx[]`
+        only ever holds values drawn from those two -- so `pool[h * BLK + 1]`,
+        `gen[h]` and `nx[h]` are in bounds in every run of every rung. **R1
+        executes no undefined behaviour at all.**
+
+        ⚠⚠ **WHAT MAKES THAT A MEASUREMENT AND NOT A RESTATEMENT.** The two
+        `NIL` guards above are the only thing standing between the buggy rung
+        and an out-of-range index, and this file carries `NIL` through its index
+        path exactly as the rungs do, so **deleting either guard makes the
+        detector fire**: `detector_selftest()` does precisely that, `selfcheck()`
+        runs it, and the gate calls `selfcheck()` once per input on every run.
+        Before `TASK_147` it could not fire at all -- the guard was
+        `0 <= s < SLOTS` on a number drawn from `range(SLOTS)`, and the one
+        input that would have tripped it crashed the model instead
+        (`TASK_145_REPORT` §4b, ../NOTES.md 11). ⚠ **The verdict did not move;
+        the evidence for it did.**
+
+        ⚠ **What it does NOT derive, said so nobody reads it as more.** It
+        derives the SPATIAL half -- no index leaves an array, which is what ASan
+        and UBSan are looking for. Miri's silence is derived by the same
+        argument one level up and needs no simulation at all: Miri is an
+        instrument about allocations, and this kernel makes no allocator call in
+        any rung (`../spec.md`'s `miri.reason`).
 
         ⚠⚠ **THAT IS THE ROW'S DETECTOR-COVERAGE RESULT AND NOT A CONCESSION.**
         The storage is a pool the program owns from the first instruction to the
@@ -500,8 +699,9 @@ class Model:
 
     def selfcheck(self):
         """The object-identity simulation vs the five sequences that mirror
-        Verus, plus the simulation's own out-of-range detector."""
-        problems = []
+        Verus, plus the simulation's own out-of-range detector **and the
+        must-fire arm that proves the detector is alive**."""
+        problems = list(detector_selftest())
         for c in self.sample_calls(8):
             want = self.pool_fold(c["buf"], c["off"], c["len"])
             if want != c["result"]:
@@ -513,7 +713,7 @@ class Model:
             problems.append("the simulation says the BUGGY rung computes an "
                             "out-of-range index on this input, which p32's "
                             "whole argument says is impossible -- check "
-                            "Pool._touch and c/kernel.c together")
+                            "Pool.touch_slot and c/kernel.c together")
         return problems
 
 
