@@ -31,13 +31,21 @@ retracted along the way, and **the retraction list is the most transferable
 thing the project produced** (§6).
 
 ⚠ **A NOTE ON THE COUNT, so the title and the corpus can be reconciled.** The
-four Results below were drawn from **26** kernels. A twenty-seventh, `p29`
-(BST delete), landed afterwards and is **not** folded into Results 1–4 or into
-the idiom census, which genuinely ran over 26. It appears in §7, where it
-changes the corpus composition — the temporal axis goes from one row to two.
-**Where this document says "26 kernels" it means the analysed set, and that is
-the honest scope; the tree has 27.** Run `harness/tools/composition.py` for the
-current composition rather than trusting any count printed here.
+four Results below were drawn from **26** kernels. **Two more have landed since
+and NEITHER is folded into Results 1–4 or into the idiom census, which genuinely
+ran over 26**: `p29` (BST delete, `TASK_139`) and `p32` (free-list pool,
+`TASK_144`). They appear in §7, where they change the corpus composition — **the
+temporal axis goes from one row to three.** **Where this document says
+"26 kernels" it means the analysed set, and that is the honest scope; the tree
+has 28.** ⚠ **And the count is the smaller half of the gap.** `p32` was admitted
+only because a **kill was retracted**: the admission bar was measuring the wrong
+thing (RECAP finding 53), it was replaced with a **C-side-only** bar
+(`CLAUDE.md` rule 6), and re-adjudication **admitted seven rows and left zero
+refusals standing**. So this document's corpus is not merely two kernels short —
+it was assembled under a **selection rule this project has since withdrawn**, and
+§7's composition discussion is the part that moves most. Run
+`harness/tools/composition.py` for the current composition rather than trusting
+any count printed here.
 
 **Four results and a method.** That compression is itself a finding: twenty-six
 patterns do not give twenty-six independent lessons about safety cost. The
@@ -1320,6 +1328,18 @@ on a conjunct count.**
 has a second row under it rather than one.**
 ⚠ **This does not weaken the spatial results — those are the fifteen — it says
 where the document's confidence should stop.**
+
+⚠⚠ **AND A THIRD TEMPORAL ROW HAS SINCE LANDED, `p32` (free-list pool,
+`TASK_144`) — DELIBERATELY NOT WRITTEN UP HERE YET.** Its review (`TASK_145`)
+had not reported when this paragraph was added, and `PROTOCOL.md` rule 9 keeps
+an unreviewed result out of the layers a reader quotes. **What can be said
+without it:** `p32` allocates nothing — a fixed pool with a LIFO free list,
+owned by the program from start to finish — so it is exactly the *recycles its
+own storage* case §3's rule names, and it is the first row in this project
+**built because a kill was retracted** rather than because a candidate passed.
+**Read `.memory/06-catalogue.md`'s `p32` cell and RECAP finding 55 for the
+current state; do not quote a `p32` number from this document, because there
+is not one here yet.**
 
 ⚠ **The table counts safety lines, not bugs.** `p09` ships two and only the
 omitted `q < nbits` is spatial.
