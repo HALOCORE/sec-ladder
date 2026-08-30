@@ -1789,8 +1789,9 @@ the priority and the bar had to move together.**
 
 ### The measured reason the priority is right
 
-✅ **Composition of the 26 BUILT patterns, by the bug each `spec.md` actually
-ships.** ⚠⚠ **THIS TABLE IS NOW DERIVED AND CHECKED — `harness/tools/composition.py`.**
+✅ **Composition of the BUILT patterns, by the bug each `spec.md` actually
+ships.** ⚠ **The table below is derived; DO NOT maintain a total in this
+sentence — run `harness/tools/composition.py`.** ⚠⚠ **THIS TABLE IS NOW DERIVED AND CHECKED — `harness/tools/composition.py`.**
 `--check` **exits 1 if the copy below drifts from the tree** and is the anti-rot
 mechanism for the whole priority; `--evidence` prints each pattern's catalogue
 bug text next to its class so the judgement is auditable in one command.
