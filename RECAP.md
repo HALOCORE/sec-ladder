@@ -4774,8 +4774,11 @@ the number.** Two task files have already sent an agent to the wrong finding.
     silent. **`p28`'s is that safe Rust CANNOT REPRODUCE ITS BUGGY C AT ALL.**
     Deleting the safety line from `#![forbid(unsafe_code)]` safe Rust, in **both**
     idiomatic spellings, **changes no answer on any input this pattern ships**;
-    its only trace is a `None` where `.unwrap()` expects `Some`, i.e. a **PANIC**
-    on one input in one spelling. **Never UB, never silently wrong.**
+    its only trace is a `None` where `.unwrap()` expects `Some`.
+    **Never UB, never silently wrong.** ⚠ **This entry said *"a PANIC on ONE
+    input in ONE spelling"* and `TASK_149` measured that it understates by ~1600×
+    in case count: the strict panic is TYPICAL, not exceptional — 80% of random
+    inputs.** The claim that matters is unchanged: **no VALUE ever differs.**
     ✅ **AND THERE IS A STRUCTURAL REASON, WHICH IS WORTH MORE THAN THE TABLE:**
     the eviction list is insertion-ordered and every chain is newest-first, so
     **the globally oldest object in a bucket is that bucket's chain TAIL** — TRIM
@@ -4793,9 +4796,15 @@ the number.** Two task files have already sent an agent to the wrong finding.
     **READ**. **`p28`'s read path is CORRECT and its DESTROY path is
     INCOMPLETE** — an object is on two intrusive lists at once, `TRIM` reaches
     its victim through the LRU list so it holds no hash-chain cursor, and R1 frees
-    without leaving the chain. **The dangling pointer therefore lives INSIDE
-    ANOTHER HEAP OBJECT's link field**, not in a stack table (`p27`), a stack
-    local (`p29`) or a program-owned pool (`p32`).
+    without leaving the chain. **The dangling pointer therefore lives inside
+    ANOTHER HEAP OBJECT's link field, OR IN `bucket[]`** — ⚠ **and this sentence
+    dropped the second disjunct until `TASK_149` restored it. `bucket[]` is a
+    STACK ARRAY, and `controls/harm_sites.json`'s own invariant names it as the
+    second of two separately reachable sites**, so *"not in a stack table"* was
+    the manager's gloss and not the row's claim; `spec.md`'s hashed `why` and
+    `c/kernel.h` both carry the disjunct. ✅ **What survives, and it is the whole
+    distinction: neither site is a stack LOCAL (`p29`) or a program-owned pool
+    (`p32`), and the heap-resident site has no analogue in `p27`.**
     ⚠ **And its safety line is the first in the tree that is NOT A TEST**: a
     nine-line **SPLICE**, a WRITE that maintains *membership implies ownership*.
     **`composition.py`'s stated test — *what does the safety line ASK?* — does

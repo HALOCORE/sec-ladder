@@ -15,7 +15,7 @@
   "generated-record": "the string is inside a GENERATED artefact; not a citation",
   "lost": "gone and not regenerable; the note says what it showed"
  },
- "count": 91,
+ "count": 90,
  "entries": [
   {
    "file": "TOOLCHAIN.md",
@@ -538,6 +538,24 @@
    "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
   },
   {
+   "file": "patterns/p28-intrusive-lists/controls/proof_mutants.py",
+   "lines": [
+    51
+   ],
+   "path": ".temp/p28mut",
+   "kind": "destination",
+   "note": "the proof-mutant battery's own scratch directory; `proof_mutants.py` creates it (`os.makedirs`) and writes one mutated `verus.rs` per arm into it, then runs `./verus_run.py` over each. The mutants are artefacts and are deleted (`.memory/00-environment.md` constraint 6); re-run the control to regenerate them. Same kind as p32's `.temp/p32mut`."
+  },
+  {
+   "file": "patterns/p28-intrusive-lists/controls/repro.py",
+   "lines": [
+    65
+   ],
+   "path": ".temp/build/p28-repro",
+   "kind": "destination",
+   "note": "`repro.py`'s own build output directory, named per pattern so no neighbour control's binary can be enumerated by this one -- the split TASK_147 made on p32 after `storage_arms.py` and `forgeable.py` shared one. The script creates it and rebuilds its binaries; they are deleted as artefacts."
+  },
+  {
    "file": "patterns/p29-bst-delete/controls/arms.py",
    "lines": [
     48
@@ -574,15 +592,6 @@
    "note": "scratch directory the citing script CREATES with `mkdir -p` and deletes on success (`.memory/00-environment.md` constraint 6). p29's controls, landed at TASK_139. Dangling is the CORRECT steady state: the blobs are re-derivable by re-running the script."
   },
   {
-   "file": "patterns/p32-free-list-pool/controls/forgeable.py",
-   "lines": [
-    49
-   ],
-   "path": ".temp/build/p32-arms",
-   "kind": "destination",
-   "note": "the storage-arms build output directory; `storage_arms.py` and `forgeable.py` both create it (`os.makedirs`) and both rebuild every binary in it. The binaries are artefacts and are deleted (`.memory/00-environment.md` constraint 6); re-run either control to regenerate them."
-  },
-  {
    "file": "patterns/p32-free-list-pool/controls/proof_mutants.py",
    "lines": [
     58
@@ -603,30 +612,11 @@
   {
    "file": "patterns/p32-free-list-pool/controls/repro.py",
    "lines": [
-    66
-   ],
-   "path": ".temp/build/p32-arms",
-   "kind": "destination",
-   "note": "prose, not a path this file writes: the comment names the directory it deliberately does NOT share, which is the whole point of the TASK_147 split. Same directory as the `destination` entries above."
-  },
-  {
-   "file": "patterns/p32-free-list-pool/controls/repro.py",
-   "lines": [
     73
    ],
    "path": ".temp/build/p32-repro",
    "kind": "destination",
    "note": "`repro.py`'s OWN build output directory, split off from `.temp/build/p32-arms` at TASK_147 so that a neighbour control's binary can no longer be enumerated by this one's `os.listdir`. The script creates it and rebuilds its binaries; they are deleted as artefacts."
-  },
-  {
-   "file": "patterns/p32-free-list-pool/controls/storage_arms.py",
-   "lines": [
-    99,
-    170
-   ],
-   "path": ".temp/build/p32-arms",
-   "kind": "destination",
-   "note": "the storage-arms build output directory; `storage_arms.py` and `forgeable.py` both create it (`os.makedirs`) and both rebuild every binary in it. The binaries are artefacts and are deleted (`.memory/00-environment.md` constraint 6); re-run either control to regenerate them."
   },
   {
    "file": "patterns/p36-vtable-dispatch/NOTES.md",
