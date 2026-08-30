@@ -117,10 +117,29 @@ catalogue in the other direction.
    `TASK_136`'s was a line-by-line copy of its own kernel — same variable names,
    same guard — which satisfies the model-sandbox rule mechanically and defeats
    it in substance, and is exactly how its delete bug went undetected.
-   ✅ **`p29`'s model is the good example (a reachability walk) and `p32`'s is
-   the recent one. Say in `NOTES.md` how yours differs structurally** — the
-   obvious independent formulation here is a **set/dict cache with an explicit
-   recency order**, carrying no links at all.
+   ✅ **`p29`'s model is the good example (a reachability walk). Say in
+   `NOTES.md` how yours differs structurally** — the obvious independent
+   formulation here is a **dict cache with an explicit recency order**, carrying
+   no links at all.
+
+   ⚠⚠⚠ **AND THERE IS A SECOND `model.py` FAILURE MODE, FOUND ON `p32` ONE TASK
+   AGO (`TASK_145` M1), THAT INDEPENDENCE DOES NOT PROTECT YOU FROM: A CHECK
+   THAT IS A TAUTOLOGY OF THE MODEL'S OWN REPRESENTATION.** `p32`'s `model.py`
+   claimed — in six places, two inside `contract_sha256` — to **DERIVE** its
+   `sanitizer_expect` by computing *"every index the buggy rung would compute"*.
+   Its guard was `0 <= s < SLOTS` over a slot drawn from a successor map over
+   `0..SLOTS-1`: **structurally incapable of firing. 0 firings in 20 000 fuzzed
+   buggy windows**, and the one input that would have tripped it **crashed the
+   model** before the field was read. The conclusion was true and the evidence
+   claim was false.
+   ⚠⚠ **So: whatever your `model.py` DERIVES rather than declares, SHOW IT
+   FIRING.** A derived `sanitizer_expect` owes an input or a planted mutation on
+   which it returns `"fires"`. **If it cannot fire, declare it and say so** —
+   declaring is honest, a derivation that cannot fire is not.
+   ⚠ **`p28` is more exposed to this than `p32` was**, because its whole harm is
+   a pointer left in another object's `hn` field, which a Python dict model does
+   not have. **Decide early whether your model can represent the stale link at
+   all, and write the answer down rather than discovering it at gate time.**
 3. **The R5 owes an ATTACK ARM THAT MUST FAIL TO VERIFY, plus a VACUITY arm.**
    ⚠⚠ **You have a ready-made one from `TASK_091`: delete the ADDRESS
    INJECTIVITY conjunct and `fake3` passes — ONE node with `prev = next =
