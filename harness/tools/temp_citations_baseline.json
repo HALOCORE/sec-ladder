@@ -15,7 +15,7 @@
   "generated-record": "the string is inside a GENERATED artefact; not a citation",
   "lost": "gone and not regenerable; the note says what it showed"
  },
- "count": 85,
+ "count": 87,
  "entries": [
   {
    "file": "TOOLCHAIN.md",
@@ -103,7 +103,7 @@
   {
    "file": "harness/check.py",
    "lines": [
-    9006
+    9155
    ],
    "path": ".temp/check/probe-selftest",
    "kind": "destination",
@@ -574,6 +574,24 @@
    "note": "scratch directory the citing script CREATES with `mkdir -p` and deletes on success (`.memory/00-environment.md` constraint 6). p29's controls, landed at TASK_139. Dangling is the CORRECT steady state: the blobs are re-derivable by re-running the script."
   },
   {
+   "file": "patterns/p32-free-list-pool/controls/proof_mutants.py",
+   "lines": [
+    52
+   ],
+   "path": ".temp/p32mut",
+   "kind": "destination",
+   "note": "scratch directory the citing script CREATES with `mkdir -p` and deletes on success (`.memory/00-environment.md` constraint 6). p32's proof-mutant battery, landed at TASK_144. Dangling is the CORRECT steady state."
+  },
+  {
+   "file": "patterns/p32-free-list-pool/controls/proof_mutants.py",
+   "lines": [
+    34
+   ],
+   "path": ".temp/p32mut/",
+   "kind": "destination",
+   "note": "scratch directory the citing script CREATES with `mkdir -p` and deletes on success (`.memory/00-environment.md` constraint 6). p32's proof-mutant battery, landed at TASK_144. Dangling is the CORRECT steady state."
+  },
+  {
    "file": "patterns/p36-vtable-dispatch/NOTES.md",
    "lines": [
     731
@@ -787,9 +805,9 @@
   {
    "file": "results/gate/p42-goto-cleanup.json",
    "lines": [
-    2406,
-    2417,
-    2450
+    2409,
+    2420,
+    2453
    ],
    "path": ".temp/build/p42/c-gcc-asan+0xc477f",
    "kind": "generated-record",
