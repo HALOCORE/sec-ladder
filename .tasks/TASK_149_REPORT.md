@@ -9,6 +9,10 @@ shrink or retire it, and I did not look for one on the Rust or Verus side
 (`CLAUDE.md` rule 6). The C-mechanism distinction is the only admissible ground
 and it **survives, narrowed** (item 1).
 
+✅ **`harness/check.py p28` re-run from scratch: `PASS`, 0 failures, 0 blocked,
+`contract_sha256` unchanged** — and the record moves only 5 of 1296 leaf values,
+all of them nuisance fields.
+
 **Two `major` findings, both measured, both in text the pattern SHIPS:**
 
 1. ⚠⚠⚠ **R1 DOUBLE-FREES on a shipped input.** `spec.md`'s `idiom.required` —
@@ -44,6 +48,7 @@ See item 2 — and the suffix property is a **theorem**, not just an argument.
 | D2 | is `p28` FINISHED? | **NO — `results/synthesis.md` does not carry it** |
 | D3 | `RECAP` 56 / `CAVEATS` / catalogue overstatements | **one in `RECAP` 56** |
 | D4 | the one open number (`safe_tuned` dearer) | **RESOLVED — mechanism measured** |
+| — | `harness/check.py p28`, re-run | ✅ **PASS**, 0 failures, 0 blocked, contract hash unchanged |
 
 ---
 
@@ -685,31 +690,80 @@ the literal `--list`, and none of p28's do.)
 
 ---
 
-## Gate re-run
+## Gate re-run — ✅ PASS, and the record is FAR more reproducible than "not byte-reproducible"
 
-`harness/check.py p28` was started fresh at 18:27 and is **still running at the
-time of writing**, inside stage 5c (clause deletion) — `.temp/clausemut/p28/
-patterns/p28-intrusive-lists/verus.rs`. Everything up to and including stage 5b
-printed green in `.temp/t149/gate_rerun.log`. ⚠ **This is expected, not a
-symptom**: the committed record has **8** clause-deletion mutants, every one of
-them is *supposed* to FAIL, and `TASK_146` §11 measured that a p28 mutant which
-fails for a real reason then **exhausts the whole `--rlimit 400` on a second
-query** (its `A3` arm takes ~25 min alone). `check.py`'s per-run timeout is 900 s,
-so the stage is bounded at roughly two hours and cannot hang.
+`harness/check.py p28`, run fresh from 18:27 to 19:00 (33 min; stage 5c's eight
+clause-deletion mutants are all *supposed* to fail, and a p28 mutant that fails
+for a real reason then burns the whole `--rlimit 400` on a second query —
+`TASK_146` §11):
 
-⚠ **Nothing in this review depends on the re-run.** The task file says records
-are not byte-reproducible; the committed record is `PASS`, `failures 0`,
-`blocked 0` (read out of the RECORD, not grepped from the log), and I re-derived
-its substantive contents independently — the adversarial row counts, the
-sanitizer expectations, the identity pin, the marginal and kernel-exclusive `Ir`
-figures, the control-JSON freshness, and the table render. **If the manager wants
-a fresh verdict, re-run it; budget ~2 h and do not read the pause as a hang.**
+```
+check.py: PASS
+results/gate/p28-intrusive-lists.json
+    verdict  PASS      failures 0      blocked 0      (read out of the RECORD)
+    contract_sha256  5c92154096baea5de8f8fd4c24a16c6d285000687bd6006782837db00d724455  UNCHANGED
+    loud     2   [collapse-ir]  [tcb-unsafe]   <- both documented, both expected
+```
 
-⚠ **A note for the next agent, because it cost me a restore.** Running any p28
-control **writes into `patterns/p28-*/controls/*.json`** — `safety_line.py`,
-`harm_sites.py` and `rust_arms.py` all regenerate their committed JSON as a side
-effect, and three of the five accept unknown arguments without complaint. Check
-`git status` afterwards.
+`[tcb-unsafe]` names `p28` as the **eighth** pattern to exercise
+`.memory/04-verus.md`'s parameter-coverage false positive, exactly as `TASK_146`
+§9a claims.
+
+⚠⚠ **And the record turns out to be nearly byte-reproducible, which the task file
+did not expect.** Leaf-by-leaf against `git show HEAD:`:
+
+```
+leaf values: HEAD=1296  MINE=1296   MOVED=5   only-in-HEAD=0  only-in-MINE=0
+moved: 4 x sanitizer/<input>/diagnostic   (ONLY the embedded ASan pid, ==58xxxx== -> ==62xxxx==)
+       1 x miri/runs[3]/seconds           (0.2 -> 0.1, wall clock)
+```
+
+**Zero `Ir`, zero md5, zero checksum, zero identity, zero adversarial row, zero
+verdict movement.** So `p28`'s gate record reproduces down to a pid and one
+wall-clock float — a stronger statement than the standing *"records are not
+byte-reproducible"*, and worth knowing before anyone treats a moved gate record as
+a signal. ⚠ **The two nondeterministic fields are both nuisance fields**; if the
+manager wants gate records diffable, masking the ASan pid (as `check.py`'s own
+`-fstrict-aliasing` blast-radius probe already does — `check.py:7267`) and the
+Miri `seconds` would make this one exact.
+
+⚠ **`results/gate/p28-intrusive-lists.json` is therefore MODIFIED in the working
+tree, by my run.** It is a `PASS` record with the same contract hash; `git
+checkout` it if you would rather keep the committed one. Nothing else of mine
+touches a tracked file.
+
+## ⚠⚠ CONCURRENCY: the manager was editing this tree while I ran
+
+`git status` at 19:01 shows three files I did **not** touch:
+
+```
+ M RECAP.md                                    18:57:33
+ M harness/tools/temp_citations_baseline.json  18:57:15
+?? .tasks/TASK_150.md                          18:58:40
+```
+
+**`PROTOCOL` rule 11 is live right now** — *"Never `git add -A` while a subagent
+is working. Stage explicit paths."* Whatever lands next must name paths, or this
+report, the gate record and the manager's own edits go into one commit.
+
+✅ **One consequence is good news and I am withdrawing a finding because of it**:
+the `temp_citations.py` failure I report below **is already fixed in the working
+tree.** The manager added both `p28` baseline entries (`.temp/p28mut`,
+`.temp/build/p28-repro`, `kind: destination`, with notes) at 18:57, and the check
+now passes:
+
+```
+temp_citations.py: OK  (new=0 unclassified=0 resolved=0)
+```
+
+I am leaving the finding written up because **the mechanism is still worth
+recording** — `proof_mutants.py:273` deletes the directory it cites, so the green
+result `TASK_146` §9b reported was an artefact of run ordering and could not have
+been reproduced from a clean tree. The baseline entry is the right fix and it is
+in.
+
+⚠ **I did not touch `RECAP.md`, `TASK_150.md` or the baseline**, and I have not
+re-read them; nothing in this report is written against them.
 
 ---
 
@@ -896,12 +950,9 @@ one, at 72%, and the `hn`-per-step one is inside the 1.9%.**
   and it is the semantics every Rust rung and `model.py` implement — but it means
   I have not shown glibc reporting `double free detected in tcache`. On the real
   allocator the SEGV at `c/kernel.c:193` arrives first, every run.
-* **The gate re-run did not finish** — see *Gate re-run* above. Nothing here
-  depends on it, and it will overwrite `results/gate/p28-intrusive-lists.json`
-  when it does complete, so ⚠ **if the manager finds that record modified in the
-  working tree, that is my run finishing, not a regression** — check its
-  `verdict` / `failures` / `blocked` against the committed copy before doing
-  anything else.
+* **The gate re-run DID finish, `PASS`** — see *Gate re-run* above. It leaves
+  `results/gate/p28-intrusive-lists.json` modified in the working tree (5 leaf
+  values, all nuisance fields). ⚠ **That is my run, not a regression.**
 * `.temp/t149/` holds **only** the generators, logs, JSON and `.rs`/`.c` probe
   sources; every binary, `.o` and mutant tree is deleted
   (`constraint 6`). `.temp/t149/cleanup.sh` names the exact rebuild command for
@@ -924,13 +975,13 @@ one, at 72%, and the `hn`-per-step one is inside the 1.9%.**
 | **minor** | Retracted predictions still standing in two pinned control `invariant` strings; one of them is garbled. |
 | **minor** | Three controls silently accept unknown arguments and rewrite committed JSON in `patterns/`. |
 | **minor** | `miri_iters = 4` is not disclosed where the Miri silence is claimed. |
-| **minor** | `harness/tools/temp_citations.py` **exits 1** on the tree today; both new dangling citations are `p28` controls with no baseline entry, while `p32`'s identical pair is baselined. `TASK_146` §9b's `OK` is not reproducible from a clean tree. |
+| ~~minor~~ **FIXED MID-REVIEW** | `harness/tools/temp_citations.py` exited 1 on `p28`'s two unbaselined `.temp/` citations; **the manager landed both baseline entries at 18:57 while I ran** and it is now `OK`. Recorded because the mechanism stands: `proof_mutants.py:273` deletes the directory it cites, so `TASK_146` §9b's `OK` was an artefact of run ordering. |
 | — | `safe_tuned.rs`'s three-lever header omits the change that dominates its cost (deliverable 4 — a result, not a defect). |
 
 ---
 
 **PROTOCOL rule 2 running count: launched from 756 (`TASK_146_REPORT.md`'s closing
-paragraph), carried to 768** — branch delta **+12**. ⚠ `TASK_148` was written from
+paragraph), carried to 769** — branch delta **+13**. ⚠ `TASK_148` was written from
 the same base and has not reported; **reconciliation across the two branches is
 the manager's job, not mine.**
 
@@ -962,9 +1013,13 @@ the manager's job, not mine.**
 11. **Deliverable 4 resolved: 72% of `safe_tuned`'s excess is the WALK HOIST**, a
     fourth change its header does not list, paid **per operation** (+38% with no
     walk at all, +1.9% with a 30-deep one).
-12. **`temp_citations.py` exits 1 on `p28`'s two unbaselined `.temp/` citations**,
-    and `TASK_146`'s `OK` was an artefact of run ordering — `proof_mutants.py`
-    deletes the directory it cites, which is why `p32` baselines the identical
-    pair as *"dangling is the CORRECT steady state"*.
+12. **`temp_citations.py` exited 1 on `p28`'s two unbaselined `.temp/`
+    citations**, and `TASK_146`'s `OK` was an artefact of run ordering —
+    `proof_mutants.py` deletes the directory it cites. ✅ **Fixed by the manager
+    mid-review**; recorded for the mechanism, not as an outstanding defect.
+13. **The gate re-runs `PASS` and its record moves 5 of 1296 leaf values** — four
+    ASan pids and one Miri wall-clock float, and **nothing else**. `p28`'s record
+    is materially reproducible, which the standing *"not byte-reproducible"* note
+    understates.
 
 ⚠ **A rigour signal, not a ledger.**
