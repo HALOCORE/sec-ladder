@@ -2874,6 +2874,30 @@ already been struck.** Keep the list, not the ordinal.
     > CLASS.** The figures are the part that survived. **Ask separately what the
     > figures were said to MEAN, and whether that reading was ever attacked.**
 
+    ⚠⚠⚠ **SECOND INSTANCE, AND IT IS THE MANAGER'S OWN — RE-RUNNING SOMEONE'S
+    SCRIPT CHECKS THE ARITHMETIC, NOT THE EXPERIMENT DESIGN.** `TASK_134`
+    published *"in `p25`'s shipped heap topology `realloc` NEVER moves,
+    `moved = 0/12` under both compilers"*. **The manager re-ran the probe, got
+    `0/12` under both compilers, and stamped it ✅ manager-verified — into
+    `RECAP` finding 48, the `p25` catalogue cell, and a kill that stood for nine
+    tasks.**
+
+    ✅ **`TASK_143` refuted it on a CORRECTED probe: the single-vector topology
+    moves `11/48`, and a token vector plus a string table — what a PARSER does —
+    moves `24/48`, identical under gcc and clang.** ⚠⚠ **`0/12` was a property of
+    a GROWTH SCHEDULE THAT NEVER CROSSES `16 → 32`. The script was faithful; the
+    INPUT it was driven with could not exhibit the phenomenon.**
+
+    > ⚠⚠⚠ **BEFORE STAMPING A RE-RUN: ask what input would make this probe say
+    > the OPPOSITE, and check the probe can reach it.** A probe that cannot
+    > produce the negative result is not evidence for the positive one — this is
+    > entry 14's *"a control that fires is not a control that tested what you
+    > said it did"*, on the OTHER side of the same coin.
+
+    ⚠ **The `TASK_143` engineer hit the identical trap (its first adversarial
+    input grew only `4 → 8`), FOUND it with a dedicated `probe_when.c`, and
+    disclosed it rather than quietly fixing it.**
+
     ⚠ **`.memory/03-measurement.md` already carries the governing rule — *"an
     out-of-sample test validates the LAW, not the STORY"* — and it was violated
     by a document that quotes it. **Any 8-point sequence can be lag-4
