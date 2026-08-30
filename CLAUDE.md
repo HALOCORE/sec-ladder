@@ -80,3 +80,18 @@ rest is reference.
    Read-only git is fine; the manager agent commits at task boundaries.
 5. **Don't bump the Verus/vstd pin** without checking crates.io first — a driver whose
    vstd was never published panics `cargo verus` (`TOOLCHAIN.md`).
+6. ⚠⚠⚠ **NEVER REFUSE OR REMOVE A PATTERN FOR A RUST-SIDE, VERUS-SIDE OR
+   LADDER-SIDE REASON.** **Admission is decided SOLELY on the C program**: is it
+   correct on benign inputs (so performance is measurable), does it exhibit the
+   target error on an adversarial input, and is its **C mechanism** distinct
+   from a built row's? **The Rust and Verus rungs are the NEXT step — do the
+   best possible there, and whatever they land on is a RESULT to report.**
+   ⚠ ***"Safe Rust can't express it"*, *"safe Rust reproduces the bug
+   bit-identically"*, *"there's no cost gradient"*, *"the R5 can't state the
+   obligation"*, *"no column moves"*, *"Miri doesn't see it"* and *"the bug is
+   in-bounds so it's logical, not temporal"* are ALL FINDINGS, NEVER KILLS.**
+   ⚠⚠ **This bias has shaped real refusals — six of ten temporal ones — and it
+   went uncaught for many sessions because it lived IN THE ADMISSION BAR rather
+   than in any single row, so row-level review could not see it.** Full rule and
+   the audit: `.memory/02-bench-rules.md`, *THE ADMISSION BAR IS C-SIDE ONLY*,
+   and `RECAP.md` finding 53. ✅ **C-side DUPLICATION remains a legitimate kill.**

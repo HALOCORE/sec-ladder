@@ -1871,25 +1871,80 @@ do NOT probe it, and do NOT let a later session re-open it as *"but the census
 found it"*. The census is a SPATIAL instrument; that it points at a spatial gap
 is what it is for.**
 
-### THE BAR AMENDMENT, AND WITHOUT IT THE PRIORITY IS UNIMPLEMENTABLE
+## ⚠⚠⚠ THE ADMISSION BAR IS C-SIDE ONLY. USER DECISION, AND IT SUPERSEDES EVERY EARLIER BAR IN THIS FILE.
 
-**The reviewed bar admits a row that brings a new MECHANISM — a new operator on
-the safety line, a new source of the bound, or a new reason the check is or is
-not elided.** ⚠⚠ **All three limbs presuppose A COST GRADIENT TO PRICE. Most
-temporal candidates have no gradient, which is exactly how `p28`–`p34` died —
-and dying that way is the RIGHT verdict under the OLD bar.**
+> ⚠⚠⚠ **A PATTERN IS ADMITTED, OR NOT, **SOLELY** ON WHETHER THE **C PROGRAM**
+> MAKES SENSE. NOTHING ABOUT RUST, VERUS, MIRI, THE COST GRADIENT OR WHAT THE
+> LADDER CAN "PRICE" MAY EVER REMOVE A ROW.**
 
-> ✅ **FOURTH LIMB, ADDED HERE: a row is admissible if it MAPS A BOUNDARY OF THE
-> INSTRUMENT — a rung that cannot EXPRESS the program, a proof that cannot STATE
-> the obligation, or a safe rung that is SILENTLY WRONG.**
+### The bar, in full
 
-⚠ **This is not a loosening invented for convenience: the project's three most
-cited results are already of exactly this shape and NONE of them is a cost
-result.** **`p17`** — provably memory-safe and still leaking. **`p36`** — Verus
-at the pin cannot type `fn(u64) -> u64` *at all*, so C's own dispatch mechanism
-is not an admissible rung. **`p42`** — the first pattern whose R5 proof does not
-cover its own bug class. ⚠ **`p08` is a fourth: *"a tooling-and-expressiveness
-result, not a performance one"*, `R4 == R5 exact` at both levels.**
+A candidate is **ADMITTED** when, **on the C side alone**:
+
+1. ✅ **The C kernel is CORRECT on normal/benign inputs** — so its performance is
+   measurable and comparable against the other rungs. A program that is wrong on
+   ordinary input is not a benchmark.
+2. ✅ **It exhibits the target error on at least one ADVERSARIAL input** —
+   demonstrated with a detector firing and a positive control that must also
+   fire, not argued.
+3. ✅ **Its C MECHANISM is distinct from every built row's C mechanism.**
+   ⚠ Duplication is judged on **what the C code does**, never on *"the published
+   result would look similar"*.
+4. ✅ **It fits the pinned kernel signature** — a flat blob in, a `u64` out, the
+   shared driver loop. ⚠ **`p27` proves a structure can live INSIDE the kernel
+   driven by an opcode stream; `p27/unsafe.rs` holds 32 raw pointers. *"A file
+   cannot name a pointer, but it CAN name an operation that saves one."***
+5. ✅ **`c/kernel_hardened.c` differs from `c/kernel.c` by the SAFETY LINE and
+   nothing else.** ⚠ Not necessarily *one conjunct* — that gloss was false;
+   measured, it is 4 of 25 (`TASK_140`/`141`).
+
+### ⚠⚠⚠ WHAT IS **NOT** AN ADMISSION CRITERION — ALL OF THESE ARE **RESULTS TO REPORT**
+
+**Every one of these has been used to kill a row, and every one of them was
+wrong to use that way:**
+
+| ~~used as a kill~~ | what it actually is |
+|---|---|
+| ~~"safe Rust cannot EXPRESS the bug"~~ | a **finding** — and it has been refuted **three times** (`TASK_093`, `TASK_094`, `TASK_134`) |
+| ~~"safe Rust reproduces the bug bit-identically"~~ | **the most interesting possible result.** Safe Rust silently wrong is a headline, not a disqualification |
+| ~~"there is no COST GRADIENT to price"~~ | report `0.00`. **8 of 26 built patterns already publish a zero on their own headline axis** |
+| ~~"the R5 cannot STATE the obligation"~~ | `p42` ships exactly that way and it is one of the most cited rows here |
+| ~~"the ladder cannot price it" / "no column moves"~~ | a limit of the INSTRUMENT. Publish the limit |
+| ~~"Miri/ASan does not see it"~~ | a **detector-coverage finding**. `p29`'s whole result is four mechanisms disagreeing |
+| ~~"the bug is in-bounds, so it is LOGICAL not temporal"~~ | a **classification**, not a defect. `p29` shipped precisely this and four mechanisms split on it |
+
+### ⚠⚠ THE BIAS THIS REPLACES, NAMED SO IT CAN BE CAUGHT AGAIN
+
+**The previous bar had four limbs — a new operator on the safety line, a new
+source of the bound, a new reason the check is elided, and *maps a boundary of
+the instrument*. ALL FOUR ASK WHAT THE LADDER CAN SEE. NONE ASKS WHETHER THE C
+PROGRAM IS A REAL INSTANCE OF THE BUG.**
+
+⚠⚠⚠ **Consequence, measured: of ~17 temporal candidates considered, only TWO were
+built — and the audit at `TASK_143` found that MOST OF THE REFUSALS RESTED ON
+RUST-SIDE OR LADDER-SIDE GROUNDS**, including `p28` (*"safe Rust's answer is an
+arena"*), `p32`/`p33` (*"safe slab == buggy C bit for bit"*), `p34` (*"no
+inversion"*) and the **seven temporal CVEs** (*"the bug becomes logical, not
+temporal"*). **Those are all valid C programs with real temporal bugs. Under this
+bar they are candidates again.**
+
+⚠ **This is the same failure mode the project already names twice — A RIGHT
+VERDICT RESTING ON A WRONG REASON (`p31`'s shape) — and it went uncaught because
+it was in the BAR ITSELF rather than in any one row.**
+
+### ✅ What the old limbs are still good for
+
+**They are a good way to describe what a row CONTRIBUTES once it is in.** Keep
+them as vocabulary for the writeup. ⚠ **They are not a gate, and a task file
+must never ask *"which limb does this come in on?"* as a precondition to
+building.**
+
+⚠ **The three most cited results here are all non-cost results — `p17` provably
+memory-safe and still leaking, `p36` where Verus at the pin cannot type
+`fn(u64) -> u64` at all, `p42` whose R5 does not cover its own bug class, and
+`p08`'s *"tooling-and-expressiveness result, not a performance one"*. That is
+evidence the ladder's VALUE is not the cost column — which is exactly why the
+cost column must not gate admission.**
 
 ### ✅ AND *"R5 IS OPEN"* IS A SHIPPABLE ROW PROPERTY — DECIDE IT NOW, NOT LATER
 
@@ -1901,7 +1956,13 @@ to state it and does not — `p42`'s ghost ledger verified `18/0` while leaking.
 Every temporal R5 owes an ATTACK arm that must FAIL to verify, not just a
 deletion arm.** (`.memory/03-measurement.md` failure-class entry 8.)
 
-### ✅ THE FOURTH LIMB HAS NOW BEEN USED, AND IT IS NOT A RUBBER STAMP
+### ⚠⚠⚠ THE NINE-CANDIDATE TABLE BELOW IS HISTORY, AND IT IS THE EVIDENCE FOR THE BIAS
+
+⚠⚠ **READ IT AS A RECORD OF HOW ROWS WERE KILLED, NOT AS SETTLED ADJUDICATION.**
+**Under the C-side bar above, the entries marked `refused` on RUST-SIDE grounds
+are CANDIDATES AGAIN.** Marked below.
+
+### ~~✅ THE FOURTH LIMB HAS NOW BEEN USED, AND IT IS NOT A RUBBER STAMP~~
 
 ⚠ **A limb added to make a priority implementable is exactly the kind of rule
 that quietly admits everything.** It was applied to **NINE candidates across
@@ -1909,17 +1970,33 @@ that quietly admits everything.** It was applied to **NINE candidates across
 `p35`, `p29`, `p30`, `p32`/`p33`, `p34` — **and it admitted ONE.**
 
 ```
-p29        ADMITTED   limb 1 -- see below; the limb-4 reading is SUPERSEDED
-p25        refused    UB executes and is unobservable; no conjunct to omit;
-                      R1 has no reproducible checksum -> ungatable
-stack      refused    C is not silently wrong (both compilers warn by default)
-iterator   refused    no independent bug: resolves to p25, to spatial, or to p27
-p35        blocked    a trusted item owes a twin; a union read has no safe twin
-p30        refused    p27's half alone, now measured rather than argued
-p32/p33    refused    the silence is WHERE THE STORAGE LIVES, and both choices
-                      already ship bit-identically as p04 and p27
-p34        refused    no inversion: C's own refcount rung leaks identically
+                                                              C-SIDE?  status under the NEW bar
+p29   ADMITTED  built                                            --    BUILT
+p25   refused   UB executes and is unobservable in the SHIPPED
+                heap topology; R1 has no reproducible checksum   part  ⚠ RE-OPEN: the topology is
+                                                                       a DRIVER artefact, not a fact
+                                                                       about C. realloc DOES move.
+stack refused   C is not silently wrong -- both compilers warn
+                at DEFAULT flags                                 YES   stands (weakly)
+iter  refused   no independent bug: the three C spellings ARE
+                p25, spatial, or p27                             YES   stands (C-side duplication)
+p30   refused   the C bug and C mechanism are p27's              YES   stands (C-side duplication)
+p35   blocked   a trusted item owes a twin; a union read has
+                no safe twin                                     NO    ⚠⚠ RE-OPEN -- pure VERUS-side
+p32/  refused   "safe slab == buggy C bit for bit"; both
+p33             storage choices already ship as p04 and p27      NO    ⚠⚠ RE-OPEN -- the first half is
+                                                                       RUST-side and is the RESULT
+p34   refused   "no inversion: C's own refcount leaks too"       NO    ⚠⚠ RE-OPEN -- "no inversion" is
+                                                                       about the LADDER'S STORY
+p28   refused   "safe Rust's answer is an arena that never
+                frees, or p27's mechanism"                       NO    ⚠⚠ RE-OPEN -- pure RUST-side
+CVE   refused   "ported as a generational index into an arena,
+x7              so the bug is LOGICAL, not temporal"             NO    ⚠⚠ RE-OPEN -- a CLASSIFICATION,
+                                                                       and p29 shipped that shape
 ```
+
+⚠⚠⚠ **SIX OF TEN WERE KILLED ON GROUNDS THIS BAR FORBIDS.** ✅ **Four stand, and
+three of those stand on C-SIDE DUPLICATION, which remains legitimate.**
 
 ⚠⚠⚠ **AND THE ADMITTED ROW MOVED LIMBS ONCE IT WAS BUILT: `p29` SHIPPED ON
 LIMB 1, NOT LIMB 4.** Its safe rungs are **CORRECT** by design, with the
@@ -1933,7 +2010,10 @@ bug classes selected by the input.** ⚠ **So the row is admissible and has now
 been argued THREE different ways. Read RECAP finding 52 before quoting any of
 them.**
 
-✅ **One admission in nine is evidence the limb discriminates.** ⚠ **And the
+~~✅ **One admission in nine is evidence the limb discriminates.**~~ ⚠⚠⚠ **THAT
+SENTENCE WAS THE MANAGER REASSURING ITSELF. A bar that admits 1 of 9 REAL C BUGS
+is not "discriminating" — it is MEASURING THE WRONG THING, and the audit above
+is what that looks like once the criterion is stated properly.** ⚠ **And the
 admitted row was NOT admitted on the reason the manager predicted** — the
 manager's stated basis for `p29` (*"outcome 5, the only good outcome"*) was
 already struck in `.memory/01-ladder.md` before the task was written. **The limb
