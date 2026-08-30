@@ -4495,6 +4495,19 @@ the number.** Two task files have already sent an agent to the wrong finding.
     `p32` `+9/−0`, `p28` `+15/−0`). **gcc + clang × plain/ASan/UBSan, benign and
     adversarial, 20-run reproducibility, every probe with a positive control that
     fires.**
+    ⚠ **TWO OF THOSE FIGURES ARE SUPERSEDED BY THE ROWS THEMSELVES; THIS LINE IS
+    THE DEMONSTRATION'S, NOT THE SHIPPED PATTERN'S.** ✅ **`p32` SHIPS AT
+    `+2/−0`** — `TASK_144` moved the include-twice construction into `controls/`
+    (applying it to the rungs removes the C kernel bodies from
+    `forbidden_verdict`'s text scan) and `controls/safety_line.py` measures the
+    shipped preprocessed files; `TASK_145` §5 confirmed it. ✅ **`p28` SHOULD
+    SHIP AT `+9/−0`, NOT `+15/−0`** — the manager built the doubly linked
+    hash-chain spelling `TASK_143` predicted at *"4"* and did not build: it is
+    **9**, and it costs **NOTHING** shared (both R1 bodies preprocess to 127
+    lines, because the three lines `hp` adds to PUT cancel the three `prevn` no
+    longer needs in DEL) at **bit-identical behaviour on all four inputs × both
+    arms**, same 20/20 reproducibility, same three ASan firings
+    (`.temp/mgr146/NOTES.md`; `TASK_146` builds that spelling).
 
     ⚠⚠ **TWO ROW PROPERTIES NO BUILT PATTERN HAS:** **`p34` has NO BENIGN INPUT
     THAT CAN EXECUTE ITS SAFETY LINE** — a missing retain plus a matched release
