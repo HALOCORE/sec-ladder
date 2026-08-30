@@ -1,0 +1,649 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p28-intrusive-lists/controls/rust_arms.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p28-intrusive-lists/controls/arm_rawptr.rs": "466f9201121e2f4695ec7fae85e82483cf3f7c20755f151fce7e3c9fcf745e6d",
+    "patterns/p28-intrusive-lists/controls/arm_safe_bug.rs": "2dddf723378c20233a8da2193794bcac403bbac977aedec8ef1e0ff93d813703",
+    "patterns/p28-intrusive-lists/controls/rust_arms.py": "adebb4207b8ede85b352072755564a4dfaea70c29aa933b3df055a76cc416767",
+    "patterns/p28-intrusive-lists/safe_tuned.rs": "5fe7dadc477207bc5d5c567d8d8011a5158675a9e0d31d70c2ca4ed4f3c0bfb9",
+    "patterns/p28-intrusive-lists/c/kernel.c": "9c351d73f84372bb94f1f4a8b29189be6203d6ebf2a6e2eae2b716b13df2749f",
+    "patterns/p28-intrusive-lists/c/kernel_hardened.c": "73bf0fccd1f8317ebacdfef3a77d9de606a6c916ad39a983503918752a625442"
+  },
+  "measured_utc": "2026-08-30T14:02:09Z",
+  "miri_iters": 4,
+  "checksums": {
+    "small.bin": {
+      "O0": {
+        "c_bug": [
+          0,
+          "18314675230631941442"
+        ],
+        "c_fix": [
+          0,
+          "18314675230631941442"
+        ],
+        "raw_bug": [
+          0,
+          "18314675230631941442"
+        ],
+        "raw_fix": [
+          0,
+          "18314675230631941442"
+        ],
+        "safe_strict": [
+          0,
+          "18314675230631941442"
+        ],
+        "safe_lenient": [
+          0,
+          "18314675230631941442"
+        ]
+      },
+      "O3": {
+        "c_bug": [
+          0,
+          "18314675230631941442"
+        ],
+        "c_fix": [
+          0,
+          "18314675230631941442"
+        ],
+        "raw_bug": [
+          0,
+          "18314675230631941442"
+        ],
+        "raw_fix": [
+          0,
+          "18314675230631941442"
+        ],
+        "safe_strict": [
+          0,
+          "18314675230631941442"
+        ],
+        "safe_lenient": [
+          0,
+          "18314675230631941442"
+        ]
+      }
+    },
+    "large.bin": {
+      "O0": {
+        "c_bug": [
+          0,
+          "6273464424967602007"
+        ],
+        "c_fix": [
+          0,
+          "6273464424967602007"
+        ],
+        "raw_bug": [
+          0,
+          "6273464424967602007"
+        ],
+        "raw_fix": [
+          0,
+          "6273464424967602007"
+        ],
+        "safe_strict": [
+          0,
+          "6273464424967602007"
+        ],
+        "safe_lenient": [
+          0,
+          "6273464424967602007"
+        ]
+      },
+      "O3": {
+        "c_bug": [
+          0,
+          "6273464424967602007"
+        ],
+        "c_fix": [
+          0,
+          "6273464424967602007"
+        ],
+        "raw_bug": [
+          0,
+          "6273464424967602007"
+        ],
+        "raw_fix": [
+          0,
+          "6273464424967602007"
+        ],
+        "safe_strict": [
+          0,
+          "6273464424967602007"
+        ],
+        "safe_lenient": [
+          0,
+          "6273464424967602007"
+        ]
+      }
+    },
+    "degenerate.bin": {
+      "O0": {
+        "c_bug": [
+          0,
+          "17281166933783909376"
+        ],
+        "c_fix": [
+          0,
+          "17281166933783909376"
+        ],
+        "raw_bug": [
+          0,
+          "17281166933783909376"
+        ],
+        "raw_fix": [
+          0,
+          "17281166933783909376"
+        ],
+        "safe_strict": [
+          0,
+          "17281166933783909376"
+        ],
+        "safe_lenient": [
+          0,
+          "17281166933783909376"
+        ]
+      },
+      "O3": {
+        "c_bug": [
+          0,
+          "17281166933783909376"
+        ],
+        "c_fix": [
+          0,
+          "17281166933783909376"
+        ],
+        "raw_bug": [
+          0,
+          "17281166933783909376"
+        ],
+        "raw_fix": [
+          0,
+          "17281166933783909376"
+        ],
+        "safe_strict": [
+          0,
+          "17281166933783909376"
+        ],
+        "safe_lenient": [
+          0,
+          "17281166933783909376"
+        ]
+      }
+    },
+    "adversarial-stride3.bin": {
+      "O0": {
+        "c_bug": [
+          0,
+          "0"
+        ],
+        "c_fix": [
+          0,
+          "0"
+        ],
+        "raw_bug": [
+          0,
+          "0"
+        ],
+        "raw_fix": [
+          0,
+          "0"
+        ],
+        "safe_strict": [
+          0,
+          "0"
+        ],
+        "safe_lenient": [
+          0,
+          "0"
+        ]
+      },
+      "O3": {
+        "c_bug": [
+          0,
+          "0"
+        ],
+        "c_fix": [
+          0,
+          "0"
+        ],
+        "raw_bug": [
+          0,
+          "0"
+        ],
+        "raw_fix": [
+          0,
+          "0"
+        ],
+        "safe_strict": [
+          0,
+          "0"
+        ],
+        "safe_lenient": [
+          0,
+          "0"
+        ]
+      }
+    },
+    "adversarial-uaf-read.bin": {
+      "O0": {
+        "c_bug": [
+          0,
+          "9891317877474112512"
+        ],
+        "c_fix": [
+          0,
+          "14476180526798907392"
+        ],
+        "raw_bug": [
+          0,
+          "9891317877474112512"
+        ],
+        "raw_fix": [
+          0,
+          "14476180526798907392"
+        ],
+        "safe_strict": [
+          0,
+          "14476180526798907392"
+        ],
+        "safe_lenient": [
+          0,
+          "14476180526798907392"
+        ]
+      },
+      "O3": {
+        "c_bug": [
+          0,
+          "9891317877474112512"
+        ],
+        "c_fix": [
+          0,
+          "14476180526798907392"
+        ],
+        "raw_bug": [
+          0,
+          "9891317877474112512"
+        ],
+        "raw_fix": [
+          0,
+          "14476180526798907392"
+        ],
+        "safe_strict": [
+          0,
+          "14476180526798907392"
+        ],
+        "safe_lenient": [
+          0,
+          "14476180526798907392"
+        ]
+      }
+    },
+    "adversarial-uaf-head.bin": {
+      "O0": {
+        "c_bug": [
+          0,
+          "7155896426678277120"
+        ],
+        "c_fix": [
+          0,
+          "11740759076003072000"
+        ],
+        "raw_bug": [
+          0,
+          "7155896426678277120"
+        ],
+        "raw_fix": [
+          0,
+          "11740759076003072000"
+        ],
+        "safe_strict": [
+          0,
+          "11740759076003072000"
+        ],
+        "safe_lenient": [
+          0,
+          "11740759076003072000"
+        ]
+      },
+      "O3": {
+        "c_bug": [
+          0,
+          "7155896426678277120"
+        ],
+        "c_fix": [
+          0,
+          "11740759076003072000"
+        ],
+        "raw_bug": [
+          0,
+          "7155896426678277120"
+        ],
+        "raw_fix": [
+          0,
+          "11740759076003072000"
+        ],
+        "safe_strict": [
+          0,
+          "11740759076003072000"
+        ],
+        "safe_lenient": [
+          0,
+          "11740759076003072000"
+        ]
+      }
+    },
+    "adversarial-uaf-write.bin": {
+      "O0": {
+        "c_bug": [
+          -11,
+          ""
+        ],
+        "c_fix": [
+          0,
+          "14476180526798907392"
+        ],
+        "raw_bug": [
+          -11,
+          ""
+        ],
+        "raw_fix": [
+          0,
+          "14476180526798907392"
+        ],
+        "safe_strict": [
+          0,
+          "14476180526798907392"
+        ],
+        "safe_lenient": [
+          0,
+          "14476180526798907392"
+        ]
+      },
+      "O3": {
+        "c_bug": [
+          -11,
+          ""
+        ],
+        "c_fix": [
+          0,
+          "14476180526798907392"
+        ],
+        "raw_bug": [
+          -11,
+          ""
+        ],
+        "raw_fix": [
+          0,
+          "14476180526798907392"
+        ],
+        "safe_strict": [
+          0,
+          "14476180526798907392"
+        ],
+        "safe_lenient": [
+          0,
+          "14476180526798907392"
+        ]
+      }
+    },
+    "adversarial-many.bin": {
+      "O0": {
+        "c_bug": [
+          0,
+          "6439359753103586304"
+        ],
+        "c_fix": [
+          0,
+          "8660776832395219968"
+        ],
+        "raw_bug": [
+          0,
+          "6439359753103586304"
+        ],
+        "raw_fix": [
+          0,
+          "8660776832395219968"
+        ],
+        "safe_strict": [
+          101,
+          ""
+        ],
+        "safe_lenient": [
+          0,
+          "8660776832395219968"
+        ]
+      },
+      "O3": {
+        "c_bug": [
+          0,
+          "6439359753103586304"
+        ],
+        "c_fix": [
+          0,
+          "8660776832395219968"
+        ],
+        "raw_bug": [
+          0,
+          "6439359753103586304"
+        ],
+        "raw_fix": [
+          0,
+          "8660776832395219968"
+        ],
+        "safe_strict": [
+          101,
+          ""
+        ],
+        "safe_lenient": [
+          0,
+          "8660776832395219968"
+        ]
+      }
+    }
+  },
+  "miri": {
+    "raw_bug/small.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "14256721844730394074"
+    },
+    "raw_fix/small.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "14256721844730394074"
+    },
+    "safe_strict/small.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "14256721844730394074"
+    },
+    "safe_lenient/small.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "14256721844730394074"
+    },
+    "raw_bug/large.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "10826063030632597564"
+    },
+    "raw_fix/large.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "10826063030632597564"
+    },
+    "safe_strict/large.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "10826063030632597564"
+    },
+    "safe_lenient/large.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "10826063030632597564"
+    },
+    "raw_bug/degenerate.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "6238725709514349184"
+    },
+    "raw_fix/degenerate.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "6238725709514349184"
+    },
+    "safe_strict/degenerate.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "6238725709514349184"
+    },
+    "safe_lenient/degenerate.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "6238725709514349184"
+    },
+    "raw_bug/adversarial-stride3.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "0"
+    },
+    "raw_fix/adversarial-stride3.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "0"
+    },
+    "safe_strict/adversarial-stride3.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "0"
+    },
+    "safe_lenient/adversarial-stride3.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "0"
+    },
+    "raw_bug/adversarial-uaf-read.bin": {
+      "exit": 1,
+      "ub": true,
+      "first": "error: Undefined Behavior: in-bounds pointer arithmetic failed: alloc2076 has been freed, so this pointer is dangling",
+      "stdout": ""
+    },
+    "raw_fix/adversarial-uaf-read.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "154398814336"
+    },
+    "safe_strict/adversarial-uaf-read.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "154398814336"
+    },
+    "safe_lenient/adversarial-uaf-read.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "154398814336"
+    },
+    "raw_bug/adversarial-uaf-head.bin": {
+      "exit": 1,
+      "ub": true,
+      "first": "error: Undefined Behavior: in-bounds pointer arithmetic failed: alloc2076 has been freed, so this pointer is dangling",
+      "stdout": ""
+    },
+    "raw_fix/adversarial-uaf-head.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "175491764864"
+    },
+    "safe_strict/adversarial-uaf-head.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "175491764864"
+    },
+    "safe_lenient/adversarial-uaf-head.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "175491764864"
+    },
+    "raw_bug/adversarial-uaf-write.bin": {
+      "exit": 1,
+      "ub": true,
+      "first": "error: Undefined Behavior: in-bounds pointer arithmetic failed: alloc2044 has been freed, so this pointer is dangling",
+      "stdout": ""
+    },
+    "raw_fix/adversarial-uaf-write.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "154398814336"
+    },
+    "safe_strict/adversarial-uaf-write.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "154398814336"
+    },
+    "safe_lenient/adversarial-uaf-write.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "154398814336"
+    },
+    "raw_bug/adversarial-many.bin": {
+      "exit": 1,
+      "ub": true,
+      "first": "error: Undefined Behavior: in-bounds pointer arithmetic failed: alloc2081 has been freed, so this pointer is dangling",
+      "stdout": ""
+    },
+    "raw_fix/adversarial-many.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "5368908807947603008"
+    },
+    "safe_strict/adversarial-many.bin": {
+      "exit": 101,
+      "ub": false,
+      "first": "",
+      "stdout": ""
+    },
+    "safe_lenient/adversarial-many.bin": {
+      "exit": 0,
+      "ub": false,
+      "first": "",
+      "stdout": "5368908807947603008"
+    }
+  },
+  "safe_arm_observable_on": [
+    "adversarial-many.bin/O0",
+    "adversarial-many.bin/O3"
+  ],
+  "problems": [],
+  "invariant": "The RAW-POINTER port of both C arms agrees with the shipped rungs on every input, so the slot-table representation ../unsafe.rs and ../verus.rs use changed the PROOF BURDEN and not the PROGRAM. Miri reports undefined behaviour on the raw-pointer BUG arm on every adversarial input and on nothing else. \u26a0 And Miri is SILENT on arm_safe_bug -- safe Rust with the same line deleted -- on the same inputs, while its checksum and its checksum differs on at least one of them: safe Rust changes the bug's CLASS from a use-after-free into NOTHING AT ALL, a PANIC, or a wrong answer, decided by the input and by which of two idiomatic safe spellings the port uses -- and never into undefined behaviour. `safe_arm_observable_on` names the cells where the deleted line is observable at all; on the others a `None` slot terminates the walk exactly as `NIL` does."
+}

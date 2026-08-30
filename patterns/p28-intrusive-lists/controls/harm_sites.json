@@ -1,0 +1,109 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p28-intrusive-lists/controls/harm_sites.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p28-intrusive-lists/controls/arm_sites.c": "fe82b7a3e3e338bcb7d55ac9edf8828c64ce0253480d991797958dfcd22848fd",
+    "patterns/p28-intrusive-lists/controls/arm_body.inc": "aa8ac3522b7d027916a91b4effefc3adfc5ed30dcd6f85cc4efaa52d0809b8da",
+    "patterns/p28-intrusive-lists/controls/harm_sites.py": "b7ffb7abbf3306493cccc98bb1dfe403eb23fd7ecab9d3e4bf8c99dd7119996d"
+  },
+  "measured_utc": "2026-08-30T13:45:38Z",
+  "windows": {
+    "head": {
+      "hex": "040000000005010503000105",
+      "expected_site": "head"
+    },
+    "tail": {
+      "hex": "040000000005000d03000105",
+      "expected_site": "interior"
+    }
+  },
+  "rows": {
+    "ctl/asan_gcc": {
+      "exit": 1,
+      "stdout": "",
+      "asan_lines": 2,
+      "class": [
+        "heap-use-after-free"
+      ]
+    },
+    "ctl/asan_clang": {
+      "exit": 1,
+      "stdout": "",
+      "asan_lines": 2,
+      "class": [
+        "heap-use-after-free"
+      ]
+    },
+    "site/head": {
+      "exit": 0,
+      "stdout": "fix 5700746 head=1 interior=0",
+      "asan_lines": 0,
+      "class": []
+    },
+    "site/tail": {
+      "exit": 0,
+      "stdout": "fix 5015554 head=0 interior=1",
+      "asan_lines": 0,
+      "class": []
+    },
+    "bug/head/asan_gcc": {
+      "exit": 1,
+      "stdout": "",
+      "asan_lines": 2,
+      "class": [
+        "heap-use-after-free"
+      ]
+    },
+    "bug/head/asan_clang": {
+      "exit": 1,
+      "stdout": "",
+      "asan_lines": 2,
+      "class": [
+        "heap-use-after-free"
+      ]
+    },
+    "fix/head/asan_gcc": {
+      "exit": 0,
+      "stdout": "fix 5700746 head=1 interior=0",
+      "asan_lines": 0,
+      "class": []
+    },
+    "fix/head/asan_clang": {
+      "exit": 0,
+      "stdout": "fix 5700746 head=1 interior=0",
+      "asan_lines": 0,
+      "class": []
+    },
+    "bug/tail/asan_gcc": {
+      "exit": 1,
+      "stdout": "",
+      "asan_lines": 2,
+      "class": [
+        "heap-use-after-free"
+      ]
+    },
+    "bug/tail/asan_clang": {
+      "exit": 1,
+      "stdout": "",
+      "asan_lines": 2,
+      "class": [
+        "heap-use-after-free"
+      ]
+    },
+    "fix/tail/asan_gcc": {
+      "exit": 0,
+      "stdout": "fix 5015554 head=0 interior=1",
+      "asan_lines": 0,
+      "class": []
+    },
+    "fix/tail/asan_clang": {
+      "exit": 0,
+      "stdout": "fix 5015554 head=0 interior=1",
+      "asan_lines": 0,
+      "class": []
+    }
+  },
+  "problems": [],
+  "invariant": "The two dangling-pointer sites p28 claims -- inside `bucket[]` when the victim is the chain head, and inside ANOTHER HEAP OBJECT's `hn` when it is not -- are separately reachable, ASan reports a heap-use-after-free on the buggy arm at both, the hardened arm is silent at both, and the positive control fires on both compilers."
+}

@@ -1846,7 +1846,7 @@ run it whenever a pattern is added or a class is argued about.
 spatial (OOB read/write, index/bound)  15   p02 p03 p05 p07 p09 p10 p11 p12 p13
                                             p14 p16 p17 p23 p36 p46
 logical, memory-safe                    3   p04 p06 p19
-TEMPORAL                                3   p27 p29 p32
+TEMPORAL                                4   p27 p28 p29 p32
 TYPE                                    1   p38
 resource / leak                         1   p42
 side channel                            1   p47
@@ -1856,8 +1856,24 @@ aliasing UB                             1   p08
 calibration, no bug                     1   p01
 ```
 
-⚠ **15 of 26 spatial against ONE temporal and ONE type. A 16th spatial row makes
-the corpus worse, not better, whatever it measures.**
+⚠ **15 of 29 spatial. A 16th spatial row makes the corpus worse, not better,
+whatever it measures.** ⚠⚠ **THIS LINE READ *"15 of 26 spatial against ONE
+temporal and ONE type"* AND THE TEMPORAL HALF IS NOW STALE FOUR TIMES OVER — the
+C-side bar (finding 53) admitted seven rows and the temporal axis has gone
+`1 → 4` (`p27`, `p29` at `TASK_139`, `p32` at `TASK_144`, `p28` at `TASK_146`),
+with two more admitted and unbuilt.** ✅ **THE TYPE AXIS IS STILL ONE ROW
+(`p38`), and `p35` — ranked FIRST of seven by distance — is the second.**
+⚠ **Do not re-derive any of these from this paragraph: run
+`harness/tools/composition.py`.**
+
+⚠⚠ **AND THE TABLE'S OWN STATED TEST NO LONGER REACHES EVERY ROW IT
+CLASSIFIES.** It says it counts **SAFETY LINES** and asks *"what does the safety
+line ASK?"* — **`p28`'s safety line asks nothing.** It is a nine-line **SPLICE**,
+a WRITE on the destroy path that maintains an invariant, so its class is read off
+the **HARM** instead. **`p28` is the first row whose safety line is a maintaining
+write rather than a guard, and `CAVEATS["p28"]` records it.** ⚠ **A taxonomy
+whose test does not reach a row it contains is a real limitation, not a wording
+problem — say so when quoting the table.**
 
 ### THE RULE
 

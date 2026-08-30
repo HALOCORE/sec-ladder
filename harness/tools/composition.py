@@ -95,9 +95,11 @@ CLASSES = {
     "temporal": (
         "the ACCESS OUTLIVES THE OBJECT'S LIFETIME. ⚠ Not necessarily its "
         "STORAGE: the block may still be live and merely RECYCLED, or "
-        "program-owned throughout. The test is what the SAFETY LINE asks -- "
-        "'is this still the object I was given?' -- not whether free() ran",
-        ["p27", "p29", "p32"],
+        "program-owned throughout. ⚠⚠ AND THE STATED TEST -- 'what does the "
+        "SAFETY LINE ask?' -- DOES NOT REACH EVERY ROW HERE: p28's safety line "
+        "asks nothing, it is a maintaining WRITE, so its class is read off the "
+        "HARM instead. See CAVEATS['p28']",
+        ["p27", "p28", "p29", "p32"],
     ),
     "type": (
         "the bytes are read at a type they were not written at",
@@ -142,6 +144,22 @@ ORDER = ["spatial", "logical", "temporal", "type", "resource", "side-channel",
 # that the safety line does not name, and `p09` does.
 # ---------------------------------------------------------------------------
 CAVEATS = {
+    "p28": "the safety line is NOT A TEST, it is a nine-line SPLICE -- a WRITE "
+           "on the DESTROY path that maintains 'membership implies ownership' "
+           "across two intrusive lists. ⚠⚠ So this table's own stated test "
+           "(what does the safety line ASK?) DOES NOT APPLY, and `temporal` is "
+           "read off the HARM instead: a real free() followed by a read or a "
+           "write through a link naming the freed object -- ASan "
+           "heap-use-after-free on both compilers, Miri UB on the faithful "
+           "raw-pointer port. p28 is the first row whose safety line is a "
+           "maintaining write rather than a guard. ⚠ The harm has an ALIASING "
+           "limb and it is p32's caveat MIRRORED: here the aliasing (one "
+           "object on two lists, p08's class) is the SETUP that makes the "
+           "omission possible and the use-after-free is the HARM, where in p32 "
+           "the aliasing IS the harm. ⚠⚠ And the row is the tree's first "
+           "INVERSION: p27, p29 and p32 all keep a correct free discipline and "
+           "put the missing check on the READ; p28's read path is correct and "
+           "its DESTROY path is incomplete.",
     "p32": "the storage is NEVER deallocated -- a fixed pool with a LIFO free "
            "list, owned by the program from start to finish -- so 'temporal' "
            "here is about the OBJECT's lifetime, not the allocation's. Counted "

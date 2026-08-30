@@ -1,0 +1,118 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p28-intrusive-lists/controls/proof_mutants.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p28-intrusive-lists/verus.rs": "231d586a3502c51e26d68360df2e14215328cc98fa45e221d992fb5ba9f6e271",
+    "patterns/p28-intrusive-lists/controls/proof_mutants.py": "74e4e9ee975506a54b458721900b0411b2a4d19f2acba2513f161c8dc06de3fb"
+  },
+  "verus_flags": [
+    "--rlimit",
+    "400"
+  ],
+  "measured_utc": "2026-08-30T16:41:29Z",
+  "mutants": [
+    {
+      "mutant": "A0-control",
+      "kind": "control",
+      "expected": "verify",
+      "got": "verify",
+      "ok": true,
+      "verified": 23,
+      "errors": 0,
+      "rc": 0,
+      "error_kinds": [],
+      "why": "the shipped file, run through the same harness and the same flags. If this does not verify, nothing below means anything."
+    },
+    {
+      "mutant": "A1-exec-safety-line",
+      "kind": "attack",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 22,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 1 previous error",
+        "assertion failed"
+      ],
+      "why": "\u26a0\u26a0 **THE ATTACK ARM, and it is c/kernel.c exactly**: delete the hash-chain splice from TRIM's EXEC code and nothing else, so the freed victim stays in `bucket[vb]` or in a live object's `hn`. It must FAIL, and it does -- **at `assert(st == step(st_in, c, a).0)`, the REFINEMENT assertion** (measured; the mutant's own diagnostic names that line). It is a functional failure and not a permission one, which is this row's R5 result, and A4 is what proves the distinction is real rather than a reading of one error message."
+    },
+    {
+      "mutant": "A2-constant-body",
+      "kind": "vacuity",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 20,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 1 previous error; 1 warning emitted",
+        "postcondition not satisfied"
+      ],
+      "why": "`.memory/04-verus.md`'s vacuity probe in its sharp form -- what is the CHEAPEST body that satisfies the postcondition? `TASK_137` discharged `TASK_136`'s ARM_C with `fn arm_c() -> u8 { 9 }`, and `p42`'s ghost ledger verified 18/0 while leaking. Here the cheapest body is `return 0;` and it must FAIL, because `cache_fold` is a function of the window bytes and no constant equals it."
+    },
+    {
+      "mutant": "A3-spec-only-weaken",
+      "kind": "attack",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 22,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 2 previous errors",
+        "assertion failed",
+        "while loop: Resource limit (rlimit) exceeded; consider rerun"
+      ],
+      "why": "delete the chain splice from the ABSTRACT MACHINE `trim` only, leaving the exec code intact -- a postcondition true of the WRONG program. It must FAIL. With A1 (exec only) and A4 (both) this is the third cell, and it is what stops A4 from being an assertion: the two sides are tied to each other and to nothing outside."
+    },
+    {
+      "mutant": "A4-spec-weaken",
+      "kind": "must-verify",
+      "expected": "verify",
+      "got": "verify",
+      "ok": true,
+      "verified": 23,
+      "errors": 0,
+      "rc": 0,
+      "error_kinds": [],
+      "why": "\u26a0\u26a0\u26a0 **THE ARM THAT IS SUPPOSED TO VERIFY, AND IT IS p28's R5 RESULT.** Delete the chain splice from the exec code AND from `trim`, so the specification describes the BUGGY kernel. It verifies. **The linear resources do NOT force this safety line** -- `rec_close` consumes the victim's `PointsTo` and its `Dealloc`, and that is a real temporal guarantee about READS, but what `c/kernel.c` forgets is a LINK, and leaving a `u8` behind consumes nothing. \u26a0\u26a0 **That is the same shape `p32` reported and it is SHARPER here**: `p32` had no linear resource at all, so of course none forced its conjunct; p28 HAS them, consumed by a real `free`, and they still do not reach the destroy path's omission. What forces the safety line is the FUNCTIONAL postcondition, which A1 shows and A3 shows is not inert."
+    },
+    {
+      "mutant": "A5-walk-liveness",
+      "kind": "attack",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 22,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 1 previous error",
+        "assertion failed"
+      ],
+      "why": "the CONTRAST arm: delete `live[cur] == 1u8` from the walk's loop condition and leave everything else alone. It must FAIL, and \u26a0 **it fails for a MEMORY-SAFETY reason** -- measured, the diagnostic names `assert(alive(st, cur))` inside `walk`, which is the step that licenses `perms.tracked_borrow(cur)`; the borrow's own precondition is never reached because the licence is gone one line earlier. Contrast A1, whose diagnostic names `assert(st == step(st_in, c, a).0)`. **Two arms, two different failing obligations, and that is what lets this battery tell a permission failure from a refinement failure** -- the distinction A1 and A4 turn on."
+    },
+    {
+      "mutant": "A6-epilogue-dead",
+      "kind": "must-verify",
+      "expected": "verify",
+      "got": "verify",
+      "ok": true,
+      "verified": 23,
+      "errors": 0,
+      "rc": 0,
+      "error_kinds": [],
+      "why": "\u26a0\u26a0 **THE ARM THAT WAS PREDICTED TO FAIL AND VERIFIES, AND THE PREDICTION WAS THE ONE WRITTEN INTO THIS FILE FIRST.** Make the epilogue's `live[j] == 1` test unreachable, so NOTHING is freed at the end of the window and every surviving object leaks. It VERIFIES, `23/0`. The reason is already in `.memory/04-verus.md`: **`Tracked<Dealloc>` is AFFINE, not linear** -- dropping a token is legal, so a proof built on it shows deallocation is LEGAL (no double free, no use after free) and never that it HAPPENS. `TASK_104` measured that on `p42` with a committed must-fail control; this is the same result on a fourth pattern, and it is why the sentence *the linear resources force the epilogue* -- which this battery asserted before it was run -- is RETRACTED. \u26a0 What stands behind p28's epilogue instead is `controls/rust_arms.py`'s Miri arm and the C rungs' own structure, not the proof."
+    }
+  ],
+  "invariant": "The ATTACK arm (A1, the shipped bug), the VACUITY arm (A2, a constant body), the SPEC-ONLY arm (A3), the WALK-GUARD arm (A5) and the EPILOGUE arm (A6) all FAIL. The SPEC-WEAKEN arm (A4) VERIFIES, and that is p28's R5 RESULT rather than a defect: the safety line is load-bearing against the SPECIFICATION, not against the linear resources -- which p28 HAS and p32 did not, so the finding is sharper here. A1 exec-only FAIL / A3 spec-only FAIL / A4 both VERIFY is the three-cell form that makes it a result. A5 and A6 are the contrast: the two arms that fail because a PERMISSION is missing rather than because a postcondition stopped holding.",
+  "summary": {
+    "n": 7,
+    "as_expected": 7
+  }
+}

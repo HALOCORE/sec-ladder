@@ -1,0 +1,247 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p28-intrusive-lists/controls/repro.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p28-intrusive-lists/c/kernel.c": "9c351d73f84372bb94f1f4a8b29189be6203d6ebf2a6e2eae2b716b13df2749f",
+    "patterns/p28-intrusive-lists/c/kernel_hardened.c": "73bf0fccd1f8317ebacdfef3a77d9de606a6c916ad39a983503918752a625442",
+    "patterns/p28-intrusive-lists/c/main.c": "32ab741abdd4df78e9967826c13d4a0f54638d522473e46167b4e0f6d03be99e",
+    "patterns/p28-intrusive-lists/inputs/gen.py": "20b54f69e517161b606aee5bb80c354a37feee37cab8a420b19e5c9503111182",
+    "patterns/p28-intrusive-lists/controls/repro.py": "b0f7c49b4fddb0db413fb04fb86411d33df5dc3a7e97041377f54876f72c6335",
+    "patterns/p28-intrusive-lists/controls/arm_aslr.c": "4ce79a9d4632aecad651ee4936e85dad3495e56c19ade6636a48d830f6420930",
+    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3"
+  },
+  "runs": 20,
+  "measured_utc": "2026-08-30T14:53:04Z",
+  "rows": [
+    {
+      "input": "adversarial-uaf-read.bin",
+      "cells": {
+        "c-gcc/O0": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "9891317877474112512"
+        },
+        "c-gcc/O3": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "9891317877474112512"
+        },
+        "c-clang/O0": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "9891317877474112512"
+        },
+        "c-clang/O3": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "9891317877474112512"
+        }
+      },
+      "same_across_cells": true,
+      "distinct_behaviours_across_cells": 1,
+      "is_a_value": true
+    },
+    {
+      "input": "adversarial-uaf-head.bin",
+      "cells": {
+        "c-gcc/O0": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "7155896426678277120"
+        },
+        "c-gcc/O3": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "7155896426678277120"
+        },
+        "c-clang/O0": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "7155896426678277120"
+        },
+        "c-clang/O3": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "7155896426678277120"
+        }
+      },
+      "same_across_cells": true,
+      "distinct_behaviours_across_cells": 1,
+      "is_a_value": true
+    },
+    {
+      "input": "adversarial-uaf-write.bin",
+      "cells": {
+        "c-gcc/O0": {
+          "distinct": 1,
+          "exit_codes": [
+            -11
+          ],
+          "value": null
+        },
+        "c-gcc/O3": {
+          "distinct": 1,
+          "exit_codes": [
+            -11
+          ],
+          "value": null
+        },
+        "c-clang/O0": {
+          "distinct": 1,
+          "exit_codes": [
+            -11
+          ],
+          "value": null
+        },
+        "c-clang/O3": {
+          "distinct": 1,
+          "exit_codes": [
+            -11
+          ],
+          "value": null
+        }
+      },
+      "same_across_cells": true,
+      "distinct_behaviours_across_cells": 1,
+      "is_a_value": false
+    },
+    {
+      "input": "adversarial-many.bin",
+      "cells": {
+        "c-gcc/O0": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "6439359753103586304"
+        },
+        "c-gcc/O3": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "6439359753103586304"
+        },
+        "c-clang/O0": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "6439359753103586304"
+        },
+        "c-clang/O3": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "6439359753103586304"
+        }
+      },
+      "same_across_cells": true,
+      "distinct_behaviours_across_cells": 1,
+      "is_a_value": true
+    },
+    {
+      "input": "degenerate.bin",
+      "cells": {
+        "c-gcc/O0": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "17281166933783909376"
+        },
+        "c-gcc/O3": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "17281166933783909376"
+        },
+        "c-clang/O0": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "17281166933783909376"
+        },
+        "c-clang/O3": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "17281166933783909376"
+        }
+      },
+      "same_across_cells": true,
+      "distinct_behaviours_across_cells": 1,
+      "is_a_value": true
+    },
+    {
+      "input": "small.bin",
+      "cells": {
+        "c-gcc/O0": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "18314675230631941442"
+        },
+        "c-gcc/O3": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "18314675230631941442"
+        },
+        "c-clang/O0": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "18314675230631941442"
+        },
+        "c-clang/O3": {
+          "distinct": 1,
+          "exit_codes": [
+            0
+          ],
+          "value": "18314675230631941442"
+        }
+      },
+      "same_across_cells": true,
+      "distinct_behaviours_across_cells": 1,
+      "is_a_value": true
+    }
+  ],
+  "negative_control": {
+    "arm": "controls/arm_aslr.c",
+    "distinct": 20,
+    "runs": 20,
+    "exit_codes": [
+      0
+    ],
+    "randomize_va_space": "2",
+    "fired": true,
+    "what": "reads user offset 0 of a freed tcache chunk -- the word glibc overwrites with a safe-linked next derived from the heap base, and the word p28's LAYOUT deliberately keeps R1 away from. It MUST give more than one distinct value in N runs; if it gives one, the counter is blind and every figure above is vacuous."
+  },
+  "unstable_cells": [],
+  "invariant": "EVERY cell is stable at 1 distinct value in N runs, on every input including the four adversarial ones -- although R1 READS FREED HEAP on all four. The layout is why (c/kernel.h): the links come first, so glibc's tcache clobbers `lp` and `ln` and leaves the `key`/`val`/`hn`/`hp` R1's walk reads intact. \u26a0 WHAT THIS BUYS IS A PINNABLE FIGURE AND NOT A GATE: harness/check.py records adversarial behaviour and never requires it to agree with model.py, in any pattern (TASK_146 deliverable 0, measured). \u26a0\u26a0 AND IT IS ONLY EVIDENCE BESIDE THE NEGATIVE CONTROL: arm_aslr.c goes through the SAME counter and must report MORE than one distinct value. `adv-uaf-write` is a stable SIGSEGV rather than a stable value, so its `value` is null and its stability lives in `exit_codes`."
+}

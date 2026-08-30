@@ -1,0 +1,32 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p28-intrusive-lists/controls/safety_line.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p28-intrusive-lists/c/kernel.c": "9c351d73f84372bb94f1f4a8b29189be6203d6ebf2a6e2eae2b716b13df2749f",
+    "patterns/p28-intrusive-lists/c/kernel_hardened.c": "73bf0fccd1f8317ebacdfef3a77d9de606a6c916ad39a983503918752a625442",
+    "patterns/p28-intrusive-lists/c/kernel.h": "190c85765115549ad1268242ee6c23ec8dc0434899252bd060d600b8b7c0ef97",
+    "patterns/p28-intrusive-lists/controls/safety_line.py": "028a7e95daaac880945bef07d2c0c4968ef8985558a55267baa201ef8aaa71e6"
+  },
+  "measured_utc": "2026-08-30T14:25:35Z",
+  "preprocessed_lines": {
+    "kernel.c": 392,
+    "kernel_hardened.c": 401
+  },
+  "added": [
+    "{",
+    "size_t vb = (size_t)(victim->key % 8);",
+    "if (victim->hp != ((void *)0))",
+    "victim->hp->hn = victim->hn;",
+    "else",
+    "bucket[vb] = victim->hn;",
+    "if (victim->hn != ((void *)0))",
+    "victim->hn->hp = victim->hp;",
+    "}"
+  ],
+  "removed": [],
+  "victim_hp_sites": 3,
+  "victim_hn_sites": 4,
+  "problems": [],
+  "invariant": "The preprocessed difference between the two C rungs is a pure ADDITION consisting of the hash-chain splice alone, at exactly ONE site -- TRIM. The line COUNT is printed and recorded, never pinned in spec.md."
+}

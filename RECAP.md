@@ -8,8 +8,8 @@ this box is reference; this box is what to *do*.
 
 | | |
 |---|---|
-| **Patterns** | ⚠⚠ **DERIVE EVERY COUNT IN THIS ROW; DO NOT TRUST IT. This row has gone stale FOUR times.** `ls -d patterns/p*/ | wc -l` · `grep -c '^| p[0-9]' .memory/06-catalogue.md` · read `verdict`/`failures`/`blocked` out of `results/gate/p*.json` · `harness/measure.py --check-stale` · `harness/tools/composition.py --check`. ✅ **State at `TASK_147`: 28 patterns, `26 PASS + 2 PASS-WITH-BLOCKED-ROWS`, 0 failures, blocked exactly `p01 = 1` and `p42 = 1`, 56 measurement records 0 STALE, catalogue 48 rows, composition 28 patterns / temporal 3, `temp_citations.py` OK.** ✅✅ **ALL 28 ARE BUILT, REVIEWED, AND THEIR CORRECTIONS LANDED — `p32` was the last, closed at `TASK_147`. There is no unreviewed pattern.** ⚠ **NEW TOOL, and use it whenever a `contract_sha256` moves: `python3 harness/tools/contract_diff.py pNN [ref]` says WHAT moved inside the hashed block, key by key, **from `git` alone** — `--all` sweeps every pattern and exits 1 if any moved. It exists because `TASK_145` could not reproduce `TASK_144`'s disclosure (that check needed a gitignored artefact — *"a real gap in the evidence chain"*). `harness/tools/` is outside the gate digest, so it costs nothing.** ⚠ **`p42`'s blocked count MAY LEGITIMATELY BE 2 on any run — the Miri slowdown is selected by the ENVIRONMENT, not by the gate (`.memory/00-environment.md`). Do NOT read a second `p42` block as a regression.** ⚠⚠ **READ `blocked` OUT OF THE RECORD, NEVER `grep` THE LOG:** `grep -c BLOCKED` matches the verdict string `PASS-WITH-BLOCKED-ROWS` and decodes as `2N+1` (validated 130/130). ⚠⚠ **AND A GREEN GATE RECORD IS NOT SELF-CERTIFYING: `p29` shipped as *"green"* off a record that said `PASS` while `check.py` said `FAIL [tables]` — stage 9c's one-run lag, CLOSED IN CODE at `TASK_141` with a must-fire arm. If a gate fails on `[tables]`, run `harness/report.py pNN` then re-gate.** ⚠ **Still PROVISIONAL and load-bearing: `TASK_088` (`p19`'s re-fitted laws) and `TASK_092` (`p46`'s headline ground). `TASK_135` adjudicated the marker debt — 5 stand, 2 stale-as-worded, 1 not a marker, 1 site cleared — and rule 3 blocks the manager from clearing site 2 because `TASK_092_REPORT.md` says the manager wrote it after the fact.** |
-| **Do this next** | ⚠⚠⚠ **BUILD THE ADMITTED TEMPORAL/TYPE ROWS. `TASK_143` ADMITTED SEVEN AND ZERO REFUSALS SURVIVED — read finding 54 first, and `.memory/02-bench-rules.md`'s *THE ADMISSION BAR IS C-SIDE ONLY* before proposing anything.** > **A pattern is admitted SOLELY on whether the C program makes sense: correct on benign inputs so perf is measurable, exhibits the error on an adversarial input, C MECHANISM distinct from a built row's, fits the pinned signature. NOTHING about Rust, Verus, Miri, a cost gradient or what the ladder can 'price' may EVER remove a row — those are RESULTS.** (`CLAUDE.md` rule 6.) ✅✅ **`p32`/`p33` IS DONE — built (`TASK_144`), reviewed (`TASK_145`, verdict `p32` STANDS), corrections landed (`TASK_147`). Finding 55.** ⚠⚠⚠ **THE NEXT ACTION IS `TASK_146`: BUILD `p28`. It is written, committed, and NOT YET LAUNCHED.** ✅✅ **ALL FOUR REMAINING ROWS HAVE BEEN PRE-VERIFIED BY THE MANAGER — re-run with controls, not quoted — and THREE HAD A DEFECT A BUILD TASK WOULD HAVE INHERITED. Read the catalogue cell before writing any of their tasks; the corrections are there, not in `TASK_143_REPORT.md`.** ⚠ **`p28`** (`.temp/mgr146/`): reproducibility confirmed **against a negative control giving 20 distinct values**, but *"gatable against `model.py` on its adversarial inputs"* is **DISPUTED** — stage 2 gates non-adversarial cells only — and the doubly linked spelling `TASK_143` predicted at *"4"* is **9, and free** (both R1 bodies preprocess to 127 lines). ⚠ **`p25`** (`.temp/mgr148/`): `TASK_143` §1.5 **published a DRAW as a FIGURE** — 37 distinct values in 40 draws — and contradicts itself four lines below. ⚠ **`p35`** (`.temp/mgr147/`): safety line confirmed a pure `+2/−2` REORDER, but its `ubsan` column was **unlicensed** (the control fires only under ASan); closed with a UBSan-specific control. ✅ **`p34`** (`.temp/mgr149/`): its *"believed structural but unproven"* claim is **PROVED IN TWO LINES**, and the four-shape search **missed a cell** — `DUP+NEW+READ` is reproducible, checksum-divergent **AND** ASan-firing, which **no built temporal row has**. ✅ **BUILD ORDER FROM HERE: `p28` (written) → `p35` (type axis, ranks most novel, still ONE built row) → `p34` → `p25`.** ⚠⚠ **REFUSED, and only on C-SIDE duplication of a BUILT row: `CVE-2024-25062` and `Issue-15143` (both are `p29`'s C mechanism); `p30` and iterator-invalidation (`p27`'s and `p25`'s); stack-lifetime (both compilers warn at DEFAULT flags, so C is not silently wrong).** ⚠ **`CVE-2016-4658`, `CVE-2022-23308`, `Issue-15192` pass the bar but duplicate admitted candidates — build the candidate, not the CVE.** ⚠⚠ **~3 tasks per row at the measured rate. Temporal would go 2 → up to 8.** ✅ **Tree state when this was written: 27 patterns, `25 PASS + 2 PASS-WITH-BLOCKED-ROWS`, 0 failures, blocked `p01 = 1`/`p42 = 1`, `54 records 0 STALE`, `composition.py --check` OK, `temp_citations.py` OK, orphan control sources 0. DERIVE these; do not trust this row.** ⚠⚠ **OWED, NOT BLOCKING, AND THE FIRST TWO NOW BUNDLE — both are `harness/*.py` INSIDE the gate digest, so each costs a FULL RE-GATE and doing them together costs one. Land them when a sweep is due anyway.** (i) **finding 46 (iii)**, the self-reference detector's allow-list inversion in `report.py`; (ii) **`assume(false)` verifies while `check.py` only SHOUTS `[tcb-axiom]`** (`TASK_145` §3) — ✅ **exposure TODAY is ZERO: `assume(` count is `0` across all 28 shipped `verus.rs`, so the risk is entirely PROSPECTIVE**; (iii) **`SYNTHESIS.md` reconciliation** — its four Results were drawn from **26** kernels and the tree is 28; §0 and §7 now say so and name `p29` and `p32`, ⚠ **and §0 also records the larger half: that corpus was assembled under a SELECTION RULE THIS PROJECT HAS SINCE WITHDRAWN, so §7's composition discussion is the part that moves most.** ⚠⚠ **OPERATIONAL, NEVER DELETE: `results/SYNTHESIS.md` is HAND-WRITTEN; `results/synthesis.md` (lower case) is GENERATED. Never regenerate over the capitalised one.** |
+| **Patterns** | ⚠⚠ **DERIVE EVERY COUNT IN THIS ROW; DO NOT TRUST IT. This row has gone stale FOUR times.** `ls -d patterns/p*/ | wc -l` · `grep -c '^| p[0-9]' .memory/06-catalogue.md` · read `verdict`/`failures`/`blocked` out of `results/gate/p*.json` · `harness/measure.py --check-stale` · `harness/tools/composition.py --check`. ✅ **State at `TASK_146`: 29 patterns, `27 PASS + 2 PASS-WITH-BLOCKED-ROWS`, 0 failures, blocked exactly `p01 = 1` and `p42 = 1`, 58 measurement records 0 STALE, catalogue 48 rows, composition 29 patterns / temporal 4 / type 1, `temp_citations.py` OK.** ⚠⚠ **ONE PATTERN IS UNREVIEWED: `p28-intrusive-lists` (`TASK_146`). `TASK_149` IS ITS REVIEW. The other 28 are built, reviewed AND their corrections landed.** ⚠ **NEW TOOL, and use it whenever a `contract_sha256` moves: `python3 harness/tools/contract_diff.py pNN [ref]` says WHAT moved inside the hashed block, key by key, **from `git` alone** — `--all` sweeps every pattern and exits 1 if any moved. It exists because `TASK_145` could not reproduce `TASK_144`'s disclosure (that check needed a gitignored artefact — *"a real gap in the evidence chain"*). `harness/tools/` is outside the gate digest, so it costs nothing.** ⚠ **`p42`'s blocked count MAY LEGITIMATELY BE 2 on any run — the Miri slowdown is selected by the ENVIRONMENT, not by the gate (`.memory/00-environment.md`). Do NOT read a second `p42` block as a regression.** ⚠⚠ **READ `blocked` OUT OF THE RECORD, NEVER `grep` THE LOG:** `grep -c BLOCKED` matches the verdict string `PASS-WITH-BLOCKED-ROWS` and decodes as `2N+1` (validated 130/130). ⚠⚠ **AND A GREEN GATE RECORD IS NOT SELF-CERTIFYING: `p29` shipped as *"green"* off a record that said `PASS` while `check.py` said `FAIL [tables]` — stage 9c's one-run lag, CLOSED IN CODE at `TASK_141` with a must-fire arm. If a gate fails on `[tables]`, run `harness/report.py pNN` then re-gate.** ⚠ **Still PROVISIONAL and load-bearing: `TASK_088` (`p19`'s re-fitted laws) and `TASK_092` (`p46`'s headline ground). `TASK_135` adjudicated the marker debt — 5 stand, 2 stale-as-worded, 1 not a marker, 1 site cleared — and rule 3 blocks the manager from clearing site 2 because `TASK_092_REPORT.md` says the manager wrote it after the fact.** |
+| **Do this next** | ⚠⚠⚠ **BUILD THE ADMITTED TEMPORAL/TYPE ROWS. `TASK_143` ADMITTED SEVEN AND ZERO REFUSALS SURVIVED — read finding 54 first, and `.memory/02-bench-rules.md`'s *THE ADMISSION BAR IS C-SIDE ONLY* before proposing anything.** > **A pattern is admitted SOLELY on whether the C program makes sense: correct on benign inputs so perf is measurable, exhibits the error on an adversarial input, C MECHANISM distinct from a built row's, fits the pinned signature. NOTHING about Rust, Verus, Miri, a cost gradient or what the ladder can 'price' may EVER remove a row — those are RESULTS.** (`CLAUDE.md` rule 6.) ✅✅ **`p32` IS DONE — built (`TASK_144`), reviewed (`TASK_145`, verdict STANDS), corrections landed (`TASK_147`). Finding 55.** ✅✅ **`p28` IS BUILT AND GREEN (`TASK_146`, finding 56) — 29 patterns, the FOURTH temporal row, and its result is the EXACT OPPOSITE of `p32`'s: safe Rust CANNOT REPRODUCE its buggy C at all, for a structural reason.** ⚠⚠⚠ **THE NEXT ACTION IS `p28`'s REVIEW — `TASK_149`, written and NOT YET LAUNCHED.** ⚠ **`TASK_148` (build `p35`) is written and queued behind it.** ✅✅ **ALL FOUR REMAINING ROWS HAVE BEEN PRE-VERIFIED BY THE MANAGER — re-run with controls, not quoted — and THREE HAD A DEFECT A BUILD TASK WOULD HAVE INHERITED. Read the catalogue cell before writing any of their tasks; the corrections are there, not in `TASK_143_REPORT.md`.** ⚠ **`p28`** (`.temp/mgr146/`): reproducibility confirmed **against a negative control giving 20 distinct values**, but *"gatable against `model.py` on its adversarial inputs"* is **DISPUTED** — stage 2 gates non-adversarial cells only — and the doubly linked spelling `TASK_143` predicted at *"4"* is **9, and free** (both R1 bodies preprocess to 127 lines). ⚠ **`p25`** (`.temp/mgr148/`): `TASK_143` §1.5 **published a DRAW as a FIGURE** — 37 distinct values in 40 draws — and contradicts itself four lines below. ⚠ **`p35`** (`.temp/mgr147/`): safety line confirmed a pure `+2/−2` REORDER, but its `ubsan` column was **unlicensed** (the control fires only under ASan); closed with a UBSan-specific control. ✅ **`p34`** (`.temp/mgr149/`): its *"believed structural but unproven"* claim is **PROVED IN TWO LINES**, and the four-shape search **missed a cell** — `DUP+NEW+READ` is reproducible, checksum-divergent **AND** ASan-firing, which **no built temporal row has**. ✅ **BUILD ORDER FROM HERE: `p28` (written) → `p35` (type axis, ranks most novel, still ONE built row) → `p34` → `p25`.** ⚠⚠ **REFUSED, and only on C-SIDE duplication of a BUILT row: `CVE-2024-25062` and `Issue-15143` (both are `p29`'s C mechanism); `p30` and iterator-invalidation (`p27`'s and `p25`'s); stack-lifetime (both compilers warn at DEFAULT flags, so C is not silently wrong).** ⚠ **`CVE-2016-4658`, `CVE-2022-23308`, `Issue-15192` pass the bar but duplicate admitted candidates — build the candidate, not the CVE.** ⚠⚠ **~3 tasks per row at the measured rate. Temporal would go 2 → up to 8.** ✅ **Tree state when this was written: 27 patterns, `25 PASS + 2 PASS-WITH-BLOCKED-ROWS`, 0 failures, blocked `p01 = 1`/`p42 = 1`, `54 records 0 STALE`, `composition.py --check` OK, `temp_citations.py` OK, orphan control sources 0. DERIVE these; do not trust this row.** ⚠⚠ **OWED, NOT BLOCKING, AND THE FIRST TWO NOW BUNDLE — both are `harness/*.py` INSIDE the gate digest, so each costs a FULL RE-GATE and doing them together costs one. Land them when a sweep is due anyway.** (i) **finding 46 (iii)**, the self-reference detector's allow-list inversion in `report.py`; (ii) **`assume(false)` verifies while `check.py` only SHOUTS `[tcb-axiom]`** (`TASK_145` §3) — ✅ **exposure TODAY is ZERO: `assume(` count is `0` across all 28 shipped `verus.rs`, so the risk is entirely PROSPECTIVE**; (iii) **`SYNTHESIS.md` reconciliation** — its four Results were drawn from **26** kernels and the tree is 28; §0 and §7 now say so and name `p29` and `p32`, ⚠ **and §0 also records the larger half: that corpus was assembled under a SELECTION RULE THIS PROJECT HAS SINCE WITHDRAWN, so §7's composition discussion is the part that moves most.** ⚠⚠ **OPERATIONAL, NEVER DELETE: `results/SYNTHESIS.md` is HAND-WRITTEN; `results/synthesis.md` (lower case) is GENERATED. Never regenerate over the capitalised one.** |
 | **⚠⚠⚠ THE CATALOGUE IS RE-OPENED — AND THIS TIME NOT ON A MEASUREMENT, BUT BECAUSE THE ADMISSION BAR WAS WRONG** | ⚠⚠⚠ **THE HEADER USED TO READ *"THE CATALOGUE IS CLOSED, AND THIS TIME EVERY ROW HAS A MEASUREMENT"*. THAT IS FALSE. `TASK_143` RE-ADJUDICATED THE TEMPORAL REFUSALS ON A C-SIDE BAR AND ADMITTED SEVEN ROWS.** ✅ **ADMITTED: `p25` · `p28` · `p32`/`p33` (BUILT at `TASK_144`) · `p34` · `p35` · `CVE-2021-3518` · `CVE-2022-40304`.** ⚠ **Only TWO refusals survived, and both name C-SIDE DUPLICATION of the BUILT `p29`: `CVE-2024-25062` and `Issue-15143`.** ⚠⚠ **Read `RECAP` findings 53 and 54, and `.memory/02-bench-rules.md`'s *THE ADMISSION BAR IS C-SIDE ONLY*, before quoting anything about the catalogue being closed.** ✅ **The catalogue is still 48 ROWS — `grep -c '^| p[0-9]' .memory/06-catalogue.md`; re-admission changes STATUS CELLS, not the row count.** ⚠ **Every per-row reason is in the status cell. READ THE CELL — and note that six cells carry a RE-OPENED banner naming which side their old refusal rested on, precisely so the dead reason is not quietly reused.** |
 | **⚠⚠⚠ THE ENDGAME QUESTION — THE OLD ANSWER WAS *STOP BUILDING* AND IT IS WITHDRAWN. WE ARE BUILDING AGAIN.** | ⚠⚠⚠ **THIS ROW SAID *"STOP BUILDING, FOR A REASON NOBODY EXPECTED"* AND IT WAS WRONG — NOT ABOUT THE EVIDENCE IT CITED, BUT BECAUSE THE BAR IT APPLIED THAT EVIDENCE TO WAS MEASURING THE WRONG THING (finding 53).** ✅ **What still STANDS from the old answer:** the 47 catalogue rows are PRE-PROJECT (`git`-verified against `d5e0ccd`), so the catalogue running out said little about the domain; the CVE corpus answers *which mechanisms are missing* and CANNOT answer *which idioms matter*, because CVEs select for EXPLOITABILITY not FREQUENCY; and the idiom census (finding 45) is real — 49 898 bound sites over 991 147 deduplicated lines in 22 programs — with `ptr_offset` in ALL 22, ranked 2nd or 3rd in 15, and ZERO in the built tree. ⚠ **That gap is SPATIAL and is refused by the user's standing priority; record it as a limitation, do not probe it.** ⚠⚠⚠ **WHAT IS WITHDRAWN: the ENUMERATION's conclusion. `TASK_123` closed the SEVEN temporal CVEs on a CITATION with NO MEASUREMENT SPENT — it says so in terms — and `TASK_143` measured them: the citation is accurate about EXACTLY ONE port (`CVE-2022-23308`). Six of seven use real `malloc`/`free`, with ASan reporting `heap-use-after-free` on five and double-free on one.** ⚠ **A closure argued rather than measured stood for twenty tasks and suppressed six admissible rows.** |
 | **⚠⚠ The manager generalisation that was REFUTED, and it is the most useful thing here** | I read `TASK_093`'s `p28` refusal as a **family** result — *"safe Rust's answer to every pointer-backed structure is either an arena that never frees or `p27`'s mechanism, so `p29`–`p34` are ONE finding, not five."* **I wrote it into two task files by name and asked to be corrected. Both agents corrected me.** ✅ **The reviewed replacement is now in `.memory/01-ladder.md` and it is a RULE, not a refusal:** *"safe Rust's temporal guarantee is a guarantee about the **ALLOCATOR**; a structure that **recycles its own storage** gets no guarantee at all."* **There are FOUR outcomes, not two** — and outcome 3 is that **the type system is SILENT** (use-after-recycle *and* slot double-free both writable under `#![forbid(unsafe_code)]`, silently wrong, **Miri-clean**, ✅ manager-re-run), which is `p04`'s finding. ⚠⚠⚠ **THAT OUTCOME WAS THEN USED TO KILL `p32`/`p33`, AND THAT KILL IS WITHDRAWN (finding 53): *the type system is silent* is a RESULT, not a reason to refuse. `p32` IS BUILT and outcome 3 IS ITS HEADLINE — ✅ safe Rust reproduces the buggy C bit for bit on 10 of 10 cells.** ✅ **The LAW itself is vindicated, not weakened: `p32` allocates nothing, so it is exactly the *recycles its own storage* case, and `TASK_144` found the PROOF-SIDE analogue — nothing LINEAR forces the safety conjunct, so `M4-spec-weaken` verifies `15/0`.** ⚠ **A generation tag does NOT rescue it**, so **this file's own p14-cycle `(slot, gen)` proposal yields a `p04`-shaped row, not a temporal one.** Outcome 4 is `p34`: **the safe rung is WORSE than C** (`Rc` cycle leaks, `Weak` does not). And `p29` is the fifth and only good outcome. ⚠⚠ **AND `TASK_093`'s OWN STATED REASON WAS REJECTED BY ITS REVIEW** — *"safe Rust has no owned intrusive DLL (`E0382` + `E0499`)"* is **false**: the `E0382` was a plain double move (reproduced with a control containing no data structure at all), `E0499` is refuted by **four compiling spellings** under `forbid(unsafe_code)` including `split_at_mut` with two `&mut` alive simultaneously, and **the claim was self-contradicted by its own table two rows below it.** **Right verdict, wrong reason — `p31`'s failure mode, and rule 9 is the only thing that kept it out of `.memory/`.** ⚠ **A refusal's REASON is what gets reused on the next row. It needs the same scrutiny as a finding.** |
@@ -4500,14 +4500,25 @@ the number.** Two task files have already sent an agent to the wrong finding.
     `+2/−0`** — `TASK_144` moved the include-twice construction into `controls/`
     (applying it to the rungs removes the C kernel bodies from
     `forbidden_verdict`'s text scan) and `controls/safety_line.py` measures the
-    shipped preprocessed files; `TASK_145` §5 confirmed it. ✅ **`p28` SHOULD
-    SHIP AT `+9/−0`, NOT `+15/−0`** — the manager built the doubly linked
-    hash-chain spelling `TASK_143` predicted at *"4"* and did not build: it is
-    **9**, and it costs **NOTHING** shared (both R1 bodies preprocess to 127
-    lines, because the three lines `hp` adds to PUT cancel the three `prevn` no
-    longer needs in DEL) at **bit-identical behaviour on all four inputs × both
-    arms**, same 20/20 reproducibility, same three ASan firings
-    (`.temp/mgr146/NOTES.md`; `TASK_146` builds that spelling).
+    shipped preprocessed files; `TASK_145` §5 confirmed it. ✅ **`p28` SHIPS AT `+9/−0`, NOT `+15/−0`** —
+    the doubly linked hash-chain spelling `TASK_143` predicted at *"4"* and did
+    not build. ⚠⚠⚠ **BUT THE MANAGER'S *"AND IT COSTS NOTHING SHARED"* IS
+    RETRACTED AT `TASK_146`, AND THE VARIANT IT RESTED ON WAS AN INCORRECT
+    PROGRAM: `.temp/mgr146/p28d/body.inc` NEVER INITIALISES `hp`** — six reads,
+    zero writes on the PUT path, because the generator used `str.replace()` and
+    **asserted no substitution count**, so an edit indented 12 spaces where the
+    source has 16 **matched nothing and returned the string unchanged,
+    silently.** **Under ASan it SEGVs on a BENIGN input in the HARDENED arm**, at
+    `body.inc:164` *inside the safety line*, so it fails admission question 1.
+    ✅ **Corrected: `9` against `15` at `+3` SHARED lines (R1 body 130 vs 127),
+    behaviour then bit-identical. The conclusion survives; the arithmetic did
+    not.** ⚠⚠ **AND THE REASON THE VERIFICATION MISSED IT IS THE REUSABLE
+    HALF: `repro.sh` ran ASan on `ctl` and `bug` and NEVER ON `fix`. A
+    safety-line change is a change to R1h — so the one arm the change touched
+    was the only arm no detector ever saw, and admission question 1 is a
+    question about exactly that arm.** **Both rules are in
+    `.temp/mgr146/NOTES.md`'s retraction; `repro.sh` now runs every (arm ×
+    input) cell.**
 
     ⚠⚠ **TWO ROW PROPERTIES NO BUILT PATTERN HAS:** **`p34` has NO BENIGN INPUT
     THAT CAN EXECUTE ITS SAFETY LINE** — a missing retain plus a matched release
@@ -4750,6 +4761,107 @@ the number.** Two task files have already sent an agent to the wrong finding.
     Evidence: `.tasks/TASK_144_REPORT.md`, `.tasks/TASK_145_REPORT.md`,
     `patterns/p32-free-list-pool/`, `results/gate/p32-free-list-pool.json`,
     `.temp/mgr144-*.log`, `.temp/t145/`.
+
+56. ✅✅✅ **`p28` IS BUILT AND GREEN — 29 PATTERNS, THE FOURTH TEMPORAL ROW —
+    AND ITS RESULT IS THE EXACT OPPOSITE OF `p32`'s.** `TASK_146`, engineer work,
+    **NOT YET REVIEWED** (rule 9). ⚠ **Manager-verified from the record:
+    `PASS`, 0 failures, 0 blocked, 0 shouts; 29 patterns,
+    `27 PASS + 2 PASS-WITH-BLOCKED-ROWS`, `58 records 0 STALE`; and NO TRACKED
+    FILE WAS MODIFIED — the build is purely additive.**
+
+    ⚠⚠⚠ **THE HEADLINE, AND IT SPLITS OUTCOME 3 IN TWO.** `p32`'s result is that
+    **safe Rust reproduces its buggy C BIT FOR BIT** — the type system is
+    silent. **`p28`'s is that safe Rust CANNOT REPRODUCE ITS BUGGY C AT ALL.**
+    Deleting the safety line from `#![forbid(unsafe_code)]` safe Rust, in **both**
+    idiomatic spellings, **changes no answer on any input this pattern ships**;
+    its only trace is a `None` where `.unwrap()` expects `Some`, i.e. a **PANIC**
+    on one input in one spelling. **Never UB, never silently wrong.**
+    ✅ **AND THERE IS A STRUCTURAL REASON, WHICH IS WORTH MORE THAN THE TABLE:**
+    the eviction list is insertion-ordered and every chain is newest-first, so
+    **the globally oldest object in a bucket is that bucket's chain TAIL** — TRIM
+    always evicts a tail, the entries the buggy rung leaves behind form a
+    **SUFFIX**, and a walk that stops at the first `None` loses only objects that
+    are already gone. **GET and DEL are right for a reason, not by luck.**
+    ⚠ **An argument plus a measurement over the shipped inputs, NOT a proof** — a
+    cache whose eviction order and chain order disagreed would not have it.
+    ⚠⚠ **So `.memory/01-ladder.md`'s outcome 3 has TWO OPPOSITE SHAPES: the
+    representation safe Rust FORCES on you either preserves the harm exactly
+    (`p32`) or REMOVES ITS MECHANISM ALONG WITH THE POINTERS (`p28`).**
+
+    ⚠⚠ **THE C MECHANISM IS THE TREE'S FIRST INVERSION.** `p27`, `p29` and `p32`
+    all keep a **correct free discipline** and put the missing check on the
+    **READ**. **`p28`'s read path is CORRECT and its DESTROY path is
+    INCOMPLETE** — an object is on two intrusive lists at once, `TRIM` reaches
+    its victim through the LRU list so it holds no hash-chain cursor, and R1 frees
+    without leaving the chain. **The dangling pointer therefore lives INSIDE
+    ANOTHER HEAP OBJECT's link field**, not in a stack table (`p27`), a stack
+    local (`p29`) or a program-owned pool (`p32`).
+    ⚠ **And its safety line is the first in the tree that is NOT A TEST**: a
+    nine-line **SPLICE**, a WRITE that maintains *membership implies ownership*.
+    **`composition.py`'s stated test — *what does the safety line ASK?* — does
+    not reach it, and its class is read off the HARM instead.** That is recorded
+    in `CAVEATS["p28"]` and is a real limitation of the taxonomy, not a wording
+    problem.
+
+    ⚠⚠⚠ **DELIVERABLE 0 SETTLED, AND THE MANAGER WAS RIGHT — PLUS ONE THING THE
+    MANAGER MISSED.** *"Gatable against `model.py` on its adversarial inputs"*
+    does **not** follow: stage 2 takes `good_models` only and stage 4 merely
+    RECORDS, and **54 adversarial rows carry `diverges: true` inside three
+    PASSING verdicts** (`p27`/`p29`/`p32`). ⚠ **But `sanitizer_expect` IS gated
+    on adversarial inputs** (`check_sanitizers` takes `all_models`), **so those
+    rows are not ungated — they are gated by the DETECTOR rather than by the
+    checksum.** ✅ **And `p28`'s pinnable figure is stronger than claimed: ONE
+    value per input across all four (compiler × opt) cells.**
+
+    ⚠⚠⚠ **THE MANAGER'S OWN INSTRUCTION WAS WRONG, AND IT IS THE SHARPEST
+    PROCESS LESSON HERE.** `TASK_146` ordered *"build `p28d`, NOT `p28` —
+    measured, not argued"* on the strength of *"`+9/−0` at a shared cost of
+    ZERO"*. **`.temp/mgr146/p28d/body.inc` never initialises `hp`** — six reads,
+    zero writes on the PUT path — because the generator used `str.replace()` and
+    **asserted no substitution count**, so an edit indented 12 spaces where the
+    source has 16 **matched nothing and returned the string unchanged, silently.**
+    **Under ASan it SEGVs on a BENIGN input in the HARDENED arm**, inside the
+    safety line, failing admission question 1. The plain build survived only
+    because a fresh `brk` page reads as zero. ✅ **Corrected: `9` against `15` at
+    `+3` shared lines; behaviour then bit-identical, and the row ships the doubly
+    linked spelling. The conclusion survived; the arithmetic did not.**
+    ⚠⚠ **Why the manager's own verification could not see it, and this is the
+    reusable half: `repro.sh` ran ASan on `ctl` and `bug` and NEVER ON `fix`. A
+    safety-line change is a change to R1h — so the one arm the change touched was
+    the only arm no detector ever saw.** **Two rules:
+    (1) A GENERATOR THAT EDITS SOURCE BY STRING SUBSTITUTION MUST ASSERT THE
+    SUBSTITUTION COUNT — a silent no-op compiles, runs, and is wrong.
+    (2) RUN THE DETECTOR ON THE ARM YOU EDITED, NOT ONLY ON THE ARM YOU EXPECT TO
+    FAIL.** ⚠ **Two other scripts written the same session DO assert `n == 1`;
+    the one that mattered did not.**
+
+    ⚠ **Two further predictions in this tree measured FALSE and were retracted in
+    the files carrying them:** *"safe Rust gives a wrong answer"* (§6 above), and
+    *"the linear resources force the epilogue"* — **arm `A6` VERIFIES while
+    leaking**, the affine-token family's **fourth** instance after `p42`'s ghost
+    ledger.
+
+    ⚠ **DISCLOSED DIVERGENCE, and it is measured rather than argued: every Rust
+    rung stores links as `u8` SLOT NUMBERS, not pointers** — safe Rust has no
+    choice, and `unsafe.rs`/`verus.rs` follow so R4/R5 stay byte-comparable.
+    ✅ **`controls/arm_rawptr.rs` is the FAITHFUL raw-pointer port of both C arms
+    from one macro expansion; its fix arm equals `c/kernel_hardened.c` on every
+    input at both levels and its bug arm equals `c/kernel.c` on the benign ones,
+    so the slot table changed the PROOF BURDEN and not the PROGRAM.**
+    ✅ **Miri reports `in-bounds pointer arithmetic failed` on the raw-pointer BUG
+    arm on all four adversarial inputs AND ON NOTHING ELSE** — not its fix arm,
+    not the benign inputs, not either safe arm. ⚠ **`TASK_091` proved `wf` for
+    ONE list; `p28` has TWO and the bug is in their interaction. That gap is
+    reported as a RESULT and is the honest answer to `TASK_091`'s open question.**
+
+    ⚠ **NO COST AXIS IS PUBLISHED — three confounds, and the absence is declared
+    in `spec.md`, `NOTES.md` and every rung header so it does not read as a
+    zero.** ⚠ **One open number: the record shows `safe_tuned` DEARER than
+    `safe_naive` in both conventions; direction stated, MECHANISM NOT
+    INVESTIGATED.**
+
+    Evidence: `.tasks/TASK_146_REPORT.md`, `patterns/p28-intrusive-lists/`,
+    `results/gate/p28-intrusive-lists.json`, `.temp/t146/`, `.temp/mgr146/`.
 
 ## Retracted — do not reinstate
 
