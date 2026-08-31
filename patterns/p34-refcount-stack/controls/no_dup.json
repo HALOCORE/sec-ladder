@@ -1,0 +1,113 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p34-refcount-stack/controls/no_dup.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p34-refcount-stack/inputs/gen.py": "671bceca2e1ce7eb720d29d406c9430abc867ba79a6d19f015059903e0bf52b8",
+    "patterns/p34-refcount-stack/model.py": "d971affb40e4459e8e68cf9249046e60e75ab9c1e184cbb67b8a2c728fd6e489",
+    "patterns/p34-refcount-stack/controls/no_dup.py": "9043de2a7e47259a58e410c558bf824ccfcab0025b042021218a2d382c7b4601"
+  },
+  "measured_utc": "2026-08-31T12:34:23Z",
+  "rows": [
+    {
+      "input": "adversarial-blind.bin",
+      "stride": 36,
+      "n_blob": 36,
+      "nwin": 1,
+      "ops": {
+        "NEW": 4,
+        "DUP": 4,
+        "POP": 8,
+        "READ": 0
+      }
+    },
+    {
+      "input": "adversarial-blindread.bin",
+      "stride": 44,
+      "n_blob": 44,
+      "nwin": 1,
+      "ops": {
+        "NEW": 4,
+        "DUP": 4,
+        "POP": 8,
+        "READ": 4
+      }
+    },
+    {
+      "input": "adversarial-many.bin",
+      "stride": 388,
+      "n_blob": 388,
+      "nwin": 1,
+      "ops": {
+        "NEW": 48,
+        "DUP": 36,
+        "POP": 84,
+        "READ": 24
+      }
+    },
+    {
+      "input": "adversarial-recycle.bin",
+      "stride": 60,
+      "n_blob": 60,
+      "nwin": 1,
+      "ops": {
+        "NEW": 8,
+        "DUP": 4,
+        "POP": 12,
+        "READ": 4
+      }
+    },
+    {
+      "input": "adversarial-stride3.bin",
+      "stride": 3,
+      "n_blob": 30,
+      "nwin": 0,
+      "ops": {
+        "NEW": 0,
+        "DUP": 0,
+        "POP": 0,
+        "READ": 0
+      }
+    },
+    {
+      "input": "degenerate.bin",
+      "stride": 72,
+      "n_blob": 72,
+      "nwin": 1,
+      "ops": {
+        "NEW": 21,
+        "DUP": 0,
+        "POP": 5,
+        "READ": 8
+      }
+    },
+    {
+      "input": "large.bin",
+      "stride": 244,
+      "n_blob": 15616,
+      "nwin": 64,
+      "ops": {
+        "NEW": 3441,
+        "DUP": 0,
+        "POP": 2309,
+        "READ": 1930
+      }
+    },
+    {
+      "input": "small.bin",
+      "stride": 52,
+      "n_blob": 416,
+      "nwin": 8,
+      "ops": {
+        "NEW": 80,
+        "DUP": 0,
+        "POP": 59,
+        "READ": 53
+      }
+    }
+  ],
+  "dup_ops_matrix": 0,
+  "dup_ops_adversarial": 48,
+  "problems": [],
+  "invariant": "Every non-adversarial blob executes ZERO DUP ops and every adversarial blob except adversarial-stride3.bin executes at least one. The first half is what makes p34's benign cost gradient 0.00 by construction; the second is what stops the first from being vacuous."
+}

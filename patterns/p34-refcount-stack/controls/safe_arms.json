@@ -1,0 +1,172 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p34-refcount-stack/controls/safe_arms.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p34-refcount-stack/c/kernel.c": "a5ba19f99a38748ffaafd63c14ba655bb39a9f6a824c3f300c565e497d8fe149",
+    "patterns/p34-refcount-stack/c/kernel_hardened.c": "bd2bb22db44ab50b623b365d9587cf2dd31efca729c37f8fc9e70086c383f681",
+    "patterns/p34-refcount-stack/safe_naive.rs": "9d0c7294edc97cedde3870808c121a65d4fc3fe89d6c06fb77920d2827955d36",
+    "patterns/p34-refcount-stack/controls/arm_safe_arena.rs": "8a59586d35c2238bb47343272d90a2f2981f6cd7587fcec78e6bd9fd0fb1cdcf",
+    "patterns/p34-refcount-stack/controls/arm_safe_rc_move.rs": "f338b4831a95bc4fd4879477c1070b92122066cfd9d595739c96c181c3603838",
+    "patterns/p34-refcount-stack/controls/arm_safe_rc_borrow.rs": "4b8c89c9596a13a442bb35aa48730402dc3a0ff22d953caaebeeccde598fff70",
+    "patterns/p34-refcount-stack/controls/safe_arms.py": "5f955b7038dbe66e3901d1a4a0ed43be4b082524fd6b50506ac25e9e3b0e7ce9",
+    "patterns/p34-refcount-stack/inputs/gen.py": "671bceca2e1ce7eb720d29d406c9430abc867ba79a6d19f015059903e0bf52b8"
+  },
+  "measured_utc": "2026-08-31T12:41:34Z",
+  "branch_a_compiles": {
+    "safe_naive.rs": {
+      "ok": true,
+      "error_codes": [],
+      "first_error": ""
+    },
+    "arm_safe_rc_move.rs": {
+      "ok": false,
+      "error_codes": [
+        "E0507"
+      ],
+      "first_error": "error[E0507]: cannot move out of `*t` which is behind a shared reference"
+    },
+    "arm_safe_rc_borrow.rs": {
+      "ok": false,
+      "error_codes": [
+        "E0502"
+      ],
+      "first_error": "error[E0502]: cannot borrow `objs` as mutable because it is also borrowed as immutable"
+    }
+  },
+  "branch_b_checksums": {
+    "adversarial-blind.bin": {
+      "arena_bug": "5576862673510090752",
+      "arena_retain": "5576862673510090752",
+      "c_kernel": "5576862673510090752",
+      "c_kernel_hardened": "5576862673510090752",
+      "model": "5576862673510090752",
+      "arena_bug_eq_c_bug": true,
+      "arena_retain_eq_model": true,
+      "c_rungs_agree": true
+    },
+    "adversarial-blindread.bin": {
+      "arena_bug": "12442434272084377600",
+      "arena_retain": "12442434272084377600",
+      "c_kernel": "12442434272084377600",
+      "c_kernel_hardened": "12442434272084377600",
+      "model": "12442434272084377600",
+      "arena_bug_eq_c_bug": true,
+      "arena_retain_eq_model": true,
+      "c_rungs_agree": true
+    },
+    "adversarial-many.bin": {
+      "arena_bug": "5628475829885786112",
+      "arena_retain": "2893199866468423680",
+      "c_kernel": "5628475829885786112",
+      "c_kernel_hardened": "2893199866468423680",
+      "model": "2893199866468423680",
+      "arena_bug_eq_c_bug": true,
+      "arena_retain_eq_model": true,
+      "c_rungs_agree": false
+    },
+    "adversarial-recycle.bin": {
+      "arena_bug": "16102462438644451328",
+      "arena_retain": "7544618244297525248",
+      "c_kernel": "16102462438644451328",
+      "c_kernel_hardened": "7544618244297525248",
+      "model": "7544618244297525248",
+      "arena_bug_eq_c_bug": true,
+      "arena_retain_eq_model": true,
+      "c_rungs_agree": false
+    },
+    "adversarial-stride3.bin": {
+      "arena_bug": "0",
+      "arena_retain": "0",
+      "c_kernel": "0",
+      "c_kernel_hardened": "0",
+      "model": "0",
+      "arena_bug_eq_c_bug": true,
+      "arena_retain_eq_model": true,
+      "c_rungs_agree": true
+    },
+    "degenerate.bin": {
+      "arena_bug": "12018165609759525888",
+      "arena_retain": "12018165609759525888",
+      "c_kernel": "12018165609759525888",
+      "c_kernel_hardened": "12018165609759525888",
+      "model": "12018165609759525888",
+      "arena_bug_eq_c_bug": true,
+      "arena_retain_eq_model": true,
+      "c_rungs_agree": true
+    },
+    "large.bin": {
+      "arena_bug": "7726184805965551230",
+      "arena_retain": "7726184805965551230",
+      "c_kernel": "7726184805965551230",
+      "c_kernel_hardened": "7726184805965551230",
+      "model": "7726184805965551230",
+      "arena_bug_eq_c_bug": true,
+      "arena_retain_eq_model": true,
+      "c_rungs_agree": true
+    },
+    "small.bin": {
+      "arena_bug": "13533250923909195085",
+      "arena_retain": "13533250923909195085",
+      "c_kernel": "13533250923909195085",
+      "c_kernel_hardened": "13533250923909195085",
+      "model": "13533250923909195085",
+      "arena_bug_eq_c_bug": true,
+      "arena_retain_eq_model": true,
+      "c_rungs_agree": true
+    }
+  },
+  "miri_iters": 4,
+  "miri": {
+    "adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "13067481219009684096",
+      "ub": false,
+      "stderr": ""
+    },
+    "adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "6432277959588983808",
+      "ub": false,
+      "stderr": ""
+    },
+    "adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "14152675795861195520",
+      "ub": false,
+      "stderr": ""
+    },
+    "adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "6830987893070020224",
+      "ub": false,
+      "stderr": ""
+    },
+    "adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "ub": false,
+      "stderr": ""
+    },
+    "degenerate.bin": {
+      "rc": 0,
+      "stdout": "14311526893980817856",
+      "ub": false,
+      "stderr": ""
+    },
+    "large.bin": {
+      "rc": 0,
+      "stdout": "953361826603137763",
+      "ub": false,
+      "stderr": ""
+    },
+    "small.bin": {
+      "rc": 0,
+      "stdout": "17846914642437350232",
+      "ub": false,
+      "stderr": ""
+    }
+  },
+  "problems": [],
+  "invariant": "Branch A: the two safe-Rust attempts to publish a second reference without counting it do NOT compile, while the shipped safe_naive.rs on the same command line does. Branch B: the safe INDEX-ARENA arm without the retain reproduces c/kernel.c bit for bit on every input, and with the retain it equals model.py. Both branches of .memory/01-ladder.md's temporal law, in one row, selected by the port."
+}

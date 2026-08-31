@@ -1,0 +1,2139 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p34-refcount-stack/controls/detectors.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p34-refcount-stack/c/kernel.c": "a5ba19f99a38748ffaafd63c14ba655bb39a9f6a824c3f300c565e497d8fe149",
+    "patterns/p34-refcount-stack/c/kernel_hardened.c": "bd2bb22db44ab50b623b365d9587cf2dd31efca729c37f8fc9e70086c383f681",
+    "patterns/p34-refcount-stack/c/kernel.h": "1757bd3a8ce7962a625795258b7be4f4524501860c1d71ab80032c1bff38722f",
+    "patterns/p34-refcount-stack/c/main.c": "5b11232bf1a757a0ae09447bb463225e675f5608908308ee2797fd83fb679579",
+    "patterns/p34-refcount-stack/controls/ctl_asan.c": "78749cae8f5cbab18b7dde41b51540b5489855dd9f1b00e328e22bca67e751f8",
+    "patterns/p34-refcount-stack/controls/ctl_ubsan.c": "2115942aff04e2962a12ac0c133b1955452f611693303092d2ff76fc6bbc50a7",
+    "patterns/p34-refcount-stack/controls/detectors.py": "7f3e8e19b6e523d97fae7499f0b90d87ca6a3fd6e6eec2786a49f1c6668042aa",
+    "patterns/p34-refcount-stack/inputs/gen.py": "671bceca2e1ce7eb720d29d406c9430abc867ba79a6d19f015059903e0bf52b8",
+    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3"
+  },
+  "measured_utc": "2026-08-31T12:37:15Z",
+  "build_lines": {
+    "plain_gcc_O0": [
+      "/usr/bin/gcc",
+      "O0",
+      []
+    ],
+    "asan_gcc_O0": [
+      "/usr/bin/gcc",
+      "O0",
+      [
+        "-fsanitize=address",
+        "-static-libasan"
+      ]
+    ],
+    "ubsan_gcc_O0": [
+      "/usr/bin/gcc",
+      "O0",
+      [
+        "-fsanitize=undefined",
+        "-static-libubsan"
+      ]
+    ],
+    "plain_gcc_O3": [
+      "/usr/bin/gcc",
+      "O3",
+      []
+    ],
+    "asan_gcc_O3": [
+      "/usr/bin/gcc",
+      "O3",
+      [
+        "-fsanitize=address",
+        "-static-libasan"
+      ]
+    ],
+    "ubsan_gcc_O3": [
+      "/usr/bin/gcc",
+      "O3",
+      [
+        "-fsanitize=undefined",
+        "-static-libubsan"
+      ]
+    ],
+    "plain_clang_O0": [
+      "/home/apt/tools/llvm/bin/clang",
+      "O0",
+      []
+    ],
+    "asan_clang_O0": [
+      "/home/apt/tools/llvm/bin/clang",
+      "O0",
+      [
+        "-fsanitize=address"
+      ]
+    ],
+    "ubsan_clang_O0": [
+      "/home/apt/tools/llvm/bin/clang",
+      "O0",
+      [
+        "-fsanitize=undefined"
+      ]
+    ],
+    "plain_clang_O3": [
+      "/home/apt/tools/llvm/bin/clang",
+      "O3",
+      []
+    ],
+    "asan_clang_O3": [
+      "/home/apt/tools/llvm/bin/clang",
+      "O3",
+      [
+        "-fsanitize=address"
+      ]
+    ],
+    "ubsan_clang_O3": [
+      "/home/apt/tools/llvm/bin/clang",
+      "O3",
+      [
+        "-fsanitize=undefined"
+      ]
+    ]
+  },
+  "controls": {
+    "ctl_asan.c/asan_clang_O0": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 1 at 0x<addr> thread T0 #0 0x<addr> (<scratch> #"
+    },
+    "ctl_ubsan.c/asan_clang_O0": {
+      "rc": 0,
+      "stdout": "-2147483632",
+      "hits": 0,
+      "diagnostic": ""
+    },
+    "ctl_asan.c/asan_clang_O3": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 1 at 0x<addr> thread T0 #0 0x<addr> (<scratch> #"
+    },
+    "ctl_ubsan.c/asan_clang_O3": {
+      "rc": 0,
+      "stdout": "-2147483632",
+      "hits": 0,
+      "diagnostic": ""
+    },
+    "ctl_asan.c/asan_gcc_O0": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 1 at 0x<addr> thread T0 #0 0x<addr> in main patt"
+    },
+    "ctl_ubsan.c/asan_gcc_O0": {
+      "rc": 0,
+      "stdout": "-2147483632",
+      "hits": 0,
+      "diagnostic": ""
+    },
+    "ctl_asan.c/asan_gcc_O3": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 1 at 0x<addr> thread T0 #0 0x<addr> in main patt"
+    },
+    "ctl_ubsan.c/asan_gcc_O3": {
+      "rc": 0,
+      "stdout": "-2147483632",
+      "hits": 0,
+      "diagnostic": ""
+    },
+    "ctl_asan.c/plain_clang_O0": {
+      "rc": 0,
+      "stdout": "37",
+      "hits": 0,
+      "diagnostic": ""
+    },
+    "ctl_ubsan.c/plain_clang_O0": {
+      "rc": 0,
+      "stdout": "-2147483632",
+      "hits": 0,
+      "diagnostic": ""
+    },
+    "ctl_asan.c/plain_clang_O3": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": ""
+    },
+    "ctl_ubsan.c/plain_clang_O3": {
+      "rc": 0,
+      "stdout": "-2147483632",
+      "hits": 0,
+      "diagnostic": ""
+    },
+    "ctl_asan.c/plain_gcc_O0": {
+      "rc": 0,
+      "stdout": "37",
+      "hits": 0,
+      "diagnostic": ""
+    },
+    "ctl_ubsan.c/plain_gcc_O0": {
+      "rc": 0,
+      "stdout": "-2147483632",
+      "hits": 0,
+      "diagnostic": ""
+    },
+    "ctl_asan.c/plain_gcc_O3": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": ""
+    },
+    "ctl_ubsan.c/plain_gcc_O3": {
+      "rc": 0,
+      "stdout": "-2147483632",
+      "hits": 0,
+      "diagnostic": ""
+    },
+    "ctl_asan.c/ubsan_clang_O0": {
+      "rc": 0,
+      "stdout": "37",
+      "hits": 0,
+      "diagnostic": ""
+    },
+    "ctl_ubsan.c/ubsan_clang_O0": {
+      "rc": 0,
+      "stdout": "-2147483632",
+      "hits": 2,
+      "diagnostic": "patterns/p34-refcount-stack/controls/ctl_ubsan.c:37:21: runtime error: signed integer overflow: 32 + 2147483632 cannot be represented in type 'int' SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior patterns/p34-refcount-stack/controls"
+    },
+    "ctl_asan.c/ubsan_clang_O3": {
+      "rc": 0,
+      "stdout": "37",
+      "hits": 0,
+      "diagnostic": ""
+    },
+    "ctl_ubsan.c/ubsan_clang_O3": {
+      "rc": 0,
+      "stdout": "-2147483632",
+      "hits": 2,
+      "diagnostic": "patterns/p34-refcount-stack/controls/ctl_ubsan.c:37:21: runtime error: signed integer overflow: 32 + 2147483632 cannot be represented in type 'int' SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior patterns/p34-refcount-stack/controls"
+    },
+    "ctl_asan.c/ubsan_gcc_O0": {
+      "rc": 0,
+      "stdout": "37",
+      "hits": 0,
+      "diagnostic": ""
+    },
+    "ctl_ubsan.c/ubsan_gcc_O0": {
+      "rc": 0,
+      "stdout": "-2147483632",
+      "hits": 1,
+      "diagnostic": "patterns/p34-refcount-stack/controls/ctl_ubsan.c:37:9: runtime error: signed integer overflow: 32 + 2147483632 cannot be represented in type 'int'"
+    },
+    "ctl_asan.c/ubsan_gcc_O3": {
+      "rc": 0,
+      "stdout": "37",
+      "hits": 0,
+      "diagnostic": ""
+    },
+    "ctl_ubsan.c/ubsan_gcc_O3": {
+      "rc": 0,
+      "stdout": "-2147483632",
+      "hits": 1,
+      "diagnostic": "patterns/p34-refcount-stack/controls/ctl_ubsan.c:37:9: runtime error: signed integer overflow: 32 + 2147483632 cannot be represented in type 'int'"
+    }
+  },
+  "kernels": {
+    "R1/asan_clang_O0/adversarial-blind.bin": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 8 at 0x<addr> thread T0 #0 0x<addr> (<scratch> #",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/asan_clang_O0/adversarial-blindread.bin": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 1 at 0x<addr> thread T0 #0 0x<addr> (<scratch> #",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/asan_clang_O0/adversarial-many.bin": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 8 at 0x<addr> thread T0 #0 0x<addr> (<scratch> #",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/asan_clang_O0/adversarial-recycle.bin": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 1 at 0x<addr> thread T0 #0 0x<addr> (<scratch> #",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/asan_clang_O0/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/asan_clang_O0/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/asan_clang_O0/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/asan_clang_O0/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/asan_clang_O0/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/asan_clang_O0/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/asan_clang_O0/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "2893199866468423680",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/asan_clang_O0/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "7544618244297525248",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/asan_clang_O0/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/asan_clang_O0/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/asan_clang_O0/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/asan_clang_O0/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/asan_clang_O3/adversarial-blind.bin": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 8 at 0x<addr> thread T0 #0 0x<addr> (<scratch> #",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/asan_clang_O3/adversarial-blindread.bin": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 1 at 0x<addr> thread T0 #0 0x<addr> (<scratch> #",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/asan_clang_O3/adversarial-many.bin": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 8 at 0x<addr> thread T0 #0 0x<addr> (<scratch> #",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/asan_clang_O3/adversarial-recycle.bin": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 1 at 0x<addr> thread T0 #0 0x<addr> (<scratch> #",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/asan_clang_O3/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/asan_clang_O3/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/asan_clang_O3/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/asan_clang_O3/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/asan_clang_O3/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/asan_clang_O3/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/asan_clang_O3/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "2893199866468423680",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/asan_clang_O3/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "7544618244297525248",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/asan_clang_O3/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/asan_clang_O3/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/asan_clang_O3/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/asan_clang_O3/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/asan_gcc_O0/adversarial-blind.bin": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 8 at 0x<addr> thread T0 #0 0x<addr> in kernel pa",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/asan_gcc_O0/adversarial-blindread.bin": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 1 at 0x<addr> thread T0 #0 0x<addr> in kernel pa",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/asan_gcc_O0/adversarial-many.bin": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 8 at 0x<addr> thread T0 #0 0x<addr> in kernel pa",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/asan_gcc_O0/adversarial-recycle.bin": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 1 at 0x<addr> thread T0 #0 0x<addr> in kernel pa",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/asan_gcc_O0/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/asan_gcc_O0/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/asan_gcc_O0/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/asan_gcc_O0/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/asan_gcc_O0/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/asan_gcc_O0/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/asan_gcc_O0/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "2893199866468423680",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/asan_gcc_O0/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "7544618244297525248",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/asan_gcc_O0/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/asan_gcc_O0/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/asan_gcc_O0/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/asan_gcc_O0/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/asan_gcc_O3/adversarial-blind.bin": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 8 at 0x<addr> thread T0 #0 0x<addr> in kernel pa",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/asan_gcc_O3/adversarial-blindread.bin": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 1 at 0x<addr> thread T0 #0 0x<addr> in kernel pa",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/asan_gcc_O3/adversarial-many.bin": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 8 at 0x<addr> thread T0 #0 0x<addr> in kernel pa",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/asan_gcc_O3/adversarial-recycle.bin": {
+      "rc": 1,
+      "stdout": "",
+      "hits": 3,
+      "diagnostic": "================================================================= ==<pid>==ERROR: AddressSanitizer: heap-use-after-free on address 0x<addr> at pc 0x<addr> bp 0x<addr> sp 0x<addr> READ of size 1 at 0x<addr> thread T0 #0 0x<addr> in kernel pa",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/asan_gcc_O3/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/asan_gcc_O3/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/asan_gcc_O3/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/asan_gcc_O3/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/asan_gcc_O3/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/asan_gcc_O3/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/asan_gcc_O3/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "2893199866468423680",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/asan_gcc_O3/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "7544618244297525248",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/asan_gcc_O3/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/asan_gcc_O3/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/asan_gcc_O3/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/asan_gcc_O3/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/plain_clang_O0/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1/plain_clang_O0/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1/plain_clang_O0/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "5628475829885786112",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/plain_clang_O0/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "16102462438644451328",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/plain_clang_O0/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/plain_clang_O0/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/plain_clang_O0/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/plain_clang_O0/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/plain_clang_O0/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/plain_clang_O0/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/plain_clang_O0/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "2893199866468423680",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/plain_clang_O0/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "7544618244297525248",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/plain_clang_O0/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/plain_clang_O0/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/plain_clang_O0/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/plain_clang_O0/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/plain_clang_O3/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1/plain_clang_O3/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1/plain_clang_O3/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "5628475829885786112",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/plain_clang_O3/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "16102462438644451328",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/plain_clang_O3/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/plain_clang_O3/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/plain_clang_O3/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/plain_clang_O3/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/plain_clang_O3/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/plain_clang_O3/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/plain_clang_O3/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "2893199866468423680",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/plain_clang_O3/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "7544618244297525248",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/plain_clang_O3/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/plain_clang_O3/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/plain_clang_O3/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/plain_clang_O3/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/plain_gcc_O0/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1/plain_gcc_O0/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1/plain_gcc_O0/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "5628475829885786112",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/plain_gcc_O0/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "16102462438644451328",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/plain_gcc_O0/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/plain_gcc_O0/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/plain_gcc_O0/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/plain_gcc_O0/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/plain_gcc_O0/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/plain_gcc_O0/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/plain_gcc_O0/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "2893199866468423680",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/plain_gcc_O0/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "7544618244297525248",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/plain_gcc_O0/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/plain_gcc_O0/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/plain_gcc_O0/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/plain_gcc_O0/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/plain_gcc_O3/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1/plain_gcc_O3/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1/plain_gcc_O3/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "5628475829885786112",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/plain_gcc_O3/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "16102462438644451328",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/plain_gcc_O3/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/plain_gcc_O3/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/plain_gcc_O3/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/plain_gcc_O3/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/plain_gcc_O3/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/plain_gcc_O3/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/plain_gcc_O3/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "2893199866468423680",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/plain_gcc_O3/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "7544618244297525248",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/plain_gcc_O3/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/plain_gcc_O3/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/plain_gcc_O3/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/plain_gcc_O3/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_clang_O0/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_clang_O0/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_clang_O0/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "5628475829885786112",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/ubsan_clang_O0/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "16102462438644451328",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/ubsan_clang_O0/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_clang_O0/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_clang_O0/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_clang_O0/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_clang_O0/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_clang_O0/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_clang_O0/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "2893199866468423680",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_clang_O0/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "7544618244297525248",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_clang_O0/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_clang_O0/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_clang_O0/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_clang_O0/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_clang_O3/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_clang_O3/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_clang_O3/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "5628475829885786112",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/ubsan_clang_O3/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "16102462438644451328",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/ubsan_clang_O3/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_clang_O3/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_clang_O3/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_clang_O3/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_clang_O3/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_clang_O3/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_clang_O3/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "2893199866468423680",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_clang_O3/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "7544618244297525248",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_clang_O3/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_clang_O3/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_clang_O3/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_clang_O3/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_gcc_O0/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_gcc_O0/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_gcc_O0/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "5628475829885786112",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/ubsan_gcc_O0/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "16102462438644451328",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/ubsan_gcc_O0/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_gcc_O0/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_gcc_O0/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_gcc_O0/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_gcc_O0/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_gcc_O0/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_gcc_O0/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "2893199866468423680",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_gcc_O0/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "7544618244297525248",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_gcc_O0/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_gcc_O0/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_gcc_O0/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_gcc_O0/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_gcc_O3/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_gcc_O3/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_gcc_O3/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "5628475829885786112",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/ubsan_gcc_O3/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "16102462438644451328",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": false
+    },
+    "R1/ubsan_gcc_O3/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_gcc_O3/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_gcc_O3/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1/ubsan_gcc_O3/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_gcc_O3/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "5576862673510090752",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "5576862673510090752",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_gcc_O3/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "12442434272084377600",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12442434272084377600",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_gcc_O3/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "2893199866468423680",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "2893199866468423680",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_gcc_O3/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "7544618244297525248",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7544618244297525248",
+      "model_sanitizer_expect": "fires",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_gcc_O3/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "0",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_gcc_O3/degenerate.bin": {
+      "rc": 0,
+      "stdout": "12018165609759525888",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "12018165609759525888",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_gcc_O3/large.bin": {
+      "rc": 0,
+      "stdout": "7726184805965551230",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "7726184805965551230",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    },
+    "R1h/ubsan_gcc_O3/small.bin": {
+      "rc": 0,
+      "stdout": "13533250923909195085",
+      "hits": 0,
+      "diagnostic": "",
+      "model_stdout": "13533250923909195085",
+      "model_sanitizer_expect": "clean",
+      "agrees_with_model": true
+    }
+  },
+  "checksum_discrimination": {
+    "plain_clang_O0/adversarial-blind.bin": {
+      "R1": "5576862673510090752",
+      "R1h": "5576862673510090752",
+      "equal": true
+    },
+    "plain_clang_O0/adversarial-blindread.bin": {
+      "R1": "12442434272084377600",
+      "R1h": "12442434272084377600",
+      "equal": true
+    },
+    "plain_clang_O0/adversarial-many.bin": {
+      "R1": "5628475829885786112",
+      "R1h": "2893199866468423680",
+      "equal": false
+    },
+    "plain_clang_O0/adversarial-recycle.bin": {
+      "R1": "16102462438644451328",
+      "R1h": "7544618244297525248",
+      "equal": false
+    },
+    "plain_clang_O0/adversarial-stride3.bin": {
+      "R1": "0",
+      "R1h": "0",
+      "equal": true
+    },
+    "plain_clang_O0/degenerate.bin": {
+      "R1": "12018165609759525888",
+      "R1h": "12018165609759525888",
+      "equal": true
+    },
+    "plain_clang_O0/large.bin": {
+      "R1": "7726184805965551230",
+      "R1h": "7726184805965551230",
+      "equal": true
+    },
+    "plain_clang_O0/small.bin": {
+      "R1": "13533250923909195085",
+      "R1h": "13533250923909195085",
+      "equal": true
+    },
+    "plain_clang_O3/adversarial-blind.bin": {
+      "R1": "5576862673510090752",
+      "R1h": "5576862673510090752",
+      "equal": true
+    },
+    "plain_clang_O3/adversarial-blindread.bin": {
+      "R1": "12442434272084377600",
+      "R1h": "12442434272084377600",
+      "equal": true
+    },
+    "plain_clang_O3/adversarial-many.bin": {
+      "R1": "5628475829885786112",
+      "R1h": "2893199866468423680",
+      "equal": false
+    },
+    "plain_clang_O3/adversarial-recycle.bin": {
+      "R1": "16102462438644451328",
+      "R1h": "7544618244297525248",
+      "equal": false
+    },
+    "plain_clang_O3/adversarial-stride3.bin": {
+      "R1": "0",
+      "R1h": "0",
+      "equal": true
+    },
+    "plain_clang_O3/degenerate.bin": {
+      "R1": "12018165609759525888",
+      "R1h": "12018165609759525888",
+      "equal": true
+    },
+    "plain_clang_O3/large.bin": {
+      "R1": "7726184805965551230",
+      "R1h": "7726184805965551230",
+      "equal": true
+    },
+    "plain_clang_O3/small.bin": {
+      "R1": "13533250923909195085",
+      "R1h": "13533250923909195085",
+      "equal": true
+    },
+    "plain_gcc_O0/adversarial-blind.bin": {
+      "R1": "5576862673510090752",
+      "R1h": "5576862673510090752",
+      "equal": true
+    },
+    "plain_gcc_O0/adversarial-blindread.bin": {
+      "R1": "12442434272084377600",
+      "R1h": "12442434272084377600",
+      "equal": true
+    },
+    "plain_gcc_O0/adversarial-many.bin": {
+      "R1": "5628475829885786112",
+      "R1h": "2893199866468423680",
+      "equal": false
+    },
+    "plain_gcc_O0/adversarial-recycle.bin": {
+      "R1": "16102462438644451328",
+      "R1h": "7544618244297525248",
+      "equal": false
+    },
+    "plain_gcc_O0/adversarial-stride3.bin": {
+      "R1": "0",
+      "R1h": "0",
+      "equal": true
+    },
+    "plain_gcc_O0/degenerate.bin": {
+      "R1": "12018165609759525888",
+      "R1h": "12018165609759525888",
+      "equal": true
+    },
+    "plain_gcc_O0/large.bin": {
+      "R1": "7726184805965551230",
+      "R1h": "7726184805965551230",
+      "equal": true
+    },
+    "plain_gcc_O0/small.bin": {
+      "R1": "13533250923909195085",
+      "R1h": "13533250923909195085",
+      "equal": true
+    },
+    "plain_gcc_O3/adversarial-blind.bin": {
+      "R1": "5576862673510090752",
+      "R1h": "5576862673510090752",
+      "equal": true
+    },
+    "plain_gcc_O3/adversarial-blindread.bin": {
+      "R1": "12442434272084377600",
+      "R1h": "12442434272084377600",
+      "equal": true
+    },
+    "plain_gcc_O3/adversarial-many.bin": {
+      "R1": "5628475829885786112",
+      "R1h": "2893199866468423680",
+      "equal": false
+    },
+    "plain_gcc_O3/adversarial-recycle.bin": {
+      "R1": "16102462438644451328",
+      "R1h": "7544618244297525248",
+      "equal": false
+    },
+    "plain_gcc_O3/adversarial-stride3.bin": {
+      "R1": "0",
+      "R1h": "0",
+      "equal": true
+    },
+    "plain_gcc_O3/degenerate.bin": {
+      "R1": "12018165609759525888",
+      "R1h": "12018165609759525888",
+      "equal": true
+    },
+    "plain_gcc_O3/large.bin": {
+      "R1": "7726184805965551230",
+      "R1h": "7726184805965551230",
+      "equal": true
+    },
+    "plain_gcc_O3/small.bin": {
+      "R1": "13533250923909195085",
+      "R1h": "13533250923909195085",
+      "equal": true
+    }
+  },
+  "problems": [],
+  "invariant": "Each positive control fires in the detector whose column it licenses and only there. With both alive: R1 fires under ASan on exactly the inputs model.py derives as `fires`; R1 is SILENT under UBSan on every input at both optimisation levels on both compilers, which is a published result and not an aside; R1h is silent everywhere; and the two rungs' plain checksums are BIT-IDENTICAL on adversarial-blind and adversarial-blindread while DIVERGING on adversarial-recycle and adversarial-many."
+}

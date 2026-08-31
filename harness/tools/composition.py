@@ -99,7 +99,7 @@ CLASSES = {
         "SAFETY LINE ask?' -- DOES NOT REACH EVERY ROW HERE: p28's safety line "
         "asks nothing, it is a maintaining WRITE, so its class is read off the "
         "HARM instead. See CAVEATS['p28']",
-        ["p27", "p28", "p29", "p32"],
+        ["p27", "p28", "p29", "p32", "p34"],
     ),
     "type": (
         "the bytes are read at a type they were not written at",
@@ -181,6 +181,31 @@ CAVEATS = {
            "g`), which asks a lifetime question. ⚠ Its stale-FREE consequence "
            "is ALIASING (two live handles naming one block), overlapping p08's "
            "class; the aliasing is the HARM, the stale generation is the BUG.",
+    "p34": "the safety line is a one-statement maintaining WRITE (`t->rc = "
+           "t->rc + 1`), so like p28 it ASKS NOTHING and this table's stated "
+           "test does not apply; `temporal` is read off the HARM -- a real "
+           "free() followed by a read of the freed block, ASan "
+           "heap-use-after-free on four adversarial inputs under both "
+           "compilers. ⚠⚠ THE REPAIR SITE IS WHAT DISTINGUISHES IT, and it "
+           "is a third position: p27, p29 and p32 all fix the READ, p28 fixes "
+           "the DESTROY path, and p34's read path is correct by construction -- "
+           "a refcounted pointer is valid by definition -- so ONLY THE ACQUIRE "
+           "can be repaired, an unbounded distance from the harm. ⚠⚠ AND "
+           "ITS BENIGN COST GRADIENT IS 0.00 BY CONSTRUCTION, not by "
+           "measurement: the safety line is the kernel's only increment, so any "
+           "executed DUP forces a free-then-read and NO benign input can reach "
+           "it -- manager-verified in the record, where c-gcc and c-gcc-h (and "
+           "c-clang/c-clang-h) have identical `marginal_ir_per_call` in all 16 "
+           "cells. ⚠ It is the FIRST TEMPORAL ROW with a DETECTOR-ONLY cell "
+           "(`adversarial-blind`, `adversarial-blindread`: the checksums agree "
+           "with the model bit for bit and ASan is the only discriminator) -- "
+           "manager-derived over all 31 gate records, where the other three "
+           "rows holding such a cell are p18, p38 and p42, none of them "
+           "temporal. ⚠ The wider novelty claim the build task carried -- "
+           "'no built temporal row has a reproducible + checksum-divergent + "
+           "detector-firing cell' -- is FALSE and was refuted by the engineer "
+           "and re-derived by the manager: that combination holds in 75 cells "
+           "across 20 patterns, p27, p28 and p34 among them.",
     "p09": "ships TWO bugs. The safety line is the omitted `q < nbits`, which "
            "is spatial and caught everywhere; the second is `q & 31`, which is "
            "invisible to a memory-safety proof and is NOT spatial. Counted "

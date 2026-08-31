@@ -1,0 +1,181 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p34-refcount-stack/controls/rust_bug.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p34-refcount-stack/unsafe.rs": "529ffe1cd330016867c3a2a97e60fb7709233d0aea557e1c2e0cb2a1a19d4bb8",
+    "patterns/p34-refcount-stack/c/kernel.c": "a5ba19f99a38748ffaafd63c14ba655bb39a9f6a824c3f300c565e497d8fe149",
+    "patterns/p34-refcount-stack/controls/arm_unsafe_bug.rs": "36056611000071456ad739328e0acac57e396d5ab001c760150813d61c9e8f5c",
+    "patterns/p34-refcount-stack/controls/rust_bug.py": "aa4cc9d7d087923a17d613a0a8816a8d13d6057921b198de6627d3e2f62ecaf8",
+    "patterns/p34-refcount-stack/inputs/gen.py": "671bceca2e1ce7eb720d29d406c9430abc867ba79a6d19f015059903e0bf52b8"
+  },
+  "measured_utc": "2026-08-31T13:03:26Z",
+  "derivation_ok": true,
+  "checksums": {
+    "adversarial-blind.bin": {
+      "arm_unsafe_bug": "5576862673510090752",
+      "c_kernel": "5576862673510090752",
+      "equal": true,
+      "model": "5576862673510090752"
+    },
+    "adversarial-blindread.bin": {
+      "arm_unsafe_bug": "12442434272084377600",
+      "c_kernel": "12442434272084377600",
+      "equal": true,
+      "model": "12442434272084377600"
+    },
+    "adversarial-many.bin": {
+      "arm_unsafe_bug": "5628475829885786112",
+      "c_kernel": "5628475829885786112",
+      "equal": true,
+      "model": "2893199866468423680"
+    },
+    "adversarial-recycle.bin": {
+      "arm_unsafe_bug": "16102462438644451328",
+      "c_kernel": "16102462438644451328",
+      "equal": true,
+      "model": "7544618244297525248"
+    },
+    "adversarial-stride3.bin": {
+      "arm_unsafe_bug": "0",
+      "c_kernel": "0",
+      "equal": true,
+      "model": "0"
+    },
+    "degenerate.bin": {
+      "arm_unsafe_bug": "12018165609759525888",
+      "c_kernel": "12018165609759525888",
+      "equal": true,
+      "model": "12018165609759525888"
+    },
+    "large.bin": {
+      "arm_unsafe_bug": "7726184805965551230",
+      "c_kernel": "7726184805965551230",
+      "equal": true,
+      "model": "7726184805965551230"
+    },
+    "small.bin": {
+      "arm_unsafe_bug": "13533250923909195085",
+      "c_kernel": "13533250923909195085",
+      "equal": true,
+      "model": "13533250923909195085"
+    }
+  },
+  "miri_iters": 4,
+  "miri": {
+    "bug/adversarial-blind.bin": {
+      "rc": 1,
+      "stdout": "",
+      "ub": true,
+      "kind": "constructing invalid value of type &mut Obj: encountered a dangling reference (use-after-free)",
+      "stderr": "warning: function `obj_retain` is never used --> /home/apt/repos_common/sec-ladder/patterns/p34-refcount-stack/controls/arm_unsafe_bug.rs:119:4 | 119 | fn obj_retain(p: *mut Obj) { | ^^^^^^^^^^ | = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default error: Undefined Behavior: constr"
+    },
+    "bug/adversarial-blindread.bin": {
+      "rc": 1,
+      "stdout": "",
+      "ub": true,
+      "kind": "constructing invalid value of type &Obj: encountered a dangling reference (use-after-free)",
+      "stderr": "warning: function `obj_retain` is never used --> /home/apt/repos_common/sec-ladder/patterns/p34-refcount-stack/controls/arm_unsafe_bug.rs:119:4 | 119 | fn obj_retain(p: *mut Obj) { | ^^^^^^^^^^ | = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default error: Undefined Behavior: constr"
+    },
+    "bug/adversarial-many.bin": {
+      "rc": 1,
+      "stdout": "",
+      "ub": true,
+      "kind": "constructing invalid value of type &mut Obj: encountered a dangling reference (use-after-free)",
+      "stderr": "warning: function `obj_retain` is never used --> /home/apt/repos_common/sec-ladder/patterns/p34-refcount-stack/controls/arm_unsafe_bug.rs:119:4 | 119 | fn obj_retain(p: *mut Obj) { | ^^^^^^^^^^ | = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default error: Undefined Behavior: constr"
+    },
+    "bug/adversarial-recycle.bin": {
+      "rc": 1,
+      "stdout": "",
+      "ub": true,
+      "kind": "constructing invalid value of type &Obj: encountered a dangling reference (use-after-free)",
+      "stderr": "warning: function `obj_retain` is never used --> /home/apt/repos_common/sec-ladder/patterns/p34-refcount-stack/controls/arm_unsafe_bug.rs:119:4 | 119 | fn obj_retain(p: *mut Obj) { | ^^^^^^^^^^ | = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default error: Undefined Behavior: constr"
+    },
+    "bug/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "ub": false,
+      "kind": "",
+      "stderr": "warning: function `obj_retain` is never used --> /home/apt/repos_common/sec-ladder/patterns/p34-refcount-stack/controls/arm_unsafe_bug.rs:119:4 | 119 | fn obj_retain(p: *mut Obj) { | ^^^^^^^^^^ | = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default warning: 1 warning emitted"
+    },
+    "bug/degenerate.bin": {
+      "rc": 0,
+      "stdout": "14311526893980817856",
+      "ub": false,
+      "kind": "",
+      "stderr": "warning: function `obj_retain` is never used --> /home/apt/repos_common/sec-ladder/patterns/p34-refcount-stack/controls/arm_unsafe_bug.rs:119:4 | 119 | fn obj_retain(p: *mut Obj) { | ^^^^^^^^^^ | = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default warning: 1 warning emitted"
+    },
+    "bug/large.bin": {
+      "rc": 0,
+      "stdout": "953361826603137763",
+      "ub": false,
+      "kind": "",
+      "stderr": "warning: function `obj_retain` is never used --> /home/apt/repos_common/sec-ladder/patterns/p34-refcount-stack/controls/arm_unsafe_bug.rs:119:4 | 119 | fn obj_retain(p: *mut Obj) { | ^^^^^^^^^^ | = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default warning: 1 warning emitted"
+    },
+    "bug/small.bin": {
+      "rc": 0,
+      "stdout": "17846914642437350232",
+      "ub": false,
+      "kind": "",
+      "stderr": "warning: function `obj_retain` is never used --> /home/apt/repos_common/sec-ladder/patterns/p34-refcount-stack/controls/arm_unsafe_bug.rs:119:4 | 119 | fn obj_retain(p: *mut Obj) { | ^^^^^^^^^^ | = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default warning: 1 warning emitted"
+    },
+    "ship/adversarial-blind.bin": {
+      "rc": 0,
+      "stdout": "13067481219009684096",
+      "ub": false,
+      "kind": "",
+      "stderr": ""
+    },
+    "ship/adversarial-blindread.bin": {
+      "rc": 0,
+      "stdout": "6432277959588983808",
+      "ub": false,
+      "kind": "",
+      "stderr": ""
+    },
+    "ship/adversarial-many.bin": {
+      "rc": 0,
+      "stdout": "8163035620885547776",
+      "ub": false,
+      "kind": "",
+      "stderr": ""
+    },
+    "ship/adversarial-recycle.bin": {
+      "rc": 0,
+      "stdout": "11597992975491645056",
+      "ub": false,
+      "kind": "",
+      "stderr": ""
+    },
+    "ship/adversarial-stride3.bin": {
+      "rc": 0,
+      "stdout": "0",
+      "ub": false,
+      "kind": "",
+      "stderr": ""
+    },
+    "ship/degenerate.bin": {
+      "rc": 0,
+      "stdout": "14311526893980817856",
+      "ub": false,
+      "kind": "",
+      "stderr": ""
+    },
+    "ship/large.bin": {
+      "rc": 0,
+      "stdout": "953361826603137763",
+      "ub": false,
+      "kind": "",
+      "stderr": ""
+    },
+    "ship/small.bin": {
+      "rc": 0,
+      "stdout": "17846914642437350232",
+      "ub": false,
+      "kind": "",
+      "stderr": ""
+    }
+  },
+  "problems": [],
+  "invariant": "arm_unsafe_bug.rs is unsafe.rs with obj_retain(t); deleted and nothing else, re-derived at every run; it reproduces c/kernel.c bit for bit on every input; Miri REPORTS Undefined Behaviour on it for exactly the inputs model.py derives as `fires`; and Miri is SILENT on the shipped unsafe.rs on every input, which is what makes that silence a measurement."
+}

@@ -1,0 +1,104 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p34-refcount-stack/controls/proof_mutants.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p34-refcount-stack/verus.rs": "c55ea504ab2f699c1480eab237cbe225c9dedb3ff90cf4d7a2dd12f16627bff7",
+    "patterns/p34-refcount-stack/controls/proof_mutants.py": "d9d815b007a84924eed8b531c54807dc61ae23e7ff18f628725566f5edb2ffc1"
+  },
+  "measured_utc": "2026-08-31T13:04:03Z",
+  "mutants": [
+    {
+      "mutant": "M0-control",
+      "kind": "control",
+      "expected": "verify",
+      "got": "verify",
+      "ok": true,
+      "verified": 24,
+      "errors": 0,
+      "rc": 0,
+      "error_kinds": [],
+      "why": "the shipped file, run through the same harness. If this does not verify, nothing below means anything."
+    },
+    {
+      "mutant": "M1-delete-retain",
+      "kind": "attack",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 23,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 1 previous error",
+        "assertion failed"
+      ],
+      "why": "THE ATTACK ARM, and it is the row's bug exactly: delete `obj_retain` from the DUP arm and nothing else. What survives is `c/kernel.c` -- a kernel that frees an object while a live stack entry still names it. It must FAIL, and WHERE it fails is the finding: the loop invariant `wf` can no longer be re-established, because `cnt(ids, k)` has gone up by one and the count in the object's first word has not."
+    },
+    {
+      "mutant": "M2-constant-body",
+      "kind": "vacuity",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 21,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 1 previous error; 1 warning emitted",
+        "postcondition not satisfied"
+      ],
+      "why": "`.memory/04-verus.md`'s vacuity probe in its sharp form -- what is the CHEAPEST body that satisfies the postcondition? `TASK_137` discharged `TASK_136`'s ARM_C with `fn arm_c() -> u8 { 9 }`. Here the cheapest body is `return 0;` and it must FAIL, because `rc_fold` is a function of the window bytes and no constant equals it."
+    },
+    {
+      "mutant": "X1-delete-rc-conjunct",
+      "kind": "attack",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 22,
+      "errors": 2,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 4 previous errors",
+        "precondition not satisfied"
+      ],
+      "why": "p35's X1 arm, transplanted: strike the CENTRAL OBLIGATION out of the invariant and see whether anything but a hand-written pin notices. The conjunct is `perms[k].value().rc == cnt(stk, k)` -- the bridge between the count the object stores and the number of stack entries naming it. \u26a0 On p35 the equivalent deletion VERIFIED at the pinned obligation count and only the `verus.items` pin caught it. Here it must FAIL, and the reason is that this bridge is what discharges `obj_dec`'s `requires rc > 0` and what licenses `obj_free` at zero: it is a MEMORY-SAFETY precondition, not a functional one."
+    },
+    {
+      "mutant": "X2-exec-and-spec",
+      "kind": "spec-weaken",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 22,
+      "errors": 2,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 4 previous errors",
+        "precondition not satisfied"
+      ],
+      "why": "THE TWO-CELL PAIR. Delete the retain from the exec code AND the bridge from the invariant, so the two agree with each other again. \u26a0 On p32 the equivalent arm VERIFIES, and p32 publishes that as the honest statement of what its R5 buys -- its safety line is load-bearing against the SPECIFICATION alone, because nothing there is allocated and there is no linear resource to consume. p34 allocates, so the prediction is that this arm FAILS ANYWAY: without the bridge nothing discharges `obj_dec`'s `rc > 0`, and `obj_free` consumes a permission a live stack entry still needs. **Whatever it does is p34's answer and it is reported either way.**"
+    },
+    {
+      "mutant": "M3-delete-epilogue",
+      "kind": "deletion",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 23,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 1 previous error",
+        "assertion failed"
+      ],
+      "why": "make the epilogue's guard unreachable (`ntop > CAP` is false under the invariant), so no reference left on the stack is released. It must FAIL, and the failing obligation is the LEAK-FREEDOM corollary at the end of the kernel: `obj_ok` requires `cnt(ids, k) > 0` for every key in the permission map, so the map is empty only once the stack is. That is what makes leak-freedom a proved property of this rung rather than a remark."
+    }
+  ],
+  "invariant": "The ATTACK arm (M1, the shipped bug), the VACUITY arm (M2, a constant body), the X1 arm (strike the count/alias bridge out of the invariant) and the epilogue deletion (M3) all FAIL. \u26a0 X2 -- the exec code and the invariant weakened TOGETHER, which is the arm p32 publishes as VERIFYING -- is the one whose verdict is the row's R5 result, and it is recorded here rather than predicted in prose.",
+  "summary": {
+    "n": 6,
+    "as_expected": 6
+  }
+}

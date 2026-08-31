@@ -1,0 +1,257 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p34-refcount-stack/controls/spellings.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p34-refcount-stack/safe_naive.rs": "9d0c7294edc97cedde3870808c121a65d4fc3fe89d6c06fb77920d2827955d36",
+    "patterns/p34-refcount-stack/safe_tuned.rs": "f5175d8b181a5d7f0cd0274f86b1d436bc0f2f0700c21875824d02c6a76df5fc",
+    "patterns/p34-refcount-stack/unsafe.rs": "529ffe1cd330016867c3a2a97e60fb7709233d0aea557e1c2e0cb2a1a19d4bb8",
+    "patterns/p34-refcount-stack/verus.rs": "c55ea504ab2f699c1480eab237cbe225c9dedb3ff90cf4d7a2dd12f16627bff7",
+    "patterns/p34-refcount-stack/controls/spellings.py": "8474ad00cb2618417b13f38003bbef4d8854a81eb75f6269b8f564fe5533497a",
+    "patterns/p34-refcount-stack/inputs/gen.py": "671bceca2e1ce7eb720d29d406c9430abc867ba79a6d19f015059903e0bf52b8"
+  },
+  "measured_utc": "2026-08-31T13:03:47Z",
+  "probe_iters": [
+    100,
+    200
+  ],
+  "variants": {
+    "safe_naive": {
+      "rung": "safe_naive.rs",
+      "substitutions_applied": 0,
+      "checksums": {
+        "adversarial-blind.bin": "5576862673510090752",
+        "adversarial-blindread.bin": "12442434272084377600",
+        "adversarial-many.bin": "2893199866468423680",
+        "adversarial-recycle.bin": "7544618244297525248",
+        "adversarial-stride3.bin": "0",
+        "degenerate.bin": "12018165609759525888",
+        "large.bin": "7726184805965551230",
+        "small.bin": "13533250923909195085"
+      },
+      "marginal": {
+        "O0/small.bin": 6265.4,
+        "O0/large.bin": 29015.21,
+        "O3/small.bin": 2785.16,
+        "O3/large.bin": 13782.86
+      }
+    },
+    "safe_tuned": {
+      "rung": "safe_tuned.rs",
+      "substitutions_applied": 0,
+      "checksums": {
+        "adversarial-blind.bin": "5576862673510090752",
+        "adversarial-blindread.bin": "12442434272084377600",
+        "adversarial-many.bin": "2893199866468423680",
+        "adversarial-recycle.bin": "7544618244297525248",
+        "adversarial-stride3.bin": "0",
+        "degenerate.bin": "12018165609759525888",
+        "large.bin": "7726184805965551230",
+        "small.bin": "13533250923909195085"
+      },
+      "marginal": {
+        "O0/small.bin": 8243.33,
+        "O0/large.bin": 38129.31,
+        "O3/small.bin": 2558.38,
+        "O3/large.bin": 12623.43
+      }
+    },
+    "unsafe": {
+      "rung": "unsafe.rs",
+      "substitutions_applied": 0,
+      "checksums": {
+        "adversarial-blind.bin": "5576862673510090752",
+        "adversarial-blindread.bin": "12442434272084377600",
+        "adversarial-many.bin": "2893199866468423680",
+        "adversarial-recycle.bin": "7544618244297525248",
+        "adversarial-stride3.bin": "0",
+        "degenerate.bin": "12018165609759525888",
+        "large.bin": "7726184805965551230",
+        "small.bin": "13533250923909195085"
+      },
+      "marginal": {
+        "O0/small.bin": 5631.32,
+        "O0/large.bin": 27058.04,
+        "O3/small.bin": 2364.59,
+        "O3/large.bin": 11906.72
+      }
+    },
+    "r3_cursor": {
+      "rung": "safe_tuned.rs",
+      "substitutions_applied": 1,
+      "checksums": {
+        "adversarial-blind.bin": "5576862673510090752",
+        "adversarial-blindread.bin": "12442434272084377600",
+        "adversarial-many.bin": "2893199866468423680",
+        "adversarial-recycle.bin": "7544618244297525248",
+        "adversarial-stride3.bin": "0",
+        "degenerate.bin": "12018165609759525888",
+        "large.bin": "7726184805965551230",
+        "small.bin": "13533250923909195085"
+      },
+      "marginal": {
+        "O0/small.bin": 6133.33,
+        "O0/large.bin": 28339.31,
+        "O3/small.bin": 2775.04,
+        "O3/large.bin": 13716.39
+      }
+    },
+    "r4_checked": {
+      "rung": "unsafe.rs",
+      "substitutions_applied": 5,
+      "checksums": {
+        "adversarial-blind.bin": "5576862673510090752",
+        "adversarial-blindread.bin": "12442434272084377600",
+        "adversarial-many.bin": "2893199866468423680",
+        "adversarial-recycle.bin": "7544618244297525248",
+        "adversarial-stride3.bin": "0",
+        "degenerate.bin": "12018165609759525888",
+        "large.bin": "7726184805965551230",
+        "small.bin": "13533250923909195085"
+      },
+      "marginal": {
+        "O0/small.bin": 5227.32,
+        "O0/large.bin": 25048.44,
+        "O3/small.bin": 2417.61,
+        "O3/large.bin": 12174.14
+      },
+      "verus": {
+        "verified": 24,
+        "errors": 0,
+        "rc": 0,
+        "error_kinds": []
+      }
+    },
+    "r4_readdirect": {
+      "rung": "unsafe.rs",
+      "substitutions_applied": 1,
+      "checksums": {
+        "adversarial-blind.bin": "5576862673510090752",
+        "adversarial-blindread.bin": "12442434272084377600",
+        "adversarial-many.bin": "2893199866468423680",
+        "adversarial-recycle.bin": "7544618244297525248",
+        "adversarial-stride3.bin": "0",
+        "degenerate.bin": "12018165609759525888",
+        "large.bin": "7726184805965551230",
+        "small.bin": "13533250923909195085"
+      },
+      "marginal": {
+        "O0/small.bin": 5515.19,
+        "O0/large.bin": 26446.94,
+        "O3/small.bin": 2364.59,
+        "O3/large.bin": 11906.72
+      },
+      "verus": {
+        "verified": 24,
+        "errors": 0,
+        "rc": 0,
+        "error_kinds": []
+      }
+    }
+  },
+  "spans": {
+    "O0/small.bin": {
+      "R3_side": {
+        "cheapest": [
+          "r3_cursor",
+          6133.33
+        ],
+        "dearest": [
+          "safe_tuned",
+          8243.33
+        ],
+        "width": 2110.0
+      },
+      "R4_side": {
+        "cheapest": [
+          "r4_checked",
+          5227.32
+        ],
+        "dearest": [
+          "unsafe",
+          5631.32
+        ],
+        "width": 404.0
+      },
+      "R2_shipped": 6265.4
+    },
+    "O0/large.bin": {
+      "R3_side": {
+        "cheapest": [
+          "r3_cursor",
+          28339.31
+        ],
+        "dearest": [
+          "safe_tuned",
+          38129.31
+        ],
+        "width": 9789.999999999996
+      },
+      "R4_side": {
+        "cheapest": [
+          "r4_checked",
+          25048.44
+        ],
+        "dearest": [
+          "unsafe",
+          27058.04
+        ],
+        "width": 2009.6000000000022
+      },
+      "R2_shipped": 29015.21
+    },
+    "O3/small.bin": {
+      "R3_side": {
+        "cheapest": [
+          "safe_tuned",
+          2558.38
+        ],
+        "dearest": [
+          "r3_cursor",
+          2775.04
+        ],
+        "width": 216.65999999999985
+      },
+      "R4_side": {
+        "cheapest": [
+          "unsafe",
+          2364.59
+        ],
+        "dearest": [
+          "r4_checked",
+          2417.61
+        ],
+        "width": 53.01999999999998
+      },
+      "R2_shipped": 2785.16
+    },
+    "O3/large.bin": {
+      "R3_side": {
+        "cheapest": [
+          "safe_tuned",
+          12623.43
+        ],
+        "dearest": [
+          "r3_cursor",
+          13716.39
+        ],
+        "width": 1092.9599999999991
+      },
+      "R4_side": {
+        "cheapest": [
+          "unsafe",
+          11906.72
+        ],
+        "dearest": [
+          "r4_checked",
+          12174.14
+        ],
+        "width": 267.4200000000001
+      },
+      "R2_shipped": 13782.86
+    }
+  },
+  "problems": [],
+  "weaker_searched_endpoint": "THE R4 SIDE. spec.md pins `identity: unsafe == verus`, so every R4 candidate must also verify before it is a rung, and this file measures two candidates and records their Verus verdicts. The R3 side is free of that constraint and therefore cheaper to search, so a published R3-minus-R4 figure is an UPPER BOUND on the R3 side and a POINT on the R4 side. `.memory/01-ladder.md` finding 14: cheapest FOUND, never minimum.",
+  "invariant": "Every variant returns the model's checksum on every input; the marginal Ir of each is measured at both optimisation levels on both probe inputs; and each R4 variant's Verus verdict is recorded, because the identity pin makes an unverified R4 a control rather than a rung."
+}
