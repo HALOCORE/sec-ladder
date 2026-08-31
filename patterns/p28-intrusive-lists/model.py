@@ -99,6 +99,15 @@ lives, so it is measured OUTSIDE this file**, at C level, by
 `controls/harm_sites.py`, which ships one adversarial window of each shape and
 reads the site back out of ASan's report. ../NOTES.md 2.
 
+⚠⚠ **AND WHAT IT CANNOT REPRESENT AT ALL: THE ROW'S THIRD HARM SHAPE, THE
+CWE-415 DOUBLE FREE.** `_sim_buggy` has a `released` FLAG and no allocator, so
+releasing an object twice sets a boolean that was already set — there is nothing
+here for a second `free` to be a second *of*. That is not a gap in the
+derivation, because `sanitizer_expect` derives the TEMPORAL half only and ASan
+never sees the double free either (it SEGVs first); it is a limit of THIS
+representation, and the double free is therefore measured entirely outside this
+file, with an allocator interposer. ../NOTES.md 2d.
+
 --------------------------------------------------------------------------
 **Why the benign inputs never touch a released object.** They cannot: the moment
 one does, R1 returns a different number (or crashes) and the cell no longer
@@ -351,21 +360,42 @@ _PROBE_READ = _probe([(0, 5), (0, 13), (3, 0), (1, 5)])
 # survivor is 13, which sits in front of 5 in the chain, so DEL 13 splices and
 # writes into 5. Neither probe is ever fed to a rung.
 _PROBE_WRITE = _probe([(0, 5), (0, 13), (3, 0), (2, 13)])
+# ⚠ QUIET shape: the SAME TRIM, then an operation on a DIFFERENT bucket. This is
+# the probe that makes the last-hop arm two-valued -- an arm that only ever
+# expects `fires` is satisfied by `return "fires"`. Bucket 5 is poisoned and
+# never touched again; `GET 1` walks bucket 1, which is empty.
+_PROBE_QUIET = _probe([(0, 5), (0, 13), (3, 0), (1, 1)])
+
+
+def _model_over(window, n_iters=1):
+    """A `Model` over a SYNTHETIC one-window payload, built from BYTES.
+
+    ⚠ No file is opened and nothing under `inputs/` is read: the probe windows
+    above are handed straight to `Model` through the same `SlbFile` shape
+    `slb.read` returns. That is what lets `detector_selftest()` assert the
+    PUBLISHED value of `sanitizer_expect` rather than only the detector three
+    steps upstream of it, without writing anything to disk during a gate run."""
+    payload = len(window).to_bytes(8, "little") + window
+    return Model("<probe>", _file=slb.SlbFile(n_iters, len(payload), payload))
 
 
 def detector_selftest():
-    """Show that `_sim_buggy` CAN FIRE, and that the safety line is what stops
-    it. Four cells, two per probe:
+    """Show that `_sim_buggy` CAN FIRE, that the safety line is what stops it,
+    **and that the string this file PUBLISHES follows from it.** SEVEN cells
+    since `TASK_150` — four on the detector, three on the last hop:
 
       * `_PROBE_READ`  with the safety line KEPT    -> silent
       * `_PROBE_READ`  with the safety line DELETED -> **fires**
       * `_PROBE_WRITE` with the safety line KEPT    -> silent
       * `_PROBE_WRITE` with the safety line DELETED -> **fires**
+      * `sanitizer_expect` over `_PROBE_READ`       -> `"fires"`
+      * `sanitizer_expect` over `_PROBE_WRITE`      -> `"fires"`
+      * `sanitizer_expect` over `_PROBE_QUIET`      -> `"clean"`
 
     ⚠⚠ `.memory/03-measurement.md` 19: *whatever a model DERIVES rather than
     declares owes an arm that shows it firing.* p28's derivation also fires on
-    two SHIPPED inputs (`adversarial-uaf-read.bin` and
-    `adversarial-uaf-write.bin`), which p32's could not, so this arm is the
+    **all four** adversarial SHIPPED inputs, which p32's could not, so this arm
+    is the
     second line of evidence rather than the only one -- but it is the one that
     runs on every invocation and the one that keeps working if the adversarial
     blobs are ever regenerated differently.
@@ -381,7 +411,7 @@ def detector_selftest():
     for name, blob, what in arms:
         try:
             quiet, _ = _sim_buggy(blob, 0, len(blob), True)
-        except Exception as e:                        # noqa: BLE001
+        except BaseException as e:                    # noqa: BLE001
             problems.append(
                 f"MUST-FIRE ARM BROKEN ({name}, safety line KEPT): the "
                 f"detector raised {type(e).__name__}: {e}. A crash is not a "
@@ -395,7 +425,7 @@ def detector_selftest():
                 f"probe or `_sim_buggy` is wrong")
         try:
             loud, sites = _sim_buggy(blob, 0, len(blob), False)
-        except Exception as e:                        # noqa: BLE001
+        except BaseException as e:                    # noqa: BLE001
             problems.append(
                 f"MUST-FIRE ARM BROKEN ({name}, safety line DELETED): the "
                 f"detector raised {type(e).__name__}: {e} instead of "
@@ -414,14 +444,53 @@ def detector_selftest():
             problems.append(
                 f"MUST-FIRE ARM ({name}) reports a firing with NO SITE, so it "
                 f"cannot say what fired")
+
+    # ------------------------------------------------------------------
+    # ⚠⚠ THE LAST HOP, ADDED AT TASK_150 BECAUSE THE ARM ABOVE DOES NOT
+    # COVER IT. `TASK_149`'s `N2` arm replaced `sanitizer_expect`'s body with
+    # a per-filename table and **every cell above still passed**: the four
+    # cells license `_sim_buggy`, and `sanitizer_expect` is three steps
+    # further on (`_sim_buggy` -> `_window` -> `any_uaf` -> the string).
+    # `.memory/03-measurement.md` 19's rule is about WHATEVER IS DERIVED, and
+    # what this file PUBLISHES is the string, so the string is what owes an
+    # arm. Both directions are required: an arm that only ever expects
+    # `fires` is satisfied by `return "fires"`.
+    # ⚠ This is a hole in the must-fire MECHANISM, not in p28 -- every
+    # pattern with a derived `sanitizer_expect` has it, and `N1`/`N3` show
+    # p28's own wire is live. p28 is just where it was measured first.
+    # ------------------------------------------------------------------
+    for name, blob, want in (("READ", _PROBE_READ, "fires"),
+                             ("WRITE", _PROBE_WRITE, "fires"),
+                             ("QUIET", _PROBE_QUIET, "clean")):
+        try:
+            got = _model_over(blob).sanitizer_expect
+        except BaseException as e:                    # noqa: BLE001
+            problems.append(
+                f"LAST-HOP ARM BROKEN ({name}): deriving `sanitizer_expect` "
+                f"over the planted probe raised {type(e).__name__}: {e}. The "
+                f"published expectation cannot be read as derived until this "
+                f"arm runs to completion")
+            continue
+        if got != want:
+            problems.append(
+                f"LAST-HOP ARM ({name}): `sanitizer_expect` is {got!r} on a "
+                f"planted probe whose simulated buggy run is {want!r}. The "
+                f"path from `_sim_buggy` to the published string is broken, "
+                f"or the string is a table rather than a derivation "
+                f"(`TASK_149` N2) -- do not quote this pattern's expectation "
+                f"as DERIVED until it agrees again")
     return problems
 
 
 class Model:
     """Simulates ../spec.md's driver loop and kernel from the file alone."""
 
-    def __init__(self, path):
-        f = slb.read(path)
+    def __init__(self, path, _file=None):
+        # `_file` is for `_model_over` alone -- a probe window handed over as
+        # bytes, so the last-hop arm can drive `sanitizer_expect` without a
+        # file. `build(path)`, which is the only entry point the gate uses,
+        # never passes it.
+        f = slb.read(path) if _file is None else _file
         self.path = path
         self.n_iters = f.n_iters
         self.declared_len = f.declared_len
@@ -445,6 +514,18 @@ class Model:
         # `.temp/t146/mustfire_probe.py`'s M4 arm, which plants a detector that
         # raises the WRONG exception type: before this field it escaped
         # `Model.__init__` and the gate saw a crash instead of a sentence.
+        #
+        # ⚠⚠ **"ANY exception" WAS A LIE UNTIL TASK_150, AND IT IS A TREE-WIDE
+        # ONE.** All three catch sites in this file spelled `except Exception`,
+        # so a `BaseException` -- `SystemExit`, `KeyboardInterrupt`,
+        # `GeneratorExit` -- walked straight past them and the gate saw exactly
+        # the crash this field exists to prevent. `TASK_149`'s `N4` arm plants
+        # one and measured it escaping; `TASK_146`'s `M4` did not catch it
+        # because a `KeyError` IS an `Exception`. ⚠ Not hypothetical spelling:
+        # `.temp/t146/mustfire_probe.py:86` itself bails out with `SystemExit`.
+        # All three sites now spell `except BaseException`. **Every pattern with
+        # a must-fire arm has the same hole; this file is the only one this task
+        # was scoped to fix.**
         self.detector_error = None
         self.nwin = 0
         self._work = 0
@@ -454,15 +535,17 @@ class Model:
 
     # -- the window table (computed once) ----------------------------------
     def _window(self, off):
-        """(result, R1_touches_a_released_object) for the window at `off`.
+        """(result, R1_touches_a_released_object, sites) for the window at
+        `off` -- a THREE-tuple; this docstring said two until `TASK_150`.
 
         The first element is Implementation 1 -- the dict cache, no links. The
         second is the detector, run under the BUGGY semantics, because the
-        question it answers is what the rung with no safety line would do."""
+        question it answers is what the rung with no safety line would do. The
+        third names WHERE it fired, so a firing can say what fired."""
         r_ok = _sim_checked(self.buf, off, self.stride)
         try:
             uaf, sites = _sim_buggy(self.buf, off, self.stride, False)
-        except Exception as e:                                # noqa: BLE001
+        except BaseException as e:                            # noqa: BLE001
             # See `detector_error`'s comment in __init__. The window's answer is
             # `_sim_checked`'s and does not depend on the detector, so the model
             # keeps working and `selfcheck()` says what broke.
@@ -684,22 +767,49 @@ class Model:
         represents and what it collapses.
 
         ⚠⚠ **WHAT MAKES IT A MEASUREMENT AND NOT A RESTATEMENT.** The predicate
-        takes BOTH values on shipped inputs: `clean` on `small`, `large` and
-        `degenerate` -- all of which TRIM, repeatedly -- and `fires` on
-        `adversarial-uaf-read` and `adversarial-uaf-write`. It is not false by
-        construction, it is false on the benign rows because `inputs/gen.py`
+        takes BOTH values on shipped inputs: `clean` on `small`, `large`,
+        `degenerate` and `adversarial-stride3` -- the first three TRIM,
+        repeatedly -- and `fires` on **all four** of `adversarial-uaf-read`,
+        `adversarial-uaf-write`, `adversarial-uaf-head` and `adversarial-many`.
+        (⚠ This paragraph named only the first two until `TASK_150`; it
+        UNDERSTATED the derivation rather than overstating it.) It is not false
+        by construction, it is false on the benign rows because `inputs/gen.py`
         keeps the poisoned buckets untouched, and TRUE the moment one is
         touched. `detector_selftest()` closes the other half by DELETING the
         safety line from the simulated rung and showing the same two probes go
-        from silent to firing; `selfcheck()` runs it on every gate invocation.
-        `.memory/03-measurement.md` 19.
+        from silent to firing, **and then drives THIS PROPERTY over a third
+        probe pair** so the last hop is licensed too; `selfcheck()` runs the
+        whole thing on every gate invocation. `.memory/03-measurement.md` 19.
 
         ⚠ **What it does NOT derive.** It derives the TEMPORAL half -- a
         released object is touched -- which is what ASan is looking for. It says
-        nothing about UBSan, which sees nothing here for the same reason it sees
-        nothing on p27 and p29: no signed overflow, no misaligned access, no
-        out-of-range index. R1's every index is in range; what is out of range
-        is the object's LIFETIME. ../NOTES.md 2."""
+        nothing about UBSan.
+
+        ⚠⚠ **AND "UBSan SEES NOTHING HERE" IS FALSE. IT WAS ASSERTED IN THIS
+        DOCSTRING AND IN ../NOTES.md 2b AND `TASK_149` MEASURED IT FALSE.**
+        A UBSan-only build of `c/kernel.c` reports, on
+        `adversarial-uaf-write.bin` and on no other shipped input:
+
+            c/kernel.c  n->lp->ln = n->ln;
+              gcc    member access within misaligned address ... for type
+                     'struct p28_obj', which requires 8 byte alignment
+              clang  the same, PLUS `store to misaligned address ... for type
+                     'struct p28_obj *'`
+
+        on **44/50 runs (gcc) and 45/50 (clang)** -- about nine in ten, NOT the
+        10/10 an early sample of ten suggested; the miss is the run in which the
+        SEGV wins the race. Silent on the other seven inputs (0/112) and silent
+        on all eight in the HARDENED arm (0/16).
+
+        **The mechanism is ALIGNMENT, not lifetime, and that is why this
+        derivation still says nothing about it**: glibc's tcache has overwritten
+        the freed chunk's `lp`, so the splice stores through a garbage pointer
+        that happens not to be 8-byte aligned. UBSan is reporting the alignment.
+        A different tcache word, or a different allocator, and it would be
+        silent while the use-after-free was exactly as present -- so the right
+        reading is *UBSan sees an ARTEFACT of this row's harm*, not *UBSan
+        detects this row's harm*. ../NOTES.md 2b tabulates which instrument sees
+        which of the row's THREE harm shapes."""
         return "fires" if self.any_uaf else "clean"
 
     # -- what a conforming driver does -------------------------------------

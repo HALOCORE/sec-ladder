@@ -3,12 +3,12 @@
     "regenerate": "python3 patterns/p28-intrusive-lists/controls/safety_line.py"
   },
   "derived_from_sha256": {
-    "patterns/p28-intrusive-lists/c/kernel.c": "9c351d73f84372bb94f1f4a8b29189be6203d6ebf2a6e2eae2b716b13df2749f",
+    "patterns/p28-intrusive-lists/c/kernel.c": "6f905c2c31d6e31168d7d3fbdb1a6c087b13e5546ceec7e8e47a07e51b89ca18",
     "patterns/p28-intrusive-lists/c/kernel_hardened.c": "73bf0fccd1f8317ebacdfef3a77d9de606a6c916ad39a983503918752a625442",
-    "patterns/p28-intrusive-lists/c/kernel.h": "190c85765115549ad1268242ee6c23ec8dc0434899252bd060d600b8b7c0ef97",
-    "patterns/p28-intrusive-lists/controls/safety_line.py": "028a7e95daaac880945bef07d2c0c4968ef8985558a55267baa201ef8aaa71e6"
+    "patterns/p28-intrusive-lists/c/kernel.h": "ae1ef0c5eed49d52c686ab76187d7cb6e9957d9a3173a1d83b39e1345f679c6c",
+    "patterns/p28-intrusive-lists/controls/safety_line.py": "ada2c8c31f13de07fe5f35ed30c49476ecbd652068037976f5606714d488a653"
   },
-  "measured_utc": "2026-08-30T14:25:35Z",
+  "measured_utc": "2026-08-30T19:24:48Z",
   "preprocessed_lines": {
     "kernel.c": 392,
     "kernel_hardened.c": 401

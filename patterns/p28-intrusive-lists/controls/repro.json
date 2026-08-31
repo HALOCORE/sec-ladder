@@ -3,16 +3,16 @@
     "regenerate": "python3 patterns/p28-intrusive-lists/controls/repro.py"
   },
   "derived_from_sha256": {
-    "patterns/p28-intrusive-lists/c/kernel.c": "9c351d73f84372bb94f1f4a8b29189be6203d6ebf2a6e2eae2b716b13df2749f",
+    "patterns/p28-intrusive-lists/c/kernel.c": "6f905c2c31d6e31168d7d3fbdb1a6c087b13e5546ceec7e8e47a07e51b89ca18",
     "patterns/p28-intrusive-lists/c/kernel_hardened.c": "73bf0fccd1f8317ebacdfef3a77d9de606a6c916ad39a983503918752a625442",
     "patterns/p28-intrusive-lists/c/main.c": "32ab741abdd4df78e9967826c13d4a0f54638d522473e46167b4e0f6d03be99e",
-    "patterns/p28-intrusive-lists/inputs/gen.py": "20b54f69e517161b606aee5bb80c354a37feee37cab8a420b19e5c9503111182",
+    "patterns/p28-intrusive-lists/inputs/gen.py": "46ada474d6483df1c24a020ae84e5de1fee397f49240cf78fd070330561ce6d5",
     "patterns/p28-intrusive-lists/controls/repro.py": "b0f7c49b4fddb0db413fb04fb86411d33df5dc3a7e97041377f54876f72c6335",
     "patterns/p28-intrusive-lists/controls/arm_aslr.c": "4ce79a9d4632aecad651ee4936e85dad3495e56c19ade6636a48d830f6420930",
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3"
   },
   "runs": 20,
-  "measured_utc": "2026-08-30T14:53:04Z",
+  "measured_utc": "2026-08-30T19:25:16Z",
   "rows": [
     {
       "input": "adversarial-uaf-read.bin",

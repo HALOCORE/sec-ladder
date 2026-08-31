@@ -1,6 +1,6 @@
 # p28-intrusive-lists — results
 
-Generated 2026-08-30T16:41:38Z from `results/p28-intrusive-lists.json` (git `ae336a8bff83`, working tree dirty).
+Generated 2026-08-31T02:06:16Z from `results/p28-intrusive-lists.json` (git `dff659297180`, working tree dirty).
 
 ## Toolchain
 
@@ -63,7 +63,7 @@ Every delta below is a difference between rungs that are meant to be spellings o
 - **required** — *per language:*
   - `c` — THE LINKS COME FIRST IN THE STRUCT, in both C rungs: `struct p28_obj *lp, *ln;`. It is what makes R1's stale read reproducible rather than ASLR-dependent -- c/kernel.h's LAYOUT NOTE, and controls/repro.py measures both sides of it.
   - `rust` — not applicable: the Rust rungs' links are slot numbers, so there is no layout question. The why key states the divergence and controls/arm_rawptr.rs measures it.
-- **required** — THE EPILOGUE FREES EVERY OBJECT STILL ALIVE, in all seven rungs, so NEITHER C rung leaks and neither double-frees. It is spelled three ways because the representation forces three: the C rungs walk the eviction list, unsafe.rs and verus.rs scan the slot table, and safe_naive.rs and safe_tuned.rs have no epilogue at all because dropping the table IS the loop.
+- **required** — THE EPILOGUE FREES EVERY OBJECT STILL ALIVE, in all seven rungs, so NEITHER C rung LEAKS, and NEITHER DOUBLE-FREES IN THE EPILOGUE -- TRIM unlinks its victim from the eviction list before freeing it, so the epilogue's walk cannot reach it. It is spelled three ways because the representation forces three: the C rungs walk the eviction list, unsafe.rs and verus.rs scan the slot table, and safe_naive.rs and safe_tuned.rs have no epilogue at all because dropping the table IS the loop. ⚠⚠ THIS ENTRY READ 'so NEITHER C rung leaks and neither double-frees', UNSCOPED, UNTIL TASK_150, AND THE SECOND HALF OF THAT WAS FALSE. R1's DEL double-frees: its walk can reach an object TRIM already released and then run the splice to completion, free(n) included. Measured on adversarial-uaf-write.bin with a --wrap=malloc,--wrap=free interposer under LEAKING semantics -- the semantics model.py and all four Rust rungs implement, since slots are never recycled -- R1 gives mallocs=4 frees=5 doublefree=1 where R1h gives 4/4/0, on the same input through the same driver, with the safety line as the only difference; every other shipped input is balanced in both arms. The real allocator masks it, because glibc's tcache overwrites the freed chunk's user offsets 0 and 8, which are exactly lp and ln, so the splice faults two statements before free(n). THE LEAK HALF OF THE OLD SENTENCE IS TRUE AND STAYS. This is PROTOCOL rule 6's second half -- the hash matched and the measurement refuted the claim -- and it is p46's shape on a second pattern. NOTES.md 2d and 10 carry the numbers and the sha256 disclosure.
 - **FORBIDDEN** — `realloc(`
 - **FORBIDDEN** — `calloc(`
 - **FORBIDDEN** — `Vec::with_capacity`
@@ -84,7 +84,7 @@ Every delta below is a difference between rungs that are meant to be spellings o
 
 ### Spelling audit (stage `0b`, reporting only)
 
-Measured by the gate, not by this file — from `results/gate/p28-intrusive-lists.json`, contract `5c92154096ba`.
+Measured by the gate, not by this file — from `results/gate/p28-intrusive-lists.json`, contract `f0bd1f608df2`.
 
 `56` backticked spelling(s) over `6` rung(s) → **162** (spelling, rung) pair(s), **78** present — not the product, because a per-language entry is read against its own language's rungs only. Matching is `check.spelling_matches`: comments, string literals and Verus ghost clauses blanked, then all whitespace deleted.
 
@@ -107,7 +107,7 @@ Measured by the gate, not by this file — from `results/gate/p28-intrusive-list
 
 ## What the gate said out loud (reporting only)
 
-From `results/gate/p28-intrusive-lists.json` — the `loud` and `controls_json` keys, at contract `5c92154096ba`. **These did not fail the gate and are not defects**; they are the conditions `check.py` refuses to be silent about. Each one is a caveat on a number below or on the declaration above. The run's **verdict** is deliberately not printed here: it is an output of the same gate run that checks this table is current (stage `9c`), and rendering it made the table an input to its own checker — see `read_gate_loud`. Read the verdict from `results/gate/p28-intrusive-lists.json`.
+From `results/gate/p28-intrusive-lists.json` — the `loud` and `controls_json` keys, at contract `f0bd1f608df2`. **These did not fail the gate and are not defects**; they are the conditions `check.py` refuses to be silent about. Each one is a caveat on a number below or on the declaration above. The run's **verdict** is deliberately not printed here: it is an output of the same gate run that checks this table is current (stage `9c`), and rendering it made the table an input to its own checker — see `read_gate_loud`. Read the verdict from `results/gate/p28-intrusive-lists.json`.
 
 - **`collapse-ir`** — the derived floor is 186x below the tightest cell actually measured, so it rules out total collapse and essentially nothing else -- a cell could lose 99.46% of its work and still pass this stage. Read it as a smoke test, not as evidence that the work happened.
 - **`tcb-unsafe`** — verus.rs:591 `arr_set_unchecked`'s `requires` constrains nothing about ['x'], which its trusted body uses. spec.md justifies it: `x` is a pure VALUE parameter: it is stored into the array and is never used as an address, an index or a length, so there is no precondition a caller could usefully be asked for -- every `T` is a legal thing to store in a `T` slot. The two parameters that DO decide whether the unchecked store is defined, `v` and `i`, are both constrained by `i < old(v)@.len()`, which for a `&mut [T; N]` reads `i < N`. This is the parameter-coverage false positive `.memory/04-verus.md` names; p03 was the first pattern to exercise it, p12 the second, p06 the third, p14 the fourth, p27 the fifth, p29 the sixth, p32 the seventh and p28 the eighth.
@@ -196,22 +196,22 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 45.24 | 47.44 | 4.9% | 38.64 | 39.27 | 1.6% |
-| c-gcc | whole | 45.61 | 47.86 | 4.9% | 38.12 | 38.52 | 1.0% |
-| c-clang | isolated | 48.71 | 51.27 | 5.2% | 39.79 | 40.82 | 2.6% |
-| c-clang | whole | 48.61 | 51.51 | 6.0% | 40.30 | 41.19 | 2.2% |
-| safe_naive | isolated | 58.68 | 61.72 | 5.2% | 55.34 | 56.88 | 2.8% |
-| safe_naive | whole | 59.51 | 62.88 | 5.7% | 56.88 | 58.51 | 2.9% |
-| safe_tuned | isolated | 60.91 | 63.66 | 4.5% | 54.79 | 55.32 | 1.0% |
-| safe_tuned | whole | 60.61 | 63.90 | 5.4% | 54.00 | 54.94 | 1.7% |
-| unsafe | isolated | 59.46 | 62.28 | 4.7% | 52.05 | 54.38 | 4.5% |
-| unsafe | whole | 58.82 | 61.96 | 5.3% | 50.15 | 51.94 | 3.6% |
-| verus | isolated | 58.58 | 61.63 | 5.2% | 48.34 | 50.25 | 4.0% |
-| verus | whole | 61.02 | 63.96 | 4.8% | 52.41 | 53.74 | 2.6% |
-| c-gcc-h | isolated | 46.60 | 48.58 | 4.2% | 38.09 | 38.55 | 1.2% |
-| c-gcc-h | whole | 46.24 | 48.51 | 4.9% | 38.18 | 38.69 | 1.4% |
-| c-clang-h | isolated | 49.41 | 51.61 | 4.5% | 40.21 | 41.12 | 2.3% |
-| c-clang-h | whole | 48.89 | 51.48 | 5.3% | 40.65 | 41.82 | 2.9% |
+| c-gcc | isolated | 45.42 | 46.01 | 1.3% | 36.94 | 37.46 | 1.4% |
+| c-gcc | whole | 45.73 | 46.14 | 0.9% | 36.34 | 36.82 | 1.3% |
+| c-clang | isolated | 48.19 | 49.40 | 2.5% | 37.76 | 38.91 | 3.0% |
+| c-clang | whole | 48.94 | 49.48 | 1.1% | 38.34 | 39.62 | 3.3% |
+| safe_naive | isolated | 58.50 | 60.28 | 3.0% | 52.74 | 54.62 | 3.6% |
+| safe_naive | whole | 59.60 | 60.75 | 1.9% | 54.03 | 56.22 | 4.0% |
+| safe_tuned | isolated | 60.81 | 61.52 | 1.2% | 52.07 | 53.10 | 2.0% |
+| safe_tuned | whole | 60.96 | 61.79 | 1.4% | 51.51 | 52.26 | 1.5% |
+| unsafe | isolated | 59.41 | 60.16 | 1.3% | 50.04 | 51.23 | 2.4% |
+| unsafe | whole | 58.91 | 59.68 | 1.3% | 48.11 | 49.21 | 2.3% |
+| verus | isolated | 58.36 | 59.43 | 1.8% | 46.79 | 48.37 | 3.4% |
+| verus | whole | 60.78 | 61.84 | 1.7% | 50.27 | 51.41 | 2.3% |
+| c-gcc-h | isolated | 45.86 | 46.94 | 2.4% | 36.15 | 36.80 | 1.8% |
+| c-gcc-h | whole | 45.97 | 46.82 | 1.9% | 36.38 | 36.89 | 1.4% |
+| c-clang-h | isolated | 49.02 | 49.81 | 1.6% | 38.30 | 39.21 | 2.4% |
+| c-clang-h | whole | 48.73 | 49.57 | 1.7% | 38.59 | 39.86 | 3.3% |
 
 Every wall-clock cell is within the 10% min-to-median spread threshold.
 

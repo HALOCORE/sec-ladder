@@ -395,7 +395,10 @@ def main():
     body = bytes(body)
     write("degenerate.bin", 20000, len(body), body)
 
-    # --- adversarial: both harm shapes live here and nowhere else ----------
+    # --- adversarial: ALL THREE harm shapes live here and nowhere else -----
+    # (READ, WRITE and -- on adversarial-uaf-write.bin -- the CWE-415 double
+    #  free. This comment said "both" until TASK_150; ../c/kernel.h tabulates
+    #  the three and names the instrument that sees each.)
     for name, ops in (("adversarial-uaf-read.bin", adv_read_window()),
                       ("adversarial-uaf-head.bin", adv_head_window()),
                       ("adversarial-uaf-write.bin", adv_write_window()),

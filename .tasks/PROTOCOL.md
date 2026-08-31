@@ -158,6 +158,36 @@ context still applies — do not restart from scratch.
     p10's predictions and must keep *preceding* the measurement commit for that
     registration to mean anything. Correct in a following commit, the way
     `bb36e2f`'s message error was corrected. `git add <path> …`, always.
+
+    ⚠⚠⚠ **AND THE RULE AS WRITTEN ABOVE IS TOO NARROW. IT HAS BEEN COMPLIED
+    WITH TO THE LETTER AND VIOLATED IN SUBSTANCE TWICE, ONE REVIEW APART.**
+    ✅ **WIDENED: while a subagent runs, do not EDIT — and do not COMMIT — any
+    file that subagent READS or WRITES.** That includes `RECAP.md`, `.memory/`,
+    the baseline JSONs, and **the subagent's own report**.
+    ⚠ **Committing is not a read-only act**: it fixes a moving file at an
+    arbitrary point and publishes it as the record. At `TASK_149` the manager
+    committed a report at **970 lines** that finished at **1025**, and edited
+    `RECAP.md`, `temp_citations_baseline.json` and the next task file underneath
+    the same running reviewer. **The reviewer reported all of it.**
+
+    ⚠⚠ **THE PROXIMATE CAUSE IS ABOUT THIS HARNESS AND IS WORTH KNOWING: A
+    COMPLETION NOTIFICATION MEANS THE AGENT STOPPED, NOT THAT IT IS FINISHED.**
+    An agent that spawned a background child — a long `check.py`, say — notifies
+    when it stops, then **RESUMES when the child exits**, and the same task id
+    notifies again. `TASK_149` did exactly that: it resumed after a **33-minute**
+    gate run, added 92 lines, corrected its own running count and recorded a new
+    finding. **Before treating a report as final, confirm the agent has no
+    running child** (`ps` on the exact PID it named, or `ListAgents`).
+    ⚠ **The manager DID wait on that PID before launching the next task, so the
+    pattern files were never contended — the wait covered the artefact the next
+    task would WRITE and not the one it would READ.**
+
+    ⚠ **AND DO NOT FIX A FINDING OUT FROM UNDER A RUNNING REVIEW.** The same
+    session's citation-baseline repair was correct in substance and wrongly
+    timed: the reviewer had to withdraw a live finding and keep only its
+    mechanism. **Collect while a review runs; fix after it reports.**
+    ✅ **If an edit does land underneath a running agent, TELL THE AGENT**
+    (`SendMessage`) — cheap insurance against it working from a stale input.
 12. **Ask the review for the mechanism, not just the number.** p05's review was
    asked "if five rungs emit identical mnemonics, where did the bounds check go?"
    and came back with the hoisted trip-count computation, the surviving scalar

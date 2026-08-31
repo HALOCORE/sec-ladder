@@ -77,20 +77,48 @@
  * has no analogue here BECAUSE THERE IS NO `h`. There is no slot number, no
  * liveness bit and no generation anywhere in either C rung.
  *
- * ONE OMITTED BLOCK, TWO HARM SHAPES, SELECTED BY THE INPUT:
+ * ONE OMITTED BLOCK, **THREE** HARM SHAPES, SELECTED BY THE INPUT. ⚠ This table
+ * listed TWO until TASK_150; the third was always in the source and no text in
+ * the pattern named it (TASK_149_REPORT 6, ../NOTES.md 2d):
  *
  *   a later GET on the victim's bucket     walks the chain into the freed object
  *                                          and reads `n->key` / `n->val`
- *                                          -> heap-use-after-free READ. ASan
- *                                             reports it; the value is stable
- *                                             (see the layout note below)
- *   a later DEL on the victim's bucket     the same walk, then a SPLICE that
- *                                          WRITES through `n->hp`/`n->hn`/
- *                                          `n->lp`/`n->ln` read out of a freed
- *                                          chunk -- and the write lands on a
- *                                          THIRD object
- *                                          -> heap-use-after-free WRITE. In a
- *                                             plain build it SIGSEGVs.
+ *                                          -> CWE-416 heap-use-after-free READ.
+ *                                             ASan reports it; the value is
+ *                                             stable (see the layout note below)
+ *   a later PUT or DEL on that bucket      the same walk, then a WRITE into or
+ *                                          through the freed chunk: PUT's hit
+ *                                          arm stores `n->val` inside it, and
+ *                                          DEL's SPLICE writes through
+ *                                          `n->hp`/`n->hn`/`n->lp`/`n->ln` read
+ *                                          out of it, landing on a THIRD object
+ *                                          -> CWE-416 heap-use-after-free WRITE.
+ *                                             In a plain build it SIGSEGVs.
+ *   the SAME DEL, two statements later     `free(n)` on an object TRIM already
+ *                                          freed
+ *                                          -> CWE-415 DOUBLE FREE.
+ *
+ * **WHICH INSTRUMENT SEES WHICH, MEASURED ON THIS BOX** (../NOTES.md 2b, 2d;
+ * every column carries its own positive control, and the HARDENED arm is silent
+ * on all eight shipped inputs in every one of them):
+ *
+ *   READ         ASan, on adversarial-uaf-read / -uaf-head / -uaf-write /
+ *                -many. It is the FIRST error on all four, which is why the
+ *                gate's halting build never shows anything else.
+ *   WRITE        ASan, but only with `-fsanitize-recover=address`, and only on
+ *                adversarial-many: 2 reports, `n->val` (size 1) and the DEL
+ *                splice's `n->hn->hp` (size 8). On adversarial-uaf-write ASan
+ *                gives 6 READs and a SEGV and NO write, because the splice
+ *                faults first -- and there UBSan is the only witness, reporting
+ *                a misaligned member access and (clang) a misaligned STORE for
+ *                type `struct p28_obj *`.
+ *   DOUBLE FREE  ⚠ NOTHING ON THIS BOX EXCEPT AN ALLOCATOR INTERPOSER. ASan
+ *                never reaches it (the SEGV is not recoverable), UBSan does not
+ *                look for it, Miri drives the Rust rungs which never recycle a
+ *                slot, and valgrind's memcheck cannot start here (`libc6-dbg`
+ *                is absent). It is measured with `-Wl,--wrap=malloc,--wrap=free`
+ *                under LEAKING semantics -- which is exactly what ../model.py
+ *                and all four Rust rungs implement.
  *
  * **LAYOUT NOTE, DISCLOSED, because it decides whether the row is reproducible.**
  * The links come FIRST in the struct -- the Linux `list_head`-embedded-first

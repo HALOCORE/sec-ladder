@@ -4,13 +4,13 @@
   },
   "derived_from_sha256": {
     "patterns/p28-intrusive-lists/controls/arm_rawptr.rs": "466f9201121e2f4695ec7fae85e82483cf3f7c20755f151fce7e3c9fcf745e6d",
-    "patterns/p28-intrusive-lists/controls/arm_safe_bug.rs": "2dddf723378c20233a8da2193794bcac403bbac977aedec8ef1e0ff93d813703",
-    "patterns/p28-intrusive-lists/controls/rust_arms.py": "adebb4207b8ede85b352072755564a4dfaea70c29aa933b3df055a76cc416767",
-    "patterns/p28-intrusive-lists/safe_tuned.rs": "5fe7dadc477207bc5d5c567d8d8011a5158675a9e0d31d70c2ca4ed4f3c0bfb9",
-    "patterns/p28-intrusive-lists/c/kernel.c": "9c351d73f84372bb94f1f4a8b29189be6203d6ebf2a6e2eae2b716b13df2749f",
+    "patterns/p28-intrusive-lists/controls/arm_safe_bug.rs": "6a60efd9c038f41336cb09261f123b8aff989f62545f46da80ebb2cc87fc2c24",
+    "patterns/p28-intrusive-lists/controls/rust_arms.py": "d933ca7ae9785bbc91d010e93aafd595e8a0c03f93e87c851f7916f7849bc0a9",
+    "patterns/p28-intrusive-lists/safe_tuned.rs": "eb6be3f9fa2b799bbe84ff8ed16be46746b62f903ba684da40d3c38e2919db68",
+    "patterns/p28-intrusive-lists/c/kernel.c": "6f905c2c31d6e31168d7d3fbdb1a6c087b13e5546ceec7e8e47a07e51b89ca18",
     "patterns/p28-intrusive-lists/c/kernel_hardened.c": "73bf0fccd1f8317ebacdfef3a77d9de606a6c916ad39a983503918752a625442"
   },
-  "measured_utc": "2026-08-30T14:02:09Z",
+  "measured_utc": "2026-08-31T02:11:40Z",
   "miri_iters": 4,
   "checksums": {
     "small.bin": {
@@ -645,5 +645,5 @@
     "adversarial-many.bin/O3"
   ],
   "problems": [],
-  "invariant": "The RAW-POINTER port of both C arms agrees with the shipped rungs on every input, so the slot-table representation ../unsafe.rs and ../verus.rs use changed the PROOF BURDEN and not the PROGRAM. Miri reports undefined behaviour on the raw-pointer BUG arm on every adversarial input and on nothing else. \u26a0 And Miri is SILENT on arm_safe_bug -- safe Rust with the same line deleted -- on the same inputs, while its checksum and its checksum differs on at least one of them: safe Rust changes the bug's CLASS from a use-after-free into NOTHING AT ALL, a PANIC, or a wrong answer, decided by the input and by which of two idiomatic safe spellings the port uses -- and never into undefined behaviour. `safe_arm_observable_on` names the cells where the deleted line is observable at all; on the others a `None` slot terminates the walk exactly as `NIL` does."
+  "invariant": "The RAW-POINTER port of both C arms agrees with the shipped rungs on every input, so the slot-table representation ../unsafe.rs and ../verus.rs use changed the PROOF BURDEN and not the PROGRAM. Miri reports undefined behaviour on the raw-pointer BUG arm on every adversarial input and on nothing else. \u26a0 And Miri is SILENT on arm_safe_bug -- safe Rust with the same line deleted -- on the same inputs, while the arm's checksum EQUALS the checked kernel's on every input it produces one for: safe Rust changes the bug's CLASS from a use-after-free into NOTHING AT ALL or a PANIC, decided by the input and by which of two idiomatic safe spellings the port uses -- and never into undefined behaviour and never into a wrong answer. \u26a0\u26a0 THIS SENTENCE READ '... NOTHING AT ALL, a PANIC, or a wrong answer' until TASK_150, and 'a wrong answer' is the prediction the measurement below REFUTED (TASK_146 \u00a76); it also read 'while its checksum and its checksum differs on at least one of them', which was garbled. TASK_149 then attacked the claim with 3,257,436 EXHAUSTIVELY enumerated op sequences plus 20,000 randomised ones across five attack-shaped generators and found ZERO value differences, with 17,687 of the 20,000 cases actually truncating the walk. `safe_arm_observable_on` names the cells where the deleted line is observable at all; on the others a `None` slot terminates the walk exactly as `NIL` does, and ../NOTES.md 4c carries the three-step PROOF that this is structural rather than lucky, together with the two hypotheses it rests on."
 }

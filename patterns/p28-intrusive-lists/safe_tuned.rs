@@ -18,6 +18,22 @@
 //!      touches anything else -- which it must, because the safety line writes
 //!      into the neighbours it just named.
 //!
+//! ⚠⚠ **AND THERE IS A FOURTH CHANGE THIS LIST DID NOT NAME, AND IT DOMINATES
+//! THE COST.** This rung HOISTS THE WALK out of the opcode dispatch: PUT, GET
+//! and DEL share one copy of it at the top of the loop body, where R2 writes the
+//! walk inside each arm. `TASK_149` deliverable 4 measured that **un-hoisting it
+//! recovers 72% of this rung's excess over R2 on `small.bin`** (kernel-exclusive
+//! `Ir`, callgrind, three variants with identical checksums on every probe), and
+//! that the cost is paid **per OPERATION rather than per walk step**: `+38%`
+//! with no walk at all, `+1.9%` with a 30-deep one. The three levers above are
+//! neutral-to-favourable -- on the TRIM path, which uses none of the hoisted
+//! walk, this rung is genuinely **5% cheaper** than R2, which is lever 3 doing
+//! what it says.
+//!
+//! ⚠ **So "tuned" is ASPIRATIONAL AND THE PORT IS FAIR**: R3 measures DEARER
+//! than R2 in both conventions (`../NOTES.md` 8a), no rung changed the
+//! algorithm, and this pattern publishes no rung-to-rung cost anyway.
+//!
 //! What is deliberately NOT changed: the representation is still
 //! `Option<Box<Obj>>` over a slot table with `u8` links and slots never
 //! recycled, the allocation is still one `Box::new` per object and one drop per

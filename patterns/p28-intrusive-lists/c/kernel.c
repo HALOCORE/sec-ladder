@@ -28,22 +28,44 @@
  * the object it reaches is one this rung's DESTROY path should never have left
  * reachable.
  *
- * **ONE OMISSION, TWO HARM SHAPES, SELECTED BY THE INPUT** -- a later GET on the
- * victim's bucket is a use-after-free READ, a later DEL is a use-after-free
- * WRITE that lands on a THIRD object. c/kernel.h tabulates both.
+ * **ONE OMISSION, THREE HARM SHAPES, SELECTED BY THE INPUT** -- a later GET on
+ * the victim's bucket is a use-after-free READ, a later DEL is a use-after-free
+ * WRITE that lands on a THIRD object, and that same DEL ends in `free(n)` on an
+ * object TRIM already freed, which is a DOUBLE FREE (CWE-415). c/kernel.h
+ * tabulates all three.
  *
  * **What this rung KEEPS.** The eviction-list unlink in TRIM, so that list --
- * which is the OWNERSHIP list -- stays exact and the epilogue frees each live
- * object exactly once: **neither rung leaks and neither double-frees.** The full
- * two-list splice in DEL. The allocation budget `nmade < P28_SLOTS` and the walk
- * fuel `steps < P28_SLOTS`. **The whole of the bug is that one of the two lists
- * is left holding a pointer to storage the program has returned to the
+ * which is the OWNERSHIP list -- stays exact and **the EPILOGUE frees each live
+ * object exactly once: neither rung leaks, and neither double-frees THERE.**
+ * ⚠⚠ **THAT IS THE EPILOGUE, AND ONLY THE EPILOGUE. R1's DEL DOES DOUBLE-FREE**
+ * -- its walk can reach an object TRIM already released and then run the splice
+ * to completion, `free(n)` included. Measured on adversarial-uaf-write.bin with
+ * a `-Wl,--wrap=malloc,--wrap=free` interposer under leaking semantics (the
+ * semantics model.py and all four Rust rungs implement, since slots are never
+ * recycled): R1 mallocs=4 frees=5 doublefree=1 against R1h's 4/4/0, same input,
+ * same driver, same recipe, the safety line the only difference. The real
+ * allocator hides it -- glibc's tcache overwrites the freed chunk's user
+ * offsets 0 and 8, which are exactly `lp` and `ln`, so `n->lp->ln = n->ln;`
+ * faults two statements before `free(n)` and the program never gets there.
+ * ../NOTES.md 2d. This sentence previously read "neither rung leaks and neither
+ * double-frees", unscoped, and the unscoped half was FALSE.
+ *
+ * The full two-list splice in DEL. The allocation budget `nmade < P28_SLOTS` and
+ * the walk fuel `steps < P28_SLOTS`. **The whole of the bug is that one of the
+ * two lists is left holding a pointer to storage the program has returned to the
  * allocator.**
  *
  * **`bucket[b]` and the predecessor's `hn` are deliberately NOT cleared** -- they
- * are not cleared because nothing on this path knows they exist. That is the
- * point: p27 and p29 have a stale reference IN A VARIABLE THE FREEING CODE CAN
- * SEE; here it is in a field of a different heap object.
+ * are not cleared because nothing on this path holds a CURSOR to them. ⚠ That is
+ * the point, and it is about the cursor and not about storage class: TRIM must
+ * compute `victim->key % P28_NB` before it can name the chain at all, which is
+ * what c/kernel_hardened.c's added block spends its first line doing. An earlier
+ * version of this comment said p27 and p29 keep the stale reference "in a
+ * variable the freeing code can see" while p28 keeps it "in a field of a
+ * different heap object". Both halves are wrong: half of p28's harm lands in
+ * `bucket[]`, a stack array in this very frame, and c/kernel_hardened.c writes
+ * `bucket[vb]` from inside TRIM, so the freeing code CAN see it
+ * (TASK_149_REPORT 1; controls/harm_sites.py measures the two sites separately).
  *
  * The links come FIRST in the struct -- the Linux `list_head`-embedded-first
  * layout -- which is what makes R1's stale read reproducible. c/kernel.h's

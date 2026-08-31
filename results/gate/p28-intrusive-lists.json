@@ -11,7 +11,7 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "5c92154096baea5de8f8fd4c24a16c6d285000687bd6006782837db00d724455",
+  "contract_sha256": "f0bd1f608df27895eed33e180bc1ba75b7c87f2a83b13829acbbc8ac778a081c",
   "run_timeout_s": {},
   "expected_hang": [],
   "idiom": {
@@ -60,7 +60,7 @@
         "c": "THE LINKS COME FIRST IN THE STRUCT, in both C rungs: `struct p28_obj *lp, *ln;`. It is what makes R1's stale read reproducible rather than ASLR-dependent -- c/kernel.h's LAYOUT NOTE, and controls/repro.py measures both sides of it.",
         "rust": "not applicable: the Rust rungs' links are slot numbers, so there is no layout question. The why key states the divergence and controls/arm_rawptr.rs measures it."
       },
-      "THE EPILOGUE FREES EVERY OBJECT STILL ALIVE, in all seven rungs, so NEITHER C rung leaks and neither double-frees. It is spelled three ways because the representation forces three: the C rungs walk the eviction list, unsafe.rs and verus.rs scan the slot table, and safe_naive.rs and safe_tuned.rs have no epilogue at all because dropping the table IS the loop."
+      "THE EPILOGUE FREES EVERY OBJECT STILL ALIVE, in all seven rungs, so NEITHER C rung LEAKS, and NEITHER DOUBLE-FREES IN THE EPILOGUE -- TRIM unlinks its victim from the eviction list before freeing it, so the epilogue's walk cannot reach it. It is spelled three ways because the representation forces three: the C rungs walk the eviction list, unsafe.rs and verus.rs scan the slot table, and safe_naive.rs and safe_tuned.rs have no epilogue at all because dropping the table IS the loop. \u26a0\u26a0 THIS ENTRY READ 'so NEITHER C rung leaks and neither double-frees', UNSCOPED, UNTIL TASK_150, AND THE SECOND HALF OF THAT WAS FALSE. R1's DEL double-frees: its walk can reach an object TRIM already released and then run the splice to completion, free(n) included. Measured on adversarial-uaf-write.bin with a --wrap=malloc,--wrap=free interposer under LEAKING semantics -- the semantics model.py and all four Rust rungs implement, since slots are never recycled -- R1 gives mallocs=4 frees=5 doublefree=1 where R1h gives 4/4/0, on the same input through the same driver, with the safety line as the only difference; every other shipped input is balanced in both arms. The real allocator masks it, because glibc's tcache overwrites the freed chunk's user offsets 0 and 8, which are exactly lp and ln, so the splice faults two statements before free(n). THE LEAK HALF OF THE OLD SENTENCE IS TRUE AND STAYS. This is PROTOCOL rule 6's second half -- the hash matched and the measurement refuted the claim -- and it is p46's shape on a second pattern. NOTES.md 2d and 10 carry the numbers and the sha256 disclosure."
     ],
     "forbidden": [
       "`realloc(`",
@@ -197,27 +197,27 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "d82747da107a031842a8fc441961553c1f43277d55ee91219beafbd97ae57076",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
-    "patterns/p28-intrusive-lists/NOTES.md": "0514a55013b3088048f6aba7626ccaaef321240f63443c81ede70b9ebf7fe591",
+    "patterns/p28-intrusive-lists/NOTES.md": "a2267b364995edc60b9437295b5dbc241e52e03c3d82ce48e0962a4f21d21e1b",
     "patterns/p28-intrusive-lists/README.md": "345ff1bd02d9887faa603fa5905e2720ff8634ee32edc199441b2b52cd95aa72",
-    "patterns/p28-intrusive-lists/c/kernel.c": "9c351d73f84372bb94f1f4a8b29189be6203d6ebf2a6e2eae2b716b13df2749f",
-    "patterns/p28-intrusive-lists/c/kernel.h": "190c85765115549ad1268242ee6c23ec8dc0434899252bd060d600b8b7c0ef97",
+    "patterns/p28-intrusive-lists/c/kernel.c": "6f905c2c31d6e31168d7d3fbdb1a6c087b13e5546ceec7e8e47a07e51b89ca18",
+    "patterns/p28-intrusive-lists/c/kernel.h": "ae1ef0c5eed49d52c686ab76187d7cb6e9957d9a3173a1d83b39e1345f679c6c",
     "patterns/p28-intrusive-lists/c/kernel_hardened.c": "73bf0fccd1f8317ebacdfef3a77d9de606a6c916ad39a983503918752a625442",
     "patterns/p28-intrusive-lists/c/main.c": "32ab741abdd4df78e9967826c13d4a0f54638d522473e46167b4e0f6d03be99e",
     "patterns/p28-intrusive-lists/controls/arm_aslr.c": "4ce79a9d4632aecad651ee4936e85dad3495e56c19ade6636a48d830f6420930",
     "patterns/p28-intrusive-lists/controls/arm_body.inc": "aa8ac3522b7d027916a91b4effefc3adfc5ed30dcd6f85cc4efaa52d0809b8da",
     "patterns/p28-intrusive-lists/controls/arm_rawptr.rs": "466f9201121e2f4695ec7fae85e82483cf3f7c20755f151fce7e3c9fcf745e6d",
-    "patterns/p28-intrusive-lists/controls/arm_safe_bug.rs": "2dddf723378c20233a8da2193794bcac403bbac977aedec8ef1e0ff93d813703",
+    "patterns/p28-intrusive-lists/controls/arm_safe_bug.rs": "6a60efd9c038f41336cb09261f123b8aff989f62545f46da80ebb2cc87fc2c24",
     "patterns/p28-intrusive-lists/controls/arm_sites.c": "fe82b7a3e3e338bcb7d55ac9edf8828c64ce0253480d991797958dfcd22848fd",
-    "patterns/p28-intrusive-lists/controls/harm_sites.py": "b7ffb7abbf3306493cccc98bb1dfe403eb23fd7ecab9d3e4bf8c99dd7119996d",
+    "patterns/p28-intrusive-lists/controls/harm_sites.py": "c64ff6fd9df65b4aae3c8814e7db45601710d90ccdb08f4d518a1aab7f11c34b",
     "patterns/p28-intrusive-lists/controls/proof_mutants.py": "74e4e9ee975506a54b458721900b0411b2a4d19f2acba2513f161c8dc06de3fb",
     "patterns/p28-intrusive-lists/controls/repro.py": "b0f7c49b4fddb0db413fb04fb86411d33df5dc3a7e97041377f54876f72c6335",
-    "patterns/p28-intrusive-lists/controls/rust_arms.py": "adebb4207b8ede85b352072755564a4dfaea70c29aa933b3df055a76cc416767",
-    "patterns/p28-intrusive-lists/controls/safety_line.py": "028a7e95daaac880945bef07d2c0c4968ef8985558a55267baa201ef8aaa71e6",
-    "patterns/p28-intrusive-lists/inputs/gen.py": "20b54f69e517161b606aee5bb80c354a37feee37cab8a420b19e5c9503111182",
-    "patterns/p28-intrusive-lists/model.py": "7aa987fd9b7febec21e851dd03dace00748d708f6fb655334d6d20219f18e1a6",
-    "patterns/p28-intrusive-lists/safe_naive.rs": "30c4cee43c829b114287757ce23f7cfbcefe08d322a1084d3ac17febd244ea36",
-    "patterns/p28-intrusive-lists/safe_tuned.rs": "5fe7dadc477207bc5d5c567d8d8011a5158675a9e0d31d70c2ca4ed4f3c0bfb9",
-    "patterns/p28-intrusive-lists/spec.md": "7d3e70937c37f637e3198478e89edc41690ce84efb9de048c4e89f7bc9c323fc",
+    "patterns/p28-intrusive-lists/controls/rust_arms.py": "d933ca7ae9785bbc91d010e93aafd595e8a0c03f93e87c851f7916f7849bc0a9",
+    "patterns/p28-intrusive-lists/controls/safety_line.py": "ada2c8c31f13de07fe5f35ed30c49476ecbd652068037976f5606714d488a653",
+    "patterns/p28-intrusive-lists/inputs/gen.py": "46ada474d6483df1c24a020ae84e5de1fee397f49240cf78fd070330561ce6d5",
+    "patterns/p28-intrusive-lists/model.py": "ac0075f8013cd8047066a1592afcbfc6158078b31d1d888e237780d8d62336a6",
+    "patterns/p28-intrusive-lists/safe_naive.rs": "ab95af96f43ea77b46ad550003b7ee7ebd9401cb154405b90c4e22d4ab82831b",
+    "patterns/p28-intrusive-lists/safe_tuned.rs": "eb6be3f9fa2b799bbe84ff8ed16be46746b62f903ba684da40d3c38e2919db68",
+    "patterns/p28-intrusive-lists/spec.md": "ac94dd693836d9224af8c499af2b32fae8677e3cbfd7c371d14615632cc46abd",
     "patterns/p28-intrusive-lists/unsafe.rs": "fdc46418c249998fd3bab106e6a1706df084c6c987821aeb3654e9a4a115df0f",
     "patterns/p28-intrusive-lists/verus.rs": "231d586a3502c51e26d68360df2e14215328cc98fa45e221d992fb5ba9f6e271",
     "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
@@ -1689,7 +1689,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==621965==ERROR: AddressSanitizer: heap-use-after-free on address 0x504000000070 at pc 0x55c7c1ebd2a9 bp 0x7ffe4a9a4560 sp 0x7ffe4a9a4550 READ of size 1 at 0x504000000070 thread T0 #0 0x55c7c1ebd2a8 in kernel /home/apt/repos_common/se",
+      "diagnostic": "================================================================= ==821789==ERROR: AddressSanitizer: heap-use-after-free on address 0x504000000070 at pc 0x5595e0b812a9 bp 0x7ffeb0dcb3c0 sp 0x7ffeb0dcb3b0 READ of size 1 at 0x504000000070 thread T0 #0 0x5595e0b812a8 in kernel /home/apt/repos_common/se",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1711,7 +1711,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==621968==ERROR: AddressSanitizer: heap-use-after-free on address 0x504000000030 at pc 0x55f06aa612a9 bp 0x7ffe63e8c830 sp 0x7ffe63e8c820 READ of size 1 at 0x504000000030 thread T0 #0 0x55f06aa612a8 in kernel /home/apt/repos_common/se",
+      "diagnostic": "================================================================= ==821792==ERROR: AddressSanitizer: heap-use-after-free on address 0x504000000030 at pc 0x55a1534792a9 bp 0x7fff94d279d0 sp 0x7fff94d279c0 READ of size 1 at 0x504000000030 thread T0 #0 0x55a1534792a8 in kernel /home/apt/repos_common/se",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1722,7 +1722,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==621969==ERROR: AddressSanitizer: heap-use-after-free on address 0x504000000030 at pc 0x5573aab152a9 bp 0x7ffd94191ee0 sp 0x7ffd94191ed0 READ of size 1 at 0x504000000030 thread T0 #0 0x5573aab152a8 in kernel /home/apt/repos_common/se",
+      "diagnostic": "================================================================= ==821793==ERROR: AddressSanitizer: heap-use-after-free on address 0x504000000030 at pc 0x56552b19c2a9 bp 0x7ffc42dca2d0 sp 0x7ffc42dca2c0 READ of size 1 at 0x504000000030 thread T0 #0 0x56552b19c2a8 in kernel /home/apt/repos_common/se",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1733,7 +1733,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==621970==ERROR: AddressSanitizer: heap-use-after-free on address 0x504000000030 at pc 0x5653d8aa143e bp 0x7ffcd6440430 sp 0x7ffcd6440420 READ of size 1 at 0x504000000030 thread T0 #0 0x5653d8aa143d in kernel /home/apt/repos_common/se",
+      "diagnostic": "================================================================= ==821794==ERROR: AddressSanitizer: heap-use-after-free on address 0x504000000030 at pc 0x55d1bda7e43e bp 0x7fffae289880 sp 0x7fffae289870 READ of size 1 at 0x504000000030 thread T0 #0 0x55d1bda7e43d in kernel /home/apt/repos_common/se",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1831,7 +1831,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.2,
+        "seconds": 0.1,
         "stdout": "175491764864",
         "model_stdout": "175491764864",
         "stderr": ""
@@ -1843,7 +1843,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.1,
+        "seconds": 0.2,
         "stdout": "154398814336",
         "model_stdout": "154398814336",
         "stderr": ""
@@ -1855,7 +1855,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.2,
+        "seconds": 0.1,
         "stdout": "154398814336",
         "model_stdout": "154398814336",
         "stderr": ""
@@ -1900,17 +1900,17 @@
   },
   "published_table": {
     "table": "results/tables/p28-intrusive-lists.md",
-    "contract_sha256": "5c92154096baea5de8f8fd4c24a16c6d285000687bd6006782837db00d724455",
+    "contract_sha256": "f0bd1f608df27895eed33e180bc1ba75b7c87f2a83b13829acbbc8ac778a081c",
     "cited": [
-      "5c92154096ba"
+      "f0bd1f608df2"
     ],
     "verdict": "FRESH"
   },
   "table_render": {
     "table": "results/tables/p28-intrusive-lists.md",
     "renders_to": "results/tables/p28-intrusive-lists.md",
-    "render_sha256": "c5b532298eb51c22a022e1811ecfb3ff84735312dafe9288c06949432d2c87b5",
-    "published_sha256": "c5b532298eb51c22a022e1811ecfb3ff84735312dafe9288c06949432d2c87b5",
+    "render_sha256": "49c900cd4aa9ed75391f0cff621e037a844339f6b10825e3e7ec39a271b5a7cf",
+    "published_sha256": "49c900cd4aa9ed75391f0cff621e037a844339f6b10825e3e7ec39a271b5a7cf",
     "verdict": "FRESH"
   },
   "controls_json": {

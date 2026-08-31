@@ -3151,6 +3151,28 @@ already been struck.** Keep the list, not the ordinal.
     and only one of them says what happened.
 
 
+20. ⚠⚠ **`measure.py` HASHES `measurement_sources` BEFORE THE MEASUREMENT LOOP,
+    NOT AFTER — SO EDITING A MEASUREMENT-HASHED FILE MID-RUN COSTS THE WHOLE
+    RUN.** `harness/measure.py:450` calls `provenance(pdir, indir)` and builds
+    `source_sha256` **above** the cell loop.
+
+    **The consequence, and it is not the obvious one:** the record that lands
+    carries the hashes of the sources **as they were when the run STARTED**,
+    while the cells were measured against whatever was on disk **as each one
+    ran**. If the file changed in between, `--check-stale` compares the *new*
+    disk against the *old* recorded hash and correctly says **STALE** — so
+    nothing false ships. ⚠ **But the run is wasted, and a long one.**
+
+    ✅ **`TASK_150` paid it: two full `p28` measure runs for one edit**, and
+    reported it rather than absorbing it. ⚠ **The temptation is real** — the
+    natural workflow is *measure, read the record, fix the comment the record
+    made you notice, measure again* — **and the fix is free: make every
+    measurement-hashed edit BEFORE the run, and treat the run as a barrier.**
+    ⚠ **Same shape as `TASK_139`'s cost** (control JSONs generated before the
+    sources were final) **and it is the mirror image**: there the artefact was
+    generated too EARLY, here the source was edited too LATE.
+
+
 ## ⚠ A number GREPPED OUT OF A LOG is not a number READ OUT OF A RECORD
 
 **`TASK_127`, swept at `TASK_132`.** **The gate writes structured JSON and also

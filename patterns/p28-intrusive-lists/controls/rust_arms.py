@@ -46,6 +46,7 @@ WHAT IT ASSERTS, and it exits non-zero if any of it stops holding
 does -- otherwise a 200 000-iteration driver under interpretation never returns.
 """
 
+import argparse
 import hashlib
 import json
 import os
@@ -147,7 +148,28 @@ def derived_from():
     return out
 
 
+def _args():
+    """⚠ STRICT since TASK_150. This script took NO arguments and SILENTLY
+    IGNORED any it was given -- `TASK_149_REPORT` 7 found three of p28's five
+    controls doing it, and the reviewer dirtied two patterns' `controls/`
+    probing for a flag that does not exist. A script that ignores what it was
+    told is `.temp/mgr146`'s lesson, and here it costs a restore, because:
+
+    ⚠⚠ **RUNNING THIS SCRIPT REWRITES ITS COMMITTED JSON SIDECAR IN
+    `patterns/p28-intrusive-lists/controls/`.** That is by design -- the sidecar
+    is a measurement and `derived_from_sha256` pins it to the sources it was
+    taken against, so it MUST be regenerated whenever they move -- but it means
+    a bare re-run leaves the working tree dirty. `git status` afterwards, and
+    `git diff` before you keep it."""
+    argparse.ArgumentParser(
+        description=__doc__.strip().splitlines()[0],
+        epilog="Takes NO arguments. REWRITES its committed .json sidecar in "
+               "controls/ on every run -- check `git status` afterwards.",
+    ).parse_args()
+
+
 def main():
+    _args()
     problems = []
     rows = {}
     moved = set()
@@ -257,15 +279,26 @@ def main():
                "not the PROGRAM. Miri reports undefined behaviour on the "
                "raw-pointer BUG arm on every adversarial input and on nothing "
                "else. ⚠ And Miri is SILENT on arm_safe_bug -- safe Rust with "
-               "the same line deleted -- on the same inputs, while its checksum "
-               "and its checksum differs on at least one of them: safe Rust "
-               "changes the bug's CLASS from a use-after-free into NOTHING AT "
-               "ALL, a PANIC, or a wrong answer, decided by the input and by "
-               "which of two idiomatic safe spellings the port uses -- and "
-               "never into undefined behaviour. `safe_arm_observable_on` names "
-               "the cells where the deleted line is observable at all; on the "
-               "others a `None` slot terminates the walk exactly as `NIL` "
-               "does."}
+               "the same line deleted -- on the same inputs, while the arm's "
+               "checksum EQUALS the checked kernel's on every input it "
+               "produces one for: safe Rust changes the bug's CLASS from a "
+               "use-after-free into NOTHING AT ALL or a PANIC, decided by the "
+               "input and by which of two idiomatic safe spellings the port "
+               "uses -- and never into undefined behaviour and never into a "
+               "wrong answer. ⚠⚠ THIS SENTENCE READ '... NOTHING AT ALL, a "
+               "PANIC, or a wrong answer' until TASK_150, and 'a wrong answer' "
+               "is the prediction the measurement below REFUTED (TASK_146 §6); "
+               "it also read 'while its checksum and its checksum differs on "
+               "at least one of them', which was garbled. TASK_149 then "
+               "attacked the claim with 3,257,436 EXHAUSTIVELY enumerated op "
+               "sequences plus 20,000 randomised ones across five "
+               "attack-shaped generators and found ZERO value differences, "
+               "with 17,687 of the 20,000 cases actually truncating the walk. "
+               "`safe_arm_observable_on` names the cells where the deleted "
+               "line is observable at all; on the others a `None` slot "
+               "terminates the walk exactly as `NIL` does, and ../NOTES.md 4c "
+               "carries the three-step PROOF that this is structural rather "
+               "than lucky, together with the two hypotheses it rests on."}
     out = os.path.join(HERE, "rust_arms.json")
     json.dump(doc, open(out, "w"), indent=2)
     print(f"wrote {out}")

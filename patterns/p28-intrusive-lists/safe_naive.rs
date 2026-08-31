@@ -32,6 +32,16 @@
 //!      form a SUFFIX; a walk that stops at the first `None` slot loses only
 //!      objects that are already gone. ../NOTES.md 4b, and
 //!      `controls/rust_arms.json` for the table.
+//!      ✅ **That is now a THEOREM rather than an argument** (../NOTES.md 4c,
+//!      three steps from slot-monotonicity and never-recycling), and it
+//!      survived an attack: 3,257,436 EXHAUSTIVELY enumerated op sequences plus
+//!      20,000 randomised ones, **zero** value differences and **zero**
+//!      counterexamples, with 17,687 of the 20,000 actually truncating the
+//!      walk. ⚠ **Its two hypotheses are the useful part** -- eviction order
+//!      equals chain order, and slots are never recycled -- because a cache
+//!      that broke either would not have the result. ⚠ And the PANIC is the
+//!      typical outcome of the strict spelling, not an exotic one: 80% of
+//!      random windows.
 //!   3. Slots are **never recycled** (`nmade` only grows), which is `p27`'s and
 //!      `p29`'s convention and is what keeps the answer a function of the ops
 //!      rather than of the allocator. It is also why every rung, C included,

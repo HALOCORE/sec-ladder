@@ -5,9 +5,9 @@
   "derived_from_sha256": {
     "patterns/p28-intrusive-lists/controls/arm_sites.c": "fe82b7a3e3e338bcb7d55ac9edf8828c64ce0253480d991797958dfcd22848fd",
     "patterns/p28-intrusive-lists/controls/arm_body.inc": "aa8ac3522b7d027916a91b4effefc3adfc5ed30dcd6f85cc4efaa52d0809b8da",
-    "patterns/p28-intrusive-lists/controls/harm_sites.py": "b7ffb7abbf3306493cccc98bb1dfe403eb23fd7ecab9d3e4bf8c99dd7119996d"
+    "patterns/p28-intrusive-lists/controls/harm_sites.py": "c64ff6fd9df65b4aae3c8814e7db45601710d90ccdb08f4d518a1aab7f11c34b"
   },
-  "measured_utc": "2026-08-30T13:45:38Z",
+  "measured_utc": "2026-08-30T19:24:53Z",
   "windows": {
     "head": {
       "hex": "040000000005010503000105",

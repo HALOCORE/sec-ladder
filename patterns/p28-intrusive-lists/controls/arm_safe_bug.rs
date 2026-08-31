@@ -18,21 +18,47 @@
 //!     adversarial-uaf-write     correct      correct           correct
 //!     adversarial-many          correct      **PANIC** (101)   correct
 //!
-//! **In the safe slot-table representation, deleting p28's safety line does not
-//! change the ANSWER on any input this pattern ships.** Its only trace is a
-//! `None` where `.unwrap()` expects `Some`.
+//! **In the safe slot-table representation, deleting p28's safety line changes
+//! no VALUE on any input this pattern ships -- never undefined behaviour, never
+//! silently wrong -- while the `.unwrap()` spelling PANICS instead.**
+//! ⚠ This sentence read *"its only trace is a `None` where `.unwrap()` expects
+//! `Some`"* until `TASK_150`, which reads as an exotic corner. **It is the
+//! TYPICAL case**: `TASK_149` measured the strict spelling panicking on
+//! **15,929 of 20,000** randomly generated windows (80%) and on **304,578 of
+//! 3,257,436** exhaustively enumerated ones (9.4%, and 100% of the length-6
+//! cases that evict a whole bucket). One SHIPPED input reaches it; most random
+//! ones do. And a panic at exit 101 IS a changed answer -- the program prints
+//! no checksum at all.
 //!
-//! ⚠ **AND THERE IS A REASON, not a coincidence, which is worth more than the
-//! table.** The eviction list is insertion-ordered and every chain is
-//! newest-first, so **the globally oldest object in a bucket is that bucket's
-//! chain TAIL** -- TRIM always evicts a chain tail, and the entries the buggy
-//! rung leaves behind therefore form a SUFFIX of the chain. Truncating the walk
-//! at the first `None` slot loses only objects that are already gone. So the
-//! safe rung's walk sees exactly the live prefix, which is exactly the correct
-//! chain, and GET and DEL are right for a structural reason rather than by luck.
-//! (⚠ This is an ARGUMENT plus a measurement over the shipped inputs, not a
-//! proof. A cache whose eviction order and chain order disagreed would not have
-//! it.) The one path that notices is PUT, which writes the old chain head's `hp`
+//! ⚠⚠ **AND THE REASON IS A THEOREM, not an argument.** The eviction list is
+//! insertion-ordered and every chain is newest-first, so **the globally oldest
+//! object in a bucket is that bucket's chain TAIL** -- TRIM always evicts a
+//! chain tail, and the entries the buggy rung leaves behind therefore form a
+//! SUFFIX of the chain. Truncating the walk at the first `None` slot loses only
+//! objects that are already gone. The proof, in three steps (`TASK_149` 2, and
+//! it REPLACES this file's former hedge *"an argument plus a measurement over
+//! the shipped inputs, not a proof"*):
+//!
+//!   1. **Every chain is strictly decreasing in slot number.** Slots are handed
+//!      out as `s = nmade`, monotonically; PUT prepends the largest so far, DEL
+//!      splices, and the buggy TRIM does not touch chains at all.
+//!   2. **The eviction list is in that same order, so its TAIL is the MINIMUM
+//!      live slot.** Same three writers.
+//!   3. **Therefore live-before-dead.** Suppose slot `i` is dead and slot
+//!      `j < i` is live, both in bucket `b`'s chain, so `j` sits behind `i`.
+//!      `i` cannot have died by DEL, which splices it out. So TRIM freed `i` --
+//!      but TRIM takes the minimum live slot and `j < i` was live.
+//!      Contradiction. Slots are never recycled, so a dead slot never returns.
+//!
+//! ⚠⚠ **THE TWO HYPOTHESES ARE THE USEFUL OUTPUT, because they are what a real
+//! cache would break: (a) eviction order EQUALS chain order, and (b) slots are
+//! never recycled.** An LRU that promoted on a hit would break (a); a recycling
+//! arena would break (b); either one and this result is gone. `TASK_149`
+//! mechanised step 3 as a `SUFFIX!` column over 3,277,436 sequences and it is
+//! **0** -- with **17,687 of 20,000** random cases actually truncating the
+//! walk, so the mechanism is exercised rather than dodged.
+//!
+//! The one path that notices is PUT, which writes the old chain head's `hp`
 //! without walking to it -- and when every object in the bucket has been
 //! evicted, that head is a `None` slot.
 //!

@@ -41,6 +41,7 @@ WHAT IT ASSERTS, and it exits non-zero if any of it stops holding
     window being harmless.
 """
 
+import argparse
 import hashlib
 import json
 import os
@@ -124,7 +125,28 @@ def derived_from():
     return out
 
 
+def _args():
+    """⚠ STRICT since TASK_150. This script took NO arguments and SILENTLY
+    IGNORED any it was given -- `TASK_149_REPORT` 7 found three of p28's five
+    controls doing it, and the reviewer dirtied two patterns' `controls/`
+    probing for a flag that does not exist. A script that ignores what it was
+    told is `.temp/mgr146`'s lesson, and here it costs a restore, because:
+
+    ⚠⚠ **RUNNING THIS SCRIPT REWRITES ITS COMMITTED JSON SIDECAR IN
+    `patterns/p28-intrusive-lists/controls/`.** That is by design -- the sidecar
+    is a measurement and `derived_from_sha256` pins it to the sources it was
+    taken against, so it MUST be regenerated whenever they move -- but it means
+    a bare re-run leaves the working tree dirty. `git status` afterwards, and
+    `git diff` before you keep it."""
+    argparse.ArgumentParser(
+        description=__doc__.strip().splitlines()[0],
+        epilog="Takes NO arguments. REWRITES its committed .json sidecar in "
+               "controls/ on every run -- check `git status` afterwards.",
+    ).parse_args()
+
+
 def main():
+    _args()
     bins = build()
     problems = []
     rows = {}

@@ -31,9 +31,12 @@ through it.
 | what the input does after a TRIM | what R1 does |
 |---|---|
 | GET or PUT on the victim's bucket | walks the chain into the freed object and reads `n->key`, then `n->val`. ASan: `heap-use-after-free READ`. **The value is STABLE** (`controls/repro.py`) |
+| PUT that HITS the freed object | stores `n->val` **inside** the freed chunk. ASan: `heap-use-after-free WRITE`, size 1, measured on `adversarial-many.bin` |
 | DEL on the victim's bucket | the same walk, then a SPLICE that WRITES through `n->lp` -- the word glibc's tcache has overwritten -- so a plain build **SIGSEGVs**, and the write lands at an allocator-chosen address |
+| ⚠ **the same DEL, two statements later** | **`free(n)` on an object TRIM already freed — CWE-415 DOUBLE FREE.** Reachable on `adversarial-uaf-write.bin` and invisible to every detector on this box except an allocator interposer, because the SEGV above arrives first. `NOTES.md` 2d |
 
-**One omitted block, two harm shapes, selected by the input.** And **the READ
+**One omitted block, THREE harm shapes, selected by the input** — ⚠ this line said
+*two* until `TASK_150`, and the third was in the source all along. And **the READ
 path is CORRECT while the DESTROY path is INCOMPLETE**, which is the INVERSION of
 `p27`, `p29` and `p32`: all three keep a correct free discipline and put the
 missing check on the READ. There is no test to add on this rung's read path.
@@ -210,7 +213,7 @@ what the identity pin is measuring.
         "c": "THE LINKS COME FIRST IN THE STRUCT, in both C rungs: `struct p28_obj *lp, *ln;`. It is what makes R1's stale read reproducible rather than ASLR-dependent -- c/kernel.h's LAYOUT NOTE, and controls/repro.py measures both sides of it.",
         "rust": "not applicable: the Rust rungs' links are slot numbers, so there is no layout question. The why key states the divergence and controls/arm_rawptr.rs measures it."
       },
-      "THE EPILOGUE FREES EVERY OBJECT STILL ALIVE, in all seven rungs, so NEITHER C rung leaks and neither double-frees. It is spelled three ways because the representation forces three: the C rungs walk the eviction list, unsafe.rs and verus.rs scan the slot table, and safe_naive.rs and safe_tuned.rs have no epilogue at all because dropping the table IS the loop."
+      "THE EPILOGUE FREES EVERY OBJECT STILL ALIVE, in all seven rungs, so NEITHER C rung LEAKS, and NEITHER DOUBLE-FREES IN THE EPILOGUE -- TRIM unlinks its victim from the eviction list before freeing it, so the epilogue's walk cannot reach it. It is spelled three ways because the representation forces three: the C rungs walk the eviction list, unsafe.rs and verus.rs scan the slot table, and safe_naive.rs and safe_tuned.rs have no epilogue at all because dropping the table IS the loop. ⚠⚠ THIS ENTRY READ 'so NEITHER C rung leaks and neither double-frees', UNSCOPED, UNTIL TASK_150, AND THE SECOND HALF OF THAT WAS FALSE. R1's DEL double-frees: its walk can reach an object TRIM already released and then run the splice to completion, free(n) included. Measured on adversarial-uaf-write.bin with a --wrap=malloc,--wrap=free interposer under LEAKING semantics -- the semantics model.py and all four Rust rungs implement, since slots are never recycled -- R1 gives mallocs=4 frees=5 doublefree=1 where R1h gives 4/4/0, on the same input through the same driver, with the safety line as the only difference; every other shipped input is balanced in both arms. The real allocator masks it, because glibc's tcache overwrites the freed chunk's user offsets 0 and 8, which are exactly lp and ln, so the splice faults two statements before free(n). THE LEAK HALF OF THE OLD SENTENCE IS TRUE AND STAYS. This is PROTOCOL rule 6's second half -- the hash matched and the measurement refuted the claim -- and it is p46's shape on a second pattern. NOTES.md 2d and 10 carry the numbers and the sha256 disclosure."
     ],
     "forbidden": [
       "`realloc(`",
