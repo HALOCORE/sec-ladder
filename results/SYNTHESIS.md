@@ -31,13 +31,17 @@ retracted along the way, and **the retraction list is the most transferable
 thing the project produced** (§6).
 
 ⚠ **A NOTE ON THE COUNT, so the title and the corpus can be reconciled.** The
-four Results below were drawn from **26** kernels. **Two more have landed since
-and NEITHER is folded into Results 1–4 or into the idiom census, which genuinely
-ran over 26**: `p29` (BST delete, `TASK_139`) and `p32` (free-list pool,
-`TASK_144`). They appear in §7, where they change the corpus composition — **the
-temporal axis goes from one row to three.** **Where this document says
+four Results below were drawn from **26** kernels. **FOUR more have landed since
+and NOT ONE is folded into Results 1–4 or into the idiom census, which genuinely
+ran over 26**: `p29` (BST delete, `TASK_139`), `p32` (free-list pool,
+`TASK_144`), `p28` (intrusive lists, `TASK_146`) and `p35` (tagged union,
+`TASK_148`). They appear in §7, where they change the corpus composition —
+**the temporal axis goes from one row to FOUR and the TYPE axis from one to
+TWO.** ⚠ **This sentence said *"two more"* and *"one to three"*; both were
+already stale when written down, which is why the counts here are now derived
+rather than asserted.** **Where this document says
 "26 kernels" it means the analysed set, and that is the honest scope; the tree
-has 28.** ⚠ **And the count is the smaller half of the gap.** `p32` was admitted
+has 30 — DERIVE IT, do not trust this sentence, which has now been wrong twice.** ⚠ **And the count is the smaller half of the gap.** `p32` was admitted
 only because a **kill was retracted**: the admission bar was measuring the wrong
 thing (RECAP finding 53), it was replaced with a **C-side-only** bar
 (`CLAUDE.md` rule 6), and re-adjudication **admitted seven rows and left zero
@@ -1281,25 +1285,27 @@ record on the pass that found this — so the only check for it is to ask, of a
 finished document, which way its gaps point.**
 
 **What the corpus is made of, and it bounds the generality more than the
-toolchain pin does.** The 28 kernels classify, by the safety line each one's
-`c/kernel.c` omits, like this — derived and drift-checked by
-`harness/tools/composition.py`:
+toolchain pin does.** ⚠ **This paragraph said *"the 28 kernels"*; the tree
+is now 30 — run `harness/tools/composition.py` rather than trusting any
+count printed here.** They classify, by the safety line each one's
+`c/kernel.c` omits, like this — derived and drift-checked by that script:
 
 ```
 spatial          15   p02 p03 p05 p07 p09 p10 p11 p12 p13 p14 p16 p17 p23 p36 p46
 logical           3   p04 p06 p19
-temporal          3   p27 p29 p32
-type              1   p38
+temporal          4   p27 p28 p29 p32
+type              2   p35 p38
 resource          1   p42
 side-channel      1   p47
-UB, not memory    1   p18
+ub-not-mem        1   p18
 non-termination   1   p22
 aliasing          1   p08
 calibration       1   p01
 ```
 
-⚠⚠ **Fifteen of twenty-eight are spatial, and every claim this document makes
-about the type axis rests on ONE pattern.** `p38` is the only type-confusion.
+⚠⚠ **Fifteen of THIRTY are spatial** — the sentence here read *"fifteen of
+twenty-eight"* — **and every claim this document makes about the type axis rested
+on ONE pattern.** `p38` was the only type-confusion.
 A result drawn from a single row is a result about that row until a second one
 agrees with it, and **§5's `6.00 Ir`/call for a type-based aliasing property is
 in exactly that position** — a one-row result stated as a law.
@@ -1327,8 +1333,23 @@ count unmoved** — the gate then fails only on a declaration the author writes.
 **The row ships the honest configuration with the gap as its result** (`p42`'s
 precedent), and **no `check.py` change was proposed.**
 
-✅ **The temporal axis is the one place this improved: `p29` (BST delete) joined
-`p27` at TASK_139**, and the two are **not** the same shape. `p29`'s
+✅ **The temporal axis has improved most of all — from ONE row to FOUR:** `p29`
+(BST delete, `TASK_139`), `p32` (free-list pool, `TASK_144`) and `p28`
+(intrusive lists, `TASK_146`) all joined `p27`. ⚠ **This paragraph said *"the
+one place this improved"* and named only `p29`.** **The four are not the same
+shape**, and the differences are the point: `p27` and `p29` and `p32` all keep a
+correct free discipline and put the missing check on the **READ**, while
+**`p28` INVERTS that — its read path is correct and its DESTROY path is
+incomplete.** ⚠⚠ **And the safe-Rust answers DISAGREE ACROSS THE FOUR, which is
+the sharpest thing on this axis: `p32`'s safe rung reproduces the buggy C BIT
+FOR BIT, and `p28`'s CANNOT REPRODUCE IT AT ALL** — the representation safe Rust
+forces on you either preserves the harm exactly or removes its mechanism along
+with the pointers, **and which one is a property of the STRUCTURE, not of
+Rust.** ⚠ **§3's *"safe Rust's temporal guarantee is a guarantee about the
+allocator"* now has four rows under it rather than one, and they do not all say
+the same thing.**
+
+Taking `p29` and `p27` specifically, the two are **not** the same shape. `p29`'s
 in-order-successor splice **overwrites its victim in place and frees the
 successor**, so one source line carries **two bug classes selected by the
 input** — a use-after-*free* on leaf victims and an in-bounds
@@ -1347,22 +1368,24 @@ conjunct suffices** — widening the liveness array from a bit to the occupant t
 is exact and adds no state. **The row stands on the two-bug-class mechanism, not
 on a conjunct count.**
 
-**§3's *"safe Rust's temporal guarantee is a guarantee about the allocator"* now
-has a second row under it rather than one.**
+~~**§3's *"safe Rust's temporal guarantee is a guarantee about the allocator"*
+now has a second row under it rather than one.**~~ ⚠ **Superseded: it has
+FOUR — see the paragraph above, which also records that they do not all say the
+same thing.**
 ⚠ **This does not weaken the spatial results — those are the fifteen — it says
 where the document's confidence should stop.**
 
-⚠⚠ **AND A THIRD TEMPORAL ROW HAS SINCE LANDED, `p32` (free-list pool,
-`TASK_144`) — DELIBERATELY NOT WRITTEN UP HERE YET.** Its review (`TASK_145`)
-had not reported when this paragraph was added, and `PROTOCOL.md` rule 9 keeps
-an unreviewed result out of the layers a reader quotes. **What can be said
-without it:** `p32` allocates nothing — a fixed pool with a LIFO free list,
-owned by the program from start to finish — so it is exactly the *recycles its
-own storage* case §3's rule names, and it is the first row in this project
-**built because a kill was retracted** rather than because a candidate passed.
-**Read `.memory/06-catalogue.md`'s `p32` cell and RECAP finding 55 for the
-current state; do not quote a `p32` number from this document, because there
-is not one here yet.**
+⚠ **`p32`'s own write-up was deferred here while its review was in flight; that
+review has since landed (`TASK_145`, verdict STANDS) and its corrections with it
+(`TASK_147`). `p32` allocates nothing — a fixed pool with a LIFO free list,
+owned by the program throughout — so it is exactly the *recycles its own
+storage* case §3's rule names, and it is the first row this project built
+**because a kill was retracted** rather than because a candidate passed.**
+⚠⚠ **Its proof-side result was over-generalised once and is now scoped:**
+*"nothing linear forces the safety conjunct, so the spec-weaken arm verifies"*
+is **`p32`'s property, not a law** — `p35`'s equivalent arm FAILS at `wf_cells`
+(`TASK_152`). **Read `.memory/06-catalogue.md` and RECAP findings 55–58 for the
+current state of all four temporal rows.**
 
 ⚠ **The table counts safety lines, not bugs.** `p09` ships two and only the
 omitted `q < nbits` is spatial.
