@@ -8,12 +8,12 @@
     "patterns/p35-tagged-union/c/main.c": "d49d2ecc36009b1896dcddf2425feb8f231fcac7ab915bbc53a160929b3f56e5",
     "patterns/p35-tagged-union/controls/arm_unsafe_bug.rs": "7322b5b75c0fa4266ea992d14088a148ac3e1120124932ae93dc949a65ff85e4",
     "patterns/p35-tagged-union/controls/arm_safe_bug.rs": "05a1404f984a613db005a68949dd9d0b7e016c13e8f3226e7f0e156cdc66fc6c",
-    "patterns/p35-tagged-union/controls/rust_bug.py": "4f458d60d6372e143b94a344916fa51abead549fab77a3aa72dfbf1154b55de5",
-    "patterns/p35-tagged-union/inputs/gen.py": "a35611291390db86728865fdd579bda0f5ca04de51c47e20c80eb29626aec37f",
+    "patterns/p35-tagged-union/controls/rust_bug.py": "2acb34cbcdac13af0aa7e433859e333a2d51894fc2c3f1939aad09586b610f7f",
+    "patterns/p35-tagged-union/inputs/gen.py": "96f293a8b48c9d1c7882ca4a99df9c204b78ff310529cf66c48fe18b2decd650",
     "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3"
   },
-  "measured_utc": "2026-08-31T07:38:18Z",
+  "measured_utc": "2026-08-31T09:31:10Z",
   "miri_iters": 4,
   "native": {
     "small.bin": {
@@ -87,7 +87,7 @@
       "safe_arm": {
         "rc": 101,
         "stdout": "",
-        "stderr": "thread 'main' (1046519) panicked at patterns/p35-tagged-union/controls/arm_safe_bug.rs:108:17: index out of bounds: the len is 4 but the index is 169883888704 note: run with `RUST_BACKTRACE=1` environ"
+        "stderr": "thread 'main' (1129033) panicked at patterns/p35-tagged-union/controls/arm_safe_bug.rs:108:17: index out of bounds: the len is 4 but the index is 169883888704 note: run with `RUST_BACKTRACE=1` environ"
       },
       "unsafe_reproduces_c": true,
       "safe_reproduces_c": false
@@ -106,7 +106,7 @@
       "safe_arm": {
         "rc": 101,
         "stdout": "",
-        "stderr": "thread 'main' (1046522) panicked at patterns/p35-tagged-union/controls/arm_safe_bug.rs:108:17: index out of bounds: the len is 4 but the index is 297296805232 note: run with `RUST_BACKTRACE=1` environ"
+        "stderr": "thread 'main' (1129036) panicked at patterns/p35-tagged-union/controls/arm_safe_bug.rs:108:17: index out of bounds: the len is 4 but the index is 297296805232 note: run with `RUST_BACKTRACE=1` environ"
       },
       "unsafe_reproduces_c": true,
       "safe_reproduces_c": false
@@ -120,6 +120,13 @@
       "ran": true,
       "diagnostic": ""
     },
+    "adversarial-exhaust.bin": {
+      "rc": 1,
+      "stdout": "",
+      "ub": true,
+      "ran": true,
+      "diagnostic": "error: Undefined Behavior: reading memory at alloc1843[0x0..0x8], but memory is uninitialized at [0x4..0x8], and this operation requires initialized memory --> patterns/p35-tagged-union/controls/arm_unsafe_bug.rs:127:29 | 127 | if unsafe { pays[idx].d } > 1.0 { | ^^^^^^^^^^^ Undefined Behavior occurred here | = help: this indicates a bug in the program: it performed an invalid operation, and cause"
+    },
     "adversarial-ptr-confusion.bin": {
       "rc": 1,
       "stdout": "",
@@ -129,5 +136,5 @@
     }
   },
   "problems": [],
-  "invariant": "Both Rust arms reproduce c/kernel.c's SILENT wrong value bit for bit, and Miri is silent on the unsafe one -- a wrong-variant union read is not UB in Rust. Neither reproduces the LOUD harm: the unsafe arm turns it into an out-of-bounds `get_unchecked` that Miri DOES report (the must-fire arm for the Miri half), and the safe arm turns it into a panic. The shipped safe rungs cannot express either, because their `Cell` enum makes the mismatch unrepresentable."
+  "invariant": "Both Rust arms reproduce c/kernel.c's SILENT wrong value bit for bit, on EVERY silent input including adversarial-exhaust. Miri is silent on the DBL confusion -- a wrong-variant union read whose bytes were all written is not UB in Rust -- and REPORTS the exhaust one, where the read is 8 bytes wide over a 4-byte `o: u32` payload, so the condition is validity AND initialisedness. Neither arm reproduces the LOUD harm: the unsafe arm turns it into an out-of-bounds `get_unchecked` that Miri DOES report, and the safe arm turns it into a panic. The two firing rows are the must-fire arms for the one silent row. The shipped safe rungs cannot express any of it, because their `Cell` enum makes the mismatch unrepresentable."
 }

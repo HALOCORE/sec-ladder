@@ -28,11 +28,24 @@ So there are two configurations, and this script runs both:
     A  SHIPPED   the read inside `#[verifier::external_body]`. Verifies. The
                  correct-variant obligation survives as the wrapper's
                  `requires` and is checked AT EVERY CALL SITE. What is
-                 axiomatised is that the body reads the member its name says.
+                 axiomatised is BOTH unchecked operations in
+                 `unsafe { v.get_unchecked(i).i }`: that the body reads the
+                 member its name says, AND that `i < v@.len()` licenses the
+                 index. (⚠ CORRECTED AT TASK_153 -- this line read ~~what is
+                 axiomatised is that the body reads the member its name says~~,
+                 which describes one of two. TASK_152 M5.)
                  The gate accepts it and BLOCKS the missing twin, out loud.
     B  REFUSED   the read in VERIFIED code. Verifies, and Verus checks the
                  variant AT THE READ -- a strictly stronger statement, with no
                  axiom at all. `_scan_unsafe_sites` FAILS it.
+
+⚠⚠ **AND THE TWO CONFIGURATIONS DIFFER IN A SECOND WAY THAT IS SHARPER THAN
+AXIOM-VERSUS-CHECK (TASK_152 M3, landed TASK_153).** Delete the correct-variant
+conjunct itself. In **A** the file still verifies at the shipped obligation
+count (`../controls/proof_mutants.py` arm `X1`) and only `spec.md`'s item pin
+notices. In **B** the same deletion **FAILS AT THE READ** -- that is arm `B2`
+below, and it is the same mutation. **So the gate forces the configuration whose
+central obligation can be deleted without the gate noticing.**
 
 **p35 ships A and makes the gap the finding** -- `p42`'s standing precedent.
 ⚠ This script does NOT propose a `check.py` change: a `check.py` edit is a
@@ -294,10 +307,16 @@ def main():
                      "which Verus checks the correct-variant obligation AT THE "
                      "READ rather than assuming it; the configuration p35 SHIPS "
                      "keeps the obligation as a wrapper precondition that is "
-                     "checked at every call site, and axiomatises only that the "
-                     "wrapper's body reads the member its name says. No safe "
-                     "Rust spelling of a union read exists, in any of three "
-                     "forms, so the twin the gate asks for cannot be written.",
+                     "checked at every call site, and axiomatises BOTH "
+                     "unchecked operations in the body -- the union field read "
+                     "AND the unchecked index. No safe Rust spelling of a union "
+                     "read exists, in any of three forms, so the twin the gate "
+                     "asks for cannot be written. ⚠⚠ The same `requires` "
+                     "deletion that arm B2 makes FAIL AT THE READ in "
+                     "configuration B leaves configuration A verifying at its "
+                     "shipped obligation count (proof_mutants.py arm X1), so "
+                     "the refused configuration is stronger in resistance as "
+                     "well as in what it assumes.",
     }
     out = os.path.join(HERE, "union_oracle.json")
     json.dump(doc, open(out, "w"), indent=2)

@@ -191,8 +191,13 @@ def write(name, n_iters, stride, body, declared_len=None):
 # ---------------------------------------------------------------------------
 # The sweep. Diagnostic only: `harness/check.py` drops `sweep-*` from the
 # matrix (`inputs_of`), and a per-call cost measured at ONE window length is a
-# coincidence rather than a law. NOTES.md 8 fits the `Ir` per operation over
-# this family.
+# coincidence rather than a law.
+# ⚠ CITATION CORRECTED AT TASK_153. This comment read ~~NOTES.md 8 fits the
+# `Ir` per operation over this family~~ and NO SUCH FIT EXISTS: NOTES.md 8 is
+# the *"what this pattern does NOT publish"* list and NOTES.md 12.6 says in
+# terms that **no sweep law is published and nothing in the pattern rests on
+# these blobs.** Same rot class as the `NOTES.md 6b/6c` letters TASK_148 caught
+# one file over -- a pointer that decayed away from the thing it points at.
 SWEEP_NOPS = tuple(range(4, 65, 4))
 SWEEP_WINS = 8
 SWEEP_ITERS = 20000

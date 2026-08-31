@@ -58,13 +58,28 @@ correct variant`. It is a **language builtin, not a vstd spec**, so a
 configurations of the read, each with a must-fail arm, and shows that the one
 the gate **refuses** is the stronger one. `NOTES.md` 6 is the finding.
 
+⚠⚠⚠ **AND THE SHARP FORM OF IT.** Delete the correct-variant `requires` from
+the three trusted readers and the shipped proof **still verifies at its pinned
+obligation count** (`controls/proof_mutants.py` arm `X1`); the refused
+configuration **fails at the read** on the same deletion (`union_oracle.py` arm
+`B2`). **So the gate does not merely force the weaker of two available proofs —
+it forces the one whose central obligation can be deleted without the gate
+noticing**, and the stage that would have judged clause strength, `5c-twin`, is
+one of this row's three blocked rows. `NOTES.md` 6b.
+
 ## Can Rust reproduce the bug?
 
 `controls/rust_bug.py`, three cells:
 
 * **unsafe Rust with a real union** reproduces the SILENT harm **bit for bit**,
   and **Miri says nothing** — a wrong-variant union read is not undefined
-  behaviour in Rust when the bytes are a valid value of the field's type;
+  behaviour in Rust when the bytes are a valid value of the field's type **and
+  were all written**. ⚠⚠ **That last clause was added at `TASK_153` and it is
+  load-bearing**: `Pay` has a 4-byte `o: u32` in an 8-byte union, so the
+  *widening* confusion `adversarial-exhaust.bin` reaches reads uninitialised
+  memory and **Miri DOES report it**. That confusion exists only in the Rust
+  rungs — C's three members are all 8 bytes — so it is another consequence of
+  the offset-for-pointer substitution below. `NOTES.md` 7;
 * **safe Rust with `f64::from_bits`** reproduces it too, under
   `#![forbid(unsafe_code)]`. That is why `from_bits`/`to_bits` are forbidden in
   a *rung*;

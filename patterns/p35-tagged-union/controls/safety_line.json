@@ -4,11 +4,11 @@
   },
   "derived_from_sha256": {
     "patterns/p35-tagged-union/c/kernel.c": "f7adfd4b97c62168003ec12d0b9efd5b2f30ac54b738448a1b4a710a9a0ff53c",
-    "patterns/p35-tagged-union/c/kernel_hardened.c": "18965950cd5ff2ebb19c284981b326c5e6acdf1e1dd17bbd866edf79e1d2f531",
+    "patterns/p35-tagged-union/c/kernel_hardened.c": "aba0afcb6a9c00f2cd67f4b3ceafc58757bb11fcd6f542270cf329d58e4765b6",
     "patterns/p35-tagged-union/c/kernel.h": "7315c59d0988636ed2ef8e08c66d66380dfdd4f862b63928e9181303e8980374",
     "patterns/p35-tagged-union/controls/safety_line.py": "28dcca10fc654d852e7d90f54f421a4b1b447029d84bad23f739f887d7e66ce0"
   },
-  "measured_utc": "2026-08-31T07:37:54Z",
+  "measured_utc": "2026-08-31T09:30:36Z",
   "preprocessed_lines": {
     "kernel.c": 230,
     "kernel_hardened.c": 230

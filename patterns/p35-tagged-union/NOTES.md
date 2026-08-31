@@ -173,57 +173,167 @@ this project's standing R4/R5 result.
 gcc's 139 — and are still 3.6% dearer per call than gcc R1.** Static size is not
 dynamic cost, and this row is a clean instance of it.
 
-**(iii) ⚠⚠ R3 (safe, tuned) IS CHEAPER THAN R4 (unsafe): 3060.92 against
-3231.48, −5.3%.** ⚠ Before quoting that, the levers on each side were counted,
-because five patterns have published a headline wrong in the flattering
-direction. R3's levers are the window reslice (`&buf[off..off+len]`) and
-`w[4..].chunks_exact(2).take(nops)`; R4's is `get_unchecked` on every array
-access. **R4 cannot take R3's lever, and that is a fact about the prover rather
-than about Rust** — re-measured here rather than quoted from `p16`:
+**(iii) ⚠⚠⚠ THE R3-VS-R4 HEADLINE IS RETRACTED AND REPLACED. THE ORIGINAL IS
+STRUCK, NOT DELETED.** This subsection read:
 
-```
-$ ./verus_run.py .temp/t148/verus/probe5.rs
-error: `core::slice::impl&%0::chunks_exact` is not supported (note: you may be
-able to add a Verus specification to this function with `assume_specification`)
-```
+> ~~**R3 (safe, tuned) IS CHEAPER THAN R4 (unsafe): 3060.92 against 3231.48,
+> −5.3%.** ⚠ Before quoting that, the levers on each side were counted, because
+> five patterns have published a headline wrong in the flattering direction.
+> R3's levers are the window reslice and `chunks_exact(2).take(nops)`; R4's is
+> `get_unchecked`. **R4 cannot take R3's lever**~~
 
-`.memory/01-ladder.md`'s finding: *a rung covered by an `identity` pin is
-chained to the prover*, so the admissible-R4 class and the admissible-R3 class
-are **incomparable, not nested**. p35 is another instance and it is on the cost
-axis rather than only on the expressibility one.
+⚠⚠ **The levers were counted on ONE side.** R3's two were named; R4's side was
+never searched — one lever named, **zero counterfactuals measured** — and R4 is
+therefore the weaker-searched endpoint. This is the **sixth** instance of this
+project's flattering-direction trap (`TASK_152` M1) and the first caught by a
+review pointed at it on purpose.
+
+**The four-arm rig, re-run at `TASK_153` with the two shipped rungs as controls
+that must reproduce the committed record** (`.temp/t153/rig/measure_rig.py`,
+`rig_t153.log`; `harness/build.py::rust_flags` and `check.py`'s own
+`(Ir₂₀₀−Ir₁₀₀)/100` probe method):
+
+| arm | `O3` large | `O3` small | `O0` large | `O0` small |
+|---|---|---|---|---|
+| `safe_tuned` R3 — **CONTROL, = record** | 3060.92 | 684.55 | 17783.37 | 4223.32 |
+| `unsafe` R4 — **CONTROL, = record** | 3231.48 | 712.02 | 14591.09 | 3332.22 |
+| R4 + R3's **lever 1** (reslice) | 3239.48 | 720.02 | 14369.09 | 3302.22 |
+| R4 + **levers 1 and 2** (`chunks_exact`) | **2857.87** | **653.71** | 20626.55 | 4691.10 |
+
+**All four arms print the same checksum on `small.bin` and `large.bin`**
+(`751388249273516652` / `3733036646187536480`), and all eight control cells
+reproduce `results/gate/p35-tagged-union.json` exactly.
+
+**Three things follow, and none of them is "safe Rust beat unsafe Rust".**
+
+1. ⚠⚠ **Matched on the op-walk, R4 WINS by 203.05 `Ir`/call (6.63 %) on `large`
+   and 30.84 (4.51 %) on `small`.** The sign reverses on both inputs.
+2. ✅ **So the honest figure is what the `identity` pin COSTS R4: 373.61
+   `Ir`/call, 11.56 %** (`3231.48 → 2857.87`). The published `170.56` is 46 % of
+   it, and it is a number about the pin, not about `unsafe`.
+3. ⚠ **The sign is not even stable across optimisation level.** At `-O0` the
+   *shipped* pair already runs the other way — R4 `14591.09` against R3
+   `17783.37` on `large`, **17.95 % in R4's favour**, with no matching at all —
+   because `chunks_exact(2).take(nops)` is an iterator that only pays for itself
+   once the optimiser sees through it: the same **pair of levers**, applied to
+   the same rung, is **−373.61 `Ir`/call at `-O3` and +6035.46 at `-O0`**
+   (`unsafe_ctl` → `unsafe_chunks`, `large.bin`).
+
+**Why that spelling cannot ship, and which half of the old claim was right.**
+
+* `chunks_exact` — **confirmed, re-measured a third time** at `TASK_153`
+  (`.temp/t153/verus/p_chunks.rs`). Four errors, not one:
+
+  ```
+  error: `core::iter::adapters::take::Take` is not supported
+  error: `core::slice::iter::ChunksExact` is not supported
+  error: `core::slice::iter::impl&%90%default%take` is not supported
+  error: `core::slice::impl&%0::chunks_exact` is not supported
+  ```
+
+  ⚠ **`take` is unsupported as well as `chunks_exact`**, so lever 2 is doubly
+  out of reach, and `identity: unsafe ≡ verus` chains R4 to R5.
+* the **reslice**, however, **was available all along** and the old text implied
+  otherwise by saying *"R4 cannot take R3's lever"* in the singular:
+  `&buf[off..end]` with `assert(w@ =~= buf@.subrange(..))` gives **`2 verified,
+  0 errors`** at the pin (`.temp/t153/verus/p_reslice2.rs`). Given to R4 it
+  **costs `+8.00` `Ir`/call at `-O3`**, which is exactly why it is not the
+  source of R3's win — and why not shipping it is a measured choice rather than
+  an oversight.
+
+`.memory/01-ladder.md`'s finding — *a rung covered by an `identity` pin is
+chained to the prover* — is the right entry, on the **cost** axis, **and its
+figure is 373.61, not 170.56.** The admissible-R4 class and the admissible-R3
+class are **incomparable, not nested**; what the shipped pair measures is the
+width of that gap, not a safety premium.
 
 ---
 
 ## 4. ⚠⚠ THE SAFETY LINE IS FREE, AND ON THIS PATTERN IT IS BETTER THAN FREE
 
-**R1h is CHEAPER than R1, on both compilers, and by a margin far outside the
-noise band.**
+**R1h is CHEAPER than R1 on ALL SIXTEEN cells** — 2 compilers × 2 optimisation
+levels × 2 inline modes × 2 inputs, read out of
+`results/gate/p35-tagged-union.json` (`.temp/t153/bands_and_deltas.txt`).
 
-| | R1 | R1h | Δ |
+| | R1 | R1h | Δ | band |
+|---|---|---|---|---|
+| gcc `O3` `large.bin` | 3117.95 | 3032.04 | **−85.91 (−2.8%)** | `≥16.00` — *every one is real* |
+| gcc `O3` `small.bin` | 715.40 | 701.69 | −13.71 (−1.9%) | ⚠ `2.00…16.00` — ***a coin flip, do not quote alone*** |
+| clang `O3` `large.bin` | 3583.93 | 3368.07 | **−215.86 (−6.0%)** | `≥16.00` |
+| clang `O3` `small.bin` | 773.58 | 733.18 | **−40.40 (−5.2%)** | `≥16.00` |
+| gcc **and** clang `O0` `large.bin` | 6953.44 / 7757.30 | 6788.94 / 7592.80 | **−164.50** *(identical)* | `≥16.00` |
+| gcc **and** clang `O0` `small.bin` | 1596.85 / 1738.43 | 1578.50 / 1720.08 | **−18.35** *(identical)* | `≥16.00` |
+
+⚠⚠ **THE SENTENCE THAT USED TO SIT UNDER THAT TABLE IS RETRACTED AND STRUCK**
+(`TASK_152` M2, landed `TASK_153`). It read ~~`results/synthesis.md`'s own
+calibration calls anything under `16.00 Ir/call` a coin flip; every figure above
+is 13.7 to 215.9, so all four are real~~. **`|−13.71| = 13.71` is INSIDE the
+`2.00 … 16.00` band**, the one `results/synthesis.md` labels *"a coin flip — do
+not quote alone"*. Three of the four `-O3` figures clear the band; the sentence
+said four. **So the band is stated per figure above, not asserted as a blanket.**
+
+✅ **The conclusion survives on evidence the build report never used — the `O0`
+cells.** `−18.35` and `−164.50`, **numerically identical on gcc and clang and in
+both inline modes**, eight cells, every one in the `≥ 16.00` band. ⚠ And the
+band is itself calibrated on the *derived environment-block correction* column,
+so it is a borrowed yardstick even where it is satisfied; **the part that does
+not depend on it is the direction, 16 of 16.**
+
+### ⚠⚠ The mechanism is CLOSED at `-O0`, and the hedge is retired
+
+`c/kernel.c` writes the tag on the failure path as well as the success path, so
+it performs a store the hardened rung does not. The denominator has to be the
+**marginal** window, because `marginal_ir_per_call` is `(Ir@200 − Ir@100)/100`
+— the mean over calls **100…199**, not over all 200:
+
+```
+$ python3 .temp/t153/failed_stores_t153.py          # reproduces BOTH published checksums
+small.bin  failed stores: all200=734  (3.6700/call)   calls100-199=367  (3.6700/call)
+large.bin  failed stores: all200=6551 (32.7550/call)  calls100-199=3290 (32.9000/call)
+```
+
+⚠⚠ **`32.76` was the wrong denominator and the whole of the old hedge rests on
+it.** With `32.90`:
+
+| cell | input | Δ | `Ir` per failed tag store |
 |---|---|---|---|
-| gcc, `large.bin` | 3117.95 | 3032.04 | **−85.91 Ir/call (−2.8%)** |
-| gcc, `small.bin` | 715.40 | 701.69 | **−13.71 Ir/call (−1.9%)** |
-| clang, `large.bin` | 3583.93 | 3368.07 | **−215.86 Ir/call (−6.0%)** |
-| clang, `small.bin` | 773.58 | 733.18 | **−40.40 Ir/call (−5.2%)** |
+| `c-gcc` / `c-clang` **`O0`**, both modes | `small` | −18.35 | **5.0000** |
+| `c-gcc` / `c-clang` **`O0`**, both modes | `large` | −164.50 | **5.0000** |
+| `c-gcc` `O3` isolated | `small` | −13.71 | 3.7357 |
+| `c-gcc` `O3` isolated | `large` | −85.91 | 2.6112 |
+| `c-clang` `O3` isolated | `small` | −40.40 | 11.0082 |
+| `c-clang` `O3` isolated | `large` | −215.86 | 6.5611 |
 
-`results/synthesis.md`'s own calibration calls anything under `16.00 Ir/call` a
-coin flip; every figure above is 13.7 to 215.9, so all four are real.
+**Exactly `5.0000` on all eight `-O0` cells, on both compilers, in both inline
+modes.** And a check that does not depend on the constant at all: if one store
+is the whole mechanism, the ratio of the two `O0` deltas must equal the ratio of
+the two store counts — `164.50/18.35 = 8.964578` and `32.9000/3.6700 =
+8.964578`, to six decimals.
 
-**The candidate mechanism, and it is NOT settled.** `c/kernel.c` writes the tag
-on the failure path as well as the success path, so it performs a store the
-hardened rung does not. `.temp/t148/failed_stores.py` counts them from the input
-alone:
+✅ **And it closes at the INSTRUCTION level too, which is what makes it a
+mechanism rather than a fit.** `harness/asm.py diff` on the two `-O0` kernels
+moves a **five-instruction block and nothing else**, on both compilers, with the
+static count identical either side (gcc 293/293, clang 259/259):
 
 ```
-small.bin    calls=  200 ops/call=   24.00 FAILED stores/call=    3.67
-large.bin    calls=  200 ops/call=  120.00 FAILED stores/call=   32.76
+gcc    mov -(%rbp),%rax · shl $,%rax · add %rbp,%rax · sub $,%rax · movb $,(%rax)
+clang  mov -(%rbp),%rcx · lea -(%rbp),%rax · shl $,%rcx · add %rcx,%rax · movb $,(%rax)
 ```
 
-Dividing gives **2.62 Ir per failed store on gcc/large and 3.74 on gcc/small;
-6.59 and 11.01 on clang.** ⚠ **The constant is not stable across window length,
-so "one extra store" does not account for the whole of it** and the mechanism is
-recorded as OPEN. What is not open is the direction and the size: the safety
-line costs nothing, and the unhardened spelling is the slower one.
+(`.temp/t153/asm_O0_gcc.diff`, `.temp/t153/asm_O0_clang.diff`.) **A `-O0` tag
+store is five instructions; the hardened rung does not execute it on the failure
+path; `5.0000 × failed stores` is the entire delta.**
+
+⚠ **What remains OPEN is `-O3` only**, where the optimiser restructures around
+the removed store and the implied constant spans `2.61`–`11.01`. The previous
+text recorded the *whole* mechanism as open on the strength of that spread; the
+spread is real and it is an `-O3` phenomenon.
+
+⚠ **And the honest framing of the direction follows from the mechanism**: R1h is
+not "hardening for free". **R1h executes strictly less work than R1** — the
+buggy rung performs a tag store, 32.9 times per call on `large.bin`, whose
+result nothing ever reads. *The bug wastes a store*; safety is not
+negative-cost.
 
 ⚠ **What this does NOT mean.** It is not evidence that safety is free in
 general; it is evidence that *this* safety line is a reordering rather than a
@@ -307,7 +417,46 @@ UB*. `controls/rust_bug.py` now asserts `ran` explicitly.
 pattern's spelling; it is the row's R5 result, and section 6d is the experiment
 behind it.**
 
-### 6b. What the proof forces — `controls/proof_mutants.py`, 8 arms, 8 as designed
+⚠⚠ **HOW WIDE EACH READER'S AXIOM ACTUALLY IS — CORRECTED AT `TASK_153`
+(`TASK_152` M5).** `spec.md`, `verus.rs` and `controls/union_oracle.py` all used
+to end this argument with *"what is axiomatised is only that the body reads the
+member its name says"*. **That names one of two unchecked operations.**
+`unsafe { v.get_unchecked(i).i }` is an unchecked **index** *and* a union
+**field read**, so each of the three readers axiomatises both — and
+`pay_d_gt1` axiomatises **three** things, the third being the exec-versus-spec
+comparison (6c). The `SLB-TRUSTED-ARGUMENT` sections below always said "two";
+the summary sentence above them did not, which is `PROTOCOL` rule 13's shape —
+*the body gets maintained and the header rots.*
+
+**CONFIGURATION C — measured, available, and DELIBERATELY NOT SHIPPED.** The
+narrower spelling exists (`.temp/t152/verus/c4_split.rs`): split the index out
+into
+
+```
+fn pay_ref<const N>(v: &[Pay; N], i) -> (r: &Pay)   external_body, requires i < v@.len()
+    #[cfg(slb_twin)] slb_twin_pay_ref { &v[i] }     <- SAFE RUST, and it verifies
+fn pay_i(p: &Pay) -> (r: u64)                       external_body, requires *p is i
+```
+
+`2 verified, 0 errors` shipped, `3 verified, 0 errors` with the twin, and the
+**real** `check._scan_unsafe_sites` returns `{'failures': 0}` on it while the
+same predicate returns `1` on configuration B. It moves the unchecked index out
+of an untested axiom and into a twin-checked one — **the split this pattern's
+own WRITE side already makes** (`pay_set_unchecked`).
+
+⚠ **Why it is not shipped, said plainly so the choice is reviewable rather than
+implicit.** It does **not** reduce `blocked` — the three readers still have no
+twin, because the field read still has no safe spelling — and it takes the TCB
+from **nine items to ten**. A tenth trusted item for a narrower axiom on three
+of them is a real trade and it is not obviously the right way round; what is
+*not* defensible is a justification that describes one of two operations, and
+that is fixed above. **The shipped obligation therefore rests on: (a) the member
+read matching the item's name, and (b) `i < v@.len()` licensing
+`get_unchecked` — neither of which any gate stage tests for strength on these
+three items, because `5c-twin` is the stage that would and it is BLOCKED.** The
+backstops are stage 3c identity (R4 ≡ R5 byte for byte) and stage 8 Miri.
+
+### 6b. What the proof forces — `controls/proof_mutants.py`, 9 arms, 9 as designed
 
 | arm | what it does | result |
 |---|---|---|
@@ -316,19 +465,64 @@ behind it.**
 | `M2-bug-order-exec` | R1's bug in R5's exec code | **FAILS**, `assertion failed` at `st_out =~= step(st_in, c, a).0` |
 | `M3-bug-order-both` | M2 **plus the same reorder in the abstract machine** | **FAILS**, `invariant not satisfied at end of loop body`, naming **`wf_cells`** |
 | `M6-weaken-invariant` | M3 **plus `wf_cell` weakened to `true`** | **FAILS**, `precondition not satisfied` |
+| **`X1-delete-variant-requires`** | **delete `v@[i as int] is {i,o,d}` from all THREE trusted readers' own `requires`** | ⚠⚠ **VERIFIES**, `16 verified, 0 errors` — **the shipped obligation count, unmoved** |
 | `M4-constant-body` | the kernel returns `0` | **FAILS**, `postcondition not satisfied` |
 | `M5-assume-false` | `assume(false);` in the kernel | ⚠ **VERIFIES**, `16 verified, 0 errors` |
-| `M5b-gate-sees-it` | `check._assume_keyword_hits` on the same text | `{'assume(': [513]}`; shipped file `{}`; `spec.md` declares `0` |
+| `M5b-gate-sees-it` | `check._assume_keyword_hits` on the same text | `{'assume(': [551]}`; shipped file `{}`; `spec.md` declares `0` |
 
-⚠⚠ **M3 IS THE ROW'S SHARPEST R5 RESULT AND IT IS THE OPPOSITE OF `p32`'s.**
-`p32`'s spec-weaken arm — delete the safety conjunct from the exec code *and*
-from the abstract machine — **VERIFIES `15/0`**, because nothing forces the
-conjunct and the proof is purely functional. **p35's does not**, and `M6` says
-why: with the invariant itself weakened to `true`, the proof still fails, now at
-the union read's own `requires`. **The correct-variant obligation is imposed by
-the type system at the operation and cannot be specified away.** That is the
-first row in this tree where the safety line is forced by something other than
-the postcondition.
+⚠⚠ **M3 IS THE OPPOSITE OF `p32`'s ANSWER, AND THAT PART STANDS.** `p32`'s
+spec-weaken arm — delete the safety conjunct from the exec code *and* from the
+abstract machine — **VERIFIES `15/0`**, because nothing forces the conjunct and
+the proof is purely functional. **p35's does not**, and `M6` says why: with the
+invariant itself weakened to `true`, the proof still fails, now at the union
+read's own `requires`. This is the first row in this tree where the safety line
+is forced by something other than the postcondition.
+
+⚠⚠⚠ **BUT THE CONCLUSION THIS SECTION DREW FROM M3 AND M6 IS RETRACTED, AND THE
+ORIGINAL IS STRUCK RATHER THAN QUIETLY REPLACED** (`TASK_152` M3, landed
+`TASK_153`). It read: ~~**The correct-variant obligation is imposed by the type
+system at the operation and cannot be specified away.**~~ **That is false of the
+SHIPPED configuration.** `M3` and `M6` weaken the **abstract machine** (`step`,
+`wf_cell`); they never touch the trusted readers' own `requires`, **and that is
+where the obligation lives in configuration A.** Arm `X1` deletes it there and
+`verus.rs` reports `16 verified, 0 errors` with the pinned count unmoved
+(re-derived at `TASK_153`, `.temp/t153/x1_probe.log`).
+
+**What catches `X1`, executed rather than read** — the real `check.py` pin
+comparison (`vparse.parse` + `check._clauses` against `spec.md`'s `verus.items`)
+driven over the mutant text, `.temp/t153/x1_pin_probe.log`:
+
+```
+SHIPPED   verus.rs: 0 item(s) drift from the spec.md pin
+X1 MUTANT verus.rs: 3 item(s) drift from the spec.md pin
+   proof-pin  pay_d_gt1  requires: ['i < v@.len()'] != pinned ['i < v@.len()', 'v@[i as int] is d']
+   proof-pin  pay_i      requires: ['i < v@.len()'] != pinned ['i < v@.len()', 'v@[i as int] is i']
+   proof-pin  pay_o      requires: ['i < v@.len()'] != pinned ['i < v@.len()', 'v@[i as int] is o']
+```
+
+**`proof-pin` — a declaration the author writes — and nothing else.** `TASK_152`
+planted `X1` into the tree and ran the whole gate: `FAIL`, failures 6, and every
+soundness stage still green — verus `16 verified, 0 errors` at pinned 16,
+identity `O3 exact`, `requires_strength` reporting every clause *"not a
+tautology"*, Miri 8 runs 0 UB. **The stage that judges clause STRENGTH rather
+than triviality is `5c-twin`, and it is BLOCKED for exactly these three items.**
+
+✅✅ **SO THE HEADLINE SHARPENS RATHER THAN WEAKENS.** In configuration **B** —
+the one `_scan_unsafe_sites` refuses — the same deletion **FAILS AT THE READ**
+(`requirement not met: to access this field, the union must be in the correct
+variant`; `controls/union_oracle.py` arm `B2`, which *is* that mutation).
+**The two configurations differ not only in axiom-versus-check but in
+RESISTANCE TO A `requires` DELETION**, so:
+
+> **The gate does not merely force the weaker of two available proofs. It forces
+> the one whose central obligation can be DELETED WITHOUT THE GATE NOTICING.**
+
+⚠ **The correct wording, in full:** the correct-variant obligation **cannot be
+weakened by editing the abstract machine** — `M3`/`M6` measure that and it is
+`p32`'s opposite — and it **can be deleted outright from the trusted readers'
+`requires`**, with the proof staying green at the pinned obligation count.
+*"Imposed by the type system at the operation"* is true of **configuration B
+only**; in A, Verus never sees the read.
 
 ⚠ **Two predictions in that battery were wrong about the diagnostic and right
 about the outcome, and they are corrected rather than quietly refitted.** M2 and
@@ -413,11 +607,16 @@ read it. `E-*` is plain `rustc` on three spellings of the twin, so the
 impossibility is a fact about the **language** and not about one way of writing
 it.
 
-> ⚠⚠⚠ **THE CONFIGURATION THE GATE REFUSES IS THE STRONGER ONE.** In B the
-> prover checks the variant at the read and there is no axiom at all. In A —
-> what ships — the obligation survives as the wrapper's `requires`, which Verus
-> checks **at every call site**, and what is axiomatised is that the body reads
-> the member its name says.
+> ⚠⚠⚠ **THE CONFIGURATION THE GATE REFUSES IS THE STRONGER ONE, IN TWO
+> INDEPENDENT SENSES.** In B the prover checks the variant at the read and there
+> is no axiom at all. In A — what ships — the obligation survives as the
+> wrapper's `requires`, which Verus checks **at every call site**, and what is
+> axiomatised is **both** unchecked operations in the body: the field read *and*
+> the index (6a). ⚠⚠ **And the second sense, which is the sharper one:** delete
+> the `requires` conjunct itself and **B FAILS AT THE READ (arm `B2` above)
+> while A still verifies at its pinned obligation count** (`proof_mutants.py`
+> arm `X1`, 6b). **The refused configuration resists a mutation the shipped one
+> does not.**
 
 **p35 ships A and makes the gap the finding.** `p42` is the standing precedent
 and its sentence transfers with one word changed: *the pin protected the
@@ -443,20 +642,57 @@ reports `precondition not satisfied`. The tag/variant agreement IS proved.
 | arm | the DBL (silent) harm | the PTR (loud) harm |
 |---|---|---|
 | `c/kernel.c` | silent wrong value | SIGSEGV, ASan reports |
-| `controls/arm_unsafe_bug.rs` — a real `union` | **reproduces it bit for bit**; Miri **silent** | out-of-bounds `get_unchecked`; **Miri reports it**; native SIGSEGV |
+| `controls/arm_unsafe_bug.rs` — a real `union` | **reproduces it bit for bit**; Miri **silent** on the *narrowing* confusion (`-dbl-confusion`) and ⚠ **REPORTS** the *widening* one (`-exhaust`) | out-of-bounds `get_unchecked`; **Miri reports it**; native SIGSEGV |
 | `controls/arm_safe_bug.rs` — `#![forbid(unsafe_code)]`, `f64::from_bits` | **reproduces it bit for bit** | **panics**, index out of bounds |
 | **the shipped R2/R3** — a `Cell` **enum** | **unrepresentable** | **unrepresentable** |
 
 Three findings, in order of how much they move:
 
 1. ⚠⚠ **A wrong-variant union read is NOT undefined behaviour in Rust** when the
-   bytes are a valid value of the field's type — and every bit pattern is valid
-   for `u32`, `u64` and `f64`. So `unsafe` Rust reproduces C's silent harm
-   exactly and **Miri has nothing to say about it.** This is the type-axis
-   mirror of `p38`'s result rather than a repeat of it: `p38` found that Rust
-   has no type-based *aliasing* rule for `unsafe` to unlock; `p35` finds that
-   Rust *does* have a correct-*variant* rule, that `unsafe` is required to break
-   it, that **Verus checks it natively** — and that **Miri does not**.
+   bytes are a valid value of the field's type **and were all written**. So
+   `unsafe` Rust reproduces C's silent harm exactly and **Miri has nothing to
+   say about it.** This is the type-axis mirror of `p38`'s result rather than a
+   repeat of it: `p38` found that Rust has no type-based *aliasing* rule for
+   `unsafe` to unlock; `p35` finds that Rust *does* have a correct-*variant*
+   rule, that `unsafe` is required to break it, that **Verus checks it
+   natively** — and that **Miri does not**.
+
+   ⚠⚠⚠ **THE QUALIFIER IN BOLD WAS ADDED AT `TASK_153` AND IT IS NOT COSMETIC —
+   THE ORIGINAL IS STRUCK** (`TASK_152` minor 1, then measured further here).
+   The sentence read ~~when the bytes are a valid value of the field's type —
+   and every bit pattern is valid for `u32`, `u64` and `f64`~~, i.e. **validity
+   was published as the whole condition. It is not: INITIALISEDNESS is the other
+   half**, and `Pay` has a 4-byte `o: u32` inside an 8-byte union.
+   ⚠ **And the counter-example is REACHABLE on a shipped input, not merely
+   constructible.** `.temp/t153/confusion_pairs.py` enumerates every
+   `(tag dispatched on, member last stored)` pair the committed inputs reach:
+
+   ```
+   tag PTR(o:u32,4B)  over live INT(u64,8B)   n=  80   narrowing 8B -> 4B   all initialised
+   tag DBL(f64,8B)    over live INT(u64,8B)   n= 200   same width           all initialised
+   tag DBL(f64,8B)    over live PTR(o:u32,4B) n= 160   WIDENING 4B -> 8B    UNINITIALISED
+   ```
+
+   The third row is `adversarial-exhaust.bin`, and Miri **reports** it —
+   *"reading memory at `alloc…[0x0..0x8]`, but memory is uninitialized at
+   `[0x4..0x8]`"* at `pays[idx].d` (`.temp/t153/miri/exhaust_probe.log`;
+   `controls/rust_bug.py` now runs that input as the must-fire arm for this
+   half). ⚠ **The NATIVE run still reproduces C bit for bit on the same input**
+   (`1705852038987163136`), because the bytes left in the slot are the previous
+   `Pay { i: .. }`'s — which is precisely what C's stale union holds.
+
+   ✅ **This does not move a published number and it sharpens two.** The gate's
+   Miri stage runs the **correct** rung, which never confuses a cell, so its
+   `0 UB` on 8 inputs is unaffected; the DBL-confusion row's `UB=False` stands
+   because that confusion is *narrowing*. What changes is the scope: **Miri is
+   silent on this bug class only where the read is no wider than the write.**
+   ⚠⚠ **And the widening case exists ONLY in the Rust rungs** — `uint8_t *` is
+   8 bytes on this target, so all three C members are 8 bytes and every C-side
+   confusion is same-width — **so it is a consequence of the disclosed
+   offset-for-pointer substitution (section 5), which therefore changes which
+   instrument fires on the SILENT harm as well as on the loud one.** Section 5
+   said the substitution changes the loud harm's class; it changes one limb of
+   the silent harm's detector coverage too.
 2. ⚠ **SAFE Rust reproduces the silent harm too**, under
    `#![forbid(unsafe_code)]`, through `f64::from_bits` — safe Rust's **total**
    reinterpretation, defined for every bit pattern. That is why `from_bits` and
@@ -479,7 +715,12 @@ where it was.**
 * **No wall-clock headline.** The measurement record carries the timing block;
   nothing in this file rests on it.
 * **No claim that the safety line is free in general.** Section 4's result is
-  about a reordering, and it is stated with its mechanism marked OPEN.
+  about a reordering, its mechanism is **closed at `-O0` and open at `-O3`**,
+  and the mechanism is *the bug wastes a store* rather than *safety is
+  negative-cost*.
+* **⚠ No safe-versus-unsafe cost claim from the R3/R4 pair.** Section 3 (iii)
+  retracts the one this file used to make: matched on the op-walk the sign
+  reverses, so what that pair measures is the price of the `identity` pin.
 * **No `min_ir_per_work` of its own** — the harness default of `0.25 Ir/byte`
   applies, and stage 3b's tightest margin is **49.7×** over it.
 * **No `run` budget**: nothing here is declared non-terminating.
@@ -782,7 +1023,7 @@ refuted by this pattern's own controls:
 
 | clause, as first written | what refutes it |
 |---|---|
-| *"the R1-vs-R1h cost … is a SCHEDULING difference and nothing more, which is why NOTES.md 4 reports it … rather than as a headline"* | section 4: R1h is **cheaper**, by −13.71 to −215.86 Ir/call over four measurements, and the candidate mechanism is an extra **store** (32.76 per call on `large.bin`), not scheduling. §4 *is* a headline. |
+| *"the R1-vs-R1h cost … is a SCHEDULING difference and nothing more, which is why NOTES.md 4 reports it … rather than as a headline"* | section 4: R1h is **cheaper**, by −13.71 to −215.86 Ir/call over four measurements, and the candidate mechanism is an extra **store** (~~32.76~~ **32.90** per call on `large.bin` — the marginal-window figure; see the `TASK_153` subsection below), not scheduling. §4 *is* a headline. |
 | *"IT REMOVES THE LOUD HARM FROM THE RUST SIDE ENTIRELY"* | `controls/rust_bug.py`: the unsafe arm **SIGSEGVs**, `rc=-11`, exactly as C does. What the substitution changes is the harm's **class** — a wrong index rather than a wild pointer — and therefore **which instrument reports it**. |
 
 **Both are corrected in the fence with the original left visible** (`p42`'s house
@@ -808,6 +1049,53 @@ Two further corrections were made in the same re-read and are visible rather
 than silent: the `M2`/`M3` diagnostics in 6b, and the `(double)a + 0.5` →
 two-literals deviation in 6c.
 
+### ⚠⚠ THE HASH MOVED A SECOND TIME, AT `TASK_153`, AND THIS ONE IS CHECKABLE
+
+`TASK_152`'s review found three statements inside the hashed fence that
+measurement had refuted, and `TASK_153` struck all three with the originals left
+visible.
+
+```
+contract_sha256 as FIRST WRITTEN    141fb37c7358beccd8bdfac962aeb3d5b78fc4ea074218cc325c4e5ffbaefa01
+contract_sha256 as shipped TASK_148 e8e7199af62d589d4e709cba9ffcd99f4aefd23c98bb56efd0e1902f337b73ba
+contract_sha256 as shipped TASK_153 7f85ac5ea2bca031f60e8d7600d7326b0134cd5cfb450da9a2dee99bd9d90d56
+```
+
+✅ **The pattern is now committed, so `harness/tools/contract_diff.py p35` CAN
+show this move key by key, from `git` alone** — the thing it could not do at
+`TASK_148`. Run it; `.temp/t153/contract_diff_after.log` is the transcript, and
+its own verdict is:
+
+```
+10 path(s) moved: idiom, idiom.why, miri, miri.reason, verus,
+                  verus.twin_justifications{,.verus.rs}{,.pay_i,.pay_o,.pay_d_gt1}
+```
+
+⚠⚠ **NOTHING THE GATE PINS MOVED, AND THIS TIME THAT IS A TOOL'S OUTPUT AND NOT
+AN ASSERTION.** `contract_diff.py` prints `IDENTICAL` for `idiom.required`,
+`idiom.forbidden`, `identity`, `verus.obligations`, `verus.twin_obligations`,
+`verus.items`, `verus.unsafe_justifications`, `requires`, `ensures`, `driver`,
+`collapse`, `note`, `kernel` and `model`. The whole of the diff is prose in
+three keys:
+
+| key | what was struck | why |
+|---|---|---|
+| `idiom.why` | *"four figures, every one of them outside the coin-flip band"* | `\|−13.71\| = 13.71` is INSIDE the `2.00 … 16.00` band (`TASK_152` M2). Replaced with a per-figure band statement and the `O0` evidence |
+| `idiom.why` | *"what NOTES.md 4 marks OPEN is the MECHANISM … not stable"* | wrong denominator (`32.76` for `32.90`); with the marginal window the mechanism CLOSES at `-O0` at exactly `5.0000` `Ir` per failed tag store |
+| `miri.reason` | *"NOT undefined behaviour … every bit pattern is valid for u32, u64 and f64"* | validity is half the condition; **initialisedness** is the other half and the counter-example is REACHABLE on `adversarial-exhaust.bin` (section 7) |
+| `verus.twin_justifications` ×3 | *"only that this body reads the member its name says"* | the body has **two** unchecked operations and the axiom covers both (`TASK_152` M5); `pay_d_gt1`'s covers three |
+
+⚠ **The direction test (`.memory/01-ladder.md`) is satisfied in the strict
+direction on all three**: every edit makes the declaration **weaker, narrower or
+more specific** because a measurement said so. None of them relaxes anything the
+gate checks — the obligation count, the clause text, the identity pin and both
+idiom lists are byte-identical across the move.
+
+⚠ **One more thing moved for a mechanical reason and is disclosed here rather
+than left to be noticed**: `M5b`'s reported `assume(` line number went
+`513 → 551`, because the `TASK_153` corrections added lines to `verus.rs`'s
+module note. The table in 6b carries the new number.
+
 ---
 
 ## 12. What was NOT done, and what is open
@@ -819,10 +1107,28 @@ two-literals deviation in 6c.
 2. **No `check.py` change is proposed or made.** The `_scan_unsafe_sites`
    interaction is reported in `.tasks/TASK_148_REPORT.md`; a `check.py` edit is a
    29-pattern re-gate.
-3. **The mechanism of section 4's R1h-is-cheaper result is OPEN.** The direction
-   and the size are measured; "one extra tag store on the failure path" does not
-   account for the whole of it, because the implied per-store cost is not stable
-   across the two window lengths.
+3. ~~**The mechanism of section 4's R1h-is-cheaper result is OPEN.** The
+   direction and the size are measured; "one extra tag store on the failure
+   path" does not account for the whole of it, because the implied per-store
+   cost is not stable across the two window lengths.~~
+   ✅ **CLOSED AT `-O0` AT `TASK_153`, AND THE HEDGE ABOVE RESTED ON A WRONG
+   DENOMINATOR.** With the marginal-window count (`32.90`, not `32.76`) the
+   constant is **exactly `5.0000` `Ir` per failed tag store on all eight `-O0`
+   cells, both compilers, both inline modes**, and `harness/asm.py diff` shows a
+   **five-instruction** tag-store block moving and nothing else. ⚠ **`-O3` is
+   still open** — the constant spans `2.61`–`11.01` there because the optimiser
+   restructures around the removed store. Section 4.
+3b. ⚠ **What `X1` leaves open (6b).** I re-derived that `X1` verifies at the
+   pinned obligation count and that the **only** stage which drifts is
+   `proof-pin`, by executing the real predicate on the mutant text. I did **not**
+   re-plant `X1` into the tree and re-run the whole gate — `TASK_152` did that,
+   with a byte-verified restore — and I did not build the `TASK_003_REVIEW`
+   shape where the mutation **and** the pin move in one commit, which is what
+   the blocked twin exists to catch.
+3c. ⚠ **Configuration C is measured as a proof, not as a rung** (6a). Nobody has
+   rebuilt R5 on it, so whether it moves `Ir` or survives the `identity` pin
+   with a mirrored `unsafe.rs` is unmeasured. It is recorded as available and
+   not shipped, with the reason.
 4. **`f64` in the proof is an axiom, not a theorem** (6c), and it is the one
    place where a reader should not read `16 verified, 0 errors` as covering the
    whole kernel.

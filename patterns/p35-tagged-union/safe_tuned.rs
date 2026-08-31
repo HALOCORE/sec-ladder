@@ -19,6 +19,17 @@
 //! `get_unchecked` and R5 proves the precondition that licenses that.
 //! ../NOTES.md 3 has the per-rung numbers.
 //!
+//! ⚠⚠ **WHICH OF THE TWO LEVERS IS ACTUALLY R4-EXCLUSIVE -- MEASURED ON BOTH
+//! SIDES AT TASK_153, BECAUSE THE FIRST TIME ONLY THIS SIDE WAS SEARCHED.**
+//! Lever 1, the reslice, is **not** exclusive: `&buf[off..end]` VERIFIES at the
+//! pinned vstd (`2 verified, 0 errors`), so R4/R5 could always have taken it --
+//! and given to R4 it COSTS `+8.00` Ir/call at `-O3`, which is why it is not
+//! the source of this rung's win. Lever 2 is the exclusive one: `chunks_exact`,
+//! `ChunksExact` and `Take` are each `is not supported`, and `identity: unsafe
+//! == verus` chains R4 to R5. **So the R3-minus-R4 gap prices the `identity`
+//! pin and is NOT a safe-versus-unsafe result** -- matched on the op-walk, R4
+//! wins by 6.63%. ../NOTES.md 3.
+//!
 //! ⚠ The equivalence of `chunks_exact(2).take(nops)` to C's
 //! `for (i = 0; i < nops; i++) { if (len - p < 2) break; ... }` is exact and
 //! not approximate: both stop at `min(nops, (len - 4) / 2)` operations, and the

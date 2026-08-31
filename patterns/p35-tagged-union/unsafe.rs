@@ -28,6 +28,20 @@
 //! pointer points at, and every checksum agrees. ../NOTES.md 5 measures what
 //! the substitution does and does not change.
 //!
+//! ⚠⚠⚠ **THIS RUNG IS THE ENDPOINT NOBODY SEARCHED, AND THE SENTENCE THAT
+//! RESTED ON THAT IS RETRACTED (TASK_152 M1, landed TASK_153).** ../NOTES.md 3
+//! published ~~R3 (safe, tuned) IS CHEAPER THAN R4 (unsafe): -5.3%~~ as a
+//! safe-vs-unsafe result. R3's side had TWO levers counted; **this side had
+//! ONE named and ZERO counterfactuals measured.** Give R4 R3's own op-walk and
+//! **R4 wins by 203.05 Ir/call (6.63%) at identical checksums**, so the figure
+//! is not about `unsafe` at all -- it is **THE PRICE OF THE `identity` PIN,
+//! 373.61 Ir/call (11.56%)**, and that spelling cannot ship because
+//! `chunks_exact`, `Take` and `ChunksExact` are all `is not supported` at the
+//! pinned vstd while `identity: unsafe == verus` chains this file to R5.
+//! ⚠ At `-O0` the SHIPPED pair already runs the other way (R4 14591.09 against
+//! R3 17783.37 on `large.bin`), so the sign is not even stable across
+//! optimisation level. ../NOTES.md 3 has the four-arm rig and its two controls.
+//!
 //! SAFETY (1): `off + len <= buf.len()` is the caller's structural
 //!   precondition. Unchecked here; discharged at the call site in verus.rs.
 //! SAFETY (2): `len >= 4` guards the window header.

@@ -10,10 +10,21 @@
  * at both sites.
  *
  * ⚠ **This is the third SHAPE of safety line in the tree** -- p27's is a
- * CONJUNCT, p13's is a STORE, p35's is a SEQUENCING CONSTRAINT. It is also the
- * cheapest: there is no extra test, no extra load and no extra branch, so the
- * R1-vs-R1h cost of this pattern's safety is a scheduling difference and
- * nothing more. ../NOTES.md 4 measures it.
+ * CONJUNCT, p13's is a STORE, p35's is a SEQUENCING CONSTRAINT. There is no
+ * extra test, no extra load and no extra branch.
+ *
+ * ⚠⚠ **THE SENTENCE THAT USED TO FOLLOW IS RETRACTED, AND THE ORIGINAL IS
+ * STRUCK RATHER THAN QUIETLY DELETED** (PROTOCOL rule 6's added step; this
+ * file is the copy the TASK_148 sweep MISSED, found by TASK_152 M4 and struck
+ * at TASK_153). It read: ~~so the R1-vs-R1h cost of this pattern's safety is a
+ * scheduling difference and nothing more~~. MEASURED, it is not a scheduling
+ * difference and it is not nothing: R1h is CHEAPER than R1 on **16 of 16**
+ * cells (2 compilers x 2 opt levels x 2 modes x 2 inputs), and at `-O0` the
+ * whole of the difference is THIS FILE NOT EXECUTING A STORE -- exactly
+ * 5.0000 Ir per failed tag store on all eight `-O0` cells, on both compilers,
+ * because a `-O0` tag store is a five-instruction block (`harness/asm.py diff`
+ * on the two `-O0` kernels moves precisely those five). ../NOTES.md 4 has the
+ * table, the denominator and the instruction-level mechanism.
  *
  * **What it buys.** With the tag published only on the path that stores, the
  * tag and the union's live member cannot disagree, so `GET` always reads the

@@ -512,6 +512,17 @@ class Model:
                                         so there is nothing for a sanitizer to
                                         report; the value is simply wrong.
 
+        ⚠⚠ **THE ROW ABOVE IS SCOPED TO `over an int payload` AND THAT SCOPE IS
+        LOAD-BEARING (measured at TASK_153).** The same ordering also reaches
+        `tag DBL over a PTR payload` (`adversarial-exhaust.bin`), and in C that
+        is another 8-byte-over-8-byte reinterpretation and equally silent --
+        `uint8_t *` is 8 bytes here, so C's union has no narrow member at all.
+        **In the RUST rungs it is not**: they carry `o: u32` instead of a
+        pointer, so the same confusion reads 8 bytes where 4 were written and
+        **Miri REPORTS it** as uninitialised memory. That is a consequence of
+        the disclosed offset-for-pointer substitution, not of the C program,
+        and `../NOTES.md` 5 and 7 measure it.
+
         ⚠ **That asymmetry is the row's result, not a gap in the run.** One
         statement ordering, two harms, and the detector coverage differs by the
         TYPE the tag happens to name."""

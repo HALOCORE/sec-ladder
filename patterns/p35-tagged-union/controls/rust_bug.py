@@ -28,18 +28,35 @@ WHAT IS MEASURED, per input, against the C rung's own output
     benign (small/large)      correct     == C, Miri clean      == C
     adversarial-dbl-*         silent      == C bit for bit,     == C bit for
                               wrong       Miri CLEAN            bit
+    adversarial-exhaust       silent      == C bit for bit,     == C bit for
+                              wrong       Miri REPORTS IT       bit
     adversarial-ptr-*         SIGSEGV     OOB `get_unchecked`,  PANIC, index
                                           Miri REPORTS it       out of bounds
 
-**Two findings live in that table.** (1) Reading a union member other than the
+**Three findings live in that table.** (1) Reading a union member other than the
 one last stored is NOT undefined behaviour in Rust when the bytes are a valid
-value of the field's type, so the SILENT harm survives into `unsafe` Rust with
-Miri saying nothing -- and survives into SAFE Rust too, through `from_bits`,
-which is exactly why `../spec.md` forbids that spelling in a rung. (2) The LOUD
-harm does NOT survive, and the reason is the OFFSET-for-POINTER substitution
-`../spec.md` documents: what follows the confused read is an out-of-bounds index
-rather than a wild pointer, which Miri catches in the unsafe arm and the bounds
-check catches in the safe one.
+value of the field's type **and were all written**, so the SILENT harm survives
+into `unsafe` Rust with Miri saying nothing -- and survives into SAFE Rust too,
+through `from_bits`, which is exactly why `../spec.md` forbids that spelling in
+a rung. (2) The LOUD harm does NOT survive, and the reason is the
+OFFSET-for-POINTER substitution `../spec.md` documents: what follows the
+confused read is an out-of-bounds index rather than a wild pointer, which Miri
+catches in the unsafe arm and the bounds check catches in the safe one.
+
+⚠⚠ **(3) ADDED AT TASK_153, AND IT NARROWS (1). VALIDITY IS NOT THE WHOLE
+CONDITION -- INITIALISEDNESS IS THE OTHER HALF, AND THIS ORDERING REACHES IT ON
+A SHIPPED INPUT.** `adversarial-exhaust.bin` produces `tag DBL over a cell whose
+live member is PTR`. In **C** that is another 8-byte-over-8-byte
+reinterpretation and is silent, because `uint8_t *` is 8 bytes and C's union has
+no narrow member. In the **Rust** arms it is not: they carry `o: u32` instead of
+a pointer -- `../spec.md`'s disclosed substitution -- so `pays[idx].d` reads 8
+bytes where 4 were written, and **Miri reports `reading memory ... but memory is
+uninitialized`**. ⚠ The NATIVE run still reproduces C bit for bit
+(`1705852038987163136`), because the bytes left in the slot are the previous
+`Pay { i: .. }` initialiser's, which is exactly what C's stale union holds. **So
+the substitution changes which instrument fires on the SILENT harm too, and not
+only on the loud one** -- and this control did not see it until TASK_153,
+because it ran Miri on the DBL and PTR inputs only.
 
 ⚠ Miri runs with a REDUCED `n_iters` (the file's header is rewritten in a
 scratch copy) because Miri is an interpreter; the checksum then differs from the
@@ -244,6 +261,7 @@ def main():
         print("\nMiri on arm_unsafe_bug.rs "
               f"(n_iters reduced to {MIRI_ITERS}):")
         for n in ("adversarial-dbl-confusion.bin",
+                  "adversarial-exhaust.bin",
                   "adversarial-ptr-confusion.bin"):
             m = miri("arm_unsafe_bug.rs", reduced_input(n, MIRI_ITERS), sysroot)
             mir[n] = m
@@ -260,8 +278,25 @@ def main():
             problems.append(
                 "Miri reported UB on the DBL confusion. This control's claim is "
                 "that a wrong-variant union READ is not UB in Rust when the "
-                "bytes are a valid value of the field's type -- read the "
-                "diagnostic before believing either half.")
+                "bytes read are a valid value of the field's type AND WERE ALL "
+                "WRITTEN -- read the diagnostic before believing either half.")
+        # ⚠ ADDED AT TASK_153. `adversarial-exhaust.bin` reaches the OTHER
+        # confusion this ordering produces -- tag DBL over a cell whose live
+        # member is `o: u32` -- and that reads 8 bytes where 4 were written.
+        # VALIDITY is satisfied (every bit pattern is a valid f64);
+        # INITIALISEDNESS is not, and Miri reports it. This is the must-fire
+        # arm for the initialisedness half of the claim, and it is the arm the
+        # first version of this control did not have: it ran Miri on the DBL
+        # and PTR inputs only, so the one input that could refute the
+        # generalisation was the one input Miri never saw.
+        if not mir.get("adversarial-exhaust.bin", {}).get("ub"):
+            problems.append(
+                "Miri did NOT report UB on adversarial-exhaust, where the arm "
+                "reads `pays[idx].d` (8 bytes) from a cell whose live member is "
+                "`o: u32` (4 bytes). Without this firing, the DBL row's silence "
+                "cannot be read as `validity is the whole condition` -- it "
+                "would be indistinguishable from Miri not modelling union "
+                "initialisedness at all.")
         if not mir.get("adversarial-ptr-confusion.bin", {}).get("ub"):
             problems.append(
                 "Miri did NOT report UB on the PTR confusion, where the arm "
@@ -278,14 +313,19 @@ def main():
            "miri": mir,
            "problems": problems,
            "invariant": "Both Rust arms reproduce c/kernel.c's SILENT wrong "
-                        "value bit for bit, and Miri is silent on the unsafe "
-                        "one -- a wrong-variant union read is not UB in Rust. "
-                        "Neither reproduces the LOUD harm: the unsafe arm turns "
-                        "it into an out-of-bounds `get_unchecked` that Miri DOES "
-                        "report (the must-fire arm for the Miri half), and the "
-                        "safe arm turns it into a panic. The shipped safe rungs "
-                        "cannot express either, because their `Cell` enum makes "
-                        "the mismatch unrepresentable."}
+                        "value bit for bit, on EVERY silent input including "
+                        "adversarial-exhaust. Miri is silent on the DBL "
+                        "confusion -- a wrong-variant union read whose bytes "
+                        "were all written is not UB in Rust -- and REPORTS the "
+                        "exhaust one, where the read is 8 bytes wide over a "
+                        "4-byte `o: u32` payload, so the condition is validity "
+                        "AND initialisedness. Neither arm reproduces the LOUD "
+                        "harm: the unsafe arm turns it into an out-of-bounds "
+                        "`get_unchecked` that Miri DOES report, and the safe "
+                        "arm turns it into a panic. The two firing rows are the "
+                        "must-fire arms for the one silent row. The shipped "
+                        "safe rungs cannot express any of it, because their "
+                        "`Cell` enum makes the mismatch unrepresentable."}
     out = os.path.join(HERE, "rust_bug.json")
     json.dump(doc, open(out, "w"), indent=2)
     print(f"\nwrote {out}")

@@ -22,6 +22,30 @@ in the postcondition, so weakening the specification does not rescue the
 mutant -- the `pay_*` call site simply stops verifying. `M3` below is that
 measurement.
 
+⚠⚠⚠ **AND THE CONCLUSION THIS FILE USED TO DRAW FROM IT IS RETRACTED
+(TASK_152 M3, landed TASK_153). ORIGINAL STRUCK, NOT DELETED.** It read
+~~weakening the specification does not rescue the mutant ... the correct-variant
+obligation cannot be specified away~~ **as a statement about the SHIPPED
+configuration**, and that is false. `M3` and `M6` weaken the ABSTRACT MACHINE
+(`step`, `wf_cell`) and they reproduce exactly; **they do not touch the trusted
+readers' own `requires`, which is where the obligation actually lives in
+configuration A.** New arm **`X1`** deletes `v@[i as int] is {i,o,d}` from all
+THREE trusted readers and the file reports **`16 verified, 0 errors` at the
+shipped obligation count** -- nothing moves.
+
+✅ **SO THE ROW'S HEADLINE IS SHARPER, NOT WEAKER.** The correct-variant
+obligation cannot be weakened by editing the abstract machine (`M3`/`M6`, and
+that IS `p32`'s opposite). It CAN be **deleted outright** from the trusted
+readers' `requires`, and the only thing that catches it is `../spec.md`'s item
+pin -- **a declaration the author writes** -- while every soundness stage stays
+green (verus `16/0`, identity `exact`, Miri `0 UB`) and the gate stage that
+judges STRENGTH rather than triviality, `5c-twin`, is BLOCKED for exactly these
+three items. **Configuration B RESISTS the same deletion** -- Verus fails AT THE
+READ, `../controls/union_oracle.py` arm `B2`. So the gate does not merely force
+the weaker of two proofs: **it forces the one whose central obligation can be
+deleted without the gate noticing.** *"Imposed by the type system at the
+operation"* is true of configuration B only; in A, Verus never sees the read.
+
 THE ARMS
 --------
   M1-drop-tag-test    the GET arm reads `pay_i` without testing the tag.
@@ -36,6 +60,18 @@ THE ARMS
                       `true`, so NOTHING in the specification says a tag names
                       the union member its payload is. MUST FAIL, at the union
                       read's own precondition.
+  X1-delete-variant-requires
+                      ⚠⚠ the arm M3/M6 do NOT cover: delete
+                      `v@[i as int] is {i,o,d}` from ALL THREE trusted readers'
+                      OWN `requires`. **MUST VERIFY**, at the shipped
+                      obligation count -- and that is the finding, not a pass.
+                      Nothing in the PROOF holds the obligation up once the
+                      declaration stops asking for it; the catcher is
+                      `../spec.md`'s item pin, which is `proof-pin` and not a
+                      proof. TASK_152 M3 planted it into the tree and ran the
+                      real gate: FAIL on `proof-pin` (3 items) and `tables`
+                      only, with verus `16/0`, identity `exact` and Miri `0 UB`
+                      all still green.
   M4-constant-body    the kernel returns `0`. MUST FAIL: the `ensures` is not
                       satisfiable by a constant. (`TASK_136`'s ARM_C shape.)
   M5-assume-false     `assume(false);` at the top of the kernel. **VERIFIES**,
@@ -266,6 +302,34 @@ def main():
         "the TYPE SYSTEM at the operation and cannot be specified away. **This "
         "is the cell that p32 has no counterpart for.**")
 
+    # ⚠⚠ X1 -- the arm M3 and M6 do NOT cover, and the one that decides what
+    # the row's headline may say. M3/M6 weaken the ABSTRACT MACHINE; X1 deletes
+    # the correct-variant conjunct from the three TRUSTED READERS' own
+    # `requires`, which is where the obligation lives in the shipped
+    # configuration. Added at TASK_153 from TASK_152 M3.
+    def _x1(t):
+        for member in ("i", "o", "d"):
+            t = sub(t,
+                    f"        i < v@.len(),\n"
+                    f"        v@[i as int] is {member},\n",
+                    "        i < v@.len(),\n", f"X1/{member}")
+        return t
+
+    arm("X1-delete-variant-requires", _x1,
+        lambda r: r.get("errors") == 0
+        and r.get("verified") == SHIPPED_OBLIGATIONS,
+        "⚠⚠ THIS ONE VERIFIES AT THE SHIPPED OBLIGATION COUNT AND THAT IS THE "
+        "RESULT. Deleting the correct-variant conjunct from all three trusted "
+        "readers' `requires` removes the obligation from every call site and "
+        "nothing in the PROOF objects -- M3 and M6 cannot see this because "
+        "they weaken the abstract machine, not the trusted contract. The only "
+        "catcher is spec.md's item pin (`proof-pin`), a declaration the author "
+        "writes, and the stage that judges clause STRENGTH (5c-twin) is "
+        "BLOCKED for exactly these three items. Configuration B RESISTS the "
+        "same deletion -- union_oracle.py arm B2 fails AT THE READ -- so the "
+        "two configurations differ in resistance to a `requires` deletion and "
+        "not only in axiom-versus-check")
+
     arm("M4-constant-body",
         lambda t: sub(t, RETURN_EXPR,
                       "    // No epilogue: nothing was ever acquired.\n    0",
@@ -327,15 +391,24 @@ def main():
            "arms_as_designed": nok,
            "arms_total": len(cells),
            "invariant": "M0 verifies at the shipped obligation count; M1, M2, "
-                        "M3 and M4 each FAIL with the named diagnostic; M5 "
-                        "VERIFIES and M5b shows the gate's assume-detector "
-                        "seeing it. ⚠ M3 is the arm that separates p35 from "
-                        "p32: making the specification agree with the buggy "
-                        "code rescues p32's mutant and does NOT rescue p35's -- "
-                        "it fails at `wf_cells` -- and M6 shows why: with the "
-                        "invariant itself weakened to `true` the proof fails at "
-                        "the union read's own precondition, which the type "
-                        "system imposes and no specification can weaken away."}
+                        "M3, M6 and M4 each FAIL with the named diagnostic; M5 "
+                        "and X1 VERIFY, and M5b shows the gate's "
+                        "assume-detector seeing M5. ⚠ M3 is the arm that "
+                        "separates p35 from p32: making the ABSTRACT MACHINE "
+                        "agree with the buggy code rescues p32's mutant and "
+                        "does NOT rescue p35's -- it fails at `wf_cells` -- and "
+                        "M6 shows why: with the invariant itself weakened to "
+                        "`true` the proof fails at the union read's own "
+                        "precondition. ⚠⚠ X1 is the arm that bounds how far "
+                        "that may be pushed, and it RETRACTS the sentence this "
+                        "control used to draw from M3/M6: delete the "
+                        "correct-variant conjunct from the three trusted "
+                        "readers' OWN `requires` and the file still verifies "
+                        "16/0. So the obligation cannot be specified away by "
+                        "editing the abstract machine, and CAN be deleted "
+                        "outright from the trusted contract -- caught only by "
+                        "spec.md's item pin, while configuration B fails AT "
+                        "THE READ."}
     out = os.path.join(HERE, "proof_mutants.json")
     json.dump(doc, open(out, "w"), indent=2)
     print(f"wrote {out}")

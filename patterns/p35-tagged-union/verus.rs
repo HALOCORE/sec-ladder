@@ -41,8 +41,33 @@
 //! wrappers' `requires` are `v@[i] is i` / `is o` / `is d`, and **Verus checks
 //! those AT EVERY CALL SITE** -- delete the tag test in front of a `pay_*` call
 //! and the proof fails with `precondition not satisfied`. So the tag/variant
-//! agreement IS proved; what is axiomatised is only that the wrapper's body
-//! reads the member its name says.
+//! agreement IS proved.
+//!
+//! ⚠⚠ **WHAT THE AXIOM COVERS -- CORRECTED AT TASK_153, TASK_152 M5.** This
+//! note used to end *"what is axiomatised is only that the wrapper's body
+//! reads the member its name says"*. That describes ONE of TWO unchecked
+//! operations. `unsafe { v.get_unchecked(i).i }` is an **unchecked INDEX** and
+//! a **union field read**, and the axiom asserts both: that the body reads the
+//! member its name says, AND that `i < v@.len()` is the whole of what licenses
+//! the index. Neither clause's STRENGTH is tested for these three items, which
+//! is exactly what their three BLOCKED rows say.
+//! ⚠ **A narrower CONFIGURATION C exists and is NOT shipped** -- split the
+//! index into a `fn pay_ref(v, i) -> &Pay` that DOES have a safe twin (`&v[i]`,
+//! which verifies) and axiomatise only the bare field read, which is the split
+//! `pay_set_unchecked` already uses on the WRITE side. It is gate-legal
+//! (`_scan_unsafe_sites` -> 0 failures) and verifies `2/0` and `3/0` with the
+//! twin (`.temp/t152/verus/c4_split.rs`). It does NOT reduce `blocked`, and it
+//! adds a TENTH trusted item; the shipped configuration keeps nine and states
+//! the axiom's true width here instead. ../NOTES.md 6a records the choice.
+//!
+//! ⚠⚠ **AND THE `requires` ITSELF CAN BE DELETED WITHOUT VERUS NOTICING**
+//! (`../controls/proof_mutants.py` arm `X1`, TASK_152 M3): strike
+//! `v@[i as int] is {i,o,d}` from all three readers and the file still reports
+//! `16 verified, 0 errors` at the pinned obligation count. The only thing that
+//! catches it is `../spec.md`'s item pin -- a declaration the author writes --
+//! and the gate stage that judges STRENGTH rather than triviality, `5c-twin`,
+//! is BLOCKED for exactly these three items. In configuration B the same
+//! deletion FAILS at the read. ../NOTES.md 6b and 6d.
 //!
 //! ⚠ **`f64` IS OPAQUE AT THE PINNED vstd AND THE PROOF SAYS SO.** `f64`
 //! arithmetic carries an `add_req` precondition nothing discharges and `u8 as
@@ -432,8 +457,21 @@ fn slb_twin_pay_set_unchecked<const N: usize>(v: &mut [Pay; N], i: usize, x: Pay
 // Each `requires` has TWO conjuncts: the index is in range, and **the cell is
 // in the member's variant**. Verus checks BOTH at every call site -- delete the
 // tag test in front of one of these calls and the proof fails with
-// `precondition not satisfied` -- so the tag/variant agreement is PROVED. What
-// is axiomatised is only that the body reads the member its name says.
+// `precondition not satisfied` -- so the tag/variant agreement is PROVED.
+//
+// ⚠⚠ WHAT THE AXIOM COVERS, CORRECTED AT TASK_153 (TASK_152 M5). This comment
+// read ~~What is axiomatised is only that the body reads the member its name
+// says~~, and that names ONE of TWO unchecked operations. Each body below does
+// an UNCHECKED INDEX and a UNION FIELD READ, and the axiom asserts both: that
+// the member read is the one the item's name says, AND that `i < v@.len()` is
+// the whole of what licenses `get_unchecked`. The module note has the narrower
+// configuration C that was measured and not shipped.
+//
+// ⚠⚠ AND THE VARIANT CONJUNCT CAN BE DELETED OUTRIGHT: strike `v@[i as int] is
+// {i,o,d}` from all three and the file still verifies at 16 obligations
+// (../controls/proof_mutants.py arm `X1`). Nothing but ../spec.md's item pin
+// catches it. Configuration B RESISTS the same deletion -- Verus fails at the
+// read -- so the two configurations differ in more than axiom-versus-check.
 //
 // **Neither can have a verified twin**, because Rust has no safe spelling of a
 // union read (`error[E0133]`) and `_TWIN_BANNED` forbids `unsafe` in a twin.

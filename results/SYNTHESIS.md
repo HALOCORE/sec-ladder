@@ -1304,6 +1304,29 @@ A result drawn from a single row is a result about that row until a second one
 agrees with it, and **§5's `6.00 Ir`/call for a type-based aliasing property is
 in exactly that position** — a one-row result stated as a law.
 
+✅✅ **AND THAT SENTENCE IS NOW OUT OF DATE, WHICH IS THE POINT OF WRITING IT
+DOWN. `p35` (tagged union / discriminated dispatch, CWE-843) LANDED AT
+`TASK_148` AND THE TYPE AXIS HAS TWO ROWS** — run
+`harness/tools/composition.py`, which says `type 2 — p35 p38`. ⚠⚠ **The two are
+NOT the same shape, and the difference is C-side and MEASURED, which is the only
+ground that could have kept them apart: `p38` harms ONLY at gcc `-O3`, is
+CORRECT at `-O0`, and NEVER harms on clang; `p35` harms IDENTICALLY in all four
+(compiler × level) cells on both compilers.** ⚠ **So §5's one-row law is still a
+one-row law — `p35` does not corroborate it, it sits beside it** — but the axis
+is no longer a single point, and a reader can now ask which of the two a claim
+about "type confusion" is really about.
+
+⚠ **`p35`'s own headline is a LADDER-SIDE result and belongs in §7 rather than
+in the Results: THE GATE FORCES THE WEAKER OF TWO AVAILABLE PROOFS.** Verus
+checks a union read **natively** — a language builtin, so a `std_specs/` grep
+misses it — while `_scan_unsafe_sites` requires the `unsafe` token inside a
+trusted body, **which is exactly what converts the checked read into an axiom.**
+⚠⚠ **And the review sharpened it: the shipped configuration's central obligation
+can be DELETED and Verus still reports `16 verified, 0 errors` with the pinned
+count unmoved** — the gate then fails only on a declaration the author writes.
+**The row ships the honest configuration with the gap as its result** (`p42`'s
+precedent), and **no `check.py` change was proposed.**
+
 ✅ **The temporal axis is the one place this improved: `p29` (BST delete) joined
 `p27` at TASK_139**, and the two are **not** the same shape. `p29`'s
 in-order-successor splice **overwrites its victim in place and frees the
