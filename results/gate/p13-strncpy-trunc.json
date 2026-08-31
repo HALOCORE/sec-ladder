@@ -132,12 +132,12 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "c3014dbe0dcc130007a7d83c1ed3c9fdf715fb457b5dcfa25ace2ef70e2639bf",
+    "harness/check.py": "703f0aa2104e5f8473456157eca3f55e2343d4b0b88f780dbb588ebc0bb2602e",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
-    "harness/report.py": "d82747da107a031842a8fc441961553c1f43277d55ee91219beafbd97ae57076",
+    "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
     "patterns/p13-strncpy-trunc/NOTES.md": "14ade048693a904f6cefc5e9b81e7a290af0a370fb1e630c371785272ac5e85d",
     "patterns/p13-strncpy-trunc/README.md": "87b0261b50597a71710e8573336bb569deca0a6cb0f516171c3a3d194f7311ca",
@@ -171,7 +171,7 @@
     "collapse_rate_ir_per_work": 0.25,
     "collapse_work_unit": "byte",
     "collapse_floor_min_declarable": 0.015625,
-    "collapse_tightest_margin": 27.5358667676003
+    "collapse_tightest_margin": 27.533535200605606
   },
   "identity": [
     {
@@ -230,64 +230,62 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3280,
-    "nvars": 48,
-    "envp_stack_bytes": 3664,
-    "tuning_vars": {
-      "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
-    },
+    "bytes": 3222,
+    "nvars": 47,
+    "envp_stack_bytes": 3598,
+    "tuning_vars": {},
     "repo_path_bytes": 33,
     "domain": "Comparable ONLY against a record with the same `envp_stack_bytes` (= bytes + 8*nvars), the same `tuning_vars` and the same `repo_path_bytes`. That is a NECESSARY condition, not a proved sufficient one: `bytes` alone was believed sufficient and TASK_114 falsified it at +-7 Ir/call. argv beyond the repo prefix, and anything else on the initial stack, are not recorded here. When the three differ, compare `kernel_exclusive_ir` in results/pNN-*.json instead -- structurally immune, 0 of 288 triples moved."
   },
   "marginal_ir_per_call": {
-    "c-clang/O0/isolated/small.bin": 11171.28,
-    "c-clang/O0/isolated/large.bin": 30324.72,
-    "c-clang/O0/isolated/d_ir_d_work": 23.911910112359553,
-    "c-clang/O0/whole/small.bin": 11145.28,
-    "c-clang/O0/whole/large.bin": 30276.72,
-    "c-clang/O0/whole/d_ir_d_work": 23.884444444444448,
-    "c-clang/O3/isolated/small.bin": 3807.28,
-    "c-clang/O3/isolated/large.bin": 9133.72,
-    "c-clang/O3/isolated/d_ir_d_work": 6.649737827715354,
-    "c-clang/O3/whole/small.bin": 3778.28,
-    "c-clang/O3/whole/large.bin": 9093.72,
-    "c-clang/O3/whole/d_ir_d_work": 6.636004993757801,
-    "c-clang-h/O0/isolated/small.bin": 11184.28,
-    "c-clang-h/O0/isolated/large.bin": 30348.72,
-    "c-clang-h/O0/isolated/d_ir_d_work": 23.925642946317108,
-    "c-clang-h/O0/whole/small.bin": 11158.28,
-    "c-clang-h/O0/whole/large.bin": 30300.72,
-    "c-clang-h/O0/whole/d_ir_d_work": 23.898177278402,
-    "c-clang-h/O3/isolated/small.bin": 3820.28,
-    "c-clang-h/O3/isolated/large.bin": 9157.72,
-    "c-clang-h/O3/isolated/d_ir_d_work": 6.663470661672907,
-    "c-clang-h/O3/whole/small.bin": 3791.28,
-    "c-clang-h/O3/whole/large.bin": 9117.72,
-    "c-clang-h/O3/whole/d_ir_d_work": 6.649737827715354,
-    "c-gcc/O0/isolated/small.bin": 12655.28,
-    "c-gcc/O0/isolated/large.bin": 33390.72,
-    "c-gcc/O0/isolated/d_ir_d_work": 25.88694132334582,
-    "c-gcc/O0/whole/small.bin": 12655.28,
-    "c-gcc/O0/whole/large.bin": 33390.72,
-    "c-gcc/O0/whole/d_ir_d_work": 25.88694132334582,
-    "c-gcc/O3/isolated/small.bin": 5270.28,
-    "c-gcc/O3/isolated/large.bin": 11534.72,
-    "c-gcc/O3/isolated/d_ir_d_work": 7.8207740324594255,
-    "c-gcc/O3/whole/small.bin": 5242.28,
-    "c-gcc/O3/whole/large.bin": 11522.72,
-    "c-gcc/O3/whole/d_ir_d_work": 7.840749063670412,
-    "c-gcc-h/O0/isolated/small.bin": 12668.28,
-    "c-gcc-h/O0/isolated/large.bin": 33414.72,
-    "c-gcc-h/O0/isolated/d_ir_d_work": 25.900674157303374,
-    "c-gcc-h/O0/whole/small.bin": 12668.28,
-    "c-gcc-h/O0/whole/large.bin": 33414.72,
-    "c-gcc-h/O0/whole/d_ir_d_work": 25.900674157303374,
-    "c-gcc-h/O3/isolated/small.bin": 5283.28,
-    "c-gcc-h/O3/isolated/large.bin": 11558.72,
-    "c-gcc-h/O3/isolated/d_ir_d_work": 7.834506866416978,
-    "c-gcc-h/O3/whole/small.bin": 5255.28,
-    "c-gcc-h/O3/whole/large.bin": 11546.72,
-    "c-gcc-h/O3/whole/d_ir_d_work": 7.854481897627965,
+    "c-clang/O0/isolated/small.bin": 11172.05,
+    "c-clang/O0/isolated/large.bin": 30323.95,
+    "c-clang/O0/isolated/d_ir_d_work": 23.909987515605494,
+    "c-clang/O0/whole/small.bin": 11146.05,
+    "c-clang/O0/whole/large.bin": 30275.95,
+    "c-clang/O0/whole/d_ir_d_work": 23.882521847690388,
+    "c-clang/O3/isolated/small.bin": 3808.05,
+    "c-clang/O3/isolated/large.bin": 9132.95,
+    "c-clang/O3/isolated/d_ir_d_work": 6.6478152309612994,
+    "c-clang/O3/whole/small.bin": 3779.05,
+    "c-clang/O3/whole/large.bin": 9092.95,
+    "c-clang/O3/whole/d_ir_d_work": 6.634082397003746,
+    "c-clang-h/O0/isolated/small.bin": 11185.05,
+    "c-clang-h/O0/isolated/large.bin": 30347.95,
+    "c-clang-h/O0/isolated/d_ir_d_work": 23.923720349563048,
+    "c-clang-h/O0/whole/small.bin": 11159.05,
+    "c-clang-h/O0/whole/large.bin": 30299.95,
+    "c-clang-h/O0/whole/d_ir_d_work": 23.896254681647942,
+    "c-clang-h/O3/isolated/small.bin": 3821.05,
+    "c-clang-h/O3/isolated/large.bin": 9156.95,
+    "c-clang-h/O3/isolated/d_ir_d_work": 6.661548064918852,
+    "c-clang-h/O3/whole/small.bin": 3792.05,
+    "c-clang-h/O3/whole/large.bin": 9116.95,
+    "c-clang-h/O3/whole/d_ir_d_work": 6.6478152309612994,
+    "c-gcc/O0/isolated/small.bin": 12656.05,
+    "c-gcc/O0/isolated/large.bin": 33389.95,
+    "c-gcc/O0/isolated/d_ir_d_work": 25.885018726591756,
+    "c-gcc/O0/whole/small.bin": 12656.05,
+    "c-gcc/O0/whole/large.bin": 33389.95,
+    "c-gcc/O0/whole/d_ir_d_work": 25.885018726591756,
+    "c-gcc/O3/isolated/small.bin": 5271.05,
+    "c-gcc/O3/isolated/large.bin": 11533.95,
+    "c-gcc/O3/isolated/d_ir_d_work": 7.818851435705369,
+    "c-gcc/O3/whole/small.bin": 5243.05,
+    "c-gcc/O3/whole/large.bin": 11521.95,
+    "c-gcc/O3/whole/d_ir_d_work": 7.838826466916355,
+    "c-gcc-h/O0/isolated/small.bin": 12669.05,
+    "c-gcc-h/O0/isolated/large.bin": 33413.95,
+    "c-gcc-h/O0/isolated/d_ir_d_work": 25.89875156054931,
+    "c-gcc-h/O0/whole/small.bin": 12669.05,
+    "c-gcc-h/O0/whole/large.bin": 33413.95,
+    "c-gcc-h/O0/whole/d_ir_d_work": 25.89875156054931,
+    "c-gcc-h/O3/isolated/small.bin": 5284.05,
+    "c-gcc-h/O3/isolated/large.bin": 11557.95,
+    "c-gcc-h/O3/isolated/d_ir_d_work": 7.832584269662922,
+    "c-gcc-h/O3/whole/small.bin": 5256.05,
+    "c-gcc-h/O3/whole/large.bin": 11545.95,
+    "c-gcc-h/O3/whole/d_ir_d_work": 7.852559300873908,
     "safe_naive/O0/isolated/small.bin": 16849.7,
     "safe_naive/O0/isolated/large.bin": 46180.3,
     "safe_naive/O0/isolated/d_ir_d_work": 36.617478152309616,
@@ -950,8 +948,20 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/isolated",
           "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "16725268236661028992",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "15458078583401325696",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "16725268236661028992",
@@ -980,6 +990,7 @@
         "stderr": "",
         "signal": null,
         "cells": [
+          "O0/whole",
           "O3/whole"
         ],
         "model_exit": 0,
@@ -993,7 +1004,6 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole",
           "O3/isolated"
         ],
         "model_exit": 0,
@@ -1130,7 +1140,6 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/isolated",
           "O3/whole"
         ],
         "model_exit": 0,
@@ -1145,7 +1154,8 @@
         "signal": null,
         "cells": [
           "O0/isolated",
-          "O0/whole"
+          "O0/whole",
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "11140422339664390272",
@@ -1160,7 +1170,6 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole",
           "O3/whole"
         ],
         "model_exit": 0,
@@ -1174,6 +1183,7 @@
         "stderr": "",
         "signal": null,
         "cells": [
+          "O0/whole",
           "O3/isolated"
         ],
         "model_exit": 0,
@@ -1454,7 +1464,6 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/isolated",
           "O3/whole"
         ],
         "model_exit": 0,
@@ -1469,7 +1478,8 @@
         "signal": null,
         "cells": [
           "O0/isolated",
-          "O0/whole"
+          "O0/whole",
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
@@ -1484,6 +1494,7 @@
         "stderr": "",
         "signal": null,
         "cells": [
+          "O0/whole",
           "O3/whole"
         ],
         "model_exit": 0,
@@ -1497,7 +1508,6 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole",
           "O3/isolated"
         ],
         "model_exit": 0,
@@ -1635,7 +1645,8 @@
         "signal": null,
         "cells": [
           "O0/isolated",
-          "O0/whole"
+          "O0/whole",
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "8714310972305648768",
@@ -1648,7 +1659,6 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/isolated",
           "O3/whole"
         ],
         "model_exit": 0,
@@ -1664,7 +1674,6 @@
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole",
           "O3/isolated"
         ],
         "model_exit": 0,
@@ -1691,6 +1700,7 @@
         "stderr": "",
         "signal": null,
         "cells": [
+          "O0/whole",
           "O3/whole"
         ],
         "model_exit": 0,
@@ -1836,7 +1846,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7fee30c00040 with insufficient space for an obj",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7ff25e200040 with insufficient space for an obj",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1847,7 +1857,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7fc20d800040 with insufficient space for an obj",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7fd188400040 with insufficient space for an obj",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1869,7 +1879,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7fb8f2a00040 with insufficient space for an obj",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7f5d1aa00040 with insufficient space for an obj",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1880,7 +1890,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7fbe98600040 with insufficient space for an obj",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: index 32 out of bounds for type 'uint8_t [32]' /home/apt/repos_common/sec-ladder/patterns/p13-strncpy-trunc/c/kernel.c:70:19: runtime error: load of address 0x7fd27e000040 with insufficient space for an obj",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1905,6 +1915,116 @@
       "diagnostic": "",
       "declared_hang": false,
       "hung": false,
+      "stdout": "17479224122809884383",
+      "model_stdout": "17479224122809884383"
+    }
+  },
+  "sanitizer_hardened": {
+    "adversarial-empty.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": true,
+      "stdout": "227437609984",
+      "model_stdout": "227437609984"
+    },
+    "adversarial-exact.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": true,
+      "stdout": "8714310972305648768",
+      "model_stdout": "8714310972305648768"
+    },
+    "adversarial-nonul-dst.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": true,
+      "stdout": "16725268236661028992",
+      "model_stdout": "16725268236661028992"
+    },
+    "adversarial-nonul-src.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": true,
+      "stdout": "11140422339664390272",
+      "model_stdout": "11140422339664390272"
+    },
+    "adversarial-stride3.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": true,
+      "stdout": "0",
+      "model_stdout": "0"
+    },
+    "adversarial-truncate-alt.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": true,
+      "stdout": "8714310972305648768",
+      "model_stdout": "8714310972305648768"
+    },
+    "adversarial-truncate.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": true,
+      "stdout": "8714310972305648768",
+      "model_stdout": "8714310972305648768"
+    },
+    "large.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": false,
+      "stdout": "10467335530746193689",
+      "model_stdout": "10467335530746193689"
+    },
+    "small.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": false,
       "stdout": "17479224122809884383",
       "model_stdout": "17479224122809884383"
     }
@@ -2062,7 +2182,7 @@
   "controls_json": {},
   "failures": [],
   "notes": [
-    "adversarial-nonul-dst.bin/c-gcc: opt/mode variants of this rung disagree (2 distinct behaviours)",
+    "adversarial-nonul-dst.bin/c-gcc: opt/mode variants of this rung disagree (3 distinct behaviours)",
     "adversarial-nonul-dst.bin/c-clang: opt/mode variants of this rung disagree (3 distinct behaviours)",
     "adversarial-nonul-src.bin/c-gcc: opt/mode variants of this rung disagree (2 distinct behaviours)",
     "adversarial-nonul-src.bin/c-clang: opt/mode variants of this rung disagree (3 distinct behaviours)",

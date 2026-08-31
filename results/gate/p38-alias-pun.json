@@ -125,12 +125,12 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "c3014dbe0dcc130007a7d83c1ed3c9fdf715fb457b5dcfa25ace2ef70e2639bf",
+    "harness/check.py": "703f0aa2104e5f8473456157eca3f55e2343d4b0b88f780dbb588ebc0bb2602e",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
-    "harness/report.py": "d82747da107a031842a8fc441961553c1f43277d55ee91219beafbd97ae57076",
+    "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
     "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
     "patterns/p38-alias-pun/NOTES.md": "7cdccdd61c2508f6547c9a5f92506b3cb7981760333388a98197f99ceb049e0d",
     "patterns/p38-alias-pun/README.md": "486d16a4d87c1ffb0afe49d2259036f2ac6ddca8e53905302ac1cdb6aba5d7e9",
@@ -945,11 +945,11 @@
     "adversarial-oob.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "16017672891193660672",
+        "stdout": "14406721765126525234",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/whole"
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "8516071857945885891",
@@ -958,11 +958,11 @@
       },
       {
         "exit": 0,
-        "stdout": "16985423622091993715",
+        "stdout": "14860679484876153682",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/isolated"
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "8516071857945885891",
@@ -1113,6 +1113,19 @@
     "adversarial-stale.bin/c-gcc": [
       {
         "exit": 0,
+        "stdout": "10280604892802781388",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "10509230270850152637",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
         "stdout": "10509230270850152637",
         "stderr": "",
         "signal": null,
@@ -1127,24 +1140,11 @@
       },
       {
         "exit": 0,
-        "stdout": "168873172714616011",
+        "stdout": "16514579800609480928",
         "stderr": "",
         "signal": null,
         "cells": [
           "O3/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "10509230270850152637",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "17277588696602671974",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "10509230270850152637",
@@ -1429,7 +1429,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7f9f5e900220 with insufficient space for an object",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7ff34c700220 with insufficient space for an object",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1451,7 +1451,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7f0bae500220 with insufficient space for an object",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: index 256 out of bounds for type 'uint16_t [256]' /home/apt/repos_common/sec-ladder/patterns/p38-alias-pun/c/kernel.c:119:42: runtime error: load of address 0x7fe0f6100220 with insufficient space for an object",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1509,6 +1509,104 @@
       "diagnostic": "",
       "declared_hang": false,
       "hung": false,
+      "stdout": "8087734315336093952",
+      "model_stdout": "8087734315336093952"
+    }
+  },
+  "sanitizer_hardened": {
+    "adversarial-huge.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": true,
+      "stdout": "15963742333423663363",
+      "model_stdout": "15963742333423663363"
+    },
+    "adversarial-nrec.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": true,
+      "stdout": "573548035304320128",
+      "model_stdout": "573548035304320128"
+    },
+    "adversarial-oob.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": true,
+      "stdout": "8516071857945885891",
+      "model_stdout": "8516071857945885891"
+    },
+    "adversarial-stale.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": true,
+      "stdout": "10509230270850152637",
+      "model_stdout": "10509230270850152637"
+    },
+    "adversarial-stride7.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": true,
+      "stdout": "0",
+      "model_stdout": "0"
+    },
+    "degenerate.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": false,
+      "stdout": "15819171708748271115",
+      "model_stdout": "15819171708748271115"
+    },
+    "large.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": false,
+      "stdout": "6576101629690481408",
+      "model_stdout": "6576101629690481408"
+    },
+    "small.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": false,
       "stdout": "8087734315336093952",
       "model_stdout": "8087734315336093952"
     }

@@ -3173,6 +3173,56 @@ already been struck.** Keep the list, not the ordinal.
     generated too EARLY, here the source was edited too LATE.
 
 
+21. ⚠⚠⚠ **A RE-GATE IS NOT VALUE-FREE, AND `--check-stale` STRUCTURALLY CANNOT
+    SEE IT.** `TASK_151`, ✅ **manager-re-verified independently against `HEAD`.**
+
+    `marginal_ir_per_call` is a **callgrind measurement taken INSIDE the gate**,
+    so a gate run re-draws it. Re-gating all 29 patterns on an **otherwise
+    unchanged tree**:
+
+    ```
+    marginal_ir_per_call cells compared   2772
+    cells that MOVED                       673   across 18 patterns
+    max |delta| 7.00   mean 0.916   cells >= the published 16.00 band: 0
+    p01:16 p03:62 p04:14 p05:32 p06:32 p07:32 p08:85 p09:32 p10:32
+    p12:48 p13:48 p14:32 p16:32 p17:32 p18:32 p19:32 p23:32 p27:48
+    ```
+
+    ✅ **`--check-stale` said `0 STALE` and was RIGHT** — it hashes **sources**,
+    not **values**, and no source moved. **The two properties are different and
+    only one of them is checked.**
+
+    > ⚠⚠ **THE RULE: a gate record holds two KINDS of leaf — DERIVED FACTS about
+    > committed bytes (hashes, `md5_fn`, identity, obligation counts, verdicts),
+    > which are reproducible, and MEASUREMENTS taken during the run, which are
+    > DRAWS. `--check-stale` covers the first kind only.** **Before quoting a
+    > gate-record number, ask which kind it is.**
+
+    ⚠ **SCOPE, AND DO NOT OVER-ATTRIBUTE IT** — this is the error the manager
+    made one task earlier. `results/synthesis.md`'s `‡` note describes an
+    environment-phase mechanism **for `p03` and `p04`**, bistable with a 32-byte
+    period. **The movement measured here is WIDER — 18 patterns — but whether it
+    is the SAME mechanism is NOT established by this measurement.** *"18 patterns
+    move"* is the finding; *"18 patterns are `‡`"* is not.
+    ✅ **What is safe either way: nothing reached the published `≥16.00` band**,
+    so no headline figure is in question.
+
+22. ⚠⚠ **A SECOND MECHANISM FOR *"a number grepped out of a log is not a number
+    read out of a record"*, AND IT IS NOT A COUNTING BUG.** `TASK_151`,
+    self-disclosed by the engineer.
+
+    The known instance is `grep -c BLOCKED == 2N + 1` — a **substring** matching
+    the verdict string `PASS-WITH-BLOCKED-ROWS`. The new one is **ALTERNATION
+    ORDER IN THE READER**: a status grep spelled roughly
+    `grep -oE 'PASS|FAIL|PASS-WITH-BLOCKED-ROWS'` reports `p01` as **`PASS`**,
+    because the regex engine takes the **first alternative that matches at the
+    leftmost position** and never tries the longer one.
+
+    ⚠ **So the reader can be wrong even when it is not counting**, and the two
+    mechanisms need different fixes: the first wants a record read, the second
+    wants the longest alternative first — or an anchor. ✅ **Both are cured by
+    the same discipline: READ THE VERDICT OUT OF `results/gate/*.json`.**
+
 ## ⚠ A number GREPPED OUT OF A LOG is not a number READ OUT OF A RECORD
 
 **`TASK_127`, swept at `TASK_132`.** **The gate writes structured JSON and also

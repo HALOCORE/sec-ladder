@@ -111,6 +111,17 @@ What it enforces, in order:
          so the obligation count, the `identity` pin and the TCB tally are all
          blind to them, and `vparse.parse` could not even see them. The gate
          SHOUTS every one in every verdict; it does not forbid them
+       - ⚠ **`assume(` and `admit(` in a pinned or `#[path]`-included Verus
+         source FAIL unless `spec.md`'s `verus.assumptions` declares the count**
+         (TASK_151). Until then they were a SHOUT, and a shout is not a failure:
+         `assume(false);` at the top of the kernel verifies at the SHIPPED
+         FILE'S OWN obligation count -- p32 `15/0` (TASK_145 arm X4), p28 `23/0`
+         (TASK_149 B1) -- with the clause pin and the `identity` pin both
+         unmoved, so a rung could ship a VACUOUS proof and pass. Visibility, not
+         prohibition, as above: declaring one moves `contract_sha256`. Exposure
+         when it landed was ZERO across all 118 committed `.rs` files, which is
+         why it owes the stage-0 must-fire arm `_ASSUME_CASES` rather than a
+         green sweep as its evidence
        - Verus itself confirms the call site verifies (`--verify-function`),
          rather than a regex confirming it looks like it might
        - the Python `requires`/`ensures` are GENERATED from `verus.rs`'s clause
@@ -148,6 +159,16 @@ What it enforces, in order:
   7  the C rung matches `model.py`'s per-input `sanitizer_expect`: "clean" means
      no ASan/UBSan diagnostic and the predicted exit, "fires" means a diagnostic
      is REQUIRED (p02's adversarial input is defined as the one that trips ASan)
+  7h **the HARDENED C rung (R1h) under the same sanitizers, expected clean on
+     EVERY input, adversarial included** -- TASK_151. Stage 7 builds
+     `c/kernel.c` only, so until then **no gate stage ran a detector on
+     `c/kernel_hardened.c` in ANY pattern**, which is the cell the `p28d`
+     variant SEGVed in on a BENIGN input while its verification was not looking
+     (TASK_146 §1). The expectation is not per-input and cannot be declared
+     away: R1h is the arm that carries the check. Exit and stdout are compared
+     to `model.py` on NON-adversarial inputs only -- 72 of 72 such rows are
+     identical between the arms, while **74 of 139 adversarial rows differ, and
+     that difference is the result**
   8  the Miri policy: mandatory wherever the pattern has a trusted item or a
      hand-written axiom at all,
      and never waivable when R4 and R5 are not the same machine code (`norel` or
@@ -870,6 +891,16 @@ def check_selftests(rep):
         if got != want:
             rep.fail("named-spelling-selftest",
                      f"named_spelling_problem: {label}: got {got}, want {want}")
+    # TASK_151's must-fire arm for the vacuity check. It is HERE, run on every
+    # invocation, because the repair is PROSPECTIVE: no shipped `verus.rs`
+    # spells `assume(` or `admit(`, so a green sweep says nothing about whether
+    # the check can fire. `got[0] == "RAISED"` means `_axiom_keyword_scan`
+    # threw -- reported, not crashed (`.memory/03-measurement.md` entry 19).
+    for label, got, want in _ASSUME_CASES:
+        if got != want:
+            rep.fail("assume-selftest",
+                     f"_axiom_keyword_scan: {label}: got [fail,shout]={got}, "
+                     f"want {want}")
 
 
 # ==========================================================================
@@ -4450,8 +4481,48 @@ def _check_axiom_decls(rep, src, txt, vcfg):
     return axioms
 
 
-def _axiom_keyword_shout(rep, src, txt):
+#: The three keywords the axiom scan below looks for, and the regexes are
+#: WORD-ANCHORED where the old `re.escape("assume(")` was not -- promoting a
+#: check to a FAIL means a false positive now stops the gate, and
+#: `re.escape` would have matched `reassume(`. `\s*\(` also catches
+#: `assume (false)`, which the literal spelling missed.
+_ASSUME_KEYWORDS = {
+    "assume(": r"\bassume\s*\(",
+    "admit(": r"\badmit\s*\(",
+    "assume_specification": r"\bassume_specification\b",
+}
+
+#: ⚠⚠ **The two that can make a proof VACUOUS, and they are the two this stage
+#: FAILS on.** `assume_specification` is deliberately NOT here: it is a body-less
+#: trusted DECLARATION, `vparse.axiom_decls` sees it, and `_check_axiom_decls`
+#: already `rep.fail`s unless `verus.axioms` declares it. Promoting it here as
+#: well would double-report one item under two contract keys.
+_VACUITY_KEYWORDS = ("assume(", "admit(")
+
+
+def _assume_keyword_hits(txt):
+    """`{keyword: [line, ...]}` over CODE ONLY -- `vparse.blank_noncode` blanks
+    comments and string literals first, so `// assume(false)` is not a hit while
+    a ghost `proof { assume(false); }` is.
+
+    A **pure function of the text**, which is what lets `check_selftests` drive
+    it (`_ASSUME_CASES`) without a pattern, a contract or a Verus run."""
+    code = vparse.blank_noncode(txt)
+    out = {}
+    for kw, rx in _ASSUME_KEYWORDS.items():
+        lines = [code.count("\n", 0, m.start()) + 1
+                 for m in re.finditer(rx, code)]
+        if lines:
+            out[kw] = lines
+    return out
+
+
+def _axiom_keyword_scan(rep, src, txt, vcfg):
     """The `assume(` / `admit(` / `assume_specification` keyword scan.
+
+    ⚠ Named `_axiom_keyword_shout` until TASK_151, and renamed because it no
+    longer only shouts; `TASK_145_REPORT` §3 and `TASK_149_REPORT` §6 cite the
+    old name.
 
     Split out of `check_verus_contract` at TASK_088 so it can run over
     `#[path]`-included files as well as over `verus.obligations`. It used to run
@@ -4459,13 +4530,139 @@ def _axiom_keyword_shout(rep, src, txt):
     detector: route C planted `assume(x==0); admit();` in a proof fn of an
     included module and **the axiom stage was silent** -- the plant was caught
     only because it happened to move the obligation count, which a plant in an
-    `#[verifier::external]` file would not."""
-    for kw in ("assume(", "assume_specification", "admit("):
-        n = len(re.findall(re.escape(kw), vparse.blank_noncode(txt)))
-        if n:
-            rep.shout("tcb-axiom",
-                      f"{src}: {kw} appears {n}x -- must be justified in "
-                      f"NOTES.md and counted in this pattern's TCB tally")
+    `#[verifier::external]` file would not.
+
+    ⚠⚠⚠ **AND UNTIL TASK_151 IT ONLY SHOUTED, WHICH IS NOT A FAILURE, SO A RUNG
+    COULD SHIP A VACUOUS PROOF AND PASS.** Measured on two shipped rows, both
+    times by a reviewer planting `assume(false);` at the top of the kernel:
+
+        p32   TASK_145 §3 arm `X4`   verifies  15/0   <- the shipped file's count
+        p28   TASK_149 §6 arm `B1`   verifies  23/0   <- the shipped file's count
+
+    **The obligation count is therefore NOT a discriminator** -- both plants
+    verify at exactly the pinned number -- the `verus.items` clause pin does not
+    move (the clauses are untouched), and the `identity` pin does not move
+    either (an `assume` is ghost and emits no instructions). The keyword scan
+    was the whole textual trace, and it was advisory.
+
+    ⚠ **This is PROSPECTIVE, and the exposure figure belongs with it: when this
+    landed, `assume(` / `admit(` appeared ZERO times in code across all 118
+    committed `.rs` files, `common/driver.rs` included.** So there is no shipped
+    row this breaks, which is exactly why it owes the must-fire arm in
+    `_ASSUME_CASES` rather than a green sweep as its evidence.
+
+    **VISIBILITY, NOT PROHIBITION** -- the same design as `_check_axiom_decls`
+    and `_check_included_tcb` immediately below, chosen over a flat ban for the
+    reason `check_sanitizers`' docstring gives about a gate that cannot be
+    passed honestly. An author who genuinely needs an `assume` declares
+    `verus.assumptions[<src>] = <int>` **inside the `slb-contract` block**, so
+    the declaration moves `contract_sha256`, `harness/tools/contract_diff.py`
+    prints exactly what moved, and `PROTOCOL.md`'s definition-of-done item 6
+    already requires them to disclose it. **A one-line diff in review beats a
+    line of log nobody reads.**"""
+    hits = _assume_keyword_hits(txt)
+    for kw, lines in sorted(hits.items()):
+        rep.shout("tcb-axiom",
+                  f"{src}: {kw} appears {len(lines)}x (line(s) "
+                  f"{lines[:8]}{' …' if len(lines) > 8 else ''}) -- must be "
+                  f"justified in NOTES.md and counted in this pattern's TCB "
+                  f"tally")
+    n_vac = sum(len(hits.get(k, [])) for k in _VACUITY_KEYWORDS)
+    want = (vcfg.get("assumptions") or {}).get(src, 0)
+    try:
+        want = int(want)
+    except (TypeError, ValueError):
+        rep.fail("proof-vacuity",
+                 f"{src}: spec.md's `verus.assumptions[{src!r}]` is {want!r}; "
+                 f"it must be an integer count of `assume(` + `admit(` "
+                 f"occurrences in this file.")
+        return hits
+    if n_vac != want:
+        detail = ", ".join(f"{k} x{len(hits[k])} at line(s) {hits[k][:8]}"
+                           for k in _VACUITY_KEYWORDS if k in hits) or "none"
+        rep.fail("proof-vacuity",
+                 f"{src}: {n_vac} vacuity keyword(s) ({detail}), but spec.md's "
+                 f"`verus.assumptions` declares {want}. `assume(` and `admit(` "
+                 f"DISCHARGE A PROOF OBLIGATION WITHOUT PROVING IT, so one of "
+                 f"them can make a whole rung's proof true of the empty "
+                 f"program while every other stage stays green: `assume(false)` "
+                 f"at the top of the kernel verifies at the SAME "
+                 f"`N verified, 0 errors` as the shipped file -- p32 15/0 "
+                 f"(TASK_145 arm X4), p28 23/0 (TASK_149 B1) -- so the "
+                 f"obligation count cannot tell them apart, the `verus.items` "
+                 f"clause pin does not move, and the `identity` pin does not "
+                 f"move because ghost code emits no instructions. Until "
+                 f"TASK_151 this stage only `rep.shout`ed, and a shout is not a "
+                 f"failure. If the assumption is deliberate, DECLARE it -- "
+                 f"`verus.assumptions[{src!r}] = {n_vac}` inside the "
+                 f"`slb-contract` block, which moves `contract_sha256` and so "
+                 f"makes it a one-line diff a reviewer sees -- and count it in "
+                 f"this pattern's NOTES.md TCB tally with the argument for why "
+                 f"the assumed proposition is true of real Rust. Exposure when "
+                 f"this check landed was ZERO across all 118 committed `.rs` "
+                 f"files.")
+    elif n_vac:
+        rep.shout("tcb-axiom",
+                  f"{src}: {n_vac} DECLARED `assume(`/`admit(` "
+                  f"(`verus.assumptions` = {want}). Verus proves NOTHING about "
+                  f"these: they are hand-written axioms in this pattern's "
+                  f"trusted base and every claim downstream of them is "
+                  f"conditional on them.")
+    return hits
+
+
+def _ak(text, declared=None):
+    """One `_ASSUME_CASES` cell: `[fails, shouts]` from `_axiom_keyword_scan`.
+
+    ⚠ **An exception becomes a THREE-element list**, which can never equal a
+    two-element expectation, so a broken detector REPORTS at stage 0 instead of
+    killing the import. `.memory/03-measurement.md` entry 19: three of `p32`'s
+    four planted mutations failed by crashing and the diagnostic was lost."""
+    src = "verus.rs"
+    rep = _StubReport()
+    vcfg = {} if declared is None else {"assumptions": {src: declared}}
+    try:
+        _axiom_keyword_scan(rep, src, text, vcfg)
+    except Exception as e:                                       # noqa: BLE001
+        return ["RAISED", type(e).__name__, str(e)[:120]]
+    return [rep.n["fail"], rep.n["shout"]]
+
+
+#: ⚠⚠ **THE MUST-FIRE ARM FOR THE VACUITY CHECK (TASK_151), and it exists
+#: because the repair is PROSPECTIVE: exposure across the shipped tree is ZERO,
+#: so a green sweep is not evidence that this can fire at all.** Seven cells,
+#: covering both guards -- the KEYWORD SCAN (does it see code, and only code?)
+#: and the DECLARATION COMPARISON (does a mismatch fail, and a match not?).
+#: Run by `check_selftests` at stage 0 on **every** gate invocation, which is
+#: the shape `TASK_147`'s `detector_selftest()` established.
+_ASSUME_CASES = [
+    # --- guard 1: the keyword scan -------------------------------------------
+    ("an undeclared `assume(` in code FAILS", _ak("proof { assume(false); }"),
+     [1, 1]),
+    ("an undeclared `admit(` in code FAILS", _ak("proof fn p() { admit(); }"),
+     [1, 1]),
+    # The blanking half. Every hardened C rung and half the `.rs` doc comments
+    # in this repo mention `assume`; if comments were hits the gate would be
+    # unpassable, and TASK_151 measured 3 `.rs` files that name
+    # `assume_specification` in a comment alone.
+    ("`assume(` in a COMMENT is not a hit", _ak("// proof { assume(false); }\n"),
+     [0, 0]),
+    ("`assume(` in a STRING literal is not a hit",
+     _ak('let s = "assume(false)";'), [0, 0]),
+    # `reassume(` is why the regex is `\b`-anchored rather than `re.escape`.
+    ("a keyword that merely ENDS in `assume(` is not a hit",
+     _ak("let x = reassume(y);"), [0, 0]),
+    # --- guard 2: the declaration comparison ---------------------------------
+    ("a DECLARED `assume(` passes and shouts twice",
+     _ak("proof { assume(false); }", declared=1), [0, 2]),
+    ("declaring MORE than the file spells also FAILS",
+     _ak("proof fn p() { }", declared=1), [1, 0]),
+    # --- and the boundary: `assume_specification` has its OWN key -------------
+    ("`assume_specification` shouts but does NOT fail here "
+     "(`verus.axioms` owns it)",
+     _ak("assume_specification[ core::mem::swap ](a, b);"), [0, 1]),
+    ("a clean file is silent", _ak("fn main() { }"), [0, 0]),
+]
 
 
 def _check_included_tcb(rep, src, txt, vcfg):
@@ -4743,7 +4940,11 @@ def check_verus_contract(pdir, rep, contract):
         # that can verify a false program at an unmoved obligation count.
         # TASK_088 moved the body into `_axiom_keyword_shout` so the
         # `#[path]`-included files get it too (TASK_084_REVIEW major 1, route C).
-        _axiom_keyword_shout(rep, src, txt)
+        # ⚠ TASK_151 renamed it `_axiom_keyword_scan` and made `assume(` /
+        # `admit(` a FAILURE unless `verus.assumptions` declares them: a shout
+        # is not a failure, and `assume(false)` verifies at the shipped file's
+        # own obligation count (p32 15/0, p28 23/0).
+        _axiom_keyword_scan(rep, src, txt, vcfg)
         axioms = _check_axiom_decls(rep, src, txt, vcfg)
 
         # --- obligation count --------------------------------------------
@@ -4832,7 +5033,7 @@ def check_verus_contract(pdir, rep, contract):
         txt = open(p).read()
         ax = _check_axiom_decls(rep, rel, txt, vcfg)
         itcb = _check_included_tcb(rep, rel, txt, vcfg)
-        _axiom_keyword_shout(rep, rel, txt)
+        _axiom_keyword_scan(rep, rel, txt, vcfg)
         if ax or itcb:
             out[rel] = {"path_included": True, "axiom_decls": ax,
                         "tcb_items": itcb}
@@ -7226,6 +7427,55 @@ def check_driver_identity(pdir, rep, contract, verus_ok=frozenset(),
 # 7. sanitizers
 # ==========================================================================
 
+def _san_build(pdir, rep, kernel, tag):
+    """The ASan+UBSan build line, once, for one C kernel TU. `None` on failure.
+
+    ⚠ **Factored out at TASK_151 so the HARDENED arm is built by THE SAME LINE
+    as the plain one and cannot drift from it.** Two copies of a compiler
+    invocation is how `-fstrict-aliasing` came to be missing from one of them
+    (see the caller's docstring), and stage `7h` exists precisely to compare two
+    kernels under identical flags.
+
+    ⚠ `-static-libasan` / `-static-libubsan` are **gcc spellings and clang
+    rejects them**; a hand-run battery that did not check `build_errors` claimed
+    a clean result for four columns it never compiled (`TASK_149` §6). This
+    stage is gcc-only, as it always was, so the trap is recorded rather than
+    hit -- but a future clang column must not copy this line."""
+    out = os.path.join(REPO, ".temp", "build", buildmod.pattern_id(pdir), tag)
+    # This stage compiles its own binary and used to rely on `build.py` having
+    # created the directory earlier in the same run. Under `--no-build` on a
+    # fresh clone it died with a raw `ld: cannot open output file` (TASK_053).
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    cmd = [buildmod.GCC, "-std=c99", "-Wall", "-Wextra", "-O1", "-g",
+           "-fsanitize=address,undefined",
+           # See the caller's docstring: gcc turns this on at -O2, this stage
+           # builds at -O1, and without it stage 7 cannot see a flag-gated UB
+           # class.
+           "-fstrict-aliasing",
+           # the container has an LD_PRELOAD that breaks the shared ASan
+           # runtime's init ordering; static linking sidesteps it
+           "-static-libasan", "-static-libubsan",
+           "-DSLB_ISOLATED", "-I", os.path.join(REPO, "common"),
+           "-I", os.path.join(pdir, "c"),
+           os.path.join(REPO, "common", "driver.c"),
+           os.path.join(pdir, "c", kernel),
+           os.path.join(pdir, "c", "main.c"), "-o", out]
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    if r.returncode != 0:
+        rep.fail("sanitizer",
+                 f"asan build failed for c/{kernel}: "
+                 f"{(r.stdout + r.stderr)[-400:]}")
+        return None
+    return out
+
+
+def _san_fired(se):
+    """Did ASan or UBSan say anything? One spelling of the predicate, used by
+    both arms."""
+    return ("runtime error" in se or "AddressSanitizer" in se
+            or "UndefinedBehaviorSanitizer" in se or "ERROR:" in se)
+
+
 def check_sanitizers(pdir, rep, indir, models, budgets=None):
     """ASan/UBSan on the C rung, with a **per-input expectation**.
 
@@ -7281,30 +7531,14 @@ def check_sanitizers(pdir, rep, indir, models, budgets=None):
                                           and it is the row that shows why a
                                           sanitizer is not a miscompile
                                           detector.
+
+    ⚠⚠ **THIS ARM BUILDS `c/kernel.c` ONLY, AND THAT WAS THE WHOLE GATE UNTIL
+    TASK_151.** The R1h kernel is now stage `7h`
+    (`check_sanitizers_hardened`); read that function for why the gap mattered.
     """
     head("7. C rung under ASan + UBSan (per-input expectation)")
-    out = os.path.join(REPO, ".temp", "build",
-                       buildmod.pattern_id(pdir), "c-gcc-asan")
-    # This stage compiles its own binary and used to rely on `build.py` having
-    # created the directory earlier in the same run. Under `--no-build` on a
-    # fresh clone it died with a raw `ld: cannot open output file` (TASK_053).
-    os.makedirs(os.path.dirname(out), exist_ok=True)
-    cmd = [buildmod.GCC, "-std=c99", "-Wall", "-Wextra", "-O1", "-g",
-           "-fsanitize=address,undefined",
-           # See the docstring: gcc turns this on at -O2, this stage builds at
-           # -O1, and without it stage 7 cannot see a flag-gated UB class.
-           "-fstrict-aliasing",
-           # the container has an LD_PRELOAD that breaks the shared ASan
-           # runtime's init ordering; static linking sidesteps it
-           "-static-libasan", "-static-libubsan",
-           "-DSLB_ISOLATED", "-I", os.path.join(REPO, "common"),
-           "-I", os.path.join(pdir, "c"),
-           os.path.join(REPO, "common", "driver.c"),
-           os.path.join(pdir, "c", "kernel.c"),
-           os.path.join(pdir, "c", "main.c"), "-o", out]
-    r = subprocess.run(cmd, capture_output=True, text=True)
-    if r.returncode != 0:
-        rep.fail("sanitizer", f"asan build failed: {(r.stdout + r.stderr)[-400:]}")
+    out = _san_build(pdir, rep, "kernel.c", "c-gcc-asan")
+    if out is None:
         return {}
     budgets = budgets or {}
     res = {}
@@ -7317,8 +7551,7 @@ def check_sanitizers(pdir, rep, indir, models, budgets=None):
         expect = sbg(mod, "sanitizer_expect")
         m_exit = sbg(mod, "expected_exit")
         want_out = (sbg(mod, "expected_stdout") or "").strip()
-        fired = ("runtime error" in se or "AddressSanitizer" in se
-                 or "UndefinedBehaviorSanitizer" in se or "ERROR:" in se)
+        fired = _san_fired(se)
         diag = re.sub(r"\s+", " ", se.strip())[:300]
         res[name] = {"exit": rc, "expected_exit": m_exit,
                      "expect": expect, "fired": fired, "diagnostic": diag,
@@ -7409,6 +7642,135 @@ def check_sanitizers(pdir, rep, indir, models, budgets=None):
                   + ("  [adversarial: recorded, not required to agree]"
                      if name.startswith("adversarial")
                      else " matches the model"))
+    return res
+
+
+def check_sanitizers_hardened(pdir, rep, indir, models, budgets=None):
+    """⚠⚠ **THE R1h ARM UNDER ASan + UBSan — AND UNTIL TASK_151 THE GATE NEVER
+    RAN A DETECTOR ON IT, FOR ANY PATTERN.**
+
+    `check_sanitizers` above builds `c/kernel.c` / gcc / `-O1` and nothing else,
+    so `c/kernel_hardened.c` — **28 of the 29 patterns ship one** — was
+    structurally outside the gate. Found at `TASK_149` §6, and it is not a
+    hypothetical:
+
+      * **It already cost a wrong manager instruction.** The `p28d` variant
+        SEGVed **in the hardened arm on a BENIGN input** and its verification
+        never looked (`TASK_146` §1). ⚠ **Admission question 1 — is the C
+        program correct on benign inputs, so performance is measurable? — is a
+        question about exactly this arm**, and R1h is half of the R1-vs-R1h
+        comparison every "C is faster *because* it skipped the check" claim
+        rests on (`build.py`'s module docstring).
+      * `TASK_149` then hand-ran the missing cell for `p28` and found it
+        **clean over 88 (arm x detector x input) cells** — so this is a GATE
+        GAP, not a live defect, and the repair is what tells anyone whether the
+        other 27 rows are clean too.
+
+    **THE EXPECTATION, AND IT IS NOT PER-INPUT.** The plain arm reads
+    `model.sanitizer_expect` because an adversarial input is *defined* as the
+    one that trips the bug. **R1h is the rung that does NOT have the bug**, so
+    the expectation is `clean` on **EVERY** input, adversarial included — that
+    is what R1h *means*, and a per-input declaration here would let a pattern
+    declare its way out of the only thing this stage asks. **A row that fires
+    here is a real finding.**
+
+    **What is compared, and the scoping is measured rather than cautious**
+    (`.temp/t151/hardened_stdout.py`, all 28 hardened patterns):
+
+      any diagnostic, any input   FAIL.  Measured 0 over **2027** (pattern x
+                                  input) cells before this landed, so it costs
+                                  zero new failures today.
+      NON-adversarial exit+stdout FAIL on a mismatch. **72 of 72 non-adversarial
+                                  rows are byte-identical between the two arms**,
+                                  and the plain arm's are already checked against
+                                  `model.py`, so this is inherited, not assumed.
+      adversarial exit+stdout     RECORDED, never required — **74 of 139
+                                  adversarial rows DIFFER between the arms, and
+                                  that difference IS the result.** Requiring
+                                  agreement here would false-fail 74 rows.
+      a declared hang             RECORDED either way. ⚠ **`expected_hang` is a
+                                  claim about the BUGGY rung**: `p22`'s R1 runs
+                                  past the 120 s budget on `adversarial-full`
+                                  and its **R1h finishes in a second**. Neither
+                                  outcome is an error here.
+
+    ⚠ **Cost, measured before it was written rather than after** (the task file
+    predicted this would roughly double stage 7 and be the repair most likely
+    to blow the budget): the second build is **~0.3 s** and the extra runs are
+    **~3.9 s** per pattern, **117 s over all 28** — and that figure is an upper
+    bound, because the probe ran every `sweep-*` blob and this stage does not.
+    Against a sweep in which `check.py p28` alone takes 33 minutes it is
+    **noise**, so the narrowed fallback the task file offered — hardened arm on
+    non-adversarial inputs only — was **not** taken."""
+    head("7h. R1h (hardened C kernel) under ASan + UBSan -- clean on EVERY input")
+    if not buildmod.has_hardened(pdir):
+        # p01 is the whole population of this branch today: it models no bug,
+        # so there is no check to add back and no R1h to build.
+        print("    this pattern ships no c/kernel_hardened.c -- nothing to run")
+        return {}
+    out = _san_build(pdir, rep, "kernel_hardened.c", "c-gcc-h-asan")
+    if out is None:
+        return {}
+    budgets = budgets or {}
+    res = {}
+    nfired = 0
+    for name, mod in sorted(models.items()):
+        stem = stem_of(name)
+        hangs = sbg_opt(mod, "expected_hang", False)
+        rc, so, se = run_bin(out, os.path.join(indir, name),
+                             timeout=budgets.get(stem))
+        got = so.strip()
+        m_exit = sbg(mod, "expected_exit")
+        want_out = (sbg(mod, "expected_stdout") or "").strip()
+        fired = _san_fired(se)
+        diag = re.sub(r"\s+", " ", se.strip())[:300]
+        adversarial = name.startswith("adversarial")
+        res[name] = {"exit": rc, "expected_exit": m_exit, "expect": "clean",
+                     "fired": fired, "diagnostic": diag,
+                     "declared_hang": hangs, "hung": rc is None,
+                     "adversarial": adversarial,
+                     "stdout": got, "model_stdout": want_out}
+        if fired:
+            nfired += 1
+            rep.fail("sanitizer-hardened",
+                     f"{name}: ASan/UBSan fired on the HARDENED C rung: {diag}. "
+                     f"R1h is the arm that carries the check, so it is expected "
+                     f"clean on EVERY input including the adversarial ones -- "
+                     f"that is what the R1-vs-R1h comparison means. This is a "
+                     f"real finding about the pattern, not a gate false alarm: "
+                     f"the whole of stage 7h measured 0 firings over 2027 cells "
+                     f"across all 28 hardened patterns when it landed "
+                     f"(TASK_151). Report it; do not silence it.")
+        elif rc is None:
+            # No requirement in either direction -- see the docstring. Recorded
+            # so a reader can see WHICH arm ran forever, which is the axis
+            # `expected_hang` does not have.
+            rep.note(f"{name:28s} R1h did not terminate within "
+                     f"{budgets.get(stem)}s [declared_hang={hangs}; recorded, "
+                     f"not required]")
+        elif adversarial:
+            print(f"    ok   {name:28s} R1h clean, exit={rc}, stdout {got!r}"
+                  f"  [adversarial: recorded, not required to agree]")
+        elif rc != m_exit:
+            rep.fail("sanitizer-hardened",
+                     f"{name}: R1h exited {rc} on a NON-adversarial input, "
+                     f"model expects {m_exit}. The hardened rung must be "
+                     f"correct on benign inputs -- that is admission question 1 "
+                     f"and it is what `p28d` failed while the gate was not "
+                     f"looking (TASK_146 §1).")
+        elif got != want_out:
+            rep.fail("sanitizer-hardened",
+                     f"{name}: R1h printed {got!r} on a NON-adversarial input, "
+                     f"model says {want_out!r}. R1 and R1h must agree wherever "
+                     f"the bug is not exercised, or the R1-vs-R1h cost "
+                     f"comparison is between two different programs.")
+        else:
+            print(f"    ok   {name:28s} R1h clean, exit={rc} (model {m_exit}), "
+                  f"stdout {got!r} matches the model")
+    if res and not nfired:
+        rep.ok(f"R1h clean under ASan+UBSan on all {len(res)} input(s), "
+               f"adversarial included -- the arm no gate stage ran until "
+               f"TASK_151")
     return res
 
 
@@ -7785,10 +8147,20 @@ def check_table_render(pdir, rep, tables, gate_now):
     `verdict` changed.** Fixed in `report.py` by not rendering `verdict` at
     all, and the regression detector is
     `python3 harness/tools/table_render_inputs.py --selfref`, which exits 1 if
-    ANY run-scoped key reaches the render. ⚠ **The rule that generalises: this
-    stage may never `rep.shout`** -- `loud` IS rendered, so a shout here is the
-    same defect wearing a milder verb. `rep.fail` only, and `failures` is not
-    rendered (measured, not assumed: `--reads`).
+    any key OUTSIDE ITS ALLOW-LIST reaches the render. ⚠ **The rule that
+    generalises: this stage may never `rep.shout`** -- `loud` IS rendered, so a
+    shout here is the same defect wearing a milder verb. `rep.fail` only, and
+    `failures` is not rendered (measured, not assumed: `--reads`).
+
+    ⚠⚠ **THAT DETECTOR WAS A HAND-WRITTEN DENY-LIST UNTIL TASK_151 AND IT WAS
+    BLIND TO THIS STAGE'S OWN VERDICT.** Its tuple named 9 of the record's 34
+    keys, so a `report.py` rendering `table_render` measured `26/26 READ` while
+    `--selfref` printed `0` and passed (`TASK_132`, `RECAP` finding 46 (iii)).
+    It is now a census over every key each record carries, with an allow-list of
+    four and a `--selftest` must-fire arm. ⚠ **Note what that means for anything
+    added to the gate record from here on -- including TASK_151's own
+    `sanitizer_hardened`: a new key is FORBIDDEN in the render by default, and
+    the detector covers it without anyone remembering to list it.**
 
     ⚠⚠⚠ **THE ONE-RUN LAG. IT WAS REAL, THIS DOCSTRING CALLED IT *"THE STATUS
     QUO, NOT A NEW DEFECT"*, AND THAT DEFENCE WAS WRONG -- IT THEN COST TWO
@@ -8741,6 +9113,10 @@ def main():
                                     slopes.pop("_cg_files", None),
                                     slopes.pop("_cg_probe", None))
     san = check_sanitizers(pdir, rep, indir, all_models, budgets)
+    # TASK_151. The same detector on the OTHER C arm -- until then no gate stage
+    # ran one on `c/kernel_hardened.c` in any pattern, which is the cell that
+    # already cost a wrong manager instruction (`p28d`, TASK_146 §1).
+    san_h = check_sanitizers_hardened(pdir, rep, indir, all_models, budgets)
     # `advtable` carries stage 4's per-rung `hung` column, which is the
     # per-rung axis `model.expected_hang` does not have (TASK_077, "Owed" 19a).
     # Stage 4 runs at :6271 above, so the measurement is in hand by here.
@@ -8960,6 +9336,13 @@ def main():
         "driver_loops": drivers,
         "adversarial": advtable,
         "sanitizer": san,
+        # TASK_151, stage 7h. ⚠ Its OWN key rather than a field of `sanitizer`,
+        # for the same reason `table_render` is not a field of
+        # `published_table`: the two arms are held to DIFFERENT expectations --
+        # `sanitizer` is per-input from `model.sanitizer_expect`, this one is
+        # `clean` on every input -- and merging them would make a reader think
+        # one verdict covered both. `{}` for a pattern with no R1h (p01 only).
+        "sanitizer_hardened": san_h,
         "miri": miri,
         # TASK_107 §E: the two published sidecars nothing had a detector for.
         # RECAP owed-item 23 predicted its own recurrence and was right twice.

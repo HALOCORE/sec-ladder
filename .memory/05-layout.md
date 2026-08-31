@@ -728,7 +728,10 @@ silently and nothing in this repo will notice.** `--check-stale` globs
 - ⚠⚠⚠ **RETIRED, AND IT WAS WRONG IN KIND RATHER THAN IN COUNT.**
   ~~*"STILL UNPINNED: 21 `controls/*.py` sidecars across 12 patterns"*~~ —
   ✅ **`TASK_141`: 6 of 6 committed `controls/*.json` ALREADY carry a pin; ZERO
-  outstanding. The 21 are GENERATORS, and they all `json.dump` into gitignored
+  outstanding.** ⚠ **THE COUNT IS NOW `16` OF `16`** (`TASK_151`, re-derived —
+  `p29`, `p32` and `p28` each added several); **all still `derived_from_sha256`,
+  so the conclusion is unchanged and only the denominator moved.** ⚠ **Do not
+  quote "6 of 6": run `ls patterns/*/controls/*.json | wc -l`. The 21 are GENERATORS, and they all `json.dump` into gitignored
   `.temp/` — outside stage 9b's only glob — so a `derived_from_sha256` from any
   of them would be read by NOTHING.** ⚠ **And the parenthetical reason
   *"because the glob is `controls/*.py`"* is ALSO false now: `TASK_142` widened
@@ -738,7 +741,7 @@ silently and nothing in this repo will notice.** `--check-stale` globs
   tidiness: stage 9b accepts `gate_source_sha256` as well as
   `derived_from_sha256`, so a sidecar using the former AND sitting inside
   `source_sha256` would be an UNREACHABLE FIXPOINT — writing it moves the digest
-  it must equal.** ✅ **No sidecar uses that key today (6 of 6 use
+  it must equal.** ✅ **No sidecar uses that key today (16 of 16 use
   `derived_from_sha256`), so the hazard was one sidecar away and is now designed
   out.**
 
@@ -791,6 +794,18 @@ written, `contract_diff.py` proves what changed since, and only the second
 survives hand-editing. ⚠ **A new pattern should still promote its generator if
 it has one; the point is that `spec.md` being hand-maintained is now a RECORDED
 state rather than an undisclosed skew.**
+
+⚠⚠ **RE-EMITTING `synthesis/licence.json` IS A REQUIRED STEP AFTER ANY
+`harness/*.py` EDIT, AND IT IS EASY TO MISS.** The sidecar pins each gate
+record's `source_sha256`, which **every** `harness/*.py` edit moves — so a
+sweep followed by a bare `synthesize.py` publishes false **`LICENCE STALE`**
+verdicts. ✅ **Order: `python3 synthesis/licence.py --emit synthesis/licence.json`
+THEN `python3 synthesis/synthesize.py`.** ⚠ **The `--emit` TAKES A PATH; bare
+`--emit` exits `rc=2` and writes NOTHING.** ⚠⚠ **AND IT READS ITS POPULATION
+FROM `.temp/build/`, so a stray scratch pattern id there KILLS IT** — `TASK_151`
+hit `KeyError: 'p90'` from its own arm's sandbox and added the cleanup to that
+generator's `finally`. **If it crashes, look in `.temp/build/` before looking at
+the code.**
 
 ⚠ **`harness/tools/temp_citations.py` had TWO defects and both are fixed
 (`TASK_132`): it matched `.temp/` ANYWHERE in a line, so an absolute path into

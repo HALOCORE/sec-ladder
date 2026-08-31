@@ -344,8 +344,8 @@ def read_gate_loud(pattern, gate=None):
     job** and never settles. Measured before removing it: **19 of the 26
     tables changed bytes when the record's `verdict` changed**; the standing
     regression detector is `python3 harness/tools/table_render_inputs.py
-    --selfref`, which exits 1 if any run-scoped key reaches the render again.
-    ⚠ `rep.shout` would be worse, not better:
+    --selfref`, which exits 1 if any key outside the allow-list reaches the
+    render again. ⚠ `rep.shout` would be worse, not better:
     `loud` is rendered by `shout_section` below, so a shout is self-referential
     too.
 
@@ -356,6 +356,15 @@ def read_gate_loud(pattern, gate=None):
     `verdict` and `blocked` are functions of the run. The gate verdict is still
     in `results/gate/<pattern>.json`, one hop away, and stage 9c's own record
     key `table_render` says whether this table is current.
+
+    ⚠⚠ **AND THE DETECTOR WAS A DENY-LIST UNTIL TASK_151, WHICH IS WHY THAT
+    SENTENCE NOW NAMES AN ALLOW-LIST.** Its hand-written tuple classified 9 of
+    the record's 34 keys, so a `report.py` that rendered `table_render` --
+    **stage 9c's own verdict about this very table** -- measured `26/26 READ`
+    while `--selfref` printed `0` and exited `PASS` (`TASK_132`; `RECAP`
+    finding 46 (iii)). `--selfref` is now a **census over every key the record
+    has**, permitting only the four named above, and `--selftest` is its
+    must-fire arm.
 
     `gate`: see `gate_record`. The one-run lag this docstring's oscillation
     argument is a cousin of was closed at TASK_141 by passing the run's own
