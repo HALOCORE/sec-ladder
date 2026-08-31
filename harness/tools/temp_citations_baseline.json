@@ -15,7 +15,7 @@
   "generated-record": "the string is inside a GENERATED artefact; not a citation",
   "lost": "gone and not regenerable; the note says what it showed"
  },
- "count": 97,
+ "count": 95,
  "entries": [
   {
    "file": "TOOLCHAIN.md",
@@ -502,6 +502,42 @@
    "note": "the citing line is the assignment that CREATES this directory when the script runs -- an ASSEMBLED path (`os.path.join(REPO, \".temp\", ...)`), invisible to this checker until TASK_132 fixed defect 2. Not a reference to evidence; nothing is lost when it is absent."
   },
   {
+   "file": "patterns/p25-realloc-growth/controls/proof_mutants.json",
+   "lines": [
+    29
+   ],
+   "path": ".temp/p25ctl/mut_attack.rs",
+   "kind": "quote",
+   "note": "the citing text is VERUS'S OWN DIAGNOSTIC, captured verbatim in the control's `tail` field -- the absolute path is part of the compiler's error message, not a reference to evidence. `proof_mutants.py` writes each mutant under `.temp/p25ctl/`, runs `verus_run.py` on it and deletes it on success; the mutant DEFINITIONS live in the script, which is committed and regenerates every one."
+  },
+  {
+   "file": "patterns/p25-realloc-growth/controls/proof_mutants.json",
+   "lines": [
+    65
+   ],
+   "path": ".temp/p25ctl/mut_spec_weaken.rs",
+   "kind": "quote",
+   "note": "the citing text is VERUS'S OWN DIAGNOSTIC, captured verbatim in the control's `tail` field -- the absolute path is part of the compiler's error message, not a reference to evidence. `proof_mutants.py` writes each mutant under `.temp/p25ctl/`, runs `verus_run.py` on it and deletes it on success; the mutant DEFINITIONS live in the script, which is committed and regenerates every one."
+  },
+  {
+   "file": "patterns/p25-realloc-growth/controls/proof_mutants.json",
+   "lines": [
+    53
+   ],
+   "path": ".temp/p25ctl/mut_vacuity.rs",
+   "kind": "quote",
+   "note": "the citing text is VERUS'S OWN DIAGNOSTIC, captured verbatim in the control's `tail` field -- the absolute path is part of the compiler's error message, not a reference to evidence. `proof_mutants.py` writes each mutant under `.temp/p25ctl/`, runs `verus_run.py` on it and deletes it on success; the mutant DEFINITIONS live in the script, which is committed and regenerates every one."
+  },
+  {
+   "file": "patterns/p25-realloc-growth/controls/proof_mutants.json",
+   "lines": [
+    41
+   ],
+   "path": ".temp/p25ctl/mut_x1.rs",
+   "kind": "quote",
+   "note": "the citing text is VERUS'S OWN DIAGNOSTIC, captured verbatim in the control's `tail` field -- the absolute path is part of the compiler's error message, not a reference to evidence. `proof_mutants.py` writes each mutant under `.temp/p25ctl/`, runs `verus_run.py` on it and deletes it on success; the mutant DEFINITIONS live in the script, which is committed and regenerates every one."
+  },
+  {
    "file": "patterns/p27-handle-table/NOTES.md",
    "lines": [
     492
@@ -610,18 +646,9 @@
    "note": "`repro.py`'s OWN build output directory, split off from `.temp/build/p32-arms` at TASK_147 so that a neighbour control's binary can no longer be enumerated by this one's `os.listdir`. The script creates it and rebuilds its binaries; they are deleted as artefacts."
   },
   {
-   "file": "patterns/p34-refcount-stack/controls/detectors.py",
-   "lines": [
-    83
-   ],
-   "path": ".temp/p34ctl",
-   "kind": "destination",
-   "note": "the citing line is the assignment that CREATES this scratch directory when the control runs (`os.path.join(REPO, \".temp\", \"p34ctl\")`) -- an ASSEMBLED path. detectors.py builds and runs ctl_asan.c / ctl_ubsan.c there and deletes the binaries on success; nothing is lost when it is absent."
-  },
-  {
    "file": "patterns/p34-refcount-stack/controls/proof_mutants.py",
    "lines": [
-    56
+    83
    ],
    "path": ".temp/p34mut",
    "kind": "destination",
@@ -630,56 +657,11 @@
   {
    "file": "patterns/p34-refcount-stack/controls/proof_mutants.py",
    "lines": [
-    37
+    64
    ],
    "path": ".temp/p34mut/",
    "kind": "destination",
    "note": "prose spelling of the same path, in the docstring that states the mutants are written there and deleted on success. A QUOTE, not a reference to evidence."
-  },
-  {
-   "file": "patterns/p34-refcount-stack/controls/rust_bug.py",
-   "lines": [
-    61
-   ],
-   "path": ".temp/p34ctl",
-   "kind": "destination",
-   "note": "same shared scratch directory, created by the citing assignment. rust_bug.py compiles the raw-pointer bug arm there; the arm SOURCE is committed at controls/arm_unsafe_bug.rs and the binary is re-derivable."
-  },
-  {
-   "file": "patterns/p34-refcount-stack/controls/safe_arms.py",
-   "lines": [
-    71
-   ],
-   "path": ".temp/p34ctl",
-   "kind": "destination",
-   "note": "same shared scratch directory, created by the citing assignment. safe_arms.py compiles the three safe ports there; all three SOURCES are committed as controls/arm_safe_{arena,rc_borrow,rc_move}.rs, so only the binaries are absent."
-  },
-  {
-   "file": "patterns/p34-refcount-stack/controls/safety_line.py",
-   "lines": [
-    102
-   ],
-   "path": ".temp/p34ctl",
-   "kind": "destination",
-   "note": "same shared scratch directory, created by the citing assignment. safety_line.py preprocesses controls/arm_body.inc twice there to re-derive the +1/-0 safety-line diff; the .inc is committed."
-  },
-  {
-   "file": "patterns/p34-refcount-stack/controls/spellings.py",
-   "lines": [
-    74
-   ],
-   "path": ".temp/p34ctl",
-   "kind": "destination",
-   "note": "same shared scratch directory, created by the citing assignment. spellings.py builds each R3/R4 respelling there and measures it; the spellings are emitted by the script itself, so the script IS the generator."
-  },
-  {
-   "file": "patterns/p34-refcount-stack/controls/spellings.py",
-   "lines": [
-    267
-   ],
-   "path": ".temp/p34ctl/",
-   "kind": "destination",
-   "note": "prose spelling of the same assembled path, in the comment that explains why the rung sources need a two-level-up include path when built out of tree. A QUOTE of the directory name, not a reference to evidence."
   },
   {
    "file": "patterns/p36-vtable-dispatch/NOTES.md",
