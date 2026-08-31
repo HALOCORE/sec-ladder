@@ -36,13 +36,33 @@ context still applies — do not restart from scratch.
    | grep -o 'p[0-9]*'` also matches the `p` in `patterns/`, so it reports every
    pattern missing and reads as a catastrophe. Use `basename`:
 
+   ⚠⚠⚠ **AND THE CHECK AS FIRST WRITTEN GIVES A FALSE PASS. FOUND AT
+   `TASK_155` M6, ON `p34`, BY THE REVIEWER — AND THE MANAGER HAD RUN IT, SEEN
+   SILENCE, AND MOVED ON THE SAME SESSION.** The struck spelling greps the
+   **whole findings section** for a mention, and a pattern is mentioned there
+   long before it is built: `p34` appeared **six** times in pre-build catalogue
+   findings, so the loop stayed silent while `p34` had no finding, was absent
+   from `results/synthesis.md`, and `RECAP.md`'s own box still said its build
+   task did not exist. ⚠ **A MENTION IS NOT AN ANCHOR.** ✅ **The repair is to
+   grep only the finding HEADERS** — the numbered lines, which is where a row's
+   own result is announced:
+
    ```sh
-   awk '/^## The findings so far/,/^## Retracted/' RECAP.md > .temp/f.$$
+   awk '/^## The findings so far/,/^## Retracted/' RECAP.md \
+     | grep -E '^[0-9]+\. ' > .temp/h.$$
    for d in patterns/p*/; do id=$(basename "$d" | cut -d- -f1)
-     grep -q "\b$id\b" .temp/f.$$ || echo "MISSING: $id"; done; rm -f .temp/f.$$
+     grep -q "\b$id\b" .temp/h.$$ || echo "MISSING: $id"; done; rm -f .temp/h.$$
    ```
-   ⚠ **`.temp/`, not `/tmp` — constraint 1, and the manager broke it writing
-   this very check.**
+
+   ✅ **Manager-verified: on a tree where the old form printed NOTHING, this one
+   prints `p34` (correct — it had no finding) and `p01` (correct and benign —
+   the calibration row models no bug and announces no result).** ⚠ **One known
+   benign exception is what a working check looks like; silence is what a broken
+   one looks like.** ⚠ **`.temp/`, not `/tmp` — constraint 1, and the manager
+   broke it writing this very check.**
+   ⚠⚠ **THE GENERAL LESSON, AND IT IS THE THIRD TIME THIS PROJECT HAS PAID IT:
+   *before believing a check, ask what would make it FAIL.* Here nothing would
+   have, for any pattern the catalogue had ever discussed.**
    ⚠⚠ **THE RUNNING COUNT BREAKS UNDER CONCURRENCY, AND IT BROKE AT TASK_099.**
    Rule 2 puts the count in **one** place — the newest task file's closing
    paragraph. **Three agents running at once means three task files, each written
