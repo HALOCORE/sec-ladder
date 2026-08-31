@@ -1,0 +1,478 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p25-realloc-growth/controls/no_stale.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p25-realloc-growth/model.py": "f4ea1bfba72471b74b47728b0eadd568df6a9e8992193972c63a1462ff44d22b",
+    "patterns/p25-realloc-growth/inputs/gen.py": "39c40b42328cb74e7dbddf6c41df641d51a3b2e1ee0b24bee89f0a3a1516aa78",
+    "patterns/p25-realloc-growth/controls/no_stale.py": "de46cf6c95c79bc283353e1d90db5c7d425c4cf86c2ef1a7a8c9bc10f39f15d3"
+  },
+  "measured_utc": "2026-08-31T17:09:11Z",
+  "files": [
+    {
+      "file": "adversarial-lateread.bin",
+      "windows": 1,
+      "stale_windows": [
+        0
+      ],
+      "class": "adversarial",
+      "must_be_clean": false
+    },
+    {
+      "file": "adversarial-many.bin",
+      "windows": 1,
+      "stale_windows": [
+        0
+      ],
+      "class": "adversarial",
+      "must_be_clean": false
+    },
+    {
+      "file": "adversarial-move.bin",
+      "windows": 1,
+      "stale_windows": [
+        0
+      ],
+      "class": "adversarial",
+      "must_be_clean": false
+    },
+    {
+      "file": "adversarial-nogrow.bin",
+      "windows": 1,
+      "stale_windows": [],
+      "class": "adversarial",
+      "must_be_clean": true
+    },
+    {
+      "file": "adversarial-stride3.bin",
+      "windows": 0,
+      "stale_windows": [],
+      "class": "adversarial",
+      "must_be_clean": true
+    },
+    {
+      "file": "degenerate.bin",
+      "windows": 1,
+      "stale_windows": [],
+      "class": "matrix",
+      "must_be_clean": true
+    },
+    {
+      "file": "large.bin",
+      "windows": 64,
+      "stale_windows": [],
+      "class": "matrix",
+      "must_be_clean": true
+    },
+    {
+      "file": "small.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "matrix",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o008.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o012.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o016.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o020.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o024.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o028.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o032.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o036.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o040.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o044.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o048.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o052.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o056.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o060.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o064.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o068.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o072.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o076.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o080.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o084.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o088.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o092.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o096.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o100.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o104.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o108.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o112.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o116.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o120.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o124.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-o128.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-r000.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-r005.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-r010.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-r015.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-r020.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-r025.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-r030.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-r035.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-r040.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-r045.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-r050.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-r055.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-r060.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-r065.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-r070.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-r075.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-r080.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-t010.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-t020.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-t030.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-t040.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-t050.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-t060.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-t070.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-t080.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    },
+    {
+      "file": "sweep-t090.bin",
+      "windows": 8,
+      "stale_windows": [],
+      "class": "sweep",
+      "must_be_clean": true
+    }
+  ],
+  "n_matrix_files": 8,
+  "n_sweep_files": 57,
+  "problems": [],
+  "invariant": "No non-adversarial window, and no window of adversarial-nogrow or adversarial-stride3, reads through an interior pointer whose token vector was reallocated after the SAVE; and every OTHER adversarial file has at least one window that does. The blobs are gitignored, so the hashes pinned above are the GENERATOR and the model, not the .bin files."
+}

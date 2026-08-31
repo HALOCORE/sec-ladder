@@ -1,0 +1,128 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p25-realloc-growth/controls/rederive.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p25-realloc-growth/c/kernel.c": "f3c0be0f0ed65cf375eef01d07c34386b79ebd582c63338557234fa4fa73a845",
+    "patterns/p25-realloc-growth/c/kernel_hardened.c": "8c6f35e4f7f9b99228938b0ab7c27c5423f90428ba82a54f994e9e29753d3fdb",
+    "patterns/p25-realloc-growth/c/main.c": "1734d2d11d8bcce6b6b370a210eb62ccef8b8e9f0522907c12182c448f1b52b8",
+    "patterns/p25-realloc-growth/model.py": "f4ea1bfba72471b74b47728b0eadd568df6a9e8992193972c63a1462ff44d22b",
+    "patterns/p25-realloc-growth/inputs/gen.py": "39c40b42328cb74e7dbddf6c41df641d51a3b2e1ee0b24bee89f0a3a1516aa78",
+    "patterns/p25-realloc-growth/controls/rederive.py": "b154139ab08a5aaf69e0f4eaa9efd8b76f20e71ca0fb0eac377e9925285a2d29",
+    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3"
+  },
+  "measured_utc": "2026-08-31T16:57:00Z",
+  "substitution": {
+    "from": "\n                v = (uint64_t)*cur;\n",
+    "to": "\n                v = (uint64_t)toks[curi];\n",
+    "count": 1
+  },
+  "checksums": {
+    "adversarial-lateread.bin": {
+      "stdout": "14062580838451436544",
+      "model": "14062580838451436544",
+      "fired": false
+    },
+    "adversarial-many.bin": {
+      "stdout": "418471180153818624",
+      "model": "418471180153818624",
+      "fired": false
+    },
+    "adversarial-move.bin": {
+      "stdout": "11296769385036522496",
+      "model": "11296769385036522496",
+      "fired": false
+    },
+    "adversarial-nogrow.bin": {
+      "stdout": "16907751744586910720",
+      "model": "16907751744586910720",
+      "fired": false
+    },
+    "adversarial-stride3.bin": {
+      "stdout": "0",
+      "model": "0",
+      "fired": false
+    },
+    "degenerate.bin": {
+      "stdout": "14970537519737710592",
+      "model": "14970537519737710592",
+      "fired": false
+    },
+    "large.bin": {
+      "stdout": "7796663744873786006",
+      "model": "7796663744873786006",
+      "fired": false
+    },
+    "small.bin": {
+      "stdout": "18234900705708003722",
+      "model": "18234900705708003722",
+      "fired": false
+    }
+  },
+  "static_kernel_insns": {
+    "gcc/O0/R1": {
+      "n_fn_nopad": 218,
+      "fn_bytes": 1002
+    },
+    "gcc/O0/R1h": {
+      "n_fn_nopad": 228,
+      "fn_bytes": 1044
+    },
+    "gcc/O0/rederive": {
+      "n_fn_nopad": 220,
+      "fn_bytes": 1015
+    },
+    "gcc/O3/R1": {
+      "n_fn_nopad": 165,
+      "fn_bytes": 653
+    },
+    "gcc/O3/R1h": {
+      "n_fn_nopad": 176,
+      "fn_bytes": 732
+    },
+    "gcc/O3/rederive": {
+      "n_fn_nopad": 168,
+      "fn_bytes": 684
+    },
+    "clang/O0/R1": {
+      "n_fn_nopad": 209,
+      "fn_bytes": 1007
+    },
+    "clang/O0/R1h": {
+      "n_fn_nopad": 218,
+      "fn_bytes": 1040
+    },
+    "clang/O0/rederive": {
+      "n_fn_nopad": 210,
+      "fn_bytes": 1012
+    },
+    "clang/O3/R1": {
+      "n_fn_nopad": 150,
+      "fn_bytes": 634
+    },
+    "clang/O3/R1h": {
+      "n_fn_nopad": 162,
+      "fn_bytes": 652
+    },
+    "clang/O3/rederive": {
+      "n_fn_nopad": 152,
+      "fn_bytes": 618
+    }
+  },
+  "marginal_ir_per_call": {
+    "small.bin/O0/R1": 1375.16,
+    "small.bin/O0/R1h": 1389.92,
+    "small.bin/O0/rederive": 1382.54,
+    "small.bin/O3/R1": 703.85,
+    "small.bin/O3/R1h": 728.54,
+    "small.bin/O3/rederive": 714.72,
+    "large.bin/O0/R1": 6540.98,
+    "large.bin/O0/R1h": 6672.06,
+    "large.bin/O0/rederive": 6606.52,
+    "large.bin/O3/R1": 3173.74,
+    "large.bin/O3/R1h": 3338.13,
+    "large.bin/O3/rederive": 3239.41
+  },
+  "problems": [],
+  "invariant": "The UNCONDITIONAL re-derive -- the only C rung that DR 400 cannot reach, because it never dereferences `cur` -- agrees with model.py on EVERY input including the adversarial ones, is sanitizer-clean everywhere, and its static and marginal costs are recorded beside R1's and R1h's at both optimisation levels. \u26a0 Neither repair's SPELLING has been searched; the figures are the cost of THESE two spellings, never of 'the repair'."
+}

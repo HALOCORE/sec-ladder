@@ -1,0 +1,85 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p25-realloc-growth/controls/safe_arms.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p25-realloc-growth/model.py": "f4ea1bfba72471b74b47728b0eadd568df6a9e8992193972c63a1462ff44d22b",
+    "patterns/p25-realloc-growth/inputs/gen.py": "39c40b42328cb74e7dbddf6c41df641d51a3b2e1ee0b24bee89f0a3a1516aa78",
+    "patterns/p25-realloc-growth/safe_naive.rs": "0c305588caea7d4b18d6e3ee9365d4ca14f58048da1024e090583b1c1fd496af",
+    "patterns/p25-realloc-growth/controls/safe_arms.py": "64a0677496fd948d4c0e1f95b4c5486bb73e6cbeb451c151024dd98816b1da36",
+    "patterns/p25-realloc-growth/controls/arm_safe_ptr.rs": "6d0600641c0fb7d08819d5219f182a48fe82185162a521c6d5d71030155b1824",
+    "patterns/p25-realloc-growth/controls/arm_safe_ptr_nopush.rs": "a957066783496128f2b6fa32840c62484f91e39625515e90263a225bd4dd7dd4",
+    "patterns/p25-realloc-growth/controls/arm_safe_negctl.rs": "58a1322c0f81de79156d029a3d6364283fe27218ca5a780bd83e555413db5d48",
+    "patterns/p25-realloc-growth/controls/arm_safe_index.rs": "3b410dae0cedd74999c3c7165a52c38bf8b79e5e65d44e39a7649c9fcc5842b5"
+  },
+  "measured_utc": "2026-08-31T16:54:44Z",
+  "arms": [
+    {
+      "arm": "A",
+      "source": "arm_safe_ptr.rs",
+      "compiles": false,
+      "error_codes": [
+        "E0502"
+      ],
+      "what": "the interior pointer across the push",
+      "diagnostic": "error[E0502]: cannot borrow `toks` as mutable because it is also borrowed as immutable --> /home/apt/repos_common/sec-ladder/patterns/p25-realloc-growth/controls/arm_safe_ptr.rs:41:17 | 41 | toks.push(a); | ^^^^^^^^^^^^ mutable borrow occurs here ... 57 | cur = Some(&toks[curi]); | ---- immutable borrow occurs here ... 63 | match cur { | --- immutable borrow later used here error: aborting due to "
+    },
+    {
+      "arm": "B",
+      "source": "arm_safe_ptr_nopush.rs",
+      "compiles": true,
+      "error_codes": [],
+      "what": "the same file with the push deleted",
+      "diagnostic": ""
+    },
+    {
+      "arm": "C",
+      "source": "arm_safe_negctl.rs",
+      "compiles": false,
+      "error_codes": [
+        "E0502"
+      ],
+      "what": "THE NEGATIVE CONTROL: no container",
+      "diagnostic": "error[E0502]: cannot borrow `s` as mutable because it is also borrowed as immutable --> /home/apt/repos_common/sec-ladder/patterns/p25-realloc-growth/controls/arm_safe_negctl.rs:32:10 | 31 | let r = &s.v; | ---- immutable borrow occurs here 32 | bump(&mut s); | ^^^^^^ mutable borrow occurs here 33 | println!(\"{}\", *r); | -- immutable borrow later used here error: aborting due to 1 previous error F"
+    },
+    {
+      "arm": "D",
+      "source": "arm_safe_index.rs",
+      "compiles": true,
+      "error_codes": [],
+      "what": "the index port",
+      "diagnostic": ""
+    }
+  ],
+  "shared_error_codes_A_and_C": [
+    "E0502"
+  ],
+  "index_port_vs_model": [
+    {
+      "input": "adversarial-move.bin",
+      "arm_d": "15929619903505355621",
+      "parse_fold": "15929619903505355621",
+      "agree": true
+    },
+    {
+      "input": "adversarial-lateread.bin",
+      "arm_d": "106624422387384795",
+      "parse_fold": "106624422387384795",
+      "agree": true
+    },
+    {
+      "input": "adversarial-many.bin",
+      "arm_d": "65457698703667799",
+      "parse_fold": "65457698703667799",
+      "agree": true
+    },
+    {
+      "input": "adversarial-nogrow.bin",
+      "arm_d": "16825141936780540791",
+      "parse_fold": "16825141936780540791",
+      "agree": true
+    }
+  ],
+  "problems": [],
+  "invariant": "The interior-pointer arm does not compile; the same file with the push deleted DOES, so the diagnostic is attributable; the NEGATIVE CONTROL -- no container, no growth, no saved reference -- does not compile either and prints the SAME code, so the code carries no information; and the index port compiles and agrees with model.py::parse_fold on every shipped adversarial window, i.e. the safe port has NO BUG rather than a prevented one."
+}

@@ -99,7 +99,7 @@ CLASSES = {
         "SAFETY LINE ask?' -- DOES NOT REACH EVERY ROW HERE: p28's safety line "
         "asks nothing, it is a maintaining WRITE, so its class is read off the "
         "HARM instead. See CAVEATS['p28']",
-        ["p27", "p28", "p29", "p32", "p34"],
+        ["p25", "p27", "p28", "p29", "p32", "p34"],
     ),
     "type": (
         "the bytes are read at a type they were not written at",
@@ -181,6 +181,29 @@ CAVEATS = {
            "g`), which asks a lifetime question. ⚠ Its stale-FREE consequence "
            "is ALIASING (two live handles naming one block), overlapping p08's "
            "class; the aliasing is the HARM, the stale generation is the BUG.",
+    "p25": "the object is NEVER `free`d by the program -- `realloc` RETIRES the "
+           "old block as a side effect of GROWTH, and the stale reference is an "
+           "INTERIOR pointer into the middle of a container rather than a "
+           "pointer to a whole object. Counted `temporal` on the HARM: a read "
+           "through a reference into storage the allocator has taken back. "
+           "\u26a0\u26a0 IT IS THE ONLY ROW IN THE TREE WHERE THE STORAGE MOVES "
+           "WHILE LOGICALLY LIVE -- manager-measured, `realloc` appears in 1 of "
+           "32 C rungs and that one is p25. \u26a0 The catalogue calls the row "
+           "'growth overflow, stale pointer'; THE GROWTH-OVERFLOW HALF IS "
+           "SPATIAL AND DID NOT SHIP, so the safety line names the stale-pointer "
+           "half only. \u26a0\u26a0 THE HARM WINDOW IS NARROW AND THAT IS A "
+           "PROPERTY OF THE ROW, NOT A WEAKNESS: exactly ONE of six doubling "
+           "growths relocates (16 -> 32), because a second live allocation (the "
+           "string table) sits behind the token vector -- with ONE vector and "
+           "nothing behind it glibc extends in place and the UB is "
+           "unobservable, which is what the retracted TASK_134 kill had "
+           "measured. \u26a0 ASan is a BIASED instrument here: its allocator "
+           "moves on EVERY realloc, so it fires even under a topology where "
+           "glibc never relocates -- the plain-build divergence is the unbiased "
+           "evidence. \u26a0 And R1 is NOT deterministic on the adversarial "
+           "input: every R1 answer is `min + 31*b` for the single stale byte "
+           "`b`, so R1 EQUALS R1h about 1 run in 256. Gated on the invariant "
+           "with no pinned count, p29's precedent.",
     "p34": "the safety line is a one-statement maintaining WRITE (`t->rc = "
            "t->rc + 1`), so like p28 it ASKS NOTHING and this table's stated "
            "test does not apply; `temporal` is read off the HARM -- a real "

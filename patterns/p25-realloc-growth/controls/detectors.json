@@ -1,0 +1,419 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p25-realloc-growth/controls/detectors.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p25-realloc-growth/c/kernel.c": "f3c0be0f0ed65cf375eef01d07c34386b79ebd582c63338557234fa4fa73a845",
+    "patterns/p25-realloc-growth/c/kernel_hardened.c": "8c6f35e4f7f9b99228938b0ab7c27c5423f90428ba82a54f994e9e29753d3fdb",
+    "patterns/p25-realloc-growth/c/main.c": "1734d2d11d8bcce6b6b370a210eb62ccef8b8e9f0522907c12182c448f1b52b8",
+    "patterns/p25-realloc-growth/model.py": "f4ea1bfba72471b74b47728b0eadd568df6a9e8992193972c63a1462ff44d22b",
+    "patterns/p25-realloc-growth/inputs/gen.py": "39c40b42328cb74e7dbddf6c41df641d51a3b2e1ee0b24bee89f0a3a1516aa78",
+    "patterns/p25-realloc-growth/controls/ctl_asan.c": "071970452350318bff570caa4063858bd73504366861c809104fa433ab5ecc26",
+    "patterns/p25-realloc-growth/controls/ctl_ubsan.c": "5044ffb4ededa68a84ff29376b4f73500a4155c2db1cfad1ef195c796ddf6ad8",
+    "patterns/p25-realloc-growth/controls/detectors.py": "422d521e20c82fbb79291606618865a0f86fe0c9dcf63ec6d274e971f62e39b7",
+    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3"
+  },
+  "measured_utc": "2026-08-31T16:52:35Z",
+  "positive_controls": [
+    {
+      "control": "ctl_asan.c",
+      "build": "asan",
+      "exit": 1,
+      "stdout": "",
+      "fired": {
+        "asan": true,
+        "ubsan": false
+      },
+      "diagnostic": "================================================================= ==1366242==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000013 at pc 0x55d0c2ee6341 bp 0x7ffdfd2100c0 sp 0x7ffdfd21"
+    },
+    {
+      "control": "ctl_asan.c",
+      "build": "ubsan",
+      "exit": 0,
+      "stdout": "ctl_asan 85",
+      "fired": {
+        "asan": false,
+        "ubsan": false
+      },
+      "diagnostic": ""
+    },
+    {
+      "control": "ctl_ubsan.c",
+      "build": "asan",
+      "exit": 0,
+      "stdout": "ctl_ubsan -2147483631",
+      "fired": {
+        "asan": false,
+        "ubsan": false
+      },
+      "diagnostic": ""
+    },
+    {
+      "control": "ctl_ubsan.c",
+      "build": "ubsan",
+      "exit": 1,
+      "stdout": "",
+      "fired": {
+        "asan": false,
+        "ubsan": true
+      },
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p25-realloc-growth/controls/ctl_ubsan.c:39:9: runtime error: signed integer overflow: 25 + 2147483640 cannot be represented in type 'int'"
+    }
+  ],
+  "kernels": [
+    {
+      "input": "adversarial-lateread.bin",
+      "arm": "R1",
+      "build": "asan",
+      "exit": 1,
+      "stdout": "",
+      "fired": true,
+      "model_expect": "fires",
+      "model_stdout": "14062580838451436544",
+      "diagnostic": "================================================================= ==1366317==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000073 at pc 0x55ab3bfe0826 bp 0x7ffdbe120a50 sp 0x7ffdbe12"
+    },
+    {
+      "input": "adversarial-lateread.bin",
+      "arm": "R1",
+      "build": "ubsan",
+      "exit": 0,
+      "stdout": "3528946245511863296",
+      "fired": false,
+      "model_expect": "fires",
+      "model_stdout": "14062580838451436544",
+      "diagnostic": ""
+    },
+    {
+      "input": "adversarial-lateread.bin",
+      "arm": "R1h",
+      "build": "asan",
+      "exit": 0,
+      "stdout": "14062580838451436544",
+      "fired": false,
+      "model_expect": "fires",
+      "model_stdout": "14062580838451436544",
+      "diagnostic": ""
+    },
+    {
+      "input": "adversarial-lateread.bin",
+      "arm": "R1h",
+      "build": "ubsan",
+      "exit": 0,
+      "stdout": "14062580838451436544",
+      "fired": false,
+      "model_expect": "fires",
+      "model_stdout": "14062580838451436544",
+      "diagnostic": ""
+    },
+    {
+      "input": "adversarial-many.bin",
+      "arm": "R1",
+      "build": "asan",
+      "exit": 1,
+      "stdout": "",
+      "fired": true,
+      "model_expect": "fires",
+      "model_stdout": "418471180153818624",
+      "diagnostic": "================================================================= ==1366342==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000051 at pc 0x5648a3bfc826 bp 0x7ffecb69b650 sp 0x7ffecb69"
+    },
+    {
+      "input": "adversarial-many.bin",
+      "arm": "R1",
+      "build": "ubsan",
+      "exit": 0,
+      "stdout": "1607464562486742528",
+      "fired": false,
+      "model_expect": "fires",
+      "model_stdout": "418471180153818624",
+      "diagnostic": ""
+    },
+    {
+      "input": "adversarial-many.bin",
+      "arm": "R1h",
+      "build": "asan",
+      "exit": 0,
+      "stdout": "418471180153818624",
+      "fired": false,
+      "model_expect": "fires",
+      "model_stdout": "418471180153818624",
+      "diagnostic": ""
+    },
+    {
+      "input": "adversarial-many.bin",
+      "arm": "R1h",
+      "build": "ubsan",
+      "exit": 0,
+      "stdout": "418471180153818624",
+      "fired": false,
+      "model_expect": "fires",
+      "model_stdout": "418471180153818624",
+      "diagnostic": ""
+    },
+    {
+      "input": "adversarial-move.bin",
+      "arm": "R1",
+      "build": "asan",
+      "exit": 1,
+      "stdout": "",
+      "fired": true,
+      "model_expect": "fires",
+      "model_stdout": "11296769385036522496",
+      "diagnostic": "================================================================= ==1366413==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000073 at pc 0x55921a3de826 bp 0x7ffd332581a0 sp 0x7ffd3325"
+    },
+    {
+      "input": "adversarial-move.bin",
+      "arm": "R1",
+      "build": "ubsan",
+      "exit": 0,
+      "stdout": "13108979121352709120",
+      "fired": false,
+      "model_expect": "fires",
+      "model_stdout": "11296769385036522496",
+      "diagnostic": ""
+    },
+    {
+      "input": "adversarial-move.bin",
+      "arm": "R1h",
+      "build": "asan",
+      "exit": 0,
+      "stdout": "11296769385036522496",
+      "fired": false,
+      "model_expect": "fires",
+      "model_stdout": "11296769385036522496",
+      "diagnostic": ""
+    },
+    {
+      "input": "adversarial-move.bin",
+      "arm": "R1h",
+      "build": "ubsan",
+      "exit": 0,
+      "stdout": "11296769385036522496",
+      "fired": false,
+      "model_expect": "fires",
+      "model_stdout": "11296769385036522496",
+      "diagnostic": ""
+    },
+    {
+      "input": "adversarial-nogrow.bin",
+      "arm": "R1",
+      "build": "asan",
+      "exit": 0,
+      "stdout": "16907751744586910720",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "16907751744586910720",
+      "diagnostic": ""
+    },
+    {
+      "input": "adversarial-nogrow.bin",
+      "arm": "R1",
+      "build": "ubsan",
+      "exit": 0,
+      "stdout": "16907751744586910720",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "16907751744586910720",
+      "diagnostic": ""
+    },
+    {
+      "input": "adversarial-nogrow.bin",
+      "arm": "R1h",
+      "build": "asan",
+      "exit": 0,
+      "stdout": "16907751744586910720",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "16907751744586910720",
+      "diagnostic": ""
+    },
+    {
+      "input": "adversarial-nogrow.bin",
+      "arm": "R1h",
+      "build": "ubsan",
+      "exit": 0,
+      "stdout": "16907751744586910720",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "16907751744586910720",
+      "diagnostic": ""
+    },
+    {
+      "input": "adversarial-stride3.bin",
+      "arm": "R1",
+      "build": "asan",
+      "exit": 0,
+      "stdout": "0",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "0",
+      "diagnostic": ""
+    },
+    {
+      "input": "adversarial-stride3.bin",
+      "arm": "R1",
+      "build": "ubsan",
+      "exit": 0,
+      "stdout": "0",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "0",
+      "diagnostic": ""
+    },
+    {
+      "input": "adversarial-stride3.bin",
+      "arm": "R1h",
+      "build": "asan",
+      "exit": 0,
+      "stdout": "0",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "0",
+      "diagnostic": ""
+    },
+    {
+      "input": "adversarial-stride3.bin",
+      "arm": "R1h",
+      "build": "ubsan",
+      "exit": 0,
+      "stdout": "0",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "0",
+      "diagnostic": ""
+    },
+    {
+      "input": "degenerate.bin",
+      "arm": "R1",
+      "build": "asan",
+      "exit": 0,
+      "stdout": "14970537519737710592",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "14970537519737710592",
+      "diagnostic": ""
+    },
+    {
+      "input": "degenerate.bin",
+      "arm": "R1",
+      "build": "ubsan",
+      "exit": 0,
+      "stdout": "14970537519737710592",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "14970537519737710592",
+      "diagnostic": ""
+    },
+    {
+      "input": "degenerate.bin",
+      "arm": "R1h",
+      "build": "asan",
+      "exit": 0,
+      "stdout": "14970537519737710592",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "14970537519737710592",
+      "diagnostic": ""
+    },
+    {
+      "input": "degenerate.bin",
+      "arm": "R1h",
+      "build": "ubsan",
+      "exit": 0,
+      "stdout": "14970537519737710592",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "14970537519737710592",
+      "diagnostic": ""
+    },
+    {
+      "input": "large.bin",
+      "arm": "R1",
+      "build": "asan",
+      "exit": 0,
+      "stdout": "7796663744873786006",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "7796663744873786006",
+      "diagnostic": ""
+    },
+    {
+      "input": "large.bin",
+      "arm": "R1",
+      "build": "ubsan",
+      "exit": 0,
+      "stdout": "7796663744873786006",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "7796663744873786006",
+      "diagnostic": ""
+    },
+    {
+      "input": "large.bin",
+      "arm": "R1h",
+      "build": "asan",
+      "exit": 0,
+      "stdout": "7796663744873786006",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "7796663744873786006",
+      "diagnostic": ""
+    },
+    {
+      "input": "large.bin",
+      "arm": "R1h",
+      "build": "ubsan",
+      "exit": 0,
+      "stdout": "7796663744873786006",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "7796663744873786006",
+      "diagnostic": ""
+    },
+    {
+      "input": "small.bin",
+      "arm": "R1",
+      "build": "asan",
+      "exit": 0,
+      "stdout": "18234900705708003722",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "18234900705708003722",
+      "diagnostic": ""
+    },
+    {
+      "input": "small.bin",
+      "arm": "R1",
+      "build": "ubsan",
+      "exit": 0,
+      "stdout": "18234900705708003722",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "18234900705708003722",
+      "diagnostic": ""
+    },
+    {
+      "input": "small.bin",
+      "arm": "R1h",
+      "build": "asan",
+      "exit": 0,
+      "stdout": "18234900705708003722",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "18234900705708003722",
+      "diagnostic": ""
+    },
+    {
+      "input": "small.bin",
+      "arm": "R1h",
+      "build": "ubsan",
+      "exit": 0,
+      "stdout": "18234900705708003722",
+      "fired": false,
+      "model_expect": "clean",
+      "model_stdout": "18234900705708003722",
+      "diagnostic": ""
+    }
+  ],
+  "problems": [],
+  "invariant": "Each positive control fires in its OWN detector and only there; R1's ASan column equals model.py's derived sanitizer_expect on every input; R1 is UBSan-silent on every input; and R1h is clean under BOTH detectors on every input including the adversarial ones (stage 7h's standard). \u26a0 ASan is a BIASED instrument here -- its allocator moves on every realloc -- so this table is the conservative half and reloc_probe.py is the unbiased one."
+}

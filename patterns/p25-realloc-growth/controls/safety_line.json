@@ -1,0 +1,35 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p25-realloc-growth/controls/safety_line.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p25-realloc-growth/c/kernel.c": "f3c0be0f0ed65cf375eef01d07c34386b79ebd582c63338557234fa4fa73a845",
+    "patterns/p25-realloc-growth/c/kernel_hardened.c": "8c6f35e4f7f9b99228938b0ab7c27c5423f90428ba82a54f994e9e29753d3fdb",
+    "patterns/p25-realloc-growth/c/kernel.h": "2c0e71f9b8d614628f17e70e6d990fcd8715682216858a2ae33fd4c83e24e611",
+    "patterns/p25-realloc-growth/controls/arm_body.inc": "2779e6a7d4760e1c624f2cf7d08abbd4f8f8d957d963305e66d4336c4cea2eba",
+    "patterns/p25-realloc-growth/controls/safety_line.py": "bc2dcda8160a6337f819e48e097993baffc64ab200c84d8d5967d066dda8e838"
+  },
+  "measured_utc": "2026-08-31T17:09:10Z",
+  "preprocessed_lines": {
+    "kernel.c": 328,
+    "kernel_hardened.c": 330,
+    "arm_body.inc@0": 328,
+    "arm_body.inc@1": 330
+  },
+  "added": [
+    "} else if (curbase == toks) {",
+    "v = (uint64_t)*cur;",
+    "v = (uint64_t)toks[curi];"
+  ],
+  "removed": [
+    "v = (uint64_t)*cur;"
+  ],
+  "conjunct_sites": 1,
+  "include_twice_reproduces_shipped": [
+    true,
+    true
+  ],
+  "problems": [],
+  "net_lines": 2,
+  "invariant": "The preprocessed difference between the two shipped C rungs is exactly: the unguarded read leaves, and the conjunct `curbase == toks`, that same read (now guarded) and the re-derive `toks[curi]` arrive -- +3 / -1, net +2, at exactly ONE site. It is NOT a pure addition, because the read MOVES. And the include-twice body in arm_body.inc preprocesses to each shipped file exactly. The counts are printed and recorded, never pinned in spec.md."
+}

@@ -1,0 +1,282 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p25-realloc-growth/controls/reloc_probe.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p25-realloc-growth/c/kernel.c": "f3c0be0f0ed65cf375eef01d07c34386b79ebd582c63338557234fa4fa73a845",
+    "patterns/p25-realloc-growth/c/main.c": "1734d2d11d8bcce6b6b370a210eb62ccef8b8e9f0522907c12182c448f1b52b8",
+    "patterns/p25-realloc-growth/controls/probe_realloc.c": "612b50fa69df433daf72ded68005aa52f779427cdc9a8894c3d6c62ae54a3a29",
+    "patterns/p25-realloc-growth/controls/reloc_probe.py": "44cb37d870039f469b5dfff0bdf9098c6d0f0ff828ba04e3aee95fe55d428347",
+    "patterns/p25-realloc-growth/inputs/gen.py": "39c40b42328cb74e7dbddf6c41df641d51a3b2e1ee0b24bee89f0a3a1516aa78",
+    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3"
+  },
+  "measured_utc": "2026-08-31T17:09:11Z",
+  "compilers": [
+    "clang",
+    "gcc"
+  ],
+  "events": {
+    "adversarial-move.bin/gcc": [
+      {
+        "n": 0,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 1,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 2,
+        "size": 8,
+        "moved": false
+      },
+      {
+        "n": 3,
+        "size": 16,
+        "moved": false
+      },
+      {
+        "n": 4,
+        "size": 32,
+        "moved": true
+      }
+    ],
+    "adversarial-move.bin/clang": [
+      {
+        "n": 0,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 1,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 2,
+        "size": 8,
+        "moved": false
+      },
+      {
+        "n": 3,
+        "size": 16,
+        "moved": false
+      },
+      {
+        "n": 4,
+        "size": 32,
+        "moved": true
+      }
+    ],
+    "adversarial-lateread.bin/gcc": [
+      {
+        "n": 0,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 1,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 2,
+        "size": 8,
+        "moved": false
+      },
+      {
+        "n": 3,
+        "size": 16,
+        "moved": false
+      },
+      {
+        "n": 4,
+        "size": 32,
+        "moved": true
+      }
+    ],
+    "adversarial-lateread.bin/clang": [
+      {
+        "n": 0,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 1,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 2,
+        "size": 8,
+        "moved": false
+      },
+      {
+        "n": 3,
+        "size": 16,
+        "moved": false
+      },
+      {
+        "n": 4,
+        "size": 32,
+        "moved": true
+      }
+    ],
+    "adversarial-many.bin/gcc": [
+      {
+        "n": 0,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 1,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 2,
+        "size": 8,
+        "moved": false
+      },
+      {
+        "n": 3,
+        "size": 16,
+        "moved": false
+      },
+      {
+        "n": 4,
+        "size": 32,
+        "moved": true
+      },
+      {
+        "n": 5,
+        "size": 64,
+        "moved": false
+      },
+      {
+        "n": 6,
+        "size": 8,
+        "moved": false
+      }
+    ],
+    "adversarial-many.bin/clang": [
+      {
+        "n": 0,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 1,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 2,
+        "size": 8,
+        "moved": false
+      },
+      {
+        "n": 3,
+        "size": 16,
+        "moved": false
+      },
+      {
+        "n": 4,
+        "size": 32,
+        "moved": true
+      },
+      {
+        "n": 5,
+        "size": 64,
+        "moved": false
+      },
+      {
+        "n": 6,
+        "size": 8,
+        "moved": false
+      }
+    ],
+    "adversarial-nogrow.bin/gcc": [
+      {
+        "n": 0,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 1,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 2,
+        "size": 8,
+        "moved": false
+      }
+    ],
+    "adversarial-nogrow.bin/clang": [
+      {
+        "n": 0,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 1,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 2,
+        "size": 8,
+        "moved": false
+      }
+    ],
+    "small.bin/gcc": [
+      {
+        "n": 0,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 1,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 2,
+        "size": 8,
+        "moved": false
+      },
+      {
+        "n": 3,
+        "size": 8,
+        "moved": false
+      }
+    ],
+    "small.bin/clang": [
+      {
+        "n": 0,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 1,
+        "size": 4,
+        "moved": false
+      },
+      {
+        "n": 2,
+        "size": 8,
+        "moved": false
+      },
+      {
+        "n": 3,
+        "size": 8,
+        "moved": false
+      }
+    ]
+  },
+  "problems": [],
+  "invariant": "Under the SHIPPED driver and the SHIPPED kernel, the token vector's 16 -> 32 growth RELOCATES on adversarial-move (both compilers), NOTHING relocates on adversarial-nogrow, and the two compilers agree -- because relocation is an allocator fact, not a codegen one. This is the measurement TASK_134's `moved = 0/12` lacked: that number was taken under a different driver."
+}

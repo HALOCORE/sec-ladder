@@ -1,0 +1,346 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p25-realloc-growth/controls/no_reloc.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p25-realloc-growth/controls/no_reloc.py": "8b678a85fc1ee01240ffea2f18215f73bf6362f68f89a27e37b6fd55da69be17"
+  },
+  "measured_utc": "2026-08-31T17:09:11Z",
+  "n_patterns_with_c": 32,
+  "realloc_callers": [
+    "p25-realloc-growth"
+  ],
+  "allocating_patterns": [
+    "p27-handle-table",
+    "p28-intrusive-lists",
+    "p29-bst-delete",
+    "p34-refcount-stack",
+    "p42-goto-cleanup"
+  ],
+  "freeing_patterns": [
+    "p01-array-sum",
+    "p02-buffer-copy",
+    "p03-bounded-stack",
+    "p04-ring-buffer",
+    "p05-index-flatten",
+    "p06-rotate",
+    "p07-binary-search",
+    "p08-overlap-move",
+    "p09-bitset",
+    "p10-fir-stencil",
+    "p11-nul-scan",
+    "p12-strcat-fixed",
+    "p13-strncpy-trunc",
+    "p14-field-split",
+    "p16-tlv-walk",
+    "p17-http-range",
+    "p18-varint-shift",
+    "p19-state-machine",
+    "p22-hash-probe",
+    "p23-partition",
+    "p25-realloc-growth",
+    "p27-handle-table",
+    "p28-intrusive-lists",
+    "p29-bst-delete",
+    "p32-free-list-pool",
+    "p34-refcount-stack",
+    "p35-tagged-union",
+    "p36-vtable-dispatch",
+    "p38-alias-pun",
+    "p42-goto-cleanup",
+    "p46-bignum-mac",
+    "p47-ct-compare"
+  ],
+  "per_pattern": [
+    {
+      "pattern": "p01-array-sum",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 3
+    },
+    {
+      "pattern": "p02-buffer-copy",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 3,
+      "files": 4
+    },
+    {
+      "pattern": "p03-bounded-stack",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p04-ring-buffer",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p05-index-flatten",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p06-rotate",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p07-binary-search",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p08-overlap-move",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p09-bitset",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p10-fir-stencil",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p11-nul-scan",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p12-strcat-fixed",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p13-strncpy-trunc",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p14-field-split",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p16-tlv-walk",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p17-http-range",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p18-varint-shift",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p19-state-machine",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p22-hash-probe",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p23-partition",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p25-realloc-growth",
+      "realloc": 4,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 6,
+      "files": 4
+    },
+    {
+      "pattern": "p27-handle-table",
+      "realloc": 0,
+      "malloc": 2,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 6,
+      "files": 4
+    },
+    {
+      "pattern": "p28-intrusive-lists",
+      "realloc": 0,
+      "malloc": 2,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 8,
+      "files": 4
+    },
+    {
+      "pattern": "p29-bst-delete",
+      "realloc": 0,
+      "malloc": 2,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 6,
+      "files": 4
+    },
+    {
+      "pattern": "p32-free-list-pool",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p34-refcount-stack",
+      "realloc": 0,
+      "malloc": 2,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 6,
+      "files": 4
+    },
+    {
+      "pattern": "p35-tagged-union",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p36-vtable-dispatch",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p38-alias-pun",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p42-goto-cleanup",
+      "realloc": 0,
+      "malloc": 2,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 4,
+      "files": 4
+    },
+    {
+      "pattern": "p46-bignum-mac",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    },
+    {
+      "pattern": "p47-ct-compare",
+      "realloc": 0,
+      "malloc": 0,
+      "calloc": 0,
+      "aligned_alloc": 0,
+      "free": 2,
+      "files": 4
+    }
+  ],
+  "problems": [],
+  "invariant": "Exactly one pattern's C rungs call `realloc`, and it is p25. Comments and string literals are blanked first, so a `realloc` in prose cannot satisfy or break the census. \u26a0 This settles the TOKEN question, not the semantic one: 'no other row has an allocation that moves while live' is an argument in spec.md and this is its load-bearing premise."
+}

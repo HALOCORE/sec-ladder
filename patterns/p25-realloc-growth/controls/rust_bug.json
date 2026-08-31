@@ -1,0 +1,108 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p25-realloc-growth/controls/rust_bug.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p25-realloc-growth/unsafe.rs": "e94c6faaf632048a5a4a658ad5bbaa191ae6af1331bb665f66f2df172cd511f5",
+    "patterns/p25-realloc-growth/inputs/gen.py": "39c40b42328cb74e7dbddf6c41df641d51a3b2e1ee0b24bee89f0a3a1516aa78",
+    "patterns/p25-realloc-growth/controls/arm_unsafe_ptr.rs": "292b2967f32a776a8b3fbc8f4505239d298c7b9896a04a39ac434803ec6fbdf6",
+    "patterns/p25-realloc-growth/controls/rust_bug.py": "767f35591fb97f2879c5e5d08d9c423c426041368e42d8df9149fd554f7792ff",
+    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e"
+  },
+  "measured_utc": "2026-08-31T16:58:57Z",
+  "miri_probe_iters": 4,
+  "arms": [
+    {
+      "source": "unsafe.rs",
+      "input": "adversarial-move.bin",
+      "exit": 0,
+      "ub": false,
+      "kind": null,
+      "stdout": "7621398087856828736",
+      "stderr_head": ""
+    },
+    {
+      "source": "arm_unsafe_ptr.rs",
+      "input": "adversarial-move.bin",
+      "exit": 1,
+      "ub": true,
+      "kind": "memory access failed: alloc2171 has been freed, so this pointer is dangling",
+      "stdout": "",
+      "stderr_head": "error: Undefined Behavior: memory access failed: alloc2171 has been freed, so this pointer is dangling --> /home/apt/repos_common/sec-ladder/patterns/p25-realloc-growth/controls/arm_unsafe_ptr.rs:91:38 | 91 | let v: u8 = unsafe { *cur }; | ^^^^ Undefined Behavior occurred here | = help: this indicates a bug in the program: it performed an invalid operation, and caused Undefined Behavior = help: se"
+    },
+    {
+      "source": "unsafe.rs",
+      "input": "adversarial-lateread.bin",
+      "exit": 0,
+      "ub": false,
+      "kind": null,
+      "stdout": "17252517726662893248",
+      "stderr_head": ""
+    },
+    {
+      "source": "arm_unsafe_ptr.rs",
+      "input": "adversarial-lateread.bin",
+      "exit": 1,
+      "ub": true,
+      "kind": "memory access failed: alloc2143 has been freed, so this pointer is dangling",
+      "stdout": "",
+      "stderr_head": "error: Undefined Behavior: memory access failed: alloc2143 has been freed, so this pointer is dangling --> /home/apt/repos_common/sec-ladder/patterns/p25-realloc-growth/controls/arm_unsafe_ptr.rs:91:38 | 91 | let v: u8 = unsafe { *cur }; | ^^^^ Undefined Behavior occurred here | = help: this indicates a bug in the program: it performed an invalid operation, and caused Undefined Behavior = help: se"
+    },
+    {
+      "source": "unsafe.rs",
+      "input": "adversarial-many.bin",
+      "exit": 0,
+      "ub": false,
+      "kind": null,
+      "stdout": "4354692859368398272",
+      "stderr_head": ""
+    },
+    {
+      "source": "arm_unsafe_ptr.rs",
+      "input": "adversarial-many.bin",
+      "exit": 1,
+      "ub": true,
+      "kind": "memory access failed: alloc1888 has been freed, so this pointer is dangling",
+      "stdout": "",
+      "stderr_head": "error: Undefined Behavior: memory access failed: alloc1888 has been freed, so this pointer is dangling --> /home/apt/repos_common/sec-ladder/patterns/p25-realloc-growth/controls/arm_unsafe_ptr.rs:91:38 | 91 | let v: u8 = unsafe { *cur }; | ^^^^ Undefined Behavior occurred here | = help: this indicates a bug in the program: it performed an invalid operation, and caused Undefined Behavior = help: se"
+    },
+    {
+      "source": "unsafe.rs",
+      "input": "adversarial-nogrow.bin",
+      "exit": 0,
+      "ub": false,
+      "kind": null,
+      "stdout": "15936024309086987712",
+      "stderr_head": ""
+    },
+    {
+      "source": "arm_unsafe_ptr.rs",
+      "input": "adversarial-nogrow.bin",
+      "exit": 0,
+      "ub": false,
+      "kind": null,
+      "stdout": "15936024309086987712",
+      "stderr_head": ""
+    },
+    {
+      "source": "unsafe.rs",
+      "input": "small.bin",
+      "exit": 0,
+      "ub": false,
+      "kind": null,
+      "stdout": "5149416040430046988",
+      "stderr_head": ""
+    },
+    {
+      "source": "arm_unsafe_ptr.rs",
+      "input": "small.bin",
+      "exit": 0,
+      "ub": false,
+      "kind": null,
+      "stdout": "5149416040430046988",
+      "stderr_head": ""
+    }
+  ],
+  "problems": [],
+  "invariant": "Miri is SILENT on the shipped ../unsafe.rs on every probed input, and reports Undefined Behavior on arm_unsafe_ptr.rs -- the same file with the saved index replaced by a raw interior pointer -- on exactly the inputs whose windows grow the token vector after the SAVE, and NOT on adversarial-nogrow or small. So unsafe Rust CAN express p25's bug; what excludes it from the shipped rung is the identity pin and Verus's provenance, not the language."
+}

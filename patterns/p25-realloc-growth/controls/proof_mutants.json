@@ -1,0 +1,70 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p25-realloc-growth/controls/proof_mutants.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p25-realloc-growth/verus.rs": "438d464188fb7d841a7d182844e7c5109a69b08b8c6566bccf124d788a02ba26",
+    "patterns/p25-realloc-growth/controls/proof_mutants.py": "3239f1d061e9060c59d05f8640828720ff78cf7153ee966d97627f75fe8bd163",
+    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "measured_utc": "2026-08-31T17:00:06Z",
+  "baseline": {
+    "exit": 0,
+    "verified": 10,
+    "errors": 0,
+    "first_error": null,
+    "tail": "verification results:: 10 verified, 0 errors"
+  },
+  "mutants": [
+    {
+      "mutant": "ATTACK",
+      "applied": true,
+      "substitutions": 1,
+      "what": "deletes SAFETY (5) from the loop invariant, so vec_get_unchecked's `requires i < v@.len()` is unprovable at the READ",
+      "failed_as_required": true,
+      "exit": 1,
+      "verified": 9,
+      "errors": 1,
+      "first_error": "error: precondition not satisfied",
+      "tail": "verification results:: 9 verified, 1 errors error: precondition not satisfied --> /home/apt/repos_common/sec-ladder/.temp/p25ctl/mut_attack.rs:494:29 | 342 | i < v@.len(), | ------------ failed precondition ... 494 | let v: u8 = vec_get_unchecked(&toks, curi); | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ error: aborting due to 1 previous error"
+    },
+    {
+      "mutant": "X1",
+      "applied": true,
+      "substitutions": 1,
+      "what": "leaves the invariant and strikes the ONE statement that re-establishes it, so the invariant fails at the SAVE rather than at the READ",
+      "failed_as_required": true,
+      "exit": 1,
+      "verified": 9,
+      "errors": 1,
+      "first_error": "error: invariant not satisfied at end of loop body",
+      "tail": "| 410 | while o < nops | ^^^^^^^^^^^^^^ error: invariant not satisfied at end of loop body --> /home/apt/repos_common/sec-ladder/.temp/p25ctl/mut_x1.rs:419:13 | 419 | have ==> curi < toks@.len(), | ^^^^^^^^^^^^^^^^^^^^^^^^^^^ error: invariant not satisfied at end of loop body --> /home/apt/repos_common/sec-ladder/.temp/p25ctl/mut_x1.rs:420:13 | 420 | / run( 421 | | buf@, 422 | | off as int, 423 | | len as int, ... | 443 | | 0, 444 | | ), | |_____________^ error: aborting due to 2 previous errors"
+    },
+    {
+      "mutant": "VACUITY",
+      "applied": true,
+      "substitutions": 1,
+      "what": "a constant kernel body, so the `ensures` is not discharged by anything a trivial program does",
+      "failed_as_required": true,
+      "exit": 1,
+      "verified": 8,
+      "errors": 1,
+      "first_error": "error: postcondition not satisfied",
+      "tail": "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unreachable statement | = note: `#[warn(unreachable_code)]` (part of `#[warn(unused)]`) on by default error: postcondition not satisfied --> /home/apt/repos_common/sec-ladder/.temp/p25ctl/mut_vacuity.rs:387:9 | 387 | r == parse_fold(buf@, off as int, len as int), | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition 388 | { 389 | return 0; | -------- at this exit error: aborting due to 1 previous error; 1 warning emitted"
+    },
+    {
+      "mutant": "SPEC-WEAKEN",
+      "applied": true,
+      "substitutions": 1,
+      "what": "weakens the kernel's postcondition to a tautology and leaves main alone, so main's `assert(r == parse_fold(..))` -- the statement that CONSUMES the postcondition -- can no longer be discharged",
+      "failed_as_required": true,
+      "exit": 1,
+      "verified": 9,
+      "errors": 1,
+      "first_error": "error: assertion failed",
+      "tail": "verification results:: 9 verified, 1 errors error: assertion failed --> /home/apt/repos_common/sec-ladder/.temp/p25ctl/mut_spec_weaken.rs:571:20 | 571 | assert(r == parse_fold(buf@, (k * stride) as int, stride as int)); | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed error: aborting due to 1 previous error"
+    }
+  ],
+  "problems": [],
+  "invariant": "The unmutated verus.rs verifies, and all four mutants FAIL: deleting SAFETY (5) from the loop invariant, striking the statement that re-establishes it, a constant kernel body, and weakening the kernel's postcondition to a tautology. Every substitution count is asserted to be exactly 1 before the mutant is run."
+}

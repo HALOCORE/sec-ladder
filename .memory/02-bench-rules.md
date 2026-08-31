@@ -1846,7 +1846,7 @@ run it whenever a pattern is added or a class is argued about.
 spatial (OOB read/write, index/bound)  15   p02 p03 p05 p07 p09 p10 p11 p12 p13
                                             p14 p16 p17 p23 p36 p46
 logical, memory-safe                    3   p04 p06 p19
-TEMPORAL                                5   p27 p28 p29 p32 p34
+TEMPORAL                                6   p25 p27 p28 p29 p32 p34
 TYPE                                    2   p35 p38
 resource / leak                         1   p42
 side channel                            1   p47
@@ -1856,15 +1856,16 @@ aliasing UB                             1   p08
 calibration, no bug                     1   p01
 ```
 
-⚠ **15 of 31 spatial. A 16th spatial row makes the corpus worse, not better,
+⚠ **15 of 32 spatial. A 16th spatial row makes the corpus worse, not better,
 whatever it measures.** ⚠⚠ **THIS LINE READ *"15 of 26 spatial against ONE
 temporal and ONE type"* AND THE TEMPORAL HALF IS NOW STALE FIVE TIMES OVER — the
 C-side bar (finding 53) admitted seven rows and the temporal axis has gone
-`1 → 5` (`p27`, `p29` at `TASK_139`, `p32` at `TASK_144`, `p28` at `TASK_146`,
-`p34` at `TASK_154`), with `p25` and two CVEs admitted and unbuilt.**
+`1 → 6` (`p27`, `p29` at `TASK_139`, `p32` at `TASK_144`, `p28` at `TASK_146`,
+`p34` at `TASK_154`, `p25` at `TASK_157`), with only the two CVEs admitted and
+unbuilt.**
 ✅✅ **AND THE TYPE AXIS NOW HAS TWO ROWS: `p35` LANDED AT `TASK_148`.**
 ⚠ **The spatial COUNT has not moved since the priority was set; the denominator
-has. That is the point of the decision, and it is now `15 / 31` rather than
+has. That is the point of the decision, and it is now `15 / 32` rather than
 `15 / 26`.**
 ⚠ **That matters more than the count: `results/SYNTHESIS.md` §7 says in terms
 that *"every claim this document makes about the type axis rests on ONE
