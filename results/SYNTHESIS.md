@@ -31,17 +31,18 @@ retracted along the way, and **the retraction list is the most transferable
 thing the project produced** (§6).
 
 ⚠ **A NOTE ON THE COUNT, so the title and the corpus can be reconciled.** The
-four Results below were drawn from **26** kernels. **FOUR more have landed since
+four Results below were drawn from **26** kernels. **FIVE more have landed since
 and NOT ONE is folded into Results 1–4 or into the idiom census, which genuinely
 ran over 26**: `p29` (BST delete, `TASK_139`), `p32` (free-list pool,
-`TASK_144`), `p28` (intrusive lists, `TASK_146`) and `p35` (tagged union,
-`TASK_148`). They appear in §7, where they change the corpus composition —
-**the temporal axis goes from one row to FOUR and the TYPE axis from one to
-TWO.** ⚠ **This sentence said *"two more"* and *"one to three"*; both were
-already stale when written down, which is why the counts here are now derived
-rather than asserted.** **Where this document says
+`TASK_144`), `p28` (intrusive lists, `TASK_146`), `p35` (tagged union,
+`TASK_148`) and `p34` (reference counting, `TASK_154`). They appear in §7, where
+they change the corpus composition — **the temporal axis goes from one row to
+FIVE and the TYPE axis from one to TWO.** ⚠ **This sentence said *"two more"*,
+then *"FOUR more"*; each was already stale when written down, which is why the
+counts here are now derived rather than asserted.** **Where this document says
 "26 kernels" it means the analysed set, and that is the honest scope; the tree
-has 30 — DERIVE IT, do not trust this sentence, which has now been wrong twice.** ⚠ **And the count is the smaller half of the gap.** `p32` was admitted
+has 31 — DERIVE IT, do not trust this sentence, which has now been wrong three
+times.** ⚠ **And the count is the smaller half of the gap.** `p32` was admitted
 only because a **kill was retracted**: the admission bar was measuring the wrong
 thing (RECAP finding 53), it was replaced with a **C-side-only** bar
 (`CLAUDE.md` rule 6), and re-adjudication **admitted seven rows and left zero
@@ -1293,7 +1294,7 @@ count printed here.** They classify, by the safety line each one's
 ```
 spatial          15   p02 p03 p05 p07 p09 p10 p11 p12 p13 p14 p16 p17 p23 p36 p46
 logical           3   p04 p06 p19
-temporal          4   p27 p28 p29 p32
+temporal          5   p27 p28 p29 p32 p34
 type              2   p35 p38
 resource          1   p42
 side-channel      1   p47
@@ -1333,21 +1334,42 @@ count unmoved** — the gate then fails only on a declaration the author writes.
 **The row ships the honest configuration with the gap as its result** (`p42`'s
 precedent), and **no `check.py` change was proposed.**
 
-✅ **The temporal axis has improved most of all — from ONE row to FOUR:** `p29`
-(BST delete, `TASK_139`), `p32` (free-list pool, `TASK_144`) and `p28`
-(intrusive lists, `TASK_146`) all joined `p27`. ⚠ **This paragraph said *"the
-one place this improved"* and named only `p29`.** **The four are not the same
-shape**, and the differences are the point: `p27` and `p29` and `p32` all keep a
-correct free discipline and put the missing check on the **READ**, while
-**`p28` INVERTS that — its read path is correct and its DESTROY path is
-incomplete.** ⚠⚠ **And the safe-Rust answers DISAGREE ACROSS THE FOUR, which is
-the sharpest thing on this axis: `p32`'s safe rung reproduces the buggy C BIT
-FOR BIT, and `p28`'s CANNOT REPRODUCE IT AT ALL** — the representation safe Rust
-forces on you either preserves the harm exactly or removes its mechanism along
-with the pointers, **and which one is a property of the STRUCTURE, not of
-Rust.** ⚠ **§3's *"safe Rust's temporal guarantee is a guarantee about the
-allocator"* now has four rows under it rather than one, and they do not all say
-the same thing.**
+✅ **The temporal axis has improved most of all — from ONE row to FIVE:** `p29`
+(BST delete, `TASK_139`), `p32` (free-list pool, `TASK_144`), `p28`
+(intrusive lists, `TASK_146`) and `p34` (reference counting, `TASK_154`) all
+joined `p27`. ⚠ **This paragraph said *"the one place this improved"* and named
+only `p29`.** **The five are not the same shape**, and the differences are the
+point — **and the axis that separates them is the REPAIR SITE**: `p27`, `p29`
+and `p32` all keep a correct free discipline and put the missing check on the
+**READ**; **`p28` INVERTS that — its read path is correct and its DESTROY path
+is incomplete**; and **`p34` is a third position again — its read path is
+correct BY CONSTRUCTION, since a refcounted pointer is valid by definition, so
+the repair belongs at the ACQUIRE, an unbounded distance from the harm.**
+⚠⚠ **And the safe-Rust answers DISAGREE ACROSS THE FIVE, which is the sharpest
+thing on this axis: `p32`'s safe rung reproduces the buggy C BIT FOR BIT, and
+`p28`'s CANNOT REPRODUCE IT AT ALL** — the representation safe Rust forces on
+you either preserves the harm exactly or removes its mechanism along with the
+pointers, **and which one is a property of the STRUCTURE, not of Rust.**
+✅✅ **`p34` SETTLES THAT BY SHOWING BOTH BRANCHES IN ONE ROW, selected by the
+storage representation: its `Rc` port CANNOT COMPILE the bug, while a safe
+INDEX-ARENA port under `forbid(unsafe_code)` reproduces the buggy C BIT FOR BIT
+on 8/8 inputs, recycle divergence included.** ⚠ **§3's *"safe Rust's temporal
+guarantee is a guarantee about the allocator"* now has five rows under it rather
+than one, they do not all say the same thing, and `p34` is the row where the
+guarantee's PRESENCE and ABSENCE are demonstrated side by side in one kernel.**
+
+⚠⚠ **`p34` ALSO CARRIES THE ONLY SAFETY LINE IN THIS CORPUS WHOSE BENIGN COST IS
+`0.00`, AND IT IS STRUCTURAL RATHER THAN LUCKY.** `t->rc = t->rc + 1` is the
+kernel's only increment, so any executed `DUP` forces a free-then-read: **no
+benign input can reach the safety line at all** (proved, then checked
+exhaustively over 33.6 M op streams). Measured `+0.00` `Ir`/call on all sixteen
+cells. ⚠ **It is not free because the check is cheap — it is free because the
+CORRECT program never runs it, which is a different claim and a narrower one.**
+✅ **And the row prices the alternative rather than asserting there is none: a
+DESTROY-path repair was BUILT and costs `+160.64`/`+2403.83` `Ir` (`-O3`,
+`small`/`large`) and `+164.70`/`+2953.27` (`-O0`) — the scan is `O(ntop)` on
+every release, so that price grows with STACK DEPTH.** ⚠ **The zero belongs to
+the SITE, not to the pattern.**
 
 Taking `p29` and `p27` specifically, the two are **not** the same shape. `p29`'s
 in-order-successor splice **overwrites its victim in place and frees the

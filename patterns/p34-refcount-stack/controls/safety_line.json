@@ -4,12 +4,12 @@
   },
   "derived_from_sha256": {
     "patterns/p34-refcount-stack/c/kernel.c": "a5ba19f99a38748ffaafd63c14ba655bb39a9f6a824c3f300c565e497d8fe149",
-    "patterns/p34-refcount-stack/c/kernel_hardened.c": "bd2bb22db44ab50b623b365d9587cf2dd31efca729c37f8fc9e70086c383f681",
-    "patterns/p34-refcount-stack/c/kernel.h": "1757bd3a8ce7962a625795258b7be4f4524501860c1d71ab80032c1bff38722f",
+    "patterns/p34-refcount-stack/c/kernel_hardened.c": "1b5dc080e8cf04feb8df98775070699d7dbbdc4aba3bcc9e198e98b24b3de552",
+    "patterns/p34-refcount-stack/c/kernel.h": "b409000cb86567bee321a4e90b64d0e51568e8a3117a2b74ea73102fb6bf03ec",
     "patterns/p34-refcount-stack/controls/arm_body.inc": "db5aa326b2e13461e085ca32386337cd00f8b82896609f1fdb49d1857ca6f2a8",
     "patterns/p34-refcount-stack/controls/safety_line.py": "ea11c314c0328c32e36b9ff56989e4b577345808ce685a15a7104bce5a399584"
   },
-  "measured_utc": "2026-08-31T12:33:46Z",
+  "measured_utc": "2026-08-31T15:23:29Z",
   "preprocessed_lines": {
     "kernel.c": 332,
     "kernel_hardened.c": 333,

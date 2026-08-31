@@ -34,9 +34,17 @@ block. Two consequences, and either alone would be enough:
   1. `harness/check.py` stage 2 requires every non-adversarial cell to agree with
      `../model.py` **and with every other cell**. A window with a DUP makes R1
      disagree, so such a window cannot be a perf row.
-  2. The safety line's benign cost gradient is therefore `0.00` BY
-     CONSTRUCTION -- a statement about the pattern rather than a measurement
-     outcome -- and that claim is only worth making if the property is CHECKED.
+  2. The safety line is therefore NEVER EXECUTED on a matrix blob, which is what
+     the `0.00` benign cost gradient was PREDICTED from -- and that prediction is
+     only worth making if the property is CHECKED.
+     ⚠ **"BY CONSTRUCTION" IS ABOUT WHICH STATEMENTS EXECUTE, NEVER ABOUT THE
+     NUMBER, AND THIS PARAGRAPH USED TO BLUR THE TWO** (`TASK_155_REPORT` M2,
+     corrected at `TASK_156`). It read *"the benign cost gradient is therefore
+     `0.00` BY CONSTRUCTION -- a statement about the pattern rather than a
+     measurement outcome"*, and that is refuted: a never-executed statement
+     still moves layout, register allocation and inlining, and one planted on
+     this very path moved the `-O3` cell by `-14.22` Ir/call. `0.00` is
+     MEASURED (`../NOTES.md` 4b).
 
 So this generator emits NEW/POP/READ only on every matrix blob and refuses to
 write one that contains a DUP, and `../model.py::no_dup_problems` re-derives the

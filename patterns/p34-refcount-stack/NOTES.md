@@ -41,7 +41,8 @@ asks for, and it is the gate's finding rather than the author's judgement.**
 | | value |
 |---|---|
 | as first written (all five `ensures`) | `1fa98c8af297710166a2c93731f12b45be7c2c9b4dc39331fcd06203fae8f3dd` |
-| **as shipped** (four `ensures`) | `f1537d7f601175122e67f9991a107449ad7ca52520b0484f5f014685369d2762` |
+| as built (four `ensures`) | `f1537d7f601175122e67f9991a107449ad7ca52520b0484f5f014685369d2762` |
+| **as shipped** (`TASK_156`, the `why` corrections below) | `329c786f99c874b306d2b923815963db9aa49a40f2ffdfda9d7a4b9b098c5b4a` |
 
 **Nothing else in the block changed**, and the delta is checkable with
 `python3 harness/tools/contract_diff.py p34` once the pattern is committed. The
@@ -74,6 +75,35 @@ measures it), *checksums bit-identical on two shapes* (§2), *UBSan silent* (§2
 *78 lines and no `Rc` spec* (§6), and *`global layout` checked by rustc* (§6a).
 None was falsified.
 
+### ⚠⚠⚠ 0a. THE SECOND MOVE, `TASK_156` — AND THIS TIME THE PRE-EDIT TEXT IS KEPT
+
+**`f1537d7f6011…` → `329c786f99c8…`.** The `why` carried a sentence that
+measurement had **falsified**, which is PROTOCOL rule 6's known hole (`p46`'s
+shape): the disclosure above verifies perfectly and says nothing about whether
+what it froze is still true.
+
+**What moved — five substitutions, each asserted to match exactly once, generator
+at `.temp/t156/edit_why.py`, plus one follow-up dropping a line number:**
+
+| # | why | see |
+|---|---|---|
+| 1 | *"a borrow cannot be stored in the stack array because the borrow checker ties it to the array it came from"* — **FALSE**, replaced by the measured statement and the negative controls behind it | §8 |
+| 2 | *"safe Rust does not offer the separation"* → *"…not in a program that ALSO DESTROYS THE OBJECT"* | §8 |
+| 3 | *"only the ACQUIRE"* → the acquire is the only **ZERO-COST** site, with the destroy-side repair's measured price | §4c |
+| 4 | *"a statement about the pattern rather than a measurement outcome"* → *"about WHICH STATEMENTS EXECUTE and never about the NUMBER"* | §4b |
+| 5 | the `0.00` hedge, with the `−14.22` plant and the `34×` plant behind it | §4b |
+
+⚠⚠ **THE PRE-EDIT BLOCK TEXT IS KEPT VERBATIM, NOT ONLY ITS HASH**, at
+`.temp/t156/contract_pre_edit.json` (42,327 bytes, re-hashing to
+`f1537d7f6011…`); the post-edit text is at `.temp/t156/contract_post_edit.json`.
+**`TASK_155_REPORT` m7 tried SIX reconstructions of the `1fa98c8a…` → `f1537d7f…`
+move and all six failed**, because a hash of a ~30 KB blob is not diffable and
+the preimage was not kept. ⚠ **That earlier move therefore has NO recoverable
+text and this file states so plainly rather than implying the table above covers
+it** — the `git show <commit>:` route only becomes available for moves made
+after the pattern's landing commit, and both of the pre-landing states are gone.
+✅ **Cost of not losing the next one: one `cp`.**
+
 ---
 
 ## 1. What the row is
@@ -96,6 +126,11 @@ no test the read could grow would repair this program without becoming a livenes
 table. **The free happens EARLY rather than the read happening LATE** — which is
 what makes it a different C program from `p27`, `p29` and `p32`, all three of
 which are repaired by a conjunct on the READ path.
+
+⚠ **The ACQUIRE is the only ZERO-COST repair site, not the only repair site —
+§4c prices the other one.** *"There is only one place to fix this"* is the kind
+of sentence a build reads off the prose and nobody compiles; it was compiled, and
+it is false.
 
 **Layout note, disclosed the way `p28` discloses its own.** The count comes
 first, so glibc's tcache `next` and `key` words — user offsets 0 and 8 — land on
@@ -313,6 +348,86 @@ So *"the safety line is free"* is true of **executed** instructions and false of
 **emitted** ones, and this row is the cleanest instance of that distinction in the
 tree: `0.00` dynamic against `+1` static at `-O3`. A pattern that quoted only the
 static column would report a cost that never runs.
+
+⚠⚠ **AND *"`0.00` BY CONSTRUCTION, NOT BY MEASUREMENT"* IS WITHDRAWN**
+(`TASK_155_REPORT` M2). It was `harness/tools/composition.py`'s caveat and
+`dd46507`'s commit message, never this file's — §4b's own heading is *"predicted
+from the proof, **then measured**"* and `spec.md`'s `why` carried the hedge — and
+the reviewer refuted it by planting a **different** never-executed statement on
+the same dead `DUP` path: the `-O3` cell moved by **−14.22 Ir/call** through
+layout alone. ✅ **The shipped `0.00` is nonetheless real and not a plumbing
+tautology**: a *hot* plant on the fold moved the same cell **34×**
+(`2,207.05 → 74,287.83`), and a same-shape dead statement (`t->len = t->len + 1;`)
+read exactly baseline. **The construction is about which statements EXECUTE; the
+number is a codegen outcome, and it was measured.**
+
+### 4c. ⚠⚠ THE OTHER REPAIR SITE, AND WHAT IT COSTS
+
+`harness/tools/composition.py` published *"`p34`'s read path is correct by
+construction … so **ONLY THE ACQUIRE can be repaired**, an unbounded distance
+from the harm."* **False** (`TASK_155_REPORT` M1). Re-derived here from a probe
+regenerated mechanically out of `c/kernel.c`
+(`.temp/t156/csite/make_destroyfix.py`, measured by
+`.temp/t156/csite/destroy_cost.py`, results in `destroy_cost.json`).
+
+**The probe.** `DUP` is untouched — it still publishes a second reference and
+still does not count it, and the file contains no retain anywhere. Both release
+sites stop trusting `rc` and ask instead whether any **live** stack entry still
+names the object:
+
+```c
+ntop = ntop - 1;
+o = stk[ntop];
+for (j = 0; j < ntop; j++)
+    if (stk[j] == o)
+        named = 1;
+if (!named)
+    free(o);
+```
+
+That is **`p28`'s repair site** — an ownership test at the free — and it works:
+
+```
+checksums   destroyfix == R1h on 8/8 inputs, the four divergent ones included
+ASan        destroyfix rc=0 hits=0 on 8/8;  POSITIVE CONTROL R1 rc=1 hits=1 on
+            the four adversarial inputs, R1h clean on 8/8
+```
+
+**What it is not is free.** Marginal `Ir` per kernel call, gcc, `isolated`,
+`(Ir@200 − Ir@100) / 100` — the same difference-of-two-runs method
+`check.py::check_marginal_ir` uses:
+
+| input | level | R1 = R1h | destroy-side | Δ |
+|---|---|---:|---:|---:|
+| `small.bin` | `-O0` | 3,144.48 | 3,309.18 | **+164.70 (+5.24 %)** |
+| `small.bin` | `-O3` | 2,207.59 | 2,368.23 | **+160.64 (+7.28 %)** |
+| `large.bin` | `-O0` | 15,579.69 | 18,532.96 | **+2,953.27 (+18.96 %)** |
+| `large.bin` | `-O3` | 11,106.93 | 13,510.76 | **+2,403.83 (+21.64 %)** |
+
+⚠⚠ **THE COST SCALES WITH THE INPUT, NOT WITH THE OPTIMISATION LEVEL, AND THE
+SUMMARY THAT SAID OTHERWISE IS CORRECTED HERE.** `TASK_156`'s own task file and
+`RECAP.md` finding 59 both quote this pair as *"`+160.64` (`+7.28 %`) at `-O3`
+and `+2403.83` (`+21.6 %`) at `-O0`"*. **Both of those figures are `-O3`**; they
+differ by **input size**. The `-O0` pair is `+164.70` / `+2,953.27`, and it is
+*smaller* in percentage terms, not larger. The mechanism the corrected labelling
+exposes is the better one: **the scan is `O(ntop)` on EVERY release, while the
+retain runs only on a `DUP`, which no benign input contains** — so the
+destroy-side price grows with stack depth, and `large.bin` (deeper stacks, 64
+windows) pays 15× what `small.bin` does.
+
+✅ **So the measured statement is: the ACQUIRE is the only site at which this
+program can be repaired at ZERO benign cost, and the destroy-side repair that
+achieves the same behaviour costs 5–22 % of the kernel.** That is a better
+headline than the one it replaces, because it *explains* why the acquire is
+idiomatic instead of asserting that nothing else exists. ⚠ It also narrows the
+`p28` comparison correctly: `p34` and `p28` **share** a viable repair site; what
+`p34` has and `p28` does not is a **free** one.
+
+⚠ `.temp/t156/csite/`'s probe is a PROBE and not a rung: `harness/build.py` never
+builds it, no record carries it, and its levels sit ~0.54 Ir/call above `§5a`'s
+because its binaries and probe inputs live at a different path (the known
+environment-block level shift, `.memory/03-measurement.md`). **Every Δ above is a
+within-run difference and cancels it.**
 
 ---
 
@@ -534,22 +649,66 @@ what fails.
 | `X2-exec-and-spec` | spec-weaken | fail | `22 / 2` | **`precondition not satisfied`** |
 | `M3-delete-epilogue` | deletion | fail | `23 / 1` | `assertion failed` |
 
-⚠⚠ **`X1` and `X2` are the two to read, and both come from other rows' results.**
+⚠⚠ **`X1` and `X2` are the two to read, and both were published with a WRONG
+CROSS-ROW COMPARISON. Corrected here at `TASK_156` from `TASK_155_REPORT` M5,
+and both sides RE-DERIVED rather than quoted.**
 
-* **`X1` is `p35`'s arm.** Strike the central obligation out of the invariant and
-  see whether anything but a hand-written pin notices. **On `p35` the equivalent
-  deletion VERIFIED** at the pinned obligation count, and only the `verus.items`
-  pin caught it — which is the sharper half of that row's headline. **On `p34` it
-  FAILS, on a `precondition not satisfied`.** The bridge is what discharges
-  `obj_dec`'s `requires rc > 0` and what licenses `obj_free` at zero, so it is a
-  memory-safety precondition rather than a refinement clause.
-* **`X2` is `p32`'s arm.** Weaken the exec code AND the invariant so the two
-  agree with each other again. **On `p32` that VERIFIES**, and p32 publishes it
-  as the honest statement of what its R5 buys: its safety line is load-bearing
-  against the SPECIFICATION alone, because nothing there is allocated and there
-  is no linear resource to consume. **On `p34` it FAILS**, again on a
-  precondition. **That is the sharpest difference between the two rows' R5
-  results, and it is exactly the difference the storage makes.**
+#### ⚠⚠⚠ WITHDRAWN: *"`X1` is `p35`'s arm … on `p35` it VERIFIED, on `p34` it FAILS"*
+
+Until `TASK_156` this section read *"**`X1` is `p35`'s arm.** … **On `p35` the
+equivalent deletion VERIFIED** at the pinned obligation count, and only the
+`verus.items` pin caught it … **On `p34` it FAILS**."* **That names the wrong
+`p35` arm, and the difference it claims does not exist.** `p34`'s `X1` weakens a
+**LOOP INVARIANT**; the `p35` arm that verifies deletes the correct-variant
+conjunct from **three TRUSTED items' `requires`** — a different object.
+
+**Both sides, re-derived.** `p35`'s column is read out of
+`patterns/p35-tagged-union/controls/proof_mutants.json`, which its own gate pins
+`FRESH`; `p34`'s `Z1` is a fresh Verus run built by `.temp/t156/zmut.py`, which
+deletes `i < v@.len()` / `i < old(v)@.len()` from `buf_get_unchecked`,
+`arr_get_unchecked` and `arr_set_unchecked` and leaves the `#[cfg(slb_twin)]`
+twins alone:
+
+| what is weakened | `p34` | `p35` |
+|---|---|---|
+| the loop invariant / the abstract machine | `X1` **22 / 2 — FAILS** | `M6` **15 / 1 — FAILS** |
+| a **TRUSTED item's `requires`** | `Z1` **24 / 0 — VERIFIES** | `X1` **16 / 0 — VERIFIES** |
+
+⚠ **THE TWO ROWS BEHAVE THE SAME.** What decides whether a mutation is caught is
+**which object it touches**, not which row it is on: the proof defends the
+invariant on both and defends the trusted contract on neither. `p34` is not
+"stronger than `p35`" on this axis and the sentence that said so is withdrawn.
+
+✅ **What `X1` does still say, and it is worth having.** The bridge
+`perms[k].value().rc == cnt(stk, k)` is a **memory-safety precondition rather
+than a refinement clause** — it is what discharges `obj_dec`'s `requires rc > 0`
+and what licenses `obj_free` at zero — so striking it out of the invariant
+fails, at `22 / 2`, on a `precondition not satisfied`.
+
+✅ **And there IS a real cross-row difference; it is a GATE difference.** A
+trusted-`requires` deletion is invisible to *both* proofs, but on `p34` the gate
+catches it: stage `5c-twin`'s per-conjunct probe deletes each conjunct from the
+twin and the twin FAILS — `28 verified, 1 error` for each of
+`buf_get_unchecked`, `arr_get_unchecked` and `arr_set_unchecked`, read out of
+`results/gate/p34-refcount-stack.json`'s `verified_twins`. On `p35` that stage is
+**BLOCKED for exactly the three items its `X1` mutates**, which is why `p35` is
+left with a hand-written pin as its only catcher. **`p34` owns five twins and
+none is blocked** (§6a).
+
+* **`X2` is `p32`'s question, not literally `p32`'s arm.** Weaken the exec code
+  AND the invariant so the two agree with each other again. **On `p32` the
+  equivalent arm VERIFIES** (`15 / 0`, from `p32`'s own sidecar), and `p32`
+  publishes it as the honest statement of what its R5 buys: its safety line is
+  load-bearing against the SPECIFICATION alone, because nothing there is
+  allocated and there is no linear resource to consume. **On `p34` it FAILS**,
+  `22 / 2`, again on a precondition. **That is a real difference between the two
+  rows' R5 results and it is exactly the difference the storage makes** — `run`
+  has no reference count, so no spec weakening can rescue `p34`'s mutant and the
+  failure is a linear-resource one. ⚠ **Name the object:** `p32`'s
+  `M4-spec-weaken` weakens its exec code and its **abstract machine `step`** —
+  the specification — while `p34`'s `X2` weakens its exec code and the **loop
+  invariant `wf`**. The conclusion holds; *"`X2` is `p32`'s arm"* is not
+  literally true (`TASK_155_REPORT` M5).
 
 ### 6d. What the pinned vstd does not have
 
@@ -640,14 +799,57 @@ the selector is the PORT rather than the pattern.** `controls/safe_arms.py`:
 ```
 
 The two arms cover the two ways a program could hold a second reference at all —
-**own it** or **borrow it** — and safe Rust closes both, for two different
-reasons. `Rc::clone` publishes the second reference and increments in ONE
-operation and there is no way to obtain a second `Rc<Obj>` without it; a borrow
-cannot be stored in the stack array because the borrow checker ties it to the
-array it came from. **`c/kernel.c`'s bug is exactly the separation of *publish a
-reference* from *count it*, and safe Rust does not offer the separation.**
-⚠ The sanity arm matters: two files that fail to compile prove nothing unless a
-third one on the same command line succeeds.
+**own it** or **borrow it** — and safe Rust closes both. ⚠ The sanity arm
+matters: two files that fail to compile prove nothing unless a third one on the
+same command line succeeds.
+
+#### ⚠⚠⚠ …AND UNTIL `TASK_156` THIS SECTION SAID *WHY* THEY FAIL, WRONGLY. THE NEGATIVE CONTROLS
+
+`TASK_155_REPORT` B1: *"this file does not compile"* is evidence about safe Rust
+only if **the bug** is what stops it compiling, and that had never been checked.
+The three controls below are now part of `controls/safe_arms.py` and their
+results are in `safe_arms.json`'s `negative_controls`. **All three were
+re-derived at `TASK_156`, not quoted.**
+
+| control | what it is | result |
+|---|---|---|
+| `arm_safe_rc_move.rs` `_nodup` twin | the same file with its **whole `DUP` arm** replaced by the `SENT` fold it already writes when the guard fails — a program that publishes no second reference and so **cannot have `p34`'s bug** | **COMPILES** |
+| `arm_safe_rc_borrow.rs` `_nodup` twin | the same construction | **REJECTED — `E0502`, the SAME code at the SAME line as the arm** |
+| `arm_safe_rc_borrow_frozen.rs` | the arm's `DUP` line character for character (`let t = stk[ntop - 1]; stk[ntop] = t;`) over an owner built once and then frozen | **COMPILES and prints `201`** |
+
+**What that changes, sentence by sentence.**
+
+* ✅ **`arm_safe_rc_move.rs` survives and is now attributed.** Its `E0507` is
+  caused by the two edited lines: delete them and the file compiles. *"`Rc::clone`
+  publishes the second reference and increments in ONE operation and there is no
+  way to obtain a second `Rc<Obj>` without it"* stands.
+* ⚠⚠ **`arm_safe_rc_borrow.rs`'s `E0502` is NOT about the duplication.** It is
+  raised on the **`NEW`** path — the `objs.push` against the live `&objs[..]`
+  borrows — and it survives the `DUP` body's deletion **identically**. That arm
+  measures **where** the borrow route closes, not that a second borrow is
+  refused.
+* ⚠⚠⚠ **THE HASHED SENTENCE WAS FALSE AND IS WITHDRAWN.** `spec.md`'s
+  `slb-contract` `why` and this section both read *"a borrow cannot be stored in
+  the stack array because the borrow checker ties it to the array it came
+  from."* **It can**: `arm_safe_rc_borrow_frozen.rs` stores a second `&Obj` into
+  the stack array and runs. ✅ **The true statement is stronger:** the borrow
+  route to `p34`'s bug is closed **at the OWNER MUTATION, not at the
+  duplication** — and since **a `free` is an owner mutation**, safe Rust
+  forbids exactly the destruction that the uncounted alias would make unsound.
+  So `c/kernel.c`'s separation of *publish a reference* from *count it* is
+  unavailable **in a program that also destroys the object**, which is the
+  precise form of the claim.
+* ⚠ **The error CODES carry no information about reference counting** — 12-line
+  programs with no `Rc`, no container and no count print the same `E0507` and
+  the same `E0502` (`.temp/t155/ctl/e0507_nothing.rs`, `e0502_nothing.rs`).
+  **Third time this project has read a rustc code as distinguishing when it was
+  not** (`p25`'s `E0502`, `p28`'s `E0382`/`E0499`). `safe_arms.py` still pins
+  `want_code = "E0507"`, but as a *spelling*; the attribution arms are the
+  evidence.
+* ⚠ **This is PROTOCOL rule 6's known hole, for the second time in the tree**
+  (`p46` was the first): the `contract_sha256` disclosure in §0 verified
+  perfectly and the hashed sentence was false anyway. **A frozen declaration is
+  evidence about *when* it was written, never about whether it is still true.**
 
 ### Branch B — the index-arena port: it reproduces `c/kernel.c` BIT FOR BIT
 
@@ -666,6 +868,26 @@ safety line:
 under `forbid(unsafe_code)` reproducing the exact output of a use-after-free. The
 free list is LIFO precisely because glibc's tcache is; a FIFO list would not
 reproduce it and would be measuring a different allocator.
+
+⚠ **The arena's headroom is now MEASURED and not argued** (`TASK_156`, from
+`TASK_155_REPORT` M4). `safe_arms.py` derives an instrumented copy of
+`arm_safe_arena.rs` — five substitutions, each asserted to match exactly once,
+adding a running high-water counter and sweeping **every** window rather than
+the driver's sampled ones — and records the maximum:
+
+| input | windows | max slots in use, of `ARENA` = 32 |
+|---|---:|---:|
+| `adversarial-blind` / `-blindread` / `-many` / `-recycle` | 1 | 1 |
+| `adversarial-stride3` | 0 | 0 |
+| `degenerate` | 1 | **16** |
+| `large` | 64 | **16** |
+| `small` | 8 | 11 |
+
+**Worst case 16, exactly `CAP`, with 16 slots of margin**, so the `free[]` pop
+cannot underflow. ⚠ Until `TASK_156` the arm's header *claimed* `safe_arms.py`
+recorded this and `safe_arms.py` recorded nothing of the kind — a citation of a
+**measurement** is as dangling as a citation of a file, and
+`harness/tools/temp_citations.py` can see neither.
 
 ⚠ **And Miri is silent on the arena arm on every input.** Nothing is allocated in
 that kernel — the arena is a local — so there is no deallocation for Miri to see.

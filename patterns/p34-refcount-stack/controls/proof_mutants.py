@@ -14,18 +14,45 @@ history say why: `p42`'s ghost ledger verified `18/0` while leaking, and
   * **VACUITY arms** ask what the CHEAPEST body satisfying the postcondition is.
     `M2` is `return 0;`, i.e. `TASK_136`'s `fn arm_c() -> u8 { 9 }` in this
     file's terms.
-  * **`X1` is `p35`'s arm, transplanted**: strike the central obligation out of
-    the invariant and see whether anything but a hand-written pin notices. On
-    `p35` the answer was *nothing did* -- `16 verified, 0 errors` at the pinned
-    count -- and that is the sharper half of that row's headline. Here the
-    conjunct is `perms[k].value().rc == cnt(stk, k)`, the bridge between the
-    count in the object's first word and the number of stack entries naming it.
+  * **`X1` strikes the central obligation out of the LOOP INVARIANT** and asks
+    whether anything but a hand-written pin notices. The conjunct is
+    `perms[k].value().rc == cnt(stk, k)`, the bridge between the count in the
+    object's first word and the number of stack entries naming it.
+
+    ⚠⚠ **THIS ARM WAS PUBLISHED AS *"`p35`'s arm, transplanted"* AND THAT WAS A
+    WRONG CROSS-ROW COMPARISON (`TASK_155_REPORT` M5, corrected at
+    `TASK_156`).** `p35`'s arm that VERIFIES, `X1-delete-variant-requires`,
+    deletes the correct-variant conjunct from **three TRUSTED items'
+    `requires`** -- a different object from an invariant. Read out of the two
+    rows' own committed sidecars and re-derived at `TASK_156`
+    (`.temp/t156/zmut.py`):
+
+    | what is weakened | p34 | p35 |
+    |---|---|---|
+    | the loop invariant / abstract machine | `X1` **22/2 FAILS** | `M6` **15/1 FAILS** |
+    | a TRUSTED item's `requires` | `Z1` **24/0 VERIFIES** | `X1` **16/0 VERIFIES** |
+
+    **The two rows behave the SAME**, and the thing that decides whether a
+    mutation is caught is WHICH OBJECT it touches, not which row it is on: the
+    proof defends the invariant on both, and defends the trusted contract on
+    neither. ⚠ The real cross-row difference is a GATE difference -- `p34`'s
+    stage `5c-twin` re-derives each trusted `requires` conjunct and each one,
+    deleted alone, makes its twin FAIL (`28 verified, 1 error`, three of three
+    accessors, read out of `results/gate/p34-refcount-stack.json`), while on
+    `p35` that stage is BLOCKED for exactly the three items its `X1` mutates.
   * **`X2` is the two-cell pair**: `M1` and `X1` TOGETHER, i.e. the exec code and
     the invariant weakened to agree with each other. On `p32` the equivalent arm
     VERIFIES, and that is p32's honest statement of what its R5 buys -- the
     safety line is load-bearing against the SPECIFICATION and nothing else.
     ⚠ **Whatever this arm does is p34's answer to the same question and it is
     reported either way.**
+    ⚠ **Name the OBJECT, not just the row** (`TASK_155_REPORT` M5): `p32`'s
+    `M4-spec-weaken` weakens its exec code and its **abstract machine `step`**,
+    i.e. the SPECIFICATION; `p34`'s `X2` weakens its exec code and the **loop
+    invariant `wf`**. The conclusion -- `p32` verifies at `15/0`, `p34` fails at
+    `22/2` -- is sound and the mechanism is right (`run` has no reference count,
+    so no spec weakening can rescue the mutant and the failure is a
+    linear-resource one), but *"X2 is p32's arm"* is not literally true.
   * **`M3`** deletes the epilogue, which is what the leak-freedom corollary
     rests on.
   * **MUST-VERIFY controls** (`M0`) make sure a failure is caused by the mutation
@@ -97,15 +124,21 @@ MUTANTS = [
      "is `return 0;` and it must FAIL, because `rc_fold` is a function of the "
      "window bytes and no constant equals it."),
     ("X1-delete-rc-conjunct", "attack", "fail", [(RC_CONJ, "")],
-     "p35's X1 arm, transplanted: strike the CENTRAL OBLIGATION out of the "
-     "invariant and see whether anything but a hand-written pin notices. The "
-     "conjunct is `perms[k].value().rc == cnt(stk, k)` -- the bridge between "
-     "the count the object stores and the number of stack entries naming it. "
-     "⚠ On p35 the equivalent deletion VERIFIED at the pinned obligation "
-     "count and only the `verus.items` pin caught it. Here it must FAIL, and "
-     "the reason is that this bridge is what discharges `obj_dec`'s "
+     "Strike the CENTRAL OBLIGATION out of the LOOP INVARIANT and see whether "
+     "anything but a hand-written pin notices. The conjunct is "
+     "`perms[k].value().rc == cnt(stk, k)` -- the bridge between the count the "
+     "object stores and the number of stack entries naming it. It must FAIL, "
+     "and the reason is that this bridge is what discharges `obj_dec`'s "
      "`requires rc > 0` and what licenses `obj_free` at zero: it is a "
-     "MEMORY-SAFETY precondition, not a functional one."),
+     "MEMORY-SAFETY precondition, not a functional one. "
+     "⚠⚠ THE CROSS-ROW SENTENCE THIS ENTRY USED TO CARRY IS WITHDRAWN "
+     "(TASK_155_REPORT M5, corrected TASK_156). It read `On p35 the equivalent "
+     "deletion VERIFIED at the pinned obligation count and only the "
+     "verus.items pin caught it`, and that names the wrong p35 arm: p35's "
+     "invariant weakenings M3 and M6 both FAIL at 15/1, exactly as this arm "
+     "fails at 22/2, and the p35 arm that verifies deletes a TRUSTED item's "
+     "`requires` -- on which p34 verifies too, 24/0 (.temp/t156/zmut.py). The "
+     "two rows behave the same; the module docstring above carries the table."),
     ("X2-exec-and-spec", "spec-weaken", "fail",
      [(RETAIN, RETAIN_GONE), (RC_CONJ, "")],
      "THE TWO-CELL PAIR. Delete the retain from the exec code AND the bridge "

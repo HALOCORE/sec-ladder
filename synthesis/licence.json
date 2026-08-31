@@ -3263,6 +3263,236 @@
    }
   }
  },
+ "p34": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [
+     "abort@plt",
+     "free@plt",
+     "free@plt",
+     "malloc@plt"
+    ],
+    "unresolved_indirect": [
+     "jmp *%rcx",
+     "jmp *%rcx"
+    ]
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [
+     "abort@plt",
+     "free@plt",
+     "free@plt",
+     "malloc@plt"
+    ],
+    "unresolved_indirect": [
+     "jmp *%rcx",
+     "jmp *%rcx"
+    ]
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "kernel.cold  [tail/outlined]",
+     "malloc@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "free@plt",
+     "kernel.cold  [tail/outlined]",
+     "malloc@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RINvNtCs4NRVxsYgnAr_4core3ptr9drop_glueAINtNtB4_6option6OptionINtNtCscdodAO9FK5_5alloc2rc2RcNtCsaBH6GJeUSWJ_10safe_naive3ObjEEj10_EB1u_",
+     "_RINvNtCs4NRVxsYgnAr_4core3ptr9drop_glueAINtNtB4_6option6OptionINtNtCscdodAO9FK5_5alloc2rc2RcNtCsaBH6GJeUSWJ_10safe_naive3ObjEEj10_EB1u_",
+     "_RNvCs9wFQrvczXsK_7___rustc12___rust_alloc",
+     "_RNvCs9wFQrvczXsK_7___rustc35___rust_no_alloc_shim_is_unstable_v2",
+     "_RNvMs6_NtCscdodAO9FK5_5alloc2rcINtB5_2RcNtCsaBH6GJeUSWJ_10safe_naive3ObjE9drop_slowBE_",
+     "_RNvMs6_NtCscdodAO9FK5_5alloc2rcINtB5_2RcNtCsaBH6GJeUSWJ_10safe_naive3ObjE9drop_slowBE_",
+     "_RNvMs6_NtCscdodAO9FK5_5alloc2rcINtB5_2RcNtCsaBH6GJeUSWJ_10safe_naive3ObjE9drop_slowBE_",
+     "_RNvNtCs4NRVxsYgnAr_4core6option13unwrap_failed",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCscdodAO9FK5_5alloc5alloc18handle_alloc_error",
+     "_Unwind_Resume@plt"
+    ],
+    "unresolved_indirect": [
+     "jmp *%rax"
+    ]
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RINvNtCs4NRVxsYgnAr_4core3ptr9drop_glueAINtNtB4_6option6OptionINtNtCscdodAO9FK5_5alloc2rc2RcNtCs86OlWC8CPt8_10safe_tuned3ObjEEj10_EB1u_",
+     "_RINvNtCs4NRVxsYgnAr_4core3ptr9drop_glueAINtNtB4_6option6OptionINtNtCscdodAO9FK5_5alloc2rc2RcNtCs86OlWC8CPt8_10safe_tuned3ObjEEj10_EB1u_",
+     "_RNvCs9wFQrvczXsK_7___rustc12___rust_alloc",
+     "_RNvCs9wFQrvczXsK_7___rustc35___rust_no_alloc_shim_is_unstable_v2",
+     "_RNvMs6_NtCscdodAO9FK5_5alloc2rcINtB5_2RcNtCs86OlWC8CPt8_10safe_tuned3ObjE9drop_slowBE_",
+     "_RNvMs6_NtCscdodAO9FK5_5alloc2rcINtB5_2RcNtCs86OlWC8CPt8_10safe_tuned3ObjE9drop_slowBE_",
+     "_RNvMs6_NtCscdodAO9FK5_5alloc2rcINtB5_2RcNtCs86OlWC8CPt8_10safe_tuned3ObjE9drop_slowBE_",
+     "_RNvNtCs4NRVxsYgnAr_4core6option13unwrap_failed",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCscdodAO9FK5_5alloc5alloc18handle_alloc_error",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_Unwind_Resume@plt"
+    ],
+    "unresolved_indirect": [
+     "jmp *%rax"
+    ]
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [
+     "_RNvCs9wFQrvczXsK_7___rustc12___rust_alloc",
+     "_RNvCs9wFQrvczXsK_7___rustc14___rust_dealloc",
+     "_RNvCs9wFQrvczXsK_7___rustc35___rust_no_alloc_shim_is_unstable_v2",
+     "_RNvNtCs2AWtUsOyxgP_3std7process5abort"
+    ],
+    "unresolved_indirect": [
+     "jmp *%rax",
+     "call *%r14",
+     "jmp *%rax"
+    ]
+   },
+   "verus": {
+    "error": null,
+    "outward": [
+     "_RNvCs9wFQrvczXsK_7___rustc12___rust_alloc",
+     "_RNvCs9wFQrvczXsK_7___rustc14___rust_dealloc",
+     "_RNvCs9wFQrvczXsK_7___rustc35___rust_no_alloc_shim_is_unstable_v2",
+     "_RNvNtCs2AWtUsOyxgP_3std7process5abort"
+    ],
+    "unresolved_indirect": [
+     "jmp *%rax",
+     "call *%r14",
+     "jmp *%rax"
+    ]
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "703f0aa2104e5f8473456157eca3f55e2343d4b0b88f780dbb588ebc0bb2602e",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
+   "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
+   "patterns/p34-refcount-stack/NOTES.md": "c1ea61804a1732841872571f03f27a4bcb663df33749a9ded4c90d1327ca0005",
+   "patterns/p34-refcount-stack/README.md": "3481728644d97e2f6d73970bd257142d78ed31d0083f4f030032cec2d7c90cd4",
+   "patterns/p34-refcount-stack/c/kernel.c": "a5ba19f99a38748ffaafd63c14ba655bb39a9f6a824c3f300c565e497d8fe149",
+   "patterns/p34-refcount-stack/c/kernel.h": "b409000cb86567bee321a4e90b64d0e51568e8a3117a2b74ea73102fb6bf03ec",
+   "patterns/p34-refcount-stack/c/kernel_hardened.c": "1b5dc080e8cf04feb8df98775070699d7dbbdc4aba3bcc9e198e98b24b3de552",
+   "patterns/p34-refcount-stack/c/main.c": "5b11232bf1a757a0ae09447bb463225e675f5608908308ee2797fd83fb679579",
+   "patterns/p34-refcount-stack/controls/arm_body.inc": "db5aa326b2e13461e085ca32386337cd00f8b82896609f1fdb49d1857ca6f2a8",
+   "patterns/p34-refcount-stack/controls/arm_safe_arena.rs": "731b42d2ab795fb12f942b1752fb7eea25a3f5281e4aba69fa4efca50eec3b89",
+   "patterns/p34-refcount-stack/controls/arm_safe_rc_borrow.rs": "7cc49a1351b4a9b51377671d25b1d881695ff9f0b0f5c47e83d34fa7b9b3febf",
+   "patterns/p34-refcount-stack/controls/arm_safe_rc_borrow_frozen.rs": "606f27e3423e630876fb96fed894cee3bb290f46a82a30a9f21dd9be7c0c35be",
+   "patterns/p34-refcount-stack/controls/arm_safe_rc_move.rs": "f338b4831a95bc4fd4879477c1070b92122066cfd9d595739c96c181c3603838",
+   "patterns/p34-refcount-stack/controls/arm_unsafe_bug.rs": "36056611000071456ad739328e0acac57e396d5ab001c760150813d61c9e8f5c",
+   "patterns/p34-refcount-stack/controls/ctl_asan.c": "78749cae8f5cbab18b7dde41b51540b5489855dd9f1b00e328e22bca67e751f8",
+   "patterns/p34-refcount-stack/controls/ctl_ubsan.c": "2115942aff04e2962a12ac0c133b1955452f611693303092d2ff76fc6bbc50a7",
+   "patterns/p34-refcount-stack/controls/detectors.py": "7f3e8e19b6e523d97fae7499f0b90d87ca6a3fd6e6eec2786a49f1c6668042aa",
+   "patterns/p34-refcount-stack/controls/no_dup.py": "e1606adbe98e97cf29efaa09289ac25eca2d6a664fd32252a20a876768177bcf",
+   "patterns/p34-refcount-stack/controls/proof_mutants.py": "92fdfe205ee3bd98781a3382817b12bc5f4203c8ec362583239bc6b3d033167c",
+   "patterns/p34-refcount-stack/controls/rust_bug.py": "aa4cc9d7d087923a17d613a0a8816a8d13d6057921b198de6627d3e2f62ecaf8",
+   "patterns/p34-refcount-stack/controls/safe_arms.py": "ad1965d9e0cdca6c741c97832364b2d4a652e71c26030a833bba26df529dff30",
+   "patterns/p34-refcount-stack/controls/safety_line.py": "ea11c314c0328c32e36b9ff56989e4b577345808ce685a15a7104bce5a399584",
+   "patterns/p34-refcount-stack/controls/spellings.py": "8474ad00cb2618417b13f38003bbef4d8854a81eb75f6269b8f564fe5533497a",
+   "patterns/p34-refcount-stack/inputs/gen.py": "1c700ec5d29a749fd0da3ab2fa2c938339b5b8b9e331063567c5187a30f92c3e",
+   "patterns/p34-refcount-stack/model.py": "a7f48e4f416cec4d546ba36293a5f4a05be4cb25f776762c1f72a129715021a1",
+   "patterns/p34-refcount-stack/safe_naive.rs": "9d0c7294edc97cedde3870808c121a65d4fc3fe89d6c06fb77920d2827955d36",
+   "patterns/p34-refcount-stack/safe_tuned.rs": "f5175d8b181a5d7f0cd0274f86b1d436bc0f2f0700c21875824d02c6a76df5fc",
+   "patterns/p34-refcount-stack/spec.md": "304b749944bb11bc3efeb2369dade4058e42b1a28d2e4d2799a8127e5b369191",
+   "patterns/p34-refcount-stack/unsafe.rs": "529ffe1cd330016867c3a2a97e60fb7709233d0aea557e1c2e0cb2a1a19d4bb8",
+   "patterns/p34-refcount-stack/verus.rs": "c55ea504ab2f699c1480eab237cbe225c9dedb3ff90cf4d7a2dd12f16627bff7",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "NOT-LIC",
+    "why": "ASYMMETRIC INDIRECT dispatch (safe_naive: 1, unsafe: 3); e.g. `jmp *%rax`"
+   },
+   "R3-R4": {
+    "verdict": "NOT-LIC",
+    "why": "ASYMMETRIC INDIRECT dispatch (safe_tuned: 1, unsafe: 3); e.g. `jmp *%rax`"
+   },
+   "R5-R4": {
+    "verdict": "UNDEC",
+    "why": "both sides dispatch through an unresolvable pointer (3 each); e.g. `jmp *%rax`"
+   },
+   "gcc-clang": {
+    "verdict": "NOT-LIC",
+    "why": "ASYMMETRIC INDIRECT dispatch (c-gcc: 0, c-clang: 2); e.g. `jmp *%rcx`"
+   }
+  }
+ },
  "p35": {
   "cells": {
    "c-clang": {

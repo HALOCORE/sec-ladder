@@ -4,19 +4,21 @@
   },
   "derived_from_sha256": {
     "patterns/p34-refcount-stack/c/kernel.c": "a5ba19f99a38748ffaafd63c14ba655bb39a9f6a824c3f300c565e497d8fe149",
-    "patterns/p34-refcount-stack/c/kernel_hardened.c": "bd2bb22db44ab50b623b365d9587cf2dd31efca729c37f8fc9e70086c383f681",
+    "patterns/p34-refcount-stack/c/kernel_hardened.c": "1b5dc080e8cf04feb8df98775070699d7dbbdc4aba3bcc9e198e98b24b3de552",
     "patterns/p34-refcount-stack/safe_naive.rs": "9d0c7294edc97cedde3870808c121a65d4fc3fe89d6c06fb77920d2827955d36",
-    "patterns/p34-refcount-stack/controls/arm_safe_arena.rs": "8a59586d35c2238bb47343272d90a2f2981f6cd7587fcec78e6bd9fd0fb1cdcf",
+    "patterns/p34-refcount-stack/controls/arm_safe_arena.rs": "731b42d2ab795fb12f942b1752fb7eea25a3f5281e4aba69fa4efca50eec3b89",
     "patterns/p34-refcount-stack/controls/arm_safe_rc_move.rs": "f338b4831a95bc4fd4879477c1070b92122066cfd9d595739c96c181c3603838",
-    "patterns/p34-refcount-stack/controls/arm_safe_rc_borrow.rs": "4b8c89c9596a13a442bb35aa48730402dc3a0ff22d953caaebeeccde598fff70",
-    "patterns/p34-refcount-stack/controls/safe_arms.py": "5f955b7038dbe66e3901d1a4a0ed43be4b082524fd6b50506ac25e9e3b0e7ce9",
-    "patterns/p34-refcount-stack/inputs/gen.py": "671bceca2e1ce7eb720d29d406c9430abc867ba79a6d19f015059903e0bf52b8"
+    "patterns/p34-refcount-stack/controls/arm_safe_rc_borrow.rs": "7cc49a1351b4a9b51377671d25b1d881695ff9f0b0f5c47e83d34fa7b9b3febf",
+    "patterns/p34-refcount-stack/controls/arm_safe_rc_borrow_frozen.rs": "606f27e3423e630876fb96fed894cee3bb290f46a82a30a9f21dd9be7c0c35be",
+    "patterns/p34-refcount-stack/controls/safe_arms.py": "ad1965d9e0cdca6c741c97832364b2d4a652e71c26030a833bba26df529dff30",
+    "patterns/p34-refcount-stack/inputs/gen.py": "1c700ec5d29a749fd0da3ab2fa2c938339b5b8b9e331063567c5187a30f92c3e"
   },
-  "measured_utc": "2026-08-31T12:41:34Z",
+  "measured_utc": "2026-08-31T15:24:14Z",
   "branch_a_compiles": {
     "safe_naive.rs": {
       "ok": true,
       "error_codes": [],
+      "error_line": null,
       "first_error": ""
     },
     "arm_safe_rc_move.rs": {
@@ -24,6 +26,7 @@
       "error_codes": [
         "E0507"
       ],
+      "error_line": 79,
       "first_error": "error[E0507]: cannot move out of `*t` which is behind a shared reference"
     },
     "arm_safe_rc_borrow.rs": {
@@ -31,8 +34,87 @@
       "error_codes": [
         "E0502"
       ],
+      "error_line": 100,
       "first_error": "error[E0502]: cannot borrow `objs` as mutable because it is also borrowed as immutable"
     }
+  },
+  "negative_controls": {
+    "arm_safe_rc_move.rs _nodup twin": {
+      "ok": true,
+      "error_codes": [],
+      "error_line": null,
+      "first_error": "",
+      "expected_ok": true,
+      "as_expected": true,
+      "arm_error_line": 79,
+      "arm_error_codes": [
+        "E0507"
+      ],
+      "same_error_as_arm": false,
+      "meaning": "the E0507 IS attributable to the DUP body: delete it and the same file compiles."
+    },
+    "arm_safe_rc_borrow.rs _nodup twin": {
+      "ok": false,
+      "error_codes": [
+        "E0502"
+      ],
+      "error_line": 100,
+      "first_error": "error[E0502]: cannot borrow `objs` as mutable because it is also borrowed as immutable",
+      "expected_ok": false,
+      "as_expected": true,
+      "arm_error_line": 100,
+      "arm_error_codes": [
+        "E0502"
+      ],
+      "same_error_as_arm": true,
+      "meaning": "the E0502 is NOT attributable to the DUP body -- it is raised on the NEW path (`objs.push` against live borrows) and survives the DUP body's deletion. That is this row's PUBLISHED reading of the arm, so a twin that started compiling would falsify it."
+    },
+    "arm_safe_rc_borrow_frozen.rs": {
+      "ok": true,
+      "error_codes": [],
+      "error_line": null,
+      "first_error": "",
+      "stdout": "201",
+      "expected_ok": true,
+      "expected_stdout": "201"
+    }
+  },
+  "arena_high_water": {
+    "adversarial-blind.bin": {
+      "windows": 1,
+      "max_slots_in_use": 1
+    },
+    "adversarial-blindread.bin": {
+      "windows": 1,
+      "max_slots_in_use": 1
+    },
+    "adversarial-many.bin": {
+      "windows": 1,
+      "max_slots_in_use": 1
+    },
+    "adversarial-recycle.bin": {
+      "windows": 1,
+      "max_slots_in_use": 1
+    },
+    "adversarial-stride3.bin": {
+      "windows": 0,
+      "max_slots_in_use": 0
+    },
+    "degenerate.bin": {
+      "windows": 1,
+      "max_slots_in_use": 16
+    },
+    "large.bin": {
+      "windows": 64,
+      "max_slots_in_use": 16
+    },
+    "small.bin": {
+      "windows": 8,
+      "max_slots_in_use": 11
+    },
+    "worst_case": 16,
+    "ARENA": 32,
+    "CAP": 16
   },
   "branch_b_checksums": {
     "adversarial-blind.bin": {
@@ -168,5 +250,5 @@
     }
   },
   "problems": [],
-  "invariant": "Branch A: the two safe-Rust attempts to publish a second reference without counting it do NOT compile, while the shipped safe_naive.rs on the same command line does. Branch B: the safe INDEX-ARENA arm without the retain reproduces c/kernel.c bit for bit on every input, and with the retain it equals model.py. Both branches of .memory/01-ladder.md's temporal law, in one row, selected by the port."
+  "invariant": "Branch A: the two safe-Rust attempts to publish a second reference without counting it do NOT compile, while the shipped safe_naive.rs on the same command line does. NEGATIVE CONTROLS (TASK_156): the attribution is measured rather than assumed -- arm_safe_rc_move.rs's `_nodup` twin COMPILES, so its E0507 is caused by the DUP body; arm_safe_rc_borrow.rs's twin FAILS identically, so that arm's E0502 is about mutating the owner and NOT about duplicating a borrow; and arm_safe_rc_borrow_frozen.rs stores a second &Obj in the stack array over a frozen owner and COMPILES. The arena high-water mark is MEASURED at 16 of 32. Branch B: the safe INDEX-ARENA arm without the retain reproduces c/kernel.c bit for bit on every input, and with the retain it equals model.py. Both branches of .memory/01-ladder.md's temporal law, in one row, selected by the port."
 }

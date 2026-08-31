@@ -21,7 +21,7 @@ rungs do can shrink it.
 | **Safety line** | `t->rc = t->rc + 1;` on the `DUP` path — **`+1 / −0` preprocessed lines, the smallest in this tree.** `controls/safety_line.py` measures it on the shipped files AND checks that the include-twice body in `controls/arm_body.inc` reproduces both of them exactly. |
 | **Rungs** | R1 `c/kernel.c` · R1h `c/kernel_hardened.c` · R2 `safe_naive.rs` · R3 `safe_tuned.rs` · R4 `unsafe.rs` · R5 `verus.rs` |
 | **R5** | `24 verified, 0 errors` (twin config `29 / 0`), TCB **7 `external_body` items**, of which **5 are inside the twin regime** (`_is_trusted`: `external_body` + an `ensures`, or `unsafe` in the body) — **all 5 twinned, `blocked` is `[]`**. The other two, `load_input` and `emit`, carry no `ensures` and no `unsafe`, so they are outside the regime and owe no twin. Full functional refinement plus the temporal invariant `perms[k].value().rc == cnt(ids, k)`. |
-| **Headline 1** | **The benign cost gradient across the safety line is `0.00` BY CONSTRUCTION, and it is proved rather than searched** — and then measured anyway: `+0.00` Ir/call on all sixteen cells. |
+| **Headline 1** | **No benign input can EXECUTE the safety line, and that is proved rather than searched** — so the gradient was predicted `0.00` and then **measured** `+0.00` Ir/call on all sixteen cells. ⚠ *"`0.00` by construction, NOT by measurement"* is withdrawn: the construction is about which statements run, and the number is a codegen outcome (`NOTES.md` 4b). |
 | **Headline 2** | **Two bug classes separated by WHICH INSTRUMENT SEES THEM.** On two of the four adversarial inputs the two rungs' checksums are **bit-identical** and ASan is the only discriminator. |
 | **Headline 3** | **BOTH branches of `.memory/01-ladder.md`'s temporal law, in ONE row, selected by the PORT.** The `Rc` port cannot express the bug at all; a safe index-arena port reproduces `c/kernel.c` **bit for bit**. |
 
@@ -39,6 +39,16 @@ grow would repair this program without becoming a liveness table. **The free
 happens EARLY rather than the read happening LATE** — a different C program with
 a different repair site, and the harm lands an unbounded distance from the
 omission.
+
+⚠⚠ **"Fix the ACQUIRE" means the only ZERO-COST fix, not the only fix.** A
+destroy-side repair that leaves `DUP` untouched and decides the free by scanning
+the live stack — **`p28`'s repair site** — matches `c/kernel_hardened.c` on 8/8
+inputs and is ASan-clean, at **+7.28 % (`small`) and +21.64 % (`large`) marginal
+`Ir` at `-O3`**, +5.24 % / +18.96 % at `-O0`. The cost grows with **stack
+depth**, because the scan runs on every release while the retain runs only on a
+`DUP` — which no benign input contains. **Two repair sites priced beats one
+asserted** (`NOTES.md` 4c; the *"only the acquire can be repaired"* sentence is
+withdrawn).
 
 ## Headline 1 — `0.00`, proved, then measured
 
@@ -60,6 +70,12 @@ compiled function. Measured: **`R1h − R1 = +0.00` Ir/call on all sixteen cells
 (2 inputs × 2 opt levels × 2 inline modes × 2 compilers), while the **static**
 instruction count moves by **+1 at `-O3` and +5 at `-O0`** on both compilers.
 `NOTES.md` 4.
+
+⚠⚠ **That hedge is load-bearing and it has been cashed.** A *different*
+never-executed statement planted on the same dead `DUP` path moved the `-O3`
+cell by **−14.22 Ir/call** through layout alone, and a *hot* plant moved it
+**34×** — so the cell is neither a plumbing tautology nor a number the proof
+decides. **`0.00` is what was measured.**
 
 ## Headline 2 — two bug classes, and the checksum sees only one
 
@@ -85,6 +101,20 @@ disclosed**, the way `p28` discloses its own.
 |---|---|---|
 | **`Rc`** (the shipped R2/R3) | **not expressible** | `arm_safe_rc_move.rs` → `error[E0507]`, `arm_safe_rc_borrow.rs` → `error[E0502]`; `safe_naive.rs` compiles on the same command line |
 | **index arena** (`arm_safe_arena.rs`, `#![forbid(unsafe_code)]`) | **reproduces `c/kernel.c` BIT FOR BIT on all 8 inputs**, the recycle-divergent one included | and with `--cfg slb_arm_retain` it equals `model.py` on all 8 |
+
+⚠⚠ **The `Rc` half is the weaker one and it is now ATTRIBUTED rather than
+asserted** (`NOTES.md` 8). *"It does not compile"* is evidence about safe Rust
+only if the **bug** is what stops it, so `safe_arms.py` ships three negative
+controls: delete `arm_safe_rc_move.rs`'s whole `DUP` arm and it **compiles**
+(its `E0507` is attributable); delete `arm_safe_rc_borrow.rs`'s and it fails
+with the **same `E0502` at the same line** (that arm's error is about mutating
+the owner, not about duplicating a borrow); and
+`arm_safe_rc_borrow_frozen.rs` stores a **second `&Obj` into the stack array**
+over a frozen owner and **compiles and runs**. ✅ **So the borrow route is
+closed at the OWNER MUTATION — which is where a `free` would have to happen —
+and not at the duplication**, and the hashed sentence that said otherwise is
+withdrawn. ⚠ The error **codes** carry no information about reference counting:
+12-line programs with no `Rc` print both of them.
 
 `.memory/01-ladder.md`'s law is *safe Rust's temporal guarantee is a guarantee
 about the ALLOCATOR; a structure that recycles its own storage gets no guarantee
@@ -120,10 +150,19 @@ returns.
 | `M3-delete-epilogue` | fail | `23 / 1` | `assertion failed` — leak-freedom |
 
 ⚠⚠ **`X2` is the arm to read.** It weakens the exec code AND the invariant so
-they agree again — the arm `p32` publishes as **VERIFYING**, because p32
+they agree again — the question `p32` answers **VERIFYING**, because p32
 allocates nothing and its safety line is load-bearing against the specification
 alone. **On `p34` it FAILS, on a memory-safety precondition.** That is the
 sharpest difference between the two rows' R5 results.
+
+⚠⚠⚠ **`X1`'s cross-row sentence is WITHDRAWN** (`NOTES.md` 6c). It used to read
+*"`X1` is `p35`'s arm; on `p35` it VERIFIED and on `p34` it FAILS"*, and that
+names the wrong `p35` arm. `p34`'s `X1` weakens a **loop invariant**, and so does
+`p35`'s `M6` — **both FAIL**. The `p35` arm that verifies deletes a **trusted
+item's `requires`**, and on that arm **`p34` verifies too, `24 / 0`**. The two
+rows behave the same; what differs is a **gate** stage, not a proof — `p34`'s
+`5c-twin` fails the twin (`28 / 1`) for each of the three accessors, while on
+`p35` that stage is blocked for exactly those items.
 
 ## What the pinned vstd does not have, reported as a result
 
@@ -143,8 +182,13 @@ search beside it** (`controls/spellings.py`), never as a bare point — six
 patterns in this project have published a rung-to-rung headline wrong in the
 flattering direction. `NOTES.md` 5 gives both optimisation levels, names the
 weaker-searched endpoint, and records the one comparison that **REVERSES between
-optimisation levels**. The `0.00` safety-line figure above needs no such search:
-nothing can move a statement about a statement that does not run.
+optimisation levels**. ⚠ **The `0.00` safety-line figure is NOT exempt from that
+discipline, and the sentence that said it was is withdrawn.** It used to read
+*"nothing can move a statement about a statement that does not run"* — which is
+false: a never-executed statement moves layout, register allocation and
+inlining, and a planted one moved this very cell by **−14.22 Ir/call** at `-O3`.
+What the construction settles is that the safety line does not EXECUTE; the
+`0.00` is a measurement and is reported as one.
 
 ## Reproducing
 

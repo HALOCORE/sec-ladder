@@ -138,9 +138,31 @@ class Pool:
 
     ⚠ `recycle` is what makes this a simulation of glibc rather than of an
     abstract heap. `free` pushes the block onto a LIFO list and the next
-    allocation POPS it, which is the tcache's discipline -- and it is the whole
-    of the difference between p34's checksum-blind shapes and its divergent one.
-    `../controls/storage_arms.py` measures that the real allocator agrees."""
+    allocation POPS it, which is the tcache's discipline -- and in **the C
+    program** it is the whole of the difference between p34's checksum-blind
+    shapes and its divergent one.
+
+    ⚠⚠ **IT DECIDES NOTHING THIS MODEL PUBLISHES, AND THAT IS MEASURED
+    (`TASK_156`, `.temp/t156/recycle_probe.py`).** Turning the recycle off
+    entirely -- every allocation takes a fresh block -- moves **0 of 56** leaf
+    values across the eight shipped inputs: same `checksum`, same
+    `sanitizer_expect`, same `expected_stdout`/`expected_exit`, same `any_uaf`,
+    same `work_per_call`, same `selfcheck`. The reason is structural: `Model`
+    publishes the HARDENED checksum and keeps only the buggy run's `uaf` FLAG
+    (`Model._window`), and a `DUP`'d object's SECOND release reads `o->rc` out
+    of a freed block **whatever the allocator does with the storage** --
+    exhaustively confirmed over 33 628 000 op streams by
+    `.temp/t155/dupproof.py`. Recycling decides *which* access and *what value*;
+    it cannot decide *whether*. What it buys here is a faithful diagnostic in
+    `uaf_sites`, not a published number.
+
+    ⚠ **What DOES measure that the real allocator recycles LIFO is
+    `../controls/safe_arms.py` branch B**: a safe index-arena port whose free
+    list is a LIFO stack reproduces `c/kernel.c` bit for bit on
+    `adversarial-recycle` -- the input on which the two C rungs DIVERGE -- and
+    on all eight. A FIFO list would not.
+    ⚠ **This docstring cited `../controls/storage_arms.py` until `TASK_156`, and
+    that file has never existed** (`TASK_155_REPORT` M4)."""
 
     def __init__(self):
         self.objs = []        # every object ever created, in creation order

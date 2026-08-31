@@ -7,9 +7,9 @@
     "patterns/p34-refcount-stack/c/kernel.c": "a5ba19f99a38748ffaafd63c14ba655bb39a9f6a824c3f300c565e497d8fe149",
     "patterns/p34-refcount-stack/controls/arm_unsafe_bug.rs": "36056611000071456ad739328e0acac57e396d5ab001c760150813d61c9e8f5c",
     "patterns/p34-refcount-stack/controls/rust_bug.py": "aa4cc9d7d087923a17d613a0a8816a8d13d6057921b198de6627d3e2f62ecaf8",
-    "patterns/p34-refcount-stack/inputs/gen.py": "671bceca2e1ce7eb720d29d406c9430abc867ba79a6d19f015059903e0bf52b8"
+    "patterns/p34-refcount-stack/inputs/gen.py": "1c700ec5d29a749fd0da3ab2fa2c938339b5b8b9e331063567c5187a30f92c3e"
   },
-  "measured_utc": "2026-08-31T13:03:26Z",
+  "measured_utc": "2026-08-31T15:24:19Z",
   "derivation_ok": true,
   "checksums": {
     "adversarial-blind.bin": {

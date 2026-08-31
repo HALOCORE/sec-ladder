@@ -4,9 +4,9 @@
   },
   "derived_from_sha256": {
     "patterns/p34-refcount-stack/verus.rs": "c55ea504ab2f699c1480eab237cbe225c9dedb3ff90cf4d7a2dd12f16627bff7",
-    "patterns/p34-refcount-stack/controls/proof_mutants.py": "d9d815b007a84924eed8b531c54807dc61ae23e7ff18f628725566f5edb2ffc1"
+    "patterns/p34-refcount-stack/controls/proof_mutants.py": "92fdfe205ee3bd98781a3382817b12bc5f4203c8ec362583239bc6b3d033167c"
   },
-  "measured_utc": "2026-08-31T13:04:03Z",
+  "measured_utc": "2026-08-31T15:24:56Z",
   "mutants": [
     {
       "mutant": "M0-control",
@@ -63,7 +63,7 @@
         "aborting due to 4 previous errors",
         "precondition not satisfied"
       ],
-      "why": "p35's X1 arm, transplanted: strike the CENTRAL OBLIGATION out of the invariant and see whether anything but a hand-written pin notices. The conjunct is `perms[k].value().rc == cnt(stk, k)` -- the bridge between the count the object stores and the number of stack entries naming it. \u26a0 On p35 the equivalent deletion VERIFIED at the pinned obligation count and only the `verus.items` pin caught it. Here it must FAIL, and the reason is that this bridge is what discharges `obj_dec`'s `requires rc > 0` and what licenses `obj_free` at zero: it is a MEMORY-SAFETY precondition, not a functional one."
+      "why": "Strike the CENTRAL OBLIGATION out of the LOOP INVARIANT and see whether anything but a hand-written pin notices. The conjunct is `perms[k].value().rc == cnt(stk, k)` -- the bridge between the count the object stores and the number of stack entries naming it. It must FAIL, and the reason is that this bridge is what discharges `obj_dec`'s `requires rc > 0` and what licenses `obj_free` at zero: it is a MEMORY-SAFETY precondition, not a functional one. \u26a0\u26a0 THE CROSS-ROW SENTENCE THIS ENTRY USED TO CARRY IS WITHDRAWN (TASK_155_REPORT M5, corrected TASK_156). It read `On p35 the equivalent deletion VERIFIED at the pinned obligation count and only the verus.items pin caught it`, and that names the wrong p35 arm: p35's invariant weakenings M3 and M6 both FAIL at 15/1, exactly as this arm fails at 22/2, and the p35 arm that verifies deletes a TRUSTED item's `requires` -- on which p34 verifies too, 24/0 (.temp/t156/zmut.py). The two rows behave the same; the module docstring above carries the table."
     },
     {
       "mutant": "X2-exec-and-spec",

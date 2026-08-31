@@ -20,9 +20,16 @@
  * LUCK.** The line executes only on a `DUP`, and a `DUP` in R1 always leads to a
  * use-after-free (c/kernel.h's two-line proof), so no input on which R1 and R1h
  * agree can contain one -- and `inputs/gen.py` enforces exactly that on every
- * matrix blob it writes. The R1-vs-R1h benign gradient is `0.00` because the
- * added statement is never executed, and ../NOTES.md 4 reports the MEASURED
- * instruction delta beside the prediction rather than leaving the zero implied.
+ * matrix blob it writes.
+ *
+ * ⚠⚠ **"BY CONSTRUCTION" IS ABOUT WHICH STATEMENTS EXECUTE AND NEVER ABOUT THE
+ * NUMBER.** This paragraph used to end *"the R1-vs-R1h benign gradient is `0.00`
+ * BECAUSE the added statement is never executed"*, and that causal step does not
+ * hold: a never-executed statement still moves layout, register allocation and
+ * inlining, and `TASK_155` planted a different dead statement on the same `DUP`
+ * path and moved the `-O3` cell by **-14.22** Ir/call. `0.00` is PREDICTED from
+ * the construction and then MEASURED, and ../NOTES.md 4b reports the measured
+ * delta on both compilers at both levels beside the prediction.
  *
  * Everything else in this file is character-identical to c/kernel.c, including
  * the layout note and the reasons the guards are where they are. */

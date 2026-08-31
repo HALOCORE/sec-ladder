@@ -31,8 +31,20 @@
 //!
 //! ⚠ `ARENA` is 32 where the stack holds 16, which is headroom that is never
 //! reached: at most `ntop <= CAP` distinct slots can be allocated at once and a
-//! `NEW` runs only under `ntop < CAP`. `safe_arms.py` records the high-water
-//! mark so the headroom is a measured claim rather than an assumption.
+//! `NEW` runs only under `ntop < CAP`. **`safe_arms.py` MEASURES the high-water
+//! mark** (`arena_high_water` in `safe_arms.json`): it derives an instrumented
+//! copy of THIS FILE — five mechanical substitutions, each asserted to match
+//! exactly once, adding a running `hw` and sweeping EVERY window instead of the
+//! driver's sampled ones — builds it and takes the maximum. Measured:
+//! **16 of 32 slots, worst case, on `degenerate.bin` and `large.bin`**, i.e.
+//! exactly `CAP`, with 16 slots of margin, so the `free[]` pop below cannot
+//! underflow.
+//!
+//! ⚠⚠ **THIS COMMENT CLAIMED THE MEASUREMENT BEFORE THE MEASUREMENT EXISTED.**
+//! Until `TASK_156` it said `safe_arms.py` "records the high-water mark" and
+//! `safe_arms.py` recorded nothing of the kind (`TASK_155_REPORT` M4) — a
+//! citation of a measurement is as dangling as a citation of a file, and
+//! `harness/tools/temp_citations.py` can see neither.
 
 #![forbid(unsafe_code)]
 
@@ -89,7 +101,9 @@ pub fn kernel(buf: &[u8], off: usize, len: usize) -> u64 {
         if c % 4 == 0 {
             if ntop < CAP {
                 // POP the free list. The headroom claim is that this cannot
-                // underflow; `safe_arms.py` records the high-water mark.
+                // underflow, and `safe_arms.py` MEASURES it from an
+                // instrumented copy of this file: worst case 16 of ARENA = 32
+                // slots in use, on `degenerate.bin` and `large.bin`.
                 nfree = nfree - 1;
                 let s = free[nfree];
                 pool[s].rc = 1;

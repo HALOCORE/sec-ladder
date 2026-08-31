@@ -17,6 +17,38 @@
 //! spelling is rejected; it does not show the SEPARATION is unavailable. The two
 //! together cover the two ways a program could hold a second reference at all --
 //! own it, or borrow it -- and safe Rust closes both, for two different reasons.
+//!
+//! ⚠⚠⚠ **AND THE TWO REASONS ARE NOT THE SAME KIND OF EVIDENCE. READ THIS
+//! BEFORE QUOTING THIS ARM** (`TASK_155_REPORT` B1, re-derived at `TASK_156`;
+//! `safe_arms.py`'s `negative_controls` block is the measurement).
+//!
+//!   * **Attempt 1 IS attributable to its DUP body.** Replace this file's and
+//!     `arm_safe_rc_move.rs`'s whole `c % 4 == 1` arm with the `SENT` fold the
+//!     same file already writes when the guard fails -- a program that
+//!     publishes NO second reference and therefore CANNOT have p34's bug --
+//!     and `arm_safe_rc_move.rs` **COMPILES**. Its `E0507` is caused by the two
+//!     edited lines.
+//!   * **THIS ARM IS NOT.** Its `E0502` is reported on the **NEW** path — the
+//!     `objs.push` below, against the live `&objs[..]` borrows — and the
+//!     `_nodup` twin **fails with the identical `E0502` at the identical
+//!     line**. So this arm does NOT measure that duplicating a borrow is
+//!     closed. ⚠ `safe_arms.py` asserts that identity RELATIVELY (arm line ==
+//!     twin line) rather than against a fixed number, because this very header
+//!     moved the reported line from 68 to 98.
+//!   * **What it DOES measure, and it is arguably the stronger statement.**
+//!     Storing a second `&Obj` into the stack array is FINE --
+//!     `arm_safe_rc_borrow_frozen.rs` does exactly that, over a pre-built
+//!     owner, and compiles and runs. What safe Rust refuses is MUTATING THE
+//!     OWNER while those borrows are live. **A free is an owner mutation**, so
+//!     the borrow route is closed not at the duplication but at the point where
+//!     the harm would have to happen.
+//!   * ⚠ **The error CODE carries no information about reference counting.**
+//!     A 12-line program with no `Rc`, no container and no count prints the
+//!     same `E0507`, and a `Vec` push past a live `&v[0]` prints the same
+//!     `E0502`. This is the third time this project has read a rustc code as
+//!     distinguishing when it was not (`p25`'s `E0502`, `p28`'s
+//!     `E0382`/`E0499`). **The attribution arms above, not the code, are the
+//!     evidence.**
 
 #![forbid(unsafe_code)]
 

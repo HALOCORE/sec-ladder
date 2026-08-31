@@ -1,17 +1,25 @@
 #!/usr/bin/env python3
-"""p34 CONTROLS: **the census that makes `0.00` a checked property rather than an
-argument** -- which of this pattern's shipped blobs contain an executed `DUP` op?
+"""p34 CONTROLS: **the census that makes the no-DUP corollary a checked property
+rather than an argument** -- which of this pattern's shipped blobs contain an
+executed `DUP` op?
 
     python3 patterns/p34-refcount-stack/controls/no_dup.py
 
 WHY THIS EXISTS
 ---------------
-p34's headline is that its benign cost gradient across the safety line is `0.00`
-BY CONSTRUCTION, and the proof is two lines (`../c/kernel.h`): the retain is the
-only increment in the kernel, so in R1 every object's `rc` is permanently 1, and
-any executed DUP therefore ends in a use-after-free. The corollary is that **no
-input on which R1 and R1h agree can contain a DUP**, and `harness/check.py`
-stage 2 requires every non-adversarial cell to agree.
+p34's headline is that **no benign input can EXECUTE the safety line**, and the
+proof is two lines (`../c/kernel.h`): the retain is the only increment in the
+kernel, so in R1 every object's `rc` is permanently 1, and any executed DUP
+therefore ends in a use-after-free. The corollary is that **no input on which R1
+and R1h agree can contain a DUP**, and `harness/check.py` stage 2 requires every
+non-adversarial cell to agree.
+
+⚠ **THE CONSTRUCTION SETTLES *WHICH STATEMENTS EXECUTE*, NOT *WHAT THE NUMBER
+IS*, AND THIS FILE USED TO BLUR THE TWO** (`TASK_155_REPORT` M2, corrected at
+`TASK_156`). What is proved is the census below; the `0.00` marginal `Ir` is a
+codegen outcome that was PREDICTED from the census and then MEASURED
+(`../NOTES.md` 4b). A never-executed statement can still move the cell -- one
+planted on this very path moved it by `-14.22` Ir/call at `-O3`.
 
 ⚠ A structural claim of that shape is exactly the kind this project has been
 wrong about before, so it is checked in THREE independent places rather than
@@ -101,8 +109,9 @@ def main():
             problems.append(
                 f"{name} is a MATRIX input and executes {hist[m34.DUP]} DUP "
                 f"op(s). R1 would free an object a live stack entry still "
-                f"names, so R1 and R1h cannot agree on it and the `0.00` "
-                f"benign gradient stops being true by construction")
+                f"names, so R1 and R1h cannot agree on it and the no-DUP "
+                f"corollary the `0.00` gradient was predicted from stops "
+                f"holding")
         if adv and name not in NO_OPS and not hist[m34.DUP]:
             problems.append(
                 f"{name} is an ADVERSARIAL input and executes NO DUP, so it "
@@ -133,7 +142,9 @@ def main():
            "invariant": "Every non-adversarial blob executes ZERO DUP ops and "
                         "every adversarial blob except adversarial-stride3.bin "
                         "executes at least one. The first half is what makes "
-                        "p34's benign cost gradient 0.00 by construction; the "
+                        "p34's safety line unexecutable on every benign "
+                        "input, which is what the 0.00 benign cost gradient "
+                        "was PREDICTED from and then measured; the "
                         "second is what stops the first from being vacuous."}
     out = os.path.join(HERE, "no_dup.json")
     json.dump(doc, open(out, "w"), indent=2)

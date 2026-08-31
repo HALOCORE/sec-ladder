@@ -52,6 +52,26 @@
  * with a different repair site. Nothing in `p27`, `p29` or `p32` computes
  * whether to free from a counter; `p32` allocates nothing at all.
  *
+ * ⚠⚠ **THE ACQUIRE IS THE ONLY ZERO-COST REPAIR SITE, NOT THE ONLY REPAIR
+ * SITE -- MEASURED, AND THE STRONGER CLAIM IS WITHDRAWN.** `TASK_155` built the
+ * counterexample and `TASK_156` re-derived it
+ * (`.temp/t156/csite/{make_destroyfix.py,destroy_cost.py}`): leave `DUP`
+ * untouched, and decide the free on the RELEASE path by scanning
+ * `stk[0..ntop)` for the object instead of trusting `rc`. That is `p28`'s
+ * repair site, an ownership test at the free, and it WORKS -- checksum-equal to
+ * R1h on 8/8 inputs and ASan-clean where R1 fires. **What it is not is free:**
+ *
+ *     marginal Ir/call, gcc, isolated, (Ir@200 - Ir@100)/100
+ *       small.bin  -O0   R1/R1h 3144.48    destroy-side 3309.18   +164.70  (+5.24 %)
+ *       small.bin  -O3   R1/R1h 2207.59    destroy-side 2368.23   +160.64  (+7.28 %)
+ *       large.bin  -O0   R1/R1h 15579.69   destroy-side 18532.96  +2953.27 (+18.96 %)
+ *       large.bin  -O3   R1/R1h 11106.93   destroy-side 13510.76  +2403.83 (+21.64 %)
+ *
+ * ⚠ **The cost grows with the INPUT, not with the optimisation level**, because
+ * the scan is `O(ntop)` on EVERY release while the retain runs only on a `DUP`
+ * -- which no benign input contains. That is *why* the acquire is the idiomatic
+ * site, and pricing two repair sites is a better result than asserting one.
+ *
  * ⚠⚠ **THERE IS NO BENIGN INPUT THAT EXECUTES THE SAFETY LINE, AND THAT IS
  * PROVED RATHER THAN SEARCHED.** `t->rc = t->rc + 1` is the ONLY increment in
  * the kernel, so in R1 every object's `rc` is permanently 1. Any executed `DUP`
@@ -61,6 +81,14 @@
  * `o->rc` out of a freed block. **So `p34`'s benign cost gradient across the
  * safety line is `0.00` BY CONSTRUCTION**, and `inputs/gen.py` enforces the
  * corollary mechanically: NO MATRIX INPUT MAY CONTAIN A `DUP` OP.
+ *
+ * ⚠ **"BY CONSTRUCTION" IS ABOUT THE STATEMENT, NEVER ABOUT THE NUMBER, AND
+ * THAT DISTINCTION IS MEASURED.** The construction proves the safety line is
+ * not EXECUTED; the marginal `Ir` is a codegen outcome and R1h is a different
+ * compiled function. `TASK_155` planted a *different* never-executed statement
+ * on the same dead `DUP` path and moved the `-O3` cell by **-14.22** Ir/call
+ * through layout alone. `0.00` is what was MEASURED (../NOTES.md 4b), not what
+ * was assumed, and *"`0.00` by construction, NOT by measurement"* is withdrawn.
  *
  * TWO BUG CLASSES, SEPARATED BY WHICH INSTRUMENT SEES THEM
  * -------------------------------------------------------
@@ -109,7 +137,13 @@
  * slot that is never freed has nothing to decide. `.memory/01-ladder.md`'s law
  * -- *safe Rust's temporal guarantee is a guarantee about the ALLOCATOR* -- is
  * what makes the storage choice load-bearing rather than incidental, and
- * ../controls/storage_arms.py measures both sides of it.
+ * ../controls/safe_arms.py measures both sides of it: branch A is the `Rc`
+ * port, whose two must-fail arms do not compile, and branch B is a safe
+ * INDEX-ARENA port that reproduces this file's checksum on 8/8 inputs.
+ * ⚠ **This line cited `../controls/storage_arms.py` until `TASK_156`, AND THAT
+ * FILE HAS NEVER EXISTED** (`TASK_155_REPORT` M4) -- a citation is what a
+ * reader trusts INSTEAD of re-checking, so a dangling one removes the check it
+ * was meant to enable.
  *
  * Two C rungs share this declaration, and both take `buf_len` and ignore it:
  * p34's bound is not the source buffer's length. p12's, p06's, p14's, p27's,
