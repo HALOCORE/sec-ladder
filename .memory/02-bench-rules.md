@@ -1847,7 +1847,7 @@ spatial (OOB read/write, index/bound)  15   p02 p03 p05 p07 p09 p10 p11 p12 p13
                                             p14 p16 p17 p23 p36 p46
 logical, memory-safe                    3   p04 p06 p19
 TEMPORAL                                4   p27 p28 p29 p32
-TYPE                                    1   p38
+TYPE                                    2   p35 p38
 resource / leak                         1   p42
 side channel                            1   p47
 UB that is not memory-unsafety          1   p18
@@ -1861,8 +1861,10 @@ whatever it measures.** ⚠⚠ **THIS LINE READ *"15 of 26 spatial against ONE
 temporal and ONE type"* AND THE TEMPORAL HALF IS NOW STALE FOUR TIMES OVER — the
 C-side bar (finding 53) admitted seven rows and the temporal axis has gone
 `1 → 4` (`p27`, `p29` at `TASK_139`, `p32` at `TASK_144`, `p28` at `TASK_146`),
-with two more admitted and unbuilt.** ✅ **THE TYPE AXIS IS STILL ONE ROW
-(`p38`), and `p35` — ranked FIRST of seven by distance — is the second.**
+with two more admitted and unbuilt.** ✅✅ **AND THE TYPE AXIS NOW HAS TWO ROWS: `p35` LANDED AT `TASK_148`.**
+⚠ **That matters more than the count: `results/SYNTHESIS.md` §7 says in terms
+that *"every claim this document makes about the type axis rests on ONE
+pattern"*, and `p38` was that pattern. It no longer is.**
 ⚠ **Do not re-derive any of these from this paragraph: run
 `harness/tools/composition.py`.**
 

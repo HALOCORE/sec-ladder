@@ -103,7 +103,7 @@ CLASSES = {
     ),
     "type": (
         "the bytes are read at a type they were not written at",
-        ["p38"],
+        ["p35", "p38"],
     ),
     "resource": (
         "a resource acquired and not released; memory-safe while it happens",
@@ -144,6 +144,20 @@ ORDER = ["spatial", "logical", "temporal", "type", "resource", "side-channel",
 # that the safety line does not name, and `p09` does.
 # ---------------------------------------------------------------------------
 CAVEATS = {
+    "p35": "the safety line is a STATEMENT ORDERING -- the tag store moves "
+           "inside the budget test -- so this table's stated test (what does "
+           "the safety line ASK?) applies only obliquely: it asks nothing, it "
+           "SEQUENCES. Counted `type` on the HARM's cause: a GET dispatches on "
+           "a tag that names a different type from the one the payload was "
+           "written at, which is CWE-843 exactly. \u26a0 The harm has TWO limbs "
+           "and only one is memory-unsafe: the DBL limb is a SILENT WRONG VALUE "
+           "with no undefined behaviour anywhere (reading a union member other "
+           "than the one last stored is DEFINED in C99 6.2.6.1p7), which is "
+           "`logical`'s class; the PTR limb dereferences an attacker-derived "
+           "integer, which is CWE-822. Counted `type` because ONE ordering "
+           "produces both and the type confusion is what produces them. "
+           "\u26a0\u26a0 p35 is the SECOND row on this axis; until TASK_148 every "
+           "claim the synthesis made about the type axis rested on p38 alone.",
     "p28": "the safety line is NOT A TEST, it is a nine-line SPLICE -- a WRITE "
            "on the DESTROY path that maintains 'membership implies ownership' "
            "across two intrusive lists. ⚠⚠ So this table's own stated test "

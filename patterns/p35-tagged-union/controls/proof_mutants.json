@@ -1,0 +1,77 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p35-tagged-union/controls/proof_mutants.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p35-tagged-union/verus.rs": "7e89d6e26dbf70ecb24ed63121b6eef0621efcdaae6bffe800757eeccd4d5fe1",
+    "patterns/p35-tagged-union/controls/proof_mutants.py": "303c4e883ab0bf9d196abc2d58922462aaaa72b646b2e5982abcf3dcc3e9b385",
+    "harness/check.py": "703f0aa2104e5f8473456157eca3f55e2343d4b0b88f780dbb588ebc0bb2602e",
+    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "measured_utc": "2026-08-31T07:38:17Z",
+  "shipped_obligations": 16,
+  "arms": {
+    "M0-unmutated": {
+      "verified": 16,
+      "errors": 0,
+      "diagnostic": "verification results:: 16 verified, 0 errors",
+      "expectation": "the shipped file verifies at exactly 16 obligations; every arm below is a diff against THIS run",
+      "as_designed": true
+    },
+    "M1-drop-tag-test": {
+      "verified": 15,
+      "errors": 1,
+      "diagnostic": "verification results:: 15 verified, 1 errors note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function --> <scratch> | 556 | while o < nops | ^^^^^^^^^^^^^^ error: precondition not satisfied --> <scratch> | 449 | v@[i as int] is i, | ----------------- failed precondition ... 647 | pay_i(&pays, idx) & 0xFF | ^^^^^^^^^^^^^^^^^ error: assertion failed --> <scratch> | 664 | assert(v == step(st_in, c, a).1); | ^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed error: aborting due to 2 previous errors",
+      "expectation": "reading `pay_i` without testing the tag must FAIL with `precondition not satisfied` -- this is what proves the tag/variant agreement is CHECKED at the call site and not merely asserted in spec.md",
+      "as_designed": true
+    },
+    "M2-bug-order-exec": {
+      "verified": 15,
+      "errors": 1,
+      "diagnostic": "verification results:: 15 verified, 1 errors error: assertion failed --> <scratch> | 663 | assert(st_out =~= step(st_in, c, a).0); | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed error: aborting due to 1 previous error",
+      "expectation": "R1's bug in R5's exec code -- the tag store moves out of the budget test -- must FAIL. \u26a0 MEASURED diagnostic: `assertion failed` at `assert(st_out =~= step(st_in, c, a).0)`, i.e. the exec code stops agreeing with the abstract machine before anything reaches a union read. The prediction written for this arm was `precondition not satisfied` and it was WRONG about the diagnostic, right about the outcome",
+      "as_designed": true
+    },
+    "M3-bug-order-both": {
+      "verified": 15,
+      "errors": 1,
+      "diagnostic": "verification results:: 15 verified, 1 errors error: invariant not satisfied at end of loop body --> <scratch> | 567 | wf_cells(St { tags: tags@, pays: pays@, navail: navail as int }), | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ error: aborting due to 1 previous error",
+      "expectation": "THE SPEC-WEAKEN ARM, and p35's answer is the OPPOSITE of p32's. Making the abstract machine agree with the buggy code does NOT rescue the mutant. \u26a0 MEASURED diagnostic: `invariant not satisfied at end of loop body`, naming `wf_cells` -- so what stops being maintainable is the CORRECT-VARIANT INVARIANT itself, which is a sharper result than the `precondition not satisfied` this arm was written expecting. p32's equivalent arm VERIFIES 15/0",
+      "as_designed": true
+    },
+    "M6-weaken-invariant": {
+      "verified": 15,
+      "errors": 1,
+      "diagnostic": "verification results:: 15 verified, 1 errors note: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function --> <scratch> | 554 | while o < nops | ^^^^^^^^^^^^^^ error: precondition not satisfied --> <scratch> | 447 | v@[i as int] is i, | ----------------- failed precondition ... 645 | pay_i(&pays, idx) & 0xFF | ^^^^^^^^^^^^^^^^^ error: precondition not satisfied --> <scratch> | 459 | v@[i as int] is o, | ----------------- failed precondition ... 647 | arr_get_unchecked(&arena, pay_o(&pays, idx) as usize) as u64 | ^^^^^^^^^^^^^^^^^ error: aborting due to 2 previous errors",
+      "expectation": "M3 taken one step further, and it is the TRUE analogue of p32's `M4-spec-weaken`: with `wf_cell` weakened to `true`, NOTHING in the specification says a tag names the union member its payload is. The proof still fails, now at the union read's own `requires` -- `precondition not satisfied` -- because that obligation is imposed by the TYPE SYSTEM at the operation and cannot be specified away. **This is the cell that p32 has no counterpart for.**",
+      "as_designed": true
+    },
+    "M4-constant-body": {
+      "verified": 15,
+      "errors": 1,
+      "diagnostic": "verification results:: 15 verified, 1 errors error: postcondition not satisfied --> <scratch> | 508 | r == cell_fold(buf@, off as int, len as int), | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ failed this postcondition ... 680 | 0 | - at the end of the function body error: aborting due to 1 previous error",
+      "expectation": "TASK_136's ARM_C shape: a constant body must not discharge the `ensures`",
+      "as_designed": true
+    },
+    "M5-assume-false": {
+      "verified": 16,
+      "errors": 0,
+      "diagnostic": "verification results:: 16 verified, 0 errors",
+      "expectation": "\u26a0 THIS ONE VERIFIES, and that is the finding: `assume(false)` in the kernel body is invisible to the obligation count, the clause pin and the identity pin. TASK_145 and TASK_149 both planted it. The gate-side half is measured below",
+      "as_designed": true
+    },
+    "M5b-gate-sees-it": {
+      "hits_in_mutant": {
+        "assume(": [
+          513
+        ]
+      },
+      "hits_in_shipped": {},
+      "spec_md_verus_assumptions": 0,
+      "as_designed": true
+    }
+  },
+  "arms_as_designed": 8,
+  "arms_total": 8,
+  "invariant": "M0 verifies at the shipped obligation count; M1, M2, M3 and M4 each FAIL with the named diagnostic; M5 VERIFIES and M5b shows the gate's assume-detector seeing it. \u26a0 M3 is the arm that separates p35 from p32: making the specification agree with the buggy code rescues p32's mutant and does NOT rescue p35's -- it fails at `wf_cells` -- and M6 shows why: with the invariant itself weakened to `true` the proof fails at the union read's own precondition, which the type system imposes and no specification can weaken away."
+}

@@ -1,0 +1,133 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p35-tagged-union/controls/rust_bug.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p35-tagged-union/c/kernel.c": "f7adfd4b97c62168003ec12d0b9efd5b2f30ac54b738448a1b4a710a9a0ff53c",
+    "patterns/p35-tagged-union/c/kernel.h": "7315c59d0988636ed2ef8e08c66d66380dfdd4f862b63928e9181303e8980374",
+    "patterns/p35-tagged-union/c/main.c": "d49d2ecc36009b1896dcddf2425feb8f231fcac7ab915bbc53a160929b3f56e5",
+    "patterns/p35-tagged-union/controls/arm_unsafe_bug.rs": "7322b5b75c0fa4266ea992d14088a148ac3e1120124932ae93dc949a65ff85e4",
+    "patterns/p35-tagged-union/controls/arm_safe_bug.rs": "05a1404f984a613db005a68949dd9d0b7e016c13e8f3226e7f0e156cdc66fc6c",
+    "patterns/p35-tagged-union/controls/rust_bug.py": "4f458d60d6372e143b94a344916fa51abead549fab77a3aa72dfbf1154b55de5",
+    "patterns/p35-tagged-union/inputs/gen.py": "a35611291390db86728865fdd579bda0f5ca04de51c47e20c80eb29626aec37f",
+    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3"
+  },
+  "measured_utc": "2026-08-31T07:38:18Z",
+  "miri_iters": 4,
+  "native": {
+    "small.bin": {
+      "c_r1": {
+        "rc": 0,
+        "stdout": "751388249273516652",
+        "stderr": ""
+      },
+      "unsafe_arm": {
+        "rc": 0,
+        "stdout": "751388249273516652",
+        "stderr": ""
+      },
+      "safe_arm": {
+        "rc": 0,
+        "stdout": "751388249273516652",
+        "stderr": ""
+      },
+      "unsafe_reproduces_c": true,
+      "safe_reproduces_c": true
+    },
+    "adversarial-dbl-confusion.bin": {
+      "c_r1": {
+        "rc": 0,
+        "stdout": "15737687950051384960",
+        "stderr": ""
+      },
+      "unsafe_arm": {
+        "rc": 0,
+        "stdout": "15737687950051384960",
+        "stderr": ""
+      },
+      "safe_arm": {
+        "rc": 0,
+        "stdout": "15737687950051384960",
+        "stderr": ""
+      },
+      "unsafe_reproduces_c": true,
+      "safe_reproduces_c": true
+    },
+    "adversarial-exhaust.bin": {
+      "c_r1": {
+        "rc": 0,
+        "stdout": "1705852038987163136",
+        "stderr": ""
+      },
+      "unsafe_arm": {
+        "rc": 0,
+        "stdout": "1705852038987163136",
+        "stderr": ""
+      },
+      "safe_arm": {
+        "rc": 0,
+        "stdout": "1705852038987163136",
+        "stderr": ""
+      },
+      "unsafe_reproduces_c": true,
+      "safe_reproduces_c": true
+    },
+    "adversarial-ptr-confusion.bin": {
+      "c_r1": {
+        "rc": -11,
+        "stdout": "",
+        "stderr": ""
+      },
+      "unsafe_arm": {
+        "rc": -11,
+        "stdout": "",
+        "stderr": ""
+      },
+      "safe_arm": {
+        "rc": 101,
+        "stdout": "",
+        "stderr": "thread 'main' (1046519) panicked at patterns/p35-tagged-union/controls/arm_safe_bug.rs:108:17: index out of bounds: the len is 4 but the index is 169883888704 note: run with `RUST_BACKTRACE=1` environ"
+      },
+      "unsafe_reproduces_c": true,
+      "safe_reproduces_c": false
+    },
+    "adversarial-ptr-deep.bin": {
+      "c_r1": {
+        "rc": -11,
+        "stdout": "",
+        "stderr": ""
+      },
+      "unsafe_arm": {
+        "rc": -11,
+        "stdout": "",
+        "stderr": ""
+      },
+      "safe_arm": {
+        "rc": 101,
+        "stdout": "",
+        "stderr": "thread 'main' (1046522) panicked at patterns/p35-tagged-union/controls/arm_safe_bug.rs:108:17: index out of bounds: the len is 4 but the index is 297296805232 note: run with `RUST_BACKTRACE=1` environ"
+      },
+      "unsafe_reproduces_c": true,
+      "safe_reproduces_c": false
+    }
+  },
+  "miri": {
+    "adversarial-dbl-confusion.bin": {
+      "rc": 0,
+      "stdout": "162643197298427456",
+      "ub": false,
+      "ran": true,
+      "diagnostic": ""
+    },
+    "adversarial-ptr-confusion.bin": {
+      "rc": 1,
+      "stdout": "",
+      "ub": true,
+      "ran": true,
+      "diagnostic": "error: Undefined Behavior: `assume` called with `false` --> patterns/p35-tagged-union/controls/arm_unsafe_bug.rs:122:27 | 122 | unsafe { *arena.get_unchecked(k as usize) as u64 } | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Undefined Behavior occurred here | = help: this indicates a bug in the program: it performed an invalid operation, and caused Undefined Behavior = help: see https://doc.rust-lang.org/nigh"
+    }
+  },
+  "problems": [],
+  "invariant": "Both Rust arms reproduce c/kernel.c's SILENT wrong value bit for bit, and Miri is silent on the unsafe one -- a wrong-variant union read is not UB in Rust. Neither reproduces the LOUD harm: the unsafe arm turns it into an out-of-bounds `get_unchecked` that Miri DOES report (the must-fire arm for the Miri half), and the safe arm turns it into a panic. The shipped safe rungs cannot express either, because their `Cell` enum makes the mismatch unrepresentable."
+}

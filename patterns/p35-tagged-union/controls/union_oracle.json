@@ -1,0 +1,69 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p35-tagged-union/controls/union_oracle.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p35-tagged-union/verus.rs": "7e89d6e26dbf70ecb24ed63121b6eef0621efcdaae6bffe800757eeccd4d5fe1",
+    "patterns/p35-tagged-union/controls/union_oracle.py": "2787f1163eb745e999ceb85b4e907633a8a3d5f03fbc1dd5ad01b9ce2d1762ba",
+    "harness/check.py": "703f0aa2104e5f8473456157eca3f55e2343d4b0b88f780dbb588ebc0bb2602e",
+    "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
+    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "measured_utc": "2026-08-31T07:38:03Z",
+  "cells_ok": 9,
+  "cells_total": 9,
+  "results": {
+    "A1_shipped_verifies": {
+      "file": ".temp/p35ctl/oracle/conf_a.rs",
+      "verified": 2,
+      "errors": 0,
+      "diagnostic": "verification results:: 2 verified, 0 errors"
+    },
+    "A2_call_site_mutant": {
+      "file": ".temp/p35ctl/oracle/conf_a_mut.rs",
+      "verified": 1,
+      "errors": 1,
+      "diagnostic": "verification results:: 1 verified, 1 errors error: precondition not satisfied --> <scratch> | 12 | requires *p is i, | ------- failed precondition ... 19 | if t == 1u8 { pay_i(p) } else { pay_i(p) } | ^^^^^^^^ error: aborting due to 1 previous error"
+    },
+    "B1_refused_verifies": {
+      "file": ".temp/p35ctl/oracle/conf_b.rs",
+      "verified": 2,
+      "errors": 0,
+      "diagnostic": "verification results:: 2 verified, 0 errors"
+    },
+    "B2_requires_mutant": {
+      "file": ".temp/p35ctl/oracle/conf_b_mut.rs",
+      "verified": 1,
+      "errors": 1,
+      "diagnostic": "verification results:: 1 verified, 1 errors error: requirement not met: to access this field, the union must be in the correct variant --> <scratch> | 14 | unsafe { p.i } | ^^^ error: aborting due to 1 previous error"
+    },
+    "G_scan_unsafe_sites_A": {
+      "failures": 0,
+      "messages": []
+    },
+    "G_scan_unsafe_sites_B": {
+      "failures": 1,
+      "messages": [
+        "verus.rs:14 an `unsafe` token sits outside every trusted item's body, so no `requires` rule and no verified twin governs it. This is TASK_009_REVIEW's blocker x1: a `macro_rules!` holding `unsafe { *$v.get_unchecked($i) }` is invisible to `vparse` (which parses `fn` items only), so the trusted item's body contained no `unsafe` token, 5a said nothing and 5c-twin reported \"no trusted `unsafe` item, so no twin is required\" -- with the `requires` and the twin both deleted and the pins moved in the same commit. Put the unchecked operation inside an `#[verifier::external_body]` item with a `requires`, an `ensures` and a `#[cfg(slb_twin)]` twin."
+      ]
+    },
+    "E_safe_twin_spellings": {
+      "index": {
+        "rc": 1,
+        "E0133": true,
+        "diagnostic": "error[E0133]: access to union field is unsafe and requires unsafe function or block --> <scratch> | 3 | pub fn t(v: &[Pay; 8], i: usize) -> u64 { v[i].i } | ^^^^^^ access to union field | = note: the "
+      },
+      "get_unchecked": {
+        "rc": 1,
+        "E0133": true,
+        "diagnostic": "error[E0133]: access to union field is unsafe and requires unsafe function or block --> <scratch> | 3 | pub fn t(v: &[Pay; 8], i: usize) -> u64 { v.get_unchecked(i).i } | ^^^^^^^^^^^^^^^^^^^^ access t"
+      },
+      "deref": {
+        "rc": 1,
+        "E0133": true,
+        "diagnostic": "error[E0133]: access to union field is unsafe and requires unsafe function or block --> <scratch> | 3 | pub fn t(p: &Pay) -> u64 { p.i } | ^^^ access to union field | = note: the field may not be prop"
+      }
+    }
+  },
+  "invariant": "Both configurations of the union read VERIFY, and each has a must-fail arm that fires with the diagnostic named above. The configuration the gate REFUSES is the one in which Verus checks the correct-variant obligation AT THE READ rather than assuming it; the configuration p35 SHIPS keeps the obligation as a wrapper precondition that is checked at every call site, and axiomatises only that the wrapper's body reads the member its name says. No safe Rust spelling of a union read exists, in any of three forms, so the twin the gate asks for cannot be written."
+}
