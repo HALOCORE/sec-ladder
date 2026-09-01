@@ -31,18 +31,25 @@ retracted along the way, and **the retraction list is the most transferable
 thing the project produced** (§6).
 
 ⚠ **A NOTE ON THE COUNT, so the title and the corpus can be reconciled.** The
-four Results below were drawn from **26** kernels. **FIVE more have landed since
+four Results below were drawn from **26** kernels. **SEVEN more have landed since
 and NOT ONE is folded into Results 1–4 or into the idiom census, which genuinely
 ran over 26**: `p29` (BST delete, `TASK_139`), `p32` (free-list pool,
 `TASK_144`), `p28` (intrusive lists, `TASK_146`), `p35` (tagged union,
-`TASK_148`) and `p34` (reference counting, `TASK_154`). They appear in §7, where
-they change the corpus composition — **the temporal axis goes from one row to
-FIVE and the TYPE axis from one to TWO.** ⚠ **This sentence said *"two more"*,
-then *"FOUR more"*; each was already stale when written down, which is why the
-counts here are now derived rather than asserted.** **Where this document says
-"26 kernels" it means the analysed set, and that is the honest scope; the tree
-has 31 — DERIVE IT, do not trust this sentence, which has now been wrong three
-times.** ⚠ **And the count is the smaller half of the gap.** `p32` was admitted
+`TASK_148`), `p34` (reference counting, `TASK_154`), `p25` (`realloc` growth,
+`TASK_157`) and `p49` (interned pool / `CVE-2022-40304`, `TASK_161`). They appear
+in §7, where they change the corpus composition — **the temporal axis goes from
+one row to SIX, the TYPE axis from one to TWO, and the ALIASING axis from one to
+TWO.** ⚠⚠ **This sentence has said *"two more"*, *"FOUR more"* and *"FIVE
+more"*; each was already stale when written down. It is now wrong FIVE times,
+and the lesson is not that the number keeps changing — it is that a
+HAND-MAINTAINED COUNT INSIDE A DOCUMENT WHOSE NEIGHBOURS ARE GENERATED will
+always lose the race. ✅ DERIVE IT: `ls -d patterns/p*/ | wc -l` and
+`harness/tools/composition.py`.** **Where this document says "26 kernels" it
+means the analysed set, and that is the honest scope; the tree has 33.**
+✅✅ **AND THE BUILD PROGRAMME IS NOW COMPLETE: every admitted candidate is
+either built or refused on C-side duplication, and NOTHING ADMITTED REMAINS
+UNBUILT** (`p49` closed it at `TASK_163`; `CVE-2021-3518` was refused at
+`TASK_160` as a duplicate of `p28`). ⚠ **And the count is the smaller half of the gap.** `p32` was admitted
 only because a **kill was retracted**: the admission bar was measuring the wrong
 thing (RECAP finding 53), it was replaced with a **C-side-only** bar
 (`CLAUDE.md` rule 6), and re-adjudication **admitted seven rows and left zero
@@ -854,8 +861,13 @@ on a measurement**~~ — **CORRECTED TWICE. At TASK_113 the true figure was 13; 
 adjudicated and landed.** ✅ **The catalogue now decomposes as `48 = 26 BUILT +
 17 REFUSED + 3 DEFERRED + 2 OTHER`, with ZERO rows left unadjudicated** —
 `p24` (probed, live, needs a new reason) and `p35` (blocked, not refused) are the
-two; `p20`/`p21`/`p25` are the deferrals. ⚠ **`p25` is the one row in the whole
-catalogue on which this project has run NOTHING, and its cell now says so.** Eight further
+two; `p20`/`p21` are the deferrals. ⚠⚠ **THIS SENTENCE LISTED `p25` AS A DEFERRAL AND
+SAID IT WAS *"the one row in the whole catalogue on which this project has run
+NOTHING"*. BOTH ARE NOW FALSE AND IN THE OPPOSITE DIRECTION: `p25` WAS BUILT AT
+`TASK_157`, reviewed at `TASK_158` and finished at `TASK_159`, and it is the
+tree's SIXTH temporal row.** ⚠ **The decomposition line above it is stale for the
+same reason and is superseded by `harness/tools/composition.py`, which derives
+it. Do not quote either from here — run the script.** Eight further
 candidates proposed later were probed and **all eight refused** — ⚠ **but they
 were all selected for BUG-CLASS NOVELTY, the criterion this project's own
 admission bar says "predicts neither way", and none was an `index >= len`
@@ -1294,18 +1306,19 @@ count printed here.** They classify, by the safety line each one's
 ```
 spatial          15   p02 p03 p05 p07 p09 p10 p11 p12 p13 p14 p16 p17 p23 p36 p46
 logical           3   p04 p06 p19
-temporal          5   p27 p28 p29 p32 p34
+temporal          6   p25 p27 p28 p29 p32 p34
 type              2   p35 p38
 resource          1   p42
 side-channel      1   p47
 ub-not-mem        1   p18
 non-termination   1   p22
-aliasing          1   p08
+aliasing          2   p08 p49
 calibration       1   p01
 ```
 
-⚠⚠ **Fifteen of THIRTY are spatial** — the sentence here read *"fifteen of
-twenty-eight"* — **and every claim this document makes about the type axis rested
+⚠⚠ **Fifteen of THIRTY-THREE are spatial** — this sentence has read *"fifteen of
+twenty-eight"* and then *"of THIRTY"*; **the numerator has not moved since the
+priority was set and the denominator has, which is the point of the decision** — **and every claim this document makes about the type axis rested
 on ONE pattern.** `p38` was the only type-confusion.
 A result drawn from a single row is a result about that row until a second one
 agrees with it, and **§5's `6.00 Ir`/call for a type-based aliasing property is

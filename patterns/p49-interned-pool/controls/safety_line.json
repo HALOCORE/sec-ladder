@@ -3,12 +3,12 @@
     "regenerate": "python3 patterns/p49-interned-pool/controls/safety_line.py"
   },
   "derived_from_sha256": {
-    "patterns/p49-interned-pool/c/kernel.c": "3ec9aad07719288fc89d3f50e6a5361dccb886b86c3fa2c29bbe15e587e0cb5d",
-    "patterns/p49-interned-pool/c/kernel_hardened.c": "0a245f0715854acd17814a5802c8d2720f457816b65eec49bbba8608cfac0f29",
+    "patterns/p49-interned-pool/c/kernel.c": "207aa0952b83ec749603559a256abdf5ee573d0b81ff3f917d1502aab167ae4f",
+    "patterns/p49-interned-pool/c/kernel_hardened.c": "2c4bf39ef9f0ed75e16f63ee2cec7b268fca3f76f49c10376e7207f497af2e79",
     "patterns/p49-interned-pool/c/kernel.h": "35bdbc0098675fa47fc2a2a8fee3820bdd4390a2cb724f673b9e40876f8ce6d1",
     "patterns/p49-interned-pool/controls/safety_line.py": "d948016e667e31b47079074f73cd7ceb43eb8d26e9b8416ceedb40ea89e9c6ad"
   },
-  "measured_utc": "2026-09-01T08:39:51Z",
+  "measured_utc": "2026-09-01T17:03:03Z",
   "preprocessed_lines": {
     "kernel.c": 229,
     "kernel_hardened.c": 243

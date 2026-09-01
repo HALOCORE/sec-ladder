@@ -25,8 +25,28 @@ reference so the bug cannot be written in safe Rust at all.
      the standard library's** and the bug is not expressible. Reproduces
      `c/kernel_hardened.c` bit for bit.
 
-✅ **B and C differ in ONE TYPE.** That is the result: safe Rust rules the bug
-out here by an API choice, not by the type system.
+⚠⚠ **THE SENTENCE THAT USED TO STAND HERE — *"B and C differ in ONE
+TYPE"* — IS FALSE AND WAS MEASURED FALSE** (`TASK_162` MAJOR 3, decomposed
+at `TASK_163`). C also carries a 20-line block at the write site that B does
+not: an `Rc::strong_count(..) > 1` test, a budget refusal, a budget charge and a
+flag clear. **That block is the BENCHMARK'S STORAGE ACCOUNTING, not the safety**
+-- it reproduces this kernel's fixed 44-byte private pool and the ownership flag
+its epilogue folds, neither of which a real `Rc`-based pool would have.
+`arm_rc_makemut.rs:17-23` says so and five downstream summaries dropped it.
+
+Measured over the **5 of 9** shipped inputs that discriminate between the two C
+rungs at all (`.temp/t163/e2_arms.py`): strip the block and C matches NEITHER C
+rung, 5 of 5; keep only the flag clear, 4 of 5; keep only the budget, 1 of 5.
+The ownership QUESTION is not tied to `strong_count` (`Rc::get_mut(..).is_none()`
+matches 5 of 5), and the REFUSAL is the only part that must precede the write
+(asking afterwards via `Rc::as_ptr` matches 4 of 5).
+
+✅ **What survives is stronger than the struck sentence:** with the block
+deleted from C the two arms ARE literally one type apart, and they still agree
+on the four non-discriminating inputs and disagree on all five discriminating
+ones. **The TYPE carries the safety; the BLOCK carries the C kernel's
+accounting.** Safe Rust still rules the bug out here by an API choice rather
+than by the type system.
 
 THE rustc-ERROR ARM, AND ITS NEGATIVE CONTROL
 ---------------------------------------------
@@ -48,6 +68,10 @@ WHAT IT ASSERTS
     from the standard library**;
   * the `Rc<Buf>` write-through does not compile, and the error code is reported
     beside the negative control's so a reader can see whether it distinguishes.
+
+⚠ **AND IT NOW REPORTS WHICH INPUTS DISCRIMINATE.** On four of the nine the two
+C rungs print the SAME number, so an arm that matches one matches both and the
+row carries no information about the arm. `9/9` is true; the support is `5`.
 """
 
 import glob
@@ -77,6 +101,11 @@ ARMS = {"A_index_arena": os.path.join(PDIR, "safe_naive.rs"),
 EXPECT = {"A_index_arena": "R1h", "B_rc_refcell": "R1", "C_rc_makemut": "R1h"}
 
 ECODE = re.compile(r"error\[(E\d+)\]")
+
+#: Filled by `main`: the inputs on which `c/kernel.c` and `c/kernel_hardened.c`
+#: print DIFFERENT numbers. An arm's `9/9` is only worth `len(DISCRIMINATING)`
+#: (TASK_162 MINOR 8), and saying so is cheaper than being corrected again.
+DISCRIMINATING = []
 
 #: The write-through arm: `Rc<Buf>` without `make_mut`. Written out here rather
 #: than shipped as a file, because it does not compile and a source file that
@@ -173,17 +202,25 @@ def main():
         print(f"  built {name:16s} <- {os.path.relpath(src, REPO)}")
 
     print(f"\n{'input':32s} {'R1 (bug)':>21s} {'R1h (cow)':>21s}  "
-          + "  ".join(f"{k:>14s}" for k in ARMS))
+          + "  ".join(f"{k:>14s}" for k in ARMS) + "   discriminating?")
     rows = []
     for path in inputs:
         name = os.path.basename(path)
         a = {k: run(ref[k], path) for k in ref}
         b = {k: run(exes[k], path) for k in ARMS}
-        rows.append({"input": name, **{f"c_{k}": v for k, v in a.items()},
-                     **b})
+        # ⚠ TASK_163 / TASK_162 MINOR 8. An input on which the two C rungs print
+        # the SAME number cannot tell an arm that reproduces one from an arm
+        # that reproduces the other, so `9/9` and `5 of 9` are different
+        # statements and only the second is about the arms.
+        disc = a["R1"] != a["R1h"]
+        if disc:
+            DISCRIMINATING.append(name)
+        rows.append({"input": name, "discriminating": disc,
+                     **{f"c_{k}": v for k, v in a.items()}, **b})
         print(f"{name:32s} {a['R1']:>21s} {a['R1h']:>21s}  "
               + "  ".join(f"{'==' + EXPECT[k] if b[k] == a[EXPECT[k]] else b[k]:>14s}"
-                          for k in ARMS))
+                          for k in ARMS)
+              + ("   DISCRIMINATING" if disc else "   R1 == R1h"))
         for k in ARMS:
             if b[k] != a[EXPECT[k]]:
                 problems.append(
@@ -226,15 +263,27 @@ def main():
            "rustc_errors": codes,
            "error_code_distinguishes": not same,
            "problems": problems,
+           "discriminating_inputs": DISCRIMINATING,
            "invariant": "Three safe-Rust ports of one kernel: the index arena "
                         "(shipped R2) and `Rc<Buf>` + `Rc::make_mut` both "
                         "reproduce c/kernel_hardened.c exactly, and "
                         "`Rc<RefCell<Buf>>` reproduces c/kernel.c exactly -- so "
-                        "SAFE RUST EXPRESSES BOTH THE BUG AND THE REPAIR, and "
-                        "the difference between the last two is ONE TYPE. The "
-                        "rustc error for a write through a shared `Rc<Buf>` is "
-                        "recorded beside a negative control's, because a code "
-                        "that both produce says nothing about this pattern."}
+                        "SAFE RUST EXPRESSES BOTH THE BUG AND THE REPAIR. "
+                        "⚠ The 9/9 agreement rests on 5 DISCRIMINATING "
+                        "inputs; on the other 4 the two C rungs print the same "
+                        "number, so an arm that matches one matches both. "
+                        "⚠⚠ The claim that the last two arms differ "
+                        "in ONE TYPE is WITHDRAWN and was measured false "
+                        "(TASK_162 MAJOR 3, decomposed at TASK_163): arm C also "
+                        "carries a 20-line block at the write site which is the "
+                        "BENCHMARK'S STORAGE ACCOUNTING -- the fixed private "
+                        "pool and the ownership flag the epilogue folds -- and "
+                        "not the safety. With that block deleted the two arms "
+                        "ARE one type apart and still disagree on exactly the 5 "
+                        "discriminating inputs. The rustc error for a write "
+                        "through a shared `Rc<Buf>` is recorded beside a "
+                        "negative control's, because a code that both produce "
+                        "says nothing about this pattern."}
     out = os.path.join(HERE, "safe_arms.json")
     json.dump(doc, open(out, "w"), indent=2)
     print(f"wrote {out}")

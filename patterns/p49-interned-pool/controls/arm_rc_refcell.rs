@@ -20,8 +20,14 @@
 //! p49's bug is about *whether the object is yours to mutate at all*, and no
 //! Rust rule states that.
 //!
-//! Its sibling `arm_rc_makemut.rs` is the same program with `RefCell` removed
-//! and `Rc::make_mut` in its place, and it CANNOT express the bug.
+//! Its sibling `arm_rc_makemut.rs` is this program with `RefCell` removed and
+//! `Rc::make_mut` in its place, **plus a 20-line accounting block at the write
+//! site that this file does not have** — a `strong_count` test, a budget
+//! refusal, a budget charge and a flag clear, none of which is the safety.
+//! ⚠ *"The same program with one type changed"* was the shipped claim and it
+//! was measured FALSE (`TASK_162` MAJOR 3). ✅ **With that block deleted the
+//! two files ARE one type apart and still disagree on all five discriminating
+//! inputs, so the type is what rules the bug out.** `../NOTES.md` 3e.
 //!
 //! Not a rung: it is never built by `harness/build.py` and never measured.
 

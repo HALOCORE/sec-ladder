@@ -2,9 +2,20 @@
 //! the STANDARD LIBRARY.**
 //!
 //! ⚠⚠ **THIS ARM REPRODUCES `c/kernel_hardened.c` BIT FOR BIT, AND IT CONTAINS
-//! NO SAFETY LINE.** It is `arm_rc_refcell.rs` with one type changed --
-//! `Rc<RefCell<Buf>>` becomes `Rc<Buf>` -- and the write spelled
-//! `Rc::make_mut(&mut recs[t].0).data[0] = 0;`.
+//! NO SAFETY LINE.** It is `arm_rc_refcell.rs` with `Rc<RefCell<Buf>>` changed
+//! to `Rc<Buf>`, the write spelled `Rc::make_mut(&mut recs[t].0).data[0] = 0;`
+//! -- **and the 20-line accounting block below, which `arm_rc_refcell.rs` does
+//! not have.**
+//!
+//! ⚠ **THE SENTENCE THAT SAID *"with ONE TYPE CHANGED"* FULL STOP IS
+//! WITHDRAWN** (`TASK_162` MAJOR 3, decomposed at `TASK_163`). Strip the block
+//! and this arm matches NEITHER C rung on all five discriminating inputs; keep
+//! only the flag clear and it matches `R1h` 4 of 5; keep only the budget, 1 of
+//! 5. ✅ **What IS true, and it is the better claim:** with the block deleted,
+//! this arm and `arm_rc_refcell.rs` are literally one type apart and they still
+//! disagree on exactly those five inputs and agree on the other four -- **so
+//! the TYPE carries the safety and the BLOCK carries the C kernel's
+//! accounting.** `../NOTES.md` 3e.
 //!
 //! `Rc::make_mut` **IS** copy-on-write: it clones the value when the strong
 //! count exceeds one and hands back a unique `&mut`. So the mutation cannot

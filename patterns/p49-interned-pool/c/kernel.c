@@ -198,9 +198,19 @@ SLB_NOINLINE uint64_t kernel(const uint8_t *buf, size_t buf_len, size_t off,
 
     /* Fold EVERY record, so a corrupted neighbour cannot hide, and fold each
      * record's ownership flag beside its content: `rshd[t]` is this kernel's
-     * reduction of the port's `"interned":true/false` field, and it is what
-     * makes the PROVENANCE repair benign-observable while copy-on-write is not
-     * (c/kernel.h, ../controls/spellings.py). */
+     * reduction of the port's `"interned":true/false` field
+     * (c/kernel.h, ../controls/spellings.py).
+     *
+     * ⚠ WHAT THIS FOLD IS AND IS NOT. It is SUFFICIENT to make the PROVENANCE
+     * repair benign-observable. It is NOT NECESSARY, and the sentence that said
+     * it was is WITHDRAWN (TASK_162 item 7, measured). Delete this one line from
+     * all three arms and `provenance` STILL moves 2 of the 3 benign checksums --
+     * because it also deletes the deduplication, so every record consumes
+     * private bytes, the 44-byte private region fills (`sent_priv_full` 4 -> 398
+     * on large.bin) and `nrec` changes (768 -> 762); the epilogue folds both of
+     * those independently of the flag. Only `degenerate.bin`, where the two arms
+     * agree on record count and refusals, needs the flag to separate them.
+     * ../NOTES.md 3b has the table. */
     for (t = 0; t < nrec; t++) {
         acc = p49_fold(mem, roff[t], rlen[t], acc);
         acc = acc * 31 + (uint64_t)rshd[t];

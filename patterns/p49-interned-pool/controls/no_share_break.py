@@ -33,6 +33,18 @@ assumed once:
      the op histogram beside the guard's two answers, so a reader can see the
      answer for the whole directory instead of one input at a time.
 
+⚠⚠ **AND UNTIL `TASK_163` NONE OF THE THREE HAD A MUST-FIRE ARM INSIDE THE
+GATE**, which is `.memory/03-measurement.md` entry 19 one level up: neuter
+`window_share_break` to `return False, 0, 0` and place 2 goes silent, place 1
+stops filtering, and place 3 -- this file -- **is HASHED by the gate but never
+RUN by it**, so nothing turns red (`TASK_162` MINOR 7, measured on all nine
+inputs). ✅ **`../model.py::census_selftest()` is the repair**: four hand-built
+probe windows on which the census must answer three different ways, an arm that
+makes `no_share_break_problems` itself REPORT, and an arm for the arena-capacity
+refusal that no shipped input reaches. `selfcheck()` runs it once per input on
+every gate invocation, exactly as it runs `detector_selftest()`. **Seven planted
+defects, seven designed messages, zero crashes** (`.temp/t163/e5_mutate.py`).
+
 ⚠ It walks the cursor the RUNGS walk -- `nops` operations, two bytes each,
 stopping when `len - p < 2` -- so an op the header DECLARES but the window cannot
 hold is not counted. A census over raw bytes would over-report and would

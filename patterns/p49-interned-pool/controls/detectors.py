@@ -46,9 +46,17 @@ WHAT IT RUNS
 adversarial ones included. ⚠ `p28d`'s lesson is that the hardened arm is the one
 no stage ran a detector on until `TASK_151`, so it is here on equal terms.
 
-Each control is built with **the same compiler and the same flags** as the
-binaries whose column it licenses, and every child runs with `LD_PRELOAD`
-unset.
+Each control is built with **the same compiler, the same optimisation level and
+the same SANITIZER flags** as the binaries whose column it licenses, and every
+child runs with `LD_PRELOAD` unset.
+⚠ **Not *"the same flags"*, which is what this said until `TASK_163`
+(`TASK_162` MINOR 9) and is not true**: `build_ctl` omits `-DSLB_ISOLATED` and
+both `-I` paths, and links **one** translation unit where `build_kernel` links
+three, because a control is a standalone `.c` file with its own `main` and needs
+none of them. What has to match for the licence to mean anything is the
+detector's own configuration, and that is what does match -- but a claim a
+reader can check against `build_ctl` ten lines below should be the claim that is
+true.
 
 WHAT IT ASSERTS
 ---------------

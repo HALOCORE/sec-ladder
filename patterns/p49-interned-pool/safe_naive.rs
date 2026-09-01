@@ -12,12 +12,11 @@
 //!      `../controls/rust_bug.py` writes the buggy one, in safe Rust, with no
 //!      `unsafe` anywhere. **The borrow checker has nothing to say: the alias is
 //!      an integer.**
-//!   2. `Rc<RefCell<Buf>>` -- an idiomatic shared mutable buffer (`Buf` carries
-//!      the width as a field, so the two `Rc` arms differ in ONE type and
-//!      nothing else). **Reproduces `c/kernel.c` bit for bit on all nine
-//!      inputs**, safely, because `RefCell` is exactly the "shared and mutable"
-//!      the pattern is about and the runtime borrow check passes: there is only
-//!      ever one borrow at a time.
+//!   2. `Rc<RefCell<Buf>>` -- an idiomatic shared mutable buffer. **Reproduces
+//!      `c/kernel.c` bit for bit on all nine inputs** (5 of the 9 discriminate
+//!      between the two C rungs at all), safely, because `RefCell` is exactly
+//!      the "shared and mutable" the pattern is about and the runtime borrow
+//!      check passes: there is only ever one borrow at a time.
 //!   3. `Rc<Buf>` with `Rc::make_mut`. ⚠⚠ **THE SAFETY LINE IS THE STANDARD
 //!      LIBRARY'S**: `make_mut` IS copy-on-write -- it clones when the strong
 //!      count exceeds one and hands back a unique reference -- so the repair is
@@ -25,6 +24,21 @@
 //!      `c/kernel_hardened.c` bit for bit on all nine inputs. **That is the only
 //!      one of the three in which the safe language rules the bug out**, and it
 //!      does it with an API choice rather than with the type system.
+//!
+//! ⚠⚠ **THE SENTENCE THAT SAID ARMS 2 AND 3 *"DIFFER IN ONE TYPE AND NOTHING
+//! ELSE"* IS WITHDRAWN -- IT WAS MEASURED FALSE** (TASK_162 MAJOR 3, re-derived
+//! at TASK_163). Arm 3 also carries a 20-line block at the write site that arm
+//! 2 does not, and that block is **the BENCHMARK'S STORAGE ACCOUNTING, not the
+//! safety**: it clears the ownership flag the epilogue folds and charges the
+//! private copy against the same fixed 44-byte pool `c/kernel_hardened.c`
+//! charges it against, refusing when it is exhausted. Measured, on the 5
+//! discriminating inputs: strip the whole block and the arm matches NEITHER C
+//! rung 5/5; keep only the flag clear and it matches `R1h` 4/5; keep only the
+//! budget and it matches 1/5. ✅ **What survives is better than the struck
+//! sentence: with the block deleted from arm 3, arms 2 and 3 ARE literally one
+//! type apart, and they still disagree on exactly those 5 inputs and agree on
+//! the other 4 -- so the TYPE carries the safety and the BLOCK carries the C
+//! kernel's accounting.** `../controls/safe_arms.py` and `../NOTES.md` 3e.
 //!
 //! `CLAUDE.md` rule 6: *"safe Rust reproduces the bug bit-identically" is a
 //! FINDING, never a kill.* Here it is the finding, it is measured in three

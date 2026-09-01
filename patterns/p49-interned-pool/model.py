@@ -87,6 +87,13 @@ SHARED.** That is the corollary of the row's headline -- the safety line's TRUE
 branch cannot execute on an input R1 and R1h agree about -- and it is checked on
 the SHIPPED blob rather than assumed. `inputs/gen.py` refuses to write one and
 `controls/no_share_break.py` censuses every blob in the directory.
+⚠⚠ **AND THAT CENSUS HAD NO MUST-FIRE ARM UNTIL `TASK_163`, WHICH IS ENTRY 19'S
+DEFECT ONE LEVEL UP.** `Detector` had `detector_selftest()`; the census -- the
+row's own structural claim -- had nothing, and `TASK_162` MINOR 7 measured it:
+neuter `window_share_break` to `return False, 0, 0` and `selfcheck()` stays
+SILENT on all nine inputs and the model checksum does not move.
+`census_selftest()` is the repair, and `selfcheck()` runs it once per input on
+every gate invocation, exactly as it runs `detector_selftest()`.
 ⚠ Note what the constraint is stated ABOUT: the FLAG, not the corruption. R1h's
 copy-on-write also consumes private storage and clears the flag, and the
 epilogue folds the flag, so a BREAK on a shared record moves the checksum even
@@ -357,6 +364,25 @@ def window_share_break(buf, off, ln):
 _PROBE_OWNED = bytes([2, 0, 0, 0, 0, 3, 2, 0])                 # DEFINE(own) BREAK
 _PROBE_LONE = bytes([2, 0, 0, 0, 0, 8, 2, 0])                  # DEFINE(intern) BREAK
 _PROBE_SHARED = bytes([3, 0, 0, 0, 0, 8, 0, 8, 2, 1])          # x2 then BREAK rec 1
+#: DEFINE(intern) then READ -- a window in which the guard is NEVER EVALUATED.
+#: Its whole job is to be distinguishable from `_PROBE_OWNED`, where the guard
+#: IS evaluated and is false: *never fires* and *cannot fire* are the two things
+#: `.memory/03-measurement.md` entry 19 says a census must be able to tell apart.
+_PROBE_NOBREAK = bytes([2, 0, 0, 0, 0, 8, 3, 0])
+#: THE ARENA-CAP PROBE. Six interned DEFINEs at `w = 3` with six DISTINCT keys
+#: (`a = 2, 8, 14, 20, 26, 32` -> `w = 1 + a%6 = 3`, keys 2, 1, 0, 6, 5, 4) spend
+#: 18 of the 20-byte arena; then one OWNED DEFINE (`a = 3` -> `w = 4 >= THRESH`);
+#: then a SEVENTH distinct interned `(key 3, w 3)` which needs 21 bytes, so
+#: `arena_used + w > ARENA` REFUSES IT -- and `len(table) == 6 < NENT`, so the
+#: ARENA conjunct is what decides. Then `BREAK` with operand 13.
+#:
+#:   with the cap:    7 records, `13 % 7 == 6` -> the OWNED record  -> SILENT
+#:   without the cap: 8 records, `13 % 8 == 5` -> an INTERNED one   -> `published`
+#:
+#: So the refusal is load-bearing on an OBSERVABLE, which is what makes this an
+#: arm and not a comment. No shipped window reaches this branch (NOTES.md 2f).
+_PROBE_ARENA = bytes([9, 0, 0, 0, 0, 2, 0, 8, 0, 14, 0, 20, 0, 26, 0, 32,
+                      0, 3, 0, 38, 2, 13])
 
 
 def detector_selftest():
@@ -395,6 +421,91 @@ def detector_selftest():
                 f"expected aliased={want_alias} published={want_pub}. This row "
                 f"has NO detector but the checksum, so do not quote its harm as "
                 f"DERIVED until this arm answers again")
+    return problems
+
+
+def census_selftest():
+    """THE MUST-FIRE ARM FOR THE CENSUS, which until TASK_163 did not exist.
+
+    ⚠⚠ `.memory/03-measurement.md` entry 19 one level up. `Detector` got a
+    `detector_selftest()`; `window_share_break` -- **the row's structural
+    headline, stated as a check** -- did not, and `TASK_162` MINOR 7 measured
+    the consequence: neuter `window_share_break` to `return False, 0, 0` and
+    `selfcheck()` stays SILENT and the model checksum does not move, on all
+    nine inputs. The same measurement found the arena-capacity refusal
+    (`arena_used + w > ARENA`) invisible for the same reason.
+
+    Three groups, and each is a DIRECTION some mutation has to break:
+
+      1. **`window_share_break` answers three ways on four probes.** A neutered
+         census fails arms 2 and 3; a constant-`True` census fails arms 1 and 4;
+         and arm 4 exists because *the guard was never evaluated* and *the guard
+         was evaluated and was false* are the two things a census that cannot
+         fire is indistinguishable from.
+      2. **`no_share_break_problems` itself REPORTS.** The predicate being alive
+         is not the same as the check being wired to it, and this is the arm
+         that says so -- including the `adversarial-` exemption, which is a real
+         early return and is exercised here rather than trusted.
+      3. **The arena-capacity refusal DECIDES an observable.** `_PROBE_ARENA` is
+         built so that dropping `arena_used + w > ARENA` moves the BREAK onto a
+         different record and makes the detector fire. No shipped window reaches
+         that branch, so without this arm nothing in the gate does.
+
+    Returns a list of problem strings, exactly like `detector_selftest()`."""
+    problems = []
+
+    # -- 1. the census answers, per probe: (hit, guard TRUE, guard FALSE) ----
+    arms = (("OWNED, BREAK -- guard evaluated and FALSE", _PROBE_OWNED,
+             (False, 0, 1)),
+            ("INTERNED but unshared, BREAK -- guard TRUE", _PROBE_LONE,
+             (True, 1, 0)),
+            ("SHARED by two records, BREAK -- guard TRUE", _PROBE_SHARED,
+             (True, 1, 0)),
+            ("no BREAK at all -- guard NEVER EVALUATED", _PROBE_NOBREAK,
+             (False, 0, 0)))
+    for shape, blob, want in arms:
+        got = window_share_break(blob, 0, len(blob))
+        if got != want:
+            problems.append(
+                f"MUST-FIRE ARM WRONG: window_share_break on the `{shape}` "
+                f"probe returned (hit, guard_true, guard_false) = {got}, "
+                f"expected {want}. This function IS p49's structural claim, so "
+                f"do not quote `no benign input BREAKs a shared record` until "
+                f"it answers again")
+
+    # -- 2. the CHECK, not just the predicate --------------------------------
+    for shape, blob, want_n in (("SHARED", _PROBE_SHARED, 1),
+                                ("LONE", _PROBE_LONE, 1),
+                                ("OWNED", _PROBE_OWNED, 0)):
+        n = len(no_share_break_problems("probe.bin", blob, len(blob),
+                                        len(blob)))
+        if n != want_n:
+            problems.append(
+                f"MUST-FIRE ARM WRONG: no_share_break_problems reported {n} "
+                f"problem(s) on the `{shape}` probe, expected {want_n} -- the "
+                f"census is alive but the CHECK is not wired to it")
+    if no_share_break_problems("adversarial-probe.bin", _PROBE_SHARED,
+                               len(_PROBE_SHARED), len(_PROBE_SHARED)):
+        problems.append(
+            "no_share_break_problems reported on an `adversarial-` path, which "
+            "is the one place a shared BREAK is allowed")
+
+    # -- 3. the arena-capacity refusal decides an observable ------------------
+    _, loud = _sim_window(_PROBE_ARENA, 0, len(_PROBE_ARENA), False)
+    _, quiet = _sim_window(_PROBE_ARENA, 0, len(_PROBE_ARENA), True)
+    if loud.aliased or loud.published or quiet.aliased or quiet.published:
+        problems.append(
+            f"MUST-FIRE ARM WRONG: the arena-capacity probe fired the detector "
+            f"(buggy aliased={loud.aliased} published={loud.published}; "
+            f"hardened aliased={quiet.aliased} published={quiet.published}). "
+            f"With `arena_used + w > ARENA` in force the seventh interned "
+            f"DEFINE is refused, the window ends with 7 records and the BREAK's "
+            f"operand 13 selects record 6 -- the OWNED one -- so nothing is "
+            f"reached. A firing here means the refusal stopped deciding")
+    if window_share_break(_PROBE_ARENA, 0, len(_PROBE_ARENA)) != (False, 0, 1):
+        problems.append(
+            "MUST-FIRE ARM WRONG: window_share_break's own copy of the arena "
+            "cap stopped deciding on the arena-capacity probe")
     return problems
 
 
@@ -713,8 +824,10 @@ class Model:
     def selfcheck(self):
         """The object simulation vs the offset formulation that mirrors Verus,
         plus the must-fire arm that proves the detector is alive and
-        discriminating, plus the no-shared-BREAK census on this input."""
+        discriminating, plus the must-fire arm that proves the CENSUS is
+        (TASK_163), plus the no-shared-BREAK census on this input."""
         problems = list(detector_selftest())
+        problems += census_selftest()
         problems += no_share_break_problems(self.path, self.buf, self.stride,
                                             self.n_blob)
         for c in self.sample_calls(8):

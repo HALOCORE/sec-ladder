@@ -361,8 +361,10 @@ pub open spec fn step(st: St, c: u8, a: u8) -> (St, u64) {
 
 /// The epilogue: fold every record's content and its ownership flag.
 /// ⚠ The flag is in the answer on purpose -- it is this kernel's reduction of
-/// the port's `"interned":true/false` API field, and it is what makes the
-/// PROVENANCE repair benign-observable while copy-on-write is not.
+/// the port's `"interned":true/false` API field. ⚠ It is SUFFICIENT to make the
+/// PROVENANCE repair benign-observable and NOT NECESSARY; the stronger claim is
+/// WITHDRAWN (TASK_162 item 7, measured -- delete the fold and `provenance`
+/// still moves 2 of 3 benign checksums). See `c/kernel.c`'s epilogue comment.
 pub open spec fn fold_recs(st: St, t: int, acc: u64) -> u64
     decreases st.nrec - t,
 {

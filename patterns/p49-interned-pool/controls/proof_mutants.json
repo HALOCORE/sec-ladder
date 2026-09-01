@@ -3,10 +3,10 @@
     "regenerate": "python3 patterns/p49-interned-pool/controls/proof_mutants.py"
   },
   "derived_from_sha256": {
-    "patterns/p49-interned-pool/verus.rs": "04a9c54a63b97d4b67a96fa6c607baf77c4c111b43600ddbe81328f8319295ea",
+    "patterns/p49-interned-pool/verus.rs": "30ae5451e4b7960160b6cad5252337101f103038f72a26ecbf7d796837ca185c",
     "patterns/p49-interned-pool/controls/proof_mutants.py": "ec7d25b64acfa612425b9c835bf68fdadb89dfca028f9653687c8fcef2b0206c"
   },
-  "measured_utc": "2026-09-01T08:43:49Z",
+  "measured_utc": "2026-09-01T17:06:54Z",
   "rlimit": [
     "--rlimit",
     "200"

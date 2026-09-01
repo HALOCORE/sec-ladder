@@ -4524,5 +4524,161 @@
     "why": "only c-gcc calls ['memcmp@plt']; only c-clang calls ['bcmp@plt']; \u26a0 UNPRICED: gcc's PLT thunk on 2 live `@plt` site(s)"
    }
   }
+ },
+ "p49": {
+  "cells": {
+   "c-clang": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-clang-h": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "c-gcc": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "c-gcc-h": {
+    "error": null,
+    "outward": [
+     "__stack_chk_fail@plt"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_naive": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check"
+    ],
+    "unresolved_indirect": []
+   },
+   "safe_tuned": {
+    "error": null,
+    "outward": [
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking18panic_bounds_check",
+     "_RNvNtCs4NRVxsYgnAr_4core9panicking9panic_fmt",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "_RNvNtNtCs4NRVxsYgnAr_4core5slice5index16slice_index_fail",
+     "memmove@GLIBC_2.2.5"
+    ],
+    "unresolved_indirect": []
+   },
+   "unsafe": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   },
+   "verus": {
+    "error": null,
+    "outward": [],
+    "unresolved_indirect": []
+   }
+  },
+  "gate_source_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "common/layout/analyze.py": "aa44bea2991abc1c6ffc36996035e2104ec35dd8c8ce9795ec16c9dc3ef142a3",
+   "common/layout/layout_gen.py": "1ecc412642288bbbea70aa63e8d57aa288ab0c691d30e55dee4d7cdc0a4688ec",
+   "common/layout/loopfit.py": "7e0af70bb5d8f03024b7218e756c6b34e39e01299abfbc1c277a02530a29cd23",
+   "common/layout/modesim2.py": "fd581ddefc59523bbec6f52d7454741f7250ca07a7dfcbc082833e5c01705ae9",
+   "common/layout/order.py": "f1707c3e12c91f75a7d06cc5d386e192091d5769a3f466a1b82b6c07bcc1948a",
+   "common/layout/predict_then_time.py": "810213bdf105dd1b97f77e2ac37f533b624acacbf4875396eaec5ff7fab8c150",
+   "common/layout/q3_convergence.py": "e2291d03c6a1a42c2658db943caab3f299ae5cb6f575becc7c542e851844ccd8",
+   "common/layout/survives.py": "bf8c2ae6603fb3aca044ceddc62b58f6125f0440a2855189ce48bbe38802ddda",
+   "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+   "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "harness/check.py": "703f0aa2104e5f8473456157eca3f55e2343d4b0b88f780dbb588ebc0bb2602e",
+   "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+   "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+   "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
+   "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+   "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
+   "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
+   "patterns/p49-interned-pool/NOTES.md": "ab9c43b83cfd8048d7f8ebc3aed3e010b2f0fdabf541e4dffe5a81b2934afd9c",
+   "patterns/p49-interned-pool/README.md": "af05ca0e8b4ffca9df97926397c1eb85c034c0416e556530c5bab6be2985cc61",
+   "patterns/p49-interned-pool/c/kernel.c": "207aa0952b83ec749603559a256abdf5ee573d0b81ff3f917d1502aab167ae4f",
+   "patterns/p49-interned-pool/c/kernel.h": "35bdbc0098675fa47fc2a2a8fee3820bdd4390a2cb724f673b9e40876f8ce6d1",
+   "patterns/p49-interned-pool/c/kernel_hardened.c": "2c4bf39ef9f0ed75e16f63ee2cec7b268fca3f76f49c10376e7207f497af2e79",
+   "patterns/p49-interned-pool/c/main.c": "c49b42d558c766397e76d4bd0eebf31b6644ba3fa0bff2a9abc4f695411bc9d1",
+   "patterns/p49-interned-pool/controls/arm_rc_makemut.rs": "d89276e3f9523258d0cf0a90c694d9a32e1cea7366cf01c44d2b25fbf9c7e36b",
+   "patterns/p49-interned-pool/controls/arm_rc_refcell.rs": "2786d2d4ad1ea3ef4f82605b9810358192314c5b45d66a56796f9b1879096f55",
+   "patterns/p49-interned-pool/controls/ctl_asan.c": "a0242db468965e30d8baa0c8ba1566b5a7ece3ba521619389df5543dbb5195f0",
+   "patterns/p49-interned-pool/controls/ctl_asan_stack.c": "e0f435338bd68a3b4b9826917cb4b1af372967e98a4959c292a13116aa1b2ddd",
+   "patterns/p49-interned-pool/controls/ctl_ubsan.c": "be101e29c614ea02da9b00a56c644f20bd65060e1cf6814dd8ba3e53e7657699",
+   "patterns/p49-interned-pool/controls/detectors.py": "d8015df6ebc5b71559771287807ae5203ad0876fbf7ee6ca5e28bd16099bccd7",
+   "patterns/p49-interned-pool/controls/no_overlap.py": "08b87d708da819cd661c95d634e4f0e2d97ce54cef1a224f181b36495cb4e47c",
+   "patterns/p49-interned-pool/controls/no_share_break.py": "6bbf51b8aa4a323c35fb6b62bedd73881cf1f480a4e684707b240c4f1b59b44a",
+   "patterns/p49-interned-pool/controls/proof_mutants.py": "ec7d25b64acfa612425b9c835bf68fdadb89dfca028f9653687c8fcef2b0206c",
+   "patterns/p49-interned-pool/controls/rust_bug.py": "445163c0e5a2341d29b11d3727eb5f59c5ad0e744f5baf178a821335c86dfd80",
+   "patterns/p49-interned-pool/controls/safe_arms.py": "7a8a6e2ad3326016bd8ccd2b6bb030f32d873112ef81b50394ef12de293c1839",
+   "patterns/p49-interned-pool/controls/safety_line.py": "d948016e667e31b47079074f73cd7ceb43eb8d26e9b8416ceedb40ea89e9c6ad",
+   "patterns/p49-interned-pool/controls/spellings.py": "1260c7bf6b41ea381b2f66d1a7dd54303a0662a74ffbd487310dadaaeb801d1a",
+   "patterns/p49-interned-pool/controls/threshold.py": "a944b2818d233a37ba88eb9f15c929f2b8151e3b3e883ac30e658b970205bff9",
+   "patterns/p49-interned-pool/inputs/gen.py": "d55ecd27225aafcef6e4b029ba9ca7db3e9e68d31eca5685dc46e2f4b2cda221",
+   "patterns/p49-interned-pool/model.py": "35237f42db7eaa31c0d4363a5dfa057e68db8821285b7dd26dd19c14914fb10c",
+   "patterns/p49-interned-pool/safe_naive.rs": "c699a0d29f744a997485585001aef671c80bd2f06e6d14a22d061b689e6e6f07",
+   "patterns/p49-interned-pool/safe_tuned.rs": "1fcff77eaa9c149dbcffba5aab3638cc34cb45faecdfa87fbefb240673d1930a",
+   "patterns/p49-interned-pool/spec.md": "26330e4e7d8d9dcfcd4d7ea5cbfebc1d564ab39017e4b929d23be5301d685b47",
+   "patterns/p49-interned-pool/unsafe.rs": "ca5b9c62b745e83f1c2537680f03af82515004ed5f42ece7aebe9350974ece97",
+   "patterns/p49-interned-pool/verus.rs": "30ae5451e4b7960160b6cad5252337101f103038f72a26ecbf7d796837ca185c",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "mode": "isolated",
+  "opt": "O3",
+  "pairs": {
+   "R2-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: Nt::core::panicking::panic_bounds_check"
+   },
+   "R3-R4": {
+    "verdict": "NOT-LIC",
+    "why": "only safe_tuned calls ['memmove@GLIBC_2.2.5']"
+   },
+   "R5-R4": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers"
+   },
+   "gcc-clang": {
+    "verdict": "LICENSED",
+    "why": "0 outward transfers; differs only in DIVERGING callees, which execute 0 times in any accepted run: __stack_chk_fail@plt"
+   }
+  }
  }
 }

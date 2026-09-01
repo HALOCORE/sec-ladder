@@ -62,20 +62,34 @@ if (rshd[t]) {                                  /* not mine to write */
    overlap is UB, lasts one call, is an arithmetic accident, and the repair is a
    different function. Here the sharing is by design, is correct, is not UB at
    all, persists, and the repair is an ownership test before a write.
-   `controls/no_overlap.py` re-derives from the shipped blobs that this kernel
-   has **no overlapping copy at all** and that two records' content ranges either
-   coincide exactly or are disjoint — never partial, which is the only kind
-   `p08` has.
+   **The distinction rests on that argument**, and the argument stands on its
+   own. `controls/no_overlap.py` re-derives from the shipped blobs that this
+   kernel has **no overlapping copy at all** and that two records' content ranges
+   either coincide exactly or are disjoint — never partial.
+   ⚠ **That census CONFIRMS a theorem; it cannot DISTINGUISH** (`TASK_162`
+   MAJOR 4a, landed in `RECAP.md` finding 62): a record's `(off, len)` is either
+   freshly bump-allocated or copied verbatim from a matching table entry, so
+   `partial` is unreachable **by construction** rather than absent by accident —
+   and `p08`'s `9` are COPY source/destination relations, not record pairs, so
+   the two figures are not the same measurement. `NOTES.md` 1.
 2. **Why the safety line is `cow` and not the upstream patch.** Upstream fixes
    the *provenance* — never borrow — which deletes the deduplication and
    **changes a benign observable**. `controls/spellings.py` builds both and
    prices them.
 3. **Why the reduction this row came from had a dead branch, and what fixing it
    cost.** `.temp/t160/red/k40304.c` fixed the content width at 3 against a
-   threshold of 5, so the guard could never be false. Deriving the width from the
-   input made both branches live — and turned three straight-line operations
-   into loops, which at R5 cost three recursive spec functions, four verified
-   helper loops and two induction lemmas. `NOTES.md` 8 counts it.
+   threshold of 5, so `if (K_CLEN < K_THRESH)` was a compile-time constant, the
+   non-interned branch was dead and **no record was ever born owned**.
+   ⚠⚠ **The stronger claim — *"so the guard could never be false"* — IS FALSE
+   AND WAS MEASURED FALSE** (`NOTES.md` 8a): the reduction's own copy-on-write
+   arm writes `r_shared[i] = 0` when it un-shares, so a second BREAK on a record
+   the first one copied takes the false branch — **guard TRUE 67 195, FALSE
+   30 263, i.e. 31.1 % of 97 458 evaluations.** What the constant width kills is
+   *records born owned*, not the branch, and the two would need different
+   repairs. Deriving the width from the input fixed the real defect — and turned
+   three straight-line operations into loops, which at R5 cost three recursive
+   spec functions, four verified helper loops and two induction lemmas.
+   `NOTES.md` 8 counts it.
 4. **Safe Rust offers both the bug and the repair.** `Rc<RefCell<Buf>>`
    reproduces `c/kernel.c` bit for bit, safely; `Rc<Buf>` with `Rc::make_mut` is
    copy-on-write supplied by the standard library. `controls/safe_arms.py` builds

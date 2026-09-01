@@ -6,7 +6,7 @@ where what they do NOT support is written down.**
 
 ---
 
-## 0. PROTOCOL rule 6 — the contract hash, and the FOUR moves it has made
+## 0. PROTOCOL rule 6 — the contract hash, and the FIVE moves it has made
 
 `spec.md`'s `slb-contract` block, **as first written, before any measurement of
 its own pins**:
@@ -31,11 +31,12 @@ seven rungs were built and cross-checked**, because three of the block's own pin
 values that cannot be written before the rung they measure exists. p25's and
 p34's disclosures have the same shape; saying so is the point of the rule.
 
-**FOUR moves, all disclosed. ⚠⚠ AND THE OBVIOUS SUMMARY — *"no entry moved"* —
+**FIVE moves, all disclosed. ⚠⚠ AND THE OBVIOUS SUMMARY — *"no entry moved"* —
 WOULD BE FALSE, WHICH IS EXACTLY THE SENTENCE `p25`'s NOTES HAD TO WITHDRAW.**
-So here is the diff, key by key, produced by parsing all five texts and diffing
-the objects rather than by assertion (`.temp/t161/` holds all five and each
-re-hashes to its digest):
+So here is the diff, key by key, produced by parsing all six texts and diffing
+the objects rather than by assertion (`.temp/t161/` holds the first five and each
+re-hashes to its digest; `.temp/t163/contract_step5_preedit.txt` is the fifth
+saved VERBATIM, 46 012 characters, as the pre-image of the sixth):
 
 ```
 1 first-written -> 2 pins        /idiom/required[0]/rust    -2 chars
@@ -45,6 +46,7 @@ re-hashes to its digest):
 2 pins          -> 3 entry19     /idiom/why              +1045
 3 entry19       -> 4 stale       /idiom/why               +192
 4 stale         -> 5 breakqual   /idiom/why               +162
+5 breakqual     -> 6 t163        /idiom/why              +2162
 ```
 
 **So THREE `required` entries DID move at step 2**, and what moved in them is
@@ -70,17 +72,37 @@ other `required` entry, `forbidden`, `verus.obligations`,
 |---|---|---|
 | `f4bc4334c9fab9a506ec2f4a81456da22e3c4eb4d8faaf51fc68233e731dd180` | **three accidental backticks and one added sentence** | The gate's own idiom audit printed `3 pin nothing` — `` `rshd[]` `` twice and `` `"interned":true/false` `` once were backticked inside prose, so the audit read them as pinned spellings no rung contains. Unbackticked. In the same edit the `why` gained a sentence saying the `memcpy`/`memmove`/`memset` ban is about SOURCE spellings and not about the object, because `safe_tuned.rs`'s `copy_within` lowers to `memmove@GLIBC_2.2.5` and the gate's own stage-3a column prints it. Text: `.temp/t161/contract_step2_pins.json`. |
 | `de0d40a5c9b85a22a8fe10da2f499d3c501f50926ce75e4663cb60377dcb4d5d` | **the entry-19 paragraph of `why`** | It repeated the task file's *"the guard CAN NEVER BE FALSE"*, and §8a **refutes that by measurement in the reduction's own C**. Rule 6's second half is exactly this case: a frozen declaration is evidence about *when* it was written, not about whether it is still true. Text: `.temp/t161/contract_step3_entry19.json`. |
-| `3001e6edd05cb2cc5b0cd382088a06ec153f38f716ba588e4f680153bbd584ab` | **the `Rc` arm names in `why`** | It named the safe-Rust control arms `Rc<RefCell<[u8; MAXW]>>` and `Rc<[u8]>`; what was actually built is `Rc<RefCell<Buf>>` and `Rc<Buf>`, where `Buf` carries the width as a field — **so the two arms differ in ONE type, which is the finding the old spelling obscured**. Text: `.temp/t161/contract_step4_stale.json`. |
+| `3001e6edd05cb2cc5b0cd382088a06ec153f38f716ba588e4f680153bbd584ab` | **the `Rc` arm names in `why`** | It named the safe-Rust control arms `Rc<RefCell<[u8; MAXW]>>` and `Rc<[u8]>`; what was actually built is `Rc<RefCell<Buf>>` and `Rc<Buf>`, where `Buf` carries the width as a field. ⚠⚠ **The sentence this edit ADDED — *"so the two arms differ in ONE type"* — was itself FALSE, and move 6 withdraws it.** Text: `.temp/t161/contract_step4_stale.json`. |
 | `d339ef900e0b2c59c1f8b3a851fdebe3b46ae8f999294e593a5dc5d7a667e0be` | **one qualifier** | *"the safety line DOES EXECUTE ON EVERY BENIGN BREAK"* → **every benign BREAK THAT NAMES A RECORD**. `degenerate.bin` executes 3 BREAKs and evaluates the guard twice, because a BREAK with `nrec == 0` folds SENT before reaching it. Text: `.temp/t161/contract_step5_breakqual.json`. |
+| `3446cc4081a72c5400b449802402769b8144cfabbf73b57e00a23a563a31390d` | **THREE claims measurement refuted, struck and replaced** (`TASK_163`) | *(a)* ***"THE TWO Rc ARMS DIFFER IN ONE TYPE"* is FALSE** (`TASK_162` MAJOR 3); the replacement is the measured DECOMPOSITION in §3e, not a weakening. *(b)* the **`0 PARTIAL` census** now says in terms that it **confirms a theorem of the dedup code and cannot DISTINGUISH**, and that `p08`'s `9` is a different measurement (`TASK_162` MAJOR 4a, landed in `RECAP.md` finding 62). *(c)* ⚠⚠ **`idiom.required[5].c`'s copy of the ITEM-7 COUNTERFACTUAL** — *"it is what makes the PROVENANCE repair benign-observable while copy-on-write is not"* — **which no review had looked at.** `TASK_162` reported the hashed `why` CLEAN of that sentence and was RIGHT about the `why`; `TASK_163.md` then said in terms not to disturb the `why` for it. **Both were true and the BLOCK was still carrying it**, because rule 6's second half is about the whole hashed block and not one key of it. ⚠ **An edit made AFTER the measurement, and disclosed as one.** Generator `.temp/t163/fix_why.py` (asserted counts, `--check` mode, idempotent); pre-image `.temp/t163/contract_step5_preedit.txt`; disclosure `python3 harness/tools/contract_diff.py p49` → **`idiom.why` and `idiom.required` and nothing else**, with all **43** backticked spellings in `required` byte-identical before and after, so **no pin moved**. |
 
-All five texts re-hash exactly to the five digests above
+The first five texts re-hash exactly to the first five digests above
 (`.temp/t161/mkcontract.py` is the generator; it asserts its own substitution
-count and has a `--check` mode).
+count and has a `--check` mode), and `.temp/t163/fix_why.py` carries the fifth
+to the sixth the same way.
 
-⚠ **The third and fourth moves are the SAME CLASS as the second and they were
-found by the rule-6 second-half pass**, not by any gate stage: nothing in
-`check.py` reads a `why` for truth. Three MEASUREMENT-hashed files were corrected
-in the same pass and cost one re-measure between them — `inputs/gen.py` (the same
+⚠⚠ **THREE OF THE SIX MOVES STRIKE A SENTENCE THE HASH MATCHED PERFECTLY** — moves 3, 4 and 6, and move 6 strikes **four** of them at once. **A frozen
+declaration is evidence about WHEN it was written, never about whether it is
+still true**, and on this row the hash has now matched over five separate false
+sentences. `PROTOCOL.md` rule 6's second half is not a formality here; it is the
+only thing that has ever caught them.
+⚠⚠ **AND ONE OF THE FIVE SURVIVED A REVIEW THAT LOOKED IN THE RIGHT FILE.**
+`TASK_162` checked the hashed `why` for the item-7 counterfactual, reported it
+CLEAN, and was **right** — the `why` does not carry it. `idiom.required[5].c`,
+**inside the same `contract_sha256`**, carries it verbatim, and `TASK_163.md`
+inherited the clean verdict and said in terms *"do not disturb it"*. ⚠ **A key
+is not a block. When rule 6's second half says re-read the DECLARATION, it means
+every string in the fence.**
+
+⚠ **The third, fourth and sixth moves are the SAME CLASS as the second, and the
+first two of them were found by the rule-6 second-half pass** — not by any gate
+stage: nothing in `check.py` reads a `why` for truth. ⚠⚠ **The sixth was found by a
+REVIEW, which is the part rule 6 cannot do**, and the same review's sweep at
+`TASK_163` turned up **two more MEASUREMENT-hashed sites nobody had named** —
+`verus.rs`'s `fold_recs` doc comment and `safe_naive.rs`'s module header, both
+carrying a sentence this file had already withdrawn elsewhere. Three
+MEASUREMENT-hashed files were corrected in the earlier pass and cost one
+re-measure between them — `inputs/gen.py` (the same
 *can never be false* claim), `c/kernel.c` (*"the copy loop below"*, **and
 `c/kernel.c` has no copy loop at all**) and `verus.rs` (`lemma_rec_in_pool` is a
 solver hint, §8c). ⚠ **A false sentence in a shipped rung source is the thing
@@ -116,6 +138,26 @@ p08   partially-overlapping copies (the negative control) ..       9
 semantics (R1 and R1h) on every window, and the `p08` arm is synthesised from
 `p08`'s own documented decode so it runs from a fresh clone whether or not that
 pattern's gitignored blobs are present.
+
+⚠⚠ **AND THE CENSUS CONFIRMS A THEOREM; IT CANNOT DISTINGUISH. THE ROW MUST NOT
+LEAD WITH IT** (`TASK_162` MAJOR 4a, landed in `RECAP.md` finding 62). Two
+reasons, and they are different:
+
+1. **`0 PARTIAL` is FORCED BY THE CODE.** A record's `(off, len)` is either
+   freshly bump-allocated — disjoint from everything — or copied **verbatim**
+   from a table entry whose `(ekey, elen)` matched. `partial` is *unreachable*,
+   so the census cannot come out any other way and it is a property of the
+   construction rather than evidence about it.
+2. **The two figures are not the same measurement.** `p49`'s three numbers are
+   **RECORD-PAIR** relations; `p08`'s `9` are **COPY source/destination**
+   relations. `p08` has no records at all, so its record-pair column does not
+   exist. On the like-for-like axis `p08`'s copies are **32 887 disjoint
+   against 9 partial** — 0.027 %.
+
+✅ **What the census IS good for is the direction it is not quoted in**: it fails
+if no two records ever hold one buffer, so it is a live check that the sharing
+this row is about actually happens. **The C-side distinction from `p08` rests on
+the argument below, and that argument stands without either number.**
 
 ⚠ **The `11 084` is load-bearing in the other direction too**: a census that only
 ever answered *no overlap here* would pass on a program with no sharing at all,
@@ -228,6 +270,68 @@ Across the shipped inputs: `adversarial-rehash` is the one where `aliased` is
 boundary **forwards in time**, into a record that did not exist when the write
 happened. No built row can produce that.
 
+### 2f. ⚠⚠ The CENSUS had no must-fire arm until `TASK_163`
+
+`.memory/03-measurement.md` entry 19 says *whatever a model DERIVES rather than
+DECLARES owes an arm that SHOWS IT FIRING*. `Detector` had one from the start
+(§2e). **`model.py::window_share_break` — the row's structural headline
+stated as a check — did not**, and `TASK_162` MINOR 7 measured the
+consequence by planting eight defects into a copy of `model.py`:
+
+```
+mutation                            selfcheck   model checksum moves
+D1-detector-dead                    REPORTED    0/9
+D2-detector-constant-true           REPORTED    0/9
+D3-safety-line-deleted              REPORTED    5/9
+S1-spec-epilogue-flagfold-dropped   REPORTED    0/9
+S2-sim-dedup-disabled               REPORTED    2/9
+S3-sim-arena-cap-dropped            SILENT      0/9      <-- invisible
+W1-share-break-census-neutered      SILENT      0/9      <-- invisible
+W2-share-break-census-always        REPORTED    0/9
+```
+
+✅ **6 of 8 REPORTED with the designed message and NONE crashed** — which
+is strictly better than the `p32` arm entry 19 closes on, where *three of four
+fail by CRASHING and the diagnostic is lost*. The two silent ones are repaired
+here by `model.py::census_selftest()`, which `selfcheck()` runs once per input
+on every gate invocation:
+
+* **`window_share_break` answers three ways on four probes.** A neutered census
+  fails two arms, a constant-`True` census fails the other two. ⚠ The fourth
+  probe has **no BREAK at all**, because *the guard was never evaluated* and
+  *the guard was evaluated and was false* are exactly the two states a census
+  that cannot fire is indistinguishable from.
+* **`no_share_break_problems` itself REPORTS.** A live predicate is not a wired
+  check; this arm is the difference, and it exercises the `adversarial-` early
+  return rather than trusting it.
+* **The arena-capacity refusal DECIDES an observable.** ⚠ **It is NOT
+  unreachable, and the earlier reading of `TASK_162`'s census as *"the branch
+  is dead"* is too strong:** seven distinct `(key, w = 3)` entries need **21**
+  bytes of a **20**-byte arena, so `_PROBE_ARENA` reaches it with
+  `len(table) == 6 < NENT` — the ARENA conjunct is what decides. The probe
+  is built so the refusal MOVES AN ANSWER: with the cap the window ends with 7
+  records and `BREAK 13 % 7 == 6` selects the OWNED record, so the detector is
+  silent; drop the cap and there are 8 records, `13 % 8 == 5` selects an
+  interned one, and `published` fires.
+
+⚠ **What remains true is the reachability census**: `abump + w > P49_ARENA`
+decides **nothing on any shipped window**, in either C rung, at either level
+(`large.bin`'s 4 refusals are all `nent >= NENT`). So no *shipped input* tests
+it, which is why the arm is a synthetic probe and not a tenth blob — and
+saying that plainly is the alternative entry 19 allows.
+
+**Re-measured at `TASK_163` on the repaired model** (`.temp/t163/e5_mutate.py`,
+each mutation an asserted substitution, every arm run inside a `try` so a crash
+is reported AS a crash):
+
+```
+W1-census-neutered            REPORTED     W1-check-unwired              REPORTED
+W1-census-always-true         REPORTED     W1-check-adversarial-always   REPORTED
+W1-census-guard-inverted      REPORTED     S3-sim-arena-cap-dropped      REPORTED
+S3-census-arena-cap-dropped   REPORTED     C0-control-inert              SILENT
+                              7 of 7 REPORT, 0 SILENT, 0 CRASH
+```
+
 ---
 
 ## 3. The safety line
@@ -286,6 +390,30 @@ safety line; check it against the benign observable.*
 Both repairs fix every adversarial input except `adversarial-stride3.bin`, whose
 windows the driver guard skips.
 
+⚠⚠ **THE FLAG FOLD IS SUFFICIENT FOR THIS AND NOT NECESSARY, AND THE COUNTERFACTUAL
+THIS FILE PUBLISHED IS WITHDRAWN** (`TASK_162` item 7 — §10 assumption 3 was
+**FALSE**, and the reviewer settled it by deleting the fold from all three arms
+and re-running):
+
+```
+epilogue as shipped        cow moves a benign answer  0 of 3   provenance 3 of 3
+FLAG FOLD DELETED          cow moves a benign answer  0 of 3   provenance 2 of 3
+```
+
+**With the fold gone `provenance` still moves `large.bin` and `small.bin`; only
+`degenerate.bin` collapses.** ✅ **The mechanism, which is the part that matters:**
+`provenance` deletes the deduplication, so every record consumes private bytes
+where interning shared them — the 44-byte private region fills
+(`sent_priv_full` **4 → 398** on `large.bin`, **0 → 11** on `small.bin`) and `nrec`
+changes (**768 → 762**) — **and the epilogue folds both of those independently of
+the flag.** `degenerate.bin` is the one input where the two arms produce identical
+record counts and identical refusals, which is exactly why it, and only it, needs
+the flag to separate them.
+⚠ **So the safety line's choice STANDS and its stated reason did not.** The same
+counterfactual was in **three** measurement-hashed rung sources — `c/kernel.c`,
+`c/kernel_hardened.c` and `verus.rs` — and all three now say *sufficient, not
+necessary* (`TASK_163`).
+
 ### 3c. The repair can REFUSE, and that is priced
 
 Un-sharing needs storage the bug does not need. `adversarial-cowfull.bin` drives
@@ -310,6 +438,86 @@ benign window does is take its TRUE branch. So p49 has a real, non-zero benign
 cost gradient where p34's is `0.00`, and §4 prices it. `controls/no_share_break.py`
 fails the row if a matrix blob ever evaluates the guard **zero** times, because a
 matrix blob with no BREAK at all would silently turn p49 into p34.
+
+### 3e. Safe Rust offers both sides — and what the gap between them IS
+
+`controls/safe_arms.py` builds three safe ports and asserts each against a C
+rung on all nine inputs: the **index arena** (the shipped R2) and
+**`Rc<Buf>` + `Rc::make_mut`** both reproduce `c/kernel_hardened.c`;
+**`Rc<RefCell<Buf>>`** reproduces `c/kernel.c` — **the bug, in safe Rust,
+with no `unsafe` anywhere and no panic.** `CLAUDE.md` rule 6 names *"safe Rust
+reproduces the bug bit-identically"* as a FINDING, and on this row it is the
+finding.
+
+⚠ **`9/9` is right and its DISCRIMINATING support is `5`.** On
+`degenerate.bin`, `large.bin`, `small.bin` and `adversarial-stride3.bin` the two
+C rungs print the SAME number, so an arm that matches one matches both. The five
+that decide anything are `adversarial-cascade`, `-cowfull`, `-many`, `-rehash`
+and `-share`.
+
+⚠⚠ **AND *"THE TWO `Rc` ARMS DIFFER IN ONE TYPE"* IS FALSE. IT WAS IN THE
+HASHED `why`, IN THIS FILE, IN `safe_naive.rs`, IN `controls/safe_arms.py` AND
+IN A COMMIT MESSAGE** (`TASK_162` MAJOR 3). Arm C also carries a 20-line block
+at the write site that arm B does not — an `Rc::strong_count(..) > 1` test,
+a budget refusal, a budget charge and a flag clear. **The arm file itself
+discloses the block** (`arm_rc_makemut.rs:17-23`: *"the one explicit test below
+is a BUDGET test and not a safety test"*); five downstream summaries dropped
+the disclosure, which is `PROTOCOL.md` rule 13 — the detail is maintained
+and the header rots.
+
+**So what IS the block for? Measured, not weakened** (`.temp/t163/e2_arms.py`;
+every variant derived from the shipped arm by asserted substitution, built with
+`harness/build.py::rust_flags("O3", "isolated", "unwind")`, scored over the five
+discriminating inputs):
+
+```
+arm                                            =R1h  =R1  NEITHER
+C_ship     query + refusal + charge + flag clear  5    0      0
+C_bare     the whole block deleted                0    0      5
+C_flag     query + FLAG CLEAR only                4    0      1
+C_budget   query + refusal + charge, no flag      1    0      4
+C_getmut   the query via `Rc::get_mut(..).is_none()`
+                                                  5    0      0
+C_posthoc  the query AFTER the write, by `Rc::as_ptr`
+                                                  4    0      1
+B_ship     the `RefCell` arm                      0    5      0
+```
+
+Four things fall out:
+
+1. **The block is the BENCHMARK'S STORAGE ACCOUNTING, not the safety.** It
+   clears the ownership flag the epilogue folds and charges the private copy
+   against the same fixed 44-byte pool `c/kernel_hardened.c` charges it against.
+   A real `Rc` pool would allocate and would need neither.
+2. **Both halves are load-bearing and neither is redundant** — flag clear
+   alone 4 of 5, budget alone 1 of 5, and the one the budget carries is
+   `adversarial-cowfull.bin`, the input the refusal path exists for.
+3. **The ownership QUESTION is not tied to `strong_count`.**
+   `Rc::get_mut(&mut r).is_none()` is a different safe API asking the same
+   question and it matches 5 of 5. What cannot be dropped is asking *at all*.
+   ⚠ **And the REFUSAL is the only part that must precede the write**:
+   `C_posthoc` asks nothing beforehand and reads the answer off
+   `Rc::as_ptr` across `make_mut`, which recovers the flag and the charge but
+   cannot refuse — 4 of 5, failing on exactly `adversarial-cowfull.bin`.
+4. ✅ **The residue of *"one type apart"* is TRUE and is a better claim.**
+   With the block deleted from arm C the two arms are *literally* one type
+   apart (`Rc<Buf>` against `Rc<RefCell<Buf>>`, plus the write spelling that
+   type forces), and they **agree on the four non-discriminating inputs and
+   differ on all five discriminating ones**. ⚠ Neither of them then reproduces
+   either shipped C rung. **So the TYPE carries the safety and the BLOCK
+   carries the C kernel's accounting** — and what `Rc::make_mut` replaces
+   is exactly ONE of the four things `c/kernel_hardened.c`'s safety line does:
+   the COPY, and its aliasing correctness. The other three are hand-written in
+   safe Rust either way.
+
+**The `rustc` error arm.** `Rc<Buf>` written through without `make_mut` is
+`error[E0594]`, and so is a NEGATIVE CONTROL that cannot have p49's bug
+(one `Rc<i32>` assigned through). **`E0594` is NOT distinguishing** — the
+fifth time this project has checked and the fifth time the answer is no; the
+control records `error_code_distinguishes: false` rather than leaving a reader
+to assume otherwise.
+
+⚠ **None of the three arms is priced** (§10).
 
 ---
 
@@ -375,7 +583,7 @@ under gcc (−2.79) and DEARER under clang (+13.87).** That is `p35`'s trap —
 carries its compiler and its level. **A single headline number for "the price of
 p49's safety line" does not exist.**
 
-### 4c. What the price is a price OF — and a decomposition that does NOT close
+### 4c. What the price is a price OF — and the decomposition, which CLOSES
 
 No benign window takes the guard's TRUE branch (§3d), so on every matrix input
 the copy loop, the flag store and the bump **never execute**: the whole gradient
@@ -397,15 +605,86 @@ gcc   O3  small  -0.66      clang O3  small  +3.28
 gcc   O3  large  +1.41      clang O3  large  +7.66
 ```
 
-⚠⚠ **AND THAT DECOMPOSITION DOES NOT CLOSE, SO IT IS NOT PUBLISHED AS THE PRICE
-OF THE GUARD.** Within one (compiler, level) cell the figure moves as much
-across the two INPUTS (gcc `-O3`: −0.66 against +1.41; clang `-O3`: +3.28
-against +7.66) as it does across compilers. A per-guard constant would be
-input-independent, and this is not: the extra branch also changes register
-pressure and scheduling in the rest of the loop, and this measurement cannot
-separate the two. **What is published is the per-CALL delta per cell above.**
-`.memory/03-measurement.md`'s rule — *close a decomposition over every function
-or say "presumed"* — and this one is not closed.
+⚠ **That NET figure is not the guard's price** — it mixes the guard with what the
+guard displaces, which is why it moves across inputs within one cell. **The
+sentence this section used to carry — *"the decomposition does NOT close"* — is
+WITHDRAWN. It closes, on gcc, to a law with NO FITTED PARAMETER.**
+
+#### The line-level diff (`.temp/t163/e3_decomp.py`)
+
+The `-g` builds are verified code-identical to the measured cells on all **eight**
+C cells by `n_fn_nopad` **and** `md5_raw` (gcc `-O3` 274 / 410, `1a7e56ae…` /
+`66ae47be…`). callgrind per source line, R1h minus R1, gcc `-O3`:
+
+```
+small.bin (probe: 2 000 calls)          large.bin (200 calls)
+  +8.43  if (rshd[t]) {                     +44.75  if (rshd[t]) {
+  -4.62  m[base+j] = p49_cbyte(key, j);      -5.70  m[base+j] = ...
+  -4.62  abump = abump + w;                  -5.70  abump = abump + w;
+  -1.00  key = (uint8_t)(a % P49_NKEY);      -1.00  key = ...
+  -1.00  w   = (uint8_t)(1u + a % MAXW);     -1.00  w   = ...
+  -----  sum over ALL moving lines           -----
+  -2.81  = the whole kernel delta           +31.35  = the whole delta
+```
+
+**Zero `Ir` in `<counts for unidentified lines>` on either gcc cell**, so the sum
+is over every line and not over the five that were looked at.
+
+#### The law, and it has no fitted parameter
+
+Let **`G`** be guard evaluations per call and **`C`** intern-table creations per
+call. Both are counted **directly**, by an instrumented copy of
+`c/kernel_hardened.c` with two counters spliced in by asserted substitution, run
+against the **shipped** driver on the **shipped** blobs — not replayed:
+
+```
+small.bin  200 000 calls   G = 4.2318   C = 4.6256
+large.bin   20 000 calls   G = 22.3508  C = 5.6449
+```
+
+The guard costs a CONSTANT per evaluation, and the interning-DEFINE path loses
+exactly one instruction at each of two sites per creation (`abump` and the
+`p49_fill` store each drop **9 237** `Ir` on the small probe — precisely its
+9 237 creations), plus one per call in the operand decode. So:
+
+```
+            law                predicted     record   residual
+gcc  -O3    2*G - 2*C - 2          -2.7877    -2.7877    -0.0000   small.bin
+gcc  -O3    2*G - 2*C - 2         +31.4117   +31.4117    -0.0000   large.bin
+gcc  -O0    6*G                   +25.3909   +25.3909    -0.0000   small.bin
+clang-O0    4*G                   +16.9273   +16.9273    +0.0000   small.bin
+```
+
+**Worst |residual| over the four published cells: `0.0000` `Ir`/call** (`.temp/t163/e3_law.py`).
+
+⚠⚠⚠ **SO THE SIGN IS SET BY THE EVENT MIX, NOT BY THE COMPILER, AND THE CROSSOVER
+HAS A CLOSED FORM: at gcc `-O3` the hardened kernel is CHEAPER exactly when
+`G < C + 1`.** `small.bin` 4.23 < 5.63 → cheaper; `large.bin` 22.35 > 6.64 →
+dearer. **gcc alone reverses between its own two inputs**, so *"a reversal between
+COMPILERS"* is the wrong reading of §4b's table — both readings are true of the
+numbers, only the event-mix one explains them.
+
+#### ⚠ The per-evaluation figures, and the one the reviewer's table got wrong
+
+```
+cell         guard LINE   KERNEL SYMBOL   unidentified   verdict
+gcc   -O3        2.00           2.00            0.0 %        exact
+gcc   -O0        6.00           6.00            0.0 %        exact
+clang -O0        3.00        >> 4.00 <<         0.7 %        line count SHORT by 1.00
+clang -O3        2.00         3.29 / 7.70   19.5–20.5 %   NOT a constant
+```
+
+⚠⚠ **`TASK_162` MAJOR 6 and `RECAP.md` finding 62 publish *"clang-O0 3.00"*, and
+that is the GUARD LINE's identified `Ir` only.** The `<counts for unidentified
+lines>` bucket moves by **exactly 1.00 more per guard evaluation**, so the kernel
+SYMBOL — which is the convention `results/*.json` publishes — costs **4.00**, and
+`4*G` reproduces the record's `+16.9273` exactly while `3*G` gives `12.70`.
+⚠ **At clang `-O3` a fifth of the kernel is unidentified and the symbol-level
+per-guard figure is not constant** (+3.29 on `small.bin`, +7.70 on `large.bin`),
+so *"clang-O3 2.00"* is a line-attribution artefact as well. ✅ **The
+constant-cost-per-evaluation result is a GCC result and is not published as more.**
+No clang decomposition is offered and none should be quoted: the file TOTAL still
+closes on clang, the per-LINE attribution does not.
 
 ### 4d. The R4/R5 pair: 0.00 in every measured cell
 
@@ -427,10 +706,28 @@ table above is the **kernel-exclusive** column from the MEASUREMENT record. They
 are different quantities measured by different instruments, and p49's entry-23
 figure is whatever `results/gate/p49-interned-pool.json` says — not this.
 
+**Entry 23's null, read out of the GATE record, per (level, mode) cell as entry 23
+demands** (`TASK_162` §4; it had never been computed, and `TASK_162.md` itself
+asserted *"0.00 in every cell"* off the kernel-exclusive column above):
+
+```
+R4/R5 null = verus − unsafe, marginal_ir_per_call
+  O0 isolated   small +0.00   large +0.00   d_ir_d_work +0.00
+  O0 whole      small +0.00   large +0.00   d_ir_d_work +0.00
+  O3 isolated   small -1.00   large -1.00   d_ir_d_work +0.00
+  O3 whole      small -3.23   large +55.57  d_ir_d_work +0.31
+```
+
+At `-O3 isolated` — the cell entry 23 publishes corrections in — p49 reads **−1.00**,
+below the `2.00` band, so it does **not** join `p25`/`p42`/`p04`/`p03`/`p02`.
+⚠ **It is non-zero even though `identity` is `exact` at `-O3`**: the two kernels
+are byte-identical (`md5_raw 563ecf2f…` on both) and the whole-program slope still
+differs, which is entry 23's whole point demonstrated on a fresh row.
+
 ### 4e. The ladder, `-O3` isolated, against R1h (the CHECKED C rung)
 
 ```
-small.bin   c-gcc 0.99  c-gcc-h 1.00  c-clang 1.16  c-clang-h 1.17
+small.bin   c-gcc 1.00  c-gcc-h 1.00  c-clang 1.16  c-clang-h 1.17
             safe_naive 1.29  safe_tuned 1.22  unsafe 1.15  verus 1.15
 large.bin   c-gcc 0.99  c-gcc-h 1.00  c-clang 1.15  c-clang-h 1.18
             safe_naive 1.31  safe_tuned 1.19  unsafe 1.18  verus 1.18
@@ -440,9 +737,18 @@ large.bin   c-gcc 0.99  c-gcc-h 1.00  c-clang 1.15  c-clang-h 1.18
 15–18% dearer.** ⚠ The gap between safe and unsafe Rust — 0.14x on `small.bin`,
 0.13x on `large.bin` — is what the bounds checks cost, and it is small because
 the kernel's inner work (the dedup scan and the byte loops) dominates the index
-arithmetic. ⚠ **And note that clang's C is 15–17% dearer than gcc's on this
-kernel**, so *"C"* is not one column: a C-vs-Rust claim taken against clang
-would be half the size of the same claim against gcc.
+arithmetic. ⚠ **And note that clang's C is 15–18% dearer than gcc's on this kernel** (bug/bug
+15.8 % and 15.4 %, hardened/hardened 16.7 % and 18.0 %), so *"C"* is not one
+column: a C-vs-Rust claim taken against clang would be half the size of the same
+claim against gcc.
+
+⚠ **`small.bin c-gcc` read `0.99` until `TASK_163` and the record says `1.00`**
+(`1974.4131 / 1971.6254 = 1.001414`). `0.99` says the **buggy** rung is 1 % cheaper
+— the **opposite sign** to §4b's own `−2.79` on those same two numbers, which is
+this row's one cell where the safety line is free. `large.bin`'s `0.99` is right
+(`0.993852`). **All sixteen cells of this table were re-derived from the record;
+that one was the only disagreement** (`.temp/t163/e4_ratios.py`), and §4a's 32 cells,
+§4b's 8 deltas and §4f's wall figures all re-derive exactly.
 
 ### 4f. Wall clock — SECONDARY, and it cannot resolve the safety line
 
@@ -792,9 +1098,10 @@ CAVEATS["p49"] = (
   * **The `Rc` arms are checked for their ANSWER, not priced.**
     `controls/safe_arms.py` establishes that `Rc<RefCell<Buf>>` reproduces
     `c/kernel.c` and `Rc<Buf>`+`make_mut` reproduces `c/kernel_hardened.c`, on
-    all nine inputs. It does **not** measure what either costs. **So "safe Rust
-    offers both the bug and the repair" is a claim about EXPRESSIVENESS and
-    carries no number.**
+    all nine inputs — **5 of which discriminate** (§3e). It does **not**
+    measure what either costs. **So "safe Rust offers both the bug and the
+    repair" is a claim about EXPRESSIVENESS and carries no number**, and the
+    six-variant decomposition in §3e is about ANSWERS too, not about cost.
   * **`M1`'s failure site** (§6b).
   * **The `provenance` arm is priced but never gated**: `controls/spellings.py`
     builds it and reports its `Ir`, and no gate stage runs a detector on it. It
@@ -812,25 +1119,41 @@ CAVEATS["p49"] = (
      EXACT content comparison *because* content is a function of `(key, w)` —
      `model.py::content` — so there is no hash collision to model. A pool whose
      key were a real hash would have a collision path this row does not have.
-  3. ⚠ **The epilogue folds the ownership flag**, which is what makes the
-     `provenance` repair benign-observable (§3b). That is a modelling choice
-     standing in for the port's `"interned"` API field. **Without it,
-     `provenance` and `cow` would be indistinguishable on benign input and this
-     row would have no reason to prefer one.** It is disclosed in the `why`, in
-     `c/kernel.h` and here, and a reviewer may reasonably call it the thing that
-     decides §3b.
+  3. ⚠ **The epilogue folds the ownership flag.** That is a modelling
+     choice standing in for the port's `"interned"` API field, disclosed in the
+     `why`, in `c/kernel.h` and here.
+     ⚠⚠ **THE SECOND HALF OF THIS ASSUMPTION AS FIRST WRITTEN — *"without
+     it, `provenance` and `cow` would be indistinguishable on benign input"* —
+     IS FALSE AND WAS MEASURED FALSE** (`TASK_162` item 7). Delete the fold from
+     all three arms and `provenance` still moves **2 of the 3** benign
+     checksums; only `degenerate.bin` collapses. §3b now carries the
+     mechanism. ✅ **The safety-line choice STANDS and its stated reason did
+     not** — which is the more useful half of the result, because a
+     conclusion and its mechanism have different evidence.
   4. ⚠ **`no_share_break` is a property of the SHIPPED blobs, not a theorem.**
      `inputs/gen.py` cannot emit a violating window and `model.py` re-derives the
      property every gate run, but a hand-written blob could violate it and the
      gate would then report a stage-2 disagreement rather than a clear message.
-  5. ⚠ **§4c's per-guard figures do not close.** They are printed to be argued
-     with, not quoted.
+  5. ⚠ **§4c's per-guard figures DO close on gcc, and the clang side is
+     open.** The NET per-guard figure this file used to print is not the guard's
+     price; §4c now gives the guard's own constant, the offsetting sites, and a
+     zero-parameter law exact on four published cells. ⚠ **On clang the
+     per-LINE attribution is untrustworthy** — 19.5–20.5 % of the
+     kernel lands in `<counts for unidentified lines>` at `-O3` — and no
+     clang decomposition is offered.
+  6. ⚠ **The `census_selftest()` probes are hand-written windows, not
+     generated.** They are chosen so that each mutation moves an answer (§2f),
+     and `.temp/t163/e5_probe.py` prints what the shipped model says on each,
+     but a reader should check the arithmetic rather than take the constants on
+     trust.
 
 **Process**
 
   * `.memory/`, `RECAP.md`, `results/SYNTHESIS.md` and
     `harness/tools/composition.py` were **not** edited — the task forbids it and
-    the class proposal in §9 is a proposal.
+    the class proposal in §9 is a proposal. ⚠ The manager applied `aliasing`
+    at `TASK_162`'s commit; §9 is left as written so the proposal and the
+    decision stay separable.
   * `harness/tools/composition.py --check` will FAIL with `built but
     unclassified` until the manager applies §9. **That is the check working.**
 
