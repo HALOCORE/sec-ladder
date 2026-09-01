@@ -10,10 +10,10 @@
     "patterns/p25-realloc-growth/inputs/gen.py": "39c40b42328cb74e7dbddf6c41df641d51a3b2e1ee0b24bee89f0a3a1516aa78",
     "patterns/p25-realloc-growth/controls/ctl_asan.c": "071970452350318bff570caa4063858bd73504366861c809104fa433ab5ecc26",
     "patterns/p25-realloc-growth/controls/ctl_ubsan.c": "5044ffb4ededa68a84ff29376b4f73500a4155c2db1cfad1ef195c796ddf6ad8",
-    "patterns/p25-realloc-growth/controls/detectors.py": "422d521e20c82fbb79291606618865a0f86fe0c9dcf63ec6d274e971f62e39b7",
+    "patterns/p25-realloc-growth/controls/detectors.py": "9ce8d4656f70b8a3212071eb0fc0a58c781ad90e9c50a0f65e6c0a5841a23b72",
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3"
   },
-  "measured_utc": "2026-08-31T16:52:35Z",
+  "measured_utc": "2026-09-01T01:42:14Z",
   "positive_controls": [
     {
       "control": "ctl_asan.c",
@@ -24,13 +24,13 @@
         "asan": true,
         "ubsan": false
       },
-      "diagnostic": "================================================================= ==1366242==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000013 at pc 0x55d0c2ee6341 bp 0x7ffdfd2100c0 sp 0x7ffdfd21"
+      "diagnostic": "================================================================= ==1535923==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000013 at pc 0x55a34c4f5341 bp 0x7ffe027b7e60 sp 0x7ffe027b"
     },
     {
       "control": "ctl_asan.c",
       "build": "ubsan",
       "exit": 0,
-      "stdout": "ctl_asan 85",
+      "stdout": "<non-reproducible: with ASan absent this control reads recycled heap and its value moves between runs; `fired` is what it asserts>",
       "fired": {
         "asan": false,
         "ubsan": false
@@ -70,14 +70,14 @@
       "fired": true,
       "model_expect": "fires",
       "model_stdout": "14062580838451436544",
-      "diagnostic": "================================================================= ==1366317==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000073 at pc 0x55ab3bfe0826 bp 0x7ffdbe120a50 sp 0x7ffdbe12"
+      "diagnostic": "================================================================= ==1535984==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000073 at pc 0x562efe2b4826 bp 0x7fff0cd1fb40 sp 0x7fff0cd1"
     },
     {
       "input": "adversarial-lateread.bin",
       "arm": "R1",
       "build": "ubsan",
       "exit": 0,
-      "stdout": "3528946245511863296",
+      "stdout": "12899811682830179328",
       "fired": false,
       "model_expect": "fires",
       "model_stdout": "14062580838451436544",
@@ -114,14 +114,14 @@
       "fired": true,
       "model_expect": "fires",
       "model_stdout": "418471180153818624",
-      "diagnostic": "================================================================= ==1366342==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000051 at pc 0x5648a3bfc826 bp 0x7ffecb69b650 sp 0x7ffecb69"
+      "diagnostic": "================================================================= ==1535988==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000051 at pc 0x562a3acae826 bp 0x7ffca6095dc0 sp 0x7ffca609"
     },
     {
       "input": "adversarial-many.bin",
       "arm": "R1",
       "build": "ubsan",
       "exit": 0,
-      "stdout": "1607464562486742528",
+      "stdout": "9283385744530148864",
       "fired": false,
       "model_expect": "fires",
       "model_stdout": "418471180153818624",
@@ -158,14 +158,14 @@
       "fired": true,
       "model_expect": "fires",
       "model_stdout": "11296769385036522496",
-      "diagnostic": "================================================================= ==1366413==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000073 at pc 0x55921a3de826 bp 0x7ffd332581a0 sp 0x7ffd3325"
+      "diagnostic": "================================================================= ==1535992==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000073 at pc 0x55fa6caf5826 bp 0x7ffec2179f50 sp 0x7ffec217"
     },
     {
       "input": "adversarial-move.bin",
       "arm": "R1",
       "build": "ubsan",
       "exit": 0,
-      "stdout": "13108979121352709120",
+      "stdout": "5804659643157313536",
       "fired": false,
       "model_expect": "fires",
       "model_stdout": "11296769385036522496",

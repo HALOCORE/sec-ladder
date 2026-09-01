@@ -29,11 +29,37 @@ trust — the standard `TASK_155` found missing on p34 and `TASK_156` fixed.
 | `8cef5a43b154bd5fbf5ba433ca5d1773df5c3c9b6453d0802df1ffef1a4bbf3c` | **25 unicode escapes** | The block as first written carried `\\u26a0` where p27, p32 and p34 carry `⚠`, so JSON decoded a six-character literal instead of `⚠`. Verified purely cosmetic: parsing both texts and normalising the escape gives **identical** objects. |
 | `c41099be4dfdc6464941b3e60ea6b3e0067b8156735c4748b1ecdf5b6d00fddd` | **the tail of `why`** | The gate's own `idiom-named-spelling` stage FAILED the first full run: `idiom.why` must end with the SHARED named-spelling paragraph **byte-identical** (11 003 bytes, `sha256 59748cce2db5…`, *"NAMED-SPELLING STANDARD"* → *"p01 and p08 neither"*), and what was there was a faithful paraphrase. p34's is spliced in verbatim. ⚠ The block was re-serialised in the same edit, so the whitespace moved too; verified that the parsed objects differ in `idiom.why` **and nothing else**, that the p25-specific prefix of `why` is byte-identical to before, and that the tail is byte-identical to p34's. |
 
-**No `required`, `forbidden`, `identity`, `obligations`, `driver`, `collapse` or
-`miri` entry moved at any of the three steps** — checked by parsing each pair and
-diffing the objects, not by reading the diff.
+⚠⚠ **NO PIN *VALUE* MOVED — AND THIS SENTENCE USED TO SAY *"no entry moved"*,
+WHICH IS FALSE** (`TASK_158` minor 10). Three entries' **prose** moved at step 2,
+by exactly the 25 `\\u26a0` → `⚠` normalisations the table above calls cosmetic.
+Here is the diff, key by key, produced by parsing each pair and diffing the
+objects — the instrument is `.temp/t159/contract_steps.py`, and
+`harness/tools/contract_diff.py p25` says the shipped block is `UNCHANGED`
+against `HEAD`:
+
+```
+step 1  first_written -> after_no_reloc     /idiom/why                    +521 chars
+step 2  after_no_reloc -> after_escapes     /collapse/note                 -10
+                                            /identity[0]/why               -10
+                                            /idiom/why                     -85
+                                            /miri/reason                   -10
+                                            /verus/obligations_note         -5
+                                            /verus/twin_obligations_note    -5
+                                                              == exactly 25 escapes
+step 3  after_escapes -> after_shared_para  /idiom/why                  +9568 chars
+        after_shared_para -> SHIPPED        parsed objects IDENTICAL
+```
+
+**So: `identity`, `collapse` and `miri` DID move, and no `required`, `forbidden`,
+`identity`, `obligations`, `driver`, `collapse` or `miri` PIN VALUE did** — every
+step-2 change is `⚠`-escape normalisation inside a free-text `why` / `note` /
+`reason` field, and the character counts sum to precisely the 25 escapes the
+table describes. ⚠ **A disclosure is what a reviewer trusts INSTEAD of
+re-checking, so a wrong one removes the check it was meant to enable**; that is
+why this now prints the diff rather than asserting the conclusion.
 `.temp/t157/contract_after_no_reloc.json`, `.temp/t157/contract_after_escapes.json`
-and `.temp/t157/contract_after_shared_para.json` are the intermediate texts.
+and `.temp/t157/contract_after_shared_para.json` are the intermediate texts, and
+all four re-hash exactly to the four digests above.
 
 ⚠ **And rule 6 is necessary, not sufficient** (p46's lesson): the hashed `why`
 was re-read against the measured numbers before finishing, which is how the
@@ -218,51 +244,126 @@ under the abstract machine, even though no relocating allocator can observe it �
 under ASan the true branch is taken only when no `realloc` happened at all, which
 is why R1h is ASan-clean everywhere.
 
+⚠⚠ **AND THE READING IS BROADER THAN THE DEREFERENCE — THIS SENTENCE USED TO
+STOP AT `*cur` AND THAT WAS TOO NARROW** (`TASK_158` minor 4). **`curbase == toks`
+is itself a read of an indeterminate pointer value, on EVERY path including the
+false one.** The dereference is the vivid case; the *comparison* is what makes
+the whole guarded form unreachable-by-repair. That broader statement is what
+actually licenses the conclusion below, and it is also why the growth-site arm
+`fixup` (`if (cur != NULL) …`) is **not** standard-clean while `fixup2`, which
+tests an `int`, is (§3c).
+
+⚠ **The citation is loose and the claim is not** (`TASK_158` minor 5). **WG14
+DR 400 is titled *"realloc with size zero problems"***; the load-bearing text for
+*"indeterminate whether or not it moved"* is **C11 6.2.4p2** (a pointer's value
+becomes indeterminate when the object's lifetime ends) together with **7.22.3.5p4**
+(*"deallocates the old object"*), with **DR 260** for *"an indeterminate value may
+change"*. The number *DR 400* is quoted as shorthand in `spec.md`'s hashed `why`,
+`c/kernel.c`, `README.md` and `controls/rederive.py`; **it is not the authority
+for the claim, and those four spellings were left alone deliberately** — `spec.md`
+inside the fence costs a `contract_sha256` move and `c/kernel.c` costs a
+re-measure, and neither is worth a citation shorthand.
+
 **The only C rung DR 400 cannot reach is the UNCONDITIONAL re-derive**, which is
 precisely the addressing-mode change `TASK_134`'s kill named. `controls/rederive.py`
 generates it from the shipped `c/kernel.c` by one asserted substitution and
-prices it (§3c).
+prices it (§3c) — alongside the two GROWTH-site arms, of which `fixup2` is the
+second standard-clean repair.
 
 > **So both halves of the old kill are answered and they go opposite ways: the
 > conjunct EXISTS (the first half is refuted, and §3a is it) and it is
 > INSUFFICIENT (the second half is vindicated, for a reason nobody had stated).**
 
-### 3c. ⚠⚠ THE SAFER REPAIR IS ALSO THE CHEAPER ONE
+### 3c. ⚠⚠ THREE REPAIR SITES — AND THE ORDERING BETWEEN THE TWO STANDARD-CLEAN ONES REVERSES BETWEEN OPTIMISATION LEVELS
 
-`controls/rederive.py`. The re-derive arm agrees with `model.py` on **8 of 8**
-inputs — benign and adversarial — and is ASan- and UBSan-clean on all of them.
+`controls/rederive.py`, re-run at `TASK_159`. **Every arm agrees with `model.py`
+on 8 of 8 inputs — benign and adversarial — and every one is ASan- and
+UBSan-clean on all of them** (24 checksums, `problems: []`).
 
-**Static `kernel` instructions (non-pad, `-DSLB_ISOLATED`):**
+⚠⚠ **THIS SECTION USED TO PUBLISH A GCC-ONLY DYNAMIC TABLE UNDER THE WORDS *"on
+both compilers"*, AND USED TO CLAIM *"the safer repair dominates"* OF THE CLASS
+(`TASK_158` M5, M6). Both are corrected here, and the correction is in the row's
+own disfavour on one axis and in its favour on the other.**
+
+⚠ **THE CONVENTION, BECAUSE THIS ROW HAS TWO AND THEY DISAGREE (§8a):** every
+`Ir` figure below is **KERNEL-EXCLUSIVE** — `controls/rederive.py::kernel_ir`
+sums the `callgrind_annotate` rows matching `measure.py`'s own kernel needle.
+`rederive.json`'s field is spelled `marginal_ir_per_call`, which **collides with
+the gate record's key of the same name, and that one is WHOLE-PROGRAM.**
+
+**The three sites.** `R1h` guards the READ; `rederive` replaces the READ; `fixup`
+and `fixup2` refresh `cur` at the GROWTH and leave the READ as R1 writes it.
+⚠ **`fixup` is NOT standard-clean** — `if (cur != NULL)` is itself an evaluation
+of the pointer value `realloc` made indeterminate (§3b). **`fixup2` carries the
+"a SAVE has happened" bit in an `int` and reads no indeterminate value.** So the
+standard-clean set is `{rederive, fixup2}` and `fixup` is priced as the spelling
+a C programmer reaches for first.
+
+**Static `kernel` instructions (non-pad, `-DSLB_ISOLATED`), over R1:**
 
 | | gcc `-O0` | gcc `-O3` | clang `-O0` | clang `-O3` |
 |---|---|---|---|---|
 | R1 | 218 | 165 | 209 | 150 |
-| R1h (conjunct + re-derive) | 228 (**+10**) | 176 (**+11**) | 218 (**+9**) | 162 (**+12**) |
-| unconditional re-derive | 220 (**+2**) | 168 (**+3**) | 210 (**+1**) | 152 (**+2**) |
+| R1h (READ, guarded — **shipped**) | 228 (**+10**) | 176 (**+11**) | 218 (**+9**) | 162 (**+12**) |
+| `rederive` (READ, unconditional) | 220 (**+2**) | 168 (**+3**) | 210 (**+1**) | 152 (**+2**) |
+| `fixup` (GROWTH, ⚠ not clean) | 224 (**+6**) | 171 (**+6**) | 215 (**+6**) | 158 (**+8**) |
+| `fixup2` (GROWTH, clean) | 226 (**+8**) | 175 (**+10**) | 217 (**+8**) | 161 (**+11**) |
 
-**Marginal `Ir` per kernel call, gcc, isolated, `(Ir@200 − Ir@100) / 100`:**
+**Marginal `Ir` per kernel call over R1, kernel-exclusive, `isolated`,
+`(Ir@200 − Ir@100) / 100`, BOTH compilers and BOTH levels:**
 
-| input | opt | R1 | R1h | unconditional re-derive |
-|---|---|---|---|---|
-| `small` | `-O0` | 1375.16 | 1389.92 (**+14.76**, +1.07 %) | 1382.54 (**+7.38**, +0.54 %) |
-| `small` | `-O3` | 703.85 | 728.54 (**+24.69**, +3.51 %) | 714.72 (**+10.87**, +1.54 %) |
-| `large` | `-O0` | 6540.98 | 6672.06 (**+131.08**, +2.00 %) | 6606.52 (**+65.54**, +1.00 %) |
-| `large` | `-O3` | 3173.74 | 3338.13 (**+164.39**, +5.18 %) | 3239.41 (**+65.67**, +2.07 %) |
+| cc | input | opt | R1 | R1h | `rederive` | `fixup` ⚠ | `fixup2` |
+|---|---|---|---:|---:|---:|---:|---:|
+| gcc | `small` | `-O0` | 1375.16 | **+14.76** | **+7.38** | +2.18 | **+5.90** |
+| gcc | `small` | `-O3` | 703.85 | **+24.69** | **+10.87** | +14.14 | **+21.67** |
+| gcc | `large` | `-O0` | 6540.98 | **+131.08** | **+65.54** | +2.68 | **+19.77** |
+| gcc | `large` | `-O3` | 3173.74 | **+164.39** | **+65.67** | +69.69 | **+104.21** |
+| clang | `small` | `-O0` | 1418.11 | **+18.45** | **+3.69** | +3.27 | **+6.99** |
+| clang | `small` | `-O3` | 738.80 | **+18.72** | **+3.72** | +17.25 | **+26.43** |
+| clang | `large` | `-O0` | 6828.46 | **+163.85** | **+32.77** | +4.02 | **+21.11** |
+| clang | `large` | `-O3` | 3263.16 | **+93.65** | **+17.09** | +60.47 | **+128.85** |
 
-> ⚠⚠ **The repair that is correct under the C standard costs about HALF what the
-> idiomatic one costs, on both compilers at both optimisation levels and on both
-> inputs. On the C side this row has no trade-off: the safer repair dominates on
-> both axes.**
+**1. The direction survives and the MAGNITUDE was a gcc-only figure.** The
+unconditional re-derive is cheaper than the shipped conjunct at every one of the
+eight cells, but *"about half"* is **gcc's** number and no other:
+
+| R1h ÷ `rederive`, over R1 | `small -O0` | `small -O3` | `large -O0` | `large -O3` |
+|---|---:|---:|---:|---:|
+| **gcc** | 2.00× | 2.27× | 2.00× | 2.50× |
+| **clang** | 5.00× | 5.03× | 5.00× | 5.48× |
+
+> ⚠⚠ **The repair that is correct under the C standard costs `2.0–2.5×` less
+> than the idiomatic conjunct on gcc and `5.0–5.5×` less on clang. Say which
+> compiler.** The statically countable cost tells the same story with different
+> numbers (`+10/+11` against `+2/+3` on gcc, `+9/+12` against `+1/+2` on clang).
+
+**2. *"The safer repair dominates"* is FALSE OF THE CLASS**, though it is true of
+the shipped pair. Between the two **standard-clean** repairs the ordering
+reverses with the optimisation level:
+
+```
+gcc   large -O0   rederive +65.54   fixup2 +19.77   <- fixup2, 3.32x cheaper
+gcc   small -O0   rederive  +7.38   fixup2  +5.90   <- fixup2, 1.25x
+clang large -O0   rederive +32.77   fixup2 +21.11   <- fixup2, 1.55x
+clang small -O0   rederive  +3.69   fixup2  +6.99   <- rederive, 1.89x
+every       -O3   rederive wins, by 1.59x (gcc large) to 7.54x (clang large)
+```
+
+> ⚠⚠ **A comparison that reverses between optimisation levels is not a fact
+> about the things compared** (`p35`'s lesson, here on a third axis: the repair
+> SITE). What is true is narrower and is what this row publishes: **of the two
+> spellings on the READ, the standard-clean one is cheaper at every cell; of the
+> two standard-clean repairs, which one wins depends on the level.**
 
 ⚠ **NAME THE WEAKER-SEARCHED ENDPOINT** (`TASK_157` deliverable 4; the trap has
-now fired seven times). **Neither repair's spelling has been searched.** Each is
-ONE spelling, chosen for readability, and the levers were not counted on either
-side. The figures above are *"the cost of THESE TWO SPELLINGS"* and never *"the
-cost of the repair"*. The inline mode is **isolated** in every row of both
-tables, and both optimisation levels are given because `p35` showed a
-rung-to-rung comparison can reverse between them — here it does not reverse, but
-the **relative** cost of R1h grows from +1.07 % to +5.18 %, so quoting one level
-would understate it by 5×.
+now fired seven times). The **site** is now searched — three of them — and one
+respelling lever was tried at each READ site and moved nothing: `TASK_158` §4b
+found a ternary spelling of R1h and a `*(toks + curi)` spelling of `rederive`
+equal to their originals **to the hundredth at every cell**, so neither shipped
+figure is a spelling artefact on that lever. ⚠ **What is still unsearched is the
+spelling of the GROWTH-site repair**: `fixup2` is one way to carry the bit, and a
+`curbase`-style sentinel or an index-only rewrite were not built. The inline mode
+is **isolated** in every row of both tables.
 
 ## 4. The benign gradient, and how it differs from p34's
 
@@ -471,19 +572,43 @@ Both columns are given below, and each answers a different question — *what th
 kernel's own instructions cost* against *what the rung costs the program*. Two
 places where reading only one would have published something false:
 
-* ⚠ **the gate column shows an R4→R5 "proof tax" of `+269.52` Ir/call on `large`
-  `-O3` (5379.39 → 5648.91) and there is no such thing.** Measured directly
+* ⚠ **the gate column shows an R4→R5 "proof tax" of about `+269` Ir/call on
+  `large` `-O3` (5379 → 5649) and there is no such thing.** Measured directly
   (`.temp/t157/irprobe/`), the two kernels cost **exactly** 9104.17 (`-O0`) and
   **exactly** 4152.71 (`-O3`), and `realloc` (205.36), `finish_grow` (159.48),
   `grow_one` (127.00) and `malloc` (84.00) are identical to the instruction in
-  both binaries. What differs is three **unnamed libc routines** — 461.00 Ir/call
-  in the R4 binary against 718.28 in the R5 one.
+  both binaries.
   **Conclusion, which stands on its own: the R4 and R5 KERNELS cost identical Ir
   at both levels, and the whole-program delta is not a proof cost.**
-  ⚠ **Mechanism: OPEN.** It is consistent with glibc copying different amounts
-  inside `realloc` because the two binaries have different heap layouts — the
-  same class of fact this row exists to study — but that was not separately
-  measured and is not asserted here.
+
+  ✅ **MECHANISM — CLOSED at `TASK_158`, over EVERY function, and it is SIX
+  routines rather than the three this section first named.**
+  `.temp/t158/symdiff.py`, `-O3 isolated large.bin`, environment pads 0 and 16
+  giving results identical to the hundredth (`check_marginal_ir`'s own
+  16-wide-window argument makes a two-pad screen a *complete* phase detector):
+
+  ```
+  verus::kernel − unsafe::kernel  =  0.00   (4152.71 each)
+  verus::main   − unsafe::main    =  0.00   (  14.00 each)
+  SIX glibc malloc-internal symbols            SUM = +268.88 = 100.0 % of it
+    0xab570 +133.54  (reached from malloc and from 0xacf50 -> _int_malloc)
+    0xab170 +111.44  (reached from free   and from 0xacf50 -> _int_free)
+    0xa9ad0  +46.50 · 0xa9bb0 −31.62 · 0xacf50 +12.30 (from realloc) · 0xa91f0 −3.28
+  ```
+
+  ⚠ **This section previously said *"three unnamed libc routines — 461.00 against
+  718.28"*, which is 95.7 % of the delta and reads as closed** (`TASK_158`
+  minor 1): `133.54 + 111.44 + 12.30 = 257.28`, and the remaining `+11.60` is
+  three further symbols. **It is NOT the environment-phase effect** (identical
+  at pads 0 and 16). Symbol names are unavailable — `libc6-dbg` is absent on
+  this box — so the caller edges identify them.
+
+  ⚠ **QUOTE THIS TO THE INSTRUCTION, NOT TO THE HUNDREDTH**
+  (`check_marginal_ir`'s own rule; `TASK_158` minor 2). The gate record says
+  `verus … 5648.91`; two independent re-runs both give **5648.27**, a drift of
+  **0.64** — 32× the ±0.02 scratch-directory term. **`unsafe` reproduces
+  exactly at 5379.39.** So the honest figure is *"about +269"* and never
+  *"+269.52"*.
 * ⚠ **the two columns invert R2 against R3 at `-O0`.** Kernel-only they are
   within 0.6 % (`small`: 1710.46 vs 1700.99); whole-program R3 is **1.75×
   DEARER** (2741.37 vs 4807.90), and on `large` **1.75×** again (12678.50 vs
@@ -523,6 +648,20 @@ places where reading only one would have published something false:
 R4/R5 result — the proof licenses the unsafe code at zero instruction cost —
 reproduces here, and §8a is why it has to be read off the kernel column.
 
+⚠⚠ **AND QUOTE THE `md5` WITH IT, BECAUSE p25's `identity` IS `norel`, NOT
+`exact`, AT BOTH LEVELS** (`.memory/03-measurement.md`: *"quote the `md5` when
+saying a proof costs zero"*; `TASK_158` minor 7). **The gate record's two
+`identity` entries both carry `md5_raw_equal: false`**, and `spec.md`:169 / :427
+disclose the mechanism in full: the two crates place `kernel` `0x20` apart, so
+every intra-function displacement carries that offset — `lea -0xde51(%rip)`
+against `lea -0xde31(%rip)`, **both resolving to the same absolute `0x7910`** —
+while `md5_fn_norel`, `md5_raw_norel` and `md5_norm` are identical and the
+counts are equal on both sides: **`[189, 189, 751]` at `-O3`** and
+**`[313, 313, 1791]` at `-O0`**. `md5_fn_norel` zeroes
+branch-displacement fields, so `norel` does **not** entail `Ir` equality in
+general; what licenses the zero here is the equal instruction count plus the
+measured 4-of-4 `Ir` equality above, not the digest alone.
+
 **The safety line, R1h − R1** (kernel-only, so this is the conjunct itself and
 not the allocator):
 
@@ -533,7 +672,8 @@ not the allocator):
 
 ⚠ **Non-zero everywhere, unlike p34's `0.00`**, because p25's safety line
 *executes* on every benign input (§4) — and `controls/rederive.py` prices the
-standard-clean alternative at about half of it (§3c).
+standard-clean alternative at **`2.0–2.5×` less on gcc and `5.0–5.5×` less on
+clang** (§3c; *"about half"* was gcc's number quoted as both compilers').
 ⚠ **Both compilers and both levels are given because they do not agree on the
 shape**: gcc's cost grows from `-O0` to `-O3` on both inputs, clang's *falls* on
 `large` (163.85 → 93.65). A single-compiler, single-level figure would have

@@ -292,6 +292,46 @@ PHASE_SCREEN = {
 }
 
 
+# ⚠⚠ WHY EACH `R5-R4` ROW THAT CLEARS THE FLOOR DOES NOT MEAN "THE PROOF COSTS
+# INSTRUCTIONS".  This dict exists because the paragraph under §5 claim 1's
+# COMPUTED list was TYPED, and it was false: it asserted *"every one of those
+# rows is in the uncertain 2.00-16.00 band"* over a list whose `p42 large
+# -31.00` is >= CONFIDENT and prints in bold two sections earlier, then
+# resolved *"all six"* of seven (TASK_158 M4; PROTOCOL rule 13's class, in a
+# generator).  ⚠ A row with NO entry here prints as **UNRESOLVED**, loudly --
+# the failure mode being repaired is a summary sentence that covers a row
+# nobody looked at.  Key `(pattern, blob)`; `(pattern, None)` covers both.
+R5_ROW_WHY = {
+    ("p02", None):
+        "the sweep measures **0.00**: the derived `−2.00` is the driver "
+        "residual and nothing else (`CALLEE_NOTE` — gcc's PLT thunk is the "
+        "only true-but-small correction in the tree, and this is not it)",
+    ("p03", None):
+        "a **real** term — glibc `memset`'s alignment-dependent path length "
+        "between two byte-identical kernels — that **has no value**: over 32 "
+        "environment phases it takes `{−8.00, −1.00, +6.00}` with support "
+        "14 / 4 / 14, so the `+6.00` this file used to print was one draw "
+        "**tied with its own sign-reverse**. Withdrawn in §2 (`‡`); the part "
+        "that reproduces is `main`'s **−1.00**",
+    ("p04", None):
+        "identical to p03's, on the same 32-phase sweep and both blobs — "
+        "withdrawn in §2 (`‡`), reproducible content `main`'s **−1.00**",
+    ("p25", "large.bin"):
+        "**decomposed over every function** at pads 0 and 16, identical "
+        "(TASK_158 §1g): `verus::kernel − unsafe::kernel = 0.00` (4152.71 "
+        "each) and `verus::main − unsafe::main = 0.00` (14.00 each), with "
+        "**six glibc malloc-internal symbols summing to +268.88 = 100.0 %** "
+        "of the delta. Symbol names are unavailable (`libc6-dbg` absent); the "
+        "caller edges identify them as reached from `malloc`, `free` and "
+        "`realloc`. ⚠ It is **not** the environment phase",
+    ("p42", "large.bin"):
+        "**decomposed over every function**, same instrument, pads 0 and 16 "
+        "identical (TASK_158 §1h): kernels `0.00` (50734.00 each), `main`s "
+        "`0.00` (13.00 each), and a single symbol `0xab170` (`_int_free`) at "
+        "**−31.00 = 100.0 %** of the delta",
+}
+
+
 def _phase_note(pat, lab):
     """`{-8.00: 14, ...}` -> `−8.00 on 14 pads, −1.00 on 4, +6.00 on 14`."""
     if (pat, lab) in PHASE_SCREEN:
@@ -487,6 +527,115 @@ def derived_correction(meas, gates, pat, a_, b_, inp):
     return (ma - mb) - (ka - kb)
 
 
+# ------------------------------------------- the PER-PATTERN null, and the rule
+#
+# `NULL_PAIR` is the pair the `identity` pin forces to agree.  `check_identity`
+# compares the two rungs' `-O3 isolated` kernel digests (`check.py:3303`), so on
+# THIS column -- `-O3 isolated`, the only one this file publishes -- the pair's
+# derived correction is a MEASURED NULL: a number that ought to be zero and is
+# not.  Anything a pattern reads there is that pattern's own noise on this
+# column, and a correction no larger than it is not resolvable HERE, whatever
+# the tree-wide bands say.
+#
+# ⚠ MODE AND LEVEL ARE PART OF THE STATEMENT, and getting either wrong has
+# already produced two wrong tables (TASK_158 M1/M2, and this file's third
+# correction of the same derivation -- see `NULL_NOTE`).
+NULL_PAIR = ("verus", "unsafe")
+
+
+def r5_null(meas, gates, pat, inp):
+    """This pattern's own `R5 - R4` derived correction on this blob."""
+    return derived_correction(meas, gates, pat, *NULL_PAIR, inp)
+
+
+def null_for(meas, gates, pat, a_, b_, inp):
+    """The null to score `(a_, b_)` against -- `None` on the pair that IS the
+    null.  A control cannot be its own control: scored against itself the
+    `R5-R4` column refuses every row it prints, at a ratio of exactly 1.00x."""
+    if (a_, b_) == NULL_PAIR:
+        return None
+    return r5_null(meas, gates, pat, inp)
+
+
+def classify(c, null):
+    """The band a derived correction prints in.  PURE -- `(correction, null)`
+    in, band out -- so it can be exercised on PLANTED values, which is what
+    `null_rule_selftest` does.  Returns `low` / `mid` / `high` / `refused`.
+
+    `refused` means *this pattern's own null on this column is at least as big
+    as the figure*, so the figure is not promoted to a band; the null prints
+    beside it instead.  A null inside the global floor is not a null at all --
+    it is what every pattern reads -- so it never refuses anything."""
+    if c is None:
+        return None
+    if abs(c) < FLOOR:
+        return "low"
+    if null is not None and abs(null) >= FLOOR and abs(c) <= abs(null):
+        return "refused"
+    return "high" if abs(c) >= CONFIDENT else "mid"
+
+
+def null_rule_selftest(meas, gates):
+    """MUST-FIRE and SILENT arms for `classify`, run on every invocation.
+
+    ⚠ `.memory/03-measurement.md`: *every harm probe owes a positive control
+    that must fire, in the detector whose column it licenses.*  The planted
+    arms are pure and cannot fail to run; the live arms are derived from the
+    records and name the rows the rule actually moved.  Raises `SystemExit` on
+    any disagreement -- a rule whose own control is broken must not publish."""
+    planted = [
+        # (name, got, want) -- MUST-FIRE first
+        ("MUST-FIRE  a CONFIDENT-sized figure under a bigger null",
+         classify(100.00, 500.00), "refused"),
+        # ⚠ no raw `|` in an arm name -- these print inside a markdown table.
+        ("MUST-FIRE  equality is refusal (correction == null in magnitude)",
+         classify(19.42, -19.42), "refused"),
+        ("MUST-FIRE  a mid-band figure under a bigger null",
+         classify(5.00, -31.00), "refused"),
+        # ⚠ `want` here is `high`, not `mid`: 19.43 >= CONFIDENT, so "promotes
+        # normally" IS the confident band.  This arm was written with `mid` and
+        # the selftest refused to publish -- which is the control working.
+        ("silent     one Ir over its null promotes normally",
+         classify(19.43, -19.42), "high"),
+        ("silent     a big figure with a floor-sized null is untouched",
+         classify(100.00, 1.00), "high"),
+        ("silent     a big figure with NO null is untouched",
+         classify(100.00, None), "high"),
+        ("silent     a big figure with a null of exactly the floor",
+         classify(100.00, 2.00), "high"),
+        ("silent     the rule never MANUFACTURES a figure below the floor",
+         classify(1.00, 500.00), "low"),
+        ("silent     mid stays mid when the null is small",
+         classify(3.00, 1.00), "mid"),
+    ]
+    fails = [p for p in planted if p[1] != p[2]]
+    live = []
+    for a_, b_, lab in PAIRS:
+        for pat in sorted(meas):
+            for inp in ("small.bin", "large.bin"):
+                c = derived_correction(meas, gates, pat, a_, b_, inp)
+                n = null_for(meas, gates, pat, a_, b_, inp)
+                if classify(c, n) == "refused":
+                    live.append((pat, inp[:-4], lab, c, n))
+    # The live must-fire arm, named so that its ABSENCE is loud.  It is
+    # conditional on the row existing, and it says so when it does not.
+    want = ("p25", "large", "gcc-clang")
+    if "p25" in meas and "p25" in gates:
+        if not any(r[:3] == want for r in live):
+            fails.append(("MUST-FIRE (live)  p25 large gcc-clang is refused",
+                          "absent", "present"))
+        live_note = ("live must-fire arm **`p25 large gcc-clang` FIRED**"
+                     if any(r[:3] == want for r in live) else "**DID NOT FIRE**")
+    else:
+        live_note = ("live must-fire arm **NOT RUN** -- `p25` is not in the "
+                     "records this run read")
+    if fails:
+        raise SystemExit("null_rule_selftest FAILED: "
+                         + "; ".join(f"{n}: got {g!r} want {w!r}"
+                                     for n, g, w in fails))
+    return planted, live, live_note
+
+
 def derived(meas, gates, pat, a_, b_, lab=None):
     """The `corrected (derived)` cell: the corrected difference with the
     correction in parentheses, on both blobs.  A dash means the derived
@@ -519,9 +668,15 @@ def derived(meas, gates, pat, a_, b_, lab=None):
             out.append(f"{nm} no record")
             continue
         any_row = True
-        if abs(c) < FLOOR:
+        nul = null_for(meas, gates, pat, a_, b_, inp)
+        band = classify(c, nul)
+        if band == "low":
             out.append(f"{nm} <{FLOOR:.2f}")
-        elif abs(c) < CONFIDENT:
+        elif band == "refused":
+            any_move = True
+            out.append(f"{nm} {k - k2 + c:+.2f} ({c:+.2f}) **†** "
+                       f"(own null {nul:+.2f})")
+        elif band == "mid":
             any_move = True
             out.append(f"{nm} {k - k2 + c:+.2f} ({c:+.2f}) **?**")
         else:
@@ -650,7 +805,7 @@ def calibrate_licence(meas, lic, outw):
     if not outw or not lic:
         return None
     s = {"hit": 0, "false LICENSED": 0, "false alarm": 0, "abstain": 0}
-    smallest = None
+    smallest, alarms = None, []
     for pat in sorted(meas):
         for inp in ("small.bin", "large.bin"):
             for _, _, lab in PAIRS:
@@ -673,7 +828,9 @@ def calibrate_licence(meas, lic, outw):
                     s["false LICENSED"] += 1
                 else:
                     s["false alarm"] += 1
+                    alarms.append(f"{pat} {inp[:-4]} `{lab}`")
     s["smallest_NOT-LIC_move"] = smallest
+    s["alarms"] = alarms
     return s
 
 
@@ -1021,22 +1178,45 @@ def main():
               f"direction), {lc['false alarm']} false alarm, "
               f"{lc['abstain']} abstain**. The smallest movement under a "
               f"`NOT-LIC` verdict is "
-              f"**{lc['smallest_NOT-LIC_move']:.2f} `Ir`/call**, so "
-              f"*0 false alarms* is robust to any tolerance below that and is "
-              f"not an artefact of the 5e-3 cut.")
+              f"**{lc['smallest_NOT-LIC_move']:.2f} `Ir`/call**.")
             w("")
-            w("⚠ **`0 false alarms` is a statement about this sweep, not about "
-              "the rule** (TASK_075_REVIEW M4) — which is why this line is "
-              "recomputed rather than quoted. Correcting one thing the rule "
-              "got right for a contradicted reason (`kernel.cold`, below) "
-              "moved the score from `156 / 10 / 0 / 10` to "
-              "`154 / 12 / 0 / 10` **in this task**, by converting p27's "
+            # ⚠⚠ THIS PARAGRAPH WAS TYPED UNDER A COMPUTED TRIPLE AND WENT
+            # FALSE UNDERNEATH IT — the SECOND instance of §5 claim 1's defect
+            # in this same file, 400 lines earlier, and no review found it
+            # (TASK_159).  It asserted `0 false alarms` in three places while
+            # the generated figure beside it read `2`.  It is derived now.
+            if lc["false alarm"] == 0:
+                w("✅ **`0 false alarms` is a statement about this sweep, not "
+                  "about the rule** (TASK_075_REVIEW M4) — which is why this "
+                  "line is recomputed rather than quoted. It holds on this "
+                  "run.")
+            else:
+                w(f"⚠⚠ **THE `0 false alarms` THIS FILE USED TO ASSERT IS GONE "
+                  f"— IT NOW READS `{lc['false alarm']}`, AND THE PARAGRAPH "
+                  f"THAT ASSERTED IT WAS TYPED UNDER A COMPUTED TRIPLE.** "
+                  f"(Found at TASK_159; it is §5 claim 1's defect a second "
+                  f"time, in this same file.) The sentence used to read "
+                  f"*\"the smallest movement under a `NOT-LIC` verdict is X, "
+                  f"so 0 false alarms is robust to any tolerance below "
+                  f"that\"* — and the smallest movement is now "
+                  f"**{lc['smallest_NOT-LIC_move']:.2f}**, which is not a "
+                  f"margin at all: it IS the false alarms. The rows are "
+                  f"**{', '.join(lc['alarms'])}**. ⚠ *A `NOT-LIC` on a row "
+                  f"the sweep says does not move is the SAFE direction* — the "
+                  f"rule refused to license a difference that would have been "
+                  f"fine — so nothing published is wrong because of it; what "
+                  f"was wrong is the file saying there were none.")
+            w("")
+            w("⚠ **The score is a property of the sweep, not of the rule.** "
+              "Correcting one thing the rule got right for a contradicted "
+              "reason (`kernel.cold`, below) moved it from `156 / 10 / 0 / 10` "
+              "to `154 / 12 / 0 / 10` at TASK_076, by converting p27's "
               "`gcc-clang` from a lucky `NOT-LIC` into an honest false "
-              "`LICENSED`. The false-alarm zero survived; the hit count did "
-              "not. A second sweep under a **longer environment block** reads "
-              "`152 / 14 / 0 / 10`, the excess being p03's and p04's `memset` "
-              "term — **so the published triple is one draw and "
-              "`0 false alarms` is the part that holds across both of them.**")
+              "`LICENSED`; a second sweep under a **longer environment block** "
+              "read `152 / 14 / 0 / 10`, the excess being p03's and p04's "
+              "`memset` term. ⚠⚠ **Those three historical triples are quoted "
+              "as history and NOT as the current score** — the live figures "
+              "are the ones in the sentence above, and they have moved.")
             w("")
             w("⚠ **That control was called VACUOUS on an arithmetic slip, and "
               "it is not** (TASK_098 BLOCKER 2, TASK_099 §A2; re-measured "
@@ -1057,6 +1237,83 @@ def main():
               "control fired.** ⚠ It is still ONE contrast rather than a "
               "period, which is what `‡` is for.")
     w("")
+
+    # ---------------------------------------------- the per-pattern null, `†`
+    nulls = sorted(((p, i, r5_null(meas, gates, p, i))
+                    for p in sorted(meas) for i in ("small.bin", "large.bin")),
+                   key=lambda r: -abs(r[2] or 0.0))
+    over = [r for r in nulls if r[2] is not None and abs(r[2]) >= FLOOR]
+    rest = max((abs(r[2]) for r in nulls if r not in over and r[2] is not None),
+               default=0.0)
+    planted, live, live_note = null_rule_selftest(meas, gates)
+    w("⚠⚠ **`†` — A PATTERN'S OWN NULL, AND IT OUTRANKS THE TREE-WIDE BANDS.** "
+      "The bands above are scored across the tree. But `identity` forces R4's "
+      "and R5's kernels to agree — `check.py::check_identity` compares their "
+      "`-O3 isolated` digests (`check.py:3303`) — so on **this column** each "
+      "pattern's own `R5 - R4` correction is a **measured null**: a number "
+      "that ought to be 0.00 and is not. It is not small everywhere:")
+    w("")
+    w("| pattern | blob | own `R5 - R4` null |")
+    w("|---|---|---:|")
+    for p, i, v in over:
+        w(f"| {p} | {i[:-4]} | {v:+.2f} |")
+    w(f"| *every other row* | | *≤ {rest:.2f}* |")
+    w("")
+    w(f"**So a correction no bigger than its own pattern's null is not "
+      f"resolvable here, and this file no longer promotes one to a band.** "
+      f"`†` marks such a row and prints the null beside it. The rule is "
+      f"`|correction| <= |null|` with `|null| >= {FLOOR:.2f}` — a null inside "
+      f"the global floor is what *every* pattern reads and refuses nothing — "
+      f"and it is **not applied to the `R5-R4` column itself**, because a "
+      f"control cannot be its own control: scored against itself that column "
+      f"refuses every row it prints, at a ratio of exactly 1.00x.")
+    w("")
+    if live:
+        w("**Rows the rule moved on this run** — derived, not listed:")
+        w("")
+        w("| pattern | blob | pair | correction | band it would have had | "
+          "own null | ratio |")
+        w("|---|---|---|---:|---|---:|---:|")
+        for p, i, lab, c, n in live:
+            was = "**bold** (≥ CONFIDENT)" if abs(c) >= CONFIDENT else "`?`"
+            w(f"| {p} | {i} | `{lab}` | {c:+.2f} | {was} | {n:+.2f} | "
+              f"{abs(n) / abs(c):.2f}x |")
+        w("")
+    else:
+        w("**No row on this run is at or below its own pattern's null.**")
+        w("")
+    w(f"✅ **The rule's own controls, run on every invocation of this file** "
+      f"(`null_rule_selftest`; it raises rather than publishing if any arm "
+      f"disagrees). {len(planted)} planted arms — "
+      f"{sum(1 for n, _, _ in planted if n.startswith('MUST-FIRE'))} must-fire, "
+      f"{sum(1 for n, _, _ in planted if n.startswith('silent'))} silent — plus "
+      f"a {live_note}:")
+    w("")
+    w("| arm | verdict |")
+    w("|---|---|")
+    for n, got, _ in planted:
+        w(f"| {n} | `{got}` |")
+    w("")
+    w("⚠⚠ **THE NULL TABLE ABOVE IS `-O3 isolated` AND THREE ARTEFACTS "
+      "PUBLISH IT WITH TWO `-O0` ROWS IN IT.** `RECAP.md` finding 60, "
+      "`.memory/03-measurement.md` entry 23 and `.tasks/TASK_159.md` all print "
+      "*\"R4/R5 null, -O3 ISOLATED (the published column): p28 1732.73 · "
+      "p29 425.80 · p25 269.52 · p42 31.00 · everything else <= 6.00\"*. "
+      "**`p28 1732.73` and `p29 425.80` are `-O0 isolated` cells.** At "
+      "`-O3 isolated` — the level this file publishes and the only level the "
+      "corrections above are taken at — **p28 reads `+1.01` and p29 reads "
+      "`−0.02`**; that quoted list is the max over ISOLATED at *both* levels. "
+      "The mode fix (TASK_158 M1, `whole` excluded) was right and the LEVEL "
+      "was not fixed with it. ⚠ *\"Real exposure is FOUR patterns\"* is "
+      f"likewise `-O0 isolated`'s count: at `-O3 isolated` **{len(over)} rows "
+      f"across {len({p for p, _, _ in over})} patterns** clear the "
+      f"{FLOOR:.2f} floor and "
+      f"**{len({p for p, _, v in over if abs(v) >= CONFIDENT})}** reach "
+      f"{CONFIDENT:.2f}. ✅ **The three affected published numbers survive "
+      "the correction unchanged** — they are `-O3 isolated` rows scored "
+      "against `-O3 isolated` nulls, and p28's and p29's `-O0` figures never "
+      "touched them.")
+    w("")
     w(BULK_CALLS_NOTE)
     w("")
     for a_, b_, lab in PAIRS:
@@ -1067,8 +1324,10 @@ def main():
           f"corrections are inside the ±{FLOOR:.2f} `Ir` floor; a cell marked "
           f"**?** is in the {FLOOR:.2f}–{CONFIDENT:.2f} band and means *look "
           f"further*, not a figure; **bold** is ≥{CONFIDENT:.2f}. The three "
-          f"bands are scored above. ⚠ **`‡` marks a cell whose correction is a "
-          f"phase of the environment block rather than a property of the "
+          f"bands are scored above. ⚠ **`†` marks a cell at or below its own "
+          f"pattern's `R5 - R4` null and is NOT promoted to a band at all** — "
+          f"the null prints beside it. ⚠ **`‡` marks a cell whose correction "
+          f"is a phase of the environment block rather than a property of the "
           f"code** — see the note under the table.*")
         w("")
         if show_search:
@@ -1443,7 +1702,7 @@ def main():
                    and any(e.get("opt") == "O3" and e.get("pair") == R5_PAIR
                            for e in g.get("identity", [])))
     # where the callee correction breaks the zero, DERIVED from the records
-    broke = []
+    broke, broke_rows = [], []
     for pat in sorted(meas):
         for inp in ("small.bin", "large.bin"):
             c = derived_correction(meas, gates, pat, "verus", "unsafe", inp)
@@ -1457,6 +1716,7 @@ def main():
             broke.append(f"{pat} {inp[:-4]} "
                          + ("**WITHDRAWN** `‡`" if (pat, "R5-R4") in WITHDRAWN
                             else f"{k - k2 + c:+.2f}"))
+            broke_rows.append((pat, inp, c))
     w(f"**Claim 1 -- `R5 - R4 = 0.00` on every row. SCOPED, and it is a "
       f"TAUTOLOGY rather than a result.** Re-derived: **{len(bad)} of "
       f"{rows_seen}** `-O3 isolated` pattern/input rows differ from 0.00. But "
@@ -1483,26 +1743,47 @@ def main():
       "driver's.")
     w("")
     if broke:
+        mid = [r for r in broke_rows if abs(r[2]) < CONFIDENT]
+        high = [r for r in broke_rows if abs(r[2]) >= CONFIDENT]
         w(f"⚠ **And the zero does NOT survive the callee correction.** On the "
           f"derived callee-corrected column `R5 - R4` clears the "
           f"±{FLOOR:.2f} floor on {len(broke)} rows -- {', '.join(broke)} -- "
           f"i.e. *\"the proof costs instructions\"* between two "
           f"**byte-identical** kernels.")
         w("")
-        w(f"**Every one of those rows is in the uncertain "
-          f"{FLOOR:.2f}–{CONFIDENT:.2f} band, and the two halves resolve "
-          f"differently.** On **p03** and **p04** there is a real term — glibc "
-          f"`memset`'s alignment-dependent path length between two "
-          f"byte-identical kernels — but **it has no value**: over 32 "
-          f"environment phases the correction takes `{{−8.00, −1.00, +6.00}}` "
-          f"with support 14 / 4 / 14, so the `+6.00` this file used to print "
-          f"was one draw **tied with its own sign-reverse**, and the four "
-          f"cells are withdrawn in §2 (`‡`). The part that reproduces is "
-          f"`main`'s **−1.00**. On **p02** the sweep measures **0.00**: the "
-          f"derived `−2.00` is the driver residual and nothing else. **The "
-          f"kernel-exclusive zero is the correct reading on all six**, and on "
-          f"p03/p04 it is the only one of the two columns that reproduces at "
-          f"all.")
+        w(f"⚠⚠ **THIS PARAGRAPH USED TO BE TYPED UNDER A COMPUTED LIST, AND "
+          f"IT WAS FALSE.** It read *\"every one of those rows is in the "
+          f"uncertain {FLOOR:.2f}–{CONFIDENT:.2f} band\"* and resolved *\"on "
+          f"all six\"* over a **seven**-row list containing "
+          f"`p42 large −31.00`, which is `≥ {CONFIDENT:.2f}` and prints in "
+          f"**bold** in §2 — three internal disagreements in one claim "
+          f"(TASK_158 M4). It is now derived from the same list. "
+          f"**{len(mid)} of the {len(broke)} rows are in the "
+          f"{FLOOR:.2f}–{CONFIDENT:.2f} band and {len(high)} "
+          f"{'is' if len(high) == 1 else 'are'} at or above "
+          f"{CONFIDENT:.2f}**, and they do not resolve the same way:")
+        w("")
+        for pat, inp, c in broke_rows:
+            why = R5_ROW_WHY.get((pat, inp)) or R5_ROW_WHY.get((pat, None))
+            band = "**≥ CONFIDENT**" if abs(c) >= CONFIDENT else "mid"
+            if why is None:
+                w(f"- ⚠⚠ **{pat} {inp[:-4]} {c:+.2f} — UNRESOLVED.** No "
+                  f"decomposition is recorded for this row, so nothing here "
+                  f"licenses reading it as zero. *(This bullet is generated: "
+                  f"a row with no entry in `R5_ROW_WHY` prints as unresolved "
+                  f"rather than being swept into a summary sentence.)*")
+            else:
+                w(f"- **{pat} {inp[:-4]}** {c:+.2f} ({band}) — {why}")
+        w("")
+        w(f"**The kernel-exclusive zero is the correct reading on all "
+          f"{len(broke)}** — every row above is a difference between two "
+          f"kernels the `identity` pin makes agree, and every one that has "
+          f"been decomposed puts 100 % of the delta *outside* the kernel "
+          f"symbol. ⚠ **What does not follow, and what §2's `†` now enforces, "
+          f"is that these rows are harmless to the REST of the table**: a "
+          f"pattern that reads `{max((abs(c) for _, _, c in broke_rows), default=0):+.2f}` "
+          f"here cannot also resolve a correction smaller than that on any "
+          f"other pair.")
         w("")
 
     # claim 2

@@ -139,8 +139,23 @@ def main():
             b = build_ctl(src, san, f"{src[:-2]}_{san}")
             rc, so, se = run(b)
             f = fired(se)
+            # ⚠⚠ `ctl_asan` IS A USE-AFTER-FREE, SO ITS STDOUT IS A DRAW WHEN
+            # NOTHING CATCHES IT, AND THIS RECORD USED TO COMMIT THE DRAW AS A
+            # FIGURE (`"stdout": "ctl_asan 85"`; TASK_158 minor 11, found by
+            # running the probe twice -- `85` then `86` at -O1, `98` then `99`
+            # at -O3).  It is inert, because this file asserts only `fired` for
+            # the controls and asserts a checksum only for R1h, whose semantics
+            # are deterministic -- but a draw recorded as a figure is the class
+            # `RECAP` finding 4 names and `.memory/06-catalogue.md`'s own p25
+            # row warns about for this very pattern.  `fired` is deterministic;
+            # the recycled-heap byte is not.
+            so_rec = so
+            if src == "ctl_asan.c" and not f["asan"]:
+                so_rec = ("<non-reproducible: with ASan absent this control "
+                          "reads recycled heap and its value moves between "
+                          "runs; `fired` is what it asserts>")
             ctl_rows.append({"control": src, "build": san, "exit": rc,
-                             "stdout": so, "fired": f,
+                             "stdout": so_rec, "fired": f,
                              "diagnostic": " ".join(se.split())[:200]})
             print(f"     {src:14s} under {san:6s} exit={rc!s:4s} "
                   f"asan={f['asan']} ubsan={f['ubsan']} out={so!r}")

@@ -1,8 +1,26 @@
 #!/usr/bin/env python3
-"""p25 CONTROLS: **the THIRD C arm -- the unconditional re-derive -- built and
-priced against R1 and R1h.**
+"""p25 CONTROLS: **the REPAIR SEARCH -- every repair site and spelling this row
+knows about, built and priced against R1 and R1h, on BOTH compilers.**
 
     python3 patterns/p25-realloc-growth/controls/rederive.py
+
+⚠⚠ **THIS FILE USED TO BUILD `gcc` ONLY IN ITS DYNAMIC SECTION, AND THE ROW
+QUOTED IT AS *"on both compilers"* (TASK_158 M5).** The clang arm is here now,
+and it does **not** agree with gcc: the R1h/RD ratio is `2.0-2.5x` on gcc and
+`5.0-5.5x` on clang. **Quote the compiler, every time.**
+
+⚠⚠ **AND THE REPAIR *SITE* WAS NEVER SEARCHED -- ONLY THE REPAIR *SPELLING*
+AT ONE SITE** (TASK_158 M6). There are **three** sites, not two:
+
+    the READ, guarded      `if (curbase == toks) *cur else toks[curi]`  -- R1h
+    the READ, unguarded    `toks[curi]`, always                         -- RD
+    the GROWTH             refresh `cur` where `realloc` invalidates it -- FIXUP*
+
+and among the two STANDARD-CLEAN repairs (`RD` and `FIXUP2`) **the ordering
+REVERSES between optimisation levels**, so *"the safer repair dominates"* is a
+statement about ONE level and ONE spelling. Every figure below is therefore
+printed at **both** levels and on **both** compilers, and the JSON carries all
+of them.
 
 ⚠⚠ **WHY THIS ARM EXISTS, AND IT IS THIS ROW'S SHARPEST C-SIDE FINDING.** The
 shipped hardened cell guards the stale dereference with `curbase == toks` and
@@ -27,24 +45,50 @@ silently matched nothing (`CLAUDE.md` rule 1). One statement in the SHIPPED
 `v = (uint64_t)toks[curi];` -- and the count must be exactly 1 or this script
 exits before compiling anything.
 
+THE ARMS
+--------
+  R1        `../c/kernel.c`, unmodified -- the bug.
+  R1h       `../c/kernel_hardened.c`, unmodified -- the SHIPPED conjunct.
+  rederive  R1 with the read re-derived unconditionally. **Standard-clean**:
+            it never dereferences `cur`, so DR 400 cannot reach it.
+  fixup     R1 with `cur` refreshed at the GROWTH (`if (cur != NULL) cur = toks
+            + curi;`) and the READ left exactly as R1 writes it.
+            ⚠ **NOT standard-clean**: `cur != NULL` is itself an evaluation of
+            a pointer value `realloc` has made indeterminate, which is the very
+            defect `../NOTES.md` §3b charges R1h with. It is measured because
+            it is the SPELLING a C programmer reaches for first.
+  fixup2    `fixup` made standard-clean: a `int have` carries the "a SAVE has
+            happened" bit, `cur` is refreshed at every growth and consulted
+            nowhere else, and no indeterminate pointer value is ever read.
+
 WHAT IT MEASURES
 ----------------
-  * **correctness**: the re-derive arm's checksum on every shipped input, against
-    `../model.py`. It must agree on ALL of them -- benign AND adversarial --
-    because it is the standard-clean rung;
-  * **the detector**: ASan and UBSan on every input; the arm must be CLEAN
+  * **correctness**: every generated arm's checksum on every shipped input,
+    against `../model.py`. Each must agree on ALL of them -- benign AND
+    adversarial -- because each is a REPAIR;
+  * **the detector**: ASan and UBSan on every input; every arm must be CLEAN
     everywhere, exactly as R1h is;
-  * **static cost**: non-pad instruction count of the `kernel` symbol for R1,
-    R1h and the re-derive arm, at `-O0` and `-O3`, gcc and clang;
+  * **static cost**: non-pad instruction count of the `kernel` symbol for all
+    five arms, at `-O0` and `-O3`, gcc and clang;
   * **dynamic cost**: marginal `Ir` per kernel call, `(Ir@200 - Ir@100) / 100`,
-    on `small.bin` and `large.bin`, at `-O0` and `-O3`, with the PINNED
-    callgrind. ⚠ Two runs of the same binary, so the one-shot loader terms
-    cancel; `.memory/03-measurement.md`'s rule.
+    on `small.bin` and `large.bin`, at `-O0` and `-O3`, **gcc and clang**, with
+    the PINNED callgrind. ⚠ Two runs of the same binary, so the one-shot loader
+    terms cancel; `.memory/03-measurement.md`'s rule.
 
-⚠ **NAME THE WEAKER-SEARCHED ENDPOINT** (`TASK_157` deliverable 4). Neither the
-shipped R1h nor this arm has had its spelling searched: each is ONE spelling of
-its repair, chosen for readability. The figure below is *"the cost of THESE two
-spellings"* and never *"the cost of the repair"*.
+⚠⚠ **WHICH `Ir` CONVENTION: KERNEL-EXCLUSIVE.** `kernel_ir` below sums the
+`callgrind_annotate` rows whose function matches `measure.py`'s own kernel
+needle, so `marginal_ir_per_call` in this file's JSON is the **kernel symbol
+alone** and is NOT the gate record's key of the same name, which is
+whole-program. On this pattern the two genuinely differ (`../NOTES.md` §8a).
+`.memory/03-measurement.md`: *say which convention a number is in, every time.*
+
+⚠ **NAME THE WEAKER-SEARCHED ENDPOINT** (`TASK_157` deliverable 4). The SITE is
+now searched (three sites) and so is one respelling lever at each READ site
+(`TASK_158` §4b found `TERN == R1h` and `PTR == RD` to the hundredth, so those
+two are not spelling artefacts). **What is still unsearched is the spelling of
+the GROWTH-site repair** -- `fixup2` is one way to carry the bit, and a
+`curbase`-style sentinel or a `size_t` index-only rewrite are others that were
+not built.
 """
 
 import glob
@@ -84,26 +128,95 @@ OLD = "\n                v = (uint64_t)*cur;\n"
 NEW = "\n                v = (uint64_t)toks[curi];\n"
 _CG_ROW = re.compile(r"^\s*([\d,]+)\s+(.*)$")
 
+# ---- the GROWTH-site repair, `fixup`: refresh `cur` where realloc breaks it.
+FIXUP_OLD = """                    toks = nt;
+                    tcap = nc;
+                }
+"""
+FIXUP_NEW = """                    toks = nt;
+                    tcap = nc;
+                    if (cur != NULL)
+                        cur = toks + curi;
+                }
+"""
+# ---- `fixup2`: the same site, made DR-400-clean by carrying the "a SAVE has
+# happened" bit in an `int` so that no indeterminate POINTER value is read.
+F2_DECL_OLD = "    size_t nops, i, p;\n"
+F2_DECL_NEW = "    size_t nops, i, p;\n    int have = 0;\n"
+F2_GROW_NEW = """                    toks = nt;
+                    tcap = nc;
+                    if (have)
+                        cur = toks + curi;
+                }
+"""
+F2_SAVE_OLD = """                cur = &toks[curi];
+                curbase = toks;
+                v = 2;
+"""
+F2_SAVE_NEW = """                cur = &toks[curi];
+                curbase = toks;
+                have = 1;
+                v = 2;
+"""
+F2_READ_OLD = """            if (cur == NULL) {
+                v = P25_SENT;
+"""
+F2_READ_NEW = """            if (!have) {
+                v = P25_SENT;
+"""
 
-def make_arm():
-    """`../c/kernel.c` with the ONE dereference replaced by the re-derive."""
+# The generated arms, each `(header, [(old, new, what), ...])` applied to
+# `../c/kernel.c`.  ⚠ EVERY substitution count is asserted at exactly 1 --
+# `p28d` shipped an uninitialised pointer because a `str.replace()` silently
+# matched nothing, and this file's own first anchor matched TWICE (once as code,
+# once inside the comment that spells the hardened rung out), so the guard has
+# already fired here once.
+ARM_SPECS = {
+    "rederive": (
+        "/* GENERATED by controls/rederive.py from ../c/kernel.c by ONE\n"
+        " * substitution of the READ statement. Do not edit; edit the\n"
+        " * generator.\n"
+        " * THIS IS THE STANDARD-CLEAN RUNG: it never dereferences `cur`,\n"
+        " * so DR 400's indeterminate-pointer rule cannot reach it. */\n",
+        [(OLD, NEW, "rederive read")]),
+    "fixup": (
+        "/* GENERATED by controls/rederive.py from ../c/kernel.c: the repair\n"
+        " * moved to the GROWTH SITE. The READ is R1's, unchanged.\n"
+        " * ⚠ NOT STANDARD-CLEAN: `cur != NULL` evaluates a pointer value\n"
+        " * `realloc` has made indeterminate. Measured because it is the\n"
+        " * spelling a C programmer reaches for first. */\n",
+        [(FIXUP_OLD, FIXUP_NEW, "fixup growth")]),
+    "fixup2": (
+        "/* GENERATED by controls/rederive.py from ../c/kernel.c: the GROWTH\n"
+        " * SITE repair made DR-400-CLEAN. `int have` carries the \"a SAVE has\n"
+        " * happened\" bit, so no indeterminate POINTER value is ever read. */\n",
+        [(F2_DECL_OLD, F2_DECL_NEW, "fixup2 decl"),
+         (FIXUP_OLD, F2_GROW_NEW, "fixup2 growth"),
+         (F2_SAVE_OLD, F2_SAVE_NEW, "fixup2 save"),
+         (F2_READ_OLD, F2_READ_NEW, "fixup2 read")]),
+}
+
+
+def make_arms():
+    """Every generated arm, from `../c/kernel.c`, counts asserted."""
     src = open(os.path.join(CDIR, "kernel.c")).read()
-    n = src.count(OLD)
-    if n != 1:
-        raise SystemExit(
-            f"rederive.py: the substitution `{OLD}` matched {n} time(s) in "
-            f"c/kernel.c, not 1. REFUSING to build -- a str.replace() that "
-            f"silently matches nothing is how p28d shipped an uninitialised "
-            f"pointer (CLAUDE.md rule 1).")
-    body = src.replace(OLD, NEW)
-    hdr = ("/* GENERATED by controls/rederive.py from ../c/kernel.c by ONE\n"
-           " * substitution of the READ statement. Do not edit; edit the\n"
-           " * generator.\n"
-           " * THIS IS THE STANDARD-CLEAN RUNG: it never dereferences `cur`,\n"
-           " * so DR 400's indeterminate-pointer rule cannot reach it. */\n")
-    out = os.path.join(TMP, "kernel_rederive.c")
-    open(out, "w").write(hdr + body)
-    return out, n
+    paths, counts = {}, {}
+    for name, (hdr, subs) in ARM_SPECS.items():
+        body, counts[name] = src, {}
+        for old, new, what in subs:
+            n = body.count(old)
+            if n != 1:
+                raise SystemExit(
+                    f"rederive.py: the substitution for `{what}` matched "
+                    f"{n} time(s), not 1. REFUSING to build -- a "
+                    f"str.replace() that silently matches nothing is how p28d "
+                    f"shipped an uninitialised pointer (CLAUDE.md rule 1).")
+            body = body.replace(old, new)
+            counts[name][what] = n
+        out = os.path.join(TMP, f"kernel_{name}.c")
+        open(out, "w").write(hdr + body)
+        paths[name] = out
+    return paths, counts
 
 
 def build(cc, kern, opt, tag, extra=()):
@@ -179,45 +292,56 @@ def derived_from():
 
 def main():
     os.makedirs(TMP, exist_ok=True)
-    arm, nsub = make_arm()
-    print(f"  generated {os.path.relpath(arm, REPO)} by {nsub} substitution")
+    arms, counts = make_arms()
+    for name in ARM_SPECS:
+        print(f"  generated {os.path.relpath(arms[name], REPO)} by "
+              f"{len(counts[name])} substitution(s): "
+              + ", ".join(sorted(counts[name])))
     problems = []
 
     kernels = {"R1": os.path.join(CDIR, "kernel.c"),
-               "R1h": os.path.join(CDIR, "kernel_hardened.c"),
-               "rederive": arm}
+               "R1h": os.path.join(CDIR, "kernel_hardened.c")}
+    for name in ARM_SPECS:              # rederive, fixup, fixup2 -- declared order
+        kernels[name] = arms[name]
+    scratch = []
 
-    # ---- correctness + detectors on the re-derive arm --------------------
-    print("\nA. correctness and detectors, re-derive arm, gcc -O1")
+    # ---- correctness + detectors on every generated arm ------------------
+    print("\nA. correctness and detectors, every generated arm, gcc -O1")
     ck = {}
     inputs = sorted(f for f in os.listdir(INDIR)
                     if f.endswith(".bin") and not f.startswith("sweep-"))
-    plain = build(GCC, arm, "O1", "plain_rd")
-    asan = build(GCC, arm, "O1", "asan_rd",
-                 ("-fsanitize=address", "-fno-omit-frame-pointer"))
-    ubsan = build(GCC, arm, "O1", "ubsan_rd",
-                  ("-fsanitize=undefined", "-fno-sanitize-recover=all",
-                   "-fstrict-aliasing"))
-    for name in inputs:
-        mod = m25.build(os.path.join(INDIR, name))
-        rc, so, _ = run(plain, os.path.join(INDIR, name))
-        _rc2, _so2, se2 = run(asan, os.path.join(INDIR, name))
-        _rc3, _so3, se3 = run(ubsan, os.path.join(INDIR, name))
-        fired = ("AddressSanitizer" in se2) or ("runtime error:" in se3)
-        ck[name] = {"stdout": so, "model": str(mod.checksum), "fired": fired}
-        ok = so == str(mod.checksum)
-        print(f"     {name:26s} {so:24s} model {mod.checksum!s:24s} "
-              f"{'OK' if ok else 'DIFFERS'}  sanitizer={'FIRED' if fired else 'clean'}")
-        if not ok:
-            problems.append(
-                f"{name}: the re-derive arm printed {so}, model says "
-                f"{mod.checksum}. It is supposed to be the STANDARD-CLEAN rung, "
-                f"so it must agree on every input, adversarial included")
-        if fired:
-            problems.append(
-                f"{name}: a sanitizer fired on the re-derive arm "
-                f"({se2[:120]} {se3[:120]}). It never dereferences `cur`, so "
-                f"there is nothing for a detector to see")
+    for aname in ARM_SPECS:
+        arm = arms[aname]
+        plain = build(GCC, arm, "O1", f"plain_{aname}")
+        asan = build(GCC, arm, "O1", f"asan_{aname}",
+                     ("-fsanitize=address", "-fno-omit-frame-pointer"))
+        ubsan = build(GCC, arm, "O1", f"ubsan_{aname}",
+                      ("-fsanitize=undefined", "-fno-sanitize-recover=all",
+                       "-fstrict-aliasing"))
+        scratch += [plain, asan, ubsan]
+        print(f"   -- {aname}")
+        for name in inputs:
+            mod = m25.build(os.path.join(INDIR, name))
+            rc, so, _ = run(plain, os.path.join(INDIR, name))
+            _rc2, _so2, se2 = run(asan, os.path.join(INDIR, name))
+            _rc3, _so3, se3 = run(ubsan, os.path.join(INDIR, name))
+            fired = ("AddressSanitizer" in se2) or ("runtime error:" in se3)
+            ck[f"{aname}/{name}"] = {"stdout": so, "model": str(mod.checksum),
+                                     "fired": fired}
+            ok = so == str(mod.checksum)
+            print(f"     {name:26s} {so:24s} model {mod.checksum!s:24s} "
+                  f"{'OK' if ok else 'DIFFERS'}  "
+                  f"sanitizer={'FIRED' if fired else 'clean'}")
+            if not ok:
+                problems.append(
+                    f"{aname}/{name}: the arm printed {so}, model says "
+                    f"{mod.checksum}. Every arm here is a REPAIR, so it must "
+                    f"agree on every input, adversarial included")
+            if fired:
+                problems.append(
+                    f"{aname}/{name}: a sanitizer fired on the {aname} arm "
+                    f"({se2[:120]} {se3[:120]}). Every arm here repairs the "
+                    f"stale read, so there is nothing for a detector to see")
 
     # ---- static cost -----------------------------------------------------
     print("\nB. static instruction count of the `kernel` symbol")
@@ -235,63 +359,107 @@ def main():
                 os.unlink(b)
         for opt in ("O0", "O3"):
             r1 = static[f"{ccname}/{opt}/R1"]["n_fn_nopad"]
-            r1h = static[f"{ccname}/{opt}/R1h"]["n_fn_nopad"]
-            rd = static[f"{ccname}/{opt}/rederive"]["n_fn_nopad"]
-            print(f"     {ccname:6s} {opt}  R1 {r1:5d}   R1h {r1h:5d} "
-                  f"({r1h - r1:+d})   rederive {rd:5d} ({rd - r1:+d} vs R1, "
-                  f"{rd - r1h:+d} vs R1h)")
+            print(f"     {ccname:6s} {opt}  R1 {r1:5d}   " + "   ".join(
+                f"{a} {static[f'{ccname}/{opt}/{a}']['n_fn_nopad']:d} "
+                f"({static[f'{ccname}/{opt}/{a}']['n_fn_nopad'] - r1:+d})"
+                for a in kernels if a != "R1"))
 
     # ---- dynamic cost ----------------------------------------------------
-    print("\nC. marginal Ir per kernel call, (Ir@200 - Ir@100)/100, gcc, isolated")
+    # ⚠ BOTH compilers.  This section built `gcc` only until TASK_159, and the
+    # row published its ratio as *"on both compilers"* (TASK_158 M5).
+    print("\nC. marginal Ir per KERNEL call (kernel-exclusive), "
+          "(Ir@200 - Ir@100)/100, isolated, gcc AND clang")
     marg = {}
     for inp in ("small.bin", "large.bin"):
         b100, b200 = iters_copy(inp, 100), iters_copy(inp, 200)
-        for opt in ("O0", "O3"):
-            for arm_name, kern in kernels.items():
-                b = build(GCC, kern, opt, f"cg_{opt}_{arm_name}",
-                          ("-DSLB_ISOLATED",))
-                i100 = kernel_ir(b, b100, f"{inp}_{opt}_{arm_name}_100")
-                i200 = kernel_ir(b, b200, f"{inp}_{opt}_{arm_name}_200")
-                marg[f"{inp}/{opt}/{arm_name}"] = (
-                    None if i100 is None or i200 is None
-                    else (i200 - i100) / 100.0)
-                os.unlink(b)
-            r1 = marg[f"{inp}/{opt}/R1"]
-            r1h = marg[f"{inp}/{opt}/R1h"]
-            rd = marg[f"{inp}/{opt}/rederive"]
-            if None not in (r1, r1h, rd):
-                print(f"     {inp:10s} {opt}  R1 {r1:10.2f}   "
-                      f"R1h {r1h:10.2f} ({r1h - r1:+8.2f}, "
-                      f"{100 * (r1h - r1) / r1:+6.2f}%)   "
-                      f"rederive {rd:10.2f} ({rd - r1:+8.2f}, "
-                      f"{100 * (rd - r1) / r1:+6.2f}%)")
+        for cc, ccname in ((GCC, "gcc"), (CLANG, "clang")):
+            if not os.path.exists(cc) and not cc.startswith("/usr"):
+                continue
+            for opt in ("O0", "O3"):
+                for arm_name, kern in kernels.items():
+                    b = build(cc, kern, opt, f"cg_{ccname}_{opt}_{arm_name}",
+                              ("-DSLB_ISOLATED",))
+                    i100 = kernel_ir(b, b100,
+                                     f"{inp}_{ccname}_{opt}_{arm_name}_100")
+                    i200 = kernel_ir(b, b200,
+                                     f"{inp}_{ccname}_{opt}_{arm_name}_200")
+                    marg[f"{ccname}/{inp}/{opt}/{arm_name}"] = (
+                        None if i100 is None or i200 is None
+                        else (i200 - i100) / 100.0)
+                    os.unlink(b)
+                r1 = marg[f"{ccname}/{inp}/{opt}/R1"]
+                if r1 is None:
+                    continue
+                print(f"     {ccname:6s} {inp:10s} {opt}  R1 {r1:10.2f}   "
+                      + "   ".join(
+                          f"{a} {marg[f'{ccname}/{inp}/{opt}/{a}']:.2f} "
+                          f"({marg[f'{ccname}/{inp}/{opt}/{a}'] - r1:+.2f})"
+                          for a in kernels if a != "R1"
+                          and marg[f"{ccname}/{inp}/{opt}/{a}"] is not None))
         os.unlink(b100)
         os.unlink(b200)
+
+    # ---- the two things the row publishes, computed here rather than by hand
+    print("\nD. the repair cost over R1, and the R1h/rederive ratio, per cell")
+    over_r1, ratios = {}, {}
+    for k, v in marg.items():
+        ccname, inp, opt, arm_name = k.split("/")
+        r1 = marg.get(f"{ccname}/{inp}/{opt}/R1")
+        if v is None or r1 is None or arm_name == "R1":
+            continue
+        over_r1[k] = v - r1
+    for ccname in ("gcc", "clang"):
+        for inp in ("small.bin", "large.bin"):
+            for opt in ("O0", "O3"):
+                a = over_r1.get(f"{ccname}/{inp}/{opt}/R1h")
+                b = over_r1.get(f"{ccname}/{inp}/{opt}/rederive")
+                if a is None or b is None or b == 0:
+                    continue
+                ratios[f"{ccname}/{inp}/{opt}"] = a / b
+                f2 = over_r1.get(f"{ccname}/{inp}/{opt}/fixup2")
+                print(f"     {ccname:6s} {inp:10s} {opt}  R1h {a:+8.2f}   "
+                      f"rederive {b:+8.2f}   ratio {a / b:5.2f}x"
+                      + (f"   fixup2 {f2:+8.2f}  -> "
+                         + ("fixup2 cheaper" if abs(f2) < abs(b)
+                            else "rederive cheaper")
+                         if f2 is not None else ""))
 
     doc = {"pin": {"regenerate": "python3 patterns/p25-realloc-growth/controls/"
                                  "rederive.py"},
            "derived_from_sha256": derived_from(),
            "measured_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-           "substitution": {"from": OLD, "to": NEW, "count": nsub},
+           "substitutions": counts,
+           "ir_convention": "kernel-exclusive (the `kernel` symbol alone, "
+                            "measure.py's needle). NOT the gate record's "
+                            "whole-program key of the same name; the two "
+                            "differ on this pattern (../NOTES.md 8a).",
            "checksums": ck,
            "static_kernel_insns": static,
            "marginal_ir_per_call": marg,
+           "marginal_over_r1": over_r1,
+           "r1h_over_rederive_ratio": ratios,
            "problems": problems,
-           "invariant": "The UNCONDITIONAL re-derive -- the only C rung that DR "
-                        "400 cannot reach, because it never dereferences `cur` "
-                        "-- agrees with model.py on EVERY input including the "
-                        "adversarial ones, is sanitizer-clean everywhere, and "
-                        "its static and marginal costs are recorded beside R1's "
-                        "and R1h's at both optimisation levels. ⚠ Neither "
-                        "repair's SPELLING has been searched; the figures are "
-                        "the cost of THESE two spellings, never of 'the "
-                        "repair'."}
+           "invariant": "Three REPAIR SITES are built from the shipped "
+                        "c/kernel.c -- the guarded read (R1h, shipped), the "
+                        "unconditional re-derive at the read, and the refresh "
+                        "at the GROWTH (fixup, fixup2) -- every one agrees "
+                        "with model.py on EVERY input including the "
+                        "adversarial ones, every one is sanitizer-clean "
+                        "everywhere, and every static and marginal cost is "
+                        "recorded at BOTH optimisation levels on BOTH "
+                        "compilers. ⚠ The R1h/rederive ratio is NOT the same "
+                        "on the two compilers and the ordering of the two "
+                        "STANDARD-CLEAN repairs (rederive, fixup2) REVERSES "
+                        "between -O0 and -O3: quote the compiler and the "
+                        "level, never a single number. ⚠ `fixup` is NOT "
+                        "standard-clean (it evaluates `cur != NULL` on an "
+                        "indeterminate pointer); `fixup2` is."}
     out = os.path.join(HERE, "rederive.json")
     json.dump(doc, open(out, "w"), indent=2)
     print(f"\nwrote {out}")
     for p in problems:
         print(f"  *** {p}", file=sys.stderr)
-    for f in [plain, asan, ubsan] + glob.glob(os.path.join(TMP, "it*_*.bin")):
+    for f in scratch + glob.glob(os.path.join(TMP, "it*_*.bin")):
         if os.path.exists(f):
             os.unlink(f)
     return 1 if problems else 0

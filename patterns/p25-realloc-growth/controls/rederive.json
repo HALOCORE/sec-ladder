@@ -8,52 +8,142 @@
     "patterns/p25-realloc-growth/c/main.c": "1734d2d11d8bcce6b6b370a210eb62ccef8b8e9f0522907c12182c448f1b52b8",
     "patterns/p25-realloc-growth/model.py": "f4ea1bfba72471b74b47728b0eadd568df6a9e8992193972c63a1462ff44d22b",
     "patterns/p25-realloc-growth/inputs/gen.py": "39c40b42328cb74e7dbddf6c41df641d51a3b2e1ee0b24bee89f0a3a1516aa78",
-    "patterns/p25-realloc-growth/controls/rederive.py": "b154139ab08a5aaf69e0f4eaa9efd8b76f20e71ca0fb0eac377e9925285a2d29",
+    "patterns/p25-realloc-growth/controls/rederive.py": "f966118bce2d984a01b6510431a05352b4eb8aa8c62768f37d115865f895628f",
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3"
   },
-  "measured_utc": "2026-08-31T16:57:00Z",
-  "substitution": {
-    "from": "\n                v = (uint64_t)*cur;\n",
-    "to": "\n                v = (uint64_t)toks[curi];\n",
-    "count": 1
+  "measured_utc": "2026-09-01T01:37:26Z",
+  "substitutions": {
+    "rederive": {
+      "rederive read": 1
+    },
+    "fixup": {
+      "fixup growth": 1
+    },
+    "fixup2": {
+      "fixup2 decl": 1,
+      "fixup2 growth": 1,
+      "fixup2 save": 1,
+      "fixup2 read": 1
+    }
   },
+  "ir_convention": "kernel-exclusive (the `kernel` symbol alone, measure.py's needle). NOT the gate record's whole-program key of the same name; the two differ on this pattern (../NOTES.md 8a).",
   "checksums": {
-    "adversarial-lateread.bin": {
+    "rederive/adversarial-lateread.bin": {
       "stdout": "14062580838451436544",
       "model": "14062580838451436544",
       "fired": false
     },
-    "adversarial-many.bin": {
+    "rederive/adversarial-many.bin": {
       "stdout": "418471180153818624",
       "model": "418471180153818624",
       "fired": false
     },
-    "adversarial-move.bin": {
+    "rederive/adversarial-move.bin": {
       "stdout": "11296769385036522496",
       "model": "11296769385036522496",
       "fired": false
     },
-    "adversarial-nogrow.bin": {
+    "rederive/adversarial-nogrow.bin": {
       "stdout": "16907751744586910720",
       "model": "16907751744586910720",
       "fired": false
     },
-    "adversarial-stride3.bin": {
+    "rederive/adversarial-stride3.bin": {
       "stdout": "0",
       "model": "0",
       "fired": false
     },
-    "degenerate.bin": {
+    "rederive/degenerate.bin": {
       "stdout": "14970537519737710592",
       "model": "14970537519737710592",
       "fired": false
     },
-    "large.bin": {
+    "rederive/large.bin": {
       "stdout": "7796663744873786006",
       "model": "7796663744873786006",
       "fired": false
     },
-    "small.bin": {
+    "rederive/small.bin": {
+      "stdout": "18234900705708003722",
+      "model": "18234900705708003722",
+      "fired": false
+    },
+    "fixup/adversarial-lateread.bin": {
+      "stdout": "14062580838451436544",
+      "model": "14062580838451436544",
+      "fired": false
+    },
+    "fixup/adversarial-many.bin": {
+      "stdout": "418471180153818624",
+      "model": "418471180153818624",
+      "fired": false
+    },
+    "fixup/adversarial-move.bin": {
+      "stdout": "11296769385036522496",
+      "model": "11296769385036522496",
+      "fired": false
+    },
+    "fixup/adversarial-nogrow.bin": {
+      "stdout": "16907751744586910720",
+      "model": "16907751744586910720",
+      "fired": false
+    },
+    "fixup/adversarial-stride3.bin": {
+      "stdout": "0",
+      "model": "0",
+      "fired": false
+    },
+    "fixup/degenerate.bin": {
+      "stdout": "14970537519737710592",
+      "model": "14970537519737710592",
+      "fired": false
+    },
+    "fixup/large.bin": {
+      "stdout": "7796663744873786006",
+      "model": "7796663744873786006",
+      "fired": false
+    },
+    "fixup/small.bin": {
+      "stdout": "18234900705708003722",
+      "model": "18234900705708003722",
+      "fired": false
+    },
+    "fixup2/adversarial-lateread.bin": {
+      "stdout": "14062580838451436544",
+      "model": "14062580838451436544",
+      "fired": false
+    },
+    "fixup2/adversarial-many.bin": {
+      "stdout": "418471180153818624",
+      "model": "418471180153818624",
+      "fired": false
+    },
+    "fixup2/adversarial-move.bin": {
+      "stdout": "11296769385036522496",
+      "model": "11296769385036522496",
+      "fired": false
+    },
+    "fixup2/adversarial-nogrow.bin": {
+      "stdout": "16907751744586910720",
+      "model": "16907751744586910720",
+      "fired": false
+    },
+    "fixup2/adversarial-stride3.bin": {
+      "stdout": "0",
+      "model": "0",
+      "fired": false
+    },
+    "fixup2/degenerate.bin": {
+      "stdout": "14970537519737710592",
+      "model": "14970537519737710592",
+      "fired": false
+    },
+    "fixup2/large.bin": {
+      "stdout": "7796663744873786006",
+      "model": "7796663744873786006",
+      "fired": false
+    },
+    "fixup2/small.bin": {
       "stdout": "18234900705708003722",
       "model": "18234900705708003722",
       "fired": false
@@ -72,6 +162,14 @@
       "n_fn_nopad": 220,
       "fn_bytes": 1015
     },
+    "gcc/O0/fixup": {
+      "n_fn_nopad": 224,
+      "fn_bytes": 1027
+    },
+    "gcc/O0/fixup2": {
+      "n_fn_nopad": 226,
+      "fn_bytes": 1054
+    },
     "gcc/O3/R1": {
       "n_fn_nopad": 165,
       "fn_bytes": 653
@@ -83,6 +181,14 @@
     "gcc/O3/rederive": {
       "n_fn_nopad": 168,
       "fn_bytes": 684
+    },
+    "gcc/O3/fixup": {
+      "n_fn_nopad": 171,
+      "fn_bytes": 685
+    },
+    "gcc/O3/fixup2": {
+      "n_fn_nopad": 175,
+      "fn_bytes": 717
     },
     "clang/O0/R1": {
       "n_fn_nopad": 209,
@@ -96,6 +202,14 @@
       "n_fn_nopad": 210,
       "fn_bytes": 1012
     },
+    "clang/O0/fixup": {
+      "n_fn_nopad": 215,
+      "fn_bytes": 1032
+    },
+    "clang/O0/fixup2": {
+      "n_fn_nopad": 217,
+      "fn_bytes": 1056
+    },
     "clang/O3/R1": {
       "n_fn_nopad": 150,
       "fn_bytes": 634
@@ -107,22 +221,102 @@
     "clang/O3/rederive": {
       "n_fn_nopad": 152,
       "fn_bytes": 618
+    },
+    "clang/O3/fixup": {
+      "n_fn_nopad": 158,
+      "fn_bytes": 666
+    },
+    "clang/O3/fixup2": {
+      "n_fn_nopad": 161,
+      "fn_bytes": 681
     }
   },
   "marginal_ir_per_call": {
-    "small.bin/O0/R1": 1375.16,
-    "small.bin/O0/R1h": 1389.92,
-    "small.bin/O0/rederive": 1382.54,
-    "small.bin/O3/R1": 703.85,
-    "small.bin/O3/R1h": 728.54,
-    "small.bin/O3/rederive": 714.72,
-    "large.bin/O0/R1": 6540.98,
-    "large.bin/O0/R1h": 6672.06,
-    "large.bin/O0/rederive": 6606.52,
-    "large.bin/O3/R1": 3173.74,
-    "large.bin/O3/R1h": 3338.13,
-    "large.bin/O3/rederive": 3239.41
+    "gcc/small.bin/O0/R1": 1375.16,
+    "gcc/small.bin/O0/R1h": 1389.92,
+    "gcc/small.bin/O0/rederive": 1382.54,
+    "gcc/small.bin/O0/fixup": 1377.34,
+    "gcc/small.bin/O0/fixup2": 1381.06,
+    "gcc/small.bin/O3/R1": 703.85,
+    "gcc/small.bin/O3/R1h": 728.54,
+    "gcc/small.bin/O3/rederive": 714.72,
+    "gcc/small.bin/O3/fixup": 717.99,
+    "gcc/small.bin/O3/fixup2": 725.52,
+    "clang/small.bin/O0/R1": 1418.11,
+    "clang/small.bin/O0/R1h": 1436.56,
+    "clang/small.bin/O0/rederive": 1421.8,
+    "clang/small.bin/O0/fixup": 1421.38,
+    "clang/small.bin/O0/fixup2": 1425.1,
+    "clang/small.bin/O3/R1": 738.8,
+    "clang/small.bin/O3/R1h": 757.52,
+    "clang/small.bin/O3/rederive": 742.52,
+    "clang/small.bin/O3/fixup": 756.05,
+    "clang/small.bin/O3/fixup2": 765.23,
+    "gcc/large.bin/O0/R1": 6540.98,
+    "gcc/large.bin/O0/R1h": 6672.06,
+    "gcc/large.bin/O0/rederive": 6606.52,
+    "gcc/large.bin/O0/fixup": 6543.66,
+    "gcc/large.bin/O0/fixup2": 6560.75,
+    "gcc/large.bin/O3/R1": 3173.74,
+    "gcc/large.bin/O3/R1h": 3338.13,
+    "gcc/large.bin/O3/rederive": 3239.41,
+    "gcc/large.bin/O3/fixup": 3243.43,
+    "gcc/large.bin/O3/fixup2": 3277.95,
+    "clang/large.bin/O0/R1": 6828.46,
+    "clang/large.bin/O0/R1h": 6992.31,
+    "clang/large.bin/O0/rederive": 6861.23,
+    "clang/large.bin/O0/fixup": 6832.48,
+    "clang/large.bin/O0/fixup2": 6849.57,
+    "clang/large.bin/O3/R1": 3263.16,
+    "clang/large.bin/O3/R1h": 3356.81,
+    "clang/large.bin/O3/rederive": 3280.25,
+    "clang/large.bin/O3/fixup": 3323.63,
+    "clang/large.bin/O3/fixup2": 3392.01
+  },
+  "marginal_over_r1": {
+    "gcc/small.bin/O0/R1h": 14.759999999999991,
+    "gcc/small.bin/O0/rederive": 7.379999999999882,
+    "gcc/small.bin/O0/fixup": 2.1799999999998363,
+    "gcc/small.bin/O0/fixup2": 5.899999999999864,
+    "gcc/small.bin/O3/R1h": 24.68999999999994,
+    "gcc/small.bin/O3/rederive": 10.870000000000005,
+    "gcc/small.bin/O3/fixup": 14.139999999999986,
+    "gcc/small.bin/O3/fixup2": 21.66999999999996,
+    "clang/small.bin/O0/R1h": 18.450000000000045,
+    "clang/small.bin/O0/rederive": 3.6900000000000546,
+    "clang/small.bin/O0/fixup": 3.270000000000209,
+    "clang/small.bin/O0/fixup2": 6.990000000000009,
+    "clang/small.bin/O3/R1h": 18.720000000000027,
+    "clang/small.bin/O3/rederive": 3.7200000000000273,
+    "clang/small.bin/O3/fixup": 17.25,
+    "clang/small.bin/O3/fixup2": 26.430000000000064,
+    "gcc/large.bin/O0/R1h": 131.08000000000084,
+    "gcc/large.bin/O0/rederive": 65.54000000000087,
+    "gcc/large.bin/O0/fixup": 2.680000000000291,
+    "gcc/large.bin/O0/fixup2": 19.770000000000437,
+    "gcc/large.bin/O3/R1h": 164.39000000000033,
+    "gcc/large.bin/O3/rederive": 65.67000000000007,
+    "gcc/large.bin/O3/fixup": 69.69000000000005,
+    "gcc/large.bin/O3/fixup2": 104.21000000000004,
+    "clang/large.bin/O0/R1h": 163.85000000000036,
+    "clang/large.bin/O0/rederive": 32.76999999999953,
+    "clang/large.bin/O0/fixup": 4.019999999999527,
+    "clang/large.bin/O0/fixup2": 21.109999999999673,
+    "clang/large.bin/O3/R1h": 93.65000000000009,
+    "clang/large.bin/O3/rederive": 17.090000000000146,
+    "clang/large.bin/O3/fixup": 60.470000000000255,
+    "clang/large.bin/O3/fixup2": 128.85000000000036
+  },
+  "r1h_over_rederive_ratio": {
+    "gcc/small.bin/O0": 2.0000000000000306,
+    "gcc/small.bin/O3": 2.2713891444342162,
+    "gcc/large.bin/O0": 1.9999999999999862,
+    "gcc/large.bin/O3": 2.503273945485003,
+    "clang/small.bin/O0": 4.999999999999939,
+    "clang/small.bin/O3": 5.0322580645161,
+    "clang/large.bin/O0": 5.0000000000000835,
+    "clang/large.bin/O3": 5.479812755997618
   },
   "problems": [],
-  "invariant": "The UNCONDITIONAL re-derive -- the only C rung that DR 400 cannot reach, because it never dereferences `cur` -- agrees with model.py on EVERY input including the adversarial ones, is sanitizer-clean everywhere, and its static and marginal costs are recorded beside R1's and R1h's at both optimisation levels. \u26a0 Neither repair's SPELLING has been searched; the figures are the cost of THESE two spellings, never of 'the repair'."
+  "invariant": "Three REPAIR SITES are built from the shipped c/kernel.c -- the guarded read (R1h, shipped), the unconditional re-derive at the read, and the refresh at the GROWTH (fixup, fixup2) -- every one agrees with model.py on EVERY input including the adversarial ones, every one is sanitizer-clean everywhere, and every static and marginal cost is recorded at BOTH optimisation levels on BOTH compilers. \u26a0 The R1h/rederive ratio is NOT the same on the two compilers and the ordering of the two STANDARD-CLEAN repairs (rederive, fixup2) REVERSES between -O0 and -O3: quote the compiler and the level, never a single number. \u26a0 `fixup` is NOT standard-clean (it evaluates `cur != NULL` on an indeterminate pointer); `fixup2` is."
 }

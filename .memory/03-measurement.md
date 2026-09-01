@@ -3236,19 +3236,44 @@ already been struck.** Keep the list, not the ordinal.
     zero:
 
     ```
-    R4/R5 null, -O3 ISOLATED (the published column)
-      p28 1732.73 · p29 425.80 · p25 269.52 · p42 31.00 · everything else <= 6.00
+    R4/R5 null -- STATE IT PER (level, mode) CELL; NEVER max across either
+                  O0/iso     O3/iso    O0/whole   O3/whole
+      p25          269.52     269.52     269.52     269.52
+      p28         1732.73       1.01    1732.73     211.87
+      p29          425.80       0.02     425.80     465.55
+      p42           31.00      31.00      31.00      33.00
+      p11            0.00       1.00       0.00     494.00
+      p06/p14/p17/p18/p13/p35/p38/p34  <= 1.01 isolated, 14..36 at O3/whole
+
+    At -O3 ISOLATED -- the cell the corrections are published in -- only p25 and
+    p42 reach 16.00, and FIVE patterns clear 2.00:
+      p25 269.52 . p42 31.00 . p04 6.00 . p03 6.00 . p02 2.00
     ```
+
+    ⚠⚠⚠ **THIS TABLE WAS WRONG TWICE AND THE SHAPE OF BOTH ERRORS IS THE SAME:
+    A MAX TAKEN ACROSS A DIMENSION THAT MATTERS.** The manager's first version
+    maxed over `isolated` AND `whole` and reported *"ten patterns at >= 20"*;
+    `TASK_158` removed `whole` and the manager published the result as
+    *"-O3 isolated"* when it was still **maxed over BOTH LEVELS** -- so
+    `p28 1732.73` and `p29 425.80`, which are `-O0` cells, were printed under an
+    `-O3` heading, and *"four patterns"* was `-O0`'s count. `TASK_159` removed
+    the level. ⚠ **Three passes, each removing one confound and leaving the
+    next.** ✅ **THE RULE: a null is a property of a CELL. Do not max it over
+    mode, over level, or over input -- print the cell.**
+
+    ✅ **THE FINDING ITSELF IS UNTOUCHED BY BOTH CORRECTIONS, and that was
+    checked rather than assumed**: at `-O3 isolated` `p25`'s null is still
+    `269.52`, `p42`'s still `31.00`, `p02`'s still `2.00`.
 
     ✅ **The mechanism is CLOSED over every function** (pads 0 and 16 identical):
     kernels `0.00`, `main` `0.00`, and **six glibc malloc-internal symbols
     accounting for 100.0%**. On `p25` the two kernels cost *exactly* `9104.17`
     (`-O0`) and `4152.71` (`-O3`) while the slope differs by `+269.52`.
 
-    ⚠⚠ **THE MODE MATTERS AND THE MANAGER'S FIRST DERIVATION IGNORED IT.**
+    ⚠⚠ **THE MODE MATTERS AND SO DOES THE LEVEL — see the table's own note.**
     Maxing over cells including `whole` gave *"ten patterns at ≥ 20"*; in
-    `-O3 isolated` **eight of that top ten read `−1.00`**. **Real exposure is
-    FOUR patterns.** ⚠⚠⚠ **AND `whole` IS NOT A NULL AT ALL: `check_identity`
+    `-O3 isolated` **eight of that top ten are negligible (`|Δ| ≤ 1.01`)**.
+    ⚠⚠⚠ **AND `whole` IS NOT A NULL AT ALL: `check_identity`
     compares `isolated` digests only (`check.py:3303`), and at `p11`'s
     `O3/whole` cell — the one the `−494.00` comes from — there is NO `kernel`
     symbol, the difference is `unsafe::main` vs `verus::main`, and the static
