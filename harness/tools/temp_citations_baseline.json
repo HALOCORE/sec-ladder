@@ -15,7 +15,7 @@
   "generated-record": "the string is inside a GENERATED artefact; not a citation",
   "lost": "gone and not regenerable; the note says what it showed"
  },
- "count": 95,
+ "count": 101,
  "entries": [
   {
    "file": "TOOLCHAIN.md",
@@ -864,6 +864,60 @@
    "path": ".temp/p47/a",
    "kind": "destination",
    "note": "a `sha256sum ... > .temp/p47/a` / `sha256sum -c` pair in the docstring's determinism recipe. ⚠ This file is MEASUREMENT-HASHED (`measure.py::measurement_sources` globs `inputs/gen.py`), so it must not be edited for a documentation reason -- and it does not need to be."
+  },
+  {
+   "file": "patterns/p49-interned-pool/controls/detectors.py",
+   "lines": [
+    76
+   ],
+   "path": ".temp/p49ctl/detectors",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this scratch directory when the control runs (`os.path.join(REPO, \".temp\", ...)`) -- an ASSEMBLED path. The control builds and runs its arms there and deletes the binaries on success; every arm SOURCE is committed under controls/, so nothing is lost when the directory is absent."
+  },
+  {
+   "file": "patterns/p49-interned-pool/controls/proof_mutants.py",
+   "lines": [
+    70
+   ],
+   "path": ".temp/p49mut",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES the mutant directory when the control runs -- an ASSEMBLED path. proof_mutants.py writes each planted verus.rs mutant there, runs verus_run.py on it and deletes it on success; the mutant DEFINITIONS live in the script, which is committed."
+  },
+  {
+   "file": "patterns/p49-interned-pool/controls/proof_mutants.py",
+   "lines": [
+    52
+   ],
+   "path": ".temp/p49mut/",
+   "kind": "quote",
+   "note": "prose spelling of the same assembled path, in the docstring that states the mutants are written there and deleted on success. A QUOTE of the directory name, not a reference to evidence."
+  },
+  {
+   "file": "patterns/p49-interned-pool/controls/rust_bug.py",
+   "lines": [
+    58
+   ],
+   "path": ".temp/p49ctl/rust_bug",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this scratch directory when the control runs (`os.path.join(REPO, \".temp\", ...)`) -- an ASSEMBLED path. The control builds and runs its arms there and deletes the binaries on success; every arm SOURCE is committed under controls/, so nothing is lost when the directory is absent."
+  },
+  {
+   "file": "patterns/p49-interned-pool/controls/safe_arms.py",
+   "lines": [
+    67
+   ],
+   "path": ".temp/p49ctl/safe_arms",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this scratch directory when the control runs (`os.path.join(REPO, \".temp\", ...)`) -- an ASSEMBLED path. The control builds and runs its arms there and deletes the binaries on success; every arm SOURCE is committed under controls/, so nothing is lost when the directory is absent."
+  },
+  {
+   "file": "patterns/p49-interned-pool/controls/spellings.py",
+   "lines": [
+    74
+   ],
+   "path": ".temp/p49ctl/spellings",
+   "kind": "destination",
+   "note": "the citing line is the assignment that CREATES this scratch directory when the control runs (`os.path.join(REPO, \".temp\", ...)`) -- an ASSEMBLED path. The control builds and runs its arms there and deletes the binaries on success; every arm SOURCE is committed under controls/, so nothing is lost when the directory is absent."
   },
   {
    "file": "pilot/README.md",
