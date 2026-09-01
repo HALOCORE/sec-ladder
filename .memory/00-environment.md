@@ -616,6 +616,49 @@ one stale stack root, and `use_stacks=0` removes it at zero measured cost.
 
 ---
 
+## ⚠⚠ A `pgrep -f` WAITER MATCHES ITSELF, AND SO DOES THE TOOL CALL THAT LAUNCHED IT
+
+`TASK_157`'s engineer self-disclosed five background waiters spelled
+
+```sh
+until ! pgrep -f "harness/check.py p25"; do sleep 30; done
+```
+
+that **would have polled forever**: the waiter's own command line contains the
+string it greps for, so `pgrep -f` matches the waiter itself and the condition is
+never false. Five stray processes on a shared box, outliving the task, and
+**they look exactly like a job still legitimately working.**
+
+✅ **MANAGER-REPRODUCED** (`.temp/mgr159/pgrep_selfmatch.sh`, one command), with
+nothing named `harness/check.py p25` running:
+
+```
+waiter pid 1528620   bash -c until ! pgrep -f "harness/check.py p25" ...
+RESULT: waiter is STILL RUNNING with no target present -- IT MATCHED ITSELF.
+```
+
+⚠⚠ **AND IT IS WORSE THAN REPORTED: THE ENCLOSING TOOL-INVOCATION SHELL MATCHES
+TOO.** This harness wraps every command in a `bash -c` whose command line
+contains the **whole script text**, so the same probe also matched pid `1528609`
+— the shell running the probe. **The hazard therefore fires even when the waiter
+itself does not contain the pattern**, as long as the tool call that launched it
+does. Two false matches, neither of them the target.
+
+✅ **THE CURES**, in preference order:
+
+- **`wait <pid>`** on the exact PID you started — no pattern, no match.
+- a **PID file** or a **`.done` sentinel** the job writes on exit.
+- if you must pattern-match, **anchor on something the waiter cannot contain**:
+  `pgrep -f "$PAT" | grep -v "^$$\$"`, or match the binary rather than the
+  argument.
+
+⚠ **Same class as this project's own reflex — *ask what would make it FAIL*.**
+Here the waiter's exit condition could never be true, and there is no output
+that distinguishes *"still working"* from *"will never stop"*. ⚠ **And when you
+do clean up, `CLAUDE.md` rule 2 still binds: confirm each exact PID's full
+command line against `/proc/<pid>/cmdline` first — never `pkill`, never a
+substring match.**
+
 ## Toolchain facts established by probing candidate rows (TASK_102, PROVISIONAL)
 
 ⚠ **All four were found while REFUSING rows, and they outlive the rows.**

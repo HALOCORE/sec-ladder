@@ -3223,6 +3223,63 @@ already been struck.** Keep the list, not the ordinal.
     wants the longest alternative first — or an anchor. ✅ **Both are cured by
     the same discipline: READ THE VERDICT OUT OF `results/gate/*.json`.**
 
+23. ⚠⚠⚠ **`marginal_ir_per_call` IS A WHOLE-PROGRAM SLOPE, SO THE R4/R5 PAIR HAS
+    A NON-ZERO NULL — AND THREE PUBLISHED NUMBERS SIT BELOW THEIR OWN PATTERN'S.**
+    Found by `TASK_157`'s engineer on `p25`, extended tree-wide by the manager,
+    **and the extension was corrected twice by `TASK_158` before it was right.**
+
+    The slope is `Ir@N − Ir@N/2` over the call difference — **deliberately
+    symbol-independent**, so it works in `whole` mode and at `-O0` where a
+    rung's work lives in `core::iter`. The consequence is that it includes
+    everything the kernel calls. `identity` forces R4's and R5's kernels to
+    agree, so **their difference is a measured null control**, and it is not
+    zero:
+
+    ```
+    R4/R5 null, -O3 ISOLATED (the published column)
+      p28 1732.73 · p29 425.80 · p25 269.52 · p42 31.00 · everything else <= 6.00
+    ```
+
+    ✅ **The mechanism is CLOSED over every function** (pads 0 and 16 identical):
+    kernels `0.00`, `main` `0.00`, and **six glibc malloc-internal symbols
+    accounting for 100.0%**. On `p25` the two kernels cost *exactly* `9104.17`
+    (`-O0`) and `4152.71` (`-O3`) while the slope differs by `+269.52`.
+
+    ⚠⚠ **THE MODE MATTERS AND THE MANAGER'S FIRST DERIVATION IGNORED IT.**
+    Maxing over cells including `whole` gave *"ten patterns at ≥ 20"*; in
+    `-O3 isolated` **eight of that top ten read `−1.00`**. **Real exposure is
+    FOUR patterns.** ⚠⚠⚠ **AND `whole` IS NOT A NULL AT ALL: `check_identity`
+    compares `isolated` digests only (`check.py:3303`), and at `p11`'s
+    `O3/whole` cell — the one the `−494.00` comes from — there is NO `kernel`
+    symbol, the difference is `unsafe::main` vs `verus::main`, and the static
+    traces are genuinely 751 against 747 non-pad instructions.** ⚠ **A null
+    control is only a null in the MODE ITS IDENTITY PIN COVERS. Never max a
+    null across modes.**
+
+    ⚠⚠⚠ **THREE PUBLISHED NUMBERS ARE BELOW THEIR OWN PATTERN'S NULL**:
+    `p25 large gcc-clang` `+19.42`, which the published calibration places in
+    the **`≥ 16.00` band labelled *"every one is real"***, against a null of
+    `+269.52` — **13.9× larger**; `p42 large gcc-clang` `+5.00` against
+    `−31.00`; `p02` `+2.00` against `−2.00`. ⚠ **And `results/synthesis.md`'s
+    first calibration claim was ALREADY false independently of `p25`**: it lists
+    seven rows including `p42 −31.00`, asserts *"every one is in the
+    `2.00 … 16.00` band"* when `p42` is `≥ 16` and printed **bold**, then
+    resolves *"all six"*.
+
+    ✅ **THE RULE: for a cross-RUNG comparison use `kernel_exclusive_ir`; use
+    `marginal_ir_per_call` for anti-collapse, which is what it was built for.
+    And on any pattern whose kernel calls out of itself, compare a correction
+    against that pattern's OWN `R5 − R4` null before quoting a band.**
+    ⚠ **The repair is `synthesis/`-only and costs NO re-gate: refuse to promote
+    a correction to the CONFIDENT band when it is below its own pattern's null.**
+
+    ⚠ **NOT A NEW FACT, and the manager cited the wrong precedent for it.**
+    `check.py:2805`, `synthesize.py:27–33` and `CALLEE_NOTE` all document the
+    whole-program reading. `RECAP`'s *"the R4/R5 pair is not a null control …
+    a source-path-length artefact"* is the **`ns`** finding — a different claim
+    about wall clock. **What is new is the magnitude, the mode split, and the
+    three affected numbers.**
+
 ## ⚠ A number GREPPED OUT OF A LOG is not a number READ OUT OF A RECORD
 
 **`TASK_127`, swept at `TASK_132`.** **The gate writes structured JSON and also
