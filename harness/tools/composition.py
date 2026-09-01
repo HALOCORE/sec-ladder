@@ -122,8 +122,15 @@ CLASSES = {
         ["p22"],
     ),
     "aliasing": (
-        "two live references to overlapping storage, one of them mutable",
-        ["p08"],
+        "two live references to overlapping storage, one of them mutable. "
+        "⚠ The two members differ on whether that is UNDEFINED BEHAVIOUR: p08's "
+        "overlap is a `memcpy` whose ranges overlap (C11 7.24.2.1p2) and IS UB; "
+        "p49's sharing is created deliberately by a dedup table, is correct C, "
+        "and the bug is the WRITE THROUGH IT. ⚠⚠ ADMITTING p49 WIDENED THIS "
+        "DESCRIPTION, and that was the stated cost of the classification rather "
+        "than a discovery after it (TASK_161; the engineer argued `logical` "
+        "fairly and the manager took `aliasing`)",
+        ["p08", "p49"],
     ),
     "calibration": (
         "no bug: the ladder measuring itself",
@@ -217,6 +224,26 @@ CAVEATS = {
            "ALSO GAVE THAT NON-DETERMINISM AS `min + 31*b` AND THAT WAS "
            "OVER-GENERAL: the closed-form belongs to the SENTINEL-FOLDING cell "
            "the build REJECTED, not to the shipped one.",
+    "p49": "the aliasing is the CONTRACT, not the bug -- deduplication is what "
+           "an intern pool IS. controls/no_overlap.py measures that two "
+           "records' content ranges are always EQUAL or DISJOINT and never "
+           "PARTIAL (11 084 equal, 892 352 disjoint, 0 partial), while p08's "
+           "are PARTIAL (9 copies) -- so the C-side distinction from p08 is a "
+           "NUMBER and not an adjective. Counted `aliasing` on what the SAFETY "
+           "LINE ASKS -- *is this buffer mine to write?*, an OWNERSHIP question "
+           "-- which is this table's own stated test. \u26a0 `logical` is the "
+           "defensible alternative and is literally satisfied: nothing is "
+           "allocated, nothing is freed, every index is in bounds, and ASan, "
+           "UBSan and Miri are silent on EVERY input including the adversarial "
+           "ones (216 + 18 cells, 0 diagnostics). It was not chosen because "
+           "logical's three members have no aliasing structure at all while p49 "
+           "cannot exist without one -- delete the sharing and the pool stops "
+           "deduplicating. \u26a0\u26a0 p49 is the THIRD position on this "
+           "axis: p28's aliasing is the SETUP that makes the omission possible, "
+           "p32's IS the harm, and p49's is the CONTRACT while the WRITE is the "
+           "harm. \u26a0 It is also the tree's only row with NO DETECTOR AT "
+           "ALL -- the checksum is the sole instrument, which is the exact "
+           "inverse of p34's detector-only cell.",
     "p34": "the safety line is a one-statement maintaining WRITE (`t->rc = "
            "t->rc + 1`), so like p28 it ASKS NOTHING and this table's stated "
            "test does not apply; `temporal` is read off the HARM -- a real "

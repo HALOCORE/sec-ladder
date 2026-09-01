@@ -1,0 +1,226 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p49-interned-pool/controls/spellings.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p49-interned-pool/c/kernel.c": "3ec9aad07719288fc89d3f50e6a5361dccb886b86c3fa2c29bbe15e587e0cb5d",
+    "patterns/p49-interned-pool/c/kernel_hardened.c": "0a245f0715854acd17814a5802c8d2720f457816b65eec49bbba8608cfac0f29",
+    "patterns/p49-interned-pool/c/main.c": "c49b42d558c766397e76d4bd0eebf31b6644ba3fa0bff2a9abc4f695411bc9d1",
+    "patterns/p49-interned-pool/inputs/gen.py": "d55ecd27225aafcef6e4b029ba9ca7db3e9e68d31eca5685dc46e2f4b2cda221",
+    "patterns/p49-interned-pool/controls/spellings.py": "1260c7bf6b41ea381b2f66d1a7dd54303a0662a74ffbd487310dadaaeb801d1a"
+  },
+  "measured_utc": "2026-09-01T08:40:07Z",
+  "compilers": [
+    "gcc",
+    "clang"
+  ],
+  "answers": {
+    "adversarial-cascade.bin": {
+      "bug": "8653438269484025856",
+      "cow": "18333534148569259008",
+      "provenance": "9260253242170300416"
+    },
+    "adversarial-cowfull.bin": {
+      "bug": "8897935692788144128",
+      "cow": "9887309797562598400",
+      "provenance": "14692946632457442304"
+    },
+    "adversarial-many.bin": {
+      "bug": "10636248267475679232",
+      "cow": "4770081662406190080",
+      "provenance": "7486053008742277120"
+    },
+    "adversarial-rehash.bin": {
+      "bug": "14042888476904305664",
+      "cow": "1773053308779294720",
+      "provenance": "4075389840640351232"
+    },
+    "adversarial-share.bin": {
+      "bug": "17203576457335438336",
+      "cow": "9997648724353765376",
+      "provenance": "16910375262405065728"
+    },
+    "adversarial-stride3.bin": {
+      "bug": "0",
+      "cow": "0",
+      "provenance": "0"
+    },
+    "degenerate.bin": {
+      "bug": "15194016535539881984",
+      "cow": "15194016535539881984",
+      "provenance": "12899752825868076032"
+    },
+    "large.bin": {
+      "bug": "15925195548848871244",
+      "cow": "15925195548848871244",
+      "provenance": "17145160620310663358"
+    },
+    "small.bin": {
+      "bug": "3739266750910054865",
+      "cow": "3739266750910054865",
+      "provenance": "15723623573944554171"
+    }
+  },
+  "benign_inputs": [
+    "degenerate.bin",
+    "large.bin",
+    "small.bin"
+  ],
+  "cow_moves_benign": [],
+  "provenance_moves_benign": [
+    "degenerate.bin",
+    "large.bin",
+    "small.bin"
+  ],
+  "price": [
+    {
+      "arm": "bug",
+      "cc": "gcc",
+      "opt": "O0",
+      "n_fn_nopad": 364,
+      "marginal_ir_per_call": 6542.19
+    },
+    {
+      "arm": "bug",
+      "cc": "gcc",
+      "opt": "O3",
+      "n_fn_nopad": 274,
+      "marginal_ir_per_call": 1991.37
+    },
+    {
+      "arm": "bug",
+      "cc": "clang",
+      "opt": "O0",
+      "n_fn_nopad": 306,
+      "marginal_ir_per_call": 5440.9
+    },
+    {
+      "arm": "bug",
+      "cc": "clang",
+      "opt": "O3",
+      "n_fn_nopad": 350,
+      "marginal_ir_per_call": 2304.32
+    },
+    {
+      "arm": "cow",
+      "cc": "gcc",
+      "opt": "O0",
+      "n_fn_nopad": 430,
+      "marginal_ir_per_call": 6568.77
+    },
+    {
+      "arm": "cow",
+      "cc": "gcc",
+      "opt": "O3",
+      "n_fn_nopad": 410,
+      "marginal_ir_per_call": 1989.03
+    },
+    {
+      "arm": "cow",
+      "cc": "clang",
+      "opt": "O0",
+      "n_fn_nopad": 354,
+      "marginal_ir_per_call": 5458.62
+    },
+    {
+      "arm": "cow",
+      "cc": "clang",
+      "opt": "O3",
+      "n_fn_nopad": 481,
+      "marginal_ir_per_call": 2319.05
+    },
+    {
+      "arm": "provenance",
+      "cc": "gcc",
+      "opt": "O0",
+      "n_fn_nopad": 276,
+      "marginal_ir_per_call": 6028.4
+    },
+    {
+      "arm": "provenance",
+      "cc": "gcc",
+      "opt": "O3",
+      "n_fn_nopad": 232,
+      "marginal_ir_per_call": 2008.71
+    },
+    {
+      "arm": "provenance",
+      "cc": "clang",
+      "opt": "O0",
+      "n_fn_nopad": 229,
+      "marginal_ir_per_call": 4924.64
+    },
+    {
+      "arm": "provenance",
+      "cc": "clang",
+      "opt": "O3",
+      "n_fn_nopad": 254,
+      "marginal_ir_per_call": 2023.65
+    }
+  ],
+  "deltas_vs_bug": [
+    {
+      "arm": "cow",
+      "cc": "gcc",
+      "opt": "O0",
+      "d_instructions": 66,
+      "d_marginal_ir": 26.580000000000837
+    },
+    {
+      "arm": "provenance",
+      "cc": "gcc",
+      "opt": "O0",
+      "d_instructions": -88,
+      "d_marginal_ir": -513.79
+    },
+    {
+      "arm": "cow",
+      "cc": "gcc",
+      "opt": "O3",
+      "d_instructions": 136,
+      "d_marginal_ir": -2.339999999999918
+    },
+    {
+      "arm": "provenance",
+      "cc": "gcc",
+      "opt": "O3",
+      "d_instructions": -42,
+      "d_marginal_ir": 17.340000000000146
+    },
+    {
+      "arm": "cow",
+      "cc": "clang",
+      "opt": "O0",
+      "d_instructions": 48,
+      "d_marginal_ir": 17.720000000000255
+    },
+    {
+      "arm": "provenance",
+      "cc": "clang",
+      "opt": "O0",
+      "d_instructions": -77,
+      "d_marginal_ir": -516.2599999999993
+    },
+    {
+      "arm": "cow",
+      "cc": "clang",
+      "opt": "O3",
+      "d_instructions": 131,
+      "d_marginal_ir": 14.730000000000018
+    },
+    {
+      "arm": "provenance",
+      "cc": "clang",
+      "opt": "O3",
+      "d_instructions": -96,
+      "d_marginal_ir": -280.6700000000001
+    }
+  ],
+  "probe_iters": [
+    100,
+    200
+  ],
+  "probe_input": "small.bin",
+  "problems": [],
+  "invariant": "`cow` -- the shipped safety line -- changes NO benign observable; `provenance`, which is upstream's patch, changes at least one. Both repair every adversarial input except adversarial-stride3.bin. The price of each is reported per (arm, compiler, level) CELL and never maxed across one."
+}

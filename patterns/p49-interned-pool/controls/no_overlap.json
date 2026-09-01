@@ -1,0 +1,231 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p49-interned-pool/controls/no_overlap.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p49-interned-pool/model.py": "354c7fb92556b31b01aee9765072ef5d8403858eca6b24ddaf373cec29f439bb",
+    "patterns/p49-interned-pool/inputs/gen.py": "d55ecd27225aafcef6e4b029ba9ca7db3e9e68d31eca5685dc46e2f4b2cda221",
+    "patterns/p49-interned-pool/c/kernel.c": "3ec9aad07719288fc89d3f50e6a5361dccb886b86c3fa2c29bbe15e587e0cb5d",
+    "patterns/p49-interned-pool/c/kernel_hardened.c": "0a245f0715854acd17814a5802c8d2720f457816b65eec49bbba8608cfac0f29",
+    "patterns/p08-overlap-move/c/kernel.c": "a1240809985bda7164c99d60aed2ca1efee4b1f8fc36afa0754fd0cbef202a8c",
+    "patterns/p49-interned-pool/controls/no_overlap.py": "08b87d708da819cd661c95d634e4f0e2d97ce54cef1a224f181b36495cb4e47c"
+  },
+  "measured_utc": "2026-09-01T08:39:53Z",
+  "p49": [
+    {
+      "input": "adversarial-cascade.bin",
+      "semantics": "R1h",
+      "copies": 1,
+      "disjoint_copies": 1,
+      "equal": 25,
+      "disjoint": 15,
+      "partial": 0
+    },
+    {
+      "input": "adversarial-cascade.bin",
+      "semantics": "R1",
+      "copies": 0,
+      "disjoint_copies": 0,
+      "equal": 40,
+      "disjoint": 0,
+      "partial": 0
+    },
+    {
+      "input": "adversarial-cowfull.bin",
+      "semantics": "R1h",
+      "copies": 0,
+      "disjoint_copies": 0,
+      "equal": 12,
+      "disjoint": 252,
+      "partial": 0
+    },
+    {
+      "input": "adversarial-cowfull.bin",
+      "semantics": "R1",
+      "copies": 0,
+      "disjoint_copies": 0,
+      "equal": 12,
+      "disjoint": 252,
+      "partial": 0
+    },
+    {
+      "input": "adversarial-many.bin",
+      "semantics": "R1h",
+      "copies": 3,
+      "disjoint_copies": 3,
+      "equal": 17,
+      "disjoint": 495,
+      "partial": 0
+    },
+    {
+      "input": "adversarial-many.bin",
+      "semantics": "R1",
+      "copies": 0,
+      "disjoint_copies": 0,
+      "equal": 46,
+      "disjoint": 466,
+      "partial": 0
+    },
+    {
+      "input": "adversarial-rehash.bin",
+      "semantics": "R1h",
+      "copies": 1,
+      "disjoint_copies": 1,
+      "equal": 0,
+      "disjoint": 11,
+      "partial": 0
+    },
+    {
+      "input": "adversarial-rehash.bin",
+      "semantics": "R1",
+      "copies": 0,
+      "disjoint_copies": 0,
+      "equal": 5,
+      "disjoint": 6,
+      "partial": 0
+    },
+    {
+      "input": "adversarial-share.bin",
+      "semantics": "R1h",
+      "copies": 1,
+      "disjoint_copies": 1,
+      "equal": 2,
+      "disjoint": 3,
+      "partial": 0
+    },
+    {
+      "input": "adversarial-share.bin",
+      "semantics": "R1",
+      "copies": 0,
+      "disjoint_copies": 0,
+      "equal": 5,
+      "disjoint": 0,
+      "partial": 0
+    },
+    {
+      "input": "degenerate.bin",
+      "semantics": "R1h",
+      "copies": 0,
+      "disjoint_copies": 0,
+      "equal": 35,
+      "disjoint": 779,
+      "partial": 0
+    },
+    {
+      "input": "degenerate.bin",
+      "semantics": "R1",
+      "copies": 0,
+      "disjoint_copies": 0,
+      "equal": 35,
+      "disjoint": 779,
+      "partial": 0
+    },
+    {
+      "input": "large.bin",
+      "semantics": "R1h",
+      "copies": 0,
+      "disjoint_copies": 0,
+      "equal": 5379,
+      "disjoint": 439270,
+      "partial": 0
+    },
+    {
+      "input": "large.bin",
+      "semantics": "R1",
+      "copies": 0,
+      "disjoint_copies": 0,
+      "equal": 5379,
+      "disjoint": 439270,
+      "partial": 0
+    },
+    {
+      "input": "small.bin",
+      "semantics": "R1h",
+      "copies": 0,
+      "disjoint_copies": 0,
+      "equal": 46,
+      "disjoint": 5377,
+      "partial": 0
+    },
+    {
+      "input": "small.bin",
+      "semantics": "R1",
+      "copies": 0,
+      "disjoint_copies": 0,
+      "equal": 46,
+      "disjoint": 5377,
+      "partial": 0
+    }
+  ],
+  "p49_totals": {
+    "copies": 6,
+    "disjoint_copies": 6,
+    "equal": 11084,
+    "disjoint": 892352,
+    "partial": 0
+  },
+  "p08_control": [
+    {
+      "window": "overlapping  d=4  m=64",
+      "source": "synthetic",
+      "relations": [
+        "partial"
+      ]
+    },
+    {
+      "window": "overlapping  d=1  m=16",
+      "source": "synthetic",
+      "relations": [
+        "partial",
+        "partial",
+        "partial",
+        "partial"
+      ]
+    },
+    {
+      "window": "disjoint     d=40 m=64",
+      "source": "synthetic",
+      "relations": [
+        "disjoint"
+      ]
+    },
+    {
+      "window": "adversarial-dbig.bin",
+      "source": "shipped",
+      "equal": 0,
+      "disjoint": 0,
+      "partial": 0
+    },
+    {
+      "window": "adversarial-dzero.bin",
+      "source": "shipped",
+      "equal": 0,
+      "disjoint": 0,
+      "partial": 0
+    },
+    {
+      "window": "adversarial-overlap.bin",
+      "source": "shipped",
+      "equal": 0,
+      "disjoint": 0,
+      "partial": 4
+    },
+    {
+      "window": "large.bin",
+      "source": "shipped",
+      "equal": 0,
+      "disjoint": 32768,
+      "partial": 0
+    },
+    {
+      "window": "small.bin",
+      "source": "shipped",
+      "equal": 0,
+      "disjoint": 128,
+      "partial": 0
+    }
+  ],
+  "p08_partial_copies": 9,
+  "problems": [],
+  "invariant": "In p49, every copy has disjoint source and destination, and two records' content ranges are always EQUAL or DISJOINT and never PARTIAL, in both semantics on every shipped window; in p08 at least one copy is PARTIALLY overlapping, which is what makes the first half a distinction rather than a tautology."
+}

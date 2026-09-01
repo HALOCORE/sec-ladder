@@ -1,0 +1,109 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p49-interned-pool/controls/safe_arms.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p49-interned-pool/safe_naive.rs": "cf83ed1be8e3532c8ced73d9f661e2186dd5a5424ed5404b747610775fbdbbed",
+    "patterns/p49-interned-pool/c/kernel.c": "3ec9aad07719288fc89d3f50e6a5361dccb886b86c3fa2c29bbe15e587e0cb5d",
+    "patterns/p49-interned-pool/c/kernel_hardened.c": "0a245f0715854acd17814a5802c8d2720f457816b65eec49bbba8608cfac0f29",
+    "patterns/p49-interned-pool/inputs/gen.py": "d55ecd27225aafcef6e4b029ba9ca7db3e9e68d31eca5685dc46e2f4b2cda221",
+    "patterns/p49-interned-pool/controls/arm_rc_refcell.rs": "9a82a1f728cbb9229f2e7e645e57b685054604cd60634e94d78543a35c1f179b",
+    "patterns/p49-interned-pool/controls/arm_rc_makemut.rs": "b37ef5069890487e3c9059e965d5b4612e0617e3107cf1ab644ed57d4f87c52e",
+    "patterns/p49-interned-pool/controls/safe_arms.py": "b28d0af976f6f75793e112d4ab766c7f77ec6e1cc8c26546184eda5231d3368c"
+  },
+  "measured_utc": "2026-09-01T08:40:11Z",
+  "expect": {
+    "A_index_arena": "R1h",
+    "B_rc_refcell": "R1",
+    "C_rc_makemut": "R1h"
+  },
+  "rows": [
+    {
+      "input": "adversarial-cascade.bin",
+      "c_R1": "8653438269484025856",
+      "c_R1h": "18333534148569259008",
+      "A_index_arena": "18333534148569259008",
+      "B_rc_refcell": "8653438269484025856",
+      "C_rc_makemut": "18333534148569259008"
+    },
+    {
+      "input": "adversarial-cowfull.bin",
+      "c_R1": "8897935692788144128",
+      "c_R1h": "9887309797562598400",
+      "A_index_arena": "9887309797562598400",
+      "B_rc_refcell": "8897935692788144128",
+      "C_rc_makemut": "9887309797562598400"
+    },
+    {
+      "input": "adversarial-many.bin",
+      "c_R1": "10636248267475679232",
+      "c_R1h": "4770081662406190080",
+      "A_index_arena": "4770081662406190080",
+      "B_rc_refcell": "10636248267475679232",
+      "C_rc_makemut": "4770081662406190080"
+    },
+    {
+      "input": "adversarial-rehash.bin",
+      "c_R1": "14042888476904305664",
+      "c_R1h": "1773053308779294720",
+      "A_index_arena": "1773053308779294720",
+      "B_rc_refcell": "14042888476904305664",
+      "C_rc_makemut": "1773053308779294720"
+    },
+    {
+      "input": "adversarial-share.bin",
+      "c_R1": "17203576457335438336",
+      "c_R1h": "9997648724353765376",
+      "A_index_arena": "9997648724353765376",
+      "B_rc_refcell": "17203576457335438336",
+      "C_rc_makemut": "9997648724353765376"
+    },
+    {
+      "input": "adversarial-stride3.bin",
+      "c_R1": "0",
+      "c_R1h": "0",
+      "A_index_arena": "0",
+      "B_rc_refcell": "0",
+      "C_rc_makemut": "0"
+    },
+    {
+      "input": "degenerate.bin",
+      "c_R1": "15194016535539881984",
+      "c_R1h": "15194016535539881984",
+      "A_index_arena": "15194016535539881984",
+      "B_rc_refcell": "15194016535539881984",
+      "C_rc_makemut": "15194016535539881984"
+    },
+    {
+      "input": "large.bin",
+      "c_R1": "15925195548848871244",
+      "c_R1h": "15925195548848871244",
+      "A_index_arena": "15925195548848871244",
+      "B_rc_refcell": "15925195548848871244",
+      "C_rc_makemut": "15925195548848871244"
+    },
+    {
+      "input": "small.bin",
+      "c_R1": "3739266750910054865",
+      "c_R1h": "3739266750910054865",
+      "A_index_arena": "3739266750910054865",
+      "B_rc_refcell": "3739266750910054865",
+      "C_rc_makemut": "3739266750910054865"
+    }
+  ],
+  "rustc_errors": {
+    "Rc<Buf> write-through": {
+      "rc": 1,
+      "code": "E0594",
+      "first_line": "error[E0594]: cannot assign to data in an `Rc`"
+    },
+    "NEGATIVE CONTROL (Rc<i32>)": {
+      "rc": 1,
+      "code": "E0594",
+      "first_line": "error[E0594]: cannot assign to data in an `Rc`"
+    }
+  },
+  "error_code_distinguishes": false,
+  "problems": [],
+  "invariant": "Three safe-Rust ports of one kernel: the index arena (shipped R2) and `Rc<Buf>` + `Rc::make_mut` both reproduce c/kernel_hardened.c exactly, and `Rc<RefCell<Buf>>` reproduces c/kernel.c exactly -- so SAFE RUST EXPRESSES BOTH THE BUG AND THE REPAIR, and the difference between the last two is ONE TYPE. The rustc error for a write through a shared `Rc<Buf>` is recorded beside a negative control's, because a code that both produce says nothing about this pattern."
+}

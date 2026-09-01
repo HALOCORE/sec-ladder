@@ -1,0 +1,126 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p49-interned-pool/controls/no_share_break.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p49-interned-pool/inputs/gen.py": "d55ecd27225aafcef6e4b029ba9ca7db3e9e68d31eca5685dc46e2f4b2cda221",
+    "patterns/p49-interned-pool/model.py": "354c7fb92556b31b01aee9765072ef5d8403858eca6b24ddaf373cec29f439bb",
+    "patterns/p49-interned-pool/controls/no_share_break.py": "c196c0095feff1afe596f22c933638fe78941d3ae2f68090ad49d593957f9e35"
+  },
+  "measured_utc": "2026-09-01T08:39:53Z",
+  "rows": [
+    {
+      "input": "adversarial-cascade.bin",
+      "stride": 22,
+      "n_blob": 22,
+      "nwin": 1,
+      "define": 4,
+      "break": 1,
+      "read": 4,
+      "guard_true": 1,
+      "guard_false": 0,
+      "adversarial": true
+    },
+    {
+      "input": "adversarial-cowfull.bin",
+      "stride": 30,
+      "n_blob": 30,
+      "nwin": 1,
+      "define": 10,
+      "break": 1,
+      "read": 2,
+      "guard_true": 1,
+      "guard_false": 0,
+      "adversarial": true
+    },
+    {
+      "input": "adversarial-many.bin",
+      "stride": 48,
+      "n_blob": 48,
+      "nwin": 1,
+      "define": 12,
+      "break": 4,
+      "read": 6,
+      "guard_true": 3,
+      "guard_false": 1,
+      "adversarial": true
+    },
+    {
+      "input": "adversarial-rehash.bin",
+      "stride": 18,
+      "n_blob": 18,
+      "nwin": 1,
+      "define": 3,
+      "break": 1,
+      "read": 3,
+      "guard_true": 1,
+      "guard_false": 0,
+      "adversarial": true
+    },
+    {
+      "input": "adversarial-share.bin",
+      "stride": 16,
+      "n_blob": 16,
+      "nwin": 1,
+      "define": 2,
+      "break": 1,
+      "read": 3,
+      "guard_true": 1,
+      "guard_false": 0,
+      "adversarial": true
+    },
+    {
+      "input": "adversarial-stride3.bin",
+      "stride": 3,
+      "n_blob": 30,
+      "nwin": 0,
+      "define": 0,
+      "break": 0,
+      "read": 0,
+      "guard_true": 0,
+      "guard_false": 0,
+      "adversarial": true
+    },
+    {
+      "input": "degenerate.bin",
+      "stride": 48,
+      "n_blob": 48,
+      "nwin": 1,
+      "define": 16,
+      "break": 3,
+      "read": 3,
+      "guard_true": 0,
+      "guard_false": 2,
+      "adversarial": false
+    },
+    {
+      "input": "large.bin",
+      "stride": 244,
+      "n_blob": 15616,
+      "nwin": 64,
+      "define": 4239,
+      "break": 1437,
+      "read": 2004,
+      "guard_true": 0,
+      "guard_false": 1437,
+      "adversarial": false
+    },
+    {
+      "input": "small.bin",
+      "stride": 52,
+      "n_blob": 416,
+      "nwin": 8,
+      "define": 112,
+      "break": 34,
+      "read": 46,
+      "guard_true": 0,
+      "guard_false": 34,
+      "adversarial": false
+    }
+  ],
+  "guard_true_matrix": 0,
+  "guard_false_matrix": 1473,
+  "guard_true_adversarial": 7,
+  "problems": [],
+  "invariant": "Every non-adversarial blob evaluates the copy-on-write guard at least once and with the answer FALSE every time; every adversarial blob except adversarial-stride3.bin evaluates it TRUE at least once. The first half is what makes R1 and R1h agree on every matrix input; the second is what stops the first from being vacuous; and the 'at least once' is what distinguishes p49's non-zero benign gradient from p34's 0.00."
+}

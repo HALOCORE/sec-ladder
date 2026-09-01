@@ -1,0 +1,227 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p49-interned-pool/controls/rust_bug.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p49-interned-pool/safe_naive.rs": "cf83ed1be8e3532c8ced73d9f661e2186dd5a5424ed5404b747610775fbdbbed",
+    "patterns/p49-interned-pool/unsafe.rs": "ca5b9c62b745e83f1c2537680f03af82515004ed5f42ece7aebe9350974ece97",
+    "patterns/p49-interned-pool/c/kernel.c": "3ec9aad07719288fc89d3f50e6a5361dccb886b86c3fa2c29bbe15e587e0cb5d",
+    "patterns/p49-interned-pool/inputs/gen.py": "d55ecd27225aafcef6e4b029ba9ca7db3e9e68d31eca5685dc46e2f4b2cda221",
+    "patterns/p49-interned-pool/controls/rust_bug.py": "445163c0e5a2341d29b11d3727eb5f59c5ad0e744f5baf178a821335c86dfd80"
+  },
+  "measured_utc": "2026-09-01T08:40:17Z",
+  "unsafe_tokens_in_safe_bug_arm": 0,
+  "answers": [
+    {
+      "input": "adversarial-cascade.bin",
+      "c_kernel_c": "8653438269484025856",
+      "safe_bug": "8653438269484025856",
+      "unsafe_bug": "8653438269484025856"
+    },
+    {
+      "input": "adversarial-cowfull.bin",
+      "c_kernel_c": "8897935692788144128",
+      "safe_bug": "8897935692788144128",
+      "unsafe_bug": "8897935692788144128"
+    },
+    {
+      "input": "adversarial-many.bin",
+      "c_kernel_c": "10636248267475679232",
+      "safe_bug": "10636248267475679232",
+      "unsafe_bug": "10636248267475679232"
+    },
+    {
+      "input": "adversarial-rehash.bin",
+      "c_kernel_c": "14042888476904305664",
+      "safe_bug": "14042888476904305664",
+      "unsafe_bug": "14042888476904305664"
+    },
+    {
+      "input": "adversarial-share.bin",
+      "c_kernel_c": "17203576457335438336",
+      "safe_bug": "17203576457335438336",
+      "unsafe_bug": "17203576457335438336"
+    },
+    {
+      "input": "adversarial-stride3.bin",
+      "c_kernel_c": "0",
+      "safe_bug": "0",
+      "unsafe_bug": "0"
+    },
+    {
+      "input": "degenerate.bin",
+      "c_kernel_c": "15194016535539881984",
+      "safe_bug": "15194016535539881984",
+      "unsafe_bug": "15194016535539881984"
+    },
+    {
+      "input": "large.bin",
+      "c_kernel_c": "15925195548848871244",
+      "safe_bug": "15925195548848871244",
+      "unsafe_bug": "15925195548848871244"
+    },
+    {
+      "input": "small.bin",
+      "c_kernel_c": "3739266750910054865",
+      "safe_bug": "3739266750910054865",
+      "unsafe_bug": "3739266750910054865"
+    }
+  ],
+  "miri": [
+    {
+      "arm": "arm_miri_ctl.rs",
+      "input": null,
+      "rc": 1,
+      "ub": true,
+      "stdout": "",
+      "first_error": "error: Undefined Behavior: `assume` called with `false`"
+    },
+    {
+      "arm": "arm_safe_bug.rs",
+      "input": "adversarial-cascade.bin",
+      "rc": 0,
+      "ub": false,
+      "stdout": "7752583825816705664",
+      "first_error": ""
+    },
+    {
+      "arm": "arm_safe_bug.rs",
+      "input": "adversarial-cowfull.bin",
+      "rc": 0,
+      "ub": false,
+      "stdout": "9411437838521256832",
+      "first_error": ""
+    },
+    {
+      "arm": "arm_safe_bug.rs",
+      "input": "adversarial-many.bin",
+      "rc": 0,
+      "ub": false,
+      "stdout": "3108297833826711936",
+      "first_error": ""
+    },
+    {
+      "arm": "arm_safe_bug.rs",
+      "input": "adversarial-rehash.bin",
+      "rc": 0,
+      "ub": false,
+      "stdout": "12890945258073658944",
+      "first_error": ""
+    },
+    {
+      "arm": "arm_safe_bug.rs",
+      "input": "adversarial-share.bin",
+      "rc": 0,
+      "ub": false,
+      "stdout": "3791110708148515008",
+      "first_error": ""
+    },
+    {
+      "arm": "arm_safe_bug.rs",
+      "input": "adversarial-stride3.bin",
+      "rc": 0,
+      "ub": false,
+      "stdout": "0",
+      "first_error": ""
+    },
+    {
+      "arm": "arm_safe_bug.rs",
+      "input": "degenerate.bin",
+      "rc": 0,
+      "ub": false,
+      "stdout": "18178744829029223296",
+      "first_error": ""
+    },
+    {
+      "arm": "arm_safe_bug.rs",
+      "input": "large.bin",
+      "rc": 0,
+      "ub": false,
+      "stdout": "4836818177774165017",
+      "first_error": ""
+    },
+    {
+      "arm": "arm_safe_bug.rs",
+      "input": "small.bin",
+      "rc": 0,
+      "ub": false,
+      "stdout": "12652849267808107347",
+      "first_error": ""
+    },
+    {
+      "arm": "arm_unsafe_bug.rs",
+      "input": "adversarial-cascade.bin",
+      "rc": 0,
+      "ub": false,
+      "stdout": "7752583825816705664",
+      "first_error": ""
+    },
+    {
+      "arm": "arm_unsafe_bug.rs",
+      "input": "adversarial-cowfull.bin",
+      "rc": 0,
+      "ub": false,
+      "stdout": "9411437838521256832",
+      "first_error": ""
+    },
+    {
+      "arm": "arm_unsafe_bug.rs",
+      "input": "adversarial-many.bin",
+      "rc": 0,
+      "ub": false,
+      "stdout": "3108297833826711936",
+      "first_error": ""
+    },
+    {
+      "arm": "arm_unsafe_bug.rs",
+      "input": "adversarial-rehash.bin",
+      "rc": 0,
+      "ub": false,
+      "stdout": "12890945258073658944",
+      "first_error": ""
+    },
+    {
+      "arm": "arm_unsafe_bug.rs",
+      "input": "adversarial-share.bin",
+      "rc": 0,
+      "ub": false,
+      "stdout": "3791110708148515008",
+      "first_error": ""
+    },
+    {
+      "arm": "arm_unsafe_bug.rs",
+      "input": "adversarial-stride3.bin",
+      "rc": 0,
+      "ub": false,
+      "stdout": "0",
+      "first_error": ""
+    },
+    {
+      "arm": "arm_unsafe_bug.rs",
+      "input": "degenerate.bin",
+      "rc": 0,
+      "ub": false,
+      "stdout": "18178744829029223296",
+      "first_error": ""
+    },
+    {
+      "arm": "arm_unsafe_bug.rs",
+      "input": "large.bin",
+      "rc": 0,
+      "ub": false,
+      "stdout": "4836818177774165017",
+      "first_error": ""
+    },
+    {
+      "arm": "arm_unsafe_bug.rs",
+      "input": "small.bin",
+      "rc": 0,
+      "ub": false,
+      "stdout": "12652849267808107347",
+      "first_error": ""
+    }
+  ],
+  "miri_probe_iters": 4,
+  "problems": [],
+  "invariant": "Deleting the safety line from R2 (SAFE Rust, zero `unsafe` tokens) or from R4 reproduces c/kernel.c's answer exactly on every shipped input, and Miri reports NO undefined behaviour on either arm on any of them -- while reporting it immediately on a must-fire arm built and run the same way. p49's harm is invisible to Miri for the same reason it is invisible to ASan and UBSan: there is no undefined behaviour to see."
+}

@@ -1,0 +1,117 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p49-interned-pool/controls/threshold.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p49-interned-pool/model.py": "354c7fb92556b31b01aee9765072ef5d8403858eca6b24ddaf373cec29f439bb",
+    "patterns/p49-interned-pool/inputs/gen.py": "d55ecd27225aafcef6e4b029ba9ca7db3e9e68d31eca5685dc46e2f4b2cda221",
+    "patterns/p49-interned-pool/c/kernel.c": "3ec9aad07719288fc89d3f50e6a5361dccb886b86c3fa2c29bbe15e587e0cb5d",
+    "patterns/p49-interned-pool/c/kernel_hardened.c": "0a245f0715854acd17814a5802c8d2720f457816b65eec49bbba8608cfac0f29",
+    "patterns/p49-interned-pool/controls/threshold.py": "a944b2818d233a37ba88eb9f15c929f2b8151e3b3e883ac30e658b970205bff9"
+  },
+  "measured_utc": "2026-09-01T08:39:53Z",
+  "cross_check_windows": 78,
+  "seed": 4903,
+  "random_windows": 20000,
+  "configurations": {
+    "shipped   w = 1 + a % MAXW": {
+      "intern_branch": 90476,
+      "own_branch": 89409,
+      "dedup_hit": 9525,
+      "guard_true": 33373,
+      "guard_false": 64127,
+      "cow_refuse": 412,
+      "born_shared": 90222,
+      "born_owned": 87760,
+      "gf_born_owned": 48033,
+      "gf_after_cow": 16094,
+      "guard_evals": 97500,
+      "guard_true_pct": 34.23,
+      "guard_false_pct": 65.77,
+      "intern_pct": 50.3
+    },
+    "reduction w == 3 (K_CLEN)": {
+      "intern_branch": 180834,
+      "own_branch": 0,
+      "dedup_hit": 81624,
+      "guard_true": 65973,
+      "guard_false": 31527,
+      "cow_refuse": 0,
+      "born_shared": 177555,
+      "born_owned": 0,
+      "gf_born_owned": 0,
+      "gf_after_cow": 31527,
+      "guard_evals": 97500,
+      "guard_true_pct": 67.66,
+      "guard_false_pct": 32.34,
+      "intern_pct": 100.0
+    }
+  },
+  "shipped_blobs": [
+    {
+      "input": "adversarial-cascade.bin",
+      "nwin": 1,
+      "guard_true": 1,
+      "guard_false": 0,
+      "adversarial": true
+    },
+    {
+      "input": "adversarial-cowfull.bin",
+      "nwin": 1,
+      "guard_true": 1,
+      "guard_false": 0,
+      "adversarial": true
+    },
+    {
+      "input": "adversarial-many.bin",
+      "nwin": 1,
+      "guard_true": 3,
+      "guard_false": 1,
+      "adversarial": true
+    },
+    {
+      "input": "adversarial-rehash.bin",
+      "nwin": 1,
+      "guard_true": 1,
+      "guard_false": 0,
+      "adversarial": true
+    },
+    {
+      "input": "adversarial-share.bin",
+      "nwin": 1,
+      "guard_true": 1,
+      "guard_false": 0,
+      "adversarial": true
+    },
+    {
+      "input": "adversarial-stride3.bin",
+      "nwin": 0,
+      "guard_true": 0,
+      "guard_false": 0,
+      "adversarial": true
+    },
+    {
+      "input": "degenerate.bin",
+      "nwin": 1,
+      "guard_true": 0,
+      "guard_false": 2,
+      "adversarial": false
+    },
+    {
+      "input": "large.bin",
+      "nwin": 64,
+      "guard_true": 0,
+      "guard_false": 1437,
+      "adversarial": false
+    },
+    {
+      "input": "small.bin",
+      "nwin": 8,
+      "guard_true": 0,
+      "guard_false": 34,
+      "adversarial": false
+    }
+  ],
+  "problems": [],
+  "invariant": "The SHIPPED width rule takes BOTH branches of the INLINE_THRESHOLD and makes the copy-on-write guard take BOTH values; the reduction's constant width (K_CLEN 3) leaves one branch dead and the guard constantly TRUE, which is .memory/03-measurement.md entry 19. On the SHIPPED blobs the guard is evaluated on every BREAK and is FALSE on every matrix input and TRUE at least once on every adversarial one except adversarial-stride3.bin. \u26a0 The reduction's guard IS reachable in its false branch -- after an earlier copy-on-write -- so what the constant width kills is records BORN owned, not the branch. See the module docstring and .temp/t161/red_probe/probe.py."
+}

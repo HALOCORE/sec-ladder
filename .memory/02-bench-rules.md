@@ -1852,20 +1852,22 @@ resource / leak                         1   p42
 side channel                            1   p47
 UB that is not memory-unsafety          1   p18
 non-termination                         1   p22
-aliasing UB                             1   p08
+aliasing                                2   p08 p49
 calibration, no bug                     1   p01
 ```
 
-⚠ **15 of 32 spatial. A 16th spatial row makes the corpus worse, not better,
+⚠ **15 of 33 spatial. A 16th spatial row makes the corpus worse, not better,
 whatever it measures.** ⚠⚠ **THIS LINE READ *"15 of 26 spatial against ONE
 temporal and ONE type"* AND THE TEMPORAL HALF IS NOW STALE FIVE TIMES OVER — the
 C-side bar (finding 53) admitted seven rows and the temporal axis has gone
 `1 → 6` (`p27`, `p29` at `TASK_139`, `p32` at `TASK_144`, `p28` at `TASK_146`,
-`p34` at `TASK_154`, `p25` at `TASK_157`), with only the two CVEs admitted and
-unbuilt.**
+`p34` at `TASK_154`, `p25` at `TASK_157`), with the CVE corpus now closed too —
+`CVE-2022-40304` BUILT as `p49` at `TASK_161` and `CVE-2021-3518` REFUSED at
+`TASK_160` on C-side duplication of `p28`. ✅ **NOTHING ADMITTED REMAINS
+UNBUILT.**
 ✅✅ **AND THE TYPE AXIS NOW HAS TWO ROWS: `p35` LANDED AT `TASK_148`.**
 ⚠ **The spatial COUNT has not moved since the priority was set; the denominator
-has. That is the point of the decision, and it is now `15 / 32` rather than
+has. That is the point of the decision, and it is now `15 / 33` rather than
 `15 / 26`.**
 ⚠ **That matters more than the count: `results/SYNTHESIS.md` §7 says in terms
 that *"every claim this document makes about the type axis rests on ONE

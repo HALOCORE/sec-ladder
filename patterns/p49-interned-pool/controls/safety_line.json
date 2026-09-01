@@ -1,0 +1,51 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p49-interned-pool/controls/safety_line.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p49-interned-pool/c/kernel.c": "3ec9aad07719288fc89d3f50e6a5361dccb886b86c3fa2c29bbe15e587e0cb5d",
+    "patterns/p49-interned-pool/c/kernel_hardened.c": "0a245f0715854acd17814a5802c8d2720f457816b65eec49bbba8608cfac0f29",
+    "patterns/p49-interned-pool/c/kernel.h": "35bdbc0098675fa47fc2a2a8fee3820bdd4390a2cb724f673b9e40876f8ce6d1",
+    "patterns/p49-interned-pool/controls/safety_line.py": "d948016e667e31b47079074f73cd7ceb43eb8d26e9b8416ceedb40ea89e9c6ad"
+  },
+  "measured_utc": "2026-09-01T08:39:51Z",
+  "preprocessed_lines": {
+    "kernel.c": 229,
+    "kernel_hardened.c": 243
+  },
+  "added": [
+    "uint8_t c, a, key, w, j;",
+    "if (rshd[t]) {",
+    "if (pbump + rlen[t] > 64u) {",
+    "v = 251u;",
+    "} else {",
+    "for (j = 0; j < rlen[t]; j++)",
+    "mem[pbump + j] = mem[roff[t] + j];",
+    "roff[t] = (uint8_t)pbump;",
+    "rshd[t] = 0;",
+    "pbump = pbump + rlen[t];",
+    "mem[roff[t]] = 0;",
+    "v = 2;",
+    "}",
+    "} else {",
+    "mem[roff[t]] = 0;",
+    "v = 2;",
+    "}"
+  ],
+  "removed": [
+    "uint8_t c, a, key, w;",
+    "mem[roff[t]] = 0;",
+    "v = 2;"
+  ],
+  "guard_sites": {
+    "kernel.c": 0,
+    "kernel_hardened.c": 1
+  },
+  "write_sites": {
+    "kernel.c": 1,
+    "kernel_hardened.c": 2
+  },
+  "identical_outside_the_break_arm": true,
+  "problems": [],
+  "invariant": "The preprocessed difference between the two shipped C rungs is the copy-on-write block at the ONE site where the cycle-breaker writes; nothing is deleted (the two removed lines are re-indented into the block's inner `else`, and the one further `-`/`+` pair is the copy loop's index declaration); the ownership test appears exactly once in the hardened rung and never in the buggy one; the write itself appears in BOTH; and with the block removed the two files are statement-identical. The line COUNTS are printed and recorded, never pinned in spec.md."
+}

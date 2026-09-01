@@ -1,0 +1,147 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns/p49-interned-pool/controls/proof_mutants.py"
+  },
+  "derived_from_sha256": {
+    "patterns/p49-interned-pool/verus.rs": "04a9c54a63b97d4b67a96fa6c607baf77c4c111b43600ddbe81328f8319295ea",
+    "patterns/p49-interned-pool/controls/proof_mutants.py": "ec7d25b64acfa612425b9c835bf68fdadb89dfca028f9653687c8fcef2b0206c"
+  },
+  "measured_utc": "2026-09-01T08:43:49Z",
+  "rlimit": [
+    "--rlimit",
+    "200"
+  ],
+  "mutants": [
+    {
+      "mutant": "M0-control",
+      "kind": "control",
+      "expected": "verify",
+      "got": "verify",
+      "ok": true,
+      "verified": 34,
+      "errors": 0,
+      "rc": 0,
+      "error_kinds": [],
+      "why": "the shipped file, run through the same harness and the same flags. If this does not verify, nothing below means anything."
+    },
+    {
+      "mutant": "M1-safety-line",
+      "kind": "attack",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 33,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 1 previous error",
+        "while loop: Resource limit (rlimit) exceeded; consider rerun"
+      ],
+      "why": "THE ATTACK ARM, and it is the row's bug exactly: delete the copy-on-write block from the exec code and nothing else. What survives is `c/kernel.c` -- a kernel that writes through a buffer another record owns. It must FAIL, and it does. \u26a0\u26a0 **WHAT IT FAILS ON IS NOT ESTABLISHED HERE, AND AN EARLIER DRAFT OF THIS TEXT CLAIMED IT WAS.** At `--rlimit 200` the diagnostic is `while loop: Resource limit (rlimit) exceeded` on the kernel's own op loop -- the solver runs out of budget before it can name a failing clause -- and a probe at `--rlimit 4000` was still running after about twenty-five minutes and was terminated without an answer (`.temp/t161/m1_rlimit4000.log`). **So what is measured is that the file does not verify, and nothing finer.** \u26a0 What IS established elsewhere is the contrast this arm is for: X1 fails with a FUNCTIONAL diagnostic and X3 with a memory-safety-shaped one, so a battery that read M1's rlimit message as *the postcondition failed* would be reading a statement about the solver's SEARCH as a statement about the proof. \u26a0 And note what the MUTANT does not do -- undefined behaviour. Every index it forms is still in range, which is why ASan, UBSan and Miri are all silent on the shipped bug."
+    },
+    {
+      "mutant": "M2-constant-body",
+      "kind": "vacuity",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 31,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 1 previous error; 1 warning emitted",
+        "postcondition not satisfied"
+      ],
+      "why": "`.memory/04-verus.md`'s vacuity probe in its sharp form -- **what is the CHEAPEST body that satisfies the postcondition?** `TASK_137` discharged `TASK_136`'s ARM_C with `fn arm_c() -> u8 { 9 }`. Here the cheapest body is `return 0;` and it must FAIL, because `intern_fold` is a function of the window bytes and no constant equals it."
+    },
+    {
+      "mutant": "M3-spec-weaken",
+      "kind": "must-verify",
+      "expected": "verify",
+      "got": "verify",
+      "ok": true,
+      "verified": 34,
+      "errors": 0,
+      "rc": 0,
+      "error_kinds": [],
+      "why": "\u26a0\u26a0\u26a0 **THE ARM THAT IS SUPPOSED TO VERIFY.** Delete the copy-on-write from the exec code AND from `step`, so the specification describes the BUGGY kernel. It verifies. **That is the honest statement of what this R5 buys**: the safety line is load-bearing against the SPECIFICATION and against nothing else, because p49 allocates nothing and has no linear resource whose consumption could force it. Compare p29, whose `live[cur] = 0` cannot be deleted at any price. `p32` is the precedent and `p42` the one before it. \u26a0 Read it with X1 below: M1, X1 and M3 are three cells of ONE experiment and M3 alone is an assertion."
+    },
+    {
+      "mutant": "X1-spec-only-weaken",
+      "kind": "attack",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 33,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 2 previous errors",
+        "assertion failed"
+      ],
+      "why": "\u26a0\u26a0 **THE THIRD CELL, and it is what turns M3 from an assertion into a result.** Delete the copy-on-write from the abstract machine `step` ONLY, leaving the exec code intact -- a postcondition true of the WRONG program. It must FAIL. With M1 (exec only -> fail) and M3 (both -> verify) that gives EXEC-ONLY FAIL / SPEC-ONLY FAIL / BOTH VERIFY, which is the difference between *the proof does not care about the safety line* -- false -- and *the safety line is load-bearing against the specification and against nothing else* -- true. \u2705 **Measured diagnostic, and it is the FUNCTIONAL one**: `assertion failed` on `st_out =~= step(st_in, c, a).0` and on `v == step(st_in, c, a).1`, both inside the op loop's proof block -- the exec state stops being what the weakened machine says it is."
+    },
+    {
+      "mutant": "X2-provenance-invariant",
+      "kind": "deletion",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 33,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 2 previous errors",
+        "postcondition not satisfied"
+      ],
+      "why": "\u26a0\u26a0 **THIS ROW'S OWN ARM.** Delete `wf_prov`'s clause that a SHARED record's content lies wholly inside the interning arena. Nothing then discharges `copy_bytes`'s `src + w <= dst`, so the copy-on-write loses its licence. It must FAIL -- and it fails on the MEMORY-SAFETY facts rather than on the answer. **That is what makes the disjointness obligation real rather than decorative**, and `TASK_160` \u00a78 predicted that nothing in this tree states one. \u2705 **Measured diagnostic, and it is NOT the one this arm was written expecting**: the failure lands on `lemma_rec_in_pool`'s OWN postconditions -- `roff[t] + rlen[t] <= MEM` and `rshd[t] == 1 ==> roff[t] + rlen[t] <= ARENA` -- rather than on `copy_bytes`'s precondition at the call site. That is the same fact one step earlier: the lemma is where those two memory-safety facts are DERIVED from `wf_prov`, so deleting the clause stops them being derivable before any caller gets to ask. \u26a0 **It therefore does NOT, on its own, demonstrate that `copy_bytes`'s precondition becomes undischargeable** -- X3 is the arm that shows that, from the other side."
+    },
+    {
+      "mutant": "X3-copy-disjointness",
+      "kind": "deletion",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 33,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 1 previous error",
+        "invariant not satisfied before loop"
+      ],
+      "why": "the same obligation from the other side: delete `src + w <= dst` from `copy_bytes`'s own `requires`, leaving `dst + w <= MEM`. The body can then no longer show that the byte it reads out of the pool it is writing to is the byte the specification names -- `lemma_copied_below` needs `0 <= i < dst`. It must FAIL. \u2705 **Measured diagnostic**: `invariant not satisfied before loop` on `src + w <= dst` -- the copy loop's own invariant, which the deleted precondition was the only thing establishing. \u26a0 Together with X2 this is the pair `.memory/04-verus.md` asks for: the precondition demands something, and something has to discharge it -- X3 shows the demand is real, X2 shows the discharge is."
+    },
+    {
+      "mutant": "M4-lemma-rec-in-pool",
+      "kind": "must-verify",
+      "expected": "verify",
+      "got": "verify",
+      "ok": true,
+      "verified": 34,
+      "errors": 0,
+      "rc": 0,
+      "error_kinds": [],
+      "why": "\u26a0\u26a0 **AN ARM THAT IS SUPPOSED TO VERIFY, AND IT SURPRISED THIS FILE'S AUTHOR.** Delete BOTH `lemma_rec_in_pool` calls -- the BREAK arm's and the READ arm's. It VERIFIES, so the lemma is NOT load-bearing in the shipped file: it is a solver HINT. The arm was written expecting `fail` and the run said `verify`, which is recorded here rather than quietly relaxed. **The reason is M5**: two independent edits cure the same solver blow-up and the shipped file carries BOTH, so neither is necessary given the other."
+    },
+    {
+      "mutant": "M5-both-hints",
+      "kind": "attack",
+      "expected": "fail",
+      "got": "fail",
+      "ok": true,
+      "verified": 33,
+      "errors": 1,
+      "rc": 1,
+      "error_kinds": [
+        "aborting due to 1 previous error",
+        "while loop: Resource limit (rlimit) exceeded; consider rerun"
+      ],
+      "why": "\u26a0\u26a0\u26a0 **THE ARM THAT MAKES M4 A RESULT, AND IT IS THIS ROW'S VERUS FINDING.** Delete the `lemma_rec_in_pool` calls AND respell `lemma_find`'s second `ensures` from TWO CLAUSES back to ONE clause joined by `&&` -- semantically the same postcondition. It FAILS, with `while loop: Resource limit (rlimit) exceeded` on the kernel's own op loop. **So `A && B` in one `ensures` clause and `A`, `B` as two clauses are NOT the same thing for the solver**, and either that respelling or the lemma is enough on its own. \u26a0 The first complete verus.rs had the merged spelling and no lemma, and reported exactly this error at the DEFAULT budget; at `--rlimit 400` the real gap appeared (`fold_bytes`'s `base + w <= MEM`, undischarged on the READ path). **The rlimit message is a diagnostic about the solver's SEARCH, not about the proof's difficulty**, and reading it as the latter would have sent this build down a much longer road. ../NOTES.md 8c."
+    }
+  ],
+  "invariant": "The ATTACK arm (M1, the shipped bug) and the VACUITY arm (M2, a constant body) both FAIL. The SPEC-WEAKEN arm (M3) VERIFIES, and that is the finding rather than a defect: p49's safety line is load-bearing against the specification alone, because the pattern allocates nothing and has no linear resource to consume. THE THREE-CELL FORM IS WHAT MAKES THAT A RESULT: M1 exec-only FAIL, X1 spec-only FAIL, M3 both VERIFY. X2 and X3 are this row's own pair, on the DISJOINTNESS precondition `copy_bytes` carries and `wf_prov` discharges: both FAIL, X3 on the copy loop's own `src + w <= dst` invariant and X2 on the two memory-safety postconditions lemma_rec_in_pool exports. M4 VERIFIES and M5 FAILS: two independent edits -- the lemma_rec_in_pool calls, and spelling lemma_find's second ensures as TWO clauses instead of one `&&`-joined clause -- each cure the same solver blow-up, so neither is necessary given the other and the shipped file carries both.",
+  "summary": {
+    "n": 9,
+    "as_expected": 9
+  }
+}
