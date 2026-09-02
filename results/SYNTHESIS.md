@@ -1,10 +1,16 @@
-# What 26 kernels say about the cost of memory safety
+# What 33 kernels say about the cost of memory safety
 
 *A cross-pattern synthesis of `sec-ladder`. Written at TASK_108 against 26 built
 patterns and (at the time) 39 recorded findings; reviewed at TASK_111 and corrected at
 TASK_112, which restored nine reviewed results the first pass had dropped and
 fixed two blockers, nine majors and twelve minors. §7 says which, and which way
 they pointed.*
+
+⚠⚠ **This file said "26 kernels" for 58 tasks after the tree passed 26, and the
+count was the smaller half of the problem: the four Results had never been
+RE-DERIVED against the rows that landed after them. They have been now
+(`TASK_166`), and the out-of-sample verdicts are in §0.** ⚠ **The title changed
+because the analysed set did — not because the corpus grew.**
 
 > **This file is the argument. `results/synthesis.md` (lower case) is the
 > numbers** — the kernel-exclusive `Ir` matrix, every pair difference with its
@@ -30,22 +36,38 @@ inline modes, gated, and reviewed adversarially; nineteen published claims were
 retracted along the way, and **the retraction list is the most transferable
 thing the project produced** (§6).
 
-⚠ **A NOTE ON THE COUNT, so the title and the corpus can be reconciled.** The
-four Results below were drawn from **26** kernels. **SEVEN more have landed since
-and NOT ONE is folded into Results 1–4 or into the idiom census, which genuinely
-ran over 26**: `p29` (BST delete, `TASK_139`), `p32` (free-list pool,
+⚠⚠⚠ **THE OUT-OF-SAMPLE TEST, AND IT IS THE MOST INFORMATIVE THING IN THIS
+FILE.** The four Results below were drawn from **26** kernels. **SEVEN more
+landed afterwards** — `p29` (BST delete, `TASK_139`), `p32` (free-list pool,
 `TASK_144`), `p28` (intrusive lists, `TASK_146`), `p35` (tagged union,
 `TASK_148`), `p34` (reference counting, `TASK_154`), `p25` (`realloc` growth,
-`TASK_157`) and `p49` (interned pool / `CVE-2022-40304`, `TASK_161`). They appear
-in §7, where they change the corpus composition — **the temporal axis goes from
-one row to SIX, the TYPE axis from one to TWO, and the ALIASING axis from one to
-TWO.** ⚠⚠ **This sentence has said *"two more"*, *"FOUR more"* and *"FIVE
-more"*; each was already stale when written down. It is now wrong FIVE times,
-and the lesson is not that the number keeps changing — it is that a
-HAND-MAINTAINED COUNT INSIDE A DOCUMENT WHOSE NEIGHBOURS ARE GENERATED will
-always lose the race. ✅ DERIVE IT: `ls -d patterns/p*/ | wc -l` and
-`harness/tools/composition.py`.** **Where this document says "26 kernels" it
-means the analysed set, and that is the honest scope; the tree has 33.**
+`TASK_157`) and `p49` (interned pool / `CVE-2022-40304`, `TASK_161`) — and for
+**58 tasks** they were folded into **no Result at all**: derived at `TASK_166`,
+they appeared **ZERO** times in §1, §2, §3, §4 **and** §6.
+
+**`TASK_166` re-derived every Result against all 33. The verdicts:**
+
+| | out of sample |
+|---|---|
+| **Result 1** (§2) — the tax is a property of a *pair of spellings* | ✅ **SURVIVES**, three numbers move, and it gains a **structural** caveat that is bigger than the numbers |
+| **Result 2** (§3) — where safe Rust does not help | ✅ **SURVIVES, and it is the one that GROWS** — the temporal axis went `1 → 6` and the six **disagree** |
+| **Result 3** (§4) — a proof discharges what it says; `obligations` is a size proxy | ✅ **SURVIVES, STRENGTHENED** — both correlations rise on the two largest proofs in the tree |
+| **Result 4** (§5) — what the instrument can price | ⚠ **SCOPE ONLY. The `6.00 Ir` type law is STILL A ONE-ROW LAW** — `p35` sits beside it and does **not** corroborate it (measured) |
+| the `ptr_offset` census (§7) | ✅ **SURVIVES**, and its `p` improves ~5× |
+| the Rust-rung control arm (§7) | ✅ **SURVIVES** — `129/58/0 → 166/85/0`, the `0` by two independent methods |
+
+⚠⚠ **NOTHING FELL, AND THAT IS NOT AS REASSURING AS IT READS.** Additivity
+extrapolation — the only other out-of-sample test this project has run — **did**
+fail once, on `p38`. What did fall here is a *manager* hypothesis about why the
+new rows behave differently, refuted on all three of its arms, and a published
+*justification* for a band constant that turned out never to have reproduced.
+**Both are in `RECAP` finding 64, and neither is a Result.**
+
+⚠⚠ **This paragraph has said *"two more"*, *"FOUR more"* and *"FIVE more"*;
+each was already stale when written down. The lesson is not that the number keeps
+changing — it is that a HAND-MAINTAINED COUNT INSIDE A DOCUMENT WHOSE NEIGHBOURS
+ARE GENERATED will always lose the race. ✅ DERIVE IT:
+`ls -d patterns/p*/ | wc -l` and `harness/tools/composition.py`.**
 ✅✅ **AND THE BUILD PROGRAMME IS NOW COMPLETE: every admitted candidate is
 either built or refused on C-side duplication, and NOTHING ADMITTED REMAINS
 UNBUILT** (`p49` closed it at `TASK_163`; `CVE-2021-3518` was refused at
@@ -80,7 +102,7 @@ in what enforces memory safety:
 | **R1** | C | idiomatic C99, no bounds checks, *including* the bug class the pattern models |
 | **R2** | safe Rust, naive | the mechanical port: `for i in 0..n { v[i] }`. Zero `unsafe` |
 | **R3** | safe Rust, tuned | same semantics, rewritten to help LLVM elide checks: iterators, reslicing, `chunks_exact`, hoisted assertions. Still zero `unsafe` |
-| **R4** | unsafe Rust | `get_unchecked`, raw pointers. ⚠ **Not "correct, just unverified": at this pin an R4 must have a byte-identical R5 twin that Verus verifies** — `identity: exact` on 25 of 26 patterns and `norel` on the 26th |
+| **R4** | unsafe Rust | `get_unchecked`, raw pointers. ⚠ **Not "correct, just unverified": at this pin an R4 must have a byte-identical R5 twin that Verus verifies** — `identity: exact` on **28 of 33** patterns and `norel` on **five** (`p25 p28 p29 p34 p36`) — ⚠ **and `norel` is LINK LAYOUT, not a semantic difference: on `p28`'s pair, 69 of 71 differing disassembly lines are objdump printing a different ABSOLUTE target for an IDENTICAL encoded field, and the two real byte differences are `lea`s to the same address, differing by the `0x20` shift between the kernels. ZERO `call` instructions differ** |
 | **R5** | unsafe Rust + Verus | R4's executable code, plus specifications and proofs discharging every unsafe precondition |
 
 ⚠⚠ **That R4 row is a constraint, not a definition, and it governs every
@@ -124,7 +146,7 @@ the one pattern whose kernel *is* a call. A pattern with no libc calls is not
 therefore safe to difference. `results/synthesis.md` §2 prints
 both and tags every row with a **licence** saying whether the two cells dispatch
 the same work outside the kernel. A row tagged `NOT-LIC` is *known* to be wrong
-as a kernel-exclusive difference. Four of the 26 `R3−R4` rows are not licensed.
+as a kernel-exclusive difference. ⚠⚠ **TEN of the 33 `R3−R4` rows are not licensed, and the growth is the finding: it was FOUR of 26 (15%) and is now TEN of 33 (30%), with SIX OF THE SEVEN NEWEST ROWS IN IT** (`p25 p28 p29 p34 p35 p49`; only `p32` is licensed). **So §2's apparatus structurally cannot see most of the recent corpus** — see §2's structural caveat. ✅ **And the licence is static multiset SYMMETRY, not "does the kernel call out": `p35` and `p49` are unlicensed with kernels that call NOTHING, while `p08` is LICENSED at `5409.88 Ir`/call outward** (`TASK_166`).
 
 **gcc's column carries a mitigation clang's does not.** gcc on this box defaults
 to `-fcf-protection=full`, so every gcc-compiled function opens with an
@@ -138,12 +160,15 @@ attributing any gcc-vs-clang gap to codegen** — including the `+5` (gcc) versu
 `+12` (clang) hardening figures below, which are safe only because each is a
 difference taken *within* one compiler.
 
-**The gate.** `harness/check.py` is an 8 434-line adversarial checker each pattern
+**The gate.** `harness/check.py` is a **10 048**-line adversarial checker each pattern
 must pass: rung equivalence on committed inputs against an independent Python
 model, sanitizer and Miri rows, Verus obligation counts, byte-level identity
 between R4 and R5, and a hashed contract in the pattern's `spec.md` naming the
-tokens each rung must spell. The tree today is 24 `PASS` + 2
-`PASS-WITH-BLOCKED-ROWS`, 0 failures, 52 measurement records with 0 stale.
+tokens each rung must spell. The tree today is **30 `PASS` + 3
+`PASS-WITH-BLOCKED-ROWS`**, 0 failures, and `measure.py --check-stale` reports
+**66 examined, 0 STALE** — ⚠ **that is gate PLUS measurement records; there are
+33 of each, and a commit message has already misread it as 66 measurement
+records.**
 
 **The contract, and why it exists.** Early on the project published *"safe Rust
 beats unsafe Rust"* three times and retracted it three times, each time because
@@ -164,24 +189,41 @@ a pinned vstd. §7 says what that costs you.
 
 ### The distribution
 
-Over the 22 patterns whose `R3−R4` row is licensed for differencing
+⚠⚠⚠ **READ THIS BEFORE THE DISTRIBUTION, BECAUSE IT BOUNDS EVERY NUMBER IN
+§2.** The buckets below are over the rows this convention is *licensed* to
+difference, and **that set has not kept up with the corpus**: it was **22 of 26
+(85%)** and is **23 of 33 (70%)**. **Six of the seven rows that landed after the
+first version of this document are NOT LICENSED** — `p25 p28 p29 p34 p35 p49` —
+so §2's apparatus **structurally cannot see them**. `p32` is the only one it can
+price, and it enters below. ⚠ **That is not a gap somebody forgot to fill: the
+licence is a disassembly property, and a row is unlicensed because the two cells
+dispatch different work outside the kernel symbol.** ✅ **The honest reading is
+that as the corpus moved off the bounds-check family, the fraction of it this
+Result can speak about fell by half.**
+
+Over the **23** patterns whose `R3−R4` row is licensed for differencing
 (`results/synthesis.md` §2; re-derivable with `python3 synthesis/census.py`,
 which reads that one committed file), **shipped spellings**, `-O3 isolated`,
 kernel-exclusive `Ir` per call:
 
-- **9 of 22** sit within **±32 `Ir` per call on both blobs** — p01, p02, p04,
+- **9 of 23** sit within **±32 `Ir` per call on both blobs** — p01, p02, p04,
   p08, p12, p17, p18, p22, p38. Flat in the size of the data, not a percentage.
-- **4 of 22** are **negative on both blobs** — p10, p13, p18, p46: safe Rust is
+- **4 of 23** are **negative on both blobs** — p10, p13, p18, p46: safe Rust is
   *cheaper* than the unsafe rung. Three of the four have been investigated
   (p10, p13, p46) and in each, **none of the margin is safety**; p18's search
   state is undeclared.
-- **9 of 22** exceed 100 `Ir` per call on at least one blob — p03, p05, p06,
-  p07, p09, p14, p19, p23, p47. These are the interesting ones, and the table
-  below says what each is actually paying for.
+- **10 of 23** exceed 100 `Ir` per call on at least one blob — p03, p05, p06,
+  p07, p09, p14, p19, p23, **p32**, p47. These are the interesting ones, and the
+  table below says what each is actually paying for.
 
-⚠ **`9 + 4 + 9 = 22` is a coincidence, not a partition.** **p18** is in two
-buckets (within ±32 *and* negative on both) and **p16** (`27 / 77`) is in none.
-The sum landing exactly on the row count is what makes that easy to miss.
+⚠ **`9 + 4 + 9 = 22` was a coincidence, not a partition, and the out-of-sample
+row broke the coincidence rather than the result.** **p18** is in two buckets
+(within ±32 *and* negative on both) and **p16** (`27 / 77`) is in none — so at 23
+rows the sum is `9 + 4 + 10 = 23` for the same two offsetting reasons. **The sum
+landing on the row count is an accident and always was.**
+✅ **`p32` is the single new entrant and it joins the `>100` bucket — a TEMPORAL
+row, in a distribution assembled almost entirely from the bounds-check
+family.**
 
 ⚠⚠ **AND THE WORD "SHIPPED" IN THAT HEADER IS DOING MORE WORK THAN A READER
 WILL GIVE IT. Four of the 22 rows have a measured, verifying, in-contract
@@ -222,18 +264,26 @@ blobs" is true; "flat in the size of the data" is what a reader takes from the
 bucket, and for p17 that is the retracted sentence.
 
 **Always quote R3.** The naive rung R2 is dearer than the tuned one by a median
-of **7.26×** across the 17 licensed rows whose `R3 − R4` is positive on `large`
-(p05 is the 9th of 17), running from **−1.37×** (p47) to **3 536×** (p08, a
-`memmove` idiom R2's indexing defeats) with 3 323× on p04. ⚠ **Three of the
-seventeen are not overstatements at all** — p47 (−1.37×), p09 (0.74×) and p14
-(0.86×) have R2 *cheaper* than R3, and on p09 that is the documented
-reslice/load-merge hazard rather than noise. ⚠ **The `1.05×` low this document
+of **6.75×** across the **18** licensed rows whose `R3 − R4` is positive on
+`large` (p05 is the 10th of 18), running from **−1.37×** (p47) to **3 536×**
+(p08, a `memmove` idiom R2's indexing defeats) with 3 323× on p04.
+⚠ **This read `7.26×` over 17 rows until `TASK_166`; the row that moved it is
+`p32` entering at `0.83×`, and it is a TEMPORAL row.** ⚠ **FOUR of the
+eighteen are not overstatements at all** — p47 (−1.37×), p09 (0.74×),
+**p32 (0.83×)** and p14 (0.86×) have R2 *cheaper* than R3, and on p09 that is the
+documented reslice/load-merge hazard rather than noise.
+✅ **R2-is-dearer-than-R3 is a bounds-check-family property, and the row that
+weakened it came from outside that family.** ⚠ **The `1.05×` low this document
 used to print is p27**, a `NOT-LIC` row this section's own licence rule
 excludes — the range and the median were being taken over two different
 populations. ✅ **And the median is the robust half of this, measured**: apply
 all four searched R4s from the table above and p22's own ratio collapses from
 1 033× to **2.02×** while p12 and p13 enter the population, and the median does
-not move — still **7.26×**, now the 10th of 19. **Quote the median, not the
+not move — still **6.75×**, now the 11th of 20.
+⚠⚠ **THAT ROBUSTNESS PROPERTY IS WHAT THE PARAGRAPH IS ACTUALLY ABOUT, AND IT
+SURVIVED THE OUT-OF-SAMPLE TEST WHILE THE VALUE DID NOT.** The median moved 7%
+between corpora and remains **identical across the shipped and substituted arms**
+in both. **Quote the invariance, not the number.** **Quote the median, not the
 range**, and do not quote any single row's ratio without its search state. What
 survives: a benchmark that ships R2 as "safe Rust" is not measuring safety, it
 is measuring whether anyone tuned it.
@@ -464,9 +514,10 @@ callgrind's caller→callee edges, not read off that column.
 **Two caveats, and they are different things.** The first is *search depth*:
 `R3 − R4` differences two rungs **searched to wildly different depths**, and
 every time a side has been searched properly the number moved a long way. In
-`results/synthesis.md` §2's own search-state column, **14 of 26 patterns print
-`undeclared`**, three more owe a span, and **nine** report a real search on at
-least one side. Of the nine: p10's −323/−603 became −129/−241 against a
+`results/synthesis.md` §2's own search-state column, **14 of 33 patterns print
+`undeclared`**, three more owe a span, and **19** report a real search or a
+reviewed declaration of *no* search on at least one side. ⚠ **The 14 are the same
+14 as at 26 patterns, and §7 records why that coincidence is not reassuring.** Of the nine: p10's −323/−603 became −129/−241 against a
 verifying R4 candidate; p13's −177/−1054 became +44/+77, a sign flip; p12's
 −26.00 became +66.00, another; p22's `+2.00` became `+125/+1021`; p17's
 `+32/+32` has an in-contract R3 respelling at **−19.00** flat; p36 refuses to
@@ -530,6 +581,21 @@ not better; only R5 sees it.** Stated at its honest width: *nothing on this
 ladder emits the capacity check — five rungs write it by hand*, and the bounded
 spelling that terminates is measurably a **different function**.
 
+**The bug is a write through a pointer the program does not own — and NOTHING
+sees it.** `p49` ports `CVE-2022-40304`: an interning pool deduplicates records,
+so two records legitimately share one buffer, and the bug is that a later write
+goes **through** the shared pointer. ⚠⚠ **Every index is in bounds, nothing is
+allocated, nothing is freed, and the C is CORRECT C — the aliasing is the
+CONTRACT, not the defect.** **216 sanitizer cells and 18 Miri cells produce
+`0` diagnostics**, so **the checksum is the only instrument on the row**, and its
+positive controls are the only thing separating *silent* from *not linked in*.
+⚠ **This is the exact inverse of `p34`, which has a cell where the checksums
+agree bit-for-bit and ASan is the only discriminator — the two rows bracket
+*which instrument sees the harm* from both ends, and neither could have been
+written without the other.** ⚠ **It is the second `aliasing` row and the first
+with no UB at all**, which is a different claim from `p08`'s overlapping
+`memcpy` (UB, C11 7.24.2.1p2).
+
 **The bug is in the trace, not the value.** p47, constant-time compare. Take the
 verified rung and add an early exit: `14 verified, 0 errors`, the kernel's
 obligation count **unchanged**, identical checksums on all 32 cells, and
@@ -549,6 +615,33 @@ nothing for the guarantee to attach to. Under `#![forbid(unsafe_code)]`, zero
 double-free yields two aliased handles — both silently wrong, both **Miri-clean
 in all three modes**. A generation tag does **not** rescue it, because the bump
 is a hand-written second store: exactly the one C omits.
+
+⚠⚠⚠ **THAT RULE HAD ONE DEMONSTRATION WHEN IT WAS WRITTEN. IT NOW HAS SIX ROWS
+UNDER IT AND THEY DO NOT ALL SAY THE SAME THING — WHICH IS THE MOST INFORMATIVE
+THING THIS AXIS PRODUCED, AND IT LIVED ONLY IN §7 UNTIL NOW.**
+The temporal axis went from **one row to six** (`p25 p27 p28 p29 p32 p34`), and
+what safe Rust does with the bug **is a property of the STRUCTURE, not of Rust**:
+
+| row | what the safe rung does with the C bug |
+|---|---|
+| **`p32`** (free-list pool) | **reproduces it BIT FOR BIT on 10 of 10 cells** — the type system is silent |
+| **`p28`** (intrusive lists) | **cannot reproduce it AT ALL**, and for a structural reason: eviction order and chain order agree, so the stale entries form a suffix a walk never reaches. Never UB, never silently wrong |
+| **`p34`** (reference counting) | **BOTH, in one kernel, selected by the storage representation** — the `Rc` port **cannot compile** the bug, while a safe index-arena port under `forbid(unsafe_code)` reproduces the buggy C **bit for bit on 8/8 inputs**, recycle divergence included |
+| **`p35`** (tagged union, `type` axis) | **BOTH, split between RUNGS** — the harm reproduces bit-for-bit in the unsafe *and* the safe `from_bits` arms with Miri silent, while the shipped `enum` rungs cannot express it at all |
+
+⚠ **So the representation safe Rust FORCES on you either preserves the harm
+exactly or removes its mechanism along with the pointers.** ✅ **`p34` is the
+cleanest confirmation of the rule in the tree, because it shows the guarantee's
+PRESENCE and ABSENCE side by side in one kernel** — a guarantee about the
+allocator, and a structure recycling its own storage getting none.
+⚠⚠ **What does NOT generalise is the proof-side analogue.** *"Nothing linear
+forces the safety conjunct, so the spec-weaken arm verifies"* is **`p32`'s
+property, not a law** — `p35`'s equivalent arm FAILS at `wf_cells`.
+⚠ **And the axis that separates the six is the REPAIR SITE, not the bug class:**
+`p27`/`p29`/`p32` fix the **READ**, `p28` the **DESTROY**, `p34` the
+**ACQUIRE** (an unbounded distance from the harm, and its read path is correct
+*by construction* because a refcounted pointer is valid by definition), and
+`p49` the **WRITE-THROUGH**.
 
 **One safe spelling leaks where an equally safe one does not, and there is no C
 side to compare it against.** ⚠ PROVISIONAL, from a refused row: `Rc` in both
@@ -619,7 +712,8 @@ ships labelled a *demonstration kernel* rather than a claim about prevalent code
 sentence is *"the UB is not a speed win"*, not *"safety is free here"*.
 
 ⚠ **The count, said plainly, because the shape of this section is itself a
-finding.** Seven entries above where the safe rungs buy nothing, one measured
+finding.** **Eight** entries above where the safe rungs buy nothing (`p49` is the
+newest and it is the one where *no detector* buys anything either), one measured
 case where they buy the whole bug, and two wins with no cost axis at all. That
 ratio is a property of *which patterns were built* — the catalogue was written
 around bug classes a five-rung ladder can price, and a bug class safety prevents
@@ -654,9 +748,10 @@ CHOSEN by the porter, and only the first is a result.**
 
 ### What a proof costs: zero
 
-**`R5 − R4 = 0.00` on 26 of 26 patterns × both blobs** (`results/synthesis.md`
-§2). ⚠ Do not cite that column as the evidence: at `-O3` the gate pins
-`identity: unsafe ≡ verus, exact` on 25 patterns, meaning the machine code is
+**`R5 − R4 = 0.00` on 33 of 33 patterns × both blobs** (`results/synthesis.md`
+§2, re-derived at `TASK_166`). ⚠ Do not cite that column as the evidence: at
+`-O3` the gate pins `identity: unsafe ≡ verus, exact` on **28** patterns
+(`norel` on five), meaning the machine code is
 byte-identical, so the `Ir` zero is *entailed* and is a tautology. **The evidence
 is the raw-byte digest**, checked at both optimisation levels since the pilot.
 
@@ -767,9 +862,27 @@ count closes. Only a textual pin in the pattern's contract catches its removal.
 
 ### The trusted base is the number to look at, and it needs prose beside it
 
-Across all 26 patterns: **108 trusted items, 230 trusted lines, 0 pattern-local
+Across all 33 patterns: **152 trusted items, 333 trusted lines, 0 pattern-local
 axioms** (`results/synthesis.md` §3, counted as distinct `(source, name, line)`
-triples, not as a column sum). Four things a reader must know before using that:
+triples, not as a column sum).
+
+⚠⚠⚠ **THAT `0` WAS FALSE ON TEN ROWS AND IS NOW REPORTED BESIDE THE COUNT.**
+(`TASK_165` MAJOR 1, landed `TASK_166`.) **Ten of the 33 patterns carry a
+hand-written, pattern-local `global` directive** — `global layout` on
+`p28 p29 p34`, `global size_of` on `p10 p19 p22 p36 p38 p46 p47` — and the Verus
+guide describes the construct as *"exporting the **axioms**"*. The `axioms`
+column counts five body-less forms and **not** this sixth, so the column reads
+`0` while ten authors wrote one. ⚠ **The gloss *"a `0` says this pattern's author
+wrote none of their own"* was the falsehood, not the count.**
+✅ **What keeps the `0` defensible as a COUNT: rustc const-evaluates a `global`
+and rejects a false one — measured on twelve probes, including a
+never-constructed type, `--crate-type=lib`, a generic instantiation, a type
+alias and a `#[path]`-included module, all `error[E0080]` — so it is not
+*"trusted and checked by nothing"* the way the other five are.** ⚠ **But it is
+hand-written, pattern-local, and Verus proves things from it, so it is now
+reported in its own column rather than being invisible.**
+
+Four things a reader must know before using that:
 
 - **A `0` in the axiom column does not mean the tree rests on no hand-written
   axiom.** All 26 verified sources carry `broadcast use`, and
@@ -819,6 +932,16 @@ dispute below as a gap somebody still needs to fill with a better law.**
 **`p38` prices a type-based aliasing property at exactly `6.00 Ir`/call** — five
 independent one-line fixes agreeing to the unit, **none of them a compare or a
 branch, and one of them a compiler flag** (`patterns/p38-alias-pun/NOTES.md`).
+
+⚠⚠⚠ **AND THAT `6.00` IS STILL A ONE-ROW LAW AT 33 PATTERNS. `p35` DOES NOT
+CORROBORATE IT.** The `type` axis now has two rows, and the obvious inference —
+*"so the one-row law has a second row"* — is **wrong, and it is wrong on a C-side
+measurement rather than an argument**: `p38` harms in **1 of 4** (compiler ×
+level) C cells (gcc `-O3` only; **correct** at `-O0`, and never on clang), while
+`p35` harms **identically in all 4**. **They are not the same phenomenon, so
+`p35` sits beside the law rather than under it** (`TASK_166` item G, re-measured
+by running the binaries). ⚠ **A second row on an AXIS is not a second row under a
+LAW, and this is the place that distinction cost the most to get right.**
 ⚠ **And the counterexample is inside TASK_102's own report, which lists
 *"`p06`'s division instead of a compare"* sixty-four lines after asserting the
 fourteen are "all compare-and-branch".** **The IF half is unsupported:** two of
@@ -842,8 +965,13 @@ from. At the kernel boundary a real pattern would draw, the mechanism costs
 `+208` bytes and `+329.00 Ir`/call — while `obligations` reads `5` for a
 DEAD-CODE arm against `4` for the MECHANISM arm.** ⚠ **`obligations` is
 `verified` out of the gate record, i.e. a count of SMT query units — one per
-function body, one per loop — and across the built tree it correlates `0.894`
-with syntactic size and `0.795` with `verus.rs` source lines.** ⚠⚠ **The
+function body, one per loop — and across the built tree it correlates **`0.920`**
+with syntactic size and **`0.805`** with `verus.rs` source lines.**
+⚠ **Those read `0.894` and `0.795` at 26 patterns; re-derived at 33 (`TASK_166`)
+they both RISE, on a corpus that added the two largest proofs in the tree, with
+two independent parsers agreeing. "Syntactic size" is
+`(exec_fn − tcb_items) + proof_fn + loops`.** ✅ **This is the one Result the
+out-of-sample rows made STRONGER.** ⚠⚠ **The
 operational test, and it is cheap enough to apply to any column before quoting
 it: a column's SPELLING SPREAD against its PRESENCE GAP. `Ir` measures
 `8519 : 1` — invariant under re-spelling, moving under presence.
@@ -952,7 +1080,7 @@ is a trap in the apparatus, they are transferable to any benchmark of this shape
 and collecting them in one place is deliberate — the alternative is scattering one
 coherent result across twenty-six unrelated pattern write-ups.
 
-**1. Search both sides, or you are publishing search effort.** Five patterns
+**1. Search both sides, or you are publishing search effort.** **Seven** patterns
 published a headline in the *flattering* direction and passed a fully green gate
 doing it. p10: *"safe Rust cheaper than unsafe"*, of which 60% was an unsearched
 unsafe side. p38: `+21/+25` published against a true `+24/+32`. p22: **`+2.00`
@@ -962,6 +1090,20 @@ carefully, left the safe side one lever, and that lever moved the safe side the
 wrong way — published `+15.00 flat`, and the review's first in-contract respelling
 made it `+7`. **Count the levers on each side and name the weaker-searched
 endpoint. A difference is only as honest as its weaker endpoint.**
+
+⚠⚠ **THIS SAID *"FIVE"* UNTIL `TASK_166` AND THE TWO IT WAS MISSING CARRY THE
+LESSON, NOT THE COUNT.** **`p35` is the sixth** — and the first caught by a
+review the manager pointed at it **on purpose**; it also adds a failure mode none
+of the first five had, because **its `R3−R4` REVERSES BETWEEN OPTIMISATION
+LEVELS** (the same levers are `−373.61` at `-O3` and `+6035.46` at `-O0`), so
+naming the level is not a footnote. **`p34` is the seventh and is the first
+caught by the ENGINEER'S OWN CONTROL before any review saw it**
+(`controls/spellings.py`): the shipped-pair gap at `-O0` was overstated by
+**2.88×/3.36×** once both sides were searched, while at `-O3` the shipped pair
+really is the cheapest found.
+✅ **The trend is the finding: `p38` disclosed after review → `p22` before being
+asked → `p36` CHANGED WHICH RUNG SHIPS → `p34` shipped a control that makes the
+search RE-DERIVABLE instead of a paragraph claiming it happened.**
 
 **2. Your out-of-sample test is probably fake, in one of two ways.** *Fake by
 residue*: p23 produced **three mutually inconsistent "exact" laws, each with zero
@@ -1176,13 +1318,19 @@ is `0` of the built tree's 255 bound sites. It occurs in all 22 programs, ranks
 second or third in 15 of them, and its share runs 0.4 %–26.1 % with a median of
 6.9 %.** **Every built kernel indexes; none walks.** ⚠ **Confirmed by three
 independent instruments, including a classifier-free regex that returns `0`
-across all 26 kernels.**
+across all 26 kernels — ⚠ **re-run at 33 (`TASK_166`): all four guard variants unchanged, `0` over 33 `kernel.c` and `0` over 131 `c/*.{c,h}`.**
 
 ⚠⚠ **TWO CAVEATS THAT BELONG WITH THE NUMBER, both from the review (TASK_131).**
 *(1)* **`0 of 255` is not 255 independent draws: the sites sit in 30
 site-carrying functions across 26 files cloned from one template. Size-matched
 to the ladder's own function-size distribution, the honest figure at the function
 unit is `p ≈ 0.06` against the largest corpus — suggestive, not decisive.**
+⚠⚠ **RE-DERIVED AT 33 (`TASK_166`) AND IT IS `0 of 464` SITES IN 40 FUNCTIONS,
+WITH `p = 0.0123` — about 5× stronger.** ⚠ **So this caveat needed
+RE-COMPUTING, not re-wording**, and the manager had reported the instrument
+unrecoverable; it exists, and it reproduces the published `255`/`30`/`26`
+exactly as a control before giving the 33-pattern figure. ⚠ **It still lives in
+gitignored `.temp/`** — `RECAP` queue item 36.
 *(2)* ⚠ **An earlier draft of this paragraph said `ptr_offset` was a top-3
 operator in *every* one of the 22 programs. It is 15 of 22; seven put it fourth.**
 
@@ -1223,10 +1371,19 @@ PLAINLY: ACROSS ALL 26 PATTERNS AND EVERY ADVERSARIAL INPUT, THE FOUR RUST RUNGS
 HAVE NEVER ONCE DISAGREED WITH EACH OTHER.**
 
 ```
-129  adversarial (pattern, input) pairs in results/gate/*.json
- 58  with ANY cell divergence
+166  adversarial (pattern, input) pairs in results/gate/*.json   (129 at 26)
+ 85  with ANY cell divergence                                     ( 58 at 26)
   0  where safe_naive / safe_tuned / unsafe / verus differ from one another
 ```
+
+✅ **Re-derived at 33 patterns by TWO independent methods, and the `0` is
+method-independent.** ⚠⚠ **But the committed instrument that produced the first
+two figures is WRONG and the number to publish is `85`, not the `83` it prints:**
+`.temp/t124/A/rung_split_census.py` assigns `by[inp][rung]` **inside** its loop
+over runs, so **only the LAST run per `(input, rung)` survives**, and the two
+rows it drops are `p38 adversarial-{huge,oob}.bin` — **the one row in the tree
+whose harm is selected by optimisation LEVEL**, i.e. exactly the row a
+last-run-wins reduction is guaranteed to mangle.
 
 **Every behavioural divergence in this tree is among the C variants.** ✅ **It is
 the cheapest check in the project — one pass over committed gate records, no
@@ -1241,7 +1398,8 @@ was refused.**
 enough"* — WAS TESTED AND IS WRONG, and the reason is worth more than the
 census.** **13 449 fresh candidate inputs across all 26 patterns produced 600
 rung splits and STILL ZERO Rust-rung splits, and so did the same corpus built
-with `debug-assertions=ON`.** **The cause is in the contracts:** `requires` is a
+with `debug-assertions=ON`.** ⚠ **The fuzz half is the 26-pattern figure and has
+NOT been re-run at 33; the gate-record half above has, and is still `0`.** **The cause is in the contracts:** `requires` is a
 **length** bound in **26 of 26 patterns and never mentions buffer CONTENTS**,
 `ensures` is a single **total** value clause, and the pinned driver loop makes
 the window bound a **theorem**. **So an adversarial input can only change bytes
@@ -1264,9 +1422,19 @@ being re-aimed. **`p42` carries 10 adversarial inputs of which 7 are zero-call.*
 **Those inputs are doing no work, and no per-pattern number in this document
 would have shown it.**
 
-**Structural gaps.** The unsafe side is unsearched on most patterns: **14 of 26**
-print `undeclared` in the search-state column and **nine** report a real search on
-at least one side. There is **no cross-pattern wall-clock column**, because the
+**Structural gaps.** The unsafe side is unsearched on most patterns: **14 of 33**
+print `undeclared` in the search-state column and **19** report a real search or a
+reviewed declaration of *no* search on at least one side.
+⚠⚠ **THAT `14` IS THE SAME FOURTEEN AS AT 26 PATTERNS, AND THE COINCIDENCE HID A
+DEFECT.** The column is a **hand-maintained dict inside a generated file**
+(`synthesize.py::SEARCH_REVIEWED`), `undeclared` has never meant *"nobody
+searched"* — only *"nobody wrote an entry"* — and at `TASK_166` **all seven new
+rows were printing `undeclared` while four of them had a reviewed search**,
+including `p34`, which searched both sides and **shipped the control that proves
+it**. ⚠ **The obvious detector does not work either: `p49` ships a
+`controls/spellings.py` and its `undeclared` was RIGHT** (that control is a
+repair-site control, not a rung search). ⚠⚠ **And the fourteen that remain have
+never been audited the way the seven just were** — `RECAP` queue item 35. There is **no cross-pattern wall-clock column**, because the
 timing floor is a per-session property and these measurements span 22 sessions.
 And the whole kernel-exclusive matrix speaks for one inline mode: of 414 `-O3`
 whole-mode cell/input pairs, 394 have no kernel symbol at all — the kernel
@@ -1298,9 +1466,10 @@ record on the pass that found this — so the only check for it is to ask, of a
 finished document, which way its gaps point.**
 
 **What the corpus is made of, and it bounds the generality more than the
-toolchain pin does.** ⚠ **This paragraph said *"the 28 kernels"*; the tree
-is now 30 — run `harness/tools/composition.py` rather than trusting any
-count printed here.** They classify, by the safety line each one's
+toolchain pin does.** ⚠ **This paragraph has said *"the 28 kernels"* and then
+*"30"*; the tree is **33** — run `harness/tools/composition.py` rather than
+trusting any count printed here, which is why the table below is derived and
+drift-checked by that script rather than typed.** They classify, by the safety line each one's
 `c/kernel.c` omits, like this — derived and drift-checked by that script:
 
 ```
@@ -1347,10 +1516,14 @@ count unmoved** — the gate then fails only on a declaration the author writes.
 **The row ships the honest configuration with the gap as its result** (`p42`'s
 precedent), and **no `check.py` change was proposed.**
 
-✅ **The temporal axis has improved most of all — from ONE row to FIVE:** `p29`
+✅ **The temporal axis has improved most of all — from ONE row to SIX:** `p29`
 (BST delete, `TASK_139`), `p32` (free-list pool, `TASK_144`), `p28`
-(intrusive lists, `TASK_146`) and `p34` (reference counting, `TASK_154`) all
-joined `p27`. ⚠ **This paragraph said *"the one place this improved"* and named
+(intrusive lists, `TASK_146`), `p34` (reference counting, `TASK_154`) and
+**`p25` (`realloc` growth, `TASK_157`)** all joined `p27`.
+⚠ **This paragraph said FIVE while the composition table three paragraphs above
+it said SIX — the same file disagreeing with itself one section apart, and
+`p25` was the row it dropped.** ✅ **§3 now carries the axis's actual finding
+rather than leaving it here; this paragraph is the provenance.** ⚠ **This paragraph said *"the one place this improved"* and named
 only `p29`.** **The five are not the same shape**, and the differences are the
 point — **and the axis that separates them is the REPAIR SITE**: `p27`, `p29`
 and `p32` all keep a correct free discipline and put the missing check on the
@@ -1430,7 +1603,7 @@ census over 49,898 bound sites in 991,147 deduplicated lines of real C in 22
 programs (PHP 4.0.2, GNU coreutils, and upstream GNU packages) found
 `ptr_offset` — walking memory with a pointer cursor rather than an index — in
 **all 22 programs, ranking second or third in 15 of them**, share 0.4%–26.1%,
-median 6.9%. **It is zero in all 26 kernels here.** No kernel in this tree walks
+median 6.9%. **It is zero in all 33 kernels here — `0 of 464` sites in 40 functions, out of sample, all four guard variants** (`TASK_166`; it was `0 of 255` over 26). No kernel in this tree walks
 memory with a pointer cursor.
 
 ⚠ **Do not quote that zero as `0 of 255` and call it decisive.** The 255 sites
@@ -1455,9 +1628,17 @@ say which pair.**
 ---
 
 *Sources: `results/synthesis.md` (generated tables and provenance), `RECAP.md`
-findings 1–39, `.memory/01-ladder.md` (rung definitions and per-pattern
+findings 1–64, `.memory/01-ladder.md` (rung definitions and per-pattern
 findings, authoritative), `.memory/03-measurement.md` (measurement rules),
 `.memory/04-verus.md` (proof burden and trusted base), `.memory/06-catalogue.md`
 (the pattern catalogue and its refusals). Census counts and bucket lists in §2
 are re-derivable from a clone with `python3 synthesis/census.py`, which reads
-`results/synthesis.md` and nothing else.*
+`results/synthesis.md` and nothing else; the pointer-cursor zero with
+`python3 common/census/ptr_cursor_regex.py --ladder`; the callee oracle with
+`python3 synthesis/outward_ir.py --emit synthesis/outward_ir.json`.*
+
+⚠ **The out-of-sample re-derivation is `TASK_166`
+(`.tasks/TASK_166_REPORT.md`), and the manager's pre-task pass is
+`.temp/mgr164/NOTES.md`. `RECAP` finding 64 records what FELL: a manager
+hypothesis, on all three of its arms, and a published justification for a band
+constant that had never reproduced.**
