@@ -5781,9 +5781,29 @@ the number.** Two task files have already sent an agent to the wrong finding.
     `problems` given as a STRING must FAIL rather than read as "no problems".
     ⚠⚠ **THE ARM IS THE ENTIRE EVIDENCE: exposure today is ZERO** (35 CLEAN,
     11 NO-VERDICT, 0 FAILED across all 46), so a green sweep says nothing.
-    ⊘ **Four bespoke verdict shapes remain unread** (`arms_as_designed`,
-    `cells_ok`, `hardened_kernel_broke`, `unstable_cells`); the better repair is
-    generator-side, not a third convention in the gate.
+    ⚠⚠ **BESPOKE VERDICT SHAPES REMAIN UNREAD, AND *"FOUR"* WAS WRONG — IT IS
+    SEVEN SIDECARS AND SEVEN DISTINCT SPELLINGS** (`TASK_165` MAJOR 3;
+    manager-re-derived). The engineer named four and **`p29/arms.json`
+    (`asan_positive_control`, `compiler_warnings`) and
+    `p32/storage_arms.json` (`positive_control_dead_builds`) are named
+    nowhere**:
+
+    ```
+    p28/repro.json        unstable_cells
+    p29/arms.json         asan_positive_control, compiler_warnings
+    p32/forgeable.json    hardened_kernel_broke
+    p32/repro.json        unstable_cells
+    p32/storage_arms.json positive_control_dead_builds
+    p35/proof_mutants.json arms_as_designed
+    p35/union_oracle.json  cells_ok
+    ```
+
+    ⚠ **NONE of the seven carries a readable `problems` or `summary` beside it**,
+    so each is a control whose verdict the gate cannot see at all. ⚠⚠ **And the
+    proposed generator-side repair — have `p35`'s two emit `summary: {n,
+    as_expected}` — covers 2 of 7.** ✅ **Generator-side is still the right
+    shape** (a `controls/*.py` edit is a gate re-run and no re-measure); the
+    scope was under-counted by 3.5×.
 
     **(b) `global` directives are a sixth body-less trusted form
     `vparse.axiom_decls` could not see.** ⚠⚠⚠ **The manager published *"live on
@@ -5814,14 +5834,63 @@ the number.** Two task files have already sent an agent to the wrong finding.
     checks"* would be false) and because counting them there costs **10
     `contract_sha256` moves and a SECOND sweep**. **One line to reverse.**
 
+    ⚠⚠⚠ **REVIEWED AT `TASK_165` (MAJOR 1): THE DEVIATION *SURVIVES, NARROWED*,
+    AND THE NARROWING PUBLISHES A FALSEHOOD TODAY.** ✅ **The soundness half got
+    STRONGER**: the reviewer ran **eight** probes the engineer had not — a false
+    **`align`** (its own diagnostic; `TASK_164` only ever lied about *size*), a
+    generic instantiation, a type alias, a ghost-only use, and **a lie inside a
+    `#[path]`-included module** (`1 verified, 0 errors`, then `E0080`), which is
+    the vector with blast radius 33 because every `verus.rs` `#[path]`-includes
+    `common/driver.rs`. The `--cfg` attack is **inexpressible** (`global layout`
+    refuses a type declared outside `verus!`), and `global` outside `verus!` is a
+    syntax error. **Stage 5e's joint holds**: `check_verus_exit_codes` is called
+    unconditionally, no flag reaches a PASS with it skipped, and all five
+    `blocked` rows in the tree are `miri` or `twin`.
+    ⚠⚠ **BUT REASON 1 ANSWERS A QUESTION `verus.axioms` IS NOT ASKING.** The
+    *"axioms NOTHING checks"* caption is the **`tcb-axiom` shout**'s, where it is
+    correct. The **declared-count** caption is a different sentence, and its four
+    clauses — *"Verus does not prove it, adds no verified function, emits no
+    instructions, carries no `external_body`"* — are **all true of a `global`**.
+    The Verus guide says the directive *"exports the **axioms** … for use in
+    Verus proofs"*, and for `usize` it narrows `usize::MAX`.
+    ⚠⚠⚠ **THE CONSEQUENCE IS PUBLISHED: `results/synthesis.md` prints *"152
+    items (333 lines) and 0 axioms"* with `0` on ALL 33 ROWS, and
+    `synthesize.py`'s own prose says a `0` means *"this pattern's author wrote
+    none of their own"* — WHICH IS FALSE ON TEN ROWS**, on an axis `CLAUDE.md`
+    names.
+    ✅ **THE REVIEWER'S RECOMMENDATION, AND THE MANAGER TAKES IT — OPTION B, NOT
+    A SWEEP.** `synthesis/*.py` is in **neither digest**, so publishing
+    `global_decls` and rewriting that sentence costs a `synthesize.py` edit and
+    one run: **no gate, no re-measure.** ⚠ **Scheduled into the Results task,
+    which is already editing `synthesize.py` and regenerating `synthesis.md`.**
+    ⚠ **Full reversal (option A: 10 `contract_sha256` moves + a second sweep)
+    only if it can ride a sweep something else is running anyway — and nothing
+    scheduled is.**
+
     **(c) A FOURTH error in `.memory/03-measurement.md` entry 23, same shape as
     the first three: the null table MAXED OVER *INPUT*** — the fourth dimension
-    its own rule forbids. ✅ **Manager-re-derived.** Every printed figure was
+    its own rule forbids. ✅ **The four-axis table is manager-re-derived and
+    reproduces exactly** (`TASK_165` item 3 re-derived every tree-wide count
+    independently and found them exact). Every figure the OLD table printed was
     right and was the worst input, **but three of five rows have `0.00` on the
-    other input** (`p25` and `p42` are `0.00` on `small` in all four cells) and
-    ⚠ **`p11`'s `−494.00` is the `small` cell, not `large`.** Entry 23 now
-    carries the four-axis table. ⚠ **Three passes each removed one confound and
-    left the next; this is the fourth.**
+    other input** (`p25` is `0.00` on `small` in all four cells) and ⚠ **`p11`'s
+    `−494.00` is the `small` cell, not `large`.**
+
+    ⚠⚠⚠ **AND THIS BULLET SHIPPED A FIFTH ERROR, WHICH IS THE MANAGER'S AND IS
+    THE SHARPEST OF THE FIVE.** (`TASK_165` MAJOR 2.) It read *"`p25` **and
+    `p42`** are `0.00` on `small` in all four cells"*. **`p42`'s
+    `-O3/whole/small` is `-2.00`** (`unsafe` 1444, `verus` 1442) — **and the
+    four-axis table the manager had just written PRINTS `-2.00` IN THAT CELL,
+    eight lines above the sentence generalising it away.** ⚠⚠ **It was marked
+    `✅ manager-re-derived`, which is the one mark a reader is entitled to trust,
+    and it propagated report §4 → entry 23 → commit `8273bfd` → this bullet.**
+    ✅ **This is exactly what `TASK_165` item 5 existed to find, and it found
+    it.** ⚠ **The rule: a summary of a table you have just written is not
+    evidence — re-read the table.** **Corrected in entry 23 and here; the commit
+    message stands as written and is corrected by this line, the way `bb36e2f`'s
+    was.** ⚠ **Everything else in this finding checks out under review** — the
+    30-of-30 generators, the 0-of-46 self-pins, the 35/11/0 exposure, the whole
+    `global` half, and (d)'s confession.
 
     **(d) A cost rule nothing recorded: *"a `check.py` edit costs a re-gate and
     no re-measure"* is true and IS NOT THE WHOLE COST.** ✅ **3 of 46 sidecars
@@ -7315,6 +7384,42 @@ Both retired.
     ⚠ **Cost: it is a `check.py` edit, so it stales every gate record — a
     24-pattern sweep (~45 min) for a comment. BATCH IT** with "Owed" 0's sixth
     route, B5's remaining minors, and the `p09/spec.md` citations.
+
+31. ⚠ **`check_marginal_ir`'s DOCSTRING IS 250 LINES — 1.5× THE NEXT LONGEST IN
+    `check.py` (164)** — with the second mechanism starting at **60%** of it and
+    the operative rule (*cross-RUNG comparisons use `kernel_exclusive_ir`*) at
+    **87%**. (`TASK_165` MINOR 2.) ⚠⚠ **A warning nobody reaches is not a
+    warning**, and this one now documents two unrelated effects whose numbers
+    differ by 38×. ✅ **The repair is a four-line header at the top naming both
+    mechanisms and pointing at the two tables**, not a rewrite.
+    ⚠ **Cost: `check.py`, so a 33-pattern sweep. BATCH IT** — and note the
+    sweep now also owes **two `p35` control-generator re-runs**
+    (`.memory/05-layout.md`: 3 of 46 sidecars pin under `harness/`).
+
+32. ⚠ **`harness/tools/temp_citations.py --update` IS NOT A FREE PRUNE, AND THE
+    DEFAULT IS THE WRONG WAY.** (`TASK_165` item 6.) It currently reports **4
+    baseline entries "NO LONGER DANGLING"** (`.temp/p49ctl/{detectors,rust_bug,
+    safe_arms,spellings}`) and exits **0**, calling it *"not a failure"*.
+    ⚠⚠ **Pruning them is not safe: `bad = new or unclassified`, so the moment
+    that gitignored scratch is cleaned — which `CLAUDE.md` constraint 1 says to
+    do — the four come back as `new=4` and the check exits 1.** ✅ **Leaving
+    them is the right call and `TASK_164` was right not to run `--update`; what
+    is owed is that the reason be written down instead of rediscovered.**
+    **Decide, do not default.**
+
+33. ⚠ **`vparse`'s UNCLASSIFIED-`global` FALLBACK IS LINE-ANCHORED**, so an
+    unknown `global` form written on the same line as something else is
+    invisible, and the `_selftest` cell that guards it uses the **own-line**
+    spelling — i.e. the arm cannot see the gap. (`TASK_165` MINOR 3.)
+    **Prospective: no shipped source spells one.** ⚠ Same class as *"a check
+    that cannot fire"* (`.memory/03-measurement.md` entry 19), one level down.
+
+34. ⚠ **BOTH OF `TASK_164`'s MUST-FIRE ARMS SIT BEHIND `check_selftests`'
+    `fixture.ensure()` EARLY RETURN.** (`TASK_165` MINOR 4.) ✅ **It fails RED,
+    not falsely green** — a missing fixture is `rep.fail`, so the pattern cannot
+    PASS — **but the arms then never run**, so a run that is already failing for
+    a fixture reason says nothing about them. **Hygiene; note it where the arms
+    live.**
 
 ### Deferred with a stated reason
 

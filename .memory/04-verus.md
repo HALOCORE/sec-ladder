@@ -1925,3 +1925,80 @@ Verus's linear mode were both NAMED AND NOT BUILT.** The measured statement is:
   `PointsToRaw` / `PointsTo` directly — `p27`'s route, with no slice shortcut.
 - **No `size_of::<[T; N]>()` axiom**, which closes the cheap R5 route.
 - **`with_addr` and `addr` ARE specified; `add` and `offset` are NOT.**
+
+## ⚠⚠ A `global` DIRECTIVE IS A TRUSTED DECLARATION — AND rustc CATCHES A LIE EARLIER THAN THE VERUS GUIDE SAYS
+
+**`TASK_164` (engineer) extended by `TASK_165` (reviewer), twelve probes between
+them, all `./verus_run.py` single-file, no `--cargo` and no `--compile`.**
+
+`global layout T is size == N, align == M;` and `global size_of usize == 8;` are
+a **sixth body-less trusted form**. They live on **10 of 33** patterns —
+`global layout` on `p28 p29 p34`, `global size_of` on
+`p10 p19 p22 p36 p38 p46 p47` — and until `TASK_164` nothing in `harness/` even
+mentioned them. ⚠ **The gate now records them per file under
+`verus.<src>.global_decls`; `vparse.GLOBAL_KINDS` names the partition.**
+
+**What Verus does with a lie:**
+
+```
+false `global layout` (6-byte struct declared size == 24)
+    verification results:: 2 verified, 0 errors      <- Verus is satisfied
+    error[E0080]: evaluation panicked: does not have the expected size
+false `global size_of usize == 4`                      identical, to the character
+```
+
+⚠ **The claim is not ghost.** Both probes discharge
+`fn measured() -> (r: usize) ensures r == 24usize { core::mem::size_of::<S>() }`
+— a claim about a value the program computes **at run time** — because vstd
+specifies `core::mem::size_of` as `ensures u as nat == size_of::<V>()`
+(`vstd/layout.rs`). **Verus proves a falsehood about executed behaviour.**
+
+⚠⚠ **BUT NOTHING REACHES A RUNNING BINARY, AND THE GUIDE UNDERSTATES THIS.**
+`_VERUS_DOC_/guide/src/reference-global.md` says the static check *"only happens
+when codegen is run; an 'ordinary' verification pass will not perform this
+check"*. **On the pinned Verus that is too weak** — `E0080` is a **const-eval**
+error and it fires in a plain verify-only run. Vectors tried and all rejected:
+
+- `--crate-type=lib`, no `main`;
+- a type **nothing constructs and nothing mentions**;
+- a **ghost-only** use;
+- a **generic instantiation** and a **type alias**;
+- ⚠⚠ **a lie inside a `#[path]`-included module** — `1 verified, 0 errors`, then
+  `E0080` at the included file's own line. **This is the vector with blast
+  radius 33**, because every `verus.rs` `#[path]`-includes `common/driver.rs`.
+- ⚠ **A false `align` is const-checked too**, with its **own** diagnostic —
+  `TASK_164` only ever lied about *size*.
+- **The `--cfg` attack is inexpressible**: `global layout` refuses a type
+  declared outside `verus!`, and `global` outside `verus!` is a syntax error.
+
+✅ **AND THE GATE CATCHES IT — but state the MECHANISM, not the outcome
+(`PROTOCOL` rule 12).** ⚠⚠ **Stage `5e` is a *rustc-rejection* detector, not a
+`global` detector.** `check.py::_verus` flags *"summary parsed, `errors == 0`,
+`returncode != 0"* as an anomaly and `check_verus_exit_codes` turns it into a
+stage failure; it is called **unconditionally**, and no flag
+(`--no-build`/`--no-callgrind`/`--no-verus-mutants`/`--skip`/`--cells`) reaches a
+PASS with it skipped. **It catches a `global` lie because rustc rejects the
+file** — so it also catches anything else rustc rejects, and it would miss a
+trusted form rustc accepts. ⚠ **`TASK_156` minor 2's *"Verus reports `1
+verified, 0 errors` on a lie, so NO VERIFY-ONLY STAGE IS PROTECTED" is
+REFUTED** by driving the probes through `_verus` in process: 3 anomalies, 3
+stage-5e failures.
+
+⚠ **Two documentation facts worth having:** the Verus guide documents only the
+`global layout` spelling and **not** the `global size_of` one that **7 of the 10
+patterns use**; and neither spelling appears anywhere in `harness/` before
+`TASK_164`.
+
+⚠⚠ **OPEN, AND IT IS THE HALF THAT IS NOT ABOUT SOUNDNESS: `global` kinds are
+partitioned OUT of the `verus.axioms` DECLARED count** (`TASK_164`'s deliberate
+deviation, reviewed at `TASK_165` MAJOR 1 as *SURVIVES, NARROWED*). The
+`tcb-axiom` shout's caption — *"axioms NOTHING checks"* — is right to exclude
+them. **The declared-count caption is a different sentence, and its four clauses
+(*Verus does not prove it, adds no verified function, emits no instructions,
+carries no `external_body`*) are ALL TRUE of a `global`** — and the Verus guide
+itself says the directive *"exports the **axioms** … for use in Verus proofs"*.
+⚠⚠⚠ **The published consequence: `results/synthesis.md` prints `0 axioms` on
+all 33 rows and glosses `0` as *"this pattern's author wrote none of their
+own"*, which is FALSE ON TEN ROWS.** ✅ **The repair is `synthesis/`-only —
+neither digest reaches it — so it costs one `synthesize.py` edit and one run,
+no gate and no re-measure.**

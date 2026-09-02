@@ -3261,12 +3261,24 @@ already been struck.** Keep the list, not the ordinal.
     ```
 
     ⚠⚠ **THE INPUT AXIS IS NOT COSMETIC — ON THREE OF THE FIVE ROWS ONE INPUT IS
-    EXACTLY `0.00`.** `p25`'s and `p42`'s `small.bin` nulls are `0.00` in **all
-    four** cells, so *"`p25`'s null is 269.52"* is a `large.bin` statement;
+    EXACTLY `0.00`.** `p25`'s `small.bin` null is `0.00` in **all four** cells,
+    so *"`p25`'s null is 269.52"* is a `large.bin` statement;
     `p28`'s `O0/iso` is `+281.28` on `small` against `+1732.73` on `large`; and
     ⚠ **`p11`'s `-494.00` is the `SMALL` cell, not the large one** (`large` is
     `-166.00`), which is the one place the old table's implied input was also
     the wrong one. **State the input with the cell, always.**
+
+    ⚠⚠⚠ **AND THIS PARAGRAPH WAS ITSELF WRONG WHEN IT LANDED — THE FIFTH ERROR
+    IN THIS ENTRY'S LINEAGE AND THE FIRST TO CONTRADICT ITS OWN TABLE.**
+    (`TASK_165` MAJOR 2.) It read *"`p25`'s **and `p42`'s** `small.bin` nulls
+    are `0.00` in all four cells"*. **`p42`'s `-O3/whole/small` is `-2.00`**
+    (`unsafe` 1444 against `verus` 1442) — **and the four-axis table EIGHT LINES
+    ABOVE ALREADY PRINTS `-2.00` IN THAT CELL.** ⚠⚠ **The manager wrote a
+    summary sentence that contradicts the table directly above it, and marked it
+    `✅ manager-re-derived` in `RECAP` finding 63(c).** ⚠ **The mechanism is
+    `PROTOCOL` rule 13 operating INSIDE one entry: the table was derived and the
+    prose beside it was generalised from three rows to four.** ✅ **A summary of
+    a table you have just written is not evidence — re-read the table.**
 
     ✅ **Tree-wide at `-O3 isolated`, 66 `(pattern, input)` cells over 33
     patterns:** `|null| >= 2.00` in **8**, `1.00 <= |null| < 2.00` in **35** (34
