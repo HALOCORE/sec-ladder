@@ -169,6 +169,15 @@ context still applies — do not restart from scratch.
 
     Run it before every commit that cites a report. (`TASK_NNN.md` in this file is
     a placeholder and will always show up; ignore that one.)
+
+    ⚠⚠ **AND DO NOT "IMPROVE" THIS CHECK INTO A SCAN FOR TASK FILES WITH NO
+    `_REPORT.md` — THE MANAGER DID THAT AT `TASK_163` AND GOT 73 FALSE ALARMS.**
+    Early tasks pair `TASK_NNN.md` with **`TASK_NNN_REVIEW_REPORT.md`**, and
+    many produced no separate report file at all: there are **204** task files
+    against **135** reports, and that gap is history, not debt. ✅ **The check
+    above is the right one because it starts from what is CITED rather than from
+    a naming convention** — a citation that dangles is a real defect; a report
+    that was never written is not.
 11. **Never `git add -A` while a subagent is working.** Stage explicit paths.
     The manager did it at `e9d4271` and swept **23 files of an in-progress
     pattern** into a commit whose message is about something else entirely — so
