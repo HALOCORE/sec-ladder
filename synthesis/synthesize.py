@@ -213,6 +213,88 @@ SEARCH_REVIEWED = {
             ".memory/01-ladder.md finding 23 (p36): publishes +7.00 flat "
             "(fixed-R4 bound, cheapest R3 found) and +10.00 flat (matched "
             "pair), never a single number, and NO pair interval"),
+    # ---------------------------------------------------------------------
+    # ⚠⚠ TASK_166 item E. THE SEVEN ROWS ADDED AFTER TASK_112 ALL PRINTED
+    # `undeclared`, and the growth `14 of 26 -> 21 of 33` was ENTIRELY those
+    # seven -- the 14 old undeclared rows are exactly the published 14. Four
+    # of the seven had a REVIEWED search and no entry (`p25 p28 p34 p35`);
+    # three had a REVIEWED DECLARATION OF NO SEARCH (`p29 p32 p49`, listed in
+    # `SEARCH_NONE` below), which `undeclared` also fails to distinguish from
+    # "nobody wrote an entry". ⚠ **`p49` ships `controls/spellings.py` and it
+    # is NOT a rung-spelling search** -- it is the `cow`-vs-`provenance` REPAIR
+    # SITE control on the C kernel -- so inferring an entry from the presence
+    # of that filename would have produced a WRONG entry here.
+    "p25": ("the repair SITE searched (three); one respelling lever per READ "
+            "site measured EQUAL to the hundredth. R3/R4 rung spellings and "
+            "the GROWTH-site repair spelling still unsearched",
+            "`patterns/p25-realloc-growth/NOTES.md` §3c, REVIEWED at "
+            "TASK_158 §4b, which built a ternary spelling of R1h and a "
+            "`*(toks + curi)` spelling of `rederive` and found both equal to "
+            "their originals **to the hundredth at every cell** — so neither "
+            "shipped figure is a spelling artefact on that lever. ⚠ The file "
+            "names the weaker-searched endpoint itself: the spelling of the "
+            "GROWTH-site repair (`fixup2`) was not searched"),
+    "p28": ("R2-vs-R3 searched at review: the WALK HOIST is 72% of the gap, "
+            "and it is a FOURTH lever `safe_tuned.rs`'s own header omits",
+            "`patterns/p28-intrusive-lists/NOTES.md` §8, `TASK_149` "
+            "deliverable 4 (`.temp/t149/lever/`), resolved at TASK_150: three "
+            "variants, identical checksum on every probe, and un-hoisting the "
+            "walk recovers **72%** of the `R3 − R2` gap on `small.bin` and "
+            "57% on the GET-miss probe; on the TRIM path R3 is genuinely 5% "
+            "cheaper. ⚠ p28 publishes NO rung-to-rung cost (§8) and the "
+            "absence is declared, so this is a search result without a "
+            "published figure attached to it"),
+    "p34": ("BOTH sides searched, and the control caught a flattering-"
+            "direction headline BEFORE any review: the `-O0` shipped-pair gap "
+            "was 2.88×/3.36× too large",
+            "`patterns/p34-refcount-stack/NOTES.md` §5 and "
+            "`patterns/p34-refcount-stack/controls/spellings.py`, REVIEWED at "
+            "TASK_155: `r3_cursor`, `r4_checked` and `r4_readdirect` are "
+            "built by text substitution from the shipped rungs. `r4_readdirect` "
+            "ties the shipped R4 exactly at `-O3` and beats it by "
+            "116.13 / 611.10 at `-O0` **and verifies at the pinned obligation "
+            "count**, so p34 is the first pattern with more than one R4 "
+            "spelling SHOWN admissible and a measured R4-side width "
+            "(53.02 / 267.42 at `-O3`). The weaker-searched endpoint is named: "
+            "the C side, which had no spelling search at all"),
+    "p35": ("R4 searched at review: the SIGN REVERSES — matched on the "
+            "op-walk R4 WINS by 203.05 `Ir`/call (6.63%) on `large`",
+            "`patterns/p35-tagged-union/NOTES.md` §1(iii), TASK_152 M1 "
+            "(the first flattering-direction headline caught by a review "
+            "pointed at it on purpose) and the four-arm rig re-run at "
+            "TASK_153 (`.temp/t153/rig/measure_rig.py`) with both shipped "
+            "rungs as controls that reproduce `results/gate/` exactly. The "
+            "published `R3 − R4 = −170.56` is withdrawn; what the pin costs "
+            "R4 is **373.61 `Ir`/call (11.56%)**. ⚠ And the same pair of "
+            "levers is **−373.61 at `-O3` and +6035.46 at `-O0`**"),
+    "p29": ("⊘ NO SEARCH, declared — NEITHER side searched, and the row "
+            "publishes no rung-to-rung cost at all",
+            "`patterns/p29-bst-delete/NOTES.md` §8, REVIEWED at TASK_140: "
+            "*\"No cost axis is published … Neither side was searched. The "
+            "measurement record exists and the numbers are in it; nothing "
+            "here reads them.\"* ⚠ Three R4 spellings WERE built and counted "
+            "for the `-O0` **identity** question (§5) and none matches — that "
+            "is an identity search, not a cost search, and it licenses no "
+            "figure"),
+    "p32": ("⊘ NO SEARCH, declared — NEITHER side searched, no cost axis, and "
+            "the four unmeasured R2/R3 levers are named for the next task",
+            "`patterns/p32-free-list-pool/NOTES.md` §7, REVIEWED at TASK_145 "
+            "(verdict STANDS): *\"p32 SHIPS WITH NO COST AXIS. THE ABSENCE IS "
+            "DECLARED, NOT A MEASURED ZERO … That search was not done, on "
+            "either side.\"* The four levers left open are the flat "
+            "`[u8; 32]` pool vs `[[u8; 4]; 8]`, the NIL-sentinel register "
+            "pair vs `Option<(u8, u32)>`, re-widening `h as usize` per use, "
+            "and an `if` chain vs a `match`"),
+    "p49": ("⊘ NO R3-SIDE SPREAD — only ONE in-contract R3 spelling built, so "
+            "there is not even a second point to bound a spread with",
+            "`patterns/p49-interned-pool/NOTES.md` §5 and §10, REVIEWED at "
+            "TASK_162: the R2/R3 sign REVERSES with the level (R3 +27.05% at "
+            "`-O0`, −5.81%/−9.18% at `-O3`), and the file states that no "
+            "R3-side spread is published because a second spelling was never "
+            "built. ⚠⚠ **`patterns/p49-interned-pool/controls/spellings.py` "
+            "is NOT a rung-spelling search** — it is the `cow`-vs-"
+            "`provenance` REPAIR-SITE control on `c/kernel.c`, which is why "
+            "this entry does not claim one"),
     "p47": ("R4 searched, six levers",
             "`patterns/p47-ct-compare/NOTES.md` §8e, REVIEWED — \"Six R4 "
             "levers were built, each measured and put through "
@@ -224,11 +306,55 @@ SEARCH_REVIEWED = {
             "citation — not the figure — was what was wrong"),
 }
 
-# The two bands of the derived column, MEASURED rather than asserted
-# (`.temp/p76/derived_probe.py`, `.temp/p76/bands.txt`; see `CALLEE_NOTE`):
-#   |correction| <  FLOOR      120 rows, ALL spurious -- nothing real hides here
-#   FLOOR .. CONFIDENT          22 rows, 8 real / 14 spurious -- a coin flip
-#   |correction| >= CONFIDENT   34 rows, ALL real, smallest 17.00
+# ⚠ The entries above that record a REVIEWED DECLARATION OF *NO* SEARCH rather
+# than a search result.  `undeclared` cannot express the difference -- it means
+# "nobody wrote an entry" -- and three of the seven rows added at TASK_166 are
+# in this class, so the aggregate below is split rather than quoted as one
+# number.  Keeping it as an explicit set rather than sniffing the entry text is
+# deliberate: a prefix test is a hand-maintained convention inside a
+# hand-maintained dict, which is the defect this whole block exists to record.
+SEARCH_NONE = {"p29", "p32", "p49"}
+
+# The two bands of the derived column, MEASURED rather than asserted.
+#
+# ⚠⚠⚠ THE HEADLINE JUSTIFICATION FOR `FLOOR` -- *"2.00 is THE ONLY THRESHOLD
+# THAT MISSES NOTHING"* -- IS FALSE AGAINST THE COMMITTED TREE AND WAS FALSE
+# BEFORE THE SEVEN NEW ROWS LANDED.  Re-scored at TASK_166 (`.temp/t166/
+# bands33.py`, `.temp/t166/bands_subset.py`) with today's records and a
+# 33-pattern oracle, truth = `|moves_by| >= 5e-3`:
+#
+#   population        2.00 Ir            3.00 Ir            5.00 Ir
+#   TASK_076's 22     156 / 4 / 16       158 / 6 / 12       159 / 6 / 11
+#   SYNTHESIS's 26    188 / 4 / 16       190 / 6 / 12       191 / 6 / 11
+#   all 33            236 / 5 / 23       240 / 7 / 17       245 / 7 / 12
+#   published (22)    162 / 0 / 14       164 / 2 / 10       165 / 2 / 9
+#
+# The four misses present at EVERY population and EVERY threshold are `p03` and
+# `p04` `R3-R4` on both blobs: callgrind measures `-7.00` (the glibc `memset`
+# alignment tail) where the derived route computes EXACTLY `+0.00`, so no
+# positive floor can catch them.  The 33-population adds one more, `p34 large
+# R5-R4` (truth `+0.0065`, derived `-0.10`).  ⚠ The ORACLE did not move: the
+# committed 26-pattern sidecar and the TASK_166 re-emit agree on **0 of 208**
+# pair rows and **0 of 824** cell figures.  What moved is the DERIVED side --
+# the committed `marginal_ir_per_call` records -- and the table was never
+# re-scored after it did.
+#
+# ✅ NEITHER CONSTANT MOVES, and that is measured rather than assumed:
+#   * `FLOOR = 2.00` still MINIMISES misses (5 at 33) and has the fewest false
+#     alarms of every threshold that does (1.50 -> 5/24, 2.00 -> 5/23,
+#     2.50 -> 7/20).  Only a threshold at or below 0.10 catches `p34`, at
+#     98 false alarms.  The VALUE stands; the SENTENCE does not.
+#   * `CONFIDENT = 16.00`: the `>= CONFIDENT` band is **57 rows, 57 real, 0
+#     spurious, smallest |correction| 17.0027** -- the same 17.00 the 22-row
+#     fit found, with 23 more rows in it.
+#
+# The band populations at 33 (`.temp/t166/bands33.py`), against 22 published:
+#   |correction| <  FLOOR      175 rows, 5 REAL / 170 spurious   (was 120, 0 real)
+#   FLOOR .. CONFIDENT          32 rows, 9 real / 23 spurious    (was 22, 8/14)
+#   |correction| >= CONFIDENT   57 rows, ALL real, smallest 17.00 (was 34)
+# ⚠⚠ **THE LOW BAND IS NO LONGER EMPTY OF REAL CORRECTIONS** -- *"nothing real
+# hides here"* is now false on 5 rows, and `classify` returns `low` BEFORE it
+# consults the null, so those five are dropped silently rather than refused.
 FLOOR = 2.00
 CONFIDENT = 16.00
 
@@ -1085,11 +1211,15 @@ def main():
         w(f"⚠ **`synthesis/outward_ir.json` is absent, so the bands are "
           f"QUOTED and not recomputed.** Every corrected figure below is still "
           f"present — the derived column needs no sidecar at all. As last "
-          f"measured (TASK_076, 176 rows): `<{FLOOR:.2f}` **120 rows, 0 real**; "
-          f"`{FLOOR:.2f}–{CONFIDENT:.2f}` **22 rows, 8 real / 14 spurious**; "
-          f"`≥{CONFIDENT:.2f}` **34 rows, all real, smallest 17.00**. "
-          f"Re-emit the sidecar (`synthesis/outward_ir.py --emit`, ~4m40s) to "
-          f"make this line live again.")
+          f"measured (TASK_166, 33 patterns, 264 rows): `<{FLOOR:.2f}` "
+          f"**175 rows, 5 REAL / 170 spurious**; "
+          f"`{FLOOR:.2f}–{CONFIDENT:.2f}` **32 rows, 9 real / 23 spurious**; "
+          f"`≥{CONFIDENT:.2f}` **57 rows, all real, smallest 17.00**. "
+          f"⚠ The 22-pattern fit this line used to quote read "
+          f"`120 rows, 0 real` in the low band; **it is not 0 any more**. "
+          f"Re-emit the sidecar (`synthesis/outward_ir.py --emit "
+          f"synthesis/outward_ir.json`, 524 callgrind runs, ~48 min against a "
+          f"warm `.temp/build/`) to make this line live again.")
     else:
         w(f"**Calibration, recomputed on every run of this file** — the "
           f"derived column scored against `synthesis/outward_ir.json`, a "
@@ -1121,17 +1251,35 @@ def main():
             w(f"| `{rng}` ({mark}) | {n} | {real} | {spur} | "
               + (f"{small:.2f}" if small is not None else "-") + f" | {read} |")
         w("")
-        w("⚠⚠ **THE `< 2.00` BAND'S OWN CLAIM WAS FALSE, AND THIS IS THE "
-          "CORRECTION.** It read *\"safe: nothing real hides below the "
-          "floor\"*, scored `0 real / 120 spurious`. Both numbers are right "
-          "**about the environment this run was taken in**, and the adjective "
-          "was not: **p03's and p04's `R3-R4` correction is `0.00` — blank, in "
-          "this band — at 16 of 32 environment phases and `±7.00` at the other "
-          "16**, three and a half times the floor. A band scored at one draw "
-          "cannot certify the absence of a term that is invisible at that "
-          "draw. The rows that carry it are marked `‡` below; the band is "
-          "otherwise unchanged and still means *the derived route cannot "
-          "resolve this*.")
+        _lo_n, _lo_real, _lo_spur, _ = cal["bands"]["low"]
+        w(f"⚠⚠⚠ **THE `< {FLOOR:.2f}` BAND'S OWN CLAIM WAS FALSE, AND IT IS "
+          f"NOW FALSE ARITHMETICALLY AND NOT ONLY IN ITS ADJECTIVE.** It read "
+          f"*\"safe: nothing real hides below the floor\"*, scored "
+          f"`0 real / 120 spurious` over a **22-pattern** fit. **This run "
+          f"scores `{_lo_real} REAL / {_lo_spur} spurious`** — the misses "
+          f"named in the calibration line above. ⚠ **They are not the seven "
+          f"new rows**: re-scored at TASK_166 on the SAME 22 patterns with "
+          f"today's records the floor already misses **4**, and the oracle did "
+          f"not move to make it so (the committed 26-pattern sidecar and the "
+          f"TASK_166 re-emit agree on 0 of 208 pair rows and 0 of 824 cell "
+          f"figures). What moved is the DERIVED side, and nothing re-scored "
+          f"the table when it did. So *\"{FLOOR:.2f} is the only threshold "
+          f"that misses nothing\"* — this file's stated reason for the "
+          f"constant — **is retracted**; what survives, and is re-measured, is "
+          f"that {FLOOR:.2f} MINIMISES misses and carries the fewest false "
+          f"alarms of any threshold that does.")
+        w("")
+        w("⚠ **The mechanism behind four of the misses was already published "
+          "here and is unchanged:** **p03's and p04's `R3-R4` correction is "
+          "`0.00` — blank, in this band — at 16 of 32 environment phases and "
+          "`±7.00` at the other 16**, three and a half times the floor. A band "
+          "scored at one draw cannot certify the absence of a term that is "
+          "invisible at that draw. The rows that carry it are marked `‡` "
+          "below. ⚠ **And the `‡` note below says the disagreement is on "
+          "`R2-R4`; measured today it is on `R2-R4`, `R3-R4` AND `R5-R4` — 8 "
+          "of p03/p04's 16 pair/blob rows disagree between the derived route "
+          "and the sweep.** The band still means *the derived route cannot "
+          "resolve this*; it no longer means *there is nothing here*.")
         w("")
         w("⚠ **The middle band is where p03, p04, p07 and p22 live.** On p03 "
           "and p04 `R5-R4` the derived route was reporting `+6.00`, one draw "
@@ -1526,25 +1674,57 @@ def main():
       "import `group_array_axioms`, and `lemma_u128_shr_is_div` appears 23 "
       "times. **Every published number here rests on hand-written axioms. They "
       "are vstd's, they are pinned, and they are outside this column by "
-      "construction** — a `0` says *this pattern's author wrote none of their "
-      "own*, which is a narrower and still worth-having claim. ⚠ **A USED vstd "
+      "construction**. ⚠ **A USED vstd "
       "`assume_specification` declares nothing locally and is invisible here "
       "too** (RECAP \"Owed\" 0, sixth route). The gate has carried "
       "`axiom_decls` per Verus source since TASK_082; nothing published read "
       "it, so a byte-identical regeneration was **not** evidence that nothing "
       "moved (TASK_083_REVIEW major 4).")
     w("")
+    # ⚠⚠⚠ TASK_166 item D, from TASK_165 MAJOR 1 (option B). THE SENTENCE THAT
+    # USED TO SIT HERE -- *"a `0` says THIS PATTERN'S AUTHOR WROTE NONE OF
+    # THEIR OWN"* -- WAS FALSE ON TEN ROWS, and the `0 axioms` total was read
+    # with it. `_check_axiom_decls` partitions the `global` directive OUT of
+    # `verus.axioms` (TASK_164's deviation, reviewed SURVIVES-NARROWED), so a
+    # hand-written `global layout` / `global size_of` is invisible in that
+    # column. The count is NOT changed here -- changing it would demand a
+    # declaration on 10 patterns, 10 `contract_sha256` moves and a full sweep.
+    # ⚠ What is fixed is the REPORTING: `global` is published beside `axioms`
+    # as its own column and its own total, and the prose says what a `0` in
+    # each column does and does not mean.
+    n_glob_rows = sum(1 for g in gates.values()
+                      if any((v.get("global_decls") or [])
+                             for v in (g.get("verus") or {}).values()))
+    w(f"⚠⚠ **AND A `0` IN THE `axioms` COLUMN DOES NOT MEAN THIS PATTERN'S "
+      f"AUTHOR WROTE NO HAND-WRITTEN DECLARATION OF THEIR OWN — "
+      f"{n_glob_rows} of the {len(gates)} rows below carry a `global` "
+      f"directive, and every one of them prints `0 axioms`.** This paragraph "
+      f"said the opposite until TASK_166 (TASK_165 MAJOR 1). Verus's `global "
+      f"layout` / `global size_of` is hand-written, pattern-local, and the "
+      f"Verus guide describes it as *exporting the **axioms** "
+      f"`size_of::<T>() == n` and `align_of::<T>() == m`*; for `usize` it also "
+      f"narrows the SMT integer range. The gate deliberately partitions it out "
+      f"of `verus.axioms` — **rustc const-checks a `global` and rejects a "
+      f"false one with `E0080`**, so it is not an unchecked claim the way an "
+      f"`assume_specification` is, and stage 5e catches the rejection "
+      f"(TASK_164, re-derived and extended at TASK_165). ✅ **So the two "
+      f"columns answer different questions and are published side by side: "
+      f"`axioms` is *what nothing checks*, `global` is *what the author "
+      f"declared and rustc checks*.** ⚠ **Neither is zero for this tree, and "
+      f"quoting `0 axioms` alone understates the hand-written declarations on "
+      f"{n_glob_rows} rows.**")
+    w("")
     w("| pattern | obligations | errors | TCB items | TCB lines | axioms | "
-      "R4=R5 @O3 | verdict |")
-    w("|---|---:|---:|---:|---:|---:|---|---|")
-    tot_ob = tot_tcb = tot_lines = tot_ax = 0
+      "global | R4=R5 @O3 | verdict |")
+    w("|---|---:|---:|---:|---:|---:|---:|---|---|")
+    tot_ob = tot_tcb = tot_lines = tot_ax = tot_glob = 0
     # ⚠ **THE TOTALS DEDUPE THE `#[path]`-INCLUDED ROWS** (`TASK_084_REVIEW`
     # minor 1). `common/driver.rs` is included by all 23 `verus.rs`, so ONE
     # axiom or ONE trusted item there lands in all 23 records. The per-row `1`
     # is right -- every one of those patterns' binaries executes it -- but the
     # column total then reads 23 for one item, and the prose below tells the
     # reader to quote the total. Distinct key: `(source, name, line)`.
-    shared_ax, shared_tcb = set(), {}
+    shared_ax, shared_tcb, shared_glob = set(), {}, set()
     extra_srcs = {}
     for pat in sorted(gates):
         g = gates[pat]
@@ -1564,12 +1744,16 @@ def main():
         # `synthesis.md`: the gate did not look and this column could not see.
         own_ax = list(vb.get("axiom_decls") or [])
         own_items = list(vb.get("tcb_items") or [])
-        inc_ax, inc_items = [], []
+        own_glob = list(vb.get("global_decls") or [])
+        inc_ax, inc_items, inc_glob = [], [], []
         for k, v in sorted(vall.items()):
             if v.get("path_included"):
                 inc_ax += [dict(d, src=k) for d in (v.get("axiom_decls") or [])]
                 inc_items += [dict(d, src=k) for d in (v.get("tcb_items") or [])]
+                inc_glob += [dict(d, src=k)
+                             for d in (v.get("global_decls") or [])]
         ax = own_ax + inc_ax
+        glob = own_glob + inc_glob
         items = own_items + inc_items
         lines = sum(i.get("body_lines", 0) for i in items)
         others = {k: v for k, v in sorted(vall.items())
@@ -1583,24 +1767,32 @@ def main():
         tot_tcb += len(own_items)
         tot_lines += sum(i.get("body_lines", 0) for i in own_items)
         tot_ax += len(own_ax)
+        tot_glob += len(own_glob)
         for d in inc_ax:
             shared_ax.add((d.get("src"), d.get("name"), d.get("line")))
+        for d in inc_glob:
+            shared_glob.add((d.get("src"), d.get("name"), d.get("line")))
         for d in inc_items:
             shared_tcb[(d.get("src"), d.get("name"), d.get("line"))] = \
                 d.get("body_lines", 0)
         w(f"| {g['pattern']} | {vb.get('verified', '-')} | "
           f"{vb.get('errors', '-')} | {len(items)} | {lines} | {len(ax)} | "
-          f"{lvl} | {g.get('verdict', '-')} |")
+          f"{len(glob)} | {lvl} | {g.get('verdict', '-')} |")
     n_shared_ax, n_shared_tcb = len(shared_ax), len(shared_tcb)
+    n_shared_glob = len(shared_glob)
+    tot_glob += n_shared_glob
     tot_ax += n_shared_ax
     tot_tcb += n_shared_tcb
     tot_lines += sum(shared_tcb.values())
     w(f"| **total** | **{tot_ob}** | | **{tot_tcb}** | **{tot_lines}** | "
-      f"**{tot_ax}** | | |")
+      f"**{tot_ax}** | **{tot_glob}** | | |")
     w("")
     w(f"**Trusted base, all {len(gates)} rows: {tot_tcb} items ({tot_lines} "
-      f"lines) and {tot_ax} axioms.** Quote both numbers; there is no single "
-      f"one.")
+      f"lines), {tot_ax} axioms and {tot_glob} `global` directives on "
+      f"{n_glob_rows} rows.** Quote all three; there is no single one. "
+      f"⚠ **`{tot_ax} axioms` on its own is the number this file used to "
+      f"print, beside prose saying a `0` meant the author wrote nothing of "
+      f"their own — see the warning above the table.**")
     w("")
     w(f"⚠ **The totals are DISTINCT counts, not column sums, and the rows are "
       f"not** (`TASK_084_REVIEW` minor 1, fixed at TASK_088). Every pattern's "
@@ -1609,7 +1801,8 @@ def main():
       f"counted {len(gates)} times in a column sum. The rows above add the "
       f"shared file's items because that row's binary executes them; the "
       f"totals add each `(source, name, line)` **once**. Today the shared file "
-      f"contributes **{n_shared_tcb} item(s)** and **{n_shared_ax} axiom(s)**, "
+      f"contributes **{n_shared_tcb} item(s)**, **{n_shared_ax} axiom(s)** and "
+      f"**{n_shared_glob} `global` directive(s)**, "
       f"so the two agree — the dedupe is measured inert and is here for the "
       f"day it is not.")
     w("")
@@ -1623,8 +1816,8 @@ def main():
         w(f"*No pattern pins a Verus source other than `{TCB_SRC}`.*")
     else:
         w("| pattern | other pinned Verus source | obligations | TCB items | "
-          "axioms | why it is not in the row above |")
-        w("|---|---|---:|---:|---:|---|")
+          "axioms | global | why it is not in the row above |")
+        w("|---|---|---:|---:|---:|---:|---|")
         for pat in sorted(extra_srcs):
             for src, v in sorted(extra_srcs[pat].items()):
                 why = ("the **R2v control**: safe Rust carrying the same "
@@ -1638,7 +1831,8 @@ def main():
                        "and its trusted base is unaccounted for above.**")
                 w(f"| {pat} | `{src}` | {v.get('verified', '-')} | "
                   f"{len(v.get('tcb_items') or [])} | "
-                  f"{len(v.get('axiom_decls') or [])} | {why} |")
+                  f"{len(v.get('axiom_decls') or [])} | "
+                  f"{len(v.get('global_decls') or [])} | {why} |")
     w("")
 
     # --------------------------------------------------------- static shape
@@ -1934,6 +2128,8 @@ def main():
       "to degrade to *\"no source attribution\"* rather than to a wrong count.")
     w("")
     n_undecl = len(meas) - len(SEARCH_REVIEWED)
+    n_none = len(SEARCH_NONE & set(SEARCH_REVIEWED))
+    n_found = len(SEARCH_REVIEWED) - n_none
     w("*Declared*, in `synthesize.py::SEARCH_REVIEWED`, every entry cited to a "
       "**reviewed** artefact — except one, `p06`, which is marked `⊘` because "
       "`.memory/01-ladder.md` marks it `⊘`: it landed at TASK_048 and has not "
@@ -1942,9 +2138,41 @@ def main():
       f"`undeclared`, which is its true state — **{n_undecl} of {len(meas)}** "
       "today:")
     w("")
+    w(f"⚠⚠ **AND THE {len(SEARCH_REVIEWED)} DECLARED ROWS SPLIT TWO WAYS, "
+      f"WHICH ONE COUNT CANNOT SAY: {n_found} report a SEARCH RESULT and "
+      f"{n_none} report a REVIEWED DECLARATION OF *NO* SEARCH "
+      f"({', '.join(sorted(SEARCH_NONE & set(SEARCH_REVIEWED)))}, marked `⊘` "
+      f"in their entry text and listed in `SEARCH_NONE`).** A row that "
+      f"publishes no rung-to-rung figure and says so is not in the same state "
+      f"as a row nobody has looked at, and `undeclared` collapses the two. "
+      f"⚠ **So do not read `{n_undecl} of {len(meas)}` as *the unsearched "
+      f"fraction*** — it is *the fraction with no entry in this dict*, which "
+      f"is what it has always been.")
+    w("")
     for pat in sorted(SEARCH_REVIEWED):
         w(f"- **{pat}** — {SEARCH_REVIEWED[pat][0]}  \n  "
           f"*{SEARCH_REVIEWED[pat][1]}*")
+    w("")
+    w("⚠⚠⚠ **THE SAME DEFECT TASK_112 FIXED RECURRED ON THE SEVEN ROWS ADDED "
+      "AFTER IT, AND NOTHING FIRED — because a missing entry is "
+      "indistinguishable from a true `undeclared`.** Before TASK_166 this "
+      "column printed **21 of 33** undeclared against a published **14 of "
+      "26**, and ⚠ **the entire growth was the seven new rows**: the 14 rows "
+      "undeclared at 26 are still exactly the 14 undeclared among those 26 "
+      "today, so `14 → 21` was **100% bookkeeping and 0% a change in search "
+      "state**. Of the seven, **four had a REVIEWED SEARCH and no entry** "
+      "(`p25 p28 p34 p35` — `p34`'s own `controls/spellings.py` caught a "
+      "flattering-direction headline before any review saw it, and `p35`'s "
+      "search REVERSED the sign of its published `R3 − R4`) and **three had a "
+      "REVIEWED DECLARATION OF NO SEARCH** (`p29 p32 p49`). ✅ **This defect "
+      "runs AGAINST the usual flattering direction — it UNDER-reports the "
+      "project's own search effort.** ⚠⚠ **And the obvious detector does not "
+      "work: `p49` ships `controls/spellings.py` and it is NOT a rung-spelling "
+      "search** — it is the `cow`-vs-`provenance` repair-site control on "
+      "`c/kernel.c` — so *\"a pattern shipping `controls/spellings.py` with no "
+      "entry here\"* would have produced a WRONG entry for `p49`. A check that "
+      "could tell a missing entry from a true `undeclared` has to read the "
+      "pattern's `NOTES.md`, not its file list.")
     w("")
     w("⚠⚠ **FOUR ENTRIES WERE ADDED AT TASK_112 AND THE COLUMN UNDERSTATED THE "
       "RECORD BY THAT MUCH** (TASK_111, adjacent work 1, which named three of "

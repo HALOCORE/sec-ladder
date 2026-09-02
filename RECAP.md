@@ -5917,6 +5917,96 @@ the number.** Two task files have already sent an agent to the wrong finding.
     `harness/check.py::control_json_verdict`, `harness/vparse.py::axiom_decls`,
     `.temp/t164/`, `.temp/mgr164/`.
 
+64. ⚠⚠⚠ **THE MANAGER'S UNIFYING HYPOTHESIS FALLS ON ALL THREE ARMS — AND THE
+    REFUTATION IS WORTH MORE THAN THE HYPOTHESIS WOULD HAVE BEEN.**
+    ⚠ **UNREVIEWED (`TASK_166`) — `TASK_167` is the review. ✅ = manager
+    re-derived; ⊘ = engineer's alone.**
+
+    Three facts about the seven newest rows had been recorded independently, and
+    the manager proposed they were **one property — *the kernel calls out of
+    itself***. `synthesis/outward_ir.json`, re-emitted at **33 patterns / 524
+    cell entries** (0 skipped, 0 unpinned, 0 stale — the engineer's written
+    prediction, hit exactly), settles it:
+
+    - ⊘ **Arm (b), *"work outside the kernel symbol → `NOT-LIC`"* — FALSE IN
+      BOTH DIRECTIONS.** ✅ `p35` and `p49` are `UNDEC`/`NOT-LIC` with kernels
+      that call **nothing** (`0.00 Ir`, `0.000` calls/kernel-call, every cell,
+      both blobs), while `p08` is **LICENSED at `5409.88 Ir`/call outward**
+      (`large`, 6 calls per kernel call). **13 of 23 LICENSED rows call out.**
+      ✅ **The licence is static multiset SYMMETRY, not non-emptiness.**
+    - ⊘✅ **Arm (c), *"`call rel32` displacements that differ → `norel`"* —
+      FALSE, AND THE NAMED MECHANISM IS NOT THE MECHANISM.** ✅ **Manager
+      re-derived `p28` instruction by instruction**: of 371 kernel instructions
+      and 71 differing lines, **69 are objdump printing a different ABSOLUTE
+      target for an IDENTICAL encoded field**, and **exactly 2 have a real byte
+      difference — both `lea -0x…(%rip),%rdx` to the SAME target
+      (`GCC_except_table142+0x2c`), differing by the `0x20` shift between the two
+      kernels' base addresses. ZERO `call` instructions differ.** ✅ **And the
+      counterevidence is the stronger half: `p11` is `exact` while its `c-gcc`
+      kernel makes 150 outward calls per kernel call, and `p27` is `exact` with
+      `p28`/`p29`/`p34`'s exact callee set — 16 `exact` counterexamples.**
+      ⚠ **`norel` is LINK LAYOUT.**
+    - ⊘ **Arm (a), *"callees in the whole-program slope → a non-zero null"* —
+      FALSE AT THE PUBLISHED CELL, and *anti*-correlated.** The three biggest
+      callers have the **smallest** nulls (`p28 +1.01`, `p29 −0.02`,
+      `p34 −0.10`) while `p03`/`p04` read `+6.00` with **one** call.
+
+    ✅ **Three facts, three generators. The manager assembled the hypothesis from
+    record greps with NOTHING RUN — the same shape as the two axis proposals
+    this file records as refused for the same reason — and named it as the call
+    to attack, which is why one task settled it.**
+
+    **AND THE SAME TASK RETRACTED A PUBLISHED JUSTIFICATION THAT PREDATES THE
+    SEVEN NEW ROWS.** ⊘ `synthesize.py`'s `FLOOR = 2.00` was justified as *"the
+    only threshold at which it misses nothing"*; re-scored with the corrected
+    rule it is **4 misses on its own 22 patterns** and 5 at 33, and the four are
+    `p03`/`p04` `R3−R4` where callgrind reads `−7.00` and the derived route
+    computes **exactly `+0.00`** — the `±7` `memset`-alignment term, which **no
+    positive threshold can catch.** ✅ **The oracle did NOT move** (0 of 208 pair
+    rows, 0 of 824 cell figures); **the DERIVED records moved and nothing
+    re-scored.** ✅ **Both constants survive on a different argument** — `2.00`
+    minimises misses with the fewest false alarms among thresholds that do;
+    `CONFIDENT = 16.00` is unmoved and better supported (57 rows, 57 real,
+    smallest `17.0027`). ⚠⚠ **What is retracted is the low band's MEANING:
+    *"below 2.00 nothing real hides"* is false on 5 rows, and `classify()`
+    returns `low` BEFORE consulting the null, so those five are dropped
+    SILENTLY rather than `refused`.**
+
+    **Three more, each a manager or published claim corrected:**
+    - ⊘ **`0.894` "syntactic size" IS recoverable** — it is
+      `(exec_fn − tcb_items) + proof_fn + loops`, and at 33 it is **`0.920`**,
+      two parsers agreeing. The manager had reported it unrecoverable.
+    - ⊘ **The `0 of 255` instrument EXISTS**, reproduces `255`/`30`/`26` exactly
+      as a control, and gives **`0 of 464`** at 33 — so §7's `p ≈ 0.06` caveat
+      needs **re-computing, not re-wording**: it is **`0.0123`**, ~5× stronger.
+      The manager had reported no instrument.
+    - ⊘ **`14 of 26 → 21 of 33` undeclared was 100% BOOKKEEPING** — the 14 old
+      rows are still exactly the 14. Of the seven new rows, **4 had a reviewed
+      search and 3 had a reviewed declaration of NO search.**
+      ⚠⚠ **AND THE MANAGER'S OWN EVIDENCE WAS WRONG: *"`p49` ships a
+      `controls/spellings.py` too"* — it is a REPAIR-SITE control, not a rung
+      search, and `p49`'s `undeclared` was RIGHT.** ✅ **The obvious detector —
+      *"has a `spellings.py` but no `SEARCH_REVIEWED` entry"* — would have got
+      it wrong.**
+
+    ✅ **AND THE ONE THE TASK FILE SAID MUST NOT BE ASSUMED HELD:** §5's
+    `6.00 Ir`/call type-based-aliasing law **IS STILL A ONE-ROW LAW**, measured
+    by running the binaries — `p38` harms in **1 of 4** (compiler × level) C
+    cells, `p35` in **4 of 4**. **`p35` sits beside it; it does not corroborate
+    it.**
+
+    ⚠ **A defect in a committed instrument, found on the way:**
+    `.temp/t124/A/rung_split_census.py` keeps only the **LAST** run per
+    `(input, rung)` and prints `56`/`83` where the published method gives
+    `58`/`85`. **The two rows it drops are `p38 adversarial-{huge,oob}` — the one
+    row whose harm is selected by optimisation LEVEL.** ✅ **The load-bearing
+    column is method-independent: the third figure is `0` either way, and `0` at
+    33 (166 pairs, 85 with any divergence, 0 Rust-rung splits).**
+
+    Evidence: `.tasks/TASK_166_REPORT.md`, `.tasks/TASK_166.md`,
+    `synthesis/outward_ir.json`, `synthesis/synthesize.py`,
+    `common/census/README.md`, `.temp/t166/`, `.temp/mgr164/`.
+
 ## Retracted — do not reinstate
 
 - **"Safe Rust pays an O(n) bounds-check tax"** (p02). The indexed fold's bounds
@@ -7420,6 +7510,31 @@ Both retired.
     PASS — **but the arms then never run**, so a run that is already failing for
     a fixture reason says nothing about them. **Hygiene; note it where the arms
     live.**
+
+35. ⚠⚠ **THE 14 OLD `undeclared` SEARCH-STATE ROWS HAVE NEVER BEEN AUDITED THE
+    WAY THE SEVEN NEW ONES JUST WERE — AND 4 OF THE 7 TURNED OUT WRONG.**
+    (`TASK_166` item E.) `synthesize.py::SEARCH_REVIEWED` is a hand-maintained
+    dict inside a GENERATED file; `undeclared` means *"nobody wrote an entry"*,
+    never *"nobody searched"*, and the file's own preamble predicted this rot at
+    `TASK_112`. **The seven new rows split 4 reviewed-search / 3
+    reviewed-NO-search**, so `undeclared` fell `21 → 14` with **zero new rows
+    left in it**. ⚠ **The 14 — manager-derived from the regenerated table:
+    `p02 p04 p05 p07 p09 p14 p16 p18 p19 p23 p27 p38 p42 p46` — are the same 14
+    as at 26 patterns, and nobody has read their `NOTES.md` against the dict.** ⚠⚠ **The obvious detector does NOT
+    work**: `p49` ships a `controls/spellings.py` and its `undeclared` is
+    **right** — that control is a repair-site control, not a rung search.
+    **This needs reading, not grepping.**
+
+36. ⚠ **TWO PUBLISHED NUMBERS REST ON INSTRUMENTS THAT LIVE ONLY IN GITIGNORED
+    `.temp/`.** (`TASK_166` F.2/F.3.) `TASK_129`'s bound-site classifier
+    (behind *"0 of 255"*, now **0 of 464** at 33) and `TASK_131`'s size probe
+    (behind *"`p ≈ 0.06`"*, now **`0.0123`**) **both still run and both
+    reproduce their published figures exactly as controls** — but a `.temp/`
+    clean, which `CLAUDE.md` constraint 1 asks for, deletes them.
+    ✅ **`common/census/` is the precedent and the promotion costs no sweep and
+    no re-measure** — that directory is outside both digests (`TASK_132` §F).
+    ⚠ **Same class as the defect that created `common/census/`: a number
+    published from an instrument nobody else can run.**
 
 ### Deferred with a stated reason
 

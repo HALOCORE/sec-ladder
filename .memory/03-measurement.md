@@ -3333,6 +3333,26 @@ already been struck.** Keep the list, not the ordinal.
     `2.00 … 16.00` band"* when `p42` is `≥ 16` and printed **bold**, then
     resolves *"all six"*.
 
+    ⚠⚠⚠ **AND THE OBVIOUS CAUSE IS REFUTED — THE NULL IS *ANTI*-CORRELATED WITH
+    CALL VOLUME.** (`TASK_166`, from the re-emitted `synthesis/outward_ir.json`
+    at 33 patterns.) The manager proposed that a non-zero null is *"the kernel
+    calls out of itself, so callees land in the whole-program slope"*. **The
+    three biggest callers have the SMALLEST nulls:**
+
+    ```
+    -O3 isolated, large.bin     outward calls per kernel call     R5-R4 null
+      p28                                   ~28..144                   +1.01
+      p29                                   ~32                        -0.02
+      p34                                   ~30                        -0.10
+      p03 / p04                              1                         +6.00
+      p35 / p49 / p11 (unsafe)               0                          --
+    ```
+
+    ✅ **Entry 23's own `-O3 isolated` list — `p25 269.52 · p42 31.00 ·
+    p04 6.00 · p03 6.00 · p02 2.00` — is the right one, and it is anti-correlated
+    with how much the kernel calls.** ⚠ **So "does this kernel call out?" is NOT
+    a screen for whether the null matters. Read the cell.**
+
     ✅ **THE RULE: for a cross-RUNG comparison use `kernel_exclusive_ir`; use
     `marginal_ir_per_call` for anti-collapse, which is what it was built for.
     And on any pattern whose kernel calls out of itself, compare a correction
@@ -3667,3 +3687,107 @@ not a property.**
 note the shape: this is a COUNT that is a CACHED DERIVATION of a nondeterministic
 run, which is the same class as the failure-class list's own rotting ordinal —
 `a count is a cached derivation` keeps being the lesson.**
+
+## ⚠⚠ `norel` IS A LINK-ADDRESS PROPERTY, NOT A CALL PROPERTY — and the manager's proposed mechanism was refuted
+
+**`TASK_166`, and the manager re-derived the `p28` case instruction by
+instruction.** At `-O3`, five of 33 R4/R5 pairs are `norel` rather than `exact`:
+`p25 p28 p29 p34 p36`. The manager proposed the cause was *"`call rel32`
+displacements that differ between two binaries"*. **It is not.**
+
+`harness/asm.py show --raw` on `p28`'s `unsafe`/`verus` pair at `-O3 isolated`,
+371 kernel instructions each, 71 differing lines:
+
+```
+same encoded field, objdump printing a different ABSOLUTE target : 69
+GENUINELY different encoded field                                :  2
+    - lea -0xde28(%rip),%rdx     # 78f0 <GCC_except_table142+0x2c>
+    + lea -0xde08(%rip),%rdx     # 78f0 <GCC_except_table142+0x2c>
+    - lea -0xe07e(%rip),%rdx     # 78f0 <GCC_except_table142+0x2c>
+    + lea -0xe05e(%rip),%rdx     # 78f0 <GCC_except_table142+0x2c>
+mnemonics with a real byte difference: ['lea']      ZERO `call`
+```
+
+**The `verus` kernel sits `0x20` earlier than the `unsafe` one, so a
+rip-relative reference to a target that did NOT move differs by exactly that
+shift.** Every branch keeps an **identical** symbol-relative offset (`+0x68` on
+both sides) and differs only in the absolute address objdump prints for it; the
+`call` through the GOT keeps an identical displacement because its GOT entry
+moved with the binary. ⚠ **That is what `md5_raw_norel` is for, and it is why it
+matches.**
+
+⚠⚠ **THE COUNTEREVIDENCE IS THE STRONGER HALF, and it is what kills the call
+story outright:** `p11` is **`exact`** while its `c-gcc` kernel makes **150
+outward calls per kernel call**, and `p27` is **`exact`** with `p28`/`p29`/`p34`'s
+exact callee set. ✅ **Sixteen `exact` counterexamples; calling out neither
+implies `norel` nor is implied by it.**
+
+⚠ **MECHANISM PARTLY OPEN.** The instruction-level decomposition above is
+`p28`'s (manager) plus two more diffed by `TASK_166`; **three of five, not
+five.** The *conclusion* — `norel` ⊥ calling out — rests on the 16 `exact`
+counterexamples and does not depend on the decomposition.
+⚠ **At `-O0`, `norel` is the NORM (30 of 33), so the `-O3` five are the
+interesting set, not the anomalous one.**
+
+## ⚠⚠⚠ `2.00 Ir → 0 misses` NEVER REPRODUCED, AND THE LOW BAND IS NOT EMPTY
+
+**`TASK_166`.** `synthesis/synthesize.py`'s `FLOOR = 2.00` was justified by a
+table reading *"2.00 Ir: 162 hit / **0 miss** / 14 false alarm"* — *"the only
+threshold at which it misses nothing"*. **Re-scored against the committed
+records with the corrected rule (`truth = |moves_by| >= 5e-3`, not
+`truth = |correction| >= threshold`):**
+
+```
+population        2.00 Ir            3.00 Ir            5.00 Ir
+TASK_076's 22     156 / 4 / 16       158 / 6 / 12       159 / 6 / 11
+SYNTHESIS's 26    188 / 4 / 16       190 / 6 / 12       191 / 6 / 11
+all 33            236 / 5 / 23       240 / 7 / 17       245 / 7 / 12
+published (22)    162 / 0 / 14       164 / 2 / 10       165 / 2 / 9   <- DOES NOT REPRODUCE
+```
+
+⚠⚠ **The four misses on its OWN 22 patterns are `p03`/`p04` `R3−R4` on both
+blobs**, where callgrind measures `−7.00` and the derived route computes
+**exactly `+0.00`** — **so no positive threshold can catch them.** That is the
+`±7` `__memset_avx2_unaligned_erms` alignment term, i.e. **the miss is a known
+effect the derived route structurally cannot see**, not noise.
+
+✅ **MANAGER-RE-DERIVED, and this is the load-bearing half**: the oracle's
+`moves_by` for `p03`/`p04` `R3−R4` is `−7.00` on **all four** (pattern, blob)
+cells, while the derived marginal `R3−R4` (`359.00 / 626.00 / 5.00 / 5.00`)
+equals the kernel-exclusive difference **exactly**, so the derived correction is
+`0.00` and the miss is structural. ⊘ **The rest of the scoring table above is
+the engineer's and has not been independently re-derived.**
+
+✅ **The ORACLE did not move** — committed 26-pattern sidecar against the
+33-pattern re-emit: **0 of 208 pair rows and 0 of 824 cell figures differ**.
+**What moved is the DERIVED side, the committed `marginal_ir_per_call` records,
+and nothing re-scored the table when it did.** The seven new rows contribute
+**1 of the 5** misses (`p34 large R5−R4`); four were already there.
+
+✅ **Both constants SURVIVE, on a different argument.** `FLOOR = 2.00`
+**minimises misses and has the fewest false alarms among thresholds that do**
+(`1.50 → 5/24`, `2.00 → 5/23`, `2.50 → 7/20`); only `≤ 0.10` catches `p34`, at
+**98** false alarms. `CONFIDENT = 16.00` is unmoved and **better** supported:
+57 rows at 33, **57 real, 0 spurious, smallest `|correction| = 17.0027`** — the
+same `17.00` the 22-row fit found, with 23 more rows under it.
+
+⚠⚠⚠ **WHAT IS RETRACTED IS THE LOW BAND'S MEANING.** *"Below 2.00 nothing real
+hides"* is **false on 5 rows**, and ⚠ **`classify()` returns `low` BEFORE it
+consults the null, so those five are dropped SILENTLY rather than `refused` —
+`TASK_159`'s CONFIDENT-band refusal rule never sees them.**
+
+## ⚠ A COMMITTED CONTROL-ARM INSTRUMENT KEEPS ONLY THE LAST RUN PER `(input, rung)`
+
+**`TASK_166`.** `.temp/t124/A/rung_split_census.py` — the instrument behind
+`results/SYNTHESIS.md` §7's *"no input can be adversarial to a Rust rung"* control
+— **de-duplicates by overwriting**, so it reports `56` / `83` where the published
+method reports `58` / `85`. ⚠ **The two rows it drops are
+`p38 adversarial-{huge,oob}.bin` — the one row in the tree whose harm is selected
+by OPTIMISATION LEVEL**, i.e. exactly the row a last-run-wins reduction is
+guaranteed to mangle.
+
+✅ **The load-bearing column is unaffected: the third figure is `0` under both
+methods, and it is `0` at 33 patterns** (166 adversarial `(pattern, input)`
+pairs, 85 with any cell divergence, **0** where the four Rust rungs differ from
+one another). ⚠ **Quote the `0`; do not quote the first two from that script
+without saying which method produced them.**

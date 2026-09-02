@@ -195,25 +195,27 @@ sweep says the callee moves -- but its MAGNITUDE is a phase, so quote the
 support, never the draw.
 
 
-**Calibration, recomputed on every run of this file** — the derived column scored against `synthesis/outward_ir.json`, a callgrind caller→callee sweep, at the 2.00 `Ir` floor: **208 rows, 188 hit, 4 miss (the dangerous direction), 16 false alarm**; residual median **0.30**, p95 **7.00**, max **15.79**. ⚠ Misses: p03 small R3-R4 -7.00, p03 large R3-R4 -7.00, p04 small R3-R4 -7.00, p04 large R3-R4 -7.00.
+**Calibration, recomputed on every run of this file** — the derived column scored against `synthesis/outward_ir.json`, a callgrind caller→callee sweep, at the 2.00 `Ir` floor: **264 rows, 236 hit, 5 miss (the dangerous direction), 23 false alarm**; residual median **0.86**, p95 **7.00**, max **243.52**. ⚠ Misses: p03 small R3-R4 -7.00, p03 large R3-R4 -7.00, p04 small R3-R4 -7.00, p04 large R3-R4 -7.00, p34 large R5-R4 +0.01.
 
 **So the column has three bands, and they are measured on every run rather than chosen** — each row sorted by `|correction|` against whether the sweep says the row moves at all:
 
 | band | rows | real | spurious | smallest \|correction\| | reading |
 |---|---:|---:|---:|---:|---|
-| `< 2.00` (blank / `<2.00`) | 143 | 4 | 139 | 0.00 | **not safe — this is one environment phase.** ⚠ See `‡` |
-| `2.00 … 16.00` (marked **?**) | 24 | 8 | 16 | 2.00 | **a coin flip — do not quote alone** |
-| `≥ 16.00` (**bold**) | 41 | 41 | 0 | 17.00 | **every one is real** |
+| `< 2.00` (blank / `<2.00`) | 175 | 5 | 170 | 0.00 | **not safe — this is one environment phase.** ⚠ See `‡` |
+| `2.00 … 16.00` (marked **?**) | 32 | 9 | 23 | 2.00 | **a coin flip — do not quote alone** |
+| `≥ 16.00` (**bold**) | 57 | 57 | 0 | 17.00 | **every one is real** |
 
-⚠⚠ **THE `< 2.00` BAND'S OWN CLAIM WAS FALSE, AND THIS IS THE CORRECTION.** It read *"safe: nothing real hides below the floor"*, scored `0 real / 120 spurious`. Both numbers are right **about the environment this run was taken in**, and the adjective was not: **p03's and p04's `R3-R4` correction is `0.00` — blank, in this band — at 16 of 32 environment phases and `±7.00` at the other 16**, three and a half times the floor. A band scored at one draw cannot certify the absence of a term that is invisible at that draw. The rows that carry it are marked `‡` below; the band is otherwise unchanged and still means *the derived route cannot resolve this*.
+⚠⚠⚠ **THE `< 2.00` BAND'S OWN CLAIM WAS FALSE, AND IT IS NOW FALSE ARITHMETICALLY AND NOT ONLY IN ITS ADJECTIVE.** It read *"safe: nothing real hides below the floor"*, scored `0 real / 120 spurious` over a **22-pattern** fit. **This run scores `5 REAL / 170 spurious`** — the misses named in the calibration line above. ⚠ **They are not the seven new rows**: re-scored at TASK_166 on the SAME 22 patterns with today's records the floor already misses **4**, and the oracle did not move to make it so (the committed 26-pattern sidecar and the TASK_166 re-emit agree on 0 of 208 pair rows and 0 of 824 cell figures). What moved is the DERIVED side, and nothing re-scored the table when it did. So *"2.00 is the only threshold that misses nothing"* — this file's stated reason for the constant — **is retracted**; what survives, and is re-measured, is that 2.00 MINIMISES misses and carries the fewest false alarms of any threshold that does.
+
+⚠ **The mechanism behind four of the misses was already published here and is unchanged:** **p03's and p04's `R3-R4` correction is `0.00` — blank, in this band — at 16 of 32 environment phases and `±7.00` at the other 16**, three and a half times the floor. A band scored at one draw cannot certify the absence of a term that is invisible at that draw. The rows that carry it are marked `‡` below. ⚠ **And the `‡` note below says the disagreement is on `R2-R4`; measured today it is on `R2-R4`, `R3-R4` AND `R5-R4` — 8 of p03/p04's 16 pair/blob rows disagree between the derived route and the sweep.** The band still means *the derived route cannot resolve this*; it no longer means *there is nothing here*.
 
 ⚠ **The middle band is where p03, p04, p07 and p22 live.** On p03 and p04 `R5-R4` the derived route was reporting `+6.00`, one draw from `{−8.00, −1.00, +6.00}` — **tied with its own sign-reverse** — and those four cells are now **withdrawn** rather than marked **?**: `?` means *look further*, and there is nothing further to look at. Treat a surviving **?** as *"look with the licence or a callgrind run"*, never as a figure.
 
-⚠⚠ **`synthesis/outward_ir.json` IS STALE against the gate records, so the calibration above is scored partly on rows taken against sources that have since moved.** **STALE: p01, p02, p03, p04, p05, p06, p07, p08, p09, p10, p11, p12, p13, p14, p16, p17, p18, p19, p22, p23, p27, p36, p38, p42, p46, p47.** Re-emit with `synthesis/outward_ir.py --emit synthesis/outward_ir.json` against a fully built `.temp/build/` (352 callgrind runs), then re-run this file.
+✅ **`synthesis/outward_ir.json` is FRESH** — all 33 entries carry the gate `source_sha256` they were taken against and every one still matches (TASK_107 §F; the key and the check are copied from `licence.json`, which is why `LICENCE STALE` and this line now mean the same thing). It was once found **three patterns stale, 22 entries against 25**, and this file's own text said the pin did not exist — a warning where a detector was wanted. Re-emitting costs 352 callgrind runs against a fully built `.temp/build/`, which is why it calibrates a column here and no longer **is** one.
 
-**And the LICENCE TAG scored against the same sweep, also recomputed here**: **179 hit, 17 false `LICENSED` (the dangerous direction), 2 false alarm, 10 abstain**. The smallest movement under a `NOT-LIC` verdict is **0.00 `Ir`/call**.
+**And the LICENCE TAG scored against the same sweep, also recomputed here**: **209 hit, 17 false `LICENSED` (the dangerous direction), 14 false alarm, 24 abstain**. The smallest movement under a `NOT-LIC` verdict is **0.00 `Ir`/call**.
 
-⚠⚠ **THE `0 false alarms` THIS FILE USED TO ASSERT IS GONE — IT NOW READS `2`, AND THE PARAGRAPH THAT ASSERTED IT WAS TYPED UNDER A COMPUTED TRIPLE.** (Found at TASK_159; it is §5 claim 1's defect a second time, in this same file.) The sentence used to read *"the smallest movement under a `NOT-LIC` verdict is X, so 0 false alarms is robust to any tolerance below that"* — and the smallest movement is now **0.00**, which is not a margin at all: it IS the false alarms. The rows are **p42 small `R3-R4`, p42 large `R3-R4`**. ⚠ *A `NOT-LIC` on a row the sweep says does not move is the SAFE direction* — the rule refused to license a difference that would have been fine — so nothing published is wrong because of it; what was wrong is the file saying there were none.
+⚠⚠ **THE `0 false alarms` THIS FILE USED TO ASSERT IS GONE — IT NOW READS `14`, AND THE PARAGRAPH THAT ASSERTED IT WAS TYPED UNDER A COMPUTED TRIPLE.** (Found at TASK_159; it is §5 claim 1's defect a second time, in this same file.) The sentence used to read *"the smallest movement under a `NOT-LIC` verdict is X, so 0 false alarms is robust to any tolerance below that"* — and the smallest movement is now **0.00**, which is not a margin at all: it IS the false alarms. The rows are **p25 small `R2-R4`, p25 small `R3-R4`, p25 large `R2-R4`, p25 large `R3-R4`, p28 small `R2-R4`, p28 small `R3-R4`, p28 large `R2-R4`, p28 large `R3-R4`, p35 small `gcc-clang`, p35 large `gcc-clang`, p42 small `R3-R4`, p42 large `R3-R4`, p49 small `R3-R4`, p49 large `R3-R4`**. ⚠ *A `NOT-LIC` on a row the sweep says does not move is the SAFE direction* — the rule refused to license a difference that would have been fine — so nothing published is wrong because of it; what was wrong is the file saying there were none.
 
 ⚠ **The score is a property of the sweep, not of the rule.** Correcting one thing the rule got right for a contradicted reason (`kernel.cold`, below) moved it from `156 / 10 / 0 / 10` to `154 / 12 / 0 / 10` at TASK_076, by converting p27's `gcc-clang` from a lucky `NOT-LIC` into an honest false `LICENSED`; a second sweep under a **longer environment block** read `152 / 14 / 0 / 10`, the excess being p03's and p04's `memset` term. ⚠⚠ **Those three historical triples are quoted as history and NOT as the current score** — the live figures are the ones in the sentence above, and they have moved.
 
@@ -331,19 +333,19 @@ answer* (`.memory/03-measurement.md`).
 | p19-state-machine | 1594.00 | 25594.00 | LICENSED |  | undeclared |
 | p22-hash-probe | 275.00 | 2067.00 | LICENSED |  | R4 searched: `+2.00` is a fixed-R4 bound; against `r4_reslice` the gap is +125/+1021 -- 510x on `large` |
 | p23-partition | 350.69 | 531.17 | LICENSED |  | undeclared |
-| p25-realloc-growth | 131.34 | 622.28 | NOT-LIC |  | undeclared |
+| p25-realloc-growth | 131.34 | 622.28 | NOT-LIC |  | the repair SITE searched (three); one respelling lever per READ site measured EQUAL to the hundredth. R3/R4 rung spellings and the GROWTH-site repair spelling still unsearched |
 | p27-handle-table | 119.49 | 693.82 | NOT-LIC | **small +238.67** (+119.18) / **large +824.47** (+130.65) | undeclared |
-| p28-intrusive-lists | 439.47 | 1302.02 | NOT-LIC | small +441.96 (+2.49) **?** / large <2.00 | undeclared |
-| p29-bst-delete | 96.00 | 991.80 | NOT-LIC | **small +220.35** (+124.35) / **large +1190.87** (+199.07) | undeclared |
-| p32-free-list-pool | 153.13 | 685.01 | LICENSED |  | undeclared |
-| p34-refcount-stack | 273.11 | 1388.94 | NOT-LIC | **small +420.57** (+147.46) / **large +1876.14** (+487.20) | undeclared |
-| p35-tagged-union | 156.09 | 715.55 | UNDEC |  | undeclared |
+| p28-intrusive-lists | 439.47 | 1302.02 | NOT-LIC | small +441.96 (+2.49) **?** / large <2.00 | R2-vs-R3 searched at review: the WALK HOIST is 72% of the gap, and it is a FOURTH lever `safe_tuned.rs`'s own header omits |
+| p29-bst-delete | 96.00 | 991.80 | NOT-LIC | **small +220.35** (+124.35) / **large +1190.87** (+199.07) | ⊘ NO SEARCH, declared — NEITHER side searched, and the row publishes no rung-to-rung cost at all |
+| p32-free-list-pool | 153.13 | 685.01 | LICENSED |  | ⊘ NO SEARCH, declared — NEITHER side searched, no cost axis, and the four unmeasured R2/R3 levers are named for the next task |
+| p34-refcount-stack | 273.11 | 1388.94 | NOT-LIC | **small +420.57** (+147.46) / **large +1876.14** (+487.20) | BOTH sides searched, and the control caught a flattering-direction headline BEFORE any review: the `-O0` shipped-pair gap was 2.88×/3.36× too large |
+| p35-tagged-union | 156.09 | 715.55 | UNDEC |  | R4 searched at review: the SIGN REVERSES — matched on the op-walk R4 WINS by 203.05 `Ir`/call (6.63%) on `large` |
 | p36-vtable-dispatch | 1803.00 | 14347.00 | UNDEC |  | BOTH sides searched (4 R3 levers, 3 R4) |
 | p38-alias-pun | 257.00 | 711.00 | LICENSED |  | undeclared |
 | p42-goto-cleanup | 599.00 | 25092.00 | NOT-LIC | **small +752.00** (+153.00) / **large +29252.00** (+4160.00) | undeclared |
 | p46-bignum-mac | -165.00 | -909.00 | LICENSED |  | undeclared |
 | p47-ct-compare | -166.00 | -194.00 | NOT-LIC | **small -77.63** (+88.37) / **large -28.00** (+166.00) | R4 searched, six levers |
-| p49-interned-pool | 286.53 | 623.38 | LICENSED | small +293.18 (+6.65) **?** / large <2.00 | undeclared |
+| p49-interned-pool | 286.53 | 623.38 | LICENSED | small +293.18 (+6.65) **?** / large <2.00 | ⊘ NO R3-SIDE SPREAD — only ONE in-contract R3 spelling built, so there is not even a second point to bound a spread with |
 
 ⚠ **`‡` — the environment-phase term, and it is not noise.** The derived correction is a **whole-program** figure, so it contains the callees; a per-call `memset` of a **stack** array takes an alignment-dependent tail in `__memset_avx2_unaligned_erms`, and the initial stack pointer moves with the **length of the environment block**. The effect is bistable, period **32 bytes**, window exactly **16 wide**, and the phase differs per binary — so one rung can sit high while another sits low and **a pair swings by 14, not 7**. Per row, with its instrument:
 
@@ -396,19 +398,19 @@ answer* (`.memory/03-measurement.md`).
 | p19-state-machine | 260.00 | 4100.00 | LICENSED |  | undeclared |
 | p22-hash-probe | 2.00 | 2.00 | LICENSED |  | R4 searched: `+2.00` is a fixed-R4 bound; against `r4_reslice` the gap is +125/+1021 -- 510x on `large` |
 | p23-partition | 305.74 | 443.55 | LICENSED |  | undeclared |
-| p25-realloc-growth | -60.44 | -361.82 | NOT-LIC |  | undeclared |
+| p25-realloc-growth | -60.44 | -361.82 | NOT-LIC |  | the repair SITE searched (three); one respelling lever per READ site measured EQUAL to the hundredth. R3/R4 rung spellings and the GROWTH-site repair spelling still unsearched |
 | p27-handle-table | 109.98 | 661.82 | NOT-LIC | **small +229.12** (+119.14) / **large +792.47** (+130.65) | undeclared |
-| p28-intrusive-lists | 686.28 | 2564.22 | NOT-LIC | small <2.00 / large +2561.31 (-2.91) **?** | undeclared |
-| p29-bst-delete | 67.05 | 897.60 | NOT-LIC | **small +193.53** (+126.48) / **large +1092.51** (+194.91) | undeclared |
-| p32-free-list-pool | 193.87 | 826.56 | LICENSED | small <2.00 / large +823.42 (-3.14) **?** | undeclared |
-| p34-refcount-stack | 46.69 | 228.99 | NOT-LIC | **small +193.79** (+147.10) / **large +716.71** (+487.72) | undeclared |
-| p35-tagged-union | -26.50 | -170.56 | UNDEC |  | undeclared |
+| p28-intrusive-lists | 686.28 | 2564.22 | NOT-LIC | small <2.00 / large +2561.31 (-2.91) **?** | R2-vs-R3 searched at review: the WALK HOIST is 72% of the gap, and it is a FOURTH lever `safe_tuned.rs`'s own header omits |
+| p29-bst-delete | 67.05 | 897.60 | NOT-LIC | **small +193.53** (+126.48) / **large +1092.51** (+194.91) | ⊘ NO SEARCH, declared — NEITHER side searched, and the row publishes no rung-to-rung cost at all |
+| p32-free-list-pool | 193.87 | 826.56 | LICENSED | small <2.00 / large +823.42 (-3.14) **?** | ⊘ NO SEARCH, declared — NEITHER side searched, no cost axis, and the four unmeasured R2/R3 levers are named for the next task |
+| p34-refcount-stack | 46.69 | 228.99 | NOT-LIC | **small +193.79** (+147.10) / **large +716.71** (+487.72) | BOTH sides searched, and the control caught a flattering-direction headline BEFORE any review: the `-O0` shipped-pair gap was 2.88×/3.36× too large |
+| p35-tagged-union | -26.50 | -170.56 | UNDEC |  | R4 searched at review: the SIGN REVERSES — matched on the op-walk R4 WINS by 203.05 `Ir`/call (6.63%) on `large` |
 | p36-vtable-dispatch | 15.00 | 15.00 | UNDEC |  | BOTH sides searched (4 R3 levers, 3 R4) |
 | p38-alias-pun | 21.00 | 25.00 | LICENSED |  | undeclared |
 | p42-goto-cleanup | 12.00 | 11.00 | NOT-LIC |  | undeclared |
 | p46-bignum-mac | -119.00 | -815.00 | LICENSED |  | undeclared |
 | p47-ct-compare | 90.00 | 142.00 | LICENSED |  | R4 searched, six levers |
-| p49-interned-pool | 138.48 | 11.18 | NOT-LIC | small <2.00 / large +7.95 (-3.23) **?** | undeclared |
+| p49-interned-pool | 138.48 | 11.18 | NOT-LIC | small <2.00 / large +7.95 (-3.23) **?** | ⊘ NO R3-SIDE SPREAD — only ONE in-contract R3 spelling built, so there is not even a second point to bound a spread with |
 
 ⚠ **`‡` — the environment-phase term, and it is not noise.** The derived correction is a **whole-program** figure, so it contains the callees; a per-call `memset` of a **stack** array takes an alignment-dependent tail in `__memset_avx2_unaligned_erms`, and the initial stack pointer moves with the **length of the environment block**. The effect is bistable, period **32 bytes**, window exactly **16 wide**, and the phase differs per binary — so one rung can sit high while another sits low and **a pair swings by 14, not 7**. Per row, with its instrument:
 
@@ -573,54 +575,56 @@ From `results/gate/*.json` (`verus`, `identity`, `verdict`). `obligations` is wh
 
 ⚠ **`axioms` is a SEPARATE column and is deliberately not folded into `TCB items`, because the two are not the same kind of thing.** A TCB item is **usually** an `#[verifier::external_body]` wrapper with a body a reviewer can read and an `ensures` that can be checked against real Rust semantics. ⚠ **Two corrections, both measured (TASK_084_REVIEW major 2), because an earlier version of this paragraph overstated both:** since TASK_084 a bodied `#[verifier::external_fn_specification]` *also* counts as a TCB item — and `.memory/05-layout.md` records that it and `assume_specification` are **one mechanism**, so the split between these two columns is *has a reviewable body*, not *is a different kind of trust*. And the twin-and-`(a)/(b)/(c)` requirement does NOT cover every published item: `load_input` and `emit` (33 and 33, one per pattern) are `external_body` with **no `ensures`**, so `_is_trusted` is false and nothing is demanded of them. ⚠ **These counts are COMPUTED from the records every run — an earlier version hardcoded them and went stale the moment a pattern was added.** An **axiom** is a hand-written claim about code Verus never compiles: `assume_specification`, `axiom fn`, `uninterp spec fn`, `#[verifier::external_trait_specification]`. It has **no body**, so it adds **0** to `TCB lines`; it adds no verified function, so `obligations` does not move; it emits no instructions, so `R4=R5 @O3` does not move; and the form Verus's own error message prints for you to paste carries **no `requires` and no `ensures` at all**, which verifies a 1 MiB out-of-bounds read and a null dereference at `4 verified, 0 errors` (`.memory/04-verus.md`). One column would let a 7-line reviewed wrapper be traded for a zero-line unconditional axiom **at par**, and nothing in the table would move.
 
-**So the trusted base of a row is `TCB items` + `axioms`, and the totals below are reported that way rather than summed.** ⚠⚠ **The `axioms` column counts PATTERN-LOCAL declarations only, and reading `0` does NOT mean this tree rests on no hand-written axiom — an earlier version of this paragraph claimed exactly that and it is FALSE (TASK_084_REVIEW major 2).** All **33** of the **33** `verus.rs` carry `broadcast use`, and `vstd::slice::group_slice_axioms` alone is six `broadcast axiom fn`s in the pinned vstd (`vstd/slice.rs:186`); ten also import `group_array_axioms`, and `lemma_u128_shr_is_div` appears 23 times. **Every published number here rests on hand-written axioms. They are vstd's, they are pinned, and they are outside this column by construction** — a `0` says *this pattern's author wrote none of their own*, which is a narrower and still worth-having claim. ⚠ **A USED vstd `assume_specification` declares nothing locally and is invisible here too** (RECAP "Owed" 0, sixth route). The gate has carried `axiom_decls` per Verus source since TASK_082; nothing published read it, so a byte-identical regeneration was **not** evidence that nothing moved (TASK_083_REVIEW major 4).
+**So the trusted base of a row is `TCB items` + `axioms`, and the totals below are reported that way rather than summed.** ⚠⚠ **The `axioms` column counts PATTERN-LOCAL declarations only, and reading `0` does NOT mean this tree rests on no hand-written axiom — an earlier version of this paragraph claimed exactly that and it is FALSE (TASK_084_REVIEW major 2).** All **33** of the **33** `verus.rs` carry `broadcast use`, and `vstd::slice::group_slice_axioms` alone is six `broadcast axiom fn`s in the pinned vstd (`vstd/slice.rs:186`); ten also import `group_array_axioms`, and `lemma_u128_shr_is_div` appears 23 times. **Every published number here rests on hand-written axioms. They are vstd's, they are pinned, and they are outside this column by construction**. ⚠ **A USED vstd `assume_specification` declares nothing locally and is invisible here too** (RECAP "Owed" 0, sixth route). The gate has carried `axiom_decls` per Verus source since TASK_082; nothing published read it, so a byte-identical regeneration was **not** evidence that nothing moved (TASK_083_REVIEW major 4).
 
-| pattern | obligations | errors | TCB items | TCB lines | axioms | R4=R5 @O3 | verdict |
-|---|---:|---:|---:|---:|---:|---|---|
-| p01-array-sum | 7 | 0 | 3 | 6 | 0 | exact | PASS-WITH-BLOCKED-ROWS |
-| p02-buffer-copy | 9 | 0 | 4 | 10 | 0 | exact | PASS |
-| p03-bounded-stack | 9 | 0 | 5 | 10 | 0 | exact | PASS |
-| p04-ring-buffer | 9 | 0 | 5 | 10 | 0 | exact | PASS |
-| p05-index-flatten | 12 | 0 | 3 | 6 | 0 | exact | PASS |
-| p06-rotate | 18 | 0 | 5 | 10 | 0 | exact | PASS |
-| p07-binary-search | 10 | 0 | 3 | 6 | 0 | exact | PASS |
-| p08-overlap-move | 12 | 0 | 3 | 9 | 0 | exact | PASS |
-| p09-bitset | 18 | 0 | 4 | 7 | 0 | exact | PASS |
-| p10-fir-stencil | 10 | 0 | 3 | 6 | 0 | exact | PASS |
-| p11-nul-scan | 12 | 0 | 3 | 6 | 0 | exact | PASS |
-| p12-strcat-fixed | 15 | 0 | 5 | 10 | 0 | exact | PASS |
-| p13-strncpy-trunc | 19 | 0 | 5 | 10 | 0 | exact | PASS |
-| p14-field-split | 19 | 0 | 6 | 11 | 0 | exact | PASS |
-| p16-tlv-walk | 10 | 0 | 3 | 6 | 0 | exact | PASS |
-| p17-http-range | 10 | 0 | 3 | 6 | 0 | exact | PASS |
-| p18-varint-shift | 12 | 0 | 3 | 6 | 0 | exact | PASS |
-| p19-state-machine | 12 | 0 | 3 | 6 | 0 | exact | PASS |
-| p22-hash-probe | 20 | 0 | 5 | 10 | 0 | exact | PASS |
-| p23-partition | 16 | 0 | 5 | 10 | 0 | exact | PASS |
-| p25-realloc-growth | 10 | 0 | 4 | 7 | 0 | norel | PASS |
-| p27-handle-table | 15 | 0 | 7 | 20 | 0 | exact | PASS |
-| p28-intrusive-lists | 23 | 0 | 7 | 20 | 0 | norel | PASS |
-| p29-bst-delete | 25 | 0 | 7 | 20 | 0 | norel | PASS |
-| p32-free-list-pool | 15 | 0 | 5 | 10 | 0 | exact | PASS |
-| p34-refcount-stack | 24 | 0 | 7 | 20 | 0 | norel | PASS |
-| p35-tagged-union | 16 | 0 | 9 | 16 | 0 | exact | PASS-WITH-BLOCKED-ROWS |
-| p36-vtable-dispatch | 12 | 0 | 4 | 7 | 0 | norel | PASS |
-| p38-alias-pun | 13 | 0 | 5 | 10 | 0 | exact | PASS |
-| p42-goto-cleanup | 18 | 0 | 5 | 16 | 0 | exact | PASS-WITH-BLOCKED-ROWS |
-| p46-bignum-mac | 21 | 0 | 5 | 10 | 0 | exact | PASS |
-| p47-ct-compare | 12 | 0 | 3 | 6 | 0 | exact | PASS |
-| p49-interned-pool | 34 | 0 | 5 | 10 | 0 | exact | PASS |
-| **total** | **497** | | **152** | **333** | **0** | | |
+⚠⚠ **AND A `0` IN THE `axioms` COLUMN DOES NOT MEAN THIS PATTERN'S AUTHOR WROTE NO HAND-WRITTEN DECLARATION OF THEIR OWN — 10 of the 33 rows below carry a `global` directive, and every one of them prints `0 axioms`.** This paragraph said the opposite until TASK_166 (TASK_165 MAJOR 1). Verus's `global layout` / `global size_of` is hand-written, pattern-local, and the Verus guide describes it as *exporting the **axioms** `size_of::<T>() == n` and `align_of::<T>() == m`*; for `usize` it also narrows the SMT integer range. The gate deliberately partitions it out of `verus.axioms` — **rustc const-checks a `global` and rejects a false one with `E0080`**, so it is not an unchecked claim the way an `assume_specification` is, and stage 5e catches the rejection (TASK_164, re-derived and extended at TASK_165). ✅ **So the two columns answer different questions and are published side by side: `axioms` is *what nothing checks*, `global` is *what the author declared and rustc checks*.** ⚠ **Neither is zero for this tree, and quoting `0 axioms` alone understates the hand-written declarations on 10 rows.**
 
-**Trusted base, all 33 rows: 152 items (333 lines) and 0 axioms.** Quote both numbers; there is no single one.
+| pattern | obligations | errors | TCB items | TCB lines | axioms | global | R4=R5 @O3 | verdict |
+|---|---:|---:|---:|---:|---:|---:|---|---|
+| p01-array-sum | 7 | 0 | 3 | 6 | 0 | 0 | exact | PASS-WITH-BLOCKED-ROWS |
+| p02-buffer-copy | 9 | 0 | 4 | 10 | 0 | 0 | exact | PASS |
+| p03-bounded-stack | 9 | 0 | 5 | 10 | 0 | 0 | exact | PASS |
+| p04-ring-buffer | 9 | 0 | 5 | 10 | 0 | 0 | exact | PASS |
+| p05-index-flatten | 12 | 0 | 3 | 6 | 0 | 0 | exact | PASS |
+| p06-rotate | 18 | 0 | 5 | 10 | 0 | 0 | exact | PASS |
+| p07-binary-search | 10 | 0 | 3 | 6 | 0 | 0 | exact | PASS |
+| p08-overlap-move | 12 | 0 | 3 | 9 | 0 | 0 | exact | PASS |
+| p09-bitset | 18 | 0 | 4 | 7 | 0 | 0 | exact | PASS |
+| p10-fir-stencil | 10 | 0 | 3 | 6 | 0 | 1 | exact | PASS |
+| p11-nul-scan | 12 | 0 | 3 | 6 | 0 | 0 | exact | PASS |
+| p12-strcat-fixed | 15 | 0 | 5 | 10 | 0 | 0 | exact | PASS |
+| p13-strncpy-trunc | 19 | 0 | 5 | 10 | 0 | 0 | exact | PASS |
+| p14-field-split | 19 | 0 | 6 | 11 | 0 | 0 | exact | PASS |
+| p16-tlv-walk | 10 | 0 | 3 | 6 | 0 | 0 | exact | PASS |
+| p17-http-range | 10 | 0 | 3 | 6 | 0 | 0 | exact | PASS |
+| p18-varint-shift | 12 | 0 | 3 | 6 | 0 | 0 | exact | PASS |
+| p19-state-machine | 12 | 0 | 3 | 6 | 0 | 1 | exact | PASS |
+| p22-hash-probe | 20 | 0 | 5 | 10 | 0 | 1 | exact | PASS |
+| p23-partition | 16 | 0 | 5 | 10 | 0 | 0 | exact | PASS |
+| p25-realloc-growth | 10 | 0 | 4 | 7 | 0 | 0 | norel | PASS |
+| p27-handle-table | 15 | 0 | 7 | 20 | 0 | 0 | exact | PASS |
+| p28-intrusive-lists | 23 | 0 | 7 | 20 | 0 | 1 | norel | PASS |
+| p29-bst-delete | 25 | 0 | 7 | 20 | 0 | 1 | norel | PASS |
+| p32-free-list-pool | 15 | 0 | 5 | 10 | 0 | 0 | exact | PASS |
+| p34-refcount-stack | 24 | 0 | 7 | 20 | 0 | 1 | norel | PASS |
+| p35-tagged-union | 16 | 0 | 9 | 16 | 0 | 0 | exact | PASS-WITH-BLOCKED-ROWS |
+| p36-vtable-dispatch | 12 | 0 | 4 | 7 | 0 | 1 | norel | PASS |
+| p38-alias-pun | 13 | 0 | 5 | 10 | 0 | 1 | exact | PASS |
+| p42-goto-cleanup | 18 | 0 | 5 | 16 | 0 | 0 | exact | PASS-WITH-BLOCKED-ROWS |
+| p46-bignum-mac | 21 | 0 | 5 | 10 | 0 | 1 | exact | PASS |
+| p47-ct-compare | 12 | 0 | 3 | 6 | 0 | 1 | exact | PASS |
+| p49-interned-pool | 34 | 0 | 5 | 10 | 0 | 0 | exact | PASS |
+| **total** | **497** | | **152** | **333** | **0** | **10** | | |
 
-⚠ **The totals are DISTINCT counts, not column sums, and the rows are not** (`TASK_084_REVIEW` minor 1, fixed at TASK_088). Every pattern's `verus.rs` `#[path]`-includes the same `common/driver.rs`, so one trusted item or one axiom there is real in every row and would be counted 33 times in a column sum. The rows above add the shared file's items because that row's binary executes them; the totals add each `(source, name, line)` **once**. Today the shared file contributes **0 item(s)** and **0 axiom(s)**, so the two agree — the dedupe is measured inert and is here for the day it is not.
+**Trusted base, all 33 rows: 152 items (333 lines), 0 axioms and 10 `global` directives on 10 rows.** Quote all three; there is no single one. ⚠ **`0 axioms` on its own is the number this file used to print, beside prose saying a `0` meant the author wrote nothing of their own — see the warning above the table.**
+
+⚠ **The totals are DISTINCT counts, not column sums, and the rows are not** (`TASK_084_REVIEW` minor 1, fixed at TASK_088). Every pattern's `verus.rs` `#[path]`-includes the same `common/driver.rs`, so one trusted item or one axiom there is real in every row and would be counted 33 times in a column sum. The rows above add the shared file's items because that row's binary executes them; the totals add each `(source, name, line)` **once**. Today the shared file contributes **0 item(s)**, **0 axiom(s)** and **0 `global` directive(s)**, so the two agree — the dedupe is measured inert and is here for the day it is not.
 
 *This table reads **one** Verus source per pattern, `verus.rs` — the R5 rung's. The list below is derived from the records on every run, so a pattern that grows a second pinned source announces itself here instead of being silently dropped.*
 
-| pattern | other pinned Verus source | obligations | TCB items | axioms | why it is not in the row above |
-|---|---|---:|---:|---:|---|
-| p01-array-sum | `safe_naive_verus.rs` | 7 | 2 | 0 | the **R2v control**: safe Rust carrying the same proof, which holds up `.memory/01-ladder.md` finding 2 (*a proof alone buys nothing*). It is not a rung and is not in the measured 6-cell matrix, so its trusted base is not R5's and summing the two would publish a number describing no rung. |
+| pattern | other pinned Verus source | obligations | TCB items | axioms | global | why it is not in the row above |
+|---|---|---:|---:|---:|---:|---|
+| p01-array-sum | `safe_naive_verus.rs` | 7 | 2 | 0 | 0 | the **R2v control**: safe Rust carrying the same proof, which holds up `.memory/01-ladder.md` finding 2 (*a proof alone buys nothing*). It is not a rung and is not in the measured 6-cell matrix, so its trusted base is not R5's and summing the two would publish a number describing no rung. |
 
 ## 4. Static shape, `-O3 isolated`
 
@@ -698,8 +702,8 @@ Two consequences: the evidence for *"a proof costs zero instructions"* is the ra
 | p12-strcat-fixed | large -26.00 | LICENSED | inside the ±2.00 floor | R4 searched at review: the SIGN FLIPS on `large` to +66.00 |
 | p13-strncpy-trunc | small -177.00, large -1054.00 | LICENSED | inside the ±2.00 floor | R4 searched: the SIGN FLIPS to +44/+77 |
 | p18-varint-shift | small -25.00, large -12.00 | LICENSED | inside the ±2.00 floor | undeclared |
-| p25-realloc-growth | small -60.44, large -361.82 | NOT-LIC | inside the ±2.00 floor | undeclared |
-| p35-tagged-union | small -26.50, large -170.56 | UNDEC | inside the ±2.00 floor | undeclared |
+| p25-realloc-growth | small -60.44, large -361.82 | NOT-LIC | inside the ±2.00 floor | the repair SITE searched (three); one respelling lever per READ site measured EQUAL to the hundredth. R3/R4 rung spellings and the GROWTH-site repair spelling still unsearched |
+| p35-tagged-union | small -26.50, large -170.56 | UNDEC | inside the ±2.00 floor | R4 searched at review: the SIGN REVERSES — matched on the op-walk R4 WINS by 203.05 `Ir`/call (6.63%) on `large` |
 | p46-bignum-mac | small -119.00, large -815.00 | LICENSED | inside the ±2.00 floor | undeclared |
 
 The argument that scheduled this work said the claim rests *"at its two biggest numbers, on the column the tree has caught reversing a comparison three times"*, naming **p11 and p13** as *"precisely the two patterns whose `.memory/` entries already say their rungs dispatch different work outward"*.
@@ -778,7 +782,9 @@ p18   large        -12.00         0.00       -12.00
 
 ⚠ **TASK_075_REVIEW M6 prescribed deriving the lever count this way for "the 10 patterns that expose a `--list`" and deleting the declared table. Measured, that cannot be done.** Ten patterns expose a `--list` and **five of them print no source file at all** (p06 p09 p22 p36 p38); the other five split two ways (`from x.rs` on p10 and p47, `<- x.rs` on p03, p04 and p12). **p36 — the review's own worked example — is in the first group**: its `--list` prints `r3_hdr4  rust`, the *language*. Deriving p36's split from the `r3_`/`r4_` **name prefix** instead gives 4 R3 and **2** R4, while `.memory/01-ladder.md` finding 23 says **3** R4 — so the derivation-by-convention rots in the same direction the hand table does and less visibly. The census above is therefore built to degrade to *"no source attribution"* rather than to a wrong count.
 
-*Declared*, in `synthesize.py::SEARCH_REVIEWED`, every entry cited to a **reviewed** artefact — except one, `p06`, which is marked `⊘` because `.memory/01-ladder.md` marks it `⊘`: it landed at TASK_048 and has not been through a second review, and it is labelled here rather than omitted or silently promoted. A pattern with no entry prints `undeclared`, which is its true state — **21 of 33** today:
+*Declared*, in `synthesize.py::SEARCH_REVIEWED`, every entry cited to a **reviewed** artefact — except one, `p06`, which is marked `⊘` because `.memory/01-ladder.md` marks it `⊘`: it landed at TASK_048 and has not been through a second review, and it is labelled here rather than omitted or silently promoted. A pattern with no entry prints `undeclared`, which is its true state — **14 of 33** today:
+
+⚠⚠ **AND THE 19 DECLARED ROWS SPLIT TWO WAYS, WHICH ONE COUNT CANNOT SAY: 16 report a SEARCH RESULT and 3 report a REVIEWED DECLARATION OF *NO* SEARCH (p29, p32, p49, marked `⊘` in their entry text and listed in `SEARCH_NONE`).** A row that publishes no rung-to-rung figure and says so is not in the same state as a row nobody has looked at, and `undeclared` collapses the two. ⚠ **So do not read `14 of 33` as *the unsearched fraction*** — it is *the fraction with no entry in this dict*, which is what it has always been.
 
 - **p01** — R3 span OWED  
   *RECAP 'Owed' 3: p01 and p08 owe an in-contract R3-side span*
@@ -800,10 +806,26 @@ p18   large        -12.00         0.00       -12.00
   *.memory/01-ladder.md p17 (TASK_018, reviewed at TASK_018_REVIEW): an in-contract respelling keeping `let start: i64`, `let end: i64` and the literal `if start < end && start >= 0` measures -19.00 flat against the shipped R4 on both bands and is BYTE-IDENTICAL (md5_fn 532201c70eeb.., 135 instructions) to a row an earlier task had declared out of contract. ⚠ It is an R3-SIDE bound with R4 held by fiat, emphatically not 'safe beats unsafe'. And the published `+32 flat` is retracted AS A LAW: both shipped bands sit at nsuf = 3, and swept over nsuf 1-8 `R3ship - R4` runs 18...63. p17 ships no sweep inputs*
 - **p22** — R4 searched: `+2.00` is a fixed-R4 bound; against `r4_reslice` the gap is +125/+1021 -- 510x on `large`  
   *.memory/01-ladder.md finding 22 (p22), reviewed at TASK_070_REVIEW which re-measured it end to end: `r4_reslice` is R4 plus R3's one reslice, in contract, same checksum on all 8 inputs, `20 verified, 0 errors`, and its R4/R5 pair is byte-identical at -O3 (md5_fn ea06db04c435 both sides, built and diffed). It is 1*nkw - 5 cheaper than the shipped R4, so `R3ship - r4_reslice = 1*nkw - 3` = +125.00 / +1021.00. The R4 was NOT re-shipped (.memory/02-bench-rules.md), so both numbers publish. ⚠ Added at TASK_112: this row printed `undeclared` while §6 of results/SYNTHESIS.md reported the 510x retraction*
+- **p25** — the repair SITE searched (three); one respelling lever per READ site measured EQUAL to the hundredth. R3/R4 rung spellings and the GROWTH-site repair spelling still unsearched  
+  *`patterns/p25-realloc-growth/NOTES.md` §3c, REVIEWED at TASK_158 §4b, which built a ternary spelling of R1h and a `*(toks + curi)` spelling of `rederive` and found both equal to their originals **to the hundredth at every cell** — so neither shipped figure is a spelling artefact on that lever. ⚠ The file names the weaker-searched endpoint itself: the spelling of the GROWTH-site repair (`fixup2`) was not searched*
+- **p28** — R2-vs-R3 searched at review: the WALK HOIST is 72% of the gap, and it is a FOURTH lever `safe_tuned.rs`'s own header omits  
+  *`patterns/p28-intrusive-lists/NOTES.md` §8, `TASK_149` deliverable 4 (`.temp/t149/lever/`), resolved at TASK_150: three variants, identical checksum on every probe, and un-hoisting the walk recovers **72%** of the `R3 − R2` gap on `small.bin` and 57% on the GET-miss probe; on the TRIM path R3 is genuinely 5% cheaper. ⚠ p28 publishes NO rung-to-rung cost (§8) and the absence is declared, so this is a search result without a published figure attached to it*
+- **p29** — ⊘ NO SEARCH, declared — NEITHER side searched, and the row publishes no rung-to-rung cost at all  
+  *`patterns/p29-bst-delete/NOTES.md` §8, REVIEWED at TASK_140: *"No cost axis is published … Neither side was searched. The measurement record exists and the numbers are in it; nothing here reads them."* ⚠ Three R4 spellings WERE built and counted for the `-O0` **identity** question (§5) and none matches — that is an identity search, not a cost search, and it licenses no figure*
+- **p32** — ⊘ NO SEARCH, declared — NEITHER side searched, no cost axis, and the four unmeasured R2/R3 levers are named for the next task  
+  *`patterns/p32-free-list-pool/NOTES.md` §7, REVIEWED at TASK_145 (verdict STANDS): *"p32 SHIPS WITH NO COST AXIS. THE ABSENCE IS DECLARED, NOT A MEASURED ZERO … That search was not done, on either side."* The four levers left open are the flat `[u8; 32]` pool vs `[[u8; 4]; 8]`, the NIL-sentinel register pair vs `Option<(u8, u32)>`, re-widening `h as usize` per use, and an `if` chain vs a `match`*
+- **p34** — BOTH sides searched, and the control caught a flattering-direction headline BEFORE any review: the `-O0` shipped-pair gap was 2.88×/3.36× too large  
+  *`patterns/p34-refcount-stack/NOTES.md` §5 and `patterns/p34-refcount-stack/controls/spellings.py`, REVIEWED at TASK_155: `r3_cursor`, `r4_checked` and `r4_readdirect` are built by text substitution from the shipped rungs. `r4_readdirect` ties the shipped R4 exactly at `-O3` and beats it by 116.13 / 611.10 at `-O0` **and verifies at the pinned obligation count**, so p34 is the first pattern with more than one R4 spelling SHOWN admissible and a measured R4-side width (53.02 / 267.42 at `-O3`). The weaker-searched endpoint is named: the C side, which had no spelling search at all*
+- **p35** — R4 searched at review: the SIGN REVERSES — matched on the op-walk R4 WINS by 203.05 `Ir`/call (6.63%) on `large`  
+  *`patterns/p35-tagged-union/NOTES.md` §1(iii), TASK_152 M1 (the first flattering-direction headline caught by a review pointed at it on purpose) and the four-arm rig re-run at TASK_153 (`.temp/t153/rig/measure_rig.py`) with both shipped rungs as controls that reproduce `results/gate/` exactly. The published `R3 − R4 = −170.56` is withdrawn; what the pin costs R4 is **373.61 `Ir`/call (11.56%)**. ⚠ And the same pair of levers is **−373.61 at `-O3` and +6035.46 at `-O0`***
 - **p36** — BOTH sides searched (4 R3 levers, 3 R4)  
   *.memory/01-ladder.md finding 23 (p36): publishes +7.00 flat (fixed-R4 bound, cheapest R3 found) and +10.00 flat (matched pair), never a single number, and NO pair interval*
 - **p47** — R4 searched, six levers  
   *`patterns/p47-ct-compare/NOTES.md` §8e, REVIEWED — "Six R4 levers were built, each measured and put through `./verus_run.py`" — and §8e's table has six rows: `unsafe` shipped, `u_base`, `u_winu`, `u_end`, `u_win`, `u_ptr`. `gen_controls.py --list` registers five `from unsafe.rs`; the sixth is the shipped rung. ⚠ TASK_075_REVIEW M6.3 read this as four and called the number unsupported; it is supported, and the citation — not the figure — was what was wrong*
+- **p49** — ⊘ NO R3-SIDE SPREAD — only ONE in-contract R3 spelling built, so there is not even a second point to bound a spread with  
+  *`patterns/p49-interned-pool/NOTES.md` §5 and §10, REVIEWED at TASK_162: the R2/R3 sign REVERSES with the level (R3 +27.05% at `-O0`, −5.81%/−9.18% at `-O3`), and the file states that no R3-side spread is published because a second spelling was never built. ⚠⚠ **`patterns/p49-interned-pool/controls/spellings.py` is NOT a rung-spelling search** — it is the `cow`-vs-`provenance` REPAIR-SITE control on `c/kernel.c`, which is why this entry does not claim one*
+
+⚠⚠⚠ **THE SAME DEFECT TASK_112 FIXED RECURRED ON THE SEVEN ROWS ADDED AFTER IT, AND NOTHING FIRED — because a missing entry is indistinguishable from a true `undeclared`.** Before TASK_166 this column printed **21 of 33** undeclared against a published **14 of 26**, and ⚠ **the entire growth was the seven new rows**: the 14 rows undeclared at 26 are still exactly the 14 undeclared among those 26 today, so `14 → 21` was **100% bookkeeping and 0% a change in search state**. Of the seven, **four had a REVIEWED SEARCH and no entry** (`p25 p28 p34 p35` — `p34`'s own `controls/spellings.py` caught a flattering-direction headline before any review saw it, and `p35`'s search REVERSED the sign of its published `R3 − R4`) and **three had a REVIEWED DECLARATION OF NO SEARCH** (`p29 p32 p49`). ✅ **This defect runs AGAINST the usual flattering direction — it UNDER-reports the project's own search effort.** ⚠⚠ **And the obvious detector does not work: `p49` ships `controls/spellings.py` and it is NOT a rung-spelling search** — it is the `cow`-vs-`provenance` repair-site control on `c/kernel.c` — so *"a pattern shipping `controls/spellings.py` with no entry here"* would have produced a WRONG entry for `p49`. A check that could tell a missing entry from a true `undeclared` has to read the pattern's `NOTES.md`, not its file list.
 
 ⚠⚠ **FOUR ENTRIES WERE ADDED AT TASK_112 AND THE COLUMN UNDERSTATED THE RECORD BY THAT MUCH** (TASK_111, adjacent work 1, which named three of the four; `p12` was found while landing it). `p22`, `p17`, `p06` and `p12` each have a **reviewed** search result in `.memory/01-ladder.md`, and each printed `undeclared` here. ⚠ **The consequence was not cosmetic**: `results/SYNTHESIS.md` §2 was quoting p22's `+2.00` and p12's `-26.00` inside a bucket labelled *"flat in the size of the data"* while RECAP finding 33 and `.memory/01-ladder.md` finding 22 carried the 510× correction for one of them (⚠ it is recorded there and in RECAP's standing trap box, **not** on the *"Retracted -- do not reinstate"* list, where p17's `+32 flat` does sit). **An `undeclared` in this column means *nobody wrote an entry*, and it has never meant *nobody searched*.**
 
