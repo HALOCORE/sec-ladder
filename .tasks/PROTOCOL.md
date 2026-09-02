@@ -352,6 +352,27 @@ A task is done when **all** hold:
    every rung-source doc fix into ONE pass rather than avoiding them** — fixing
    `c/kernel.c` alongside them is then free at the margin.
 
+   ⚠⚠⚠ **AND THE TABLE ABOVE OMITS A COST THAT IS NOT OPTIONAL, FOUND AT
+   `TASK_168`: A RE-MEASURE STALES THAT PATTERN'S PUBLISHED TABLE, AND STAGE 9c
+   HARD-FAILS ON IT.** `results/tables/pNN.md` cites the measurement record, so
+   every re-measured pattern owes **`harness/report.py pNN` plus a SECOND gate
+   run** — and a pattern whose `controls_json` also moved owes two.
+   `TASK_168` re-measured four patterns and paid **+5 renders and +6 gate runs**
+   that this rule's cost table does not mention. ✅ **Budget
+   `re-measure → report.py → gate` per pattern, not `re-measure` alone.**
+
+   ⚠⚠ **A PREDICTION LESSON FROM THE SAME TASK, AND IT IS RULE 14's SHAPE ONE
+   LEVEL DOWN: PREDICT FROM THE COMMAND'S DEFAULTS, NOT FROM THE RECORD'S
+   VALUES.** `TASK_168` predicted its re-measure's deterministic half **exactly**
+   — zero `Ir`, checksum, md5, static or input-hash movement on all four
+   patterns, and `source_sha256` movers exactly the five edited files — and got
+   the wall-clock half wrong, because **two record fields are `argparse`
+   arguments** (`reps`, `timing_cpu`): `p12`/`p13` had been taken at
+   `--reps 31` and `p16` at `--cpu 5`, and a re-run at the defaults silently
+   retired both. ⚠ **A record field that is a command-line argument moves
+   whenever the argument does, and the record is exactly where you cannot see
+   that.**
+
    **If the hash changes later, say so and say why** — a declaration edit made
    after a measurement is exactly what the direction test governs
    (`.memory/01-ladder.md`), and disclosing one has twice been upheld on review.

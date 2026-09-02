@@ -435,13 +435,48 @@ clone cost steps `1.15 → 8.34` between **n = 1024 and n = 1025** on `u64`s, i.
 8192 bytes. **`rep movsb` is one retired instruction that callgrind charges at
 ≈1 `Ir` per byte moved**, roughly **10× the vector path's 0.104**.
 
-⚠⚠ **AND "BLAST RADIUS CHECKED AND EMPTY" IS A TASK_074 STATEMENT WITH SIX
-PATTERNS BUILT SINCE — see RECAP "Owed" 28.** It has **not** been re-run over
-p13, p14, p18, p10, p27, p47, p38, p22, p36 or p19. ⚠ **Do not read it as
-current.** Note the distinction the re-check must respect: **what matters is the
+⚠⚠⚠ **"BLAST RADIUS CHECKED AND EMPTY" WAS A TASK_074 STATEMENT AND IT IS NOW
+RE-RUN AT 33 PATTERNS (`TASK_168`) — IT IS NOT EMPTY, AND THE `8192` BAR ABOVE
+IS THE WRONG BAR FOR `memset`.**
+
+⚠⚠ **THE MANAGER'S TASK FILE ASKED *"does any single `mem*` call exceed 8192
+bytes?"* AND THAT QUESTION MISSES BOTH HITS.** `8192` is the
+**`memcpy`/`rep movsb`** threshold; **`memset` flips at 2–4 KiB** — which this
+very entry says three lines above, and which the *"`memset` CROSSES TO
+`rep stosb`"* section further down states as **2000–4000 bytes**. **Two libc
+routines, two thresholds, and the manager quoted one at the other.** ✅ **The
+`Ir`/byte signature is what separates them cleanly and is what the re-check
+used**: `≈1.00` means a byte-wise `rep` path, `≈0.10` means the vector path.
+
+**Both hits are 4096-byte `memset`-class transfers:**
+
+- ⚠⚠⚠ **`p42` IS A NEW, ASYMMETRIC, PUBLISHED HIT.** `safe_naive`'s
+  `vec![0u8; 4096]` costs **`+4160.00` `Ir`/call at `1.0156` `Ir`/byte** over
+  `unsafe`'s `with_capacity` — the `rep stosb` signature to three decimals.
+  **On the vector path the same zeroing prices at ≈426 `Ir`, so roughly 90% of
+  the term is COUNTER, not code.** ⚠⚠ **`results/synthesis.md` §2 prints exactly
+  `+4160.00`, in BOLD, in the band whose own legend says *"every row is
+  real"*.** ✅ **The behavioural difference IS real — one rung zeroes and the
+  other does not — but its MAGNITUDE in `Ir` is inflated ~10×.**
+- ⚠⚠ **`.memory/`'s own *"only `p08`'s gcc kernels contain a `rep`
+  instruction"* is FALSE at 33.** Scanned over the same symbols `measure.py`
+  counts: **26 of 1052 measured windows, across NINE patterns** — `p06 p08 p14
+  p23 p27 p29 p32 p35 p46`. ✅ ***"gcc"* and *"-O3"* are right** — all 26 are
+  `c-gcc`/`c-gcc-h` at `-O3`, **zero** clang or Rust windows. ✅ **And all 34
+  instructions are the WORD-wise form** (`rep stos %rax`, ≈`0.126` `Ir`/byte),
+  **so the direction is that gcc's `Ir` UNDERSTATES its work** relative to clang
+  and Rust — `p08`'s documented `Ir`-vs-`ns` direction disagreement, on nine
+  patterns instead of one. ⚠ **The exposed column is `gcc-clang`, which
+  `results/synthesis.md` publishes; every rung pair is untouched because every
+  hit is a C cell.**
+
+⚠ **The distinction the re-check DID respect, and it stands: what matters is the
 size of an individual `memcpy`/`memmove`/`memset` CALL inside the measured
-window, not the size of the input file.** p02 copies 61 B and 4092 B out of a
+window, not the size of the input file.** `p02` copies 61 B and 4092 B out of a
 16 KB blob; conflating the two overstates the risk.
+⚠⚠ **AND THE `p42` HIT CARRIES NONE OF THOSE THREE NAMES** — it is a `Vec`
+allocation-and-zero, so a scan keyed on `mem*` call sites would have missed it.
+**Key on the `Ir`/byte signature, not on the callee name.**
 
 ⚠ **PROVISIONAL — measured at TASK_074, NOT YET REVIEWED. The threshold does not
 merely inflate the number; at the crossing it INVERTS THE DIRECTION, and that is

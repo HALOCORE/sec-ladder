@@ -1,6 +1,6 @@
 # p12-strcat-fixed — results
 
-Generated 2026-08-20T01:09:35Z from `results/p12-strcat-fixed.json` (git `3779cb7ff321`, working tree dirty).
+Generated 2026-09-02T07:44:40Z from `results/p12-strcat-fixed.json` (git `8fd484477573`, working tree dirty).
 
 ## Toolchain
 
@@ -177,26 +177,26 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 ## Wall clock (secondary)
 
-> taskset -c 3, interleaved round-robin, 31 reps, min and median; frequency scaling on, shared box. Frequency scaling is on and cannot be disabled without root; the box is shared and containerised. Wall clock is a sanity check on `Ir`, never the headline. Times include process start-up and reading the input file.
+> taskset -c 3, interleaved round-robin, 30 reps, min and median; frequency scaling on, shared box. Frequency scaling is on and cannot be disabled without root; the box is shared and containerised. Wall clock is a sanity check on `Ir`, never the headline. Times include process start-up and reading the input file.
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 28.65 | 29.06 | 1.4% | 24.31 | 24.51 | 0.8% |
-| c-gcc | whole | 28.84 | 29.01 | 0.6% | 23.30 | 24.71 | 6.0% |
-| c-clang | isolated | 26.88 | 27.21 | 1.2% | 23.30 | 23.47 | 0.7% |
-| c-clang | whole | 27.25 | 27.54 | 1.1% | 23.45 | 23.74 | 1.3% |
-| safe_naive | isolated | 30.81 | 31.18 | 1.2% | 36.81 | 37.19 | 1.0% |
-| safe_naive | whole | 30.31 | 30.59 | 0.9% | 36.53 | 36.97 | 1.2% |
-| safe_tuned | isolated | 27.23 | 27.51 | 1.0% | 30.32 | 30.67 | 1.2% |
-| safe_tuned | whole | 26.93 | 27.22 | 1.1% | 30.33 | 30.60 | 0.9% |
-| unsafe | isolated | 26.34 | 26.69 | 1.3% | 30.18 | 30.45 | 0.9% |
-| unsafe | whole | 26.87 | 27.12 | 0.9% | 31.55 | 31.76 | 0.7% |
-| verus | isolated | 26.34 | 26.67 | 1.3% | 30.12 | 30.49 | 1.2% |
-| verus | whole | 27.00 | 27.23 | 0.8% | 30.63 | 32.10 | 4.8% |
-| c-gcc-h | isolated | 28.10 | 28.38 | 1.0% | 24.25 | 24.47 | 0.9% |
-| c-gcc-h | whole | 28.11 | 28.37 | 0.9% | 24.15 | 24.45 | 1.3% |
-| c-clang-h | isolated | 27.23 | 27.59 | 1.3% | 23.55 | 23.88 | 1.4% |
-| c-clang-h | whole | 27.01 | 27.39 | 1.4% | 23.53 | 23.71 | 0.8% |
+| c-gcc | isolated | 28.85 | 29.25 | 1.4% | 24.37 | 24.74 | 1.5% |
+| c-gcc | whole | 28.91 | 29.63 | 2.5% | 24.30 | 24.81 | 2.1% |
+| c-clang | isolated | 27.10 | 27.60 | 1.8% | 23.34 | 23.71 | 1.6% |
+| c-clang | whole | 27.54 | 28.13 | 2.1% | 23.47 | 23.94 | 2.0% |
+| safe_naive | isolated | 30.96 | 31.60 | 2.1% | 36.85 | 37.32 | 1.3% |
+| safe_naive | whole | 30.55 | 31.06 | 1.7% | 36.64 | 37.20 | 1.5% |
+| safe_tuned | isolated | 27.35 | 27.99 | 2.3% | 30.42 | 30.71 | 0.9% |
+| safe_tuned | whole | 27.22 | 27.61 | 1.4% | 30.39 | 30.77 | 1.2% |
+| unsafe | isolated | 26.57 | 27.48 | 3.4% | 30.14 | 30.67 | 1.8% |
+| unsafe | whole | 27.04 | 27.65 | 2.3% | 31.49 | 32.07 | 1.8% |
+| verus | isolated | 26.49 | 27.03 | 2.0% | 30.40 | 30.75 | 1.2% |
+| verus | whole | 27.02 | 27.89 | 3.2% | 31.94 | 32.36 | 1.3% |
+| c-gcc-h | isolated | 28.18 | 29.02 | 3.0% | 24.28 | 24.62 | 1.4% |
+| c-gcc-h | whole | 28.27 | 28.82 | 1.9% | 24.21 | 24.60 | 1.6% |
+| c-clang-h | isolated | 27.26 | 27.84 | 2.1% | 23.61 | 24.11 | 2.1% |
+| c-clang-h | whole | 27.22 | 27.87 | 2.4% | 23.52 | 23.89 | 1.6% |
 
 Every wall-clock cell is within the 10% min-to-median spread threshold.
 

@@ -73,6 +73,33 @@
     "no_rung_entries": 0,
     "no_rung": []
   },
+  "doc_citations": {
+    "fatal": [],
+    "other": [],
+    "harness_modules": [
+      "asm.py",
+      "build.py",
+      "check.py",
+      "composition.py",
+      "contract_diff.py",
+      "dloop.py",
+      "fixture.py",
+      "limbs.py",
+      "measure.py",
+      "report.py",
+      "table_render_inputs.py",
+      "temp_citations.py",
+      "vparse.py"
+    ]
+  },
+  "codegen_cfgs": {
+    "build_py_cfgs": [
+      "slb_isolated"
+    ],
+    "missing": [],
+    "unresolved": 0,
+    "verdict": "OK"
+  },
   "source_sha256": {
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
     "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
@@ -88,13 +115,13 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "60aba3e5a118296c4c8eea74441095beacee54df67ea72344978e91c16ae87c0",
+    "harness/check.py": "741c6d2ea110a225962e6c4dd451c1368d22edde521a54fee629cbb032d69cb2",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
-    "harness/vparse.py": "0922b5ad2a1e7bcd7f8f67aa2d8ff0f66d66584c36deb344507b32a72776725f",
+    "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
     "patterns/p16-tlv-walk/NOTES.md": "06a402d0b76638f73b7cc4217a4c19bb6b0f2d61d05726445dd4a391bd38d3e7",
     "patterns/p16-tlv-walk/README.md": "f15228277fb40556da91f02dfa7bd453eada8276cf34d529db519b65a2911bd6",
     "patterns/p16-tlv-walk/c/kernel.c": "a59fbef6d3427711a78b7806569978223367c6cba81bfcf1881e1ac83977aba0",
@@ -104,7 +131,7 @@
     "patterns/p16-tlv-walk/controls/foldcmp.py": "3bb15bd9fc21c5056a306e0da31f670d93bcf0ccfcd6811b4219991a0d391089",
     "patterns/p16-tlv-walk/controls/gen_controls.py": "a59ac84ef83ca240686726c78130a98328315be0833fc5249943dcb61f02526a",
     "patterns/p16-tlv-walk/inputs/gen.py": "7891a2f6fe438908a0e663da8660b58fcacfa2ec859f1f3105571fe13f054a03",
-    "patterns/p16-tlv-walk/model.py": "8b35eae6926af6654d6816d9a1733808234217fda9cdb8a8ee1d873d1877a6e9",
+    "patterns/p16-tlv-walk/model.py": "55234b05234fc0bcc8e9f5ef14630b36041630e08f5a6d8cc0f90dced84e8b79",
     "patterns/p16-tlv-walk/safe_naive.rs": "3f58f658310c5615d0899d01e0907a68b5689673b79d856b6372dbf8cd149054",
     "patterns/p16-tlv-walk/safe_tuned.rs": "6044ce0394896c3605e02178e84aa38b05d9c3bc4d31444cb52ab8674889d2fd",
     "patterns/p16-tlv-walk/spec.md": "58fdae0a2b9ba51bccea3d4e6e0b2b1153f8c5405f72456370a6833d46e73aca",
@@ -921,7 +948,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2467071==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51f000001a80 at pc 0x55d5e6049717 bp 0x7ffc2600db50 sp 0x7ffc2600db40 READ of size 1 at 0x51f000001a80 thread T0 #0 0x55d5e6049716 in kernel /home/apt/repos_common/",
+      "diagnostic": "================================================================= ==2833019==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51f000001a80 at pc 0x56313181c717 bp 0x7ffeb2840d40 sp 0x7ffeb2840d30 READ of size 1 at 0x51f000001a80 thread T0 #0 0x56313181c716 in kernel /home/apt/repos_common/",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1088,7 +1115,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.1,
+        "seconds": 0.2,
         "stdout": "5018301368121126796",
         "model_stdout": "5018301368121126796",
         "stderr": ""
@@ -1130,8 +1157,8 @@
   "table_render": {
     "table": "results/tables/p16-tlv-walk.md",
     "renders_to": "results/tables/p16-tlv-walk.md",
-    "render_sha256": "dc914724c21ac1018fce70d1786c34a4b7f737389419643c30afc828eef8aa96",
-    "published_sha256": "dc914724c21ac1018fce70d1786c34a4b7f737389419643c30afc828eef8aa96",
+    "render_sha256": "0922e4b4042143523126c231b757c59ad9ba3546266e26614a2db5066c7542f1",
+    "published_sha256": "0922e4b4042143523126c231b757c59ad9ba3546266e26614a2db5066c7542f1",
     "verdict": "FRESH"
   },
   "controls_json": {},

@@ -27,8 +27,9 @@ omits, is the CAPACITY CHECK on the write:
 --------------------------------------------------------------------------
 WHY small AND large ARE 100% ACCEPT, AND WHY THAT IS NOT A CHOICE
 --------------------------------------------------------------------------
-`harness/check.py:1249-1278` requires **every cell, R1 included, to print
-`model.py`'s checksum on every non-adversarial input**. R1 omits the capacity
+`harness/check.py::check_checksums` requires **every cell, R1 included, to print
+`model.py`'s checksum on every non-adversarial input** -- the non-adversarial
+set is `check.py::inputs_of`'s `good`. R1 omits the capacity
 check, so on any window where the check would fire R1 copies bytes the checked
 rungs skip *and* ends with a larger `dlen` -- and both are folded. R1's checksum
 therefore differs *necessarily*, for every `DST_CAP` and for a truncating policy

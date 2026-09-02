@@ -16,7 +16,8 @@ notes only where p16 differs.
     work_per_call the WINDOW, in bytes -- i.e. `stride`, constant across every
                   call on a given input. Argued below; the short version is that
                   a parser has a *distribution* of work per call and
-                  `check.py:625` needs one scalar, and denominating in records
+                  `check.py::check_marginal_ir` needs one scalar, and
+                  denominating in records
                   or in bytes-actually-folded collapses to 0 the moment a probe
                   input contains a rejected record.
     sanitizer     derived, not tabulated: an input is "fires" exactly when the
@@ -178,8 +179,11 @@ class Model:
         """The window, in bytes -- `stride` -- from the file alone.
 
         **Why the window and not the records, and not the bytes folded.**
-        `check.py:625` needs one scalar per input and hard-fails on `work <= 0`
-        at `:632`. A parser has a *distribution* of work per call: it early-exits
+        `check.py::check_marginal_ir` needs one scalar per input and hard-fails
+        with `rep.fail("collapse-ir", ...)` on `model.py reports
+        work_per_call=...; a probe input on which the kernel has nothing to do
+        cannot bound anything`.
+        A parser has a *distribution* of work per call: it early-exits
         on a malformed record, and p02's convention (the minimum over records)
         collapses to 0 the moment a probe input contains one rejected record --
         which is exactly what a TLV corpus contains. Denominating in *records*

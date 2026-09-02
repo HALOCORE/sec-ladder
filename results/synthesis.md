@@ -211,7 +211,7 @@ support, never the draw.
 
 ⚠ **The middle band is where p03, p04, p07 and p22 live.** On p03 and p04 `R5-R4` the derived route was reporting `+6.00`, one draw from `{−8.00, −1.00, +6.00}` — **tied with its own sign-reverse** — and those four cells are now **withdrawn** rather than marked **?**: `?` means *look further*, and there is nothing further to look at. Treat a surviving **?** as *"look with the licence or a callgrind run"*, never as a figure.
 
-✅ **`synthesis/outward_ir.json` is FRESH** — all 33 entries carry the gate `source_sha256` they were taken against and every one still matches (TASK_107 §F; the key and the check are copied from `licence.json`, which is why `LICENCE STALE` and this line now mean the same thing). It was once found **three patterns stale, 22 entries against 25**, and this file's own text said the pin did not exist — a warning where a detector was wanted. Re-emitting costs 352 callgrind runs against a fully built `.temp/build/`, which is why it calibrates a column here and no longer **is** one.
+⚠⚠ **`synthesis/outward_ir.json` IS STALE against the gate records, so the calibration above is scored partly on rows taken against sources that have since moved.** **STALE: p01, p02, p03, p04, p05, p06, p07, p08, p09, p10, p11, p12, p13, p14, p16, p17, p18, p19, p22, p23, p25, p27, p28, p29, p32, p34, p35, p36, p38, p42, p46, p47, p49.** Re-emit with `synthesis/outward_ir.py --emit synthesis/outward_ir.json` against a fully built `.temp/build/` (352 callgrind runs), then re-run this file.
 
 **And the LICENCE TAG scored against the same sweep, also recomputed here**: **209 hit, 17 false `LICENSED` (the dangerous direction), 14 false alarm, 24 abstain**. The smallest movement under a `NOT-LIC` verdict is **0.00 `Ir`/call**.
 

@@ -850,13 +850,35 @@ def axiom_decls(text, code=None):
             nm = re.sub(r"\s+", " ", sm.group(1)).strip()
             add("global size_of", nm or "?", m.start())
             continue
-        # A `global` this cannot classify. Line-anchored, because `global` is an
-        # ITEM keyword in Verus and an unanchored fallback would count a local
-        # named `global` (measured at TASK_164: ZERO code-level `global` tokens
-        # outside the two forms across all 161 tracked `.rs`, so this fallback
-        # is prospective). Never invisible -- same rule as the `?` above.
-        bol = code.rfind("\n", 0, m.start()) + 1
-        if not code[bol:m.start()].strip():
+        # A `global` this cannot classify. ANCHORED ON THE PRECEDING NON-SPACE
+        # CHARACTER, because `global` is an ITEM keyword in Verus and an
+        # unanchored fallback would count a local named `global` (measured at
+        # TASK_164: ZERO code-level `global` tokens outside the two forms across
+        # all 161 tracked `.rs`, so this fallback is prospective). Never
+        # invisible -- same rule as the `?` above.
+        #
+        # ⚠⚠ IT WAS LINE-ANCHORED UNTIL TASK_168 AND THAT WAS A HOLE: an unknown
+        # `global` sharing a line with anything else scored ZERO --
+        # `struct S { } global align_of u8 == 1;` was invisible -- and the
+        # `_selftest` cell guarding it used the OWN-LINE spelling, so the arm
+        # could not see the gap (`RECAP.md` queue item 33; the class of
+        # `.memory/03-measurement.md` entry 19, one level down). The arm below
+        # now spells it the way the gap does, and it was confirmed to FAIL
+        # against the line-anchored matcher before this line was changed.
+        #
+        # `{};]` is the item-position set: an item can only begin after a block,
+        # a statement terminator, or an ATTRIBUTE -- `]` is in deliberately, so
+        # `#[verifier::external_body] global ...` is seen and this does NOT
+        # repeat `impl_spans`' documented `]` gap (RECAP "Owed" 20). It still
+        # rejects `let global`, `= global`, `(global`, `, global` and `.global`,
+        # which is every shape a local named `global` can appear in. Direction:
+        # a false POSITIVE shouts and can turn a green pattern red, a false
+        # NEGATIVE hides a trusted declaration -- so the anchor is TIGHTENED
+        # rather than dropped.
+        k = m.start() - 1
+        while k >= 0 and code[k] in " \t\r\n":
+            k -= 1
+        if k < 0 or code[k] in "{};]":
             add("global", "?", m.start())
 
     # `assume_specification` names its target in brackets rather than after
@@ -2200,6 +2222,43 @@ fn hide() { let s = "global layout Fake is size == 1;"; let _ = s; }
     want("axiom_decls: an UNKNOWN `global` form at item position is counted",
          [(d["kind"], d["name"]) for d in axiom_decls("verus!{\nglobal align_of u8 == 1;\n}")],
          [("global", "?")])
+    # TASK_168, RECAP queue item 33: the MUST-FIRE arm for the unclassified
+    # fallback, spelled the way the GAP is rather than the way the fix is. The
+    # next THREE cells put an unknown `global` on the same line as something
+    # else, and ⚠ **all three RETURN `[]` UNDER THE LINE-ANCHORED MATCHER** --
+    # confirmed by rebuilding the old predicate and running both
+    # (`.temp/t168/global_arm.py`), so these are arms that have been SEEN to
+    # fail and not merely written.
+    want("axiom_decls: an unknown `global` after `}` ON THE SAME LINE is counted",
+         [(d["kind"], d["name"]) for d in
+          axiom_decls("verus!{ struct S { } global align_of u8 == 1; }")],
+         [("global", "?")])
+    want("axiom_decls: an unknown `global` after `;` ON THE SAME LINE is counted",
+         [(d["kind"], d["name"]) for d in
+          axiom_decls("verus!{\nuse vstd::prelude::*; global align_of u8 == 1;\n}")],
+         [("global", "?")])
+    want("axiom_decls: an unknown `global` after an ATTRIBUTE is counted",
+         [(d["kind"], d["name"]) for d in
+          axiom_decls("verus!{\n#[verifier::external_body] global align_of u8 == 1;\n}")],
+         [("global", "?")])
+    # ⚠ CONTROL, NOT AN ARM, and it is labelled so because the probe above
+    # caught it being mislabelled: the two KNOWN forms were never line-anchored
+    # -- only the unclassified fallback was -- so this cell passes under BOTH
+    # matchers and could never have fired. It earns its place as the check that
+    # the widening did not break classification, and nothing more. Calling it a
+    # must-fire arm would be item 33's own defect one level further down.
+    want("axiom_decls: CONTROL -- a KNOWN `global` sharing a line is still "
+         "classified (passes under both matchers)",
+         [(d["kind"], d["name"]) for d in
+          axiom_decls("verus!{ struct S { } global size_of usize == 8; }")],
+         [("global size_of", "usize")])
+    # ...and the false-positive direction has to survive the widening: every
+    # shape below has a non-`{};]` character before the token.
+    want("axiom_decls: `global` after `=`, `(`, `,` and `.` is still not a "
+         "directive",
+         axiom_decls("verus!{ fn f(global: u8) -> u8 { let a = global; "
+                     "let b = g(global, global); let c = a.global; b + c } }"),
+         [])
     # ...and the false-positive direction: `global` as an ordinary identifier.
     want("axiom_decls: a LOCAL named `global` is not a directive",
          axiom_decls("verus!{ fn f() { let global = 1u8; let _ = global; } }"),

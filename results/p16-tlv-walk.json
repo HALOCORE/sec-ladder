@@ -1,10 +1,10 @@
 {
   "pattern": "p16-tlv-walk",
-  "generated_utc": "2026-08-19T17:14:01Z",
+  "generated_utc": "2026-09-02T07:50:30Z",
   "git": {
-    "commit": "79950f694cffdecad0c3f7d584e247bb3e661233",
+    "commit": "8fd484477573d172d306cb7575bcba60f08420ed",
     "dirty": true,
-    "dirty_files": 2,
+    "dirty_files": 10,
     "note": "commit is HEAD when measured, i.e. the parent of the commit this file lands in; a fresh run always names HEAD~1 and reads dirty. For real staleness run `harness/measure.py --check-stale`, which compares this record's source_sha256/input_sha256 against the tree."
   },
   "source_sha256": {
@@ -20,7 +20,7 @@
     "patterns/p16-tlv-walk/c/kernel_hardened.c": "a8a078fda62dae779146c3c32dd2dc53766b13e866222a2c9665e67efa39e470",
     "patterns/p16-tlv-walk/c/main.c": "7bb5a45a3f0103b60a2dd27b8e45eb52ce0015fa31c813b1135d77fc444be6aa",
     "patterns/p16-tlv-walk/inputs/gen.py": "7891a2f6fe438908a0e663da8660b58fcacfa2ec859f1f3105571fe13f054a03",
-    "patterns/p16-tlv-walk/model.py": "8b35eae6926af6654d6816d9a1733808234217fda9cdb8a8ee1d873d1877a6e9",
+    "patterns/p16-tlv-walk/model.py": "55234b05234fc0bcc8e9f5ef14630b36041630e08f5a6d8cc0f90dced84e8b79",
     "patterns/p16-tlv-walk/safe_naive.rs": "3f58f658310c5615d0899d01e0907a68b5689673b79d856b6372dbf8cd149054",
     "patterns/p16-tlv-walk/safe_tuned.rs": "6044ce0394896c3605e02178e84aa38b05d9c3bc4d31444cb52ab8674889d2fd",
     "patterns/p16-tlv-walk/unsafe.rs": "ae04d5ee891f29376555b3ef60f99348bb3bfa080eb897f4520dd8bbbbf6f2a4",
@@ -48,11 +48,11 @@
     "governor": "powersave",
     "note": "frequency scaling active, shared container -- wall clock is noisy"
   },
-  "timing_cpu": 5,
+  "timing_cpu": 3,
   "protocol": {
     "static": "harness/asm.py; raw and padding-excluded both reported",
     "ir": "callgrind per-function exclusive Ir, kernel symbol only; whole-program summary deliberately not recorded",
-    "wall": "taskset -c 5, interleaved round-robin, 30 reps, min and median; frequency scaling on, shared box"
+    "wall": "taskset -c 3, interleaved round-robin, 30 reps, min and median; frequency scaling on, shared box"
   },
   "inputs": {
     "adversarial-overrun.bin": {
@@ -247,16 +247,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.012277157977223396,
-          "median_s": 0.013436363078653812,
+          "min_s": 0.012683962471783161,
+          "median_s": 0.01304463529959321,
           "reps": 30,
-          "spread_pct": 9.441966158462531
+          "spread_pct": 2.8435343341042247
         },
         "large.bin": {
-          "min_s": 0.07486910279840231,
-          "median_s": 0.07848803419619799,
+          "min_s": 0.07207268103957176,
+          "median_s": 0.07286134641617537,
           "reps": 30,
-          "spread_pct": 4.833678062818865
+          "spread_pct": 1.0942639641372351
         }
       }
     },
@@ -317,16 +317,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.012883288785815239,
-          "median_s": 0.01367849251255393,
+          "min_s": 0.012763872742652893,
+          "median_s": 0.013015214819461107,
           "reps": 30,
-          "spread_pct": 6.172365922700007
+          "spread_pct": 1.9691678370335606
         },
         "large.bin": {
-          "min_s": 0.0734030669555068,
-          "median_s": 0.07766877766698599,
+          "min_s": 0.0717993825674057,
+          "median_s": 0.07286048820242286,
           "reps": 30,
-          "spread_pct": 5.811352152444589
+          "spread_pct": 1.477875710171998
         }
       }
     },
@@ -485,16 +485,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.012909217737615108,
-          "median_s": 0.013763318303972483,
+          "min_s": 0.012748325243592262,
+          "median_s": 0.013029217720031738,
           "reps": 30,
-          "spread_pct": 6.616206990363798
+          "spread_pct": 2.2033676665149566
         },
         "large.bin": {
-          "min_s": 0.07497880700975657,
-          "median_s": 0.07757148845121264,
+          "min_s": 0.07169402483850718,
+          "median_s": 0.07294893963262439,
           "reps": 30,
-          "spread_pct": 3.457885694445243
+          "spread_pct": 1.750375706962949
         }
       }
     },
@@ -557,16 +557,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.013019283302128315,
-          "median_s": 0.013800289016216993,
+          "min_s": 0.012720891274511814,
+          "median_s": 0.013010338880121708,
           "reps": 30,
-          "spread_pct": 5.998838000253087
+          "spread_pct": 2.2753720581658055
         },
         "large.bin": {
-          "min_s": 0.07487259525805712,
-          "median_s": 0.07792021194472909,
+          "min_s": 0.07188645005226135,
+          "median_s": 0.07287606783211231,
           "reps": 30,
-          "spread_pct": 4.070403431546625
+          "spread_pct": 1.376640214020179
         }
       }
     },
@@ -731,17 +731,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.012602902948856354,
-          "median_s": 0.013891732320189476,
+          "min_s": 0.012797323986887932,
+          "median_s": 0.01312055392190814,
           "reps": 30,
-          "spread_pct": 10.226448434644787,
-          "warning": "min-to-median spread > 10% -- `.memory/03-measurement.md` says discard"
+          "spread_pct": 2.525761912032453
         },
         "large.bin": {
-          "min_s": 0.07490976992994547,
-          "median_s": 0.07804226502776146,
+          "min_s": 0.07217350881546736,
+          "median_s": 0.0729665313847363,
           "reps": 30,
-          "spread_pct": 4.181690987364472
+          "spread_pct": 1.0987723643816951
         }
       }
     },
@@ -806,17 +805,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.0122947683557868,
-          "median_s": 0.013775238301604986,
+          "min_s": 0.012922150082886219,
+          "median_s": 0.013231984805315733,
           "reps": 30,
-          "spread_pct": 12.041462701665058,
-          "warning": "min-to-median spread > 10% -- `.memory/03-measurement.md` says discard"
+          "spread_pct": 2.397702552919978
         },
         "large.bin": {
-          "min_s": 0.0743576530367136,
-          "median_s": 0.07836972363293171,
+          "min_s": 0.07141880132257938,
+          "median_s": 0.07354491064324975,
           "reps": 30,
-          "spread_pct": 5.3956390934463405
+          "spread_pct": 2.976960241977888
         }
       }
     },
@@ -985,16 +983,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.012580658309161663,
-          "median_s": 0.013594369404017925,
+          "min_s": 0.012840937823057175,
+          "median_s": 0.013163392897695303,
           "reps": 30,
-          "spread_pct": 8.057695153504355
+          "spread_pct": 2.51114894473773
         },
         "large.bin": {
-          "min_s": 0.07504430878907442,
-          "median_s": 0.07740328880026937,
+          "min_s": 0.07186843547970057,
+          "median_s": 0.07318586437031627,
           "reps": 30,
-          "spread_pct": 3.14344958233313
+          "spread_pct": 1.8331119660839328
         }
       }
     },
@@ -1059,16 +1057,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.012482615187764168,
-          "median_s": 0.013693438842892647,
+          "min_s": 0.012911048717796803,
+          "median_s": 0.013203954324126244,
           "reps": 30,
-          "spread_pct": 9.7000799665391
+          "spread_pct": 2.268643026074986
         },
         "large.bin": {
-          "min_s": 0.07441507466137409,
-          "median_s": 0.07780662830919027,
+          "min_s": 0.07147260289639235,
+          "median_s": 0.07317307824268937,
           "reps": 30,
-          "spread_pct": 4.557616401313109
+          "spread_pct": 2.379198850169285
         }
       }
     },
@@ -1233,16 +1231,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.012843665666878223,
-          "median_s": 0.013712691143155098,
+          "min_s": 0.012918448075652122,
+          "median_s": 0.013127260841429234,
           "reps": 30,
-          "spread_pct": 6.766179522392532
+          "spread_pct": 1.6163920352837753
         },
         "large.bin": {
-          "min_s": 0.07391063310205936,
-          "median_s": 0.07823636569082737,
+          "min_s": 0.07186465803533792,
+          "median_s": 0.07314748596400023,
           "reps": 30,
-          "spread_pct": 5.852652598435769
+          "spread_pct": 1.7850609238709472
         }
       }
     },
@@ -1307,16 +1305,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.013282219879329205,
-          "median_s": 0.013765676412731409,
+          "min_s": 0.01290527731180191,
+          "median_s": 0.013124328572303057,
           "reps": 30,
-          "spread_pct": 3.6398775038696365
+          "spread_pct": 1.697377400025518
         },
         "large.bin": {
-          "min_s": 0.07538490369915962,
-          "median_s": 0.0777687500230968,
+          "min_s": 0.07188495993614197,
+          "median_s": 0.0732939443551004,
           "reps": 30,
-          "spread_pct": 3.1622330293747556
+          "spread_pct": 1.9600545374304692
         }
       }
     },
@@ -1479,17 +1477,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.012572914361953735,
-          "median_s": 0.013880140613764524,
+          "min_s": 0.012888994067907333,
+          "median_s": 0.01317872665822506,
           "reps": 30,
-          "spread_pct": 10.397161820862479,
-          "warning": "min-to-median spread > 10% -- `.memory/03-measurement.md` says discard"
+          "spread_pct": 2.2479069257944606
         },
         "large.bin": {
-          "min_s": 0.07521201856434345,
-          "median_s": 0.0775536522269249,
+          "min_s": 0.07177051715552807,
+          "median_s": 0.07325961999595165,
           "reps": 30,
-          "spread_pct": 3.113376967243858
+          "spread_pct": 2.0748113563075905
         }
       }
     },
@@ -1554,16 +1551,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.013018610887229443,
-          "median_s": 0.01393285347148776,
+          "min_s": 0.012794950045645237,
+          "median_s": 0.013116495683789253,
           "reps": 30,
-          "spread_pct": 7.022581688459103
+          "spread_pct": 2.5130667724134987
         },
         "large.bin": {
-          "min_s": 0.0745348958298564,
-          "median_s": 0.07752006128430367,
+          "min_s": 0.07156209833920002,
+          "median_s": 0.07336946157738566,
           "reps": 30,
-          "spread_pct": 4.005057525352445
+          "spread_pct": 2.525587259360188
         }
       }
     },
@@ -1722,17 +1719,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.01233332697302103,
-          "median_s": 0.013649636413902044,
+          "min_s": 0.012722025625407696,
+          "median_s": 0.013058849610388279,
           "reps": 30,
-          "spread_pct": 10.672784754352342,
-          "warning": "min-to-median spread > 10% -- `.memory/03-measurement.md` says discard"
+          "spread_pct": 2.6475656856711383
         },
         "large.bin": {
-          "min_s": 0.07286203932017088,
-          "median_s": 0.07731687603518367,
+          "min_s": 0.07162307482212782,
+          "median_s": 0.07323551923036575,
           "reps": 30,
-          "spread_pct": 6.114070861285277
+          "spread_pct": 2.2512917970114463
         }
       }
     },
@@ -1793,16 +1789,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.01258213073015213,
-          "median_s": 0.013553423807024956,
+          "min_s": 0.012725122272968292,
+          "median_s": 0.012954393401741982,
           "reps": 30,
-          "spread_pct": 7.719623152104077
+          "spread_pct": 1.8017204381660448
         },
         "large.bin": {
-          "min_s": 0.07387836743146181,
-          "median_s": 0.07800812041386962,
+          "min_s": 0.0717879319563508,
+          "median_s": 0.07345035718753934,
           "reps": 30,
-          "spread_pct": 5.589935357246556
+          "spread_pct": 2.315744702325928
         }
       }
     },
@@ -1961,16 +1957,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.012954415753483772,
-          "median_s": 0.0136456866748631,
+          "min_s": 0.012786714360117912,
+          "median_s": 0.012990390416234732,
           "reps": 30,
-          "spread_pct": 5.33617983654282
+          "spread_pct": 1.592872495471473
         },
         "large.bin": {
-          "min_s": 0.07332431804388762,
-          "median_s": 0.0772633976303041,
+          "min_s": 0.0719551369547844,
+          "median_s": 0.0731371040455997,
           "reps": 30,
-          "spread_pct": 5.372132590525809
+          "spread_pct": 1.6426444877146678
         }
       }
     },
@@ -2033,16 +2029,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.012612683698534966,
-          "median_s": 0.01345538767054677,
+          "min_s": 0.01280366349965334,
+          "median_s": 0.013066627085208893,
           "reps": 30,
-          "spread_pct": 6.681400978204896
+          "spread_pct": 2.0538151878380217
         },
         "large.bin": {
-          "min_s": 0.0749972965568304,
-          "median_s": 0.07738219061866403,
+          "min_s": 0.07211979478597641,
+          "median_s": 0.0733286147005856,
           "reps": 30,
-          "spread_pct": 3.179973374142131
+          "spread_pct": 1.6761277790605238
         }
       }
     }

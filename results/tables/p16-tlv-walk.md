@@ -1,6 +1,6 @@
 # p16-tlv-walk — results
 
-Generated 2026-08-19T17:14:01Z from `results/p16-tlv-walk.json` (git `79950f694cff`, working tree dirty).
+Generated 2026-09-02T07:50:30Z from `results/p16-tlv-walk.json` (git `8fd484477573`, working tree dirty).
 
 ## Toolchain
 
@@ -139,33 +139,28 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 ## Wall clock (secondary)
 
-> taskset -c 5, interleaved round-robin, 30 reps, min and median; frequency scaling on, shared box. Frequency scaling is on and cannot be disabled without root; the box is shared and containerised. Wall clock is a sanity check on `Ir`, never the headline. Times include process start-up and reading the input file.
+> taskset -c 3, interleaved round-robin, 30 reps, min and median; frequency scaling on, shared box. Frequency scaling is on and cannot be disabled without root; the box is shared and containerised. Wall clock is a sanity check on `Ir`, never the headline. Times include process start-up and reading the input file.
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 74.87 | 78.49 | 4.8% | 12.28 | 13.44 | 9.4% |
-| c-gcc | whole | 73.40 | 77.67 | 5.8% | 12.88 | 13.68 | 6.2% |
-| c-clang | isolated | 74.98 | 77.57 | 3.5% | 12.91 | 13.76 | 6.6% |
-| c-clang | whole | 74.87 | 77.92 | 4.1% | 13.02 | 13.80 | 6.0% |
-| safe_naive | isolated | 74.91 | 78.04 | 4.2% | 12.60 | 13.89 | **10.2% ✗** |
-| safe_naive | whole | 74.36 | 78.37 | 5.4% | 12.29 | 13.78 | **12.0% ✗** |
-| safe_tuned | isolated | 75.04 | 77.40 | 3.1% | 12.58 | 13.59 | 8.1% |
-| safe_tuned | whole | 74.42 | 77.81 | 4.6% | 12.48 | 13.69 | 9.7% |
-| unsafe | isolated | 73.91 | 78.24 | 5.9% | 12.84 | 13.71 | 6.8% |
-| unsafe | whole | 75.38 | 77.77 | 3.2% | 13.28 | 13.77 | 3.6% |
-| verus | isolated | 75.21 | 77.55 | 3.1% | 12.57 | 13.88 | **10.4% ✗** |
-| verus | whole | 74.53 | 77.52 | 4.0% | 13.02 | 13.93 | 7.0% |
-| c-gcc-h | isolated | 72.86 | 77.32 | 6.1% | 12.33 | 13.65 | **10.7% ✗** |
-| c-gcc-h | whole | 73.88 | 78.01 | 5.6% | 12.58 | 13.55 | 7.7% |
-| c-clang-h | isolated | 73.32 | 77.26 | 5.4% | 12.95 | 13.65 | 5.3% |
-| c-clang-h | whole | 75.00 | 77.38 | 3.2% | 12.61 | 13.46 | 6.7% |
+| c-gcc | isolated | 72.07 | 72.86 | 1.1% | 12.68 | 13.04 | 2.8% |
+| c-gcc | whole | 71.80 | 72.86 | 1.5% | 12.76 | 13.02 | 2.0% |
+| c-clang | isolated | 71.69 | 72.95 | 1.8% | 12.75 | 13.03 | 2.2% |
+| c-clang | whole | 71.89 | 72.88 | 1.4% | 12.72 | 13.01 | 2.3% |
+| safe_naive | isolated | 72.17 | 72.97 | 1.1% | 12.80 | 13.12 | 2.5% |
+| safe_naive | whole | 71.42 | 73.54 | 3.0% | 12.92 | 13.23 | 2.4% |
+| safe_tuned | isolated | 71.87 | 73.19 | 1.8% | 12.84 | 13.16 | 2.5% |
+| safe_tuned | whole | 71.47 | 73.17 | 2.4% | 12.91 | 13.20 | 2.3% |
+| unsafe | isolated | 71.86 | 73.15 | 1.8% | 12.92 | 13.13 | 1.6% |
+| unsafe | whole | 71.88 | 73.29 | 2.0% | 12.91 | 13.12 | 1.7% |
+| verus | isolated | 71.77 | 73.26 | 2.1% | 12.89 | 13.18 | 2.2% |
+| verus | whole | 71.56 | 73.37 | 2.5% | 12.79 | 13.12 | 2.5% |
+| c-gcc-h | isolated | 71.62 | 73.24 | 2.3% | 12.72 | 13.06 | 2.6% |
+| c-gcc-h | whole | 71.79 | 73.45 | 2.3% | 12.73 | 12.95 | 1.8% |
+| c-clang-h | isolated | 71.96 | 73.14 | 1.6% | 12.79 | 12.99 | 1.6% |
+| c-clang-h | whole | 72.12 | 73.33 | 1.7% | 12.80 | 13.07 | 2.1% |
 
-**4 of 32 wall-clock cells exceed the 10% min-to-median spread threshold and are DISCARDED** per `.memory/03-measurement.md` step 4. They are printed above marked ✗ rather than deleted, because a missing cell that looks like an omission is worse than a documented failure (`.memory/02-bench-rules.md`). **No claim in this report rests on a marked row.**
-
-- `safe_naive / isolated` on `small.bin`: spread 10.2%
-- `safe_naive / whole` on `small.bin`: spread 12.0%
-- `verus / isolated` on `small.bin`: spread 10.4%
-- `c-gcc-h / isolated` on `small.bin`: spread 10.7%
+Every wall-clock cell is within the 10% min-to-median spread threshold.
 
 
 ## Cells and metrics not measured

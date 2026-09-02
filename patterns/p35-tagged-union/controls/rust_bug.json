@@ -8,12 +8,12 @@
     "patterns/p35-tagged-union/c/main.c": "d49d2ecc36009b1896dcddf2425feb8f231fcac7ab915bbc53a160929b3f56e5",
     "patterns/p35-tagged-union/controls/arm_unsafe_bug.rs": "7322b5b75c0fa4266ea992d14088a148ac3e1120124932ae93dc949a65ff85e4",
     "patterns/p35-tagged-union/controls/arm_safe_bug.rs": "05a1404f984a613db005a68949dd9d0b7e016c13e8f3226e7f0e156cdc66fc6c",
-    "patterns/p35-tagged-union/controls/rust_bug.py": "2acb34cbcdac13af0aa7e433859e333a2d51894fc2c3f1939aad09586b610f7f",
+    "patterns/p35-tagged-union/controls/rust_bug.py": "3f4ea25f50ef4b43c9b68e18b51e146f58d89bd8df435cf6c1834a3dcc607695",
     "patterns/p35-tagged-union/inputs/gen.py": "96f293a8b48c9d1c7882ca4a99df9c204b78ff310529cf66c48fe18b2decd650",
     "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3"
   },
-  "measured_utc": "2026-08-31T09:31:10Z",
+  "measured_utc": "2026-09-02T09:54:26Z",
   "miri_iters": 4,
   "native": {
     "small.bin": {
@@ -80,16 +80,16 @@
         "stderr": ""
       },
       "unsafe_arm": {
-        "rc": -11,
+        "rc": -7,
         "stdout": "",
         "stderr": ""
       },
       "safe_arm": {
         "rc": 101,
         "stdout": "",
-        "stderr": "thread 'main' (1129033) panicked at patterns/p35-tagged-union/controls/arm_safe_bug.rs:108:17: index out of bounds: the len is 4 but the index is 169883888704 note: run with `RUST_BACKTRACE=1` environ"
+        "stderr": "thread 'main' (2817819) panicked at patterns/p35-tagged-union/controls/arm_safe_bug.rs:108:17: index out of bounds: the len is 4 but the index is 169883888704 note: run with `RUST_BACKTRACE=1` environ"
       },
-      "unsafe_reproduces_c": true,
+      "unsafe_reproduces_c": false,
       "safe_reproduces_c": false
     },
     "adversarial-ptr-deep.bin": {
@@ -106,7 +106,7 @@
       "safe_arm": {
         "rc": 101,
         "stdout": "",
-        "stderr": "thread 'main' (1129036) panicked at patterns/p35-tagged-union/controls/arm_safe_bug.rs:108:17: index out of bounds: the len is 4 but the index is 297296805232 note: run with `RUST_BACKTRACE=1` environ"
+        "stderr": "thread 'main' (2817822) panicked at patterns/p35-tagged-union/controls/arm_safe_bug.rs:108:17: index out of bounds: the len is 4 but the index is 297296805232 note: run with `RUST_BACKTRACE=1` environ"
       },
       "unsafe_reproduces_c": true,
       "safe_reproduces_c": false

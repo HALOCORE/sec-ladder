@@ -135,6 +135,40 @@
     "no_rung_entries": 0,
     "no_rung": []
   },
+  "doc_citations": {
+    "fatal": [],
+    "other": [
+      {
+        "file": "patterns/p19-state-machine/inputs/gen.py",
+        "line": 38,
+        "module": "measure.py",
+        "cited_line": 64
+      }
+    ],
+    "harness_modules": [
+      "asm.py",
+      "build.py",
+      "check.py",
+      "composition.py",
+      "contract_diff.py",
+      "dloop.py",
+      "fixture.py",
+      "limbs.py",
+      "measure.py",
+      "report.py",
+      "table_render_inputs.py",
+      "temp_citations.py",
+      "vparse.py"
+    ]
+  },
+  "codegen_cfgs": {
+    "build_py_cfgs": [
+      "slb_isolated"
+    ],
+    "missing": [],
+    "unresolved": 0,
+    "verdict": "OK"
+  },
   "source_sha256": {
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
     "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
@@ -150,13 +184,13 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "60aba3e5a118296c4c8eea74441095beacee54df67ea72344978e91c16ae87c0",
+    "harness/check.py": "741c6d2ea110a225962e6c4dd451c1368d22edde521a54fee629cbb032d69cb2",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
-    "harness/vparse.py": "0922b5ad2a1e7bcd7f8f67aa2d8ff0f66d66584c36deb344507b32a72776725f",
+    "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
     "patterns/p19-state-machine/NOTES.md": "14540d0730b258fb2930fe3c3f1a8bf2f1f34f0b0323cdae7ab70cb888327118",
     "patterns/p19-state-machine/README.md": "9937d7599c55c8b43fa632f79cbd9f35e4d9f860c415ca94a22e20851bb68003",
     "patterns/p19-state-machine/c/kernel.c": "5a775abadfaddb9bb6d28382f70b6cd5888fb3db4b2a2324e3f832aff1f99de2",
@@ -1302,7 +1336,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==2476974==ERROR: AddressSanitizer: SEGV on unknown address 0x51e000010b85 (pc 0x55e0914ab5ed bp 0x51e000010b85 sp 0x7ffceefb3590 T0) ==2476974==The signal is caused by a READ memory access. #0 0x55e0914a",
+      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==2723139==ERROR: AddressSanitizer: SEGV on unknown address 0x51e000010b85 (pc 0x556a4ee965ed bp 0x51e000010b85 sp 0x7ffef36cbc10 T0) ==2723139==The signal is caused by a READ memory access. #0 0x556a4ee9",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1313,7 +1347,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2476975==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51e000001685 at pc 0x55de90bbe68d bp 0x7fffdb9f7690 sp 0x7fffdb9f7680 READ of size 1 at 0x51e000001685 thread T0 #0 0x55de90bbe68c in kernel /home/apt/repos_common/",
+      "diagnostic": "================================================================= ==2723140==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51e000001685 at pc 0x5574ffeb868d bp 0x7ffcbc315db0 sp 0x7ffcbc315da0 READ of size 1 at 0x51e000001685 thread T0 #0 0x5574ffeb868c in kernel /home/apt/repos_common/",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1575,7 +1609,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 4.5,
+        "seconds": 4.3,
         "stdout": "9293610825097060496",
         "model_stdout": "9293610825097060496",
         "stderr": ""
@@ -1587,7 +1621,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 1.0,
+        "seconds": 1.1,
         "stdout": "5834492554122981434",
         "model_stdout": "5834492554122981434",
         "stderr": ""
@@ -1611,7 +1645,9 @@
   },
   "controls_json": {},
   "failures": [],
-  "notes": [],
+  "notes": [
+    "1 line citation(s) into other harness modules, reported not failed (promoting them costs a re-measure where the file is measurement-hashed): patterns/p19-state-machine/inputs/gen.py:38 -> measure.py:64"
+  ],
   "loud": [],
   "blocked": [],
   "verdict": "PASS",

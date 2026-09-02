@@ -27,8 +27,9 @@ The line R1 omits, and the only thing it omits, is the TERMINATION:
 --------------------------------------------------------------------------
 WHY small AND large ARE 100% NON-TRUNCATING, AND WHY THAT IS NOT A CHOICE
 --------------------------------------------------------------------------
-`harness/check.py:1249-1278` requires **every cell, R1 included, to print
-`model.py`'s checksum on every non-adversarial input**. The source scan stops at
+`harness/check.py::check_checksums` requires **every cell, R1 included, to print
+`model.py`'s checksum on every non-adversarial input** -- the non-adversarial
+set is `check.py::inputs_of`'s `good`. The source scan stops at
 the first zero byte, so every one of the `n = min(slen, DST_CAP)` copied bytes
 is non-zero, and the zero-fill `for i in n .. DST_CAP` is empty exactly when
 `slen >= DST_CAP`. So

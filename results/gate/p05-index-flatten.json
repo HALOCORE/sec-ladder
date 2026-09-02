@@ -58,6 +58,33 @@
     "no_rung_entries": 0,
     "no_rung": []
   },
+  "doc_citations": {
+    "fatal": [],
+    "other": [],
+    "harness_modules": [
+      "asm.py",
+      "build.py",
+      "check.py",
+      "composition.py",
+      "contract_diff.py",
+      "dloop.py",
+      "fixture.py",
+      "limbs.py",
+      "measure.py",
+      "report.py",
+      "table_render_inputs.py",
+      "temp_citations.py",
+      "vparse.py"
+    ]
+  },
+  "codegen_cfgs": {
+    "build_py_cfgs": [
+      "slb_isolated"
+    ],
+    "missing": [],
+    "unresolved": 0,
+    "verdict": "OK"
+  },
   "source_sha256": {
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
     "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
@@ -73,13 +100,13 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "60aba3e5a118296c4c8eea74441095beacee54df67ea72344978e91c16ae87c0",
+    "harness/check.py": "741c6d2ea110a225962e6c4dd451c1368d22edde521a54fee629cbb032d69cb2",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
-    "harness/vparse.py": "0922b5ad2a1e7bcd7f8f67aa2d8ff0f66d66584c36deb344507b32a72776725f",
+    "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
     "patterns/p05-index-flatten/NOTES.md": "014901768a70174b1d1bb03a65c772ad8df747064679d473144986fb0f4762bd",
     "patterns/p05-index-flatten/README.md": "1d63da6e199fa8b5a981fbbb6fd9c13dbde52530f69632b44e5cea69a05c49c7",
     "patterns/p05-index-flatten/c/kernel.c": "484308a6fa4dd4f61aa00ccb58b25bbe8cd4cb182de0bbefa9308e4fed5296ae",
@@ -473,11 +500,11 @@
     "adversarial-dims.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "11981615517444714496",
+        "stdout": "15432572115919116544",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/isolated"
+          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "0",
@@ -486,7 +513,7 @@
       },
       {
         "exit": 0,
-        "stdout": "12087471920506915584",
+        "stdout": "3398681817612501504",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -499,7 +526,7 @@
       },
       {
         "exit": 0,
-        "stdout": "7461495051049588992",
+        "stdout": "5846108357463243264",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -512,11 +539,11 @@
       },
       {
         "exit": 0,
-        "stdout": "9974555400197393920",
+        "stdout": "9354228360057400064",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/isolated"
+          "O0/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "0",
@@ -527,33 +554,7 @@
     "adversarial-dims.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "13931512230572280320",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "0",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "14371878653175701504",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "0",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "1717661314729092608",
+        "stdout": "11761432306143003904",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -566,11 +567,37 @@
       },
       {
         "exit": 0,
-        "stdout": "9525718572416664320",
+        "stdout": "15824245539580091392",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "18328835483550587904",
         "stderr": "",
         "signal": null,
         "cells": [
           "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "6572291800665438208",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "0",
@@ -1125,7 +1152,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2428357==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d4 at pc 0x56076911f7a1 bp 0x7fff93bf14d0 sp 0x7fff93bf14c0 READ of size 1 at 0x5070000000d4 thread T0 #0 0x56076911f7a0 in kernel /home/apt/repos_common/",
+      "diagnostic": "================================================================= ==2684640==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d4 at pc 0x55dbc914e7a1 bp 0x7ffd20594bb0 sp 0x7ffd20594ba0 READ of size 1 at 0x5070000000d4 thread T0 #0 0x55dbc914e7a0 in kernel /home/apt/repos_common/",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1136,7 +1163,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2428358==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d8 at pc 0x5632820797a1 bp 0x7ffc0d639a20 sp 0x7ffc0d639a10 READ of size 1 at 0x5070000000d8 thread T0 #0 0x5632820797a0 in kernel /home/apt/repos_common/",
+      "diagnostic": "================================================================= ==2684641==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x5070000000d8 at pc 0x55cefd1d07a1 bp 0x7fff0e170db0 sp 0x7fff0e170da0 READ of size 1 at 0x5070000000d8 thread T0 #0 0x55cefd1d07a0 in kernel /home/apt/repos_common/",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1339,7 +1366,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 1.1,
+        "seconds": 1.2,
         "stdout": "12411506697557515452",
         "model_stdout": "12411506697557515452",
         "stderr": ""

@@ -160,7 +160,7 @@ def reduced_input(name, n_iters):
 
 def miri(src, arg, sysroot):
     """Miri on one control arm, with **the same command line
-    `harness/check.py`'s stage 8 uses** (`check.py:8841`): the binary from the
+    `harness/check.py`'s stage 8 uses** (`check.py::check_miri`): the binary from the
     pinned nightly, `--sysroot`, `--edition 2021`, `-Zmiri-disable-isolation`,
     the source, `--`, and the program's argument. ⚠ The `--` is load-bearing:
     without it Miri reads the input path as a second input FILENAME and exits 1

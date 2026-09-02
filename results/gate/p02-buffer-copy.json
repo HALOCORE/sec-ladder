@@ -120,6 +120,33 @@
     "no_rung_entries": 0,
     "no_rung": []
   },
+  "doc_citations": {
+    "fatal": [],
+    "other": [],
+    "harness_modules": [
+      "asm.py",
+      "build.py",
+      "check.py",
+      "composition.py",
+      "contract_diff.py",
+      "dloop.py",
+      "fixture.py",
+      "limbs.py",
+      "measure.py",
+      "report.py",
+      "table_render_inputs.py",
+      "temp_citations.py",
+      "vparse.py"
+    ]
+  },
+  "codegen_cfgs": {
+    "build_py_cfgs": [
+      "slb_isolated"
+    ],
+    "missing": [],
+    "unresolved": 0,
+    "verdict": "OK"
+  },
   "source_sha256": {
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
     "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
@@ -135,13 +162,13 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "60aba3e5a118296c4c8eea74441095beacee54df67ea72344978e91c16ae87c0",
+    "harness/check.py": "741c6d2ea110a225962e6c4dd451c1368d22edde521a54fee629cbb032d69cb2",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
-    "harness/vparse.py": "0922b5ad2a1e7bcd7f8f67aa2d8ff0f66d66584c36deb344507b32a72776725f",
+    "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
     "patterns/p02-buffer-copy/NOTES.md": "7172b6acf5542cf22264ccef0c9acc1d829dbc9b404e6d94cbee7f5cf3a56d31",
     "patterns/p02-buffer-copy/README.md": "675248ea9ccda4e76145e62678bf04b3c46ab8fe786289878470f9c71e2647bb",
     "patterns/p02-buffer-copy/c/kernel.c": "60a0e02c9394e0fba94d229b011d1b237cee71c7adc99e1ed326bca4700ee090",
@@ -1681,7 +1708,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2417319==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x506000000060 at pc 0x5571438f7f13 bp 0x7fff8d5b0290 sp 0x7fff8d5afa38 WRITE of size 65 at 0x506000000060 thread T0 #0 0x5571438f7f12 in __interceptor_memcpy (/home/",
+      "diagnostic": "================================================================= ==2675739==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x506000000060 at pc 0x557bf3e45f13 bp 0x7ffcf68f2500 sp 0x7ffcf68f1ca8 WRITE of size 65 at 0x506000000060 thread T0 #0 0x557bf3e45f12 in __interceptor_memcpy (/home/",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1714,7 +1741,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2417326==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000038 at pc 0x562e9c06c036 bp 0x7ffd75720cc0 sp 0x7ffd75720468 READ of size 61 at 0x504000000038 thread T0 #0 0x562e9c06c035 in __interceptor_memcpy (/home/a",
+      "diagnostic": "================================================================= ==2675744==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x504000000038 at pc 0x556fa4754036 bp 0x7ffe63558600 sp 0x7ffe63557da8 READ of size 61 at 0x504000000038 thread T0 #0 0x556fa4754035 in __interceptor_memcpy (/home/a",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1736,7 +1763,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2417331==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x527000006a38 at pc 0x55588e80c036 bp 0x7ffd667e3750 sp 0x7ffd667e2ef8 READ of size 65535 at 0x527000006a38 thread T0 #0 0x55588e80c035 in __interceptor_memcpy (/hom",
+      "diagnostic": "================================================================= ==2675747==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x527000006a38 at pc 0x5633e09a7036 bp 0x7fffbc125df0 sp 0x7fffbc125598 READ of size 65535 at 0x527000006a38 thread T0 #0 0x5633e09a7035 in __interceptor_memcpy (/hom",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1990,7 +2017,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 1.6,
+        "seconds": 1.5,
         "stdout": "16186812096",
         "model_stdout": "16186812096",
         "stderr": ""

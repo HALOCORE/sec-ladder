@@ -125,6 +125,40 @@
     "no_rung_entries": 0,
     "no_rung": []
   },
+  "doc_citations": {
+    "fatal": [],
+    "other": [
+      {
+        "file": "patterns/p12-strcat-fixed/README.md",
+        "line": 48,
+        "module": "measure.py",
+        "cited_line": 64
+      }
+    ],
+    "harness_modules": [
+      "asm.py",
+      "build.py",
+      "check.py",
+      "composition.py",
+      "contract_diff.py",
+      "dloop.py",
+      "fixture.py",
+      "limbs.py",
+      "measure.py",
+      "report.py",
+      "table_render_inputs.py",
+      "temp_citations.py",
+      "vparse.py"
+    ]
+  },
+  "codegen_cfgs": {
+    "build_py_cfgs": [
+      "slb_isolated"
+    ],
+    "missing": [],
+    "unresolved": 0,
+    "verdict": "OK"
+  },
   "source_sha256": {
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
     "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
@@ -140,13 +174,13 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "60aba3e5a118296c4c8eea74441095beacee54df67ea72344978e91c16ae87c0",
+    "harness/check.py": "741c6d2ea110a225962e6c4dd451c1368d22edde521a54fee629cbb032d69cb2",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
-    "harness/vparse.py": "0922b5ad2a1e7bcd7f8f67aa2d8ff0f66d66584c36deb344507b32a72776725f",
+    "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
     "patterns/p12-strcat-fixed/NOTES.md": "c6c691fd30ebc7a1e485c591148f3b095250f5141bd415653e11ea3d153aff4d",
     "patterns/p12-strcat-fixed/README.md": "5bd778c4ea9de44448f062a7949b6bb0bd2606f44658b5a9e83cd2b89baa28cd",
     "patterns/p12-strcat-fixed/c/kernel.c": "8f40894e72413d7d4681498943d80839dd43e7ca7941edad6c055da29a630dbb",
@@ -157,7 +191,7 @@
     "patterns/p12-strcat-fixed/controls/pads.py": "cb9af76e8a42b1037f63cc8aaf960b6fcce3e30e90a9e53d8432c79761898b93",
     "patterns/p12-strcat-fixed/controls/sweep_ir.py": "e93760b15703f7d091a99e6a218709ec5fff48e618be9c765048ec26cbe119cb",
     "patterns/p12-strcat-fixed/controls/threshold_probe.py": "ac3ab421ff885fbb8ea0e21db08a1a0c4aa5af5e2a96d1fddae007084cc32111",
-    "patterns/p12-strcat-fixed/inputs/gen.py": "40e163e63417abab3a0bffd70399e323246740421aa26963cd6f4c895dac130a",
+    "patterns/p12-strcat-fixed/inputs/gen.py": "f67d1eb55125b9562ac66eeaef037f7029a00d249a83f5dbfa98c521d57a8f09",
     "patterns/p12-strcat-fixed/model.py": "9e7a2c1fa9f28068d955e385051c562073deaf510eeadd06a45fa1140545627f",
     "patterns/p12-strcat-fixed/safe_naive.rs": "8ee597f6587dc9fa85cbe2465214a5aa2eac85985cb85d86f595a133a9dfd002",
     "patterns/p12-strcat-fixed/safe_tuned.rs": "0e2d6d822935209bf726ee672c9f993849b3193f595033de97400dd8c77bc8de",
@@ -1586,7 +1620,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:16: runtime error: index 128 out of bounds for type 'uint8_t [128]' /home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:25: runtime error: store to address 0x7fe8b71001a0 with insufficient space for an ob",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:16: runtime error: index 128 out of bounds for type 'uint8_t [128]' /home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:25: runtime error: store to address 0x7fc0e09001a0 with insufficient space for an ob",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1597,7 +1631,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:16: runtime error: index 128 out of bounds for type 'uint8_t [128]' /home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:25: runtime error: store to address 0x7ff5ffd001a0 with insufficient space for an ob",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:16: runtime error: index 128 out of bounds for type 'uint8_t [128]' /home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:25: runtime error: store to address 0x7f4951b001a0 with insufficient space for an ob",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1608,7 +1642,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:16: runtime error: index 128 out of bounds for type 'uint8_t [128]' /home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:25: runtime error: store to address 0x7f39d4d001a0 with insufficient space for an ob",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:16: runtime error: index 128 out of bounds for type 'uint8_t [128]' /home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:25: runtime error: store to address 0x7ff7277001a0 with insufficient space for an ob",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1880,13 +1914,14 @@
   "table_render": {
     "table": "results/tables/p12-strcat-fixed.md",
     "renders_to": "results/tables/p12-strcat-fixed.md",
-    "render_sha256": "30bc4576dc1cd1e4eec8563d3628f01b98082df5fb257828f2c85c22485d9411",
-    "published_sha256": "30bc4576dc1cd1e4eec8563d3628f01b98082df5fb257828f2c85c22485d9411",
+    "render_sha256": "057b5b858b799d669d68b8bb8f5b228d5d4e78b712fe367014608fe760fb2058",
+    "published_sha256": "057b5b858b799d669d68b8bb8f5b228d5d4e78b712fe367014608fe760fb2058",
     "verdict": "FRESH"
   },
   "controls_json": {},
   "failures": [],
   "notes": [
+    "1 line citation(s) into other harness modules, reported not failed (promoting them costs a re-measure where the file is measurement-hashed): patterns/p12-strcat-fixed/README.md:48 -> measure.py:64",
     "adversarial-overflow.bin/c-gcc: opt/mode variants of this rung disagree (2 distinct behaviours)",
     "adversarial-overflow.bin/c-clang: opt/mode variants of this rung disagree (3 distinct behaviours)"
   ],

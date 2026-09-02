@@ -86,6 +86,33 @@
     "no_rung_entries": 0,
     "no_rung": []
   },
+  "doc_citations": {
+    "fatal": [],
+    "other": [],
+    "harness_modules": [
+      "asm.py",
+      "build.py",
+      "check.py",
+      "composition.py",
+      "contract_diff.py",
+      "dloop.py",
+      "fixture.py",
+      "limbs.py",
+      "measure.py",
+      "report.py",
+      "table_render_inputs.py",
+      "temp_citations.py",
+      "vparse.py"
+    ]
+  },
+  "codegen_cfgs": {
+    "build_py_cfgs": [
+      "slb_isolated"
+    ],
+    "missing": [],
+    "unresolved": 0,
+    "verdict": "OK"
+  },
   "source_sha256": {
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
     "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
@@ -101,13 +128,13 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "60aba3e5a118296c4c8eea74441095beacee54df67ea72344978e91c16ae87c0",
+    "harness/check.py": "741c6d2ea110a225962e6c4dd451c1368d22edde521a54fee629cbb032d69cb2",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
-    "harness/vparse.py": "0922b5ad2a1e7bcd7f8f67aa2d8ff0f66d66584c36deb344507b32a72776725f",
+    "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
     "patterns/p09-bitset/NOTES.md": "766def13a2644ba4d79de8804c97f97a15c1caa91933fa4524c7fcf7e617ac68",
     "patterns/p09-bitset/README.md": "86f16831041b13e094ac308164db2a233be5ccc32455e410b8f4a4a52b66e840",
     "patterns/p09-bitset/c/kernel.c": "962971116e73d2e3276ad23ce1fd9e02cc3fea40d19cef41b8ce49585789e913",
@@ -978,7 +1005,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==2444131==ERROR: AddressSanitizer: SEGV on unknown address 0x50b0002000f0 (pc 0x56408c1a8b74 bp 0x00000000ff00 sp 0x7fffb2621c80 T0) ==2444131==The signal is caused by a READ memory access. #0 0x56408c1a",
+      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==2696552==ERROR: AddressSanitizer: SEGV on unknown address 0x50b0002000f0 (pc 0x55acd045cb74 bp 0x00000000ff00 sp 0x7fffeaa28cd0 T0) ==2696552==The signal is caused by a READ memory access. #0 0x55acd045",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1136,7 +1163,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 3.9,
+        "seconds": 3.8,
         "stdout": "5457833412554140714",
         "model_stdout": "5457833412554140714",
         "stderr": ""

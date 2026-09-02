@@ -191,12 +191,14 @@ and deliberately not in `results/gate/` where a verdict survey would find it
 """
 
 import argparse
+import ast
 import contextlib
 import difflib
 import functools
 import glob
 import hashlib
 import importlib.util
+import io
 import json
 import os
 import re
@@ -205,6 +207,7 @@ import subprocess
 import sys
 import textwrap
 import time
+import tokenize
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(REPO, "common"))
@@ -854,6 +857,19 @@ REQUIRED_MODEL_ATTRS = ("n_iters", "truncated", "checksum", "expected_exit",
 
 def check_selftests(rep):
     head("0. extractor + parsers reproduce .memory/ and their own selftests")
+    # ⚠⚠ THESE TWO LOOPS ARE ABOVE `fixture.ensure()` ON PURPOSE. RECAP queue
+    # item 34: every other arm in this function sits BELOW the early return, so
+    # a run that is already failing for a missing fixture says nothing about
+    # them. Stages 0c and 0d need no fixture, so their arms need not inherit
+    # that. (The existing arms are not moved -- that is not this task's scope.)
+    for label, got, want in _CITE_VERDICT_CASES:
+        if got != want:
+            rep.fail("doc-citation-selftest",
+                     f"citation_verdict: {label}: got {got}, want {want}")
+    for label, got, want in _CFG_VERDICT_CASES:
+        if got != want:
+            rep.fail("codegen-cfg-selftest",
+                     f"codegen_cfg_verdict: {label}: got {got}, want {want}")
     if not fixture.ensure():
         rep.fail("fixture", "could not build .temp/build/docrepro "
                             "(harness/fixture.py) -- step 0 cannot run")
@@ -914,6 +930,234 @@ def check_selftests(rep):
 
 
 # ==========================================================================
+# 0c. a LINE citation into a harness file decays. Cite the FUNCTION.
+# ==========================================================================
+#
+# `.memory/02-bench-rules.md`, *"Line citations into `check.py` decay. Cite the
+# FUNCTION"*: **name the FUNCTION and give NO LINE NUMBER AT ALL**, because a
+# function name cannot rot silently -- rename it and `grep` returns nothing,
+# which is a loud failure.
+#
+# ⚠⚠ THIS IS A GATE STAGE AND NOT A RULE BECAUSE THE RULE DID NOT WORK.
+# `patterns/p35-tagged-union/controls/rust_bug.py`'s `check.py:8841` was
+# written at TASK_148 -- *after* the convention was recorded -- and was already
+# rotten ~16 tasks later. At TASK_168-time all EIGHT surviving citations across
+# FIVE patterns pointed at the wrong code (`:1249` a blank line, `:625` a
+# `Report` method, `:8841` a `MIRI_BIN` argument list, `:469` a `#`, `:459` a
+# comment about row counts), and every one of the five had been rotten at HEAD
+# *before* the sweep that moved `check.py` again.
+#
+# ⚠ WHAT IT COSTS AND WHAT IT WOULD HAVE COST. Nothing today: 0 `check.py:NNNN`
+# under `patterns/`. Historically it would have fired on **13 patterns / 25
+# citations** at TASK_068 (all re-cited by function there) and on the residual
+# **8 across 5** from then until TASK_168 -- which is exactly the set it would
+# have stopped being written.
+#
+# ⚠⚠ AND THE FATAL SET IS NARROWER THAN THE PROBLEM. `check.py` is the file
+# that grows every task, but it is not the only one cited by line: 13 citations
+# into `measure.py`, `build.py` and `dloop.py` survive under `patterns/`, and
+# **two of them are rotten right now** -- `measure.py:238` (cited for staleness
+# detection, now `def matrix_inputs`) and `build.py:66` (cited for the `O0d`
+# level, now `ALL_CELLS`). They are REPORTED and not failed, because promoting
+# them costs three MEASUREMENT re-runs (`p19`, `p22`, `p36` each cite
+# `measure.py:64` from `inputs/gen.py`) and that is the manager's call, not this
+# stage's. `.memory/02-bench-rules.md`'s clean negative *"Only `check.py`
+# decays"* was true of the `.memory/` layer at TASK_066 and is NOT true of the
+# pattern layer today.
+
+#: The one harness module a pattern doc may not cite by line. Everything else
+#: is reported.
+CITE_FATAL_MODULE = "check.py"
+
+_CITE_RE = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*\.py):(\d+)")
+
+#: Files under a pattern that are not text and must not be read.
+_CITE_SKIP_EXT = (".bin", ".log", ".pyc", ".png", ".pdf", ".gz")
+
+
+def harness_module_names():
+    """Basenames of every `harness/` module a doc could cite by line.
+
+    DERIVED from the tree rather than enumerated, so a new harness file is
+    covered the day it lands -- the coupling `CODEGEN_CFGS` was missing (item
+    16(b)). `model.py:50` and `gen.py:30` are NOT in it: those are a pattern's
+    own files and a pattern may cite its own lines."""
+    return frozenset(
+        os.path.basename(p)
+        for p in glob.glob(os.path.join(REPO, "harness", "*.py"))
+        + glob.glob(os.path.join(REPO, "harness", "tools", "*.py")))
+
+
+def line_citations(text, names):
+    """`(line_in_text, module, cited_line)` for each `<module>.py:<N>` in `text`
+    whose module basename is in `names`.
+
+    Deliberately has NO escape hatch. A doc that needs to quote a rotted
+    citation can spell it without the colon; adding an opt-out is how a check
+    stops firing."""
+    out = []
+    for i, line in enumerate(text.split("\n"), 1):
+        for m in _CITE_RE.finditer(line):
+            if m.group(1) in names:
+                out.append((i, m.group(1), int(m.group(2))))
+    return out
+
+
+def _pattern_text_files(pdir):
+    out = []
+    for root, dirs, files in os.walk(pdir):
+        dirs[:] = [d for d in dirs if d != "__pycache__"]
+        out += [os.path.join(root, f) for f in files
+                if not f.endswith(_CITE_SKIP_EXT)]
+    return sorted(out)
+
+
+def citation_verdict(text, names=None):
+    """`(verdict, fatal, other)` for one blob of text -- the whole stage's
+    decision, so the must-fire arm can exercise the decision and not just the
+    matcher."""
+    names = harness_module_names() if names is None else names
+    hits = line_citations(text, names)
+    fatal = [h for h in hits if h[1] == CITE_FATAL_MODULE]
+    other = [h for h in hits if h[1] != CITE_FATAL_MODULE]
+    return ("FAIL" if fatal else "OK"), fatal, other
+
+
+def check_doc_citations(pdir, rep):
+    head("0c. no `check.py:NNNN` line citation in the pattern's own files")
+    names = harness_module_names()
+    files = _pattern_text_files(pdir)
+    fatal, other = [], []
+    for path in files:
+        try:
+            with open(path, encoding="utf-8") as fh:
+                txt = fh.read()
+        except (UnicodeDecodeError, OSError):
+            continue
+        rel = os.path.relpath(path, REPO)
+        # the SAME decision the must-fire arm exercises -- not a second copy
+        _, f_hits, o_hits = citation_verdict(txt, names)
+        for dest, hits in ((fatal, f_hits), (other, o_hits)):
+            dest += [{"file": rel, "line": ln, "module": mod,
+                      "cited_line": cited} for ln, mod, cited in hits]
+    for h in fatal:
+        rep.fail("doc-citation",
+                 f"{h['file']}:{h['line']} cites `check.py:{h['cited_line']}` "
+                 f"-- a line citation into check.py rots (it has grown every "
+                 f"task). Name the FUNCTION and give no line number: "
+                 f"`check.py::<function>`. See `.memory/02-bench-rules.md`.")
+    if not fatal:
+        rep.ok(f"0 `check.py:NNNN` citations in {len(files)} files")
+    if other:
+        rep.note(f"{len(other)} line citation(s) into other harness modules, "
+                 f"reported not failed (promoting them costs a re-measure "
+                 f"where the file is measurement-hashed): "
+                 + " . ".join(f"{h['file']}:{h['line']} -> "
+                              f"{h['module']}:{h['cited_line']}" for h in other))
+    return {"fatal": fatal, "other": other,
+            "harness_modules": sorted(names)}
+
+
+# ==========================================================================
+# 0d. CODEGEN_CFGS is a whitelist -- couple it to build.py
+# ==========================================================================
+#
+# RECAP queue item 16(b): *"`CODEGEN_CFGS` is a whitelist and nothing couples it
+# to `build.py`"* -- a new `--cfg` there and the code it gates silently leaves
+# the idiom audit, because `_cfg_reaches_codegen` answers "no" and `exec_code`
+# blanks the item. The item calls this the expensive class because `build.py` is
+# measurement-hashed; ⚠ **that is wrong about its own cost.** A cross-check that
+# READS `build.py` and fails on a mismatch lives here, in `check.py`, which is
+# gate-only. `build.py` is not edited.
+
+
+def build_cfg_flags(src):
+    """`(sorted names, n_unresolved)` for every `--cfg` value in Python source.
+
+    TOKENISED, not grepped, and that is the whole point: `build.py` mentions
+    `--cfg` in a COMMENT (*"verus_run.py forwards unrecognised flags to rustc
+    verbatim, --cfg included"*), so a substring search reports two flags where
+    there is one. Same class as the `global layout` census that counted
+    *"this pattern has NO global layout"* as an instance
+    (`.memory/05-layout.md`) -- a substring search cannot tell a USE from a
+    MENTION.
+
+    `n_unresolved` counts a `--cfg` whose value is not a string literal. That is
+    not a failure by itself -- nothing can statically name it -- but it is the
+    one shape this check cannot audit, so it is shouted rather than dropped."""
+    toks = [t for t in tokenize.generate_tokens(io.StringIO(src).readline)
+            if t.type not in (tokenize.COMMENT, tokenize.NL, tokenize.NEWLINE,
+                              tokenize.INDENT, tokenize.DEDENT,
+                              tokenize.ENDMARKER)]
+    names, unresolved = [], 0
+    for i, t in enumerate(toks):
+        if t.type != tokenize.STRING:
+            continue
+        try:
+            v = ast.literal_eval(t.string)
+        except (ValueError, SyntaxError):
+            continue
+        if not isinstance(v, str):
+            continue
+        if v.startswith("--cfg="):
+            names.append(v[len("--cfg="):])
+            continue
+        if v != "--cfg":
+            continue
+        # the value is the next token that is not a separator
+        j = i + 1
+        while j < len(toks) and toks[j].type == tokenize.OP and \
+                toks[j].string in (",", "+", "(", "["):
+            j += 1
+        w = None
+        if j < len(toks) and toks[j].type == tokenize.STRING:
+            try:
+                w = ast.literal_eval(toks[j].string)
+            except (ValueError, SyntaxError):
+                w = None
+        if isinstance(w, str):
+            names.append(w)
+        else:
+            unresolved += 1
+    return sorted(set(names)), unresolved
+
+
+def codegen_cfg_verdict(src, allowed=None):
+    """`(verdict, missing, n_unresolved)` -- the stage's whole decision."""
+    allowed = CODEGEN_CFGS if allowed is None else allowed
+    names, unresolved = build_cfg_flags(src)
+    missing = sorted(n for n in names if n not in allowed)
+    return ("FAIL" if missing else "OK"), missing, unresolved
+
+
+def check_codegen_cfgs(rep):
+    head("0d. CODEGEN_CFGS covers every `--cfg` harness/build.py passes")
+    path = getattr(buildmod, "__file__", None) or os.path.join(
+        REPO, "harness", "build.py")
+    with open(path, encoding="utf-8") as fh:
+        src = fh.read()
+    verdict, missing, unresolved = codegen_cfg_verdict(src)
+    names, _ = build_cfg_flags(src)
+    if missing:
+        rep.fail("codegen-cfgs",
+                 f"harness/build.py passes --cfg {missing} which "
+                 f"`check.py::CODEGEN_CFGS` does not list, so `exec_code` "
+                 f"BLANKS every `#[cfg(...)]` item gated on it and the idiom "
+                 f"audit silently stops seeing that code. Add it to "
+                 f"CODEGEN_CFGS, or say in a comment why it reaches no codegen "
+                 f"unit here.")
+    else:
+        rep.ok(f"build.py passes --cfg {names or '(none)'}; all in "
+               f"CODEGEN_CFGS ({len(CODEGEN_CFGS)} names)")
+    if unresolved:
+        rep.shout("codegen-cfgs",
+                  f"{unresolved} `--cfg` in harness/build.py whose value is "
+                  f"not a string literal -- this stage cannot audit it")
+    return {"build_py_cfgs": names, "missing": missing,
+            "unresolved": unresolved, "verdict": verdict}
+
+
+# ==========================================================================
 # 0b. the pattern declares the idiom its rungs implement
 # ==========================================================================
 
@@ -969,12 +1213,16 @@ def _blank_ghost(code):
 #: else names code that reaches no codegen unit here, so `exec_code` blanks it.
 #:
 #: Derived, not enumerated from failures: the first entry is the only `--cfg`
-#: `build.py` passes (`build.py:150`, isolated mode), the second is set by the
-#: interpreter stage 8 runs, and the rest are rustc's own, defined for every
-#: compilation by the target rather than by any flag of ours (Rust reference,
-#: "Conditional compilation"). `test` is deliberately NOT here: nothing in this
-#: repo ever passes `--test`, so a `#[cfg(test)]` module is dead in every cell
-#: that is built, measured or interpreted.
+#: `build.py` passes (`build.py::rust_flags`, isolated mode -- ⚠ this read
+#: `build.py:150` until TASK_168 and is now a function name for the reason
+#: stage 0c exists), the second is set by the interpreter stage 8 runs, and the
+#: rest are rustc's own, defined for every compilation by the target rather than
+#: by any flag of ours (Rust reference, "Conditional compilation"). `test` is
+#: deliberately NOT here: nothing in this repo ever passes `--test`, so a
+#: `#[cfg(test)]` module is dead in every cell that is built, measured or
+#: interpreted.
+#: ⚠ **It is no longer only a claim: `check_codegen_cfgs` (stage 0d) re-derives
+#: `build.py`'s `--cfg` list by TOKENISING it and fails if this set misses one.**
 CODEGEN_CFGS = frozenset({
     "slb_isolated", "miri",
     "unix", "windows", "panic", "debug_assertions", "overflow_checks",
@@ -982,6 +1230,61 @@ CODEGEN_CFGS = frozenset({
     "target_pointer_width", "target_vendor", "target_feature",
     "target_has_atomic", "target_abi", "target_thread_local",
 })
+
+# --- TASK_168: must-fire arms for stages 0c and 0d ------------------------
+# Both stages are PROSPECTIVE on a green tree -- 0 `check.py:NNNN` under
+# `patterns/` and 1 `--cfg` that is already whitelisted -- so a green
+# 33-pattern sweep says NOTHING about whether either can fire. Each case
+# exercises the stage's whole VERDICT, not just its matcher, and each is run on
+# every invocation. ⚠ They are checked BEFORE `check_selftests`' `fixture.ensure()`
+# early return, which the other arms sit behind (RECAP queue item 34).
+
+_CITE_NAMES = frozenset({"check.py", "measure.py", "build.py", "vparse.py"})
+
+_CITE_VERDICT_CASES = [
+    ("a `check.py:NNNN` citation FAILS",
+     citation_verdict("see `check.py:1249` for the rule", _CITE_NAMES),
+     ("FAIL", [(1, "check.py", 1249)], [])),
+    ("the same citation written as a FUNCTION passes",
+     citation_verdict("see `check.py::check_checksums` for the rule",
+                      _CITE_NAMES),
+     ("OK", [], [])),
+    ("a range citation `check.py:1249-1278` still FAILS (the leading number "
+     "is the citation)",
+     citation_verdict("`harness/check.py:1249-1278` requires", _CITE_NAMES),
+     ("FAIL", [(1, "check.py", 1249)], [])),
+    ("a pattern's OWN `model.py:50` is not a harness citation",
+     citation_verdict("`model.py:50` and `gen.py:30`", _CITE_NAMES),
+     ("OK", [], [])),
+    ("another harness module's line citation is REPORTED, not failed",
+     citation_verdict("`measure.py:64` is SKIP_INPUT_PREFIX", _CITE_NAMES),
+     ("OK", [], [(1, "measure.py", 64)])),
+    ("`checkNpy:1` and `xcheck.py:1` do not match; `harness/check.py:1` does",
+     citation_verdict("checkNpy:1 xcheck.py:1 harness/check.py:1",
+                      _CITE_NAMES),
+     ("FAIL", [(1, "check.py", 1)], [])),
+]
+
+_CFG_VERDICT_CASES = [
+    ("a --cfg build.py passes that CODEGEN_CFGS lacks is a FAIL",
+     codegen_cfg_verdict('f += ["--cfg", "slb_bogus"]\n'),
+     ("FAIL", ["slb_bogus"], 0)),
+    ("the `--cfg=NAME` spelling is caught too",
+     codegen_cfg_verdict('f += ["--cfg=slb_bogus"]\n'),
+     ("FAIL", ["slb_bogus"], 0)),
+    ("the shipped flag passes",
+     codegen_cfg_verdict('f += ["--cfg", "slb_isolated"]\n'),
+     ("OK", [], 0)),
+    ("a `--cfg` in a COMMENT is NOT a flag (what a grep gets wrong)",
+     codegen_cfg_verdict('# forwards --cfg slb_bogus verbatim\nx = 1\n'),
+     ("OK", [], 0)),
+    ("a `--cfg` whose value is not a literal is UNRESOLVED, not silent",
+     codegen_cfg_verdict('f += ["--cfg", name]\n'),
+     ("OK", [], 1)),
+    ("a bare trailing `--cfg` is unresolved too",
+     codegen_cfg_verdict('f.append("--cfg")\n'),
+     ("OK", [], 1)),
+]
 
 _CFG_ATTR = re.compile(r"#!?\[\s*cfg\s*\(")
 _ATTR_START = re.compile(r"#!?\[")
@@ -2808,6 +3111,15 @@ def _callgrind_total(binary, arg, outfile):
 
 def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
     """The dynamic half of anti-collapse: does the loop still do work per call?
+
+    ⚠⚠ **READ THIS FIRST. `marginal_ir_per_call` CARRIES TWO UNRELATED EFFECTS
+    AND THEIR MAGNITUDES DIFFER BY 38x.** (1) the ENVIRONMENT BLOCK moves a
+    per-call stack array's alignment -- `+-0.20` on p08 up to `+-7` per array;
+    census table under *"THE EXPOSED SET IS A MEASUREMENT"*. (2) it is a
+    WHOLE-PROGRAM slope, so it carries the kernel's CALLEES -- up to `+1732.73`;
+    null table under *"EVERYTHING ABOVE IS ONE MECHANISM AND THERE ARE TWO"*.
+    ✅ **The operative rule is at the END of this docstring, marked "THE
+    OPERATIVE RULE": for a cross-RUNG comparison use `kernel_exclusive_ir`.**
 
     A kernel that got constant-folded, hoisted or CSE'd away still has a
     backward branch somewhere in its symbol, so the structural check above
@@ -9511,6 +9823,13 @@ def main():
 
     rep = Report()
     check_selftests(rep)
+    # TASK_168, RECAP queue items 12 and 16(b). Both are static reads of
+    # committed text, need no build and no fixture, so they run first: a doc
+    # that cites a line number of `check.py` is wrong the moment `check.py`
+    # grows, and a `--cfg` that `CODEGEN_CFGS` does not know silently removes
+    # code from the idiom audit below.
+    citations = check_doc_citations(pdir, rep)
+    cfgs = check_codegen_cfgs(rep)
     audit = check_idiom(rep, pdir, contract)
     budgets = run_budgets(contract, rep, all_stems)
     if budgets:
@@ -9736,6 +10055,14 @@ def main():
         # docstring says why `forbidden` carries a verdict and `required`
         # cannot.
         "idiom_audit": audit,
+        # TASK_168. Stage 0c: `fatal` is always empty on a passing run (it is a
+        # hard fail), so the key that carries information is `other` -- the line
+        # citations into harness modules this stage REPORTS rather than fails,
+        # recorded so the next task can price promoting them without re-deriving
+        # the list. Stage 0d: the `--cfg` list re-derived from `build.py`, so a
+        # diff of this record shows the day a new one lands.
+        "doc_citations": citations,
+        "codegen_cfgs": cfgs,
         "source_sha256": source_sha,
         "derived_contract": {"requires": reqs, "ensures": enss,
                              # the harness default, and the rate actually used:

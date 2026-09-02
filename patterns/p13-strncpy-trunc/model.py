@@ -47,9 +47,11 @@ reaches `DST_CAP`; the gate records that disagreement in its behaviour table
 rather than requiring it to vanish (`.memory/02-bench-rules.md`).
 
 **Why `small` and `large` are 100% NON-TRUNCATING, and why that is not a
-choice.** `harness/check.py:1249-1278` requires every cell, R1 included, to
-print this model's checksum on every non-adversarial **matrix** input
-(`sweep-*` is dropped at `check.py:469`). R1 omits the termination store, so on
+choice.** `harness/check.py::check_checksums` requires every cell, R1 included,
+to print this model's checksum on every non-adversarial **matrix** input
+(`sweep-*` is dropped by `check.py::inputs_of`, whose comment reads *"`sweep-*`
+files are diagnostic ... They are not part of the matrix"*). R1 omits the
+termination store, so on
 any window holding a string of `DST_CAP` bytes or more its consumer reads past
 `dst[31]` -- and under `gcc -O3` the value it reads is not even stable across
 runs (../NOTES.md 0). So a p13 row on which the bug fires cannot also be a

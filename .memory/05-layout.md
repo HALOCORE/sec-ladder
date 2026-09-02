@@ -482,6 +482,38 @@ one hour apart.
 gate digest (see `check.py::main`'s `srcs` comment), so regenerating a sidecar
 cannot move the digest that certifies the run evaluating it.
 
+⚠⚠⚠ **AND THE COUNT ABOVE IS STILL NOT THE WHOLE COST — `TASK_168` PAID TWO
+MORE.**
+
+* **A `controls/*.json` sidecar also pins ITS OWN GENERATOR**, so a
+  `controls/*.py` edit stales it too. `TASK_168` edited
+  `p35/controls/rust_bug.py` and `p35` therefore had **THREE** stale sidecars,
+  not the two the harness-pin rule predicts. ✅ **Budget one generator re-run per
+  sidecar that pins EITHER a `harness/` file OR the generator you are editing.**
+* ⚠⚠ **`synthesis/outward_ir.json` PINS THE GATE `source_sha256` FOR ALL 33
+  PATTERNS, so ANY `harness/*.py` edit stales the whole sidecar — and re-emitting
+  it is 352+ callgrind runs.** `TASK_166` re-emitted it; `TASK_168`'s `check.py`
+  edits staled all 33 again, and it stopped and reported rather than spending it.
+  ⚠⚠ **THIS IS THE EXACT FAILURE MODE STAGE 9b's OWN DOCSTRING ARGUES AGAINST**:
+  *"`gate_source_sha256` … is the WRONG key for anything that derives from a
+  narrower set, because the gate digest covers `patterns/*/*.md`: pinning against
+  it reports STALE on a prose fix, and a pin whose STALE does not mean 'the
+  numbers are wrong' is a pin that gets switched off."* **A `check.py` docstring
+  edit cannot move a callgrind number, so every one of these 33 STALEs is
+  FALSE.** ✅ **The repair is `synthesis/`-only and in neither digest: pin
+  `derived_from_sha256` over what actually determines the numbers — the rung
+  sources, `c/*`, `build.py`, `asm.py`, `inputs/gen.py` — i.e.
+  `measure.py::measurement_sources`.**
+  ⚠ **And `outward_ir.py`'s own docstring says *"It carries no staleness pin"*,
+  which has been false since `TASK_107` §F added one.** Rule 13 header rot.
+
+⚠ **A THIRD cost nobody had priced, and `PROTOCOL` rule 6's table omits it: a
+RE-MEASURE stales that pattern's PUBLISHED TABLE** (`results/tables/pNN.md`), and
+**stage 9c hard-fails on it** — so each re-measured pattern owes **`report.py`
+plus a second gate run**, and a pattern whose `controls_json` also moved owes
+two. `TASK_168` re-measured four patterns and paid **+5 renders and +6 gate
+runs**.
+
 ## ⚠ `vparse.parse()` DROPS BODY-LESS ITEMS ON PURPOSE — widening it turns p36 red
 
 (TASK_082. **The manager predicted the opposite and was wrong; this is the

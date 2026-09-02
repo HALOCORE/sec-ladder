@@ -25,7 +25,8 @@ cell agrees.** The `adversarial-*` blobs are the ones that declare more, and
 they are the only inputs on which any rung can diverge -- p02's and p14's shape.
 
 `--sweep` appends the `sweep-*` band. The prefix is the whole mechanism
-(`check.py:459-460`, `measure.py:60`): `sweep-*` blobs are diagnostic, are not
+(`check.py::inputs_of`, `measure.py::SKIP_INPUT_PREFIX`): `sweep-*` blobs are
+diagnostic, are not
 part of the measured matrix, and a band named otherwise would enter it.
 
 **Two structural parameters vary INDEPENDENTLY in the sweep** -- `nrec`
