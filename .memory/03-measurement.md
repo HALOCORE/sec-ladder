@@ -422,7 +422,11 @@ ns disagreeing in direction, with a named mechanism*. This is finding 5/6's
 family with a cause attached, and it is a property of the **counter**, not of
 the code.
 
-**Blast radius checked and empty.** glibc picks the byte-wise `rep` paths only
+⚠⚠⚠ **RETRACTED AT `TASK_168`/`TASK_169` — THE HEADER SENTENCE BELOW IS FALSE
+AND IS KEPT ONLY BECAUSE THE PARAGRAPH UNDER IT IS STILL RIGHT ABOUT `p02`.
+READ THE RE-CHECK FURTHER DOWN BEFORE QUOTING ANY OF IT.**
+
+~~**Blast radius checked and empty.**~~ glibc picks the byte-wise `rep` paths only
 above a size threshold — `memcpy`/`memmove` stay on the vector path at 0.104
 Ir/byte up to somewhere between 8 KiB and 16 KiB, `memset` flips at 3 KiB — and
 p02's copies (61 B = 26 Ir, 4092 B = 425 Ir) are well inside the vector regime.
@@ -453,22 +457,57 @@ used**: `≈1.00` means a byte-wise `rep` path, `≈0.10` means the vector path.
 - ⚠⚠⚠ **`p42` IS A NEW, ASYMMETRIC, PUBLISHED HIT.** `safe_naive`'s
   `vec![0u8; 4096]` costs **`+4160.00` `Ir`/call at `1.0156` `Ir`/byte** over
   `unsafe`'s `with_capacity` — the `rep stosb` signature to three decimals.
-  **On the vector path the same zeroing prices at ≈426 `Ir`, so roughly 90% of
-  the term is COUNTER, not code.** ⚠⚠ **`results/synthesis.md` §2 prints exactly
-  `+4160.00`, in BOLD, in the band whose own legend says *"every row is
-  real"*.** ✅ **The behavioural difference IS real — one rung zeroes and the
-  other does not — but its MAGNITUDE in `Ir` is inflated ~10×.**
+  ⚠⚠ **`results/synthesis.md` §2 prints exactly `+4160.00`, in BOLD, in the band
+  whose own legend says *"every row is real"*.**
+
+  ⚠⚠⚠ **AND THE MANAGER'S GLOSS — *"on the vector path the same zeroing prices
+  at ≈426 `Ir`, so roughly 90% of the term is COUNTER, not code"* — IS
+  WITHDRAWN.** (`TASK_169`.) **`426` is glibc `memcpy`'s own figure, re-badged
+  as a `memset` counterfactual**, and the manager published it under a `✅`
+  without re-deriving it. ⚠ **There is no measured vector-path counterfactual
+  for this zeroing, so no percentage may be quoted.**
+
+  ✅ **WHAT IS TRUE AND IS ALL THAT IS TRUE:** the `+4160.00` is a **real
+  behavioural difference** — one rung zeroes 4096 bytes and the other does not —
+  measured at `1.0156` `Ir`/byte, which is the byte-wise `rep` regime.
+  ⚠⚠ **So the row is REGIME-DEPENDENT: it crosses a libc bulk-routine threshold,
+  and a difference taken across such a threshold is not comparable with one that
+  is not.** ✅ **That is what should be marked beside it — not a discount
+  factor.**
 - ⚠⚠ **`.memory/`'s own *"only `p08`'s gcc kernels contain a `rep`
   instruction"* is FALSE at 33.** Scanned over the same symbols `measure.py`
   counts: **26 of 1052 measured windows, across NINE patterns** — `p06 p08 p14
   p23 p27 p29 p32 p35 p46`. ✅ ***"gcc"* and *"-O3"* are right** — all 26 are
-  `c-gcc`/`c-gcc-h` at `-O3`, **zero** clang or Rust windows. ✅ **And all 34
-  instructions are the WORD-wise form** (`rep stos %rax`, ≈`0.126` `Ir`/byte),
-  **so the direction is that gcc's `Ir` UNDERSTATES its work** relative to clang
-  and Rust — `p08`'s documented `Ir`-vs-`ns` direction disagreement, on nine
-  patterns instead of one. ⚠ **The exposed column is `gcc-clang`, which
-  `results/synthesis.md` publishes; every rung pair is untouched because every
-  hit is a C cell.**
+  `c-gcc`/`c-gcc-h` at `-O3`, **zero** clang or Rust windows.
+
+  ⚠⚠⚠ **BUT *"ALL 34 ARE THE WORD-WISE FORM AT ≈`0.126` `Ir`/BYTE"* IS FALSE,
+  AND THE MANAGER MARKED IT `✅ re-derived` WITHOUT RUNNING IT** (`TASK_169`
+  blocker 1; manager-re-derived afterwards, properly this time):
+
+  ```
+  rep stos %rax   20     8 bytes/iteration   ~0.126 Ir/byte
+  rep stos %eax   16     4 bytes/iteration   ~0.25  Ir/byte   <- DOUBLE
+  rep movsq        2
+  ```
+
+  **Sixteen of thirty-six are `%eax`, at twice the `Ir`/byte the sentence
+  claimed.** ⚠ **The word-wise-only statement is true of the published
+  `-O3 isolated` quadrant and not of the census.**
+
+  ⚠⚠⚠ **AND THE OLD CONCLUSION — *"no previously published `Ir` comparison is
+  contaminated"* — FALLS ON A LICENSED ROW.** `results/synthesis.md`'s `p27`
+  **`gcc-clang`** row is `−25.02 / −201.73` and is tagged **`LICENSED`**; gcc's
+  32-`Ir` `rep stos` sits against clang's 19-`Ir` vector spelling, i.e.
+  **over half the magnitude of a published, licensed difference.**
+  ⚠ **The exposed column is `gcc-clang`, and every rung pair really is untouched
+  (every hit is a C cell) — but *"exposed"* is not *"hypothetical"*, and one row
+  is materially affected.**
+
+  ⚠⚠ **The DIRECTION also needs narrowing.** *"gcc's `Ir` understates its
+  work"* is `p08`'s result and does **not** transfer unexamined: `p08` zeroes
+  **4096** bytes, above the 2048-byte threshold, while five of the other eight
+  zero **128–768 bytes**, where gcc is **dearer**. **State the direction per
+  row, with its transfer size.**
 
 ⚠ **The distinction the re-check DID respect, and it stands: what matters is the
 size of an individual `memcpy`/`memmove`/`memset` CALL inside the measured

@@ -6068,12 +6068,30 @@ the number.** Two task files have already sent an agent to the wrong finding.
     is FALSE at 33.** ⊘ Scanned over the same symbols `measure.py` counts:
     **26 of 1052 measured windows across NINE patterns** — `p06 p08 p14 p23 p27
     p29 p32 p35 p46`. ✅ ***"gcc"* and *"-O3"* were right** (all 26 are
-    `c-gcc`/`c-gcc-h` at `-O3`; zero clang, zero Rust). ✅ **All 34 instructions
-    are the WORD-wise form (`rep stos %rax`, ≈`0.126` `Ir`/byte), so the
-    direction is that gcc's `Ir` UNDERSTATES its work** — `p08`'s documented
-    `Ir`-vs-`ns` disagreement, on nine rows instead of one. ⚠ **The exposed
-    column is `gcc-clang`; every rung pair is untouched because every hit is a C
-    cell.**
+    `c-gcc`/`c-gcc-h` at `-O3`; zero clang, zero Rust).
+
+    ⚠⚠⚠ **THREE BLOCKERS, ALL IN THIS BULLET'S OWN `✅` MARKS, ALL THE
+    MANAGER'S** (`TASK_169`; re-derived properly afterwards):
+    **(i)** *"all 34 are the WORD-wise form at ≈`0.126` `Ir`/byte"* is **FALSE** —
+    `rep stos %rax` **20**, **`rep stos %eax` 16** (4 bytes/iteration,
+    ≈`0.25` `Ir`/byte, **double**), `rep movsq` 2. True of the published
+    `-O3 isolated` quadrant, not of the census.
+    **(ii)** *"no previously published `Ir` comparison is contaminated"*
+    **FALLS ON A LICENSED ROW**: `results/synthesis.md`'s `p27` **`gcc-clang`**
+    is `−25.02 / −201.73`, tagged `LICENSED`, and gcc's 32-`Ir` `rep stos`
+    against clang's 19-`Ir` vector spelling is **over half its magnitude**.
+    **(iii)** *"gcc's `Ir` UNDERSTATES its work on nine patterns"* needs a
+    transfer over the 2048-byte threshold — `p08` zeroes **4096**, five of the
+    others zero **128–768**, where gcc is **dearer**. **State the direction per
+    row with its transfer size.**
+    ⚠ **The exposed column is still `gcc-clang` and every rung pair really is
+    untouched (every hit is a C cell) — but *"exposed"* is not *"hypothetical"*.**
+
+    ⚠⚠⚠ **AND THE PATTERN IS NOW THREE FOR THREE: `TASK_165`, `TASK_167` AND
+    `TASK_169` EACH FOUND A `✅ manager-re-derived` MARK THE MANAGER HAD NOT
+    EARNED.** ✅ **The mark is the one thing a reader is entitled to trust, so
+    the rule is: put `✅` on a sentence ONLY after running it, and put `⊘` on
+    everything copied from a report — including sentences you agree with.**
 
     **(c) THREE COSTS NOBODY HAD PRICED, all now in `.memory/05-layout.md` and
     `PROTOCOL` rule 6.** ⊘ A re-measure **stales that pattern's PUBLISHED TABLE**
@@ -7664,10 +7682,14 @@ Both retired.
     this case**: *"a pin whose STALE does not mean 'the numbers are wrong' is a
     pin that gets switched off."* **A docstring edit cannot move a callgrind
     number, so all 33 STALEs are FALSE.**
-    ✅ **The repair is `synthesis/`-only, in NEITHER digest, and costs no sweep
-    and no re-measure: pin `derived_from_sha256` over what determines the numbers
-    — the rung sources, `c/*`, `build.py`, `asm.py`, `inputs/gen.py`, i.e.
-    `measure.py::measurement_sources`.** ⚠ **Fix the docstring in the same pass:
+    ⚠⚠ **THE REPAIR IS `synthesis/`-ONLY AND IN NEITHER DIGEST — BUT THE
+    MANAGER'S *"and it clears the staleness"* IS WRONG, AND `TASK_169` MEASURED
+    IT: pinning `measure.py::measurement_sources` STILL REPORTS 4 OF 33
+    STALE.** ⚠ **So the item is a real improvement (33 false STALEs → 4) and
+    NOT a fix; whoever takes it owes an account of the four before switching the
+    pin, or it trades a pin nobody believes for a pin nobody believes.**
+    ✅ **Pin over what determines the numbers — the rung sources, `c/*`,
+    `build.py`, `asm.py`, `inputs/gen.py`.** ⚠ **Fix the docstring in the same pass:
     `outward_ir.py` still says *"It carries no staleness pin"*, false since
     `TASK_107` §F.** ⚠ **Do the repair BEFORE the next re-emit, or the re-emit
     buys a pin that will be false again on the next `check.py` comment.**
@@ -7691,6 +7713,45 @@ Both retired.
     published one, and that is the right call.** **What is owed is either an
     assertion with a stated tolerance, or a sentence in `p35`'s `NOTES.md`
     saying the arm is stochastic — a declaration edit, so price it.**
+
+40. ⚠⚠⚠ **A ROTTEN `check.py:NNNN` CITATION IS IN A *PUBLISHED* ARTEFACT, AND
+    THE MANAGER'S OWN REPAIR MISSED IT.** (`TASK_169`.) `results/synthesis.md:224`
+    carries **`check.py:3303`**, emitted by `synthesize.py:659` and `:1400`, and
+    that line is now a docstring sentence about the whole tree rather than
+    `check_identity`'s isolated comparison (which lives at `check_identity`).
+    ⚠⚠ **`.memory/` recorded this exact coordinate as rotted and repaired it —
+    IN ITS OWN COPY ONLY.** ⚠ **`RECAP.md` carries six of its own, ≥4 rotten.**
+    ✅ **`synthesis/` is in NEITHER digest, so fixing the generator and
+    regenerating costs one run, no gate and no re-measure.**
+    ⚠⚠ **And the wider point `TASK_169` makes: stage `0c` enforces the
+    convention over `check.py ∩ patterns/` — ONE of thirteen modules and ONE of
+    six directories that carry it.** ✅ **The right home for the tree-wide form
+    already exists: `harness/tools/temp_citations.py`, which is outside the gate
+    digest and already walks the whole repo.**
+
+41. ⚠⚠ **`p35` SHIPS A LIVE `rc=-11` vs `rc=-7` CONTRADICTION ACROSS FIVE
+    DOCUMENTS, ONE OF THEM A HASHED `why`.** (`TASK_169`; see also item 39.)
+    The unsafe arm is **stochastic** — SIGSEGV 37/40 and 38/40 on the two
+    pointer inputs, SIGBUS the rest, while C is 40/40 — and the five documents
+    disagree about which draw is *the* result. ⚠ **A hashed `why` makes this a
+    declaration edit: `contract_sha256` moves, so price `report.py` + a second
+    gate for `p35`.** ✅ **The honest fix is to say the arm is stochastic and
+    give the distribution, not to re-roll for the published draw.**
+
+42. ⚠ **`0c`/`0d` ARE THE ONLY ARM SETS IN `check.py` WITH NO `RAISED` GUARD.**
+    (`TASK_169`.) Every other `_*_CASES` table catches its own exception and
+    reports `"RAISED"`; these two do not, **so a throw inside one kills the gate
+    at import rather than failing a stage** — `.memory/03-measurement.md`
+    entry 19's *"reported, not crashed"* rule. **One line each; free on any
+    sweep.**
+
+43. ⚠⚠ **OUT OF SCOPE WHEN FOUND, AND IT TOUCHES 31 COMMITTED RECORDS:
+    `asm.py`'s `main` needle MIS-RESOLVES to `driftsort_main`.** (`TASK_169`,
+    reported not investigated.) **31 of the committed records name the wrong
+    symbol for the `whole`-mode window.** ⚠ **Establish what it changes before
+    deciding anything** — `asm.py` is **measurement-hashed**, so a fix is a
+    full re-measure, and the `whole` column is already the one
+    `.memory/03-measurement.md` says is not a null.
 
 ### Deferred with a stated reason
 
