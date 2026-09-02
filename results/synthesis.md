@@ -318,7 +318,7 @@ answer* (`.memory/03-measurement.md`).
 | p05-index-flatten | 700.00 | 2895.00 | LICENSED |  | undeclared |
 | p06-rotate | 173.00 | 395.00 | LICENSED |  | ⊘ PROVISIONAL -- R3 searched at review: `c_idx` is 0.00000 Ir/BYTE, and on `small` it is +80.00 against a shipped +334.00. ⚠ On `large` the SHIPPED R3 (+172) is the CHEAPER of the two |
 | p07-binary-search | 5758.94 | 18735.88 | LICENSED | small +5763.59 (+4.65) **?** / large +18725.77 (-10.11) **?** | undeclared |
-| p08-overlap-move | 11076.00 | 91941.00 | NOT-LIC | **small +10956.00** (-120.00) / **large +91057.02** (-883.98) | R3 span OWED |
+| p08-overlap-move | 11076.00 | 91941.00 | NOT-LIC | **small +10956.02** (-119.98) / **large +91057.00** (-884.00) | R3 span OWED |
 | p09-bitset | 9936.00 | 36409.00 | LICENSED |  | undeclared |
 | p10-fir-stencil | 2881.00 | 5345.00 | LICENSED |  | R4 searched at review: -323/-603 becomes -129/-241 |
 | p11-nul-scan | 5488.00 | 29088.00 | LICENSED |  | R4 chained to the prover; `r4_cstr` inadmissible |
@@ -500,7 +500,7 @@ answer* (`.memory/03-measurement.md`).
 | p05-index-flatten | 363.00 | 782.00 | LICENSED |  |
 | p06-rotate | 862.00 | 281.00 | NOT-LIC | **small +800.00** (-62.00) / **large +93.00** (-188.00) |
 | p07-binary-search | 5635.45 | 18555.09 | LICENSED | small +5640.80 (+5.35) **?** / large +18545.67 (-9.42) **?** |
-| p08-overlap-move | 1725.00 | 10256.00 | NOT-LIC | **small -2427.74** (-4152.74) / **large +5767.10** (-4488.90) |
+| p08-overlap-move | 1725.00 | 10256.00 | NOT-LIC | **small -2427.82** (-4152.82) / **large +5767.10** (-4488.90) |
 | p09-bitset | 7322.00 | 25908.00 | NOT-LIC | **small +7701.00** (+379.00) / **large +28534.00** (+2626.00) |
 | p10-fir-stencil | 269.00 | -1187.00 | LICENSED |  |
 | p11-nul-scan | 1171.00 | 8878.00 | LICENSED | **small +1472.00** (+301.00) / **large +8961.00** (+83.00) |

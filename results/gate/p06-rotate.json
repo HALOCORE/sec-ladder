@@ -149,13 +149,13 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "703f0aa2104e5f8473456157eca3f55e2343d4b0b88f780dbb588ebc0bb2602e",
+    "harness/check.py": "60aba3e5a118296c4c8eea74441095beacee54df67ea72344978e91c16ae87c0",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
-    "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
+    "harness/vparse.py": "0922b5ad2a1e7bcd7f8f67aa2d8ff0f66d66584c36deb344507b32a72776725f",
     "patterns/p06-rotate/NOTES.md": "74dc7a93c736e599fde01716f37e2922fef4ec66425e6be821f469d80de933fb",
     "patterns/p06-rotate/README.md": "e11771fa40c70b79fc56c482e93a9705c932c45ad1be8f5889e7f8c1a905344d",
     "patterns/p06-rotate/c/kernel.c": "8baf222692697c003ed0ed6076678807860f97a83e3b584cbc9db9145a503a3a",
@@ -248,62 +248,64 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3222,
-    "nvars": 47,
-    "envp_stack_bytes": 3598,
-    "tuning_vars": {},
+    "bytes": 3269,
+    "nvars": 48,
+    "envp_stack_bytes": 3653,
+    "tuning_vars": {
+      "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
+    },
     "repo_path_bytes": 33,
     "domain": "Comparable ONLY against a record with the same `envp_stack_bytes` (= bytes + 8*nvars), the same `tuning_vars` and the same `repo_path_bytes`. That is a NECESSARY condition, not a proved sufficient one: `bytes` alone was believed sufficient and TASK_114 falsified it at +-7 Ir/call. argv beyond the repo prefix, and anything else on the initial stack, are not recorded here. When the three differ, compare `kernel_exclusive_ir` in results/pNN-*.json instead -- structurally immune, 0 of 288 triples moved."
   },
   "marginal_ir_per_call": {
-    "c-clang/O0/isolated/small.bin": 6450.82,
+    "c-clang/O0/isolated/small.bin": 6450.28,
     "c-clang/O0/isolated/large.bin": 3642.0,
-    "c-clang/O0/isolated/d_ir_d_work": 57.32285714285714,
-    "c-clang/O0/whole/small.bin": 6441.82,
+    "c-clang/O0/isolated/d_ir_d_work": 57.31183673469387,
+    "c-clang/O0/whole/small.bin": 6441.28,
     "c-clang/O0/whole/large.bin": 3619.0,
-    "c-clang/O0/whole/d_ir_d_work": 57.60857142857142,
-    "c-clang/O3/isolated/small.bin": 2691.82,
+    "c-clang/O0/whole/d_ir_d_work": 57.59755102040816,
+    "c-clang/O3/isolated/small.bin": 2691.28,
     "c-clang/O3/isolated/large.bin": 1910.0,
-    "c-clang/O3/isolated/d_ir_d_work": 15.955510204081635,
-    "c-clang/O3/whole/small.bin": 2650.82,
+    "c-clang/O3/isolated/d_ir_d_work": 15.944489795918372,
+    "c-clang/O3/whole/small.bin": 2650.28,
     "c-clang/O3/whole/large.bin": 1894.0,
-    "c-clang/O3/whole/d_ir_d_work": 15.445306122448983,
-    "c-clang-h/O0/isolated/small.bin": 6490.82,
+    "c-clang/O3/whole/d_ir_d_work": 15.434285714285718,
+    "c-clang-h/O0/isolated/small.bin": 6490.28,
     "c-clang-h/O0/isolated/large.bin": 3738.0,
-    "c-clang-h/O0/isolated/d_ir_d_work": 56.17999999999999,
-    "c-clang-h/O0/whole/small.bin": 6481.82,
+    "c-clang-h/O0/isolated/d_ir_d_work": 56.16897959183673,
+    "c-clang-h/O0/whole/small.bin": 6481.28,
     "c-clang-h/O0/whole/large.bin": 3715.0,
-    "c-clang-h/O0/whole/d_ir_d_work": 56.46571428571428,
-    "c-clang-h/O3/isolated/small.bin": 2646.82,
+    "c-clang-h/O0/whole/d_ir_d_work": 56.454693877551016,
+    "c-clang-h/O3/isolated/small.bin": 2646.28,
     "c-clang-h/O3/isolated/large.bin": 1802.0,
-    "c-clang-h/O3/isolated/d_ir_d_work": 17.241224489795922,
-    "c-clang-h/O3/whole/small.bin": 2605.82,
+    "c-clang-h/O3/isolated/d_ir_d_work": 17.230204081632657,
+    "c-clang-h/O3/whole/small.bin": 2605.28,
     "c-clang-h/O3/whole/large.bin": 1786.0,
-    "c-clang-h/O3/whole/d_ir_d_work": 16.731020408163268,
-    "c-gcc/O0/isolated/small.bin": 7151.82,
+    "c-clang-h/O3/whole/d_ir_d_work": 16.720000000000002,
+    "c-gcc/O0/isolated/small.bin": 7151.28,
     "c-gcc/O0/isolated/large.bin": 4297.0,
-    "c-gcc/O0/isolated/d_ir_d_work": 58.26163265306122,
-    "c-gcc/O0/whole/small.bin": 7151.82,
+    "c-gcc/O0/isolated/d_ir_d_work": 58.25061224489795,
+    "c-gcc/O0/whole/small.bin": 7151.28,
     "c-gcc/O0/whole/large.bin": 4297.0,
-    "c-gcc/O0/whole/d_ir_d_work": 58.26163265306122,
-    "c-gcc/O3/isolated/small.bin": 3491.82,
+    "c-gcc/O0/whole/d_ir_d_work": 58.25061224489795,
+    "c-gcc/O3/isolated/small.bin": 3491.28,
     "c-gcc/O3/isolated/large.bin": 2003.0,
-    "c-gcc/O3/isolated/d_ir_d_work": 30.384081632653064,
-    "c-gcc/O3/whole/small.bin": 3489.82,
+    "c-gcc/O3/isolated/d_ir_d_work": 30.3730612244898,
+    "c-gcc/O3/whole/small.bin": 3489.28,
     "c-gcc/O3/whole/large.bin": 2010.0,
-    "c-gcc/O3/whole/d_ir_d_work": 30.20040816326531,
-    "c-gcc-h/O0/isolated/small.bin": 7186.82,
+    "c-gcc/O3/whole/d_ir_d_work": 30.189387755102047,
+    "c-gcc-h/O0/isolated/small.bin": 7186.28,
     "c-gcc-h/O0/isolated/large.bin": 4381.0,
-    "c-gcc-h/O0/isolated/d_ir_d_work": 57.26163265306122,
-    "c-gcc-h/O0/whole/small.bin": 7186.82,
+    "c-gcc-h/O0/isolated/d_ir_d_work": 57.25061224489795,
+    "c-gcc-h/O0/whole/small.bin": 7186.28,
     "c-gcc-h/O0/whole/large.bin": 4381.0,
-    "c-gcc-h/O0/whole/d_ir_d_work": 57.26163265306122,
-    "c-gcc-h/O3/isolated/small.bin": 3532.82,
+    "c-gcc-h/O0/whole/d_ir_d_work": 57.25061224489795,
+    "c-gcc-h/O3/isolated/small.bin": 3532.28,
     "c-gcc-h/O3/isolated/large.bin": 2098.0,
-    "c-gcc-h/O3/isolated/d_ir_d_work": 29.282040816326536,
-    "c-gcc-h/O3/whole/small.bin": 3515.82,
+    "c-gcc-h/O3/isolated/d_ir_d_work": 29.27102040816327,
+    "c-gcc-h/O3/whole/small.bin": 3515.28,
     "c-gcc-h/O3/whole/large.bin": 2041.0,
-    "c-gcc-h/O3/whole/d_ir_d_work": 30.09836734693878,
+    "c-gcc-h/O3/whole/d_ir_d_work": 30.087346938775514,
     "safe_naive/O0/isolated/small.bin": 10811.89,
     "safe_naive/O0/isolated/large.bin": 6870.0,
     "safe_naive/O0/isolated/d_ir_d_work": 80.44673469387754,
@@ -390,7 +392,8 @@
           "line": 533
         }
       ],
-      "axiom_decls": []
+      "axiom_decls": [],
+      "global_decls": []
     }
   },
   "verified_call_site": {
@@ -831,20 +834,8 @@
         "stderr": "",
         "signal": null,
         "cells": [
+          "O3/isolated",
           "O3/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "9876901382056522496",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "443332761253903",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "9876901382056522496",
@@ -1023,7 +1014,19 @@
         "cells": [
           "O0/isolated",
           "O0/whole",
-          "O3/isolated",
+          "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "10384349632315276160",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": -6,
+        "stdout": "6455646746518069606",
+        "stderr": "*** stack smashing detected ***: terminated",
+        "signal": 6,
+        "cells": [
           "O3/whole"
         ],
         "model_exit": 0,
@@ -1040,19 +1043,6 @@
         "signal": 11,
         "cells": [
           "O3/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "10384349632315276160",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "1975836741785433007",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "10384349632315276160",
@@ -1079,6 +1069,19 @@
         "signal": null,
         "cells": [
           "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "10384349632315276160",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "7746484262099371238",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated"
         ],
         "model_exit": 0,
         "model_stdout": "10384349632315276160",
@@ -1500,7 +1503,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7f74b0c00060 with insufficient space for an object of type 'u",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 64 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7f79a9c00060 with insufficient space for an object of type 'u",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1511,7 +1514,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 111 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7f5f1800008f with insufficient space for an object of type '",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 111 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7f7c3d00008f with insufficient space for an object of type '",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1522,7 +1525,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 99999 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7fd420c186bf with insufficient space for an object of type",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:20: runtime error: index 99999 out of bounds for type 'uint8_t [64]' /home/apt/repos_common/sec-ladder/patterns/p06-rotate/c/kernel.c:83:15: runtime error: load of address 0x7fc8d58186bf with insufficient space for an object of type",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1715,7 +1718,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.1,
+        "seconds": 0.2,
         "stdout": "9445956822181738880",
         "model_stdout": "9445956822181738880",
         "stderr": ""
@@ -1812,8 +1815,9 @@
   "controls_json": {},
   "failures": [],
   "notes": [
-    "adversarial-past1.bin/c-gcc: opt/mode variants of this rung disagree (3 distinct behaviours)",
+    "adversarial-past1.bin/c-gcc: opt/mode variants of this rung disagree (2 distinct behaviours)",
     "adversarial-past1.bin/c-clang: opt/mode variants of this rung disagree (4 distinct behaviours)",
+    "adversarial-past48.bin/c-gcc: opt/mode variants of this rung disagree (2 distinct behaviours)",
     "adversarial-past48.bin/c-clang: opt/mode variants of this rung disagree (4 distinct behaviours)"
   ],
   "loud": [

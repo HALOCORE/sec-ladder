@@ -5,11 +5,11 @@
   "derived_from_sha256": {
     "patterns/p35-tagged-union/verus.rs": "4fa51f4cb6873fbdb8295a2d0fd391821d4016fe36b18c5b715af9723808e8ae",
     "patterns/p35-tagged-union/controls/union_oracle.py": "a58522cc5e4d5db28d22a7ffd8fad154e324db4093a409e9773ee5f954530564",
-    "harness/check.py": "703f0aa2104e5f8473456157eca3f55e2343d4b0b88f780dbb588ebc0bb2602e",
-    "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
+    "harness/check.py": "60aba3e5a118296c4c8eea74441095beacee54df67ea72344978e91c16ae87c0",
+    "harness/vparse.py": "0922b5ad2a1e7bcd7f8f67aa2d8ff0f66d66584c36deb344507b32a72776725f",
     "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
   },
-  "measured_utc": "2026-08-31T09:31:05Z",
+  "measured_utc": "2026-09-02T02:45:36Z",
   "cells_ok": 9,
   "cells_total": 9,
   "results": {

@@ -901,6 +901,16 @@ def check_selftests(rep):
             rep.fail("assume-selftest",
                      f"_axiom_keyword_scan: {label}: got [fail,shout]={got}, "
                      f"want {want}")
+    # TASK_164's must-fire arm for stage 9b's VERDICT read, here for exactly the
+    # same reason: all 30 shipped `problems` lists are EMPTY and all 5 shipped
+    # `summary` blocks are `as_expected == n`, so a green 33-pattern sweep says
+    # nothing about whether the check can fire. `got[0] == "RAISED"` means
+    # `control_json_verdict` threw -- reported, not crashed.
+    for label, got, want in _CONTROL_VERDICT_CASES:
+        if got != want:
+            rep.fail("control-verdict-selftest",
+                     f"control_json_verdict: {label}: got [verdict,n]={got}, "
+                     f"want {want}")
 
 
 # ==========================================================================
@@ -2848,6 +2858,29 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
     invariant** until TASK_097 refuted it with a one-variable experiment. The
     honest form is the census, and re-taking it costs ~90 minutes:
 
+    ⚠⚠⚠ **THE CENSUS BELOW IS DATED `2026-08-22` AND ITS DENOMINATOR IS 24
+    PATTERNS. THE TREE HAS 33.** It has NOT been re-taken, and the ~90 minutes
+    it costs bought nothing TASK_164 needed. **Read every figure in it as a
+    statement about 24 of 33 rows, made on 2026-08-22.**
+
+    ⚠ **The nine it does not cover are DERIVED, not remembered** -- the census
+    artefact is still on this box and names its own subjects
+    (`.temp/r98/treescan_large.json`, 24 keys of the form `pNN/large.bin`).
+    TASK_164 read it rather than reconstructing the list from landing dates,
+    **because the first attempt at this sentence guessed and got two of the
+    nine wrong** (it named `p27` and `p47`, which ARE in the census, and missed
+    `p23` and `p42`):
+
+        in the census (24)  p01 p02 p03 p04 p05 p06 p07 p08 p09 p10 p11 p12
+                            p13 p14 p16 p17 p18 p19 p22 p27 p36 p38 p46 p47
+        NOT in it     (9)   p23 p25 p28 p29 p32 p34 p35 p42 p49
+
+    **It is not evidence about those nine in either direction.** ⚠ And the gap
+    is not a random nine: **seven of them are the temporal, type and aliasing
+    rows** (`harness/tools/composition.py --check`: temporal p25 p28 p29 p32
+    p34, type p35, aliasing p49), which is the half of the tree the SECOND
+    mechanism below has its largest nulls on. p23 and p42 are the other two.
+
         2026-08-22, `.temp/r98/treescan.py` (TASK_098, reviewed), 24 patterns
         x 6 cells x 2 blobs at `-O3 isolated`, pad 0 against pad 16:
 
@@ -2911,6 +2944,86 @@ def check_marginal_ir(pdir, built, rep, modmod, contract, indir, enabled):
         TASK_098 attributed **100% of the swing** to that one libc symbol by
         per-symbol differencing. p08's work is a heap `memmove`, which is why
         p08 moves in hundredths.
+
+    ⚠⚠⚠ **EVERYTHING ABOVE IS ONE MECHANISM AND THERE ARE TWO. THE SECOND IS
+    LARGER, IT IS NOT DRIFT, AND UNTIL TASK_164 THIS DOCSTRING DID NOT NAME
+    IT.** The two are routinely conflated -- *"leads with ±0.20 and warns of ±7
+    against a measured 269.52"* is a sentence somebody wrote about this
+    docstring, and it puts three numbers from two different quantities in one
+    interval. They are not comparable:
+
+        | | mechanism | magnitude | what varies |
+        |---|---|---|---|
+        | above | the environment block shifts the stack pointer -> a per-call
+          stack array's alignment -> a different tail in
+          `__memset_avx2_unaligned_erms` | ±0.20 (p08); ±7 per stack array
+          (p03/p04/p38/p46) | **two runs of the SAME build** |
+        | below | `marginal_ir_per_call` is a **WHOLE-PROGRAM SLOPE**, so it
+          charges everything the kernel calls -- glibc malloc internals above
+          all | up to **269.52** at `-O3 isolated` | **R4 against R5 INSIDE ONE
+          RUN**, on a pair `identity` pins to `exact` |
+
+    **So the R4/R5 pair has a NON-ZERO NULL CONTROL.** `identity` forces R4's
+    and R5's kernels to agree byte for byte, so their marginal difference is a
+    measured null -- and it is not zero, because the slope is deliberately
+    symbol-independent and therefore includes the callees.
+    `.memory/03-measurement.md` entry 23 is the authority; the table below is
+    **re-derived from `results/gate/p*.json` at TASK_164**
+    (`.temp/t164/r45_null.py`), not copied from it.
+
+    ⚠⚠⚠ **A NULL IS A PROPERTY OF A CELL. DO NOT MAX IT OVER MODE, OVER LEVEL,
+    OR OVER INPUT.** Entry 23 records that this table was published wrong TWICE,
+    both times by maxing across a dimension that mattered -- `p28 1732.73` and
+    `p29 425.80` are **`-O0`** cells and were printed under an `-O3` heading.
+    ⚠ **And they are `large.bin` cells: on `small.bin` p25's and p42's nulls are
+    `0.00` in every mode and level.** So the axis is `(level, mode, INPUT)`:
+
+        verus - unsafe, `marginal_ir_per_call`, per (level, mode, input) cell
+                    O0/iso            O3/iso           O0/whole          O3/whole
+                 small    large    small    large    small    large    small    large
+        p25       0.00  +269.52    0.00  +269.52    0.00  +269.52    0.00  +269.52
+        p28    +281.28 +1732.73    0.00    +1.01 +281.28 +1732.73  +46.02  +211.87
+        p29    +113.76  +425.80    0.00    -0.02 +113.76  +425.80 +101.77  +465.55
+        p42       0.00   -31.00    0.00   -31.00    0.00   -31.00   -2.00   -33.00
+        p11       0.00     0.00   -1.00    -1.00    0.00     0.00 -494.00  -166.00
+
+        at -O3 ISOLATED -- the column corrections are published in -- the
+        WHOLE tree, 66 (pattern, input) cells over 33 patterns:
+            |null| >= 2.00 in  8: p25 large +269.52 . p42 large -31.00 .
+                                  p03 +6.00 (both) . p04 +6.00 (both) .
+                                  p02 -2.00 (both)
+            1.00 <= |null| < 2  35   (34 of them exactly -1.00; p28 large 1.01)
+            |null| < 1.00       23
+        at -O0 ISOLATED, |null| >= 2.00 in 10 of 66:
+            p28 large +1732.73 . p29 large +425.80 . p28 small +281.28 .
+            p25 large +269.52  . p29 small +113.76 . p42 large  -31.00 .
+            p19 -6.00 (both)   . p46 -3.00 (both)
+
+    ⚠⚠ **AND `whole` IS NOT A NULL AT ALL.** `check_identity` compares
+    **`isolated`** digests only (the `digests.get((a, o, "isolated"))` line in
+    `check_identity`), so at a `whole` cell there is no `kernel` symbol pinned
+    and the difference is `unsafe::main` against `verus::main` -- genuinely
+    different programs. p11's `-494.00` is that: `O3/whole/small.bin`, where the
+    static traces are 751 against 747 non-pad instructions. **A null control is
+    only a null in the MODE ITS IDENTITY PIN COVERS.** For the record, 37 of 66
+    `-O3 whole` cells clear 2.00 and 15 clear 20.00 (p11 -494.00/-166.00,
+    p29 +465.55/+101.77, p25 +269.52, p28 +211.87/+46.02, p49 +55.57,
+    p35 +36.47, p14 +34.00, p42 -33.00, p17 +30.00 both, p18 -25.00,
+    p13 +22.00) -- and none of that is a defect, because nothing pins them
+    equal.
+
+    ✅ **THE OPERATIVE RULE, AND IT IS WIDER THAN THE ONE THIS DOCSTRING USED TO
+    GIVE:** *for a cross-RUNG comparison use `kernel_exclusive_ir`; use
+    `marginal_ir_per_call` for anti-collapse, which is what it was built for.*
+    The narrow version named only p03 and p04, on the strength of the ±7
+    mechanism. The rule binds every pattern whose kernel calls out of itself,
+    and on any such pattern a published correction must be compared against
+    **that pattern's OWN R5 - R4 null** before it is quoted in a band -- entry
+    23 records three published numbers sitting below their own pattern's null,
+    `p25 large gcc-clang +19.42` against `+269.52` being the worst at 13.9x.
+    `kernel_exclusive_ir` is structurally immune to BOTH mechanisms: 0 of 288
+    moved in the pad census above, and it is symbol-scoped so it never charges a
+    callee.
 
     Three consequences. Quote marginals **to the instruction, never to the
     hundredth**, across sessions. **`-O3 isolated` is the least bad column and
@@ -4436,8 +4549,51 @@ def _check_axiom_decls(rep, src, txt, vcfg):
     repo-relative key has exactly one spelling -- `os.path.relpath(p, REPO)`,
     which is what `_scan_unsafe_sites` already prints -- and it cannot collide
     with a `verus.obligations` key, since those are bare file names with no
-    `/`. The gate prints the exact key in its failure message either way."""
-    axioms = vparse.axiom_decls(txt)
+    `/`. The gate prints the exact key in its failure message either way.
+
+    ---- TASK_164 item B: `global` is SEEN here and DECLARED nowhere ---------
+
+    ⚠⚠ **`vparse.axiom_decls` reports `global layout` / `global size_of` since
+    TASK_164 (10 of 33 patterns), and they are DELIBERATELY PARTITIONED OUT of
+    the `verus.axioms` comparison, the `tcb-axiom` shout and `_axiom_items`.**
+    Two reasons, and the first is the one that decides it:
+
+      * **A `global` is NOT an unchecked axiom.** The other five forms are
+        trusted because *nothing* checks them. A `global` is const-evaluated by
+        rustc: measured at TASK_164 on four probes
+        (`.temp/t164/globalprobe/`), a FALSE `global layout S is size == 24` on
+        a 6-byte struct and a FALSE `global size_of usize == 4` each give
+        `2 verified, 0 errors` **and then** `error[E0080]: evaluation panicked:
+        does not have the expected size`, exit 1 -- in a plain verify-only
+        `verus_run.py` run, on a never-constructed type, and with
+        `--crate-type=lib`. `_verus` already turns `errors == 0 && rc != 0`
+        into a stage `5e` FAILURE, so the gate catches a lie here today; and
+        `build.py::build_verus` compiles the R5 rung, which is a second net.
+        Putting them in the axiom count would say Verus trusts them, and it
+        does not have to.
+      * **The cost, stated rather than hidden.** `verus.axioms` lives inside
+        the `slb-contract` fence, so counting `global` there would demand a
+        declaration on 10 patterns -- 10 `contract_sha256` moves, 10 stale
+        published tables, a `report.py` per pattern and a SECOND full sweep.
+        That is a real repair somebody may still want; it is not this one, and
+        the visibility it would add over what lands here is a DECLARED integer
+        rather than a RECORDED one.
+
+    ✅ What lands instead: the directives are **printed** on their own line and
+    **returned**, so `check_verus_contract` writes them to the gate record's
+    `global_decls`, and `vparse.GLOBAL_KINDS` names the partition in one
+    place."""
+    all_decls = vparse.axiom_decls(txt)
+    axioms = [d for d in all_decls if d["kind"] not in vparse.GLOBAL_KINDS]
+    globals_ = [d for d in all_decls if d["kind"] in vparse.GLOBAL_KINDS]
+    if globals_:
+        print(f"    {src}: `global` layout/size_of directives (body-less, "
+              f"hand-written, and CONST-EVALUATED BY RUSTC -- a false one gives "
+              f"`N verified, 0 errors` and then `error[E0080]`, which stage 5e "
+              f"fails on): {len(globals_)}")
+        for d in globals_:
+            print(f"       {d['kind']:22s} {d['name']:36s} (line {d['line']}, "
+                  f"in_verus={d['in_verus']})")
     want = (vcfg.get("axioms") or {}).get(src, 0)
     want_n = len(want) if isinstance(want, (list, tuple)) else int(want)
     print(f"    {src}: body-less trusted declarations "
@@ -4478,7 +4634,7 @@ def _check_axiom_decls(rep, src, txt, vcfg):
                   f"Verus, not the obligation count, and no gate stage. They "
                   f"are part of this pattern's trusted base and must be in its "
                   f"TCB tally.")
-    return axioms
+    return axioms, globals_
 
 
 #: The three keywords the axiom scan below looks for, and the regexes are
@@ -4945,7 +5101,7 @@ def check_verus_contract(pdir, rep, contract):
         # is not a failure, and `assume(false)` verifies at the shipped file's
         # own obligation count (p32 15/0, p28 23/0).
         _axiom_keyword_scan(rep, src, txt, vcfg)
-        axioms = _check_axiom_decls(rep, src, txt, vcfg)
+        axioms, gdecls = _check_axiom_decls(rep, src, txt, vcfg)
 
         # --- obligation count --------------------------------------------
         #
@@ -4974,7 +5130,16 @@ def check_verus_contract(pdir, rep, contract):
                     "tcb_items": [dict(name=i.name, attr=i.external,
                                        body_lines=i.body_lines, line=i.line)
                                   for i in tcb],
-                    "axiom_decls": axioms}
+                    "axiom_decls": axioms,
+                    # TASK_164 item B. A SEPARATE key, not folded into
+                    # `axiom_decls`: `results/synthesis.md`'s section-3 "axioms"
+                    # column is `len(axiom_decls)` and its prose says a `0`
+                    # means "this pattern's author wrote no axiom of their
+                    # own". A `global` is rustc-checked, so putting it there
+                    # would move a published column and make it say something
+                    # else. Count either without re-deriving the census:
+                    # `vparse.GLOBAL_KINDS` carries the `kind` spellings.
+                    "global_decls": gdecls}
         if n_err:
             rep.fail("proof-verify", f"{src}: {n_ver} verified, {n_err} errors")
         elif n_ver != want_n:
@@ -5031,12 +5196,12 @@ def check_verus_contract(pdir, rep, contract):
               f"bodied trusted items and assume/admit: {[k for k, _ in included]}")
     for rel, p in included:
         txt = open(p).read()
-        ax = _check_axiom_decls(rep, rel, txt, vcfg)
+        ax, gd = _check_axiom_decls(rep, rel, txt, vcfg)
         itcb = _check_included_tcb(rep, rel, txt, vcfg)
         _axiom_keyword_scan(rep, rel, txt, vcfg)
-        if ax or itcb:
+        if ax or itcb or gd:
             out[rel] = {"path_included": True, "axiom_decls": ax,
-                        "tcb_items": itcb}
+                        "global_decls": gd, "tcb_items": itcb}
     return out
 
 
@@ -6184,9 +6349,58 @@ def check_trusted_twins(pdir, rep, contract, enabled=True):
     `verus.rs` carries `slb_twin_<name>` -- the *same signature and the same
     contract, character for character*, implemented in checked code instead of
     `unsafe`. `get_unchecked`'s twin is `{ v[i] }`; `copy_bytes`'s is an indexed
-    copy loop (there is no vstd spec for `copy_from_slice`, so a bulk-copy twin
-    is not available -- `.memory/04-verus.md`). The gate asserts the twin
-    verifies against that contract.
+    copy loop. The gate asserts the twin verifies against that contract.
+
+    ⚠⚠⚠ **THE PARENTHESIS THAT USED TO SIT ON THAT SENTENCE WAS FALSE, AND THIS
+    WAS THE THIRD AND WORST SITE OF IT.** It read *"there is no vstd spec for
+    `copy_from_slice`, so a bulk-copy twin is not available --
+    `.memory/04-verus.md`"*. The pinned vstd ships
+
+        ~/tools/verus/vstd/std_specs/slice.rs:205
+        pub assume_specification<T: Copy>[ <[T]>::copy_from_slice ]
+            (dst: &mut [T], src: &[T])
+            requires old(dst)@.len() == src@.len(),
+            ensures  final(dst)@ == src@;
+
+    and has since before p02 was built. `CLAUDE.md` records this exact claim as
+    having stood from TASK_004 to TASK_048; `patterns/p02-buffer-copy/NOTES.md`
+    5b, `patterns/p06-rotate/NOTES.md` 6a and three p06 rung sources all carry
+    the correction, and **the gate's own explanation of its rule did not** --
+    which made this the site an engineer reads *while being told to write a
+    twin*. ⚠ The `.memory/04-verus.md` citation was dangling as well: that file
+    now carries only the CORRECTION (`:691`, `:1149`), so the parenthesis cited,
+    as its authority, a file that says the opposite.
+
+    ✅ **A BULK-COPY TWIN IS AVAILABLE, AND TASK_164 BUILT ONE RATHER THAN
+    ARGUING ABOUT IT** (`.temp/t164/twinprobe/`, generators kept). Replacing
+    only `slb_twin_copy_bytes`'s BODY with
+    `let (a, _b) = dst.split_at_mut(n); a.copy_from_slice(&src[from..from + n]);`
+    -- keeping the shipped twin's own `assert(src@.len() ==
+    vstd::slice::spec_slice_len(src));`, which fires `axiom_spec_len` so
+    `from + n` cannot overflow:
+
+        shipped indexed loop, `--cfg slb_twin`          12 verified, 0 errors
+        bulk-copy twin,       `--cfg slb_twin`          11 verified, 0 errors
+        bulk-copy twin + the documented weakening       10 verified, 1 errors
+          (`from + n <= src@.len()` -> `... + 1`, in BOTH the trusted item and
+           the twin) -> `precondition not satisfied` at `&src[from..from + n]`
+
+    **So the bulk twin is a working strength oracle, not merely compilable.**
+    It is one obligation cheaper because the `while` loop is gone.
+
+    ⚠ **p02 is NOT changed here, and the reason is a cost rather than an
+    impossibility.** `verus.twin_obligations` is `{"verus.rs": 12}` INSIDE the
+    `slb-contract` fence, so swapping the twin moves `contract_sha256`, stales
+    the published table and costs a `report.py` plus a second gate. The indexed
+    loop also remains the more independent check -- it re-derives the copy
+    element by element from `v[i]`-style indexing rather than leaning on one
+    more vstd `assume_specification`. **Reported at TASK_164, not built.**
+    ⚠⚠ **What does NOT apply here is the `identity` argument**: p02 keeps its
+    `external_body` wrapper on the SHIPPED `copy_bytes` because the verified
+    spelling is 81/79 instructions against R4's 72/70, `+5.00 Ir`/call, and
+    breaks `identity: exact` (p02 `NOTES.md` 5b). A twin is `#[cfg(slb_twin)]`
+    and no build compiles it, so it costs zero instructions either way. The two
+    questions are different and the old parenthesis blurred them.
 
     Why this is an oracle for strength: a precondition too weak to license the
     unchecked operation is too weak to license the checked one, and the checked
@@ -7886,7 +8100,16 @@ def _axiom_items(pdir, contract):
         if not os.path.exists(path):
             continue
         txt = open(path).read()
-        got = [d["name"] for d in vparse.axiom_decls(txt)]
+        # TASK_164: `global layout` / `global size_of` are excluded. This set
+        # MANDATES MIRI, on the argument that "the axiom is ghost but the call
+        # it licenses is executed" -- and Miri is not the backstop for a
+        # `global`. rustc is: a false one const-evaluates to `error[E0080]`,
+        # which `_verus` + stage 5e already fail on (measured, TASK_164;
+        # `vparse.axiom_decls`' docstring has the four probes). Including them
+        # would put a rustc-checked fact in a list captioned "axioms that
+        # NOTHING checks".
+        got = [d["name"] for d in vparse.axiom_decls(txt)
+               if d["kind"] not in vparse.GLOBAL_KINDS]
         try:
             got += [i.name for i in vparse.parse(txt)
                     if (i.external or "").startswith(
@@ -8347,9 +8570,171 @@ def _check_render_inputs_final(doc, gate_now, rep):
              f"`gate_now` snapshot in `main`, the way stage 9b was moved.")
 
 
+#: TASK_164 item A. The verdict conventions the 46 tracked sidecars ACTUALLY
+#: use, censused before anything was written (`.temp/t164/keys_sidecars.py`):
+#:
+#:     `problems`: [...]                 30 of 46, ALL EMPTY today
+#:     `summary`: {n, as_expected}        5 of 46, all `proof_mutants.json`
+#:     neither                           11 of 46
+#:
+#: ⚠ **`problems` is a VERDICT and not a note field, and that is measured, not
+#: judged: 30 of 30 generators that write the key EXIT 1 when it is non-empty.**
+#: So `rep.fail` is what the tree already means by it.
+#: ⚠ **No third convention is invented here** -- but four of the 11 do carry a
+#: verdict in a bespoke shape (`p35/proof_mutants.json`'s
+#: `arms_as_designed`/`arms_total`, `p35/union_oracle.json`'s
+#: `cells_ok`/`cells_total`, `p32/forgeable.json`'s `hardened_kernel_broke`,
+#: and `unstable_cells` on `p28`/`p32`'s `repro.json`), and this stage still
+#: cannot read any of them. That is reported in `TASK_164_REPORT.md`, not fixed.
+def control_json_verdict(doc):
+    """`(verdict, [detail, ...])` -- what did this control sidecar CONCLUDE?
+
+    `verdict` is one of:
+
+      * **`"FAILED"`** -- a verdict field is present and says something is
+        wrong. `details` quotes it.
+      * **`"CLEAN"`** -- a verdict field is present and says nothing is wrong.
+      * **`"NO-VERDICT"`** -- the document carries neither convention.
+
+    ⚠ **A PURE FUNCTION OF THE DOCUMENT**, with no filesystem and no `rep`, which
+    is what lets `check_selftests` drive it directly on synthetic documents
+    (`_CONTROL_VERDICT_CASES`) on **every** invocation. That is not decoration:
+    the repair is **PROSPECTIVE** -- all 30 shipped `problems` lists are EMPTY
+    and all 5 shipped `summary` blocks are `as_expected == n` -- so a green
+    33-pattern sweep says **nothing** about whether this can fire. An arm nobody
+    has seen fail is not an arm (`TASK_151`; `.memory/03-measurement.md`
+    entry 19).
+
+    ⚠⚠ **AND THE HOLE THIS CLOSES IS INVISIBLE TO THE PIN ABOVE IT.** 0 of 46
+    sidecars pin THEMSELVES in `derived_from_sha256`, so editing `problems`
+    from `[]` to `["the control failed"]` moves nothing stage 9b hashes: the
+    stage printed `FRESH` and the gate stayed green. The `summary` half is the
+    *"regenerated at 7 of 9"* case -- a proof-mutant battery that regressed
+    reads `FRESH` today.
+
+    **`problems` MUST BE A LIST, and a non-list is a FAILURE rather than a
+    silent pass.** `[]` is the one spelling of *"no problems"* the tree uses (30
+    of 30). A string, a number, `null` or a dict is a generator typo or a hand
+    edit, and the failure mode it creates is the bad one: a reader sees a
+    `problems` key and reads "reported and clean", while `if doc["problems"]:`
+    in the generator would have read a non-empty string as a FAILURE. Pinning
+    the shape costs nothing (it fires on zero sidecars) and removes the
+    ambiguity.
+
+    **A `summary` with `as_expected != n` fails in BOTH directions.**
+    `as_expected < n` is the battery that regressed; `as_expected > n` is
+    incoherent and can only be a generator bug, and calling it clean would be
+    the same silence in the other direction."""
+    if not isinstance(doc, dict):
+        return "FAILED", [f"the sidecar is a {type(doc).__name__}, not a JSON "
+                          f"object, so no verdict field can be read from it"]
+    bad, seen = [], False
+    if "problems" in doc:
+        p = doc["problems"]
+        if isinstance(p, list):
+            seen = True
+            if p:
+                bad.append(f"`problems` is NON-EMPTY -- {len(p)} entry/entries: "
+                           f"{[str(x)[:160] for x in p[:5]]}")
+        else:
+            bad.append(f"`problems` is a {type(p).__name__} ({str(p)[:80]!r}), "
+                       f"not a list. Every one of the 30 sidecars that carries "
+                       f"this key writes a LIST and its generator exits 1 when "
+                       f"the list is non-empty; `[]` is the only spelling of "
+                       f"'no problems'.")
+    if doc.get("summary") is not None:
+        s = doc["summary"]
+        if not isinstance(s, dict):
+            bad.append(f"`summary` is a {type(s).__name__} ({str(s)[:80]!r}), "
+                       f"not an object with `n` and `as_expected`")
+        elif "n" in s or "as_expected" in s:
+            n, ae = s.get("n"), s.get("as_expected")
+            ints = all(isinstance(v, int) and not isinstance(v, bool)
+                       for v in (n, ae))
+            if not ints:
+                bad.append(f"`summary` carries n={n!r} as_expected={ae!r}; both "
+                           f"must be integers for the count to mean anything")
+            else:
+                seen = True
+                if ae != n:
+                    bad.append(f"`summary` says {ae} of {n} arms behaved AS "
+                               f"EXPECTED -- {n - ae} did not"
+                               if ae < n else
+                               f"`summary` says {ae} of {n} arms behaved as "
+                               f"expected, and {ae} > {n} is incoherent")
+    if bad:
+        return "FAILED", bad
+    return ("CLEAN" if seen else "NO-VERDICT"), []
+
+
+def _cv(doc):
+    """One `_CONTROL_VERDICT_CASES` cell: `[verdict, n_details]`.
+
+    ⚠ **An exception becomes `["RAISED", <type>, <msg>]`**, a THREE-element list
+    that can never equal a two-element expectation -- so a malformed document is
+    REPORTED at stage 0 instead of killing the gate's import
+    (`.memory/03-measurement.md` entry 19: three of `p32`'s four planted
+    mutations failed by CRASHING and the diagnostic was lost)."""
+    try:
+        v, d = control_json_verdict(doc)
+    except Exception as e:                                       # noqa: BLE001
+        return ["RAISED", type(e).__name__, str(e)[:120]]
+    return [v, len(d)]
+
+
+#: ⚠⚠ **THE MUST-FIRE ARM FOR THE SIDECAR VERDICT READ (TASK_164 item A).**
+#: Exposure across the shipped tree is ZERO -- 30 empty `problems`, 5 clean
+#: `summary` blocks -- so a green 33-pattern sweep is not evidence that this can
+#: fire at all. Same shape as `_ASSUME_CASES` above and `TASK_147`'s
+#: `detector_selftest()`: synthetic in-memory documents, run by
+#: `check_selftests` on **every** invocation.
+_CONTROL_VERDICT_CASES = [
+    # --- the two firing arms, which is the whole point of the item ----------
+    ("a NON-EMPTY `problems` FAILS",
+     _cv({"problems": ["the hardened arm segfaulted on small.bin"]}),
+     ["FAILED", 1]),
+    ("`summary` {n: 9, as_expected: 7} FAILS (the regressed battery)",
+     _cv({"summary": {"n": 9, "as_expected": 7}}), ["FAILED", 1]),
+    # --- and the silent ones, or the arm would fire on the whole tree -------
+    ("`summary` {n: 9, as_expected: 9} is silent",
+     _cv({"summary": {"n": 9, "as_expected": 9}}), ["CLEAN", 0]),
+    ("`problems: []` is silent -- and it is 30 of 46 sidecars today",
+     _cv({"problems": []}), ["CLEAN", 0]),
+    # --- the SHAPE pin: a generator typo must not read as "no problems" -----
+    ("`problems` as a STRING FAILS rather than passing",
+     _cv({"problems": "none"}), ["FAILED", 1]),
+    ("...an EMPTY string too -- falsy is not the same as `[]`",
+     _cv({"problems": ""}), ["FAILED", 1]),
+    ("`problems` as a NUMBER FAILS", _cv({"problems": 0}), ["FAILED", 1]),
+    ("`problems: null` FAILS -- 'not computed' is not 'none found'",
+     _cv({"problems": None}), ["FAILED", 1]),
+    ("`summary` with non-integer counts FAILS",
+     _cv({"summary": {"n": "9", "as_expected": "9"}}), ["FAILED", 1]),
+    ("`summary` with as_expected > n FAILS (incoherent, not clean)",
+     _cv({"summary": {"n": 7, "as_expected": 9}}), ["FAILED", 1]),
+    ("half a `summary` FAILS", _cv({"summary": {"n": 9}}), ["FAILED", 1]),
+    # --- both channels at once, and both must be reported -------------------
+    ("a doc that fails BOTH ways reports BOTH",
+     _cv({"problems": ["x"], "summary": {"n": 9, "as_expected": 7}}),
+     ["FAILED", 2]),
+    # --- the no-verdict disposition, PINNED so it cannot drift silently -----
+    ("a sidecar with NEITHER field is NO-VERDICT, not FAILED "
+     "(11 of 46 today -- see the stage's docstring for why it is not a shout)",
+     _cv({"derived_from_sha256": {}, "rows": []}), ["NO-VERDICT", 0]),
+    ("`summary: null` alone is NO-VERDICT, not a malformed summary",
+     _cv({"summary": None}), ["NO-VERDICT", 0]),
+    ("a `summary` of some OTHER shape does not silently pass as a verdict",
+     _cv({"summary": {"windows": 20000}}), ["NO-VERDICT", 0]),
+    # --- and the malformed-input arms: REPORTED, never a crash --------------
+    ("a sidecar that is a LIST, not an object, FAILS rather than raising",
+     _cv([1, 2, 3]), ["FAILED", 1]),
+    ("...and a `None` document too", _cv(None), ["FAILED", 1]),
+]
+
+
 def check_control_json_pins(pdir, rep, source_sha):
     """`patterns/*/controls/*.json` -- does a published sidecar say what it was
-    taken against?
+    taken against, **and what did it conclude?**
 
     `harness/measure.py --check-stale` globs `results/*.json` and
     `results/gate/p*.json` **and nothing else**, so a tracked cache of measured
@@ -8396,8 +8781,53 @@ def check_control_json_pins(pdir, rep, source_sha):
     ⚠⚠ The two excluded extensions are excluded so that the files THIS STAGE
     evaluates stay out of the digest that certifies the run evaluating them --
     see `main`'s `srcs` comment for the `gate_source_sha256` fixpoint that
-    would otherwise be one sidecar away."""
-    head("9b. controls/*.json staleness pins")
+    would otherwise be one sidecar away.
+
+    ---- TASK_164 item A: the stage now reads the VERDICT, not only the PIN ---
+
+    ⚠⚠⚠ **UNTIL TASK_164 THIS STAGE READ `derived_from_sha256` AND
+    `gate_source_sha256` AND NOTHING ELSE.** It answered *"were these numbers
+    taken against this tree?"* and never *"what did the control conclude?"*, and
+    `grep -rn 'problems\\|invariant\\|measured_utc' harness/ synthesis/` found
+    **zero** reads of any verdict field anywhere. **Run a control, let it record
+    real problems, and the sidecar was still `FRESH` and the gate still green.**
+    ⚠ It cannot happen through STALENESS -- the pin catches that -- it happens
+    when a control is re-run and its own findings are ignored, and **0 of 46
+    sidecars pin THEMSELVES**, so editing `problems` from `[]` to
+    `["it failed"]` moves nothing this stage hashes.
+
+    `control_json_verdict` above is the read; its docstring carries the census
+    and the shape rules. Two things this stage decides, and both are decisions
+    rather than oversights:
+
+      * ⚠⚠ **A sidecar with NO verdict field is SILENT (printed, not shouted,
+        not failed), and the reason is measured rather than aesthetic.**
+        `controls_json` -- this function's return value -- and `loud` are two of
+        the FOUR keys `report.py` renders into `results/tables/*.md`
+        (`RENDER_INPUT_KEYS`), and `report.py::shout_section` prints a line for
+        **every `controls_json` entry whose value is not `"FRESH"`**. So a
+        `rep.shout` here, or a new verdict string for the 11 no-verdict
+        sidecars, makes the published table of **p23, p28, p29, p32 and p35**
+        STALE -- stage 9c then FAILS, which costs a `report.py` per pattern and
+        a SECOND full sweep for a stage that has found nothing. The substance
+        agrees with the price: a pin-only document (`p23/controls_pin.json`) or
+        a table of rows (`p29/miri_arms.json`) has no verdict to give, and a red
+        gate nobody can clear is how gates get switched off -- the same
+        argument this docstring already makes for an unpinned sidecar.
+        ⚠ **Promoting it to a SHOUT is a one-line change and it is the
+        manager's call, not a defect here.**
+      * **A FAILED verdict APPENDS to the pin verdict rather than replacing
+        it** (`FRESH+VERDICT-FAILED`). Losing "the numbers are current" in order
+        to say "the numbers are bad" would trade one fact for another; a reader
+        of `controls_json` needs both. It fires on **zero** sidecars today,
+        which is exactly why the must-fire arm is in `check_selftests` and not
+        in this sweep.
+
+    ⚠ **`measured_utc` (41 of 46) and `invariant` (41 of 46) are deliberately
+    NOT wired in.** Nothing reads either; an unread timestamp is untidy, not
+    unsound, and `derived_from_sha256` already answers the stronger question the
+    timestamp does not (*against WHAT?*)."""
+    head("9b. controls/*.json staleness pins AND verdicts")
     cdir = os.path.join(pdir, "controls")
     out = {}
     if not os.path.isdir(cdir):
@@ -8407,6 +8837,7 @@ def check_control_json_pins(pdir, rep, source_sha):
     if not blobs:
         print("    controls/ ships no .json sidecar")
         return out
+    noverdict = []
     for f in blobs:
         rel = os.path.relpath(os.path.join(cdir, f), REPO)
         try:
@@ -8415,6 +8846,17 @@ def check_control_json_pins(pdir, rep, source_sha):
             out[f] = "UNREADABLE"
             rep.fail("tables", f"{rel}: not readable as JSON ({e})")
             continue
+        # THE VERDICT READ (TASK_164 item A), taken from the RAW document --
+        # before the coercion below turns a non-object into `{}` -- so a sidecar
+        # that is not a JSON object is reported rather than silently emptied.
+        # Wrapped, because a malformed document must be REPORTED, not crash the
+        # gate (`.memory/03-measurement.md` entry 19).
+        try:
+            vverdict, vdetail = control_json_verdict(doc)
+        except Exception as e:                                   # noqa: BLE001
+            vverdict, vdetail = "FAILED", [
+                f"reading this sidecar's verdict raised "
+                f"{type(e).__name__}: {str(e)[:200]}"]
         doc = doc if isinstance(doc, dict) else {}
         meta = doc.get("pin") if isinstance(doc.get("pin"), dict) else {}
         fix = meta.get("regenerate") or "re-run its generator in `controls/`"
@@ -8469,6 +8911,32 @@ def check_control_json_pins(pdir, rep, source_sha):
                       f"`patterns/p23-partition/controls/sweep_fit.py::"
                       f"derived_from` is the shape to copy. Until then treat "
                       f"every figure quoted from it as UNDATED.")
+        # --- and what the sidecar CONCLUDED (TASK_164 item A) --------------
+        if vverdict == "FAILED":
+            out[f] = f"{out[f]}+VERDICT-FAILED"
+            rep.fail("tables",
+                     f"{rel} REPORTS A FAILURE OF ITS OWN and nothing read it "
+                     f"until TASK_164: "
+                     + " | ".join(vdetail)
+                     + f". The staleness pin above says only that these numbers "
+                       f"were taken against THIS tree -- it says nothing about "
+                       f"what they SAY, and 0 of 46 sidecars pin themselves, so "
+                       f"a control that starts reporting problems moves nothing "
+                       f"this stage hashes and prints FRESH. `problems` is a "
+                       f"verdict and not a note field: 30 of 30 generators that "
+                       f"write it exit 1 when it is non-empty. Fix the thing the "
+                       f"control found, or -- if the entry is stale -- re-run its "
+                       f"generator: {fix}")
+        elif vverdict == "NO-VERDICT":
+            noverdict.append(f)
+    if noverdict:
+        # PRINTED, not shouted: `controls_json` and `loud` are both rendered
+        # into `results/tables/*.md`, so a shout here would make five patterns'
+        # published tables stale and cost a second full sweep. See the docstring.
+        print(f"    no verdict field (neither `problems` nor a "
+              f"`summary` with `n`/`as_expected`) in {len(noverdict)} of "
+              f"{len(blobs)} sidecar(s): {noverdict} -- their pins are checked "
+              f"above, but nothing here reads a conclusion from them")
     return out
 
 

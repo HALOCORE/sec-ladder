@@ -667,6 +667,19 @@ _EXT_TYPE_ATTR_RE = re.compile(r"\bexternal_type_specification\b")
 _TYPE_ITEM_RE = re.compile(r"\b(?:struct|enum|union)\s+(" + _IDENT + r")")
 _FN_NAME_RE = re.compile(r"\bfn\s+(" + _IDENT + r")")
 
+#: TASK_164 item B. The `global` DIRECTIVE is a SIXTH body-less trusted form and
+#: nothing in `harness/` mentioned it. `GLOBAL_KINDS` is exported because
+#: `check.py` partitions on it: a `global` is trusted and body-less like the five
+#: above, but it is NOT an unchecked axiom -- rustc const-evaluates it (measured;
+#: see the docstring) -- so it does not belong in the `verus.axioms` declared
+#: count or in the Miri-mandating set. Anything that wants "all trusted body-less
+#: declarations" takes the whole list; anything that wants "axioms nothing
+#: checks" subtracts these.
+GLOBAL_KINDS = ("global layout", "global size_of", "global")
+_GLOBAL_RE = re.compile(r"\bglobal\b")
+_GLOBAL_LAYOUT_RE = re.compile(r"\Alayout\b\s*(" + _IDENT + r")?")
+_GLOBAL_SIZEOF_RE = re.compile(r"\Asize_of\b([^=;{}]*)")
+
 
 def axiom_decls(text, code=None):
     """[{kind, name, line, in_verus}] for every body-less TRUSTED declaration.
@@ -743,7 +756,65 @@ def axiom_decls(text, code=None):
 
     An attribute this cannot attach to a readable item is still counted, with
     `name='?'`, so an unparseable trait cannot make a trusted declaration
-    invisible."""
+    invisible.
+
+    ---- TASK_164, item B: the `global` DIRECTIVE is a SIXTH form -------------
+
+    **`global layout T is size == n, align == m;` and `global size_of T == n;`
+    are body-less, hand-written and trusted, and nothing in `harness/`
+    mentioned either.** They are matched here, keyword-keyed, for the same
+    reason the other five are and NOT by widening `parse()` -- see the warning
+    above, which is still the measurement that governs.
+
+    **The census, re-derived at TASK_164 with comments BLANKED**
+    (`.temp/t164/census_global.py`), because the published *"live on four
+    patterns (p28 p29 p32 p34)"* was a `grep -l` and was wrong in BOTH
+    directions:
+
+        global layout   p28 p29 p34                          3 patterns
+        global size_of  p10 p19 p22 p36 p38 p46 p47          7 patterns
+        union                                               10 of 33
+        axiom_decls saw, before this:                         0 of 10
+
+    ⚠ **`p32` HAS NONE.** `patterns/p32-free-list-pool/verus.rs:17` and
+    `patterns/p49-interned-pool/verus.rs:29` are COMMENTS SAYING THE PATTERN HAS
+    NO `global layout`, and a raw `grep -l` counted the negation as an instance.
+    Those two files are the live negative controls for the comment-blanking arm
+    in `_selftest`.
+
+    **The `kind` distinguishes `layout` from `size_of` on purpose**, so a later
+    reader can count either without re-deriving the census. They are the same
+    CONSTRUCT and -- measured, not argued -- the same EXPOSURE:
+
+        .temp/t164/globalprobe/, verus 0.2026.08.09.92f466f, single-file mode
+          a FALSE `global layout S is size == 24` on a 6-byte struct
+            -> `2 verified, 0 errors`  THEN  rustc `error[E0080]: evaluation
+               panicked: does not have the expected size`, exit 1
+          a FALSE `global size_of usize == 4`
+            -> `2 verified, 0 errors`  THEN the SAME `E0080`, exit 1
+          the same lie on a NEVER-CONSTRUCTED type, and with `--crate-type=lib`
+            -> `1 verified, 0 errors` THEN the same `E0080`, exit 1
+          the TRUE controls (`size == 6`, `usize == 8`) -> `2 verified, 0 errors`,
+            exit 0
+
+    So a `global` directive **CAN make Verus prove something false about the
+    program's behaviour** -- the probes' `ensures r == 24usize` is a claim about
+    the value `core::mem::size_of::<S>()` returns at run time, and Verus
+    discharges it -- and the program **cannot be built**. ⚠ The Verus guide says
+    the static check *"only happens when codegen is run"*
+    (`_VERUS_DOC_/guide/src/reference-global.md`); on the pinned Verus that is
+    too weak -- `E0080` is a const-eval error and it fires in a plain
+    verify-only `./verus_run.py <file>` run, with no `--compile`, and in
+    `--crate-type=lib`.
+
+    ⚠⚠ **AND THE GATE ALREADY CATCHES IT, which refutes `TASK_156` minor 2's
+    *"no verify-only stage is protected"*.** `check.py::_verus` treats
+    `summary parsed and errors == 0 and returncode != 0` as an anomaly and
+    stage `5e` (`check_verus_exit_codes`) fails on it. Driven in-process over
+    these probes (`.temp/t164/globalprobe/drive_verus.py`): all three false ones
+    return `(None, None, ...)` with `SUMMARY SUPPRESSED`, both true ones return
+    `(2, 0)`, and stage 5e raises **3** failures. **This is visibility, not a
+    hole being closed** -- which is exactly what `axiom_decls` is for."""
     code = code if code is not None else blank_noncode(text)
     vs = verus_span(text, code)
     out = []
@@ -756,6 +827,37 @@ def axiom_decls(text, code=None):
     for kind, rx in _AXIOM_RE:
         for m in rx.finditer(code):
             add(kind, m.group(1), m.start())
+
+    # --- TASK_164: the `global` directive ---------------------------------
+    # Keyword-keyed like the two above. `code` has comments and string literals
+    # blanked already, which is the whole difference between this and the
+    # `grep -l` that counted p32's and p49's "this pattern has NO global layout"
+    # comments as instances.
+    for m in _GLOBAL_RE.finditer(code):
+        j = m.end()
+        while j < len(code) and code[j] in " \t\r\n":
+            j += 1
+        rest = code[j:]
+        lm = _GLOBAL_LAYOUT_RE.match(rest)
+        if lm:
+            add("global layout", lm.group(1) or "?", m.start())
+            continue
+        sm = _GLOBAL_SIZEOF_RE.match(rest)
+        if sm:
+            # `global size_of usize == 8;` -- the type runs to the `==`. A
+            # truncated line has nothing there and is counted as `?` rather
+            # than dropped, the convention every other form here uses.
+            nm = re.sub(r"\s+", " ", sm.group(1)).strip()
+            add("global size_of", nm or "?", m.start())
+            continue
+        # A `global` this cannot classify. Line-anchored, because `global` is an
+        # ITEM keyword in Verus and an unanchored fallback would count a local
+        # named `global` (measured at TASK_164: ZERO code-level `global` tokens
+        # outside the two forms across all 161 tracked `.rs`, so this fallback
+        # is prospective). Never invisible -- same rule as the `?` above.
+        bol = code.rfind("\n", 0, m.start()) + 1
+        if not code[bol:m.start()].strip():
+            add("global", "?", m.start())
 
     # `assume_specification` names its target in brackets rather than after
     # `fn`: `pub assume_specification<T>[ <[T]>::starts_with ](s: &[T]) -> ...`.
@@ -2058,6 +2160,55 @@ pub fn ex_count_ones(x: u64) -> (r: u32) ensures r == 0, { x.count_ones() }
           ("external_trait_specification", "ExVis2::c")])
     want("...and a pub(crate) ORDINARY trait is still not an axiom",
          [d for d in axiom_decls(vis) if d["name"].startswith("PlainVis")], [])
+
+    # --- TASK_164 item B: the `global` DIRECTIVE, and BOTH DIRECTIONS -------
+    # ⚠⚠ Case 3 is the arm that would have caught the published *"four
+    # patterns (p28 p29 p32 p34)"* error: it was a `grep -l` and `p32`'s and
+    # `p49`'s hits are COMMENTS SAYING THE PATTERN HAS NONE. A negation counted
+    # as an instance. Those two files are the live negative controls; the cell
+    # below is the synthetic one that runs on every invocation.
+    glob = '''use vstd::prelude::*;
+verus! {
+// This pattern has NO `global layout` -- a COMMENT, and the p32/p49 shape.
+global layout Obj is size == 24, align == 8;
+global size_of usize == 8;
+fn hide() { let s = "global layout Fake is size == 1;"; let _ = s; }
+}
+'''
+    want("axiom_decls: a `global` directive is counted, with its own kind",
+         [(d["kind"], d["name"]) for d in axiom_decls(glob)],
+         [("global layout", "Obj"), ("global size_of", "usize")])
+    want("axiom_decls: `global layout` in a COMMENT is NOT counted "
+         "(the p32/p49 error)",
+         [d for d in axiom_decls(glob) if d["name"] in ("Fake", "NO")], [])
+    want("axiom_decls: `global` in a STRING LITERAL is not counted",
+         [d for d in axiom_decls(glob) if d["line"] == 6], [])
+    want("axiom_decls: a `global` directive is inside verus!",
+         sorted({d["in_verus"] for d in axiom_decls(glob)}), [True])
+    want("axiom_decls: `global` is not a `parse()` item either",
+         sorted(set(i.name for i in parse(glob))
+                & {d["name"] for d in axiom_decls(glob)}), [])
+    # A truncated / unreadable directive is COUNTED as `?`, never invisible --
+    # the convention `assume_specification` and `external_trait_specification`
+    # already use above.
+    want("axiom_decls: a truncated `global layout` is counted as `?`",
+         [(d["kind"], d["name"]) for d in axiom_decls("verus!{\nglobal layout\n}")],
+         [("global layout", "?")])
+    want("axiom_decls: a truncated `global size_of` is counted as `?`",
+         [(d["kind"], d["name"]) for d in axiom_decls("verus!{\nglobal size_of\n}")],
+         [("global size_of", "?")])
+    want("axiom_decls: an UNKNOWN `global` form at item position is counted",
+         [(d["kind"], d["name"]) for d in axiom_decls("verus!{\nglobal align_of u8 == 1;\n}")],
+         [("global", "?")])
+    # ...and the false-positive direction: `global` as an ordinary identifier.
+    want("axiom_decls: a LOCAL named `global` is not a directive",
+         axiom_decls("verus!{ fn f() { let global = 1u8; let _ = global; } }"),
+         [])
+    want("GLOBAL_KINDS covers every kind this can emit for a `global`",
+         sorted({d["kind"] for d in
+                 axiom_decls("verus!{\nglobal layout A is size == 1;\n"
+                             "global size_of usize == 8;\nglobal x;\n}")}
+                - set(GLOBAL_KINDS)), [])
 
     print("vparse selftest:", "PASS" if bad == 0 else f"FAIL ({bad})")
     return 0 if bad == 0 else 1

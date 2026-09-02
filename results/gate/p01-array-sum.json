@@ -69,13 +69,13 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "703f0aa2104e5f8473456157eca3f55e2343d4b0b88f780dbb588ebc0bb2602e",
+    "harness/check.py": "60aba3e5a118296c4c8eea74441095beacee54df67ea72344978e91c16ae87c0",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
-    "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
+    "harness/vparse.py": "0922b5ad2a1e7bcd7f8f67aa2d8ff0f66d66584c36deb344507b32a72776725f",
     "patterns/p01-array-sum/NOTES.md": "bd27f74ede3d4b9cf0b6bbb95c3bbf853c10eee4fabeff02f1971975cd67ee8c",
     "patterns/p01-array-sum/README.md": "e450c2e9b261f7576b08ca60d6891924b14578d10249bc1469582da0e3e2d042",
     "patterns/p01-array-sum/c/kernel.c": "1b79c738a5ab4da534d62a931919ec2d16a6add4f3710b29a347e16b88c96fe7",
@@ -215,37 +215,39 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3222,
-    "nvars": 47,
-    "envp_stack_bytes": 3598,
-    "tuning_vars": {},
+    "bytes": 3269,
+    "nvars": 48,
+    "envp_stack_bytes": 3653,
+    "tuning_vars": {
+      "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
+    },
     "repo_path_bytes": 33,
     "domain": "Comparable ONLY against a record with the same `envp_stack_bytes` (= bytes + 8*nvars), the same `tuning_vars` and the same `repo_path_bytes`. That is a NECESSARY condition, not a proved sufficient one: `bytes` alone was believed sufficient and TASK_114 falsified it at +-7 Ir/call. argv beyond the repo prefix, and anything else on the initial stack, are not recorded here. When the three differ, compare `kernel_exclusive_ir` in results/pNN-*.json instead -- structurally immune, 0 of 288 triples moved."
   },
   "marginal_ir_per_call": {
-    "c-clang/O0/isolated/small.bin": 6544.95,
-    "c-clang/O0/isolated/large.bin": 53279.95,
+    "c-clang/O0/isolated/small.bin": 6545.72,
+    "c-clang/O0/isolated/large.bin": 53280.72,
     "c-clang/O0/isolated/d_ir_d_work": 13.0,
-    "c-clang/O0/whole/small.bin": 6544.95,
-    "c-clang/O0/whole/large.bin": 53279.95,
+    "c-clang/O0/whole/small.bin": 6545.72,
+    "c-clang/O0/whole/large.bin": 53280.72,
     "c-clang/O0/whole/d_ir_d_work": 13.0,
-    "c-clang/O3/isolated/small.bin": 912.95,
-    "c-clang/O3/isolated/large.bin": 7199.95,
+    "c-clang/O3/isolated/small.bin": 913.72,
+    "c-clang/O3/isolated/large.bin": 7200.72,
     "c-clang/O3/isolated/d_ir_d_work": 1.748817802503477,
-    "c-clang/O3/whole/small.bin": 906.95,
-    "c-clang/O3/whole/large.bin": 7193.95,
+    "c-clang/O3/whole/small.bin": 907.72,
+    "c-clang/O3/whole/large.bin": 7194.72,
     "c-clang/O3/whole/d_ir_d_work": 1.748817802503477,
-    "c-gcc/O0/isolated/small.bin": 6060.95,
-    "c-gcc/O0/isolated/large.bin": 49200.95,
+    "c-gcc/O0/isolated/small.bin": 6061.72,
+    "c-gcc/O0/isolated/large.bin": 49201.72,
     "c-gcc/O0/isolated/d_ir_d_work": 12.0,
-    "c-gcc/O0/whole/small.bin": 6060.95,
-    "c-gcc/O0/whole/large.bin": 49200.95,
+    "c-gcc/O0/whole/small.bin": 6061.72,
+    "c-gcc/O0/whole/large.bin": 49201.72,
     "c-gcc/O0/whole/d_ir_d_work": 12.0,
-    "c-gcc/O3/isolated/small.bin": 1285.95,
-    "c-gcc/O3/isolated/large.bin": 10272.95,
+    "c-gcc/O3/isolated/small.bin": 1286.72,
+    "c-gcc/O3/isolated/large.bin": 10273.72,
     "c-gcc/O3/isolated/d_ir_d_work": 2.4998609179415854,
-    "c-gcc/O3/whole/small.bin": 1273.95,
-    "c-gcc/O3/whole/large.bin": 10261.95,
+    "c-gcc/O3/whole/small.bin": 1274.72,
+    "c-gcc/O3/whole/large.bin": 10262.72,
     "c-gcc/O3/whole/d_ir_d_work": 2.5001390820584146,
     "safe_naive/O0/isolated/small.bin": 26116.3,
     "safe_naive/O0/isolated/large.bin": 213056.3,
@@ -327,7 +329,8 @@
           "line": 53
         }
       ],
-      "axiom_decls": []
+      "axiom_decls": [],
+      "global_decls": []
     },
     "verus.rs": {
       "verified": 7,
@@ -353,7 +356,8 @@
           "line": 107
         }
       ],
-      "axiom_decls": []
+      "axiom_decls": [],
+      "global_decls": []
     }
   },
   "verified_call_site": {
@@ -1512,7 +1516,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.2,
+        "seconds": 0.1,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""

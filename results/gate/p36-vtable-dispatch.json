@@ -126,13 +126,13 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "703f0aa2104e5f8473456157eca3f55e2343d4b0b88f780dbb588ebc0bb2602e",
+    "harness/check.py": "60aba3e5a118296c4c8eea74441095beacee54df67ea72344978e91c16ae87c0",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
-    "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
+    "harness/vparse.py": "0922b5ad2a1e7bcd7f8f67aa2d8ff0f66d66584c36deb344507b32a72776725f",
     "patterns/p36-vtable-dispatch/NOTES.md": "74bcf8415d45da28e457d85a820d0f94af15341b6b41c18e7f75b7acd7a7ab20",
     "patterns/p36-vtable-dispatch/README.md": "e397f6a8022224b1b5abc2e4269ce8bcb2eeed0e974d27e0f7bfe49a45f0e9d5",
     "patterns/p36-vtable-dispatch/c/kernel.c": "7826367c087a6950c5d57eeb18c751f411ed43b38f6e3bf917a33b6854e827e1",
@@ -226,9 +226,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3280,
+    "bytes": 3269,
     "nvars": 48,
-    "envp_stack_bytes": 3664,
+    "envp_stack_bytes": 3653,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -364,7 +364,15 @@
           "line": 379
         }
       ],
-      "axiom_decls": []
+      "axiom_decls": [],
+      "global_decls": [
+        {
+          "kind": "global size_of",
+          "name": "usize",
+          "line": 90,
+          "in_verus": true
+        }
+      ]
     }
   },
   "verified_call_site": {
@@ -1181,7 +1189,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: index 8 out of bounds for type '<unknown> *[8]' /home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: load of address 0x55c7a9b44a80 with insufficient space for a",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: index 8 out of bounds for type '<unknown> *[8]' /home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: load of address 0x560c22695a80 with insufficient space for a",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1192,7 +1200,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: index 255 out of bounds for type '<unknown> *[8]' /home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: load of address 0x557a482a6238 with insufficient space for",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: index 255 out of bounds for type '<unknown> *[8]' /home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: load of address 0x56474cab7238 with insufficient space for",
       "declared_hang": false,
       "hung": false,
       "stdout": "",

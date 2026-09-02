@@ -5,10 +5,10 @@
   "derived_from_sha256": {
     "patterns/p35-tagged-union/verus.rs": "4fa51f4cb6873fbdb8295a2d0fd391821d4016fe36b18c5b715af9723808e8ae",
     "patterns/p35-tagged-union/controls/proof_mutants.py": "4ed2d85a4a1f99be4433af1e41ab39aee2311b56b8ae0bd88c3b3464cd4c0506",
-    "harness/check.py": "703f0aa2104e5f8473456157eca3f55e2343d4b0b88f780dbb588ebc0bb2602e",
+    "harness/check.py": "60aba3e5a118296c4c8eea74441095beacee54df67ea72344978e91c16ae87c0",
     "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
   },
-  "measured_utc": "2026-08-31T09:30:56Z",
+  "measured_utc": "2026-09-02T02:45:58Z",
   "shipped_obligations": 16,
   "arms": {
     "M0-unmutated": {

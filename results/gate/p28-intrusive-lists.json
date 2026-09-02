@@ -190,13 +190,13 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "703f0aa2104e5f8473456157eca3f55e2343d4b0b88f780dbb588ebc0bb2602e",
+    "harness/check.py": "60aba3e5a118296c4c8eea74441095beacee54df67ea72344978e91c16ae87c0",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
-    "harness/vparse.py": "de1f4db8f885f8cba9412f163ccb9cdaf1271c013ecfd0b72912d57fdfdb2dc1",
+    "harness/vparse.py": "0922b5ad2a1e7bcd7f8f67aa2d8ff0f66d66584c36deb344507b32a72776725f",
     "patterns/p28-intrusive-lists/NOTES.md": "a2267b364995edc60b9437295b5dbc241e52e03c3d82ce48e0962a4f21d21e1b",
     "patterns/p28-intrusive-lists/README.md": "345ff1bd02d9887faa603fa5905e2720ff8634ee32edc199441b2b52cd95aa72",
     "patterns/p28-intrusive-lists/c/kernel.c": "6f905c2c31d6e31168d7d3fbdb1a6c087b13e5546ceec7e8e47a07e51b89ca18",
@@ -292,9 +292,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3280,
+    "bytes": 3269,
     "nvars": 48,
-    "envp_stack_bytes": 3664,
+    "envp_stack_bytes": 3653,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -383,8 +383,8 @@
     "unsafe/O3/isolated/small.bin": 2964.26,
     "unsafe/O3/isolated/large.bin": 15463.1,
     "unsafe/O3/isolated/d_ir_d_work": 65.098125,
-    "unsafe/O3/whole/small.bin": 2966.98,
-    "unsafe/O3/whole/large.bin": 15481.21,
+    "unsafe/O3/whole/small.bin": 2973.98,
+    "unsafe/O3/whole/large.bin": 15488.21,
     "unsafe/O3/whole/d_ir_d_work": 65.17828125,
     "verus/O0/isolated/small.bin": 9210.59,
     "verus/O0/isolated/large.bin": 56529.58,
@@ -395,8 +395,8 @@
     "verus/O3/isolated/small.bin": 2964.26,
     "verus/O3/isolated/large.bin": 15464.11,
     "verus/O3/isolated/d_ir_d_work": 65.10338541666667,
-    "verus/O3/whole/small.bin": 3013.0,
-    "verus/O3/whole/large.bin": 15693.08,
+    "verus/O3/whole/small.bin": 3020.0,
+    "verus/O3/whole/large.bin": 15700.08,
     "verus/O3/whole/d_ir_d_work": 66.04208333333334
   },
   "verus": {
@@ -448,7 +448,15 @@
           "line": 681
         }
       ],
-      "axiom_decls": []
+      "axiom_decls": [],
+      "global_decls": [
+        {
+          "kind": "global layout",
+          "name": "Obj",
+          "line": 162,
+          "in_verus": true
+        }
+      ]
     }
   },
   "verified_call_site": {
@@ -1689,7 +1697,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==959776==ERROR: AddressSanitizer: heap-use-after-free on address 0x504000000070 at pc 0x56055cedc2a9 bp 0x7fff8889bdf0 sp 0x7fff8889bde0 READ of size 1 at 0x504000000070 thread T0 #0 0x56055cedc2a8 in kernel /home/apt/repos_common/se",
+      "diagnostic": "================================================================= ==2512108==ERROR: AddressSanitizer: heap-use-after-free on address 0x504000000070 at pc 0x55785aba12a9 bp 0x7ffcd3484e80 sp 0x7ffcd3484e70 READ of size 1 at 0x504000000070 thread T0 #0 0x55785aba12a8 in kernel /home/apt/repos_common/s",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1711,7 +1719,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==959780==ERROR: AddressSanitizer: heap-use-after-free on address 0x504000000030 at pc 0x55f8045e72a9 bp 0x7ffe9bc97940 sp 0x7ffe9bc97930 READ of size 1 at 0x504000000030 thread T0 #0 0x55f8045e72a8 in kernel /home/apt/repos_common/se",
+      "diagnostic": "================================================================= ==2512111==ERROR: AddressSanitizer: heap-use-after-free on address 0x504000000030 at pc 0x563fc47c72a9 bp 0x7fffeeb7bec0 sp 0x7fffeeb7beb0 READ of size 1 at 0x504000000030 thread T0 #0 0x563fc47c72a8 in kernel /home/apt/repos_common/s",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1722,7 +1730,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==959782==ERROR: AddressSanitizer: heap-use-after-free on address 0x504000000030 at pc 0x555f385802a9 bp 0x7ffe26703250 sp 0x7ffe26703240 READ of size 1 at 0x504000000030 thread T0 #0 0x555f385802a8 in kernel /home/apt/repos_common/se",
+      "diagnostic": "================================================================= ==2512112==ERROR: AddressSanitizer: heap-use-after-free on address 0x504000000030 at pc 0x559849b812a9 bp 0x7ffd6c823440 sp 0x7ffd6c823430 READ of size 1 at 0x504000000030 thread T0 #0 0x559849b812a8 in kernel /home/apt/repos_common/s",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1733,7 +1741,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==959783==ERROR: AddressSanitizer: heap-use-after-free on address 0x504000000030 at pc 0x559aa59f143e bp 0x7ffe4fb65fd0 sp 0x7ffe4fb65fc0 READ of size 1 at 0x504000000030 thread T0 #0 0x559aa59f143d in kernel /home/apt/repos_common/se",
+      "diagnostic": "================================================================= ==2512113==ERROR: AddressSanitizer: heap-use-after-free on address 0x504000000030 at pc 0x55bd3851743e bp 0x7fff07ce3660 sp 0x7fff07ce3650 READ of size 1 at 0x504000000030 thread T0 #0 0x55bd3851743d in kernel /home/apt/repos_common/s",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1929,7 +1937,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.1,
+        "seconds": 0.2,
         "stdout": "175491764864",
         "model_stdout": "175491764864",
         "stderr": ""
@@ -1941,7 +1949,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.2,
+        "seconds": 0.1,
         "stdout": "154398814336",
         "model_stdout": "154398814336",
         "stderr": ""
