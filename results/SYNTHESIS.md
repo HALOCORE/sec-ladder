@@ -51,7 +51,7 @@ they appeared **ZERO** times in §1, §2, §3, §4 **and** §6.
 |---|---|
 | **Result 1** (§2) — the tax is a property of a *pair of spellings* | ✅ **SURVIVES**, three numbers move, and it gains a **structural** caveat that is bigger than the numbers |
 | **Result 2** (§3) — where safe Rust does not help | ✅ **SURVIVES, and it is the one that GROWS** — the temporal axis went `1 → 6` and the six **disagree** |
-| **Result 3** (§4) — a proof discharges what it says; `obligations` is a size proxy | ✅ **SURVIVES, STRENGTHENED** — both correlations rise on the two largest proofs in the tree |
+| **Result 3** (§4) — a proof discharges what it says; `obligations` is a size proxy | ✅ **SURVIVES.** ⚠ **NOT *"strengthened"* — the manager published that and it is a RANGE-EXTENSION ARTEFACT**: both correlations rise, and the seven new rows are nonetheless the **worst-fitting** in the corpus (§4) |
 | **Result 4** (§5) — what the instrument can price | ⚠ **SCOPE ONLY. The `6.00 Ir` type law is STILL A ONE-ROW LAW** — `p35` sits beside it and does **not** corroborate it (measured) |
 | the `ptr_offset` census (§7) | ✅ **SURVIVES**, and its `p` improves ~5× |
 | the Rust-rung control arm (§7) | ✅ **SURVIVES** — `129/58/0 → 166/85/0`, the `0` by two independent methods |
@@ -222,8 +222,10 @@ row broke the coincidence rather than the result.** **p18** is in two buckets
 rows the sum is `9 + 4 + 10 = 23` for the same two offsetting reasons. **The sum
 landing on the row count is an accident and always was.**
 ✅ **`p32` is the single new entrant and it joins the `>100` bucket — a TEMPORAL
-row, in a distribution assembled almost entirely from the bounds-check
-family.**
+row.** ⚠ **This sentence claimed the distribution was *"assembled almost entirely
+from the bounds-check family"*; measured (`TASK_167`) it is **6 of 10** in the
+`>100` bucket and **13 of 23** across the licensed set. **Predominantly, not
+almost entirely.**
 
 ⚠⚠ **AND THE WORD "SHIPPED" IN THAT HEADER IS DOING MORE WORK THAN A READER
 WILL GIVE IT. Four of the 22 rows have a measured, verifying, in-contract
@@ -272,8 +274,21 @@ of **6.75×** across the **18** licensed rows whose `R3 − R4` is positive on
 eighteen are not overstatements at all** — p47 (−1.37×), p09 (0.74×),
 **p32 (0.83×)** and p14 (0.86×) have R2 *cheaper* than R3, and on p09 that is the
 documented reslice/load-merge hazard rather than noise.
-✅ **R2-is-dearer-than-R3 is a bounds-check-family property, and the row that
-weakened it came from outside that family.** ⚠ **The `1.05×` low this document
+⚠⚠⚠ **A SENTENCE STOOD HERE AND IT WAS FALSE. IT READ *"R2-is-dearer-than-R3
+is a bounds-check-family property, and the row that weakened it came from
+outside that family."* THE MANAGER WROTE IT FROM ONE ROW WHILE FOLDING, WITH
+NOTHING RUN** — one commit after `TASK_166` refuted a manager hypothesis of
+exactly that shape. **`TASK_167` killed it on three independent tests:** the
+18-row population splits **exactly 9 inside / 9 outside** the spatial family and
+the non-overstatement rate is **identical, 2 of 9 each way**; the two inside are
+`p09` (0.74×) and `p14` (0.86×), **both spatial and both already in the 26**, so
+the property was weakened **from inside the family before `p32` existed**;
+medians are 7.26 inside against 6.24 outside at a permutation `p = 0.666`; and
+the two largest ratios in the table — `p08` 3536× (`aliasing`) and `p04` 3323×
+(`logical`) — are **outside** it, on a paragraph that names `p08` as its own
+exemplar. ✅ **What is true and is all that is true: four of the eighteen rows
+have R2 cheaper than R3, they are spread evenly across the classification, and
+each has its own mechanism.** ⚠ **The `1.05×` low this document
 used to print is p27**, a `NOT-LIC` row this section's own licence rule
 excludes — the range and the median were being taken over two different
 populations. ✅ **And the median is the robust half of this, measured**: apply
@@ -620,7 +635,11 @@ is a hand-written second store: exactly the one C omits.
 UNDER IT AND THEY DO NOT ALL SAY THE SAME THING — WHICH IS THE MOST INFORMATIVE
 THING THIS AXIS PRODUCED, AND IT LIVED ONLY IN §7 UNTIL NOW.**
 The temporal axis went from **one row to six** (`p25 p27 p28 p29 p32 p34`), and
-what safe Rust does with the bug **is a property of the STRUCTURE, not of Rust**:
+what safe Rust does with the bug **is a property of the STRUCTURE, not of Rust**.
+⚠ **The table below shows the four rows whose safe answer has been established,
+and it includes `p35`, which is a `type` row rather than a temporal one — it is
+there because it is the other row that shows both shapes at once. `p25`,
+`p27` and `p29`'s safe answers are not tabulated here** (`TASK_167` MAJOR 5):
 
 | row | what the safe rung does with the C bug |
 |---|---|
@@ -878,7 +897,11 @@ wrote none of their own"* was the falsehood, not the count.**
 and rejects a false one — measured on twelve probes, including a
 never-constructed type, `--crate-type=lib`, a generic instantiation, a type
 alias and a `#[path]`-included module, all `error[E0080]` — so it is not
-*"trusted and checked by nothing"* the way the other five are.** ⚠ **But it is
+*"trusted and checked by nothing"* the way the other five are.** ⚠ **This
+paragraph said *"twelve probes … all `error[E0080]`"*; re-counted it is
+`error[E0080]` on **9 of 16** probes, and the five constructs named above are
+each one of the nine, so the conclusion stands and the tally did not**
+(`TASK_167` MAJOR 8). ⚠ **But it is
 hand-written, pattern-local, and Verus proves things from it, so it is now
 reported in its own column rather than being invisible.**
 
@@ -968,10 +991,23 @@ DEAD-CODE arm against `4` for the MECHANISM arm.** ⚠ **`obligations` is
 function body, one per loop — and across the built tree it correlates **`0.920`**
 with syntactic size and **`0.805`** with `verus.rs` source lines.**
 ⚠ **Those read `0.894` and `0.795` at 26 patterns; re-derived at 33 (`TASK_166`)
-they both RISE, on a corpus that added the two largest proofs in the tree, with
-two independent parsers agreeing. "Syntactic size" is
-`(exec_fn − tcb_items) + proof_fn + loops`.** ✅ **This is the one Result the
-out-of-sample rows made STRONGER.** ⚠⚠ **The
+they both RISE, with two independent parsers agreeing. "Syntactic size" is
+`(exec_fn − tcb_items) + proof_fn + loops`.**
+
+⚠⚠⚠ **DO NOT READ THAT RISE AS CORROBORATION — IT IS A RANGE-EXTENSION
+ARTEFACT, AND THE MANAGER PUBLISHED IT AS *"the one Result the out-of-sample
+rows made STRONGER"* BEFORE ANYONE RAN THE CONTROL.** (`TASK_167` MAJOR 2.)
+The seven new rows are the **largest** proofs in the tree, so they extend the
+x-range and a correlation coefficient rises **even if they fit worse**.
+**The control says they fit worse:** place the seven exactly on the 26-row
+regression line and `r` would be **`0.957`** (units) / **`0.908`** (lines);
+**measured it is `0.920` / `0.805`.** ⚠ **They are the worst-fitting rows in
+the corpus** — `p28` misses by **8.4 sd**, `p49` by **3.6 sd**.
+⚠⚠ **This is §6 trap 2 of this same document — *"your out-of-sample test is
+probably fake"* — committed in the section that cites it.**
+✅ **What survives, and it is the actual Result: `obligations` remains a SIZE
+PROXY, and the new rows do not weaken that; they weaken the idea that a higher
+`r` on a wider range is evidence of anything.** ⚠⚠ **The
 operational test, and it is cheap enough to apply to any column before quoting
 it: a column's SPELLING SPREAD against its PRESENCE GAP. `Ir` measures
 `8519 : 1` — invariant under re-spelling, moving under presence.
@@ -1367,7 +1403,7 @@ list of variables whose *content* changes codegen paths was derived from a singl
 measurement and is not proved complete.
 
 ⚠⚠ **AND THE CONTROL ARM THIS DOCUMENT NEVER HAD, FOUND LATE AND WORTH STATING
-PLAINLY: ACROSS ALL 26 PATTERNS AND EVERY ADVERSARIAL INPUT, THE FOUR RUST RUNGS
+PLAINLY: ACROSS ALL 33 PATTERNS AND EVERY ADVERSARIAL INPUT, THE FOUR RUST RUNGS
 HAVE NEVER ONCE DISAGREED WITH EACH OTHER.**
 
 ```
@@ -1414,6 +1450,26 @@ of the seven are the *shared driver* refusing a malformed file rather than a
 kernel. **The C rungs on the same inputs: 29 SIGSEGVs, 8 aborts, 2 hangs.**
 ⚠ **That is the single most direct statement of the safety half of this
 project's subject, and it went unmeasured for 125 tasks.**
+
+⚠⚠⚠ **A SCOPE MARKER, BECAUSE THE FOLD RE-DERIVED THE FOUR RESULTS AND NOT
+EVERYTHING ELSE.** `TASK_167` found the fold had promoted the *document* to 33
+while leaving several §7 claims at their 26-pattern scope with nothing saying so.
+**These are 26-PATTERN figures and have NOT been re-derived at 33:**
+
+- *"8 of the 26 built patterns publish a zero on their own headline axis"*;
+- the destination-buffer census — *"14 destination buffers, 13 `#define`
+  capacities plus one input extent, ZERO prior-pass counts"*;
+- *"no `forbidden` entry in 26 patterns excludes a pointer cursor"*;
+- the **fuzz** half of the control arm — *"13 449 fresh candidate inputs …
+  600 rung splits, ZERO Rust-rung splits"* (⚠ **the gate-record half above HAS
+  been re-derived at 33 and is still `0`**);
+- *"`requires` is a length bound in 26 of 26 patterns"*;
+- *"the `adversarial-strideN.bin` template is 0-call in 22 of 26 patterns"*.
+
+⚠ **Each is cheap to re-take and none is load-bearing for a Result.** ✅ **What
+IS re-derived at 33 is stated as such wherever it appears: the buckets, the
+median, both correlations, the licence count, the `ptr_offset` census, the
+gate-record control arm, the identity levels and the composition table.**
 
 ⚠ **A real weakness DOES exist and it is elsewhere: 36 of the 129 adversarial
 inputs (27.9%) make ZERO kernel calls**, and the `adversarial-strideN.bin`
@@ -1531,8 +1587,13 @@ and `p32` all keep a correct free discipline and put the missing check on the
 is incomplete**; and **`p34` is a third position again — its read path is
 correct BY CONSTRUCTION, since a refcounted pointer is valid by definition, so
 the repair belongs at the ACQUIRE, an unbounded distance from the harm.**
-⚠⚠ **And the safe-Rust answers DISAGREE ACROSS THE FIVE, which is the sharpest
-thing on this axis: `p32`'s safe rung reproduces the buggy C BIT FOR BIT, and
+⚠⚠ **`p25` IS THE SIXTH TEMPORAL ROW AND THE REPAIR-SITE LIST KEPT LEAVING IT
+OUT** (`TASK_167` MAJOR 5). **It is the row the axis most needs, because it has
+TWO sites, not one** — the READ and the GROWTH — **in three spellings whose
+ordering REVERSES between optimisation levels.** ⚠ **A row with two repair
+sites is what shows the "site" is a choice rather than a property of the bug.**
+⚠⚠ **And the safe-Rust answers DISAGREE ACROSS THE SIX, which is the sharpest
+thing on this axis — §3 now carries the four-row table; this is the provenance: `p32`'s safe rung reproduces the buggy C BIT FOR BIT, and
 `p28`'s CANNOT REPRODUCE IT AT ALL** — the representation safe Rust forces on
 you either preserves the harm exactly or removes its mechanism along with the
 pointers, **and which one is a property of the STRUCTURE, not of Rust.**
@@ -1540,7 +1601,7 @@ pointers, **and which one is a property of the STRUCTURE, not of Rust.**
 storage representation: its `Rc` port CANNOT COMPILE the bug, while a safe
 INDEX-ARENA port under `forbid(unsafe_code)` reproduces the buggy C BIT FOR BIT
 on 8/8 inputs, recycle divergence included.** ⚠ **§3's *"safe Rust's temporal
-guarantee is a guarantee about the allocator"* now has five rows under it rather
+guarantee is a guarantee about the allocator"* now has SIX rows under it rather
 than one, they do not all say the same thing, and `p34` is the row where the
 guarantee's PRESENCE and ABSENCE are demonstrated side by side in one kernel.**
 
@@ -1606,12 +1667,17 @@ programs (PHP 4.0.2, GNU coreutils, and upstream GNU packages) found
 median 6.9%. **It is zero in all 33 kernels here — `0 of 464` sites in 40 functions, out of sample, all four guard variants** (`TASK_166`; it was `0 of 255` over 26). No kernel in this tree walks
 memory with a pointer cursor.
 
-⚠ **Do not quote that zero as `0 of 255` and call it decisive.** The 255 sites
-sit in 30 site-carrying functions across 26 files cloned from one template, so
-the draws are not independent; size-matched against the ladder's own function
-length distribution, the honest figure is **p ≈ 0.06 — suggestive, not
-decisive**, and the `0 of 255` framing overstated it by roughly 5000× in
-p-value. ⚠ **The zero is also a property of the regex guard that measured it.**
+⚠ **Do not quote that zero as `0 of 255` and call it decisive** — and
+⚠⚠ **`0 of 255` is the 26-pattern figure; at 33 it is `0 of 464` sites in 40
+functions.** The sites sit in **40** site-carrying functions across **33** files
+cloned from one template, so the draws are not independent; size-matched against
+the ladder's own function length distribution, the honest figure is
+**`p = 0.0123` — about 5× stronger than the `p ≈ 0.06` this paragraph carried at
+26, and still suggestive rather than decisive**. ⚠ **The `0 of 255` framing
+overstated the raw count by roughly 5000× in p-value; that criticism stands and
+is why the function-unit figure is the one to quote.** ✅ **Re-derived
+end-to-end at `TASK_167` with the 26-row control reproducing the published
+`0.0612` exactly.** ⚠ **The zero is also a property of the regex guard that measured it.**
 Figures and caveats are finding 45's.
 
 **And the scope that bounds every number above.** One box, one libc, one gcc, one

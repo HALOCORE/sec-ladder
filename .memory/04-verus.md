@@ -1928,8 +1928,11 @@ Verus's linear mode were both NAMED AND NOT BUILT.** The measured statement is:
 
 ## ⚠⚠ A `global` DIRECTIVE IS A TRUSTED DECLARATION — AND rustc CATCHES A LIE EARLIER THAN THE VERUS GUIDE SAYS
 
-**`TASK_164` (engineer) extended by `TASK_165` (reviewer), twelve probes between
-them, all `./verus_run.py` single-file, no `--cargo` and no `--compile`.**
+**`TASK_164` (engineer) extended by `TASK_165` (reviewer), all `./verus_run.py`
+single-file, no `--cargo` and no `--compile`.** ⚠ **The tally has been said as
+*"twelve probes"* and re-counted at `TASK_167` it is `error[E0080]` on **9 of
+16**; the constructs listed below are each one of the nine, so the conclusion is
+unaffected and the count was.**
 
 `global layout T is size == N, align == M;` and `global size_of usize == 8;` are
 a **sixth body-less trusted form**. They live on **10 of 33** patterns —

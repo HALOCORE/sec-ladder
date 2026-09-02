@@ -15,9 +15,9 @@ this box is reference; this box is what to *do*.
 
 ✅✅ **DONE — THE RESULTS GAP. `TASK_166` re-derived all four Results, the idiom census and the control arm against ALL 33 KERNELS, and the manager folded it into `results/SYNTHESIS.md` at `7b5822a`.** **Nothing fell.** Result 1 SURVIVES (three numbers, plus a structural caveat bigger than the numbers: the licensed fraction went `22/26` → `23/33` and **six of the seven new rows are unlicensed**, so §2's apparatus structurally cannot see most of the recent corpus); Result 2 **GROWS** (the temporal law had ONE demonstration in §3 while its six rows and their disagreement lived only in §7 — the join is now made, and `p49` has the §3 entry it never had); Result 3 SURVIVES **STRENGTHENED** (`0.795 → 0.805`, `0.894 → 0.920`); Result 4 is **SCOPE ONLY** — ⚠⚠ **§5's `6.00 Ir` type law is STILL A ONE-ROW LAW; `p35` adds a second row to the type AXIS and NOT to that LAW, measured (`p38` harms in 1 of 4 compiler×level C cells, `p35` in 4 of 4).** ⚠ **The title is now *"What 33 kernels say"*.**
 
-⚠⚠⚠ **FIRST — `TASK_167`, THE REVIEW OF `TASK_166` *AND* OF THE MANAGER'S `SYNTHESIS.md` FOLD.** `PROTOCOL` rule 1 (alternate) and rule 3 (**the manager wrote the fold, so a different agent must attack it**) — and rule 9, because `.memory/03-measurement.md` gained **three new sections from an unreviewed report**. ⚠ **The precedent is exact and it worked: `TASK_165` reviewed `TASK_164` plus the manager's fold and found, in the fold, a sentence marked `✅ manager-re-derived` that contradicted the table eight lines above it.** **Targets, in order:** (a) ⚠⚠ **the `SYNTHESIS.md` rewrite itself — 246 insertions across seven sections, hand-written, unreviewed, and every number in it is quoted from `TASK_166_REPORT.md` rather than re-derived by the manager**; (b) the three new `.memory/03-measurement.md` sections (`norel` is link layout — ✅ manager re-derived on `p28`; the null/call **anti**-correlation — ✅ manager re-derived; the band re-scoring — ⚠ **only its load-bearing half was manager-checked, the table is the engineer's**); (c) finding 64's ✅/⊘ separation, exactly as `TASK_165` item 5 was scoped; (d) ⚠ **`TASK_166`'s own three judgement calls, which it flagged**: the three `⊘ NO SEARCH` `SEARCH_REVIEWED` entries, the `p ≈ 0.0123` figure (its own, unreviewed), and the `global` reporting design. ✅ **No sweep is needed for any of it.**
+✅✅ **DONE — `TASK_167`, THE REVIEW OF `TASK_166` AND OF THE MANAGER'S FOLD. NINE MAJORS, NO BLOCKER.** ⚠⚠⚠ **THE SENTENCE THE MANAGER NAMED FOR ATTACK FELL, AND SO DID FOUR MORE MANAGER CLAIMS** — all now corrected in place: (1) *"R2-is-dearer-than-R3 is a bounds-check-family property"* is **FALSE** — the 18-row population splits **exactly 9 inside / 9 outside** the spatial family with an **identical** 2-of-9 non-overstatement rate, and the two inside (`p09` 0.74×, `p14` 0.86×) **were already in the 26**, so the property was weakened from INSIDE the family before `p32` existed; (2) *"the one Result the out-of-sample rows made STRONGER"* is a **RANGE-EXTENSION ARTEFACT** — place the seven on the 26-row line and `r` would be `0.957`/`0.908` against a measured `0.920`/`0.805`, i.e. **they are the worst-fitting rows in the corpus**, which is §6 trap 2 of the document it was written into; (3) *"`FLOOR = 2.00` minimises misses"* is **FALSE** (`0.05 → 4`, `0.10+ → 5`) — ⚠⚠ **a retraction and its replacement wrong in the SAME SHAPE one commit apart, with the disconfirming sweep two lines below the headline the manager was reading**; (4) *"anti-correlated"* OVER-CLAIMS (Pearson `−0.052`), and the manager's table printed `small.bin` figures under a `large.bin` heading **inside the entry whose subject is not collapsing the input axis**; (5) `.temp/mgr164/QUEUE_TRIAGE.md`'s *"`.memory/` is genuinely clean"* is wrong — **6 `check.py:NNNN` citations, ≥2 already rotten**. ✅ **The TITLE and the `15% → 30%` framing both SURVIVE** (un-lumped, `11.5% → 24.2%`, slightly stronger). ✅ **`p = 0.0123` is no longer the engineer's alone — re-derived end-to-end with the 26-row control reproducing `0.0612` exactly.** ⚠ **`SYNTHESIS.md` now carries an explicit SCOPE MARKER naming the six §7 claims still at 26-pattern scope.**
 
-⚠⚠⚠ **SECOND — AND IT IS THE HONEST ANSWER TO *"IS THE RESEARCH WORK FINISHED?"*: TRIAGE AND CLOSE `RECAP`'s IMMEDIATE QUEUE.** ✅ **The manager has already triaged all 36 items — `.temp/mgr164/QUEUE_TRIAGE.md`** — into: **(A) cheap, needs a sweep it does not deserve alone** (item 12's **8** rotten `check.py:NNNN` citations across **5** patterns, all five targets dead at HEAD, and `p35`'s was written AFTER the convention was recorded and rotted within 16 tasks; item 15's empty-set `forbidden` audits; item 31's 250-line docstring; item 33's line-anchored `global` fallback); **(B) needs a re-measure, so batch it** (items 24, 28, 16b — ⚠ **item 28's re-check set is SEVENTEEN patterns, not the ten it names**); **(C) real research, all of it 26-era spelling-search debt** (items 1, 2, 3, 11, plus new items 35 and 36); **(D) curiosities to RETIRE as stated limitations** (7, 8, 9); **(E) deliberately declined** (5, 20, 25). ⚠⚠ **THE FRAMING THAT MUST NOT BE LOST: every pattern is built, gated, reviewed and has a finding — that is TRUE — and NOT every rung's cheapest admissible spelling has been searched, which is FALSE and has never been claimed. `results/SYNTHESIS.md` §7 publishes the count: 14 of 33 print `undeclared`, and those 14 have never been audited the way the seven new rows just were (queue item 35).** ✅ **Finishing means saying where the confidence stops, not extending it.**
+⚠⚠⚠ **THE ONLY THING LEFT, AND IT IS THE HONEST ANSWER TO *"IS THE RESEARCH WORK FINISHED?"*: TRIAGE AND CLOSE `RECAP`'s IMMEDIATE QUEUE.** ✅ **The manager has already triaged all 36 items — `.temp/mgr164/QUEUE_TRIAGE.md`** — into: **(A) cheap, needs a sweep it does not deserve alone** (item 12's **8** rotten `check.py:NNNN` citations across **5** patterns, all five targets dead at HEAD, and `p35`'s was written AFTER the convention was recorded and rotted within 16 tasks; item 15's empty-set `forbidden` audits; item 31's 250-line docstring; item 33's line-anchored `global` fallback); **(B) needs a re-measure, so batch it** (items 24, 28, 16b — ⚠ **item 28's re-check set is SEVENTEEN patterns, not the ten it names**); **(C) real research, all of it 26-era spelling-search debt** (items 1, 2, 3, 11, plus new items 35 and 36); **(D) curiosities to RETIRE as stated limitations** (7, 8, 9); **(E) deliberately declined** (5, 20, 25). ⚠⚠ **THE FRAMING THAT MUST NOT BE LOST: every pattern is built, gated, reviewed and has a finding — that is TRUE — and NOT every rung's cheapest admissible spelling has been searched, which is FALSE and has never been claimed. `results/SYNTHESIS.md` §7 publishes the count: 14 of 33 print `undeclared`, and those 14 have never been audited the way the seven new rows just were (queue item 35).** ✅ **Finishing means saying where the confidence stops, not extending it.**
 
 ✅ **`synthesis/outward_ir.json` IS NO LONGER STALE — re-emitted at `TASK_166`, 33 patterns / 524 cell entries, 0 skipped, 0 unpinned, 0 stale.** ⚠ **And re-emitting it settled two things at once: it is the ONLY instrument that names the callee and counts the calls, so it is what refuted the manager's unifying hypothesis (finding 64), and re-scoring the bands against it retracted `FLOOR = 2.00`'s stated reason.** ✅ **`results/SYNTHESIS.md` is CURRENT — folded at `7b5822a`; its four Results are now derived against all 33.** ⚠⚠ **OPERATIONAL, NEVER DELETE: `results/SYNTHESIS.md` is HAND-WRITTEN; `results/synthesis.md` (lower case) is GENERATED. Never regenerate over the capitalised one.** ⚠⚠ **READ THE CATALOGUE CELL, NOT `TASK_143_REPORT.md`: both rows' cells carry manager corrections the report does not.** ⚠⚠ **AND A NEW ROW NOW OWES TWO THINGS `TASK_143`-era task files do not mention (`TASK_151`, finding 57): (a) its HARDENED arm must be sanitizer-CLEAN on EVERY input — stage `7h`; (b) `spec.md` must declare `verus.assumptions` if any rung uses `assume(`/`admit(`.** ✅ **THE BAR, and it is the whole of it (`CLAUDE.md` rule 6, findings 53–54): a pattern is admitted SOLELY on whether the C program makes sense — correct on benign inputs, exhibits the error on an adversarial one, C MECHANISM distinct from a BUILT row's, fits the pinned signature. NOTHING about Rust, Verus, Miri, a cost gradient or what the ladder can 'price' may EVER remove a row; those are RESULTS.** ⚠⚠ **REFUSED, and only on C-SIDE duplication of a BUILT row: `CVE-2024-25062` and `Issue-15143` (`p29`'s mechanism); `p30` and iterator-invalidation (`p27`'s and `p25`'s); stack-lifetime (both compilers warn at DEFAULT flags, so C is not silently wrong).** ⚠ **`CVE-2016-4658`, `CVE-2022-23308`, `Issue-15192` pass the bar but duplicate admitted candidates — build the candidate, not the CVE. ⚠ Re-adjudicate the two ADMITTED CVEs (`CVE-2022-40304`, `CVE-2021-3518`) against the ENLARGED built tree once `p25` lands — `p34` already has; `p28` and `p32` were candidates when they were ranked and are now rows.** ⚠⚠ **~3 tasks per row at the measured rate (build → review → land corrections).** ✅ **BOTH OF THIS CELL'S OLD "STILL OWED" GATE ITEMS ARE CLOSED at `TASK_164`** — stage 9b now reads the verdict (30 of 30 generators that write a `problems` key exit non-zero on it, so it IS a verdict), and `global` directives are recorded per file under `verus.<src>.global_decls`. **Finding 63.** ⚠ **What is left over from them and is NOT done: four bespoke verdict shapes stage 9b still cannot read, and a no-verdict sidecar SHOUT that was priced (5 stale tables, 5 `report.py` runs, a second sweep) and deliberately not taken.** ⚠⚠ **OPERATIONAL, NEVER DELETE: `results/SYNTHESIS.md` is HAND-WRITTEN; `results/synthesis.md` (lower case) is GENERATED. Never regenerate over the capitalised one.**
 
@@ -5949,9 +5949,19 @@ the number.** Two task files have already sent an agent to the wrong finding.
       `p28`/`p29`/`p34`'s exact callee set — 16 `exact` counterexamples.**
       ⚠ **`norel` is LINK LAYOUT.**
     - ⊘ **Arm (a), *"callees in the whole-program slope → a non-zero null"* —
-      FALSE AT THE PUBLISHED CELL, and *anti*-correlated.** The three biggest
-      callers have the **smallest** nulls (`p28 +1.01`, `p29 −0.02`,
-      `p34 −0.10`) while `p03`/`p04` read `+6.00` with **one** call.
+      FALSE AT THE PUBLISHED CELL.** ✅ **Manager-re-derived at
+      `-O3/isolated/large.bin`: `p36` makes **1024** outward calls per kernel
+      call and its null is **exactly `0.00`**, while `p25` makes **7** and its
+      null is `269.52`; `p34` 144 calls → `0.10`, `p28` 108 → `1.01`,
+      `p29` 96 → `0.02`, `p03`/`p04` **one** call → `+6.00`.**
+      ⚠⚠ **This bullet said *"anti-correlated"* and that OVER-CLAIMS
+      — Pearson is `−0.052`, Spearman `−0.139` (`TASK_167` MAJOR
+      7).** ✅ **The honest statement is *call volume does not PREDICT the
+      null*: what refutes the hypothesis is the two extremes, not a trend.**
+      ⚠ **The first version of this table also printed `small.bin` figures
+      under a `large.bin` heading and omitted `p36` — the manager
+      collapsing the input axis in a finding whose subject is not collapsing the
+      input axis.**
 
     ✅ **Three facts, three generators. The manager assembled the hypothesis from
     record greps with NOTHING RUN — the same shape as the two axis proposals
@@ -5966,10 +5976,17 @@ the number.** Two task files have already sent an agent to the wrong finding.
     computes **exactly `+0.00`** — the `±7` `memset`-alignment term, which **no
     positive threshold can catch.** ✅ **The oracle did NOT move** (0 of 208 pair
     rows, 0 of 824 cell figures); **the DERIVED records moved and nothing
-    re-scored.** ✅ **Both constants survive on a different argument** — `2.00`
-    minimises misses with the fewest false alarms among thresholds that do;
-    `CONFIDENT = 16.00` is unmoved and better supported (57 rows, 57 real,
-    smallest `17.0027`). ⚠⚠ **What is retracted is the low band's MEANING:
+    re-scored.** ⚠⚠⚠ **AND THE REPLACEMENT JUSTIFICATION WAS WRONG IN THE SAME
+    SHAPE AS THE CLAIM IT REPLACED — the manager's, marked `✅`, killed at
+    `TASK_167` MAJOR 4.** It said `2.00` *"minimises misses"*; **it does not** —
+    `0.05 → 4`, `0.10 and above → 5` (manager-re-derived over 198 `-O3
+    isolated` pair rows). ⚠⚠ **A retraction and its replacement wrong the same
+    way one commit apart, with the disconfirming sweep two lines below the
+    headline in the report being read.** ✅ **The honest justification is a
+    TRADE-OFF: `2.00` accepts one extra miss to cut false alarms ~4×, and the
+    row it gives up is `p34 large R5−R4` at truth `+0.0065`.**
+    ✅ **`CONFIDENT = 16.00` is unmoved and better supported** (57 rows, 57
+    real, smallest `17.0027`). ⚠⚠ **What is retracted is the low band's MEANING:
     *"below 2.00 nothing real hides"* is false on 5 rows, and `classify()`
     returns `low` BEFORE consulting the null, so those five are dropped
     SILENTLY rather than `refused`.**
@@ -5978,6 +5995,15 @@ the number.** Two task files have already sent an agent to the wrong finding.
     - ⊘ **`0.894` "syntactic size" IS recoverable** — it is
       `(exec_fn − tcb_items) + proof_fn + loops`, and at 33 it is **`0.920`**,
       two parsers agreeing. The manager had reported it unrecoverable.
+      ⚠⚠⚠ **BUT DO NOT READ THE RISE AS CORROBORATION — `TASK_167` MAJOR 2:
+      IT IS A RANGE-EXTENSION ARTEFACT, AND THE MANAGER PUBLISHED IT INTO
+      `SYNTHESIS.md` AS *"the one Result the out-of-sample rows made
+      STRONGER"*.** The seven new rows are the **largest** proofs in the tree,
+      so `r` rises even if they fit worse — **and the control says they fit
+      worse: place them on the 26-row line and `r` would be `0.957` / `0.908`;
+      measured it is `0.920` / `0.805`, with `p28` missing by 8.4 sd and `p49`
+      by 3.6 sd.** ⚠ **That is §6 trap 2 of the very document it was written
+      into.** ✅ **The Result survives: `obligations` is still a size proxy.**
     - ⊘ **The `0 of 255` instrument EXISTS**, reproduces `255`/`30`/`26` exactly
       as a control, and gives **`0 of 464`** at 33 — so §7's `p ≈ 0.06` caveat
       needs **re-computing, not re-wording**: it is **`0.0123`**, ~5× stronger.

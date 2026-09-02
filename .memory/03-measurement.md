@@ -3340,18 +3340,29 @@ already been struck.** Keep the list, not the ordinal.
     three biggest callers have the SMALLEST nulls:**
 
     ```
-    -O3 isolated, large.bin     outward calls per kernel call     R5-R4 null
-      p28                                   ~28..144                   +1.01
-      p29                                   ~32                        -0.02
-      p34                                   ~30                        -0.10
-      p03 / p04                              1                         +6.00
-      p35 / p49 / p11 (unsafe)               0                          --
+    -O3/isolated/large.bin   outward calls per kernel call    |R5-R4 null|
+      p36                              1024.000                    0.00
+      p34                               144.253                    0.10
+      p28                               107.562                    1.01
+      p29                                95.871                    0.02
+      p42                                 3.000                   31.00
+      p03 / p04                           1.000                    6.00
+      p25                                 7.080                  269.52
+      p35 / p49 / p11 (unsafe)            0.000                     --
     ```
 
-    ✅ **Entry 23's own `-O3 isolated` list — `p25 269.52 · p42 31.00 ·
-    p04 6.00 · p03 6.00 · p02 2.00` — is the right one, and it is anti-correlated
-    with how much the kernel calls.** ⚠ **So "does this kernel call out?" is NOT
-    a screen for whether the null matters. Read the cell.**
+    ⚠⚠⚠ **AND THE FIRST VERSION OF THAT TABLE WAS `small.bin` FIGURES UNDER A
+    `large.bin` HEADING, AND OMITTED `p36`, THE BEST COUNTEREXAMPLE**
+    (`TASK_167` MAJOR 7) — the manager collapsing the input axis **inside the
+    very entry whose subject is not collapsing the input axis.**
+
+    ⚠⚠ **AND *"ANTI-CORRELATED"* OVER-CLAIMS. Measured over all 33:
+    Pearson `−0.052`, Spearman `−0.139`.** ✅ **The honest statement is
+    *call volume DOES NOT PREDICT the null*** — what refutes the hypothesis is
+    not a trend but the two extremes: **`p36` makes 1024 outward calls per
+    kernel call and its null is exactly `0.00`, while `p25` makes 7 and its null
+    is `269.52`.** ⚠ **So "does this kernel call out?" is NOT a screen for
+    whether the null matters. Read the cell.**
 
     ✅ **THE RULE: for a cross-RUNG comparison use `kernel_exclusive_ir`; use
     `marginal_ir_per_call` for anti-collapse, which is what it was built for.
@@ -3764,12 +3775,23 @@ the engineer's and has not been independently re-derived.**
 and nothing re-scored the table when it did.** The seven new rows contribute
 **1 of the 5** misses (`p34 large R5−R4`); four were already there.
 
-✅ **Both constants SURVIVE, on a different argument.** `FLOOR = 2.00`
-**minimises misses and has the fewest false alarms among thresholds that do**
-(`1.50 → 5/24`, `2.00 → 5/23`, `2.50 → 7/20`); only `≤ 0.10` catches `p34`, at
-**98** false alarms. `CONFIDENT = 16.00` is unmoved and **better** supported:
-57 rows at 33, **57 real, 0 spurious, smallest `|correction| = 17.0027`** — the
-same `17.00` the 22-row fit found, with 23 more rows under it.
+⚠⚠⚠ **AND THE REPLACEMENT JUSTIFICATION WAS WRONG IN THE SAME SHAPE AS THE
+CLAIM IT REPLACED — `TASK_167` MAJOR 4, and it was the manager's, marked `✅`.**
+It read *"`FLOOR = 2.00` **minimises misses** and has the fewest false alarms
+among thresholds that do"*. **It does not minimise misses:** `0.05 → 4`,
+`0.10 and above → 5` (manager-re-derived over 198 `-O3 isolated` pair rows;
+the engineer's fuller sweep says the same). ⚠⚠ **A retraction and its
+replacement wrong the same way, one commit apart, is this entry's own recurring
+defect — and the disconfirming sweep was two lines below the headline in the
+report the manager was reading.**
+
+✅ **THE HONEST JUSTIFICATION IS A TRADE-OFF, NOT A MINIMUM.** `2.00` accepts
+**one extra miss** (5 rather than 4) to cut false alarms by roughly 4×
+(`0.05 → 72`, `2.00 → 17` on the manager's subset; `98 → 23` on the engineer's
+full one). **The one row it gives up is `p34 large R5−R4`, truth `+0.0065`.**
+`CONFIDENT = 16.00` is unmoved and better supported: 57 rows at 33, **57 real,
+0 spurious, smallest `|correction| = 17.0027`** — the same `17.00` the 22-row
+fit found, with 23 more rows under it.
 
 ⚠⚠⚠ **WHAT IS RETRACTED IS THE LOW BAND'S MEANING.** *"Below 2.00 nothing real
 hides"* is **false on 5 rows**, and ⚠ **`classify()` returns `low` BEFORE it
