@@ -435,6 +435,53 @@ and **4 of 22 tables were content-stale** — three citing a superseded
 **Regenerating both costs no gate run and no re-measure.** Do it whenever a
 verdict, a contract hash or an audit count moves.
 
+### ⚠⚠ "A `check.py` EDIT COSTS A RE-GATE AND NO RE-MEASURE" IS TRUE AND IS **NOT THE WHOLE COST**
+
+**TASK_164, and nothing recorded it before.** A `harness/` edit **also stales
+any `controls/*.json` sidecar that pins that file in its own
+`derived_from_sha256`**, and stage `9b` then **FAILS** the pattern. Measured on
+the tree:
+
+```
+3 of 46 sidecars pin something under harness/
+  p23/controls/sweep_fit.json     asm.py, build.py, measure.py
+  p35/controls/proof_mutants.json check.py
+  p35/controls/union_oracle.json  check.py, vparse.py
+```
+
+So `TASK_164`'s `check.py`+`vparse.py` bundle took **`p35` from PASS to two
+`FAIL [tables]`** until both generators were re-run. ✅ **The extra cost is
+small, bounded and measured — 76 s, both `rc=0`, `9/9` and `9/9`, and a leaf
+diff shows ZERO substantive values moved** (only the two pinned hashes and
+`measured_utc`). ⚠ **But it is not zero, and it is invisible until the sweep
+reaches `p35`.**
+
+✅ **The rule: before a `harness/` bundle, enumerate the hits and budget one
+generator re-run each.** ⚠⚠ **AND THE OBVIOUS SPELLING IS WRONG — the manager
+wrote it, ran it, and it said FOUR.**
+`grep -l '"harness/' patterns/*/controls/*.json` also matches
+`p23/controls/controls_pin.json`, whose `harness/` string is in its **`pin.read_by`
+prose** (*"harness/check.py::check_control_json_pins (gate stage 9b)"*) and not
+in a pin at all. **Read the KEY, not the file:**
+
+```sh
+python3 -c "
+import json,glob
+for p in sorted(glob.glob('patterns/*/controls/*.json')):
+    h=[k for k in (json.load(open(p)).get('derived_from_sha256') or {})
+       if k.startswith('harness/')]
+    if h: print(p, h)"
+```
+
+⚠ **Same class as the `global layout` census this task also fixed, and as
+`check_miri`'s whitelist-grep-called-a-census: a substring search cannot tell a
+DECLARATION from a MENTION OF ONE.** Both errors were made in the same session,
+one hour apart.
+
+⚠ **There is no fixpoint hazard** — `.json` is deliberately excluded from the
+gate digest (see `check.py::main`'s `srcs` comment), so regenerating a sidecar
+cannot move the digest that certifies the run evaluating it.
+
 ## ⚠ `vparse.parse()` DROPS BODY-LESS ITEMS ON PURPOSE — widening it turns p36 red
 
 (TASK_082. **The manager predicted the opposite and was wrong; this is the

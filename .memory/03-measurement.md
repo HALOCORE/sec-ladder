@@ -3235,20 +3235,45 @@ already been struck.** Keep the list, not the ordinal.
     agree, so **their difference is a measured null control**, and it is not
     zero:
 
+    ⚠⚠⚠ **AND THE TABLE BELOW WAS WRONG A FOURTH TIME, IN THE SAME SHAPE AS THE
+    FIRST THREE — IT MAXED OVER *INPUT*.** Found by `TASK_164`'s engineer,
+    **manager-re-derived independently** from `results/gate/p*.json`. The rule
+    three paragraphs down says *"do not max it over mode, over level, **or over
+    input**"*, and the table under it had **three axes** and printed one number
+    per `(pattern, level, mode)`. ✅ **Every figure it printed is RIGHT and is
+    the worst input, which is the right one for the argument** — but the axis
+    was missing, so the table is replaced with the four-axis form:
+
     ```
-    R4/R5 null -- STATE IT PER (level, mode) CELL; NEVER max across either
-                  O0/iso     O3/iso    O0/whole   O3/whole
-      p25          269.52     269.52     269.52     269.52
-      p28         1732.73       1.01    1732.73     211.87
-      p29          425.80       0.02     425.80     465.55
-      p42           31.00      31.00      31.00      33.00
-      p11            0.00       1.00       0.00     494.00
+    verus - unsafe, `marginal_ir_per_call`, per (level, mode, INPUT) cell
+                O0/iso            O3/iso           O0/whole          O3/whole
+             small    large    small    large    small    large    small    large
+    p25       0.00  +269.52    0.00  +269.52    0.00  +269.52    0.00  +269.52
+    p28    +281.28 +1732.73    0.00    +1.01 +281.28 +1732.73  +46.02  +211.87
+    p29    +113.76  +425.80    0.00    -0.02 +113.76  +425.80 +101.77  +465.55
+    p42       0.00   -31.00    0.00   -31.00    0.00   -31.00   -2.00   -33.00
+    p11       0.00     0.00   -1.00    -1.00    0.00     0.00 -494.00  -166.00
       p06/p14/p17/p18/p13/p35/p38/p34  <= 1.01 isolated, 14..36 at O3/whole
 
     At -O3 ISOLATED -- the cell the corrections are published in -- only p25 and
     p42 reach 16.00, and FIVE patterns clear 2.00:
       p25 269.52 . p42 31.00 . p04 6.00 . p03 6.00 . p02 2.00
     ```
+
+    ⚠⚠ **THE INPUT AXIS IS NOT COSMETIC — ON THREE OF THE FIVE ROWS ONE INPUT IS
+    EXACTLY `0.00`.** `p25`'s and `p42`'s `small.bin` nulls are `0.00` in **all
+    four** cells, so *"`p25`'s null is 269.52"* is a `large.bin` statement;
+    `p28`'s `O0/iso` is `+281.28` on `small` against `+1732.73` on `large`; and
+    ⚠ **`p11`'s `-494.00` is the `SMALL` cell, not the large one** (`large` is
+    `-166.00`), which is the one place the old table's implied input was also
+    the wrong one. **State the input with the cell, always.**
+
+    ✅ **Tree-wide at `-O3 isolated`, 66 `(pattern, input)` cells over 33
+    patterns:** `|null| >= 2.00` in **8**, `1.00 <= |null| < 2.00` in **35** (34
+    of them exactly `-1.00`), `|null| < 1.00` in **23**. At `-O0 isolated`,
+    `|null| >= 2.00` in **10 of 66**. ⚠ At `-O3 whole`, 37 of 66 clear 2.00 and
+    15 clear 20.00 — **and none of that is a defect**, because `check_identity`
+    compares `isolated` digests only and nothing pins the `whole` cells equal.
 
     ⚠⚠⚠ **THIS TABLE WAS WRONG TWICE AND THE SHAPE OF BOTH ERRORS IS THE SAME:
     A MAX TAKEN ACROSS A DIMENSION THAT MATTERS.** The manager's first version
@@ -3274,12 +3299,17 @@ already been struck.** Keep the list, not the ordinal.
     Maxing over cells including `whole` gave *"ten patterns at ≥ 20"*; in
     `-O3 isolated` **eight of that top ten are negligible (`|Δ| ≤ 1.01`)**.
     ⚠⚠⚠ **AND `whole` IS NOT A NULL AT ALL: `check_identity`
-    compares `isolated` digests only (`check.py:3303`), and at `p11`'s
-    `O3/whole` cell — the one the `−494.00` comes from — there is NO `kernel`
-    symbol, the difference is `unsafe::main` vs `verus::main`, and the static
-    traces are genuinely 751 against 747 non-pad instructions.** ⚠ **A null
-    control is only a null in the MODE ITS IDENTITY PIN COVERS. Never max a
-    null across modes.**
+    compares `isolated` digests only, and at `p11`'s
+    `O3/whole` **`small.bin`** cell — the one the `−494.00` comes from — there
+    is NO `kernel` symbol, the difference is `unsafe::main` vs `verus::main`,
+    and the static traces are genuinely 751 against 747 non-pad
+    instructions.** ⚠ **A null control is only a null in the MODE ITS IDENTITY
+    PIN COVERS. Never max a null across modes.**
+    ⚠ **This sentence carried `check.py:3303` until `TASK_164`, by which time
+    the line was `:3313`** — ordinary citation rot, and
+    `.memory/02-bench-rules.md`'s rule is *name the FUNCTION and give NO LINE
+    NUMBER AT ALL*, because a function name cannot decay. **Fixed by deleting
+    the number, not by updating it.**
 
     ⚠⚠⚠ **THREE PUBLISHED NUMBERS ARE BELOW THEIR OWN PATTERN'S NULL**:
     `p25 large gcc-clang` `+19.42`, which the published calibration places in
