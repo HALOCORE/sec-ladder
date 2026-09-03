@@ -27,7 +27,7 @@ this box is reference; this box is what to *do*.
 
 ✅✅ **DONE — `TASK_171`, THE CLOSING REVIEW. TWO BLOCKERS, AND ITS VERDICT WAS THAT `results/SYNTHESIS.md` WAS *NOT SAFE TO PUBLISH* — four sentences a reader would act on were unbacked, THREE OF THEM NEW IN THE MANAGER'S OWN TWO COMMITS. All four are now fixed (finding 67).** ⚠⚠⚠ **The call the manager named for attack FELL, exactly as feared: withdrawing *"not every rung's cheapest spelling has been searched"* on the strength of `14/0/0` substituted DOCUMENTED for DEEP. Re-derived: only **10 of 33** rows have BOTH endpoints searched; 17 declare one side or an owed span; 2 declare NO SEARCH on either. THE LIMITATION IS RESTORED.** ⚠⚠ **And the manager published a LIMITATION THAT DOES NOT EXIST — *"no pattern ships a length-heterogeneous sweep band"* — by copying a stale QUEUE header while `RECAP`'s own FINDING had already retired it and four patterns ship one. `PROTOCOL` rule 13 now carries it: check a retired item against the TREE, not against its header.** ⚠ **`TASK_169`'s `p27 gcc-clang` claim STANDS; the manager's dismissal was a mechanism invented for a null result, and the `§` census is structurally blind to inline spellings.** ⚠ **Four reviews in a row have now found a `✅ manager-re-derived` mark the manager had not earned.**
 
-⚠⚠⚠ **WHAT REMAINS, AND IT IS SMALL, NAMED AND PRICED — THERE IS NO FURTHER STRUCTURED PROGRAMME.** ✅ **All 33 patterns built, reviewed, corrected, with findings; the four Results re-derived at 33; the gate bundle, the Results gap and the backlog queue all closed and reviewed; the remainder retired as STATED LIMITATIONS in `results/SYNTHESIS.md` §7.** **The open items, all in finding 67 and none of them blocking:** (a) ⚠⚠ **item 43 — `asm.py`'s `main` needle mis-resolves on 33 cells, MASKS a real stage-3a failure on `p01 safe_tuned -O0 isolated`, and `p05/NOTES.md` §1a invented a mechanism for the artefact; BOTH accusations are now VERIFIED and neither correction has landed. `asm.py` is MEASUREMENT-hashed, so a fix is a full re-measure** — ⚠ **and `.memory/01-ladder.md` still says *"Quote the 23/32"* where it is 22/10**; (b) the `§` marker's `BULK_REGIME` is **a whitelist of three hardcoded keys** and must be described as one, with `__memchr_avx2`/`__strlen_avx2` unclassified on six published `gcc-clang` rows; (c) `results/synthesis.md`'s *"every entry cited to a reviewed artefact — except one"* is **false on three** (`p01 p03 p08` cite the open backlog) and its *"seven of the fourteen"* **lists six**; (d) `RECAP.md`'s own 15 line citations, 10 wrong. ⚠ **Each is a `synthesis/`- or doc-level fix except (a); none needs a sweep except (a)'s re-measure.**
+⚠⚠⚠ **WHAT REMAINS, AND IT IS SMALL, NAMED AND PRICED — THERE IS NO FURTHER STRUCTURED PROGRAMME.** ✅ **All 33 patterns built, reviewed, corrected, with findings; the four Results re-derived at 33; the gate bundle, the Results gap and the backlog queue all closed and reviewed; the remainder retired as STATED LIMITATIONS in `results/SYNTHESIS.md` §7.** **The open items, all in finding 67 and none of them blocking:** (a) ⚠⚠ **item 43 — `asm.py`'s `main` needle mis-resolves on 33 cells, MASKS a real stage-3a failure on `p01 safe_tuned -O0 isolated`, and `p05/NOTES.md` §1a invented a mechanism for the artefact; BOTH accusations are now VERIFIED and neither correction has landed. `asm.py` is MEASUREMENT-hashed, so a fix is a full re-measure** — ✅ **`.memory/01-ladder.md`'s *"Quote the 23/32"* is corrected to `22/32`, marked ⊘ reviewer-measured, with the note that the load-bearing qualifier survives and that `p05/NOTES.md` §1a itself is NOT yet fixed (a gate-hashed doc, so a sweep)**; (b) the `§` marker's `BULK_REGIME` is **a whitelist of three hardcoded keys** and must be described as one, with `__memchr_avx2`/`__strlen_avx2` unclassified on six published `gcc-clang` rows; (c) `results/synthesis.md`'s *"every entry cited to a reviewed artefact — except one"* is **false on three** (`p01 p03 p08` cite the open backlog) and its *"seven of the fourteen"* **lists six**; (d) ✅ **DONE — `RECAP.md`'s own line citations are rewritten to name FUNCTIONS** (`check.py::_is_trusted`, `::build_models`, `::check_identity`, `::check_marginal_ir`, `::check_adversarial`, `::_include_literals`; `dloop.py::_apply_call_args`; `limbs.py::contract`; two module docstrings) — **11 rewritten, and the EIGHT that remain are deliberate QUOTATIONS of rotten coordinates inside the findings ABOUT the rot, which is exactly the escape hatch `TASK_169` said such a check needs.** ⚠ **Do not "fix" those eight.** ⚠ **Each is a `synthesis/`- or doc-level fix except (a); none needs a sweep except (a)'s re-measure.**
 
 ⚠⚠⚠ **`synthesis/outward_ir.json` WAS RE-EMITTED AT `TASK_166` (33 patterns / 524 cell entries, 0 skipped) AND IS STALE ON ALL 33 AGAIN ONE TASK LATER — because it pins the GATE `source_sha256`, so any `harness/*.py` edit invalidates it. Manager-verified. All 33 STALEs are FALSE (a docstring cannot move a callgrind number), and queue item 37 is the `synthesis/`-only repair.** ⚠ **And re-emitting it settled two things at once: it is the ONLY instrument that names the callee and counts the calls, so it is what refuted the manager's unifying hypothesis (finding 64), and re-scoring the bands against it retracted `FLOOR = 2.00`'s stated reason.** ✅ **`results/SYNTHESIS.md` is CURRENT — folded at `7b5822a`; its four Results are now derived against all 33.** ⚠⚠ **OPERATIONAL, NEVER DELETE: `results/SYNTHESIS.md` is HAND-WRITTEN; `results/synthesis.md` (lower case) is GENERATED. Never regenerate over the capitalised one.** ⚠⚠ **READ THE CATALOGUE CELL, NOT `TASK_143_REPORT.md`: both rows' cells carry manager corrections the report does not.** ⚠⚠ **AND A NEW ROW NOW OWES TWO THINGS `TASK_143`-era task files do not mention (`TASK_151`, finding 57): (a) its HARDENED arm must be sanitizer-CLEAN on EVERY input — stage `7h`; (b) `spec.md` must declare `verus.assumptions` if any rung uses `assume(`/`admit(`.** ✅ **THE BAR, and it is the whole of it (`CLAUDE.md` rule 6, findings 53–54): a pattern is admitted SOLELY on whether the C program makes sense — correct on benign inputs, exhibits the error on an adversarial one, C MECHANISM distinct from a BUILT row's, fits the pinned signature. NOTHING about Rust, Verus, Miri, a cost gradient or what the ladder can 'price' may EVER remove a row; those are RESULTS.** ⚠⚠ **REFUSED, and only on C-SIDE duplication of a BUILT row: `CVE-2024-25062` and `Issue-15143` (`p29`'s mechanism); `p30` and iterator-invalidation (`p27`'s and `p25`'s); stack-lifetime (both compilers warn at DEFAULT flags, so C is not silently wrong).** ⚠ **`CVE-2016-4658`, `CVE-2022-23308`, `Issue-15192` pass the bar but duplicate admitted candidates — build the candidate, not the CVE. ⚠ Re-adjudicate the two ADMITTED CVEs (`CVE-2022-40304`, `CVE-2021-3518`) against the ENLARGED built tree once `p25` lands — `p34` already has; `p28` and `p32` were candidates when they were ranked and are now rows.** ⚠⚠ **~3 tasks per row at the measured rate (build → review → land corrections).** ✅ **BOTH OF THIS CELL'S OLD "STILL OWED" GATE ITEMS ARE CLOSED at `TASK_164`** — stage 9b now reads the verdict (30 of 30 generators that write a `problems` key exit non-zero on it, so it IS a verdict), and `global` directives are recorded per file under `verus.<src>.global_decls`. **Finding 63.** ⚠ **What is left over from them and is NOT done: four bespoke verdict shapes stage 9b still cannot read, and a no-verdict sidecar SHOUT that was priced (5 stale tables, 5 `report.py` runs, a second sweep) and deliberately not taken.** ⚠⚠ **OPERATIONAL, NEVER DELETE: `results/SYNTHESIS.md` is HAND-WRITTEN; `results/synthesis.md` (lower case) is GENERATED. Never regenerate over the capitalised one.**
 
@@ -3828,7 +3828,7 @@ the number.** Two task files have already sent an agent to the wrong finding.
 
     ⚠⚠ **`p35` STAYS BLOCKED, ON A SHARPER REASON, AND TWO CATALOGUE STATEMENTS
     ABOUT IT WERE WRONG.** The `unsafe` can only live in an
-    `#[verifier::external_body]` body (`check.py:4178-4180` is the ONE allowed
+    `#[verifier::external_body]` body (`check.py::_is_trusted` carries the ONE allowed
     branch), which makes it a trusted item, **which owes a TWIN — and a twin must
     be a SAFE SPELLING OF THE SAME OPERATION.** `p01`'s twin for `get_unchecked`
     is literally `v[i]`. **Rust has a safe spelling for indexing and NONE for a
@@ -3847,7 +3847,7 @@ the number.** Two task files have already sent an agent to the wrong finding.
     engineer's six Verus runs.**
     ✅ **Correction 2 — the *"a GATE-CLEAN `p35` DOES EXIST"* `include!` route is
     CLOSED AT HEAD, and the catalogue still advertised it. Manager-verified at
-    `harness/check.py:3941`: `cand += _include_literals(txt)[0]`, so
+    `harness/check.py::_include_literals`: `cand += _include_literals(txt)[0]`, so
     `_path_includes` DOES resolve `include!`.**
 
     ⚠⚠ **WHAT THE MANAGER DID *NOT* VERIFY, AND THE ENGINEER FLAGGED IT FIRST:
@@ -3959,7 +3959,7 @@ the number.** Two task files have already sent an agent to the wrong finding.
     ✅ **`p27`'s hashed `why` actually says *"a file cannot name a pointer"*,
     which is about the OP STREAM, not the kernel.** **The corrected rule: *a file
     cannot name a pointer, but it CAN name an operation that saves one.*** ⚠ **All
-    five structures are expressible; `dloop.py:361` constrains DECLARATIONS, not
+    five structures are expressible; `dloop.py::_apply_call_args` constrains DECLARATIONS, not
     arity — the citation itself is still accurate.**
 
     ⚠⚠ **`p32`/`p33` — THE MANAGER'S LEAST-CERTAIN CALL, AND THE ANSWER IS
@@ -4654,7 +4654,7 @@ the number.** Two task files have already sent an agent to the wrong finding.
     cannot fire"* owes the same test as the thing it repaired**
     (`.temp/mgr151/`): four mutations planted into a *copy* — `touch` neutered,
     `touch` always raising, the upper bound dropped, the predicate made
-    constant-`True` — and **all four make the gate FAIL** (`check.py:2387` calls
+    constant-`True` — and **all four make the gate FAIL** (`check.py::build_models` calls
     `sb(m.selfcheck)`, and `sb` propagates).
     ⚠ **MINOR, recorded and deliberately NOT repaired: three of the four fail by
     CRASHING inside the simulation rather than returning the designed message, so
@@ -5184,7 +5184,7 @@ the number.** Two task files have already sent an agent to the wrong finding.
     mentions `p35` ZERO times** (manager-confirmed). ⚠ Minors: the hashed
     `miri.reason` **omits initialisedness** (measured — `Pay{o:..}` then reading
     `.i` IS Miri-reported UB); five stale catalogue claims plus a decayed
-    `check.py:3941 → 3972` citation; and **stage 9b hashes a control sidecar and
+    `check.py::check_adversarial` citation (recorded then as `:3941 → 3972`); and **stage 9b hashes a control sidecar and
     never reads its own verdict.**
 
     ✅✅ **CLEAN NEGATIVES — do not re-run.** **`p38` DUPLICATION FALLS ON
@@ -5444,7 +5444,7 @@ the number.** Two task files have already sent an agent to the wrong finding.
     cell is `O3/whole`, where there is **no `kernel` symbol at all** and the
     difference is `unsafe::main` vs `verus::main`, 751 against 747 non-pad
     instructions. ✅ **`check_identity` compares `isolated` digests only
-    (`check.py:3303`), so `whole` MUST BE EXCLUDED: the pair is not a null
+    (`check.py::check_identity`), so `whole` MUST BE EXCLUDED: the pair is not a null
     there.** ⚠ **A null control is only a null in the mode the identity pin
     covers.**
 
@@ -5463,8 +5463,8 @@ the number.** Two task files have already sent an agent to the wrong finding.
 
     ✅ **THE MECHANISM IS CLOSED, over every function, pads 0 and 16 identical:
     kernels `0.00`, `main` `0.00`, and SIX glibc malloc-internal symbols
-    accounting for `100.0%`.** ⚠ **It is NOT a new fact** — `check.py:2805`,
-    `synthesize.py:27–33` and `CALLEE_NOTE` all document the whole-program
+    accounting for `100.0%`.** ⚠ **It is NOT a new fact** — `check.py::check_marginal_ir`,
+    `synthesize.py`'s module docstring and `CALLEE_NOTE` all document the whole-program
     reading — **and the manager cited the wrong precedent for it: `RECAP`'s
     *"the R4/R5 pair is not a null control … a source-path-length artefact"* is
     the `ns` finding, a DIFFERENT claim.** **What is new is the magnitude, the
@@ -6665,7 +6665,7 @@ prose. **Land it bundled with a pattern that is being re-measured anyway.**
   the UAF must live on **adversarial inputs only** (at `-O3` the stores into the
   recycled slab are **dead-store-eliminated**, so that row does not execute the
   bug and the checksums disagree across `-O` level — the offset-16 fix was
-  necessary and **not sufficient**); **`dloop.py:361` raises on rung-signature
+  necessary and **not sufficient**); **`dloop.py::_apply_call_args` raises on rung-signature
   arity**, and the one escape measured to work is a **dead `slab` argument** on
   R4, whose `-O3` survival is unmeasured; and the R5 catcher is an **ordinary
   SMT obligation, not linearity** — that claim is retracted.
@@ -6963,7 +6963,7 @@ Both retired.
     own TEST is the wrong test.** It asks *"does the gate execute it?"*; the right
     question is **"does a committed claim depend on it?"** — `limbs.py`,
     `report.py` and `measure.py` are cited in **64 committed doc references**, and
-    `harness/limbs.py:14-19` already decided it: *"That coupling is deliberate...
+    `harness/limbs.py`'s module docstring already decided it: *"That coupling is deliberate...
     The staleness is the alarm."* ⚠ **And the item's COST FIGURE IS 3.3x STALE:**
     ~~13 min~~ is **2593 s = 43.2 min** measured, 2672 s = 44.5 min on the next
     sweep. **A full sweep is three quarters of an hour; batch accordingly.**
@@ -7287,7 +7287,7 @@ Both retired.
     bare-keyed and **six** consumers turn its `ValueError` into a failure —
     `check_call_site`, `check_clause_deletion`, `check_requires_strength`,
     `check_trusted_twins`, `derive_contract` in `check.py`, plus
-    **`harness/limbs.py:102`, which the review did not name.**
+    **`harness/limbs.py::contract`, which the review did not name.**
 
     ⚠ **And there is a STRUCTURAL reason qualification cannot fix it, found at
     TASK_078 and decisive**: `check_trusted_twins` builds its lookup key as

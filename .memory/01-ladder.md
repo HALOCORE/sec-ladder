@@ -914,9 +914,18 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
      overhead outside the kernel. Two errors that cancelled. **Always difference
      `n_iters`; never divide a total wall time by a byte count.**)*
    - **Vectorisation is not a confound, but "nothing vectorises in any rung" is
-     false** — it is **23 of 32 cells**; the 9 with `['xmm']` are all `whole`-mode
+     false** — the 9 with `['xmm']` are all `whole`-mode
      `main`, i.e. the driver, not the fold. The *fold* is scalar in every rung, so
-     the gap is measured on a scalar loop on both sides. Quote the 23/32.
+     the gap is measured on a scalar loop on both sides.
+     ⚠⚠⚠ **THE SPLIT IS `22 / 10`, NOT `23 / 9`, AND THIS LINE SAID *"Quote the
+     23/32"* UNTIL `TASK_171`.** ⊘ **Reviewer-measured, NOT manager-re-derived:**
+     `p05/NOTES.md` §1a asserts `verus::main` LACKS two `xmm` instructions and
+     **it carries exactly those two**, so one cell was on the wrong side.
+     ⚠ **The qualifier survives** — the extra cell is also a `whole`-mode `main`,
+     so *"every vectorised cell is the driver, not the fold"* still holds, which
+     is the load-bearing half. ⚠⚠ **`p05/NOTES.md` §1a is NOT yet corrected: it
+     is a gate-hashed pattern doc, so the fix costs a sweep** (`RECAP` finding 67
+     (e)). **Quote the 22/32 and say the source doc still disagrees.**
    - **R3 survives, and is now the *fourth* pattern in a row** — see the opening
      of this finding. `7 + 7·nrec` (`7 + 5·nrec` when vlen ≡ 0 mod 4) is a
      **zero-degrees-of-freedom interpolation**, and only `large` is genuinely
