@@ -1,6 +1,21 @@
 {
  "p01": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p01-array-sum/c/kernel.c": "1b79c738a5ab4da534d62a931919ec2d16a6add4f3710b29a347e16b88c96fe7",
+   "patterns/p01-array-sum/c/kernel.h": "2eaee3e8be741b9ef00a9d6061e72f8ab6199143724b2438251c7032db01add4",
+   "patterns/p01-array-sum/c/main.c": "065a6d17209b6c5ddb03d33ea38b623265b73293d98415ac99d5f66f467d18ef",
+   "patterns/p01-array-sum/safe_naive.rs": "31718428bae78cc7c8d50ba5c520091e0596dca1b5216a6bb76f85bbd88abbfb",
+   "patterns/p01-array-sum/safe_naive_verus.rs": "6e84117379183aef6345c849ed2bea0777be2ec5422715bf9475c6c9b8a8bb87",
+   "patterns/p01-array-sum/safe_tuned.rs": "ff2d49dd5338f48a3051989565137f8f7ae685521e4fa78999874edff48e4c16",
+   "patterns/p01-array-sum/unsafe.rs": "026e4b6aa62113972c6881f0daa5e12da366c0eb0b9e7d5369cd0fc8c12db8e9",
+   "patterns/p01-array-sum/verus.rs": "2b2b8d1c63fecfacb9f3487e2db205a4ba415808ed1b99fba2be6918108afe70",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -36,6 +51,10 @@
    "patterns/p01-array-sum/unsafe.rs": "026e4b6aa62113972c6881f0daa5e12da366c0eb0b9e7d5369cd0fc8c12db8e9",
    "patterns/p01-array-sum/verus.rs": "2b2b8d1c63fecfacb9f3487e2db205a4ba415808ed1b99fba2be6918108afe70",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p01-array-sum/inputs/large.bin": "8f7c78bedad2dd287d6349261e0cc1dc5005d20c6ac02c3c0c5e834cc63378c9",
+   "patterns/p01-array-sum/inputs/small.bin": "962bd41e6903d806d49eb6bc195f266a331b10cae4fb79ff644d4b062dc22706"
   },
   "large.bin": {
    "cells": {
@@ -112,6 +131,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -189,7 +209,22 @@
   }
  },
  "p02": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p02-buffer-copy/c/kernel.c": "60a0e02c9394e0fba94d229b011d1b237cee71c7adc99e1ed326bca4700ee090",
+   "patterns/p02-buffer-copy/c/kernel.h": "df4d7ff77c75b24e648005c3e160634f6c4cfd28750b3642969822c351b8f8f1",
+   "patterns/p02-buffer-copy/c/kernel_hardened.c": "6bdb40962acc154134de0d551827cfdaeeb0db11e47b75ebae9c3a1af12d38da",
+   "patterns/p02-buffer-copy/c/main.c": "457769c4cb05725ca9aa8ce5acaf6e0cf8a1b0ef494ab08b86d914a37a42bd47",
+   "patterns/p02-buffer-copy/safe_naive.rs": "82d6331dc4d2b028b4ceb11dd82d9c62ea49593fb00f491b9b5a4d3e4321a360",
+   "patterns/p02-buffer-copy/safe_tuned.rs": "23f1b0b7a7d45856ad430fe176062b4342044195f9393d2cd623b52c25850b4b",
+   "patterns/p02-buffer-copy/unsafe.rs": "d295410141f7ae1879305a0b57763f76e2f232a58688fd9efda59481b999c55c",
+   "patterns/p02-buffer-copy/verus.rs": "af43f782703a2a55a7e81dba6e91ce1f4e8919c82ea400f2e76751a5e8c53c60",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -225,6 +260,10 @@
    "patterns/p02-buffer-copy/unsafe.rs": "d295410141f7ae1879305a0b57763f76e2f232a58688fd9efda59481b999c55c",
    "patterns/p02-buffer-copy/verus.rs": "af43f782703a2a55a7e81dba6e91ce1f4e8919c82ea400f2e76751a5e8c53c60",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p02-buffer-copy/inputs/large.bin": "649efd4370393365221b372eb68d1e6f96db9c599c8f2c6dbbaafe91b83c5a78",
+   "patterns/p02-buffer-copy/inputs/small.bin": "87ecabcb40fb1805eb68a249aa9cfc025356140ce56801694cb0e5e100797141"
   },
   "large.bin": {
    "cells": {
@@ -359,6 +398,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -494,7 +534,22 @@
   }
  },
  "p03": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p03-bounded-stack/c/kernel.c": "9f1558cfbe298a11dc7edd231e2ee8d1efcf339e9f2332dc3e2cc0ef3782bf37",
+   "patterns/p03-bounded-stack/c/kernel.h": "11a5cfc8f821fb56cbf3384ab99c24465c4d0d861cd6c770607cb84318d097bc",
+   "patterns/p03-bounded-stack/c/kernel_hardened.c": "5cba2e2c70b3946c57d0c0fcbf2037ff8a066006126bf6f082287e5754e80486",
+   "patterns/p03-bounded-stack/c/main.c": "09a0b93a61d861465ade53467faab2a342fe3159a57805c8142b102ae0ae9bc7",
+   "patterns/p03-bounded-stack/safe_naive.rs": "8d7f24002a402e3f8113f275fb58ed5931f2fc2ab1d27cf4f87b27fe2d05bb70",
+   "patterns/p03-bounded-stack/safe_tuned.rs": "9cc6fe2f60f4d1ae6953bc2a270a2926a643f590c492a3c3f274509d2a73bcc1",
+   "patterns/p03-bounded-stack/unsafe.rs": "cabf872d67893b12845aa60a55d7b9041cb7f26f87e9520e217dbe6b38c63517",
+   "patterns/p03-bounded-stack/verus.rs": "06d8f71f7e9b4de82466fc19e90cb064cc515cead87de8f81d70a11361c65a8a",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -531,6 +586,10 @@
    "patterns/p03-bounded-stack/unsafe.rs": "cabf872d67893b12845aa60a55d7b9041cb7f26f87e9520e217dbe6b38c63517",
    "patterns/p03-bounded-stack/verus.rs": "06d8f71f7e9b4de82466fc19e90cb064cc515cead87de8f81d70a11361c65a8a",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p03-bounded-stack/inputs/large.bin": "27bf00e922b09ce24e97ba8f69f5e5bfd30cffcf06d109e266d652e18cc9a300",
+   "patterns/p03-bounded-stack/inputs/small.bin": "66f804b01c6585c83dd80cf91a36ab08dd824637ba5b97dd6a16a13949d4aacc"
   },
   "large.bin": {
    "cells": {
@@ -647,6 +706,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -764,7 +824,22 @@
   }
  },
  "p04": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p04-ring-buffer/c/kernel.c": "95bc661335bea8e21f887c743a4751456f5e06f39dfee6fcd0bcc58cf6cea2df",
+   "patterns/p04-ring-buffer/c/kernel.h": "b912897b321df089943a8b9bfa30b1df930dfe879f316c8d0ff79f15c95d705c",
+   "patterns/p04-ring-buffer/c/kernel_hardened.c": "c242d75dccaab160ab1c544222f3bd9b5966463bf0158dcdbba5e404bd148df7",
+   "patterns/p04-ring-buffer/c/main.c": "89ce77ab596aa51f831e2a69e03ee37d607ae70f9b9e4969329d7dfa9f9b3c93",
+   "patterns/p04-ring-buffer/safe_naive.rs": "52b9d59169a76b4b839a579ff2b09f003b2954ea871cf362f08e8ed4b39c0943",
+   "patterns/p04-ring-buffer/safe_tuned.rs": "20e785af4bd121e06276a8893e1682ae986baa5d71a682db76af28ce12b3cd8c",
+   "patterns/p04-ring-buffer/unsafe.rs": "1059af0d1cb83784aa89b65b6a927c82439e9b5040b2a557f52b7a4615b4a093",
+   "patterns/p04-ring-buffer/verus.rs": "2b53b17e4024b5512240b79f729ea939dd7c78cd19ba5b177c3e54cce87d8848",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -802,6 +877,10 @@
    "patterns/p04-ring-buffer/unsafe.rs": "1059af0d1cb83784aa89b65b6a927c82439e9b5040b2a557f52b7a4615b4a093",
    "patterns/p04-ring-buffer/verus.rs": "2b53b17e4024b5512240b79f729ea939dd7c78cd19ba5b177c3e54cce87d8848",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p04-ring-buffer/inputs/large.bin": "23fac74e77523ee7bc7db876a543074c65884f9087680f7f24cf4b21b08dfb1f",
+   "patterns/p04-ring-buffer/inputs/small.bin": "84189c1aba9c2f661f9d8d615cab0ace3ceb0b61c0244831fa187662a20e8f47"
   },
   "large.bin": {
    "cells": {
@@ -918,6 +997,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -1035,7 +1115,22 @@
   }
  },
  "p05": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p05-index-flatten/c/kernel.c": "484308a6fa4dd4f61aa00ccb58b25bbe8cd4cb182de0bbefa9308e4fed5296ae",
+   "patterns/p05-index-flatten/c/kernel.h": "910c7479b88896eea27be86c34958ab9a6474c97844ea01b34865a1f23098c72",
+   "patterns/p05-index-flatten/c/kernel_hardened.c": "960540172dda6666a97a93eb2cc116bebce7d29b9cdcd17e1dc042c5443fdf99",
+   "patterns/p05-index-flatten/c/main.c": "8c97ad24ee97e19807c1fcc6b90b42147f8ded6e66ef07199420130333e2caea",
+   "patterns/p05-index-flatten/safe_naive.rs": "f1bdc43ae2fbc5e0efcff53d23f6510a5ea495d3769df65573b026cc7bfda482",
+   "patterns/p05-index-flatten/safe_tuned.rs": "af4a170e21f7624d2bbb14efc805a2bb1c5025c93e2d0db4e14ce8d1cc57aa09",
+   "patterns/p05-index-flatten/unsafe.rs": "d188a0a02300d051ac2a07cf6105267752ca29a19ebce1af9ff13320a08ab879",
+   "patterns/p05-index-flatten/verus.rs": "42c94e0fcb9acb4bcd02456da7f0b4aed924d3a04a772c46e82683043911b22e",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -1071,6 +1166,10 @@
    "patterns/p05-index-flatten/unsafe.rs": "d188a0a02300d051ac2a07cf6105267752ca29a19ebce1af9ff13320a08ab879",
    "patterns/p05-index-flatten/verus.rs": "42c94e0fcb9acb4bcd02456da7f0b4aed924d3a04a772c46e82683043911b22e",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p05-index-flatten/inputs/large.bin": "dc0bccf40b7ef660b64a04790ad04ee3c2a1bcc6dbd148155183734358996bd8",
+   "patterns/p05-index-flatten/inputs/small.bin": "fa20dfba435b345a99f5dcec3cd9011395b5e664c0df0c0783dbc02500e1b6fa"
   },
   "large.bin": {
    "cells": {
@@ -1163,6 +1262,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -1256,7 +1356,22 @@
   }
  },
  "p06": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p06-rotate/c/kernel.c": "8baf222692697c003ed0ed6076678807860f97a83e3b584cbc9db9145a503a3a",
+   "patterns/p06-rotate/c/kernel.h": "e993082c2d65a03abbfd89294ddd986c4f4607adb1032848ac4a570eeddc91ec",
+   "patterns/p06-rotate/c/kernel_hardened.c": "9bcf321d3aeb76128d2f4b0dcefdea88c0e5a6dc3527c9f4f61747378879a78e",
+   "patterns/p06-rotate/c/main.c": "2e63a96b7dfabd6f28f2e540b3057c8d7fc45f9c90428f69477dbc39f56283d1",
+   "patterns/p06-rotate/safe_naive.rs": "71baa85e8c4b6e6758bcb91c8a5e398f195e12790001de255672780e9ad79e12",
+   "patterns/p06-rotate/safe_tuned.rs": "61ade37283aa39912be28055b2a99613f7fa2a31397454a028340000b19aa173",
+   "patterns/p06-rotate/unsafe.rs": "b191fc8d09513ee68142f8f7d85a142d05113b724545c404eb76250e739800ba",
+   "patterns/p06-rotate/verus.rs": "7f006d38720ddbbddfdf6706ea468cec643bc964fbbea71029647cc126fd5bb1",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -1299,6 +1414,10 @@
    "patterns/p06-rotate/unsafe.rs": "b191fc8d09513ee68142f8f7d85a142d05113b724545c404eb76250e739800ba",
    "patterns/p06-rotate/verus.rs": "7f006d38720ddbbddfdf6706ea468cec643bc964fbbea71029647cc126fd5bb1",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p06-rotate/inputs/large.bin": "f76394ed311a727b6ad7887626e5d3815ff1ff88801183ec69eb0cf8c6887649",
+   "patterns/p06-rotate/inputs/small.bin": "54e7b41dc18b262b041d22c370e49d2c1e70179edb2b9f9267f33d01344407d9"
   },
   "large.bin": {
    "cells": {
@@ -1427,6 +1546,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -1556,7 +1676,22 @@
   }
  },
  "p07": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p07-binary-search/c/kernel.c": "0442f65e78a943d43bbb4025cacb8ac3cdb59cd93358d2b70f1b90e458acabdf",
+   "patterns/p07-binary-search/c/kernel.h": "c9fbc3a97360785b5c5bf0f39902de7790a27b77970190e1487c17a8798ea69c",
+   "patterns/p07-binary-search/c/kernel_hardened.c": "482afd02c19226166bee91842d1b6e7fc7c620f088f242f661f7333e797dcd68",
+   "patterns/p07-binary-search/c/main.c": "c91f1b099a6fc782b7ed3964224f203766e0e3a4b2f19e8be3ef608cc1d9719a",
+   "patterns/p07-binary-search/safe_naive.rs": "8f4f830a71715a8b60d6ba9c43895716c8d82481fe839def4d75b3bedc663b03",
+   "patterns/p07-binary-search/safe_tuned.rs": "8fb449181022196a22ff1e7123ce382618eb679a9cb5b002af2c7400c109ba97",
+   "patterns/p07-binary-search/unsafe.rs": "75afd26ac939c386629272fe9792472c7f065f05b9f1540415cc6ff69718de44",
+   "patterns/p07-binary-search/verus.rs": "65a717b1262a501741ca7aa51578ab72d842650a41c763d3f01dafc604690f9c",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -1593,6 +1728,10 @@
    "patterns/p07-binary-search/unsafe.rs": "75afd26ac939c386629272fe9792472c7f065f05b9f1540415cc6ff69718de44",
    "patterns/p07-binary-search/verus.rs": "65a717b1262a501741ca7aa51578ab72d842650a41c763d3f01dafc604690f9c",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p07-binary-search/inputs/large.bin": "a1107311b0c696e7191ccbeaae5df4dde6d4fdc1915f0c2f497ec01bd5202fc1",
+   "patterns/p07-binary-search/inputs/small.bin": "d8e705cf99c1c524f2fa68d818a5ce25e9fe71a3263b62aacaeb05f3335e9e45"
   },
   "large.bin": {
    "cells": {
@@ -1685,6 +1824,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -1778,7 +1918,22 @@
   }
  },
  "p08": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p08-overlap-move/c/kernel.c": "a1240809985bda7164c99d60aed2ca1efee4b1f8fc36afa0754fd0cbef202a8c",
+   "patterns/p08-overlap-move/c/kernel.h": "0849b814a8299dd729a16fdb195cb604cd6c795abc8d410ed80b0ecfd39f8302",
+   "patterns/p08-overlap-move/c/kernel_hardened.c": "11512d63c0ef067b06a1e9eb181f9a13cbc84561c785cc2e00c1f9caff0b767c",
+   "patterns/p08-overlap-move/c/main.c": "1c832f94f3e48fd5a722069cb4ea1d7fc251886417d8c5c0b7b6d6e886e01a26",
+   "patterns/p08-overlap-move/safe_naive.rs": "08afa4f9ecd706164a7d4103198d9f2b4df88785b16eee40f8d915c0bf143577",
+   "patterns/p08-overlap-move/safe_tuned.rs": "644b61f50ba17672461db5ed35ff22104a70314a579eba99ed385899c33ededc",
+   "patterns/p08-overlap-move/unsafe.rs": "69a6babbb2c886ff43a517f8dbba559e4336be347818803b5456b0a24206592f",
+   "patterns/p08-overlap-move/verus.rs": "44368f1124e857ae186dc500fa73e8813cb4af8da68ca1475b0cec078d30c6f5",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -1815,6 +1970,10 @@
    "patterns/p08-overlap-move/unsafe.rs": "69a6babbb2c886ff43a517f8dbba559e4336be347818803b5456b0a24206592f",
    "patterns/p08-overlap-move/verus.rs": "44368f1124e857ae186dc500fa73e8813cb4af8da68ca1475b0cec078d30c6f5",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p08-overlap-move/inputs/large.bin": "3f2341a4ca9569da34b9ba5bd08615dc117e1cc96bd78b208f63a9ebd7ad35c6",
+   "patterns/p08-overlap-move/inputs/small.bin": "e61a825ae1a90eee08649ddc8b8aa449010f2a87592cd7d6297d35e2b023054c"
   },
   "large.bin": {
    "cells": {
@@ -1979,6 +2138,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -2144,7 +2304,22 @@
   }
  },
  "p09": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p09-bitset/c/kernel.c": "962971116e73d2e3276ad23ce1fd9e02cc3fea40d19cef41b8ce49585789e913",
+   "patterns/p09-bitset/c/kernel.h": "a8dad60f84cecd1e7c599c5530f3fb933f1835af32522918db65af5dccb7a4f6",
+   "patterns/p09-bitset/c/kernel_hardened.c": "0b735e606354850d4977e52ec3a8dac22cd4216e4561b789f466131404771b5f",
+   "patterns/p09-bitset/c/main.c": "13a81c55d33fd2acd4e260d211b6f6f4778bb9698d313fcd29d497d2b9d5c55d",
+   "patterns/p09-bitset/safe_naive.rs": "b260fd51f4b7541aae8ceb34af32782e147096ee62d9252328eb5c6a32826584",
+   "patterns/p09-bitset/safe_tuned.rs": "0e1945f10e4289e34bac3a64d0eed05508b2783e7476962cc348f4c912238f68",
+   "patterns/p09-bitset/unsafe.rs": "416d57c0f8140fde01da09a8edb561ec670ccae8c7575cb8f3372ad8869b11e1",
+   "patterns/p09-bitset/verus.rs": "b6064d0a90bd2ed6e3d4a4a4bb3d04d7ee84869d0ede0616c652ae8b8f788c6e",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -2181,6 +2356,10 @@
    "patterns/p09-bitset/unsafe.rs": "416d57c0f8140fde01da09a8edb561ec670ccae8c7575cb8f3372ad8869b11e1",
    "patterns/p09-bitset/verus.rs": "b6064d0a90bd2ed6e3d4a4a4bb3d04d7ee84869d0ede0616c652ae8b8f788c6e",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p09-bitset/inputs/large.bin": "843697857479db12343562805f99b4dbd65e171f82335522dd3287b1ef19b216",
+   "patterns/p09-bitset/inputs/small.bin": "66db401fc767f0cb3d0ce780486849df6da7f8aa09b0f749cc904ce89af391e1"
   },
   "large.bin": {
    "cells": {
@@ -2285,6 +2464,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -2390,7 +2570,22 @@
   }
  },
  "p10": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p10-fir-stencil/c/kernel.c": "94827f68ea7c31d663c30b098563bcc3561e97e8139b1431ae2dfc3e28dfcf15",
+   "patterns/p10-fir-stencil/c/kernel.h": "d5ae31eab24b460ae100659ea6fd87034115bfd260d7048cd27de7dbcb4415eb",
+   "patterns/p10-fir-stencil/c/kernel_hardened.c": "cc90de9f7caceb6d75ba6e303ae316bf9cd292739a830fe19bf0c5b39a550a81",
+   "patterns/p10-fir-stencil/c/main.c": "6bd1325c165b985e62c4456969487abf8f0e08df7d31a2cf392dc0846a0daa21",
+   "patterns/p10-fir-stencil/safe_naive.rs": "ff50c0c15d00182ea9045c9f1ba55f8fecfd1828366cd13a8910d24be9fab6a4",
+   "patterns/p10-fir-stencil/safe_tuned.rs": "7cb93ea0ea4afea8779d5bcd2dc203a64f519621e2c1ca4339eab759a433d89d",
+   "patterns/p10-fir-stencil/unsafe.rs": "860d2bbc86d4661a6e4defbdc6442cdd9ec7c63c0bbf4d9184f8f85e681ca3b2",
+   "patterns/p10-fir-stencil/verus.rs": "f05c8516acff46c5c3b734e402c04a0a286698b2a3dbcb2359e227aa023f8fa9",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -2434,6 +2629,10 @@
    "patterns/p10-fir-stencil/unsafe.rs": "860d2bbc86d4661a6e4defbdc6442cdd9ec7c63c0bbf4d9184f8f85e681ca3b2",
    "patterns/p10-fir-stencil/verus.rs": "f05c8516acff46c5c3b734e402c04a0a286698b2a3dbcb2359e227aa023f8fa9",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p10-fir-stencil/inputs/large.bin": "31b3479ccf29775b799d2aa688bc4a2016a2e1b6cf29f5baee43232b04b826e8",
+   "patterns/p10-fir-stencil/inputs/small.bin": "269d43e859e2ffbc0b2d61672c583e45d871521dd6e81093f2f117fe4791e753"
   },
   "large.bin": {
    "cells": {
@@ -2526,6 +2725,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -2619,7 +2819,22 @@
   }
  },
  "p11": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p11-nul-scan/c/kernel.c": "e4f3f2d0c3dfc871e83d28ec822e4bda7c98aaa1566c018d5c79bb7e0f971f96",
+   "patterns/p11-nul-scan/c/kernel.h": "aa44dd53403a286c7fbd6dea582d1c48771b6d022469804be0c80d801edc9d89",
+   "patterns/p11-nul-scan/c/kernel_hardened.c": "f0bda03b36f3e8334a35c14ce6863435a10faf80eac73b8df629e3aa213b09f5",
+   "patterns/p11-nul-scan/c/main.c": "0896021efbca0fc3b5b40415c2ddb4da9a6db098fa640efd60b3a271854777cb",
+   "patterns/p11-nul-scan/safe_naive.rs": "3c053c7d80c10b40fee9029b14d6b352ebb1c7f01ad5d8045b7b7e122503e630",
+   "patterns/p11-nul-scan/safe_tuned.rs": "251657e52838beceab27ba38a049c51bfe189a2fabc00d6f347024b86f1d79ce",
+   "patterns/p11-nul-scan/unsafe.rs": "c6d2e114b65c01e6668e0a7120d4f78b186ba952e70f1db60427f369739829a6",
+   "patterns/p11-nul-scan/verus.rs": "291f34bd92c9140b7f30044a23aebc524bd123669ecd4040a66236d4d2b8b950",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -2656,6 +2871,10 @@
    "patterns/p11-nul-scan/unsafe.rs": "c6d2e114b65c01e6668e0a7120d4f78b186ba952e70f1db60427f369739829a6",
    "patterns/p11-nul-scan/verus.rs": "291f34bd92c9140b7f30044a23aebc524bd123669ecd4040a66236d4d2b8b950",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p11-nul-scan/inputs/large.bin": "054c9d418c61312a9f9beae5f9265e1f99cc14ed3271f299558ed3225a1c96e1",
+   "patterns/p11-nul-scan/inputs/small.bin": "629d091977da6b13729e3cd3b4bf2d9e11750debc2c2cd438ab13166990a1479"
   },
   "large.bin": {
    "cells": {
@@ -2784,6 +3003,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -2913,7 +3133,22 @@
   }
  },
  "p12": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p12-strcat-fixed/c/kernel.c": "8f40894e72413d7d4681498943d80839dd43e7ca7941edad6c055da29a630dbb",
+   "patterns/p12-strcat-fixed/c/kernel.h": "c15eafe202c635ef0dca883cdfb84891d2df9bdcf1bae606101aed4529f8b3bf",
+   "patterns/p12-strcat-fixed/c/kernel_hardened.c": "275164743c2b66eefd42b08864f2e8ae3acee0002a2169478c652c2344479726",
+   "patterns/p12-strcat-fixed/c/main.c": "0f9406cdf8ab0beb4ec5365a3060d00b8c23decbbd1ea6cb7946dfb1dc37b717",
+   "patterns/p12-strcat-fixed/safe_naive.rs": "8ee597f6587dc9fa85cbe2465214a5aa2eac85985cb85d86f595a133a9dfd002",
+   "patterns/p12-strcat-fixed/safe_tuned.rs": "0e2d6d822935209bf726ee672c9f993849b3193f595033de97400dd8c77bc8de",
+   "patterns/p12-strcat-fixed/unsafe.rs": "725789c9db6d777d5e715ebbe07942ce23e86508be03640c2c62e6b57590c6ce",
+   "patterns/p12-strcat-fixed/verus.rs": "9065a14588c3ffa1f8d4eaafcca464635003a298276ed9f1ad3252d8650fffa3",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -2953,6 +3188,10 @@
    "patterns/p12-strcat-fixed/unsafe.rs": "725789c9db6d777d5e715ebbe07942ce23e86508be03640c2c62e6b57590c6ce",
    "patterns/p12-strcat-fixed/verus.rs": "9065a14588c3ffa1f8d4eaafcca464635003a298276ed9f1ad3252d8650fffa3",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p12-strcat-fixed/inputs/large.bin": "22706e70a973267dd55b426847f2d281ad4e3b685d5d9919089b2c73a23dd54c",
+   "patterns/p12-strcat-fixed/inputs/small.bin": "87b630e3aa79e52cb66753c3cdd1bb41326d41769d002f39f35a2a8565d4a5af"
   },
   "large.bin": {
    "cells": {
@@ -3105,6 +3344,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -3258,7 +3498,22 @@
   }
  },
  "p13": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p13-strncpy-trunc/c/kernel.c": "fd76e9c128584f4d0779639b8ade864afc05417897ea066701e25b685c0a84c8",
+   "patterns/p13-strncpy-trunc/c/kernel.h": "f977e19494d16766d3c25648a5bc44747764fa7b43fdf61607bb774b00e56f1d",
+   "patterns/p13-strncpy-trunc/c/kernel_hardened.c": "ca4fe4d8ab8d2ab98f02701211cfb045c3d438797323023a74be4ed9e3060c90",
+   "patterns/p13-strncpy-trunc/c/main.c": "a79b73afd93a7a4945e930744bc65708ac5b363f196410df1067a7b624176662",
+   "patterns/p13-strncpy-trunc/safe_naive.rs": "ecb8597e5811a82a737ca4db3c7b372ab61033c4a1d70c9e863b4061ab9cd050",
+   "patterns/p13-strncpy-trunc/safe_tuned.rs": "fc8b720185403917122156d2f3276e532184fbeff5ad92e1a2fa990b30c5d5a5",
+   "patterns/p13-strncpy-trunc/unsafe.rs": "82dd14142a71573c506fcae7b8969d07e054cfb5309faa4652945c04975040a5",
+   "patterns/p13-strncpy-trunc/verus.rs": "c6d45ccc197838ec1874c134bf2c354e1038cc8fdc75c52524512a2e09938916",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -3300,6 +3555,10 @@
    "patterns/p13-strncpy-trunc/unsafe.rs": "82dd14142a71573c506fcae7b8969d07e054cfb5309faa4652945c04975040a5",
    "patterns/p13-strncpy-trunc/verus.rs": "c6d45ccc197838ec1874c134bf2c354e1038cc8fdc75c52524512a2e09938916",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p13-strncpy-trunc/inputs/large.bin": "a2ad032a380cb1486bc95d613a44808dc9a3a5c691805a44c5f0fa5059733231",
+   "patterns/p13-strncpy-trunc/inputs/small.bin": "3c3a532a061026490544514530dbec50ee54c7703df86fe64f7d991c8599c79d"
   },
   "large.bin": {
    "cells": {
@@ -3467,6 +3726,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -3635,7 +3895,22 @@
   }
  },
  "p14": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p14-field-split/c/kernel.c": "23fd96ea04fc8ba8ca982a6defc77e21799270bc1d69cea8bb7e021ca5ee5f02",
+   "patterns/p14-field-split/c/kernel.h": "7c65f5261facad4c62f9cd0e5cdc40435269335bcad3807f98ed1008decfefb0",
+   "patterns/p14-field-split/c/kernel_hardened.c": "b126bd0191624387784fdca88a59e24f487212c0c0da73da503aecf24f5b9a8f",
+   "patterns/p14-field-split/c/main.c": "fab95b323dbae4e85befdb59ee419cae08bcff9992ac4740903979fae33c0c7f",
+   "patterns/p14-field-split/safe_naive.rs": "e73298e9ee4bfe1f15dffb119c883c89575be9b7d6333db80e4aba94a8965277",
+   "patterns/p14-field-split/safe_tuned.rs": "26458aca0ed99e6d05335b95b8c6d4950a9002b8507893a4439bc77305b786ae",
+   "patterns/p14-field-split/unsafe.rs": "cce8ad50866def4e230c5dc20429d36a36a843fbcecaaeeee9cf58a046e0c3ae",
+   "patterns/p14-field-split/verus.rs": "d2af5de9c1af57d5da0b328f62385640d495c3d29c42c40e95083aa9098c6e66",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -3681,6 +3956,10 @@
    "patterns/p14-field-split/unsafe.rs": "cce8ad50866def4e230c5dc20429d36a36a843fbcecaaeeee9cf58a046e0c3ae",
    "patterns/p14-field-split/verus.rs": "d2af5de9c1af57d5da0b328f62385640d495c3d29c42c40e95083aa9098c6e66",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p14-field-split/inputs/large.bin": "800a09c4a29b466482e403165cb31fbf87b2d51555e25d4a985c1c88f96f56da",
+   "patterns/p14-field-split/inputs/small.bin": "147784491c81b92fa7b80f2972dcb1ebdd16abab27359bae7a2b579f2f0d36e3"
   },
   "large.bin": {
    "cells": {
@@ -3809,6 +4088,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -3938,7 +4218,22 @@
   }
  },
  "p16": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p16-tlv-walk/c/kernel.c": "a59fbef6d3427711a78b7806569978223367c6cba81bfcf1881e1ac83977aba0",
+   "patterns/p16-tlv-walk/c/kernel.h": "2cc7285986c387baed556449abb63ad25cc3409e27a081300a1ca5e2c84641aa",
+   "patterns/p16-tlv-walk/c/kernel_hardened.c": "a8a078fda62dae779146c3c32dd2dc53766b13e866222a2c9665e67efa39e470",
+   "patterns/p16-tlv-walk/c/main.c": "7bb5a45a3f0103b60a2dd27b8e45eb52ce0015fa31c813b1135d77fc444be6aa",
+   "patterns/p16-tlv-walk/safe_naive.rs": "3f58f658310c5615d0899d01e0907a68b5689673b79d856b6372dbf8cd149054",
+   "patterns/p16-tlv-walk/safe_tuned.rs": "6044ce0394896c3605e02178e84aa38b05d9c3bc4d31444cb52ab8674889d2fd",
+   "patterns/p16-tlv-walk/unsafe.rs": "ae04d5ee891f29376555b3ef60f99348bb3bfa080eb897f4520dd8bbbbf6f2a4",
+   "patterns/p16-tlv-walk/verus.rs": "58c6d06cd6f86430578f5e3120644324162e5822db489ace7cdbba191e79332e",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -3976,6 +4271,10 @@
    "patterns/p16-tlv-walk/unsafe.rs": "ae04d5ee891f29376555b3ef60f99348bb3bfa080eb897f4520dd8bbbbf6f2a4",
    "patterns/p16-tlv-walk/verus.rs": "58c6d06cd6f86430578f5e3120644324162e5822db489ace7cdbba191e79332e",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p16-tlv-walk/inputs/large.bin": "407e82fd06bec57240091bd6430232815cc70dcd09682c2f0e4ca88fd062d042",
+   "patterns/p16-tlv-walk/inputs/small.bin": "7545e98ed4434314ba90e132000e439953ccfa847d00ee519e7b722c840edd15"
   },
   "large.bin": {
    "cells": {
@@ -4068,6 +4367,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -4161,7 +4461,22 @@
   }
  },
  "p17": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p17-http-range/c/kernel.c": "7c4e302d420db1ef666a7218a884c611120811324629dc9cdc7884c0e0ad7db6",
+   "patterns/p17-http-range/c/kernel.h": "09bfe23afa37872032784e8d0afe473713fbac12cd8a6c28e5f8ffe6b8c85f05",
+   "patterns/p17-http-range/c/kernel_hardened.c": "603c7e13ba191725a6a15fbbd347b0c97319176d5a9607e1064c594ff41993b8",
+   "patterns/p17-http-range/c/main.c": "32788ae111359ab8ecfa90067376c208079c886b20f041e648573bacd907c478",
+   "patterns/p17-http-range/safe_naive.rs": "43fadb4c64f6f60e219ba8ce16bf27daa1085f6239d873a16bca7a7b5e20340b",
+   "patterns/p17-http-range/safe_tuned.rs": "4afff314daf7d1fdadfeb1fe661a13a07808da9dce560bece1798518fbbf0414",
+   "patterns/p17-http-range/unsafe.rs": "a119e3782f413cfdaa2e71fcf5fe572ed820d5db6daade7e06ea13cc2a415960",
+   "patterns/p17-http-range/verus.rs": "5a09e9d58df3639b5802a955e66fafd01e4b2b49cbff80ee0d82d4fa9ca6cc12",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -4197,6 +4512,10 @@
    "patterns/p17-http-range/unsafe.rs": "a119e3782f413cfdaa2e71fcf5fe572ed820d5db6daade7e06ea13cc2a415960",
    "patterns/p17-http-range/verus.rs": "5a09e9d58df3639b5802a955e66fafd01e4b2b49cbff80ee0d82d4fa9ca6cc12",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p17-http-range/inputs/large.bin": "7f2be4db442cd47ac78eaf60b88f6cb405be1567c40eb81e3cabd0bb57d210cf",
+   "patterns/p17-http-range/inputs/small.bin": "83102059e1f1ed473ff64b595634f07472800c09c13ef804b138652171dd0096"
   },
   "large.bin": {
    "cells": {
@@ -4289,6 +4608,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -4382,7 +4702,22 @@
   }
  },
  "p18": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p18-varint-shift/c/kernel.c": "0c7a4348ece77e33ea759bed5c194b673492e5a57e832e9fe793455332de2fb9",
+   "patterns/p18-varint-shift/c/kernel.h": "3d33b0217d5a9ded582ea48cc9995fae80f659c548bbff2aa8c530da4c6e74a9",
+   "patterns/p18-varint-shift/c/kernel_hardened.c": "e0b9b1c66a80b3e61707ea529b0c9c9586237d4fe7057d2ce857379609c387f5",
+   "patterns/p18-varint-shift/c/main.c": "c834d3e6b43c56b07901bdffd8104fd5e829ea0cae63bcfe65a1ac4434c7761d",
+   "patterns/p18-varint-shift/safe_naive.rs": "afce0114f361de09282a17a8686331020cf7b02a61415d504d417654118711b3",
+   "patterns/p18-varint-shift/safe_tuned.rs": "2a45369416b3038eea0e43270416440a9e1f8cb74957c86e375d742f603e4746",
+   "patterns/p18-varint-shift/unsafe.rs": "14b841461bbeca4e3d518e60b4d383e8c4f47c3fdd490efd2c5fcb9094c075b3",
+   "patterns/p18-varint-shift/verus.rs": "0764a7426b1256e304bf87bdc831953154db1e2b62d1eb66a37797f928b31198",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -4427,6 +4762,10 @@
    "patterns/p18-varint-shift/unsafe.rs": "14b841461bbeca4e3d518e60b4d383e8c4f47c3fdd490efd2c5fcb9094c075b3",
    "patterns/p18-varint-shift/verus.rs": "0764a7426b1256e304bf87bdc831953154db1e2b62d1eb66a37797f928b31198",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p18-varint-shift/inputs/large.bin": "f33b0eecb21dfaa3c5260cd588de47bced723969ee3a09c74ef969f0df8e550c",
+   "patterns/p18-varint-shift/inputs/small.bin": "54ca535ea6bd2fd848e4494a2279bed1035bd01045fb8e3f714b407e077c4a6e"
   },
   "large.bin": {
    "cells": {
@@ -4519,6 +4858,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -4612,7 +4952,22 @@
   }
  },
  "p19": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p19-state-machine/c/kernel.c": "5a775abadfaddb9bb6d28382f70b6cd5888fb3db4b2a2324e3f832aff1f99de2",
+   "patterns/p19-state-machine/c/kernel.h": "016092bdc98fcfab652e2959ebb13ccad9e1753833b507ef35f14e0825056fa7",
+   "patterns/p19-state-machine/c/kernel_hardened.c": "e32a529524836805b078e1c06f7c207ac76dfc6bdf4653a6f1aae9032a33388e",
+   "patterns/p19-state-machine/c/main.c": "0aa85eb983404e12ee36fcb1dfb2205f2b049534f0f196af44dbe13e5e64ac91",
+   "patterns/p19-state-machine/safe_naive.rs": "ea87c0745e4f374b749055fda4b2cb7a01054c95233972c9f4dc59e98ac0fb31",
+   "patterns/p19-state-machine/safe_tuned.rs": "83d940483ca6adf16ed025a99c3cd26f2354a6570edb799e26cce79d348467f7",
+   "patterns/p19-state-machine/unsafe.rs": "e32de8c9812c9c670adf0eb22fb181475ea83eae4477b0ce5e0c393d4b7f74a1",
+   "patterns/p19-state-machine/verus.rs": "2f859cf735e411a517a604fbffbc1bf807fa6f881afa05889d052a63da69154c",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -4648,6 +5003,10 @@
    "patterns/p19-state-machine/unsafe.rs": "e32de8c9812c9c670adf0eb22fb181475ea83eae4477b0ce5e0c393d4b7f74a1",
    "patterns/p19-state-machine/verus.rs": "2f859cf735e411a517a604fbffbc1bf807fa6f881afa05889d052a63da69154c",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p19-state-machine/inputs/large.bin": "1f45110ce16d3ce3a60f4d4b94bbb66257e195a3a042f5b11b7b1771b92894ff",
+   "patterns/p19-state-machine/inputs/small.bin": "1409bd0b820234842f1c5bcca827adf5f9fdc84ab9b3d466005e043819fce875"
   },
   "large.bin": {
    "cells": {
@@ -4740,6 +5099,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -4833,7 +5193,22 @@
   }
  },
  "p22": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p22-hash-probe/c/kernel.c": "f3ea8cc679f5c86d3c20289c009ae64a965366764394d052f37de79858202528",
+   "patterns/p22-hash-probe/c/kernel.h": "911260a439df516ab72d6283212e0ef86daa0ad8f0f5cc77fdb0d293a291c9d7",
+   "patterns/p22-hash-probe/c/kernel_hardened.c": "bcbfa36ce7acd64db13c330cc5ac1359461bd9d7ccef063f56aa0a5930546af7",
+   "patterns/p22-hash-probe/c/main.c": "4f2d43744047e3f210535a6f2140e8486d8bdfc31fdf6b9026c509377ef09834",
+   "patterns/p22-hash-probe/safe_naive.rs": "9c71760f4f876ee8faec963278f8a559a28575f149498cef17421cece55fcd45",
+   "patterns/p22-hash-probe/safe_tuned.rs": "f86d71efb9eea6251cf0d659909c845ba8608d2f74b6985ca788de3622e637b1",
+   "patterns/p22-hash-probe/unsafe.rs": "63a1e32ae8b7205c5cd06e373c716d4b5c07b3b15707db61cd342d690bf30671",
+   "patterns/p22-hash-probe/verus.rs": "22f3538929c4b2e8ebda09686b30395648b9f90f3eee985d32b06a0e0975a6fe",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -4874,6 +5249,10 @@
    "patterns/p22-hash-probe/unsafe.rs": "63a1e32ae8b7205c5cd06e373c716d4b5c07b3b15707db61cd342d690bf30671",
    "patterns/p22-hash-probe/verus.rs": "22f3538929c4b2e8ebda09686b30395648b9f90f3eee985d32b06a0e0975a6fe",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p22-hash-probe/inputs/large.bin": "e4561807381429afe8ee66ae08fec3dffde75d950cc54e2d34e7ba972dfa8c0b",
+   "patterns/p22-hash-probe/inputs/small.bin": "eab6cfc17c1ce130912215758c3967628741ca399f7ff99cc292b1d68ecafe95"
   },
   "large.bin": {
    "cells": {
@@ -4966,6 +5345,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -5059,7 +5439,22 @@
   }
  },
  "p23": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p23-partition/c/kernel.c": "1ffddd045414cfce27c58ebdb2e203bbb8a55287f928153735f6a3b1c9330fd8",
+   "patterns/p23-partition/c/kernel.h": "2d4cb8223d99cb552eea4cf82d220bb9248c8a22de1dd459e08d98b279618ef4",
+   "patterns/p23-partition/c/kernel_hardened.c": "f6177d752a71e0af8ffc6c47554d2fe4174e7ebdc16458e5341f6d09b9328ead",
+   "patterns/p23-partition/c/main.c": "5b6bc3bb8df0b07df3e31ef04b97a600c9dd4f1e70a877a417c0090302ab6d97",
+   "patterns/p23-partition/safe_naive.rs": "ae42dd20ed9beb37892a601dd44da3c1de8f238c84a0d1da433b6da795a6f240",
+   "patterns/p23-partition/safe_tuned.rs": "a1f8d7440effceed168509512db75bb07d5d3a8d1aa2a57d349ba32fc004caca",
+   "patterns/p23-partition/unsafe.rs": "b295e98714a8c0f5e590213773a3cd626d42f5e1da28754f51d2200aa4562e64",
+   "patterns/p23-partition/verus.rs": "dba011654ea2e35a3cd8ef55628fbec7963cad5d6256f52c13e6c96ced749182",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -5099,6 +5494,10 @@
    "patterns/p23-partition/unsafe.rs": "b295e98714a8c0f5e590213773a3cd626d42f5e1da28754f51d2200aa4562e64",
    "patterns/p23-partition/verus.rs": "dba011654ea2e35a3cd8ef55628fbec7963cad5d6256f52c13e6c96ced749182",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p23-partition/inputs/large.bin": "9a1ef8cd56d9d2b3e07acb00d712c3918cbe0461d4263ddc469238b38d77a4e8",
+   "patterns/p23-partition/inputs/small.bin": "01991fc1587ffb562c2cd816940ff88a0e25c14f217d25ffbce0b79429bc5237"
   },
   "large.bin": {
    "cells": {
@@ -5227,6 +5626,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -5356,7 +5756,22 @@
   }
  },
  "p25": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p25-realloc-growth/c/kernel.c": "f3c0be0f0ed65cf375eef01d07c34386b79ebd582c63338557234fa4fa73a845",
+   "patterns/p25-realloc-growth/c/kernel.h": "2c0e71f9b8d614628f17e70e6d990fcd8715682216858a2ae33fd4c83e24e611",
+   "patterns/p25-realloc-growth/c/kernel_hardened.c": "8c6f35e4f7f9b99228938b0ab7c27c5423f90428ba82a54f994e9e29753d3fdb",
+   "patterns/p25-realloc-growth/c/main.c": "1734d2d11d8bcce6b6b370a210eb62ccef8b8e9f0522907c12182c448f1b52b8",
+   "patterns/p25-realloc-growth/safe_naive.rs": "0c305588caea7d4b18d6e3ee9365d4ca14f58048da1024e090583b1c1fd496af",
+   "patterns/p25-realloc-growth/safe_tuned.rs": "6283ad390d0ed4f5716a21d5d40ca93487ff3dec4eff2f4cc2652b7303e5c474",
+   "patterns/p25-realloc-growth/unsafe.rs": "e94c6faaf632048a5a4a658ad5bbaa191ae6af1331bb665f66f2df172cd511f5",
+   "patterns/p25-realloc-growth/verus.rs": "438d464188fb7d841a7d182844e7c5109a69b08b8c6566bccf124d788a02ba26",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -5410,6 +5825,10 @@
    "patterns/p25-realloc-growth/unsafe.rs": "e94c6faaf632048a5a4a658ad5bbaa191ae6af1331bb665f66f2df172cd511f5",
    "patterns/p25-realloc-growth/verus.rs": "438d464188fb7d841a7d182844e7c5109a69b08b8c6566bccf124d788a02ba26",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p25-realloc-growth/inputs/large.bin": "aa336ea2ae0408cdcff98fdf9df800f829a64fcb4cf8b324c3d69a7f8ce0bb04",
+   "patterns/p25-realloc-growth/inputs/small.bin": "14f8cc670a83cbdb14a1637e42558d59f969524008fc1396e004535112355421"
   },
   "large.bin": {
    "cells": {
@@ -5580,6 +5999,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -5751,7 +6171,22 @@
   }
  },
  "p27": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p27-handle-table/c/kernel.c": "8e20a7f4e0fcdac61453e48552103d34a2301e4cb8b4d277c07354d8d672f2f3",
+   "patterns/p27-handle-table/c/kernel.h": "46e457d6f455f939104afa720118651226902d3ea8882032e6ff3fc0a237b956",
+   "patterns/p27-handle-table/c/kernel_hardened.c": "508059641e1157edda5fc853c45cf75be16d443429ef1342f7d469df7d194be2",
+   "patterns/p27-handle-table/c/main.c": "2533f37e9d7760ecc132cfda86c304bfebcb550e1fb8ccb2a2448b5b3ef56859",
+   "patterns/p27-handle-table/safe_naive.rs": "0b983901b13109fbe15dc9592bcaf972bdc703b9c1fc5a8d139952d39f7cd5b4",
+   "patterns/p27-handle-table/safe_tuned.rs": "d4ea2eb335ca894ddad20eade4c49baa04b0df20e8a6cc3e5cd8d2d2843fbf23",
+   "patterns/p27-handle-table/unsafe.rs": "638d9d71d32b885405bdb97891d7b64e3f8e2a162480daed4d11bd82a198ff18",
+   "patterns/p27-handle-table/verus.rs": "75fef39e60a30041e2883052213722b6bb7bba90a8a11f12ff5a3253ea2abd41",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -5796,6 +6231,10 @@
    "patterns/p27-handle-table/unsafe.rs": "638d9d71d32b885405bdb97891d7b64e3f8e2a162480daed4d11bd82a198ff18",
    "patterns/p27-handle-table/verus.rs": "75fef39e60a30041e2883052213722b6bb7bba90a8a11f12ff5a3253ea2abd41",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p27-handle-table/inputs/large.bin": "c9ddc729ef4b35e845d70def9076910d8f546fe4b850dac917ab3b39d8090aa7",
+   "patterns/p27-handle-table/inputs/small.bin": "9894c8cc12061d17c69da92c86f004f54eea6af39995381ce8b468b7d2668792"
   },
   "large.bin": {
    "cells": {
@@ -5984,6 +6423,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -6173,7 +6613,22 @@
   }
  },
  "p28": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p28-intrusive-lists/c/kernel.c": "6f905c2c31d6e31168d7d3fbdb1a6c087b13e5546ceec7e8e47a07e51b89ca18",
+   "patterns/p28-intrusive-lists/c/kernel.h": "ae1ef0c5eed49d52c686ab76187d7cb6e9957d9a3173a1d83b39e1345f679c6c",
+   "patterns/p28-intrusive-lists/c/kernel_hardened.c": "73bf0fccd1f8317ebacdfef3a77d9de606a6c916ad39a983503918752a625442",
+   "patterns/p28-intrusive-lists/c/main.c": "32ab741abdd4df78e9967826c13d4a0f54638d522473e46167b4e0f6d03be99e",
+   "patterns/p28-intrusive-lists/safe_naive.rs": "ab95af96f43ea77b46ad550003b7ee7ebd9401cb154405b90c4e22d4ab82831b",
+   "patterns/p28-intrusive-lists/safe_tuned.rs": "eb6be3f9fa2b799bbe84ff8ed16be46746b62f903ba684da40d3c38e2919db68",
+   "patterns/p28-intrusive-lists/unsafe.rs": "fdc46418c249998fd3bab106e6a1706df084c6c987821aeb3654e9a4a115df0f",
+   "patterns/p28-intrusive-lists/verus.rs": "231d586a3502c51e26d68360df2e14215328cc98fa45e221d992fb5ba9f6e271",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -6219,6 +6674,10 @@
    "patterns/p28-intrusive-lists/unsafe.rs": "fdc46418c249998fd3bab106e6a1706df084c6c987821aeb3654e9a4a115df0f",
    "patterns/p28-intrusive-lists/verus.rs": "231d586a3502c51e26d68360df2e14215328cc98fa45e221d992fb5ba9f6e271",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p28-intrusive-lists/inputs/large.bin": "7bf43ab4ac08bb5abe36ade63768883be9432427cd89d2467048f31ed6fae3b1",
+   "patterns/p28-intrusive-lists/inputs/small.bin": "3ec5dbb1be31b9ddfa7efe869eba89a63db69cfd84ee1f3760756561dc712468"
   },
   "large.bin": {
    "cells": {
@@ -6413,6 +6872,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -6608,7 +7068,22 @@
   }
  },
  "p29": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p29-bst-delete/c/kernel.c": "643952706b4565418260741178b49e89e7e7c6dd243e3bc0047c4154246cc7c3",
+   "patterns/p29-bst-delete/c/kernel.h": "c12a89f8c8e2655616b133fb3ec3c3edc355cf58373d4e0f993a8a73deacd7c5",
+   "patterns/p29-bst-delete/c/kernel_hardened.c": "9f61f5b340954c00d628fd25517c0611395d604e4e17ed9df726b4a683040d70",
+   "patterns/p29-bst-delete/c/main.c": "e49eaf71150a23a385a2047effd4fbdab8f5dc32f2582c60a22d2407941881ab",
+   "patterns/p29-bst-delete/safe_naive.rs": "61e9a417ca04af85152e7cc93ca9cd5e3d1ba17c17834bc2b0347c9ef4d7e54a",
+   "patterns/p29-bst-delete/safe_tuned.rs": "ea8364c761e949ed3704e1077a301a7b0017f26ee49e629f8dd6f1b6605ee235",
+   "patterns/p29-bst-delete/unsafe.rs": "3fb708192d174e52ea37267b5bfe2a850eecce8bc72aab87be70db0830a24378",
+   "patterns/p29-bst-delete/verus.rs": "35f3201b471d0075cb264c7b891fc79c26ab2d4ee1ed6f2f3dc162370f673100",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -6649,6 +7124,10 @@
    "patterns/p29-bst-delete/unsafe.rs": "3fb708192d174e52ea37267b5bfe2a850eecce8bc72aab87be70db0830a24378",
    "patterns/p29-bst-delete/verus.rs": "35f3201b471d0075cb264c7b891fc79c26ab2d4ee1ed6f2f3dc162370f673100",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p29-bst-delete/inputs/large.bin": "5a94c4efc3c6c0232d374b429c03a056d69c79fa6bd14a6b430297b858a5cc63",
+   "patterns/p29-bst-delete/inputs/small.bin": "0edcd9a83628aa76a622f90ec2b786249d8b38d7ab3a0d9092ff054c7aa525c2"
   },
   "large.bin": {
    "cells": {
@@ -6837,6 +7316,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -7020,7 +7500,22 @@
   }
  },
  "p32": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p32-free-list-pool/c/kernel.c": "9676b36aa28f42299add3275f7ff715aac699f6a1a2cd8fbb53ff15f5eec7e63",
+   "patterns/p32-free-list-pool/c/kernel.h": "65ed8d4d7fd00011e9a7ee8a95a44a75fa5ff0da308c211fdb7093e20d218f2c",
+   "patterns/p32-free-list-pool/c/kernel_hardened.c": "20be02f6225dfe7958fe03d2b69edc5fbdd76e8c8855cb2d1d18ab08932bcb15",
+   "patterns/p32-free-list-pool/c/main.c": "9b5259192ddba59a91fbf1b736c6c007726216ea35b60542a79a6f9c852b1911",
+   "patterns/p32-free-list-pool/safe_naive.rs": "ef5e81cdb73cf4da1cca47ca2d638feaa858b46d238d5be15699dcf7ce91c4bf",
+   "patterns/p32-free-list-pool/safe_tuned.rs": "31155074cf8b9d01f771fdd2b52c88247b6201104b6d8d8416f60713838bda21",
+   "patterns/p32-free-list-pool/unsafe.rs": "751723f8711ca10d42876d34d6d624aa072c68c39e7f65ef86f8b1c6bffb8823",
+   "patterns/p32-free-list-pool/verus.rs": "0ac30864cd7abc2993e627fec8a5747667da9e7d36400aef652801509825be49",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -7066,6 +7561,10 @@
    "patterns/p32-free-list-pool/unsafe.rs": "751723f8711ca10d42876d34d6d624aa072c68c39e7f65ef86f8b1c6bffb8823",
    "patterns/p32-free-list-pool/verus.rs": "0ac30864cd7abc2993e627fec8a5747667da9e7d36400aef652801509825be49",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p32-free-list-pool/inputs/large.bin": "d8b04750a5f815b1834829dcc864a9676ece8c3d0d6841a5ba1a0a0db963c43b",
+   "patterns/p32-free-list-pool/inputs/small.bin": "17a5d8d0a76182e75011c2a51656bb46201963e50f26c2e868e6638a222ff238"
   },
   "large.bin": {
    "cells": {
@@ -7158,6 +7657,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -7251,7 +7751,22 @@
   }
  },
  "p34": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p34-refcount-stack/c/kernel.c": "a5ba19f99a38748ffaafd63c14ba655bb39a9f6a824c3f300c565e497d8fe149",
+   "patterns/p34-refcount-stack/c/kernel.h": "b409000cb86567bee321a4e90b64d0e51568e8a3117a2b74ea73102fb6bf03ec",
+   "patterns/p34-refcount-stack/c/kernel_hardened.c": "1b5dc080e8cf04feb8df98775070699d7dbbdc4aba3bcc9e198e98b24b3de552",
+   "patterns/p34-refcount-stack/c/main.c": "5b11232bf1a757a0ae09447bb463225e675f5608908308ee2797fd83fb679579",
+   "patterns/p34-refcount-stack/safe_naive.rs": "9d0c7294edc97cedde3870808c121a65d4fc3fe89d6c06fb77920d2827955d36",
+   "patterns/p34-refcount-stack/safe_tuned.rs": "f5175d8b181a5d7f0cd0274f86b1d436bc0f2f0700c21875824d02c6a76df5fc",
+   "patterns/p34-refcount-stack/unsafe.rs": "529ffe1cd330016867c3a2a97e60fb7709233d0aea557e1c2e0cb2a1a19d4bb8",
+   "patterns/p34-refcount-stack/verus.rs": "c55ea504ab2f699c1480eab237cbe225c9dedb3ff90cf4d7a2dd12f16627bff7",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -7302,6 +7817,10 @@
    "patterns/p34-refcount-stack/unsafe.rs": "529ffe1cd330016867c3a2a97e60fb7709233d0aea557e1c2e0cb2a1a19d4bb8",
    "patterns/p34-refcount-stack/verus.rs": "c55ea504ab2f699c1480eab237cbe225c9dedb3ff90cf4d7a2dd12f16627bff7",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p34-refcount-stack/inputs/large.bin": "ceb6b75b699dd6036cd2a34e676f0fa4b28db374b7e9b4ede075f1913c55671b",
+   "patterns/p34-refcount-stack/inputs/small.bin": "243ab62af1d3f6d2844ec8a67753d5b6916f9b56d24fedccae3a6db20333a14e"
   },
   "large.bin": {
    "cells": {
@@ -7490,6 +8009,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -7679,7 +8199,22 @@
   }
  },
  "p35": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p35-tagged-union/c/kernel.c": "f7adfd4b97c62168003ec12d0b9efd5b2f30ac54b738448a1b4a710a9a0ff53c",
+   "patterns/p35-tagged-union/c/kernel.h": "7315c59d0988636ed2ef8e08c66d66380dfdd4f862b63928e9181303e8980374",
+   "patterns/p35-tagged-union/c/kernel_hardened.c": "aba0afcb6a9c00f2cd67f4b3ceafc58757bb11fcd6f542270cf329d58e4765b6",
+   "patterns/p35-tagged-union/c/main.c": "d49d2ecc36009b1896dcddf2425feb8f231fcac7ab915bbc53a160929b3f56e5",
+   "patterns/p35-tagged-union/safe_naive.rs": "93e6b0f21e442b14612d2defd98a2aed7c3d799280637ed319f7e0222df0fbe4",
+   "patterns/p35-tagged-union/safe_tuned.rs": "116471e4de1dabad191294ebe8becdd4f3b0458c47778b4725e4a839e7ea1f6e",
+   "patterns/p35-tagged-union/unsafe.rs": "aa25553f871e5656a6331bdc01b357661f1b6e742f8379f1e1ea313d9768aa4d",
+   "patterns/p35-tagged-union/verus.rs": "4fa51f4cb6873fbdb8295a2d0fd391821d4016fe36b18c5b715af9723808e8ae",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -7724,6 +8259,10 @@
    "patterns/p35-tagged-union/unsafe.rs": "aa25553f871e5656a6331bdc01b357661f1b6e742f8379f1e1ea313d9768aa4d",
    "patterns/p35-tagged-union/verus.rs": "4fa51f4cb6873fbdb8295a2d0fd391821d4016fe36b18c5b715af9723808e8ae",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p35-tagged-union/inputs/large.bin": "ec474b54efb756b407a3b9a3ea970b61605c8e40ef0fc552beb2943be5e895c6",
+   "patterns/p35-tagged-union/inputs/small.bin": "884f983cfbb417bc02ce651a96b97d7d547eb75b445bd13831cb62f30b64e7d9"
   },
   "large.bin": {
    "cells": {
@@ -7816,6 +8355,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -7909,7 +8449,22 @@
   }
  },
  "p36": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p36-vtable-dispatch/c/kernel.c": "7826367c087a6950c5d57eeb18c751f411ed43b38f6e3bf917a33b6854e827e1",
+   "patterns/p36-vtable-dispatch/c/kernel.h": "63533f4dcc74cdf1005466dd2f5b9e8bbe4371790b81c01c621bcda8c7d0b92d",
+   "patterns/p36-vtable-dispatch/c/kernel_hardened.c": "f2903ef64463bf54c3be3b1630f6d404594f14e1703781de41265183fcbfa28d",
+   "patterns/p36-vtable-dispatch/c/main.c": "c9e96b7ae706897c3947217172fef21e237efff5cbaf1d45314e14bc981772b3",
+   "patterns/p36-vtable-dispatch/safe_naive.rs": "b8aa807b5ed727a76be70324dcff4a1158ba566056d75aae02b1293fc9a7a120",
+   "patterns/p36-vtable-dispatch/safe_tuned.rs": "94e2328d86cdc15a53dc33dac1173778751905739d8a0533d4a3222079dcd5b6",
+   "patterns/p36-vtable-dispatch/unsafe.rs": "acd480931200640ec1b9dffb4cc70721dae3f0093ab941496c638d0c65c1d15f",
+   "patterns/p36-vtable-dispatch/verus.rs": "936a4a1b7d69480f14bdbaef7ee340ec0b15c7714feb006afba7b7f1e021dcf3",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -7953,6 +8508,10 @@
    "patterns/p36-vtable-dispatch/unsafe.rs": "acd480931200640ec1b9dffb4cc70721dae3f0093ab941496c638d0c65c1d15f",
    "patterns/p36-vtable-dispatch/verus.rs": "936a4a1b7d69480f14bdbaef7ee340ec0b15c7714feb006afba7b7f1e021dcf3",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p36-vtable-dispatch/inputs/large.bin": "0866028ffca0407d6ccac97b24f437da054b3470e1b71fef854f99509eee7de7",
+   "patterns/p36-vtable-dispatch/inputs/small.bin": "016fec7c6409fac8e8dda308555772792b78a6e0d4777792b9a86c56c60d5a47"
   },
   "large.bin": {
    "cells": {
@@ -8261,6 +8820,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -8570,7 +9130,22 @@
   }
  },
  "p38": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p38-alias-pun/c/kernel.c": "3e5f9f518672d7ff518a4eb93708b1539fa41ba5ef7160dcf8a0714b946e4e4f",
+   "patterns/p38-alias-pun/c/kernel.h": "0ff681bf67d48ee649480acb2181855176257e00f3f9409828ef89261decb205",
+   "patterns/p38-alias-pun/c/kernel_hardened.c": "dbfb9d24a522295f537e9b6833735cb19f8db2200c051aa24b7403201608dc07",
+   "patterns/p38-alias-pun/c/main.c": "5314a7830f81f25373048b0b018dd7c9629d78d50f5baeb021cdd71f8c16b4d2",
+   "patterns/p38-alias-pun/safe_naive.rs": "3e497d62b303969a13485bc2d523e2f2138b7f1d5c3ed6d31b08a8e34ca69e94",
+   "patterns/p38-alias-pun/safe_tuned.rs": "215e6787cfba29a3421b0b3fa6342df0691d554d36987d1935557dcb03c5f985",
+   "patterns/p38-alias-pun/unsafe.rs": "c3b55e6a478c154d6969ed6cc08b89299754f2a5cb855cb755518b08adc2c014",
+   "patterns/p38-alias-pun/verus.rs": "7c6cab70fd088de81840b63aee0e31949e412ef2a7dfc559c5e15da87face87d",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -8611,6 +9186,10 @@
    "patterns/p38-alias-pun/unsafe.rs": "c3b55e6a478c154d6969ed6cc08b89299754f2a5cb855cb755518b08adc2c014",
    "patterns/p38-alias-pun/verus.rs": "7c6cab70fd088de81840b63aee0e31949e412ef2a7dfc559c5e15da87face87d",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p38-alias-pun/inputs/large.bin": "d1d4dc46d1ba913864d64d740ca7fd75099a3980ae4b8a6cc626a742169931d3",
+   "patterns/p38-alias-pun/inputs/small.bin": "facf4f06f1316e1471e58fe3e6a47d6680d431b8af58bc6ac15c6e199242bbcb"
   },
   "large.bin": {
    "cells": {
@@ -8727,6 +9306,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -8844,7 +9424,22 @@
   }
  },
  "p42": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p42-goto-cleanup/c/kernel.c": "367876b34186e2643a1e8c44ee32acf81ee93437425d1fbfa826413a7ccec419",
+   "patterns/p42-goto-cleanup/c/kernel.h": "1f1d939e49eccf0cb0fd9a475d5cc22a8e846e9f5b2e8d80c173a1069ed7b1d5",
+   "patterns/p42-goto-cleanup/c/kernel_hardened.c": "b6dbcb4956d3b967ec7fa4758afac7be8f7f59b246ac047d282122444a748f44",
+   "patterns/p42-goto-cleanup/c/main.c": "606f0d60055a38bab258ebd0489c736ba5cfc7053ce3f4bf06ac6d9136a1fd28",
+   "patterns/p42-goto-cleanup/safe_naive.rs": "84bcbe5f70acae23e5c4c48299a543f34b457702741feb084de6834e6ee6a7bb",
+   "patterns/p42-goto-cleanup/safe_tuned.rs": "271504068d0a5565505276ba9cd7293209668d51670521c7dfe1fb745a54d825",
+   "patterns/p42-goto-cleanup/unsafe.rs": "a9c54d97913a952fe0e6ae4ea4aeccc113de993213c31f2ef6825ad51d30d72b",
+   "patterns/p42-goto-cleanup/verus.rs": "34169b79c9959156e8a5d7988a23906edb5dd052bb3bfc071fca642d8bcad031",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -8887,6 +9482,10 @@
    "patterns/p42-goto-cleanup/unsafe.rs": "a9c54d97913a952fe0e6ae4ea4aeccc113de993213c31f2ef6825ad51d30d72b",
    "patterns/p42-goto-cleanup/verus.rs": "34169b79c9959156e8a5d7988a23906edb5dd052bb3bfc071fca642d8bcad031",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p42-goto-cleanup/inputs/large.bin": "b78335c4971f2b1114298e5c6b82fae30659ecf4d1c27cf905cb12be956b3b44",
+   "patterns/p42-goto-cleanup/inputs/small.bin": "3c5c4cf74fd6d33c5bcd630af0b2459960f1ee67cd0ba8d96ba482a200216c90"
   },
   "large.bin": {
    "cells": {
@@ -9069,6 +9668,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -9252,7 +9852,22 @@
   }
  },
  "p46": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p46-bignum-mac/c/kernel.c": "b01228088e22b1f534c430bc2727e18c1c79f322ebc3d94acc820dc9654c2752",
+   "patterns/p46-bignum-mac/c/kernel.h": "97db20f661a4a2493757e3866b8ddb6900cc58dd531633ac57cbbc96abfa7dfc",
+   "patterns/p46-bignum-mac/c/kernel_hardened.c": "79e9c8758554c88fb21f24eb5eb6eab5cf83891d9a5a6ff3e74bbf6d96ddacc1",
+   "patterns/p46-bignum-mac/c/main.c": "7289d9637e558306c85f00bcbcd6635f9b2a8b52c561b4795d4331fb70021372",
+   "patterns/p46-bignum-mac/safe_naive.rs": "225c7a4889a0146f68a3fb32add0bd344b8bf7999548cb3a4bf0be93966887f5",
+   "patterns/p46-bignum-mac/safe_tuned.rs": "1c4025c3998a5af0e97fcd784c5617c4a4589a5fb9f9e6399e321b83bce3d0e4",
+   "patterns/p46-bignum-mac/unsafe.rs": "89f01036dcf21821c6a332824e085481e66d109e6ed4b5e9625609139a4bf62e",
+   "patterns/p46-bignum-mac/verus.rs": "fbe032d0b0e41efd755edcc44e5faaf9cbede5ce3391b90bb4bffe68a98e4d9d",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -9292,6 +9907,10 @@
    "patterns/p46-bignum-mac/unsafe.rs": "89f01036dcf21821c6a332824e085481e66d109e6ed4b5e9625609139a4bf62e",
    "patterns/p46-bignum-mac/verus.rs": "fbe032d0b0e41efd755edcc44e5faaf9cbede5ce3391b90bb4bffe68a98e4d9d",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p46-bignum-mac/inputs/large.bin": "cb8cc6c919cf396a2796f41aa54a21e4fe2662b1d59ef468959105b491debc25",
+   "patterns/p46-bignum-mac/inputs/small.bin": "8d5969e3e1d915ad8a764335de73b3147e75b2186befa13e96763dad382b1898"
   },
   "large.bin": {
    "cells": {
@@ -9432,6 +10051,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -9573,7 +10193,22 @@
   }
  },
  "p47": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p47-ct-compare/c/kernel.c": "9f671934377a348322ffa3fa8c7d6e7a3c368d420f25aba1bcc0afa6482c8d49",
+   "patterns/p47-ct-compare/c/kernel.h": "7252951224967e284ab402c6acb4b50c75e521ecf2936de638ab1013a8b01765",
+   "patterns/p47-ct-compare/c/kernel_hardened.c": "7bc11f3367f8a2aee8f5a18385380d1e3783c845ce5b9f7d04b264e02cd774bc",
+   "patterns/p47-ct-compare/c/main.c": "0e31a35914fc75adcb4e95e8673d5cf2a9583c2645261a30ad44d6047a578f5c",
+   "patterns/p47-ct-compare/safe_naive.rs": "502cea6bdabcadb2ba422ca9070ab183b019a4ce08a3aa9d225a1de255242271",
+   "patterns/p47-ct-compare/safe_tuned.rs": "15ca404fcf8696174b6e63d259e9facafbf1bc4ae06ed7d82d7b44904ac7d7ee",
+   "patterns/p47-ct-compare/unsafe.rs": "5287d6a438107033302321b66a3715b62b46da9e02cf6357e6ffc75c631cfec6",
+   "patterns/p47-ct-compare/verus.rs": "533e5c3405de055be30b0041149e5c8326f6492a812efc55a268e35fda6dc16c",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -9617,6 +10252,10 @@
    "patterns/p47-ct-compare/unsafe.rs": "5287d6a438107033302321b66a3715b62b46da9e02cf6357e6ffc75c631cfec6",
    "patterns/p47-ct-compare/verus.rs": "533e5c3405de055be30b0041149e5c8326f6492a812efc55a268e35fda6dc16c",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p47-ct-compare/inputs/large.bin": "764537cde2c729046282b2958ecac25a18ea4aa56808272afd511c9a379cd122",
+   "patterns/p47-ct-compare/inputs/small.bin": "c6fa25abdac0fbfabfcdc98ce380058f606288fc6ffa5a76f9ae8f837d2b422c"
   },
   "large.bin": {
    "cells": {
@@ -9730,6 +10369,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {
@@ -9844,7 +10484,22 @@
   }
  },
  "p49": {
-  "gate_source_sha256": {
+  "derived_from_sha256": {
+   "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+   "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+   "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+   "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+   "patterns/p49-interned-pool/c/kernel.c": "207aa0952b83ec749603559a256abdf5ee573d0b81ff3f917d1502aab167ae4f",
+   "patterns/p49-interned-pool/c/kernel.h": "35bdbc0098675fa47fc2a2a8fee3820bdd4390a2cb724f673b9e40876f8ce6d1",
+   "patterns/p49-interned-pool/c/kernel_hardened.c": "2c4bf39ef9f0ed75e16f63ee2cec7b268fca3f76f49c10376e7207f497af2e79",
+   "patterns/p49-interned-pool/c/main.c": "c49b42d558c766397e76d4bd0eebf31b6644ba3fa0bff2a9abc4f695411bc9d1",
+   "patterns/p49-interned-pool/safe_naive.rs": "c699a0d29f744a997485585001aef671c80bd2f06e6d14a22d061b689e6e6f07",
+   "patterns/p49-interned-pool/safe_tuned.rs": "1fcff77eaa9c149dbcffba5aab3638cc34cb45faecdfa87fbefb240673d1930a",
+   "patterns/p49-interned-pool/unsafe.rs": "ca5b9c62b745e83f1c2537680f03af82515004ed5f42ece7aebe9350974ece97",
+   "patterns/p49-interned-pool/verus.rs": "30ae5451e4b7960160b6cad5252337101f103038f72a26ecbf7d796837ca185c",
+   "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "gate_source_sha256_at_emit": {
    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -9894,6 +10549,10 @@
    "patterns/p49-interned-pool/unsafe.rs": "ca5b9c62b745e83f1c2537680f03af82515004ed5f42ece7aebe9350974ece97",
    "patterns/p49-interned-pool/verus.rs": "30ae5451e4b7960160b6cad5252337101f103038f72a26ecbf7d796837ca185c",
    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+   "patterns/p49-interned-pool/inputs/large.bin": "287738a889993b995417ef60e14a1c783f1b7e57414b3641265d9db7cb0895a9",
+   "patterns/p49-interned-pool/inputs/small.bin": "d1e50963912af8706a69410c1ac5108e235c0c73f9a6a71f735721ddad7c3e28"
   },
   "large.bin": {
    "cells": {
@@ -9986,6 +10645,7 @@
     }
    }
   },
+  "pin_note": "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS FILE'S OWN committed `gate_source_sha256` map, so the hashes are the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE TASK_166'S. `input_sha256` is TASK_170's reading of the blob, cross-checked against the measurement record's own `input_sha256` where that key exists.",
   "small.bin": {
    "cells": {
     "c-clang": {

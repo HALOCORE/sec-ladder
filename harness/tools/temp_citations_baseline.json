@@ -1,7 +1,7 @@
 {
  "_": "Known-dangling `.temp/` citations from COMMITTED files, on THIS BOX.",
  "generated_by": "harness/tools/temp_citations.py --update  (classification: .temp/t125/classify.py)",
- "policy": "TASK_121 §B / TASK_125: PROMOTE, DON'T PUBLISH. A `.temp/` path cited from a committed file should be promoted into the tree if a reader is meant to check it. `.tasks/*_REPORT.md` is exempt: a report is a dated record.",
+ "policy": "TASK_121 \u00a7B / TASK_125: PROMOTE, DON'T PUBLISH. A `.temp/` path cited from a committed file should be promoted into the tree if a reader is meant to check it. `.tasks/*_REPORT.md` is exempt: a report is a dated record.",
  "why_a_file_and_not_a_count": "A count is a cached derivation and this project has watched one rot three times (PROTOCOL rule 13). Each entry carries the `kind` and the `note` that make the citation honest, which is the half of the fix that would otherwise live in 43 files of prose.",
  "read_this_first": "57 of these 66 entries are NOT broken references: `destination` 25 (the citing script CREATES the path), `regenerable` 15 (constraint 6 working -- keep the generator, delete the artefact), `negative` 7 (the sentence says the path is wrong), `promoted` 4, `transient` 3, `quote`/`example`/`generated-record` 1 each. Only `lost` 9 are gone for good, and each of those notes says what the artefact showed and where the surviving evidence for it is. Counts as of TASK_125; re-derive with `harness/tools/temp_citations.py`, which prints the histogram.",
  "kinds": {
@@ -15,7 +15,7 @@
   "generated-record": "the string is inside a GENERATED artefact; not a citation",
   "lost": "gone and not regenerable; the note says what it showed"
  },
- "count": 101,
+ "count": 97,
  "entries": [
   {
    "file": "TOOLCHAIN.md",
@@ -71,7 +71,7 @@
    ],
    "path": ".temp/layout/layout_p01.json",
    "kind": "promoted",
-   "note": "the layout population. Step 1 of the same recipe (`common/layout/layout_gen.py`) rebuilds it, AND a committed copy of the artefact is in the tree at `common/layout/data/layout_p01.json` (TASK_032). ⚠ OWED-AND-COSTED: repointing the three `common/layout/*.py` usage lines costs a 26-pattern gate sweep, because `check.py`'s `srcs` globs `common/layout/*.py` into every pattern's `source_sha256`. Bundle it with the next edit to those files."
+   "note": "the layout population. Step 1 of the same recipe (`common/layout/layout_gen.py`) rebuilds it, AND a committed copy of the artefact is in the tree at `common/layout/data/layout_p01.json` (TASK_032). \u26a0 OWED-AND-COSTED: repointing the three `common/layout/*.py` usage lines costs a 26-pattern gate sweep, because `check.py`'s `srcs` globs `common/layout/*.py` into every pattern's `source_sha256`. Bundle it with the next edit to those files."
   },
   {
    "file": "common/layout/analyze.py",
@@ -80,7 +80,7 @@
    ],
    "path": ".temp/layout/layout_p01.json",
    "kind": "promoted",
-   "note": "the layout population. Step 1 of the same recipe (`common/layout/layout_gen.py`) rebuilds it, AND a committed copy of the artefact is in the tree at `common/layout/data/layout_p01.json` (TASK_032). ⚠ OWED-AND-COSTED: repointing the three `common/layout/*.py` usage lines costs a 26-pattern gate sweep, because `check.py`'s `srcs` globs `common/layout/*.py` into every pattern's `source_sha256`. Bundle it with the next edit to those files."
+   "note": "the layout population. Step 1 of the same recipe (`common/layout/layout_gen.py`) rebuilds it, AND a committed copy of the artefact is in the tree at `common/layout/data/layout_p01.json` (TASK_032). \u26a0 OWED-AND-COSTED: repointing the three `common/layout/*.py` usage lines costs a 26-pattern gate sweep, because `check.py`'s `srcs` globs `common/layout/*.py` into every pattern's `source_sha256`. Bundle it with the next edit to those files."
   },
   {
    "file": "common/layout/loopfit.py",
@@ -89,7 +89,7 @@
    ],
    "path": ".temp/layout/layout_p01.json",
    "kind": "promoted",
-   "note": "the layout population. Step 1 of the same recipe (`common/layout/layout_gen.py`) rebuilds it, AND a committed copy of the artefact is in the tree at `common/layout/data/layout_p01.json` (TASK_032). ⚠ OWED-AND-COSTED: repointing the three `common/layout/*.py` usage lines costs a 26-pattern gate sweep, because `check.py`'s `srcs` globs `common/layout/*.py` into every pattern's `source_sha256`. Bundle it with the next edit to those files."
+   "note": "the layout population. Step 1 of the same recipe (`common/layout/layout_gen.py`) rebuilds it, AND a committed copy of the artefact is in the tree at `common/layout/data/layout_p01.json` (TASK_032). \u26a0 OWED-AND-COSTED: repointing the three `common/layout/*.py` usage lines costs a 26-pattern gate sweep, because `check.py`'s `srcs` globs `common/layout/*.py` into every pattern's `source_sha256`. Bundle it with the next edit to those files."
   },
   {
    "file": "common/layout/q3_convergence.py",
@@ -98,12 +98,12 @@
    ],
    "path": ".temp/layout/layout_p01.json",
    "kind": "promoted",
-   "note": "the layout population. Step 1 of the same recipe (`common/layout/layout_gen.py`) rebuilds it, AND a committed copy of the artefact is in the tree at `common/layout/data/layout_p01.json` (TASK_032). ⚠ OWED-AND-COSTED: repointing the three `common/layout/*.py` usage lines costs a 26-pattern gate sweep, because `check.py`'s `srcs` globs `common/layout/*.py` into every pattern's `source_sha256`. Bundle it with the next edit to those files."
+   "note": "the layout population. Step 1 of the same recipe (`common/layout/layout_gen.py`) rebuilds it, AND a committed copy of the artefact is in the tree at `common/layout/data/layout_p01.json` (TASK_032). \u26a0 OWED-AND-COSTED: repointing the three `common/layout/*.py` usage lines costs a 26-pattern gate sweep, because `check.py`'s `srcs` globs `common/layout/*.py` into every pattern's `source_sha256`. Bundle it with the next edit to those files."
   },
   {
    "file": "harness/check.py",
    "lines": [
-    9538
+    10450
    ],
    "path": ".temp/check/probe-selftest",
    "kind": "destination",
@@ -112,7 +112,7 @@
   {
    "file": "harness/check.py",
    "lines": [
-    4685
+    5270
    ],
    "path": ".temp/r84/plant/ax_mod.rs",
    "kind": "quote",
@@ -134,7 +134,7 @@
    ],
    "path": ".temp/p19/v02/bin-r3_shipped-O3-isolated",
    "kind": "lost",
-   "note": "one of the two builds in §10b's table. The point of the row is that the SAME source in a DIFFERENT build directory gives 10210.84 vs 10210.82 Ir/call; the row records `md5_fn e207ec6c8697d244...` and `n_fn 95` for both, which is the identity evidence. The binary is gone."
+   "note": "one of the two builds in \u00a710b's table. The point of the row is that the SAME source in a DIFFERENT build directory gives 10210.84 vs 10210.82 Ir/call; the row records `md5_fn e207ec6c8697d244...` and `n_fn 95` for both, which is the identity evidence. The binary is gone."
   },
   {
    "file": "patterns/p05-index-flatten/NOTES.md",
@@ -362,7 +362,7 @@
    ],
    "path": ".temp/review018/in16/",
    "kind": "lost",
-   "note": "22 review inputs. ⚠ The sentence citing them SAYS they were not in the tree, and the paragraph continues that the `nrec` axis now ships and the laws were re-derived from committed blobs at TASK_020. Nothing published still rests on them."
+   "note": "22 review inputs. \u26a0 The sentence citing them SAYS they were not in the tree, and the paragraph continues that the `nrec` axis now ships and the laws were re-derived from committed blobs at TASK_020. Nothing published still rests on them."
   },
   {
    "file": "patterns/p16-tlv-walk/controls/gen_controls.py",
@@ -390,7 +390,7 @@
    ],
    "path": ".temp/p17/sweep/",
    "kind": "lost",
-   "note": "340 callgrind runs behind the one-iteration hold. The band ships and §10b supersedes the paragraph (the second citation is inside a struck-through sentence marked CLOSED at TASK_082)."
+   "note": "340 callgrind runs behind the one-iteration hold. The band ships and \u00a710b supersedes the paragraph (the second citation is inside a struck-through sentence marked CLOSED at TASK_082)."
   },
   {
    "file": "patterns/p17-http-range/NOTES.md",
@@ -863,16 +863,7 @@
    ],
    "path": ".temp/p47/a",
    "kind": "destination",
-   "note": "a `sha256sum ... > .temp/p47/a` / `sha256sum -c` pair in the docstring's determinism recipe. ⚠ This file is MEASUREMENT-HASHED (`measure.py::measurement_sources` globs `inputs/gen.py`), so it must not be edited for a documentation reason -- and it does not need to be."
-  },
-  {
-   "file": "patterns/p49-interned-pool/controls/detectors.py",
-   "lines": [
-    76
-   ],
-   "path": ".temp/p49ctl/detectors",
-   "kind": "destination",
-   "note": "the citing line is the assignment that CREATES this scratch directory when the control runs (`os.path.join(REPO, \".temp\", ...)`) -- an ASSEMBLED path. The control builds and runs its arms there and deletes the binaries on success; every arm SOURCE is committed under controls/, so nothing is lost when the directory is absent."
+   "note": "a `sha256sum ... > .temp/p47/a` / `sha256sum -c` pair in the docstring's determinism recipe. \u26a0 This file is MEASUREMENT-HASHED (`measure.py::measurement_sources` globs `inputs/gen.py`), so it must not be edited for a documentation reason -- and it does not need to be."
   },
   {
    "file": "patterns/p49-interned-pool/controls/proof_mutants.py",
@@ -893,33 +884,6 @@
    "note": "prose spelling of the same assembled path, in the docstring that states the mutants are written there and deleted on success. A QUOTE of the directory name, not a reference to evidence."
   },
   {
-   "file": "patterns/p49-interned-pool/controls/rust_bug.py",
-   "lines": [
-    58
-   ],
-   "path": ".temp/p49ctl/rust_bug",
-   "kind": "destination",
-   "note": "the citing line is the assignment that CREATES this scratch directory when the control runs (`os.path.join(REPO, \".temp\", ...)`) -- an ASSEMBLED path. The control builds and runs its arms there and deletes the binaries on success; every arm SOURCE is committed under controls/, so nothing is lost when the directory is absent."
-  },
-  {
-   "file": "patterns/p49-interned-pool/controls/safe_arms.py",
-   "lines": [
-    67
-   ],
-   "path": ".temp/p49ctl/safe_arms",
-   "kind": "destination",
-   "note": "the citing line is the assignment that CREATES this scratch directory when the control runs (`os.path.join(REPO, \".temp\", ...)`) -- an ASSEMBLED path. The control builds and runs its arms there and deletes the binaries on success; every arm SOURCE is committed under controls/, so nothing is lost when the directory is absent."
-  },
-  {
-   "file": "patterns/p49-interned-pool/controls/spellings.py",
-   "lines": [
-    74
-   ],
-   "path": ".temp/p49ctl/spellings",
-   "kind": "destination",
-   "note": "the citing line is the assignment that CREATES this scratch directory when the control runs (`os.path.join(REPO, \".temp\", ...)`) -- an ASSEMBLED path. The control builds and runs its arms there and deletes the binaries on success; every arm SOURCE is committed under controls/, so nothing is lost when the directory is absent."
-  },
-  {
    "file": "pilot/README.md",
    "lines": [
     90
@@ -931,13 +895,771 @@
   {
    "file": "results/gate/p42-goto-cleanup.json",
    "lines": [
-    2409,
-    2420,
-    2453
+    2437,
+    2448,
+    2481
    ],
    "path": ".temp/build/p42/c-gcc-asan+0xc477f",
    "kind": "generated-record",
    "note": "inside a LeakSanitizer diagnostic captured by the gate. `results/gate/*.json` is GENERATED by `harness/check.py`; the string is a sanitizer frame, not a citation, and hand-editing the record is forbidden."
   }
- ]
+ ],
+ "line_citations": [
+  {
+   "file": ".memory/02-bench-rules.md",
+   "lines": [
+    1266
+   ],
+   "citation": "dloop.py:361",
+   "as_written": "dloop.py:361",
+   "kind": "quotation",
+   "note": "same clean-negative sentence at `:1266`; the coordinate is the subject."
+  },
+  {
+   "file": ".memory/02-bench-rules.md",
+   "lines": [
+    35,
+    1265
+   ],
+   "citation": "measure.py:56",
+   "as_written": "measure.py:56",
+   "kind": "quotation",
+   "note": "the audit's CLEAN NEGATIVE names these coordinates in order to say they still resolve (`:1265`) -- the sentence's subject IS the coordinate. \u26a0 The other occurrence, `:35`, is a live citation of `CG_PLAN` and is owed a re-cite by function."
+  },
+  {
+   "file": ".memory/02-bench-rules.md",
+   "lines": [
+    1265
+   ],
+   "citation": "measure.py:64",
+   "as_written": "measure.py:64",
+   "kind": "quotation",
+   "note": "same clean-negative sentence at `:1265`; the coordinate is the subject."
+  },
+  {
+   "file": ".memory/03-measurement.md",
+   "lines": [
+    3220
+   ],
+   "citation": "check.py:2387",
+   "as_written": "check.py:2387",
+   "kind": "owed",
+   "note": "a LIVE citation and ROTTEN: `:2387` no longer holds the `sb(m.selfcheck)` call the sentence describes. Re-cite by function. Manager-owned."
+  },
+  {
+   "file": ".memory/03-measurement.md",
+   "lines": [
+    3449
+   ],
+   "citation": "check.py:2805",
+   "as_written": "check.py:2805",
+   "kind": "owed",
+   "note": "a LIVE citation and ROTTEN. Re-cite by function. Manager-owned."
+  },
+  {
+   "file": ".memory/03-measurement.md",
+   "lines": [
+    3394
+   ],
+   "citation": "check.py:3303",
+   "as_written": "check.py:3303",
+   "kind": "quotation",
+   "note": "*\"This sentence carried `check.py:3303` until TASK_164\"* -- the coordinate IS the finding. Spelling it without the colon deletes it."
+  },
+  {
+   "file": ".memory/03-measurement.md",
+   "lines": [
+    2040
+   ],
+   "citation": "measure.py:325",
+   "as_written": "measure.py:325-328",
+   "kind": "owed",
+   "note": "a live citation into `measure.py`'s staleness reporting; re-cite by function. Manager-owned."
+  },
+  {
+   "file": ".memory/03-measurement.md",
+   "lines": [
+    3230
+   ],
+   "citation": "measure.py:450",
+   "as_written": "measure.py:450",
+   "kind": "owed",
+   "note": "a live citation of the `provenance(pdir, indir)` call; re-cite by function. Manager-owned."
+  },
+  {
+   "file": ".memory/04-verus.md",
+   "lines": [
+    1251
+   ],
+   "citation": "dloop.py:361",
+   "as_written": "dloop.py:361",
+   "kind": "owed",
+   "note": "a live citation and it still RESOLVES (`if keep[-1] >= len(args):`), but it is a line and `dloop.py` can grow. Re-cite by function. Manager-owned."
+  },
+  {
+   "file": ".memory/06-catalogue.md",
+   "lines": [
+    842
+   ],
+   "citation": "check.py:1249",
+   "as_written": "check.py:1249",
+   "kind": "quotation",
+   "note": "*\"`check.py:1249` is not the checksum rule -- it is a selftest for...\"* -- the coordinate IS the subject of the correction."
+  },
+  {
+   "file": ".memory/06-catalogue.md",
+   "lines": [
+    414
+   ],
+   "citation": "check.py:3941",
+   "as_written": "check.py:3941",
+   "kind": "quotation",
+   "note": "the row says *\"MANAGER-VERIFIED AT `harness/check.py:3941` -- \u26a0 the line has since moved to `3972`; cite the predicate, not the number\"*. The sentence is ABOUT the coordinate's decay."
+  },
+  {
+   "file": ".memory/06-catalogue.md",
+   "lines": [
+    414
+   ],
+   "citation": "check.py:4178",
+   "as_written": "check.py:4178-4180",
+   "kind": "quotation",
+   "note": "same catalogue row, same sentence about the coordinate's decay."
+  },
+  {
+   "file": "RECAP.md",
+   "lines": [
+    6135,
+    7699
+   ],
+   "citation": "build.py:66",
+   "as_written": "build.py:66",
+   "kind": "quotation",
+   "note": "queue item 38 and its Owed twin quote this coordinate as an EXAMPLE of a rotten one. \u26a0 TASK_170 measured it: `build.py:66` is mis-aimed by an AUTHORING error at `18f7a28` (p18 quotes `ALL_OPTS`, the line holds `ALL_CELLS`), not by decay -- `build.py` has not moved."
+  },
+  {
+   "file": "RECAP.md",
+   "lines": [
+    4649
+   ],
+   "citation": "check.py:2387",
+   "as_written": "check.py:2387",
+   "kind": "owed",
+   "note": "a LIVE citation and ROTTEN -- it lands inside `forbidden_verdict`'s message, not on the `sb(...)` call the sentence describes. Manager-owned."
+  },
+  {
+   "file": "RECAP.md",
+   "lines": [
+    5458
+   ],
+   "citation": "check.py:2805",
+   "as_written": "check.py:2805",
+   "kind": "owed",
+   "note": "a LIVE citation and ROTTEN. Manager-owned."
+  },
+  {
+   "file": "RECAP.md",
+   "lines": [
+    5439,
+    7719
+   ],
+   "citation": "check.py:3303",
+   "as_written": "check.py:3303",
+   "kind": "quotation",
+   "note": "`:7719` quotes the coordinate as the subject of queue item 40. \u26a0 The OTHER occurrence, `:5439`, is a LIVE citation and is ROTTEN -- it lands on a census data line. Manager-owned."
+  },
+  {
+   "file": "RECAP.md",
+   "lines": [
+    3842,
+    5179
+   ],
+   "citation": "check.py:3941",
+   "as_written": "check.py:3941",
+   "kind": "quotation",
+   "note": "`:5179` quotes the `3941 \u2192 3972` decay as evidence. \u26a0 The other occurrence, `:3842`, is a LIVE citation and is ROTTEN. Manager-owned."
+  },
+  {
+   "file": "RECAP.md",
+   "lines": [
+    3823
+   ],
+   "citation": "check.py:4178",
+   "as_written": "check.py:4178-4180",
+   "kind": "owed",
+   "note": "a LIVE citation and ROTTEN -- `:4178-4180` now holds a `#[path]` comment, not the one allowed `external_body` body. Manager-owned."
+  },
+  {
+   "file": "RECAP.md",
+   "lines": [
+    3954,
+    6493
+   ],
+   "citation": "dloop.py:361",
+   "as_written": "dloop.py:361",
+   "kind": "owed",
+   "note": "live, and it still RESOLVES; re-cite by function anyway. Manager-owned."
+  },
+  {
+   "file": "RECAP.md",
+   "lines": [
+    7115
+   ],
+   "citation": "limbs.py:102",
+   "as_written": "limbs.py:102",
+   "kind": "owed",
+   "note": "a LIVE citation and ROTTEN: `:102` is a blank line and the `vparse.by_name` consumer the sentence names is at `:155`. Manager-owned."
+  },
+  {
+   "file": "RECAP.md",
+   "lines": [
+    6791
+   ],
+   "citation": "limbs.py:14",
+   "as_written": "limbs.py:14-19",
+   "kind": "owed",
+   "note": "live, and it still RESOLVES (*\"That coupling is deliberate\"* is at `:15`); re-cite by function anyway. Manager-owned."
+  },
+  {
+   "file": "RECAP.md",
+   "lines": [
+    6134,
+    7698
+   ],
+   "citation": "measure.py:238",
+   "as_written": "measure.py:238",
+   "kind": "quotation",
+   "note": "quoted by the same two RECAP sentences as an example of a rotten citation. \u26a0\u26a0 IT IS NOT ROTTEN: it resolves to `def matrix_inputs(indir):`, byte-identical since `05ec7da` (TASK_169 \u00a74a, re-confirmed TASK_170). RECAP's *\"TWO rotten\"* is ONE."
+  },
+  {
+   "file": "harness/check.py",
+   "lines": [
+    1300,
+    2662
+   ],
+   "citation": "build.py:150",
+   "as_written": "build.py:150",
+   "kind": "quotation",
+   "note": "`:1300` records that `CODEGEN_CFGS`' comment carried `build.py:150` until TASK_168 and is now a function name -- the coordinate is the subject. \u26a0 `:2662` is a separate arm literal (test data)."
+  },
+  {
+   "file": "harness/check.py",
+   "lines": [
+    960,
+    964
+   ],
+   "citation": "build.py:66",
+   "as_written": "build.py:66",
+   "kind": "quotation",
+   "note": "same stage comment; quoted as the one genuinely mis-aimed citation."
+  },
+  {
+   "file": "harness/check.py",
+   "lines": [
+    1370,
+    1371,
+    1372
+   ],
+   "citation": "check.py:1",
+   "as_written": "check.py:1",
+   "kind": "fixture",
+   "note": "the `checkNpy:1 / xcheck.py:1 / harness/check.py:1` arm. Test data."
+  },
+  {
+   "file": "harness/check.py",
+   "lines": [
+    999,
+    1000,
+    1004,
+    1351,
+    1352,
+    1356,
+    1358,
+    1359,
+    1362,
+    1363,
+    1379
+   ],
+   "citation": "check.py:1249",
+   "as_written": "check.py:1249",
+   "kind": "fixture",
+   "note": "stage `0c`'s own must-fire arm literals plus the comment that explains the range form. The string is TEST DATA -- `_CITE_VERDICT_CASES` drives `citation_verdict` on it and requires a FAIL."
+  },
+  {
+   "file": "harness/check.py",
+   "lines": [
+    942
+   ],
+   "citation": "check.py:8841",
+   "as_written": "check.py:8841",
+   "kind": "quotation",
+   "note": "the stage's own rationale: p35's `check.py:8841` was written AFTER the convention was recorded and was rotten ~16 tasks later. The coordinate is the argument for the stage existing."
+  },
+  {
+   "file": "harness/check.py",
+   "lines": [
+    960,
+    961
+   ],
+   "citation": "measure.py:238",
+   "as_written": "measure.py:238",
+   "kind": "quotation",
+   "note": "the stage comment quotes it while CORRECTING the claim that it is rotten. The coordinate is the subject."
+  },
+  {
+   "file": "harness/check.py",
+   "lines": [
+    1368,
+    1369
+   ],
+   "citation": "measure.py:64",
+   "as_written": "measure.py:64",
+   "kind": "fixture",
+   "note": "the *\"another harness module is SHOUTED, not failed\"* arm. Test data."
+  },
+  {
+   "file": "harness/tools/temp_citations.py",
+   "lines": [
+    550,
+    551
+   ],
+   "citation": "build.py:66",
+   "as_written": "build.py:66",
+   "kind": "fixture",
+   "note": "the same arm. Test data."
+  },
+  {
+   "file": "harness/tools/temp_citations.py",
+   "lines": [
+    555
+   ],
+   "citation": "check.py:1",
+   "as_written": "check.py:1",
+   "kind": "fixture",
+   "note": "the enumerate()-offset arm. Test data."
+  },
+  {
+   "file": "harness/tools/temp_citations.py",
+   "lines": [
+    142,
+    290,
+    333,
+    523,
+    525,
+    526,
+    527,
+    529,
+    530,
+    533,
+    534
+   ],
+   "citation": "check.py:1249",
+   "as_written": "check.py:1249\u20131278",
+   "kind": "fixture",
+   "note": "this file's own must-fire arms and the docstring that explains them. Test data. \u26a0 A checker that has to baseline its own prose is a checker nobody believes -- these are ARMS, and `check.py` carries the same."
+  },
+  {
+   "file": "harness/tools/temp_citations.py",
+   "lines": [
+    550,
+    552
+   ],
+   "citation": "measure.py:238",
+   "as_written": "measure.py:238",
+   "kind": "fixture",
+   "note": "the *\"EVERY harness module counts here\"* arm. Test data."
+  },
+  {
+   "file": "harness/tools/temp_citations.py",
+   "lines": [
+    537,
+    538
+   ],
+   "citation": "measure.py:64",
+   "as_written": "measure.py:64",
+   "kind": "fixture",
+   "note": "the path-prefix arm. Test data."
+  },
+  {
+   "file": "patterns/p12-strcat-fixed/README.md",
+   "lines": [
+    48
+   ],
+   "citation": "measure.py:64",
+   "as_written": "measure.py:64",
+   "kind": "owed",
+   "note": "a pattern doc/generator citing a harness module by line. Re-cite by FUNCTION when this pattern is next re-measured anyway: the site is in a `model.py` / `inputs/gen.py` / `spec.md` that `measure.py::measurement_sources` or the gate digest covers, so fixing it alone costs a re-measure or a re-gate (RECAP queue item 38). Stage 0c SHOUTS on it since TASK_170; it does not fail."
+  },
+  {
+   "file": "patterns/p14-field-split/NOTES.md",
+   "lines": [
+    623
+   ],
+   "citation": "measure.py:56",
+   "as_written": "measure.py:56-61",
+   "kind": "owed",
+   "note": "a pattern doc/generator citing a harness module by line. Re-cite by FUNCTION when this pattern is next re-measured anyway: the site is in a `model.py` / `inputs/gen.py` / `spec.md` that `measure.py::measurement_sources` or the gate digest covers, so fixing it alone costs a re-measure or a re-gate (RECAP queue item 38). Stage 0c SHOUTS on it since TASK_170; it does not fail."
+  },
+  {
+   "file": "patterns/p18-varint-shift/NOTES.md",
+   "lines": [
+    762
+   ],
+   "citation": "build.py:26",
+   "as_written": "build.py:26-28",
+   "kind": "owed",
+   "note": "a pattern doc/generator citing a harness module by line. Re-cite by FUNCTION when this pattern is next re-measured anyway: the site is in a `model.py` / `inputs/gen.py` / `spec.md` that `measure.py::measurement_sources` or the gate digest covers, so fixing it alone costs a re-measure or a re-gate (RECAP queue item 38). Stage 0c SHOUTS on it since TASK_170; it does not fail."
+  },
+  {
+   "file": "patterns/p18-varint-shift/NOTES.md",
+   "lines": [
+    758
+   ],
+   "citation": "build.py:66",
+   "as_written": "build.py:66",
+   "kind": "owed",
+   "note": "a pattern doc/generator citing a harness module by line. Re-cite by FUNCTION when this pattern is next re-measured anyway: the site is in a `model.py` / `inputs/gen.py` / `spec.md` that `measure.py::measurement_sources` or the gate digest covers, so fixing it alone costs a re-measure or a re-gate (RECAP queue item 38). Stage 0c SHOUTS on it since TASK_170; it does not fail."
+  },
+  {
+   "file": "patterns/p19-state-machine/inputs/gen.py",
+   "lines": [
+    38
+   ],
+   "citation": "measure.py:64",
+   "as_written": "measure.py:64",
+   "kind": "owed",
+   "note": "a pattern doc/generator citing a harness module by line. Re-cite by FUNCTION when this pattern is next re-measured anyway: the site is in a `model.py` / `inputs/gen.py` / `spec.md` that `measure.py::measurement_sources` or the gate digest covers, so fixing it alone costs a re-measure or a re-gate (RECAP queue item 38). Stage 0c SHOUTS on it since TASK_170; it does not fail."
+  },
+  {
+   "file": "patterns/p22-hash-probe/inputs/gen.py",
+   "lines": [
+    33
+   ],
+   "citation": "measure.py:64",
+   "as_written": "measure.py:64",
+   "kind": "owed",
+   "note": "a pattern doc/generator citing a harness module by line. Re-cite by FUNCTION when this pattern is next re-measured anyway: the site is in a `model.py` / `inputs/gen.py` / `spec.md` that `measure.py::measurement_sources` or the gate digest covers, so fixing it alone costs a re-measure or a re-gate (RECAP queue item 38). Stage 0c SHOUTS on it since TASK_170; it does not fail."
+  },
+  {
+   "file": "patterns/p27-handle-table/NOTES.md",
+   "lines": [
+    1040
+   ],
+   "citation": "build.py:67",
+   "as_written": "build.py:67",
+   "kind": "owed",
+   "note": "a pattern doc/generator citing a harness module by line. Re-cite by FUNCTION when this pattern is next re-measured anyway: the site is in a `model.py` / `inputs/gen.py` / `spec.md` that `measure.py::measurement_sources` or the gate digest covers, so fixing it alone costs a re-measure or a re-gate (RECAP queue item 38). Stage 0c SHOUTS on it since TASK_170; it does not fail."
+  },
+  {
+   "file": "patterns/p27-handle-table/NOTES.md",
+   "lines": [
+    342
+   ],
+   "citation": "dloop.py:361",
+   "as_written": "dloop.py:361",
+   "kind": "owed",
+   "note": "a pattern doc/generator citing a harness module by line. Re-cite by FUNCTION when this pattern is next re-measured anyway: the site is in a `model.py` / `inputs/gen.py` / `spec.md` that `measure.py::measurement_sources` or the gate digest covers, so fixing it alone costs a re-measure or a re-gate (RECAP queue item 38). Stage 0c SHOUTS on it since TASK_170; it does not fail."
+  },
+  {
+   "file": "patterns/p27-handle-table/NOTES.md",
+   "lines": [
+    1747
+   ],
+   "citation": "measure.py:225",
+   "as_written": "measure.py:225-262",
+   "kind": "owed",
+   "note": "a pattern doc/generator citing a harness module by line. Re-cite by FUNCTION when this pattern is next re-measured anyway: the site is in a `model.py` / `inputs/gen.py` / `spec.md` that `measure.py::measurement_sources` or the gate digest covers, so fixing it alone costs a re-measure or a re-gate (RECAP queue item 38). Stage 0c SHOUTS on it since TASK_170; it does not fail."
+  },
+  {
+   "file": "patterns/p27-handle-table/NOTES.md",
+   "lines": [
+    605
+   ],
+   "citation": "measure.py:238",
+   "as_written": "measure.py:238",
+   "kind": "owed",
+   "note": "a pattern doc/generator citing a harness module by line. Re-cite by FUNCTION when this pattern is next re-measured anyway: the site is in a `model.py` / `inputs/gen.py` / `spec.md` that `measure.py::measurement_sources` or the gate digest covers, so fixing it alone costs a re-measure or a re-gate (RECAP queue item 38). Stage 0c SHOUTS on it since TASK_170; it does not fail."
+  },
+  {
+   "file": "patterns/p27-handle-table/controls/mkspec.py",
+   "lines": [
+    361
+   ],
+   "citation": "dloop.py:361",
+   "as_written": "dloop.py:361",
+   "kind": "owed",
+   "note": "a pattern doc/generator citing a harness module by line. Re-cite by FUNCTION when this pattern is next re-measured anyway: the site is in a `model.py` / `inputs/gen.py` / `spec.md` that `measure.py::measurement_sources` or the gate digest covers, so fixing it alone costs a re-measure or a re-gate (RECAP queue item 38). Stage 0c SHOUTS on it since TASK_170; it does not fail."
+  },
+  {
+   "file": "patterns/p27-handle-table/spec.md",
+   "lines": [
+    24
+   ],
+   "citation": "dloop.py:361",
+   "as_written": "dloop.py:361",
+   "kind": "owed",
+   "note": "a pattern doc/generator citing a harness module by line. Re-cite by FUNCTION when this pattern is next re-measured anyway: the site is in a `model.py` / `inputs/gen.py` / `spec.md` that `measure.py::measurement_sources` or the gate digest covers, so fixing it alone costs a re-measure or a re-gate (RECAP queue item 38). Stage 0c SHOUTS on it since TASK_170; it does not fail."
+  },
+  {
+   "file": "patterns/p36-vtable-dispatch/inputs/gen.py",
+   "lines": [
+    25
+   ],
+   "citation": "measure.py:64",
+   "as_written": "measure.py:64",
+   "kind": "owed",
+   "note": "a pattern doc/generator citing a harness module by line. Re-cite by FUNCTION when this pattern is next re-measured anyway: the site is in a `model.py` / `inputs/gen.py` / `spec.md` that `measure.py::measurement_sources` or the gate digest covers, so fixing it alone costs a re-measure or a re-gate (RECAP queue item 38). Stage 0c SHOUTS on it since TASK_170; it does not fail."
+  },
+  {
+   "file": "results/gate/p12-strcat-fixed.json",
+   "lines": [
+    136,
+    1931
+   ],
+   "citation": "measure.py:64",
+   "as_written": "measure.py:64",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/gate/p14-field-split.json",
+   "lines": [
+    189,
+    1950
+   ],
+   "citation": "measure.py:56",
+   "as_written": "measure.py:56-61",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/gate/p18-varint-shift.json",
+   "lines": [
+    122,
+    1671
+   ],
+   "citation": "build.py:26",
+   "as_written": "build.py:26-28",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/gate/p18-varint-shift.json",
+   "lines": [
+    115,
+    1671
+   ],
+   "citation": "build.py:66",
+   "as_written": "build.py:66",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/gate/p19-state-machine.json",
+   "lines": [
+    146,
+    1653
+   ],
+   "citation": "measure.py:64",
+   "as_written": "measure.py:64",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/gate/p22-hash-probe.json",
+   "lines": [
+    140,
+    1777
+   ],
+   "citation": "measure.py:64",
+   "as_written": "measure.py:64",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/gate/p27-handle-table.json",
+   "lines": [
+    347,
+    2202
+   ],
+   "citation": "build.py:67",
+   "as_written": "build.py:67",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/gate/p27-handle-table.json",
+   "lines": [
+    333,
+    361,
+    368,
+    2202
+   ],
+   "citation": "dloop.py:361",
+   "as_written": "dloop.py:361",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/gate/p27-handle-table.json",
+   "lines": [
+    354,
+    2202
+   ],
+   "citation": "measure.py:225",
+   "as_written": "measure.py:225-262",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/gate/p27-handle-table.json",
+   "lines": [
+    340,
+    2202
+   ],
+   "citation": "measure.py:238",
+   "as_written": "measure.py:238",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/gate/p36-vtable-dispatch.json",
+   "lines": [
+    122,
+    1506
+   ],
+   "citation": "measure.py:64",
+   "as_written": "measure.py:64",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/tables/p12-strcat-fixed.md",
+   "lines": [
+    98
+   ],
+   "citation": "measure.py:64",
+   "as_written": "measure.py:64",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/tables/p14-field-split.md",
+   "lines": [
+    121
+   ],
+   "citation": "measure.py:56",
+   "as_written": "measure.py:56-61",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/tables/p18-varint-shift.md",
+   "lines": [
+    97
+   ],
+   "citation": "build.py:26",
+   "as_written": "build.py:26-28",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/tables/p18-varint-shift.md",
+   "lines": [
+    97
+   ],
+   "citation": "build.py:66",
+   "as_written": "build.py:66",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/tables/p19-state-machine.md",
+   "lines": [
+    85
+   ],
+   "citation": "measure.py:64",
+   "as_written": "measure.py:64",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/tables/p22-hash-probe.md",
+   "lines": [
+    106
+   ],
+   "citation": "measure.py:64",
+   "as_written": "measure.py:64",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/tables/p27-handle-table.md",
+   "lines": [
+    133
+   ],
+   "citation": "build.py:67",
+   "as_written": "build.py:67",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/tables/p27-handle-table.md",
+   "lines": [
+    133
+   ],
+   "citation": "dloop.py:361",
+   "as_written": "dloop.py:361",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/tables/p27-handle-table.md",
+   "lines": [
+    133
+   ],
+   "citation": "measure.py:225",
+   "as_written": "measure.py:225-262",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/tables/p27-handle-table.md",
+   "lines": [
+    133
+   ],
+   "citation": "measure.py:238",
+   "as_written": "measure.py:238",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "results/tables/p36-vtable-dispatch.md",
+   "lines": [
+    95
+   ],
+   "citation": "measure.py:64",
+   "as_written": "measure.py:64",
+   "kind": "generated-record",
+   "note": "inside a GENERATED artefact -- this is stage `0c`'s own `doc-citation-other` shout, re-emitted by `check.py` into the record and by `report.py::shout_section` into the table. **Do not edit the artefact**: the fix site is the citing pattern file, which is in this baseline separately with kind `owed`."
+  },
+  {
+   "file": "synthesis/synthesize.py",
+   "lines": [
+    937
+   ],
+   "citation": "check.py:3303",
+   "as_written": "check.py:3303",
+   "kind": "quotation",
+   "note": "the TASK_170 note recording that this generator emitted a rotten `check.py:3303` into a PUBLISHED artefact, and that the repair had been applied to `.memory/`'s copy of the sentence only. The coordinate IS the finding; removing it invites the next agent to put the number back."
+  }
+ ],
+ "line_citation_count": 70,
+ "line_citation_kinds": {
+  "quotation": "the sentence's SUBJECT is the coordinate -- it quotes a rotted citation as evidence; removing the colon deletes the finding",
+  "fixture": "a literal inside a checker's own must-fire arm; the string is test DATA",
+  "generated-record": "the citation is inside a GENERATED artefact; the `note` names the real fix site (the generator, or the file the generator read)",
+  "owed": "a real citation owed a re-cite BY FUNCTION whose repair is priced elsewhere; the `note` names the target function and the cost"
+ },
+ "line_citation_kinds_note": "TASK_170 item A. A kind is MANDATORY: `--update` writes an empty one and the check FAILS on it, so the escape hatch cannot be used silently. Keyed on (citing file, coordinate) -- never on the citing LINE number, which is the very rot this check is about."
 }

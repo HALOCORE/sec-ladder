@@ -185,7 +185,8 @@
         "file": "patterns/p14-field-split/NOTES.md",
         "line": 623,
         "module": "measure.py",
-        "cited_line": 56
+        "cited_line": 56,
+        "as_written": "measure.py:56-61"
       }
     ],
     "harness_modules": [
@@ -227,7 +228,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "741c6d2ea110a225962e6c4dd451c1368d22edde521a54fee629cbb032d69cb2",
+    "harness/check.py": "ae040b91af8bca292923a3eb3cd446b7f307c86e1ad000f02989a2a57bf76d66",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
@@ -329,9 +330,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3269,
+    "bytes": 3267,
     "nvars": 48,
-    "envp_stack_bytes": 3653,
+    "envp_stack_bytes": 3651,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -1614,7 +1615,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7f10402000a0 with insufficient space for an object ",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7f3b82c000a0 with insufficient space for an object ",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1625,7 +1626,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7fcc8ae000a0 with insufficient space for an object ",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7f5d968000a0 with insufficient space for an object ",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1636,7 +1637,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7fc7b2e000a0 with insufficient space for an object ",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7f20c2a000a0 with insufficient space for an object ",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1647,7 +1648,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7f9e59a000a0 with insufficient space for an object ",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:19: runtime error: index 16 out of bounds for type 'size_t [16]' /home/apt/repos_common/sec-ladder/patterns/p14-field-split/c/kernel.c:87:24: runtime error: store to address 0x7f19908000a0 with insufficient space for an object ",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1841,7 +1842,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.1,
+        "seconds": 0.2,
         "stdout": "15299648",
         "model_stdout": "15299648",
         "stderr": ""
@@ -1865,7 +1866,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.1,
+        "seconds": 0.2,
         "stdout": "14078533561653437184",
         "model_stdout": "14078533561653437184",
         "stderr": ""
@@ -1931,20 +1932,23 @@
   "table_render": {
     "table": "results/tables/p14-field-split.md",
     "renders_to": "results/tables/p14-field-split.md",
-    "render_sha256": "d790a2ab97bdd7d2f4af4c416759e65bb8e96da6e13ecfbac5344c8927721bd6",
-    "published_sha256": "d790a2ab97bdd7d2f4af4c416759e65bb8e96da6e13ecfbac5344c8927721bd6",
+    "render_sha256": "e4629caaf6d02ee3448fd8151b190e3859b92e8dac5fb57a2d1e3d4ec664a178",
+    "published_sha256": "e4629caaf6d02ee3448fd8151b190e3859b92e8dac5fb57a2d1e3d4ec664a178",
     "verdict": "FRESH"
   },
   "controls_json": {},
   "failures": [],
   "notes": [
-    "1 line citation(s) into other harness modules, reported not failed (promoting them costs a re-measure where the file is measurement-hashed): patterns/p14-field-split/NOTES.md:623 -> measure.py:56",
     "adversarial-alt33.bin/c-clang: opt/mode variants of this rung disagree (3 distinct behaviours)",
     "adversarial-full65.bin/c-clang: opt/mode variants of this rung disagree (3 distinct behaviours)",
     "adversarial-many.bin/c-clang: opt/mode variants of this rung disagree (3 distinct behaviours)",
     "adversarial-run17.bin/c-clang: opt/mode variants of this rung disagree (2 distinct behaviours)"
   ],
   "loud": [
+    {
+      "section": "doc-citation-other",
+      "message": "1 line citation(s) into harness modules other than `check.py`. NOT failed: these sit in measurement-hashed files, so re-citing them by function costs a re-measure (RECAP queue item 38). Cite the FUNCTION when one of these files is next re-measured anyway: patterns/p14-field-split/NOTES.md:623 -> measure.py:56-61"
+    },
     {
       "section": "tcb-unsafe",
       "message": "verus.rs:403 `tl_set_unchecked`'s `requires` constrains nothing about ['x'], which its trusted body uses. spec.md justifies it: `x` is a pure VALUE parameter: it is stored into the array and is never used as an address, an index or a length, so there is no precondition a caller could usefully be asked for -- every `usize` is a legal thing to store in a `usize` slot. The two parameters that DO decide whether the unchecked store is defined, `v` and `i`, are both constrained by `i < old(v)@.len()`, which for a `&mut [usize; 16]` reads `i < 16`. This is the parameter-coverage false positive `.memory/04-verus.md` names; p03 was the first pattern to exercise it, p12 the second, p06 the third and p14 the fourth, and on p14 the item is the one the whole pattern is about -- it is called once per field and its `requires` is what excludes R1's out-of-bounds store. A second conjunct `old(v)@.len() == 16` is deliberately NOT written: for a `&mut [usize; 16]` it is a TAUTOLOGY discharged from the parameter type alone by vstd's `array_len_matches_n`, and p03's gate run refused exactly that draft (p03 NOTES.md 5b)."

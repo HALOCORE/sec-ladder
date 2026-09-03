@@ -22,9 +22,79 @@ Its soundness as an oracle was established with two purpose-built probes
 from two call sites plus transitively sums to exactly
 `callgrind_annotate --inclusive=yes`, counted once.
 
-⚠ **It carries no staleness pin**, unlike `synthesis/licence.json`, and
-re-emitting costs 352 callgrind runs against a fully built `.temp/build/`.
-That is the reason it calibrates rather than publishes.
+## THE STALENESS PIN, AND ⚠⚠ THIS PARAGRAPH USED TO SAY THERE WAS NONE
+
+It said *"⚠ **It carries no staleness pin**, unlike `synthesis/licence.json`"*,
+and that has been **false since TASK_107 §F** added one -- `PROTOCOL` rule 13's
+header rot, in the file's own opening. Corrected at TASK_170.
+
+Re-emitting costs 352 callgrind runs against a fully built `.temp/build/`, which
+is the reason it calibrates rather than publishes -- and the reason the pin has
+to be RIGHT, because a sidecar nobody will re-emit is a sidecar whose false
+STALE just gets ignored.
+
+⚠⚠⚠ **AND THE PIN TASK_107 ADDED WAS THE WRONG KEY, MEASURED.** It carried the
+**gate** `source_sha256`, which covers `harness/check.py`, `harness/vparse.py`,
+every `patterns/*/*.md`, `model.py`, `inputs/gen.py` and `common/layout/*` --
+none of which this file reads and none of which can move a callgrind number of an
+already-built binary. One `check.py` docstring edit therefore staled **all 33
+entries, falsely** (`TASK_168` P3). Stage 9b's own docstring argues against the
+key in terms: *"a pin whose STALE does not mean 'the numbers are wrong' is a pin
+that gets switched off."*
+
+⚠⚠ **RECAP queue item 37's proposed replacement -- `measure.py::
+measurement_sources` -- IS NOT THE REPAIR EITHER, and it was measured twice**
+(`TASK_169` §5e, re-derived at `TASK_170` item D, `.temp/t170/pin_probe.py`):
+it still reports **4 of 33 STALE** (`p12 p13 p16 p38`), because it globs
+`model.py` and `inputs/gen.py` and those four had comment-only edits at
+TASK_168. A pin that turns 33 false STALEs into 4 false STALEs is an improvement
+and not a fix.
+
+✅ **WHAT THIS FILE PINS NOW (`--repin`, TASK_170): the BUILD DETERMINANTS, and
+nothing else.** Measured over the same evidence: **0 of 33 stale.**
+
+    patterns/<pat>/*.rs        the four rung sources
+    patterns/<pat>/c/*         kernel.c / kernel.h / kernel_hardened.c / main.c
+    common/driver.{c,h,rs}     linked into every cell
+    harness/build.py           the flags
+    verus_run.py               builds the R5 cell
+    + patterns/<pat>/inputs/{small,large}.bin   the blob, hashed directly
+    + n_iters, which is the per-call DIVISOR
+
+⚠ `common/slb.py` is deliberately **excluded** although `measurement_sources`
+globs it: it is a Python reader/writer that is compiled into nothing. It reaches
+this sidecar only through the blob's CONTENT, and the blob is pinned directly --
+so including it would reintroduce exactly the false-STALE class the whole repair
+is about. Same for `harness/asm.py` and `harness/measure.py`: this file imports
+neither (only `harness/build.py`), and the one thing `measure.py` supplies is
+`n_iters`, which is pinned as a VALUE.
+
+⚠ **The pin is over SOURCES as a proxy for the BINARY.** What callgrind actually
+saw is `.temp/build/<pat>/<cell>-O3-isolated`, which is gitignored; the source
+set above is what `build.py` rebuilds it from. That is the same proxy every
+measurement record uses and it has the same limit: a binary rebuilt with a
+different toolchain from identical sources is not detected here.
+
+⚠⚠ **HOW `--repin` AVOIDS A RE-EMIT, AND WHY THE VALUES ARE STILL HONEST.**
+The old `gate_source_sha256` is not one hash -- it is the whole
+`path -> sha256` MAP the gate recorded, so **the emit-time hash of every build
+determinant is already committed inside this file.** `--repin` therefore
+*filters that map*; it does not read the working tree for the values at all. So
+the new `derived_from_sha256` is provably the emit-time content, `TASK_166`'s,
+with no callgrind run and no `git` archaeology. The old map is kept, renamed
+`gate_source_sha256_at_emit`, as provenance that is no longer COMPARED -- a key
+that looks like a pin and is not checked is a trap.
+
+⚠ **The one thing `--repin` cannot verify retroactively is the BLOB**, because
+the gate map does not cover gitignored files. It pins today's hashes and
+cross-checks them against each measurement record's own `input_sha256`, which
+predates this sidecar. **MEASURED at TASK_170: 56 of 66 blobs retro-verified,
+0 mismatched.** The other 10 are the two blobs each of **`p02 p05 p07 p11
+p17`, whose measurement records carry no `input_sha256` at all** -- they were
+emitted before TASK_035's provenance block, and `measure.py --check-stale`
+cannot date them either while still printing `0 STALE`. **So for those five the
+blob pin starts at TASK_170 and is not retro-verified.** That is a KNOWN
+residual, named here rather than papered over.
 
 It is NOT in `harness/`: `check.py` hashes `harness/*.py` into all 22 gate
 records and `measure.py` is hashed into all 22 MEASUREMENT records, so putting
@@ -96,6 +166,7 @@ neither, and `synthesize.py` does not read them.  Re-emit to populate.
 """
 import argparse
 import glob
+import hashlib
 import json
 import os
 import re
@@ -225,6 +296,174 @@ def _gate_source_sha256(pat):
     return None
 
 
+# ==========================================================================
+# THE PIN (TASK_170 item D).  See the module docstring for WHY these files and
+# not `measure.py::measurement_sources`.
+# ==========================================================================
+
+#: Shared build inputs, by exact relative path.  ⚠ `common/slb.py`,
+#: `harness/asm.py` and `harness/measure.py` are deliberately ABSENT although
+#: `measurement_sources` globs all three -- see the docstring.
+SHARED_DETERMINANTS = frozenset({
+    "common/driver.c", "common/driver.h", "common/driver.rs",
+    "harness/build.py", "verus_run.py",
+})
+
+
+def is_build_determinant(rel, pat_dirname):
+    """Can this committed path change a number `outward_ir.py` records?
+
+    Pure function of the path, so the must-fire arm can exercise the DECISION
+    (`--selftest`) and not just its callers."""
+    prefix = f"patterns/{pat_dirname}/"
+    if rel.startswith(prefix):
+        tail = rel[len(prefix):]
+        # a rung source at the top level, or anything under `c/`
+        return (tail.endswith(".rs") and "/" not in tail) or tail.startswith("c/")
+    return rel in SHARED_DETERMINANTS
+
+
+_PIN_CASES = [
+    ("a rung source IS a determinant",
+     is_build_determinant("patterns/p12-x/unsafe.rs", "p12-x"), True),
+    ("the C kernel IS",
+     is_build_determinant("patterns/p12-x/c/kernel.c", "p12-x"), True),
+    ("a hardened C kernel IS (it is a measured cell)",
+     is_build_determinant("patterns/p12-x/c/kernel_hardened.c", "p12-x"), True),
+    ("the shared driver IS",
+     is_build_determinant("common/driver.rs", "p12-x"), True),
+    ("build.py IS -- it decides the flags",
+     is_build_determinant("harness/build.py", "p12-x"), True),
+    ("verus_run.py IS -- it builds the R5 cell",
+     is_build_determinant("verus_run.py", "p12-x"), True),
+    ("⚠ model.py is NOT -- this is the 4-of-33 case item 37 got wrong",
+     is_build_determinant("patterns/p12-x/model.py", "p12-x"), False),
+    ("⚠ inputs/gen.py is NOT -- the BLOB is pinned instead",
+     is_build_determinant("patterns/p12-x/inputs/gen.py", "p12-x"), False),
+    ("⚠ check.py is NOT -- this is the 33-of-33 case",
+     is_build_determinant("harness/check.py", "p12-x"), False),
+    ("⚠ vparse.py is NOT",
+     is_build_determinant("harness/vparse.py", "p12-x"), False),
+    ("⚠ a pattern doc is NOT",
+     is_build_determinant("patterns/p12-x/NOTES.md", "p12-x"), False),
+    ("⚠ a controls/ probe is NOT",
+     is_build_determinant("patterns/p12-x/controls/pads.py", "p12-x"), False),
+    ("⚠ common/slb.py is NOT -- it is compiled into nothing",
+     is_build_determinant("common/slb.py", "p12-x"), False),
+    ("⚠ asm.py is NOT -- this file never imports it",
+     is_build_determinant("harness/asm.py", "p12-x"), False),
+    ("⚠ ANOTHER pattern's rung source is NOT",
+     is_build_determinant("patterns/p13-y/unsafe.rs", "p12-x"), False),
+    ("a `.rs` in a SUBDIRECTORY is not a rung source",
+     is_build_determinant("patterns/p12-x/controls/v.rs", "p12-x"), False),
+]
+
+
+def pin_selftest():
+    bad = 0
+    for label, got, want in _PIN_CASES:
+        ok = got == want
+        bad += not ok
+        print(f"  {'ok  ' if ok else 'FAIL'}  {label}")
+        if not ok:
+            print(f"          got {got!r} want {want!r}")
+    print(f"\noutward_ir.py --selftest: {'FAIL' if bad else 'OK'}  "
+          f"({len(_PIN_CASES)} arms, {bad} failing)")
+    return 1 if bad else 0
+
+
+def blob_sha256(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def repin(path):
+    """Rewrite ONLY the pin keys of an existing sidecar. No callgrind, no build.
+
+    ⚠⚠ IT MUST NOT TOUCH A SINGLE MEASURED VALUE, and it asserts that: the
+    per-input subtrees are compared before and after and the run aborts if any
+    moved. `PROTOCOL` rule 6's artefact-vs-generator lesson cuts both ways --
+    a re-pinner that quietly re-rounded a number would be undetectable."""
+    with open(path) as fh:
+        doc = json.load(fh)
+    before = {p: {k: v for k, v in d.items() if k.endswith(".bin")}
+              for p, d in doc.items() if isinstance(d, dict)}
+
+    pats = sorted(p for p in doc if isinstance(doc[p], dict))
+    n_pinned = n_blob = 0
+    verified, unverified, mismatched = [], [], []
+    for pat in pats:
+        d = doc[pat]
+        gate = d.pop("gate_source_sha256", None) or \
+            d.get("gate_source_sha256_at_emit") or {}
+        # keep the old map as PROVENANCE under a name nothing compares
+        d["gate_source_sha256_at_emit"] = gate
+        try:
+            pdirname = os.path.basename(pattern_dir(pat))
+        except KeyError:
+            continue
+        # ⚠ the values come from the sidecar's OWN committed map, never from
+        # the working tree -- that is what makes them emit-time values.
+        d["derived_from_sha256"] = {
+            rel: h for rel, h in sorted(gate.items())
+            if is_build_determinant(rel, pdirname)}
+        n_pinned += len(d["derived_from_sha256"])
+
+        # the blob: today's hash, cross-checked against the measurement
+        # record's own `input_sha256`, which predates this sidecar.
+        rec = record_for(pat) or {}
+        recin = rec.get("input_sha256") or {}
+        blobs = {}
+        for inp in ("small.bin", "large.bin"):
+            rel = os.path.join("patterns", pdirname, "inputs", inp)
+            ap = os.path.join(REPO, rel)
+            if not os.path.exists(ap):
+                continue
+            h = blob_sha256(ap)
+            blobs[rel] = h
+            n_blob += 1
+            if rel in recin:
+                (verified if recin[rel] == h else mismatched).append(rel)
+            else:
+                unverified.append(rel)
+        d["input_sha256"] = blobs
+        d["pin_note"] = (
+            "TASK_170 item D. `derived_from_sha256` is FILTERED FROM THIS "
+            "FILE'S OWN committed `gate_source_sha256` map, so the hashes are "
+            "the EMIT-TIME ones (TASK_166, commit 6f5674f) and no callgrind "
+            "run was needed. The MEASURED VALUES BELOW ARE UNCHANGED AND ARE "
+            "TASK_166'S. `input_sha256` is TASK_170's reading of the blob, "
+            "cross-checked against the measurement record's own "
+            "`input_sha256` where that key exists.")
+
+    after = {p: {k: v for k, v in d.items() if k.endswith(".bin")}
+             for p, d in doc.items() if isinstance(d, dict)}
+    assert before == after, "REPIN MOVED A MEASURED VALUE -- refusing to write"
+
+    with open(path, "w") as fh:
+        json.dump(doc, fh, indent=1, sort_keys=True)
+        fh.write("\n")
+    print(f"{os.path.relpath(path, REPO)}: re-pinned {len(pats)} patterns")
+    print(f"  derived_from_sha256 : {n_pinned} entries "
+          f"({n_pinned // max(len(pats), 1)} per pattern)")
+    print(f"  input_sha256        : {n_blob} blobs  "
+          f"({len(verified)} retro-verified against a measurement record, "
+          f"{len(unverified)} not (record predates TASK_035), "
+          f"{len(mismatched)} MISMATCHED)")
+    if unverified:
+        print("  ⚠ blob pin NOT retro-verified for: "
+              + " ".join(sorted({r.split('/')[1] for r in unverified})))
+    if mismatched:
+        print("  ⚠⚠ MISMATCHED (a blob moved since its own measurement "
+              "record): " + " ".join(mismatched))
+    print("  measured values compared before/after: IDENTICAL "
+          "(asserted, not inspected)")
+    return 1 if mismatched else 0
+
+
 def run_pattern(pat, inp, opt="O3", mode="isolated", cells=None, echo=True):
     rec = record_for(pat)
     if rec is None:
@@ -263,8 +502,17 @@ def main():
     ap.add_argument("--opt", default="O3")
     ap.add_argument("--mode", default="isolated")
     ap.add_argument("--emit", metavar="PATH")
+    ap.add_argument("--repin", metavar="PATH",
+                    help="rewrite ONLY the pin keys of an existing sidecar "
+                         "(no callgrind, no build); see the module docstring")
+    ap.add_argument("--selftest", action="store_true",
+                    help="the must-fire arms for `is_build_determinant`")
     a = ap.parse_args()
 
+    if a.selftest:
+        return pin_selftest()
+    if a.repin:
+        return repin(a.repin)
     if not a.emit:
         run_pattern(a.pattern, a.input, a.opt, a.mode)
         return
@@ -321,7 +569,18 @@ def main():
             doc[pat][inp] = {"n_iters": n, "cells": cells, "pairs": pairs}
     json.dump(doc, open(a.emit, "w"), indent=1, sort_keys=True)
     print(f"wrote {a.emit}: {len(doc)} patterns")
+    # ⚠⚠ ARTEFACT-vs-GENERATOR SKEW, and this is the file `PROTOCOL` rule 6's
+    # warning is about: TASK_170 re-pinned the committed sidecar with `--repin`,
+    # and an `--emit` that wrote only `gate_source_sha256` would SILENTLY REVERT
+    # that on the next re-emit. So the emit path calls the SAME re-pinner --
+    # one code path decides what the pin is, and there is no second copy of the
+    # determinant list to rot.
+    rc = repin(a.emit)
+    print("(pin written by the same `repin()` the `--repin` flag calls)")
+    return rc
 
 
 if __name__ == "__main__":
-    main()
+    # ⚠ `sys.exit(...)`, not a bare call: `--repin` and `--selftest` return a
+    # STATUS, and a script whose exit code is always 0 cannot be checked.
+    sys.exit(main() or 0)

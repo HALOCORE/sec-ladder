@@ -64,6 +64,7 @@ native one by construction and is compared against a native run of the SAME
 reduced input, never against the shipped one.
 """
 
+import collections
 import hashlib
 import json
 import os
@@ -92,6 +93,41 @@ MIRI_ITERS = 4
 NAMES = ("small.bin", "adversarial-dbl-confusion.bin",
          "adversarial-exhaust.bin", "adversarial-ptr-confusion.bin",
          "adversarial-ptr-deep.bin")
+
+#: The two inputs that reach the LOUD harm.
+PTR_NAMES = ("adversarial-ptr-confusion.bin", "adversarial-ptr-deep.bin")
+
+SIGSEGV, SIGBUS = -11, -7
+
+#: ⚠⚠ THE UNSAFE ARM'S SIGNAL IS A DRAW, NOT A CONSTANT (TASK_170 items H /
+#: RECAP queue items 39 and 41; measured at TASK_168).
+#:
+#: This control RECORDED `unsafe_reproduces_c` for these two inputs and NEVER
+#: ASSERTED it -- `.memory/03-measurement.md` entry 19's family: a control that
+#: records a claim it does not check. Meanwhile FIVE documents, one of them a
+#: `contract_sha256`-hashed `why`, asserted a single `rc=-11` *"exactly as
+#: c/kernel.c does"*, and the committed sidecar said `rc=-7,
+#: unsafe_reproduces_c: false` on one of them. That contradiction shipped.
+#:
+#: ⚠ **THE HONEST FIX IS NOT TO RE-ROLL FOR THE PUBLISHED DRAW.** It is to
+#: measure the distribution and assert what is actually invariant. Both signals
+#: mean the same thing about the ROW -- the wrong-variant read produces an
+#: out-of-bounds `get_unchecked` whose address is unmapped -- and WHICH one the
+#: kernel delivers depends on where the faulting address lands relative to the
+#: mapping, which ASLR re-rolls per process. C is deterministic here because
+#: its wild pointer is an attacker-derived INTEGER and lands in the same place
+#: every run; the Rust arm's is an arena-relative OFFSET, which is the
+#: disclosed `*p` -> `arena[o]` substitution `../spec.md` documents. **So the
+#: stochasticity is a consequence of the substitution, not noise.**
+#:
+#: ⚠ **THE STATED TOLERANCE.** Asserted per draw: the arm dies on a SIGNAL, and
+#: the signal is one of the two. Asserted over the draws: the SIGSEGV share
+#: clears `SIGSEGV_FLOOR`. The floor is 0.50 against a measured ~0.93 -- loose
+#: on purpose, because this control must fail on *"the arm stopped crashing"*
+#: and must NOT fail on a different machine's ASLR landing the other way more
+#: often. A tight band would be a re-roll dressed as an assertion.
+SIGNAL_DRAWS = 40
+SIGSEGV_FLOOR = 0.50
 
 
 
@@ -250,6 +286,59 @@ def main():
                             f"contradicts this control's own claim that the "
                             f"LOUD harm does not survive into Rust")
 
+    # ---- the SIGNAL is a DRAW, and it is now ASSERTED (TASK_170 item H) -----
+    # ⚠ The single-draw rows above are LEFT AS THEY FELL: `unsafe_arm.rc` is one
+    # sample and this block is what says so. Re-running until it read -11 would
+    # be the dishonest fix (RECAP item 39: *"the engineer kept the honest draw
+    # rather than re-rolling for the published one, and that is the right
+    # call"*).
+    draws = {}
+    for n in PTR_NAMES:
+        arg = os.path.join(INPUTS, n)
+        cs, us = collections.Counter(), collections.Counter()
+        for _ in range(SIGNAL_DRAWS):
+            cs[run(cbin, arg)["rc"]] += 1
+            us[run(ubin, arg)["rc"]] += 1
+        share = us[SIGSEGV] / SIGNAL_DRAWS
+        draws[n] = {"draws": SIGNAL_DRAWS,
+                    "c_r1_rc": {str(k): v for k, v in sorted(cs.items())},
+                    "unsafe_arm_rc": {str(k): v for k, v in sorted(us.items())},
+                    "unsafe_sigsegv_share": share,
+                    "unsafe_died_on_a_signal": all(k < 0 for k in us)}
+        print(f"  {n:32s} {SIGNAL_DRAWS} draws   C {dict(cs)}   "
+              f"unsafe {dict(us)}   SIGSEGV share {share:.3f}")
+        # (a) C is DETERMINISTIC -- the control the stochastic claim needs.
+        if set(cs) != {SIGSEGV}:
+            problems.append(
+                f"{n}: C R1 is NOT 40/40 SIGSEGV over {SIGNAL_DRAWS} draws "
+                f"({dict(cs)}). The claim that the RUST arm's signal is the "
+                f"stochastic one depends on C's being fixed; without this, "
+                f"`{n}`'s row says nothing about the substitution.")
+        # (b) the arm always dies LOUDLY -- the invariant that is actually true.
+        if not draws[n]["unsafe_died_on_a_signal"]:
+            problems.append(
+                f"{n}: the UNSAFE arm did not die on a signal in "
+                f"{SIGNAL_DRAWS - sum(v for k, v in us.items() if k < 0)} of "
+                f"{SIGNAL_DRAWS} draws ({dict(us)}). The LOUD harm is supposed "
+                f"to survive into unsafe Rust as a CRASH -- what the "
+                f"substitution changes is the CLASS, not the presence.")
+        # (c) and only in the two ways the mechanism allows.
+        bad = {k: v for k, v in us.items() if k not in (SIGSEGV, SIGBUS)}
+        if bad:
+            problems.append(
+                f"{n}: the UNSAFE arm produced an unexpected exit state {bad}. "
+                f"Only SIGSEGV ({SIGSEGV}) and SIGBUS ({SIGBUS}) are accounted "
+                f"for by an unmapped-address fault; anything else is a "
+                f"different failure and must be read before it is blessed.")
+        # (d) the STATED TOLERANCE. See SIGSEGV_FLOOR's comment for why it is
+        #     this loose and what a tight band would actually be measuring.
+        if share < SIGSEGV_FLOOR:
+            problems.append(
+                f"{n}: SIGSEGV share {share:.3f} is below SIGSEGV_FLOOR "
+                f"{SIGSEGV_FLOOR}. Measured ~0.93 at TASK_168 and TASK_170. "
+                f"This is a TOLERANCE, not a fingerprint: read the "
+                f"distribution before changing either number.")
+
     # ---- Miri, on the unsafe arm ------------------------------------------
     sysroot = miri_sysroot()
     mir = {}
@@ -310,6 +399,20 @@ def main():
            "measured_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
            "miri_iters": MIRI_ITERS,
            "native": rows,
+           "signal_draws": draws,
+           "signal_draws_note":
+               "TASK_170 item H. `native.<ptr input>.unsafe_arm.rc` above is "
+               "ONE DRAW and must not be quoted as a constant: the unsafe "
+               "arm's signal is stochastic, SIGSEGV (-11) most of the time and "
+               "SIGBUS (-7) otherwise, while C is deterministic SIGSEGV. The "
+               "mechanism is `../spec.md`'s disclosed `*p` -> `arena[o]` "
+               "substitution -- C dereferences an attacker-derived INTEGER "
+               "that lands in the same place every run, the Rust arm indexes "
+               "an ARENA-RELATIVE offset whose faulting address moves with "
+               "ASLR. `unsafe_reproduces_c` is therefore FALSE on a draw that "
+               "came up SIGBUS, and that is NOT a defect: what is asserted is "
+               "that the arm dies on a signal, that the signal is one of those "
+               "two, and that the SIGSEGV share clears SIGSEGV_FLOOR.",
            "miri": mir,
            "problems": problems,
            "invariant": "Both Rust arms reproduce c/kernel.c's SILENT wrong "

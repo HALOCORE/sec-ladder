@@ -148,6 +148,24 @@ both and tags every row with a **licence** saying whether the two cells dispatch
 the same work outside the kernel. A row tagged `NOT-LIC` is *known* to be wrong
 as a kernel-exclusive difference. ⚠⚠ **TEN of the 33 `R3−R4` rows are not licensed, and the growth is the finding: it was FOUR of 26 (15%) and is now TEN of 33 (30%), with SIX OF THE SEVEN NEWEST ROWS IN IT** (`p25 p28 p29 p34 p35 p49`; only `p32` is licensed). **So §2's apparatus structurally cannot see most of the recent corpus** — see §2's structural caveat. ✅ **And the licence is static multiset SYMMETRY, not "does the kernel call out": `p35` and `p49` are unlicensed with kernels that call NOTHING, while `p08` is LICENSED at `5409.88 Ir`/call outward** (`TASK_166`).
 
+⚠⚠⚠ **AND A SECOND gcc-VS-clang TERM WAS PUBLISHED FOR THE WHOLE LIFE OF THIS
+DOCUMENT WITHOUT BEING NOTICED: `p08 gcc-clang` IS A COUNTER ARTEFACT ON BOTH
+BLOBS.** For the **same** 4096-byte fill, gcc inlines a **512-`Ir`
+`rep stos %rax`** while clang calls glibc `memset` at **4113.00 `Ir`** — an ~8×
+gap in the *counter*, not in the work, because `rep stosb` is what the hardware
+runs **precisely because it is fast**, so `Ir` charges most where the machine
+charges least. ✅ **`results/synthesis.md` now marks such rows `§` — *crosses a
+libc bulk-routine threshold: regime-dependent, and not comparable with the rest
+of this column*** — and the marked set is **DERIVED, not listed**
+(`synthesize.py::regime_crossing`: a bulk routine must contribute asymmetrically
+across the pair by ≥ 2.00 `Ir` **and** one side must be in the byte-wise regime).
+⚠⚠ **NO DISCOUNT FACTOR IS PUBLISHED.** The gloss *"~90% of the term is counter,
+not code"* was drafted and **withdrawn**: its `≈426 Ir` counterfactual was glibc
+**`memcpy`**'s own figure re-badged as a **`memset`** one.
+⚠ **The first spelling of that census found `p42` and nothing else — the
+flattering answer — because glibc's routines carry no symbol in the sidecar and
+a name regex misses every one of them.**
+
 **gcc's column carries a mitigation clang's does not.** gcc on this box defaults
 to `-fcf-protection=full`, so every gcc-compiled function opens with an
 `endbr64` IBT landing pad and clang and rustc emit none. It is measured, on p36,
@@ -529,10 +547,12 @@ callgrind's caller→callee edges, not read off that column.
 **Two caveats, and they are different things.** The first is *search depth*:
 `R3 − R4` differences two rungs **searched to wildly different depths**, and
 every time a side has been searched properly the number moved a long way. In
-`results/synthesis.md` §2's own search-state column, **14 of 33 patterns print
-`undeclared`**, three more owe a span, and **19** report a real search or a
-reviewed declaration of *no* search on at least one side. ⚠ **The 14 are the same
-14 as at 26 patterns, and §7 records why that coincidence is not reassuring.** Of the nine: p10's −323/−603 became −129/−241 against a
+`results/synthesis.md` §2's own search-state column, **ZERO of 33 patterns now
+print `undeclared`** — ⚠⚠ **and that is a correction, not progress: `undeclared`
+never measured search effort, only whether somebody had written a dict entry.
+`TASK_166` found four of seven new rows wrong and `TASK_170` found the remaining
+fourteen wrong 14/14** (§7). **Read each row's stated search state; the count
+says nothing.** Of the nine: p10's −323/−603 became −129/−241 against a
 verifying R4 candidate; p13's −177/−1054 became +44/+77, a sign flip; p12's
 −26.00 became +66.00, another; p22's `+2.00` became `+125/+1021`; p17's
 `+32/+32` has an in-contract R3 respelling at **−19.00** flat; p36 refuses to
@@ -1478,19 +1498,34 @@ being re-aimed. **`p42` carries 10 adversarial inputs of which 7 are zero-call.*
 **Those inputs are doing no work, and no per-pattern number in this document
 would have shown it.**
 
-**Structural gaps.** The unsafe side is unsearched on most patterns: **14 of 33**
-print `undeclared` in the search-state column and **19** report a real search or a
-reviewed declaration of *no* search on at least one side.
-⚠⚠ **THAT `14` IS THE SAME FOURTEEN AS AT 26 PATTERNS, AND THE COINCIDENCE HID A
-DEFECT.** The column is a **hand-maintained dict inside a generated file**
-(`synthesize.py::SEARCH_REVIEWED`), `undeclared` has never meant *"nobody
-searched"* — only *"nobody wrote an entry"* — and at `TASK_166` **all seven new
-rows were printing `undeclared` while four of them had a reviewed search**,
-including `p34`, which searched both sides and **shipped the control that proves
-it**. ⚠ **The obvious detector does not work either: `p49` ships a
-`controls/spellings.py` and its `undeclared` was RIGHT** (that control is a
-repair-site control, not a rung search). ⚠⚠ **And the fourteen that remain have
-never been audited the way the seven just were** — `RECAP` queue item 35. There is **no cross-pattern wall-clock column**, because the
+⚠⚠⚠ **A STRUCTURAL GAP THIS DOCUMENT PUBLISHED FOR 62 TASKS DOES NOT EXIST, AND
+THE ERROR RAN AGAINST THIS PROJECT'S OWN INTEREST.** This paragraph read *"the
+unsafe side is unsearched on most patterns: **14 of 33** print `undeclared` in
+the search-state column"*. **`undeclared` was 100% BOOKKEEPING — at 26 AND at
+33 — and it has never measured search effort at all.**
+
+The column is a **hand-maintained dict inside a generated file**
+(`synthesize.py::SEARCH_REVIEWED`); `undeclared` means *"nobody wrote an
+entry"*. `TASK_166` audited the seven newest rows and **four of seven were
+wrong**. `TASK_170` then audited the remaining fourteen and the score is
+**14 / 0 / 0 — every one had a documented, reviewed search.** ✅ **The column
+now reads `undeclared` on ZERO of 33.**
+
+⚠⚠ **AND SEVERAL OF THOSE SEARCHES CARRY RESULTS THAT MOVE PUBLISHED NUMBERS,
+WHICH IS WHY THIS IS NOT A BOOKKEEPING FOOTNOTE:** `p16`'s `R3 − R4` **flips
+sign** against the cheapest in-contract spelling (`+27 / +77` → `−199 / −2545`);
+`p09`'s R3-side span is **65×** wide (`+263…+16992`) around a published
+`+13756`; `p14`'s shipped cell **overstates the safe side by 88.9%** on `large`;
+`p42`'s sign flipped and the cheaper rung **was shipped**. ⚠ **Those belong in
+§2's search-state discussion and are not folded into any bucket.**
+
+⚠⚠⚠ **THE HONEST STATEMENT OF THE GAP IS THEREFORE DIFFERENT AND NARROWER:
+this project has searched more than it could show, and the instrument that was
+supposed to show it measured whether somebody had written a sentence.**
+⚠ **The obvious detector does not work either**: `p49` ships a
+`controls/spellings.py` and its `undeclared` was **right** (a repair-site
+control, not a rung search), and the filename detector would have missed 13 of
+the 14. **This needed reading, and reading is what settled it.** There is **no cross-pattern wall-clock column**, because the
 timing floor is a per-session property and these measurements span 22 sessions.
 And the whole kernel-exclusive matrix speaks for one inline mode: of 414 `-O3`
 whole-mode cell/input pairs, 394 have no kernel symbol at all — the kernel

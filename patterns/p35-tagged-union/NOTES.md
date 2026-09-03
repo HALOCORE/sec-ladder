@@ -366,8 +366,41 @@ four Rust rungs are one algorithm.
 | `small.bin` | `751388249273516652` | **same** | **same** |
 | `adversarial-dbl-confusion` | `15737687950051384960` | **same** | **same** |
 | `adversarial-exhaust` | `1705852038987163136` | **same** | **same** |
-| `adversarial-ptr-confusion` | `rc=-11` SIGSEGV | `rc=-11` SIGSEGV | `rc=101` **panic** |
-| `adversarial-ptr-deep` | `rc=-11` SIGSEGV | `rc=-11` SIGSEGV | `rc=101` **panic** |
+| `adversarial-ptr-confusion` | `rc=-11` SIGSEGV | **a SIGNAL, and WHICH one is a DRAW** — see below | `rc=101` **panic** |
+| `adversarial-ptr-deep` | `rc=-11` SIGSEGV | **a SIGNAL, and WHICH one is a DRAW** | `rc=101` **panic** |
+
+⚠⚠ **THE UNSAFE ARM'S SIGNAL IS STOCHASTIC AND THIS TABLE USED TO PRINT ONE
+DRAW AS A CONSTANT** (`rc=-11` in both cells, *"exactly as C does"*).
+`controls/rust_bug.py` now takes **40 draws per input** and asserts the
+distribution rather than the sample (TASK_170; RECAP queue items 39 and 41):
+
+| input | C R1, 40 draws | unsafe arm, 40 draws |
+|---|---|---|
+| `adversarial-ptr-confusion` | **40/40 SIGSEGV (`-11`)** | 33 SIGSEGV / 7 SIGBUS (`-7`) — share **0.825** |
+| `adversarial-ptr-deep` | **40/40 SIGSEGV** | 38 SIGSEGV / 2 SIGBUS — share **0.950** |
+
+⚠ **The single-draw row above is left as it fell.** Re-running until it read
+`-11` would be a re-roll for the published answer, and the committed sidecar
+has shipped `rc=-7, unsafe_reproduces_c: false` on `-ptr-confusion` before
+(TASK_168's draw). ⚠ **TASK_168 measured 37/40 and 38/40 and TASK_170 measured
+33/40 and 38/40** — the shares move between sessions, which is the point, so
+**quote the mechanism and the floor, never the counts.**
+
+**The mechanism is this pattern's own disclosed substitution, so the
+stochasticity is a RESULT and not noise.** C dereferences an attacker-derived
+INTEGER, which lands at the same address every run; the Rust arm indexes an
+arena-relative OFFSET, so the faulting address moves with ASLR and the kernel
+delivers SIGSEGV or SIGBUS depending on where it lands relative to the mapping.
+**C's determinism is the control that makes that claim checkable**, and
+`rust_bug.py` asserts it (40/40) alongside the arm's own three conditions:
+every draw dies on a signal, every signal is one of those two, and the SIGSEGV
+share clears a **stated tolerance of 0.50** — loose on purpose, because the
+control must fail on *"the arm stopped crashing"* and must not fail on another
+machine's ASLR landing the other way more often.
+⚠ **`unsafe_reproduces_c` is therefore `false` on a SIGBUS draw and that is not
+a defect.** Until TASK_170 that field was RECORDED and never ASSERTED, which is
+`.memory/03-measurement.md` entry 19's family — a control that records a claim
+it does not check.
 
 So the substitution does **not** make the Rust side quieter on the silent harm —
 it reproduces it bit for bit — and on the loud harm it changes **which
@@ -1024,7 +1057,7 @@ refuted by this pattern's own controls:
 | clause, as first written | what refutes it |
 |---|---|
 | *"the R1-vs-R1h cost … is a SCHEDULING difference and nothing more, which is why NOTES.md 4 reports it … rather than as a headline"* | section 4: R1h is **cheaper**, by −13.71 to −215.86 Ir/call over four measurements, and the candidate mechanism is an extra **store** (~~32.76~~ **32.90** per call on `large.bin` — the marginal-window figure; see the `TASK_153` subsection below), not scheduling. §4 *is* a headline. |
-| *"IT REMOVES THE LOUD HARM FROM THE RUST SIDE ENTIRELY"* | `controls/rust_bug.py`: the unsafe arm **SIGSEGVs**, `rc=-11`, exactly as C does. What the substitution changes is the harm's **class** — a wrong index rather than a wild pointer — and therefore **which instrument reports it**. |
+| *"IT REMOVES THE LOUD HARM FROM THE RUST SIDE ENTIRELY"* | `controls/rust_bug.py`: the unsafe arm **still dies on a signal**. What the substitution changes is the harm's **class** — a wrong index rather than a wild pointer — and therefore **which instrument reports it**. ⚠ **The refutation used to read *"SIGSEGVs, `rc=-11`, exactly as C does"* and that was ONE DRAW** (TASK_170): the arm's signal is stochastic, ~0.83–0.95 SIGSEGV against C's 40/40, and the sidecar has shipped `rc=-7` on it. §5's table above has the distribution. |
 
 **Both are corrected in the fence with the original left visible** (`p42`'s house
 style: strike, do not delete), and the same over-claim was fixed in `spec.md`'s
@@ -1095,6 +1128,41 @@ idiom lists are byte-identical across the move.
 than left to be noticed**: `M5b`'s reported `assume(` line number went
 `513 → 551`, because the `TASK_153` corrections added lines to `verus.rs`'s
 module note. The table in 6b carries the new number.
+
+### ⚠⚠ THE HASH MOVED A THIRD TIME, AT `TASK_170`, AND ONE KEY MOVED
+
+`TASK_169` §4d found a **live self-contradiction at `HEAD`**: `controls/rust_bug.json`
+said `rc=-7, unsafe_reproduces_c: false` on `adversarial-ptr-confusion` while
+**five documents, one of them this hashed `why`**, said `rc=-11` *"exactly as
+c/kernel.c does"*. The gate was green over it, because stage 9b checks the
+sidecar's FRESHNESS and `rust_bug.py` asserted `unsafe_reproduces_c` only on the
+three SILENT inputs. `TASK_170` measured the distribution and corrected all five.
+
+```
+contract_sha256 as FIRST WRITTEN    141fb37c7358beccd8bdfac962aeb3d5b78fc4ea074218cc325c4e5ffbaefa01
+contract_sha256 as shipped TASK_148 e8e7199af62d589d4e709cba9ffcd99f4aefd23c98bb56efd0e1902f337b73ba
+contract_sha256 as shipped TASK_153 7f85ac5ea2bca031f60e8d7600d7326b0134cd5cfb450da9a2dee99bd9d90d56
+contract_sha256 as shipped TASK_170 9ad1219ef1d99362d4598aab56e1373bbc8fcc576c54c53520214706004043ff
+```
+
+✅ **`python3 harness/tools/contract_diff.py p35` is the disclosure and it is a
+tool's output, not an assertion** (`.temp/t170/p35/contract_diff.log`):
+
+```
+2 path(s) moved: ['idiom', 'idiom.why']
+```
+
+and it prints `IDENTICAL` for `collapse`, `driver`, `ensures`, `identity`,
+`kernel`, `miri`, `model`, `note`, `requires`, `verus`, `idiom.forbidden` and
+`idiom.required`. **Nothing the gate pins moved.** ⚠ The pre-edit block TEXT is
+also kept verbatim, not only its hash, per `TASK_156`'s standard:
+`.temp/t170/p35/contract_PRE.txt`, 392 lines,
+sha256 `1fd2e8534a0273155407c6adf3ef10e6f09ea3ba17301ccc41d808ae120f65f9`.
+
+⚠ **The direction test is satisfied**: the edit makes the declaration WEAKER and
+more specific — it withdraws an exit code and replaces it with the invariant that
+is actually true (*the arm dies on a signal*) plus the measured distribution.
+The original is struck rather than deleted, this file's house style.
 
 ---
 

@@ -89,9 +89,26 @@ Neither Rust arm reproduces the loud harm's **class**, and the reason is the one
 asymmetry this pattern discloses: the Rust union carries the arena **offset**
 where C's carries a **pointer**, so what follows a confused read is an
 out-of-bounds index rather than a wild dereference. ⚠ **Both still crash** — the
-unsafe arm SIGSEGVs at `rc=-11` exactly as C does and the safe arm panics at
-`rc=101` — so what the substitution changes is **which instrument reports it**:
-Miri reports the out-of-bounds index and says nothing about the union read.
+unsafe arm dies on a SIGNAL and the safe arm panics at `rc=101` — so what the
+substitution changes is **which instrument reports it**: Miri reports the
+out-of-bounds index and says nothing about the union read.
+
+⚠⚠ **AND THE UNSAFE ARM'S SIGNAL IS A DRAW, NOT A CONSTANT** (TASK_170; the
+sentence here used to read *"SIGSEGVs at `rc=-11` exactly as C does"*).
+Measured over **40 runs per input** by `controls/rust_bug.py`, which now
+asserts it:
+
+| input | C R1 | unsafe arm |
+|---|---|---|
+| `adversarial-ptr-confusion` | **40/40 SIGSEGV** | 33 SIGSEGV (`-11`) / 7 SIGBUS (`-7`) |
+| `adversarial-ptr-deep` | **40/40 SIGSEGV** | 38 SIGSEGV / 2 SIGBUS |
+
+**The stochasticity is a consequence of the same substitution, not noise**:
+C's wild pointer is an attacker-derived *integer* and lands in the same place
+every run, while the Rust arm's is an arena-relative *offset* whose faulting
+address moves with ASLR. So `unsafe_reproduces_c` is `false` on any draw that
+comes up SIGBUS, and that is **not** a defect — what is invariant is that the
+arm dies loudly, and that is what is asserted.
 
 ## Reproducing
 

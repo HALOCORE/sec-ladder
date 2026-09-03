@@ -96,6 +96,70 @@ lets the check key on `(citing file, path)` pairs, so a NEW file citing an
 ALREADY-dead path is still a new defect. `--update` writes the skeleton but
 leaves `kind` empty and the check FAILS on an empty `kind`: you cannot bless a
 new entry without saying what it is.
+
+## The SECOND check in this file: `<harness module>.py:NNNN` line citations
+
+`python3 harness/tools/temp_citations.py --lines` (and it runs by default).
+
+`.memory/02-bench-rules.md`, *"Line citations into `check.py` decay. Cite the
+FUNCTION"*: **name the FUNCTION and give NO LINE NUMBER AT ALL**, because a
+function name cannot rot silently -- rename it and `grep` returns nothing, which
+is a loud failure.
+
+⚠⚠ **`check.py`'s stage `0c` enforces that over `check.py` ∩ `patterns/` -- ONE
+of THIRTEEN harness modules and ONE of SIX committed directories that carry the
+citation.** TASK_169 measured the rest and TASK_170 landed this: outside that
+intersection the tree carried **7 in `RECAP.md`** (the file `CLAUDE.md` says to
+read first, ≥4 rotten), **6 in `.memory/`**, **1 in a PUBLISHED
+`results/synthesis.md`** emitted by `synthesis/synthesize.py`, and 13
+non-`check.py` citations under `patterns/`. **The published one is the argument
+for this check**: `.memory/03-measurement.md` recorded that exact coordinate as
+rotted and repaired it *in its own copy of the sentence*, while the GENERATOR
+kept re-emitting the other copy into a published artefact on every run --
+`PROTOCOL` rule 6's artefact-vs-generator skew, on the citation-rot class itself.
+
+**Why here and not in `0c`.** Two reasons, and the second is the deciding one:
+
+  1. A **per-pattern** stage is the wrong instrument for a **repo-wide**
+     convention. `0c` runs 33 times; scanning `RECAP.md` from it would report the
+     same failures 33 times and couple every pattern's verdict to manager-owned
+     files nobody edits during a build.
+  2. ⚠⚠ **`0c`'s `line_citations` has, deliberately, NO ESCAPE HATCH -- and a
+     tree-wide scan needs one.** Its documented workaround (*"spell it without
+     the colon"*) DESTROYS the evidence in the cases that matter, because the
+     sentence's whole subject IS the coordinate.
+
+## ⚠ SO: WHAT AN ESCAPE HATCH LOOKS LIKE, AND WHY IT IS A BASELINE FILE
+
+**It is the same baseline file, a second array, and four kinds** -- not an inline
+`# noqa`-style marker. An inline marker would sit in `.memory/` and `RECAP.md`
+prose as noise, and worse, it would be invisible to a reader deciding whether a
+citation is still true. A classified baseline entry is diffable, carries the
+reason, and `--list-lines` prints **the text the cited line holds today** beside
+it, which is `.memory/02-bench-rules.md`'s own eyeball aid made mechanical.
+
+  * `quotation` -- the sentence's SUBJECT is the coordinate: it quotes a rotted
+    citation as evidence (`.memory/06-catalogue.md`'s *"`check.py:1249` is not
+    the checksum rule"*). Spelling it without the colon deletes the finding.
+  * `fixture` -- a literal inside a checker's own must-fire arm
+    (`check.py`'s `_CITE_VERDICT_CASES`). The string is test DATA.
+  * `generated-record` -- the citation sits inside a GENERATED artefact
+    (`results/gate/*.json` re-emitting stage `0c`'s own report). **Fix the
+    generator or the file it read, never the artefact** -- that is exactly the
+    skew this check exists to catch, so the `note` must name the fix site.
+  * `owed` -- a real citation that should be re-cited by function, whose repair
+    is PRICED ELSEWHERE (the 13 under `patterns/` sit in `model.py` /
+    `inputs/gen.py`, which are MEASUREMENT-hashed, so fixing them costs a
+    re-measure). The `note` must name the target function and the cost.
+
+**A kind is mandatory: `--update` writes the skeleton with an empty `kind` and
+the check FAILS on an empty one.** So the hatch cannot be used silently, and a
+NEW citation from a NEW file fails even if the same coordinate is already blessed
+somewhere else.
+
+⚠ **What this check does NOT do: decide whether a citation is still TRUE.**
+Nothing can know what a citation meant. It prints the current line for a human --
+same limit `.memory/02-bench-rules.md` states for its own aid.
 """
 import argparse
 import collections
@@ -215,6 +279,313 @@ KINDS = {
     # gone, not regenerable. `note` must say what it showed.
     "lost",
 }
+
+# --------------------------------------------------------------------------
+# CHECK 2: `<harness module>.py:NNNN` line citations, tree-wide.
+# --------------------------------------------------------------------------
+
+#: ⚠ DELIBERATELY THE SAME EXPRESSION AS `check.py::_CITE_RE`, character for
+#: character, so the two checks cannot disagree about what a citation IS. It
+#: matches the LEADING number of a range, which is what makes
+#: `check.py:1249-1278` -- the tree's own worst case, and four of the eight
+#: citations TASK_168 fixed were ranges -- a hit. `\b` stops `12check.py:5`.
+_LINE_CITE_RE = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*\.py):(\d+)")
+
+#: The range/span TAIL, reported so a reader sees the citation as written.
+_LINE_CITE_TAIL = re.compile(r"\A[-–—](\d+)")
+
+#: Not text. (Nothing tracked has these today; the guard is so that a future
+#: committed blob cannot make this scan emit mojibake hits.)
+_LINE_SKIP_EXT = (".bin", ".log", ".pyc", ".png", ".pdf", ".gz", ".o", ".so")
+
+LINE_KINDS = {
+    # the sentence's SUBJECT is the coordinate -- it quotes a rotted citation
+    # as evidence. Removing the colon deletes the finding.
+    "quotation",
+    # a literal inside a checker's own must-fire arm; the string is test DATA.
+    "fixture",
+    # the citation is inside a GENERATED artefact. `note` must name the real
+    # fix site -- the generator, or the file the generator read.
+    "generated-record",
+    # a real citation owed a re-cite by FUNCTION, whose repair is priced
+    # elsewhere. `note` must name the target function and the cost.
+    "owed",
+}
+
+
+def harness_module_names():
+    """Basenames of every `harness/` module a committed file could cite by line.
+
+    ⚠ DERIVED from the tree, never enumerated -- the same rule and the same two
+    globs as `check.py::harness_module_names`, so a new harness module is
+    covered the day it lands. `harness/tools/` is included: this file is in it.
+    A pattern's own `model.py:50` / `gen.py:30` is NOT a harness citation and is
+    not matched, because a pattern may cite its own lines."""
+    return frozenset(
+        os.path.basename(p)
+        for p in globmod.glob(os.path.join(REPO, "harness", "*.py"))
+        + globmod.glob(os.path.join(REPO, "harness", "tools", "*.py")))
+
+
+def line_citations(text, names):
+    """`[(line_in_text, module, cited_line, as_written)]` for one blob of text.
+
+    `as_written` keeps the range tail (`check.py:1249-1278`) so the report shows
+    the citation the way the file spells it, while the KEY stays the leading
+    coordinate -- a range whose head is re-cited is fixed, and one whose head
+    still stands is not."""
+    out = []
+    for i, line in enumerate(text.split("\n"), 1):
+        for m in _LINE_CITE_RE.finditer(line):
+            if m.group(1) not in names:
+                continue
+            written = m.group(0)
+            tail = _LINE_CITE_TAIL.match(line[m.end():])
+            if tail:
+                written += tail.group(0)
+            out.append((i, m.group(1), int(m.group(2)), written))
+    return out
+
+
+def scan_lines(include_tasks, names=None):
+    """-> `[(file, line, "<module>.py:<N>", as_written, text)]`, sorted.
+
+    Scope is every COMMITTED file `tracked()` yields -- which is every committed
+    directory, minus `.tasks/` (dated instructions) and `*_REPORT.md` (dated
+    records), for the reason `tracked()` states: repointing a dated record
+    falsifies it."""
+    names = harness_module_names() if names is None else names
+    hits = []
+    for rel in tracked(include_tasks):
+        if rel.endswith(_LINE_SKIP_EXT):
+            continue
+        try:
+            with open(os.path.join(REPO, rel), encoding="utf-8") as fh:
+                txt = fh.read()
+        except (UnicodeDecodeError, OSError):
+            continue
+        for n, mod, cited, written in line_citations(txt, names):
+            src = txt.split("\n")[n - 1].strip()[:150]
+            hits.append((rel, n, f"{mod}:{cited}", written, src))
+    return sorted(hits)
+
+
+def _line_text(cite):
+    """The text the cited coordinate holds TODAY -- the eyeball aid.
+
+    ⚠ This is `.memory/02-bench-rules.md`'s aid, mechanised and no stronger:
+    *"nothing can know what a citation MEANT, so it prints each target for a
+    human to judge."* It never decides."""
+    mod, _, n = cite.partition(":")
+    for sub in ("harness", os.path.join("harness", "tools")):
+        p = os.path.join(REPO, sub, mod)
+        if os.path.exists(p):
+            with open(p, encoding="utf-8", errors="replace") as fh:
+                lines = fh.read().split("\n")
+            i = int(n)
+            return lines[i - 1].strip()[:78] if 1 <= i <= len(lines) else \
+                f"(past EOF: {mod} has {len(lines)} lines)"
+    return "(module not found)"
+
+
+def check_lines(a):
+    """The line-citation half. Same contract as `check`: NEW or UNCLASSIFIED
+    fails, everything else is reported."""
+    names = harness_module_names()
+    hits = scan_lines(a.include_tasks, names)
+    base = load_baseline()
+    known = {(e["file"], e["citation"]): e
+             for e in base.get("line_citations", [])}
+    seen = {(f, c) for f, _, c, _, _ in hits}
+
+    new = sorted({(f, n, c, w, t) for f, n, c, w, t in hits
+                  if (f, c) not in known})
+    unclassified = sorted(k for k, e in known.items()
+                          if e.get("kind") not in LINE_KINDS)
+    resolved = sorted(k for k in known if k not in seen)
+
+    by_dir = collections.Counter(
+        (f.split("/")[0] if "/" in f else "(root)") for f, _, _, _, _ in hits)
+    print(f"\n=== line citations: `<harness module>.py:NNNN` in committed files")
+    print(f"harness modules  : {len(names)} derived from harness/*.py + "
+          f"harness/tools/*.py")
+    print(f"citations        : {len(hits)} over "
+          f"{len({c for _, _, c, _, _ in hits})} distinct coordinates in "
+          f"{len({f for f, _, _, _, _ in hits})} files")
+    print("   by directory  : " + "  ".join(
+        f"{d} {n}" for d, n in sorted(by_dir.items(), key=lambda kv: -kv[1])))
+    print(f"baseline         : {len(known)} entries")
+    hist = collections.Counter(e.get("kind") or "(none)"
+                               for e in base.get("line_citations", []))
+    print("   by kind       : " + "  ".join(
+        f"{k} {n}" for k, n in sorted(hist.items(), key=lambda kv: -kv[1])))
+
+    if resolved:
+        print(f"\n-- {len(resolved)} baseline line-citation entr"
+              f"{'y' if len(resolved) == 1 else 'ies'} NO LONGER PRESENT "
+              f"(re-cited by function, or the file stopped citing it).")
+        print("   Not a failure. Run --update to prune.")
+        for f, c in resolved:
+            print(f"   RESOLVED  {c}   <- {f}")
+
+    if unclassified:
+        print(f"\n-- {len(unclassified)} baseline line-citation entries have no "
+              f"`kind`. An unexplained entry is not a baseline, it is a mute.")
+        for f, c in unclassified:
+            print(f"   UNCLASSIFIED  {c}   <- {f}")
+
+    if new:
+        print(f"\n-- {len(new)} NEW line citation(s) into a harness module:")
+        for f, n, c, w, t in new:
+            print(f"   {f}:{n}  cites `{w}`\n      | {t}\n"
+                  f"      that line today: {_line_text(c)}")
+        print("\nFix: NAME THE FUNCTION AND GIVE NO LINE NUMBER --\n"
+              "  `check.py::check_identity`. A function name cannot rot "
+              "silently; rename it and\n"
+              "  `grep` returns nothing, which is a loud failure. "
+              "(`.memory/02-bench-rules.md`.)\n"
+              "  ⚠ If the file is GENERATED, fix the GENERATOR -- editing the "
+              "artefact is reverted\n"
+              "     on the next run (PROTOCOL rule 6). If the coordinate IS "
+              "the sentence's subject,\n"
+              "     `--update` and classify it `quotation`.")
+
+    bad = bool(new) or bool(unclassified)
+    print(f"\ntemp_citations.py --lines: {'FAIL' if bad else 'OK'}"
+          f"  (new={len(new)} unclassified={len(unclassified)} "
+          f"resolved={len(resolved)})")
+    return 1 if bad else 0
+
+
+def show_lines(a):
+    """The classified line-citation baseline, with today's text at each target.
+
+    This is the half that would have caught item 40: a `generated-record` entry
+    whose target line has drifted onto an unrelated function is visible here
+    without anyone grepping."""
+    base = load_baseline()
+    by = collections.defaultdict(list)
+    for e in base.get("line_citations", []):
+        by[e.get("kind") or "(none)"].append(e)
+    for kind in sorted(by):
+        if a.kind and a.kind != kind:
+            continue
+        print(f"\n=== {kind}  ({len(by[kind])})")
+        for e in sorted(by[kind], key=lambda x: (x["file"], x["citation"])):
+            lines = ",".join(str(n) for n in e.get("lines", []))
+            print(f"  {e['citation']}   <- {e['file']}:{lines}")
+            print(f"      that line today: {_line_text(e['citation'])}")
+            print(f"      {e['note']}")
+    return 0
+
+
+# --------------------------------------------------------------------------
+# MUST-FIRE ARMS.
+#
+# ⚠ `owner()`'s docstring has cited *"Must-fire arm: `--selftest`"* since
+# TASK_132 and THERE WAS NO `--selftest` -- a dangling citation inside the
+# citation checker. TASK_170 added the flag and the arms, `owner`'s included.
+#
+# Every arm states the REGRESSION it is armed against, and every one of them was
+# SEEN TO FAIL under that regression before it was written down (TASK_170,
+# `.temp/t170/arm_break.py`).
+# --------------------------------------------------------------------------
+
+_N = frozenset({"check.py", "measure.py", "build.py"})
+
+
+def _guard(fn, *args):
+    """Call `fn`, or return `("RAISED", repr)`.
+
+    ⚠ EVERY arm below goes through this. `.memory/03-measurement.md` entry 19:
+    *reported, not crashed*. These tables are built at MODULE SCOPE, so a bare
+    call that throws is an import-time traceback and the tool has no output at
+    all -- which is the same defect TASK_170 item G fixed in `check.py`'s `0c`
+    and `0d` arm tables. Do not un-wrap these."""
+    try:
+        return fn(*args)
+    except Exception as e:                                   # noqa: BLE001
+        return ("RAISED", repr(e))
+
+
+def _lc(text):
+    """`line_citations` with a fixed name set, guarded."""
+    return _guard(line_citations, text, _N)
+
+
+def _ow(line, start):
+    """`owner`, guarded."""
+    return _guard(owner, line, start)
+
+
+_SELFTEST_CASES = [
+    # (label, got, want) -- regression each arm is armed against, in the label.
+    ("a plain `check.py:1249` is a citation "
+     "[armed against: the module filter dropping check.py]",
+     _lc("see `check.py:1249` for the rule"),
+     [(1, "check.py", 1249, "check.py:1249")]),
+    ("a RANGE `check.py:1249-1278` is caught, keyed on its HEAD "
+     "[armed against: a `(?!-)` guard that would skip ranges]",
+     _lc("`harness/check.py:1249-1278` requires"),
+     [(1, "check.py", 1249, "check.py:1249-1278")]),
+    ("an EN-DASH range keeps its tail too "
+     "[armed against: an ASCII-only tail matcher]",
+     _lc("`check.py:1249–1278`"),
+     [(1, "check.py", 1249, "check.py:1249–1278")]),
+    ("a path prefix does not hide it "
+     "[armed against: anchoring the module at a word start only]",
+     _lc("see harness/measure.py:64"),
+     [(1, "measure.py", 64, "measure.py:64")]),
+    ("the FUNCTION spelling passes -- this is the convention "
+     "[armed against: matching `::` as if it were `:`]",
+     _lc("see `check.py::check_identity` for the rule"), []),
+    ("a pattern's OWN model.py/gen.py is not a harness citation "
+     "[armed against: dropping the name filter and failing every pattern]",
+     _lc("`model.py:50` and `gen.py:30`"), []),
+    ("a digit-glued lookalike is not a citation "
+     "[armed against: dropping `_LINE_CITE_RE`'s leading \\b]",
+     _lc("see `12check.py:5`"), []),
+    ("EVERY harness module counts here, not just check.py "
+     "[armed against: re-narrowing this check to CITE_FATAL_MODULE]",
+     _lc("`build.py:66` and `measure.py:238`"),
+     [(1, "build.py", 66, "build.py:66"),
+      (1, "measure.py", 238, "measure.py:238")]),
+    ("line numbers are the CITING file's, so a second line is reported as 2 "
+     "[armed against: enumerate() starting at 0]",
+     _lc("nothing here\n`check.py:1`"), [(2, "check.py", 1, "check.py:1")]),
+    # `owner()` -- the arm its docstring has cited since TASK_132.
+    ("owner(): a bare `.temp/` hit is THIS repo's "
+     "[armed against: treating every hit as foreign and checking nothing]",
+     _ow("see `.temp/tNN/x`", 5), "self"),
+    ("owner(): an absolute path INTO this repo is this repo's "
+     "[armed against: a naive startswith('/') foreign test]",
+     _ow(f"{REPO}/.temp/tNN/x", len(REPO) + 1), "self"),
+    ("owner(): another project's absolute `.temp/` is FOREIGN "
+     "[armed against: joining a foreign path to REPO and reporting it dangling]",
+     _ow("/home/apt/other/.temp/x", len("/home/apt/other/")), "/home/apt/other"),
+]
+
+
+def selftest(_a=None):
+    bad = 0
+    for label, got, want in _SELFTEST_CASES:
+        ok = got == want
+        bad += not ok
+        print(f"  {'ok  ' if ok else 'FAIL'}  {label}")
+        if not ok:
+            print(f"          got  {got!r}\n          want {want!r}")
+    # the derivation itself, not a fixture: this is what makes a new harness
+    # module covered the day it lands.
+    names = harness_module_names()
+    for must in ("check.py", "measure.py", "build.py", "vparse.py",
+                 "temp_citations.py"):
+        if must not in names:
+            bad += 1
+            print(f"  FAIL  harness_module_names() is missing {must}")
+    print(f"\ntemp_citations.py --selftest: "
+          f"{'FAIL' if bad else 'OK'}  ({len(_SELFTEST_CASES)} arms, "
+          f"{bad} failing, {len(names)} harness modules derived)")
+    return 1 if bad else 0
 
 
 def tracked(include_tasks):
@@ -402,6 +773,59 @@ def update(a):
     if added:
         print(f"⚠ {added} entr{'y' if added == 1 else 'ies'} need a `kind` "
               f"(one of {sorted(KINDS)}) and a `note`.")
+    return update_lines(a, base)
+
+
+def update_lines(a, base=None):
+    """The same re-skeleton for the line-citation array. Keyed on
+    `(citing file, "<module>.py:<N>")` -- NOT on the citing line number, for the
+    reason `update` states above: keying on a line number makes the baseline go
+    stale on any edit above the citation, which is the very rot this check is
+    about."""
+    base = load_baseline() if base is None else base
+    hits = scan_lines(a.include_tasks)
+    known = {(e["file"], e["citation"]): e
+             for e in base.get("line_citations", [])}
+    lines, written = collections.defaultdict(set), {}
+    for f, n, c, w, _ in hits:
+        lines[(f, c)].add(n)
+        written[(f, c)] = w
+    entries, added = [], 0
+    for f, c in sorted(lines):
+        old = known.get((f, c))
+        if old:
+            old["lines"] = sorted(lines[(f, c)])
+            old["as_written"] = written[(f, c)]
+            entries.append(old)
+        else:
+            entries.append({"file": f, "lines": sorted(lines[(f, c)]),
+                            "citation": c, "as_written": written[(f, c)],
+                            "kind": "", "note": ""})
+            added += 1
+    dropped = [k for k in known if k not in lines]
+    base["line_citations"] = entries
+    base["line_citation_count"] = len(entries)
+    base["line_citation_kinds"] = {
+        "quotation": "the sentence's SUBJECT is the coordinate -- it quotes a "
+                     "rotted citation as evidence; removing the colon deletes "
+                     "the finding",
+        "fixture": "a literal inside a checker's own must-fire arm; the string "
+                   "is test DATA",
+        "generated-record": "the citation is inside a GENERATED artefact; the "
+                            "`note` names the real fix site (the generator, or "
+                            "the file the generator read)",
+        "owed": "a real citation owed a re-cite BY FUNCTION whose repair is "
+                "priced elsewhere; the `note` names the target function and "
+                "the cost",
+    }
+    with open(BASELINE, "w") as fh:
+        json.dump(base, fh, indent=1)
+        fh.write("\n")
+    print(f"{BASELINE[len(REPO) + 1:]}: {len(entries)} line-citation entries "
+          f"(+{added} new, -{len(dropped)} resolved)")
+    if added:
+        print(f"⚠ {added} line-citation entr{'y' if added == 1 else 'ies'} "
+              f"need a `kind` (one of {sorted(LINE_KINDS)}) and a `note`.")
     return 0
 
 
@@ -499,14 +923,34 @@ def main():
                     help="the promotion size-bound figures")
     ap.add_argument("--include-tasks", action="store_true",
                     help="also scan .tasks/ (dated instructions; exempt by default)")
+    ap.add_argument("--lines", action="store_true",
+                    help="ONLY the `<harness module>.py:NNNN` line-citation "
+                         "check (it also runs by default)")
+    ap.add_argument("--list-lines", action="store_true",
+                    help="the classified line-citation baseline, with the text "
+                         "each cited line holds TODAY")
+    ap.add_argument("--selftest", action="store_true",
+                    help="the must-fire arms")
     a = ap.parse_args()
+    if a.selftest:
+        return selftest(a)
+    if a.list_lines:
+        return show_lines(a)
     if a.show:
         return show(a)
     if a.update:
         return update(a)
     if a.census:
         return census(a)
-    return check(a)
+    if a.lines:
+        return check_lines(a)
+    # ⚠ BOTH checks, and the exit status is the OR. A tool whose second half can
+    # fail while it prints `OK` is worse than no second half -- `PROTOCOL` rule
+    # 7's *"check each script's own exit status, not a pipeline's"* applies
+    # inside a script too.
+    rc = check(a)
+    rc |= check_lines(a)
+    return rc
 
 
 if __name__ == "__main__":

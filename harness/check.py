@@ -955,21 +955,54 @@ def check_selftests(rep):
 #
 # ⚠⚠ AND THE FATAL SET IS NARROWER THAN THE PROBLEM. `check.py` is the file
 # that grows every task, but it is not the only one cited by line: 13 citations
-# into `measure.py`, `build.py` and `dloop.py` survive under `patterns/`, and
-# **two of them are rotten right now** -- `measure.py:238` (cited for staleness
-# detection, now `def matrix_inputs`) and `build.py:66` (cited for the `O0d`
-# level, now `ALL_CELLS`). They are REPORTED and not failed, because promoting
-# them costs three MEASUREMENT re-runs (`p19`, `p22`, `p36` each cite
-# `measure.py:64` from `inputs/gen.py`) and that is the manager's call, not this
-# stage's. `.memory/02-bench-rules.md`'s clean negative *"Only `check.py`
-# decays"* was true of the `.memory/` layer at TASK_066 and is NOT true of the
-# pattern layer today.
+# into `measure.py`, `build.py` and `dloop.py` survive under `patterns/`.
+# ⚠ **ONE of them is rotten now, not two.** This comment said *"two"* and named
+# `measure.py:238` and `build.py:66`; TASK_169 §4a checked both against the
+# commit each was written at and found that **`measure.py:238` resolves
+# correctly** -- it lands on `def matrix_inputs(indir):`, byte-identical since
+# `05ec7da`, whose own docstring states the two-hash property p27's sentence is
+# describing. `build.py:66` IS mis-aimed (p18 quotes `ALL_OPTS` and cites the
+# line holding `ALL_CELLS`) but by an authoring error at `18f7a28`, not by
+# decay: `build.py` has not moved. ⚠ **And "across 6 patterns" is SEVEN** --
+# p12, p14, p18, p19, p22, p27, p36. Both wrong numbers were this comment's,
+# copied from a report, and RECAP queue item 38 repeats the "two".
+#
+# ⚠⚠ THEY ARE SHOUTED, NOT FAILED, AND THE REASON IS A PRICE (TASK_170 item F).
+# Every one of the 13 sits in a `model.py` or an `inputs/gen.py`, and
+# `measure.py::measurement_sources` globs both -- so re-citing them by function
+# costs a **re-measure of seven patterns**, which is the manager's call and not
+# this stage's. A `rep.note` died in the log; a `rep.shout` survives to the
+# verdict and is rendered into `results/tables/pNN-*.md`, where a reader who
+# never runs the gate will see it. **Fix them when one of those files is next
+# re-measured anyway** -- `PROTOCOL` rule 6's own advice is to batch doc fixes
+# into a pass that is already paying for itself.
+#
+# `.memory/02-bench-rules.md`'s clean negative *"Only `check.py` decays"* was
+# true of the `.memory/` layer at TASK_066 and is NOT true of the pattern layer.
+#
+# ⚠ SCOPE, STATED SO IT IS NOT MISTAKEN FOR THE WHOLE CONVENTION: this stage
+# enforces it over **`check.py` ∩ `patterns/`** -- one of thirteen harness
+# modules and one of six committed directories that carry line citations. The
+# repo-wide form is `harness/tools/temp_citations.py --lines` (TASK_170 item A),
+# which is outside both digests and has the classified escape hatch `.memory/`
+# and `RECAP.md` need for citations whose SUBJECT is a rotted coordinate.
+# `line_citations` here still has no hatch, deliberately.
 
 #: The one harness module a pattern doc may not cite by line. Everything else
 #: is reported.
 CITE_FATAL_MODULE = "check.py"
 
 _CITE_RE = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*\.py):(\d+)")
+
+#: The RANGE tail. ⚠ The regex above already FAILS a range -- it matches the
+#: leading coordinate, which is the one that has to be re-cited -- but the
+#: report printed `check.py:1249` for a source line that says
+#: `check.py:1249-1278`, and the tree's own worst case was a range (FOUR of the
+#: eight citations TASK_168 fixed were). This makes the message quote the
+#: citation AS WRITTEN while the DECISION still keys on the head.
+#: ⚠ The en-dash and em-dash are here because `.md` prose uses them: TASK_169
+#: found `check.py:1249–1278` caught by the head match with no arm covering it.
+_CITE_TAIL = re.compile(r"\A[-–—](\d+)")
 
 #: Files under a pattern that are not text and must not be read.
 _CITE_SKIP_EXT = (".bin", ".log", ".pyc", ".png", ".pdf", ".gz")
@@ -989,17 +1022,29 @@ def harness_module_names():
 
 
 def line_citations(text, names):
-    """`(line_in_text, module, cited_line)` for each `<module>.py:<N>` in `text`
-    whose module basename is in `names`.
+    """`(line_in_text, module, cited_line, as_written)` for each
+    `<module>.py:<N>` in `text` whose module basename is in `names`.
 
     Deliberately has NO escape hatch. A doc that needs to quote a rotted
     citation can spell it without the colon; adding an opt-out is how a check
-    stops firing."""
+    stops firing. ⚠ **That is right HERE and wrong tree-wide** -- `.memory/` and
+    `RECAP.md` carry citations whose whole SUBJECT is the rotted coordinate, and
+    the repo-wide form of this check therefore lives in
+    `harness/tools/temp_citations.py --lines`, which has a classified baseline.
+    This stage stays `patterns/`-only on purpose (TASK_170 item A).
+
+    ⚠ `as_written` (TASK_170 item F) carries the RANGE tail so the failure
+    message quotes the citation the way the file spells it. The DECISION still
+    keys on the leading coordinate: a range whose head has been re-cited by
+    function is fixed, and one whose head still stands is not."""
     out = []
     for i, line in enumerate(text.split("\n"), 1):
         for m in _CITE_RE.finditer(line):
-            if m.group(1) in names:
-                out.append((i, m.group(1), int(m.group(2))))
+            if m.group(1) not in names:
+                continue
+            tail = _CITE_TAIL.match(line[m.end():])
+            out.append((i, m.group(1), int(m.group(2)),
+                        m.group(0) + (tail.group(0) if tail else "")))
     return out
 
 
@@ -1023,6 +1068,29 @@ def citation_verdict(text, names=None):
     return ("FAIL" if fatal else "OK"), fatal, other
 
 
+def _cite(text, names=None):
+    """One `_CITE_VERDICT_CASES` cell: `citation_verdict`, GUARDED.
+
+    ⚠⚠ TASK_170 item G / TASK_169 §1c. `_CITE_VERDICT_CASES` and
+    `_CFG_VERDICT_CASES` were the ONLY `_*_CASES` tables in this file that
+    called their predicate BARE at module scope, so a throw inside one was an
+    **import-time traceback with no `results/gate/*.json` written for ANY
+    pattern** -- a designed one-line gate failure turned into a repo-wide
+    crash. Every other table wraps (`_ak` TASK_151, `_cv` TASK_164), and
+    `check.py::run_budgets` already carries the same recorded lesson:
+    *"indexing here turned a clean gate failure into a Python traceback with no
+    verdict"*. `.memory/03-measurement.md` entry 19: **reported, not crashed**.
+
+    An exception becomes a THREE-element tuple, which can never equal a
+    three-element expectation of the shipped shape either -- `("RAISED", type,
+    msg)` has a string where the arms have a list -- so it always mismatches
+    and always reports."""
+    try:
+        return citation_verdict(text, names)
+    except Exception as e:                                       # noqa: BLE001
+        return ("RAISED", type(e).__name__, str(e)[:120])
+
+
 def check_doc_citations(pdir, rep):
     head("0c. no `check.py:NNNN` line citation in the pattern's own files")
     names = harness_module_names()
@@ -1039,21 +1107,36 @@ def check_doc_citations(pdir, rep):
         _, f_hits, o_hits = citation_verdict(txt, names)
         for dest, hits in ((fatal, f_hits), (other, o_hits)):
             dest += [{"file": rel, "line": ln, "module": mod,
-                      "cited_line": cited} for ln, mod, cited in hits]
+                      "cited_line": cited, "as_written": written}
+                     for ln, mod, cited, written in hits]
     for h in fatal:
         rep.fail("doc-citation",
-                 f"{h['file']}:{h['line']} cites `check.py:{h['cited_line']}` "
+                 f"{h['file']}:{h['line']} cites `{h['as_written']}` "
                  f"-- a line citation into check.py rots (it has grown every "
                  f"task). Name the FUNCTION and give no line number: "
                  f"`check.py::<function>`. See `.memory/02-bench-rules.md`.")
     if not fatal:
         rep.ok(f"0 `check.py:NNNN` citations in {len(files)} files")
     if other:
-        rep.note(f"{len(other)} line citation(s) into other harness modules, "
-                 f"reported not failed (promoting them costs a re-measure "
-                 f"where the file is measurement-hashed): "
-                 + " . ".join(f"{h['file']}:{h['line']} -> "
-                              f"{h['module']}:{h['cited_line']}" for h in other))
+        # ⚠⚠ SHOUT, NOT NOTE (TASK_170 item F / RECAP queue item 38). A `note`
+        # prints to the log and dies there; a SHOUT survives to the verdict and
+        # is rendered into `results/tables/pNN-*.md`, which is where a reader
+        # who never runs the gate will see it. These are NOT failed on purpose:
+        # every one of the 13 sits in a `model.py` or an `inputs/gen.py`, both
+        # of which `measure.py::measurement_sources` globs -- so re-citing them
+        # by function costs a RE-MEASURE of p12/p13/p16/p19/p22/p27/p36, which
+        # is the manager's call and not this stage's. Failing them would make a
+        # cheap doc convention cost seven re-measures, and a check that
+        # expensive gets switched off.
+        rep.shout("doc-citation-other",
+                  f"{len(other)} line citation(s) into harness modules other "
+                  f"than `{CITE_FATAL_MODULE}`. NOT failed: these sit in "
+                  f"measurement-hashed files, so re-citing them by function "
+                  f"costs a re-measure (RECAP queue item 38). Cite the "
+                  f"FUNCTION when one of these files is next re-measured "
+                  f"anyway: "
+                  + " . ".join(f"{h['file']}:{h['line']} -> "
+                               f"{h['as_written']}" for h in other))
     return {"fatal": fatal, "other": other,
             "harness_modules": sorted(names)}
 
@@ -1239,51 +1322,85 @@ CODEGEN_CFGS = frozenset({
 # every invocation. ⚠ They are checked BEFORE `check_selftests`' `fixture.ensure()`
 # early return, which the other arms sit behind (RECAP queue item 34).
 
+# ⚠⚠⚠ AND THESE TWO TABLES WERE THE ONLY ONES IN THIS FILE THAT CALLED THEIR
+# PREDICATE BARE AT MODULE SCOPE (TASK_169 §1c, fixed at TASK_170 item G).
+# A throw inside `citation_verdict` or `codegen_cfg_verdict` -- the shape arm
+# C2's own mutation has, a widened `_CITE_RE` that lets `int()` see a non-digit
+# -- was an IMPORT-TIME TRACEBACK with no `results/gate/*.json` for ANY pattern,
+# instead of one failing stage on one pattern. `_ak` (TASK_151) and `_cv`
+# (TASK_164) both wrap; so do `_cite` and `_cfg` now.
+# `.memory/03-measurement.md` entry 19: **reported, not crashed.**
+
 _CITE_NAMES = frozenset({"check.py", "measure.py", "build.py", "vparse.py"})
+
+
+def _cfg(src, allowed=None):
+    """One `_CFG_VERDICT_CASES` cell: `codegen_cfg_verdict`, GUARDED.
+
+    ⚠ `codegen_cfg_verdict` TOKENISES Python, so a malformed literal in a
+    future arm -- or a `tokenize` behaviour change across interpreter versions
+    -- raises. See `_cite` for the full argument."""
+    try:
+        return codegen_cfg_verdict(src, allowed)
+    except Exception as e:                                       # noqa: BLE001
+        return ("RAISED", type(e).__name__, str(e)[:120])
+
 
 _CITE_VERDICT_CASES = [
     ("a `check.py:NNNN` citation FAILS",
-     citation_verdict("see `check.py:1249` for the rule", _CITE_NAMES),
-     ("FAIL", [(1, "check.py", 1249)], [])),
+     _cite("see `check.py:1249` for the rule", _CITE_NAMES),
+     ("FAIL", [(1, "check.py", 1249, "check.py:1249")], [])),
     ("the same citation written as a FUNCTION passes",
-     citation_verdict("see `check.py::check_checksums` for the rule",
-                      _CITE_NAMES),
+     _cite("see `check.py::check_checksums` for the rule", _CITE_NAMES),
      ("OK", [], [])),
     ("a range citation `check.py:1249-1278` still FAILS (the leading number "
-     "is the citation)",
-     citation_verdict("`harness/check.py:1249-1278` requires", _CITE_NAMES),
-     ("FAIL", [(1, "check.py", 1249)], [])),
+     "is the citation) AND IS QUOTED AS THE FILE SPELLS IT",
+     _cite("`harness/check.py:1249-1278` requires", _CITE_NAMES),
+     ("FAIL", [(1, "check.py", 1249, "check.py:1249-1278")], [])),
+    ("an EN-DASH range is a range too -- `.md` prose uses it and no arm "
+     "covered it before TASK_170",
+     _cite("`check.py:1249–1278` requires", _CITE_NAMES),
+     ("FAIL", [(1, "check.py", 1249, "check.py:1249–1278")], [])),
     ("a pattern's OWN `model.py:50` is not a harness citation",
-     citation_verdict("`model.py:50` and `gen.py:30`", _CITE_NAMES),
+     _cite("`model.py:50` and `gen.py:30`", _CITE_NAMES),
      ("OK", [], [])),
-    ("another harness module's line citation is REPORTED, not failed",
-     citation_verdict("`measure.py:64` is SKIP_INPUT_PREFIX", _CITE_NAMES),
-     ("OK", [], [(1, "measure.py", 64)])),
+    ("another harness module's line citation is SHOUTED, not failed",
+     _cite("`measure.py:64` is SKIP_INPUT_PREFIX", _CITE_NAMES),
+     ("OK", [], [(1, "measure.py", 64, "measure.py:64")])),
     ("`checkNpy:1` and `xcheck.py:1` do not match; `harness/check.py:1` does",
-     citation_verdict("checkNpy:1 xcheck.py:1 harness/check.py:1",
-                      _CITE_NAMES),
-     ("FAIL", [(1, "check.py", 1)], [])),
+     _cite("checkNpy:1 xcheck.py:1 harness/check.py:1", _CITE_NAMES),
+     ("FAIL", [(1, "check.py", 1, "check.py:1")], [])),
+    # ⚠ THE RAISED GUARD'S OWN ARM. `names` is used with `in`, so a non-container
+    # makes `line_citations` throw. The point is not the input -- it is that the
+    # gate REPORTS a three-element `("RAISED", ...)` here instead of dying at
+    # import. Planted and SEEN to take the whole gate down before the guard
+    # existed (TASK_170, `.temp/t170/raised_break.py`).
+    ("a THROW inside citation_verdict is REPORTED, not an import traceback",
+     _cite("see `check.py:1249`", 7)[0], "RAISED"),
 ]
 
 _CFG_VERDICT_CASES = [
     ("a --cfg build.py passes that CODEGEN_CFGS lacks is a FAIL",
-     codegen_cfg_verdict('f += ["--cfg", "slb_bogus"]\n'),
+     _cfg('f += ["--cfg", "slb_bogus"]\n'),
      ("FAIL", ["slb_bogus"], 0)),
     ("the `--cfg=NAME` spelling is caught too",
-     codegen_cfg_verdict('f += ["--cfg=slb_bogus"]\n'),
+     _cfg('f += ["--cfg=slb_bogus"]\n'),
      ("FAIL", ["slb_bogus"], 0)),
     ("the shipped flag passes",
-     codegen_cfg_verdict('f += ["--cfg", "slb_isolated"]\n'),
+     _cfg('f += ["--cfg", "slb_isolated"]\n'),
      ("OK", [], 0)),
     ("a `--cfg` in a COMMENT is NOT a flag (what a grep gets wrong)",
-     codegen_cfg_verdict('# forwards --cfg slb_bogus verbatim\nx = 1\n'),
+     _cfg('# forwards --cfg slb_bogus verbatim\nx = 1\n'),
      ("OK", [], 0)),
     ("a `--cfg` whose value is not a literal is UNRESOLVED, not silent",
-     codegen_cfg_verdict('f += ["--cfg", name]\n'),
+     _cfg('f += ["--cfg", name]\n'),
      ("OK", [], 1)),
     ("a bare trailing `--cfg` is unresolved too",
-     codegen_cfg_verdict('f.append("--cfg")\n'),
+     _cfg('f.append("--cfg")\n'),
      ("OK", [], 1)),
+    # the same guard arm, on the other table.
+    ("a THROW inside codegen_cfg_verdict is REPORTED, not an import traceback",
+     _cfg('f += ["--cfg", "x"\n')[0], "RAISED"),
 ]
 
 _CFG_ATTR = re.compile(r"#!?\[\s*cfg\s*\(")

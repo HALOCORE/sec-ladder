@@ -101,12 +101,44 @@ understates it by an order of magnitude.
 
 ## 3. The `0 of 255` denominator, and what it is at 33 kernels
 
-⚠ **`results/SYNTHESIS.md` §7 quotes `ptr_offset` as `0` of the built tree's
-**255** bound sites, with a size-matched `p ≈ 0.06` caveat.** Both come from
-`TASK_129`'s classifier and `TASK_131`'s size probe, and **neither is committed**
-— they live in gitignored `.temp/t129/` and `.temp/t131/` with a `REBUILD.sh`
-each. They are re-runnable and they were re-run at `TASK_166`; recording the
-numbers here so the published ones stop resting on scratch nobody can find:
+✅✅ **PROMOTED AT TASK_170 (item C). Both instruments are now in this
+directory, and each carries its 26-pattern CONTROL:**
+
+    python3 common/census/bound_sites.py        # both halves; exit 1 on a move
+
+* `census_c.py` — `TASK_129`'s bound-site classifier, a **verbatim** promotion
+  of `.temp/t129/census.py` (only the header differs; the body is
+  byte-identical). `python3 common/census/census_c.py selftest` is its own.
+* `bound_sites.py` — the driver. It extracts every `patterns/*/c/*.{c,h}` at
+  `git HEAD` (**not** the working tree — the published figure is a property of
+  the committed kernels), classifies twice, and **asserts both rows of the
+  table below**, exiting 1 if any of the eight numbers moves.
+
+⚠⚠ **THE 26-ROW IS A REAL CONTROL, NOT A STORED NUMBER.** The 26-kernel
+population is today's tree minus the seven patterns added after the caveat was
+computed (`p25 p28 p29 p32 p34 p35 p49`), re-lexed and re-classified on the same
+run by the same code. Measured at TASK_170: it reproduces `255 / 0 / 30 / 26`
+and `0.0612` **exactly**, so the 33-figures are the same instrument on a bigger
+population and not a new one.
+
+⚠ **What is deliberately NOT committed: the census JSONs.** `cgnu.json` alone is
+**11.9 MB** against a 506 K manifest set, and it is exactly re-derivable —
+*keep the generator, delete the artefact* (`CLAUDE.md` constraint 1).
+`bound_sites.py --build-corpus` rebuilds it from the committed manifests via
+`census_filelists.py`. ✅ **And that route is VERIFIED rather than asserted**:
+the rebuilt lists select the **identical 2555 files** — php 299, coreutils 94,
+cgnu 2162, symmetric difference **0** — as `TASK_131`'s scratch lists that
+produced the published `p`. ⚠ **The p-value half needs the three C corpora, two
+of which live under other projects' trees**; if they are gone it reports
+`rc = 2` — *the half did not run* — rather than printing a number or passing
+silently.
+
+⚠ **History, kept because it is the reason this section exists:** until
+TASK_170 both instruments lived **only** in gitignored `.temp/t129/` and
+`.temp/t131/` with a `REBUILD.sh` each. They were re-runnable and they were
+re-run at `TASK_166`, which recorded the numbers here — but a `.temp/` clean,
+which `CLAUDE.md` constraint 1 asks for, would have deleted the instrument
+behind a published number. That is the same defect that created this directory.
 
 | population | bound sites | `ptr_offset` | site-carrying functions | files |
 |---|---:|---:|---:|---:|

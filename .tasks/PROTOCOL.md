@@ -352,6 +352,16 @@ A task is done when **all** hold:
    every rung-source doc fix into ONE pass rather than avoiding them** — fixing
    `c/kernel.c` alongside them is then free at the margin.
 
+   ⚠⚠⚠ **AND A GATE-ONLY CHANGE CAN COST THE SAME CHAIN, WHICH IS THE ROW
+   NOBODY HAD: `report.py` RENDERS THE `loud` SECTION, so turning a `rep.note`
+   into a `rep.shout` STALES EVERY TABLE IT FIRES ON.** `TASK_170` added one
+   shout, it fired on **seven** patterns, and stage 9c hard-failed all seven:
+   **+7 renders and +7 re-gates for a change that touched only `check.py`.**
+   ✅ **The rule: `gate → report → gate` per pattern whose RENDERED output moves
+   — and `loud` is rendered.** ⚠ **Smoke-test one pattern before committing a
+   tree-wide sweep to it; `TASK_170` did, on `p12`, and the sweep was not
+   wasted.**
+
    ⚠⚠⚠ **AND THE TABLE ABOVE OMITS A COST THAT IS NOT OPTIONAL, FOUND AT
    `TASK_168`: A RE-MEASURE STALES THAT PATTERN'S PUBLISHED TABLE, AND STAGE 9c
    HARD-FAILS ON IT.** `results/tables/pNN.md` cites the measurement record, so

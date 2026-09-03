@@ -19,7 +19,15 @@ this box is reference; this box is what to *do*.
 
 ✅✅ **DONE — `TASK_168`, THE BACKLOG BUNDLE. 33/33 gate-green (`30 PASS + 3 PASS-WITH-BLOCKED-ROWS`, 0 failures, `blocked` `p01` 1 / `p35` 3 / `p42` 1, manager-verified from the records), one sweep, one batched re-measure of four patterns.** **Finding 65; queue items 12, 15, 16(b), 28, 31 and 33 closed; 37–39 opened.** ⚠⚠⚠ **AND THE ITEM THE MANAGER PUT FIRST *"because it might close for free"* DID NOT CLOSE — the task file asked *"does any single `mem*` call exceed 8192 bytes?"* and THAT QUESTION MISSES BOTH HITS, because `8192` is the `memcpy` threshold and `memset` flips at 2–4 KiB, which `.memory/` states three lines above the figure the manager quoted.** ⚠⚠ **One hit is a PUBLISHED BOLD NUMBER: `p42`'s `+4160.00` is `vec![0u8; 4096]` against `with_capacity` at `1.0156 Ir`/byte — the `rep stosb` signature — and ~90% of the term is COUNTER, not code.** ⚠ **And `.memory/`'s *"only `p08`'s gcc kernels contain a `rep` instruction"* is FALSE: 26 of 1052 windows across NINE patterns.** ⚠ **It carries none of the three `mem*` names, so key on the `Ir`/byte SIGNATURE, not the callee.**
 
-⚠⚠⚠ **THE ONLY THING LEFT, AND IT IS THE HONEST ANSWER TO *"IS THE RESEARCH WORK FINISHED?"*: FINISH THE QUEUE — items 35, 36, 37, 38, 39 AND THE RETIREMENT.** ✅ **None of the five needs a sweep or a re-measure**: **35** audit the 14 `undeclared` search-state rows against their own `NOTES.md` (4 of the 7 new rows were wrong, and the obvious detector does NOT work — `p49`'s `undeclared` was right); **36** promote `TASK_129`'s bound-site classifier and `TASK_131`'s size probe out of gitignored `.temp/` (both still run, both reproduce their published figures as controls, and `common/census/` is the precedent — outside both digests); **37** re-pin `synthesis/outward_ir.json` on `measurement_sources` instead of the gate digest, **before** the next re-emit; **38** widen stage `0c`'s regex to the other harness modules (one line, free on any sweep); **39** `p35`'s stochastic arm. ⚠ **Then RETIRE queue groups C, D and E as STATED LIMITATIONS with their evidence, not silent deletions** — `.temp/mgr164/QUEUE_TRIAGE.md` has the classification. ⚠⚠ **THE FRAMING THAT MUST NOT BE LOST: every pattern is built, gated, reviewed and has a finding — TRUE — and NOT every rung's cheapest admissible spelling has been searched — FALSE, measurable, and never claimed. `results/SYNTHESIS.md` §7 publishes the count: 14 of 33 print `undeclared`, and those 14 have never been audited the way the seven new rows just were.** ✅ **Finishing means saying where the confidence stops, not extending it.**
+✅✅ **DONE — `TASK_169` (the review of the gate bundle: three blockers, ALL in the manager's `✅` marks — three consecutive reviews have now each found one) and `TASK_170` (THE QUEUE, CLOSED: items 35–42 landed, 43 investigated, 43 gate runs, 8 renders, ZERO re-measures).** **Final gate `30 PASS + 3 PASS-WITH-BLOCKED-ROWS`, 0 failures, blocked `p01` 1 / `p35` 3 / `p42` 1.** **Findings 65 and 66.**
+
+⚠⚠⚠ **AND THE BIGGEST THING IN THE WHOLE BACKLOG IS THAT A "STRUCTURAL GAP" THIS PROJECT PUBLISHED FOR 62 TASKS DOES NOT EXIST: `undeclared` in the search-state column was 100% BOOKKEEPING, at 26 AND at 33, and NEVER measured search effort. `TASK_166` found 4 of the 7 new rows wrong; `TASK_170` audited the remaining fourteen and scored 14/0/0. The column now reads `undeclared` on ZERO of 33.** ⚠⚠ **Several of those searches move published numbers — `p16`'s `R3 − R4` FLIPS SIGN (`+27/+77` → `−199/−2545`), `p09`'s R3 span is 65× wide, `p14` overstates the safe side by 88.9% on `large` — and NONE is folded into a bucket.** ✅ **The error ran AGAINST this project's usual direction: it searched more than it could show.**
+
+⚠⚠⚠ **THE ONLY THING LEFT — AND IT IS THE HONEST ANSWER TO *"IS THE RESEARCH WORK FINISHED?"*: THE MANAGER'S RETIREMENT PASS, PLUS ONE REVIEW.**
+
+**FIRST — `TASK_171`, the review of `TASK_170` and of the manager's fold.** ⚠⚠ **Rule 3, and the precedent is now three for three: `TASK_165`, `TASK_167` and `TASK_169` EACH found a `✅ manager-re-derived` mark the manager had not earned, and the last found three in one bullet.** **Targets:** the `§` `regime_crossing` census (⚠ **its first spelling found the flattering answer, and it does NOT reproduce `TASK_169`'s `p27 gcc-clang` claim — that disagreement is OPEN and neither side is asserted**); the build-determinant pin (`0 of 33`, and whether `--emit` really cannot revert it); the 14 search-state entries, each of which must cite a REVIEWED artefact; the five new must-fire arm sets; and item 43's *"masks a real stage-3a failure on `p01 safe_tuned -O0 isolated`"* plus *"`p05/NOTES.md` §1a INVENTED A MECHANISM"* — ⚠ **that second one is an accusation against a shipped pattern doc and needs a run behind it.** ✅ **No sweep is needed.**
+
+**SECOND — THE RETIREMENT, and it is the manager's.** Queue groups **C** (26-era spelling-search debt: items 1, 2, 3, 11), **D** (curiosities: 7, 8, 9) and **E** (declined: 5, 20, 25) are the honest remainder. ⚠⚠ **RETIRE THEM AS STATED LIMITATIONS WITH THEIR EVIDENCE, IN `results/SYNTHESIS.md` §7 — NOT AS SILENT DELETIONS.** ⚠ **And group C's framing needs rewriting in light of finding 66(a): the old sentence was *"not every rung's cheapest spelling has been searched"*, and what is now true is narrower — the four named LEVERS (the two-step reslice, `p03`'s `+5` constant, `p01`/`p08`'s R3-side span, a length-heterogeneous sweep band) are untried, while the per-row search state is documented on all 33.** ⚠ **Item 43 goes with them: a real defect, priced at a full re-measure, deliberately not taken.**
 
 ⚠⚠⚠ **`synthesis/outward_ir.json` WAS RE-EMITTED AT `TASK_166` (33 patterns / 524 cell entries, 0 skipped) AND IS STALE ON ALL 33 AGAIN ONE TASK LATER — because it pins the GATE `source_sha256`, so any `harness/*.py` edit invalidates it. Manager-verified. All 33 STALEs are FALSE (a docstring cannot move a callgrind number), and queue item 37 is the `synthesis/`-only repair.** ⚠ **And re-emitting it settled two things at once: it is the ONLY instrument that names the callee and counts the calls, so it is what refuted the manager's unifying hypothesis (finding 64), and re-scoring the bands against it retracted `FLOOR = 2.00`'s stated reason.** ✅ **`results/SYNTHESIS.md` is CURRENT — folded at `7b5822a`; its four Results are now derived against all 33.** ⚠⚠ **OPERATIONAL, NEVER DELETE: `results/SYNTHESIS.md` is HAND-WRITTEN; `results/synthesis.md` (lower case) is GENERATED. Never regenerate over the capitalised one.** ⚠⚠ **READ THE CATALOGUE CELL, NOT `TASK_143_REPORT.md`: both rows' cells carry manager corrections the report does not.** ⚠⚠ **AND A NEW ROW NOW OWES TWO THINGS `TASK_143`-era task files do not mention (`TASK_151`, finding 57): (a) its HARDENED arm must be sanitizer-CLEAN on EVERY input — stage `7h`; (b) `spec.md` must declare `verus.assumptions` if any rung uses `assume(`/`admit(`.** ✅ **THE BAR, and it is the whole of it (`CLAUDE.md` rule 6, findings 53–54): a pattern is admitted SOLELY on whether the C program makes sense — correct on benign inputs, exhibits the error on an adversarial one, C MECHANISM distinct from a BUILT row's, fits the pinned signature. NOTHING about Rust, Verus, Miri, a cost gradient or what the ladder can 'price' may EVER remove a row; those are RESULTS.** ⚠⚠ **REFUSED, and only on C-SIDE duplication of a BUILT row: `CVE-2024-25062` and `Issue-15143` (`p29`'s mechanism); `p30` and iterator-invalidation (`p27`'s and `p25`'s); stack-lifetime (both compilers warn at DEFAULT flags, so C is not silently wrong).** ⚠ **`CVE-2016-4658`, `CVE-2022-23308`, `Issue-15192` pass the bar but duplicate admitted candidates — build the candidate, not the CVE. ⚠ Re-adjudicate the two ADMITTED CVEs (`CVE-2022-40304`, `CVE-2021-3518`) against the ENLARGED built tree once `p25` lands — `p34` already has; `p28` and `p32` were candidates when they were ranked and are now rows.** ⚠⚠ **~3 tasks per row at the measured rate (build → review → land corrections).** ✅ **BOTH OF THIS CELL'S OLD "STILL OWED" GATE ITEMS ARE CLOSED at `TASK_164`** — stage 9b now reads the verdict (30 of 30 generators that write a `problems` key exit non-zero on it, so it IS a verdict), and `global` directives are recorded per file under `verus.<src>.global_decls`. **Finding 63.** ⚠ **What is left over from them and is NOT done: four bespoke verdict shapes stage 9b still cannot read, and a no-verdict sidecar SHOUT that was priced (5 stale tables, 5 `report.py` runs, a second sweep) and deliberately not taken.** ⚠⚠ **OPERATIONAL, NEVER DELETE: `results/SYNTHESIS.md` is HAND-WRITTEN; `results/synthesis.md` (lower case) is GENERATED. Never regenerate over the capitalised one.**
 
@@ -6143,6 +6151,86 @@ the number.** Two task files have already sent an agent to the wrong finding.
 
     Evidence: `.tasks/TASK_168_REPORT.md`, `.tasks/TASK_168.md`,
     `.temp/t168/`, `.temp/mgr164/QUEUE_TRIAGE.md`.
+
+66. ⚠⚠⚠ **THE QUEUE IS CLOSED — AND THE LARGEST THING IN IT IS THAT A
+    "STRUCTURAL GAP" THIS PROJECT PUBLISHED FOR 62 TASKS DOES NOT EXIST.**
+    (`TASK_170`.) ⚠ **UNREVIEWED — ✅ = manager re-derived, ⊘ = engineer's
+    alone.** **Final gate: `30 PASS + 3 PASS-WITH-BLOCKED-ROWS`, 0 failures,
+    `blocked` `p01` 1 / `p35` 3 / `p42` 1 — ✅ manager-verified from the
+    records.**
+
+    **(a) `undeclared` WAS 100% BOOKKEEPING, AT 26 *AND* AT 33, AND IT NEVER
+    MEASURED SEARCH EFFORT.** `results/SYNTHESIS.md` §7 published *"the unsafe
+    side is unsearched on most patterns: 14 of 33 print `undeclared`"*.
+    `TASK_166` audited the seven newest rows and **four of seven were wrong**;
+    ⊘ `TASK_170` audited the remaining fourteen and the score is **14 / 0 / 0 —
+    every one had a documented, reviewed search.** ✅ **The column now reads
+    `undeclared` on ZERO of 33 (manager-verified).**
+    ⚠⚠ **AND SEVERAL OF THOSE SEARCHES MOVE PUBLISHED NUMBERS, which is why this
+    is not a footnote:** ⊘ `p16`'s `R3 − R4` **flips sign** against the cheapest
+    in-contract spelling (`+27 / +77` → `−199 / −2545`); `p09`'s R3-side span is
+    **65×** wide around a published `+13756`; `p14`'s shipped cell **overstates
+    the safe side by 88.9%** on `large`; `p42`'s sign flipped and **the cheaper
+    rung was shipped**. ⚠ **None is folded into a bucket.**
+    ✅ **The honest statement is narrower and runs AGAINST this project's usual
+    error direction: it has searched more than it could show, and the instrument
+    meant to show it measured whether somebody had written a sentence.**
+    ⚠ **The filename detector would have missed 13 of the 14; `p49`'s
+    `undeclared` was RIGHT. This needed reading.**
+
+    **(b) A SECOND gcc-VS-clang COUNTER ARTEFACT WAS PUBLISHED FROM THE
+    BEGINNING AND NOBODY HAD NOTICED — `p08 gcc-clang`, BOTH BLOBS.** ⊘ For the
+    same 4096-byte fill, **gcc inlines a 512-`Ir` `rep stos %rax` while clang
+    calls glibc `memset` at 4113.00 `Ir`** — ~8× in the counter, not the work.
+    ✅ **`results/synthesis.md` now marks such rows `§`, and the marked set is
+    DERIVED rather than listed** (`regime_crossing`: a bulk routine must
+    contribute asymmetrically by ≥ 2.00 `Ir` **and** one side be byte-wise) —
+    `p08 gcc-clang` on both blobs, `p42 large R2−R4`.
+    ⚠⚠ **THE FIRST SPELLING OF THAT CENSUS FOUND `p42` AND NOTHING ELSE, WHICH
+    IS THE FLATTERING ANSWER**, because glibc's routines carry **no symbol at
+    all** in the sidecar and a name regex misses every one. ⚠ **`TASK_169`'s
+    `p27 gcc-clang` claim is NOT reproduced by this census** — its contribution
+    is small and both sides may sit in one regime. **OPEN; neither is asserted.**
+    ✅ **No discount factor is published** — the `≈426` counterfactual was glibc
+    `memcpy`'s figure re-badged as a `memset` one.
+
+    **(c) THE MANAGER'S PIN FELL, AND SO DID ITS REPLACEMENT.** ⊘ Re-pinning
+    `outward_ir.json` on `measurement_sources` still reports **4 of 33 STALE**;
+    the right key is the **build determinants** — **0 of 33**. ✅ **And it cost
+    NO callgrind run and no git archaeology, because the old key was never one
+    hash but the whole `path → sha256` MAP, so every emit-time determinant was
+    already committed inside the sidecar** — `--repin` filters it.
+    ⚠ **`--emit` was about to silently revert the re-pin** (rule 6's
+    artefact-vs-generator skew); it now calls the same `repin()`.
+
+    **(d) ⚠⚠ A BUDGET BREACH, MEASURED BEFORE THE SWEEP RATHER THAN AFTER.**
+    ⊘ The task file priced item F's shout at zero. **`report.py` RENDERS the
+    `loud` section**, so `rep.note → rep.shout` staled **seven** published tables
+    and stage 9c hard-failed all seven: **+7 renders and +7 re-gates for a
+    `check.py`-only change** (43 gate runs and 8 renders in total, 0
+    re-measures). ✅ **Smoke-tested on `p12` first, so the sweep was not
+    wasted.** ✅ **Now a row in `PROTOCOL` rule 6: `gate → report → gate` per
+    pattern whose RENDERED output moves, and `loud` is rendered.**
+
+    **(e) `RECAP.md` ITSELF CARRIES 15 LINE CITATIONS, NOT 6, AND 10 ARE
+    WRONG** — all seven `check.py` ones rotten, `limbs.py:102` rotten,
+    `build.py:66` mis-aimed twice. ⚠ **The manager reported six.**
+
+    **(f) Item 43, investigated not fixed.** ⊘ `asm.py`'s `main` needle
+    mis-resolves on **33 cells, `-O0` only**; `TASK_169`'s isolated figure is
+    **525/526, not 526/526**; and its proposed exact-match-first fix **moves 266
+    windows**. ⚠⚠ **It MASKS A REAL STAGE-3a FAILURE on `p01 safe_tuned -O0
+    isolated`, and `p05/NOTES.md` §1a INVENTED A MECHANISM for the artefact.**
+    ⚠ **`asm.py` is MEASUREMENT-hashed, so a fix is a full re-measure. Do not
+    take it as a hygiene item.**
+
+    ✅ **Every new check has must-fire arms SEEN TO FAIL** — 12
+    (`temp_citations`), 16 (`is_build_determinant`), 7 (pin status), 15
+    (`0c`/`0d`, all re-broken after the tuple shape changed), 5
+    (`bound_sites`). ✅ **The unguarded `0c`/`0d` form was seen to take the
+    module down AT IMPORT**, which is what queue item 42 predicted.
+
+    Evidence: `.tasks/TASK_170_REPORT.md`, `.tasks/TASK_170.md`, `.temp/t170/`.
 
 ## Retracted — do not reinstate
 

@@ -118,7 +118,8 @@
         "file": "patterns/p36-vtable-dispatch/inputs/gen.py",
         "line": 25,
         "module": "measure.py",
-        "cited_line": 64
+        "cited_line": 64,
+        "as_written": "measure.py:64"
       }
     ],
     "harness_modules": [
@@ -160,7 +161,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "741c6d2ea110a225962e6c4dd451c1368d22edde521a54fee629cbb032d69cb2",
+    "harness/check.py": "ae040b91af8bca292923a3eb3cd446b7f307c86e1ad000f02989a2a57bf76d66",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
@@ -260,9 +261,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3269,
+    "bytes": 3267,
     "nvars": 48,
-    "envp_stack_bytes": 3653,
+    "envp_stack_bytes": 3651,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -1223,7 +1224,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: index 8 out of bounds for type '<unknown> *[8]' /home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: load of address 0x559512b66a80 with insufficient space for a",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: index 8 out of bounds for type '<unknown> *[8]' /home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: load of address 0x564d27958a80 with insufficient space for a",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1234,7 +1235,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: index 255 out of bounds for type '<unknown> *[8]' /home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: load of address 0x55f1e835b238 with insufficient space for",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: index 255 out of bounds for type '<unknown> *[8]' /home/apt/repos_common/sec-ladder/patterns/p36-vtable-dispatch/c/kernel.c:89:20: runtime error: load of address 0x55574e577238 with insufficient space for",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1462,7 +1463,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.9,
+        "seconds": 0.8,
         "stdout": "1092665795224792872",
         "model_stdout": "1092665795224792872",
         "stderr": ""
@@ -1492,16 +1493,19 @@
   "table_render": {
     "table": "results/tables/p36-vtable-dispatch.md",
     "renders_to": "results/tables/p36-vtable-dispatch.md",
-    "render_sha256": "a1bc96eeb9aca6ea54d751cd59bce4dc39d7ed8650e5897597c6e1b876ec35ec",
-    "published_sha256": "a1bc96eeb9aca6ea54d751cd59bce4dc39d7ed8650e5897597c6e1b876ec35ec",
+    "render_sha256": "6d8bdde49c9ff8559e7579c56ac4808e358f9b7e721cc6ae6a18d1a92051049f",
+    "published_sha256": "6d8bdde49c9ff8559e7579c56ac4808e358f9b7e721cc6ae6a18d1a92051049f",
     "verdict": "FRESH"
   },
   "controls_json": {},
   "failures": [],
-  "notes": [
-    "1 line citation(s) into other harness modules, reported not failed (promoting them costs a re-measure where the file is measurement-hashed): patterns/p36-vtable-dispatch/inputs/gen.py:25 -> measure.py:64"
+  "notes": [],
+  "loud": [
+    {
+      "section": "doc-citation-other",
+      "message": "1 line citation(s) into harness modules other than `check.py`. NOT failed: these sit in measurement-hashed files, so re-citing them by function costs a re-measure (RECAP queue item 38). Cite the FUNCTION when one of these files is next re-measured anyway: patterns/p36-vtable-dispatch/inputs/gen.py:25 -> measure.py:64"
+    }
   ],
-  "loud": [],
   "blocked": [],
   "verdict": "PASS",
   "complete_run": true,

@@ -132,7 +132,8 @@
         "file": "patterns/p12-strcat-fixed/README.md",
         "line": 48,
         "module": "measure.py",
-        "cited_line": 64
+        "cited_line": 64,
+        "as_written": "measure.py:64"
       }
     ],
     "harness_modules": [
@@ -174,7 +175,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "741c6d2ea110a225962e6c4dd451c1368d22edde521a54fee629cbb032d69cb2",
+    "harness/check.py": "ae040b91af8bca292923a3eb3cd446b7f307c86e1ad000f02989a2a57bf76d66",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
@@ -270,9 +271,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3269,
+    "bytes": 3267,
     "nvars": 48,
-    "envp_stack_bytes": 3653,
+    "envp_stack_bytes": 3651,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -1620,7 +1621,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:16: runtime error: index 128 out of bounds for type 'uint8_t [128]' /home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:25: runtime error: store to address 0x7fc0e09001a0 with insufficient space for an ob",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:16: runtime error: index 128 out of bounds for type 'uint8_t [128]' /home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:25: runtime error: store to address 0x7f991c3001a0 with insufficient space for an ob",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1631,7 +1632,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:16: runtime error: index 128 out of bounds for type 'uint8_t [128]' /home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:25: runtime error: store to address 0x7f4951b001a0 with insufficient space for an ob",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:16: runtime error: index 128 out of bounds for type 'uint8_t [128]' /home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:25: runtime error: store to address 0x7fbd411001a0 with insufficient space for an ob",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1642,7 +1643,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:16: runtime error: index 128 out of bounds for type 'uint8_t [128]' /home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:25: runtime error: store to address 0x7ff7277001a0 with insufficient space for an ob",
+      "diagnostic": "/home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:16: runtime error: index 128 out of bounds for type 'uint8_t [128]' /home/apt/repos_common/sec-ladder/patterns/p12-strcat-fixed/c/kernel.c:64:25: runtime error: store to address 0x7f487ad001a0 with insufficient space for an ob",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1914,18 +1915,21 @@
   "table_render": {
     "table": "results/tables/p12-strcat-fixed.md",
     "renders_to": "results/tables/p12-strcat-fixed.md",
-    "render_sha256": "057b5b858b799d669d68b8bb8f5b228d5d4e78b712fe367014608fe760fb2058",
-    "published_sha256": "057b5b858b799d669d68b8bb8f5b228d5d4e78b712fe367014608fe760fb2058",
+    "render_sha256": "7922641c26adb190ef8baa15f0ab30bab3a26571cd4004280ddcb77b1cf7c033",
+    "published_sha256": "7922641c26adb190ef8baa15f0ab30bab3a26571cd4004280ddcb77b1cf7c033",
     "verdict": "FRESH"
   },
   "controls_json": {},
   "failures": [],
   "notes": [
-    "1 line citation(s) into other harness modules, reported not failed (promoting them costs a re-measure where the file is measurement-hashed): patterns/p12-strcat-fixed/README.md:48 -> measure.py:64",
     "adversarial-overflow.bin/c-gcc: opt/mode variants of this rung disagree (2 distinct behaviours)",
     "adversarial-overflow.bin/c-clang: opt/mode variants of this rung disagree (3 distinct behaviours)"
   ],
   "loud": [
+    {
+      "section": "doc-citation-other",
+      "message": "1 line citation(s) into harness modules other than `check.py`. NOT failed: these sit in measurement-hashed files, so re-citing them by function costs a re-measure (RECAP queue item 38). Cite the FUNCTION when one of these files is next re-measured anyway: patterns/p12-strcat-fixed/README.md:48 -> measure.py:64"
+    },
     {
       "section": "tcb-unsafe",
       "message": "verus.rs:327 `dst_set_unchecked`'s `requires` constrains nothing about ['x'], which its trusted body uses. spec.md justifies it: `x` is a pure VALUE parameter: it is stored into the array and is never used as an address, an index or a length, so there is no precondition a caller could usefully be asked for -- every `u8` is a legal thing to store in a `u8` slot. The two parameters that DO decide whether the unchecked store is defined, `v` and `i`, are both constrained by `i < old(v)@.len()`, which for a `&mut [u8; 128]` reads `i < 128`. This is the parameter-coverage false positive `.memory/04-verus.md` names and p03 was the first pattern to exercise; p12 is the second, and on p12 the item is the one the whole pattern is about. A second conjunct `old(v)@.len() == 128` is deliberately NOT written: for a `&mut [u8; 128]` it is a TAUTOLOGY discharged from the parameter type alone by vstd's `array_len_matches_n`, and p03's gate run refused exactly that draft (p03 NOTES.md 5b)."

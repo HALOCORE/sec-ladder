@@ -329,37 +329,43 @@
         "file": "patterns/p27-handle-table/NOTES.md",
         "line": 342,
         "module": "dloop.py",
-        "cited_line": 361
+        "cited_line": 361,
+        "as_written": "dloop.py:361"
       },
       {
         "file": "patterns/p27-handle-table/NOTES.md",
         "line": 605,
         "module": "measure.py",
-        "cited_line": 238
+        "cited_line": 238,
+        "as_written": "measure.py:238"
       },
       {
         "file": "patterns/p27-handle-table/NOTES.md",
         "line": 1040,
         "module": "build.py",
-        "cited_line": 67
+        "cited_line": 67,
+        "as_written": "build.py:67"
       },
       {
         "file": "patterns/p27-handle-table/NOTES.md",
         "line": 1747,
         "module": "measure.py",
-        "cited_line": 225
+        "cited_line": 225,
+        "as_written": "measure.py:225-262"
       },
       {
         "file": "patterns/p27-handle-table/controls/mkspec.py",
         "line": 361,
         "module": "dloop.py",
-        "cited_line": 361
+        "cited_line": 361,
+        "as_written": "dloop.py:361"
       },
       {
         "file": "patterns/p27-handle-table/spec.md",
         "line": 24,
         "module": "dloop.py",
-        "cited_line": 361
+        "cited_line": 361,
+        "as_written": "dloop.py:361"
       }
     ],
     "harness_modules": [
@@ -401,7 +407,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "741c6d2ea110a225962e6c4dd451c1368d22edde521a54fee629cbb032d69cb2",
+    "harness/check.py": "ae040b91af8bca292923a3eb3cd446b7f307c86e1ad000f02989a2a57bf76d66",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
@@ -502,9 +508,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3269,
+    "bytes": 3267,
     "nvars": 48,
-    "envp_stack_bytes": 3653,
+    "envp_stack_bytes": 3651,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -1171,7 +1177,7 @@
     "adversarial-many.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "15903295355883229332",
+        "stdout": "10864788341330317340",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1184,11 +1190,11 @@
       },
       {
         "exit": 0,
-        "stdout": "18329046891978352952",
+        "stdout": "12672686937786111798",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O3/whole"
+          "O0/whole"
         ],
         "model_exit": 0,
         "model_stdout": "6582356636790626304",
@@ -1197,7 +1203,7 @@
       },
       {
         "exit": 0,
-        "stdout": "7128576683986790465",
+        "stdout": "15675330035311411247",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1210,11 +1216,11 @@
       },
       {
         "exit": 0,
-        "stdout": "8662916895756403221",
+        "stdout": "3755293667955419062",
         "stderr": "",
         "signal": null,
         "cells": [
-          "O0/whole"
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "6582356636790626304",
@@ -1225,20 +1231,7 @@
     "adversarial-many.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "12444721617214293713",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "6582356636790626304",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "16657927487865649345",
+        "stdout": "12535907745443020947",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1251,7 +1244,7 @@
       },
       {
         "exit": 0,
-        "stdout": "17918709314949080399",
+        "stdout": "14505734336456707427",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1264,7 +1257,20 @@
       },
       {
         "exit": 0,
-        "stdout": "18237860763749625718",
+        "stdout": "18105166801457143451",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "6582356636790626304",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "6803529829595082128",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1387,33 +1393,7 @@
     "adversarial-noreuse.bin/c-gcc": [
       {
         "exit": 0,
-        "stdout": "1372655416600471552",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "3390747988282288128",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "7059997167727323136",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O0/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "3390747988282288128",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "8077780024137721856",
+        "stdout": "11974180038389508096",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1426,11 +1406,37 @@
       },
       {
         "exit": 0,
-        "stdout": "9165455445104044032",
+        "stdout": "13026909177077868544",
         "stderr": "",
         "signal": null,
         "cells": [
           "O0/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "3390747988282288128",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "13887433763237439488",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "3390747988282288128",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "8112726306415683584",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "3390747988282288128",
@@ -1441,33 +1447,7 @@
     "adversarial-noreuse.bin/c-clang": [
       {
         "exit": 0,
-        "stdout": "10095872595819538432",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/isolated"
-        ],
-        "model_exit": 0,
-        "model_stdout": "3390747988282288128",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "10183238301514442752",
-        "stderr": "",
-        "signal": null,
-        "cells": [
-          "O3/whole"
-        ],
-        "model_exit": 0,
-        "model_stdout": "3390747988282288128",
-        "hung": false,
-        "diverges": true
-      },
-      {
-        "exit": 0,
-        "stdout": "5304001713130219520",
+        "stdout": "11148601734507898880",
         "stderr": "",
         "signal": null,
         "cells": [
@@ -1480,11 +1460,37 @@
       },
       {
         "exit": 0,
-        "stdout": "9060616598270158848",
+        "stdout": "13044382318216849408",
         "stderr": "",
         "signal": null,
         "cells": [
           "O0/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "3390747988282288128",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "14009745751210305536",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/isolated"
+        ],
+        "model_exit": 0,
+        "model_stdout": "3390747988282288128",
+        "hung": false,
+        "diverges": true
+      },
+      {
+        "exit": 0,
+        "stdout": "3285909141448402944",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O3/whole"
         ],
         "model_exit": 0,
         "model_stdout": "3390747988282288128",
@@ -1895,7 +1901,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2738897==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x5585bc930fbd bp 0x7fff3a679f40 sp 0x7fff3a679f30 READ of size 1 at 0x502000000010 thread T0 #0 0x5585bc930fbc in kernel /home/apt/repos_common/s",
+      "diagnostic": "================================================================= ==3100595==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x563d864a5fbd bp 0x7ffd55236180 sp 0x7ffd55236170 READ of size 1 at 0x502000000010 thread T0 #0 0x563d864a5fbc in kernel /home/apt/repos_common/s",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1906,7 +1912,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2738898==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x5595bad4afbd bp 0x7ffff09196f0 sp 0x7ffff09196e0 READ of size 1 at 0x502000000010 thread T0 #0 0x5595bad4afbc in kernel /home/apt/repos_common/s",
+      "diagnostic": "================================================================= ==3100596==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x55d76921dfbd bp 0x7ffc37870220 sp 0x7ffc37870210 READ of size 1 at 0x502000000010 thread T0 #0 0x55d76921dfbc in kernel /home/apt/repos_common/s",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1928,7 +1934,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2738901==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x56454dd8dfbd bp 0x7fff01f95c80 sp 0x7fff01f95c70 READ of size 1 at 0x502000000010 thread T0 #0 0x56454dd8dfbc in kernel /home/apt/repos_common/s",
+      "diagnostic": "================================================================= ==3100599==ERROR: AddressSanitizer: heap-use-after-free on address 0x502000000010 at pc 0x5636ae5adfbd bp 0x7ffdfaab7460 sp 0x7ffdfaab7450 READ of size 1 at 0x502000000010 thread T0 #0 0x5636ae5adfbc in kernel /home/apt/repos_common/s",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -2148,7 +2154,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.3,
+        "seconds": 0.2,
         "stdout": "3862273672025539787",
         "model_stdout": "3862273672025539787",
         "stderr": ""
@@ -2178,20 +2184,23 @@
   "table_render": {
     "table": "results/tables/p27-handle-table.md",
     "renders_to": "results/tables/p27-handle-table.md",
-    "render_sha256": "fa9125d30c9838f9827a823aebc6f9f43086f5f425571f28895d7d5ac51e970c",
-    "published_sha256": "fa9125d30c9838f9827a823aebc6f9f43086f5f425571f28895d7d5ac51e970c",
+    "render_sha256": "954bd5bd186a93c05d16a0222803e4d2dc582bf125ab7e3665eb03d684c0820a",
+    "published_sha256": "954bd5bd186a93c05d16a0222803e4d2dc582bf125ab7e3665eb03d684c0820a",
     "verdict": "FRESH"
   },
   "controls_json": {},
   "failures": [],
   "notes": [
-    "6 line citation(s) into other harness modules, reported not failed (promoting them costs a re-measure where the file is measurement-hashed): patterns/p27-handle-table/NOTES.md:342 -> dloop.py:361 . patterns/p27-handle-table/NOTES.md:605 -> measure.py:238 . patterns/p27-handle-table/NOTES.md:1040 -> build.py:67 . patterns/p27-handle-table/NOTES.md:1747 -> measure.py:225 . patterns/p27-handle-table/controls/mkspec.py:361 -> dloop.py:361 . patterns/p27-handle-table/spec.md:24 -> dloop.py:361",
     "adversarial-many.bin/c-gcc: opt/mode variants of this rung disagree (4 distinct behaviours)",
     "adversarial-many.bin/c-clang: opt/mode variants of this rung disagree (4 distinct behaviours)",
     "adversarial-noreuse.bin/c-gcc: opt/mode variants of this rung disagree (4 distinct behaviours)",
     "adversarial-noreuse.bin/c-clang: opt/mode variants of this rung disagree (4 distinct behaviours)"
   ],
   "loud": [
+    {
+      "section": "doc-citation-other",
+      "message": "6 line citation(s) into harness modules other than `check.py`. NOT failed: these sit in measurement-hashed files, so re-citing them by function costs a re-measure (RECAP queue item 38). Cite the FUNCTION when one of these files is next re-measured anyway: patterns/p27-handle-table/NOTES.md:342 -> dloop.py:361 . patterns/p27-handle-table/NOTES.md:605 -> measure.py:238 . patterns/p27-handle-table/NOTES.md:1040 -> build.py:67 . patterns/p27-handle-table/NOTES.md:1747 -> measure.py:225-262 . patterns/p27-handle-table/controls/mkspec.py:361 -> dloop.py:361 . patterns/p27-handle-table/spec.md:24 -> dloop.py:361"
+    },
     {
       "section": "collapse-ir",
       "message": "the derived floor is 134x below the tightest cell actually measured, so it rules out total collapse and essentially nothing else -- a cell could lose 99.26% of its work and still pass this stage. Read it as a smoke test, not as evidence that the work happened."

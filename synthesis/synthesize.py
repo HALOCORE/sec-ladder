@@ -44,6 +44,7 @@ Three things here are NOT derived from a record, each declared where it prints:
 """
 import argparse
 import glob
+import hashlib
 import json
 import os
 import re
@@ -304,6 +305,274 @@ SEARCH_REVIEWED = {
             "sixth is the shipped rung. ⚠ TASK_075_REVIEW M6.3 read this as "
             "four and called the number unsupported; it is supported, and the "
             "citation — not the figure — was what was wrong"),
+    # ---------------------------------------------------------------------
+    # ⚠⚠⚠ TASK_170 item B / RECAP queue item 35. THE FOURTEEN ROWS THAT HAD
+    # PRINTED `undeclared` SINCE 26 PATTERNS WERE READ AGAINST THIS DICT --
+    # every `NOTES.md` in full, every `.memory/01-ladder.md` section, every
+    # `controls/` header, and the reviewing task report -- and
+    # **ALL FOURTEEN HAD A REVIEWED SEARCH.** Zero were a reviewed declaration
+    # of NO search; zero were genuinely undeclared. So `undeclared` falls
+    # 14 -> 0 and the column is fully declared at 33.
+    #
+    # ⚠⚠ THAT IS THE STRONG FORM OF TASK_112's AND TASK_166's FINDING, NOT A
+    # NEW ONE: this column has NEVER been a measure of search effort. Its
+    # `undeclared` was 100% bookkeeping, on both audits, at every size.
+    #
+    # ⚠ AND THE FILENAME DETECTOR WOULD HAVE MISSED ALMOST ALL OF THEM.
+    # Only p42 of the fourteen ships a `controls/spellings.py`; p14, p16, p18,
+    # p07, p09 and p38 put the rung search inside `controls/gen_controls.py` or
+    # `controls/span.py`, and **p19 and p23 ship no committed spelling probe at
+    # all** (their levers were built in gitignored scratch and are recorded only
+    # in prose). Meanwhile p23's `controls/guard_variants.c` and p38's
+    # `controls/gen_controls.py` C-side family are repair-site controls, the
+    # `p49` false-positive shape. **Reading, not grepping**, is what this cost.
+    # ---------------------------------------------------------------------
+    "p02": ("R3 searched and SWEPT over 16 consecutive lengths: the fixed-R4 "
+            "bound falls +10 → **+6** on both shipped blobs. ⚠ The R4 side is "
+            "explicitly UNsearched, so +6 is an R3-side bound",
+            "`patterns/p02-buffer-copy/NOTES.md` §10a (TASK_019, forced by "
+            "TASK_018_REVIEW M1), REVIEWED at TASK_023_REVIEW minor 10, which "
+            "works the figure and confirms the file states it correctly — and "
+            "whose own *\"what I did not do\"* names p02's R4 side as the next "
+            "target. Five variants, three in contract; the cheapest "
+            "(`r3_hdrslice`, the `u16` header read out of a 2-byte reslice) is "
+            "−4/−3 against the shipped R3 with ZERO residual on all 16 swept "
+            "lengths. ⚠⚠ And it BEATS the forbidden additive guard at 14 of 16 "
+            "lengths and ties at 2, so **p02's exclusion costs its published "
+            "floor nothing** — the opposite of p16, where the exclusion made "
+            "the tax 4.5× larger"),
+    "p04": ("BOTH sides searched — 16 R3 candidates, 3 R4 with Verus twins: "
+            "the tightest in-contract bound is **+4.00**, not the shipped "
+            "+5.00, so 20% of the whole published tax was R3 SPELLING",
+            "`patterns/p04-ring-buffer/NOTES.md` §10a/§10b/§13c, REVIEWED at "
+            "TASK_042_REVIEW blocker 1 (16 candidates, each verdicted by "
+            "`check.py::spelling_matches` AND by `model.py` on all five matrix "
+            "inputs), landed at TASK_044 and recorded in "
+            "`.memory/01-ladder.md` finding 13. Six in-contract spellings "
+            "across FIVE distinct machine codes measure 3367/11666 against the "
+            "shipped 3368/11667; the mechanism is REGISTER ALLOCATION, not "
+            "bounds-check removal. Both numbers publish — `+5.00` fixed-R4, "
+            "`+4.00` cheapest-found — and §13c records the decision NOT to "
+            "re-ship. R4: `r4_forloop` and `m_clamp_unsafe` are both "
+            "`9 verified, 0 errors` and BYTE-IDENTICAL to the shipped R4, so "
+            "the R4 endpoint has zero measured width. ⚠ The cheaper R3 has "
+            "MORE panic pads (2 vs 1) — pad count is not the tax"),
+    "p05": ("BOTH sides searched hardest in the project (11 R3 spellings, 46 "
+            "R4 over three rounds): R3-side span 101…127 / 331…403 against a "
+            "published 123/399, and the R4 side has NEVER moved by an "
+            "admissible instruction",
+            "`patterns/p05-index-flatten/NOTES.md` §13, §14 and §14f, REVIEWED "
+            "at TASK_021_REVIEW (blocker B1), re-searched at TASK_022, and the "
+            "R4 half WITHDRAWN at TASK_027_REVIEW/TASK_028 on seven Verus "
+            "twins; `.memory/01-ladder.md` finding 6 uses p05 as its canonical "
+            "worked example of the three quantities. ⚠⚠ THREE successive "
+            "published *minima* (`5·nrow+6` → `5·nrow+11` → `5·nrow+13`) were "
+            "each overturned by the next agent's FIRST lever, and each had "
+            "been reached by several independent `md5_fn` bodies — *\"reached "
+            "by many spellings\"* is not evidence of a floor. ⚠ Every R4 "
+            "spelling that moves respells the header read and needs "
+            "`read_unaligned`/`as_ptr`/`from_raw_parts`/`TryFromSliceError`/"
+            "`from_le_bytes`, each `is not supported` at the pinned vstd, so "
+            "those rows are NOT MADE OF RUNGS"),
+    "p07": ("BOTH sides searched: the cheapest in-contract R3 is +2554.45 / "
+            "+8412.35 against a shipped +3017.14 / +10019.42 — a span of "
+            "EXACTLY 1.0000 `Ir` per probe. R4 degenerate; its one admissible "
+            "respelling is DEARER",
+            "`patterns/p07-binary-search/NOTES.md` §10a/§10b, built by "
+            "`controls/gen_controls.py` (`r3_getunwrap`, `r3_prefix`, "
+            "`r3_splitat`, `r3_win`, `r4_for`, `r4_ptr`), REVIEWED at "
+            "TASK_026_REVIEW — *\"reproduces §10a/§10b/§11a to the "
+            "instruction\"* — whose minor 4 caught that `r4_for`'s "
+            "admissibility was an INSPECTION standing beside somebody else's "
+            "Verus run and BUILT the missing twin (`10 verified, 0 errors`); "
+            "landed at TASK_029, recorded in `.memory/01-ladder.md` finding 8. "
+            "The admissible `r4_for` is +58/+92 DEARER and `r4_ptr` dies on "
+            "*\"dereferencing a raw pointer\"*. ⚠ The one OUT-of-contract R3 "
+            "(`r3_win`) is dearer than the cheapest in-contract one, so unlike "
+            "p05 and p16 **p07's declaration is demonstrably not protecting a "
+            "number**"),
+    "p09": ("R3 searched: a **65×** R3-side span (+263…+16992 / +854…+58953) "
+            "against a published +13756 / +48885 — the SPELLING axis alone is "
+            "+13493 `Ir`/call on `small`. R4 searched and degenerate",
+            "`patterns/p09-bitset/NOTES.md` §10a and §3's three-factor table, "
+            "built by `controls/gen_controls.py` family 3 and verdicted in "
+            "contract by `check.py::spelling_matches`, REVIEWED at "
+            "TASK_038_REVIEW: *\"Every marginal `Ir` in NOTES 3/6b/8/8a/10a "
+            "reproduced to 0.01\"* and *\"`spelling_matches` on every control: "
+            "all seeding and R3-span controls in contract; `r3_wordchunks` "
+            "out, as NOTES says\"*. ⚠⚠ The 65× span is the WIDEST in-contract "
+            "R3 spread on this project, and p09 prices the SPELLING factor "
+            "(+13493) beside the LIBRARY one (+29.00 `Ir`/word) so neither is "
+            "mistaken for the safety one. ⚠ `r3_best`'s cheapness comes from "
+            "`chunks_exact(4)`, `is not supported` at the pinned vstd — so "
+            "+263 is a number no R4 could answer with (R4-by-permission "
+            "again). ⚠ The R4 half is the weaker one: `m_clamp_u` (+241) and "
+            "`m_clampb_u` (+721) both RAISE R4 and every route to a wider load "
+            "is unsupported AND `idiom.forbidden`, but neither candidate had a "
+            "Verus twin BUILT the way p04's and p07's did, and the review "
+            "names its own limit: *\"did not attempt an in-contract R3 cheaper "
+            "than `r3_best`, nor re-search R4\"*"),
+    "p14": ("R3 searched (3 in-contract spellings): on `large` the shipped "
+            "cell **OVERSTATES the safe-side figure by 88.9%** — +425.00 "
+            "becomes +225.00. ⚠ The R4 side was never searched",
+            "`patterns/p14-field-split/NOTES.md` §8a/§8a′, a commissioned "
+            "TASK_049 deliverable (*\"two in-contract R3 spellings, and quote "
+            "the cheaper\"*), REVIEWED at TASK_049_REVIEW, whose clean "
+            "negative 7 re-measured 8 cells × 10 blobs independently and "
+            "reproduced `R3 − R4 = +638.00/+425.00`, and whose clean negative "
+            "11 direction-tested both out-of-contract fiats and found both "
+            "against p14's interest. In-contract span `4291.99…4488.99` "
+            "(small) / `2406.99…2607.99` (large). ⚠ THE CHEAPEST SPELLING IS "
+            "NOT THE SAME ONE ON BOTH INPUTS — `t_idxfold` wins on `large`, "
+            "the shipped iterator fold on `small`. ⚠ The only `u_*` control is "
+            "`u_nocap`, a delete-the-check row, so the R4 endpoint is fiat"),
+    "p16": ("BOTH sides searched and the SIGN FLIPS: a published `R3 − R4` of "
+            "+27/+77 becomes **−199 (small) / −2545 (large)** against the "
+            "cheapest-found in-contract R3. The R4 side was searched and its "
+            "one mover DISQUALIFIED",
+            "`.memory/01-ladder.md` finding 4 (p16) and "
+            "`patterns/p16-tlv-walk/NOTES.md` §10a (TASK_018, promoted to a "
+            "SWEPT law at TASK_018_REVIEW — 11 `nrec` values × 2 residue "
+            "classes, 110 marginals, zero residual), §10a.1 (TASK_023, the R4 "
+            "side) and §10a.2 (corrected at TASK_025_REVIEW / TASK_027). The "
+            "in-contract R3 spread is 42 `Ir`/call at `large` (−32 … +10) "
+            "against a published 77 — 55% of the tax. ⚠ THE R4 MOVER IS NOT A "
+            "RUNG: `r4_hdr` needs `read_unaligned`, `is not supported` at the "
+            "pinned vstd, withdrawn at TASK_028 — *\"neither pattern's R4 side "
+            "has moved by a single admissible instruction\"*. ⚠ NO SINGLE "
+            "SPELLING IS CHEAPEST ON BOTH BLOBS: `chunks_exact(64)` is 72 "
+            "dearer at `small` and 180 cheaper at `large`"),
+    "p18": ("R3 searched, 3 in-contract spellings, and the SHIPPED one is the "
+            "cheapest — span width **1.00 `Ir`/call, the narrowest published**, "
+            "so nothing moves. ⊘ The R4 side is NOT searched, declared",
+            "`patterns/p18-varint-shift/NOTES.md` §8d, REVIEWED at "
+            "TASK_051_REVIEW clean negative 11, which reproduced every cell: "
+            "shipped R3 2307.00/890.00, `t_1step` +1.00, `t_chain` 0.00, and "
+            "the out-of-contract `t_iter` −101.00 on `small` but DEARER on "
+            "short varints. ⚠ This is a searched NULL, not an absence — which "
+            "is why it is not in `SEARCH_NONE`. The R4 half IS a declared "
+            "absence, in `.memory/01-ladder.md` finding 17 and in RECAP's "
+            "*Owed*: *\"p18 publishes no pair interval and its R4 side is "
+            "unsearched in contract\"*. ⚠ Every price in §8d is a "
+            "`cut == 0, brk == 0` law — the controls were never re-swept over "
+            "band `t` (§8d, §12, RECAP *Owed*) — so the span is stated on the "
+            "benign fully-terminating domain only"),
+    "p19": ("BOTH sides searched, 3 levers a side, and ALL THREE SIDES ARE "
+            "DEGENERATE — spreads 12 / 11 / 13 `Ir`/call at m = 4096, so "
+            "neither published `R3 − R4` (+4094) nor `R2 − R4` (+25592) "
+            "depends on which spelling ships",
+            "`patterns/p19-state-machine/NOTES.md` §10 (*\"Spelling spread — "
+            "and BOTH sides were searched\"*), REVIEWED at TASK_087_REVIEW, "
+            "which built TWO MORE in-contract R2 spellings that measure "
+            "exactly the shipped R2's numbers (one byte-identical) — *\"five "
+            "R2 spellings now, all degenerate\"* — and rebuilt R4 WITHOUT the "
+            "identity pin's sub-slice to a byte-identical kernel at an "
+            "identical marginal 41516.3000, so **the pin costs R4 nothing at "
+            "the measured level**. §10 also prices the in-contract-and-DEARER "
+            "levers (R3 branch clamp +8.25 `Ir`/byte; absolute indexing +2.25 "
+            "R4 and +10.87 R3, the latter because the check comes back), and "
+            "the rejected absolute-indexing R4 went through Verus FIRST "
+            "(`8 verified, 0 errors`) — rejected on cost with admissibility "
+            "established. ⚠ p19 ships no `controls/`, so the levers are "
+            "scratch and only the review re-measured them; and §10's absolutes "
+            "are a probe binary's, which §12 says and keeps"),
+    "p23": ("BOTH sides searched and the two spans OVERLAP: the in-contract R3 "
+            "floor fell 150.00 `Ir`/call to 2991.00 — **59.00 BELOW an "
+            "in-contract R4** — and the headline ratio went 3.11× → 1.3148×",
+            "`patterns/p23-partition/NOTES.md` §9b/§9b′, `.memory/"
+            "06-catalogue.md`'s p23 row and RECAP finding 38. ⚠⚠ The floor was "
+            "found BY THE REVIEW (TASK_105 M5, *\"the published R3-side span's "
+            "FLOOR is wrong by 150 `Ir`/call\"*) and settled AGAINST the "
+            "headline at TASK_106: `k_u5` restores the pinned conjunct as a "
+            "TAUTOLOGY, matches all 8 `required` including the English, and "
+            "compiles to the SAME OBJECT CODE as the out-of-contract `k_u1` "
+            "(`md5_norm da08af26d9b1`, 249 instructions both). Corrected span "
+            "2991.00 … 3719.00 over twelve in-contract spellings against an R4 "
+            "span 2876.00 … 3050.00, so **at least 150 of the published "
+            "safe-side figure is SPELLING, not SAFETY**. ⚠ The span's TOP "
+            "endpoint was wrong too — 4208.00 was `r3b`, which is "
+            "`forbidden`. ⚠ The correction is rank-dependent: 338.00 at rank "
+            "0, 150.00 at rank 50, 46.00 the other way at rank 100. ⚠ The "
+            "probes are gitignored scratch; `controls/` holds only the C-side "
+            "guard controls and the sweep fitter"),
+    "p27": ("R4 searched at review and THE SHIPPED RUNG MOVED: a dead store "
+            "deleted, +223.26/+782.25 → **+230.07/+792.75** — i.e. AGAINST "
+            "interest. R3 searched twice; R2 never",
+            "`patterns/p27-handle-table/NOTES.md` §8 and §8a, REVIEWED at "
+            "TASK_060_REVIEW major 2 — *\"an admissible, verifying, "
+            "byte-identical R4/R5 pair exists that is 6.81 / 10.50 `Ir`/call "
+            "cheaper, so 'the R4 endpoint is degenerate as far as this task "
+            "searched' is now false\"* — and SHIPPED at TASK_061. The deleted "
+            "line is the epilogue's `arr_set_unchecked(&mut live, j, 0u8)`, "
+            "dead because `live` is a kernel local and `j` only increases; R5 "
+            "still verifies 15/0, twin 20/0, `R4 = R5 exact`, checksums "
+            "identical on all 7 inputs. `.memory/01-ladder.md` finding 19 "
+            "publishes the POST-correction figure. R3 side: two in-contract "
+            "spellings, and the cheapest found IS the shipped one "
+            "(+9.52/+32.00). ⚠ §11 names the unsearched endpoints itself — the "
+            "R2 side, the fold's spelling, the cursor arithmetic and the table "
+            "layout"),
+    "p38": ("R4 searched and it is NOT degenerate: `r4_slice` is −3.00/−7.00 "
+            "below R4ship, so `R3 − inf(R4 found)` is +24.00/+32.00 against a "
+            "published +21.00/+25.00 — 14%/28% of the headline, and it "
+            "FLATTERS SAFE",
+            "`patterns/p38-alias-pun/NOTES.md` §8a/§8b and "
+            "`patterns/p38-alias-pun/controls/span.py`, whose own header gives "
+            "the motive: *\"'degenerate as far as this task searched' was "
+            "false on two consecutive patterns (p10, p27) and both times it "
+            "flattered the safe rung\"*. REVIEWED at TASK_066_REVIEW P1, which "
+            "re-ran the control and reproduced every number (R3ship "
+            "1391.30/3350.00, R4ship 1370.30/3325.00, `r4_slice` −3.00/−7.00, "
+            "`r4_end` +79.00/+303.00); recorded at `.memory/01-ladder.md` "
+            "finding 21 as *\"the R4 side is disclosed but NOT established, "
+            "and it flatters SAFE\"*. `r4_slice`'s twin was NOT built (it "
+            "needs an unchecked reslice AND an element accessor — two new "
+            "trusted items on a pattern with three), so what ships is the "
+            "fixed-R4 bound plus an R3-side span of 1391.30…1597.30 / "
+            "3350.00…3972.00, and no pair interval. ⚠⚠ "
+            "`controls/gen_controls.py` is NOT this search — it is the C-side "
+            "`c_pun`-vs-neighbours repair control of §8c"),
+    "p42": ("BOTH sides searched TWICE and the SIGN FLIPPED: a fifth R4 "
+            "spelling beat every R3 measured, −36.00/−2036.00 → "
+            "**+12.00/+11.00**, and it was SHIPPED as the R4 rung. The R3 span "
+            "was separately 4.5× too wide",
+            "`patterns/p42-goto-cleanup/NOTES.md` §9/§9a/§11b and "
+            "`patterns/p42-goto-cleanup/controls/spellings.py` (five R4, four "
+            "R3, each substituted from a shipped rung). REVIEWED at TASK_109 "
+            "blocker 2, which searched ONE spelling past TASK_104's "
+            "four-per-side and found a do-while fold over a descending cursor "
+            "— `15 verified, 0 errors`, `identity exact`, agreeing on all 12 "
+            "inputs — BELOW every R3 spelling p42 had measured; shipped at "
+            "TASK_110. REVIEWED AGAIN at TASK_116 §B4 and corrected at "
+            "TASK_118: `r3_zeroed` matches `required`'s **R2** clause and "
+            "`r3_push` has no `extend`, so the in-contract R3 span is "
+            "1419…1627 / 51138…59845, not 1419…2634 / 51138…102846. ⚠⚠ The R3 "
+            "and R4 spans OVERLAP at both ends, so p42 publishes NO "
+            "rung-to-rung difference — only `R3ship − R4ship` as a fixed-R4 "
+            "bound. ⚠ The lesson is about the SEARCH, not the number: the "
+            "first four R4 spellings were four ways of writing ONE shape"),
+    "p46": ("BOTH sides searched (3 R4 levers, 3 R3), and BOTH ARE DEGENERATE "
+            "— R4's span is 2.00 `Ir`/call, R3's is 0.00, every lever flat in "
+            "`n` and in `m`. ⚠ Those widths are TASK_092's UNREVIEWED "
+            "re-measure; the reviewed pair was 3 and 2",
+            "`patterns/p46-bignum-mac/NOTES.md` §8b (*\"searching one side is "
+            "not searching\"*) and §0c, levers generated by "
+            "`controls/mkvariants.py` from the shipped rungs by substitutions "
+            "that assert their own count and FAIL CLOSED. REVIEWED at "
+            "TASK_089_REVIEW M1, which caught `spec.md`'s hashed `why` "
+            "claiming *\"three R3 spellings span 9490 … three R4 spellings "
+            "span 2750; NEITHER SIDE IS DEGENERATE\"* — figures that appear "
+            "NOWHERE in `NOTES.md` and came from the retracted pre-build "
+            "probe. ⚠⚠ The CHEAPEST unsafe spelling found is not a rung and "
+            "not degenerate: `r4_mutreslice` is −695…−2595 `Ir`/call below "
+            "R4ship and below EVERY safe spelling, its full R5 verifies "
+            "`21 verified, 0 errors`, and it is excluded on two MEASURED "
+            "grounds — two new trusted items (TCB 5/3 → 7/5) and an R4/R5 pair "
+            "that is `differ` at `-O3` by `15n + 1`. **Relax either and the "
+            "headline inverts.** ⚠ The corrected widths come from TASK_092's "
+            "one-sided `-C codegen-units=1` fix, which `RECAP.md`'s START HERE "
+            "box still marks PROVISIONAL and unreviewed; it moved the "
+            "conclusion in the STRENGTHENING direction"),
 }
 
 # ⚠ The entries above that record a REVIEWED DECLARATION OF *NO* SEARCH rather
@@ -655,13 +924,24 @@ def derived_correction(meas, gates, pat, a_, b_, inp):
 
 # ------------------------------------------- the PER-PATTERN null, and the rule
 #
-# `NULL_PAIR` is the pair the `identity` pin forces to agree.  `check_identity`
-# compares the two rungs' `-O3 isolated` kernel digests (`check.py:3303`), so on
-# THIS column -- `-O3 isolated`, the only one this file publishes -- the pair's
+# `NULL_PAIR` is the pair the `identity` pin forces to agree.
+# `check.py::check_identity` compares the two rungs' `-O3 isolated` kernel
+# digests, so on THIS column -- `-O3 isolated`, the only one this file
+# publishes -- the pair's
 # derived correction is a MEASURED NULL: a number that ought to be zero and is
 # not.  Anything a pattern reads there is that pattern's own noise on this
 # column, and a correction no larger than it is not resolvable HERE, whatever
 # the tree-wide bands say.
+#
+# ⚠ TASK_170 item A: this comment and the published sentence in `emit_bands`
+# both carried `(check.py:3303)` beside the function name.  That line had
+# ROTTED -- it is a data line inside `check_marginal_ir`'s docstring, not
+# `check_identity` at all -- and the belt-and-braces spelling (function name
+# AND line) is exactly the shape `.memory/02-bench-rules.md` retracts:
+# *"name the FUNCTION and give NO LINE NUMBER AT ALL"*.  `.memory/` recorded
+# this same coordinate as rotted and repaired it IN ITS OWN COPY ONLY, which
+# is why the generator kept re-emitting it into a PUBLISHED artefact.
+# **Do not put a line number back.**
 #
 # ⚠ MODE AND LEVEL ARE PART OF THE STATEMENT, and getting either wrong has
 # already produced two wrong tables (TASK_158 M1/M2, and this file's third
@@ -762,7 +1042,106 @@ def null_rule_selftest(meas, gates):
     return planted, live, live_note
 
 
-def derived(meas, gates, pat, a_, b_, lab=None):
+# --------------------------------------------------------------------------
+# `§` -- A CORRECTION THAT CROSSES A LIBC BULK-ROUTINE THRESHOLD (TASK_170 E)
+#
+# `Ir` counts instructions, and a bulk fill/copy changes INSTRUCTIONS PER BYTE
+# by ~10x across a size threshold while the hardware cost goes the other way:
+# `rep stosb` is what the CPU runs BECAUSE it is fast, so `Ir` reports the cost
+# RISING at exactly the size the real cost falls (`.memory/03-measurement.md`).
+# A difference taken across that threshold is real work, priced in a regime no
+# other row in this column is in -- so it is not comparable with them.
+#
+# ⚠⚠ WHAT MUST NOT BE PUBLISHED HERE IS A DISCOUNT FACTOR. The *"~90% of the
+# term is counter, not code"* gloss is WITHDRAWN: its `≈426 Ir` counterfactual
+# was glibc **`memcpy`**'s 4092-byte figure (`0.104 Ir`/byte) re-badged as a
+# **`memset`** counterfactual (TASK_169 §3b). There is no measured vector-path
+# counterfactual for p42's zeroing, so no percentage may be quoted. One rung
+# zeroes 4096 bytes and the other does not; the work is REAL and belongs
+# entirely to one rung. What `Ir` gets wrong is the PRICE, not the presence.
+#
+# THE TEST IS THE `Ir`/BYTE SIGNATURE, and the sidecar gives `Ir` PER CALL of
+# the routine without a byte count -- so the byte count is inferred from the
+# two possible rates and checked against the routine's own measured crossover:
+#
+#   vector 0.10 Ir/byte  =>  bytes = 10 * C  =>  C < lo forces VECTOR
+#   byte-wise ~1.00      =>  bytes = C       =>  C > hi forces BYTE-WISE
+#
+# ⚠ AND THE FIRST SPELLING OF THIS CENSUS FOUND ONLY p42, WHICH IS THE
+# FLATTERING ANSWER. In this sidecar the glibc routines have NO SYMBOL -- they
+# are bare addresses -- so a name regex misses every one of them and reports
+# the one Rust-named callee. `0x189480` and `0x188a80` are resolved in
+# `.memory/03-measurement.md`.
+BULK_REGIME = {
+    "0x0000000000189480":
+        ("glibc `memset` (`__memset_avx2_unaligned_erms`)", 300.0, 4000.0),
+    "0x0000000000188a80":
+        ("glibc `memmove` (`__memmove_avx_unaligned_erms`)", 852.0, 8192.0),
+    "__rustc::__rust_alloc_zeroed":
+        ("`__rust_alloc_zeroed`'s fill", 300.0, 4000.0),
+}
+
+
+def bulk_regime(callee, ir_per_callee_call):
+    """`(name, "VECTOR"|"BYTE-WISE"|"?")`, or `None` if not a bulk routine."""
+    if callee not in BULK_REGIME:
+        return None
+    name, lo, hi = BULK_REGIME[callee]
+    c = ir_per_callee_call
+    return (name, "VECTOR" if c < lo else "BYTE-WISE" if c > hi else "?")
+
+
+def regime_crossing(outw, floor=None):
+    """`{(pat, inp, lab): [evidence]}` -- published rows the `§` marker applies to.
+
+    A row qualifies when a bulk routine's contribution is ASYMMETRIC across the
+    pair by at least the floor AND at least one side is in the BYTE-WISE
+    regime. Symmetric terms cancel out of the difference and are not marked --
+    p08's `memset` is 4113.00 `Ir` in all four RUST cells, so `R2-R4`, `R3-R4`
+    and `R5-R4` are clean and only `gcc-clang` is not (gcc inlines the same
+    4096-byte fill as a 512-`Ir` `rep stos %rax`)."""
+    floor = FLOOR if floor is None else floor
+    out = {}
+    for pat, d in sorted(outw.items()):
+        if not isinstance(d, dict):
+            continue
+        for inp in ("small.bin", "large.bin"):
+            side = d.get(inp)
+            if not isinstance(side, dict):
+                continue
+            cells = side.get("cells") or {}
+            for a_, b_, lab in PAIRS:
+                if a_ not in cells or b_ not in cells:
+                    continue
+                ev = []
+                for k in sorted(set(BULK_REGIME)):
+                    ia = (cells[a_].get("outward_by_callee_per_call") or {}).get(k, 0.0)
+                    ib = (cells[b_].get("outward_by_callee_per_call") or {}).get(k, 0.0)
+                    if abs(ia - ib) < floor:
+                        continue
+                    regs = []
+                    for cell in (a_, b_):
+                        c = (cells[cell].get("outward_ir_per_callee_call")
+                             or {}).get(k)
+                        if c is None:
+                            continue
+                        nm, r = bulk_regime(k, c)
+                        regs.append((cell, nm, c, r))
+                    if any(r == "BYTE-WISE" for _, _, _, r in regs):
+                        ev.append(
+                            f"{regs[0][1]} contributes {ia - ib:+.2f} `Ir` to "
+                            "this difference and is priced BYTE-WISE on "
+                            + " and ".join(
+                                f"`{cell}` ({c:.2f} `Ir`/call)"
+                                for cell, _, c, r in regs if r == "BYTE-WISE")
+                            + (" while the other side does not call it at all"
+                               if len(regs) == 1 else ""))
+                if ev:
+                    out[(pat, inp, lab)] = ev
+    return out
+
+
+def derived(meas, gates, pat, a_, b_, lab=None, cross=None):
     """The `corrected (derived)` cell: the corrected difference with the
     correction in parentheses, on both blobs.  A dash means the derived
     correction is inside the +-2.00 Ir floor, where this route cannot tell it
@@ -808,6 +1187,11 @@ def derived(meas, gates, pat, a_, b_, lab=None):
         else:
             any_move = True
             out.append(f"**{nm} {k - k2 + c:+.2f}** ({c:+.2f})")
+        # `§` is PER BLOB, not per row: p42's zeroing is BYTE-WISE at
+        # n = 4096 (`large`) and VECTOR at n = 168 (`small`), which is the
+        # whole point -- the same code, the same rung pair, two regimes.
+        if cross and (pat, inp, lab) in cross and band != "low":
+            out[-1] += " **§**"
     if not any_row:
         return "no record"
     s = " / ".join(out) if any_move else ""
@@ -861,6 +1245,107 @@ def control_census(pat_dir, timeout=60):
     return ", ".join(f"{k} {counts[k]}" for k in sorted(counts))
 
 
+def _sha256_file(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def outward_pin_status(outw, meas, read=None):
+    """`{pattern: [reason, ...]}` -- empty list means FRESH. TASK_170 item D.
+
+    Three comparisons, because the sidecar has three kinds of determinant:
+
+      * `derived_from_sha256` -- the BUILD determinants, written by
+        `outward_ir.py::repin`, which owns the definition and arms it;
+      * `input_sha256` -- the blob, which no source hash can stand in for;
+      * `n_iters` -- the per-call DIVISOR, which lives in the measurement
+        record and is a VALUE, not a file.
+
+    ⚠ A MISSING blob is *not* staleness, exactly as
+    `measure.py::matrix_inputs`' docstring insists: the blobs are gitignored
+    and running `inputs/gen.py` is the documented way to get them back. A
+    checker that shouts STALE on a fresh clone is a checker that gets
+    switched off, which is this whole item's argument.
+
+    `read` is an injection point for the must-fire arms: `(relpath) -> sha256
+    or None`. Nothing else passes it."""
+    if read is None:
+        def read(rel):
+            p = os.path.join(REPO, rel)
+            return _sha256_file(p) if os.path.isfile(p) else None
+    out = {}
+    for pat, d in sorted(outw.items()):
+        if not isinstance(d, dict):
+            continue
+        why = []
+        for rel, want in sorted((d.get("derived_from_sha256") or {}).items()):
+            got = read(rel)
+            if got is None:
+                why.append(f"{rel} is GONE")
+            elif got != want:
+                why.append(f"{rel} moved")
+        for rel, want in sorted((d.get("input_sha256") or {}).items()):
+            got = read(rel)
+            if got is not None and got != want:
+                why.append(f"{rel} (blob) moved")
+        for inp in ("small.bin", "large.bin"):
+            side = d.get(inp)
+            rec = (meas.get(pat) or {}).get("inputs") or {}
+            if isinstance(side, dict) and inp in rec:
+                if side.get("n_iters") != rec[inp].get("n_iters"):
+                    why.append(f"{inp} n_iters {side.get('n_iters')} != "
+                               f"record {rec[inp].get('n_iters')}")
+        out[pat] = why
+    return out
+
+
+#: Must-fire arms for the pin comparison. Driven from `main`, printed into the
+#: artefact, and each was SEEN TO FAIL under the regression its label names
+#: (TASK_170, `.temp/t170/pin_status_break.py`).
+_PIN_H = "a" * 64
+_PIN_G = "b" * 64
+_PIN_DOC = {"p90": {"derived_from_sha256": {"harness/build.py": _PIN_H},
+                    "input_sha256": {"patterns/p90-x/inputs/small.bin": _PIN_H},
+                    "small.bin": {"n_iters": 100}}}
+_PIN_MEAS = {"p90": {"inputs": {"small.bin": {"n_iters": 100}}}}
+
+
+def _pin_arm(reader):
+    try:
+        return outward_pin_status(_PIN_DOC, _PIN_MEAS, reader)["p90"]
+    except Exception as e:                                    # noqa: BLE001
+        return ["RAISED " + repr(e)]
+
+
+PIN_STATUS_CASES = [
+    ("everything matches -> FRESH",
+     _pin_arm(lambda rel: _PIN_H), []),
+    ("a BUILD determinant moved -> stale",
+     _pin_arm(lambda rel: _PIN_G if rel.endswith("build.py") else _PIN_H),
+     ["harness/build.py moved"]),
+    ("a build determinant DELETED -> stale, and it says so differently",
+     _pin_arm(lambda rel: None if rel.endswith("build.py") else _PIN_H),
+     ["harness/build.py is GONE"]),
+    ("the BLOB moved -> stale (no source hash can see this)",
+     _pin_arm(lambda rel: _PIN_G if rel.endswith(".bin") else _PIN_H),
+     ["patterns/p90-x/inputs/small.bin (blob) moved"]),
+    ("⚠ a MISSING blob is NOT staleness -- a fresh clone has none",
+     _pin_arm(lambda rel: None if rel.endswith(".bin") else _PIN_H), []),
+    ("the n_iters DIVISOR moved -> stale",
+     outward_pin_status(_PIN_DOC,
+                        {"p90": {"inputs": {"small.bin": {"n_iters": 101}}}},
+                        lambda rel: _PIN_H)["p90"],
+     ["small.bin n_iters 100 != record 101"]),
+    ("⚠ an UNPINNED entry is not reported STALE here -- `unpinned` is a "
+     "separate list, and conflating them is how 33 false STALEs happened",
+     outward_pin_status({"p90": {"small.bin": {"n_iters": 100}}}, _PIN_MEAS,
+                        lambda rel: _PIN_G)["p90"], []),
+]
+
+
 def calibrate(meas, gates, outw):
     """Score the DERIVED column against the callgrind sidecar, live.
 
@@ -878,13 +1363,24 @@ def calibrate(meas, gates, outw):
     # found THREE PATTERNS STALE (22 entries against 25) with nothing able to
     # say so, and `results/synthesis.md` printed the ABSENCE of the pin as a
     # caveat in its own text -- a warning is not a detector.
-    s["stale"] = sorted(
-        p for p, d in outw.items()
-        if isinstance(d, dict) and d.get("gate_source_sha256")
-        and p in gates and d["gate_source_sha256"] != gates[p].get("source_sha256"))
+    #
+    # ⚠⚠⚠ AND THE KEY IT COMPARED WAS THE WRONG ONE -- TASK_170 item D.
+    # `gate_source_sha256` covers `check.py`, `vparse.py`, every `*.md`,
+    # `model.py`, `inputs/gen.py` and `common/layout/*`, none of which the
+    # sidecar reads, so ONE `check.py` docstring edit printed STALE on all 33
+    # (TASK_168 P3) and every one of those STALEs was FALSE. RECAP item 37's
+    # proposed replacement, `measure.py::measurement_sources`, was MEASURED at
+    # TASK_169 §5e and again at TASK_170 (`.temp/t170/pin_probe.py`) and STILL
+    # reports 4 of 33 (`p12 p13 p16 p38`), on `model.py`/`inputs/gen.py`
+    # comment edits. The pin is now `derived_from_sha256` -- the BUILD
+    # determinants only -- plus the blob and `n_iters`, written by
+    # `outward_ir.py::repin`, which documents the set and arms it.
+    st = outward_pin_status(outw, meas)
+    s["stale"] = sorted(p for p, why in st.items() if why)
+    s["stale_why"] = st
     s["unpinned"] = sorted(
         p for p, d in outw.items()
-        if isinstance(d, dict) and not d.get("gate_source_sha256"))
+        if isinstance(d, dict) and not d.get("derived_from_sha256"))
     # bands[name] = [rows, real, spurious, smallest |correction| in the band]
     bands = {b: [0, 0, 0, None] for b in ("low", "mid", "high")}
     resid, misses = [], []
@@ -1292,31 +1788,78 @@ def main():
         # TASK_107 §F. This paragraph used to read "⚠ That sidecar is the only
         # thing in this file with no staleness pin", which was true and was a
         # WARNING rather than a DETECTOR -- the sidecar was found three patterns
-        # stale (22 entries against 25) with nothing able to report it. It now
-        # carries `gate_source_sha256` per pattern, the same key
-        # `licence.json` has, and the status is computed on every run.
+        # stale (22 entries against 25) with nothing able to report it.
+        # ⚠⚠ TASK_170 item D: the pin TASK_107 added was the GATE
+        # `source_sha256`, and it was the WRONG KEY -- one `check.py` docstring
+        # edit printed STALE on all 33 and every one of those was FALSE. The
+        # comparison is now `outward_pin_status`, over the BUILD determinants
+        # plus the blob plus the `n_iters` divisor.
         if cal["stale"] or cal["unpinned"]:
-            w(f"⚠⚠ **`synthesis/outward_ir.json` IS STALE against the gate "
-              f"records, so the calibration above is scored partly on rows "
-              f"taken against sources that have since moved.**"
-              + (f" **STALE: {', '.join(cal['stale'])}.**" if cal["stale"]
-                 else "")
-              + (f" **No pin at all (emitted before TASK_107): "
-                 f"{', '.join(cal['unpinned'])}.**" if cal["unpinned"] else "")
+            w(f"⚠⚠ **`synthesis/outward_ir.json` IS STALE, so the calibration "
+              f"above is scored partly on rows taken against sources that have "
+              f"since moved.**"
+              + (" **STALE: "
+                 + "; ".join(f"{p} ({', '.join(cal['stale_why'][p][:3])})"
+                             for p in cal["stale"]) + ".**"
+                 if cal["stale"] else "")
+              + (f" **No pin at all: {', '.join(cal['unpinned'])}.** Run "
+                 f"`synthesis/outward_ir.py --repin synthesis/outward_ir.json`, "
+                 f"which needs no callgrind." if cal["unpinned"] else "")
               + f" Re-emit with `synthesis/outward_ir.py --emit "
               f"synthesis/outward_ir.json` against a fully built `.temp/build/` "
               f"(352 callgrind runs), then re-run this file.")
         else:
+            npin = sum(len(d.get("derived_from_sha256") or {})
+                       for d in outw.values() if isinstance(d, dict))
             w(f"✅ **`synthesis/outward_ir.json` is FRESH** — all "
-              f"{len(outw)} entries carry the gate `source_sha256` they were "
-              f"taken against and every one still matches (TASK_107 §F; the "
-              f"key and the check are copied from `licence.json`, which is why "
-              f"`LICENCE STALE` and this line now mean the same thing). It was "
-              f"once found **three patterns stale, 22 entries against 25**, "
-              f"and this file's own text said the pin did not exist — a "
-              f"warning where a detector was wanted. Re-emitting costs 352 "
-              f"callgrind runs against a fully built `.temp/build/`, which is "
-              f"why it calibrates a column here and no longer **is** one.")
+              f"{len(outw)} entries carry a pin and every one still matches: "
+              f"**{npin} build-determinant hashes, {sum(len(d.get('input_sha256') or {}) for d in outw.values() if isinstance(d, dict))} "
+              f"input blobs and the `n_iters` divisor**, compared by "
+              f"`synthesize.py::outward_pin_status`. It was once found **three "
+              f"patterns stale, 22 entries against 25**, and this file's own "
+              f"text said the pin did not exist — a warning where a detector "
+              f"was wanted. Re-emitting costs 352 callgrind runs against a "
+              f"fully built `.temp/build/`, which is why it calibrates a "
+              f"column here and no longer **is** one.")
+        w("")
+        w("⚠⚠ **AND THE PIN IT CARRIED UNTIL TASK_170 WAS THE WRONG KEY — "
+          "which matters because a sidecar nobody will re-emit is a sidecar "
+          "whose false STALE just gets ignored.** TASK_107 §F pinned the "
+          "**gate** `source_sha256`, copied from `licence.json`. That digest "
+          "covers `harness/check.py`, `harness/vparse.py`, every "
+          "`patterns/*/*.md`, `model.py`, `inputs/gen.py` and "
+          "`common/layout/*` — **none of which this sidecar reads, and none "
+          "of which can move a callgrind number of an already-built binary.** "
+          "One `check.py` docstring edit at TASK_168 therefore printed STALE "
+          "on **all 33 entries, every one FALSE**, and stage 9b's own "
+          "docstring had already argued against the key in terms: *\"a pin "
+          "whose STALE does not mean 'the numbers are wrong' is a pin that "
+          "gets switched off.\"* ⚠ **The obvious replacement — "
+          "`measure.py::measurement_sources` — was MEASURED TWICE and is not "
+          "the repair either: it still reports 4 of 33 STALE (`p12 p13 p16 "
+          "p38`), on `model.py`/`inputs/gen.py` comment edits.** What is "
+          "pinned now is the BUILD determinants only (the four rung sources, "
+          "`c/*`, `common/driver.*`, `build.py`, `verus_run.py`) plus the blob "
+          "and the divisor: **0 of 33 stale on the same evidence.** ✅ **And "
+          "no callgrind run was needed to land it**: the old key was not one "
+          "hash but the whole `path → sha256` map, so `outward_ir.py --repin` "
+          "*filters that map* — the values below are still TASK_166's, taken "
+          "at commit `6f5674f`. ⚠ **The one determinant that could not be "
+          "verified retroactively is the blob for `p02 p05 p07 p11 p17`, "
+          "whose measurement records predate TASK_035's provenance block and "
+          "carry no `input_sha256`; 56 of 66 blobs were cross-checked and 0 "
+          "mismatched.**")
+        w("")
+        bad_arms = [lab for lab, got, want in PIN_STATUS_CASES if got != want]
+        w(f"*The pin comparison's own must-fire arms, run on every emission of "
+          f"this file:* **{len(PIN_STATUS_CASES) - len(bad_arms)} of "
+          f"{len(PIN_STATUS_CASES)} pass**"
+          + ("." if not bad_arms else
+             " — ⚠⚠ **FAILING: " + "; ".join(bad_arms) + "**.")
+          + " They cover a moved determinant, a deleted one, a moved blob, a "
+            "**missing** blob (which is NOT staleness — the blobs are "
+            "gitignored and a fresh clone has none), a moved `n_iters`, and an "
+            "entry with no pin at all.")
         w("")
         lc = calibrate_licence(meas, lic, outw)
         if lc:
@@ -1397,7 +1940,7 @@ def main():
     w("⚠⚠ **`†` — A PATTERN'S OWN NULL, AND IT OUTRANKS THE TREE-WIDE BANDS.** "
       "The bands above are scored across the tree. But `identity` forces R4's "
       "and R5's kernels to agree — `check.py::check_identity` compares their "
-      "`-O3 isolated` digests (`check.py:3303`) — so on **this column** each "
+      "`-O3 isolated` digests — so on **this column** each "
       "pattern's own `R5 - R4` correction is a **measured null**: a number "
       "that ought to be 0.00 and is not. It is not small everywhere:")
     w("")
@@ -1464,6 +2007,74 @@ def main():
     w("")
     w(BULK_CALLS_NOTE)
     w("")
+
+    # ------------------------------------------------------- `§`, TASK_170 E
+    cross = regime_crossing(outw)
+    w("⚠⚠ **`§` — A CORRECTION THAT CROSSES A LIBC BULK-ROUTINE THRESHOLD: "
+      "REGIME-DEPENDENT, AND NOT COMPARABLE WITH THE REST OF THIS COLUMN.**")
+    w("")
+    w("`Ir` counts instructions. A bulk fill or copy changes its "
+      "**instructions per byte by roughly 10×** across a size threshold — and "
+      "in the direction that makes the counter *wrong*: `rep stosb` is what "
+      "the hardware runs **because it is fast**, so `Ir` reports the cost "
+      "**rising 6.5× at exactly the size the real cost falls** "
+      "(`.memory/03-measurement.md`'s zero-fill probe: 326.30 `Ir` at "
+      "n = 1024, **2106.94** at n = 2048 — ⚠ that probe is TASK_074's and "
+      "`.memory/` marks it **PROVISIONAL, not yet reviewed**, so it is "
+      "quoted as the direction and the size of the jump, not as a "
+      "constant). A difference taken across that "
+      "threshold is **real work**, priced in a regime no other row here is "
+      "in — so the number stands, its band stands, and its **magnitude is not "
+      "comparable** with a sub-threshold row.")
+    w("")
+    w("⚠⚠ **NO DISCOUNT FACTOR IS PUBLISHED, AND THE ONE THAT WAS DRAFTED IS "
+      "WITHDRAWN.** The gloss *\"~90% of the term is counter, not code\"* "
+      "rested on a `≈426 Ir` vector-path counterfactual that was glibc "
+      "**`memcpy`**'s own 4092-byte figure (`0.104 Ir`/byte) re-badged as a "
+      "**`memset`** counterfactual — two libc routines, two thresholds, one "
+      "quoted at the other (TASK_169 §3b). **There is no measured "
+      "vector-path counterfactual for these fills, so no percentage may be "
+      "quoted**, and *\"the work is not there\"* would be false anyway: on "
+      "p42 one rung zeroes 4096 bytes and the other does not.")
+    w("")
+    if cross:
+        w("**The marked rows are DERIVED, not listed** — "
+          "`synthesize.py::regime_crossing` requires a bulk routine's "
+          "contribution to be **asymmetric across the pair** by at least "
+          f"{FLOOR:.2f} `Ir` **and** at least one side to be in the byte-wise "
+          "regime. The regime is read off the routine's own `Ir` per call "
+          "against its measured crossover, because the sidecar has no byte "
+          "count: below `0.10 Ir`/byte a call of `C` `Ir` implies `10C` "
+          "bytes, so a small `C` **forces** the vector path and a large one "
+          "**forces** the byte-wise path.")
+        w("")
+        w("| pattern | blob | pair | why |")
+        w("|---|---|---|---|")
+        for (p_, i_, l_), ev in sorted(cross.items()):
+            w(f"| {p_} | {i_[:-4]} | `{l_}` | " + " · ".join(ev) + " |")
+        w("")
+        w("⚠ **Two things this census settles that marking `p42` by hand "
+          "would not have.** (a) **`p08 gcc-clang` is marked and nobody had "
+          "noticed**: gcc inlines the same 4096-byte fill as a 512-`Ir` "
+          "`rep stos %rax` while clang calls glibc `memset` at 4113.00 `Ir` "
+          "— identical work, 8× apart, inside a published row. (b) **p08's "
+          "rung pairs are NOT marked**, correctly: the 4113.00 `Ir` `memset` "
+          "is in *all four* Rust cells, so it cancels out of `R2-R4`, "
+          "`R3-R4` and `R5-R4` exactly. ⚠ And **`§` is per BLOB**: p42's "
+          "`R2-R4` is marked on `large` (the fill is 4342.00 `Ir`) and not "
+          "on `small` (189.01 `Ir`, forced vector) — the same code, the same "
+          "rung pair, two regimes.")
+    else:
+        w("**No row qualifies today.**")
+    w("")
+    w("⚠ **The first spelling of this census found `p42` and nothing else, "
+      "which is the flattering answer.** In `synthesis/outward_ir.json` the "
+      "glibc routines carry **no symbol at all** — they are bare addresses — "
+      "so a name regex misses every one of them and reports only the "
+      "Rust-named `__rust_alloc_zeroed`. `0x189480` and `0x188a80` are "
+      "resolved in `.memory/03-measurement.md`.")
+    w("")
+
     for a_, b_, lab in PAIRS:
         show_search = lab in ("R2-R4", "R3-R4")
         w(f"### `{lab}`  (`{a_}` - `{b_}`)")
@@ -1476,7 +2087,9 @@ def main():
           f"pattern's `R5 - R4` null and is NOT promoted to a band at all** — "
           f"the null prints beside it. ⚠ **`‡` marks a cell whose correction "
           f"is a phase of the environment block rather than a property of the "
-          f"code** — see the note under the table.*")
+          f"code**, and **`§` a cell whose correction crosses a libc "
+          f"bulk-routine threshold and is therefore regime-dependent** — see "
+          f"the notes above and below the table.*")
         w("")
         if show_search:
             w("⚠ The last column is the **R3/R4 spelling search state**, and it "
@@ -1508,7 +2121,7 @@ def main():
             if entry.get("why") and (verd != "LICENSED"
                                      or "UNPRICED" in entry["why"]):
                 whys.append(f"- **{pat}** `{verd}` — {entry['why']}")
-            corr = derived(meas, gates, pat, a_, b_, lab)
+            corr = derived(meas, gates, pat, a_, b_, lab, cross)
             s = SEARCH_REVIEWED.get(pat)
             w(f"| {d['pattern']} | {fmt(v[0], 1)} | {fmt(v[1], 1)} | {verd} "
               f"| {corr} |"
@@ -2001,7 +2614,8 @@ def main():
         w(f"| {meas[pat]['pattern']} | "
           + ", ".join(f"{i} {v:.2f}" for i, v in neg[pat]) + " | "
           + pl.get("verdict", "-") + " | "
-          + (derived(meas, gates, pat, "safe_tuned", "unsafe", "R3-R4")
+          + (derived(meas, gates, pat, "safe_tuned", "unsafe", "R3-R4",
+                      regime_crossing(outw))
              or f"inside the ±{FLOOR:.2f} floor") + " | "
           + (s[0] if s else "undeclared") + " |")
     w("")
@@ -2060,14 +2674,27 @@ def main():
       "refuses to publish a single number at all. **THREE of the six negatives "
       "in this table are known to move and every one of the three moves "
       "AGAINST the safe rung; p11's cheaper R4 exists and is inadmissible at "
-      "the pin; only p18 and p46 have an undeclared search state.** So the "
+      + (f"the pin; **{', '.join(sorted(set(neg) - set(SEARCH_REVIEWED)))} "
+         f"still ha{'s' if len(set(neg) - set(SEARCH_REVIEWED)) == 1 else 've'}"
+         f" an undeclared search state.** "
+         if set(neg) - set(SEARCH_REVIEWED) else
+         "the pin; and every row in this table now DECLARES its search "
+         "state.** ")
+      + "So the "
       "honest reading is that the column is partly measuring search effort. "
       "That is what the aggregate genuinely adds: it makes an unsearched R4 "
       "side a *systematic* problem instead of a per-pattern footnote. "
       "⚠ **p12 was in this list printing `undeclared` until TASK_112**, "
       "although TASK_040_REVIEW had built its cheaper R4 and `.memory/` "
       "records it -- so the sentence above understated its own case by one "
-      "row for as long as the column existed.")
+      "row for as long as the column existed. ⚠⚠ **AND THE CLAUSE ABOVE WAS "
+      "TYPED, NOT DERIVED, FOR THE SAME REASON:** it read *\"only p18 and p46 "
+      "have an undeclared search state\"* and stayed in the artefact after "
+      "TASK_170 declared both — the identical defect one paragraph below its "
+      "own confession. It is now computed from `SEARCH_REVIEWED` and cannot "
+      "say a number the dict does not. ⚠ **`declared` still does not mean "
+      "`searched deeply enough`** — the three sign flips above are all rows "
+      "that were declared at the time.")
     w("")
     w("**Claim 3 -- a cross-pattern `Ir` comparison is available in "
       "`isolated` mode ONLY. CONFIRMED and SHARPENED** -- see limit 1 above. "
@@ -2127,20 +2754,53 @@ def main():
       "hand table does and less visibly. The census above is therefore built "
       "to degrade to *\"no source attribution\"* rather than to a wrong count.")
     w("")
-    n_undecl = len(meas) - len(SEARCH_REVIEWED)
+    # ⚠ SET DIFFERENCE, not a difference of lengths. The old spelling
+    # (`len(meas) - len(SEARCH_REVIEWED)`) prints the right number only while
+    # every key is also a measured pattern, and prints a SMALLER one -- never a
+    # larger -- the moment a key is not. A published count that can only fail
+    # in the flattering direction is exactly the shape this section is about.
+    undecl = sorted(set(meas) - set(SEARCH_REVIEWED))
+    n_undecl = len(undecl)
     n_none = len(SEARCH_NONE & set(SEARCH_REVIEWED))
-    n_found = len(SEARCH_REVIEWED) - n_none
+    n_found = len((SEARCH_REVIEWED.keys() & set(meas))) - n_none
     w("*Declared*, in `synthesize.py::SEARCH_REVIEWED`, every entry cited to a "
       "**reviewed** artefact — except one, `p06`, which is marked `⊘` because "
       "`.memory/01-ladder.md` marks it `⊘`: it landed at TASK_048 and has not "
       "been through a second review, and it is labelled here rather than "
       "omitted or silently promoted. A pattern with no entry prints "
       f"`undeclared`, which is its true state — **{n_undecl} of {len(meas)}** "
-      "today:")
+      "today"
+      + (f" ({', '.join(undecl)})" if undecl else "") + ":")
     w("")
-    w(f"⚠⚠ **AND THE {len(SEARCH_REVIEWED)} DECLARED ROWS SPLIT TWO WAYS, "
-      f"WHICH ONE COUNT CANNOT SAY: {n_found} report a SEARCH RESULT and "
-      f"{n_none} report a REVIEWED DECLARATION OF *NO* SEARCH "
+    if n_undecl == 0:
+        w("⚠⚠⚠ **AND THE HONEST SENTENCE IS NOT *\"EVERY RUNG'S CHEAPEST "
+          "SPELLING HAS BEEN SEARCHED\"*. IT IS THIS: every one of the "
+          f"{len(meas)} rows now DECLARES its search state, and "
+          f"{n_found} of them declare a search that was reviewed.** "
+          "TASK_170 read all fourteen rows that had printed `undeclared` "
+          "since 26 patterns — `p02 p04 p05 p07 p09 p14 p16 p18 p19 p23 p27 "
+          "p38 p42 p46` — against their own `NOTES.md`, "
+          "`.memory/01-ladder.md`, `controls/` and reviewing report, and "
+          "**all fourteen had a reviewed search**: none was a reviewed "
+          "declaration of NO search, and none was genuinely undeclared. "
+          "⚠⚠ **So `undeclared` was 100% bookkeeping at 26 patterns, 100% "
+          "bookkeeping at 33, and never once measured search effort — the "
+          "same conclusion TASK_112 and TASK_166 reached on smaller "
+          "samples, now at the whole tree.** ⚠ **What is still NOT claimed, "
+          "and what this column has never been able to say: that the search "
+          "was DEEP ENOUGH.** Seven of the fourteen name their own weaker "
+          "endpoint (p02, p14 and p27 have an unsearched R4 or R2 side; p09 "
+          "and p19 rest on a review that re-measured one side; p46's widths "
+          "are an unreviewed re-measure), and the entries below say so. "
+          "⚠⚠ **Read a declared row as *somebody looked and wrote down what "
+          "they found*, never as *this is the floor*: on p05 three "
+          "successive published minima were each overturned by the next "
+          "agent's FIRST lever, and on p42 the fifth R4 spelling reversed "
+          "the sign of the published difference.**")
+        w("")
+    w(f"⚠⚠ **AND THE {len((SEARCH_REVIEWED.keys() & set(meas)))} DECLARED ROWS SPLIT "
+      f"TWO WAYS, WHICH ONE COUNT CANNOT SAY: {n_found} report a SEARCH "
+      f"RESULT and {n_none} report a REVIEWED DECLARATION OF *NO* SEARCH "
       f"({', '.join(sorted(SEARCH_NONE & set(SEARCH_REVIEWED)))}, marked `⊘` "
       f"in their entry text and listed in `SEARCH_NONE`).** A row that "
       f"publishes no rung-to-rung figure and says so is not in the same state "
@@ -2223,7 +2883,19 @@ def main():
         open(a.out, "w").write(txt)
         print(f"wrote {os.path.relpath(a.out, REPO)}  ({len(txt)} bytes, "
               f"{len(L)} lines)")
+    # ⚠ TASK_170: this file used to exit 0 whatever happened, so a broken
+    # must-fire arm would have been a sentence in the artefact and nothing
+    # else. `PROTOCOL`'s closing rule -- CHECK EACH SCRIPT'S OWN EXIT STATUS --
+    # needs the script to HAVE one.
+    bad = [lab for lab, got, want in PIN_STATUS_CASES if got != want]
+    for lab, got, want in PIN_STATUS_CASES:
+        if got != want:
+            print(f"  ARM FAIL  {lab}\n            got  {got!r}\n"
+                  f"            want {want!r}")
+    print(f"outward-pin must-fire arms: "
+          f"{len(PIN_STATUS_CASES) - len(bad)}/{len(PIN_STATUS_CASES)} pass")
+    return 1 if bad else 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main() or 0)

@@ -142,7 +142,8 @@
         "file": "patterns/p19-state-machine/inputs/gen.py",
         "line": 38,
         "module": "measure.py",
-        "cited_line": 64
+        "cited_line": 64,
+        "as_written": "measure.py:64"
       }
     ],
     "harness_modules": [
@@ -184,7 +185,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "741c6d2ea110a225962e6c4dd451c1368d22edde521a54fee629cbb032d69cb2",
+    "harness/check.py": "ae040b91af8bca292923a3eb3cd446b7f307c86e1ad000f02989a2a57bf76d66",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
@@ -276,9 +277,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3269,
+    "bytes": 3267,
     "nvars": 48,
-    "envp_stack_bytes": 3653,
+    "envp_stack_bytes": 3651,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -1336,7 +1337,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==2723139==ERROR: AddressSanitizer: SEGV on unknown address 0x51e000010b85 (pc 0x556a4ee965ed bp 0x51e000010b85 sp 0x7ffef36cbc10 T0) ==2723139==The signal is caused by a READ memory access. #0 0x556a4ee9",
+      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==3090598==ERROR: AddressSanitizer: SEGV on unknown address 0x51e000010b85 (pc 0x559022c105ed bp 0x51e000010b85 sp 0x7fffd6757130 T0) ==3090598==The signal is caused by a READ memory access. #0 0x559022c1",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1347,7 +1348,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2723140==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51e000001685 at pc 0x5574ffeb868d bp 0x7ffcbc315db0 sp 0x7ffcbc315da0 READ of size 1 at 0x51e000001685 thread T0 #0 0x5574ffeb868c in kernel /home/apt/repos_common/",
+      "diagnostic": "================================================================= ==3090599==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51e000001685 at pc 0x55eb8e30f68d bp 0x7fff9a5fa7e0 sp 0x7fff9a5fa7d0 READ of size 1 at 0x51e000001685 thread T0 #0 0x55eb8e30f68c in kernel /home/apt/repos_common/",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1609,7 +1610,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 4.3,
+        "seconds": 4.4,
         "stdout": "9293610825097060496",
         "model_stdout": "9293610825097060496",
         "stderr": ""
@@ -1621,7 +1622,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 1.1,
+        "seconds": 1.0,
         "stdout": "5834492554122981434",
         "model_stdout": "5834492554122981434",
         "stderr": ""
@@ -1639,16 +1640,19 @@
   "table_render": {
     "table": "results/tables/p19-state-machine.md",
     "renders_to": "results/tables/p19-state-machine.md",
-    "render_sha256": "5f722462d40fdb7e92c71e03e95ed39d242d60d64fc6ef88c0e7758d914448a5",
-    "published_sha256": "5f722462d40fdb7e92c71e03e95ed39d242d60d64fc6ef88c0e7758d914448a5",
+    "render_sha256": "e2403f6ccea633262dd4379e52130d7e49cbeebca74e31db4525412d77125231",
+    "published_sha256": "e2403f6ccea633262dd4379e52130d7e49cbeebca74e31db4525412d77125231",
     "verdict": "FRESH"
   },
   "controls_json": {},
   "failures": [],
-  "notes": [
-    "1 line citation(s) into other harness modules, reported not failed (promoting them costs a re-measure where the file is measurement-hashed): patterns/p19-state-machine/inputs/gen.py:38 -> measure.py:64"
+  "notes": [],
+  "loud": [
+    {
+      "section": "doc-citation-other",
+      "message": "1 line citation(s) into harness modules other than `check.py`. NOT failed: these sit in measurement-hashed files, so re-citing them by function costs a re-measure (RECAP queue item 38). Cite the FUNCTION when one of these files is next re-measured anyway: patterns/p19-state-machine/inputs/gen.py:38 -> measure.py:64"
+    }
   ],
-  "loud": [],
   "blocked": [],
   "verdict": "PASS",
   "complete_run": true,
