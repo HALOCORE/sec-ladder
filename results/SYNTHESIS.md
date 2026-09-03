@@ -1539,6 +1539,88 @@ those rows — but the justification needed correcting, and
 `results/synthesis.md` printed the four `kernel` rows four lines above the
 sentence that denied them.
 
+### What is deliberately NOT done, and what each omission costs a reader
+
+⚠⚠⚠ **THIS SUBSECTION EXISTS BECAUSE A BACKLOG THAT IS QUIETLY DROPPED READS
+EXACTLY LIKE A BACKLOG THAT WAS FINISHED.** The project's own queue was triaged
+item by item at `TASK_164`–`TASK_170`; what closed, closed with a run. **What
+follows is what did not, with its evidence and its price.** ⚠ **Nothing here is
+a soft spot somebody forgot; each was priced and declined.**
+
+**(1) FOUR SPELLING LEVERS ARE UNTRIED, AND THAT IS NARROWER THAN IT SOUNDS.**
+⚠⚠ **This used to be stated as *"not every rung's cheapest admissible spelling
+has been searched"*, and after `TASK_166`/`TASK_170` that framing is
+WITHDRAWN — the per-row search state is now documented on ALL 33 rows.** What
+remains is four *named* levers nobody has run:
+
+- **The two-step reslice**, untried on most patterns. It costs zero `unsafe` and
+  zero trusted items, and its mechanism is **register allocation** rather than
+  check removal — so **no prior spelling search ran it**. ⚠ **Do not quote
+  *"−1 `Ir`/call, confirmed on seven patterns"***: on `p04` that −1 was **20% of
+  the whole published tax**; on `p10` it is one instruction in 3269.
+- **`p03`'s `+5` per-call constant has never been searched at all.** It is the
+  entire remaining gap between `p03`'s two class minima, and *"safe Rust must
+  pay it"* is an argument, not a measurement.
+- **`p01` and `p08` owe an in-contract R3-side span.** ⚠ **Both pair intervals
+  this project ever published were built from R4s that are not rungs.**
+- **No pattern ships a length-HETEROGENEOUS sweep band**, which makes every
+  natural step basis singular — so `p13` could not have fitted a step law even
+  if one exists. **Whoever next hits a size-dispatched library routine needs
+  this.**
+
+**(2) A REAL DEFECT IN THE ASSEMBLY EXTRACTOR, PRICED AND NOT TAKEN.**
+`harness/asm.py`'s `main` needle **mis-resolves on 33 cells** (`-O0` only), and
+it is worse than a mis-label: it **masks a genuine stage-3a failure on
+`p01 safe_tuned -O0 isolated`**, and `p05/NOTES.md` §1a **invented a mechanism**
+for what is an artefact. ⚠⚠ **`asm.py` is MEASUREMENT-hashed, so a fix is a full
+re-measure of the tree**, and the obvious repair (exact-match-first) **moves 266
+windows**. **Recorded at `TASK_170`, deliberately not taken.**
+
+**(3) THREE NAMED CURIOSITIES, REPRODUCIBLE AND UNEXPLAINED.**
+(a) **`p04`'s `small` R2 layout population is bimodal at 1.42×** — 27 layouts at
+6.43–7.17 ms against four at 9.30–9.88 ms, reproducible across both passes, and
+**neither `(loop, property)` pairs nor `addr % 32` separates it**. It moves no
+published verdict, **but it is the first counterexample to finding 16's *"every
+layout mode found so far is `win32` or `jcc32`"*, so retiring it means SCOPING
+that finding rather than dropping this.**
+(b) **`p13`'s `controls/library_axis.py` keeps a deliberately narrower fold**, so
+its LEVELS are not comparable with `p13`'s own §4 while every DIFFERENCE inside
+it is — **the only place in the tree where two folds coexist.**
+(c) **`p13`'s corrected wall-clock ratios do not clear the ±9-point bar**, so it
+has no corrected-ratio row. **Not a defect — the rule working — but somebody
+will look for one.**
+
+**(4) TWO REPAIRS ARGUED AND DECLINED, WITH THE ARGUMENT.**
+(a) **Qualifying `duplicate_names` by `(impl, name)` CANNOT admit the eight-impl
+spelling**, for a structural reason: `check_trusted_twins` keys on
+`TWIN_PREFIX + name`, which **hits in a bare map and misses in a qualified
+one**, and `vparse.impl_spans` refuses any `impl` whose preceding character is
+not `{};` while `#[cfg(slb_twin)]` ends in `]`. **The CLAIM was corrected rather
+than the code, with five selftest assertions pinning both limits.** ⚠ **The
+residue is real and larger than it looks: changing `impl_spans`' matching rule
+feeds the tautology probe's synthesis site for EVERY pattern.**
+(b) **The gate's `harness/*.py` glob is over-broad** — `measure.py` is hashed
+into gate records and is not executed by the gate. **Argued and declined**; the
+cost of narrowing it is borne by every future harness edit either way.
+
+**(5) AND ONE ROW'S REFUSAL WHOSE UNBLOCKING CONDITION IS DEAD.** `p15` was
+refused, and the condition it named for re-admission (`_scan_unsafe_sites` being
+removed) **was decided against**. ✅ **Its reusable artefact survives regardless:
+a verified UTF-8 validator, `5 verified, 0 errors`, with ZERO trusted items.**
+
+⚠ **The count, said plainly, and DERIVED rather than asserted — the first
+version of this sentence invented one.** The project's backlog is **44 numbered
+items**; `TASK_164`–`TASK_170` **closed sixteen with a run** (12, 15, 16b, 26,
+28, 30, 31, 33, 35, 36, 37, 38, 39, 40, 41, 42) and **investigated a
+seventeenth** (43). **The five headings above retire eleven more** (1, 2, 3, 11;
+43; 7, 8, 9; 5, 20; 25). ⚠⚠ **The remainder cannot be counted mechanically,
+because several items are CLOSED IN THEIR BODIES UNDER AN OPEN HEADER** — the
+project's own rule-13 header rot, in the artefact that tracks it. **Read the
+bodies.**
+✅ **The point of writing any of this down: a backlog that is quietly dropped
+reads exactly like a backlog that was finished, and this is the only way a
+reader can tell them apart.**
+
 **A gap in this document rather than in the project, disclosed because it is the
 kind that repeats.** The first version of this file compressed twenty-six
 patterns into four results, and **every significant omission ran one way**: it
