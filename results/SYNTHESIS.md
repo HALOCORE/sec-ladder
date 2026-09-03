@@ -551,8 +551,11 @@ every time a side has been searched properly the number moved a long way. In
 print `undeclared`** — ⚠⚠ **and that is a correction, not progress: `undeclared`
 never measured search effort, only whether somebody had written a dict entry.
 `TASK_166` found four of seven new rows wrong and `TASK_170` found the remaining
-fourteen wrong 14/14** (§7). **Read each row's stated search state; the count
-says nothing.** Of the nine: p10's −323/−603 became −129/−241 against a
+fourteen wrong 14/14** (§7). ⚠⚠⚠ **DO NOT READ THE ZERO AS *"everything has been
+searched"*: derived from the column's own text, only **10 of 33** rows have had
+BOTH endpoints searched, 17 declare one side or an owed span, and two declare NO
+SEARCH on either side.** **Read each row's stated search state; the count says
+nothing.** Of the nine: p10's −323/−603 became −129/−241 against a
 verifying R4 candidate; p13's −177/−1054 became +44/+77, a sign flip; p12's
 −26.00 became +66.00, another; p22's `+2.00` became `+125/+1021`; p17's
 `+32/+32` has an in-contract R3 respelling at **−19.00** flat; p36 refuses to
@@ -1519,9 +1522,16 @@ sign** against the cheapest in-contract spelling (`+27 / +77` → `−199 / −2
 `p42`'s sign flipped and the cheaper rung **was shipped**. ⚠ **Those belong in
 §2's search-state discussion and are not folded into any bucket.**
 
-⚠⚠⚠ **THE HONEST STATEMENT OF THE GAP IS THEREFORE DIFFERENT AND NARROWER:
-this project has searched more than it could show, and the instrument that was
-supposed to show it measured whether somebody had written a sentence.**
+⚠⚠⚠ **THE HONEST STATEMENT OF THE GAP IS THEREFORE DIFFERENT — BUT IT IS NOT
+SMALLER, AND THE MANAGER BRIEFLY WROTE THAT IT WAS.** *"This project searched
+more than it could show"* is true about the INSTRUMENT and says nothing about
+DEPTH. ⚠⚠ **Derived from the column's own text: only 10 of 33 rows have had
+BOTH endpoints searched; 17 declare one side only or a span still owed, and two
+declare NO SEARCH on either side.** ✅ **So the original limitation — *the
+unsafe side is unsearched on most patterns* — SURVIVES; what changed is that
+the state is now legible per row instead of hidden behind a bookkeeping
+default.** **See the retirement subsection below, which carries the
+breakdown.**
 ⚠ **The obvious detector does not work either**: `p49` ships a
 `controls/spellings.py` and its `undeclared` was **right** (a repair-site
 control, not a rung search), and the filename detector would have missed 13 of
@@ -1547,11 +1557,37 @@ item by item at `TASK_164`–`TASK_170`; what closed, closed with a run. **What
 follows is what did not, with its evidence and its price.** ⚠ **Nothing here is
 a soft spot somebody forgot; each was priced and declined.**
 
-**(1) FOUR SPELLING LEVERS ARE UNTRIED, AND THAT IS NARROWER THAN IT SOUNDS.**
-⚠⚠ **This used to be stated as *"not every rung's cheapest admissible spelling
-has been searched"*, and after `TASK_166`/`TASK_170` that framing is
-WITHDRAWN — the per-row search state is now documented on ALL 33 rows.** What
-remains is four *named* levers nobody has run:
+**(1) THE UNSAFE SIDE IS STILL UNSEARCHED ON MOST ROWS — AND THE MANAGER BRIEFLY
+WITHDREW THAT SENTENCE ON A MISREADING, WHICH IS THE MOST DANGEROUS THING THIS
+DOCUMENT NEARLY SHIPPED.** (`TASK_171` blocker 2.)
+
+`TASK_170` audited every `undeclared` row and scored **14 / 0 / 0** — every one
+had a documented search. The manager read that as *"the limitation is
+withdrawn; only four named levers remain"*. ⚠⚠⚠ **`14 / 0 / 0` says every row's
+search state is DOCUMENTED. The withdrawn sentence measured DEPTH. They are not
+the same claim, and the substitution ran in the flattering direction.**
+
+**Derived from the column's own text, not asserted:**
+
+```
+BOTH sides searched                    10 of 33   p04 p05 p07 p16 p19
+                                                  p23 p34 p36 p42 p46
+ONE side only, or a span still OWED    17 of 33
+neither phrasing (incl. 2 rows that
+  declare NO SEARCH on either side)     6 of 33
+```
+
+✅ **So the honest statement is: ten of thirty-three rows have had both
+endpoints searched, and the R4 side specifically is unsearched or owed on
+roughly forty per cent of the tree.** ⚠ **That is close to what the original
+sentence said, and it should never have been withdrawn** — what changed is only
+that the state is now *legible* per row instead of hidden behind a bookkeeping
+default.
+
+⚠⚠ **AND FOUR IS THE WRONG COUNT FOR THE LEVERS.** The four below are the ones
+with a named mechanism and no run; **nine more rows carry an explicitly
+unsearched endpoint in their own entry** (`p02`, `p14` and `p18` say so in
+terms). **Read the column, not this list.** The four with a mechanism:
 
 - **The two-step reslice**, untried on most patterns. It costs zero `unsafe` and
   zero trusted items, and its mechanism is **register allocation** rather than
@@ -1563,10 +1599,17 @@ remains is four *named* levers nobody has run:
   pay it"* is an argument, not a measurement.
 - **`p01` and `p08` owe an in-contract R3-side span.** ⚠ **Both pair intervals
   this project ever published were built from R4s that are not rungs.**
-- **No pattern ships a length-HETEROGENEOUS sweep band**, which makes every
-  natural step basis singular — so `p13` could not have fitted a step law even
-  if one exists. **Whoever next hits a size-dispatched library routine needs
-  this.**
+- ⚠⚠⚠ **A FOURTH LEVER STOOD HERE AND IT WAS FALSE AGAINST THE SHIPPED TREE.**
+  It read *"no pattern ships a length-HETEROGENEOUS sweep band"*. **Four
+  patterns do** — `p10`, `p22`, `p38` and `p47` ship `sweep-h1/h2/h3.bin` —
+  and **`patterns/p06-rotate/inputs/gen.py` cites that queue item BY NAME as its
+  motive and hard-asserts length-heterogeneity in its own selfcheck.**
+  ⚠ **`RECAP.md` had already recorded the item as retired**, in a finding, while
+  its queue entry still read *"no pattern has one"*. **The manager copied the
+  queue header into a published limitation without reading the tree** — rule-13
+  header rot escaping the backlog into `results/`. ✅ **What survives is
+  narrower and is `p13`'s alone: `p13`'s own fit blobs are length-homogeneous,
+  so `p13` could not have fitted a step law even if one exists.**
 
 **(2) A REAL DEFECT IN THE ASSEMBLY EXTRACTOR, PRICED AND NOT TAKEN.**
 `harness/asm.py`'s `main` needle **mis-resolves on 33 cells** (`-O0` only), and
@@ -1612,8 +1655,10 @@ a verified UTF-8 validator, `5 verified, 0 errors`, with ZERO trusted items.**
 version of this sentence invented one.** The project's backlog is **44 numbered
 items**; `TASK_164`–`TASK_170` **closed sixteen with a run** (12, 15, 16b, 26,
 28, 30, 31, 33, 35, 36, 37, 38, 39, 40, 41, 42) and **investigated a
-seventeenth** (43). **The five headings above retire eleven more** (1, 2, 3, 11;
-43; 7, 8, 9; 5, 20; 25). ⚠⚠ **The remainder cannot be counted mechanically,
+seventeenth** (43). **The five headings above retire ten more** (1, 2, 3; 43; 7, 8, 9;
+5, 20; 25) — ⚠ **item 11 is NOT among them: it was retired long ago and the
+manager re-published it as a live limitation by copying a stale queue
+header.** ⚠⚠ **The remainder cannot be counted mechanically,
 because several items are CLOSED IN THEIR BODIES UNDER AN OPEN HEADER** — the
 project's own rule-13 header rot, in the artefact that tracks it. **Read the
 bodies.**

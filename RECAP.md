@@ -25,9 +25,9 @@ this box is reference; this box is what to *do*.
 
 ⚠⚠⚠ **THE ONLY THING LEFT — AND IT IS THE HONEST ANSWER TO *"IS THE RESEARCH WORK FINISHED?"*: THE MANAGER'S RETIREMENT PASS, PLUS ONE REVIEW.**
 
-**FIRST — `TASK_171`, the review of `TASK_170` and of the manager's fold.** ⚠⚠ **Rule 3, and the precedent is now three for three: `TASK_165`, `TASK_167` and `TASK_169` EACH found a `✅ manager-re-derived` mark the manager had not earned, and the last found three in one bullet.** **Targets:** the `§` `regime_crossing` census (⚠ **its first spelling found the flattering answer, and it does NOT reproduce `TASK_169`'s `p27 gcc-clang` claim — that disagreement is OPEN and neither side is asserted**); the build-determinant pin (`0 of 33`, and whether `--emit` really cannot revert it); the 14 search-state entries, each of which must cite a REVIEWED artefact; the five new must-fire arm sets; and item 43's *"masks a real stage-3a failure on `p01 safe_tuned -O0 isolated`"* plus *"`p05/NOTES.md` §1a INVENTED A MECHANISM"* — ⚠ **that second one is an accusation against a shipped pattern doc and needs a run behind it.** ✅ **No sweep is needed.**
+✅✅ **DONE — `TASK_171`, THE CLOSING REVIEW. TWO BLOCKERS, AND ITS VERDICT WAS THAT `results/SYNTHESIS.md` WAS *NOT SAFE TO PUBLISH* — four sentences a reader would act on were unbacked, THREE OF THEM NEW IN THE MANAGER'S OWN TWO COMMITS. All four are now fixed (finding 67).** ⚠⚠⚠ **The call the manager named for attack FELL, exactly as feared: withdrawing *"not every rung's cheapest spelling has been searched"* on the strength of `14/0/0` substituted DOCUMENTED for DEEP. Re-derived: only **10 of 33** rows have BOTH endpoints searched; 17 declare one side or an owed span; 2 declare NO SEARCH on either. THE LIMITATION IS RESTORED.** ⚠⚠ **And the manager published a LIMITATION THAT DOES NOT EXIST — *"no pattern ships a length-heterogeneous sweep band"* — by copying a stale QUEUE header while `RECAP`'s own FINDING had already retired it and four patterns ship one. `PROTOCOL` rule 13 now carries it: check a retired item against the TREE, not against its header.** ⚠ **`TASK_169`'s `p27 gcc-clang` claim STANDS; the manager's dismissal was a mechanism invented for a null result, and the `§` census is structurally blind to inline spellings.** ⚠ **Four reviews in a row have now found a `✅ manager-re-derived` mark the manager had not earned.**
 
-**SECOND — THE RETIREMENT, and it is the manager's.** Queue groups **C** (26-era spelling-search debt: items 1, 2, 3, 11), **D** (curiosities: 7, 8, 9) and **E** (declined: 5, 20, 25) are the honest remainder. ⚠⚠ **RETIRE THEM AS STATED LIMITATIONS WITH THEIR EVIDENCE, IN `results/SYNTHESIS.md` §7 — NOT AS SILENT DELETIONS.** ⚠ **And group C's framing needs rewriting in light of finding 66(a): the old sentence was *"not every rung's cheapest spelling has been searched"*, and what is now true is narrower — the four named LEVERS (the two-step reslice, `p03`'s `+5` constant, `p01`/`p08`'s R3-side span, a length-heterogeneous sweep band) are untried, while the per-row search state is documented on all 33.** ⚠ **Item 43 goes with them: a real defect, priced at a full re-measure, deliberately not taken.**
+⚠⚠⚠ **WHAT REMAINS, AND IT IS SMALL, NAMED AND PRICED — THERE IS NO FURTHER STRUCTURED PROGRAMME.** ✅ **All 33 patterns built, reviewed, corrected, with findings; the four Results re-derived at 33; the gate bundle, the Results gap and the backlog queue all closed and reviewed; the remainder retired as STATED LIMITATIONS in `results/SYNTHESIS.md` §7.** **The open items, all in finding 67 and none of them blocking:** (a) ⚠⚠ **item 43 — `asm.py`'s `main` needle mis-resolves on 33 cells, MASKS a real stage-3a failure on `p01 safe_tuned -O0 isolated`, and `p05/NOTES.md` §1a invented a mechanism for the artefact; BOTH accusations are now VERIFIED and neither correction has landed. `asm.py` is MEASUREMENT-hashed, so a fix is a full re-measure** — ⚠ **and `.memory/01-ladder.md` still says *"Quote the 23/32"* where it is 22/10**; (b) the `§` marker's `BULK_REGIME` is **a whitelist of three hardcoded keys** and must be described as one, with `__memchr_avx2`/`__strlen_avx2` unclassified on six published `gcc-clang` rows; (c) `results/synthesis.md`'s *"every entry cited to a reviewed artefact — except one"* is **false on three** (`p01 p03 p08` cite the open backlog) and its *"seven of the fourteen"* **lists six**; (d) `RECAP.md`'s own 15 line citations, 10 wrong. ⚠ **Each is a `synthesis/`- or doc-level fix except (a); none needs a sweep except (a)'s re-measure.**
 
 ⚠⚠⚠ **`synthesis/outward_ir.json` WAS RE-EMITTED AT `TASK_166` (33 patterns / 524 cell entries, 0 skipped) AND IS STALE ON ALL 33 AGAIN ONE TASK LATER — because it pins the GATE `source_sha256`, so any `harness/*.py` edit invalidates it. Manager-verified. All 33 STALEs are FALSE (a docstring cannot move a callgrind number), and queue item 37 is the `synthesis/`-only repair.** ⚠ **And re-emitting it settled two things at once: it is the ONLY instrument that names the callee and counts the calls, so it is what refuted the manager's unifying hypothesis (finding 64), and re-scoring the bands against it retracted `FLOOR = 2.00`'s stated reason.** ✅ **`results/SYNTHESIS.md` is CURRENT — folded at `7b5822a`; its four Results are now derived against all 33.** ⚠⚠ **OPERATIONAL, NEVER DELETE: `results/SYNTHESIS.md` is HAND-WRITTEN; `results/synthesis.md` (lower case) is GENERATED. Never regenerate over the capitalised one.** ⚠⚠ **READ THE CATALOGUE CELL, NOT `TASK_143_REPORT.md`: both rows' cells carry manager corrections the report does not.** ⚠⚠ **AND A NEW ROW NOW OWES TWO THINGS `TASK_143`-era task files do not mention (`TASK_151`, finding 57): (a) its HARDENED arm must be sanitizer-CLEAN on EVERY input — stage `7h`; (b) `spec.md` must declare `verus.assumptions` if any rung uses `assume(`/`admit(`.** ✅ **THE BAR, and it is the whole of it (`CLAUDE.md` rule 6, findings 53–54): a pattern is admitted SOLELY on whether the C program makes sense — correct on benign inputs, exhibits the error on an adversarial one, C MECHANISM distinct from a BUILT row's, fits the pinned signature. NOTHING about Rust, Verus, Miri, a cost gradient or what the ladder can 'price' may EVER remove a row; those are RESULTS.** ⚠⚠ **REFUSED, and only on C-SIDE duplication of a BUILT row: `CVE-2024-25062` and `Issue-15143` (`p29`'s mechanism); `p30` and iterator-invalidation (`p27`'s and `p25`'s); stack-lifetime (both compilers warn at DEFAULT flags, so C is not silently wrong).** ⚠ **`CVE-2016-4658`, `CVE-2022-23308`, `Issue-15192` pass the bar but duplicate admitted candidates — build the candidate, not the CVE. ⚠ Re-adjudicate the two ADMITTED CVEs (`CVE-2022-40304`, `CVE-2021-3518`) against the ENLARGED built tree once `p25` lands — `p34` already has; `p28` and `p32` were candidates when they were ranked and are now rows.** ⚠⚠ **~3 tasks per row at the measured rate (build → review → land corrections).** ✅ **BOTH OF THIS CELL'S OLD "STILL OWED" GATE ITEMS ARE CLOSED at `TASK_164`** — stage 9b now reads the verdict (30 of 30 generators that write a `problems` key exit non-zero on it, so it IS a verdict), and `global` directives are recorded per file under `verus.<src>.global_decls`. **Finding 63.** ⚠ **What is left over from them and is NOT done: four bespoke verdict shapes stage 9b still cannot read, and a no-verdict sidecar SHOUT that was priced (5 stale tables, 5 `report.py` runs, a second sweep) and deliberately not taken.** ⚠⚠ **OPERATIONAL, NEVER DELETE: `results/SYNTHESIS.md` is HAND-WRITTEN; `results/synthesis.md` (lower case) is GENERATED. Never regenerate over the capitalised one.**
 
@@ -6172,9 +6172,23 @@ the number.** Two task files have already sent an agent to the wrong finding.
     **65×** wide around a published `+13756`; `p14`'s shipped cell **overstates
     the safe side by 88.9%** on `large`; `p42`'s sign flipped and **the cheaper
     rung was shipped**. ⚠ **None is folded into a bucket.**
-    ✅ **The honest statement is narrower and runs AGAINST this project's usual
-    error direction: it has searched more than it could show, and the instrument
-    meant to show it measured whether somebody had written a sentence.**
+    ⚠⚠⚠ **AND THE MANAGER THEN OVER-READ IT, WHICH `TASK_171` CALLS THE MOST
+    DANGEROUS THING THE SESSION NEARLY SHIPPED.** The manager withdrew
+    `results/SYNTHESIS.md`'s published limitation *"not every rung's cheapest
+    admissible spelling has been searched"* on the strength of `14/0/0`.
+    ⚠⚠ **`14/0/0` says every row's search state is DOCUMENTED; the withdrawn
+    sentence measured DEPTH. They are not the same claim, and the substitution
+    ran in the FLATTERING direction.** ✅ **Derived from the column's own text
+    (manager-re-derived after the review): only **10 of 33** rows have had BOTH
+    endpoints searched — `p04 p05 p07 p16 p19 p23 p34 p36 p42 p46`; **17**
+    declare one side only or a span still OWED; **2** declare NO SEARCH on
+    either side.** ✅ **So the original limitation SURVIVES and is restored; what
+    genuinely changed is only that the state is LEGIBLE per row instead of
+    hidden behind a bookkeeping default.**
+    ⚠ **The manager's first attempt to re-derive this used a REGEX and got 7 —
+    a census that can only find the phrasings you thought of, which is this
+    project's own named defect for the third time. The 10/17/2 split is from
+    classifying every entry's opening clause.**
     ⚠ **The filename detector would have missed 13 of the 14; `p49`'s
     `undeclared` was RIGHT. This needed reading.**
 
@@ -6182,15 +6196,31 @@ the number.** Two task files have already sent an agent to the wrong finding.
     BEGINNING AND NOBODY HAD NOTICED — `p08 gcc-clang`, BOTH BLOBS.** ⊘ For the
     same 4096-byte fill, **gcc inlines a 512-`Ir` `rep stos %rax` while clang
     calls glibc `memset` at 4113.00 `Ir`** — ~8× in the counter, not the work.
-    ✅ **`results/synthesis.md` now marks such rows `§`, and the marked set is
-    DERIVED rather than listed** (`regime_crossing`: a bulk routine must
-    contribute asymmetrically by ≥ 2.00 `Ir` **and** one side be byte-wise) —
-    `p08 gcc-clang` on both blobs, `p42 large R2−R4`.
+    ⊘ **`results/synthesis.md` now marks such rows `§`** (`regime_crossing`: a
+    bulk routine must contribute asymmetrically by ≥ 2.00 `Ir` **and** one side
+    be byte-wise) — `p08 gcc-clang` on both blobs, `p42 large R2−R4`.
+    ⚠⚠ **THE MANAGER MARKED *"the marked set is DERIVED rather than listed"*
+    `✅` AND HAD NOT RUN IT** (`TASK_171`): **`BULK_REGIME` is THREE HARDCODED
+    KEYS, two of them bare glibc addresses**, and `__memchr_avx2` /
+    `__strlen_avx2` are unclassified while contributing asymmetrically on **six**
+    published `gcc-clang` rows. ⚠ **Worse, gcc cells spell libc callees as
+    client PLT addresses, so the marker's own reason — *"while the other side
+    does not call it at all"* — is TRUE BY CONSTRUCTION** (`p08 c-gcc` carries
+    the same `memmove` at 39.0 against clang's 39.4, under a bare-address key).
+    ✅ **The two marked rows are right; the CENSUS is a whitelist and must be
+    described as one.**
     ⚠⚠ **THE FIRST SPELLING OF THAT CENSUS FOUND `p42` AND NOTHING ELSE, WHICH
     IS THE FLATTERING ANSWER**, because glibc's routines carry **no symbol at
-    all** in the sidecar and a name regex misses every one. ⚠ **`TASK_169`'s
-    `p27 gcc-clang` claim is NOT reproduced by this census** — its contribution
-    is small and both sides may sit in one regime. **OPEN; neither is asserted.**
+    all** in the sidecar and a name regex misses every one. ⚠⚠⚠ **AND `TASK_169`'s `p27 gcc-clang` CLAIM STANDS. The manager wrote
+    that the census not marking it meant *"its contribution is small and both
+    sides may sit in one regime"* — A MECHANISM INVENTED FOR A NULL RESULT**
+    (`TASK_171`). **Both `p27` spellings are INLINE** — gcc's `rep stos`
+    (32 `Ir`) and clang's 18 `movaps` + 1 `xorps` (19 `Ir`) sit **inside
+    `<kernel>`** and produce no callee edge at all — **so `regime_crossing` is
+    STRUCTURALLY BLIND to the row and tested nothing.** ⚠ **13 `Ir` of a
+    `−25.02` difference is 52%, not *"small"*.** ✅ **The lesson is the
+    manager's, twice over: a census that does not mark a row is not evidence the
+    row is clean, and *"the check did not fire"* is not a mechanism.**
     ✅ **No discount factor is published** — the `≈426` counterfactual was glibc
     `memcpy`'s figure re-badged as a `memset` one.
 
@@ -6231,6 +6261,63 @@ the number.** Two task files have already sent an agent to the wrong finding.
     module down AT IMPORT**, which is what queue item 42 predicted.
 
     Evidence: `.tasks/TASK_170_REPORT.md`, `.tasks/TASK_170.md`, `.temp/t170/`.
+
+67. ⚠⚠⚠ **THE CLOSING REVIEW: `results/SYNTHESIS.md` WAS *NOT SAFE TO PUBLISH*,
+    AND THREE OF THE FOUR UNBACKED SENTENCES WERE NEW IN THE MANAGER'S OWN TWO
+    COMMITS.** (`TASK_171`; two blockers, several majors, all now landed.)
+
+    **(a) THE REFRAMING THE MANAGER NAMED FOR ATTACK — *FALLS*.** Withdrawing
+    *"not every rung's cheapest admissible spelling has been searched"* on the
+    strength of `14/0/0` substituted **documented** for **deep**. ✅
+    Manager-re-derived from the column's own text: **10 of 33 rows have BOTH
+    endpoints searched; 17 declare one side or an owed span; 2 declare NO SEARCH
+    on either side.** **The limitation is restored.** ⚠ **And the manager's
+    first re-derivation used a REGEX and returned 7** — a census that can only
+    find the phrasings you thought of, this project's own named defect, third
+    instance.
+
+    **(b) A RETIREMENT REASON WAS FALSE AGAINST THE SHIPPED TREE.**
+    `results/SYNTHESIS.md` published *"no pattern ships a length-HETEROGENEOUS
+    sweep band"* as a priced, deliberate omission. ✅ **Four patterns do** —
+    `p10 p22 p38 p47` ship `sweep-h1/h2/h3.bin` — **and
+    `patterns/p06-rotate/inputs/gen.py` cites that queue item BY NAME as its
+    motive and hard-asserts heterogeneity in its own selfcheck.** ⚠⚠ **`RECAP`
+    had already retired it IN A FINDING while its QUEUE entry still said *"no
+    pattern has one"*, and the manager copied the queue header into a published
+    limitation without reading the tree.** ⚠⚠⚠ **Rule-13 header rot escaping the
+    backlog into `results/` — the first time this project has published a
+    LIMITATION that does not exist, which is the mirror image of publishing a
+    result that does not.** ✅ **What survives is `p13`'s alone.**
+
+    **(c) `TASK_169`'s `p27 gcc-clang` STANDS and the manager's dismissal was a
+    mechanism invented for a NULL RESULT.** Both spellings are **inline** — gcc
+    `rep stos` 32 `Ir`, clang 18 `movaps` + 1 `xorps` = 19 — so they produce no
+    callee edge and **`regime_crossing` is STRUCTURALLY BLIND to the row.**
+    **13 of a `−25.02` difference is 52%, not *"small"*.** ✅ **A census that
+    does not mark a row is not evidence the row is clean.**
+
+    **(d) TWO MORE UNEARNED `✅`, MAKING IT FOUR REVIEWS IN A ROW.** *"The marked
+    set is DERIVED rather than listed"* — `BULK_REGIME` is **three hardcoded
+    keys**, two bare glibc addresses, with `__memchr_avx2`/`__strlen_avx2`
+    unclassified and contributing asymmetrically on **six** published
+    `gcc-clang` rows; and the marker's stated reason *"the other side does not
+    call it at all"* is **true by construction**, because gcc cells spell libc
+    callees as client PLT addresses.
+
+    **(e) ITEM 43's TWO ACCUSATIONS ARE BOTH VERIFIED.** `p01 safe_tuned -O0
+    isolated`'s real kernel is **41 instructions, 0 back edges, 0 bulk calls**,
+    while the `Iterator::fold` window `asm.py` picks instead has **4** — and
+    `check.py`'s stage 3a fails exactly that condition, so the mis-resolution
+    **masks a real failure**. And `p05/NOTES.md` §1a says `verus::main` lacks two
+    `xmm` instructions **that it carries**. ⚠ **Neither correction has landed;
+    `.memory/01-ladder.md` still says *"Quote the 23/32"* where it is 22/10.**
+
+    ✅ **The review's verdict on the pin is the good news and it was attacked
+    four ways: the build-determinant key HOLDS at `0 of 33`, its determinant set
+    equals the tree exactly, an empty pin cannot read FRESH, and 4272 measured
+    leaves are identical across the re-pin.**
+
+    Evidence: `.tasks/TASK_171_REPORT.md`, `git show d6aa844`, `git show 87baad7`.
 
 ## Retracted — do not reinstate
 

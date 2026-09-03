@@ -226,6 +226,21 @@ context still applies — do not restart from scratch.
    disbelieves.
 
 13. ⚠⚠ **IN A LONG DOC ITEM, ONLY THE BODY GETS MAINTAINED — THE HEADER ROTS.**
+    ⚠⚠⚠ **AND AT `TASK_171` IT ESCAPED THE BACKLOG INTO A PUBLISHED DOCUMENT
+    FOR THE FIRST TIME.** The manager retired `RECAP`'s queue item 11 into
+    `results/SYNTHESIS.md` as a priced limitation — *"no pattern ships a
+    length-heterogeneous sweep band"* — **by copying the queue header. Four
+    patterns ship one, `p06`'s input generator cites that very item as its
+    motive and hard-asserts the opposite in its own selfcheck, and `RECAP` had
+    ALREADY retired the item in a FINDING while the QUEUE entry still said *"no
+    pattern has one"*.** ⚠⚠ **So the project published a LIMITATION THAT DOES
+    NOT EXIST — the mirror image of publishing a result that does not, and just
+    as damaging, because a reader treats a stated limitation as measured.**
+    ✅ **THE RULE: before retiring a backlog item into a published document,
+    CHECK THE ITEM AGAINST THE TREE, not against its own header.** ⚠ **One
+    `ls patterns/*/inputs/ | grep sweep-h` would have caught it.**
+
+
     Found twice in one pass over `RECAP.md`'s owed queue, and the second case is
     the sharp one. **Item 27's header read *"the authoritative layer cites 34
     `.temp/` paths, and NONE of them exists in a fresh clone"* while its own next

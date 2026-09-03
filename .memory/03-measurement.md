@@ -538,10 +538,20 @@ about to publish.**
 look benign: 0.58783 → 0.31865 → **1.02878** → 1.01439 → 1.00090. **A fit banded
 below the threshold extrapolates into a different regime with no in-sample
 residual to warn you** — the RESIDUE-CLASS rule's shape, in a different variable.
-p01, p05, p16 and p17 call no bulk routine at all. **Only p08's gcc kernels
-contain a `rep` instruction**, so no previously published `Ir` comparison is
-contaminated. Re-check this before denominating any future pattern in bytes
-moved rather than bytes folded.
+p01, p05, p16 and p17 call no bulk routine at all.
+⚠⚠⚠ **THE NEXT SENTENCE IS RETRACTED TWICE OVER AND STOOD HERE UN-ANNOTATED
+UNTIL `TASK_171` FOUND IT AT HEAD FOR THE THIRD TIME.** ~~*"Only p08's gcc
+kernels contain a `rep` instruction, so no previously published `Ir` comparison
+is contaminated."*~~ **Both halves are false:** `rep` is in **26 of 1052
+measured windows across NINE patterns** (`TASK_168`), and **two published
+comparisons ARE contaminated** — `p08 gcc-clang` on both blobs (gcc's inlined
+512-`Ir` `rep stos %rax` against clang's 4113-`Ir` glibc `memset` for the *same*
+4096-byte fill) and **`p27 gcc-clang`, a LICENSED row where 13 of a `−25.02`
+difference is 52%** (`TASK_169`, upheld at `TASK_171`; both `p27` spellings are
+**inline**, so the `§` census is structurally blind to it).
+⚠ **Re-check this before denominating any future pattern in bytes moved rather
+than bytes folded** — and note the marker `results/synthesis.md` now carries
+(`§`) is a **whitelist**, not a census.
 
 ### Callgrind prices a hardware `div` at 1 `Ir`
 
