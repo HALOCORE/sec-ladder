@@ -485,6 +485,17 @@ cannot move the digest that certifies the run evaluating it.
 ⚠⚠⚠ **AND THE COUNT ABOVE IS STILL NOT THE WHOLE COST — `TASK_168` PAID TWO
 MORE.**
 
+* ⚠⚠⚠ **AND A GATE-ONLY `check.py` EDIT CAN HARD-FAIL A PATTERN THROUGH A
+  SIDECAR, WHICH `PROTOCOL` RULE 6 DOES NOT LIST.** (`TASK_172`.) Two of
+  `p35`'s `controls/*.json` pin **`harness/check.py`'s HASH**, so a
+  docstring-only `check.py` change staled them and **stage 9c hard-failed
+  `p35` at `rc=1`** on a sweep that touched nothing else. **Fixed by re-running
+  both generators — no `report.py` needed.** ✅ **Blast radius measured: FOUR
+  sidecars NAME `check.py`, TWO PIN it, ONE pattern pays.** ⚠⚠ **A
+  single-pattern smoke test on `p01` could NOT have caught it**; the one-line
+  check is `python3 -c "import json,glob; [print(p) for p in
+  sorted(glob.glob('patterns/*/controls/*.json')) if any(k.startswith('harness/')
+  for k in (json.load(open(p)).get('derived_from_sha256') or {}))]"`.
 * **A `controls/*.json` sidecar also pins ITS OWN GENERATOR**, so a
   `controls/*.py` edit stales it too. `TASK_168` edited
   `p35/controls/rust_bug.py` and `p35` therefore had **THREE** stale sidecars,

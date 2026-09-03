@@ -412,7 +412,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "ae040b91af8bca292923a3eb3cd446b7f307c86e1ad000f02989a2a57bf76d66",
+    "harness/check.py": "eeb7ffa7b0346724d4fc83d03e9b96d7476d482d5fc39ab0a4e3e1e8aa493c2a",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
@@ -513,9 +513,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3267,
+    "bytes": 3280,
     "nvars": 48,
-    "envp_stack_bytes": 3651,
+    "envp_stack_bytes": 3664,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -1832,7 +1832,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==3078464==ERROR: AddressSanitizer: SEGV on unknown address 0x000571bb4d88 (pc 0x559e3d6e22cc bp 0x00278dde6c40 sp 0x7ffe7338d800 T0) ==3078464==The signal is caused by a READ memory access. #0 0x559e3d6e",
+      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==3679928==ERROR: AddressSanitizer: SEGV on unknown address 0x000571bb4d88 (pc 0x55fcf42a52cc bp 0x00278dde6c40 sp 0x7ffde4e37f70 T0) ==3679928==The signal is caused by a READ memory access. #0 0x55fcf42a",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1843,7 +1843,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==3078465==ERROR: AddressSanitizer: SEGV on unknown address 0x0009270827ae (pc 0x560e757b02cc bp 0x004538453d70 sp 0x7fff080a8c00 T0) ==3078465==The signal is caused by a READ memory access. #0 0x560e757b",
+      "diagnostic": "AddressSanitizer:DEADLYSIGNAL ================================================================= ==3679929==ERROR: AddressSanitizer: SEGV on unknown address 0x0009270827ae (pc 0x56464320c2cc bp 0x004538453d70 sp 0x7ffe0b01e950 T0) ==3679929==The signal is caused by a READ memory access. #0 0x56464320",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -2028,7 +2028,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.1,
+        "seconds": 0.2,
         "stdout": "162643197481653824",
         "model_stdout": "162643197481653824",
         "stderr": ""
@@ -2052,7 +2052,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.1,
+        "seconds": 0.2,
         "stdout": "54233813321995840",
         "model_stdout": "54233813321995840",
         "stderr": ""
@@ -2088,7 +2088,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.2,
+        "seconds": 0.1,
         "stdout": "7373701001472",
         "model_stdout": "7373701001472",
         "stderr": ""

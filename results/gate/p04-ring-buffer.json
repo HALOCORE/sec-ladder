@@ -125,7 +125,7 @@
     "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
     "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
-    "harness/check.py": "ae040b91af8bca292923a3eb3cd446b7f307c86e1ad000f02989a2a57bf76d66",
+    "harness/check.py": "eeb7ffa7b0346724d4fc83d03e9b96d7476d482d5fc39ab0a4e3e1e8aa493c2a",
     "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
     "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
     "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
@@ -219,9 +219,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3267,
+    "bytes": 3269,
     "nvars": 48,
-    "envp_stack_bytes": 3651,
+    "envp_stack_bytes": 3653,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -286,8 +286,8 @@
     "safe_naive/O3/isolated/small.bin": 8183.0,
     "safe_naive/O3/isolated/large.bin": 28342.0,
     "safe_naive/O3/isolated/d_ir_d_work": 6.7989881956155145,
-    "safe_naive/O3/whole/small.bin": 9603.0,
-    "safe_naive/O3/whole/large.bin": 33335.0,
+    "safe_naive/O3/whole/small.bin": 9596.0,
+    "safe_naive/O3/whole/large.bin": 33328.0,
     "safe_naive/O3/whole/d_ir_d_work": 8.004047217537943,
     "safe_tuned/O0/isolated/small.bin": 20793.0,
     "safe_tuned/O0/isolated/large.bin": 72381.0,
@@ -298,8 +298,8 @@
     "safe_tuned/O3/isolated/small.bin": 3425.0,
     "safe_tuned/O3/isolated/large.bin": 11724.0,
     "safe_tuned/O3/isolated/d_ir_d_work": 2.7989881956155145,
-    "safe_tuned/O3/whole/small.bin": 3658.0,
-    "safe_tuned/O3/whole/large.bin": 12550.0,
+    "safe_tuned/O3/whole/small.bin": 3651.0,
+    "safe_tuned/O3/whole/large.bin": 12543.0,
     "safe_tuned/O3/whole/d_ir_d_work": 2.998988195615514,
     "unsafe/O0/isolated/small.bin": 43234.0,
     "unsafe/O0/isolated/large.bin": 150859.0,

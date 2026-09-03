@@ -195,7 +195,7 @@ sweep says the callee moves -- but its MAGNITUDE is a phase, so quote the
 support, never the draw.
 
 
-**Calibration, recomputed on every run of this file** — the derived column scored against `synthesis/outward_ir.json`, a callgrind caller→callee sweep, at the 2.00 `Ir` floor: **264 rows, 236 hit, 5 miss (the dangerous direction), 23 false alarm**; residual median **0.96**, p95 **7.00**, max **243.52**. ⚠ Misses: p03 small R3-R4 -7.00, p03 large R3-R4 -7.00, p04 small R3-R4 -7.00, p04 large R3-R4 -7.00, p34 large R5-R4 +0.01.
+**Calibration, recomputed on every run of this file** — the derived column scored against `synthesis/outward_ir.json`, a callgrind caller→callee sweep, at the 2.00 `Ir` floor: **264 rows, 236 hit, 5 miss (the dangerous direction), 23 false alarm**; residual median **0.86**, p95 **7.00**, max **243.52**. ⚠ Misses: p03 small R3-R4 -7.00, p03 large R3-R4 -7.00, p04 small R3-R4 -7.00, p04 large R3-R4 -7.00, p34 large R5-R4 +0.01.
 
 **So the column has three bands, and they are measured on every run rather than chosen** — each row sorted by `|correction|` against whether the sweep says the row moves at all:
 
@@ -315,17 +315,48 @@ answer* (`.memory/03-measurement.md`).
 
 ⚠⚠ **NO DISCOUNT FACTOR IS PUBLISHED, AND THE ONE THAT WAS DRAFTED IS WITHDRAWN.** The gloss *"~90% of the term is counter, not code"* rested on a `≈426 Ir` vector-path counterfactual that was glibc **`memcpy`**'s own 4092-byte figure (`0.104 Ir`/byte) re-badged as a **`memset`** counterfactual — two libc routines, two thresholds, one quoted at the other (TASK_169 §3b). **There is no measured vector-path counterfactual for these fills, so no percentage may be quoted**, and *"the work is not there"* would be false anyway: on p42 one rung zeroes 4096 bytes and the other does not.
 
-**The marked rows are DERIVED, not listed** — `synthesize.py::regime_crossing` requires a bulk routine's contribution to be **asymmetric across the pair** by at least 2.00 `Ir` **and** at least one side to be in the byte-wise regime. The regime is read off the routine's own `Ir` per call against its measured crossover, because the sidecar has no byte count: below `0.10 Ir`/byte a call of `C` `Ir` implies `10C` bytes, so a small `C` **forces** the vector path and a large one **forces** the byte-wise path.
+**The marked ROWS are derived; the ROUTINE SET is a WHITELIST.** `synthesize.py::regime_crossing` requires a bulk routine's contribution to be **asymmetric across the pair** by at least 2.00 `Ir` **and** at least one side to be in the byte-wise regime. The regime is read off the routine's own `Ir` per call against its measured crossover, because the sidecar has no byte count: below `0.10 Ir`/byte a call of `C` `Ir` implies `10C` bytes, so a small `C` **forces** the vector path and a large one **forces** the byte-wise path.
+
+⚠⚠ **This file used to call the marked set *"DERIVED rather than listed"*. That was withdrawn at TASK_171 and it is corrected here:** `synthesize.py::BULK_REGIME` is **3 hand-classified keys**, two of them bare glibc load addresses that a glibc bump would silently retire. What makes it a whitelist is not the names but the pair `(lo, hi)` — the routine's own byte-count crossover — which **a sidecar carrying `Ir` per call and no byte count cannot supply**, so a routine-independent signature rule is not available here. It is printed in full rather than described:
+
+| callee key | routine | forced VECTOR below | forced BYTE-WISE above | cells in the sidecar |
+|---|---|---:|---:|---:|
+| `0x0000000000188a80` | glibc `memmove` (`__memmove_avx_unaligned_erms`) | 852.00 `Ir`/call | 8192.00 `Ir`/call | 82 |
+| `0x0000000000189480` | glibc `memset` (`__memset_avx2_unaligned_erms`) | 300.00 `Ir`/call | 4000.00 `Ir`/call | 68 |
+| `__rustc::__rust_alloc_zeroed` | `__rust_alloc_zeroed`'s fill | 300.00 `Ir`/call | 4000.00 `Ir`/call | 2 |
+
+**The 3 (pattern, blob, pair) row(s) that clear both tests, and why:**
 
 | pattern | blob | pair | why |
 |---|---|---|---|
-| p08 | large | `gcc-clang` | glibc `memset` (`__memset_avx2_unaligned_erms`) contributes -4112.49 `Ir` to this difference and is priced BYTE-WISE on `c-clang` (4113.00 `Ir`/call) while the other side does not call it at all |
-| p08 | small | `gcc-clang` | glibc `memset` (`__memset_avx2_unaligned_erms`) contributes -4112.84 `Ir` to this difference and is priced BYTE-WISE on `c-clang` (4113.00 `Ir`/call) while the other side does not call it at all |
-| p42 | large | `R2-R4` | `__rust_alloc_zeroed`'s fill contributes +4342.00 `Ir` to this difference and is priced BYTE-WISE on `safe_naive` (4342.00 `Ir`/call) while the other side does not call it at all |
+| p08 | large | `gcc-clang` | glibc `memset` (`__memset_avx2_unaligned_erms`) contributes -4112.49 `Ir` to this difference and is priced BYTE-WISE on `c-clang` (4113.00 `Ir`/call) while `c-gcc` reports NO CALLEE EDGE UNDER THIS KEY — which on a `gcc-clang` pair is NOT the same as not calling it, because the key space is compiler-dependent: see the caption below the table |
+| p08 | small | `gcc-clang` | glibc `memset` (`__memset_avx2_unaligned_erms`) contributes -4112.84 `Ir` to this difference and is priced BYTE-WISE on `c-clang` (4113.00 `Ir`/call) while `c-gcc` reports NO CALLEE EDGE UNDER THIS KEY — which on a `gcc-clang` pair is NOT the same as not calling it, because the key space is compiler-dependent: see the caption below the table |
+| p42 | large | `R2-R4` | `__rust_alloc_zeroed`'s fill contributes +4342.00 `Ir` to this difference and is priced BYTE-WISE on `safe_naive` (4342.00 `Ir`/call) while `unsafe` reports NO CALLEE EDGE UNDER THIS KEY — and both cells here are rustc-built, so the key space is common and this one does mean no call |
+
+⚠⚠ **THE *"no callee edge under this key"* CLAUSE IS NOT A MEASUREMENT OF *"the other side does not call it"* ON A `gcc-clang` ROW, AND IT USED TO SAY IT WAS.** This file printed *"while the other side does not call it at all"*, which is **true by construction** rather than measured (TASK_171 §1a(iii), RECAP finding 67(d)): on a `gcc-clang` pair the two cells do not share a key space, because gcc-built cells report their libc callees under **the client's own PLT address** while clang-built cells report the **libc** address. Re-derived at TASK_172 on the marked pattern itself: `p08 c-gcc` carries the SAME `memmove` at **39.0** `Ir`/callee-call under key `0x0004001160` against `c-clang`'s **39.4** under `0x188a80` — the delta is the extra thunk. On `memset` the clause happens to be true (gcc inlines it, as `rep stos %rax`); on `memmove` the identical sentence would have been false. **The census got the right answer on `p08` for a reason it had not established**, and the clause now names the KEY rather than the call.
 
 ⚠ **Two things this census settles that marking `p42` by hand would not have.** (a) **`p08 gcc-clang` is marked and nobody had noticed**: gcc inlines the same 4096-byte fill as a 512-`Ir` `rep stos %rax` while clang calls glibc `memset` at 4113.00 `Ir` — identical work, 8× apart, inside a published row. (b) **p08's rung pairs are NOT marked**, correctly: the 4113.00 `Ir` `memset` is in *all four* Rust cells, so it cancels out of `R2-R4`, `R3-R4` and `R5-R4` exactly. ⚠ And **`§` is per BLOB**: p42's `R2-R4` is marked on `large` (the fill is 4342.00 `Ir`) and not on `small` (189.01 `Ir`, forced vector) — the same code, the same rung pair, two regimes.
 
 ⚠ **The first spelling of this census found `p42` and nothing else, which is the flattering answer.** In `synthesis/outward_ir.json` the glibc routines carry **no symbol at all** — they are bare addresses — so a name regex misses every one of them and reports only the Rust-named `__rust_alloc_zeroed`. `0x189480` and `0x188a80` are resolved in `.memory/03-measurement.md`.
+
+⚠⚠ **AND HERE IS WHAT THE WHITELIST DOES NOT DECIDE, DERIVED RATHER THAN ASSERTED.** Every callee **not** in `BULK_REGIME` that contributes asymmetrically by at least 2.00 `Ir` on a published pair is the population a complete census would have to rule on: **69 distinct callee keys across 221 published rows** (`synthesize.py::unclassified_bulk_candidates`). Scored against the smallest crossover any *classified* routine has — forced VECTOR below **300.00** `Ir`/callee-call, forced BYTE-WISE above **4000.00** — **0 clear the byte-wise bound** and **6 clear even the vector bound**:
+
+| unclassified callee | max `Ir`/callee-call | rows | patterns |
+|---|---:|---:|---|
+| `core::ptr::drop_glue::<[core::option::Option<alloc::boxed::Box<safe_naive::Rec>>; 32]>` | 3246.60 | 2 | p29 |
+| `core::ptr::drop_glue::<[core::option::Option<alloc::boxed::Box<safe_tuned::Rec>>; 32]>` | 3246.60 | 2 | p29 |
+| `core::ptr::drop_glue::<[core::option::Option<alloc::rc::Rc<safe_naive::Obj>>; 16]>` | 1505.75 | 2 | p34 |
+| `core::ptr::drop_glue::<[core::option::Option<alloc::rc::Rc<safe_tuned::Obj>>; 16]>` | 1505.75 | 2 | p34 |
+| `core::ptr::drop_glue::<[core::option::Option<alloc::boxed::Box<u8>>; 32]>` | 1252.36 | 4 | p27 |
+| `0x0000000004001190` | 414.87 | 2 | p02 |
+
+✅ **This settles the two routines TASK_171 named as the whitelist's silence, and it settles them with a MEASUREMENT rather than with a name.** glibc `__memchr_avx2` peaks at **41.51** `Ir`/callee-call over the whole sidecar (6 cells, max at `p11/large/c-clang-h`), **7×** under the bound; glibc `__strlen_avx2` peaks at **33.06** `Ir`/callee-call over the whole sidecar (6 cells, max at `p11/large/c-clang`), **9×** under the bound. The bound is the 300.00 `Ir`/callee-call figure that **forces** the vector path under every crossover this project has resolved, so both routines are in the VECTOR regime on every cell they appear in: they cannot trigger the mark, and adding them to the whitelist would change **no row**. Their asymmetry on six published `gcc-clang` rows is real and is a *callee-resolution* asymmetry, not a regime one.
+
+⚠ **And the single biggest callee in the whole sidecar is excluded by the FLOOR rather than by a name**, which is the same point from the other side: `0x0000000000015220` — `ld.so`'s `_dl_runtime_resolve_xsavec` — reads **4828.00** `Ir` per callee-call (46 cells, max at `p08/small/c-clang`), the largest figure here and above the byte-wise bound, and it appears in the census above **not at all**. It is the lazy-binding resolver, invoked once per program rather than once per kernel call, so its contribution to every published difference is under 2.00 `Ir`. **No rule had to know its name.**
+
+⚠ **The limit of that scoring, stated rather than hidden:** it uses the crossovers of the routines this project has *resolved*. A bulk routine whose own crossover sat far below every resolved one would be byte-wise while reading under 300.00 `Ir`/callee-call, and **a sidecar with no byte count cannot tell**. Nothing on this tree is near that case: the largest unclassified figure above is a Rust `drop_glue` over a 32-element array, which has no size regime at all.
+
+⚠⚠ **AND THE CENSUS IS STRUCTURALLY BLIND TO AN INLINED BULK INSTRUCTION, WHICH IS A KNOWN PUBLISHED ROW AND NOT A HYPOTHETICAL.** It reads `outward_by_callee_per_call`, so a bulk fill the compiler emits *inline* produces **no callee edge and cannot be seen at all**. `p27 gcc-clang` is exactly that (TASK_169, upheld at TASK_171 §1c): gcc emits `rep stos` for 32 `Ir` inside `<kernel>` and clang emits 18 `movaps` + 1 `xorps` = 19, both **inline**, and the 13-`Ir` difference is **52% of that row's published `−25.02`**. It is not marked, and **non-marking is not evidence the row is clean** — a census that cannot see a row says nothing about it. ⚠ The same is true of the marked pattern's own gcc side: `p08 c-gcc` inlines its 4096-byte fill as `rep stos %rax`, so `p08 gcc-clang` is marked **only because clang calls out**, and a pair where *both* sides inlined would be silently unmarked.
 
 ### `R2-R4`  (`safe_naive` - `unsafe`)
 
@@ -547,7 +578,7 @@ answer* (`.memory/03-measurement.md`).
 | p36-vtable-dispatch | -120.00 | -1016.00 | UNDEC | **small +9.00** (+129.00) / **large +9.00** (+1025.00) |
 | p38-alias-pun | -232.00 | -617.00 | LICENSED |  |
 | p42-goto-cleanup | 367.00 | 16367.00 | LICENSED | small +372.00 (+5.00) **?** / large +16372.00 (+5.00) **†** (own null -31.00) |
-| p46-bignum-mac | 2163.00 | 5778.00 | NOT-LIC | **small +2069.00** (-94.00) / **large +5649.10** (-128.90) ‡ |
+| p46-bignum-mac | 2163.00 | 5778.00 | NOT-LIC | **small +2076.00** (-87.00) / **large +5656.10** (-121.90) ‡ |
 | p47-ct-compare | 15.00 | 23.00 | NOT-LIC | small +24.00 (+9.00) **?** / **large +40.00** (+17.00) |
 | p49-interned-pool | -312.42 | -780.02 | LICENSED | small <2.00 / large -775.56 (+4.46) **?** |
 
@@ -804,11 +835,29 @@ p18   large        -12.00         0.00       -12.00
 
 ⚠ **TASK_075_REVIEW M6 prescribed deriving the lever count this way for "the 10 patterns that expose a `--list`" and deleting the declared table. Measured, that cannot be done.** Ten patterns expose a `--list` and **five of them print no source file at all** (p06 p09 p22 p36 p38); the other five split two ways (`from x.rs` on p10 and p47, `<- x.rs` on p03, p04 and p12). **p36 — the review's own worked example — is in the first group**: its `--list` prints `r3_hdr4  rust`, the *language*. Deriving p36's split from the `r3_`/`r4_` **name prefix** instead gives 4 R3 and **2** R4, while `.memory/01-ladder.md` finding 23 says **3** R4 — so the derivation-by-convention rots in the same direction the hand table does and less visibly. The census above is therefore built to degrade to *"no source attribution"* rather than to a wrong count.
 
-*Declared*, in `synthesize.py::SEARCH_REVIEWED`, every entry cited to a **reviewed** artefact — except one, `p06`, which is marked `⊘` because `.memory/01-ladder.md` marks it `⊘`: it landed at TASK_048 and has not been through a second review, and it is labelled here rather than omitted or silently promoted. A pattern with no entry prints `undeclared`, which is its true state — **0 of 33** today:
+*Declared*, in `synthesize.py::SEARCH_REVIEWED`, every row has an entry, and **4 of 33 are NOT cited to a reviewed measurement** — a count this file used to give as *"except one, `p06`"*, which was false on three (TASK_171 §3d) and is derived here rather than typed. The exceptions:
 
-⚠⚠⚠ **AND THE HONEST SENTENCE IS NOT *"EVERY RUNG'S CHEAPEST SPELLING HAS BEEN SEARCHED"*. IT IS THIS: every one of the 33 rows now DECLARES its search state, and 30 of them declare a search that was reviewed.** TASK_170 read all fourteen rows that had printed `undeclared` since 26 patterns — `p02 p04 p05 p07 p09 p14 p16 p18 p19 p23 p27 p38 p42 p46` — against their own `NOTES.md`, `.memory/01-ladder.md`, `controls/` and reviewing report, and **all fourteen had a reviewed search**: none was a reviewed declaration of NO search, and none was genuinely undeclared. ⚠⚠ **So `undeclared` was 100% bookkeeping at 26 patterns, 100% bookkeeping at 33, and never once measured search effort — the same conclusion TASK_112 and TASK_166 reached on smaller samples, now at the whole tree.** ⚠ **What is still NOT claimed, and what this column has never been able to say: that the search was DEEP ENOUGH.** Seven of the fourteen name their own weaker endpoint (p02, p14 and p27 have an unsearched R4 or R2 side; p09 and p19 rest on a review that re-measured one side; p46's widths are an unreviewed re-measure), and the entries below say so. ⚠⚠ **Read a declared row as *somebody looked and wrote down what they found*, never as *this is the floor*: on p05 three successive published minima were each overturned by the next agent's FIRST lever, and on p42 the fifth R4 spelling reversed the sign of the published difference.**
+- `p06` — marked `⊘` because `.memory/01-ladder.md` marks it `⊘`: it landed at TASK_048 and has not been through a second review. Labelled rather than omitted or silently promoted.
+- **`p01`, `p03`, `p08`** — the cited artefact is `RECAP`'s ***Owed*** queue, i.e. **the open backlog**: outstanding work, not a reviewed measurement, and each entry's own verdict says so — `p01` *"R3 span OWED"*; `p03` *"R3 span 1 unreviewed measurement; the +5 constant NEVER searched"*; `p08` *"R3 span OWED"*. `synthesize.py::backlog_cited` derives this from the citation itself. ⚠ **The boundary is printed too**: 4 entries *mention* the queue (`p01`, `p03`, `p08`, `p18`) and 3 cite it and nothing else; `p18` cites a `NOTES.md` and a review as well, which is a different state.
 
-⚠⚠ **AND THE 33 DECLARED ROWS SPLIT TWO WAYS, WHICH ONE COUNT CANNOT SAY: 30 report a SEARCH RESULT and 3 report a REVIEWED DECLARATION OF *NO* SEARCH (p29, p32, p49, marked `⊘` in their entry text and listed in `SEARCH_NONE`).** A row that publishes no rung-to-rung figure and says so is not in the same state as a row nobody has looked at, and `undeclared` collapses the two. ⚠ **So do not read `0 of 33` as *the unsearched fraction*** — it is *the fraction with no entry in this dict*, which is what it has always been.
+A pattern with no entry prints `undeclared`, which is its true state — **0 of 33** today.
+
+⚠⚠⚠ **AND THE HONEST SENTENCE IS NOT *"EVERY RUNG'S CHEAPEST SPELLING HAS BEEN SEARCHED"*. IT IS THIS: every one of the 33 rows now DECLARES its search state, and 27 of them declare a search that was reviewed.** TASK_170 read all 14 rows that had printed `undeclared` since 26 patterns — `p02` `p04` `p05` `p07` `p09` `p14` `p16` `p18` `p19` `p23` `p27` `p38` `p42` `p46` — against their own `NOTES.md`, `.memory/01-ladder.md`, `controls/` and reviewing report, and **all 14 had a reviewed search**: none was a reviewed declaration of NO search, and none was genuinely undeclared. ⚠⚠ **So `undeclared` was 100% bookkeeping at 26 patterns, 100% bookkeeping at 33, and never once measured search effort — the same conclusion TASK_112 and TASK_166 reached on smaller samples, now at the whole tree.** ⚠ **What is still NOT claimed, and what this column has never been able to say: that the search was DEEP ENOUGH.**
+
+**8 of the 14 name an endpoint of their OWN that is unsearched, fiat, or resting on a measurement nobody reviewed** — in their own words, and the count below is `len()` of this list rather than a word typed above it (`synthesize.py::WEAKER_ENDPOINT`, which fails closed if a quote drifts out of its entry):
+
+- **p02** — *"The R4 side is explicitly UNsearched"*
+- **p09** — *"The R4 half is the weaker one"*
+- **p14** — *"The R4 side was never searched"*
+- **p18** — *"⊘ The R4 side is NOT searched, declared"*
+- **p19** — *"only the review re-measured them"*
+- **p27** — *"R3 searched twice; R2 never"*
+- **p38** — *"the R4 side is disclosed but NOT established, and it flatters SAFE"*
+- **p46** — *"Those widths are TASK_092's UNREVIEWED re-measure"*
+
+⚠⚠ **Read a declared row as *somebody looked and wrote down what they found*, never as *this is the floor*: on p05 three successive published minima were each overturned by the next agent's FIRST lever, and on p42 the fifth R4 spelling reversed the sign of the published difference.**
+
+⚠⚠ **AND THE 33 DECLARED ROWS SPLIT THREE WAYS — NOT TWO, WHICH IS WHAT THIS SENTENCE USED TO SAY — AND ONE COUNT CANNOT SAY IT: 27 report a SEARCH RESULT, 3 report a REVIEWED DECLARATION OF *NO* SEARCH (p29, p32, p49, marked `⊘` in their entry text and listed in `SEARCH_NONE`), and 3 report a SEARCH THAT IS STILL OWED (p01, p03, p08, whose cited artefact is the open backlog).** ⚠⚠ **The third bucket is new here and it is a correction, not a refinement**: `n_found` used to be a RESIDUAL — declared minus `SEARCH_NONE` — so a row that says its span is OWED landed in *report a SEARCH RESULT* by arithmetic (TASK_171 §3d). It is now a set difference and all three buckets are printed. A row that publishes no rung-to-rung figure and says so is not in the same state as a row nobody has looked at, nor as a row that owes one, and `undeclared` collapses all three. ⚠ **So do not read `0 of 33` as *the unsearched fraction*** — it is *the fraction with no entry in this dict*, which is what it has always been.
 
 - **p01** — R3 span OWED  
   *RECAP 'Owed' 3: p01 and p08 owe an in-contract R3-side span*

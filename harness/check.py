@@ -927,6 +927,19 @@ def check_selftests(rep):
             rep.fail("control-verdict-selftest",
                      f"control_json_verdict: {label}: got [verdict,n]={got}, "
                      f"want {want}")
+    # TASK_172's must-fire arms for stage 3a's THIRD disjunct, here for exactly
+    # the same reason as the two above and one degree worse: the disjunct is
+    # PROSPECTIVE. `asm.py`'s needle mis-resolves on 33 `-O0` windows and hands
+    # stage 3a p01's `Iterator::fold` symbol instead of its `kernel` symbol, so
+    # on today's tree `callee_loop_witness` is never called with a window that
+    # reaches it -- a green 33-pattern sweep says nothing at all about whether
+    # it can fire, or about whether it fires when it must not.
+    # `got[0] == "RAISED"` means `callee_loop_witness` threw -- reported, not
+    # crashed (`.memory/03-measurement.md` entry 19).
+    for label, got, want in _CALLEE_LOOP_CASES:
+        if got != want:
+            rep.fail("callee-loop-selftest",
+                     f"callee_loop_witness: {label}: got {got}, want {want}")
 
 
 # ==========================================================================
@@ -2982,6 +2995,185 @@ def check_checksums(built, rep, models, indir):
 # ==========================================================================
 # 3. anti-collapse -- structural AND dynamic
 # ==========================================================================
+#
+# ⚠⚠ **STAGE 3a's THIRD DISJUNCT, AND WHY IT IS DERIVED RATHER THAN NAMED.**
+# TASK_172, from TASK_170 item 43 / TASK_171 §6a / RECAP finding 67(e).
+#
+# Stage 3a passes a cell when the window has a backward branch **or** a call to
+# a bulk-memory routine. The second disjunct exists because *"the loop is real,
+# it is just in a callee"* is a healthy kernel, not a collapsed one -- it was
+# added at TASK_003_REVIEW for p02's `-O3` `memcpy` kernel, and widened again
+# (`asm.py::_V0_BULK_RES`) for **p02's `safe_tuned` at `-O0`**, whose comment
+# says in as many words: *"it false-failed p02's `safe_tuned` at O0, where the
+# copy and the fold are still out-of-line calls and the kernel symbol therefore
+# has no loop of its own."*
+#
+# ⚠ **That hatch is a NAME LIST, and the property it is groping for is
+# STRUCTURAL.** `p01 safe_tuned -O0 isolated`'s kernel is 40 non-pad
+# instructions with **zero** backward branches: it bounds-checks the sub-slice
+# and tail-calls
+# `<core::slice::Iter<u64> as Iterator>::fold::<..., safe_tuned::kernel::
+# {closure#0}>`, which carries **4**. The loop is p01's own loop, one direct
+# call away, in a monomorphisation instantiated at p01's own closure -- and
+# `Iterator::fold` is not a bulk-memory routine and can never be in a list of
+# them. **Measured: on the whole tree exactly TWO windows have no backward
+# branch in the window itself (p01 and p02 `safe_tuned -O0 isolated`), and both
+# call the SAME looping `Iterator::fold` monomorphisation. The derived rule
+# below subsumes the name-based one on the one window the name-based one was
+# built for.**
+#
+# ⚠⚠ **WHY THIS IS NOT "the check is a `-O3` test run at `-O0`", WHICH IS THE
+# TEMPTING READING AND IS WRONG.** `-O0` is not the discriminating variable:
+# **261 of 263 `-O0 isolated` windows carry their own backward branch**, and the
+# first cell this class ever bit was `-O3` (p02, gcc, `memcpy`). Gating the
+# structural test on the optimisation level would relax the predicate on 526
+# windows to fix 1. The discriminating variable is *callee-resident loop*, and
+# it is level-independent.
+#
+# ✅ **What bounds the disjunct, measured rather than asserted** (probe:
+# `.temp/t172/callee_loop_probe.py`, 1052 windows):
+#   * it is only consulted when the window has NO backward branch AND NO bulk
+#     call -- **1 window of 1052 reaches it today**;
+#   * `isolated` ONLY. In `whole` mode the window is `main`, whose direct
+#     callees include the driver's own `arg_path`/`load`, both of which loop
+#     over I/O that is not the kernel's work; a witness there would be free and
+#     would mean nothing. In `isolated` mode the needle names the kernel and its
+#     direct callees are its work. (`whole` loses nothing: `main` contains the
+#     driver's `while it < n_iters` by construction, so all 526 `whole` windows
+#     already pass on the first disjunct.)
+#   * **DIRECT calls only, depth 1**, to a symbol defined in the SAME binary.
+#     A constant-folded kernel has no such call.
+#   * the panic path is not a loophole *on this tree*: **0 of the 444 windows
+#     with a looping direct callee have one whose name mentions
+#     panic/unwind/abort/assert.**
+# ⚠ **Not a licence to skip the DYNAMIC check.** On the one window that reaches
+# this disjunct, stage 3b measures 10622.3 Ir/call against a derived floor of
+# 125.25 (84x) and `d(Ir)/d(work) = 21.0` against `ALPHA_IR_PER_WORK = 0.25`.
+# ⚠⚠ **And this disjunct is PROSPECTIVE on today's tree**: `asm.py`'s `main`/
+# `kernel` needle mis-resolves on 33 `-O0` windows and hands stage 3a p01's
+# `fold` symbol instead of its `kernel` symbol, so the branch below is
+# unreachable until that is fixed. That is exactly why it owes the must-fire
+# arms in `_CALLEE_LOOP_CASES` -- a green 33-pattern sweep says nothing about
+# whether it can fire.
+
+_CALL_MNEMONIC_RE = re.compile(r"^callq?$")
+
+
+def _direct_call_targets(insns):
+    """`<symbol>` operands of DIRECT `call` instructions, in order, deduped.
+
+    An indirect call (`call *0x4398f(%rip)`) has no `<...>` operand and is
+    therefore not a target. objdump renders an interior destination as
+    `<sym+0x10>`; the symbol is the part before the `+`."""
+    out = []
+    for i in insns:
+        if not _CALL_MNEMONIC_RE.match(i.mnemonic):
+            continue
+        mt = re.search(r"<([^>]+)>", i.text)
+        if mt:
+            n = mt.group(1).split("+")[0]
+            if n not in out:
+                out.append(n)
+    return out
+
+
+def callee_loop_witness(mode, k, syms, extents):
+    """Stage 3a's third disjunct: is the loop one DIRECT CALL away?
+
+    `syms`/`extents` are `asm.symbols(path)` / `asm.nm_extents(path)` for the
+    same binary. Returns `[(callee, n_backward_branches), ...]`, empty meaning
+    no witness. See the block comment above for what bounds it and why the rule
+    is structural rather than a list of names.
+
+    Deliberately NOT required: that the callee's name mention the kernel. p01's
+    does (`...6kernel0...`, the closure the `fold` is instantiated at), but the
+    sibling spelling `v[a..b].iter().sum::<u64>()` monomorphises to
+    `<u64 as Sum<&u64>>::sum::<Iter<u64>>`, which does not -- and *"a census
+    that can only find the phrasings you thought of"* is this project's own
+    named defect."""
+    if mode != "isolated":
+        return []
+    out = []
+    for t in _direct_call_targets(k.insns):
+        if t == k.symbol:
+            continue          # a self-call is recursion, not a callee's loop
+        ins = syms.get(t)
+        if not ins:
+            continue          # a PLT stub or an undefined symbol: not a body
+        kc = asm.Kernel(k.binary, t, ins, extents.get(t))
+        if kc.has_loop:
+            out.append((t, len(kc.backward_branches)))
+    return out
+
+
+def _mk_insns(texts, base=0x1000):
+    return [asm.Insn(base + 4 * n, b"\x90", t) for n, t in enumerate(texts)]
+
+
+#: Arm bodies, as functions of the address the arm places them at -- a branch
+#: target is an ABSOLUTE hex address in objdump's rendering, so a body pinned to
+#: one base stops looping the moment an arm moves it (which is how the first
+#: draft of the two-callee arm below silently tested nothing).
+def _arm_loop(base):
+    """A body whose last instruction branches back to its own first address."""
+    return ["mov (%rdi),%rax", "add $0x8,%rdi", f"jne {base:x} <self>"]
+
+
+def _arm_fwd(base):
+    """A body whose only branch is FORWARD -- not a loop."""
+    return ["cmp $0x0,%rax", f"je {base + 8:x} <self+0x8>", "ret"]
+
+
+def _arm_flat(base):
+    return ["mov (%rdi),%rax", "ret"]
+
+
+def _clw(mode, window, callees, wbase=0x1000, cbase=0x2000):
+    """Arm helper: `window` is a list of objdump instruction texts, `callees` a
+    {symbol: body-builder} map standing in for the rest of the binary, laid out
+    at `cbase`, `cbase + 0x100`, ... in sorted order.  Returns just the witness
+    symbol names, so an arm reads as data."""
+    syms, addrs = {}, {}
+    for i, n in enumerate(sorted(callees)):
+        a = cbase + 0x100 * i
+        addrs[n], syms[n] = a, _mk_insns(callees[n](a), a)
+    k = asm.Kernel("<arm>", "kernel", _mk_insns(window, wbase))
+    syms.setdefault("kernel", k.insns)
+    try:
+        return [n for n, _ in callee_loop_witness(mode, k, syms, {})]
+    except Exception as e:                                  # pragma: no cover
+        return ["RAISED", type(e).__name__, str(e)]
+
+
+_CALLEE_LOOP_CASES = [
+    # --- the fire: p01 safe_tuned -O0 isolated's shape ------------------------
+    ("a DIRECT call to a callee with a backward branch IS a witness",
+     _clw("isolated", ["sub $0x48,%rsp", "call 2000 <fold>", "ret"],
+          {"fold": _arm_loop}), ["fold"]),
+    ("two looping callees are both reported",
+     _clw("isolated", ["call 2000 <a>", "call 2100 <b>", "ret"],
+          {"a": _arm_loop, "b": _arm_loop}), ["a", "b"]),
+    # objdump prints an interior destination as `<sym+0xNN>`.
+    ("an INTERIOR target `<sym+0x10>` resolves to `sym`",
+     _clw("isolated", ["call 2010 <fold+0x10>", "ret"], {"fold": _arm_loop}),
+     ["fold"]),
+    # --- and every way it must NOT fire ---------------------------------------
+    ("a callee with NO backward branch is NOT a witness",
+     _clw("isolated", ["call 2000 <flat>", "ret"], {"flat": _arm_flat}), []),
+    ("a callee whose only branch is FORWARD is NOT a witness",
+     _clw("isolated", ["call 2000 <fwd>", "ret"], {"fwd": _arm_fwd}), []),
+    ("a call to a symbol NOT DEFINED in this binary is NOT a witness",
+     _clw("isolated", ["call 2000 <memcpy@plt>", "ret"], {}), []),
+    ("an INDIRECT call is not a call target at all",
+     _clw("isolated", ["call *0x4398f(%rip)", "ret"], {"fold": _arm_loop}), []),
+    ("a SELF-call is not a witness",
+     _clw("isolated", ["call 1000 <kernel>", "ret"], {}), []),
+    ("a collapsed kernel -- no calls at all -- has no witness",
+     _clw("isolated", ["mov $0x2a,%eax", "ret"], {"fold": _arm_loop}), []),
+    ("`whole` mode has NO witness even when a callee loops",
+     _clw("whole", ["call 2000 <fold>", "ret"], {"fold": _arm_loop}), []),
+]
+
 
 def check_no_collapse(built, rep):
     head("3a. anti-collapse, structural: the kernel loop survived optimisation")
@@ -3008,7 +3200,26 @@ def check_no_collapse(built, rep):
         # measured before p02 existed). The dynamic check in 3b is what actually
         # establishes the work happened, and it is unaffected either way.
         if not k.has_loop and not bulk:
-            problems.append("no backward branch and no bulk-memory call")
+            # TASK_172, third disjunct: the loop may be one DIRECT CALL away in
+            # a callee that is not a bulk-memory routine and never could be
+            # (p01's `Iterator::fold`). Resolved here rather than in `asm.py`
+            # because it needs the whole binary's symbol table, and paid for
+            # only on the windows that would otherwise fail -- 1 of 1052.
+            # Full argument and the measured bounds: the block comment above.
+            wit = callee_loop_witness(m, k, asm.symbols(path),
+                                      asm.nm_extents(path))
+            if wit:
+                rep.note(f"{c} {o} {m}: the kernel symbol has no backward "
+                         f"branch and no bulk-memory call, but the loop is one "
+                         f"DIRECT CALL away -- "
+                         + "; ".join(f"{n} ({b} back edge"
+                                     f"{'s' if b != 1 else ''})"
+                                     for n, b in wit)
+                         + ". Structural anti-collapse is satisfied by the "
+                           "callee; 3b is what establishes the work happened.")
+            else:
+                problems.append("no backward branch, no bulk-memory call, and "
+                                "no direct callee with a backward branch")
         if k.n_fn_nopad < floor:
             problems.append(f"body {k.n_fn_nopad} < floor {floor}")
         if not loads and not bulk:

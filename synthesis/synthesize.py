@@ -584,6 +584,103 @@ SEARCH_REVIEWED = {
 # hand-maintained dict, which is the defect this whole block exists to record.
 SEARCH_NONE = {"p29", "p32", "p49"}
 
+# --- TASK_172 item C: two counts that were TYPED under a computed list ------
+#
+# ⚠⚠ **THIS FILE'S MOST-REPEATED DEFECT IS A HAND-TYPED COUNT UNDER A COMPUTED
+# LIST, AND `RECAP` RECORDS IT AT LEAST THREE TIMES.** TASK_170 fixed one
+# instance (`n_undecl`, difference-of-lengths -> set difference) and TASK_171
+# found two more **in the same block, one paragraph below that fix**:
+#
+#   * *"every entry cited to a **reviewed** artefact -- except one, `p06`"* was
+#     **false on three**: `p01`, `p03` and `p08` cite `RECAP`'s ***Owed***
+#     queue, i.e. the OPEN BACKLOG, and their own verdict text says the span is
+#     OWED or NEVER searched. Worse, `n_found` is a RESIDUAL
+#     (`len(SEARCH_REVIEWED & meas) - len(SEARCH_NONE)`), so all three were
+#     counted inside the published *"N report a SEARCH RESULT"*.
+#   * *"Seven of the fourteen name their own weaker endpoint"* **listed SIX**,
+#     omitting `p18` and `p38` -- the two most explicit -- so the typed word,
+#     the printed list and the truth were three different numbers.
+#
+# ✅ **Both are now DATA, and both counts are `len()` of the thing that is
+# printed.** A count and a list that come from one object cannot disagree.
+# ⚠ **And the membership quotes are checked** -- `weaker_endpoint_rows` FAILS
+# CLOSED if an entry's own words move away from the quote anchoring it, which
+# is the only way this kind of set rots.
+
+#: The rows that printed `undeclared` at 26 patterns and that TASK_170 read
+#: against their own artefacts. Data, not a typed string: *"fourteen"* below is
+#: `len(UNDECLARED_AT_26)`.
+UNDECLARED_AT_26 = ("p02 p04 p05 p07 p09 p14 p16 p18 p19 p23 p27 p38 p42 p46"
+                    .split())
+
+#: Of those, the entries that name an endpoint of their OWN which is
+#: unsearched, fiat, or resting on a measurement nobody reviewed -- keyed to a
+#: VERBATIM substring of that pattern's own `SEARCH_REVIEWED` entry, so a
+#: reader can check the membership against the words rather than trusting a
+#: count. ⚠ Deliberately NOT included: `p04`, `p05`, `p07`, `p16`, `p42`, whose
+#: entries report a SEARCHED-AND-DEGENERATE endpoint (a result, not a gap), and
+#: `p23`, whose one disclosure is about probe durability and whose floor
+#: correction was found and settled BY a review.
+WEAKER_ENDPOINT = {
+    "p02": "The R4 side is explicitly UNsearched",
+    "p09": "The R4 half is the weaker one",
+    "p14": "The R4 side was never searched",
+    "p18": "⊘ The R4 side is NOT searched, declared",
+    "p19": "only the review re-measured them",
+    "p27": "R3 searched twice; R2 never",
+    "p38": "the R4 side is disclosed but NOT established, and it flatters SAFE",
+    "p46": "Those widths are TASK_092's UNREVIEWED re-measure",
+}
+
+
+def weaker_endpoint_rows(reviewed=None, quotes=None, population=None):
+    """`[(pat, quote)]` for the rows whose own entry names a weaker endpoint.
+
+    **FAILS CLOSED.** Every key must be in the population, must have an entry,
+    and its quote must still occur verbatim in that entry's verdict-or-citation
+    text. A quote that has drifted raises rather than silently dropping the row
+    -- silently dropping is the flattering direction and is how the sentence
+    this replaces came to say `Seven` over a list of six."""
+    reviewed = SEARCH_REVIEWED if reviewed is None else reviewed
+    quotes = WEAKER_ENDPOINT if quotes is None else quotes
+    population = UNDECLARED_AT_26 if population is None else population
+    out, bad = [], []
+    for pat in sorted(quotes):
+        if pat not in population:
+            bad.append(f"{pat}: not in the population {sorted(population)}")
+            continue
+        e = reviewed.get(pat)
+        if not e:
+            bad.append(f"{pat}: no SEARCH_REVIEWED entry")
+            continue
+        if quotes[pat] not in (e[0] + " " + e[1]):
+            bad.append(f"{pat}: the anchoring quote {quotes[pat]!r} is no "
+                       f"longer in its entry")
+            continue
+        out.append((pat, quotes[pat]))
+    if bad:
+        raise ValueError("WEAKER_ENDPOINT has rotted away from the entries it "
+                         "describes: " + "; ".join(bad))
+    return out
+
+
+def backlog_cited(reviewed=None):
+    """Entries whose PRIMARY cited artefact is `RECAP`'s ***Owed*** queue --
+    outstanding work, not a reviewed measurement.
+
+    `(primary, mentions)`. `primary` is the citation that *starts* with
+    `RECAP`; `mentions` is every entry whose citation names the queue anywhere.
+    **Both are printed**, because the difference between them is the boundary
+    of the rule and a reader must be able to see it: `p18` cites a `NOTES.md`
+    and a review AND names the queue for its R4 half, which is a different
+    state from citing the queue and nothing else."""
+    reviewed = SEARCH_REVIEWED if reviewed is None else reviewed
+    primary = sorted(p for p, (_, c) in reviewed.items()
+                     if c.lstrip().startswith("RECAP"))
+    mentions = sorted(p for p, (_, c) in reviewed.items()
+                      if "Owed" in c or "owed" in c)
+    return primary, mentions
+
 # The two bands of the derived column, MEASURED rather than asserted.
 #
 # ⚠⚠⚠ THE HEADLINE JUSTIFICATION FOR `FLOOR` -- *"2.00 is THE ONLY THRESHOLD
@@ -1072,6 +1169,26 @@ def null_rule_selftest(meas, gates):
 # are bare addresses -- so a name regex misses every one of them and reports
 # the one Rust-named callee. `0x189480` and `0x188a80` are resolved in
 # `.memory/03-measurement.md`.
+#
+# ⚠⚠ **AND THIS DICT IS A WHITELIST. IT WAS PUBLISHED AS *"DERIVED rather than
+# listed"* AND THAT MARK WAS NOT EARNED** (TASK_171 §1a(ii)/§5, RECAP finding
+# 67(d)). The marked ROWS are derived; the ROUTINE SET is three keys somebody
+# typed, two of them bare glibc load addresses that a glibc bump would silently
+# retire -- returning `{}`, the flattering answer again. What makes it a
+# whitelist is **not** the names: it is the pair `(lo, hi)`, the routine's own
+# byte-count crossover, which the sidecar cannot supply because it carries `Ir`
+# per call and no byte count. A signature rule with routine-independent
+# thresholds is therefore NOT available from this sidecar, and saying so is the
+# honest form.
+# ✅ **What IS available, and is now derived on every run:
+# `unclassified_bulk_candidates` prints what the whitelist does not decide** --
+# every callee NOT in this dict that contributes asymmetrically above the floor
+# on a published pair, scored against the smallest `lo` and `hi` any classified
+# routine has. On today's tree it settles TASK_171's open question with a
+# measurement instead of a name: `__memchr_avx2` and `__strlen_avx2` peak at
+# 41.51 and 33.06 `Ir` per callee-call over the WHOLE sidecar, 7x and 9x below
+# the smallest `lo` (300.0) -- **forced VECTOR on every cell they appear in, so
+# they cannot trigger the mark, and adding them would change nothing.**
 BULK_REGIME = {
     "0x0000000000189480":
         ("glibc `memset` (`__memset_avx2_unaligned_erms`)", 300.0, 4000.0),
@@ -1128,17 +1245,124 @@ def regime_crossing(outw, floor=None):
                         nm, r = bulk_regime(k, c)
                         regs.append((cell, nm, c, r))
                     if any(r == "BYTE-WISE" for _, _, _, r in regs):
+                        # ⚠ THE REASON STRING USED TO END *"while the other
+                        # side does not call it at all"* AND THAT IS TRUE BY
+                        # CONSTRUCTION, not by measurement (TASK_171 §1a(iii),
+                        # RECAP 67(d)). `regs` has one entry when the OTHER
+                        # side reports no entry under THIS KEY -- and on a
+                        # `gcc-clang` pair the key space is compiler-dependent:
+                        # gcc cells spell their libc callees as the client's
+                        # own PLT address. Re-derived here at TASK_172, on the
+                        # marked pattern itself: `p08 c-gcc` carries the SAME
+                        # `memmove` at 39.0 `Ir`/callee-call under key
+                        # `0x0004001160` against `c-clang`'s 39.4 under
+                        # `0x188a80` -- the delta is the extra thunk. So the
+                        # honest clause names the KEY, not the call.
                         ev.append(
                             f"{regs[0][1]} contributes {ia - ib:+.2f} `Ir` to "
                             "this difference and is priced BYTE-WISE on "
                             + " and ".join(
                                 f"`{cell}` ({c:.2f} `Ir`/call)"
                                 for cell, _, c, r in regs if r == "BYTE-WISE")
-                            + (" while the other side does not call it at all"
+                            + (f" while `{b_ if regs[0][0] == a_ else a_}` "
+                               "reports NO CALLEE EDGE UNDER THIS KEY"
+                               + (" — which on a `gcc-clang` pair is NOT the "
+                                  "same as not calling it, because the key "
+                                  "space is compiler-dependent: see the "
+                                  "caption below the table"
+                                  if lab == "gcc-clang" else
+                                  " — and both cells here are rustc-built, so "
+                                  "the key space is common and this one does "
+                                  "mean no call")
                                if len(regs) == 1 else ""))
                 if ev:
                     out[(pat, inp, lab)] = ev
     return out
+
+
+def unclassified_bulk_candidates(outw, floor=None):
+    """What `BULK_REGIME`'s whitelist does NOT decide, derived.
+
+    `{callee_key: {"rows": n, "max_ir_per_callee_call": x, "pats": [...]}}` over
+    every callee **not** in `BULK_REGIME` that contributes asymmetrically by at
+    least the floor on a published pair -- i.e. exactly the population a
+    complete census would have to rule on.
+
+    ⚠ **The scoring is against `BULK_REGIME`'s OWN thresholds and that is its
+    limit**, stated rather than hidden: a callee under `min(lo)` is forced into
+    the VECTOR regime by every crossover this project has resolved, and one over
+    `min(hi)` would be forced BYTE-WISE. A routine whose own crossover is far
+    below every resolved one would sit under `min(lo)` and still be byte-wise --
+    that case cannot be settled from a sidecar with no byte count, and no row on
+    this tree is near it (the largest unclassified figure is 3246.60, a Rust
+    `drop_glue` over a 32-element array, which has no size regime at all)."""
+    floor = FLOOR if floor is None else floor
+    out = {}
+    for pat, d in sorted(outw.items()):
+        if not isinstance(d, dict):
+            continue
+        for inp in ("small.bin", "large.bin"):
+            side = d.get(inp)
+            if not isinstance(side, dict):
+                continue
+            cells = side.get("cells") or {}
+            for a_, b_, lab in PAIRS:
+                if a_ not in cells or b_ not in cells:
+                    continue
+                ka = cells[a_].get("outward_by_callee_per_call") or {}
+                kb = cells[b_].get("outward_by_callee_per_call") or {}
+                for k in sorted(set(ka) | set(kb)):
+                    if k in BULK_REGIME:
+                        continue
+                    if abs(ka.get(k, 0.0) - kb.get(k, 0.0)) < floor:
+                        continue
+                    per = [(cells[c].get("outward_ir_per_callee_call")
+                            or {}).get(k) for c in (a_, b_)]
+                    m = max([v for v in per if v is not None] or [0.0])
+                    e = out.setdefault(k, {"rows": 0,
+                                           "max_ir_per_callee_call": 0.0,
+                                           "pats": set()})
+                    e["rows"] += 1
+                    e["max_ir_per_callee_call"] = max(
+                        e["max_ir_per_callee_call"], m)
+                    e["pats"].add(pat)
+    for e in out.values():
+        e["pats"] = sorted(e["pats"])
+    return out
+
+
+def sidecar_callee_peak(outw, key):
+    """Peak `Ir` per callee-call for one callee key over the WHOLE sidecar --
+    every pattern, blob and cell, not only the published pairs. `(peak, where,
+    n_cells)`, `(None, None, 0)` if the key never appears."""
+    best, where, n = None, None, 0
+    for pat, d in sorted(outw.items()):
+        if not isinstance(d, dict):
+            continue
+        for inp in ("small.bin", "large.bin"):
+            side = d.get(inp)
+            if not isinstance(side, dict):
+                continue
+            for cell, c in sorted((side.get("cells") or {}).items()):
+                v = (c.get("outward_ir_per_callee_call") or {}).get(key)
+                if v is None:
+                    continue
+                n += 1
+                if best is None or v > best:
+                    best, where = v, f"{pat}/{inp[:-4]}/{cell}"
+    return best, where, n
+
+
+#: Callees TASK_171 §1a(ii) found unclassified in the sidecar and named as the
+#: whitelist's silence.  They are resolved by address in the pinned glibc, and
+#: they are here so the caption can print a MEASURED verdict on them rather
+#: than leaving them unmentioned -- `unclassified_bulk_candidates` finds them
+#: on its own; this dict only supplies the human name.
+NAMED_UNCLASSIFIED = {
+    "0x0000000000188080": "glibc `__memchr_avx2`",
+    "0x000000000018b7c0": "glibc `__strlen_avx2`",
+    "0x0000000000015220": "`ld.so`'s `_dl_runtime_resolve_xsavec`",
+}
 
 
 def derived(meas, gates, pat, a_, b_, lab=None, cross=None):
@@ -2038,7 +2262,7 @@ def main():
       "p42 one rung zeroes 4096 bytes and the other does not.")
     w("")
     if cross:
-        w("**The marked rows are DERIVED, not listed** — "
+        w("**The marked ROWS are derived; the ROUTINE SET is a WHITELIST.** "
           "`synthesize.py::regime_crossing` requires a bulk routine's "
           "contribution to be **asymmetric across the pair** by at least "
           f"{FLOOR:.2f} `Ir` **and** at least one side to be in the byte-wise "
@@ -2048,10 +2272,50 @@ def main():
           "bytes, so a small `C` **forces** the vector path and a large one "
           "**forces** the byte-wise path.")
         w("")
+        w("⚠⚠ **This file used to call the marked set *\"DERIVED rather than "
+          "listed\"*. That was withdrawn at TASK_171 and it is corrected "
+          "here:** `synthesize.py::BULK_REGIME` is "
+          f"**{len(BULK_REGIME)} hand-classified keys**, two of them bare "
+          "glibc load addresses that a glibc bump would silently retire. What "
+          "makes it a whitelist is not the names but the pair `(lo, hi)` — the "
+          "routine's own byte-count crossover — which **a sidecar carrying "
+          "`Ir` per call and no byte count cannot supply**, so a "
+          "routine-independent signature rule is not available here. It is "
+          "printed in full rather than described:")
+        w("")
+        w("| callee key | routine | forced VECTOR below | forced BYTE-WISE "
+          "above | cells in the sidecar |")
+        w("|---|---|---:|---:|---:|")
+        for k_, (nm_, lo_, hi_) in sorted(BULK_REGIME.items()):
+            _, _, ncell = sidecar_callee_peak(outw, k_)
+            w(f"| `{k_}` | {nm_} | {lo_:.2f} `Ir`/call | {hi_:.2f} `Ir`/call "
+              f"| {ncell} |")
+        w("")
+        w(f"**The {len(cross)} (pattern, blob, pair) row(s) that clear both "
+          f"tests, and why:**")
+        w("")
         w("| pattern | blob | pair | why |")
         w("|---|---|---|---|")
         for (p_, i_, l_), ev in sorted(cross.items()):
             w(f"| {p_} | {i_[:-4]} | `{l_}` | " + " · ".join(ev) + " |")
+        w("")
+        w("⚠⚠ **THE *\"no callee edge under this key\"* CLAUSE IS NOT A "
+          "MEASUREMENT OF *\"the other side does not call it\"* ON A "
+          "`gcc-clang` ROW, AND IT USED TO SAY IT WAS.** This file printed "
+          "*\"while the other side does not call it at all\"*, which is **true "
+          "by construction** rather than measured (TASK_171 §1a(iii), RECAP "
+          "finding 67(d)): on a `gcc-clang` pair the two cells do not share a "
+          "key space, because gcc-built cells report their libc callees under "
+          "**the client's own PLT address** while clang-built cells report the "
+          "**libc** address. Re-derived at TASK_172 on the marked pattern "
+          "itself: `p08 c-gcc` carries the SAME `memmove` at **39.0** "
+          "`Ir`/callee-call under key `0x0004001160` against `c-clang`'s "
+          "**39.4** under `0x188a80` — the delta is the extra thunk. On "
+          "`memset` the clause happens to be true (gcc inlines it, as `rep "
+          "stos %rax`); on `memmove` the identical sentence would have been "
+          "false. **The census got the right answer on `p08` for a reason it "
+          "had not established**, and the clause now names the KEY rather "
+          "than the call.")
         w("")
         w("⚠ **Two things this census settles that marking `p42` by hand "
           "would not have.** (a) **`p08 gcc-clang` is marked and nobody had "
@@ -2073,6 +2337,100 @@ def main():
       "so a name regex misses every one of them and reports only the "
       "Rust-named `__rust_alloc_zeroed`. `0x189480` and `0x188a80` are "
       "resolved in `.memory/03-measurement.md`.")
+    w("")
+
+    # ------------------------------------------- what the whitelist misses
+    # TASK_172 item B. The whitelist's silence is turned into a printed,
+    # derived census, and the two routines TASK_171 named get a MEASURED
+    # verdict instead of an absence.
+    unc = unclassified_bulk_candidates(outw)
+    lo_min = min(lo for _, lo, _ in BULK_REGIME.values())
+    hi_min = min(hi for _, _, hi in BULK_REGIME.values())
+    over_hi = {k: e for k, e in unc.items()
+               if e["max_ir_per_callee_call"] >= hi_min}
+    over_lo = {k: e for k, e in unc.items()
+               if e["max_ir_per_callee_call"] >= lo_min}
+    w(f"⚠⚠ **AND HERE IS WHAT THE WHITELIST DOES NOT DECIDE, DERIVED RATHER "
+      f"THAN ASSERTED.** Every callee **not** in `BULK_REGIME` that "
+      f"contributes asymmetrically by at least {FLOOR:.2f} `Ir` on a published "
+      f"pair is the population a complete census would have to rule on: "
+      f"**{len(unc)} distinct callee keys across "
+      f"{sum(e['rows'] for e in unc.values())} published rows** "
+      f"(`synthesize.py::unclassified_bulk_candidates`). Scored against the "
+      f"smallest crossover any *classified* routine has — forced VECTOR below "
+      f"**{lo_min:.2f}** `Ir`/callee-call, forced BYTE-WISE above "
+      f"**{hi_min:.2f}** — **{len(over_hi)} clear the byte-wise bound** and "
+      f"**{len(over_lo)} clear even the vector bound**"
+      + (":" if over_lo else "."))
+    if over_lo:
+        w("")
+        w("| unclassified callee | max `Ir`/callee-call | rows | patterns |")
+        w("|---|---:|---:|---|")
+        for k_, e in sorted(over_lo.items(),
+                            key=lambda kv: -kv[1]["max_ir_per_callee_call"]):
+            nm_ = NAMED_UNCLASSIFIED.get(k_)
+            short = k_ if len(k_) <= 92 else k_[:91] + "…"
+            w(f"| `{short}`" + (f" — {nm_}" if nm_ else "")
+              + f" | {e['max_ir_per_callee_call']:.2f} | {e['rows']} | "
+              + " ".join(e["pats"]) + " |")
+    w("")
+    named = []
+    for k_ in ("0x0000000000188080", "0x000000000018b7c0"):
+        pk, where, ncell = sidecar_callee_peak(outw, k_)
+        if pk is not None:
+            named.append(f"{NAMED_UNCLASSIFIED[k_]} peaks at **{pk:.2f}** "
+                         f"`Ir`/callee-call over the whole sidecar "
+                         f"({ncell} cells, max at `{where}`), "
+                         f"**{lo_min / pk:.0f}×** under the bound")
+    if named:
+        w("✅ **This settles the two routines TASK_171 named as the "
+          "whitelist's silence, and it settles them with a MEASUREMENT rather "
+          "than with a name.** " + "; ".join(named)
+          + f". The bound is the {lo_min:.2f} `Ir`/callee-call figure that "
+            f"**forces** the vector path under every crossover this project "
+            f"has resolved, so both routines are in the VECTOR regime on every "
+            f"cell they appear in: they cannot trigger the mark, and adding "
+            f"them to the whitelist would change **no row**. Their asymmetry "
+            f"on six published `gcc-clang` rows is real and is a "
+            f"*callee-resolution* asymmetry, not a regime one.")
+        w("")
+    dl = "0x0000000000015220"
+    dlpk, dlwhere, dlcells = sidecar_callee_peak(outw, dl)
+    if dlpk is not None and dl not in unc:
+        w(f"⚠ **And the single biggest callee in the whole sidecar is excluded "
+          f"by the FLOOR rather than by a name**, which is the same point from "
+          f"the other side: `{dl}` — {NAMED_UNCLASSIFIED[dl]} — reads "
+          f"**{dlpk:.2f}** `Ir` per callee-call ({dlcells} cells, max at "
+          f"`{dlwhere}`), the largest figure here and above the byte-wise "
+          f"bound, and it appears in the census above **not at all**. It is "
+          f"the lazy-binding resolver, invoked once per program rather than "
+          f"once per kernel call, so its contribution to every published "
+          f"difference is under {FLOOR:.2f} `Ir`. **No rule had to know its "
+          f"name.**")
+        w("")
+    w("⚠ **The limit of that scoring, stated rather than hidden:** it uses "
+      "the crossovers of the routines this project has *resolved*. A bulk "
+      "routine whose own crossover sat far below every resolved one would be "
+      "byte-wise while reading under "
+      f"{lo_min:.2f} `Ir`/callee-call, and **a sidecar with no byte count "
+      "cannot tell**. Nothing on this tree is near that case: the largest "
+      "unclassified figure above is a Rust `drop_glue` over a 32-element "
+      "array, which has no size regime at all.")
+    w("")
+    w("⚠⚠ **AND THE CENSUS IS STRUCTURALLY BLIND TO AN INLINED BULK "
+      "INSTRUCTION, WHICH IS A KNOWN PUBLISHED ROW AND NOT A HYPOTHETICAL.** "
+      "It reads `outward_by_callee_per_call`, so a bulk fill the compiler "
+      "emits *inline* produces **no callee edge and cannot be seen at all**. "
+      "`p27 gcc-clang` is exactly that (TASK_169, upheld at TASK_171 §1c): "
+      "gcc emits `rep stos` for 32 `Ir` inside `<kernel>` and clang emits "
+      "18 `movaps` + 1 `xorps` = 19, both **inline**, and the 13-`Ir` "
+      "difference is **52% of that row's published `−25.02`**. It is not "
+      "marked, and **non-marking is not evidence the row is clean** — a "
+      "census that cannot see a row says nothing about it. ⚠ The same is "
+      "true of the marked pattern's own gcc side: `p08 c-gcc` inlines its "
+      "4096-byte fill as `rep stos %rax`, so `p08 gcc-clang` is marked **only "
+      "because clang calls out**, and a pair where *both* sides inlined would "
+      "be silently unmarked.")
     w("")
 
     for a_, b_, lab in PAIRS:
@@ -2761,50 +3119,105 @@ def main():
     # in the flattering direction is exactly the shape this section is about.
     undecl = sorted(set(meas) - set(SEARCH_REVIEWED))
     n_undecl = len(undecl)
-    n_none = len(SEARCH_NONE & set(SEARCH_REVIEWED))
-    n_found = len((SEARCH_REVIEWED.keys() & set(meas))) - n_none
-    w("*Declared*, in `synthesize.py::SEARCH_REVIEWED`, every entry cited to a "
-      "**reviewed** artefact — except one, `p06`, which is marked `⊘` because "
-      "`.memory/01-ladder.md` marks it `⊘`: it landed at TASK_048 and has not "
-      "been through a second review, and it is labelled here rather than "
-      "omitted or silently promoted. A pattern with no entry prints "
-      f"`undeclared`, which is its true state — **{n_undecl} of {len(meas)}** "
-      "today"
-      + (f" ({', '.join(undecl)})" if undecl else "") + ":")
+    # ⚠ TASK_172 item C, and it is the SAME defect as `n_undecl` above one
+    # paragraph down: `n_found` was `declared - n_none`, a RESIDUAL, so the
+    # three entries whose cited artefact is the OPEN BACKLOG were counted as
+    # reporting a search RESULT. The split is three ways, and each way is a set.
+    owed_primary, owed_mentions = backlog_cited()
+    declared = SEARCH_REVIEWED.keys() & set(meas)
+    n_owed = len(set(owed_primary) & declared)
+    # ⚠ `n_none` was scored against `SEARCH_REVIEWED` while the denominator
+    # is `declared`, so an entry for an unmeasured pattern would have
+    # inflated it. All three buckets are now scored on the same set.
+    n_none = len(SEARCH_NONE & declared)
+    n_found = len(declared) - n_none - n_owed
+    w("*Declared*, in `synthesize.py::SEARCH_REVIEWED`, every row has an "
+      f"entry, and **{n_owed + 1} of {len(declared)} are NOT cited to a "
+      "reviewed measurement** — a count this file used to give as *\"except "
+      "one, `p06`\"*, which was false on three (TASK_171 §3d) and is derived "
+      "here rather than typed. The exceptions:")
+    w("")
+    w("- `p06` — marked `⊘` because `.memory/01-ladder.md` marks it `⊘`: it "
+      "landed at TASK_048 and has not been through a second review. Labelled "
+      "rather than omitted or silently promoted.")
+    only_mentions = sorted(set(owed_mentions) - set(owed_primary))
+    w(f"- **{', '.join('`%s`' % p for p in owed_primary)}** — the cited "
+      "artefact is `RECAP`'s ***Owed*** queue, i.e. **the open backlog**: "
+      "outstanding work, not a reviewed measurement, and each entry's own "
+      "verdict says so — "
+      + "; ".join(f"`{p}` *\"{SEARCH_REVIEWED[p][0]}\"*" for p in owed_primary)
+      + ". `synthesize.py::backlog_cited` derives this from the citation "
+      f"itself. ⚠ **The boundary is printed too**: {len(owed_mentions)} "
+      f"entries *mention* the queue ("
+      + ", ".join('`%s`' % p for p in owed_mentions)
+      + f") and {len(owed_primary)} cite it and nothing else; "
+      + ", ".join('`%s`' % p for p in only_mentions)
+      + (" cites" if len(only_mentions) == 1 else " cite")
+      + " a `NOTES.md` and a review as well, which is a different state.")
+    w("")
+    w("A pattern with no entry prints `undeclared`, which is its true state — "
+      f"**{n_undecl} of {len(meas)}** today"
+      + (f" ({', '.join(undecl)}):" if undecl else "."))
     w("")
     if n_undecl == 0:
         w("⚠⚠⚠ **AND THE HONEST SENTENCE IS NOT *\"EVERY RUNG'S CHEAPEST "
           "SPELLING HAS BEEN SEARCHED\"*. IT IS THIS: every one of the "
           f"{len(meas)} rows now DECLARES its search state, and "
           f"{n_found} of them declare a search that was reviewed.** "
-          "TASK_170 read all fourteen rows that had printed `undeclared` "
-          "since 26 patterns — `p02 p04 p05 p07 p09 p14 p16 p18 p19 p23 p27 "
-          "p38 p42 p46` — against their own `NOTES.md`, "
+          f"TASK_170 read all {len(UNDECLARED_AT_26)} rows that had printed "
+          "`undeclared` since 26 patterns — "
+          + " ".join(f"`{p}`" for p in UNDECLARED_AT_26)
+          + " — against their own `NOTES.md`, "
           "`.memory/01-ladder.md`, `controls/` and reviewing report, and "
-          "**all fourteen had a reviewed search**: none was a reviewed "
-          "declaration of NO search, and none was genuinely undeclared. "
+          f"**all {len(UNDECLARED_AT_26)} had a reviewed search**: none was a "
+          "reviewed declaration of NO search, and none was genuinely "
+          "undeclared. "
           "⚠⚠ **So `undeclared` was 100% bookkeeping at 26 patterns, 100% "
           "bookkeeping at 33, and never once measured search effort — the "
           "same conclusion TASK_112 and TASK_166 reached on smaller "
           "samples, now at the whole tree.** ⚠ **What is still NOT claimed, "
           "and what this column has never been able to say: that the search "
-          "was DEEP ENOUGH.** Seven of the fourteen name their own weaker "
-          "endpoint (p02, p14 and p27 have an unsearched R4 or R2 side; p09 "
-          "and p19 rest on a review that re-measured one side; p46's widths "
-          "are an unreviewed re-measure), and the entries below say so. "
-          "⚠⚠ **Read a declared row as *somebody looked and wrote down what "
+          "was DEEP ENOUGH.**")
+        w("")
+        # ⚠ TASK_172 item C. This used to read *"Seven of the fourteen"* and
+        # then list SIX, omitting `p18` and `p38` -- a hardcoded count inside a
+        # generated file, one paragraph below the same defect's own fix, and it
+        # undercounted in the flattering direction (TASK_171 §3c). The count is
+        # now `len()` of the list that is printed, and each membership is
+        # anchored to a VERBATIM quote from the row's own entry.
+        wk = weaker_endpoint_rows()
+        w(f"**{len(wk)} of the {len(UNDECLARED_AT_26)} name an endpoint of "
+          "their OWN that is unsearched, fiat, or resting on a measurement "
+          "nobody reviewed** — in their own words, and the count below is "
+          "`len()` of this list rather than a word typed above it "
+          "(`synthesize.py::WEAKER_ENDPOINT`, which fails closed if a quote "
+          "drifts out of its entry):")
+        w("")
+        for pat, q in wk:
+            w(f"- **{pat}** — *\"{q}\"*")
+        w("")
+        w("⚠⚠ **Read a declared row as *somebody looked and wrote down what "
           "they found*, never as *this is the floor*: on p05 three "
           "successive published minima were each overturned by the next "
           "agent's FIRST lever, and on p42 the fifth R4 spelling reversed "
           "the sign of the published difference.**")
         w("")
-    w(f"⚠⚠ **AND THE {len((SEARCH_REVIEWED.keys() & set(meas)))} DECLARED ROWS SPLIT "
-      f"TWO WAYS, WHICH ONE COUNT CANNOT SAY: {n_found} report a SEARCH "
-      f"RESULT and {n_none} report a REVIEWED DECLARATION OF *NO* SEARCH "
-      f"({', '.join(sorted(SEARCH_NONE & set(SEARCH_REVIEWED)))}, marked `⊘` "
-      f"in their entry text and listed in `SEARCH_NONE`).** A row that "
-      f"publishes no rung-to-rung figure and says so is not in the same state "
-      f"as a row nobody has looked at, and `undeclared` collapses the two. "
+    w(f"⚠⚠ **AND THE {len(declared)} DECLARED ROWS SPLIT THREE WAYS — NOT "
+      f"TWO, WHICH IS WHAT THIS SENTENCE USED TO SAY — AND "
+      f"ONE COUNT CANNOT SAY IT: {n_found} report a SEARCH "
+      f"RESULT, {n_none} report a REVIEWED DECLARATION OF *NO* SEARCH "
+      f"({', '.join(sorted(SEARCH_NONE & declared))}, marked `⊘` "
+      f"in their entry text and listed in `SEARCH_NONE`), and {n_owed} report "
+      f"a SEARCH THAT IS STILL OWED "
+      f"({', '.join(sorted(set(owed_primary) & declared))}, whose cited "
+      f"artefact is the open backlog).** ⚠⚠ **The third bucket is new here "
+      f"and it is a correction, not a refinement**: `n_found` used to be a "
+      f"RESIDUAL — declared minus `SEARCH_NONE` — so a row that says its span "
+      f"is OWED landed in *report a SEARCH RESULT* by arithmetic "
+      f"(TASK_171 §3d). It is now a set difference and all three buckets are "
+      f"printed. A row that publishes no rung-to-rung figure and says so is "
+      f"not in the same state as a row nobody has looked at, nor as a row "
+      f"that owes one, and `undeclared` collapses all three. "
       f"⚠ **So do not read `{n_undecl} of {len(meas)}` as *the unsearched "
       f"fraction*** — it is *the fraction with no entry in this dict*, which "
       f"is what it has always been.")

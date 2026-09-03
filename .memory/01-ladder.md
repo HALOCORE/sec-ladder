@@ -918,14 +918,17 @@ unrelated. The same trap sits at "13" (here = p04, there = p08) and at "12"
      `main`, i.e. the driver, not the fold. The *fold* is scalar in every rung, so
      the gap is measured on a scalar loop on both sides.
      ⚠⚠⚠ **THE SPLIT IS `22 / 10`, NOT `23 / 9`, AND THIS LINE SAID *"Quote the
-     23/32"* UNTIL `TASK_171`.** ⊘ **Reviewer-measured, NOT manager-re-derived:**
-     `p05/NOTES.md` §1a asserts `verus::main` LACKS two `xmm` instructions and
-     **it carries exactly those two**, so one cell was on the wrong side.
-     ⚠ **The qualifier survives** — the extra cell is also a `whole`-mode `main`,
-     so *"every vectorised cell is the driver, not the fold"* still holds, which
-     is the load-bearing half. ⚠⚠ **`p05/NOTES.md` §1a is NOT yet corrected: it
-     is a gate-hashed pattern doc, so the fix costs a sweep** (`RECAP` finding 67
-     (e)). **Quote the 22/32 and say the source doc still disagrees.**
+     23/32"* UNTIL `TASK_171`.** ⊘ **Reviewer-measured (`TASK_171` §6c) and
+     re-derived at `TASK_172`, NOT manager-re-derived:** the count was computed
+     from a **MIS-RESOLVED window** — `p16`'s own `verus -O0 whole` `main`
+     carries the two `xmm` instructions it was recorded as lacking, so one cell
+     sat on the wrong side. ⚠ **The load-bearing qualifier SURVIVES** — the
+     tenth cell is also a `whole`-mode `main`, so *"every vectorised cell is the
+     driver, not the fold"* still holds. ✅ **`p05/NOTES.md` §1a, which carried
+     the claim, is CORRECTED at `TASK_172` and now states the split per cell.**
+     ⚠⚠ **`patterns/p16-tlv-walk/NOTES.md` still says *"quote 23/32"* — the LAST
+     copy, and it is a gate-hashed pattern doc, so the fix needs a sweep.**
+     **Quote `22/32` and say `p16`'s own doc still disagrees.**
    - **R3 survives, and is now the *fourth* pattern in a row** — see the opening
      of this finding. `7 + 7·nrec` (`7 + 5·nrec` when vlen ≡ 0 mod 4) is a
      **zero-degrees-of-freedom interpolation**, and only `large` is genuinely

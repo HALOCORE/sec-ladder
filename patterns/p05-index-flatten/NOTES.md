@@ -174,13 +174,42 @@ still once per row, the arithmetic is still wrapping, `nrow*ncol` is still
 folded into the result, and the check is still `nrow * ncol > avail` in 64 bits.
 A 32-bit per-row checksum is also what a real row hash would use.
 
-### 1a. Which cells vectorise, kernel-only — the number is 19 of 32
+### 1a. Which cells vectorise, kernel-only — the number is 20 of 32
+
+⚠⚠⚠ **CORRECTED AT TASK_172. THIS SECTION PUBLISHED `19 of 32`, *"the three
+`O0 whole` hits"*, a `—` IN THE `verus` CELL — AND AN INVENTED MECHANISM FOR
+THE `—`.** The true figures are **20 of 32** and **four** `O0 whole` hits, and
+the `verus` cell **carries the same two instructions as the other three Rust
+rungs**. The `—` was never a property of p05: it is a symbol mis-resolution in
+`harness/asm.py::find_symbol`, whose `main` needle matches on substring and
+picks by instruction count, so on a `-O0 whole` Verus build it returns
+`core::slice::sort::stable::driftsort_main` instead of the crate's own `main`.
+Found at `TASK_169`, blast radius measured at `TASK_170` (**33 cells, `-O0`
+only**), both accusations verified at `TASK_171` §6b, landed here at TASK_172.
+✅ Re-derived directly, `asm.py` untouched:
+
+```
+$ objdump -d --disassemble=_RNvCs5wP2qveqZnT_5verus4main \
+      .temp/build/p05/verus-O0-whole | grep '%xmm'
+  16e42: 0f 10 84 24 80 00 00   movups 0x80(%rsp),%xmm0
+  16e4a: 0f 29 44 24 50         movaps %xmm0,0x50(%rsp)
+```
+
+~~The `verus` cell does not have them because its `main` never materialises that
+aggregate (`load_input` is `external_body`, so the tuple stays in the
+callee).~~ ⚠⚠ **STRUCK: that mechanism was invented for an artefact.**
+`load_input` *is* `external_body`, and that is the trap — the sentence is
+plausible, checkable in one command, and nobody checked it. **A mechanism
+supplied for a null result is the failure class this project's retraction list
+exists for**, and this is its worked example.
 
 `.memory/01-ladder.md` records that "nothing vectorises in all 32 cells" was
-once written about p16 and was false — it was 23/32, with the 9 exceptions in
-`whole`-mode `main`. So this table is **kernel-only in `isolated` and
-`main`-only in `whole`**, which is what `harness/check.py` itself reads, and it
-says which:
+once written about p16 and was false. ⚠ **That correction was itself computed
+from the mis-resolved window**: re-derived at TASK_171 §6c and again here, p16
+is **22 of 32** without a vector register and **10** with — not 23 and 9 — and
+the tenth is p16's own `verus -O0 whole` `main`, the same cell and the same two
+instructions. So this table is **kernel-only in `isolated` and `main`-only in
+`whole`**, which is what `harness/check.py` itself reads, and it says which:
 
 | cell | O0 iso | O0 whole | O3 iso | O3 whole |
 |---|---|---|---|---|
@@ -191,11 +220,11 @@ says which:
 | safe_naive | — | xmm (2) | **xmm** (17) | **xmm** (27) |
 | safe_tuned | — | xmm (2) | **xmm** (17) | **xmm** (27) |
 | unsafe | — | xmm (2) | **xmm** (17) | **xmm** (27) |
-| verus | — | — | **xmm** (17) | **xmm** (27) |
+| verus | — | xmm (2) | **xmm** (17) | **xmm** (27) |
 
 (counts in brackets are vector-register-bearing instructions in the symbol)
 
-**19 of 32 cells carry a vector register, and all 16 `-O3` cells do.** The three
+**20 of 32 cells carry a vector register, and all 16 `-O3` cells do.** The four
 `O0 whole` hits are exactly two instructions each in the Rust `main`, and they
 are
 
@@ -205,10 +234,14 @@ movaps %xmm0,(%rsp)
 ```
 
 — a 16-byte stack-slot move of an aggregate, **not the fold** — which is the
-same artefact p16's review found and the reason that finding says "quote the
-23/32". They are printed here rather than folded into the headline. The `verus`
-cell does not have them because its `main` never materialises that aggregate
-(`load_input` is `external_body`, so the tuple stays in the callee).
+same artefact p16's review found. They are printed here rather than folded into
+the headline. ⚠ **All four Rust rungs have them; nothing distinguishes the
+`verus` cell.**
+
+⚠ **The `-O3` rows in the table above are unaffected**, and so is everything
+this pattern publishes: the mis-resolution is `-O0`-only (`TASK_170` §43b, 33
+cells, re-derived at TASK_172 over all 1052 built windows), and p05's `-O3
+isolated` and `-O3 whole` windows all resolve to the right symbol.
 
 ### 1b. The vector body, and that the safe and unsafe ones are the same body
 

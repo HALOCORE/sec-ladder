@@ -1611,13 +1611,31 @@ terms). **Read the column, not this list.** The four with a mechanism:
   narrower and is `p13`'s alone: `p13`'s own fit blobs are length-homogeneous,
   so `p13` could not have fitted a step law even if one exists.**
 
-**(2) A REAL DEFECT IN THE ASSEMBLY EXTRACTOR, PRICED AND NOT TAKEN.**
-`harness/asm.py`'s `main` needle **mis-resolves on 33 cells** (`-O0` only), and
-it is worse than a mis-label: it **masks a genuine stage-3a failure on
-`p01 safe_tuned -O0 isolated`**, and `p05/NOTES.md` §1a **invented a mechanism**
-for what is an artefact. ⚠⚠ **`asm.py` is MEASUREMENT-hashed, so a fix is a full
-re-measure of the tree**, and the obvious repair (exact-match-first) **moves 266
-windows**. **Recorded at `TASK_170`, deliberately not taken.**
+**(2) A REAL DEFECT IN THE ASSEMBLY EXTRACTOR, PRICED AND NOT TAKEN — AND THE
+PRICE PRINTED HERE WAS FOR THE WRONG REPAIR.** `harness/asm.py`'s `main` needle
+**mis-resolves on 33 windows across 31 patterns**, and it is worse than a
+mis-label: it **masked a stage-3a failure on `p01 safe_tuned -O0 isolated`**.
+⚠⚠ **`asm.py` is MEASUREMENT-hashed, so a fix is a full re-measure of the
+tree.** **Deliberately not taken.**
+
+⚠⚠⚠ **THREE CORRECTIONS TO THE PARAGRAPH THIS REPLACES, ALL MEASURED
+(`TASK_172`):**
+- **The *"266 windows"* figure priced *candidate B* — a repair `TASK_170`
+  explicitly said not to ship**, and it is worse than untaken: candidate B
+  collapses onto the 8/11-instruction libstd `main` shim and **hard-fails stage
+  3a on all 266**. **The correct repair moves 33 windows in 31 patterns.**
+- ⚠ **`p02` and `p17` escape only by a SEVEN-INSTRUCTION ACCIDENT** — their
+  Verus `main` is 124/101 instructions against `driftsort_main`'s 93, where
+  `p01`'s is 86. **Nothing structural protects them.**
+- ✅ **`p01` ITSELF IS CLEAN, and the masked failure was the GATE's, not the
+  pattern's.** Stage 3a's *"the loop is in a callee"* hatch was a **name list**,
+  and `p01`'s callee is `Iterator::fold` monomorphised at its own closure —
+  **a name no bulk list can ever contain.** ⚠ **`-O0` was NOT the discriminating
+  variable** (261 of 263 `-O0 isolated` kernels carry their own back edge, and
+  the class first bit at `-O3`), **so the level-gating the manager proposed
+  would have relaxed 526 windows to fix one.** ✅ **Stage 3a now carries a third
+  disjunct that proves the loop in a direct callee, with 10 must-fire arms; it
+  is a NO-OP on today's tree, which is why the arms are the evidence.**
 
 **(3) THREE NAMED CURIOSITIES, REPRODUCIBLE AND UNEXPLAINED.**
 (a) **`p04`'s `small` R2 layout population is bimodal at 1.42×** — 27 layouts at

@@ -27,7 +27,17 @@ this box is reference; this box is what to *do*.
 
 ✅✅ **DONE — `TASK_171`, THE CLOSING REVIEW. TWO BLOCKERS, AND ITS VERDICT WAS THAT `results/SYNTHESIS.md` WAS *NOT SAFE TO PUBLISH* — four sentences a reader would act on were unbacked, THREE OF THEM NEW IN THE MANAGER'S OWN TWO COMMITS. All four are now fixed (finding 67).** ⚠⚠⚠ **The call the manager named for attack FELL, exactly as feared: withdrawing *"not every rung's cheapest spelling has been searched"* on the strength of `14/0/0` substituted DOCUMENTED for DEEP. Re-derived: only **10 of 33** rows have BOTH endpoints searched; 17 declare one side or an owed span; 2 declare NO SEARCH on either. THE LIMITATION IS RESTORED.** ⚠⚠ **And the manager published a LIMITATION THAT DOES NOT EXIST — *"no pattern ships a length-heterogeneous sweep band"* — by copying a stale QUEUE header while `RECAP`'s own FINDING had already retired it and four patterns ship one. `PROTOCOL` rule 13 now carries it: check a retired item against the TREE, not against its header.** ⚠ **`TASK_169`'s `p27 gcc-clang` claim STANDS; the manager's dismissal was a mechanism invented for a null result, and the `§` census is structurally blind to inline spellings.** ⚠ **Four reviews in a row have now found a `✅ manager-re-derived` mark the manager had not earned.**
 
-⚠⚠⚠ **WHAT REMAINS, AND IT IS SMALL, NAMED AND PRICED — THERE IS NO FURTHER STRUCTURED PROGRAMME.** ✅ **All 33 patterns built, reviewed, corrected, with findings; the four Results re-derived at 33; the gate bundle, the Results gap and the backlog queue all closed and reviewed; the remainder retired as STATED LIMITATIONS in `results/SYNTHESIS.md` §7.** **The open items, all in finding 67 and none of them blocking:** (a) ⚠⚠ **item 43 — `asm.py`'s `main` needle mis-resolves on 33 cells, MASKS a real stage-3a failure on `p01 safe_tuned -O0 isolated`, and `p05/NOTES.md` §1a invented a mechanism for the artefact; BOTH accusations are now VERIFIED and neither correction has landed. `asm.py` is MEASUREMENT-hashed, so a fix is a full re-measure** — ✅ **`.memory/01-ladder.md`'s *"Quote the 23/32"* is corrected to `22/32`, marked ⊘ reviewer-measured, with the note that the load-bearing qualifier survives and that `p05/NOTES.md` §1a itself is NOT yet fixed (a gate-hashed doc, so a sweep)**; (b) the `§` marker's `BULK_REGIME` is **a whitelist of three hardcoded keys** and must be described as one, with `__memchr_avx2`/`__strlen_avx2` unclassified on six published `gcc-clang` rows; (c) `results/synthesis.md`'s *"every entry cited to a reviewed artefact — except one"* is **false on three** (`p01 p03 p08` cite the open backlog) and its *"seven of the fourteen"* **lists six**; (d) ✅ **DONE — `RECAP.md`'s own line citations are rewritten to name FUNCTIONS** (`check.py::_is_trusted`, `::build_models`, `::check_identity`, `::check_marginal_ir`, `::check_adversarial`, `::_include_literals`; `dloop.py::_apply_call_args`; `limbs.py::contract`; two module docstrings) — **11 rewritten, and the EIGHT that remain are deliberate QUOTATIONS of rotten coordinates inside the findings ABOUT the rot, which is exactly the escape hatch `TASK_169` said such a check needs.** ⚠ **Do not "fix" those eight.** ⚠ **Each is a `synthesis/`- or doc-level fix except (a); none needs a sweep except (a)'s re-measure.**
+✅✅ **DONE — `TASK_172`, THE LAST OPEN ITEM. The masked stage-3a failure was THE GATE'S, NOT THE PATTERN'S: `p01` is clean, stage 3a's *"the loop is in a callee"* hatch was a NAME LIST that can never contain `Iterator::fold` monomorphised at its own closure, and it now carries a third disjunct with TEN must-fire arms. ⚠⚠ The manager's proposed `-O0` level-gate would have RELAXED 526 WINDOWS TO FIX ONE — `-O0` is not the discriminating variable (261 of 263 `-O0 isolated` kernels carry their own back edge). Finding 68.** ✅ **And the `asm.py` re-measure question is settled without spending it: 462 of 40 755 leaves would move and ZERO are certifying.**
+
+⚠⚠⚠ **THE STRUCTURED PROGRAMME IS COMPLETE. THERE IS NO NEXT TASK — what follows is a SHORT, PRICED, NON-BLOCKING LIST, and every item is named with its cost.**
+✅ **All 33 patterns built, reviewed, corrected, with findings. The four Results re-derived at 33 and reviewed. The gate bundle, the Results gap and the backlog queue closed and reviewed. The remainder retired as STATED LIMITATIONS in `results/SYNTHESIS.md` §7. `30 PASS + 3 PASS-WITH-BLOCKED-ROWS`, 0 failures, 0 STALE.**
+
+**What is left, all optional:**
+(1) ⚠ **`harness/asm.py`'s `main` needle mis-resolves 33 windows across 31 patterns.** ✅ **Priced and settled: the correct repair moves 462 of 40 755 leaves and ZERO are certifying.** ⚠ **`asm.py` is MEASUREMENT-hashed, so taking it is a full re-measure for a change that moves no certifying value.** **Deliberately untaken; §7 carries it.**
+(2) ⚠ **`patterns/p16-tlv-walk/NOTES.md` carries the LAST *"quote 23/32"*** (it is `22/32`). **A gate-hashed doc, so it needs a sweep — bundle it with anything else that re-gates.**
+(3) ⚠ **`p28` is an unlisted fifth member of `check_marginal_ir`'s `±7` family.** **A docstring line, free on any sweep.**
+(4) ⚠ **`RECAP.md`'s eight remaining line citations are DELIBERATE QUOTATIONS of rotten coordinates inside the findings about the rot.** ✅ **Do NOT "fix" them** — that is the escape hatch `TASK_169` said such a check needs.
+⚠⚠ **Nothing above blocks publication, and `TASK_171` was explicit that `results/SYNTHESIS.md` needed four sentences fixed rather than withdrawing — all four are fixed.**
 
 ⚠⚠⚠ **`synthesis/outward_ir.json` WAS RE-EMITTED AT `TASK_166` (33 patterns / 524 cell entries, 0 skipped) AND IS STALE ON ALL 33 AGAIN ONE TASK LATER — because it pins the GATE `source_sha256`, so any `harness/*.py` edit invalidates it. Manager-verified. All 33 STALEs are FALSE (a docstring cannot move a callgrind number), and queue item 37 is the `synthesis/`-only repair.** ⚠ **And re-emitting it settled two things at once: it is the ONLY instrument that names the callee and counts the calls, so it is what refuted the manager's unifying hypothesis (finding 64), and re-scoring the bands against it retracted `FLOOR = 2.00`'s stated reason.** ✅ **`results/SYNTHESIS.md` is CURRENT — folded at `7b5822a`; its four Results are now derived against all 33.** ⚠⚠ **OPERATIONAL, NEVER DELETE: `results/SYNTHESIS.md` is HAND-WRITTEN; `results/synthesis.md` (lower case) is GENERATED. Never regenerate over the capitalised one.** ⚠⚠ **READ THE CATALOGUE CELL, NOT `TASK_143_REPORT.md`: both rows' cells carry manager corrections the report does not.** ⚠⚠ **AND A NEW ROW NOW OWES TWO THINGS `TASK_143`-era task files do not mention (`TASK_151`, finding 57): (a) its HARDENED arm must be sanitizer-CLEAN on EVERY input — stage `7h`; (b) `spec.md` must declare `verus.assumptions` if any rung uses `assume(`/`admit(`.** ✅ **THE BAR, and it is the whole of it (`CLAUDE.md` rule 6, findings 53–54): a pattern is admitted SOLELY on whether the C program makes sense — correct on benign inputs, exhibits the error on an adversarial one, C MECHANISM distinct from a BUILT row's, fits the pinned signature. NOTHING about Rust, Verus, Miri, a cost gradient or what the ladder can 'price' may EVER remove a row; those are RESULTS.** ⚠⚠ **REFUSED, and only on C-SIDE duplication of a BUILT row: `CVE-2024-25062` and `Issue-15143` (`p29`'s mechanism); `p30` and iterator-invalidation (`p27`'s and `p25`'s); stack-lifetime (both compilers warn at DEFAULT flags, so C is not silently wrong).** ⚠ **`CVE-2016-4658`, `CVE-2022-23308`, `Issue-15192` pass the bar but duplicate admitted candidates — build the candidate, not the CVE. ⚠ Re-adjudicate the two ADMITTED CVEs (`CVE-2022-40304`, `CVE-2021-3518`) against the ENLARGED built tree once `p25` lands — `p34` already has; `p28` and `p32` were candidates when they were ranked and are now rows.** ⚠⚠ **~3 tasks per row at the measured rate (build → review → land corrections).** ✅ **BOTH OF THIS CELL'S OLD "STILL OWED" GATE ITEMS ARE CLOSED at `TASK_164`** — stage 9b now reads the verdict (30 of 30 generators that write a `problems` key exit non-zero on it, so it IS a verdict), and `global` directives are recorded per file under `verus.<src>.global_decls`. **Finding 63.** ⚠ **What is left over from them and is NOT done: four bespoke verdict shapes stage 9b still cannot read, and a no-verdict sidecar SHOUT that was priced (5 stale tables, 5 `report.py` runs, a second sweep) and deliberately not taken.** ⚠⚠ **OPERATIONAL, NEVER DELETE: `results/SYNTHESIS.md` is HAND-WRITTEN; `results/synthesis.md` (lower case) is GENERATED. Never regenerate over the capitalised one.**
 
@@ -6318,6 +6328,61 @@ the number.** Two task files have already sent an agent to the wrong finding.
     leaves are identical across the re-pin.**
 
     Evidence: `.tasks/TASK_171_REPORT.md`, `git show d6aa844`, `git show 87baad7`.
+
+68. ⚠⚠ **THE MASKED GATE FAILURE WAS THE GATE'S, NOT THE PATTERN'S — AND THE
+    MANAGER'S PROPOSED CURE WOULD HAVE RELAXED 526 WINDOWS TO FIX ONE.**
+    (`TASK_172`.) ⚠ **UNREVIEWED. ✅ = manager re-derived, ⊘ = engineer's.**
+    **Final gate: `30 PASS + 3 PASS-WITH-BLOCKED-ROWS`, 0 failures, `blocked`
+    `p01` 1 / `p35` 3 / `p42` 1 — ✅ manager-verified from the records.**
+
+    **(a) THE CONCLUSION THE MANAGER GUESSED WAS RIGHT; THE MECHANISM WAS
+    WRONG.** The task file proposed *"stage 3a is asking a `-O3` question at
+    `-O0`"*. ⊘ **`-O0` is NOT the discriminating variable: 261 of 263
+    `-O0 isolated` kernels carry their own back edge, and the class first bit at
+    `-O3`.** ⚠⚠ **So the level-gate the manager made sound likely would have
+    relaxed 526 windows to fix ONE.** ✅ **The real defect: stage 3a's *"the loop
+    is in a callee"* hatch was a NAME LIST (`_BULK_NAMES`) — and `p01`'s callee
+    is `Iterator::fold` monomorphised at its own closure, a name no bulk list can
+    ever contain.** ⚠ **The list's own comment describes `p01`'s situation
+    verbatim — about `p02`.** ✅ **`p01` is CLEAN** (loop proved in a direct
+    callee by disassembly; stage 3b passes at 84×; `-O3 isolated` has 2 back
+    edges). ✅ **Landed: a third disjunct, `callee_loop_witness`, with TEN
+    must-fire arms — and it is a NO-OP on today's tree** (unreachable while
+    `asm.py` mis-resolves), **which is exactly why the arms are the evidence.**
+
+    **(b) `results/SYNTHESIS.md` PRICED THE WRONG REPAIR, AND THE MANAGER
+    PUBLISHED THE PRICE.** ⊘ The *"266 windows"* figure is **candidate B — a
+    repair `TASK_170` said not to ship** — and it is worse than untaken:
+    candidate B **collapses onto the 8/11-instruction libstd `main` shim and
+    HARD-FAILS stage 3a on all 266.** ✅ **The correct repair moves 33 windows
+    across 31 patterns, not 33.** ⚠ **`p02` and `p17` escape by a
+    SEVEN-INSTRUCTION ACCIDENT** — their Verus `main` is 124/101 against
+    `driftsort_main`'s 93, where `p01`'s is 86. **Nothing structural protects
+    them.** ✅ **Corrected in place.**
+
+    **(c) A COST `PROTOCOL` RULE 6 STILL DID NOT LIST, AND IT COST A `rc=1` ON A
+    SWEEP THAT TOUCHED NOTHING ELSE.** ⊘ Two of `p35`'s `controls/*.json` pin
+    **`harness/check.py`'s HASH**, so a **docstring-only** `check.py` edit staled
+    them and stage 9c **hard-failed `p35`**. Fixed by re-running both generators;
+    no `report.py` needed. ✅ **Blast radius, manager-verified: FOUR sidecars
+    name `check.py`, THREE pin under `harness/` (`p23`'s `sweep_fit`, `p35`'s
+    two), ONE pattern pays.** ⚠⚠ **A single-pattern smoke test on `p01` could
+    NOT have caught it**; `.memory/05-layout.md` now carries the one-line check.
+
+    **(d) The re-measure question is SETTLED AND THE ANSWER IS *"nothing
+    certifying moved"*.** ⊘ **462 of 40 755 record leaves moved and ZERO are
+    certifying** — checked by key: md5, checksum, identity, verdict,
+    `kernel_exclusive_ir`, static counts, `loud`, `controls_json`, all zero.
+    ✅ **So the `asm.py` repair remains untaken and its price is now known
+    rather than estimated.**
+
+    ✅ **Also landed:** `p05/NOTES.md` §1a corrected (it rode the sweep) and the
+    `§` census re-described as the **whitelist** it is. ⚠ **Still owed:
+    `patterns/p16-tlv-walk/NOTES.md` carries the LAST *"quote 23/32"*, a
+    gate-hashed doc needing a sweep**; and ⊘ **`p28` is an unlisted fifth member
+    of `check_marginal_ir`'s `±7` family.**
+
+    Evidence: `.tasks/TASK_172_REPORT.md`, `.tasks/TASK_172.md`, `.temp/t172/`.
 
 ## Retracted — do not reinstate
 
