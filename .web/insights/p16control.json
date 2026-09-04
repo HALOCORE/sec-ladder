@@ -1,0 +1,1092 @@
+{
+ "builds": {
+  "c-clang": {
+   "argv": [
+    "<home>/tools/llvm/bin/clang",
+    "-std=c99",
+    "-Wall",
+    "-Wextra",
+    "-O3",
+    "-DSLB_ISOLATED",
+    "-I",
+    "<repo>/common",
+    "-I",
+    "<repo>/patterns/p16-tlv-walk/c",
+    "<repo>/common/driver.c",
+    "<repo>/patterns/p16-tlv-walk/c/kernel.c",
+    "<repo>/patterns/p16-tlv-walk/c/main.c",
+    "-o",
+    "<work>/bin/c-clang-O3-isolated"
+   ],
+   "log": "",
+   "ok": true,
+   "rc": 0
+  },
+  "c-clang-h": {
+   "argv": [
+    "<home>/tools/llvm/bin/clang",
+    "-std=c99",
+    "-Wall",
+    "-Wextra",
+    "-O3",
+    "-DSLB_ISOLATED",
+    "-I",
+    "<repo>/common",
+    "-I",
+    "<repo>/patterns/p16-tlv-walk/c",
+    "<repo>/common/driver.c",
+    "<repo>/patterns/p16-tlv-walk/c/kernel_hardened.c",
+    "<repo>/patterns/p16-tlv-walk/c/main.c",
+    "-o",
+    "<work>/bin/c-clang-h-O3-isolated"
+   ],
+   "log": "",
+   "ok": true,
+   "rc": 0
+  },
+  "c-gcc": {
+   "argv": [
+    "/usr/bin/gcc",
+    "-std=c99",
+    "-Wall",
+    "-Wextra",
+    "-O3",
+    "-DSLB_ISOLATED",
+    "-I",
+    "<repo>/common",
+    "-I",
+    "<repo>/patterns/p16-tlv-walk/c",
+    "<repo>/common/driver.c",
+    "<repo>/patterns/p16-tlv-walk/c/kernel.c",
+    "<repo>/patterns/p16-tlv-walk/c/main.c",
+    "-o",
+    "<work>/bin/c-gcc-O3-isolated"
+   ],
+   "log": "",
+   "ok": true,
+   "rc": 0
+  },
+  "c-gcc-h": {
+   "argv": [
+    "/usr/bin/gcc",
+    "-std=c99",
+    "-Wall",
+    "-Wextra",
+    "-O3",
+    "-DSLB_ISOLATED",
+    "-I",
+    "<repo>/common",
+    "-I",
+    "<repo>/patterns/p16-tlv-walk/c",
+    "<repo>/common/driver.c",
+    "<repo>/patterns/p16-tlv-walk/c/kernel_hardened.c",
+    "<repo>/patterns/p16-tlv-walk/c/main.c",
+    "-o",
+    "<work>/bin/c-gcc-h-O3-isolated"
+   ],
+   "log": "",
+   "ok": true,
+   "rc": 0
+  },
+  "nocheck-safe_naive": {
+   "argv": [
+    "<home>/.cargo/bin/rustc",
+    "--edition",
+    "2021",
+    "-C",
+    "codegen-units=1",
+    "-C",
+    "opt-level=3",
+    "-C",
+    "debug-assertions=off",
+    "--cfg",
+    "slb_isolated",
+    "<work>/src/nocheck-safe_naive.rs",
+    "-o",
+    "<work>/bin/nocheck-safe_naive-O3-isolated"
+   ],
+   "log": "",
+   "ok": true,
+   "rc": 0
+  },
+  "nocheck-safe_tuned": {
+   "argv": [
+    "<home>/.cargo/bin/rustc",
+    "--edition",
+    "2021",
+    "-C",
+    "codegen-units=1",
+    "-C",
+    "opt-level=3",
+    "-C",
+    "debug-assertions=off",
+    "--cfg",
+    "slb_isolated",
+    "<work>/src/nocheck-safe_tuned.rs",
+    "-o",
+    "<work>/bin/nocheck-safe_tuned-O3-isolated"
+   ],
+   "log": "",
+   "ok": true,
+   "rc": 0
+  },
+  "nocheck-unsafe": {
+   "argv": [
+    "<home>/.cargo/bin/rustc",
+    "--edition",
+    "2021",
+    "-C",
+    "codegen-units=1",
+    "-C",
+    "opt-level=3",
+    "-C",
+    "debug-assertions=off",
+    "--cfg",
+    "slb_isolated",
+    "<work>/src/nocheck-unsafe.rs",
+    "-o",
+    "<work>/bin/nocheck-unsafe-O3-isolated"
+   ],
+   "log": "",
+   "ok": true,
+   "rc": 0
+  },
+  "safe_naive": {
+   "argv": [
+    "<home>/.cargo/bin/rustc",
+    "--edition",
+    "2021",
+    "-C",
+    "codegen-units=1",
+    "-C",
+    "opt-level=3",
+    "-C",
+    "debug-assertions=off",
+    "--cfg",
+    "slb_isolated",
+    "<repo>/patterns/p16-tlv-walk/safe_naive.rs",
+    "-o",
+    "<work>/bin/safe_naive-O3-isolated"
+   ],
+   "log": "",
+   "ok": true,
+   "rc": 0
+  },
+  "safe_tuned": {
+   "argv": [
+    "<home>/.cargo/bin/rustc",
+    "--edition",
+    "2021",
+    "-C",
+    "codegen-units=1",
+    "-C",
+    "opt-level=3",
+    "-C",
+    "debug-assertions=off",
+    "--cfg",
+    "slb_isolated",
+    "<repo>/patterns/p16-tlv-walk/safe_tuned.rs",
+    "-o",
+    "<work>/bin/safe_tuned-O3-isolated"
+   ],
+   "log": "",
+   "ok": true,
+   "rc": 0
+  },
+  "unsafe": {
+   "argv": [
+    "<home>/.cargo/bin/rustc",
+    "--edition",
+    "2021",
+    "-C",
+    "codegen-units=1",
+    "-C",
+    "opt-level=3",
+    "-C",
+    "debug-assertions=off",
+    "--cfg",
+    "slb_isolated",
+    "<repo>/patterns/p16-tlv-walk/unsafe.rs",
+    "-o",
+    "<work>/bin/unsafe-O3-isolated"
+   ],
+   "log": "",
+   "ok": true,
+   "rc": 0
+  },
+  "verus": {
+   "argv": [
+    "<home>/tools/verus/verus",
+    "--compile",
+    "<repo>/patterns/p16-tlv-walk/verus.rs",
+    "-o",
+    "<work>/bin/verus-O3-isolated",
+    "-C",
+    "codegen-units=1",
+    "-C",
+    "opt-level=3",
+    "-C",
+    "debug-assertions=off",
+    "--cfg",
+    "slb_isolated"
+   ],
+   "log": "",
+   "ok": true,
+   "rc": 0
+  }
+ },
+ "caveat": "the plain-C and unsafe-Rust rows are UNDEFINED BEHAVIOUR by construction; their exit status and output are what this box produced, not what the language guarantees. A --check drift on those two rows is a report about the machine, not a broken generator. The other rows are defined behaviour and a drift there is real.",
+ "flags": {
+  "c": [
+   "-std=c99",
+   "-Wall",
+   "-Wextra",
+   "-O3",
+   "-DSLB_ISOLATED"
+  ],
+  "cc_clang": "<home>/tools/llvm/bin/clang",
+  "cc_gcc": "/usr/bin/gcc",
+  "rust": [
+   "--edition",
+   "2021",
+   "-C",
+   "codegen-units=1",
+   "-C",
+   "opt-level=3",
+   "-C",
+   "debug-assertions=off",
+   "--cfg",
+   "slb_isolated"
+  ],
+  "rustc": "<home>/.cargo/bin/rustc",
+  "source": "harness/build.py c_flags()/rust_flags() at opt=O3 mode=isolated panic=unwind"
+ },
+ "generated_utc": "2026-08-28T18:32:13Z",
+ "inputs": {
+  "adversarial-overrun.bin": {
+   "bytes": 3096,
+   "sha256": "ecf185eebd3c3466e759852c5be4322965209d1ee9d58260f1730cd7792f7f2c"
+  },
+  "adversarial-stride2.bin": {
+   "bytes": 88,
+   "sha256": "c12c78cd5fc0c5f9ef0c4df1b45086e64a79f5ce599dcfaffe95da53cdc83428"
+  },
+  "adversarial-trunc.bin": {
+   "bytes": 1664,
+   "sha256": "7e502bf18f0dfa42799b8305f5c8424f3ccb8437de681ec86a61010dc54e39bd"
+  },
+  "large.bin": {
+   "bytes": 8384524,
+   "sha256": "407e82fd06bec57240091bd6430232815cc70dcd09682c2f0e4ca88fd062d042"
+  },
+  "small.bin": {
+   "bytes": 16280,
+   "sha256": "7545e98ed4434314ba90e132000e439953ccfa847d00ee519e7b722c840edd15"
+  }
+ },
+ "mode": "isolated",
+ "mutants": {
+  "nocheck-safe_naive": {
+   "deleted_at_line": 34,
+   "deleted_lines": 3,
+   "deleted_text": "        if vlen > end - (p + 3) {\n            break;\n        }\n",
+   "from": "safe_naive.rs",
+   "from_sha256": "3f58f658310c5615d0899d01e0907a68b5689673b79d856b6372dbf8cd149054",
+   "path": "<work>/src/nocheck-safe_naive.rs",
+   "reanchored": {
+    "count": 1,
+    "from": "#[path = \"../../common/driver.rs\"]",
+    "to": "#[path = \"<repo>/common/driver.rs\"]",
+    "why": "the mutant is built outside patterns/, so the driver module's source-relative #[path] would resolve elsewhere"
+   },
+   "sha256": "65acda5c7bc76630f7396ca1066896c92c11cb5994b3d1f26729cf3f60827593"
+  },
+  "nocheck-safe_tuned": {
+   "deleted_at_line": 34,
+   "deleted_lines": 3,
+   "deleted_text": "        if vlen > end - (p + 3) {\n            break;\n        }\n",
+   "from": "safe_tuned.rs",
+   "from_sha256": "6044ce0394896c3605e02178e84aa38b05d9c3bc4d31444cb52ab8674889d2fd",
+   "path": "<work>/src/nocheck-safe_tuned.rs",
+   "reanchored": {
+    "count": 1,
+    "from": "#[path = \"../../common/driver.rs\"]",
+    "to": "#[path = \"<repo>/common/driver.rs\"]",
+    "why": "the mutant is built outside patterns/, so the driver module's source-relative #[path] would resolve elsewhere"
+   },
+   "sha256": "62d13e4cacbcd49dce4f9272825f68c5a751624a7a02c735ed94c05735980b88"
+  },
+  "nocheck-unsafe": {
+   "deleted_at_line": 44,
+   "deleted_lines": 3,
+   "deleted_text": "        if vlen > end - (p + 3) {\n            break;\n        }\n",
+   "from": "unsafe.rs",
+   "from_sha256": "ae04d5ee891f29376555b3ef60f99348bb3bfa080eb897f4520dd8bbbbf6f2a4",
+   "path": "<work>/src/nocheck-unsafe.rs",
+   "reanchored": {
+    "count": 1,
+    "from": "#[path = \"../../common/driver.rs\"]",
+    "to": "#[path = \"<repo>/common/driver.rs\"]",
+    "why": "the mutant is built outside patterns/, so the driver module's source-relative #[path] would resolve elsewhere"
+   },
+   "sha256": "26e474549e3a84a0bf30dba1f7ead4afdfb3afd55f62378ddb14d4375a033d59"
+  },
+  "nocheck-verus": {
+   "deleted_at_line": 265,
+   "deleted_lines": 3,
+   "deleted_text": "        if vlen > end - (p + 3) {\n            break;\n        }\n",
+   "from": "verus.rs",
+   "from_sha256": "58c6d06cd6f86430578f5e3120644324162e5822db489ace7cdbba191e79332e",
+   "path": "<work>/src/nocheck-verus.rs",
+   "reanchored": {
+    "count": 1,
+    "from": "#[path = \"../../common/driver.rs\"]",
+    "to": "#[path = \"<repo>/common/driver.rs\"]",
+    "why": "the mutant is built outside patterns/, so the driver module's source-relative #[path] would resolve elsewhere"
+   },
+   "sha256": "c4ded8319a401eddf37ef439b0b4be87b5ea289872d2df5d102dd043f2355693"
+  }
+ },
+ "opt": "O3",
+ "panic": "unwind",
+ "pattern": "p16-tlv-walk",
+ "runs": {
+  "c-clang": {
+   "adversarial-overrun.bin": {
+    "rc": -11,
+    "signal": "SIGSEGV",
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": ""
+    },
+    "timed_out": false
+   },
+   "adversarial-stride2.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "0\n"
+    },
+    "timed_out": false
+   },
+   "adversarial-trunc.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "3988538283260473009\n"
+    },
+    "timed_out": false
+   },
+   "large.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "16533539788217857060\n"
+    },
+    "timed_out": false
+   },
+   "small.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "71049275114976110\n"
+    },
+    "timed_out": false
+   }
+  },
+  "c-clang-h": {
+   "adversarial-overrun.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "8267139675305953920\n"
+    },
+    "timed_out": false
+   },
+   "adversarial-stride2.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "0\n"
+    },
+    "timed_out": false
+   },
+   "adversarial-trunc.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "3988538283260473009\n"
+    },
+    "timed_out": false
+   },
+   "large.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "16533539788217857060\n"
+    },
+    "timed_out": false
+   },
+   "small.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "71049275114976110\n"
+    },
+    "timed_out": false
+   }
+  },
+  "c-gcc": {
+   "adversarial-overrun.bin": {
+    "rc": -11,
+    "signal": "SIGSEGV",
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": ""
+    },
+    "timed_out": false
+   },
+   "adversarial-stride2.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "0\n"
+    },
+    "timed_out": false
+   },
+   "adversarial-trunc.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "3988538283260473009\n"
+    },
+    "timed_out": false
+   },
+   "large.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "16533539788217857060\n"
+    },
+    "timed_out": false
+   },
+   "small.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "71049275114976110\n"
+    },
+    "timed_out": false
+   }
+  },
+  "c-gcc-h": {
+   "adversarial-overrun.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "8267139675305953920\n"
+    },
+    "timed_out": false
+   },
+   "adversarial-stride2.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "0\n"
+    },
+    "timed_out": false
+   },
+   "adversarial-trunc.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "3988538283260473009\n"
+    },
+    "timed_out": false
+   },
+   "large.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "16533539788217857060\n"
+    },
+    "timed_out": false
+   },
+   "small.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "71049275114976110\n"
+    },
+    "timed_out": false
+   }
+  },
+  "nocheck-safe_naive": {
+   "adversarial-overrun.bin": {
+    "rc": 101,
+    "signal": null,
+    "stderr": {
+     "text": "\nthread 'main' (<tid>) panicked at <work>/src/nocheck-safe_naive.rs:35:53:\nindex out of bounds: the len is 3072 but the index is 3072\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    "stdout": {
+     "text": ""
+    },
+    "timed_out": false
+   },
+   "adversarial-stride2.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "0\n"
+    },
+    "timed_out": false
+   },
+   "adversarial-trunc.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "3988538283260473009\n"
+    },
+    "timed_out": false
+   },
+   "large.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "16533539788217857060\n"
+    },
+    "timed_out": false
+   },
+   "small.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "71049275114976110\n"
+    },
+    "timed_out": false
+   }
+  },
+  "nocheck-safe_tuned": {
+   "adversarial-overrun.bin": {
+    "rc": 101,
+    "signal": null,
+    "stderr": {
+     "text": "\nthread 'main' (<tid>) panicked at <work>/src/nocheck-safe_tuned.rs:34:18:\nrange end index 7107 out of range for slice of length 3072\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    "stdout": {
+     "text": ""
+    },
+    "timed_out": false
+   },
+   "adversarial-stride2.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "0\n"
+    },
+    "timed_out": false
+   },
+   "adversarial-trunc.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "3988538283260473009\n"
+    },
+    "timed_out": false
+   },
+   "large.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "16533539788217857060\n"
+    },
+    "timed_out": false
+   },
+   "small.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "71049275114976110\n"
+    },
+    "timed_out": false
+   }
+  },
+  "nocheck-unsafe": {
+   "adversarial-overrun.bin": {
+    "rc": -11,
+    "signal": "SIGSEGV",
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": ""
+    },
+    "timed_out": false
+   },
+   "adversarial-stride2.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "0\n"
+    },
+    "timed_out": false
+   },
+   "adversarial-trunc.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "3988538283260473009\n"
+    },
+    "timed_out": false
+   },
+   "large.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "16533539788217857060\n"
+    },
+    "timed_out": false
+   },
+   "small.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "71049275114976110\n"
+    },
+    "timed_out": false
+   }
+  },
+  "safe_naive": {
+   "adversarial-overrun.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "8267139675305953920\n"
+    },
+    "timed_out": false
+   },
+   "adversarial-stride2.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "0\n"
+    },
+    "timed_out": false
+   },
+   "adversarial-trunc.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "3988538283260473009\n"
+    },
+    "timed_out": false
+   },
+   "large.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "16533539788217857060\n"
+    },
+    "timed_out": false
+   },
+   "small.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "71049275114976110\n"
+    },
+    "timed_out": false
+   }
+  },
+  "safe_tuned": {
+   "adversarial-overrun.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "8267139675305953920\n"
+    },
+    "timed_out": false
+   },
+   "adversarial-stride2.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "0\n"
+    },
+    "timed_out": false
+   },
+   "adversarial-trunc.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "3988538283260473009\n"
+    },
+    "timed_out": false
+   },
+   "large.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "16533539788217857060\n"
+    },
+    "timed_out": false
+   },
+   "small.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "71049275114976110\n"
+    },
+    "timed_out": false
+   }
+  },
+  "unsafe": {
+   "adversarial-overrun.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "8267139675305953920\n"
+    },
+    "timed_out": false
+   },
+   "adversarial-stride2.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "0\n"
+    },
+    "timed_out": false
+   },
+   "adversarial-trunc.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "3988538283260473009\n"
+    },
+    "timed_out": false
+   },
+   "large.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "16533539788217857060\n"
+    },
+    "timed_out": false
+   },
+   "small.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "71049275114976110\n"
+    },
+    "timed_out": false
+   }
+  },
+  "verus": {
+   "adversarial-overrun.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "8267139675305953920\n"
+    },
+    "timed_out": false
+   },
+   "adversarial-stride2.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "0\n"
+    },
+    "timed_out": false
+   },
+   "adversarial-trunc.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "3988538283260473009\n"
+    },
+    "timed_out": false
+   },
+   "large.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "16533539788217857060\n"
+    },
+    "timed_out": false
+   },
+   "small.bin": {
+    "rc": 0,
+    "signal": null,
+    "stderr": {
+     "text": ""
+    },
+    "stdout": {
+     "text": "71049275114976110\n"
+    },
+    "timed_out": false
+   }
+  }
+ },
+ "sources": {
+  "c/kernel.c": {
+   "bytes": 2744,
+   "sha256": "a59fbef6d3427711a78b7806569978223367c6cba81bfcf1881e1ac83977aba0"
+  },
+  "c/kernel_hardened.c": {
+   "bytes": 1773,
+   "sha256": "a8a078fda62dae779146c3c32dd2dc53766b13e866222a2c9665e67efa39e470"
+  },
+  "common/driver.c": {
+   "bytes": 5915,
+   "sha256": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3"
+  },
+  "common/driver.rs": {
+   "bytes": 6302,
+   "sha256": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e"
+  },
+  "harness/build.py": {
+   "bytes": 11953,
+   "sha256": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675"
+  },
+  "safe_naive.rs": {
+   "bytes": 2810,
+   "sha256": "3f58f658310c5615d0899d01e0907a68b5689673b79d856b6372dbf8cd149054"
+  },
+  "safe_tuned.rs": {
+   "bytes": 2806,
+   "sha256": "6044ce0394896c3605e02178e84aa38b05d9c3bc4d31444cb52ab8674889d2fd"
+  },
+  "unsafe.rs": {
+   "bytes": 3469,
+   "sha256": "ae04d5ee891f29376555b3ef60f99348bb3bfa080eb897f4520dd8bbbbf6f2a4"
+  },
+  "verus.rs": {
+   "bytes": 17326,
+   "sha256": "58c6d06cd6f86430578f5e3120644324162e5822db489ace7cdbba191e79332e"
+  }
+ },
+ "table": [
+  "c-gcc",
+  "nocheck-safe_naive",
+  "nocheck-unsafe",
+  "nocheck-verus"
+ ],
+ "verus": {
+  "nocheck-verus": {
+   "argv": [
+    "<home>/tools/verus/verus",
+    "--compile",
+    "<work>/src/nocheck-verus.rs",
+    "-o",
+    "<work>/bin/nocheck-verus-O3-isolated",
+    "-C",
+    "codegen-units=1",
+    "-C",
+    "opt-level=3",
+    "-C",
+    "debug-assertions=off",
+    "--cfg",
+    "slb_isolated"
+   ],
+   "binary_built": false,
+   "diagnostics": [
+    "error: aborting due to 1 previous error",
+    "error: invariant not satisfied before loop",
+    "verification results:: 9 verified, 1 errors"
+   ],
+   "errors": 1,
+   "rc": 1,
+   "stderr": {
+    "text": "error: invariant not satisfied before loop\n   --> <work>/src/nocheck-verus.rs:272:17\n    |\n272 |                 p + 3 + vlen <= end,\n    |                 ^^^^^^^^^^^^^^^^^^^\n\nerror: aborting due to 1 previous error\n\n"
+   },
+   "stdout": {
+    "text": "verification results:: 9 verified, 1 errors\n"
+   },
+   "timed_out": false,
+   "verified": 9
+  },
+  "verus": {
+   "argv": [
+    "<home>/tools/verus/verus",
+    "--compile",
+    "<repo>/patterns/p16-tlv-walk/verus.rs",
+    "-o",
+    "<work>/bin/verus-O3-isolated",
+    "-C",
+    "codegen-units=1",
+    "-C",
+    "opt-level=3",
+    "-C",
+    "debug-assertions=off",
+    "--cfg",
+    "slb_isolated"
+   ],
+   "binary_built": true,
+   "diagnostics": [
+    "verification results:: 10 verified, 0 errors"
+   ],
+   "errors": 0,
+   "rc": 0,
+   "stderr": {
+    "text": ""
+   },
+   "stdout": {
+    "text": "verification results:: 10 verified, 0 errors\n"
+   },
+   "timed_out": false,
+   "verified": 10
+  }
+ }
+}
