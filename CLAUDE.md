@@ -61,6 +61,27 @@ rest is reference.
   into two patterns' comments — and this line, which pointed only here, is the
   most likely way it happened.
 - `../LearnVeri/microbench/` — 20 CVE ports with security proofs; reusable kernels.
+- `.web/` — **the report over this tree: eight views, the tech report and the
+  talk, built from `results/`, `results/gate/` and `patterns/`.** It is a
+  *reader* of this repository and never a writer — `build_data.py` routes every
+  write through `_out()`, which refuses any path outside `.web/`. Serve it, or
+  rebuild with `python3 .web/build_data.py` and gate with `node .web/check.mjs`.
+  ⚠ **Its `data/` is derived and gitignored**; the generator is committed and
+  the artefact is not, the same rule as `.temp/` and `patterns/*/inputs/*.bin`.
+  ⚠⚠ **`.web/.memory/` IS NOT `.memory/`.** The 00–06 files here are the
+  research findings layer under `PROTOCOL.md` rule 9; the ones in `.web/` are
+  notes about building the report and carry **no research authority**.
+  **Read `.web/CLAUDE.md` before editing anything in there** — in particular
+  `PITFALLS.md`, because the defect that has cost that report the most is one
+  no gate can see: a document that is correct, fully qualified and unreadable.
+
+  ⚠ **It has already been a check on this tree, twice over.** Its build warns
+  on evidence it does not understand, so a gate-record schema change surfaces
+  there; its guarded notes withhold a claim the moment the evidence stops
+  supporting it; and a review of the report found the site over-claiming in
+  three places where **`results/SYNTHESIS.md` was already more careful than the
+  page built from it**. If the two disagree, `SYNTHESIS.md` wins — including
+  over `RECAP.md`, which twice carried a figure the synthesis had corrected.
 
 ## Don't
 
