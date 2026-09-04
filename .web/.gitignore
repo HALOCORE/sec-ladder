@@ -1,0 +1,40 @@
+# `.web/` is ignored by the repository root .gitignore, so this directory is its
+# own local git repo.  This file keeps the derived and the ephemeral out of that
+# history: what stays is source, what a script can rebuild goes.
+#
+# Everything under data/ is DERIVED — `python3 .web/build_data.py` rebuilds it
+# from results/ and patterns/ in a second.  Keep the generator, drop the artefact.
+data/
+
+# Scratch space (project rule: no /tmp, use .temp/ instead).
+.temp/
+
+# Terminal-runner transcripts: scrollback, stdin, ctrlog, grid.  Rewritten on
+# every run, and the .md beside them is the invocation, not a document.
+*.run/
+*.run.md
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Node — vendor/ is committed on purpose (4 vendored files the page loads
+# directly); anything a package manager installs is not.
+node_modules/
+package-lock.json
+
+# Logs and process leftovers
+*.log
+*.pid
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/

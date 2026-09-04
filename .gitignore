@@ -18,5 +18,7 @@ __pycache__/
 # committed evidence.
 results/gate/*.partial.json
 
-# maintained by user for understanding, do not interfere with research work
-.web/
+# `.web/` — the static report over this tree's evidence. It was ignored here and
+# kept its own local git history until it was folded into this repository. Its
+# own `.web/.gitignore` still drops the derived (`data/`, which
+# `.web/build_data.py` rebuilds in about a second) and the ephemeral.
