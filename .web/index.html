@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>sec-ladder — the performance ↔ memory-safety ladder, measured</title>
+  <meta name="description" content="A micro-benchmark for the performance/memory-safety trade: 13 C patterns built at six rungs from C to Verus-proved unsafe Rust, compared on assembly, executed instructions, proof burden and trusted-base size.">
+  <link rel="stylesheet" href="./vendor/toastify-js/toastify.css">
+  <link rel="stylesheet" href="./common.css">
+  <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+  <script src="./vendor/incremental-dom/incremental-dom.js"></script>
+  <script src="./vendor/incremental-dom/jsonml2idom.js"></script>
+  <script src="./vendor/toastify-js/toastify.js"></script>
+
+  <!-- single JSONML root -->
+  <div id="app"></div>
+
+  <!-- hover readout; text is inserted with textContent, never innerHTML -->
+  <div id="tip"></div>
+
+  <!-- required by UI.createSmartConfirm (unused today, kept for the rebuild dialog) -->
+  <div id="sc-backdrop" style="display:none">
+    <div id="sc-dialog"></div>
+  </div>
+
+  <script src="./common.js"></script>
+  <!-- code rendering: tokens, never HTML strings (this page has no innerHTML) -->
+  <script src="./syntax.js"></script>
+  <script src="./diff.js"></script>
+  <script src="./paper.js"></script>
+  <!-- the 45-minute talk: engine, then the deck it renders -->
+  <script src="./slides.js"></script>
+  <script src="./slides_deck.js"></script>
+  <script src="./content.js"></script>
+  <!-- summary data at parse time (written by build_data.py); index.js falls back
+       to fetching data/index.json if this file is absent -->
+  <script src="./data/index.boot.js"></script>
+  <script src="./index.js"></script>
+</body>
+</html>

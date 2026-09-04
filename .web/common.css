@@ -1,0 +1,140 @@
+/* common.css — Smart confirm dialog styles + shared CSS vars.
+ *
+ * Loaded before index.css so app styles can reference the same vars.
+ * If you fork this template, this file is one of the things worth copying
+ * verbatim — the sc-dialog rules are paired with createSmartConfirm in common.js.
+ */
+
+:root {
+  --color-bg:           #1a1a2e;
+  --color-bg-secondary: #16213e;
+  --color-bg-tertiary:  #0f3460;
+  --color-text:         #eaeaea;
+  --color-text-muted:   #a0a0a0;
+  --color-primary:      #4a9eff;
+  --color-border:       #2a2a4a;
+  --color-danger:       #f44336;
+  --color-warning:      #ff9800;
+  --radius:             6px;
+}
+
+/* ==================== Smart Confirm Dialog ==================== */
+
+#sc-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+#sc-dialog {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  min-width: 320px;
+  max-width: 440px;
+}
+
+.sc-content { padding: 20px; }
+.sc-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.sc-message { font-size: 12px; color: var(--color-text-muted); margin-bottom: 16px; white-space: pre-wrap; word-break: break-all; line-height: 1.5; }
+
+.sc-fields { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+.sc-field { display: flex; flex-direction: column; gap: 4px; }
+.sc-label { font-size: 11px; font-weight: 600; color: var(--color-text-muted); }
+.sc-input, .sc-select {
+  padding: 6px 10px;
+  font-family: monospace;
+  font-size: 12px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+.sc-input:focus, .sc-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.sc-info {
+  margin: 0;
+  padding: 8px 10px;
+  font-family: monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  max-height: 160px;
+  overflow-y: auto;
+  white-space: pre;
+}
+
+.sc-textarea {
+  padding: 6px 10px;
+  font-family: monospace;
+  font-size: 12px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  resize: vertical;
+  min-height: 60px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.sc-textarea:focus { outline: none; border-color: var(--color-primary); }
+
+.sc-error {
+  margin: 0 0 12px 0;
+  padding: 8px 10px;
+  font-family: monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #ffb4b4;
+  background: rgba(244, 67, 54, 0.1);
+  border: 1px solid rgba(244, 67, 54, 0.4);
+  border-radius: 4px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.sc-radio-group { display: flex; gap: 16px; }
+.sc-radio-item, .sc-checkbox-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 12px; cursor: pointer; color: var(--color-text);
+}
+.sc-radio-item input, .sc-checkbox-item input { cursor: pointer; }
+
+.sc-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+.sc-btn {
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.sc-btn-cancel {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+.sc-btn-cancel:hover { color: var(--color-text); }
+
+.sc-danger  { background: var(--color-danger);  color: white; }
+.sc-warning { background: var(--color-warning); color: #000; }
+.sc-teal    { background: #0097a7;              color: white; }
+.sc-green   { background: #388e3c;              color: white; }
+.sc-danger:hover, .sc-warning:hover, .sc-teal:hover, .sc-green:hover { opacity: 0.9; }
+
+/* ==================== Toastify customization ==================== */
+
+.toast-info    { background: var(--color-bg-tertiary); color: var(--color-text); }
+.toast-success { background: #388e3c; color: white; }
+.toast-error   { background: var(--color-danger); color: white; }
