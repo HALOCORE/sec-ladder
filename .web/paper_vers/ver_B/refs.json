@@ -1,0 +1,82 @@
+{
+  "msrc19": {
+    "short": "Miller 19",
+    "title": "Trends, Challenges, and Strategic Shifts in the Software Vulnerability Mitigation Landscape",
+    "text": "M. Miller (Microsoft Security Response Center). “Trends, Challenges, and Strategic Shifts in the Software Vulnerability Mitigation Landscape.” BlueHat IL, 2019. The source of the widely quoted figure that ~70% of the CVEs Microsoft assigns are memory-safety issues."
+  },
+  "chromium": {
+    "short": "Chromium",
+    "title": "Memory safety (Chromium security documentation)",
+    "text": "The Chromium Projects. “Memory safety.” Chromium security documentation, chromium.org. Reports that around 70% of Chromium's serious security bugs are memory-safety problems."
+  },
+  "android22": {
+    "short": "Android 22",
+    "title": "Memory Safe Languages in Android 13",
+    "text": "J. Vander Stoep. “Memory Safe Languages in Android 13.” Google Security Blog, 2022. Reports memory-safety bugs falling as a share of Android's total vulnerabilities as new code moved to memory-safe languages."
+  },
+  "astrauskas20": {
+    "short": "Astrauskas+20",
+    "title": "How Do Programmers Use Unsafe Rust?",
+    "text": "V. Astrauskas, C. Matheja, F. Poli, P. Müller, A. J. Summers. OOPSLA 2020 (PACMPL vol. 4)."
+  },
+  "evans20": {
+    "short": "Evans+20",
+    "title": "Is Rust Used Safely by Software Developers?",
+    "text": "A. N. Evans, B. Campbell, M. L. Soffa. ICSE 2020."
+  },
+  "qin20": {
+    "short": "Qin+20",
+    "title": "Understanding Memory and Thread Safety Practices and Issues in Real-World Rust Programs",
+    "text": "B. Qin, Y. Chen, Z. Yu, L. Song, Y. Zhang. PLDI 2020."
+  },
+  "rustbelt18": {
+    "short": "Jung+18",
+    "title": "RustBelt: Securing the Foundations of the Rust Programming Language",
+    "text": "R. Jung, J.-H. Jourdan, R. Krebbers, D. Dreyer. POPL 2018 (PACMPL vol. 2)."
+  },
+  "stackedborrows20": {
+    "short": "Jung+20",
+    "title": "Stacked Borrows: An Aliasing Model for Rust",
+    "text": "R. Jung, H.-H. Dang, J. Kang, D. Dreyer. POPL 2020 (PACMPL vol. 4). The aliasing discipline Miri checks by default."
+  },
+  "verus23": {
+    "short": "Lattuada+23",
+    "title": "Verus: Verifying Rust Programs using Linear Ghost Types",
+    "text": "A. Lattuada, T. Hance, C. Cho, M. Brun, I. Subasinghe, Y. Zhou, J. Howell, B. Parno, C. Hawblitzel. OOPSLA 2023."
+  },
+  "z3": {
+    "short": "de Moura+08",
+    "title": "Z3: An Efficient SMT Solver",
+    "text": "L. de Moura, N. Bjørner. TACAS 2008. The solver behind every proof result reported here."
+  },
+  "ctverif16": {
+    "short": "Almeida+16",
+    "title": "Verifying Constant-Time Implementations",
+    "text": "J. B. Almeida, M. Barbosa, G. Barthe, F. Dupressoir, M. Emmi. USENIX Security 2016. Reduces constant-time, a relational property, to a safety property of a product program."
+  },
+  "jasmin17": {
+    "short": "Almeida+17",
+    "title": "Jasmin: High-Assurance and High-Speed Cryptography",
+    "text": "J. B. Almeida, M. Barbosa, G. Barthe, A. Blot, B. Grégoire, V. Laporte, T. Oliveira, et al. ACM CCS 2017."
+  },
+  "fact19": {
+    "short": "Cauligi+19",
+    "title": "FaCT: A DSL for Timing-Sensitive Computation",
+    "text": "S. Cauligi, G. Soeller, B. Johannesmeyer, F. Brown, R. S. Wahby, J. Renner, B. Grégoire, G. Barthe, R. Jhala, D. Stefan. PLDI 2019."
+  },
+  "compcertct": {
+    "short": "Barthe+20",
+    "title": "Formal Verification of a Constant-Time Preserving C Compiler",
+    "text": "G. Barthe, S. Blazy, B. Grégoire, R. Hutin, V. Laporte, D. Pichardie, A. Trieu. POPL 2020 (PACMPL vol. 4). Addresses the artefact half of the problem: the back end chooses the machine code after the prover has finished."
+  },
+  "mytkowicz09": {
+    "short": "Mytkowicz+09",
+    "title": "Producing Wrong Data Without Doing Anything Obviously Wrong!",
+    "text": "T. Mytkowicz, A. Diwan, M. Hauswirth, P. F. Sweeney. ASPLOS 2009. Measurement bias from environment size and link order, large enough to invert conclusions."
+  },
+  "stabilizer13": {
+    "short": "Curtsinger+13",
+    "title": "STABILIZER: Statistically Sound Performance Evaluation",
+    "text": "C. Curtsinger, E. D. Berger. ASPLOS 2013. Repeatedly re-randomises code and data layout so layout effects can be treated statistically."
+  }
+}

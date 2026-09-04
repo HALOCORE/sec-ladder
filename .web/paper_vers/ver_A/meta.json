@@ -1,0 +1,9 @@
+{
+  "short": "A",
+  "title": "Where the obligation goes",
+  "subtitle": "Six rungs of memory safety, measured to the instruction — what each one costs, and what each one leaves behind",
+  "status": "draft",
+  "framing": "**ver_A argues that no rung of the ladder discharges a safety obligation — each relocates it**, and that the risk left over after each move is predictable from *the resource the new mechanism quantifies over*. The cost half and the guarantee half are the same story told in two units. Its central abstraction is the **guarantee quadruple** — property, bearer, quantifier, residual — and its central artefact is a table of property classes against the mechanisms that can and cannot reach each one, with a worked example in every cell that matters. A different version would be needed to argue the measurement-methods thesis (that a safety cost is a property of a *pair of spellings*, and that a benchmark which does not search both sides publishes search effort); that result appears here as the reason no single cost number is quoted, not as the headline.",
+  "authors": ["sec-ladder"],
+  "date": "2026-08"
+}

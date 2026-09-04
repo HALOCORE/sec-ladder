@@ -1,0 +1,12 @@
+{
+  "msrc19": {
+    "short": "Miller 19",
+    "title": "Trends, Challenges, and Strategic Shifts in the Software Vulnerability Mitigation Landscape",
+    "text": "M. Miller (Microsoft Security Response Center). “Trends, Challenges, and Strategic Shifts in the Software Vulnerability Mitigation Landscape.” BlueHat IL, 2019. The source of the widely quoted figure that ~70% of the CVEs Microsoft assigns are memory-safety issues."
+  },
+  "chromium": {
+    "short": "Chromium",
+    "title": "Memory safety (Chromium security documentation)",
+    "text": "The Chromium Projects. “Memory safety.” Chromium security documentation, chromium.org. Reports that around 70% of Chromium's serious security bugs are memory-safety problems."
+  }
+}

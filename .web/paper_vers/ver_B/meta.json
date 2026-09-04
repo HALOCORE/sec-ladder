@@ -1,0 +1,12 @@
+{
+  "short": "B",
+  "current": false,
+  "title": "Before you rewrite it in Rust",
+  "subtitle": "What memory safety costs, why your sanitizers are quiet, and what is still your problem after the proof passes",
+  "status": "draft",
+  "framing": "**ver_B argues nothing about safety in the abstract.** It answers, in order, the three questions a working developer actually arrives with — *what will this cost me*, *will my existing tools tell me if I am wrong*, and *if it is memory-safe, or even proved, am I done* — and it introduces a concept **only after the obvious answer to one of those questions has failed against a measurement.** Its central abstraction is a trimmed form of the one ver_A builds its argument on — **property, bearer, resource** — and here it arrives fourth, in one page, as the minimum vocabulary needed to explain three programs the reader has already watched verify and break. ver_A's fourth coordinate, *residual*, is gone: two reviewers found it unused after its own definition, misapplied on first use, and colliding with the ordinary regression sense this paper needs elsewhere. What it named survives as a sentence — whatever a guarantee does not range over is still your problem. A concept whose motivating problem cannot be named is cut, not shortened. ver_A remains the version for a reader who wants the taxonomy first; this one is for the reader who has a codebase and a deadline.",
+  "authors": [
+    "sec-ladder"
+  ],
+  "date": "2026-08"
+}
