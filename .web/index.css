@@ -1,0 +1,1566 @@
+/* index.css — sec-ladder report.
+ *
+ * Light-first research-report styling.  Dark mode is a selected set of steps,
+ * not an inverted flip.
+ *
+ * TWO palettes, with different jobs:
+ *   - the RUNG palette (--rung-*, below) carries identity: which rung a bar,
+ *     dot or rule belongs to.  It is the one a reader learns once and then
+ *     reads everywhere.  Its validation report is in the block beside it.
+ *   - the dataviz reference palette (--series-*, --seq-*, status) is used only
+ *     where the subject is not a rung: outcome status in the matrix, sequential
+ *     magnitude, chrome.  Validated on these surfaces:
+ *       node validate_palette.js "#2a78d6,#eb6834,#1baf7a" --mode light --pairs all --surface "#fdfdfc"
+ *       node validate_palette.js "#3987e5,#d95926,#199e70" --mode dark  --pairs all --surface "#16181c"
+ *     Both pass; light-mode aqua sits under 3:1, so anything wearing it also
+ *     carries a visible label or a table view.
+ */
+
+:root {
+  color-scheme: light;
+
+  --plane:        #f5f5f1;
+  --surface:      #fdfdfc;
+  --surface-2:    #f8f8f5;
+  --ink:          #16161a;
+  --ink-2:        #55554f;
+  --muted:        #86867e;
+  --grid:         #e6e5de;
+  --rule:         #dcdbd3;
+  --hairline:     rgba(20, 20, 26, 0.10);
+
+  --series-1:     #2a78d6;   /* blue   — the default single hue */
+  --series-2:     #eb6834;   /* orange */
+  --series-3:     #1baf7a;   /* aqua   — labelled wherever used */
+  --deemph:       #c7c6bd;
+
+  /* Rung identity — one base hue per sub-family, and the plain rung is that same
+   * base seen through white glass: `mix(base, white)` keeping 62% of the base.
+   * So the pair is literally one colour at two strengths, and the three channels
+   * still read: language (C cool / Rust warm), sub-family (gcc cyan · clang blue ·
+   * safe amber · unsafe red), strength (washed = plain, solid = hardened, tuned
+   * or proven).
+   *
+   * Validated with the dataviz validator, in bar order, on this report's
+   * surfaces.  Cross-family separation — the part that carries identity —
+   * PASSES in both modes: worst adjacent CVD ΔE 8.8 light / 11.8 dark.  Three
+   * checks fail BY CONSTRUCTION and are relieved by the layout rather than by
+   * colour: whitening lowers chroma (the washed members sit at 0.08–0.09
+   * against a 0.10 floor — pale teal and pale amber, not gray), the within-pair
+   * normal-vision ΔE is ~13–15 because a pair is MEANT to look like one hue at
+   * two strengths, and the washed light-mode members sit at 2.1–3.0 against the
+   * light surface.  Every bar carries its rung name and its value on the same
+   * row, and every chart has a table twin, so colour is never the only channel
+   * and never the load-bearing one. */
+  --rung-c-gcc:     #61bccc;   /* R1  gcc      — cyan, washed  */
+  --rung-c-gcc-h:   #0093ac;   /* R1h gcc      — cyan, solid   */
+  --rung-c-clang:   #818ee7;   /* R1  clang    — blue, washed  */
+  --rung-c-clang-h: #3348d8;   /* R1h clang    — blue, solid   */
+  --rung-r2:        #c9ad61;   /* R2  safe naive   — amber, washed */
+  --rung-r3:        #a87b00;   /* R3  safe tuned   — amber, solid  */
+  --rung-r4:        #d97a74;   /* R4  unsafe       — red, washed   */
+  --rung-r5:        #c1291f;   /* R5  unsafe+proof — red, solid    */
+  --rung-r2v:       #8a7248;   /* R2v control (p01 only) — muted amber */
+
+  --seq-100:      #cde2fb;
+  --seq-250:      #86b6ef;
+  --seq-400:      #3987e5;
+  --seq-550:      #1c5cab;
+  --seq-700:      #0d366b;
+
+  --div-neg:      #2a78d6;   /* diverging: cool pole */
+  --div-pos:      #e34948;   /* diverging: warm pole */
+  --div-mid:      #eceae4;
+
+  --good:         #0ca30c;
+  --warning:      #fab219;
+  --serious:      #ec835a;
+  --critical:     #d03b3b;
+
+  --accent:       #2a78d6;
+  --accent-wash:  rgba(42, 120, 214, 0.09);
+
+  --radius:       8px;
+  --radius-sm:    5px;
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Dark values under both scopes: the media query covers the OS setting, the
+ * [data-theme] scope covers the toggle, and the toggle must win both ways. */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --plane:      #0d0f11;
+    --surface:    #16181c;
+    --surface-2:  #1c1f24;
+    --ink:        #f1f2f4;
+    --ink-2:      #b7bbc3;
+    --muted:      #8b9099;
+    --grid:       #262a31;
+    --rule:       #2e333b;
+    --hairline:   rgba(255, 255, 255, 0.10);
+    --series-1:   #3987e5;
+    --series-2:   #d95926;
+    --series-3:   #199e70;
+    --deemph:     #3d434c;
+    --rung-c-gcc:     #6ab7c8;
+    --rung-c-gcc-h:   #0f8ba6;
+    --rung-c-clang:   #8f9aec;
+    --rung-c-clang-h: #4a5ce0;
+    --rung-r2:        #baa46b;
+    --rung-r3:        #8f6c10;
+    --rung-r4:        #d8877e;
+    --rung-r5:        #c03e2f;
+    --rung-r2v:       #8e7c56;
+    --seq-100:    #17324f;
+    --seq-250:    #1c5cab;
+    --seq-400:    #2a78d6;
+    --seq-550:    #5598e7;
+    --seq-700:    #9ec5f4;
+    --div-neg:    #3987e5;
+    --div-pos:    #e66767;
+    --div-mid:    #2b3038;
+    --accent:     #5598e7;
+    --accent-wash: rgba(85, 152, 231, 0.14);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --plane:      #0d0f11;
+  --surface:    #16181c;
+  --surface-2:  #1c1f24;
+  --ink:        #f1f2f4;
+  --ink-2:      #b7bbc3;
+  --muted:      #8b9099;
+  --grid:       #262a31;
+  --rule:       #2e333b;
+  --hairline:   rgba(255, 255, 255, 0.10);
+  --series-1:   #3987e5;
+  --series-2:   #d95926;
+  --series-3:   #199e70;
+  --deemph:     #3d434c;
+  --rung-c-gcc:     #6ab7c8;
+  --rung-c-gcc-h:   #0f8ba6;
+  --rung-c-clang:   #8f9aec;
+  --rung-c-clang-h: #4a5ce0;
+  --rung-r2:        #baa46b;
+  --rung-r3:        #8f6c10;
+  --rung-r4:        #d8877e;
+  --rung-r5:        #c03e2f;
+  --rung-r2v:       #8e7c56;
+  --seq-100:    #17324f;
+  --seq-250:    #1c5cab;
+  --seq-400:    #2a78d6;
+  --seq-550:    #5598e7;
+  --seq-700:    #9ec5f4;
+  --div-neg:    #3987e5;
+  --div-pos:    #e66767;
+  --div-mid:    #2b3038;
+  --accent:     #5598e7;
+  --accent-wash: rgba(85, 152, 231, 0.14);
+}
+
+/* the smart-confirm dialog + toasts inherit these from common.css */
+:root {
+  --color-bg: var(--surface);
+  --color-bg-secondary: var(--surface);
+  --color-bg-tertiary: var(--surface-2);
+  --color-text: var(--ink);
+  --color-text-muted: var(--ink-2);
+  --color-primary: var(--accent);
+  --color-border: var(--rule);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0;
+  background: var(--plane);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
+a:hover { border-bottom-color: currentColor; }
+
+code, .mono { font-family: var(--mono); font-size: 0.88em; }
+p code, li code, td code, .prose code {
+  background: var(--surface-2);
+  border: 1px solid var(--hairline);
+  border-radius: 3px;
+  padding: 0.05em 0.32em;
+}
+
+/* ============================================================ app shell === */
+
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--rule);
+}
+.topbar-in {
+  max-width: 1280px; margin: 0 auto; padding: 0 24px;
+  display: flex; align-items: center; gap: 20px; min-height: 54px; flex-wrap: wrap;
+}
+.brand { display: flex; align-items: baseline; gap: 10px; margin-right: 4px; }
+.brand-name { font-weight: 650; letter-spacing: -0.015em; font-size: 15px; }
+.brand-sub { color: var(--muted); font-size: 12px; }
+
+.tabs { display: flex; gap: 2px; flex: 1; flex-wrap: wrap; }
+.tab {
+  appearance: none; background: none; border: 0; cursor: pointer;
+  font: inherit; font-size: 13.5px; color: var(--ink-2);
+  padding: 7px 11px; border-radius: var(--radius-sm);
+  border-bottom: 2px solid transparent;
+}
+.tab:hover { background: var(--surface-2); color: var(--ink); }
+.tab.active { color: var(--ink); font-weight: 600; border-bottom-color: var(--accent); border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+
+.icon-btn {
+  appearance: none; background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius-sm); cursor: pointer; color: var(--ink-2);
+  font: inherit; font-size: 12px; padding: 5px 10px;
+}
+.icon-btn:hover { color: var(--ink); border-color: var(--muted); }
+
+.panel-area { flex: 1; }
+.panel { display: none; }
+.panel.visible { display: block; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 30px 24px 90px; }
+.prose { max-width: 74ch; }
+.prose p { margin: 0 0 14px; }
+
+h1, h2, h3, h4 { letter-spacing: -0.02em; line-height: 1.25; margin: 0 0 10px; }
+h1 { font-size: 30px; font-weight: 660; }
+h2 { font-size: 21px; font-weight: 640; margin-top: 6px; }
+h3 { font-size: 16px; font-weight: 640; }
+.eyebrow {
+  text-transform: uppercase; letter-spacing: 0.09em; font-size: 11px;
+  font-weight: 650; color: var(--muted); margin-bottom: 8px;
+}
+.lede { font-size: 17px; line-height: 1.62; color: var(--ink-2); max-width: 74ch; }
+.section { margin-top: 42px; }
+.section > h2 { margin-bottom: 4px; }
+.section-note { color: var(--muted); font-size: 13px; margin: 0 0 18px; max-width: 74ch; }
+
+/* ================================================================ cards === */
+
+.card {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: 18px 20px;
+}
+.grid { display: grid; gap: 14px; }
+.grid > * { min-width: 0; }
+/* `min(Npx, 100%)` rather than a bare `Npx`: a bare track minimum is wider than
+ * its container once the viewport drops below it, and the grid overflows the
+ * page instead of collapsing to one column.  The min() keeps the intended
+ * column width on wide screens and yields at narrow ones. */
+.g2 { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); }
+.g4 { grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr)); }
+
+/* stat tiles ---------------------------------------------------------- */
+.kpi {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: 14px 16px;
+}
+.kpi-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.kpi-value { font-size: 26px; font-weight: 660; letter-spacing: -0.02em; line-height: 1.1; }
+.kpi-sub { font-size: 12px; color: var(--ink-2); margin-top: 4px; }
+.kpi-value.good { color: var(--good); }
+.kpi-value.crit { color: var(--critical); }
+/* a KPI that is a caveat rather than a defect — "declared but never checked" is
+ * not a failure, and colouring it red would say it was */
+.kpi-value.warn { color: var(--warning); }
+
+.hero {
+  display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap;
+  padding: 22px 24px; border: 1px solid var(--rule); border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--accent-wash), transparent 70%), var(--surface);
+}
+.hero-fig { font-size: 62px; font-weight: 680; letter-spacing: -0.04em; line-height: 1; }
+.hero-cap { max-width: 56ch; color: var(--ink-2); font-size: 14px; }
+.hero-cap strong { color: var(--ink); }
+
+/* ================================================================ chips === */
+
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11.5px; font-weight: 600; padding: 2px 8px;
+  border-radius: 999px; border: 1px solid var(--hairline);
+  background: var(--surface-2); color: var(--ink-2); white-space: nowrap;
+}
+.chip .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.chip.good     { color: #0a7a0a; }
+.chip.warning  { color: #8a6108; }
+.chip.serious  { color: #a44a24; }
+.chip.critical { color: #a32a2a; }
+:root[data-theme="dark"] .chip.good,
+:root[data-theme="dark"] .chip.warning,
+:root[data-theme="dark"] .chip.serious,
+:root[data-theme="dark"] .chip.critical { color: var(--ink); }
+:root[data-theme="dark"] .chip.good .dot { background: var(--good); }
+:root[data-theme="dark"] .chip.warning .dot { background: var(--warning); }
+:root[data-theme="dark"] .chip.serious .dot { background: var(--serious); }
+:root[data-theme="dark"] .chip.critical .dot { background: var(--critical); }
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) .chip.good,
+  :root:where(:not([data-theme="light"])) .chip.warning,
+  :root:where(:not([data-theme="light"])) .chip.serious,
+  :root:where(:not([data-theme="light"])) .chip.critical { color: var(--ink); }
+  :root:where(:not([data-theme="light"])) .chip.good .dot { background: var(--good); }
+  :root:where(:not([data-theme="light"])) .chip.warning .dot { background: var(--warning); }
+  :root:where(:not([data-theme="light"])) .chip.serious .dot { background: var(--serious); }
+  :root:where(:not([data-theme="light"])) .chip.critical .dot { background: var(--critical); }
+}
+.chip.tag { font-weight: 500; color: var(--muted); }
+.chip.other { color: var(--ink-2); }
+.chip.other .dot { background: var(--muted); }
+/* a cell whose builds disagree gets one chip per behaviour, stacked */
+.chip-stack { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
+
+/* ============================================================== callouts === */
+
+.callout {
+  border: 1px solid var(--rule); border-left: 3px solid var(--muted);
+  background: var(--surface); border-radius: var(--radius-sm);
+  padding: 12px 16px; font-size: 14px; margin: 14px 0; max-width: 82ch;
+}
+.callout .callout-h { font-weight: 650; margin-bottom: 4px; display: flex; gap: 7px; align-items: center; }
+.callout.warn    { border-left-color: var(--warning); }
+.callout.retract { border-left-color: var(--critical); }
+.callout.note    { border-left-color: var(--accent); }
+.callout p { margin: 0 0 8px; }
+.callout p:last-child { margin-bottom: 0; }
+
+/* ================================================================ rungs === */
+
+.rung-strip { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(168px, 100%), 1fr)); }
+.rung-card {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: 14px 15px; position: relative;
+  border-top: 0; overflow: hidden;
+}
+/* the rung's own colour as a top rule — a gradient when the rung covers two
+ * compilers, which a border-color cannot express */
+.rung-card::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px;
+  background: var(--step, var(--deemph));
+}
+.rung-id { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--ink); }
+.rung-title { font-weight: 620; font-size: 14px; margin: 3px 0 6px; }
+.rung-line { font-size: 12.5px; color: var(--ink-2); line-height: 1.45; }
+.rung-meta { margin-top: 10px; font-size: 11.5px; color: var(--muted); border-top: 1px solid var(--grid); padding-top: 8px; }
+.rung-meta b { color: var(--ink-2); font-weight: 600; }
+
+/* =========================================================== ladder viz === */
+/* The overview's centrepiece.  One row per rung, the rung's own colour as a
+ * left rail (never by rank — the rail is identity, same as everywhere else).
+ * Deliberately NOT a rising staircase: the ladder is not monotone in safety,
+ * because R4 gives the guarantee back up.  Rows, not steps, avoid asserting an
+ * ordering the data does not have. */
+
+.intro-p { font-size: 15px; line-height: 1.68; color: var(--ink-2); max-width: 74ch; margin: 0 0 14px; }
+/* the single result on the front page — marked as a finding without becoming a
+ * chart, since the Overview leads with the argument by design */
+.intro-p.callout-lite {
+  color: var(--ink); border-left: 3px solid var(--accent);
+  padding: 10px 0 10px 15px; margin-top: 20px; background: var(--surface-2);
+  padding-right: 15px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+/* The two tracks stack full-width rather than sitting side by side: three text
+ * columns per row need the width, and the headers already make the two ladders
+ * read as separate climbs. */
+.lv-tracks { display: grid; gap: 28px; }
+.lv-track { min-width: 0; }
+.lv-track-h { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; margin-bottom: 3px; }
+.lv-track-name { font-size: 16px; font-weight: 660; color: var(--ink); }
+.lv-track-start {
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--ink-2); background: var(--surface-2);
+  border: 1px solid var(--hairline); border-radius: 999px; padding: 2px 9px;
+}
+.lv-track-dir { margin-left: auto; font-size: 11.5px; font-weight: 600; color: var(--muted); }
+.lv-track-arc { font-size: 12.5px; line-height: 1.5; color: var(--muted); margin: 0 0 11px; }
+
+.ladder-viz {
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--surface); overflow: hidden;
+}
+.lv-head, .lv-row {
+  display: grid;
+  grid-template-columns: 4px 52px minmax(190px, 1.25fr) minmax(190px, 1.15fr) minmax(140px, 0.85fr);
+  gap: 0 16px; align-items: start;
+}
+.lv-head {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.075em;
+  font-weight: 650; color: var(--muted);
+  padding: 10px 16px 9px 0; background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+}
+.lv-row { padding: 0 16px 0 0; border-top: 1px solid var(--hairline); }
+.lv-row:first-of-type { border-top: 0; }
+
+/* the rail carries the rung colour, and a gradient where the rung is two
+ * compilers — same rungStripe() the rung cards use */
+.lv-rail { align-self: stretch; background: var(--step, var(--deemph)); }
+
+.lv-id {
+  font-family: var(--mono); font-size: 12px; font-weight: 700;
+  color: var(--ink); padding: 15px 0 16px 12px;
+}
+.lv-what, .lv-check, .lv-tcb { padding: 14px 0 16px; }
+.lv-title { font-weight: 620; font-size: 14px; color: var(--ink); margin-bottom: 3px; }
+.lv-line  { font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+.lv-check { font-size: 13px; line-height: 1.55; color: var(--ink-2); }
+.lv-tcb   { font-size: 12.5px; line-height: 1.55; color: var(--muted); }
+.lv-check strong, .lv-tcb strong { color: var(--ink); font-weight: 600; }
+
+/* The comparison rung (R4).  De-emphasised, but its hue is NOT changed — colour
+ * identifies the rung everywhere on this site, so the rail keeps its red and
+ * only its weight drops.  The tag is what carries the status. */
+.lv-row.aside { background: var(--surface-2); }
+.lv-row.aside .lv-rail { opacity: 0.42; }
+.lv-row.aside .lv-id,
+.lv-row.aside .lv-title { color: var(--ink-2); font-weight: 600; }
+.lv-row.aside .lv-check,
+.lv-row.aside .lv-tcb,
+.lv-row.aside .lv-line { color: var(--muted); }
+.lv-row.aside .lv-check strong,
+.lv-row.aside .lv-tcb strong { color: var(--ink-2); }
+.lv-aside {
+  display: inline-block; margin-top: 7px;
+  font-size: 10.5px; font-weight: 650; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--muted);
+  border: 1px dashed var(--rule); border-radius: 999px; padding: 2px 9px;
+}
+
+/* Narrow: stack the three text columns, keep the rail and the rung id as the
+ * row's header so colour identity survives the reflow. */
+@media (max-width: 860px) {
+  .lv-head { display: none; }
+  .lv-row {
+    grid-template-columns: 4px 1fr;
+    /* one row per text child: id, what, check, tcb */
+    grid-template-rows: repeat(4, auto);
+    padding: 0 16px 0 0; gap: 0 14px;
+  }
+  /* ⚠⚠ `grid-row: 1 / -1` NEEDS AN EXPLICIT ROW TRACK LIST. With none, `-1`
+   * resolves to the first line, the rail spans a single row instead of the
+   * whole card, and the three remaining text children auto-flow into the
+   * leftover cells — .lv-what and .lv-tcb land in the 4px RAIL COLUMN, where
+   * they wrap one word per line and overlap the cell beside them. That is
+   * exactly what shipped, and it was invisible to every check here because
+   * nothing was wrong with the tree, the tokens or any track's width.
+   * Placing all four text children in column 2 explicitly is what makes this
+   * independent of auto-placement. */
+  .lv-rail { grid-column: 1; grid-row: 1 / -1; }
+  .lv-id, .lv-what, .lv-check, .lv-tcb { grid-column: 2; min-width: 0; }
+  .lv-id   { padding: 14px 0 0 12px; }
+  .lv-what { padding: 2px 0 0; }
+  .lv-check, .lv-tcb { padding: 8px 0 0; }
+  .lv-tcb { padding-bottom: 16px; }
+  .lv-check::before { content: "check: "; color: var(--muted); font-weight: 600; }
+  .lv-tcb::before   { content: "trusted: "; color: var(--muted); font-weight: 600; }
+}
+
+/* ========================================================= "where next" === */
+
+.next-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(232px, 100%), 1fr)); }
+.next-card {
+  display: block; width: 100%; text-align: left; font: inherit; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: 15px 17px;
+  transition: border-color 0.12s, background 0.12s, transform 0.12s;
+}
+.next-card:hover  { border-color: var(--accent); background: var(--accent-wash); }
+.next-card:active { transform: translateY(1px); }
+.next-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.next-label {
+  font-weight: 640; font-size: 14px; color: var(--ink); margin-bottom: 5px;
+}
+.next-label::after { content: " →"; color: var(--accent); font-weight: 500; }
+.next-blurb { font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+
+/* =============================================================== charts === */
+
+.chart { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); padding: 18px 20px 16px; }
+.chart-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 4px; flex-wrap: wrap; }
+.chart-title { font-weight: 640; font-size: 15px; }
+.chart-sub { color: var(--muted); font-size: 12.5px; max-width: 78ch; margin-bottom: 16px; }
+.chart-foot { color: var(--muted); font-size: 11.5px; margin-top: 12px; border-top: 1px solid var(--grid); padding-top: 9px; }
+
+.legend { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; font-size: 12px; color: var(--ink-2); }
+.legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.legend-key { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+.legend-key.line { height: 3px; border-radius: 2px; width: 16px; }
+.legend-key.split-key { background: var(--muted); position: relative; }
+.legend-key.split-key::after {
+  content: ""; position: absolute; right: 0; bottom: 0;
+  border-width: 0 0 6px 6px; border-style: solid;
+  border-color: transparent transparent var(--surface) transparent;
+}
+
+/* diverging bar rows ------------------------------------------------- */
+.dbar-rows { display: flex; flex-direction: column; gap: 2px; }
+.dbar-row { display: grid; grid-template-columns: 148px 1fr 96px; align-items: center; gap: 10px; }
+.dbar-name { font-size: 12.5px; color: var(--ink-2); font-family: var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dbar-track { position: relative; height: 22px; border-radius: 3px; background: transparent; }
+.dbar-track::before {
+  content: ""; position: absolute; left: var(--zero, 50%); top: -1px; bottom: -1px;
+  width: 1px; background: var(--rule);
+}
+.dbar-fill { position: absolute; top: 4px; height: 14px; border-radius: 2px; }
+/* Polarity is carried by direction, by the signed value at the row end, and by
+ * the rung colour of whichever rung the excess belongs to — so the diverging
+ * pair here is not a third meaning for blue and red, it is the same two rungs. */
+.dbar-fill.pos { border-radius: 2px 4px 4px 2px; }
+.dbar-fill.neg { border-radius: 4px 2px 2px 4px; }
+.dbar-val { font-family: var(--mono); font-size: 12px; text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; }
+/* a value is text: it wears an ink token, never the mark's colour — the sign and
+ * the bar's direction already carry the polarity */
+.dbar-val.pos, .dbar-val.neg { color: var(--ink); }
+.dbar-val.zero { color: var(--muted); }
+.dbar-row:hover .dbar-fill { filter: brightness(1.08); }
+
+/* spread ------------------------------------------------------------- */
+/* The band is a range, not a magnitude, so it does not start at the zero line —
+ * it starts where the data starts. It reuses .dbar-row/.dbar-track, so the zero
+ * rule and the label columns are the same ones the diverging chart uses. */
+.spread-band { position: absolute; top: 6px; height: 10px; border-radius: 2px; background: var(--deemph); }
+.spread-band.sw-c-gcc, .spread-band.sw-c-gcc-h, .spread-band.sw-c-clang, .spread-band.sw-c-clang-h,
+.spread-band.sw-safe_naive, .spread-band.sw-safe_tuned, .spread-band.sw-unsafe,
+.spread-band.sw-verus, .spread-band.sw-safe_naive_verus { background: var(--rung); }
+.spread-band.sw-c-gcc         { --rung: var(--rung-c-gcc); }
+.spread-band.sw-c-gcc-h       { --rung: var(--rung-c-gcc-h); }
+.spread-band.sw-c-clang       { --rung: var(--rung-c-clang); }
+.spread-band.sw-c-clang-h     { --rung: var(--rung-c-clang-h); }
+.spread-band.sw-safe_naive    { --rung: var(--rung-r2); }
+.spread-band.sw-safe_tuned    { --rung: var(--rung-r3); }
+.spread-band.sw-unsafe        { --rung: var(--rung-r4); }
+.spread-band.sw-verus         { --rung: var(--rung-r5); }
+.spread-band.neg { border-radius: 4px 2px 2px 4px; }
+.spread-band.pos { border-radius: 2px 4px 4px 2px; }
+/* one tick per build — a sample, so it wears ink and never a rung colour */
+.spread-tick {
+  position: absolute; top: 2px; width: 1px; height: 18px;
+  background: var(--ink); opacity: .34; transform: translateX(-.5px);
+}
+.dbar-row:hover .spread-tick { opacity: .62; }
+.dbar-row:hover .spread-band { filter: brightness(1.08); }
+
+/* dumbbell ------------------------------------------------------------ */
+.dumb-rows { display: flex; flex-direction: column; gap: 3px; }
+.dumb-row { display: grid; grid-template-columns: 148px 1fr 150px; align-items: center; gap: 10px; }
+.dumb-track { position: relative; height: 24px; }
+.dumb-axis { position: absolute; left: 0; right: 0; top: 11px; height: 1px; background: var(--grid); }
+.dumb-conn { position: absolute; top: 10.5px; height: 3px; background: var(--seq-100); border-radius: 2px; }
+.dumb-dot {
+  position: absolute; top: 6px; width: 12px; height: 12px; border-radius: 50%;
+  transform: translateX(-6px); box-shadow: 0 0 0 2px var(--surface);
+}
+/* the dot's colour comes from its rung class (.sw-*), which is a single class —
+ * so these must not set a background at higher specificity */
+.dumb-dot.a, .dumb-dot.b { background: var(--deemph); }
+.dumb-dot.sw-c-gcc, .dumb-dot.sw-c-gcc-h, .dumb-dot.sw-c-clang, .dumb-dot.sw-c-clang-h,
+.dumb-dot.sw-safe_naive, .dumb-dot.sw-safe_tuned, .dumb-dot.sw-unsafe, .dumb-dot.sw-verus,
+.dumb-dot.sw-safe_naive_verus { background: var(--rung); }
+.dumb-dot.sw-c-gcc            { --rung: var(--rung-c-gcc); }
+.dumb-dot.sw-c-gcc-h          { --rung: var(--rung-c-gcc-h); }
+.dumb-dot.sw-c-clang          { --rung: var(--rung-c-clang); }
+.dumb-dot.sw-c-clang-h        { --rung: var(--rung-c-clang-h); }
+.dumb-dot.sw-safe_naive       { --rung: var(--rung-r2); }
+.dumb-dot.sw-safe_tuned       { --rung: var(--rung-r3); }
+.dumb-dot.sw-unsafe           { --rung: var(--rung-r4); }
+.dumb-dot.sw-verus            { --rung: var(--rung-r5); }
+.dumb-dot.sw-safe_naive_verus { --rung: var(--rung-r2v); }
+.dumb-conn.pairline { background: var(--grid); }
+.dumb-val { font-family: var(--mono); font-size: 11.5px; color: var(--ink-2); text-align: right; font-variant-numeric: tabular-nums; }
+
+/* rung swatches — one class per cell, used by bars, dots, legend keys, chips */
+.sw-c-gcc            { background: var(--rung-c-gcc); }
+.sw-c-gcc-h          { background: var(--rung-c-gcc-h); }
+.sw-c-clang          { background: var(--rung-c-clang); }
+.sw-c-clang-h        { background: var(--rung-c-clang-h); }
+.sw-safe_naive       { background: var(--rung-r2); }
+.sw-safe_tuned       { background: var(--rung-r3); }
+.sw-unsafe           { background: var(--rung-r4); }
+.sw-verus            { background: var(--rung-r5); }
+.sw-safe_naive_verus { background: var(--rung-r2v); }
+
+/* horizontal bars (ladder profile) ------------------------------------ */
+/* One row per rung: the rung's name at the left, the bar from a single
+ * baseline, the value at the tip.  Horizontal because the rung names are the
+ * thing being compared and they read as a list, not as tick labels. */
+.bars { display: flex; flex-direction: column; gap: 3px; }
+.bar-row { display: grid; grid-template-columns: 112px 1fr 74px; gap: 10px; align-items: center; }
+.bar-lab {
+  font-family: var(--mono); font-size: 11px; color: var(--ink-2);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.bar-track { position: relative; height: 16px; }
+.bar-track::after {                      /* the baseline every bar grows from */
+  content: ""; position: absolute; left: 0; top: -2px; bottom: -2px; width: 1px;
+  background: var(--rule);
+}
+.bar-fill {
+  position: absolute; left: 0; top: 0; height: 100%;
+  border-radius: 2px 4px 4px 2px;        /* square at the baseline, rounded at the data end */
+  min-width: 2px;
+}
+.bar-row:hover .bar-fill { filter: brightness(1.06); }
+.bar-val {
+  font-family: var(--mono); font-size: 11px; text-align: right; color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.bars.small .bar-row { grid-template-columns: 60px 1fr 46px; gap: 6px; }
+.bars.small .bar-lab, .bars.small .bar-val { font-size: 9.5px; }
+.bars.small .bar-track { height: 11px; }
+
+/* small multiples ------------------------------------------------------ */
+.sm-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(215px, 100%), 1fr)); }
+.sm {
+  border: 1px solid var(--rule); border-radius: var(--radius-sm);
+  padding: 11px 12px 9px; background: var(--surface); cursor: pointer;
+}
+.sm:hover { border-color: var(--accent); }
+.sm-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+.sm-t { font-family: var(--mono); font-size: 12px; font-weight: 650; }
+.sm-s { font-size: 11px; color: var(--muted); }
+
+/* matrix / heatmap ----------------------------------------------------- */
+.matrix { overflow-x: auto; }
+.matrix table { border-collapse: separate; border-spacing: 2px; }
+.matrix th {
+  font-size: 11px; font-weight: 600; color: var(--muted); padding: 3px 6px;
+  text-align: center; white-space: nowrap;
+}
+.matrix th.row { text-align: left; font-family: var(--mono); font-size: 12px; color: var(--ink-2); font-weight: 500; }
+/* the pattern the detail pane below is showing — the status colours in the
+ * cells are reserved, so the mark goes on the row label and nowhere else */
+.matrix tr.on th.row { color: var(--ink); font-weight: 700; box-shadow: inset 2px 0 0 var(--accent); }
+.matrix td { padding: 0; }
+.cell {
+  width: 62px; height: 30px; border-radius: 4px; cursor: default;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 650; color: #fff; border: 0;
+}
+.cell.match    { background: var(--good); }
+.cell.silent   { background: var(--critical); }
+.cell.crash    { background: var(--serious); color: #2a1408; }
+.cell.hung     { background: var(--warning); color: #2a2004; }
+.cell.loud     { background: var(--muted); }
+.cell.other    { background: var(--muted); }
+.cell.none     { background: var(--surface-2); color: var(--muted); }
+.cell:hover    { outline: 2px solid var(--ink); outline-offset: 1px; }
+/* corner notch: this rung did not behave the same way in every build */
+.cell.split { position: relative; }
+.cell.split::after {
+  content: ""; position: absolute; right: 0; bottom: 0;
+  border-width: 0 0 8px 8px; border-style: solid;
+  border-color: transparent transparent rgba(255,255,255,0.85) transparent;
+}
+
+/* ================================================================ table === */
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); }
+table.tbl { border-collapse: collapse; width: 100%; font-size: 13px; }
+table.tbl th, table.tbl td { padding: 7px 12px; text-align: left; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+table.tbl th { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 650; background: var(--surface-2); position: sticky; top: 0; }
+table.tbl td.num, table.tbl th.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+table.tbl tr:last-child td { border-bottom: 0; }
+table.tbl tbody tr:hover td { background: var(--surface-2); }
+table.tbl td.wrap { white-space: normal; min-width: 260px; }
+.pos { color: var(--critical); }
+.neg { color: var(--accent); }
+.zero { color: var(--muted); }
+
+/* ---------------------------------------------- rung toggles (the legend) --- */
+
+.rung-toggles { display: flex; gap: 6px; flex-wrap: wrap; }
+.rtog {
+  appearance: none; font: inherit; font-size: 12px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 10px 3px 8px; border-radius: 999px;
+  border: 1px solid var(--rule); background: var(--surface); color: var(--ink-2);
+  min-height: 26px;                       /* hit target, not just the painted key */
+}
+.rtog:hover { border-color: var(--muted); color: var(--ink); }
+.rtog:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.rtog .k { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+/* the off state is carried by three channels, not by colour alone */
+.rtog.off { background: var(--surface-2); color: var(--muted); border-style: dashed; }
+.rtog.off .k { opacity: 0.22; }
+.rtog.off .lbl { text-decoration: line-through; }
+
+/* =============================================================== inputs === */
+
+.filters {
+  display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-end;
+  padding: 12px 16px; border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--surface); margin-bottom: 22px;
+}
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.seg { display: flex; border: 1px solid var(--rule); border-radius: var(--radius-sm); overflow: hidden; }
+.seg button {
+  appearance: none; border: 0; background: var(--surface); color: var(--ink-2);
+  font: inherit; font-size: 12.5px; padding: 5px 11px; cursor: pointer;
+  border-right: 1px solid var(--rule);
+}
+.seg button:last-child { border-right: 0; }
+.seg button:hover { background: var(--surface-2); color: var(--ink); }
+.seg button.on { background: var(--accent); color: #fff; font-weight: 600; }
+.seg button:disabled { color: var(--muted); cursor: not-allowed; background: var(--surface-2); }
+.seg button:disabled:hover { color: var(--muted); }
+select.sel {
+  font: inherit; font-size: 13px; padding: 5px 9px; border-radius: var(--radius-sm);
+  border: 1px solid var(--rule); background: var(--surface); color: var(--ink);
+  max-width: 100%;
+}
+
+/* A detail pane that shows ONE pattern puts its picker in its own heading, so
+ * the pane is visibly switchable without having to discover that the table
+ * above it is clickable. Wraps to its own line before the heading is squeezed. */
+.pane-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 10px 16px; flex-wrap: wrap;
+}
+.pane-head h2 { margin: 0; }
+.pane-pick { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.pane-pick-l {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.075em;
+  font-weight: 650; color: var(--muted);
+}
+/* the row the detail pane below is currently showing — a mark, not just a hover */
+table.tbl tbody tr.on td { background: var(--surface-2); }
+table.tbl tbody tr.on td:first-child { box-shadow: inset 2px 0 0 var(--accent); }
+
+/* ============================================================= patterns === */
+
+.pat-layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 22px; align-items: start; }
+.pat-layout > * { min-width: 0; }
+@media (max-width: 900px) { .pat-layout { grid-template-columns: 1fr; } }
+/* Sticky, and it must carry its own scrollbar: at 23 patterns the list is
+ * taller than the viewport, so without a height cap the only way to reach the
+ * bottom of it is to scroll the whole page — which defeats the sticky. */
+.pat-list {
+  display: flex; flex-direction: column; gap: 2px;
+  position: sticky; top: 74px;
+  max-height: calc(100vh - 92px); overflow-y: auto; overscroll-behavior: contain;
+  padding-right: 5px; scrollbar-width: thin;
+}
+.pat-list::-webkit-scrollbar { width: 8px; }
+.pat-list::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 4px; }
+.pat-list::-webkit-scrollbar-track { background: transparent; }
+/* the count heading should not scroll away with the items.  --plane, not
+ * --surface: this list sits directly on the page, not inside a card. */
+.pat-list > .eyebrow {
+  position: sticky; top: 0; z-index: 1; margin: 0 0 6px;
+  background: var(--plane); padding: 2px 0 5px;
+}
+.pat-item {
+  appearance: none; text-align: left; background: none; border: 0; cursor: pointer;
+  font: inherit; padding: 7px 10px; border-radius: var(--radius-sm); color: var(--ink-2);
+  border-left: 2px solid transparent; display: flex; flex-direction: column; gap: 1px;
+}
+.pat-item:hover { background: var(--surface-2); }
+.pat-item.on { background: var(--accent-wash); color: var(--ink); border-left-color: var(--accent); }
+.pat-item .pid { font-family: var(--mono); font-size: 12px; font-weight: 650; }
+.pat-item .pnm { font-size: 11.5px; color: var(--muted); }
+.pat-item.on .pnm { color: var(--ink-2); }
+
+.codebar { display: flex; gap: 2px; flex-wrap: wrap; margin-bottom: 10px; }
+pre.code {
+  margin: 0; padding: 14px 16px; overflow: auto; max-height: 480px;
+  background: var(--surface-2); border: 1px solid var(--rule); border-radius: var(--radius);
+  font-family: var(--mono); font-size: 12px; line-height: 1.55; color: var(--ink);
+  white-space: pre; tab-size: 4;
+}
+.code-meta { font-size: 11.5px; color: var(--muted); margin-top: 7px; font-family: var(--mono); }
+pre.code.clause { padding: 8px 11px; margin-bottom: 6px; white-space: pre-wrap; }
+
+/* ========================================================== code tokens === */
+/* Unlike every other colour on this site, these encode NOTHING.  They are a
+ * reading aid — nothing here is being identified or grouped, so this palette is
+ * chosen for legibility alone and does not have to avoid the rung colours.
+ *
+ * The Verus classes are the exception: those ARE semantic, and their categories
+ * are the ones this project's claims are made in.  See content.js VERUS_LEGEND. */
+
+.tk-com  { color: var(--tk-com); font-style: italic; }
+.tk-str  { color: var(--tk-str); }
+.tk-num  { color: var(--tk-num); }
+.tk-kw   { color: var(--tk-kw); font-weight: 600; }
+.tk-typ  { color: var(--tk-typ); }
+.tk-fn   { color: var(--tk-fn); }
+.tk-mac  { color: var(--tk-mac); }
+.tk-pre  { color: var(--tk-mac); }
+
+/* The proof layer.  A background, not just a colour, because the point is to
+ * make the shape of the proof visible at a glance in a wall of Rust. */
+.tk-vspec, .tk-vproof, .tk-vghost, .tk-vtrust {
+  border-radius: 3px; padding: 0 3px; margin: 0 -1px; font-weight: 600;
+}
+.tk-vspec  { background: var(--tk-spec-bg);  color: var(--tk-spec-fg); }
+.tk-vproof { background: var(--tk-proof-bg); color: var(--tk-proof-fg); }
+.tk-vghost { background: var(--tk-ghost-bg); color: var(--tk-ghost-fg); }
+/* trusted, not verified — the one class that should look like a warning */
+.tk-vtrust {
+  background: var(--tk-trust-bg); color: var(--tk-trust-fg);
+  box-shadow: inset 0 0 0 1px var(--tk-trust-br);
+}
+
+:root {
+  --tk-com: #6d7280;  --tk-str: #0a7040;  --tk-num: #9a5000;
+  --tk-kw:  #9326a9;  --tk-typ: #0f6ea8;  --tk-fn:  #1a4fb4;  --tk-mac: #a03a12;
+  --tk-spec-bg:  #e3f0ff; --tk-spec-fg:  #0d3f79;
+  --tk-proof-bg: #e8f3e2; --tk-proof-fg: #24571b;
+  --tk-ghost-bg: #f0ebf8; --tk-ghost-fg: #4b2c73;
+  --tk-trust-bg: #fdeae2; --tk-trust-fg: #8a2b06; --tk-trust-br: #f0b49a;
+}
+:root[data-theme="dark"] {
+  --tk-com: #7f8794;  --tk-str: #6fce9a;  --tk-num: #e0a55f;
+  --tk-kw:  #d79ae8;  --tk-typ: #6ec2f0;  --tk-fn:  #8fb4ff;  --tk-mac: #f0a07a;
+  --tk-spec-bg:  #16304d; --tk-spec-fg:  #a8d0f7;
+  --tk-proof-bg: #1c3a20; --tk-proof-fg: #a9dfa2;
+  --tk-ghost-bg: #2d2440; --tk-ghost-fg: #cfb6f0;
+  --tk-trust-bg: #4a2113; --tk-trust-fg: #ffc0a3; --tk-trust-br: #7d3d22;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    --tk-com: #7f8794;  --tk-str: #6fce9a;  --tk-num: #e0a55f;
+    --tk-kw:  #d79ae8;  --tk-typ: #6ec2f0;  --tk-fn:  #8fb4ff;  --tk-mac: #f0a07a;
+    --tk-spec-bg:  #16304d; --tk-spec-fg:  #a8d0f7;
+    --tk-proof-bg: #1c3a20; --tk-proof-fg: #a9dfa2;
+    --tk-ghost-bg: #2d2440; --tk-ghost-fg: #cfb6f0;
+    --tk-trust-bg: #4a2113; --tk-trust-fg: #ffc0a3; --tk-trust-br: #7d3d22;
+  }
+}
+
+/* ------------------------------------------------------- the verus legend -- */
+.vlegend {
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--surface-2); padding: 12px 14px; margin-bottom: 12px;
+}
+.vleg-row {
+  display: grid; grid-template-columns: 46px minmax(110px, auto) 1fr;
+  gap: 4px 12px; align-items: baseline; padding: 4px 0;
+  font-size: 12.5px; color: var(--muted);
+}
+.vleg-key { font-family: var(--mono); font-size: 11px; text-align: center; }
+.vleg-name { font-weight: 650; color: var(--ink-2); font-size: 12.5px; }
+.vleg-blurb code { font-size: 11.5px; }
+@media (max-width: 620px) {
+  .vleg-row { grid-template-columns: 46px 1fr; }
+  .vleg-blurb { grid-column: 1 / -1; }
+}
+
+/* ============================================================== the diff === */
+
+.codebar-group { margin-bottom: 10px; }
+.codebar-lab {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em;
+  font-weight: 650; color: var(--muted); margin-bottom: 5px;
+}
+.tab.diff { font-family: var(--mono); font-size: 12px; }
+
+.diff-head {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 8px;
+}
+.diff-stat { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; font-size: 12.5px; }
+.dstat { font-family: var(--mono); font-weight: 650; }
+.dstat.add { color: var(--tk-str); }
+.dstat.del { color: var(--tk-mac); }
+.dstat.muted { color: var(--muted); font-weight: 400; }
+.seg-btn {
+  appearance: none; font: inherit; font-size: 12px; cursor: pointer;
+  padding: 4px 10px; border-radius: var(--radius-sm);
+  border: 1px solid var(--rule); background: var(--surface); color: var(--ink-2);
+}
+.seg-btn:hover { border-color: var(--accent); color: var(--ink); }
+.seg-btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.difflines {
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--surface-2); overflow: auto;
+  font-family: var(--mono); font-size: 12px; line-height: 1.55;
+  padding: 8px 0;
+  /* Capped, because these get long: the R4->R5 source diff adds a median of
+   * 281 lines and one assembly diff runs to 807.  Without a cap the page is
+   * the diff. */
+  max-height: 72vh; overscroll-behavior: contain;
+}
+.difflines.asm { max-height: 60vh; }
+.dl { display: flex; align-items: baseline; white-space: pre; min-width: max-content; }
+.dl-no {
+  flex: none; width: 38px; text-align: right; padding-right: 8px;
+  color: var(--muted); opacity: 0.7; user-select: none; font-size: 11px;
+}
+.dl-sign { flex: none; width: 18px; text-align: center; user-select: none; font-weight: 700; }
+.dl-src { padding-right: 16px; }
+/* +/- carry a background AND the sign glyph, so the distinction survives both
+ * colour-blindness and a greyscale print */
+.dl.dadd { background: var(--diff-add-bg); }
+.dl.ddel { background: var(--diff-del-bg); }
+.dl.dadd .dl-sign { color: var(--tk-str); }
+.dl.ddel .dl-sign { color: var(--tk-mac); }
+.dl.dctx { opacity: 0.78; }
+.dl.skip {
+  color: var(--muted); font-style: italic; font-size: 11px;
+  padding: 3px 0 3px 64px; border-top: 1px dashed var(--grid);
+  border-bottom: 1px dashed var(--grid); margin: 3px 0; opacity: 0.85;
+}
+/* ------------------------------------------- linked source <-> assembly --- */
+/* Stacked rather than side by side: the split diff is already two columns, and
+ * putting the assembly beside it would make four.  Each pane caps its own
+ * height so both stay on screen together, which is the point. */
+/* One compact strip per pane instead of paragraphs between them.  Both panes
+ * have to fit the viewport together or the linked view has no point, so the
+ * prose folds and what stays is a label, the counts, and a hint. */
+.pane-head {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  margin: 12px 0 5px;
+}
+.pane-lab {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em;
+  font-weight: 650; color: var(--muted);
+}
+.pane-stats { display: flex; gap: 6px; flex-wrap: wrap; }
+.pstat {
+  font-family: var(--mono); font-size: 10.5px; color: var(--muted);
+  background: var(--surface-2); border: 1px solid var(--hairline);
+  border-radius: 999px; padding: 1px 8px;
+}
+.pstat.on  { color: var(--ink-2); border-color: var(--rule); }
+.pstat.off { color: var(--tk-mac); }
+.align-leg {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--ink-2);
+}
+.align-leg.none { color: var(--muted); font-style: italic; }
+.rel-key {
+  width: 10px; height: 10px; border-radius: 2px; flex: none;
+  background: var(--rel-bg); box-shadow: inset 2px 0 0 var(--rel-br);
+}
+.pane-hint { margin-left: auto; font-size: 11px; color: var(--muted); font-style: italic; }
+.mini-btn {
+  appearance: none; font: inherit; font-size: 11px; cursor: pointer;
+  padding: 2px 9px; border-radius: 999px;
+  border: 1px solid var(--rule); background: var(--surface); color: var(--ink-2);
+}
+.mini-btn:hover { border-color: var(--accent); color: var(--ink); }
+.mini-btn.on { background: var(--accent-wash); border-color: var(--accent); color: var(--ink); }
+.pane-notes {
+  border-left: 2px solid var(--rule); padding: 2px 0 2px 13px;
+  margin: 0 0 12px;
+}
+.pane-notes > :last-child { margin-bottom: 0; }
+
+/* Sized so the pair fits one screen together, which is the whole point. */
+.difflines.pane { max-height: 34vh; }
+.difflines.asm { max-height: 38vh; }
+
+/* the selected source line and the instructions it produced */
+.dl.sel, .sl-side.sel { box-shadow: inset 2px 0 0 var(--accent), inset -2px 0 0 var(--accent); }
+.dl.sel { background: var(--link-sel) !important; }
+.sl-side.sel { background: var(--link-sel) !important; }
+:root { --link-sel: rgba(42, 120, 214, 0.16); }
+:root[data-theme="dark"] { --link-sel: rgba(85, 152, 231, 0.26); }
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) { --link-sel: rgba(85, 152, 231, 0.26); }
+}
+/* Lines related to the selection THROUGH THE ASSEMBLY — the other side's lines
+ * whose instructions co-occur with the selected line's.  Deliberately weaker
+ * than the selection itself, and it means one specific thing: an instruction in
+ * the compiled kernel is IDENTICAL on both sides and carries a source line on
+ * each.  Positional pairing inside a change block was tried and dropped — two
+ * compilers' output pairs arbitrarily, so it would have been noise wearing the
+ * colour of evidence. */
+.sl-side.rel  { background: var(--rel-bg); box-shadow: inset 2px 0 0 var(--rel-br); }
+:root {
+  --rel-bg:  rgba(26, 175, 122, 0.15);  --rel-br:  #1baf7a;
+  --relw-bg: rgba(26, 175, 122, 0.07);  --relw-br: rgba(26, 175, 122, 0.45);
+}
+:root[data-theme="dark"] {
+  --rel-bg:  rgba(25, 158, 112, 0.24);  --rel-br:  #199e70;
+  --relw-bg: rgba(25, 158, 112, 0.11);  --relw-br: rgba(25, 158, 112, 0.5);
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    --rel-bg:  rgba(25, 158, 112, 0.24);  --rel-br:  #199e70;
+    --relw-bg: rgba(25, 158, 112, 0.11);  --relw-br: rgba(25, 158, 112, 0.5);
+  }
+}
+
+/* Mapping confidence.  `certain` is the default and is deliberately unmarked —
+ * badging almost every row says nothing.  The two weaker tiers get a coloured
+ * left edge, so a reader can see at a glance which lines are inferences. */
+.dl.c-likely, .sl-side.c-likely { box-shadow: inset 3px 0 0 var(--conf-likely); }
+.dl.c-approx, .sl-side.c-approx { box-shadow: inset 3px 0 0 var(--conf-approx); }
+.dl.c-approx .dl-src, .sl-side.c-approx .sl-src { opacity: 0.82; }
+.pstat.tc { color: var(--ink-2); }
+.pstat.tl { color: var(--conf-likely); border-color: var(--conf-likely); }
+.pstat.ta { color: var(--conf-approx); border-color: var(--conf-approx); }
+
+.conf-legend { margin: 6px 0 10px; display: grid; gap: 3px; }
+.conf-row { display: flex; align-items: baseline; gap: 8px; font-size: 12px; color: var(--muted); }
+.conf-row b { color: var(--ink-2); font-weight: 640; flex: none; }
+.conf-key { width: 12px; height: 12px; border-radius: 2px; flex: none; align-self: center; }
+.conf-key.k-certain { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--rule); }
+.conf-key.k-likely  { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--conf-likely); }
+.conf-key.k-approx  { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--conf-approx); }
+
+:root { --conf-likely: #b07d00; --conf-approx: #b4531f; }
+:root[data-theme="dark"] { --conf-likely: #d2a441; --conf-approx: #e08a5c; }
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) { --conf-likely: #d2a441; --conf-approx: #e08a5c; }
+}
+
+/* Selection and confidence both paint a left edge, and equal specificity would
+ * let whichever came last silently win.  Carry both: confidence on the left
+ * edge, selection on the right, plus the selection's background. */
+.dl.sel.c-likely, .sl-side.sel.c-likely {
+  box-shadow: inset 3px 0 0 var(--conf-likely), inset -2px 0 0 var(--accent);
+}
+.dl.sel.c-approx, .sl-side.sel.c-approx {
+  box-shadow: inset 3px 0 0 var(--conf-approx), inset -2px 0 0 var(--accent);
+}
+
+/* clickable rows in the linked view */
+.difflines.pane .dl, .difflines.pane .sl-side,
+.difflines.asm .dl, .difflines.asm .sl-side { cursor: pointer; }
+
+/* ------------------------------------------------------- assembly view --- */
+.diff-ctl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.asmpair { margin-top: 16px; }
+.asmpair:first-of-type { margin-top: 8px; }
+.asm-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 6px;
+}
+.asm-sym { font-size: 12.5px; color: var(--ink-2); min-width: 0; overflow-wrap: anywhere; }
+.asm-sym b { font-weight: 640; color: var(--ink); }
+.asm-symnames { display: block; font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 2px; }
+.asm-symnames code { font-size: 11px; color: var(--muted); }
+.asm-stat { display: flex; gap: 9px; align-items: baseline; flex-wrap: wrap; }
+.chip.neutral { color: var(--ink-2); }
+.difflines.asm { font-size: 11.5px; }
+.difflines.asm .dl-sign { width: 16px; }
+.difflines.asm .dl-src { padding-left: 4px; }
+
+/* x86 tokens.  Same rule as the source palette: this identifies nothing, it
+ * only helps the eye find the operation, its registers and its operands. */
+.tk-asm-op  { color: var(--tk-kw); font-weight: 600; }
+.tk-asm-mov { color: var(--tk-fn); font-weight: 600; }
+.tk-asm-jmp { color: var(--tk-mac); font-weight: 600; }
+.tk-asm-reg { color: var(--tk-typ); }
+/* immediates and branch targets are ERASED by normalisation — shown as the
+ * redactions they are, so nobody reads `$` as a value */
+.tk-asm-imm, .tk-asm-tgt {
+  color: var(--muted); opacity: 0.85;
+  border-bottom: 1px dotted var(--rule);
+}
+
+/* Row hover, in both layouts: a wide diff is easy to lose your place in, and
+ * this is the cheapest way to keep one line tracked across the gutter.  It is
+ * also what makes `.unified` a real class rather than dead markup — a check
+ * flags any class the page emits and the stylesheet ignores. */
+.difflines.unified .dl:not(.skip):hover,
+.difflines.split .sl:hover > .sl-side:not(.del):not(.add):not(.none) {
+  background: var(--hover-row);
+}
+:root { --hover-row: rgba(20, 20, 26, 0.045); }
+:root[data-theme="dark"] { --hover-row: rgba(255, 255, 255, 0.05); }
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) { --hover-row: rgba(255, 255, 255, 0.05); }
+}
+
+/* ------------------------------------------------------- split diff view -- */
+/* Two columns, one row per pair.  A side with nothing opposite it gets a blank
+ * cell rather than a missing one, so the columns never drift out of step. */
+/* ONE grid for the whole diff, not one per row.
+ *
+ * The first version made each `.sl` its own `1fr 1fr` grid with
+ * `min-width: max-content`, so every row sized to its OWN content and the split
+ * landed in a different place on every row — a long line pushed its right
+ * column off the screen while a short line two rows down started halfway
+ * across.  Columns can only line up if they are columns of the same grid, so
+ * the rows are `display: contents` and the container owns the tracks.
+ *
+ * And because the columns are now a fixed half each, long lines WRAP rather
+ * than widening their row.  `minmax(0, 1fr)` is what allows that: a bare `1fr`
+ * has an auto minimum and would still be pushed wide by a long line. */
+.difflines.split {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  padding: 0; overflow-x: hidden;
+}
+.sl { display: contents; }
+.sl-side {
+  display: flex; align-items: baseline; min-width: 0;
+  padding: 1px 10px 1px 0; border-right: 1px solid var(--grid);
+}
+.sl-side:last-child { border-right: 0; }
+.sl-side.del  { background: var(--diff-del-bg); }
+.sl-side.add  { background: var(--diff-add-bg); }
+/* the empty half of an unpaired change — dimmed, so the eye reads "nothing
+ * here" rather than "identical here" */
+.sl-side.none { background: var(--diff-none-bg); }
+.sl-no {
+  flex: none; width: 40px; text-align: right; padding-right: 9px;
+  color: var(--muted); opacity: 0.65; user-select: none; font-size: 11px;
+}
+/* assembly rows have no line-number gutter, and their instructions are short
+ * enough not to want a hanging indent — reset both, or the negative text-indent
+ * from the rule below drags the first line out of its cell */
+.sl.noline .sl-src { padding-left: 12px; text-indent: 0; }
+/* Wrap instead of overflowing, with a hanging indent so a continuation is not
+ * mistaken for a new statement — code's leading whitespace is structure. */
+.sl-src {
+  flex: 1 1 auto; min-width: 0;
+  white-space: pre-wrap; overflow-wrap: anywhere;
+  padding-left: 2.2em; text-indent: -2.2em;
+}
+.sl-src.blank { display: block; min-height: 1.55em; padding: 0; text-indent: 0; }
+/* An anchor row: the two lines here produced the same instruction, and every
+ * row above it has been padded so they meet.  Marked, because the alignment is
+ * DERIVED from the compiled code and a reader has no other way to tell which
+ * rows are load-bearing and which are just filling the gap between them. */
+.sl.anchor > .sl-side { border-top: 1px solid var(--rel-br); }
+.sl.anchor > .sl-side:first-child::before {
+  content: "⇔"; position: absolute; left: 2px; color: var(--rel-br);
+  font-size: 10px; line-height: inherit;
+}
+.sl.anchor > .sl-side:first-child { position: relative; }
+
+/* the skip marker spans both columns; it must opt out of `display: contents` */
+.sl.skip {
+  display: block; grid-column: 1 / -1;
+  color: var(--muted); font-style: italic; font-size: 11px;
+  padding: 3px 0 3px 50px; border-top: 1px dashed var(--grid);
+  border-bottom: 1px dashed var(--grid); opacity: 0.85;
+}
+
+:root { --diff-add-bg: #e6f6ec; --diff-del-bg: #fdeceb; --diff-none-bg: rgba(20,20,26,0.035); }
+:root[data-theme="dark"] { --diff-add-bg: #16301f; --diff-del-bg: #3a1d1b; --diff-none-bg: rgba(255,255,255,0.035); }
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) { --diff-add-bg: #16301f; --diff-del-bg: #3a1d1b; --diff-none-bg: rgba(255,255,255,0.035); }
+}
+
+details.fold { border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--surface); padding: 0; margin: 12px 0; }
+details.fold > summary { cursor: pointer; padding: 9px 14px; font-size: 13px; font-weight: 600; color: var(--ink-2); list-style: none; }
+details.fold > summary::-webkit-details-marker { display: none; }
+details.fold > summary::before { content: "▸ "; color: var(--muted); }
+details.fold[open] > summary::before { content: "▾ "; }
+details.fold > summary:hover { color: var(--ink); }
+.fold-body { padding: 0 14px 14px; font-size: 13px; color: var(--ink-2); }
+.fold-body pre { white-space: pre-wrap; word-break: break-word; font-size: 11.5px; line-height: 1.5; margin: 0; color: var(--ink-2); }
+
+/* ============================================================== tooltip === */
+
+#tip {
+  position: fixed; z-index: 200; pointer-events: none; opacity: 0;
+  transform: translate(-50%, -100%); transition: opacity 90ms linear;
+  background: var(--ink); color: var(--surface); border-radius: 6px;
+  padding: 7px 10px; font-size: 12px; line-height: 1.45; max-width: 340px;
+  box-shadow: 0 6px 22px rgba(0,0,0,0.22); white-space: pre-line;
+}
+#tip.on { opacity: 1; }
+#tip b { color: #fff; }
+:root[data-theme="dark"] #tip { background: #f1f2f4; color: #16181c; }
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) #tip { background: #f1f2f4; color: #16181c; }
+}
+
+/* =============================================================== misc ==== */
+
+.muted { color: var(--muted); }
+.small { font-size: 12.5px; }
+.mt0 { margin-top: 0; } .mt8 { margin-top: 8px; } .mt16 { margin-top: 16px; } .mt28 { margin-top: 28px; }
+.row-between { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.stack { display: flex; flex-direction: column; gap: 14px; }
+.inline-list { display: flex; gap: 8px; flex-wrap: wrap; }
+.loading { color: var(--muted); font-size: 13px; padding: 30px 0; }
+.footer { border-top: 1px solid var(--rule); margin-top: 46px; padding-top: 16px; color: var(--muted); font-size: 12px; }
+
+/* ========================================================== narrow viewports ==
+ * Everything above is written for a desktop column.  The rules below are the
+ * only place this report adapts, and they exist because three constructs stop
+ * working as the viewport narrows:
+ *
+ *   1. the bar charts, whose label and value columns are fixed px and eat the
+ *      whole row before the bar gets any width — this is the real breakage;
+ *   2. the pattern list, which is `position: sticky` and becomes a full-width
+ *      wall above the content once .pat-layout collapses to one column;
+ *   3. page and card padding, which is tuned for 1280px and wastes a phone.
+ *
+ * Tables and the outcome matrix already scroll (`.table-wrap`, `.matrix` carry
+ * `overflow-x: auto`), so they are deliberately left alone — a wide table is
+ * better scrolled than reflowed, and reflowing it would break the column
+ * alignment the numbers are read by.
+ * ============================================================================ */
+
+/* ---- 900px: the pattern sidebar stops being a sidebar ---------------------- */
+@media (max-width: 900px) {
+  /* The header, which is the worst of the narrow-width breakage.  `.tabs` is
+   * `flex: 1`, i.e. flex-basis 0 — so once the brand and the theme button have
+   * taken their width the tabs are left with almost none and wrap to ONE TAB
+   * PER LINE, turning the header into a ~330px vertical column.
+   *
+   * The fix is to give the tabs a row of their own (`flex: 1 0 100%`) rather
+   * than a share of the brand's row.  They then wrap horizontally and every tab
+   * stays visible — which a horizontal scroll strip would not have done.  It
+   * starts here rather than lower down because at 768px the shared row already
+   * fits only two tabs per line. */
+  .topbar-in { padding: 8px 24px; gap: 7px 12px; min-height: 0; align-items: center; }
+  .brand { order: 1; flex: 1 1 auto; min-width: 0; }
+  .icon-btn { order: 2; flex: none; }
+  .tabs { order: 3; flex: 1 0 100%; gap: 3px; }
+
+  /* .pat-layout collapses to 1fr at this width (see the patterns section).  The
+   * list must also stop sticking, or 23 patterns pin themselves over the page.
+   * Once it is a wrapped row of chips the height cap and its scrollbar have to
+   * come off too, or the chips get their own pointless inner scroll. */
+  .pat-list {
+    position: static; flex-direction: row; flex-wrap: wrap;
+    gap: 4px; margin-bottom: 6px;
+    max-height: none; overflow-y: visible; padding-right: 0;
+  }
+  .pat-list > .eyebrow { position: static; flex: 1 0 100%; margin: 0 0 2px; padding: 0; }
+  .pat-item { flex-direction: row; align-items: baseline; gap: 6px; padding: 6px 9px; }
+  .pat-item .pnm { display: none; }   /* the id is enough once they are chips */
+}
+
+/* ---- 720px: reclaim the chart rows ---------------------------------------- */
+@media (max-width: 720px) {
+  .wrap { padding: 22px 16px 70px; }
+
+  .topbar-in { padding: 8px 16px; }
+  .tab { padding: 6px 10px; font-size: 13px; }
+
+  .dbar-row { grid-template-columns: 104px 1fr 66px; gap: 8px; }
+  .dumb-row { grid-template-columns: 104px 1fr 104px; gap: 8px; }
+  .bar-row  { grid-template-columns: 88px 1fr 60px; gap: 8px; }
+  .dbar-name { font-size: 11.5px; }
+  .dumb-val { font-size: 10.5px; }
+
+  .card { padding: 15px 16px; }
+  .chart { padding: 15px 16px 14px; }
+  .filters { padding: 11px 13px; gap: 13px; }
+}
+
+/* ---- 560px: phone.  The bar rows stack: label over the bar ----------------- */
+@media (max-width: 560px) {
+  .wrap { padding: 18px 13px 60px; }
+  .difflines, .difflines.asm { max-height: 60vh; font-size: 11px; }
+  .topbar-in { padding: 7px 13px; }
+  .brand-name { font-size: 14px; }
+  .brand-sub { display: none; }   /* "performance ↔ memory-safety, measured" needs a row of its own here */
+  h1 { font-size: 24px; }
+  h2 { font-size: 18.5px; }
+  .lede { font-size: 15.5px; }
+  .intro-p { font-size: 14.5px; }
+
+  /* A fixed label column cannot survive here: at 13px padding there are ~334px
+   * to divide, and the desktop row spends 264 of them before the bar starts.
+   * So the name gets its own line and the bar gets the full width. */
+  .dbar-row, .dumb-row, .bar-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "name val" "track track";
+    gap: 2px 8px; padding: 5px 0;
+  }
+  .dbar-name, .bar-lab { grid-area: name; overflow: visible; white-space: normal; }
+  .dbar-val, .dumb-val, .bar-val { grid-area: val; }
+  .dbar-track, .dumb-track, .bar-track { grid-area: track; }
+  .dbar-rows, .bars { gap: 4px; }
+  .bars.small .bar-row { grid-template-columns: 1fr auto; gap: 2px 6px; }
+
+  /* the ladder's rung ids read better inline once the rows have stacked */
+  .lv-id { padding-top: 13px; }
+
+  .kpi-value { font-size: 24px; }
+  .next-card { padding: 13px 14px; }
+  #tip { max-width: min(340px, calc(100vw - 24px)); }
+}
+
+/* ---- 400px: smallest phones ---------------------------------------------- */
+@media (max-width: 400px) {
+  .wrap { padding: 16px 10px 52px; }
+  .topbar-in { padding: 6px 10px; }
+  .tab { padding: 5px 7px; font-size: 12px; }
+  h1 { font-size: 21px; }
+  .card, .chart { padding: 13px 13px 12px; }
+  .cell { width: 52px; height: 27px; }
+}
+
+/* ================================================================ paper === */
+/* `paper_vers/` rendered by paper.js. A reading column, not a dashboard: the
+ * measure is capped near 72ch because this is the one view on the site that is
+ * meant to be read start to finish rather than scanned. */
+
+.pp-title { margin-bottom: 4px; }
+.pp-sub { color: var(--muted); font-size: 15px; max-width: 74ch; margin: 0 0 4px; }
+.pp-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 14px 0 18px; }
+
+.pp-layout { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 30px; align-items: start; }
+.pp-layout > * { min-width: 0; }
+
+/* the outline is a nav, and like the pattern list it must carry its own
+ * scrollbar or a long paper makes the last section unreachable without
+ * scrolling the whole page */
+.pp-outline {
+  position: sticky; top: 76px; display: flex; flex-direction: column; gap: 1px;
+  max-height: calc(100vh - 110px); overflow-y: auto; padding-right: 4px;
+}
+.pp-ol {
+  display: block; padding: 3px 6px; border-radius: var(--radius-sm);
+  font-size: 12.5px; color: var(--ink-2); text-decoration: none; line-height: 1.35;
+}
+.pp-ol:hover { background: var(--surface-2); color: var(--ink); }
+.pp-ol.sub { padding-left: 18px; color: var(--muted); font-size: 12px; }
+.pp-olnum { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+.pp-body { max-width: 74ch; }
+.pp-h2 { font-size: 20px; margin: 34px 0 10px; scroll-margin-top: 84px; }
+.pp-h3 { font-size: 16px; margin: 24px 0 8px; scroll-margin-top: 84px; }
+.pp-secnum { font-family: var(--mono); font-size: 0.78em; color: var(--muted); }
+.pp-p { font-size: 14.5px; line-height: 1.68; margin: 0 0 13px; color: var(--ink-2); }
+.pp-list { font-size: 14.5px; line-height: 1.62; color: var(--ink-2); margin: 0 0 13px; padding-left: 22px; }
+.pp-list li { margin-bottom: 5px; }
+.pp-quote {
+  margin: 0 0 14px; padding: 2px 0 2px 15px; border-left: 3px solid var(--rule);
+  color: var(--muted); font-size: 14px; line-height: 1.6;
+}
+.pp-code {
+  background: var(--surface-2); border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm); padding: 11px 13px; overflow-x: auto;
+  font-size: 12.5px; line-height: 1.5; margin: 0 0 14px;
+}
+
+/* A live value. It is marked because the distinction is the format's whole
+ * point: this number came from data/index.json at build time, the sentence
+ * around it did not, and a reader is entitled to know which is which. */
+.pp-num {
+  font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink);
+  border-bottom: 1px dotted var(--rule); cursor: help;
+}
+.pp-bad { color: var(--critical); font-family: var(--mono); font-size: 0.9em; }
+.pp-ref, .pp-cite { color: var(--accent); text-decoration: none; }
+.pp-ref:hover, .pp-cite:hover { text-decoration: underline; }
+.pp-cite { font-size: 0.92em; }
+.pp-src {
+  font-size: 11px; color: var(--muted); background: var(--surface-2);
+  border: 1px solid var(--hairline); border-radius: 3px; padding: 0 4px; cursor: help;
+}
+.pp-pat { font-family: var(--mono); font-size: 0.92em; color: var(--ink-2); }
+.pp-todo {
+  background: var(--warning); color: #241a00; font-weight: 650; font-size: 11.5px;
+  border-radius: 3px; padding: 1px 6px;
+}
+
+/* environments — the paper's spine */
+.pp-env { margin: 0 0 18px; border-radius: var(--radius); border: 1px solid var(--rule); }
+.pp-envh { padding: 9px 15px 0; }
+.pp-envl {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.075em;
+  font-weight: 700; color: var(--muted);
+}
+.pp-envt { font-size: 12.5px; font-weight: 620; color: var(--ink-2); }
+.pp-envb { padding: 7px 15px 3px; }
+.pp-envb .pp-p:last-child, .pp-envb .pp-list:last-child { margin-bottom: 10px; }
+
+.pp-abstract { background: var(--surface-2); }
+.pp-abstract .pp-p { font-size: 14px; }
+/* a principle is the one thing a reader should be able to find by scanning, so
+ * it gets the accent edge and nothing else does */
+.pp-principle { border-left: 3px solid var(--accent); background: var(--surface); }
+.pp-principle .pp-p { color: var(--ink); }
+.pp-example { background: var(--surface-2); border-style: dashed; }
+.pp-takeaway { border-left: 3px solid var(--good); background: var(--surface); }
+.pp-caveat { border-left: 3px solid var(--warning); background: var(--surface); }
+.pp-retraction { border-left: 3px solid var(--critical); background: var(--surface); }
+/* ⚠ This rule was written as `.pp-quote-env` and matched NOTHING — `paper.js`
+ * emits `div.pp-env.pp-quote`, so a quote environment was drawing the generic
+ * environment's full box on top of `.pp-quote`'s left rule. Named correctly it
+ * needs the left rule restated, because `.pp-env.pp-quote` outranks both. */
+.pp-env.pp-quote { border: 0; border-left: 3px solid var(--rule); }
+.pp-envcite {
+  padding: 0 15px 9px; font-size: 11.5px; color: var(--muted);
+  font-family: var(--mono);
+}
+
+.pp-fig {
+  margin: 0 0 20px; padding: 14px 15px 11px; border: 1px solid var(--rule);
+  border-radius: var(--radius); background: var(--surface);
+}
+.pp-figbody { overflow-x: auto; }
+.pp-cap { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin-top: 10px; }
+.pp-figlab { font-weight: 700; color: var(--ink-2); }
+.pp-figmiss { color: var(--muted); font-style: italic; font-size: 12.5px; padding: 16px 0; }
+
+.pp-bib { display: flex; flex-direction: column; gap: 7px; max-width: 74ch; }
+.pp-bibitem { font-size: 13px; line-height: 1.55; color: var(--ink-2); }
+
+/* The editorial note, collapsed, at the very bottom of the Paper tab.  It is
+   deliberately quiet: the paper is the artefact, this is a note about how the
+   paper was built.  Same measure as the bibliography above it. */
+.pp-framing { padding: 0 14px 14px; max-width: 74ch; font-size: 13px; line-height: 1.6; color: var(--ink-2); }
+.pp-bibkey { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+/* Narrow: the outline stops being a sidebar and becomes a lead-in. It is not
+ * hidden — on a phone it is the only way to see the paper's shape. */
+@media (max-width: 900px) {
+  .pp-layout { grid-template-columns: 1fr; gap: 18px; }
+  .pp-outline {
+    position: static; max-height: none; overflow: visible;
+    border: 1px solid var(--rule); border-radius: var(--radius); padding: 11px 12px;
+    background: var(--surface-2);
+  }
+  .pp-body { max-width: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE TALK — a 16:9 deck as a banner figure at the top of the paper.
+
+   Two states and one geometry.  Banner: an aspect-ratio box in the page flow,
+   so it cannot push the paper's own first sentence below the fold.  Expanded:
+   `position: fixed` over the whole viewport, which is what "full viewport"
+   means on a page that must keep working without the Fullscreen API.
+
+   ⚠ Type scales with the BOX, not with the page (`cqw` against the deck's own
+   container), so one set of rules serves a 900px banner and a 4K projector.
+   Without container units the banner needs a second, hand-tuned scale and the
+   two drift.  Fallback below for browsers without container queries.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.deck-wrap { margin: 0 0 26px; }
+.deck-cap { display: flex; align-items: baseline; gap: 9px; margin-bottom: 7px; }
+.deck-caplab {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .09em; text-transform: uppercase;
+  color: var(--surface); background: var(--ink); padding: 2px 7px; border-radius: 3px;
+}
+.deck-captext { font-size: 12.5px; color: var(--muted); }
+
+.deck {
+  container-type: inline-size;
+  border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;
+  background: var(--surface-2);
+}
+.deck-stage { aspect-ratio: 16 / 9; position: relative; background: var(--surface); }
+
+/* Expanded: own the viewport.  The stage drops its aspect box and fills, so a
+   projector at any ratio gets the whole screen rather than a pillarboxed 16:9. */
+.deck-wrap.is-full {
+  position: fixed; inset: 0; z-index: 90; margin: 0;
+  background: var(--plane); display: flex; flex-direction: column;
+}
+.deck-wrap.is-full .deck-cap { display: none; }
+.deck-wrap.is-full .deck { flex: 1; border: 0; border-radius: 0; display: flex; flex-direction: column; }
+.deck-wrap.is-full .deck-stage { aspect-ratio: auto; flex: 1; }
+
+/* ── the slide ── */
+.slide {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  padding: 4.2cqw 5cqw 3.4cqw; box-sizing: border-box;
+}
+.sl-qbar {
+  display: flex; align-items: baseline; gap: .9cqw; flex: 0 0 auto;
+  padding-bottom: 1.4cqw; margin-bottom: 2cqw; border-bottom: 1px solid var(--rule);
+}
+.sl-qbar.empty { border: 0; padding: 0; margin: 0; }
+.sl-qlab {
+  font-family: var(--mono); font-size: 1.05cqw; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); flex: 0 0 auto;
+}
+.sl-qtext { font-size: 1.65cqw; line-height: 1.35; color: var(--ink-2); font-style: italic; }
+
+.sl-body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 1.8cqw; }
+.sl-mid { flex: 1; min-height: 0; display: flex; flex-direction: column;
+          align-items: flex-start; justify-content: center; gap: 1.6cqw; }
+
+.sl-head { font-size: 2.5cqw; line-height: 1.28; font-weight: 620; color: var(--ink); max-width: 46ch; }
+.sl-head.t-warn { color: var(--ink); border-left: .35cqw solid var(--series-2); padding-left: 1.2cqw; }
+
+.sl-ul { margin: 0; padding: 0 0 0 1.6cqw; display: flex; flex-direction: column; gap: 1.05cqw; }
+.sl-ul.wide { gap: 1.6cqw; }
+.sl-li { font-size: 1.62cqw; line-height: 1.5; color: var(--ink-2); max-width: 62ch; }
+.sl-li::marker { color: var(--deemph); }
+.sl-li strong { color: var(--ink); font-weight: 640; }
+
+.sl-aside {
+  margin-top: auto; font-size: 1.42cqw; line-height: 1.5; color: var(--muted);
+  border-top: 1px dashed var(--rule); padding-top: 1.2cqw; max-width: 74ch;
+}
+.sl-aside strong { color: var(--ink-2); }
+
+/* title / ask / end — the full-bleed kinds */
+.sl-title { font-size: 4.1cqw; line-height: 1.14; font-weight: 680; color: var(--ink); max-width: 21ch; }
+.sl-title.sm { font-size: 2.9cqw; max-width: 30ch; }
+.sl-sub { font-size: 1.85cqw; line-height: 1.45; color: var(--ink-2); max-width: 56ch; }
+.sl-foot { font-family: var(--mono); font-size: 1.2cqw; color: var(--muted); margin-top: 1cqw; }
+.sl-askmark { font-size: 7cqw; line-height: .6; color: var(--deemph); font-family: Georgia, serif; }
+.sl-ask { font-size: 3.6cqw; line-height: 1.2; font-weight: 640; color: var(--ink); max-width: 24ch; }
+.sl-cue { font-family: var(--mono); font-size: 1.15cqw; color: var(--muted); }
+.sl-quote { font-size: 2.4cqw; line-height: 1.35; color: var(--ink); max-width: 40ch; font-style: italic; }
+.sl-qsrc { font-size: 1.35cqw; color: var(--muted); max-width: 64ch; }
+
+/* table + code, sharing the site's own type and token colours */
+.sl-tw { overflow: auto; min-height: 0; }
+.sl-tbl { width: 100%; border-collapse: collapse; font-size: 1.42cqw; }
+.sl-tbl th {
+  text-align: left; font-family: var(--mono); font-size: 1.08cqw; font-weight: 500;
+  letter-spacing: .05em; text-transform: uppercase; color: var(--muted);
+  padding: 0 1.1cqw .7cqw 0; border-bottom: 1px solid var(--rule); white-space: nowrap;
+}
+.sl-tbl td { padding: .72cqw 1.1cqw .72cqw 0; border-bottom: 1px solid var(--grid); color: var(--ink-2); vertical-align: top; }
+.sl-tbl td.num, .sl-tbl th.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.sl-tbl tr.hi td { background: var(--accent-wash); color: var(--ink); }
+.sl-tbl td strong { color: var(--ink); }
+.sl-code {
+  margin: 0; padding: 1.4cqw 1.6cqw; background: var(--surface-2);
+  border: 1px solid var(--rule); border-radius: 5px; overflow: auto;
+  font-family: var(--mono); font-size: 1.35cqw; line-height: 1.55;
+}
+.sl-num { position: absolute; right: 1.8cqw; bottom: 1.2cqw;
+          font-family: var(--mono); font-size: 1.05cqw; color: var(--deemph); }
+
+/* ── the bar ── */
+.deck-bar {
+  display: flex; align-items: center; gap: 8px; padding: 7px 9px;
+  border-top: 1px solid var(--rule); background: var(--surface-2); flex: 0 0 auto;
+}
+.deck-b {
+  font-family: var(--mono); font-size: 12px; line-height: 1; cursor: pointer;
+  color: var(--ink-2); background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 4px; padding: 6px 10px; min-width: 30px;
+}
+.deck-b.wide { min-width: 0; margin-left: auto; }
+.deck-b:hover:not([disabled]) { border-color: var(--accent); color: var(--accent); }
+.deck-b[disabled] { opacity: .38; cursor: default; }
+.deck-prog { flex: 0 1 190px; height: 3px; background: var(--grid); border-radius: 2px; overflow: hidden; }
+.deck-progfill { height: 100%; background: var(--accent); }
+.deck-sec {
+  font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; flex: 1 1 auto; min-width: 0;
+}
+
+/* Without container queries the cqw sizes collapse, so pin a readable scale off
+   the viewport instead.  Measured on the narrow end: the banner stays legible
+   and the expanded deck is unaffected because it fills the viewport anyway. */
+@supports not (container-type: inline-size) {
+  .sl-head { font-size: 22px; } .sl-li, .sl-qtext { font-size: 15px; }
+  .sl-title { font-size: 34px; } .sl-ask { font-size: 30px; }
+  .sl-sub { font-size: 17px; } .sl-quote { font-size: 21px; }
+  .sl-aside, .sl-tbl, .sl-code { font-size: 13px; }
+  .sl-qlab, .sl-foot, .sl-cue, .sl-num, .sl-tbl th { font-size: 10.5px; }
+  .slide { padding: 26px 30px 22px; }
+}
