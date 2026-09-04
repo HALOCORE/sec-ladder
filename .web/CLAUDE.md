@@ -89,12 +89,21 @@ by the ccneo server the user runs. Views are hash-routed (`#cost`,
    correct, fully qualified, and unreadable. ⚠ **If a figure needs a qualifier it
    cannot carry, cut the figure, not the qualifier** — and *"the reader was
    confused by X"* never means *"explain X better"*.
-1. **Never write outside `.web/`.** The parent is an active research tree; a
-   `git status` there must be unchanged by anything you run. `build_data.py`
-   routes every write through `_out()`, which refuses any path outside this
-   directory — keep it that way, and keep `index.stdio.py` read-only upstream.
-   This directory is **its own git repo** — commit here when the user asks for it,
-   and never run a history-mutating git command in the parent.
+1. **Never write outside `.web/`.** The tree above is active research; nothing
+   you run may modify a file in it. `build_data.py` routes every write through
+   `_out()`, which refuses any path outside this directory — keep it that way,
+   and keep `index.stdio.py` read-only upstream.
+   ⚠ **This directory is no longer its own git repo.** It was gitignored and
+   kept a separate local history until it was folded into the research
+   repository; that history is preserved as a backup under `../.temp/`. So a
+   commit here is a commit to the *research* repository, and the rules that
+   govern it are the parent's: **commit at task boundaries, subagents never
+   commit, and do not push** — there is a GitHub remote and pushing is the
+   user's call.
+   ⚠ **What this changed, and it is the part that bites:** a `git status` in
+   the parent now legitimately shows your edits, so it is no longer the signal
+   that you have stayed in your lane. Use `git status --porcelain -- . ':!.web'`
+   — anything it prints is a file you should not have touched.
 2. **Never hard-code a count, a pattern name, or a claim that the data can
    settle.** "13 patterns", "47 catalogued" and "byte-identical on every
    pattern" were all true when written and all false within days. Derive from

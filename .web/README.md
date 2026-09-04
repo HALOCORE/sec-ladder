@@ -8,9 +8,10 @@ caveats.
 **Nothing in this directory writes outside it.** `build_data.py` routes every
 write through one `_out()` helper that refuses any path outside `.web/`;
 `index.stdio.py` reads repository files and never writes one. Running anything
-here leaves the parent repository's `git status` unchanged — which matters,
-because that tree is under active research by other agents. `.web/` is ignored
-by the parent and keeps its own git history.
+here leaves every file in the research tree untouched — which matters, because
+that tree is under active research by other agents. `.web/` is part of the
+sec-ladder repository (it was gitignored with its own local history until it
+was folded in), so a commit here is a commit to that repository.
 
 **Three docs, three audiences:** this file is how to run and read it,
 [`CLAUDE.md`](./CLAUDE.md) is the rules for an agent editing it, and

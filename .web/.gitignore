@@ -1,6 +1,8 @@
-# `.web/` is ignored by the repository root .gitignore, so this directory is its
-# own local git repo.  This file keeps the derived and the ephemeral out of that
-# history: what stays is source, what a script can rebuild goes.
+# This directory is part of the sec-ladder repository (it was gitignored and had
+# its own local history until it was folded in).  This file keeps the derived and
+# the ephemeral out of that history: what stays is source, what a script can
+# rebuild goes -- the same rule the root .gitignore uses for .temp/ and
+# patterns/*/inputs/*.bin.
 #
 # Everything under data/ is DERIVED — `python3 .web/build_data.py` rebuilds it
 # from results/ and patterns/ in a second.  Keep the generator, drop the artefact.
