@@ -1,0 +1,12 @@
+{
+  "short": "F",
+  "current": true,
+  "title": "One Bug, Six Versions: What Memory Safety Costs and What It Guarantees",
+  "subtitle": "An empirical study of small C programs, each carrying one real bug, rebuilt as hardened C, safe Rust, unsafe Rust and verified Rust — counted to the instruction, attacked, and proved.",
+  "status": "draft",
+  "framing": "**ver_F is a conventional empirical-study paper, in the shape of the bug-study and user-study papers the project keeps as references: abstract, introduction with a summary of findings, methodology with its threats stated up front, three results sections organised by research question, lessons, threats to validity, related work, conclusion.** It exists as its own framing because the organising principle changed again: ver_E argued through a reader's objections, which motivated every section but made the document a dialogue rather than a report, and the owner asked for the readability *and* the rigour of a real research paper. The rigour is the structure a reader of such papers already knows — every result is a numbered **Finding** box of one or two sentences, the evidence sits under it, and the box is the only thing a skimming reader needs — and the readability is the rule the previous versions paid to learn: claim, one concrete picture, so what; each finding demonstrated once; a number that needs a qualifier it cannot carry is cut rather than qualified. Two things are new in the machinery rather than the prose. The corpus figures earlier versions froze as literals — licensed rows, the flat/negative/expensive buckets, the port-versus-tuned median, the hardened-C median — are now derived by the build and written with live values, because every one of them had moved between 26 and 33 programs while nothing warned. And the `finding` environment was added to the renderer so the box a reader skims first is a first-class object with its own number. Kept from ver_D and ver_E: plain words, every term defined at first use, names instead of pattern ids, the hardened-C row wherever plain C is compared with Rust, and every admission of the project's own errors, including the direction they run.",
+  "authors": [
+    "sec-ladder"
+  ],
+  "date": "2026-09"
+}

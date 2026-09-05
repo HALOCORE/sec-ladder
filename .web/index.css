@@ -1384,6 +1384,13 @@ details.fold > summary:hover { color: var(--ink); }
  * it gets the accent edge and nothing else does */
 .pp-principle { border-left: 3px solid var(--accent); background: var(--surface); }
 .pp-principle .pp-p { color: var(--ink); }
+/* a finding is the empirical-study twin of a principle: the box a reader skims
+ * first.  Same accent edge and ink as a principle, so the two read as one
+ * family; the body is set slightly heavier because a finding is one sentence
+ * and is meant to be quotable.  ⚠ Not visually verified on this box (rule 6):
+ * it copies the principle rule with one weight change. */
+.pp-finding { border-left: 3px solid var(--accent); background: var(--surface); }
+.pp-finding .pp-p { color: var(--ink); font-weight: 560; }
 .pp-example { background: var(--surface-2); border-style: dashed; }
 .pp-takeaway { border-left: 3px solid var(--good); background: var(--surface); }
 .pp-caveat { border-left: 3px solid var(--warning); background: var(--surface); }

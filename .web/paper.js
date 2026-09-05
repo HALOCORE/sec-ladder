@@ -107,7 +107,10 @@
 
   // -------------------------------------------------------------- blocks ---
 
-  const ENVS = ["abstract", "principle", "example", "takeaway", "caveat",
+  // `finding` is the empirical-study box — "Finding 3 — short name", numbered
+  // independently like a principle, because a reader of that kind of paper
+  // refers to "Finding 3" and skims the boxes before reading anything else.
+  const ENVS = ["abstract", "principle", "example", "finding", "takeaway", "caveat",
                 "retraction", "quote"];
 
   function parseBlocks(src) {
@@ -253,7 +256,7 @@
   function number(blocks) {
     const labels = {};
     const outline = [];
-    let sec = 0, sub = 0, prin = 0, exa = 0, fig = 0;
+    let sec = 0, sub = 0, prin = 0, exa = 0, fig = 0, fnd = 0;
     let pendingKind = null, pendingNum = null, pendingText = null;
 
     for (const b of blocks) {
@@ -274,11 +277,14 @@
       } else if (b.t === "env-open" && b.env === "example") {
         exa++; b.num = String(exa);
         pendingKind = "example"; pendingNum = "Example " + exa; pendingText = b.arg;
+      } else if (b.t === "env-open" && b.env === "finding") {
+        fnd++; b.num = String(fnd);
+        pendingKind = "finding"; pendingNum = "Finding " + fnd; pendingText = b.arg;
       } else if (b.t === "label") {
         if (pendingKind) labels[b.id] = { num: pendingNum, text: pendingText, kind: pendingKind };
       }
     }
-    return { labels, outline, counts: { sec, prin, exa, fig } };
+    return { labels, outline, counts: { sec, prin, exa, fig, fnd } };
   }
 
   // --------------------------------------------------------------- render --
@@ -344,14 +350,16 @@
       abstract: ["Abstract"],
       principle: ["Principle " + e.num],
       example: ["Example " + e.num],
+      finding: ["Finding " + e.num],
       takeaway: ["In short"],
       caveat: e.arg ? argNodes : ["Caveat"],
       retraction: ["Retracted — ", ...argNodes],
       quote: null,
     }[e.env];
     const id = e.env === "principle" ? "pp-Principle " + e.num
-             : e.env === "example" ? "pp-Example " + e.num : undefined;
-    const named = (e.env === "principle" || e.env === "example") && e.arg;
+             : e.env === "example" ? "pp-Example " + e.num
+             : e.env === "finding" ? "pp-Finding " + e.num : undefined;
+    const named = (e.env === "principle" || e.env === "example" || e.env === "finding") && e.arg;
     // ⚠ `quote` is the one environment whose argument is an ATTRIBUTION rather
     // than a heading, so it renders BELOW the quotation instead of above it —
     // and it renders at all, which it did not. `head` is null for `quote`, so

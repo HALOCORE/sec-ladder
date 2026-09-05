@@ -425,7 +425,7 @@ def layout_effect() -> dict:
 # quotes a number the data no longer has is exactly the failure this whole
 # project keeps having, so it is a build error and not a warning.
 
-FIGURE_IDS = {"ladder", "spread", "outcomes", "tcb", "rungcost", "identity"}
+FIGURE_IDS = {"ladder", "spread", "outcomes", "tcb", "rungcost", "identity", "programs"}
 _RE_INPUT = re.compile(r"^\s*\\input\{([^}]+)\}\s*$", re.M)
 _RE_NUM = re.compile(r"\\num\{([^}]+)\}")
 _RE_LABEL = re.compile(r"\\label\{([^}]+)\}")
@@ -435,6 +435,7 @@ _RE_FIG = re.compile(r"\\figure\{([^}]+)\}")
 _RE_TODO = re.compile(r"\\todo\{")
 _RE_PRINCIPLE = re.compile(r"\\begin\{principle\}")
 _RE_EXAMPLE = re.compile(r"\\begin\{example\}")
+_RE_FINDING = re.compile(r"\\begin\{finding\}")
 
 
 def _paper_resolve(root: str, rel: str, seen: list, errs: list) -> str:
@@ -610,6 +611,7 @@ def build_paper(index: dict, quiet: bool) -> dict:
         stats = {"words": words, "todos": len(_RE_TODO.findall(body)),
                  "principles": len(_RE_PRINCIPLE.findall(body)),
                  "examples": len(_RE_EXAMPLE.findall(body)),
+                 "findings": len(_RE_FINDING.findall(visible)),
                  "sections": len(re.findall(r"\\section\{", body))}
         rec = {"id": v, "meta": meta, "body": body, "refs": refs,
                "nums": nums, "stats": stats, "errors": errs}
@@ -620,8 +622,8 @@ def build_paper(index: dict, quiet: bool) -> dict:
                  + ("…" if len(errs) > 3 else ""))
         if not quiet:
             print(f"  paper {v:14s} {stats['words']:6d} words · {stats['sections']} sections · "
-                  f"{stats['principles']} principles · {stats['examples']} examples · "
-                  f"{stats['todos']} todo · {len(errs)} error(s)")
+                  f"{stats['findings']} findings · {stats['principles']} principles · "
+                  f"{stats['examples']} examples · {stats['todos']} todo · {len(errs)} error(s)")
     return out
 
 
@@ -1157,8 +1159,18 @@ def main() -> int:
     # kind of number this project has watched go stale.
     san_expect_fires = san_fired = san_expect_clean = san_clean = 0
     pd_inputs = pd_calls = pd_ok = 0
+    adv_inputs = adv_zero_call = 0
     for r in rows:
         det_p = json.loads(open(_out(f"data/patterns/{r['id']}.json"), encoding="utf-8").read())
+        # hostile inputs that never reach the measured function: the shared
+        # driver rejects the file first, so every version agrees trivially.  The
+        # research names this a real weakness (SYNTHESIS §7) and a paper that
+        # quotes the hostile-run total owes the reader this fraction beside it.
+        for name, rec in (det_p.get("inputs") or {}).items():
+            if name.startswith("adversarial"):
+                adv_inputs += 1
+                if not (rec.get("calls") or 0):
+                    adv_zero_call += 1
         for rec in (det_p.get("sanitizer") or {}).values():
             if rec.get("expect") == "fires":
                 san_expect_fires += 1
@@ -1177,6 +1189,9 @@ def main() -> int:
     totals["sanitizer"] = {"declared_fires": san_expect_fires, "fired": san_fired,
                            "declared_clean": san_expect_clean, "clean": san_clean}
     totals["proof_domain"] = {"inputs": pd_inputs, "calls": pd_calls, "requires_ok": pd_ok}
+    totals["adversarial_inputs"] = adv_inputs
+    totals["adversarial_zero_call"] = adv_zero_call
+    totals["adversarial_zero_call_pct"] = round(100.0 * adv_zero_call / adv_inputs) if adv_inputs else 0
 
     # How much text a proof costs, in the unit a reader can budget in.  Counted
     # here rather than quoted, because it is the figure a verification decision
@@ -1338,6 +1353,91 @@ def main() -> int:
     insights = run_insights()
     lic = licence_table()
     lic_ch = licence_c_hardening()
+
+    # ── the corpus figures a paper otherwise FREEZES, derived here instead ──
+    #
+    # ver_E carried "22 licensed rows", "9 / 4 / 9", "7.26x over 17" and
+    # "median 24" as literals against 26 patterns; at 33 every one of them had
+    # moved (23, 9 / 4 / 10, 6.75x over 18, ~19).  Nothing warned, because a
+    # literal is invisible to `\num{}`.  The same arithmetic `synthesis/census.py`
+    # runs over results/synthesis.md is run here over the kernel-exclusive column
+    # and the parsed licence, so a paper can write \num{totals.buckets.flat} and
+    # be told the day it changes.  PASSING patterns only, `-O3 isolated`, the
+    # SHIPPED cells — the searched-value arm is the research's to publish.
+    def _kern(r, inp, cell):
+        row = (r.get("kern") or {}).get(f"isolated/{inp}") or {}
+        c = (row.get("cells") or {}).get(cell)
+        return None if c is None else c.get("delta")
+
+    def _median(xs):
+        xs = sorted(xs)
+        if not xs:
+            return None
+        m = len(xs) // 2
+        return xs[m] if len(xs) % 2 else (xs[m - 1] + xs[m]) / 2
+
+    lic34 = (lic or {}).get("R3-R4", {})
+    licensed = [r for r in pas if lic34.get(r["id"]) == "LICENSED"]
+    flat = neg = big = neg_not_flat = 0
+    ratios, smalls, larges = [], [], []
+    for r in licensed:
+        s3, l3 = _kern(r, "small.bin", "safe_tuned"), _kern(r, "large.bin", "safe_tuned")
+        if s3 is None or l3 is None:
+            continue
+        smalls.append(s3)
+        larges.append(l3)
+        is_flat = abs(s3) <= 32 and abs(l3) <= 32
+        is_neg = s3 < 0 and l3 < 0
+        flat += 1 if is_flat else 0
+        neg += 1 if is_neg else 0
+        neg_not_flat += 1 if (is_neg and not is_flat) else 0
+        if s3 > 100 or l3 > 100:
+            big += 1
+        l2 = _kern(r, "large.bin", "safe_naive")
+        if l3 > 0 and l2 is not None:
+            ratios.append(l2 / l3)
+    # `flat` and `expensive` are disjoint by construction (|v| <= 32 and v > 100
+    # cannot both hold), so `between` partitions the licensed rows with them;
+    # `negative` overlaps `flat`, which is why a paper must not add it in.
+    totals["buckets"] = {"licensed": len(licensed), "flat": flat, "negative": neg,
+                         "negative_not_flat": neg_not_flat,
+                         "between": len(licensed) - flat - big,
+                         "expensive": big, "unlicensed": len(pas) - len(licensed),
+                         # the tuned-safe-minus-unsafe median itself, per input,
+                         # so "about what hardened C costs" can be sized honestly
+                         "median_small": round(_median(smalls)) if smalls else None,
+                         "median_large": round(_median(larges)) if larges else None}
+    med = _median(ratios)
+    srt = sorted(ratios)
+    half = len(srt) // 2
+    q1 = _median(srt[:half]) if half else None
+    q3 = _median(srt[-half:]) if half else None
+    totals["r2_over_r3"] = {"rows": len(ratios),
+                            "median": round(med, 2) if med is not None else None,
+                            "median_int": round(med) if med is not None else None,
+                            "q1": round(q1, 1) if q1 is not None else None,
+                            "q3": round(q3) if q3 is not None else None,
+                            "not_overstated": sum(1 for x in ratios if x < 1)}
+
+    # hardened C minus plain C, within one compiler, both inputs — the "what does
+    # the same check cost in C" figure, whose median the paper used to freeze.
+    hard = {}
+    for cc in ("gcc", "clang"):
+        ds, negp = [], set()
+        for r in pas:
+            for inp in ("small.bin", "large.bin"):
+                a, b = _kern(r, inp, f"c-{cc}"), _kern(r, inp, f"c-{cc}-h")
+                if a is None or b is None:
+                    continue
+                ds.append(b - a)
+                if b - a < 0:
+                    negp.add(r["id"])
+        if ds:
+            hard[cc] = {"rows": len(ds), "median": round(_median(ds), 1),
+                        "median_int": round(_median(ds)), "min": round(min(ds)),
+                        "max": round(max(ds)), "negative_patterns": len(negp)}
+    hard["patterns"] = sum(1 for r in pas if _kern(r, "small.bin", "c-gcc-h") is not None)
+    totals["hardened"] = hard
     # Count what the page will have to disclose, and say it at build time too.
     if lic:
         bad = {p: sum(1 for v in rws.values() if v != "LICENSED")

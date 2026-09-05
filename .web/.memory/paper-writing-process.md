@@ -332,3 +332,47 @@ presumes the reader owns our six versions and is differencing pairs on a bench.
 ⚠ **And the meta-lesson, which the owner had to state explicitly: one named
 example is a sample, not the defect.** When told a slide is broken, audit every
 slide against the property that broke it before reporting back.
+
+---
+
+## From ver_F — the lessons that were new
+
+**28. A corpus figure the paper freezes is a bug waiting for the corpus to
+move; derive it in the build instead.** ver_E froze *22 licensed rows*,
+*9/4/9*, *7.26× over 17* and *median 24* against 26 patterns; at 33 every one
+had moved and nothing warned, because `\num{}` only guards paths. The fix was
+not a `%%literal-ok` but thirty lines in `build_data.py` computing the same
+arithmetic the research's `census.py` runs, verified identical, exposed as
+`totals.buckets.*`, `totals.r2_over_r3.*`, `totals.hardened.*`. **If a
+sentence quotes a count over the corpus and the build can compute it, the build
+must compute it.**
+
+**29. A previous version's fact-checked prose is not a source.** The worst
+error in ver_F's first draft — the state machine's sign flip explained
+backwards — was carried verbatim from ver_E, which had passed a fact-check. The
+mechanism had been read off a summary, not off `p19/NOTES.md:375-380`, and the
+summary was compatible with both readings. Same law as the fact pack, one level
+up: **the only thing that counts as verifying a mechanism is opening the
+pattern's notes.**
+
+**30. Check the review artefact itself before handing it to a reviewer.** The
+plain-text render numbered findings per file, so a cold reader met *"Finding 1"*
+three times and reported the paper's cross-references as broken. Real defect,
+wrong object — but it cost the reader trust in the first ten minutes, and a
+worse renderer bug would have invalidated the whole read. **Render, read the
+render, then delegate.**
+
+**31. The coverage-bias reflex recurs, and it recurs on the same item.** The
+research's first synthesis dropped the p02 one-byte overflow — its own
+strongest security result — and had to restore it. ver_F's first draft dropped
+it again, for the same reason (a document organised around *what safety does
+not reach* has no slot for what it does), and only the gaps review noticed.
+**Run the gaps review on every draft, and check the omissions against the list
+of what was dropped last time first.**
+
+**32. Two reviews can each be right and jointly lengthen the paper.** The cold
+read asked for 1,500 words out; the fact-check and gaps review together put
+~900 words of missing evidence in. Both were right. The resolution was to cut
+restatement (bullets, conclusion, duplicated caveats) and keep every evidence
+sentence, and the paper still grew. **Budget for the reviews' additions before
+promising a word count.**

@@ -3033,6 +3033,35 @@ function paperFigure(id) {
     ], "f-id", { num: [1] });
   }
 
+  // every program on one page: the evidence table an empirical paper owes its
+  // reader, so that a cross-program median in the text can be checked by eye.
+  // Kernel-exclusive Ir per call at -O3 isolated, the same column the census
+  // and the paper's live buckets use; a difference the research does not
+  // license for subtraction is shown as a dash rather than a number.
+  if (id === "programs") {
+    const lic = ((d.licence || {})["R3-R4"]) || {};
+    const kd = (p, inp, cell) => {
+      const row = (p.kern || {})[`isolated/${inp}`];
+      const c = row && row.cells && row.cells[cell];
+      return c ? c.delta : null;
+    };
+    const f = (v) => v === null || v === undefined ? "—" : (v >= 0 ? "+" : "") + Math.round(v).toLocaleString("en-US");
+    const rows = d.patterns.map(p => {
+      const ok = lic[p.id] === "LICENSED";
+      const hs = kd(p, "small.bin", "c-clang-h"), hp = kd(p, "small.bin", "c-clang");
+      const hl = kd(p, "large.bin", "c-clang-h"), hq = kd(p, "large.bin", "c-clang");
+      return [pid(p.id), pname(p.id),
+        ok ? f(kd(p, "small.bin", "safe_tuned")) : "—",
+        ok ? f(kd(p, "large.bin", "safe_tuned")) : "—",
+        (hs === null || hp === null) ? "—" : f(hs - hp),
+        (hl === null || hq === null) ? "—" : f(hl - hq),
+        p.identity_o3.equal ? "yes" : "addresses only"];
+    });
+    return dataTable(["", "program", "tuned safe − unsafe, small", "large",
+                      "hardened − plain C (clang), small", "large", "verified ≡ unsafe"],
+      rows, "f-prog", { num: [2, 3, 4, 5] });
+  }
+
   if (id === "tcb") {
     return dataTable(["", "pattern", "obligations", "trusted items", "trusted lines", "twins"],
       d.patterns.map(p => [pid(p.id), pname(p.id), p.verus.verified,
@@ -3158,7 +3187,9 @@ function viewPaper() {
         : ["span.chip.tag", { key: "only" }, cur],
       ["span.chip.tag", { key: "w" }, fmt(stats.words || 0) + " words"],
       ["span.chip.tag", { key: "s" }, (stats.sections || 0) + " sections"],
-      ["span.chip.tag", { key: "p" }, (stats.principles || 0) + " principles · " + (stats.examples || 0) + " examples"],
+      stats.findings
+        ? ["span.chip.tag", { key: "p" }, stats.findings + " findings"]
+        : ["span.chip.tag", { key: "p" }, (stats.principles || 0) + " principles · " + (stats.examples || 0) + " examples"],
       stats.todos ? ["span.chip.warning", { key: "t" }, ["span.dot"], stats.todos + " todo"] : ["span", { key: "nt" }, ""],
     ],
 

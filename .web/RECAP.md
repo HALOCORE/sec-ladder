@@ -32,9 +32,121 @@ For an agent picking this up cold. Read `CLAUDE.md` first (the rules), then this
 | Assembly | `asmcache/` (committed, digest-checked against `results/`), per-instruction source lines, graded **certain / likely / approximate** |
 | Linking | click a source line → its instructions light and scroll; click an instruction → its line lights; cross-language sources laid out by shared-instruction anchors |
 | Guarded notes | `insights/insight_*.py` — prose emitted only while its assertions hold |
-| **Paper** | `paper_vers/ver_X/` → the **Paper** tab, via `paper.js`. One directory per **framing**, not per draft. `\num{}` resolves against `data/index.json` at build time and a bad path **fails the build**. Spec: `paper_vers/README.md`. **Five framings; `ver_E` is current** — a dialogue with a sceptical C developer, every section an objection in their voice. A–D are kept, not edited: each was rejected as a *framing*, and a version is a framing. The tab follows `"current": true` |
+| **Paper** | `paper_vers/ver_X/` → the **Paper** tab, via `paper.js`. One directory per **framing**, not per draft. `\num{}` resolves against `data/index.json` at build time and a bad path **fails the build**. Spec: `paper_vers/README.md`. **Six framings; `ver_F` is current** — a conventional empirical-study paper (abstract · intro with a bulleted summary of findings · methodology · three results sections by research question, each result a numbered **Finding** box · lessons · threats · related work), in the shape of the reference papers under `ref_papers/`. A–E are kept, not edited: each was rejected as a *framing*, and a version is a framing. The tab follows `"current": true` |
 | **The talk** | `slides.js` + `slides_deck.js` + `tools/render_deck.mjs`. **50 slides**, rendered as a 16:9 banner at the top of the Paper tab, `⤢ expand` for the viewport. ⚠ **The engine refuses to build a slide that cannot name the question it answers**, and `check.mjs` renders every slide in both states. Under a hard size cap — see the talk section below |
 | **⚠ `PITFALLS.md`** | **What did not work, ordered by cost. `CLAUDE.md` rule 0.** Every entry shipped with green gates. Read before writing prose or touching the renderer |
+
+### ✅ `paper_vers/ver_F` — BUILT, `"current": true`. A conventional research paper, 11 findings
+
+**Why a sixth framing.** The owner's verdict on A–E was that the write-ups were
+*"mostly far from the kind of easy-to-understand and rigor as in real research
+papers"*, pointing at `ref_papers/` (TaxDC, the NDSS C-to-Rust user study, the
+PLDI skeletons paper). ver_E had motivation (every section an objection) but the
+result was a dialogue, not a report. **ver_F is the shape a reader of those
+papers already knows**, and that familiarity is most of its readability:
+abstract → introduction ending in a bulleted *Summary of findings* (TaxDC §1.2)
+→ methodology with definitions, dataset, measurement and the three rules that
+shape every number → results organised by **three research questions** (cost /
+reach under attack / the proof), each result a numbered **Finding N — short
+name** box of one or two sentences with its evidence beneath → lessons for named
+audiences → threats to validity, every limit with its direction → related work
+→ conclusion.
+
+**What is new in the machinery, and it is the durable part:**
+
+- **`finding{Short name}` environment** in `paper.js` (numbered continuously,
+  like `principle`), `.pp-finding` in `index.css` (copies the principle rule;
+  ⚠ **not visually verified**, rule 6), counted in `build_data.py` stats and
+  shown as a chip on the Paper tab. Documented in `paper_vers/README.md`.
+- **Corpus figures the earlier versions FROZE are now derived and live.**
+  ver_E carried *"22 licensed rows"*, *"9 / 4 / 9"*, *"7.26× over 17"* and
+  *"median 24"* as literals against 26 patterns; at 33 every one had moved
+  (23 · 9/4/10 · 6.75× over 18 · ~19) and nothing warned. `build_data.py` now
+  computes `totals.buckets.*` (licensed / flat / negative / expensive),
+  `totals.r2_over_r3.*` (rows, median, not_overstated) and
+  `totals.hardened.*` (per-compiler median, min, max, negative patterns,
+  patterns) over passing patterns from the kernel-exclusive column and the
+  parsed licence — the same arithmetic `synthesis/census.py` runs, verified
+  identical this session. ⚠ **Side effect:** ver_B/C/E now trigger the
+  literal warning for `10,242` / `5,637` because those became `totals.*`
+  values. They are frozen versions and are not edited; the warning is folded
+  on the Method tab as maintainer housekeeping.
+- **`tools/render_paper.py`** renders environments as labelled blocks and
+  numbers them across the whole paper (a per-file counter printed *"Finding 1"*
+  three times and would have confused every cold reader).
+
+**Every corpus-level figure was re-derived from `results/gate/*.json` before
+being written** (`.temp/verF/verify.py`, gitignored): 133 crashes (67 gcc, 66
+clang) and 8 hangs, all plain C; 0 exit-101; hardened C 1,280 cells, 0
+divergent; 166 (pattern, input) pairs, 85 divergent, **0 Rust-rung splits**;
+Miri 252 runs, 0 UB, 2 blocked; identity 28 exact / 5 norel; 497 verified / 0
+errors; TCB 152 / 333; sanitizer 67 fired / 185 clean on plain C, 0 of 244 on
+hardened C. ⚠ **One stale figure caught by doing this: the hardened-C median
+is 18.5 (gcc) / 21 (clang) at 33 patterns, not the 24 CLAIMS.md §1.5 records
+at 26.** Per-program literals each carry a `%%` comment naming their primary
+source (file:line) at the top of the section file.
+
+**Three review agents ran blind and in parallel on the rendered draft
+(`.temp/verF/DRAFT.md`):** a fact-check at primary artefacts, a cold read by a
+reader of empirical papers, and the gaps/coverage-bias review. Their reports are
+`.temp/verF/{FACTCHECK,COLDREAD,GAPS}.md` (gitignored). What each found, and
+what it changed:
+
+- **Cold read — 6/10 on the first draft.** *"Well-designed experiment, unusually
+  honest, three excellent exhibits, let down by the text."* Real defects: the
+  headline **6.75× had no stated denominator** (read as total cost, it does not
+  match the record-walker table's 1.68×) — it is a ratio of *overheads over
+  unsafe*, and the word is now defined in the sentence that first uses it; the
+  intro's eight bullets restated the eleven boxes, so every finding was met four
+  times — **bullets deleted, conclusion cut to four sentences**; the three-row
+  distribution table summed to 23 by coincidence beside a paragraph saying it did
+  not — **replaced by one sentence that partitions exactly**, all counts live;
+  §5 argued *"a proof is a proof of what you wrote down"* without showing a
+  specification — **the bitset's five-line `requires`/`ensures` is now printed
+  verbatim**; the 33 programs were never listed — **`\figure{programs}`** added
+  (per-program table from `data/`). ⚠ The render tool numbered findings per
+  file (*"Finding 1"* three times), which the reader flagged as a defect of the
+  paper; **check the review artefact before handing it over.**
+- **Fact-check — 122 claims, 95 confirmed, 7 wrong, 19 imprecise.** ⚠⚠ **The
+  worst was inherited from ver_E's own fact-checked prose:** the state
+  machine's sign flip was explained as *"the C validates its table once, safe
+  Rust checks per byte"* — **inverted.** `p19/NOTES.md:375-380`: the *Rust*
+  versions run the 2,048-entry validation pass (the proof rests on it), the
+  *plain C skips it* (that is its bug) and saves 5,647 fixed, and the slope is
+  gcc not unrolling the fold; under clang the pair is flat. **A previous
+  version's fact-checked sentence is not a source either.** Also wrong: rustc's
+  message names `split_at_mut`, not `copy_within`; the tuned walker re-slices
+  and folds with an iterator, `chunks_exact` is a control; the calibration
+  sentence priced a hardened C that p01 does not ship; *"never refused for
+  Rust-side reasons"* is the current rule stated as history (RECAP 53); 47
+  catalogue rows are pre-project, not 49. Could not locate the eighth member of
+  the deleted-check control (seven found; CLAIMS §1.6's 4/2/2 stands).
+- **Gaps review — omissions balanced by count across the languages (7:8) but
+  tilted against safe Rust by weight, and one-sided toward the proof (7:1) and
+  the method (16:3).** ⚠⚠ **The first draft dropped p02 — the one-byte overflow,
+  "the strongest thing here" — which is the exact omission the research's own
+  first synthesis made and had to restore.** Now in §4 with the record-walker
+  control beside it, and the ledger reads 8 misses / 1 measured win / 2
+  unpriceable, as SYNTHESIS §3 has it. Added on its findings: the searched-arm
+  7/3/10 with all four moves against safe Rust; the record walker's own
+  −199/−2,545 cheapest safe spelling (the counter-instance to *"our errors run in
+  safe Rust's favour"*, now stated with the other counter-instances); *"8 to 2 is
+  a selection property, not a score"* plus the admission-bar history; p36's
+  26-byte stub; the unchecked trusted body; the gate's blindness to `ensures`
+  prose; the 8.5% proof-enabling guard; the zero-call hostile inputs (now live,
+  `totals.adversarial_zero_call`); the non-invariance of `Ir`; nineteen
+  retractions stated without a denominator because none exists. Cut on its
+  advice: the +5's asserted mechanism (never searched), the affine-token
+  paragraph (p42), the counterfactual *"four hand-written declarations"*.
+
+**Owed, in order:** (1) **the visual pass** — `.pp-finding` and the new
+`programs` figure have never been looked at; `node check.mjs --snap` then open
+`.temp/snap-paper.html`. (2) **Length: ~8,100 words** including seven tables
+and a code block; the reviews *added* ~900 words of evidence the first draft
+lacked. If the owner wants it under 7,000, cut Finding 5's layout paragraph
+(−90), Finding 8's temporal paragraph to two sentences (−80), and the
+per-audience Lessons to two audiences (−120) — never a Finding box. (3) A
+second cold read of the revised draft has not been run.
 
 ### The paper — `paper_vers/ver_A`, drafted and once-revised
 

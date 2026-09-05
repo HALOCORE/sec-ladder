@@ -1,6 +1,6 @@
 {
   "short": "E",
-  "current": true,
+  "current": false,
   "title": "Seven objections to rewriting your C in Rust, answered in the order you raise them",
   "subtitle": "Each section is what a C developer says after hearing the answer to the last one. Seven objections at the top level, each answer provoking its own — read the top level alone and it is a complete short paper.",
   "status": "draft",

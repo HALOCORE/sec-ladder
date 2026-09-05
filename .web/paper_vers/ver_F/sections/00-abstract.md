@@ -1,0 +1,12 @@
+%% The abstract states what was done, then the four results a reader should
+%% leave with, then the direction of our own errors.  Every count is live.
+%% ⚠ "overhead" is DEFINED in the sentence that first uses the median ratio — a
+%% cold reader read it as a ratio of total costs.  Do not drop the definition.
+%% ⚠ Fact-check A1/A2: 32 programs carry a bug, one is a calibration program
+%% with none, and not all 32 bugs are memory-safety bugs; only the C has two
+%% compilers.
+\begin{abstract}
+Memory safety is usually priced as a percentage and sold as a guarantee, and both numbers are quoted without the two programs they came from. We measured both halves directly. We took \num{totals.passing.patterns} small C programs — all but one carrying a real bug, most of them memory-safety bugs and the rest from classes memory safety is often assumed to cover — and built every one in six versions: the plain C, the same C with the missing check written in, a line-for-line port to safe Rust, a hand-tuned safe Rust version, an unsafe Rust version, and that unsafe version carrying a machine-checked proof. The C versions were built by two compilers and every version at two optimisation levels; all were counted to the instruction, checked against an independent reference implementation, and attacked with inputs written to trigger their bug — \num{totals.passing.cells} builds and \num{totals.passing.adversarial_runs} hostile runs in all.
+
+Four results carry the paper. First, two safe Rust versions of the same program differ by more than safe Rust differs from unsafe: measured as overhead — instructions per call beyond the unsafe version — the line-for-line port's is a median \num{totals.r2_over_r3.median}× the tuned version's, so most published "safe Rust overhead" is measuring who wrote the code. Second, where safe Rust does cost something, the bill is at least as often something other than the bounds check. Third, under attack every crash and every hang was in plain C; hardened C and every Rust version returned the reference answer on every input, and not one bounds check ever fired. What separates the languages is not the outcome but that in C the check is optional. Fourth, a proof costs zero instructions by construction and proves exactly what was written down: a one-character bug that stays inside its array verifies under a memory-safety specification. We report where each result breaks, and the direction in which our own errors run.
+\end{abstract}

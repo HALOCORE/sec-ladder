@@ -34,4 +34,4 @@ If a note is about the app rather than about the user, it belongs in `RECAP.md`.
 - [Report style](web-report-style.md) — take template_apps' framework, not its dark CSS.
 - [Script-guarded notes](script-guarded-notes.md) — prose attached to assertions, withheld when the evidence moves.
 - [Division of labour](division-of-labour.md) — I own `.web/`; the tree above is read-only and moves under me.
-- [Paper writing process](paper-writing-process.md) — the sub-agent roles behind ver_A and ver_B, and the nine things that decided their quality: ground on primary artefacts, run reviewers blind so their contradictions surface, and check the supervisor's own rulings too.
+- [Paper writing process](paper-writing-process.md) — the sub-agent roles behind ver_A–ver_F, and the lessons that decided their quality: ground on primary artefacts, run reviewers blind so their contradictions surface, check the supervisor's own rulings too, derive every corpus figure in the build, and read the review artefact before delegating it.

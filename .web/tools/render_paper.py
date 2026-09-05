@@ -63,6 +63,11 @@ for _line in open(f"paper_vers/{ver}/paper.md"):
             if _lm:
                 _labels[_lm.group(1)] = _cur
 
+# Environment numbering runs across the WHOLE paper, as paper.js numbers it —
+# a per-file counter printed "Finding 1" three times and a cold reader could
+# not tell which finding the Lessons section was pointing at.
+_envn = {"n": 0}
+
 for line in open(f"paper_vers/{ver}/paper.md"):
     m = re.match(r"\\input\{(.+?)\}", line.strip())
     if not m:
@@ -78,4 +83,17 @@ for line in open(f"paper_vers/{ver}/paper.md"):
     t = re.sub(r"\\ref\{(.+?)\}", lambda m: _labels.get(m.group(1), "??"), t)
     t = re.sub(r"\\src\{(.+?)\}", r"[source: \1]", t)
     t = re.sub(r"\\cite\{(.+?)\}", r"[\1]", t)
+    # environments render as a labelled block, so a cold reader sees the
+    # "Finding 3 — name" box the page shows rather than a raw \begin line
+    def _env_open(m):
+        kind, arg = m.group(1), m.group(2) or ""
+        if kind in ("finding", "principle", "example"):
+            _envn["n"] += 1
+            return f"> **{kind.capitalize()} {_envn['n']}" + (f" — {arg}**" if arg else "**")
+        label = {"abstract": "Abstract", "takeaway": "In short", "caveat": arg or "Caveat",
+                 "retraction": "Retracted — " + arg, "quote": ""}.get(kind, kind)
+        return f"> **{label}**" if label else ">"
+    t = re.sub(r"\\begin\{([a-z]+)\}(?:\{(.*?)\})?", _env_open, t)
+    t = re.sub(r"\\end\{[a-z]+\}", "", t)
+    t = re.sub(r"\\figure\{([^}]+)\}\{(.*?)\}", r"[Figure: \1 — \2]", t)
     print(re.sub(r"\n{3,}", "\n\n", t).strip() + "\n")

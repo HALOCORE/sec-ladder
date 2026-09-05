@@ -103,13 +103,19 @@ array fails too — `\num` is for scalars.
 \end{abstract}
 ```
 
-`abstract`, `principle{Short name}`, `example{Caption}`, `takeaway`,
-`caveat{Heading}`, `retraction{What was claimed}`, `quote{Attribution}`.
+`abstract`, `principle{Short name}`, `example{Caption}`, `finding{Short name}`,
+`takeaway`, `caveat{Heading}`, `retraction{What was claimed}`, `quote{Attribution}`.
 
 `principle` and `example` are the paper's spine: **a principle is a rule a
 reader could follow, an example is the smallest concrete thing that makes it
 land.** The renderer numbers principles and lists them in the outline, so a
 principle that never gets an example is visible at a glance.
+
+`finding{Short name}` is the empirical-study box (*"Finding 3 — …"*), numbered
+independently and continuously the way a principle is. It exists because an
+empirical paper is skimmed box-first: **a finding is one sentence a reader could
+quote, and the paragraphs around it are only its evidence.** The build reports
+the count beside the word count.
 
 ### Inline
 
