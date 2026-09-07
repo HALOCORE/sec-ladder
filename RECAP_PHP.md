@@ -26,10 +26,11 @@ RUNNING    3 read-only mining agents over the PHP 5.0.0 corpus (temporal,
            spatial, type), writing to .temp/php-mine/<axis>/.
            Their reports are NOT IN YET. Do not predict them.
 
-NEXT       (1) land the miners' output into patterns-php/CATALOGUE.md
+NEXT       (1) TASK_PHP_002 -- Phase 0 foundation. WRITTEN AND COMMITTED,
+               NOT YET LAUNCHED. Construction is 1-agent-at-a-time, so it
+               waits for the miners to finish. Launch it first.
+           (2) land the miners' output into patterns-php/CATALOGUE.md
                -> adjudicate + review, ONE agent at a time
-           (2) Phase 0 foundation (PLAN_PHP.md §8), which is INDEPENDENT of
-               the mining and can be written while it runs
 
 BAR        C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
            patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
@@ -45,6 +46,7 @@ READ       PLAN_PHP.md (the design + all 10 decisions), then
 | | |
 |---|---|
 | **rows built** | **0** |
+| **tasks** | `TASK_PHP_001` mining wave RUNNING · `TASK_PHP_002` Phase 0 written, not launched |
 | **catalogue** | not yet written — Phase 1 |
 | **infrastructure** | not yet built — Phase 0 |
 | **citation base** | PHP 5.0.0, pristine tarball, sha256 `5783e0c0…d6919`, 5595997 B, 3815 entries. **4.0.x ignored** (`DP-06`) |
