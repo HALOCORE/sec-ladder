@@ -1015,5 +1015,166 @@ const INTRO = {
     ["proof", "Proof & trusted base", "What the proof discharges, what it still trusts, and how many lines of that trusted base you have to read."],
     ["patterns", "Patterns", "Every pattern's own numbers, contract, sources and gate record."],
     ["findings", "Findings", "The cross-cutting results — including the ones this project has had to retract."],
+    ["faq", "FAQ", "Where unsafe actually helps, why removing a check speeds up the loop around it, and how to get that back without writing unsafe."],
   ],
 };
+
+// ============================================================ FAQ ==========
+//
+// Reader questions, in the order a real reader actually asked them. Every one
+// of these was a live question from somebody reading this report — which is
+// why they pass PITFALLS §1.6's say-it-out-loud test without being rewritten:
+// nobody had to invent them.
+//
+// ⚠ PITFALLS §1.1 and §1.8 govern this file more than any other: an answer here
+// leads with a MECHANISM and stops. Where a figure needs a qualifier it cannot
+// carry, the figure is cut, not the qualifier. Any arithmetic an answer invites
+// has to close on the page (§1.7) — the three-row table in "how can removing a
+// bounds check make the loop faster" is there so 10.00 → 8.00 → 5.75 subtracts
+// to the 2.00 and 2.25 the prose names.
+//
+// The counts are NOT here. `MECHANISM` below is an attribution per program and
+// index.js does the counting, so a program entering or leaving the expensive
+// group moves the sentence instead of falsifying it (CLAUDE.md rule 2, and the
+// exact failure PITFALLS §2.2 records).
+
+// What each of the big gaps is actually paying for.
+//
+//   verdict: "check"   the bounds check, and there is nothing to recover
+//            "partly"  the check — but it costs because the optimiser failed to
+//                      prove something, and the fact can be handed to it
+//            "no"      something else entirely; naming it is the whole point
+//
+// ⚠ The keys must be exactly the programs the data puts above 100 instructions
+// per call. check.mjs asserts that, so this list cannot silently go stale.
+const MECHANISM = {
+  "p07-binary-search": { verdict: "check", what: "The check, genuinely. A binary search jumps by a rule nothing can follow, so there is no inner loop to hoist the test out of and nothing to fold it into." },
+  "p09-bitset": { verdict: "check", what: "The checks — and this is the one case where that is established rather than assumed. The gap splits over three of them with no fitted constants, and predicts the larger input exactly." },
+  "p03-bounded-stack": { verdict: "partly", what: "The check — but one dead line of safe Rust deletes all of it, on both sides. See *can I get the check removed without writing unsafe* below." },
+  "p05-index-flatten": { verdict: "partly", what: "A per-row check the compiler could not hoist, because the fact it would need is nonlinear. Restructure the guard and the whole per-row apparatus goes." },
+  "p06-rotate": { verdict: "no", what: "None of it is a bounds check. It is the iterator adaptors asking *am I done* on every step." },
+  "p14-field-split": { verdict: "no", what: "An unrolling the unsafe version gets and the safe one does not." },
+  "p19-state-machine": { verdict: "no", what: "One masking instruction per byte. A mask, not a check." },
+  "p23-partition": { verdict: "no", what: "The shape of the data rather than its size — and a large part of it is simply which direction the loop counts." },
+  "p32-free-list-pool": { verdict: "no", what: "Not established. This program publishes no cost claim of its own, and the difference is left here unexplained rather than given a mechanism it has not earned." },
+  "p47-ct-compare": { verdict: "no", what: "The constant-time discipline. The naive version is faster precisely because it leaks timing." },
+};
+
+const FAQ_LEDE = "Questions readers have actually asked, with the mechanism rather than the headline. Each one expands.";
+
+const FAQ = [
+  {
+    id: "where",
+    q: "Where does unsafe Rust actually help?",
+    a: [
+      "Mostly it does not. On most of these programs the difference between tuned safe Rust and unsafe Rust is a flat handful of instructions per call — about what the hand-written check costs inside C. It is not a percentage of your runtime and it does not grow with your data.",
+      "Where it does help it helps a lot — and the table below names what each of those is actually paying for, because **\"the bounds check costs X\" is usually the wrong sentence.**",
+    ],
+    mechTable: true,
+  },
+  {
+    id: "besides",
+    q: "Is removing bounds checks the only thing unsafe buys?",
+    a: [
+      "No — and the largest single effect is indirect. A bounds check costs about two instructions per element, but it also **stops the compiler unrolling the loop**, which is worth about the same again. So over half of what `unsafe` buys on a loop is not the check; it is the loop shape you can have once the check is gone. That is the next question.",
+      "The rest are smaller and specific to the program: different address arithmetic on the unsafe side; iterator adaptors that re-test exhaustion every step; a discipline the safe version has to keep, like staying constant-time.",
+    ],
+    negTail: true,
+  },
+  {
+    id: "unroll",
+    q: "How can removing a bounds check make the loop itself faster?",
+    a: [
+      "Unrolling works by amortising the loop's own bookkeeping: four copies of the body share one increment, one compare and one branch instead of four.",
+      "A bounds check will not share. If the second element is out of range the program has to fail **there**, having done exactly two elements of work — so the compiler may not merge four checks into one, or move them earlier. Unroll a checked loop and you have four bodies and still four checks.",
+    ],
+    table: {
+      head: ["version of the inner loop", "instructions per byte"],
+      rows: [
+        ["safe Rust, rolled, checked", "10.00"],
+        ["unsafe, rolled", "8.00"],
+        ["unsafe, unrolled four ways — as shipped", "5.75"],
+      ],
+    },
+    b: [
+      "The first step is the check: **2.00**. The second is the unrolling that the check was preventing: **2.25**.",
+      "The obvious reply is to force the compiler to unroll the checked loop and take the 2.25 anyway. That was tried, and it lands at 9.50 — it recovers **0.50**, because the four copies each keep their own test.",
+      "So the sharper sentence is the stronger one: the check does not merely cost two instructions per element, it **forecloses an optimisation worth slightly more that it could never have amortised anyway**.",
+    ],
+    refs: ["p16-tlv-walk"],
+  },
+  {
+    id: "elide",
+    q: "Doesn't the compiler remove bounds checks on its own?",
+    a: [
+      "Often, yes — which is why most of these programs show a flat difference. But it is all-or-nothing.",
+      "What runs is a *prover*, not a merger. Either it proves the index is in range and deletes the check outright — and then the loop unrolls and vectorises freely — or it fails and keeps the check on every element. There is no middle setting where it checks once on behalf of four, because establishing that those four indices are in range **is the same proof it just failed**.",
+      "It succeeds when the operator hands the fact over, as `x % CAP` does, or when an earlier test in the same function is simple enough to follow. It fails for three reasons, and all three are here:",
+    ],
+    list: [
+      ["the arithmetic is nonlinear", "from `rows * cols <= len`, prove `i * cols + j < len`. True, but it needs reasoning about multiplication, and range analysis does not do that."],
+      ["the fact relates two values", "one program keeps a provably-dead check whose implication is purely *linear*, because what it needs is a relation across the loop and the analysis tracks one value at a time."],
+      ["the bound really does come from the data", "a length field read out of the input. No compiler will ever remove these, which is why the two largest wins for `unsafe` are the binary search and the bitset."],
+    ],
+    refs: ["p05-index-flatten", "p08-overlap-move"],
+  },
+  {
+    id: "hint",
+    q: "Can I get the check removed without writing unsafe?",
+    a: [
+      "Sometimes, and for nothing. On the bounded stack, adding one line that never executes:",
+    ],
+    code: [
+      "if sp > STACK_CAP { return 0; }   // never taken: sp <= STACK_CAP always",
+    ],
+    b: [
+      "Safe Rust goes from 17 instructions per pop to 13, and unsafe from 14 to 13. **The gap becomes zero** — in safe Rust, with no `unsafe` anywhere.",
+      "It has to be the actual invariant. `sp > 1000` changes nothing at all. `sp > 65`, one past the real bound, leaves the check standing *and* costs more, because `sp <= 65` still does not prove `sp - 1 < 64`.",
+      "And this is not a Rust story. Give the C version a hand-written bounds check and both gcc and clang keep it; hand either one the same dead line and both delete all of it.",
+    ],
+    refs: ["p03-bounded-stack"],
+  },
+  {
+    id: "return0",
+    q: "Why is that hint a return, and not an assertion?",
+    a: [
+      "Because the useful fact comes from the *branch*, not from what is inside it. On the path where the condition was false the compiler knows `sp <= STACK_CAP`, and it does not care whether the taken side returns, panics or prints. So `return 0` is just the cheapest safe thing to put there.",
+    ],
+    list: [
+      ["`unreachable_unchecked()`", "would work, and it is `unsafe` — a promise. If you are wrong you get memory corruption, which is the thing you were avoiding."],
+      ["`assert!` or `unreachable!`", "also work, and drag a panic path in behind them."],
+      ["`return 0`", "promises nothing. If the invariant is ever wrong you get a wrong answer instead of undefined behaviour."],
+    ],
+    b: [
+      "It costs nothing at run time either, because the compiler deletes the hint as well: having used it to prove the bounds check redundant, it goes on to prove the guard itself unreachable. The hint is scaffolding for the analysis, not code.",
+    ],
+    refs: ["p03-bounded-stack"],
+  },
+  {
+    id: "unsafefn",
+    q: "This helper skips the bounds check but isn't marked unsafe. Is that a bug?",
+    a: [
+      "Good catch, and the answer differs between the two versions. The unsafe one is written like this, with no `unsafe` on the function itself:",
+    ],
+    code: [
+      "fn buf_get_unchecked(v: &[u8], i: usize) -> u8 {",
+      "    unsafe { *v.get_unchecked(i) }",
+      "}",
+    ],
+    b: [
+      "By Rust's own convention that is wrong. The function carries a precondition that matters for memory safety, so it should be an `unsafe fn`; as written, a caller in ordinary safe code can pass any index at all.",
+      "In the proved version the same function carries `requires i < v.len()`, and the verifier discharges that at **every call site** — a stronger obligation than `unsafe fn`, which only makes a caller acknowledge the precondition rather than prove it.",
+      "Three things keep it away from the numbers: the two spellings compile to identical instructions; the helper is private to its own file; and the unsafe version is pinned byte-identical to the proved one, so each of these programs *is* a verified program.",
+      "What it does cost is a claim. Somebody grepping for `unsafe fn` finds nothing, so that file under-declares its own unsafe surface — awkward for a project whose headline product is a count of what you have to trust. Repairing it would edit every such file, and their hashes are recorded inside the measurements, so it has been left in place and written down here instead.",
+    ],
+  },
+  {
+    id: "precond",
+    q: "Every proof assumes the buffer window fits. Doesn't that assume away the bug?",
+    a: [
+      "No, and it is worth being exact about why. The precondition is about the *shape* of the window the harness handed over — that the slice it built lies inside the buffer it built it from. That is the calling convention's own arithmetic, and the caller discharges it.",
+      "Everything an attacker controls sits **inside** that window: the declared lengths, the counts, the indices, every byte. None of it is assumed. A precondition about *contents* — \"the length field is honest\" — would be the thing you are worried about, and would put exactly the malformed inputs this project exists to run outside the proof.",
+    ],
+    see: ["proof", "Proof & trusted base — including how many real calls each precondition was checked on"],
+  },
+];

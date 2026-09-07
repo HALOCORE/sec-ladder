@@ -1209,6 +1209,26 @@ details.fold > summary:hover { color: var(--ink); }
  * alignment the numbers are read by.
  * ============================================================================ */
 
+/* ---- 1330px: ten tabs stop sharing a row with the brand -------------------- */
+/*
+ * Nothing else moves here — this is the header alone. With nine tabs the shared
+ * row measured 880px into 916px available at 1280 and fit; the tenth (FAQ) took
+ * it to 927 and left ONE tab stranded on a second line, which is the scrambled
+ * shape the 900px block below exists to prevent. `tools/responsive_audit.mjs`
+ * computes that arithmetic and now derives the tab list from index.js, so the
+ * next tab to be added will report this rather than ship it.
+ *
+ * 1330 is chosen so 1366 — the common laptop — keeps the single-row header
+ * (1002px available against 927 needed) and 1280 gets the clean two-row one.
+ * Placed BEFORE the 900px block so that block still wins where they overlap.
+ */
+@media (max-width: 1330px) {
+  .brand { order: 1; flex: 1 1 auto; min-width: 0; }
+  .icon-btn { order: 2; flex: none; }
+  .tabs { order: 3; flex: 1 0 100%; }
+  .topbar-in { flex-wrap: wrap; gap: 6px 12px; }
+}
+
 /* ---- 900px: the pattern sidebar stops being a sidebar ---------------------- */
 @media (max-width: 900px) {
   /* The header, which is the worst of the narrow-width breakage.  `.tabs` is
@@ -1571,3 +1591,63 @@ details.fold > summary:hover { color: var(--ink); }
   .sl-qlab, .sl-foot, .sl-cue, .sl-num, .sl-tbl th { font-size: 10.5px; }
   .slide { padding: 26px 30px 22px; }
 }
+
+/* ================================================================== FAQ === */
+/*
+ * Additive only: every selector here is a class that exists nowhere else, so
+ * this block cannot change any other view (CLAUDE.md rule 6 — a green render
+ * check cannot see a stylesheet, and deleting a CSS block by line range once
+ * made every bar transparent while the check stayed green).
+ *
+ * The question list reuses `details.fold` for the open/close mechanics and only
+ * raises the summary to question size; the folded state is what makes the tab
+ * scannable, so the closed row must read as a question and not as a caption.
+ */
+
+details.fold.faq-item { margin: 8px 0; }
+details.fold.faq-item > summary.faq-q {
+  font-size: 15px; font-weight: 600; color: var(--ink);
+  padding: 12px 14px; line-height: 1.45;
+}
+details.fold.faq-item > summary.faq-q:hover { color: var(--accent); }
+details.fold.faq-item[open] > summary.faq-q { border-bottom: 1px solid var(--grid); }
+.faq-item .fold-body { font-size: 14px; line-height: 1.62; padding-top: 12px; }
+.faq-item .fold-body > p { max-width: 74ch; margin: 0 0 12px; }
+
+/* A code sample is an illustration here, not a source view: no tokenizer, no
+ * line numbers, and it must wrap rather than scroll on a narrow screen. */
+pre.faq-code {
+  font-family: var(--mono); font-size: 12.5px; line-height: 1.6;
+  background: var(--surface-2); border: 1px solid var(--rule);
+  border-radius: var(--radius-sm); padding: 10px 12px; margin: 0 0 12px;
+  white-space: pre-wrap; word-break: break-word; overflow-x: auto; color: var(--ink-2);
+}
+
+ul.faq-list { margin: 0 0 12px; padding-left: 20px; max-width: 74ch; }
+ul.faq-list > li { margin: 0 0 7px; }
+
+/* The mechanism list. One block per program so the prose can wrap — see the
+ * note at its call site for why this is not a table. */
+ul.faq-mech { list-style: none; margin: 14px 0; padding: 0; }
+.faq-mech-i {
+  border: 1px solid var(--rule); border-radius: var(--radius-sm);
+  background: var(--surface-2); padding: 9px 12px; margin: 0 0 7px;
+}
+.faq-mech-h { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; margin-bottom: 3px; }
+.faq-mech-w { color: var(--ink-2); max-width: 74ch; }
+.faq-verdict {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 650;
+  padding: 1px 7px; border-radius: 999px; border: 1px solid var(--rule); color: var(--muted);
+}
+/* ⚠ Colour is NOT the only channel — the verdict is spelled out in the chip's
+ * own text, so this survives a monochrome print and rule 7 is not engaged (no
+ * rung is being repainted; these are attributions, not cells). */
+.faq-verdict.v-check  { border-color: var(--warning); color: var(--warning); }
+.faq-verdict.v-partly { border-color: var(--accent); color: var(--accent); }
+
+button.linklike {
+  background: none; border: none; padding: 0; margin: 0; cursor: pointer;
+  font: inherit; color: var(--accent); text-align: left;
+  text-decoration: underline; text-underline-offset: 2px;
+}
+button.linklike:hover { color: var(--ink); }

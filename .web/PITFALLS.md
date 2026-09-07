@@ -243,7 +243,32 @@ In `check.mjs`'s sandbox `window` is a plain object distinct from the global, so
 the deck silently never loaded and the check passed on an empty banner. Match
 `syntax.js`: `(typeof globalThis !== "undefined" ? globalThis : this)`.
 
-### 3.4 ⚠ A green render check cannot see CSS, and there is no screenshot on this box
+### 3.4 ⚠⚠ A check that keeps its own copy of the list it checks fails SILENTLY UPWARD
+
+Three times now, and the third and fourth were found together when a tenth tab
+was added:
+
+1. `check.mjs` hard-coded eight tabs. The Paper tab existed and was swept by
+   nothing. ✅ Fixed then — it reads `TABS` out of `index.js`.
+2. `tools/responsive_audit.mjs` hard-coded `TAB_LABELS`, **and had never gained
+   "Paper" either.** Every header verdict it printed for months was computed for
+   eight tabs against a page rendering nine.
+3. `check.mjs --snap`'s view list is hand-curated *states*, which is correct —
+   but a tab in none of them is a view **nobody can screenshot**, and rule 6
+   says a CSS change is only believed once it has been looked at.
+
+⚠ **The shared property is the direction of the failure.** A stale copy does not
+throw and does not report less confidence — it reports **`ok` for a smaller
+page than the one that exists**. The audit did not say "I could not check
+Paper"; it said the header was fine. That is worse than no check, because it
+retires the question.
+
+✅ Derive the list, or assert your list against the real one. Every one of these
+was six lines to fix. And when you fix one, **grep for the others** — §1.5.
+Fixing the audit's copy is what surfaced a genuine 1280px header defect that the
+stale version had been reporting `ok` on.
+
+### 3.5 ⚠ A green render check cannot see CSS, and there is no screenshot on this box
 
 `CLAUDE.md` rule 6, still true. ~120 lines of deck CSS shipped **unlooked at**.
 Say so rather than implying it was verified.

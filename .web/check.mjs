@@ -207,7 +207,9 @@ const TABS = vm.runInContext("TABS", sandbox).map(t => t.id);
 // came from this repo's prose, so a literal one is a lost emphasis marker.
 // `patterns` is excluded: it shows C, where `*` is a pointer and `/* */` a
 // comment, and judging those is not this check's business.
-const NO_CODE_TABS = new Set(["overview", "ladder", "cost", "security", "proof", "findings", "method"]);
+// `faq` belongs here even though it shows two code samples: they render inside
+// <pre>, which the sweep strips, so every asterisk left on that tab is ours.
+const NO_CODE_TABS = new Set(["overview", "ladder", "cost", "security", "proof", "findings", "method", "faq"]);
 
 // `const` bindings are script-scoped in a vm context, so reach them by evaluation.
 const APP = vm.runInContext("APP", sandbox);
@@ -379,6 +381,43 @@ async function run() {
     for (const [id, v] of Object.entries(C.S)) {
       if (/[`*_]/.test(v))
         problems.push(`content.js SHORT["${id}"] contains markdown — it is a label, rendered raw`);
+    }
+  }
+
+  // The FAQ names programs in prose and counts them in index.js. Both can go
+  // stale in ways no render check sees: a renamed pattern leaves a dead link,
+  // and a pattern crossing into the expensive group leaves an attribution list
+  // that silently answers a smaller question than the sentence above it claims.
+  // This is the guard PITFALLS §2.2 is about — the DENOMINATOR's meaning moving
+  // while every number still resolves.
+  {
+    const F = vm.runInContext("({FAQ, MECHANISM})", sandbox);
+    const ids = new Set(D.patterns.map(p => p.id));
+
+    // `summary` is rendered raw — it is a question, not prose (PITFALLS §3.1).
+    for (const f of F.FAQ) {
+      if (/[`*_]/.test(f.q))
+        problems.push(`content.js FAQ["${f.id}"].q contains markdown — the summary is rendered raw`);
+      for (const r of f.refs || []) {
+        if (!ids.has(r)) problems.push(`content.js FAQ["${f.id}"].refs names "${r}", which is not a pattern`);
+      }
+      if (f.see && !TABS.includes(f.see[0]))
+        problems.push(`content.js FAQ["${f.id}"].see points at tab "${f.see[0]}", which does not exist`);
+    }
+
+    const expensive = vm.runInContext("expensiveIds()", sandbox);
+    const attributed = Object.keys(F.MECHANISM);
+    for (const id of expensive) {
+      if (!ids.has(id)) problems.push(`expensiveIds() produced "${id}", which is not a pattern`);
+      if (!attributed.includes(id))
+        problems.push(`MECHANISM has no entry for "${id}", which the data puts above 100 Ir/call — the FAQ's count would answer a smaller question than its sentence claims`);
+    }
+    for (const id of attributed) {
+      if (!expensive.includes(id))
+        problems.push(`MECHANISM attributes "${id}", which the data no longer puts above 100 Ir/call — remove it or the count over-counts`);
+      const v = (F.MECHANISM[id] || {}).verdict;
+      if (!["check", "partly", "no"].includes(v))
+        problems.push(`MECHANISM["${id}"].verdict is "${v}" — index.js renders no label for that`);
     }
   }
 
@@ -709,7 +748,23 @@ async function run() {
       ["paper",    () => { APP.tab = "paper"; }],
       ["ladder",   () => { APP.tab = "ladder"; }],
       ["cost",     () => { APP.tab = "cost"; }],
+      // every question open, because the folded state is one line of text and
+      // the thing that needs looking at is the answer layout
+      ["faq",      () => { APP.tab = "faq"; }],
     ];
+    // ⚠ The list above is hand-curated STATES, not tabs — but a tab that appears
+    // in none of them is a view nobody can screenshot, and rule 6 says a CSS
+    // change is only believed after it has been looked at. The FAQ tab shipped
+    // its stylesheet before this guard existed and `--snap` silently skipped it.
+    {
+      const covered = new Set();
+      for (const [, set] of snaps) { set(); covered.add(APP.tab); }
+      const missed = TABS.filter(t => !covered.has(t));
+      if (missed.length) {
+        console.error(`FAIL: --snap renders no state on tab(s): ${missed.join(", ")}`);
+        process.exit(1);
+      }
+    }
     for (const [name, set] of snaps) {
       set();
       sandbox.renderAll();

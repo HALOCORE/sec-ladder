@@ -216,8 +216,20 @@ console.log(thin ? `\n${thin} row/viewport pair(s) leave the bar under 45% of th
 // theme button it is left with whatever they did not take, and eight tabs wrap
 // ONE PER LINE into a tall vertical column.  Giving `.tabs` its own row
 // (`flex-basis: 100%`) is what fixes it, so that is what this checks.
-const TAB_LABELS = ["Overview", "The ladder", "Cost of safety", "Hostile input",
-  "Proof & trusted base", "Patterns", "Findings", "Method"];
+// ⚠⚠ DERIVED FROM index.js, NEVER RETYPED. This was a hard-coded list and it
+// was ALREADY STALE when the FAQ tab was added — it had never gained "Paper",
+// so every header verdict below had been computed for eight tabs while the page
+// rendered nine. A stale list here does not fail; it reports `ok` for a header
+// narrower than the real one, which is the worst way for a check to be wrong.
+// Same rule, same reason, as check.mjs's own TABS.
+const TAB_LABELS = (() => {
+  const src = fs.readFileSync(path.join(WEB, "index.js"), "utf8");
+  const m = src.match(/const TABS = \[([\s\S]*?)\n\];/);
+  if (!m) { console.error("responsive_audit: could not find TABS in index.js"); process.exit(1); }
+  const labels = [...m[1].matchAll(/label:\s*"([^"]+)"/g)].map(x => x[1]);
+  if (!labels.length) { console.error("responsive_audit: TABS parsed to zero labels"); process.exit(1); }
+  return labels;
+})();
 
 function padX(sel, vw) {
   const p = resolve(sel, "padding", vw);
@@ -228,7 +240,7 @@ function padX(sel, vw) {
   return px ? +px[1] : 0;
 }
 
-console.log("\nheader: how the eight tabs lay out\n");
+console.log(`\nheader: how the ${TAB_LABELS.length} tabs lay out\n`);
 console.log("viewport   tabs row      per row   rows   verdict");
 console.log("--------   -----------   -------   ----   -------");
 

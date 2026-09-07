@@ -29,6 +29,7 @@ is owed.
 | Proof & trusted base | obligations, trusted items and lines, verified twins, the vacuity probes, byte-identity |
 | Patterns | per pattern: narrative, contract, profile, inputs, adversarial behaviour, wall clock, each rung's source, gate record, and its own README / spec / NOTES |
 | Findings | the cross-cutting results, marked `standing` or `corrected`, plus the full retraction list |
+| FAQ | questions readers actually asked, answered with the mechanism: where `unsafe` helps, why removing a check speeds up the loop around it, and how to get that back without writing `unsafe` |
 | Method | what a cell is, the two `Ir` columns, wall clock, what the gate checks, and what this benchmark cannot tell you |
 
 ## Look at it

@@ -23,6 +23,7 @@ const TABS = [
   { id: "proof",    label: "Proof & trusted base" },
   { id: "patterns", label: "Patterns" },
   { id: "findings", label: "Findings" },
+  { id: "faq",      label: "FAQ" },
   { id: "method",   label: "Method" },
   { id: "paper",    label: "Paper" },
 ];
@@ -609,6 +610,7 @@ function jml_app() {
       jml_panel("proof", viewProof),
       jml_panel("patterns", viewPatterns),
       jml_panel("findings", viewFindings),
+      jml_panel("faq", viewFaq),
       jml_panel("method", viewMethod),
       jml_panel("paper", viewPaper),
     ],
@@ -3315,6 +3317,129 @@ function buildNotes(warnings) {
             ...maint.map((w, i) => ["p.small.muted", { key: "mwx" + i }, ...md("· " + w)])],
         ]
       : ["div", { key: "nm" }, ""],
+  ];
+}
+
+// ---------------------------------------------------------------------- FAQ --
+//
+// Reader questions, click to expand. The prose is content.js's; every count on
+// this tab is derived here, so content.js never states one (CLAUDE.md rule 3)
+// and a program entering or leaving the expensive group moves the sentence
+// rather than falsifying it.
+
+// The programs whose tuned-safe-minus-unsafe gap clears 100 instructions per
+// call on either input — recomputed here with build_data.py's own arithmetic
+// rather than read back from `totals`, because the TABLE needs the membership
+// and not just the count.
+function expensiveIds() {
+  const d = APP.data || {};
+  const lic = ((d.licence || {})["R3-R4"]) || {};
+  const kern = (p, inp) => (((((p.kern || {})[`isolated/${inp}`]) || {}).cells || {}).safe_tuned || {}).delta;
+  return (d.patterns || []).filter(p => {
+    if (lic[p.id] !== "LICENSED") return false;
+    const s = kern(p, "small.bin"), l = kern(p, "large.bin");
+    if (s === undefined || l === undefined) return false;
+    return s > 100 || l > 100;
+  }).map(p => p.id);
+}
+
+const MECH = () => (typeof MECHANISM !== "undefined" ? MECHANISM : {});
+
+const MECH_LABEL = {
+  check: "the bounds check",
+  partly: "the check, recoverable",
+  no: "something else",
+};
+
+// ⚠ The count sentence is generated from the attributions, never typed. If a
+// program joins the expensive group and nobody writes its mechanism down, this
+// says so on the page instead of quietly shrinking the denominator.
+function mechSection() {
+  const ids = expensiveIds();
+  const m = MECH();
+  const known = ids.filter(id => m[id]);
+  const missing = ids.filter(id => !m[id]);
+  const n = (v) => known.filter(id => m[id].verdict === v).length;
+  const rows = ["check", "partly", "no"].flatMap(v =>
+    known.filter(id => m[id].verdict === v).map(id => [id, v]));
+  return ["div", { key: "mech" },
+    ["p", { key: "sum" }, ...md(
+      `Across the **${ids.length}** programs where the gap clears 100 instructions per call, ` +
+      `the bounds check is the whole story on **${n("check")}**. On **${n("partly")}** more it is the check, ` +
+      `but it costs only because the optimiser could not prove something — and that can be handed to it. ` +
+      `The remaining **${n("no")}** are paying for something else entirely.`)],
+    // ⚠ Deliberately NOT a table: `table.tbl td` is `white-space: nowrap`, so a
+    // prose column turns the whole tab into a horizontal scroll on a phone.
+    ["ul.faq-mech", { key: "ml" },
+      ...rows.map(([id, v], i) => ["li.faq-mech-i", { key: "mr" + i },
+        ["div.faq-mech-h",
+          ["button.linklike", { key: "b", onclick: () => go("patterns", id) }, prow(id)],
+          ["span.faq-verdict.v-" + v, { key: "v" }, MECH_LABEL[v]],
+        ],
+        ["div.faq-mech-w", ...md(m[id].what)],
+      ]),
+    ],
+    missing.length
+      ? callout("warn", "A program above 100 instructions per call has no mechanism written down",
+          ["This tab counts attributions, so an unexplained one is shown rather than dropped: " +
+           missing.map(id => "`" + pid(id) + "`").join(", ") + "."])
+      : ["div", { key: "mok" }, ""],
+  ];
+}
+
+// A question's body. Every text field goes through md() — PITFALLS §3.1 is four
+// separate discoveries of exactly one field that did not.
+function faqBody(f) {
+  const out = [];
+  (f.a || []).forEach((p, i) => out.push(mdP(p, "a" + i)));
+  if (f.mechTable) out.push(mechSection());
+  if (f.negTail) {
+    const neg = ((APP.data || {}).totals || {}).buckets || {};
+    out.push(["p", { key: "neg" }, ...md(
+      `And on **${neg.negative}** of them it goes the other way — safe Rust is *faster* than the unsafe ` +
+      `version. Where that was investigated, none of the margin was safety.`)]);
+  }
+  if (f.table) out.push(["div.table-wrap", { key: "ft" },
+    ["table.tbl",
+      ["thead", ["tr", ...f.table.head.map((h, i) => ["th" + (i ? ".num" : ""), { key: "h" + i }, h])]],
+      ["tbody", ...f.table.rows.map((r, i) => ["tr", { key: "r" + i },
+        ...r.map((c, j) => ["td" + (j ? ".num" : ""), { key: "c" + j }, c])])],
+    ],
+  ]);
+  if (f.code) out.push(["pre.faq-code", { key: "code" }, f.code.join("\n")]);
+  // `list` before `b`: the fields read as before / illustration / after, and a
+  // list that lands after its own summing-up paragraph reads as an afterthought
+  // — which is exactly how "why is that hint a return" first rendered.
+  if (f.list) out.push(["ul.faq-list", { key: "ul" },
+    ...f.list.map(([k, v], i) => ["li", { key: "li" + i }, ["strong", ...md(k)], " — ", ...md(v)]),
+  ]);
+  (f.b || []).forEach((p, i) => out.push(mdP(p, "b" + i)));
+  if (f.refs) out.push(["p.small.muted", { key: "refs" },
+    "Measured on: ",
+    ...f.refs.flatMap((id, i) => [
+      i ? ["span", { key: "s" + i }, ", "] : ["span", { key: "s0" }, ""],
+      ["button.linklike", { key: "r" + id, onclick: () => go("patterns", id) }, prow(id)],
+    ]),
+  ]);
+  if (f.see) out.push(["p.small.muted", { key: "see" },
+    ["button.linklike", { onclick: () => go(f.see[0]) }, "→ " + f.see[1]],
+  ]);
+  return out;
+}
+
+function viewFaq() {
+  if (!APP.data) return ["div.loading", "Loading…"];
+  return ["div", { key: "fq" },
+    ["div.eyebrow", "questions readers asked, answered with the mechanism"],
+    ["h1", "FAQ"],
+    ["p.lede", ...md(FAQ_LEDE)],
+    ["div.section", { key: "qs" },
+      ...FAQ.map((f, i) => ["details.fold.faq-item", { key: "fq-" + f.id },
+        ["summary.faq-q", f.q],
+        ["div.fold-body", ...faqBody(f)],
+      ]),
+    ],
+    footer(),
   ];
 }
 
