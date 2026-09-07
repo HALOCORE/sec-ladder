@@ -77,15 +77,14 @@ PHASE 0 IS CLOSED. _009 reviewed _008 and found NO BLOCKER: 4 majors,
            the enforcement layer is unsound in a way we cannot bound; that
            was true of B1 twice and is not true now."
 
-NEXT       (1) TASK_PHP_010 -- land _009's M1-M4. SMALL AND MECHANICAL:
-               os.listdir for glob in 4 audits; refuse row subdirectories
-               outside {c,inputs,controls}; make the coverage stage PER-ROW
-               (one change, closes M3 and M4 both). Precondition on rows.
-           (2) TASK_PHP_011 -- the catalogue. ADJUDICATION_001.md settles
-               ~80 rows and is UNREVIEWED manager work; _011 builds
-               patterns-php/CATALOGUE.md from it, ATTACKS it, and verifies
-               _010's four fixes (folded review -- stated, not hidden).
-           (3) then BUILD ROWS. PLAN_PHP.md §8: spatial -> type -> temporal.
+           _010 landed M1-M4 + all 6 minors. UNREVIEWED (rule 9).
+
+NEXT       (1) TASK_PHP_011 -- THE CATALOGUE, and the first non-infrastructure
+               task since _001. Builds patterns-php/CATALOGUE.md from
+               ADJUDICATION_001.md (~80 rows, UNREVIEWED manager work),
+               ATTACKS that adjudication, and verifies _010's fixes
+               (folded review -- stated, not hidden).
+           (2) then BUILD ROWS. PLAN_PHP.md §8: spatial -> type -> temporal.
 
 BAR        C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
            patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
@@ -514,6 +513,49 @@ why it is not a blocker.
 PER-ROW rather than globally.** The global scope is what turns any single
 uncertifiable record into a programme-wide stop, and it is the property §8b's
 first deadlock also rode on.
+
+### F18 — both whitelists this manager wrote were wrong on first contact with the corpus
+
+⚠ **`{c, inputs, controls}` as specified refused ALL 33 BUILT PAT ROWS** — every
+one carries `__pycache__/`. Measured 33/33 before shipping, and exempted.
+
+That is the **second** whitelist-shaped decision in this programme and the second
+to fail: the `c/<subdir>` ban was **both insufficient and over-strict**
+(`TASK_PHP_009`), and this one was over-strict the moment it met the tree.
+⭐ **The transferable part: a whitelist written from the layouts you INTEND is
+not a whitelist over the layouts that EXIST. Run it against the corpus before
+shipping it** — which is what caught this, and cost one command.
+
+✅ The manager named it as a least-sure call both times, and both times that was
+the right instinct and the wrong artefact.
+
+### F19 — *"show it converges"* was the wrong success condition
+
+⚠ The manager's `TASK_PHP_010` §3 asked the engineer to *"show it converges"*.
+**A retired row's orphan record never converges by repetition, and must not** —
+the repair is **deletion**, not iteration. The right condition was *"it stops
+blocking"*, and the engineer supplied it.
+
+⚠ **This is the same error as F13, one level down.** There the manager read a
+refuted mechanism as a cleared design; here it carried a success condition
+(*convergence*) from the **fresh-clone** deadlock, where repetition **is** the
+repair, into the **orphan-record** one, where it never can be. **A success
+condition is part of a design and does not travel with the shape of a bug.**
+
+### F20 — one `..` too few
+
+⚠ `#include "../../shared/x.h"` from `<row>/c/` reaches `patterns-php/shared/`,
+**compiles, runs the outside allocator (`tally=7`), and is in neither digest** —
+and it is not a directory *under* the row, so `ROW_DIRS` cannot see it. It is
+`TASK_PHP_009` M2 with one more `..`.
+
+✅ **Latent on both sides today: no row has such an include.** Reported and
+deliberately **not fixed**, because both repairs are worse than the risk: parsing
+`#include` targets is the **idiom-enumeration class this programme has deleted
+twice**, and the spelling-free version (`-MD`) needs a `harness/` edit and a
+33-pattern re-measure. ⚠ **The discipline is written into `PROTOCOL_PHP.md` §B3a
+instead — `<row>/c/` holds everything the row compiles, checked by eye at
+review** — so the next author is not told the guard is stronger than it is.
 
 ## Open items — carried, not closed
 
