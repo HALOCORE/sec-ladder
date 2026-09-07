@@ -115,6 +115,108 @@
       ],
       "verdict": "tool exited",
       "tool_returncode": 0
+    },
+    {
+      "row": null,
+      "provenance_checked": false,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "harness_php_sha256": {
+        "gate.py": "456b8ce250ee8fa5008ac407ba1e54d52e70fb88f3dd7474ffbf321f575984e4",
+        "provenance.py": "37ba80dfc4c9882ebf04a8e6d93cc146325e547f21441e461603d04f14c915c3",
+        "root.py": "c5df5c135f3ea080d2b151f7a1dbdcdb4b0372bd06ef8697287de201e131d474"
+      },
+      "problems": [],
+      "tool": "measure",
+      "gate_argv": [
+        "--tool",
+        "measure",
+        "--check-stale"
+      ],
+      "tool_argv": [
+        "--check-stale"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 1
+    },
+    {
+      "row": null,
+      "provenance_checked": false,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "harness_php_sha256": {
+        "gate.py": "f4d01cc4c3abd23cb4f87edd0f4a1318cc3030aa0847783bc80a5f21e13b1463",
+        "provenance.py": "37ba80dfc4c9882ebf04a8e6d93cc146325e547f21441e461603d04f14c915c3",
+        "root.py": "c5df5c135f3ea080d2b151f7a1dbdcdb4b0372bd06ef8697287de201e131d474"
+      },
+      "problems": [],
+      "tool": "measure",
+      "gate_argv": [
+        "--tool",
+        "measure",
+        "--check-stale"
+      ],
+      "tool_argv": [
+        "--check-stale"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
     }
   ]
 }

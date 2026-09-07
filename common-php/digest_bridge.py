@@ -82,7 +82,7 @@ GLOB_PATTERNS = ["driver.*", "*.py", os.path.join("layout", "*.py")]
 # BEGIN BRIDGED TABLE -- rewritten by `--regen`. Do not hand-edit.
 BRIDGED = {
     "emalloc_probe.c": "ad013ba83ff59e496cec5565263a8b4d58da6a0b8dea9c0f367ae82729d08c46",
-    "emalloc_shim.c": "3dd92f81ad1c0e1cb59d3493af41d49e77840600458de08a75a130cae8f93321",
+    "emalloc_shim.c": "2e7a82b002949faf599c92fbf4da1ce8e4fec6fad55bc4d8620980bc5dfedff9",
     "emalloc_shim.h": "aa9abf48535e8df93c9398e96c044697a784d73c40d7a7ccc830b5ee308c378f",
 }
 # END BRIDGED TABLE

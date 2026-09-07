@@ -47,13 +47,16 @@ would be a second, unvalidated gate wearing the first one's name. If a php
 row needs a check the PAT gate does not have, it goes in that row's
 `controls/` or in a separate tool, and the report says which.
 
-The preflight is SEVEN things. ⚠ SIX of them can FAIL the run; the seventh is
-a loud NOTE and says so. ⚠⚠ THIS LINE SAID "FIVE THINGS, ALL OF WHICH CAN
+The preflight is NINE things. ⚠ EIGHT of them can FAIL the run; stage 8 is a
+REPORTED number and cannot. ⚠⚠ THIS LINE SAID "FIVE THINGS, ALL OF WHICH CAN
 FAIL" AND THE "ALL" WAS FALSE OF STAGE 1 (TASK_PHP_005 F-6): stage 1 ran
 `root.py`'s `build()` BEFORE its `check()`, so a mis-aimed shim link -- one
 planted at the FROZEN PAT `results/` tree -- was silently repaired and recorded
 `shim_ok: true`. Fixed at TASK_PHP_006: check, then repair, then check, and a
-repair is printed and recorded in `shim_repaired`.
+repair is printed and recorded in `shim_repaired`. ⚠ It then said SEVEN over a
+body of seven-plus-two; corrected at TASK_PHP_008, where stage 9 became a
+failure. **Count the `problems.extend` / `problems.append` calls in
+`preflight()` before believing this number** -- `.tasks/PROTOCOL.md` rule 13.
 
   1. `harness-php/root.py` -- the shim exists and every link points where it
      should, and nothing that is not a link lives in it.
@@ -62,20 +65,29 @@ repair is printed and recorded in `shim_repaired`.
      `layout/*.py`, ALL NON-RECURSIVE, so `emalloc_shim.h` is in none of them
      and the bridge is what covers it. Ten committed control sources sat in no
      digest at all on the PAT side for many tasks; this is that check.
-  3. ⚠⚠ `c_subdir_audit()` -- NO `patterns-php/<row>/c/<subdir>/`. Added at
-     TASK_PHP_006. `check.py` and `measure.py` glob `<row>/c/*` NON-RECURSIVELY,
-     so a source in a `c/` subdirectory is COMPILED and in NO digest at all.
-     Fixing that is a `harness/` edit; the php side forbids the layout instead
-     (`RECAP_PHP.md` open item 17). ⚠ The refusal message prices three ways out,
-     one of them measured -- read it before working around it.
-  4. ⚠⚠ `shim_link_audit()` -- THE ALLOCATOR SYMLINK. Added at TASK_PHP_004;
-     see the block below, because for one task this was "mandatory" in two
-     documents and enforced by nothing. ⚠ Its detector was a STRING SEARCH and
-     TASK_PHP_005 F-1 got past it twice; since TASK_PHP_006 it is the
-     PREPROCESSOR (`_tu_closure`).
+  3. ⚠⚠ `c_digest_audit()` -- EVERY file under `<row>/c/` has a digest key.
+     `check.py` and `measure.py` build both digests from `glob(<row>/c/*)`,
+     which is NON-RECURSIVE and never matches a leading dot, so a file in a
+     `c/` subdirectory or a `c/.dotfile` is COMPILED and in NO digest at all.
+     ⚠ It was a blanket BAN on the subdirectory layout (`c_subdir_audit`,
+     TASK_PHP_006) until TASK_PHP_008 §1: TASK_PHP_007 M1/m1 showed the ban was
+     UNSOUND (it skipped a symlinked directory by name, and never saw a
+     dotfile) and OVER-STRICT (the flat-symlink layout is safe under exactly
+     this audit). The layout is now AVAILABLE AND PRICED.
+  4. ⚠⚠ `shim_link_audit()` -- THE ALLOCATOR SYMLINK, **UNCONDITIONAL** since
+     TASK_PHP_008 §0. Every row carries `c/emalloc_shim.h` whether or not it
+     allocates. ⚠ It used to DETECT allocator use -- a string search
+     (TASK_PHP_004, bypassed twice at TASK_PHP_005 F-1) and then `gcc -MM`
+     (TASK_PHP_006, bypassed twice at TASK_PHP_007 B1/B2). Both answered
+     *"does this row use the allocator?"*, a question with an unbounded answer
+     space. See the function's docstring for why the answer was to stop asking.
   5. `overlap_selftest()` -- `provenance.py`'s kernel-overlap normaliser still
-     refuses the dead-code cases TASK_PHP_005 F-4 built. Runs here because a
-     self-test nobody runs is the silent-skip class this project keeps finding.
+     scores the dead-code cases TASK_PHP_005 F-4 built the way it did when they
+     were measured. Runs here because a self-test nobody runs is the
+     silent-skip class this project keeps finding. ⚠ Since TASK_PHP_008 §2 the
+     overlap is REPORTED and no longer refuses, so this guards a NUMBER rather
+     than a verdict -- which is still worth guarding: a wrong number is worse
+     than an unenforced one.
   6. `manifest_audit()` -- `patterns-php/php-5.0.0.manifest` still hashes to
      what `MANIFEST.sha256` says. `provenance.py` consults that manifest to
      decide whether a `c_file` is in the corpus, so a tampered manifest changes
@@ -89,11 +101,17 @@ repair is printed and recorded in `shim_repaired`.
      not be indistinguishable from one taken with the check (TASK_PHP_003 M6:
      the gate record's `invocation` field is `check.py`'s argv, not this
      script's, so the skip left NO trace at all).
-
-  + `preflight_coverage_audit()` -- a NOTE, never a failure: which php records
-    have no preflight record beside them. ⚠ It is a DETECTOR, not a pin, and it
-    cannot be made into one from here -- see its docstring, and TASK_PHP_006
-    §1.3. `gate.py --audit` is the same check with an exit code.
+  8. `why_sizes()` + `why_band()` -- ⚠ THE ONE STAGE THAT CANNOT FAIL. Each php
+     row's row-specific `idiom.why` size beside the PAT band, which is COMPUTED
+     from `patterns/*/spec.md` and no longer a hard-coded constant in a printed
+     string (TASK_PHP_007 m6). `RECAP_PHP.md` open item 19: no size rule.
+  9. ⚠⚠ `preflight_coverage_audit()` -- A FAILURE SINCE TASK_PHP_008 §3 M4:
+     which php records have no preflight record beside them, and which have one
+     in which NOT ONE RUN certified the tree. It was a note, on the strength of
+     a deadlock that TASK_PHP_007 M4 demonstrated does not exist -- `main()`
+     writes the record on the FAILURE path. ⚠ It is a DETECTOR, not a pin, and
+     it cannot be made into one from here; see TASK_PHP_006 §1.3.
+     `gate.py --audit` is the same check with an exit code and nothing else run.
 
 ⚠⚠ WHAT THIS SCRIPT DOES **NOT** ENFORCE, STATED HERE BECAUSE A HALF-TRUE
 CLAIM IS WORSE THAN NONE: **it cannot make itself mandatory.**
@@ -106,8 +124,17 @@ needs a `harness/` edit and a 33-pattern re-gate. `PROTOCOL_PHP.md` §E says
 convention, not a mechanism.
 
 ============================================================================
-⚠⚠⚠ THE `<row>/c/emalloc_shim.h` SYMLINK, AND WHY IT IS CHECKED HERE
+⚠⚠⚠ THE `<row>/c/emalloc_shim.h` SYMLINK -- UNCONDITIONAL SINCE TASK_PHP_008
 ============================================================================
+⚠⚠ EVERY row carries it, whether or not it allocates. That is the design
+change, and it exists because the alternative -- deciding WHICH rows need it --
+was closed twice and reopened twice (TASK_PHP_005 F-1, TASK_PHP_007 B1/B2).
+Full argument in `shim_link_audit`'s docstring; the short form is that
+*"does this row use the allocator?"* has an unbounded answer space and a guard
+that enumerates idioms is reopened by the next idiom. There is now nothing to
+detect: `os.path.islink` + `os.path.realpath`, no subprocess, no compiler, no
+flag space, no fallback, no regex.
+
 `.tasks-php/PROTOCOL_PHP.md` §B2 and `RECAP_PHP.md` open item 10 both call it
 MANDATORY. TASK_PHP_003 built a row that links the allocator and omits the
 symlink: it BUILDS (`#include "emalloc_shim.h"` resolves through `-I COMMON`,
@@ -119,6 +146,16 @@ refreshes it; but `measure.py::measurement_sources()` names neither
 `common/*.py` nor anything under `common-php/`, so the MEASUREMENT record --
 the one carrying every `Ir` -- stays FRESH for ever, carrying numbers taken
 under an allocator that no longer exists.
+
+⚠⚠ AND THAT ASYMMETRY IS THE WHOLE PRICE OF THE UNCONDITIONAL RULE, WHICH IS
+SMALLER THAN IT LOOKS. The GATE half was ALREADY unconditional and has been
+since TASK_PHP_002: `common-php/digest_bridge.py` carries `emalloc_shim.h`'s
+sha256 in its `BRIDGED` table, and `check.py`'s `common/*.py` glob puts
+digest_bridge.py's OWN hash into EVERY php gate record -- so a shim edit has
+always staled every php gate record, linked or not. Measured at TASK_PHP_008,
+`.temp/php8/02-digest-reality.log`. What the link adds is the MEASUREMENT half,
+so the marginal cost of "every row" over "every allocating row" is a re-measure
+plus a `report.py` render, on top of a re-gate that was owed anyway.
 
 The symlink is what closes it: `check.py` globs `<row>/c/*` (:10189, :10314)
 and `measure.py::measurement_sources` globs `<row>/c/*` too, `glob` returns
@@ -167,38 +204,32 @@ TOOLS = {
     "build": "build.py",
 }
 
-#: The one allocator. `PROTOCOL_PHP.md` §B.
+#: The one allocator. `PROTOCOL_PHP.md` §B. EVERY row links it -- see
+#: `shim_link_audit`, and TASK_PHP_008 §0 for why "every" and not "every row
+#: that uses it".
 SHIM_HEADER = "emalloc_shim.h"
-#: ⚠⚠ AND ITS SECOND SPELLING. `emalloc_shim.c` is two lines --
-#: `#define PHP_SHIM_IMPL` / `#include "emalloc_shim.h"` -- and it sits on
-#: `-I common-php`, so `#include "emalloc_shim.c"` from `c/kernel.c` pulls the
-#: WHOLE allocator in while no `c/` file contains the string `emalloc_shim.h`.
-#: TASK_PHP_005 F-1 built that row: it compiles, links and allocates
-#: (`alloc tally = 7688571`) with the allocator in NEITHER digest and the
-#: preflight green. ⚠ `emalloc_shim.c`'s own header comment said it *"IS NOT ON
-#: THE PATTERN BUILD PATH AND CANNOT BE"*, which is true of `build.py`'s TU list
-#: and FALSE of the preprocessor -- corrected there at TASK_PHP_006.
-SHIM_IMPL_TU = "emalloc_shim.c"
-ALLOC_FILES = (SHIM_HEADER, SHIM_IMPL_TU)
 #: The spelling `PROTOCOL_PHP.md` §B2 prescribes, from `<row>/c/`.
 CANONICAL_LINK = os.path.join("..", "..", "..", "common-php", SHIM_HEADER)
 
-#: The FALLBACK detector, used only when the preprocessor cannot answer.
-#: ⚠ IT HAS A SPELLING and that is stated out loud wherever it fires:
-#: it requires the name inside an `#include` ON THE SAME LINE, which is what
-#: closes TASK_PHP_005 F-8 (a row whose only mention is the comment
-#: `PLAN_PHP.md` §4.3 tells a NON-allocating row to write), and it still cannot
-#: see a computed include, a macro-built path or a name reached through a
-#: `-include` flag. The preprocessor closure below has no spelling; this does.
-_INCLUDE_RX = re.compile(
-    rb'^[ \t]*#[ \t]*include[ \t]*[<"][^">]*emalloc_shim\.[hc][">]', re.M)
-
-#: `harness/build.py::c_flags` -- the two preprocessor states every measured C
-#: cell is built in. `-O0`/`-O3` do not change the include closure; `-flto` does
-#: not either; `-DSLB_ISOLATED` CAN, so both states are swept and unioned.
-#: A row that hides `#include "emalloc_shim.h"` behind `#ifdef SLB_ISOLATED`
-#: is a shim user in half its cells and this is what sees it.
-_MM_CONFIGS = ([], ["-DSLB_ISOLATED"])
+#: ⚠⚠⚠ THERE IS NO DETECTOR HERE ANY MORE, AND THAT IS THE WHOLE POINT.
+#: TASK_PHP_008 §0. `_INCLUDE_RX`, `_MM_CONFIGS`, `_tu_closure`, `_text_mentions`
+#: and the text fallback were DELETED. Every one of them answered the question
+#: *"does this row use the allocator?"*, and that question has an UNBOUNDED
+#: answer space -- every preprocessor spelling, every flag combination, every
+#: compiler -- so each round enumerated a few more of it and the next idiom
+#: reopened the hole:
+#:
+#:   TASK_PHP_004  a mandatory symlink, checked by a STRING SEARCH of `c/*`
+#:                 -> bypassed by `#include "emalloc_shim.c"` and by `c/<sub>/*`
+#:   TASK_PHP_006  the string search replaced by `gcc -MM`
+#:                 -> bypassed by `__OPTIMIZE__`, `__clang__` and
+#:                    `__has_include` (2 of build.py's 8 preprocessor states
+#:                    were simulated), and by a fallback that FAILS OPEN and
+#:                    that the row can CHOOSE (TASK_PHP_007 B1/B2)
+#:
+#: ⚠ A guard whose correctness depends on enumerating idioms will be reopened
+#: by the next idiom. Two rounds was enough evidence. The rule is now
+#: UNCONDITIONAL -- see `shim_link_audit` -- so there is nothing to detect.
 
 
 def sha256_file(p):
@@ -209,81 +240,63 @@ def sha256_file(p):
     return h.hexdigest()
 
 
-def _tu_closure(cdir, common_dir):
-    """The row's REAL translation-unit closure, from the preprocessor.
+def _walk_files(top, _seen=None):
+    """Every file under `top`, FOLLOWING directory symlinks, cycle-safe.
 
-    Returns `(by_tu, errors)` where `by_tu` maps a TU's basename to the set of
-    `realpath`s its `#include` graph reaches, under both `_MM_CONFIGS`.
+    ⚠ `os.walk` does not follow a directory symlink, and `glob("c/*")` never
+    matches a leading dot. TASK_PHP_007 M1 and m1 both walked round
+    `c_subdir_audit` on exactly those two properties: `ln -s ../../extract/Zend
+    c/zend` and `c/.payload.h` each COMPILED, landed in NO digest, and were not
+    refused. This walker sees both. `followlinks=True` on `os.walk` would loop
+    for ever on a cyclic link; the `_seen` set of realpaths is what makes
+    following safe.
 
-    ⚠⚠ THIS IS THE DETECTOR, AND THE POINT IS THAT IT HAS NO SPELLING.
-    TASK_PHP_005 F-1 got round the previous textual one twice -- once with
-    `#include "emalloc_shim.c"` (the audit knew only the `.h`) and once with
-    `c/sub/row_alloc.h` (`glob(cdir + "/*")` is not recursive) -- and
-    TASK_PHP_005 F-8 showed the same detector FALSE-POSITIVING on a row whose
-    only mention of the name is the comment `PLAN_PHP.md` §4.3 tells a
-    non-allocating row to write. `gcc -MM` closes all three at once: it answers
-    the question the digests care about, which is *"does the allocator's source
-    reach a compiled TU"*, and it answers it the way `harness/build.py` would.
-
-    ⚠ MEASURED PRICE (TASK_PHP_006, `.temp/php6/03-mm-price-batched.log`):
-    **2 `gcc -MM` calls and ~115 ms per row**, batched over every TU, against a
-    gate that takes ~24 minutes. Nine rows cost 1.03 s.
-
-    ⚠ TUs are `build.py::build_c`'s: `common/driver.c` plus every `.c` in the
-    row's `c/`. `driver.c` is included even though it is frozen PAT code,
-    because `build_c` compiles it with `-I <row>/c` and a row could therefore
-    shadow a driver header with one of its own.
-
-    ⚠ IT CAN FAIL, AND FAILING IS NOT AN ANSWER. A row mid-construction whose
-    `#include` does not resolve makes `gcc -MM` exit non-zero; the caller falls
-    back to `_INCLUDE_RX` and SAYS SO. Do not read a failure as "no allocator".
+    Yields absolute paths, dotfiles included.
     """
-    by_tu, errors = {}, []
-    tus = sorted(glob.glob(os.path.join(cdir, "*.c")))
-    drv = os.path.join(common_dir, "driver.c")
-    if os.path.exists(drv):
-        tus.append(drv)
-    if not tus:
-        return by_tu, errors
-    for defs in _MM_CONFIGS:
-        cmd = (["gcc", "-std=c99", "-MM"] + defs
-               + ["-I", common_dir, "-I", cdir] + tus)
-        try:
-            r = subprocess.run(cmd, capture_output=True, text=True, cwd=REPO)
-        except OSError as e:
-            errors.append(f"cannot run gcc -MM: {e}")
-            return by_tu, errors
-        if r.returncode != 0:
-            errors.append(f"gcc -MM {' '.join(defs) or '(no -D)'} exited "
-                          f"{r.returncode}: "
-                          f"{(r.stderr.strip().splitlines() or ['?'])[0]}")
-            continue
-        for rule in r.stdout.replace("\\\n", " ").splitlines():
-            if ":" not in rule:
-                continue
-            deps = [os.path.realpath(os.path.join(REPO, t))
-                    for t in rule.split(":", 1)[1].split()]
-            if not deps:
-                continue
-            # `gcc -MM a.o: a.c hdr.h` -- the first dependency is the TU.
-            by_tu.setdefault(os.path.basename(deps[0]), set()).update(deps)
-    return by_tu, errors
-
-
-def _text_mentions(path):
-    """Fallback detector: the allocator's name inside an `#include`."""
+    _seen = _seen if _seen is not None else set()
+    real = os.path.realpath(top)
+    if real in _seen:
+        return
+    _seen.add(real)
     try:
-        with open(path, "rb") as fh:
-            return bool(_INCLUDE_RX.search(fh.read()))
+        entries = sorted(os.listdir(top))
     except OSError:
-        return False
+        return
+    for e in entries:
+        p = os.path.join(top, e)
+        if os.path.isdir(p):
+            yield from _walk_files(p, _seen)
+        else:
+            yield p
 
 
-def c_subdir_audit(patterns_dir=None):
-    """⚠⚠ REFUSE any `patterns-php/<row>/c/<subdir>/`. Returns `(problems, [])`.
+def c_digest_audit(patterns_dir=None):
+    """⚠⚠ EVERY file under a row's `c/` is in BOTH digests, or the row is
+    refused. Returns `(problems, [])`.
+
+    ⚠⚠⚠ THIS REPLACES `c_subdir_audit`, WHICH BANNED THE SUBDIRECTORY LAYOUT
+    OUTRIGHT. TASK_PHP_007 M1/m1 PROVED THE BAN WAS BOTH UNSOUND AND
+    OVER-STRICT, AND THE MANAGER LIFTED IT AT TASK_PHP_008 §1.
+
+      * UNSOUND: `c_subdir_audit` skipped a SYMLINKED directory by name
+        (`if not os.path.isdir(p) or os.path.islink(p): continue`), so
+        `ln -s ../../../extract/Zend c/zend` compiled every header behind it
+        into NEITHER digest, unrefused. And `glob("c/*")` never matches a
+        leading dot, so `c/.payload.h` walked round it too.
+      * OVER-STRICT: the flat-symlink hatch the ban's own docstring priced and
+        declined *"because nothing would force the NEXT file added to that
+        subdirectory to get a link"* is forced by twelve lines. The reviewer
+        BUILT them and fired them in both directions
+        (`.temp/php7/a7_manager_calls.py`, log `07-manager-calls.log`).
+
+    ⚠⚠ AND THE REASON THIS IS SOUND WHERE THE ALLOCATOR DETECTOR WAS NOT:
+    **IT ENUMERATES FILES -- A FINITE, OBSERVABLE SET -- NOT IDIOMS.** There is
+    no preprocessor state, no compiler, no flag space and no spelling. A file
+    either has a key in `glob("c/*")` or it does not, and `_walk_files` sees
+    every file including the two classes `glob` cannot.
 
     ============================================================================
-    WHY A LEGITIMATE DIRECTORY LAYOUT IS FORBIDDEN HERE
+    WHY A FILE WITH NO FLAT KEY IS A REAL DEFECT
     ============================================================================
     `harness/check.py:10314` and `harness/measure.py:226` build a row's digest
     from `glob(<row>/c/*)` and then drop the directory entry with
@@ -299,37 +312,38 @@ def c_subdir_audit(patterns_dir=None):
         preprocessor is recursive even though the glob is not.
 
     That is TASK_PHP_005 F-1's second mechanism, and it is bigger than the
-    allocator: ANY source in a `c/` subdirectory is unpinned.
+    allocator: ANY source in a `c/` subdirectory is unpinned -- and so is any
+    DOTFILE at the top level of `c/`, for the same reason one directory over.
 
-    ⚠ THIS IS A DELIBERATE TRADE, NOT AN OVERSIGHT, AND THE REFUSAL IS THE
-    CHEAPER HALF OF IT. Fixing the glob is a `harness/` edit; `harness/*.py` is
-    hashed into all 33 PAT gate records and `harness/measure.py` into all 33
-    measurement records, so the repair costs a 33-pattern re-gate for zero
-    present benefit -- `find patterns patterns-php -mindepth 3 -maxdepth 3
-    -type d -path '*/c/*'` is empty. The manager decided against it:
-    `RECAP_PHP.md` open item 17.
+    ⚠ Fixing the two globs is a `harness/` edit; `harness/*.py` is hashed into
+    all 33 PAT gate records and `harness/measure.py` into all 33 measurement
+    records, so the repair costs a 33-pattern re-gate (`RECAP_PHP.md` open item
+    17, carried not closed). The php side pays for it with a flat symlink
+    instead, which costs nothing.
 
-    ⚠⚠ IF YOU ARE READING THIS BECAUSE THE PREFLIGHT REFUSED YOUR ROW, THE
-    TRADE MAY NOW BE WRONG AND THE PROJECT WANTS TO KNOW. php rows are
-    EXTRACTED C and `c/zend/` is an ordinary thing to want. Three ways out, in
-    order of cost:
+    ============================================================================
+    WHAT THIS AUDIT DEMANDS, AND THE TWO WAYS TO SATISFY IT
+    ============================================================================
+    Every file `_walk_files` finds under `<row>/c/` must have the same
+    `realpath` as some entry of `glob("<row>/c/*")` that `os.path.isfile`
+    accepts -- because that glob, and only that glob, is what both digests are
+    built from.
 
       1. FLATTEN. Name the file for its origin -- `c/zend__zend_hash.h` for
-         `Zend/zend_hash.h` -- and rewrite the `#include` to match. Costs one
-         line in the deletion ledger (`PROTOCOL_PHP.md` §A2) and nothing else.
-         This is the expected answer and no row has yet needed more.
-      2. FLAT SYMLINK. Keep `c/zend/foo.h` and add `c/zend__foo.h -> zend/foo.h`
-         beside it. ✅ MEASURED at TASK_PHP_006 (`.temp/php6/b1_rerun.py` §C,
-         log `05-b1-rerun.log`): `glob` returns the flat symlink,
-         `os.path.isfile` and `sha256_file` follow it, so the real bytes DO land
-         in both digests under the flat key `c/zend__zend_hash.h` while the
-         subdirectory file itself stays keyed nowhere.
-         ⚠ It is NOT enabled here, and deliberately: nothing would force
-         the NEXT file added to that subdirectory to get a link, so the
-         guarantee would hold only for as long as somebody remembered it.
-         If a row needs this, ask for it and it comes with a check.
-      3. PAY THE RE-GATE. Fix the two globs in `harness/`, re-gate 33 PAT rows.
-         Open item 17 is carried, not closed, precisely so this stays available.
+         `Zend/zend_hash.h` -- and rewrite the `#include`. One deletion-ledger
+         line (`PROTOCOL_PHP.md` §A2), and still the cheapest answer.
+      2. FLAT SYMLINK BESIDE IT. Keep `c/zend/zend_hash.h` and add
+         `c/zend__zend_hash.h -> zend/zend_hash.h`. ✅ MEASURED at TASK_PHP_006
+         (`.temp/php6/05-b1-rerun.log` §C) and re-derived independently at
+         TASK_PHP_007 (`.temp/php7/03-subdir.log`, row `ph83-flatlink`): `glob`
+         returns the flat symlink, `os.path.isfile` and `sha256_file` follow it,
+         so the real bytes land in BOTH digests under the flat key. ⚠ The
+         layout is AVAILABLE AND PRICED, not forbidden -- and this audit is
+         what forces the next file added to the directory to get a link, which
+         is the exact objection TASK_PHP_006 declined it on.
+
+    ⚠ A DOTFILE HAS NO SANCTIONED FORM. `glob` cannot match it, so there is no
+    flat key to give it; rename it.
     """
     patterns_dir = patterns_dir or os.path.join(REPO, "patterns-php")
     problems = []
@@ -340,57 +354,98 @@ def c_subdir_audit(patterns_dir=None):
         if not os.path.isdir(cdir):
             continue
         row = os.path.basename(pdir)
-        for entry in sorted(os.listdir(cdir)):
-            p = os.path.join(cdir, entry)
-            if not os.path.isdir(p) or os.path.islink(p):
+        # EXACTLY what `check.py:10314` and `measure.py:226` glob, and the
+        # `os.path.isfile` filter they apply. A symlink is kept: `isfile`
+        # follows it and `sha256_file` hashes the TARGET's bytes.
+        keyed = {os.path.realpath(p): os.path.basename(p)
+                 for p in sorted(glob.glob(os.path.join(cdir, "*")))
+                 if os.path.isfile(p)}
+        for p in _walk_files(cdir):
+            real = os.path.realpath(p)
+            if real in keyed:
                 continue
-            inside = sorted(os.path.relpath(os.path.join(r, f), cdir)
-                            for r, _d, fs in os.walk(p) for f in fs)
+            rel = os.path.relpath(p, cdir)
+            dotted = any(part.startswith(".") for part in rel.split(os.sep))
+            flat = rel.replace(os.sep, "__")
+            fix = (f"       Fix: RENAME it -- `glob` never matches a leading "
+                   f"dot, so there is no flat key a dotfile can have.\n"
+                   if dotted else
+                   f"       Fix: EITHER flatten it to c/{flat} and rewrite the "
+                   f"#include, OR add the flat symlink beside it:\n"
+                   f"             ln -s {rel} patterns-php/{row}/c/{flat}\n")
             problems.append(
-                f"allocator/digest: {row}: c/{entry}/ IS A DIRECTORY, and no "
-                f"file under it is in ANY digest.\n"
-                f"       {len(inside)} file(s): {inside[:6]}"
-                f"{'...' if len(inside) > 6 else ''}\n"
-                f"       check.py:10314 and measure.py:226 glob `<row>/c/*` "
-                f"NON-RECURSIVELY and drop the directory with isfile(), so "
-                f"these files are compiled (build_c passes -I <row>/c) and "
-                f"pinned by nothing: no gate digest, no measurement digest, "
-                f"and not even check.py's --no-build staleness scan. Editing "
-                f"one would not mark a single binary stale.\n"
-                f"       ⚠ Fixing the glob is a harness/ edit = a 33-pattern "
-                f"re-gate; the manager decided against it (RECAP_PHP.md open "
-                f"item 17), so the php side forbids the layout instead.\n"
-                f"       Fix: FLATTEN -- move it to c/{entry}__<name> and "
-                f"rewrite the #include (one deletion-ledger line, "
-                f"PROTOCOL_PHP.md §A2).\n"
-                f"       ⚠⚠ IF FLATTENING IS WRONG FOR YOUR ROW, SAY SO -- "
-                f"TASK_PHP_006 §5 call 1 asks to be told, with the row that "
-                f"needs it. Two sanctioned alternatives are priced in "
-                f"`c_subdir_audit`'s docstring, one of them measured.")
+                f"digest: {row}: c/{rel} is COMPILED and in NO DIGEST.\n"
+                f"       check.py:10314 and measure.py:226 build both digests "
+                f"from `glob(<row>/c/*)` + isfile(): that glob is "
+                f"NON-RECURSIVE and never matches a leading dot, while "
+                f"`build_c` passes `-I <row>/c` and the preprocessor is "
+                f"recursive. So this file is in no gate digest, no measurement "
+                f"digest, and not even check.py's --no-build staleness scan "
+                f"(check.py:10187-10189, same glob) -- editing it would not "
+                f"mark a single binary stale.\n"
+                + fix
+                + f"       (TASK_PHP_007 M1/m1; TASK_PHP_008 §1 lifted the "
+                  f"blanket subdirectory ban in favour of this audit.)")
     return problems, []
 
 
 def shim_link_audit(patterns_dir=None, common_dir=None):
-    """`PROTOCOL_PHP.md` §B2's 'mandatory' symlink, as a check.
+    """⚠⚠⚠ EVERY `patterns-php/` ROW CARRIES `c/emalloc_shim.h` AS A SYMLINK TO
+    `common-php/emalloc_shim.h` -- UNCONDITIONALLY. Returns `(problems, notes)`.
 
-    Returns `(problems, notes)`. A row whose TUs REACH `emalloc_shim.h` (or
-    `emalloc_shim.c`) MUST carry `<row>/c/emalloc_shim.h` as a SYMLINK resolving
-    to `common-php/emalloc_shim.h`; anything else is a problem. A row that
-    carries the link without using it gets a note, not a problem -- it is odd
-    but it pins the right bytes.
+    ============================================================================
+    WHY UNCONDITIONALLY, AND WHY THIS IS THE THIRD ATTEMPT
+    ============================================================================
+    B1 was closed twice and reopened twice, and both fixes answered the same
+    question -- *"does this row use the allocator?"*:
 
-    ⚠⚠ "REACH" IS DECIDED BY THE PREPROCESSOR, NOT BY A STRING SEARCH, SINCE
-    TASK_PHP_006. The previous detector searched each `c/*` file for the literal
-    `emalloc_shim.h`; TASK_PHP_005 F-1 got past it twice and F-8 made it fire on
-    a comment. See `_tu_closure`. The text detector survives as a FALLBACK for
-    the one case the preprocessor cannot answer -- a row that does not
-    preprocess -- and every use of it says so in the notes.
+      TASK_PHP_004  a STRING SEARCH over `c/*`.
+                    Bypassed by `#include "emalloc_shim.c"` (the audit knew only
+                    the `.h`, and `emalloc_shim.c`'s own header comment claimed
+                    it *"CANNOT BE"* on the build path -- true of `build.py`'s
+                    TU list, false of the preprocessor) and by `c/<subdir>/*`
+                    (`glob` is not recursive). TASK_PHP_005 F-1.
+      TASK_PHP_006  `gcc -MM`, "the preprocessor, which has no spelling".
+                    ⚠ It simulated **2 of build.py's 8** preprocessor states:
+                    `_MM_CONFIGS` swept `-DSLB_ISOLATED` and hard-coded `gcc`
+                    with no `-O`, so `__OPTIMIZE__`, `__clang__` and
+                    `__has_include` each gave a LIVE allocator in a real
+                    measured cell with the audit silent -- and emitting a NOTE
+                    saying *"dead code … Not treated as a shim user"* about a
+                    row that allocates 1000 times in half its cells. Its text
+                    FALLBACK failed OPEN and the row could CHOOSE it (a `c/*.c`
+                    that `build.py` never compiles makes `gcc -MM` fail for the
+                    whole row). TASK_PHP_007 B1/B2.
+
+    ⚠⚠ THAT QUESTION HAS AN UNBOUNDED ANSWER SPACE, so each round enumerated a
+    few more of it. **A guard whose correctness depends on enumerating idioms
+    will be reopened by the next idiom.** TASK_PHP_008 §0 stopped asking it:
+    every row carries the link whether or not it allocates, so there is nothing
+    to detect. No subprocess, no flag space, no compiler, no fallback, no regex.
+
+    ============================================================================
+    WHAT IT COSTS, STATED HONESTLY -- AND IT IS SMALLER THAN THE DECISION SAID
+    ============================================================================
+    An `emalloc_shim.h` edit now stales EVERY php row, not only the allocating
+    ones. ⚠ But the GATE half of that was ALREADY unconditional and has been
+    since TASK_PHP_002: `common-php/digest_bridge.py` carries the shim's sha256
+    in `BRIDGED`, and `check.py`'s `common/*.py` glob puts *digest_bridge.py's
+    own hash* into every php gate record -- measured at TASK_PHP_008,
+    `.temp/php8/02-digest-reality.log`. So the MARGINAL price of the
+    unconditional link is the MEASUREMENT half only: a re-measure plus a
+    `report.py` render per row, on top of a re-gate that was owed anyway.
+
+    It errs SAFE: it can over-re-gate, and it can never leave a stale record
+    FRESH.
+
+    ⚠ `uses_allocator` in the row's `provenance` block is the DECLARED answer to
+    the question this audit stopped asking. It is documentation for a reviewer;
+    nothing depends on it being right, and nothing here reads it.
 
     ⚠ Parameterised on purpose so a negative test can point it at a fixture
     tree under `.temp/` instead of at `patterns-php/`
-    (`.temp/php4/b1_symlink_test.py`, `.temp/php5/b1_bypass.py`,
-    `.temp/php6/b1_rerun.py`). A guard nobody has constructed a failing case for
-    is a guard nobody has tested.
+    (`.temp/php5/b1_bypass.py`, `.temp/php7/a1_flagmatrix.py`). A guard nobody
+    has constructed a failing case for is a guard nobody has tested.
     """
     patterns_dir = patterns_dir or os.path.join(REPO, "patterns-php")
     common_dir = common_dir or os.path.join(REPO, "common-php")
@@ -403,9 +458,6 @@ def shim_link_audit(patterns_dir=None, common_dir=None):
                         f"not exist -- every row's symlink dangles")
         return problems, notes
     want = os.path.realpath(real_shim)
-    alloc_real = {os.path.realpath(os.path.join(common_dir, f))
-                  for f in ALLOC_FILES
-                  if os.path.exists(os.path.join(common_dir, f))}
 
     for pdir in sorted(glob.glob(os.path.join(patterns_dir, "*"))):
         if not os.path.isdir(pdir):
@@ -415,91 +467,42 @@ def shim_link_audit(patterns_dir=None, common_dir=None):
             continue
         row = os.path.basename(pdir)
         link = os.path.join(cdir, SHIM_HEADER)
+        why = (f"       Every php row carries it, whether or not it allocates: "
+               f"the alternative is a detector, and two of those have been "
+               f"bypassed (TASK_PHP_005 F-1, TASK_PHP_007 B1/B2). With the "
+               f"link, the allocator's bytes are in the GATE digest and the "
+               f"MEASUREMENT digest under `c/{SHIM_HEADER}`, so a later shim "
+               f"fix can never leave this row's Ir numbers FRESH under an "
+               f"allocator that no longer exists.\n"
+               f"       Fix:  ln -s {CANONICAL_LINK} "
+               f"patterns-php/{row}/c/{SHIM_HEADER}\n"
+               f"       (PROTOCOL_PHP.md §B2; TASK_PHP_008 §0.)")
 
-        by_tu, mm_errors = _tu_closure(cdir, common_dir)
-        # Every `c/` source, RECURSIVELY -- the text detector must not repeat
-        # the non-recursive mistake even though `c_subdir_audit` forbids the
-        # layout that exploits it.
-        texty = sorted(
-            os.path.relpath(os.path.join(r, f), cdir)
-            for r, _d, fs in os.walk(cdir) for f in fs
-            if f != SHIM_HEADER and _text_mentions(os.path.join(r, f)))
-
-        if mm_errors:
-            for e in mm_errors:
-                notes.append(f"{row}: ⚠ PREPROCESSOR COULD NOT DECIDE -- {e}. "
-                             f"Falling back to the TEXT detector, which only "
-                             f"sees the name inside an #include and can miss a "
-                             f"computed or conditional one. Make the row "
-                             f"preprocess and re-run.")
-            users = texty
-            how = "text fallback"
-        else:
-            users = sorted(tu for tu, deps in by_tu.items()
-                           if deps & alloc_real)
-            how = "preprocessor"
-            # Text says yes, the preprocessor says no: dead or conditional
-            # code. Not a refusal -- the preprocessor is the authority -- but
-            # worth saying, because it is the shape F-4 found on the overlap
-            # floor.
-            only_text = [t for t in texty
-                         if not (by_tu.get(os.path.basename(t), set())
-                                 & alloc_real)]
-            reached = bool(users)
-            for t in only_text:
-                if not reached:
-                    notes.append(
-                        f"{row}: c/{t} #include(s) an emalloc_shim file but no "
-                        f"translation unit REACHES it under -DSLB_ISOLATED or "
-                        f"without it -- dead code, or a header nothing "
-                        f"includes. Not treated as a shim user.")
-
-        present = os.path.islink(link) or os.path.exists(link)
-
-        if not users:
-            if present:
-                notes.append(f"{row}: carries c/{SHIM_HEADER} but no "
-                             f"translation unit reaches it ({how}) -- "
-                             f"harmless, but the record pins an "
-                             f"allocator the row does not use")
-            continue
-
-        who = ", ".join(users)
-        if not present:
-            problems.append(
-                f"allocator: {row}: the TU(s) {who} REACH an emalloc_shim "
-                f"source ({how}) and {row}/c/{SHIM_HEADER} IS ABSENT.\n"
-                f"       It BUILDS anyway (-I common-php), and that is the "
-                f"whole problem: the allocator then sits in NEITHER the gate "
-                f"digest nor the MEASUREMENT digest, so a later shim fix "
-                f"leaves this row's Ir numbers FRESH for ever under an "
-                f"allocator that no longer exists.\n"
-                f"       Fix:  ln -s {CANONICAL_LINK} "
-                f"patterns-php/{row}/c/{SHIM_HEADER}\n"
-                f"       (PROTOCOL_PHP.md §B2; TASK_PHP_003 B1.)")
-            continue
         if not os.path.islink(link):
-            problems.append(
-                f"allocator: {row}: {row}/c/{SHIM_HEADER} is a REGULAR FILE, "
-                f"not a symlink. A copy is hashed under the same key and looks "
-                f"identical in the record while holding a DIFFERENT allocator. "
-                f"Replace it with:  ln -s {CANONICAL_LINK} "
-                f"patterns-php/{row}/c/{SHIM_HEADER}")
+            if os.path.exists(link):
+                problems.append(
+                    f"allocator: {row}: {row}/c/{SHIM_HEADER} is a REGULAR "
+                    f"FILE, not a symlink. A copy is hashed under the same key "
+                    f"and looks identical in the record while holding a "
+                    f"DIFFERENT allocator.\n" + why)
+            else:
+                problems.append(
+                    f"allocator: {row}: {row}/c/{SHIM_HEADER} IS ABSENT.\n"
+                    + why)
             continue
         got = os.path.realpath(link)
         if got != want:
             problems.append(
                 f"allocator: {row}: {row}/c/{SHIM_HEADER} -> "
                 f"{os.readlink(link)!r} resolves to {got}, not "
-                f"{want}. Every row links the ONE allocator.")
+                f"{want}. Every row links the ONE allocator.\n" + why)
             continue
         target = os.readlink(link)
         if target != CANONICAL_LINK:
             notes.append(f"{row}: c/{SHIM_HEADER} -> {target!r} resolves "
                          f"correctly but is not the canonical "
                          f"{CANONICAL_LINK!r} (PROTOCOL_PHP.md §B2)")
-        notes.append(f"{row}: c/{SHIM_HEADER} OK -- symlink, in BOTH digests, "
-                     f"reached by {who} ({how})")
+        notes.append(f"{row}: c/{SHIM_HEADER} OK -- symlink, in BOTH digests")
     return problems, notes
 
 
@@ -636,6 +639,41 @@ def why_sizes(patterns_dir=None):
     return out
 
 
+def why_band(patterns_dir=None):
+    """The PAT corpus's row-specific `why` distribution, COMPUTED not quoted.
+
+    ⚠ TASK_PHP_007 m6: `preflight` printed the band `median 989, p90 1817,
+    max 3140` as a HARD-CODED CONSTANT inside an f-string, and `why_sizes`
+    reads `patterns-php/` only -- so the moment PAT gains or edits a row the
+    printed comparison is silently wrong. That is the citation-rot class this
+    project keeps paying for, and the engineer disclosed it rather than fixing
+    it. This derives it from `patterns/*/spec.md` on every run instead.
+
+    ⚠ READ-ONLY. `patterns/` is frozen PAT infrastructure; this opens files
+    there and writes nothing.
+    """
+    sizes = why_sizes(patterns_dir or os.path.join(REPO, "patterns"))
+    vals = sorted(s["row_specific_words"] for s in sizes.values())
+    if not vals:
+        return None
+
+    # ⚠⚠ THE PERCENTILE CONVENTION IS PINNED TO THE ONE ALREADY PUBLISHED, AND
+    # THAT MATTERS MORE THAN WHICH ONE IS "RIGHT". `RECAP_PHP.md`'s size box
+    # warns that this quantity already HAS three answers and that arbitrating
+    # it again is the wrong move. `floor(f*(n-1))` -- numpy's `lower` -- is what
+    # reproduces TASK_PHP_006's published `p90 1817`; `round` gives 2062 and
+    # linear interpolation 2013, both defensible and both a FOURTH answer.
+    # Measured at TASK_PHP_008, `.temp/php8/07-why-band.log`.
+    # (The `527 / 989 / 1544` quartiles quoted in `why_sizes` and
+    # `PROTOCOL_PHP.md` §E are Tukey's hinges over the same 33 values and are
+    # CORRECT under that convention -- checked, not assumed.)
+    def q(f):
+        return vals[int(f * (len(vals) - 1))]
+
+    return {"n": len(vals), "min": vals[0], "median": q(0.5),
+            "p90": q(0.9), "max": vals[-1]}
+
+
 def overlap_selftest():
     """Run `provenance.py`'s dead-code regression cases. Returns `(problems, note)`.
 
@@ -659,10 +697,90 @@ def overlap_selftest():
     return ([], f"{len(provmod.OVERLAP_CASES)} cases")
 
 
+#: ⚠⚠⚠ THE PREFIX THAT MAKES M4 AND M5 COMPOSE, AND WITHOUT IT THEY DEADLOCK.
+#: This module's OWN coverage problems are tagged with it, and
+#: `_run_is_certifying` discounts them. Read that function before touching it.
+_COVERAGE_TAG = "preflight coverage:"
+
+
+def _run_is_certifying(run):
+    """Did this stored run actually certify the tree? Returns `(bool, why)`.
+
+    ⚠⚠ TASK_PHP_007 M5: `--audit` only asked whether a preflight FILE existed,
+    so a row whose ONLY recorded run was `PREFLIGHT FAILED` /
+    `provenance_skipped` / `shim_ok: false` reported "coverage: complete".
+    This is what reads the verdict instead.
+
+    ⚠⚠⚠ AND THE OBVIOUS SPELLING OF IT DEADLOCKS. FOUND AT TASK_PHP_008,
+    BEFORE SHIPPING, BY RUNNING IT (`.temp/php8/g4_selfdeadlock.py`,
+    log `21-selfdeadlock-BEFORE.log`). The obvious rule is *"a run whose
+    verdict is PREFLIGHT FAILED never certifies"*, and combined with M4 --
+    which makes a MISSING record fail the preflight -- it is self-referential:
+
+        run 1  no record          -> coverage problem -> PREFLIGHT FAILED
+                                  -> writes a record whose only run FAILED
+        run 2  record exists, its only run FAILED (M5)
+                                  -> coverage problem -> PREFLIGHT FAILED
+        run N  ... for ever, and NOTHING the operator can do fixes it.
+
+    Measured: 6 runs, `coverage problems = 1` every time.
+    ⚠ **THAT IS A REAL DEADLOCK, AND IT IS THE MIRROR OF THE ONE TASK_PHP_007
+    M4 DISPROVED** -- the engineer asserted a deadlock that did not exist, and
+    the fix for that assertion created one that does. Both were settled by
+    running the loop rather than reading the code.
+
+    ✅ THE REPAIR, AND IT IS ALSO THE HONEST READING: a run that failed ONLY on
+    a coverage problem still verified the shim, the digest bridge, the `c/`
+    digest keys, the allocator symlink, the overlap self-test, the manifest and
+    provenance. It certified THIS tree; what it complained about was some OTHER
+    row's paperwork. So only a SUBSTANTIVE problem -- one not tagged
+    `_COVERAGE_TAG` -- makes a run non-certifying.
+
+    ⚠ Do not "simplify" this back to `verdict == "PREFLIGHT FAILED"`. The
+    must-fire control in `g4_selfdeadlock.py` exists to catch exactly that
+    edit, and `verdict` is redundant anyway: it is `PREFLIGHT FAILED` iff
+    `problems` is non-empty.
+    """
+    if not isinstance(run, dict):
+        return False, "unparseable entry"
+    substantive = [p for p in (run.get("problems") or [])
+                   if not str(p).startswith(_COVERAGE_TAG)]
+    if substantive:
+        return False, (f"{len(substantive)} recorded problem(s), first: "
+                       f"{str(substantive[0]).splitlines()[0][:60]}")
+    if run.get("provenance_skipped"):
+        return False, "provenance_skipped=true (--no-provenance)"
+    if run.get("shim_ok") is False:
+        return False, "shim_ok=false"
+    return True, ""
+
+
 def preflight_coverage_audit():
     """⚠ Which php records were produced by a run NOTHING certified?
 
     Returns `(problems, notes)`.
+
+    ⚠⚠ IT RETURNS **PROBLEMS** SINCE TASK_PHP_008 §3 M4. It used to return
+    notes only, justified by a DEADLOCK -- *"if a missing record failed the
+    preflight, the repair (`gate.py --preflight <row>`) is itself a preflight
+    and would fail on every OTHER uncovered row BEFORE WRITING ANYTHING"*.
+    ⚠ **THAT DEADLOCK DOES NOT EXIST**: `main()` writes the record on the
+    FAILURE path before returning 2, so N uncovered rows are repaired by the
+    same N `--preflight <row>` invocations the note design needed anyway.
+    Demonstrated by the reviewer (`.temp/php7/08-deadlock.log`) and re-run
+    end-to-end at TASK_PHP_008 (`.temp/php8/23-coverage-cap-AFTER.log`, the
+    three-uncovered-row repair loop).
+
+    ⚠⚠ BUT MAKING IT A FAILURE CREATES A DIFFERENT DEADLOCK THAT IS REAL, AND
+    `_run_is_certifying` IS WHAT AVOIDS IT. Read that function before changing
+    either of them: this stage's own problems are tagged `_COVERAGE_TAG` and
+    discounted there precisely so the pair composes.
+
+    ⚠⚠ AND IT READS THE VERDICT, NOT JUST THE FILENAME (TASK_PHP_007 M5). A
+    row whose only recorded run was `PREFLIGHT FAILED` / `provenance_skipped` /
+    `shim_ok: false` used to count as covered, so the one question the
+    committed record exists to answer was answered wrongly by the only tool
+    that asked it.
 
     TASK_PHP_005 §1's second half: `grep -c preflight harness/{check,measure,
     report}.py` is `0 0 0`, the gate record's 37 top-level keys carry no
@@ -681,16 +799,13 @@ def preflight_coverage_audit():
     COMMITTED as of TASK_PHP_006 (`RECAP_PHP.md` open item 18); while it was
     gitignored, a clean checkout made every row look uncertified.
 
-    ⚠ A NOTE, NOT A PROBLEM, AND THE REASON IS A DEADLOCK. If a missing record
-    failed the preflight, the repair (`gate.py --preflight <row>`) would itself
-    be a preflight and would fail on every OTHER uncovered row before writing
-    anything. Loud beats unrunnable. `gate.py --audit` exits non-zero on the
-    same condition, for anyone who wants it as a gate.
+    ⚠ `gate.py --audit` is the same check with an exit code and nothing else
+    run, for anyone who wants it standalone.
     """
-    notes, uncovered = [], []
+    problems, uncovered, hollow = [], [], []
     rdir = os.path.join(REPO, "results-php")
     if not os.path.isdir(rdir):
-        return [], notes
+        return problems, []
     recs = (sorted(glob.glob(os.path.join(rdir, "*.json")))
             + sorted(glob.glob(os.path.join(rdir, "gate", "*.json"))))
     for rec in recs:
@@ -698,19 +813,58 @@ def preflight_coverage_audit():
             continue
         stem = os.path.basename(rec)[:-len(".json")]
         rid = stem.split("-")[0]
-        hits = glob.glob(os.path.join(PREFLIGHT_DIR, f"{rid}*.preflight.json"))
+        hits = sorted(glob.glob(os.path.join(PREFLIGHT_DIR,
+                                            f"{rid}*.preflight.json")))
         if not hits:
             uncovered.append(os.path.relpath(rec, REPO))
+            continue
+        # ⚠ THE FILE EXISTING IS NOT THE QUESTION (TASK_PHP_007 M5).
+        why, certified = [], False
+        for h in hits:
+            try:
+                doc = json.load(open(h, encoding="utf-8"))
+            except (ValueError, OSError) as e:
+                why.append(f"{os.path.basename(h)}: unreadable ({e})")
+                continue
+            runs = doc.get("runs") if isinstance(doc, dict) else None
+            if not isinstance(runs, list) or not runs:
+                why.append(f"{os.path.basename(h)}: no runs[]")
+                continue
+            for run in runs:
+                ok, reason = _run_is_certifying(run)
+                if ok:
+                    certified = True
+                    break
+                why.append(f"{os.path.basename(h)}: {reason}")
+            if certified:
+                break
+        if not certified:
+            hollow.append((os.path.relpath(rec, REPO), sorted(set(why))[:4]))
     if uncovered:
-        notes.append(
-            f"⚠ {len(uncovered)} php record(s) have NO preflight record: "
-            f"{uncovered}. Either the run did not go through gate.py "
-            f"(PLAN_PHP.md §2.1a documents that spelling and nothing "
+        problems.append(
+            f"{_COVERAGE_TAG} {len(uncovered)} php record(s) have NO "
+            f"preflight record: {uncovered}. Either the run did not go through "
+            f"gate.py (PLAN_PHP.md §2.1a documents that spelling and nothing "
             f"downstream records it -- TASK_PHP_005 §1), or the record was "
-            f"deleted. Re-run `python3 harness-php/gate.py --preflight <row>` "
-            f"to certify the CURRENT tree, and say in the report that the "
-            f"original run was not certified.")
-    return [], notes
+            f"deleted.\n"
+            f"       Fix: `python3 harness-php/gate.py --preflight <row>` per "
+            f"uncovered row, and say in the report that the ORIGINAL run was "
+            f"not certified -- this certifies the CURRENT tree, not that one.\n"
+            f"       ⚠ THERE IS NO DEADLOCK: `main()` writes the record on the "
+            f"FAILURE path, so each repair invocation covers its own row even "
+            f"while this stage is still failing on the others "
+            f"(TASK_PHP_007 M4).")
+    for rec, why in hollow:
+        problems.append(
+            f"{_COVERAGE_TAG} {rec} HAS a preflight record and NOT ONE RUN "
+            f"IN IT CERTIFIED THE TREE: {why}.\n"
+            f"       A record that only says the preflight FAILED, or that "
+            f"provenance was SKIPPED, is evidence AGAINST the row and not for "
+            f"it -- and `--audit` used to call that `complete` because it "
+            f"never opened the file (TASK_PHP_007 M5).\n"
+            f"       Fix: `python3 harness-php/gate.py --preflight <row>` with "
+            f"the tarball present, and read the output.")
+    return problems, []
 
 
 def preflight(row, do_provenance=True):
@@ -750,18 +904,21 @@ def preflight(row, do_provenance=True):
     record["digest_bridge_ok"] = r.returncode == 0
     print(f"  {'ok  ' if r.returncode == 0 else 'FAIL'} common-php/ digest bridge")
 
-    sub_bad, _ = c_subdir_audit()
+    sub_bad, _ = c_digest_audit()
     problems.extend(sub_bad)
-    record["c_subdir_ok"] = not sub_bad
-    print(f"  {'ok  ' if not sub_bad else 'FAIL'} no patterns-php/*/c/ "
-          f"subdirectory (RECAP_PHP.md open item 17)")
+    record["c_digest_ok"] = not sub_bad
+    print(f"  {'ok  ' if not sub_bad else 'FAIL'} every patterns-php/*/c/ file "
+          f"has a digest key (RECAP_PHP.md open item 17)")
+    for b in sub_bad:
+        print(f"       | {b.splitlines()[0]}")
 
     alloc_bad, alloc_notes = shim_link_audit()
     problems.extend(alloc_bad)
     record["allocator_symlink_ok"] = not alloc_bad
     record["allocator_symlink_notes"] = alloc_notes
     print(f"  {'ok  ' if not alloc_bad else 'FAIL'} "
-          f"<row>/c/{SHIM_HEADER} symlink (PROTOCOL_PHP.md §B2)")
+          f"<row>/c/{SHIM_HEADER} symlink, UNCONDITIONAL "
+          f"(PROTOCOL_PHP.md §B2, TASK_PHP_008 §0)")
     for n in alloc_notes:
         print(f"       | {n}")
 
@@ -795,20 +952,29 @@ def preflight(row, do_provenance=True):
 
     sizes = why_sizes()
     record["why_sizes"] = sizes
+    band = why_band()
+    record["why_band_pat"] = band
+    band_txt = (f"PAT corpus n={band['n']}: median {band['median']}, "
+                f"p90 {band['p90']}, max {band['max']}."
+                if band else "PAT corpus: not readable from here.")
     print(f"  --   `idiom.why` row-specific size (REPORTED, NO LIMIT -- "
           f"RECAP_PHP.md open item 19, `why_sizes`)")
     for r, s in sorted(sizes.items()):
         print(f"       | {r}: {s['row_specific_words']} words "
               f"({s.get('prefix_words')} before the shared block + "
-              f"{s.get('tail_words')} after). PAT corpus n=33: "
-              f"median 989, p90 1817, max 3140. NO LIMIT.")
+              f"{s.get('tail_words')} after). {band_txt} NO LIMIT.")
 
-    _cov_bad, cov_notes = preflight_coverage_audit()
-    record["uncertified_records"] = cov_notes
-    print(f"  {'ok  ' if not cov_notes else '!!  '} every php record has a "
-          f"preflight record beside it")
-    for n in cov_notes:
-        print(f"       | {n}")
+    # ⚠⚠ A FAILURE SINCE TASK_PHP_008 §3 M4, AND THE RETURN VALUE IS BOUND.
+    # It used to read `_cov_bad, cov_notes = ...` and DISCARD the problems, so
+    # the stage could not have failed the run even if it had returned any
+    # (TASK_PHP_007 M4, parenthetical). Two lines, not one.
+    cov_bad, _cov_notes = preflight_coverage_audit()
+    problems.extend(cov_bad)
+    record["uncertified_records"] = cov_bad
+    print(f"  {'ok  ' if not cov_bad else 'FAIL'} every php record has a "
+          f"CERTIFYING preflight record beside it")
+    for n in cov_bad:
+        print(f"       | {n.splitlines()[0]}")
 
     record["harness_php_sha256"] = harness_php_hashes()
     record["problems"] = problems
@@ -833,6 +999,62 @@ WHEN_FIELD = "when"
 _RUN_SLOT = {}
 
 
+#: ⚠ "COLLAPSE" IS NOT "BOUNDED". Content collapse removes repeats; a tree that
+#: genuinely differs between runs still adds one entry each time. TASK_PHP_007
+#: M3 measured the committed file quintupling in six cycles of ordinary use and
+#: found nothing that prunes -- `gate.py contains 'prune'/'MAX_RUNS'/'truncat'/
+#: 'rotate': False/False/False/False`. This is the missing one.
+MAX_RUNS = 40
+
+
+def _carries_evidence(run):
+    """Never dropped by the cap. These are the entries the record EXISTS for:
+    TASK_PHP_005 F-2a is about a `--no-provenance` run being erased."""
+    return bool(isinstance(run, dict)
+                and (run.get("provenance_skipped")
+                     or run.get("problems")
+                     or run.get("shim_repaired")
+                     or run.get("verdict") == "PREFLIGHT FAILED"
+                     or run.get("_schema")))
+
+
+def _collapse_and_cap(runs, slot):
+    """Drop content-duplicates (keeping the FIRST), then cap. TASK_PHP_008 M3.
+
+    Returns `(runs, slot_or_None, n_dropped_by_the_cap)`. `slot` comes back
+    `None` if the entry at `slot` was collapsed away onto an earlier identical
+    one -- see `write_preflight_record` for why the caller must not reuse it.
+    """
+    seen, kept, newslot = {}, [], None
+    for i, r in enumerate(runs):
+        k = json.dumps(r, sort_keys=True)
+        if k in seen:
+            continue                      # byte-identical to an earlier entry
+        seen[k] = len(kept)
+        if i == slot:
+            newslot = len(kept)
+        kept.append(r)
+    dropped = 0
+    if len(kept) > MAX_RUNS:
+        keep_idx = {0, len(kept) - 1}
+        keep_idx |= {i for i, r in enumerate(kept) if _carries_evidence(r)}
+        # then the most recent, until the cap is met
+        for i in range(len(kept) - 1, -1, -1):
+            if len(keep_idx) >= MAX_RUNS:
+                break
+            keep_idx.add(i)
+        dropped = len(kept) - len(keep_idx)
+        remap = {}
+        pruned = []
+        for i, r in enumerate(kept):
+            if i in keep_idx:
+                remap[i] = len(pruned)
+                pruned.append(r)
+        newslot = remap.get(newslot)
+        kept = pruned
+    return kept, newslot, dropped
+
+
 def _record_paths(stem):
     return (os.path.join(PREFLIGHT_DIR, f"{stem}.preflight.json"),
             os.path.join(PREFLIGHT_DIR, f"{stem}.when.json"))
@@ -849,15 +1071,31 @@ def write_preflight_record(record):
     file now holds `{"row": ..., "runs": [...]}` and a run is appended, never
     overwritten.
 
-    ⚠ CONSECUTIVE IDENTICAL RUNS COLLAPSE, and that is what makes the file
-    COMMITTABLE. `RECAP_PHP.md` open item 18: the manager gitignored this
-    directory as churn, and TASK_PHP_005 F-2c showed the churn was ONE field --
-    `when` -- while `gate_argv` is a function of the command and everything else
-    is byte-identical across runs. So `when` goes to a gitignored
-    `<row>.when.json` sidecar and the committed record is dropped in if it
-    repeats the previous entry. Two identical `--check-stale` runs therefore
-    leave the committed file BYTE-IDENTICAL, and a `--no-provenance` run leaves
-    a permanent entry in git.
+    ⚠⚠ IDENTICAL RUNS COLLAPSE **ON CONTENT, NOT ON ADJACENCY** -- TASK_PHP_008
+    §3 M3. Until then a run was dropped only if it equalled the IMMEDIATELY
+    PRECEDING one, so two command lines used ALTERNATELY never collapsed at
+    all, and one of them is the bracket every task file mandates twice. The
+    reviewer measured it: `--preflight` alternated with
+    `--tool measure --check-stale` grew the COMMITTED file by **+2 runs and
+    +2385 bytes per cycle**, x5 in six cycles, ~19 kB/cycle at 80 rows, with
+    nothing pruning (`.temp/php7/05-record-growth.log`). Now a run equal to ANY
+    stored run is dropped, so both of those cycles are byte-neutral.
+
+    ⚠ Collapsing on FULL CONTENT can never lose a fact: two entries only
+    collapse when every field agrees, `provenance_skipped` included. That is
+    why the key is the whole body and not a chosen subset.
+
+    ⚠ AND IT IS CAPPED (`MAX_RUNS`), because "collapse" is not "bounded": a
+    tree that really does change between every run produces a distinct entry
+    every time. The cap keeps the first, everything that carries evidence
+    (a failed verdict, a recorded problem, a skipped provenance, a repaired
+    shim) and the most recent, and records how many it dropped.
+
+    `RECAP_PHP.md` open item 18: the manager gitignored this directory as
+    churn, and TASK_PHP_005 F-2c showed the churn was ONE field -- `when` --
+    while `gate_argv` is a function of the command and everything else is
+    byte-identical across runs. So `when` goes to a gitignored
+    `<row>.when.json` sidecar and the committed record is stable.
 
     ⚠ It is still EVIDENCE AND NOT A PIN: nothing hashes it, so it can prove
     `--no-provenance` WAS used and cannot prove it was not. Putting
@@ -888,17 +1126,22 @@ def write_preflight_record(record):
             doc = {"row": old.get("row"), "runs": [legacy]}
 
     slot = _RUN_SLOT.get(stem)
-    if slot is None:
+    if slot is None or not doc["runs"]:
         doc["runs"].append(body)
         slot = len(doc["runs"]) - 1
-        _RUN_SLOT[stem] = slot
     else:
         slot = min(slot, len(doc["runs"]) - 1)
         doc["runs"][slot] = body
-    # Collapse a run that says exactly what the previous one said.
-    if slot >= 1 and doc["runs"][slot] == doc["runs"][slot - 1]:
-        doc["runs"].pop(slot)
-        _RUN_SLOT[stem] = slot = len(doc["runs"]) - 1
+
+    doc["runs"], slot, dropped = _collapse_and_cap(doc["runs"], slot)
+    if dropped:
+        doc["_dropped_runs"] = doc.get("_dropped_runs", 0) + dropped
+    # ⚠ `slot is None` means THIS run collapsed onto an older identical entry.
+    # Forget the slot rather than pointing at that older entry: the next
+    # in-process write (`tool RUNNING` -> `tool exited`) would otherwise
+    # OVERWRITE somebody else's record. It appends instead, and the collapse
+    # runs again on the new content.
+    _RUN_SLOT[stem] = slot
 
     with open(out, "w", encoding="utf-8") as fh:
         json.dump(doc, fh, indent=2, sort_keys=False)
@@ -957,12 +1200,12 @@ def main():
     row = next((x for x in argv if not x.startswith("-")), None)
 
     if a.audit:
-        _bad, notes = preflight_coverage_audit()
-        for n in notes:
+        bad, _notes = preflight_coverage_audit()
+        for n in bad:
             print(f"  {n}")
         print("preflight coverage: "
-              + ("complete" if not notes else f"{len(notes)} problem(s)"))
-        return 1 if notes else 0
+              + ("complete" if not bad else f"{len(bad)} problem(s)"))
+        return 1 if bad else 0
 
     problems, record = preflight(row, not a.no_provenance)
     record["tool"] = a.tool

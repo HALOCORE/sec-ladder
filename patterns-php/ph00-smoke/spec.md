@@ -301,7 +301,9 @@ a green gate are, separately, evidence of very little:
     "why": "THROWAWAY INFRASTRUCTURE SMOKE ROW -- NOT A PHP ROW. No PHP source, no root_cause_id, no CWE, no fix_commit, no security claim, no measured result. A copy of patterns/p01-array-sum/ used once, at TASK_PHP_002, to prove the unmodified PAT gate runs green through .temp/php-root/ and writes to results-php/. harness-php/provenance.py accepts it ONLY because of this declaration; every real row carries c_file/c_lines/extract_sha256 instead.",
     "copied_from": "patterns/p01-array-sum/",
     "copied_at_commit": "4afcef235eeaf244506899db6172a99a7247ee8f",
-    "task": "TASK_PHP_002"
+    "task": "TASK_PHP_002",
+    "uses_allocator": false,
+    "uses_allocator_why": "c/kernel.c sums u32s out of a mapped buffer and allocates nothing; no rung calls php_shim_emalloc. DECLARED, NEVER DETECTED (TASK_PHP_008 §0.4) -- nothing reads this field and no verdict depends on it. The row still carries c/emalloc_shim.h as a symlink, because that rule is UNCONDITIONAL: two detectors of exactly this question were built and bypassed (TASK_PHP_005 F-1, TASK_PHP_007 B1/B2), so the audit stopped asking it."
   }
 }
 ```

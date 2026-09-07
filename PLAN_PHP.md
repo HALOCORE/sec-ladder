@@ -425,11 +425,17 @@ where the two predicates agree and therefore could not see this.
 **Rule: any allocating php row links `common-php/emalloc_shim.*` — faithful and
 line-cited against the pristine tarball — or states in `spec.md` why not.**
 ⚠ Enforcing this on the earlier attempt exposed **three** link sites, not one.
-⚠ **And "links it" is now CHECKED, not conventional**: `harness-php/gate.py`'s
-preflight refuses any row whose `c/` sources mention `emalloc_shim.h` without
-the `<row>/c/emalloc_shim.h` symlink that puts the allocator in **both**
-digests (`PROTOCOL_PHP.md` §B2; it was enforced by nothing until
-`TASK_PHP_004`).
+⚠ **And "links it" is now CHECKED, not conventional** — ⚠⚠ **and since
+`TASK_PHP_008` §0 the check is UNCONDITIONAL: `harness-php/gate.py`'s preflight
+refuses ANY row, allocating or not, that does not carry
+`<row>/c/emalloc_shim.h` as a symlink to `common-php/emalloc_shim.h`.** The
+symlink is what puts the allocator in **both** digests. It used to refuse only
+rows a detector judged to be shim users, and **that detector was built twice
+and bypassed twice** (`TASK_PHP_005` F-1 on the string search, `TASK_PHP_007`
+B1/B2 on `gcc -MM`) — the question *"does this row use the allocator?"* has an
+unbounded answer space, so the rule stopped asking it. `PROTOCOL_PHP.md` §B2
+has the full argument and the price; it was enforced by nothing until
+`TASK_PHP_004`.
 ⚠ And the truncation is a *multiplier on every sizing defect in the engine*, not
 a pattern of its own; it was correctly retired from that catalogue as a
 mechanism. Do not re-propose it as a row.
@@ -511,9 +517,27 @@ block**, so the gate pins it and a drift is detectable:
   "cwe":          "CWE-125",
   "fix_commit":   "…",
   "invariant":    "I1", "obligation": "O2",
-  "echoes":       ["p16"]
+  "echoes":       ["p16"],
+  "uses_allocator": true,
+  "uses_allocator_why": "kernel.c calls php_shim_emalloc on every element; the T1 truncation is the defect"
 }
 ```
+
+⚠⚠⚠ **`uses_allocator` IS DECLARED, NEVER DETECTED, AND NOTHING MAY DEPEND ON
+IT BEING RIGHT** (`TASK_PHP_008` §0.4). The row's author states whether the
+kernel's numbers were taken under `common-php/emalloc_shim.h`; a **reviewer**
+checks it against the kernel. **No digest, no verdict and no audit reads it.**
+
+**It exists because the project stopped asking the question mechanically.**
+Two guards answered *"does this row use the allocator?"* — a string search
+(`TASK_PHP_004`) and `gcc -MM` (`TASK_PHP_006`) — and **both were bypassed
+twice** (`TASK_PHP_005` F-1, `TASK_PHP_007` B1/B2), because that question has an
+unbounded answer space: every preprocessor spelling, every flag combination,
+every compiler. `TASK_PHP_008` made the `c/emalloc_shim.h` symlink
+**unconditional** so the question is no longer load-bearing, and this field is
+what a human reads instead. ⚠ **If it ever acquires a consumer it has become a
+third detector** — `provenance.py::ALLOC_KEY`'s comment is the warning, and it
+is deliberately absent from `REQUIRED` for the same reason.
 
 `extract_sha256` is the load-bearing field: it makes ***"those lines of that
 tarball hash to this"*** a one-command check rather than a claim.
@@ -525,8 +549,9 @@ inside this sentence. It now does, and here is the honest split:
 
 | | |
 |---|---|
-| ✅ checked | tarball sha256 · `c_file` in `php-5.0.0.manifest` · the span is **non-empty and in range** · its sha256 · `extract_cmd` is the canonical spelling · a **heuristic line overlap** between the excerpt and `c/kernel*.{c,h}`, floored per tier (`verbatim` 50 %, `narrowed` 25 %, `modelled` reported only) · a row declaring PHP provenance ships a kernel at all |
-| ✗ **not** checked | `tier` · `deletions` · `root_cause_ids` · `cwe` · `fix_commit` · `invariant` · `obligation` · `echoes` — free-text declarations, every one |
+| ✅ checked | tarball sha256 · `c_file` in `php-5.0.0.manifest` · the span is **non-empty and in range** · its sha256 · `extract_cmd` is the canonical spelling · a row declaring PHP provenance ships a kernel at all |
+| ⚠ **reported, not checked** | the **heuristic line overlap** between the excerpt and `c/kernel*.{c,h}`, printed beside the tier's expectation (`verbatim` 50 %, `narrowed` 25 %, `modelled` none) — ⚠ **it no longer REFUSES a row** (`TASK_PHP_008` §2): its correctness depended on recognising every spelling of "this block is dead", and `TASK_PHP_007` M2 measured **nine more** past the `#if 0` that `TASK_PHP_006` fixed. Printed with it: how many preprocessor conditions the heuristic could not evaluate. |
+| ✗ **not** checked | `tier` · `deletions` · `root_cause_ids` · `cwe` · `fix_commit` · `invariant` · `obligation` · `echoes` · **`uses_allocator`** — free-text declarations, every one |
 
 ⚠ **An out-of-range span used to PASS**: `sed` prints nothing past EOF and the
 caller compared `sha256(b"")`, so a transposed line number verified green and

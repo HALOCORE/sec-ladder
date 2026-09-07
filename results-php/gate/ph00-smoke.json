@@ -11,7 +11,7 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "91d88e1e18b192258a1acc577672b2989e33f84c112615b03090bb011dad5e8b",
+  "contract_sha256": "191025e448f7514c5971f6a50749fbbe00577588eb4ab608c707ac6d5dc06e23",
   "run_timeout_s": {},
   "expected_hang": [],
   "idiom": {
@@ -56,7 +56,29 @@
   },
   "doc_citations": {
     "fatal": [],
-    "other": [],
+    "other": [
+      {
+        "file": "patterns/ph00-smoke/c/emalloc_shim.h",
+        "line": 117,
+        "module": "build.py",
+        "cited_line": 163,
+        "as_written": "build.py:163-165"
+      },
+      {
+        "file": "patterns/ph00-smoke/c/emalloc_shim.h",
+        "line": 133,
+        "module": "build.py",
+        "cited_line": 167,
+        "as_written": "build.py:167"
+      },
+      {
+        "file": "patterns/ph00-smoke/c/emalloc_shim.h",
+        "line": 492,
+        "module": "build.py",
+        "cited_line": 168,
+        "as_written": "build.py:168-171"
+      }
+    ],
     "harness_modules": [
       "asm.py",
       "build.py",
@@ -82,7 +104,7 @@
     "verdict": "OK"
   },
   "source_sha256": {
-    "common/digest_bridge.py": "298bac49524df1c5def28d0142ea771785d6eaef36e9c03fa17fa8c229fefdae",
+    "common/digest_bridge.py": "aaa5931dd76e491f1b95a3fcc84304da245cb2ed1db880893bee8600310d5ca9",
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
     "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
     "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -98,6 +120,7 @@
     "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
     "patterns/ph00-smoke/NOTES.md": "296244a1629619a31cbece6235ffc18b85e6b153f149350e5307e2d0010ac0ed",
     "patterns/ph00-smoke/README.md": "850f67da40738dc52d95cac1a0cb40d9001338b7ffecf07807784424c9025578",
+    "patterns/ph00-smoke/c/emalloc_shim.h": "aa9abf48535e8df93c9398e96c044697a784d73c40d7a7ccc830b5ee308c378f",
     "patterns/ph00-smoke/c/kernel.c": "1b79c738a5ab4da534d62a931919ec2d16a6add4f3710b29a347e16b88c96fe7",
     "patterns/ph00-smoke/c/kernel.h": "2eaee3e8be741b9ef00a9d6061e72f8ab6199143724b2438251c7032db01add4",
     "patterns/ph00-smoke/c/main.c": "065a6d17209b6c5ddb03d33ea38b623265b73293d98415ac99d5f66f467d18ef",
@@ -106,7 +129,7 @@
     "patterns/ph00-smoke/safe_naive.rs": "31718428bae78cc7c8d50ba5c520091e0596dca1b5216a6bb76f85bbd88abbfb",
     "patterns/ph00-smoke/safe_naive_verus.rs": "6e84117379183aef6345c849ed2bea0777be2ec5422715bf9475c6c9b8a8bb87",
     "patterns/ph00-smoke/safe_tuned.rs": "ff2d49dd5338f48a3051989565137f8f7ae685521e4fa78999874edff48e4c16",
-    "patterns/ph00-smoke/spec.md": "a365d5d5877113392755b8a9c7b79b8d233ee9e3da1904079be2b9bf47cd17b9",
+    "patterns/ph00-smoke/spec.md": "97e3259a2aeb0f2db456e2f526503b140182f6202717f30af020560261cc6924",
     "patterns/ph00-smoke/unsafe.rs": "026e4b6aa62113972c6881f0daa5e12da366c0eb0b9e7d5369cd0fc8c12db8e9",
     "patterns/ph00-smoke/verus.rs": "2b2b8d1c63fecfacb9f3487e2db205a4ba415808ed1b99fba2be6918108afe70",
     "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
@@ -235,9 +258,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3303,
+    "bytes": 3305,
     "nvars": 49,
-    "envp_stack_bytes": 3695,
+    "envp_stack_bytes": 3697,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -1578,7 +1601,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 1.3,
+        "seconds": 1.1,
         "stdout": "14491869159741396368",
         "model_stdout": "14491869159741396368",
         "stderr": ""
@@ -1587,23 +1610,27 @@
   },
   "published_table": {
     "table": "results/tables/ph00-smoke.md",
-    "contract_sha256": "91d88e1e18b192258a1acc577672b2989e33f84c112615b03090bb011dad5e8b",
+    "contract_sha256": "191025e448f7514c5971f6a50749fbbe00577588eb4ab608c707ac6d5dc06e23",
     "cited": [
-      "91d88e1e18b1"
+      "191025e448f7"
     ],
     "verdict": "FRESH"
   },
   "table_render": {
     "table": "results/tables/ph00-smoke.md",
     "renders_to": "results/tables/ph00-smoke.md",
-    "render_sha256": "6e772aadbbbd37be61035e5a3fc8abc06687741c7bc9018d1a17e2f7b4a1abb9",
-    "published_sha256": "6e772aadbbbd37be61035e5a3fc8abc06687741c7bc9018d1a17e2f7b4a1abb9",
+    "render_sha256": "9270beaaa542a7629e5abf609250b2babf5bd8092fab33f299d1d80bb71afc33",
+    "published_sha256": "9270beaaa542a7629e5abf609250b2babf5bd8092fab33f299d1d80bb71afc33",
     "verdict": "FRESH"
   },
   "controls_json": {},
   "failures": [],
   "notes": [],
   "loud": [
+    {
+      "section": "doc-citation-other",
+      "message": "3 line citation(s) into harness modules other than `check.py`. NOT failed: these sit in measurement-hashed files, so re-citing them by function costs a re-measure (RECAP queue item 38). Cite the FUNCTION when one of these files is next re-measured anyway: patterns/ph00-smoke/c/emalloc_shim.h:117 -> build.py:163-165 . patterns/ph00-smoke/c/emalloc_shim.h:133 -> build.py:167 . patterns/ph00-smoke/c/emalloc_shim.h:492 -> build.py:168-171"
+    },
     {
       "section": "idiom-forbidden",
       "message": "idiom.forbidden[0] has NOT ONE backticked spelling, so the enforced audit never ranges over it and its share of the 0 hits above is vacuous: a dead v_len parameter on the C kernel. Backtick the spelling if it has one (p09 shipped 5 entries and 0 audited spellings; TASK_038_REVIEW) -- and if it has none, because the entry forbids a STRUCTURE rather than a token (p05's 'a running row pointer'), say so in `why`: this line is then permanent and correct, and it is what stops the pattern's `ok` above from reading as enforcement it does not have."

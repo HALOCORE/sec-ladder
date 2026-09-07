@@ -31,23 +31,37 @@ So, itemised, because a half-true validator is worse than an honest one:
               `sha256(b"")` -- so a transposed line number verified GREEN and
               printed `0 bytes`, on the module's own "a wrong span lands here
               often" comment)
-  ✅ CHECKED  a HEURISTIC kernel overlap: what fraction of the excerpt's
-              non-trivial lines survive, normalised, into the row's `c/`
-              sources. See `kernel_overlap` -- it is a threshold, not a proof,
-              and the measured number is always printed.
+  ⚠ REPORTED, NOT CHECKED (since TASK_PHP_008 §2)  a HEURISTIC kernel overlap:
+              what fraction of the excerpt's non-trivial lines survive,
+              normalised, into the row's `c/kernel*.{c,h}`. It used to REFUSE a
+              row below a per-tier floor. It no longer does, and the reason is
+              the same one that made the allocator symlink unconditional: the
+              floor's correctness depended on recognising every spelling of
+              "this block is dead", TASK_PHP_007 M2 measured **nine more** past
+              the `#if 0` that TASK_PHP_006 fixed, and a check that must
+              enumerate idioms is reopened by the next idiom.
+              ⚠ The number, the tier's expectation and the count of
+              preprocessor conditions this module CANNOT evaluate
+              (`unevaluable_conditionals`) are all printed on every run.
   ✗ NOT CHECKED  ⚠⚠ THAT THE CITED LINES ARE COMPILED. The overlap reads
               `c/kernel*.{c,h}` and nothing else -- not `main.c`, not the
               driver loop, not `build.py`. TASK_PHP_005 F-4: a kernel that
               implements DIVISION, cites MULTIPLICATION and hides the citation
-              behind `#if 0` scored 100 % and was ACCEPTED. `#if 0` and block
-              comments are elided since TASK_PHP_006 (`selftest_overlap`), but
-              an unused `static` function beside the one the driver calls
-              still scores full marks, and `-Wall -Wextra` without `-Werror`
-              does not stop it. **A PASS MEASURES TEXT IN A FILE, NOT CODE IN
-              THE BENCHMARK.**
+              behind `#if 0` scored 100 % and was ACCEPTED. `#if 0`, `#elif 0`
+              and block comments are elided (`selftest_overlap`), but an unused
+              `static` function beside the one the driver calls still scores
+              full marks, and `-Wall -Wextra` without `-Werror` does not stop
+              it. **IT MEASURES TEXT IN A FILE, NOT CODE IN THE BENCHMARK** --
+              `RECAP_PHP.md` open item 14 said so before the floor was demoted.
   ✗ NOT CHECKED  `tier` (`verbatim`/`narrowed`/`modelled`) is a free-text
               declaration. The overlap number is evidence about it and no
               more.
+  ✗ NOT CHECKED  ⚠⚠ `uses_allocator` -- DECLARED BY THE AUTHOR, NEVER
+              DETECTED, and NOTHING MAY DEPEND ON IT BEING RIGHT
+              (TASK_PHP_008 §0.4). Two detectors of exactly this fact were
+              built and bypassed; the third answer was to stop asking and make
+              the `c/emalloc_shim.h` symlink UNCONDITIONAL. This field is for a
+              reviewer, and its absence is reported loudly rather than refused.
   ✗ NOT CHECKED  `deletions`, `root_cause_ids`, `cwe`, `fix_commit`,
               `invariant`, `obligation`, `echoes` -- all unvalidated
               declarations.
@@ -112,6 +126,16 @@ _FENCE = re.compile(r"```slb-contract\s*\n(.*?)```", re.S)
 #: this is meant for -- must say so IN TERMS rather than by omitting the block,
 #: so that a missing block is always a defect and never a shrug.
 NON_PHP_KEY = "php_provenance"
+
+#: ⚠⚠⚠ DECLARED, NEVER DETECTED. TASK_PHP_008 §0.4. The row's author states
+#: whether the kernel's numbers were taken under `common-php/emalloc_shim.h`;
+#: a reviewer checks it against the kernel. It is DOCUMENTATION -- no digest,
+#: no verdict and no audit reads it, and the `c/emalloc_shim.h` symlink is
+#: unconditional whatever it says. ⚠ It is deliberately NOT in `REQUIRED`:
+#: making it a hard requirement would be one step from making it load-bearing,
+#: and two detectors of this exact fact have already been bypassed. A missing
+#: one is reported loudly on every run instead.
+ALLOC_KEY = "uses_allocator"
 
 REQUIRED = ["php_version", "tarball_sha256", "c_file", "c_lines",
             "extract_cmd", "extract_sha256", "tier"]
@@ -187,13 +211,32 @@ def excerpt(tarball, c_file, a, b):
 #: citation never claimed.
 _KERNEL_GLOBS = ("kernel.c", "kernel.h", "kernel_hardened.c", "kernel_*.c")
 
-#: Below this fraction of the excerpt's non-trivial lines surviving into the
-#: kernel, the row is refused. ⚠ These are THRESHOLDS ON A HEURISTIC, not a
-#: proof of extraction: a `verbatim` lift keeps the body nearly line for line,
-#: a `narrowed` one drops a wrapper, and a `modelled` one is re-expressed by
-#: definition and so is only reported. Chosen deliberately low so that a real
-#: row is never blocked by macro plumbing; the measured number is always
-#: printed, and a row far above its floor is the interesting case.
+#: ⚠⚠⚠ REPORTED, NOT ENFORCED, SINCE TASK_PHP_008 §2. These are the fractions
+#: a tier is EXPECTED to clear, printed beside the measured number so a reader
+#: (and a reviewer) can see the gap. **The validator no longer refuses a row
+#: for missing one.**
+#:
+#: The reason is TASK_PHP_008 §0's reason, one level down. The floor's
+#: correctness depends on `_strip_dead_conditionals` recognising every way to
+#: write "this block is dead", and TASK_PHP_007 M2 measured **nine more
+#: spellings** past the `#if 0` that TASK_PHP_006 fixed -- `#if 0L`, `#if (0)`,
+#: `#if 00`, `#if !1`, `#ifdef NEVER_DEFINED`, `#ifndef __STDC__`,
+#: `#if defined(NOPE) && defined(NOPE2)`, the undisclosed `#if 1 … #else` and
+#: the actively mishandled `#elif 0` -- each scoring **100 %** on a kernel that
+#: divides while citing multiplication. A check whose correctness depends on
+#: parsing every preprocessor conditional will be reopened by the next one.
+#:
+#: ⚠ AND `RECAP_PHP.md` OPEN ITEM 14 ALREADY RECORDED WHAT THE CHECK REALLY IS:
+#: *it measures presence of TEXT IN A FILE, not presence of CODE IN THE
+#: BENCHMARK.* It never reads `main.c`, the driver loop or `build.py`. That is
+#: an honest thing to report and a dishonest thing to gate on.
+#:
+#: ⚠⚠ WHAT IS STILL ENFORCED IS THE EXACT HALF: `c_file` must be in the
+#: manifest, the span must be in range, and `extract_sha256` must be the
+#: sha256 of those lines of that tarball. Those are not heuristics.
+#: ⚠ `#elif 0` IS FIXED ANYWAY (`_strip_dead_conditionals`), because a WRONG
+#: number is worse than an unenforced one -- the same reason the false
+#: "dead code" note was deleted from `gate.py`.
 _OVERLAP_FLOOR = {"verbatim": 0.50, "narrowed": 0.25, "modelled": None}
 
 
@@ -271,7 +314,8 @@ _LITERAL_FALSE = re.compile(r"^\s*0\s*$")
 
 
 def _strip_dead_conditionals(text):
-    """Delete `#if 0` … (`#else` | `#endif`) regions. Comments already gone.
+    """Delete `#if 0` / `#elif 0` … (`#else` | `#elif` | `#endif`) regions.
+    Comments are already gone.
 
     ⚠⚠ TASK_PHP_005 F-4, THE BLOCKER-SHAPED MAJOR: a kernel that implements
     DIVISION, cites MULTIPLICATION, and pastes the cited lines behind `#if 0`
@@ -281,6 +325,28 @@ def _strip_dead_conditionals(text):
 
     ⚠ `#else` is handled rather than ignored: the other arm of a `#if 0` IS
     compiled, so skipping it too would make the check refuse honest rows.
+
+    ⚠⚠ `#elif` WAS A BUG AND NOT A LIMITATION, AND IT IS FIXED HERE
+    (TASK_PHP_007 M2, landed TASK_PHP_008 §2). The old code read
+
+        elif kw in ("else", "elif"):
+            if skip_at == depth: skip_at = None
+
+    so a `#elif 0` arm -- which is DEAD, unconditionally, whatever the `#if`
+    said -- turned skipping OFF and everything under it counted. The function
+    believed it handled `elif`; it handled it backwards, and
+    `#if 0 … #elif 0 <payload> #endif` scored **100 %**.
+
+    ⚠⚠⚠ AND THE RESIDUAL IS NAMED RATHER THAN ENUMERATED. `#if 0L`, `#if (0)`,
+    `#if 00`, `#if !1`, `#ifdef NEVER_DEFINED`, `#ifndef __STDC__`,
+    `#if defined(NOPE) && defined(NOPE2)` and `#if 1 … #else <payload> #endif`
+    are all still counted, and chasing them is `TASK_PHP_008` §0's mistake one
+    level down: a check whose correctness depends on parsing every conditional
+    will be reopened by the next one. **So the overlap no longer REFUSES a row
+    (TASK_PHP_008 §2) -- it is reported.** What is reported alongside it is
+    `unevaluable_conditionals()`, which counts the conditions this function
+    could not evaluate, so the reader sees the size of the residual instead of
+    being told there is none.
     """
     out, depth, skip_at = [], 0, None
     for line in text.splitlines():
@@ -291,7 +357,15 @@ def _strip_dead_conditionals(text):
                 depth += 1
                 if skip_at is None and kw == "if" and _LITERAL_FALSE.match(rest):
                     skip_at = depth
-            elif kw in ("else", "elif"):
+            elif kw == "elif":
+                # A `#elif 0` arm is dead whatever the preceding conditions
+                # were; any other `#elif` ENDS a `#if 0` skip at this depth.
+                if _LITERAL_FALSE.match(rest):
+                    if skip_at is None or skip_at == depth:
+                        skip_at = depth
+                elif skip_at == depth:
+                    skip_at = None
+            elif kw == "else":
                 if skip_at == depth:
                     skip_at = None
             elif kw == "endif":
@@ -302,6 +376,33 @@ def _strip_dead_conditionals(text):
             continue
         out.append("" if skip_at is not None else line)
     return "\n".join(out)
+
+
+def unevaluable_conditionals(text):
+    """How many `#if`/`#elif` conditions `_strip_dead_conditionals` could not
+    decide, plus every `#ifdef`/`#ifndef`. Returns `(n, [spellings])`.
+
+    ⚠ THIS EXISTS BECAUSE THE ALTERNATIVE IS THE ENUMERATION TREADMILL.
+    TASK_PHP_007 M2 listed nine more spellings of "this block is dead" that the
+    normaliser counts in full, and TASK_PHP_008 §0's whole lesson is that
+    enumerating idioms loses. Rather than add nine predicates and wait for the
+    tenth, the tool REPORTS how much of the file it could not evaluate. A
+    number the reader can see is worth more than a guarantee that is false.
+
+    ⚠ It is not a check and must never become one: a legitimate `verbatim` lift
+    of PHP source is full of `#ifdef`s.
+    """
+    seen = []
+    for line in _strip_comments(text).splitlines():
+        m = _CPP_RX.match(line)
+        if not m:
+            continue
+        kw, rest = m.group(1), m.group(2)
+        if kw in ("ifdef", "ifndef"):
+            seen.append(f"#{kw}{rest[:40]}")
+        elif kw in ("if", "elif") and not _LITERAL_FALSE.match(rest):
+            seen.append(f"#{kw}{rest[:40]}")
+    return len(seen), seen
 
 
 def _normalise(text):
@@ -490,9 +591,15 @@ OVERLAP_CASES = [
      + "\n#if 0\n#if 1\n" + _SELFTEST_EXCERPT + "\n#endif\n#endif\n",
      0.0, _FLOOR,
      "a nested LIVE conditional inside a dead one is still dead."),
+    ("B4 wrong kernel + `#elif 0`", _SELFTEST_WRONG
+     + "\n#if 0\nint dead(void){return 0;}\n#elif 0\n" + _SELFTEST_EXCERPT
+     + "\n#endif\n", 0.0, _FLOOR,
+     "TASK_PHP_007 M2: `#elif` was handled BACKWARDS -- a `#elif 0` arm is "
+     "DEAD and the code turned skipping OFF for it, so this scored 100%. "
+     "Fixed at TASK_PHP_008 §2."),
     ("C control: wrong kernel, no dead code", _SELFTEST_WRONG, 0.0, _FLOOR,
      "the must-fire control. If this passes the floor, the floor measures "
-     "nothing and B/B2/B3 prove nothing."),
+     "nothing and B/B2/B3/B4 prove nothing."),
     ("D the excerpt itself", _SELFTEST_EXCERPT, 0.99, 1.01,
      "⚠ THE MUST-NOT-FIRE. A `_normalise` that returned the empty set would "
      "satisfy B, B2, B3 and C vacuously. This is what stops the self-test "
@@ -502,6 +609,12 @@ OVERLAP_CASES = [
      + "\n#endif\n", 0.99, 1.01,
      "⚠ the second must-not-fire: the other arm of a `#if 0` IS compiled, so "
      "stripping it too would refuse honest rows."),
+    ("E2 `#if 0` / `#elif COND` -- the possibly-live arm", _SELFTEST_WRONG
+     + "\n#if 0\nint dead(void){return 0;}\n#elif defined(PH_X)\n"
+     + _SELFTEST_EXCERPT + "\n#endif\n", 0.99, 1.01,
+     "⚠ THE THIRD MUST-NOT-FIRE, AND IT IS B4's GUARD. A non-literal `#elif` "
+     "arm CAN be compiled, so the `#elif 0` fix must not start skipping every "
+     "`#elif`. Without this case, `elif -> always skip` would satisfy B4."),
 ]
 
 
@@ -555,6 +668,22 @@ def check_row(pdir, tarball, use_tarball=True, show=False):
                        f"a row with no PHP source says so with "
                        f'"{NON_PHP_KEY}": false and a `why`.']
 
+    # ⚠⚠ `uses_allocator` IS DECLARED, NEVER DETECTED (TASK_PHP_008 §0.4).
+    # Two detectors of the same fact were bypassed (TASK_PHP_005 F-1,
+    # TASK_PHP_007 B1/B2), so the audit stopped asking and the SYMLINK became
+    # unconditional. This field is what a reviewer reads to know whether the
+    # row's numbers were taken under the shim. ⚠⚠⚠ NOTHING DEPENDS ON IT BEING
+    # RIGHT -- not the digests, not the preflight, not a single verdict. If it
+    # ever acquires a consumer, it has become a third detector and this comment
+    # is the warning.
+    uses_alloc = prov.get(ALLOC_KEY)
+    if uses_alloc is not None:
+        msgs.append(f"{row}: uses_allocator={uses_alloc!r} -- ⚠ DECLARED BY "
+                    f"THE AUTHOR, NEVER DETECTED, and nothing depends on it "
+                    f"being right. A reviewer checks it against the kernel; "
+                    f"the `c/emalloc_shim.h` symlink is unconditional either "
+                    f"way (TASK_PHP_008 §0).")
+
     if prov.get(NON_PHP_KEY) is False:
         if not prov.get("why"):
             return False, [f"{row}: declares {NON_PHP_KEY}=false with no "
@@ -562,6 +691,10 @@ def check_row(pdir, tarball, use_tarball=True, show=False):
                            f"mistakes it for a php row."]
         msgs.append(f"{row}: NOT A PHP ROW -- {NON_PHP_KEY}=false. "
                     f"why: {prov['why'][:90]}")
+        if uses_alloc is None:
+            msgs.append(f"{row}: ⚠ no `uses_allocator` declared. Add it "
+                        f"(PLAN_PHP.md §6, TASK_PHP_008 §0.4) -- a row with no "
+                        f"PHP source still either allocates or does not.")
         return True, msgs
 
     missing = [k for k in REQUIRED if k not in prov]
@@ -639,31 +772,39 @@ def check_row(pdir, tarball, use_tarball=True, show=False):
         msgs.append(f"{row}: ⚠ excerpt has no non-trivial code lines; kernel "
                     f"overlap not computed")
         return True, msgs
-    floor = _OVERLAP_FLOOR.get(prov["tier"])
+    expect = _OVERLAP_FLOOR.get(prov["tier"])
+    nuc, spellings = unevaluable_conditionals(
+        "\n".join(open(os.path.join(pdir, "c", f), encoding="utf-8",
+                       errors="replace").read() for f in kfiles))
     msgs.append(f"{row}: kernel overlap {frac:.0%} ({nhit}/{nwant} excerpt "
                 f"lines in {', '.join(kfiles)})"
-                + (f"  floor {floor:.0%} for tier={prov['tier']}"
-                   if floor is not None
-                   else f"  (tier={prov['tier']}: reported, no floor)"))
+                + (f"  tier={prov['tier']} is expected to clear {expect:.0%} "
+                   f"-- REPORTED, NOT ENFORCED (TASK_PHP_008 §2)"
+                   if expect is not None
+                   else f"  (tier={prov['tier']}: reported, no expectation)"))
+    if expect is not None and frac < expect:
+        msgs.append(
+            f"{row}: ⚠⚠ THE OVERLAP IS BELOW WHAT tier={prov['tier']} LEADS A "
+            f"READER TO EXPECT ({frac:.0%} < {expect:.0%}). This is REPORTED "
+            f"and does not refuse the row. Either the citation is wrong, or "
+            f"the tier is (`modelled` is the honest answer for a re-expressed "
+            f"mechanism), or the heuristic is wrong about this row -- say "
+            f"which in NOTES.md, because a reviewer will ask.")
     msgs.append(f"{row}: ⚠ the overlap measures TEXT IN {', '.join(kfiles)}, "
                 f"not code in the benchmark -- it never reads main.c, the "
-                f"driver loop or the build, so a PASS is not evidence that the "
-                f"cited lines are COMPILED (TASK_PHP_005 F-4).")
-    if floor is not None and frac < floor:
-        return False, msgs + [
-            f"{row}: KERNEL DOES NOT MATCH THE CITATION. Only {frac:.0%} of "
-            f"{prov['c_file']}:{a}-{b}'s non-trivial lines appear in "
-            f"{', '.join(kfiles)}; tier={prov['tier']} requires "
-            f"{floor:.0%}.\n"
-            f"       Either the citation is wrong, or the tier is "
-            f"(`modelled` has no floor and is the honest answer for a "
-            f"re-expressed mechanism). ⚠ This is a HEURISTIC line-overlap "
-            f"threshold, not a proof: say so in the row's NOTES.md if you "
-            f"believe it is a false alarm.\n"
-            f"       ⚠ And the converse is the bigger risk: a PASS is not "
-            f"evidence that the cited lines are compiled -- this check reads "
-            f"{', '.join(kfiles)} and never main.c, the driver loop or the "
-            f"build (TASK_PHP_005 F-4)."]
+                f"driver loop or the build, so a HIGH NUMBER is not evidence "
+                f"that the cited lines are COMPILED (TASK_PHP_005 F-4), and a "
+                f"LOW one is not a refusal (TASK_PHP_008 §2).")
+    msgs.append(f"{row}: ⚠ {nuc} preprocessor condition(s) in the kernel this "
+                f"heuristic CANNOT evaluate"
+                + (f": {spellings[:4]}" if spellings else "")
+                + f". Anything inside a dead one of those is counted as live "
+                  f"(TASK_PHP_007 M2 measured nine such spellings). This is "
+                  f"the size of the residual, not a defect.")
+    if uses_alloc is None:
+        msgs.append(f"{row}: ⚠ no `uses_allocator` declared. Add it (true or "
+                    f"false, with a reason if false) -- PLAN_PHP.md §6, "
+                    f"TASK_PHP_008 §0.4. DECLARED, NEVER DETECTED.")
     return True, msgs
 
 

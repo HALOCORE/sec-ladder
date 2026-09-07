@@ -215,6 +215,346 @@
       ],
       "verdict": "tool exited",
       "tool_returncode": 0
+    },
+    {
+      "row": "ph00",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph00-smoke: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph00-smoke: NOT A PHP ROW -- php_provenance=false. why: THROWAWAY INFRASTRUCTURE SMOKE ROW -- NOT A PHP ROW. No PHP source, no root_cause_id, no C",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 2062,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "harness_php_sha256": {
+        "gate.py": "71a8f56fc3b00c0ec1bd3ba6c2cf9f1eb0dfdd907ff5cbf39249dd0f1b42ac28",
+        "provenance.py": "37ba80dfc4c9882ebf04a8e6d93cc146325e547f21441e461603d04f14c915c3",
+        "root.py": "c5df5c135f3ea080d2b151f7a1dbdcdb4b0372bd06ef8697287de201e131d474"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "--preflight",
+        "ph00"
+      ],
+      "tool_argv": [
+        "ph00"
+      ],
+      "verdict": "preflight only"
+    },
+    {
+      "row": "ph00",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph00-smoke: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph00-smoke: NOT A PHP ROW -- php_provenance=false. why: THROWAWAY INFRASTRUCTURE SMOKE ROW -- NOT A PHP ROW. No PHP source, no root_cause_id, no C",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "harness_php_sha256": {
+        "gate.py": "456b8ce250ee8fa5008ac407ba1e54d52e70fb88f3dd7474ffbf321f575984e4",
+        "provenance.py": "37ba80dfc4c9882ebf04a8e6d93cc146325e547f21441e461603d04f14c915c3",
+        "root.py": "c5df5c135f3ea080d2b151f7a1dbdcdb4b0372bd06ef8697287de201e131d474"
+      },
+      "problems": [],
+      "tool": "measure",
+      "gate_argv": [
+        "--tool",
+        "measure",
+        "ph00"
+      ],
+      "tool_argv": [
+        "ph00"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph00",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph00-smoke: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph00-smoke: NOT A PHP ROW -- php_provenance=false. why: THROWAWAY INFRASTRUCTURE SMOKE ROW -- NOT A PHP ROW. No PHP source, no root_cause_id, no C",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "harness_php_sha256": {
+        "gate.py": "456b8ce250ee8fa5008ac407ba1e54d52e70fb88f3dd7474ffbf321f575984e4",
+        "provenance.py": "37ba80dfc4c9882ebf04a8e6d93cc146325e547f21441e461603d04f14c915c3",
+        "root.py": "c5df5c135f3ea080d2b151f7a1dbdcdb4b0372bd06ef8697287de201e131d474"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph00"
+      ],
+      "tool_argv": [
+        "ph00"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 1
+    },
+    {
+      "row": "ph00",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph00-smoke: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph00-smoke: NOT A PHP ROW -- php_provenance=false. why: THROWAWAY INFRASTRUCTURE SMOKE ROW -- NOT A PHP ROW. No PHP source, no root_cause_id, no C",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "harness_php_sha256": {
+        "gate.py": "2a38173d6250920bff4061b0510c705f5905f87bec34c94936ed58aa693603ab",
+        "provenance.py": "37ba80dfc4c9882ebf04a8e6d93cc146325e547f21441e461603d04f14c915c3",
+        "root.py": "c5df5c135f3ea080d2b151f7a1dbdcdb4b0372bd06ef8697287de201e131d474"
+      },
+      "problems": [],
+      "tool": "report",
+      "gate_argv": [
+        "--tool",
+        "report",
+        "ph00"
+      ],
+      "tool_argv": [
+        "ph00"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph00",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph00-smoke: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph00-smoke: NOT A PHP ROW -- php_provenance=false. why: THROWAWAY INFRASTRUCTURE SMOKE ROW -- NOT A PHP ROW. No PHP source, no root_cause_id, no C",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "harness_php_sha256": {
+        "gate.py": "2a38173d6250920bff4061b0510c705f5905f87bec34c94936ed58aa693603ab",
+        "provenance.py": "37ba80dfc4c9882ebf04a8e6d93cc146325e547f21441e461603d04f14c915c3",
+        "root.py": "c5df5c135f3ea080d2b151f7a1dbdcdb4b0372bd06ef8697287de201e131d474"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph00"
+      ],
+      "tool_argv": [
+        "ph00"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph00",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph00-smoke: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph00-smoke: NOT A PHP ROW -- php_provenance=false. why: THROWAWAY INFRASTRUCTURE SMOKE ROW -- NOT A PHP ROW. No PHP source, no root_cause_id, no C",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "harness_php_sha256": {
+        "gate.py": "f4d01cc4c3abd23cb4f87edd0f4a1318cc3030aa0847783bc80a5f21e13b1463",
+        "provenance.py": "37ba80dfc4c9882ebf04a8e6d93cc146325e547f21441e461603d04f14c915c3",
+        "root.py": "c5df5c135f3ea080d2b151f7a1dbdcdb4b0372bd06ef8697287de201e131d474"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "--preflight",
+        "ph00"
+      ],
+      "tool_argv": [
+        "ph00"
+      ],
+      "verdict": "preflight only"
     }
   ]
 }
