@@ -59,18 +59,26 @@ MINED      TASK_PHP_001 DONE, all 3 axes. 54 candidates, evidence promoted to
              type     15 cands / 12 mechanism families
            ALL THREE REFUTED THE MANAGER CLAIM THEY WERE NAMED TO ATTACK.
 
-BUILT      Phase 0: _002 built it, _003 reviewed (2 blockers), _004 landed
-           them, _005 reviewed THAT (1 blocker), _006 landed that.
-           B1 CLOSED at _006 -- and by asking the COMPILER: gcc -MM over
-                      build.py's own TU list, not a string search. All 8 of
-                      the reviewer's fixture rows land from their UNMODIFIED
-                      generator. ~115 ms/row. UNREVIEWED (rule 9).
+BUILT      Phase 0, five rounds: _002 built, _003 reviewed (2 blockers),
+           _004 landed, _005 reviewed (1 blocker), _006 landed, _007
+           reviewed (2 blockers), _008 landed. UNREVIEWED (rule 9).
+           B1 was closed TWICE by DETECTING whether a row uses the
+                      allocator, and reopened twice -- a string search, then
+                      gcc -MM at 2 of 8 preprocessor states.
+           B1 NOW     answered by making the question not matter: EVERY php
+                      row carries c/emalloc_shim.h unconditionally, and the
+                      detector is DELETED. No subprocess, no flag space, no
+                      fallback, no regex.
            B2 CLOSED at _004, CONFIRMED at _005: 4 clean negatives.
-           SIZE RULE: there is NONE, and that is the answer (open item 19).
 
-NEXT       (1) TASK_PHP_007 -- REVIEW TASK_PHP_006 (alternation, rule 1).
-           (2) TASK_PHP_008 -- the catalogue. .tasks-php/ADJUDICATION_001.md
-               settles ~80 rows and is UNREVIEWED manager work; _008 builds
+NEXT       (1) TASK_PHP_009 -- REVIEW TASK_PHP_008 (alternation, rule 1).
+           (2) ⚠ MANAGER DECISION: PHASE 0 THEN CLOSES UNLESS _009 FINDS A
+               BLOCKER. Majors and minors get carried as open items. Eight
+               tasks have gone to infrastructure and mining with 0 rows
+               built; the _008 design change is meant to END the B1 class
+               rather than iterate it, and iterating is the failure mode.
+           (3) TASK_PHP_010 -- the catalogue. ADJUDICATION_001.md settles
+               ~80 rows and is UNREVIEWED manager work; _010 builds
                patterns-php/CATALOGUE.md from it AND attacks it.
 
 BAR        C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
@@ -377,6 +385,78 @@ no reason to doubt, and it comes back as evidence.
 took the row-specific half as the *prefix only*, so `p16-tlv-walk`, the corpus
 **maximum** at 3 140 words, appears in its table as the **minimum** at 109.
 **Three parties measured this quantity and all three got a different span.**
+
+### F13 — ⚠⚠⚠ A REFUTED MECHANISM IS NOT A LICENCE FOR THE DESIGN IT ARGUED AGAINST
+
+**The manager's own error, caught by an engineer before it shipped, and the most
+useful thing this round produced.**
+
+`TASK_PHP_006` justified *"a missing preflight record is a NOTE, not a failure"*
+with an **asserted** deadlock. `TASK_PHP_007` M4 **disproved** it by running it —
+and said in terms *"I am not recommending the hard failure."* ⚠ **The manager
+asked for the hard failure anyway**, reading a refuted mechanism as a cleared
+design.
+
+Composed with M5 (*a record whose every run FAILED counts as no record*) the hard
+failure is **self-referential** and deadlocks the **fresh-clone path** for ever,
+with no escape flag:
+
+```
+run 1  no record          -> coverage problem -> PREFLIGHT FAILED -> writes a record whose only run FAILED
+run 2  record exists, only run FAILED (M5) -> coverage problem -> PREFLIGHT FAILED
+run N  ... and nothing an operator can do fixes it
+```
+
+✅ **The engineer did not find this by reading. It wrote the loop, ran it,
+watched six runs never converge, and repaired it before shipping** — by
+discounting the audit's *own* coverage problems, on the honest reading that a run
+which failed only on another row's paperwork still certified **this** tree. The
+naive rule survives as a **must-fire control**, and `_run_is_certifying`'s
+docstring forbids simplifying it back.
+
+⚠⚠ **The rule: refuting the ARGUMENT for a decision does not establish its
+opposite.** The original engineer's *conclusion* — loud beats unrunnable — had a
+real case behind it that its *stated mechanism* got wrong. That is
+`PROTOCOL.md` rule 9's conclusion-versus-mechanism split arriving from the other
+side, and the manager walked into it while holding a correct refutation.
+
+### F14 — `0 STALE` does not mean "everything is pinned"
+
+`harness/measure.py::_compare` iterates the **recorded** keys, so **a file ADDED
+to a row is invisible to `--check-stale`** — it has no key, so it cannot be
+stale. ✅ Observed, not reasoned: adding `c/emalloc_shim.h` to `ph00` left the
+measurement record `FRESH` while the file sat on disk unrecorded.
+
+⚠⚠ **This is the bracket every task file in this programme mandates twice**, and
+its true meaning is *"every source that was pinned still matches"*. What closes
+the gap is the **preflight**, not the digest — `shim_link_audit` refuses the row,
+so a gate cannot pass in that state.
+
+⚠ It is a `harness/` property and affects **all 33 PAT rows identically**. Not
+fixed: the fix is a `harness/` edit and a 33-pattern re-gate. → `PROTOCOL_PHP.md`
+§E carries the sentence.
+
+### F15 — the cheapest correct design was the one already in the docstring
+
+✅ **Manager cost claim refuted, in the manager's favour.** *"An `emalloc_shim.h`
+edit will re-gate every php row"* — the **gate** half has been unconditional
+since `TASK_PHP_002`, because `digest_bridge.py`'s own hash is in every php gate
+record. The marginal price of *"every row"* over *"every allocating row"* is the
+**measurement** half only: a re-measure (~8 min) plus a render.
+
+⚠ **And the measurement the manager said it had not made is one command**:
+`git log -- common-php/emalloc_shim.h` → **3 edits in 7 php tasks, two of the
+three for PROSE.** That cuts *against* the design — a comment fix costing a
+corpus-wide re-measure — and the mitigation is already protocol: **batch prose
+fixes, never land one alone** (`PROTOCOL.md` rule 6, verbatim).
+
+Three cheaper designs were considered and rejected, recorded so nobody
+re-derives them. ⚠ **The instructive rejection is versioning the shim**
+(`emalloc_shim_v1.h`, each row links what it measured under): correct by
+construction *and* cheaper, and **wrong, because it inverts the property we
+want** — a shim fix that does not propagate leaves rows measured under a
+known-wrong allocator silently and for ever, converting a loud re-measure into a
+quiet divergence.
 
 ## Open items — carried, not closed
 
