@@ -45,29 +45,24 @@ between them read `CLAUDE.md`'s top table.
 ## ▶ START HERE — the next action, in ≤ 20 lines
 
 ```
-STATE      ROWS BUILT: 1 (ph03).  CATALOGUED: 91.  Phase 0 CLOSED at _009.
-           EXISTS: patterns-php/ + CATALOGUE.md, harness-php/, common-php/,
-                   results-php/, .tasks-php/    NOT YET: .memory-php/ (item 12)
-
-NEXT       TASK_PHP_015 -- fix the TEMPLATE, then build ph07.
-             M1: model.py::uu_fold != verus.rs::uu_fold, and inputs/gen.py
-             emits length 45 ONLY, which is what hides it. 90 rows would
-             copy that shape, so the fixture rule lands before the row does.
-           THEN review ph07; then ph21 -> ph16 -> ph12 -> ph29, ph29 LAST.
-
-ROW 1      ph03 gate PASS, REVIEWED, headline upheld AND strengthened:
-           PHP's real 2004 fix is BOTH DEAD AND INCOMPLETE -- one hunk
-           provably redundant, the other leaving 144 over-reads, unfixed
-           until 2014. Verus refuses it in one line. (F29)
-           Ladder (F33): safe_naive +26.8% · safe_tuned +3.7% ·
-           unsafe -7.6% · verus == unsafe, byte-identical.
-
-BAR        C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
-           patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
-
-READ       PLAN_PHP.md, .tasks/PROTOCOL.md (reused unchanged), CATALOGUE.md;
-           then F1-F33 and the open items below. Phase 0's five rounds and
-           the mining wave live in .tasks-php/ reports, not here.
+STATE   ROWS BUILT 1 (ph03) · CATALOGUED 91 · Phase 0 CLOSED at _009.
+        NOT YET: .memory-php/ (open item 12).
+NEXT    TASK_PHP_015 -- fix the TEMPLATE, then build ph07.
+          M1: model.py::uu_fold != verus.rs::uu_fold, and inputs/gen.py
+          emits length 45 ONLY, which is what hides it. 90 rows would copy
+          that shape, so the fixture rule lands before the row does.
+        THEN review ph07; then ph21 -> ph16 -> ph12 -> ph29, ph29 LAST.
+ROW 1   ph03 gate PASS, REVIEWED, headline upheld AND strengthened: PHP's
+        real 2004 fix is BOTH DEAD AND INCOMPLETE -- one hunk provably
+        redundant, the other leaving 144 over-reads, unfixed until 2014;
+        Verus refuses it in one line. (F29)
+        Ladder (F33): safe_naive +26.8% · safe_tuned +3.7% · unsafe -7.6%
+        · verus == unsafe byte-identical.
+BAR     C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
+        patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
+READ    PLAN_PHP.md · .tasks/PROTOCOL.md (reused unchanged) · CATALOGUE.md ·
+        then F1-F33 and the open items. Phase 0's five rounds and the mining
+        wave are in .tasks-php/ reports, not here.
 ```
 
 ---
