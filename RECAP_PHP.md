@@ -71,15 +71,21 @@ BUILT      Phase 0, five rounds: _002 built, _003 reviewed (2 blockers),
                       fallback, no regex.
            B2 CLOSED at _004, CONFIRMED at _005: 4 clean negatives.
 
-NEXT       (1) TASK_PHP_009 -- REVIEW TASK_PHP_008 (alternation, rule 1).
-           (2) ⚠ MANAGER DECISION: PHASE 0 THEN CLOSES UNLESS _009 FINDS A
-               BLOCKER. Majors and minors get carried as open items. Eight
-               tasks have gone to infrastructure and mining with 0 rows
-               built; the _008 design change is meant to END the B1 class
-               rather than iterate it, and iterating is the failure mode.
-           (3) TASK_PHP_010 -- the catalogue. ADJUDICATION_001.md settles
-               ~80 rows and is UNREVIEWED manager work; _010 builds
-               patterns-php/CATALOGUE.md from it AND attacks it.
+PHASE 0 IS CLOSED. _009 reviewed _008 and found NO BLOCKER: 4 majors,
+           6 minors, 20 clean negatives. Its verdict was argued, not waved --
+           "the thing that would justify a ninth infrastructure task is that
+           the enforcement layer is unsound in a way we cannot bound; that
+           was true of B1 twice and is not true now."
+
+NEXT       (1) TASK_PHP_010 -- land _009's M1-M4. SMALL AND MECHANICAL:
+               os.listdir for glob in 4 audits; refuse row subdirectories
+               outside {c,inputs,controls}; make the coverage stage PER-ROW
+               (one change, closes M3 and M4 both). Precondition on rows.
+           (2) TASK_PHP_011 -- the catalogue. ADJUDICATION_001.md settles
+               ~80 rows and is UNREVIEWED manager work; _011 builds
+               patterns-php/CATALOGUE.md from it, ATTACKS it, and verifies
+               _010's four fixes (folded review -- stated, not hidden).
+           (3) then BUILD ROWS. PLAN_PHP.md §8: spatial -> type -> temporal.
 
 BAR        C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
            patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
@@ -457,6 +463,57 @@ construction *and* cheaper, and **wrong, because it inverts the property we
 want** — a shim fix that does not propagate leaves rows measured under a
 known-wrong allocator silently and for ever, converting a loud re-measure into a
 quiet divergence.
+
+### F16 — ⚠⚠ A WRONG ENUMERATION IS NOT AN UNBOUNDABLE ONE
+
+**The manager had this backwards, and the correction is worth more than the bug
+it is about.**
+
+`TASK_PHP_009` M1: a **dotted row directory** hides from `glob("patterns-php/*")`,
+so all four audits skip it while `build.py::pattern_dir` (`os.listdir`) and
+`provenance.py` both resolve it. ✅ Demonstrated end to end on the real tree —
+`gate.py --preflight .ph93` returns **rc=0** on a row carrying a regular-file
+allocator copy *and* an unkeyed subdirectory source, printing *"ok every
+`patterns-php/*/c/` file has a digest key"*, with the identically-defective
+normally-named row refused as the fired control.
+
+⚠ **The manager wrote: *"if a row can hide from `glob`, the whole argument
+collapses and we are back to whack-a-mole with a smaller board."* That is
+wrong:**
+
+> The idiom detector's defining property was that **no complete enumeration
+> existed** — no function anywhere returns "every way to spell an `#include`".
+> For rows one **does**, it is a single call, and `build.py:81-89` already uses
+> it. The audit and the builder can be made to enumerate **the same set**, and
+> that set is provably complete against the only resolver that decides what gets
+> compiled.
+
+⚠⚠ **Treating a wrong enumeration and an unboundable one as the same failure is
+how a fixable bug gets priced as a phase.** The fix is a substitution
+(`os.listdir` for `glob`), not another round of the game — which is exactly the
+property the unconditional-link design was adopted for, and it survives.
+
+### F17 — the second deadlock, and its message denies it
+
+`TASK_PHP_009` M3: `preflight_coverage_audit` is a **GLOBAL** stage, so **one**
+uncertifiable record fails **every** `gate.py` invocation — including the
+bracket every task file mandates twice. An orphan `results-php/<row>.json` (a
+retired row whose committed records survive — `PLAN_PHP.md` §3 *expects* rows to
+be retired) cannot obtain a certifying run, because the prescribed repair fails
+on **provenance**, which is substantive. ✅ Run end to end: three cycles,
+non-convergent; the actual fix (delete the record) appears nowhere in the
+message.
+
+⚠⚠ **And the message printed at that moment says *"⚠ THERE IS NO DEADLOCK"*** —
+the same shape as the *"dead code … Not treated as a shim user"* note that
+`TASK_PHP_008` deleted for exactly this reason: **a reassurance that tells the
+reader not to look further.** ⚠ It is escapable and destroys nothing, which is
+why it is not a blocker.
+
+⭐ **One change closes M3 and M4 together: make the coverage stage report
+PER-ROW rather than globally.** The global scope is what turns any single
+uncertifiable record into a programme-wide stop, and it is the property §8b's
+first deadlock also rode on.
 
 ## Open items — carried, not closed
 
