@@ -87,10 +87,18 @@ CATALOGUE  patterns-php/CATALOGUE.md EXISTS -- 91 rows: 38 spatial /
            audited the kills it SUSPECTED and never re-opened the ones it
            had UPHELD. Five of those reverse at source (F21).
 
-NEXT       (1) TASK_PHP_012 -- REVIEW the catalogue (alternation), and
-               RECOMMEND the first build batch. The 5 new reversals and the
-               3 settled rows are unreviewed engineer work.
-           (2) then BUILD ROWS. PLAN_PHP.md §8: spatial -> type -> temporal.
+           _012 REVIEWED it: 1 blocker, 7 majors, 8 minors. ph15's
+           mechanism is REFUTED and the row is marked unresolved IN the
+           catalogue -- a kernel built to its blob spec would gate GREEN
+           while modelling nothing.
+
+NEXT       (1) ⭐ TASK_PHP_013 -- BUILD ph03, THE FIRST REAL PHP ROW.
+               php_uudecode / CRASH-115. Validated end-to-end by _012 with
+               ASan and a must-fire control. verbatim, 46 lines, one-line
+               reproducer, crashes_pristine=True, DP-07 pointer cursor.
+           (2) TASK_PHP_014 -- review the row AND land _012's catalogue
+               corrections (B1, M1-M7), informed by what row 1 taught.
+           (3) then the batch: ph29 -> ph07 -> ph21 -> ph16 -> ph12.
 
 BAR        C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
            patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
@@ -636,6 +644,74 @@ shared DIRECTORY.** `common-php/x.h` symlinked as `<row>/c/x.h` lands in **both
 digests**, which is the mechanism already sanctioned for the allocator.
 → **F20 stays latent and correctly so; what is owed is one clause in
 `PROTOCOL_PHP.md` §B2, not an infrastructure task.**
+
+### F25 — ⚠⚠ THE MANAGER'S FIRST-ROW PICK WAS REFUTED BY A MEASUREMENT, AND THE MEASUREMENT IS ITSELF A RESULT
+
+The manager's prior was `ph11` — *"the smallest possible spatial defect, no
+arithmetic, no cursor, no allocation"*. ✅ **Measured at `-O3`: safe Rust and
+unsafe Rust emit BYTE-IDENTICAL kernel `Ir` (11 010 064), and BOTH BEAT C
+(11 534 345).**
+
+**Mechanism:** LLVM folds Rust's `0 ≤ o < len` into **one unsigned compare**,
+which C's **one-sided signed** test cannot fold, and then unrolls 2×.
+
+⚠ **So `ph11` would publish ONE number across four rungs** — which is a genuine
+finding and a terrible row to prove the pipeline *measures* anything with.
+**Keep it; do not build it first.** ⭐ And note what it says on its own: **the
+safety check is not merely free, it is faster than the unchecked C**, because a
+two-sided unsigned bound is more optimisable than a one-sided signed one.
+
+### F26 — the real upstream fix is a 1.4 KB fetch, not a 1 GB clone
+
+`TASK_PHP_012` M7: **no `php-src` clone exists on this box**, so
+`PROTOCOL_PHP.md` §F5's *"sha-pinned `fix_commit`"* was unmeetable and **R1h had
+never been built php-side at all** — which would have failed `PLAN_PHP.md` §3
+criterion 4 on the first row.
+
+✅ **Manager-resolved, and verified before being written down:**
+`https://github.com/php/php-src/commit/<sha>.patch` returns the real commit.
+For `ph03`'s `f95c1df58349` that is **Ilia Alshanetsky, 2004-08-24, bug
+#29821**, `ext/standard/uuencode.c`, +17 lines — adding exactly:
+
+```c
+if (len > src_len) { goto err; }          /* before total_len += len */
+ee = s + (len == 45 ? 60 : (int) floor(len * 1.33));
+if (ee > e) { goto err; }                 /* <-- the bound the mining report predicted */
+```
+
+⚠ Fetching a bare sha by `git fetch` does **not** work (the server refuses
+arbitrary-SHA wants); the `.patch` URL does. **R1h is buildable verbatim, for
+real, on every row whose `fix_commit` the corpus records.**
+
+### F27 — *"a kill written as a set hides its members"* has now fired THREE times
+
+F22 found it once (`CRASH-124/127/128` behind `CRASH-123`'s sentence).
+`TASK_PHP_012` found it **twice more**:
+
+- **M1** — the catalogue's claim that every §3.1 kill *"survives inside another
+  row's `corpus rows`"* is **false for 6 of 12**. ⚠⚠ **And the tool built to
+  check coverage could not see it, because `coverage.py` counts a mention in the
+  KILL TABLE as coverage** — a checker that accepts the artefact it is checking.
+- **M2** — the four-`LOGIC` set kill into `ph47` is the same shape re-committed,
+  and **3 of 4 are refuted by the catalogue's own discriminator**.
+
+⭐ **Three instances make it a rule, not an anecdote: a rejection covering N rows
+must enumerate the N against `index.csv`, and any coverage checker must count
+ADMISSIONS ONLY.** → the correction task must fix `coverage.py` first, because
+every later count depends on it.
+
+### F28 — demoting the overlap floor cost more than the manager priced
+
+`TASK_PHP_012` M4: **12 of 41 `verbatim` tiers are mis-declared**, measured
+mechanically. ⚠⚠ **And the manager's own decision is why that matters now**:
+`TASK_PHP_008` demoted `provenance.py`'s overlap check from **enforcing** to
+**reporting**, so the **hand-declared tier is the only surviving fidelity
+signal** — and it is wrong on 29 % of the rows that claim the strictest tier.
+
+⚠ The demotion itself still looks right (its input space was unbounded). **What
+was wrong was pricing it as free.** → the correction task must decide whether
+the reported overlap is printed *beside the declared tier* so a mismatch is
+visible, which is the cheap half of what the floor used to do.
 
 ## Open items — carried, not closed
 

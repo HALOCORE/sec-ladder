@@ -90,7 +90,7 @@ argument, and the measurement behind it, is `TASK_PHP_011_REPORT.md` §6.
 | ph12 | spatial | guard short-circuited by an unrelated optional argument | verbatim | I1/O1 | CRASH-108 | p02 | catalogued |
 | ph13 | spatial | base + attacker 32-bit offset, lower-bounded only | narrowed | I1/O1 | CRASH-136 | — | catalogued |
 | ph14 | spatial | the overflowed product is used in its own bound check | narrowed | I11/O1 | CRASH-134 | p13 | catalogued |
-| ph15 | spatial | `end -= needle_len` underflows below a zero-length haystack | verbatim | I1/O1 | CRASH-096 | p24 | catalogued |
+| ph15 | spatial | ⚠ **MECHANISM REFUTED — see below. Do not build.** | — | I1/O1 | CRASH-096 | p24 | **unresolved** |
 | ph16 | spatial | bit-set index straight from input, past an on-stack `fd_set` | verbatim | I1/O2 | CRASH-098 | p02 | catalogued |
 | ph17 | spatial | code point over 0xFF sets a bit past a fixed-size bitset | narrowed | I1/O2 | CRASH-127 | p02 | catalogued |
 | ph18 | spatial | sizing sum wraps; the pad loop that follows has no bound | verbatim | I11/O1, I11/O2 | CRASH-001, CRASH-011 | p13 | catalogued |
@@ -299,8 +299,23 @@ The only bound on `offset` is `if (len && offset >= s1_len)`, and its **first co
 ▸ blob: an IFD directory entry stream.
 ⚠ risk: distinct from ph18, where **two different** attacker integers defeat one guard; here **one** integer defeats it twice. Do not merge.
 
-**ph15 · `zend_memnstr`: `end` underflows below the haystack** — `Zend/zend_operators.h:128-151` · CRASH-096 · `verbatim` · I1/O1 · echoes p24
-✅ Settled here (adjudication left it open). `zend_memnstr(haystack, needle, needle_len, end)` does `end -= needle_len` at `:134` with **no precondition that the haystack is at least `needle_len` long**, and no NULL/empty check. For a zero-length haystack `end` underflows below `haystack`, `while (p <= end)` at `:136` is true under unsigned pointer comparison, and `:137 memchr(p, *needle, (end-p+1))` gets a length of `(size_t)-1`. GUARD: `ext/standard/streamsfuncs.c:1047` — `if (max_length < 0)`, so **zero passes**. FAULT: `main/streams/streams.c:844`.
+**ph15 · `zend_memnstr`: `end` underflows below the haystack** — `Zend/zend_operators.h:128-151` · CRASH-096 · **UNRESOLVED** · I1/O1 · echoes p24
+
+> ⚠⚠⚠ **THE MECHANISM BELOW IS REFUTED. DO NOT BUILD THIS ROW.**
+> `TASK_PHP_012` B1 measured it: with a **real zero-length haystack**,
+> `end -= needle_len` makes `p <= end` **FALSE** and `zend_memnstr` returns
+> correctly. The defect needs `haystack == NULL` — a wrap **through** zero, not
+> an underflow below a live buffer. ⚠ **A kernel built to the `▸ blob` spec
+> below would gate GREEN while modelling nothing**, which is the worst available
+> outcome for a benchmark row.
+> ✅ **What survives: the defect site is `zend_operators.h:134`, not the stream
+> layer** — that conclusion is now three-for-three across independent readings.
+> ⚠ **This is the THIRD wrong mechanism for CRASH-096** (two miners, then the
+> manager's adjudication, then this). **A fourth reading is not the way to bet:
+> re-derive it from a RUN, not from the source.** Text kept below, struck, so
+> the next attempt can see what has already been tried.
+
+~~✅ Settled here (adjudication left it open).~~ `zend_memnstr(haystack, needle, needle_len, end)` does `end -= needle_len` at `:134` with **no precondition that the haystack is at least `needle_len` long**, and no NULL/empty check. For a zero-length haystack `end` underflows below `haystack`, `while (p <= end)` at `:136` is true under unsigned pointer comparison, and `:137 memchr(p, *needle, (end-p+1))` gets a length of `(size_t)-1`. GUARD: `ext/standard/streamsfuncs.c:1047` — `if (max_length < 0)`, so **zero passes**. FAULT: `main/streams/streams.c:844`.
 ▸ trigger: `stream_get_line($f, 0, "xy")` — `php_stream_fill_read_buffer(stream, 0)` fills nothing, `readbuf` stays NULL, `readbuflen` 0.
 ▸ benign: ordinary substring searches; `u64` = the found offset, or a sentinel.
 ▸ blob: haystack bytes + a length field + needle bytes.
