@@ -45,81 +45,29 @@ between them read `CLAUDE.md`'s top table.
 ## ▶ START HERE — the next action, in ≤ 20 lines
 
 ```
-STATE      NO ROWS BUILT. Phase 0 infrastructure EXISTS and is gated.
-           (⚠ this box said "NOTHING BUILT ... DO NOT EXIST YET" four lines
-           above "TASK_PHP_002 Phase 0 built + gated" -- TASK_PHP_003 m1.)
-           Renames landed (RECAP_PAT.md / PLAN_PAT.md); PLAN_PHP.md written.
-           EXISTS: patterns-php/ harness-php/ results-php/ .tasks-php/
-                   common-php/      NOT YET: .memory-php/ (open item 12)
+STATE      ROWS BUILT: 1 (ph03).  CATALOGUED: 91.  Phase 0 CLOSED at _009.
+           EXISTS: patterns-php/ + CATALOGUE.md, harness-php/, common-php/,
+                   results-php/, .tasks-php/    NOT YET: .memory-php/ (item 12)
 
-MINED      TASK_PHP_001 DONE, all 3 axes. 54 candidates, evidence promoted to
-           .tasks-php/TASK_PHP_001_MINE/. UNREVIEWED (rule 9).
-             temporal 23 cands / 85 of 85 rows / 11 verbatim 10 narrowed 2 modelled
-             spatial  16 cands / 18 rows / 8 ptr_cursor / 0 emalloc-dependent
-             type     15 cands / 12 mechanism families
-           ALL THREE REFUTED THE MANAGER CLAIM THEY WERE NAMED TO ATTACK.
+NEXT       TASK_PHP_015 -- fix the TEMPLATE, then build ph07.
+             M1: model.py::uu_fold != verus.rs::uu_fold, and inputs/gen.py
+             emits length 45 ONLY, which is what hides it. 90 rows would
+             copy that shape, so the fixture rule lands before the row does.
+           THEN review ph07; then ph21 -> ph16 -> ph12 -> ph29, ph29 LAST.
 
-BUILT      Phase 0, five rounds: _002 built, _003 reviewed (2 blockers),
-           _004 landed, _005 reviewed (1 blocker), _006 landed, _007
-           reviewed (2 blockers), _008 landed. UNREVIEWED (rule 9).
-           B1 was closed TWICE by DETECTING whether a row uses the
-                      allocator, and reopened twice -- a string search, then
-                      gcc -MM at 2 of 8 preprocessor states.
-           B1 NOW     answered by making the question not matter: EVERY php
-                      row carries c/emalloc_shim.h unconditionally, and the
-                      detector is DELETED. No subprocess, no flag space, no
-                      fallback, no regex.
-           B2 CLOSED at _004, CONFIRMED at _005: 4 clean negatives.
-
-PHASE 0 IS CLOSED. _009 reviewed _008 and found NO BLOCKER: 4 majors,
-           6 minors, 20 clean negatives. Its verdict was argued, not waved --
-           "the thing that would justify a ninth infrastructure task is that
-           the enforcement layer is unsound in a way we cannot bound; that
-           was true of B1 twice and is not true now."
-
-           _010 landed M1-M4 + all 6 minors; _011 verified all four.
-
-CATALOGUE  patterns-php/CATALOGUE.md EXISTS -- 91 rows: 38 spatial /
-           22 type-init / 31 temporal, 1 unresolved (ph91). UNREVIEWED.
-           222/222 citations resolve against the pinned tarball across 52
-           sha256-checked files; all 166 corpus ids accounted for.
-           ⚠ 91, not the ~80 the manager predicted -- the adjudication had
-           audited the kills it SUSPECTED and never re-opened the ones it
-           had UPHELD. Five of those reverse at source (F21).
-
-           _012 REVIEWED it: 1 blocker, 7 majors, 8 minors. ph15's
-           mechanism is REFUTED and the row is marked unresolved IN the
-           catalogue -- a kernel built to its blob spec would gate GREEN
-           while modelling nothing.
-
-           ⭐ _013 BUILT ph03 -- THE FIRST REAL ROW. Gate PASS, 0 failures.
-           Five rungs + R1h. R5 verifies 25/0 with a FULL FUNCTIONAL
-           postcondition; R4 == R5 byte-identical at O3. UNREVIEWED.
-
-ROWS       1 built (ph03), 91 catalogued.
-
-           _014 REVIEWED it: row SURVIVES every attack; R5's postcondition
-           is genuinely strong (17 of 19 mutants killed). 6 majors, 7 minors,
-           14 clean negatives.
-
-NEXT       (1) TASK_PHP_015 -- land _014's majors + _012's catalogue
-               corrections, THEN build ph07 and ph21 in the same task.
-               ⚠ M1 first: model.py::uu_fold != verus.rs::uu_fold and the
-               input generator hides it -- a TEMPLATE defect 90 rows would
-               copy.
-           (2) then the batch, REORDERED on the engineer's advice:
-               ph07 -> ph21 -> ph16 -> ph12 -> ph29, with ph29 LAST --
-               the tally-in-the-checksum technique ph03 relies on does not
-               carry to a row where the allocator truncation IS the defect,
-               and that is a design call to take with five rows of
-               experience rather than one. ✅ ph07's tier verified at
-               source by _012; it is the first `narrowed` row.
+ROW 1      ph03 gate PASS, REVIEWED, headline upheld AND strengthened:
+           PHP's real 2004 fix is BOTH DEAD AND INCOMPLETE -- one hunk
+           provably redundant, the other leaving 144 over-reads, unfixed
+           until 2014. Verus refuses it in one line. (F29)
+           Ladder (F33): safe_naive +26.8% · safe_tuned +3.7% ·
+           unsafe -7.6% · verus == unsafe, byte-identical.
 
 BAR        C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
            patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
 
-READ       PLAN_PHP.md (the design + all 10 decisions), then
-           .tasks/PROTOCOL.md (reused unchanged), then .memory-php/.
+READ       PLAN_PHP.md, .tasks/PROTOCOL.md (reused unchanged), CATALOGUE.md;
+           then F1-F33 and the open items below. Phase 0's five rounds and
+           the mining wave live in .tasks-php/ reports, not here.
 ```
 
 ---
