@@ -4,47 +4,41 @@
 For the *other* programme (`patterns/`) read `RECAP_PAT.md`; for the split
 between them read `CLAUDE.md`'s top table.
 
-> ⚠⚠ **SIZE DISCIPLINE, AND IT IS A MEASURED LESSON, NOT A PREFERENCE.**
-> `RECAP_PAT.md` reached **560 KB** and one pattern's `why` field became a
-> single ~7,000-word JSON string. **Both stopped being read**, which is how a
-> published limitation that did not exist got copied out of a stale header
-> (`.tasks/PROTOCOL.md` rule 13). **The START HERE box stays ≤ 20 lines.**
+> ⚠⚠ **SIZE DISCIPLINE — AND EVERY NUMBER THIS BOX ONCE GAVE FOR IT WAS WRONG.**
+> `RECAP_PAT.md` really did reach **560 KB**, and **the START HERE box stays
+> ≤ 20 lines.** Everything else here was invented or miscalibrated:
 >
-> ⚠⚠ **THIS RULE ALSO SAID *"a `spec.md` `why` stays ≤ 200 words"* AND THAT WAS
-> UNSATISFIABLE — REFUTED AT `TASK_PHP_002`, ✅ MANAGER-VERIFIED.** The gate
-> hard-requires a shared `NAMED-SPELLING STANDARD` paragraph, byte-identical
-> across patterns: `ph00-smoke`'s `why` is **12 224 bytes / 2 056 words**, of
-> which **~11 003–11 006 bytes is that mandated block**, leaving a row-specific
-> half of **exactly 200 words**.
+> | this box said | measured |
+> |---|---|
+> | a `why` became *"a ~7,000-word JSON string"* | **no such row.** `p01`, the row meant, is **2 057**; the largest anywhere is `p16-tlv-walk` at **4 995** |
+> | *"a `why` stays ≤ 200 words"* | unsatisfiable — the gate mandates an 11 003-byte shared block |
+> | *"the ROW-SPECIFIC half stays ≤ 200 words"* | **30 of 33 PAT rows break it**; `p01`, the template, is 201 |
 >
-> ⚠⚠ **DO NOT ARBITRATE THAT BYTE COUNT — IT HAS THREE ANSWERS AND THE
-> DISAGREEMENT IS A DEFINITION, NOT AN ERROR.** The manager measured **11 004**
-> (from the literal `NAMED-SPELLING STANDARD`), `PROTOCOL_PHP.md` and
-> `ph00-smoke/NOTES.md` say **11 003**, and the manager's *longest-common-suffix
-> against `p01`* — the only definition the gate's byte-identity actually pins —
-> gives **11 006**. All three are right about different cuts. ✅ **The quantity
-> the RULE needs is robust and was measured at all three: the row-specific half
-> is 200 words.** ⚠ `TASK_PHP_004` recorded 11 003 as *"correct"* and the other
-> as *"wrong"*; that was a false precision on a number nobody had defined, and it
-> is withdrawn here rather than swapped for a fourth figure.
-> ⚠⚠⚠ **AND THE *REPAIRED* RULE — *"the ROW-SPECIFIC half of `why` stays ≤ 200
-> words"* — IS NOW WITHDRAWN TOO. THAT IS TWO FAILED VERSIONS OF ONE RULE, AND
-> THE THIRD MUST NOT BE A NUMBER THE MANAGER INVENTS.** `TASK_PHP_005` F-5
-> measured it against the corpus the 200 came from: **30 of 33 PAT rows break it,
-> by up to 12× (2 533 words), and `p01` — the template every row clones — is
-> 201.** The 200 was never a limit derived from anything; it was the measurement
-> of the single row that had been measured, and it is **enforced by nothing**.
-> ⚠ **The line below this one warns that a rule that cannot be met is worse than
-> none. It was written in the same breath as a rule that could not be met.**
-> → **open item 19**: `TASK_PHP_006` measures the distribution and proposes a
-> limit *or* a structural rule, and whatever lands is enforced by a check or
-> dropped. Until then there is **no size rule on `why`** — only the standing
-> advice that anything long belongs in `.memory-php/` or the row's `NOTES.md`.
+> ✅✅ **SETTLED AT `TASK_PHP_006` §5: THERE IS NO SIZE RULE ON `why`, AND THAT IS
+> THE ANSWER, NOT A GAP.** Distribution over 33 PAT rows + `ph00`: **min 197 ·
+> median 989 · p90 1817 · max 3140.** Any limit at or under q1544 refuses a
+> quarter of the built corpus; any limit the corpus meets permits 3× the median.
+> Imposing one on PAT means editing text *inside the hashed block* on 33 rows —
+> **33 re-gates for a style rule.** The manager's structural alternative was
+> **also** unsatisfiable (**not one `why` in either programme contains a single
+> newline**, so no row has a second paragraph). What replaces it:
+> `gate.py::why_sizes` **reports** each php row's size on every preflight and
+> **cannot fail a run**. A reported size is not a rule — which is why it is safe.
 >
-> ✅ The **byte count** above survived review unchanged (`TASK_PHP_005` §4): the
-> 11 003/11 004 gap is a single `'.'` after `check.py`'s `END` marker, both cuts
-> are right, and the 200 is exactly 200. **The withdrawal was the correct call;
-> the rule built on it was not.**
+> ⚠⚠⚠ **THE LESSON IS THE PROPAGATION, NOT THE ARITHMETIC.** The 7 000 went:
+> manager task file (`TASK_PHP_002.md:149`) → this box → an engineer citing it
+> back as *"the figure **that motivated the size rule**"*
+> (`TASK_PHP_002_REPORT.md:492`). **Three versions of a rule were written, two
+> failed, and the justification for all three was a number nobody had measured.**
+> `PROTOCOL.md` rule 14, and the **second** time here — the first was *"123 ASan
+> reports"* (F4). **A premise in a task file is one an engineer has no reason to
+> doubt.**
+>
+> ⚠ Detail — the 11 003/11 004/11 006 byte count, its withdrawal, and
+> `TASK_PHP_005` F-5's own wrong span (it measured the prefix only, making the
+> corpus **maximum**, `p16-tlv-walk` at 3 140, look like the minimum at 109) — is
+> in `TASK_PHP_005_REPORT.md` §4 and `TASK_PHP_006_REPORT.md` §5. ⚠ **This box
+> had grown to 74 lines about keeping documents short.**
 
 ---
 
@@ -65,21 +59,19 @@ MINED      TASK_PHP_001 DONE, all 3 axes. 54 candidates, evidence promoted to
              type     15 cands / 12 mechanism families
            ALL THREE REFUTED THE MANAGER CLAIM THEY WERE NAMED TO ATTACK.
 
-BUILT      TASK_PHP_002 built Phase 0; _003 reviewed it (2 blockers);
-           _004 landed them; _005 REVIEWED THAT: 1 BLOCKER, 4 majors,
-           7 minors, 9 clean negatives, 3 refutations (2 engineer, 1 manager).
-           B1 *NOT* CLOSED -- this box said "B1 CLOSED" and that was FALSE.
-                      2 of 5 bypasses land: #include "emalloc_shim.c", and
-                      c/<subdir>/*. Both BUILD, LINK and RUN a live allocator
-                      into NEITHER digest with the preflight green. (F-1)
-           B2 CLOSED  and now better: all 4 attacks on it were clean
-                      negatives, and the 3 unrun matrix cells are run. (F-3)
+BUILT      Phase 0: _002 built it, _003 reviewed (2 blockers), _004 landed
+           them, _005 reviewed THAT (1 blocker), _006 landed that.
+           B1 CLOSED at _006 -- and by asking the COMPILER: gcc -MM over
+                      build.py's own TU list, not a string search. All 8 of
+                      the reviewer's fixture rows land from their UNMODIFIED
+                      generator. ~115 ms/row. UNREVIEWED (rule 9).
+           B2 CLOSED at _004, CONFIRMED at _005: 4 clean negatives.
+           SIZE RULE: there is NONE, and that is the answer (open item 19).
 
-NEXT       (1) TASK_PHP_006 -- LAND TASK_PHP_005's corrections (F-1 blocker
-               first). Then review it.
-           (2) then the catalogue: .tasks-php/ADJUDICATION_001.md is written
-               and settles ~80 rows; TASK_PHP_008 builds
-               patterns-php/CATALOGUE.md, and a review attacks both.
+NEXT       (1) TASK_PHP_007 -- REVIEW TASK_PHP_006 (alternation, rule 1).
+           (2) TASK_PHP_008 -- the catalogue. .tasks-php/ADJUDICATION_001.md
+               settles ~80 rows and is UNREVIEWED manager work; _008 builds
+               patterns-php/CATALOGUE.md from it AND attacks it.
 
 BAR        C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
            patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
@@ -352,6 +344,40 @@ is not an enforcement mechanism"*. F-10 is the sequel: _a check that greps for a
 word is barely more of one._** The audit needs to key on what the *compiler*
 sees, not on what the text says.
 
+### F11 — the guard that closed B1 asks the COMPILER, and that is the transferable part
+
+`TASK_PHP_006` closed F-1 by **replacing the string search with `gcc -MM`** over
+`build.py`'s own TU list under both `-DSLB_ISOLATED` states, intersected by
+`realpath`. ✅ **Priced before it was adopted: 2 calls, ~115 ms/row** — the
+manager had worried it would be unaffordable and was wrong. All eight of the
+reviewer's fixture rows land from their **unmodified** generator, and **F-8's
+false positive closes as a side effect**, because a comment is not an include.
+
+⚠⚠ **The manager's suggested fallback would NOT have worked.** `TASK_PHP_006.md`
+called *"require the name inside an `#include` on the same line"* the obvious
+repair; it would have left `ph53-subdir` open, because that bypass is about
+**where the file is**, not how the include is spelled.
+
+⭐ **The rule: a guard that greps has a spelling, and its spelling is a
+vulnerability. Ask the tool that actually decides.** This is the third step of
+one staircase — `TASK_PHP_004`: *a word in a document is not an enforcement
+mechanism* → `TASK_PHP_005` F-10: *a check that greps for a word is barely more
+of one* → here: *ask the compiler.*
+
+### F12 — three size rules were justified by a figure nobody had measured
+
+Detailed in the size box above. ✅ `p01`'s `why` is **2 057 words**, not the
+*"~7,000"* the manager wrote into a task file, copied into the state layer, and
+an engineer then cited back as the rule's motivation. **The lesson is `PROTOCOL.md`
+rule 14 and this is its second instance on this programme** (after F4's *"123
+ASan reports"*): a premise stated as fact in a task file is one an engineer has
+no reason to doubt, and it comes back as evidence.
+
+⚠ **The reviewer's own correction was also mis-measured** — `TASK_PHP_005` F-5
+took the row-specific half as the *prefix only*, so `p16-tlv-walk`, the corpus
+**maximum** at 3 140 words, appears in its table as the **minimum** at 109.
+**Three parties measured this quantity and all three got a different span.**
+
 ## Open items — carried, not closed
 
 | # | item | note |
@@ -365,14 +391,14 @@ sees, not on what the text says.
 | ~~7~~ | ✅ **CLOSED at F9 — and the check turned out to be impossible.** All spatial `hotness` fields stay **reasoned** | The census holds **zero** spatial reports from `Zend/` or `ext/standard/`: 2156 of 2520 fault inside `libmysqlclient.so.14`, the rest in the regex matcher. **The census is struck as a source of spatial frequency evidence** rather than left as an open promise |
 | 8 | Rank 15 (CRASH-158) may be spatial, not temporal | cross-check the two miners' lists at adjudication |
 | 9 | ⚠⚠ **No php marginal `Ir` is comparable to any PAT one — and no two php runs are comparable to each other either** | `repo_path_bytes` is **15** bytes longer through the shim (⚠ this said **20**; corrected at `TASK_PHP_003`), and `gate.py`'s own `PYTHONDONTWRITEBYTECODE=1` adds `nvars` **+1** and `envp_stack_bytes` **+34** — measured directly at `TASK_PHP_004` (`25 + NUL + one 8-byte envp slot`). ⚠ **`TASK_PHP_003` gave that as +33 and that was a record-to-record difference between two SHELLS, not the variable's cost**: `ph00`'s own `envp_stack_bytes` moved **3686 → 3695** across two runs of the same gate with no source change, so the p01 delta was +33 and is now +42. **Never quote a php figure against a `pNN` one, and re-check the env block before quoting one php figure against another** |
-| 10 | ⚠⚠⚠ **STILL OPEN — `common-php/*.h` is in NO gate digest, and the `<row>/c/` symlink that was supposed to close the measurement half is BYPASSABLE** | `check.py`'s three `common/` globs are non-recursive and none matches `emalloc_shim.h`. The bridge half **fires** (F7). The symlink half was enforced by nothing (B1), was checked in `gate.py`'s preflight at `TASK_PHP_004` — and `TASK_PHP_005` **F-1** got round it twice, with rows that build, link and run a live allocator into neither digest. **`TASK_PHP_006` closes it** |
-| 17 | ⚠⚠ **PAT-SIDE, LATENT, AND DELIBERATELY NOT FIXED: `check.py:10314` and `measure.py:226` glob `<row>/c/*` NON-RECURSIVELY and drop the directory entry with `isfile()`** | so **every source file a row puts in a `c/` subdirectory is in no digest at all**, and `check.py`'s `--no-build` staleness scan misses it too, so editing one does not even mark a binary stale. ✅ **No row is affected today** — `find patterns patterns-php -mindepth 3 -maxdepth 3 -type d -path '*/c/*'` is empty. ⚠ **Fixing it is a `harness/` edit = a 33-pattern re-gate for zero present benefit.** Decision: **do not fix; FORBID the layout on the php side** (`TASK_PHP_006`), and carry this row so the next person to reach for `c/sub/` finds out first. ⚠ It matters more here than on PAT: php rows are *extracted* C and `c/zend/` is an ordinary thing to want |
+| ~~10~~ | ✅ **CLOSED at `TASK_PHP_006` — `common-php/*.h` is in NO gate digest, and the `<row>/c/` symlink that was supposed to close the measurement half is BYPASSABLE** | `check.py`'s three `common/` globs are non-recursive and none matches `emalloc_shim.h`. The bridge half **fires** (F7). The symlink half was enforced by nothing (B1), was checked in `gate.py`'s preflight at `TASK_PHP_004` — and `TASK_PHP_005` **F-1** got round it twice, with rows that build, link and run a live allocator into neither digest. **`TASK_PHP_006` closes it** |
+| 17 | ⚠ **PAT-SIDE, LATENT, DELIBERATELY NOT FIXED — and the php side now REFUSES the layout: `check.py:10314` and `measure.py:226` glob `<row>/c/*` NON-RECURSIVELY and drop the directory entry with `isfile()`** | so **every source file a row puts in a `c/` subdirectory is in no digest at all**, and `check.py`'s `--no-build` staleness scan misses it too, so editing one does not even mark a binary stale. ✅ **No row is affected today** — `find patterns patterns-php -mindepth 3 -maxdepth 3 -type d -path '*/c/*'` is empty. ⚠ **Fixing it is a `harness/` edit = a 33-pattern re-gate for zero present benefit.** Decision: **do not fix; FORBID the layout on the php side** (`TASK_PHP_006`), and carry this row so the next person to reach for `c/sub/` finds out first. ⚠ It matters more here than on PAT: php rows are *extracted* C and `c/zend/` is an ordinary thing to want |
 | 11 | A new php row costs **six commands (~28 min)**, not three | `gate → report → gate` is irreducible and `measure.py` builds nothing. Budget it. ✅ The three places that said three/five now say six (`TASK_PHP_004`) |
 | 12 | `.memory-php/` **does not exist yet** | `PLAN_PHP.md` lists it, `TASK_PHP_002` did not ask for it, and rule 4 makes it the manager's. Create it when the first finding survives review |
 | 13 | ⚠ **`harness-php/*.py` is in NO digest, and putting it in one costs a 33-pattern re-gate** | `check.py`'s `srcs` would have to reach `harness-php/`, i.e. a `harness/` edit (`PLAN_PHP.md` §2.1). `TASK_PHP_004` landed the **cheap half**: `gate.py` writes `results-php/preflight/<row>.preflight.json` with the `harness-php/*.py` hashes, the manifest hash and whether `--no-provenance` was used. ⚠ **That record is evidence, not a pin — nothing hashes it** — ⚠⚠ **and `TASK_PHP_005` F-2 found it is worse than that: it is written one file per ROW, not per run, so a later preflight ERASES `provenance_skipped: true`; nothing anywhere detects a missing record; and the manager had made it uncommitted.** Being fixed at `TASK_PHP_006` (item 18) |
 | 14 | ⚠⚠ **`provenance.py`'s overlap floor is SATISFIED BY DEAD CODE — the risk is a false PASS, not a false refusal** | Added at `TASK_PHP_004` for `TASK_PHP_003` M5. ⚠ **This row used to say the danger was a good row tripping a floor. `TASK_PHP_005` F-4 shows the opposite**: a kernel that implements *division*, cites *multiplication*, and hides the citation behind `#if 0` scores **100 % and is ACCEPTED** (`_normalise` drops lines starting with `#`, so `#if 0`/`#endif` vanish and everything between them counts); the same kernel without the dead block is refused at 11 %. ✅ **The floor is not too high** — a realistic `verbatim` `mul_function` lift scores 68 %. ⚠ **The check never reads `main.c`, the driver loop or the build, so it measures presence of TEXT IN A FILE, not presence of code in the benchmark**: a pass is not even evidence that the cited lines are compiled |
 | 16 | ⚠ **`TASK_PHP_004` edited `RECAP_PHP.md` — the manager's own handoff file** | `PROTOCOL.md` rule 4 reserves the state layer to the manager, and `TASK_PHP_004.md` did not forbid it explicitly. ✅ **The content is ACCEPTED — it is more accurate than what the manager was about to write** (the `+34` vs `+33` shell artefact, the `3686 → 3695` instability, items 13–15). ⚠ **But the boundary is real**: an engineer correcting the manager's numbers *in the manager's file* is how an unreviewed claim reaches the state layer without passing rule 9. **Future php task files must say explicitly that `RECAP_PHP.md` is manager-only** — the fix is one sentence in the task template, not a rollback of good work |
-| 18 | ⚠ **The manager GITIGNORED `results-php/preflight/` and that was WRONG — reversed** | `.gitignore:24-26` justified it as *"carries a `when` timestamp and the literal `gate_argv`, so it churns"*. ⚠ **`TASK_PHP_005` F-2c measured it: only `when` moves.** `sha256(rest)` is identical across two runs (`d91ce008ad273b36`) and `gate_argv` is a function of the command, **which is exactly the evidence M6 wanted**. The split the manager asked the reviewer to price **exists and costs one field**. → `TASK_PHP_006` commits the record without `when` and fixes the per-row overwrite |
-| 19 | ⚠⚠ **The 200-word `why` rule is WITHDRAWN as a number — it was calibrated on n = 1 and is broken by 30 of 33 PAT rows** | `TASK_PHP_005` F-5: up to **2 533** words, and **`p01` — the template every row clones, and the row `PROTOCOL_PHP.md` cites as complying — is 201.** The 200 was simply the measurement of the one row that had been measured. ⚠⚠ **This is the THIRD version of this rule and the second that could not be met**; `RECAP_PHP.md` itself warns that *"a size rule that cannot be met is worse than none"*. **The manager must not invent a fourth number** — `TASK_PHP_006` measures the corpus distribution and proposes a limit, or proposes a structural rule instead, **and whatever lands must be enforced by a check or dropped** |
-| 20 | ⚠ **`gate.py <row> --preflight` silently forwards `--preflight` to the tool and runs it** | `argparse.REMAINDER` collects from the first positional (`TASK_PHP_005` F-7). ⚠⚠ **The manager's own 06:55 `ph00.preflight.json` — cited as manager-verified evidence for the gitignore decision — is an instance: a FAILED `check.py` launch (`tool_returncode 2`) recorded as a preflight.** Part of the evidence for a manager decision was an artefact of a CLI bug |
+| ~~18~~ | ✅ **CLOSED at `TASK_PHP_006`. The record is COMMITTED (minus `when`), the per-row overwrite is fixed by appending, and an absence is now a preflight NOTE** | `.gitignore:24-26` justified it as *"carries a `when` timestamp and the literal `gate_argv`, so it churns"*. ⚠ **`TASK_PHP_005` F-2c measured it: only `when` moves.** `sha256(rest)` is identical across two runs (`d91ce008ad273b36`) and `gate_argv` is a function of the command, **which is exactly the evidence M6 wanted**. The split the manager asked the reviewer to price **exists and costs one field**. → `TASK_PHP_006` commits the record without `when` and fixes the per-row overwrite |
+| ~~19~~ | ✅ **CLOSED: THERE IS NO SIZE RULE. The 200-word rule is withdrawn — it was calibrated on n = 1 and is broken by 30 of 33 PAT rows** | `TASK_PHP_005` F-5: up to **2 533** words, and **`p01` — the template every row clones, and the row `PROTOCOL_PHP.md` cites as complying — is 201.** The 200 was simply the measurement of the one row that had been measured. ⚠⚠ **This is the THIRD version of this rule and the second that could not be met**; `RECAP_PHP.md` itself warns that *"a size rule that cannot be met is worse than none"*. **The manager must not invent a fourth number** — `TASK_PHP_006` measures the corpus distribution and proposes a limit, or proposes a structural rule instead, **and whatever lands must be enforced by a check or dropped** |
+| ~~20~~ | ✅ **CLOSED at `TASK_PHP_006`** (was: `gate.py <row> --preflight` silently forwarded the flag and ran the tool) | `argparse.REMAINDER` collects from the first positional (`TASK_PHP_005` F-7). ⚠⚠ **The manager's own 06:55 `ph00.preflight.json` — cited as manager-verified evidence for the gitignore decision — is an instance: a FAILED `check.py` launch (`tool_returncode 2`) recorded as a preflight.** Part of the evidence for a manager decision was an artefact of a CLI bug |
 | 15 | ⚠ **The php staleness check is `gate.py --tool measure --check-stale`** and the mandated PAT `66/0` one does **not** examine `results-php/` at all | Both are now in `PROTOCOL_PHP.md` §E1 (`TASK_PHP_004`); today the php side is **2 records** |
