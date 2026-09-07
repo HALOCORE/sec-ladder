@@ -24,6 +24,14 @@ grep -rho '\.tasks-php/TASK_PHP_[A-Za-z0-9_]*\.md' .memory-php/ .tasks-php/ RECA
   | sort -u | while read p; do [ -e "$p" ] || echo "MISSING: $p"; done
 ```
 
+⚠ **One expected hit, and it is what a working check looks like, not a defect:**
+a spec names its own report in its header before that report exists, so an
+*unfinished* task always shows `MISSING: …_REPORT.md`. The PAT side has the same
+exception for its `TASK_NNN.md` placeholder (`PROTOCOL.md` rule 10). **Ignore a
+MISSING report for a task that is still open; investigate one for a task that is
+closed.** ⚠ Silence, by contrast, is what a *broken* check looks like — the
+`grep` matching nothing at all would also print nothing.
+
 ## Sibling directory convention
 
 `.tasks-php/` is dotted and `results-php/` is not — **because `.tasks/` is dotted
