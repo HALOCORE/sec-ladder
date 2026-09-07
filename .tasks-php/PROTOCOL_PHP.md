@@ -281,13 +281,68 @@ under `<row>/c/` — following directory symlinks, cycle-safe, dotfiles included
    `ph85-dirlink-ok`, both must-NOT-fire).
 
 ⚠ **A DOTFILE HAS NO SANCTIONED FORM** — `glob` cannot match it, so there is no
-flat key to give it. Rename it.
+flat key to give it. Rename it. ⚠⚠ **AND NEITHER HAS A DOTTED *ROW***, since
+`TASK_PHP_010` §1 — `patterns-php/.ph07-wip/` is refused **by name**. `glob`
+cannot reach its records either, and the record half cannot be repaired from
+here: `harness/measure.py:303` is frozen and globs `results/p*.json`, which
+`.ph07-wip.json` does not match, so `--check-stale` would print `0 STALE`
+having never looked at that row.
+
+### ⚠⚠⚠ B3a. THE DANGER IS **NOT** "A SUBDIRECTORY OF `c/`". IT IS "ANY FILE `glob(<row>/c/*)` DOES NOT MATCH", AND THE SIBLING DIRECTORY IS THE ONE THAT ESCAPED
+
+⚠⚠ **This section taught the `c/` subdirectory as the hazard, and the layout it
+made most likely was the one no audit covered** (`TASK_PHP_009` M2). `#include`
+with quotes resolves **relative to the directory of the including file**, so
+`c/kernel.c` reaches a SIBLING with `"../aux/x.h"` — and the natural php layout
+is exactly that: extracted tarball sources at `<row>/extract/Zend/…`, mirroring
+their origin, one character away from the sanctioned `c/zend -> …` and with the
+opposite guarantee. **Measured**: that file compiles, runs the row's own
+allocator, is in **neither** digest, and editing it moved the binary's behaviour
+(`tally 1 → 1000`) with **0 digest keys moved and 0 preflight problems**
+(`.temp/php9/04-upward-include.log`).
+
+✅ **Closed at `TASK_PHP_010` §2: a row may contain only `c/`, `inputs/` and
+`controls/`** (`gate.py::ROW_DIRS`, refused inside `c_digest_audit`;
+`__pycache__` is exempt because Python creates it). **Put extracted sources
+under `c/`** — flatten, or keep the tarball's shape at `c/zend/…` with a flat
+symlink beside each file, exactly as the two spellings above prescribe.
+
+⚠ **Do NOT reach for `gcc -MD`.** An include-closure detector is what
+`TASK_PHP_008` §0 deleted after two rounds; its input space is unbounded and it
+needs a `build.py` edit. The whitelist is one `os.listdir` with a finite answer.
+
+⚠⚠ **WHAT THE WHITELIST DOES NOT BOUND, AND IT IS MEASURED, NOT GUESSED**
+(`TASK_PHP_010`, `.temp/php10/05-outside-row.log`): `..` **twice** leaves the
+row. `#include "../../shared/x.h"` from `<row>/c/` reaches
+`patterns-php/shared/x.h`; it compiles, runs, is in no digest, and **is not
+refused** — `patterns-php/shared/` is not a directory *under* the row, and as a
+row with no `c/` both audits skip it. **The rule bounds the escape INSIDE the
+row and not the escape OUT of it.** Until that is closed, treat *"every file a
+row compiles lives under `<row>/c/`"* as a **discipline**, and read a row's
+`#include` lines in review: a `..` in one is a claim that needs the reviewer's
+eye, not the gate's.
 
 ⚠⚠ **AND THE REASON THIS AUDIT IS SOUND WHERE THE ALLOCATOR DETECTOR WAS NOT:
 IT ENUMERATES FILES — A FINITE, OBSERVABLE SET — NOT IDIOMS.** No preprocessor
 state, no compiler, no flag space, no spelling. That is the distinction to
 carry: §B2's guard kept being reopened because its input was unbounded; this
 one's input is `os.listdir`.
+
+⚠⚠⚠ **AND THAT SENTENCE WAS FALSE OF THE ROW LOOP FOR FIVE TASKS — TRUE OF THE
+FILE WALK, FALSE OF THE ENUMERATION AROUND IT.** `_walk_files` used
+`os.listdir`; the four audits that called it iterated **`glob(patterns-php/*)`**,
+which never matches a leading dot, while `build.py::pattern_dir` (`os.listdir`)
+and `provenance.py` both resolve a dotted row. `gate.py --preflight .ph93`
+returned **rc=0** on a row carrying a regular-file allocator copy *and* an
+unkeyed subdirectory source, printing `ok every patterns-php/*/c/ file has a
+digest key` about a tree where that was false (`TASK_PHP_009` M1). ✅ **Made
+true at `TASK_PHP_010` §1**: every row-iterating audit — `shim_link_audit`,
+`c_digest_audit`, `why_sizes` and `preflight_coverage_audit` — now goes through
+`gate.py::_row_dirs`, one `os.listdir`, the same set the builder compiles.
+⚠ **The invariant to keep is that sentence, not the code: THE AUDIT AND THE
+BUILDER MUST ENUMERATE THE SAME SET.** A wrong enumeration is not an
+unboundable one — the fix was a substitution, in one call — but it is only
+*checkable* because there is one call to check.
 
 ---
 
@@ -432,8 +487,9 @@ exist.
 
 | | |
 |---|---|
-| ✅ **enforced** | every check in `gate.py`'s preflight, **nine stages, eight of which can fail** — the shim link, the digest bridge, `c_digest_audit`, the **unconditional** `c/emalloc_shim.h` symlink, the overlap self-test, the manifest, provenance, and **preflight coverage** (a failure since `TASK_PHP_008` §3). All exit 2 and do not run the tool. ⚠ Stage 8, `why_sizes`, is a REPORTED number and cannot fail — that is deliberate and stated in the code. |
-| ✅ **recorded** | `results-php/preflight/<row>.preflight.json`, **committed** since `TASK_PHP_006`, one entry per run, appended and never overwritten. It carries `harness_php_sha256`, the manifest hash, and whether `--no-provenance` was used. ⚠ Identical runs collapse on **content**, not adjacency (`TASK_PHP_008` M3 — two alternating routine commands used to grow it without bound), and the list is capped at `MAX_RUNS` keeping the first, the last and every evidence-carrying entry. |
+| ✅ **enforced** | every check in `gate.py`'s preflight, **nine stages, eight of which can fail** — the shim link, the digest bridge, `c_digest_audit` (**every `c/` file keyed, plus since `TASK_PHP_010` the row-directory whitelist `{c, inputs, controls}` and the refusal of a DOTTED row**), the **unconditional** `c/emalloc_shim.h` symlink, the overlap self-test, the manifest, provenance, and **preflight coverage** (a failure since `TASK_PHP_008` §3, ⚠ **scoped to the row in hand since `TASK_PHP_010` §3** — another row's uncertifiable record is printed and recorded, and `gate.py --audit` is the global spelling with an exit code). All exit 2 and do not run the tool. ⚠ Stage 8, `why_sizes`, is a REPORTED number and cannot fail — that is deliberate and stated in the code. |
+| ✅ **recorded** | `results-php/preflight/<row>.preflight.json`, **committed** since `TASK_PHP_006`, one entry per run, appended and never overwritten. It carries `harness_php_sha256`, the manifest hash, and whether `--no-provenance` was used. ⚠ Identical runs collapse on **content**, not adjacency (`TASK_PHP_008` M3 — two alternating routine commands used to grow it without bound), and the list is capped at `MAX_RUNS`: first, last, then evidence-carrying newest-first, then the rest. ⚠⚠ **Evidence is a PRIORITY, not an EXEMPTION, since `TASK_PHP_010` §4** — the exemption made the cap unenforceable for the only class that accumulates (`TASK_PHP_009` m2: **1000 failing runs kept 1000**, ~1.4 MB in a committed file, while the test that cleared the cap used 1000 *clean* ones, which capped at 40). A dropped evidence entry is counted in `_dropped_evidence_runs`. |
+| ⚠ **not read-only** | **a FAILING run grows a COMMITTED file** (`TASK_PHP_009` m5): one failed `gate.py --tool measure --check-stale` added **52 lines** to `results-php/preflight/_norow.preflight.json`. So a probe that plants into `common-php/` dirties `results-php/` as a second-order effect — **print `git status` inside every `finally:`**, not just the sha256 of what you meant to touch. |
 | ✅ **detected** | a php record with **no** preflight record beside it, **and one whose every recorded run failed, skipped provenance or ran on a broken shim** (`TASK_PHP_008` M5 — `--audit` used to ask only whether the FILE existed and called such a row `complete`). `gate.py --audit` exits 1; the preflight now **fails**. |
 | ❌ **NOT enforced** | **that the wrapper ran at all.** `grep -c preflight harness/{check,measure,report}.py` → `0 0 0`; a gate record's `invocation` is `check.py`'s own argv and is **byte-identical** whether the run came through `gate.py` or straight out of the shim, which `PLAN_PHP.md` §2.1a documents as a supported spelling. Closing it needs `check.py` to know about `harness-php/`, i.e. a `harness/` edit and a 33-pattern re-gate. |
 | ❌ **NOT enforced** | **the kernel-overlap floor**, demoted to a reported number at `TASK_PHP_008` §2. And ⚠ **`uses_allocator` is a declaration nothing reads.** |
@@ -447,6 +503,19 @@ reporting `FRESH`.** A row measured *before* its link exists therefore has a
 record nothing will ever complain about. **The preflight is what closes that,
 not the digest** — which is a reason to keep the preflight failing loudly, and
 a reason not to read `0 STALE` as "every source is pinned".
+
+⚠⚠ **AND `0 STALE` DOES NOT MEAN "EVERY PINNED SOURCE STILL EXISTS" EITHER —
+IT MEANS EVERY PINNED SOURCE STILL MATCHES *OR HAS BEEN DELETED***
+(`TASK_PHP_009` m3, measured in `.temp/php9/14-survival.log` §B).
+`measure.py:270-278` iterates the **recorded** keys and `:338-348` increments
+`bad` only on `stale or bstale`, so a **missing** file prints its own
+`MISSING` line and **does not fail the run**: moving `ph00-smoke/c/emalloc_shim.h`
+aside gave `FRESH … 29 source(s)` *and* `MISSING … c/emalloc_shim.h` *and*
+`2 record(s) examined, 0 STALE`, exit 0. ⚠ The bracket quotes the summary line,
+which is exactly where that does not show. **The preflight catches it (1
+problem); `--check-stale` does not.** It is a `harness/` property, identical on
+all 33 PAT rows, and it is **known, not fixed** — the fix is a `harness/` edit
+and a 33-pattern re-gate.
 
 ⚠ **So the honest reading of a green php gate record is: *the tree passed the
 PAT gate*. The preflight record beside it is EVIDENCE that the php-specific

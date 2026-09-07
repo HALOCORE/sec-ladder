@@ -74,6 +74,13 @@ failure. **Count the `problems.extend` / `problems.append` calls in
      UNSOUND (it skipped a symlinked directory by name, and never saw a
      dotfile) and OVER-STRICT (the flat-symlink layout is safe under exactly
      this audit). The layout is now AVAILABLE AND PRICED.
+     ⚠⚠ SINCE TASK_PHP_010 IT ALSO REFUSES (a) A DOTTED ROW DIRECTORY, by name
+     -- `glob` cannot key it and `measure.py --check-stale` cannot even see its
+     RECORDS (TASK_PHP_009 M1) -- and (b) ANY DIRECTORY UNDER `<row>/` OUTSIDE
+     `{c, inputs, controls}`, because `#include "../aux/x.h"` from `c/kernel.c`
+     compiles into the row while `<row>/aux/` is in neither digest
+     (TASK_PHP_009 M2). Both are `os.listdir` questions with finite answers;
+     neither is `gcc -MD`, which is the detector TASK_PHP_008 §0 deleted.
   4. ⚠⚠ `shim_link_audit()` -- THE ALLOCATOR SYMLINK, **UNCONDITIONAL** since
      TASK_PHP_008 §0. Every row carries `c/emalloc_shim.h` whether or not it
      allocates. ⚠ It used to DETECT allocator use -- a string search
@@ -111,7 +118,13 @@ failure. **Count the `problems.extend` / `problems.append` calls in
      a deadlock that TASK_PHP_007 M4 demonstrated does not exist -- `main()`
      writes the record on the FAILURE path. ⚠ It is a DETECTOR, not a pin, and
      it cannot be made into one from here; see TASK_PHP_006 §1.3.
-     `gate.py --audit` is the same check with an exit code and nothing else run.
+     ⚠⚠ **SCOPED TO THE ROW IN HAND SINCE TASK_PHP_010** (TASK_PHP_009 M3/M4):
+     another row's uncertifiable record is PRINTED and RECORDED but does not
+     fail this run, because the GLOBAL scope turned one orphan record -- from a
+     row `PLAN_PHP.md` §3 expects to be retired -- into a programme-wide stop
+     that blocked even the mandated bracket, with no repair that converged.
+     `gate.py --audit` is the same check asked GLOBALLY, with an exit code and
+     nothing else run.
 
 ⚠⚠ WHAT THIS SCRIPT DOES **NOT** ENFORCE, STATED HERE BECAUSE A HALF-TRUE
 CLAIM IS WORSE THAN NONE: **it cannot make itself mandatory.**
@@ -177,7 +190,11 @@ PYTHONDONTWRITEBYTECODE, and why it is not superstition
 Importing `check.py` through `.temp/php-root/harness/` writes the `.pyc` into
 the REAL `harness/__pycache__/` (the OS resolves the link) with the SHIM path
 recorded as `co_filename`, so a later PAT traceback would name a path under
-`.temp/`. Measured at `TASK_PHP_002` (`.temp/php0/pycdemo`). It moves no hash,
+`.temp/`. Measured at `TASK_PHP_002`; ⚠ the probe tree `.temp/php0/pycdemo` was
+deleted with the rest of that task's scratch binaries (`.memory/00-environment.md`
+constraint 6, "keep the generator, delete the artefact"), so the surviving
+evidence is the pasted output in `.tasks-php/TASK_PHP_002_REPORT.md:290-295`
+-- cite that, not the path (TASK_PHP_009 m4). It moves no hash,
 but it is a write into a directory this programme has promised not to touch,
 and one environment variable removes it.
 """
@@ -270,9 +287,132 @@ def _walk_files(top, _seen=None):
             yield p
 
 
+#: ⚠⚠⚠ THE ROW ENUMERATION, AND IT IS ONE CALL ON PURPOSE. TASK_PHP_009 M1.
+#: Every audit in this file enumerates rows THROUGH `_row_dirs`, and `_row_dirs`
+#: uses `os.listdir` because `harness/build.py:81-89::pattern_dir` -- the ONLY
+#: resolver that decides what actually gets COMPILED and MEASURED -- uses
+#: `os.listdir`.
+#:
+#: ⚠⚠ **THE AUDIT AND THE BUILDER MUST ENUMERATE THE SAME SET.** That is the
+#: whole invariant, and until TASK_PHP_010 it was false: `shim_link_audit`,
+#: `c_digest_audit`, `why_sizes` and `preflight_coverage_audit` all iterated
+#: `glob(patterns-php/*)`, and **`glob` NEVER MATCHES A LEADING DOT**, while
+#: `build.py::pattern_dir` (os.listdir) and `provenance.py:841-843`
+#: (`glob(<row>*)`, where the row string carries the dot) both resolve a dotted
+#: row. The reviewer ran the real `gate.py --preflight .ph93` on a row carrying
+#: a REGULAR-FILE allocator copy AND an unkeyed subdirectory source and got
+#: **rc=0**, with the preflight printing `ok  every patterns-php/*/c/ file has a
+#: digest key` about a tree where that sentence was false, on the line under a
+#: provenance stage that names the row (`.temp/php9/17-dotted-e2e.log`).
+#:
+#: ⚠⚠⚠ AND THE REASON THIS IS A SUBSTITUTION RATHER THAN ANOTHER ROUND OF
+#: WHACK-A-MOLE, WHICH IS WHY THE DESIGN SURVIVES M1 AT ALL (TASK_PHP_009 §1.1,
+#: §6.1): the deleted allocator DETECTOR asked *"does this row use the
+#: allocator?"* -- a question with an UNBOUNDED answer space and **no complete
+#: enumeration available anywhere**, so each fix enumerated a few more idioms
+#: and the next idiom reopened it. This asks *"which rows exist?"*, which HAS a
+#: complete enumeration, in ONE call, and the builder already makes it.
+#: **A WRONG enumeration is not an UNBOUNDABLE one; pricing the first as the
+#: second is how a fixable bug gets priced as a phase.**
+#: ⚠ So DO NOT put `glob("*")` back here for tidiness or symmetry. It returns a
+#: DIFFERENT SET from the one that gets compiled, and that difference IS the
+#: bug. If you need the glob's ordering, sort `_row_dirs`'s output.
+def _row_dirs(patterns_dir):
+    """Every row directory under `patterns_dir`. Returns `(rows, dotted)`.
+
+    `rows` is every subdirectory, dotted ones INCLUDED and listed last;
+    `dotted` is the subset whose name begins with `.`, so a caller can refuse
+    them BY NAME while still auditing their contents. Both are absolute paths.
+
+    ⚠ A dotted row is enumerated rather than skipped, deliberately: skipping it
+    would reproduce M1 one layer up. It is refused by name in `c_digest_audit`
+    AND its `c/` is audited like anybody else's.
+
+    `__pycache__` is dropped because it is not a row under any resolver --
+    `build.py::pattern_dir` would only ever return it for the literal argument
+    `__pycache__`, and nothing else in the programme names it.
+    """
+    try:
+        entries = sorted(os.listdir(patterns_dir))
+    except OSError:
+        return [], []
+    rows, dotted = [], []
+    for e in entries:
+        if e == "__pycache__":
+            continue
+        p = os.path.join(patterns_dir, e)
+        if not os.path.isdir(p):
+            continue
+        (dotted if e.startswith(".") else rows).append(p)
+    return rows + dotted, dotted
+
+
+#: ⚠⚠ THE ONLY DIRECTORIES A ROW MAY CONTAIN -- TASK_PHP_009 M2, the scope half.
+#: `c_digest_audit` is exhaustive INSIDE `<row>/c/` and was blind ONE DIRECTORY
+#: UP: `#include "../aux/x.h"` from `c/kernel.c` resolves relative to the
+#: INCLUDING FILE, so it compiles, and `<row>/aux/` is in no gate digest
+#: (`check.py:10313-10324`), no measurement digest (`measure.py:224-235`) and
+#: not walked by `_walk_files(cdir)`. MEASURED end to end: editing that header
+#: moved the binary's behaviour (`tally 1 -> 1000`) with **0 digest keys moved
+#: and 0 preflight problems** (`.temp/php9/04-upward-include.log`).
+ROW_DIRS = ("c", "inputs", "controls")
+
+
+def _row_layout_problems(pdir, row):
+    """⚠ Refuse any directory under `<row>/` outside `ROW_DIRS`. TASK_PHP_009 M2.
+
+    ⚠⚠ WHY A DIRECTORY WHITELIST AND NOT `gcc -MD`. The include closure IS the
+    exact question -- and it is the question this programme DELETED at
+    TASK_PHP_008 §0 after two rounds, because its input space is unbounded
+    (every preprocessor spelling x every flag combination x every compiler:
+    `build.py` compiles in 8 preprocessor states and `_MM_CONFIGS` simulated 2).
+    A real `-MD` would also need a `build.py` edit, i.e. a 33-pattern re-measure.
+    **The row's directory list is a FINITE, OBSERVABLE SET -- one `os.listdir` --
+    which is the same property that makes `c_digest_audit` sound.**
+
+    ⚠⚠ WHAT IT DOES **NOT** BOUND, SAID HERE BECAUSE A HALF-TRUE GUARD IS WORSE
+    THAN NONE (TASK_PHP_010, measured in `.temp/php10/05-outside-row.log`):
+    `..` twice leaves the row altogether. `#include "../../shared/x.h"` from
+    `<row>/c/` reaches `patterns-php/shared/x.h`, and `../../../extract/…`
+    reaches the repo root -- both COMPILE, both are in neither digest, and
+    neither is a directory under `<row>/`, so nothing here sees them. A
+    `patterns-php/shared/` is additionally enumerated by `_row_dirs` as a row
+    with no `c/`, which both audits skip. **This whitelist bounds the escape
+    INSIDE the row and does not bound the escape OUT of it** -- the residual is
+    reported as a number in TASK_PHP_010's report, not enumerated away here.
+    """
+    problems = []
+    for e in sorted(os.listdir(pdir)):
+        p = os.path.join(pdir, e)
+        if not os.path.isdir(p) or e in ROW_DIRS:
+            continue
+        if e == "__pycache__":
+            continue
+        problems.append(
+            f"digest: {row}: {row}/{e}/ IS NOT A SANCTIONED ROW DIRECTORY. A "
+            f"row may contain only {', '.join(ROW_DIRS)}/.\n"
+            f"       `#include \"...\"` resolves relative to the INCLUDING "
+            f"FILE, so `c/kernel.c` reaches `{row}/{e}/` with "
+            f"`\"../{e}/x.h\"`. That file COMPILES (`build_c` passes "
+            f"`-I <row>/c`), and it is in NO gate digest "
+            f"(check.py:10313-10324), NO measurement digest "
+            f"(measure.py:224-235) and not walked by `_walk_files(<row>/c)` -- "
+            f"so it can be edited with every record still reading FRESH. "
+            f"MEASURED: tally 1 -> 1000, 0 digest keys moved, 0 preflight "
+            f"problems (TASK_PHP_009 M2, `.temp/php9/04-upward-include.log`).\n"
+            f"       Fix: move it under `{row}/c/` and give every file a flat "
+            f"key -- flatten to `c/{e}__<name>` or add a flat symlink beside it "
+            f"(PROTOCOL_PHP.md §B3). Then `c_digest_audit` covers it and both "
+            f"digests carry its bytes.\n"
+            f"       (TASK_PHP_009 M2; TASK_PHP_010 §2. ⚠ Not `gcc -MD`: an "
+            f"include-closure detector is what TASK_PHP_008 §0 deleted, and it "
+            f"would come back with the same unbounded input space.)")
+    return problems
+
+
 def c_digest_audit(patterns_dir=None):
-    """⚠⚠ EVERY file under a row's `c/` is in BOTH digests, or the row is
-    refused. Returns `(problems, [])`.
+    """⚠⚠ EVERY file under a row's `c/` is in BOTH digests, and a row contains
+    only `ROW_DIRS`, or the row is refused. Returns `(problems, [])`.
 
     ⚠⚠⚠ THIS REPLACES `c_subdir_audit`, WHICH BANNED THE SUBDIRECTORY LAYOUT
     OUTRIGHT. TASK_PHP_007 M1/m1 PROVED THE BAN WAS BOTH UNSOUND AND
@@ -343,20 +483,57 @@ def c_digest_audit(patterns_dir=None):
          is the exact objection TASK_PHP_006 declined it on.
 
     ⚠ A DOTFILE HAS NO SANCTIONED FORM. `glob` cannot match it, so there is no
-    flat key to give it; rename it.
+    flat key to give it; rename it. ⚠⚠ **AND NEITHER HAS A DOTTED ROW** --
+    TASK_PHP_009 M1, refused by name below.
+
+    ⚠⚠ IT ALSO REFUSES A DIRECTORY UNDER `<row>/` OUTSIDE `ROW_DIRS` since
+    TASK_PHP_010 (`_row_layout_problems`): the `c/` walk is exhaustive INSIDE
+    `c/` and the escape was one directory UP. Same stage, same finite input,
+    one `os.listdir` wider.
     """
     patterns_dir = patterns_dir or os.path.join(REPO, "patterns-php")
     problems = []
     if not os.path.isdir(patterns_dir):
         return problems, []
-    for pdir in sorted(glob.glob(os.path.join(patterns_dir, "*"))):
+    rows, dotted = _row_dirs(patterns_dir)
+    for pdir in dotted:
+        row = os.path.basename(pdir)
+        problems.append(
+            f"digest: {row}: A DOTTED ROW DIRECTORY HAS NO SANCTIONED FORM -- "
+            f"rename it. This is the same verdict this audit already gives a "
+            f"dotted FILE, and for the same reason one level up: `glob` never "
+            f"matches a leading dot, so nothing can key it.\n"
+            f"       Its RECORDS are unreachable too, and that half cannot be "
+            f"repaired from here: `harness/measure.py:303` -- FROZEN, hashed "
+            f"into all 33 PAT measurement records -- globs "
+            f"`results/p*.json` + `results/gate/p*.json`, and "
+            f"`{row}.json` matches neither. So `--check-stale` would examine "
+            f"every OTHER record and report `0 STALE` while this row's numbers "
+            f"were never compared to anything.\n"
+            f"       ⚠ `build.py::pattern_dir` and `provenance.py` BOTH resolve "
+            f"this row, so it builds, measures and passes provenance while the "
+            f"audits that key it are blind. Measured end to end: "
+            f"`gate.py --preflight .ph93` returned rc=0 on a row with a "
+            f"REGULAR-FILE allocator copy and an unkeyed subdirectory source "
+            f"(TASK_PHP_009 M1, `.temp/php9/17-dotted-e2e.log`).\n"
+            f"       Fix: `mv patterns-php/{row} patterns-php/{row.lstrip('.')}`"
+            f" and re-run.")
+    for pdir in rows:
+        row = os.path.basename(pdir)
+        problems.extend(_row_layout_problems(pdir, row))
         cdir = os.path.join(pdir, "c")
         if not os.path.isdir(cdir):
             continue
-        row = os.path.basename(pdir)
         # EXACTLY what `check.py:10314` and `measure.py:226` glob, and the
         # `os.path.isfile` filter they apply. A symlink is kept: `isfile`
         # follows it and `sha256_file` hashes the TARGET's bytes.
+        # ⚠ `os.path.isfile` is ALSO what keeps a FIFO out of the key set, and
+        # that is load-bearing by accident rather than by design (TASK_PHP_009
+        # m6): `sha256_file` on a FIFO BLOCKS FOR EVER, with no timeout, so a
+        # keyed FIFO would hang the gate rather than fail it. `isfile` is False
+        # for a FIFO, so it is never keyed -- and `_walk_files` yields it, so
+        # the row is REFUSED below instead. Do not "fix" this filter to
+        # `os.path.exists`.
         keyed = {os.path.realpath(p): os.path.basename(p)
                  for p in sorted(glob.glob(os.path.join(cdir, "*")))
                  if os.path.isfile(p)}
@@ -459,9 +636,11 @@ def shim_link_audit(patterns_dir=None, common_dir=None):
         return problems, notes
     want = os.path.realpath(real_shim)
 
-    for pdir in sorted(glob.glob(os.path.join(patterns_dir, "*"))):
-        if not os.path.isdir(pdir):
-            continue
+    # ⚠ `_row_dirs`, NOT `glob("*")` -- TASK_PHP_009 M1. A dotted row is
+    # enumerated here too: `c_digest_audit` refuses it by name, and this audit
+    # still has to see its allocator, because a row this one cannot see is a
+    # row whose allocator nothing checks. Read `_row_dirs`'s comment block.
+    for pdir in _row_dirs(patterns_dir)[0]:
         cdir = os.path.join(pdir, "c")
         if not os.path.isdir(cdir):
             continue
@@ -617,8 +796,17 @@ def why_sizes(patterns_dir=None):
 
     patterns_dir = patterns_dir or os.path.join(REPO, "patterns-php")
     out = {}
-    for spec in sorted(glob.glob(os.path.join(patterns_dir, "*", "spec.md"))):
-        row = os.path.basename(os.path.dirname(spec))
+    # ⚠ `_row_dirs`, NOT `glob("*/spec.md")` -- TASK_PHP_009 M1. This stage
+    # cannot fail, so a blind spot here hides a row rather than passing it; the
+    # point is that ALL FOUR row-iterating audits enumerate the same set as
+    # `build.py`, so that the next reader can check that property in one place.
+    # ✅ Verified byte-identical on the PAT corpus across the change: n=33,
+    # median 989, p90 1817, max 3140 (`.temp/php10/03-m1-unit.log`).
+    for pdir in _row_dirs(patterns_dir)[0]:
+        spec = os.path.join(pdir, "spec.md")
+        if not os.path.isfile(spec):
+            continue
+        row = os.path.basename(pdir)
         try:
             m = _FENCE_RX.search(open(spec, encoding="utf-8").read())
             why = (json.loads(m.group(1)).get("idiom") or {}).get("why")
@@ -755,10 +943,61 @@ def _run_is_certifying(run):
     return True, ""
 
 
-def preflight_coverage_audit():
+def _row_key(name):
+    """The record/row id a coverage question is asked about.
+
+    `results-php/ph00-smoke.json` -> `ph00`; the command-line row `ph00` ->
+    `ph00`; `ph00-smoke` -> `ph00`. ⚠ EXACT equality on this key is what
+    replaced the PREFIX GLOB `f"{rid}*.preflight.json"` (TASK_PHP_009 m1): a
+    record `results-php/ph10-victim.json` with NO preflight record of its own
+    reported COVERED, because `ph10*` matches `ph100.preflight.json`. The audit's
+    whole job is to answer that one question and it could answer it wrongly.
+    """
+    return os.path.basename(name).split("-")[0]
+
+
+def preflight_coverage_audit(row=None):
     """⚠ Which php records were produced by a run NOTHING certified?
 
-    Returns `(problems, notes)`.
+    Returns `(problems, notes)` -- **`problems` is SCOPED TO `row`** and every
+    other record's finding comes back as a NOTE. With `row=None` (the `--audit`
+    spelling, and `--tool measure --check-stale`) NOTHING is a problem and
+    everything is a note; `--audit` reports `problems + notes` and exits 1 on
+    either, so the GLOBAL question is still asked, by the tool whose entire job
+    it is.
+
+    ⚠⚠⚠ **THE SCOPE IS THE FIX FOR TWO DEADLOCKS AND IT IS NOT A RELAXATION.**
+    TASK_PHP_009 M3/M4: this stage used to be GLOBAL, so **one** uncertifiable
+    record failed **every** `gate.py` invocation -- including the bracket every
+    task file mandates twice, before the agent had done anything. Two states
+    reach that, both run end to end by the reviewer:
+
+      M3  an ORPHAN record whose row was RETIRED (`PLAN_PHP.md` §3 expects rows
+          to be refused and retired). The prescribed repair
+          `gate.py --preflight <retired-row>` fails on PROVENANCE -- a
+          SUBSTANTIVE problem -- so the run it writes never certifies and the
+          loop does not converge: 3 cycles, identical
+          (`.temp/php9/07-orphan-deadlock.log`).
+      M4  a `php_provenance: true` row on a box with **no tarball**. Its own
+          provenance stage fails, so no run of it can ever certify, and
+          `--no-provenance` is rejected by construction
+          (`_run_is_certifying`'s `provenance_skipped` arm). ⚠ Under
+          the global scope that blocked every OTHER row too
+          (`.temp/php9/08-notarball-cap.log`).
+
+    ⚠ **What the per-row scope changes, exactly**: an uncertifiable record for
+    row A no longer blocks work on row B, and no longer blocks a rowless
+    bracket. It still fails `gate.py A`, which is the moment the question is
+    load-bearing -- you are about to certify A -- and it is still PRINTED, on
+    every invocation, for every row. ⚠⚠ **M4's residual is NOT a deadlock and
+    is not repaired here**: on a tarball-less box the PROVENANCE STAGE fails
+    that row directly, coverage or no coverage, which is the intended
+    behaviour and is loud. Measured at TASK_PHP_010 §3
+    (`.temp/php10/07-m3m4.log`).
+
+    ⚠ A GLOBAL stage turns any single uncertifiable record into a
+    programme-wide stop. **Scope a stage to the row in hand unless it must be
+    global** -- and if it must, give it its own command, as `--audit` is.
 
     ⚠⚠ IT RETURNS **PROBLEMS** SINCE TASK_PHP_008 §3 M4. It used to return
     notes only, justified by a DEADLOCK -- *"if a missing record failed the
@@ -802,21 +1041,44 @@ def preflight_coverage_audit():
     ⚠ `gate.py --audit` is the same check with an exit code and nothing else
     run, for anyone who wants it standalone.
     """
-    problems, uncovered, hollow = [], [], []
     rdir = os.path.join(REPO, "results-php")
     if not os.path.isdir(rdir):
-        return problems, []
-    recs = (sorted(glob.glob(os.path.join(rdir, "*.json")))
-            + sorted(glob.glob(os.path.join(rdir, "gate", "*.json"))))
+        return [], []
+    # ⚠ `os.listdir`, NOT `glob("*.json")` -- TASK_PHP_009 M1, the RECORD half.
+    # A dotted row's record `.ph93-dotted.json` was invisible to the very stage
+    # that exists to notice a record nothing certified, so the row with the most
+    # reason to hide was the one this audit could not see
+    # (`.temp/php9/16-dotted-chain.log`). `c_digest_audit` refuses the row by
+    # name; this makes sure the RECORD is not silently uncounted meanwhile.
+    def _jsons(d):
+        try:
+            return [os.path.join(d, e) for e in sorted(os.listdir(d))
+                    if e.endswith(".json")
+                    and os.path.isfile(os.path.join(d, e))]
+        except OSError:
+            return []
+
+    want = _row_key(row) if row else None
+    problems, notes = [], []
+    uncovered, hollow = [], []          # (relpath, mine)  /  (relpath, why, mine)
+    recs = _jsons(rdir) + _jsons(os.path.join(rdir, "gate"))
     for rec in recs:
         if rec.endswith(".partial.json"):
             continue
         stem = os.path.basename(rec)[:-len(".json")]
-        rid = stem.split("-")[0]
-        hits = sorted(glob.glob(os.path.join(PREFLIGHT_DIR,
-                                            f"{rid}*.preflight.json")))
+        rid = _row_key(stem)
+        mine = want is not None and rid == want
+        # ⚠ EXACT filenames, not a prefix glob (TASK_PHP_009 m1). Two spellings
+        # are legitimate: the record is named for the SLUG (`measure.py:576`)
+        # and the preflight record for whatever was typed on the command line
+        # (`write_preflight_record`, `stem = record["row"]`), which is normally
+        # the id. Both, and nothing else.
+        hits = [h for h in (os.path.join(PREFLIGHT_DIR, f"{rid}.preflight.json"),
+                            os.path.join(PREFLIGHT_DIR, f"{stem}.preflight.json"))
+                if os.path.exists(h)]
+        hits = sorted(set(hits))
         if not hits:
-            uncovered.append(os.path.relpath(rec, REPO))
+            uncovered.append((os.path.relpath(rec, REPO), mine))
             continue
         # ⚠ THE FILE EXISTING IS NOT THE QUESTION (TASK_PHP_007 M5).
         why, certified = [], False
@@ -839,32 +1101,76 @@ def preflight_coverage_audit():
             if certified:
                 break
         if not certified:
-            hollow.append((os.path.relpath(rec, REPO), sorted(set(why))[:4]))
-    if uncovered:
-        problems.append(
-            f"{_COVERAGE_TAG} {len(uncovered)} php record(s) have NO "
-            f"preflight record: {uncovered}. Either the run did not go through "
-            f"gate.py (PLAN_PHP.md §2.1a documents that spelling and nothing "
-            f"downstream records it -- TASK_PHP_005 §1), or the record was "
-            f"deleted.\n"
-            f"       Fix: `python3 harness-php/gate.py --preflight <row>` per "
-            f"uncovered row, and say in the report that the ORIGINAL run was "
-            f"not certified -- this certifies the CURRENT tree, not that one.\n"
-            f"       ⚠ THERE IS NO DEADLOCK: `main()` writes the record on the "
-            f"FAILURE path, so each repair invocation covers its own row even "
-            f"while this stage is still failing on the others "
-            f"(TASK_PHP_007 M4).")
-    for rec, why in hollow:
-        problems.append(
-            f"{_COVERAGE_TAG} {rec} HAS a preflight record and NOT ONE RUN "
-            f"IN IT CERTIFIED THE TREE: {why}.\n"
-            f"       A record that only says the preflight FAILED, or that "
-            f"provenance was SKIPPED, is evidence AGAINST the row and not for "
-            f"it -- and `--audit` used to call that `complete` because it "
-            f"never opened the file (TASK_PHP_007 M5).\n"
-            f"       Fix: `python3 harness-php/gate.py --preflight <row>` with "
-            f"the tarball present, and read the output.")
-    return problems, []
+            hollow.append((os.path.relpath(rec, REPO),
+                           sorted(set(why))[:4], mine))
+
+    #: ⚠⚠⚠ THE TWO REPAIRS, AND THE SECOND ONE USED TO BE UNNAMED WHILE THE
+    #: MESSAGE ASSERTED THERE WAS NO PROBLEM. This text said *"⚠ THERE IS NO
+    #: DEADLOCK"*, and TASK_PHP_009 M3 printed it to an operator standing in
+    #: one: an ORPHAN record (row retired, records kept) can never obtain a
+    #: certifying run, because the only repair the message named --
+    #: `--preflight <row>` -- fails on PROVENANCE for a row that no longer
+    #: exists, writes a non-certifying run, exits 2, and says the same thing
+    #: next time. ⚠⚠ **A REASSURANCE THAT TELLS THE READER NOT TO LOOK FURTHER
+    #: IS THE THIRD INSTANCE OF ONE CLASS IN THREE TASKS** -- after
+    #: `emalloc_shim.c`'s *"CANNOT BE"* (TASK_PHP_005 F-1) and *"dead code …
+    #: Not treated as a shim user"* (TASK_PHP_007 B2). **Name the repairs;
+    #: do not certify the absence of a problem.**
+    _REPAIRS = (
+        "       Fix, and there are TWO -- pick by WHY the record is here:\n"
+        "         (a) the row EXISTS and the run did not go through gate.py:\n"
+        "             python3 harness-php/gate.py --preflight <row>\n"
+        "             ⚠ Say in the report that the ORIGINAL run was not "
+        "certified: this certifies the CURRENT tree, not that one. Each "
+        "invocation covers its own row -- `main()` writes the record on the "
+        "FAILURE path -- so N uncovered rows cost N invocations "
+        "(TASK_PHP_007 M4).\n"
+        "         (b) the row was RETIRED and its records outlived it "
+        "(`PLAN_PHP.md` §3 expects retirement). Then (a) CANNOT succeed -- "
+        "provenance fails on a row that is not there, which is a SUBSTANTIVE "
+        "problem, so the run it writes never certifies. DELETE the records "
+        "instead, in the same commit as the row:\n"
+        "             git rm results-php/<row>.json results-php/gate/<row>.json"
+        "\n             (and results-php/preflight/<row>.preflight.json, "
+        "results-php/tables/<row>.md if they exist)\n"
+        "         (TASK_PHP_009 M3, `.temp/php9/07-orphan-deadlock.log`; "
+        "TASK_PHP_010 §3.)")
+
+    # ⚠ SPELLED AS TWO EXPLICIT `.append` CALLS, NOT
+    # `(problems if mine else notes).append(...)`. TASK_PHP_009 §2.2 attacks
+    # this file with an AST scan over every `problems.append` / `.extend` and
+    # prints each call's literal first element -- that is how the `_COVERAGE_TAG`
+    # discount was verified rather than trusted -- and a conditional-attribute
+    # call is INVISIBLE to it, which would have turned that clean negative into
+    # a silent `[]`. Keep the scanner able to see this stage.
+    def _emit(text, mine):
+        if mine:
+            problems.append(text)
+        else:
+            notes.append(text)
+
+    for rec, mine in uncovered:
+        _emit(f"{_COVERAGE_TAG} {rec} has NO preflight record beside it. "
+              f"Either the run did not go through gate.py (PLAN_PHP.md §2.1a "
+              f"documents that spelling and nothing downstream records it -- "
+              f"TASK_PHP_005 §1), or the record outlived its row.\n"
+              + _REPAIRS, mine)
+    for rec, why, mine in hollow:
+        _emit(f"{_COVERAGE_TAG} {rec} HAS a preflight record and NOT ONE RUN "
+              f"IN IT CERTIFIED THE TREE: {why}.\n"
+              f"       A record that only says the preflight FAILED, or that "
+              f"provenance was SKIPPED, is evidence AGAINST the row and not "
+              f"for it -- and `--audit` used to call that `complete` because "
+              f"it never opened the file (TASK_PHP_007 M5).\n"
+              f"       ⚠ On a box with NO TARBALL a `php_provenance: true` row "
+              f"lands here and cannot leave: its provenance stage fails, and "
+              f"`--no-provenance` is non-certifying by construction "
+              f"(`_run_is_certifying`). That row's own gate fails at the "
+              f"PROVENANCE "
+              f"stage anyway -- this line is a consequence, not the cause "
+              f"(TASK_PHP_009 M4).\n"
+              + _REPAIRS, mine)
+    return problems, notes
 
 
 def preflight(row, do_provenance=True):
@@ -968,13 +1274,25 @@ def preflight(row, do_provenance=True):
     # It used to read `_cov_bad, cov_notes = ...` and DISCARD the problems, so
     # the stage could not have failed the run even if it had returned any
     # (TASK_PHP_007 M4, parenthetical). Two lines, not one.
-    cov_bad, _cov_notes = preflight_coverage_audit()
+    # ⚠⚠ SCOPED TO THE ROW IN HAND SINCE TASK_PHP_010 §3 (TASK_PHP_009 M3/M4).
+    # `cov_other` is every OTHER row's coverage finding: PRINTED on every
+    # invocation and RECORDED, but it does not fail this run, because a
+    # GLOBAL stage turns one uncertifiable record -- an orphan from a retired
+    # row, or a php row on a tarball-less box -- into a programme-wide stop
+    # that also blocks the mandated bracket. `gate.py --audit` is the global
+    # spelling and still exits 1 on any of them.
+    cov_bad, cov_other = preflight_coverage_audit(row)
     problems.extend(cov_bad)
     record["uncertified_records"] = cov_bad
+    record["uncertified_records_other_rows"] = cov_other
     print(f"  {'ok  ' if not cov_bad else 'FAIL'} every php record has a "
-          f"CERTIFYING preflight record beside it")
+          f"CERTIFYING preflight record beside it"
+          + (f" (scope: {row})" if row else " (scope: none -- no row named; "
+                                            "`--audit` asks this globally)"))
     for n in cov_bad:
         print(f"       | {n.splitlines()[0]}")
+    for n in cov_other:
+        print(f"       | ⚠ OTHER ROW, not failed here: {n.splitlines()[0]}")
 
     record["harness_php_sha256"] = harness_php_hashes()
     record["problems"] = problems
@@ -1008,8 +1326,9 @@ MAX_RUNS = 40
 
 
 def _carries_evidence(run):
-    """Never dropped by the cap. These are the entries the record EXISTS for:
-    TASK_PHP_005 F-2a is about a `--no-provenance` run being erased."""
+    """Dropped LAST by the cap, and ⚠ NOT exempt from it since TASK_PHP_010 §4.
+    These are the entries the record EXISTS for: TASK_PHP_005 F-2a is about a
+    `--no-provenance` run being erased."""
     return bool(isinstance(run, dict)
                 and (run.get("provenance_skipped")
                      or run.get("problems")
@@ -1018,12 +1337,50 @@ def _carries_evidence(run):
                      or run.get("_schema")))
 
 
-def _collapse_and_cap(runs, slot):
+def _collapse_and_cap(runs, slot, stats=None):
     """Drop content-duplicates (keeping the FIRST), then cap. TASK_PHP_008 M3.
 
-    Returns `(runs, slot_or_None, n_dropped_by_the_cap)`. `slot` comes back
+    Returns `(runs, slot_or_None, n_dropped_by_the_cap)`; if `stats` is a dict
+    it also gets `dropped_evidence`. ⚠ The RETURN SHAPE IS UNCHANGED on purpose
+    -- `.temp/php8/g3_coverage_and_cap.py` and `.temp/php9/a5_notarball_and_cap.py`
+    unpack three values and are the controls this fix is measured against; a
+    fourth return value would have broken the evidence rather than re-run it.
+    `slot` comes back
     `None` if the entry at `slot` was collapsed away onto an earlier identical
     one -- see `write_preflight_record` for why the caller must not reuse it.
+
+    ⚠⚠⚠ THE CAP USED TO BOUND ONLY THE CLASS THAT DOES NOT ACCUMULATE, AND
+    THE TEST THAT CLEARED IT MEASURED THAT SAME CLASS -- TASK_PHP_009 m2.
+    `keep_idx` unioned in EVERY `_carries_evidence` entry BEFORE the cap loop,
+    so the cap could never drop one, and `_carries_evidence` is true of any run
+    with a non-empty `problems`. Measured (`.temp/php9/08-notarball-cap.log`):
+
+        1000 distinct runs, no problems           -> kept   40, dropped 960
+        1000 distinct runs CARRYING EVIDENCE      -> kept 1000, dropped   0
+        1000 coverage-only failures (M3's state)  -> kept 1000, dropped   0
+
+    and a real failing entry is ~1400 bytes, i.e. ~1.4 MB in a COMMITTED file.
+    ⚠ **The engineer's clearing test used 120 NO-PROBLEM runs -- the one class
+    the cap already bounded** -- while the class that actually accumulates is a
+    development session where every run fails and `harness_php_sha256` moves per
+    edit, so content-collapse cannot fold them either. **Test a cap on the class
+    that ACCUMULATES, not on the class it bounds.**
+
+    ✅ THE FIX, AND THE TRADE IS NAMED RATHER THAN HIDDEN: the cap is now
+    ABSOLUTE. Priority order, most recent first within each tier --
+
+        1. the FIRST and the LAST entry, always (they bracket the history);
+        2. then evidence-carrying entries, newest first;
+        3. then anything else, newest first,
+
+    until `MAX_RUNS`. ⚠ So an OLD evidence-carrying entry CAN now be dropped,
+    which F-2a's exemption existed to prevent -- but only past 40 distinct
+    stored runs, and every drop is counted in `_dropped_runs` and, separately,
+    in `_dropped_evidence_runs`, so an erasure is visible in the record rather
+    than silent. **A bound that exempts the growing class is not a bound**, and
+    "the file grows without limit" is the worse failure: nothing prunes it, it
+    is committed, and `MAX_RUNS` was added precisely because collapse is not
+    boundedness.
     """
     seen, kept, newslot = {}, [], None
     for i, r in enumerate(runs):
@@ -1034,16 +1391,26 @@ def _collapse_and_cap(runs, slot):
         if i == slot:
             newslot = len(kept)
         kept.append(r)
-    dropped = 0
+    dropped = dropped_evidence = 0
     if len(kept) > MAX_RUNS:
         keep_idx = {0, len(kept) - 1}
-        keep_idx |= {i for i, r in enumerate(kept) if _carries_evidence(r)}
-        # then the most recent, until the cap is met
+        # ⚠ TIER 2, NOT AN EXEMPTION (TASK_PHP_009 m2). Evidence is kept in
+        # preference to everything else and newest first, but it is inside the
+        # cap: the union that used to happen here made `MAX_RUNS` unenforceable
+        # for exactly the runs that accumulate.
+        for i in range(len(kept) - 1, -1, -1):
+            if len(keep_idx) >= MAX_RUNS:
+                break
+            if _carries_evidence(kept[i]):
+                keep_idx.add(i)
+        # tier 3: anything else, most recent first, until the cap is met
         for i in range(len(kept) - 1, -1, -1):
             if len(keep_idx) >= MAX_RUNS:
                 break
             keep_idx.add(i)
         dropped = len(kept) - len(keep_idx)
+        dropped_evidence = sum(1 for i, r in enumerate(kept)
+                               if i not in keep_idx and _carries_evidence(r))
         remap = {}
         pruned = []
         for i, r in enumerate(kept):
@@ -1052,6 +1419,8 @@ def _collapse_and_cap(runs, slot):
                 pruned.append(r)
         newslot = remap.get(newslot)
         kept = pruned
+    if stats is not None:
+        stats["dropped_evidence"] = dropped_evidence
     return kept, newslot, dropped
 
 
@@ -1087,9 +1456,19 @@ def write_preflight_record(record):
 
     ⚠ AND IT IS CAPPED (`MAX_RUNS`), because "collapse" is not "bounded": a
     tree that really does change between every run produces a distinct entry
-    every time. The cap keeps the first, everything that carries evidence
-    (a failed verdict, a recorded problem, a skipped provenance, a repaired
-    shim) and the most recent, and records how many it dropped.
+    every time. The cap keeps the first and the last, then evidence-carrying
+    entries newest-first, then anything else newest-first, and records how many
+    it dropped. ⚠⚠ **EVIDENCE IS A PRIORITY, NOT AN EXEMPTION, SINCE
+    TASK_PHP_010 §4** -- exempting it made `MAX_RUNS` unenforceable for the only
+    class that accumulates (TASK_PHP_009 m2: 1000 failing runs kept 1000, while
+    the clearing test used 1000 *clean* ones, which capped at 40). A dropped
+    evidence entry is counted in `_dropped_evidence_runs`.
+
+    ⚠ AND A FAILING RUN IS NOT READ-ONLY (TASK_PHP_009 m5): every `gate.py`
+    invocation that fails the preflight APPENDS to this COMMITTED file -- one
+    measured failure added 52 lines to `_norow.preflight.json` -- and a probe
+    that plants into `common-php/` therefore dirties `results-php/` as a
+    second-order effect. Print `git status` inside every `finally:`.
 
     `RECAP_PHP.md` open item 18: the manager gitignored this directory as
     churn, and TASK_PHP_005 F-2c showed the churn was ONE field -- `when` --
@@ -1133,9 +1512,17 @@ def write_preflight_record(record):
         slot = min(slot, len(doc["runs"]) - 1)
         doc["runs"][slot] = body
 
-    doc["runs"], slot, dropped = _collapse_and_cap(doc["runs"], slot)
+    stats = {}
+    doc["runs"], slot, dropped = _collapse_and_cap(doc["runs"], slot, stats)
     if dropped:
         doc["_dropped_runs"] = doc.get("_dropped_runs", 0) + dropped
+    # ⚠ COUNTED SEPARATELY BECAUSE IT IS THE ONE THE CAP USED TO EXEMPT
+    # (TASK_PHP_009 m2). An evidence-carrying entry is dropped only past
+    # `MAX_RUNS` distinct stored runs and only oldest-first, but when it
+    # happens the record says so rather than losing the fact silently.
+    if stats.get("dropped_evidence"):
+        doc["_dropped_evidence_runs"] = (doc.get("_dropped_evidence_runs", 0)
+                                         + stats["dropped_evidence"])
     # ⚠ `slot is None` means THIS run collapsed onto an older identical entry.
     # Forget the slot rather than pointing at that older entry: the next
     # in-process write (`tool RUNNING` -> `tool exited`) would otherwise
@@ -1200,7 +1587,13 @@ def main():
     row = next((x for x in argv if not x.startswith("-")), None)
 
     if a.audit:
-        bad, _notes = preflight_coverage_audit()
+        # ⚠ THE GLOBAL SPELLING, AND IT STAYS GLOBAL. `preflight()` scopes the
+        # stage to the row in hand (TASK_PHP_010 §3); this asks the question
+        # about EVERY record and exits 1 on any answer, which is why the scope
+        # change is not a relaxation -- it moves the global question into the
+        # command that exists for it, out of the path of every other command.
+        mine, others = preflight_coverage_audit(row)
+        bad = mine + others
         for n in bad:
             print(f"  {n}")
         print("preflight coverage: "

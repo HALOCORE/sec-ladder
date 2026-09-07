@@ -109,8 +109,11 @@ KNOWN, ACCEPTED, AND MEASURED: `__pycache__`
 Importing `check.py` through `.temp/php-root/harness/` writes the bytecode
 cache into the REAL `harness/__pycache__/` (the OS resolves the link), and the
 `.pyc` records the SHIM path as `co_filename`, so a later PAT traceback would
-name `.temp/php-root/harness/check.py`. Measured, not assumed:
-`.temp/php0/pycdemo` in `TASK_PHP_002`.
+name `.temp/php-root/harness/check.py`. Measured, not assumed, at
+`TASK_PHP_002` -- ⚠ its probe tree `.temp/php0/pycdemo` was deleted with that
+task's other scratch artefacts, so the citation is the pasted output in
+`.tasks-php/TASK_PHP_002_REPORT.md:290-295` and not the path
+(TASK_PHP_009 m4).
 
 It moves no hash (`__pycache__` is gitignored and outside every glob) and it
 only happens when a php run is the FIRST to import a freshly-edited harness
