@@ -95,8 +95,13 @@ surface its exit code. **It must not reimplement any gate stage.**
 ### 4. `common-php/`
 
 - `emalloc_shim.{c,h}` — faithful to `Zend/zend_alloc.c`'s `_emalloc`, **every
-  line cited to the pristine tarball**, reproducing the **32-bit `unsigned int
-  real_size` truncation**. This is not optional: substituting plain `malloc`
+  line cited to the pristine tarball**, reproducing **BOTH truncations**:
+  `zend_alloc.c:129`'s `unsigned int real_size` **and** — found by the spatial
+  miner after this spec's first draft, ✅ manager-verified —
+  **`zend_alloc.h:53`'s `unsigned int size:31`, the 31-bit bitfield the
+  *recorded* size is stored in.** ⚠ Note that `_safe_emalloc` checks in 64-bit
+  `long` and **then calls the truncating `_emalloc`**, so it protects against
+  neither; a shim that models only `_safe_emalloc` is not faithful. This is not optional: substituting plain `malloc`
   once made an earlier effort report a real defect as unreachable *and* invent
   an explanation for the upstream fix (`PLAN_PHP.md` §4.3). Ship a probe that
   **demonstrates the truncation firing** — an 18-exabyte request becoming a
@@ -206,7 +211,10 @@ corrected**, not the other way round.
 
 ---
 
-**Running count for this programme: launched from 0** (`.tasks-php/README.md`).
+**Running count for this programme: launched from 4.** `TASK_PHP_001`'s three
+miners each refuted the manager claim they were named to attack, and one of them
+additionally corrected a manager error that had reached all three prompts (the
+*"123 ASan reports"* figure).
 It is a rigour signal, not a ledger; never add it to the PAT programme's ≈965.
 **Reconciliation is the manager's job, not yours** — state in your report the
 figure you were launched from and what you refuted, and let the manager carry it
