@@ -53,13 +53,38 @@ re-identified is a census nobody can check"*. **Phase 0 must therefore land a
 `patterns-php/SOURCES.md` carrying the tarball sha256 and a per-file manifest**,
 the same way `common/census/php.manifest` does for 4.0.2.
 
+### ⚠⚠⚠ THE CSV IS AUTHORITATIVE; THE REPRODUCER `.php` COMMENT IS NOT
+
+**Found independently by the spatial and temporal miners, and manager-verified.**
+`index.csv`'s `c_file_line` resolved **exactly** on every citation either agent
+checked. The `input/crash/*.php` **header comments do not** — six of them
+describe PHP **4.0.2** code that no longer exists at 5.0.0, and
+`CRASH-017.php`'s says so in its own text:
+
+```
+ * php-4.0.2:ext/standard/url.c:345:  str = emalloc(3 * len + 1);   // int arith
+```
+
+Pristine 5.0.0 `ext/standard/url.c:499` is `safe_emalloc(3, len, 1)` — **the int
+overflow is already fixed**, which is why the CSV points at `zend_alloc.c`.
+⚠⚠ **Following the comment instead of the CSV would have inverted the verdict**:
+substitute plain `malloc` and `malloc(4 GiB)` succeeds under overcommit, so the
+defect vanishes. §4.3 firing before a kernel was extracted.
+
+Also drifting: two `root_cause_id` strings (`…line738` → really `:734`;
+`…line218` → really `:247`), `CRASH-012.php`'s header (`array.c:1645` is a `}`;
+the CSV's `:2060` is right), and `CRASH-066`'s `.re` cross-references (+5 / −6).
+
+**Rule: cite the CSV line, verified against the pristine tarball. Never cite a
+reproducer comment. A reproducer is an INPUT, not a citation.**
+
 ### The three mining substrates
 
 | substrate | what it gives | path |
 |---|---|---|
 | **166-root-cause corpus** | per row: `root_cause_id`, `cwe`, `c_file_line`, **`fix_commit`**, `crashes_pristine_5_0_0` (60 True), and a reproducing `.php` | `paper/evaluation/security/vuln-corpus-5.0/index.csv` + `input/crash/` |
 | **20 invariants, blind-labelled** | an independent C-side classification: obligations, T1/T2/T3 tiers, per-case labels produced by analysts **forbidden to read the Rust port**, against a vocabulary frozen and committed before labelling | `paper/invariants-list.md`, `paper/invariants-166.json` |
-| **ASan on real traffic** | 123 ASan reports from ordinary WordPress / phpBB / Gallery page renders — **frequency** evidence, which a CVE corpus structurally cannot give (a CVE corpus selects for exploitability) | `php-in-safe-rust/.temp/san_tests/` |
+| **ASan on real traffic** | ⚠ **THIS ROW SAID "123 ASan reports" AND THAT WAS A MANAGER MISREAD THAT REACHED THREE TASK PROMPTS** (`TASK_PHP_001`). `REPORT.md`'s 123 is one curated pass (18 apps × 8 pages) and the column beside it reads **7 DISTINCT SITES**; the real population is `asan-logs/` = **2534 files / 3199 report occurrences**. ✅ Manager-verified. **Quote "7 distinct sites" for independent defects and the occurrence counts for frequency — never 123 as a census.** | `php-in-safe-rust/.temp/san_tests/` |
 
 ⚠ The `fix_commit` column is worth more than it looks: it means **R1h is the
 real upstream patch and the adversarial input is the real reproducer**, neither
@@ -296,6 +321,24 @@ Every row declares its tier in `spec.md`, inside the hashed block:
 
 **Every deletion is listed, individually, with a line citation and a reason.**
 
+### 4.2a ⚠⚠⚠ `c_file_line` NAMES THE FAULTING FRAME, NOT THE DEFECT
+
+**The temporal miner refuted the manager's axis prediction on this, and the
+mechanism is reusable.** The manager predicted the CWE-416 mass would need the
+whole executor and rate `modelled`. Grouped by **mechanism** instead of by file,
+the axis is **23 families, 11 `verbatim` / 10 `narrowed` / 2 `modelled`** — nine
+in ten lift. ✅ Manager-recomputed from the artefact.
+
+The prediction read plausible because the corpus's `c_file_line` points at where
+PHP **crashed**, which is nearly always executor code, while the defect is
+usually one call down in a **standalone container**: `zend_ptr_stack.h` (68
+lines, no zval, no TSRM, 5 rows), `zend_objects_API.c`, `zend_opcode.c`, and
+`zend_hash.h:88`'s `typedef Bucket* HashPosition;`. CRASH-002's line is
+`array.c:1062`; its mechanism is `zend_hash.h:88`.
+
+**Rule: group candidates by C MECHANISM, never by file. Reading the axis by
+`c_file_line` measures where PHP crashes, not where it is wrong.**
+
 ### 4.2 ⚠ Settle the defect against the kernel you are about to extract, BEFORE writing any rung
 
 A corpus row's `root_cause_id` is a claim about **PHP**, not about the kernel we
@@ -311,6 +354,22 @@ deliverable #1 of every build task, in writing, before any rung exists.**
 allocation that **succeeds**. An earlier effort substituted plain `malloc`
 during extraction and, as a direct result, **reported a real defect as
 unreachable and then invented an explanation for the upstream fix**.
+
+⚠⚠ **AND THERE IS A SECOND TRUNCATION THIS SECTION DID NOT KNOW ABOUT**, found
+by the spatial miner and ✅ manager-verified: `Zend/zend_alloc.h:53` declares the
+*recorded* size as `unsigned int size:31` — a 31-bit bitfield, distinct from
+`real_size`. And **`_safe_emalloc` checks in 64-bit `long` and then calls the
+truncating `_emalloc`**, so it does not protect against either.
+
+⚠⚠⚠ **CONSEQUENCE FOR ADMISSION, AND IT IS NOT OPTIONAL:
+`crashes_pristine_5_0_0 = False` IS NOT EVIDENCE THAT A DEFECT IS ABSENT.**
+`zend_alloc.c:39-43` forces the size-class cache on in both `#ifdef` arms, and
+`san_tests/REPORT.md` §2 measures **63.5 % of PHP's heap traffic never reaching
+`malloc`**. **A C kernel on plain `malloc`/`free` will reproduce MORE of these
+than pristine PHP does** — 40 of the 85 temporal rows are `False` and mostly for
+this reason. **Do not use that column as an admission filter.** Fold an
+`(allocs, frees)` tally into the kernel's `u64` so the defect lands in the
+checksum and not only in a sanitizer.
 
 **Rule: any allocating php row links `common-php/emalloc_shim.*` — faithful and
 line-cited against the pristine tarball — or states in `spec.md` why not.**

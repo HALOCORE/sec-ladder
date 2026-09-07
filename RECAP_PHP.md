@@ -22,15 +22,17 @@ STATE      NOTHING BUILT. The programme opened 2026-09-07.
            patterns-php/ harness-php/ results-php/ .tasks-php/ .memory-php/
            common-php/ DO NOT EXIST YET -- Phase 0 creates them.
 
-RUNNING    3 read-only mining agents over the PHP 5.0.0 corpus (temporal,
-           spatial, type), writing to .temp/php-mine/<axis>/.
-           Their reports are NOT IN YET. Do not predict them.
+MINED      TASK_PHP_001 DONE, all 3 axes. 54 candidates, evidence promoted to
+           .tasks-php/TASK_PHP_001_MINE/. UNREVIEWED (rule 9).
+             temporal 23 cands / 85 of 85 rows / 11 verbatim 10 narrowed 2 modelled
+             spatial  16 cands / 18 rows / 8 ptr_cursor / 0 emalloc-dependent
+             type     15 cands / 12 mechanism families
+           ALL THREE REFUTED THE MANAGER CLAIM THEY WERE NAMED TO ATTACK.
 
-NEXT       (1) TASK_PHP_002 -- Phase 0 foundation. WRITTEN AND COMMITTED,
-               NOT YET LAUNCHED. Construction is 1-agent-at-a-time, so it
-               waits for the miners to finish. Launch it first.
-           (2) land the miners' output into patterns-php/CATALOGUE.md
-               -> adjudicate + review, ONE agent at a time
+NEXT       (1) TASK_PHP_002 -- Phase 0 foundation. WRITTEN, NOT LAUNCHED.
+               No agent is running now, so it can go.
+           (2) TASK_PHP_003 -- adjudicate the 54 into patterns-php/CATALOGUE.md,
+               then REVIEW it. One agent at a time.
 
 BAR        C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
            patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
@@ -46,7 +48,8 @@ READ       PLAN_PHP.md (the design + all 10 decisions), then
 | | |
 |---|---|
 | **rows built** | **0** |
-| **tasks** | `TASK_PHP_001` mining wave RUNNING · `TASK_PHP_002` Phase 0 written, not launched |
+| **tasks** | `TASK_PHP_001` mining wave **DONE, unreviewed** · `TASK_PHP_002` Phase 0 written, not launched |
+| **candidates** | **54** across three axes, covering 85/85 temporal rows. Evidence in `.tasks-php/TASK_PHP_001_MINE/` |
 | **catalogue** | not yet written — Phase 1 |
 | **infrastructure** | not yet built — Phase 0 |
 | **citation base** | PHP 5.0.0, pristine tarball, sha256 `5783e0c0…d6919`, 5595997 B, 3815 entries. **4.0.x ignored** (`DP-06`) |
@@ -81,7 +84,40 @@ READ       PLAN_PHP.md (the design + all 10 decisions), then
 
 ## Findings
 
-*(none yet — the first row has not been built)*
+*(none yet — the first row has not been built. What follows are the mining
+wave's results: engineer work, **UNREVIEWED**, `PROTOCOL.md` rule 9.)*
+
+### F1 (PROVISIONAL) — `c_file_line` names the FAULTING FRAME, not the defect
+
+Grouped by mechanism rather than by file, the temporal axis is **23 families,
+11 `verbatim` / 10 `narrowed` / 2 `modelled`** — nine in ten lift. ✅
+Manager-recomputed. The manager had predicted the opposite and would have
+written off the richest axis in the corpus. The defect usually sits one call
+below the crash, in a standalone container (`zend_ptr_stack.h`, 68 lines;
+`zend_hash.h:88`'s `typedef Bucket* HashPosition;`). → `PLAN_PHP.md` §4.2a.
+
+### F2 (PROVISIONAL) — the CSV is authoritative; the reproducer comment is not
+
+Found independently by two agents on two axes. Every `index.csv` `c_file_line`
+resolved exactly; **six `input/crash/*.php` header comments describe 4.0.2**,
+and `CRASH-017.php` self-labels as such. ✅ Manager-verified: following it
+instead of the CSV **inverts the verdict**. → `PLAN_PHP.md` §1.
+
+### F3 (PROVISIONAL) — `crashes_pristine_5_0_0 = False` is not evidence of absence
+
+40 of 85 temporal rows are `False`, mostly because PHP's size-class cache keeps
+**63.5 % of heap traffic away from `malloc`**. A C kernel on plain
+`malloc`/`free` reproduces **more** of these than pristine PHP does. **Not an
+admission filter.** A second allocator truncation was also found —
+`zend_alloc.h:53`'s `unsigned int size:31` (✅ verified). → `PLAN_PHP.md` §4.3.
+
+### F4 — a manager error, corrected by an agent
+
+The manager told all three agents `.temp/san_tests/` holds *"123 ASan reports"*.
+✅ Verified wrong: 123 is one curated pass, the column beside it says **7
+distinct sites**, and the real population is **2534 log files**. `PROTOCOL.md`
+rule 14's shape — a premise stated as fact in a task file is one an engineer has
+no reason to doubt. → `PLAN_PHP.md` §1 corrected.
 
 ---
 
@@ -92,3 +128,8 @@ READ       PLAN_PHP.md (the design + all 10 decisions), then
 | 1 | The pristine tarball lives under **another project's gitignored `.temp/`** and is deletable at any time | Phase 0 must land `patterns-php/SOURCES.md` with the sha256 + a per-file manifest before anything cites it |
 | 2 | *"Where does the existing Rust port land on these scales?"* | **deferred, not deleted** (`DP-05`). Well-posed once the corpus exists |
 | 3 | `.web/` does not know `results-php/` exists | deliberate. Do not teach it until there is something worth publishing |
+| 4 | **CRASH-136 (exif) was rejected on EXTRACTION COST** | ⚠ the bar does not permit that as a kill — cost is a *tier*, not a filter. **Manager must re-adjudicate.** The most likely place the spatial axis lost a real row |
+| 5 | `EG(garbage)` is `zval *garbage[2]` with an unchecked `EG(garbage)[EG(garbage_ptr)++]` | a faithful temporal extraction **inherits a SPATIAL overflow**. Flagged, not bounded away — bounding it silently would be §4.2's invented non-defect. Manager decides |
+| 6 | Four temporal merges flagged as probably wrong | ranks 21, 8, 12, 23. Split decisions owed at catalogue adjudication |
+| 7 | All `hotness` fields on the SPATIAL axis are **reasoned, not measured** | that agent never opened `.temp/san_tests/`. **Must not be quoted as frequency evidence** until checked |
+| 8 | Rank 15 (CRASH-158) may be spatial, not temporal | cross-check the two miners' lists at adjudication |

@@ -1,0 +1,1104 @@
+#!/usr/bin/env python3
+"""Emit candidates.json for the TEMPORAL axis of the php-5.0.0 mining pass.
+
+Regenerates .temp/php-mine/temporal/candidates.json.  Every c_lines span in
+here was checked against the pristine tarball
+  /home/apt/repos_common/php-in-safe-rust/.app-tests/.temp/oracle/build-5.0.0/php-5.0.0.tar.gz
+  sha256 5783e0c0ba94f165633a565fe73a83e59cf17b6880ef95fa8f936dc6301d6919
+with `tar -xzOf <tarball> php-5.0.0/<file> | sed -n '<a>,<b>p'`; see VERIFY.md.
+fix_commit / crashes_pristine_5_0_0 / engine_locus are copied verbatim from
+paper/evaluation/security/vuln-corpus-5.0/index.csv; invariant/obligation from
+paper/invariants-166.json.
+"""
+import csv, json, os, sys
+
+CORPUS = '/home/apt/repos_common/php-in-safe-rust/paper/evaluation/security/vuln-corpus-5.0/index.csv'
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'candidates.json')
+ROWS = {r['input_id']: r for r in csv.DictReader(open(CORPUS))}
+
+C = []
+def cand(**kw):
+    ids = kw['root_cause_ids']
+    prim = ids[0]
+    r = ROWS[prim]
+    kw.setdefault('cwe', r['cwe'])
+    kw.setdefault('fix_commit', {i: ROWS[i]['fix_commit'] for i in ids})
+    kw.setdefault('crashes_pristine_5_0_0',
+                  {i: ROWS[i]['crashes_pristine_5_0_0'] for i in ids})
+    kw.setdefault('engine_locus', {i: ROWS[i]['engine_locus'] for i in ids})
+    kw['rank'] = len(C) + 1
+    C.append(kw)
+
+# ---------------------------------------------------------------- rank 1
+cand(
+ id='argstack-realloc-invalidates-borrowed-arg-slot',
+ root_cause_ids=['CRASH-155','CRASH-075','CRASH-081','CRASH-083','CRASH-117'],
+ c_file='Zend/zend_ptr_stack.h',
+ c_lines='Zend/zend_ptr_stack.h:44-52 (the growth site) with Zend/zend_builtin_functions.c:611-621 '
+         '(CRASH-155 deref), ext/standard/array.c:1036+1081 (CRASH-075), '
+         'ext/standard/array.c:3903-3938 (CRASH-081), ext/standard/basic_functions.c:1885+1902 '
+         '(CRASH-083), ext/standard/var.c:806 (CRASH-117)',
+ invariant='I10 — a pointer into a container\'s storage designates a live slot of that same container for as long as it is held.',
+ obligation='I10/O1 (storage must not be reallocated while an interior pointer into it is live) + I10/O3 (re-derive after any step that can run user code); contributing I2/O2.',
+ mechanism=(
+  "EG(argument_stack) is a `zend_ptr_stack`: a `void **elements` block plus `top`/`max`/`top_element`. "
+  "`zend_ptr_stack_push` (zend_ptr_stack.h:46-49) doubles it with erealloc the moment `top >= max`, "
+  "and fixes up only its own `top_element` — nothing else. `zend_get_parameters_ex` hands callers raw "
+  "`zval **` that point *into* that block. Five different internal functions latch such a pointer, then "
+  "call something that can re-enter userland (zend_lookup_class/__autoload, zend_call_function, "
+  "__wakeup), which pushes more args, grows the stack, frees the old block — and then dereference the "
+  "latched pointer. There is no interior-pointer/growth interlock anywhere in the type."),
+ benign_behaviour=(
+  "Push N argument slots, call a callee that itself pushes and pops, pop back. On benign input the "
+  "borrowed slot pointer stays valid because `top` never crosses `max`, and every read returns the "
+  "argument that was pushed. Checksum: fold each popped `zval*`'s payload word into a running "
+  "u64 (`h = h*0x100000001b3 ^ payload`), plus the final `top` and `max`, so a moved block that "
+  "happens to hold plausible bytes still perturbs the digest."),
+ adversarial_trigger=(
+  "Any blob whose opcode stream makes the callee push past the current `max` while the caller still "
+  "holds a slot pointer. Corpus ships reproducers: CRASH-155.php (is_a() + __autoload recursion), "
+  "CRASH-081.php, CRASH-083.php, CRASH-117.php, CRASH-075.php. None is marked "
+  "crashes_pristine_5_0_0=True — see `risks`."),
+ self_containment=('verbatim — `zend_ptr_stack` is 60 lines of header with no zval, no emalloc beyond '
+                   'erealloc, no TSRM. The re-entrant callee is modelled by an opcode in the blob. '
+                   'The five call sites are `narrowed` (parameter-fetch wrapper comes off).'),
+ blob_drivability=(
+  "Direct. Opcode stream over the blob: 0x01 PUSH n (push n slots), 0x02 BORROW k (latch a pointer to "
+  "slot top-k into a register), 0x03 CALL m (a nested frame that pushes m slots and pops them — this is "
+  "the growth), 0x04 READ (deref the latched pointer and fold into the checksum), 0x05 POP n. "
+  "Benign blobs keep `PUSH` totals under the initial 64; adversarial ones cross it while a BORROW is live."),
+ hotness=(
+  "Maximal. Every PHP function call pushes its args through this. Independent evidence: in the "
+  "ASan-on-real-traffic census (.temp/san_tests/asan-logs, 2534 reports over ordinary WordPress/phpBB/"
+  "Gallery renders) 490 are heap-use-after-free and **280 of them have `zend_do_fcall_common_helper` as "
+  "the faulting frame** — the call-teardown/arg-stack region — freed by `_zval_ptr_dtor`."),
+ mechanism_distinctness=('Growth of a *vector* invalidates an interior pointer. Distinct from rank 2 '
+                         '(same growth mechanism but a slot-map/handle table, and the stale pointer is '
+                         'written through, not read) and from rank 3 (no reallocation at all: a single '
+                         'node is unlinked and freed under a cursor).'),
+ risks=[
+  "All five rows are crashes_pristine_5_0_0=False. The stale read usually lands in the *same* "
+  "erealloc'd-away block, which glibc often leaves mapped and byte-identical — so a naive C kernel may "
+  "silently 'work'. The extraction must checksum the read value, not just survive it, or it will not "
+  "exhibit the defect at all.",
+  "PTR_STACK_BLOCK_SIZE is 64 and doubling is *4 at op_array but *2 here; get the growth policy right "
+  "or the trigger threshold moves.",
+  "CRASH-075's real root is at array.c:1081 (BG(array_walk_func_name) = an arg-stack slot) and only "
+  "*surfaces* at :1036; lifting only :1036 would lie about where the invariant breaks."],
+)
+
+# ---------------------------------------------------------------- rank 2
+cand(
+ id='objstore-realloc-invalidates-cached-bucket-ptr',
+ root_cause_ids=['CRASH-046','CRASH-070'],
+ c_file='Zend/zend_objects_API.c',
+ c_lines='Zend/zend_objects_API.c:129-165 (cache at :132, growth at :91-94 via zend_objects_store_put, '
+         'stale reads/writes at :147 and :156); sibling in a different container: '
+         'Zend/zend_compile.c:1301-1327 (cache at :1305, growth at :1319 via get_next_op → '
+         'Zend/zend_opcode.c:259-280, stale writes at :1321/:1323/:1324)',
+ invariant='I10 — interior pointers into a container designate a live slot for as long as they are held.',
+ obligation='I10/O1 + I10/O3; contributing I2/O2.',
+ mechanism=(
+  "`zend_objects_store_del_ref` caches `obj = &object_buckets[handle].bucket.obj` at :132, then at :144 "
+  "calls the *userland* destructor. If that destructor allocates objects, `zend_objects_store_put` "
+  "reaches `top == size` and ereallocs `object_buckets` (:91-94). `obj` now points into the freed "
+  "block, and :147 reads `obj->refcount` and :156 *writes* `obj->refcount--` through it. The identical "
+  "shape appears in the compiler: `last_op = &opcodes[n-1]` (zend_compile.c:1305), then `get_next_op` "
+  "may `op_array->size *= 4; op_array_alloc_ops()`, then :1321/:1323 write through `last_op`."),
+ benign_behaviour=(
+  "A slot map with a free list: PUT returns a handle, ADDREF/DELREF move a per-slot refcount, DELREF "
+  "to zero runs a dtor callback and returns the slot to the free list. On benign input the store never "
+  "crosses its initial 1024 slots, so the cached pointer stays valid. Checksum: fold every returned "
+  "handle, the final `top`, `free_list_head` and the sum of all live refcounts."),
+ adversarial_trigger=(
+  "A dtor that allocates more than `size - top` objects. CRASH-046.php does exactly this "
+  "(`__destruct` creates 4000 stdClass with the store initialised to 1024 at "
+  "Zend/zend_execute_API.c:174). crashes_pristine_5_0_0 = **True**."),
+ self_containment=('verbatim — `zend_objects_store` is a plain `{bucket*, top, size, free_list_head}` '
+                   'over a tagged union; `zend_object_handle` is a `zend_uint`. Nothing zval-shaped is '
+                   'needed: the dtor is a function pointer the kernel supplies. zend_compile.c sibling '
+                   'is `narrowed`.'),
+ blob_drivability=(
+  "Direct and it is the cleanest of the set. Opcodes: 0x10 PUT (allocate a slot, push handle), "
+  "0x11 ADDREF h, 0x12 DELREF h, 0x13 SET_DTOR h,k (bind slot h's dtor to 'PUT k more objects'). "
+  "A blob is a sequence of these; the kernel replays it and checksums the handle stream."),
+ hotness=('Warm, not hot: every object creation and every refcount-to-zero. Not represented in the '
+          'ASan render census top frames (destructor-driven store growth is rare on ordinary page '
+          'renders). `none` on the frequency axis, high on the structural axis.'),
+ mechanism_distinctness=('Same growth-invalidates-pointer root as rank 1 but the container is a '
+                         'slot map with a free list rather than a stack, and the stale access is a '
+                         'refcount *decrement* — a write into freed memory, not a read.'),
+ risks=[
+  "The dtor at :144 is guarded by `destructor_called`, so a naive re-entrancy model will not reach "
+  "the growth path; the extraction must let the dtor allocate *new* slots, not re-enter the same one.",
+  "It is tempting to merge this with CRASH-045 (:139-146, the missing refcount guard around the dtor "
+  "call, in the same 25 lines). They are different defects: this one is pointer invalidation, that one "
+  "is a missing ownership claim. Lifting the function once and calling it two rows would be a lie."],
+)
+
+# ---------------------------------------------------------------- rank 3
+cand(
+ id='hash-cursor-freed-under-traversal',
+ root_cause_ids=['CRASH-002','CRASH-022','CRASH-040'],
+ c_file='Zend/zend_hash.c',
+ c_lines='Zend/zend_hash.h:88 (`typedef Bucket* HashPosition;`) + Zend/zend_hash.c '
+         '(zend_hash_move_forward_ex) with the three drivers: ext/standard/array.c:1007-1063 '
+         '(CRASH-002, cursor `pos` held across the callback at :1045, advanced at :1062), '
+         'ext/standard/array.c:535-560 + zend_hash_sort (CRASH-022, Bucket* snapshot array), '
+         'Zend/zend_execute.c:69+76 with Zend/zend_hash.c:567-590 (CRASH-040, apply_deleter)',
+ invariant='I10 — cursor validity.',
+ obligation='I10/O1 (no structural modification while a cursor is live) + I10/O3; CRASH-040 is primary I5/O2+O3.',
+ mechanism=(
+  "`HashPosition` is not an index — zend_hash.h:88 makes it a bare `Bucket *`, and "
+  "`zend_hash_move_forward_ex` advances it by `*current = (*current)->pListNext`. php_array_walk holds "
+  "one such cursor across `zend_call_function` (array.c:1045) and then dereferences it at :1062. If the "
+  "userland callback unsets the current element, `zend_hash_del_key_or_index` pefrees that Bucket and "
+  "the advance reads `pListNext` out of freed memory. `zend_hash_sort` is the same wound with a "
+  "snapshot: it pemallocs an `arTmp` of every `Bucket *`, hands two of them to a user comparator, and "
+  "relinks them afterwards — a comparator that unsets elements frees buckets `arTmp` still names."),
+ benign_behaviour=(
+  "Iterate a hash, invoking a per-element callback that only reads. The walk visits every element once "
+  "in insertion order. Checksum: fold (key-hash, value) of each visited element in visit order, plus "
+  "the element count — so a skipped or re-visited element changes it."),
+ adversarial_trigger=(
+  "A callback that deletes the element the cursor is parked on (or, for the sort variant, deletes any "
+  "element while the comparator is running). CRASH-002.php and CRASH-022.php ship it; CRASH-002 and "
+  "CRASH-040 are crashes_pristine_5_0_0=**True**."),
+ self_containment=('narrowed — `zend_hash` is a self-contained container (bucket + two doubly-linked '
+                   'lists) and lifts whole; only the zval payload and the `zend_call_function` wrapper '
+                   'come off, replaced by a `void*` payload and a kernel-supplied callback.'),
+ blob_drivability=(
+  "Direct. Opcodes: 0x20 INSERT key,val · 0x21 DELETE key · 0x22 WALK cb_id · and a callback program "
+  "also decoded from the blob (e.g. `on visit i: DELETE key_j`). The walk's visit order and the "
+  "resulting checksum are fully determined by the blob."),
+ hotness=('Hot. This cursor is `foreach`, `each()`, `array_walk`, `reset/next`, and every internal '
+          'iteration in the tree. No direct census frame (the ASan renders fault in call teardown, not '
+          'here), so: structurally hot, no frequency evidence.'),
+ mechanism_distinctness=('No reallocation and no refcount arithmetic: a single node is unlinked and '
+                         'freed while a raw pointer to it is parked in a caller\'s local. Distinct from '
+                         'rank 10 (same shape but a singly-linked list with no cursor abstraction at '
+                         'all) and from rank 6 (bucket stays linked, its *payload* is destroyed).'),
+ risks=[
+  "CRASH-002's index.csv line (:1062) is the *use*; the window opens at :1045. Citing only :1062 "
+  "would make the extraction look like an off-by-one instead of a lifetime hole.",
+  "In php-5.0.0 the freed Bucket is small enough to land in Zend's size-class allocation cache "
+  "(zend_alloc.h:63-64), so `pListNext` is frequently still readable and the walk silently continues. "
+  "A C kernel using plain malloc/free may need a quarantine-free allocator to make the defect observable "
+  "at all — this is the same measurement blind spot .temp/san_tests/REPORT.md §2 documents."],
+)
+
+# ---------------------------------------------------------------- rank 4
+cand(
+ id='unserialize-backref-table-holds-freed-zval',
+ root_cause_ids=['CRASH-121','CRASH-118'],
+ c_file='ext/standard/var_unserializer.c',
+ c_lines='ext/standard/var_unserializer.c:875-893 (CRASH-121: dtor at :887, faulting deref at :890) '
+         '== var_unserializer.re:292-296; and ext/standard/var_unserializer.c:176-186 (CRASH-118: '
+         'zend_hash_update at :181 destroys a zval the var_hash still tracks) == .re:186',
+ invariant='I5 — exactly one owner, released exactly once, and no third party retains the pointer past release.',
+ obligation='I5/O3 (no third party may retain the pointer past release) and I5/O2 (CRASH-118); contributing I2/O2.',
+ mechanism=(
+  "The unserializer keeps `var_hash`, a flat back-reference table of every zval it has produced, so "
+  "that `r:N;` / `R:N;` can point back at entry N. The `r:` handler does "
+  "`if (*rval != NULL) zval_ptr_dtor(rval);` at :887 and then `*rval = *rval_ref; (*rval)->refcount++;` "
+  "at :889-890 — but the zval it just destroyed is *still an entry in var_hash*, and `rval_ref` can be "
+  "that very entry, so :890 increments a refcount inside freed storage. CRASH-118 is the same table "
+  "with a different eviction: a repeated object-property key makes `zend_hash_update` (:181) run the "
+  "hash's destructor on the previously-stored zval, which var_hash still lists."),
+ benign_behaviour=(
+  "Parse a serialized byte string into a value graph, resolving back-references. On benign input every "
+  "`r:N` resolves to a live entry and the result is the intended graph. Checksum: a structural digest of "
+  "the decoded graph (type tag + payload + child count, folded in traversal order) plus the final "
+  "var_hash length."),
+ adversarial_trigger=(
+  "A serialized blob whose back-reference index names the entry currently being built, e.g. "
+  "`a:2:{i:0;r:2;i:1;r:2;}` (CRASH-121.php verbatim), or an object payload with a duplicated property "
+  "name (CRASH-118). Both crashes_pristine_5_0_0=**True**."),
+ self_containment=('modelled — the parser is a re2c-generated state machine over `zval`. But the '
+                   '*mechanism* — a growable table of raw pointers to values the parser also frees — '
+                   'lifts cleanly onto a `Vec<*mut Node>`; that is the narrowing, and the re2c body '
+                   'does not need to come along.'),
+ blob_drivability=(
+  "Best of the whole set: the input **already is** a flat byte blob. The kernel is literally "
+  "`u64 checksum(const u8 *blob, size_t n)` where the blob is the serialization. No synthetic opcode "
+  "encoding is needed — `s:`, `i:`, `a:`, `O:`, `r:`, `R:` *are* the opcodes."),
+ hotness=('Warm on real traffic — PHP sessions are serialize()/unserialize() on every request, and '
+          'phpBB/WordPress both store serialized options. No direct census frame.'),
+ mechanism_distinctness=('An *interning / back-reference table* of raw pointers whose entries the '
+                         'producer also destroys. Distinct from rank 1 (that is the table\'s storage '
+                         'moving; here the storage stays put and the *pointees* die) and from rank 8 '
+                         '(one pointer in two owning slots — here it is one pointer in an owning slot '
+                         'and a borrowing table).'),
+ risks=[
+  "The `.c` is generated from the `.re`; a citation to the `.c` alone is fragile if anyone regenerates. "
+  "index.csv already carries both spellings and they agree — keep both.",
+  "Nesting depth in the reproducer is tiny (2 elements). If the extraction adds recursion limits to make "
+  "the kernel 'safe', it deletes the defect."],
+)
+
+# ---------------------------------------------------------------- rank 5
+cand(
+ id='hash-del-numeric-bucket-shortcircuits-key-compare',
+ root_cause_ids=['LOGIC-001'],
+ c_file='Zend/zend_hash.c',
+ c_lines='Zend/zend_hash.c:450-465 (the defective predicate is :464-465)',
+ invariant='I7 — a zval\'s refcount equals the number of live holders, and the engine reads it to decide release.',
+ obligation='I7/O2 (every decrement must be matched by an increment taken by the releasing party) + I7/O3.',
+ mechanism=(
+  "`zend_hash_del_key_or_index` matches a bucket with "
+  "`(p->h == h) && ((p->nKeyLength == 0) || ((p->nKeyLength == nKeyLength) && !memcmp(...)))`. "
+  "For a *numeric* bucket `nKeyLength` is 0, so the left disjunct fires and **the key is never compared "
+  "at all** — hash equality alone is treated as identity. A string-keyed delete whose "
+  "`zend_inline_hash_func(key)` collides with an existing integer index therefore unlinks and destroys "
+  "that unrelated live element, running its destructor and dropping a refcount nobody took."),
+ benign_behaviour=(
+  "Insert a mix of string- and integer-keyed entries, delete some, look the rest up. On benign input "
+  "every delete removes exactly the named entry. Checksum: fold (key, value) over the surviving "
+  "elements in list order, plus nNumOfElements — so destroying the wrong element is *directly* visible "
+  "in the digest with no allocator behaviour involved."),
+ adversarial_trigger=(
+  "One integer key equal to `zend_inline_hash_func(s)` for some string key `s` that is then deleted. "
+  "Corpus class is LOGIC (non-crash): crashes_pristine_5_0_0 = 'n/a (non-crash class)', and there is a "
+  "reproducer file listed but it is a *silent* wrong-answer, not a fault."),
+ self_containment=('verbatim — this is the whole of `zend_hash_del_key_or_index` plus '
+                   '`zend_inline_hash_func`. It needs no zval: the payload can be a `u64` and the '
+                   'destructor a counter.'),
+ blob_drivability=('Direct and trivial: 0x30 INS_STR len,bytes,val · 0x31 INS_IDX idx,val · '
+                   '0x32 DEL_STR len,bytes · 0x33 DEL_IDX idx · 0x34 SUM. The adversarial blob is one '
+                   'whose INS_IDX index equals the DJBX33A hash of a later DEL_STR key — computable '
+                   'offline and pinned in the fixture.'),
+ hotness=('Hot — every `unset()`, every internal hash delete. No census frame (it does not fault).'),
+ mechanism_distinctness=('Pure *identity confusion*: no pointer is stale, no allocation moves, nothing '
+                         'is freed twice. The lookup simply answers the wrong question, and the '
+                         'temporal harm is downstream. It is the only candidate here whose defect is '
+                         'visible in the checksum with the allocator entirely out of the picture.'),
+ risks=[
+  "It is the one candidate whose corpus row is a LOGIC row, so 'does it crash pristine 5.0.0' is not a "
+  "meaningful question for it. If the manager's admission bar requires an observable fault rather than "
+  "an observable wrong answer, this row needs a decision — but the C program is correct on benign input "
+  "and wrong on adversarial input, which is the bar as written.",
+  "The hash is DJBX33A over nKeyLength bytes *including* the trailing NUL for string keys "
+  "(callers pass len+1). Get that off by one and the preimage in the fixture stops colliding."],
+)
+
+# ---------------------------------------------------------------- rank 6
+cand(
+ id='hash-destructor-runs-on-still-linked-bucket',
+ root_cause_ids=['CRASH-160','CRASH-154'],
+ c_file='Zend/zend_hash.c',
+ c_lines='Zend/zend_hash.c:214-236 (destructor at :228-230 runs before UPDATE_DATA at :231 and before '
+         'the bucket is re-pointed; *pDest = p->pData at :233); sibling shape in '
+         'Zend/zend_variables.c:47-56 (CRASH-154: zend_hash_destroy at :52 with zvalue->type still '
+         'IS_ARRAY and zvalue->value.ht still live)',
+ invariant='I10 (CRASH-160) / I5 (CRASH-154).',
+ obligation='I10/O1 + I10/O3 (CRASH-160); I5/O1 + I5/O2 (CRASH-154, released exactly once).',
+ mechanism=(
+  "The update arm of `_zend_hash_add_or_update` calls `ht->pDestructor(p->pData)` at :229 while bucket "
+  "`p` is **still linked into both of the table's lists and still advertises the dead payload**, then "
+  "keeps using `p` at :231 and :233. For pointer-sized payloads `INIT_DATA` sets `p->pData = "
+  "&p->pDataPtr`, so `pData` aliases storage *inside the bucket*: a destructor that re-enters and "
+  "deletes the same key pefrees the bucket, and control returns into a caller still holding `p`. "
+  "CRASH-154 is the same failure to poison before recursing, one level up: `_zval_dtor`'s array arm "
+  "calls `zend_hash_destroy(zvalue->value.ht)` without first clearing `zvalue->type`, so a "
+  "self-referential array re-enters `_zval_dtor` on a zval that still claims to own a table already "
+  "mid-destruction."),
+ benign_behaviour=(
+  "Insert/overwrite/delete with an owning destructor; every overwritten payload is released exactly "
+  "once. Checksum: a running free-counter XOR'd with each released payload word, plus the surviving "
+  "table digest — a double release moves the counter."),
+ adversarial_trigger=(
+  "A destructor that re-enters the table on the key being updated (CRASH-160.php: `extract()` → "
+  "`__destruct` → `unset($GLOBALS[k])`), or a value graph with a cycle back to itself (CRASH-154.php). "
+  "CRASH-154 is crashes_pristine_5_0_0=**True**; CRASH-160 is False."),
+ self_containment='verbatim for CRASH-160 (zend_hash alone); narrowed for CRASH-154 (zval tag + table).',
+ blob_drivability=('Direct: 0x40 INS k,v · 0x41 UPD k,v · 0x42 SET_DTOR_ACTION k,action where action is '
+                   'itself a small blob-decoded program (`delete k`, `insert k2`, `nothing`). The '
+                   'destructor is a kernel callback so the re-entrancy is fully blob-controlled.'),
+ hotness=('Hot — `zend_hash_update` is the single most executed mutator in the engine. No census frame.'),
+ mechanism_distinctness=('The container is *structurally intact and reachable* at the moment it runs '
+                         'foreign code; nothing has moved and no cursor is held. The bug is an ordering '
+                         'one — "destroy the old payload, then commit" instead of "commit, then destroy" '
+                         '— which is exactly the shape rank 13 has on the ownership-transfer side.'),
+ risks=[
+  "The `pData` self-aliasing (`&p->pDataPtr`) is what turns re-entrancy into a wild free. An extraction "
+  "that stores payloads out-of-line loses the sharpest half of the defect and should say so.",
+  "CRASH-160's real reachability is via extract(); a kernel that calls the update directly is fine, but "
+  "must not claim it reproduced 'the extract() bug'."],
+)
+
+# ---------------------------------------------------------------- rank 7
+cand(
+ id='objstore-stale-handle-resolves-to-recycled-slot',
+ root_cause_ids=['CRASH-030','CRASH-045','CRASH-044'],
+ c_file='Zend/zend_execute_API.c',
+ c_lines='Zend/zend_execute_API.c:617-626 (missing `!object_buckets[handle].valid` guard; faulting '
+         'deref `Z_OBJCE_PP(fci->object_pp)` at :625) with Zend/zend_objects_API.c:124-154 '
+         '(the free list at :124-127 and the unguarded dtor call at :138-146 = CRASH-045) and '
+         'Zend/zend_objects_API.c:43-59 (CRASH-044)',
+ invariant='I17 — an object-store bucket\'s refcount equals the number of live zvals carrying its handle, and a freed bucket is never handed back through its handle.',
+ obligation='I17/O4 (a handle lookup must fail rather than return a stale pointer) + I17/O1; contributing I2/O2.',
+ mechanism=(
+  "The store recycles slots through a free list (`ZEND_OBJECTS_STORE_ADD_TO_FREE_LIST` sets "
+  "`valid = 0` and pushes the handle; `zend_objects_store_put` pops it back at :87-89) but the handle "
+  "carries **no generation tag**. A zval that still holds the old handle therefore resolves, through "
+  "the same index, to whatever object now occupies the slot — or, before recycling, to a slot with "
+  "`valid == 0` whose `bucket.obj` fields are stale. `zend_call_function` reads "
+  "`Z_OBJCE_PP(fci->object_pp)` at :625 with no `valid` check at all. CRASH-045 is the adjacent hole "
+  "that produces the stale handle: `del_ref` runs the userland destructor at :144 *without* first "
+  "claiming a reference — the comment at :134-137 promises that guard and the code does not implement it."),
+ benign_behaviour=(
+  "PUT/ADDREF/DELREF/CALL over a handle table; on benign input every CALL names a live handle and "
+  "returns the object's class id. Checksum: fold every CALL's returned class id, plus the final "
+  "free-list length and `top`."),
+ adversarial_trigger=(
+  "Hold a handle across the object\'s destruction and then call through it — CRASH-030.php "
+  "(call a method on an object destroyed at shutdown). crashes_pristine_5_0_0 = **True** for all three "
+  "rows."),
+ self_containment='verbatim — the handle table alone; the class-entry deref becomes a payload word read.',
+ blob_drivability=('Direct: 0x50 PUT · 0x51 DUP h (a second holder) · 0x52 DELREF h · 0x53 CALL h '
+                   '(read the payload and fold it) · 0x54 SHUTDOWN (call_destructors sweep). An '
+                   'adversarial blob interleaves PUT after DELREF so the slot is recycled under a '
+                   'surviving DUP.'),
+ hotness=('Warm — every method call resolves a handle. No census frame.'),
+ mechanism_distinctness=('The pointer is *not* stale — the table is exactly where it was. The **index** '
+                         'is stale, and the slot has been legitimately reused. This is the ABA / '
+                         'missing-generation-counter mechanism, which no amount of pointer discipline '
+                         'catches; rank 2 is its exact opposite (valid index, moved storage).'),
+ risks=[
+  "Easy to conflate with rank 2 because both live in zend_objects_API.c and both are reached from "
+  "del_ref. They are opposite failures and should not share a kernel.",
+  "CRASH-044 and CRASH-045 are near-duplicates of each other (the same missing refcount guard in the "
+  "sweep and in the single-object path). Listed as merged members; the manager may want them split."],
+)
+
+# ---------------------------------------------------------------- rank 8
+cand(
+ id='one-owned-pointer-installed-in-two-owning-slots',
+ root_cause_ids=['CRASH-131','CRASH-047','CRASH-099','CRASH-103','CRASH-080'],
+ c_file='ext/pcre/php_pcre.c',
+ c_lines='ext/pcre/php_pcre.c:584-593 (defect at :586-590: zend_hash_update under the name and '
+         'zend_hash_next_index_insert at the index, with no ZVAL_ADDREF between); siblings '
+         'Zend/zend_object_handlers.c:392-395 (CRASH-047 over-decrement), '
+         'ext/standard/streamsfuncs.c:681 (CRASH-099), ext/standard/string.c:1412-1413 (CRASH-103), '
+         'ext/standard/array.c:3804 (CRASH-080)',
+ invariant='I7 — refcount accuracy.',
+ obligation='I7/O1 (every party that can subsequently reach the zval must increment) for CRASH-131; I7/O2 / I9/O2 for the over-decrement siblings.',
+ mechanism=(
+  "In the PREG_PATTERN_ORDER tail, each `match_sets[i]` (refcount 1, one owner) is written into the "
+  "result array **twice** — once under the subpattern name at :587-588 and once at the next integer "
+  "index at :590 — with no `ZVAL_ADDREF` in between. Two owning slots now name one allocation with a "
+  "count of 1, so destroying the array releases it twice. The siblings are the mirror error: "
+  "`zend_std_read_dimension` does a bare `retval->refcount--` at :393 to 'undo PZVAL_LOCK' on a zval "
+  "the lock was never taken on, and stristr/stream_select `zval_ptr_dtor` arguments they do not own."),
+ benign_behaviour=(
+  "Build a keyed container from a batch of freshly allocated values, then tear it down. On benign input "
+  "every value is released exactly once. Checksum: fold each value\'s payload in insertion order and "
+  "append the allocator\'s (allocs, frees) pair — the imbalance is the defect, directly in the digest."),
+ adversarial_trigger=(
+  "Any input that produces a *named* group, so the double insert fires: "
+  "`preg_match_all('/(?P<word>the)/', ...)` — CRASH-131.php verbatim. crashes_pristine_5_0_0=False "
+  "(the second free usually lands in the size-class cache)."),
+ self_containment=('narrowed — the PCRE match loop comes off entirely; what lifts is '
+                   '`for i: if named: put(name_i, v_i); put_next_index(v_i)` over a refcounted box.'),
+ blob_drivability=('Direct: the blob is a list of (has_name, name_bytes, value) records; the kernel '
+                   'builds the container, checksums it, tears it down, and folds the alloc/free tally.'),
+ hotness=('Warm — preg_match_all with named groups is common in template engines; more importantly the '
+          '*shape* (two puts, one addref) is a recurring idiom.'),
+ mechanism_distinctness=('Nothing is stale and nothing moves: the count is simply arithmetically wrong '
+                         'at the moment of publication. This is the only family in the set whose defect '
+                         'is a single missing increment.'),
+ risks=[
+  "Five rows merged here are not one defect — CRASH-131 is a missing increment, CRASH-047/099/103/080 "
+  "are unmatched decrements. They break the same invariant from opposite directions (I7/O1 vs I7/O2). "
+  "If the manager wants one row per obligation, this is two candidates, not one.",
+  "With Zend's allocation cache on, the double free is a cache double-push, not a libc double free, and "
+  "is invisible to ASan. Any 'does it fault' claim must state the allocator."],
+)
+
+# ---------------------------------------------------------------- rank 9
+cand(
+ id='container-freed-then-interior-slot-still-used',
+ root_cause_ids=['CRASH-004','CRASH-003','CRASH-025','CRASH-067'],
+ c_file='Zend/zend_execute.c',
+ c_lines='Zend/zend_execute.c:220-278 (CRASH-004: the free at :236-240, the UAF read of '
+         '`value_ptr->is_ref` at :242); Zend/zend_execute.c:614-670 (CRASH-003: the destroy at :629 / '
+         'the free at :634, the write through `*variable_ptr_ptr` at :669)',
+ invariant='I2 — temporal validity.',
+ obligation='I2/O4 (destruction must be ordered after the last use of every pointer derived from the value) + I2/O1; contributing I10/O1+O2.',
+ mechanism=(
+  "`zend_assign_to_variable_reference` decrements and, at zero, `zendi_zval_dtor`+`FREE_ZVAL`s the "
+  "*destination container* at :236-240, and only then reads `value_ptr->is_ref` at :242 — but "
+  "`value_ptr` can be an element *inside* the container just destroyed (`$a = array(1); $a = &$a[0];`), "
+  "so the read is of freed storage. `zend_assign_to_variable` has the write-side twin: at :629/:634 it "
+  "destroys the old value, which for a self-assignment destroys the array that owns the very bucket "
+  "`variable_ptr_ptr` points into, and then :669 writes `(*variable_ptr_ptr)->is_ref = 0` through it."),
+ benign_behaviour=(
+  "Rebind a slot: drop the old value, install the new one, report the new binding. On benign input "
+  "(source and destination in different containers) the sequence is correct. Checksum: the post-state "
+  "of every slot touched, folded in order, plus the alloc/free tally."),
+ adversarial_trigger=('A blob in which the source operand is an element of the destination container '
+                      '(the self-referential rebind). Both rows are crashes_pristine_5_0_0=False.'),
+ self_containment=('modelled — the surrounding function is dense executor plumbing (temp_variable '
+                   'table, znode operand kinds, PZVAL_LOCK). The mechanism, "release the owner then '
+                   'dereference a pointer derived from it", re-expresses in a few lines over a '
+                   'refcounted box + a container of boxes.'),
+ blob_drivability=('Yes, but via an object graph: 0x60 MKARR n · 0x61 SET c,i,v · 0x62 REBIND dst,src '
+                   'where dst and src are (container,index) pairs. The adversarial blob simply names '
+                   'the same container on both sides — p27 already holds 32 raw pointers this way.'),
+ hotness=('Hot — `=` and `=&` are the two most common opcodes in any PHP program. The census puts 280 '
+          'of 490 UAF reports in the call-teardown neighbourhood of this file, though not at these '
+          'exact lines.'),
+ mechanism_distinctness=('Ownership is correctly counted and nothing is stale-by-realloc; the *order of '
+                         'two statements* is wrong relative to a derived pointer. Rank 6 is the same '
+                         'ordering error inside a container; this is it across a container boundary.'),
+ risks=[
+  "This is the candidate most likely to require the executor. If it is narrowed too far it becomes "
+  "indistinguishable from an ordinary `free(p); use(p->q);` and stops being a PHP finding.",
+  "CRASH-003 and CRASH-004 sit in two different functions 400 lines apart and are genuinely two "
+  "defects (read-side and write-side). Merging them is a convenience, not a claim."],
+)
+
+# ---------------------------------------------------------------- rank 10
+cand(
+ id='llist-element-freed-inside-apply-loop',
+ root_cause_ids=['CRASH-086'],
+ c_file='Zend/zend_llist.c',
+ c_lines='Zend/zend_llist.c (zend_llist_apply: `for (element=l->head; element; element=element->next) '
+         'func(element->data)`) with the driver at ext/standard/basic_functions.c:2100-2137 '
+         '(the freed element is still dereferenced at :2135 `tick_fe->calling = 0;`) and '
+         ':2139-2144 (run_user_tick_functions → zend_llist_apply)',
+ invariant='I10 — borrowed slot and cursor validity.',
+ obligation='I10/O1 + I10/O3; contributing I2/O1 and I2/O2.',
+ mechanism=(
+  "`zend_llist_apply` walks `element = element->next` and calls `func(element->data)` with no "
+  "protection against `func` unlinking `element`. `user_tick_function_call` is such a func: the tick "
+  "callback it invokes may call `unregister_tick_function`, which `zend_llist_del_element`s and frees "
+  "the very element whose `data` is the `tick_fe` in hand — and the loop then writes "
+  "`tick_fe->calling = 0` at basic_functions.c:2135 and reads `element->next` in freed storage."),
+ benign_behaviour=(
+  "Register N callbacks, fire the list M times. On benign input every callback runs once per fire, in "
+  "registration order. Checksum: fold (callback id, fire index) in call order plus the final list "
+  "length."),
+ adversarial_trigger=('A callback that unregisters itself (or a later element) during the sweep. '
+                      'CRASH-086.php ships it; crashes_pristine_5_0_0=False.'),
+ self_containment=('verbatim — `zend_llist` is a ~200-line singly-forward/doubly-back list with an '
+                   'inline `char data[1]` payload; `zend_llist_apply` is eight lines.'),
+ blob_drivability=('Direct: 0x70 REG id,action · 0x71 FIRE · where `action` is decoded from the blob '
+                   '("unregister id j", "register a new id", "nothing").'),
+ hotness=('Cold — declare(ticks=N) is rare. But the *idiom* `zend_llist_apply` is used across the tree '
+          '(shutdown functions, stream filters, headers).'),
+ mechanism_distinctness=('A linked list with an inline payload and no cursor abstraction: the loop '
+                         'variable itself is the freed node. Rank 3 is the same failure with an '
+                         'explicit HashPosition cursor and an out-of-line Bucket; here the "cursor" is '
+                         'a for-loop local and the payload lives inside the node.'),
+ risks=[
+  "The write at basic_functions.c:2135 (`tick_fe->calling = 0`) is in the driver, not in zend_llist.c. "
+  "A verbatim lift of zend_llist alone gives a stale *read* only; the write needs the driver's shape.",
+  "The list is tiny in practice (1-3 elements); a benchmark that wants measurable time must fire it a "
+  "great many times, which changes the allocation pattern the defect depends on."],
+)
+
+# ---------------------------------------------------------------- rank 11
+cand(
+ id='conditional-alloc-unconditional-free',
+ root_cause_ids=['CRASH-074','CRASH-125','CRASH-112'],
+ c_file='ext/standard/array.c',
+ c_lines='ext/standard/array.c:993-1063 (CRASH-074: `zval *key;` uninitialised at :997, '
+         'MAKE_STD_ZVAL(key) only at :1024 inside the else-arm, unconditional `zval_ptr_dtor(&key)` at '
+         ':1061); ext/mbstring/mbstring.c:2196-2231 (CRASH-125: efree(list) at :2200 without '
+         '`list = NULL`, second efree at :2229-2230); ext/standard/user_filters.c:140 (CRASH-112)',
+ invariant='I5 — released exactly once, and releasing ends the releaser\'s ownership.',
+ obligation='I5/O2 (no variable may continue to be treated as owning, or as a presence flag for, released storage) + I5/O1.',
+ mechanism=(
+  "`php_array_walk` allocates `key` only on the *callback* arm (:1024) but frees it at :1061 on **every** "
+  "arm — so the first iteration that takes the `recursive && IS_ARRAY` arm frees an uninitialised stack "
+  "pointer, and every later one frees the previous iteration's already-released key. "
+  "`mb_detect_encoding` is the same defect with the pointer alive: it `efree(list)` on the parse-failure "
+  "path at :2200 but leaves `list` non-NULL, and the unconditional `if (list != NULL) efree(list)` at "
+  ":2229 frees it again."),
+ benign_behaviour=(
+  "Process a batch of records, allocating a per-record scratch buffer where the record needs one, and "
+  "releasing it once. On benign input allocs == frees. Checksum: fold each record\'s digest plus the "
+  "(allocs, frees) pair."),
+ adversarial_trigger=('A blob whose *first* record takes the no-allocation arm (a nested array for '
+                      'CRASH-074: `array_walk_recursive` over `array("hello", array("world", ...))` — '
+                      'CRASH-074.php verbatim; a malformed encoding list for CRASH-125). Both False on '
+                      'crashes_pristine_5_0_0.'),
+ self_containment='narrowed — the loop body lifts; only the userland call and the zval box come off.',
+ blob_drivability=('Direct: the blob is a record stream where each record\'s tag selects the arm. The '
+                   'defect is a function of *arm ordering* in the blob, which is exactly what a blob '
+                   'controls best.'),
+ hotness=('Cold-to-warm. array_walk_recursive is uncommon; the *idiom* is everywhere.'),
+ mechanism_distinctness=('The only family here whose defect is a control-flow mismatch between an '
+                         'allocation site and a release site — no aliasing, no re-entrancy, no '
+                         'container. It is also the only one that can free an *uninitialised* pointer, '
+                         'i.e. a value that was never an allocator return at all (I5/O4 territory).'),
+ risks=[
+  "index.csv itself records that CRASH-074's *claimed* line (:1005, `args[2] = userdata;`) exists but is "
+  "not the defect; the defect is the :997/:1024/:1061 triangle. Do not cite :1005.",
+  "Whether the uninitialised `key` is actually garbage depends on the frame layout the compiler picks. "
+  "At -O0 vs -O3 the two rungs may differ in whether the first free faults — which is a finding for the "
+  "optimisation-level axis, not a reason to drop the row."],
+)
+
+# ---------------------------------------------------------------- rank 12
+cand(
+ id='stack-value-published-to-a-callee-that-retains-it',
+ root_cause_ids=['CRASH-052','CRASH-051','CRASH-027','CRASH-032','CRASH-100','CRASH-139'],
+ cwe='CWE-562',
+ c_file='Zend/zend_object_handlers.c',
+ c_lines='Zend/zend_object_handlers.c:520-592 (CRASH-051: stack `zval method_name, method_args, '
+         '__call_name` at :524, published via call_args at :561-570, torn down at :587-588); '
+         'Zend/zend_execute.c:1136-1160 (CRASH-052: stack `zval tmp` at :1138, escapes through '
+         'read_property at :1157, dtor at :1158-1159); Zend/zend_execute_API.c:881+917 (CRASH-027); '
+         'Zend/zend_objects.c:34 (CRASH-032); ext/standard/streamsfuncs.c:728/735/742 (CRASH-100); '
+         'Zend/zend_API.c:1957/1965/1966 (CRASH-139)',
+ invariant='I14 — everything reachable from the userland value graph obeys the zval/HashTable lifetime protocol, and storage the engine or the request lifecycle owns never enters that graph as an owned member.',
+ obligation='I14/O1 (a value published where userland can retain it must be heap-allocated, so that refcount reaching zero is what destroys it) + I14/O2/O3; contributing I2/O3.',
+ mechanism=(
+  "Six sites build a value in **automatic storage** and hand its address to code that can store it. "
+  "`zend_std_call_user_call` declares `zval method_name, method_args, __call_name;` on the stack, "
+  "publishes `&method_name_ptr` / `&method_args_ptr` into `call_args`, and calls userland `__call`; a "
+  "`__call` that does `$GLOBALS['keep'] = $args` retains a pointer into a frame that returns, and the "
+  "`zval_dtor(method_args_ptr)` at :587 destroys the payload out from under it. Compounding it, "
+  "`ZVAL_STRING(method_name_ptr, func->function_name, 0)` at :540 sets `dup = 0`, so the stack zval "
+  "*borrows* engine-owned storage that :591 then efrees."),
+ benign_behaviour=(
+  "Build a descriptor on the stack, pass it to a handler, tear it down after the handler returns. On "
+  "benign input (a handler that does not retain) this is correct and allocation-free — which is exactly "
+  "why the idiom exists. Checksum: fold the handler\'s return plus the descriptor\'s post-state."),
+ adversarial_trigger=('A handler that stashes the pointer it was given in a table the kernel reads '
+                      'after the frame returns. CRASH-027, CRASH-032 and CRASH-100 are '
+                      'crashes_pristine_5_0_0=**True**.'),
+ self_containment=('narrowed — the idiom is `T local; publish(&local); callback(); teardown(&local);` '
+                   'plus a retention table. No executor needed; the zval box can be a two-word struct.'),
+ blob_drivability=('Direct: 0x80 CALL h,arg (invoke handler h with a stack descriptor) · handler '
+                   'programs decoded from the blob decide RETAIN / DROP · 0x81 READBACK (read the '
+                   'retention table and fold it). Benign blobs never RETAIN.'),
+ hotness=('Warm — `__get`/`__call`/`__autoload` are on every overloaded-object path, and the stack-zval '
+          'idiom appears at six independent sites, which is itself the frequency evidence.'),
+ mechanism_distinctness=('The storage is not heap at all — nothing is freed, the frame simply returns. '
+                         'This is the only family in the set where the allocator is uninvolved, so no '
+                         'allocator discipline (quarantine, cache, generation tags) can help it.'),
+ risks=[
+  "index.csv already flags that CRASH-052's *claimed sibling* Zend/zend_object_handlers.c:277 is a real "
+  "instance of the idiom but is not reachable; the reachable one is zend_execute.c:1138. Cite the "
+  "reachable one.",
+  "The six rows share an idiom, not a defect. Reporting them as one candidate understates the breadth; "
+  "reporting them as six overstates the distinctness. I have merged them and flagged it."],
+)
+
+# ---------------------------------------------------------------- rank 13
+cand(
+ id='ownership-committed-after-a-fallible-step',
+ root_cause_ids=['CRASH-161','LOGIC-026','LOGIC-027','LOGIC-004'],
+ c_file='Zend/zend_variables.c',
+ c_lines='Zend/zend_variables.c:139-153 (CRASH-161: zend_hash_copy at :151 runs before the commit '
+         '`zvalue->value.ht = tmp_ht;` at :152); Zend/zend_execute.c:3367-3415 (LOGIC-026: ownership '
+         'taken at :3370/:3382/:3388, unchecked zend_hash_next_index_insert at :3414); '
+         'Zend/zend_compile.c:2938-2961 (LOGIC-004/LOGIC-027: ALLOC_ZVAL at :2942, switch with no '
+         'default arm at :2945-2957, unchecked insert at :2959)',
+ cwe='CWE-415 / CWE-401',
+ invariant='I9 (CRASH-161) / I6 (the LOGIC rows).',
+ obligation='I9/O3 (the container produced by a by-value copy must not alias the source\'s payload) for CRASH-161; I6/O3 (a dispatch that performs the ownership transfer must be total over the value it switches on) and I6/O1 for the LOGIC rows.',
+ mechanism=(
+  "`zval_copy_ctor`'s array arm allocates `tmp_ht`, fills it with `zend_hash_copy`, and only *then* "
+  "writes `zvalue->value.ht = tmp_ht`. `zend_hash_copy` can longjmp (zend_bailout on allocation "
+  "failure) or run a copy-ctor that re-enters — and on that path the caller's zval still names "
+  "`original_ht` while `tmp_ht` is orphaned, or two zvals end up naming one table. "
+  "`zend_do_add_static_array_element` is the same hole with a switch: it takes ownership at :2942 and "
+  "then dispatches on the offset type over a switch with **no default arm** (:2945-2957) — an "
+  "IS_DOUBLE/IS_BOOL/IS_NULL offset falls straight through, transferring nothing and leaking both the "
+  "element and the offset table."),
+ benign_behaviour=(
+  "Deep-copy a container, or move an owned element into one. On benign input each allocation ends with "
+  "exactly one owner. Checksum: the copied container\'s digest plus the (allocs, frees) pair — the "
+  "leak and the double-own are both directly visible."),
+ adversarial_trigger=('An offset whose type has no arm (a float or bool array key at compile time), or '
+                      'an insert that fails because `nNextFreeElement` is at LONG_MAX. LOGIC rows are '
+                      '"n/a (non-crash class)"; CRASH-161 is crashes_pristine_5_0_0=False.'),
+ self_containment='narrowed — the copy/insert pair lifts; the zval tag becomes a small enum.',
+ blob_drivability=('Direct: 0x90 COPY c · 0x91 PUT c,tagged_key,v where the blob supplies the key *tag* '
+                   'and the kernel dispatches on it. A blob that emits an unhandled tag exercises the '
+                   'missing arm; a blob that drives nNextFreeElement to the top exercises the unchecked '
+                   'insert.'),
+ hotness=('Hot for the copy (COW separation is on every array write); cold for the compile-time rows.'),
+ mechanism_distinctness=('The failure is on the *error/unhandled* path, not the success path — the code '
+                         'is correct for every input it recognises. This is the only family whose '
+                         'trigger is a value the dispatch does not know about rather than a value it '
+                         'mishandles, and it is the natural home for the CWE-401 mass.'),
+ risks=[
+  "CRASH-161's bailout path needs `zend_bailout`/setjmp to reproduce faithfully. Modelling it as a "
+  "plain error return changes the defect from 'unwound past the commit' to 'forgot to check a return' — "
+  "still a defect, but a different one. Say which was built.",
+  "LOGIC-004 and LOGIC-027 are the same 20 lines (missing default arm; unchecked insert). They are two "
+  "obligations, one function."],
+)
+
+# ---------------------------------------------------------------- rank 14
+cand(
+ id='engine-owned-table-adopted-and-then-freed',
+ root_cause_ids=['CRASH-012','CRASH-148','CRASH-026','CRASH-078'],
+ cwe='CWE-590',
+ c_file='ext/standard/array.c',
+ c_lines='ext/standard/array.c:2058-2061 (CRASH-012: zend_hash_destroy + `efree(Z_ARRVAL_P(array))` at '
+         ':2059-2060 on a HashTable that may be `&EG(symbol_table)`); Zend/zend_operators.c:653-664 '
+         '(CRASH-148: `object_and_properties_init(op, ..., op->value.ht)` at :661 adopts it as object '
+         'properties); Zend/zend_execute.c:363-381 (CRASH-026); ext/standard/array.c:3272-3274 '
+         '(CRASH-078: `zval_copy_ctor` no-ops for &EG(symbol_table), so the "copy" aliases it)',
+ invariant='I14 — engine/request-lifecycle storage never enters the userland graph as an owned member.',
+ obligation='I14/O3 (no engine subsystem may adopt storage the request lifecycle owns as a container it will later destroy) + I14/O4; contributing I5/O4 (only addresses returned by the allocator are passed to the deallocator).',
+ mechanism=(
+  "`EG(symbol_table)` is a `HashTable` **embedded in the executor-globals struct** — not an allocator "
+  "return. `$GLOBALS` is a zval whose `value.ht` is its address. `array_splice` destroys and "
+  "`efree`s `Z_ARRVAL_P(array)` unconditionally at :2059-2060, so `array_splice($GLOBALS, ...)` hands a "
+  "non-heap address to the deallocator. `convert_to_object` adopts the same table as an object's "
+  "property table at :661, arming the same free later. CRASH-078 is the quiet twin: `zval_copy_ctor` "
+  "(zend_variables.c:146-148) *returns SUCCESS doing nothing* for `&EG(symbol_table)`, so array_diff's "
+  "`*return_value = **args[0]; zval_copy_ctor(return_value);` produces a 'copy' that aliases the "
+  "original and whose Bucket* snapshots outlive it."),
+ benign_behaviour=(
+  "Splice/copy/convert a container. On benign input the container is heap-owned and every operation "
+  "is correct. Checksum: the resulting container\'s digest plus (allocs, frees) — an efree of a "
+  "non-heap address is caught by the kernel\'s own allocator bookkeeping without needing a fault."),
+ adversarial_trigger=('Name the embedded table. CRASH-012.php (`array_splice($GLOBALS, ...)`) and '
+                      'CRASH-148.php are both crashes_pristine_5_0_0=**True**.'),
+ self_containment=('verbatim — a struct with an embedded container plus a heap-allocated one, and one '
+                   'function that frees "the container" without asking which kind it has.'),
+ blob_drivability=('Direct: 0xA0 MKHEAP · 0xA1 GLOBALS (push the embedded one) · 0xA2 SPLICE c · '
+                   '0xA3 COPY c · 0xA4 FREE c. Whether the blob ever names the embedded container is '
+                   'the benign/adversarial switch.'),
+ hotness=('Cold on frequency, but `$GLOBALS` reaches an enormous fraction of legacy PHP.'),
+ mechanism_distinctness=('The pointer is perfectly live and the refcount perfectly accurate — it simply '
+                         'was never an allocator return. This is the only family whose defect is a '
+                         '*provenance* error, and it is the one where a tagged-pointer or '
+                         'enum-of-owners representation is the whole fix.'),
+ risks=[
+  "The CRASH-012.php header comment cites `ext/standard/array.c:1645`, which in the pristine tarball is "
+  "a closing brace of an unrelated function. index.csv's `:2060` is the correct pristine line. See "
+  "NOTES.md 'citations corrected'.",
+  "CRASH-078's harm needs the Bucket* snapshot arrays (lists[]/ptrs[]) to be live; without them it is "
+  "'just' an aliasing copy and the row looks weaker than it is."],
+)
+
+# ---------------------------------------------------------------- rank 15
+cand(
+ id='erealloc-grow-leaves-uninitialised-tail-under-a-live-count',
+ root_cause_ids=['CRASH-158'],
+ cwe='CWE-824',
+ c_file='Zend/zend_compile.c',
+ c_lines='Zend/zend_compile.c:2569-2572 (the erealloc at :2571, sized by ce->num_interfaces which is '
+         'already the full declared count); deref sink Zend/zend_operators.c:1534-1535 '
+         '(instanceof_function_ex); compare-only sink Zend/zend_compile.c:1951',
+ invariant='I19 — an engine descriptor becomes reachable from a userland-visible table only after every table its own header describes is fully populated.',
+ obligation='I19/O2 (a header count must not be raised before the matching slot is written, when the count and the slot are written by different phases) + I19/O1/O3; contributing I3/O2+O3.',
+ mechanism=(
+  "`zend_do_end_class_declaration` ereallocs `ce->interfaces` to `num_interfaces` entries **without "
+  "zeroing the new tail**, at a point where `num_interfaces` is already the full declared count but "
+  "the slots are still filled one at a time by runtime `ZEND_ADD_INTERFACE` opcodes. Any read of "
+  "`ce->interfaces[0..num_interfaces)` before every ADD_INTERFACE has run — an `instanceof` from a "
+  "static initialiser, say — walks uninitialised heap and `instanceof_function_ex` dereferences it as "
+  "a `zend_class_entry *`."),
+ benign_behaviour=(
+  "Grow a descriptor's slot array to its declared arity, fill the slots, then answer membership "
+  "queries. On benign input every query is answered from written slots. Checksum: fold each query\'s "
+  "boolean answer plus the descriptor\'s final arity."),
+ adversarial_trigger=('A query issued between the grow and the last fill. CRASH-158.php ships it; '
+                      'crashes_pristine_5_0_0=**True**.'),
+ self_containment=('verbatim — `{ptr, count}` grown by erealloc, filled by a second pass, queried in '
+                   'between. Nothing from the compiler needs to come.'),
+ blob_drivability=('Direct: 0xB0 DECLARE n (grow to n, set count=n) · 0xB1 FILL i,v · 0xB2 QUERY v '
+                   '(scan 0..count). The blob decides whether a QUERY precedes the last FILL.'),
+ hotness=('Cold — class declaration is once per class per request.'),
+ mechanism_distinctness=('Nothing is freed and nothing is stale: the storage is live and *never was '
+                         'written*. It is the set\'s only read-of-uninitialised (CWE-824) and the only '
+                         'one where the length field, not the pointer, is what lies.'),
+ risks=[
+  "erealloc of a block that does not move returns memory holding the *previous* interface pointers, "
+  "which are valid class entries — so the read is uninitialised but often benign-looking. Making the "
+  "defect observable needs the block to move, i.e. a large enough arity in the fixture.",
+  "This one is arguably a spatial/initialisation row, not a temporal one. I include it because I19 and "
+  "the CWE-824 label put it on my axis, but the manager may want it on the spatial list instead."],
+)
+
+# ---------------------------------------------------------------- rank 16
+cand(
+ id='deferred-free-garbage-list-double-unlock',
+ root_cause_ids=['CRASH-151','CRASH-057','CRASH-050','LOGIC-011','LOGIC-022'],
+ c_file='Zend/zend_execute.c',
+ c_lines='Zend/zend_execute.c:57-83 (the protocol: PZVAL_UNLOCK resurrects at :66-70 into a '
+         '`zval *garbage[2]` — Zend/zend_globals.h:214-215 — drained by zend_clean_garbage at :73-78); '
+         'defect sites Zend/zend_execute.c:374-381 (CRASH-151, second unlock at :380), '
+         'Zend/zend_execute.c:500-538 (CRASH-057, `&value` — the address of a parameter — stored into '
+         'the temp table at :535), Zend/zend_execute.c:196-218 + :3152-3170 (CRASH-050, '
+         'zend_switch_free re-run by brk/cont at :3162), Zend/zend_execute.c:986-987 (LOGIC-011), '
+         'Zend/zend_execute.c:448-452 (LOGIC-022)',
+ invariant='I7 — refcount accuracy, including engine-internal holders (VM operand temps).',
+ obligation='I7/O2 (a temporary lock must be released on the very zval it was taken on) and I7/O5 (a zval queued for deferred destruction must not be re-published to a new owner).',
+ mechanism=(
+  "The VM's operand protocol is PZVAL_LOCK/PZVAL_UNLOCK. `zend_pzval_unlock_func` decrements, and when "
+  "the count hits zero it does not free — it **resurrects** the zval (`refcount = 1; is_ref = 0`) and "
+  "pushes it onto `EG(garbage)`, a *fixed two-element array*, drained at the next statement boundary. "
+  "Any path that unlocks twice therefore hands a still-live zval to a deferred free. The non-object arm "
+  "of `zend_assign_to_object` does exactly that: `get_zval_ptr` already unlocked the IS_VAR operand, "
+  "and :380 unlocks it again. `zend_switch_free` is the control-flow variant — a brk/cont at :3162 "
+  "re-runs the same free the RETURN path already ran."),
+ benign_behaviour=(
+  "Evaluate an operand stream with lock/unlock discipline and a deferred-free queue drained per "
+  "statement. On benign input every temp is released exactly once, at the statement boundary. "
+  "Checksum: fold the queue contents at each drain plus the (allocs, frees) pair."),
+ adversarial_trigger=('An operand stream that reaches the error arm (assign to a property of a '
+                      'non-object) or a non-linear exit (break out of a switch inside a loop). '
+                      'CRASH-057 and CRASH-050 are crashes_pristine_5_0_0=**True**.'),
+ self_containment=('narrowed — lock/unlock/garbage/drain is 25 lines and lifts as-is; the operand '
+                   'stream replaces the opcode dispatch.'),
+ blob_drivability=('Direct: 0xC0 LOCK t · 0xC1 UNLOCK t · 0xC2 STMT_END (drain) · 0xC3 BRANCH off. '
+                   'The blob is a lock/unlock trace, which is the most natural encoding in the set.'),
+ hotness=('Hottest region measured. In the ASan render census, **98 of 490 heap-use-after-free reports '
+          'have `_zval_ptr_dtor <- zend_switch_free_handler <- execute` as their top frames** — i.e. '
+          'the double-free of a loop/switch temp fires on ordinary WordPress/phpBB page renders, '
+          'unprompted.'),
+ mechanism_distinctness=('A *deferred* free: the release is queued, not performed, so the window '
+                         'between the logical release and the physical one is where every other holder '
+                         'lives. No other candidate has a resurrection step.'),
+ risks=[
+  "`EG(garbage)` is `zval *garbage[2]` with an unchecked `EG(garbage)[EG(garbage_ptr)++]`. A faithful "
+  "extraction inherits a *spatial* overflow inside a temporal kernel. That is a real property of the "
+  "C — but it must be reported, not quietly bounded, or the row will be measured as something it is not.",
+  "CRASH-057 is not purely a double-unlock: :535 stores `&value`, the address of a *function parameter*, "
+  "into the temp table, so it is also a stack-escape (rank 12). It genuinely sits in two families."],
+)
+
+# ---------------------------------------------------------------- rank 17
+cand(
+ id='unaddrefd-pointee-freed-by-a-user-callback',
+ root_cause_ids=['CRASH-042','CRASH-159','CRASH-035','CRASH-064','CRASH-010','CRASH-132','CRASH-113'],
+ c_file='Zend/zend_object_handlers.c',
+ c_lines='Zend/zend_object_handlers.c:264-296 (CRASH-042: `zobj` cached at :274, getter runs at :293, '
+         'the **write** `zobj->in_get = 0;` at :294 lands in freed storage); '
+         'Zend/zend_execute.c:1665-1708 (CRASH-159: `object` held unaddrefd across read_property at '
+         ':1682 and used at :1699; identical construct at :1223 and :1281); '
+         'Zend/zend_execute.c:280-292 (CRASH-035); Zend/zend_execute.c:561-595 (CRASH-064); '
+         'Zend/zend_execute.c:138-151 (CRASH-010); ext/pcre/php_pcre.c:670-684 (CRASH-132); '
+         'ext/standard/user_filters.c:128 (CRASH-113)',
+ invariant='I17 (CRASH-042) / I7 (CRASH-159) — the holder must count its own reference for the duration.',
+ obligation='I17/O1 and I7/O4 (a zval must not be freed while any holder — including one created by user code during the call — still points at it); contributing I2/O1+O2.',
+ mechanism=(
+  "A caller latches a raw pointer to a heap object it does not own a reference to, calls something that "
+  "runs userland, and then uses the pointer. `zend_std_read_property` caches `zobj = Z_OBJ_P(object)` "
+  "at :274, calls `__get` at :293, and then **writes** `zobj->in_get = 0` at :294 — a getter that "
+  "reassigns the last holder of the object has freed `zobj` by then, so the re-entrancy guard is "
+  "cleared inside freed memory. `zend_binary_assign_op_obj_helper` is the read-then-write version: it "
+  "carries `object` across `read_property` (:1682) and hands it to `write_property` (:1699). Nothing "
+  "has moved and no container is involved — the pointee itself is gone."),
+ benign_behaviour=(
+  "Read a property through a handler, then write it back. On benign input (a handler that does not "
+  "touch the holder) the object is stable and the read-modify-write is correct. Checksum: fold each "
+  "property\'s post-state plus the object\'s final guard flags."),
+ adversarial_trigger=('A handler that drops the last reference to the object it was invoked on — '
+                      'CRASH-042.php (`__get` reassigns the static that holds it). CRASH-159 is '
+                      'crashes_pristine_5_0_0=**True**; CRASH-042/035/064/010 are False.'),
+ self_containment=('narrowed — a refcounted object with a guard flag, a handler table, and a callback '
+                   'the kernel supplies. No executor, no hashtable.'),
+ blob_drivability=('Direct: 0xD0 NEW · 0xD1 BIND slot,obj · 0xD2 GET obj,prop (invokes the '
+                   'blob-supplied handler program) · 0xD3 RMW obj,prop. The handler program can '
+                   'contain `BIND slot, NEW` — which is the release.'),
+ hotness=('Warm — every overloaded property access. The idiom recurs at five sites in zend_execute.c '
+          'alone (:1223, :1281, :1682, plus the two assign helpers), which is its own frequency signal.'),
+ mechanism_distinctness=('The pointer is not interior to any container, nothing reallocates, and the '
+                         'refcount is not wrong — no reference was ever taken. Rank 1/2 lose the '
+                         'pointer because the *storage moved*; this loses it because the *object died*.'),
+ risks=[
+  "CRASH-042's harm is a one-byte write to a guard flag. If the extraction models the object as a "
+  "value rather than a struct with flags, the write disappears and the row degrades to a read.",
+  "Seven rows merged; CRASH-010 (foreach key==value) and CRASH-064 (ze1 self-assign) are arguably "
+  "refcount-arithmetic rows (rank 8) rather than borrow rows. Flagged, not decided."],
+)
+
+# ---------------------------------------------------------------- rank 18
+cand(
+ id='cached-or-reused-pointer-to-a-per-invocation-target',
+ root_cause_ids=['CRASH-038','CRASH-069','CRASH-031','CRASH-072','LOGIC-025'],
+ c_file='Zend/zend_execute_API.c',
+ c_lines='Zend/zend_execute_API.c:718-728 (CRASH-038: the unconditional cache write at :718-723, the '
+         'stale reuse at :725, the faulting read at :733); Zend/zend_execute.c:2764-2784 (CRASH-069: '
+         '`efree(EX(fbc))` at :2767 and the read `EX(fbc)->common.fn_flags` at :2778; CRASH-031: the '
+         'double release `EG(This)->refcount--; zval_ptr_dtor(&EG(This));` at :2779-2780); '
+         'main/streams/streams.c:1395-1406 + :350 (CRASH-072); '
+         'Zend/zend_object_handlers.c:676+:683 with Zend/zend_execute.c:4235-4247 (LOGIC-025)',
+ invariant='I20 — a cached resolution denotes, for as long as the cache can be consulted, the same live entity a fresh resolution would produce.',
+ obligation='I20/O1 (a resolution whose target is allocated per invocation must not be cached) + I20/O3; contributing I5/O3.',
+ mechanism=(
+  "`zend_call_function` caches the resolved handler unconditionally at :718-723. For `__call`/`__get` "
+  "the resolved handler is a **trampoline emalloc\'d by get_method for this one call** and efree\'d "
+  "when the call returns, so the next call takes the :724-728 branch and reads a freed "
+  "`zend_function` at :733. The same lifetime error appears without a cache in the call teardown: "
+  "`zend_do_fcall_common_helper` does `efree(EX(fbc))` at :2767 and then reads "
+  "`EX(fbc)->common.fn_flags` at :2778, eleven lines later, on the exception path — and the very next "
+  "line double-releases `EG(This)` (`refcount--` then `zval_ptr_dtor`)."),
+ benign_behaviour=(
+  "Resolve a name to a handler, call it, optionally cache the resolution, call again. On benign input "
+  "(a statically-owned handler) the cache is a pure win and every call dispatches correctly. Checksum: "
+  "fold each call\'s handler id and return value, plus a cache hit/miss tally."),
+ adversarial_trigger=('Two calls where the first resolves to a per-invocation target: CRASH-038.php '
+                      '(`array_map(array($f,\'seg\'), ...)` → __call trampoline cached → then '
+                      '`array_map(array($f,\'NormalMethod\'), ...)`). CRASH-038, CRASH-069 and '
+                      'CRASH-031 are all crashes_pristine_5_0_0=**True**.'),
+ self_containment=('narrowed — a resolver returning either a borrowed static handler or a freshly '
+                   'allocated one, a one-entry cache, and a caller that frees what it was handed. '
+                   'The whole defect is that the two kinds are the same C type.'),
+ blob_drivability=('Direct: 0xE0 CALL name where the blob\'s name table marks each name as '
+                   '`static` or `trampoline`. A blob that calls a trampoline name and then any name '
+                   'reuses the poisoned cache entry.'),
+ hotness=('Hottest measured region: **280 of 490 heap-use-after-free reports in the ordinary-traffic '
+          'ASan census fault in `zend_do_fcall_common_helper`**, freed by `_zval_ptr_dtor` — the '
+          ':2767/:2778 neighbourhood of CRASH-069/CRASH-031. This is the single best-evidenced hot '
+          'temporal defect in the corpus.'),
+ mechanism_distinctness=('Two C types that are indistinguishable — "handler I borrowed" and "handler I "'
+                         '"own and will free" — flowing through one pointer field. Rank 14 is the same '
+                         'confusion for *containers* (heap vs embedded); this is it for *code pointers*, '
+                         'and it is the only family where a cache is the amplifier.'),
+ risks=[
+  "CRASH-069 and CRASH-031 sit two lines apart and both are real; they are different defects (a stale "
+  "read vs a double release) and should not be one kernel.",
+  "The trampoline is only reachable through the overloaded-object path. Narrowing it to 'resolver "
+  "returns owned-or-borrowed' is faithful to the mechanism but loses the __call framing — say so."],
+)
+
+# ---------------------------------------------------------------- rank 19
+cand(
+ id='foreign-registry-aliases-a-buffer-its-owner-frees',
+ root_cause_ids=['CRASH-084','CRASH-092','CRASH-114','CRASH-141'],
+ c_file='ext/standard/basic_functions.c',
+ c_lines='ext/standard/basic_functions.c:1325-1385 (CRASH-084: the guard that never fires at :1333, '
+         'the `zend_hash_del` whose destructor efrees the string at :1376, the scan of `environ` that '
+         'reads it at :1380-1382); ext/standard/http_fopen_wrapper.c:197-201 (CRASH-092, free at '
+         ':201); ext/standard/user_filters.c:405-424 (CRASH-114, double append with no refcount '
+         'increment at :420-424); Zend/zend_object_handlers.c:75 with '
+         'Zend/zend_execute_API.c:748-753 (CRASH-141)',
+ invariant='I5 — the allocating subsystem and the releasing subsystem must agree on the block\'s lifetime.',
+ obligation='I5/O3 (no third party may retain the pointer past the release) + I5/O2.',
+ mechanism=(
+  "`putenv()` hands its `pe.putenv_string` to libc `putenv()`, which **does not copy** — `environ[]` "
+  "now aliases PHP\'s emalloc\'d buffer. The next `putenv()` for the same key does "
+  "`zend_hash_del(&BG(putenv_ht), ...)` at :1376, whose destructor `php_putenv_destructor` efrees that "
+  "buffer while `environ` still points at it; the loop at :1380-1382 then `strncmp`s over freed "
+  "storage. Two ownership domains — PHP\'s hashtable and libc\'s `environ` — hold one pointer and "
+  "only one of them knows it."),
+ benign_behaviour=(
+  "Install key=value pairs into a registry that also publishes them to a second, borrowing table; read "
+  "them back. On benign input (distinct keys) every buffer has one owner and the published view is "
+  "consistent. Checksum: fold the published table\'s bytes in order plus the (allocs, frees) pair."),
+ adversarial_trigger=('Re-set an already-set key, so the delete fires while the borrowing table still '
+                      'aliases the old buffer. CRASH-084.php ships it; crashes_pristine_5_0_0=False.'),
+ self_containment=('verbatim — an owning hashtable with a destructor plus a borrowing array of raw '
+                   'pointers. `environ` is modelled by a second array; nothing from libc is needed.'),
+ blob_drivability=('Direct: 0xF0 SET key,val · 0xF1 UNSET key · 0xF2 SCAN (walk the borrowing table '
+                   'and fold every byte). The adversarial blob is any that SETs the same key twice.'),
+ hotness=('Cold — putenv is rare. But the *shape* (publish a borrowed pointer into a table the owner '
+          'cannot see) is the archetype for every "two subsystems, one buffer" bug.'),
+ mechanism_distinctness=('The alias lives in a table the owning code does not even reference, so no '
+                         'amount of local reasoning at the free site can see it. Every other family '
+                         'here has both parties in one translation unit.'),
+ risks=[
+  "The guard at :1333 (`if (Z_STRVAL_PP(str) && *(Z_STRVAL_PP(str)))`) rejects the empty string, which "
+  "is what the historical bug turned on; the mechanism is live for non-empty keys too, so the "
+  "extraction should not depend on the empty-key path.",
+  "index.csv already records that CRASH-092's claimed `:263` is the *fix commit tree's* line, not "
+  "php-5.0.0's; the pristine site is :197-201. Do not propagate :263."],
+)
+
+# ---------------------------------------------------------------- rank 20
+cand(
+ id='freed-slot-left-non-null-and-read-by-reentrant-code',
+ root_cause_ids=['CRASH-142','CRASH-140'],
+ c_file='Zend/zend_execute.h',
+ c_lines='Zend/zend_execute.h:117-127 (`zend_ptr_stack_clear_multiple`: the loop at :123-125 '
+         '`zval_ptr_dtor((zval **) --p)` releases each slot and leaves the slot itself unwritten); '
+         'observed stale read at Zend/zend_builtin_functions.c:1420; '
+         'Zend/zend_builtin_functions.c:1453 + :1486 + :1558-1559 (CRASH-140: `zval *arg_array = NULL;` '
+         'hoisted out of the per-frame loop, so the previous frame\'s freed array is re-read and '
+         're-freed)',
+ invariant='I5 — releasing ends the releaser\'s ownership; no variable may continue to be treated as owning, or as a presence flag for, released storage.',
+ obligation='I5/O2 (the exact obligation: a slot must not remain a presence flag for released storage) + I5/O1; contributing I2/O2.',
+ mechanism=(
+  "The argument-stack teardown walks down the frame calling `zval_ptr_dtor` on each slot but never "
+  "writes the slot — it only moves `top`/`top_element`. Any code that walks the stack by frame "
+  "descriptor rather than by `top` (debug_backtrace, an error handler firing *during* the teardown) "
+  "reads slots that still hold freed `zval *`. CRASH-140 is the same defect in a local: "
+  "`zval *arg_array = NULL;` is declared **outside** the `while (ptr)` frame loop, so a frame with no "
+  "args inherits the previous frame\'s already-freed array and both re-reads it at :1433 and re-frees "
+  "it at :1559."),
+ benign_behaviour=(
+  "Tear down a frame of slots, then produce a trace of the frames still live. On benign input the "
+  "trace covers exactly the live frames. Checksum: fold each traced slot\'s payload plus the frame "
+  "count and the (allocs, frees) pair."),
+ adversarial_trigger=('Take a trace while a teardown is in progress, or trace a frame that has no '
+                      'arguments after one that did. Both rows are crashes_pristine_5_0_0=False.'),
+ self_containment=('verbatim — `zend_ptr_stack_clear_multiple` is eleven lines and needs only a slot '
+                   'array and a release callback.'),
+ blob_drivability=('Direct: 0x100 PUSHFRAME n · 0x101 POPFRAME · 0x102 TRACE (walk by descriptor and '
+                   'fold) · and a release callback the blob can program to issue TRACE, which is the '
+                   're-entrancy.'),
+ hotness=('Hot — the teardown runs on every function return. It is inside the '
+          '`zend_do_fcall_common_helper` region that carries 280 of 490 census UAF reports, though the '
+          'census cannot attribute to a line.'),
+ mechanism_distinctness=('Nothing is stale in the *holder* — the holder is the container itself, and '
+                         'the container is intact. The defect is that "freed" and "present" are the '
+                         'same bit pattern, so a second reader cannot tell them apart. It is the only '
+                         'family fixed entirely by writing NULL.'),
+ risks=[
+  "A kernel that reads back through `top` will never see the defect; the second reader must walk by a "
+  "*descriptor* (frame base + count), which is the part that must be preserved in the extraction.",
+  "CRASH-140's hoisted-declaration variant is arguably rank 11 (conditional alloc, unconditional use). "
+  "It is here because the harm is a stale *slot*, not a stale local — a judgement call."],
+)
+
+# ---------------------------------------------------------------- rank 21
+cand(
+ id='lock-taken-on-one-path-released-only-by-a-textually-later-site',
+ root_cause_ids=['LOGIC-002','LOGIC-011','LOGIC-022','LOGIC-015','LOGIC-006','LOGIC-023','LOGIC-009',
+                 'LOGIC-019','LOGIC-024','LOGIC-025','LOGIC-010','LOGIC-012','LOGIC-016','LOGIC-021'],
+ cwe='CWE-401 / CWE-911',
+ c_file='Zend/zend_execute.c',
+ c_lines='Zend/zend_execute.c:4235-4265 (LOGIC-002/LOGIC-025: the exception handler unwinds the '
+         'argument stack at :4242-4247 but releases no loop temp, while the acquisitions are at '
+         ':3713/:3737/:3741 and the only release is the textual loop-end SWITCH_FREE emitted at '
+         'Zend/zend_compile.c:1468-1480); Zend/zend_execute.c:986-987 (LOGIC-011: bare PZVAL_LOCK '
+         'ignoring RETURN_VALUE_UNUSED); Zend/zend_execute.c:448-452 (LOGIC-022: lock taken despite a '
+         'pending exception); Zend/zend_execute.c:3142-3146 (LOGIC-015: `zval tmp` copy_ctor\'d, never '
+         'dtor\'d); Zend/zend_execute.c:914-926 (LOGIC-006: array_init over a live IS_STRING payload '
+         'with no zval_dtor)',
+ invariant='I6 — every allocation is released, or transferred, on every path that leaves the block that produced it, including unwind paths.',
+ obligation='I6/O1 and I6/O2 (a deep copy must be matched by a destructor on every path that does not transfer it); I17/O1+O2 for the CWE-911 rows.',
+ mechanism=(
+  "The VM acquires a lock/addref at the *point of use* and relies on a release emitted at the "
+  "**textually** matching point — FE_RESET locks the container and only the loop-end SWITCH_FREE "
+  "releases it; a throw jumps to `zend_handle_exception_handler`, which drains the argument stack "
+  "(:4242-4247) and nothing else, so every loop temp between the throw and the handler is stranded. "
+  "The smaller rows are the same non-total release: `zend_brk_cont_helper` copy-ctors a `zval tmp` at "
+  ":3143-3144 and never dtors it; the FETCH_DIM_W autovivify path calls `array_init(container)` at "
+  ":924 straight over a live `IS_STRING` payload with no `zval_dtor` first, so the string buffer is "
+  "orphaned by a type-tag overwrite."),
+ benign_behaviour=(
+  "Acquire per-iteration temps, run a loop, release at the loop end. On benign input (no non-linear "
+  "exit) acquisitions and releases balance exactly. Checksum: the loop result plus the (acquires, "
+  "releases) pair — the leak is the digest, no allocator introspection needed."),
+ adversarial_trigger=('Any blob with a non-linear exit out of the loop body (throw / break / return) '
+                      'or an unhandled operand type. All are LOGIC rows: crashes_pristine_5_0_0 = '
+                      '"n/a (non-crash class)". They leak; they do not fault.'),
+ self_containment=('narrowed for LOGIC-006/LOGIC-015 (a few lines each); `modelled` for LOGIC-002, '
+                   'which genuinely needs a loop construct with an unwind path.'),
+ blob_drivability=('Direct: 0x110 LOOP n · 0x111 ACQUIRE · 0x112 THROW · 0x113 ENDLOOP. The blob '
+                   'decides where the exit happens; the checksum is the balance.'),
+ hotness=('Hot for LOGIC-002 and LOGIC-011 (foreach and string-offset fetch are everywhere); the leak '
+          'per occurrence is small, which is exactly why it survived.'),
+ mechanism_distinctness=('Nothing is ever freed too early — the defect is that a release *never runs*. '
+                         'It is the only family in the set whose harm is unbounded growth rather than '
+                         'corruption, and the only one where the correct C is a structural change '
+                         '(scope-bound release) rather than a reordering or an extra check.'),
+ risks=[
+  "Fourteen rows merged. They are one *invariant* (I6) and at least four distinct C shapes: stranded "
+  "loop temp on unwind, unconditional lock ignoring result-usage, deep copy with no matching dtor, and "
+  "type-tag overwrite over a live payload. The manager should probably split this into four.",
+  "A leak is only measurable if the kernel runs the loop enough times; the benchmark's timing axis and "
+  "its leak-detection axis want opposite iteration counts. That is a real tension to flag before it is "
+  "built, not after."],
+)
+
+# ---------------------------------------------------------------- rank 22
+cand(
+ id='compile-time-liveness-metadata-names-the-wrong-temp',
+ root_cause_ids=['CRASH-065','CRASH-024'],
+ c_file='Zend/zend_compile.c',
+ c_lines='Zend/zend_compile.c:885-899 (CRASH-065: the backwards scan at :889 stops at the first '
+         'ZEND_JMP_NO_CTOR it finds and marks `(opline-1)->result` and `(opline+1)->op1` EXT_TYPE_UNUSED '
+         'at :896-897, without checking that this JMP_NO_CTOR belongs to the expression being freed); '
+         'Zend/zend_compile.c:487-508 (CRASH-024: zend_do_assign_ref never sets '
+         'ZEND_RETURNS_FUNCTION on the opline) consumed at Zend/zend_execute.c:2241-2248',
+ invariant='I18 — every opcode delivered to the VM carries, in materialised form, exactly the operands and metadata its handler will consume, and any rewrite preserves that contract.',
+ obligation='I18/O2 (an opcode or fetch-mode rewrite must preserve operand presence and handler expectations rather than silently reinterpret them); contributing I7/O2+O4.',
+ mechanism=(
+  "`zend_do_free` decides *at compile time* which runtime temp is dead. When the result is not the "
+  "operand it walks backwards through the emitted opcodes looking for `ZEND_JMP_NO_CTOR` (:889-894) "
+  "and, on the first one it finds, stamps `EXT_TYPE_UNUSED` onto the *preceding* opcode\'s result and "
+  "the *following* opcode\'s op1 (:896-897). Nothing ties that JMP_NO_CTOR to the expression being "
+  "freed, so an earlier unrelated `new` supplies the match and a **live** temp is marked dead; the VM "
+  "then frees it while a later opcode still reads it. CRASH-024 is the mirror: the compiler omits the "
+  "`ZEND_RETURNS_FUNCTION` flag on assign-ref of a call return, so the executor takes the wrong "
+  "ownership branch at zend_execute.c:2241-2248 and drops a live `$this`."),
+ benign_behaviour=(
+  "Compile an expression stream to a temp-slot program, run it, and free each temp exactly once at its "
+  "computed death point. On benign input every temp is live at every read. Checksum: fold each opcode\'s "
+  "result plus a per-slot (writes, reads, frees) triple."),
+ adversarial_trigger=('An expression stream containing an earlier construct that emits the marker the '
+                      'backwards scan matches on. Both rows are crashes_pristine_5_0_0=False.'),
+ self_containment=('narrowed — an opcode buffer, a temp-slot table, a liveness-marking pass and a tiny '
+                   'interpreter. This is the one candidate whose natural kernel is *two* passes.'),
+ blob_drivability=('Direct and idiomatic: the blob **is** the opcode stream. 0x120 EMIT op,slots · '
+                   '0x121 FREE slot (runs the marking pass) · then interpret. Whether the scan finds '
+                   'the right marker is a pure function of the blob.'),
+ hotness=('Cold at run time (compilation is once per file) but the *marking* runs for every discarded '
+          'expression statement, which is most statements.'),
+ mechanism_distinctness=('The only family where the defect is in a *static analysis the program runs on '
+                         'itself*: no pointer, no refcount, no container. The runtime faithfully obeys '
+                         'metadata that is wrong.'),
+ risks=[
+  "Extracting this without the two-pass structure turns it into 'free the wrong index', which is not "
+  "the same finding. The backwards scan must survive.",
+  "CRASH-024 is only observable through $this ownership; narrowed too far it becomes an ordinary "
+  "missing-flag bug."],
+)
+
+# ---------------------------------------------------------------- rank 23
+cand(
+ id='error-path-consumes-storage-it-just-released-or-never-set',
+ root_cause_ids=['CRASH-068','CRASH-129','CRASH-062'],
+ c_file='Zend/zend_constants.c',
+ c_lines='Zend/zend_constants.c:310-326 (CRASH-068: `name = c->name` at :316, `free(c->name)` at :320, '
+         'and `zend_error(E_NOTICE,"Constant %s already defined", name)` at :324 formats the freed '
+         'buffer); ext/mbstring/php_mbregex.c:727-738 (CRASH-129: unchecked `zend_eval_string` at :732, '
+         '`convert_to_string(&v)` at :734 and `Z_STRVAL(v)` at :735 over a stack zval the failed eval '
+         'never wrote); Zend/zend_execute_API.c:282 (CRASH-062: zend_destroy_rsrc_list run before '
+         'Zend/zend.c:822 shutdown_compiler)',
+ invariant='I5 (CRASH-068) / I12 (CRASH-129) — release ends ownership; a fallible call\'s failure is tested before its result is used.',
+ obligation='I5/O2 (releasing ends ownership: no variable may continue to be treated as naming released storage) for CRASH-068; I12/O1+O2 for CRASH-129.',
+ mechanism=(
+  "`zend_register_constant`\'s duplicate arm releases the constant and then reports it: `name` aliases "
+  "`c->name` on the case-sensitive (CONST_CS) path (:316), :320 `free`s that buffer, and :324 hands "
+  "the released pointer to `zend_error` as the `%s` of \"Constant %s already defined\". The allocator "
+  "itself is consistent — every `c->name` in this file comes from `zend_strndup` "
+  "(zend_constants.c:41/119/170/184/199), so libc `free` is the right deallocator; the defect is "
+  "purely the free-before-format ordering. `php_mbregex`\'s eval arm is the un-initialised twin: "
+  "`zend_eval_string` at :732 can fail without ever writing the stack zval `v`, and :734/:735 convert "
+  "and read it anyway."),
+ benign_behaviour=(
+  "Register entries, rejecting duplicates with a diagnostic that names the offender. On benign input "
+  "(no duplicate, no failing eval) nothing is released early and every diagnostic is well-formed. "
+  "Checksum: fold each registration\'s outcome code and the bytes of every emitted diagnostic."),
+ adversarial_trigger=('Register the same name twice, or supply an expression the evaluator rejects. '
+                      'CRASH-062 is crashes_pristine_5_0_0=**True**; CRASH-068 and CRASH-129 are False.'),
+ self_containment='verbatim for CRASH-068 (a registry, a release, and a formatted message).',
+ blob_drivability=('Direct: 0x130 REGISTER name,val · the blob repeats a name to reach the arm; the '
+                   'diagnostic bytes go straight into the checksum, which is what makes the UAF read '
+                   '*observable in the digest* rather than only in a sanitizer.'),
+ hotness=('Cold — error paths by construction. That is the point: these are the paths ordinary traffic '
+          'never covers, and the ASan render census correspondingly shows nothing here.'),
+ mechanism_distinctness=('The only family whose defect lives entirely on the *diagnostic* path: the '
+                         'freed value is consumed by a message formatter rather than by program logic, '
+                         'so the harm lands in output bytes rather than in program state — which makes '
+                         'it the easiest of the 23 to observe in a u64 checksum.'),
+ risks=[
+  "CRASH-062 is a *teardown-ordering* row (resource list destroyed before compiler globals) and shares "
+  "only the 'reached via an error handler' framing with the other two. It is here so that all 85 rows "
+  "are accounted for; it is the weakest merge in this file and the manager should probably split it.",
+  "index.csv itself records that CRASH-062's claimed site Zend/zend.c:975 is real but is only the "
+  "semantics bug; the lifetime defect is at zend_execute_API.c:282. Do not cite zend.c:975 as the UAF."],
+)
+
+json.dump({'axis':'temporal',
+           'source':'php-5.0.0 pristine tarball sha256 5783e0c0ba94f165633a565fe73a83e59cf17b6880ef95fa8f936dc6301d6919',
+           'corpus_rows_on_axis':85,
+           'mechanism_families_found':23,
+           'candidates':C}, open(OUT,'w'), indent=1)
+print('wrote', OUT, len(C), 'candidates')

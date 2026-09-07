@@ -1,0 +1,349 @@
+{
+ "CRASH-002": [
+  "I10/O1/O3 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-003": [
+  "I2/O1/O4 (primary)",
+  "I10/O1/O2 (contributing)"
+ ],
+ "CRASH-004": [
+  "I2/O4/O2/O1 (primary)",
+  "I10/O1/O2 (contributing)"
+ ],
+ "CRASH-010": [
+  "I7/O2/O4 (primary)",
+  "I10/O4 (contributing)"
+ ],
+ "CRASH-012": [
+  "I14/O3/O4 (primary)",
+  "I5/O4 (contributing)"
+ ],
+ "CRASH-022": [
+  "I10/O1/O3 (primary)",
+  "I2/O2/O1 (contributing)"
+ ],
+ "CRASH-024": [
+  "I7/O2/O4 (primary)",
+  "I2/O1/O2 (contributing)"
+ ],
+ "CRASH-025": [
+  "I8/O1/O4 (primary)",
+  "I17/O1/O4 (primary)",
+  "I10/O1/O3 (contributing)"
+ ],
+ "CRASH-026": [
+  "I14/O1/O3/O4 (primary)",
+  "I5/O4 (contributing)"
+ ],
+ "CRASH-027": [
+  "I14/O1/O2 (primary)",
+  "I5/O4 (contributing)",
+  "I2/O3 (contributing)"
+ ],
+ "CRASH-030": [
+  "I17/O1/O4 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-031": [
+  "I7/O2/O3/O4 (primary)",
+  "I2/O1/O2 (contributing)"
+ ],
+ "CRASH-032": [
+  "I14/O1/O3 (primary)",
+  "I2/O3/O2 (contributing)",
+  "I5/O4 (contributing)"
+ ],
+ "CRASH-035": [
+  "I10/O3/O1 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-038": [
+  "I20/O1/O3 (primary)",
+  "I5/O3 (contributing)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-040": [
+  "I5/O2/O3 (primary)",
+  "I7/O2/O5 (contributing)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-042": [
+  "I17/O1/O3 (primary)",
+  "I2/O1/O2 (contributing)"
+ ],
+ "CRASH-044": [
+  "I17/O1/O3 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-045": [
+  "I7/O1/O4 (primary)",
+  "I2/O1/O2 (contributing)"
+ ],
+ "CRASH-046": [
+  "I10/O1/O3 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-047": [
+  "I9/O2/O1 (primary)",
+  "I7/O2 (contributing)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-050": [
+  "I5/O2/O1/O3 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-051": [
+  "I14/O1/O2 (primary)",
+  "I2/O1/O3 (contributing)"
+ ],
+ "CRASH-052": [
+  "I14/O1/O3 (primary)",
+  "I2/O1/O3 (contributing)"
+ ],
+ "CRASH-057": [
+  "I5/O2/O3 (primary)",
+  "I2/O2/O4 (contributing)"
+ ],
+ "CRASH-062": [
+  "I5/O3/O2 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-064": [
+  "I2/O1/O4/O2 (primary)",
+  "I17/O4 (contributing)"
+ ],
+ "CRASH-065": [
+  "I18/O2 (primary)",
+  "I7/O2/O4 (contributing)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-067": [
+  "I8/O1/O3 (primary)",
+  "I9/O5 (contributing)",
+  "I10/O2 (contributing)"
+ ],
+ "CRASH-068": [
+  "I2/O1/O2/O4 (primary)"
+ ],
+ "CRASH-069": [
+  "I5/O3/O2 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-070": [
+  "I10/O1/O3 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-072": [
+  "I5/O3/O2 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-074": [
+  "I5/O2/O1 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-075": [
+  "I10/O1/O3 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-078": [
+  "I9/O3/O4 (primary)",
+  "I10/O1 (contributing)",
+  "I14/O3/O4 (contributing)"
+ ],
+ "CRASH-080": [
+  "I5/O4/O1/O3 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-081": [
+  "I10/O1/O3 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-083": [
+  "I10/O3/O1 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-084": [
+  "I5/O3/O2 (primary)",
+  "I12/O2/O1 (contributing)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-086": [
+  "I10/O1/O3 (primary)",
+  "I2/O1/O2 (contributing)"
+ ],
+ "CRASH-092": [
+  "I7/O2 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-099": [
+  "I7/O2/O1 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-100": [
+  "I14/O1/O3 (primary)",
+  "I5/O4 (contributing)",
+  "I2/O3/O2 (contributing)"
+ ],
+ "CRASH-103": [
+  "I5/O1/O3 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-112": [
+  "I5/O3/O2 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-113": [
+  "I5/O3/O2 (primary)",
+  "I2/O2/O1 (contributing)"
+ ],
+ "CRASH-114": [
+  "I5/O3/O2 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-117": [
+  "I10/O1/O3 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-118": [
+  "I5/O2/O3 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-121": [
+  "I5/O3/O2 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-125": [
+  "I5/O2/O1 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-129": [
+  "I12/O1/O2 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-131": [
+  "I7/O1/O4 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-132": [
+  "I5/O3/O1 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-139": [
+  "I14/O1/O3 (primary)",
+  "I5/O4 (contributing)",
+  "I3/O1/O2 (contributing)"
+ ],
+ "CRASH-140": [
+  "I5/O2/O1 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-141": [
+  "I14/O1/O3 (primary)",
+  "I7/O1 (contributing)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-142": [
+  "I5/O2/O3 (primary)",
+  "I2/O1/O2 (contributing)"
+ ],
+ "LOGIC-001": [
+  "I7/O2/O3 (primary)"
+ ],
+ "LOGIC-002": [
+  "I6/O1/O2 (primary)",
+  "I7/O2 (contributing)"
+ ],
+ "LOGIC-004": [
+  "I6/O3/O1/O2 (primary)"
+ ],
+ "LOGIC-006": [
+  "I6/O1/O2 (primary)"
+ ],
+ "LOGIC-009": [
+  "I6/O1/O3 (primary)"
+ ],
+ "LOGIC-010": [
+  "I6/O1 (primary)",
+  "I14/O2/O4 (contributing)"
+ ],
+ "LOGIC-011": [
+  "I7/O2 (primary)",
+  "I6/O3 (contributing)"
+ ],
+ "LOGIC-012": [
+  "I6/O1/O2 (primary)",
+  "I7/O1/O3 (contributing)"
+ ],
+ "LOGIC-015": [
+  "I17/O1/O2 (primary)",
+  "I4/O1/O2 (contributing)"
+ ],
+ "LOGIC-016": [
+  "I17/O2 (primary)",
+  "I6/O2 (contributing)"
+ ],
+ "CRASH-148": [
+  "I14/O3/O4 (primary)",
+  "I9/O3/O4 (contributing)",
+  "I5/O4/O3 (contributing)"
+ ],
+ "LOGIC-019": [
+  "I6/O3/O2/O4 (primary)"
+ ],
+ "LOGIC-021": [
+  "I6/O1 (primary)"
+ ],
+ "CRASH-151": [
+  "I7/O2 (primary)",
+  "I2/O1/O2 (contributing)"
+ ],
+ "CRASH-154": [
+  "I5/O1/O2 (primary)",
+  "I10/O1/O3 (contributing)"
+ ],
+ "CRASH-155": [
+  "I10/O1/O3 (primary)",
+  "I2/O2 (contributing)"
+ ],
+ "CRASH-158": [
+  "I19/O1/O2/O3 (primary)",
+  "I3/O2/O3 (contributing)"
+ ],
+ "CRASH-159": [
+  "I7/O1/O4 (primary)",
+  "I2/O2/O1 (contributing)"
+ ],
+ "CRASH-160": [
+  "I10/O1/O3 (primary)",
+  "I2/O2/O4 (contributing)"
+ ],
+ "CRASH-161": [
+  "I9/O3/O4 (primary)",
+  "I5/O1 (contributing)",
+  "I2/O2 (contributing)"
+ ],
+ "LOGIC-022": [
+  "I16/O1/O2 (primary)",
+  "I6/O1/O4 (contributing)"
+ ],
+ "LOGIC-023": [
+  "I6/O1 (primary)",
+  "I7/O2 (contributing)"
+ ],
+ "LOGIC-024": [
+  "I6/O1/O3 (primary)"
+ ],
+ "LOGIC-025": [
+  "I6/O1/O2 (primary)"
+ ],
+ "LOGIC-026": [
+  "I6/O1/O4 (primary)",
+  "I12/O1/O2 (contributing)"
+ ],
+ "LOGIC-027": [
+  "I6/O1/O3 (primary)",
+  "I12/O1/O2 (contributing)",
+  "I11/O1 (contributing)"
+ ]
+}
