@@ -35,6 +35,16 @@ So, itemised, because a half-true validator is worse than an honest one:
               non-trivial lines survive, normalised, into the row's `c/`
               sources. See `kernel_overlap` -- it is a threshold, not a proof,
               and the measured number is always printed.
+  ✗ NOT CHECKED  ⚠⚠ THAT THE CITED LINES ARE COMPILED. The overlap reads
+              `c/kernel*.{c,h}` and nothing else -- not `main.c`, not the
+              driver loop, not `build.py`. TASK_PHP_005 F-4: a kernel that
+              implements DIVISION, cites MULTIPLICATION and hides the citation
+              behind `#if 0` scored 100 % and was ACCEPTED. `#if 0` and block
+              comments are elided since TASK_PHP_006 (`selftest_overlap`), but
+              an unused `static` function beside the one the driver calls
+              still scores full marks, and `-Wall -Wextra` without `-Werror`
+              does not stop it. **A PASS MEASURES TEXT IN A FILE, NOT CODE IN
+              THE BENCHMARK.**
   ✗ NOT CHECKED  `tier` (`verbatim`/`narrowed`/`modelled`) is a free-text
               declaration. The overlap number is evidence about it and no
               more.
@@ -187,15 +197,128 @@ _KERNEL_GLOBS = ("kernel.c", "kernel.h", "kernel_hardened.c", "kernel_*.c")
 _OVERLAP_FLOOR = {"verbatim": 0.50, "narrowed": 0.25, "modelled": None}
 
 
+def _strip_comments(text):
+    """Translation phase 3: replace every comment with nothing, keeping lines.
+
+    ⚠⚠ THIS IS HALF OF TASK_PHP_005 F-4's REPAIR, AND IT IS THE HALF F-4 DID
+    NOT NAME. `_normalise` used to drop lines that *start with* `/*`, `*` or
+    `//`, which is not the same thing as dropping comments: a citation pasted
+    inside a block comment whose continuation lines do not begin with `*`
+
+        /*
+        result->value.lval = op1->value.lval * op2->value.lval;
+        */
+
+    counted in full, exactly as the `#if 0` block did. Measured at
+    TASK_PHP_006; it is `selftest_overlap`'s case B2.
+
+    String and character literals are tracked so that `"/*"` in a `printf`
+    does not open a comment. Line structure is preserved because the overlap is
+    a line-set comparison.
+    """
+    out = []
+    i, n = 0, len(text)
+    state = None  # None | 'str' | 'chr' | 'block' | 'line'
+    while i < n:
+        c = text[i]
+        nxt = text[i + 1] if i + 1 < n else ""
+        if state is None:
+            if c == "/" and nxt == "*":
+                state, i = "block", i + 2
+                continue
+            if c == "/" and nxt == "/":
+                state, i = "line", i + 2
+                continue
+            if c == '"':
+                state = "str"
+            elif c == "'":
+                state = "chr"
+            out.append(c)
+        elif state in ("str", "chr"):
+            out.append(c)
+            if c == "\\":
+                if nxt:
+                    out.append(nxt)
+                i += 2
+                continue
+            if (state == "str" and c == '"') or (state == "chr" and c == "'"):
+                state = None
+            elif c == "\n":          # unterminated literal; do not swallow the file
+                state = None
+        elif state == "block":
+            if c == "\n":
+                out.append("\n")
+            elif c == "*" and nxt == "/":
+                state, i = None, i + 2
+                continue
+        elif state == "line":
+            if c == "\n":
+                out.append("\n")
+                state = None
+        i += 1
+    return "".join(out)
+
+
+#: A preprocessor conditional whose condition is the literal `0`. ⚠ THAT IS THE
+#: ONLY DEAD ARM THIS MODULE CAN SEE, AND THE LIMIT IS STATED RATHER THAN
+#: PRETENDED AWAY: `#ifdef NEVER_DEFINED`, `#if SOMETHING_FALSE` and a block
+#: excluded by a `-D` on the command line are all still counted. Resolving them
+#: needs a real preprocessor, and `gcc -E` cannot be used here because it
+#: EXPANDS MACROS and would destroy the line-for-line comparison against the raw
+#: tarball excerpt that the whole overlap number is.
+_CPP_RX = re.compile(r"^\s*#\s*(if|ifdef|ifndef|elif|else|endif)\b(.*)$")
+_LITERAL_FALSE = re.compile(r"^\s*0\s*$")
+
+
+def _strip_dead_conditionals(text):
+    """Delete `#if 0` … (`#else` | `#endif`) regions. Comments already gone.
+
+    ⚠⚠ TASK_PHP_005 F-4, THE BLOCKER-SHAPED MAJOR: a kernel that implements
+    DIVISION, cites MULTIPLICATION, and pastes the cited lines behind `#if 0`
+    scored **100 %** and was ACCEPTED, while the same kernel without the dead
+    block was refused at 11 %. `_normalise` dropped lines *starting with* `#`,
+    so `#if 0` and `#endif` vanished and everything between them counted.
+
+    ⚠ `#else` is handled rather than ignored: the other arm of a `#if 0` IS
+    compiled, so skipping it too would make the check refuse honest rows.
+    """
+    out, depth, skip_at = [], 0, None
+    for line in text.splitlines():
+        m = _CPP_RX.match(line)
+        if m:
+            kw, rest = m.group(1), m.group(2)
+            if kw in ("if", "ifdef", "ifndef"):
+                depth += 1
+                if skip_at is None and kw == "if" and _LITERAL_FALSE.match(rest):
+                    skip_at = depth
+            elif kw in ("else", "elif"):
+                if skip_at == depth:
+                    skip_at = None
+            elif kw == "endif":
+                if skip_at == depth:
+                    skip_at = None
+                depth = max(0, depth - 1)
+            out.append("")
+            continue
+        out.append("" if skip_at is not None else line)
+    return "\n".join(out)
+
+
 def _normalise(text):
     """Non-trivial code lines, whitespace-collapsed, for a set comparison.
 
-    Drops blanks, brace-only lines, comment lines and preprocessor lines --
-    `TSRMLS_*` plumbing and `#include`s are exactly what a `verbatim` lift is
-    allowed to remove, so counting them would penalise a correct extraction.
+    Drops comments, `#if 0` regions, blanks, brace-only lines and preprocessor
+    lines -- `TSRMLS_*` plumbing and `#include`s are exactly what a `verbatim`
+    lift is allowed to remove, so counting them would penalise a correct
+    extraction.
+
+    ⚠ THE RESIDUAL, STATED: this measures TEXT IN A FILE. It cannot see
+    `#ifdef NEVER`, an unused `static` function sitting beside the one the
+    driver calls, or a second kernel source the build never compiles. See
+    `kernel_overlap`'s docstring for what a PASS does and does not mean.
     """
     out = set()
-    for raw in text.splitlines():
+    for raw in _strip_dead_conditionals(_strip_comments(text)).splitlines():
         s = " ".join(raw.split())
         if not s or s in ("{", "}", "};", "*/", "/*"):
             continue
@@ -207,9 +330,38 @@ def _normalise(text):
     return out
 
 
+def overlap_of(kernel_text, ex_text):
+    """(fraction, n_excerpt, n_matched) over already-read text, or (None, 0, 0).
+
+    Split out of `kernel_overlap` so `selftest_overlap` can exercise the
+    normaliser with no tarball, no filesystem and no row.
+    """
+    want = _normalise(ex_text)
+    if not want:
+        return None, 0, 0
+    kern = _normalise(kernel_text)
+    hit = len(want & kern)
+    return hit / len(want), len(want), hit
+
+
 def kernel_overlap(pdir, ex_text):
     """(fraction, n_excerpt, n_matched, [files]) or (None, 0, 0, []) if the
-    row ships no kernel source."""
+    row ships no kernel source.
+
+    ⚠⚠ WHAT A PASS MEANS, AND IT IS LESS THAN IT LOOKS. This function reads the
+    row's `c/kernel*.{c,h}` and NOTHING ELSE. It never opens `main.c`, never
+    looks at the driver loop, and never consults `harness/build.py`, so
+    **a pass is not evidence that the cited lines are COMPILED**, let alone
+    that they are what the benchmark measures. A row that keeps the extracted
+    function as an unused `static` beside the simplified one the driver
+    actually calls scores the same as an honest lift -- `build.py` passes
+    `-Wall -Wextra` and not `-Werror`, so `-Wunused-function` does not stop it
+    either. TASK_PHP_005 F-4; `RECAP_PHP.md` open item 14.
+
+    ⚠ What it IS evidence for: that the row's kernel source is not a
+    re-expression wearing a `verbatim` tier. That is worth having, and it is
+    the only claim the number supports.
+    """
     cdir = os.path.join(pdir, "c")
     files = []
     for pat in _KERNEL_GLOBS:
@@ -218,14 +370,158 @@ def kernel_overlap(pdir, ex_text):
                 files.append(p)
     if not files:
         return None, 0, 0, []
-    kern = set()
-    for p in files:
-        kern |= _normalise(open(p, encoding="utf-8", errors="replace").read())
-    want = _normalise(ex_text)
-    if not want:
+    kern_text = "\n".join(
+        open(p, encoding="utf-8", errors="replace").read() for p in files)
+    frac, nwant, nhit = overlap_of(kern_text, ex_text)
+    if frac is None:
         return None, 0, 0, [os.path.basename(f) for f in files]
-    hit = len(want & kern)
-    return hit / len(want), len(want), hit, [os.path.basename(f) for f in files]
+    return frac, nwant, nhit, [os.path.basename(f) for f in files]
+
+
+# ---------------------------------------------------------------------------
+# The regression test for the two dead-code bypasses. TASK_PHP_005 F-4 built
+# cases A/B/C against the live tarball; these are the same cases with the
+# excerpt EMBEDDED, so the self-test runs on a box with no tarball -- which is
+# the box `--no-tarball` exists for, and the box a re-gate has to work on.
+#
+# ⚠⚠ D AND E ARE THE MUST-NOT-FIRE HALF AND THEY ARE THE POINT. Without them a
+# `_normalise` that returned the EMPTY SET would satisfy every "must score
+# under the floor" case and the self-test would go green on a normaliser that
+# had stopped measuring anything. `.tasks/PROTOCOL.md` rule 1: before believing
+# a check, ask what would make it FAIL.
+
+#: `php-5.0.0/Zend/zend_operators.c:821-850` -- `mul_function`, the TYPE axis's
+#: own leading candidate and the call site of the macro `PROTOCOL_PHP.md` §B is
+#: about. Embedded verbatim (tabs included).
+_SELFTEST_EXCERPT = (
+    'ZEND_API int mul_function(zval *result, zval *op1, zval *op2 TSRMLS_DC)\n'
+    '{\n'
+    '\tzval op1_copy, op2_copy;\n'
+    '\t\n'
+    '\tzendi_convert_scalar_to_number(op1, op1_copy, result);\n'
+    '\tzendi_convert_scalar_to_number(op2, op2_copy, result);\n'
+    '\n'
+    '\tif (op1->type == IS_LONG && op2->type == IS_LONG) {\n'
+    '\t\tlong overflow;\n'
+    '\n'
+    '\t\tZEND_SIGNED_MULTIPLY_LONG(op1->value.lval,op2->value.lval, '
+    'result->value.lval,result->value.dval,overflow);\n'
+    '\t\tresult->type = overflow ? IS_DOUBLE : IS_LONG;\t\n'
+    '\t\treturn SUCCESS;\n'
+    '\t}\n'
+    '\tif ((op1->type == IS_DOUBLE && op2->type == IS_LONG)\n'
+    '\t\t|| (op1->type == IS_LONG && op2->type == IS_DOUBLE)) {\n'
+    '\t\tresult->value.dval = (op1->type == IS_LONG ?\n'
+    '\t\t\t\t\t\t (((double) op1->value.lval) * op2->value.dval) :\n'
+    '\t\t\t\t\t\t (op1->value.dval * ((double) op2->value.lval)));\n'
+    '\t\tresult->type = IS_DOUBLE;\n'
+    '\t\treturn SUCCESS;\n'
+    '\t}\n'
+    '\tif (op1->type == IS_DOUBLE && op2->type == IS_DOUBLE) {\n'
+    '\t\tresult->type = IS_DOUBLE;\n'
+    '\t\tresult->value.dval = op1->value.dval * op2->value.dval;\n'
+    '\t\treturn SUCCESS;\n'
+    '\t}\n'
+    '\tzend_error(E_ERROR, "Unsupported operand types");\n'
+    '\treturn FAILURE;\t\t\t\t/* unknown datatype */\n'
+    '}\n')
+
+#: What a row that extracts `mul_function` HAS to change, and every one is
+#: forced rather than stylistic: `ZEND_API`/`TSRMLS_DC` are Zend build plumbing,
+#: `zendi_convert_scalar_to_number` drags in the whole zval conversion tree, and
+#: `zend_error(E_ERROR, …)` is the engine's error path. TASK_PHP_005's clean
+#: negative 7 -- the floor is not too HIGH -- lives or dies on this case.
+_SELFTEST_KERNEL_A = (
+    '#include "kernel.h"\n'
+    '/* Extracted from php-5.0.0 Zend/zend_operators.c:821-850, tier verbatim. */\n'
+    'int mul_function(zval *result, zval *op1, zval *op2)\n'
+    '{\n'
+    '\tif (op1->type == IS_LONG && op2->type == IS_LONG) {\n'
+    '\t\tlong overflow;\n'
+    '\n'
+    '\t\tPHP_SHIM_SIGNED_MULTIPLY_LONG(op1->value.lval,op2->value.lval, '
+    'result->value.lval,result->value.dval,overflow);\n'
+    '\t\tresult->type = overflow ? IS_DOUBLE : IS_LONG;\n'
+    '\t\treturn SUCCESS;\n'
+    '\t}\n'
+    '\tif ((op1->type == IS_DOUBLE && op2->type == IS_LONG)\n'
+    '\t\t|| (op1->type == IS_LONG && op2->type == IS_DOUBLE)) {\n'
+    '\t\tresult->value.dval = (op1->type == IS_LONG ?\n'
+    '\t\t\t\t\t\t (((double) op1->value.lval) * op2->value.dval) :\n'
+    '\t\t\t\t\t\t (op1->value.dval * ((double) op2->value.lval)));\n'
+    '\t\tresult->type = IS_DOUBLE;\n'
+    '\t\treturn SUCCESS;\n'
+    '\t}\n'
+    '\tif (op1->type == IS_DOUBLE && op2->type == IS_DOUBLE) {\n'
+    '\t\tresult->type = IS_DOUBLE;\n'
+    '\t\tresult->value.dval = op1->value.dval * op2->value.dval;\n'
+    '\t\treturn SUCCESS;\n'
+    '\t}\n'
+    '\treturn FAILURE;\t\t\t\t/* unknown datatype */\n'
+    '}\n')
+
+#: The WRONG kernel: it divides. Everything after it is the payload.
+_SELFTEST_WRONG = (
+    '#include "kernel.h"\n'
+    '/* This kernel implements DIVISION. It cites multiplication. */\n'
+    'int div_kernel(zval *result, zval *op1, zval *op2)\n'
+    '{\n'
+    '\tresult->value.dval = op1->value.dval / op2->value.dval;\n'
+    '\tresult->type = IS_DOUBLE;\n'
+    '\treturn SUCCESS;\n'
+    '}\n')
+
+_FLOOR = 0.50   # `_OVERLAP_FLOOR["verbatim"]`, spelled out so a floor change
+                # cannot silently retune the regression test.
+
+OVERLAP_CASES = [
+    ("A verbatim lift, plausible", _SELFTEST_KERNEL_A, _FLOOR, 1.01,
+     "TASK_PHP_005 clean negative 7: the floor must NOT be too high. If this "
+     "drops under the floor, a correct `verbatim` row is being refused."),
+    ("B wrong kernel + `#if 0`", _SELFTEST_WRONG
+     + "\n#if 0   /* never compiled */\n" + _SELFTEST_EXCERPT + "\n#endif\n",
+     0.0, _FLOOR,
+     "TASK_PHP_005 F-4: this scored 100% and was ACCEPTED."),
+    ("B2 wrong kernel + block comment", _SELFTEST_WRONG
+     + "\n/*\n" + _SELFTEST_EXCERPT + "\n*/\n", 0.0, _FLOOR,
+     "TASK_PHP_006: the same bypass spelled with a comment whose continuation "
+     "lines do not start with `*`."),
+    ("B3 wrong kernel + nested `#if 0`", _SELFTEST_WRONG
+     + "\n#if 0\n#if 1\n" + _SELFTEST_EXCERPT + "\n#endif\n#endif\n",
+     0.0, _FLOOR,
+     "a nested LIVE conditional inside a dead one is still dead."),
+    ("C control: wrong kernel, no dead code", _SELFTEST_WRONG, 0.0, _FLOOR,
+     "the must-fire control. If this passes the floor, the floor measures "
+     "nothing and B/B2/B3 prove nothing."),
+    ("D the excerpt itself", _SELFTEST_EXCERPT, 0.99, 1.01,
+     "⚠ THE MUST-NOT-FIRE. A `_normalise` that returned the empty set would "
+     "satisfy B, B2, B3 and C vacuously. This is what stops the self-test "
+     "going green on a normaliser that stopped measuring."),
+    ("E `#if 0` / `#else` -- the LIVE arm", _SELFTEST_WRONG
+     + "\n#if 0\nint dead(void){return 0;}\n#else\n" + _SELFTEST_EXCERPT
+     + "\n#endif\n", 0.99, 1.01,
+     "⚠ the second must-not-fire: the other arm of a `#if 0` IS compiled, so "
+     "stripping it too would refuse honest rows."),
+]
+
+
+def selftest_overlap():
+    """Run `OVERLAP_CASES`. Returns a list of failure strings; empty is pass.
+
+    ⚠ No tarball, no filesystem, no compiler -- pure string work, ~1 ms, which
+    is why `harness-php/gate.py`'s preflight runs it on every invocation.
+    """
+    bad = []
+    for name, kernel, lo, hi, why in OVERLAP_CASES:
+        frac, nwant, nhit = overlap_of(kernel, _SELFTEST_EXCERPT)
+        if frac is None:
+            bad.append(f"{name}: the excerpt normalised to NOTHING -- "
+                       f"`_normalise` is broken, not the case. {why}")
+            continue
+        if not (lo <= frac < hi):
+            bad.append(f"{name}: overlap {frac:.0%} ({nhit}/{nwant}), wanted "
+                       f"{lo:.0%} <= x < {hi:.0%}. {why}")
+    return bad
 
 
 def manifest_map():
@@ -349,6 +645,10 @@ def check_row(pdir, tarball, use_tarball=True, show=False):
                 + (f"  floor {floor:.0%} for tier={prov['tier']}"
                    if floor is not None
                    else f"  (tier={prov['tier']}: reported, no floor)"))
+    msgs.append(f"{row}: ⚠ the overlap measures TEXT IN {', '.join(kfiles)}, "
+                f"not code in the benchmark -- it never reads main.c, the "
+                f"driver loop or the build, so a PASS is not evidence that the "
+                f"cited lines are COMPILED (TASK_PHP_005 F-4).")
     if floor is not None and frac < floor:
         return False, msgs + [
             f"{row}: KERNEL DOES NOT MATCH THE CITATION. Only {frac:.0%} of "
@@ -359,7 +659,11 @@ def check_row(pdir, tarball, use_tarball=True, show=False):
             f"(`modelled` has no floor and is the honest answer for a "
             f"re-expressed mechanism). ⚠ This is a HEURISTIC line-overlap "
             f"threshold, not a proof: say so in the row's NOTES.md if you "
-            f"believe it is a false alarm."]
+            f"believe it is a false alarm.\n"
+            f"       ⚠ And the converse is the bigger risk: a PASS is not "
+            f"evidence that the cited lines are compiled -- this check reads "
+            f"{', '.join(kfiles)} and never main.c, the driver loop or the "
+            f"build (TASK_PHP_005 F-4)."]
     return True, msgs
 
 
@@ -371,8 +675,24 @@ def main():
     ap.add_argument("--show", action="store_true", help="print the excerpt")
     ap.add_argument("--no-tarball", action="store_true",
                     help="manifest-only; does NOT verify extract_sha256")
+    ap.add_argument("--selftest", action="store_true",
+                    help="run the kernel-overlap regression cases and stop "
+                         "(no tarball, no row needed)")
     ap.add_argument("--tarball", default=DEFAULT_TARBALL)
     a = ap.parse_args()
+
+    if a.selftest:
+        bad = selftest_overlap()
+        for name, kernel, lo, hi, _why in OVERLAP_CASES:
+            frac, nwant, nhit = overlap_of(kernel, _SELFTEST_EXCERPT)
+            mark = "FAIL" if any(b.startswith(name) for b in bad) else "ok  "
+            got = "n/a" if frac is None else f"{frac:.0%}"
+            print(f"  {mark}  {name:38s} overlap {got:>4s} "
+                  f"({nhit}/{nwant})  want {lo:.0%} <= x < {hi:.0%}")
+        for b in bad:
+            print(f"  BAD  {b}")
+        print(f"\n{len(OVERLAP_CASES)} overlap case(s), {len(bad)} FAILED")
+        return 1 if bad else 0
 
     if a.all:
         dirs = sorted(d for d in glob.glob(os.path.join(PATTERNS, "ph*"))

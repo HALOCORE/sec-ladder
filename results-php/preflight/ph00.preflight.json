@@ -1,0 +1,220 @@
+{
+  "row": "ph00",
+  "runs": [
+    {
+      "row": "ph00",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "digest_bridge_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [],
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph00-smoke: NOT A PHP ROW -- php_provenance=false. why: THROWAWAY INFRASTRUCTURE SMOKE ROW -- NOT A PHP ROW. No PHP source, no root_cause_id, no C",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "harness_php_sha256": {
+        "gate.py": "2f0920abe15baa3bbfcd1c8aa31187eb884406023e6d4818d070624e95b3766f",
+        "provenance.py": "967614c2e5353aff2699b5539dd69b4a826960d6b52aea83e222eb04d0ac9b39",
+        "root.py": "7c2a74412773cb1f601ef87fcec31bac041568f393d17814f0be7c0af3d1a020"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph00",
+        "--preflight"
+      ],
+      "tool_argv": [
+        "ph00",
+        "--preflight"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 2,
+      "_schema": "pre-TASK_PHP_006 single-record file, migrated"
+    },
+    {
+      "row": "ph00",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_subdir_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph00-smoke: NOT A PHP ROW -- php_provenance=false. why: THROWAWAY INFRASTRUCTURE SMOKE ROW -- NOT A PHP ROW. No PHP source, no root_cause_id, no C",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "uncertified_records": [],
+      "harness_php_sha256": {
+        "gate.py": "3d23c4db3ac826234a4c2b175e6cb20bfe11144ecbb9bb9ace0761474613eafb",
+        "provenance.py": "b541ce18aa1950b83f0fecafbc5ed6d16b456072f5249899320638bda7194b6e",
+        "root.py": "7c2a74412773cb1f601ef87fcec31bac041568f393d17814f0be7c0af3d1a020"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "--preflight",
+        "ph00"
+      ],
+      "tool_argv": [
+        "ph00"
+      ],
+      "verdict": "preflight only"
+    },
+    {
+      "row": "ph00",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": false,
+      "c_subdir_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph00-smoke: NOT A PHP ROW -- php_provenance=false. why: THROWAWAY INFRASTRUCTURE SMOKE ROW -- NOT A PHP ROW. No PHP source, no root_cause_id, no C",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        }
+      },
+      "uncertified_records": [],
+      "harness_php_sha256": {
+        "gate.py": "f50ad092636c5e439db48f16cad7dd6142979a9cdb8e439cd5005e8579c3b3a3",
+        "provenance.py": "b541ce18aa1950b83f0fecafbc5ed6d16b456072f5249899320638bda7194b6e",
+        "root.py": "c5df5c135f3ea080d2b151f7a1dbdcdb4b0372bd06ef8697287de201e131d474"
+      },
+      "problems": [
+        "digest bridge:\n  BAD  MOVED: emalloc_shim.c c9636c1e9dc2 -> 3dd92f81ad1c. Run --regen, and say so in the row's NOTES.md.\n  BAD  MOVED: emalloc_shim.h 59b146689d42 -> aa9abf48535e. Run --regen, and say so in the row's NOTES.md.\ndigest bridge: 2 problem(s)\n"
+      ],
+      "tool": "check",
+      "gate_argv": [
+        "--preflight",
+        "ph00"
+      ],
+      "tool_argv": [
+        "ph00"
+      ],
+      "verdict": "PREFLIGHT FAILED"
+    },
+    {
+      "row": "ph00",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_subdir_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph00-smoke: NOT A PHP ROW -- php_provenance=false. why: THROWAWAY INFRASTRUCTURE SMOKE ROW -- NOT A PHP ROW. No PHP source, no root_cause_id, no C",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        }
+      },
+      "uncertified_records": [],
+      "harness_php_sha256": {
+        "gate.py": "439e7f8efe5ca6e94c59bf62f8bd99e0d8f74af0fd182ab881ba009ea4e1b3ac",
+        "provenance.py": "b541ce18aa1950b83f0fecafbc5ed6d16b456072f5249899320638bda7194b6e",
+        "root.py": "c5df5c135f3ea080d2b151f7a1dbdcdb4b0372bd06ef8697287de201e131d474"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "--preflight",
+        "ph00"
+      ],
+      "tool_argv": [
+        "ph00"
+      ],
+      "verdict": "preflight only"
+    },
+    {
+      "row": "ph00",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_subdir_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph00-smoke: NOT A PHP ROW -- php_provenance=false. why: THROWAWAY INFRASTRUCTURE SMOKE ROW -- NOT A PHP ROW. No PHP source, no root_cause_id, no C",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        }
+      },
+      "uncertified_records": [],
+      "harness_php_sha256": {
+        "gate.py": "0e16876f96e84e28e6609c0197aa7ddcf7517aba08b3d74e23e0d26627a93df4",
+        "provenance.py": "b541ce18aa1950b83f0fecafbc5ed6d16b456072f5249899320638bda7194b6e",
+        "root.py": "c5df5c135f3ea080d2b151f7a1dbdcdb4b0372bd06ef8697287de201e131d474"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph00"
+      ],
+      "tool_argv": [
+        "ph00"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    }
+  ]
+}

@@ -458,15 +458,66 @@ static inline void php_shim_efree(void *ptr)
  * invented-defect failure mode, inside the file written to prevent it.
  * MEASURED: 84,523 disagreements in 20 M samples, 100 % in that direction
  * (TASK_PHP_003; reproduced exactly at TASK_PHP_004,
- * `.temp/php4/mul_probe.c`, which now reports 0 for this spelling on
- * gcc/clang x O0/O3 x {-DSLB_ISOLATED,-flto} and keeps firing on the
- * `__builtin_mul_overflow` control).
+ * `.temp/php4/mul_probe.c`).
  *
- * ⚠ OPERAND TYPE IS PART OF THE PREDICATE. `_safe_emalloc` (:234) invokes the
- * macro on `nmemb` and `size`, which are `size_t`, so `(a)*(b)` is a WRAPPING
- * unsigned 64-bit multiply narrowed to `long`, not a signed overflow. Passing
- * `long` here would be undefined behaviour at exactly the inputs the row is
- * about. Do not "simplify" the parameter types.
+ * ⚠⚠ THE CONFIGURATION CLAIM, RESTATED AS WHAT WAS RUN. This paragraph used to
+ * say the probe "reports 0 for this spelling on gcc/clang x O0/O3 x
+ * {-DSLB_ISOLATED,-flto}". That Cartesian notation names EIGHT cells and
+ * TASK_PHP_004 ran FIVE of them -- `TASK_PHP_005` F-3, and the sharp part is
+ * that this sentence is DIGEST-PINNED into every php gate record, so an
+ * overclaim here is an overclaim in the record. Itemised:
+ *
+ *   TASK_PHP_004, `.temp/php4/mul_probe.sh`, 20 M samples each, 0 disagreements,
+ *   control (`__builtin_mul_overflow`) firing at 84,523 in every cell:
+ *       gcc   -O0 -DSLB_ISOLATED      gcc   -O3 -DSLB_ISOLATED
+ *       clang -O0 -DSLB_ISOLATED      clang -O3 -DSLB_ISOLATED
+ *       gcc   -O3 -flto
+ *   ... plus three cells `harness/build.py` never uses, run to bound the claim:
+ *       gcc -O3 -march=native, gcc -O3 -ffast-math, gcc -O3 -mfpmath=387.
+ *   Attempted and FAILED TO LINK: clang -O3 -flto.
+ *   Never in the script at all: gcc -O0 -flto, clang -O0 -flto.
+ *
+ *   TASK_PHP_005 `.temp/php5/mul_probe_missing.sh` ran the three missing cells
+ *   with the same probe; TASK_PHP_006 re-ran them (`.temp/php6/11-mul-missing-RERUN.log`)
+ *   and got byte-identical output:
+ *       gcc -O0 -flto | clang -O0 -flto | clang -O3 -flto -fuse-ld=lld
+ *       -> 20,000,000 agree, 0 disagreements, control 84,523 FIRED, all three.
+ *
+ * ✅ SO THE EIGHT-CELL CLAIM IS NOW TRUE, AND IT IS TRUE BECAUSE THE CELLS WERE
+ * RUN AND NOT BECAUSE THE NOTATION WAS TIDY.
+ *
+ * ⚠⚠ AND THE STATED LIMITATION DOES NOT EXIST. `TASK_PHP_004_REPORT.md`
+ * Problem 1 disclosed *"`clang -O3 -flto` cannot link on this box"* (`ld` cannot
+ * load `LLVMgold.so`). It links with `-fuse-ld=lld` -- which is the flag
+ * `harness/build.py:168-171` INSERTS for every clang whole-mode cell, so the
+ * probe was the only thing on this box missing it. Re-measured at TASK_PHP_006:
+ * without the flag `error loading plugin: .../LLVMgold.so`, with it `LINKED ok`.
+ * `.tasks/PROTOCOL.md` rule 13's shape -- a published limitation that is not
+ * real is as damaging as a published result that is not, because a reader
+ * treats a stated limitation as measured.
+ *
+ * ⚠ OPERAND TYPE IS PART OF THE PREDICATE, AND THE TWO CALL SITES DISAGREE.
+ * There are exactly two in pristine 5.0.0 (`grep -rn ZEND_SIGNED_MULTIPLY_LONG`):
+ *
+ *   `zend_alloc.c:234`, `_safe_emalloc` -- `nmemb` and `size` are `size_t`, so
+ *      `(a)*(b)` is a WRAPPING unsigned 64-bit multiply narrowed to `long`.
+ *   `zend_operators.c:831`, `mul_function` -- `op1->value.lval` and
+ *      `op2->value.lval` are `long`, so `(a)*(b)` is SIGNED overflow, which is
+ *      undefined behaviour.
+ *
+ * ⚠⚠ THIS NOTE USED TO END *"Do not 'simplify' the parameter types"*, which
+ * forbade the second call site. THAT UB IS PHP'S, not this file's, and
+ * `mul_function` is the TYPE axis's own leading candidate: a faithful row MUST
+ * pass `long` (`TASK_PHP_005` §2.4). The macro is parameterised and takes
+ * whatever it is given, exactly as the original does. What the note should say
+ * is: KNOW WHICH CALL SITE YOU ARE MODELLING and say so in the row's `spec.md`,
+ * because the two have different C semantics for the same source text.
+ * ⚠ Measured on this box: 10 M signed samples spanning `LONG_MIN`, `-1` and
+ * both zero crossings, plus 20 M straddling `LONG_MAX`, give 0 shim-vs-pristine
+ * disagreements with the control firing, and the pristine macro's whole output
+ * stream hashes to `0e813d9ad6308e5a` on six configurations including `-fwrapv`
+ * and `-fno-strict-overflow` (`TASK_PHP_005` §2). So the UB does not bite here
+ * TODAY; that is an observation about this compiler, not a guarantee.
  */
 #define PHP_SHIM_SIGNED_MULTIPLY_LONG(a, b, lval, dval, usedval) do {         \
     long   __lres  = (a) * (b);                                               \

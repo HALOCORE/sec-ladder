@@ -221,25 +221,56 @@ _MODULES = ["build.py", "check.py", "measure.py", "report.py",
 #: "gate")` are SECOND-level and are already covered by the `common` and
 #: `results` links -- an earlier spelling of this sweep matched them too and
 #: printed four false gaps (`driver.c`, `gate`, `tables`, `p*.json`).
-_JOIN_REPO = re.compile(r'os\.path\.join\(\s*REPO\s*,\s*"([^"]+)"')
+#:
+#: ⚠⚠ THE QUOTE CLASS IS THE FIX FOR TASK_PHP_005 F-10, AND THERE IS A LIVE
+#: INSTANCE. These patterns required DOUBLE quotes, so a single-quoted or
+#: prefixed literal was invisible: `harness/limbs.py:66` is
+#: `sys.path.insert(0, os.path.join(REPO, 'harness'))` -- benign only because
+#: `harness` is already linked for other reasons. One `'` in a future harness
+#: edit and the sweep went quiet on a genuinely missing link, which is exactly
+#: the silent-skip class this project keeps paying for. `harness/` is frozen and
+#: cannot be respelled, so the SWEEP learns both spellings instead.
+_QUOTED = r"""(?:[rRfFbBuU]{0,2})(['"])([^'"]+)\1"""
+_JOIN_REPO = re.compile(r'os\.path\.join\(\s*REPO\s*,\s*' + _QUOTED)
 #: The same root, spelled inline off `__file__` instead of via `REPO` --
 #: `asm.py:822` and `dloop.py:744` both do this and neither defines `REPO`.
-_JOIN_FILE = re.compile(r'os\.path\.abspath\(__file__\)\)\)\s*,\s*\n?\s*"([^"]+)"')
+_JOIN_FILE = re.compile(r'os\.path\.abspath\(__file__\)\)\)\s*,\s*\n?\s*' + _QUOTED)
+#: ⚠ `os.path.join(REPO, <not a literal>)` -- a component the sweep CANNOT
+#: derive, because it is computed at run time. TASK_PHP_005 F-10 counted five,
+#: all of them `source_sha256` keys built from a variable and all covered today.
+#: They are REPORTED rather than silently skipped: a reader of `--sweep` should
+#: be able to see what the sweep could not answer, not just what it could.
+#: The third spelling: an f-string that interpolates `REPO` directly rather
+#: than calling `os.path.join`. No harness module uses it today; it is here
+#: because TASK_PHP_005 F-10's planted `corpus_c` proved the sweep could not see
+#: it, and a sweep whose job is to age with the harness must not be blind to a
+#: spelling a future edit is free to use.
+_FSTRING_REPO = re.compile(r'''f(['"])\{REPO\}/([^'"/{}]+)''')
+#: ⚠ `(?=\S)` is load-bearing: without it `\s*` backtracks to zero width, the
+#: negative lookahead is evaluated at a SPACE and succeeds, and every literal
+#: site is reported as dynamic. Measured while writing this -- 54 false
+#: "DYNAMIC" lines on the first spelling.
+_JOIN_DYNAMIC = re.compile(
+    r'os\.path\.join\(\s*REPO\s*,\s*(?=\S)(?![rRfFbBuU]{0,2}["\'])([^),]+)')
 
 
 def sweep():
     """Print every first path component the harness builds off its repo root."""
     hits = {}
+    dynamic = []
     for m in _MODULES:
         p = os.path.join(REPO, "harness", m)
         if not os.path.exists(p):
             continue
         txt = open(p, encoding="utf-8").read()
-        for rx in (_JOIN_REPO, _JOIN_FILE):
+        for rx in (_JOIN_REPO, _JOIN_FILE, _FSTRING_REPO):
             for mo in rx.finditer(txt):
-                comp = mo.group(1)
+                comp = mo.group(2)
                 ln = txt.count("\n", 0, mo.start()) + 1
                 hits.setdefault(comp, []).append(f"{m}:{ln}")
+        for mo in _JOIN_DYNAMIC.finditer(txt):
+            ln = txt.count("\n", 0, mo.start()) + 1
+            dynamic.append((f"{m}:{ln}", mo.group(1).strip()))
     # Also the module-level constants, which the regex above sees only at
     # their use sites.
     for m in _MODULES:
@@ -247,9 +278,9 @@ def sweep():
         if not os.path.exists(p):
             continue
         for i, line in enumerate(open(p, encoding="utf-8"), 1):
-            mo = re.search(r'=\s*os\.path\.join\(REPO,\s*"([^"]+)"', line)
+            mo = re.search(r'=\s*os\.path\.join\(REPO,\s*' + _QUOTED, line)
             if mo:
-                hits.setdefault(mo.group(1), []).append(f"{m}:{i}")
+                hits.setdefault(mo.group(2), []).append(f"{m}:{i}")
 
     # ⚠⚠ THERE WAS A SECOND ARM HERE AND IT MADE THE SWEEP A TAUTOLOGY FOR
     # FOUR OF THE SEVEN LINKS. It read
@@ -279,6 +310,14 @@ def sweep():
         else:
             print(f"  ⚠ GAP    {comp:16s} {where}")
             rc = 1
+    if dynamic:
+        print(f"\n  ⚠ {len(dynamic)} `os.path.join(REPO, <computed>)` site(s) "
+              f"this sweep CANNOT derive a component for:")
+        for where, expr in sorted(set(dynamic)):
+            print(f"    ? DYNAMIC  {expr[:44]:44s} {where}")
+        print("    (the component is a run-time value -- typically a "
+              "`source_sha256` key. All covered today; listed so the sweep's "
+              "residual is visible instead of silent. TASK_PHP_005 F-10.)")
     print()
     if rc:
         print("A GAP means the harness builds a repo-root-relative path the "

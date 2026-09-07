@@ -154,16 +154,70 @@ allocator its numbers were taken with.
 `TASK_PHP_003` B1 built a row that links the allocator and omits the symlink:
 it **builds** (via `-I common-php`) and the allocator lands in **neither**
 digest, so a later shim fix would leave that row's `Ir` numbers `FRESH` for
-ever under an allocator that no longer exists. ✅ **Closed at `TASK_PHP_004`:
-`harness-php/gate.py::shim_link_audit` runs in the preflight, before every
-tool, over every row — if any `<row>/c/` source mentions `emalloc_shim.h` and
-`<row>/c/emalloc_shim.h` is absent, is a REGULAR FILE, or resolves anywhere
-but `common-php/emalloc_shim.h`, the preflight fails with exit 2 and the tool
-is not run.** Its must-fire negatives are `.temp/php4/b1_symlink_test.py`
-(three refused fixtures, three accepted, plus a planted row under
-`patterns-php/`). ⚠ **A word in a document is not an enforcement mechanism** —
-that is the durable lesson, and it applies to every other "mandatory" in this
-file.
+ever under an allocator that no longer exists. Enforced at `TASK_PHP_004` by
+`harness-php/gate.py::shim_link_audit`, which runs in the preflight before
+every tool over every row and exits 2 without running the tool.
+
+⚠⚠⚠ **AND THAT ENFORCEMENT WAS A STRING SEARCH, AND A GUARD THAT IS A STRING
+SEARCH IS A GUARD WITH A SPELLING. `TASK_PHP_005` F-1 GOT PAST IT TWICE.** Both
+constructed rows compiled, linked and ran a live allocator
+(`alloc tally = 7688571`) into **neither digest** with the preflight green:
+
+1. `#include "emalloc_shim.c"` — the audit knew only the `.h`, and the `.c` is
+   two lines that include it, sitting on `-I common-php`. ⚠ **The audit did not
+   cover this spelling because `emalloc_shim.c`'s own header comment said it
+   *"IS NOT ON THE PATTERN BUILD PATH AND CANNOT BE"* — true of `build.py`'s TU
+   list, FALSE of the preprocessor.** Comment corrected at `TASK_PHP_006`.
+2. `c/<subdir>/*.h` — `glob(cdir + "/*")` is not recursive.
+
+✅ **Closed at `TASK_PHP_006` by CHANGING THE QUESTION.** The detector is now
+`gate.py::_tu_closure`: `gcc -MM` over `build.py`'s own TU list
+(`common/driver.c` + every `<row>/c/*.c`) under both `-DSLB_ISOLATED` and
+without it, and a row is a shim user iff some TU's `#include` closure contains
+`common-php/emalloc_shim.{h,c}` by `realpath`. **It has no spelling**: it asks
+the preprocessor the question the digests care about. ⚠ Price, measured:
+**2 `gcc -MM` calls and ~115 ms per row** (`.temp/php6/03-mm-price-batched.log`).
+⚠ If a row does not preprocess, the audit falls back to a text detector that
+requires the name inside an `#include` **and says so in the notes** — a
+failure to preprocess is never read as "no allocator".
+
+✅ **And the same change closed a FALSE POSITIVE** (`TASK_PHP_005` F-8): the old
+detector refused a row whose only mention was the comment §4.3 of `PLAN_PHP.md`
+and `emalloc_shim.h:6-9` **tell a non-allocating row to write**, asserting an
+`include` that did not exist and offering to symlink an allocator the row never
+uses. All eight of `TASK_PHP_005`'s fixture rows now land correctly:
+`.temp/php6/04-b1-AFTER.log`.
+
+⚠ **A word in a document is not an enforcement mechanism** — that is the
+durable lesson, and it applies to every other "mandatory" in this file. ⚠⚠ **And
+the second lesson, from F-1: a MECHANISM IS ONLY AS GOOD AS THE QUESTION IT
+ASKS. The string search was a real mechanism, ran on every invocation, had
+must-fire negatives, and was still bypassable in two lines, because it asked
+*"does this text appear"* where the digest cares about *"does this file reach a
+compiled translation unit"*.**
+
+### B3. ⚠⚠ NO `patterns-php/<row>/c/<subdir>/` — the layout is FORBIDDEN
+
+`harness/check.py:10314` and `harness/measure.py:226` glob `<row>/c/*`
+**non-recursively** and drop the directory entry with `os.path.isfile`, so **any
+source in a `c/` subdirectory is compiled and in NO digest at all** — not the
+gate one, not the measurement one, and not `check.py`'s `--no-build` staleness
+scan, so editing one does not even mark a binary stale. Fixing the glob is a
+`harness/` edit and costs a 33-pattern re-gate for zero present benefit
+(`find patterns patterns-php -mindepth 3 -maxdepth 3 -type d -path '*/c/*'` is
+empty). **Decision: forbid the layout on the php side instead**
+(`RECAP_PHP.md` open item 17), enforced by `gate.py::c_subdir_audit` since
+`TASK_PHP_006`.
+
+⚠ **This is a real cost and it is priced, not waved away.** php rows are
+*extracted* C and `c/zend/` is an ordinary thing to want. The refusal message
+gives three ways out — **flatten** the name (`c/zend__zend_hash.h`, one
+deletion-ledger line, and the expected answer); a **flat symlink** beside the
+subdirectory file, ✅ measured at `TASK_PHP_006` to land the real bytes in both
+digests (`.temp/php6/05-b1-rerun.log` §C) but deliberately **not** enabled,
+because nothing would force the *next* file into the same discipline; or
+**pay the re-gate**. ⚠⚠ **If a row genuinely needs the directory, say so with
+the row — the trade is a decision, not a law of nature.**
 
 ---
 
@@ -204,6 +258,24 @@ python3 harness-php/provenance.py <row> --no-tarball   # PARTIAL: skips the exce
   the measured number is always printed. `tier`, `deletions`, `cwe`,
   `fix_commit`, `invariant`, `obligation` and `echoes` remain **unvalidated
   declarations**; `provenance.py`'s own docstring itemises checked vs not.
+  ⚠⚠ **AND THE RISK IS A FALSE PASS, NOT A FALSE REFUSAL — THIS BULLET HAD IT
+  THE WRONG WAY ROUND.** `TASK_PHP_005` F-4: a kernel that implements
+  **division**, cites **multiplication**, and hides the citation behind `#if 0`
+  scored **100 % and was ACCEPTED**, because the normaliser dropped lines
+  *starting with* `#` and so deleted the `#if 0` and `#endif` while keeping
+  everything between them. The same kernel without the dead block was refused at
+  11 %, so the floor works and it was the *normaliser* that did not.
+  ✅ Fixed at `TASK_PHP_006` (`#if 0` regions and block comments are elided,
+  `#else` arms are kept), and the regression cases live in
+  `provenance.py::OVERLAP_CASES` — **run on every preflight**, seven of them,
+  including two must-NOT-fire cases so that a normaliser which stopped
+  measuring anything could not pass. `python3 harness-php/provenance.py --selftest`.
+  ⚠⚠⚠ **AND EVEN GREEN, A PASS IS NOT EVIDENCE THAT THE CITED LINES ARE
+  COMPILED.** The check reads `c/kernel*.{c,h}` and never `main.c`, the driver
+  loop or `build.py`, so an unused `static` function beside the one the driver
+  actually calls scores full marks (`-Wall -Wextra` without `-Werror` does not
+  stop it). **It measures text in a file, not code in the benchmark**, and it
+  now says so itself in every message it prints.
 - ⚠ **An out-of-range span used to PASS.** `sed` prints nothing past EOF and
   the caller compared `sha256(b"")`, so a transposed line number verified
   green and printed `0 bytes`. Rejected since `TASK_PHP_004`, along with a span
@@ -242,7 +314,23 @@ python3 harness-php/provenance.py <row> --no-tarball   # PARTIAL: skips the exce
 
 **Never run `harness/check.py` directly on a php row.** Everything goes
 through the driver, which builds the shim, verifies the digest bridge and
-checks provenance first:
+checks provenance first.
+
+⚠⚠ **AND THAT SENTENCE IS A CONVENTION, NOT A MECHANISM — SAID PLAINLY HERE
+BECAUSE A HALF-TRUE CLAIM IS WORSE THAN NONE** (`TASK_PHP_005` §1, landed
+`TASK_PHP_006` §1.3). What is and is not enforced:
+
+| | |
+|---|---|
+| ✅ **enforced** | every check in `gate.py`'s preflight — the shim, the digest bridge, the `c/` subdirectory ban, the allocator closure, the overlap self-test, the manifest, provenance. All exit 2 and do not run the tool. |
+| ✅ **recorded** | `results-php/preflight/<row>.preflight.json`, **committed** since `TASK_PHP_006`, one entry per run, appended and never overwritten. It carries `harness_php_sha256`, the manifest hash, and whether `--no-provenance` was used. |
+| ✅ **detected** | a php record with **no** preflight record beside it — `gate.py --audit` exits 1, and every preflight prints it as a loud note. |
+| ❌ **NOT enforced** | **that the wrapper ran at all.** `grep -c preflight harness/{check,measure,report}.py` → `0 0 0`; a gate record's `invocation` is `check.py`'s own argv and is **byte-identical** whether the run came through `gate.py` or straight out of the shim, which `PLAN_PHP.md` §2.1a documents as a supported spelling. Closing it needs `check.py` to know about `harness-php/`, i.e. a `harness/` edit and a 33-pattern re-gate. |
+| ❌ **NOT a pin** | nothing hashes the preflight record. It can prove `--no-provenance` **was** used; it cannot prove it was not. |
+
+⚠ **So the honest reading of a green php gate record is: *the tree passed the
+PAT gate*. The preflight record beside it is EVIDENCE that the php-specific
+checks also passed, and its absence is evidence they did not run.**
 
 ⚠⚠ **A BRAND-NEW ROW COSTS SIX COMMANDS (~28 min), NOT THREE, AND THE ORDER IS
 LOAD-BEARING. MEASURED AT `TASK_PHP_002` — `ph00-smoke` needed all six:**
@@ -299,10 +387,42 @@ is disclosed in its `NOTES.md` rather than quietly replaced.
 ⚠⚠ **AND `idiom.why` HAS A MANDATORY 11,003-BYTE TAIL.**
 `[idiom-named-spelling]` hard-fails any `why` that does not end with the
 shared named-spelling paragraph, byte-identical across every `spec.md`
-(sha256 `59748cce2db5…`). **`RECAP_PHP.md`'s *"a `spec.md` `why` stays ≤ 200
-words"* can therefore only mean 200 words of ROW-SPECIFIC prose before that
-paragraph** — p01's row-specific half is 201 words and 1,177 chars, so p01
-already complies with the rule the size note was written against it for.
+(sha256 `59748cce2db5…`).
+
+⚠⚠⚠ **THERE IS NO SIZE RULE ON `why`, AND THAT IS NOW A MEASURED CONCLUSION
+RATHER THAN AN OMISSION.** This paragraph used to read *"`RECAP_PHP.md`'s 'a
+`spec.md` `why` stays ≤ 200 words' can therefore only mean 200 words of
+ROW-SPECIFIC prose before that paragraph — p01's row-specific half is 201 words
+… so p01 already complies"*. ⚠ **p01 is 201 against a limit of 200: the sentence
+said the template complies while its own number says it does not.** That was the
+third version of the rule and the second that could not be met
+(`RECAP_PHP.md` open item 19). `TASK_PHP_006` measured the corpus and proposes
+**(c) no rule** — see `harness-php/gate.py::why_sizes`, which carries the
+argument and the numbers:
+
+- a **word limit** is out: over the 33 built PAT rows, min 197, median 989,
+  p90 1817, **max 3140**, quartiles 527 / 989 / 1544. Anything at or below the
+  upper quartile refuses a quarter of the built corpus; anything the corpus
+  meets permits ~3× the median. And imposing one on PAT means editing text
+  **inside the hashed block** on 33 rows — 33 `contract_sha256` moves.
+- a **paragraph rule** is out: ⚠ **0 of 34 `why` strings contain a single
+  newline**, so none of them has a second paragraph to be "unbounded
+  thereafter", and giving them one is the same 33 re-gates.
+- a **first-sentence rule** is satisfiable (median 26 words, max 80) and
+  **vacuous**: there are only **14 distinct openers across 34 rows**, and 22
+  rows open with one of exactly two boilerplate sentences.
+- ⚠ **`TASK_PHP_005` F-5's own table understates the corpus**, because it
+  measured only the PREFIX. Two rows carry prose *after* the shared block —
+  `p16-tlv-walk`'s tail is **3 031 words**, so p16's row-specific half is
+  **3 140, the largest in the corpus**, where F-5 lists it as the smallest at
+  109. `check.py:1866` says in passing that p17 does this; p16 does it four
+  times harder.
+
+**What replaces the rule:** every preflight prints and records each php row's
+row-specific `why` size beside the corpus band. It is a **number in front of
+the writer, not a bar** — an unenforced size rule is what produced both
+previous failures, and a reported size is not a rule at all.
+
 ⚠ Do not write the literal phrase `NAMED-SPELLING STANDARD` anywhere earlier
 in the file: the gate's own reproduction command uses `str.find`, takes the
 FIRST occurrence, and a stray one in your prose makes it hash the wrong

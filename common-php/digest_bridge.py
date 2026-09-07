@@ -82,8 +82,8 @@ GLOB_PATTERNS = ["driver.*", "*.py", os.path.join("layout", "*.py")]
 # BEGIN BRIDGED TABLE -- rewritten by `--regen`. Do not hand-edit.
 BRIDGED = {
     "emalloc_probe.c": "ad013ba83ff59e496cec5565263a8b4d58da6a0b8dea9c0f367ae82729d08c46",
-    "emalloc_shim.c": "c9636c1e9dc2c98d351093df4c1c2b603591d57634b1469dc1751c6c7aade6c5",
-    "emalloc_shim.h": "59b146689d42e6961273883fb0723e341784fd37f233da33f7cbad702380d29d",
+    "emalloc_shim.c": "3dd92f81ad1c0e1cb59d3493af41d49e77840600458de08a75a130cae8f93321",
+    "emalloc_shim.h": "aa9abf48535e8df93c9398e96c044697a784d73c40d7a7ccc830b5ee308c378f",
 }
 # END BRIDGED TABLE
 # ---------------------------------------------------------------------------
@@ -138,6 +138,22 @@ def symlinked_dirs():
     is REFUSE, not follow: a directory symlink under `common-php/` has no
     sanctioned use, and the bridge says so instead of being blind to it.
     Negative: `.temp/php4/m5b_bridge_test.py`.
+
+    ⚠⚠ ONE NAME IS DIFFERENT AND THE MESSAGE USED TO SAY SOMETHING UNTRUE
+    ABOUT IT (TASK_PHP_005 F-9). `GLOBBED_SUBDIRS` below is the set of directory
+    names `check.py`'s own `common/` globs reach -- today exactly `layout`, from
+    `glob(REPO/common/layout/*.py)`. A `common-php/layout -> ../common/layout`
+    symlink is still REFUSED, and refusing is still right, but the reason is NOT
+    "everything behind it is in NO digest": `check.py` follows the symlink and
+    those eight `.py` files land in every php gate record as real
+    `common/layout/*.py` keys. Measured by planting the link
+    (`.temp/php5/08-bridge-layout.log`, re-run `.temp/php6/12-bridge-layout.log`).
+    The real reason for `layout/` is narrower and still sufficient: THIS BRIDGE
+    is blind to it, so anything under it that those globs do not match -- a
+    `.md`, a `.c`, a nested directory -- is in no digest at all while `--verify`
+    prints `current`. ⚠ Saying the wrong reason is how a CORRECT refusal gets
+    argued away by the next person who checks it. `_symlinked_dir_message`
+    carries the two texts.
     """
     out = []
     for root, dirs, _files in os.walk(HERE):
@@ -146,6 +162,35 @@ def symlinked_dirs():
             if os.path.islink(p):
                 out.append(os.path.relpath(p, HERE))
     return out
+
+
+#: Directory components of `GLOB_PATTERNS` -- the names `check.py` DOES reach
+#: behind. Derived, not hand-listed, so it ages with `GLOB_PATTERNS`.
+GLOBBED_SUBDIRS = {os.path.dirname(p) for p in GLOB_PATTERNS if os.path.dirname(p)}
+
+
+def _symlinked_dir_message(rel):
+    """The refusal text for one symlinked directory. See `symlinked_dirs`."""
+    if os.path.basename(rel.rstrip("/")) in GLOBBED_SUBDIRS:
+        pats = sorted(p for p in GLOB_PATTERNS
+                      if os.path.dirname(p) == os.path.basename(rel))
+        return (f"SYMLINKED DIRECTORY: {rel}/ -- REFUSED, but not for the usual "
+                f"reason. check.py globs {pats} and FOLLOWS the link, so the "
+                f"files it matches WOULD be real `common/{rel}/…` keys in every "
+                f"php gate record. What is blind is THIS bridge: `os.walk` does "
+                f"not follow the link, so anything under {rel}/ that those "
+                f"globs do NOT match is in no digest and --verify would print "
+                f"`current` over it. Use per-file symlinks "
+                f"(`ln -s ../../common/{rel}/x.py common-php/{rel}__x.py` is "
+                f"NOT equivalent -- the key must stay `{rel}/x.py`, so make "
+                f"{rel}/ a REAL directory of per-file links) and re-run "
+                f"--regen. (TASK_PHP_003 m5; message corrected TASK_PHP_006 "
+                f"from TASK_PHP_005 F-9.)")
+    return (f"SYMLINKED DIRECTORY: {rel}/ -- `os.walk` does not follow it, so "
+            f"everything behind it is in NO digest and this check would "
+            f"otherwise print `current`. Replace it with a real directory (its "
+            f"files then bridge normally) or with per-file symlinks. See "
+            f"`symlinked_dirs`. (TASK_PHP_003 m5.)")
 
 
 def classify():
@@ -158,12 +203,7 @@ def verify(quiet=False):
     _g, bridged = classify()
     problems = []
     for rel in symlinked_dirs():
-        problems.append(
-            f"SYMLINKED DIRECTORY: {rel}/ -- `os.walk` does not follow it, so "
-            f"everything behind it is in NO digest and this check would "
-            f"otherwise print `current`. Replace it with a real directory (its "
-            f"files then bridge normally) or with per-file symlinks. See "
-            f"`symlinked_dirs`. (TASK_PHP_003 m5.)")
+        problems.append(_symlinked_dir_message(rel))
     for rel in bridged:
         want = BRIDGED.get(rel)
         got = sha256_file(os.path.join(HERE, rel))

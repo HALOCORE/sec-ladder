@@ -1,0 +1,120 @@
+{
+  "row": null,
+  "runs": [
+    {
+      "row": null,
+      "provenance_checked": false,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "digest_bridge_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [],
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "harness_php_sha256": {
+        "gate.py": "2f0920abe15baa3bbfcd1c8aa31187eb884406023e6d4818d070624e95b3766f",
+        "provenance.py": "967614c2e5353aff2699b5539dd69b4a826960d6b52aea83e222eb04d0ac9b39",
+        "root.py": "7c2a74412773cb1f601ef87fcec31bac041568f393d17814f0be7c0af3d1a020"
+      },
+      "problems": [],
+      "tool": "measure",
+      "gate_argv": [
+        "--tool",
+        "measure",
+        "--check-stale"
+      ],
+      "tool_argv": [
+        "--check-stale"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0,
+      "_schema": "pre-TASK_PHP_006 single-record file, migrated"
+    },
+    {
+      "row": null,
+      "provenance_checked": false,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_subdir_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        }
+      },
+      "uncertified_records": [],
+      "harness_php_sha256": {
+        "gate.py": "0e16876f96e84e28e6609c0197aa7ddcf7517aba08b3d74e23e0d26627a93df4",
+        "provenance.py": "b541ce18aa1950b83f0fecafbc5ed6d16b456072f5249899320638bda7194b6e",
+        "root.py": "c5df5c135f3ea080d2b151f7a1dbdcdb4b0372bd06ef8697287de201e131d474"
+      },
+      "problems": [],
+      "tool": "measure",
+      "gate_argv": [
+        "--tool",
+        "measure",
+        "--check-stale"
+      ],
+      "tool_argv": [
+        "--check-stale"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 1
+    },
+    {
+      "row": null,
+      "provenance_checked": false,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_subdir_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        }
+      },
+      "uncertified_records": [],
+      "harness_php_sha256": {
+        "gate.py": "0e16876f96e84e28e6609c0197aa7ddcf7517aba08b3d74e23e0d26627a93df4",
+        "provenance.py": "b541ce18aa1950b83f0fecafbc5ed6d16b456072f5249899320638bda7194b6e",
+        "root.py": "c5df5c135f3ea080d2b151f7a1dbdcdb4b0372bd06ef8697287de201e131d474"
+      },
+      "problems": [],
+      "tool": "measure",
+      "gate_argv": [
+        "--tool",
+        "measure",
+        "--check-stale"
+      ],
+      "tool_argv": [
+        "--check-stale"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    }
+  ]
+}
