@@ -853,9 +853,10 @@ figure.
 
 **What row 1 says, and it is the shape the crash course needs:**
 
-1. **Naive safe Rust costs +26.8 %. Tuned safe Rust costs +3.7 %** — the tuning
-   recovers roughly six-sevenths of the gap, so *"safe Rust is 27 % slower"* and
-   *"safe Rust is ~free"* are **the same pattern written two ways.**
+1. **Naive safe Rust costs +26.8 %. Tuned safe Rust costs +3.7 %** — ✅ the
+   tuning recovers **86.4 %** of the naive gap (measured, not estimated), so
+   *"safe Rust is 27 % slower"* and *"safe Rust is ~free"* are **the same
+   pattern written two ways.**
 2. ⭐ **Unsafe Rust is 7.6 % FASTER than gcc C**, and **`verus` is byte-identical
    to `unsafe`** (`md5_fn 33850579` on both) — **the proof costs nothing at
    run time**, which is what R4≡R5 means concretely.
