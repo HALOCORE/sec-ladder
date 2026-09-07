@@ -98,8 +98,15 @@ CATALOGUE  patterns-php/CATALOGUE.md EXISTS -- 91 rows: 38 spatial /
 
 ROWS       1 built (ph03), 91 catalogued.
 
-NEXT       (1) TASK_PHP_014 -- REVIEW ph03. It is the TEMPLATE for 90 more
-               rows, so a defect here multiplies. Alternation, rule 1.
+           _014 REVIEWED it: row SURVIVES every attack; R5's postcondition
+           is genuinely strong (17 of 19 mutants killed). 6 majors, 7 minors,
+           14 clean negatives.
+
+NEXT       (1) TASK_PHP_015 -- land _014's majors + _012's catalogue
+               corrections, THEN build ph07 and ph21 in the same task.
+               ⚠ M1 first: model.py::uu_fold != verus.rs::uu_fold and the
+               input generator hides it -- a TEMPLATE defect 90 rows would
+               copy.
            (2) then the batch, REORDERED on the engineer's advice:
                ph07 -> ph21 -> ph16 -> ph12 -> ph29, with ph29 LAST --
                the tally-in-the-checksum technique ph03 relies on does not
@@ -725,7 +732,8 @@ visible, which is the cheap half of what the floor used to do.
 
 **`ph03`'s `c/kernel_hardened.c` is the REAL upstream fix** —
 `f95c1df58349`, Ilia Alshanetsky, 2004-08-24, bug #29821 — and **it is
-incomplete.** Proved three independent ways, UNREVIEWED:
+incomplete.** ✅ **REVIEWED at `TASK_PHP_014`: the headline survives every
+attack, and got STRONGER** — see the two amendments below the three limbs.
 
 1. **Counted.** Over 12 600 documents the fix closes **every write**
    (3 352 → 0) and leaves **144 over-reads**. `ee` bounds where the loop
@@ -741,6 +749,20 @@ incomplete.** Proved three independent ways, UNREVIEWED:
 ⚠ PHP did not complete this fix until **2014** (`1e2818b14376`, bug #67252),
 and **that commit's own `.phpt` reproducer is the same `fl == 1, ee == e` shape
 the count found independently.** Ten years.
+
+⭐⭐ **AMENDMENT 1 — it is worse than incomplete: HALF THE 2004 FIX IS DEAD.**
+`TASK_PHP_014` M5 proves hunk 1 (`if (len > src_len) goto err;`) **redundant**
+three ways: deleting it from the Verus exec still gives **25/0**, neutralising
+it in the spec still gives **25/0**, and **all 1 953 of its C firings would also
+be refused by hunk 2.** So of a two-hunk fix, one hunk is dead and the other is
+incomplete.
+
+⚠ **AMENDMENT 2 — limb 2 is HARNESS-CONDITIONAL and *"measured twice, two ways"*
+over-promised.** With the source allocated the way PHP's `emalloc` actually
+allocates a zval string (`ALIGN8(len + 1)`), **ASan is silent** — the over-read
+lands in the padding. ✅ **Limbs 1 (the count) and 3 (Verus) are
+allocator-independent, so F29 stands** — but the ASan limb says *"a detector
+fires under this allocator"*, not *"PHP faults"*.
 
 ⭐⭐ **This is the crash course's argument in one row, and it is not "the proof
 is cheap": it is that the OBLIGATION IS STATED AT ALL.** A `requires` clause
@@ -783,13 +805,34 @@ harness edit.** The evidence lives in `controls/` and the report, and this is a
 **standing limitation of the gate, recorded here**: ⚠ **a green php gate does
 not mean the upstream fix is complete, and cannot.**
 
-### F32 — the byte count was wrong a fourth time
+### F32 — ⚠⚠⚠ THE MANAGER ARBITRATED THE ONE NUMBER THIS FILE SAYS NOT TO ARBITRATE, AND WAS WRONG
 
-`PROTOCOL_PHP.md` §E says the named-spelling tail is **11 003** bytes; it is
-**11 004**. ⚠ **Fourth wrong value for the one quantity `RECAP_PHP.md` already
-warns has three answers** (the size box). Left for the corrections task — but
-noted here because *the document warning that this number is contested was
-itself carrying a wrong one.*
+**Retracted, and replaced by what actually happened.**
+
+This entry said *"`PROTOCOL_PHP.md` §E says the named-spelling tail is 11 003
+bytes; it is 11 004 — a fourth wrong value."* ✅ **Verified independently:
+`harness/check.py:1910` is `NAMED_SPELLING_LEN = 11003`. §E was RIGHT. There is
+no fourth value.** `TASK_PHP_005_REPORT.md:487-490` had already settled it —
+*"both are correct about different cuts"* — and this file's own size box says so
+at line 14.
+
+⚠⚠ **So the manager took an engineer's claim on trust, wrote it into the state
+layer as a finding, and thereby made this document contradict itself** — line 14
+carrying the right number while this entry declared it wrong.
+
+⭐ **The lesson is sharper than the error.** The size box's standing instruction
+is *"DO NOT ARBITRATE THAT BYTE COUNT — IT HAS THREE ANSWERS AND THE DISAGREEMENT
+IS A DEFINITION, NOT AN ERROR."* **The manager arbitrated it anyway, in the same
+document, four sections below the warning.** ⚠ A rule written for other people is
+not a rule you have read.
+
+⚠ **And the mechanism is the one this programme already knows**: a claim arrived
+in a report, was plausible, matched a pattern the manager was primed for (*"this
+number keeps being wrong"*), and went into the authoritative layer **without the
+one command that would have checked it** — `grep -n NAMED_SPELLING_LEN
+harness/check.py`. That is `PROTOCOL.md` rule 14's shape with the roles
+reversed: **an engineer premise the MANAGER had no reason to doubt, and did not
+check.**
 
 ## Open items — carried, not closed
 
