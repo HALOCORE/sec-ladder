@@ -77,13 +77,19 @@ PHASE 0 IS CLOSED. _009 reviewed _008 and found NO BLOCKER: 4 majors,
            the enforcement layer is unsound in a way we cannot bound; that
            was true of B1 twice and is not true now."
 
-           _010 landed M1-M4 + all 6 minors. UNREVIEWED (rule 9).
+           _010 landed M1-M4 + all 6 minors; _011 verified all four.
 
-NEXT       (1) TASK_PHP_011 -- THE CATALOGUE, and the first non-infrastructure
-               task since _001. Builds patterns-php/CATALOGUE.md from
-               ADJUDICATION_001.md (~80 rows, UNREVIEWED manager work),
-               ATTACKS that adjudication, and verifies _010's fixes
-               (folded review -- stated, not hidden).
+CATALOGUE  patterns-php/CATALOGUE.md EXISTS -- 91 rows: 38 spatial /
+           22 type-init / 31 temporal, 1 unresolved (ph91). UNREVIEWED.
+           222/222 citations resolve against the pinned tarball across 52
+           sha256-checked files; all 166 corpus ids accounted for.
+           ⚠ 91, not the ~80 the manager predicted -- the adjudication had
+           audited the kills it SUSPECTED and never re-opened the ones it
+           had UPHELD. Five of those reverse at source (F21).
+
+NEXT       (1) TASK_PHP_012 -- REVIEW the catalogue (alternation), and
+               RECOMMEND the first build batch. The 5 new reversals and the
+               3 settled rows are unreviewed engineer work.
            (2) then BUILD ROWS. PLAN_PHP.md §8: spatial -> type -> temporal.
 
 BAR        C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
@@ -103,7 +109,7 @@ READ       PLAN_PHP.md (the design + all 10 decisions), then
 | **tasks** | `_001` mining wave DONE · `_002` Phase 0 built · `_003` reviewed it · `_004` landed the fixes · `_005` reviewed **those** — **1 blocker open (F-1)**. `_006` = land `_005`'s corrections |
 | **infrastructure** | **built and reviewed TWICE**: `harness-php/{root,gate,provenance}.py` · `common-php/` · `patterns-php/{SOURCES.md,php-5.0.0.manifest}` (1170 files, 109 KB) · `.tasks-php/PROTOCOL_PHP.md` · `results-php/`. ⚠ **Reviewed is not the same as correct — the second review found a blocker in the first review's own fix.** ⚠ There used to be a SECOND row in this table also labelled `infrastructure` saying *"not yet built — Phase 0"* (`TASK_PHP_003` m1); it is gone |
 | **candidates** | **54** delivered across three axes. ⚠ **`.tasks-php/ADJUDICATION_001.md` takes that to ≈ 80**: +6 splits, −2 merges, **+17 kills reversed**, +1 dropped with no reason recorded, +4 that fell between axes. Evidence in `.tasks-php/TASK_PHP_001_MINE/` |
-| **catalogue** | not yet written — `TASK_PHP_008`. The **adjudication** that decides its contents is written and is `.tasks-php/ADJUDICATION_001.md` |
+| **catalogue** | ✅ **`patterns-php/CATALOGUE.md` — 91 rows, UNREVIEWED.** Part A is a 113-line scannable table, Part B a 150-word block per row under 23 family headings, Part C the kill list with a re-derived criterion per kill. ⚠ **Size was measured, not argued: 1 304 B/row against `.memory/06-catalogue.md`'s 4 340 — 3.3× denser than the PAT catalogue that works.** Built from `.tasks-php/ADJUDICATION_001.md`, which it also reviews |
 | **citation base** | PHP 5.0.0, pristine tarball, sha256 `5783e0c0…d6919`, 5595997 B, 3815 entries. **4.0.x ignored** (`DP-06`) |
 | **rungs** | all five, R4/R5 may land as findings (`DP-02`) |
 | **PAT tree** | untouched and must stay so — `harness/*.py` and `common/*.py` are hashed into all 33 gate records (`PLAN_PHP.md` §2.1) |
@@ -556,6 +562,80 @@ twice**, and the spelling-free version (`-MD`) needs a `harness/` edit and a
 33-pattern re-measure. ⚠ **The discipline is written into `PROTOCOL_PHP.md` §B3a
 instead — `<row>/c/` holds everything the row compiles, checked by eye at
 review** — so the next author is not told the guard is stronger than it is.
+
+### F21 — ⚠⚠⚠ THE AUDIT LOOKED AT THE KILLS IT SUSPECTED AND NEVER AT THE KILLS IT UPHELD
+
+**`ADJUDICATION_001.md` §1's whole finding was that extraction cost had been
+written as a criterion-3 failure. The manager wrote `TASK_PHP_011` expecting
+that finding to be attacked as an OVER-reach — *"if the distinction does not
+hold, ~17 reversals are wrong and the catalogue is inflated by a fifth."*
+✅ The distinction holds. The error was the opposite one and it was in where the
+lens was pointed.**
+
+The adjudication produced a `§3b Kills UPHELD` list and **never re-opened it at
+source**. Doing so reverses **five more**:
+
+| row | the kill said | at source |
+|---|---|---|
+| **CRASH-097** | *"the quantity comes from a socket"* | ⚠⚠ **it comes from `zend_parse_parameters`.** The kill priced the **wrong operand** — F1 landing on the manager's own upheld list |
+| **CRASH-098** | *"needs real file descriptors"* | measured: **`FD_SET` never touches the fd table** |
+| **CRASH-135** | *"needs a calendar library"* | `SdnToJulian` is **46 self-contained lines** of a 250-line file |
+| **CRASH-133** | *"needs bcmath"* | same shape |
+| **CRASH-147** | *"irreducibly ~2 GiB"* | a **resource budget**, not a kernel shape — criterion 3 is about shape |
+
+Plus **six killed on *"mechanism quality"***, which is **not in the bar at all**.
+**The catalogue is 91 rows, not the ~80 predicted.**
+
+⚠⚠ **The transferable rule: an audit that only re-examines the decisions it
+already doubts measures its own priors.** The adjudication's §6 said *"the thing
+to attack first is whether the criterion-3-vs-tier distinction is crisp"* — it
+was, and asking that question is what stopped anyone asking the cheaper one:
+*did I apply it everywhere, or only where I expected to find something?*
+
+### F22 — ⭐ A KILL WRITTEN AS A SET HIDES ITS MEMBERS
+
+**`CRASH-124`, `CRASH-127` and `CRASH-128` were killed by the SAME SENTENCE as
+`CRASH-123`** — the row `ADJUDICATION_001.md` §1b made its **headline
+reversal**, the five-line pointer-in-an-`int`. Nobody asked whether the other
+three fell the same way. **They do.**
+
+⚠ **This is unfindable by reading reject tables**, which is how both the
+adjudication and every review before it worked. It was found by **diffing
+catalogue coverage against `index.csv`** — a mechanical set difference.
+⭐ **When a rejection covers N rows in one sentence, reversing it must
+re-adjudicate all N, and the only reliable way to enumerate them is against the
+corpus index, not against the prose.**
+
+### F23 — the document that made the citation point had citation defects
+
+⚠ **Three, in `ADJUDICATION_001.md` itself**: `CRASH-107` off by one on **all
+three** lines, and `CRASH-123` off by one and by two — **inside §1b's five-line
+headline exhibit**, the very passage arguing that a kill had priced the wrong
+frame. ✅ **The CSV and the miners were right both times.**
+
+That is `RECAP_PHP.md`'s own standing lesson — *the citation and the story about
+it are two separate claims* — landing on the document that restated it. ⚠ **The
+substance survived every time; only the line numbers moved.** ✅ And the
+catalogue's own citations were then checked properly: **222/222 resolve against
+the pinned tarball across 52 sha256-checked files, 51/53 miner quotes exact, two
+correct-line paraphrases, ZERO wrong lines.**
+
+✅ **`§7b`'s mechanism is also corrected**: the NULL test **is** present at
+`zend_execute.c:141`; the bug is the `return` at `:147`. **That makes the
+`CRASH-053`/`CRASH-056` pairing stronger, not weaker.** And `CRASH-096` gets a
+**third** answer — `zend_memnstr`'s `end -= needle_len` underflow, blob-pure,
+**not** the stream layer where the manager had left it conditional.
+
+### F24 — ~12 rows need a shared header; none needs a shared directory
+
+The question `TASK_PHP_011` was asked because **a catalogue can answer it and an
+infrastructure task cannot**: would any real row want `patterns-php/shared/`?
+
+✅ **Measured: ~12 type rows genuinely need a shared `zval.h` — and none needs a
+shared DIRECTORY.** `common-php/x.h` symlinked as `<row>/c/x.h` lands in **both
+digests**, which is the mechanism already sanctioned for the allocator.
+→ **F20 stays latent and correctly so; what is owed is one clause in
+`PROTOCOL_PHP.md` §B2, not an infrastructure task.**
 
 ## Open items — carried, not closed
 
