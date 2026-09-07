@@ -834,6 +834,46 @@ harness/check.py`. That is `PROTOCOL.md` rule 14's shape with the roles
 reversed: **an engineer premise the MANAGER had no reason to doubt, and did not
 check.**
 
+### F33 — the first PHP ladder, read off the gate's own table
+
+`results-php/tables/ph03-uudecode-bound.md`, **`Ir(kernel)`, `small.bin`,
+`O3 / isolated`** — the row's own rungs against each other. ⚠ **These are
+within-row ratios only**; open item 9 forbids any comparison with a `pNN`
+figure.
+
+| rung | `Ir(kernel)` | vs `c-gcc` | `md5_fn` |
+|---|---:|---:|---|
+| `c-gcc` | 165 650 000 | — | `a970030d` |
+| `c-clang` | 140 125 004 | −15.4 % | `1d3044b1` |
+| **`safe_naive`** | 210 100 000 | **+26.8 %** | `59bd6d88` |
+| **`safe_tuned`** | 171 700 000 | **+3.7 %** | `9a762cc4` |
+| **`unsafe`** | 153 125 000 | **−7.6 %** | `33850579` |
+| **`verus`** | 153 125 000 | **−7.6 %** | `33850579` |
+| `c-gcc-h` (real 2004 fix) | 165 025 000 | **−0.4 %** | `4224991b` |
+
+**What row 1 says, and it is the shape the crash course needs:**
+
+1. **Naive safe Rust costs +26.8 %. Tuned safe Rust costs +3.7 %** — the tuning
+   recovers roughly six-sevenths of the gap, so *"safe Rust is 27 % slower"* and
+   *"safe Rust is ~free"* are **the same pattern written two ways.**
+2. ⭐ **Unsafe Rust is 7.6 % FASTER than gcc C**, and **`verus` is byte-identical
+   to `unsafe`** (`md5_fn 33850579` on both) — **the proof costs nothing at
+   run time**, which is what R4≡R5 means concretely.
+3. ⭐ **The hardened C — carrying the REAL 2004 safety check — is 0.4 % faster
+   than the unchecked C.** The safety check is not merely free here; it is
+   negative-cost, because it lets gcc drop a `setae` and two `cmove`s (F30).
+4. ⚠ **`c-clang` beats `c-gcc` by 15.4 %, which is larger than every safety
+   effect on this row.** **A compiler difference, not a safety difference** —
+   quote a rung against a rung, never against "C".
+5. ⚠ The `vec` column: **both C compilers vectorise (`xmm`); no Rust rung
+   does.** That is likely most of the naive gap and is a property of *how the
+   translation is written*, not of Rust.
+
+⚠⚠ **CAVEAT, and it is the engineer's own**: `controls/spellings.py` was **not**
+built, so **no ratio here is *the* cost of safety** — each is the cost of *these
+spellings* of these rungs. A different safe-tuned spelling moves row 2's number
+and would move this one.
+
 ## Open items — carried, not closed
 
 | # | item | note |
