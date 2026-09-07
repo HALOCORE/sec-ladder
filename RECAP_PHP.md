@@ -38,15 +38,15 @@ MINED      TASK_PHP_001 DONE, all 3 axes. 54 candidates, evidence promoted to
              type     15 cands / 12 mechanism families
            ALL THREE REFUTED THE MANAGER CLAIM THEY WERE NAMED TO ATTACK.
 
-BUILT      TASK_PHP_002 DONE. Phase 0 green, PAT tree byte-identical.
-           ph00-smoke gates PASS-WITH-BLOCKED-ROWS, 0 failures, in
-           results-php/gate/. 66 records 0 STALE before AND after.
-           UNREVIEWED (rule 9).
+BUILT      TASK_PHP_002 Phase 0 built + gated. TASK_PHP_003 REVIEWED IT:
+           2 BLOCKERS, 6 majors, 7 minors, 6 against MANAGER design.
+           ⚠ PHASE 0 IS NOT DONE until B1 and B2 close.
+           B1 the "mandatory" c/ symlink is enforced by NOTHING
+           B2 the emalloc shim INVENTS DEFECTS (wrong multiply predicate)
 
-NEXT       (1) TASK_PHP_003 -- REVIEW Phase 0. It is infrastructure the whole
-               programme rests on and one agent built it alone. Do this first.
-           (2) TASK_PHP_004 -- adjudicate the 54 candidates into
-               patterns-php/CATALOGUE.md, then review it.
+NEXT       (1) TASK_PHP_004 -- land the review. WRITTEN, ready to launch.
+           (2) then adjudicate the 54 candidates into
+               patterns-php/CATALOGUE.md, and review that.
 
 BAR        C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
            patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
@@ -62,7 +62,7 @@ READ       PLAN_PHP.md (the design + all 10 decisions), then
 | | |
 |---|---|
 | **rows built** | **0** — `ph00-smoke` is a relocated PAT calibration kernel, throwaway, **no PHP provenance**, and prices nothing |
-| **tasks** | `TASK_PHP_001` mining wave **DONE, unreviewed** · `TASK_PHP_002` Phase 0 **DONE, unreviewed** |
+| **tasks** | `TASK_PHP_001` mining wave **DONE, unreviewed** · `TASK_PHP_002` Phase 0 **built, REVIEWED at `TASK_PHP_003` — 2 blockers open** · `TASK_PHP_004` written |
 | **infrastructure** | built: `harness-php/{root,gate,provenance}.py` · `common-php/` · `patterns-php/{SOURCES.md,php-5.0.0.manifest}` (1170 files, 109 KB) · `.tasks-php/PROTOCOL_PHP.md` · `results-php/` |
 | **candidates** | **54** across three axes, covering 85/85 temporal rows. Evidence in `.tasks-php/TASK_PHP_001_MINE/` |
 | **catalogue** | not yet written — Phase 1 |
@@ -126,6 +126,34 @@ instead of the CSV **inverts the verdict**. → `PLAN_PHP.md` §1.
 admission filter.** A second allocator truncation was also found —
 `zend_alloc.h:53`'s `unsigned int size:31` (✅ verified). → `PLAN_PHP.md` §4.3.
 
+### F6 — ⚠⚠ THE ALLOCATOR SHIM INVENTED DEFECTS, IN THE FILE WRITTEN TO PREVENT THAT
+
+`common-php/emalloc_shim.h:340` claimed `__builtin_mul_overflow` is the *"same
+predicate"* as PHP's `ZEND_SIGNED_MULTIPLY_LONG`. ✅ **Manager-verified false:**
+`Zend/zend_multiply.h:22` guards the exact `imul` arm with
+`#if defined(__i386__) && defined(__GNUC__)`, so on **x86-64** PHP falls to the
+`#else` at `:34` — a **double-precision heuristic** (`__dres + __delta != __dres`),
+not an exact test. Measured: **84 523 disagreements in 20 M samples, 100 % one
+way — PHP raises `E_ERROR` where the shim allocates.**
+
+⚠⚠⚠ **This is `PLAN_PHP.md` §4.3's own failure mode — a substituted primitive
+inventing a defect — inside the file that exists to prevent it**, and it is the
+same shape as the earlier PHP effort's `malloc`-for-`emalloc`, which published a
+false explanation of an upstream fix. **Blocker; `TASK_PHP_004` closes it.**
+
+### F7 — the manager's stated expectation was REFUTED, and that is the good news
+
+The manager predicted Phase 0 would fall over on the `common-php/*.h` digest gap
+and asked for a constructed case. **It fires**: planting `MAX_CACHED_MEMORY
+11→12` makes the preflight refuse (`exit 2`, tool not run), and with `--regen`
+the gate record goes `STALE`. ⚠ **What is NOT protected is the second half** —
+B1, the unenforced `<row>/c/` symlink.
+
+✅ **And the run of four is broken: `TASK_PHP_003` checked every `file:line` the
+manager marked ✅ and found ZERO unearned.** ⚠ The *reasoning* around two of them
+was still wrong (the `REAL_SIZE` story, `repo_path_bytes` 20 vs 15) — **the marks
+were on the citations, and the citations held.**
+
 ### F5 (PROVISIONAL) — a THIRD allocator truncation, and the calloc path
 
 `Zend/zend_alloc.c:295` in `_ecalloc` is `int final_size = size*nmemb;` — a
@@ -161,7 +189,7 @@ no reason to doubt. → `PLAN_PHP.md` §1 corrected.
 | 6 | Four temporal merges flagged as probably wrong | ranks 21, 8, 12, 23. Split decisions owed at catalogue adjudication |
 | 7 | All `hotness` fields on the SPATIAL axis are **reasoned, not measured** | that agent never opened `.temp/san_tests/`. **Must not be quoted as frequency evidence** until checked |
 | 8 | Rank 15 (CRASH-158) may be spatial, not temporal | cross-check the two miners' lists at adjudication |
-| 9 | ⚠⚠ **No php marginal `Ir` is comparable to any PAT one** | `repo_path_bytes` is 20 bytes longer through the shim, and the gate's own domain rule makes layout part of the measurement. **Never quote a php figure against a `pNN` one** |
+| 9 | ⚠⚠ **No php marginal `Ir` is comparable to any PAT one** | `repo_path_bytes` is **15** bytes longer through the shim (⚠ this said **20**; corrected at `TASK_PHP_003`), and `gate.py`'s own `PYTHONDONTWRITEBYTECODE=1` moves `envp_stack_bytes` **+33** as well — a second term nobody had named. The gate's domain rule makes layout part of the measurement. **Never quote a php figure against a `pNN` one** |
 | 10 | ⚠⚠ **`common-php/*.h` is in NO gate digest, and cannot be without a harness edit** | `check.py`'s three `common/` globs (`driver.*`, `*.py`, `layout/*.py`) are all non-recursive and none matches `emalloc_shim.h`. Closed with a digest bridge (gate half) + a mandatory `<row>/c/` symlink (measurement half). **The review must attack this** — it is the exact "unhashed shared file" gap that cost the PAT side ten control sources |
 | 11 | A new php row costs **six commands (~28 min)**, not three | `gate → report → gate` is irreducible and `measure.py` builds nothing. Budget it |
 | 12 | `.memory-php/` **does not exist yet** | `PLAN_PHP.md` lists it, `TASK_PHP_002` did not ask for it, and rule 4 makes it the manager's. Create it when the first finding survives review |

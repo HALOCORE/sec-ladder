@@ -40,11 +40,24 @@ found   /home/apt/repos_common/php-in-safe-rust/.app-tests/.temp/oracle/build-5.
 read    tar -xzOf <tarball> php-5.0.0/<path> | sed -n '<a>,<b>p'
 ```
 
-⚠⚠ **Every extracted tree on this box is patched.** `build/php-4.0.2/` carries
-modern-gcc patches; `.temp/san_tests/oracle/.../php-5.0.0/` and
-`.app-tests/.temp/oracle/build-5.0.0-*/` carry modern-gcc **and allocator**
-patches (`REAL_SIZE(size)→(size)`, which is exactly the mechanism §4.3 is
-about). A citation taken from one of them is a citation to a different program.
+⚠⚠ **THIS PARAGRAPH SAID *"every extracted tree on this box is patched"* AND
+GAVE `REAL_SIZE(size)→(size)` AS THE REASON. BOTH WERE WRONG — REFUTED AT
+`TASK_PHP_003`, and the manager's recount agrees: of **13** extracted
+`zend_alloc.c` trees, **8 are byte-identical to the pristine tarball**, the
+allocator patch is in a **small minority**, and ✅ **it does not delete the
+truncation anyway.**
+
+✅ **THE RULE SURVIVES; ONLY ITS STATED REASON FELL.** Cite the tarball, because
+a *some-trees-are-patched* corpus is one where you cannot tell by looking which
+tree you are in — and `build/php-4.0.2/` really does carry modern-gcc patches,
+and 4.0.x is out of scope regardless (`DP-06`). ⚠ **A rule that survives with a
+false reason is the shape this project has already been burned by twice** (a
+right verdict resting on a wrong reason), so the reason is corrected here rather
+than quietly dropped.
+
+⚠ The exact tree-by-tree split is **owed**: the reviewer counted 7 of 12
+pristine and the manager 8 of 13, which is a tree-*set* disagreement, not a
+content one. `TASK_PHP_004` settles it.
 
 ⚠⚠ **The tarball lives under another project's gitignored `.temp/`, which that
 project's own convention makes deletable at any time.** This is the hazard
