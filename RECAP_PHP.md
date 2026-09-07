@@ -92,13 +92,21 @@ CATALOGUE  patterns-php/CATALOGUE.md EXISTS -- 91 rows: 38 spatial /
            catalogue -- a kernel built to its blob spec would gate GREEN
            while modelling nothing.
 
-NEXT       (1) ⭐ TASK_PHP_013 -- BUILD ph03, THE FIRST REAL PHP ROW.
-               php_uudecode / CRASH-115. Validated end-to-end by _012 with
-               ASan and a must-fire control. verbatim, 46 lines, one-line
-               reproducer, crashes_pristine=True, DP-07 pointer cursor.
-           (2) TASK_PHP_014 -- review the row AND land _012's catalogue
-               corrections (B1, M1-M7), informed by what row 1 taught.
-           (3) then the batch: ph29 -> ph07 -> ph21 -> ph16 -> ph12.
+           ⭐ _013 BUILT ph03 -- THE FIRST REAL ROW. Gate PASS, 0 failures.
+           Five rungs + R1h. R5 verifies 25/0 with a FULL FUNCTIONAL
+           postcondition; R4 == R5 byte-identical at O3. UNREVIEWED.
+
+ROWS       1 built (ph03), 91 catalogued.
+
+NEXT       (1) TASK_PHP_014 -- REVIEW ph03. It is the TEMPLATE for 90 more
+               rows, so a defect here multiplies. Alternation, rule 1.
+           (2) then the batch, REORDERED on the engineer's advice:
+               ph07 -> ph21 -> ph16 -> ph12 -> ph29, with ph29 LAST --
+               the tally-in-the-checksum technique ph03 relies on does not
+               carry to a row where the allocator truncation IS the defect,
+               and that is a design call to take with five rows of
+               experience rather than one. ✅ ph07's tier verified at
+               source by _012; it is the first `narrowed` row.
 
 BAR        C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
            patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
@@ -113,7 +121,7 @@ READ       PLAN_PHP.md (the design + all 10 decisions), then
 
 | | |
 |---|---|
-| **rows built** | **0** — `ph00-smoke` is a relocated PAT calibration kernel, throwaway, **no PHP provenance**, and prices nothing |
+| **rows built** | ⭐ **1 — `ph03-uudecode-bound`**, gate `PASS`, five rungs + R1h, R5 at 25/0. (`ph00-smoke` is a relocated PAT calibration kernel, throwaway, **no PHP provenance**, and prices nothing) |
 | **tasks** | `_001` mining wave DONE · `_002` Phase 0 built · `_003` reviewed it · `_004` landed the fixes · `_005` reviewed **those** — **1 blocker open (F-1)**. `_006` = land `_005`'s corrections |
 | **infrastructure** | **built and reviewed TWICE**: `harness-php/{root,gate,provenance}.py` · `common-php/` · `patterns-php/{SOURCES.md,php-5.0.0.manifest}` (1170 files, 109 KB) · `.tasks-php/PROTOCOL_PHP.md` · `results-php/`. ⚠ **Reviewed is not the same as correct — the second review found a blocker in the first review's own fix.** ⚠ There used to be a SECOND row in this table also labelled `infrastructure` saying *"not yet built — Phase 0"* (`TASK_PHP_003` m1); it is gone |
 | **candidates** | **54** delivered across three axes. ⚠ **`.tasks-php/ADJUDICATION_001.md` takes that to ≈ 80**: +6 splits, −2 merges, **+17 kills reversed**, +1 dropped with no reason recorded, +4 that fell between axes. Evidence in `.tasks-php/TASK_PHP_001_MINE/` |
@@ -712,6 +720,76 @@ signal** — and it is wrong on 29 % of the rows that claim the strictest tier.
 was wrong was pricing it as free.** → the correction task must decide whether
 the reported overlap is printed *beside the declared tier* so a mismatch is
 visible, which is the cheap half of what the floor used to do.
+
+### F29 — ⭐⭐⭐ THE FIRST ROW'S RESULT: A STATED OBLIGATION CAUGHT IN 2026 WHAT A PATCH MISSED FOR TEN YEARS
+
+**`ph03`'s `c/kernel_hardened.c` is the REAL upstream fix** —
+`f95c1df58349`, Ilia Alshanetsky, 2004-08-24, bug #29821 — and **it is
+incomplete.** Proved three independent ways, UNREVIEWED:
+
+1. **Counted.** Over 12 600 documents the fix closes **every write**
+   (3 352 → 0) and leaves **144 over-reads**. `ee` bounds where the loop
+   *tests*; the body reads `*(s+3)`. Smallest surviving case: `src_len = 2`,
+   `len = 1` → `ee == e`, so hunk 2 never fires.
+2. **ASan**, on the *fixed* decoder, at `uuencode.c:144` — with a must-fire
+   control proving the detector is live and a benign case staying silent.
+3. ⭐ **Verus refuses it in one line.** Deleting **only** the four lines of
+   PHP's *2014* check from `verus.rs` — leaving exactly the algorithm the 2004
+   fix implements — fails `i < v@.len()` on `get_unchecked(buf, s + 1)`: **the
+   same byte ASan reports.**
+
+⚠ PHP did not complete this fix until **2014** (`1e2818b14376`, bug #67252),
+and **that commit's own `.phpt` reproducer is the same `fl == 1, ee == e` shape
+the count found independently.** Ten years.
+
+⭐⭐ **This is the crash course's argument in one row, and it is not "the proof
+is cheap": it is that the OBLIGATION IS STATED AT ALL.** A `requires` clause
+caught in 2026 what a careful maintainer's patch missed for a decade.
+
+⚠⚠ **And it reshapes the ladder: R2–R5 are NOT ports of R1h.** With only the
+2004 pair a safe-Rust rung **panics** on those 144 documents — and *a rung that
+panics is not a translation of the C*. So R2–R5 carry **both** fixes, R1h
+carries 2004 only, and **only R1 diverges** on the shipped inputs. That is a
+general rule for this corpus, not a quirk of `ph03`.
+
+### F30 — the 2004 safety check has a NEGATIVE cost on gcc
+
+✅ Measured on `ph03`: **−3.0 `Ir`/line on gcc**, +3.0 on clang. With the check
+present, gcc's `setae` and two `cmove`s **disappear** (3 → 0, counted).
+Rung deltas: **R2−R4 = +18.9 `Ir`/group** (one `cmp`/`jae` per checked access);
+**R3−R4 = +6.1** (the reslice adds a wrap test R2 never had).
+
+⚠ **Do not quote these against any `pNN` figure** (open item 9). And no ratio
+here is *the* cost of safety — `controls/spellings.py` was not built.
+
+### F31 — two frozen-harness limits only a real row could find, and both are DECIDED
+
+**B1 — `harness/build.py` links no `-lm`.** ✅ Manager-verified independently:
+`floor()` emits a real call at **-O0** and is inlined at **-O3**, and **libm was
+never merged into libc** — so a `verbatim` libm kernel fails to link in the -O0
+cells. **Decision: keep `ph03`'s macro substitution** (shipped with a
+differential and a must-fire control, and in the deletion ledger), **and BATCH
+the `-lm` edit** rather than pay a 33-row re-gate + re-measure now.
+⭐ **Worth recording for whoever does it: `-lm` is a LINK-ONLY flag, so for
+every pattern that calls no libm function the re-measured numbers must be
+byte-identical — which makes that re-measure self-verifying rather than
+risky.**
+
+**B2 — `check_sanitizers_hardened` hard-fails on any R1h diagnostic.** That is
+right for a hand-written PAT R1h and **wrong for a shipped upstream fix that is
+incomplete** — i.e. it structurally forbids a row from carrying
+`PROTOCOL_PHP.md` §C's strongest result as *gate* evidence. **Decision: no
+harness edit.** The evidence lives in `controls/` and the report, and this is a
+**standing limitation of the gate, recorded here**: ⚠ **a green php gate does
+not mean the upstream fix is complete, and cannot.**
+
+### F32 — the byte count was wrong a fourth time
+
+`PROTOCOL_PHP.md` §E says the named-spelling tail is **11 003** bytes; it is
+**11 004**. ⚠ **Fourth wrong value for the one quantity `RECAP_PHP.md` already
+warns has three answers** (the size box). Left for the corrections task — but
+noted here because *the document warning that this number is contested was
+itself carrying a wrong one.*
 
 ## Open items — carried, not closed
 
