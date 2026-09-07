@@ -8,8 +8,17 @@ between them read `CLAUDE.md`'s top table.
 > `RECAP_PAT.md` reached **560 KB** and one pattern's `why` field became a
 > single ~7,000-word JSON string. **Both stopped being read**, which is how a
 > published limitation that did not exist got copied out of a stale header
-> (`.tasks/PROTOCOL.md` rule 13). **The START HERE box stays ≤ 20 lines. A
-> `spec.md` `why` stays ≤ 200 words.** If something needs more room it goes in
+> (`.tasks/PROTOCOL.md` rule 13). **The START HERE box stays ≤ 20 lines.**
+>
+> ⚠⚠ **THIS RULE ALSO SAID *"a `spec.md` `why` stays ≤ 200 words"* AND THAT WAS
+> UNSATISFIABLE — REFUTED AT `TASK_PHP_002`, ✅ MANAGER-VERIFIED.** The gate
+> hard-requires a shared `NAMED-SPELLING STANDARD` paragraph, byte-identical
+> across patterns: `ph00-smoke`'s `why` is **12 224 bytes / 2 056 words**, of
+> which **11 004 bytes is that mandated block**, leaving a row-specific half of
+> ~201 words. **The repaired rule: the ROW-SPECIFIC half of `why` stays ≤ 200
+> words; the shared paragraph is gate-mandated and does not count against it.**
+> ⚠ A size rule that cannot be met is worse than none — it gets ignored wholesale
+> and takes the satisfiable half with it. Anything longer goes in
 > `.memory-php/` or the row's `NOTES.md`, not here.
 
 ---
@@ -29,10 +38,15 @@ MINED      TASK_PHP_001 DONE, all 3 axes. 54 candidates, evidence promoted to
              type     15 cands / 12 mechanism families
            ALL THREE REFUTED THE MANAGER CLAIM THEY WERE NAMED TO ATTACK.
 
-NEXT       (1) TASK_PHP_002 -- Phase 0 foundation. WRITTEN, NOT LAUNCHED.
-               No agent is running now, so it can go.
-           (2) TASK_PHP_003 -- adjudicate the 54 into patterns-php/CATALOGUE.md,
-               then REVIEW it. One agent at a time.
+BUILT      TASK_PHP_002 DONE. Phase 0 green, PAT tree byte-identical.
+           ph00-smoke gates PASS-WITH-BLOCKED-ROWS, 0 failures, in
+           results-php/gate/. 66 records 0 STALE before AND after.
+           UNREVIEWED (rule 9).
+
+NEXT       (1) TASK_PHP_003 -- REVIEW Phase 0. It is infrastructure the whole
+               programme rests on and one agent built it alone. Do this first.
+           (2) TASK_PHP_004 -- adjudicate the 54 candidates into
+               patterns-php/CATALOGUE.md, then review it.
 
 BAR        C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
            patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
@@ -47,8 +61,9 @@ READ       PLAN_PHP.md (the design + all 10 decisions), then
 
 | | |
 |---|---|
-| **rows built** | **0** |
-| **tasks** | `TASK_PHP_001` mining wave **DONE, unreviewed** · `TASK_PHP_002` Phase 0 written, not launched |
+| **rows built** | **0** — `ph00-smoke` is a relocated PAT calibration kernel, throwaway, **no PHP provenance**, and prices nothing |
+| **tasks** | `TASK_PHP_001` mining wave **DONE, unreviewed** · `TASK_PHP_002` Phase 0 **DONE, unreviewed** |
+| **infrastructure** | built: `harness-php/{root,gate,provenance}.py` · `common-php/` · `patterns-php/{SOURCES.md,php-5.0.0.manifest}` (1170 files, 109 KB) · `.tasks-php/PROTOCOL_PHP.md` · `results-php/` |
 | **candidates** | **54** across three axes, covering 85/85 temporal rows. Evidence in `.tasks-php/TASK_PHP_001_MINE/` |
 | **catalogue** | not yet written — Phase 1 |
 | **infrastructure** | not yet built — Phase 0 |
@@ -111,6 +126,19 @@ instead of the CSV **inverts the verdict**. → `PLAN_PHP.md` §1.
 admission filter.** A second allocator truncation was also found —
 `zend_alloc.h:53`'s `unsigned int size:31` (✅ verified). → `PLAN_PHP.md` §4.3.
 
+### F5 (PROVISIONAL) — a THIRD allocator truncation, and the calloc path
+
+`Zend/zend_alloc.c:295` in `_ecalloc` is `int final_size = size*nmemb;` — a
+**signed 32-bit** product passed straight to `_emalloc`, so
+`ecalloc(0x40000000, 4)` allocates **0 bytes and succeeds**. ✅ Manager-verified.
+With `real_size` (`:129`) and `size:31` (`zend_alloc.h:53`) that is **three**
+truncations; the plan knew of one when it was written. → `PLAN_PHP.md` §4.3.
+
+⚠ Demonstrated with controls rather than argued: 18.45 EB → 2 GiB succeeds while
+the no-truncation control returns `NULL`, and under ASan **the same UAF is
+reported on a 96-byte block and silent on a 24-byte one** — the mechanism behind
+F3, measured instead of inferred from a percentage.
+
 ### F4 — a manager error, corrected by an agent
 
 The manager told all three agents `.temp/san_tests/` holds *"123 ASan reports"*.
@@ -133,3 +161,7 @@ no reason to doubt. → `PLAN_PHP.md` §1 corrected.
 | 6 | Four temporal merges flagged as probably wrong | ranks 21, 8, 12, 23. Split decisions owed at catalogue adjudication |
 | 7 | All `hotness` fields on the SPATIAL axis are **reasoned, not measured** | that agent never opened `.temp/san_tests/`. **Must not be quoted as frequency evidence** until checked |
 | 8 | Rank 15 (CRASH-158) may be spatial, not temporal | cross-check the two miners' lists at adjudication |
+| 9 | ⚠⚠ **No php marginal `Ir` is comparable to any PAT one** | `repo_path_bytes` is 20 bytes longer through the shim, and the gate's own domain rule makes layout part of the measurement. **Never quote a php figure against a `pNN` one** |
+| 10 | ⚠⚠ **`common-php/*.h` is in NO gate digest, and cannot be without a harness edit** | `check.py`'s three `common/` globs (`driver.*`, `*.py`, `layout/*.py`) are all non-recursive and none matches `emalloc_shim.h`. Closed with a digest bridge (gate half) + a mandatory `<row>/c/` symlink (measurement half). **The review must attack this** — it is the exact "unhashed shared file" gap that cost the PAT side ten control sources |
+| 11 | A new php row costs **six commands (~28 min)**, not three | `gate → report → gate` is irreducible and `measure.py` builds nothing. Budget it |
+| 12 | `.memory-php/` **does not exist yet** | `PLAN_PHP.md` lists it, `TASK_PHP_002` did not ask for it, and rule 4 makes it the manager's. Create it when the first finding survives review |

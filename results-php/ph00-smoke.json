@@ -1,0 +1,1859 @@
+{
+  "pattern": "ph00-smoke",
+  "generated_utc": "2026-09-07T04:32:11Z",
+  "git": {
+    "commit": "4afcef235eeaf244506899db6172a99a7247ee8f",
+    "dirty": true,
+    "dirty_files": 5,
+    "note": "commit is HEAD when measured, i.e. the parent of the commit this file lands in; a fresh run always names HEAD~1 and reads dirty. For real staleness run `harness/measure.py --check-stale`, which compares this record's source_sha256/input_sha256 against the tree."
+  },
+  "source_sha256": {
+    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+    "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+    "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+    "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+    "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+    "patterns/ph00-smoke/c/kernel.c": "1b79c738a5ab4da534d62a931919ec2d16a6add4f3710b29a347e16b88c96fe7",
+    "patterns/ph00-smoke/c/kernel.h": "2eaee3e8be741b9ef00a9d6061e72f8ab6199143724b2438251c7032db01add4",
+    "patterns/ph00-smoke/c/main.c": "065a6d17209b6c5ddb03d33ea38b623265b73293d98415ac99d5f66f467d18ef",
+    "patterns/ph00-smoke/inputs/gen.py": "967329fdb0e24c79a21f8e39c92bcb65ecd81fc52913fe33d688e5091b9982ee",
+    "patterns/ph00-smoke/model.py": "cd2e58963a390b0ae40e88af505924f10eab7785dcee8205fa740c513eea182a",
+    "patterns/ph00-smoke/safe_naive.rs": "31718428bae78cc7c8d50ba5c520091e0596dca1b5216a6bb76f85bbd88abbfb",
+    "patterns/ph00-smoke/safe_naive_verus.rs": "6e84117379183aef6345c849ed2bea0777be2ec5422715bf9475c6c9b8a8bb87",
+    "patterns/ph00-smoke/safe_tuned.rs": "ff2d49dd5338f48a3051989565137f8f7ae685521e4fa78999874edff48e4c16",
+    "patterns/ph00-smoke/unsafe.rs": "026e4b6aa62113972c6881f0daa5e12da366c0eb0b9e7d5369cd0fc8c12db8e9",
+    "patterns/ph00-smoke/verus.rs": "2b2b8d1c63fecfacb9f3487e2db205a4ba415808ed1b99fba2be6918108afe70",
+    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "input_sha256": {
+    "patterns/ph00-smoke/inputs/adversarial-empty.bin": "d9f092d714bac85f2d3f0d75707b77a1c7a4852cfeeb1cc34dbf519b23e67663",
+    "patterns/ph00-smoke/inputs/adversarial-headonly.bin": "80dc1944be3aacc6382f64bcd9239115d2d305285572dba4a084aa2d58438104",
+    "patterns/ph00-smoke/inputs/adversarial-shortlen.bin": "602a61cad4c1902ee22b26772e1a8bd175bfd7bfe0a66c7296d3198a6ae86a4d",
+    "patterns/ph00-smoke/inputs/adversarial-win0.bin": "2fa591ff20a95a32d9244030cb40e21cf92b71a5fd84d78f886baf7eed5869b5",
+    "patterns/ph00-smoke/inputs/adversarial-winbig.bin": "03cd9b89f71a4dacc33f41f16de9cb157d89554d07a4e2c67fa6e0cdca68eeee",
+    "patterns/ph00-smoke/inputs/adversarial.bin": "c593c5fdec81cba8622b2a1524b5a4fb1fe1b8336368993089855672817e4b00",
+    "patterns/ph00-smoke/inputs/large.bin": "8f7c78bedad2dd287d6349261e0cc1dc5005d20c6ac02c3c0c5e834cc63378c9",
+    "patterns/ph00-smoke/inputs/small.bin": "962bd41e6903d806d49eb6bc195f266a331b10cae4fb79ff644d4b062dc22706"
+  },
+  "toolchain": {
+    "gcc": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "clang": "clang version 22.1.6 (https://github.com/llvm/llvm-project fc4aad7b5db3fff421df9a9637605b9ca5667881)",
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "rustc_llvm": "LLVM version: 22.1.6",
+    "verus": "verus binary : /home/apt/tools/verus/verus\nverus dir    : /home/apt/tools/verus\n--- verus --version ---\nVerus\n  Version: 0.2026.08.09.92f466f\n  Profile: release\n  Platform: linux_x86_64\n  Toolchain: 1.97.1-x86_64-unknown-linux-gnu\n--- rustup show active-toolchain ---\nstable-x86_64-unknown-linux-gnu (default)",
+    "valgrind": "valgrind-3.27.1",
+    "objdump": "GNU objdump (GNU Binutils for Ubuntu) 2.42"
+  },
+  "host": {
+    "cpu_model": "Intel(R) Xeon(R) Gold 6230 CPU @ 2.10GHz",
+    "governor": "powersave",
+    "note": "frequency scaling active, shared container -- wall clock is noisy"
+  },
+  "timing_cpu": 3,
+  "protocol": {
+    "static": "harness/asm.py; raw and padding-excluded both reported",
+    "ir": "callgrind per-function exclusive Ir, kernel symbol only; whole-program summary deliberately not recorded",
+    "wall": "taskset -c 3, interleaved round-robin, 30 reps, min and median; frequency scaling on, shared box"
+  },
+  "inputs": {
+    "adversarial-empty.bin": {
+      "n_iters": 1000,
+      "declared_len": 0,
+      "present": 0,
+      "truncated": false,
+      "model": "n_iters=1000 v_len=0 win=0 calls=0 work/call=0 truncated=False expected=0"
+    },
+    "adversarial-headonly.bin": {
+      "n_iters": 1000,
+      "declared_len": 8,
+      "present": 8,
+      "truncated": false,
+      "model": "n_iters=1000 v_len=0 win=8 calls=0 work/call=0 truncated=False expected=0"
+    },
+    "adversarial-shortlen.bin": {
+      "n_iters": 1000,
+      "declared_len": 4096,
+      "present": 40,
+      "truncated": true,
+      "model": "n_iters=1000 v_len=4 win=4 calls=0 work/call=0 truncated=True expected=None"
+    },
+    "adversarial-win0.bin": {
+      "n_iters": 1000,
+      "declared_len": 520,
+      "present": 520,
+      "truncated": false,
+      "model": "n_iters=1000 v_len=64 win=0 calls=0 work/call=0 truncated=False expected=0"
+    },
+    "adversarial-winbig.bin": {
+      "n_iters": 1000,
+      "declared_len": 520,
+      "present": 520,
+      "truncated": false,
+      "model": "n_iters=1000 v_len=64 win=1099511627776 calls=0 work/call=0 truncated=False expected=0"
+    },
+    "adversarial.bin": {
+      "n_iters": 0,
+      "declared_len": 520,
+      "present": 520,
+      "truncated": false,
+      "model": "n_iters=0 v_len=64 win=8 calls=0 work/call=8 truncated=False expected=0"
+    },
+    "large.bin": {
+      "n_iters": 20000,
+      "declared_len": 12000008,
+      "present": 12000008,
+      "truncated": false,
+      "model": "n_iters=20000 v_len=1500000 win=4096 calls=20000 work/call=4096 truncated=False expected=8088771909753396726"
+    },
+    "small.bin": {
+      "n_iters": 200000,
+      "declared_len": 16008,
+      "present": 16008,
+      "truncated": false,
+      "model": "n_iters=200000 v_len=2000 win=501 calls=200000 work/call=501 truncated=False expected=17245669606222259694"
+    }
+  },
+  "cells": [
+    {
+      "cell": "c-gcc",
+      "opt": "O0",
+      "mode": "isolated",
+      "binary": ".temp/build/ph00/c-gcc-O0-isolated",
+      "asm_symbol_needle": "kernel",
+      "binary_text_bytes": 2900,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/c-gcc-O0-isolated",
+        "symbol": "kernel",
+        "n_raw": 24,
+        "n_nopad": 24,
+        "n_bytes": 92,
+        "md5_raw": "f33177c43c2b2b5757d78598b69ebd40",
+        "md5_raw_norel": "8df8a2326d0a68c222e8f586da927516",
+        "has_extent": true,
+        "n_fn": 24,
+        "n_fn_nopad": 24,
+        "fn_bytes": 92,
+        "md5_fn": "f33177c43c2b2b5757d78598b69ebd40",
+        "md5_fn_norel": "8df8a2326d0a68c222e8f586da927516",
+        "pad_insns": 0,
+        "pad_bytes": 0,
+        "n_reloc_masked": 2,
+        "md5_norm": "eb909d58a472639c567ea1d4512275e4",
+        "has_loop": true,
+        "n_backward_branches": 1,
+        "bulk_calls": [],
+        "vector_regs": []
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 1205400000,
+          "kernel_functions": [
+            "kernel"
+          ],
+          "main_exclusive_ir": 6800066,
+          "main_functions": [
+            "main"
+          ]
+        }
+      }
+    },
+    {
+      "cell": "c-gcc",
+      "opt": "O0",
+      "mode": "whole",
+      "binary": ".temp/build/ph00/c-gcc-O0-whole",
+      "asm_symbol_needle": "main",
+      "binary_text_bytes": 2939,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/c-gcc-O0-whole",
+        "symbol": "main",
+        "n_raw": 98,
+        "n_nopad": 98,
+        "n_bytes": 411,
+        "md5_raw": "4104f39118e80d5e4b68e03ee93e88d1",
+        "md5_raw_norel": "8db04fb9d6d07a31122be75c742d24ce",
+        "has_extent": true,
+        "n_fn": 98,
+        "n_fn_nopad": 98,
+        "fn_bytes": 411,
+        "md5_fn": "4104f39118e80d5e4b68e03ee93e88d1",
+        "md5_fn_norel": "8db04fb9d6d07a31122be75c742d24ce",
+        "pad_insns": 0,
+        "pad_bytes": 0,
+        "n_reloc_masked": 13,
+        "md5_norm": "03f781e3bb12ba3409f5a8cc5dc6e5c9",
+        "has_loop": true,
+        "n_backward_branches": 1,
+        "bulk_calls": [],
+        "vector_regs": []
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 1205400000,
+          "kernel_functions": [
+            "kernel"
+          ],
+          "main_exclusive_ir": 6800066,
+          "main_functions": [
+            "main"
+          ]
+        }
+      }
+    },
+    {
+      "cell": "c-gcc",
+      "opt": "O3",
+      "mode": "isolated",
+      "binary": ".temp/build/ph00/c-gcc-O3-isolated",
+      "asm_symbol_needle": "kernel",
+      "binary_text_bytes": 1993,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/c-gcc-O3-isolated",
+        "symbol": "kernel",
+        "n_raw": 33,
+        "n_nopad": 31,
+        "n_bytes": 105,
+        "md5_raw": "d2209fcad6ba8930d366d4307aafa1d2",
+        "md5_raw_norel": "35ff80900f9d78121b805a1c2024afd6",
+        "has_extent": true,
+        "n_fn": 33,
+        "n_fn_nopad": 31,
+        "fn_bytes": 105,
+        "md5_fn": "d2209fcad6ba8930d366d4307aafa1d2",
+        "md5_fn_norel": "35ff80900f9d78121b805a1c2024afd6",
+        "pad_insns": 0,
+        "pad_bytes": 0,
+        "n_reloc_masked": 5,
+        "md5_norm": "8da3f7296e1ab0ac84c85176d0cd158d",
+        "has_loop": true,
+        "n_backward_branches": 2,
+        "bulk_calls": [],
+        "vector_regs": [
+          "xmm"
+        ]
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 254400000,
+          "kernel_functions": [
+            "kernel"
+          ],
+          "main_exclusive_ir": 2800052,
+          "main_functions": [
+            "main"
+          ]
+        },
+        "large.bin": {
+          "kernel_exclusive_ir": 205180000,
+          "kernel_functions": [
+            "kernel"
+          ],
+          "main_exclusive_ir": 280052,
+          "main_functions": [
+            "main"
+          ]
+        }
+      },
+      "wall": {
+        "small.bin": {
+          "min_s": 0.025210656225681305,
+          "median_s": 0.027201541233807802,
+          "reps": 30,
+          "spread_pct": 7.896997961117907
+        },
+        "large.bin": {
+          "min_s": 0.034333065152168274,
+          "median_s": 0.03568692738190293,
+          "reps": 30,
+          "spread_pct": 3.943318849436189
+        }
+      }
+    },
+    {
+      "cell": "c-gcc",
+      "opt": "O3",
+      "mode": "whole",
+      "binary": ".temp/build/ph00/c-gcc-O3-whole",
+      "asm_symbol_needle": "main",
+      "binary_text_bytes": 1268,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/c-gcc-O3-whole",
+        "symbol": "main",
+        "n_raw": 257,
+        "n_nopad": 255,
+        "n_bytes": 1024,
+        "md5_raw": "0aff704ccbf0936f3303da1f57cf8777",
+        "md5_raw_norel": "85a5045b6d6938f33c50ff12656c7877",
+        "has_extent": true,
+        "n_fn": 256,
+        "n_fn_nopad": 255,
+        "fn_bytes": 1014,
+        "md5_fn": "7ef08e5fd54fb1838d16186136a335f6",
+        "md5_fn_norel": "63d485c59dc5f16ba3e7b0b3f3c821ed",
+        "pad_insns": 1,
+        "pad_bytes": 10,
+        "n_reloc_masked": 81,
+        "md5_norm": "8b820a6cb3792e9b050f30883a51568b",
+        "has_loop": true,
+        "n_backward_branches": 9,
+        "bulk_calls": [
+          "memcpy@plt"
+        ],
+        "vector_regs": [
+          "xmm"
+        ]
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": null,
+          "kernel_functions": [],
+          "main_exclusive_ir": 254800133,
+          "main_functions": [
+            "main"
+          ]
+        },
+        "large.bin": {
+          "kernel_exclusive_ir": null,
+          "kernel_functions": [],
+          "main_exclusive_ir": 205240133,
+          "main_functions": [
+            "main"
+          ]
+        }
+      },
+      "wall": {
+        "small.bin": {
+          "min_s": 0.025439735502004623,
+          "median_s": 0.027694718446582556,
+          "reps": 30,
+          "spread_pct": 8.864018827555192
+        },
+        "large.bin": {
+          "min_s": 0.0346426060423255,
+          "median_s": 0.03645466500893235,
+          "reps": 30,
+          "spread_pct": 5.23072359046235
+        }
+      }
+    },
+    {
+      "cell": "c-clang",
+      "opt": "O0",
+      "mode": "isolated",
+      "binary": ".temp/build/ph00/c-clang-O0-isolated",
+      "asm_symbol_needle": "kernel",
+      "binary_text_bytes": 2635,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/c-clang-O0-isolated",
+        "symbol": "kernel",
+        "n_raw": 24,
+        "n_nopad": 23,
+        "n_bytes": 96,
+        "md5_raw": "8025a602de440145f183fe29b85ad1b7",
+        "md5_raw_norel": "305b7568800cdec77bf9dbaedfd887a9",
+        "has_extent": true,
+        "n_fn": 23,
+        "n_fn_nopad": 23,
+        "fn_bytes": 86,
+        "md5_fn": "de6279c55d69dcc35381e2513cf67975",
+        "md5_fn_norel": "9fe645c9a203c8a0be094506bddc7ccc",
+        "pad_insns": 1,
+        "pad_bytes": 10,
+        "n_reloc_masked": 2,
+        "md5_norm": "5afde54366b47177f0ed4f288cff32e7",
+        "has_loop": true,
+        "n_backward_branches": 1,
+        "bulk_calls": [],
+        "vector_regs": []
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 1305200000,
+          "kernel_functions": [
+            "kernel"
+          ],
+          "main_exclusive_ir": 3800055,
+          "main_functions": [
+            "main"
+          ]
+        }
+      }
+    },
+    {
+      "cell": "c-clang",
+      "opt": "O0",
+      "mode": "whole",
+      "binary": ".temp/build/ph00/c-clang-O0-whole",
+      "asm_symbol_needle": "main",
+      "binary_text_bytes": 1886,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/c-clang-O0-whole",
+        "symbol": "main",
+        "n_raw": 65,
+        "n_nopad": 65,
+        "n_bytes": 270,
+        "md5_raw": "77f37e6499c912ead576fbebc9bb4ba2",
+        "md5_raw_norel": "96ea7942a2c04f003dc6d07d19962940",
+        "has_extent": true,
+        "n_fn": 65,
+        "n_fn_nopad": 65,
+        "fn_bytes": 270,
+        "md5_fn": "77f37e6499c912ead576fbebc9bb4ba2",
+        "md5_fn_norel": "96ea7942a2c04f003dc6d07d19962940",
+        "pad_insns": 0,
+        "pad_bytes": 0,
+        "n_reloc_masked": 12,
+        "md5_norm": "1017fb67e8967d3e22f3586c10c51f00",
+        "has_loop": true,
+        "n_backward_branches": 1,
+        "bulk_calls": [],
+        "vector_regs": []
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 1305200000,
+          "kernel_functions": [
+            "kernel"
+          ],
+          "main_exclusive_ir": 3800055,
+          "main_functions": [
+            "main"
+          ]
+        }
+      }
+    },
+    {
+      "cell": "c-clang",
+      "opt": "O3",
+      "mode": "isolated",
+      "binary": ".temp/build/ph00/c-clang-O3-isolated",
+      "asm_symbol_needle": "kernel",
+      "binary_text_bytes": 1750,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/c-clang-O3-isolated",
+        "symbol": "kernel",
+        "n_raw": 38,
+        "n_nopad": 35,
+        "n_bytes": 128,
+        "md5_raw": "c9ad71e53f0aa0bd4e4cefe8e352ef37",
+        "md5_raw_norel": "e8ce0110bcfb82587c30cd23726a122a",
+        "has_extent": true,
+        "n_fn": 37,
+        "n_fn_nopad": 35,
+        "fn_bytes": 125,
+        "md5_fn": "cb7ad6f3dc03934e9aa3efad724f8b86",
+        "md5_fn_norel": "df99a8e890bb8276797b30b0fa8c0ec4",
+        "pad_insns": 1,
+        "pad_bytes": 3,
+        "n_reloc_masked": 6,
+        "md5_norm": "83c8f620672debb6a540dbfa48a3e9e0",
+        "has_loop": true,
+        "n_backward_branches": 2,
+        "bulk_calls": [],
+        "vector_regs": [
+          "xmm"
+        ]
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 180000000,
+          "kernel_functions": [
+            "kernel"
+          ],
+          "main_exclusive_ir": 2600052,
+          "main_functions": [
+            "main"
+          ]
+        },
+        "large.bin": {
+          "kernel_exclusive_ir": 143740000,
+          "kernel_functions": [
+            "kernel"
+          ],
+          "main_exclusive_ir": 260052,
+          "main_functions": [
+            "main"
+          ]
+        }
+      },
+      "wall": {
+        "small.bin": {
+          "min_s": 0.015593962743878365,
+          "median_s": 0.016982237808406353,
+          "reps": 30,
+          "spread_pct": 8.902644487033777
+        },
+        "large.bin": {
+          "min_s": 0.03390485979616642,
+          "median_s": 0.03586663957685232,
+          "reps": 30,
+          "spread_pct": 5.786131523563231
+        }
+      }
+    },
+    {
+      "cell": "c-clang",
+      "opt": "O3",
+      "mode": "whole",
+      "binary": ".temp/build/ph00/c-clang-O3-whole",
+      "asm_symbol_needle": "main",
+      "binary_text_bytes": 1202,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/c-clang-O3-whole",
+        "symbol": "main",
+        "n_raw": 242,
+        "n_nopad": 239,
+        "n_bytes": 962,
+        "md5_raw": "06d2a24ecc1c65fe3ab44f8b98e91439",
+        "md5_raw_norel": "b6d1d117c551c2f8b37f72e0ccfd42a8",
+        "has_extent": true,
+        "n_fn": 242,
+        "n_fn_nopad": 239,
+        "fn_bytes": 962,
+        "md5_fn": "06d2a24ecc1c65fe3ab44f8b98e91439",
+        "md5_fn_norel": "b6d1d117c551c2f8b37f72e0ccfd42a8",
+        "pad_insns": 0,
+        "pad_bytes": 0,
+        "n_reloc_masked": 77,
+        "md5_norm": "4ce6f91d7f78a452fe6805df22cec011",
+        "has_loop": true,
+        "n_backward_branches": 6,
+        "bulk_calls": [
+          "memcpy@plt"
+        ],
+        "vector_regs": [
+          "xmm"
+        ]
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": null,
+          "kernel_functions": [],
+          "main_exclusive_ir": 181400169,
+          "main_functions": [
+            "main"
+          ]
+        },
+        "large.bin": {
+          "kernel_exclusive_ir": null,
+          "kernel_functions": [],
+          "main_exclusive_ir": 143880169,
+          "main_functions": [
+            "main"
+          ]
+        }
+      },
+      "wall": {
+        "small.bin": {
+          "min_s": 0.01633452158421278,
+          "median_s": 0.01824038289487362,
+          "reps": 30,
+          "spread_pct": 11.667689811636986,
+          "warning": "min-to-median spread > 10% -- `.memory/03-measurement.md` says discard"
+        },
+        "large.bin": {
+          "min_s": 0.03393239341676235,
+          "median_s": 0.03566235117614269,
+          "reps": 30,
+          "spread_pct": 5.098248561876434
+        }
+      }
+    },
+    {
+      "cell": "safe_naive",
+      "opt": "O0",
+      "mode": "isolated",
+      "binary": ".temp/build/ph00/safe_naive-O0-isolated",
+      "asm_symbol_needle": "kernel",
+      "binary_text_bytes": 269315,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/safe_naive-O0-isolated",
+        "symbol": "_RNvCsaBH6GJeUSWJ_10safe_naive6kernel",
+        "n_raw": 46,
+        "n_nopad": 42,
+        "n_bytes": 192,
+        "md5_raw": "32dd86abfd2e596ab5277fb8e8d147c6",
+        "md5_raw_norel": "f0a161f24eb91b3887843b4db64a8154",
+        "has_extent": true,
+        "n_fn": 42,
+        "n_fn_nopad": 42,
+        "fn_bytes": 188,
+        "md5_fn": "bf555ac413188c88e5bf17e2b64f4f70",
+        "md5_fn_norel": "fba2e5d050310a6b8ebbbd495d6f9f99",
+        "pad_insns": 4,
+        "pad_bytes": 4,
+        "n_reloc_masked": 8,
+        "md5_norm": "f1fcab5eae0463c640fe7d53f4e28d5e",
+        "has_loop": true,
+        "n_backward_branches": 1,
+        "bulk_calls": [],
+        "vector_regs": []
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 2108600000,
+          "kernel_functions": [
+            "safe_naive::kernel"
+          ],
+          "main_exclusive_ir": 4800073,
+          "main_functions": [
+            "main",
+            "safe_naive::main"
+          ]
+        }
+      }
+    },
+    {
+      "cell": "safe_naive",
+      "opt": "O0",
+      "mode": "whole",
+      "binary": ".temp/build/ph00/safe_naive-O0-whole",
+      "asm_symbol_needle": "main",
+      "binary_text_bytes": 269315,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/safe_naive-O0-whole",
+        "symbol": "_RNvCsaBH6GJeUSWJ_10safe_naive4main",
+        "n_raw": 115,
+        "n_nopad": 113,
+        "n_bytes": 576,
+        "md5_raw": "1d0eea59f1e41c9f26f14cc580f636fc",
+        "md5_raw_norel": "8b44455252fb5c54d516e58f974ff46b",
+        "has_extent": true,
+        "n_fn": 113,
+        "n_fn_nopad": 113,
+        "fn_bytes": 574,
+        "md5_fn": "0cc27eb0b1917c6fc0705411f9170d8c",
+        "md5_fn_norel": "edfcd1150ea16492e80c347638722408",
+        "pad_insns": 2,
+        "pad_bytes": 2,
+        "n_reloc_masked": 35,
+        "md5_norm": "3153f581b70d014193cd027c7c672923",
+        "has_loop": true,
+        "n_backward_branches": 8,
+        "bulk_calls": [],
+        "vector_regs": [
+          "xmm"
+        ]
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 2108600000,
+          "kernel_functions": [
+            "safe_naive::kernel"
+          ],
+          "main_exclusive_ir": 4800073,
+          "main_functions": [
+            "main",
+            "safe_naive::main"
+          ]
+        }
+      }
+    },
+    {
+      "cell": "safe_naive",
+      "opt": "O3",
+      "mode": "isolated",
+      "binary": ".temp/build/ph00/safe_naive-O3-isolated",
+      "asm_symbol_needle": "kernel",
+      "binary_text_bytes": 259091,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/safe_naive-O3-isolated",
+        "symbol": "_RNvCsaBH6GJeUSWJ_10safe_naive6kernel",
+        "n_raw": 59,
+        "n_nopad": 47,
+        "n_bytes": 192,
+        "md5_raw": "f1e7f9511d86a6d18e7edf4e0fdbc384",
+        "md5_raw_norel": "09823d2b868e750d6f75c730f2fb49ad",
+        "has_extent": true,
+        "n_fn": 49,
+        "n_fn_nopad": 47,
+        "fn_bytes": 182,
+        "md5_fn": "12d307f2b9d1bef4f5e6c7a3ffde62cf",
+        "md5_fn_norel": "a77302fc10f915c1aa0ecfe1e55b2c59",
+        "pad_insns": 10,
+        "pad_bytes": 10,
+        "n_reloc_masked": 6,
+        "md5_norm": "5b0af5a4c2f0fc723c1005dbcd498e1c",
+        "has_loop": true,
+        "n_backward_branches": 2,
+        "bulk_calls": [],
+        "vector_regs": [
+          "xmm"
+        ]
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 182400000,
+          "kernel_functions": [
+            "safe_naive::kernel"
+          ],
+          "main_exclusive_ir": 2616286,
+          "main_functions": [
+            "main",
+            "safe_naive::main"
+          ]
+        },
+        "large.bin": {
+          "kernel_exclusive_ir": 144320000,
+          "kernel_functions": [
+            "safe_naive::kernel"
+          ],
+          "main_exclusive_ir": 12260286,
+          "main_functions": [
+            "main",
+            "safe_naive::main"
+          ]
+        }
+      },
+      "wall": {
+        "small.bin": {
+          "min_s": 0.015858610160648823,
+          "median_s": 0.016834691166877747,
+          "reps": 30,
+          "spread_pct": 6.154896276162636
+        },
+        "large.bin": {
+          "min_s": 0.035223258659243584,
+          "median_s": 0.03685454232618213,
+          "reps": 30,
+          "spread_pct": 4.631268454517192
+        }
+      }
+    },
+    {
+      "cell": "safe_naive",
+      "opt": "O3",
+      "mode": "whole",
+      "binary": ".temp/build/ph00/safe_naive-O3-whole",
+      "asm_symbol_needle": "main",
+      "binary_text_bytes": 259171,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/safe_naive-O3-whole",
+        "symbol": "_RNvCsaBH6GJeUSWJ_10safe_naive4main",
+        "n_raw": 713,
+        "n_nopad": 703,
+        "n_bytes": 3136,
+        "md5_raw": "f2cd0f528fd0db0aa28c004a0564961b",
+        "md5_raw_norel": "21a735aa45c4e19cab12e6e3305b8585",
+        "has_extent": true,
+        "n_fn": 712,
+        "n_fn_nopad": 703,
+        "fn_bytes": 3135,
+        "md5_fn": "fdff8bedf0371d53ab9e66231f2d5fcf",
+        "md5_fn_norel": "87e2f69bb6f30ddf3ab91434df1a3f99",
+        "pad_insns": 1,
+        "pad_bytes": 1,
+        "n_reloc_masked": 186,
+        "md5_norm": "76466c7ae53cd47d3e5f7c6ecfb5dd6e",
+        "has_loop": true,
+        "n_backward_branches": 21,
+        "bulk_calls": [
+          "memmove@GLIBC_2.2.5"
+        ],
+        "vector_regs": [
+          "xmm"
+        ]
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": null,
+          "kernel_functions": [],
+          "main_exclusive_ir": 185622294,
+          "main_functions": [
+            "main",
+            "safe_naive::main"
+          ]
+        },
+        "large.bin": {
+          "kernel_exclusive_ir": null,
+          "kernel_functions": [],
+          "main_exclusive_ir": 161140294,
+          "main_functions": [
+            "main",
+            "safe_naive::main"
+          ]
+        }
+      },
+      "wall": {
+        "small.bin": {
+          "min_s": 0.015548264607787132,
+          "median_s": 0.016599618829786777,
+          "reps": 30,
+          "spread_pct": 6.7618750292755445
+        },
+        "large.bin": {
+          "min_s": 0.035190208815038204,
+          "median_s": 0.03657195717096329,
+          "reps": 30,
+          "spread_pct": 3.9265136594887324
+        }
+      }
+    },
+    {
+      "cell": "safe_tuned",
+      "opt": "O0",
+      "mode": "isolated",
+      "binary": ".temp/build/ph00/safe_tuned-O0-isolated",
+      "asm_symbol_needle": "kernel",
+      "binary_text_bytes": 269667,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/safe_tuned-O0-isolated",
+        "symbol": "_RINvXs2J_NtNtCs4NRVxsYgnAr_4core5slice4iterINtB7_4IteryENtNtNtNtBb_4iter6traits8iterator8Iterator4foldyNCNvCs86OlWC8CPt8_10safe_tuned6kernel0EB1H_",
+        "n_raw": 83,
+        "n_nopad": 69,
+        "n_bytes": 288,
+        "md5_raw": "7e1d442f57478ce8bf524fcc99a5a68a",
+        "md5_raw_norel": "0593c9a97512f8b446d10f4cd4399a3f",
+        "has_extent": true,
+        "n_fn": 69,
+        "n_fn_nopad": 69,
+        "fn_bytes": 274,
+        "md5_fn": "33f805219e46d479e5bb61c19aea2e19",
+        "md5_fn_norel": "a3a34738378b3d75837f58ad49cc85eb",
+        "pad_insns": 14,
+        "pad_bytes": 14,
+        "n_reloc_masked": 19,
+        "md5_norm": "50f83d9d7f39f1eb1a25756d6a38b762",
+        "has_loop": true,
+        "n_backward_branches": 4,
+        "bulk_calls": [],
+        "vector_regs": []
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 2116800000,
+          "kernel_functions": [
+            "<core::slice::iter::Iter<u64> as core::iter::traits::iterator::Iterator>::fold::<u64, safe_tuned::kernel::{closure#0}>",
+            "safe_tuned::kernel",
+            "safe_tuned::kernel::{closure#0}"
+          ],
+          "main_exclusive_ir": 4800073,
+          "main_functions": [
+            "main",
+            "safe_tuned::main"
+          ]
+        }
+      }
+    },
+    {
+      "cell": "safe_tuned",
+      "opt": "O0",
+      "mode": "whole",
+      "binary": ".temp/build/ph00/safe_tuned-O0-whole",
+      "asm_symbol_needle": "main",
+      "binary_text_bytes": 269667,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/safe_tuned-O0-whole",
+        "symbol": "_RNvCs86OlWC8CPt8_10safe_tuned4main",
+        "n_raw": 115,
+        "n_nopad": 113,
+        "n_bytes": 576,
+        "md5_raw": "954b18e1ef9852db928c74ec73b3d429",
+        "md5_raw_norel": "8b44455252fb5c54d516e58f974ff46b",
+        "has_extent": true,
+        "n_fn": 113,
+        "n_fn_nopad": 113,
+        "fn_bytes": 574,
+        "md5_fn": "9bef66b496114c2e2ee1ae79ca0e5a49",
+        "md5_fn_norel": "edfcd1150ea16492e80c347638722408",
+        "pad_insns": 2,
+        "pad_bytes": 2,
+        "n_reloc_masked": 35,
+        "md5_norm": "3153f581b70d014193cd027c7c672923",
+        "has_loop": true,
+        "n_backward_branches": 8,
+        "bulk_calls": [],
+        "vector_regs": [
+          "xmm"
+        ]
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 2116800000,
+          "kernel_functions": [
+            "<core::slice::iter::Iter<u64> as core::iter::traits::iterator::Iterator>::fold::<u64, safe_tuned::kernel::{closure#0}>",
+            "safe_tuned::kernel",
+            "safe_tuned::kernel::{closure#0}"
+          ],
+          "main_exclusive_ir": 4800073,
+          "main_functions": [
+            "main",
+            "safe_tuned::main"
+          ]
+        }
+      }
+    },
+    {
+      "cell": "safe_tuned",
+      "opt": "O3",
+      "mode": "isolated",
+      "binary": ".temp/build/ph00/safe_tuned-O3-isolated",
+      "asm_symbol_needle": "kernel",
+      "binary_text_bytes": 259091,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/safe_tuned-O3-isolated",
+        "symbol": "_RNvCs86OlWC8CPt8_10safe_tuned6kernel",
+        "n_raw": 58,
+        "n_nopad": 44,
+        "n_bytes": 192,
+        "md5_raw": "9eb333b23958607ef7ec6c57c07b1871",
+        "md5_raw_norel": "547f48226e6f7f2a42646c485240c2e3",
+        "has_extent": true,
+        "n_fn": 46,
+        "n_fn_nopad": 44,
+        "fn_bytes": 180,
+        "md5_fn": "499ab455c4fb35767037b448144b8efa",
+        "md5_fn_norel": "331da58119a6aca68dae28f2587346be",
+        "pad_insns": 12,
+        "pad_bytes": 12,
+        "n_reloc_masked": 9,
+        "md5_norm": "21984e39624f4c8159d4d540e53086de",
+        "has_loop": true,
+        "n_backward_branches": 2,
+        "bulk_calls": [],
+        "vector_regs": [
+          "xmm"
+        ]
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 181000000,
+          "kernel_functions": [
+            "safe_tuned::kernel"
+          ],
+          "main_exclusive_ir": 2616286,
+          "main_functions": [
+            "main",
+            "safe_tuned::main"
+          ]
+        },
+        "large.bin": {
+          "kernel_exclusive_ir": 143840000,
+          "kernel_functions": [
+            "safe_tuned::kernel"
+          ],
+          "main_exclusive_ir": 12260286,
+          "main_functions": [
+            "main",
+            "safe_tuned::main"
+          ]
+        }
+      },
+      "wall": {
+        "small.bin": {
+          "min_s": 0.015578233636915684,
+          "median_s": 0.016527696046978235,
+          "reps": 30,
+          "spread_pct": 6.094801453051865
+        },
+        "large.bin": {
+          "min_s": 0.03507385589182377,
+          "median_s": 0.03631232213228941,
+          "reps": 30,
+          "spread_pct": 3.5310239178873566
+        }
+      }
+    },
+    {
+      "cell": "safe_tuned",
+      "opt": "O3",
+      "mode": "whole",
+      "binary": ".temp/build/ph00/safe_tuned-O3-whole",
+      "asm_symbol_needle": "main",
+      "binary_text_bytes": 259043,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/safe_tuned-O3-whole",
+        "symbol": "_RNvCs86OlWC8CPt8_10safe_tuned4main",
+        "n_raw": 690,
+        "n_nopad": 680,
+        "n_bytes": 3008,
+        "md5_raw": "bd44d69601713d4229112e811099df62",
+        "md5_raw_norel": "ebc0999174429580b0cdbcdac7e7b3e8",
+        "has_extent": true,
+        "n_fn": 689,
+        "n_fn_nopad": 680,
+        "fn_bytes": 3007,
+        "md5_fn": "bbdde498f89560d2f7469452efe3fb1d",
+        "md5_fn_norel": "625b5191e29a1700dfc24f678d91ab90",
+        "pad_insns": 1,
+        "pad_bytes": 1,
+        "n_reloc_masked": 190,
+        "md5_norm": "9eef81f48201df627e059c8fc3b24fc7",
+        "has_loop": true,
+        "n_backward_branches": 23,
+        "bulk_calls": [
+          "memmove@GLIBC_2.2.5"
+        ],
+        "vector_regs": [
+          "xmm"
+        ]
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": null,
+          "kernel_functions": [],
+          "main_exclusive_ir": 182416289,
+          "main_functions": [
+            "main",
+            "safe_tuned::main"
+          ]
+        },
+        "large.bin": {
+          "kernel_exclusive_ir": null,
+          "kernel_functions": [],
+          "main_exclusive_ir": 155940289,
+          "main_functions": [
+            "main",
+            "safe_tuned::main"
+          ]
+        }
+      },
+      "wall": {
+        "small.bin": {
+          "min_s": 0.015475722029805183,
+          "median_s": 0.0170592637732625,
+          "reps": 30,
+          "spread_pct": 10.232425604488915,
+          "warning": "min-to-median spread > 10% -- `.memory/03-measurement.md` says discard"
+        },
+        "large.bin": {
+          "min_s": 0.03497448470443487,
+          "median_s": 0.03634614963084459,
+          "reps": 30,
+          "spread_pct": 3.9219017463773813
+        }
+      }
+    },
+    {
+      "cell": "unsafe",
+      "opt": "O0",
+      "mode": "isolated",
+      "binary": ".temp/build/ph00/unsafe-O0-isolated",
+      "asm_symbol_needle": "kernel",
+      "binary_text_bytes": 269363,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/unsafe-O0-isolated",
+        "symbol": "_RNvCsbJ183vTuGGA_6unsafe6kernel",
+        "n_raw": 48,
+        "n_nopad": 36,
+        "n_bytes": 176,
+        "md5_raw": "5abf0ea19afa1ea712b2d7828494d755",
+        "md5_raw_norel": "0f0060ce4f112a58aa7c22d9698d9a12",
+        "has_extent": true,
+        "n_fn": 36,
+        "n_fn_nopad": 36,
+        "fn_bytes": 164,
+        "md5_fn": "78b8c557c474a766ffebddfb445341d1",
+        "md5_fn_norel": "e5bc48f259a2cb6fc0be743ecd4e0c9f",
+        "pad_insns": 12,
+        "pad_bytes": 12,
+        "n_reloc_masked": 6,
+        "md5_norm": "a0fbf3e9194ba52e8823ea029cfad288",
+        "has_loop": true,
+        "n_backward_branches": 1,
+        "bulk_calls": [],
+        "vector_regs": []
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 2008400000,
+          "kernel_functions": [
+            "unsafe::kernel"
+          ],
+          "main_exclusive_ir": 4800073,
+          "main_functions": [
+            "main",
+            "unsafe::main"
+          ]
+        }
+      }
+    },
+    {
+      "cell": "unsafe",
+      "opt": "O0",
+      "mode": "whole",
+      "binary": ".temp/build/ph00/unsafe-O0-whole",
+      "asm_symbol_needle": "main",
+      "binary_text_bytes": 269363,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/unsafe-O0-whole",
+        "symbol": "_RNvCsbJ183vTuGGA_6unsafe4main",
+        "n_raw": 115,
+        "n_nopad": 113,
+        "n_bytes": 576,
+        "md5_raw": "87e8cfc53a06179b6de83d624176f4fd",
+        "md5_raw_norel": "8b44455252fb5c54d516e58f974ff46b",
+        "has_extent": true,
+        "n_fn": 113,
+        "n_fn_nopad": 113,
+        "fn_bytes": 574,
+        "md5_fn": "14ea08642ffcc177487e35c37d5e0dfb",
+        "md5_fn_norel": "edfcd1150ea16492e80c347638722408",
+        "pad_insns": 2,
+        "pad_bytes": 2,
+        "n_reloc_masked": 35,
+        "md5_norm": "3153f581b70d014193cd027c7c672923",
+        "has_loop": true,
+        "n_backward_branches": 8,
+        "bulk_calls": [],
+        "vector_regs": [
+          "xmm"
+        ]
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 2008400000,
+          "kernel_functions": [
+            "unsafe::kernel"
+          ],
+          "main_exclusive_ir": 4800073,
+          "main_functions": [
+            "main",
+            "unsafe::main"
+          ]
+        }
+      }
+    },
+    {
+      "cell": "unsafe",
+      "opt": "O3",
+      "mode": "isolated",
+      "binary": ".temp/build/ph00/unsafe-O3-isolated",
+      "asm_symbol_needle": "kernel",
+      "binary_text_bytes": 259043,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/unsafe-O3-isolated",
+        "symbol": "_RNvCsbJ183vTuGGA_6unsafe6kernel",
+        "n_raw": 39,
+        "n_nopad": 34,
+        "n_bytes": 144,
+        "md5_raw": "fb90a96cd00ffbd0517c0f50a1a5ed76",
+        "md5_raw_norel": "f37ab80b2c7395cc3ea230a9f83405fe",
+        "has_extent": true,
+        "n_fn": 36,
+        "n_fn_nopad": 34,
+        "fn_bytes": 141,
+        "md5_fn": "619b1d1b656189b3315f3d3609cef3e3",
+        "md5_fn_norel": "6fdd2d270593b9fdf38e6799ab563890",
+        "pad_insns": 3,
+        "pad_bytes": 3,
+        "n_reloc_masked": 5,
+        "md5_norm": "d0e9aa67c2870f167d5529a65d431589",
+        "has_loop": true,
+        "n_backward_branches": 2,
+        "bulk_calls": [],
+        "vector_regs": [
+          "xmm"
+        ]
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 180200000,
+          "kernel_functions": [
+            "unsafe::kernel"
+          ],
+          "main_exclusive_ir": 2616286,
+          "main_functions": [
+            "main",
+            "unsafe::main"
+          ]
+        },
+        "large.bin": {
+          "kernel_exclusive_ir": 143740000,
+          "kernel_functions": [
+            "unsafe::kernel"
+          ],
+          "main_exclusive_ir": 12260286,
+          "main_functions": [
+            "main",
+            "unsafe::main"
+          ]
+        }
+      },
+      "wall": {
+        "small.bin": {
+          "min_s": 0.01572839729487896,
+          "median_s": 0.016852155793458223,
+          "reps": 30,
+          "spread_pct": 7.144774369001668
+        },
+        "large.bin": {
+          "min_s": 0.0352153480052948,
+          "median_s": 0.03645404148846865,
+          "reps": 30,
+          "spread_pct": 3.5174818746292202
+        }
+      }
+    },
+    {
+      "cell": "unsafe",
+      "opt": "O3",
+      "mode": "whole",
+      "binary": ".temp/build/ph00/unsafe-O3-whole",
+      "asm_symbol_needle": "main",
+      "binary_text_bytes": 259043,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/unsafe-O3-whole",
+        "symbol": "_RNvCsbJ183vTuGGA_6unsafe4main",
+        "n_raw": 688,
+        "n_nopad": 677,
+        "n_bytes": 3008,
+        "md5_raw": "3cab7870905213c9e90f809c2b62c1db",
+        "md5_raw_norel": "aeb97508c4a6de2890358e4ba7a652a8",
+        "has_extent": true,
+        "n_fn": 687,
+        "n_fn_nopad": 677,
+        "fn_bytes": 3007,
+        "md5_fn": "40f1f18feb9b96e796d3965693363bb1",
+        "md5_fn_norel": "414c1d61841b84dd6442a857528ce3cf",
+        "pad_insns": 1,
+        "pad_bytes": 1,
+        "n_reloc_masked": 187,
+        "md5_norm": "610d66a5018c65a9f0951a33e57b1fd3",
+        "has_loop": true,
+        "n_backward_branches": 23,
+        "bulk_calls": [
+          "memmove@GLIBC_2.2.5"
+        ],
+        "vector_regs": [
+          "xmm"
+        ]
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": null,
+          "kernel_functions": [],
+          "main_exclusive_ir": 181616289,
+          "main_functions": [
+            "main",
+            "unsafe::main"
+          ]
+        },
+        "large.bin": {
+          "kernel_exclusive_ir": null,
+          "kernel_functions": [],
+          "main_exclusive_ir": 155840289,
+          "main_functions": [
+            "main",
+            "unsafe::main"
+          ]
+        }
+      },
+      "wall": {
+        "small.bin": {
+          "min_s": 0.01619212981313467,
+          "median_s": 0.01737330947071314,
+          "reps": 30,
+          "spread_pct": 7.294776358699419
+        },
+        "large.bin": {
+          "min_s": 0.034850883297622204,
+          "median_s": 0.03661419916898012,
+          "reps": 30,
+          "spread_pct": 5.059601664323455
+        }
+      }
+    },
+    {
+      "cell": "verus",
+      "opt": "O0",
+      "mode": "isolated",
+      "binary": ".temp/build/ph00/verus-O0-isolated",
+      "asm_symbol_needle": "kernel",
+      "binary_text_bytes": 269507,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/verus-O0-isolated",
+        "symbol": "_RNvCs5wP2qveqZnT_5verus6kernel",
+        "n_raw": 48,
+        "n_nopad": 36,
+        "n_bytes": 176,
+        "md5_raw": "7a961606e8f7c3685a81d77748d86ee7",
+        "md5_raw_norel": "0f0060ce4f112a58aa7c22d9698d9a12",
+        "has_extent": true,
+        "n_fn": 36,
+        "n_fn_nopad": 36,
+        "fn_bytes": 164,
+        "md5_fn": "a5bbe0c0f5efec40b33e8f9ff795e478",
+        "md5_fn_norel": "e5bc48f259a2cb6fc0be743ecd4e0c9f",
+        "pad_insns": 12,
+        "pad_bytes": 12,
+        "n_reloc_masked": 6,
+        "md5_norm": "a0fbf3e9194ba52e8823ea029cfad288",
+        "has_loop": true,
+        "n_backward_branches": 1,
+        "bulk_calls": [],
+        "vector_regs": []
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 2008400000,
+          "kernel_functions": [
+            "verus::kernel"
+          ],
+          "main_exclusive_ir": 4800052,
+          "main_functions": [
+            "main",
+            "verus::main"
+          ]
+        }
+      }
+    },
+    {
+      "cell": "verus",
+      "opt": "O0",
+      "mode": "whole",
+      "binary": ".temp/build/ph00/verus-O0-whole",
+      "asm_symbol_needle": "main",
+      "binary_text_bytes": 269507,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/verus-O0-whole",
+        "symbol": "_RINvNtNtNtCs4NRVxsYgnAr_4core5slice4sort6stable14driftsort_mainNtNtCsdB6qrhj7hiN_9addr2line4line12LineSequenceNCINvMNtCscdodAO9FK5_5alloc5sliceSBZ_11sort_by_keyyNCINvMs_B11_NtB11_5Lines5parseINtNtNtCsjd0ZH04R2Z3_5gimli4read12endian_slice11EndianSliceNtNtB3a_9endianity12LittleEndianEEs_0E0INtNtB1S_3vec3VecBZ_EECs2AWtUsOyxgP_3std",
+        "n_raw": 93,
+        "n_nopad": 86,
+        "n_bytes": 336,
+        "md5_raw": "6369b1eba6540d06aedbac91d1a9a0d3",
+        "md5_raw_norel": "a7890774f78d5e6ec8c76d17478b9e27",
+        "has_extent": true,
+        "n_fn": 86,
+        "n_fn_nopad": 86,
+        "fn_bytes": 329,
+        "md5_fn": "d78a5de2e0c87630582bb85cfcb1ab6c",
+        "md5_fn_norel": "15d3c087590ea976363bb70726b10d86",
+        "pad_insns": 7,
+        "pad_bytes": 7,
+        "n_reloc_masked": 13,
+        "md5_norm": "5a232eccfc3d2a0bc05956a19b0b9f3c",
+        "has_loop": true,
+        "n_backward_branches": 1,
+        "bulk_calls": [],
+        "vector_regs": []
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 2008400000,
+          "kernel_functions": [
+            "verus::kernel"
+          ],
+          "main_exclusive_ir": 4800052,
+          "main_functions": [
+            "main",
+            "verus::main"
+          ]
+        }
+      }
+    },
+    {
+      "cell": "verus",
+      "opt": "O3",
+      "mode": "isolated",
+      "binary": ".temp/build/ph00/verus-O3-isolated",
+      "asm_symbol_needle": "kernel",
+      "binary_text_bytes": 259107,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/verus-O3-isolated",
+        "symbol": "_RNvCs5wP2qveqZnT_5verus6kernel",
+        "n_raw": 39,
+        "n_nopad": 34,
+        "n_bytes": 144,
+        "md5_raw": "fb90a96cd00ffbd0517c0f50a1a5ed76",
+        "md5_raw_norel": "f37ab80b2c7395cc3ea230a9f83405fe",
+        "has_extent": true,
+        "n_fn": 36,
+        "n_fn_nopad": 34,
+        "fn_bytes": 141,
+        "md5_fn": "619b1d1b656189b3315f3d3609cef3e3",
+        "md5_fn_norel": "6fdd2d270593b9fdf38e6799ab563890",
+        "pad_insns": 3,
+        "pad_bytes": 3,
+        "n_reloc_masked": 5,
+        "md5_norm": "d0e9aa67c2870f167d5529a65d431589",
+        "has_loop": true,
+        "n_backward_branches": 2,
+        "bulk_calls": [],
+        "vector_regs": [
+          "xmm"
+        ]
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 180200000,
+          "kernel_functions": [
+            "verus::kernel"
+          ],
+          "main_exclusive_ir": 2416291,
+          "main_functions": [
+            "main",
+            "verus::main"
+          ]
+        },
+        "large.bin": {
+          "kernel_exclusive_ir": 143740000,
+          "kernel_functions": [
+            "verus::kernel"
+          ],
+          "main_exclusive_ir": 12240291,
+          "main_functions": [
+            "main",
+            "verus::main"
+          ]
+        }
+      },
+      "wall": {
+        "small.bin": {
+          "min_s": 0.015349671244621277,
+          "median_s": 0.016621458809822798,
+          "reps": 30,
+          "spread_pct": 8.285438462710866
+        },
+        "large.bin": {
+          "min_s": 0.035033038817346096,
+          "median_s": 0.03665389213711023,
+          "reps": 30,
+          "spread_pct": 4.626642091241013
+        }
+      }
+    },
+    {
+      "cell": "verus",
+      "opt": "O3",
+      "mode": "whole",
+      "binary": ".temp/build/ph00/verus-O3-whole",
+      "asm_symbol_needle": "main",
+      "binary_text_bytes": 259027,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/verus-O3-whole",
+        "symbol": "_RNvCs5wP2qveqZnT_5verus4main",
+        "n_raw": 685,
+        "n_nopad": 674,
+        "n_bytes": 2992,
+        "md5_raw": "c3b956f79f4509897c6adf027a253799",
+        "md5_raw_norel": "583553a01779d21d6c50d6eb15531f4b",
+        "has_extent": true,
+        "n_fn": 684,
+        "n_fn_nopad": 674,
+        "fn_bytes": 2991,
+        "md5_fn": "893735f066b52a53ad080d23a653f3bf",
+        "md5_fn_norel": "9cf779daf734102bd8146b82dbdf7cfc",
+        "pad_insns": 1,
+        "pad_bytes": 1,
+        "n_reloc_masked": 187,
+        "md5_norm": "de86edaa0e4bc43858d2b8ce05b79d1d",
+        "has_loop": true,
+        "n_backward_branches": 25,
+        "bulk_calls": [
+          "memmove@GLIBC_2.2.5"
+        ],
+        "vector_regs": [
+          "xmm"
+        ]
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": null,
+          "kernel_functions": [],
+          "main_exclusive_ir": 181616288,
+          "main_functions": [
+            "main",
+            "verus::main"
+          ]
+        },
+        "large.bin": {
+          "kernel_exclusive_ir": null,
+          "kernel_functions": [],
+          "main_exclusive_ir": 155840288,
+          "main_functions": [
+            "main",
+            "verus::main"
+          ]
+        }
+      },
+      "wall": {
+        "small.bin": {
+          "min_s": 0.01596464216709137,
+          "median_s": 0.017610976472496986,
+          "reps": 30,
+          "spread_pct": 10.312378368237274,
+          "warning": "min-to-median spread > 10% -- `.memory/03-measurement.md` says discard"
+        },
+        "large.bin": {
+          "min_s": 0.03455908223986626,
+          "median_s": 0.0368123697116971,
+          "reps": 30,
+          "spread_pct": 6.520102172249019
+        }
+      }
+    },
+    {
+      "cell": "safe_naive_verus",
+      "opt": "O0",
+      "mode": "isolated",
+      "binary": ".temp/build/ph00/safe_naive_verus-O0-isolated",
+      "asm_symbol_needle": "kernel",
+      "binary_text_bytes": 269459,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/safe_naive_verus-O0-isolated",
+        "symbol": "_RNvCskQ1yMm8zfmt_16safe_naive_verus6kernel",
+        "n_raw": 46,
+        "n_nopad": 42,
+        "n_bytes": 192,
+        "md5_raw": "32dd86abfd2e596ab5277fb8e8d147c6",
+        "md5_raw_norel": "f0a161f24eb91b3887843b4db64a8154",
+        "has_extent": true,
+        "n_fn": 42,
+        "n_fn_nopad": 42,
+        "fn_bytes": 188,
+        "md5_fn": "bf555ac413188c88e5bf17e2b64f4f70",
+        "md5_fn_norel": "fba2e5d050310a6b8ebbbd495d6f9f99",
+        "pad_insns": 4,
+        "pad_bytes": 4,
+        "n_reloc_masked": 8,
+        "md5_norm": "f1fcab5eae0463c640fe7d53f4e28d5e",
+        "has_loop": true,
+        "n_backward_branches": 1,
+        "bulk_calls": [],
+        "vector_regs": []
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 2108600000,
+          "kernel_functions": [
+            "safe_naive_verus::kernel"
+          ],
+          "main_exclusive_ir": 4800052,
+          "main_functions": [
+            "main",
+            "safe_naive_verus::main"
+          ]
+        }
+      }
+    },
+    {
+      "cell": "safe_naive_verus",
+      "opt": "O0",
+      "mode": "whole",
+      "binary": ".temp/build/ph00/safe_naive_verus-O0-whole",
+      "asm_symbol_needle": "main",
+      "binary_text_bytes": 269459,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/safe_naive_verus-O0-whole",
+        "symbol": "_RINvNtNtNtCs4NRVxsYgnAr_4core5slice4sort6stable14driftsort_mainNtNtCsdB6qrhj7hiN_9addr2line4line12LineSequenceNCINvMNtCscdodAO9FK5_5alloc5sliceSBZ_11sort_by_keyyNCINvMs_B11_NtB11_5Lines5parseINtNtNtCsjd0ZH04R2Z3_5gimli4read12endian_slice11EndianSliceNtNtB3a_9endianity12LittleEndianEEs_0E0INtNtB1S_3vec3VecBZ_EECs2AWtUsOyxgP_3std",
+        "n_raw": 93,
+        "n_nopad": 86,
+        "n_bytes": 336,
+        "md5_raw": "255954b41bdc3a5b47019d92766440f9",
+        "md5_raw_norel": "a7890774f78d5e6ec8c76d17478b9e27",
+        "has_extent": true,
+        "n_fn": 86,
+        "n_fn_nopad": 86,
+        "fn_bytes": 329,
+        "md5_fn": "73b402491bc22d2421db1927a6656e4e",
+        "md5_fn_norel": "15d3c087590ea976363bb70726b10d86",
+        "pad_insns": 7,
+        "pad_bytes": 7,
+        "n_reloc_masked": 13,
+        "md5_norm": "5a232eccfc3d2a0bc05956a19b0b9f3c",
+        "has_loop": true,
+        "n_backward_branches": 1,
+        "bulk_calls": [],
+        "vector_regs": []
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 2108600000,
+          "kernel_functions": [
+            "safe_naive_verus::kernel"
+          ],
+          "main_exclusive_ir": 4800052,
+          "main_functions": [
+            "main",
+            "safe_naive_verus::main"
+          ]
+        }
+      }
+    },
+    {
+      "cell": "safe_naive_verus",
+      "opt": "O3",
+      "mode": "isolated",
+      "binary": ".temp/build/ph00/safe_naive_verus-O3-isolated",
+      "asm_symbol_needle": "kernel",
+      "binary_text_bytes": 259091,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/safe_naive_verus-O3-isolated",
+        "symbol": "_RNvCskQ1yMm8zfmt_16safe_naive_verus6kernel",
+        "n_raw": 59,
+        "n_nopad": 47,
+        "n_bytes": 192,
+        "md5_raw": "f1e7f9511d86a6d18e7edf4e0fdbc384",
+        "md5_raw_norel": "09823d2b868e750d6f75c730f2fb49ad",
+        "has_extent": true,
+        "n_fn": 49,
+        "n_fn_nopad": 47,
+        "fn_bytes": 182,
+        "md5_fn": "12d307f2b9d1bef4f5e6c7a3ffde62cf",
+        "md5_fn_norel": "a77302fc10f915c1aa0ecfe1e55b2c59",
+        "pad_insns": 10,
+        "pad_bytes": 10,
+        "n_reloc_masked": 6,
+        "md5_norm": "5b0af5a4c2f0fc723c1005dbcd498e1c",
+        "has_loop": true,
+        "n_backward_branches": 2,
+        "bulk_calls": [],
+        "vector_regs": [
+          "xmm"
+        ]
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": 182400000,
+          "kernel_functions": [
+            "safe_naive_verus::kernel"
+          ],
+          "main_exclusive_ir": 2616287,
+          "main_functions": [
+            "main",
+            "safe_naive_verus::main"
+          ]
+        },
+        "large.bin": {
+          "kernel_exclusive_ir": 144320000,
+          "kernel_functions": [
+            "safe_naive_verus::kernel"
+          ],
+          "main_exclusive_ir": 12260287,
+          "main_functions": [
+            "main",
+            "safe_naive_verus::main"
+          ]
+        }
+      },
+      "wall": {
+        "small.bin": {
+          "min_s": 0.015228244476020336,
+          "median_s": 0.01732001267373562,
+          "reps": 30,
+          "spread_pct": 13.736108590909183,
+          "warning": "min-to-median spread > 10% -- `.memory/03-measurement.md` says discard"
+        },
+        "large.bin": {
+          "min_s": 0.034954776987433434,
+          "median_s": 0.03616976458579302,
+          "reps": 30,
+          "spread_pct": 3.475884279840733
+        }
+      }
+    },
+    {
+      "cell": "safe_naive_verus",
+      "opt": "O3",
+      "mode": "whole",
+      "binary": ".temp/build/ph00/safe_naive_verus-O3-whole",
+      "asm_symbol_needle": "main",
+      "binary_text_bytes": 259123,
+      "status": "ok",
+      "static": {
+        "binary": "/home/apt/repos_common/sec-ladder/.temp/php-root/.temp/build/ph00/safe_naive_verus-O3-whole",
+        "symbol": "_RNvCskQ1yMm8zfmt_16safe_naive_verus4main",
+        "n_raw": 698,
+        "n_nopad": 688,
+        "n_bytes": 3088,
+        "md5_raw": "c8c8bc3cc4b912018324036f0c2cef79",
+        "md5_raw_norel": "9d0aa391218e0d2e299354eab9253edc",
+        "has_extent": true,
+        "n_fn": 697,
+        "n_fn_nopad": 688,
+        "fn_bytes": 3087,
+        "md5_fn": "728213b69f3b3caf317b0095126dd09b",
+        "md5_fn_norel": "83dd443df3014ded3a52895e1400027d",
+        "pad_insns": 1,
+        "pad_bytes": 1,
+        "n_reloc_masked": 187,
+        "md5_norm": "d2607e11a992510212a49ee9b55fa74d",
+        "has_loop": true,
+        "n_backward_branches": 23,
+        "bulk_calls": [
+          "memmove@GLIBC_2.2.5"
+        ],
+        "vector_regs": [
+          "xmm"
+        ]
+      },
+      "checksum": {
+        "small.bin": "17245669606222259694",
+        "large.bin": "8088771909753396726"
+      },
+      "ir": {
+        "small.bin": {
+          "kernel_exclusive_ir": null,
+          "kernel_functions": [],
+          "main_exclusive_ir": 183816290,
+          "main_functions": [
+            "main",
+            "safe_naive_verus::main"
+          ]
+        },
+        "large.bin": {
+          "kernel_exclusive_ir": null,
+          "kernel_functions": [],
+          "main_exclusive_ir": 156460290,
+          "main_functions": [
+            "main",
+            "safe_naive_verus::main"
+          ]
+        }
+      },
+      "wall": {
+        "small.bin": {
+          "min_s": 0.0164159731939435,
+          "median_s": 0.018562206998467445,
+          "reps": 30,
+          "spread_pct": 13.074057682524574,
+          "warning": "min-to-median spread > 10% -- `.memory/03-measurement.md` says discard"
+        },
+        "large.bin": {
+          "min_s": 0.034574477933347225,
+          "median_s": 0.036539871245622635,
+          "reps": 30,
+          "spread_pct": 5.684520576317307
+        }
+      }
+    }
+  ]
+}

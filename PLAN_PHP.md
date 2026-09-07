@@ -355,6 +355,18 @@ allocation that **succeeds**. An earlier effort substituted plain `malloc`
 during extraction and, as a direct result, **reported a real defect as
 unreachable and then invented an explanation for the upstream fix**.
 
+⚠⚠⚠ **THERE ARE THREE TRUNCATIONS, NOT ONE.** The third was found at
+`TASK_PHP_002` and ✅ manager-verified: `Zend/zend_alloc.c:295`, inside
+`_ecalloc`, is
+
+```c
+	int final_size = size*nmemb;
+```
+
+— a **signed 32-bit** product passed straight to `_emalloc`, so
+`ecalloc(0x40000000, 4)` allocates **0 bytes and succeeds**. A shim that models
+only `_emalloc` misses the calloc path entirely.
+
 ⚠⚠ **AND THERE IS A SECOND TRUNCATION THIS SECTION DID NOT KNOW ABOUT**, found
 by the spatial miner and ✅ manager-verified: `Zend/zend_alloc.h:53` declares the
 *recorded* size as `unsigned int size:31` — a 31-bit bitfield, distinct from
@@ -363,7 +375,8 @@ truncating `_emalloc`**, so it does not protect against either.
 
 ⚠⚠⚠ **CONSEQUENCE FOR ADMISSION, AND IT IS NOT OPTIONAL:
 `crashes_pristine_5_0_0 = False` IS NOT EVIDENCE THAT A DEFECT IS ABSENT.**
-`zend_alloc.c:39-43` forces the size-class cache on in both `#ifdef` arms, and
+`zend_alloc.c:40-44` forces the size-class cache on in both `#ifdef` arms (⚠ this
+said `:39-43` and was **wrong by one**, caught at `TASK_PHP_002`), and
 `san_tests/REPORT.md` §2 measures **63.5 % of PHP's heap traffic never reaching
 `malloc`**. **A C kernel on plain `malloc`/`free` will reproduce MORE of these
 than pristine PHP does** — 40 of the 85 temporal rows are `False` and mostly for
