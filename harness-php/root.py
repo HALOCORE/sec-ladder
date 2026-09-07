@@ -55,14 +55,24 @@ needed two more:
         reason the middle one loses is the one that decided it:
 
           A. leave it nesting at `.temp/php-root/.temp/`
-             REJECTED. This script REBUILDS the shim by removing and
-             recreating it -- that is what makes it a derived artefact -- so
-             every rebuild would silently delete every build artefact,
-             `docrepro` fixture and callgrind output underneath it and force a
-             full recompile. A scratch tree must not live inside the thing
-             that gets thrown away. Secondarily: a `.temp` inside a `.temp` is
-             invisible to `ls .temp/` and to any "delete the artefact" sweep
-             (`CLAUDE.md` constraint 1).
+             REJECTED -- ⚠ BUT NOT FOR THE REASON THIS DOCSTRING GAVE UNTIL
+             TASK_PHP_004. It said *"this script REBUILDS the shim by removing
+             and recreating it ... so every rebuild would silently delete every
+             build artefact underneath it"*, and TASK_PHP_003 m3 MEASURED that
+             to be fiction: `build()` is `makedirs(exist_ok=True)` plus a
+             per-link `unlink` only when the target differs, there is no
+             `rmtree` anywhere in this file, and a scratch marker planted
+             inside the shim SURVIVED a `build()`.
+             ✅ Option C is still right, on the reasons that hold:
+               - a `.temp` inside a `.temp` is invisible to `ls .temp/` and to
+                 any "delete the artefact" sweep (`CLAUDE.md` constraint 1);
+               - `check()` REFUSES any entry in the shim that is not a link
+                 ("unexpected entries in the shim"), so a nested scratch tree
+                 would make the preflight fail on every run -- that check, not
+                 a rebuild, is what actually protects the shim;
+               - the shim IS a derived artefact and a human deleting it by
+                 hand (which is the documented repair) would take the scratch
+                 tree with it.
           B. point it at the REAL `.temp/`
              REJECTED, and this is the dangerous one. `build.py:119` keys the
              build directory on `pattern_id(pdir)` = `basename.split("-")[0]`,
@@ -158,8 +168,11 @@ def build(verbose=True):
             raise SystemExit(
                 f"root.py: {link} exists and is NOT a symlink. Refusing to "
                 f"delete it -- a real file here means somebody wrote into the "
-                f"shim, and the shim is a derived artefact that this script "
-                f"rebuilds. Inspect it, then remove it by hand.")
+                f"shim, and the shim is a derived artefact meant to hold "
+                f"nothing but links. Inspect it, then remove it by hand. "
+                f"(⚠ This message used to say 'that this script rebuilds'; "
+                f"`build()` never deletes anything but a mis-aimed link, "
+                f"measured at TASK_PHP_003 m3.)")
         os.symlink(target, link)
     if verbose:
         print(f"shim -> {os.path.relpath(SHIM, REPO)}")
@@ -238,6 +251,23 @@ def sweep():
             if mo:
                 hits.setdefault(mo.group(1), []).append(f"{m}:{i}")
 
+    # ⚠⚠ THERE WAS A SECOND ARM HERE AND IT MADE THE SWEEP A TAUTOLOGY FOR
+    # FOUR OF THE SEVEN LINKS. It read
+    #
+    #     elif comp in ("common", "harness", "patterns", "results"):
+    #         print("LINKED ...")
+    #
+    # -- a hard-coded whitelist of four names that are ALSO in `LINKS`, so it
+    # was unreachable while the map was intact and, the moment a link was
+    # deleted to test the sweep, it silently caught it and printed LINKED.
+    # `--sweep` exists to make the link list age with the harness; for the four
+    # links that carry the gate it could not fail. TASK_PHP_003 M2 measured it
+    # link by link: `harness`, `common`, `patterns`, `results` all returned
+    # rc=0 with a deleted entry, and the engineer's own must-fire control had
+    # been run on `pilot`, one of the three the whitelist does NOT cover, so
+    # the whitelist was never exercised. This is the silent-skip class the
+    # project has now found eleven times. Deleted at TASK_PHP_004; the
+    # per-link negative is `.temp/php4/m2_sweep_test.py`.
     covered = {n for n, _, _ in LINKS}
     print("first path component off the harness's repo root, from a source sweep")
     print(f"({len(_MODULES)} modules; the link map has {len(LINKS)} entries)\n")
@@ -245,8 +275,6 @@ def sweep():
     for comp in sorted(hits):
         where = ", ".join(sorted(set(hits[comp]))[:6])
         if comp in covered:
-            print(f"  LINKED   {comp:16s} {where}")
-        elif comp in ("common", "harness", "patterns", "results"):
             print(f"  LINKED   {comp:16s} {where}")
         else:
             print(f"  ⚠ GAP    {comp:16s} {where}")

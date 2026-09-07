@@ -55,9 +55,20 @@ false reason is the shape this project has already been burned by twice** (a
 right verdict resting on a wrong reason), so the reason is corrected here rather
 than quietly dropped.
 
-⚠ The exact tree-by-tree split is **owed**: the reviewer counted 7 of 12
-pristine and the manager 8 of 13, which is a tree-*set* disagreement, not a
-content one. `TASK_PHP_004` settles it.
+✅ **THE TREE-SET DISAGREEMENT IS SETTLED — `TASK_PHP_004`, and it was a SCOPE
+disagreement, not a content one.** There are **12** `php-5.0.0/Zend/zend_alloc.c`
+files on this box, plus **one** `php-4.0.2` one. **8 of the 12 are
+byte-identical** to the tarball. So the manager's **8** and **13** are each
+right about a different set (13 only if the 4.0.2 tree, which cannot be
+pristine-5.0.0, is counted); the reviewer's **12** is right and their **7** is
+one short. The full enumeration, with each patch and what it does, is
+`patterns-php/SOURCES.md` §3; the raw list is `.temp/php4/trees_500.txt`.
+⚠ The consequential patch is **`ZEND_DISABLE_MEMORY_CACHE 0 → 1`** in the two
+`-nocache` trees — an allocator with **no size-class cache at all** — and it was
+named nowhere. `REAL_SIZE(size)→(size)` is in exactly **one** tree, at `:132`,
+and ✅ **verified not to delete the truncation**: `real_size` is still
+`unsigned int` and the store at `:129`/`:135` is what truncates
+(`.temp/php4/real_size_probe.c`).
 
 ⚠⚠ **The tarball lives under another project's gitignored `.temp/`, which that
 project's own convention makes deletable at any time.** This is the hazard
@@ -397,9 +408,28 @@ this reason. **Do not use that column as an admission filter.** Fold an
 `(allocs, frees)` tally into the kernel's `u64` so the defect lands in the
 checksum and not only in a sanitizer.
 
+⚠⚠⚠ **AND THE SHIM ITSELF DID THIS ONCE — SEE `RECAP_PHP.md` F6.** For one
+task `_safe_emalloc`'s guard was modelled with `__builtin_mul_overflow` on the
+claim that it was the *"same predicate"* as `ZEND_SIGNED_MULTIPLY_LONG`. It is
+not: `zend_multiply.h:22` guards the `imul` arm with `#if defined(__i386__)`,
+so on x86-64 PHP uses a **double-precision heuristic**, and the exact builtin
+allocates where PHP raises `E_ERROR` — **84,523 times in 20 M samples, 100 % in
+that direction**. ✅ Fixed at `TASK_PHP_004`. ⚠ **The heuristic's inaccuracy IS
+the behaviour: a more correct shim is a less faithful one.**
+⚠⚠ **THE REUSABLE RULE: *"modelled by an equivalent builtin"* IS A CLAIM THAT
+NEEDS A DIFFERENTIAL TEST, NOT A COMMENT** — and the differential test needs a
+**must-fire control**, because the original probe's own control
+(`SE CONTROL: a true 64-bit overflow IS refused`) exercised only the region
+where the two predicates agree and therefore could not see this.
+
 **Rule: any allocating php row links `common-php/emalloc_shim.*` — faithful and
 line-cited against the pristine tarball — or states in `spec.md` why not.**
 ⚠ Enforcing this on the earlier attempt exposed **three** link sites, not one.
+⚠ **And "links it" is now CHECKED, not conventional**: `harness-php/gate.py`'s
+preflight refuses any row whose `c/` sources mention `emalloc_shim.h` without
+the `<row>/c/emalloc_shim.h` symlink that puts the allocator in **both**
+digests (`PROTOCOL_PHP.md` §B2; it was enforced by nothing until
+`TASK_PHP_004`).
 ⚠ And the truncation is a *multiplier on every sizing defect in the engine*, not
 a pattern of its own; it was correctly retired from that catalogue as a
 mechanism. Do not re-propose it as a row.
@@ -485,8 +515,24 @@ block**, so the gate pins it and a drift is detectable:
 }
 ```
 
-`extract_sha256` is the load-bearing field: it makes *"this kernel came from
-those lines of that tarball"* a one-command check rather than a claim.
+`extract_sha256` is the load-bearing field: it makes ***"those lines of that
+tarball hash to this"*** a one-command check rather than a claim.
+
+⚠⚠ **THIS SENTENCE SAID *"THIS KERNEL came from those lines"* AND THAT WAS AN
+OVERCLAIM** — `TASK_PHP_003` M5, corrected at `TASK_PHP_004`. The validator
+**never opened `c/kernel.c`**; the word `kernel` appeared in the module only
+inside this sentence. It now does, and here is the honest split:
+
+| | |
+|---|---|
+| ✅ checked | tarball sha256 · `c_file` in `php-5.0.0.manifest` · the span is **non-empty and in range** · its sha256 · `extract_cmd` is the canonical spelling · a **heuristic line overlap** between the excerpt and `c/kernel*.{c,h}`, floored per tier (`verbatim` 50 %, `narrowed` 25 %, `modelled` reported only) · a row declaring PHP provenance ships a kernel at all |
+| ✗ **not** checked | `tier` · `deletions` · `root_cause_ids` · `cwe` · `fix_commit` · `invariant` · `obligation` · `echoes` — free-text declarations, every one |
+
+⚠ **An out-of-range span used to PASS**: `sed` prints nothing past EOF and the
+caller compared `sha256(b"")`, so a transposed line number verified green and
+printed `0 bytes`. ⚠ **The overlap is evidence about the tier, not a proof of
+extraction**, and the measured number is always printed so a reader can judge
+it. Negatives: `.temp/php4/m5_prov_test.py`.
 
 ---
 

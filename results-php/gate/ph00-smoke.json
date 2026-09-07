@@ -82,7 +82,7 @@
     "verdict": "OK"
   },
   "source_sha256": {
-    "common/digest_bridge.py": "8f693aa5fe34fa36a871403c42971e6f9b42db68b5eb41cd2eff28606c4e9f55",
+    "common/digest_bridge.py": "c5321600ab44e0543342245ac2838561842e6960d2a8a48d4329074c2f239138",
     "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
     "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
     "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
@@ -96,8 +96,8 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
     "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
-    "patterns/ph00-smoke/NOTES.md": "5e61f554cb93d57f387caca5818a1ef5c6746890fcfa02ba1baf6f93ed746965",
-    "patterns/ph00-smoke/README.md": "f56e3def71dea3cadc46f8054cbd2c081d942cd0a80752d2d83b1aa51541e2b6",
+    "patterns/ph00-smoke/NOTES.md": "296244a1629619a31cbece6235ffc18b85e6b153f149350e5307e2d0010ac0ed",
+    "patterns/ph00-smoke/README.md": "850f67da40738dc52d95cac1a0cb40d9001338b7ffecf07807784424c9025578",
     "patterns/ph00-smoke/c/kernel.c": "1b79c738a5ab4da534d62a931919ec2d16a6add4f3710b29a347e16b88c96fe7",
     "patterns/ph00-smoke/c/kernel.h": "2eaee3e8be741b9ef00a9d6061e72f8ab6199143724b2438251c7032db01add4",
     "patterns/ph00-smoke/c/main.c": "065a6d17209b6c5ddb03d33ea38b623265b73293d98415ac99d5f66f467d18ef",
@@ -235,9 +235,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3294,
+    "bytes": 3303,
     "nvars": 49,
-    "envp_stack_bytes": 3686,
+    "envp_stack_bytes": 3695,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -1512,7 +1512,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.2,
+        "seconds": 0.1,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""

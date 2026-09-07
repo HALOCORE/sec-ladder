@@ -16,12 +16,37 @@
  *   sha256 5783e0c0ba94f165633a565fe73a83e59cf17b6880ef95fa8f936dc6301d6919
  *   read   tar -xzOf <tarball> php-5.0.0/Zend/zend_alloc.c | sed -n 'a,bp'
  *
- * ⚠ NOT against any extracted tree on this box. `build/php-4.0.2/` carries
- * modern-gcc patches; `.temp/san_tests/oracle/.../php-5.0.0/` and
- * `.app-tests/.temp/oracle/build-5.0.0-<n>/` carry modern-gcc AND ALLOCATOR
+ * ⚠ NOT against any extracted tree on this box. ⚠⚠ THIS PARAGRAPH USED TO SAY
+ * *"`.app-tests/...` and `.temp/san_tests/...` carry modern-gcc AND ALLOCATOR
  * patches -- specifically `REAL_SIZE(size) -> (size)`, which deletes the very
- * truncation this file exists to reproduce. Citing one of those is citing a
- * different program. (`patterns-php/SOURCES.md`.)
+ * truncation this file exists to reproduce"*. BOTH HALVES WERE FALSE. Measured
+ * at TASK_PHP_004 over every `php-5.0.0/Zend/zend_alloc.c` on this box
+ * (`.temp/php4/trees_500.txt`, 12 trees):
+ *
+ *     8 of 12   BYTE-IDENTICAL to the pristine tarball (sha256 fb4215f19dc2e68c)
+ *               -- including ALL THREE `.app-tests/.temp/oracle/` trees
+ *     2 of 12   ZEND_DISABLE_MEMORY_CACHE 0 -> 1 at :40 and :43   (`-nocache`,
+ *               `-nocache-asan`)  <- the CONSEQUENTIAL one: it turns off the
+ *               size-class cache this file models, and it is the control the
+ *               63.5 % figure is derived from
+ *     1 of 12   the above PLUS `REAL_SIZE(size) -> (size)` at :132 (NOT :135)
+ *               (`-nocache-detect-asan`)
+ *     1 of 12   ASAN_{UN,}POISON_MEMORY_REGION annotations at :35-41, :162,
+ *               :284 (`-poison-asan`)
+ *
+ * ⚠ AND `REAL_SIZE(size) -> (size)` DOES NOT DELETE THE TRUNCATION. `real_size`
+ * is still `unsigned int` (:129) and `real_size = REAL_SIZE(size)` (:135) still
+ * truncates mod 2^32; all the patch removes is the round-up-to-8, so ASan's
+ * redzone starts at the requested size. For `emalloc_probe.c:61`'s 18.45 EB
+ * request both spellings give real_size = 2147483648 (measured,
+ * `.temp/php4/real_size_probe.c`). ⚠ That equality is VALUE-DEPENDENT, not
+ * general: at SIZE_MAX they give 0 and 4294967295 -- still both truncating.
+ *
+ * ✅ THE RULE SURVIVES AND IS UNCHANGED: cite the tarball, never a tree. A
+ * corpus where SOME trees are patched is one where you cannot tell by looking
+ * which tree you are in, and `build/php-4.0.2/` (the 13th tree, out of scope
+ * under `DP-06`) really does carry modern-gcc patches. Only the stated reason
+ * was wrong. (`patterns-php/SOURCES.md`; TASK_PHP_003 M3, TASK_PHP_004 §2.7.)
  *
  * ============================================================================
  * THE THREE TRUNCATIONS, AND THEY ARE DISTINCT
@@ -113,10 +138,16 @@
  * call N's behaviour depend on call N-1 and destroys the marginal-Ir
  * subtraction the whole measurement rests on (`.memory/03-measurement.md`).
  *
- * ⚠ FOLD THE TALLY INTO THE CHECKSUM. `php_shim_tally()` returns
- * (allocs, frees, cache_hits, bytes_requested_low) mixed into one u64 so the
- * defect lands in the kernel's `u64` and not only in a sanitizer
- * (`PLAN_PHP.md` §4.3).
+ * ⚠ FOLD THE TALLY INTO THE CHECKSUM. `php_shim_tally()` mixes
+ * (n_alloc, n_free, n_cache_hit, BYTES_MALLOCKED) into one u64 so the defect
+ * lands in the kernel's `u64` and not only in a sanitizer (`PLAN_PHP.md`
+ * §4.3). ⚠⚠ THE FOURTH FIELD IS `bytes_mallocked` -- WHAT REACHED `malloc`,
+ * i.e. the sum of the TRUNCATED `real_size` -- NOT `bytes_requested`. This
+ * comment said `bytes_requested_low` until TASK_PHP_004 (TASK_PHP_003 m4) and
+ * the two are exactly the two sides of truncation T1: they differ by precisely
+ * the amount a truncation defect moves, so a row that folded the wrong one in
+ * on the strength of this comment would have folded in the quantity that does
+ * NOT move. Both are readable from `php_shim_ag` if a row wants the pair.
  *
  * ============================================================================
  * WHAT IS DELIBERATELY NOT MODELLED
@@ -214,7 +245,21 @@ extern php_shim_state php_shim_ag;
 
 /* Wipe the cache and the tally. ⚠ Frees every cached block first: without
  * this a long driver loop leaks the whole cache and the run's RSS, not its
- * instruction count, becomes the limit. */
+ * instruction count, becomes the limit.
+ *
+ * ⚠⚠ IT DOES **NOT** FREE THE LIVE (`head`) LIST, AND THAT IS DELIBERATE --
+ * but it is a second RSS hazard and this comment did not name it until
+ * TASK_PHP_004 (TASK_PHP_003 m6). Setting `head = NULL` orphans every
+ * still-live block. It cannot free them: a kernel may legitimately hold a
+ * pointer across the reset, and freeing it here would MANUFACTURE a
+ * use-after-free -- `PLAN_PHP.md` §4.2's invented-defect failure, which is the
+ * one thing this file exists to avoid.
+ *
+ * ⚠ SO A ROW THAT LEAKS ON PURPOSE (the corpus has 15 CWE-401 rows) MUST CALL
+ * `php_shim_shutdown()` -- not `php_shim_reset()` -- at the end of every kernel
+ * call, or the driver loop's thousands of iterations are bounded by RSS rather
+ * than by instruction count, which is exactly the hazard the cache note above
+ * exists for, one field over. */
 static inline void php_shim_reset(void)
 {
     int i;
@@ -231,6 +276,60 @@ static inline void php_shim_reset(void)
     php_shim_ag.n_cache_push = 0;
     php_shim_ag.bytes_requested = 0;
     php_shim_ag.bytes_mallocked = 0;
+}
+
+/* ---- zend_alloc.c:469-569  `shutdown_memory_manager`, the `!ZEND_DEBUG &&
+ * !ZEND_MM` projection. This is PHP's REQUEST BOUNDARY, and it is what a
+ * leaking row needs so that the leak is a per-call fact rather than a
+ * whole-run RSS climb (see the note on `php_shim_reset`).
+ *
+ *   :478-496  the cache sweep. ⚠ `for (i=1; ...)` -- PHP starts at ONE, so
+ *             cache class 0 (real_size 0..7, i.e. `emalloc(0)`) is never
+ *             returned to malloc by shutdown. Reproduced, not "fixed".
+ *             :490 REMOVE_POINTER_FROM_LIST(ptr) then :491 ZEND_DO_FREE(ptr).
+ *   :529-569  the leak sweep: walk `AG(head)` and free every block whose
+ *             `cached` bit is 0, skipping the cached ones (they are already
+ *             gone above, and their `cached` bit is what says so).
+ *
+ * The tally is NOT reset here -- shutdown is a PHP event, `php_shim_reset` is
+ * the instrumentation event, and collapsing them would make a row unable to
+ * measure a request that shuts down mid-loop. */
+static inline void php_shim_shutdown(void)
+{
+    php_shim_mem_header *p, *t;
+    int i;
+    unsigned int j;
+
+    for (i = 1; i < PHP_SHIM_MAX_CACHED_MEMORY; i++) {   /* :484  i starts at 1 */
+        for (j = 0; j < php_shim_ag.cache_count[i]; j++) {
+            php_shim_mem_header *ptr = php_shim_ag.cache[i][j];
+            if (ptr == php_shim_ag.head)                 /* :490 */
+                php_shim_ag.head = ptr->pNext;
+            else if (ptr->pLast)
+                ptr->pLast->pNext = ptr->pNext;
+            if (ptr->pNext)
+                ptr->pNext->pLast = ptr->pLast;
+            free(ptr);                                   /* :491 */
+        }
+        php_shim_ag.cache_count[i] = 0;                  /* :493 */
+    }
+
+    t = php_shim_ag.head;                                /* :530-531 */
+    while (t) {                                          /* :532 */
+        if (!t->cached) {
+            p = t->pNext;                                /* :562 */
+            if (t == php_shim_ag.head)                   /* :563 */
+                php_shim_ag.head = t->pNext;
+            else if (t->pLast)
+                t->pLast->pNext = t->pNext;
+            if (t->pNext)
+                t->pNext->pLast = t->pLast;
+            free(t);                                     /* :564 */
+            t = p;
+        } else {
+            t = t->pNext;                                /* :567 */
+        }
+    }
 }
 
 /* ---- zend_alloc.c:142-217  `_emalloc`.
@@ -335,13 +434,56 @@ static inline void php_shim_efree(void *ptr)
     free(p);                                                  /* :287 */
 }
 
+/* ---- Zend/zend_multiply.h:36-45  `ZEND_SIGNED_MULTIPLY_LONG`, THE `#else`
+ * ARM, transcribed character for character.
+ *
+ * ⚠⚠⚠ THE ARM IS THE WHOLE POINT, AND GETTING IT WRONG IS WHAT TASK_PHP_003
+ * FOUND (B2). zend_multiply.h:22 guards the exact `imul`/`adc` spelling with
+ *
+ *     #if defined(__i386__) && defined(__GNUC__)
+ *
+ * and on x86-64 `__i386__` IS NOT DEFINED, so PHP 5.0.0 on this machine
+ * compiles the `#else` at :34 -- a DOUBLE-PRECISION HEURISTIC, not an exact
+ * overflow test. `(double)(a)` rounds a 64-bit operand to 53 bits, so for
+ * products at or above 2^53 the reconstructed `__dres` can miss `__lres` by
+ * more than half an ulp and the test reports overflow on a product that did
+ * not overflow.
+ *
+ * ⚠⚠ THIS IS MODELLED, NOT REPAIRED. The heuristic's INACCURACY IS THE 5.0.0
+ * BEHAVIOUR: PHP raises `E_ERROR` on those inputs and returns 0. A shim that
+ * used an exact test (`__builtin_mul_overflow`, which is what this file did
+ * until TASK_PHP_004) allocates where PHP refuses, and a row at a
+ * `safe_emalloc` call site would then show a reachable truncation that
+ * pristine PHP's guard actually rejects -- `PLAN_PHP.md` §4.3's own
+ * invented-defect failure mode, inside the file written to prevent it.
+ * MEASURED: 84,523 disagreements in 20 M samples, 100 % in that direction
+ * (TASK_PHP_003; reproduced exactly at TASK_PHP_004,
+ * `.temp/php4/mul_probe.c`, which now reports 0 for this spelling on
+ * gcc/clang x O0/O3 x {-DSLB_ISOLATED,-flto} and keeps firing on the
+ * `__builtin_mul_overflow` control).
+ *
+ * ⚠ OPERAND TYPE IS PART OF THE PREDICATE. `_safe_emalloc` (:234) invokes the
+ * macro on `nmemb` and `size`, which are `size_t`, so `(a)*(b)` is a WRAPPING
+ * unsigned 64-bit multiply narrowed to `long`, not a signed overflow. Passing
+ * `long` here would be undefined behaviour at exactly the inputs the row is
+ * about. Do not "simplify" the parameter types.
+ */
+#define PHP_SHIM_SIGNED_MULTIPLY_LONG(a, b, lval, dval, usedval) do {         \
+    long   __lres  = (a) * (b);                                               \
+    double __dres  = (double)(a) * (double)(b);                               \
+    double __delta = (double) __lres - __dres;                                \
+    if ( ((usedval) = (( __dres + __delta ) != __dres))) {                    \
+        (dval) = __dres;                                                      \
+    } else {                                                                  \
+        (lval) = __lres;                                                      \
+    }                                                                         \
+} while (0)
+
 /* ---- zend_alloc.c:221-244  `_safe_emalloc`.
  *
  * ⚠ THE POINT OF SHIPPING THIS AT ALL is that it is NOT safe. The 64-bit
  * guard at :224-237 passes, and :238 then hands the value to `_emalloc`,
- * which truncates it. `ZEND_SIGNED_MULTIPLY_LONG` (Zend/zend_multiply.h) is
- * modelled by the `__builtin_mul_overflow` below: same predicate, same
- * `use_dval` fall-through to the error path.
+ * which truncates it (T1). The guard's own multiply is the heuristic above.
  */
 static inline void *php_shim_safe_emalloc(size_t nmemb, size_t size,
                                           size_t offset)
@@ -351,13 +493,18 @@ static inline void *php_shim_safe_emalloc(size_t nmemb, size_t size,
      * this file, so the comparisons are kept and the vacuity is stated. */
     if (nmemb < (size_t)__LONG_MAX__ && size < (size_t)__LONG_MAX__
         && offset < (size_t)__LONG_MAX__) {
-        long lval;
-        int use_dval = 0;
-        long a = (long)nmemb, b = (long)size;
-        if (__builtin_mul_overflow(a, b, &lval))
-            use_dval = 1;                                     /* :234 */
-        if (!use_dval && lval < (long)(__LONG_MAX__ - (long)offset))
-            return php_shim_emalloc((size_t)(lval + (long)offset)); /* :238 */
+        long lval = 0;
+        double dval = 0;
+        int use_dval;
+        /* :234. ⚠ `nmemb`/`size` go in as `size_t`, exactly as PHP passes
+         * them; see the macro's note on operand type. */
+        PHP_SHIM_SIGNED_MULTIPLY_LONG(nmemb, size, lval, dval, use_dval);
+        (void)dval;   /* PHP sets `dval` and never reads it either (:231) */
+        /* :236-237. `LONG_MAX - offset` is a size_t subtraction in the
+         * original (`offset` is size_t), and `lval + offset` at :238 is a
+         * size_t addition -- so neither can overflow a signed long here. */
+        if (!use_dval && lval < (long)((size_t)__LONG_MAX__ - offset))
+            return php_shim_emalloc((size_t)lval + offset);    /* :238 */
     }
     /* :242-243 -- PHP raises E_ERROR and returns 0. */
     return NULL;

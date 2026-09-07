@@ -20,6 +20,14 @@ __pycache__/
 results/gate/*.partial.json
 results-php/gate/*.partial.json
 
+# `harness-php/gate.py --preflight` writes one of these per invocation. It
+# carries a `when` timestamp and the literal `gate_argv`, so it churns on every
+# run -- measured, two consecutive identical-source runs differ. The GENERATOR is
+# committed and the artefact is not, the same rule as `.temp/` and the input
+# blobs. ⚠ It is also the only place `harness_php_sha256` is recorded, so that
+# pin is NOT committed evidence -- see `RECAP_PHP.md` open item 13.
+results-php/preflight/
+
 # `.web/` — the static report over this tree's evidence. It was ignored here and
 # kept its own local git history until it was folded into this repository. Its
 # own `.web/.gitignore` still drops the derived (`data/`, which

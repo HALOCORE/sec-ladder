@@ -51,19 +51,49 @@ grep 'Zend/zend_alloc\.c$' patterns-php/php-5.0.0.manifest
 
 ## 3. ⚠⚠⚠ THE RULE: NEVER CITE A BUILD TREE
 
-**Every extracted PHP tree on this box is patched.** A citation taken from one
-of them is a citation to a different program.
+**The rule stands. Everything this section previously gave as its reason was
+wrong**, and the correction is `TASK_PHP_003` M3 → `TASK_PHP_004` §2.7. It said
+*"every extracted PHP tree on this box is patched"* and named an allocator
+patch *"which deletes the 32-bit truncation at `Zend/zend_alloc.c:135`"*.
+Measured over **every** `php-5.0.0/Zend/zend_alloc.c` on this box
+(`find`, 12 trees; hashes against the tarball's `fb4215f19dc2e68c…`):
 
-| tree | patched with |
-|---|---|
-| `php-in-safe-rust/build/php-4.0.2/` | modern-gcc — and it is 4.0.2, which `DP-06` excludes entirely |
-| `php-in-safe-rust/.temp/san_tests/oracle/.../php-5.0.0/` | modern-gcc **and allocator** |
-| `php-in-safe-rust/.app-tests/.temp/oracle/build-5.0.0-<n>/php-5.0.0/` | modern-gcc **and allocator** |
+| n | `zend_alloc.c` | tree(s) | what the patch does |
+|--:|---|---|---|
+| 3 | **pristine** | `.app-tests/.temp/oracle/build-5.0.0-mysql-webext{,-O3lto,-maxlto}/` | — (this row's table used to call these *"modern-gcc **and allocator**"* patched) |
+| 3 | **pristine** | `.trash/temp-20260805-0920/build-5.0.0{,-mysql,-mysql-webext}/` | — |
+| 2 | **pristine** | `.temp/san_tests/oracle/…-maxlto-asan`, `…-maxlto-hardened` | — |
+| 2 | `d6245088682d2e00` | `.temp/san_tests/oracle/…-maxlto-nocache{,-asan}` | `ZEND_DISABLE_MEMORY_CACHE 0 → 1` at **`:40` and `:43`** — turns OFF the size-class cache. ⚠ **The consequential one**, and it was named nowhere: it is the control the 63.5 % figure is derived from |
+| 1 | `74a20877c68d1ff4` | `.temp/san_tests/oracle/…-maxlto-nocache-detect-asan` | the cache patch **plus** `REAL_SIZE(size) → (size)` at **`:132`** |
+| 1 | `b817edb91015b918` | `.temp/san_tests/oracle/…-maxlto-poison-asan` | `ASAN_{,UN}POISON_MEMORY_REGION` at `:35-41`, `:162`, `:284` |
 
-⚠ The allocator patch is `REAL_SIZE(size) → (size)`, which **deletes the
-32-bit truncation at `Zend/zend_alloc.c:135`** — the exact mechanism
-`PLAN_PHP.md` §4.3 exists for and `common-php/emalloc_shim.h` reproduces. A
-row extracted from a patched tree would model a defect that is not there.
+**8 of 12 are byte-identical to the pristine tarball**, including all three
+`.app-tests/` trees this table named as allocator-patched.
+
+⚠⚠ **AND `REAL_SIZE(size) → (size)` DOES NOT DELETE THE TRUNCATION.**
+`real_size` is still `unsigned int` (`:129`) and `real_size = REAL_SIZE(size)`
+(`:135`) still truncates mod 2^32. All the patch removes is the round-up-to-8,
+so ASan's redzone starts at the requested size. Measured
+(`.temp/php4/real_size_probe.c`): for `emalloc_probe.c:61`'s 18.45 EB request
+both spellings give `real_size = 2147483648`. ⚠ That equality is
+**value-dependent** — at `SIZE_MAX` they give `0` and `4294967295`, still both
+truncating.
+
+⚠ **The tree count.** There are **12** `php-5.0.0` trees and **13**
+`Zend/zend_alloc.c` files if you count `php-in-safe-rust/build/php-4.0.2/`,
+which `DP-06` excludes and which cannot be byte-identical to a 5.0.0 tarball.
+That, and nothing else, is the `7 of 12` / `8 of 13` disagreement between the
+reviewer and the manager: the **8** and the **13** are each right about a
+different set. Settled at `TASK_PHP_004`; enumeration in
+`.temp/php4/trees_500.txt`.
+
+✅ **So why the rule still holds:** a *some-trees-are-patched* corpus is one
+where **you cannot tell by looking which tree you are in** — three of the four
+patched trees sit beside eight pristine ones under sibling directory names
+differing by one suffix — and the two `-nocache` trees model an allocator with
+**no size-class cache at all**, which is a bigger lie about PHP than the patch
+this section used to warn about. `php-in-safe-rust/build/php-4.0.2/` really is
+modern-gcc patched, and is 4.0.2.
 
 ⚠ And the same rule one level up (`PLAN_PHP.md` §1): **the corpus CSV's
 `c_file_line` is authoritative; the reproducer `.php` header comment is not.**
@@ -131,3 +161,11 @@ Check it with `python3 harness-php/provenance.py <row>`. The validator does
 and separately requires `extract_cmd` to be the canonical spelling of those
 fields, so the two can fail independently and the failures mean different
 things.
+
+⚠ **What it checks and what it does not** is itemised in `provenance.py`'s own
+docstring and is worth reading before writing a `provenance` block. In short:
+the tarball hash, the manifest membership, the span (non-empty, in range) and
+its sha256, the canonical `extract_cmd`, and a **heuristic line overlap**
+between the excerpt and the row's `c/kernel*.{c,h}` with a per-tier floor. It
+does **not** validate `tier`, `deletions`, `cwe`, `fix_commit`, `invariant`,
+`obligation` or `echoes` — those are declarations.

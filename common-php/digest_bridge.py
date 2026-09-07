@@ -37,6 +37,10 @@ the sha256 of every `common-php/` file the globs do not reach. Therefore:
      hash that is in every php gate record, or (b) making `--verify` fail.
   ✅ `--verify` runs before every gate (`harness-php/gate.py`), so (b) is
      loud rather than silent.
+  ✅ a DIRECTORY SYMLINK under `common-php/` is REFUSED rather than walked --
+     `os.walk` does not follow one, so anything behind it would be in no
+     digest while `--verify` printed `current` (TASK_PHP_003 m5). See
+     `symlinked_dirs` for why refusing beats `followlinks=True`.
 
   ⚠ WHAT IT DOES NOT BUY, STATED PLAINLY BECAUSE A HALF-TRUE CHECK IS WORSE
      THAN NO CHECK: the bridged files do NOT appear as KEYS in
@@ -79,7 +83,7 @@ GLOB_PATTERNS = ["driver.*", "*.py", os.path.join("layout", "*.py")]
 BRIDGED = {
     "emalloc_probe.c": "ad013ba83ff59e496cec5565263a8b4d58da6a0b8dea9c0f367ae82729d08c46",
     "emalloc_shim.c": "c9636c1e9dc2c98d351093df4c1c2b603591d57634b1469dc1751c6c7aade6c5",
-    "emalloc_shim.h": "0d05c94ff579cff80a4fdd0a8a6c141b43dd4c223005ce49daedf6c67f62233f",
+    "emalloc_shim.h": "59b146689d42e6961273883fb0723e341784fd37f233da33f7cbad702380d29d",
 }
 # END BRIDGED TABLE
 # ---------------------------------------------------------------------------
@@ -115,6 +119,35 @@ def all_files():
     return out
 
 
+def symlinked_dirs():
+    """Directory symlinks under `common-php/`.
+
+    ⚠⚠ `os.walk` DOES NOT FOLLOW DIRECTORY SYMLINKS, so every file behind one
+    is invisible to `all_files()` and therefore to the bridge -- it is neither
+    GLOBBED nor BRIDGED, and `--verify` used to print `current` with a payload
+    sitting behind it. Measured at TASK_PHP_003 m5:
+
+        a new top-level .h            -> rc=1  NOT BRIDGED
+        a file in a REAL subdirectory -> rc=1  NOT BRIDGED
+        a file behind a SYMLINKED dir -> rc=0  "digest bridge: current"   <-- blind
+
+    ⚠ `os.walk(followlinks=True)` is NOT the fix: `common-php/` is a directory
+    of FILE symlinks into `common/`, and a directory symlink pointing back at
+    `common/` (or at `patterns/`) would silently pull the PAT tree into the php
+    bridge table and make every `--regen` a cross-programme diff. So the rule
+    is REFUSE, not follow: a directory symlink under `common-php/` has no
+    sanctioned use, and the bridge says so instead of being blind to it.
+    Negative: `.temp/php4/m5b_bridge_test.py`.
+    """
+    out = []
+    for root, dirs, _files in os.walk(HERE):
+        for d in sorted(dirs):
+            p = os.path.join(root, d)
+            if os.path.islink(p):
+                out.append(os.path.relpath(p, HERE))
+    return out
+
+
 def classify():
     g = globbed()
     return sorted(g), sorted(all_files() - g)
@@ -124,6 +157,13 @@ def verify(quiet=False):
     """Returns a list of problems; empty means the bridge is current."""
     _g, bridged = classify()
     problems = []
+    for rel in symlinked_dirs():
+        problems.append(
+            f"SYMLINKED DIRECTORY: {rel}/ -- `os.walk` does not follow it, so "
+            f"everything behind it is in NO digest and this check would "
+            f"otherwise print `current`. Replace it with a real directory (its "
+            f"files then bridge normally) or with per-file symlinks. See "
+            f"`symlinked_dirs`. (TASK_PHP_003 m5.)")
     for rel in bridged:
         want = BRIDGED.get(rel)
         got = sha256_file(os.path.join(HERE, rel))

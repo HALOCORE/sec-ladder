@@ -2,10 +2,18 @@
 
 ## `PROTOCOL.md` rule 6 — the contract hash, as first written, and it MOVED
 
-| when | `contract_sha256` |
-|---|---|
-| **as first written, before any cell was built** | `6e20789ef14e867495ff66f0489885acb00224249ba10b21c9edef27ed31ff58` |
-| **as shipped**, after gate run 1 required the named-spelling standard | `91d88e1e18b192258a1acc577672b2989e33f84c112615b03090bb011dad5e8b` |
+| # | when | `contract_sha256` |
+|---|---|---|
+| 1 | **as first written, before any cell was built** | `6e20789ef14e867495ff66f0489885acb00224249ba10b21c9edef27ed31ff58` |
+| 2 | **intermediate, never gated**: the row-specific `why` still contained the literal `NAMED-SPELLING STANDARD`, which the gate's own reproduction command (`str.find`, first occurrence) made it hash the wrong bytes for; the prose was reworded | **not recorded** — see below |
+| 3 | **as shipped**, after gate run 1 required the named-spelling standard | `91d88e1e18b192258a1acc577672b2989e33f84c112615b03090bb011dad5e8b` |
+
+⚠ **This table showed TWO states and there were at least THREE**
+(`TASK_PHP_003` m7). State 2 is described in `.tasks-php/TASK_PHP_002_REPORT.md`
+("Building `ph00-smoke`" §1) and its hash was **never recorded**, so it cannot
+be reconstructed — which is the point of rule 6 and exactly the gap rule 6
+exists to close. Row 2 is listed with `not recorded` rather than omitted,
+because a two-row table read as *"it moved once"* and it moved at least twice.
 
 ⚠⚠ **THE FIRST NUMBER THIS FILE RECORDED WAS WRONG, AND IT IS DISCLOSED HERE
 RATHER THAN QUIETLY REPLACED, BECAUSE A FALSE DISCLOSURE IS WORSE THAN THE
@@ -111,14 +119,64 @@ A minimal fresh kernel would have needed a `spec.md` contract, a `model.py`, an
 `inputs/gen.py`, five rungs **and a Verus proof** — against one string edit. The
 manager's claim stands.
 
-⚠ **One real cost the claim did not mention, and it is a path-length one:**
-`check.py::_env_block` records `repo_path_bytes = len(REPO)`, and through the shim
-`REPO` is `<repo>/.temp/php-root` — **20 bytes longer** than the PAT root. The
-gate's own `domain` string says a record is comparable only against one with
-the same `repo_path_bytes`, and `TASK_114` measured `±7 Ir/call` from a
-2-character `argv` change. **So this row's marginal `Ir` is NOT comparable to
-`p01`'s, by the harness's own rule, and no claim in this repo should compare
-them.** That is a property of every php row, not of this one.
+⚠ **One real cost the claim did not mention, and it is not only a path-length
+one.** `check.py`'s `domain` string says a record is comparable only against
+one with **the same `repo_path_bytes`, the same `envp_stack_bytes` and the
+same `tuning_vars`**, and `TASK_114` measured `±7 Ir/call` from a 2-character
+`argv` change. Two of those three move through the shim. Measured from the two
+**committed** gate records at `TASK_PHP_003` (M1):
+
+```
+p01  gate record : repo_path_bytes 33   envp_stack_bytes 3653  nvars 48
+ph00 gate record : repo_path_bytes 48   envp_stack_bytes 3686  nvars 49
+'/home/apt/repos_common/sec-ladder'                 33
+'/home/apt/repos_common/sec-ladder/.temp/php-root'  48   delta +15
+```
+
+⚠⚠ **This paragraph said `repo_path_bytes` was 20 bytes longer. It is 15**,
+and `repo_path_bytes` **is not the only term that moved**: `nvars` is **+1**
+and `envp_stack_bytes` moves too, because `harness-php/gate.py` injects
+`PYTHONDONTWRITEBYTECODE=1` into every child. **The mitigation for the
+`__pycache__` escape is itself a second domain violation**, and nobody named it
+until the review.
+
+⚠⚠⚠ **BUT THE MAGNITUDE `TASK_PHP_003` GAVE FOR IT — `envp_stack_bytes` +33 —
+IS NOT THE VARIABLE'S COST, AND THE DIFFERENCE MATTERS.** Measured directly at
+`TASK_PHP_004` (`.temp/php4/m1_env_test.py`), same shell, the variable added
+and removed:
+
+```
+                         bytes  nvars  envp_stack_bytes
+without the var           3279     48              3663
+with    the var           3305     49              3697
+DELTA                      +26     +1              +34
+len('PYTHONDONTWRITEBYTECODE=1') + NUL + one 8-byte envp slot = 25 + 1 + 8 = 34
+```
+
+**The variable costs exactly +34 and +1 var.** The `+33` was a *record-to-record*
+difference between two runs taken in two different shells, i.e. the 34 plus
+whatever those shells differed by — and the residue is not constant:
+
+| record | `repo_path_bytes` | `envp_stack_bytes` | `nvars` |
+|---|--:|--:|--:|
+| `p01`, committed | 33 | 3653 | 48 |
+| `ph00`, the record `TASK_PHP_003` measured | 48 | 3686 | 49 |
+| `ph00`, re-gated at `TASK_PHP_004` | 48 | **3695** | 49 |
+
+⚠⚠ **`ph00`'s own `envp_stack_bytes` moved 9 bytes between two runs of the same
+gate on the same box with no source change**, so the p01→ph00 delta was `+33`
+and is now `+42`. **That does not weaken the conclusion, it strengthens it:**
+not only is no php marginal `Ir` comparable to any PAT one, **two php runs are
+not comparable to each other unless the invoking shell is byte-identical.**
+`repo_path_bytes` (+15) is the only one of the three terms that is a property
+of the tree rather than of whoever typed the command.
+
+A future agent who "fixed" the path length — by shortening the shim's name,
+say — would still not have comparable records and would not know why.
+
+**So this row's marginal `Ir` is NOT comparable to `p01`'s, by the harness's
+own rule, and no claim in this repo should compare them.** That is a property
+of every php row, not of this one.
 
 ## Provenance
 

@@ -93,6 +93,22 @@ tarball and all demonstrated firing with positive controls by
 `long` (`zend_alloc.c:224-237`) and then calls the truncating `_emalloc`
 (`:238`). A shim that models only `_safe_emalloc` is not faithful.
 
+⚠⚠⚠ **AND ITS GUARD IS NOT AN EXACT OVERFLOW TEST.** `zend_multiply.h:22`
+guards the `imul`/`adc` arm with `#if defined(__i386__) && defined(__GNUC__)`,
+so on **x86-64** `ZEND_SIGNED_MULTIPLY_LONG` is the `#else` at `:36-45` — a
+**double-precision heuristic** (`__dres + __delta != __dres`) that reports
+overflow on products at or above 2^53 that did not overflow. The shim modelled
+it with `__builtin_mul_overflow` for one task: **84,523 disagreements in 20 M
+samples, 100 % of them "PHP raises `E_ERROR` where the shim allocates"**
+(`TASK_PHP_003` B2). ⚠ **The inaccuracy IS the 5.0.0 behaviour: a more correct
+shim is a less faithful one, and modelling it exactly would invent a defect at
+every `safe_emalloc` call site.** Fixed at `TASK_PHP_004`
+(`PHP_SHIM_SIGNED_MULTIPLY_LONG`); differential probe with a must-fire control
+in `.temp/php4/mul_probe.c`.
+
+⚠ **THE GENERAL RULE THIS BUYS:** *"modelled by an equivalent builtin"* is a
+claim that needs a **differential test**, not a comment.
+
 ### B1. Three mechanical consequences
 
 1. ⚠ **`crashes_pristine_5_0_0 = False` IS NOT EVIDENCE OF ABSENCE and is
@@ -134,6 +150,21 @@ the real content under `<row>/c/emalloc_shim.h` in **both** digests
 `TASK_PHP_002` T4). Without it, a row's measurement record does not pin the
 allocator its numbers were taken with.
 
+⚠⚠⚠ **AND FOR ONE TASK THIS WORD "MANDATORY" WAS ENFORCED BY NOTHING.**
+`TASK_PHP_003` B1 built a row that links the allocator and omits the symlink:
+it **builds** (via `-I common-php`) and the allocator lands in **neither**
+digest, so a later shim fix would leave that row's `Ir` numbers `FRESH` for
+ever under an allocator that no longer exists. ✅ **Closed at `TASK_PHP_004`:
+`harness-php/gate.py::shim_link_audit` runs in the preflight, before every
+tool, over every row — if any `<row>/c/` source mentions `emalloc_shim.h` and
+`<row>/c/emalloc_shim.h` is absent, is a REGULAR FILE, or resolves anywhere
+but `common-php/emalloc_shim.h`, the preflight fails with exit 2 and the tool
+is not run.** Its must-fire negatives are `.temp/php4/b1_symlink_test.py`
+(three refused fixtures, three accepted, plus a planted row under
+`patterns-php/`). ⚠ **A word in a document is not an enforcement mechanism** —
+that is the durable lesson, and it applies to every other "mandatory" in this
+file.
+
 ---
 
 ## C. R1h is the real upstream fix
@@ -161,8 +192,23 @@ python3 harness-php/provenance.py --all
 python3 harness-php/provenance.py <row> --no-tarball   # PARTIAL: skips the excerpt hash
 ```
 
-- `extract_sha256` is the load-bearing field: it makes *"this kernel came from
-  those lines of that tarball"* a **one-command check** rather than a claim.
+- `extract_sha256` is the load-bearing field: it makes *"**those lines of that
+  tarball hash to this**"* a **one-command check** rather than a claim.
+  ⚠ **It said *"this KERNEL came from those lines"* and that overclaimed**
+  (`TASK_PHP_003` M5): until `TASK_PHP_004` the validator never opened
+  `c/kernel.c` at all. It now also computes a **heuristic line overlap**
+  between the excerpt and the row's `c/kernel*.{c,h}` and enforces a floor per
+  tier (`verbatim` 50 %, `narrowed` 25 %, `modelled` reported with no floor),
+  and refuses a row that declares PHP provenance and ships no kernel source.
+  ⚠ **The overlap is evidence about the tier, not a proof of extraction**, and
+  the measured number is always printed. `tier`, `deletions`, `cwe`,
+  `fix_commit`, `invariant`, `obligation` and `echoes` remain **unvalidated
+  declarations**; `provenance.py`'s own docstring itemises checked vs not.
+- ⚠ **An out-of-range span used to PASS.** `sed` prints nothing past EOF and
+  the caller compared `sha256(b"")`, so a transposed line number verified
+  green and printed `0 bytes`. Rejected since `TASK_PHP_004`, along with a span
+  that runs past EOF and one that is only whitespace. Negatives:
+  `.temp/php4/m5_prov_test.py`.
 - The validator does **not** `exec` `extract_cmd`. It derives the excerpt from
   `c_file`/`c_lines` and *separately* requires `extract_cmd` to be the
   canonical spelling of those fields, so the two failures mean different
@@ -175,9 +221,16 @@ python3 harness-php/provenance.py <row> --no-tarball   # PARTIAL: skips the exce
   tarball. NEVER cite a reproducer `.php` header comment** — six of them
   describe 4.0.2 code that no longer exists at 5.0.0 and one says so in its own
   text. **A reproducer is an INPUT, not a citation** (`PLAN_PHP.md` §1).
-- ⚠ **NEVER cite a build tree.** Every extracted PHP tree on this box is
-  patched, two of them with the allocator patch that deletes the very
-  truncation §B is about (`patterns-php/SOURCES.md` §3).
+- ⚠ **NEVER cite a build tree.** ⚠⚠ **The RULE stands; the reason this line
+  gave was measured false** (`TASK_PHP_003` M3, settled at `TASK_PHP_004`):
+  **8 of the 12** extracted `php-5.0.0` trees on this box carry a
+  **byte-identical pristine** `Zend/zend_alloc.c`, the `REAL_SIZE(size)→(size)`
+  patch exists in **exactly one** (at `:132`, not `:135`), and **it does not
+  delete the truncation** — `real_size` is still `unsigned int`. The real
+  reason to cite the tarball is that a *some-trees-are-patched* corpus is one
+  where you cannot tell by looking which tree you are in, and the two
+  `ZEND_DISABLE_MEMORY_CACHE 0→1` trees are far more consequential than the
+  one this line named. Full enumeration: `patterns-php/SOURCES.md` §3.
 - `echoes: ["pNN"]` records where a `patterns/` row covers the same mechanism.
   ⚠ **It is a cross-reference for us and NEVER a filter** — `patterns-php/` is
   fresh, and *"that's p35's mechanism"* may not refuse a candidate
@@ -191,8 +244,15 @@ python3 harness-php/provenance.py <row> --no-tarball   # PARTIAL: skips the exce
 through the driver, which builds the shim, verifies the digest bridge and
 checks provenance first:
 
-⚠⚠ **A BRAND-NEW ROW COSTS FIVE COMMANDS, NOT THREE, AND THE ORDER IS
-LOAD-BEARING. MEASURED AT `TASK_PHP_002` — `ph00-smoke` needed all five:**
+⚠⚠ **A BRAND-NEW ROW COSTS SIX COMMANDS (~28 min), NOT THREE, AND THE ORDER IS
+LOAD-BEARING. MEASURED AT `TASK_PHP_002` — `ph00-smoke` needed all six:**
+
+> ⚠ **This header said FIVE over a SIX-command body** — `.tasks/PROTOCOL.md`
+> rule 13's exact failure mode (*"in a long doc item only the body gets
+> maintained; the header rots"*), reproduced in a brand-new document within one
+> task of the rule being restated. Corrected at `TASK_PHP_004` from
+> `TASK_PHP_003` M4. The body below, `RECAP_PHP.md` open item 11 and
+> `harness-php/gate.py`'s docstring now all say **six**.
 
 ```sh
 python3 harness-php/gate.py --tool build   <row> --all   # 1. the 28 binaries
@@ -218,7 +278,7 @@ python3 harness-php/gate.py                <row>         # 6. green
   not before."*
 - ✅ **`check.py::check_published_tables`'s own "three commands, not two"
   message is about a DIFFERENT case** — a row with no measurement record at
-  all. Both are true; the five-command figure is the one to plan against.
+  all. Both are true; **six** is the figure to plan against.
 
 ⚠⚠ **AND COMPUTE `contract_sha256` THE WAY THE GATE DOES.**
 `check.py::read_contract` matches
@@ -259,6 +319,17 @@ bytes. Measured at `TASK_PHP_002`.
   STALE`** at the start **and end** of every php task. ⚠ 66 is gate **plus**
   measurement records; a commit message has already misread that as
   measurement records alone.
+- ⚠ **THAT COMMAND DOES NOT EXAMINE `results-php/` AT ALL.** It globs
+  `results/p*.json` and `results/gate/p*.json` off the *real* REPO. The php
+  half is a second command and it was missing from this list until
+  `TASK_PHP_004`:
+
+  ```sh
+  python3 harness-php/gate.py --tool measure --check-stale   # -> 2 record(s), 0 STALE
+  ```
+
+  Run **both**. The PAT one proves you touched nothing; the php one proves your
+  own records still match their sources.
 - ⚠ **The coupling runs the other way too:** a future PAT `harness/*.py` edit
   will stale php gate records. That is correct — the dependency is real — but
   it means the two programmes are coupled through the harness even though
