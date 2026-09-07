@@ -488,3 +488,133 @@ genuinely PHP engine code.
    sanitizer on real page renders demonstrably does not. That is the strongest
    available justification for the whole extraction approach, and nobody has
    written it down.
+
+---
+
+## §7a. CRASH-033 — SETTLED, and it is the third instance of F8
+
+§7 listed CRASH-033 as **unresolved**: I could not see an OOB from
+`zend_object_handlers.c:199-201`, because for an empty property name the hash
+over `Z_STRLEN_P(member)+1` reads `empty_string[0]`, which is **in bounds**.
+
+✅ **I was looking at the wrong frame — which is the finding, again.** The defect
+is not at the guard site the corpus cites as the *missing-guard* site; it is in a
+standalone 12-line helper one call away, `Zend/zend_compile.c:2611-2622`:
+
+```c
+2611  ZEND_API void zend_unmangle_property_name(char *mangled_property, char **class_name, char **prop_name)
+2612  {
+2613      *prop_name = *class_name = NULL;
+2614
+2615      if (mangled_property[0]!=0) {          /* the in-band marker test */
+2616          *prop_name = mangled_property;
+2617          return;
+2618      }
+2619
+2620      *class_name = mangled_property+1;                  /* one past a 0-length buffer */
+2621      *prop_name  = (*class_name)+strlen(*class_name)+1; /* strlen() walks off the heap */
+2622  }
+```
+
+**The mechanism.** PHP mangles a private/protected property name as
+`"\0ClassName\0propname"`, so **a leading NUL is the in-band marker for "this
+name is mangled"**. For an **empty** property name the first byte is not a marker
+at all — it is **the string's own terminator** — so `:2615` classifies the empty
+string as mangled, `:2620` forms a pointer one past the end of a zero-length
+allocation, and `:2621` `strlen()`s from there and adds one.
+
+**An in-band sentinel whose value collides with the empty case.** Distinct from
+everything catalogued: `sp#11` *consumes* a terminator as data and so loses its
+sentinel; this one *reads* a terminator as a type tag and so gains a wrong one.
+
+**Tier `verbatim`, and the kernel is the whole function**: a byte buffer, a
+length, one comparison and a `strlen`. ⚠ It needs **none** of the
+class-entry/property-info hash machinery the rejection priced — that machinery is
+at the *guard* site (`zend_object_handlers.c:199-201`), and the guard site is not
+where the defect is.
+
+**Axis: spatial** (the harm is an over-read and the invariant is `I1`), with a
+cross-reference to the type axis, because the confusion itself is *one byte
+meaning two things*.
+
+⚠⚠ **Count it as the third instance of F8 in this audit** — after CRASH-136
+(cost priced at the recursive callee) and CRASH-157 (cost priced at the calling
+backtrace). All three priced the machinery of a frame **adjacent** to the defect.
+`RECAP_PHP.md` F1 says `c_file_line` names the faulting frame; F8 says cost gets
+priced at the wrong frame too; **CRASH-033 shows the corpus's `missing-guard`
+field can name a third frame that is none of them.**
+
+→ §7's "two I could not settle" is now **none** — §7b settles CRASH-053 below.
+⚠ This line said *"is now **one**: CRASH-053 only"* until §7b was written twenty
+minutes later. Left visible rather than silently corrected, because it is
+`PROTOCOL.md` rule 13 happening **inside the document that is about rule-13-shaped
+errors**, in the time it takes to write two sections.
+
+→ ⚠ **And it sharpens the instruction for the catalogue task**: for every row,
+the *defect site*, the *guard site* and the *faulting site* may be three
+different places. The provenance block's `c_file`/`c_lines` must name the
+**defect** site, and the other two belong in the row's notes.
+
+---
+
+## §7b. CRASH-053 — SETTLED. The corpus label is wrong twice, and the row pairs with CRASH-056
+
+§7 left this unresolved beyond confirming the type miner's correction. ✅ Settled
+now, and the miner's *"too entangled with the compound-assign machinery"* does
+not hold — the compound-assign helper is only the **caller**.
+
+```
+1621  zval **object_ptr = get_obj_zval_ptr_ptr(&opline->op1, EX(Ts), BP_VAR_W TSRMLS_CC);
+ ...
+1632  make_real_object(object_ptr TSRMLS_CC);
+1635  if (object->type != IS_OBJECT) {          <- the check the label says is missing
+ ...
+ 294  static inline zval **get_obj_zval_ptr_ptr(znode *op, temp_variable *Ts, int type TSRMLS_DC)
+ 296      if (op->op_type == IS_UNUSED) { ... return &EG(This); }
+ 305      return get_zval_ptr_ptr(op, Ts, type);      <- reads T(op->u.var).var.ptr_ptr
+ ...
+ 283      if ((*object_ptr)->type == IS_NULL       <- SEGV here, per index.csv
+```
+
+**The mechanism.** `temp_variable` is a **union** whose live member depends on how
+the operand was fetched: an ordinary variable populates the `var` arm, a **string
+offset** (`$s[0]`) populates `str_offset`. `get_obj_zval_ptr_ptr` reads the `var`
+arm **unconditionally**, so for `$s[0]->x += 1` it returns a `zval **` derived
+from the wrong arm and `make_real_object` faults on the first byte it touches.
+
+⚠⚠ **The corpus's `root_cause_id` — *"unchecked `make_real_object`"* — is wrong
+twice.** `:1635` **does** check the type, and `make_real_object` (`:280-292`) is a
+**correct** 12-line function that guards all three of its arms. Nothing at either
+cited site is unchecked; **`object_ptr` was never valid.** ✅ The type miner
+caught the first half; this is the second.
+
+**Tier `narrowed`, ~40 lines**: the temp union, a fetch that populates
+`str_offset`, and a consumer that reads `var`.
+
+### ⭐ And it pairs with CRASH-056 — the same union, the two ways of getting it wrong
+
+CRASH-056 (`zend_execute.c:199-203`, reversed out of §7's *"requires writable
+/tmp"* kill) is the **same union**:
+
+| | what it does with the discriminant | result |
+|---|---|---|
+| **CRASH-056** | tests `if (!T(...).var.ptr_ptr)` and *then* reads `T->str_offset.str` | discriminates on a **sibling member's NULL-ness** — a sentinel, not a tag |
+| **CRASH-053** | reads the `var` arm with **no test at all** | wild `zval **` |
+
+**One union, no tag, two call sites: one invents a discriminant, the other
+forgets to.** That is a stronger finding than either row alone and belongs in the
+catalogue as a pair, the way `#4`/`#13` do for `HASH_OF`.
+
+⚠ Both are **type**-axis rows. CRASH-056 was routed to the spatial miner and
+CRASH-053 was killed by the type miner on cost, so **neither reached the axis
+that would have recognised the pair.**
+
+---
+
+## Status after this addendum
+
+**Zero rows left unresolved.** §7's two are settled, both against the reason that
+killed them, and both by the same move: *read the frame the defect is actually
+in.* That is now **four** instances in one audit (CRASH-136, CRASH-157,
+CRASH-033, CRASH-053) — enough that it is the audit's main result, not an
+anecdote.
