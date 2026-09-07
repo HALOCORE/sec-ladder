@@ -5,12 +5,38 @@ built at five rungs (C, safe Rust naive, safe Rust tuned, unsafe Rust, unsafe Ru
 Verus proof) × two optimisation levels, compared on assembly, instruction count,
 timing, proof burden and trusted-base size.
 
-## Where things are
+## ⚠⚠ TWO PROGRAMMES LIVE HERE. FIND OUT WHICH ONE YOU ARE ON BEFORE READING ANYTHING ELSE.
+
+| | **`patterns/` — the PAT programme** | **`patterns-php/` — the PHP programme** |
+|---|---|---|
+| kernels | **invented** C idioms | **extracted from real PHP 5.0.0 C** |
+| status | **COMPLETE** — 33 built, gated, reviewed, findings written | **OPEN** — this is where new work goes |
+| handoff | `RECAP_PAT.md` | `RECAP_PHP.md` |
+| plan | `PLAN_PAT.md` | `PLAN_PHP.md` |
+| harness / results / tasks | `harness/` `results/` `.tasks/` | `harness-php/` `results-php/` `.tasks-php/` |
+| authoritative layer | `.memory/` 00–06 | `.memory-php/` |
+
+⚠⚠⚠ **THE PAT SIDE IS FROZEN INFRASTRUCTURE. `harness/*.py` IS HASHED INTO ALL 33
+GATE RECORDS AND `harness/{build,asm,measure}.py` INTO ALL 33 MEASUREMENT
+RECORDS — so ADDING ANY `.py` TO `harness/` OR `common/` COSTS A 33-PATTERN
+RE-GATE, AND EDITING `build.py` COSTS A FULL RE-MEASURE.** The PHP programme
+therefore **imports** those modules and rebinds their roots at run time; it never
+edits them. Same rule for `common/` → use `common-php/`. Details: `PLAN_PHP.md` §2.
+
+⚠ **`RECAP.md` and `PLAN.md` were RENAMED to `RECAP_PAT.md` / `PLAN_PAT.md`** when
+the second programme opened. Citations of the old names survive on purpose in
+`.tasks/` (historical record), `harness/*.py` and `patterns/*/` (hash-pinned —
+rewriting them would cost a re-gate for a pointer), `pilot/` (frozen) and inside
+findings that quote what was published under the old name. **They all resolve to
+the `_PAT` files.** Every citation that was part of a *runnable command* was
+repaired and re-run; there were none in any hashed file.
+
+## Where things are — the PAT programme
 
 **Start here, in this order** — the three files below carry the live state; the
 rest is reference.
 
-- `RECAP.md` — **the handoff document.** Its START HERE box is the next action.
+- `RECAP_PAT.md` — **the handoff document.** Its START HERE box is the next action.
   Read it first, always.
 - `.tasks/PROTOCOL.md` — the agent protocol: roles, the manager's own rules,
   definition of done, the reviewer checklist. One agent works at a time.
@@ -20,7 +46,7 @@ rest is reference.
   (**48 rows** since TASK_066 added `p48`; count it with
   `grep -c '^| p[0-9]' .memory/06-catalogue.md` rather than trusting this line).
 
-- `PLAN.md` — the original plan and feasibility argument. ⚠ **Historical**: its
+- `PLAN_PAT.md` — the original plan and feasibility argument. ⚠ **Historical**: its
   pattern table is a pre-project proposal with its own numbering and at least one
   bug class the project has since retracted. `.memory/06-catalogue.md` is the
   catalogue.
@@ -81,7 +107,7 @@ rest is reference.
   supporting it; and a review of the report found the site over-claiming in
   three places where **`results/SYNTHESIS.md` was already more careful than the
   page built from it**. If the two disagree, `SYNTHESIS.md` wins — including
-  over `RECAP.md`, which twice carried a figure the synthesis had corrected.
+  over `RECAP_PAT.md`, which twice carried a figure the synthesis had corrected.
 
 ## Don't
 
@@ -115,4 +141,6 @@ rest is reference.
    went uncaught for many sessions because it lived IN THE ADMISSION BAR rather
    than in any single row, so row-level review could not see it.** Full rule and
    the audit: `.memory/02-bench-rules.md`, *THE ADMISSION BAR IS C-SIDE ONLY*,
-   and `RECAP.md` finding 53. ✅ **C-side DUPLICATION remains a legitimate kill.**
+   and `RECAP_PAT.md` finding 53. ✅ **C-side DUPLICATION remains a legitimate kill**
+   *in `patterns/`.* ⚠⚠ **IT IS NOT A KILL IN `patterns-php/`** — that corpus is
+   FRESH and stands on its own; see `PLAN_PHP.md` §3.

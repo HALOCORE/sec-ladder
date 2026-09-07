@@ -48,7 +48,7 @@ context still applies — do not restart from scratch.
    own result is announced:
 
    ```sh
-   awk '/^## The findings so far/,/^## Retracted/' RECAP.md \
+   awk '/^## The findings so far/,/^## Retracted/' RECAP_PAT.md \
      | grep -E '^[0-9]+\. ' > .temp/h.$$
    for d in patterns/p*/; do id=$(basename "$d" | cut -d- -f1)
      grep -q "\b$id\b" .temp/h.$$ || echo "MISSING: $id"; done; rm -f .temp/h.$$
@@ -163,7 +163,7 @@ context still applies — do not restart from scratch.
     nothing:
 
     ```bash
-    grep -rho '\.tasks/TASK_[A-Za-z0-9_]*\.md' .memory/ .tasks/ RECAP.md \
+    grep -rho '\.tasks/TASK_[A-Za-z0-9_]*\.md' .memory/ .tasks/ RECAP_PAT.md \
       | sort -u | while read p; do [ -e "$p" ] || echo "MISSING: $p"; done
     ```
 

@@ -1873,7 +1873,7 @@ say which pair.**
 
 ---
 
-*Sources: `results/synthesis.md` (generated tables and provenance), `RECAP.md`
+*Sources: `results/synthesis.md` (generated tables and provenance), `RECAP_PAT.md`
 findings 1–64, `.memory/01-ladder.md` (rung definitions and per-pattern
 findings, authoritative), `.memory/03-measurement.md` (measurement rules),
 `.memory/04-verus.md` (proof burden and trusted base), `.memory/06-catalogue.md`

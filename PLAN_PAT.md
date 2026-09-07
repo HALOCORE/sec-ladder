@@ -1,4 +1,10 @@
-# sec-ladder — prototype plan
+# PLAN_PAT — sec-ladder prototype plan (the PAT programme, `patterns/`)
+
+> ⚠⚠ **THIS FILE WAS `PLAN.md`.** Renamed when `patterns-php/` opened; it
+> covers `patterns/` only. The PHP programme's plan is `PLAN_PHP.md`.
+> ⚠ **It was already marked HISTORICAL before the rename** and still is: its
+> pattern table is a pre-project proposal with its own numbering and at least
+> one bug class since retracted. `.memory/06-catalogue.md` is the catalogue.
 
 A micro-benchmark for the **performance ↔ memory-safety tension** in systems
 languages. For each common C pattern we build the same program at five points on

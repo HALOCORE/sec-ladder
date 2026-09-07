@@ -1251,7 +1251,7 @@ which is a loud failure. That is the whole argument.
 *meant*, so it prints each target for a human to judge. It found all five above:
 
 ```bash
-grep -rno 'check\.py:[0-9]\+' .memory/ RECAP.md .tasks/PROTOCOL.md | sort -u \
+grep -rno 'check\.py:[0-9]\+' .memory/ RECAP_PAT.md .tasks/PROTOCOL.md | sort -u \
 | while IFS=: read -r f l ref; do n=${ref#check.py:}; \
     printf '%-34s -> %s\n' "$f:$l" "$(sed -n "${n}p" harness/check.py | cut -c1-72)"; done
 ```

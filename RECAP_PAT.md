@@ -1,4 +1,27 @@
-# RECAP — state of the research programme
+# RECAP_PAT — state of the PAT research programme (`patterns/`)
+
+> ⚠⚠ **THIS FILE WAS `RECAP.md`.** It was renamed when the second programme
+> (`patterns-php/`) opened; **it covers `patterns/` ONLY.** For the PHP
+> programme read `RECAP_PHP.md`, and for the split read `CLAUDE.md`'s top table.
+>
+> ⚠ **Citations of the old name `RECAP.md` survive on purpose** in `.tasks/`
+> (historical record), in `harness/*.py` and `patterns/*/` (hash-pinned — a
+> rewrite there costs a 33-pattern re-gate for a pointer), in `pilot/` (frozen),
+> and inside findings that quote what was published under the old name.
+> **They all resolve here.** ✅ **Every citation that was part of a RUNNABLE
+> COMMAND was repaired and RE-RUN** — `.tasks/PROTOCOL.md` rules 1 and 10,
+> `.memory/{01-ladder,02-bench-rules,03-measurement}.md`, and the two in this
+> file. **There were none in any hashed file** (measured: `grep -nE
+> '(grep|awk|sed)[^|]*\b(RECAP|PLAN)\.md' harness/*.py` → 0 hits), which is why
+> the rename cost zero gate runs and zero re-measures.
+>
+> ⚠ Two pre-existing drifts surfaced while re-running those commands and are
+> **NOT** consequences of the rename: `.memory/03-measurement.md`'s *"13
+> PROVISIONAL lines"* now measures **16**, and `.memory/01-ladder.md`'s
+> `NR>109 && NR<930` window is stale against a file this long (it returns
+> finding **21**, not the highest). Both are the citation-rot class this file
+> already documents; neither was repaired here, because repairing a number
+> inside a finding is a different act from repairing a path.
 
 ## START HERE — the next action, in one screen
 
@@ -7732,7 +7755,7 @@ Both retired.
 
     **The authoritative layer's `.temp/` citations all resolve.** Measured, not
     estimated:
-    `grep -rho '\.temp/[A-Za-z0-9_./-]*' .memory/ RECAP.md | sort -u` gives
+    `grep -rho '\.temp/[A-Za-z0-9_./-]*' .memory/ RECAP_PAT.md | sort -u` gives
     **36**, of which **2 are `pNN` PLACEHOLDERS** (`.temp/build/pNN/`,
     `.temp/pNN/`) and the other **34 all exist on this box**. ✅ **So there are
     ZERO broken citations today** — do not go chasing the two, they are prose.
@@ -8041,7 +8064,7 @@ Both retired.
 harness/measure.py --check-stale          # the invariant is "0 STALE"; the record
                                           # count moves with every pattern added
 harness/check.py p13                      # or any pattern; every one is green
-grep -rho '\.tasks/TASK_[A-Za-z0-9_]*\.md' .memory/ .tasks/ RECAP.md \
+grep -rho '\.tasks/TASK_[A-Za-z0-9_]*\.md' .memory/ .tasks/ RECAP_PAT.md \
   | sort -u | while read f; do [ -e "$f" ] || echo "MISSING: $f"; done
 # the shared named-spelling paragraph must be ONE hash across all patterns:
 python3 -c "import hashlib,glob;print({hashlib.sha256(open(f).read()[open(f).read().find('NAMED-SPELLING STANDARD'):open(f).read().find('p01 and p08 neither')+19].encode()).hexdigest()[:12] for f in glob.glob('patterns/*/spec.md')})"

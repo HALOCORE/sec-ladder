@@ -211,7 +211,7 @@ it was not run on. That is why the policy is "mandatory when R4 ≠ R5", not
 
 ## Missing / constrained on this box
 
-Relevant to benchmarking — see `PLAN.md` "Measurement methodology".
+Relevant to benchmarking — see `PLAN_PAT.md` "Measurement methodology".
 
 - **`perf` not installed, and `perf_event_paranoid=3`** → no hardware counters
   even if installed (needs root to relax). This is the only remaining hard gap:
@@ -240,7 +240,7 @@ rustc -C opt-level=3 -C debug-assertions=off -C codegen-units=1 pilot/k_unsafe.r
 
 Kernel body with addresses and symbol hashes normalised away — note this is
 **not** the snippet that produced the 33/58/38 numbers in `pilot/README.md` and
-`PLAN.md`; see `.memory/03-measurement.md` for what was wrong with that one
+`PLAN_PAT.md`; see `.memory/03-measurement.md` for what was wrong with that one
 (it counts the `<addr> <sym>:` header line as an instruction, so every published
 count is one too high, and it leaves bare-hex branch targets in so two builds
 never diff clean):
@@ -318,6 +318,6 @@ exempt, because a report is a dated record of what was true when it was written.
 - Unverifiable exec code (`println!`, `get_unchecked`) goes in a
   `#[verifier::external_body]` helper with an explicit `requires` — Verus has no
   statement-level skip. Every such helper is trusted base: keep it minimal and
-  justify it in a comment. `PLAN.md` counts these lines as a reported metric.
+  justify it in a comment. `PLAN_PAT.md` counts these lines as a reported metric.
 - Run Verus from a scratch dir (`verus_run.py` does this) so `.vir`/build
   artefacts stay out of the tree.

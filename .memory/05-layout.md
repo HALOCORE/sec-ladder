@@ -3,7 +3,8 @@
 ```
 sec-ladder/
   CLAUDE.md                 # entry point: links + DON'Ts only, keep it ~30 lines
-  PLAN.md                   # research plan, feasibility argument, decisions
+  PLAN_PAT.md               # research plan, feasibility argument, decisions
+                            # (was PLAN.md; renamed when patterns-php/ opened)
   TOOLCHAIN.md              # install record, how to run Verus, what's missing
   verus_run.py              # the only sanctioned way to invoke Verus
   .memory/                  # durable context for agents (this dir)
@@ -596,7 +597,7 @@ it is evidence the published column never reads the field.**
 
 ## Editing rules
 
-- `pilot/` is frozen evidence for `PLAN.md`. Do not edit it; p01 is its successor.
+- `pilot/` is frozen evidence for `PLAN_PAT.md`. Do not edit it; p01 is its successor.
 - `CLAUDE.md` stays minimal — links and DON'Ts. New prose goes in a topic doc and
   gets a link line, never inline.
 - Any agent that learns a durable fact (a Verus workaround, a measurement gotcha)

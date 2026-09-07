@@ -396,7 +396,7 @@ asserted the other's number. Print them instead:
 ```bash
 grep -c '^[0-9]\+\. \*\*' .memory/01-ladder.md   # this file's findings (+2: the
                                                  # two at the top are a separate list)
-awk 'NR>109 && NR<930 && /^[0-9]+\. \*\*/' RECAP.md | tail -1   # RECAP's highest
+awk 'NR>109 && NR<930 && /^[0-9]+\. \*\*/' RECAP_PAT.md | tail -1  # RECAP_PAT's highest
 ```
 
 ⚠ **A THIRD TRAP, and it is the one the manager keeps hitting: SOME OF THE MOST

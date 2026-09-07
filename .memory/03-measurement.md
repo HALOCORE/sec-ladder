@@ -3027,7 +3027,7 @@ already been struck.** Keep the list, not the ordinal.
     ✅ **Sweep case-insensitively, and read the tier out of the RECORDS rather
     than hard-coding it** (`.temp/t138/sweep_markers.py`).
     **Named-token totals: contract 3, gate 12, measure 0 — no marker anywhere
-    costs a re-measure.** ⚠ **`grep PROVISIONAL RECAP.md` is not the census; the
+    costs a re-measure.** ⚠ **`grep PROVISIONAL RECAP_PAT.md` is not the census; the
     real figure is 13 lines in `RECAP.md`, 65 in `.memory/`, 3 in
     `SYNTHESIS.md`, and 2 inside hashed contracts.**
 

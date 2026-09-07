@@ -5,6 +5,7 @@
 # Benchmark inputs are regenerated deterministically by each pattern's
 # inputs/gen.py (.memory/02-bench-rules.md); gen.py is committed, blobs are not.
 patterns/*/inputs/*.bin
+patterns-php/*/inputs/*.bin
 
 __pycache__/
 *.pyc
@@ -17,6 +18,7 @@ __pycache__/
 # beside the full-run record rather than over it. Only the full-run record is
 # committed evidence.
 results/gate/*.partial.json
+results-php/gate/*.partial.json
 
 # `.web/` — the static report over this tree's evidence. It was ignored here and
 # kept its own local git history until it was folded into this repository. Its
