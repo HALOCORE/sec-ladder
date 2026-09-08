@@ -49,7 +49,7 @@ def catalogue_rows():
         if not m:
             continue
         seen.append(m.group(1))
-        ids = re.findall(r"\b(?:CRASH|V5C)-\d+\b", line)
+        ids = re.findall(r"\b(?:CRASH|V5C|LOGIC)-\d+\b", line)
         if ids:
             out[m.group(1)] = ids
     return out, seen

@@ -1062,62 +1062,51 @@ source before building.
 
 `ph07` cost a task to *"where is the upstream fix?"*. **That question is now
 answered mechanically for every catalogued row** (`python3
-.tasks-php/fixsurvey.py`, 84 rows, patches cached, **zero fetch failures**).
+.tasks-php/fixsurvey.py`): **91 of 91, zero unmapped, zero fetch failures.**
 Only what changes a decision:
 
-- ⚠ **6 rows have the `ph07` shape — the fix is in ANOTHER FILE**: `ph07 ph27
-  ph54 ph88 ph89 ph90`. ⭐ **Four cross a subsystem boundary** (ext ↔ Zend,
-  executor ↔ compiler); `ph27`'s file was **also moved** (`ext/standard/reg.c` →
-  `ext/ereg/ereg.c`). **A function-name search cannot find any of them**, and
-  each owes a statement about an `R1h` guard that is not in its kernel's
-  translation unit.
-- ⚠ **9 fixes touch ≥ 5 files** — `ph24` **16**, `ph16` 10, `ph26` 9, `ph23` 8,
-  then `ph39 ph54 ph65 ph73 ph76`. ✅ `ph24` and `ph26` are **independently**
-  `history_status: fixed-by-rewrite`; the two fields agree.
-- ⚠⚠ **`ph36` has no sha at all** — `(bison-regeneration; no single commit)`.
-  **Exactly one row in the corpus**, so §F5 needs one escape hatch (F38).
-- ⭐⭐ **31 % of rows (26 of 83) were fixed in 2010 or later**, against a 5.0.0
-  release of 2004-07-13. **Each is one of two very different findings and the
-  survey cannot tell them apart**: *the defect really survived 6–21 years*, or
-  *the named commit is a later hardening* — **which is what `ph21`'s 2015 commit
-  turned out to be** (F38). ⚠ **This is the measurement that makes the per-row
-  tag check mandatory rather than cautious: it is live on a third of the corpus.**
-- ⭐⭐ **The standout was `ph22` (`pack`), whose fix is dated 2025. ✅ SETTLED —
-  AND IT CAME OUT THE OTHER WAY.** This finding first said *"if it is the same
-  defect, PHP shipped it for 21 years"*, flagged unverified. **It is not, and
-  the 21 years is withdrawn.** Traced across eight tags:
-
-  ```
-  5.0.0   outputpos += (arg + 1) / 2;                  <-- ph22's defect, NO CHECK
-  5.1.0   INC_OUTPUTPOS((arg + 1) / 2, 1)              <-- the checking macro ARRIVES
-  5.2.0   INC_OUTPUTPOS((arg + (arg % 2)) / 2, 1)      <-- +1 over-counted for even arg
-  5.3.0 … 8.4.0   unchanged, ~15 years
-  2025-06-29  INC_OUTPUTPOS((arg / 2) + (arg % 2), 1)  <-- 865739e5b196, the CSV's cell
-  ```
-
-  **`ph22`'s R1h is the 5.1.0 arrival of `INC_OUTPUTPOS`** — whose body is
-  `if ((a) < 0 || ((INT_MAX - outputpos)/(b)) < (a)) { … RETURN_FALSE; }` —
-  **not the 2025 commit. That is the THIRD confirmed instance of F38 half 2**,
-  after `ph12` and `ph21`, and it landed on the row this finding singled out as
-  most likely to be the exception. **The rule earned its keep on its own test
-  case.**
-
-  ⭐ **But the 2025 commit is a finding in its own right, and a better one than
-  the headline it replaces.** What survived 5.1.0 → 2025 is signed-overflow UB
-  **in the macro's ARGUMENT**: `(arg + (arg % 2))` overflows at `arg == INT_MAX`
-  *before* `INC_OUTPUTPOS`'s guard ever runs, so **an explicitly
-  overflow-checking macro is handed an already-wrapped value.** ⚠⚠ **That is
-  exactly `ph20`'s catalogued shape** — *"the wrap collapsed inside
-  `safe_emalloc`'s first argument, so the wrapper is present and bypassed"* —
-  **in a second function, and there it survived nineteen years inside the guard
-  meant to prevent it.** *A guard passed an already-wrapped value is not a
-  guard*, and this corpus now has two independent instances.
-- ⚠ `ph49` and `ph50` resolve to **one** corpus id and commit (CRASH-153).
-  Two rows from one report is legitimate — the catalogue splits by mechanism —
-  **but nobody has checked these two are distinct.** Flagged, not judged.
-
-⚠ **Coverage**: 7 rows (`ph48 ph52 ph66 ph82 ph83 ph84 ph85`) do not expose an
-id to the parse — **a limit of the parse, not the corpus.** Resolve by hand.
+- ⚠ **8 rows have the `ph07` shape — the fix is in ANOTHER FILE**: `ph07 ph27
+  ph54 ph82 ph83 ph88 ph89 ph90`.
+- ⭐⭐ **THREE of those are one sub-pattern: an EXECUTOR defect fixed in the
+  COMPILER.** `ph54`, `ph82`, `ph83` all cite `Zend/zend_execute.c` and are all
+  fixed in `Zend/zend_compile.c` (+ the parser). **For VM-level defects the
+  repair is often in the code that EMITS the opcodes, not the code that runs
+  them.** ⚠ **`R1h` for these is not a line you can add to the kernel**, and each
+  must say so. ⭐ `ph27`'s file was **also moved** (`ext/standard/reg.c` →
+  `ext/ereg/ereg.c`), so a path search fails on it too.
+- ⚠ **12 fixes touch ≥ 5 files** — `ph48` **17**, `ph24` 16, `ph16` 10, `ph26` 9,
+  `ph23`/`ph83` 8, then `ph39 ph54 ph65 ph73 ph76 ph84`. ✅ `ph24` and `ph26` are
+  **independently** `history_status: fixed-by-rewrite`; the two fields agree.
+- ⚠⚠ **`ph36` has no sha at all** — `(bison-regeneration; no single commit)`,
+  **the only such row in the corpus**, so §F5 needs one escape hatch (F38).
+- ⭐⭐ **28 of 90 rows (31 %) were fixed in 2010 or later**, against a 5.0.0
+  release of 2004-07-13. **Each is either *the defect survived 6–21 years* or
+  *the named commit is a later hardening*, and the survey cannot tell them
+  apart — only the tag check can.** ⚠⚠ **Every case tested by hand so far has
+  come out the second way: `ph12`, `ph21` and `ph22`.** That is what makes the
+  per-row tag check mandatory rather than cautious.
+- ⭐ **`ph22` was the standout — fix dated 2025 — and settling it produced the
+  third instance rather than a headline.** Traced across eight tags: the
+  memory-safety hole closed in **5.1.0**, when `INC_OUTPUTPOS` arrived with an
+  explicit `INT_MAX` guard; the expression then sat unchanged ~15 years. **`ph22`'s
+  R1h is the 5.1.0 macro, not the 2025 commit**, and *"PHP shipped it for 21
+  years"* — which this finding published — **is withdrawn.**
+  ⭐ **What the 2025 commit really fixes is better**: signed-overflow UB **in the
+  macro's ARGUMENT**, `(arg + (arg % 2))` wrapping at `INT_MAX` *before*
+  `INC_OUTPUTPOS`'s guard runs — **an overflow-checking macro handed an
+  already-wrapped value.** ⚠⚠ **That is `ph20`'s catalogued shape in a second
+  function**, surviving nineteen years **inside the guard meant to prevent it**.
+- ✅ **A clean negative worth recording.** The 7 rows an earlier version called
+  *"unmapped"* are the `LOGIC-`-prefixed ones — the corpus uses **three** id
+  prefixes and the parse knew two. ⚠ **Checked deliberately, because `LOGIC-`
+  ids also appear under `rust-eval/`, which would have put seven rows'
+  provenance on the Rust port** — against `SOURCES.md` and against the standing
+  instruction that the port is a reference, never ground truth. **It does not:
+  all 24 `LOGIC-` rows are in `index.csv` with ordinary `c_file_line` and
+  `fix_commit` cells, and `ph48` cites the `c_file_line` `V5C-166` carries.**
+- ⚠ `ph49` and `ph50` resolve to **one** corpus id and commit (CRASH-153). Two
+  rows from one report is legitimate — the catalogue splits by mechanism — **but
+  nobody has checked these two are distinct.** Flagged, not judged.
 
 ### F39 — ⚠⚠⚠ `ph03`'s LADDER IS A PAIR OF SPELLINGS, ITS OWN CONTRACT SAYS SO, AND THE PAT RECORD SAYS THE MISSING NUMBER MOVES **AGAINST SAFE RUST**
 
