@@ -63,7 +63,7 @@ BAR     C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
 ⚠ OPS   .web/ is edited by a CONCURRENT SESSION -- NEVER `git add -A`.
         Commit with explicit paths or `git add -A -- . ':!.web'`.
 READ    .memory-php/ · PLAN_PHP.md · .tasks/PROTOCOL.md (reused unchanged) ·
-        CATALOGUE.md · then F1-F38 and the open items below.
+        CATALOGUE.md · then F1-F39 and the open items below.
 ```
 
 ---
@@ -133,7 +133,8 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > **F35 ⚠⚠ this box's `grep` is silently blind to `string.c`** · **F36 the next
 > batch's four fixes, and two of them DELETE the guard** · **F37 the kills that
 > survived the audit are the ones written down as settled** · **F38 ⚠⚠ the
-> `fix_commit` was a column in the corpus index, and it is not always THE fix**
+> `fix_commit` was a column in the corpus index, and it is not always THE fix** ·
+> **F39 ⚠⚠ ph03's ladder is a pair of spellings and its own contract says so**
 
 ### F1 (PROVISIONAL) — `c_file_line` names the FAULTING FRAME, not the defect
 
@@ -839,6 +840,22 @@ built, so **no ratio here is *the* cost of safety** — each is the cost of *the
 spellings* of these rungs. A different safe-tuned spelling moves row 2's number
 and would move this one.
 
+⚠⚠⚠ **UPGRADED BY F39 — READ THAT BEFORE QUOTING ANY NUMBER ABOVE.** The caveat
+is right and it is **weaker than the situation**. Three things it does not say:
+
+1. **These are `fixed-R4 bound`s** — PAT's term (`.memory/02-bench-rules.md`),
+   and the rule is that a bound ships **labelled, beside a cheapest-found
+   counterpart**. **Above, seven numbers ship unlabelled with no counterpart.**
+2. ⚠ **The obligation is inside `ph03`'s OWN hashed `why`**: *"Every pattern
+   owes an in-contract spread beside its headline."* This is undischarged, not
+   unforeseen.
+3. ⚠⚠ **The missing number's direction is not a coin flip.** On the four PAT
+   rows where anyone searched the R4 side, **three moved out of their buckets and
+   every one moved against safe Rust** — `p22` by **510×** on the large band,
+   `p12` and `p13` **sign-flipping**. **So point 1's *"tuning recovers 86.4 %"*
+   is the single most likely claim on this row to move**, and it is the one the
+   crash course would most want to quote.
+
 ### F34 — ⚠ `ph07` DOES have a fix, and the manager found it by disbelieving the engineer
 
 `TASK_PHP_015` stopped before building `ph07` and reported that **no
@@ -1039,6 +1056,58 @@ That is the row engineer's job, and the window is the expensive half.
 mis-catalogued — a C-side question, so it can decide admission.** Settle it at
 source before building.
 
+### F39 — ⚠⚠⚠ `ph03`'s LADDER IS A PAIR OF SPELLINGS, ITS OWN CONTRACT SAYS SO, AND THE PAT RECORD SAYS THE MISSING NUMBER MOVES **AGAINST SAFE RUST**
+
+**This is not a new caveat. It is an obligation `ph03` already carries, in its
+own hashed block, undischarged.** `spec.md`'s `why` — the NAMED-SPELLING
+STANDARD paragraph, byte-identical across six PAT patterns — ends:
+
+> *"**Every pattern owes an in-contract spread beside its headline**; on the R3
+> side p16 and p17 have one from TASK_018, p02 from TASK_019 and p05 from
+> TASK_021 …, on the R4 side ONLY p05 and p16, and p01 and p08 neither."*
+
+`ph03` ships a headline (F33's ladder) and **no spread**. Its `controls/` holds
+`negatives.py`, `fix_incomplete.c` and two patches — **no `spellings.py`**,
+though the control is a solved, shipped thing on **four PAT rows** (`p13 p34 p42
+p49`).
+
+⚠⚠ **And PAT's own headline result is that this is the biggest term.**
+`results/SYNTHESIS.md` **Result 1: *"the safety tax is a property of a pair of
+spellings, and the check is rarely the biggest term."*** Where anyone searched
+the R4 side — **four rows of 22** — applying the result moved **three out of
+their buckets, every one against safe Rust**:
+
+| row | shipped | cheapest admissible R4 found |
+|---|---|---|
+| **p22** | `+2.00 / +2.00` | **`+125.00 / +1021.00`** — **510× on the large band** |
+| **p13** | `−177 / −1054` | `+44.00 / +77.00` — **sign flip** |
+| **p12** | `+3.00 / −26.00` | `+20.00 / +66.00` — **sign flip on `large`** |
+| **p10** | `−323 / −603` | `−129.00 / −241.00` — **60 % of the margin was R4 spelling** |
+
+**So the prior is not neutral.** `ph03`'s `safe_tuned +3.7 %` and *"tuning
+recovers 86.4 % of the naive-safe gap"* are exactly the shape of claim that a
+searched counterpart has moved before — and `.memory-php/02-ladder.md` publishes
+them **in the authoritative layer**, where rule 9 makes them supersede.
+
+⚠ **What is NOT claimed**: no figure is retracted. PAT's rule is *never re-ship a
+rung because a cheaper spelling was found* — the shipped cell stays and is
+published as a **`fixed-R4 bound`**, with the cheapest-found beside it, **and
+neither is "the true one"**. **`ph03`'s numbers are fixed-R4 bounds that are not
+labelled as such**, which is the one thing `SYNTHESIS.md` §2 says loses
+information.
+
+⚠ **Nor is `ph03` uniquely at fault** — the same paragraph records `p01` and
+`p08` owing both sides. **But `ph03` is the template 90 php rows will clone**, so
+an unlabelled headline here propagates in a way it does not on a finished corpus.
+
+**→ Two actions, neither urgent enough to interrupt a build, both before any
+number reaches the crash course:** (1) **label `ph03`'s ladder `fixed-R4
+bound`** wherever it is published — `.memory-php/02-ladder.md`, F33, the START
+HERE box; (2) **a task that ports `controls/spellings.py` to `ph03`** and
+publishes the spread. ⚠ **(1) is cheap and (2) is not, so do (1) first** and do
+not let (2)'s cost delay it — an unlabelled number is the defect, not a missing
+control.
+
 ### F38 — ⚠⚠⚠ THE `fix_commit` WAS IN A COLUMN OF THE CORPUS INDEX ALL ALONG — AND IT IS NOT ALWAYS *THE* FIX
 
 **Both halves of this finding matter and the second is the one that saves a row.**
@@ -1180,4 +1249,4 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 | 15 | ⚠ **The php staleness check is `gate.py --tool measure --check-stale`** and the mandated PAT `66/0` one does **not** examine `results-php/` at all | Both are now in `PROTOCOL_PHP.md` §E1 (`TASK_PHP_004`); today the php side is **2 records** |
 | 21 | ⚠⚠ **`TASK_PHP_012` M4 — 12 rows declare `verbatim` whose defect site is inside a `PHP_FUNCTION` / VM-handler / arg-parsing frame, i.e. **`narrowed`** — and NONE has been corrected in `CATALOGUE.md`** | ✅ **Re-run and reproduced by the manager** (`.temp/mgr/batch/tier_recheck.log`): `ph05 ph11 ph12 ph21 ph22 ph24 ph35 ph50 ph55 ph59 ph76 ph80`. ⚠ **A cost statement, never a filter — no row's admission moves.** But `provenance.py` reports overlap **against the declared tier's expectation** (50 % / 25 %) and `TASK_PHP_008` made that a report rather than a floor, so **a mis-declared `verbatim` row hands its reviewer a scary number that is indistinguishable from a bad extraction.** `TASK_PHP_012` said *fix before the first row*; `ph03` was unaffected, **but `ph12` and `ph21` are in the NEXT BATCH.** ✅ **Landing is staged and mechanical**: `python3 .temp/mgr/land_m4.py --check\|--apply` edits Part A + Part B for all 12 and **refuses unless every row has exactly two occurrences** (dry-run: 24 edits, 2 each). **Blocked only by `PROTOCOL.md` rule 11** — `TASK_PHP_016` is reading `CATALOGUE.md`. **Land it the moment that task reports** |
 | 22 | ⚠ **The rest of `TASK_PHP_012`'s catalogue corrections are still owed** — M1 (6 of 12 "merges" are silent drops), M2 (the four-`LOGIC` set kill), M3 (CRASH-021 reverses → a `ph60` merge, not a kill), M5 (CRASH-061/126 in the wrong family), and the minors m1/m5/m8 | Batch them with item 21's landing (`PROTOCOL.md` rule 6) — they are all `CATALOGUE.md` edits and share its rule-11 block. ✅ **m8 is ADJUDICATED** (`ADJUDICATION_002.md` §2, F37): `CRASH-106` → **`ph92`**, `CRASH-109` → **`ph93`**, both admitted, mechanisms and citations verified at source, §4 gives the exact Part A / Part B / Part C edits. **What is owed is the LANDING, not the judgement** — and the catalogue goes **91 → 93** |
-| 23 | ⚠⚠ **FIVE doc edits are BLOCKED ONLY by `PROTOCOL.md` rule 11** — `TASK_PHP_016` is reading `CATALOGUE.md`, `.memory-php/` and `PROTOCOL_PHP.md`. **Land all five in ONE pass the moment it reports** (rule 6) | **(a)** `python3 .temp/mgr/land_m4.py --apply` — the 12 mis-tiered rows (item 21). **(b)** `ADJUDICATION_002.md` §4 — add `ph92`/`ph93`, delete their `C.1` kills **and record the re-adjudication in place** (a kill that vanishes is worse than a kill that was wrong — M1), narrow `ph28`'s uniqueness claim to *resident*. Catalogue **91 → 93**. **(c)** `.memory-php/02-ladder.md` — F34's *"the guard moved to the PROLOGUE"* is **superseded**: it moved to the **CALLER, in another file** (F38), and the entry names `ph07`'s R1h, which is now `cb3cca21b345`. **(d)** `.memory-php/00-corpus.md` — its header says findings run *"F1–F34"* (rule 13: headers rot), and it should carry the **`fix_commit` column** and the **`grep -a`** hazard. **(e)** `PROTOCOL_PHP.md` — the `grep -a` rule (F35) and the pre-build item `TASK_PHP_015` asked for, in F38's stronger form: *read the CSV's `fix_commit`, fetch the patch, **and confirm against the tags that it removes the 5.0.0 defect**; if not, cite both* |
+| 23 | ⚠⚠ **FIVE doc edits are BLOCKED ONLY by `PROTOCOL.md` rule 11** — `TASK_PHP_016` is reading `CATALOGUE.md`, `.memory-php/` and `PROTOCOL_PHP.md`. **Land all five in ONE pass the moment it reports** (rule 6) | **(a)** `python3 .temp/mgr/land_m4.py --apply` — the 12 mis-tiered rows (item 21). **(b)** `ADJUDICATION_002.md` §4 — add `ph92`/`ph93`, delete their `C.1` kills **and record the re-adjudication in place** (a kill that vanishes is worse than a kill that was wrong — M1), narrow `ph28`'s uniqueness claim to *resident*. Catalogue **91 → 93**. **(c)** `.memory-php/02-ladder.md` — F34's *"the guard moved to the PROLOGUE"* is **superseded**: it moved to the **CALLER, in another file** (F38), and the entry names `ph07`'s R1h, which is now `cb3cca21b345`. **(d)** `.memory-php/00-corpus.md` — its header says findings run *"F1–F34"* (rule 13: headers rot), and it should carry the **`fix_commit` column** and the **`grep -a`** hazard. **(e)** `PROTOCOL_PHP.md` — the `grep -a` rule (F35) and the pre-build item `TASK_PHP_015` asked for, in F38's stronger form: *read the CSV's `fix_commit`, fetch the patch, **and confirm against the tags that it removes the 5.0.0 defect**; if not, cite both*. **(f)** `.memory-php/02-ladder.md` again — **label row 1's table `fixed-R4 bound`** and carry F39's direction prior; the caveat there is the engineer's and is weaker than the situation |
