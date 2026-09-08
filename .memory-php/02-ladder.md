@@ -101,9 +101,24 @@
   BOTH built rows** (`TASK_PHP_016` §7.1).
   ⚠ **The obligation is inside `ph03`'s own hashed `why`**: *"Every pattern owes
   an in-contract spread beside its headline."* Undischarged, not unforeseen.
-  ⚠⚠ **And the missing number's direction is not a coin flip.** On the four PAT
-  rows where anyone searched the R4 side, **three moved out of their buckets and
-  every one moved against safe Rust** — `p22` by **510×** on the large band,
-  `p12` and `p13` sign-flipping (`results/SYNTHESIS.md` §2, Result 1: *the safety
-  tax is a property of a pair of spellings*). **So *"tuning recovers 86.4 %"* is
-  the single most likely claim on row 1 to move.** (F39.)
+  ⚠⚠⚠ **AND THE MANAGER'S *"the direction is not a coin flip — it moves against
+  safe Rust"* IS WITHDRAWN. It was a theorem about taking a minimum, presented
+  as an observation** (`TASK_PHP_017` §2.4). What the record actually supports:
+
+  > Of the **19** PAT rows whose R4 side was searched, **eight found a cheaper
+  > R4 and eleven found none** — the R4 endpoint is degenerate more often than
+  > not. Where one *is* found the published gap necessarily widens against safe
+  > Rust, **because the statistic is `R3ship − min(R4 found)` and a minimum can
+  > only fall**; the direction of those four is *forced by the arithmetic* and is
+  > not evidence about an unsearched number. ⚠ **Three of the four counterparts
+  > are OUT OF CONTRACT by their own patterns' records**; only `p22`'s is
+  > admissible. `SYNTHESIS.md:271-277` already states the real asymmetry — *the
+  > number moves toward whichever side you did not search*, and **the R3-side
+  > levers are the cheap ones**: on **≥ 9** PAT rows an R3-side respelling moved
+  > the headline **TOWARD** safe Rust.
+
+  ⭐⭐ **And `ph07` now confirms that from inside this programme**: an R3-side
+  search found **+13.50 % → +2.62 %**, a move *for* safe Rust larger than three
+  of the four R4-side moves the withdrawn claim rested on. **A row that has
+  searched neither side is unbounded in BOTH directions**, and `ph03` has
+  searched neither. (F39, corrected by `TASK_PHP_017` §2.4.)

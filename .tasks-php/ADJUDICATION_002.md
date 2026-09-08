@@ -42,9 +42,23 @@ open item had ever named**, so a row was recovered that nothing was tracking.
 **and the user decision it quotes is explicit**: *"Even within patterns-php,
 slight variations I am still okay with as a different pattern."*
 
-⚠⚠ **Neither kill note claims exactness. Both name the distinguishing feature
-and then discount it for COST** — the move `PLAN_PHP.md` §3 forbids and F8
-names:
+⚠⚠⚠ **THIS SENTENCE WAS WRONG AND ITS OWN QUOTE BELOW REFUTES IT.** It read:
+*"Neither kill note claims exactness."* **Both notes DO** — CRASH-106 ends *"not
+a different mechanism"* and CRASH-109 *"without changing the mechanism"*, and
+**§2's own CRASH-109 quote carries that clause seven lines below the sentence
+denying it exists** (`TASK_PHP_017` §2.2). ✅ **The corrected, narrower finding —
+and the admissions follow from it unchanged:**
+
+> **Both notes assert exactness and ground it in a COST word.** The exactness
+> claim is the *conclusion*; *"a worse kernel"* and *"muddies the extraction"*
+> are the *reasons given for it*, and `PLAN_PHP.md` §3 forbids exactly that.
+
+⚠ **The stated reason did not survive; the admissions did.** ⚠⚠ **And the
+reviewer's general lesson is the sharper one: ZERO of the remaining `C.1` notes
+contains a cost word, so the re-read this document predicted finds nothing. The
+two that DO reverse need a different test — *does the C support the mechanism
+claim?* — which this document never runs on anything, including on its own two
+admissions.**
 
 | | the note says | the forbidden word |
 |---|---|---|
@@ -162,3 +176,36 @@ max `ph91` → **`ph92`** (nl2br), **`ph93`** (wordwrap).
    them** — `TASK_PHP_012` M1 found that six of twelve "merges" were silent
    drops, and a kill that vanishes is worse than a kill that was wrong.
 4. ⚠ **`ph28`'s uniqueness sentence** narrowed to *resident* (m5 rider).
+
+---
+
+## §5 ADDENDUM — `TASK_PHP_017` reviewed this document and found two MORE reversals
+
+⚠⚠ **`CRASH-126` and `CRASH-163` REVERSE**, and **not for this document's
+reason.** `C.1` kills both into `ph60` as *"same fallible call's failure not
+tested"*. **In both, the failure IS tested:**
+
+```
+CRASH-126  mbstring.c:3215   if (zend_parse_parameters(..., "|s", &typ, ...) == FAILURE) RETURN_FALSE;
+                             -> `|` makes it OPTIONAL; zero args returns SUCCESS and `typ`
+                                keeps its NULL initialiser. The call did not fail.
+CRASH-163  zend.c:1078       if (call_user_function_ex(...) == SUCCESS) {...} else { :1083 handler }
+                             -> the NULL comes from :1075, where the function nulled the global itself.
+```
+
+**Different C mechanisms, and `index.csv`'s own `root_cause_id` for CRASH-126
+says so.** ⚠ **Both were killed TWICE for reasons the bar forbids** — once in
+`C.4`'s *"ordinary null-deref set"* (`F22`'s set-shaped kill), then again under
+`C.1`. `TASK_PHP_012` rider **M5** is the same finding reached independently, and
+`RECAP_PHP.md` open item 22 still lists M5 as owed.
+
+✅ **Upheld with the C**: `CRASH-090 → ph32` (same array, same expression at
+`html.c:900`), `CRASH-037 → ph39`. ⚠ `CRASH-101 → ph39` and `CRASH-061 → ph60`
+are **slight variations**, which `PLAN_PHP.md` §3.1 admits — **so they are
+candidates too, and this document did not look at them either.**
+
+⚠⚠ **The process defect in this document, stated because it is mine:** §0 says
+*"every catalogue edit below is blocked by rule 11"*, and the edits **were then
+landed** — with a CRASH-109 quote **less accurate than the one in §2**, because
+the landing dropped exactly the words that falsify the claim it supports.
+**A quote trimmed to fit is how a refuted sentence survives its own evidence.**
