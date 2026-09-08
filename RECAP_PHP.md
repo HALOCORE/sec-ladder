@@ -1095,10 +1095,32 @@ that touches the right function; **only the bisect tells you whether it removes
 *your* defect.** The `UPSTREAM_001` survey is not made redundant by this finding
 — **it is what caught it.**
 
+**Half 3 — the same CSV has a `history_status`, and ⚠ IT IS NOT THE SHORTCUT IT
+LOOKS LIKE.** Two values: **`historical-known` 149**, **`fixed-by-rewrite` 17**.
+
+- ✅ **Useful**: **10 catalogued rows are `fixed-by-rewrite`** — `ph24 ph26 ph36
+  ph46 ph63 ph67 ph71 ph76 ph78 ph80`. **Expect F34's shape on every one of
+  them**, and budget the archaeology before picking one.
+- ✅ **Bounded**: **exactly ONE corpus row has a non-sha `fix_commit`** —
+  `bison-yycheck-table-oob` (**`ph36`**), whose cell literally reads
+  `(bison-regeneration; no single commit)`. **So `PROTOCOL_PHP.md` §F5's
+  "sha-pinned real fix" needs ONE documented escape hatch, not a redesign** —
+  and the corpus tells you in advance which row needs it.
+- ⚠⚠ **The negative result, and it is the one that matters: neither field
+  discriminates half 2.** All four batch rows are `historical-known` **with
+  `confidence: high`** — **including `ph12` and `ph21`, whose commits I proved
+  are later fixes.** **`historical-known` + `high` does NOT mean "this commit
+  removes the 5.0.0 defect".** Nobody may use these fields to skip the check.
+
+⚠ *Coverage note*: 81 of the 91 Part A rows expose a corpus id to a simple
+parse; the other 10 (`ph48 ph52 ph66 ph75 ph77 ph79 ph82 ph83 ph84 ph85`) are a
+**limit of the parse, not of the corpus** — resolve them by hand when reached.
+
 **→ The pre-build checklist gains the item `TASK_PHP_015` asked for**, in the
 form its own evidence now demands: *"read `index.csv`'s `fix_commit` for this
 id, fetch the patch, **and confirm against the tags that it is the commit which
-removes the 5.0.0 defect** — if it is not, cite both."*
+removes the 5.0.0 defect** — if it is not, cite both. Check `history_status`
+too, but **never as a substitute for that confirmation**."*
 
 ### F37 — the two kills that survived the audit are the two that were written down as settled
 
