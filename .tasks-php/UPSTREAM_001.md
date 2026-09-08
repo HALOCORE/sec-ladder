@@ -16,7 +16,7 @@ reviewer. `PROTOCOL.md` rule 9 keeps it out of `.memory-php/` until it has.
 ## §0 Method, and how to regenerate every byte
 
 ```sh
-.temp/mgr/REFETCH.sh          # re-downloads everything cited below
+.tasks-php/refetch.sh          # re-downloads everything cited below
 ```
 
 Two sources, and **only** these two:
@@ -244,7 +244,7 @@ extraction.** `TASK_PHP_012` said this must be fixed *before the first row*; it
 was not, and `ph03` was unaffected — **`ph12` and `ph21` are where it finally
 bites.**
 
-**Landing is staged and mechanical**: `python3 .temp/mgr/land_m4.py --check |
+**Landing is staged and mechanical**: `python3 .tasks-php/land_m4.py --check |
 --apply` edits Part A and Part B for all 12 and **refuses** unless every row has
 exactly two occurrences. ⚠ **Blocked only because `TASK_PHP_016` is reading
 `CATALOGUE.md`** (`PROTOCOL.md` rule 11).
