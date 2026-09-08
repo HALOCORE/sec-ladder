@@ -192,7 +192,43 @@ rg           -n "PHP_FUNCTION\(str_repeat\)" …/string.c # 4115:  (the Grep too
 you type the same line. Full census and the narrower decode hazard:
 `RECAP_PHP.md` **F35**.
 
-## §6 What this survey does NOT give you
+## §6 ⚠⚠ TWO OF THESE FOUR ROWS ARE MIS-TIERED, AND THE CATALOGUE STILL SAYS `verbatim`
+
+`TASK_PHP_012` **M4** found that **12 of the 41 rows declaring `verbatim` sit
+inside a `PHP_FUNCTION` / VM-handler / argument-parsing frame**, which
+`PROTOCOL_PHP.md` §A1 defines as **`narrowed`** (*"a wrapper comes off (zval
+unpacking, argument parsing)"*). ✅ **Re-run by the manager, reproduced exactly**
+(`.temp/mgr/batch/tier_recheck.log`): the same 12 rows, and **all 12 still say
+`verbatim` in `CATALOGUE.md`.**
+
+| row | catalogue | enclosing frame at the defect site | correct tier |
+|---|---|---|---|
+| `ph21` | `verbatim` | `PHP_FUNCTION(str_repeat)` | ⚠ **`narrowed`** |
+| `ph12` | `verbatim` | `PHP_FUNCTION(substr_compare)` | ⚠ **`narrowed`** |
+| `ph16` | `verbatim` | `static int stream_array_to_fd_set(…)` — a helper | ✅ `verbatim` |
+| `ph29` | `narrowed` | `PHP_FUNCTION(stream_socket_recvfrom)` | ✅ `narrowed` |
+
+⚠ **This is a COST statement, never a filter** (`PLAN_PHP.md` §4) — **no row
+gains or loses admission here.** But it is not cosmetic: `provenance.py` reports
+kernel overlap **against the declared tier's expectation** (`verbatim` 50 %,
+`narrowed` 25 %), and `TASK_PHP_008` demoted that from a floor to a report, which
+put the judgement on a person. **A mis-declared `verbatim` row landing at 30 %
+hands a reviewer a frightening number with no way to tell a wrong tier from a bad
+extraction.** `TASK_PHP_012` said this must be fixed *before the first row*; it
+was not, and `ph03` was unaffected — **`ph12` and `ph21` are where it finally
+bites.**
+
+**Landing is staged and mechanical**: `python3 .temp/mgr/land_m4.py --check |
+--apply` edits Part A and Part B for all 12 and **refuses** unless every row has
+exactly two occurrences. ⚠ **Blocked only because `TASK_PHP_016` is reading
+`CATALOGUE.md`** (`PROTOCOL.md` rule 11).
+
+⚠ **Also from `TASK_PHP_012` §6.2, and it stands**: `ph16` and `ph17` are a
+legitimate C-side variation, **but their Rust and Verus halves are one row twice**
+— *"index a fixed-size bitset with an unvalidated integer"* is a single
+obligation. **`ph17` stays deferred**; do not pick it up as a fifth.
+
+## §7 What this survey does NOT give you
 
 1. **No commit is pinned** — only tag windows. Expect real work; §0 has the URL
    form that works.
