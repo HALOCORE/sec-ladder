@@ -48,19 +48,23 @@ between them read `CLAUDE.md`'s top table.
 STATE   ROWS BUILT 1 (ph03, reviewed) · CATALOGUED 91 · Phase 0 CLOSED.
         .memory-php/ EXISTS (00-corpus 01-extraction 02-ladder 03-numbers
         04-process) and is AUTHORITATIVE -- read it before any task report.
-NEXT    TASK_PHP_016 is WRITTEN and unstarted: build ph07 (mbfl_strcut).
-        Launch it. Then review it; then ph21 -> ph16 -> ph12 -> ph29 last.
+NEXT    TASK_PHP_016 RUNNING: build ph07 (mbfl_strcut). Review it next; then
+        the batch ph21 -> ph16 -> ph12 -> ph29, pre-briefed in
+        .tasks-php/UPSTREAM_001.md -- all 4 fixes already located (F36).
+⚠ GREP  ALWAYS `grep -a` ON THE CORPUS. `grep` in a Bash call is a wrapper
+        function -> ugrep: on string.c + 40 files it exits 1 with NO stdout
+        and NO stderr = "absent". 13 rows cite one. rg, /usr/bin/grep and
+        a script run by `sh` all SUCCEED, so a probe script lies. (F35)
 ROW 1   ph03 gate PASS. PHP's real 2004 fix is BOTH DEAD AND INCOMPLETE --
-        one hunk provably redundant, the other leaving 144 over-reads,
-        unfixed until 2014; Verus refuses it in one line. (F29)
-        Ladder (F33): safe_naive +26.8% · safe_tuned +3.7% · unsafe -7.6%
-        · verus == unsafe byte-identical · hardened C -0.4% (negative cost).
+        one hunk provably redundant, the other leaving 144 over-reads. (F29)
+        Ladder (F33): naive +26.8% · tuned +3.7% · unsafe -7.6% · verus ==
+        unsafe byte-identical · hardened C -0.4% (negative cost).
 BAR     C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
         patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
 ⚠ OPS   .web/ is edited by a CONCURRENT SESSION -- NEVER `git add -A`.
         Commit with explicit paths or `git add -A -- . ':!.web'`.
 READ    .memory-php/ · PLAN_PHP.md · .tasks/PROTOCOL.md (reused unchanged) ·
-        CATALOGUE.md · then F1-F34 and the open items below.
+        CATALOGUE.md · then F1-F36 and the open items below.
 ```
 
 ---
@@ -126,7 +130,9 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > the fix is a 1.4 KB fetch · F27 set-kills, three instances · F28 demotion cost ·
 > **F29 the 2004 fix is dead AND incomplete** · F30 negative-cost safety check ·
 > F31 two frozen-harness limits · F32 ⚠ the manager arbitrated the un-arbitrable ·
-> **F33 the first ladder** · **F34 the guard moved to the prologue**
+> **F33 the first ladder** · **F34 the guard moved to the prologue** ·
+> **F35 ⚠⚠ this box's `grep` is silently blind to `string.c`** · **F36 the next
+> batch's four fixes, and two of them DELETE the guard**
 
 ### F1 (PROVISIONAL) — `c_file_line` names the FAULTING FRAME, not the defect
 
@@ -885,6 +891,125 @@ so `q = p + from` can no longer pass the buffer end. ⚠ **The engineer read the
    checked the loop in the fixed version. **A missing bound is often restored in
    the PROLOGUE, not at the site** — `F1`'s three-frames problem arriving in the
    *repair* rather than in the defect.
+
+### F35 — ⚠⚠⚠ THIS BOX'S `grep` REPORTS **NOTHING** IN THE CORPUS'S MOST-CITED FILE
+
+⚠ **The mechanism is NOT "the box has a weird grep" — that was the manager's
+first framing and it was wrong.** `/usr/bin/grep` is **GNU grep 3.11 and handles
+this file perfectly**. What an agent gets in a `Bash` call is a **shell function**
+from the interactive profile that dispatches to **`ugrep 7.8.4`**, and *that*
+exits **1** with **no stdout and no stderr** on a file holding one non-UTF-8
+byte — **indistinguishable from a true absence.** Measured, same file, same
+pattern:
+
+```
+$ grep       -n "PHP_FUNCTION(str_repeat)" .../ext/standard/string.c ; echo $?
+1                                    <-- no output, no stderr, "not found"
+$ grep      -an "PHP_FUNCTION(str_repeat)" ...                       ; echo $?
+4115:PHP_FUNCTION(str_repeat)                                            0
+$ /usr/bin/grep -n "PHP_FUNCTION(str_repeat)" ...                    ; echo $?
+4115:PHP_FUNCTION(str_repeat)                                            0
+$ rg         -n "PHP_FUNCTION\(str_repeat\)" ...                     ; echo $?
+4115:PHP_FUNCTION(str_repeat)                                            0
+```
+
+✅ **Trigger isolated to ONE BYTE.** Copy `string.c`, replace `S\xe6ther` with
+`Saether`, change nothing else → the wrapper `grep` finds line 4115 and exits 0.
+
+⚠⚠ **Three consequences, and the third is the one that will waste a day:**
+
+1. **The two search tools every agent has disagree**, and the one that fails,
+   fails silently. The `Grep` tool is ripgrep-backed and sees the line; `grep`
+   in a `Bash` call does not. **An engineer who greps the pinned tarball and
+   finds nothing has learned nothing.**
+2. **`grep -a` fixes it** through the wrapper, and so does `/usr/bin/grep`.
+3. ⚠⚠ **THE SAME COMMAND BEHAVES DIFFERENTLY TYPED THAN IN A SCRIPT.** A shell
+   function is not exported to `sh`, so `sh probe.sh` gets GNU grep and
+   **succeeds** where the identical line pasted into a `Bash` call **fails**.
+   The manager hit this while checking this very finding — `REFETCH.sh` printed
+   a match for the file it had just been told was unsearchable. **A probe script
+   is therefore NOT a faithful reproduction of what an agent sees**, which
+   undercuts the usual "wrap it in a script and re-run it" repair.
+
+**Priced against the corpus** — `iconv -f UTF-8 -t UTF-8` over all 1 170 `.c`/`.h`:
+
+| | |
+|---|---|
+| non-UTF-8 files | **41 of 1 170** |
+| of those, **cited by `CATALOGUE.md`** | **5**: `ext/standard/{string,html,reg,formatted_print}.c`, `ext/calendar/calendar.c` |
+| catalogued rows citing one | **13 of 91** — `ph05 ph06 ph08 ph12 ph18 ph19 ph20 ph21 ph26 ph27 ph31 ph32 ph47` |
+| **including, in the next batch** | ⚠ **`ph12` and `ph21`** (both `ext/standard/string.c`) |
+
+✅ **No built row is affected**: `uuencode.c` (`ph03`) and `mbfilter.c` (`ph07`)
+are both clean UTF-8, checked.
+
+⭐ **Where the bad bytes are decides how bad this is, and it is two different
+problems.** In four of the five files it is **one line of the licence header** —
+an author's name in ISO-8859-1 (`Stig S\xe6ther Bakken`, `Jaakko Hyv\xe4tti`,
+lines 15–17). **`ext/calendar/calendar.c:123` is the exception and it is live
+code**: `static char alef_bet[25] = "0\xe0\xe1\xe2…"`. So:
+
+1. **The search hazard is total** — the header byte poisons the *whole file* for
+   `grep`, regardless of where you are looking. **Rule: always `grep -a` against
+   the pinned corpus.** Landing in `PROTOCOL_PHP.md` (staged — `TASK_PHP_016`
+   is reading that file; `PROTOCOL.md` rule 11).
+2. **The decode hazard is narrow and latent** — `harness/check.py` reads row
+   sources with **strict** UTF-8 (`open(path).read()`, e.g. `:824`, `:2416`), so
+   a row whose extraction *region* contains such a byte raises
+   `UnicodeDecodeError` **in the frozen PAT gate we may not edit**. Only
+   `calendar.c` (**`ph31`**) has one in code. ⚠ `harness-php/provenance.py` is
+   safe — `:478` and `:780` pass `errors="replace"` — **but that means the
+   overlap score for an affected file is computed on mangled text on both
+   sides**; equal-and-mangled still matches, so it is a hazard only if one side
+   is re-typed rather than copied.
+
+⚠ **This is the THIRD silent false negative of the same shape in this project** —
+`copy_from_slice` (*"no spec exists"*, stood TASK_004→048), `index_mut`
+(TASK_089), and F34's *"no fix exists"*. **The first two needed a human to
+misread a tree. This one needs nobody to make a mistake at all.**
+
+### F36 — the next batch's four upstream repairs, found BEFORE the tasks were written
+
+F34 cost a task: `ph07` stalled at *"no `fix_commit` exists"* and the manager had
+to overturn it. So the manager surveyed the **whole** next batch first. ✅ **All
+four citations verified byte-exact against the pinned tarball, and all four
+fixes exist**, each inside the 5.0 → 5.2 window:
+
+| row | 5.0.0 defect (verified line) | fixed by | what upstream actually did |
+|---|---|---|---|
+| **ph16** | `FD_SET(this_fd, fds)` — `streamsfuncs.c:541` | **5.1.0** | `PHP_SAFE_FD_SET` + `&& this_fd >= 0` |
+| **ph29** | `emalloc(to_read + 1)`, `to_read` a `long` — `streamsfuncs.c:321` | **5.1.0** | `if (to_read <= 0) RETURN_FALSE;` — **then 5.3.0 adds** `safe_emalloc(1, to_read, 1)` |
+| **ph12** | `if (len && offset >= s1_len)` — `string.c:4786` | **5.2.0** | the `len &&` short-circuit **deleted** → `if ((offset + len) > s1_len)` |
+| **ph21** | `int result_len` `:4120` · product `:4144` · dead disjunct `:4145` | **5.2.0** | `int`→`size_t`, **the guard DELETED**, `emalloc`→`safe_emalloc(len, mult, 1)` |
+
+⭐⭐ **Two of the four repairs REMOVE the guard, and that is the finding.**
+`ph21`'s `if (result_len < 1 || result_len > 2147483647)` and `ph12`'s
+`if (len && …)` are not strengthened upstream — they are **thrown away** and the
+obligation moved into a type (`size_t`) or an allocator wrapper
+(`safe_emalloc`). **The catalogue called `ph21` *"a guard killed by the type of
+the variable it tests"*; upstream's own fix was to change the type and delete the
+guard, which is that reading confirmed by the maintainers.**
+
+⭐ **`ph16`'s fix is not a check — it is a check on one platform.** `PHP_SAFE_FD_SET`
+is `#ifdef PHP_WIN32` → bare `FD_SET`, `#else` →
+`do { if (fd < FD_SETSIZE) FD_SET(fd, set); } while(0)`
+(`main/php_network.h:194-204`, 5.1.0). ⚠ **The macro's name promises safety
+unconditionally and its POSIX branch alone delivers it** — correctly, because
+Win32's `fd_set` is a counted array rather than a bitmap, and the source says so
+in a comment. **R1h must state which branch it compiles.**
+
+⚠ **`ph29`'s repair is two-stage** (guard in 5.1, wrapper in 5.3), so *"the
+fix"* is a choice the row has to make and justify — like `ph03`'s two hunks.
+
+⚠ **What is NOT done: none of the four commits is pinned**, only the tag window.
+That is the row engineer's job, and the window is the expensive half.
+
+⚠ **And `ph29`'s catalogued mechanism is not yet verified.** The catalogue says
+*"the allocator truncates n mod 2^32"*; `to_read` is a `long` and 5.0.0's
+`emalloc` takes a `size_t`, which on this 64-bit box truncates nothing.
+**Either the mechanism is 32-bit-only, or it is elsewhere, or the row is
+mis-catalogued — a C-side question, so it can decide admission.** Settle it at
+source before building.
 
 ## Open items — carried, not closed
 
