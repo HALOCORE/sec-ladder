@@ -37,10 +37,24 @@ Two independent implementations, as p01/p02/p16 do:
     iterations tractable;
   * the **helper** `uu_fold` -- the one the derived `ensures` is evaluated
     against -- is a recursive walk over the line chain with no table, mirroring
-    the shape of the Verus spec functions `uu_walk` / `fold_line` in ../verus.rs.
+    the Verus spec functions `uu_walk` / `fold_line` / `fold_bytes` in
+    ../verus.rs: it accumulates the emitted bytes and folds the FIRST
+    `total_len` of them, exactly as `fold_bytes(w.0, w.1, 0)` does.
 
-`selfcheck()` runs them against each other; a disagreement is reported there
-rather than being silently absorbed into a green line.
+`selfcheck()` runs them against each other -- on the shipped inputs AND on
+synthetic windows it builds itself over the whole `ln` domain -- and a
+disagreement is reported there rather than being silently absorbed into a green
+line.
+
+⚠⚠ **THE SYNTHETIC SWEEP IS NOT DECORATION AND IT IS THE REASON THIS FILE'S
+DOCSTRING USED TO BE FALSE.** Until TASK_PHP_015 `uu_fold` folded EVERY emitted
+byte where verus.rs folds the first `total_len`, and the two are the same
+sequence only when `total_len == p` -- true at multiples of 3 and false for 42
+of the 63 length bytes. It passed for one reason: `inputs/gen.py` emitted length
+45 exclusively, and `45 % 3 == 0`. Found by TASK_PHP_014 M1. **A second
+implementation checked only against the corpus is a second implementation
+checked on one diagonal**, so `selfcheck` now constructs its own windows and
+`inputs/gen.py` asserts that the shipped corpus reaches the strict case as well.
 """
 
 import itertools
@@ -66,6 +80,15 @@ def dec(b):
     return (b - 0x20) & 0o77
 
 
+def enc(v):
+    """`PHP_UU_ENC` -- ext/standard/uuencode.c:62, `((c) ? ((c) & 077) + ' ' : '`')`.
+
+    The inverse of `dec` on 1..63 and the encoder `inputs/gen.py` uses. It is
+    here so that `selfcheck()` can BUILD windows rather than only read them --
+    see the docstring at the top of this file."""
+    return ((v & 0o77) + 0x20) if (v & 0xFF) else 0x60
+
+
 def line_len(ln):
     """`ee - s` at uuencode.c:141: `len == 45 ? 60 : (int) floor(len * 1.33)`.
 
@@ -73,7 +96,10 @@ def line_len(ln):
     form is the model's, and the two are equal over the whole reachable domain
     -- `len` is `dec(...)`, so 0..63 -- verified exhaustively with a must-fire
     control in `.temp/php13/02-reach.log` Q1 and re-verified per run by
-    `selfcheck()`'s `_FLOOR_TABLE` comparison below."""
+    `selfcheck()`'s check 4, which computes `int(math.floor(ln * 1.33))` from
+    the float itself so the two spellings cannot drift apart in this file's own
+    head. (This cited a `_FLOOR_TABLE` that has never existed in this file --
+    corrected at TASK_PHP_015 while the row was being re-measured anyway.)"""
     return 60 if ln == 45 else (ln * 133) // 100
 
 
@@ -239,68 +265,101 @@ class Model:
     # -- the second, independent implementation ----------------------------
     # This is what the derived `ensures` is evaluated against, so it must not be
     # the simulation in disguise. It mirrors the *Verus* spec functions
-    # (../verus.rs `uu_walk` / `fold_line`): recursive over the line chain, no
-    # collected bytearray, no table, and the same (acc, total_len) pair threaded
-    # through the recursion.
-    def _fold_line(self, src, s, ee, e, acc):
-        """`fold_line` in ../verus.rs: the inner loop, as a fold. Returns
-        (acc, ok) where `ok` is False when 1e2818b14376's check fired."""
+    # (../verus.rs `uu_walk` / `fold_line` / `fold_bytes`): RECURSIVE over the
+    # line chain where `_window` is iterative, no per-window table, `src_len`
+    # threaded separately from `e`, and the Horner pass split out of the walk so
+    # that it can be applied to the `total_len` PREFIX -- which is the whole
+    # point and is what TASK_PHP_014 M1 found missing.
+    #
+    # ⚠ What makes it independent is the SHAPE of the walk, not the absence of a
+    # buffer. The two disagree on `s_end` vs `ee + 1` (TASK_PHP_013 §6) and on
+    # `out[:total_len]` vs `out` (TASK_PHP_014 M1) -- two real modelling errors,
+    # one caught by each direction of the comparison.
+    def _fold_line(self, src, s, ee, e, out):
+        """`fold_line` in ../verus.rs: the inner loop, appending each group's
+        three bytes to `out`. Returns (out, ok), where `ok` is False when
+        1e2818b14376's check fired.
+
+        ⚠ It APPENDS rather than folding, because verus.rs's `fold_line` does:
+        it returns `out + grp(...)` and the Horner pass is a separate function
+        (`fold_bytes`) applied to a PREFIX of the result. Threading an
+        accumulator here would fold every emitted byte, which is a different
+        function whenever `total_len < out.len()` -- TASK_PHP_014 M1."""
         while s < ee:
             if e - s < 4:
-                return acc, False
-            acc = (acc * 31 + ((dec(src[s]) << 2 | dec(src[s + 1]) >> 4) & 0xFF)) & MASK
-            acc = (acc * 31 + ((dec(src[s + 1]) << 4 | dec(src[s + 2]) >> 2) & 0xFF)) & MASK
-            acc = (acc * 31 + ((dec(src[s + 2]) << 6 | dec(src[s + 3])) & 0xFF)) & MASK
+                return out, False
+            out.append((dec(src[s]) << 2 | dec(src[s + 1]) >> 4) & 0xFF)
+            out.append((dec(src[s + 1]) << 4 | dec(src[s + 2]) >> 2) & 0xFF)
+            out.append((dec(src[s + 2]) << 6 | dec(src[s + 3])) & 0xFF)
             s += 4
-        return acc, True
+        return out, True
 
-    def _uu_walk(self, src, s, e, acc, total_len):
-        """`uu_walk` in ../verus.rs, returning (acc, total_len, ok).
+    def _uu_walk(self, src, s, e, src_len, out, total_len):
+        """`uu_walk` in ../verus.rs, returning (out, total_len, ok).
 
         ⚠ The walk resumes at `s + 1 + 4*nsteps(fl) + 1`, NOT at `ee + 1`. The
         inner loop tests `s < ee` and steps by 4, so it OVERSHOOTS `ee` by up to
         3 whenever `fl` is not a multiple of 4 -- which is every `len` but 45 and
         a minority of the rest. That overshoot is the second, distinct defect
         `f95c1df58349` leaves reachable (NOTES.md §5), and a model that resumed
-        at `ee + 1` would describe a decoder PHP has never shipped. It would also
-        agree with the simulation on every input this row ships, because every
-        line here declares 45 and `60 % 4 == 0` -- so `selfcheck()` could not
-        have caught it."""
+        at `ee + 1` would describe a decoder PHP has never shipped.
+
+        ⚠⚠ This docstring used to end *"it would also agree with the simulation
+        on every input this row ships, because every line here declares 45 and
+        `60 % 4 == 0` -- so `selfcheck()` could not have caught it"*, and
+        TASK_PHP_015 makes that FALSE in the good direction: the corpus now
+        carries a short final line, so `nsteps(fl) != fl/4` on every window, and
+        `selfcheck()`'s synthetic sweep catches `ee + 1` in 65 of 896 windows
+        with the corpus set aside entirely (`.temp/php15/03-sweep-mustfire.log`,
+        mutant `resume_ee`). ⚠ **It was true when written**, which is the point:
+        a modelling error found only by writing a termination argument is one
+        the corpus was too narrow to see, and the repair is to widen the
+        corpus and to stop depending on it."""
         if s >= e:
-            return acc, total_len, True
+            return out, total_len, True
         ln = dec(src[s])
         if ln <= 0:
-            return acc, total_len, True
-        if ln > e:
-            return acc, total_len, False
+            return out, total_len, True
+        if ln > src_len:
+            return out, total_len, False
         fl = line_len(ln)
         if fl > e - (s + 1):
-            return acc, total_len, False
+            return out, total_len, False
         ee = s + 1 + fl
-        acc, ok = self._fold_line(src, s + 1, ee, e, acc)
+        out, ok = self._fold_line(src, s + 1, ee, e, out)
         if not ok:
-            return acc, total_len, False
+            return out, total_len, False
         total_len += ln
         s_end = s + 1 + 4 * ((fl + 3) // 4)
         if ln < 45 or s_end >= e:
-            return acc, total_len, True
-        return self._uu_walk(src, s_end + 1, e, acc, total_len)
+            return out, total_len, True
+        return self._uu_walk(src, s_end + 1, e, src_len, out, total_len)
 
     def uu_fold(self, buf, off, ln):
         """`uu_fold` in ../verus.rs: what the kernel must return.
 
-        ⚠ Note that the fold here is over the plaintext bytes IN EMISSION ORDER
-        and the simulation folds `out[:total_len]`. Those are the same sequence
-        only because `total_len` never exceeds the number of bytes emitted --
-        which is a real fact about this decoder (every line emits
-        `3*ceil(line_len(ln)/4) >= ln` bytes) and is exactly the fact R5's write
-        bound rests on. `selfcheck()` compares the two implementations, so if it
-        ever stopped holding this file would say so."""
+        ⚠⚠ **THE FOLD IS OVER THE FIRST `total_len` EMITTED BYTES, NOT OVER ALL
+        OF THEM**, because that is what `verus.rs::uu_fold` does --
+        `fold_bytes(w.0, w.1, 0)`, where `w.1` is `total_len` -- and because
+        that is what PHP returns: `:202 RETURN_STRINGL(dst, dst_len, 0)` makes a
+        zval string of exactly `dst_len` bytes over a buffer that holds more.
+
+        ⚠ The two are DIFFERENT sequences whenever a line declares an `ln` that
+        is not a multiple of 3: the line emits `3*ceil(line_len(ln)/4)` bytes and
+        contributes only `ln` to `total_len`, and the row's own
+        `lemma_emit_covers_declared` proves `ln <= 3*ceil(line_len(ln)/4)` with
+        equality **only at multiples of 3** -- so the inequality is STRICT for 42
+        of the 63 length bytes. Folding all of them was this file's bug until
+        TASK_PHP_015 (TASK_PHP_014 M1); `selfcheck()`'s synthetic sweep is what
+        makes it impossible to reintroduce silently."""
         src = buf[off: off + ln]
-        acc, total_len, ok = self._uu_walk(src, 0, len(src), 0, 0)
+        out, total_len, ok = self._uu_walk(src, 0, len(src), len(src), [], 0)
         if not ok:
             acc = 0xFFFFFFFF
         else:
+            acc = 0
+            for b in out[:total_len]:
+                acc = (acc * 31 + b) & MASK
             acc = (acc * 31 + total_len) & MASK
         return acc ^ tally(capacity(len(src)))
 
@@ -341,8 +400,9 @@ class Model:
 
         Note "actually makes": the driver picks windows from a checksum-derived
         index, so a malformed window that is never selected must not be
-        declared. That is why every adversarial input here has exactly one
-        window -- see inputs/gen.py.
+        declared. That is why every adversarial input that declares `fires`
+        has exactly one window -- see inputs/gen.py. (`adversarial-nowin.bin`
+        has ZERO, which is its whole point, and declares `clean`.)
 
         ⚠ It is derived from `any_2004` and NOT from `any_2014_only`, and the
         difference is the row's headline. A call in the 2014-only class makes R1
@@ -370,16 +430,76 @@ class Model:
                 f"work/call={self.work_per_call}B san={self.sanitizer_expect} "
                 f"truncated={self.truncated} expected={self.checksum}")
 
-    def selfcheck(self):
-        """Four checks, and three of them are about this row specifically.
+    # -- driving BOTH implementations on a window no input file contains ----
+    @staticmethod
+    def _both(src):
+        """(simulated, uu_fold) for an arbitrary window, off-corpus.
 
-        1. the imperative simulation against the recursive `uu_fold`;
-        2. no window reaches the 2014-only class, which is what keeps
-           `sanitizer_expect` honest and stage 7h green (see that property);
-        3. `uuencode.c:158`'s tail block stays dead on every window;
-        4. the integer `line_len` still equals `(int) floor(len * 1.33)` over
-           the whole reachable domain, computed here from the float so the two
-           spellings cannot drift apart in this file's own head."""
+        `Model.__new__` skips `__init__` deliberately: `_window` and `uu_fold`
+        read only `buf` and `stride`, so this drives the SHIPPED code paths on
+        bytes chosen here rather than on bytes `inputs/` happens to carry. That
+        is the entire mechanism behind `selfcheck` check 1b."""
+        m = Model.__new__(Model)
+        m.buf, m.stride = src, len(src)
+        return m._window(0)[0], m.uu_fold(src, 0, len(src))
+
+    @staticmethod
+    def _synthetic_windows():
+        """Windows spanning the whole `ln` domain, built here, yielded as
+        (label, bytes). ⚠ **`inputs/` is not the domain and must never be
+        mistaken for it** -- see the module docstring.
+
+        Three families, chosen because each isolates one thing the two
+        implementations could disagree about:
+
+          a. `ln` alone, 1..63, one line with plenty of payload behind it --
+             this is the axis on which `total_len` and the emitted-byte count
+             come apart, and the axis `inputs/` cannot span (a window's stride
+             is fixed, so its lines' lengths are constrained);
+          b. `ln` at the buffer's edge, so `fl > e - (s+1)` and `e - s < 4`
+             both fire -- the two refusal paths, where a walk that resumed at
+             the wrong offset shows up as a different `ok`;
+          c. two-line chains `45 -> ln`, which is the only shape in which the
+             resume point `s_end + 1` is exercised at all (a walk stops at
+             `ln < 45`), and is where TASK_PHP_013 §6's `ee + 1` error lived."""
+        for ln in range(0, 64):
+            for pad in (0, 1, 2, 3, 7):
+                yield (f"single ln={ln} pad={pad}",
+                       bytes([enc(ln)]) + bytes(
+                           enc(1 + (i % 63)) for i in range(
+                               4 * ((line_len(ln) + 3) // 4) + pad)))
+        for ln in range(0, 64):
+            for n in range(0, 6):
+                yield (f"edge ln={ln} n={n}",
+                       bytes([enc(ln)]) + bytes(enc(1 + i) for i in range(n)))
+        for ln in range(0, 64):
+            for pad in (0, 1, 4):
+                first = bytes([enc(45)]) + bytes(enc(1 + (i % 63))
+                                                 for i in range(60)) + b"\n"
+                yield (f"chain 45->{ln} pad={pad}",
+                       first + bytes([enc(ln)]) + bytes(
+                           enc(1 + (i % 63)) for i in range(
+                               4 * ((line_len(ln) + 3) // 4) + pad)))
+
+    def selfcheck(self):
+        """Five checks, and four of them are about this row specifically.
+
+        1a. the imperative simulation against the recursive `uu_fold`, on the
+            calls this input actually makes;
+        1b. ⚠⚠ the same two implementations on **synthetic windows this file
+            builds**, spanning `ln = 0..63` in three families. **1a alone is
+            what let TASK_PHP_014 M1 stand**: every line the corpus carried
+            declared 45, `45 % 3 == 0` is exactly the equality case, and a
+            helper that folded every emitted byte instead of the first
+            `total_len` agreed on the whole corpus and on nothing else. A
+            second implementation is only as strong as the domain it is
+            exercised over, and `inputs/` is not a domain -- it is seven files;
+        2.  no window reaches the 2014-only class, which is what keeps
+            `sanitizer_expect` honest and stage 7h green (see that property);
+        3.  `uuencode.c:158`'s tail block stays dead on every window;
+        4.  the integer `line_len` still equals `(int) floor(len * 1.33)` over
+            the whole reachable domain, computed here from the float so the two
+            spellings cannot drift apart in this file's own head."""
         import math
         problems = []
         for c in self.sample_calls(8):
@@ -388,6 +508,15 @@ class Model:
                 problems.append(
                     f"simulated result {c['result']} != uu_fold() {want} at "
                     f"off={c['off']}")
+                break
+        for label, src in self._synthetic_windows():
+            sim, helper = self._both(src)
+            if sim != helper:
+                problems.append(
+                    f"synthetic window [{label}]: simulated {sim} != uu_fold() "
+                    f"{helper}. The two implementations have come apart OFF the "
+                    f"corpus; inputs/ cannot see this and it is why this sweep "
+                    f"exists (TASK_PHP_014 M1)")
                 break
         if self.any_2014_only:
             problems.append(

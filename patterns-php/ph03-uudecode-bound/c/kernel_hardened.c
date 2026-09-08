@@ -19,9 +19,16 @@
  * PAT programme has to argue its hand-written hardening is fair; here we do
  * not, because this is the patch PHP shipped.
  *
+ * The line numbers below are in the PATCHED file and name the statements the
+ * commit adds, not the blank lines it adds with them; reproduce them with
+ * `patch -p1` on the pinned tarball (`.temp/php15/patchtest/`).
+ * ⚠ hunk 2 read `:145-148` until TASK_PHP_015 (TASK_PHP_014 m1) and hunk 3 read
+ * `:180-184`, which is `err:`'s preceding blank line through the function's
+ * closing brace -- neither of which the commit adds.
+ *
  *   hunk 1  `:139-142`  if (len > src_len) { goto err; }
- *   hunk 2  `:145-148`  if (ee > e)        { goto err; }
- *   hunk 3  `:180-184`  err: efree(*dest); return -1;
+ *   hunk 2  `:147-150`  if (ee > e)        { goto err; }
+ *   hunk 3  `:181-183`  err: efree(*dest); return -1;
  *   hunk 3' `:215-218`  the CALLER's `if (dst_len < 0) ... RETURN_FALSE`, which
  *                       in this benchmark is the `if (n < 0)` in `kernel()`
  *                       below. It is part of the same commit and is included
@@ -51,6 +58,20 @@
  * The smallest surviving case is `src_len = 2, len = 1`: `fl = 1`, so
  * `ee = s + 1 == e`, hunk 2 does not fire, and the body reads to `s + 3`, three
  * bytes past the end.
+ *
+ * ⚠⚠ AND THE OTHER HALF OF THE FIX IS DEAD. HUNK 1 DECIDES NOTHING.
+ * TASK_PHP_014 M5 decomposed `goto err` by hunk over the same 12 600
+ * documents: hunk 1 (`len > src_len`) fires 1 953 times and hunk 2 (`ee > e`)
+ * would have refused ALL 1 953 of them -- 0 documents are refused by hunk 1
+ * alone. Deleting hunk 1 from verus.rs's EXEC still gives `25 verified,
+ * 0 errors`, and so does neutralising the matching branch in its SPEC, so the
+ * two programs are the same program and Verus says so. The mechanism is one
+ * line: `line_len(ln) >= ln` for every `ln` in 1..63, and after `s++` we have
+ * `e - s <= src_len - 1`, so `len > src_len` forces `fl > e - s`.
+ * `controls/negatives.py --emit no2004a` is the re-derivable form, and it is
+ * the first control in either programme whose declared expectation is that the
+ * mutant STILL VERIFIES.
+ * So of a two-hunk fix, one hunk is dead and the other is incomplete.
  *
  * PHP took another TEN YEARS to close it:
  *

@@ -512,7 +512,7 @@ block**, so the gate pins it and a drift is detectable:
   "extract_cmd":  "tar -xzOf <tarball> php-5.0.0/ext/standard/url.c | sed -n '463,489p'",
   "extract_sha256": "<sha256 of that excerpt>",
   "tier":         "verbatim",
-  "deletions":    [{"what": "TSRMLS_DC", "why": "thread-safety plumbing, no semantics"}],
+  "divergences":  [{"what": "TSRMLS_DC", "kind": "deletion", "where": "url.c:463", "why": "thread-safety plumbing, no semantics"}],
   "root_cause_ids": ["…"],
   "cwe":          "CWE-125",
   "fix_commit":   "…",
@@ -551,7 +551,7 @@ inside this sentence. It now does, and here is the honest split:
 |---|---|
 | ✅ checked | tarball sha256 · `c_file` in `php-5.0.0.manifest` · the span is **non-empty and in range** · its sha256 · `extract_cmd` is the canonical spelling · a row declaring PHP provenance ships a kernel at all |
 | ⚠ **reported, not checked** | the **heuristic line overlap** between the excerpt and `c/kernel*.{c,h}`, printed beside the tier's expectation (`verbatim` 50 %, `narrowed` 25 %, `modelled` none) — ⚠ **it no longer REFUSES a row** (`TASK_PHP_008` §2): its correctness depended on recognising every spelling of "this block is dead", and `TASK_PHP_007` M2 measured **nine more** past the `#if 0` that `TASK_PHP_006` fixed. Printed with it: how many preprocessor conditions the heuristic could not evaluate. |
-| ✗ **not** checked | `tier` · `deletions` · `root_cause_ids` · `cwe` · `fix_commit` · `invariant` · `obligation` · `echoes` · **`uses_allocator`** — free-text declarations, every one |
+| ✗ **not** checked | `tier` · `divergences` (renamed from `deletions` at `TASK_PHP_015`; `PROTOCOL_PHP.md` §A2) · `root_cause_ids` · `cwe` · `fix_commit` · `invariant` · `obligation` · `echoes` · **`uses_allocator`** — free-text declarations, every one |
 
 ⚠ **An out-of-range span used to PASS**: `sed` prints nothing past EOF and the
 caller compared `sha256(b"")`, so a transposed line number verified green and

@@ -1,12 +1,25 @@
 # ph03-uudecode-bound — notes
 
 `php_uudecode`, PHP 5.0.0, `ext/standard/uuencode.c:126-171`. Corpus row
-CRASH-115 (merged with V5C-116). Tier `verbatim`. Built at `TASK_PHP_013`.
+CRASH-115 (merged with V5C-116). Tier `verbatim`. Built at `TASK_PHP_013`,
+reviewed at `TASK_PHP_014`, **corrected and re-measured at `TASK_PHP_015`**.
 
 **This is the PHP programme's first real row.** Twelve prior tasks produced
 infrastructure, mining, a catalogue and reviews; none produced a row. Several of
 the notes below are therefore about the *pipeline* rather than about uudecode,
 and they are marked ⚠⚠ where a reader should carry them to the next row.
+
+⚠⚠ **WHAT `TASK_PHP_015` CHANGED, BECAUSE EVERY NUMBER BELOW MOVED.** The row's
+findings all survived review; its **fixture** did not. `inputs/gen.py` emitted
+length byte **45 and nothing else**, so the benign corpus never once took the
+`floor()` arm of `uuencode.c:141` — the arm the whole row is named for — and
+`45 ≡ 0 (mod 3)` is exactly the case in which a line emits as many bytes as it
+declares. That hid a real defect in `model.py` for a task (§13). The generator
+now emits a **short final line** (which is also what `php_uuencode` really
+emits), so the strides moved 498 → **556** and 4032 → **4090**, a fifth
+adversarial input was added, and the row was rebuilt and re-measured. **§6, §7
+and §8 are all new numbers; nothing in §1–§5 depends on the fixture and none of
+it moved.**
 
 ---
 
@@ -15,8 +28,42 @@ and they are marked ⚠⚠ where a reader should carry them to the next row.
 ```
 contract_sha256  875387e901b85b5eb969ab5be8b9d86e45f779d87456bbeb0ade3f833ab822dd   AS FIRST WRITTEN
 contract_sha256  bb2eb51917d2aabcafde52b3693ee9e2659e0442c99be5939bbc08761d3f2746   after gate run 1
-contract_sha256  0302248bc9868121ae74260e3b4ec4987fde5437e5c0a366ca8bef78d0f140df   AS SHIPPED
+contract_sha256  0302248bc9868121ae74260e3b4ec4987fde5437e5c0a366ca8bef78d0f140df   as shipped at TASK_PHP_013
+contract_sha256  2fcd6802b9042dd2982a37636fda972cb649711ddb20bad61b2ae2893099bbc7   AS SHIPPED (TASK_PHP_015)
 ```
+
+⚠⚠ **IT MOVED A THIRD TIME AT `TASK_PHP_015`, and unlike the first two this one
+is NOT a gate finding — it is a review finding, so `PROTOCOL.md` rule 6's
+disclosure is owed differently.** The `0302248b…` line is what `TASK_PHP_013`
+committed and what the reviewer verified independently; `2fcd6802…` is this
+tree. **Four edits inside the fenced block, all of them landing corrections that
+`TASK_PHP_014` measured:**
+
+1. **`note` (M1).** It claimed `model.py::uu_fold` mirrors `verus.rs`'s walk.
+   **It did not** — it folded every emitted byte where `verus.rs` folds the
+   first `total_len`, which is a different function for 42 of the 63 length
+   bytes. ⚠ The claim was *inside the hashed contract*, so the false sentence
+   was pinned. Now corrected, and the correction names the synthetic sweep that
+   makes it checkable. §13.
+2. **`provenance.deletions` → `provenance.divergences`**, with a `kind` on each
+   entry. **Three of the four entries are not deletions** (two substitutions and
+   one projection). `PROTOCOL_PHP.md` §A2 renamed to match; nothing reads the
+   key, and `provenance.py` never did.
+3. **`collapse.note`, `miri.blocked_reason`, `uses_allocator_why`** — the window
+   sizes and `cap` bound, which the fixture change moved (498/4032 → 556/4090,
+   `cap` ≤ 3025 → ≤ 3069).
+4. **`idiom.why`** — two sentences: the dead hunk 1 (§5e), and a marker saying
+   that `sanitizer_hardened`'s four `expect: clean, fired: false` rows are **not**
+   evidence the fix is complete. That second one is `TASK_PHP_014` m6, and it
+   goes in `why` **because `why` is the only part of the contract the gate record
+   echoes** — `provenance`, including `fix_commit_note`, is not in the record at
+   all (checked: `'fix_commit_note' in json.dumps(record)` is `False`).
+
+⚠ **The `git show <commit>: | diff` test is available for this move and was
+not needed**: every edit above is itemised and the before-hash is recorded, so a
+reviewer can reproduce `0302248b…` from `git show HEAD:patterns-php/…/spec.md`
+directly. That is what a second-and-later move is supposed to look like, and it
+is the check §0's original text could not offer.
 
 ⚠⚠ **IT MOVED TWICE, AND HERE IS EXACTLY WHY — `PROTOCOL.md` rule 6: *"If the
 hash changes later, say so and say why."*** Both moves are gate findings, not
@@ -118,16 +165,33 @@ heap-buffer-overflow at uuencode.c:144 in php_uudecode, faults_5.0.0=true"*.
 Built exactly as `check.py::_san_build` builds it (gcc, `-O1 -g
 -fsanitize=address,undefined -fstrict-aliasing -static-libasan
 -static-libubsan -DSLB_ISOLATED`), run with `env -u LD_PRELOAD`
-(`PLAN_PHP.md` §7 rule 14). Full log `.temp/php13/06-asan.log`:
+(`PLAN_PHP.md` §7 rule 14). Re-run over the `TASK_PHP_015` corpus,
+`.temp/php15/12-asan.log` and `.temp/php15/22-asan-lines.log`
+(the original is `.temp/php13/06-asan.log`):
 
 | input | `c/kernel.c` (R1) | `c/kernel_hardened.c` (R1h) |
 |---|---|---|
-| `small.bin` | clean, `4724622162658835783` | clean, same |
-| `large.bin` | clean, `16949792395555472632` | clean, same |
+| `small.bin` | clean, `5115966432339535952` | clean, same |
+| `large.bin` | clean, `5544170072369974633` | clean, same |
 | `adversarial-read.bin` | **heap-buffer-overflow READ of size 1**, `php_uudecode` `kernel.c:143` = `uuencode.c:144` | clean, `9832046297558006400` |
 | `adversarial-write.bin` | **heap-buffer-overflow WRITE of size 1**, `kernel.c:145` = `uuencode.c:146` | clean, same |
 | `adversarial-shortsrc.bin` | **heap-buffer-overflow READ of size 1**, `kernel.c:145` = `uuencode.c:146` | clean, `10969280517312833152` |
+| `adversarial-floor.bin` | **heap-buffer-overflow READ of size 1**, `kernel.c:143` = `uuencode.c:144`, 0 bytes after a 45-byte region | clean, `10286939257659585152` |
 | `adversarial-nowin.bin` | clean, `0` | clean, `0` |
+
+⚠ **The three adversarial checksums did not move when the corpus was
+regenerated, and that is not luck.** A refused window returns
+`0xFFFFFFFF ^ tally(cap)`, which depends only on `cap` and therefore only on the
+window's LENGTH — so those rows pin the guard that fired and the size that was
+allocated, and nothing about the random bytes. `small`/`large` moved because
+their windows decode.
+
+⚠ **`adversarial-floor.bin` is `TASK_PHP_015`'s.** It is the first adversarial
+cell whose length byte is **not 45**, so it is the first one that reaches
+`uuencode.c:141`'s `floor()` arm: `len = 40`, `fl = (int) floor(40 * 1.33) = 53`
+against a true end 44 characters away. Hunk 1 (`len > src_len`) does **not**
+fire, so it is also the only adversarial input that isolates hunk 2 — the one
+guard of the 2004 fix that decides anything (§5e).
 
 ✅ **Same category, same function, and `uuencode.c:144` is the exact line the
 corpus names.** `TASK_PHP_012`'s probe reported a **WRITE** at `:144` where this
@@ -197,20 +261,32 @@ two limbs share a bound, ship both blobs.
 
 ---
 
-## 5. ⚠⚠⚠ THE UPSTREAM FIX IS INCOMPLETE — MEASURED, TWICE, TWO WAYS
+## 5. ⚠⚠⚠ THE HEADLINE — OF A TWO-HUNK FIX, ONE HUNK IS DEAD AND THE OTHER IS INCOMPLETE
 
 `PROTOCOL_PHP.md` §C: *"An upstream fix is not automatically correct … That is a
 result, and one of the strongest a row can carry. Report it; do not repair it."*
 
 `c/kernel_hardened.c` is `f95c1df583490814b0501c56f59671193a57507b` (Ilia
 Alshanetsky, 2004-08-24, bug #29821), all three hunks, patch bytes at
-`controls/f95c1df58349.patch`, sha256 `fc3ef3c50488d0…`. It adds
-`if (len > src_len) goto err;` and `if (ee > e) goto err;`.
+`controls/f95c1df58349.patch`, sha256 `fc3ef3c50488d0…`. Its two guards are
+`if (len > src_len) goto err;` (**hunk 1**) and `if (ee > e) goto err;`
+(**hunk 2**). Both halves of the headline are measured, and each is measured
+from both sides:
 
-**`ee` bounds where the inner loop TESTS. The body reads `*(s+3)`.** So the loop
-overshoots `ee` by up to three bytes whenever `ee - s` is not a multiple of 4 —
-which is every `len` except 45 and the minority whose
-`(int) floor(len * 1.33)` happens to be divisible by 4.
+| | claim | C side | Verus side |
+|---|---|---|---|
+| **hunk 2** | **incomplete** — bounds where the inner loop *tests*, while the body reads `*(s+3)` | 144 of 12 600 documents still read past the source (§5a) | deleting the 2014 fix makes `i < v@.len()` fail (§5b) |
+| **hunk 1** | ⚠ **dead — it decides nothing** | of its 1 953 firings, hunk 2 would have refused **1 953** (§5e) | deleting it still gives `25 verified, 0 errors` (§5e) |
+
+**Hunk 2 is incomplete because `ee` bounds where the inner loop TESTS and the
+body reads `*(s+3)`**, so the loop overshoots `ee` by up to three bytes whenever
+`ee - s` is not a multiple of 4 — which is every `len` except 45 and the
+minority whose `(int) floor(len * 1.33)` happens to be divisible by 4.
+
+⚠ **§5e was added at `TASK_PHP_015` from `TASK_PHP_014` M5. It is not a
+correction — it is a result this row missed**, and it sharpens the headline
+rather than softening it: *the patch that missed the real bug for ten years also
+shipped a check that never decided anything.*
 
 ### 5a. The C side, with a must-fire control
 
@@ -252,9 +328,43 @@ fixed2014 src_len=2, len byte declares 1, fl=1, ee == e (2014 fix APPLIED)
 fixed2014 returned -1 -- no detector fired
 ```
 
-⚠ The source buffer is `malloc`ed at **exactly** `src_len` bytes. A stack array
-or an over-allocated buffer gives the over-read slack to land in and the control
-reports nothing — §4, one level down.
+⚠⚠⚠ **AND THE CONCLUSION THAT MECHANISM IMPLIES, WHICH THIS SECTION USED TO
+STATE ONLY HALF OF** (`TASK_PHP_014` M6). The source buffer above is `malloc`ed
+at **exactly** `src_len` bytes. **PHP's is not.** `zend_parse_parameters "s"`
+hands `php_uudecode` a zval string, which is `emalloc(len + 1)`, and `emalloc`
+rounds to a multiple of 8 (`PHP_SHIM_REAL_SIZE(size) = ((size)+7) & ~7`,
+`common-php/emalloc_shim.h:217`, projecting `Zend/zend_alloc.c:135`). Measured,
+same decoder, same input, three source allocations, with a must-fire control
+(`.temp/php14/07-zval-slack.c`, re-run at `.temp/php15/21-zval-slack.log`):
+
+```
+----- control   CONTROL reading b[8] of an 8-byte malloc
+                ==1801732==ERROR: AddressSanitizer: heap-buffer-overflow
+----- exact     src_len=2, allocation 2 bytes, slack 0
+                ==1801741==ERROR: AddressSanitizer: heap-buffer-overflow
+----- zvalraw   src_len=2, allocation 3 bytes, slack 1   (USE_ZEND_ALLOC=0)
+                ==1801749==ERROR: AddressSanitizer: heap-buffer-overflow
+----- zvalmm    src_len=2, allocation 8 bytes, slack 6   (real emalloc)
+                zvalmm returned 1 -- NO DETECTOR FIRED
+```
+
+**So the honest statement is *"a detector fires under this allocator"*, not
+*"PHP faults"*.** The 2014 residual reaches `src_len + 2` while `emalloc` gives
+`ALIGN8(src_len + 1) - src_len ∈ {1..8}` of slack, so it is **invisible for 6 of
+the 8 residue classes of `src_len` mod 8** — and *a fortiori* on a stock build,
+where `_emalloc` also puts a `zend_mem_header` and an end magic inside the same
+libc block. It IS visible on a `USE_ZEND_ALLOC=0`-style build (`zvalraw`, which
+still fires), which is how PHP is sanitizer-tested and plausibly how #67252 was
+found.
+
+⚠⚠ **This does NOT weaken the headline, and the reason is worth stating rather
+than assumed.** Of §5's three proofs, **two are allocator-independent**: §1's
+interpreter uses offsets and no allocator at all, and §5b's `i < v@.len()` is a
+property of the *source slice*, not of any allocation. Only this one is
+harness-conditional. ⚠ **And the finding is STRONGER for it** — *this residual
+is not ASan-observable on a stock PHP build at all, which is part of why it
+survived ten years.* §4's lesson one level down: an oracle built on "which
+sanitizer message appears" is measuring the allocator as much as the defect.
 
 ### 5b. The Verus side: the proof refuses the shipped fix
 
@@ -278,6 +388,26 @@ verification results:: 24 verified, 1 errors
 `get_unchecked(buf, s + 1)` **is** the over-read — the same byte ASan reports at
 `uuencode.c:144` in 5a. A verifier in 2026 refuses, in one line, the patch PHP
 shipped in 2004 and did not complete until 2014.
+
+⚠⚠ **AND WHY THE FIRST ERROR IS NOT ITSELF A FINDING, because as written a
+reader could report a write overflow that does not exist** (`TASK_PHP_014` m7).
+The first error is `lemma_store_in_bounds`'s `s + 4 <= off + len`, i.e. the
+**write** bound. §5a says the 2004 fix *closes* the write, and it does — but
+**with zero slack**, so the proof has none either. Measured over **170 226**
+multi-line documents under the 2004 fix (`TASK_PHP_014` N8, re-run at
+`.temp/php15/20-hunk-rerun.log`):
+
+```
+   documents swept    : 170226
+   write past emalloc : 0     <- >0 would REFUTE 'the write is closed'
+   read  past src end : 1008
+   tightest write margin (cap-1 - wr_max) : 0 at K=0 L=1 src_len=2
+```
+
+**The tightest margin is exactly 0.** No write escapes, and there is no room to
+prove that it does not without the 2014 check. The first error is therefore a
+proof-slack artefact and the second is the live defect — which is why they must
+be read in that order and not by exit code.
 
 ### 5c. PHP's own second fix, and its reproducer
 
@@ -319,29 +449,93 @@ cannot live under `inputs/`; it lives in `controls/` and is run by hand.
 the constraint is enforced rather than remembered. Reported to the manager as a
 finding; **the fix is not this row's to make.**
 
+
+### 5e. ⚠⚠⚠ THE OTHER HALF OF THE 2004 FIX IS DEAD — HUNK 1 DECIDES NOTHING
+
+`TASK_PHP_014` M5, and it is a **result the build missed**, not a defect the
+review found. Two sides, both re-run at `TASK_PHP_015`.
+
+**C.** `.temp/php14/06-hunk.c` decomposes `goto err` by hunk over the same
+12 600 documents as §1 (`.temp/php15/20-hunk-rerun.log`):
+
+```
+   hunk 1 (`len > src_len`) fired : 1953
+   hunk 2 (`ee > e`)        fired : 1511
+   of hunk-1 firings, hunk 2 would ALSO have refused : 1953
+   of hunk-1 firings, hunk 2 would NOT have refused  : 0  <- 0 means HUNK 1 IS REDUNDANT
+```
+
+**Verus.** `controls/negatives.py` now emits two must-**PASS** mutants, and
+`.temp/php15/19-negatives.log` runs all three controls against their declared
+expectations in one pass:
+
+```
+no2014         expect REFUSE got REFUSE  verification results:: 24 verified, 1 errors ok
+no2004a        expect VERIFY got VERIFY  verification results:: 25 verified, 0 errors ok
+no2004a_both   expect VERIFY got VERIFY  verification results:: 25 verified, 0 errors ok
+```
+
+⚠ **`no2004a` is the decisive one and the argument is short.** It deletes hunk 1
+from the **exec** and leaves `uu_walk`'s matching branch in the **spec**, so the
+spec still refuses every `ln > src_len`. An exec that has lost hunk 1 can only
+satisfy that postcondition if some other branch refuses exactly the same inputs
+— and hunk 2 does. `no2004a_both` says the same thing from the spec side.
+
+**The mechanism is one line.** `line_len(ln) >= ln` for every `ln ∈ 1..63`, and
+after `s++` we have `e - s <= src_len - 1`; so `ln > src_len` forces
+`fl > e - s`, which is hunk 2's condition.
+
+⚠⚠ **This is the first control in either programme whose declared expectation is
+that the mutant STILL VERIFIES**, and `controls/negatives.py`'s docstring says
+plainly why that is a weaker instrument than a must-FAIL one and what guards it:
+the anchor-uniqueness check refuses to emit a no-op, and `no2014` shares the
+emit path and is must-FAIL, so a `negatives.py` that had stopped mutating
+anything would be caught there rather than here.
+
+⚠ **`inputs/adversarial-shortsrc.bin` stays** even though the guard it reaches
+is the dead one. It pins **which** guard R1h reaches first, which is what a
+reader of `kernel_hardened.c` asks; `inputs/adversarial-floor.bin`
+(`TASK_PHP_015`) is the cell for hunk 2 with a non-45 length byte.
+
 ---
 
 ## 6. Cross-rung agreement, and the one rung that diverges
 
 All six rungs, `-O3 isolated`, on every input
-(`.temp/php13/05-crun.log`, `.temp/php13/09-r3r4.log`, plus the R5 run):
+(`.temp/php15/11-crossrung.log`; the original is `.temp/php13/05-crun.log`):
 
 | input | R1 | R1h | R2 | R3 | R4 | R5 | `model.py` |
 |---|---|---|---|---|---|---|---|
-| `small` | `4724622162658835783` | = | = | = | = | = | = |
-| `large` | `16949792395555472632` | = | = | = | = | = | = |
+| `small` | `5115966432339535952` | = | = | = | = | = | = |
+| `large` | `5544170072369974633` | = | = | = | = | = | = |
 | `adversarial-read` | **abort** | `9832046297558006400` | = | = | = | = | = |
 | `adversarial-write` | **abort** | `9832046297558006400` | = | = | = | = | = |
 | `adversarial-shortsrc` | **abort** | `10969280517312833152` | = | = | = | = | = |
+| `adversarial-floor` | **`15053435816339650688`** | `10286939257659585152` | = | = | = | = | = |
 | `adversarial-nowin` | `0` | `0` | = | = | = | = | = |
 
 R1's "abort" without a sanitizer is glibc's own
 `malloc(): invalid size (unsorted)` at exit 134 — the heap metadata it corrupted
 is detected on the next allocation, on all eight C cells.
 
+⚠⚠ **`adversarial-floor` is the row's first input on which R1 EXITS 0 WITH A
+WRONG ANSWER**, and it is worth a sentence because it is the shape a reader
+under-weights. The other three adversarial inputs make R1 corrupt heap metadata
+badly enough that glibc notices on the next allocation; here the over-read runs
+off a 45-byte window into live heap and the over-write stays inside the
+allocator's rounding, so **nothing complains and the program prints a number**.
+Only ASan sees it (§2). *"The rung aborted"* is not the defect and *"the rung
+returned"* is not safety — `check.py`'s adversarial stage records per-rung
+behaviour rather than requiring agreement, which is exactly why it can hold
+this row.
+
 **`uuencode.c:158` is dead on every window of every input**, re-derived per input
 by `model.py::selfcheck` (§1's 0/12600 is the general statement; the model
-checks the ones that ship).
+checks the ones that ship). ⚠ It stays dead under the `TASK_PHP_015` corpus for
+a reason the short line makes non-obvious: a line emits `3*ceil(fl/4)` bytes and
+declares `ln`, and `lemma_emit_covers_declared` proves `ln <= 3*ceil(fl/4)` for
+every `ln`, so `total_len > (p - *dest)` is false by the row's own Verus lemma
+and not by the corpus's accident.
 
 ---
 
@@ -353,7 +547,7 @@ row genuinely uses it: `php_shim_reset()` at the top of every kernel call
 `php_shim_tally()` xored into the returned `u64` (§B1.2).
 
 ✅ **`emalloc_dependent: false` is CONFIRMED.** `cap = ceil(0.75·src_len) + 1`
-is 375 for `small`, 3025 for `large`, 55 and 16 for the adversarial windows.
+is 418 for `small`, 3069 for `large`, 55, 16 and 35 for the adversarial windows.
 Truncations T1 (32-bit `real_size`), T2 (31-bit recorded size) and T3
 (`_ecalloc`, never called) all sit ~2⁴⁰ below their moduli. **The shim is
 exercised, digested and executed on the first real row without its semantics
@@ -375,11 +569,28 @@ fn tally(cap: usize) -> u64 {
 the size-class cache at the top of every call, so the closed form is exact — and
 it was checked against the C before either was pinned: predicted
 `10969280517312833152` for `adversarial-shortsrc` and `9832046297558006400` for
-`adversarial-read`, both matching the C runs to the bit.
+`adversarial-read`, both matching the C runs to the bit. ⚠ **Both of those
+survived the `TASK_PHP_015` regeneration unchanged**, and that is a property
+rather than luck: a refused window returns `0xFFFFFFFF ^ tally(cap)`, so its
+checksum depends on the window's LENGTH and on nothing else in it.
 
 **What it buys:** the allocation SIZE is a pinned cross-rung quantity — a rung
 that sized its destination differently could not agree by accident, and sizing
 is *half of this defect*.
+
+⚠⚠ **AND THE PRECISE CONDITION UNDER WHICH THAT ARGUMENT WORKS, because
+"does not carry to `ph29`" without a criterion is not a rule the next row can
+apply** (`TASK_PHP_014` §4.4). `cap` depends only on `stride`, which is fixed by
+the payload header, so `php_shim_tally()` is a **per-input CONSTANT** — measured,
+one distinct value per input across every call. A constant XORed into every
+per-call result before the driver's Horner fold cannot mask a *per-call* wrong
+answer: to cancel, a rung would have to be wrong the same way on every call,
+which means it computed a different `cap`, which is the one thing the XOR is
+there to catch. **The technique is sound exactly while the tally is
+input-constant.** On `ph29` the tally VARIES with the input, because the
+truncation *is* the defect — and a varying mixed-in term is one that can cancel
+a per-call error. That is the criterion, and it is checkable before a row is
+started rather than after.
 **What it does NOT buy, and must not be read as:** it is not evidence that any
 Rust rung ran PHP's allocator, and a truncation-dependent row could not be
 modelled this way at all. ⚠ **`ph29` is the row where the shim's semantics ARE
@@ -397,24 +608,45 @@ C-vs-Rust. §8's decomposition is where that lands.
 
 From `results-php/ph03-uudecode-bound.json`; the full matrix is
 `results-php/tables/ph03-uudecode-bound.md`. **`-O3 isolated`,
-kernel-exclusive `Ir`.** `small` makes 25 000 calls over a 498-byte window
-(8 lines × 15 groups = 120 groups), `large` 20 000 calls over 4032 bytes
-(65 lines × 15 = 975 groups).
+kernel-exclusive `Ir`.** `small` makes 25 000 calls over a 556-byte window
+(8 full lines × 15 groups + a short final line × 14 = 134 groups), `large`
+20 000 calls over 4090 bytes (65 × 15 + 14 = 989 groups).
 
 | cell | `Ir`/call, small | `Ir`/call, large | **`Ir`/group** | fixed `Ir`/call |
 |---|--:|--:|--:|--:|
-| `c-gcc` (R1) | 6 626.0 | 52 168.0 | **53.27** | 234.1 |
-| `c-gcc-h` (R1h) | 6 601.0 | 51 972.0 | **53.07** | 233.1 |
-| `c-clang` (R1) | 5 605.0 | 44 413.0 | **45.39** | 158.3 |
-| `c-clang-h` (R1h) | 5 627.0 | 44 606.0 | **45.59** | 156.3 |
-| `safe_naive` (R2) | 8 404.0 | 67 675.0 | **69.32** | 85.3 |
-| `safe_tuned` (R3) | 6 868.0 | 55 196.0 | **56.52** | 85.1 |
-| `unsafe` (R4) | 6 125.0 | 49 206.0 | **50.39** | 78.5 |
-| `verus` (R5) | 6 125.0 | 49 206.0 | **50.39** | 78.5 |
+| `c-gcc` (R1) | 7 369.7 | 52 913.9 | **53.27** | 231.8 |
+| `c-gcc-h` (R1h) | 7 338.7 | 52 711.9 | **53.07** | 227.6 |
+| `c-clang` (R1) | 6 244.7 | 45 050.9 | **45.39** | 162.8 |
+| `c-clang-h` (R1h) | 6 272.7 | 45 249.9 | **45.59** | 164.0 |
+| `safe_naive` (R2) | 9 363.7 | 68 632.9 | **69.32** | 74.7 |
+| `safe_tuned` (R3) | 7 648.3 | 55 973.9 | **56.52** | 74.5 |
+| `unsafe` (R4) | 6 817.4 | 49 897.9 | **50.39** | 65.6 |
+| `verus` (R5) | 6 817.4 | 49 897.9 | **50.39** | 65.6 |
 
 `Ir`/group is the marginal `(large − small) / 855`; "fixed" is
-`small − 120 × marginal`, i.e. the per-call term that does not scale with the
-window. ⚠ `RECAP_PHP.md` open item 9 / F14: **no php `Ir` is comparable to any
+`small − 134 × marginal`, i.e. the per-call term that does not scale with the
+window. ⚠ **855 is still the divisor after the fixture change, and not by
+accident**: both windows gained exactly one 14-group short line, so the
+difference is exactly 57 FULL lines × 15 groups. The `Ir`/group column is
+therefore "per group of a full line" in both corpora, which is what makes the
+two directly comparable.
+
+⚠⚠⚠ **AND THAT COMPARISON IS THE STRONGEST THING IN THIS SECTION: EVERY
+MARGINAL FIGURE REPRODUCED TO TWO DECIMAL PLACES ACROSS A COMPLETELY DIFFERENT
+FIXTURE.** `TASK_PHP_015` moved both strides, changed every benign byte, added a
+seventh input and rebuilt all 32 cells, and 53.27 / 53.07 / 45.39 / 45.59 /
+69.32 / 56.52 / 50.39 / 50.39 came back **identical**. Nobody planned that as a
+replication and it is worth more than one that was: the marginal is a slope, and
+a slope that survives a change of both endpoints is a slope and not a fit.
+⚠ **The FIXED column is the half that moved** (Rust ≈ 85 → ≈ 75/66, C ≈ 234 →
+≈ 232), and it moved for the reason `TASK_PHP_013` §12.8 already flagged: it is
+a two-point extrapolation, `small − 134 × marginal`, and the short line's groups
+cost slightly less than a full line's (its Horner fold covers `total_len ∈
+{40,41,42}` rather than the 42 bytes it emits). **The ordering — C carrying
+~150 `Ir`/call more fixed cost than Rust — is robust and mechanism-backed; the
+exact values are not, and never were.**
+
+⚠ `RECAP_PHP.md` open item 9 / F14: **no php `Ir` is comparable to any
 PAT `Ir`**, and none of these is put next to a `pNN` number anywhere.
 
 ### 8a. The deltas, and the mechanism for each
@@ -423,7 +655,7 @@ PAT `Ir`**, and none of these is put next to a `pNN` number anywhere.
 Every number below is read off `objdump -d` of the shipped `-O3 isolated`
 binaries.
 
-**R2 − R4 = +18.94 `Ir`/group — one `cmp`/`jae` pair per checked access.**
+**R2 − R4 = +18.93 `Ir`/group — one `cmp`/`jae` pair per checked access.**
 R4's group body goes straight from the trip test to four `movzbl` loads. R2's
 emits, immediately before them:
 
@@ -438,7 +670,7 @@ There are ten checked accesses per group in R2 — four source reads, three
 destination writes, and the three fold reads the group's bytes will later
 receive — and ~1.9 `Ir` each is exactly a `cmp` + a not-taken `jae`.
 
-**R3 − R4 = +6.14 `Ir`/group, so the reslice recovers 68 % of it — and the
+**R3 − R4 = +6.13 `Ir`/group, so the reslice recovers 68 % of it — and the
 residual is NOT a bounds check.** R3's body reads:
 
 ```
@@ -465,7 +697,7 @@ while the R4-vs-gcc gap is two different compilers. `.memory/03-measurement.md`
 rule 2 — *every C-vs-Rust claim needs the clang column* — decides the sign here.
 
 **The C rungs carry ~150 `Ir`/call more FIXED cost than the Rust ones**
-(234 / 158 vs 85 / 78). That is `php_shim_reset()`: it walks 11 size classes
+(232 / 163 vs 75 / 66). That is `php_shim_reset()`: it walks 11 size classes
 every call (`PROTOCOL_PHP.md` §B1.3 requires it) where the Rust rungs only
 allocate a `Vec`. It cancels in R1-vs-R1h and does **not** cancel in C-vs-Rust,
 so it is subtracted out of the `Ir`/group column above and named here rather
@@ -476,40 +708,98 @@ than buried in it.
 Per **line** (57 more lines on `large` than on `small`), the R1h−R1 delta is
 
 ```
-gcc    (51972 - 6601) - (52168 - 6626) = -171  over 57 lines  =  -3.0 Ir/line
-clang  (44606 - 5627) - (44413 - 5605) = +171  over 57 lines  =  +3.0 Ir/line
+gcc    (52712 - 7339) - (52914 - 7370) = -171  over 57 lines  =  -3.0 Ir/line
+clang  (45250 - 6273) - (45051 - 6245) = +171  over 57 lines  =  +3.0 Ir/line
 ```
 
 ⚠ **Exactly ∓171, which is a coincidence of magnitude and not of mechanism.**
-The mechanism is visible in the per-line epilogue. **R1** (no `ee > e`) has to
-select the trip count, because without the check it cannot prove the inner loop
-runs at all:
+⚠⚠ **And it is ∓171 again after `TASK_PHP_015` changed both corpora** — the
+figures above are new numbers over a new fixture and they land on the same two.
+
+### ⚠⚠⚠ THE COMPLETE ACCOUNT: THE EPILOGUE SAVES **9**, THE NEW CHECKS COST **6**, NET **−3**
+
+`TASK_PHP_014` M4: *"the arithmetic is right and I reproduce it two independent
+ways, but the account is partial — only 5 of the 9 are named and the cost side
+is never mentioned."* **Correct, and here is the whole of it.** It is done with
+callgrind's **per-instruction** counts rather than by hand-tracing basic blocks,
+because hand-tracing is what produced the partial account
+(`.temp/php15/26-attribute.py`, `27-band.py`; alignment table in
+`.temp/php15/28-alignment.md`).
+
+The stable classifier is **execution frequency**, not instruction text: R1 and
+R1h allocate registers differently, so a text diff shows dozens of
+full-magnitude differences that cancel. On `small.bin` each call runs 9 line
+iterations and 134 group iterations, so every instruction sits in exactly one
+band:
 
 ```
-lea 0x2(%rbx),%rax ; cmp %rax,%rsi ; setae %dl
-... shr $0x2,%rax ; add $0x1,%rax
-test %dl,%dl ; cmove %r12,%rcx        <- select s += 4n  or  s unchanged
-test %dl,%dl ; cmove %rbp,%rax        <- select p += 3n  or  p unchanged
+band                               R1 Ir/line  R1h Ir/line     delta
+inner loop (~14.9/line)               773.526      773.526    +0.000
+per line  (~1/line)                    44.667       41.667    -3.000
+per call  (~0.111/line)                15.556       15.111    -0.444
+TOTAL                                 833.748      830.304    -3.444
 ```
 
-**R1h** has the check, so gcc knows the loop is entered and the trip count is
-`(ee − s + 3)/4` unconditionally, and emits straight-line arithmetic:
+⚠ **The inner loop cancels to +0.000** — 27 instructions in both
+(`.temp/php15/25-loopcount.log`) — so the entire effect is the per-line band,
+and it is **exactly −3.000**, not −3.0-ish. (`−3.444 × 9 = −31.0 Ir/call`, the
+record's own `small` delta; the extra −0.444 is a per-call constant that does
+not scale with lines and so does not appear in the marginal.)
+
+**R1h ADDS 6 instructions per line** — three two-instruction tests:
+
+```
+cmp %edi,%r12d ; jl      <- HUNK 1, `len > src_len`
+cmp %rsi,%r9   ; jb      <- HUNK 2, `ee > e`
+cmp %rsi,%r8   ; jae     <- the inner loop's entry test, now UNCONDITIONAL
+```
+
+⚠ The third is the one a reader misses: R1 emits an entry test too, but only on
+the non-45 path; R1h emits it on every line.
+
+**R1h DROPS 9 instructions per line**, of which `NOTES.md` named five:
+
+```
+lea 0x2(%rbx),%rax ; cmp %rax,%rsi   <- the PREDICATE itself, computed and tested
+setae %dl                             <- ) the five this section
+test %dl,%dl ; cmove %r12,%rcx        <- ) already named:
+test %dl,%dl ; cmove %rbp,%rax        <- ) select s += 4n / p += 3n, or neither
+mov %r9,(%rsp) ; mov (%rsp),%r9       <- a SPILL/RELOAD pair R1h does not need
+```
+
+and two address computations **swap shape and cancel**: R1's single
+`lea 0x3d(%rbx),%rsi` becomes `mov $0x3c,%esi ; add %r8,%rsi` (+1), while R1's
+`lea 0x0(,%rax,4),%rcx ; add %rcx,%r8` folds into one `lea (%r8,%rsi,4),%r8`
+(−1). **−9 + 6 + 1 − 1 = −3.**
+
+⚠⚠ **SO THE CLAIM IS NOT "three instructions removed, −3.0 `Ir`", AND THAT
+READING IS ARITHMETICALLY SEDUCTIVE AND WRONG.** It is a **9-instruction
+structural saving partly refunded by a 6-instruction check** — a safety check
+paying for itself by more than its own cost, which is a much stronger and much
+more interesting claim than the coincidence it looks like. The same warning this
+section already gives about ∓171 is owed to the 3-for-3 reading.
+
+**Why the 9 go.** Without `ee > e`, gcc cannot prove the inner loop is entered
+at all, so it must *select* the trip count rather than compute it — hence the
+predicate, the `setae`, the two `test`/`cmove` pairs, and the extra live value
+that forces the spill. With the check, the count is `(ee − s + 3)/4`
+unconditionally and gcc emits straight-line arithmetic:
 
 ```
 mov %r14,%rax ; sub %rbp,%rax ; add %rax,%rsi ; shr $0x2,%rsi ; add $0x1,%rsi
 lea (%rsi,%rsi,2),%rax ; lea (%r8,%rsi,4),%r8 ; add %rax,%r10
 ```
 
-**The `setae` and both `cmove`s are gone** — counted, not eyeballed:
-`.temp/php13/14-mechanism.sh` (re-runnable against the built tree) reports
-`setae+cmove count: 0` for R1h against `3` for R1, and confirms the float
-survives to machine code in every C cell (23 fp instructions in gcc's kernel, 20
-in clang's). ⚠⚠ **The safety check paid for itself by handing the optimiser a
-fact it otherwise had to branch around.**
-clang does not take that route and keeps the check as a plain compare, which is
-the +3.0. **So "what does the upstream fix cost?" has no single answer on this
-row: it is −3.0 `Ir`/line on gcc and +3.0 on clang, and reporting either alone
-would be reporting a compiler.**
+`.temp/php13/14-mechanism.sh` (re-run byte-identically at
+`.temp/php15/24-mechanism.log`) reports `setae+cmove count: 0` for R1h against
+`3` for R1, and confirms the float survives to machine code in every C cell
+(23 fp instructions in gcc's kernel, 20 in clang's).
+
+⚠⚠ **The safety check paid for itself by handing the optimiser a fact it
+otherwise had to branch around.** clang does not take that route and keeps the
+check as a plain compare, which is the +3.0. **So "what does the upstream fix
+cost?" has no single answer on this row: it is −3.0 `Ir`/line on gcc and +3.0 on
+clang, and reporting either alone would be reporting a compiler.**
 
 ### 8c. What these numbers are NOT
 
@@ -521,10 +811,13 @@ would be reporting a compiler.**
   spelling per rung is not a search of either endpoint (`PLAN_PHP.md` §5.3, the
   trap that has fired seven times), so **no ratio here is *the* cost of safety
   on this kernel.**
-- **not wall-clock evidence.** `-O3 isolated` medians are 17.0 ms (`small`) and
-  94.3 ms (`large`) for `c-gcc` at 30 reps on a shared box; the spread is 3.5 %
-  and 1.7 %. They are recorded and are secondary
-  (`.memory/03-measurement.md` rule 6).
+- **not wall-clock evidence.** `-O3 isolated` medians are 18.19 ms (`small`) and
+  97.98 ms (`large`) for `c-gcc` at 30 reps on a shared box; the spreads are
+  1.2 % and 6.4 %. They are recorded and are secondary
+  (`.memory/03-measurement.md` rule 6). ⚠ The `large` spread is worse than the
+  `small` one on every rung, which is what an 8.0 MiB working set on a shared
+  box looks like; it is a reason to read `Ir` and not the clock, not a reason to
+  re-run.
 
 ⚠ **`RECAP_PHP.md` open item 9 / F14: no php `Ir` is comparable to any PAT `Ir`,
 and no two php runs are comparable to each other unless the env block matches.**
@@ -699,11 +992,21 @@ reuse of item 1 for a real reason**: `dest` is a `Vec` the kernel owns and
 would break the `exact` identity pin.
 
 (b) Yes as the body stands — one expression, one unchecked read at `i`, and the
-`ensures` names it. Same residual and same two backstops as item 1. ⚠ The input
-that reaches **this** accessor's boundary is any input at all: the final fold
-runs `i` from 0 to `total_len`, and `total_len == p` on every benign window, so
-the *last* iteration reads the highest byte the decoder wrote. `small.bin` and
-`large.bin` exercise it 25 000 and 20 000 times per run.
+`ensures` names it. Same residual and same two backstops as item 1.
+⚠⚠ **THIS PARAGRAPH USED TO SAY `total_len == p` ON EVERY BENIGN WINDOW AND
+`TASK_PHP_015` MADE THAT FALSE — deliberately, and it is the whole point of the
+fixture change.** Under the short-final-line corpus `total_len < p` on **22 of
+32** `small` windows and **1 367 of 2 050** `large` ones (`inputs/gen.py`'s
+`_check_span` prints the counts on every run), so the final fold now stops
+*short* of the highest byte the decoder wrote on most windows. **The backstop is
+weaker for it and that is worth saying rather than papering over**: the last
+`vget_unchecked` of a benign call reads `dest[total_len - 1]`, not
+`dest[p - 1]`. What still reaches the accessor's real boundary is the equality
+case, which `_check_span` REFUSES to let the corpus lose — 10 `small` windows
+and 683 `large` ones — plus `adversarial-*`, where the fold runs to a
+`total_len` the decoder never wrote. ⚠ **That is the fixture rule paying for
+itself in the other direction**: the same assertion that forces the strict case
+in is what stops the equality case being dropped.
 
 (c) Yes; identical reasoning to item 1.
 
@@ -789,14 +1092,14 @@ meaningless — but three change what they MEAN**:
 | pin | verdict for an extracted row |
 |---|---|
 | `requires` / `ensures` | ✅ **unchanged.** The precondition is structural and the postcondition is a value; neither cares where the C came from. |
-| `verus.obligations` / `items` | ✅ **unchanged, and load-bearing.** 25/28 here. |
+| `verus.obligations` / `items` | ⚠ **unchanged, and NOT a measure of spec strength.** 25/28 here, and the count pins the SHAPE of the file, not the proof. `TASK_PHP_014` §1.3 measured that **`25 verified, 0 errors` survives deleting the entire functional postcondition AND its consumer**, so a reader who takes 25 as evidence for *"a full functional postcondition"* is reading a coincidence. What pins the strength is `verus.items.verus.rs.kernel.ensures`, which carries the clause text — and what DEMONSTRATES it is mutation: 19 mutants, 17 killed, every byte-level one (shift, mask, source index, destination index, capacity ±1, Horner multiplier, step size, `total_len`). It happens to be a full functional postcondition; **not because of the 25**. |
 | `driver.canonical` | ✅ **unchanged.** The driver is ours in both programmes. |
 | `collapse` | ✅ **unchanged.** |
-| `identity` | ✅ **unchanged** — and it is a *result* here (`exact` at O3, `norel` at O0), measured before it was declared. |
+| `identity` | ✅ **unchanged** — and it is a *result* here: **`exact` at O3 and `differ` at O0**. ⚠⚠ **The shipped pin at O0 is `differ`, NOT `norel`, and it was NOT measured before it was declared** — this cell said both of those things until `TASK_PHP_015` (`TASK_PHP_014` M3) while §0 of this same file, in bold, says `norel` was pinned from a hand build and **the gate refuted it**. `PROTOCOL.md` rule 13 exactly: the detail got maintained and the summary 700 lines below it did not. Re-confirmed against the `TASK_PHP_015` record: O3 both cells `md5_fn 338505795ee1…`, 200 instructions, 708 bytes; O0 **335 vs 352 instructions, 1906 vs 2042 bytes**, `md5_fn_norel` `d1d6e3b49ff2…` vs `75ad2b1a5964…`. |
 | `miri` | ✅ **unchanged**, and *more* load-bearing than on p16 because this row has a **writing** trusted accessor. |
 | ⚠ `idiom.required` | **CHANGES MEANING.** On a PAT row it says *"this is the spelling we chose and every rung must keep it"*. Here it also says *"**this is what the tarball said**"* — `(int) floor(len * 1.33)` is `required` not because it is a good idea but because it is what `:141` contains, and the row would be a different program without it. A reviewer must read these as **provenance assertions**, checkable against `extract_sha256`, and not only as style. |
 | ⚠⚠ `idiom.forbidden` | **CHANGES MEANING, AND IS THE SHARP ONE.** Every entry here forbids something that would be an *improvement* in any other row: `len = total_len - (p - *dest)` **fixes** a precedence bug; `(3 * src_len + 3) / 4` is the arithmetic the comment itself calls the obvious form. On a PAT row `forbidden` excludes a cheat; here it excludes a **repair**, and a reviewer who applies PAT's reflex will read the list backwards. |
-| ⚠ `model.py` | **CHANGES MEANING.** On a PAT row the model is an independent implementation of a spec both it and the kernel are written from. Here **there is no spec** — the C is the spec — so `model.py` is an independent *reading of the tarball*, and its two implementations disagreeing means one of them mis-read PHP, not that one has a bug. That is why `selfcheck()` also re-derives `line_len` **from the float** and re-checks `:158`'s deadness per window: those are readings, not choices. |
+| ⚠⚠ `model.py` | **CHANGES MEANING, AND THIS ROW HAS NOW PAID FOR IT TWICE.** On a PAT row the model is an independent implementation of a spec both it and the kernel are written from. Here **there is no spec** — the C is the spec — so `model.py` is an independent *reading of the tarball*, and its two implementations disagreeing means one of them mis-read PHP, not that one has a bug. That is why `selfcheck()` also re-derives `line_len` **from the float** and re-checks `:158`'s deadness per window: those are readings, not choices. ⚠⚠⚠ **AND IT IS WHY THE DOMAIN THE READINGS ARE COMPARED OVER IS PART OF THE PIN.** Both of this row's modelling errors — the `ee + 1` resume point and the `total_len` prefix (§13) — were *mis-readings of PHP* that the shipped corpus agreed with, and neither was findable from `inputs/`. `selfcheck()` now builds 896 synthetic windows spanning `ln = 0..63` and `inputs/gen.py` asserts the corpus reaches both arms of `:141`. **On an extracted row, "two independent implementations" is worth exactly as much as the domain you run them over.** |
 | ⚠ `sanitizer_expect` | **NARROWER THAN IT LOOKS**, see §5d. It is per-input for R1 and structurally `clean` for R1h, which forbids a php row from shipping the evidence that its `fix_commit` is incomplete. |
 
 **Nothing had to be invented to fill a field.** The two fields that could have
@@ -814,19 +1117,171 @@ with the confirmation that no truncation fires — §7).
   reslices, R4 unchecks) and **has not searched either endpoint further**. No
   R2-vs-R4 figure in §8 should be quoted as *the* cost of safety on this kernel
   until that search exists. Named as owed.
-- **No `sweep-*` band.** `work_per_call` moves between `small` and `large` (498
-  vs 4032, different residues mod 4/8/16), which is what
+- **No `sweep-*` band.** `work_per_call` moves between `small` and `large` (556
+  vs 4090, different residues mod 4/8/16), which is what
   `check.py::check_marginal_ir` needs, but there is no length sweep and
-  therefore no law in `nlines` or in `cap`.
-- ⚠ **`c/kernel.c:52` cites `harness/build.py:161-165` by LINE**, where
-  `.memory/02-bench-rules.md` says to name the function and give no line number
-  at all. The gate shouts it (`doc-citation-other`) and explicitly does **not**
-  fail it, because `c/kernel.c` is measurement-hashed and re-citing costs a
-  re-measure; its own advice is *"cite the FUNCTION when one of these files is
-  next re-measured anyway"*. **That advice was taken and the citation was
-  left.** The copy in this file, which is only gate-hashed, names
-  `build.py::build_c` instead. ⚠ The same shout also names three pre-existing
-  line citations inside `common-php/emalloc_shim.h`, which are not this row's.
+  therefore no law in `nlines` or in `cap`. ⚠ **`TASK_PHP_015` is as close as
+  this row has come to one and it is not a substitute**: re-measuring over a
+  second, differently shaped corpus reproduced every marginal to two decimals
+  (§8), which is a *replication at two points*, not a curve through many.
+- ✅ **`c/kernel.c`'s `harness/build.py:161-165` line citation is FIXED**, and
+  the way it was fixed is the point. `TASK_PHP_013` left it deliberately: the
+  gate shouts it (`doc-citation-other`) and explicitly does not fail it, and
+  `c/kernel.c` is measurement-hashed, so re-citing cost a re-measure the row did
+  not otherwise owe. The shout's own advice is *"cite the FUNCTION when one of
+  these files is next re-measured anyway"* — and `TASK_PHP_015` re-measured
+  anyway, so it now reads `harness/build.py::build_c` at no marginal cost.
+  ⚠ **That is `PROTOCOL.md` rule 6's "batch every rung-source doc fix into ONE
+  pass" working as designed**, and the same pass carried `verus.rs`'s
+  "Four call sites" over a list of five and `c/kernel_hardened.c`'s two wrong
+  hunk spans. ⚠ The shout also names three pre-existing line citations inside
+  `common-php/emalloc_shim.h`, which are not this row's.
 - **No claim about `php_uuencode`.** `:68-124` is in the same file and is not
   extracted; `inputs/gen.py` re-implements the encoder in Python instead, so the
   blobs are genuine uuencodings and the benign case is a real round trip.
+  ⚠ Since `TASK_PHP_015` the re-implementation includes the **padding case**
+  (`:110-115`), which is what a short final line needs and which the earlier
+  version called *"dropped"*.
+- ⚠⚠ **`provenance.c_lines` PINS ONE SPAN AND THIS ROW LIFTS TWO** — the only
+  `TASK_PHP_014` finding left unlanded, and it is left deliberately.
+  `harness-php/provenance.py:711-714` requires `c_lines` to be `[a, b]`
+  integers, so `extract_sha256` covers `uuencode.c:126-171` and **not**
+  `PHP_UU_DEC` at `uuencode.c:66`, which both C rungs also lift
+  (`c/kernel.c:122`, `c/kernel_hardened.c:110`). It is byte-correct — checked by
+  hand against the tarball, twice — but the check that exists to make *"those
+  lines of that tarball hash to this"* a **one-command fact** cannot see it, and
+  it is not in the overlap denominator either. ⚠ **This is a schema limit that
+  ninety rows will meet**: most extracted kernels need a macro, a struct or a
+  constant from outside their function.
+  **The fix the reviewer proposes is right** — let `c_lines` be a list of
+  `[a, b]` spans and hash their concatenation, backward-compatibly. **It was not
+  taken here**, and the reason is that it changes the ENFORCED half of the only
+  provenance check there is (`PROTOCOL_PHP.md` §D: *"`c_file` in the manifest,
+  the span in range, `extract_sha256` — those are not heuristics"*), on the row
+  whose provenance claim is load-bearing, inside a task already carrying a
+  fixture change and a re-measure. **A schema decision for 90 rows deserves its
+  own task and its own reviewer.** Named as owed with the design attached, not
+  quietly dropped.
+- ⚠ **The gate record still carries no `provenance` and no marker on
+  `sanitizer_hardened`.** `TASK_PHP_014` m6: a machine consumer reading the
+  record's four `expect: clean, fired: false` adversarial rows, and nothing
+  else, would conclude the 2004 fix is complete. A human cannot — `idiom.why` is
+  echoed and rendered and now says so in terms (§0) — but closing it properly
+  needs `check.py` to echo `provenance` or to carry a per-row note beside
+  `sanitizer_hardened`, and that is a `harness/` edit and a 33-pattern re-gate.
+  **Named as owed, not fixed.**
+
+---
+
+## 13. ⚠⚠⚠ THE FIXTURE WAS A MONOCULTURE, AND IT HID A REAL DEFECT FOR A TASK
+
+**This is the finding `TASK_PHP_015` exists for, and it is a SHAPE defect: it is
+about how a row is built, not about uudecode.** `TASK_PHP_014` M1 found it.
+
+### What was wrong
+
+`spec.md`'s `note` — **inside the hashed contract** — said `model.py::uu_fold`
+mirrors `verus.rs`'s `uu_walk`/`fold_line`. It did not:
+
+| | folds |
+|---|---|
+| `verus.rs:215-223` | `fold_bytes(w.0, w.1, 0)` — the **first `total_len`** emitted bytes |
+| `model.py` (as shipped at `TASK_PHP_013`) | **every** emitted byte |
+
+Those are the same sequence only when `total_len == p`. The row's own
+`lemma_emit_covers_declared` proves `ln <= 3·⌈line_len(ln)/4⌉` and `verus.rs:47`
+records that equality holds **only at multiples of 3** — so the row's own Verus
+lemma documents that its model's stated justification was false, and the
+inequality is **strict for 42 of the 63 length bytes**.
+
+⚠ **It passed for exactly one reason.** `inputs/gen.py` emitted `LINE_LEN = 45`
+on every line of every blob and called the padding case *"dropped"*, and
+`45 ≡ 0 (mod 3)` is the equality case. So `harness/check.py`'s
+`ensures re-derived independently on N sampled calls` — the green line that is
+supposed to tie the gate to R5's postcondition — **was re-deriving a different
+postcondition**, correctly, on a corpus that could not tell the difference.
+
+⚠⚠ **And the mechanism was already named in this row's own build report, eleven
+lines above a second instance of it.** `TASK_PHP_013_REPORT.md` §6 records a
+*different* modelling error in the *same function* — a walk resuming at `ee + 1`
+— found "by writing the Verus termination argument, not by any test", and says
+why no test could find it: *"it agrees with the simulation on every input this
+row ships, because every shipped line declares 45."* **The diagnosis was right
+and the repair was local.**
+
+### What was done, and why it is two repairs and not one
+
+1. **`model.py::uu_fold` now folds `out[:total_len]`**, mirroring `verus.rs`.
+   Verified against an independent transcription of `verus.rs`'s three spec
+   functions over `ln = 1..63`: **0 of 63 disagree**, where the shipped version
+   gave **42 of 63** (`.temp/php15/01-prefix-divergence.log`,
+   `04-postfix-divergence.log`). And against the *binaries*: on a window
+   declaring `ln = 1`, `_window`, `uu_fold` and all five shipped rungs now agree
+   on `152010033`, where `uu_fold` alone used to say `154280600`
+   (`.temp/php15/05-real-divergence-postfix.log`).
+2. **`model.py::selfcheck` builds its own domain.** 896 synthetic windows in
+   three families spanning `ln = 0..63` — a single line with slack, a line at
+   the buffer's edge (both refusal paths), and `45 → ln` chains (the only shape
+   in which the resume point is exercised at all). **Must-fire and
+   must-NOT-fire controls, `.temp/php15/03-sweep-mustfire.log`:**
+
+   ```
+   SHIPPED    (control)       MUST NOT fire  -> silent     0/896   ok
+   all_bytes  (the M1 bug)    MUST fire      -> FIRED    294/896   ok
+   nofold                     MUST fire      -> FIRED    440/896   ok
+   resume_ee                  MUST fire      -> FIRED     65/896   ok
+   srclen_e                   MUST NOT fire  -> silent     0/896   ok
+   ```
+
+   ⚠ It kills **both** of this row's modelling errors, including the one
+   `TASK_PHP_013` could only find by writing a termination proof.
+3. **`inputs/gen.py` emits a short final line** — which is also what
+   `php_uuencode` really emits, so the monoculture was *unfaithful* as well as
+   blind — and **asserts the span it exists to provide**. `_check_span`
+   re-decodes what it generated and refuses to write a corpus missing the
+   `floor()` arm, the strict case `declared < emitted`, or the equality case
+   `declared == emitted`:
+
+   ```
+   span ok: small.bin   windows=32    floor()-arm lines=32    declared<emitted=22    declared==emitted=10
+   span ok: large.bin   windows=2050  floor()-arm lines=2050  declared<emitted=1367  declared==emitted=683
+   ```
+
+⚠⚠ **(3) IS LOAD-BEARING AND NOT MERELY TIDIER, AND THAT WAS MEASURED**
+(`.temp/php15/08-fixture-mustfire.log`). Re-installing the pre-fix `uu_fold` and
+running **only** the corpus half of `selfcheck`:
+
+```
+                          OLD corpus (45-only)   NEW small.bin   NEW large.bin
+PRE-FIX uu_fold                 silent               FIRES           FIRES
+SHIPPED uu_fold                 silent               silent          silent
+```
+
+**The old corpus could not see the defect; the new one catches it without the
+synthetic sweep at all.**
+
+### ⚠⚠⚠ The rule, and it is `PROTOCOL_PHP.md` §A2a now
+
+> **1. The fixture must REACH every arm of the branch the defect lives on, and
+> `inputs/gen.py` must ASSERT that it does** — in the shape `_check_residues`
+> already had. An intention in a comment is what this row had.
+>
+> **2. `model.py::selfcheck` must drive its two implementations over a domain it
+> CONSTRUCTS, not only over the calls the corpus makes.** A second
+> implementation is only as strong as the domain it is exercised over, and
+> `inputs/` is not a domain — it is seven files.
+
+⚠ **Neither subsumes the other.** (1) is bounded by what a window of fixed
+stride can carry — a corpus cannot span `ln = 1..63` and keep `work_per_call`
+constant — so it buys *reachability*, not coverage. (2) buys coverage and buys
+it free, but it checks the **model** and cannot see a *measurement* taken down a
+path nothing executes.
+
+⚠ **The manager's first phrasing was *"the generator must span the parameter
+that selects the code path"*, and it does not quite generalise**: "span" is not
+achievable inside a fixed stride, and it names the fixture as the only repair
+when the cheaper and stronger one is in the model. Checked against `ph07` before
+being written down — `mbfl_strcut` walks `p += mbtab[*p]`, so its arms are the
+lead-byte classes and an all-ASCII benign corpus takes exactly one of them,
+which is this defect with a different name. The rule carries; the word
+*parameter* did not.

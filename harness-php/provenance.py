@@ -62,7 +62,10 @@ So, itemised, because a half-true validator is worse than an honest one:
               built and bypassed; the third answer was to stop asking and make
               the `c/emalloc_shim.h` symlink UNCONDITIONAL. This field is for a
               reviewer, and its absence is reported loudly rather than refused.
-  ✗ NOT CHECKED  `deletions`, `root_cause_ids`, `cwe`, `fix_commit`,
+  ✗ NOT CHECKED  `divergences` (the lift ledger -- `deletions` until
+              TASK_PHP_015, when TASK_PHP_014 measured that 3 of ph03's 4
+              entries are substitutions or projections rather than
+              deletions), `root_cause_ids`, `cwe`, `fix_commit`,
               `invariant`, `obligation`, `echoes` -- all unvalidated
               declarations.
 

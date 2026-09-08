@@ -150,7 +150,7 @@ Inside the hashed `slb-contract` block (`PLAN_PHP.md` §6):
   "extract_cmd":    "tar -xzOf <tarball> php-5.0.0/ext/standard/url.c | sed -n '463,489p'",
   "extract_sha256": "<sha256 of exactly those bytes>",
   "tier":           "verbatim",
-  "deletions":      [{"what": "TSRMLS_DC", "why": "thread plumbing, no semantics"}],
+  "divergences":    [{"what": "TSRMLS_DC", "kind": "deletion", "where": "url.c:463", "why": "thread plumbing, no semantics"}],
   "root_cause_ids": ["…"], "cwe": "CWE-125", "fix_commit": "…",
   "invariant": "I1", "obligation": "O2", "echoes": ["p16"]
 }
@@ -167,5 +167,6 @@ docstring and is worth reading before writing a `provenance` block. In short:
 the tarball hash, the manifest membership, the span (non-empty, in range) and
 its sha256, the canonical `extract_cmd`, and a **heuristic line overlap**
 between the excerpt and the row's `c/kernel*.{c,h}` with a per-tier floor. It
-does **not** validate `tier`, `deletions`, `cwe`, `fix_commit`, `invariant`,
+does **not** validate `tier`, `divergences` (the ledger, `deletions` before
+`TASK_PHP_015`), `cwe`, `fix_commit`, `invariant`,
 `obligation` or `echoes` — those are declarations.

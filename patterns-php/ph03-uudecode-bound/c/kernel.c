@@ -49,7 +49,7 @@
  *    signature is already pure C. Nothing was removed for this.
  *
  * 3. ⚠⚠ `floor` and `ceil` -> `php_uu_floor` and `php_uu_ceil`, AND THIS IS
- *    FORCED BY THE HARNESS RATHER THAN CHOSEN. `harness/build.py:161-165`
+ *    FORCED BY THE HARNESS RATHER THAN CHOSEN. `harness/build.py::build_c`
  *    compiles exactly three translation units and links with NO `-lm`, and
  *    `build.py` is frozen (`PLAN_PHP.md` §2.1: editing it costs a 33-pattern
  *    re-measure). Measured, `.temp/php13/01b-floor-runtime.log`: a kernel

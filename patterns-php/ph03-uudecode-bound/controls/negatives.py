@@ -54,6 +54,39 @@ s + 1)` is the source over-read itself -- the same byte ASan reports at
 `ext/standard/tests/strings/bug67252.phpt` reproduces. **The verifier refuses
 the shipped 2004 fix for the reason the 2014 commit exists.**
 
+-------------------------------------------- `no2004a` / `no2004a_both` ----
+⚠⚠⚠ **THE FIRST CONTROL IN EITHER PROGRAMME WHOSE EXPECTATION IS THAT THE
+MUTANT STILL VERIFIES**, and the reason it exists is a result rather than a
+worry: `f95c1df58349`'s FIRST hunk decides nothing.
+
+    `no2004a`       delete `if ln > src_len { err = true; break; }` from the
+                    EXEC only, leaving `uu_walk`'s matching branch in the SPEC.
+                    MUST STILL VERIFY -- 25 verified, 0 errors.
+    `no2004a_both`  additionally make the SPEC branch unreachable (`ln` is
+                    `dec_of(..)`, so `ln <= 63` and `ln > src_len + 64` is
+                    false for every non-negative `src_len`).
+                    MUST STILL VERIFY.
+
+⚠ **`no2004a` alone is the decisive one, and it is worth saying why.** The spec
+still refuses every `ln > src_len`, so an exec that has lost hunk 1 can only
+satisfy the postcondition if some OTHER branch refuses exactly the same inputs.
+It does: hunk 2. `line_len(ln) >= ln` for every `ln` in 1..63, and after `s++`
+we have `e - s <= src_len - 1`, so `ln > src_len` forces `fl > e - s`.
+`no2004a_both` is the same fact stated from the spec side.
+
+Measured on the C side too (TASK_PHP_014 M5, `.temp/php14/06-hunk.c`), over the
+same 12 600 documents as `.temp/php13/02-reach.log`: hunk 1 fires 1 953 times,
+and hunk 2 would have refused **all 1 953** -- 0 documents are refused by hunk 1
+alone.
+
+⚠⚠ **A must-PASS control is weaker than a must-FAIL one and this file should
+not pretend otherwise**: a mutant that verifies for the WRONG reason (a broken
+emit, an anchor that matched nothing) also prints `25 verified, 0 errors`. Two
+guards. The anchor-uniqueness check below refuses to emit when the anchor does
+not occur exactly once, so a no-op edit cannot masquerade as a passing mutant;
+and `no2014` shares the same emit path and is must-FAIL, so a `negatives.py`
+that had stopped mutating anything at all would be caught there.
+
 --------------------------------------------------------- `fix_incomplete` ----
 The same fact on the C side, with a must-fire control. Not emitted by this
 script -- it is a committed source, `controls/fix_incomplete.c`, because it is a
@@ -76,9 +109,35 @@ Y2014 = """            if e - s < 4 {
             }
 """
 
+# `f95c1df58349` hunk 1, the EXEC copy (verus.rs's kernel loop).
+Y2004A_EXEC = """        if ln > src_len {
+            err = true;
+            break;
+        }
+"""
+
+# The same hunk in the SPEC (`uu_walk`). `ln` is `dec_of(..) as int`, so
+# `ln <= 63`; `ln > src_len + 64` is therefore false for every `src_len >= 0`
+# and the branch becomes unreachable WITHOUT introducing an `if false` that
+# rustc would lint on.
+Y2004A_SPEC_OLD = "        } else if ln > src_len {\n"
+Y2004A_SPEC_NEW = "        } else if ln > src_len + 64 {\n"
+
+# name -> (source, [(old, new), ...], expectation, why)
+# ⚠ `expect` is "refuse" or "verify". A must-VERIFY mutant is a real control
+# here -- see this file's docstring -- and it is why this table carries an
+# expectation column at all rather than assuming every entry must go RED.
 MUTANTS = {
-    "no2014": ("verus.rs", Y2014, "",
+    "no2014": ("verus.rs", [(Y2014, "")], "refuse",
                "delete PHP's 2014 fix 1e2818b14376; MUST NOT VERIFY"),
+    "no2004a": ("verus.rs", [(Y2004A_EXEC, "")], "verify",
+                "delete f95c1df58349 hunk 1 from the EXEC; MUST STILL VERIFY "
+                "-- hunk 2 already refuses every input hunk 1 does"),
+    "no2004a_both": ("verus.rs",
+                     [(Y2004A_EXEC, ""),
+                      (Y2004A_SPEC_OLD, Y2004A_SPEC_NEW)], "verify",
+                     "and make the SPEC branch unreachable too; MUST STILL "
+                     "VERIFY"),
 }
 
 
@@ -90,21 +149,28 @@ def main():
     ap.add_argument("--emit", metavar="NAME")
     a = ap.parse_args()
     if a.list or not a.emit:
-        for k, (src, _o, _n, why) in sorted(MUTANTS.items()):
-            print(f"{k:12s} {src:14s} {why}")
+        for k, (src, _edits, expect, why) in sorted(MUTANTS.items()):
+            print(f"{k:14s} {src:11s} MUST {expect.upper():6s} {why}")
         return 0
     if a.emit not in MUTANTS:
         print(f"no such mutant: {a.emit}", file=sys.stderr)
         return 2
-    src, old, new, _why = MUTANTS[a.emit]
+    src, edits, _expect, _why = MUTANTS[a.emit]
     txt = open(os.path.join(ROW, src)).read()
-    n = txt.count(old)
-    if n != 1:
-        print(f"controls/negatives.py: the {a.emit} anchor occurs {n} times in "
-              f"{src}, expected exactly 1 -- the mutant would be silently wrong. "
-              f"Fix the anchor before trusting any run.", file=sys.stderr)
-        return 3
-    sys.stdout.write(txt.replace(old, new))
+    # ⚠ Every anchor is checked BEFORE any is applied. One edit can destroy the
+    # next one's anchor, and a partially applied mutant that still verifies is
+    # exactly the false pass a must-VERIFY control is vulnerable to.
+    for old, _new in edits:
+        n = txt.count(old)
+        if n != 1:
+            print(f"controls/negatives.py: an {a.emit} anchor occurs {n} times "
+                  f"in {src}, expected exactly 1 -- the mutant would be "
+                  f"silently wrong. Fix the anchor before trusting any run.\n"
+                  f"  anchor: {old!r}", file=sys.stderr)
+            return 3
+    for old, new in edits:
+        txt = txt.replace(old, new, 1)
+    sys.stdout.write(txt)
     return 0
 
 

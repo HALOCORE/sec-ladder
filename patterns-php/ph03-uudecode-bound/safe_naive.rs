@@ -25,7 +25,7 @@
 //!     R2-5 + 1e2818b14376 (2014) as well  -- memory-safe
 //!
 //! Every input this row ships trips a 2004 check first, so R1h and R2-R5 agree
-//! on all six and only R1 diverges; `model.py::selfcheck` asserts that, so the
+//! on all seven and only R1 diverges; `model.py::selfcheck` asserts that, so the
 //! agreement is checked rather than assumed.
 //!
 //! **Do not read this rung's number as a bounds-check tax without the

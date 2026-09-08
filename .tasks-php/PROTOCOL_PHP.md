@@ -21,9 +21,30 @@ about the defect in both directions.**
 
 | tier | meaning |
 |---|---|
-| `verbatim` | the function lifts as-is; only `TSRMLS_*` / macro plumbing is removed |
+| `verbatim` | the function lifts as-is; only `TSRMLS_*` / macro plumbing is removed, **or substituted where the substitution is demonstrated behaviour-preserving** — see below |
 | `narrowed` | a wrapper comes off (zval unpacking, argument parsing); **the body is unchanged** |
 | `modelled` | the mechanism is re-expressed because the original cannot be lifted |
+
+⚠⚠ **`verbatim` ADMITS SUBSTITUTIONS, AND THIS TABLE DEFINED THE TIER PURELY BY
+*REMOVAL* UNTIL TASK_PHP_015.** `ph03` does not remove `floor`/`ceil`: it
+**adds** two `static double` definitions and two `#define`s that redirect them,
+because `harness/build.py` links no `-lm` and is frozen. This row of the table
+had no word for that, so a builder reading it alone would conclude that any
+substitution forces `modelled` — and §A2 already carried the right test all
+along. Stated plainly, because a tier that is read as stricter than it is
+becomes a filter, and ⚠ *a tier is a COST, NEVER A FILTER*:
+
+> **A substitution is admissible in `verbatim` when it is (a) itemised
+> individually in the `divergences` ledger with a line citation, (b) given a
+> `why` that ends in "no semantics", and (c) DEMONSTRATED behaviour-preserving
+> over the reachable domain by a differential with a must-fire control — not
+> asserted.** `ph03`'s libm substitution is the worked example: 0 disagreements
+> over `len` 0..63 and `n` 0..10⁶, control **38**, and re-run under
+> `-ffast-math` / `-march=native` / `-funsafe-math-optimizations` / `-Ofast` on
+> both compilers. ⚠ **(c) is what keeps this from being a hole**: "modelled by
+> an equivalent" is a claim that needs a differential and not a comment — §B's
+> `ZEND_SIGNED_MULTIPLY_LONG` is the case where the equivalent builtin was
+> **84 523 disagreements** away from faithful.
 
 ⚠ **A tier is a COST, NEVER A FILTER.** `RECAP_PHP.md` open item 4 records a
 candidate rejected on extraction cost; the bar does not permit that, and the
@@ -37,22 +58,97 @@ Reading an axis by `c_file_line` measures where PHP crashes, not where it is
 wrong (`PLAN_PHP.md` §4.2a; the temporal miner refuted the manager on this and
 the axis went from "needs the whole executor" to 21 of 23 families lifting).
 
-### A2. The deletion ledger
+### A2. The divergence ledger
 
-**Every deletion is listed individually, in `provenance.deletions`, with a
-line citation and a reason.** Not "macro plumbing removed" — one entry per
-thing removed:
+⚠⚠ **THE KEY IS `provenance.divergences` AND IT WAS `provenance.deletions`
+UNTIL TASK_PHP_015. THREE OF `ph03`'s FOUR ENTRIES ARE NOT DELETIONS** (two
+substitutions and one projection of the shim's NULL arm), so the ledger's own
+name described a quarter of its contents — §A1's mistake one level down, and
+found in the same review (TASK_PHP_014). ✅ Renamed rather than explained away:
+a builder fills in the box the name describes.
+
+**Every way the row's C differs from the cited tarball lines is listed
+individually, with a `kind`, a line citation and a reason.** Not "macro
+plumbing removed" — one entry per thing:
 
 ```json
-"deletions": [
-  {"what": "TSRMLS_DC", "where": "zend_alloc.c:142", "why": "thread plumbing, no semantics"},
-  {"what": "ZEND_DEBUG arms", "where": "zend_alloc.c:153-165", "why": "the shipped 5.0.0 build is not a debug build; keeping them would ADD a poison-on-free PHP does not do"}
+"divergences": [
+  {"what": "TSRMLS_DC", "kind": "deletion", "where": "zend_alloc.c:142", "why": "thread plumbing, no semantics"},
+  {"what": "ZEND_DEBUG arms", "kind": "deletion", "where": "zend_alloc.c:153-165", "why": "the shipped 5.0.0 build is not a debug build; keeping them would ADD a poison-on-free PHP does not do"},
+  {"what": "floor -> php_uu_floor", "kind": "substitution", "where": "uuencode.c:141", "why": "build.py links no -lm and is frozen; same double expressions, 0 disagreements over the reachable domain with a must-fire control. No semantics."}
 ]
 ```
 
-⚠ A deletion that CHANGES BEHAVIOUR is not a deletion, it is a `modelled`
+`kind` is one of **`deletion`** (the text is gone), **`substitution`** (the text
+is redirected at something that behaves identically — §A1's clause governs it)
+or **`projection`** (a behaviour outside the extracted span is modelled by a
+narrower one, e.g. the shim's NULL arm for PHP's `exit(1)`).
+
+⚠ **DECLARED, NEVER DETECTED.** `provenance.py` does not read this block —
+`tier`, `divergences`, `cwe`, `fix_commit`, `invariant`, `obligation` and
+`echoes` are all unvalidated declarations (§D), and **nothing may come to
+depend on `kind` being right**; it is documentation for a reviewer, the same
+standing `uses_allocator` has. What makes the ledger worth writing is that the
+`slb-contract` block is hashed, so an entry cannot be quietly withdrawn.
+
+⚠ A divergence that CHANGES BEHAVIOUR is not a divergence, it is a `modelled`
 tier. If you cannot write a `why` that ends in "no semantics", you are in the
 wrong tier.
+
+### A2a. ⚠⚠⚠ THE ORACLE'S DOMAIN IS NOT THE CORPUS
+
+**Two rules, and they are two because they fail differently. Both come out of
+one defect — `TASK_PHP_014` M1, on the first real row.**
+
+`ph03`'s `model.py` carries two implementations of the kernel and compares them,
+exactly as `PROTOCOL.md`'s definition of done wants. One of them was **the wrong
+function** for a whole task: it folded every emitted byte where `verus.rs` folds
+the first `total_len`, which is a different function for **42 of the 63** length
+bytes. It passed because `inputs/gen.py` emitted length **45** exclusively —
+`45 ≡ 0 (mod 3)` is precisely the equality case — and the generator's own
+comment called the other arm *"dropped"*. So the gate's `ensures` re-derivation
+was **green while checking a different postcondition from the one R5 proves**.
+
+> **1. THE FIXTURE MUST REACH EVERY ARM OF THE BRANCH THE DEFECT LIVES ON, AND
+> `inputs/gen.py` MUST ASSERT THAT IT DOES.**
+>
+> `ph03`'s defect is `ee = s + (len == 45 ? 60 : (int) floor(len * 1.33))` —
+> **two arms** — and the benign corpus took the first one on every byte it
+> shipped. The repair is a short final line, which is also what real uuencoded
+> data has, so the monoculture was **unfaithful as well as blind**. ⚠ The
+> load-bearing half is the **assertion**: `inputs/gen.py::_check_span` re-decodes
+> what it just generated and refuses to write a corpus that misses an arm, in
+> the same shape as `_check_residues`. **An intention in a comment is what ph03
+> had, and it was wrong for a task.**
+>
+> **2. `model.py::selfcheck` MUST DRIVE ITS TWO IMPLEMENTATIONS OVER A DOMAIN IT
+> CONSTRUCTS, NOT ONLY OVER THE CALLS THE CORPUS MAKES.**
+>
+> **A second implementation is only as strong as the domain it is exercised
+> over, and six `.bin` files are not a domain.** `ph03`'s sweep is ~30 lines,
+> builds 896 windows spanning `ln = 0..63` in three families, costs
+> milliseconds, needs no `.bin` and no measurement. It kills **both** modelling
+> errors this row has had — the `ee + 1` resume point (65/896) and M1
+> (294/896) — and its must-fire and must-NOT-fire controls are
+> `.temp/php15/03-sweep-mustfire.log`.
+
+⚠⚠ **NEITHER RULE SUBSUMES THE OTHER.** Rule 1 is bounded by what a window of
+fixed stride can carry — a corpus cannot span `ln = 1..63` and keep
+`work_per_call` constant — so it buys *reachability*, not coverage. Rule 2
+buys coverage and buys it free, but it is a check on the **model** and cannot
+see a *measurement* taken down a path nothing ever executes. Write both.
+
+⚠ **What the manager's first phrasing said, and why this one is different.**
+`TASK_PHP_015` §1.3 put it as *"the generator must span the parameter that
+selects the code path the defect lives on"*, and asked whether that generalises.
+It does not quite: **"span the parameter" is not achievable inside a fixed
+stride, and it names the fixture as the only repair when the cheaper and
+stronger one is in the model.** *Reach every arm* is achievable, assertable and
+row-independent. ✅ **Checked against the next row before being written here**:
+`ph07`'s `mbfl_strcut` walks `p += mbtab[*p]`, so its branch arms are the
+lead-byte classes (1-, 2-, 3-byte) — an all-ASCII benign corpus takes exactly
+one of them, which is `ph03`'s defect with a different name. The rule applies
+unchanged; only the word *parameter* had to go.
 
 ### A3. ⚠ Reachability is deliverable #1, in writing, before any rung exists
 

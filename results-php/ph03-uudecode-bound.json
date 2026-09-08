@@ -1,10 +1,10 @@
 {
   "pattern": "ph03-uudecode-bound",
-  "generated_utc": "2026-09-07T16:24:10Z",
+  "generated_utc": "2026-09-08T03:32:51Z",
   "git": {
-    "commit": "5de84afe3da05078011953a7cf043b5d30f2164d",
+    "commit": "7e8602dd6d12a04afd7e916d4474fa95cac3d695",
     "dirty": true,
-    "dirty_files": 2,
+    "dirty_files": 13,
     "note": "commit is HEAD when measured, i.e. the parent of the commit this file lands in; a fresh run always names HEAD~1 and reads dirty. For real staleness run `harness/measure.py --check-stale`, which compares this record's source_sha256/input_sha256 against the tree."
   },
   "source_sha256": {
@@ -16,25 +16,26 @@
     "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "patterns/ph03-uudecode-bound/c/emalloc_shim.h": "aa9abf48535e8df93c9398e96c044697a784d73c40d7a7ccc830b5ee308c378f",
-    "patterns/ph03-uudecode-bound/c/kernel.c": "673d72ca4173e8e4820d265321f374d69391bcef8899f1739a98a7b26ca64bad",
+    "patterns/ph03-uudecode-bound/c/kernel.c": "51f2385aba7e116dd0b3aec644ce4ac48ffc11fdfc59c8a5f495a456e9c2455a",
     "patterns/ph03-uudecode-bound/c/kernel.h": "453948f120e8aec4b485d7a5436504a0d3d640a2484a7d0ebf7804f4675354cb",
-    "patterns/ph03-uudecode-bound/c/kernel_hardened.c": "3f31611c3b24884f9bf7239fd86832f6ef36f415bd788ad2c235c1cc4bfb3844",
+    "patterns/ph03-uudecode-bound/c/kernel_hardened.c": "20c20fbfc0f9b7b7816f6e808addd4111b2cb1705e7102a44d464f1bcaf9dc87",
     "patterns/ph03-uudecode-bound/c/main.c": "aa1184dc30bfc70c733cc1238d5b3bb46f0157212c24b1554c5ef5a85f2363f2",
-    "patterns/ph03-uudecode-bound/inputs/gen.py": "0dedac318aebe0a9620642fb38e67a99dd731e937c1916fe45662e860430b312",
-    "patterns/ph03-uudecode-bound/model.py": "5199c6987632344930a001693070bfb3f1ac55dcc1deb72d35c763f1cb3acce8",
-    "patterns/ph03-uudecode-bound/safe_naive.rs": "8fbb48fb759ddf6ab8ba74096f353e9e1e5fa047b5962f3daf537f9789615191",
+    "patterns/ph03-uudecode-bound/inputs/gen.py": "89beab7b86be833d2c50bba4a588a4ba41511172d1d10c366e02045801b9626f",
+    "patterns/ph03-uudecode-bound/model.py": "1bbc8a2b6373352c3b783fef6a3cae093d02cc8e23379ba65067a3ed68388ee3",
+    "patterns/ph03-uudecode-bound/safe_naive.rs": "ddebb73a840118f6a022f53e9f9ede5b93129d98cecb378f317ad3a1fb0c2a3f",
     "patterns/ph03-uudecode-bound/safe_tuned.rs": "fcd9485d5cb7ef4176b11c67ef08433aae90055ee14c4bec32f80c7f34f9848a",
     "patterns/ph03-uudecode-bound/unsafe.rs": "90f62e3ff30c7e328c5c6f50d4b2db127e76d3288962f0babc8b17f5edcf118d",
-    "patterns/ph03-uudecode-bound/verus.rs": "844f1c6374a122166c4f59a573a22b003e6580aab9783c306ac3758334cfea91",
+    "patterns/ph03-uudecode-bound/verus.rs": "471bd284785dd5d7197f07142601cdb6c8ac3eca2995ccdaede0a9176125bfbe",
     "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
   },
   "input_sha256": {
-    "patterns/ph03-uudecode-bound/inputs/adversarial-nowin.bin": "3e7502bf2fd3de7431c7131de9c00f6c0b1036401a22eef1f757a19fb91bbddc",
-    "patterns/ph03-uudecode-bound/inputs/adversarial-read.bin": "ca3a032b66b62040b61c8125625e1553a4a7572b1fb904b590dae0c69fe61fc4",
-    "patterns/ph03-uudecode-bound/inputs/adversarial-shortsrc.bin": "1c2e8bd940965aba287c0402b00eea5ee228b07e34e2b194c3e4114073fc82bb",
-    "patterns/ph03-uudecode-bound/inputs/adversarial-write.bin": "28f6613549714c8a7588fb32ba974ddc0abdf69fab664f8fd58c49b8e23a080c",
-    "patterns/ph03-uudecode-bound/inputs/large.bin": "9ce4149e8284c2bcca9bd19ee5019e4b50bf3abd1d67e13381b64d8d83c4a8bc",
-    "patterns/ph03-uudecode-bound/inputs/small.bin": "898e7584a93c3ddbce4c24824faa9f362d7dc72809d8d64523dee9949fc3752d"
+    "patterns/ph03-uudecode-bound/inputs/adversarial-floor.bin": "cbfea7c05c49d1f0bc87b7eaa238323e132845dd23497f1692f77993cd29aa99",
+    "patterns/ph03-uudecode-bound/inputs/adversarial-nowin.bin": "f3e150c4390c3e8824e85abb80afe71a48d54c30f0aa4dab75809be377ce01b5",
+    "patterns/ph03-uudecode-bound/inputs/adversarial-read.bin": "4948d709cffd8077ece6dc093cace5dcc7bd76ea9ad6f3cf79540035098db569",
+    "patterns/ph03-uudecode-bound/inputs/adversarial-shortsrc.bin": "44b217e7a3aaf22239cccd72547f293c5d2be6370af05941f78312b153760410",
+    "patterns/ph03-uudecode-bound/inputs/adversarial-write.bin": "10cff5d8bf428d284f280bcc713cd1e9c91ffe2dcf6549e8b229c0dba809ddd3",
+    "patterns/ph03-uudecode-bound/inputs/large.bin": "17fdf308c41c653bd533ec5fc19e81ac9ec756a65428f86c32738a648256b6b7",
+    "patterns/ph03-uudecode-bound/inputs/small.bin": "1549e7fd260faaa13771a668a1d9bc7755a0e2703e1e609c13941e683e61b82d"
   },
   "toolchain": {
     "gcc": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
@@ -57,12 +58,19 @@
     "wall": "taskset -c 3, interleaved round-robin, 30 reps, min and median; frequency scaling on, shared box"
   },
   "inputs": {
+    "adversarial-floor.bin": {
+      "n_iters": 8,
+      "declared_len": 53,
+      "present": 53,
+      "truncated": false,
+      "model": "n_iters=8 stride=45 n_blob=45 nwin=1 calls=8 work/call=45B san=fires truncated=False expected=10286939257659585152"
+    },
     "adversarial-nowin.bin": {
       "n_iters": 8,
-      "declared_len": 72,
-      "present": 72,
+      "declared_len": 130,
+      "present": 130,
       "truncated": false,
-      "model": "n_iters=8 stride=65 n_blob=64 nwin=0 calls=0 work/call=0B san=clean truncated=False expected=0"
+      "model": "n_iters=8 stride=123 n_blob=122 nwin=0 calls=0 work/call=0B san=clean truncated=False expected=0"
     },
     "adversarial-read.bin": {
       "n_iters": 8,
@@ -87,17 +95,17 @@
     },
     "large.bin": {
       "n_iters": 20000,
-      "declared_len": 8265608,
-      "present": 8265608,
+      "declared_len": 8384508,
+      "present": 8384508,
       "truncated": false,
-      "model": "n_iters=20000 stride=4032 n_blob=8265600 nwin=2050 calls=20000 work/call=4032B san=clean truncated=False expected=16949792395555472632"
+      "model": "n_iters=20000 stride=4090 n_blob=8384500 nwin=2050 calls=20000 work/call=4090B san=clean truncated=False expected=5544170072369974633"
     },
     "small.bin": {
       "n_iters": 25000,
-      "declared_len": 15944,
-      "present": 15944,
+      "declared_len": 17800,
+      "present": 17800,
       "truncated": false,
-      "model": "n_iters=25000 stride=498 n_blob=15936 nwin=32 calls=25000 work/call=498B san=clean truncated=False expected=4724622162658835783"
+      "model": "n_iters=25000 stride=556 n_blob=17792 nwin=32 calls=25000 work/call=556B san=clean truncated=False expected=5115966432339535952"
     }
   },
   "cells": [
@@ -133,12 +141,12 @@
         "vector_regs": []
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 154150000,
+          "kernel_exclusive_ir": 171560380,
           "kernel_functions": [
             "kernel"
           ],
@@ -181,12 +189,12 @@
         "vector_regs": []
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 154150000,
+          "kernel_exclusive_ir": 171560380,
           "kernel_functions": [
             "kernel"
           ],
@@ -231,12 +239,12 @@
         ]
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 165650000,
+          "kernel_exclusive_ir": 184243120,
           "kernel_functions": [
             "kernel"
           ],
@@ -246,7 +254,7 @@
           ]
         },
         "large.bin": {
-          "kernel_exclusive_ir": 1043360000,
+          "kernel_exclusive_ir": 1058278800,
           "kernel_functions": [
             "kernel"
           ],
@@ -258,16 +266,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.016468582674860954,
-          "median_s": 0.017040971666574478,
+          "min_s": 0.017979560419917107,
+          "median_s": 0.018189585767686367,
           "reps": 30,
-          "spread_pct": 3.4756420938838115
+          "spread_pct": 1.1681339413426477
         },
         "large.bin": {
-          "min_s": 0.09266380220651627,
-          "median_s": 0.09426150750368834,
+          "min_s": 0.09212351217865944,
+          "median_s": 0.09798476006835699,
           "reps": 30,
-          "spread_pct": 1.7241957043930973
+          "spread_pct": 6.362379973454073
         }
       }
     },
@@ -307,14 +315,14 @@
         ]
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
           "kernel_exclusive_ir": null,
           "kernel_functions": [],
-          "main_exclusive_ir": 166150141,
+          "main_exclusive_ir": 184818261,
           "main_functions": [
             "main"
           ]
@@ -322,7 +330,7 @@
         "large.bin": {
           "kernel_exclusive_ir": null,
           "kernel_functions": [],
-          "main_exclusive_ir": 1047180141,
+          "main_exclusive_ir": 1062158941,
           "main_functions": [
             "main"
           ]
@@ -330,16 +338,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.016392512246966362,
-          "median_s": 0.01696038991212845,
+          "min_s": 0.01787775382399559,
+          "median_s": 0.018445326946675777,
           "reps": 30,
-          "spread_pct": 3.4642503638646316
+          "spread_pct": 3.174745151252661
         },
         "large.bin": {
-          "min_s": 0.0923447422683239,
-          "median_s": 0.09391368459910154,
+          "min_s": 0.09337935782968998,
+          "median_s": 0.09841233305633068,
           "reps": 30,
-          "spread_pct": 1.6990055873660972
+          "spread_pct": 5.3898156333652425
         }
       }
     },
@@ -375,12 +383,12 @@
         "vector_regs": []
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 117875000,
+          "kernel_exclusive_ir": 131188820,
           "kernel_functions": [
             "kernel"
           ],
@@ -423,12 +431,12 @@
         "vector_regs": []
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 117850000,
+          "kernel_exclusive_ir": 131163820,
           "kernel_functions": [
             "kernel"
           ],
@@ -473,12 +481,12 @@
         ]
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 140125004,
+          "kernel_exclusive_ir": 156117231,
           "kernel_functions": [
             "kernel"
           ],
@@ -488,7 +496,7 @@
           ]
         },
         "large.bin": {
-          "kernel_exclusive_ir": 888260004,
+          "kernel_exclusive_ir": 901018804,
           "kernel_functions": [
             "kernel"
           ],
@@ -500,16 +508,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.016028648242354393,
-          "median_s": 0.016479920595884323,
+          "min_s": 0.017749162390828133,
+          "median_s": 0.0182302575558424,
           "reps": 30,
-          "spread_pct": 2.815411173210975
+          "spread_pct": 2.7105232034097146
         },
         "large.bin": {
-          "min_s": 0.0903458371758461,
-          "median_s": 0.0922455070540309,
+          "min_s": 0.09169638343155384,
+          "median_s": 0.09415155835449696,
           "reps": 30,
-          "spread_pct": 2.1026645361505056
+          "spread_pct": 2.6775046420186945
         }
       }
     },
@@ -549,14 +557,14 @@
         ]
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
           "kernel_exclusive_ir": null,
           "kernel_functions": [],
-          "main_exclusive_ir": 136600221,
+          "main_exclusive_ir": 152242448,
           "main_functions": [
             "main"
           ]
@@ -564,7 +572,7 @@
         "large.bin": {
           "kernel_exclusive_ir": null,
           "kernel_functions": [],
-          "main_exclusive_ir": 866180221,
+          "main_exclusive_ir": 878659021,
           "main_functions": [
             "main"
           ]
@@ -572,16 +580,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.015976514667272568,
-          "median_s": 0.016373812220990658,
+          "min_s": 0.0176479984074831,
+          "median_s": 0.01838263776153326,
           "reps": 30,
-          "spread_pct": 2.4867598596578935
+          "spread_pct": 4.162734702756194
         },
         "large.bin": {
-          "min_s": 0.09036121517419815,
-          "median_s": 0.09209350682795048,
+          "min_s": 0.09156086668372154,
+          "median_s": 0.09684877283871174,
           "reps": 30,
-          "spread_pct": 1.9170743226646731
+          "spread_pct": 5.775290630719122
         }
       }
     },
@@ -617,12 +625,12 @@
         "vector_regs": []
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 680925000,
+          "kernel_exclusive_ir": 758980220,
           "kernel_functions": [
             "safe_naive::kernel"
           ],
@@ -668,12 +676,12 @@
         ]
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 680925000,
+          "kernel_exclusive_ir": 758980220,
           "kernel_functions": [
             "safe_naive::kernel"
           ],
@@ -717,12 +725,12 @@
         "vector_regs": []
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 210100000,
+          "kernel_exclusive_ir": 234092227,
           "kernel_functions": [
             "safe_naive::kernel"
           ],
@@ -733,7 +741,7 @@
           ]
         },
         "large.bin": {
-          "kernel_exclusive_ir": 1353500000,
+          "kernel_exclusive_ir": 1372658800,
           "kernel_functions": [
             "safe_naive::kernel"
           ],
@@ -746,16 +754,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.021614210680127144,
-          "median_s": 0.02204334270209074,
+          "min_s": 0.023486409336328506,
+          "median_s": 0.024084516800940037,
           "reps": 30,
-          "spread_pct": 1.9854161149551264
+          "spread_pct": 2.5466109188788795
         },
         "large.bin": {
-          "min_s": 0.1239460613578558,
-          "median_s": 0.13124312460422516,
+          "min_s": 0.124492097645998,
+          "median_s": 0.13167646527290344,
           "reps": 30,
-          "spread_pct": 5.887289330881887
+          "spread_pct": 5.77094270460017
         }
       }
     },
@@ -795,14 +803,14 @@
         ]
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
           "kernel_exclusive_ir": null,
           "kernel_functions": [],
-          "main_exclusive_ir": 218475291,
+          "main_exclusive_ir": 243517518,
           "main_functions": [
             "main",
             "safe_naive::main"
@@ -811,7 +819,7 @@
         "large.bin": {
           "kernel_exclusive_ir": null,
           "kernel_functions": [],
-          "main_exclusive_ir": 1410360291,
+          "main_exclusive_ir": 1430359091,
           "main_functions": [
             "main",
             "safe_naive::main"
@@ -820,17 +828,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.020952438935637474,
-          "median_s": 0.021407783031463623,
+          "min_s": 0.022577622905373573,
+          "median_s": 0.024242467246949673,
           "reps": 30,
-          "spread_pct": 2.1732271704735324
+          "spread_pct": 7.373869023119609
         },
         "large.bin": {
-          "min_s": 0.11817605793476105,
-          "median_s": 0.13034618645906448,
+          "min_s": 0.11950486712157726,
+          "median_s": 0.1220953306183219,
           "reps": 30,
-          "spread_pct": 10.298303003999289,
-          "warning": "min-to-median spread > 10% -- `.memory/03-measurement.md` says discard"
+          "spread_pct": 2.167663593240304
         }
       }
     },
@@ -866,12 +873,12 @@
         "vector_regs": []
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 721050000,
+          "kernel_exclusive_ir": 803655220,
           "kernel_functions": [
             "<core::slice::iter::Iter<u8> as core::iter::traits::iterator::Iterator>::fold::<u64, safe_tuned::kernel::{closure#0}>",
             "safe_tuned::kernel",
@@ -919,12 +926,12 @@
         ]
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 721050000,
+          "kernel_exclusive_ir": 803655220,
           "kernel_functions": [
             "<core::slice::iter::Iter<u8> as core::iter::traits::iterator::Iterator>::fold::<u64, safe_tuned::kernel::{closure#0}>",
             "safe_tuned::kernel",
@@ -970,12 +977,12 @@
         "vector_regs": []
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 171700000,
+          "kernel_exclusive_ir": 191208596,
           "kernel_functions": [
             "safe_tuned::kernel"
           ],
@@ -986,7 +993,7 @@
           ]
         },
         "large.bin": {
-          "kernel_exclusive_ir": 1103920000,
+          "kernel_exclusive_ir": 1119478800,
           "kernel_functions": [
             "safe_tuned::kernel"
           ],
@@ -999,16 +1006,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.01796235889196396,
-          "median_s": 0.018216687254607677,
+          "min_s": 0.019612057134509087,
+          "median_s": 0.020675881765782833,
           "reps": 30,
-          "spread_pct": 1.415896231521689
+          "spread_pct": 5.424339853680399
         },
         "large.bin": {
-          "min_s": 0.107169384136796,
-          "median_s": 0.11490792781114578,
+          "min_s": 0.10317022912204266,
+          "median_s": 0.10891627427190542,
           "reps": 30,
-          "spread_pct": 7.220852985841504
+          "spread_pct": 5.569479876860237
         }
       }
     },
@@ -1048,14 +1055,14 @@
         ]
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
           "kernel_exclusive_ir": null,
           "kernel_functions": [],
-          "main_exclusive_ir": 179600289,
+          "main_exclusive_ir": 200108885,
           "main_functions": [
             "main",
             "safe_tuned::main"
@@ -1064,7 +1071,7 @@
         "large.bin": {
           "kernel_exclusive_ir": null,
           "kernel_functions": [],
-          "main_exclusive_ir": 1158120289,
+          "main_exclusive_ir": 1174479089,
           "main_functions": [
             "main",
             "safe_tuned::main"
@@ -1073,16 +1080,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.018525561317801476,
-          "median_s": 0.0189944040030241,
+          "min_s": 0.020214375108480453,
+          "median_s": 0.020855319686233997,
           "reps": 30,
-          "spread_pct": 2.5307880132738982
+          "spread_pct": 3.170736539289068
         },
         "large.bin": {
-          "min_s": 0.10538848862051964,
-          "median_s": 0.11053663957864046,
+          "min_s": 0.10621095076203346,
+          "median_s": 0.11505158338695765,
           "reps": 30,
-          "spread_pct": 4.884927211223384
+          "spread_pct": 8.3236545398522
         }
       }
     },
@@ -1118,12 +1125,12 @@
         "vector_regs": []
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 758925000,
+          "kernel_exclusive_ir": 845925060,
           "kernel_functions": [
             "unsafe::kernel"
           ],
@@ -1169,12 +1176,12 @@
         ]
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 758925000,
+          "kernel_exclusive_ir": 845925060,
           "kernel_functions": [
             "unsafe::kernel"
           ],
@@ -1218,12 +1225,12 @@
         "vector_regs": []
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 153125000,
+          "kernel_exclusive_ir": 170434489,
           "kernel_functions": [
             "unsafe::kernel"
           ],
@@ -1234,7 +1241,7 @@
           ]
         },
         "large.bin": {
-          "kernel_exclusive_ir": 984120000,
+          "kernel_exclusive_ir": 997958800,
           "kernel_functions": [
             "unsafe::kernel"
           ],
@@ -1247,16 +1254,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.017454273998737335,
-          "median_s": 0.01778209302574396,
+          "min_s": 0.019053608179092407,
+          "median_s": 0.01937436033040285,
           "reps": 30,
-          "spread_pct": 1.878159051647413
+          "spread_pct": 1.6834194777995193
         },
         "large.bin": {
-          "min_s": 0.09799371846020222,
-          "median_s": 0.10173760168254375,
+          "min_s": 0.09798361361026764,
+          "median_s": 0.1033972380682826,
           "reps": 30,
-          "spread_pct": 3.820533888467581
+          "spread_pct": 5.525030419420737
         }
       }
     },
@@ -1296,14 +1303,14 @@
         ]
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
           "kernel_exclusive_ir": null,
           "kernel_functions": [],
-          "main_exclusive_ir": 161050290,
+          "main_exclusive_ir": 179434779,
           "main_functions": [
             "main",
             "unsafe::main"
@@ -1312,7 +1319,7 @@
         "large.bin": {
           "kernel_exclusive_ir": null,
           "kernel_functions": [],
-          "main_exclusive_ir": 1038340290,
+          "main_exclusive_ir": 1053039090,
           "main_functions": [
             "main",
             "unsafe::main"
@@ -1321,16 +1328,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.017946001142263412,
-          "median_s": 0.018353053368628025,
+          "min_s": 0.019635668024420738,
+          "median_s": 0.02020191866904497,
           "reps": 30,
-          "spread_pct": 2.268205730835442
+          "spread_pct": 2.8837859955667993
         },
         "large.bin": {
-          "min_s": 0.10142861306667328,
-          "median_s": 0.10680478159338236,
+          "min_s": 0.10183913633227348,
+          "median_s": 0.1043114485219121,
           "reps": 30,
-          "spread_pct": 5.300445667313915
+          "spread_pct": 2.427664136479055
         }
       }
     },
@@ -1366,12 +1373,12 @@
         "vector_regs": []
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 831600000,
+          "kernel_exclusive_ir": 926870760,
           "kernel_functions": [
             "verus::kernel"
           ],
@@ -1415,12 +1422,12 @@
         "vector_regs": []
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 831600000,
+          "kernel_exclusive_ir": 926870760,
           "kernel_functions": [
             "verus::kernel"
           ],
@@ -1464,12 +1471,12 @@
         "vector_regs": []
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 153125000,
+          "kernel_exclusive_ir": 170434489,
           "kernel_functions": [
             "verus::kernel"
           ],
@@ -1480,7 +1487,7 @@
           ]
         },
         "large.bin": {
-          "kernel_exclusive_ir": 984120000,
+          "kernel_exclusive_ir": 997958800,
           "kernel_functions": [
             "verus::kernel"
           ],
@@ -1493,16 +1500,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.01782919652760029,
-          "median_s": 0.018413239158689976,
+          "min_s": 0.01943700574338436,
+          "median_s": 0.01986441295593977,
           "reps": 30,
-          "spread_pct": 3.2757652886127913
+          "spread_pct": 2.198935464640083
         },
         "large.bin": {
-          "min_s": 0.0976864006370306,
-          "median_s": 0.10485848411917686,
+          "min_s": 0.09810482524335384,
+          "median_s": 0.09978398121893406,
           "reps": 30,
-          "spread_pct": 7.341946714563968
+          "spread_pct": 1.711593666687634
         }
       }
     },
@@ -1542,14 +1549,14 @@
         ]
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
           "kernel_exclusive_ir": null,
           "kernel_functions": [],
-          "main_exclusive_ir": 161025285,
+          "main_exclusive_ir": 179409774,
           "main_functions": [
             "main",
             "verus::main"
@@ -1558,7 +1565,7 @@
         "large.bin": {
           "kernel_exclusive_ir": null,
           "kernel_functions": [],
-          "main_exclusive_ir": 1038320285,
+          "main_exclusive_ir": 1053019085,
           "main_functions": [
             "main",
             "verus::main"
@@ -1567,16 +1574,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.018358014523983,
-          "median_s": 0.018798446282744408,
+          "min_s": 0.020238462835550308,
+          "median_s": 0.02075488120317459,
           "reps": 30,
-          "spread_pct": 2.3991252332109427
+          "spread_pct": 2.551667939509502
         },
         "large.bin": {
-          "min_s": 0.1018500067293644,
-          "median_s": 0.10481099132448435,
+          "min_s": 0.10447976179420948,
+          "median_s": 0.10971186216920614,
           "reps": 30,
-          "spread_pct": 2.907201177696409
+          "spread_pct": 5.007764456146221
         }
       }
     },
@@ -1612,12 +1619,12 @@
         "vector_regs": []
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 154200000,
+          "kernel_exclusive_ir": 171610380,
           "kernel_functions": [
             "kernel"
           ],
@@ -1660,12 +1667,12 @@
         "vector_regs": []
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 154200000,
+          "kernel_exclusive_ir": 171610380,
           "kernel_functions": [
             "kernel"
           ],
@@ -1710,12 +1717,12 @@
         ]
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 165025000,
+          "kernel_exclusive_ir": 183468120,
           "kernel_functions": [
             "kernel"
           ],
@@ -1725,7 +1732,7 @@
           ]
         },
         "large.bin": {
-          "kernel_exclusive_ir": 1039440000,
+          "kernel_exclusive_ir": 1054238800,
           "kernel_functions": [
             "kernel"
           ],
@@ -1737,16 +1744,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.016376517713069916,
-          "median_s": 0.01687890850007534,
+          "min_s": 0.018095284700393677,
+          "median_s": 0.018342630937695503,
           "reps": 30,
-          "spread_pct": 3.067751006701944
+          "spread_pct": 1.3669098961258415
         },
         "large.bin": {
-          "min_s": 0.09179223515093327,
-          "median_s": 0.09343030955642462,
+          "min_s": 0.09230520203709602,
+          "median_s": 0.09594912640750408,
           "reps": 30,
-          "spread_pct": 1.7845457219751528
+          "spread_pct": 3.9476912351522957
         }
       }
     },
@@ -1786,14 +1793,14 @@
         ]
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
           "kernel_exclusive_ir": null,
           "kernel_functions": [],
-          "main_exclusive_ir": 165975143,
+          "main_exclusive_ir": 184543263,
           "main_functions": [
             "main"
           ]
@@ -1801,7 +1808,7 @@
         "large.bin": {
           "kernel_exclusive_ir": null,
           "kernel_functions": [],
-          "main_exclusive_ir": 1045900143,
+          "main_exclusive_ir": 1060798943,
           "main_functions": [
             "main"
           ]
@@ -1809,16 +1816,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.016280952841043472,
-          "median_s": 0.016782778315246105,
+          "min_s": 0.017876161262392998,
+          "median_s": 0.018207144923508167,
           "reps": 30,
-          "spread_pct": 3.0822856567556407
+          "spread_pct": 1.8515365589785595
         },
         "large.bin": {
-          "min_s": 0.09221759997308254,
-          "median_s": 0.09341422468423843,
+          "min_s": 0.09274495579302311,
+          "median_s": 0.09876882191747427,
           "reps": 30,
-          "spread_pct": 1.297609904730957
+          "spread_pct": 6.495087601200103
         }
       }
     },
@@ -1854,12 +1861,12 @@
         "vector_regs": []
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 117975000,
+          "kernel_exclusive_ir": 131288820,
           "kernel_functions": [
             "kernel"
           ],
@@ -1902,12 +1909,12 @@
         "vector_regs": []
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 117925000,
+          "kernel_exclusive_ir": 131238820,
           "kernel_functions": [
             "kernel"
           ],
@@ -1952,12 +1959,12 @@
         ]
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
-          "kernel_exclusive_ir": 140675004,
+          "kernel_exclusive_ir": 156817231,
           "kernel_functions": [
             "kernel"
           ],
@@ -1967,7 +1974,7 @@
           ]
         },
         "large.bin": {
-          "kernel_exclusive_ir": 892120004,
+          "kernel_exclusive_ir": 904998804,
           "kernel_functions": [
             "kernel"
           ],
@@ -1979,16 +1986,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.016179272904992104,
-          "median_s": 0.01652939897030592,
+          "min_s": 0.017848914489150047,
+          "median_s": 0.01810234971344471,
           "reps": 30,
-          "spread_pct": 2.1640407907686936
+          "spread_pct": 1.4198915258892637
         },
         "large.bin": {
-          "min_s": 0.09124823100864887,
-          "median_s": 0.09288803581148386,
+          "min_s": 0.09133393131196499,
+          "median_s": 0.09901634696871042,
           "reps": 30,
-          "spread_pct": 1.797081197858576
+          "spread_pct": 8.411348932857132
         }
       }
     },
@@ -2028,14 +2035,14 @@
         ]
       },
       "checksum": {
-        "small.bin": "4724622162658835783",
-        "large.bin": "16949792395555472632"
+        "small.bin": "5115966432339535952",
+        "large.bin": "5544170072369974633"
       },
       "ir": {
         "small.bin": {
           "kernel_exclusive_ir": null,
           "kernel_functions": [],
-          "main_exclusive_ir": 137175221,
+          "main_exclusive_ir": 152958817,
           "main_functions": [
             "main"
           ]
@@ -2043,7 +2050,7 @@
         "large.bin": {
           "kernel_exclusive_ir": null,
           "kernel_functions": [],
-          "main_exclusive_ir": 870080221,
+          "main_exclusive_ir": 882659021,
           "main_functions": [
             "main"
           ]
@@ -2051,16 +2058,16 @@
       },
       "wall": {
         "small.bin": {
-          "min_s": 0.01602788269519806,
-          "median_s": 0.01629235688596964,
+          "min_s": 0.017630401998758316,
+          "median_s": 0.017928019165992737,
           "reps": 30,
-          "spread_pct": 1.6500881357886155
+          "spread_pct": 1.688090647368004
         },
         "large.bin": {
-          "min_s": 0.09089457802474499,
-          "median_s": 0.09282617177814245,
+          "min_s": 0.09140312857925892,
+          "median_s": 0.09708649758249521,
           "reps": 30,
-          "spread_pct": 2.1250923821568444
+          "spread_pct": 6.217915175964728
         }
       }
     }

@@ -3,7 +3,8 @@
 **A loop bound computed from a length byte inside the data.**
 `php_uudecode`, PHP 5.0.0, `ext/standard/uuencode.c:126-171`, lifted verbatim.
 Corpus row CRASH-115 (merged with V5C-116). The first real row of the PHP
-programme (`TASK_PHP_013`).
+programme (`TASK_PHP_013`), reviewed at `TASK_PHP_014` and corrected and
+re-measured at `TASK_PHP_015`.
 
 ```c
 131  p = *dest = emalloc(ceil(src_len * 0.75) + 1);
@@ -45,6 +46,19 @@ allocation.
    in R1/R1h; the Rust rungs use the exhaustively-equal integer form because
    Verus has no `f64`. And `harness/build.py` links no `-lm`, which is why the
    C rungs substitute `floor`/`ceil` by macro. `NOTES.md` §9.
+4. ⚠⚠ **Of the 2004 fix's two guards, one is DEAD.** Hunk 1 (`len > src_len`)
+   fires 1 953 times over 12 600 documents and hunk 2 (`ee > e`) would have
+   refused every one of them; deleting hunk 1 from `verus.rs` still gives
+   `25 verified, 0 errors`. So the patch that missed the real bug for ten years
+   also shipped a check that never decided anything. `NOTES.md` §5e.
+5. ⚠⚠ **The benign fixture used to be a monoculture, and it hid a real defect
+   in `model.py` for a task.** Every line declared 45, so the corpus never took
+   `:141`'s `floor()` arm and `45 ≡ 0 (mod 3)` was the one case in which a line
+   emits as many bytes as it declares. `inputs/gen.py` now emits a short final
+   line and **asserts** that the corpus reaches both arms, and
+   `model.py::selfcheck` drives its two implementations over 896 windows it
+   builds itself. `NOTES.md` §13 — **this is the part a builder of the next row
+   should read first.**
 
 ## Running it
 
@@ -70,11 +84,18 @@ gcc -std=c99 -Wall -Wextra -O1 -g -fsanitize=address,undefined -fstrict-aliasing
 env -u LD_PRELOAD .temp/php13/fixctl control     # must fire
 env -u LD_PRELOAD .temp/php13/fixctl fixed       # fires -- the 2004 fix is incomplete
 
+python3 patterns-php/ph03-uudecode-bound/controls/negatives.py --list
 python3 patterns-php/ph03-uudecode-bound/controls/negatives.py --emit no2014 \
     > patterns-php/ph03-uudecode-bound/verus_no2014_tmp.rs
 python3 verus_run.py .temp/php-root/patterns/ph03-uudecode-bound/verus_no2014_tmp.rs
 rm patterns-php/ph03-uudecode-bound/verus_no2014_tmp.rs
 ```
+
+⚠ **`--list` prints each mutant's expectation and one of the three is
+`MUST VERIFY`** (`no2004a`, `no2004a_both`): they delete the *dead* half of the
+2004 fix, so `25 verified, 0 errors` is the result that proves the point.
+`.temp/php15/19-run-negatives.sh` runs all three against their declared
+expectations in one pass and cleans up in a `trap`.
 
 ⚠ Delete the emitted mutant afterwards: a stray `.rs` in the row directory is a
 source no record pins.

@@ -371,10 +371,12 @@ pub proof fn lemma_emit_covers_declared(ln: int)
 // documented contract for `get_unchecked` is exactly this: if the caller
 // guarantees `i < v.len()`, the call is defined and yields `v[i]`.
 //
-// Four call sites: the length byte, discharged from the outer loop's own
-// condition `s < e`; and `buf[s]`, `buf[s+1]`, `buf[s+2]`, `buf[s+3]` inside
-// the group, discharged from `s + 4 <= e` -- the 2014 check, which is the line
-// c/kernel_hardened.c does NOT have.
+// FIVE call sites (`:602`, `:676`, `:677`, `:678`, `:679`): the length byte,
+// discharged from the outer loop's own condition `s < e`; and `buf[s]`,
+// `buf[s+1]`, `buf[s+2]`, `buf[s+3]` inside the group, discharged from
+// `s + 4 <= e` -- the 2014 check, which is the line c/kernel_hardened.c does
+// NOT have. (This said "Four" over a list of five until TASK_PHP_015;
+// TASK_PHP_014 m2. NOTES.md §10 always said five.)
 #[inline(always)]
 #[verifier::external_body]
 fn get_unchecked(v: &[u8], i: usize) -> (r: u8)
