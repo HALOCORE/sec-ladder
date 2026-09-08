@@ -45,24 +45,22 @@ between them read `CLAUDE.md`'s top table.
 ## ▶ START HERE — the next action, in ≤ 20 lines
 
 ```
-STATE   ROWS BUILT 1 (ph03) · CATALOGUED 91 · Phase 0 CLOSED at _009.
-        NOT YET: .memory-php/ (open item 12).
-NEXT    TASK_PHP_015 -- fix the TEMPLATE, then build ph07.
-          M1: model.py::uu_fold != verus.rs::uu_fold, and inputs/gen.py
-          emits length 45 ONLY, which is what hides it. 90 rows would copy
-          that shape, so the fixture rule lands before the row does.
-        THEN review ph07; then ph21 -> ph16 -> ph12 -> ph29, ph29 LAST.
-ROW 1   ph03 gate PASS, REVIEWED, headline upheld AND strengthened: PHP's
-        real 2004 fix is BOTH DEAD AND INCOMPLETE -- one hunk provably
-        redundant, the other leaving 144 over-reads, unfixed until 2014;
-        Verus refuses it in one line. (F29)
+STATE   ROWS BUILT 1 (ph03, reviewed) · CATALOGUED 91 · Phase 0 CLOSED.
+        .memory-php/ EXISTS (00-corpus 01-extraction 02-ladder 03-numbers
+        04-process) and is AUTHORITATIVE -- read it before any task report.
+NEXT    TASK_PHP_016 is WRITTEN and unstarted: build ph07 (mbfl_strcut).
+        Launch it. Then review it; then ph21 -> ph16 -> ph12 -> ph29 last.
+ROW 1   ph03 gate PASS. PHP's real 2004 fix is BOTH DEAD AND INCOMPLETE --
+        one hunk provably redundant, the other leaving 144 over-reads,
+        unfixed until 2014; Verus refuses it in one line. (F29)
         Ladder (F33): safe_naive +26.8% · safe_tuned +3.7% · unsafe -7.6%
-        · verus == unsafe byte-identical.
+        · verus == unsafe byte-identical · hardened C -0.4% (negative cost).
 BAR     C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
         patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
-READ    PLAN_PHP.md · .tasks/PROTOCOL.md (reused unchanged) · CATALOGUE.md ·
-        then F1-F33 and the open items. Phase 0's five rounds and the mining
-        wave are in .tasks-php/ reports, not here.
+⚠ OPS   .web/ is edited by a CONCURRENT SESSION -- NEVER `git add -A`.
+        Commit with explicit paths or `git add -A -- . ':!.web'`.
+READ    .memory-php/ · PLAN_PHP.md · .tasks/PROTOCOL.md (reused unchanged) ·
+        CATALOGUE.md · then F1-F34 and the open items below.
 ```
 
 ---
@@ -113,6 +111,22 @@ wave's and Phase 0's results; **F8–F10 are new this round.** F8 and F9 are
 MANAGER work and are **unreviewed** — `TASK_PHP_008` attacks F8, and F9 is a
 measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 `.memory-php/` until it survives review.)*
+
+> **Index** — F1 citation frames · F2 CSV authoritative · F3 `crashes_pristine`
+> not absence · F4 the 123-ASan misread · F5 third allocator truncation · F6 the
+> shim invented defects · F7 the digest gap fires · **F8 kills priced at the wrong
+> frame** · **F9 no spatial ASan report is in PHP code** · F10 a grepping guard has
+> a spelling · F11 ask the compiler · F12 three size rules on an invented number ·
+> **F13 a refuted mechanism is not a licence** · F14 `0 STALE` ≠ pinned · F15 the
+> cheapest correct design · **F16 wrong enumeration ≠ unboundable** · F17 the
+> deadlock that denies itself · F18 whitelists fail on contact · F19 success
+> conditions do not travel · F20 one `..` too few · **F21 auditing only what you
+> doubt** · **F22 a kill written as a set** · F23 citations inside the citation
+> finding · F24 shared header, not directory · F25 the `ph11` measurement · F26
+> the fix is a 1.4 KB fetch · F27 set-kills, three instances · F28 demotion cost ·
+> **F29 the 2004 fix is dead AND incomplete** · F30 negative-cost safety check ·
+> F31 two frozen-harness limits · F32 ⚠ the manager arbitrated the un-arbitrable ·
+> **F33 the first ladder** · **F34 the guard moved to the prologue**
 
 ### F1 (PROVISIONAL) — `c_file_line` names the FAULTING FRAME, not the defect
 
@@ -888,7 +902,7 @@ so `q = p + from` can no longer pass the buffer end. ⚠ **The engineer read the
 | ~~10~~ | ✅ **CLOSED at `TASK_PHP_006` — `common-php/*.h` is in NO gate digest, and the `<row>/c/` symlink that was supposed to close the measurement half is BYPASSABLE** | `check.py`'s three `common/` globs are non-recursive and none matches `emalloc_shim.h`. The bridge half **fires** (F7). The symlink half was enforced by nothing (B1), was checked in `gate.py`'s preflight at `TASK_PHP_004` — and `TASK_PHP_005` **F-1** got round it twice, with rows that build, link and run a live allocator into neither digest. **`TASK_PHP_006` closes it** |
 | 17 | ⚠ **PAT-SIDE, LATENT, DELIBERATELY NOT FIXED — and the php side now REFUSES the layout: `check.py:10314` and `measure.py:226` glob `<row>/c/*` NON-RECURSIVELY and drop the directory entry with `isfile()`** | so **every source file a row puts in a `c/` subdirectory is in no digest at all**, and `check.py`'s `--no-build` staleness scan misses it too, so editing one does not even mark a binary stale. ✅ **No row is affected today** — `find patterns patterns-php -mindepth 3 -maxdepth 3 -type d -path '*/c/*'` is empty. ⚠ **Fixing it is a `harness/` edit = a 33-pattern re-gate for zero present benefit.** Decision: **do not fix; FORBID the layout on the php side** (`TASK_PHP_006`), and carry this row so the next person to reach for `c/sub/` finds out first. ⚠ It matters more here than on PAT: php rows are *extracted* C and `c/zend/` is an ordinary thing to want |
 | 11 | A new php row costs **six commands (~28 min)**, not three | `gate → report → gate` is irreducible and `measure.py` builds nothing. Budget it. ✅ The three places that said three/five now say six (`TASK_PHP_004`) |
-| 12 | `.memory-php/` **does not exist yet** | `PLAN_PHP.md` lists it, `TASK_PHP_002` did not ask for it, and rule 4 makes it the manager's. Create it when the first finding survives review |
+| ~~12~~ | ✅ **CLOSED — `.memory-php/` EXISTS**: `00-corpus` `01-extraction` `02-ladder` `03-numbers` `04-process` | Open from the programme's first task to its sixteenth. It carries **only php-specific** findings that survived a full engineer→reviewer cycle; the PAT `.memory/` 00–06 applies unchanged and is **not** restated. ⚠ **It supersedes any task report it contradicts** (rule 9) |
 | 13 | ⚠ **`harness-php/*.py` is in NO digest, and putting it in one costs a 33-pattern re-gate** | `check.py`'s `srcs` would have to reach `harness-php/`, i.e. a `harness/` edit (`PLAN_PHP.md` §2.1). `TASK_PHP_004` landed the **cheap half**: `gate.py` writes `results-php/preflight/<row>.preflight.json` with the `harness-php/*.py` hashes, the manifest hash and whether `--no-provenance` was used. ⚠ **That record is evidence, not a pin — nothing hashes it** — ⚠⚠ **and `TASK_PHP_005` F-2 found it is worse than that: it is written one file per ROW, not per run, so a later preflight ERASES `provenance_skipped: true`; nothing anywhere detects a missing record; and the manager had made it uncommitted.** Being fixed at `TASK_PHP_006` (item 18) |
 | 14 | ⚠⚠ **`provenance.py`'s overlap floor is SATISFIED BY DEAD CODE — the risk is a false PASS, not a false refusal** | Added at `TASK_PHP_004` for `TASK_PHP_003` M5. ⚠ **This row used to say the danger was a good row tripping a floor. `TASK_PHP_005` F-4 shows the opposite**: a kernel that implements *division*, cites *multiplication*, and hides the citation behind `#if 0` scores **100 % and is ACCEPTED** (`_normalise` drops lines starting with `#`, so `#if 0`/`#endif` vanish and everything between them counts); the same kernel without the dead block is refused at 11 %. ✅ **The floor is not too high** — a realistic `verbatim` `mul_function` lift scores 68 %. ⚠ **The check never reads `main.c`, the driver loop or the build, so it measures presence of TEXT IN A FILE, not presence of code in the benchmark**: a pass is not even evidence that the cited lines are compiled |
 | 16 | ⚠ **`TASK_PHP_004` edited `RECAP_PHP.md` — the manager's own handoff file** | `PROTOCOL.md` rule 4 reserves the state layer to the manager, and `TASK_PHP_004.md` did not forbid it explicitly. ✅ **The content is ACCEPTED — it is more accurate than what the manager was about to write** (the `+34` vs `+33` shell artefact, the `3686 → 3695` instability, items 13–15). ⚠ **But the boundary is real**: an engineer correcting the manager's numbers *in the manager's file* is how an unreviewed claim reaches the state layer without passing rule 9. **Future php task files must say explicitly that `RECAP_PHP.md` is manager-only** — the fix is one sentence in the task template, not a rollback of good work |
