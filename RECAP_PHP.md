@@ -1050,8 +1050,17 @@ column**. Measured: **all 166 corpus rows carry one**, and **142 of the 145 ids
 `V5C-116`, `V5C-173` — ⭐ **exactly the three C.1 kills that say "merged by the
 corpus itself", so the CSV's `merged_members` column independently confirms all
 three**). `CRASH-124`'s cell is `cb3cca21b345`; `CRASH-115`'s is
-`f95c1df58349`, **the commit `ph03` established independently** — so the column
-is calibrated against the one row we had already proved.
+`f95c1df58349`, the commit `ph03` ships as its R1h.
+
+⚠ **That is NOT two independent sources agreeing, and this line said it was.**
+`TASK_PHP_013` took `ph03`'s sha from **the corpus's own history layer**
+(`TASK_PHP_012` §7.3 *"predicted this from the corpus's history layer"*), so
+CSV and row share a source. **What calibrates the column is weaker and more
+useful than agreement: the identifier survived BEHAVIOURAL verification.**
+`TASK_PHP_013` applied the patch and measured its effect over 12 600 documents,
+and `TASK_PHP_014` attacked the result. **The column has been confirmed correct
+exactly once, by measurement, on one row** — which is precisely why half 2 below
+is not paranoia.
 
 ⚠ **Nobody joined the two halves that were both already found.**
 `TASK_PHP_012` **M7 counted this very column** (*"166 distinct fix_commit

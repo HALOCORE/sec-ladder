@@ -52,7 +52,10 @@ on all three.
 ⚠ **This section was added after §2–§4 were written, and it changes what §6
 says is owed.** The corpus index has a **`fix_commit` column**
 (`index.csv`, documented at `PLAN_PHP.md:109`) — **all 166 rows carry one**, and
-`CRASH-115`'s cell is `f95c1df58349`, the commit `ph03` proved independently.
+`CRASH-115`'s cell is `f95c1df58349`, the sha `ph03` ships. ⚠ **That is not an
+independent cross-check** — `ph03` took its sha from the same corpus's history
+layer. **What it is: the one row where the corpus's identifier was confirmed by
+MEASUREMENT** (`TASK_PHP_013` applied the patch over 12 600 documents).
 All five relevant patches fetched and read (`RECAP_PHP.md` **F38**):
 
 | row | `fix_commit` | date, author | verdict |
