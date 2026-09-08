@@ -818,6 +818,60 @@ built, so **no ratio here is *the* cost of safety** — each is the cost of *the
 spellings* of these rungs. A different safe-tuned spelling moves row 2's number
 and would move this one.
 
+### F34 — ⚠ `ph07` DOES have a fix, and the manager found it by disbelieving the engineer
+
+`TASK_PHP_015` stopped before building `ph07` and reported that **no
+`fix_commit` could be identified** — that 5.0.0's `for(;;)` survives byte-for-byte
+to 5.3.0, that 5.4.0 rewrites it and *"still never consults `string->len`"*, and
+that this might be **a stronger finding than `ph03`'s**. It disclosed that it had
+**not bisected history**.
+
+✅ **Manager-verified against three upstream tags. The first two claims hold; the
+third is wrong, and a fix exists.**
+
+```
+php-5.0.0  mbfl_strcut body 4708 B   for(;;) present
+php-5.3.0  mbfl_strcut body 4708 B   BYTE-FOR-BYTE IDENTICAL to 5.0.0
+php-5.4.0  mbfl_strcut body 7065 B   rewritten
+```
+
+The 5.0.0 walk, quoted — **its only exit is `n > from`, and `p` is never compared
+against `string->val + string->len`:**
+
+```c
+for (;;) { m = mbtab[*p]; n += m; p += m; if (n > from) break; start = n; }
+```
+
+⚠ `len = string->len` **is** read at the top, but only for the clamps *after* the
+walk (`if (start > len) start = len;`) — **too late; the over-read has happened.**
+⭐ And the same function's **second** walk *is* bounded (`if (k >= (int)string->len)`),
+so `mbfl_strcut` bounds its end search and not its start search.
+
+**But 5.4.0's prologue carries exactly the missing guard:**
+
+```c
+if (from < 0 || length < 0) { return NULL; }
+if (from >= string->len)    { from = string->len; }   /* <-- the bound */
+```
+
+so `q = p + from` can no longer pass the buffer end. ⚠ **The engineer read the
+5.4.0 *walk* (which is still expressed in terms of `from`) and missed the
+*prologue* that makes `from` safe** — the guard moved, it did not vanish.
+
+**Decisions:**
+1. **`ph07` is built with R1h = the 5.4.0 clamp**, not as a hand-written control.
+   ⚠ **The commit that introduced it is NOT yet identified** — bounded work for
+   the build task — and `PROTOCOL_PHP.md` §F item 5's assumption that a
+   `fix_commit` exists **survives**.
+2. ⚠ **The finding is NOT *"PHP never fixed this"*.** It is weaker and still
+   worth having: **the fix arrived inside an unlabelled rewrite, and the
+   vulnerable code shipped byte-identical from 5.0.0 through 5.3.x.**
+3. ⭐ **The reusable lesson is about where a guard is looked for.** Both the
+   engineer and the catalogue characterised this row by *the loop*, so both
+   checked the loop in the fixed version. **A missing bound is often restored in
+   the PROLOGUE, not at the site** — `F1`'s three-frames problem arriving in the
+   *repair* rather than in the defect.
+
 ## Open items — carried, not closed
 
 | # | item | note |
