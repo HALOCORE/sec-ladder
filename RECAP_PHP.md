@@ -64,7 +64,7 @@ BAR     C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
 ⚠ OPS   .web/ is edited by a CONCURRENT SESSION -- NEVER `git add -A`.
         Commit with explicit paths or `git add -A -- . ':!.web'`.
 READ    .memory-php/ · PLAN_PHP.md · .tasks/PROTOCOL.md (reused unchanged) ·
-        CATALOGUE.md · then F1-F36 and the open items below.
+        CATALOGUE.md · then F1-F37 and the open items below.
 ```
 
 ---
@@ -132,7 +132,8 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > F31 two frozen-harness limits · F32 ⚠ the manager arbitrated the un-arbitrable ·
 > **F33 the first ladder** · **F34 the guard moved to the prologue** ·
 > **F35 ⚠⚠ this box's `grep` is silently blind to `string.c`** · **F36 the next
-> batch's four fixes, and two of them DELETE the guard**
+> batch's four fixes, and two of them DELETE the guard** · **F37 the kills that
+> survived the audit are the ones written down as settled**
 
 ### F1 (PROVISIONAL) — `c_file_line` names the FAULTING FRAME, not the defect
 
@@ -1011,6 +1012,38 @@ That is the row engineer's job, and the window is the expensive half.
 mis-catalogued — a C-side question, so it can decide admission.** Settle it at
 source before building.
 
+### F37 — the two kills that survived the audit are the two that were written down as settled
+
+`ADJUDICATION_001` closed with *"**four** instances in one audit (CRASH-136,
+CRASH-157, CRASH-033, CRASH-053) — enough that it is the audit's main result"*:
+each a kill whose stated reason the C-side bar forbids. ⚠⚠ **It is six.**
+`CATALOGUE.md`'s `C.1` — headed *"Kills — **exact** C-side duplication"* — still
+holds **`CRASH-106`** and **`CRASH-109`**, and **neither note claims exactness**:
+
+| | the note's own words | what that is |
+|---|---|---|
+| CRASH-106 `nl2br` | *"distinct only in needing a ~358 MB input, **which is a worse kernel**"* | **cost** |
+| CRASH-109 `wordwrap` | *"the second `alloced` growth path at `:692` **muddies the extraction**"* | **cost** |
+
+**Both name the distinguishing feature and then discount it for cost** — and
+`PLAN_PHP.md` §3.1 admits a *slight variation* as its own row here, on an
+explicit user decision. ✅ **Both admitted, verified at source**
+(`ADJUDICATION_002.md` §2): `ph92` `nl2br` `string.c:3593` — the corpus's **only**
+sizing wrap where the multiplier is a constant, so the attacker has **one** free
+value and the 307 MB input is *a consequence of the mechanism*; `ph93`
+`wordwrap` `string.c:682` + **`:692-694`** — the corpus's **only** buffer
+**regrown mid-emit**, by arithmetic that is itself unchecked `int` and divides by
+an attacker-controlled `linelength`.
+
+⭐⭐ **The reusable result is where the survivors were.** The audit found what it
+went looking for; **the two it missed were sitting in the kill list under a
+heading that asserts the criterion they fail.** `.memory-php/01-extraction.md`
+already says *"an audit that re-examines only what it doubts measures its own
+priors"* — **this is that finding's second confirmation, from the opposite
+direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
+*"merged by the corpus itself"*, a stronger claim than a reviewer's judgement,
+**and nobody has checked that either.**
+
 ## Open items — carried, not closed
 
 | # | item | note |
@@ -1018,7 +1051,7 @@ source before building.
 | 1 | The pristine tarball lives under **another project's gitignored `.temp/`** and is deletable at any time | Phase 0 must land `patterns-php/SOURCES.md` with the sha256 + a per-file manifest before anything cites it |
 | 2 | *"Where does the existing Rust port land on these scales?"* | **deferred, not deleted** (`DP-05`). Well-posed once the corpus exists |
 | 3 | `.web/` does not know `results-php/` exists | deliberate. Do not teach it until there is something worth publishing |
-| 4 | **CRASH-136 (exif) was rejected on EXTRACTION COST** | ⚠ the bar does not permit that as a kill — cost is a *tier*, not a filter. **Manager must re-adjudicate.** The most likely place the spatial axis lost a real row |
+| ~~4~~ | ✅ **CLOSED — and it had been closed for four tasks without the table knowing.** `ADJUDICATION_001.md` item 4 admitted CRASH-136; it is `ph13` (`CATALOGUE.md:91`, `:288`) | ⭐ **And it recovered CRASH-134 too, which no open item ever named.** ⚠ **The lesson is the table, not the row**: `PROTOCOL.md` rule 13 one level up — **when you close a finding, re-read the open-items table.** The successor item (m8) was real and is settled at `ADJUDICATION_002.md` |
 | 5 | `EG(garbage)` is `zval *garbage[2]` with an unchecked `EG(garbage)[EG(garbage_ptr)++]` | a faithful temporal extraction **inherits a SPATIAL overflow**. Flagged, not bounded away — bounding it silently would be §4.2's invented non-defect. Manager decides |
 | 6 | Four temporal merges flagged as probably wrong | ranks 21, 8, 12, 23. Split decisions owed at catalogue adjudication |
 | ~~7~~ | ✅ **CLOSED at F9 — and the check turned out to be impossible.** All spatial `hotness` fields stay **reasoned** | The census holds **zero** spatial reports from `Zend/` or `ext/standard/`: 2156 of 2520 fault inside `libmysqlclient.so.14`, the rest in the regex matcher. **The census is struck as a source of spatial frequency evidence** rather than left as an open promise |
@@ -1036,4 +1069,4 @@ source before building.
 | ~~20~~ | ✅ **CLOSED at `TASK_PHP_006`** (was: `gate.py <row> --preflight` silently forwarded the flag and ran the tool) | `argparse.REMAINDER` collects from the first positional (`TASK_PHP_005` F-7). ⚠⚠ **The manager's own 06:55 `ph00.preflight.json` — cited as manager-verified evidence for the gitignore decision — is an instance: a FAILED `check.py` launch (`tool_returncode 2`) recorded as a preflight.** Part of the evidence for a manager decision was an artefact of a CLI bug |
 | 15 | ⚠ **The php staleness check is `gate.py --tool measure --check-stale`** and the mandated PAT `66/0` one does **not** examine `results-php/` at all | Both are now in `PROTOCOL_PHP.md` §E1 (`TASK_PHP_004`); today the php side is **2 records** |
 | 21 | ⚠⚠ **`TASK_PHP_012` M4 — 12 rows declare `verbatim` whose defect site is inside a `PHP_FUNCTION` / VM-handler / arg-parsing frame, i.e. **`narrowed`** — and NONE has been corrected in `CATALOGUE.md`** | ✅ **Re-run and reproduced by the manager** (`.temp/mgr/batch/tier_recheck.log`): `ph05 ph11 ph12 ph21 ph22 ph24 ph35 ph50 ph55 ph59 ph76 ph80`. ⚠ **A cost statement, never a filter — no row's admission moves.** But `provenance.py` reports overlap **against the declared tier's expectation** (50 % / 25 %) and `TASK_PHP_008` made that a report rather than a floor, so **a mis-declared `verbatim` row hands its reviewer a scary number that is indistinguishable from a bad extraction.** `TASK_PHP_012` said *fix before the first row*; `ph03` was unaffected, **but `ph12` and `ph21` are in the NEXT BATCH.** ✅ **Landing is staged and mechanical**: `python3 .temp/mgr/land_m4.py --check\|--apply` edits Part A + Part B for all 12 and **refuses unless every row has exactly two occurrences** (dry-run: 24 edits, 2 each). **Blocked only by `PROTOCOL.md` rule 11** — `TASK_PHP_016` is reading `CATALOGUE.md`. **Land it the moment that task reports** |
-| 22 | ⚠ **The rest of `TASK_PHP_012`'s catalogue corrections are still owed** — M1 (6 of 12 "merges" are silent drops), M2 (the four-`LOGIC` set kill), M3 (CRASH-021 reverses → a `ph60` merge, not a kill), M5 (CRASH-061/126 in the wrong family), and the minors m1/m5/m8 | Batch them with item 21's landing (`PROTOCOL.md` rule 6) — they are all `CATALOGUE.md` edits and share its rule-11 block. ⚠ **m8 and open item 4 point at the same place**: `CRASH-106`/`CRASH-109` killed as *exact* duplicates on a cost judgement `C.0` forbids, **the most likely place the spatial axis lost a real row** |
+| 22 | ⚠ **The rest of `TASK_PHP_012`'s catalogue corrections are still owed** — M1 (6 of 12 "merges" are silent drops), M2 (the four-`LOGIC` set kill), M3 (CRASH-021 reverses → a `ph60` merge, not a kill), M5 (CRASH-061/126 in the wrong family), and the minors m1/m5/m8 | Batch them with item 21's landing (`PROTOCOL.md` rule 6) — they are all `CATALOGUE.md` edits and share its rule-11 block. ✅ **m8 is ADJUDICATED** (`ADJUDICATION_002.md` §2, F37): `CRASH-106` → **`ph92`**, `CRASH-109` → **`ph93`**, both admitted, mechanisms and citations verified at source, §4 gives the exact Part A / Part B / Part C edits. **What is owed is the LANDING, not the judgement** — and the catalogue goes **91 → 93** |
