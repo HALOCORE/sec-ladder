@@ -47,6 +47,29 @@ this box's `grep` reports as empty.
 `:4120/:4144/:4145`; `ADJUDICATION_001.md` §0's `:4119/:4143/:4144` is off by one
 on all three.
 
+## §1b ⭐ THE COMMITS ARE PINNED AFTER ALL — and two of them are the wrong fix
+
+⚠ **This section was added after §2–§4 were written, and it changes what §6
+says is owed.** The corpus index has a **`fix_commit` column**
+(`index.csv`, documented at `PLAN_PHP.md:109`) — **all 166 rows carry one**, and
+`CRASH-115`'s cell is `f95c1df58349`, the commit `ph03` proved independently.
+All five relevant patches fetched and read (`RECAP_PHP.md` **F38**):
+
+| row | `fix_commit` | date, author | verdict |
+|---|---|---|---|
+| `ph29` | **`445daac3ab1a`** | 2004-07-28 Ilia | ✅ **exact, minimal** — adds `if (to_read <= 0) … RETURN_FALSE;`, nothing else. **Use it.** |
+| `ph16` | **`99e290f882c9`** | 2004-09-17 Wez | ✅ **right fix, big commit** — *"Bug #24189: possibly unsafe select(2) usage… by using poll(2)"*, 10 files / 27 KB; **it introduces `PHP_SAFE_FD_SET`** and applies it at the row's line. **Use it, and cite the hunk, not the commit.** |
+| `ph12` | `896a5216d73d` | 2006-04-25 Tony | ❌ **LATER fix.** Its pre-image already reads `if ((offset + len) >= s1_len)` — **the `len &&` short-circuit is already gone.** Fixes bug #33605 instead. **R1h is the earlier change (§3); cite both.** |
+| `ph21` | `c591f022f8ab` | 2015-05-10 Stas | ❌ **LATER fix, by nine years.** Adds `if (result_len > INT_MAX)` to a function that is already `size_t` + `safe_emalloc`. **R1h is the 5.2.0 change (§2); cite both.** |
+| *(`ph07`)* | **`cb3cca21b345`** | 2005-12-15 Ilia | ⭐ *not this batch, but the same lookup:* *"Fixed possible memory corruption inside `mb_strcut()`"* — **in the CALLER, `ext/mbstring/mbstring.c`**, which is why `mbfl_strcut` never changed |
+
+⚠⚠ **THE RULE THIS ESTABLISHES: the column names *a* fix for the row's function,
+not necessarily the one that removes the 5.0.0 defect.** Both `ph12` and `ph21`
+would have shipped a **wrong R1h with a plausible sha and a security-sounding
+subject** if the column had been trusted alone. **The column and the tag bisect
+below are complementary — the column gives you a real commit, the bisect tells
+you whether it is yours.**
+
 ## §2 `ph21` — `str_repeat`, and upstream DELETED the guard
 
 **5.0.0 and 5.1.0, identical** (`ext/standard/string.c`):
@@ -230,8 +253,10 @@ obligation. **`ph17` stays deferred**; do not pick it up as a fifth.
 
 ## §7 What this survey does NOT give you
 
-1. **No commit is pinned** — only tag windows. Expect real work; §0 has the URL
-   form that works.
+1. ~~**No commit is pinned** — only tag windows.~~ ✅ **Superseded by §1b: all
+   four are pinned from `index.csv`.** ⚠ **But two of the four name a LATER fix
+   than the one that removes the 5.0.0 defect**, so the tag windows in §2–§4 are
+   still the thing that decides R1h. **Cite both, and say which is which.**
 2. **No admission decision.** All four are still subject to the C-side bar.
 3. **No claim that a fix is complete.** `ph03` taught that a shipped fix can be
    **dead and incomplete at once** — measure both ends (`.memory-php/02`).

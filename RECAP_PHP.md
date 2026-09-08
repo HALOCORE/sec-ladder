@@ -50,21 +50,20 @@ STATE   ROWS BUILT 1 (ph03, reviewed) · CATALOGUED 91 · Phase 0 CLOSED.
         04-process) and is AUTHORITATIVE -- read it before any task report.
 NEXT    TASK_PHP_016 RUNNING: build ph07 (mbfl_strcut). Review it next; then
         the batch ph21 -> ph16 -> ph12 -> ph29, pre-briefed in
-        .tasks-php/UPSTREAM_001.md -- all 4 fixes already located (F36).
-⚠ GREP  ALWAYS `grep -a` ON THE CORPUS. `grep` in a Bash call is a wrapper
-        function -> ugrep: on string.c + 40 files it exits 1 with NO stdout
-        and NO stderr = "absent". 13 rows cite one. rg, /usr/bin/grep and
-        a script run by `sh` all SUCCEED, so a probe script lies. (F35)
-ROW 1   ph03 gate PASS. PHP's real 2004 fix is BOTH DEAD AND INCOMPLETE --
-        one hunk provably redundant, the other leaving 144 over-reads. (F29)
-        Ladder (F33): naive +26.8% · tuned +3.7% · unsafe -7.6% · verus ==
-        unsafe byte-identical · hardened C -0.4% (negative cost).
+        .tasks-php/UPSTREAM_001.md -- 4 fixes located AND pinned (F36/F38).
+⚠ FIX   `fix_commit` is a COLUMN in the corpus index.csv (142/145 rows) -- but
+        it names *a* fix, not always THE one; 2 of 4 were later. Check. (F38)
+⚠ GREP  ALWAYS `grep -a` ON THE CORPUS. `grep` in a Bash call is a wrapper ->
+        ugrep: on string.c + 40 files it exits 1 SILENTLY = "absent". 13 rows
+        cite one. rg, /usr/bin/grep and `sh` scripts all succeed. (F35)
+ROW 1   ph03 gate PASS. PHP's real 2004 fix is BOTH DEAD AND INCOMPLETE (F29);
+        the measured ladder is in .memory-php/02-ladder.md. (F33)
 BAR     C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
         patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
 ⚠ OPS   .web/ is edited by a CONCURRENT SESSION -- NEVER `git add -A`.
         Commit with explicit paths or `git add -A -- . ':!.web'`.
 READ    .memory-php/ · PLAN_PHP.md · .tasks/PROTOCOL.md (reused unchanged) ·
-        CATALOGUE.md · then F1-F37 and the open items below.
+        CATALOGUE.md · then F1-F38 and the open items below.
 ```
 
 ---
@@ -133,7 +132,8 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > **F33 the first ladder** · **F34 the guard moved to the prologue** ·
 > **F35 ⚠⚠ this box's `grep` is silently blind to `string.c`** · **F36 the next
 > batch's four fixes, and two of them DELETE the guard** · **F37 the kills that
-> survived the audit are the ones written down as settled**
+> survived the audit are the ones written down as settled** · **F38 ⚠⚠ the
+> `fix_commit` was a column in the corpus index, and it is not always THE fix**
 
 ### F1 (PROVISIONAL) — `c_file_line` names the FAULTING FRAME, not the defect
 
@@ -879,11 +879,38 @@ so `q = p + from` can no longer pass the buffer end. ⚠ **The engineer read the
 5.4.0 *walk* (which is still expressed in terms of `from`) and missed the
 *prologue* that makes `from` safe** — the guard moved, it did not vanish.
 
+> ⚠⚠⚠ **SUPERSEDED IN PART BY F38 — READ THAT FIRST.** The facts above about
+> the 5.0.0/5.3.0/5.4.0 *code* all hold. **The conclusion drawn from them does
+> not: the real fix is `cb3cca21b345` (Ilia Alshanetsky, 2005-12-15, *"Fixed
+> possible memory corruption inside mb_strcut()"*), and it is in
+> `PHP_FUNCTION(mb_strcut)` in `ext/mbstring/mbstring.c` — THE CALLER, IN
+> ANOTHER FILE:**
+>
+> ```c
+> if (from > Z_STRLEN_PP(arg1)) { RETURN_FALSE; }
+> if (((unsigned) from + (unsigned) len) > Z_STRLEN_PP(arg1)) { len = Z_STRLEN_PP(arg1) - from; }
+> ret = mbfl_strcut(&string, &result, from, len);
+> ```
+>
+> ⭐ **That is WHY `mbfl_strcut`'s body is byte-identical 5.0.0 → 5.3.0** — the
+> bound was restored one function up and one file away, in 2005, under an
+> explicit security subject line. The 5.4.0 prologue clamp is a **second, later**
+> restoration of the same bound inside `mbfl_strcut` itself.
+> ⚠ **So this finding's own lesson must be widened**: a missing bound is often
+> restored in the prologue — **or in the CALLER, in a different file, under the
+> caller's name.** A search keyed on the defect's function cannot find it, which
+> is exactly what happened (F38).
+> ⚠ **And the row must ask whether the caller-side guard is COMPLETE**: with
+> `from == string->len` permitted, the start walk still advances `p` by `m` while
+> `n <= from`, so `p` can pass the buffer end. **`ph03`'s shape — a real fix that
+> is incomplete — is live here and is the row's job to settle by measurement.**
+
 **Decisions:**
-1. **`ph07` is built with R1h = the 5.4.0 clamp**, not as a hand-written control.
-   ⚠ **The commit that introduced it is NOT yet identified** — bounded work for
-   the build task — and `PROTOCOL_PHP.md` §F item 5's assumption that a
-   `fix_commit` exists **survives**.
+1. ⚠ **SUPERSEDED: `ph07`'s R1h is `cb3cca21b345`**, the real 2005 caller-side
+   fix — not the 5.4.0 clamp, and not a hand-written control. The running build
+   task was sent this correction mid-flight. `PROTOCOL_PHP.md` §F item 5's
+   assumption that a `fix_commit` exists **survives, and F38 shows it holds for
+   142 of the 145 ids the catalogue cites.**
 2. ⚠ **The finding is NOT *"PHP never fixed this"*.** It is weaker and still
    worth having: **the fix arrived inside an unlabelled rewrite, and the
    vulnerable code shipped byte-identical from 5.0.0 through 5.3.x.**
@@ -1012,6 +1039,58 @@ That is the row engineer's job, and the window is the expensive half.
 mis-catalogued — a C-side question, so it can decide admission.** Settle it at
 source before building.
 
+### F38 — ⚠⚠⚠ THE `fix_commit` WAS IN A COLUMN OF THE CORPUS INDEX ALL ALONG — AND IT IS NOT ALWAYS *THE* FIX
+
+**Both halves of this finding matter and the second is the one that saves a row.**
+
+**Half 1 — the lookup nobody did.**
+`paper/evaluation/security/vuln-corpus-5.0/index.csv` has a **`fix_commit`
+column**. Measured: **all 166 corpus rows carry one**, and **142 of the 145 ids
+`CATALOGUE.md` cites resolve to one** (the 3 that do not are `V5C-015`,
+`V5C-116`, `V5C-173` — ⭐ **exactly the three C.1 kills that say "merged by the
+corpus itself", so the CSV's `merged_members` column independently confirms all
+three**). `CRASH-124`'s cell is `cb3cca21b345`; `CRASH-115`'s is
+`f95c1df58349`, **the commit `ph03` established independently** — so the column
+is calibrated against the one row we had already proved.
+
+⚠ **Nobody joined the two halves that were both already found.**
+`TASK_PHP_012` **M7 counted this very column** (*"166 distinct fix_commit
+values… and no repository to resolve them against"*) and correctly called the
+blocker *resolution*; `TASK_PHP_013` **solved resolution** (F26, the `.patch`
+URL). **From task 13 the answer was one lookup away, and at task 15 an engineer
+searched the GitHub commit API and five tag snapshots instead, and the manager
+then bisected five tags on top of that.**
+
+⭐ **Why the search HAD to fail, and it is not carelessness.** Everyone reasoned
+about the row as *`mbfl_strcut`*, so everyone searched **by function name**. The
+fix's subject says **`mb_strcut()`** and its diff touches **`mbstring.c`**.
+`TASK_PHP_015`'s search was correct and its corpus was wrong — and it bounded its
+own claim explicitly (*"'no fix_commit exists' is **not** proved"*), which is why
+this cost a task and not a row. **The key you hold is not the key the answer is
+filed under** — `F1`'s three-frames problem, arriving in the *tooling*.
+
+**Half 2 — ⚠⚠ THE COLUMN NAMES *A* FIX, NOT NECESSARILY *THE* MEMORY-SAFETY FIX.**
+All five commits fetched and read. **Two of four batch rows would have shipped a
+wrong R1h if the column had been taken on faith:**
+
+| row | CSV `fix_commit` | what it actually is |
+|---|---|---|
+| `ph29` | `445daac3ab1a` (2004-07-28, Ilia) | ✅ **exact and minimal** — adds `if (to_read <= 0) … RETURN_FALSE;` and nothing else |
+| `ph16` | `99e290f882c9` (2004-09-17, Wez) | ✅ **the right fix, inside a 10-file 27 KB change** — *"Bug #24189: possibly unsafe select(2) usage. We avoid the problem by using poll(2)"*; it **introduces** `PHP_SAFE_FD_SET` and applies it at the row's line |
+| `ph12` | `896a5216d73d` (2006-04-25, Tony) | ❌ **a LATER fix.** Its own pre-image is already `if ((offset + len) >= s1_len)` — **the `len &&` short-circuit, which is the 5.0.0 defect, was gone before this commit.** This one fixes bug #33605, a negative offset with `len == 0` |
+| `ph21` | `c591f022f8ab` (2015-05-10, Stas) | ❌ **a later fix, nine years on.** *"Fix bug #69403 and other int overflows"* adds `if (result_len > INT_MAX)` to a function that by then is **already** `size_t` + `safe_emalloc` — the 5.2.0 change that removed the defect |
+
+⭐⭐ **So the column and the tag bisect are COMPLEMENTARY, and neither alone is
+sufficient.** The column hands you a real sha with a security-sounding subject
+that touches the right function; **only the bisect tells you whether it removes
+*your* defect.** The `UPSTREAM_001` survey is not made redundant by this finding
+— **it is what caught it.**
+
+**→ The pre-build checklist gains the item `TASK_PHP_015` asked for**, in the
+form its own evidence now demands: *"read `index.csv`'s `fix_commit` for this
+id, fetch the patch, **and confirm against the tags that it is the commit which
+removes the 5.0.0 defect** — if it is not, cite both."*
+
 ### F37 — the two kills that survived the audit are the two that were written down as settled
 
 `ADJUDICATION_001` closed with *"**four** instances in one audit (CRASH-136,
@@ -1070,3 +1149,4 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 | 15 | ⚠ **The php staleness check is `gate.py --tool measure --check-stale`** and the mandated PAT `66/0` one does **not** examine `results-php/` at all | Both are now in `PROTOCOL_PHP.md` §E1 (`TASK_PHP_004`); today the php side is **2 records** |
 | 21 | ⚠⚠ **`TASK_PHP_012` M4 — 12 rows declare `verbatim` whose defect site is inside a `PHP_FUNCTION` / VM-handler / arg-parsing frame, i.e. **`narrowed`** — and NONE has been corrected in `CATALOGUE.md`** | ✅ **Re-run and reproduced by the manager** (`.temp/mgr/batch/tier_recheck.log`): `ph05 ph11 ph12 ph21 ph22 ph24 ph35 ph50 ph55 ph59 ph76 ph80`. ⚠ **A cost statement, never a filter — no row's admission moves.** But `provenance.py` reports overlap **against the declared tier's expectation** (50 % / 25 %) and `TASK_PHP_008` made that a report rather than a floor, so **a mis-declared `verbatim` row hands its reviewer a scary number that is indistinguishable from a bad extraction.** `TASK_PHP_012` said *fix before the first row*; `ph03` was unaffected, **but `ph12` and `ph21` are in the NEXT BATCH.** ✅ **Landing is staged and mechanical**: `python3 .temp/mgr/land_m4.py --check\|--apply` edits Part A + Part B for all 12 and **refuses unless every row has exactly two occurrences** (dry-run: 24 edits, 2 each). **Blocked only by `PROTOCOL.md` rule 11** — `TASK_PHP_016` is reading `CATALOGUE.md`. **Land it the moment that task reports** |
 | 22 | ⚠ **The rest of `TASK_PHP_012`'s catalogue corrections are still owed** — M1 (6 of 12 "merges" are silent drops), M2 (the four-`LOGIC` set kill), M3 (CRASH-021 reverses → a `ph60` merge, not a kill), M5 (CRASH-061/126 in the wrong family), and the minors m1/m5/m8 | Batch them with item 21's landing (`PROTOCOL.md` rule 6) — they are all `CATALOGUE.md` edits and share its rule-11 block. ✅ **m8 is ADJUDICATED** (`ADJUDICATION_002.md` §2, F37): `CRASH-106` → **`ph92`**, `CRASH-109` → **`ph93`**, both admitted, mechanisms and citations verified at source, §4 gives the exact Part A / Part B / Part C edits. **What is owed is the LANDING, not the judgement** — and the catalogue goes **91 → 93** |
+| 23 | ⚠⚠ **FIVE doc edits are BLOCKED ONLY by `PROTOCOL.md` rule 11** — `TASK_PHP_016` is reading `CATALOGUE.md`, `.memory-php/` and `PROTOCOL_PHP.md`. **Land all five in ONE pass the moment it reports** (rule 6) | **(a)** `python3 .temp/mgr/land_m4.py --apply` — the 12 mis-tiered rows (item 21). **(b)** `ADJUDICATION_002.md` §4 — add `ph92`/`ph93`, delete their `C.1` kills **and record the re-adjudication in place** (a kill that vanishes is worse than a kill that was wrong — M1), narrow `ph28`'s uniqueness claim to *resident*. Catalogue **91 → 93**. **(c)** `.memory-php/02-ladder.md` — F34's *"the guard moved to the PROLOGUE"* is **superseded**: it moved to the **CALLER, in another file** (F38), and the entry names `ph07`'s R1h, which is now `cb3cca21b345`. **(d)** `.memory-php/00-corpus.md` — its header says findings run *"F1–F34"* (rule 13: headers rot), and it should carry the **`fix_commit` column** and the **`grep -a`** hazard. **(e)** `PROTOCOL_PHP.md` — the `grep -a` rule (F35) and the pre-build item `TASK_PHP_015` asked for, in F38's stronger form: *read the CSV's `fix_commit`, fetch the patch, **and confirm against the tags that it removes the 5.0.0 defect**; if not, cite both* |
