@@ -51,6 +51,7 @@ STATE   ROWS BUILT 1 (ph03, reviewed) · CATALOGUED 91 · Phase 0 CLOSED.
 NEXT    TASK_PHP_016 RUNNING: build ph07 (mbfl_strcut). Review it next; then
         the batch ph21 -> ph16 -> ph12 -> ph29, pre-briefed in
         .tasks-php/UPSTREAM_001.md -- 4 fixes located AND pinned (F36/F38).
+        Every OTHER row's fix is surveyed in FIXSURVEY_001.md (F40).
 ⚠ FIX   `fix_commit` is a COLUMN in the corpus index.csv (142/145 rows) -- but
         it names *a* fix, not always THE one; 2 of 4 were later. Check. (F38)
 ⚠ GREP  ALWAYS `grep -a` ON THE CORPUS. `grep` in a Bash call is a wrapper ->
@@ -63,7 +64,7 @@ BAR     C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
 ⚠ OPS   .web/ is edited by a CONCURRENT SESSION -- NEVER `git add -A`.
         Commit with explicit paths or `git add -A -- . ':!.web'`.
 READ    .memory-php/ · PLAN_PHP.md · .tasks/PROTOCOL.md (reused unchanged) ·
-        CATALOGUE.md · then F1-F39 and the open items below.
+        CATALOGUE.md · then F1-F40 and the open items below.
 ```
 
 ---
@@ -134,7 +135,8 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > batch's four fixes, and two of them DELETE the guard** · **F37 the kills that
 > survived the audit are the ones written down as settled** · **F38 ⚠⚠ the
 > `fix_commit` was a column in the corpus index, and it is not always THE fix** ·
-> **F39 ⚠⚠ ph03's ladder is a pair of spellings and its own contract says so**
+> **F39 ⚠⚠ ph03's ladder is a pair of spellings and its own contract says so** ·
+> **F40 the fix hunt is done for the whole catalogue, once**
 
 ### F1 (PROVISIONAL) — `c_file_line` names the FAULTING FRAME, not the defect
 
@@ -1055,6 +1057,42 @@ That is the row engineer's job, and the window is the expensive half.
 **Either the mechanism is 32-bit-only, or it is elsewhere, or the row is
 mis-catalogued — a C-side question, so it can decide admission.** Settle it at
 source before building.
+
+### F40 — the fix hunt is now done for the WHOLE catalogue, once — `.tasks-php/FIXSURVEY_001.md`
+
+`ph07` cost a task to *"where is the upstream fix?"*. **That question is now
+answered mechanically for every catalogued row** (`python3
+.tasks-php/fixsurvey.py`, 84 rows, patches cached, **zero fetch failures**).
+Only what changes a decision:
+
+- ⚠ **6 rows have the `ph07` shape — the fix is in ANOTHER FILE**: `ph07 ph27
+  ph54 ph88 ph89 ph90`. ⭐ **Four cross a subsystem boundary** (ext ↔ Zend,
+  executor ↔ compiler); `ph27`'s file was **also moved** (`ext/standard/reg.c` →
+  `ext/ereg/ereg.c`). **A function-name search cannot find any of them**, and
+  each owes a statement about an `R1h` guard that is not in its kernel's
+  translation unit.
+- ⚠ **9 fixes touch ≥ 5 files** — `ph24` **16**, `ph16` 10, `ph26` 9, `ph23` 8,
+  then `ph39 ph54 ph65 ph73 ph76`. ✅ `ph24` and `ph26` are **independently**
+  `history_status: fixed-by-rewrite`; the two fields agree.
+- ⚠⚠ **`ph36` has no sha at all** — `(bison-regeneration; no single commit)`.
+  **Exactly one row in the corpus**, so §F5 needs one escape hatch (F38).
+- ⭐⭐ **31 % of rows (26 of 83) were fixed in 2010 or later**, against a 5.0.0
+  release of 2004-07-13. **Each is one of two very different findings and the
+  survey cannot tell them apart**: *the defect really survived 6–21 years*, or
+  *the named commit is a later hardening* — **which is what `ph21`'s 2015 commit
+  turned out to be** (F38). ⚠ **This is the measurement that makes the per-row
+  tag check mandatory rather than cautious: it is live on a third of the corpus.**
+- ⭐ **The standout: `ph22` (`pack`) — `865739e5b196`, 2025**, *"pack with h or H
+  format string overflow"*. **If it is the same defect, PHP shipped it for 21
+  years.** ⚠ **Unverified, and the most valuable single row in the corpus to
+  settle** — it is either the programme's best headline or its cleanest example
+  of a mis-attributed fix.
+- ⚠ `ph49` and `ph50` resolve to **one** corpus id and commit (CRASH-153).
+  Two rows from one report is legitimate — the catalogue splits by mechanism —
+  **but nobody has checked these two are distinct.** Flagged, not judged.
+
+⚠ **Coverage**: 7 rows (`ph48 ph52 ph66 ph82 ph83 ph84 ph85`) do not expose an
+id to the parse — **a limit of the parse, not the corpus.** Resolve by hand.
 
 ### F39 — ⚠⚠⚠ `ph03`'s LADDER IS A PAIR OF SPELLINGS, ITS OWN CONTRACT SAYS SO, AND THE PAT RECORD SAYS THE MISSING NUMBER MOVES **AGAINST SAFE RUST**
 
